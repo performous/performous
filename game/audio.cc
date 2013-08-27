@@ -6,6 +6,7 @@
 #include "libda/portaudio.hpp"
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/range/iterator_range.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/lexical_cast.hpp>
 #include <cmath>
@@ -95,8 +96,7 @@ public:
 	* @param length the duration of the current audio block
 	*/
 	void timeSync(time_duration audioPos, time_duration length) {
-		const double maxError = 0.1;  // Step the clock instead of skewing if over 100 ms off
-		const double fudgeFactor = 0.1;  // Adjustment ratio
+		constexpr double maxError = 0.1;  // Step the clock instead of skewing if over 100 ms off
 		// Full correction requires locking, but we can update max without lock too
 		boost::mutex::scoped_try_lock l(m_mutex, boost::defer_lock);
 		double max = getSeconds(audioPos + length);
@@ -106,20 +106,20 @@ public:
 		}
 		// Mutex locked - do a full update
 		ptime now = getTime();
-		double sys = pos_internal(now);  // Current position (based on system clock + corrections)
-		double audio = getSeconds(audioPos);  // Audio time
-		double diff = audio - sys;
+		const double sys = pos_internal(now);  // Current position (based on system clock + corrections)
+		const double audio = getSeconds(audioPos);  // Audio time
+		const double diff = audio - sys;
 		// Skew-based correction only if going forward and relatively well synced
 		if (max > m_max && std::abs(diff) < maxError) {
+			constexpr double fudgeFactor = 0.001;  // Adjustment ratio
 			// Update base position (this should not affect the clock)
 			m_baseTime = now;
 			m_basePos = sys;
 			// Apply a VERY ARTIFICIAL correction for clock!
-			double valadj = getSeconds(length) * 0.1 * rand() / RAND_MAX;  // Dither
-			m_skew = 0.99 * m_skew + 0.01 * (diff < valadj ? -1.0 : 1.0) * fudgeFactor;
+			const double valadj = getSeconds(length) * 0.1 * rand() / RAND_MAX;  // Dither
+			m_skew += (diff < valadj ? -1.0 : 1.0) * fudgeFactor;
 			// Limits to keep things sane in abnormal situations
-			if (m_skew > 0.01) m_skew = 0.01;
-			else if (m_skew < -0.01) m_skew = -0.01;
+			m_skew = clamp(m_skew, -0.01, 0.01);
 		} else {
 			// Off too much, step to correct time
 			m_baseTime = now;
@@ -140,7 +140,7 @@ class Music {
 		FFmpeg mpeg;
 		float fadeLevel;
 		float pitchFactor;
-		Track(std::string const& filename, unsigned int sr): mpeg(false, true, filename, sr), fadeLevel(1.0f), pitchFactor(0.0f) {}
+		Track(fs::path const& filename, unsigned int sr): mpeg(filename, sr), fadeLevel(1.0f), pitchFactor(0.0f) {}
 	};
 	typedef boost::ptr_map<std::string, Track> Tracks;
 	Tracks tracks; ///< Audio decoders
@@ -152,14 +152,13 @@ class Music {
 public:
 	double fadeLevel;
 	double fadeRate;
-	typedef std::map<std::string,std::string> Files;
 	typedef std::vector<float> Buffer;
-	Music(Files const& filenames, unsigned int sr, bool preview):
+	Music(Audio::Files const& files, unsigned int sr, bool preview):
 	  srate(sr), m_pos(), m_preview(preview), fadeLevel(), fadeRate()
 	{
-		for (Files::const_iterator it = filenames.begin(), end = filenames.end(); it != end; ++it) {
-			if (it->second.empty()) continue; // Skip tracks with no filenames; FIXME: Why do we even have those here, shouldn't they be eliminated earlier?
-			tracks.insert(it->first, std::auto_ptr<Track>(new Track(it->second, sr)));
+		for (auto const& tf /* trackname-filename pair */: files) {
+			if (tf.second.empty()) continue; // Skip tracks with no filenames; FIXME: Why do we even have those here, shouldn't they be eliminated earlier?
+			tracks.insert(tf.first, std::auto_ptr<Track>(new Track(tf.second, sr)));
 		}
 	}
 	/// Sums the stream to output sample range, returns true if the stream still has audio left afterwards.
@@ -236,12 +235,11 @@ public:
 
 struct Sample {
   private:
-	unsigned int srate;
 	double m_pos;
 	FFmpeg mpeg;
 	bool eof;
   public:
-	Sample(std::string const& filename, unsigned sr) : srate(sr), m_pos(), mpeg(false, true, filename, sr), eof(true) { }
+	Sample(fs::path const& filename, unsigned sr) : m_pos(), mpeg(filename, sr), eof(true) { }
 	void operator()(float* begin, float* end) {
 		if(eof) {
 			// No more data to play in this sample
@@ -267,7 +265,7 @@ struct Synth {
 	Notes m_notes;
 	double srate; ///< Sample rate
   public:
-	Synth(Notes const& notes, unsigned int sr) : m_notes(notes), srate(sr) {};
+	Synth(Notes const& notes, unsigned int sr) : m_notes(notes), srate(sr) {}
 	void operator()(float* begin, float* end, double position) {
 		static double phase = 0.0;
 		for (float *i = begin; i < end; ++i) *i *= 0.3; // Decrease music volume
@@ -279,7 +277,7 @@ struct Synth {
 		if (it == m_notes.end() || it->type == Note::SLEEP || it->begin > position) { phase = 0.0; return; }
 		int note = it->note % 12;
 		double d = (note + 1) / 13.0;
-		double freq = MusicalScale().getNoteFreq(note + 4 * 12);
+		double freq = MusicalScale().setNote(note + 4 * 12).getFreq();
 		double value = 0.0;
 		// Synthesize tones
 		for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
@@ -298,6 +296,7 @@ struct Command {
 	double factor;
 };
 
+/// Audio output callback wrapper. The playback Device calls this when it needs samples.
 struct Output {
 	boost::mutex mutex;
 	boost::mutex samples_mutex;
@@ -305,6 +304,7 @@ struct Output {
 	std::auto_ptr<Synth> synth;
 	std::auto_ptr<Music> preloading;
 	boost::ptr_vector<Music> playing, disposing;
+	std::vector<Analyzer*> mics;  // Used for audio pass-through
 	boost::ptr_map<std::string, Sample> samples;
 	std::vector<Command> commands;
 	volatile bool paused;
@@ -319,8 +319,7 @@ struct Output {
 			playing.insert(playing.begin(), preloading);
 		}
 		// Process commands
-		for (size_t i = 0; i < commands.size(); ++i) {
-			Command const& cmd = commands[i];
+		for (auto const& cmd: commands) {
 			switch (cmd.type) {
 			case Command::TRACK_FADE:
 				if (!playing.empty()) playing[0].trackFade(cmd.track, cmd.factor);
@@ -338,7 +337,7 @@ struct Output {
 		commands.clear();
 	}
 
-	void callback(float* begin, float* end) {
+	void callback(float* begin, float* end, double rate) {
 		callbackUpdate();
 		std::fill(begin, end, 0.0f);
 		if (paused) return;
@@ -352,6 +351,14 @@ struct Output {
 				continue;
 			}
 			++i;
+		}
+		// Mix in microphones (if pass-through is enabled)
+		if (mics.size() > 0 && config["audio/pass-through"].b()) {
+			// Decrease music volume
+			float amp = 1.0f / config["audio/pass-through_ratio"].f();
+			if (amp != 1.0f) for (auto& s: boost::make_iterator_range(begin, end)) s *= amp;
+			// Do the mixing
+			for (auto& m: mics) if (m) m->output(begin, end, rate);
 		}
 		// Mix in the samples currently playing
 		{
@@ -376,12 +383,14 @@ struct Output {
 
 Device::Device(unsigned int in, unsigned int out, double rate, unsigned int dev):
   in(in), out(out), rate(rate), dev(dev),
-  stream(*this, in ? portaudio::Params().channelCount(in).device(dev).suggestedLatency(config["audio/latency"].f()): (const PaStreamParameters*)NULL,
-	(out ? portaudio::Params().channelCount(out).device(dev).suggestedLatency(config["audio/latency"].f()) : (const PaStreamParameters*)NULL), rate),
+  stream(
+    *this,
+    portaudio::Params().channelCount(in).device(dev).suggestedLatency(config["audio/latency"].f()),
+	portaudio::Params().channelCount(out).device(dev).suggestedLatency(config["audio/latency"].f()),
+	rate),
+  mics(in, nullptr),
   outptr()
-{
-	mics.resize(in);
-}
+{}
 
 void Device::start() {
 	PaError err = Pa_StartStream(stream);
@@ -396,7 +405,7 @@ int Device::operator()(void const* input, void* output, unsigned long frames, co
 		da::sample_const_iterator it = da::sample_const_iterator(inbuf + i, in);
 		mics[i]->input(it, it + frames);
 	}
-	if (outptr) outptr->callback(outbuf, outbuf + 2 * frames);
+	if (outptr) outptr->callback(outbuf, outbuf + 2 * frames, rate);
 	return paContinue;
 } catch (std::exception& e) {
 	std::cerr << "Exception in audio callback: " << e.what() << std::endl;
@@ -408,16 +417,17 @@ int Device::operator()(void const* input, void* output, unsigned long frames, co
 struct Audio::Impl {
 	Output output;
 	portaudio::Init init;
-	boost::ptr_vector<Device> devices;
 	boost::ptr_vector<Analyzer> analyzers;
+	boost::ptr_vector<Device> devices;
 	bool playback;
 	Impl(): init(), playback() {
+		std::clog << "audio/info: " << portaudio::AudioDevices().dump() << std::flush;
 		// Parse audio devices from config
 		ConfigItem::StringList devs = config["audio/devices"].sl();
 		for (ConfigItem::StringList::const_iterator it = devs.begin(), end = devs.end(); it != end; ++it) {
 			try {
 				struct Params {
-					int out, in;
+					unsigned out, in;
 					unsigned int rate;
 					std::string dev;
 					std::vector<std::string> mics;
@@ -446,35 +456,14 @@ struct Audio::Impl {
 				// Sync mics/in settings together
 				if (params.in == 0) params.in = params.mics.size();
 				else params.mics.resize(params.in);
-				int count = portaudio::AudioDevices::count();
-				int dev = -1;
-				// Handle empty device
-				if (params.dev.empty()) dev = (params.out == 0 ? Pa_GetDefaultInputDevice() : Pa_GetDefaultOutputDevice());
-				// Try numeric value
-				if (dev < 0) {
-					std::istringstream iss(params.dev);
-					int tmp;
-					if (iss >> tmp && iss.get() == EOF && tmp >= 0 && tmp < count) dev = tmp;
-				}
 				portaudio::AudioDevices ad;
-				// Try name search with full match
-				for (unsigned i = 0; i < ad.devices.size() && dev < 0; ++i) {
-					portaudio::DeviceInfo& info = ad.devices[i];
-					if (info.name == params.dev) dev = info.idx;
-				}
-				// Try name search with partial match
-				for (unsigned i = 0; i < ad.devices.size() && dev < 0; ++i) {
-					portaudio::DeviceInfo& info = ad.devices[i];
-					if (info.name.find(params.dev) != std::string::npos) dev = info.idx;
-				}
-				if (dev < 0) throw std::runtime_error("No such device.");
-				std::clog << "audio/info: Trying audio device \"" << params.dev << "\", id: " << dev
+				auto const& info = ad.find(params.dev);
+				std::clog << "audio/info: Trying audio device \"" << params.dev << "\", idx: " << info.idx
 					<< ", in: " << params.in << ", out: " << params.out << std::endl;
-				portaudio::DeviceInfo& info = ad.devices[dev];
 				if (info.in < int(params.mics.size())) throw std::runtime_error("Device doesn't have enough input channels");
-				if (info.out < params.out) throw std::runtime_error("Device doesn't have enough output channels");
+				if (info.out < int(params.out)) throw std::runtime_error("Device doesn't have enough output channels");
 				// Match found if we got here, construct a device
-				Device* d = new Device(params.in, params.out, params.rate, info.idx);
+				auto d = new Device(params.in, params.out, params.rate, info.idx);
 				devices.push_back(d);
 				// Start capture/playback on this device (likely to throw due to audio system errors)
 				// NOTE: When it throws we want to keep the device in devices to avoid calling ~Device
@@ -483,7 +472,7 @@ struct Audio::Impl {
 				// Assign mics for all channels of the device
 				int assigned_mics = 0;
 				for (unsigned int j = 0; j < params.in; ++j) {
-					if (analyzers.size() >= 4) break; // Too many mics
+					if (analyzers.size() >= AUDIO_MAX_ANALYZERS) break; // Too many mics
 					std::string const& m = params.mics[j];
 					if (m.empty()) continue; // Input channel not used
 					// Check that the color is not already taken
@@ -500,7 +489,7 @@ struct Audio::Impl {
 				}
 				// Assign playback output for the first available stereo output
 				if (!playback && d->out == 2) { d->outptr = &output; playback = true; }
-				std::clog << "audio/info: Using audio device: " << dev;
+				std::clog << "audio/info: Using audio device: " << info.desc();
 				if (assigned_mics) std::clog << ", input channels: " << assigned_mics;
 				if (params.out) std::clog << ", output channels: " << params.out;
 				std::clog << std::endl;
@@ -508,14 +497,17 @@ struct Audio::Impl {
 				std::clog << "audio/error: Audio device '" << *it << "': " << e.what() << std::endl;
 			}
 		}
+		// Assign mic buffers to the output for pass-through
+		for (size_t i = 0; i < analyzers.size(); ++i)
+			output.mics.push_back(&analyzers[i]);
 	}
 };
 
 Audio::Audio(): self(new Impl) {}
 Audio::~Audio() {}
 
-void Audio::restart() { self.reset(new Impl); };
-void Audio::close() { self.reset(); };
+void Audio::restart() { self.reset(new Impl); }
+void Audio::close() { self.reset(); }
 
 bool Audio::isOpen() const {
 	return !self->devices.empty();
@@ -527,7 +519,7 @@ bool Audio::hasPlayback() const {
 	return false;
 }
 
-void Audio::loadSample(std::string const& streamId, std::string const& filename) {
+void Audio::loadSample(std::string const& streamId, fs::path const& filename) {
 	boost::mutex::scoped_lock l(self->output.samples_mutex);
 	self->output.samples.insert(streamId, std::auto_ptr<Sample>(new Sample(filename, getSR())));
 }
@@ -544,7 +536,7 @@ void Audio::unloadSample(std::string const& streamId) {
 	self->output.samples.erase(streamId);
 }
 
-void Audio::playMusic(std::map<std::string,std::string> const& filenames, bool preview, double fadeTime, double startPos) {
+void Audio::playMusic(Audio::Files const& filenames, bool preview, double fadeTime, double startPos) {
 	Output& o = self->output;
 	boost::mutex::scoped_lock l(o.mutex);
 	o.disposing.clear();  // Delete disposed streams
@@ -555,15 +547,14 @@ void Audio::playMusic(std::map<std::string,std::string> const& filenames, bool p
 	o.commands.clear();  // Remove old unprocessed commands (they should not apply to the new music)
 }
 
-void Audio::playMusic(std::string const& filename, bool preview, double fadeTime, double startPos) {
-	std::map<std::string,std::string> m;
+void Audio::playMusic(fs::path const& filename, bool preview, double fadeTime, double startPos) {
+	Audio::Files m;
 	m["MAIN"] = filename;
 	playMusic(m, preview, fadeTime, startPos);
 }
 
 void Audio::stopMusic() {
-	std::map<std::string,std::string> m;
-	playMusic(m, false, 0.0);
+	playMusic(Audio::Files(), false, 0.0);
 	{
 		Output& o = self->output;
 		// stop synth when music is stopped
@@ -573,8 +564,7 @@ void Audio::stopMusic() {
 }
 
 void Audio::fadeout(double fadeTime) {
-	std::map<std::string,std::string> m;
-	playMusic(m, false, fadeTime);
+	playMusic(Audio::Files(), false, fadeTime);
 	{
 		Output& o = self->output;
 		// stop synth when music is stopped
@@ -604,18 +594,14 @@ bool Audio::isPlaying() const {
 void Audio::seek(double offset) {
 	Output& o = self->output;
 	boost::mutex::scoped_lock l(o.mutex);
-	for(boost::ptr_vector<Music>::iterator it = o.playing.begin() ; it != o.playing.end() ; ++it) {
-		it->seek(clamp(it->pos() + offset, 0.0, it->duration()));
-	}
+	for (auto& trk: o.playing) trk.seek(clamp(trk.pos() + offset, 0.0, trk.duration()));
 	pause(false);
 }
 
 void Audio::seekPos(double pos) {
 	Output& o = self->output;
 	boost::mutex::scoped_lock l(o.mutex);
-	for(boost::ptr_vector<Music>::iterator it = o.playing.begin() ; it != o.playing.end() ; ++it) {
-		it->seek(pos);
-	}
+	for (auto& trk: o.playing) trk.seek(pos);
 	pause(false);
 }
 

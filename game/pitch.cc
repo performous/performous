@@ -16,8 +16,7 @@ Tone::Tone():
   stabledb(-getInf()),
   age()
 {
-	for (std::size_t i = 0; i < MAXHARM; ++i)
-	  harmonics[i] = -getInf();
+	for (auto& h: harmonics) h = -getInf();
 }
 
 void Tone::print() const {
@@ -33,24 +32,55 @@ bool Tone::operator==(double f) const {
 
 Analyzer::Analyzer(double rate, std::string id, std::size_t step):
   m_step(step),
+  m_resampleFactor(1.0),
+  m_resamplePos(),
   m_rate(rate),
   m_id(id),
   m_window(FFT_N),
-  m_bufRead(0),
-  m_bufWrite(0),
   m_fftLastPhase(FFT_N / 2),
   m_peak(0.0),
   m_oldfreq(0.0)
 {
-  	// Hamming window
+	if (m_step > FFT_N) throw std::logic_error("Analyzer step is larger that FFT_N (ideally it should be less than a fourth of FFT_N).");
+	// Hamming window
 	for (size_t i=0; i < FFT_N; i++) {
 		m_window[i] = 0.53836 - 0.46164 * std::cos(2.0 * M_PI * i / (FFT_N - 1));
 	}
 }
 
-namespace {
-	bool sqrLT(float a, float b) { return a * a < b * b; }
+void Analyzer::output(float* begin, float* end, double rate) {
+	constexpr unsigned a = 2;
+	const unsigned size = m_passthrough.size();
+	const unsigned out = (end - begin) / 2 /* stereo */;
+	if (out == 0) return;
+	const unsigned in = m_resampleFactor * (m_rate / rate) * out + 2 * a /* lanczos kernel */ + 5 /* safety margin for rounding errors */;
+	float pcm[m_passthrough.capacity];
+	m_passthrough.read(pcm, pcm + in + 4);
+	for (unsigned i = 0; i < out; ++i) {
+		double s = 0.0;
+		unsigned k = m_resamplePos;
+		double x = m_resamplePos - k;
+		// Lanczos sampling of input at m_resamplePos
+		for (unsigned j = 0; j <= 2 * a; ++j) s += pcm[k + j] * da::lanc<a>(x - j + a);
+		s *= 5.0;
+		begin[i * 2] += s;
+		begin[i * 2 + 1] += s;
+		m_resamplePos += m_resampleFactor;
+	}
+	unsigned num = m_resamplePos;
+	m_resamplePos -= num;
+	if (size > 3000) {
+		// Reset
+		m_passthrough.pop(m_passthrough.size() - 700);
+		m_resampleFactor = 1.0;
+	} else {
+		m_passthrough.pop(num);
+		m_resampleFactor = 0.99 * m_resampleFactor + 0.01 * (size > 700 ? 1.02 : 0.98);
+	}
+}
 
+
+namespace {
 	struct Peak {
 		double freq;
 		double db;
@@ -58,7 +88,7 @@ namespace {
 		Peak(double _freq = 0.0, double _db = -getInf()):
 		  freq(_freq), db(_db)
 		{
-			for (std::size_t i = 0; i < Tone::MAXHARM; ++i) harm[i] = false;
+			for (auto& h: harm) h = false;
 		}
 		void clear() {
 			freq = 0.0;
@@ -76,12 +106,15 @@ namespace {
 
 bool Analyzer::calcFFT() {
 	float pcm[FFT_N];
-	size_t r = m_bufRead;
-	// Test if there is enough audio available
-	if ((BUF_N + m_bufWrite - r) % BUF_N <= FFT_N) return false;
-	// Copy audio to local buffer
-	for (size_t i = 0; i < FFT_N; ++i) pcm[i] = m_buf[(r + i) % BUF_N];
-	m_bufRead = (r + m_step) % BUF_N;
+	// Read FFT_N samples, move forward by m_step samples
+	if (!m_buf.read(pcm, pcm + FFT_N)) return false;
+	m_buf.pop(m_step);
+	// Peak level calculation of the most recent m_step samples (the rest is overlap)
+	for (float const* ptr = pcm + FFT_N - m_step; ptr != pcm + FFT_N; ++ptr) {
+		float s = *ptr;
+		float p = s * s;
+		if (p > m_peak) m_peak = p; else m_peak *= 0.999;
+	}
 	// Calculate FFT
 	m_fft = da::fft<FFT_P>(pcm, m_window);
 	return true;
@@ -172,20 +205,20 @@ void Analyzer::calcTones() {
 
 void Analyzer::mergeWithOld(tones_t& tones) const {
 	tones.sort();
-	tones_t::iterator it = tones.begin();
+	auto it = tones.begin();
 	// Iterate over old tones
-	for (tones_t::const_iterator oldit = m_tones.begin(); oldit != m_tones.end(); ++oldit) {
+	for (auto const& old: m_tones) {
 		// Try to find a matching new tone
-		while (it != tones.end() && *it < *oldit) ++it;
+		while (it != tones.end() && *it < old) ++it;
 		// If match found
-		if (it != tones.end() && *it == *oldit) {
+		if (it != tones.end() && *it == old) {
 			// Merge the old tone into the new tone
-			it->age = oldit->age + 1;
-			it->stabledb = 0.8 * oldit->stabledb + 0.2 * it->db;
-			it->freq = 0.5 * oldit->freq + 0.5 * it->freq;
-		} else if (oldit->db > -80.0) {
+			it->age = old.age + 1;
+			it->stabledb = 0.8 * old.stabledb + 0.2 * it->db;
+			it->freq = 0.5 * old.freq + 0.5 * it->freq;
+		} else if (old.db > -80.0) {
 			// Insert a decayed version of the old tone into new tones
-			Tone& t = *tones.insert(it, *oldit);
+			Tone& t = *tones.insert(it, old);
 			t.db -= 5.0;
 			t.stabledb -= 0.1;
 		}

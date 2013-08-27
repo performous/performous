@@ -8,6 +8,7 @@
 #include "profiler.hh"
 
 #include <boost/bind.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
@@ -17,7 +18,7 @@
 #include <stdexcept>
 #include <cstdlib>
 
-Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), math_cover(), m_typeFilter(), m_database(database), m_order(), m_dirty(false), m_loading(false) {
+Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), math_cover(), m_database(database), m_type(), m_order(), m_dirty(false), m_loading(false) {
 	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
 	reload();
 }
@@ -42,78 +43,67 @@ void Songs::reload_internal() {
 	}
 	Profiler prof("songloader");
 	Paths paths = getPathsConfig("paths/songs");
-	for (Paths::iterator it = paths.begin(); m_loading && it != paths.end(); ++it) {
+	for (auto it = paths.begin(); m_loading && it != paths.end(); ++it) {
 		try {
-			if (!fs::is_directory(*it)) { m_debug << "Songs/info: >>> Not scanning: " << *it << " (no such directory)" << std::endl; continue; }
-			m_debug << "songs/info: >>> Scanning " << *it << std::endl;
+			if (!fs::is_directory(*it)) { std::clog << "songs/info: >>> Not scanning: " << *it << " (no such directory)\n"; continue; }
+			std::clog << "songs/info: >>> Scanning " << *it << std::endl;
 			size_t count = m_songs.size();
 			reload_internal(*it);
 			size_t diff = m_songs.size() - count;
-			if (diff > 0 && m_loading) m_debug << diff << " songs loaded" << std::endl;
+			if (diff > 0 && m_loading) std::clog << "songs/info: " << diff << " songs loaded\n";
 		} catch (std::exception& e) {
-			m_debug << "songs/error: >>> Error scanning " << *it << ": " << e.what() << std::endl;
+			std::clog << "songs/error: >>> Error scanning " << *it << ": " << e.what() << '\n';
 		}
 	}
 	prof("total");
 	if (m_loading) dumpSongs_internal(); // Dump the songlist to file (if requested)
+	std::clog << std::flush;
 	m_loading = false;
 }
 
 void Songs::reload_internal(fs::path const& parent) {
-	namespace fs = fs;
-	if (std::distance(parent.begin(), parent.end()) > 20) { m_debug << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
+	if (std::distance(parent.begin(), parent.end()) > 20) { std::clog << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)\n"; return; }
 	try {
-		boost::regex expression("(.*\\.txt|^song\\.ini|notes\\.xml|.*\\.sm)$", boost::regex_constants::icase);
-		boost::cmatch match;
+		boost::regex expression(R"((\.txt|^song\.ini|^notes\.xml|\.sm)$)", boost::regex_constants::icase);
 		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) {
 			fs::path p = dirIt->path();
 			if (fs::is_directory(p)) { reload_internal(p); continue; }
-#if BOOST_FILESYSTEM_VERSION < 3
-			std::string name = p.leaf(); // File basename (notes.txt)
-			std::string path = p.directory_string(); // Path without filename
-#else
-			std::string name = p.filename().string(); // File basename (notes.txt)
-			std::string path = p.string(); // Path without filename
-#endif
-			path.erase(path.size() - name.size());
-			if (!regex_match(name.c_str(), match, expression)) continue;
+			if (!regex_search(p.filename().string(), expression)) continue;
 			try {
-				boost::shared_ptr<Song>s(new Song(path, name));
+				boost::shared_ptr<Song>s(new Song(p.parent_path(), p));
 				s->randomIdx = rand();
 				boost::mutex::scoped_lock l(m_mutex);
 				m_songs.push_back(s);
 				m_dirty = true;
 			} catch (SongParserException& e) {
-				if (e.silent()) continue;
-				// Construct error message
-				m_debug << "songs/error: -!- Error in " << path << "\n    " << name;
-				if (e.line()) m_debug << " line " << e.line();
-				m_debug << ": " << e.what() << std::endl;
+				std::clog << e;
 			}
 		}
 	} catch (std::exception const& e) {
-		m_debug << "songs/error: Error accessing " << parent << e.what() << std::endl;
+		std::clog << "songs/error: Error accessing " << parent << ": " << e.what() << '\n';
 	}
 }
 
 // Make std::find work with shared_ptrs and regular pointers
 static bool operator==(boost::shared_ptr<Song> const& a, Song const* b) { return a.get() == b; }
 
-/// restore selection
+/// Store currently selected song on construction and restore the selection on destruction
+/// Assumes that m_filtered has been modified and finds the old selection by pointer value.
+/// Sets up math_cover so that the old selection is restored if possible, otherwise the first song is selected.
 class Songs::RestoreSel {
 	Songs& m_s;
 	Song const* m_sel;
   public:
 	/// constructor
-	RestoreSel(Songs& s): m_s(s), m_sel(s.empty() ? NULL : &s.current()) {}
+	RestoreSel(Songs& s): m_s(s), m_sel(s.empty() ? nullptr : &s.current()) {}
 	/// resets song to given song
-	void reset(Song const* song = NULL) { m_sel = song; }
+	void reset(Song const* song = nullptr) { m_sel = song; }
 	~RestoreSel() {
 		int pos = 0;
 		if (m_sel) {
 			SongVector& f = m_s.m_filtered;
-			SongVector::iterator it = std::find(f.begin(), f.end(), m_sel);
-			m_s.math_cover.setTarget(0, 0);
+			auto it = std::find(f.begin(), f.end(), m_sel);
+			m_s.math_cover.reset();
 			if (it != f.end()) pos = it - f.begin();
 		}
 		m_s.math_cover.setTarget(pos, m_s.size());
@@ -124,7 +114,7 @@ void Songs::update() {
 	if (m_dirty && m_updateTimer.get() > 0.5) filter_internal(); // Update with newly loaded songs
 	// A hack to move to the first song when the song screen is entered the first time
 	static bool first = true;
-	if (first) { first = false; math_cover.setTarget(0, 0); math_cover.setTarget(0, size()); }
+	if (first) { first = false; math_cover.reset(); math_cover.setTarget(0, size()); }
 }
 
 void Songs::setFilter(std::string const& val) {
@@ -133,38 +123,28 @@ void Songs::setFilter(std::string const& val) {
 	filter_internal();
 }
 
-void Songs::setTypeFilter(unsigned char filter) {
-	if (m_typeFilter == filter) return;
-	m_typeFilter = filter;
-	filter_internal();
-}
-
 void Songs::filter_internal() {
 	m_updateTimer.setValue(0.0);
 	boost::mutex::scoped_lock l(m_mutex);
-	// Print messages when loading has finished
-	if (!m_loading) {
-		std::clog << m_debug.str();
-		m_debug.str(""); m_debug.clear();
-	}
 	m_dirty = false;
 	RestoreSel restore(*this);
 	try {
 		SongVector filtered;
 		for (SongVector::const_iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
 			Song& s = **it;
-			if ((m_typeFilter & 1) && !s.hasDance()) continue;
-			if ((m_typeFilter & 2) && !s.hasDrums()) continue;
-			if ((m_typeFilter & 4) && !s.hasGuitars()) continue;
-			if ((m_typeFilter & 8) && !s.hasVocals()) continue;
-			if ((m_typeFilter & 16) && !s.hasKeyboard()) continue;
+			// All, Dance, Vocals, Duet, Guitar, Band
+			if (m_type == 1 && !s.hasDance()) continue;
+			if (m_type == 2 && !s.hasVocals()) continue;
+			if (m_type == 3 && !s.hasDuet()) continue;
+			if (m_type == 4 && !s.hasGuitars()) continue;
+			if (m_type == 5 && !s.hasDrums() && !s.hasKeyboard()) continue;
+			if (m_type == 6 && (!s.hasVocals() || !s.hasGuitars() || (!s.hasDrums() && !s.hasKeyboard()))) continue;
 			if (regex_search(s.strFull(), boost::regex(m_filter, boost::regex_constants::icase))) filtered.push_back(*it);
 		}
 		m_filtered.swap(filtered);
 	} catch (...) {
 		SongVector(m_songs.begin(), m_songs.end()).swap(m_filtered);  // Invalid regex => copy everything
 	}
-	math_cover.reset();
 	sort_internal();
 }
 
@@ -186,23 +166,48 @@ namespace {
 		}
 	};
 
-    /// A helper for easily constructing CmpByField objects
-    template <typename T> CmpByField<T> comparator(T Song::*field) { return CmpByField<T>(field); }
+	/// A helper for easily constructing CmpByField objects
+	template <typename T> CmpByField<T> comparator(T Song::*field) { return CmpByField<T>(field); }
 
-	std::string pathtrim(std::string path) {
-		std::string::size_type pos = path.rfind('/', path.size() - 1);
-		pos = path.rfind('/', pos - 1);
-		pos = path.rfind('/', pos - 1);
-		if (pos == std::string::npos) pos = 0; else ++pos;
-		return path.substr(pos, path.size() - pos - 1);
-	}
-
-	static const int orders = 7;
+	static const int types = 7, orders = 7;
 
 }
 
+std::string Songs::typeDesc() const {
+	switch (m_type) {
+		case 0: return _("show all songs");
+		case 1: return _("has dance");
+		case 2: return _("has vocals");
+		case 3: return _("has duet");
+		case 4: return _("has guitar");
+		case 5: return _("drums or keytar");
+		case 6: return _("full band");
+	}
+	throw std::logic_error("Internal error: unknown type filter in Songs::typeDesc");
+}
+
+void Songs::typeChange(int diff) {
+	if (diff == 0) m_type = 0;
+	else {
+		m_type = (m_type + diff) % types;
+		if (m_type < 0) m_type += types;
+	}
+	filter_internal();
+}
+
+void Songs::typeCycle(int cat) {
+	static const int categories[types] = { 0, 1, 2, 2, 3, 3, 4 };
+	// Find the next matching category
+	int type = 0;
+	for (int t = (categories[m_type] == cat ? m_type + 1 : 0); t < types; ++t) {
+		if (categories[t] == cat) { type = t; break; }
+	}
+	m_type = type;
+	filter_internal();
+}
+
 std::string Songs::sortDesc() const {
-	std::string str = "";
+	std::string str;
 	switch (m_order) {
 	  case 0: str = _("random order"); break;
 	  case 1: str = _("sorted by song"); break;
@@ -212,12 +217,6 @@ std::string Songs::sortDesc() const {
 	  case 5: str = _("sorted by path"); break;
 	  case 6: str = _("sorted by language"); break;
 	  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortDesc");
-	}
-	if (!empty()) {
-		if (m_order == 3) str += " (" + current().edition + ")";
-		if (m_order == 4) str += " (" + current().genre + ")";
-		if (m_order == 5) str += " (" + pathtrim(current().path) + ")";
-		if (m_order == 6) str += " (" + current().language + ")";
 	}
 	return str;
 }
@@ -245,12 +244,11 @@ void Songs::sort_internal() {
 namespace {
 	void dumpCover(xmlpp::Element* song, Song const& s, size_t num) {
 		try {
-			std::string ext = s.cover.substr(s.cover.rfind('.'));
-			fs::path cover = s.path + s.cover;
-			if (fs::exists(cover)) {
+			std::string ext = s.cover.extension().string();
+			if (exists(s.cover)) {
 				std::string coverlink = "covers/" + (boost::format("%|04|") % num).str() + ext;
 				if (fs::is_symlink(coverlink)) fs::remove(coverlink);
-				create_symlink(cover, coverlink);
+				create_symlink(s.cover, coverlink);
 				song->add_child("cover")->set_child_text(coverlink);
 			}
 		} catch (std::exception& e) {

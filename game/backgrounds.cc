@@ -1,16 +1,16 @@
 #include "backgrounds.hh"
 
 #include "configuration.hh"
-
 #include <boost/bind.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <algorithm>
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
-#include <cstdlib>
 
 void Backgrounds::reload() {
 	if (m_loading) return;
@@ -27,14 +27,15 @@ void Backgrounds::reload_internal() {
 	}
 	// Go through the background paths
 	Paths paths = getPaths();
-	for (Paths::iterator it = paths.begin(); m_loading && it != paths.end(); ++it) {
+	for (auto it = paths.begin(); m_loading && it != paths.end(); ++it) {
+		if (!m_loading) break;
 		*it /= "backgrounds";
-		if (!fs::is_directory(*it)) { std::clog << "Backgrounds/info: >>> Not scanning for backgrounds: " << *it << " (no such directory)" << std::endl; continue; }
-		std::clog << "Backgrounds/info: >>> Scanning " << *it << " (for backgrounds)" << std::endl;
+		if (!fs::is_directory(*it)) { std::clog << "backgrounds/info: >>> Not scanning for backgrounds: " << *it << " (no such directory)" << std::endl; continue; }
+		std::clog << "backgrounds/info: >>> Scanning " << *it << " (for backgrounds)" << std::endl;
 		size_t count = m_bgs.size();
 		reload_internal(*it); // Scan the found folder
 		size_t diff = m_bgs.size() - count;
-		if (diff > 0 && m_loading) std::clog << "Backgrounds/info: " << diff << " backgrounds loaded" << std::endl;
+		if (diff > 0 && m_loading) std::clog << "backgrounds/info: " << diff << " backgrounds loaded" << std::endl;
 	}
 	m_loading = false;
 	{	// Randomize the order
@@ -46,24 +47,17 @@ void Backgrounds::reload_internal() {
 }
 
 void Backgrounds::reload_internal(fs::path const& parent) {
-	namespace fs = fs;
-	if (std::distance(parent.begin(), parent.end()) > 20) { std::clog << "Backgrounds/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
+	if (std::distance(parent.begin(), parent.end()) > 20) { std::clog << "backgrounds/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
 	try {
 		// Find suitable file formats
-		boost::regex expression("(.*\\.(png|jpeg|jpg|svg))$", boost::regex_constants::icase);
-		boost::cmatch match;
+		boost::regex expression(R"(\.(png|jpeg|jpg|svg)$)", boost::regex_constants::icase);
 		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) {
 			fs::path p = dirIt->path();
 			if (fs::is_directory(p)) { reload_internal(p); continue; }
-#if BOOST_FILESYSTEM_VERSION < 3
-			std::string name = p.leaf(); // File basename
-			std::string path = p.directory_string(); // Path without filename
-#else
 			std::string name = p.filename().string(); // File basename
 			std::string path = p.string(); // Path without filename
-#endif
 			path.erase(path.size() - name.size());
-			if (!regex_match(name.c_str(), match, expression)) continue;
+			if (!regex_search(name, expression)) continue;
 			{
 				boost::mutex::scoped_lock l(m_mutex);
 				m_bgs.push_back(path + name); // Add the background

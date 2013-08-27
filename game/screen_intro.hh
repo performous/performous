@@ -1,9 +1,10 @@
 #pragma once
 
-#include <boost/scoped_ptr.hpp>
 #include "screen.hh"
 #include "menu.hh"
 #include "animvalue.hh"
+
+#include <boost/scoped_ptr.hpp>
 
 class Audio;
 class ThemeIntro;
@@ -19,6 +20,7 @@ class ScreenIntro : public Screen {
 	void exit();
 	void reloadGL();
 	void manageEvent(SDL_Event event);
+	void manageEvent(input::NavEvent const& event);
 	void draw();
 
 	/// draw menu

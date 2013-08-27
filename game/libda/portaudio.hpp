@@ -5,6 +5,7 @@
  */
 
 #include <boost/thread.hpp>
+#include <boost/regex.hpp>
 #include <portaudio.h>
 #include <cstdlib>
 #include <stdexcept>
@@ -34,24 +35,23 @@ namespace portaudio {
 	}
 
 	struct DeviceInfo {
-		DeviceInfo(int id, std::string n = "", int i = 0, int o = 0): name(n), idx(id), in(i), out(o) {}
-		std::string desc() {
+		DeviceInfo(int id, std::string n = std::string(), int i = 0, int o = 0): name(n), flex(n), idx(id), in(i), out(o) {}
+		std::string desc() const {
 			std::ostringstream oss;
 			oss << name << " (";
 			if (in) oss << in << " in";
 			if (in && out) oss << ", ";
 			if (out) oss << out << " out";
-			return oss.str() + ")";
+			oss << ")";
+			return oss.str();
 		}
-		std::string name;
+		std::string name;  ///< Full device name in UTF-8
+		std::string flex;  ///< Modified name that is less specific but still unique (allow device numbers to change)
 		int idx;
 		int in, out;
 	};
 
 	typedef std::vector<DeviceInfo> DeviceInfos;
-
-	/// List of useless legacy devices of PortAudio that we want to omit...
-	static char const* g_ignored[] = { "front", "surround40", "surround41", "surround50", "surround51", "surround71", "iec958", "spdif", "dmix", NULL };
 
 	struct AudioDevices {
 		static int count() { return Pa_GetDeviceCount(); }
@@ -61,20 +61,59 @@ namespace portaudio {
 				PaDeviceInfo const* info = Pa_GetDeviceInfo(i);
 				if (!info) continue;
 				std::string name = convertToUTF8(info->name);
-				for (unsigned j = 0; g_ignored[j] && !name.empty(); ++j) {
-					if (name.find(g_ignored[j]) != std::string::npos) name.clear();
+				/// Omit some useless legacy devices of PortAudio/ALSA from our list
+				for (auto const& dev: { "front", "surround40", "surround41", "surround50", "surround51", "surround71", "iec958", "spdif", "dmix" }) {
+					if (name.find(dev) != std::string::npos) name.clear();
 				}
-				if (!name.empty()) devices.push_back(DeviceInfo(i, name, info->maxInputChannels, info->maxOutputChannels));
+				if (name.empty()) continue;  // No acceptable device found
+				// Verify that the name is unique (haven't seen duplicate names occur though)
+				std::string n = name;
+				while (true) {
+					int num = 1;
+					for (auto& dev: devices) if (dev.name == n) goto rename;
+					break;
+				rename:
+					std::ostringstream oss;
+					oss << name << " #" << ++num;
+					n = oss.str();
+				};
+				devices.push_back(DeviceInfo(i, name, info->maxInputChannels, info->maxOutputChannels));
+			}
+			for (auto& dev: devices) {
+				// Array of regex - replacement pairs
+				static char const* const replacements[][2] = {
+					{ "\\(hw:\\d+,", "(hw:," },  // Remove ALSA device numbers
+					{ " \\(.*\\)", "" },  // Remove the parenthesis part entirely
+				};
+				for (auto const& rep: replacements) {
+					std::string flex = boost::regex_replace(dev.flex, boost::regex(rep[0]), rep[1]);
+					if (flex == dev.flex) continue;  // Nothing changed
+					// Verify that flex doesn't find any wrong devices
+					bool fail = false;
+					try {
+						if (find(flex).idx != dev.idx) fail = true;
+					} catch (...) {}  // Failure to find anything is success
+					if (!fail) dev.flex = flex;
+				}
 			}
 		}
 		/// Get a printable dump of the devices
-		std::string dump() {
+		std::string dump() const {
 			std::ostringstream oss;
 			oss << "PortAudio devices:" << std::endl;
-			for (unsigned i = 0; i < devices.size(); ++i)
-				oss << "  " << i << "   " << devices[i].name << " (" << devices[i].in << " in, " << devices[i].out << " out)" << std::endl;
+			for (auto const& d: devices) oss << "  #" << d.idx << " " << d.desc() << std::endl;
 			oss << std::endl;
 			return oss.str();
+		}
+		DeviceInfo const& find(std::string const& name) {
+			// Try name search with full match
+			for (auto const& dev: devices) if (dev.name == name) return dev;
+			// Try name search with partial/flexible match
+			for (auto const& dev: devices) {
+				if (dev.name.find(name) != std::string::npos) return dev;
+				if (dev.flex.find(name) != std::string::npos) return dev;
+			}
+			throw std::runtime_error("No such device.");
 		}
 		DeviceInfos devices;
 	};
@@ -87,24 +126,26 @@ namespace portaudio {
 	struct Params {
 		PaStreamParameters params;
 		Params(PaStreamParameters const& init = PaStreamParameters()): params(init) {
-			// Some useful defaults so that things just work
-			channelCount(2).sampleFormat(paFloat32).suggestedLatency(0.05);
+			// Some useful defaults so that things just work (channel count must be set by user anyway)
+			if (params.channelCount == 0) sampleFormat(paFloat32).suggestedLatency(0.05);
 		}
 		Params& channelCount(int val) { params.channelCount = val; return *this; }
 		Params& device(PaDeviceIndex val) { params.device = val; return *this; }
 		Params& sampleFormat(PaSampleFormat val) { params.sampleFormat = val; return *this; }
 		Params& suggestedLatency(PaTime val) { params.suggestedLatency = val; return *this; }
 		Params& hostApiSpecificStreamInfo(void* val) { params.hostApiSpecificStreamInfo = val; return *this; }
-		operator PaStreamParameters const*() const { return &params; }
+		operator PaStreamParameters const*() const { return params.channelCount > 0 ? &params : nullptr; }
 	};
 
 	template <typename Functor> int functorCallback(void const* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData) {
-		return (*static_cast<Functor*>(userData))(input, output, frameCount, timeInfo, statusFlags);
+		Functor* ptr = *reinterpret_cast<Functor**>(&userData);
+		return (*ptr)(input, output, frameCount, timeInfo, statusFlags);
 	}
 
 	class Stream {
 		PaStream* m_handle;
 	public:
+		/// Construct a stream as with Pa_OpenStream
 		Stream(
 		  PaStreamParameters const* input,
 		  PaStreamParameters const* output,
@@ -116,22 +157,21 @@ namespace portaudio {
 		{
 			PORTAUDIO_CHECKED(Pa_OpenStream, (&m_handle, input, output, sampleRate, framesPerBuffer, flags, callback, userData));
 		}
+		/// Construct stream using a C++ functor as callback
 		template <typename Functor> Stream(
 		  Functor& functor,
 		  PaStreamParameters const* input,
 		  PaStreamParameters const* output,
 		  double sampleRate,
 		  unsigned long framesPerBuffer = paFramesPerBufferUnspecified,
-		  PaStreamFlags flags = paNoFlag)
-		{
-			PORTAUDIO_CHECKED(Pa_OpenStream, (&m_handle, input, output, sampleRate, framesPerBuffer, flags, functorCallback<Functor>, &functor));
-		}
+		  PaStreamFlags flags = paNoFlag
+		): Stream(input, output, sampleRate, framesPerBuffer, flags, functorCallback<Functor>, (void*)(intptr_t)&functor) {}
 		~Stream() {
 			// Give audio a little time to shutdown but then just quit
 			boost::thread audiokiller(Pa_CloseStream, m_handle);
 			if (!audiokiller.timed_join(boost::posix_time::milliseconds(5000))) {
-				std::cout << "PortAudio BUG: Pa_CloseStream hung for more than five seconds. Exiting program." << std::endl;
-				exit(1);
+				std::cout << "PortAudio BUG: Pa_CloseStream hung for more than five seconds. Aborting." << std::endl;
+				std::abort();  // Crash. Calling exit() is prone to hang.
 			}
 		}
 		operator PaStream*() { return m_handle; }

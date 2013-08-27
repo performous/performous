@@ -30,35 +30,28 @@ void Song::reload(bool errorIgnore) {
 	start = 0.0;
 	preview_start = getNaN();
 	hasBRE = false;
-	b0rkedTracks = false;
+	b0rked.clear();
 	try { SongParser(*this); } catch (...) { if (!errorIgnore) throw; }
 	collateUpdate();
 }
 
+void Song::loadNotes(bool errorIgnore) {
+	if (loadStatus == Song::FULL) return;
+	try { SongParser(*this); } catch (...) { if (!errorIgnore) throw; }
+}
+
 void Song::dropNotes() {
-	// Singing
-	if (!vocalTracks.empty()) {
-		for (VocalTracks::iterator it = vocalTracks.begin(); it != vocalTracks.end(); ++it)
-			it->second.notes.clear();
-	}
-	// Instruments
-	if (!instrumentTracks.empty()) {
-		for (InstrumentTracks::iterator it = instrumentTracks.begin(); it != instrumentTracks.end(); ++it)
-			it->second.nm.clear();
-	}
-	// Dancing
-	if (!danceTracks.empty()) {
-		for (DanceTracks::iterator it = danceTracks.begin(); it != danceTracks.end(); ++it)
-			it->second.clear();
-	}
-	b0rkedTracks = false;
+	for (auto& trk: vocalTracks) trk.second.notes.clear();
+	for (auto& trk: instrumentTracks) trk.second.nm.clear();
+	for (auto& trk: danceTracks) trk.second.clear();
+	b0rked.clear();
 	loadStatus = HEADER;
 }
 
 void Song::collateUpdate() {
-	collateByTitle = collate(title + artist) + '\0' + filename;
+	collateByTitle = collate(title + artist) + '\0' + filename.string();
 	collateByTitleOnly = collate(title);
-	collateByArtist = collate(artist + title) + '\0' + filename;
+	collateByArtist = collate(artist + title) + '\0' + filename.string();
 	collateByArtistOnly = collate(artist);
 }
 
@@ -80,10 +73,9 @@ Song::Status Song::status(double time) {
 }
 
 bool Song::getNextSection(double pos, SongSection &section) {
-	if (songsections.empty()) return false;
-	for (std::vector<Song::SongSection>::iterator it= songsections.begin(); it != songsections.end(); ++it) {
-		if (it->begin > pos) {
-			section = *it;
+	for (auto& sect: songsections) {
+		if (sect.begin > pos) {
+			section = sect;
 			return true;
 		}
 	}
@@ -92,8 +84,7 @@ bool Song::getNextSection(double pos, SongSection &section) {
 }
 
 bool Song::getPrevSection(double pos, SongSection &section) {
-	if (songsections.empty()) return false;
-	for (std::vector<Song::SongSection>::reverse_iterator it= songsections.rbegin(); it != songsections.rend(); it++) {
+	for (auto it = songsections.rbegin(); it != songsections.rend(); ++it) {
 		// subtract 1 second so we can jump across a section
 		if (it->begin < pos - 1.0) {
 			section = *it;
@@ -103,3 +94,11 @@ bool Song::getPrevSection(double pos, SongSection &section) {
 	// returning false here will jump backwards by 5s (see screen_sing.cc)
 	return false;
 }
+
+std::ostream& operator<<(std::ostream& os, SongParserException const& e) {
+	os << (e.silent() ? "songparser/debug: " : "songparser/warning: ") << e.file().string();
+	if (e.line()) os << ":" << e.line();
+	os << ":\n  " << e.what() << std::endl;
+	return os;
+}
+

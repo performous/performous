@@ -1,623 +1,421 @@
 #include "controllers.hh"
 
+#include "fs.hh"
+#include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
-
-input::Instruments g_instruments;
-
+#include <boost/smart_ptr/weak_ptr.hpp>
 #include <libxml++/libxml++.h>
-#include "fs.hh"
+#include <SDL_joystick.h>
+#include <deque>
+#include <stdexcept>
+
+using namespace input;
 
 namespace {
 	struct XMLError {
-		XMLError(xmlpp::Element& e, std::string msg): elem(e), message(msg) {}
-		xmlpp::Element& elem;
+		XMLError(xmlpp::Element const& e, std::string const& msg): elem(e), message(msg) {}
+		xmlpp::Element const& elem;
 		std::string message;
 	};
-	std::string getAttribute(xmlpp::Element& elem, std::string const& attr) {
-		xmlpp::Attribute* a = elem.get_attribute(attr);
+	std::string getAttribute(xmlpp::Element const& elem, std::string const& attr) {
+		xmlpp::Attribute const* a = elem.get_attribute(attr);
 		if (!a) throw XMLError(elem, "attribute " + attr + " not found");
 		return a->get_value();
 	}
-}
-
-#ifdef USE_PORTMIDI
-
-void readConfig(input::MidiDrums::Map& map, fs::path const& file) {
-	if (!fs::exists(file)) {
-		std::clog << "controllers/info: Skipping " << file << " (not found)" << std::endl;
-		return;
-	}
-	std::clog << "controllers/info: Parsing " << file << std::endl;
-	xmlpp::DomParser domParser(file.string());
-	try {
-		xmlpp::NodeSet n = domParser.get_document()->get_root_node()->find("/mididrums/note");
-		for (xmlpp::NodeSet::const_iterator nodeit = n.begin(), end = n.end(); nodeit != end; ++nodeit) {
-			xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**nodeit);
-			int id = boost::lexical_cast<int>(getAttribute(elem, "id"));
-			std::string value = getAttribute(elem, "value");
-			std::string name = getAttribute(elem, "name");
-
-			// lets erase old mapping for this note
-			map.erase(id);
-
-			if(value == "kick") map[id] = input::KICK_BUTTON;
-			else if(value == "red") map[id] = input::RED_TOM_BUTTON;
-			else if(value == "yellow") map[id] = input::YELLOW_TOM_BUTTON;
-			else if(value == "blue") map[id] = input::BLUE_TOM_BUTTON;
-			else if(value == "green") map[id] = input::GREEN_TOM_BUTTON;
-			else if(value == "orange") map[id] = input::ORANGE_TOM_BUTTON;
+	template <typename T> bool tryGetAttribute(xmlpp::Element const& elem, std::string const& attr, T& var) {
+		xmlpp::Attribute const* a = elem.get_attribute(attr);
+		if (!a) return false;
+		try {
+			var = boost::lexical_cast<T>(a->get_value());
+		} catch (std::exception&) {
+			throw XMLError(elem, "attribute " + attr + " value invalid: " + a->get_value());
 		}
-	} catch (XMLError& e) {
-		int line = e.elem.get_line();
-		std::string name = e.elem.get_name();
-		throw std::runtime_error(file.string() + ":" + boost::lexical_cast<std::string>(line) + " element " + name + " " + e.message);
+		return true;
 	}
-}
-
-input::MidiDrums::MidiDrums(): stream(pm::findDevice(true, config["game/midi_input"].s())), devnum(0x8000) {
-	readConfig(map, getDefaultConfig(fs::path("/config/mididrums.xml")));
-	readConfig(map, getConfigDir() / "mididrums.xml");
-
-	while (detail::devices.find(devnum) != detail::devices.end()) ++devnum;
-	detail::devices.insert(std::make_pair(devnum, detail::InputDevPrivate(g_instruments.find("DRUMS_GUITARHERO")->second)));
-	event.type = Event::PRESS;
-	for (unsigned int i = 0; i < BUTTONS; ++i) event.pressed[i] = false;
-}
-
-#include <iomanip>
-
-void input::MidiDrums::process() {
-	PmEvent ev;
-	while (Pm_Read(stream, &ev, 1) == 1) {
-		unsigned char evnt = ev.message & 0xF0;
-		unsigned char note = ev.message >> 8;
-		unsigned char vel  = ev.message >> 16;
-#if 0
-		// it is IMHO not a good idea to filter on the channel.
-		// code snippet left here for visibility
-		unsigned char chan = ev.message & 0x0F;
-		if (chan != 0x09) continue; // only accept channel 10 (percussion)
-#endif
-		if (evnt != 0x90) continue; // 0x90 = any channel note-on
-		if (vel  == 0x00) continue; // velocity 0 is often used instead of note-off
-		Map::const_iterator it = map.find(note);
-		if (it == map.end()) {
-			std::cout << "Unassigned MIDI drum event: note " << note << std::endl;
-			continue;
-		}
-		event.button = it->second;
-		event.time = now();
-		for (unsigned int i = 0; i < BUTTONS; ++i) event.pressed[i] = false;
-		event.pressed[it->second] = true;
-		detail::devices.find(devnum)->second.addEvent(event);
+	template <typename Numeric> void parse(MinMax<Numeric>& range, xmlpp::Element const& elem) {
+		tryGetAttribute(elem, "min", range.min);
+		tryGetAttribute(elem, "max", range.max);
 	}
-}
-#endif
-
-input::detail::InputDevs input::detail::devices;
-input::SDL::SDL_devices input::SDL::sdl_devices;
-
-/// Abstract navigation actions for different input devices, including keyboard
-input::NavButton input::getNav(SDL_Event const &e) {
-	if (e.type == SDL_KEYDOWN) {
-		// Keyboard
-		int k = e.key.keysym.sym;
-		SDLMod mod = e.key.keysym.mod;
-		if (k == SDLK_UP && !(mod & KMOD_CTRL)) return input::UP;
-		else if (k == SDLK_DOWN && !(mod & KMOD_CTRL)) return input::DOWN;
-		else if (k == SDLK_LEFT) return input::LEFT;
-		else if (k == SDLK_RIGHT) return input::RIGHT;
-		else if (k == SDLK_RETURN || k == SDLK_KP_ENTER) return input::START;
-		else if (k == SDLK_ESCAPE) return input::CANCEL;
-		else if (k == SDLK_PAGEUP) return input::MOREUP;
-		else if (k == SDLK_PAGEDOWN) return input::MOREDOWN;
-		else if (k == SDLK_PAUSE || (k == SDLK_p && mod & KMOD_CTRL)) return input::PAUSE;
-		// Volume control is currently handled in main.cc
-		//else if (k == SDLK_UP && mod & KMOD_CTRL) return input::VOLUME_UP;
-		//else if (k == SDLK_DOWN && mod & KMOD_CTRL) return input::VOLUME_DOWN;
-	} else if (e.type == SDL_JOYBUTTONDOWN) {
-		// Joystick buttons
-		unsigned int joy_id = e.jbutton.which;
-		input::detail::InputDevPrivate devt = input::detail::devices.find(joy_id)->second;
-		int b = devt.buttonFromSDL(e.jbutton.button);
-		if (b == -1) return input::NONE;
-		else if (b == 8) return input::CANCEL;
-		else if (b == 9) return input::START;
-		// Totally different device types need their own custom mappings
-		if (devt.type_match(input::DANCEPAD)) {
-			// Dance pad can be used for navigation
-			if (b == 0) return input::LEFT;
-			else if (b == 1) return input::DOWN;
-			else if (b == 2) return input::UP;
-			else if (b == 3) return input::RIGHT;
-			else if (b == 5) return input::MOREUP;
-			else if (b == 6) return input::MOREDOWN;
-			else return input::NONE;
-		} else if (devt.type_match(input::DRUMS)) {
-			// Drums can be used for navigation
-			if (b == 1) return input::LEFT;
-			else if (b == 2) return input::UP;
-			else if (b == 3) return input::DOWN;
-			else if (b == 4) return input::RIGHT;
-		}
-	} else if (e.type == SDL_JOYAXISMOTION) {
-		// Axis motion
-		int axis = e.jaxis.axis;
-		int value = e.jaxis.value;
-		if (axis == 4 && value > 0) return input::RIGHT;
-		else if (axis == 4 && value < 0) return input::LEFT;
-		else if (axis == 5 && value > 0) return input::DOWN;
-		else if (axis == 5 && value < 0) return input::UP;
-	} else if (e.type == SDL_JOYHATMOTION) {
-		// Hat motion
-		int dir = e.jhat.value;
-		// HACK: We probably wan't the guitar strum to scroll songs
-		// and main menu items, but they have different orientation.
-		// These are switched so it works for now (menu scrolls also on left/right).
-		if (input::detail::devices.find(e.jhat.which)->second.type_match(input::GUITAR)) {
-			if (dir == SDL_HAT_UP) return input::LEFT;
-			else if (dir == SDL_HAT_DOWN) return input::RIGHT;
-			else if (dir == SDL_HAT_LEFT) return input::UP;
-			else if (dir == SDL_HAT_RIGHT) return input::DOWN;
-		} else {
-			if (dir == SDL_HAT_UP) return input::UP;
-			else if (dir == SDL_HAT_DOWN) return input::DOWN;
-			else if (dir == SDL_HAT_LEFT) return input::LEFT;
-			else if (dir == SDL_HAT_RIGHT) return input::RIGHT;
-		}
+	// Return a NavButton corresponding to an Event
+	NavButton navigation(Event const& ev) {
+		#define DEFINE_BUTTON(dt, btn, num, nav) if ((DEVTYPE_##dt == DEVTYPE_GENERIC || ev.devType == DEVTYPE_##dt) && ev.button == dt##_##btn) return nav;
+		#include "controllers-buttons.ii"
+		return NAV_NONE;
 	}
-	return input::NONE;
-}
 
-void input::SDL::init_devices() {
-	for (input::detail::InputDevs::iterator it = input::detail::devices.begin() ; it != input::detail::devices.end() ; ++it) {
-		unsigned int id = it->first;
-		if(it->second.assigned()) continue;
-		if(input::SDL::sdl_devices[id] == NULL) continue; // Keyboard
-		unsigned int num_buttons = SDL_JoystickNumButtons(input::SDL::sdl_devices[id]);
-		for( unsigned int i = 0 ; i < num_buttons ; ++i ) {
-			SDL_Event event;
-			int state = SDL_JoystickGetButton(input::SDL::sdl_devices[id], i);
-			if( state != 0 ) {
-				event.type = SDL_JOYBUTTONDOWN;
-				event.jbutton.type = SDL_JOYBUTTONDOWN;
-				event.jbutton.state = SDL_PRESSED;
-			} else {
-				event.type = SDL_JOYBUTTONUP;
-				event.jbutton.type = SDL_JOYBUTTONUP;
-				event.jbutton.state = SDL_RELEASED;
+	std::ostream& operator<<(std::ostream& os, SourceId const& source) {
+		switch (source.type) {
+			case SOURCETYPE_NONE: return os << "(none)";
+			case SOURCETYPE_KEYBOARD: return os << "(keyboard " << source.device << " instrument " << source.channel << ")";
+			case SOURCETYPE_JOYSTICK: return os << "(joystick " << source.device << ")";
+			case SOURCETYPE_MIDI: return os << "(midi " << source.device << " channel " << source.channel << ")";
+			case SOURCETYPE_N: break;
+		}
+		throw std::logic_error("Unknown SOURCETYPE in controllers.cc SourceId operator<<");
+	}
+	std::string buttonDebug(DevType type, Button b) {
+		#define DEFINE_BUTTON(dt, btn, num, nav) if ((DEVTYPE_##dt == DEVTYPE_GENERIC || type == DEVTYPE_##dt) && b == dt##_##btn) \
+		  return #dt " " #btn " (" #nav ")";
+		#include "controllers-buttons.ii"
+		throw std::logic_error("Invalid Button value in controllers.cc buttonDebug");
+	}
+	std::ostream& operator<<(std::ostream& os, Event const& ev) {
+		os << ev.source << ' ';
+		// Print hw button info if the event is not assigned to a function, otherwise print assignments
+		if (ev.button == GENERIC_UNASSIGNED) {
+			if (hwIsAxis.matches(ev.hw)) {
+				os << "axis hw=" << ev.hw - hwIsAxis.min << " value=" << ev.value;
+			} else if (hwIsHat.matches(ev.hw)) {
+				os << "hat hw=" << ev.hw - hwIsHat.min << ' ';
+				std::string dir;
+				unsigned val = ev.value;
+				if (val & SDL_HAT_UP) dir += "up";
+				if (val & SDL_HAT_DOWN) dir += "down";
+				if (val & SDL_HAT_LEFT) dir += "left";
+				if (val & SDL_HAT_RIGHT) dir += "right";
+				os << (dir.empty() ? "centered" : dir);
 			}
-
-			event.jbutton.which = id;
-			event.jbutton.button = i;
-			input::SDL::pushEvent(event, boost::xtime());
+			else os << "button hw=" << ev.hw << " value=" << ev.value;
+		} else {
+			os << buttonDebug(ev.devType, ev.button) << " value=" << ev.value;
 		}
+		return os;
 	}
 }
 
-void readControllers(input::Instruments &instruments, fs::path const& file) {
-	if (!fs::exists(file)) {
-		std::clog << "controllers/info: Skipping " << file << " (not found)" << std::endl;
-		return;
+struct ButtonMap {
+	Button map;  // Generic action
+	Button negative, positive;  // Half-axis movement
+	Button up, down, left, right;  // Hat direction
+	ButtonMap() { std::memset(this, 0, sizeof(*this)); }
+};
+
+typedef std::map<HWButton, ButtonMap> ButtonMapping;
+
+/// A controller definition from controllers.xml
+struct ControllerDef {
+	std::string name;
+	std::string description;
+	SourceType sourceType;
+	DevType devType;
+	double latency;
+	boost::regex deviceRegex;
+	MinMax<unsigned> deviceMinMax;
+	MinMax<unsigned> channelMinMax;
+	ButtonMapping mapping;
+	ControllerDef(): sourceType(), devType(), latency() {}
+	bool matches(Event const& ev, std::string const& devName) const {
+		if (ev.source.type != sourceType) return false;
+		if (!deviceMinMax.matches(ev.source.device)) return false;
+		if (!channelMinMax.matches(ev.source.channel)) return false;
+		if (!deviceRegex.empty() && !regex_search(devName, deviceRegex)) return false;
+		return true;
 	}
-	std::clog << "controllers/info: Parsing " << file << std::endl;
-	xmlpp::DomParser domParser(file.string());
-	try {
-		xmlpp::NodeSet n = domParser.get_document()->get_root_node()->find("/controllers/controller");
+};
+
+struct Controllers::Impl {
+	typedef std::map<std::string, ControllerDef> ControllerDefs;
+	ControllerDefs m_controllerDefs;
+
+	typedef std::map<std::string, Button> NameToButton;
+	NameToButton m_buttons[DEVTYPE_N];
+
+	typedef std::map<SourceId, ControllerDef const*> Assignments;
+	Assignments m_assignments;
+	
+	typedef std::map<SourceType, Hardware::ptr> HW;
+	HW m_hw;
+
+	std::deque<NavEvent> m_navEvents;
+	std::deque<DevicePtr> m_orphans;
+	std::map<SourceId, boost::weak_ptr<Device> > m_devices;
+	bool m_eventsEnabled;
+	
+	typedef std::pair<SourceId, ButtonId> UniqueButton;
+	std::map<UniqueButton, double> m_values;
+
+	std::map<NavButton, NavEvent> m_navRepeat;
+	
+	Impl(): m_eventsEnabled() {
+		#define DEFINE_BUTTON(devtype, button, num, nav) m_buttons[DEVTYPE_##devtype][#button] = devtype##_##button;
+		#include "controllers-buttons.ii"
+		readControllers(getShareDir() / "config/controllers.xml");
+		readControllers(getConfigDir() / "controllers.xml");
+		m_hw[SOURCETYPE_KEYBOARD] = constructKeyboard();
+		m_hw[SOURCETYPE_JOYSTICK] = constructJoysticks();
+		if (Hardware::midiEnabled()) m_hw[SOURCETYPE_MIDI] = constructMidi();
+	}
+	
+	void readControllers(fs::path const& file) {
+		if (!fs::is_regular_file(file)) {
+			std::clog << "controllers/info: Skipping " << file << " (not found)" << std::endl;
+			return;
+		}
+		std::clog << "controllers/info: Parsing " << file << std::endl;
+		xmlpp::DomParser domParser(file.string());
+		try {
+			parseControllers(domParser, "/controllers/joystick/controller", SOURCETYPE_JOYSTICK);
+			parseControllers(domParser, "/controllers/midi/controller", SOURCETYPE_MIDI);
+		} catch (XMLError& e) {
+			int line = e.elem.get_line();
+			std::string name = e.elem.get_name();
+			throw std::runtime_error(file.string() + ":" + boost::lexical_cast<std::string>(line) + " element " + name + " " + e.message);
+		}
+	}
+
+	void parseControllers(xmlpp::DomParser const& dom, std::string const& path, SourceType sourceType) {
+		xmlpp::NodeSet n = dom.get_document()->get_root_node()->find(path);
 		for (xmlpp::NodeSet::const_iterator nodeit = n.begin(), end = n.end(); nodeit != end; ++nodeit) {
 			xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**nodeit);
-			std::string name = getAttribute(elem, "name");
-			std::string type = getAttribute(elem, "type");
-
+			ControllerDef def;
+			def.name = getAttribute(elem, "name");
+			def.sourceType = sourceType;
+			// Device type
+			{
+				std::string type = getAttribute(elem, "type");
+				if (type == "guitar") def.devType = DEVTYPE_GUITAR;
+				else if (type == "drumkit") def.devType = DEVTYPE_DRUMS;
+				else if (type == "keytar") def.devType = DEVTYPE_KEYTAR;
+				else if (type == "piano") def.devType = DEVTYPE_PIANO;
+				else if (type == "dancepad") def.devType = DEVTYPE_DANCEPAD;
+				else {
+					std::clog << "controllers/warning: " << type << ": Unknown controller type in controllers.xml (skipped)" << std::endl;
+					continue;
+				}
+			}
 			xmlpp::NodeSet ns;
-			// searching description
+			// Device description
 			ns = elem.find("description/text()");
-			if(ns.size()==0) continue;
-			std::string description = dynamic_cast<xmlpp::TextNode&>(*ns[0]).get_content();
-
-			// searching the match
-			ns = elem.find("regexp");
-			if(ns.size()==0) continue;
-			std::string regexp = getAttribute(dynamic_cast<xmlpp::Element&>(*ns[0]), "match");
-
-			// setting the type
-			input::DevType devType;
-			if(type == "guitar") {
-				devType = input::GUITAR;
-			} else if(type == "drumkit") {
-				devType = input::DRUMS;
-			} else if(type == "keyboard") {
-				devType = input::KEYBOARD;
-			} else if(type == "dancepad") {
-				devType = input::DANCEPAD;
-			} else {
-				continue;
+			if (ns.size() == 1) def.description = dynamic_cast<xmlpp::TextNode&>(*ns[0]).get_content();
+			// Read filtering rules
+			ns = elem.find("device");
+			if (ns.size() == 1) {
+				xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(*ns[0]);
+				std::string regex;
+				if (tryGetAttribute(elem, "regex", regex)) def.deviceRegex = regex;
+				parse(def.deviceMinMax, elem);
+				double latency;
+				if (tryGetAttribute(elem, "latency", latency)) def.latency = latency;
 			}
-
-			// setting the mapping
-			std::vector<int> mapping(16, -1);
-			ns = elem.find("mapping/button");
-			static const int SDL_BUTTONS = 16;
-			switch(devType) {
-				case input::GUITAR:
-					for (xmlpp::NodeSet::const_iterator nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
-						xmlpp::Element& button_elem = dynamic_cast<xmlpp::Element&>(**nodeit2);
-						int id = boost::lexical_cast<int>(getAttribute(button_elem, "id"));
-						std::string value = getAttribute(button_elem, "value");
-						if(id >= SDL_BUTTONS) break;
-						if(value == "green") mapping[id] = input::GREEN_FRET_BUTTON;
-						else if(value == "red") mapping[id] = input::RED_FRET_BUTTON;
-						else if(value == "yellow") mapping[id] = input::YELLOW_FRET_BUTTON;
-						else if(value == "blue") mapping[id] = input::BLUE_FRET_BUTTON;
-						else if(value == "orange") mapping[id] = input::ORANGE_FRET_BUTTON;
-						else if(value == "godmode") mapping[id] = input::GODMODE_BUTTON;
-						else if(value == "select") mapping[id] = input::SELECT_BUTTON;
-						else if(value == "start") mapping[id] = input::START_BUTTON;
-						else continue;
-					}
-					break;
-				case input::DRUMS:
-					for (xmlpp::NodeSet::const_iterator nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
-						xmlpp::Element& button_elem = dynamic_cast<xmlpp::Element&>(**nodeit2);
-						int id = boost::lexical_cast<int>(getAttribute(button_elem, "id"));
-						std::string value = getAttribute(button_elem, "value");
-						if(id >= SDL_BUTTONS) break;
-						if(value == "kick") mapping[id] = input::KICK_BUTTON;
-						else if(value == "red") mapping[id] = input::RED_TOM_BUTTON;
-						else if(value == "yellow") mapping[id] = input::YELLOW_TOM_BUTTON;
-						else if(value == "blue") mapping[id] = input::BLUE_TOM_BUTTON;
-						else if(value == "green") mapping[id] = input::GREEN_TOM_BUTTON;
-						else if(value == "orange") mapping[id] = input::ORANGE_TOM_BUTTON;
-						else if(value == "select") mapping[id] = input::SELECT_BUTTON;
-						else if(value == "start") mapping[id] = input::START_BUTTON;
-						else continue;
-					}
-					break;
-				case input::KEYBOARD:
-					for (xmlpp::NodeSet::const_iterator nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
-						xmlpp::Element& button_elem = dynamic_cast<xmlpp::Element&>(**nodeit2);
-						int id = boost::lexical_cast<int>(getAttribute(button_elem, "id"));
-						std::string value = getAttribute(button_elem, "value");
-						if(id >= SDL_BUTTONS) break;
-						if(value == "C") mapping[id] = input::C_BUTTON;
-						else if(value == "D") mapping[id] = input::D_BUTTON;
-						else if(value == "E") mapping[id] = input::E_BUTTON;
-						else if(value == "F") mapping[id] = input::F_BUTTON;
-						else if(value == "G") mapping[id] = input::G_BUTTON;
-						else if(value == "godmode") mapping[id] = input::GODMODE_BUTTON;
-						else continue;
-					}
-					break;
-				case input::DANCEPAD:
-					for (xmlpp::NodeSet::const_iterator nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
-						xmlpp::Element& button_elem = dynamic_cast<xmlpp::Element&>(**nodeit2);
-						int id = boost::lexical_cast<int>(getAttribute(button_elem, "id"));
-						std::string value = getAttribute(button_elem, "value");
-						if(id >= SDL_BUTTONS) break;
-						if(value == "left") mapping[id] = input::LEFT_DANCE_BUTTON;
-						else if(value == "down") mapping[id] = input::DOWN_DANCE_BUTTON;
-						else if(value == "up") mapping[id] = input::UP_DANCE_BUTTON;
-						else if(value == "right") mapping[id] = input::RIGHT_DANCE_BUTTON;
-						else if(value == "down-left") mapping[id] = input::DOWN_LEFT_DANCE_BUTTON;
-						else if(value == "down-right") mapping[id] = input::DOWN_RIGHT_DANCE_BUTTON;
-						else if(value == "up-left") mapping[id] = input::UP_LEFT_DANCE_BUTTON;
-						else if(value == "up-right") mapping[id] = input::UP_RIGHT_DANCE_BUTTON;
-						else if(value == "start") mapping[id] = input::START_BUTTON;
-						else if(value == "select") mapping[id] = input::SELECT_BUTTON;
-						else continue;
-					}
-					break;
+			ns = elem.find("channel");
+			if (ns.size() == 1) parse(def.channelMinMax, dynamic_cast<xmlpp::Element&>(*ns[0]));
+			// Read button mapping
+			ns = elem.find("mapping/*");
+			for (xmlpp::NodeSet::const_iterator nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
+				xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**nodeit2);
+				HWButton hw;
+				if (!tryGetAttribute(elem, "hw", hw)) throw XMLError(elem, "Mandatory attribute hw is missing or invalid");
+				// Axes and hats use different HWButton ranges internally
+				if (elem.get_name() == "axis") hw = HWButton(hw + hwIsAxis.min);
+				else if (elem.get_name() == "hat") hw = HWButton(hw + hwIsHat.min);
+				// Parse the mapping for this HWButton
+				ButtonMap& m = def.mapping[hw];
+				m.map = parseButton(elem, "map", def);
+				m.negative = parseButton(elem, "negative", def);
+				m.positive = parseButton(elem, "positive", def);
+				m.up = parseButton(elem, "up", def);
+				m.down = parseButton(elem, "down", def);
+				m.left = parseButton(elem, "left", def);
+				m.right = parseButton(elem, "right", def);
 			}
-
-			// inserting the instrument
-			if(instruments.find(name) == instruments.end()) {
-				std::clog << "controllers/info:    Adding " << type << ": " << name << std::endl;
-			} else {
-				std::cout << "controllers/info:    Overriding " << type << ": " << name << std::endl;
-				instruments.erase(name);
-			}
-			input::Instrument instrument(name, devType, mapping);
-			instrument.match = regexp;
-			instrument.description = description;
-			instruments.insert(std::make_pair(name, instrument));
+			// Add/replace the controller definition
+			std::clog << "controllers/info: " << (m_controllerDefs.find(def.name) == m_controllerDefs.end() ? "Controller" : "Overriding")
+			  << " definition: " << def.name << ": " << def.description << std::endl;
+			m_controllerDefs[def.name] = def;
 		}
-	} catch (XMLError& e) {
-		int line = e.elem.get_line();
-		std::string name = e.elem.get_name();
-		throw std::runtime_error(file.string() + ":" + boost::lexical_cast<std::string>(line) + " element " + name + " " + e.message);
 	}
-}
-
-void input::SDL::init() {
-	readControllers(g_instruments, getDefaultConfig(fs::path("/config/controllers.xml")));
-	readControllers(g_instruments, getConfigDir() / "controllers.xml");
-	std::map<unsigned int, input::Instrument> forced_type;
-	ConfigItem::StringList instruments = config["game/instruments"].sl();
-
-	// Populate controller forcing config items
-	ConfigItem& ci0 = config["game/instrument0"];
-	ConfigItem& ci1 = config["game/instrument1"];
-	ConfigItem& ci2 = config["game/instrument2"];
-	ConfigItem& ci3 = config["game/instrument3"];
-	int i = 0;
-	for (input::Instruments::const_iterator it = g_instruments.begin(); it != g_instruments.end(); ++it, ++i) {
-		// Add the enum
-		std::string title = it->second.description;
-		ci0.addEnum(title);
-		ci1.addEnum(title);
-		ci2.addEnum(title);
-		ci3.addEnum(title);
-		// Check for active items
-		if (i == ci0.i()-1) instruments.push_back("0:" + it->first);
-		if (i == ci1.i()-1) instruments.push_back("1:" + it->first);
-		if (i == ci2.i()-1) instruments.push_back("2:" + it->first);
-		if (i == ci3.i()-1) instruments.push_back("3:" + it->first);
+	/// Read a button attribute from XML element
+	Button parseButton(xmlpp::Element const& elem, std::string const& attr, ControllerDef const& def) {
+		std::string action;
+		tryGetAttribute(elem, attr, action);
+		return findButton(def.devType, action);
 	}
-
-	// Check all forced instruments
-	for (ConfigItem::StringList::const_iterator it = instruments.begin(); it != instruments.end(); ++it) {
-		std::istringstream iss(*it);
-		unsigned sdl_id;
-		char ch;
-		std::string type;
-		if (!(iss >> sdl_id >> ch >> type) || ch != ':') {
-			std::clog << "controllers/error: \"" << *it << "\" invalid syntax, should be SDL_ID:CONTROLLER_TYPE" << std::endl;
-			continue;
+	/// Find button by name, either of given type or of generic type
+	Button findButton(DevType type, std::string name) {
+		Button button = GENERIC_UNASSIGNED;
+		if (name.empty()) return button;
+		boost::algorithm::to_upper(name);
+		boost::algorithm::replace_all(name, "-", "_");
+		// Try getting button first from devtype-specific, then generic names
+		buttonByName(type, name, button) || buttonByName(DEVTYPE_GENERIC, name, button) ||
+		  std::clog << "controllers/warning: " << name << ": Unknown button name in controllers.xml." << std::endl;
+		return button;
+	}
+	/// Try to find button of specific type
+	bool buttonByName(DevType type, std::string const& name, Button& button) {
+		NameToButton const& n2b = m_buttons[type];
+		auto it = n2b.find(name);
+		if (it == n2b.end()) return false;
+		button = it->second;
+		return true;
+	}
+	/// Return the next available navigation event from queue, if available
+	bool getNav(NavEvent& ev) {
+		if (m_navEvents.empty()) return false;
+		ev = m_navEvents.front();
+		m_navEvents.pop_front();
+		return true;
+	}
+	/// Return the next orphan device from queue, if available
+	bool getDevice(DevicePtr& dev) {
+		if (m_orphans.empty()) return false;
+		dev = *m_orphans.begin();
+		m_orphans.erase(m_orphans.begin());
+		return true;
+	}
+	void enableEvents(bool state) {
+		m_eventsEnabled = state;
+		Hardware::enableKeyboardInstruments(state);
+		if (!state) {
+			m_orphans.clear();
+			m_devices.clear();
+		}
+	}
+	/// Do internal event processing (poll for MIDI events etc)
+	void process(boost::xtime const& now) {
+		for (auto& typehw: m_hw) {
+			while (true) {
+				Event event;
+				event.time = now;
+				if (!typehw.second->process(event)) break;
+				pushHWEvent(event);
+			}
+		}
+		for (auto& kv: m_navRepeat) {
+			NavEvent& ne = kv.second;
+			double delay = 2.0 / (10 + ne.repeat);
+			if (now - ne.time < delay) continue;  // Not yet time to repeat
+			// Emit auto-repeated event
+			// Note: We intentionally only emit one per frame (call to process) to avoid surprises when latency spikes occur.
+			++ne.repeat;
+			ne.time += delay;  // Increment rather than set to now, so that repeating is smoother.
+			std::clog << "controllers/debug: NavEvent auto repeat " << ne.repeat << " next=" << now - ne.time << " delay=" << delay << std::endl;
+			m_navEvents.push_back(ne);
+		}
+	}
+	/// Handle an incoming SDL event
+	bool pushEvent(SDL_Event const& sdlEv, boost::xtime const& t) {
+		for (auto& typehw: m_hw) {
+			Event event;
+			event.time = t;
+			if (typehw.second->process(event, sdlEv)) { pushHWEvent(event); return true; }
+		}
+		return false;
+	}
+	/// Assign event's source a ControllerDef (if not already assigned) and return it
+	ControllerDef const* assign(Event const& event) {
+		// Attempt insertion (does not override existing values)
+		std::pair<Assignments::iterator, bool> ret = m_assignments.insert(Assignments::value_type(event.source, nullptr));
+		ControllerDef const*& def = ret.first->second;  // A reference to the value inside the map
+		if (!ret.second) return def;  // Source already assigned, just return it.
+		std::string devName = m_hw[event.source.type]->getName(event.source.device);
+		// Find a matching ControllerDef
+		for (ControllerDefs::const_iterator it = m_controllerDefs.begin(); it != m_controllerDefs.end() && !def; ++it) {
+			if (it->second.matches(event, devName)) def = &it->second;
+		}
+		if (def) std::clog << "controllers/info: Assigned " << event.source << " as " << def->name << std::endl;
+		else if (!event.source.isKeyboard()) std::clog << "controllers/warning: \"" << devName << " " << event.source << "\" not found from controllers.xml. Please report a bug if this is a game controller." << std::endl;
+		return def;
+	}
+	/// Handle an incoming hardware event
+	void pushHWEvent(Event event) {
+		ControllerDef const* def = assign(event);
+		if (!def) {
+			pushMappedEvent(event);  // This is for keyboard events mainly (they have no ControllerDefs)
+			return;
+		}
+		event.time += -def->latency;
+		event.devType = def->devType;
+		// Mapping from controllers.xml
+		auto it = def->mapping.find(event.hw);
+		if (it != def->mapping.end()) {
+			Event ev = event;  // Make a copy for fiddling
+			bool handled = false;
+			ButtonMap const& m = it->second;
+			double value = ev.value;
+			unsigned val = value;
+			ev.button = m.map; if (pushMappedEvent(ev)) handled = true;
+			ev.button = m.positive; ev.value = clamp(value); if (pushMappedEvent(ev)) handled = true;
+			ev.button = m.negative; ev.value = clamp(-value); if (pushMappedEvent(ev)) handled = true;
+			if (hwIsHat.matches(ev.hw)) {
+				ev.button = m.up; ev.value = !!(val & SDL_HAT_UP); if (pushMappedEvent(ev)) handled = true;
+				ev.button = m.down; ev.value = !!(val & SDL_HAT_DOWN); if (pushMappedEvent(ev)) handled = true;
+				ev.button = m.left; ev.value = !!(val & SDL_HAT_LEFT); if (pushMappedEvent(ev)) handled = true;
+				ev.button = m.right; ev.value = !!(val & SDL_HAT_RIGHT); if (pushMappedEvent(ev)) handled = true;
+			}
+			if (!handled) std::clog << "controllers/info: ignored " << event << std::endl;  // No matching attribute in controllers.xml
 		} else {
-			bool found = false;
-			for (input::Instruments::const_iterator it2 = g_instruments.begin(); it2 != g_instruments.end(); ++it2) {
-				if (type == it2->first) {
-					forced_type.insert(std::pair<unsigned int,input::Instrument>(sdl_id, input::Instrument(it2->second)));
-					found = true;
-					break;
-				}
-			}
-			if (!found) std::clog << "controllers/error: Controller type \"" << type << "\" unknown" << std::endl;
+			std::clog << "controllers/warning: not mapped " << event << std::endl;  // No matching button/axis/hat element in controllers.xml
 		}
 	}
-
-	unsigned int nbjoysticks = SDL_NumJoysticks();
-	for (unsigned int i = 0 ; i < nbjoysticks ; ++i) {
-		std::string name = SDL_JoystickName(i);
-		std::cout << "SDL joystick: " << name << std::endl;
-		SDL_Joystick* joy = SDL_JoystickOpen(i);
-		if (SDL_JoystickNumButtons(joy) == 0) {
-			std::cout << "  Not suitable for Performous" << std::endl;
-			SDL_JoystickClose(joy);
-			continue;
-		}
-		input::SDL::sdl_devices[i] = joy;
-		std::cout << "  Id: " << i;
-		std::cout << ",  Axes: " << SDL_JoystickNumAxes(joy);
-		std::cout << ", Balls: " << SDL_JoystickNumBalls(joy);
-		std::cout << ", Buttons: " << SDL_JoystickNumButtons(joy);
-		std::cout << ", Hats: " << SDL_JoystickNumHats(joy) << std::endl;
-		if( forced_type.find(i) != forced_type.end() ) {
-			std::cout << "  Detected as: " << forced_type.find(i)->second.description << " (forced)" << std::endl;
-			input::detail::devices.insert(std::make_pair(i, input::detail::InputDevPrivate(forced_type.find(i)->second)));
-		} else {
-			bool found = false;
-			for(input::Instruments::const_iterator it = g_instruments.begin() ; it != g_instruments.end() ; ++it) {
-				boost::regex sdl_name(it->second.match);
-				if (regex_search(name.c_str(), sdl_name)) {
-					std::cout << "  Detected as: " << it->second.description << std::endl;
-					input::detail::devices.insert(std::make_pair(i, input::detail::InputDevPrivate(it->second)));
-					found = true;
-					break;
-				}
-			}
-			if(!found) {
-				std::cout << "  Detected as: Unknown (please report the name; use config to force detection)" << std::endl;
-				SDL_JoystickClose(joy);
-				continue;
-			}
-		}
-	}
-	// Here we should send an event to have correct state buttons
-	init_devices();
-	// Adding keyboard instruments
-	std::clog << "controllers/info: Keyboard as guitar controller: " << (config["game/keyboard_guitar"].b() ? "enabled":"disabled") << std::endl;
-	std::clog << "controllers/info: Keyboard as drumkit controller: " << (config["game/keyboard_drumkit"].b() ? "enabled":"disabled") << std::endl;
-	std::clog << "controllers/info: Keyboard as dance pad controller: " << (config["game/keyboard_dancepad"].b() ? "enabled":"disabled") << std::endl;
-	std::clog << "controllers/info: Keyboard as keyboard controller: " << (config["game/keyboard_keyboard"].b() ? "enabled":"disabled") << std::endl;
-	input::SDL::sdl_devices[input::detail::KEYBOARD_GUITAR] = NULL;
-	input::detail::devices.insert(std::make_pair(input::detail::KEYBOARD_GUITAR, input::detail::InputDevPrivate(g_instruments.find("GUITAR_GUITARHERO")->second)));
-	input::SDL::sdl_devices[input::detail::KEYBOARD_DRUMS] = NULL;
-	input::detail::devices.insert(std::make_pair(input::detail::KEYBOARD_DRUMS, input::detail::InputDevPrivate(g_instruments.find("DRUMS_GUITARHERO")->second)));
-	input::SDL::sdl_devices[input::detail::KEYBOARD_DANCEPAD] = NULL;
-	input::detail::devices.insert(std::make_pair(input::detail::KEYBOARD_DANCEPAD, input::detail::InputDevPrivate(g_instruments.find("DANCEPAD_GENERIC")->second)));
-	input::SDL::sdl_devices[input::detail::KEYBOARD_KEYBOARD] = NULL;
-	input::detail::devices.insert(std::make_pair(input::detail::KEYBOARD_KEYBOARD, input::detail::InputDevPrivate(g_instruments.find("KEYBOARD_GENERIC")->second)));
-}
-
-bool joybutton(input::Event event, SDL_Event const& _e, bool state) {
-	using namespace input;
-	using namespace input::detail;
-	unsigned int joy_id = _e.jbutton.which;
-	if(!devices.find(joy_id)->second.assigned()) return false;
-	int button = devices.find(joy_id)->second.buttonFromSDL(_e.jbutton.button);
-	if( button == -1 ) return false;
-	for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-		event.pressed[i] = devices.find(joy_id)->second.pressed(i);
-	}
-	event.type = input::Event::PRESS;
-	event.button = button;
-	event.pressed[button] = state;
-	devices.find(joy_id)->second.addEvent(event);
-	return true;
-}
-
-bool keybutton(input::Event event, SDL_Event const& _e, bool state) {
-	using namespace input;
-	using namespace input::detail;
-	unsigned int joy_id = 0;
-	int button = 0;
-	event.type = (state ? input::Event::PRESS : input::Event::RELEASE);
-	bool guitar = config["game/keyboard_guitar"].b();
-	bool drumkit = config["game/keyboard_drumkit"].b();
-	bool dancepad = config["game/keyboard_dancepad"].b();
-	bool keyboard = config["game/keyboard_keyboard"].b();
-
-
-	switch(_e.key.keysym.sym) {
-		// Guitar picking on keyboard
-		case SDLK_RSHIFT: button++; // Button number allows using secondary pick for menu navigation
-		case SDLK_RETURN: case SDLK_KP_ENTER:
-			if (!guitar) return false;
-			if (!state) return true;
-			event.type = input::Event::PICK;
-			joy_id = input::detail::KEYBOARD_GUITAR;
-			break;
-
-		// Guitar buttons on keyboard
-		case SDLK_BACKSPACE: button++;  // Whammy
-		case SDLK_RCTRL: button++;  // God mode
-		case SDLK_F5: case SDLK_5: case SDLK_b: button++;
-		case SDLK_F4: case SDLK_4: case SDLK_v: button++;
-		case SDLK_F3: case SDLK_3: case SDLK_c: button++;
-		case SDLK_F2: case SDLK_2: case SDLK_x: button++;
-		case SDLK_F1: case SDLK_1: case SDLK_z: case SDLK_w: case SDLK_y:
-			if (!guitar) return false;
-			joy_id = KEYBOARD_GUITAR;
-			break;
-
-		// Keyboard/keytar on keyboard
-		case SDLK_F12: button++;
-		case SDLK_F11: button++;
-		case SDLK_F10: button++;
-		case SDLK_F9: button++;
-		case SDLK_F8: button++;
-		case SDLK_F7:
-			if (!keyboard) return false;
-			joy_id = KEYBOARD_KEYBOARD;
-			break;
-
-		// Drums on keyboard
-		case SDLK_p: button++;
-		case SDLK_o: button++;
-		case SDLK_i: button++;
-		case SDLK_u: button++;
-		case SDLK_SPACE:
-			if(!drumkit) return false;
-			joy_id = KEYBOARD_DRUMS;
-			event.pressed[button] = state;
-			break;
-
-		// Dance on keypad
-		case SDLK_KP9: button++;
-		case SDLK_KP7: button++;
-		case SDLK_KP3: button++;
-		case SDLK_KP1: button++;
-		case SDLK_KP6: case SDLK_RIGHT: button++;
-		case SDLK_KP8: case SDLK_UP: button++;
-		case SDLK_KP2: case SDLK_DOWN: case SDLK_KP5: button++;
-		case SDLK_KP4: case SDLK_LEFT:
-			if(!dancepad) return false;
-			joy_id = KEYBOARD_DANCEPAD;
-			break;
-
-		default: return false;
-	}
-
-	// We need to push an event
-	event.button = button;
-	// Read old button status from device
-	for(unsigned int i = 0 ; i < BUTTONS ; ++i) {
-		event.pressed[i] = devices.find(joy_id)->second.pressed(i);
-	}
-	// if we have a holdable button, update the pressed status
-	if (event.type == input::Event::PRESS || event.type == input::Event::RELEASE) {
-		event.pressed[event.button] = state;
-	}
-	devices.find(joy_id)->second.addEvent(event);
-	return true;
-}
-
-bool input::SDL::pushEvent(SDL_Event _e, boost::xtime t) {
-	using namespace input::detail;
-
-	Event event;
-	// Add event time
-	event.time = t;
-	// Translate to NavButton
-	event.nav = getNav(_e);
-	switch(_e.type) {
-		case SDL_KEYDOWN: return keybutton(event, _e, true);
-		case SDL_KEYUP: return keybutton(event, _e, false);
-		case SDL_JOYBUTTONDOWN: return joybutton(event, _e, true);
-		case SDL_JOYBUTTONUP: return joybutton(event, _e, false);
-		case SDL_JOYAXISMOTION:
-		{
-			unsigned int joy_id = 0;
-			//FIXME: XML axis config is really needed so that these horrible
-			//       quirks for RB XBOX360 and GH XPLORER guitars can be removed
-			joy_id = _e.jaxis.which;
-			InputDevPrivate& dev = devices.find(joy_id)->second;
-			if(!dev.assigned()) return false;
-			if (dev.name() != "GUITAR_GUITARHERO_XPLORER" && (_e.jaxis.axis == 5 || _e.jaxis.axis == 6 || _e.jaxis.axis == 1)) {
-				event.type = input::Event::PICK;
-				for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-					event.pressed[i] = dev.pressed(i);
-				}
-				// Direction
-				event.button = (_e.jaxis.value > 0 ? 0 /* down */: 1 /* up */);
-				dev.addEvent(event);
-				return true;
-			} else if ((dev.name() != "GUITAR_GUITARHERO_XPLORER" && _e.jaxis.axis == 2 )
-			  || (dev.name() == "GUITAR_ROCKBAND_XBOX360" && _e.jaxis.axis == 4)
-			  || (dev.name() == "GUITAR_ROCKBAND_XBOXADAPTER" && _e.jaxis.axis == 3))
+	bool pushMappedEvent(Event& ev) {
+		if (ev.button == GENERIC_UNASSIGNED) return false;
+		if (!valueChanged(ev)) return false;  // Avoid repeated or other useless events
+		std::clog << "controllers/debug: processing " << ev << std::endl;
+		ev.nav = navigation(ev);
+		// Emit nav event
+		if (ev.nav != NAV_NONE) {
+			NavEvent ne;
+			ne.source = ev.source;
+			ne.button = ev.nav;
+			// Menu navigation mapping
 			{
-				// Whammy bar (special case for XBox RB guitar
-				for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-					event.pressed[i] = dev.pressed(i);
-				}
-				event.button = input::WHAMMY_BUTTON;
-				event.type = input::Event::PRESS;
-				event.pressed[event.button] = (_e.jaxis.value > 0);
-				dev.addEvent(event);
-				return true;
-			} else if ((dev.name() == "GUITAR_ROCKBAND_XBOX360" && _e.jaxis.axis == 3)
-			  || (dev.name() == "GUITAR_GUITARHERO_XPLORER" && _e.jaxis.axis == 2)
-			  || (dev.name() == "GUITAR_ROCKBAND_XBOXADAPTER" && _e.jaxis.axis ==4))
-			{
-				// Tilt sensor as an axis on some guitars
-				for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-					event.pressed[i] = dev.pressed(i);
-				}
-				event.button = input::GODMODE_BUTTON;
-				if (_e.jaxis.value < -2) {
-					event.type = input::Event::PRESS;
-					event.pressed[event.button] = true;
-				} else {
-					event.type = input::Event::RELEASE;
-					event.pressed[event.button] = false;
-				}
-				dev.addEvent(event);
-				return true;
+				bool vertical = (ev.devType == DEVTYPE_GUITAR);
+				if (ne.button == NAV_UP) ne.menu = (vertical ? NAVMENU_A_PREV : NAVMENU_B_PREV);
+				else if (ne.button == NAV_DOWN) ne.menu = (vertical ? NAVMENU_A_NEXT : NAVMENU_B_NEXT);
+				else if (ne.button == NAV_LEFT) ne.menu = (vertical ? NAVMENU_B_PREV : NAVMENU_A_PREV);
+				else if (ne.button == NAV_RIGHT) ne.menu = (vertical ? NAVMENU_B_NEXT : NAVMENU_A_NEXT);
 			}
-			return false;
+			ne.time = ev.time;
+			if (ev.value != 0.0) {
+				m_navEvents.push_back(ne);
+				if (ne.button >= NAV_REPEAT) m_navRepeat.insert(std::make_pair(ne.button, ne));
+			} else {
+				if (ne.button >= NAV_REPEAT) m_navRepeat.erase(ne.button);
+			}
 		}
-		case SDL_JOYHATMOTION:
-		{
-			unsigned int joy_id = _e.jhat.which;
-
-			if(!devices.find(joy_id)->second.assigned()) return false;
-			event.type = input::Event::PICK;
-			for( unsigned int i = 0 ; i < BUTTONS ; ++i ) {
-				event.pressed[i] = devices.find(joy_id)->second.pressed(i);
-			}
-			if(_e.jhat.value == SDL_HAT_DOWN ) {
-				event.button = 0;
-				devices.find(joy_id)->second.addEvent(event);
-			} else if(_e.jhat.value == SDL_HAT_UP ) {
-				event.button = 1;
-				devices.find(joy_id)->second.addEvent(event);
-			}
-			break;
+		if (!m_eventsEnabled) return true;
+		// Emit Event and construct a new Device first if needed
+		DevicePtr ptr = m_devices[ev.source].lock();
+		if (!ptr) {
+			ptr.reset(new Device(ev.source, ev.devType));
+			m_orphans.push_back(ptr);
+			m_devices[ev.source] = ptr;
 		}
-		default: return false;
+		ptr->pushEvent(ev);
+		return true;
 	}
+	/// Test if button's value has changed since the last call to this function
+	bool valueChanged(Event const& ev) {
+		// Find the matching UniqueButton or add a new one with NaN value
+		auto res = m_values.insert(std::make_pair(UniqueButton(ev.source, ev.button), getNaN()));
+		double& value = res.first->second;
+		// Check and update value
+		if (value == ev.value) return false;
+		value = ev.value;
+		return true;
+	}
+};
+
+// External API simply wraps self (pImpl)
+Controllers::Controllers(): self(new Controllers::Impl()) {}
+Controllers::~Controllers() {}
+bool Controllers::getNav(NavEvent& ev) { return self->getNav(ev); }
+bool Controllers::getDevice(DevicePtr& dev) { return self->getDevice(dev); }
+void Controllers::enableEvents(bool state) { self->enableEvents(state); }
+void Controllers::process(boost::xtime const& now) { self->process(now); }
+bool Controllers::pushEvent(SDL_Event const& ev, boost::xtime const& t) { return self->pushEvent(ev, t); }
+
+bool Device::getEvent(Event& ev) {
+	if (m_events.empty()) return false;
+	ev = m_events.front();
+	m_events.pop_front();
 	return true;
+}
+
+void Device::pushEvent(Event const& ev) {
+	m_events.push_back(ev);
 }
 

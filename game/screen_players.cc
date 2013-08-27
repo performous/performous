@@ -1,4 +1,5 @@
 #include "screen_players.hh"
+#include "screen_songs.hh"
 
 #include "configuration.hh"
 #include "audio.hh"
@@ -26,10 +27,13 @@ void ScreenPlayers::enter() {
 	m_layout_singer.reset(new LayoutSinger(m_song->getVocalTrack(), m_database));
 
 	theme.reset(new ThemeSongs());
-	m_emptyCover.reset(new Surface(getThemePath("no_player_image.svg")));
+	m_emptyCover.reset(new Surface(findFile("no_player_image.svg")));
 	m_search.text.clear();
 	m_players.setFilter(m_search.text);
 	m_audio.fadeout();
+	if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
+		Game::getSingletonPtr()->activateScreen("Playlist");
+	}
 }
 
 void ScreenPlayers::exit() {
@@ -46,43 +50,44 @@ void ScreenPlayers::exit() {
 	m_database.save();
 }
 
-void ScreenPlayers::manageEvent(SDL_Event event) {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	input::NavButton nav(input::getNav(event));
-	if (nav != input::NONE) {
-		if (nav == input::CANCEL) {
-			if (m_search.text.empty()) { sm->activateScreen("Songs"); return; }
-			else { m_search.text.clear(); m_players.setFilter(m_search.text); }
-		} else if (nav == input::START) {
-			if (m_players.empty()) {
-				m_players.addPlayer(m_search.text);
-				m_players.setFilter(m_search.text);
-				m_players.update();
-				// the current player is the new created one
-			}
-			m_database.addHiscore(m_song);
-			m_database.scores.pop_front();
-
-			if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
-				// no more highscore, we are now finished
-				sm->activateScreen("Songs");
-			} else {
-				m_search.text.clear();
-				m_players.setFilter("");
-				// add all players which reach highscore because if score is very near or same it might be
-				// frustrating for second one that he cannot enter, so better go for next one...
-			}
+void ScreenPlayers::manageEvent(input::NavEvent const& event) {
+	Game* gm = Game::getSingletonPtr();
+	input::NavButton nav = event.button;
+	if (nav == input::NAV_CANCEL) {
+		if (m_search.text.empty()) { gm->activateScreen("Songs"); return; }
+		else { m_search.text.clear(); m_players.setFilter(m_search.text); }
+	} else if (nav == input::NAV_START) {
+		if (m_players.empty()) {
+			m_players.addPlayer(m_search.text);
+			m_players.setFilter(m_search.text);
+			m_players.update();
+			// the current player is the new created one
 		}
-		else if (m_players.empty()) return;
-		else if (nav == input::PAUSE) m_audio.togglePause();
-		else if (nav == input::LEFT) m_players.advance(-1);
-		else if (nav == input::RIGHT) m_players.advance(1);
-		else if (nav == input::UP) m_players.advance(-1);
-		else if (nav == input::DOWN) m_players.advance(1);
-		else if (nav == input::MOREUP) m_players.advance(-10);
-		else if (nav == input::MOREDOWN) m_players.advance(10);
+		m_database.addHiscore(m_song);
+		m_database.scores.pop_front();
+
+		if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
+			// no more highscore, we are now finished
+			gm->activateScreen("Playlist");
+		} else {
+			m_search.text.clear();
+			m_players.setFilter("");
+			// add all players which reach highscore because if score is very near or same it might be
+			// frustrating for second one that he cannot enter, so better go for next one...
+		}
 	}
-	else if (event.type == SDL_KEYDOWN) { // Process keyboard-only keys
+	else if (m_players.empty()) return;
+	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
+	else if (nav == input::NAV_LEFT) m_players.advance(-1);
+	else if (nav == input::NAV_RIGHT) m_players.advance(1);
+	else if (nav == input::NAV_UP) m_players.advance(-1);
+	else if (nav == input::NAV_DOWN) m_players.advance(1);
+	else if (nav == input::NAV_MOREUP) m_players.advance(-10);
+	else if (nav == input::NAV_MOREDOWN) m_players.advance(10);
+}
+
+void ScreenPlayers::manageEvent(SDL_Event event) {
+	if (event.type == SDL_KEYDOWN) { // Process keyboard-only keys
 		SDL_keysym keysym = event.key.keysym;
 		//int key = keysym.sym;
 		//SDLMod mod = event.key.keysym.mod;
@@ -94,7 +99,6 @@ void ScreenPlayers::manageEvent(SDL_Event event) {
 }
 
 void ScreenPlayers::draw() {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	m_players.update(); // Poll for new players
 	double length = m_audio.getLength();
 	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
@@ -114,6 +118,8 @@ void ScreenPlayers::draw() {
 			oss_song << _("Press enter to create player!");
 			oss_order << m_search.text << '\n';
 		}
+	} else if (m_database.scores.empty()) {
+		oss_song << _("No players worth mentioning!");
 	} else {
 		// Format the player information text
 		oss_song << m_database.scores.front().track << '\n';
@@ -135,7 +141,7 @@ void ScreenPlayers::draw() {
 		for (int i = -2; i < 5; ++i) {
 			PlayerItem player_display = m_players[baseidx + i];
 			if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
-			Surface* cover = 0;
+			Surface* cover = nullptr;
 			if (player_display.path != "")
 			{
 				try { cover = &m_covers[player_display.path]; }

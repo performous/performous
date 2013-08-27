@@ -16,7 +16,7 @@ class ProgressBar {
 	* @param end margin after the bar ends [0, 1]
 	* @param sliding makes the bar move; the texture is anchored at bar end rather than at bar beginning
 	**/
-	ProgressBar(std::string const& bg, std::string const& bar, Mode mode = HORIZONTAL, float begin = 0.0f, float end = 0.0f, bool sliding = false);
+	ProgressBar(fs::path const& bg, fs::path const& bar, Mode mode = HORIZONTAL, float begin = 0.0f, float end = 0.0f, bool sliding = false);
 	/** Draw a progress bar with the given percentage [0, 1] **/
 	void draw(float value);
   private:

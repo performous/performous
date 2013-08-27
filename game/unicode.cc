@@ -15,11 +15,11 @@ namespace {
 	// This is in fact (slightly modified) Glib::convert from glibmm.
 	std::string convert(const std::string& str, const std::string& to_codeset, const std::string& from_codeset) {
 		gsize bytes_written = 0;
-		GError* gerror = 0;
+		GError* gerror = nullptr;
 
 		char *const buf = g_convert(
 		  str.data(), str.size(), to_codeset.c_str(), from_codeset.c_str(),
-		  0, &bytes_written, &gerror);
+		  nullptr, &bytes_written, &gerror);
 
 		if (gerror) throw std::runtime_error("Conversion error"); // Throw on error
 		std::string ret(buf, bytes_written);
@@ -53,7 +53,7 @@ void convertToUTF8(std::stringstream &_stream, std::string _filename) {
 
 std::string convertToUTF8(std::string const& str) {
 	std::stringstream ss(str);
-	convertToUTF8(ss, "");
+	convertToUTF8(ss);
 	return ss.str();
 }
 

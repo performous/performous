@@ -20,7 +20,7 @@ void ScreenPaths::enter() {
 	m_txtinp.text.clear();
 
 	// FIXME: Temp error message
-	ScreenManager::getSingletonPtr()->dialog(
+	Game::getSingletonPtr()->dialog(
 		_("This tool is not yet available.\n"
 		  "Configure paths by adding them\n"
 		  "as command line parameters and\n"
@@ -30,19 +30,7 @@ void ScreenPaths::enter() {
 void ScreenPaths::exit() { m_theme.reset(); }
 
 void ScreenPaths::manageEvent(SDL_Event event) {
-	ScreenManager* sm = ScreenManager::getSingletonPtr();
-	input::NavButton nav(input::getNav(event));
-	if (nav != input::NONE) {
-		if (nav == input::CANCEL || nav == input::SELECT) {
-			if (m_txtinp.text.empty()) sm->activateScreen("Intro");
-			else m_txtinp.text.clear();
-		}
-		else if (nav == input::PAUSE) m_audio.togglePause();
-		else if (nav == input::START) { 
-			// TODO: Save config
-			sm->activateScreen("Intro");
-		}
-	} else if (event.type == SDL_KEYDOWN) {
+	if (event.type == SDL_KEYDOWN) {
 		return; // FIXME: Remove
 		SDLKey key = event.key.keysym.sym;
 		SDLMod modifier = event.key.keysym.mod;
@@ -56,9 +44,22 @@ void ScreenPaths::manageEvent(SDL_Event event) {
 	}
 }
 
+void ScreenPaths::manageEvent(input::NavEvent const& ev) {
+	Game* gm = Game::getSingletonPtr();
+	if (ev.button == input::NAV_CANCEL) {
+		if (m_txtinp.text.empty()) gm->activateScreen("Intro");
+		else m_txtinp.text.clear();
+	}
+	else if (ev.button == input::NAV_PAUSE) m_audio.togglePause();
+	else if (ev.button == input::NAV_START) { 
+		// TODO: Save config
+		gm->activateScreen("Intro");
+	}
+}
+
 void ScreenPaths::draw() {
-	if (!ScreenManager::getSingletonPtr()->isDialogOpen())
-		ScreenManager::getSingletonPtr()->activateScreen("Intro"); // FIXME: Remove
+	if (!Game::getSingletonPtr()->isDialogOpen())
+		Game::getSingletonPtr()->activateScreen("Intro"); // FIXME: Remove
 
 	m_theme->bg.draw();
 
@@ -68,8 +69,10 @@ void ScreenPaths::draw() {
 	m_theme->comment.dimensions.left(-0.48).screenBottom(-0.067);
 	m_theme->comment.draw(_("Press any key to exit."));
 	// Additional info
+	#ifdef _WIN32
 	m_theme->comment_bg.dimensions.middle().screenBottom(-0.01);
 	m_theme->comment_bg.draw();
 	m_theme->comment.dimensions.left(-0.48).screenBottom(-0.023);
-	m_theme->comment.draw(_("Windows users can also use ConfigureSongDirectory.bat in the bin-directory."));
+	m_theme->comment.draw(_("Windows users can also use ConfigureSongDirectory.bat script."));
+	#endif
 }

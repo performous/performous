@@ -14,15 +14,15 @@ ScreenIntro::ScreenIntro(std::string const& name, Audio& audio): Screen(name), m
 }
 
 void ScreenIntro::enter() {
-	ScreenManager::getSingletonPtr()->showLogo();
-	m_audio.playMusic(getThemePath("menu.ogg"), true);
+	Game::getSingletonPtr()->showLogo();
+	m_audio.playMusic(findFile("menu.ogg"), true);
 	m_selAnim = AnimValue(0.0, 10.0);
 	m_submenuAnim = AnimValue(0.0, 3.0);
 	populateMenu();
 	if( m_first ) {
 		std::string msg;
 		if (!m_audio.hasPlayback()) msg = _("No playback devices could be used.\n");
-		if (!msg.empty()) ScreenManager::getSingletonPtr()->dialog(msg + _("\nPlease configure some before playing."));
+		if (!msg.empty()) Game::getSingletonPtr()->dialog(msg + _("\nPlease configure some before playing."));
 		m_first = false;
 	}
 	reloadGL();
@@ -37,22 +37,27 @@ void ScreenIntro::exit() {
 	theme.reset();
 }
 
+void ScreenIntro::manageEvent(input::NavEvent const& event) {
+	input::NavButton nav = event.button;
+	if (nav == input::NAV_CANCEL) {
+		if (m_menu.getSubmenuLevel() == 0) m_menu.moveToLast();  // Move cursor to quit in main menu
+		else m_menu.closeSubmenu(); // One menu level up
+	}
+	else if (nav == input::NAV_DOWN || nav == input::NAV_MOREDOWN) m_menu.move(1);
+	else if (nav == input::NAV_UP || nav == input::NAV_MOREUP) m_menu.move(-1);
+	else if (nav == input::NAV_RIGHT && m_menu.getSubmenuLevel() >= 2) m_menu.action(1); // Config menu
+	else if (nav == input::NAV_LEFT && m_menu.getSubmenuLevel() >= 2) m_menu.action(-1); // Config menu
+	else if (nav == input::NAV_RIGHT && m_menu.getSubmenuLevel() < 2) m_menu.move(1); // Instrument nav hack
+	else if (nav == input::NAV_LEFT && m_menu.getSubmenuLevel() < 2) m_menu.move(-1); // Instrument nav hack
+	else if (nav == input::NAV_START) m_menu.action();
+	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
+	// Animation targets
+	m_selAnim.setTarget(m_menu.curIndex());
+	m_submenuAnim.setTarget(m_menu.getSubmenuLevel());
+}
+
 void ScreenIntro::manageEvent(SDL_Event event) {
-	input::NavButton nav(input::getNav(event));
-	if (nav != input::NONE) {
-		if (nav == input::CANCEL) {
-			if (m_menu.getSubmenuLevel() == 0) m_menu.moveToLast();  // Move cursor to quit in main menu
-			else m_menu.closeSubmenu(); // One menu level up
-		}
-		else if (nav == input::DOWN || nav == input::MOREDOWN) m_menu.move(1);
-		else if (nav == input::UP || nav == input::MOREUP) m_menu.move(-1);
-		else if (nav == input::RIGHT && m_menu.getSubmenuLevel() >= 2) m_menu.action(1); // Config menu
-		else if (nav == input::LEFT && m_menu.getSubmenuLevel() >= 2) m_menu.action(-1); // Config menu
-		else if (nav == input::RIGHT && m_menu.getSubmenuLevel() < 2) m_menu.move(1); // Instrument nav hack
-		else if (nav == input::LEFT && m_menu.getSubmenuLevel() < 2) m_menu.move(-1); // Instrument nav hack
-		else if (nav == input::START) m_menu.action();
-		else if (nav == input::PAUSE) m_audio.togglePause();
-	} else if (event.type == SDL_KEYDOWN && m_menu.getSubmenuLevel() > 0) {
+	if (event.type == SDL_KEYDOWN && m_menu.getSubmenuLevel() > 0) {
 		// These are only available in config menu
 		int key = event.key.keysym.sym;
 		SDLMod modifier = event.key.keysym.mod;
@@ -60,13 +65,10 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 			m_menu.current().value->reset(modifier & KMOD_ALT);
 		} else if (key == SDLK_s && modifier & KMOD_CTRL) {
 			writeConfig(modifier & KMOD_ALT);
-			ScreenManager::getSingletonPtr()->flashMessage((modifier & KMOD_ALT)
+			Game::getSingletonPtr()->flashMessage((modifier & KMOD_ALT)
 				? _("Settings saved as system defaults.") : _("Settings saved."));
 		}
 	}
-	// Animation targets
-	m_selAnim.setTarget(m_menu.curIndex());
-	m_submenuAnim.setTarget(m_menu.getSubmenuLevel());
 }
 
 void ScreenIntro::draw_menu_options() {
@@ -152,40 +154,32 @@ void ScreenIntro::draw() {
 
 SvgTxtTheme& ScreenIntro::getTextObject(std::string const& txt) {
 	if (theme->options.contains(txt)) return theme->options[txt];
-	return *theme->options.insert(txt, new SvgTxtTheme(getThemePath("mainmenu_option.svg"), config["graphic/text_lod"].f()))->second;
+	return *theme->options.insert(txt, new SvgTxtTheme(findFile("mainmenu_option.svg"), config["graphic/text_lod"].f()))->second;
 }
 
 void ScreenIntro::populateMenu() {
+	MenuImage imgSing(new Surface(findFile("intro_sing.svg")));
+	MenuImage imgPractice(new Surface(findFile("intro_practice.svg")));
+	MenuImage imgConfig(new Surface(findFile("intro_configure.svg")));
+	MenuImage imgQuit(new Surface(findFile("intro_quit.svg")));
 	m_menu.clear();
-	boost::shared_ptr<Surface> config_bg(new Surface(getThemePath("intro_configure.svg")));
-	m_menu.add(MenuOption(_("Perform"), _("Start performing!"), "Songs", "intro_sing.svg"));
-	m_menu.add(MenuOption(_("Practice"), _("Check your skills or test the microphones"), "Practice", "intro_practice.svg"));
-
-	{	// Config submenu
-		MenuOptions audiomenu;
-		MenuOptions gfxmenu;
-		MenuOptions gamemenu;
-		// Populate the submenus
-		for (Config::iterator it = config.begin(); it != config.end(); ++it) {
-			// Skip items that are configured elsewhere
-			if (it->first == "audio/devices" || it->first.find("paths/") != std::string::npos) continue;
-			MenuOptions* opts = &gamemenu; // Default to game menu
-			if (it->first.find("audio/") != std::string::npos) opts = &audiomenu;
-			else if (it->first.find("graphic/") != std::string::npos) opts = &gfxmenu;
-			// Push the ConfigItem to the submenu
-			opts->push_back(MenuOption(_(it->second.getShortDesc().c_str()), _(it->second.getLongDesc().c_str()), &it->second));
-			opts->back().image = config_bg;
+	m_menu.add(MenuOption(_("Perform"), _("Start performing!"), imgSing).screen("Songs"));
+	m_menu.add(MenuOption(_("Practice"), _("Check your skills or test the microphones"), imgPractice).screen("Practice"));
+	// Configure menu + submenu options
+	MenuOptions configmain;
+	for (MenuEntry const& submenu: configMenu) {
+		if (!submenu.items.empty()) {
+			MenuOptions opts;
+			// Process items that belong to that submenu
+			for (std::string const& item: submenu.items) {
+				ConfigItem& c = config[item];
+				opts.push_back(MenuOption(_(c.getShortDesc().c_str()), _(c.getLongDesc().c_str())).changer(c));
+			}
+			configmain.push_back(MenuOption(_(submenu.shortDesc.c_str()), _(submenu.longDesc.c_str()), imgConfig).submenu(opts));
+		} else {
+			configmain.push_back(MenuOption(_(submenu.shortDesc.c_str()), _(submenu.longDesc.c_str()), imgConfig).screen(submenu.name));
 		}
-		// Main config menu
-		MenuOptions configmain;
-		configmain.push_back(MenuOption(_("Audio Devices"), _("Setup microphones and playback"), "AudioDevices", "intro_configure.svg"));
-		configmain.push_back(MenuOption(_("Audio"), _("Configure general audio settings"), audiomenu, "intro_configure.svg"));
-		configmain.push_back(MenuOption(_("Graphics"), _("Configure rendering and video settings"), gfxmenu, "intro_configure.svg"));
-		configmain.push_back(MenuOption(_("Game"), _("Gameplay related options"), gamemenu, "intro_configure.svg"));
-		configmain.push_back(MenuOption(_("Paths"), _("Setup song and data paths"), "Paths", "intro_configure.svg"));
-		// Add to root menu
-		m_menu.add(MenuOption(_("Configure"), _("Configure audio and game options"), configmain, "intro_configure.svg"));
 	}
-
-	m_menu.add(MenuOption(_("Quit"), _("Leave the game"), "", "intro_quit.svg"));
+	m_menu.add(MenuOption(_("Configure"), _("Configure audio and game options"), imgConfig).submenu(configmain));
+	m_menu.add(MenuOption(_("Quit"), _("Leave the game"), imgQuit).screen(""));
 }

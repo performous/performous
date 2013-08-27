@@ -9,7 +9,7 @@
 class Video {
   public:
 	/// opens given video file
-	Video(std::string const& videoFile, double videoGap = 0.0);
+	Video(fs::path const& videoFile, double videoGap = 0.0);
 	void prepare(double time);  ///< Load the current video frame into a texture
 	void render(double time);  ///< Render the prepared video frame
 	/// returns Dimensions of video clip
@@ -20,7 +20,7 @@ class Video {
   private:
 	FFmpeg m_mpeg;
 	double m_videoGap;
-	VideoFrame m_videoFrame;
+	Bitmap m_videoFrame;
 	Surface m_surface;
 	double m_surfaceTime;
 	double m_lastTime;

@@ -12,7 +12,7 @@ class ConfigItem {
   public:
 	typedef std::vector<std::string> StringList; ///< a list of strings
 	typedef std::vector<std::string> OptionList; ///< a list of string options
-	ConfigItem() {}
+	ConfigItem() : m_sel() {}
 	ConfigItem(bool bval);
 	ConfigItem(int ival);
 	ConfigItem(float fval);
@@ -38,6 +38,7 @@ class ConfigItem {
 	std::string const& getShortDesc() const { return m_shortDesc; } ///< get the short description for this ConfigItem
 	std::string const& getLongDesc() const { return m_longDesc; } ///< get the long description for this ConfigItem
 	void addEnum(std::string name); ///< Dynamically adds an enum to all values
+	void selectEnum(std::string const& name); ///< Set integer value by enum name
 	std::string getEnumName(); ///< Returns the selected enum option's text
 
   private:

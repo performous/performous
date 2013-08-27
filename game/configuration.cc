@@ -2,11 +2,10 @@
 
 #include "fs.hh"
 #include "util.hh"
-#include "execname.hpp"
 #include "i18n.hh"
 #include <boost/filesystem.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
 #include <libxml++/libxml++.h>
 #include <algorithm>
 #include <iomanip>
@@ -14,20 +13,18 @@
 #include <iostream>
 #include <cmath>
 
-namespace fs = boost::filesystem;
-
 Config config;
 
 
-ConfigItem::ConfigItem(bool bval): m_type("bool"), m_value(bval) { }
+ConfigItem::ConfigItem(bool bval): m_type("bool"), m_value(bval), m_sel() { }
 
-ConfigItem::ConfigItem(int ival): m_type("int"), m_value(ival) { }
+ConfigItem::ConfigItem(int ival): m_type("int"), m_value(ival), m_sel() { }
 
-ConfigItem::ConfigItem(float fval): m_type("float"), m_value(fval) { }
+ConfigItem::ConfigItem(float fval): m_type("float"), m_value(fval), m_sel() { }
 
-ConfigItem::ConfigItem(std::string sval): m_type("string"), m_value(sval) { }
+ConfigItem::ConfigItem(std::string sval): m_type("string"), m_value(sval), m_sel() { }
 
-ConfigItem::ConfigItem(OptionList opts): m_type("option_list"), m_value(opts), m_sel(0) { }
+ConfigItem::ConfigItem(OptionList opts): m_type("option_list"), m_value(opts), m_sel() { }
 
 
 ConfigItem& ConfigItem::incdec(int dir) {
@@ -93,10 +90,9 @@ namespace {
 		return fmter.str();
 	}
 
-	fs::path origin;  // The primary shared data folder
-	
 	std::string getText(xmlpp::Element const& elem) {
-		return elem.get_child_text()->get_content();
+		xmlpp::TextNode const* n = elem.get_child_text();  // Returns NULL if there is no text
+		return n ? std::string(n->get_content()) : std::string();
 	}
 	
 	std::string getText(xmlpp::Element const& elem, std::string const& path) {
@@ -109,7 +105,7 @@ namespace {
 std::string ConfigItem::getValue() const {
 	if (m_type == "int") {
 		int val = boost::get<int>(m_value);
-		if (val >= 0 && val < m_enums.size()) return m_enums[val];
+		if (val >= 0 && val < int(m_enums.size())) return m_enums[val];
 		return numericFormat<int>(m_value, m_multiplier, m_step) + m_unit;
 	}
 	if (m_type == "float") return numericFormat<double>(m_value, m_multiplier, m_step) + m_unit;
@@ -152,9 +148,16 @@ void ConfigItem::addEnum(std::string name) {
 	m_step = 1;
 }
 
+void ConfigItem::selectEnum(std::string const& name) {
+	auto it = std::find(m_enums.begin(), m_enums.end(), name);
+	if (it == m_enums.end()) throw std::runtime_error("Enum value " + name + " not found in " + m_shortDesc);
+	i() = it - m_enums.begin();
+}
+
+
 std::string ConfigItem::getEnumName() {
 	int val = i();
-	if (val >= 0 && val < m_enums.size()) return m_enums[val];
+	if (val >= 0 && val < int(m_enums.size())) return m_enums[val];
 	return "";
 }
 
@@ -239,16 +242,17 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 	throw std::runtime_error(boost::lexical_cast<std::string>(line) + ": Error while reading entry: " + e.what());
 }
 
-fs::path systemConfFile = "/etc/xdg/performous/config.xml";
-fs::path userConfFile = getConfigDir() / "config.xml";
+// These are set in readConfig, once the paths have been bootstrapped.
+fs::path systemConfFile;
+fs::path userConfFile;
 
 void writeConfig(bool system) {
 	xmlpp::Document doc;
 	xmlpp::Node* nodeRoot = doc.create_root_node("performous");
 	bool dirty = false;
-	for (Config::iterator it = config.begin(); it != config.end(); ++it) {
-		ConfigItem& item = it->second;
-		std::string name = it->first;
+	for (auto& elem: config) {
+		ConfigItem& item = elem.second;
+		std::string name = elem.first;
 		if (item.isDefault(system)) continue; // No need to save settings with default values
 		dirty = true;
 		xmlpp::Element* entryNode = nodeRoot->add_child("entry");
@@ -260,25 +264,17 @@ void writeConfig(bool system) {
 		else if (type == "float") entryNode->set_attribute("value",boost::lexical_cast<std::string>(item.f()));
 		else if (item.get_type() == "string") entryNode->add_child("stringvalue")->add_child_text(item.s());
 		else if (item.get_type() == "string_list") {
-			std::vector<std::string> const& value = item.sl();
-			for(std::vector<std::string>::const_iterator it = value.begin(); it != value.end(); ++it) {
-				xmlpp::Element* stringvalueNode = entryNode->add_child("stringvalue");
-				stringvalueNode->add_child_text(*it);
-			}
+			for (auto const& str: item.sl()) entryNode->add_child("stringvalue")->add_child_text(str);
 		}
 		else if (item.get_type() == "option_list") {
 			//TODO: Write selected also (as attribute?)
-			ConfigItem::OptionList const& value = item.ol();
-			for(ConfigItem::OptionList::const_iterator it = value.begin(); it != value.end(); ++it) {
-				xmlpp::Element* stringvalueNode = entryNode->add_child("stringvalue");
-				stringvalueNode->add_child_text(*it);
-			}
+			for (auto const& str: item.ol()) entryNode->add_child("stringvalue")->add_child_text(str);
 		}
 	}
 	fs::path const& conf = system ? systemConfFile : userConfFile;
 	std::string tmp = conf.string() + "tmp";
 	try {
-		create_directory(conf.parent_path());
+		create_directories(conf.parent_path());
 		if (dirty) doc.write_to_file_formatted(tmp, "UTF-8");
 		if (exists(conf)) remove(conf);
 		if (dirty) {
@@ -292,7 +288,7 @@ void writeConfig(bool system) {
 	}
 	if (!system) return;
 	// Tell the items that we have changed the system default
-	for (Config::iterator it = config.begin(); it != config.end(); ++it) it->second.makeSystem();
+	for (auto& elem: config) elem.second.makeSystem();
 	// User config is no longer needed
 	if (exists(userConfFile)) remove(userConfFile);
 }
@@ -326,7 +322,7 @@ void readConfigXML(fs::path const& file, int mode) {
 			xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**nodeit);
 			std::string name = getAttribute(elem, "name");
 			if (name.empty()) throw std::runtime_error(file.string() + " element Entry missing name attribute");
-			Config::iterator it = config.find(name);
+			auto it = config.find(name);
 			if (mode == 0) { // Schema
 				if (it != config.end()) throw std::runtime_error("Configuration schema contains the same value twice: " + name);
 				config[name].update(elem, 0);
@@ -334,9 +330,9 @@ void readConfigXML(fs::path const& file, int mode) {
 				bool hidden = false;
 				try { if (getAttribute(elem, "hidden") == "true") hidden = true; } catch (XMLError&) {}
 				if (!hidden) {
-					for (ConfigMenu::iterator it = configMenu.begin(), end = configMenu.end(); it != end; ++it) {
-						std::string prefix = it->name + '/';
-						if (name.substr(0, prefix.size()) == prefix) { it->items.push_back(name); break; }
+					for (auto& elem: configMenu) {
+						std::string prefix = elem.name + '/';
+						if (name.substr(0, prefix.size()) == prefix) { elem.items.push_back(name); break; }
 					}
 				}
 			} else {
@@ -356,32 +352,18 @@ void readConfigXML(fs::path const& file, int mode) {
 	}
 }
 
-#define CONFIG_SCHEMA "/config/schema.xml"  // Relative to shared data path. Update readConfig and actual file location if you change this
-
 void readConfig() {
 	// Find config schema
-	fs::path schemafile;
-	try {
-		schemafile = getDefaultConfig(fs::path(CONFIG_SCHEMA));
-		origin = fs::path(schemafile).parent_path().parent_path(); // Assuming that two times parent from config file = origin
-	} catch(...) {
-		std::ostringstream oss;
-		oss << "No config schema file found.\n";
-		oss << "Install the file or define environment variable PERFORMOUS_ROOT\n";
-		throw std::runtime_error(oss.str());
-	}
-	readConfigXML(schemafile, 0);  // Read schema and defaults
+	fs::path schemaFile = getSchemaFilename();
+	systemConfFile = getSysConfigDir() / "config.xml";
+	userConfFile = getConfigDir() / "config.xml";
+	readConfigXML(schemaFile, 0);  // Read schema and defaults
 	readConfigXML(systemConfFile, 1);  // Update defaults with system config
 	readConfigXML(userConfFile, 2);  // Read user settings
-	{ // Populate themes
-		ConfigItem& ci = config["game/theme"];
-		std::vector<std::string> themes = getThemes();
-		bool useDefaultTheme = (ci.i() == -1);
-		for (int i = 0; i < themes.size(); ++i) {
-			ci.addEnum(themes[i]);
-			// Select the default theme is no other is selected
-			if (useDefaultTheme && themes[i] == "default")
-				ci.i() = i;
-		}
-	}
+	pathInit();
+	// Populate themes
+	ConfigItem& ci = config["game/theme"];
+	for (std::string const& theme: getThemes()) ci.addEnum(theme);
+	if (ci.i() == -1) ci.selectEnum("default");  // Select the default theme if nothing is selected
 }
+

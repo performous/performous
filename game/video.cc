@@ -3,31 +3,29 @@
 #include "util.hh"
 #include <cmath>
 
-Video::Video(std::string const& _videoFile, double videoGap): m_mpeg(true, false, _videoFile), m_videoGap(videoGap), m_surfaceTime(), m_lastTime(), m_alpha(-0.5, 1.5) {}
+Video::Video(fs::path const& _videoFile, double videoGap): m_mpeg(_videoFile), m_videoGap(videoGap), m_surfaceTime(), m_lastTime(), m_alpha(-0.5, 1.5) {}
 
 void Video::prepare(double time) {
 	time += m_videoGap;
-	VideoFrame& fr = m_videoFrame;
+	Bitmap& fr = m_videoFrame;
 	// Time to switch frame?
-	if (!fr.data.empty() && time >= fr.timestamp) {
-		Bitmap bitmap;
-		bitmap.fmt = pix::RGB;
-		bitmap.buf.swap(fr.data);
-		bitmap.resize(fr.width, fr.height);
-		m_surface.load(bitmap);
+	if (!fr.buf.empty() && time >= fr.timestamp) {
+		m_surface.load(fr);
 		m_surfaceTime = fr.timestamp;
+		fr.resize(0, 0);
 	}
 	// Preload the next future frame
-	if (fr.data.empty()) while (m_mpeg.videoQueue.tryPop(fr) && fr.timestamp < time) {};
+	if (fr.buf.empty()) while (m_mpeg.videoQueue.tryPop(fr) && fr.timestamp < time) {};
 	// Do a seek before next render, if required
-	if (time < m_lastTime - 1.0 || (!fr.data.empty() && time > fr.timestamp + 7.0)) {
+	if (time < m_lastTime - 1.0 || (!fr.buf.empty() && time > fr.timestamp + 7.0)) {
 		m_mpeg.seek(std::max(0.0, time - 5.0));  // -5 to workaround ffmpeg inaccurate seeking
-		fr.data.clear();
+		fr.buf.clear();
 	}
 	m_lastTime = time;
 }
 
 void Video::render(double time) {
+	time += m_videoGap;
 	double tdist = std::abs(m_surfaceTime - time);
 	m_alpha.setTarget(tdist < 0.4 ? 1.2f : -0.5f);
 	double alpha = clamp(m_alpha.get());

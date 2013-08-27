@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fs.hh"
 #include "glmath.hh"
 #include "glutil.hh"
 #include <string>
@@ -33,7 +34,7 @@ struct Shader: public boost::noncopyable {
 	/// Set a string that will replace "//DEFINES" in anything loaded by compileFile
 	Shader& addDefines(std::string const& defines) { defs += defines; return *this; }
 	/// Load shader from file
-	Shader& compileFile(std::string const& filename);
+	Shader& compileFile(fs::path const& filename);
 	/** Compiles a shader of a given type. */
 	Shader& compileCode(std::string const& srccode, GLenum type);
 	/** Links all compiled shaders to a shader program. */

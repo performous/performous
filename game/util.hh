@@ -1,13 +1,9 @@
 #pragma once
 
+#include <cstdint>
 #include <limits>
+#include <vector>
 #include <stdexcept>
-
-/** Implement C99 mathematical rounding (which C++ unfortunately currently lacks) **/
-template <typename T> T round(T val) { return int(val + (val >= 0 ? 0.5 : -0.5)); }
-
-/** Implement C99 remainder function (not precisely, but almost) **/
-template <typename T> T remainder(T val, T div) { return val - round(val/div) * div; }
 
 /** Limit val to range [min, max] **/
 template <typename T> T clamp(T val, T min = 0, T max = 1) {
@@ -16,6 +12,12 @@ template <typename T> T clamp(T val, T min = 0, T max = 1) {
 	if (val > max) return max;
 	return val;
 }
+
+template <typename Numeric> struct MinMax {
+	Numeric min, max;
+	explicit MinMax(Numeric min = std::numeric_limits<Numeric>::min(), Numeric max = std::numeric_limits<Numeric>::max()): min(min), max(max) {}
+	bool matches(Numeric val) const { return val >= min && val <= max; }
+};
 
 /** A convenient way for getting NaNs **/
 static inline double getNaN() { return std::numeric_limits<double>::quiet_NaN(); }

@@ -1,6 +1,5 @@
 #include "songparser.hh"
 
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 #include <stdexcept>
@@ -16,10 +15,6 @@ const std::string HARMONIC_2 = "Harmonic 2";
 const std::string HARMONIC_3 = "Harmonic 3";
 
 namespace {
-	void testAndAdd(Song& s, std::string const& trackid, std::string const& filename) {
-		std::string f = s.path + filename;
-		if (boost::filesystem::exists(f)) s.music[trackid] = f;
-	}
 	bool isVocalTrack(std::string name) {
 		if(name == TrackName::LEAD_VOCAL) return true;
 		else if(name == HARMONIC_1) return true;
@@ -62,7 +57,7 @@ namespace {
 void SongParser::midParseHeader() {
 	Song& s = m_song;
 	// Parse tracks from midi
-	MidiFileParser midi(s.path + "/" + s.midifilename);
+	MidiFileParser midi(s.midifilename);
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
 		std::string name = it->name;
@@ -72,9 +67,9 @@ void SongParser::midParseHeader() {
 		// Add dummy notes to tracks so that they can be seen in song browser
 		if (isVocalTrack(name)) s.insertVocalTrack(name, VocalTrack(name));
 		else {
-			for (MidiFileParser::NoteMap::const_iterator it2 = it->notes.begin(); it2 != it->notes.end(); ++it2) {
+			for (auto const& elem: it->notes) {
 				// If a track has not enough notes on any level, ignore it
-				if (it2->second.size() > 3) { s.instrumentTracks.insert(make_pair(name,InstrumentTrack(name))); break; }
+				if (elem.second.size() > 3) { s.instrumentTracks.insert(make_pair(name,InstrumentTrack(name))); break; }
 			}
 		}
 	}
@@ -85,7 +80,7 @@ void SongParser::midParse() {
 	Song& s = m_song;
 	s.instrumentTracks.clear();
 
-	MidiFileParser midi(s.path + "/" + s.midifilename);
+	MidiFileParser midi(s.midifilename);
 	int reversedNoteCount = 0;
 	for (uint32_t ts = 0, end = midi.ts_last + midi.division; ts < end; ts += midi.division) s.beats.push_back(midi.get_seconds(ts)+s.start);
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
@@ -96,44 +91,35 @@ void SongParser::midParse() {
 		else continue; // not a valid track
 		if (!isVocalTrack(name)) {
 			// Process non-vocal tracks
-			int durCount = 0;
+			double trackEnd = 0.0;
 			s.instrumentTracks.insert(make_pair(name,InstrumentTrack(name)));
 			NoteMap& nm2 = s.instrumentTracks.find(name)->second.nm;
-			for (MidiFileParser::NoteMap::const_iterator it2 = it->notes.begin(); it2 != it->notes.end(); ++it2) {
-				Durations& dur = nm2[it2->first];
-				MidiFileParser::Notes const& notes = it2->second;
-				for (MidiFileParser::Notes::const_iterator it3 = notes.begin(); it3 != notes.end(); ++it3) {
-					double beg = midi.get_seconds(it3->begin)+s.start;
-					double end = midi.get_seconds(it3->end)+s.start;
+			for (auto const& elem: it->notes) {
+				Durations& dur = nm2[elem.first];
+				MidiFileParser::Notes const& notes = elem.second;
+				for (auto const& note: notes) {
+					double beg = midi.get_seconds(note.begin)+s.start;
+					double end = midi.get_seconds(note.end)+s.start;
 					if (end == 0) continue; // Note with no ending
 					if (beg > end) { // Reversed note
 						if (beg - end > 0.001) { reversedNoteCount++; continue; }
 						else end = beg; // Allow 1ms error to counter rounding etc errors
 					}
 					dur.push_back(Duration(beg, end));
-					durCount++;
+					if (trackEnd < end) trackEnd = end;
 				}
 			}
-			// If a track has only 20 or less notes it's most likely b0rked.
-			// This number has been extracted from broken song tracks, but
-			// it is probably DIFFICULTYCOUNT * different_frets.
-			if (durCount <= 20) {
-				s.b0rkedTracks = true;
-				nm2.clear();
-				std::ostringstream oss;
-				oss << "Track " << name << " is broken in ";
-				oss << s.path << s.midifilename << std::endl;
-				std::clog << "songparser/warning: " << oss.str(); // More likely to be atomic when written as one string
-				s.instrumentTracks.erase(name);
-			}
+			// Discard empty tracks
+			// Note: some songs have notes at the very beginning (but are otherwise empty)
+			if (trackEnd < 1.0) s.instrumentTracks.erase(name);
 		} else {
 			// Process vocal tracks
 			VocalTrack vocal(name);
-			for (MidiFileParser::Lyrics::const_iterator it2 = it->lyrics.begin(); it2 != it->lyrics.end(); ++it2) {
+			for (auto const& lyric: it->lyrics) {
 				Note n;
-				n.begin = midi.get_seconds(it2->begin)+s.start;
-				n.end = midi.get_seconds(it2->end)+s.start;
-				n.notePrev = n.note = it2->note;
+				n.begin = midi.get_seconds(lyric.begin)+s.start;
+				n.end = midi.get_seconds(lyric.end)+s.start;
+				n.notePrev = n.note = lyric.note;
 				n.type = n.note > 100 ? Note::SLEEP : Note::NORMAL;
 				if(n.note == 116 || n.note == 103 || n.note == 124)
 					continue; // managed in the next loop (GOLDEN/FREESTYLE notes)
@@ -142,7 +128,7 @@ void SongParser::midParse() {
 				else
 					n.type = Note::NORMAL;
 				{
-					std::stringstream ss(it2->lyric);
+					std::stringstream ss(lyric.lyric);
 					convertToUTF8(ss);
 					n.syllable = ss.str();
 				}
@@ -168,7 +154,7 @@ void SongParser::midParse() {
 					}
 					// Special processing for slides (which depend on the previous note)
 					if (n.type == Note::SLIDE) {
-						Notes::reverse_iterator prev = vocal.notes.rbegin();
+						auto prev = vocal.notes.rbegin();
 						while (prev != vocal.notes.rend() && prev->type == Note::SLEEP) ++prev;
 						if (prev == vocal.notes.rend()) throw std::runtime_error("The song begins with a slide note");
 						eraseLast(prev->syllable); // Erase the space if there is any
@@ -198,14 +184,14 @@ void SongParser::midParse() {
 					vocal.notes.push_back(n);
 				}
 			}
-			for (MidiFileParser::Lyrics::const_iterator it2 = it->lyrics.begin(); it2 != it->lyrics.end(); ++it2) {
-				if(it2->note == 116 || it2->note == 103 || it2->note == 124) {
-					for(Notes::iterator it3 = vocal.notes.begin() ; it3 != vocal.notes.end(); ++it3) {
-						if(it3->begin == midi.get_seconds(it2->begin)+s.start && it3->type == Note::NORMAL) {
-							if(it2->note == 124) {
-								it3->type = Note::FREESTYLE;
+			for (auto const& lyric: it->lyrics) {
+				if(lyric.note == 116 || lyric.note == 103 || lyric.note == 124) {
+					for (auto& n: vocal.notes) {
+						if (n.begin == midi.get_seconds(lyric.begin) + s.start && n.type == Note::NORMAL) {
+							if (lyric.note == 124) {
+								n.type = Note::FREESTYLE;
 							} else {
-								it3->type = Note::GOLDEN;
+								n.type = Note::GOLDEN;
 							}
 							break;
 						}
@@ -222,18 +208,13 @@ void SongParser::midParse() {
 	// Output some warning
 	if (reversedNoteCount > 0) {
 		std::ostringstream oss;
-		oss << "Skipping " << reversedNoteCount << " reversed note(s) in ";
-		oss << s.path << s.midifilename << std::endl;
-		std::clog << "songparser/warning: " << oss.str(); // More likely to be atomic when written as one string
+		oss << "songparser/notice: Skipping " << reversedNoteCount << " reversed note(s) in " << s.midifilename.string();
+		std::clog << oss.str() << std::endl; // More likely to be atomic when written as one string
 	}
 	// copy midi sections to song section
 	// design goals: (1) keep midi parser free of dependencies on song (2) store data in song as parsers are discarded before song
 	// one option would be to pass a song reference to the midi parser however, that conflicts with goal (1)
-	for (std::vector<MidiFileParser::MidiSection>::iterator it= midi.midisections.begin(); it != midi.midisections.end(); ++it) {
-		Song::SongSection tmp(it->name, it->begin);
-		s.songsections.push_back(tmp);
-	}
-
+	for (auto& sect: midi.midisections) s.songsections.emplace_back(sect.name, sect.begin);
 }
 
 

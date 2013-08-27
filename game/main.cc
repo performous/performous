@@ -1,16 +1,17 @@
-#include "config.hh"
-#include "fs.hh"
-#include "screen.hh"
-#include "controllers.hh"
-#include "profiler.hh"
-#include "songs.hh"
 #include "backgrounds.hh"
+#include "config.hh"
+#include "controllers.hh"
 #include "database.hh"
-#include "xtime.hh"
-#include "video_driver.hh"
-#include "i18n.hh"
+#include "fs.hh"
 #include "glutil.hh"
+#include "i18n.hh"
 #include "log.hh"
+#include "profiler.hh"
+#include "screen.hh"
+#include "songs.hh"
+#include "video_driver.hh"
+#include "webcam.hh"
+#include "xtime.hh"
 
 // Screens
 #include "screen_intro.hh"
@@ -20,16 +21,26 @@
 #include "screen_audiodevices.hh"
 #include "screen_paths.hh"
 #include "screen_players.hh"
+#include "screen_playlist.hh"
 
 #include <boost/bind.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
 #include <csignal>
-#include <fstream>
 #include <string>
 #include <vector>
 #include <cstdlib>
+
+// Disable main level exception handling for debug builds (because gdb cannot properly catch throwing otherwise)
+#ifdef NDEBUG
+#define RUNTIME_ERROR std::runtime_error
+#define EXCEPTION std::exception
+#else
+namespace { struct Nothing { char const* what() const { return NULL; } }; }
+#define RUNTIME_ERROR Nothing
+#define EXCEPTION Nothing
+#endif
 
 volatile bool g_quit = false;
 
@@ -40,8 +51,8 @@ bool g_take_screenshot = false;
 static void signalSetup();
 
 extern "C" void quit(int) {
-	// shouldn't "not EXIT_SUCCESS" be sent - ^C^C is an abort, not normal termination?
-	if (g_quit) std::exit(EXIT_SUCCESS);  // Instant exit if Ctrl+C is pressed again
+	using namespace std; // Apparently some implementations put quick_exit in std:: and others in ::
+	if (g_quit) abort();  // Instant exit if Ctrl+C is pressed again
 	g_quit = true;
 	signalSetup();
 }
@@ -54,19 +65,22 @@ static void signalSetup() {
 /// can be thrown as an exception to quit the game
 struct QuitNow {};
 
-static void checkEvents_SDL(ScreenManager& sm) {
+static void checkEvents(Game& gm) {
 	if (g_quit) {
-		std::cout << "Terminating, please wait... (or kill the process)" << std::endl;
+		std::cerr << "Terminating, please wait... (or kill the process)" << std::endl;
 		throw QuitNow();
 	}
 	SDL_Event event;
 	while(SDL_PollEvent(&event) == 1) {
+		// Let the navigation system grab any and all SDL events
+		boost::xtime eventTime = now();
+		gm.controllers.pushEvent(event, eventTime);
 		switch(event.type) {
 		  case SDL_QUIT:
-			sm.finished();
+			gm.finished();
 			break;
 		  case SDL_VIDEORESIZE:
-			sm.window().resize(event.resize.w, event.resize.h);
+			gm.window().resize(event.resize.w, event.resize.h);
 			break;
 		  case SDL_KEYDOWN:
 			int keypressed  = event.key.keysym.sym;
@@ -80,121 +94,116 @@ static void checkEvents_SDL(ScreenManager& sm) {
 				continue; // Already handled here...
 			}
 			if (keypressed == SDLK_F4 && modifier & KMOD_ALT) {
-				sm.finished();
+				gm.finished();
 				continue; // Already handled here...
 			}
-			// Volume control
-			if ((keypressed == SDLK_UP || keypressed == SDLK_DOWN) && modifier & KMOD_CTRL) {
-				std::string curS = sm.getCurrentScreen()->getName();
-				// Pick proper setting
-				std::string which_vol = (curS == "Sing" || curS == "Practice")
-				  ? "audio/music_volume" : "audio/preview_volume";
-				// Adjust value
-				if (keypressed == SDLK_UP) ++config[which_vol];
-				else --config[which_vol];
-				// Show message
-				sm.flashMessage(config[which_vol].getShortDesc() + ": " + config[which_vol].getValue());
-				continue; // Already handled here...
-			}
-			// Eat away the event if there was a dialog open
-			if (sm.closeDialog()) continue;
 			break;
 		}
-		// Close dialog in case of a nav event
-		if (sm.isDialogOpen() && input::getNav(event) != input::NONE) { sm.closeDialog(); continue; }
-		// Forward to screen even if the input system takes it (ignoring pushEvent return value)
-		// This is needed to allow navigation (quiting the song) to function even then
-		boost::xtime eventTime = now();
-		input::SDL::pushEvent(event, eventTime);
-		sm.getCurrentScreen()->manageEvent(event);
+		// Screens always receive SDL events that were not already handled here
+		gm.getCurrentScreen()->manageEvent(event);
 	}
-	if (config["graphic/fullscreen"].b() != sm.window().getFullscreen()) {
-		sm.window().setFullscreen(config["graphic/fullscreen"].b());
-		sm.reloadGL();
+	for (input::NavEvent event; gm.controllers.getNav(event); ) {
+		input::NavButton nav = event.button;
+		// Volume control
+		if (nav == input::NAV_VOLUME_UP || nav == input::NAV_VOLUME_DOWN) {
+			std::string curS = gm.getCurrentScreen()->getName();
+			// Pick proper setting
+			std::string which_vol = (curS == "Sing" || curS == "Practice")
+			  ? "audio/music_volume" : "audio/preview_volume";
+			// Adjust value
+			if (nav == input::NAV_VOLUME_UP) ++config[which_vol]; else --config[which_vol];
+			// Show message
+			gm.flashMessage(config[which_vol].getShortDesc() + ": " + config[which_vol].getValue());
+			continue; // Already handled here...
+		}
+		// If a dialog is open, any nav event will close it
+		if (gm.isDialogOpen()) { gm.closeDialog(); continue; }
+		// Let the current screen handle other events
+		gm.getCurrentScreen()->manageEvent(event);
+	}
+
+	// Need to toggle full screen mode?
+	if (config["graphic/fullscreen"].b() != gm.window().getFullscreen()) {
+		gm.window().setFullscreen(config["graphic/fullscreen"].b());
+		gm.reloadGL();
 	}
 }
 
 void mainLoop(std::string const& songlist) {
+	std::clog << "core/notice: Starting the audio subsystem (errors printed on console may be ignored)." << std::endl;
 	Audio audio;
-	{ // Print the devices
-		portaudio::AudioDevices ads;
-		std::clog << "audio/info:\n" << ads.dump();
-	}
+	std::clog << "core/info: Loading assets." << std::endl;
+	Gettext localization(PACKAGE);
 	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
 	Backgrounds backgrounds;
 	Database database(getConfigDir() / "database.xml");
 	Songs songs(database, songlist);
-	ScreenManager sm(window);
+	Game gm(window);
 	try {
-		boost::scoped_ptr<input::MidiDrums> midiDrums;
-		// TODO: Proper error handling...
-		try { midiDrums.reset(new input::MidiDrums); } catch (std::runtime_error& e) {
-			std::clog << "controllers/info: " << e.what() << std::endl;
-		}
 		// Load audio samples
-		sm.loading(_("Loading audio samples..."), 0.5);
-		audio.loadSample("drum bass", getPath("sounds/drum_bass.ogg"));
-		audio.loadSample("drum snare", getPath("sounds/drum_snare.ogg"));
-		audio.loadSample("drum hi-hat", getPath("sounds/drum_hi-hat.ogg"));
-		audio.loadSample("drum tom1", getPath("sounds/drum_tom1.ogg"));
-		audio.loadSample("drum cymbal", getPath("sounds/drum_cymbal.ogg"));
-		//audio.loadSample("drum tom2", getPath("sounds/drum_tom2.ogg"));
-		audio.loadSample("guitar fail1", getPath("sounds/guitar_fail1.ogg"));
-		audio.loadSample("guitar fail2", getPath("sounds/guitar_fail2.ogg"));
-		audio.loadSample("guitar fail3", getPath("sounds/guitar_fail3.ogg"));
-		audio.loadSample("guitar fail4", getPath("sounds/guitar_fail4.ogg"));
-		audio.loadSample("guitar fail5", getPath("sounds/guitar_fail5.ogg"));
-		audio.loadSample("guitar fail6", getPath("sounds/guitar_fail6.ogg"));
+		gm.loading(_("Loading audio samples..."), 0.5);
+		audio.loadSample("drum bass", findFile("sounds/drum_bass.ogg"));
+		audio.loadSample("drum snare", findFile("sounds/drum_snare.ogg"));
+		audio.loadSample("drum hi-hat", findFile("sounds/drum_hi-hat.ogg"));
+		audio.loadSample("drum tom1", findFile("sounds/drum_tom1.ogg"));
+		audio.loadSample("drum cymbal", findFile("sounds/drum_cymbal.ogg"));
+		//audio.loadSample("drum tom2", findFile("sounds/drum_tom2.ogg"));
+		audio.loadSample("guitar fail1", findFile("sounds/guitar_fail1.ogg"));
+		audio.loadSample("guitar fail2", findFile("sounds/guitar_fail2.ogg"));
+		audio.loadSample("guitar fail3", findFile("sounds/guitar_fail3.ogg"));
+		audio.loadSample("guitar fail4", findFile("sounds/guitar_fail4.ogg"));
+		audio.loadSample("guitar fail5", findFile("sounds/guitar_fail5.ogg"));
+		audio.loadSample("guitar fail6", findFile("sounds/guitar_fail6.ogg"));
 		// Load screens
-		sm.loading(_("Creating screens..."), 0.7);
-		sm.addScreen(new ScreenIntro("Intro", audio));
-		sm.addScreen(new ScreenSongs("Songs", audio, songs, database));
-		sm.addScreen(new ScreenSing("Sing", audio, database, backgrounds));
-		sm.addScreen(new ScreenPractice("Practice", audio));
-		sm.addScreen(new ScreenAudioDevices("AudioDevices", audio));
-		sm.addScreen(new ScreenPaths("Paths", audio));
-		sm.addScreen(new ScreenPlayers("Players", audio, database));
-		sm.activateScreen("Intro");
-		sm.loading(_("Entering main menu"), 0.8);
-		sm.updateScreen();  // exit/enter, any exception is fatal error
-		sm.loading(_("Loading complete"), 1.0);
+		gm.loading(_("Creating screens..."), 0.7);
+		gm.addScreen(new ScreenIntro("Intro", audio));
+		gm.addScreen(new ScreenSongs("Songs", audio, songs, database));
+		gm.addScreen(new ScreenSing("Sing", audio, database, backgrounds));
+		gm.addScreen(new ScreenPractice("Practice", audio));
+		gm.addScreen(new ScreenAudioDevices("AudioDevices", audio));
+		gm.addScreen(new ScreenPaths("Paths", audio));
+		gm.addScreen(new ScreenPlayers("Players", audio, database));
+		gm.addScreen(new ScreenPlaylist("Playlist", audio, songs, backgrounds));
+		gm.activateScreen("Intro");
+		gm.loading(_("Entering main menu"), 0.8);
+		gm.updateScreen();  // exit/enter, any exception is fatal error
+		gm.loading(_("Loading complete"), 1.0);
 		// Main loop
 		boost::xtime time = now();
 		unsigned frames = 0;
-		while (!sm.isFinished()) {
+		std::clog << "core/info: Assets loaded, entering main loop." << std::endl;
+		while (!gm.isFinished()) {
 			Profiler prof("mainloop");
+			bool benchmarking = config["graphic/fps"].b();
 			if( g_take_screenshot ) {
-				fs::path filename;
 				try {
 					window.screenshot();
-					sm.flashMessage(_("Screenshot taken!"));
-				} catch (std::exception& e) {
+					gm.flashMessage(_("Screenshot taken!"));
+				} catch (EXCEPTION& e) {
 					std::cerr << "ERROR: " << e.what() << std::endl;
-					sm.flashMessage(_("Screenshot failed!"));
+					gm.flashMessage(_("Screenshot failed!"));
 				}
 				g_take_screenshot = false;
 			}
-			sm.updateScreen();  // exit/enter, any exception is fatal error
-			prof("misc");
+			gm.updateScreen();  // exit/enter, any exception is fatal error
+			if (benchmarking) prof("misc");
 			try {
+				window.blank();
 				// Draw
-				window.render(boost::bind(&ScreenManager::drawScreen, &sm));
-				glFinish();
-				prof("draw");
+				window.render(boost::bind(&Game::drawScreen, &gm));
+				if (benchmarking) { glFinish(); prof("draw"); }
 				// Display (and wait until next frame)
 				window.swap();
-				glFinish();
-				prof("swap");
+				if (benchmarking) { glFinish(); prof("swap"); }
 				updateSurfaces();
-				sm.prepareScreen();
-				glFinish();
-				prof("surfaces");
-				if (config["graphic/fps"].b()) {
+				gm.prepareScreen();
+				if (benchmarking) { glFinish(); prof("surfaces"); }
+				if (benchmarking) {
 					++frames;
 					if (now() - time > 1.0) {
 						std::ostringstream oss;
 						oss << frames << " FPS";
-						sm.flashMessage(oss.str());
+						gm.flashMessage(oss.str());
 						time += 1.0;
 						frames = 0;
 					}
@@ -203,21 +212,22 @@ void mainLoop(std::string const& songlist) {
 					time = now();
 					frames = 0;
 				}
-				prof("fpsctrl");
+				if (benchmarking) prof("fpsctrl");
 				// Process events for the next frame
-				if (midiDrums) midiDrums->process();
-				checkEvents_SDL(sm);
-				prof("events");
-			} catch (std::runtime_error& e) {
+				gm.controllers.process(now());
+				checkEvents(gm);
+				if (benchmarking) prof("events");
+			} catch (RUNTIME_ERROR& e) {
 				std::cerr << "ERROR: " << e.what() << std::endl;
-				sm.flashMessage(std::string("ERROR: ") + e.what());
+				gm.flashMessage(std::string("ERROR: ") + e.what());
 			}
 		}
-	} catch (std::exception& e) {
-		sm.fatalError(e.what());  // Notify the user
+	} catch (EXCEPTION& e) {
+		std::clog << "core/error: Exiting due to fatal error: " << e.what() << std::endl;
+		gm.fatalError(e.what());  // Notify the user
 		throw;
 	} catch (QuitNow&) {
-		std::cout << "Terminated." << std::endl;
+		std::cerr << "Terminated." << std::endl;
 	}
 }
 
@@ -252,10 +262,10 @@ void jstestLoop() {
 			boost::thread::sleep(time + 0.01); // Max 100 FPS
 			time = now();
 		}
-	} catch (std::exception& e) {
-		std::cout << "ERROR: " << e.what() << std::endl;
+	} catch (EXCEPTION& e) {
+		std::cerr << "ERROR: " << e.what() << std::endl;
 	} catch (QuitNow&) {
-		std::cout << "Terminated." << std::endl;
+		std::cerr << "Terminated." << std::endl;
 	}
 	return;
 }
@@ -270,24 +280,19 @@ template <typename Container> void confOverride(Container const& c, std::string 
 void outputOptionalFeatureStatus();
 
 int main(int argc, char** argv) try {
-	// initialize gettext
-	Gettext gettext(PACKAGE);
-
-	std::cout << PACKAGE " " VERSION << std::endl;
 	signalSetup();
-	outputOptionalFeatureStatus();
 	std::ios::sync_with_stdio(false);  // We do not use C stdio
-	std::srand(std::time(NULL));
+	std::srand(std::time(nullptr));
 	// Parse commandline options
 	std::vector<std::string> devices;
 	std::vector<std::string> songdirs;
 	namespace po = boost::program_options;
 	po::options_description opt1("Generic options");
 	std::string songlist;
-	std::string loglevel_regexp;
+	std::string loglevel;
 	opt1.add_options()
 	  ("help,h", "you are viewing it")
-	  ("log,l", po::value<std::string>(&loglevel_regexp)->default_value(logger::default_log_level), "selects log level")
+	  ("log,l", po::value<std::string>(&loglevel), "subsystem name or minimum level to log")
 	  ("version,v", "display version number")
 	  ("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder");
 	po::options_description opt2("Configuration options");
@@ -309,38 +314,34 @@ int main(int argc, char** argv) try {
 		po::options_description allopts(cmdline);
 		allopts.add(opt3);
 		po::store(po::command_line_parser(argc, argv).options(allopts).positional(p).run(), vm);
-	} catch (std::exception& e) {
-		std::cout << cmdline << std::endl;
-		std::cout << "ERROR: " << e.what() << std::endl;
+	} catch (EXCEPTION& e) {
+		std::cerr << cmdline << std::endl;
+		std::cerr << "ERROR: " << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
 	po::notify(vm);
 
-	// Initialize the verbose message sink
-	//logger::__log_hh_test(); // debug
-	logger::setup(loglevel_regexp);
-	atexit(logger::teardown); // We might exit from many places due to audio hangs
-
 	if (vm.count("version")) {
-		// Already printed the version string in the beginning...
+		std::cout << PACKAGE " " VERSION << std::endl;
 		return EXIT_SUCCESS;
 	}
 	if (vm.count("help")) {
 		std::cout << cmdline << "  any arguments without a switch are interpreted as song folders.\n" << std::endl;
 		return EXIT_SUCCESS;
 	}
-#ifdef USE_PORTMIDI
-	// Dump a list of MIDI input devices
-	pm::dumpDevices(true);
-#endif
+
+	Logger logger(loglevel);
+	outputOptionalFeatureStatus();
+
 	// Read config files
 	try {
 		readConfig();
-	} catch (std::exception& e) {
-		std::cerr << e.what() << std::endl;
+	} catch (EXCEPTION& e) {
+		std::clog << "core/error: Error loading configuration: " << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
 	if (vm.count("audiohelp")) {
+		std::clog << "core/notice: Starting audio subsystem for audiohelp (errors printed on console may be ignored)." << std::endl;
 		Audio audio;
 		// Print the devices
 		portaudio::AudioDevices ads;
@@ -354,7 +355,7 @@ int main(int argc, char** argv) try {
 		// Give audio a little time to shutdown but then just quit
 		boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(audio)));
 		if (!audiokiller.timed_join(boost::posix_time::milliseconds(2000)))
-			std::cout << "Audio hung." << std::endl;
+		  std::clog << "core/warning: Closing audio hung for over two seconds." << std::endl;
 		return EXIT_SUCCESS;
 	}
 	// Override XML config for options that were specified from commandline or performous.conf
@@ -362,6 +363,7 @@ int main(int argc, char** argv) try {
 	confOverride(devices, "audio/devices");
 	getPaths(); // Initialize paths before other threads start
 	if (vm.count("jstest")) { // Joystick test program
+		std::clog << "core/notice: Starting jstest input test utility." << std::endl;
 		std::cout << std::endl << "Joystick utility - Touch your joystick to see buttons here" << std::endl
 		<< "Hit ESC (window focused) to quit" << std::endl << std::endl;
 		jstestLoop();
@@ -372,17 +374,16 @@ int main(int argc, char** argv) try {
 	mainLoop(songlist);
 
 	return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
-} catch (std::exception& e) {
+} catch (EXCEPTION& e) {
 	std::cerr << "FATAL ERROR: " << e.what() << std::endl;
 	return EXIT_FAILURE;
 }
 
 void outputOptionalFeatureStatus() {
-	std::cout    << "  Internationalization:   " <<
-	(Gettext::enabled() ? "Enabled" : "Disabled")
-	<< std::endl << "  MIDI I/O:               " <<
-	(input::MidiDrums::enabled() ? "Enabled" : "Disabled")
-	<< std::endl << "  Webcam support:         " <<
-	(Webcam::enabled() ? "Enabled" : "Disabled")
-	<< std::endl << std::endl;
+	std::clog << "core/notice: " PACKAGE " " VERSION " starting..."
+	  << "\n  Build date:           " __DATE__
+	  << "\n  Internationalization: " << (Gettext::enabled() ? "Enabled" : "Disabled")
+	  << "\n  MIDI Hardware I/O:    " << (input::Hardware::midiEnabled() ? "Enabled" : "Disabled")
+	  << "\n  Webcam support:       " << (Webcam::enabled() ? "Enabled" : "Disabled")
+	  << std::endl;
 }

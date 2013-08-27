@@ -42,10 +42,8 @@ struct InstrumentTrack {
 typedef std::map<std::string, InstrumentTrack, CompInstrumentTrack> InstrumentTracks;
 typedef std::map<std::string, InstrumentTrack const*, CompInstrumentTrack> InstrumentTracksConstPtr; // this one really needed ? can't we save only the map key for comparison ?
 
-namespace {
-	bool isTrackInside(InstrumentTracks const& track_map, std::string const& name) {
-		return track_map.find(name) != track_map.end();
-	}
+static inline bool isTrackInside(InstrumentTracks const& track_map, std::string const& name) {
+	return track_map.find(name) != track_map.end();
 }
 
 // TODO: Make Note use Duration
@@ -56,6 +54,7 @@ struct Note {
 	double begin, ///< begin time
 	       end; ///< end time
 	double phase; /// Position within a measure, [0, 1)
+	// FIXME: Remove gameplay variables from here (Note should be immutable).
 	/// power of note (how well it is being hit right now)
 	mutable double power;
 	/// which players sung well
@@ -89,7 +88,8 @@ struct Note {
 
 typedef std::vector<Note> Notes;
 
-struct VocalTrack {
+class VocalTrack {
+public:
 	VocalTrack(std::string name);
 	void reload();
 	std::string name;

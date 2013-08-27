@@ -1,6 +1,5 @@
 #include "songparser.hh"
 
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <algorithm>
 #include <stdexcept>
@@ -39,19 +38,13 @@ void SongParser::txtParse() {
 	resetNoteParsingState();
 	while (txtParseNote(line) && getline(line)) {} // Parse notes
 
-	{
-		// Workaround for the terminating : 1 0 0 line, written by some converters
-		VocalTrack& vocal = m_song.getVocalTrack(TrackName::LEAD_VOCAL);
-		if (!vocal.notes.empty() && vocal.notes.back().type != Note::SLEEP
-		  && vocal.notes.back().begin == vocal.notes.back().end) vocal.notes.pop_back();
-	}{
-		// Workaround for the terminating : 1 0 0 line, written by some converters
-		VocalTrack& vocal = m_song.getVocalTrack(DUET_P2);
-		if (!vocal.notes.empty() && vocal.notes.back().type != Note::SLEEP
-		  && vocal.notes.back().begin == vocal.notes.back().end) vocal.notes.pop_back();
-		// Erase if empty
-		else if (vocal.notes.empty())
-			m_song.eraseVocalTrack(vocal.name);
+	// Workaround for the terminating : 1 0 0 line, written by some converters
+	// FIXME: Should we do this for all tracks?
+	for (auto const& name: { TrackName::LEAD_VOCAL, DUET_P2 }) {
+		Notes& notes = m_song.getVocalTrack(name).notes;
+		auto it = notes.rbegin();
+		if (!notes.empty() && it->type != Note::SLEEP && it->begin == it->end) notes.pop_back();
+		if (notes.empty()) m_song.eraseVocalTrack(name);
 	}
 
 }
@@ -64,22 +57,28 @@ bool SongParser::txtParseField(std::string const& line) {
 	std::string key = boost::trim_copy(line.substr(1, pos - 1));
 	std::string value = boost::trim_copy(line.substr(pos + 1));
 	if (value.empty()) return true;
+
+	// Parse header data that is stored in SongParser rather than in song (and thus needs to be read every time)
+	if (key == "BPM") assign(m_bpm, value);
+	else if (key == "RELATIVE") assign(m_relative, value);
+	else if (key == "GAP") { assign(m_gap, value); m_gap *= 1e-3; }
+
+	if (m_song.loadStatus >= Song::HEADER) return true;  // Only re-parsing now, skip any other data
+
+	// Parse header data that is directly stored in m_song
 	if (key == "TITLE") m_song.title = value.substr(value.find_first_not_of(" :"));
 	else if (key == "ARTIST") m_song.artist = value.substr(value.find_first_not_of(" "));
 	else if (key == "EDITION") m_song.edition = value.substr(value.find_first_not_of(" "));
 	else if (key == "GENRE") m_song.genre = value.substr(value.find_first_not_of(" "));
 	else if (key == "CREATOR") m_song.creator = value.substr(value.find_first_not_of(" "));
-	else if (key == "COVER") m_song.cover = value;
-	else if (key == "MP3") m_song.music["background"] = m_song.path + value;
-	else if (key == "VOCALS") m_song.music["vocals"] = m_song.path + value;
-	else if (key == "VIDEO") m_song.video = value;
-	else if (key == "BACKGROUND") m_song.background = value;
+	else if (key == "COVER") m_song.cover = fs::absolute(value, m_song.path);
+	else if (key == "MP3") m_song.music["background"] = fs::absolute(value, m_song.path);
+	else if (key == "VOCALS") m_song.music["vocals"] = fs::absolute(value, m_song.path);
+	else if (key == "VIDEO") m_song.video = fs::absolute(value, m_song.path);
+	else if (key == "BACKGROUND") m_song.background = fs::absolute(value, m_song.path);
 	else if (key == "START") assign(m_song.start, value);
 	else if (key == "VIDEOGAP") assign(m_song.videoGap, value);
 	else if (key == "PREVIEWSTART") assign(m_song.preview_start, value);
-	else if (key == "RELATIVE") assign(m_relative, value);
-	else if (key == "GAP") { assign(m_gap, value); m_gap *= 1e-3; }
-	else if (key == "BPM") assign(m_bpm, value);
 	else if (key == "LANGUAGE") m_song.language= value.substr(value.find_first_not_of(" "));
 	return true;
 }
@@ -155,16 +154,16 @@ bool SongParser::txtParseNote(std::string line) {
 			// Workaround for songs that use semi-random timestamps for sleep
 			if (p.type == Note::SLEEP) {
 				p.end = p.begin;
-				Notes::reverse_iterator it = notes.rbegin();
+				auto it = notes.rbegin();
 				Note& p2 = *++it;
 				if (p2.end < n.begin) p.begin = p.end = n.begin;
 			}
 			// Can we just make the previous note shorter?
 			if (p.begin <= n.begin) p.end = n.begin;
-			else { // Nothing to do, warn and skip
-				std::ostringstream oss;
-				oss << "Skipping overlapping note in " << m_song.path << m_song.filename << std::endl;
-				std::clog << "songparser/warning: " << oss.str(); // More likely to be atomic when written as one string
+			else if (m_song.b0rked.empty()) { // Cannot fix, warn and skip
+				std::string msg = "Skipped overlapping notes.\n";
+				m_song.b0rked = msg;
+				std::clog << "songparser/notice: " + m_song.filename.string() + ": " + msg << std::endl;
 				return true;
 			}
 		} else throw std::runtime_error("The first note has negative timestamp");

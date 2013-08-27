@@ -1,8 +1,8 @@
 #pragma once
 
-#include "animvalue.hh"
+//#include "animvalue.hh"
 #include "fs.hh"
-#include "song.hh"
+//#include "song.hh"
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/mutex.hpp>

@@ -7,10 +7,13 @@
 #include "ffmpeg.hh"
 #include "notes.hh"
 #include "pitch.hh"
+#include "util.hh"
 #include <boost/date_time.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
 #include "libda/portaudio.hpp"
+
+const unsigned AUDIO_MAX_ANALYZERS = 4;
 
 struct Output;
 
@@ -30,10 +33,10 @@ struct Device {
 	int operator()(void const* input, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags);
 	/// Returns true if this device is opened for output
 	bool isOutput() const { return outptr != NULL; }
-	/// Returns true if this device has the given mic color assigned
-	bool isMic(std::string mic_id) const {
-		for (std::vector<Analyzer*>::const_iterator it = mics.begin(); it != mics.end(); ++it)
-			if (*it && (*it)->getId() == mic_id) return true;
+	/// Returns true if this device is assigned to the named channel (mic color or "OUT")
+	bool isChannel(std::string const& name) const {
+		if (name == "OUT") return isOutput();
+		for (auto const& m: mics) if (m && m->getId() == name) return true;
 		return false;
 	}
 };
@@ -44,6 +47,7 @@ class Audio {
 	struct Impl;
 	boost::scoped_ptr<Impl> self;
 public:
+	typedef std::map<std::string, fs::path> Files;
 	Audio();
 	~Audio();
 	void restart();
@@ -58,11 +62,11 @@ public:
 	 * @param fadeTime time to fade
 	 * @param startPos starting position
 	 */
-	void playMusic(std::string const& filename, bool preview = false, double fadeTime = 0.5, double startPos = 0.0);
+	void playMusic(fs::path const& filename, bool preview = false, double fadeTime = 0.5, double startPos = 0.0);
 	/** Plays a list of songs **/
-	void playMusic(std::map<std::string,std::string> const& filenames, bool preview = false, double fadeTime = 0.5, double startPos = 0.0);
+	void playMusic(Files const& filenames, bool preview = false, double fadeTime = 0.5, double startPos = 0.0);
 	/** Loads/plays/unloads a sample **/
-	void loadSample(std::string const& streamId, std::string const& filename);
+	void loadSample(std::string const& streamId, fs::path const& filename);
 	void playSample(std::string const& streamId);
 	void unloadSample(std::string const& streamId);
 	/** Stops music **/

@@ -5,7 +5,7 @@ mark_as_advanced(GZIP)
 if(HELP2MAN AND GZIP)
 	set(MANFILE ${CMAKE_CURRENT_BINARY_DIR}/performous.6.gz)
 	set(H2MFILE ${CMAKE_CURRENT_SOURCE_DIR}/performous.h2m)
-	set(PERFORMOUS_EXEC ${CMAKE_BINARY_DIR}/game/performous)
+	set(PERFORMOUS_EXEC ${CMAKE_BINARY_DIR}/performous)
 	add_custom_command(
 		OUTPUT ${MANFILE}
 		COMMAND ${HELP2MAN} ${PERFORMOUS_EXEC} -s 6 -i ${H2MFILE} -N | ${GZIP} > ${MANFILE}
@@ -22,8 +22,8 @@ endif(HELP2MAN AND GZIP)
 if(ENABLE_TOOLS AND GZIP)
 	set(TOOLS 
 		"ss_pak_extract" "ss_extract" "ss_cover_conv"
-		"ss_adpcm_decode" "ss_ipu_decode" "ss_ipu_conv"
-		"gh_xen_decrypt" "ss_chc_decode")
+		"ss_adpcm_decode" "ss_ipu_conv" "ss_chc_decode"
+		"gh_fsb_decrypt" "gh_xen_decrypt")
 	set(MAN_SECTION "1")
 	foreach(TOOL ${TOOLS})
 		set(TOOL_MANFILE ${CMAKE_CURRENT_SOURCE_DIR}/${TOOL}.${MAN_SECTION})

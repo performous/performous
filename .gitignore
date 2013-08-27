@@ -2,3 +2,7 @@ build
 build32
 build64
 CMakeLists.txt.user*
+
+#dummy files you may create when translating
+*~
+*.mo

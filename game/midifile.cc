@@ -1,7 +1,7 @@
 #include "midifile.hh"
 
+#include <boost/filesystem/fstream.hpp>
 #include <algorithm>
-#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <stdexcept>
@@ -24,8 +24,8 @@ class MidiStream {
 	 *
 	 * @param file MidiFile to be read
 	 */
-	MidiStream(std::string const& file) {
-		std::ifstream ifs(file.c_str(), std::ios::binary);
+	MidiStream(fs::path const& file) {
+		fs::ifstream ifs(file, std::ios::binary);
 #if MIDI_DEBUG_LEVEL > 1
 		std::cout << "Opening file: " << file << std::endl;
 #endif
@@ -117,10 +117,10 @@ void MidiStream::Riff::seek_back(size_t o) {
 }
 
 
-MidiFileParser::MidiFileParser(std::string name):
+MidiFileParser::MidiFileParser(fs::path const& name):
   format(0), division(0), ts_last(0)
 {
-	MidiStream stream(name.c_str());
+	MidiStream stream(name);
 	size_t ntracks = parse_header(stream);
 	if (format > 0) {
 		// First track is a control track
@@ -180,9 +180,9 @@ MidiFileParser::Track MidiFileParser::read_track(MidiStream& stream) {
 					std::string sect_name = data.substr(sect_pfx.length(), data.length()-sect_pfx.length()-1);
 					if (sect_name != "big_rock_ending") {
 						bool space = true;
-						for (std::string::iterator it = sect_name.begin(); it != sect_name.end(); ++it) {
-							if (space) *it = toupper(*it);        // start in uppercase
-							if (*it == '_') {*it = ' '; space = true;} // underscores to spaces
+						for (auto& ch: sect_name) {
+							if (space) ch = toupper(static_cast<unsigned char>(ch));  // Capitalize first letter of each word
+							if (ch == '_') { ch = ' '; space = true; }  // underscores to spaces
 							else space = false;
 						}
 						// replace gtr => guitar
@@ -291,7 +291,7 @@ void MidiFileParser::cout_midi_event(uint8_t t, uint8_t arg1, uint8_t arg2, uint
 uint64_t MidiFileParser::get_us(uint32_t miditime) {
 	if (tempochanges.empty()) throw std::runtime_error("Unable to calculate note duration without tempo");
 	uint64_t time = 0;
-	std::vector<TempoChange>::iterator i = tempochanges.begin();
+	auto i = tempochanges.begin();
 	// TODO: cache previous
 	for (; i + 1 != tempochanges.end() && (i + 1)->miditime < miditime; ++i) {
 		time += static_cast<uint64_t>(i->value) * ((i + 1)->miditime - i->miditime);

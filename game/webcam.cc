@@ -47,7 +47,7 @@ Webcam::Webcam(int cam_id):
 	int framew = m_capture->get(CV_CAP_PROP_FRAME_WIDTH);
 	int frameh = m_capture->get(CV_CAP_PROP_FRAME_HEIGHT);
 	int codec = CV_FOURCC('P','I','M','1'); // MPEG-1
-	std::string out_file((getHomeDir() / std::string("performous-webcam_out.mpg")).string());
+	std::string out_file = (getHomeDir() / "performous-webcam_out.mpg").string();
 	m_writer.reset(new cv::VideoWriter(out_file.c_str(), codec, fps > 0 ? fps : 30.0f, cvSize(framew,frameh)));
 	if (!m_writer->isOpened()) {
 		std::cout << "Could not initialize webcam video saving!" << std::endl;

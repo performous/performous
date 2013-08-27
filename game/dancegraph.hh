@@ -24,13 +24,12 @@ typedef std::vector<DanceNote> DanceNotes;
 class DanceGraph: public InstrumentGraph {
   public:
 	/// constructor
-	DanceGraph(Audio& audio, Song const& song);
+	DanceGraph(Audio& audio, Song const& song, input::DevicePtr dev);
 	/** draws DanceGraph
 	 * @param time at which time to draw
 	 */
 	void draw(double time);
 	void engine();
-	bool dead() const;
 	std::string getTrack() const;
 	std::string getDifficultyString() const;
 	std::string getModeId() const;
@@ -75,7 +74,6 @@ class DanceGraph: public InstrumentGraph {
 
 	// Misc
 	int m_arrow_map[max_panels]; /// game mode dependant mapping of arrows' ordering at cursor
-	int m_flow_direction;
 	bool m_insideStop;
 };
 
