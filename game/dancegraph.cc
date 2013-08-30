@@ -124,7 +124,7 @@ void DanceGraph::setupJoinMenu() {
 		// Add difficulties to the option list
 		for (int level = 0; level < DIFFICULTYCOUNT; ++level) {
 			if (difficulty(DanceDifficulty(level), true)) {
-				ol.push_back(boost::lexical_cast<std::string>(level));
+				ol.push_back(boost::lexical_cast<std::string>(level)); //TODO set difficulty
 				if (DanceDifficulty(level) == m_level) cur = i;
 				++i;
 			}
