@@ -87,9 +87,11 @@ bool SongParser::smParseField(std::string line) {
 			if(difficultyclass == "HARD") danceDifficulty = HARD;
 			if(difficultyclass == "CHALLENGE") danceDifficulty = CHALLENGE;
 
-			//ignoring difficultymeter and radarvalues
+			//ignoring radarvalues
 			//<DifficultyMeter>:
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
+			//TODO have the difficulty-meter show up in the menu
+			std::string difficultymeter = boost::trim_copy(line.substr(0, line.find_first_of(':')));
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
 
 			//<NoteData>:
