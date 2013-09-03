@@ -18,6 +18,13 @@ ScreenPlaylist::ScreenPlaylist(std::string const& name,Audio& audio, Songs& song
 
 void ScreenPlaylist::enter() {
 	Game* gm = Game::getSingletonPtr();
+	// Initialize webcam
+	gm->loading(_("Initializing webcam..."), 0.1);
+	if (config["graphic/webcam"].b() && Webcam::enabled()) {
+		try {
+			m_cam.reset(new Webcam(config["graphic/webcamid"].i()));
+		} catch (std::exception& e) { std::cout << e.what() << std::endl; };
+	}
 	m_audio.togglePause();
 	if (gm->getCurrentPlayList().isEmpty()) {
 		gm->activateScreen("Songs");
@@ -50,6 +57,7 @@ void ScreenPlaylist::exit() {
 	theme.reset();
 	m_audio.togglePause();
 	m_background.reset();
+	m_cam.reset();
 }
 
 
@@ -61,12 +69,12 @@ void ScreenPlaylist::manageEvent(input::NavEvent const& event) {
 		keyPressed = true;
 
 	if (nav == input::NAV_CANCEL) {
-	    if(overlay_menu.isOpen()) {
-		overlay_menu.close();
-	      } else {
-		createEscMenu();
-		overlay_menu.open();
-	      }
+		if(overlay_menu.isOpen()) {
+			overlay_menu.close();
+		} else {
+			createEscMenu();
+			overlay_menu.open();
+		}
 	} else {
 		if (nav == input::NAV_PAUSE) {
 			m_audio.togglePause();
@@ -99,6 +107,7 @@ void ScreenPlaylist::draw() {
 		ss->setSong(gm->getCurrentPlayList().getNext());
 		gm->activateScreen("Sing");
 	}
+	if (m_cam && config["graphic/webcam"].b()) m_cam->render();
 	draw_menu_options();
 	//menu on top of everything
 	if (overlay_menu.isOpen()) {

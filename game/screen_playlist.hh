@@ -8,7 +8,8 @@
 #include "animvalue.hh"
 #include "playlist.hh"
 #include "controllers.hh"
-#include "configuration.hh"
+#include "surface.hh"
+#include "webcam.hh"
 #include <vector>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/mutex.hpp>
@@ -66,7 +67,7 @@ private:
 	boost::scoped_ptr<Surface> m_instrumentCover;
 	boost::scoped_ptr<Surface> m_bandCover;
 	boost::scoped_ptr<Surface> m_danceCover;
-
+	boost::scoped_ptr<Webcam> m_cam;
 };
 
 
