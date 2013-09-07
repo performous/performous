@@ -196,7 +196,10 @@ std::string DanceGraph::getTrack() const {
 
 /// Get the difficulty as displayable string
 std::string DanceGraph::getDifficultyString() const {
-	return _(diffv[m_level].c_str());
+	DanceDifficultyMap const& ddm = m_song.danceTracks.find(m_gamingMode)->second;
+	DanceTrack const& track = ddm.find(m_level)->second;
+	std::string seperator = " - "; //looks silly but without it it gives weired gliches taking the wrong translation string for each menuoption.
+	return (_(diffv[m_level].c_str()) + seperator + std::to_string(track.difficulty));
 }
 
 /// Get a string id for track and difficulty
