@@ -97,6 +97,7 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song, input::DevicePtr dev):
 		throw std::runtime_error("Could not find any dance tracks.");
 	changeTrack(0); // Get an initial game mode and notes for it
 	setupJoinMenu(); // Finally setup the menu
+	m_arrow_obj.load(findFile("arrow.obj"));
 }
 
 

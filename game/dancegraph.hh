@@ -3,6 +3,7 @@
 #include <boost/ptr_container/ptr_map.hpp>
 
 #include "instrumentgraph.hh"
+#include "3dobject.hh"
 
 class Song;
 
@@ -75,5 +76,8 @@ class DanceGraph: public InstrumentGraph {
 	// Misc
 	int m_arrow_map[max_panels]; /// game mode dependant mapping of arrows' ordering at cursor
 	bool m_insideStop;
+
+	//3d models
+	Object3d m_arrow_obj;
 };
 
