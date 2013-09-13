@@ -388,6 +388,8 @@ void DanceGraph::drawArrow(int arrow_i, Texture& tex, float ty1, float ty2) {
 	vertexPair(va, arrow_i, -arrowSize, ty1);
 	vertexPair(va, arrow_i,  arrowSize, ty2);
 	va.Draw();
+	if(arrow_i == 1)
+	m_arrow_obj.draw(-2.0f + arrow_i,ty2 + 0.5,0.2f);
 }
 
 /// Draws the dance graph
