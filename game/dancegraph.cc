@@ -511,6 +511,8 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			us()["noteType"].set(mine ? 3 : 1);
 			us()["position"].set(x, yBeg);
 			//little experiment to see if I can draw with 3d objects
+			///TODO rotate the arrows so they point in the correct direction
+			///TODO change texture color to blue with 8th beats and other colors
 			if(mine)
 				drawArrow((mine ? -1 : arrow_i), (mine ? m_mine : m_arrows));
 			else
