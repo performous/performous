@@ -97,7 +97,9 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song, input::DevicePtr dev):
 		throw std::runtime_error("Could not find any dance tracks.");
 	changeTrack(0); // Get an initial game mode and notes for it
 	setupJoinMenu(); // Finally setup the menu
+	///Load 3d objects
 	m_arrow_obj.load(findFile("arrow.obj"));
+	m_arrow_outline_obj.load(findFile("arrowoutline.obj"));
 }
 
 
@@ -420,7 +422,8 @@ void DanceGraph::draw(double time) {
 				float l = m_pressed_anim[arrow_i].get();
 				us()["hitAnim"].set(l);
 				us()["position"].set(panel2x(arrow_i), time2y(0.0));
-				drawArrow(arrow_i, m_arrows_cursor);
+				//drawArrow(arrow_i, m_arrows_cursor);
+				m_arrow_outline_obj.draw(panel2x(arrow_i),time2y(0.0),0,0.6);
 			}
 		}
 
@@ -516,7 +519,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			if(mine)
 				drawArrow((mine ? -1 : arrow_i), (mine ? m_mine : m_arrows));
 			else
-				m_arrow_obj.draw(x,yBeg,1,0.8);
+				m_arrow_obj.draw(x,yBeg,1,0.6);
 		}
 	}
 

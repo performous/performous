@@ -79,5 +79,6 @@ class DanceGraph: public InstrumentGraph {
 
 	//3d models
 	Object3d m_arrow_obj;
+	Object3d m_arrow_outline_obj;
 };
 
