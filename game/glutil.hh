@@ -29,44 +29,49 @@ namespace glutil {
 	  private:
 		std::vector<VertexInfo> m_vertices;
 		VertexInfo m_vert;
+		GLuint m_vbo = 0;
 	  public:
 		VertexArray() {}
 
-		VertexArray& Vertex(float x, float y, float z = 0.0f) {
-			return Vertex(glmath::vec3(x, y, z));
+		~VertexArray() { clear(); }
+
+		void generateVBO();
+
+		VertexArray& vertex(float x, float y, float z = 0.0f) {
+			return vertex(glmath::vec3(x, y, z));
 		}
 
-		VertexArray& Vertex(glmath::vec3 const& v) {
+		VertexArray& vertex(glmath::vec3 const& v) {
 			m_vert.position = v;
 			m_vertices.push_back(m_vert);
 			m_vert = VertexInfo();
 			return *this;
 		}
 
-		VertexArray& Normal(float x, float y, float z) {
-			return Normal(glmath::vec3(x, y, z));
+		VertexArray& normal(float x, float y, float z) {
+			return normal(glmath::vec3(x, y, z));
 		}
 
-		VertexArray& Normal(glmath::vec3 const& v) {
+		VertexArray& normal(glmath::vec3 const& v) {
 			m_vert.normal = v;
 			return *this;
 		}
 
-		VertexArray& TexCoord(float s, float t) {
-			return TexCoord(glmath::vec2(s, t));
+		VertexArray& texCoord(float s, float t) {
+			return texCoord(glmath::vec2(s, t));
 		}
 
-		VertexArray& TexCoord(glmath::vec2 const& v) {
+		VertexArray& texCoord(glmath::vec2 const& v) {
 			m_vert.texCoord = v;
 			return *this;
 		}
 
-		VertexArray& Color(glmath::vec4 const& v) {
+		VertexArray& color(glmath::vec4 const& v) {
 			m_vert.color = v;
 			return *this;
 		}
 
-		void Draw(GLint mode = GL_TRIANGLE_STRIP);
+		void draw(GLint mode = GL_TRIANGLE_STRIP);
 
 		bool empty() const {
 			return m_vertices.empty();
@@ -78,6 +83,10 @@ namespace glutil {
 
 		void clear() {
 			m_vertices.clear();
+			if (m_vbo) {
+				glDeleteBuffers(1, &m_vbo);
+				m_vbo = 0;
+			}
 		}
 
 	};

@@ -92,12 +92,13 @@ void Object3d::loadWavefrontObj(fs::path const& filepath, float scale) {
 		bool hasNormals = !i->normals.empty();
 		bool hasTexCoords = !i->texcoords.empty();
 		for (size_t j = 0; j < i->vertices.size(); ++j) {
-			if (hasNormals) m_va.Normal(normals[i->normals[j]]);
-			if (hasTexCoords) m_va.TexCoord(texcoords[i->texcoords[j]]);
-			m_va.Vertex(vertices[i->vertices[j]]);
+			if (hasNormals) m_va.normal(normals[i->normals[j]]);
+			if (hasTexCoords) m_va.texCoord(texcoords[i->texcoords[j]]);
+			m_va.vertex(vertices[i->vertices[j]]);
 		}
 	}
-
+	// Models loaded from disk are assumed static, so optimized with a VBO
+	m_va.generateVBO();
 }
 
 void Object3d::load(fs::path const& filepath, fs::path const& texturepath, float scale) {
@@ -109,9 +110,9 @@ void Object3d::draw() {
 	UseShader us(getShader("3dobject"));
 	if (m_texture) {
 		UseTexture tex(*m_texture);
-		m_va.Draw(GL_TRIANGLES);
+		m_va.draw(GL_TRIANGLES);
 	} else {
-		m_va.Draw(GL_TRIANGLES);
+		m_va.draw(GL_TRIANGLES);
 	}
 }
 
