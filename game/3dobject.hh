@@ -20,7 +20,6 @@ class Object3d: boost::noncopyable {
 	void loadWavefrontObj(fs::path const& filepath, float scale = 1.0);
   public:
 	Object3d() {}
-	/// constructors
 	Object3d(fs::path const& filepath, fs::path const& texturepath = fs::path(), float scale = 1.0) {
 		load(filepath, texturepath, scale);
 	}

@@ -29,8 +29,13 @@ namespace glutil {
 	  private:
 		std::vector<VertexInfo> m_vertices;
 		VertexInfo m_vert;
+		GLuint m_vbo = 0;
 	  public:
 		VertexArray() {}
+
+		~VertexArray() { clear(); }
+
+		void GenerateVBO();
 
 		VertexArray& Vertex(float x, float y, float z = 0.0f) {
 			return Vertex(glmath::vec3(x, y, z));
@@ -78,6 +83,10 @@ namespace glutil {
 
 		void clear() {
 			m_vertices.clear();
+			if (m_vbo) {
+				glDeleteBuffers(1, &m_vbo);
+				m_vbo = 0;
+			}
 		}
 
 	};
