@@ -17,16 +17,16 @@ varying vec3 lightDir;
 #endif
 
 #if defined(ENABLE_TEXTURING) || defined(ENABLE_SPECULAR_MAP) || defined(ENABLE_EMISSION_MAP)
-varying vec4 texCoord;
+varying vec2 texCoord;
 #endif
 
 #ifdef ENABLE_TEXTURING
 #if ENABLE_TEXTURING == 1
 uniform sampler2DRect tex;
-#define TEXFUNC texture2DRect(tex, texCoord.st)
+#define TEXFUNC texture2DRect(tex, texCoord)
 #elif ENABLE_TEXTURING == 2
 uniform sampler2D tex;
-#define TEXFUNC texture2D(tex, texCoord.st)
+#define TEXFUNC texture2D(tex, texCoord)
 #else
 #error Unknown texturing mode in ENABLE_TEXTURING
 #endif
@@ -77,13 +77,13 @@ void main() {
 	if (power > 0.0) {
 		power *= pow(spec, 100);
 		#ifdef ENABLE_SPECULAR_MAP
-		power *= texture2D(specularTex, texCoord.st);
+		power *= texture2D(specularTex, texCoord);
 		#endif
 		frag.rgb += vec3(power, power, power);
 	}
 
 	#ifdef ENABLE_EMISSION_MAP
-	frag.xyz += texture2D(emissionTex, texCoord.st);
+	frag.xyz += texture2D(emissionTex, texCoord);
 	#endif
 #endif
 
