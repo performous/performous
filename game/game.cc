@@ -76,11 +76,11 @@ void Game::drawLoading() {
 		float cy = 0;
 		float r = sq_size/2;
 		glutil::VertexArray va;
-		va.Vertex(cx - r, cy + r);
-		va.Vertex(cx + r, cy + r);
-		va.Vertex(cx - r, cy - r);
-		va.Vertex(cx + r, cy - r);
-		va.Draw(GL_TRIANGLE_STRIP);
+		va.vertex(cx - r, cy + r);
+		va.vertex(cx + r, cy + r);
+		va.vertex(cx - r, cy - r);
+		va.vertex(cx + r, cy - r);
+		va.draw(GL_TRIANGLE_STRIP);
 	}
 }
 

@@ -2,7 +2,7 @@
 
 namespace glutil {
 
-void VertexArray::GenerateVBO() {
+void VertexArray::generateVBO() {
 	if (m_vbo != 0) glDeleteBuffers(1, &m_vbo);
 	glGenBuffers(1, &m_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
@@ -10,7 +10,7 @@ void VertexArray::GenerateVBO() {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void VertexArray::Draw(GLint mode) {
+void VertexArray::draw(GLint mode) {
 	if (empty()) return;
 	unsigned stride = sizeof(VertexInfo);
 	GLint program;
