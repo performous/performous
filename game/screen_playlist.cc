@@ -321,3 +321,8 @@ void ScreenPlaylist::createSongMenu(int songNumber) {
 		overlay_menu.close();
 	}));
 }
+
+void ScreenPlaylist::triggerSongListUpdate() {
+boost::mutex::scoped_lock l (m_mutex);
+needsUpdate = true;
+}
