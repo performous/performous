@@ -155,36 +155,5 @@ namespace glutil {
 		}
 
 	};
-
-	/// easy line
-	struct Line {
-		Line(float x1, float y1, float x2, float y2) {
-			VertexArray va;
-			va.Vertex(x1, y1);
-			va.Vertex(x2, y2);
-			va.Draw(GL_LINES);
-		}
-	};
-
-	/// easy square
-	struct Square {
-		Square(float cx, float cy, float r, bool filled = false) {
-			VertexArray va;
-			if (filled) {
-				va.Vertex(cx - r, cy + r);
-				va.Vertex(cx + r, cy + r);
-				va.Vertex(cx - r, cy - r);
-				va.Vertex(cx + r, cy - r);
-				va.Draw(GL_TRIANGLE_STRIP);
-			} else {
-				va.Vertex(cx - r, cy + r);
-				va.Vertex(cx + r, cy + r);
-				va.Vertex(cx + r, cy - r);
-				va.Vertex(cx - r, cy - r);
-				va.Draw(GL_LINE_LOOP);
-			}
-		}
-	};
-
 }
 
