@@ -105,18 +105,18 @@ void Object3d::load(fs::path const& filepath, fs::path const& texturepath, float
 	loadWavefrontObj(filepath, scale);
 }
 
-void Object3d::drawVBO() {
+void Object3d::draw() {
 	UseShader us(getShader("3dobject"));
-	m_va.Draw(GL_TRIANGLES);
+	if (m_texture) {
+		UseTexture tex(*m_texture);
+		m_va.Draw(GL_TRIANGLES);
+	} else {
+		m_va.Draw(GL_TRIANGLES);
+	}
 }
 
 void Object3d::draw(float x, float y, float z, float s) {
 	using namespace glmath;
 	Transform trans(translate(vec3(x, y, z)) * scale(s));  // Move to position and scale
-	if (m_texture) {
-		UseTexture tex(*m_texture);
-		drawVBO();
-	} else {
-		drawVBO();
-	}
+	draw();
 }
