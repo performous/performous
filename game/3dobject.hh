@@ -26,7 +26,8 @@ class Object3d: boost::noncopyable {
 	}
 	/// load a new object file
 	void load(fs::path const& filepath, fs::path const& texturepath = fs::path(), float scale = 1.0);
-	void drawVBO();
-	/// draws the object
-	void draw(float x = 0, float y = 0, float z = 0, float s = 1.0);
+	/// draws the object (with texture if given)
+	void draw();
+	/// draws the object with a transform
+	void draw(float x, float y, float z = 0, float s = 1.0);
 };

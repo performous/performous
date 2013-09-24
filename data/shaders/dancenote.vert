@@ -9,18 +9,18 @@ uniform float clock;
 uniform float scale;
 uniform vec2 position;
 
-attribute vec4 vertPos;
-attribute vec4 vertTexCoord;
+attribute vec3 vertPos;
+attribute vec2 vertTexCoord;
 attribute vec3 vertNormal;
 attribute vec4 vertColor;
 
 // Per-vextex for fragment shader (if no geometry shader)
-varying vec4 texCoord;
+varying vec2 texCoord;
 varying vec3 normal;
 varying vec4 color;
 
 // Per-vertex for geometry shader (if one exists)
-varying vec4 vTexCoord;
+varying vec2 vTexCoord;
 varying vec3 vNormal;
 varying vec4 vColor;
 
@@ -76,6 +76,6 @@ void main() {
 		);
 	}
 
-	gl_Position = projMatrix * mvMatrix * (vec4(position, 0, 0) + trans * vertPos);
+	gl_Position = projMatrix * mvMatrix * (vec4(position, 0, 0) + trans * vec4(vertPos, 1.0));
 }
 
