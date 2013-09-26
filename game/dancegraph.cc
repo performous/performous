@@ -14,6 +14,9 @@ namespace {
 	static const int mapping7[max_panels] = {0, 2, 4, 6, 1, 5, 3,-1,-1,-1};
 	static const int mapping8[max_panels] = {0, 3, 4, 7, 1, 6, 2, 5,-1,-1};
 	static const int mapping10[max_panels]= {0, 3, 4, 7, 1, 6, 2, 5,-1,-1};
+	static const double arrowRotations[max_panels] = {
+		M_PI, -M_PI/2, M_PI/2, 0, 3*M_PI/4, M_PI/4, -3*M_PI/4, -M_PI/4
+	};
 	#if 0 // Here is some dummy gettext calls to populate the dictionary
 	_("Beginner") _("Easy") _("Medium") _("Hard") _("Challenge")
 	#endif
@@ -98,7 +101,7 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song, input::DevicePtr dev):
 	changeTrack(0); // Get an initial game mode and notes for it
 	setupJoinMenu(); // Finally setup the menu
 	///Load 3d objects
-	m_arrow_obj.load(findFile("arrow.obj"));
+	m_arrow_obj.load(findFile("arrow.obj"), findFile("arrow-texture.png"));
 	m_arrow_outline_obj.load(findFile("arrowoutline.obj"));
 }
 
@@ -423,11 +426,10 @@ void DanceGraph::draw(double time) {
 				us()["hitAnim"].set(l);
 				us()["position"].set(panel2x(arrow_i), time2y(0.0));
 				//drawArrow(arrow_i, m_arrows_cursor);
-				if(true) {
-						//Transform transrot(rotate(0.79, glmath::vec3(0,0,1))); /// doesn´ t do what it´ s supposed to do
-						m_arrow_outline_obj.draw(panel2x(arrow_i),time2y(0.0),0,0.6);
-				}
-
+				glmath::mat4 pos = translate(glmath::vec3(panel2x(arrow_i), time2y(0.0), 0.0));
+				glmath::mat4 rot = rotate(arrowRotations[arrow_i], glmath::vec3(0,0,-1));
+				Transform cursorTrans(pos * rot);
+				m_arrow_outline_obj.draw();
 			}
 		}
 
@@ -494,11 +496,17 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 				yEnd = std::max(time2y(0.0), yEnd);
 			}
 			if (note.releaseTime > 0) yBeg = time2y(note.releaseTime - time); // Oh noes, it got released!
+			// Draw begin
+			{
+				// TODO: This code is duplicate with short note, move to a function
+				glmath::mat4 pos = translate(glmath::vec3(x, yBeg, 0.0));
+				glmath::mat4 rot = rotate(arrowRotations[arrow_i], glmath::vec3(0,0,-1));
+				Transform noteTrans(pos * rot);
+				m_arrow_obj.draw();
+			}
+			// Tail
 			us()["noteType"].set(2);
 			us()["position"].set(x, yBeg);
-			// Draw begin
-			m_arrow_obj.draw();
-			drawArrow(arrow_i, m_arrows_hold, 0.0f, 1.0f/3.0f);
 			if (yEnd - yBeg > 0) {
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(m_arrows_hold.type(), m_arrows_hold.id());
@@ -515,15 +523,17 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 		} else {
 			// Draw short note
 			if (mine && note.isHit) yBeg = time2y(0.0);
-			us()["noteType"].set(mine ? 3 : 1);
-			us()["position"].set(x, yBeg);
-			//little experiment to see if I can draw with 3d objects
-			///TODO rotate the arrows so they point in the correct direction
-			///TODO change texture color to blue with 8th beats and other colors
-			if(mine)
-				drawArrow((mine ? -1 : arrow_i), (mine ? m_mine : m_arrows));
-			else
-				m_arrow_obj.draw(x,yBeg,1,0.6);
+			if (mine) {
+				us()["noteType"].set(mine ? 3 : 1);
+				us()["position"].set(x, yBeg);
+				drawArrow(-1, m_mine);
+			} else {
+				// TODO: Change texture color to blue with 8th beats and other colors
+				glmath::mat4 pos = translate(glmath::vec3(x, yBeg, 0.0));
+				glmath::mat4 rot = rotate(arrowRotations[arrow_i], glmath::vec3(0,0,-1));
+				Transform noteTrans(pos * rot);
+				m_arrow_obj.draw();
+			}
 		}
 	}
 
