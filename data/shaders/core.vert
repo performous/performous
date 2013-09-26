@@ -11,6 +11,7 @@ attribute vec2 vertTexCoord;
 attribute vec3 vertNormal;
 attribute vec4 vertColor;
 
+// Doubled because there may or may not be geometry shader before frag
 varying vec3 lightDir;
 varying vec3 vLightDir;
 varying vec2 texCoord;

@@ -11,14 +11,8 @@ in float bogus;  // Workaround for http://www.nvnews.net/vbulletin/showthread.ph
 
 varying vec3 normal;
 varying vec4 color;
-
-#ifdef ENABLE_LIGHTING
 varying vec3 lightDir;
-#endif
-
-#if defined(ENABLE_TEXTURING) || defined(ENABLE_SPECULAR_MAP) || defined(ENABLE_EMISSION_MAP)
 varying vec2 texCoord;
-#endif
 
 #ifdef ENABLE_TEXTURING
 #if ENABLE_TEXTURING == 1
@@ -64,13 +58,11 @@ void main() {
 	float diff = max(dot(n, l), 0.0);
 	float power = 1.0 - 0.02 * length(lightDir);
 	frag = vec4(frag.rgb * power * diff, frag.a);
-	
 #endif
 
 	frag = colorMatrix * frag;  // Colorize
 
 #ifdef ENABLE_LIGHTING
-
 	// Specular
 	vec3 refl = reflect(-l, n);
 	float spec = dot(refl, n);

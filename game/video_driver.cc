@@ -97,7 +97,8 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 		shader("color").compileFile(findFile("shaders/stereo3d.geom"));
 		shader("surface").compileFile(findFile("shaders/stereo3d.geom"));
 		shader("texture").compileFile(findFile("shaders/stereo3d.geom"));
-		shader("3dobject").compileFile(findFile("shaders/stereo3d.geom"));
+		shader("3dobject-basic").compileFile(findFile("shaders/stereo3d.geom"));
+		shader("3dobject-textured").compileFile(findFile("shaders/stereo3d.geom"));
 		shader("dancenote").compileFile(findFile("shaders/stereo3d.geom"));
 		if (!GLEW_VERSION_4_1) {
 			// Enable bugfix for some older Nvidia cards
@@ -124,8 +125,14 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	  .compileFile(findFile("shaders/core.vert"))
 	  .compileFile(findFile("shaders/core.frag"))
 	  .link();
-	shader("3dobject")
+	shader("3dobject-basic")
 	  .addDefines("#define ENABLE_LIGHTING\n")
+	  .compileFile(findFile("shaders/core.vert"))
+	  .compileFile(findFile("shaders/core.frag"))
+	  .link();
+	shader("3dobject-textured")
+	  .addDefines("#define ENABLE_LIGHTING\n")
+	  .addDefines("#define ENABLE_TEXTURING 2\n")
 	  .compileFile(findFile("shaders/core.vert"))
 	  .compileFile(findFile("shaders/core.frag"))
 	  .link();
