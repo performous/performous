@@ -11,6 +11,9 @@
 #include <sstream>
 #include <boost/format.hpp>
 
+namespace {
+	static const double NEXT_TIMEOUT = 15.0; // go to next song in 15 seconds
+}
 
 ScreenPlaylist::ScreenPlaylist(std::string const& name,Audio& audio, Songs& songs, Backgrounds& bgs):
 	Screen(name), m_audio(audio), m_songs(songs), m_backgrounds(bgs), m_covers(20), keyPressed()
@@ -61,12 +64,12 @@ void ScreenPlaylist::manageEvent(input::NavEvent const& event) {
 		keyPressed = true;
 
 	if (nav == input::NAV_CANCEL) {
-	    if(overlay_menu.isOpen()) {
-		overlay_menu.close();
-	      } else {
-		createEscMenu();
-		overlay_menu.open();
-	      }
+		if(overlay_menu.isOpen()) {
+			overlay_menu.close();
+		} else {
+			createEscMenu();
+			overlay_menu.open();
+		}
 	} else {
 		if (nav == input::NAV_PAUSE) {
 			m_audio.togglePause();
