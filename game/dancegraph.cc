@@ -423,7 +423,11 @@ void DanceGraph::draw(double time) {
 				us()["hitAnim"].set(l);
 				us()["position"].set(panel2x(arrow_i), time2y(0.0));
 				//drawArrow(arrow_i, m_arrows_cursor);
-				m_arrow_outline_obj.draw(panel2x(arrow_i),time2y(0.0),0,0.6);
+				if(true) {
+						//Transform transrot(rotate(0.79, glmath::vec3(0,0,1))); /// doesn´ t do what it´ s supposed to do
+						m_arrow_outline_obj.draw(panel2x(arrow_i),time2y(0.0),0,0.6);
+				}
+
 			}
 		}
 
