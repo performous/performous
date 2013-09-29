@@ -152,6 +152,22 @@
 				<axis hw="5" negative="up" positive="down" />
 			</mapping>
 		</controller>
+		<controller type="guitar" name="GUITAR_PS2">
+			<description>Guitar Hero 2 with PS2/USB adaptor</description>
+			<device regex="Twin USB Joystick.*" />
+			<mapping>
+				<button hw="0" map="yellow" />
+				<button hw="1" map="red" />
+				<button hw="2" map="blue" />
+				<button hw="3" map="orange" />
+				<button hw="5" map="green" />
+				<button hw="8" map="godmode" />
+				<button hw="8" map="cancel" />
+				<button hw="9" map="start" />
+				<axis hw="1" negative="up" positive="down" />
+				<axis hw="1" negative="pick_up" positive="pick_down" />
+			</mapping>
+		</controller>
 		<!-- Not managed
 		<controller type="guitar" name="GUITAR_PRO_PS3">
 			<description>Rock Band Pro Guitar for PS3</description>
