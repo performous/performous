@@ -140,6 +140,7 @@ void DanceGraph::setupJoinMenu() {
 		m_menu.add(MenuOption("", _("Select difficulty")).changer(m_selectedDifficulty)); // MenuOption that cycles the options
 		m_menu.back().setDynamicName(m_difficultyOpt); // Set the title to be dynamic
 	}
+ // TODO: create speedmod opt
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
 }
 
@@ -413,7 +414,7 @@ void DanceGraph::draw(double time) {
 		Transform trans(translate(vec3(0.0f, dimensions.y1(), 0.0)) * scale(temp_s));
 
 		// Draw the "neck" graph (beat lines)
-		drawBeats(time);
+		drawBeats(time*speedmod);
 
 		// Arrows on cursor
 		{
@@ -473,8 +474,8 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	int arrow_i = note.note.note;
 	bool mine = note.note.type == Note::MINE;
 	float x = panel2x(arrow_i);
-	float yBeg = time2y(tBeg);
-	float yEnd = time2y(tEnd);
+	float yBeg = time2y(tBeg*speedmod);
+	float yEnd = time2y(tEnd*speedmod);
 
 	// Did we hit it?
 	if (note.isHit && (note.releaseTime > 0.0 || std::abs(tEnd) < maxTolerance) && note.hitAnim.getTarget() == 0.0) {

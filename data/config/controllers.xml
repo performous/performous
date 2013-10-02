@@ -250,6 +250,22 @@
 				<button hw="9" map="cancel" />
 			</mapping>
 		</controller>
+		<controller type="dancepad" name="FutureMax Dance Mat">
+			<description>FutureMax Dance Mat</description>
+			<device regex="054c:0268" />
+			<mapping>
+				<button hw="8" map="start" />
+				<button hw="9" map="cancel" />
+				<button hw="0" map="left" />
+				<button hw="3" map="right" />
+				<button hw="1" map="down" />
+				<button hw="2" map="up" />
+				<button hw="4" map="down-left" />
+				<button hw="7" map="up-right" />
+				<button hw="6" map="up-left" />
+				<button hw="5" map="down-right" />
+			</mapping>
+		</controller>
 		<controller type="dancepad" name="DANCEPAD_TIGERGAME">
 			<description>TigerGame dancepad</description>
 			<device regex="TigerGame" />
