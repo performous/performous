@@ -81,7 +81,7 @@
 		</controller>
 		<controller type="guitar" name="GUITAR_ROCKBAND_XBOX360">
 			<description>Rock Band guitar Xbox 360</description>
-			<device regex="Harmonix Guitar .* Xbox" />
+			<device regex="Harmonix Guitar .* Xbox|Harmonix Rock Band Guitar" />
 			<mapping> 
 				<button hw="0" map="green" />
 				<button hw="1" map="red" />
