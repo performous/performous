@@ -462,7 +462,7 @@ void DanceGraph::drawBeats(double time) {
 		}*/
 		glmath::vec4 c(1.0f, 1.0f, 1.0f, time2a(tEnd));
 		va.color(c).normal(0.0f, 1.0f, 0.0f).texCoord(0.0f, texCoord).vertex(-w, time2y(tEnd));
-		va.color(c).normal(0.0f, 1.0f, 0.0f).texCoord(1.0f, texCoord).vertex(w, time2y(tEnd));
+		va.color(c).normal(0.0f, 1.0f, 0.0f).texCoord(1.0f, texCoord).vertex(w*0.7, time2y(tEnd));
 	}
 	va.draw();
 }

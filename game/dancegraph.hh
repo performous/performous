@@ -57,7 +57,7 @@ class DanceGraph: public InstrumentGraph {
 	void drawArrow(int arrow_i, Texture& tex, float ty1 = 0.0, float ty2 = 1.0);
 
 	// Helpers
-	float panel2x(int i) const { return getScale() * (-(m_pads * 0.5f) + m_arrow_map[i] + 0.5f); } /// Get x for an arrow line
+	float panel2x(int i) const { return getScale() * (-(m_pads * 0.5f) + (0.8*m_arrow_map[i]) + 0.5f); } /// Get x for an arrow line
 	float getScale() const { return 1.0f / m_pads * 8.0f; }
 	double getNotesBeginTime() const { return m_notes.front().note.begin; }
 
