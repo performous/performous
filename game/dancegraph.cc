@@ -414,7 +414,7 @@ void DanceGraph::draw(double time) {
 		Transform trans(translate(vec3(0.0f, dimensions.y1(), 0.0)) * scale(temp_s));
 
 		// Draw the "neck" graph (beat lines)
-		drawBeats(time*speedmod);
+		drawBeats(time*m_currentSpeedMod);
 
 		// Arrows on cursor
 		{
@@ -474,8 +474,8 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	int arrow_i = note.note.note;
 	bool mine = note.note.type == Note::MINE;
 	float x = panel2x(arrow_i);
-	float yBeg = time2y(tBeg*speedmod);
-	float yEnd = time2y(tEnd*speedmod);
+	float yBeg = time2y(tBeg*m_currentSpeedMod);
+	float yEnd = time2y(tEnd*m_currentSpeedMod);
 
 	// Did we hit it?
 	if (note.isHit && (note.releaseTime > 0.0 || std::abs(tEnd) < maxTolerance) && note.hitAnim.getTarget() == 0.0) {
