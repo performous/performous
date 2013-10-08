@@ -426,10 +426,10 @@ void DanceGraph::draw(double time) {
 				float l = m_pressed_anim[arrow_i].get();
 				us()["hitAnim"].set(l);
 				us()["position"].set(panel2x(arrow_i), time2y(0.0));
-				//drawArrow(arrow_i, m_arrows_cursor);
+				glmath::mat4 sca = scale(glmath::vec3(1+0.4*l,1+0.4*l,1+0.4*l));
 				glmath::mat4 pos = translate(glmath::vec3(panel2x(arrow_i), time2y(0.0), 0.0));
 				glmath::mat4 rot = rotate(arrowRotations[arrow_i], glmath::vec3(0,0,-1));
-				Transform cursorTrans(pos * rot);
+				Transform cursorTrans(pos * rot * sca);
 				m_arrow_outline_obj.draw();
 			}
 		}
