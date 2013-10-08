@@ -140,13 +140,27 @@ void DanceGraph::setupJoinMenu() {
 		m_menu.add(MenuOption("", _("Select difficulty")).changer(m_selectedDifficulty)); // MenuOption that cycles the options
 		m_menu.back().setDynamicName(m_difficultyOpt); // Set the title to be dynamic
 	}
- // TODO: create speedmod opt
+	{	 // TODO: create speedmod opt
+		ConfigItem::OptionList ol;
+		int i = 0, cur = 0;
+		//add modifiers to option list
+		for (float mod = 0.5; mod < 5; mod += 0.25) {
+			ol.push_back(boost::lexical_cast<std::string>(mod));
+			if(m_currentSpeedMod == mod) cur = i;
+			++i;
+		}
+		m_SpeedMod = ConfigItem(ol);
+		m_SpeedMod.select(cur);
+		m_menu.add(MenuOption(_(""), _("Select Speedmod")));
+		m_menu.back().setDynamicName(m_Speedmod_opt);
+	}
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
 }
 
 void DanceGraph::updateJoinMenu() {
 	m_trackOpt = getTrack();
 	m_difficultyOpt = getDifficultyString();
+	m_Speedmod_opt = "Speedmod: " + boost::lexical_cast<std::string>(m_currentSpeedMod) + "x";
 }
 
 /// Attempt to select next/previous game mode
