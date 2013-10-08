@@ -151,7 +151,7 @@ void DanceGraph::setupJoinMenu() {
 		}
 		m_SpeedMod = ConfigItem(ol);
 		m_SpeedMod.select(cur);
-		m_menu.add(MenuOption(_(""), _("Select Speedmod")));
+		m_menu.add(MenuOption(_(""), _("Select Speedmod")).changer(m_SpeedMod));
 		m_menu.back().setDynamicName(m_Speedmod_opt);
 	}
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
