@@ -25,6 +25,10 @@
 				<li><a href="#page2" data-transition="flip" data-theme="" data-icon="grid" data-iconpos="top">
 					View playlist
 				</a></li>
+				<li><a href="#page3" data-transition="flip" data-theme="" data-icon="search" data-iconpos="top">
+					Search v2.0𝛃
+				</a>
+				</li>
 			</ul>
 		</div>
 	</div>
@@ -53,6 +57,10 @@
 				<li><a href="#page2" data-transition="flip" data-theme="" data-icon="grid" data-iconpos="top" class="ui-btn-active ui-state-persist">
 					View playlist
 				</a></li>
+				<li><a href="#page3" data-transition="flip" data-theme="" data-icon="search" data-iconpos="top">
+					Search v2.0𝛃
+				</a>
+				</li>
 			</ul>
 		</div>
 	</div>
@@ -79,6 +87,36 @@
 		</div>
 		<small>Web interface by Niek Nooijens, for full credits regarding Performous see /docs/Authors.txt</small>
 	</div>
+</div>
+<div data-role="page" id="page3">
+	<div data-theme="a" data-role="header">
+		<h3>Performous web frontend</h3>
+		<div data-role="navbar" data-iconpos="top">
+			<ul>
+				<li><a href="#page1" data-transition="flip" data-theme="" data-icon="plus" data-iconpos="top">
+					Add songs
+				</a></li>
+				<li><a href="#page2" data-transition="flip" data-theme="" data-icon="grid" data-iconpos="top">
+					View playlist
+				</a></li>
+				<li><a href="#page3" data-transition="flip" data-theme="" data-icon="search" data-iconpos="top" class="ui-btn-active ui-state-persist">
+					Search v2.0𝛃
+				</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div data-role="content">
+	<input type="search" name="searchv2" id="searchv2" value="search for songs" /> <br>
+	<a id="databaseSearchButton" data-role="button" href="#page3" data-icon="search" data-iconpos="top">
+			Search
+		</a> <br> <br>
+		<ul data-role="listview" id="searchResultsViewer" data-divider-theme="b">
+			<li data-role="list-divider" role="heading">
+				Available songs:
+			</li>
+		</ul>
+</div>
 </div>
 
 <script>
@@ -121,6 +159,19 @@
 			$('#playListView').listview('refresh');
 		});
 	}
+
+$("#databaseSearchButton").bind ("click", function (event) {
+var query = $('#searchv2').val();
+		
+	results = $.post("api/search",query, function (data) {
+	database = JSON.parse(data);
+			$('#searchResultsViewer').html('<li data-role="list-divider" role="heading">Available songs:</li> <li data-theme="c">\n');
+			for (i in database) {
+				$('#searchResultsViewer').append('<li data-theme="c" data-icon="plus"><a href="javascript:AddSong('+ i + ')" data-transition="slide">' + database[i].Artist + ' - ' + database[i].Title + '</a></li>\n');
+			}
+			$('#searchResultsViewer').listview('refresh');
+});
+});
 
 	<!-- TODO: confirm boxes are ugly, use jqm's dialogs
 	function ViewInfo(songnumber) {
