@@ -107,10 +107,14 @@
 		</div>
 	</div>
 	<div data-role="content">
-	<input type="search" name="searchv2" id="searchv2" value="search for songs" /> <br>
-	<a id="databaseSearchButton" data-role="button" href="#page3" data-icon="search" data-iconpos="top">
+	<div class="ui-grid-a">
+            <div class="ui-block-a">
+                <div data-role="fieldcontain"> <input type="search" name="searchv2" id="searchv2" value="search for songs" />
+	 </div>
+            </div>
+            <div class="ui-block-b"> <a id="databaseSearchButton" data-role="button" href="#page3" data-icon="search">
 			Search
-		</a> <br> <br>
+		</a> </div> </div> <br> <br>
 		<ul data-role="listview" id="searchResultsViewer" data-divider-theme="b">
 			<li data-role="list-divider" role="heading">
 				Available songs:
@@ -161,7 +165,17 @@
 	}
 
 $("#databaseSearchButton").bind ("click", function (event) {
-var query = $('#searchv2').val();
+	DoQuery();
+});
+
+$(document).keypress(function(e) {
+    if(e.which == 13) {
+       DoQuery();
+    }
+});
+
+	function DoQuery() {
+	var query = $('#searchv2').val();
 		
 	results = $.post("api/search",query, function (data) {
 	database = JSON.parse(data);
@@ -171,9 +185,8 @@ var query = $('#searchv2').val();
 			}
 			$('#searchResultsViewer').listview('refresh');
 });
-});
-
-	<!-- TODO: confirm boxes are ugly, use jqm's dialogs
+}
+	<!-- TODO: confirm boxes are ugly, use jqm's dialogs -->
 	function ViewInfo(songnumber) {
 		if (confirm("Title: " + songlist[songnumber].Title + "\nArtist: " + songlist[songnumber].Artist + 
 			"\nEdition: " + songlist[songnumber].Edition + "\nLanguage: " + songlist[songnumber].Language + "\nCreator: " 
