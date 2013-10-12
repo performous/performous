@@ -117,6 +117,8 @@ void SongParser::guessFiles() {
 		{ &m_song.music[TrackName::BASS], R"(rhythm\.(mp3|ogg|aac)$)" },
 		{ &m_song.music[TrackName::DRUMS], R"(drums\.(mp3|ogg|aac)$)" },
 		{ &m_song.music[TrackName::KEYBOARD], R"(keyboard\.(mp3|ogg|aac)$)" },
+		{ &m_song.music[TrackName::GUITAR_COOP], R"(guitar_coop\.(mp3|ogg|aac)$)"},
+		{ &m_song.music[TrackName::GUITAR_RHYTHM], R"(guitar_rhythm\.(mp3|ogg|aac)$)"},
 		{ &m_song.music[TrackName::LEAD_VOCAL], R"(vocals\.(mp3|ogg|aac)$)" },
 		{ &m_song.music[TrackName::BGMUSIC], R"(song\.(mp3|ogg|aac)$)" },
 		{ &m_song.music[TrackName::BGMUSIC], R"(\.(mp3|ogg|aac)$)" },

@@ -33,32 +33,32 @@ namespace {
 		UseTexture tblock(texture);
 
 		// The front cap begins
-		va.TexCoord(0.0f, 0.0f).Vertex(x, ybeg);
-		va.TexCoord(0.0f, 1.0f).Vertex(x, ybeg + h);
+		va.texCoord(0.0f, 0.0f).vertex(x, ybeg);
+		va.texCoord(0.0f, 1.0f).vertex(x, ybeg + h);
 		if (w >= 2.0 * h) {
 			// Calculate the y coordinates of the middle part
 			double tmp = h / w;  // h = cap size (because it is a h by h square)
 			double y1 = (1.0 - tmp) * ybeg + tmp * yend;
 			double y2 = tmp * ybeg + (1.0 - tmp) * yend;
 			// The middle part between caps
-			va.TexCoord(0.5f, 0.0f).Vertex(x + h, y1);
-			va.TexCoord(0.5f, 1.0f).Vertex(x + h, y1 + h);
-			va.TexCoord(0.5f, 0.0f).Vertex(x + w - h, y2);
-			va.TexCoord(0.5f, 1.0f).Vertex(x + w - h, y2 + h);
+			va.texCoord(0.5f, 0.0f).vertex(x + h, y1);
+			va.texCoord(0.5f, 1.0f).vertex(x + h, y1 + h);
+			va.texCoord(0.5f, 0.0f).vertex(x + w - h, y2);
+			va.texCoord(0.5f, 1.0f).vertex(x + w - h, y2 + h);
 		} else {
 			// Note is too short to even fit caps, crop to fit.
 			double ymid = 0.5 * (ybeg + yend);
 			float crop = 0.25f * w / h;
-			va.TexCoord(crop, 0.0f).Vertex(x + 0.5 * w, ymid);
-			va.TexCoord(crop, 1.0f).Vertex(x + 0.5 * w, ymid + h);
-			va.TexCoord(1.0f - crop, 0.0f).Vertex(x + 0.5 * w, ymid);
-			va.TexCoord(1.0f - crop, 1.0f).Vertex(x + 0.5 * w, ymid + h);
+			va.texCoord(crop, 0.0f).vertex(x + 0.5 * w, ymid);
+			va.texCoord(crop, 1.0f).vertex(x + 0.5 * w, ymid + h);
+			va.texCoord(1.0f - crop, 0.0f).vertex(x + 0.5 * w, ymid);
+			va.texCoord(1.0f - crop, 1.0f).vertex(x + 0.5 * w, ymid + h);
 		}
 		// The rear cap ends
-		va.TexCoord(1.0f, 0.0f).Vertex(x + w, yend);
-		va.TexCoord(1.0f, 1.0f).Vertex(x + w, yend + h);
+		va.texCoord(1.0f, 0.0f).vertex(x + w, yend);
+		va.texCoord(1.0f, 1.0f).vertex(x + w, yend + h);
 
-		va.Draw();
+		va.draw();
 	}
 }
 
@@ -189,7 +189,7 @@ void NoteGraph::drawNotes() {
 
 namespace {
 	void strip(glutil::VertexArray& va) {
-		if (va.size() > 3) va.Draw();
+		if (va.size() > 3) va.draw();
 		va.clear();
 	}
 }
@@ -241,10 +241,10 @@ void NoteGraph::drawWaves(Database const& database) {
 			// If there has been a break or if the pitch change is too fast, terminate and begin a new one
 			if (oldval != oldval || std::abs(oldval - val) > 1) strip(va);
 			// Add a point or a pair of points
-			if (!va.size()) va.TexCoord(tex, 0.5f).Color(c).Vertex(x, y);
+			if (!va.size()) va.texCoord(tex, 0.5f).color(c).vertex(x, y);
 			else {
-				va.TexCoord(tex, 0.0f).Color(c).Vertex(x, y - thickness);
-				va.TexCoord(tex, 1.0f).Color(c).Vertex(x, y + thickness);
+				va.texCoord(tex, 0.0f).color(c).vertex(x, y - thickness);
+				va.texCoord(tex, 1.0f).color(c).vertex(x, y + thickness);
 			}
 			oldval = val;
 		}

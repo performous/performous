@@ -72,7 +72,15 @@ void Game::drawLoading() {
 	for (int i = 0; i <= m_loadingProgress * maxi; ++i) {
 		ColorTrans c(Color(0.2, 0.7, 0.7, (m_loadingProgress + 1.0)*0.5));
 		UseShader shader(getShader("color"));
-		glutil::Square(-x + i * (sq_size + spacing), 0, sq_size/2, true);
+		float cx = -x + i * (sq_size + spacing);
+		float cy = 0;
+		float r = sq_size/2;
+		glutil::VertexArray va;
+		va.vertex(cx - r, cy + r);
+		va.vertex(cx + r, cy + r);
+		va.vertex(cx - r, cy - r);
+		va.vertex(cx + r, cy - r);
+		va.draw(GL_TRIANGLE_STRIP);
 	}
 }
 

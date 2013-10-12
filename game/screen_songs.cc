@@ -413,11 +413,11 @@ namespace {
 	}
 	void drawIcon(int i, Dimensions const& dim) {
 		glutil::VertexArray va;
-		va.TexCoord(getIconTex(i), 0.0f).Vertex(dim.x1(), dim.y1());
-		va.TexCoord(getIconTex(i), 1.0f).Vertex(dim.x1(), dim.y2());
-		va.TexCoord(getIconTex(i + 1), 0.0f).Vertex(dim.x2(), dim.y1());
-		va.TexCoord(getIconTex(i + 1), 1.0f).Vertex(dim.x2(), dim.y2());
-		va.Draw();
+		va.texCoord(getIconTex(i), 0.0f).vertex(dim.x1(), dim.y1());
+		va.texCoord(getIconTex(i), 1.0f).vertex(dim.x1(), dim.y2());
+		va.texCoord(getIconTex(i + 1), 0.0f).vertex(dim.x2(), dim.y1());
+		va.texCoord(getIconTex(i + 1), 1.0f).vertex(dim.x2(), dim.y2());
+		va.draw();
 	}
 }
 
