@@ -8,6 +8,9 @@
 #include "animvalue.hh"
 #include "playlist.hh"
 #include "controllers.hh"
+#include "songs.hh"
+#include "surface.hh"
+#include "webcam.hh"
 #include "configuration.hh"
 #include <vector>
 #include <boost/scoped_ptr.hpp>
@@ -16,7 +19,6 @@
 class Audio;
 class Database;
 class Song;
-class Songs;
 class Surface;
 class ThemePlaylistScreen;
 class Backgrounds;
@@ -66,7 +68,7 @@ private:
 	boost::scoped_ptr<Surface> m_instrumentCover;
 	boost::scoped_ptr<Surface> m_bandCover;
 	boost::scoped_ptr<Surface> m_danceCover;
-
+	boost::scoped_ptr<Webcam> m_cam;
 };
 
 
