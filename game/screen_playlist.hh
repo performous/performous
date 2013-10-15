@@ -8,6 +8,7 @@
 #include "animvalue.hh"
 #include "playlist.hh"
 #include "controllers.hh"
+#include "songs.hh"
 #include "surface.hh"
 #include "webcam.hh"
 #include <vector>
@@ -17,7 +18,6 @@
 class Audio;
 class Database;
 class Song;
-class Songs;
 class Surface;
 class ThemePlaylistScreen;
 class Backgrounds;
