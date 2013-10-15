@@ -472,10 +472,27 @@ void ScreenSing::draw() {
 		} else  statustxt = (boost::format("%02u:%02u") % (t / 60) % (t % 60)).str();
 
 		if (!m_score_window.get() && m_instruments.empty() && !m_layout_singer.empty()) {
-			if (status == Song::INSTRUMENTAL_BREAK) statustxt += _("   ENTER to skip instrumental break");
-			if (status == Song::FINISHED && !config["game/karaoke_mode"].b()) statustxt += _("   Remember to wait for grading!");
+			if (status == Song::INSTRUMENTAL_BREAK)  statustxt += _("   ENTER to skip instrumental break");
+			if (status == Song::FINISHED && !config["game/karaoke_mode"].b()) {
+				if(config["game/autoplay"].b()) {
+					if(m_displayAutoPlay) {
+						statustxt += _("   Autoplay enabled");
+					}
+					else {
+						 statustxt += _("   Remember to wait for grading!");
+					}
+
+					if(m_statusTextSwitch.get() == 0) {
+					m_displayAutoPlay = !m_displayAutoPlay;
+					m_statusTextSwitch.setValue(1);
+					}
+					} else {
+					statustxt += _("   Remember to wait for grading!");
+				}
+			} else if(status == Song::FINISHED) {
+				statustxt += _("   Autoplay enabled");
+			}
 		}
-		if(status != Song::INSTRUMENTAL_BREAK && status != Song::FINISHED && config["game/autoplay"].b()) statustxt = _("Autoplay enabled");
 
 		theme->timer.draw(statustxt);
 	}
