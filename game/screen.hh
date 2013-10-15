@@ -114,6 +114,7 @@ private:
 	float m_loadingProgress;
 	Surface m_logo;
 	AnimValue m_logoAnim;
+	AnimValue m_dialogTimeOut;
 	// Dialog members
 	boost::scoped_ptr<Dialog> m_dialog;
 };

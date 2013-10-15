@@ -102,6 +102,7 @@ void Game::flashMessage(std::string const& message, float fadeIn, float hold, fl
 }
 
 void Game::dialog(std::string const& text) {
+	m_dialogTimeOut.setValue(10);
 	m_dialog.reset(new Dialog(text));
 }
 
@@ -135,5 +136,8 @@ void Game::drawNotifications() {
 		m_textMessage.draw(m_message); // Draw the message
 	}
 	// Dialog
-	if (m_dialog) m_dialog->draw();
+	if (m_dialog) {
+		m_dialog->draw();
+		if(m_dialogTimeOut.get() == 0) closeDialog();
+	}
 }
