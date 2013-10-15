@@ -1,6 +1,5 @@
 #include "screen_playlist.hh"
 #include "menu.hh"
-#include "screen_songs.hh"
 #include "screen_sing.hh"
 #include "playlist.hh"
 #include "theme.hh"
@@ -30,7 +29,17 @@ void ScreenPlaylist::enter() {
 	}
 	m_audio.togglePause();
 	if (gm->getCurrentPlayList().isEmpty()) {
-		gm->activateScreen("Songs");
+		if(config["game/autoplay"].b()) {
+			m_songs.setFilter("");
+			Screen* s = gm->getScreen("Sing");
+			ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
+			assert(ss);
+			int randomsong = std::rand() % m_songs.size();
+			ss->setSong(m_songs[randomsong]);
+			gm->activateScreen("Sing");
+		} else {
+			gm->activateScreen("Songs");
+		}
 	}
 	keyPressed = false;
 	m_nextTimer.setValue(NEXT_TIMEOUT);

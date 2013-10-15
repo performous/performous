@@ -475,6 +475,8 @@ void ScreenSing::draw() {
 			if (status == Song::INSTRUMENTAL_BREAK) statustxt += _("   ENTER to skip instrumental break");
 			if (status == Song::FINISHED && !config["game/karaoke_mode"].b()) statustxt += _("   Remember to wait for grading!");
 		}
+		if(status != Song::INSTRUMENTAL_BREAK && status != Song::FINISHED && config["game/autoplay"].b()) statustxt = _("Autoplay enabled");
+
 		theme->timer.draw(statustxt);
 	}
 
