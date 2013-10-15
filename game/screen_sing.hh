@@ -95,9 +95,12 @@ class ScreenSing: public Screen {
 	Instruments m_instruments;
 	boost::shared_ptr<ThemeSing> theme;
 	AnimValue m_quitTimer;
+	AnimValue m_statusTextSwitch;
 	std::string m_selectedTrack;
 	std::string m_selectedTrackLocalized;
 	ConfigItem m_vocalTracks[AUDIO_MAX_ANALYZERS];
 	ConfigItem m_duet;
+	bool m_displayAutoPlay = false;
+	bool m_fadeIn = false;
 };
 
