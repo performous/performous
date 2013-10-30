@@ -140,19 +140,19 @@ void DanceGraph::setupJoinMenu() {
 		m_menu.add(MenuOption("", _("Select difficulty")).changer(m_selectedDifficulty)); // MenuOption that cycles the options
 		m_menu.back().setDynamicName(m_difficultyOpt); // Set the title to be dynamic
 	}
-	{	 // TODO: create speedmod opt
+	{
 		ConfigItem::OptionList ol;
 		int i = 0, cur = 0;
 		//add modifiers to option list
 		for (float mod = 0.5; mod < 5; mod += 0.25) {
-			ol.push_back(boost::lexical_cast<std::string>(mod));
+			ol.push_back(std::to_string(mod));
 			if(m_currentSpeedMod == mod) cur = i;
 			++i;
 		}
-		m_SpeedMod = ConfigItem(ol);
-		m_SpeedMod.select(cur);
-		m_menu.add(MenuOption(_(""), _("Select Speedmod")).changer(m_SpeedMod));
-		m_menu.back().setDynamicName(m_Speedmod_opt);
+		m_SpeedModConfigItem = ConfigItem(ol);
+		m_SpeedModConfigItem.select(cur);
+		m_menu.add(MenuOption(_(""), _("Select Speedmod")).changer(m_SpeedModConfigItem));
+		m_menu.back().setDynamicName(m_SpeedmodDynamicNameString);
 	}
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
 }
@@ -160,7 +160,7 @@ void DanceGraph::setupJoinMenu() {
 void DanceGraph::updateJoinMenu() {
 	m_trackOpt = getTrack();
 	m_difficultyOpt = getDifficultyString();
-	m_Speedmod_opt = "Speedmod: " + boost::lexical_cast<std::string>(m_currentSpeedMod) + "x";
+	m_SpeedmodDynamicNameString = ("Speedmod: " + boost::lexical_cast<std::string>(m_currentSpeedMod) + "x");
 }
 
 /// Attempt to select next/previous game mode
@@ -295,6 +295,7 @@ void DanceGraph::engine() {
 			else if (boost::lexical_cast<int>(m_selectedDifficulty.so()) != m_level)
 				difficulty(DanceDifficulty(boost::lexical_cast<int>(m_selectedDifficulty.so())));
 			else if (m_rejoin.b()) { unjoin(); setupJoinMenu(); m_dev->pushEvent(input::Event()); /* FIXME: HACK? */ }
+			if (m_currentSpeedMod != boost::lexical_cast<float>(m_SpeedModConfigItem.so())) m_currentSpeedMod = boost::lexical_cast<float>(m_SpeedModConfigItem.so());
 			// Sync dynamic stuff
 			updateJoinMenu();
 		// Open Menu
