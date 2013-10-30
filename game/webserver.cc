@@ -59,6 +59,7 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		BinaryBuffer buf = readFile(findFile("index.html"));
 		return http_server::response::stock_reply(http_server::response::ok, std::string(buf.begin(), buf.end()));
 	} else if (request.destination == "/api/getDataBase.json") { //get database
+		m_songs.setFilter("");
 		std:: stringstream JSONDB;
 		JSONDB << "[\n";
 		for (int i=0; i<m_songs.size(); i++) {
@@ -104,6 +105,7 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 http_server::response WebServer::POSTresponse(const http_server::request &request) {
 	Game * gm = Game::getSingletonPtr();
 	if (request.destination == "/api/add") {
+			m_songs.setFilter("");
 		boost::shared_ptr<Song> pointer = GetSongFromJSON(request.body);
 		if (!pointer) {
 			return http_server::response::stock_reply(
@@ -125,6 +127,19 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 		} catch(std::exception e) {
 			return http_server::response::stock_reply(http_server::response::ok, "failure");
 		}
+	}else if (request.destination == "/api/search") { //get query
+			m_songs.setFilter(request.body); //set filter and get the results
+			std:: stringstream JSONDB;
+			JSONDB << "[\n";
+			for (int i=0; i<m_songs.size(); i++) {
+				JSONDB << "\n{\n\"Title\": \"" << escapeCharacters(m_songs[i]->title) << "\",\n\"Artist\": \"";
+				JSONDB << escapeCharacters(m_songs[i]->artist) << "\",\n\"Edition\": \"" << escapeCharacters(m_songs[i]->edition) << "\",\n\"Language\": \"" << escapeCharacters(m_songs[i]->language);
+				JSONDB << "\",\n\"Creator\": \"" << escapeCharacters(m_songs[i]->creator) << "\"\n},";
+			}
+			std::string output = JSONDB.str(); //remove the last comma
+			output.pop_back(); //remove the last comma
+			output += "\n]";
+			return http_server::response::stock_reply(http_server::response::ok, output);
 	} else {
 		return http_server::response::stock_reply(http_server::response::ok, "not yet implemented");
 	}

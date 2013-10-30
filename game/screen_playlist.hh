@@ -24,7 +24,6 @@ class ThemePlaylistScreen;
 class Backgrounds;
 class ThemeInstrumentMenu;
 
-
 class ScreenPlaylist : public Screen
 {
 public:

@@ -94,7 +94,6 @@ class Game: public Singleton <Game> {
 
 private:
 	Window& m_window;
-
 public:
 	input::Controllers controllers;
     PlayList& getCurrentPlayList() { return currentPlaylist; }
@@ -115,6 +114,7 @@ private:
 	float m_loadingProgress;
 	Surface m_logo;
 	AnimValue m_logoAnim;
+	AnimValue m_dialogTimeOut;
 	// Dialog members
 	boost::scoped_ptr<Dialog> m_dialog;
 };
