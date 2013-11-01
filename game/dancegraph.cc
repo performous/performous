@@ -428,8 +428,6 @@ void DanceGraph::draw(double time) {
 		float temp_s = dimensions.w() / 8.0f; // Allow for 8 pads to fit on a track
 		Transform trans(translate(vec3(0.0f, dimensions.y1(), 0.0)) * scale(temp_s));
 
-		// Draw the "neck" graph (beat lines)
-		drawBeats(time*m_currentSpeedMod);
 
 		// Arrows on cursor
 		{
@@ -461,26 +459,6 @@ void DanceGraph::draw(double time) {
 	drawInfo(time, dimensions); // Go draw some texts and other interface stuff
 }
 
-void DanceGraph::drawBeats(double time) {
-	UseTexture tex(m_beat);
-	glutil::VertexArray va;
-	float texCoord = 0.0f;
-	float tBeg = 0.0f, tEnd;
-	float w = 0.5 * m_pads * getScale();
-	for (auto it = m_song.beats.begin(); it != m_song.beats.end() && tBeg < future; ++it, texCoord += texCoordStep, tBeg = tEnd) {
-		tEnd = *it - time;
-		//if (tEnd < past) continue;
-		/*if (tEnd > future) {
-			// Crop the end off
-			texCoord -= texCoordStep * (tEnd - future) / (tEnd - tBeg);
-			tEnd = future;
-		}*/
-		glmath::vec4 c(1.0f, 1.0f, 1.0f, time2a(tEnd));
-		va.color(c).normal(0.0f, 1.0f, 0.0f).texCoord(0.0f, texCoord).vertex(-w, time2y(tEnd));
-		va.color(c).normal(0.0f, 1.0f, 0.0f).texCoord(1.0f, texCoord).vertex(w*0.7, time2y(tEnd));
-	}
-	va.draw();
-}
 
 /// Draws a single note (or hold)
 void DanceGraph::drawNote(DanceNote& note, double time) {

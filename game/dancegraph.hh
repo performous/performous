@@ -51,7 +51,6 @@ class DanceGraph: public InstrumentGraph {
 
 	// Scoring & drawing
 	void dance(double time, input::Event const& ev);
-	void drawBeats(double time);
 	void drawNote(DanceNote& note, double time);
 	void drawInfo(double time, Dimensions dimensions);
 	void drawArrow(int arrow_i, Texture& tex, float ty1 = 0.0, float ty2 = 1.0);
