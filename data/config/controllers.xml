@@ -268,7 +268,7 @@
 		</controller>
 		<controller type="dancepad" name="FutureMax Dance Mat">
 			<description>FutureMax Dance Mat</description>
-			<device regex="054c:0268" />
+			<device regex="054c:0268|Sony Corp. Batoh Device / PlayStation 3 Controller|Technology Innovation Holdings, Ltd|FutureMax Dance Mat" />
 			<mapping>
 				<button hw="8" map="start" />
 				<button hw="9" map="cancel" />
