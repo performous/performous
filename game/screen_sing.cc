@@ -40,6 +40,8 @@ ScreenSing::ScreenSing(std::string const& name, Audio& audio, Database& database
 {}
 
 void ScreenSing::enter() {
+	keyPressed = false;
+	m_DuetTimeout.setValue(10);
 	Game* gm = Game::getSingletonPtr();
 	// Initialize webcam
 	gm->loading(_("Initializing webcam..."), 0.1);
@@ -241,6 +243,7 @@ void ScreenSing::activateNextScreen()
 }
 
 void ScreenSing::manageEvent(input::NavEvent const& event) {
+	keyPressed = true;
 	input::NavButton nav = event.button;
 	m_quitTimer.setValue(QUIT_TIMEOUT);
 	double time = m_audio.getPosition();
@@ -301,6 +304,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 
 
 void ScreenSing::manageEvent(SDL_Event event) {
+	keyPressed = true;
 	double time = m_audio.getPosition();
 	int key = event.key.keysym.sym;
 	// Ctrl combinations that can be used while performing (not when score dialog is displayed)
@@ -497,7 +501,7 @@ void ScreenSing::draw() {
 		theme->timer.draw(statustxt);
 	}
 
-	if (config["game/karaoke_mode"].b()) {
+	if (config["game/karaoke_mode"].b() && !m_song->hasControllers()) { //guitar track? display the score window anyway!
 		if (!m_audio.isPlaying()) {
 			Game* gm = Game::getSingletonPtr();
 			gm->activateScreen("Playlist");
@@ -525,6 +529,9 @@ void ScreenSing::draw() {
 	// Menus on top of everything
 	for (auto& i: m_instruments) if (i.menuOpen()) i.drawMenu();
 	if (m_menu.isOpen()) drawMenu();
+	if(!keyPressed && m_DuetTimeout.get() == 0) {
+		m_menu.action();
+		}
 }
 
 

@@ -28,7 +28,7 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevicePt
   m_rejoin(false),
   m_leftymode(false),
   m_pads(),
-  m_correctness(0.0, 5.0),
+  m_correctness(1.0, 5.0),
   m_score(),
   m_scoreFactor(),
   m_starmeter(),
