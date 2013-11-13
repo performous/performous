@@ -195,6 +195,7 @@
 	function AddSong(number) {
 		$.post("api/add", JSON.stringify(database[number]));
 		RefreshPlayList();
+		$('#searchv2').val("added: " + database[number].Title); 
 	}
 
 	<!-- Playlist -->
