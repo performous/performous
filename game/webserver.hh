@@ -37,7 +37,7 @@ private:
 	boost::shared_ptr<Song> GetSongFromJSON(std::string JsonDoc);
 	std::string escapeCharacters(std::string input);
 	std::string unEscapeCharacters(std::string input);
-
+	std::string ReplaceCharacters(std::string input, std::string search, std::string replace);
 	boost::shared_ptr<boost::thread> m_serverThread;
 	boost::shared_ptr<http_server> m_server;
 	Songs& m_songs;
