@@ -12,7 +12,17 @@
 	<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
 </head>
 <body>
-
+<style>
+.ui-page {background: #feffff; /* Old browsers */
+background: -moz-linear-gradient(-45deg, #feffff 0%, #ddf1f9 35%, #a8aac1 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,#feffff), color-stop(35%,#ddf1f9), color-stop(100%,#a8aac1)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(-45deg, #feffff 0%,#ddf1f9 35%,#a8aac1 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(-45deg, #feffff 0%,#ddf1f9 35%,#a8aac1 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(-45deg, #feffff 0%,#ddf1f9 35%,#a8aac1 100%); /* IE10+ */
+background: linear-gradient(135deg, #feffff 0%,#ddf1f9 35%,#a8aac1 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', endColorstr='#a8aac1',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+}
+</style>
 <!-- Home -->
 <div data-role="page" id="page1">
 	<div data-theme="a" data-role="header">
