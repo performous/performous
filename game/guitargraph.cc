@@ -360,6 +360,9 @@ void GuitarGraph::engine() {
 			if (ev.button == input::GENERIC_START) { m_menu.open(); continue; }
 		}
 
+		// Disable gameplay when game is paused
+		if (m_audio.isPaused()) continue;
+
 		// Guitar specific actions
 		if (!m_drums) {
 			if (ev.button == input::GUITAR_GODMODE && ev.pressed()) activateStarpower();
