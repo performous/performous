@@ -77,6 +77,7 @@ class ScreenSing: public Screen {
 	void instrumentLayout(double time);
 	void createPauseMenu();
 	void drawMenu();
+	bool devCanParticipate(input::DevType const& devType) const;
 	Audio& m_audio;
 	Database& m_database;
 	Backgrounds& m_backgrounds;

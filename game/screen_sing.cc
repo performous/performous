@@ -260,7 +260,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	}
 	// Only pause or esc opens the global menu (instruments have their own menus)
 	// TODO: This should probably check if the source is participating as an instrument or not rather than check for its type
-	if (event.source.isKeyboard() && (nav == input::NAV_PAUSE || nav == input::NAV_CANCEL) && !m_audio.isPaused() && !m_menu.isOpen()) {
+	if (!devCanParticipate(event.devType) && (nav == input::NAV_PAUSE || nav == input::NAV_CANCEL) && !m_audio.isPaused() && !m_menu.isOpen()) {
 		m_menu.open();
 		m_audio.togglePause();
 	}
@@ -420,6 +420,16 @@ void ScreenSing::prepare() {
 	}
 }
 
+/// Test if a given device type can join the current song.
+// TODO: Somehow avoid duplicating these same checks in ScreenSing::prepare.
+bool ScreenSing::devCanParticipate(input::DevType const& devType) const {
+	if (devType == input::DEVTYPE_DANCEPAD && m_song->hasDance()) return true;
+	if (devType == input::DEVTYPE_GUITAR && m_song->hasGuitars()) return true;
+	if (devType == input::DEVTYPE_DRUMS && m_song->hasDrums()) return true;
+	return false;	
+}
+
+
 void ScreenSing::draw() {
 	// Get the time in the song
 	double length = m_audio.getLength();
@@ -533,7 +543,6 @@ void ScreenSing::draw() {
 		m_menu.action();
 		}
 }
-
 
 void ScreenSing::drawMenu() {
 	if (m_menu.empty()) return;
