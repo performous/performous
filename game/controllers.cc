@@ -357,9 +357,7 @@ struct Controllers::Impl {
 		ev.nav = navigation(ev);
 		// Emit nav event
 		if (ev.nav != NAV_NONE) {
-			NavEvent ne;
-			ne.source = ev.source;
-			ne.button = ev.nav;
+			NavEvent ne(ev);
 			// Menu navigation mapping
 			{
 				bool vertical = (ev.devType == DEVTYPE_GUITAR);
@@ -368,7 +366,6 @@ struct Controllers::Impl {
 				else if (ne.button == NAV_LEFT) ne.menu = (vertical ? NAVMENU_B_PREV : NAVMENU_A_PREV);
 				else if (ne.button == NAV_RIGHT) ne.menu = (vertical ? NAVMENU_B_NEXT : NAVMENU_A_NEXT);
 			}
-			ne.time = ev.time;
 			if (ev.value != 0.0) {
 				m_navEvents.push_back(ne);
 				if (ne.button >= NAV_REPEAT) m_navRepeat.insert(std::make_pair(ne.button, ne));

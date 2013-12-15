@@ -40,6 +40,12 @@ void PlayList::removeSong(int index) {
 	boost::mutex::scoped_lock(m_mutex);
 	m_list.erase(m_list.begin() + index);
 }
+void PlayList::swap(int index1, int index2) {
+	boost::shared_ptr<Song> song1 = m_list[index1];
+	m_list[index1] = m_list[index2];
+	m_list[index2] = song1;
+}
+
 
 boost::shared_ptr<Song> PlayList::getSong(int index) {
 	boost::mutex::scoped_lock(m_mutex);
