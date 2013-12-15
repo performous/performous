@@ -258,6 +258,37 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 		Game::getSingletonPtr()->activateScreen("Playlist");
 		return;
 	}
+
+	if (event.repeat == 0 && devCanParticipate(event.devType)) {
+		Game* gm = Game::getSingletonPtr();
+		input::DevicePtr dev = gm->controllers.registerDevice(event.source);
+		if (dev) {
+			// Eat all events and see if any are valid for joining
+			input::DevType type = input::DEVTYPE_GENERIC;
+			std::string msg;
+			for (input::Event ev; dev->getEvent(ev);) {
+				if (ev.value == 0.0) continue;
+				if (dev->type == input::DEVTYPE_DANCEPAD && m_song->hasDance()) {
+					if (ev.button == input::DANCEPAD_UP) type = dev->type;
+					else msg = dev->source.isKeyboard() ? _("Press UP to join dance!") : _("Step UP to join!");
+				}
+				else if (dev->type == input::DEVTYPE_GUITAR && m_song->hasGuitars()) {
+					if (ev.button == input::GUITAR_GREEN) type = dev->type;
+					else if (ev.button != input::GUITAR_WHAMMY && ev.button != input::GUITAR_GODMODE) {
+						msg = dev->source.isKeyboard() ? _("Press 1 to join guitar!") : _("Press GREEN to join!");
+					}
+				}
+				else if (dev->type == input::DEVTYPE_DRUMS && m_song->hasDrums()) {
+					if (ev.button == input::DRUMS_KICK) type = dev->type;
+					else msg = dev->source.isKeyboard() ? _("Press SPACE to join drums!") : _("KICK to join!");
+				}
+			}
+			if (!msg.empty()) gm->flashMessage(msg, 0.0, 0.1, 0.1);
+			else if (type == input::DEVTYPE_DANCEPAD) m_instruments.push_back(new DanceGraph(m_audio, *m_song, dev));
+			else if (type != input::DEVTYPE_GENERIC) m_instruments.push_back(new GuitarGraph(m_audio, *m_song, dev, m_instruments.size()));
+		}
+	}
+
 	// Only pause or esc opens the global menu (instruments have their own menus)
 	// TODO: This should probably check if the source is participating as an instrument or not rather than check for its type
 	if (!devCanParticipate(event.devType) && (nav == input::NAV_PAUSE || nav == input::NAV_CANCEL) && !m_audio.isPaused() && !m_menu.isOpen()) {
@@ -380,36 +411,10 @@ namespace {
 
 void ScreenSing::prepare() {
 	Game* gm = Game::getSingletonPtr();
-	double time = m_audio.getPosition();
 	// Enable/disable controllers as needed (mostly so that keyboard navigation will not be obstructed).
 	gm->controllers.enableEvents(m_song->hasControllers() && !m_menu.isOpen() && !m_score_window.get());
+	double time = m_audio.getPosition();
 	if (m_video) m_video->prepare(time);
-	for (input::DevicePtr dev; gm->controllers.getDevice(dev); ) {
-		// Eat all events and see if any are valid for joining
-		input::DevType type = input::DEVTYPE_GENERIC;
-		std::string msg;
-		for (input::Event ev; dev->getEvent(ev);) {
-			if (ev.value == 0.0) continue;
-			if (dev->type == input::DEVTYPE_DANCEPAD && m_song->hasDance()) {
-				if (ev.button == input::DANCEPAD_UP) type = dev->type;
-				else msg = dev->source.isKeyboard() ? _("Press UP to join dance!") : _("Step UP to join!");
-			}
-			else if (dev->type == input::DEVTYPE_GUITAR && m_song->hasGuitars()) {
-				if (ev.button == input::GUITAR_GREEN) type = dev->type;
-				else if (ev.button != input::GUITAR_WHAMMY && ev.button != input::GUITAR_GODMODE) {
-					msg = dev->source.isKeyboard() ? _("Press 1 to join guitar!") : _("Press GREEN to join!");
-				}
-			}
-			else if (dev->type == input::DEVTYPE_DRUMS && m_song->hasDrums()) {
-				if (ev.button == input::DRUMS_KICK) type = dev->type;
-				else msg = dev->source.isKeyboard() ? _("Press SPACE to join drums!") : _("KICK to join!");
-			}
-		}
-		if (!msg.empty()) gm->flashMessage(msg, 0.0, 0.1, 0.1);
-		else if (type == input::DEVTYPE_DANCEPAD) m_instruments.push_back(new DanceGraph(m_audio, *m_song, dev));
-		else if (type != input::DEVTYPE_GENERIC) m_instruments.push_back(new GuitarGraph(m_audio, *m_song, dev, m_instruments.size()));
-	}
-
 	// Menu mangling
 	// We don't allow instrument menus during global menu
 	// except for joining, in which case global menu is closed

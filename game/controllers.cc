@@ -129,7 +129,7 @@ struct Controllers::Impl {
 	HW m_hw;
 
 	std::deque<NavEvent> m_navEvents;
-	std::deque<DevicePtr> m_orphans;
+	std::map<SourceId, DevicePtr> m_orphans;
 	std::map<SourceId, boost::weak_ptr<Device> > m_devices;
 	bool m_eventsEnabled;
 	
@@ -258,12 +258,13 @@ struct Controllers::Impl {
 		m_navEvents.pop_front();
 		return true;
 	}
-	/// Return the next orphan device from queue, if available
-	bool getDevice(DevicePtr& dev) {
-		if (m_orphans.empty()) return false;
-		dev = *m_orphans.begin();
-		m_orphans.erase(m_orphans.begin());
-		return true;
+	/// Register an orphan device
+	DevicePtr registerDevice(SourceId const& source) {
+		auto it = m_orphans.find(source);
+		if (it == m_orphans.end()) return DevicePtr();
+		DevicePtr ret = it->second;
+		m_orphans.erase(it);
+		return ret;
 	}
 	void enableEvents(bool state) {
 		m_eventsEnabled = state;
@@ -355,7 +356,7 @@ struct Controllers::Impl {
 		if (!valueChanged(ev)) return false;  // Avoid repeated or other useless events
 		std::clog << "controllers/debug: processing " << ev << std::endl;
 		ev.nav = navigation(ev);
-		// Emit nav event
+		// Emit nav event (except if device is currently registered for events)
 		if (ev.nav != NAV_NONE) {
 			NavEvent ne(ev);
 			// Menu navigation mapping
@@ -373,15 +374,16 @@ struct Controllers::Impl {
 				if (ne.button >= NAV_REPEAT) m_navRepeat.erase(ne.button);
 			}
 		}
-		if (!m_eventsEnabled) return true;
-		// Emit Event and construct a new Device first if needed
-		DevicePtr ptr = m_devices[ev.source].lock();
-		if (!ptr) {
-			ptr.reset(new Device(ev.source, ev.devType));
-			m_orphans.push_back(ptr);
-			m_devices[ev.source] = ptr;
+		if (m_eventsEnabled) {
+			// Emit Event and construct a new Device first if needed
+			DevicePtr ptr = m_devices[ev.source].lock();
+			if (!ptr) {
+				ptr.reset(new Device(ev.source, ev.devType));
+				m_orphans[ev.source] = ptr;
+				m_devices[ev.source] = ptr;
+			}
+			ptr->pushEvent(ev);
 		}
-		ptr->pushEvent(ev);
 		return true;
 	}
 	/// Test if button's value has changed since the last call to this function
@@ -400,7 +402,7 @@ struct Controllers::Impl {
 Controllers::Controllers(): self(new Controllers::Impl()) {}
 Controllers::~Controllers() {}
 bool Controllers::getNav(NavEvent& ev) { return self->getNav(ev); }
-bool Controllers::getDevice(DevicePtr& dev) { return self->getDevice(dev); }
+DevicePtr Controllers::registerDevice(SourceId const& source) { return self->registerDevice(source); }
 void Controllers::enableEvents(bool state) { self->enableEvents(state); }
 void Controllers::process(boost::xtime const& now) { self->process(now); }
 bool Controllers::pushEvent(SDL_Event const& ev, boost::xtime const& t) { return self->pushEvent(ev, t); }

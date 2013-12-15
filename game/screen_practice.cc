@@ -43,12 +43,9 @@ void ScreenPractice::manageEvent(input::NavEvent const& event) {
 	input::NavButton nav = event.button;
 	if (nav == input::NAV_CANCEL || nav == input::NAV_START) gm->activateScreen("Intro");
 	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
-}
-
-void ScreenPractice::prepare() {
-	Game* gm = Game::getSingletonPtr();
 	// Process all instrument events that are available, then throw away the instruments...
-	for (input::DevicePtr dev; gm->controllers.getDevice(dev); ) {
+	input::DevicePtr dev = gm->controllers.registerDevice(event.source);
+	if (dev) {
 		for (input::Event ev; dev->getEvent(ev);) {
 			if (ev.value == 0.0) continue;
 			if (dev->type == input::DEVTYPE_DANCEPAD) {}
@@ -57,6 +54,7 @@ void ScreenPractice::prepare() {
 		}
 	}
 	// TODO: We could store the DevicePtrs and display the instruments on screen in a meaningful way
+	// Note: Alternatively this could be done via listening to NavEvents and not even registering the devices, simplifying the above processing.
 }
 
 void ScreenPractice::draw() {
