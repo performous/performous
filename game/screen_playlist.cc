@@ -328,6 +328,24 @@ void ScreenPlaylist::createSongMenu(int songNumber) {
 			createSongListMenu();
 		}
 	}));
+	if (songNumber >= 2) { //can't move up first song
+		overlay_menu.add(MenuOption(_("Move up"), _("Move this song up the list")).call([this, songNumber]() {
+			Game* gm = Game::getSingletonPtr();
+			gm->getCurrentPlayList().swap(songNumber -1, songNumber -2);
+			createSongListMenu();
+			overlay_menu.move(songNumber -2);
+		}));
+	}
+	Game* gm = Game::getSingletonPtr();
+
+	if (songNumber -1 < gm->getCurrentPlayList().getList().size()) { //can't move down the last song
+		overlay_menu.add(MenuOption(_("Move Down"), _("Move this song up the list")).call([this, songNumber]() {
+			Game* gm = Game::getSingletonPtr();
+			gm->getCurrentPlayList().swap(songNumber -1, songNumber);
+			createSongListMenu();
+			overlay_menu.move(songNumber);
+		}));
+	}
 	overlay_menu.add(MenuOption(_("Back"), _("Back to playlist viewer")).call([this]() {
 		overlay_menu.close();
 	}));
