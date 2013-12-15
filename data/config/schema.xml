@@ -62,6 +62,10 @@ to save the current settings to XML.
 		<short>Theme</short>
 		<long>Name of the theme to use.</long>
 	</entry>
+	<entry name="game/band_controllers_enabled" type="bool" value="false">
+		<short>Enable Controllers</short>
+		<long>Enable controllers during band (karaoke) song.</long>
+	</entry>
 	<entry name="game/keyboard_guitar" type="bool" value="true">
 		<short>Keyboard as guitar</short>
 		<long>Enable keyboard as guitar (Frets on Fire mode).</long>

@@ -260,7 +260,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	}
 	// Only pause or esc opens the global menu (instruments have their own menus)
 	// TODO: This should probably check if the source is participating as an instrument or not rather than check for its type
-	if (event.source.isKeyboard() && (nav == input::NAV_PAUSE || nav == input::NAV_CANCEL) && !m_audio.isPaused() && !m_menu.isOpen()) {
+	if ((event.source.isKeyboard() || config["game/band_controllers_enabled"].b()) && (nav == input::NAV_PAUSE || nav == input::NAV_CANCEL) && !m_audio.isPaused() && !m_menu.isOpen()) {
 		m_menu.open();
 		m_audio.togglePause();
 	}
