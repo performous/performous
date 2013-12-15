@@ -333,18 +333,16 @@ void ScreenPlaylist::createSongMenu(int songNumber) {
 			Game* gm = Game::getSingletonPtr();
 			gm->getCurrentPlayList().swap(songNumber -1, songNumber -2);
 			createSongListMenu();
-			overlay_menu.move(songNumber -2);
 			overlay_menu.close();
 		}));
 	}
 	Game* gm = Game::getSingletonPtr();
-
-	if (songNumber < gm->getCurrentPlayList().getList().size()) { //can't move down the last song
+	int size = gm->getCurrentPlayList().getList().size();
+	if (songNumber < size) { //can't move down the last song
 		overlay_menu.add(MenuOption(_("Move Down"), _("Move this song up the list")).call([this, songNumber]() {
 			Game* gm = Game::getSingletonPtr();
 			gm->getCurrentPlayList().swap(songNumber -1, songNumber);
 			createSongListMenu();
-			overlay_menu.move(songNumber);
 			overlay_menu.close();
 		}));
 	}
