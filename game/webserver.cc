@@ -232,24 +232,31 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 }
 
 std::string WebServer::escapeCharacters(std::string input) {
-	size_t pos = 0;
-	std::string search = "\"";
-	std::string replace = "\\\"";
-	while ((pos = input.find(search, pos)) != std::string::npos) {
-		input.replace(pos, search.length(), replace);
-		pos += replace.length();
-	}
-	return input;
+	std::string output = input;
+	output = ReplaceCharacters(output, "\\", "\\\\");
+	output = ReplaceCharacters(output, "/", "\\/");
+	output = ReplaceCharacters(output, "\t", "\\\t");
+	output = ReplaceCharacters(output, "\"", "\\\"");
+	return output;
 }
 
+
 std::string WebServer::unEscapeCharacters(std::string input) {
+	std::string output = input;
+	output = ReplaceCharacters(output, "\\\"", "\"");
+	output = ReplaceCharacters(output, "\\\t", "\t");
+	output = ReplaceCharacters(output, "\\/", "/");
+	output = ReplaceCharacters(output, "\\\\", "\\");
+	return output;
+}
+
+std::string WebServer::ReplaceCharacters(std::string input, std::string search, std::string replace) {
 	size_t pos = 0;
-	std::string search = "\\\"";
-	std::string replace = "\"";
-	while ((pos = input.find(search, pos)) != std::string::npos) {
-		input.replace(pos, search.length(), replace);
+	std::string output = input;
+	while ((pos = output.find(search, pos)) != std::string::npos) {
+		output.replace(pos, search.length(), replace);
 		pos += replace.length();
 	}
-	return input;
+	return output;
 }
 

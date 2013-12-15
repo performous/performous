@@ -59,16 +59,6 @@ namespace input {
 		bool isKeyboard() const { return type == SOURCETYPE_KEYBOARD; }  ///< This is so common test that a helper is provided
 	};
 	
-	/// NavEvent is a menu navigation event, generalized for all controller type so that the user doesn't need to know about controllers.
-	struct NavEvent {
-		SourceId source;
-		NavButton button;
-		NavMenu menu;
-		boost::xtime time;
-		unsigned repeat;  ///< Zero for hardware event, increased by one for each auto-repeat
-		NavEvent(): source(), button(), menu(), time(), repeat() {}
-	};
-	
 	struct Event {
 		SourceId source; ///< Where did it originate from
 		HWButton hw; ///< Hardware button number (for internal use and debugging only)
@@ -81,6 +71,18 @@ namespace input {
 		bool pressed() const { return value != 0.0; }
 	};
 
+	/// NavEvent is a menu navigation event, generalized for all controller type so that the user doesn't need to know about controllers.
+	struct NavEvent {
+		SourceId source;
+		DevType devType;
+		NavButton button;
+		NavMenu menu;
+		boost::xtime time;
+		unsigned repeat;  ///< Zero for hardware event, increased by one for each auto-repeat
+		NavEvent(): source(), devType(), button(), menu(), time(), repeat() {}
+		explicit NavEvent(Event const& ev): source(ev.source), devType(ev.devType), button(ev.nav), menu(), time(ev.time), repeat() {}
+	};
+	
 	/// A handle for receiving device events
 	class Device: boost::noncopyable {
 		typedef std::deque<Event> Events;
