@@ -121,6 +121,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', end
 		<small>Web interface by Niek Nooijens, for full credits regarding Performous see /docs/Authors.txt</small>
 	</div>
 </div>
+<!-- Search system -->
 <div data-role="page" id="page3">
 	<div data-theme="a" data-role="header">
 		<h3>Performous web frontend</h3>
@@ -154,6 +155,13 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', end
 			</li>
 		</ul>
 </div>
+</div>
+<!-- dialog -->
+<div data-role="page" id="page4">
+	<div data-role="content">
+		<div id="songinfo">
+		</div>
+	</div>
 </div>
 
 <script>
@@ -248,15 +256,43 @@ $(document).keypress(function(e) {
 			$('#searchResultsViewer').listview('refresh');
 });
 }
-	<!-- TODO: confirm boxes are ugly, use jqm's dialogs -->
 	function ViewInfo(songnumber) {
-		if (confirm("Title: " + songlist[songnumber].Title + "\nArtist: " + songlist[songnumber].Artist + 
-			"\nEdition: " + songlist[songnumber].Edition + "\nLanguage: " + songlist[songnumber].Language + "\nCreator: " 
-			+ songlist[songnumber].Creator + "\n \n Do you want to Remove this song from the list?"))
-		{
-			$.post("api/remove", songnumber.toString());
-			RefreshPlayList();
-		}
+		$('#songinfo').html("Title: " + songlist[songnumber].Title + "<br>\nArtist: " + songlist[songnumber].Artist + 
+			"<br>\nEdition: " + songlist[songnumber].Edition + "<br>\nLanguage: " + songlist[songnumber].Language + "<br>\nCreator: " 
+			+ songlist[songnumber].Creator + "<br>\n" + " <div class=\"ui-grid-a\">" + 
+            "<div class=\"ui-block-a\">" + 
+            "<a id=\"btnremove\" data-role=\"button\" href=\"javascript:removeSong(" + songnumber +")\" data-icon=\"delete\">" +
+            "Remove song </a> </div>" + 
+            "<div class=\"ui-block-b\"> <a id=\"btncancel\" data-role=\"button\" href=\"#page2\" data-icon=\"back\">" + 
+			"Cancel </a> </div> </div> <br> " + 
+		"<div class=\"ui-grid-a\">" +
+            "<div class=\"ui-block-a\">" +
+            "<a id=\"btnmoveup\" data-role=\"button\" href=\"javascript:moveUp(" + songnumber +")\" data-icon=\"arrow-u\">" +
+            "Move up</a></div><div class=\"ui-block-b\"> " +
+            "<a id=\"btnmovedown\" data-role=\"button\" href=\"javascript:moveDown(" + songnumber +")\" data-icon=\"arrow-d\">" +
+				"Move Down </a> </div> </div>");
+				<!--refresh the buttons so they are rendered correctly-->
+			$('#btnremove').button();
+			$('#btnmoveup').button();
+			$('#btnmovedown').button();
+			$('#btncancel').button();
+			$.mobile.changePage( "#page4", { role: "dialog" } );
+
+	}
+	function removeSong(songnumber) {
+		$.post("api/remove", songnumber.toString());
+		RefreshPlayList();
+		$.mobile.changePage( "#page2");
+	}
+	function moveUp(songnumber) {
+		$.post("api/moveup", songnumber.toString());
+		RefreshPlayList();
+		$.mobile.changePage( "#page2");
+	}
+	function moveDown(songnumber) {
+		$.post("api/movedown", songnumber.toString());
+		RefreshPlayList();
+		$.mobile.changePage( "#page2");
 	}
 
 	$('#flipupdate').bind("change", function(event, ui) {
