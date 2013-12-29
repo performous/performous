@@ -155,7 +155,7 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 	} else if (request.destination == "/api/movedown") {
 		try {
 			unsigned int songToMove = boost::lexical_cast<int>(request.body);
-			if(songToMove < gm->getCurrentPlayList().getList().size()) {
+			if(songToMove < gm->getCurrentPlayList().getList().size() -1) {
 				gm->getCurrentPlayList().swap(songToMove,songToMove + 1);
 			}
 			ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
