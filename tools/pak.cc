@@ -44,8 +44,8 @@ Pak::Pak(std::string const& filename) {
 	{
 		char magic[8];
 		f.read(magic, sizeof(magic));
-		if (!std::memcmp(magic, "SceeWhPC", sizeof(magic))) format = PAK;
-		else if (!std::memcmp(magic, "SceeWhPk", sizeof(magic))) format = PAK_WITH_CRC;
+		if (!std::memcmp(magic, "SceeWhPC", sizeof(magic))) format = PAK_WITH_CRC;
+		else if (!std::memcmp(magic, "SceeWhPk", sizeof(magic))) format = PAK;
 		else if (!std::memcmp(magic, "PACKAGE ", sizeof(magic))) format = PKD;
 		else if (!std::memcmp(magic, "\x7e\x26\x4c\x33\x24\x53\x9b\xd0", sizeof(magic))) format = PKF;
 		else throw std::runtime_error("Not a valid PAK/PKF/PKD file (" + std::string(magic) + ")");
