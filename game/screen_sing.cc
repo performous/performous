@@ -297,18 +297,21 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	}
 	// Global/singer pause menu navigation
 	if (m_menu.isOpen()) {
-		if (nav == input::NAV_START) {
-			m_menu.action();
+		int do_action = 0;
+		if (nav == input::NAV_START) { do_action = 1; }
+		else if (nav == input::NAV_LEFT) { do_action = -1; }
+		else if (nav == input::NAV_RIGHT) { do_action = 1; }
+		else if (nav == input::NAV_DOWN) { m_menu.move(1); return; }
+		else if (nav == input::NAV_UP) { m_menu.move(-1); return; }
+
+		if (do_action != 0) {
+			m_menu.action(do_action);
 			// Did the action close the menu?
 			if (!m_menu.isOpen() && m_audio.isPaused()) {
 				m_audio.togglePause();
 			}
 			return;
 		}
-		else if (nav == input::NAV_LEFT) { m_menu.move(-1); return; }
-		else if (nav == input::NAV_RIGHT) { m_menu.move(1); return; }
-		else if (nav == input::NAV_DOWN) { m_menu.move(1); return; }
-		else if (nav == input::NAV_UP) { m_menu.move(-1); return; }
 	}
 	// Start button has special functions for skipping things (only in singing for now)
 	if (nav == input::NAV_START && m_instruments.empty() && !m_layout_singer.empty() && !m_audio.isPaused()) {
