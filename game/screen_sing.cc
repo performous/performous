@@ -104,10 +104,10 @@ void ScreenSing::setupVocals() {
 		m_layout_singer.clear();
 		Engine::VocalTrackPtrs selectedTracks;
 		boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
-		unsigned players = (m_duet.i() == 0 ? (analyzers.empty() ? 1 : analyzers.size()) : 1);  // Always at least 1; number of mics if in duet mode
+		unsigned players = (analyzers.empty() ? 1 : analyzers.size());  // Always at least 1; should be number of mics
 		std::set<VocalTrack*> shownTracks;  // Tracks to be included in layout_singer (stored by name for proper sorting and merging duplicates)
 		for (unsigned player = 0; player < players; ++player) {
-			VocalTrack* vocal = &m_song->getVocalTrack(m_vocalTracks[player].i());
+			VocalTrack* vocal = &m_song->getVocalTrack(m_vocalTracks[(m_duet.i() == 0 ? player : 0)].i());
 			selectedTracks.push_back(vocal);
 			shownTracks.insert(vocal);
 		}
