@@ -580,14 +580,7 @@ void ScreenSing::drawMenu() {
 		txt->dimensions.middle(x).center(y);
 		txt->draw(it->getName());
 		if (it->value == &m_vocalTracks[player]) {
-			Color color;
-			// FIXME: Move microphone colors into a global structure?
-			if (analyzers[player].getId() == "blue") color = Color(0.2, 0.5, 0.7);
-			else if (analyzers[player].getId() == "red") color = Color(0.8, 0.3, 0.3);
-			else if (analyzers[player].getId() == "green") color = Color(0.2, 0.9, 0.2);
-			else if (analyzers[player].getId() == "orange") color = Color(1.0, 0.6, 0.0);
-			else color = Color(0.5, 0.5, 0.5);
-
+			Color color = MicrophoneColor::get(analyzers[player].getId());
 			ColorTrans c(color);
 			m_player_icon->dimensions.right(x).fixedHeight(0.050).center(y);
 			m_player_icon->draw();

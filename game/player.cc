@@ -12,11 +12,7 @@ Player::Player(VocalTrack& vocal, Analyzer& analyzer, size_t frames):
 	// Initialize note powers
 	for (Notes::const_iterator it = m_vocal.notes.begin(); it != m_vocal.notes.end(); ++it) it->power = 0.0f;
 	// Assign colors
-	if (m_analyzer.getId() == "blue") m_color = Color(0.2, 0.5, 0.7);
-	else if (m_analyzer.getId() == "red") m_color = Color(0.8, 0.3, 0.3);
-	else if (m_analyzer.getId() == "green") m_color = Color(0.2, 0.9, 0.2);
-	else if (m_analyzer.getId() == "orange") m_color = Color(1.0, 0.6, 0.0);
-	else m_color = Color(0.5, 0.5, 0.5);
+	m_color = MicrophoneColor::get(m_analyzer.getId());
 }
 
 void Player::update() {
