@@ -88,6 +88,7 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<Webcam> m_cam;
 	boost::scoped_ptr<Surface> m_pause_icon;
+	boost::scoped_ptr<Surface> m_player_icon;
 	boost::scoped_ptr<Surface> m_help;
 	boost::scoped_ptr<Engine> m_engine;
 	boost::ptr_vector<LayoutSinger> m_layout_singer;
