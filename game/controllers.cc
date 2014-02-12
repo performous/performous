@@ -7,7 +7,7 @@
 #include <boost/regex.hpp>
 #include <boost/smart_ptr/weak_ptr.hpp>
 #include <libxml++/libxml++.h>
-#include <SDL_joystick.h>
+#include <SDL2/SDL_joystick.h>
 #include <deque>
 #include <stdexcept>
 
