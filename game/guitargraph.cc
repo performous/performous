@@ -360,6 +360,9 @@ void GuitarGraph::engine() {
 			if (ev.button == input::GENERIC_START) { m_menu.open(); continue; }
 		}
 
+		// Disable gameplay when game is paused
+		if (m_audio.isPaused()) continue;
+
 		// Guitar specific actions
 		if (!m_drums) {
 			if (ev.button == input::GUITAR_GODMODE && ev.pressed()) activateStarpower();
@@ -741,8 +744,8 @@ namespace {
 		color.a = y2a(y);
 		{
 			glmath::vec4 c(color.r, color.g, color.b, color.a);
-			va.Color(c).TexCoord(0.0f, ty).Vertex(x - fretW, y, 0.1 + zn);
-			va.Color(c).TexCoord(1.0f, ty).Vertex(x + fretW, y, 0.1 - zn);
+			va.color(c).texCoord(0.0f, ty).vertex(x - fretW, y, 0.1 + zn);
+			va.color(c).texCoord(1.0f, ty).vertex(x + fretW, y, 0.1 - zn);
 		}
 	}
 
@@ -852,10 +855,10 @@ void GuitarGraph::drawNeckStuff(double time) {
 				tEnd = future;
 			}
 			glmath::vec4 c = colorize(Color::alpha(time2a(tEnd)), time + tBeg).linear();
-			va.Normal(0.0f, 1.0f, 0.0f).Color(c).TexCoord(0.0f, texCoord).Vertex(-w, time2y(tEnd));
-			va.Normal(0.0f, 1.0f, 0.0f).Color(c).TexCoord(1.0f, texCoord).Vertex(w, time2y(tEnd));
+			va.normal(0.0f, 1.0f, 0.0f).color(c).texCoord(0.0f, texCoord).vertex(-w, time2y(tEnd));
+			va.normal(0.0f, 1.0f, 0.0f).color(c).texCoord(1.0f, texCoord).vertex(w, time2y(tEnd));
 		}
-		va.Draw();
+		va.draw();
 	}
 
 	if (!menuOpen()) {
@@ -904,11 +907,11 @@ void GuitarGraph::drawNeckStuff(double time) {
 			UseTexture tblock(*ftex);
 			glutil::VertexArray va;
 			glmath::vec4 c(1.0, 1.0, 1.0, 1.0 - flameAnim);
-			va.TexCoord(0.0f, 1.0f).Color(c).Vertex(x - fretWid, time2y(0.0f), 0.0f);
-			va.TexCoord(1.0f, 1.0f).Color(c).Vertex(x + fretWid, time2y(0.0f), 0.0f);
-			va.TexCoord(0.0f, 0.0f).Color(c).Vertex(x - fretWid, time2y(0.0f), h);
-			va.TexCoord(1.0f, 0.0f).Color(c).Vertex(x + fretWid, time2y(0.0f), h);
-			va.Draw();
+			va.texCoord(0.0f, 1.0f).color(c).vertex(x - fretWid, time2y(0.0f), 0.0f);
+			va.texCoord(1.0f, 1.0f).color(c).vertex(x + fretWid, time2y(0.0f), 0.0f);
+			va.texCoord(0.0f, 0.0f).color(c).vertex(x - fretWid, time2y(0.0f), h);
+			va.texCoord(1.0f, 0.0f).color(c).vertex(x + fretWid, time2y(0.0f), h);
+			va.draw();
 			++it;
 		}
 	}
@@ -924,11 +927,11 @@ void GuitarGraph::drawNeckStuff(double time) {
 	{
 		glmath::vec4 c(bgcol, bgcol, bgcol, 0.6f * alpha);
 		glutil::VertexArray va;
-		va.Color(c).TexCoord(0,0).Vertex(x - thickness, y + maxsize);
-		va.Color(c).TexCoord(0,0).Vertex(x, y + maxsize);
-		va.Color(c).TexCoord(0,0).Vertex(x - thickness, y - maxsize);
-		va.Color(c).TexCoord(0,0).Vertex(x, y - maxsize);
-		va.Draw();
+		va.color(c).texCoord(0,0).vertex(x - thickness, y + maxsize);
+		va.color(c).texCoord(0,0).vertex(x, y + maxsize);
+		va.color(c).texCoord(0,0).vertex(x - thickness, y - maxsize);
+		va.color(c).texCoord(0,0).vertex(x, y - maxsize);
+		va.draw();
 	}
 	// Indicator bar
 	float error = m_errorMeter.get();
@@ -939,11 +942,11 @@ void GuitarGraph::drawNeckStuff(double time) {
 		if (error > 0) { c = glmath::vec4(0.0f, 1.0f, 0.0f, alpha); y2 = -maxsize * error; }
 		else { c = glmath::vec4(1.0f, 0.0f, 0.0f, alpha); y1 = -maxsize * error; }
 		glutil::VertexArray va;
-		va.Color(c).TexCoord(0,0).Vertex(x - thickness, y1 + y);
-		va.Color(c).TexCoord(0,0).Vertex(x, y1 + y);
-		va.Color(c).TexCoord(0,0).Vertex(x - thickness, y2 + y);
-		va.Color(c).TexCoord(0,0).Vertex(x, y2 + y);
-		va.Draw();
+		va.color(c).texCoord(0,0).vertex(x - thickness, y1 + y);
+		va.color(c).texCoord(0,0).vertex(x, y1 + y);
+		va.color(c).texCoord(0,0).vertex(x - thickness, y2 + y);
+		va.color(c).texCoord(0,0).vertex(x, y2 + y);
+		va.draw();
 	}
 }
 
@@ -1013,7 +1016,7 @@ void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float 
 		vertexPair(va, x, y, color, doanim ? tc(y + t) : 0.20f);
 		vertexPair(va, x, yEnd, color, doanim ? tc(yEnd + t) : 0.0f);
 		glDisable(GL_DEPTH_TEST);
-		va.Draw();
+		va.draw();
 		glEnable(GL_DEPTH_TEST);
 		// Render the fret object
 		{
@@ -1065,7 +1068,7 @@ void GuitarGraph::drawDrumfill(float tBeg, float tEnd) {
 			vertexPair(va, x, yEnd + 2.0 * fretWid, c, 0.25f);
 		}
 		vertexPair(va, x, yEnd, c, tcEnd); // Last vertex pair
-		va.Draw();
+		va.draw();
 	}
 }
 
@@ -1114,12 +1117,12 @@ void GuitarGraph::drawBar(double time, float h) {
 	UseShader shader(getShader("color"));
 	glutil::VertexArray va;
 
-	va.Normal(0.0f, 1.0f, 0.0f).TexCoord(0,0).Vertex(-2.5f, time2y(time + h));
-	va.Normal(0.0f, 1.0f, 0.0f).TexCoord(0,0).Vertex(2.5f, time2y(time + h));
-	va.Normal(0.0f, 1.0f, 0.0f).TexCoord(0,0).Vertex(-2.5f, time2y(time - h));
-	va.Normal(0.0f, 1.0f, 0.0f).TexCoord(0,0).Vertex(2.5f, time2y(time - h));
+	va.normal(0.0f, 1.0f, 0.0f).texCoord(0,0).vertex(-2.5f, time2y(time + h));
+	va.normal(0.0f, 1.0f, 0.0f).texCoord(0,0).vertex(2.5f, time2y(time + h));
+	va.normal(0.0f, 1.0f, 0.0f).texCoord(0,0).vertex(-2.5f, time2y(time - h));
+	va.normal(0.0f, 1.0f, 0.0f).texCoord(0,0).vertex(2.5f, time2y(time - h));
 
-	va.Draw();
+	va.draw();
 }
 
 bool GuitarGraph::updateTom(unsigned int tomTrack, unsigned int fretId) {

@@ -154,12 +154,12 @@ template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, Tex
 	glTexParameterf(type(), GL_TEXTURE_WRAP_S, repeating ? GL_REPEAT : GL_CLAMP);
 	glTexParameterf(type(), GL_TEXTURE_WRAP_T, repeating ? GL_REPEAT : GL_CLAMP);
 
-	va.TexCoord(tex.x1, tex.y1).Vertex(dim.x1(), dim.y1());
-	va.TexCoord(tex.x2, tex.y1).Vertex(dim.x2(), dim.y1());
-	va.TexCoord(tex.x1, tex.y2).Vertex(dim.x1(), dim.y2());
-	va.TexCoord(tex.x2, tex.y2).Vertex(dim.x2(), dim.y2());
+	va.texCoord(tex.x1, tex.y1).vertex(dim.x1(), dim.y1());
+	va.texCoord(tex.x2, tex.y1).vertex(dim.x2(), dim.y1());
+	va.texCoord(tex.x1, tex.y2).vertex(dim.x1(), dim.y2());
+	va.texCoord(tex.x2, tex.y2).vertex(dim.x2(), dim.y2());
 
-	va.Draw();
+	va.draw();
 }
 
 template <GLenum Type> void OpenGLTexture<Type>::drawCropped(Dimensions const& orig, TexCoords const& tex) const {

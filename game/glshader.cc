@@ -133,38 +133,3 @@ Uniform Shader::operator[](const std::string& uniform) {
 	if (var == -1) throw std::logic_error("GLSL shader '" + name + "' uniform variable '" + uniform + "' not found.");
 	return Uniform(uniforms[uniform] = var);
 }
-
-void VertexArray::Draw(GLint mode) {
-	if (empty()) return;
-	unsigned stride = sizeof(VertexInfo);
-	glmath::vec4 const* ptr = &m_vertices[0].position;
-	GLint program;
-	glGetIntegerv(GL_CURRENT_PROGRAM, &program);
-	GLint vertPos = glGetAttribLocation(program, "vertPos");
-	GLint vertTexCoord = glGetAttribLocation(program, "vertTexCoord");
-	GLint vertNormal = glGetAttribLocation(program, "vertNormal");
-	GLint vertColor = glGetAttribLocation(program, "vertColor");
-	if (vertPos != -1) {
-		glEnableVertexAttribArray(vertPos);
-		glVertexAttribPointer(vertPos, 4, GL_FLOAT, GL_FALSE, stride, ptr);
-	}
-	if (vertTexCoord != -1) {
-		glEnableVertexAttribArray(vertTexCoord);
-		glVertexAttribPointer(vertTexCoord, 4, GL_FLOAT, GL_FALSE, stride, ptr + 1);
-	}
-	if (vertNormal != -1) {
-		glEnableVertexAttribArray(vertNormal);
-		glVertexAttribPointer(vertNormal, 3, GL_FLOAT, GL_FALSE, stride, ptr + 2);
-	}
-	if (vertColor != -1) {
-		glEnableVertexAttribArray(vertColor);
-		glVertexAttribPointer(vertColor, 4, GL_FLOAT, GL_FALSE, stride, ptr + 3);
-	}
-	glDrawArrays(mode, 0, size());
-
-	if (vertPos != -1) glDisableVertexAttribArray(vertPos);
-	if (vertTexCoord != -1) glDisableVertexAttribArray(vertTexCoord);
-	if (vertNormal != -1) glDisableVertexAttribArray(vertNormal);
-	if (vertColor != -1) glDisableVertexAttribArray(vertColor);
-}
-

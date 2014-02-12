@@ -346,7 +346,7 @@ void ScreenSongs::drawCovers() {
 	// Draw covers and reflections
 	for (int i = -2; i < 6; ++i) {
 		if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
-		Song& song = m_songs[baseidx + i];
+		Song& song = *m_songs[baseidx + i];
 		Surface& s = getCover(song);
 		// Calculate dimensions for cover and instrument markers
 		double diff = 0.5 * (1.0 + std::cos(std::min(M_PI, std::abs(i - shift))));  // 0..1 for current cover hilight level
@@ -413,11 +413,11 @@ namespace {
 	}
 	void drawIcon(int i, Dimensions const& dim) {
 		glutil::VertexArray va;
-		va.TexCoord(getIconTex(i), 0.0f).Vertex(dim.x1(), dim.y1());
-		va.TexCoord(getIconTex(i), 1.0f).Vertex(dim.x1(), dim.y2());
-		va.TexCoord(getIconTex(i + 1), 0.0f).Vertex(dim.x2(), dim.y1());
-		va.TexCoord(getIconTex(i + 1), 1.0f).Vertex(dim.x2(), dim.y2());
-		va.Draw();
+		va.texCoord(getIconTex(i), 0.0f).vertex(dim.x1(), dim.y1());
+		va.texCoord(getIconTex(i), 1.0f).vertex(dim.x1(), dim.y2());
+		va.texCoord(getIconTex(i + 1), 0.0f).vertex(dim.x2(), dim.y1());
+		va.texCoord(getIconTex(i + 1), 1.0f).vertex(dim.x2(), dim.y2());
+		va.draw();
 	}
 }
 

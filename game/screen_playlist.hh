@@ -8,18 +8,20 @@
 #include "animvalue.hh"
 #include "playlist.hh"
 #include "controllers.hh"
+#include "songs.hh"
+#include "surface.hh"
+#include "webcam.hh"
 #include <vector>
 #include <boost/scoped_ptr.hpp>
+
 
 class Audio;
 class Database;
 class Song;
-class Songs;
 class Surface;
 class ThemePlaylistScreen;
 class Backgrounds;
 class ThemeInstrumentMenu;
-
 
 class ScreenPlaylist : public Screen
 {
@@ -47,7 +49,7 @@ private:
 	void drawMenu();
 	void createMenuFromPlaylist();
 	Backgrounds& m_backgrounds;
-	Cachemap<std::string, Surface> m_covers;
+	Cachemap<fs::path, Surface> m_covers;
 	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
 	boost::scoped_ptr<ThemePlaylistScreen> theme;
 	boost::scoped_ptr<Surface> m_background;
@@ -55,6 +57,12 @@ private:
 	AnimValue m_nextTimer;
 	void draw_menu_options();
 	bool keyPressed;
+	Surface& getCover(Song const& song);
+	boost::scoped_ptr<Surface> m_singCover;
+	boost::scoped_ptr<Surface> m_instrumentCover;
+	boost::scoped_ptr<Surface> m_bandCover;
+	boost::scoped_ptr<Surface> m_danceCover;
+	boost::scoped_ptr<Webcam> m_cam;
 };
 
 

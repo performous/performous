@@ -77,6 +77,7 @@ class ScreenSing: public Screen {
 	void instrumentLayout(double time);
 	void createPauseMenu();
 	void drawMenu();
+	bool devCanParticipate(input::DevType const& devType) const;
 	Audio& m_audio;
 	Database& m_database;
 	Backgrounds& m_backgrounds;
@@ -95,9 +96,14 @@ class ScreenSing: public Screen {
 	Instruments m_instruments;
 	boost::shared_ptr<ThemeSing> theme;
 	AnimValue m_quitTimer;
+	AnimValue m_statusTextSwitch;
+	AnimValue m_DuetTimeout;
 	std::string m_selectedTrack;
 	std::string m_selectedTrackLocalized;
 	ConfigItem m_vocalTracks[AUDIO_MAX_ANALYZERS];
 	ConfigItem m_duet;
+	bool m_displayAutoPlay = false;
+	bool m_fadeIn = false;
+	bool keyPressed = false;
 };
 

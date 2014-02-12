@@ -36,7 +36,9 @@ void Object3d::loadWavefrontObj(fs::path const& filepath, float scale) {
 	std::string row;
 	fs::ifstream file(filepath, std::ios::binary);
 	if (!file) throw std::runtime_error("Couldn't open object file "+filepath.string());
-	std::vector<glmath::vec4> m_vertices, m_normals, m_texcoords;
+	std::vector<glmath::vec3> vertices;
+	std::vector<glmath::vec3> normals;
+	std::vector<glmath::vec2> texcoords;
 	std::vector<Face> m_faces;
 	while (getline(file, row)) {
 		++linenumber;
@@ -45,16 +47,16 @@ void Object3d::loadWavefrontObj(fs::path const& filepath, float scale) {
 		std::string tempst;
 		if (row.substr(0,2) == "v ") {  // Vertices
 			srow >> tempst >> x >> y >> z;
-			m_vertices.push_back(glmath::vec4(x*scale, y*scale, z*scale, 1.0f));
+			vertices.push_back(glmath::vec3(x*scale, y*scale, z*scale));
 		} else if (row.substr(0,2) == "vt") {  // Texture Coordinates
 			srow >> tempst >> x >> y;
-			m_texcoords.push_back(glmath::vec4(x, y, 0.0f, 0.0f));
+			texcoords.push_back(glmath::vec2(x, y));
 		} else if (row.substr(0,2) == "vn") {  // Normals
 			srow >> tempst >> x >> y >> z;
 			double sum = std::abs(x)+std::abs(y)+std::abs(z);
 			if (sum == 0) throw std::runtime_error("Invalid normal in "+filepath.string()+":"+boost::lexical_cast<std::string>(linenumber));
 			x /= sum; y /= sum; z /= sum; // Normalize components
-			m_normals.push_back(glmath::vec4(x, y, z, 0.0));
+			normals.push_back(glmath::vec3(x, y, z));
 		} else if (row.substr(0,2) == "f ") {  // Faces
 			Face f;
 			srow >> tempst; // Eat away prefix
@@ -90,12 +92,13 @@ void Object3d::loadWavefrontObj(fs::path const& filepath, float scale) {
 		bool hasNormals = !i->normals.empty();
 		bool hasTexCoords = !i->texcoords.empty();
 		for (size_t j = 0; j < i->vertices.size(); ++j) {
-			if (hasNormals) m_va.Normal(m_normals[i->normals[j]]);
-			if (hasTexCoords) m_va.TexCoord(m_texcoords[i->texcoords[j]]);
-			m_va.Vertex(m_vertices[i->vertices[j]]);
+			if (hasNormals) m_va.normal(normals[i->normals[j]]);
+			if (hasTexCoords) m_va.texCoord(texcoords[i->texcoords[j]]);
+			m_va.vertex(vertices[i->vertices[j]]);
 		}
 	}
-
+	// Models loaded from disk are assumed static, so optimized with a VBO
+	m_va.generateVBO();
 }
 
 void Object3d::load(fs::path const& filepath, fs::path const& texturepath, float scale) {
@@ -103,18 +106,18 @@ void Object3d::load(fs::path const& filepath, fs::path const& texturepath, float
 	loadWavefrontObj(filepath, scale);
 }
 
-void Object3d::drawVBO() {
+void Object3d::draw() {
 	UseShader us(getShader("3dobject"));
-	m_va.Draw(GL_TRIANGLES);
+	if (m_texture) {
+		UseTexture tex(*m_texture);
+		m_va.draw(GL_TRIANGLES);
+	} else {
+		m_va.draw(GL_TRIANGLES);
+	}
 }
 
 void Object3d::draw(float x, float y, float z, float s) {
 	using namespace glmath;
 	Transform trans(translate(vec3(x, y, z)) * scale(s));  // Move to position and scale
-	if (m_texture) {
-		UseTexture tex(*m_texture);
-		drawVBO();
-	} else {
-		drawVBO();
-	}
+	draw();
 }

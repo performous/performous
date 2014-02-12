@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 project(Performous CXX C)
-set(PROJECT_VERSION "0.7.0+")
+set(PROJECT_VERSION "0.8")
+set(BUILD_SHARED_LIBS OFF)
 
 # Avoid source tree pollution
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
@@ -21,7 +22,7 @@ endif()
 
 # Enable C++11 support and other compiler flags...
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
 	message("Detected GCC version ${GCC_VERSION}")
 	if (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7)
 		set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -fcx-limited-range ${CMAKE_CXX_FLAGS}")
@@ -63,12 +64,13 @@ endif()
 
 add_subdirectory(data)
 add_subdirectory(game)
-add_subdirectory(docs)
 
 option(ENABLE_TOOLS "Enable building of song extraction utilities for SingStar and Guitar Hero." ON)
 if(ENABLE_TOOLS)
 	add_subdirectory(tools)
 endif()
+
+add_subdirectory(docs)
 
 if(WIN32)
 	option(ENABLE_VERSIONING "Add version number information. This allows adding version information to the EXE. Be careful, in beta." OFF)

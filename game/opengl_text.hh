@@ -6,6 +6,9 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <vector>
 
+/// Load custom fonts from current theme and data folders
+void loadFonts();
+
 /// zoomed text
 struct TZoomText {
 	/// text

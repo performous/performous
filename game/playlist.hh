@@ -26,6 +26,8 @@ public:
 	void clear();
 	///removes a song
 	void removeSong(int index);
+	/// swaps two songs
+	void swap (int index1, int index2);
 	/// gets a specific song and removes it from the queue
 	boost::shared_ptr<Song> getSong(int index);
 private:

@@ -191,33 +191,51 @@ fs::path getDataDir() { Lock l(mutex); return cache.data; }
 fs::path getCacheDir() { Lock l(mutex); return cache.cache; }
 Paths const& getPaths() { Lock l(mutex); return cache.paths; }
 
-fs::path findFile(fs::path const& filename, Paths const& infixes = Paths(1)) {
+Paths getThemePaths() {
+	const fs::path themes = "themes";
+	const fs::path def = "default";
+	std::string theme = config["game/theme"].getEnumName();
+	Paths paths = getPaths();
+	Paths infixes = { themes / theme, themes / def, fs::path() };
+	if (!theme.empty() && theme != def) infixes.push_front(themes / theme);
+	// Build combinations of paths and infixes
+	Paths themePaths;
+	for (fs::path const& infix: infixes) {
+		for (fs::path p: paths) {
+			p /= infix;
+			if (fs::is_directory(p)) themePaths.push_back(p);
+		}
+	}
+	return themePaths;
+}
+
+fs::path findFile(fs::path const& filename) {
 	if (filename.empty()) throw std::logic_error("findFile expects a filename.");
 	if (filename.is_absolute()) throw std::logic_error("findFile expects a filename without path.");
 	Paths list;
-	for (auto infix: infixes) {
-		for (auto p: getPaths()) {
-			p /= infix / filename;
-			list.push_back(p);
-			if (fs::exists(p)) return p.string();
-		}
+	for (fs::path p: getThemePaths()) {
+		p /= filename;
+		list.push_back(p);
+		if (fs::exists(p)) return p.string();
 	}
 	std::string logmsg = "fs/error: Unable to locate data file, tried:\n";
 	for (auto const& p: list) logmsg += "  " + p.string() + '\n';
 	std::clog << logmsg << std::flush;
-	return fs::path();
+	throw std::runtime_error("Cannot find file \"" + filename.string() + "\" in Performous theme or data folders");
 }
 
-fs::path findFile(fs::path const& filename) {
-	const fs::path themes = "themes";
-	const fs::path def = "default";
-	std::string theme = config["game/theme"].getEnumName();
-	// Try current theme and if that fails, try default theme and finally data dirs
-	Paths infixes = { themes / def, fs::path() };
-	if (!theme.empty() && theme != def) infixes.push_front(themes / theme);
-	fs::path file = findFile(filename, infixes);
-	if (file.empty()) throw std::runtime_error("Cannot find file \"" + filename.string() + "\" in Performous theme or data folders");
-	return file;
+Paths listFiles(fs::path const& dir) {
+	if (dir.is_absolute()) throw std::logic_error("findFile expects a folder name without path.");
+	std::set<fs::path> found;  // Filenames already found
+	Paths files;  // Full paths of files found
+	for (fs::path path: getThemePaths()) {
+		for (fs::recursive_directory_iterator dirIt(path), dirEnd; dirIt != dirEnd; ++dirIt) {
+			fs::path name = dirIt->path().filename();  // FIXME: Extract full path from current folder, not just the filename
+			// If successfully inserted to "found", it wasn't found before, so add to paths.
+			if (found.insert(name).second) files.push_back(*dirIt);
+		}
+	}
+	return files;
 }
 
 std::list<std::string> getThemes() {

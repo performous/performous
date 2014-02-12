@@ -17,9 +17,17 @@ namespace glmath {
 	template <typename T> T mix(T const& a, T const& b, double blend) {
 		return (1.0-blend) * a + blend * b;
 	}
-	
+
 	struct vec4;
-	
+
+	struct vec2 {
+		GLfloat x, y;
+		explicit vec2(GLfloat const* arr) { std::copy(arr, arr + 2, &x); }
+		explicit vec2(float x = 0.0, float y = 0.0): x(x), y(y) {}
+		GLfloat& operator[](unsigned j) { return (&x)[j]; }
+		GLfloat const& operator[](unsigned j) const { return (&x)[j]; }
+	};
+
 	struct vec3 {
 		GLfloat x, y, z;
 		explicit vec3(GLfloat const* arr) { std::copy(arr, arr + 3, &x); }
@@ -42,17 +50,23 @@ namespace glmath {
 
 	// Template functions to allow them to work with different types of floating-point values
 
+	template <typename Scalar> static inline vec2 operator*(Scalar k, vec2 const& v) { return vec2(k * v.x, k * v.y); }
 	template <typename Scalar> static inline vec3 operator*(Scalar k, vec3 const& v) { return vec3(k * v.x, k * v.y, k * v.z); }
 	template <typename Scalar> static inline vec4 operator*(Scalar k, vec4 const& v) { return vec4(k * v.x, k * v.y, k * v.z, k * v.w); }
 
 	static inline vec3 operator+(vec3 const& a, vec4 const& b) { return vec3(a.x + b.x, a.y + b.y, a.z + b.z); }
 	static inline vec4 operator+(vec4 const& a, vec4 const& b) { return vec4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w); }
 
+	static inline float dot(vec2 const& a, vec2 const& b) {
+		return a.x * b.x + a.y * b.y;
+	}
 	static inline float dot(vec3 const& a, vec3 const& b) {
 		return a.x * b.x + a.y * b.y + a.z * b.z;
 	}
 
+	static inline float len(vec2 const& v) { return std::sqrt(dot(v, v)); }
 	static inline float len(vec3 const& v) { return std::sqrt(dot(v, v)); }
+	static inline vec2 normalize(vec2 const& v) { return (1 / len(v)) * v; }
 	static inline vec3 normalize(vec3 const& v) { return (1 / len(v)) * v; }
 
 	template <typename Vector> struct mat {

@@ -90,8 +90,6 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 
 	if (!GLEW_VERSION_2_1) throw std::runtime_error("OpenGL 2.1 is required but not available");
 
-	if (!GLEW_ARB_viewport_array && config["graphic/stereo3d"].b()) throw std::runtime_error("OpenGL extension ARB_viewport_array is required but not available when using stereo mode");
-
 	if (GLEW_VERSION_3_3) {
 		// Compile geometry shaders when stereo is requested
 		shader("color").compileFile(findFile("shaders/stereo3d.geom"));
@@ -183,6 +181,12 @@ void Window::render(boost::function<void (void)> drawFunc) {
 	ViewTrans trans;  // Default frustum
 	bool stereo = config["graphic/stereo3d"].b();
 	int type = config["graphic/stereo3dtype"].i();
+
+	if (stereo && !GLEW_ARB_viewport_array) {
+		config["graphic/stereo3d"].b() = stereo = false;
+		std::clog << "video/warning: Your GPU does not support Stereo3D mode (OpenGL extension ARB_viewport_array is required)" << std::endl;
+		// TODO: Flash message on UI?
+	}
 
 	// Over/under only available in fullscreen
 	if (stereo && type == 2 && !m_fullscreen) stereo = false;

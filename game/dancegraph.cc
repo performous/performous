@@ -366,12 +366,12 @@ namespace {
 	void vertexPair(glutil::VertexArray& va, int arrow_i, float y, float ty) {
 		if (arrow_i < 0) {
 			// Single thing in a texture (e.g. mine)
-			va.TexCoord(0.0f, ty).Vertex(-arrowSize, y);
-			va.TexCoord(1.0f, ty).Vertex(arrowSize, y);
+			va.texCoord(0.0f, ty).vertex(-arrowSize, y);
+			va.texCoord(1.0f, ty).vertex(arrowSize, y);
 		} else {
 			// Arrow from a texture atlas
-			va.TexCoord(arrow_i * one_arrow_tex_w, ty).Vertex(-arrowSize, y);
-			va.TexCoord((arrow_i+1) * one_arrow_tex_w, ty).Vertex(arrowSize, y);
+			va.texCoord(arrow_i * one_arrow_tex_w, ty).vertex(-arrowSize, y);
+			va.texCoord((arrow_i+1) * one_arrow_tex_w, ty).vertex(arrowSize, y);
 		}
 	}
 }
@@ -383,7 +383,7 @@ void DanceGraph::drawArrow(int arrow_i, Texture& tex, float ty1, float ty2) {
 	glutil::VertexArray va;
 	vertexPair(va, arrow_i, -arrowSize, ty1);
 	vertexPair(va, arrow_i,  arrowSize, ty2);
-	va.Draw();
+	va.draw();
 }
 
 /// Draws the dance graph
@@ -447,10 +447,10 @@ void DanceGraph::drawBeats(double time) {
 			tEnd = future;
 		}*/
 		glmath::vec4 c(1.0f, 1.0f, 1.0f, time2a(tEnd));
-		va.Color(c).Normal(0.0f, 1.0f, 0.0f).TexCoord(0.0f, texCoord).Vertex(-w, time2y(tEnd));
-		va.Color(c).Normal(0.0f, 1.0f, 0.0f).TexCoord(1.0f, texCoord).Vertex(w, time2y(tEnd));
+		va.color(c).normal(0.0f, 1.0f, 0.0f).texCoord(0.0f, texCoord).vertex(-w, time2y(tEnd));
+		va.color(c).normal(0.0f, 1.0f, 0.0f).texCoord(1.0f, texCoord).vertex(w, time2y(tEnd));
 	}
-	va.Draw();
+	va.draw();
 }
 
 /// Draws a single note (or hold)
@@ -498,7 +498,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 				vertexPair(va, arrow_i, yMid, 2.0f/3.0f);
 				// End
 				vertexPair(va, arrow_i, l, 1.0f);
-				va.Draw();
+				va.draw();
 			}
 		} else {
 			// Draw short note

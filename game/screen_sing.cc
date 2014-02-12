@@ -40,6 +40,8 @@ ScreenSing::ScreenSing(std::string const& name, Audio& audio, Database& database
 {}
 
 void ScreenSing::enter() {
+	keyPressed = false;
+	m_DuetTimeout.setValue(10);
 	Game* gm = Game::getSingletonPtr();
 	// Initialize webcam
 	gm->loading(_("Initializing webcam..."), 0.1);
@@ -241,6 +243,7 @@ void ScreenSing::activateNextScreen()
 }
 
 void ScreenSing::manageEvent(input::NavEvent const& event) {
+	keyPressed = true;
 	input::NavButton nav = event.button;
 	m_quitTimer.setValue(QUIT_TIMEOUT);
 	double time = m_audio.getPosition();
@@ -255,26 +258,60 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 		Game::getSingletonPtr()->activateScreen("Playlist");
 		return;
 	}
+
+	if (event.repeat == 0 && devCanParticipate(event.devType)) {
+		Game* gm = Game::getSingletonPtr();
+		input::DevicePtr dev = gm->controllers.registerDevice(event.source);
+		if (dev) {
+			// Eat all events and see if any are valid for joining
+			input::DevType type = input::DEVTYPE_GENERIC;
+			std::string msg;
+			for (input::Event ev; dev->getEvent(ev);) {
+				if (ev.value == 0.0) continue;
+				if (dev->type == input::DEVTYPE_DANCEPAD && m_song->hasDance()) {
+					if (ev.button == input::DANCEPAD_UP) type = dev->type;
+					else msg = dev->source.isKeyboard() ? _("Press UP to join dance!") : _("Step UP to join!");
+				}
+				else if (dev->type == input::DEVTYPE_GUITAR && m_song->hasGuitars()) {
+					if (ev.button == input::GUITAR_GREEN) type = dev->type;
+					else if (ev.button != input::GUITAR_WHAMMY && ev.button != input::GUITAR_GODMODE) {
+						msg = dev->source.isKeyboard() ? _("Press 1 to join guitar!") : _("Press GREEN to join!");
+					}
+				}
+				else if (dev->type == input::DEVTYPE_DRUMS && m_song->hasDrums()) {
+					if (ev.button == input::DRUMS_KICK) type = dev->type;
+					else msg = dev->source.isKeyboard() ? _("Press SPACE to join drums!") : _("KICK to join!");
+				}
+			}
+			if (!msg.empty()) gm->flashMessage(msg, 0.0, 0.1, 0.1);
+			else if (type == input::DEVTYPE_DANCEPAD) m_instruments.push_back(new DanceGraph(m_audio, *m_song, dev));
+			else if (type != input::DEVTYPE_GENERIC) m_instruments.push_back(new GuitarGraph(m_audio, *m_song, dev, m_instruments.size()));
+		}
+	}
+
 	// Only pause or esc opens the global menu (instruments have their own menus)
 	// TODO: This should probably check if the source is participating as an instrument or not rather than check for its type
-	if (event.source.isKeyboard() && (nav == input::NAV_PAUSE || nav == input::NAV_CANCEL) && !m_audio.isPaused() && !m_menu.isOpen()) {
+	if (!devCanParticipate(event.devType) && (nav == input::NAV_PAUSE || nav == input::NAV_CANCEL) && !m_audio.isPaused() && !m_menu.isOpen()) {
 		m_menu.open();
 		m_audio.togglePause();
 	}
 	// Global/singer pause menu navigation
 	if (m_menu.isOpen()) {
-		if (nav == input::NAV_START) {
-			m_menu.action();
+		int do_action = 0;
+		if (nav == input::NAV_START) { do_action = 1; }
+		else if (nav == input::NAV_LEFT) { do_action = -1; }
+		else if (nav == input::NAV_RIGHT) { do_action = 1; }
+		else if (nav == input::NAV_DOWN) { m_menu.move(1); return; }
+		else if (nav == input::NAV_UP) { m_menu.move(-1); return; }
+
+		if (do_action != 0) {
+			m_menu.action(do_action);
 			// Did the action close the menu?
 			if (!m_menu.isOpen() && m_audio.isPaused()) {
 				m_audio.togglePause();
 			}
 			return;
 		}
-		else if (nav == input::NAV_LEFT) { m_menu.move(-1); return; }
-		else if (nav == input::NAV_RIGHT) { m_menu.move(1); return; }
-		else if (nav == input::NAV_DOWN) { m_menu.move(1); return; }
-		else if (nav == input::NAV_UP) { m_menu.move(-1); return; }
 	}
 	// Start button has special functions for skipping things (only in singing for now)
 	if (nav == input::NAV_START && m_instruments.empty() && !m_layout_singer.empty() && !m_audio.isPaused()) {
@@ -301,6 +338,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 
 
 void ScreenSing::manageEvent(SDL_Event event) {
+	keyPressed = true;
 	double time = m_audio.getPosition();
 	int key = event.key.keysym.sym;
 	// Ctrl combinations that can be used while performing (not when score dialog is displayed)
@@ -365,47 +403,21 @@ namespace {
 		Dimensions dim(arMin);
 		dim.fixedWidth(1.0);
 		glutil::VertexArray va;
-		va.TexCoord(0,0).Vertex(dim.x1(), dim.y1());
-		va.TexCoord(0,0).Vertex(dim.x2(), dim.y1());
-		va.TexCoord(0,0).Vertex(dim.x1(), dim.y2());
-		va.TexCoord(0,0).Vertex(dim.x2(), dim.y2());
+		va.texCoord(0,0).vertex(dim.x1(), dim.y1());
+		va.texCoord(0,0).vertex(dim.x2(), dim.y1());
+		va.texCoord(0,0).vertex(dim.x1(), dim.y2());
+		va.texCoord(0,0).vertex(dim.x2(), dim.y2());
 		getShader("texture").bind();
-		va.Draw();
+		va.draw();
 	}
 }
 
 void ScreenSing::prepare() {
 	Game* gm = Game::getSingletonPtr();
-	double time = m_audio.getPosition();
 	// Enable/disable controllers as needed (mostly so that keyboard navigation will not be obstructed).
 	gm->controllers.enableEvents(m_song->hasControllers() && !m_menu.isOpen() && !m_score_window.get());
+	double time = m_audio.getPosition();
 	if (m_video) m_video->prepare(time);
-	for (input::DevicePtr dev; gm->controllers.getDevice(dev); ) {
-		// Eat all events and see if any are valid for joining
-		input::DevType type = input::DEVTYPE_GENERIC;
-		std::string msg;
-		for (input::Event ev; dev->getEvent(ev);) {
-			if (ev.value == 0.0) continue;
-			if (dev->type == input::DEVTYPE_DANCEPAD && m_song->hasDance()) {
-				if (ev.button == input::DANCEPAD_UP) type = dev->type;
-				else msg = dev->source.isKeyboard() ? _("Press UP to join dance!") : _("Step UP to join!");
-			}
-			else if (dev->type == input::DEVTYPE_GUITAR && m_song->hasGuitars()) {
-				if (ev.button == input::GUITAR_GREEN) type = dev->type;
-				else if (ev.button != input::GUITAR_WHAMMY && ev.button != input::GUITAR_GODMODE) {
-					msg = dev->source.isKeyboard() ? _("Press 1 to join guitar!") : _("Press GREEN to join!");
-				}
-			}
-			else if (dev->type == input::DEVTYPE_DRUMS && m_song->hasDrums()) {
-				if (ev.button == input::DRUMS_KICK) type = dev->type;
-				else msg = dev->source.isKeyboard() ? _("Press SPACE to join drums!") : _("KICK to join!");
-			}
-		}
-		if (!msg.empty()) gm->flashMessage(msg, 0.0, 0.1, 0.1);
-		else if (type == input::DEVTYPE_DANCEPAD) m_instruments.push_back(new DanceGraph(m_audio, *m_song, dev));
-		else if (type != input::DEVTYPE_GENERIC) m_instruments.push_back(new GuitarGraph(m_audio, *m_song, dev, m_instruments.size()));
-	}
-
 	// Menu mangling
 	// We don't allow instrument menus during global menu
 	// except for joining, in which case global menu is closed
@@ -415,6 +427,16 @@ void ScreenSing::prepare() {
 		}
 	}
 }
+
+/// Test if a given device type can join the current song.
+// TODO: Somehow avoid duplicating these same checks in ScreenSing::prepare.
+bool ScreenSing::devCanParticipate(input::DevType const& devType) const {
+	if (devType == input::DEVTYPE_DANCEPAD && m_song->hasDance()) return true;
+	if (devType == input::DEVTYPE_GUITAR && m_song->hasGuitars()) return true;
+	if (devType == input::DEVTYPE_DRUMS && m_song->hasDrums()) return true;
+	return false;	
+}
+
 
 void ScreenSing::draw() {
 	// Get the time in the song
@@ -472,13 +494,32 @@ void ScreenSing::draw() {
 		} else  statustxt = (boost::format("%02u:%02u") % (t / 60) % (t % 60)).str();
 
 		if (!m_score_window.get() && m_instruments.empty() && !m_layout_singer.empty()) {
-			if (status == Song::INSTRUMENTAL_BREAK) statustxt += _("   ENTER to skip instrumental break");
-			if (status == Song::FINISHED && !config["game/karaoke_mode"].b()) statustxt += _("   Remember to wait for grading!");
+			if (status == Song::INSTRUMENTAL_BREAK)  statustxt += _("   ENTER to skip instrumental break");
+			if (status == Song::FINISHED && !config["game/karaoke_mode"].b()) {
+				if(config["game/autoplay"].b()) {
+					if(m_displayAutoPlay) {
+						statustxt += _("   Autoplay enabled");
+					}
+					else {
+						 statustxt += _("   Remember to wait for grading!");
+					}
+
+					if(m_statusTextSwitch.get() == 0) {
+					m_displayAutoPlay = !m_displayAutoPlay;
+					m_statusTextSwitch.setValue(1);
+					}
+					} else {
+					statustxt += _("   Remember to wait for grading!");
+				}
+			} else if(status == Song::FINISHED) {
+				statustxt += _("   Autoplay enabled");
+			}
 		}
+
 		theme->timer.draw(statustxt);
 	}
 
-	if (config["game/karaoke_mode"].b()) {
+	if (config["game/karaoke_mode"].b() && !m_song->hasControllers()) { //guitar track? display the score window anyway!
 		if (!m_audio.isPlaying()) {
 			Game* gm = Game::getSingletonPtr();
 			gm->activateScreen("Playlist");
@@ -506,8 +547,10 @@ void ScreenSing::draw() {
 	// Menus on top of everything
 	for (auto& i: m_instruments) if (i.menuOpen()) i.drawMenu();
 	if (m_menu.isOpen()) drawMenu();
+	if(!keyPressed && m_DuetTimeout.get() == 0) {
+		m_menu.action();
+		}
 }
-
 
 void ScreenSing::drawMenu() {
 	if (m_menu.empty()) return;

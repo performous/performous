@@ -12,7 +12,7 @@ libfind_pkg_check_modules(Freetype_PKGCONF freetype2)
 
 # Include dir
 find_path(Freetype_INCLUDE_DIR
-  NAMES freetype/freetype.h
+  NAMES freetype/freetype.h freetype2/freetype.h
   PATHS ${Freetype_PKGCONF_INCLUDE_DIRS}
   PATH_SUFFIXES freetype2
 )

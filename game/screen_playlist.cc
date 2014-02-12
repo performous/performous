@@ -1,6 +1,5 @@
 #include "screen_playlist.hh"
 #include "menu.hh"
-#include "screen_songs.hh"
 #include "screen_sing.hh"
 #include "playlist.hh"
 #include "theme.hh"
@@ -21,9 +20,26 @@ ScreenPlaylist::ScreenPlaylist(std::string const& name,Audio& audio, Songs& song
 
 void ScreenPlaylist::enter() {
 	Game* gm = Game::getSingletonPtr();
+	// Initialize webcam
+	gm->loading(_("Initializing webcam..."), 0.1);
+	if (config["graphic/webcam"].b() && Webcam::enabled()) {
+		try {
+			m_cam.reset(new Webcam(config["graphic/webcamid"].i()));
+		} catch (std::exception& e) { std::cout << e.what() << std::endl; };
+	}
 	m_audio.togglePause();
 	if (gm->getCurrentPlayList().isEmpty()) {
-		gm->activateScreen("Songs");
+		if(config["game/autoplay"].b()) {
+			m_songs.setFilter("");
+			Screen* s = gm->getScreen("Sing");
+			ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
+			assert(ss);
+			int randomsong = std::rand() % m_songs.size();
+			ss->setSong(m_songs[randomsong]);
+			gm->activateScreen("Sing");
+		} else {
+			gm->activateScreen("Songs");
+		}
 	}
 	keyPressed = false;
 	m_nextTimer.setValue(NEXT_TIMEOUT);
@@ -40,6 +56,10 @@ void ScreenPlaylist::prepare() {
 void ScreenPlaylist::reloadGL() {
 	theme.reset(new ThemePlaylistScreen());
 	m_menuTheme.reset(new ThemeInstrumentMenu());
+	m_singCover.reset(new Surface(findFile("no_cover.svg")));
+	m_instrumentCover.reset(new Surface(findFile("instrument_cover.svg")));
+	m_bandCover.reset(new Surface(findFile("band_cover.svg")));
+	m_danceCover.reset(new Surface(findFile("dance_cover.svg")));
 }
 
 void ScreenPlaylist::exit() {
@@ -49,6 +69,7 @@ void ScreenPlaylist::exit() {
 	theme.reset();
 	m_audio.togglePause();
 	m_background.reset();
+	m_cam.reset();
 }
 
 
@@ -60,12 +81,12 @@ void ScreenPlaylist::manageEvent(input::NavEvent const& event) {
 		keyPressed = true;
 
 	if (nav == input::NAV_CANCEL) {
-	    if(overlay_menu.isOpen()) {
-		overlay_menu.close();
-	      } else {
-		createEscMenu();
-		overlay_menu.open();
-	      }
+		if(overlay_menu.isOpen()) {
+			overlay_menu.close();
+		} else {
+			createEscMenu();
+			overlay_menu.open();
+		}
 	} else {
 		if (nav == input::NAV_PAUSE) {
 			m_audio.togglePause();
@@ -98,11 +119,46 @@ void ScreenPlaylist::draw() {
 		ss->setSong(gm->getCurrentPlayList().getNext());
 		gm->activateScreen("Sing");
 	}
+	if (m_cam && config["graphic/webcam"].b()) m_cam->render();
 	draw_menu_options();
 	//menu on top of everything
 	if (overlay_menu.isOpen()) {
 		drawMenu();
 	}
+	auto const& playlist = gm->getCurrentPlayList().getList();
+	for (unsigned i = playlist.size() - 1; i < playlist.size(); --i) {
+		if(i < 9) { //only draw the first 9 covers
+			Surface& s = getCover(*playlist[i]);
+			double pos =  i / std::max<double>(9, 9);
+			using namespace glmath;
+			Transform trans(
+			  translate(vec3(-0.4 + 0.9 * pos, 0.045)) //vec3(horizontal-offset-from-center, vertical offset from screen_bottom)
+			  * rotate(-0.0, vec3(0.0, 1.0, 0.0))
+			);
+			s.dimensions.middle().screenBottom(-0.06).fitInside(0.08, 0.08);
+			s.draw();
+		}
+	}
+}
+Surface& ScreenPlaylist::getCover(Song const& song) {
+	Surface* cover = nullptr;
+	// Fetch cover image from cache or try loading it
+	if (!song.cover.empty()) try { cover = &m_covers[song.cover]; } catch (std::exception const&) {}
+	// Fallback to background image as cover if needed
+	if (!cover && !song.background.empty()) try { cover = &m_covers[song.background]; } catch (std::exception const&) {}
+	// Use empty cover
+	if (!cover) {
+		if(song.hasDance()) {
+			cover = m_danceCover.get();
+		} else if(song.hasDrums()) {
+			cover = m_bandCover.get();
+		} else {
+			size_t tracks = song.instrumentTracks.size();
+			if (tracks == 0) cover = m_singCover.get();
+			else cover = m_instrumentCover.get();
+		}
+	}
+	return *cover;
 }
 
 void ScreenPlaylist::createEscMenu() {
@@ -169,10 +225,10 @@ void ScreenPlaylist::drawMenu() {
 void ScreenPlaylist::draw_menu_options() {
 	// Variables used for positioning and other stuff
 	double wcounter = 0;
-	const size_t showopts = 8; // Show at most 8 options simultaneously
+	const size_t showopts = 7; // Show at most 8 options simultaneously
 	const float x = -0.35; // x xcoordinate from screen center, the menu should be aligned left of the center therefore it´s negative.n
-	const float start_y = -0.1;
-	const float sel_margin = 0.05;
+	const float start_y = -0.15;
+	const float sel_margin = 0.04;
 	const MenuOptions opts = songlist_menu.getOptions();
 	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get()-songlist_menu.getSubmenuLevel()));
 	// Determine from which item to start
@@ -193,7 +249,7 @@ void ScreenPlaylist::draw_menu_options() {
 			// Draw the text, dim if option not available
 			{
 				ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
-				theme->option_selected.dimensions.left(x).center(start_y + ii*0.05);
+				theme->option_selected.dimensions.left(x).center(start_y + ii*0.049);
 				theme->option_selected.draw(opt.getName());
 			}
 			wcounter = std::max(wcounter, theme->option_selected.w() + 2 * sel_margin); // Calculate the widest entry
@@ -272,6 +328,24 @@ void ScreenPlaylist::createSongMenu(int songNumber) {
 			createSongListMenu();
 		}
 	}));
+	if (songNumber >= 2) { //can't move up first song
+		overlay_menu.add(MenuOption(_("Move up"), _("Move this song up the list")).call([this, songNumber]() {
+			Game* gm = Game::getSingletonPtr();
+			gm->getCurrentPlayList().swap(songNumber -1, songNumber -2);
+			createSongListMenu();
+			overlay_menu.close();
+		}));
+	}
+	Game* gm = Game::getSingletonPtr();
+	int size = gm->getCurrentPlayList().getList().size();
+	if (songNumber < size) { //can't move down the last song
+		overlay_menu.add(MenuOption(_("Move Down"), _("Move this song up the list")).call([this, songNumber]() {
+			Game* gm = Game::getSingletonPtr();
+			gm->getCurrentPlayList().swap(songNumber -1, songNumber);
+			createSongListMenu();
+			overlay_menu.close();
+		}));
+	}
 	overlay_menu.add(MenuOption(_("Back"), _("Back to playlist viewer")).call([this]() {
 		overlay_menu.close();
 	}));

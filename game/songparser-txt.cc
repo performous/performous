@@ -80,6 +80,7 @@ bool SongParser::txtParseField(std::string const& line) {
 	else if (key == "VIDEOGAP") assign(m_song.videoGap, value);
 	else if (key == "PREVIEWSTART") assign(m_song.preview_start, value);
 	else if (key == "LANGUAGE") m_song.language= value.substr(value.find_first_not_of(" "));
+	else if (key == "DUETSINGERP2") m_song.insertVocalTrack(DUET_P2, VocalTrack(DUET_P2)); // Strong hint that this is a duet, so it will be readily displayed with two singers in browser and properly filtered
 	return true;
 }
 
@@ -100,11 +101,15 @@ bool SongParser::txtParseNote(std::string line) {
 	if (line[0] == 'P') {
 		if (m_relative) // FIXME?
 			throw std::runtime_error("Relative note timing not supported with multiple singers");
-		if (line.size() < 2) throw std::runtime_error("Invalid player info line");
-		if (line[1] == '1') m_curSinger = P1;
+		if (line.size() < 2) throw std::runtime_error("Invalid player info line [too short]: " + line);
+		else if (line[1] == '1') m_curSinger = P1;
 		else if (line[1] == '2') m_curSinger = P2;
 		else if (line[1] == '3') m_curSinger = BOTH;
-		else throw std::runtime_error("Invalid player info line");
+		else if (line.size() < 3) throw std::runtime_error("Invalid player info line [too short]: " + line);
+		else if (line[2] == '1') m_curSinger = P1;
+		else if (line[2] == '2') m_curSinger = P2;
+		else if (line[2] == '3') m_curSinger = BOTH;
+		else throw std::runtime_error("Invalid player info line [malformed]: " + line);
 		resetNoteParsingState();
 		return true;
 	}

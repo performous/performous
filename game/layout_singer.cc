@@ -121,15 +121,19 @@ void LayoutSinger::draw(double time, PositionMode position) {
 		Dimensions pos;
 		switch(position) {
 			case LayoutSinger::FULL:
-				pos.screenBottom(-0.1);
+				if(config["game/karaoke_centered_lyrics"].b() && config["game/karaoke_mode"].b()) {
+					pos.center(0);
+				} else {
+					pos.screenBottom(-0.1);
+				}
 				linespacing = 0.06;
 				break;
 			case LayoutSinger::TOP:
-				pos.center(-0.05);
+				pos.center(-0.06);
 				linespacing = 0.04;
 				break;
 			case LayoutSinger::BOTTOM:
-				pos.screenBottom(-0.05);
+				pos.screenBottom(-0.07);
 				linespacing = 0.04;
 				break;
 			case LayoutSinger::LEFT:
@@ -157,7 +161,7 @@ void LayoutSinger::draw(double time, PositionMode position) {
 			for (size_t i = 0; i < m_lyrics.size(); ++i, pos.move(0.0, linespacing)) {
 				pos.move(0.0, m_lyrics[i].extraspacing.get() * linespacing);
 				if (i == 0) m_lyrics[0].draw(m_theme->lyrics_now, time, pos);
-				else if (i == 1 && position == LayoutSinger::FULL) m_lyrics[1].draw(m_theme->lyrics_next, time, pos);
+				else if (i == 1) m_lyrics[1].draw(m_theme->lyrics_next, time, pos);
 			}
 		}
 	}
