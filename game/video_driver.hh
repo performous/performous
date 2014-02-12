@@ -5,13 +5,14 @@
 #include "glutil.hh"
 #include <boost/function.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
-#include <SDL2/SDL.h> //needed for SDL_Window
 
 unsigned int screenW();
 unsigned int screenH();
 static inline float virtH() { return float(screenH()) / screenW(); }
 
 struct SDL_Surface;
+struct SDL_Window;
+struct SDL_Renderer;
 
 struct ColorTrans {
 	ColorTrans(Color const& c);
@@ -95,5 +96,6 @@ private:
 	typedef boost::ptr_map<std::string, Shader> ShaderMap;
 	ShaderMap m_shaders; ///< Shader programs by name
 	SDL_Window *screen;
+	SDL_Renderer *renderer;
 };
 

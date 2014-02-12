@@ -65,7 +65,7 @@ unsigned int screenH() { return s_height; }
 
 Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(width), m_windowH(height), m_fullscreen(fs), screen() {
 	std::atexit(SDL_Quit);
-	if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) == -1 ) throw std::runtime_error("SDL_Init failed");
+	//if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) == -1 ) throw std::runtime_error("SDL_Init failed");
 	SDL_SetWindowTitle(screen,PACKAGE " " VERSION);
 	{
 		SDL_Surface* icon = SDL_LoadBMP(findFile("icon.bmp").string().c_str());
@@ -310,8 +310,10 @@ void Window::resize() {
 		GLattrSetter attr_d(SDL_GL_DEPTH_SIZE, 24);
 		GLattrSetter attr_db(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_DestroyWindow(screen);
-		screen = SDL_CreateWindow(PACKAGE " " VERSION,SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,width, height, SDL_WINDOW_OPENGL | (m_fullscreen ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE));
+		screen = SDL_CreateWindow(PACKAGE " " VERSION,SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,width, height, SDL_WINDOW_OPENGL | (m_fullscreen ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE) | SDL_WINDOW_OPENGL);
 		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
+		renderer = SDL_CreateRenderer(screen, -1, 0);
+
 	}
 	int windowWidth;
 	int windowHeight;
