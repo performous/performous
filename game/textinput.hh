@@ -7,8 +7,8 @@ struct TextInput {
 	/// text to operate on
 	std::string text;
 	/// processes keypresses
-	bool process(SDL_keysym const& key) {
-		unsigned int ucs = key.unicode;
+	bool process(SDL_Keysym const& key) {
+		unsigned int ucs = key.mod;  //REVIEWME I don't know if the mod field replaces the unicode one correctly
 		if (key.sym == SDLK_LEFT) return false;
 		if (key.sym == SDLK_RIGHT) return false;
 		if (key.sym == SDLK_UP) return false;
