@@ -82,7 +82,7 @@ void ScreenAudioDevices::manageEvent(input::NavEvent const& event) {
 void ScreenAudioDevices::manageEvent(SDL_Event event) {
 	if (event.type == SDL_KEYDOWN) {
 		int key = event.key.keysym.sym;
-		SDLMod modifier = event.key.keysym.mod;
+		uint16_t modifier = event.key.keysym.mod;
 		if (m_devs.empty()) return; // The rest work if there are any config options
 		// Reset to defaults
 		else if (key == SDLK_r && modifier & KMOD_CTRL) {

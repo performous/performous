@@ -19,7 +19,7 @@ namespace input {
 			}
 		}
 		std::string getName(unsigned device) const override {
-			return SDL_JoystickName(device);
+			return SDL_JoystickNameForIndex(device);
 		}
 		bool process(Event& event, SDL_Event const& sdlEv) override {
 			if (sdlEv.type == SDL_JOYBUTTONDOWN || sdlEv.type == SDL_JOYBUTTONUP) {
