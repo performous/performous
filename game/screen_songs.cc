@@ -141,9 +141,9 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 void ScreenSongs::manageEvent(SDL_Event event) {
 	// Handle less common, keyboard only keys
 	if (event.type == SDL_KEYDOWN) {
-		SDL_keysym keysym = event.key.keysym;
+		SDL_Keysym keysym = event.key.keysym;
 		int key = keysym.sym;
-		SDLMod mod = event.key.keysym.mod;
+		uint16_t mod = event.key.keysym.mod;
 		if (key == SDLK_F4) m_jukebox = !m_jukebox;
 		else if (!m_jukebox) {
 			if (key == SDLK_r && mod & KMOD_CTRL) { m_songs.reload(); m_songs.setFilter(m_search.text); }

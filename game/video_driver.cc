@@ -9,7 +9,7 @@
 #include "controllers.hh"
 #include "screen.hh"
 #include <boost/date_time.hpp>
-#include <SDL2/SDL.h>
+
 
 #ifndef GLEW_ARB_viewport_array
 # define GLEW_ARB_viewport_array GL_FALSE
@@ -58,7 +58,6 @@ namespace {
 	glmath::mat4 g_color = glmath::mat4::identity();
 	glmath::mat4 g_projection = glmath::mat4::identity();
 	glmath::mat4 g_modelview =  glmath::mat4::identity();
-
 }
 
 unsigned int screenW() { return s_width; }
@@ -67,19 +66,19 @@ unsigned int screenH() { return s_height; }
 Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(width), m_windowH(height), m_fullscreen(fs), screen() {
 	std::atexit(SDL_Quit);
 	if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) == -1 ) throw std::runtime_error("SDL_Init failed");
-	SDL_WM_SetCaption(PACKAGE " " VERSION, PACKAGE);
+	SDL_SetWindowTitle(screen,PACKAGE " " VERSION);
 	{
 		SDL_Surface* icon = SDL_LoadBMP(findFile("icon.bmp").string().c_str());
-		SDL_WM_SetIcon(icon, nullptr);
+		SDL_SetWindowIcon(screen,icon);
 		SDL_FreeSurface(icon);
 	}
 	// SDL_SetVideoMode not called yet => get the desktop resolution for fs mode
-	SDL_VideoInfo const* vi = SDL_GetVideoInfo();
-	m_fsW = vi->current_w;
-	m_fsH = vi->current_h;
+	SDL_RendererInfo vi;
+	SDL_GetRenderDriverInfo(0,&vi);
+	m_fsW = vi.max_texture_width;
+	m_fsH = vi.max_texture_height;
 	resize();
 	SDL_ShowCursor(SDL_DISABLE);
-	SDL_EnableUNICODE(SDL_ENABLE);
 	if (glewInit() != GLEW_OK) throw std::runtime_error("Initializing GLEW failed (is your OpenGL broken?)");
 	// Dump some OpenGL info
 	std::clog << "video/info: GL_VENDOR:     " << glGetString(GL_VENDOR) << std::endl;
@@ -261,19 +260,22 @@ void Window::view(unsigned num) {
 	if (GL_EXT_framebuffer_sRGB) glEnable(GL_FRAMEBUFFER_SRGB);
 	shader("color").bind();
 	// Setup views (with black bars for cropping)
-	double vx = 0.5f * (screen->w - s_width);
-	double vy = 0.5f * (screen->h - s_height);
+	int windowWidth;
+	int windowHeight;
+	SDL_GetWindowSize(screen, &windowWidth, &windowHeight);
+	double vx = 0.5f * (windowWidth - s_width);
+	double vy = 0.5f * (windowHeight - s_height);
 	double vw = s_width, vh = s_height;
 	if (num == 0) {
 		glViewport(vx, vy, vw, vh);  // Drawable area of the window (excluding black bars)
 	} else {
 		// Splitscreen stereo3d
-		if (screen->w == 1280 && screen->h == 1470) {  // HDMI 720p 3D mode
+		if (windowWidth == 1280 && windowHeight == 1470) {  // HDMI 720p 3D mode
 			glViewportIndexedf(1, 0, 750, 1280, 720);
 			glViewportIndexedf(2, 0, 0, 1280, 720);
 			s_width = 1280;
 			s_height = 720;
-		} else if (screen->w == 1920 && screen->h == 2205) {  // HDMI 1080p 3D mode
+		} else if (windowWidth == 1920 && windowHeight == 2205) {  // HDMI 1080p 3D mode
 			glViewportIndexedf(1, 0, 1125, 1920, 1080);
 			glViewportIndexedf(2, 0, 0, 1920, 1080);
 			s_width = 1920;
@@ -287,7 +289,7 @@ void Window::view(unsigned num) {
 }
 
 void Window::swap() {
-	SDL_GL_SwapBuffers();
+	SDL_GL_SwapWindow(screen);
 }
 
 void Window::setFullscreen(bool _fs) {
@@ -307,12 +309,15 @@ void Window::resize() {
 		GLattrSetter attr_buf(SDL_GL_BUFFER_SIZE, 32);
 		GLattrSetter attr_d(SDL_GL_DEPTH_SIZE, 24);
 		GLattrSetter attr_db(SDL_GL_DOUBLEBUFFER, 1);
-		SDL_FreeSurface(screen);
-		screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | (m_fullscreen ? SDL_FULLSCREEN : SDL_RESIZABLE));
+		SDL_DestroyWindow(screen);
+		screen = SDL_CreateWindow(PACKAGE " " VERSION,SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,width, height, SDL_WINDOW_OPENGL | (m_fullscreen ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE));
 		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
 	}
-	s_width = screen->w;
-	s_height = screen->h;
+	int windowWidth;
+	int windowHeight;
+	SDL_GetWindowSize(screen, &windowWidth, &windowHeight);
+	s_width = windowWidth;
+	s_height = windowHeight;
 	if (!m_fullscreen) {
 		config["graphic/window_width"].i() = s_width;
 		config["graphic/window_height"].i() = s_height;

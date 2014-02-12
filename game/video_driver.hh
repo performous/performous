@@ -5,6 +5,7 @@
 #include "glutil.hh"
 #include <boost/function.hpp>
 #include <boost/ptr_container/ptr_map.hpp>
+#include <SDL2/SDL.h> //needed for SDL_Window
 
 unsigned int screenW();
 unsigned int screenH();
@@ -93,6 +94,6 @@ private:
 	bool m_fullscreen;
 	typedef boost::ptr_map<std::string, Shader> ShaderMap;
 	ShaderMap m_shaders; ///< Shader programs by name
-	SDL_Surface* screen;
+	SDL_Window *screen;
 };
 
