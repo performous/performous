@@ -82,6 +82,23 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	std::clog << "Current display resolution is: " << current.w << "x" << current.h << std::endl;
 	m_fsW = current.w;
 	m_fsH = current.h;
+	{ // Setup GL attributes for context creation
+		GLattrSetter attr_r(SDL_GL_RED_SIZE, 8);
+		GLattrSetter attr_g(SDL_GL_GREEN_SIZE, 8);
+		GLattrSetter attr_b(SDL_GL_BLUE_SIZE, 8);
+		GLattrSetter attr_a(SDL_GL_ALPHA_SIZE, 8);
+		GLattrSetter attr_buf(SDL_GL_BUFFER_SIZE, 32);
+		GLattrSetter attr_d(SDL_GL_DEPTH_SIZE, 24);
+		GLattrSetter attr_db(SDL_GL_DOUBLEBUFFER, 1);
+		screen = SDL_CreateWindow(PACKAGE " " VERSION,SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,width, height, SDL_WINDOW_OPENGL | (m_fullscreen ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE) | SDL_WINDOW_OPENGL);
+		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
+		SDL_GL_CreateContext(screen);
+
+	}
+	if (!m_fullscreen) {
+		config["graphic/window_width"].i() = s_width;
+		config["graphic/window_height"].i() = s_height;
+	}
 	resize();
 	SDL_ShowCursor(SDL_DISABLE);
 	if (glewInit() != GLEW_OK) throw std::runtime_error("Initializing GLEW failed (is your OpenGL broken?)");
@@ -300,35 +317,19 @@ void Window::swap() {
 void Window::setFullscreen(bool _fs) {
 	if (m_fullscreen == _fs) return;
 	m_fullscreen = _fs;
+	SDL_SetWindowFullscreen(screen, (m_fullscreen? SDL_WINDOW_FULLSCREEN_DESKTOP : 0 ));
 	resize();
 }
 
 void Window::resize() {
 	unsigned width = m_fullscreen ? m_fsW : m_windowW;
 	unsigned height = m_fullscreen ? m_fsH : m_windowH;
-	{ // Setup GL attributes for context creation
-		GLattrSetter attr_r(SDL_GL_RED_SIZE, 8);
-		GLattrSetter attr_g(SDL_GL_GREEN_SIZE, 8);
-		GLattrSetter attr_b(SDL_GL_BLUE_SIZE, 8);
-		GLattrSetter attr_a(SDL_GL_ALPHA_SIZE, 8);
-		GLattrSetter attr_buf(SDL_GL_BUFFER_SIZE, 32);
-		GLattrSetter attr_d(SDL_GL_DEPTH_SIZE, 24);
-		GLattrSetter attr_db(SDL_GL_DOUBLEBUFFER, 1);
-		SDL_DestroyWindow(screen);
-		screen = SDL_CreateWindow(PACKAGE " " VERSION,SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,width, height, SDL_WINDOW_OPENGL | (m_fullscreen ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE) | SDL_WINDOW_OPENGL);
-		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
-		SDL_GL_CreateContext(screen);
-
-	}
+	glViewport(0,0,width,height);
 	int windowWidth;
 	int windowHeight;
 	SDL_GetWindowSize(screen, &windowWidth, &windowHeight);
 	s_width = windowWidth;
 	s_height = windowHeight;
-	if (!m_fullscreen) {
-		config["graphic/window_width"].i() = s_width;
-		config["graphic/window_height"].i() = s_height;
-	}
 	// Enforce aspect ratio limits
 	if (s_height < 0.56f * s_width) s_width = round(s_height / 0.56f);
 	if (s_height > 0.8f * s_width) s_height = round(0.8f * s_width);

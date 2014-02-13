@@ -80,8 +80,8 @@ static void checkEvents(Game& gm) {
 		  case SDL_QUIT:
 			gm.finished();
 			break;
-		  case SDL_WINDOWEVENT_RESIZED:
-			gm.window().resize(event.window.data1, event.window.data2);
+		  case SDL_WINDOWEVENT_SIZE_CHANGED || SDL_WINDOWEVENT_RESIZED || SDL_WINDOWEVENT_MAXIMIZED:
+			gm.window().resize();
 			break;
 		  case SDL_KEYDOWN:
 			int keypressed  = event.key.keysym.sym;
