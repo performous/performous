@@ -80,9 +80,6 @@ static void checkEvents(Game& gm) {
 		  case SDL_QUIT:
 			gm.finished();
 			break;
-		  case SDL_WINDOWEVENT_RESIZED:  //TODO: THIS IS NOT TRIGGERED!!
-			gm.window().resize();
-			break;
 		  case SDL_KEYDOWN:
 			int keypressed  = event.key.keysym.sym;
 			uint16_t modifier = event.key.keysym.mod;
@@ -101,6 +98,7 @@ static void checkEvents(Game& gm) {
 			break;
 		}
 		// Screens always receive SDL events that were not already handled here
+		gm.window().resize();
 		gm.getCurrentScreen()->manageEvent(event);
 	}
 	for (input::NavEvent event; gm.controllers.getNav(event); ) {
