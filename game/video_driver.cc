@@ -312,7 +312,7 @@ void Window::resize() {
 		SDL_DestroyWindow(screen);
 		screen = SDL_CreateWindow(PACKAGE " " VERSION,SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,width, height, SDL_WINDOW_OPENGL | (m_fullscreen ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE) | SDL_WINDOW_OPENGL);
 		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
-		renderer = SDL_CreateRenderer(screen, -1, 0);
+		SDL_GL_CreateContext(screen);
 
 	}
 	int windowWidth;
