@@ -80,7 +80,7 @@ static void checkEvents(Game& gm) {
 		  case SDL_QUIT:
 			gm.finished();
 			break;
-		  case SDL_WINDOWEVENT_SIZE_CHANGED || SDL_WINDOWEVENT_RESIZED || SDL_WINDOWEVENT_MAXIMIZED:
+		  case SDL_WINDOWEVENT_RESIZED:  //TODO: THIS IS NOT TRIGGERED!!
 			gm.window().resize();
 			break;
 		  case SDL_KEYDOWN:
