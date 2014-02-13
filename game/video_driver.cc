@@ -73,10 +73,15 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 		SDL_FreeSurface(icon);
 	}
 	// SDL_SetVideoMode not called yet => get the desktop resolution for fs mode
-	SDL_RendererInfo vi;
-	SDL_GetRenderDriverInfo(0,&vi);
-	m_fsW = vi.max_texture_width;
-	m_fsH = vi.max_texture_height;
+	SDL_Init(SDL_INIT_VIDEO);
+	SDL_DisplayMode current;
+	for(int i = 0; i < SDL_GetNumVideoDisplays(); ++i){
+		int should_be_zero = SDL_GetCurrentDisplayMode(i, &current);
+		if(should_be_zero != 0) throw std::runtime_error("Could not get display mode for video display");
+	}
+	std::clog << "Current display resolution is: " << current.w << "x" << current.h << std::endl;
+	m_fsW = current.w;
+	m_fsH = current.h;
 	resize();
 	SDL_ShowCursor(SDL_DISABLE);
 	if (glewInit() != GLEW_OK) throw std::runtime_error("Initializing GLEW failed (is your OpenGL broken?)");
