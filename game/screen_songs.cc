@@ -146,7 +146,10 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 		uint16_t mod = event.key.keysym.mod;
 		if (key == SDLK_F4) m_jukebox = !m_jukebox;
 		else if (!m_jukebox) {
-			if (key == SDLK_r && mod & KMOD_CTRL) { m_songs.reload(); m_songs.setFilter(m_search.text); }
+			if (key == SDLK_r && mod & KMOD_CTRL) {
+				m_songs.reload();
+				m_songs.setFilter(m_search.text);
+				}
 			else if (m_search.process(keysym)) m_songs.setFilter(m_search.text);
 			// Shortcut keys for accessing different type filter modes
 			if (key == SDLK_TAB) m_songs.sortChange(1);
