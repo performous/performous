@@ -17,6 +17,9 @@ extern "C" {
 #if (LIBAVCODEC_VERSION_INT) < (AV_VERSION_INT(52,94,3))
 #	define AV_SAMPLE_FMT_S16 SAMPLE_FMT_S16
 #endif
+#if defined(_WIN32)
+#define AVCODEC_MAX_AUDIO_FRAME_SIZE 192000 // 1 second of 48khz 32bit audio
+#endif
 
 #define AUDIO_CHANNELS 2
 
