@@ -186,6 +186,9 @@ void SongParser::vocalsTogether() {
 	};
 	std::vector<TrackInfo> tracks;
 	for (auto& nt: m_song.vocalTracks) {
+		togetherIt->second.noteMin = std::min(togetherIt->second.noteMin, nt.second.noteMin);
+		togetherIt->second.noteMax = std::max(togetherIt->second.noteMax, nt.second.noteMax);
+
 		Notes& n = nt.second.notes;
 		if (!n.empty()) tracks.push_back(TrackInfo(n.begin(), n.end()));
 	}

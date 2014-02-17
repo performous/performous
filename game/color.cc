@@ -59,3 +59,11 @@ glmath::vec4 Color::linear() const {
 	return a * glmath::vec4(r, g, b, 1.0);
 }
 
+Color MicrophoneColor::get(std::string name) {
+	if (name == "blue") return Color(0.2, 0.5, 0.7);
+	else if (name == "red") return Color(0.8, 0.3, 0.3);
+	else if (name == "green") return Color(0.2, 0.9, 0.2);
+	else if (name == "orange") return Color(1.0, 0.6, 0.0);
+	else return Color(0.5, 0.5, 0.5);
+}
+

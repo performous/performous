@@ -24,11 +24,6 @@ ScreenAudioDevices::ScreenAudioDevices(std::string const& name, Audio& audio): S
 	m_selector.reset(new Surface(findFile("device_selector.svg")));
 	m_mic_icon.reset(new Surface(findFile("sing_pbox.svg")));
 	m_pdev_icon.reset(new Surface(findFile("icon_pdev.svg")));
-	m_colorMap["blue"] = Color(0.2, 0.5, 0.7);
-	m_colorMap["red"] = Color(0.8, 0.3, 0.3);
-	m_colorMap["green"] = Color(0.2, 0.9, 0.2);
-	m_colorMap["orange"] = Color(1.0, 0.6, 0.0);
-	m_colorMap["OUT"] = Color(0.5, 0.5, 0.5);
 }
 
 void ScreenAudioDevices::enter() {
@@ -117,7 +112,7 @@ void ScreenAudioDevices::draw() {
 	for (size_t i = 0; i < m_channels.size(); ++i) {
 		Surface& srf = (i < m_channels.size()-1) ? *m_mic_icon : *m_pdev_icon;
 		{
-			ColorTrans c(m_colorMap[m_channels[i].name]);
+			ColorTrans c(MicrophoneColor::get(m_channels[i].name));
 			int pos = m_channels[i].pos;
 			if (pos == unassigned_id) pos = m_devs.size();  // Transform -1 to the bottom of the list
 			srf.dimensions.middle(-xoff + xstep*0.5 + i*xstep).center(-yoff+pos*ystep);
