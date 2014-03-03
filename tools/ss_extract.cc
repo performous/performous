@@ -40,6 +40,7 @@ bool g_video = true;
 bool g_audio = true;
 bool g_mkvcompress = true;
 bool g_oggcompress = true;
+bool g_createtxt = true;
 
 void parseNote(xmlpp::Node* node) {
 	xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(*node);
@@ -222,21 +223,23 @@ struct Process {
 				}
 			}
 
-			std::cerr << ">>> Extracting lyrics" << std::endl;
-			xmlpp::NodeSet sentences;
-			if(dom.find("/ss:MELODY/ss:SENTENCE", sentences)) {
-				// Sentences not inside tracks (normal songs)
-				std::cerr << "  >>> Solo track" << std::endl;
-				saveTxtFile(sentences, path, song);
-			} else {
-				xmlpp::NodeSet tracks;
-				if (!dom.find("/ss:MELODY/ss:TRACK", tracks)) throw std::runtime_error("Unable to find any sentences in melody XML");
-				for (xmlpp::NodeSet::iterator it = tracks.begin(); it != tracks.end(); ++it ) {
-					xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**it);
-					std::string singer = elem.get_attribute("Artist")->get_value();
-					std::cerr << "  >>> Track from " << singer << std::endl;
-					dom.find(elem, "ss:SENTENCE", sentences);
-					saveTxtFile(sentences, path, song, singer);
+			if (g_createtxt) {
+				std::cerr << ">>> Extracting lyrics to notes.txt" << std::endl;
+				xmlpp::NodeSet sentences;
+				if(dom.find("/ss:MELODY/ss:SENTENCE", sentences)) {
+					// Sentences not inside tracks (normal songs)
+					std::cerr << "  >>> Solo track" << std::endl;
+					saveTxtFile(sentences, path, song);
+				} else {
+					xmlpp::NodeSet tracks;
+					if (!dom.find("/ss:MELODY/ss:TRACK", tracks)) throw std::runtime_error("Unable to find any sentences in melody XML");
+					for (xmlpp::NodeSet::iterator it = tracks.begin(); it != tracks.end(); ++it ) {
+						xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**it);
+						std::string singer = elem.get_attribute("Artist")->get_value();
+						std::cerr << "  >>> Track from " << singer << std::endl;
+						dom.find(elem, "ss:SENTENCE", sentences);
+						saveTxtFile(sentences, path, song, singer);
+					}
 				}
 			}
 		} catch (std::exception& e) {
@@ -355,6 +358,7 @@ int main( int argc, char **argv) {
 	  ("song", po::value<std::string>(&song), "only extract the given track (ID or partial name)")
 	  ("video", po::value<std::string>(&video)->default_value("mkv"), "specify video format (none, mkv, mpeg2)")
 	  ("audio", po::value<std::string>(&audio)->default_value("ogg"), "specify audio format (none, ogg, wav)")
+	  ("txt,t", "also convert XML to notes.txt (for UltraStar compatibility)")
 	  ;
 	// Process the first flagless option as dvd, the second as song
 	po::positional_options_description pos;
@@ -396,6 +400,8 @@ int main( int argc, char **argv) {
 			throw std::runtime_error("Invalid audio flag. Value must be {none, ogg, wav}");
 		}
 		std::cerr << ">>> Using audio flag: \"" << audio << "\"" << std::endl;
+		g_createtxt = vm.count("txt") > 0;
+		std::cerr << ">>> Convert XML to notes.txt: " << (g_createtxt?"yes":"no") << std::endl;
 	} catch (std::exception& e) {
 		std::cout << cmdline << std::endl;
 		std::cout << "ERROR: " << e.what() << std::endl;
