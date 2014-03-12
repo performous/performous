@@ -104,10 +104,10 @@ void ScreenSing::setupVocals() {
 		m_layout_singer.clear();
 		Engine::VocalTrackPtrs selectedTracks;
 		boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
-		unsigned players = (m_duet.i() == 0 ? (analyzers.empty() ? 1 : analyzers.size()) : 1);  // Always at least 1; number of mics if in duet mode
+		unsigned players = (analyzers.empty() ? 1 : analyzers.size());  // Always at least 1; should be number of mics
 		std::set<VocalTrack*> shownTracks;  // Tracks to be included in layout_singer (stored by name for proper sorting and merging duplicates)
 		for (unsigned player = 0; player < players; ++player) {
-			VocalTrack* vocal = &m_song->getVocalTrack(m_vocalTracks[player].i());
+			VocalTrack* vocal = &m_song->getVocalTrack(m_vocalTracks[(m_duet.i() == 0 ? player : 0)].i());
 			selectedTracks.push_back(vocal);
 			shownTracks.insert(vocal);
 		}
@@ -137,6 +137,7 @@ void ScreenSing::reloadGL() {
 	theme.reset(new ThemeSing());
 	m_menuTheme.reset(new ThemeInstrumentMenu());
 	m_pause_icon.reset(new Surface(findFile("sing_pause.svg")));
+	m_player_icon.reset(new Surface(findFile("sing_pbox.svg"))); // For duet menu
 	m_help.reset(new Surface(findFile("instrumenthelp.svg")));
 	m_progress.reset(new ProgressBar(findFile("sing_progressbg.svg"), findFile("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
 	// Load background
@@ -152,6 +153,7 @@ void ScreenSing::exit() {
 	m_layout_singer.clear();
 	m_help.reset();
 	m_pause_icon.reset();
+	m_player_icon.reset();
 	m_cam.reset();
 	m_video.reset();
 	m_background.reset();
@@ -568,6 +570,8 @@ void ScreenSing::drawMenu() {
 	th.bg.draw();
 	// Loop through menu items
 	w = 0;
+	int player = 0;
+	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it) {
 		// Pick the font object
 		SvgTxtTheme* txt = &th.option_selected;
@@ -575,6 +579,13 @@ void ScreenSing::drawMenu() {
 		// Set dimensions and draw
 		txt->dimensions.middle(x).center(y);
 		txt->draw(it->getName());
+		if (it->value == &m_vocalTracks[player]) {
+			Color color = MicrophoneColor::get(analyzers[player].getId());
+			ColorTrans c(color);
+			m_player_icon->dimensions.right(x).fixedHeight(0.040).center(y);
+			m_player_icon->draw();
+			player++;
+		}
 		w = std::max(w, txt->w() + 2 * step); // Calculate the widest entry
 		y += step;
 	}

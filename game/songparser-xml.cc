@@ -106,7 +106,7 @@ void SongParser::xmlParseHeader() {
 	}
 	// If no tracks are specified, we can assume that it isn't duet
 	if (tracks.empty()) m_song.insertVocalTrack("Player1", VocalTrack(s.artist));
-	else if (tracks.size() > 1) m_song.insertVocalTrack("Together", VocalTrack(singers));
+	else if (tracks.size() > 1) m_song.insertVocalTrack("Together", VocalTrack(singers.empty() ? _("Together") : singers));
 }
 
 void addNoteToTrack(VocalTrack& vocal, const Note& note) {
