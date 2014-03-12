@@ -42,7 +42,7 @@ namespace input {
 				else m_pressed.erase(pressedId);
 			}
 			// Convert SDL event into controller Event
-			event.source = SourceId(SOURCETYPE_KEYBOARD, 0);  // FIXME! make the device ID zero because in SDL2 it ain't zero!!
+			event.source = SourceId(SOURCETYPE_KEYBOARD, 0);  // FIXME! cmake the device ID zero because in SDL2 it ain't zero!!
 			event.hw = sdlEv.key.keysym.sym;
 			event.value = (sdlEv.type == SDL_KEYDOWN ? 1.0 : 0.0);
 			// Get the modifier keys that we actually use as modifiers
