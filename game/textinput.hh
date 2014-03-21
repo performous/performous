@@ -41,6 +41,11 @@ struct TextInput {
 		}
 		return *this;
 	}
+	TextInput& operator+=(char cr[]) {
+		text += cr;
+		return *this;
+	}
+
 	/// deletes last char
 	void backspace() {
 		if (text.empty()) return;

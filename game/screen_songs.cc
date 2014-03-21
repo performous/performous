@@ -140,17 +140,24 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 
 void ScreenSongs::manageEvent(SDL_Event event) {
 	// Handle less common, keyboard only keys
-	if (event.type == SDL_KEYDOWN) {
+	if (event.type == SDL_TEXTINPUT) {
+		m_search += event.text.text;
+		m_songs.setFilter(m_search.text);
+	}
+	else if (event.type == SDL_KEYDOWN) {
 		SDL_Keysym keysym = event.key.keysym;
 		int key = keysym.sym;
 		uint16_t mod = event.key.keysym.mod;
 		if (key == SDLK_F4) m_jukebox = !m_jukebox;
+		else if (key == SDLK_BACKSPACE) {
+			m_search.backspace();
+			m_songs.setFilter(m_search.text);
+		}
 		else if (!m_jukebox) {
 			if (key == SDLK_r && mod & KMOD_CTRL) {
 				m_songs.reload();
 				m_songs.setFilter(m_search.text);
 				}
-			else if (m_search.process(keysym)) m_songs.setFilter(m_search.text);
 			// Shortcut keys for accessing different type filter modes
 			if (key == SDLK_TAB) m_songs.sortChange(1);
 			if (key == SDLK_F5) m_songs.typeCycle(2);
