@@ -92,7 +92,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 		GLattrSetter attr_db(SDL_GL_DOUBLEBUFFER, 1);
 		if(width < 200) width = 640; //FIXME: window should have a minimum size
 		if(height < 200) height = 480;
-		screen = SDL_CreateWindow(PACKAGE " " VERSION,SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,width, height, SDL_WINDOW_OPENGL | (m_fullscreen ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE) | SDL_WINDOW_OPENGL);
+		screen = SDL_CreateWindow(PACKAGE " " VERSION,SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,width, height, (m_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0) | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
 		SDL_GL_CreateContext(screen);
 
