@@ -80,17 +80,14 @@ static void checkEvents(Game& gm) {
 		  case SDL_QUIT:
 			gm.finished();
 			break;
-		  case SDL_VIDEORESIZE:
-			gm.window().resize(event.resize.w, event.resize.h);
-			break;
 		  case SDL_KEYDOWN:
 			int keypressed  = event.key.keysym.sym;
-			SDLMod modifier = event.key.keysym.mod;
+			uint16_t modifier = event.key.keysym.mod;
 			if (((keypressed == SDLK_RETURN || keypressed == SDLK_KP_ENTER) && modifier & KMOD_ALT) || keypressed == SDLK_F11) {
 				config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].b();
 				continue; // Already handled here...
 			}
-			if (keypressed == SDLK_PRINT || (keypressed == SDLK_F12 && (modifier & KMOD_CTRL))) {
+			if (keypressed == SDLK_PRINTSCREEN || (keypressed == SDLK_F12 && (modifier & KMOD_CTRL))) {
 				g_take_screenshot = true;
 				continue; // Already handled here...
 			}
@@ -101,6 +98,7 @@ static void checkEvents(Game& gm) {
 			break;
 		}
 		// Screens always receive SDL events that were not already handled here
+		gm.window().resize();
 		gm.getCurrentScreen()->manageEvent(event);
 	}
 	for (input::NavEvent event; gm.controllers.getNav(event); ) {

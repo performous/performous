@@ -11,6 +11,7 @@ unsigned int screenH();
 static inline float virtH() { return float(screenH()) / screenW(); }
 
 struct SDL_Surface;
+struct SDL_Window;
 
 struct ColorTrans {
 	ColorTrans(Color const& c);
@@ -93,6 +94,6 @@ private:
 	bool m_fullscreen;
 	typedef boost::ptr_map<std::string, Shader> ShaderMap;
 	ShaderMap m_shaders; ///< Shader programs by name
-	SDL_Surface* screen;
+	SDL_Window *screen;
 };
 

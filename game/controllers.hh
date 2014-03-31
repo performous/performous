@@ -50,8 +50,6 @@ namespace input {
 	/// Each controller has unique SourceId that can be used for telling players apart etc.
 	struct SourceId {
 		SourceId(SourceType type = SOURCETYPE_NONE, unsigned device = 0, unsigned channel = 0): type(type), device(device), channel(channel) {
-			if (device >= 1024) throw std::invalid_argument("SourceId device must be smaller than 1024.");
-			if (channel >= 1024) throw std::invalid_argument("SourceId channel must be smaller than 1024.");
 		}
 		SourceType type;
 		unsigned device, channel;  ///< Device number and channel (0..1023)

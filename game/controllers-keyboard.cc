@@ -37,12 +37,12 @@ namespace input {
 			}
 			// Keep track of pressed keys
 			{
-				unsigned pressedId = sdlEv.key.which << 16 | sdlEv.key.keysym.sym;
+				unsigned pressedId = sdlEv.key.keysym.sym << 16 | sdlEv.key.keysym.sym;
 				if (sdlEv.type == SDL_KEYDOWN) m_pressed.insert(pressedId);
 				else m_pressed.erase(pressedId);
 			}
 			// Convert SDL event into controller Event
-			event.source = SourceId(SOURCETYPE_KEYBOARD, sdlEv.key.which);  // Device number .which is always zero with SDL 1.2 :(
+			event.source = SourceId(SOURCETYPE_KEYBOARD, 0);  // FIXME! cmake the device ID zero because in SDL2 it ain't zero!!
 			event.hw = sdlEv.key.keysym.sym;
 			event.value = (sdlEv.type == SDL_KEYDOWN ? 1.0 : 0.0);
 			// Get the modifier keys that we actually use as modifiers
@@ -97,14 +97,14 @@ namespace input {
 					break;
 
 				// Dance on keypad
-				case SDLK_KP9: button++;
-				case SDLK_KP7: button++;
-				case SDLK_KP3: button++;
-				case SDLK_KP1: button++;
-				case SDLK_KP6: case SDLK_RIGHT: button++;
-				case SDLK_KP8: case SDLK_UP: button++;
-				case SDLK_KP2: case SDLK_DOWN: case SDLK_KP5: button++;
-				case SDLK_KP4: case SDLK_LEFT:
+				case SDLK_KP_9: button++;
+				case SDLK_KP_7: button++;
+				case SDLK_KP_3: button++;
+				case SDLK_KP_1: button++;
+				case SDLK_KP_6: case SDLK_RIGHT: button++;
+				case SDLK_KP_8: case SDLK_UP: button++;
+				case SDLK_KP_2: case SDLK_DOWN: case SDLK_KP_5: button++;
+				case SDLK_KP_4: case SDLK_LEFT:
 					if (!m_dancepad) return;
 					event.devType = DEVTYPE_DANCEPAD;
 					break;
