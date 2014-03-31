@@ -19,6 +19,7 @@ extern "C" {
 #endif
 
 #define AUDIO_CHANNELS 2
+#define MAX_AUDIO_FRAME_SIZE 192000
 
 /*static*/ boost::mutex FFmpeg::s_avcodec_mutex;
 
@@ -228,7 +229,7 @@ void FFmpeg::processAudio(AVFrame* frame) {
 		data = &input[0];
 	}
 	// Resample to output sample rate, then push to audio queue and increment timecode
-	std::vector<int16_t> resampled(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+	std::vector<int16_t> resampled(MAX_AUDIO_FRAME_SIZE);
 	int frames = audio_resample(m_resampleContext, &resampled[0], reinterpret_cast<short*>(data), inFrames);
 	resampled.resize(frames * AUDIO_CHANNELS);
 	audioQueue.push(resampled, m_position);  // May block

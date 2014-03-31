@@ -19,7 +19,8 @@ namespace input {
 	enum DevType { DEVTYPE_GENERIC, DEVTYPE_VOCALS, DEVTYPE_GUITAR, DEVTYPE_DRUMS, DEVTYPE_KEYTAR, DEVTYPE_PIANO, DEVTYPE_DANCEPAD, DEVTYPE_N };
 	/// Generalized mapping of navigation actions
 	enum NavButton {
-		NAV_NONE, NAV_START, NAV_CANCEL, NAV_PAUSE,
+		NAV_NONE /* No NavEvent emitted */, NAV_SOME /* Major gameplay button with no direct nav function, used for joining instruments */,
+		NAV_START, NAV_CANCEL, NAV_PAUSE,
 		NAV_REPEAT = 0x80 /* Anything after this is auto-repeating */,
 		NAV_UP, NAV_DOWN, NAV_LEFT, NAV_RIGHT, NAV_MOREUP, NAV_MOREDOWN, NAV_VOLUME_UP, NAV_VOLUME_DOWN
 	};
@@ -105,8 +106,8 @@ namespace input {
 		bool getNav(NavEvent& ev);
 		/// Enable or disable event processing (pending events will be cleared).
 		void enableEvents(bool state);
-		/// Return true and an event handler device if there are any in queue. Otherwise return false.
-		bool getDevice(DevicePtr& dev);
+		/// Adopt a specific orphan device (for receiving Events).
+		DevicePtr registerDevice(SourceId const& source);
 		/// Internally poll for new events. The current time is passed for reference.
 		void process(boost::xtime const& now);
 		/// Push an SDL event for processing. Returns true if the event was taken (recognized and accepted).

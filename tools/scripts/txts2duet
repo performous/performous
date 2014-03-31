@@ -113,7 +113,7 @@ class TXTFile(object):
         self.headers.update(new_headers)
 
     def get_float_header(self, name):
-        return float(self.headers[name].replace(',', '.'))
+        return float(self.headers.get(name, '0').replace(',', '.'))
 
     def set_float_header(self, name, value):
         # the limit of 16 digits is somewhat arbitrary, but the normal string
