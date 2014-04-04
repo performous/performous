@@ -32,8 +32,8 @@ void ScreenPaths::exit() { m_theme.reset(); }
 void ScreenPaths::manageEvent(SDL_Event event) {
 	if (event.type == SDL_KEYDOWN) {
 		return; // FIXME: Remove
-		SDLKey key = event.key.keysym.sym;
-		SDLMod modifier = event.key.keysym.mod;
+		SDL_Keycode key = event.key.keysym.sym;
+		uint16_t modifier = event.key.keysym.mod;
 		if (m_txtinp.process(event.key.keysym)) /* Nop */ ;
 		// Reset to defaults
 		else if (key == SDLK_r && modifier & KMOD_CTRL) {

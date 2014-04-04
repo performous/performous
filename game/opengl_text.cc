@@ -10,7 +10,7 @@
 #include "fs.hh"
 
 void loadFonts() {
-	// Disabled on Windows due to not working and producing weird cache directory in the wrong place
+	/* Disabled on Windows due to not working and producing weird cache directory in the wrong place
 #ifndef _WIN32
 	FcConfig *config = FcInitLoadConfigAndFonts();
 	for (fs::path const& font: listFiles("fonts")) {
@@ -18,6 +18,7 @@ void loadFonts() {
 	}
 	FcConfigSetCurrent(config);
 #endif
+*/
 }
 
 namespace {

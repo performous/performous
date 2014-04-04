@@ -12,11 +12,14 @@ Lasse Kärkkäinen  <tronic+ndrm at trn.iki.fi>
 Tapio Vierros <aave000 at users.sourceforge.net>
 	* Core developer
 	* Lots of stuff in various areas
+	* Overall quality control
 
 Niek Nooijens <https://github.com/nieknooijens>
 	* Playlist Support
 	* Emedded Webserver (with help from Lasse Kärkkäinen)
 	* Mobile page design.
+	* SDL2.0 Port
+	* Some minor usability improvements
 
 
 INACTIVE DEVELOPERS

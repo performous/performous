@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
 file(GLOB SOURCE_FILES "*.cc")
-file(GLOB HEADER_FILES "*.hh" "libda/*.hpp")
+file(GLOB HEADER_FILES "*.hh")
 
 if(WIN32)
 	if(ENABLE_VERSIONING)
@@ -39,9 +39,10 @@ if(WIN32)
 		set(COMMENTS "//")
 	endif(ENABLE_VERSIONING)
 	set(RESOURCE_FILES "${CMAKE_BINARY_DIR}/performous.rc")
+	set(RESOURCE_OBJECT)#nothing
 
 	configure_file("../win32/performous.cmake.rc" "${RESOURCE_FILES}")
-	if(MINGW)
+	if(NOT MSVC)
 		# According to MinGW tools, we need to compile the rc file, and then link it into projects:
 		# windres foo.rc foores.o
 		# gcc -o foo.exe foo.o foores.o
@@ -51,12 +52,15 @@ if(WIN32)
 		if(NOT CMAKE_RC_COMPILER)
 			message(STATUS "Cannot find windres. Will not create a versioned exe.")
 			set(RESOURCE_FILES)
+			set(RESOURCE_OBJECT)
 		else()
-			set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> <FLAGS> -O coff <DEFINES> -i <SOURCE> -o <OBJECT>")
+			set(RESOURCE_OBJECT "${CMAKE_BINARY_DIR}/performous.rc.o")
+			execute_process(COMMAND "${CMAKE_RC_COMPILER}" "${RESOURCE_FILES}" "${RESOURCE_OBJECT}")
 		endif()
 	endif()
 else()
 	set(RESOURCE_FILES) #nothing
+	set(RESOURCE_OBJECT)#nothing
 endif()
 
 set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES})
@@ -68,7 +72,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 list(APPEND LIBS ${Boost_LIBRARIES})
 
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL PangoCairo LibRSVG LibXML++ GLEW AVFormat SWScale OpenGL Z Jpeg Png PortAudio Fontconfig)
+foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ GLEW AVFormat SWScale OpenGL Z Jpeg Png PortAudio Fontconfig)
 	find_package(${lib} REQUIRED)
 	include_directories(${${lib}_INCLUDE_DIRS})
 	list(APPEND LIBS ${${lib}_LIBRARIES})
@@ -144,7 +148,7 @@ else()
 endif()
 
 # Build main executable
-add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL_SOURCES})
+add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
 target_link_libraries(performous ${LIBS})
 install(TARGETS performous DESTINATION ${BIN_INSTALL})
 

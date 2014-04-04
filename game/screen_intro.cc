@@ -60,7 +60,7 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 	if (event.type == SDL_KEYDOWN && m_menu.getSubmenuLevel() > 0) {
 		// These are only available in config menu
 		int key = event.key.keysym.sym;
-		SDLMod modifier = event.key.keysym.mod;
+		uint16_t modifier = event.key.keysym.mod;
 		if (key == SDLK_r && modifier & KMOD_CTRL && m_menu.current().value) {
 			m_menu.current().value->reset(modifier & KMOD_ALT);
 		} else if (key == SDLK_s && modifier & KMOD_CTRL) {
