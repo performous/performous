@@ -11,10 +11,12 @@
 
 #define SHARED_DATA_DIR "@SHARE_INSTALL@"
 
-// FFMPEG libraries use changing include file names... Get them from CMake.
+// FFMPEG/libav libraries use changing include file names... Get them from CMake.
 #define AVCODEC_INCLUDE <@AVCodec_INCLUDE@>
 #define AVFORMAT_INCLUDE <@AVFormat_INCLUDE@>
 #define SWSCALE_INCLUDE <@SWScale_INCLUDE@>
+//libav 0.9 fix
+#define AVRESAMPLE_INCLUDE <@AVRESAMPLE_INCLUDE@>
 
 #endif
 

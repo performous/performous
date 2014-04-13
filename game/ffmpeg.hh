@@ -162,7 +162,7 @@ extern "C" {
   struct AVCodecContext;
   struct AVFormatContext;
   struct AVFrame;
-  struct ReSampleContext;
+  struct AVAudioResampleContext;
   struct SwsContext;
 }
 
@@ -203,7 +203,7 @@ class FFmpeg {
 	int m_mediaType;  // enum AVMediaType
 	AVFormatContext* m_formatContext;
 	AVCodecContext* m_codecContext;
-	ReSampleContext* m_resampleContext;
+	AVAudioResampleContext* m_resampleContext;
 	SwsContext* m_swsContext;
 	// Make sure the thread starts only after initializing everything else
 	boost::scoped_ptr<boost::thread> m_thread;

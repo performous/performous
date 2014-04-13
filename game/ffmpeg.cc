@@ -12,6 +12,7 @@ extern "C" {
 #include AVCODEC_INCLUDE
 #include AVFORMAT_INCLUDE
 #include SWSCALE_INCLUDE
+#include AVRESAMPLE_INCLUDE
 }
 
 #if (LIBAVCODEC_VERSION_INT) < (AV_VERSION_INT(52,94,3))
@@ -97,7 +98,7 @@ void FFmpeg::open() {
 
 	switch (m_mediaType) {
 	case AVMEDIA_TYPE_AUDIO:
-		m_resampleContext = av_audio_resample_init(AUDIO_CHANNELS, cc->channels, m_rate, cc->sample_rate, AV_SAMPLE_FMT_S16, AV_SAMPLE_FMT_S16, 16, 10, 0, 0.8);
+		avresample_open(m_resampleContext);
 		if (!m_resampleContext) throw std::runtime_error("Cannot create resampling context");
 		audioQueue.setSamplesPerSecond(AUDIO_CHANNELS * m_rate);
 		break;
@@ -138,7 +139,7 @@ void FFmpeg::operator()() {
 	videoQueue.reset();
 	// TODO: use RAII for freeing resources (to prevent memory leaks)
 	boost::mutex::scoped_lock l(s_avcodec_mutex); // avcodec_close is not thread-safe
-	if (m_resampleContext) audio_resample_close(m_resampleContext);
+	if (m_resampleContext) avresample_close(m_resampleContext);
 	if (m_codecContext) avcodec_close(m_codecContext);
 #if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53, 17, 0)
 	if (m_formatContext) avformat_close_input(&m_formatContext);
@@ -233,7 +234,7 @@ void FFmpeg::processAudio(AVFrame* frame) {
 	}
 	// Resample to output sample rate, then push to audio queue and increment timecode
 	std::vector<int16_t> resampled(MAX_AUDIO_FRAME_SIZE);
-	int frames = audio_resample(m_resampleContext, &resampled[0], reinterpret_cast<short*>(data), inFrames);
+	int frames = 0; //avresample(m_resampleContext, resampled[0], reinterpret_cast<short*>(data), inFrames);
 	resampled.resize(frames * AUDIO_CHANNELS);
 	audioQueue.push(resampled, m_position);  // May block
 	m_position += double(frames)/m_formatContext->streams[m_streamId]->codec->sample_rate;
