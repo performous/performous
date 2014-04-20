@@ -16,7 +16,7 @@
 #define AVFORMAT_INCLUDE <@AVFormat_INCLUDE@>
 #define SWSCALE_INCLUDE <@SWScale_INCLUDE@>
 //libav 0.9 fix
-#define AVRESAMPLE_INCLUDE <@AVRESAMPLE_INCLUDE@>
+#define AVRESAMPLE_INCLUDE <@AVResample_INCLUDE@>
 
 #endif
 

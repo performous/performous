@@ -9,26 +9,38 @@
 # See documentation on how to write CMake scripts at
 # http://www.cmake.org/Wiki/CMake:How_To_Find_Libraries
 
-include(LibAVFindComponent)
+include(LibFindMacros)
 
-libav_find_component("Resample")
+libfind_package(AVResample AVUtil)
 
-# Handle arguments
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(AVResample
-	DEFAULT_MSG
-	AVResample_LIBRARIES
-	AVResample_INCLUDE_DIRS
+
+
+libfind_pkg_check_modules(AVResample_PKGCONF libavresample)
+
+find_path(AVResample_INCLUDE_DIR
+  NAMES libavresample/avresample.h ffmpeg/avresample.h avresample.h
+  PATHS ${AVResample_PKGCONF_INCLUDE_DIRS}
+  PATH_SUFFIXES ffmpeg
 )
 if(AVResample_INCLUDE_DIR)
+  foreach(suffix libavresample/ ffmpeg/ "")
     if(NOT AVResample_INCLUDE)
       if(EXISTS "${AVResample_INCLUDE_DIR}/${suffix}avresample.h")
-        set(AVCodec_INCLUDE "${suffix}avcodec.h")
-      endif(EXISTS "${AVCodec_INCLUDE_DIR}/${suffix}avresample.h")
+        set(AVResample_INCLUDE "${suffix}avresample.h")
+      endif(EXISTS "${AVResample_INCLUDE_DIR}/${suffix}avresample.h")
     endif(NOT AVResample_INCLUDE)
+  endforeach(suffix)
+
+    if(NOT AVResample_INCLUDE)
+    message(FATAL_ERROR "Found avresample.h include dir, but not the header file. Perhaps you need to clear CMake cache?")
+  endif(NOT AVResample_INCLUDE)
 endif(AVResample_INCLUDE_DIR)
 
-set(AVResample_PROCESS_INCLUDES AVResample_INCLUDE_DIR AVResample_INCLUDE_DIRS)
+find_library(AVResample_LIBRARY
+  NAMES libavresample.dll.a avresample
+  PATHS ${AVResample_PKGCONF_LIBRARY_DIRS}
+)
+
+set(AVResample_PROCESS_INCLUDES AVResample_INCLUDE_DIR AVUtil_INCLUDE_DIRS)
 set(AVResample_PROCESS_LIBS AVResample_LIBRARY AVUtil_LIBRARIES)
 libfind_process(AVResample)
-mark_as_advanced(AVResample_LIBRARIES AVResample_INCLUDE_DIRS)
