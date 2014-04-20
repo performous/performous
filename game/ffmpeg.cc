@@ -98,6 +98,7 @@ void FFmpeg::open() {
 
 	switch (m_mediaType) {
 	case AVMEDIA_TYPE_AUDIO:
+		m_resampleContext = avresample_alloc_context();
 		avresample_open(m_resampleContext);
 		if (!m_resampleContext) throw std::runtime_error("Cannot create resampling context");
 		audioQueue.setSamplesPerSecond(AUDIO_CHANNELS * m_rate);
