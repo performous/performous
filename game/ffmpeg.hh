@@ -93,7 +93,7 @@ class AudioBuffer {
 	void setSamplesPerSecond(unsigned sps) { m_sps = sps; }
 	/// get samples per second
 	unsigned getSamplesPerSecond() const { return m_sps; }
-	void push(std::vector<int16_t> const& data, double timestamp) {
+	void push(std::vector<uint8_t> const& data, double timestamp) {
 		mutex::scoped_lock l(m_mutex);
 		while (!condition()) m_cond.wait(l);
 		if (m_quit) return;
@@ -149,7 +149,7 @@ class AudioBuffer {
 	bool condition() { return m_quit || wantMore() || wantSeek(); }
 	mutable mutex m_mutex;
 	boost::condition m_cond;
-	boost::circular_buffer<int16_t> m_data;
+	boost::circular_buffer<uint8_t> m_data;
 	size_t m_pos;
 	int64_t m_posReq;
 	unsigned m_sps;

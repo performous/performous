@@ -107,6 +107,7 @@ void FFmpeg::open() {
 		av_opt_set_int(m_resampleContext, "out_sample_rate", 44100, 0);
 		av_opt_set_int(m_resampleContext, "in_sample_fmt", AV_SAMPLE_FMT_FLTP, 0);
 		av_opt_set_int(m_resampleContext, "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
+		avresample_open(m_resampleContext);
 		if (!m_resampleContext) throw std::runtime_error("Cannot create resampling context");
 		audioQueue.setSamplesPerSecond(AUDIO_CHANNELS * m_rate);
 		break;
@@ -221,30 +222,28 @@ void FFmpeg::processVideo(AVFrame* frame) {
 }
 
 void FFmpeg::processAudio(AVFrame* frame) {
-	void* data = frame->data[0];
-	// New FFmpeg versions use non-interleaved audio decoding and samples may be in float format.
-	// Do a conversion here, allowing us to use the old (deprecated) avcodec audio_resample().
-	std::vector<int16_t> input;
-	unsigned inFrames = frame->nb_samples;
-	if (frame->data[1]) {
-		unsigned channels = m_codecContext->channels;
-		input.reserve(channels * inFrames);
-		for (unsigned i = 0; i < inFrames; ++i) {
-			for (unsigned ch = 0; ch < channels; ++ch) {
+	uint8_t* data = frame->data[0];
+	std::vector<uint8_t> input;
+	uint8_t inFrames = frame->nb_samples;
+	if(frame->data[1]) {
+		uint8_t channels = m_codecContext->channels;
+		input.reserve(channels*inFrames);
+		for(uint8_t i=0; i < inFrames; ++i) {
+			for(uint8_t ch = 0; ch < channels; ++ch) {
 				data = frame->data[ch];
 				input.push_back(m_codecContext->sample_fmt == AV_SAMPLE_FMT_FLTP ?
-				  da::conv_to_s16(reinterpret_cast<float*>(data)[i]) :
-				  reinterpret_cast<int16_t*>(data)[i]
-				);
+				da::conv_to_s16(reinterpret_cast<float*>(data)[i]) :
+				reinterpret_cast<uint8_t*>(data)[i]);
 			}
 		}
-		data = &input[0];
 	}
-	// Resample to output sample rate, then push to audio queue and increment timecode
-	std::vector<int16_t> resampled(MAX_AUDIO_FRAME_SIZE);
-	int frames = 0; //avresample(m_resampleContext, resampled[0], reinterpret_cast<short*>(data), inFrames);
-	resampled.resize(frames * AUDIO_CHANNELS);
-	audioQueue.push(resampled, m_position);  // May block
+	data = &input[0];
+	//resample to output
+	std::vector<uint8_t> resampled(MAX_AUDIO_FRAME_SIZE);
+	uint8_t* first_frame = &resampled[0];
+	int frames = avresample_convert(m_resampleContext,&first_frame,0,1000000,&data,0,inFrames );
+	resampled.resize(frames*AUDIO_CHANNELS);
+	audioQueue.push(resampled,m_position);
 	m_position += double(frames)/m_formatContext->streams[m_streamId]->codec->sample_rate;
 }
 
