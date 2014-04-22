@@ -13,6 +13,8 @@ extern "C" {
 #include AVFORMAT_INCLUDE
 #include SWSCALE_INCLUDE
 #include AVRESAMPLE_INCLUDE
+#include AVUTIL_INCLUDE
+#include AVUTIL_OPT_INCLUDE
 }
 
 #if (LIBAVCODEC_VERSION_INT) < (AV_VERSION_INT(52,94,3))
@@ -99,7 +101,12 @@ void FFmpeg::open() {
 	switch (m_mediaType) {
 	case AVMEDIA_TYPE_AUDIO:
 		m_resampleContext = avresample_alloc_context();
-		avresample_open(m_resampleContext);
+		av_opt_set_int(m_resampleContext, "in_channel_layout", AV_CH_LAYOUT_STEREO, 0);
+		av_opt_set_int(m_resampleContext, "out_channel_layout", AV_CH_LAYOUT_STEREO, 0);
+		av_opt_set_int(m_resampleContext, "in_sample_rate", 48000, 0);
+		av_opt_set_int(m_resampleContext, "out_sample_rate", 44100, 0);
+		av_opt_set_int(m_resampleContext, "in_sample_fmt", AV_SAMPLE_FMT_FLTP, 0);
+		av_opt_set_int(m_resampleContext, "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
 		if (!m_resampleContext) throw std::runtime_error("Cannot create resampling context");
 		audioQueue.setSamplesPerSecond(AUDIO_CHANNELS * m_rate);
 		break;

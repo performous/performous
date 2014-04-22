@@ -17,6 +17,8 @@
 #define SWSCALE_INCLUDE <@SWScale_INCLUDE@>
 //libav 0.9 fix
 #define AVRESAMPLE_INCLUDE <@AVResample_INCLUDE@>
+#define AVUTIL_INCLUDE <@AVUtil_INCLUDE@>
+#define AVUTIL_OPT_INCLUDE <@AVUtil_INCLUDE_DIRS@/libavutil/opt.h> //HACK to get AVOption class!
 
 #endif
 
