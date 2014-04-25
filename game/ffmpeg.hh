@@ -93,7 +93,7 @@ class AudioBuffer {
 	void setSamplesPerSecond(unsigned sps) { m_sps = sps; }
 	/// get samples per second
 	unsigned getSamplesPerSecond() const { return m_sps; }
-	void push(std::vector<uint8_t> const& data, double timestamp) {
+	void push(const uint8_t *data, int size, double timestamp) {
 		mutex::scoped_lock l(m_mutex);
 		while (!condition()) m_cond.wait(l);
 		if (m_quit) return;
@@ -106,8 +106,8 @@ class AudioBuffer {
 			m_pos = timestamp * m_sps;
 			m_data.resize(m_pos, 0);
 		}
-		m_data.insert(m_data.end(), data.begin(), data.end());
-		m_pos += data.size();
+		m_data.insert(m_data.end(), data[0], data[size-1]);
+		m_pos += size;
 	}
 	bool prepare(int64_t pos) {
 		mutex::scoped_try_lock l(m_mutex);
