@@ -56,7 +56,7 @@ namespace da {
 	// The ugly static_casts are required to avoid warnings in MSVC.
 	static inline int conv_to_s16(sample_t s) { return clamp(static_cast<int>(round(s * max_s16)), static_cast<int>(min_s16), static_cast<int>(max_s16)); }
 	static inline int conv_to_s24(sample_t s) { return clamp(static_cast<int>(round(s * max_s24)), static_cast<int>(min_s24), static_cast<int>(max_s24)); }
-	static inline int conv_to_s32(sample_t s) { return static_cast<int>(clamp(round(s * max_s32), min_s32, max_s32 )); }
+	static inline int conv_to_s32(sample_t s) { return static_cast<int>(clamp(static_cast<sample_t>(round(s * max_s32)), min_s32, max_s32 )); }
 	// Non-rounding non-clamping versions are provided for very low end devices (still lossless)
 	static inline int conv_to_s16_fast(sample_t s) { return static_cast<int>(s * max_s16); }
 	static inline int conv_to_s24_fast(sample_t s) { return static_cast<int>(s * max_s24); }
