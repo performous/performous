@@ -8,7 +8,7 @@
 
 namespace da {
 
-	using std::round;
+	using namespace std;  // For std::round which apparently is not in std namespace on mingw and thus cannot be directly used
 	
 	// Should be a floating-point type
 	typedef float sample_t;
