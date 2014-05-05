@@ -226,7 +226,7 @@ void FFmpeg::processAudio(AVFrame* frame) {
 	int out_linesize;
 	int out_samples = avresample_available(m_resampleContext) +
 			av_rescale_rnd(avresample_get_delay(m_resampleContext) +
-						   frame->linesize[0], frame->sample_rate, m_rate, AV_ROUND_UP);
+						frame->nb_samples, frame->sample_rate, m_rate, AV_ROUND_UP);
 	av_samples_alloc(&output, &out_linesize, AUDIO_CHANNELS, out_samples,
 					 AV_SAMPLE_FMT_S16, 0);
 	out_samples = avresample_convert(m_resampleContext, &output, out_linesize, out_samples,
