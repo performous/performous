@@ -15,7 +15,7 @@ extern "C" {
 #include AVRESAMPLE_INCLUDE
 #include AVUTIL_INCLUDE
 #include AVUTIL_OPT_INCLUDE
-#include <libavutil/mathematics.h>
+#include AVUTIL_MATH_INCLUDE
 }
 
 #if (LIBAVCODEC_VERSION_INT) < (AV_VERSION_INT(52,94,3))
