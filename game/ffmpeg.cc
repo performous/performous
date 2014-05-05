@@ -100,7 +100,7 @@ void FFmpeg::open() {
 	switch (m_mediaType) {
 	case AVMEDIA_TYPE_AUDIO:
 		m_resampleContext = avresample_alloc_context();
-		av_opt_set_int(m_resampleContext, "in_channel_layout", m_codecContext->channel_layout, 0);
+		av_opt_set_int(m_resampleContext, "in_channel_layout", AV_CH_LAYOUT_STEREO, 0);
 		av_opt_set_int(m_resampleContext, "out_channel_layout", av_get_default_channel_layout(AUDIO_CHANNELS), 0);
 		av_opt_set_int(m_resampleContext, "in_sample_rate", m_codecContext->sample_rate, 0);
 		av_opt_set_int(m_resampleContext, "out_sample_rate", m_rate, 0);
