@@ -79,7 +79,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 		int should_be_zero = SDL_GetCurrentDisplayMode(i, &current);
 		if(should_be_zero != 0) throw std::runtime_error("Could not get display mode for video display");
 	}
-	std::clog << "Current display resolution is: " << current.w << "x" << current.h << std::endl;
+	std::clog << "video/info: Current display resolution is: " << current.w << "x" << current.h << std::endl;
 	m_fsW = current.w;
 	m_fsH = current.h;
 	{ // Setup GL attributes for context creation
