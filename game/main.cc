@@ -370,10 +370,6 @@ int main(int argc, char** argv) try {
 		jstestLoop();
 		return EXIT_SUCCESS;
 	}
-	//enable joysticks
-	SDL_Init(SDL_INIT_JOYSTICK);
-	SDL_JoystickEventState(SDL_ENABLE);
-
 	// Run the game init and main loop
 	mainLoop(songlist);
 
