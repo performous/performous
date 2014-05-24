@@ -233,11 +233,9 @@ void FFmpeg::processAudio(AVFrame* frame) {
 		out_samples = avresample_convert(m_resampleContext, &output, out_linesize, out_samples,
 									 &frame->data[0], frame->linesize[0], frame->nb_samples);
 		// The output is now an interleaved array of 16-bit samples
-		for(int i=0; i<frame->nb_samples; i++ ) {
-		m_output.push_back(da::conv_to_s16(output[i]));
-		}
+		m_output.insert(m_output.begin(), output[0], output[out_samples * 2 * AUDIO_CHANNELS]);
+		audioQueue.push(m_output,m_position);
 		av_freep(&output);
-	audioQueue.push(m_output, m_position);
-	m_position += double(frame->nb_samples)/m_formatContext->streams[m_streamId]->codec->sample_rate;
+		m_position += double(frame->nb_samples)/m_formatContext->streams[m_streamId]->codec->sample_rate;
 }
 
