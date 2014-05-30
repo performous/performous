@@ -25,7 +25,7 @@ find_path(GObject_INCLUDE_DIR
   PATHS ${Glib_INCLUDE_DIRS}
 )
 
-set(GObject_PROCESS_INCLUDES GObject_INCLUDE_DIR Glib_INCLUDE_DIRS)
-set(GObject_PROCESS_LIBS GObject_LIBRARY Glib_LIBRARIES)
+set(GObject_PROCESS_INCLUDES GObject_INCLUDE_DIR Glib_INCLUDE_DIR)
+set(GObject_PROCESS_LIBS GObject_LIBRARY Glib_LIBRARY)
 libfind_process(GObject)
 
