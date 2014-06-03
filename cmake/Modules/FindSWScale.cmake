@@ -40,7 +40,5 @@ find_library(SWScale_LIBRARY
   PATHS ${SWScale_PKGCONF_LIBRARY_DIRS}
 )
 
-set(SWScale_PROCESS_INCLUDES SWScale_INCLUDE_DIR AVUtil_INCLUDE_DIRS)
-set(SWScale_PROCESS_LIBS SWScale_LIBRARY AVUtil_LIBRARIES)
 libfind_process(SWScale)
 

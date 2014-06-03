@@ -372,7 +372,6 @@ int main(int argc, char** argv) try {
 		jstestLoop();
 		return EXIT_SUCCESS;
 	}
-
 	// Run the game init and main loop
 	mainLoop(songlist);
 

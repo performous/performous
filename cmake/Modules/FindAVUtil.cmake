@@ -38,7 +38,5 @@ find_library(AVUtil_LIBRARY
   PATHS ${AVUtil_PKGCONF_LIBRARY_DIRS}
 )
 
-set(AVUtil_PROCESS_INCLUDES AVUtil_INCLUDE_DIR)
-set(AVUtil_PROCESS_LIBS AVUtil_LIBRARY)
 libfind_process(AVUtil)
 

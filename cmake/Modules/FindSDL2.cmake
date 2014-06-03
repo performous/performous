@@ -12,19 +12,7 @@
 # http://www.cmake.org/Wiki/CMake:How_To_Find_Libraries
 
 include(LibFindMacros)
-
-libfind_pkg_check_modules(SDL2_PKGCONF sdl2)
-
-find_path(SDL2_INCLUDE_DIR
-  NAMES SDL.h
-  PATH_SUFFIXES SDL2
-  HINTS ${SDL2_PKGCONF_INCLUDE_DIRS}
-)
-
-find_library(SDL2_SDL_LIBRARY
-  NAMES SDL2
-  HINTS ${SDL2_PKGCONF_LIBRARY_DIRS}
-)
+libfind_pkg_detect(SDL2 sdl2 FIND_PATH SDL.h PATH_SUFFIXES SDL2 FIND_LIBRARY SDL2)
 
 # Process others than OSX with native SDL normally
 if(NOT "${SDL2_SDL_LIBRARY}" MATCHES "framework")
@@ -42,7 +30,6 @@ if(NOT "${SDL2_SDL_LIBRARY}" MATCHES "framework")
   set(SDL2_PROCESS_LIBS ${SDL2_PROCESS_LIBS} SDL2_SDL_LIBRARY)
 endif()
 
-set(SDL2_PROCESS_INCLUDES SDL2_INCLUDE_DIR)
 libfind_process(SDL2)
 
 # Special processing for OSX native SDL

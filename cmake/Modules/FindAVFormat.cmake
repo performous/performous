@@ -40,7 +40,5 @@ find_library(AVFormat_LIBRARY
   PATHS ${AVFormat_PKGCONF_LIBRARY_DIRS}
 )
 
-set(AVFormat_PROCESS_INCLUDES AVFormat_INCLUDE_DIR AVCodec_INCLUDE_DIRS)
-set(AVFormat_PROCESS_LIBS AVFormat_LIBRARY AVCodec_LIBRARIES)
 libfind_process(AVFormat)
 
