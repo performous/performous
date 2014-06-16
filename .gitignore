@@ -6,3 +6,5 @@ CMakeLists.txt.user*
 #dummy files you may create when translating
 *~
 *.mo
+dylibbundler.log
+performous-app-build.sh
