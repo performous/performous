@@ -1,8 +1,0 @@
-#!/bin/bash
-export PATH="${PATH}:`pwd`"
-export FONTCONFIG_PATH="../Resources/etc/fonts"
-# Without this line, pixbuf tries to use the config file from macports
-# environment. Apparently it works just fine without it too.
-export GDK_PIXBUF_MODULE_FILE=""
-# TODO: might be a good idea to turn-off all console output
-performous

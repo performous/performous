@@ -7,12 +7,11 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 CURRDIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 export PATH="${PATH}:${CURRDIR}"
+# Point to the pango and fontconfig config files inside the bundle, in turn linking to modules and fonts inside the bundle as well.
 export FONTCONFIG_PATH="${CURRDIR}/../Resources/etc/fonts"
 export PANGO_RC_FILE="${CURRDIR}/../Resources/etc/pango/pangorc"
 # Without this line, pixbuf tries to use the config file from macports
 # environment. Apparently it works just fine without it too.
-#echo "${FONTCONFIG_PATH}"
-#read -p Lol wait
 export GDK_PIXBUF_MODULE_FILE=""
 # TODO: might be a good idea to turn-off all console output
-"${CURRDIR}/performous"
+"${CURRDIR}/performous" # Make sure the executable is actually found.
