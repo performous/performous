@@ -26,6 +26,7 @@
 	<string>0.8.0+</string>
 	<key>LSUIElement</key>
 	<false/>
+	
 	<key>NSHumanReadableCopyright</key>
 	<string>Performous contributors GPLv2+</string>
 </dict>

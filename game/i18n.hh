@@ -2,8 +2,12 @@
 
 #ifdef USE_GETTEXT
 /* Internationalization Dependances */
-#include <libintl.h>
-#include <locale.h>
+    #ifdef __APPLE__ // Using system gettext can choke portability of an app-bundle. 
+        #include "libintl.h"
+        #include "locale.h"
+    #else
+        #include <libintl.h>
+        #include <locale.h>
 #include "fs.hh"
 #define _(x) gettext(x)
 #else
