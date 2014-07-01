@@ -65,21 +65,22 @@ unsigned int screenH() { return s_height; }
 
 Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(width), m_windowH(height), m_fullscreen(fs), screen() {
 	std::atexit(SDL_Quit);
-	//if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK) == -1 ) throw std::runtime_error("SDL_Init failed");
-	SDL_SetWindowTitle(screen,PACKAGE " " VERSION);
+	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK))
+		throw std::runtime_error(std::string("SDL_Init failed: ") + SDL_GetError());
+	SDL_JoystickEventState(SDL_ENABLE);
+	SDL_SetWindowTitle(screen, PACKAGE " " VERSION);
 	{
 		SDL_Surface* icon = SDL_LoadBMP(findFile("icon.bmp").string().c_str());
 		SDL_SetWindowIcon(screen,icon);
 		SDL_FreeSurface(icon);
 	}
 	// SDL_SetVideoMode not called yet => get the desktop resolution for fs mode
-	SDL_Init(SDL_INIT_VIDEO);
 	SDL_DisplayMode current;
 	for(int i = 0; i < SDL_GetNumVideoDisplays(); ++i){
 		int should_be_zero = SDL_GetCurrentDisplayMode(i, &current);
 		if(should_be_zero != 0) throw std::runtime_error("Could not get display mode for video display");
 	}
-	std::clog << "Current display resolution is: " << current.w << "x" << current.h << std::endl;
+	std::clog << "video/info: Current display resolution is: " << current.w << "x" << current.h << std::endl;
 	m_fsW = current.w;
 	m_fsH = current.h;
 	{ // Setup GL attributes for context creation
@@ -92,7 +93,8 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 		GLattrSetter attr_db(SDL_GL_DOUBLEBUFFER, 1);
 		if(width < 200) width = 640; //FIXME: window should have a minimum size
 		if(height < 200) height = 480;
-		screen = SDL_CreateWindow(PACKAGE " " VERSION,SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,width, height, (m_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0) | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+		screen = SDL_CreateWindow(PACKAGE " " VERSION, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height,
+			(m_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0) | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
 		SDL_GL_CreateContext(screen);
 

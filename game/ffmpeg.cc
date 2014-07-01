@@ -217,20 +217,18 @@ void FFmpeg::processAudio(AVFrame* frame) {
 	// Do a conversion here, allowing us to use the old (deprecated) avcodec audio_resample().
 	std::vector<int16_t> input;
 	unsigned inFrames = frame->nb_samples;
-	if (frame->data[1]) {
-		unsigned channels = m_codecContext->channels;
-		input.reserve(channels * inFrames);
-		for (unsigned i = 0; i < inFrames; ++i) {
-			for (unsigned ch = 0; ch < channels; ++ch) {
-				data = frame->data[ch];
-				input.push_back(m_codecContext->sample_fmt == AV_SAMPLE_FMT_FLTP ?
-				  da::conv_to_s16(reinterpret_cast<float*>(data)[i]) :
-				  reinterpret_cast<int16_t*>(data)[i]
-				);
-			}
+	unsigned channels = m_codecContext->channels;
+	input.reserve(channels * inFrames);
+	for (unsigned i = 0; i < inFrames; ++i) {
+		for (unsigned ch = 0; ch < channels; ++ch) {
+			data = frame->data[ch];
+			input.push_back(m_codecContext->sample_fmt == AV_SAMPLE_FMT_FLTP ?
+			  da::conv_to_s16(reinterpret_cast<float*>(data)[i]) :
+			  reinterpret_cast<int16_t*>(data)[i]
+			);
 		}
-		data = &input[0];
 	}
+	data = &input[0];
 	// Resample to output sample rate, then push to audio queue and increment timecode
 	std::vector<int16_t> resampled(MAX_AUDIO_FRAME_SIZE);
 	int frames = audio_resample(m_resampleContext, &resampled[0], reinterpret_cast<short*>(data), inFrames);

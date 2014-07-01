@@ -34,9 +34,6 @@ find_library(Glibmm_LIBRARY
   PATHS ${Glibmm_PKGCONF_LIBRARY_DIRS}
 )
 
-# Set the include dir variables and the libraries and let libfind_process do the rest.
-# NOTE: Singular variables for this library, plural for libraries this this lib depends on.
-set(Glibmm_PROCESS_INCLUDES Glibmm_INCLUDE_DIR GlibmmConfig_INCLUDE_DIR Glib_INCLUDE_DIRS SigC++_INCLUDE_DIRS)
-set(Glibmm_PROCESS_LIBS Glibmm_LIBRARY Glib_LIBRARIES SigC++_LIBRARIES)
+set(Glibmm_PROCESS_INCLUDES GlibmmConfig_INCLUDE_DIR)
 libfind_process(Glibmm)
 
