@@ -56,6 +56,8 @@ public:
 	SvgTxtTheme lyrics_next;
 	/// time display
 	SvgTxtTheme timer;
+	/// show the current song info
+	SvgTxtTheme songinfo;
 };
 
 /// theme for audio device screen
