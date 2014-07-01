@@ -487,6 +487,7 @@ void ScreenSing::draw() {
 		unsigned t = clamp(time, 0.0, length);
 		m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
 		theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
+		theme->songinfo.dimensions.screenBottom(-0.01);
 		m_progress->draw(songPercent);
 
 		Song::SongSection section("error", 0);
@@ -552,6 +553,8 @@ void ScreenSing::draw() {
 	if(!keyPressed && m_DuetTimeout.get() == 0) {
 		m_menu.action();
 		}
+	std::string songinfo = m_song->artist + " - " + m_song->title;
+	theme->songinfo.draw(songinfo);
 }
 
 void ScreenSing::drawMenu() {
