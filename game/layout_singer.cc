@@ -97,7 +97,7 @@ void LayoutSinger::drawScore(PositionMode position) {
 
 void LayoutSinger::draw(double time, PositionMode position) {
 	// Draw notes and pitch waves (only when not in karaoke mode)
-	if (!config["game/karaoke_mode"].b()) {
+	if (!config["game/karaoke_mode"].i()) {
 		switch(position) {
 			case LayoutSinger::FULL:
 				m_noteGraph.draw(time, m_database, NoteGraph::FULLSCREEN);
@@ -121,7 +121,7 @@ void LayoutSinger::draw(double time, PositionMode position) {
 		Dimensions pos;
 		switch(position) {
 			case LayoutSinger::FULL:
-				if(config["game/karaoke_centered_lyrics"].b() && config["game/karaoke_mode"].b()) {
+				if(config["game/karaoke_mode"].i() >= 2) {
 					pos.center(0);
 				} else {
 					pos.screenBottom(-0.1);
@@ -166,7 +166,7 @@ void LayoutSinger::draw(double time, PositionMode position) {
 		}
 	}
 
-	if (!config["game/karaoke_mode"].b() ) drawScore(position); // draw score if not in karaoke mode
+	if (!config["game/karaoke_mode"].i() ) drawScore(position); // draw score if not in karaoke mode
 }
 
 double LayoutSinger::lyrics_begin() const {
