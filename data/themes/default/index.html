@@ -44,7 +44,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', end
 	</div>
 	<div data-role="content">
 	<div class="ui-grid-a">
-		<div class="ui-block-a">
+		<div class="ui-block-a" style="width:70%">
 		<form id="radioButtonForm">
 		 <fieldset data-role="controlgroup" data-type="horizontal">
         <legend>Sort by:</legend>
@@ -60,12 +60,19 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', end
         <label for="radio-choice-Creator">Creator</label>
     </fieldset>
     </form>
-    </div> <div class="ui-block-b">
-		<a id="databaseRefreshButton" data-role="button" href="#page1" data-icon="refresh">
-			Refresh database
-		</a>
+    </div> <div class="ui-block-b" style="width:30%">
+    		<div data-role="fieldcontain">
+			<label for="flipsortmode">Sort order:</label>	
+			<select name="flipsortmode" id="flipsortmode" data-role="slider" data-mini="false">
+				<option value="off">Normal</option>
+				<option value="on">Inverted</option>
+			</select>
+			</div>
 		</div>
 	</div>
+			<a id="databaseRefreshButton" data-role="button" href="#page1" data-icon="refresh">
+			Refresh database
+		</a>
 		<table id="songtable" border="1">
 			<tr>
 				<th>Artist</th>
@@ -112,7 +119,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', end
 		</div>
 		<br>
 		<div data-role="fieldcontain">
-			<label for="flipupdate">Update every 30 sec.</label>
+			<label for="flipupdate">Update every 10 sec.</label>
 			<select name="flipupdate" id="flipupdate" data-role="slider" data-mini="false">
 				<option value="off">No</option>
 				<option value="on">Yes</option>
@@ -166,6 +173,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', end
 
 <script>
 	var update = false;
+	var invertedsort = false;
 	var database = {};
 	var songlist = {};
 
@@ -199,12 +207,18 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', end
 				break;
 			}
 			    var table = document.getElementById("songtable");
-    				for(var i = table.rows.length -1; i > 0; i--) {
+			    for(var i = table.rows.length -1; i > 0; i--) {
 					table.deleteRow(i);
 					}
-			for (i in database) {
-				$("#songtable").last().append("<tr><td>" + database[i].Artist + "</td><td>" + database[i].Title + "</td><td>" + database[i].Language + "</td><td>" + database[i].Edition + "</td><td>" + database[i].Creator +"</td> </tr>");
-			}
+			    if(invertedsort) {
+			    	for (var i = database.length - 1; i>=0; i--) {
+			    		$("#songtable").last().append("<tr><td>" + database[i].Artist + "</td><td>" + database[i].Title + "</td><td>" + database[i].Language + "</td><td>" + database[i].Edition + "</td><td>" + database[i].Creator +"</td> </tr>");
+			    	}
+			    } else {
+					for (i in database) {
+						$("#songtable").last().append("<tr><td>" + database[i].Artist + "</td><td>" + database[i].Title + "</td><td>" + database[i].Language + "</td><td>" + database[i].Edition + "</td><td>" + database[i].Creator +"</td> </tr>");
+					}
+				 }
 		});
 	});
 
@@ -303,10 +317,14 @@ $(document).keypress(function(e) {
 	$('#flipupdate').bind("change", function(event, ui) {
 		update = !update;
 	});
+	
+	$('#flipsortmode').bind("change", function (event, ui) {
+		invertedsort = !invertedsort;
+	});
 
 	window.setInterval(function(){
 		if (update) RefreshPlayList();
-	}, 30000);
+	}, 10000);
 
 </script>
 
