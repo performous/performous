@@ -178,18 +178,23 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', end
 			var s = $('input[name=radio-choice-Sort]:checked', '#radioButtonForm').val();
 			switch(s) {
 				case '1':
+				database = sortByKey(database, 'Title');
 				database = sortByKey(database, 'Artist');
 				break;
 				case '2':
+				database = sortByKey(database, 'Artist');
 				database = sortByKey(database, 'Title');
 				break;
 				case '3':
+				database = sortByKey(database, 'Artist');
 				database = sortByKey(database, 'Language');
 				break;
 				case '4':
+				database = sortByKey(database, 'Artist');
 				database = sortByKey(database, 'Edition');
 				break;
 				case '5':
+				database = sortByKey(database, 'Artist');
 				database = sortByKey(database, 'Creator');
 				break;
 			}
