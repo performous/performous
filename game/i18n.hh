@@ -8,6 +8,7 @@
     #else
         #include <libintl.h>
         #include <locale.h>
+    #endif
 #include "fs.hh"
 #define _(x) gettext(x)
 #else

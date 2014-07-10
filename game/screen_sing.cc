@@ -347,7 +347,11 @@ void ScreenSing::manageEvent(SDL_Event event) {
 	if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_CTRL) && !m_score_window.get()) {
 		if (key == SDLK_s) m_audio.toggleSynth(m_song->getVocalTrack(m_selectedTrack).notes);
 		if (key == SDLK_v) m_audio.streamFade("vocals", event.key.keysym.mod & KMOD_SHIFT ? 1.0 : 0.0);
-		if (key == SDLK_k) dispInFlash(++config["game/karaoke_mode"]); // Toggle karaoke mode
+		if (key == SDLK_k)  { // Toggle karaoke mode
+			if(config["game/karaoke_mode"].i() >=2) config["game/karaoke_mode"].i() = 0;
+			else ++config["game/karaoke_mode"];
+			dispInFlash(config["game/karaoke_mode"]);
+		}
 		if (key == SDLK_w) dispInFlash(++config["game/pitch"]); // Toggle pitch wave
 		// Toggle webcam
 		if (key == SDLK_a && Webcam::enabled()) {
@@ -498,7 +502,7 @@ void ScreenSing::draw() {
 
 		if (!m_score_window.get() && m_instruments.empty() && !m_layout_singer.empty()) {
 			if (status == Song::INSTRUMENTAL_BREAK)  statustxt += _("   ENTER to skip instrumental break");
-			if (status == Song::FINISHED && !config["game/karaoke_mode"].b()) {
+			if (status == Song::FINISHED && !config["game/karaoke_mode"].i()) {
 				if(config["game/autoplay"].b()) {
 					if(m_displayAutoPlay) {
 						statustxt += _("   Autoplay enabled");
@@ -522,7 +526,7 @@ void ScreenSing::draw() {
 		theme->timer.draw(statustxt);
 	}
 
-	if (config["game/karaoke_mode"].b() && !m_song->hasControllers()) { //guitar track? display the score window anyway!
+	if (config["game/karaoke_mode"].i() && !m_song->hasControllers()) { //guitar track? display the score window anyway!
 		if (!m_audio.isPlaying()) {
 			Game* gm = Game::getSingletonPtr();
 			gm->activateScreen("Playlist");
