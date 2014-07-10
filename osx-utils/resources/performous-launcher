@@ -9,9 +9,11 @@ CURRDIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 export PATH="${PATH}:${CURRDIR}"
 # Point to the pango and fontconfig config files inside the bundle, in turn linking to modules and fonts inside the bundle as well.
 export FONTCONFIG_PATH="${CURRDIR}/../Resources/etc/fonts"
-export PANGO_RC_FILE="${CURRDIR}/../Resources/etc/pango/pangorc"
+export PANGO_LIBDIR="${CURRDIR}/../Resources/lib"
+export PANGO_SYSCONFDIR="${CURRDIR}/../Resources/etc"
 # Without this line, pixbuf tries to use the config file from macports
 # environment. Apparently it works just fine without it too.
 export GDK_PIXBUF_MODULE_FILE=""
 # TODO: might be a good idea to turn-off all console output
+cd "${CURRDIR}" # pangorc file uses the current folder as the basis for resolving relative paths to pango.modules
 "${CURRDIR}/performous" # Make sure the executable is actually found.

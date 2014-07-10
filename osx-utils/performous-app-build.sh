@@ -39,7 +39,6 @@ make -j2 install
 
 # then create the rest of the app bundle
 
-mkdir -p "$BINDIR"
 mv "$TEMPDIR/bin" "$BINDIR"
 
 cp ../resources/performous-launcher "$BINDIR"
@@ -62,8 +61,8 @@ cp -av /opt/local/etc/fonts $ETCDIR
 cp -av /opt/local/etc/pango $ETCDIR
 cd $ETCDIR/pango
 
-sed -i '' -e "s|$OLDPREFIX\/etc\/pango\/|\.\/|g" pangorc
-sed -i '' -e "s|$OLDPREFIX|\.\.\/\.\.|g" pango.modules
+sed -i '' -e "s|$OLDPREFIX\/etc\/pango\/|\.\.\/Resources\/etc\/pango\/|g" pangorc
+sed -i '' -e "s|$OLDPREFIX|\.\.\/\.\.\/\.\.\/\.\.|g" pango.modules
 
 cd $ETCDIR/fonts
 sed -i '' -e 's|\/opt\/local/share|\.\.\/\.\.\/\.\.\/Resources|g' fonts.conf
