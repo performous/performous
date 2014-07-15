@@ -222,17 +222,17 @@ void FFmpeg::processVideo(AVFrame* frame) {
 
 void FFmpeg::processAudio(AVFrame* frame) {
 	// resample to output
-		uint8_t *output;
+		int16_t *output;
 		int out_linesize;
 		int out_samples = avresample_available(m_resampleContext) +
 			av_rescale_rnd(avresample_get_delay(m_resampleContext) +
 						frame->nb_samples, frame->sample_rate, m_rate, AV_ROUND_UP);
-		av_samples_alloc(&output, &out_linesize, AUDIO_CHANNELS, out_samples,
+		av_samples_alloc((uint8_t**)&output, &out_linesize, AUDIO_CHANNELS, out_samples,
 					 AV_SAMPLE_FMT_S16, 0);
-		out_samples = avresample_convert(m_resampleContext, &output, 0, out_samples,
+		out_samples = avresample_convert(m_resampleContext, (uint8_t**)&output, 0, out_samples,
 									 &frame->data[0], 0, frame->nb_samples);
 		// The output is now an interleaved array of 16-bit samples
-		std::vector<int16_t> m_output(reinterpret_cast<int16_t*>(&output[0]),reinterpret_cast<int16_t*>(&output[(out_samples*AUDIO_CHANNELS)]));
+		std::vector<int16_t> m_output(output, output+out_samples*AUDIO_CHANNELS);
 		audioQueue.push(m_output,m_position);
 		av_freep(&output);
 		m_position += double(out_samples)/m_rate;

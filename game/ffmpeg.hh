@@ -149,7 +149,7 @@ class AudioBuffer {
 	bool condition() { return m_quit || wantMore() || wantSeek(); }
 	mutable mutex m_mutex;
 	boost::condition m_cond;
-	boost::circular_buffer<uint8_t> m_data;
+	boost::circular_buffer<int16_t> m_data;
 	size_t m_pos;
 	int64_t m_posReq;
 	unsigned m_sps;
