@@ -27,7 +27,7 @@ if(AVCodec_INCLUDE_DIR)
   foreach(suffix libavcodec/ ffmpeg/ "")
     if(NOT AVCodec_INCLUDE)
       if(EXISTS "${AVCodec_INCLUDE_DIR}/${suffix}avcodec.h")
-        set(AVCodec_INCLUDE "${suffix}avcodec.h")
+        set(AVCodec_INCLUDE "${suffix}avcodec.h" CACHE INTERNAL "")
       endif(EXISTS "${AVCodec_INCLUDE_DIR}/${suffix}avcodec.h")
     endif(NOT AVCodec_INCLUDE)
   endforeach(suffix)
@@ -42,7 +42,5 @@ find_library(AVCodec_LIBRARY
   PATHS ${AVCodec_PKGCONF_LIBRARY_DIRS}
 )
 
-set(AVCodec_PROCESS_INCLUDES AVCodec_INCLUDE_DIR AVUtil_INCLUDE_DIRS)
-set(AVCodec_PROCESS_LIBS AVCodec_LIBRARY AVUtil_LIBRARIES)
 libfind_process(AVCodec)
 

@@ -3,6 +3,7 @@
 #include "theme.hh"
 #include "opengl_text.hh"
 #include "notegraph.hh"
+#include "configuration.hh"
 
 #include <deque>
 
@@ -35,8 +36,16 @@ class LyricRow {
 		std::vector<TZoomText> sentence;
 		for (Iterator it = m_begin; it != m_end; ++it) {
 			sentence.push_back(TZoomText(it->syllable));
+			if(!config["game/Textstyle"].i()) {
 			bool current = (time >= it->begin && time < it->end);
-			sentence.back().factor = current ? 1.2 - 0.2 * (time - it->begin) / (it->end - it->begin) : 1.0;
+			sentence.back().factor = current ? 1.2 - 0.2 * (time - it->begin) / (it->end - it->begin) : 1.0; ///what the hell is the logic behind this?
+			} else {
+			bool current = time >=it->begin;
+				if(current)
+				sentence.back().factor = 1.1;
+				else
+				sentence.back().factor = 1.0;
+			}
 		}
 		ColorTrans c(Color::alpha(fade.get()));
 		txt.dimensions = dim;

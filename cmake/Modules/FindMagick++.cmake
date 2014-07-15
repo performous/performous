@@ -25,9 +25,6 @@ find_library(Magick++_LIBRARY
   PATHS ${Magick++_PKGCONF_LIBRARY_DIRS}
 )
 
-# Set the include dir variables and the libraries and let libfind_process do the rest.
-# NOTE: Singular variables for this library, plural for libraries this this lib depends on.
-set(Magick++_PROCESS_INCLUDES Magick++_INCLUDE_DIR Magick_INCLUDE_DIRS)
-set(Magick++_PROCESS_LIBS Magick++_LIBRARY Magick_LIBRARIES)
-libfind_process(Magick++)
+# Process Magick++, depends on Magick
+libfind_process(Magick++ Magick)
 

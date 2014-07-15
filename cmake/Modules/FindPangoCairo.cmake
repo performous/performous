@@ -29,7 +29,7 @@ find_library(PangoCairo_LIBRARY
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.
 # NOTE: Singular variables for this library, plural for libraries this this lib depends on.
-set(PangoCairo_PROCESS_INCLUDES PangoCairo_INCLUDE_DIR Pango_INCLUDE_DIRS Cairo_INCLUDE_DIRS)
-set(PangoCairo_PROCESS_LIBS PangoCairo_LIBRARY Pango_LIBRARIES Cairo_LIBRARIES)
+set(PangoCairo_PROCESS_INCLUDES PangoCairo_INCLUDE_DIR Pango_INCLUDE_DIR Cairo_INCLUDE_DIR)
+set(PangoCairo_PROCESS_LIBS PangoCairo_LIBRARY Pango_LIBRARY Cairo_LIBRARY)
 libfind_process(PangoCairo)
 

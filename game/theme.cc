@@ -30,7 +30,8 @@ ThemeSing::ThemeSing():
 	bg_bottom(findFile("sing_bg_bottom.svg")),
 	lyrics_now(findFile("sing_lyricscurrent.svg"), config["graphic/text_lod"].f()),
 	lyrics_next(findFile("sing_lyricsnext.svg"), config["graphic/text_lod"].f()),
-	timer(findFile("sing_timetxt.svg"), config["graphic/text_lod"].f())
+	timer(findFile("sing_timetxt.svg"), config["graphic/text_lod"].f()),
+	songinfo(findFile("sing-songinfo.svg"), config["graphic/text_lod"].f())
 {
 	lyrics_now.setHighlight(findFile("sing_lyricshighlight.svg"));
 }

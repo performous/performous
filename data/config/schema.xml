@@ -39,14 +39,22 @@ to save the current settings to XML.
 	</menu>
 
 	<!-- Gameplay preferences -->
-	<entry name="game/karaoke_mode" type="bool" value="false">
+	<entry name="game/karaoke_mode" type="int" value="0">
+		<limits>
+			<enum>Off</enum>
+			<enum>On - normal text</enum>
+			<enum>On - centered text</enum>
+		</limits>
 		<short>Karaoke mode</short>
 		<long>Hide pitch wave, notes and scoring.</long>
 	</entry>
-	<!-- TODO: merge with karaoke-mode  -->
-	<entry name="game/karaoke_centered_lyrics" type="bool" value="false">
-		<short>Karaoke mode centered text</short>
-		<long>Place the text in center of the screen during karaoke-mode.</long>
+	<entry name="game/Textstyle" type="int" value="0">
+		<limits>
+			<enum>Western mode</enum>
+			<enum>Asian mode</enum>
+		</limits>
+		<short>Lyric highlight style</short>
+		<long>Hide pitch wave, notes and scoring.</long>
 	</entry>
 	<entry name="game/autoplay" type="bool" value="false">
 		<short>Autoplay</short>
