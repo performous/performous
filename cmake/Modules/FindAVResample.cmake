@@ -41,6 +41,4 @@ find_library(AVResample_LIBRARY
   PATHS ${AVResample_PKGCONF_LIBRARY_DIRS}
 )
 
-set(AVResample_PROCESS_INCLUDES AVResample_INCLUDE_DIR AVUtil_INCLUDE_DIRS)
-set(AVResample_PROCESS_LIBS AVResample_LIBRARY AVUtil_LIBRARIES)
 libfind_process(AVResample)
