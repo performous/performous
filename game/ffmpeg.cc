@@ -235,6 +235,6 @@ void FFmpeg::processAudio(AVFrame* frame) {
 		std::vector<int16_t> m_output(&output[0],&output[(out_samples*AUDIO_CHANNELS)-1]);
 		audioQueue.push(m_output,m_position);
 		av_freep(&output);
-		m_position += double(frame->nb_samples)/m_formatContext->streams[m_streamId]->codec->sample_rate;
+		m_position += double(out_samples)/m_rate;
 }
 
