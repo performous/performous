@@ -12,17 +12,17 @@ extern "C" {
 #include AVCODEC_INCLUDE
 #include AVFORMAT_INCLUDE
 #include SWSCALE_INCLUDE
+#include AVRESAMPLE_INCLUDE
+#include AVUTIL_INCLUDE
+#include AVUTIL_OPT_INCLUDE
+#include AVUTIL_MATH_INCLUDE
 }
 
 #if (LIBAVCODEC_VERSION_INT) < (AV_VERSION_INT(52,94,3))
 #	define AV_SAMPLE_FMT_S16 SAMPLE_FMT_S16
 #endif
-#if defined(_WIN32)
-#define AVCODEC_MAX_AUDIO_FRAME_SIZE 192000 // 1 second of 48khz 32bit audio
-#endif
 
 #define AUDIO_CHANNELS 2
-#define MAX_AUDIO_FRAME_SIZE 192000
 
 /*static*/ boost::mutex FFmpeg::s_avcodec_mutex;
 
@@ -58,6 +58,7 @@ FFmpeg::FFmpeg(fs::path const& _filename, unsigned int rate):
 			  " avutil:" + ffversion(LIBAVUTIL_VERSION_INT) +
 			  " avcodec:" + ffversion(LIBAVCODEC_VERSION_INT) +
 			  " avformat:" + ffversion(LIBAVFORMAT_VERSION_INT) +
+			  " avresample:" + ffversion(LIBAVRESAMPLE_VERSION_INT) +
 			  " swscale:" + ffversion(LIBSWSCALE_VERSION_INT)
 			  << std::endl;
 		} else {
@@ -65,6 +66,7 @@ FFmpeg::FFmpeg(fs::path const& _filename, unsigned int rate):
 			  " avutil:" + ffversion(LIBAVUTIL_VERSION_INT) + "/" + ffversion(avutil_version()) +
 			  " avcodec:" + ffversion(LIBAVCODEC_VERSION_INT) + "/" + ffversion(avcodec_version()) +
 			  " avformat:" + ffversion(LIBAVFORMAT_VERSION_INT) + "/" + ffversion(avformat_version()) +
+			  " avresample:" + ffversion(LIBAVRESAMPLE_VERSION_INT) + "/" + ffversion(avresample_version()) +
 			  " swscale:" + ffversion(LIBSWSCALE_VERSION_INT) + "/" + ffversion(swscale_version())
 			  << std::endl;
 		}
@@ -97,7 +99,14 @@ void FFmpeg::open() {
 
 	switch (m_mediaType) {
 	case AVMEDIA_TYPE_AUDIO:
-		m_resampleContext = av_audio_resample_init(AUDIO_CHANNELS, cc->channels, m_rate, cc->sample_rate, AV_SAMPLE_FMT_S16, AV_SAMPLE_FMT_S16, 16, 10, 0, 0.8);
+		m_resampleContext = avresample_alloc_context();
+		av_opt_set_int(m_resampleContext, "in_channel_layout", m_codecContext->channel_layout ? m_codecContext->channel_layout : av_get_default_channel_layout(m_codecContext->channels), 0);
+		av_opt_set_int(m_resampleContext, "out_channel_layout", av_get_default_channel_layout(AUDIO_CHANNELS), 0);
+		av_opt_set_int(m_resampleContext, "in_sample_rate", m_codecContext->sample_rate, 0);
+		av_opt_set_int(m_resampleContext, "out_sample_rate", m_rate, 0);
+		av_opt_set_int(m_resampleContext, "in_sample_fmt", m_codecContext->sample_fmt, 0);
+		av_opt_set_int(m_resampleContext, "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
+		avresample_open(m_resampleContext);
 		if (!m_resampleContext) throw std::runtime_error("Cannot create resampling context");
 		audioQueue.setSamplesPerSecond(AUDIO_CHANNELS * m_rate);
 		break;
@@ -138,7 +147,7 @@ void FFmpeg::operator()() {
 	videoQueue.reset();
 	// TODO: use RAII for freeing resources (to prevent memory leaks)
 	boost::mutex::scoped_lock l(s_avcodec_mutex); // avcodec_close is not thread-safe
-	if (m_resampleContext) audio_resample_close(m_resampleContext);
+	if (m_resampleContext) avresample_close(m_resampleContext);
 	if (m_codecContext) avcodec_close(m_codecContext);
 #if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53, 17, 0)
 	if (m_formatContext) avformat_close_input(&m_formatContext);
@@ -212,28 +221,20 @@ void FFmpeg::processVideo(AVFrame* frame) {
 }
 
 void FFmpeg::processAudio(AVFrame* frame) {
-	void* data = frame->data[0];
-	// New FFmpeg versions use non-interleaved audio decoding and samples may be in float format.
-	// Do a conversion here, allowing us to use the old (deprecated) avcodec audio_resample().
-	std::vector<int16_t> input;
-	unsigned inFrames = frame->nb_samples;
-	unsigned channels = m_codecContext->channels;
-	input.reserve(channels * inFrames);
-	for (unsigned i = 0; i < inFrames; ++i) {
-		for (unsigned ch = 0; ch < channels; ++ch) {
-			data = frame->data[ch];
-			input.push_back(m_codecContext->sample_fmt == AV_SAMPLE_FMT_FLTP ?
-			  da::conv_to_s16(reinterpret_cast<float*>(data)[i]) :
-			  reinterpret_cast<int16_t*>(data)[i]
-			);
-		}
-	}
-	data = &input[0];
-	// Resample to output sample rate, then push to audio queue and increment timecode
-	std::vector<int16_t> resampled(MAX_AUDIO_FRAME_SIZE);
-	int frames = audio_resample(m_resampleContext, &resampled[0], reinterpret_cast<short*>(data), inFrames);
-	resampled.resize(frames * AUDIO_CHANNELS);
-	audioQueue.push(resampled, m_position);  // May block
-	m_position += double(frames)/m_formatContext->streams[m_streamId]->codec->sample_rate;
+	// resample to output
+		int16_t *output;
+		int out_linesize;
+		int out_samples = avresample_available(m_resampleContext) +
+			av_rescale_rnd(avresample_get_delay(m_resampleContext) +
+						frame->nb_samples, frame->sample_rate, m_rate, AV_ROUND_UP);
+		av_samples_alloc((uint8_t**)&output, &out_linesize, AUDIO_CHANNELS, out_samples,
+					 AV_SAMPLE_FMT_S16, 0);
+		out_samples = avresample_convert(m_resampleContext, (uint8_t**)&output, 0, out_samples,
+									 &frame->data[0], 0, frame->nb_samples);
+		// The output is now an interleaved array of 16-bit samples
+		std::vector<int16_t> m_output(output, output+out_samples*AUDIO_CHANNELS);
+		audioQueue.push(m_output,m_position);
+		av_freep(&output);
+		m_position += double(out_samples)/m_rate;
 }
 

@@ -94,21 +94,21 @@ class AudioBuffer {
 	/// get samples per second
 	unsigned getSamplesPerSecond() const { return m_sps; }
 	void push(std::vector<int16_t> const& data, double timestamp) {
-		mutex::scoped_lock l(m_mutex);
-		while (!condition()) m_cond.wait(l);
-		if (m_quit) return;
-		if (timestamp < 0.0) {
-			std::clog << "ffmpeg/warning: Negative audio timestamp " << timestamp << " seconds, frame ignored." << std::endl;
-			return;
+			mutex::scoped_lock l(m_mutex);
+			while (!condition()) m_cond.wait(l);
+			if (m_quit) return;
+			if (timestamp < 0.0) {
+				std::clog << "ffmpeg/warning: Negative audio timestamp " << timestamp << " seconds, frame ignored." << std::endl;
+				return;
+			}
+			// Insert silence at the beginning if the stream starts later than 0.0
+			if (m_pos == 0 && timestamp > 0.0) {
+				m_pos = timestamp * m_sps;
+				m_data.resize(m_pos, 0);
+			}
+			m_data.insert(m_data.end(), data.begin(), data.end());
+			m_pos += data.size();
 		}
-		// Insert silence at the beginning if the stream starts later than 0.0
-		if (m_pos == 0 && timestamp > 0.0) {
-			m_pos = timestamp * m_sps;
-			m_data.resize(m_pos, 0);
-		}
-		m_data.insert(m_data.end(), data.begin(), data.end());
-		m_pos += data.size();
-	}
 	bool prepare(int64_t pos) {
 		mutex::scoped_try_lock l(m_mutex);
 		if (!l.owns_lock()) return false;  // Didn't get lock, give up for now
@@ -162,7 +162,7 @@ extern "C" {
   struct AVCodecContext;
   struct AVFormatContext;
   struct AVFrame;
-  struct ReSampleContext;
+  struct AVAudioResampleContext;
   struct SwsContext;
 }
 
@@ -203,7 +203,7 @@ class FFmpeg {
 	int m_mediaType;  // enum AVMediaType
 	AVFormatContext* m_formatContext;
 	AVCodecContext* m_codecContext;
-	ReSampleContext* m_resampleContext;
+	AVAudioResampleContext* m_resampleContext;
 	SwsContext* m_swsContext;
 	// Make sure the thread starts only after initializing everything else
 	boost::scoped_ptr<boost::thread> m_thread;
