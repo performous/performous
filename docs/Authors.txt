@@ -19,6 +19,7 @@ Niek Nooijens <https://github.com/nieknooijens>
 	* Webserver support
 	* SDL2.0 Port
 	* Some minor usability improvements
+	* libavresample port with help from Tobix and Elenril (libav-irc channel)
 
 
 INACTIVE DEVELOPERS
