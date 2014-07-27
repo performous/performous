@@ -526,7 +526,7 @@ void ScreenSing::draw() {
 					} else {
 					statustxt += _("   Remember to wait for grading!");
 				}
-			} else if(status == Song::FINISHED) {
+			} else if(status == Song::FINISHED && config["game/autoplay"].b()) {
 				statustxt += _("   Autoplay enabled");
 			}
 		}
