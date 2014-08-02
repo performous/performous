@@ -20,6 +20,7 @@ Niek Nooijens <https://github.com/nieknooijens>
 	* Mobile page design.
 	* SDL2.0 Port
 	* Some minor usability improvements
+	* libavresample port with help from Tobix and Elenril (libav-irc channel)
 
 
 INACTIVE DEVELOPERS

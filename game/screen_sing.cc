@@ -237,11 +237,15 @@ void ScreenSing::activateNextScreen()
 	}
 
 	// Score window visible -> Enter quits to Players Screen
-	Screen* s = gm->getScreen("Players");
-	ScreenPlayers* ss = dynamic_cast<ScreenPlayers*> (s);
-	assert(ss);
-	ss->setSong(m_song);
-	gm->activateScreen("Players");
+	if(!config["game/karaoke_mode"].i() && !m_song->hasDance() &&!m_song->hasDrums() &&!m_song->hasGuitars()) {
+		Screen* s = gm->getScreen("Players");
+		ScreenPlayers* ss = dynamic_cast<ScreenPlayers*> (s);
+		assert(ss);
+		ss->setSong(m_song);
+		gm->activateScreen("Players");
+	} else {
+		gm->activateScreen("Playlist");
+	}
 }
 
 void ScreenSing::manageEvent(input::NavEvent const& event) {
@@ -352,6 +356,10 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			else ++config["game/karaoke_mode"];
 			dispInFlash(config["game/karaoke_mode"]);
 		}
+		if (key == SDLK_h) {
+			config["game/Textstyle"].i() ?  config["game/Textstyle"].i() = 0 : ++config["game/Textstyle"];
+			dispInFlash(config["game/Textstyle"]);
+			}
 		if (key == SDLK_w) dispInFlash(++config["game/pitch"]); // Toggle pitch wave
 		// Toggle webcam
 		if (key == SDLK_a && Webcam::enabled()) {
@@ -518,7 +526,7 @@ void ScreenSing::draw() {
 					} else {
 					statustxt += _("   Remember to wait for grading!");
 				}
-			} else if(status == Song::FINISHED) {
+			} else if(status == Song::FINISHED && config["game/autoplay"].b()) {
 				statustxt += _("   Autoplay enabled");
 			}
 		}

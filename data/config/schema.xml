@@ -216,15 +216,15 @@ to save the current settings to XML.
 		<short>Webcam id</short>
 		<long>Use -1 to autodetect or a number starting from 0 to choose specific device.</long>
 	</entry>
-	<entry name="graphic/svg_lod" type="float" value="1.0">
+	<entry name="graphic/svg_lod" type="float" value="1.5">
 		<ui unit="x" />
-		<limits min="0.5" max="3.0" step="0.1" />
+		<limits min="0.5" max="6.0" step="0.1" />
 		<short>SVG quality</short>
 		<long>Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster.</long>
 	</entry>
-	<entry name="graphic/text_lod" type="float" value="1.0">
+	<entry name="graphic/text_lod" type="float" value="1.5">
 		<ui unit="x" />
-		<limits min="0.5" max="3.0" step="0.1" />
+		<limits min="0.5" max="6.0" step="0.1" />
 		<short>Text quality</short>
 		<long>Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster.</long>
 	</entry>
