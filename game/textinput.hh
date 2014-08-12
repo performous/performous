@@ -11,13 +11,13 @@ struct TextInput {
 		unsigned int ucs = key.sym;  //SDL2.0 uses unicode all the time, so replace with keycode
 									/* Scancodes are meant to be layout-independent. Think of this as "the user pressed the Q key as it would be on a US QWERTY keyboard" regardless of whether this is actually a European keyboard or a Dvorak keyboard or whatever. The scancode is always the same key position.
 									Keycodes are meant to be layout-dependent. Think of this as "the user pressed the key that is labelled 'Q' on his specific keyboard." */
-		if (ucs == SDLK_LEFT) return false;
-		if (ucs == SDLK_RIGHT) return false;
-		if (ucs == SDLK_UP) return false;
-		if (ucs == SDLK_DOWN) return false;
-		if (ucs == SDLK_BACKSPACE && !text.empty()) backspace();
-		else if(ucs!= SDLK_LALT && ucs!= SDLK_LCTRL && ucs!= SDLK_LSHIFT && ucs!= SDLK_RALT && ucs!= SDLK_RCTRL && ucs!= SDLK_END && ucs!= SDLK_HOME &&
-			ucs!= SDLK_RSHIFT && ucs !=SDLK_PAGEDOWN && ucs!= SDLK_PAGEUP && ucs!= SDLK_RETURN && ucs!= SDLK_RETURN2 && ucs!= SDLK_ESCAPE && ucs != SDLK_BACKSPACE)
+		if (ucs == SDL_SCANCODE_LEFT) return false;
+		if (ucs == SDL_SCANCODE_RIGHT) return false;
+		if (ucs == SDL_SCANCODE_UP) return false;
+		if (ucs == SDL_SCANCODE_DOWN) return false;
+		if (ucs == SDL_SCANCODE_BACKSPACE && !text.empty()) backspace();
+		else if(ucs!= SDL_SCANCODE_LALT && ucs!= SDL_SCANCODE_LCTRL && ucs!= SDL_SCANCODE_LSHIFT && ucs!= SDL_SCANCODE_RALT && ucs!= SDL_SCANCODE_RCTRL && ucs!= SDL_SCANCODE_END && ucs!= SDL_SCANCODE_HOME &&
+			ucs!= SDL_SCANCODE_RSHIFT && ucs !=SDL_SCANCODE_PAGEDOWN && ucs!= SDL_SCANCODE_PAGEUP && ucs!= SDL_SCANCODE_RETURN && ucs!= SDL_SCANCODE_RETURN2 && ucs!= SDL_SCANCODE_ESCAPE && ucs != SDL_SCANCODE_BACKSPACE)
 		*this += ucs; //I know this is less accurate, but better readable. the old one required you to hold ctrl or shift otherwise textinput didnt work.
 		else return false;
 		return true;

@@ -346,39 +346,39 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 void ScreenSing::manageEvent(SDL_Event event) {
 	keyPressed = true;
 	double time = m_audio.getPosition();
-	int key = event.key.keysym.sym;
+	int key = event.key.keysym.scancode;
 	// Ctrl combinations that can be used while performing (not when score dialog is displayed)
 	if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_CTRL) && !m_score_window.get()) {
-		if (key == SDLK_s) m_audio.toggleSynth(m_song->getVocalTrack(m_selectedTrack).notes);
-		if (key == SDLK_v) m_audio.streamFade("vocals", event.key.keysym.mod & KMOD_SHIFT ? 1.0 : 0.0);
-		if (key == SDLK_k)  { // Toggle karaoke mode
+		if (key == SDL_SCANCODE_S) m_audio.toggleSynth(m_song->getVocalTrack(m_selectedTrack).notes);
+		if (key == SDL_SCANCODE_V) m_audio.streamFade("vocals", event.key.keysym.mod & KMOD_SHIFT ? 1.0 : 0.0);
+		if (key == SDL_SCANCODE_W)  { // Toggle karaoke mode
 			if(config["game/karaoke_mode"].i() >=2) config["game/karaoke_mode"].i() = 0;
 			else ++config["game/karaoke_mode"];
 			dispInFlash(config["game/karaoke_mode"]);
 		}
-		if (key == SDLK_h) {
+		if (key == SDL_SCANCODE_H) {
 			config["game/Textstyle"].i() ?  config["game/Textstyle"].i() = 0 : ++config["game/Textstyle"];
 			dispInFlash(config["game/Textstyle"]);
 			}
-		if (key == SDLK_w) dispInFlash(++config["game/pitch"]); // Toggle pitch wave
+		if (key == SDL_SCANCODE_W) dispInFlash(++config["game/pitch"]); // Toggle pitch wave
 		// Toggle webcam
-		if (key == SDLK_a && Webcam::enabled()) {
+		if (key == SDL_SCANCODE_A && Webcam::enabled()) {
 			// Initialize if we haven't done that already
 			if (!m_cam) { try { m_cam.reset(new Webcam(config["graphic/webcamid"].i())); } catch (...) { }; }
 			if (m_cam) { dispInFlash(++config["graphic/webcam"]); m_cam->pause(!config["graphic/webcam"].b()); }
 		}
 		// Latency settings
-		if (key == SDLK_F1) dispInFlash(--config["audio/video_delay"]);
-		if (key == SDLK_F2) dispInFlash(++config["audio/video_delay"]);
-		if (key == SDLK_F3) dispInFlash(--config["audio/round-trip"]);
-		if (key == SDLK_F4) dispInFlash(++config["audio/round-trip"]);
-		if (key == SDLK_F5) dispInFlash(--config["audio/controller_delay"]);
-		if (key == SDLK_F6) dispInFlash(++config["audio/controller_delay"]);
+		if (key == SDL_SCANCODE_F1) dispInFlash(--config["audio/video_delay"]);
+		if (key == SDL_SCANCODE_F2) dispInFlash(++config["audio/video_delay"]);
+		if (key == SDL_SCANCODE_F3) dispInFlash(--config["audio/round-trip"]);
+		if (key == SDL_SCANCODE_F4) dispInFlash(++config["audio/round-trip"]);
+		if (key == SDL_SCANCODE_F5) dispInFlash(--config["audio/controller_delay"]);
+		if (key == SDL_SCANCODE_F6) dispInFlash(++config["audio/controller_delay"]);
 		bool seekback = false;
 
 		if (m_song->danceTracks.empty()) { // Seeking backwards is currently not permitted for dance songs
-			if (key == SDLK_HOME) { m_audio.seekPos(0.0); seekback = true; }
-			if (key == SDLK_LEFT) {
+			if (key == SDL_SCANCODE_HOME) { m_audio.seekPos(0.0); seekback = true; }
+			if (key == SDL_SCANCODE_LEFT) {
 				Song::SongSection section("error", 0);
 				if (m_song->getPrevSection(m_audio.getPosition(), section)) {
 					m_audio.seekPos(section.begin);
@@ -388,7 +388,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 				seekback = true;
 			}
 		}
-		if (key == SDLK_RIGHT) {
+		if (key == SDL_SCANCODE_RIGHT) {
 			Song::SongSection section("error", 0);
 			if (m_song->getNextSection(m_audio.getPosition(), section)) {
 				m_audio.seekPos(section.begin);
@@ -402,7 +402,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			for (unsigned i = 0; i < m_layout_singer.size(); ++i)
 				m_layout_singer[i].reset();
 		// Reload current song
-		if (key == SDLK_r) {
+		if (key == SDL_SCANCODE_R) {
 			exit(); m_song->reload(); enter();
 			m_audio.seek(time);
 		}
