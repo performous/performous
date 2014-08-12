@@ -59,11 +59,11 @@ void ScreenIntro::manageEvent(input::NavEvent const& event) {
 void ScreenIntro::manageEvent(SDL_Event event) {
 	if (event.type == SDL_KEYDOWN && m_menu.getSubmenuLevel() > 0) {
 		// These are only available in config menu
-		int key = event.key.keysym.sym;
+		int key = event.key.keysym.scancode;
 		uint16_t modifier = event.key.keysym.mod;
-		if (key == SDLK_r && modifier & KMOD_CTRL && m_menu.current().value) {
+		if (key == SDL_SCANCODE_R && modifier & KMOD_CTRL && m_menu.current().value) {
 			m_menu.current().value->reset(modifier & KMOD_ALT);
-		} else if (key == SDLK_s && modifier & KMOD_CTRL) {
+		} else if (key == SDL_SCANCODE_S && modifier & KMOD_CTRL) {
 			writeConfig(modifier & KMOD_ALT);
 			Game::getSingletonPtr()->flashMessage((modifier & KMOD_ALT)
 				? _("Settings saved as system defaults.") : _("Settings saved."));

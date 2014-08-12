@@ -82,17 +82,17 @@ static void checkEvents(Game& gm) {
 			gm.finished();
 			break;
 		  case SDL_KEYDOWN:
-			int keypressed  = event.key.keysym.sym;
+			int keypressed  = event.key.keysym.scancode;
 			uint16_t modifier = event.key.keysym.mod;
-			if (((keypressed == SDLK_RETURN || keypressed == SDLK_KP_ENTER) && modifier & KMOD_ALT) || keypressed == SDLK_F11) {
+			if (((keypressed == SDL_SCANCODE_RETURN || keypressed == SDL_SCANCODE_KP_ENTER) && modifier & KMOD_ALT) || keypressed == SDL_SCANCODE_F11) {
 				config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].b();
 				continue; // Already handled here...
 			}
-			if (keypressed == SDLK_PRINTSCREEN || (keypressed == SDLK_F12 && (modifier & KMOD_CTRL))) {
+			if (keypressed == SDL_SCANCODE_PRINTSCREEN || (keypressed == SDL_SCANCODE_F12 && (modifier & KMOD_CTRL))) {
 				g_take_screenshot = true;
 				continue; // Already handled here...
 			}
-			if (keypressed == SDLK_F4 && modifier & KMOD_ALT) {
+			if (keypressed == SDL_SCANCODE_F4 && modifier & KMOD_ALT) {
 				gm.finished();
 				continue; // Already handled here...
 			}
@@ -244,10 +244,10 @@ void jstestLoop() {
 		while (true) {
 			SDL_Event e;
 			while(SDL_PollEvent(&e) == 1) {
-				if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE)) {
+				if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE)) {
 					return;
 				} else if (e.type == SDL_KEYDOWN) {
-					std::cout << "Keyboard key: " << int(e.key.keysym.sym) << ", mod: " << int(e.key.keysym.mod) << std::endl;
+					std::cout << "Keyboard key: " << int(e.key.keysym.scancode) << ", mod: " << int(e.key.keysym.mod) << std::endl;
 				} else if (e.type == SDL_JOYBUTTONDOWN) {
 					std::cout << "JoyID: " << int(e.jbutton.which) << ", button: " << int(e.jbutton.button) << ", state: " << int(e.jbutton.state) << std::endl;
 				} else if (e.type == SDL_JOYAXISMOTION) {

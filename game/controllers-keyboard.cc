@@ -50,7 +50,7 @@ namespace input {
 			// Map to keyboard instruments (sets event.button if matching)
 			if (!mod) mapping(event);
 			// Map to menu navigation
-			if (event.button == GENERIC_UNASSIGNED) event.button = navigation(event.hw, mod);
+			if (event.button == GENERIC_UNASSIGNED) event.button = navigation(sdlEv.key.keysym.scancode, mod);
 			return event.button != GENERIC_UNASSIGNED;
 		}
 		void mapping(Event& event) {
@@ -116,20 +116,20 @@ namespace input {
 		}
 		Button navigation(unsigned k, unsigned mod) {
 			if (!mod) {
-				if (k == SDLK_UP) return GENERIC_UP;
-				if (k == SDLK_DOWN) return GENERIC_DOWN;
-				if (k == SDLK_LEFT) return GENERIC_LEFT;
-				if (k == SDLK_RIGHT) return GENERIC_RIGHT;
-				if (k == SDLK_RETURN || k == SDLK_KP_ENTER) return GENERIC_START;
-				if (k == SDLK_ESCAPE) return GENERIC_CANCEL;
-				if (k == SDLK_PAGEUP) return GENERIC_MOREUP;
-				if (k == SDLK_PAGEDOWN) return GENERIC_MOREDOWN;
-				if (k == SDLK_PAUSE) return GENERIC_PAUSE;
+				if (k == SDL_SCANCODE_UP) return GENERIC_UP;
+				if (k == SDL_SCANCODE_DOWN) return GENERIC_DOWN;
+				if (k == SDL_SCANCODE_LEFT) return GENERIC_LEFT;
+				if (k == SDL_SCANCODE_RIGHT) return GENERIC_RIGHT;
+				if (k == SDL_SCANCODE_RETURN || k == SDL_SCANCODE_KP_ENTER) return GENERIC_START;
+				if (k == SDL_SCANCODE_ESCAPE) return GENERIC_CANCEL;
+				if (k == SDL_SCANCODE_PAGEUP) return GENERIC_MOREUP;
+				if (k == SDL_SCANCODE_PAGEDOWN) return GENERIC_MOREDOWN;
+				if (k == SDL_SCANCODE_PAUSE) return GENERIC_PAUSE;
 			}
 			else if (mod == KMOD_LCTRL) {
-				if (k == SDLK_UP) return GENERIC_VOLUME_UP;
-				if (k == SDLK_DOWN) return GENERIC_VOLUME_DOWN;
-				if (k == SDLK_p) return GENERIC_PAUSE;
+				if (k == SDL_SCANCODE_UP) return GENERIC_VOLUME_UP;
+				if (k == SDL_SCANCODE_DOWN) return GENERIC_VOLUME_DOWN;
+				if (k == SDL_SCANCODE_P) return GENERIC_PAUSE;
 			}
 			return GENERIC_UNASSIGNED;
 		}

@@ -93,7 +93,7 @@ void ScreenPlayers::manageEvent(SDL_Event event) {
 		//SDLMod mod = event.key.keysym.mod;
 
 		//TODO: reload -- needs database reload
-		// if (key == SDLK_r && mod & KMOD_CTRL) { m_players.reload(); m_players.setFilter(m_search.text); }
+		// if (key == SDL_SCANCODE_r && mod & KMOD_CTRL) { m_players.reload(); m_players.setFilter(m_search.text); }
 		if (m_search.process(keysym)) m_players.setFilter(m_search.text);
 	}
 }

@@ -146,24 +146,24 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 	}
 	else if (event.type == SDL_KEYDOWN) {
 		SDL_Keysym keysym = event.key.keysym;
-		int key = keysym.sym;
+		int key = keysym.scancode;
 		uint16_t mod = event.key.keysym.mod;
-		if (key == SDLK_F4) m_jukebox = !m_jukebox;
-		else if (key == SDLK_BACKSPACE) {
+		if (key == SDL_SCANCODE_F4) m_jukebox = !m_jukebox;
+		else if (key == SDL_SCANCODE_BACKSPACE) {
 			m_search.backspace();
 			m_songs.setFilter(m_search.text);
 		}
 		else if (!m_jukebox) {
-			if (key == SDLK_r && mod & KMOD_CTRL) {
+			if (key == SDL_SCANCODE_R && mod & KMOD_CTRL) {
 				m_songs.reload();
 				m_songs.setFilter(m_search.text);
 				}
 			// Shortcut keys for accessing different type filter modes
-			if (key == SDLK_TAB) m_songs.sortChange(1);
-			if (key == SDLK_F5) m_songs.typeCycle(2);
-			if (key == SDLK_F6) m_songs.typeCycle(3);
-			if (key == SDLK_F7) m_songs.typeCycle(4);
-			if (key == SDLK_F8) m_songs.typeCycle(1);
+			if (key == SDL_SCANCODE_TAB) m_songs.sortChange(1);
+			if (key == SDL_SCANCODE_F5) m_songs.typeCycle(2);
+			if (key == SDL_SCANCODE_F6) m_songs.typeCycle(3);
+			if (key == SDL_SCANCODE_F7) m_songs.typeCycle(4);
+			if (key == SDL_SCANCODE_F8) m_songs.typeCycle(1);
 		}
 	}
 	if (m_songs.empty()) m_jukebox = false;
