@@ -120,7 +120,7 @@ namespace input {
 				if (k == SDL_SCANCODE_DOWN) return GENERIC_DOWN;
 				if (k == SDL_SCANCODE_LEFT) return GENERIC_LEFT;
 				if (k == SDL_SCANCODE_RIGHT) return GENERIC_RIGHT;
-				if (k == SDL_SCANCODE_RETURN || k == SDLK_KP_ENTER) return GENERIC_START;
+				if (k == SDL_SCANCODE_RETURN || k == SDL_SCANCODE_KP_ENTER) return GENERIC_START;
 				if (k == SDL_SCANCODE_ESCAPE) return GENERIC_CANCEL;
 				if (k == SDL_SCANCODE_PAGEUP) return GENERIC_MOREUP;
 				if (k == SDL_SCANCODE_PAGEDOWN) return GENERIC_MOREDOWN;
