@@ -74,15 +74,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 		SDL_SetWindowIcon(screen,icon);
 		SDL_FreeSurface(icon);
 	}
-	// SDL_SetVideoMode not called yet => get the desktop resolution for fs mode
-	SDL_DisplayMode current;
-	for(int i = 0; i < SDL_GetNumVideoDisplays(); ++i){
-		int should_be_zero = SDL_GetCurrentDisplayMode(i, &current);
-		if(should_be_zero != 0) throw std::runtime_error("Could not get display mode for video display");
-	}
-	std::clog << "video/info: Current display resolution is: " << current.w << "x" << current.h << std::endl;
-	m_fsW = current.w;
-	m_fsH = current.h;
+
 	{ // Setup GL attributes for context creation
 		GLattrSetter attr_r(SDL_GL_RED_SIZE, 8);
 		GLattrSetter attr_g(SDL_GL_GREEN_SIZE, 8);
@@ -333,12 +325,10 @@ void Window::setFullscreen(bool _fs) {
 }
 
 void Window::resize() {
-	unsigned width = m_fullscreen ? m_fsW : m_windowW;
-	unsigned height = m_fullscreen ? m_fsH : m_windowH;
-	glViewport(0,0,width,height);
 	int windowWidth;
 	int windowHeight;
 	SDL_GetWindowSize(screen, &windowWidth, &windowHeight);
+	glViewport(0,0,windowWidth,windowHeight);
 	s_width = windowWidth;
 	s_height = windowHeight;
 	// Enforce aspect ratio limits
@@ -348,8 +338,11 @@ void Window::resize() {
 
 void Window::screenshot() {
 	Bitmap img;
-	img.width = m_fullscreen ? m_fsW : m_windowW;
-	img.height = m_fullscreen ? m_fsH : m_windowH;
+	int windowWidth;
+	int windowHeight;
+	SDL_GetWindowSize(screen, &windowWidth, &windowHeight);
+	img.width = windowWidth;
+	img.height = windowHeight;
 	unsigned stride = (img.width * 3 + 3) & ~3;  // Rows are aligned to 4 byte boundaries
 	img.buf.resize(stride * img.height);
 	img.fmt = pix::RGB;

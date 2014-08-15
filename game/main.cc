@@ -81,7 +81,7 @@ static void checkEvents(Game& gm) {
 		  case SDL_QUIT:
 			gm.finished();
 			break;
-		  case SDL_KEYDOWN:
+		  case SDL_KEYDOWN: {
 			int keypressed  = event.key.keysym.scancode;
 			uint16_t modifier = event.key.keysym.mod;
 			if (((keypressed == SDL_SCANCODE_RETURN || keypressed == SDL_SCANCODE_KP_ENTER) && modifier & KMOD_ALT) || keypressed == SDL_SCANCODE_F11) {
@@ -97,9 +97,15 @@ static void checkEvents(Game& gm) {
 				continue; // Already handled here...
 			}
 			break;
+		  }
+		case SDL_WINDOWEVENT:
+			switch (event.window.event) {
+			  case SDL_WINDOWEVENT_RESIZED:
+				gm.window().resize(event.window.data1, event.window.data2);
+				break;
+			}
 		}
 		// Screens always receive SDL events that were not already handled here
-		gm.window().resize();
 		gm.getCurrentScreen()->manageEvent(event);
 	}
 	for (input::NavEvent event; gm.controllers.getNav(event); ) {
