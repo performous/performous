@@ -90,7 +90,6 @@ private:
 	void view(unsigned num);
 	void updateStereo(float separation);
 	unsigned int m_windowW, m_windowH;
-	unsigned int m_fsW, m_fsH;
 	bool m_fullscreen;
 	typedef boost::ptr_map<std::string, Shader> ShaderMap;
 	ShaderMap m_shaders; ///< Shader programs by name
