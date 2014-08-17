@@ -30,13 +30,13 @@ void ScreenPaths::enter() {
 void ScreenPaths::exit() { m_theme.reset(); }
 
 void ScreenPaths::manageEvent(SDL_Event event) {
-	if (event.type == SDL_KEYDOWN) {
-		return; // FIXME: Remove
+	if (event.type == SDL_TEXTINPUT) {
+		m_txtinp += event.text.text;
+	} else if (event.type == SDL_KEYDOWN) {
 		SDL_Keycode key = event.key.keysym.scancode;
 		uint16_t modifier = event.key.keysym.mod;
-		if (m_txtinp.process(event.key.keysym)) /* Nop */ ;
 		// Reset to defaults
-		else if (key == SDL_SCANCODE_R && modifier & KMOD_CTRL) {
+		if (key == SDL_SCANCODE_R && modifier & KMOD_CTRL) {
 			config["paths/songs"].reset(modifier & KMOD_ALT);
 			config["paths/system"].reset(modifier & KMOD_ALT);
 			// TODO: Save
