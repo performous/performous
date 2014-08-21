@@ -265,6 +265,8 @@ void MidiFileParser::add_tempo_change(uint32_t miditime, uint32_t tempo) {
 	if (tempochanges.empty()) {
 		if (miditime > 0) throw std::runtime_error("Invalid MIDI file (tempo not set at the beginning)");
 	} else {
+		// Ignore duplicate (identical) tempo changes.
+		if (tempochanges.back().miditime == miditime && tempochanges.back().value == tempo) return;
 		if (tempochanges.back().miditime >= miditime) throw std::runtime_error("Invalid MIDI file (unexpected tempo change)");
 	}
 #if MIDI_DEBUG_LEVEL > 2
