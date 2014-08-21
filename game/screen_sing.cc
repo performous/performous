@@ -346,12 +346,12 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 void ScreenSing::manageEvent(SDL_Event event) {
 	keyPressed = true;
 	double time = m_audio.getPosition();
-	int key = event.key.keysym.scancode;
+	SDL_Scancode key = event.key.keysym.scancode;
 	// Ctrl combinations that can be used while performing (not when score dialog is displayed)
 	if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_CTRL) && !m_score_window.get()) {
 		if (key == SDL_SCANCODE_S) m_audio.toggleSynth(m_song->getVocalTrack(m_selectedTrack).notes);
 		if (key == SDL_SCANCODE_V) m_audio.streamFade("vocals", event.key.keysym.mod & KMOD_SHIFT ? 1.0 : 0.0);
-		if (key == SDL_SCANCODE_W)  { // Toggle karaoke mode
+		if (key == SDL_SCANCODE_K)  { // Toggle karaoke mode
 			if(config["game/karaoke_mode"].i() >=2) config["game/karaoke_mode"].i() = 0;
 			else ++config["game/karaoke_mode"];
 			dispInFlash(config["game/karaoke_mode"]);
