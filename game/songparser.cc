@@ -111,16 +111,17 @@ void SongParser::guessFiles() {
 		{ &m_song.cover, R"(\.(png|jpeg|jpg|svg)$)" },
 		{ &m_song.background, R"(\.(png|jpeg|jpg|svg)$)" },
 		{ &m_song.video, R"(\.(avi|mpg|mpeg|flv|mov|mp4|mkv|m4v)$)" },
-		{ &m_song.midifilename, R"(notes\.mid$)" },
+		{ &m_song.midifilename, R"(^notes\.mid$)" },
 		{ &m_song.midifilename, R"(\.mid$)" },
-		{ &m_song.music[TrackName::GUITAR], R"(guitar\.(mp3|ogg|aac)$)" },
-		{ &m_song.music[TrackName::BASS], R"(rhythm\.(mp3|ogg|aac)$)" },
-		{ &m_song.music[TrackName::DRUMS], R"(drums\.(mp3|ogg|aac)$)" },
-		{ &m_song.music[TrackName::KEYBOARD], R"(keyboard\.(mp3|ogg|aac)$)" },
-		{ &m_song.music[TrackName::GUITAR_COOP], R"(guitar_coop\.(mp3|ogg|aac)$)"},
-		{ &m_song.music[TrackName::GUITAR_RHYTHM], R"(guitar_rhythm\.(mp3|ogg|aac)$)"},
-		{ &m_song.music[TrackName::LEAD_VOCAL], R"(vocals\.(mp3|ogg|aac)$)" },
-		{ &m_song.music[TrackName::BGMUSIC], R"(song\.(mp3|ogg|aac)$)" },
+		{ &m_song.music[TrackName::PREVIEW], R"(^preview\.(mp3|ogg|aac)$)" },
+		{ &m_song.music[TrackName::GUITAR], R"(^guitar\.(mp3|ogg|aac)$)" },
+		{ &m_song.music[TrackName::BASS], R"(^rhythm\.(mp3|ogg|aac)$)" },
+		{ &m_song.music[TrackName::DRUMS], R"(^drums\.(mp3|ogg|aac)$)" },
+		{ &m_song.music[TrackName::KEYBOARD], R"(^keyboard\.(mp3|ogg|aac)$)" },
+		{ &m_song.music[TrackName::GUITAR_COOP], R"(^guitar_coop\.(mp3|ogg|aac)$)"},
+		{ &m_song.music[TrackName::GUITAR_RHYTHM], R"(^guitar_rhythm\.(mp3|ogg|aac)$)"},
+		{ &m_song.music[TrackName::LEAD_VOCAL], R"(^vocals\.(mp3|ogg|aac)$)" },
+		{ &m_song.music[TrackName::BGMUSIC], R"(^song\.(mp3|ogg|aac)$)" },
 		{ &m_song.music[TrackName::BGMUSIC], R"(\.(mp3|ogg|aac)$)" },
 	};
 
@@ -141,8 +142,8 @@ void SongParser::guessFiles() {
 
 	if (!missing) return;  // All OK!
 
+	// Try matching all files in song folder with any field
 	std::set<fs::path> files(fs::directory_iterator{m_song.path}, fs::directory_iterator{});
-	
 	for (unsigned i = 0; i < fields.size(); ++i) {
 		fs::path& field = *fields[i].first;
 		if (field.empty()) for (fs::path const& f: files) {
@@ -153,6 +154,8 @@ void SongParser::guessFiles() {
 		}
 		files.erase(field);  // Remove from available options
 	}
+
+	m_song.music[TrackName::PREVIEW].clear();  // We don't currently support preview tracks (TODO: proper handling in audio.cc).
 
 	if (logFound.empty() && logMissing.empty()) return;
 	std::clog << "songparser/" << (logMissing.empty() ? "debug" : "notice") << ": " + m_song.filename.string() + ":\n";
