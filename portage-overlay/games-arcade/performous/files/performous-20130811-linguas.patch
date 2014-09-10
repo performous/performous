@@ -1,0 +1,15 @@
+--- lang/CMakeLists.txt	2013-08-11 00:50:42.000000000 +0300
++++ lang/CMakeLists.txt	2013-08-11 01:06:00.056641668 +0300
+@@ -9,5 +9,11 @@
+ 	file(MAKE_DIRECTORY "${mobuild}")
+ 	add_custom_command(OUTPUT "${mofile}" COMMAND "${Msgfmt_BIN}" -v "${pofile}" -o "${mofile}" MAIN_DEPENDENCY "${pofile}" COMMENT "Building ${language} locale" VERBATIM)
+ 	add_custom_target("locale_${language}" ALL DEPENDS "${mofile}")  # Make sure the mofiles are always built
+-	install(FILES "${mofile}" DESTINATION "${LOCALE_DIR}/${language}/LC_MESSAGES")
++endforeach(language)
++foreach(language $ENV{LINGUAS})
++	set(pofile ${CMAKE_CURRENT_SOURCE_DIR}/${language}.po)
++	if (EXISTS ${pofile})
++		set(mofile ${CMAKE_CURRENT_BINARY_DIR}/${language}.mo)
++		install(FILES ${mofile} DESTINATION ${LOCALE_DIR}/${language}/LC_MESSAGES RENAME ${CMAKE_PROJECT_NAME}.mo)
++	endif()
+ endforeach(language)
