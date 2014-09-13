@@ -8,11 +8,6 @@
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 
-namespace {
-	const float yoff = 0.18; // Offset from center where to place top row
-	const float xoff = 0.45; // Offset from middle where to place first column
-}
-
 ScreenPaths::ScreenPaths(std::string const& name, Audio& audio): Screen(name), m_audio(audio) {}
 
 void ScreenPaths::enter() {

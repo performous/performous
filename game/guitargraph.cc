@@ -20,7 +20,6 @@ namespace {
 		{ "Hard", 0x54 },
 		{ "Expert", 0x60 }
 	};
-	const size_t diffsz = sizeof(diffv) / sizeof(*diffv);
 	const float g_angle = 1.4f; // How many radians to rotate the fretboards
 	const float past = -0.2f; // Relative time from cursor that is considered past (out of screen)
 	const float future = 1.5f; // Relative time from cursor that is considered future (out of screen)
