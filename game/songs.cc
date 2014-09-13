@@ -73,7 +73,20 @@ void Songs::reload_internal(fs::path const& parent) {
 				boost::shared_ptr<Song>s(new Song(p.parent_path(), p));
 				s->randomIdx = rand(); //give it a random identifier
 				boost::mutex::scoped_lock l(m_mutex);
-				m_songs.push_back(s); //put it in the database
+				int AdditionalFileIndex = -1;
+				for(unsigned int i = 0; i< m_songs.size(); i++) {
+					if(s->filename.extension() != m_songs[i]->filename.extension() && s->filename.stem() == m_songs[i]->filename.stem() &&
+							s->title == m_songs[i]->title && s->artist == m_songs[i]->artist) {
+						std::clog << "songs/info: >>> Found additional song file: " << s->filename << " for: " << m_songs[i]->filename << std::endl;
+						AdditionalFileIndex = i;
+					}
+				}
+				if(AdditionalFileIndex > 0) { //TODO: add it to existing song
+					std::clog << "songs/info: >>> not yet implemented " << std::endl;
+					m_songs.push_back(s); // will make it appear double!!
+				} else {
+					m_songs.push_back(s); //put it in the database
+				}
 				m_dirty = true;
 			} catch (SongParserException& e) {
 				std::clog << e;
