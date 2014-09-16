@@ -43,7 +43,7 @@ void Songs::reload_internal() {
 	}
 	Profiler prof("songloader");
 	Paths paths = getPathsConfig("paths/songs");
-	for (auto it = paths.begin(); m_loading && it != paths.end(); ++it) {
+	for (auto it = paths.begin(); m_loading && it != paths.end(); ++it) { //loop through stored directories from config
 		try {
 			if (!fs::is_directory(*it)) { std::clog << "songs/info: >>> Not scanning: " << *it << " (no such directory)\n"; continue; }
 			std::clog << "songs/info: >>> Scanning " << *it << std::endl;
@@ -65,15 +65,28 @@ void Songs::reload_internal(fs::path const& parent) {
 	if (std::distance(parent.begin(), parent.end()) > 20) { std::clog << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)\n"; return; }
 	try {
 		boost::regex expression(R"((\.txt|^song\.ini|^notes\.xml|\.sm)$)", boost::regex_constants::icase);
-		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) {
+		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) { //loop through files
 			fs::path p = dirIt->path();
-			if (fs::is_directory(p)) { reload_internal(p); continue; }
-			if (!regex_search(p.filename().string(), expression)) continue;
-			try {
+			if (fs::is_directory(p)) { reload_internal(p); continue; } //if the file is a folder redo this function with this folder as path
+			if (!regex_search(p.filename().string(), expression)) continue; //if the folder does not contain any of the requested files, ignore it
+			try { //found song file, make a new song with it.
 				boost::shared_ptr<Song>s(new Song(p.parent_path(), p));
-				s->randomIdx = rand();
+				s->randomIdx = rand(); //give it a random identifier
 				boost::mutex::scoped_lock l(m_mutex);
-				m_songs.push_back(s);
+				int AdditionalFileIndex = -1;
+				for(unsigned int i = 0; i< m_songs.size(); i++) {
+					if(s->filename.extension() != m_songs[i]->filename.extension() && s->filename.stem() == m_songs[i]->filename.stem() &&
+							s->title == m_songs[i]->title && s->artist == m_songs[i]->artist) {
+						std::clog << "songs/info: >>> Found additional song file: " << s->filename << " for: " << m_songs[i]->filename << std::endl;
+						AdditionalFileIndex = i;
+					}
+				}
+				if(AdditionalFileIndex > 0) { //TODO: add it to existing song
+					std::clog << "songs/info: >>> not yet implemented " << std::endl;
+					m_songs.push_back(s); // will make it appear double!!
+				} else {
+					m_songs.push_back(s); //put it in the database
+				}
 				m_dirty = true;
 			} catch (SongParserException& e) {
 				std::clog << e;

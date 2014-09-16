@@ -10,9 +10,6 @@
 // TODO: group handling for loader
 
 namespace {
-	static const int HAS_TEXCOORDS = 1;
-	static const int HAS_NORMALS = 2;
-
 	/// Returns a word (delimited by delim) in a string st at position pos (1-based)
 	std::string getWord(std::string& st, size_t pos, char delim) {
 		std::istringstream iss(st);

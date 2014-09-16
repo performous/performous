@@ -8,11 +8,6 @@
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 
-namespace {
-	const float yoff = 0.18; // Offset from center where to place top row
-	const float xoff = 0.45; // Offset from middle where to place first column
-}
-
 ScreenPaths::ScreenPaths(std::string const& name, Audio& audio): Screen(name), m_audio(audio) {}
 
 void ScreenPaths::enter() {
@@ -30,13 +25,13 @@ void ScreenPaths::enter() {
 void ScreenPaths::exit() { m_theme.reset(); }
 
 void ScreenPaths::manageEvent(SDL_Event event) {
-	if (event.type == SDL_KEYDOWN) {
-		return; // FIXME: Remove
+	if (event.type == SDL_TEXTINPUT) {
+		m_txtinp += event.text.text;
+	} else if (event.type == SDL_KEYDOWN) {
 		SDL_Keycode key = event.key.keysym.scancode;
 		uint16_t modifier = event.key.keysym.mod;
-		if (m_txtinp.process(event.key.keysym)) /* Nop */ ;
 		// Reset to defaults
-		else if (key == SDL_SCANCODE_R && modifier & KMOD_CTRL) {
+		if (key == SDL_SCANCODE_R && modifier & KMOD_CTRL) {
 			config["paths/songs"].reset(modifier & KMOD_ALT);
 			config["paths/system"].reset(modifier & KMOD_ALT);
 			// TODO: Save

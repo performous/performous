@@ -87,14 +87,16 @@ void ScreenPlayers::manageEvent(input::NavEvent const& event) {
 }
 
 void ScreenPlayers::manageEvent(SDL_Event event) {
-	if (event.type == SDL_KEYDOWN) { // Process keyboard-only keys
-		SDL_Keysym keysym = event.key.keysym;
-		//int key = keysym.sym;
-		//SDLMod mod = event.key.keysym.mod;
-
-		//TODO: reload -- needs database reload
-		// if (key == SDL_SCANCODE_r && mod & KMOD_CTRL) { m_players.reload(); m_players.setFilter(m_search.text); }
-		if (m_search.process(keysym)) m_players.setFilter(m_search.text);
+	if (event.type == SDL_TEXTINPUT) {
+		m_search += event.text.text;
+		m_players.setFilter(m_search.text);
+	}
+	else if (event.type == SDL_KEYDOWN) {
+		int key = event.key.keysym.scancode;
+		if (key == SDL_SCANCODE_BACKSPACE) {
+			m_search.backspace();
+			m_players.setFilter(m_search.text);
+		}
 	}
 }
 
