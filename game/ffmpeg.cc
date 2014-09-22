@@ -197,8 +197,9 @@ void FFmpeg::decodePacket() {
 		if (!frameFinished) continue;
 		// Update current position if timecode is available
 		if (frame->pkt_pts != int64_t(AV_NOPTS_VALUE)) {
-			m_position = double(frame->pkt_pts) * (av_q2d(m_formatContext->streams[m_streamId]->time_base)
-			  - double(m_formatContext->start_time) / AV_TIME_BASE);
+			m_position = double(frame->pkt_pts) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
+			if (m_formatContext->start_time != int64_t(AV_NOPTS_VALUE))
+				m_position -= double(m_formatContext->start_time) / AV_TIME_BASE;
 		}
 		if (m_mediaType == AVMEDIA_TYPE_VIDEO) processVideo(frame.get()); else processAudio(frame.get());
 	}
