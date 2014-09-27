@@ -55,7 +55,7 @@ RDEPEND="dev-cpp/glibmm
 	media-gfx/imagemagick
 	virtual/jpeg
 	media-libs/libpng:0
-	media-libs/libsdl[joystick,video]
+	media-libs/libsdl2[joystick,video]
 	virtual/ffmpeg
 	virtual/opengl
 	virtual/glu
@@ -72,11 +72,10 @@ DEPEND="${RDEPEND}
 	sys-devel/gettext"
 
 PATCHES=(
-	"${FILESDIR}"/${PN}-${PATCH_V}-libav.patch
 	"${FILESDIR}"/${PN}-20130811-gentoo.patch
-	"${FILESDIR}"/${PN}-20130811-linguas.patch
-	"${FILESDIR}"/${PN}-20130811-cmake.patch
-	"${FILESDIR}"/${PN}-20130207-desktop.patch
+	"${FILESDIR}"/${PN}-20140927-libav.patch
+	"${FILESDIR}"/${PN}-20140927-linguas.patch
+	"${FILESDIR}"/${PN}-20140927-cmake.patch
 )
 
 src_prepare() {
