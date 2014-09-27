@@ -327,7 +327,7 @@
 			</mapping>
 		</controller>
 		<controller type="dancepad" name="DANCEPAD_HONEYBEE">
-			<description>Honey Bee Xbox360 dancepad</description>
+			<description>Konami Xbox360 dancepad</description>
 			<device regex="Honey Bee Xbox360 dancepad" />
 			<mapping>
 				<button hw="0" map="up-right" />
