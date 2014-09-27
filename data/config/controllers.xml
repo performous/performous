@@ -43,6 +43,31 @@
 				<axis hw="3" /><!-- This is the GH:WT solo frets, values roughly: G: -.8, R: -.3, Y: .1, B: .5, O: 1 - Falls back to 0 when idle. -->
 				<axis hw="4" negative="left" positive="right" />
 				<axis hw="5" negative="pick_up" positive="pick_down" />
+				<hat hw="0" up="pick_up" down="pick_down" left="left" right="right" />
+			</mapping>
+		</controller>
+		<controller type="guitar" name="GUITAR_GUITARHERO4_PS3">
+			<!-- Bundled within a 1430:4734 RedOctane Guitar Hero4 hub
+			Receiver details:
+			idVendor           0x12ba Licensed by Sony Computer Entertainment America
+			idProduct          0x0100 RedOctane Guitar for PlayStation(R)3
+			bcdDevice            1.08
+			iManufacturer           1 Licensed by Sony Computer Entertainment
+			iProduct                2 Guitar Hero4 for PlayStation (R) 3
+			-->
+			<description>Guitar Hero 4 guitar for PS3</description>
+			<device regex="Licensed by Sony Computer Entertainment Guitar Hero4 for PlayStation \(R\) 3" />
+			<mapping>
+				<button hw="0" map="yellow" />
+				<button hw="1" map="green" />
+				<button hw="2" map="red" />
+				<button hw="3" map="blue" />
+				<button hw="4" map="orange" />
+				<button hw="8" map="godmode" />
+				<button hw="12" map="start" />
+				<axis hw="2" positive="whammy" />
+				<axis hw="3" /><!-- This is the GH:WT solo frets, values roughly: G: -.8, R: -.3, Y: .1, B: .5, O: 1 - Falls back to 0 when idle. -->
+				<hat hw="0" up="pick_up" down="pick_down" left="left" right="right" />
 			</mapping>
 		</controller>
 		<controller type="guitar" name="GUITAR_GUITARHERO5">
@@ -176,6 +201,7 @@
 			</mapping>
 		</controller>
 		-->
+		<!-- disabling this as the regex picks the GH4 hub/guitar. Needs a better regex and the SDL2 hat support.
 		<controller type="drumkit" name="DRUMS_GUITARHERO">
 			<description>Guitar Hero 4 drum kit</description>
 			<device regex="Guitar Hero4" />
@@ -192,6 +218,7 @@
 				<axis hw="5" negative="up" positive="down" />
 			</mapping>
 		</controller>
+		-->
 		<controller type="drumkit" name="DRUMS_GUITARHERO5">
 			<description>Guitar Hero 5/Band Hero drum kit</description>
 			<device regex="Drum Guitar Hero5" />
@@ -235,6 +262,7 @@
 				<button hw="12" /><!-- PS button -->
 				<axis hw="4" negative="left" positive="right" />
 				<axis hw="5" negative="up" positive="down" />
+				<hat hw="0" up="up" down="down" left="left" right="right" />
 			</mapping>
 		</controller>
 		<controller type="drumkit" name="DRUMS_ROCKBAND_XBOX360">
