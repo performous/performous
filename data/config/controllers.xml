@@ -326,6 +326,22 @@
 				<button hw="9" map="cancel" />
 			</mapping>
 		</controller>
+		<controller type="dancepad" name="DANCEPAD_HONEYBEE">
+			<description>Honey Bee Xbox360 dancepad</description>
+			<device regex="Honey Bee Xbox360 dancepad" />
+			<mapping>
+				<button hw="0" map="up-right" />
+				<button hw="1" map="up-left" />
+				<button hw="2" map="down-right" />
+				<button hw="3" map="down-left" />
+				<button hw="6" map="cancel" />
+				<button hw="7" map="start" />
+				<button hw="11" map="left" />
+				<button hw="12" map="right" />
+				<button hw="13" map="up" />
+				<button hw="14" map="down" />
+			</mapping>
+		</controller>
 		<controller type="keytar" name="KEYTAR_GENERIC">
 			<description>Generic keytar</description>
 			<device regex="NO MATCH" />
