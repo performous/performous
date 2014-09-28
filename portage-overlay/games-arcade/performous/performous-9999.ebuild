@@ -52,7 +52,6 @@ RDEPEND="dev-cpp/glibmm
 	dev-libs/glib
 	dev-libs/libxml2
 	gnome-base/librsvg
-	media-gfx/imagemagick
 	virtual/jpeg
 	media-libs/libpng:0
 	media-libs/libsdl2[joystick,video]
@@ -65,6 +64,7 @@ RDEPEND="dev-cpp/glibmm
 	x11-libs/gdk-pixbuf
 	x11-libs/pango
 	midi? ( media-libs/portmidi )
+	tools? ( media-gfx/imagemagick )
 	webcam? ( media-libs/opencv )"
 DEPEND="${RDEPEND}
 	media-libs/glew
