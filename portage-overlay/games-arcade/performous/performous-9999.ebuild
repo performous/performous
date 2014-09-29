@@ -1,33 +1,39 @@
-# Copyright 1999-2012 Gentoo Foundation
+# Copyright 1999-2013 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: $
+# $Header: /var/cvsroot/gentoo-x86/games-arcade/performous/performous-0.7.0-r1.ebuild,v 1.1 2013/01/24 17:04:10 hasufell Exp $
 
-EAPI=4
-
+EAPI=5
 [[ ${PV} = 9999 ]] && GIT="git-2"
 
-inherit cmake-utils ${GIT} games
+CMAKE_REMOVE_MODULES="yes"
+CMAKE_REMOVE_MODULES_LIST="FindALSA FindBoost FindGettext FindJpeg FindPng FindTiff FindZ"
 
+inherit eutils base cmake-utils games ${GIT}
+
+MY_PN=Performous
+MY_P=${MY_PN}-${PV}
 SONGS_PN=ultrastar-songs
+PATCH_V=0.7.0
 
-DESCRIPTION="Party game similar to Singstar, RockBand, Guitar Hero and Stepmania"
-HOMEPAGE="http://performous.org"
-SRC_URI="songs? ( 
-	mirror://sourceforge/${PN}/${SONGS_PN}-jc-1.zip
-	mirror://sourceforge/${PN}/${SONGS_PN}-libre-3.zip
-	mirror://sourceforge/${PN}/${SONGS_PN}-restricted-3.zip
-	mirror://sourceforge/${PN}/${SONGS_PN}-shearer-1.zip
+DESCRIPTION="SingStar GPL clone"
+HOMEPAGE="http://sourceforge.net/projects/performous/"
+SRC_URI="songs? (
+		mirror://sourceforge/performous/${SONGS_PN}-restricted-3.zip
+		mirror://sourceforge/performous/${SONGS_PN}-jc-1.zip
+		mirror://sourceforge/performous/${SONGS_PN}-libre-3.zip
+		mirror://sourceforge/performous/${SONGS_PN}-shearer-1.zip
 	)"
 
 if [ "$PV" != "9999" ]; then
-	SRC_URI=" mirror://sourceforge/${PN}/${P}.tar.bz2
-		$SRC_URI"
+    SRC_URI="mirror://sourceforge/${PN}/${P}.tar.bz2
+    $SRC_URI"
 else
-	EGIT_REPO_URI="git://performous.git.sourceforge.net/gitroot/performous/performous"
-	# git-2 default branch is master
-	#EGIT_BRANCH="master"
-	# use performous_LIVE_BRANCH env var to install another branch (for example
-	# legacy or torrent)
+#    EGIT_REPO_URI="git://performous.git.sourceforge.net/gitroot/performous/performous"
+    EGIT_REPO_URI="git://github.com/performous/performous.git"
+    # git-2 default branch is master
+    #EGIT_BRANCH="master"
+    # use performous_LIVE_BRANCH env var to install another branch (for example
+    # legacy or torrent)
 fi
 
 LICENSE="GPL-2
@@ -37,55 +43,59 @@ LICENSE="GPL-2
 	)"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
+IUSE="midi songs tools webcam"
 
-IUSE="debug bittorrent midi songs tools webcam"
-
-RDEPEND="gnome-base/librsvg
-	>=dev-libs/boost-1.39.0
-	x11-libs/pango
+RDEPEND="dev-cpp/glibmm
 	dev-cpp/libxmlpp
-	media-libs/glew
-	media-libs/libsdl[joystick,opengl]
-	media-libs/libpng
-	virtual/jpeg
-	tools? ( media-gfx/imagemagick[png] )
-	midi? ( media-libs/portmidi )
-	webcam? ( media-libs/opencv[v4l] )
-	bittorrent? ( >=net-libs/rb_libtorrent-0.16.3 )
-	>=media-video/ffmpeg-0.4.9_p20070616-r20
 	media-libs/portaudio
-	sys-apps/help2man
-	!games-arcade/ultrastar-ng"
+	dev-libs/boost[threads(+)]
+	dev-libs/glib
+	dev-libs/libxml2
+	gnome-base/librsvg
+	virtual/jpeg
+	media-libs/libpng:0
+	media-libs/libsdl2[joystick,video]
+	virtual/ffmpeg
+	virtual/opengl
+	virtual/glu
+	sys-libs/zlib
+	virtual/libintl
+	x11-libs/cairo
+	x11-libs/gdk-pixbuf
+	x11-libs/pango
+	midi? ( media-libs/portmidi )
+	tools? ( media-gfx/imagemagick )
+	webcam? ( media-libs/opencv )"
 DEPEND="${RDEPEND}
-    >=dev-util/cmake-2.6.0"
+	media-libs/glew
+	sys-apps/help2man
+	sys-devel/gettext"
 
-src_unpack() {
-	if [ "${PV}" != "9999" ]; then
-		unpack "${P}.tar.bz2"
-	else
-		git-2_src_unpack
-	fi
-	cd "${S}"
-	if use songs; then
-		unpack "${SONGS_PN}-jc-1.zip" "${SONGS_PN}-libre-3.zip" "${SONGS_PN}-restricted-3.zip" "${SONGS_PN}-shearer-1.zip"
-	fi
-}
+PATCHES=(
+	"${FILESDIR}"/${PN}-20130811-gentoo.patch
+	"${FILESDIR}"/${PN}-20140927-libav.patch
+	"${FILESDIR}"/${PN}-20140927-linguas.patch
+	"${FILESDIR}"/${PN}-20140927-cmake.patch
+)
 
 src_prepare() {
-	epatch "${FILESDIR}"/${PN}-gentoopaths.patch
+	base_src_prepare
+	sed -i \
+		-e "s:@GENTOO_BINDIR@:${GAMES_BINDIR}:" \
+		game/CMakeLists.txt \
+		|| die
+
+	strip-linguas -u lang
 }
 
 src_configure() {
-	local mycmakeargs="
+	local mycmakeargs=(
 		$(cmake-utils_use_enable tools TOOLS)
-		$(cmake-utils_use_no webcam WEBCAM)
-		$(cmake-utils_use_no bittorrent TORRENT)
-		$(cmake-utils_use_no midi PORTMIDI)
-		-DCMAKE_INSTALL_PREFIX=${GAMES_PREFIX}
-		-DGENTOO_DATA_DIR=${GAMES_DATADIR}/${PN}
-		-DLOCALE_DIR=/usr/share
-		-DCMAKE_BUILD_TYPE=Release"
-
+		$(usex midi "" "-DNO_PORTMIDI=ON")
+		$(usex webcam "" "-DNO_WEBCAM=ON")
+		-DCMAKE_VERBOSE_MAKEFILE=TRUE
+		-DSHARE_INSTALL="${GAMES_DATADIR}"/${PN}
+	)
 	cmake-utils_src_configure
 }
 
@@ -94,16 +104,11 @@ src_compile() {
 }
 
 src_install() {
-	DOCS="docs/*.txt" cmake-utils_src_install
-	mv -f "${D}/${GAMES_PREFIX}/share/man" "${D}/usr/share/"
-	mkdir -p "${D}/${GAMES_DATADIR}/${PN}"
-	mv -f "${D}/${GAMES_PREFIX}/share/games/performous" "${D}/${GAMES_DATADIR}/"
-
-	if use songs; then
-		insinto "${GAMES_DATADIR}/${PN}"
-		doins -r "${S}/songs" || die "doins songs failed"
+	cmake-utils_src_install
+	if use songs ; then
+		insinto "${GAMES_DATADIR}"/${PN}
+		doins -r "${WORKDIR}/songs"
 	fi
-	doicon "${S}/data/${PN}.xpm"
-	domenu "${S}/data/${PN}.desktop"
+	dodoc docs/{Authors,instruments}.txt
 	prepgamesdirs
 }
