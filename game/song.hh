@@ -12,6 +12,7 @@ class SongParser;
 
 namespace TrackName {
 	const std::string BGMUSIC = "background";
+	const std::string PREVIEW = "Preview";
 	const std::string GUITAR = "Guitar";
 	const std::string GUITAR_COOP = "Coop guitar";
 	const std::string GUITAR_RHYTHM = "Rhythm guitar";

@@ -104,7 +104,6 @@ class ScreenSing: public Screen {
 	ConfigItem m_vocalTracks[AUDIO_MAX_ANALYZERS];
 	ConfigItem m_duet;
 	bool m_displayAutoPlay = false;
-	bool m_fadeIn = false;
 	bool keyPressed = false;
 };
 
