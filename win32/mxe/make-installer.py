@@ -30,26 +30,35 @@ os.chdir('stage')
 
 # Find the version number.
 exepath = 'Performous.exe'
-try:
-    resources = subprocess.Popen([os.environ['WINDRES'], exepath], stdout=subprocess.PIPE)
-except:
-    try:
-        resources = subprocess.Popen(['windres', exepath], stdout=subprocess.PIPE)
-    except:
-        resources = subprocess.Popen(['i686-pc-mingw32-windres', exepath], stdout=subprocess.PIPE)
-for line in resources.stdout.readlines():
-    if not line.strip().startswith('VALUE'):
-        continue
-    if 'ProductVersion' in line:
-        version = line.strip().split('"')[-2]
-        break
+if 'WINDRES' in os.environ:
+    custom_windres = os.environ['WINDRES']
 else:
-    version = 'unknown'
+    custom_windres = 'windres'
 
+for windres in [custom_windres, 'i686-pc-mingw32-windres', 'i686-w64-mingw32.shared-windres']:
+    try:
+        resources = subprocess.Popen([windres, exepath], stdout=subprocess.PIPE)
+    except:
+        continue
+    for line in resources.stdout.readlines():
+        if not line.strip().startswith('VALUE'):
+            continue
+        if 'ProductVersion' in line:
+            version = line.strip().split('"')[-2]
+            break
+    else:
+        version = 'unknown'
+    break
+
+
+def instpath(*elements):
+    return os.path.join(*elements).replace('/', '\\').replace('.\\', '')
 
 makensis.stdin.write(r'''!include "MUI2.nsh"
+!include FileFunc.nsh
 
 !define VERSION "%s"
+!define REGKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Performous"
 
 Name "Performous ${VERSION}"
 OutFile "dist\Performous-${VERSION}.exe"
@@ -60,7 +69,7 @@ ShowInstDetails show
 ShowUninstDetails show
 
 InstallDir "$PROGRAMFILES\Performous"
-InstallDirRegKey HKLM "Software\Performous" ""
+InstallDirRegKey HKLM ${REGKEY} "InstallLocation"
 
 RequestExecutionLevel admin
 
@@ -80,34 +89,42 @@ Section
 ''' % version)
 
 for root, dirs, files in os.walk('.'):
-    makensis.stdin.write('  SetOutPath "$INSTDIR\\%s"\n' % root.replace('/', '\\'))
+    makensis.stdin.write('  SetOutPath "$INSTDIR\\%s"\n' % instpath(root))
     for file in files:
-        makensis.stdin.write('  File "%s"\n' % os.path.join('stage', root, file).replace('/', '\\'))
+        makensis.stdin.write('  File "%s"\n' % instpath('stage', root, file))
 
-makensis.stdin.write(r'''  WriteRegStr HKLM "Software\Performous" "" "$INSTDIR"
-  WriteUninstaller "$INSTDIR\uninst.exe"
+makensis.stdin.write(r'''  WriteUninstaller "$INSTDIR\uninst.exe"
   SetShellVarContext all
   CreateDirectory "$INSTDIR\songs"
   CreateDirectory "$SMPROGRAMS\Performous"
+  SetOutPath "$INSTDIR"
   CreateShortcut "$SMPROGRAMS\Performous\Performous.lnk" "$INSTDIR\Performous.exe"
   CreateShortCut "$SMPROGRAMS\Performous\ConfigureSongDirectory.lnk" "$INSTDIR\ConfigureSongDirectory.bat"
   CreateShortCut "$SMPROGRAMS\Performous\Songs.lnk" "$INSTDIR\songs"
   CreateShortcut "$SMPROGRAMS\Performous\Uninstall.lnk" "$INSTDIR\uninst.exe"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Performous" "DisplayName" "Performous"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Performous" "UninstallString" "$\"$INSTDIR\uninst.exe$\""
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Performous" "DisplayIcon" "$INSTDIR\Performous.exe"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Performous" "DisplayVersion" "${VERSION}"
+  WriteRegStr HKLM ${REGKEY} "DisplayName" "Performous"
+  WriteRegStr HKLM ${REGKEY} "UninstallString" "$\"$INSTDIR\uninst.exe$\""
+  WriteRegStr HKLM ${REGKEY} "InstallLocation" "$INSTDIR"
+  WriteRegStr HKLM ${REGKEY} "DisplayIcon" "$INSTDIR\Performous.exe"
+  WriteRegStr HKLM ${REGKEY} "DisplayVersion" "${VERSION}"
+  WriteRegStr HKLM ${REGKEY} "HelpLink" "http://performous.org/"
+  ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
+  IntFmt $0 "0x%08X" $0
+  WriteRegDWORD HKLM ${REGKEY} "EstimatedSize" "$0"
+  WriteRegDWORD HKLM ${REGKEY} "NoModify" 1
+  WriteRegDWORD HKLM ${REGKEY} "NoRepair" 1
 SectionEnd
 
 Section Uninstall
+  RmDir "$INSTDIR\songs"
 ''')
 
 for root, dirs, files in os.walk('.', topdown=False):
     for dir in dirs:
-        makensis.stdin.write('  RmDir "$INSTDIR\\%s"\n' % os.path.join(root, dir).replace('/', '\\'))
+        makensis.stdin.write('  RmDir "$INSTDIR\\%s"\n' % instpath(root, dir))
     for file in files:
-        makensis.stdin.write('  Delete "$INSTDIR\\%s"\n' % os.path.join(root, file).replace('/', '\\'))
-    makensis.stdin.write('  RmDir "$INSTDIR\\%s"\n' % root.replace('/', '\\'))
+        makensis.stdin.write('  Delete "$INSTDIR\\%s"\n' % instpath(root, file))
+    makensis.stdin.write('  RmDir "$INSTDIR\\%s"\n' % instpath(root))
 
 makensis.stdin.write(r'''  Delete "$INSTDIR\uninst.exe"
   RmDir "$INSTDIR"
@@ -117,8 +134,7 @@ makensis.stdin.write(r'''  Delete "$INSTDIR\uninst.exe"
   Delete "$SMPROGRAMS\Performous\Songs.lnk"
   Delete "$SMPROGRAMS\Performous\Uninstall.lnk"
   RmDir "$SMPROGRAMS\Performous"
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Performous"
-  DeleteRegKey /ifempty HKLM "Software\Performous"
+  DeleteRegKey HKLM ${REGKEY}
 SectionEnd
 ''')
 
