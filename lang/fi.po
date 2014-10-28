@@ -179,7 +179,7 @@ msgstr ""
 "Tämä työkalu ei ole vielä saatavilla.\n"
 "Aseta polut antamalla ne\n"
 "komentoriviparametreinä ja\n"
-"tallenna ne sitten asetusvalikosta."
+"tallenna sitten asetusvalikosta."
 
 #: ../game/screen_paths.cc:65
 msgid "Press any key to exit."
@@ -253,7 +253,7 @@ msgstr "Soita ensimmäinen"
 
 #: ../game/screen_playlist.cc:310
 msgid "Ignore the playlist's order and play this song first"
-msgstr "Jätä soittolistan järjestys huomioimatta ja soita tämä kappale ensiksi"
+msgstr "Jätä soittolistan järjestys huomioimatta ja soita tämä kappale ensin"
 
 #: ../game/screen_playlist.cc:311
 msgid "Start the song already!"
@@ -307,7 +307,7 @@ msgid ""
 "to cancel. Ctrl + R to reset defaults"
 msgstr ""
 "Nuolinäppäimet säätävät. Enter/Start tallentaa ja testaa, Esc/Select "
-"peruuttaa. Ctrl + R palauttaaksesi oletukset."
+"peruuttaa. Ctrl + R palauttaa oletukset."
 
 #: ../game/screen_audiodevices.cc:135
 msgid ""
@@ -343,7 +343,7 @@ msgstr "<kirjoita etsiäksesi>"
 
 #: ../game/screen_songs.cc:313
 msgid "songs"
-msgstr "biisit"
+msgstr "kappaleet"
 
 #: ../game/screen_songs.cc:313
 msgid "options"
@@ -407,7 +407,7 @@ msgstr "Aloita"
 
 #: ../game/screen_sing.cc:78
 msgid "Start performing"
-msgstr "Aloita esiintymään"
+msgstr "Aloita esiintyminen"
 
 #: ../game/screen_sing.cc:82
 msgid "Duet mode"
@@ -451,7 +451,7 @@ msgstr ""
 
 #: ../game/screen_sing.cc:127
 msgid "Skip"
-msgstr "Skippaa"
+msgstr "Ohita"
 
 #: ../game/screen_sing.cc:127
 msgid "Skip current song"
@@ -779,7 +779,7 @@ msgstr "Äänenkorkeusaallot"
 #: ../data/config/schema.xml:65
 msgid "Enable singing pitch display (when not in karaoke mode)."
 msgstr ""
-"Ota käyttöön laulun äänenkorkeuden näyttäminen (kun ei olla karaokemoodissa)."
+"Ota käyttöön laulun äänenkorkeuden näyttäminen (kun ei olla karaoketilassa)."
 
 #: ../data/config/schema.xml:70
 msgid "Theme"
@@ -1021,8 +1021,8 @@ msgid ""
 "This is a hint for the audio engine about the desired latency. Set this as "
 "low as possible while retaining clear audio playback. Requires restart."
 msgstr ""
-"Vihje äänilaitteille kuinka pieni latenssi halutaan. Aseta niin matalaksi "
-"kuin mahdollista ilman äänen häiriöitä. Vaatii uudelleenkäynnistyksen. "
+"Vihje äänilaitteille latenssin suuruudesta. Aseta niin matalaksi kuin "
+"mahdollista ilman äänen häiriöitä. Vaatii uudelleenkäynnistyksen. "
 
 #: ../data/config/schema.xml:226
 msgid "Audio/video latency"
@@ -1087,7 +1087,7 @@ msgstr "Valikkojen äänenvoimakkuus"
 #: ../data/config/schema.xml:253
 msgid "The volume level of menus, song previews and jukebox mode."
 msgstr ""
-"Äänenvoimakkuus valikoissa, kappaleiden esikuunteluissa ja jukeboksi tilassa."
+"Äänenvoimakkuus valikoissa, kappaleiden esikuunteluissa ja jukeboksitilassa."
 
 #: ../data/config/schema.xml:258
 msgid "Music volume"
@@ -1098,8 +1098,8 @@ msgid ""
 "The ingame music volume. Values above 90 are not recommended as distortion "
 "may occur."
 msgstr ""
-"Pelin äänenvoimakkuus. Arvot yli 90 eivät ole suositeltuja mahdollisen äänen "
-"vääristymisen takia."
+"Pelin äänenvoimakkuus. Yli 90 menevät arvot eivät ole suositeltavia "
+"mahdollisen äänen vääristymisen takia."
 
 #: ../data/config/schema.xml:264
 msgid "Failure volume"
@@ -1110,8 +1110,8 @@ msgid ""
 "The ingame fail sound volume. Values above 90 are not recommended as "
 "distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
 msgstr ""
-"Virheäänien voimakkuus. Arvot yli 90 eivät ole suositeltuja mahdollisen "
-"äänen vääristymisen takia."
+"Virheäänien voimakkuus. Yli 90 menevät arvot eivät ole suositeltavia "
+"mahdollisen äänen vääristymisen takia."
 
 #: ../data/config/schema.xml:268
 msgid "Microphone pass-through"
@@ -1127,7 +1127,8 @@ msgstr "Läpiviennin äänenvoimakkuussuhde"
 
 #: ../data/config/schema.xml:275
 msgid "How much voice is amplified compared to the music."
-msgstr "Kuinka paljon laulun tasoa suurennetaan musiikkiin suhteutettuna."
+msgstr ""
+"Kuinka paljon laulun äänenvoimakkuutta kasvatetaan musiikkiin suhteutettuna."
 
 #: ../data/config/schema.xml:286
 msgid "Song folders"
