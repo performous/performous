@@ -1,9 +1,5 @@
 #include "audio.hh"
 
-#include "configuration.hh"
-#include "util.hh"
-#include "libda/fft.hpp"  // For M_PI
-#include "libda/portaudio.hpp"
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/range/iterator_range.hpp>
@@ -12,6 +8,11 @@
 #include <cmath>
 #include <iostream>
 #include <map>
+
+#include "configuration.hh"
+#include "libda/fft.hpp"  // For M_PI
+#include "libda/portaudio.hpp"
+#include "util.hh"
 
 using namespace boost::posix_time;
 

@@ -1,10 +1,11 @@
 #include "3dobject.hh"
 
-#include "surface.hh"
 #include <boost/filesystem/fstream.hpp>
 #include <boost/lexical_cast.hpp>
-#include <sstream>
 #include <stdexcept>
+#include <sstream>
+
+#include "surface.hh"
 
 // TODO: test & fix faces that doesn't have texcoords in the file
 // TODO: group handling for loader

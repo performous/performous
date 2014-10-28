@@ -1,9 +1,11 @@
 #pragma once
 
-#include <string>
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
-#include "glshader.hh"
+#include <string>
+
+#include "fs.hh"
+#include "glutil.hh"
 
 // TODO: Exception handling
 // TODO: Texture loading

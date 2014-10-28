@@ -1,9 +1,10 @@
 #pragma once
 
-#include "util.hh"
-#include "xtime.hh"
 #include <cmath>
 #include <stdexcept>
+
+#include "util.hh"
+#include "xtime.hh"
 
 /// class for simple/linear animation/transition of values
 class AnimValue {
