@@ -2,11 +2,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-28 20:01+0100\n"
+"POT-Creation-Date: 2014-10-28 21:01+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Vincent Le Ligeour <yoda-jm@users.sourceforge.net>\n"
-"Language: fr_FR\n"
 "Language-Team: \n"
+"Language: fr_FR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -677,171 +677,171 @@ msgstr "Rejoindre le jeu"
 msgid "Change selections"
 msgstr "Changer les paramètres"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:2
+#: ../data/config/schema.xml:19
 msgid "Game"
 msgstr "Jeu"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:3
+#: ../data/config/schema.xml:20
 msgid "Gameplay related options"
 msgstr "Configurer les options de jeu"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:4
+#: ../data/config/schema.xml:23
 msgid "Graphic"
 msgstr "Graphique"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:5
+#: ../data/config/schema.xml:24
 msgid "Configure rendering and video settings"
 msgstr "Configurer les options vidéos et graphiques"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:6
+#: ../data/config/schema.xml:28
 msgid "Audio Devices"
 msgstr "Périphériques audio"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:7
+#: ../data/config/schema.xml:29
 msgid "Setup microphones and playback"
 msgstr "Configurer les microphones et la sortie son"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:8
+#: ../data/config/schema.xml:32
 msgid "Audio"
 msgstr "Audio"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:9
+#: ../data/config/schema.xml:33
 msgid "Configure general audio settings"
 msgstr "Configurer les options audio"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:10
+#: ../data/config/schema.xml:36
 msgid "Paths"
 msgstr "Chemins"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:11
+#: ../data/config/schema.xml:37
 msgid "Setup song and data paths"
 msgstr "Configurer les chemins des morceaux et des données"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:12
+#: ../data/config/schema.xml:48
 msgid "Karaoke mode"
 msgstr "Mode karaoké"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:13 /tmp/xml2gettext.OSJKOSPnBt:15
+#: ../data/config/schema.xml:49 ../data/config/schema.xml:57
 msgid "Hide pitch wave, notes and scoring."
 msgstr "Cache la hauteur chantée, les notes et le score."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:14
+#: ../data/config/schema.xml:56
 msgid "Lyric highlight style"
 msgstr "Type d'affichage des paroles"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:16
+#: ../data/config/schema.xml:60
 msgid "Autoplay"
 msgstr "Autoplay"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:17
+#: ../data/config/schema.xml:61
 msgid "Keep playing random songs after the playlist is empty."
 msgstr "Jouer un morceau aléatoire après la fin de la playlist"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:18
+#: ../data/config/schema.xml:64
 msgid "Pitch waves"
 msgstr "Hauteur chantée"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:19
+#: ../data/config/schema.xml:65
 msgid "Enable singing pitch display (when not in karaoke mode)."
 msgstr "Active l'affichage de la hauteur du chant (pas dans le mode karaoké)"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:20
+#: ../data/config/schema.xml:70
 msgid "Theme"
 msgstr "Thème"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:21
+#: ../data/config/schema.xml:71
 msgid "Name of the theme to use."
 msgstr "Nom du thème à utiliser"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:22
+#: ../data/config/schema.xml:74
 msgid "Keyboard as guitar"
 msgstr "Guitare au clavier"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:23
+#: ../data/config/schema.xml:75
 msgid "Enable keyboard as guitar (Frets on Fire mode)."
 msgstr "Activer la guitare au clavier (mode Frets on Fire)"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:24
+#: ../data/config/schema.xml:78
 msgid "Keyboard as drumkit"
 msgstr "Batterie au clavier"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:25
+#: ../data/config/schema.xml:79
 msgid "Enable keyboard as drumkit."
 msgstr "Activer la batterie au clavier"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:26
+#: ../data/config/schema.xml:82
 msgid "Keyboard as dance pad"
 msgstr "Tapis de dance au clavier"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:27
+#: ../data/config/schema.xml:83
 msgid "Enable keyboard as dance pad."
 msgstr "Activer le tapis de dance au clavier"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:28
+#: ../data/config/schema.xml:86
 msgid "Keyboard as keytar"
 msgstr "Keytar au clavier"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:29
+#: ../data/config/schema.xml:87
 msgid "Enable keyboard as keytar."
 msgstr "Activer le keytar au clavier"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:30
+#: ../data/config/schema.xml:94
 msgid "Force controller A's type"
 msgstr "Forcer le contrôleur de type A"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:31
+#: ../data/config/schema.xml:95
 msgid ""
 "Override autodetection and force the first controller to the given type."
 msgstr ""
 "Ignorer l'auto-détection et forcer le premier contrôleur à utiliser un "
 "certain type d'instrument."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:32
+#: ../data/config/schema.xml:102
 msgid "Force controller B's type"
 msgstr "Forcer le contrôleur de type B"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:33
+#: ../data/config/schema.xml:103
 msgid ""
 "Override autodetection and force the second controller to the given type."
 msgstr ""
 "Ignorer l'auto-détection et forcer le deuxième contrôleur à utiliser un "
 "certain type d'instrument."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:34
+#: ../data/config/schema.xml:110
 msgid "Force controller C's type"
 msgstr "Forcer le contrôleur de type C"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:35
+#: ../data/config/schema.xml:111
 msgid ""
 "Override autodetection and force the third controller to the given type."
 msgstr ""
 "Ignorer l'auto-détection et forcer le troisième contrôleur à utiliser un "
 "certain type d'instrument."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:36
+#: ../data/config/schema.xml:118
 msgid "Force controller D's type"
 msgstr "Forcer le contrôleur de type D"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:37
+#: ../data/config/schema.xml:119
 msgid ""
 "Override autodetection and force the fourth controller to the given type."
 msgstr ""
 "Ignorer l'auto-détection et forcer le quatrième contrôleur à utiliser un "
 "certain type d'instrument."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:38
+#: ../data/config/schema.xml:126
 msgid "Joystick configuration"
 msgstr "Configuration des manettes"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:39
+#: ../data/config/schema.xml:127
 msgid "Force joystick to some kind of instrument."
 msgstr "Attribuer de force une manette à un type d'instrument."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:40
+#: ../data/config/schema.xml:130
 msgid "Hardware MIDI input device"
 msgstr "Périphérique MIDI d'entrée"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:41
+#: ../data/config/schema.xml:131
 msgid ""
 "Regex for matching the MIDI devices to use. The default is to use all "
 "available devices."
@@ -849,59 +849,59 @@ msgstr ""
 "Expression régulière pour sélectionner le périphérique MIDI à utiliser. Par "
 "défaut utiliser tous les périphériques disponibles."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:42
+#: ../data/config/schema.xml:146
 msgid "Fallback song encoding"
 msgstr "Encodage des morceaux de secours"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:43
+#: ../data/config/schema.xml:147
 msgid "Pick the text codec used for song files that are not UTF-8."
 msgstr "Choisir l'encodage utilisé pour les morceaux qui ne sont pas en UTF-8."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:44
+#: ../data/config/schema.xml:154
 msgid "Windowed width"
 msgstr "Largeur de la fenêtre"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:45
+#: ../data/config/schema.xml:155
 msgid "The width of the window."
 msgstr "La largeur de la fenêtre"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:46
+#: ../data/config/schema.xml:160
 msgid "Windowed height"
 msgstr "Hauteur de la fenêtre"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:47
+#: ../data/config/schema.xml:161
 msgid "The height of the window."
 msgstr "La hauteur de la fenêtre"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:48
+#: ../data/config/schema.xml:164
 msgid "Fullscreen mode"
 msgstr "Mode plein écran"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:49
+#: ../data/config/schema.xml:165
 msgid "Enable fullscreen mode on startup."
 msgstr "Activer le mode plein écran au démarage"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:50
+#: ../data/config/schema.xml:168
 msgid "Stereoscopic 3D"
 msgstr "Stéréoscopie"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:51
+#: ../data/config/schema.xml:169
 msgid "Enable 3D rendering of Performous."
 msgstr "Activer le rendu 3D stéréoscopique"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:52
+#: ../data/config/schema.xml:177
 msgid "Stereo3D type"
 msgstr "Type de rendu stéréoscopique"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:53
+#: ../data/config/schema.xml:178
 msgid "Some modes may only get activated in fullscreen mode."
 msgstr "Certains modes ne peuvent être activés qu'en plein écran."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:54
+#: ../data/config/schema.xml:183
 msgid "Stereo3D separation"
 msgstr "Séparation Stereo3D"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:55
+#: ../data/config/schema.xml:184
 msgid ""
 "The strength of the effect. Experiment with different settings for best "
 "results."
@@ -909,11 +909,11 @@ msgstr ""
 "Espacement des deux images stéréoscopiques. Essayez plusieurs valeurs pour "
 "obtenir le meilleur résultat."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:56
+#: ../data/config/schema.xml:187
 msgid "Video playback"
 msgstr "Vidéo playback"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:57
+#: ../data/config/schema.xml:188
 msgid ""
 "Allows completely disabling background videos. It is recommended to leave "
 "this enabled as Performous will still smoothly fade out the video if your "
@@ -923,11 +923,11 @@ msgstr ""
 "option activée car Performous va automatiquement désactiver la vidéo en cas "
 "de problème de performances de votre ordinateur."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:58
+#: ../data/config/schema.xml:191
 msgid "Webcam background"
 msgstr "Webcam en fond d'écran"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:59
+#: ../data/config/schema.xml:192
 msgid ""
 "Performous can use webcam as a background video. Disable it if Performous "
 "crashes while entering a song."
@@ -935,22 +935,22 @@ msgstr ""
 "Performous peut essayer d'utiliser une webcam comme vidéo. Désactivez en cas "
 "de crash."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:60
+#: ../data/config/schema.xml:196
 msgid "Webcam id"
 msgstr "Id de la webcam"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:61
+#: ../data/config/schema.xml:197
 msgid ""
 "Use -1 to autodetect or a number starting from 0 to choose specific device."
 msgstr ""
 "Utilisez -1 pour l'autodétection ou un numéro en partant de 0 pour choisir "
 "un périphérique spécifique."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:62
+#: ../data/config/schema.xml:202
 msgid "SVG quality"
 msgstr "Qualité SVG"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:63
+#: ../data/config/schema.xml:203
 msgid ""
 "Larger numbers cause vector graphics to be rendered in higher resolution. "
 "Decrease this to make navigating in menus faster."
@@ -958,11 +958,11 @@ msgstr ""
 "Les grandes valeurs génèrent les images vectorielles en haute résolution. "
 "Diminuez cette valeur en cas de problèmes de performance."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:64
+#: ../data/config/schema.xml:208
 msgid "Text quality"
 msgstr "Qualité des textes"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:65
+#: ../data/config/schema.xml:209
 msgid ""
 "Larger numbers cause text to be rendered in higher resolution. Decrease this "
 "to make everything a little faster."
@@ -970,11 +970,11 @@ msgstr ""
 "Les grandes valeurs génèrent les textes en haute résolution. Diminuez cette "
 "valeur en cas de problèmes de performance."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:66
+#: ../data/config/schema.xml:212
 msgid "Benchmark mode"
 msgstr "Mode perfomance"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:67
+#: ../data/config/schema.xml:213
 msgid ""
 "Framerate limit of 100 FPS is removed and the game instead renders at full "
 "speed. FPS values are printed to console. Please note that the display "
@@ -984,11 +984,11 @@ msgstr ""
 "FPS sont affichées dans la console. Veuillez noter que le driver peut "
 "néanmoins limiter la vitesse au taux de rafraîchissement."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:68
+#: ../data/config/schema.xml:220
 msgid "Suggested latency"
 msgstr "Latence suggérée"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:69
+#: ../data/config/schema.xml:221
 msgid ""
 "This is a hint for the audio engine about the desired latency. Set this as "
 "low as possible while retaining clear audio playback. Requires restart."
@@ -997,11 +997,11 @@ msgstr ""
 "la valeur la plus petite possible sans que cela ne nuise à la qualité audio. "
 "Redémarrez."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:70
+#: ../data/config/schema.xml:226
 msgid "Audio/video latency"
 msgstr "Latence audio/vidéo"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:71
+#: ../data/config/schema.xml:227
 msgid ""
 "Affects all modes. Use negative value if your display input lag is greater "
 "than the sound card output latency, positive values in the opposite case and "
@@ -1016,11 +1016,11 @@ msgstr ""
 "rythme avec la musique. Utilisez Ctrl+F1/F2 pour l'ajuster pendant une "
 "chanson."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:72
+#: ../data/config/schema.xml:232
 msgid "Audio round-trip latency"
 msgstr "Latence audio/audio"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:73
+#: ../data/config/schema.xml:233
 msgid ""
 "Affects singing only. The time it takes for Performous playback to reach "
 "your speakers, fly to the microphone and all the way back until Performous "
@@ -1030,11 +1030,11 @@ msgstr ""
 "Affecte uniquement la voix. Latence entre la capture du micro et le son des "
 "enceintes. Utilisez Ctrl+F3/F4 pour l'ajuster pendant une chanson"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:74
+#: ../data/config/schema.xml:238
 msgid "Audio/controller latency"
 msgstr "Latence audio/controlleur"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:75
+#: ../data/config/schema.xml:239
 msgid ""
 "Affects instruments and dancing only. The total of USB (guitar or dance pad) "
 "latency combined with audio output latency. Adjust so that you can hit the "
@@ -1045,28 +1045,28 @@ msgstr ""
 "périphérique USB et la sortie sonore. Utilisez Ctrl+F5/F6 pour l'ajuster "
 "pendant une chanson."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:76
+#: ../data/config/schema.xml:246
 msgid "Audio devices"
 msgstr "Périphériques audio"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:77
+#: ../data/config/schema.xml:247
 msgid "List of audio devices to try."
 msgstr "Liste des périphériques audio à tester."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:78
+#: ../data/config/schema.xml:252
 msgid "Menu volume"
 msgstr "Volume du menu"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:79
+#: ../data/config/schema.xml:253
 msgid "The volume level of menus, song previews and jukebox mode."
 msgstr ""
 "Le volume sonore des menus, de l'aperçu des chansons et du mode jukebox."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:80
+#: ../data/config/schema.xml:258
 msgid "Music volume"
 msgstr "Volume de la musique"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:81
+#: ../data/config/schema.xml:259
 msgid ""
 "The ingame music volume. Values above 90 are not recommended as distortion "
 "may occur."
@@ -1074,11 +1074,11 @@ msgstr ""
 "Le volume de la musique pendant le jeu. Les valeurs supérieures à 90 ne sont "
 "pas recommandées (distorsion)."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:82
+#: ../data/config/schema.xml:264
 msgid "Failure volume"
 msgstr "Volume des erreurs"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:83
+#: ../data/config/schema.xml:265
 msgid ""
 "The ingame fail sound volume. Values above 90 are not recommended as "
 "distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
@@ -1086,28 +1086,28 @@ msgstr ""
 "Le volume des morceaux en cas d'erreur. Les valeurs supérieures à 90 ne sont "
 "pas recommandées (distorsion)."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:84
+#: ../data/config/schema.xml:268
 msgid "Microphone pass-through"
 msgstr "Microphone \"pass-through\""
 
-#: /tmp/xml2gettext.OSJKOSPnBt:85
+#: ../data/config/schema.xml:269
 msgid "Send captured singing voice to speakers."
 msgstr "Envoyer la sortie des micros vers les haut-parleurs."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:86
+#: ../data/config/schema.xml:274
 msgid "Pass-through volume ratio"
 msgstr "Volume du \"pass-through\""
 
-#: /tmp/xml2gettext.OSJKOSPnBt:87
+#: ../data/config/schema.xml:275
 msgid "How much voice is amplified compared to the music."
 msgstr ""
 "Quel est le niveau d'amplification des micros par rapport à la musique."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:88
+#: ../data/config/schema.xml:286
 msgid "Song folders"
 msgstr "Répertoires des chansons"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:89
+#: ../data/config/schema.xml:287
 msgid ""
 "Where to recursively look for songs. DATADIR at the beginning means all "
 "Performous data folders."
@@ -1115,11 +1115,11 @@ msgstr ""
 "Où chercher récursivement pour des morceaux. DATADIR au début désigne tous "
 "les répertoires de données."
 
-#: /tmp/xml2gettext.OSJKOSPnBt:90
+#: ../data/config/schema.xml:290
 msgid "Base folders for data"
 msgstr "Répertoire de base pour les données"
 
-#: /tmp/xml2gettext.OSJKOSPnBt:91
+#: ../data/config/schema.xml:291
 msgid ""
 "System defaults are included automatically. Additional paths can be added "
 "here."
