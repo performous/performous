@@ -151,6 +151,7 @@ class Music {
 	AudioClock m_clock;
 	time_duration durationOf(int64_t samples) const { return microseconds(1e6 * samples / srate / 2.0); }
 public:
+	bool suppressCenterChannel;
 	double fadeLevel;
 	double fadeRate;
 	typedef std::vector<float> Buffer;
@@ -161,6 +162,7 @@ public:
 			if (tf.second.empty()) continue; // Skip tracks with no filenames; FIXME: Why do we even have those here, shouldn't they be eliminated earlier?
 			tracks.insert(tf.first, std::auto_ptr<Track>(new Track(tf.second, sr)));
 		}
+		suppressCenterChannel = config["game/suppress_center_channel"].b();
 	}
 	/// Sums the stream to output sample range, returns true if the stream still has audio left afterwards.
 	bool operator()(float* begin, float* end) {
@@ -197,6 +199,15 @@ public:
 				if (fadeLevel > 1.0) { fadeLevel = 1.0; fadeRate = 0.0; }
 			}
 			begin[i] += mixbuf[i] * fadeLevel * static_cast<float>(m_preview ? config["audio/preview_volume"].i() : config["audio/music_volume"].i())/100.0;
+		}
+		// suppress center channel vocals
+		if(suppressCenterChannel && !m_preview) {
+			float diffLR;
+			for (size_t i=0; i<mixbuf.size(); i+=2) {
+				diffLR = begin[i] - begin[i+1];
+				begin[i] = diffLR;
+				begin[i+1] = diffLR;
+			}
 		}
 		return !eof;
 	}
@@ -627,6 +638,14 @@ void Audio::toggleSynth(Notes const& notes) {
 	Output& o = self->output;
 	boost::mutex::scoped_lock l(o.synth_mutex);
 	o.synth.get() ?  o.synth.reset() : o.synth.reset(new Synth(notes, getSR()));
+}
+
+void Audio::toggleCenterChannelSuppressor() {
+	Output& o = self->output;
+	boost::mutex::scoped_lock l(o.mutex);
+	for (size_t i = 0; i < o.playing.size(); i++) {
+		o.playing[i].suppressCenterChannel = !o.playing[i].suppressCenterChannel;
+	}
 }
 
 boost::ptr_vector<Analyzer>& Audio::analyzers() { return self->analyzers; }
