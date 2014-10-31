@@ -1,3 +1,4 @@
+INCLUDE(CPack)
 cmake_minimum_required(VERSION 2.8)
 project(Performous CXX C)
 set(PROJECT_VERSION "1.0")
@@ -77,3 +78,11 @@ if(WIN32)
 	install(FILES win32/ConfigureSongDirectory.bat DESTINATION .)
 endif()
 
+#CPACK variables
+SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Niek Nooijens")
+SET(CPACK_PACKAGE_CONTACT "nieknooijens@gmail.com")
+SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libavcodec54, libavformat54, libavresample1, libsdl2-2.0-0, libportaudiocpp0, libboost-all-dev, libswscale2, libxml++2.6-2, libopencv-dev, librsvg2-2, libpango-1.0-0, libcairo2, libjpeg8, libpng12-0, libportmidi0 ")
+SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION_SUMMARY "A free music rhythm game similar to SingStar, Guitar Hero and DDR")
+SET(CPACK_DEBIAN_PACKAGE_VERSION ${PROJECT_VERSION})
+SET(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
+SET(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CMAKE_BINARY_DIR};${PROJECT_NAME};ALL;/")
