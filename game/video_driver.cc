@@ -334,6 +334,10 @@ void Window::resize() {
 	// Enforce aspect ratio limits
 	if (s_height < 0.56f * s_width) s_width = round(s_height / 0.56f);
 	if (s_height > 0.8f * s_width) s_height = round(0.8f * s_width);
+	if (!m_fullscreen) {
+		config["graphic/window_width"].i() = s_width;
+		config["graphic/window_height"].i() = s_height;
+	}
 }
 
 void Window::screenshot() {

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(Performous CXX C)
-set(PROJECT_VERSION "0.8")
+set(PROJECT_VERSION "1.0")
 set(BUILD_SHARED_LIBS OFF)
 
 # Avoid source tree pollution

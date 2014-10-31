@@ -1,17 +1,17 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <map>
-
-#include "ffmpeg.hh"
-#include "notes.hh"
-#include "pitch.hh"
-#include "util.hh"
 #include <boost/date_time.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <map>
+#include <string>
+#include <vector>
+
+#include "ffmpeg.hh"
 #include "libda/portaudio.hpp"
+#include "notes.hh"
+#include "pitch.hh"
+#include "util.hh"
 
 const unsigned AUDIO_MAX_ANALYZERS = 4;
 

@@ -11,9 +11,9 @@ NoteGraph::NoteGraph(VocalTrack const& vocal):
   m_vocal(vocal),
   m_notelines(findFile("notelines.svg")), m_wave(findFile("wave.png")),
   m_star(findFile("star.svg")), m_star_hl(findFile("star_glow.svg")),
-  m_notebar(findFile("notebar.svg")), m_notebar_hl(findFile("notebar.png")),
+  m_notebar(findFile("notebar.svg")), m_notebar_hl(findFile("notebar_hi.svg")),
   m_notebarfs(findFile("notebarfs.svg")), m_notebarfs_hl(findFile("notebarfs-hl.png")),
-  m_notebargold(findFile("notebargold.svg")), m_notebargold_hl(findFile("notebargold.png")),
+  m_notebargold(findFile("notebargold.svg")), m_notebargold_hl(findFile("notebargold_hi.svg")),
   m_notealpha(0.0f), m_nlTop(0.0, 4.0), m_nlBottom(0.0, 4.0), m_time()
 {
 	dimensions.stretch(1.0, 0.5); // Initial dimensions, probably overridden from somewhere

@@ -2,9 +2,9 @@ build
 build32
 build64
 CMakeLists.txt.user*
-
-#dummy files you may create when translating
 *~
 *.mo
 dylibbundler.log
 performous-app-build.sh
+osx-utils/out
+osx-utils/Performous.dmg

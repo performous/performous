@@ -201,10 +201,10 @@
 			</mapping>
 		</controller>
 		-->
-		<!-- disabling this as the regex picks the GH4 hub/guitar. Needs a better regex and the SDL2 hat support.
 		<controller type="drumkit" name="DRUMS_GUITARHERO">
 			<description>Guitar Hero 4 drum kit</description>
-			<device regex="Guitar Hero4" />
+			<!-- Needs to be chosen manually because the joystick name is identical with the guitar. Hat bindings not tested. -->
+			<device regex="Guitar Hero4 NO-AUTODETECT" />
 			<mapping>
 				<button hw="0" map="blue" />
 				<button hw="1" map="green" />
@@ -216,9 +216,9 @@
 				<button hw="9" map="start" />
 				<axis hw="4" negative="left" positive="right" />
 				<axis hw="5" negative="up" positive="down" />
+				<hat hw="0" up="up" down="down" left="left" right="right" />
 			</mapping>
 		</controller>
-		-->
 		<controller type="drumkit" name="DRUMS_GUITARHERO5">
 			<description>Guitar Hero 5/Band Hero drum kit</description>
 			<device regex="Drum Guitar Hero5" />

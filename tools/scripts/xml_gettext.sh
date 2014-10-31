@@ -11,11 +11,6 @@
 #			<long>Hide pitch wave, notes and scoring.</long>
 #		</entry>
 
-# adds a line to the temporary source file
-append_temp_src(){
-	echo "$*" >> "$TEMP_SRC"
-}
-
 # match <entry, ignoring allowed whitespace.
 match_entry_start(){
 	echo "$1" | grep -qE '^[[:space:]]*<[[:space:]]*entry.*>[[:space:]]*$'
@@ -38,17 +33,20 @@ match_simple_tag(){
 # Note: every " is automatically replaced by \". This is what you want, not
 # invalid C code.
 transform_simple_tag_to_keyworded_string(){
-	echo "$1" | sed -re 's:\":\\\":g' -e 's:^[[:space:]]*<[[:space:]]*([a-z]+)[[:space:]]*>(.*)<[[:space:]]*/[[:space:]]*\1[[:space:]]*>[[:space:]]*$:_("\2"):'
+	echo "$1" | sed -re 's:\":\\\":g' -e 's:^[[:space:]]*<[[:space:]]*([a-z]+)[[:space:]]*>(.*)<[[:space:]]*/[[:space:]]*\1[[:space:]]*>[[:space:]]*$:\2:'
 }
 
 transform_and_add_string(){
-	append_temp_src "$(transform_simple_tag_to_keyworded_string "$1")"
+	echo "#: $2:$3"
+	echo "msgid \"$(transform_simple_tag_to_keyworded_string "$1")\""
+	echo 'msgstr ""'
+	echo
 }
 
 # transform <short/> and <long/> lines to _() lines
 process_locale_block_line(){
-	match_simple_tag "short" "$1" && transform_and_add_string "$1"
-	match_simple_tag "long" "$1" && transform_and_add_string "$1"
+	match_simple_tag "short" "$1" && transform_and_add_string "$1" "$2" "$3"
+	match_simple_tag "long" "$1" && transform_and_add_string "$1" "$2" "$3"
 }
 
 process_xml(){
@@ -65,15 +63,15 @@ process_xml(){
 			if [[ $? -eq 0 ]] ; then
 				IN_BLOCK=0
 			else
-				process_locale_block_line "$line"
+				process_locale_block_line "$line" "$1" "$line_no"
 			fi
 
 			# <entry...> with out </entry> found:
-			match_entry_start "$line" && (echo "Malformed XML $file:$line_no: Opening entry-tag found while already inside an entry block." >&2 ;exit -1)
+			match_entry_start "$line" && (echo "Malformed XML $file:$line_no: Opening entry-tag found while already inside an entry block." >&2 ;exit 2)
 
 		else
 			# </entry> with out <entry> found:
-			match_entry_end "$line" && (echo "Malformed XML $file:$line_no:: Closing entry-tag without prior opening tag." >&2 ;exit -1)
+			match_entry_end "$line" && (echo "Malformed XML $file:$line_no:: Closing entry-tag without prior opening tag." >&2 ;exit 2)
 
 			match_entry_start "$line"
 			if [[ $? -eq 0 ]] ; then
@@ -84,34 +82,20 @@ process_xml(){
 }
 
 
-if [[ $# -lt 2 ]] ; then
-	echo "USAGE: $0 <output file> <input encoding> [files...]"
-	exit -1 
-elif [[ $# -eq 2 ]] ; then
-	# no input files nothing to do
-	exit 0
+if [[ $# -lt 1 ]] ; then
+	echo "USAGE: $0 <output file> [files...]"
+	exit 1
 fi
 
 POEDIT_FILE="$1"
-ENC="$2"
 shift
-shift
-
-# create the temporary file securely.
-TEMP_SRC="$(mktemp -t xml2gettext.XXXXXXXXXX)"
-
-append_temp_src "/* This is a automatically generated temp file, it's safe to remove */"
 
 # Start the dirty work
+{
 for file in $* ; do
 	process_xml "$file"
 done
+} | msguniq -o "$POEDIT_FILE"
 
-# Invoke xgettext, poedit will merge this with the rest of the strings
-xgettext --force-po --language=C -o "$POEDIT_FILE" --from-code="$ENC" -k_ "$TEMP_SRC"
-RV=$?
 
-# clean up
-rm "$TEMP_SRC"
-
-exit $RV
+exit 0

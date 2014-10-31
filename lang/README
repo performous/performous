@@ -29,10 +29,10 @@ These steps enable translation of the XML locate bits.
   3. Click the New button and fill out the form like this:
        Language: Performous XML
        List of extensions: *.xml
-       Parser command: $SOURCE_ROOT/tools/scripts/xml_gettext.sh %o %C %F
+       Parser command: $SOURCE_ROOT/tools/scripts/xml_gettext.sh %o %F
        An item in keywords list:
        An item in input files list: %f
-       Source code charset: %c
+       Source code charset:
      Where $SOURCE_ROOT is the path to the performous sources root.
   4. Click Okay
 
