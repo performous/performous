@@ -39,6 +39,10 @@ to save the current settings to XML.
 	</menu>
 
 	<!-- Gameplay preferences -->
+	<entry name="game/suppress_center_channel" type="bool" value="false">
+		<short>Suppress center channel</short>
+		<long>Suppress audio of center channel (e.g. vocals).</long>
+	</entry>
 	<entry name="game/karaoke_mode" type="int" value="0">
 		<limits>
 			<enum>Off</enum>

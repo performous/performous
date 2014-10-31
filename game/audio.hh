@@ -92,6 +92,8 @@ public:
 	bool isPaused() const;
 	/** Toggle synth playback **/
 	void toggleSynth(Notes const&);
+	/** Toggle center channel suppressor **/
+	void toggleCenterChannelSuppressor();
 	/** Adjust volume level of a single track (used for muting incorrectly played instruments). Range 0.0 to 1.0. **/
 	void streamFade(std::string track, double volume);
 	/** Do a pitch shift - used for guitar whammy bar */
