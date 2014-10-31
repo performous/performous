@@ -60,7 +60,7 @@ namespace {
 		longjmp(myerr->setjmp_buffer, 1);
 	}
 
-	#if JPEG_LIB_VERSION < 80
+	#if JPEG_LIB_VERSION < 80 && !defined(MEM_SRCDST_SUPPORTED)
 	// Implementation of jpeg_mem_src from
 	// http://stackoverflow.com/questions/5280756/libjpeg-ver-6b-jpeg-stdio-src-vs-jpeg-mem-src 
 
