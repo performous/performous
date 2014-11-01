@@ -79,7 +79,6 @@ endif()
 add_subdirectory(docs)
 
 if(WIN32)
-	option(ENABLE_VERSIONING "Add version number information. This allows adding version information to the EXE. Be careful, in beta." OFF)
 	install(FILES win32/ConfigureSongDirectory.bat DESTINATION .)
 endif()
 

@@ -4,43 +4,40 @@ file(GLOB SOURCE_FILES "*.cc")
 file(GLOB HEADER_FILES "*.hh" "libda/*.hpp")
 
 if(WIN32)
-	if(ENABLE_VERSIONING)
-		set(COMMENTS)
-		string(REGEX MATCHALL "([^\\.,^$]+)(\\.|,|$)"  VERSIONING ${PROJECT_VERSION})
-		set(VERSIONS "MAJOR" "MINOR" "PATCH" "TWEAK")
-		foreach(s ${VERSIONING})
-			# We get the most-right number
-			string(REGEX REPLACE "[^0-9]+$" "" s ${s})#removes most right part non-numeric (like .)
-			# Now we have a string in format <numbers-letters..........numbers>
-			# Take last numbers (if there are)
-			# If string not empty, there are some numbers in right of string
-			# otherwise, set a 0, to be sure that there's a number
-			if(s STREQUAL "")
-				set(s "0")
-			endif()
-			string(REGEX MATCH "[0-9]*$" s ${s})
+	# We want to support all these version numbers:
+	# 1.0 1.0.1 1.0+ 1.0.1+ 1.0-2-g123abcd 1.0.1-5-g123abcd
+	# We use the 2-3 digits of the version as MAJOR.MINOR.PATCH
+	# and the git patch number as TWEAK
+	string(REGEX REPLACE "\\." ";"  VERSIONING ${PROJECT_VERSION})
+	list(GET VERSIONING -1 LAST_ENTRY)
+	list(REMOVE_AT VERSIONING -1)
+	string(REGEX REPLACE "^([0-9]+)(.*)$" "\\1;\\2"  LAST_ENTRIES ${LAST_ENTRY})
+	list(GET LAST_ENTRIES 0 LAST_ENTRY_NUM)
+	list(GET LAST_ENTRIES 1 LAST_ENTRY_ADD)
+	list(APPEND VERSIONING ${LAST_ENTRY_NUM})
 
-			foreach(v ${VERSIONS})
-				if(NOT VERSION_${v}_DONE)
-					set(VERSION_${v}_DONE 1)
-					set(VERSION_${v} "${s}")
-					break()
-				endif()
-			endforeach()
-		endforeach()
+	list(GET VERSIONING 0 VERSION_MAJOR)
+	list(LENGTH VERSIONING VERSION_LENGTH)
+	if(VERSION_LENGTH GREATER 1)
+		list(GET VERSIONING 1 VERSION_MINOR)
+	endif()
+	if(VERSION_LENGTH GREATER 2)
+		list(GET VERSIONING 2 VERSION_PATCH)
+	endif()
 
-		foreach(v ${VERSIONS})
-			if(NOT VERSION_${v}_DONE OR VERSION_${v} STREQUAL "") #For the substitution did before, in VERSION_${v} we have or a empty string (if all letters) or a number
-				set(VERSION_${v} "0")
-			endif()
-		endforeach()
-		message(STATUS "Setting .exe version: ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_TWEAK}")
-	else(ENABLE_VERSIONING)
-		set(COMMENTS "//")
-	endif(ENABLE_VERSIONING)
+	string(REGEX REPLACE "^-([0-9]+)-.*$" "\\1" VERSION_TWEAK "${LAST_ENTRY_ADD}")
+
+	set(VERSIONS "MAJOR" "MINOR" "PATCH" "TWEAK")
+	foreach(v ${VERSIONS})
+		if(NOT VERSION_${v} MATCHES "^[0-9]+$")
+			set(VERSION_${v} "0")
+		endif()
+	endforeach()
+	message(STATUS "Setting .exe version: ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_TWEAK}")
+
 	set(RESOURCE_FILES "${CMAKE_BINARY_DIR}/performous.rc")
-
 	configure_file("../win32/performous.cmake.rc" "${RESOURCE_FILES}")
+
 	if(MINGW)
 		# According to MinGW tools, we need to compile the rc file, and then link it into projects:
 		# windres foo.rc foores.o
