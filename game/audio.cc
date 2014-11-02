@@ -162,7 +162,7 @@ public:
 			if (tf.second.empty()) continue; // Skip tracks with no filenames; FIXME: Why do we even have those here, shouldn't they be eliminated earlier?
 			tracks.insert(tf.first, std::auto_ptr<Track>(new Track(tf.second, sr)));
 		}
-		suppressCenterChannel = config["game/suppress_center_channel"].b();
+		suppressCenterChannel = config["audio/suppress_center_channel"].b();
 	}
 	/// Sums the stream to output sample range, returns true if the stream still has audio left afterwards.
 	bool operator()(float* begin, float* end) {
