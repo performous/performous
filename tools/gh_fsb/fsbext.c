@@ -192,14 +192,14 @@ int main(int argc, char *argv[]) {
             "-a       add header to the output files for making them directly playable,\n"
             "         the extracted files are usually header-less (just as they are in the\n"
             "         FSB archive) so this option IS very useful and suggested!\n"
-            "-s FILE  binary file containing the informations for rebuilding the FSB file\n"
+            "-s FILE  binary file containing the information for rebuilding the FSB file\n"
             "-r       rebuild the original file, in short:\n"
             "         if you do NOT use -r will be created the binary file with the info\n"
             "         if you use -r will be read the binary file (-s) and will be created a\n"
             "         new FSB file (so it becomes the output and not the input)\n"
             "         Example:   fsbext -s files.dat    input.fsb\n"
             "                    fsbext -s files.dat -r output.fsb\n"
-            "-v       verbose output, debugging informations\n"
+            "-v       verbose output, debugging information\n"
             "-f FILE  dump the list of extracted/listed files in FILE\n"
             "-A       option available only with -a, gives the ima_adpcm tag (0x0011)\n"
             "         instead of the xbox adpcm one (0x0069) to the output adpcm files\n"
@@ -272,7 +272,7 @@ int main(int argc, char *argv[]) {
         if(!fdreb) {
             printf("\n"
                 "Error: you have selected the rebuild option but you have not specified the\n"
-                "       file with the rebuild informations using -s\n");
+                "       file with the rebuild information using -s\n");
             exit(1);
         }
 

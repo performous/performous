@@ -67,7 +67,7 @@ std::string Players::lookup(int id) const {
 	PlayerItem pi;
 	pi.id = id;
 	auto it = m_players.find(pi);
-	if (it == m_players.end()) return "Unkown Player";
+	if (it == m_players.end()) return "Unknown Player";
 	else return it->name;
 }
 

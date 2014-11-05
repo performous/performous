@@ -84,7 +84,7 @@ get_full_language_name(){
 			# for name= will fail => NAME="")
 
 			# Fall back to something other than an empty string
-			NAME="Unkown"
+			NAME="Unknown"
 	    fi
 	fi
 	echo "$NAME"

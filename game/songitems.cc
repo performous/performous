@@ -92,7 +92,7 @@ std::string SongItems::lookup(int id) const {
 	SongItem si;
 	si.id = id;
 	auto it = m_songs.find(si);
-	if (it == m_songs.end()) return "Unkown Song";
+	if (it == m_songs.end()) return "Unknown Song";
 	else if (!it->song) return it->artist + " - " + it->title;
 	else return it->song->artist + " - " + it->song->title;
 }

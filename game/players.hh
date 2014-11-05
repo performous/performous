@@ -61,7 +61,7 @@ class Players: boost::noncopyable {
 	int lookup(std::string const& name) const;
 
 	/** lookup a players name using the playerid.
-	  @return the players name or "Unkown Player"
+	  @return the players name or "Unknown Player"
 	  */
 	std::string lookup(int id) const;
 
