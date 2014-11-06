@@ -1,7 +1,7 @@
 #pragma once
 
 #include "glutil.hh"
-#include "image.hh"
+#include "../common/image.hh"
 #include "video_driver.hh"
 
 #include <boost/noncopyable.hpp>
