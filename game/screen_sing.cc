@@ -349,6 +349,11 @@ void ScreenSing::manageEvent(SDL_Event event) {
 	SDL_Scancode key = event.key.keysym.scancode;
 	// Ctrl combinations that can be used while performing (not when score dialog is displayed)
 	if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_CTRL) && !m_score_window.get()) {
+		if (key == SDL_SCANCODE_C) {
+			m_audio.toggleCenterChannelSuppressor();
+			++config["audio/suppress_center_channel"];
+			dispInFlash(config["audio/suppress_center_channel"]);
+		}
 		if (key == SDL_SCANCODE_S) m_audio.toggleSynth(m_song->getVocalTrack(m_selectedTrack).notes);
 		if (key == SDL_SCANCODE_V) m_audio.streamFade("vocals", event.key.keysym.mod & KMOD_SHIFT ? 1.0 : 0.0);
 		if (key == SDL_SCANCODE_K)  { // Toggle karaoke mode

@@ -274,6 +274,10 @@ to save the current settings to XML.
 		<short>Pass-through volume ratio</short>
 		<long>How much voice is amplified compared to the music.</long>
 	</entry>
+	<entry name="audio/suppress_center_channel" type="bool" value="false">
+		<short>Suppress center channel</short>
+		<long>Suppress audio of center channel (e.g. vocals).</long>
+	</entry>
 
 	<!-- Paths -->
 	<entry name="paths/songs" type="string_list">
