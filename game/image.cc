@@ -5,6 +5,9 @@
 #include <jpeglib.h>
 #include <png.h>
 
+#include <iostream>
+#include <string>
+
 using fs::ofstream;
 using fs::ifstream;
 
