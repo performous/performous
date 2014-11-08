@@ -43,6 +43,8 @@ struct Bitmap {
 	}
 	unsigned char const* data() const { return ptr ? ptr : &buf[0]; }
 	unsigned char* data() { return ptr ? ptr : &buf[0]; }
+
+	void crop(const unsigned width, const unsigned height, const unsigned x, const unsigned y);
 };
 
 // The total number of bytes per line (stride) may be specified. By default no padding at end of line is assumed.

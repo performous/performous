@@ -192,3 +192,32 @@ void loadJPEG(Bitmap& bitmap, fs::path const& filename) {
 	jpeg_destroy_decompress(&cinfo);
 }
 
+void Bitmap::crop(const unsigned width, const unsigned height, const unsigned x, const unsigned y) {
+	if (ptr) throw std::logic_error("Cannot Bitmap::crop foreign pointers.");
+	if (x + width > this->width || y+ height > this->height)
+		throw std::logic_error("Cannot crop to a size bigger then source image.");
+
+	unsigned char bpp;
+	switch (fmt) {
+	case pix::INT_ARGB: bpp = 4; break; // Correct?
+	case pix::BGR: bpp = 3; break;
+	case pix::RGB: bpp = 3; break;
+	case pix::CHAR_RGBA: bpp = 4; break;
+	default: throw std::logic_error("Unsupported picture format.");
+	}
+
+	unsigned newpos = 0;
+	for (unsigned row = y; row < y + height; row++) {
+		for (unsigned col = x; col < x + width; col++) {
+			for (char subp = 0; subp < bpp; subp++) {
+				unsigned oldpos = (row * this->width + col) * bpp + subp;
+				if (oldpos != newpos) {
+					buf[newpos] = buf[oldpos];
+				}
+				newpos++;
+			}
+		}
+	}
+	this->width = width;
+	this->height = height;
+}

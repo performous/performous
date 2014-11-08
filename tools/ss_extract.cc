@@ -170,8 +170,8 @@ struct Process {
 			std::cerr << ">>> Extracting cover image" << std::endl;
 			try {
 				SingstarCover c = SingstarCover(dvdPath + "/pack_ee.pak", boost::lexical_cast<unsigned int>(id));
-				c.write(path.string() + "/cover.jpg");
-				song.cover = path / "cover.jpg";
+				c.write(path / "/cover.png");
+				song.cover = path / "cover.png";
 			} catch (...) {}
 			remove = "";
 			// FIXME: use some library (preferrably ffmpeg):
