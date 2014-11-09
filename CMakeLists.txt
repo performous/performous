@@ -1,14 +1,20 @@
 cmake_minimum_required(VERSION 2.8)
 project(Performous CXX C)
-set(PROJECT_VERSION "1.0")
-set(BUILD_SHARED_LIBS OFF)
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+
+include(GetGitRevisionDescription)
+git_describe(PROJECT_VERSION --tags)
+if(NOT PROJECT_VERSION)
+	set(PROJECT_VERSION "1.0+")
+endif()
+
+message("Building ${PROJECT_NAME} ${PROJECT_VERSION}")
 
 # Avoid source tree pollution
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 	message(FATAL_ERROR "In-source builds are not permitted. Make a separate folder for building:\nmkdir build; cd build; cmake ..\nBefore that, remove the files already created:\nrm -rf CMakeCache.txt CMakeFiles")
 endif(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 # Add a sensible build type default and warning because empty means no optimization and no debug info.
 if(NOT CMAKE_BUILD_TYPE)
@@ -73,7 +79,15 @@ endif()
 add_subdirectory(docs)
 
 if(WIN32)
-	option(ENABLE_VERSIONING "Add version number information. This allows adding version information to the EXE. Be careful, in beta." OFF)
 	install(FILES win32/ConfigureSongDirectory.bat DESTINATION .)
 endif()
 
+#CPACK variables
+include(CPack)
+SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Niek Nooijens")
+SET(CPACK_PACKAGE_CONTACT "nieknooijens@gmail.com")
+SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libavcodec54, libavformat54, libavresample1, libsdl2-2.0-0, libportaudiocpp0, libboost-all-dev, libswscale2, libxml++2.6-2, libopencv-dev, librsvg2-2, libpango-1.0-0, libcairo2, libjpeg8, libpng12-0, libportmidi0 ")
+SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION_SUMMARY "A free music rhythm game similar to SingStar, Guitar Hero and DDR")
+SET(CPACK_DEBIAN_PACKAGE_VERSION ${PROJECT_VERSION})
+SET(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
+SET(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CMAKE_BINARY_DIR};${PROJECT_NAME};ALL;/")

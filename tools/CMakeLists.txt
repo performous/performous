@@ -8,26 +8,31 @@ include_directories(${Boost_INCLUDE_DIRS})
 # Find all the libs that don't require extra parameters
 
 if (APPLE)
-    foreach(lib LibXML++ Z Jpeg Tiff Png Freetype Z)
+	foreach(lib LibXML++ Z Jpeg Tiff Png Freetype Z)
 	find_package(${lib})
-    	if (${lib}_FOUND)
-	    	include_directories(${${lib}_INCLUDE_DIRS})
-		    add_definitions(${${lib}_DEFINITIONS})
-    	endif (${lib}_FOUND)
-    endforeach(lib)
+		if (${lib}_FOUND)
+		include_directories(${${lib}_INCLUDE_DIRS})
+			add_definitions(${${lib}_DEFINITIONS})
+		endif (${lib}_FOUND)
+	endforeach(lib)
 
-    # CMake cannot properly detect Magick++ on Mac the other way.
+# CMake cannot properly detect Magick++ on Mac the other way.
 
-    find_package(ImageMagick COMPONENTS Magick++)
-    include_directories(${ImageMagick_INCLUDE_DIRS})
+	find_package(ImageMagick COMPONENTS Magick++)
+	include_directories(${ImageMagick_INCLUDE_DIRS})
 else (APPLE)
-    foreach(lib LibXML++ Z Magick++ Jpeg Tiff Png Freetype Z)
-	    find_package(${lib})
-    	if (${lib}_FOUND)
-	    	include_directories(${${lib}_INCLUDE_DIRS})
-		    add_definitions(${${lib}_DEFINITIONS})
-    	endif (${lib}_FOUND)
-    endforeach(lib)
+	foreach(lib LibXML++ Z Jpeg Tiff Png Freetype Z)
+		find_package(${lib})
+		if (${lib}_FOUND)
+			include_directories(${${lib}_INCLUDE_DIRS})
+			add_definitions(${${lib}_DEFINITIONS})
+		endif (${lib}_FOUND)
+	endforeach(lib)
+
+	find_package(ImageMagick COMPONENTS Magick++)
+	find_package(PkgConfig)
+	PKG_CHECK_MODULES(IMAGEMAGICK Magick++ MagickWand MagickCore)
+	include_directories(${ImageMagick_INCLUDE_DIRS})
 endif (APPLE)
 
 # Set default compile flags for GCC

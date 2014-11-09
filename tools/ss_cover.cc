@@ -92,7 +92,7 @@ SingstarCover::SingstarCover(const std::string pak_file, unsigned int track_id) 
 		std::string xpath_old = std::string("/TPAGE_BIT_SET/TPAGE_BIT[@NAME='") + id + "']";
 		n = dom.get_document()->get_root_node()->find(xpath_old, nsmap);
 		if (n.empty())
-			throw std::runtime_error("Unable to find cover informations");
+			throw std::runtime_error("Unable to find cover information");
 	}
 	xmlpp::Element& e = dynamic_cast<xmlpp::Element&>(*n[0]);
 	m_u = boost::lexical_cast<unsigned int>(e.get_attribute("U")->get_value());
@@ -123,7 +123,7 @@ void SingstarCover::write(const std::string filename) {
 	image.depth(8);
 	image.magick( "RGBA" ); 
 	image.read(blob);
-	// crop image according to informations stored in xml
+	// crop image according to information stored in xml
 	image.crop( Magick::Geometry(m_width, m_height, m_u, m_v) );
 	// write it
 	image.write(filename);
