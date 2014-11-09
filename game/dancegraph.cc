@@ -27,10 +27,6 @@ namespace {
 	const float texCoordStep = -0.25f; // Four beat lines per beat texture
 	// Note: t is difference from playback time so it must be in range [past, future]
 	float time2y(float t) { return timescale * (t - past) / (future - past); }
-	float time2a(float t) {
-		float a = clamp(1.0 - t / future); // Note: we want 1.0 alpha already at zero t.
-		return std::pow(a, 0.8f); // Nicer curve
-	}
 	const double maxTolerance = 0.15; // Maximum error in seconds
 	int getNextBigStreak(int prev) { return prev + 10; }
 
