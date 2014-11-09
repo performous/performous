@@ -59,6 +59,9 @@ colorize(){
 # This assumes the file /usr/share/xml/iso-codes/iso_639.xml exists
 # and has a very strict format (not only valid XML!)
 get_full_language_name(){
+	# We have no good solution for pt_BR yet
+	L_ONLY="$(echo "$1" | sed 's/_[A-Za-z]*//')"
+
 	if [[ ! -f "$ISO_639_XML" ]] ; then
 		echo "<!> Missing file \"$(basename "$ISO_639_XML")\""
 		die "FATAL ERROR: Missing ISO-639 mappings."
@@ -72,11 +75,11 @@ get_full_language_name(){
 	# * name="Xyzuvw; ..." />               * name="Xyzuvw; ..." />
 
 	# only pick the first name if many (see XML for examples on eg "nl")
-	NAME=$(grep -A1 "iso_639_1_code=\"$1\"" "$ISO_639_XML" | grep name | sed -re 's:[ \t]*name="([^;\"]+).*:\1:')
+	NAME=$(grep -A1 "iso_639_1_code=\"$L_ONLY\"" "$ISO_639_XML" | grep name | sed -re 's:[ \t]*name="([^;\"]+).*:\1:')
 	if [[ -z "$NAME" ]] ; then
 	    # Try the 3-letter terminology form before giving up
 	    # <http://www.opentag.com/xfaq_lang.htm>
-	    NAME=$(grep -A1 "iso_639_2T_code=\"$1\"" "$ISO_639_XML" | grep name= | sed -re 's:[ \t]*name="([^;\"]+).*:\1:') 
+	    NAME=$(grep -A1 "iso_639_2T_code=\"$L_ONLY\"" "$ISO_639_XML" | grep name= | sed -re 's:[ \t]*name="([^;\"]+).*:\1:') 
 
 	    if [[ -z "$NAME" ]] ; then
 			# causes: no 2 or 3 letter code exists, or both exists and the 3 letter
@@ -118,16 +121,15 @@ last_commit_id(){
 	git log --date-order -n1 --pretty=format:%h --no-color --date=iso
 }
 last_commit_gitweb_uri(){
-	# SF_GIT_WEB_URI
-	SF_GIT_WEB_URI_BASE="http://performous.git.sourceforge.net/git/gitweb.cgi?p=performous/performous;a=commit"
-	SF_GIT_WEB_URI="${SF_GIT_WEB_URI_BASE};h=$(git log --date-order -n1 --pretty=format:%H --no-color --date=iso)"
-	echo "$SF_GIT_WEB_URI"
+	local GIT_WEB_URI_BASE="https://github.com/performous/performous"
+	local GIT_WEB_URI="${GIT_WEB_URI_BASE}/commit/$(git log --date-order -n1 --pretty=format:%H --no-color --date=iso)"
+	echo "$GIT_WEB_URI"
 }
 
 current_gitweb_uri(){
-	SF_GIT_WEB_URI_BASE="http://performous.git.sourceforge.net/git/gitweb.cgi?p=performous/performous;a=blob;hb=HEAD"
-	SF_GIT_WEB_URI="${SF_GIT_WEB_URI_BASE};f=$1"
-	echo "$SF_GIT_WEB_URI"
+	local GIT_WEB_URI_BASE="https://github.com/performous/performous/tree/master"
+	local GIT_WEB_URI="${GIT_WEB_URI_BASE}/$1"
+	echo "$GIT_WEB_URI"
 }
 
 # update_vars : ISO-369-1 LANG -> Ø
@@ -137,7 +139,7 @@ update_vars(){
 	# Extract translated, fuzzy and untranslated counts
 	# Note: msgfmt has bad habits:
 	#  * stats are apparently errors, as they're sent to stderr
-	#  * it says "1 fuzzy translation" andt "2 fuzzy translations", thus
+	#  * it says "1 fuzzy translation" and "2 fuzzy translations", thus
 	#    the "...s?..." to catch that case, I'm assuming this holds for
 	#    all three components.
 	#sed -re "s%^([0-9]+) translated messages?(, ([0-9]+) fuzzy translations?)?(, ([0-9]+) untranslated messages?)?\.%LANG=$1;T=\1;F=\3;U=\5%"
@@ -161,7 +163,7 @@ update_vars(){
 
 # internal use by generate_overview
 overview_wikify(){
-	I_LANG="$(echo "$1" | sed -re 's:lang/([a-z]+)\.po:\1:')"
+	I_LANG="$(echo "$1" | sed -re 's:lang/([a-zA-Z_]+)\.po:\1:')"
 	YYYY_MM_DD="$(LC_ALL=C git log -1 --format="%ar" lang/$I_LANG.po)"
 	LONG_LANG="$(get_full_language_name "$I_LANG")"
 	[[ $? -eq 0 ]] || die "$LONG_LANG"
@@ -172,7 +174,7 @@ overview_wikify(){
 	PC_COLOR=$(colorize $TPC)
 
 	echo "|-"
-	echo "|   [[Translations ($LONG_LANG)|$I_LANG]]  || $YYYY_MM_DD  || ${PC_COLOR} ${TPC} % || $TOT || $FUZ || ${UNT} || '''$(( $TOT + $UNT + $FUZ ))''' || [$(current_gitweb_uri "$1") $1] || ${COMMENT}"
+	echo "| [[Translations ($LONG_LANG)|$LONG_LANG ($I_LANG)]] || $YYYY_MM_DD || ${PC_COLOR} ${TPC}&nbsp;% || $TOT || $FUZ || ${UNT} || '''$(( $TOT + $UNT + $FUZ ))''' || [$(current_gitweb_uri "$1") $I_LANG.po] || ${COMMENT}"
 }
 
 generate_overview(){
