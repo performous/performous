@@ -34,8 +34,8 @@ rm -rf ./build
 mkdir build
 cd build
 
-cmake -DCMAKE_INSTALL_PREFIX=$TEMPDIR -DENABLE_TOOLS=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=1 -DFreetype_INCLUDE_DIR=/opt/local/include/freetype2 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 -DFontconfig_INCLUDE_DIR=/opt/local/include/fontconfig -DPng_INCLUDE_DIR=/opt/local/include/libpng -DAVCodec_INCLUDE_DIR=/opt/local/include/libavcodec -DOpenGL_GL_LIBRARY=/System/Library/Frameworks/OpenGL.framework -DOpenGL_GLU_LIBRARY=/System/Library/Frameworks/OpenGL.framework -DOpenGL_INCLUDE_DIR=/System/Library/Frameworks/OpenGL.framework/Headers -DAVFormat_INCLUDE_DIR=/opt/local/include/libavformat -DSWScale_INCLUDE_DIR=/opt/local/include/libswscale -DFreetype_INCLUDE_DIR=/opt/local/include/freetype2/ -DLibXML2_LIBRARY=/opt/local/lib/libxml2.dylib -DLibXML2_INCLUDE_DIR=/opt/local/include/libxml2 -DLibXML++Config_INCLUDE_DIR=/opt/local/lib/libxml++-2.6/include -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -DGettext_LIBRARY=/opt/local/lib/libgettextlib.dylib  -DGettext_INCLUDE_DIR=/opt/local/include/ -DGlibmmConfig_INCLUDE_DIR=/opt/local/lib/glibmm-2.4/include -DGlibConfig_INCLUDE_DIR=/opt/local/lib/glib-2.0/include -DCMAKE_C_COMPILER=/opt/local/bin/gcc-mp-4.9 -DCMAKE_CXX_COMPILER=/opt/local/bin/g++-mp-4.9 -DCMAKE_C_FLAGS="-arch x86_64" -DSHARE_INSTALL=Resources -DLOCALE_DIR=Resources/Locales -DCMAKE_CXX_FLAGS="-Wno-unused-function -Wno-unused-local-typedefs -Wno-ignored-qualifiers -lstdc++ -arch x86_64 -L/opt/local/lib -lintl -Wl,-framework -Wl,CoreFoundation,-headerpad_max_install_names" -DCMAKE_EXE_LINKER_FLAGS="-ldl -lstdc++ -arch x86_64" -DCMAKE_MODULE_LINKER_FLAGS="-ldl -lstdc++ -arch x86_64" -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_SHARED_LINKER_FLAGS="-ldl -lstdc++ -arch x86_64" -DCMAKE_STATIC_LINKER_FLAGS="-ldl -lstdc++ -arch x86_64" ../..
-make -j4 install
+cmake -DCMAKE_INSTALL_PREFIX=$TEMPDIR -DENABLE_TOOLS=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=1 -DFreetype_INCLUDE_DIR=/opt/local/include/freetype2 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.6 -DFontconfig_INCLUDE_DIR=/opt/local/include/fontconfig -DPng_INCLUDE_DIR=/opt/local/include/libpng -DAVCodec_INCLUDE_DIR=/opt/local/include/libavcodec -DOpenGL_GL_LIBRARY=/System/Library/Frameworks/OpenGL.framework -DOpenGL_GLU_LIBRARY=/System/Library/Frameworks/OpenGL.framework -DOpenGL_INCLUDE_DIR=/System/Library/Frameworks/OpenGL.framework/Headers -DAVFormat_INCLUDE_DIR=/opt/local/include/libavformat -DSWScale_INCLUDE_DIR=/opt/local/include/libswscale -DFreetype_INCLUDE_DIR=/opt/local/include/freetype2/ -DLibXML2_LIBRARY=/opt/local/lib/libxml2.dylib -DLibXML2_INCLUDE_DIR=/opt/local/include/libxml2 -DLibXML++Config_INCLUDE_DIR=/opt/local/lib/libxml++-2.6/include -DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16 -DGettext_LIBRARY=/opt/local/lib/libgettextlib.dylib  -DGettext_INCLUDE_DIR=/opt/local/include/ -DGlibmmConfig_INCLUDE_DIR=/opt/local/lib/glibmm-2.4/include -DGlibConfig_INCLUDE_DIR=/opt/local/lib/glib-2.0/include -DCMAKE_C_COMPILER=/opt/local/bin/gcc-mp-4.9 -DCMAKE_CXX_COMPILER=/opt/local/bin/g++-mp-4.9 -DCMAKE_C_FLAGS="-arch x86_64" -DSHARE_INSTALL=Resources -DLOCALE_DIR=Resources/Locales -DCMAKE_CXX_FLAGS="-Wno-unused-function -Wno-unused-local-typedefs -Wno-ignored-qualifiers -lstdc++ -arch x86_64 -L/opt/local/lib -lintl -Wl,-framework -Wl,CoreFoundation,-headerpad_max_install_names" -DCMAKE_EXE_LINKER_FLAGS="-ldl -lstdc++ -arch x86_64" -DCMAKE_MODULE_LINKER_FLAGS="-ldl -lstdc++ -arch x86_64" -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_SHARED_LINKER_FLAGS="-ldl -lstdc++ -arch x86_64" -DCMAKE_STATIC_LINKER_FLAGS="-ldl -lstdc++ -arch x86_64" ../..
+make -j0 install # You can change the -j value in order to spawn more build threads.
 
 # then create the rest of the app bundle
 
@@ -49,6 +49,12 @@ mkdir -p $FRAMEWORKDIR
 mkdir -p $LIBDIR
 
 dylibbundler -od -b -x "$BINDIR/performous" -d "$LIBDIR" -p @executable_path/../Resources/lib/
+declare -a performous_tools
+performous_tools=(gh_fsb_decrypt gh_xen_decrypt itg_pck ss_adpcm_decode ss_archive_extract ss_chc_decode ss_cover_conv ss_extract ss_ipu_conv ss_pak_extract)
+for i in "${performous_tools[@]}"
+do
+if [ -f "$BINDIR/$i" ]; then dylibbundler -of -b -x "$BINDIR/$i" -d "$LIBDIR" -p @executable_path/../Resources/lib/; fi
+done
 
 cp -av /opt/local/lib/pango $LIBDIR/
 
@@ -75,9 +81,7 @@ cd `find . -type d -maxdepth 1 -mindepth 1`
 
 for if in `pwd`/*.so
 do
-dylibbundler -x "$if" \
--p @executable_path/../Resources/lib/ \
--d "$LIBDIR"
+dylibbundler -x "$if" -p @executable_path/../Resources/lib/ -d "$LIBDIR"
 done 
 
 

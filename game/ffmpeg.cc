@@ -187,7 +187,15 @@ void FFmpeg::decodePacket() {
 		if (packetSize < 0) throw std::logic_error("negative packet size?!");
 		if (m_quit || m_seekTarget == m_seekTarget) return;
 		if (packet.stream_index != m_streamId) return;
+<<<<<<< HEAD
 		boost::shared_ptr<AVFrame> frame(av_frame_alloc(), &av_free);
+=======
+#if (LIBAVCODEC_VERSION_INT) < (AV_VERSION_INT(55,0,0))
+		boost::shared_ptr<AVFrame> frame(avcodec_alloc_frame(), &av_free);
+#else
+		boost::shared_ptr<AVFrame> frame(av_frame_alloc(), [](AVFrame* ptr) { av_frame_free(&ptr); });
+#endif
+>>>>>>> d91744cd58348d7371354099904869135978a9e5
 		int frameFinished = 0;
 		int decodeSize = (m_mediaType == AVMEDIA_TYPE_VIDEO ?
 		  avcodec_decode_video2(m_codecContext, frame.get(), &frameFinished, &packet) :
