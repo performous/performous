@@ -16,6 +16,8 @@ attribute vec4 vertColor;
 
 // Per-vextex for fragment shader (if no geometry shader)
 varying vec2 texCoord;
+varying vec3 lightDir;
+varying vec3 vLightDir;
 varying vec3 normal;
 varying vec4 color;
 
@@ -44,6 +46,7 @@ void main() {
 	vTexCoord = texCoord = vertTexCoord;
 	vNormal = normal = normalMatrix * vertNormal;
 	vColor = color = vertColor;
+	vLightDir = lightDir;
 
 	mat4 trans = scaleMat(scale);
 
