@@ -5,6 +5,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 
+#include <set>
 
 namespace SongParserUtil {
 	void assign(int& var, std::string const& str) {
