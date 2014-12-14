@@ -1,0 +1,13 @@
+language: cpp
+cache:
+    - apt
+compiler:
+    - gcc
+    - clang
+install:
+    - sudo apt-get install -qq gettext help2man libglew-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libavresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libopencv-dev libportmidi-dev
+script:
+    - mkdir build
+    - cd build
+    - cmake ..
+    - make
