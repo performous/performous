@@ -9,12 +9,14 @@ before_install:
     - sudo add-apt-repository --yes ppa:zoogie/sdl2-snapshots
     # Newer LibAV
     - sudo add-apt-repository --yes ppa:pali/pali
+    # Newer GCC and Toolchain
+    sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
     - sudo apt-get update
 install:
-    - sudo apt-get install gettext help2man libglew-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libavresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libopencv-dev libportmidi-dev
+    - sudo apt-get install gettext help2man libglew-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost1.48-all-dev libavcodec-dev libavformat-dev libswscale-dev libavresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libopencv-dev libportmidi-dev
     # Newer gcc, should also fetch newer libstdc++...
-    - sudo apt-get install g++-4.7
-    - if [ "$CXX" = "g++" ]; then export CXX="g++-4.7" CC="gcc-4.7"; fi
+    - sudo apt-get install g++-4.8
+    - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
 script:
     - $CXX --version
     - mkdir build
