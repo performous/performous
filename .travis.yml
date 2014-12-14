@@ -4,6 +4,12 @@ cache:
 compiler:
     - gcc
     - clang
+before_install:
+    # SDL2, although snapshots might break the build :(
+    - sudo add-apt-repository --yes ppa:zoogie/sdl2-snapshots
+    # Newer LibAV
+    - sudo add-apt-repository --yes ppa:pali/pali
+    - sudo apt-get update -qq
 install:
     - sudo apt-get install -qq gettext help2man libglew-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libavresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libopencv-dev libportmidi-dev
 script:
