@@ -290,7 +290,6 @@ void outputOptionalFeatureStatus();
 
 int main(int argc, char** argv) try {
 	signalSetup();
-	std::ios::sync_with_stdio(false);  // We do not use C stdio
 	std::srand(std::time(nullptr));
 	// Parse commandline options
 	std::vector<std::string> devices;
