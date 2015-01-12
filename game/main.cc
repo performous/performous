@@ -145,7 +145,6 @@ void mainLoop(std::string const& songlist) {
 	Backgrounds backgrounds;
 	Database database(getConfigDir() / "database.xml");
 	Songs songs(database, songlist);
-	loadFonts();
 	Game gm(window);
 	WebServer server(songs);
 	try {
