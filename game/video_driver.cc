@@ -11,21 +11,6 @@
 #include <boost/date_time.hpp>
 
 
-#ifndef GLEW_ARB_viewport_array
-# define GLEW_ARB_viewport_array GL_FALSE
-# define glViewportIndexedf(index, x, y,  w,  h) {}
-# warning "Your version of GLEW is too old, Performous is smart and let you compile it anyway"
-#endif
-#ifndef GLEW_VERSION_3_3
-# define GLEW_VERSION_3_3 GL_FALSE
-# warning "Your version of GLEW is too old, Performous is smart and let you compile it anyway"
-#endif
-#ifndef GLEW_VERSION_4_1
-# define GLEW_VERSION_4_1 GL_FALSE
-# warning "Your version of GLEW is too old, Performous is smart and let you compile it anyway"
-#endif
-
-
 namespace {
 	unsigned s_width;
 	unsigned s_height;
@@ -97,7 +82,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	}
 	resize();
 	SDL_ShowCursor(SDL_DISABLE);
-	if (glewInit() != GLEW_OK) throw std::runtime_error("Initializing GLEW failed (is your OpenGL broken?)");
+
 	// Dump some OpenGL info
 	std::clog << "video/info: GL_VENDOR:     " << glGetString(GL_VENDOR) << std::endl;
 	std::clog << "video/info: GL_VERSION:    " << glGetString(GL_VERSION) << std::endl;
@@ -105,16 +90,16 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	// Extensions would need more complex outputting, otherwise they will break clog.
 	//std::clog << "video/info: GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl;
 
-	if (!GLEW_VERSION_2_1) throw std::runtime_error("OpenGL 2.1 is required but not available");
+	if (epoxy_gl_version() < 21) throw std::runtime_error("OpenGL 2.1 is required but not available");
 
-	if (GLEW_VERSION_3_3) {
+	if (epoxy_gl_version() >= 33) {
 		// Compile geometry shaders when stereo is requested
 		shader("color").compileFile(findFile("shaders/stereo3d.geom"));
 		shader("surface").compileFile(findFile("shaders/stereo3d.geom"));
 		shader("texture").compileFile(findFile("shaders/stereo3d.geom"));
 		shader("3dobject").compileFile(findFile("shaders/stereo3d.geom"));
 		shader("dancenote").compileFile(findFile("shaders/stereo3d.geom"));
-		if (!GLEW_VERSION_4_1) {
+		if (epoxy_gl_version() < 41) {
 			// Enable bugfix for some older Nvidia cards
 			for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
 				Shader& sh = *it->second;
@@ -199,7 +184,7 @@ void Window::render(boost::function<void (void)> drawFunc) {
 	bool stereo = config["graphic/stereo3d"].b();
 	int type = config["graphic/stereo3dtype"].i();
 
-	if (stereo && !GLEW_ARB_viewport_array) {
+	if (stereo && !epoxy_has_gl_extension("GL_ARB_viewport_array")) {
 		config["graphic/stereo3d"].b() = stereo = false;
 		std::clog << "video/warning: Your GPU does not support Stereo3D mode (OpenGL extension ARB_viewport_array is required)" << std::endl;
 		// TODO: Flash message on UI?

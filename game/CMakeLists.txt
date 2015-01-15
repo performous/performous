@@ -65,7 +65,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 list(APPEND LIBS ${Boost_LIBRARIES})
 
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ GLEW AVFormat AVResample SWScale OpenGL Z Jpeg Png PortAudio Fontconfig)
+foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ LibEpoxy AVFormat AVResample SWScale OpenGL Z Jpeg Png PortAudio Fontconfig)
 	find_package(${lib} REQUIRED)
 	message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
 	include_directories(${${lib}_INCLUDE_DIRS})
@@ -133,7 +133,7 @@ if(WIN32)
 			OUTPUT_VARIABLE MXE_HACK_STRING
 		)
 		set(CMAKE_CXX_LINK_EXECUTABLE ${CMAKE_CXX_LINK_EXECUTABLE}${MXE_HACK_STRING})
-		add_definitions(-DBOOST_THREAD_USE_LIB -DGLEW_STATIC)
+		add_definitions(-DBOOST_THREAD_USE_LIB)
 	endif()
 	set(BIN_INSTALL .)  # Straight to Program Files/Performous with no bin subfolder.
 	set(SUBSYSTEM_WIN32 WIN32)
