@@ -34,6 +34,9 @@ class ScreenIntro : public Screen {
 	boost::scoped_ptr<ThemeIntro> theme;
 	Menu m_menu;
 	bool m_first;
+	bool m_drawNotice = false;
 	AnimValue m_selAnim;
 	AnimValue m_submenuAnim;
+	AnimValue m_webserverNoticeTimeout;
+	int webserversetting = 0;
 };

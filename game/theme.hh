@@ -88,6 +88,8 @@ public:
 	SvgTxtTheme comment;
 	/// configuration comment text (short tip)
 	SvgTxtTheme short_comment;
+	/// notice to remind people the webserver is active
+	SvgTxtTheme WebserverNotice;
 	/// configuration comment background
 	Surface comment_bg;
 	/// configuration comment background (short tip)
