@@ -285,6 +285,16 @@ template <typename Container> void confOverride(Container const& c, std::string 
 
 void outputOptionalFeatureStatus();
 
+void fatalError(std::string msg, std::string title = "FATAL ERROR") {
+	std::ostringstream errMsg;
+	errMsg << msg;
+	errMsg << std::endl << "If you think this is a bug in Performous, please report it at "
+	  << std::endl << "  https://github.com/performous/performous/issues";
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title.c_str(),
+	  errMsg.str().c_str(), NULL);
+	std::cerr << title << ": " << msg << std::endl;
+}
+
 int main(int argc, char** argv) try {
 	signalSetup();
 	std::srand(std::time(nullptr));
@@ -339,12 +349,8 @@ int main(int argc, char** argv) try {
 	outputOptionalFeatureStatus();
 
 	// Read config files
-	try {
-		readConfig();
-	} catch (EXCEPTION& e) {
-		std::clog << "core/error: Error loading configuration: " << e.what() << std::endl;
-		return EXIT_FAILURE;
-	}
+	readConfig();
+
 	if (vm.count("audiohelp")) {
 		std::clog << "core/notice: Starting audio subsystem for audiohelp (errors printed on console may be ignored)." << std::endl;
 		Audio audio;
@@ -379,7 +385,7 @@ int main(int argc, char** argv) try {
 
 	return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
 } catch (EXCEPTION& e) {
-	std::cerr << "FATAL ERROR: " << e.what() << std::endl;
+	fatalError(e.what());
 	return EXIT_FAILURE;
 }
 
