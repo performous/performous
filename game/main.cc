@@ -163,6 +163,7 @@ void mainLoop(std::string const& songlist) {
 		audio.loadSample("guitar fail4", findFile("sounds/guitar_fail4.ogg"));
 		audio.loadSample("guitar fail5", findFile("sounds/guitar_fail5.ogg"));
 		audio.loadSample("guitar fail6", findFile("sounds/guitar_fail6.ogg"));
+		audio.loadSample("notice.ogg",findFile("notice.ogg"));
 		// Load screens
 		gm.loading(_("Creating screens..."), 0.7);
 		gm.addScreen(new ScreenIntro("Intro", audio));

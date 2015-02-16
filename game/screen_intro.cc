@@ -28,7 +28,6 @@ void ScreenIntro::enter() {
 	reloadGL();
 	webserversetting = config["game/webserver_access"].i();
 	if(webserversetting) {
-	m_audio.loadSample("notice.ogg",findFile("notice.ogg"));
 	m_audio.playSample("notice.ogg");
 	}
 }
