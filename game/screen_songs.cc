@@ -199,7 +199,7 @@ void ScreenSongs::update() {
 	// Clear the old content and load new content if available
 	m_songbg.reset(); m_video.reset();
 	double pstart = (!m_jukebox && song ? song->preview_start : 0.0);
-	m_audio.playMusic(music, true, 2.0, pstart);
+	m_audio.playMusic(music, true, 1.0, pstart);
 	if (song) {
 		fs::path const& background = song->background.empty() ? song->cover : song->background;
 		if (!background.empty()) try { m_songbg.reset(new Surface(background)); } catch (std::exception const&) {}
