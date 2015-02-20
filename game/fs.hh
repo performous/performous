@@ -5,11 +5,6 @@
 
 namespace fs = boost::filesystem;
 
-typedef std::vector<std::uint8_t> BinaryBuffer;
-
-/// Read an entire file into a buffer
-BinaryBuffer readFile(fs::path const& path);
-
 /// Determine where the important system paths and most importantly the config schema are. Must be run before any of the functions below.
 void pathBootstrap();
 
