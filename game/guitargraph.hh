@@ -7,7 +7,7 @@
 
 class Song;
 
-struct Chord {
+struct GuitarChord {
 	double begin, end;
 	bool fret[5];
 	bool fret_cymbal[5];
@@ -19,7 +19,7 @@ struct Chord {
 	int score;
 	AnimValue hitAnim[5];
 	double releaseTimes[5];
-	Chord(): begin(), end(), polyphony(), tappable(), passed(), status(), score() {
+	GuitarChord(): begin(), end(), polyphony(), tappable(), passed(), status(), score() {
 		std::fill(fret, fret + 5, false);
 		std::fill(fret_cymbal, fret_cymbal + 5, false);
 		std::fill(dur, dur + 5, static_cast<Duration const*>(NULL));
@@ -39,7 +39,7 @@ struct Chord {
 	}
 };
 
-static inline bool operator==(Chord const& a, Chord const& b) {
+static inline bool operator==(GuitarChord const& a, GuitarChord const& b) {
 	return std::equal(a.fret, a.fret + 5, b.fret);
 }
 
@@ -132,7 +132,7 @@ class GuitarGraph: public InstrumentGraph {
 	void updateChords();
 	bool updateTom(unsigned int tomTrack, unsigned int fretId); // returns true if this tom track exists
 	double getNotesBeginTime() const { return m_chords.front().begin; }
-	typedef std::vector<Chord> Chords;
+	typedef std::vector<GuitarChord> Chords;
 	Chords m_chords;
 	Chords::iterator m_chordIt;
 	typedef std::map<Duration const*, unsigned> NoteStatus; // Note in song to m_events[unsigned - 1] or 0 for not played

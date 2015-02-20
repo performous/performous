@@ -74,7 +74,7 @@ void Menu::action(int dir) {
 			else gm->activateScreen(screen);
 			break;
 		}
-		case MenuOption::CALLBACK: {
+		case MenuOption::CALLBACK_FUNCTION: {
 			if (current().callback) current().callback();
 			break;
 		}
