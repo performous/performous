@@ -37,8 +37,8 @@ void LayoutSinger::drawScore(PositionMode position) {
 		m_score_text[i%4]->render((boost::format("%04d") % p->getScore()).str());
 		switch(position) {
 			case LayoutSinger::FULL:
-				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * j).fixedWidth(0.075).screenTop(0.055);
-				m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * j).fixedHeight(0.075).screenTop(0.055);
+				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.125 * j).fixedWidth(0.035).screenTop(0.055);
+				m_score_text[i%4]->dimensions().middle(-0.425 + 0.01 + 0.125 * j).fixedHeight(0.035).screenTop(0.055);
 				break;
 			case LayoutSinger::TOP:
 				m_player_icon->dimensions.right(0.35).fixedHeight(0.050).screenTop(0.025 + 0.050 * j);

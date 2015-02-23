@@ -13,7 +13,7 @@
 #include "pitch.hh"
 #include "util.hh"
 
-const unsigned AUDIO_MAX_ANALYZERS = 4;
+const unsigned AUDIO_MAX_ANALYZERS = 8;
 
 struct Output;
 

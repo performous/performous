@@ -111,7 +111,7 @@ void ScreenSing::setupVocals() {
 			selectedTracks.push_back(vocal);
 			shownTracks.insert(vocal);
 		}
-		if (shownTracks.size() > 2) throw std::runtime_error("Too many tracks chosen. Only two vocal tracks can be used simultaneously.");
+		//if (shownTracks.size() > 2) throw std::runtime_error("Too many tracks chosen. Only two vocal tracks can be used simultaneously.");
 		for (auto const& trk: shownTracks) m_layout_singer.push_back(new LayoutSinger(*trk, m_database, theme));
 		// Note: Engine maps tracks with analyzers 1:1. If user doesn't have mics, we still want to have singer layout enabled but without engine...
 		if (!analyzers.empty()) m_engine.reset(new Engine(m_audio, selectedTracks, m_database));
@@ -697,7 +697,7 @@ void ScoreWindow::draw() {
 	for (Database::cur_scores_t::const_iterator p = m_database.scores.begin(); p != m_database.scores.end(); ++p, ++i) {
 		int score = p->score;
 		ColorTrans c(p->color);
-		double x = -0.12 + spacing * (0.5 + i - 0.5 * m_database.scores.size());
+		double x = spacing * (0.5 + i - 0.5 * m_database.scores.size());
 		m_scoreBar.dimensions.fixedWidth(0.09).middle(x).bottom(0.20);
 		m_scoreBar.draw(score / 10000.0);
 		m_score_text.render(boost::lexical_cast<std::string>(score));
