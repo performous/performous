@@ -1,4 +1,18 @@
+#include "ss_cover.hh"
+
+#include "pak.h"
+#include "../common/image.hh"
+
+#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/lexical_cast.hpp>
+#include <libxml++/libxml++.h>
+
+#include <cstdlib>
 #include <cstring>
+#include <iostream>
+#include <stdexcept>
+#include <vector>
+
 
 namespace TX2 {
 	unsigned short getWidth(char * buffer) {
@@ -8,20 +22,18 @@ namespace TX2 {
 		return (*(unsigned short*)&buffer[0x0e])&0x7fff;
 	}
 
-	unsigned char * getBuffer(char * src) {
+	std::vector<unsigned char> getBuffer(char * src) {
 		unsigned int pixels = getWidth(src) * getHeight(src);
-		unsigned char *buffer = new unsigned char[pixels*4];
+		std::vector<unsigned char> buffer(pixels*3);
 
 		char * src_image = src+0x100;
 		char * src_palette = src+0x100+pixels+0x100;
 
 		for(unsigned int i = 0; i < pixels; i++){
 			unsigned char id = src_image[i];
-			buffer[i*4+0] = src_palette[id*4+0]; // blue
-			buffer[i*4+1] = src_palette[id*4+1]; // green
-			buffer[i*4+2] = src_palette[id*4+2]; // blue;
-			//buffer[i*4+3] = src_palette[id*4+3]; // alpha
-			buffer[i*4+3] = 0xff;
+			buffer[i*3+0] = src_palette[id*4+0]; // red
+			buffer[i*3+1] = src_palette[id*4+1]; // green
+			buffer[i*3+2] = src_palette[id*4+2]; // blue
 		}
 		return buffer;
 	}
@@ -61,18 +73,6 @@ namespace TX2 {
 	}
 }
 
-#include <cstdlib>
-#include <iostream>
-#include <stdexcept>
-
-#include <Magick++.h>
-#include <boost/lexical_cast.hpp>
-#include <libxml++/libxml++.h>
-
-#include "ss_cover.hh"
-
-#include "pak.h"
-
 SingstarCover::SingstarCover(const std::string pak_file, unsigned int track_id) {
 	xmlpp::Node::PrefixNsMap nsmap;
 	nsmap["ss"] = "http://www.singstargame.com";
@@ -106,25 +106,24 @@ SingstarCover::SingstarCover(const std::string pak_file, unsigned int track_id) 
 	p[texture_filename].get(buf_image);
 	m_image = buf_image;
 	TX2::transform(&m_image[0],&buf_image[0]);
-};
+}
 
-SingstarCover::~SingstarCover() {};
+SingstarCover::~SingstarCover() {}
 
-void SingstarCover::write(const std::string filename) {
+void SingstarCover::write(const fs::path filename) {
 	// grab format from tx2 file
-	unsigned short width = TX2::getWidth(&m_image[0]);
-	unsigned short height = TX2::getHeight(&m_image[0]);
-	unsigned char * buffer = TX2::getBuffer(&m_image[0]);
-	Magick::Blob blob( buffer, width*height*4);
-	Magick::Image image;
-	char geometry[16];
-	sprintf(geometry,"%dx%d",width,height);
-	image.size(geometry);
-	image.depth(8);
-	image.magick( "RGBA" ); 
-	image.read(blob);
+	Bitmap img;
+	img.width = TX2::getWidth(&m_image[0]);
+	img.height = TX2::getHeight(&m_image[0]);
+	img.fmt = pix::RGB;
+	img.buf = TX2::getBuffer(&m_image[0]);
+
 	// crop image according to information stored in xml
-	image.crop( Magick::Geometry(m_width, m_height, m_u, m_v) );
-	// write it
-	image.write(filename);
-};
+	img.crop(m_width, m_height, m_u, m_v);
+
+	auto ext = boost::algorithm::to_lower_copy(filename.extension().string());
+	if (ext == ".png") writePNG(filename, img);
+	//else if (ext == ".jpg" || ext == ".jpeg") writeJPEG(filename, img);
+	else throw std::runtime_error("Don't know how to write format: " + ext);
+}
+

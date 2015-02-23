@@ -88,15 +88,18 @@ class Game: public Singleton <Game> {
 	void finished() { m_finished = true; }
 	/// Returns finished state
 	bool isFinished() { return m_finished; }
-
+	/// Show performous logo
 	void showLogo(bool show = true) { m_logoAnim.setTarget(show ? 1.0 : 0.0); }
+	/// Draw the logo
 	void drawLogo();
+	///global playlist access
+	PlayList& getCurrentPlayList() { return currentPlaylist; }
 
 private:
 	Window& m_window;
 public:
 	input::Controllers controllers;
-    PlayList& getCurrentPlayList() { return currentPlaylist; }
+
 private:
 	bool m_finished;
 	typedef boost::ptr_map<std::string, Screen> screenmap_t;
