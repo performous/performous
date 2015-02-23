@@ -24,6 +24,17 @@ class WebServer
 public:
 	struct handler;
 	typedef http::server<handler> http_server;
+	typedef std::vector<std::uint8_t> BinaryBuffer;
+	BinaryBuffer readFile(fs::path const& path) {
+		BinaryBuffer ret;
+		fs::ifstream f(path, std::ios::binary);
+		f.seekg(0, std::ios::end);
+		ret.resize(f.tellg());
+		f.seekg(0);
+		f.read(reinterpret_cast<char*>(ret.data()), ret.size());
+		if (!f) throw std::runtime_error("File cannot be read: " + path.string());
+		return ret;
+	}
 
 	WebServer(Songs& songs);
 	~WebServer();
