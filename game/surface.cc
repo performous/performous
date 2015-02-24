@@ -2,8 +2,8 @@
 
 #include "configuration.hh"
 #include "video_driver.hh"
-#include "image.hh"
 #include "screen.hh"
+#include "svg.hh"
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/thread/condition.hpp>

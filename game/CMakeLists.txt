@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
-file(GLOB SOURCE_FILES "*.cc")
-file(GLOB HEADER_FILES "*.hh" "libda/*.hpp")
+file(GLOB SOURCE_FILES "*.cc" "../common/image.cc")
+file(GLOB HEADER_FILES "*.hh" "../common/image.hh" "libda/*.hpp")
 
 if(WIN32)
 	# We want to support all these version numbers:

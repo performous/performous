@@ -4,10 +4,11 @@
 #include "fbo.hh"
 #include "fs.hh"
 #include "glmath.hh"
-#include "image.hh"
+#include "../common/image.hh"
 #include "util.hh"
 #include "controllers.hh"
 #include "screen.hh"
+
 #include <boost/date_time.hpp>
 
 

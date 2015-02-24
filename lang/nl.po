@@ -4,7 +4,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-11-16 14:33+0100\n"
 "PO-Revision-Date: \n"
-"Last-Translator: bcmpinc <bcmpinc@users.sourceforge.net>\n"
+"Last-Translator: baklap4 <http://github.com/Baklap4>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -144,8 +144,8 @@ msgid ""
 "Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select "
 "to cancel. Ctrl + R to reset defaults"
 msgstr ""
-"Gebruik de pijltjestoetsen om aan te passen. Duw Enter/Start om op te slaan "
-"en te testen of Esc/Select om te annuleren. Ctrl + R laadt de standaardopties"
+"Gebruik de pijltjestoetsen om aan te passen. Druk op Enter/Start om op te slaan "
+"en te testen of Esc/Select om te annuleren. Ctrl + R herlaadt de standaardopties"
 
 #: ../game/screen_audiodevices.cc:135
 msgid ""
@@ -157,7 +157,7 @@ msgstr ""
 
 #: ../game/screen_audiodevices.cc:183
 msgid "Some devices failed to open!"
-msgstr "Openen van sommige apparaten is gefaald!"
+msgstr "Openen van sommige apparaten is mislukt!"
 
 #: ../game/songs.cc:191
 msgid "show all songs"
@@ -225,7 +225,7 @@ msgstr "Hervatten"
 
 #: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:125
 msgid "Back to performing!"
-msgstr "Terug naar optreden!"
+msgstr "Terug naar het optreden!"
 
 #: ../game/instrumentgraph.cc:57
 msgid "Rejoin"
@@ -244,7 +244,7 @@ msgid ""
 "Start the song\n"
 "from the beginning"
 msgstr ""
-"Start het lied\n"
+"Start het liedje\n"
 "vanaf het begin"
 
 #: ../game/screen_players.cc:117
@@ -285,7 +285,7 @@ msgstr "Zoek op tekst:"
 
 #: ../game/screen_sing.cc:47 ../game/screen_playlist.cc:24
 msgid "Initializing webcam..."
-msgstr "Initialiseren webcam..."
+msgstr "Initialiseren van de webcam..."
 
 #: ../game/screen_sing.cc:54
 msgid "Loading video..."
@@ -293,11 +293,11 @@ msgstr "Video wordt geladen..."
 
 #: ../game/screen_sing.cc:61
 msgid "Loading song..."
-msgstr "Lied wordt geladen..."
+msgstr "Liedje wordt geladen..."
 
 #: ../game/screen_sing.cc:68
 msgid "Song contains broken tracks!"
-msgstr "Lied bevat kapotte tracks!"
+msgstr "Liedje bevat kapotte tracks!"
 
 #: ../game/screen_sing.cc:73
 msgid "Loading menu..."
@@ -373,7 +373,7 @@ msgstr "   Automatisch afspelen aan"
 
 #: ../game/screen_sing.cc:524 ../game/screen_sing.cc:532
 msgid "   Remember to wait for grading!"
-msgstr "   Wacht A.U.B. op de uitslag!"
+msgstr "   Wacht a.u.b. op de uitslag!"
 
 #: ../game/screen_sing.cc:661
 msgid "No player!"
@@ -463,7 +463,7 @@ msgstr "<typ tekst om te zoeken>"
 
 #: ../game/screen_songs.cc:313
 msgid "songs"
-msgstr "nummers"
+msgstr "liedjes"
 
 #: ../game/screen_songs.cc:313
 msgid "options"
@@ -487,7 +487,7 @@ msgstr "jukebox modus"
 
 #: ../game/screen_songs.cc:320
 msgid "start a playlist with this song!"
-msgstr "begin een afspeellijst met dit lied!"
+msgstr "begin een afspeellijst met dit liedje!"
 
 #: ../game/screen_songs.cc:320
 msgid "open the playlist menu"
@@ -564,7 +564,7 @@ msgstr "Speel als eerste"
 
 #: ../game/screen_playlist.cc:310
 msgid "Ignore the playlist's order and play this song first"
-msgstr "Negeer de volgorde van de afspeellijst en speel dit lied als eerste"
+msgstr "Negeer de volgorde van de afspeellijst en speel dit liedje als eerste"
 
 #: ../game/screen_playlist.cc:311
 msgid "Start the song already!"
@@ -631,7 +631,7 @@ msgstr ""
 
 #: ../game/screen_intro.cc:24
 msgid "No playback devices could be used.\n"
-msgstr "Geen bruikbare afspeelapparaten.\n"
+msgstr "Geen bruikbare afspeelapparaten gevonden.\n"
 
 #: ../game/screen_intro.cc:25
 msgid ""
@@ -920,7 +920,7 @@ msgstr "Stereoscopisch 3D"
 
 #: ../data/config/schema.xml:169
 msgid "Enable 3D rendering of Performous."
-msgstr "Schake 3D-tekeningen van Performous in."
+msgstr "Schakel 3D-toepassingen van Performous in."
 
 #: ../data/config/schema.xml:177
 msgid "Stereo3D type"
@@ -928,7 +928,7 @@ msgstr "Stereo3D-type"
 
 #: ../data/config/schema.xml:178
 msgid "Some modes may only get activated in fullscreen mode."
-msgstr "Sommige functies zullen alleen werken in Volledig-scherm modus."
+msgstr "Sommige functies zullen alleen werken in volledig-scherm modus."
 
 #: ../data/config/schema.xml:183
 msgid "Stereo3D separation"
@@ -939,7 +939,7 @@ msgid ""
 "The strength of the effect. Experiment with different settings for best "
 "results."
 msgstr ""
-"De sterkte van het effect, Probeer verschillende instellingen voor de beste "
+"De sterkte van het effect, probeer verschillende instellingen voor de beste "
 "resultaten."
 
 #: ../data/config/schema.xml:187
@@ -952,7 +952,7 @@ msgid ""
 "this enabled as Performous will still smoothly fade out the video if your "
 "computer is not fast enough."
 msgstr ""
-"Staat je toe de achtergrondvideo's volledig af te zetten. Het is aangeraden "
+"Staat je toe de achtergrondvideo's volledig uit te zetten. Het is aangeraden "
 "om dit aan te laten aangezien Performous de video zacht zal uitfaden als je "
 "computer niet snel genoeg is."
 
@@ -966,7 +966,7 @@ msgid ""
 "crashes while entering a song."
 msgstr ""
 "Performous kan een webcam als achtergrond video gebruiken. Zet dit uit als "
-"performous vastloopt bij het spelen van een lied."
+"performous vastloopt bij het spelen van een liedje."
 
 #: ../data/config/schema.xml:196
 msgid "Webcam id"
@@ -1001,7 +1001,7 @@ msgid ""
 "to make everything a little faster."
 msgstr ""
 "Grotere getallen zorgen voor een rendering in hogere resolutie. Verlaag dit "
-"om alles wat vlugger te maken."
+"om alles wat sneller te maken."
 
 #: ../data/config/schema.xml:212
 msgid "Benchmark mode"
@@ -1015,8 +1015,8 @@ msgid ""
 msgstr ""
 "De framerate limiet van 100 FPS is verwijderd en het spel rendert nu op "
 "volle snelheid. FPS waarden worden geprint in de console. De "
-"beeldkaartdrivers kunnen nog altijd de rendersnelheid beperking tot de "
-"refresh rate van het scherm"
+"videokaartdrivers kunnen nog altijd de rendersnelheid beperking tot de "
+"verversingssnelheid van het scherm"
 
 #: ../data/config/schema.xml:220
 msgid "Suggested latency"
@@ -1136,7 +1136,7 @@ msgstr "Doorgeef volume sterkte"
 
 #: ../data/config/schema.xml:275
 msgid "How much voice is amplified compared to the music."
-msgstr "Hoeveel de zangstem vertserkt wordt vergeleken met de muziek."
+msgstr "Hoeveel de zangstem versterkt wordt vergeleken met de muziek."
 
 #: ../data/config/schema.xml:278
 msgid "Suppress center channel"
