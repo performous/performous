@@ -3,7 +3,7 @@
 
 #include "color.hh"
 #include "glmath.hh"
-#include <GL/glew.h>
+#include <epoxy/gl.h>
 #include <string>
 #include <iostream>
 #include <vector>

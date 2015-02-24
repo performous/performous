@@ -186,8 +186,10 @@ void Surface::load(Bitmap const& bitmap) {
 	glerror.check("glTexParameterf");
 
 	// Anisotropy is potential trouble maker
-	if (GLEW_EXT_texture_filter_anisotropic) glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);
-	glerror.check("MAX_ANISOTROPY_EXT");
+	if (epoxy_has_gl_extension("GL_EXT_texture_filter_anisotropic")) {
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);
+		glerror.check("MAX_ANISOTROPY_EXT");
+	}
 
 	// Load the data into texture
 	PixFmt const& f = getPixFmt(bitmap.fmt);
