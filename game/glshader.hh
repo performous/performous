@@ -6,7 +6,7 @@
 #include <string>
 #include <map>
 #include <vector>
-#include <GL/glew.h>
+#include <epoxy/gl.h>
 #include <boost/noncopyable.hpp>
 
 struct Uniform {
