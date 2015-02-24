@@ -1166,7 +1166,7 @@ void GuitarGraph::updateChords() {
 		// Quit processing if none were left
 		if (t == getInf()) break;
 		// Construct a chord
-		Chord c;
+		GuitarChord c;
 		c.begin = t;
 		int tapfret = -1;
 		for (unsigned fret = 0; fret < m_pads; ++fret) {

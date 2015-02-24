@@ -20,7 +20,7 @@ typedef boost::shared_ptr<Surface> MenuImage;
 /// Struct for menu options
 class MenuOption {
 public:
-	enum Type { CLOSE_SUBMENU, OPEN_SUBMENU, CHANGE_VALUE, SET_AND_CLOSE, ACTIVATE_SCREEN, CALLBACK } type;
+	enum Type { CLOSE_SUBMENU, OPEN_SUBMENU, CHANGE_VALUE, SET_AND_CLOSE, ACTIVATE_SCREEN, CALLBACK_FUNCTION } type;
 
 	/// Construct a menu option. Default function is to close the menu.
 	/// @param nm Name (menu item title)
@@ -37,7 +37,7 @@ public:
 	/// Make the option activate a screeen
 	MenuOption& screen(std::string const& scrn) { type = ACTIVATE_SCREEN; newValue = scrn; return *this; }
 	/// Make the option call a callback
-	MenuOption& call(MenuOptionCallback f) { type = CALLBACK; callback = f; return *this; }
+	MenuOption& call(MenuOptionCallback f) { type = CALLBACK_FUNCTION; callback = f; return *this; }
 	/// Sets name to follow a reference
 	MenuOption& setDynamicName(std::string& nm) { namePtr = &nm; return *this; }
 	/// Sets comment to follow a reference
