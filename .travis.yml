@@ -11,7 +11,7 @@ before_install:
     - sudo add-apt-repository --yes ppa:pali/pali
     # Newer GCC and Toolchain
     - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
-    - sudo add-apt-repository --yes "deb http://nl.archive.ubuntu.com/ubuntu utopic main universe"
+    - sudo add-apt-repository --yes "deb http://nl.archive.ubuntu.com/ubuntu vivid main universe"
     - sudo apt-get update -qq
 install:
     - sudo apt-get install -qq gettext help2man libglew-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost1.48-all-dev libavcodec-dev libavformat-dev libswscale-dev libavresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libopencv-dev libportmidi-dev libepoxy-dev
