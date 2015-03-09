@@ -285,14 +285,20 @@ template <typename Container> void confOverride(Container const& c, std::string 
 
 void outputOptionalFeatureStatus();
 
-void fatalError(std::string msg, std::string title = "FATAL ERROR") {
+void fatalError(std::string msg, bool hasLog = false, std::string title = "FATAL ERROR") {
 	std::ostringstream errMsg;
 	errMsg << msg;
+	if (hasLog) {
+		errMsg << std::endl << "More details might be available in " << getLogFilename() << ".";
+	}
 	errMsg << std::endl << "If you think this is a bug in Performous, please report it at "
 	  << std::endl << "  https://github.com/performous/performous/issues";
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title.c_str(),
 	  errMsg.str().c_str(), NULL);
 	std::cerr << title << ": " << msg << std::endl;
+	if (hasLog) {
+		std::clog << "core/error: " << errMsg.str();
+	}
 }
 
 int main(int argc, char** argv) try {
@@ -346,44 +352,50 @@ int main(int argc, char** argv) try {
 	}
 
 	Logger logger(loglevel);
-	outputOptionalFeatureStatus();
+	try {
+		outputOptionalFeatureStatus();
 
-	// Read config files
-	readConfig();
+		// Read config files
+		readConfig();
 
-	if (vm.count("audiohelp")) {
-		std::clog << "core/notice: Starting audio subsystem for audiohelp (errors printed on console may be ignored)." << std::endl;
-		Audio audio;
-		// Print the devices
-		portaudio::AudioDevices ads;
-		std::cout << ads.dump();
-		// Some examples
-		std::cout << "Example --audio parameters" << std::endl;
-		std::cout << "  --audio \"out=2\"         # Pick first working two-channel playback device" << std::endl;
-		std::cout << "  --audio \"dev=1 out=2\"   # Pick device id 1 and assign stereo playback" << std::endl;
-		std::cout << "  --audio 'dev=\"HDA Intel\" mics=blue,red'   # HDA Intel with two mics" << std::endl;
-		std::cout << "  --audio 'dev=pulse out=2 mics=blue'       # PulseAudio with input and output" << std::endl;
-		// Give audio a little time to shutdown but then just quit
-		boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(audio)));
-		if (!audiokiller.timed_join(boost::posix_time::milliseconds(2000)))
-		  std::clog << "core/warning: Closing audio hung for over two seconds." << std::endl;
-		return EXIT_SUCCESS;
+		if (vm.count("audiohelp")) {
+			std::clog << "core/notice: Starting audio subsystem for audiohelp (errors printed on console may be ignored)." << std::endl;
+			Audio audio;
+			// Print the devices
+			portaudio::AudioDevices ads;
+			std::cout << ads.dump();
+			// Some examples
+			std::cout << "Example --audio parameters" << std::endl;
+			std::cout << "  --audio \"out=2\"         # Pick first working two-channel playback device" << std::endl;
+			std::cout << "  --audio \"dev=1 out=2\"   # Pick device id 1 and assign stereo playback" << std::endl;
+			std::cout << "  --audio 'dev=\"HDA Intel\" mics=blue,red'   # HDA Intel with two mics" << std::endl;
+			std::cout << "  --audio 'dev=pulse out=2 mics=blue'       # PulseAudio with input and output" << std::endl;
+			// Give audio a little time to shutdown but then just quit
+			boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(audio)));
+			if (!audiokiller.timed_join(boost::posix_time::milliseconds(2000)))
+			  std::clog << "core/warning: Closing audio hung for over two seconds." << std::endl;
+			return EXIT_SUCCESS;
+		}
+		// Override XML config for options that were specified from commandline or performous.conf
+		confOverride(songdirs, "paths/songs");
+		confOverride(devices, "audio/devices");
+		getPaths(); // Initialize paths before other threads start
+		if (vm.count("jstest")) { // Joystick test program
+			std::clog << "core/notice: Starting jstest input test utility." << std::endl;
+			std::cout << std::endl << "Joystick utility - Touch your joystick to see buttons here" << std::endl
+			<< "Hit ESC (window focused) to quit" << std::endl << std::endl;
+			jstestLoop();
+			return EXIT_SUCCESS;
+		}
+		// Run the game init and main loop
+		mainLoop(songlist);
+
+		return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
+	} catch (EXCEPTION& e) {
+		// After logging is initialized, we can also inform the user about the log file.
+		fatalError(e.what(), true);
+		return EXIT_FAILURE;
 	}
-	// Override XML config for options that were specified from commandline or performous.conf
-	confOverride(songdirs, "paths/songs");
-	confOverride(devices, "audio/devices");
-	getPaths(); // Initialize paths before other threads start
-	if (vm.count("jstest")) { // Joystick test program
-		std::clog << "core/notice: Starting jstest input test utility." << std::endl;
-		std::cout << std::endl << "Joystick utility - Touch your joystick to see buttons here" << std::endl
-		<< "Hit ESC (window focused) to quit" << std::endl << std::endl;
-		jstestLoop();
-		return EXIT_SUCCESS;
-	}
-	// Run the game init and main loop
-	mainLoop(songlist);
-
-	return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
 } catch (EXCEPTION& e) {
 	fatalError(e.what());
 	return EXIT_FAILURE;
