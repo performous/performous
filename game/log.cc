@@ -1,6 +1,7 @@
 #include "log.hh"
 
 #include "fs.hh"
+#include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/iostreams/stream_buffer.hpp>
 #include <boost/thread/mutex.hpp>
@@ -123,6 +124,7 @@ Logger::Logger(std::string const& level) {
 		}
 		if (minLevel < 100) {
 			fs::path name = getLogFilename();
+			fs::create_directories(name.parent_path());
 			file.open(name);
 			msg += " Log file: " + name.string();
 		}
