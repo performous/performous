@@ -9,28 +9,31 @@
 # http://www.cmake.org/Wiki/CMake:How_To_Find_Libraries
 
 include(LibFindMacros)
+INCLUDE(CheckSymbolExists)
 
-# On Linux there is no pkgconfig script, but with this we force Gettext_PKGCONF_INCLUDE_DIRS to ""
 libfind_pkg_check_modules(Gettext_PKGCONF Gettext)
-if(WIN32 OR APPLE)
-  set(Gettext_LIBRARY_SEARCH_DIRS
-    ${Gettext_PKGCONF_LIBRARY_DIRS}
-    /opt/local/lib
-    /sw/local/lib
-  )
-  
-  find_library(Gettext_LIBRARY
-    NAMES intl
-    HINTS ${Gettext_LIBRARY_SEARCH_DIRS}
-  )
-
-  set(Gettext_PROCESS_LIBS Gettext_LIBRARY)
-endif()
 
 find_path(Gettext_INCLUDE_DIR
   NAMES libintl.h
   HINTS ${Gettext_PKGCONF_INCLUDE_DIRS}
 )
-
 set(Gettext_PROCESS_INCLUDES Gettext_INCLUDE_DIR)
+
+# On "traditional" UNIX systems (Solaris, BSD, Mac OS X, etc.),
+# libintl is its own library. On GNU/glibc systems (Linux), gettext
+# functionality is integrated into glibc, so we always have working
+# internationalization support.
+
+CHECK_SYMBOL_EXISTS(bindtextdomain "libintl.h" Gettext_HAS_BINDTEXTDOMAIN_WITHOUT_LIB)
+
+if(NOT Gettext_HAS_BINDTEXTDOMAIN_WITHOUT_LIB)
+  find_library(Gettext_LIBRARY
+	NAMES intl
+	HINTS ${Gettext_PKGCONF_LIBRARY_DIRS}
+	PATHS /opt/local/lib /sw/local/lib
+  )
+
+  set(Gettext_PROCESS_LIBS Gettext_LIBRARY)
+endif()
+
 libfind_process(Gettext)
