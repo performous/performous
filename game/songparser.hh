@@ -33,7 +33,7 @@ class SongParser {
 	Song& m_song;
 	std::stringstream m_ss;
 	unsigned int m_linenum;
-	bool getline(std::string& line) { ++m_linenum; return std::getline(m_ss, line);}
+	bool getline(std::string& line) { ++m_linenum; return (bool) std::getline(m_ss, line);}
 	bool m_relative;
 	double m_gap;
 	double m_bpm;
