@@ -90,7 +90,7 @@ void InstrumentGraph::drawMenu() {
 	m_arrow_down.dimensions.stretch(0.05, 0.05);
 	m_arrow_left.dimensions.stretch(0.05, 0.05);
 	m_arrow_right.dimensions.stretch(0.05, 0.05);
-	auto cur = static_cast<MenuOptions::const_iterator>(&m_menu.current());
+	const auto cur = &m_menu.current();
 	double w = m_menu.dimensions.w();
 	const float s = std::min(m_width.get(), 0.5) / w;
 	Transform trans(glmath::scale(s));  // Fit better menu on screen
@@ -114,7 +114,7 @@ void InstrumentGraph::drawMenu() {
 		std::string menutext = it->getName();
 		SvgTxtTheme* txt = &th.option_selected; // Default: font for selected menu item
 
-		if (cur != it) { // Unselected menuoption
+		if (cur != &*it) { // Unselected menuoption
 			txt = &(th.getCachedOption(menutext));
 
 		// Selected item
