@@ -14,12 +14,12 @@ libfind_pkg_check_modules(Fontconfig_PKGCONF Fontconfig)
 
 find_path(Fontconfig_INCLUDE_DIR
   NAMES fontconfig/fontconfig.h
-  PATHS ${Fontconfig_PKGCONF_INCLUDE_DIRS}
+  HINTS ${Fontconfig_PKGCONF_INCLUDE_DIRS}
 )
 
 find_library(Fontconfig_LIBRARY
   NAMES fontconfig
-  PATHS ${Fontconfig_PKGCONF_LIBRARY_DIRS}
+  HINTS ${Fontconfig_PKGCONF_LIBRARY_DIRS}
 )
 
 set(Fontconfig_PROCESS_INCLUDES Fontconfig_INCLUDE_DIR)

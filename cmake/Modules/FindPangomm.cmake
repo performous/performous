@@ -18,14 +18,14 @@ libfind_pkg_check_modules(Pangomm_PKGCONF pangomm-1.4)
 # Main include dir
 find_path(Pangomm_INCLUDE_DIR
   NAMES pangomm.h
-  PATHS ${Pangomm_PKGCONF_INCLUDE_DIRS}
+  HINTS ${Pangomm_PKGCONF_INCLUDE_DIRS}
   PATH_SUFFIXES pangomm-1.4
 )
 
 # Finally the library itself
 find_library(Pangomm_LIBRARY
   NAMES pangomm-1.4
-  PATHS ${Pangomm_PKGCONF_LIBRARY_DIRS}
+  HINTS ${Pangomm_PKGCONF_LIBRARY_DIRS}
 )
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.

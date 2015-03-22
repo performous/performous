@@ -17,14 +17,14 @@ libfind_pkg_check_modules(GIOmm_PKGCONF giomm-2.4)
 # Main include dir
 find_path(GIOmm_INCLUDE_DIR
   NAMES giomm.h
-  PATHS ${GIOmm_PKGCONF_INCLUDE_DIRS}
+  HINTS ${GIOmm_PKGCONF_INCLUDE_DIRS}
   PATH_SUFFIXES giomm-2.4
 )
 
 # Finally the library itself
 find_library(GIOmm_LIBRARY
   NAMES giomm-2.4
-  PATHS ${GIOmm_PKGCONF_LIBRARY_DIRS}
+  HINTS ${GIOmm_PKGCONF_LIBRARY_DIRS}
 )
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.

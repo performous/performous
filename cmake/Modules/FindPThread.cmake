@@ -13,7 +13,7 @@ libfind_pkg_check_modules(Png_PKGCONF PThread)
 
 find_library(PThread_LIBRARY
   NAMES pthreadGC2
-  PATHS ${PThread_PKGCONF_LIBRARY_DIRS}
+  HINTS ${PThread_PKGCONF_LIBRARY_DIRS}
 )
 
 set(PThread_PROCESS_LIBS PThread_LIBRARY)

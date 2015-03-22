@@ -14,12 +14,12 @@ libfind_pkg_check_modules(LibPulseSimple_PKGCONF libpulse-simple)
 
 find_path(LibPulseSimple_INCLUDE_DIR
   NAMES pulse/simple.h
-  PATHS ${LibPulseSimple_PKGCONF_INCLUDE_DIRS}
+  HINTS ${LibPulseSimple_PKGCONF_INCLUDE_DIRS}
 )
 
 find_library(LibPulseSimple_LIBRARY
   NAMES pulse-simple
-  PATHS ${LibPulseSimple_PKGCONF_LIBRARY_DIRS}
+  HINTS ${LibPulseSimple_PKGCONF_LIBRARY_DIRS}
 )
 
 set(LibPulseSimple_PROCESS_INCLUDES LibPulseSimple_INCLUDE_DIR)

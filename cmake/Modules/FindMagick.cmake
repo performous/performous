@@ -13,19 +13,19 @@ libfind_pkg_check_modules(Magick_PKGCONF ImageMagick)
 # Include dir
 find_path(Magick_INCLUDE_DIR
   NAMES magick/magick.h
-  PATHS ${Magick_PKGCONF_INCLUDE_DIRS}
+  HINTS ${Magick_PKGCONF_INCLUDE_DIRS}
 )
 
 # Finally the library itself
 find_library(Magick_LIBRARY
   NAMES Magick MagickCore CORE_RL_magick_
-  PATHS ${Magick_PKGCONF_LIBRARY_DIRS}
+  HINTS ${Magick_PKGCONF_LIBRARY_DIRS}
 )
 
 if(MINGW)
   find_library(MagickWand_LIBRARY
     NAMES MagickWand
-    PATHS ${Magick_PKGCONF_LIBRARY_DIRS}
+    HINTS ${Magick_PKGCONF_LIBRARY_DIRS}
   )
   set(Magick_PROCESS_LIBS MagickWand_LIBRARY)
 endif(MINGW)

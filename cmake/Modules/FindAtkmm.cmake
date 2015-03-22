@@ -17,14 +17,14 @@ libfind_pkg_check_modules(Atkmm_PKGCONF atkmm-1.6)
 # Main include dir
 find_path(Atkmm_INCLUDE_DIR
   NAMES atkmm.h
-  PATHS ${Atkmm_PKGCONF_INCLUDE_DIRS}
+  HINTS ${Atkmm_PKGCONF_INCLUDE_DIRS}
   PATH_SUFFIXES atkmm-1.6
 )
 
 # Finally the library itself
 find_library(Atkmm_LIBRARY
   NAMES atkmm-1.6
-  PATHS ${Atkmm_PKGCONF_LIBRARY_DIRS}
+  HINTS ${Atkmm_PKGCONF_LIBRARY_DIRS}
 )
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.

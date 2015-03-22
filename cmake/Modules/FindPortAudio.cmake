@@ -21,12 +21,12 @@ endif(PortAudio_PKGCONF_FOUND)
 
 find_path(PortAudio_INCLUDE_DIR
   NAMES portaudio.h
-  PATHS ${PortAudio_PKGCONF_INCLUDE_DIRS}
+  HINTS ${PortAudio_PKGCONF_INCLUDE_DIRS}
 )
 
 find_library(PortAudio_LIBRARY
   NAMES portaudio
-  PATHS ${PortAudio_PKGCONF_LIBRARY_DIRS}
+  HINTS ${PortAudio_PKGCONF_LIBRARY_DIRS}
 )
 
 set(PortAudio_PROCESS_INCLUDES PortAudio_INCLUDE_DIR)

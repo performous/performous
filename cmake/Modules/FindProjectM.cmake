@@ -13,13 +13,13 @@ libfind_pkg_check_modules(ProjectM_PKGCONF libprojectM)
 # Include dir
 find_path(ProjectM_INCLUDE_DIR
   NAMES libprojectM/projectM.hpp
-  PATHS ${ProjectM_PKGCONF_INCLUDE_DIRS}
+  HINTS ${ProjectM_PKGCONF_INCLUDE_DIRS}
 )
 
 # Finally the library itself
 find_library(ProjectM_LIBRARY
   NAMES projectM
-  PATHS ${ProjectM_PKGCONF_LIBRARY_DIRS}
+  HINTS ${ProjectM_PKGCONF_LIBRARY_DIRS}
 )
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.

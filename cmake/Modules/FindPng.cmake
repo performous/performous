@@ -14,12 +14,12 @@ libfind_pkg_check_modules(Png_PKGCONF Png)
 
 find_path(Png_INCLUDE_DIR
   NAMES pngconf.h
-  PATHS ${Png_PKGCONF_INCLUDE_DIRS}
+  HINTS ${Png_PKGCONF_INCLUDE_DIRS}
 )
 
 find_library(Png_LIBRARY
   NAMES png png12 png14
-  PATHS ${Png_PKGCONF_LIBRARY_DIRS}
+  HINTS ${Png_PKGCONF_LIBRARY_DIRS}
 )
 
 set(Png_PROCESS_INCLUDES Png_INCLUDE_DIR)
