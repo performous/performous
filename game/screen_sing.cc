@@ -578,7 +578,7 @@ void ScreenSing::drawMenu() {
 	if (m_menu.empty()) return;
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
-	auto cur = static_cast<MenuOptions::const_iterator>(&m_menu.current());
+	const auto cur = &m_menu.current();
 	double w = m_menu.dimensions.w();
 	const float txth = th.option_selected.h();
 	const float step = txth * 0.85f;
@@ -595,7 +595,8 @@ void ScreenSing::drawMenu() {
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it) {
 		// Pick the font object
 		SvgTxtTheme* txt = &th.option_selected;
-		if (cur != it) txt = &(th.getCachedOption(it->getName()));
+		if (cur != &*it)
+			txt = &(th.getCachedOption(it->getName()));
 		// Set dimensions and draw
 		txt->dimensions.middle(x).center(y);
 		txt->draw(it->getName());

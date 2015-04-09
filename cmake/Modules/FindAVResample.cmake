@@ -19,7 +19,7 @@ libfind_pkg_check_modules(AVResample_PKGCONF libavresample)
 
 find_path(AVResample_INCLUDE_DIR
   NAMES libavresample/avresample.h ffmpeg/avresample.h avresample.h
-  PATHS ${AVResample_PKGCONF_INCLUDE_DIRS}
+  HINTS ${AVResample_PKGCONF_INCLUDE_DIRS}
   PATH_SUFFIXES ffmpeg
 )
 if(AVResample_INCLUDE_DIR)
@@ -38,7 +38,7 @@ endif(AVResample_INCLUDE_DIR)
 
 find_library(AVResample_LIBRARY
   NAMES libavresample.dll.a avresample
-  PATHS ${AVResample_PKGCONF_LIBRARY_DIRS}
+  HINTS ${AVResample_PKGCONF_LIBRARY_DIRS}
 )
 
 libfind_process(AVResample)

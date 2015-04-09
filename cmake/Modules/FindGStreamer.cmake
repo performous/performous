@@ -17,13 +17,13 @@ libfind_pkg_check_modules(GStreamer_PKGCONF gstreamer-0.10)
 # Include dir
 find_path(GStreamer_INCLUDE_DIR
   NAMES gst/gst.h
-  PATHS ${GStreamer_PKGCONF_INCLUDE_DIRS}
+  HINTS ${GStreamer_PKGCONF_INCLUDE_DIRS}
 )
 
 # Finally the library itself
 find_library(GStreamer_LIBRARY
   NAMES gstreamer-0.10
-  PATHS ${GStreamer_PKGCONF_LIBRARY_DIRS}
+  HINTS ${GStreamer_PKGCONF_LIBRARY_DIRS}
 )
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.

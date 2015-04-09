@@ -193,7 +193,7 @@ void ScreenPlaylist::drawMenu() {
 	if (overlay_menu.empty()) return;
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
-	auto cur = static_cast<MenuOptions::const_iterator>(&overlay_menu.current());
+	const auto cur = &overlay_menu.current();
 	double w = overlay_menu.dimensions.w();
 	const float txth = th.option_selected.h();
 	const float step = txth * 0.85f;
@@ -208,7 +208,8 @@ void ScreenPlaylist::drawMenu() {
 	for (MenuOptions::const_iterator it = overlay_menu.begin(); it != overlay_menu.end(); ++it) {
 		// Pick the font object
 		SvgTxtTheme* txt = &th.option_selected;
-		if (cur != it) txt = &(th.getCachedOption(it->getName()));
+		if (cur != &*it)
+			txt = &(th.getCachedOption(it->getName()));
 		// Set dimensions and draw
 		txt->dimensions.middle(x).center(y);
 		txt->draw(it->getName());

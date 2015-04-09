@@ -19,21 +19,21 @@ libfind_pkg_check_modules(GDKmm_PKGCONF gdkmm-2.4)
 # Main include dir
 find_path(GDKmm_INCLUDE_DIR
   NAMES gdkmm.h
-  PATHS ${GDKmm_PKGCONF_INCLUDE_DIRS}
+  HINTS ${GDKmm_PKGCONF_INCLUDE_DIRS}
   PATH_SUFFIXES gdkmm-2.4
 )
 
 # Glib-related libraries also use a separate config header, which is in lib dir
 find_path(GDKmmConfig_INCLUDE_DIR
   NAMES gdkmmconfig.h
-  PATHS ${GDKmm_PKGCONF_INCLUDE_DIRS} /usr
+  HINTS ${GDKmm_PKGCONF_INCLUDE_DIRS} /usr
   PATH_SUFFIXES lib/gdkmm-2.4/include
 )
 
 # Finally the library itself
 find_library(GDKmm_LIBRARY
   NAMES gdkmm-2.4
-  PATHS ${GDKmm_PKGCONF_LIBRARY_DIRS}
+  HINTS ${GDKmm_PKGCONF_LIBRARY_DIRS}
 )
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.

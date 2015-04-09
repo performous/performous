@@ -16,13 +16,13 @@ libfind_pkg_check_modules(Magick++_PKGCONF ImageMagick++)
 # Include dir
 find_path(Magick++_INCLUDE_DIR
   NAMES Magick++.h
-  PATHS ${Magick++_PKGCONF_INCLUDE_DIRS}
+  HINTS ${Magick++_PKGCONF_INCLUDE_DIRS}
 )
 
 # Finally the library itself
 find_library(Magick++_LIBRARY
   NAMES Magick++ CORE_RL_magick++_
-  PATHS ${Magick++_PKGCONF_LIBRARY_DIRS}
+  HINTS ${Magick++_PKGCONF_LIBRARY_DIRS}
 )
 
 # Process Magick++, depends on Magick
