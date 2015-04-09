@@ -10,15 +10,12 @@
 #include "fs.hh"
 
 void loadFonts() {
-	/* Disabled on Windows due to not working and producing weird cache directory in the wrong place
-#ifndef _WIN32
 	FcConfig *config = FcInitLoadConfigAndFonts();
 	for (fs::path const& font: listFiles("fonts")) {
-		FcConfigAppFontAddFile(config, reinterpret_cast<const FcChar8*>(font.string().c_str()));
+		FcBool err = FcConfigAppFontAddFile(config, reinterpret_cast<const FcChar8*>(font.string().c_str()));
+		std::clog << "font/info: Loading font " << font << ": " << ((err == FcTrue)?"ok":"error") << std::endl;
 	}
 	FcConfigSetCurrent(config);
-#endif
-*/
 }
 
 namespace {
