@@ -10,12 +10,27 @@
 #include "fs.hh"
 
 void loadFonts() {
-	FcConfig *config = FcInitLoadConfigAndFonts();
+	FcConfig *config = FcInitLoadConfig();
 	for (fs::path const& font: listFiles("fonts")) {
 		FcBool err = FcConfigAppFontAddFile(config, reinterpret_cast<const FcChar8*>(font.string().c_str()));
 		std::clog << "font/info: Loading font " << font << ": " << ((err == FcTrue)?"ok":"error") << std::endl;
 	}
+	if (!FcConfigBuildFonts(config))
+		throw std::logic_error("Could not build font database.");
 	FcConfigSetCurrent(config);
+
+	// This would all be very useless if pango+cairo didn't use the fontconfig+freetype backend:
+
+	PangoCairoFontMap *map = PANGO_CAIRO_FONT_MAP(pango_cairo_font_map_get_default());
+	std::clog << "font/info: PangoCairo is using font map " << G_OBJECT_TYPE_NAME(map) << std::endl;
+	if (pango_cairo_font_map_get_font_type(map) != CAIRO_FONT_TYPE_FT) {
+		PangoCairoFontMap *ftMap = PANGO_CAIRO_FONT_MAP(pango_cairo_font_map_new_for_font_type(CAIRO_FONT_TYPE_FT));
+		std::clog << "font/info: Switching to font map " << G_OBJECT_TYPE_NAME(ftMap) << std::endl;
+		if (ftMap)
+			pango_cairo_font_map_set_default(ftMap);
+		else
+			std::clog << "font/error: Can't switch to FreeType, fonts will be unavailable!" << std::endl;
+	}
 }
 
 namespace {
