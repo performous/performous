@@ -60,7 +60,7 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	m *= 2.0;  // HACK to improve text quality without affecting compatibility with old versions
 	// Setup font settings
 	PangoAlignment alignment = parseAlignment(_text.fontalign);
-	boost::shared_ptr<PangoFontDescription> desc(
+	std::shared_ptr<PangoFontDescription> desc(
 	  pango_font_description_new(),
 	  pango_font_description_free);
 	pango_font_description_set_weight(desc.get(), parseWeight(_text.fontweight));
@@ -69,10 +69,10 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	pango_font_description_set_absolute_size(desc.get(), _text.fontsize * PANGO_SCALE * m);
 	double border = _text.stroke_width * m;
 	// Setup Pango context and layout
-	boost::shared_ptr<PangoContext> ctx(
+	std::shared_ptr<PangoContext> ctx(
 	  pango_font_map_create_context(pango_cairo_font_map_get_default()),
 	  g_object_unref);
-	boost::shared_ptr<PangoLayout> layout(
+	std::shared_ptr<PangoLayout> layout(
 	  pango_layout_new(ctx.get()),
 	  g_object_unref);
 	pango_layout_set_alignment(layout.get(), alignment);
@@ -88,10 +88,10 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 		m_y_advance = rec1.y;
 	}
 	// Create Cairo surface and drawing context
-	boost::shared_ptr<cairo_surface_t> surface(
+	std::shared_ptr<cairo_surface_t> surface(
 	  cairo_image_surface_create(CAIRO_FORMAT_ARGB32, m_x, m_y),
 	  cairo_surface_destroy);
-	boost::shared_ptr<cairo_t> dc(
+	std::shared_ptr<cairo_t> dc(
 	  cairo_create(surface.get()),
 	  cairo_destroy);
 	// Keep things sharp and fast, we scale with OpenGL anyway...
