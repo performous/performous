@@ -80,12 +80,10 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	pango_layout_set_text(layout.get(), _text.text.c_str(), -1);
 	// Compute text extents
 	{
-		PangoRectangle rec1, rec2;
-		pango_layout_get_pixel_extents(layout.get(), &rec1, &rec2);
-		m_x = rec2.width + border;  // Add twice half a border for margins
-		m_y = rec2.height + border;
-		m_x_advance = rec1.x;
-		m_y_advance = rec1.y;
+		PangoRectangle rec;
+		pango_layout_get_pixel_extents(layout.get(), NULL, &rec);
+		m_x = rec.width + border;  // Add twice half a border for margins
+		m_y = rec.height + border;
 	}
 	// Create Cairo surface and drawing context
 	std::shared_ptr<cairo_surface_t> surface(
@@ -120,8 +118,6 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	// We don't want text quality multiplier m to affect rendering size...
 	m_x /= m;
 	m_y /= m;
-	m_x_advance /= m;
-	m_y_advance /= m;
 }
 
 void OpenGLText::draw() {
