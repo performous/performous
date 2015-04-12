@@ -159,7 +159,12 @@ namespace {
 		while (std::getline(iss, token, ';')) {
 			std::istringstream iss2(token);
 			std::getline(iss2, token, ':');
-			if (token == "font-size") iss2 >> _theme.fontsize;
+			if (token == "font-size") {
+				// Parse as int because https://llvm.org/bugs/show_bug.cgi?id=17782
+				int value;
+				iss2 >> value;
+				_theme.fontsize = value;
+			}
 			else if (token == "font-family") std::getline(iss2, _theme.fontfamily);
 			else if (token == "font-style") std::getline(iss2, _theme.fontstyle);
 			else if (token == "font-weight") std::getline(iss2, _theme.fontweight);
