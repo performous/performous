@@ -80,7 +80,11 @@ bool SongParser::txtParseField(std::string const& line) {
 	else if (key == "VIDEOGAP") assign(m_song.videoGap, value);
 	else if (key == "PREVIEWSTART") assign(m_song.preview_start, value);
 	else if (key == "LANGUAGE") m_song.language= value.substr(value.find_first_not_of(" "));
-	else if (key == "DUETSINGERP2") m_song.insertVocalTrack(DUET_P2, VocalTrack(DUET_P2)); // Strong hint that this is a duet, so it will be readily displayed with two singers in browser and properly filtered
+	else if (key == "DUETSINGERP1" || key == "P1") m_song.DuetP1Name = value.substr(value.find_first_not_of(" :"));
+	else if (key == "DUETSINGERP2" || key == "P2")  { // Strong hint that this is a duet, so it will be readily displayed with two singers in browser and properly filtered
+		m_song.DuetP2Name = value.substr(value.find_first_not_of(" :"));
+		m_song.insertVocalTrack(DUET_P2, VocalTrack(DUET_P2));
+	}
 	return true;
 }
 
