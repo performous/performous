@@ -22,10 +22,10 @@ bool SongParser::txtCheck(std::vector<char> const& data) const {
 void SongParser::txtParseHeader() {
 	Song& s = m_song;
 	std::string line;
+	s.insertVocalTrack(TrackName::LEAD_VOCAL, VocalTrack(TrackName::LEAD_VOCAL)); // Dummy note to indicate there is a track
 	while (getline(line) && txtParseField(line)) {}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 	if (m_bpm != 0.0) addBPM(0, m_bpm);
-	s.insertVocalTrack(TrackName::LEAD_VOCAL, VocalTrack(TrackName::LEAD_VOCAL)); // Dummy note to indicate there is a track
 }
 
 /// Parse notes
@@ -62,6 +62,9 @@ bool SongParser::txtParseField(std::string const& line) {
 	if (key == "BPM") assign(m_bpm, value);
 	else if (key == "RELATIVE") assign(m_relative, value);
 	else if (key == "GAP") { assign(m_gap, value); m_gap *= 1e-3; }
+	else if (key == "DUETSINGERP1" || key == "P1") m_song.insertVocalTrack(TrackName::LEAD_VOCAL, VocalTrack(value.substr(value.find_first_not_of(" "))));
+	// Strong hint that this is a duet, so it will be readily displayed with two singers in browser and properly filtered
+	else if (key == "DUETSINGERP2" || key == "P2") m_song.insertVocalTrack(DUET_P2, VocalTrack(value.substr(value.find_first_not_of(" "))));
 
 	if (m_song.loadStatus >= Song::HEADER) return true;  // Only re-parsing now, skip any other data
 
@@ -79,8 +82,7 @@ bool SongParser::txtParseField(std::string const& line) {
 	else if (key == "START") assign(m_song.start, value);
 	else if (key == "VIDEOGAP") assign(m_song.videoGap, value);
 	else if (key == "PREVIEWSTART") assign(m_song.preview_start, value);
-	else if (key == "LANGUAGE") m_song.language= value.substr(value.find_first_not_of(" "));
-	else if (key == "DUETSINGERP2") m_song.insertVocalTrack(DUET_P2, VocalTrack(DUET_P2)); // Strong hint that this is a duet, so it will be readily displayed with two singers in browser and properly filtered
+	else if (key == "LANGUAGE") m_song.language = value.substr(value.find_first_not_of(" "));
 	return true;
 }
 
