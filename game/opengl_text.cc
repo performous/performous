@@ -9,6 +9,29 @@
 #include <sstream>
 #include "fs.hh"
 
+void loadFonts() {
+	FcConfig *config = FcInitLoadConfig();
+	for (fs::path const& font: listFiles("fonts")) {
+		FcBool err = FcConfigAppFontAddFile(config, reinterpret_cast<const FcChar8*>(font.string().c_str()));
+		std::clog << "font/info: Loading font " << font << ": " << ((err == FcTrue)?"ok":"error") << std::endl;
+	}
+	if (!FcConfigBuildFonts(config))
+		throw std::logic_error("Could not build font database.");
+	FcConfigSetCurrent(config);
+
+	// This would all be very useless if pango+cairo didn't use the fontconfig+freetype backend:
+
+	PangoCairoFontMap *map = PANGO_CAIRO_FONT_MAP(pango_cairo_font_map_get_default());
+	std::clog << "font/info: PangoCairo is using font map " << G_OBJECT_TYPE_NAME(map) << std::endl;
+	if (pango_cairo_font_map_get_font_type(map) != CAIRO_FONT_TYPE_FT) {
+		PangoCairoFontMap *ftMap = PANGO_CAIRO_FONT_MAP(pango_cairo_font_map_new_for_font_type(CAIRO_FONT_TYPE_FT));
+		std::clog << "font/info: Switching to font map " << G_OBJECT_TYPE_NAME(ftMap) << std::endl;
+		if (ftMap)
+			pango_cairo_font_map_set_default(ftMap);
+		else
+			std::clog << "font/error: Can't switch to FreeType, fonts will be unavailable!" << std::endl;
+	}
+}
 
 namespace {
 	PangoAlignment parseAlignment(std::string const& fontalign) {
@@ -37,7 +60,7 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	m *= 2.0;  // HACK to improve text quality without affecting compatibility with old versions
 	// Setup font settings
 	PangoAlignment alignment = parseAlignment(_text.fontalign);
-	boost::shared_ptr<PangoFontDescription> desc(
+	std::shared_ptr<PangoFontDescription> desc(
 	  pango_font_description_new(),
 	  pango_font_description_free);
 	pango_font_description_set_weight(desc.get(), parseWeight(_text.fontweight));
@@ -46,10 +69,10 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	pango_font_description_set_absolute_size(desc.get(), _text.fontsize * PANGO_SCALE * m);
 	double border = _text.stroke_width * m;
 	// Setup Pango context and layout
-	boost::shared_ptr<PangoContext> ctx(
+	std::shared_ptr<PangoContext> ctx(
 	  pango_font_map_create_context(pango_cairo_font_map_get_default()),
 	  g_object_unref);
-	boost::shared_ptr<PangoLayout> layout(
+	std::shared_ptr<PangoLayout> layout(
 	  pango_layout_new(ctx.get()),
 	  g_object_unref);
 	pango_layout_set_alignment(layout.get(), alignment);
@@ -57,18 +80,16 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	pango_layout_set_text(layout.get(), _text.text.c_str(), -1);
 	// Compute text extents
 	{
-		PangoRectangle rec1, rec2;
-		pango_layout_get_pixel_extents(layout.get(), &rec1, &rec2);
-		m_x = rec2.width + border;  // Add twice half a border for margins
-		m_y = rec2.height + border;
-		m_x_advance = rec1.x;
-		m_y_advance = rec1.y;
+		PangoRectangle rec;
+		pango_layout_get_pixel_extents(layout.get(), NULL, &rec);
+		m_x = rec.width + border;  // Add twice half a border for margins
+		m_y = rec.height + border;
 	}
 	// Create Cairo surface and drawing context
-	boost::shared_ptr<cairo_surface_t> surface(
+	std::shared_ptr<cairo_surface_t> surface(
 	  cairo_image_surface_create(CAIRO_FORMAT_ARGB32, m_x, m_y),
 	  cairo_surface_destroy);
-	boost::shared_ptr<cairo_t> dc(
+	std::shared_ptr<cairo_t> dc(
 	  cairo_create(surface.get()),
 	  cairo_destroy);
 	// Keep things sharp and fast, we scale with OpenGL anyway...
@@ -97,8 +118,6 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	// We don't want text quality multiplier m to affect rendering size...
 	m_x /= m;
 	m_y /= m;
-	m_x_advance /= m;
-	m_y_advance /= m;
 }
 
 void OpenGLText::draw() {
@@ -136,7 +155,12 @@ namespace {
 		while (std::getline(iss, token, ';')) {
 			std::istringstream iss2(token);
 			std::getline(iss2, token, ':');
-			if (token == "font-size") iss2 >> _theme.fontsize;
+			if (token == "font-size") {
+				// Parse as int because https://llvm.org/bugs/show_bug.cgi?id=17782
+				int value;
+				iss2 >> value;
+				_theme.fontsize = value;
+			}
 			else if (token == "font-family") std::getline(iss2, _theme.fontfamily);
 			else if (token == "font-style") std::getline(iss2, _theme.fontstyle);
 			else if (token == "font-weight") std::getline(iss2, _theme.fontweight);
