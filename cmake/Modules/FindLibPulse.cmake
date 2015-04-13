@@ -14,12 +14,12 @@ libfind_pkg_check_modules(LibPulse_PKGCONF libpulse)
 
 find_path(LibPulse_INCLUDE_DIR
   NAMES pulse/pulseaudio.h
-  PATHS ${LibPulse_PKGCONF_INCLUDE_DIRS}
+  HINTS ${LibPulse_PKGCONF_INCLUDE_DIRS}
 )
 
 find_library(LibPulse_LIBRARY
   NAMES pulse
-  PATHS ${LibPulse_PKGCONF_LIBRARY_DIRS}
+  HINTS ${LibPulse_PKGCONF_LIBRARY_DIRS}
 )
 
 set(LibPulse_PROCESS_INCLUDES LibPulse_INCLUDE_DIR)

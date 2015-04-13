@@ -14,12 +14,12 @@ libfind_pkg_check_modules(Jack_PKGCONF jack)
 
 find_path(Jack_INCLUDE_DIR
   NAMES jack/jack.h
-  PATHS ${Jack_PKGCONF_INCLUDE_DIRS}
+  HINTS ${Jack_PKGCONF_INCLUDE_DIRS}
 )
 
 find_library(Jack_LIBRARY
   NAMES jack
-  PATHS ${Jack_PKGCONF_LIBRARY_DIRS}
+  HINTS ${Jack_PKGCONF_LIBRARY_DIRS}
 )
 
 set(Jack_PROCESS_INCLUDES Jack_INCLUDE_DIR)

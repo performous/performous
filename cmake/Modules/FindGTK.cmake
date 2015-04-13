@@ -20,14 +20,14 @@ libfind_pkg_check_modules(GTK_PKGCONF gtk+-2.0)
 # Main include dir
 find_path(GTK_INCLUDE_DIR
   NAMES gtk/gtk.h
-  PATHS ${GTK_PKGCONF_INCLUDE_DIRS}
+  HINTS ${GTK_PKGCONF_INCLUDE_DIRS}
   PATH_SUFFIXES gtk-2.0
 )
 
 # Finally the library itself
 find_library(GTK_LIBRARY
   NAMES gtk-x11-2.0
-  PATHS ${GTK_PKGCONF_LIBRARY_DIRS}
+  HINTS ${GTK_PKGCONF_LIBRARY_DIRS}
 )
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.

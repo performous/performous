@@ -16,14 +16,14 @@ libfind_pkg_check_modules(Cairomm_PKGCONF cairomm-1.0)
 # Main include dir
 find_path(Cairomm_INCLUDE_DIR
   NAMES cairomm/cairomm.h
-  PATHS ${Cairomm_PKGCONF_INCLUDE_DIRS}
+  HINTS ${Cairomm_PKGCONF_INCLUDE_DIRS}
   PATH_SUFFIXES cairomm-1.0
 )
 
 # Finally the library itself
 find_library(Cairomm_LIBRARY
   NAMES cairomm-1.0
-  PATHS ${Cairomm_PKGCONF_LIBRARY_DIRS}
+  HINTS ${Cairomm_PKGCONF_LIBRARY_DIRS}
 )
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.

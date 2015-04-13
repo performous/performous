@@ -22,7 +22,7 @@ libfind_pkg_check_modules(ClanLib_PKGCONF clanCore-${ClanLib_VERSION})
 
 find_path(ClanLib_INCLUDE_DIR
   NAMES ClanLib/core.h
-  PATHS ${ClanLib_PKGCONF_INCLUDE_DIRS}
+  HINTS ${ClanLib_PKGCONF_INCLUDE_DIRS}
   PATH_SUFFIXES ClanLib-${ClanLib_VERSION}
 )
 
@@ -38,7 +38,7 @@ endif (ClanLib_INCLUDE_DIR)
 foreach(COMPONENT ${ClanLib_FIND_COMPONENTS})
   find_library(ClanLib_${COMPONENT}_LIBRARY
     NAMES clan${COMPONENT}
-    PATHS ${ClanLib_PKGCONF_LIBRARY_DIRS}
+    HINTS ${ClanLib_PKGCONF_LIBRARY_DIRS}
   )
   set(ClanLib_PROCESS_LIBS ${ClanLib_PROCESS_LIBS} ClanLib_${COMPONENT}_LIBRARY)
 endforeach(COMPONENT)

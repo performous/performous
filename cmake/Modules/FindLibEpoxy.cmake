@@ -14,13 +14,13 @@ libfind_pkg_check_modules(LibEpoxy_PKGCONF epoxy)
 
 find_path(LibEpoxy_INCLUDE_DIR
   NAMES epoxy/gl.h
-  PATHS ${LibEpoxy_PKGCONF_INCLUDE_DIRS}
+  HINTS ${LibEpoxy_PKGCONF_INCLUDE_DIRS}
   PATH_SUFFIXES LibEpoxy
 )
 
 find_library(LibEpoxy_LIBRARY
   NAMES epoxy
-  PATHS ${LibEpoxy_PKGCONF_LIBRARY_DIRS}
+  HINTS ${LibEpoxy_PKGCONF_LIBRARY_DIRS}
 )
 
 set(LibEpoxy_PROCESS_INCLUDES LibEpoxy_INCLUDE_DIR)

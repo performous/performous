@@ -14,12 +14,12 @@ libfind_pkg_check_modules(Tiff_PKGCONF tiff)
 
 find_path(Tiff_INCLUDE_DIR
   NAMES tiffconf.h
-  PATHS ${Tiff_PKGCONF_INCLUDE_DIRS}
+  HINTS ${Tiff_PKGCONF_INCLUDE_DIRS}
 )
 
 find_library(Tiff_LIBRARY
   NAMES tiff
-  PATHS ${Tiff_PKGCONF_LIBRARY_DIRS}
+  HINTS ${Tiff_PKGCONF_LIBRARY_DIRS}
 )
 
 set(Tiff_PROCESS_INCLUDES Tiff_INCLUDE_DIR)

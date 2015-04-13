@@ -17,21 +17,21 @@ libfind_pkg_check_modules(LibXML++_PKGCONF libxml++-2.6)
 # Main include dir
 find_path(LibXML++_INCLUDE_DIR
   NAMES libxml++/libxml++.h
-  PATHS ${LibXML++_PKGCONF_INCLUDE_DIRS}
+  HINTS ${LibXML++_PKGCONF_INCLUDE_DIRS}
   PATH_SUFFIXES libxml++-2.6
 )
 
 # Glib-related libraries also use a separate config header, which is in lib dir
 find_path(LibXML++Config_INCLUDE_DIR
   NAMES libxml++config.h
-  PATHS ${LibXML++_PKGCONF_INCLUDE_DIRS} /usr
+  HINTS ${LibXML++_PKGCONF_INCLUDE_DIRS} /usr
   PATH_SUFFIXES lib/libxml++-2.6/include ../lib/libxml++-2.6/include
 )
 
 # Finally the library itself
 find_library(LibXML++_LIBRARY
   NAMES xml++-2.6
-  PATHS ${LibXML++_PKGCONF_LIBRARY_DIRS}
+  HINTS ${LibXML++_PKGCONF_LIBRARY_DIRS}
 )
 
 set(LibXML++_PROCESS_INCLUDES LibXML++Config_INCLUDE_DIR)
