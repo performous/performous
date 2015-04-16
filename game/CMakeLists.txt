@@ -42,6 +42,8 @@ if(WIN32)
 		# According to MinGW tools, we need to compile the rc file, and then link it into projects:
 		# windres foo.rc foores.o
 		# gcc -o foo.exe foo.o foores.o
+		find_library(WSOCK32_LIBRARY wsock32)
+    		find_library(WS2_32_LIBRARY ws2_32)
 		if(NOT CMAKE_RC_COMPILER)
 			find_program(CMAKE_RC_COMPILER windres)
 		endif()
@@ -149,7 +151,11 @@ endif()
 
 # Build main executable
 add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
+if(WIN32)
+  target_link_libraries(performous wsock32 ws2_32)
+endif()
 target_link_libraries(performous ${LIBS})
+
 install(TARGETS performous DESTINATION ${BIN_INSTALL})
 
 set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)  # Store library paths in executable
