@@ -189,9 +189,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', end
 			$("#autocomplete").show();
 			$ul.html("<li><div class='ui-loader'><span class='ui-icon ui-icon-loading'></span></div></li>");
 			$ul.listview("refresh");
-			results = $.post("api/autocomplete",$input.val(), function (data) {
+			results = $.post("api/search",$input.val(), function (data) {
 				database = JSON.parse(data);
 				$.each(database, function(i, val) {
+					if(i > 5) return false;
 					html += "<li>" + database[i].Artist + " - " + database[i].Title + "</li>";
 				});
 				$ul.html( html );
