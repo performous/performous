@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fs.hh"
 #include "i18n.hh"
 #include "notes.hh"
 #include "util.hh"
