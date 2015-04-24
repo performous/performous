@@ -141,6 +141,19 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 			output.pop_back(); //remove the last comma
 			output += "\n]";
 			return http_server::response::stock_reply(http_server::response::ok, output);
+	} else if (request.destination == "/api/autocomplete") {
+		m_songs.setFilter(request.body); //set filter and get the results
+			std:: stringstream JSONDB;
+			JSONDB << "[\n";
+			for (int i=0; i<10; i++) {
+				JSONDB << "\n{\n\"Title\": \"" << escapeCharacters(m_songs[i]->title) << "\",\n\"Artist\": \"";
+				JSONDB << escapeCharacters(m_songs[i]->artist) << "\",\n\"Edition\": \"" << escapeCharacters(m_songs[i]->edition) << "\",\n\"Language\": \"" << escapeCharacters(m_songs[i]->language);
+				JSONDB << "\",\n\"Creator\": \"" << escapeCharacters(m_songs[i]->creator) << "\"\n},";
+			}
+			std::string output = JSONDB.str(); //remove the last comma
+			output.pop_back(); //remove the last comma
+			output += "\n]";
+			return http_server::response::stock_reply(http_server::response::ok, output);
 	} else if (request.destination == "/api/moveup") {
 		try {
 			int songToMove = boost::lexical_cast<int>(request.body);
