@@ -121,6 +121,13 @@ else()
 	message(STATUS "Webcam support: Disabled (explicitly disabled)")
 endif()
 
+option(ENABLE_WEBSERVER "Enable webserver support (cpp-netlib)." OFF)
+if(ENABLE_WEBSERVER)
+	message(STATUS "Webserver support: Enabled")
+	add_definitions("-DUSE_CPPNETLIB")
+else()
+	message(STATUS "Webserver support: Disabled")
+endif()
 
 if(APPLE)
 	# Needed for ffmpeg.cc to compile cleanly on OSX (it's a (unsigned long) long story)
