@@ -368,6 +368,13 @@ struct Output {
 		if (mics.size() > 0 && config["audio/pass-through"].b()) {
 			// Decrease music volume
 			float amp = 1.0f / config["audio/pass-through_ratio"].f();
+			if (amp != 1.0f)
+				for (float *i = begin; i < end; ++i) *i *= amp;
+			// All mics included
+			for (size_t i = 0; i < mics.size(); ++i) {
+				if (mics[i])
+					mics[i]->output(begin, end, mics[i]->getRate());  // Do the actual mixing
+			}
 			if (amp != 1.0f) for (auto& s: boost::make_iterator_range(begin, end)) s *= amp;
 			// Do the mixing
 			for (auto& m: mics) if (m) m->output(begin, end, rate);

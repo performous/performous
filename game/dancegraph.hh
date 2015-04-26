@@ -3,6 +3,7 @@
 #include <boost/ptr_container/ptr_map.hpp>
 
 #include "instrumentgraph.hh"
+#include "3dobject.hh"
 
 class Song;
 
@@ -50,13 +51,12 @@ class DanceGraph: public InstrumentGraph {
 
 	// Scoring & drawing
 	void dance(double time, input::Event const& ev);
-	void drawBeats(double time);
 	void drawNote(DanceNote& note, double time);
 	void drawInfo(double time, Dimensions dimensions);
 	void drawArrow(int arrow_i, Texture& tex, float ty1 = 0.0, float ty2 = 1.0);
 
 	// Helpers
-	float panel2x(int i) const { return getScale() * (-(m_pads * 0.5f) + m_arrow_map[i] + 0.5f); } /// Get x for an arrow line
+	float panel2x(int i) const { return getScale() * (-(m_pads * 0.5f) + (0.8*m_arrow_map[i]) + 0.5f); } /// Get x for an arrow line
 	float getScale() const { return 1.0f / m_pads * 8.0f; }
 	double getNotesBeginTime() const { return m_notes.front().note.begin; }
 
@@ -75,5 +75,10 @@ class DanceGraph: public InstrumentGraph {
 	// Misc
 	int m_arrow_map[max_panels]; /// game mode dependant mapping of arrows' ordering at cursor
 	bool m_insideStop;
+	float m_currentSpeedMod = 1;
+
+	//3d models
+	Object3d m_arrow_obj;
+	Object3d m_arrow_outline_obj;
 };
 

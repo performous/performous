@@ -14,6 +14,9 @@ namespace {
 	static const int mapping7[max_panels] = {0, 2, 4, 6, 1, 5, 3,-1,-1,-1};
 	static const int mapping8[max_panels] = {0, 3, 4, 7, 1, 6, 2, 5,-1,-1};
 	static const int mapping10[max_panels]= {0, 3, 4, 7, 1, 6, 2, 5,-1,-1};
+	static const double arrowRotations[max_panels] = {
+		M_PI, -M_PI/2, M_PI/2, 0, 3*M_PI/4, M_PI/4, -3*M_PI/4, -M_PI/4
+	};
 	#if 0 // Here is some dummy gettext calls to populate the dictionary
 	_("Beginner") _("Easy") _("Medium") _("Hard") _("Challenge")
 	#endif
@@ -24,15 +27,11 @@ namespace {
 	const float texCoordStep = -0.25f; // Four beat lines per beat texture
 	// Note: t is difference from playback time so it must be in range [past, future]
 	float time2y(float t) { return timescale * (t - past) / (future - past); }
-	float time2a(float t) {
-		float a = clamp(1.0 - t / future); // Note: we want 1.0 alpha already at zero t.
-		return std::pow(a, 0.8f); // Nicer curve
-	}
 	const double maxTolerance = 0.15; // Maximum error in seconds
 	int getNextBigStreak(int prev) { return prev + 10; }
 
 	/// Get an accuracy value [0, 1] for the error offset (in seconds)
-	double accuracy(double error) { return 1.0 - (std::abs(error) / maxTolerance); };
+	double accuracy(double error) { return 1.0 - (std::abs(error) / maxTolerance); }
 
 	/// Gives points based on error from a perfect hit
 	double points(double error) {
@@ -97,6 +96,9 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song, input::DevicePtr dev):
 		throw std::runtime_error("Could not find any dance tracks.");
 	changeTrack(0); // Get an initial game mode and notes for it
 	setupJoinMenu(); // Finally setup the menu
+	///Load 3d objects
+	m_arrow_obj.load(findFile("arrow.obj"), findFile("arrow-texture.png"));
+	m_arrow_outline_obj.load(findFile("arrowoutline.obj"));
 }
 
 
@@ -124,7 +126,7 @@ void DanceGraph::setupJoinMenu() {
 		// Add difficulties to the option list
 		for (int level = 0; level < DIFFICULTYCOUNT; ++level) {
 			if (difficulty(DanceDifficulty(level), true)) {
-				ol.push_back(boost::lexical_cast<std::string>(level));
+				ol.push_back(boost::lexical_cast<std::string>(level)); //TODO set difficulty
 				if (DanceDifficulty(level) == m_level) cur = i;
 				++i;
 			}
@@ -134,12 +136,27 @@ void DanceGraph::setupJoinMenu() {
 		m_menu.add(MenuOption("", _("Select difficulty")).changer(m_selectedDifficulty)); // MenuOption that cycles the options
 		m_menu.back().setDynamicName(m_difficultyOpt); // Set the title to be dynamic
 	}
+	{
+		ConfigItem::OptionList ol;
+		int i = 0, cur = 0;
+		//add modifiers to option list
+		for (float mod = 0.5; mod < 5; mod += 0.25) {
+			ol.push_back(std::to_string(mod));
+			if(m_currentSpeedMod == mod) cur = i;
+			++i;
+		}
+		m_SpeedModConfigItem = ConfigItem(ol);
+		m_SpeedModConfigItem.select(cur);
+		m_menu.add(MenuOption(_(""), _("Select Speedmod")).changer(m_SpeedModConfigItem));
+		m_menu.back().setDynamicName(m_SpeedmodDynamicNameString);
+	}
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
 }
 
 void DanceGraph::updateJoinMenu() {
 	m_trackOpt = getTrack();
 	m_difficultyOpt = getDifficultyString();
+	m_SpeedmodDynamicNameString = ("Speedmod: " + boost::lexical_cast<std::string>(m_currentSpeedMod) + "x");
 }
 
 /// Attempt to select next/previous game mode
@@ -196,7 +213,10 @@ std::string DanceGraph::getTrack() const {
 
 /// Get the difficulty as displayable string
 std::string DanceGraph::getDifficultyString() const {
-	return _(diffv[m_level].c_str());
+	DanceDifficultyMap const& ddm = m_song.danceTracks.find(m_gamingMode)->second;
+	DanceTrack const& track = ddm.find(m_level)->second;
+	std::string seperator = " - "; //looks silly but without it it gives weired gliches taking the wrong translation string for each menuoption.
+	return (_(diffv[m_level].c_str()) + seperator + std::to_string(track.difficulty));
 }
 
 /// Get a string id for track and difficulty
@@ -271,6 +291,7 @@ void DanceGraph::engine() {
 			else if (boost::lexical_cast<int>(m_selectedDifficulty.so()) != m_level)
 				difficulty(DanceDifficulty(boost::lexical_cast<int>(m_selectedDifficulty.so())));
 			else if (m_rejoin.b()) { unjoin(); setupJoinMenu(); m_dev->pushEvent(input::Event()); /* FIXME: HACK? */ }
+			if (m_currentSpeedMod != boost::lexical_cast<float>(m_SpeedModConfigItem.so())) m_currentSpeedMod = boost::lexical_cast<float>(m_SpeedModConfigItem.so());
 			// Sync dynamic stuff
 			updateJoinMenu();
 		// Open Menu
@@ -403,8 +424,6 @@ void DanceGraph::draw(double time) {
 		float temp_s = dimensions.w() / 8.0f; // Allow for 8 pads to fit on a track
 		Transform trans(translate(vec3(0.0f, dimensions.y1(), 0.0)) * scale(temp_s));
 
-		// Draw the "neck" graph (beat lines)
-		drawBeats(time);
 
 		// Arrows on cursor
 		{
@@ -416,7 +435,11 @@ void DanceGraph::draw(double time) {
 				float l = m_pressed_anim[arrow_i].get();
 				us()["hitAnim"].set(l);
 				us()["position"].set(panel2x(arrow_i), time2y(0.0));
-				drawArrow(arrow_i, m_arrows_cursor);
+				glmath::mat4 sca = scale(glmath::vec3(1+0.4*l,1+0.4*l,1+0.4*l));
+				glmath::mat4 pos = translate(glmath::vec3(panel2x(arrow_i), time2y(0.0), 0.0));
+				glmath::mat4 rot = rotate(arrowRotations[arrow_i], glmath::vec3(0,0,-1));
+				Transform cursorTrans(pos * rot * sca);
+				m_arrow_outline_obj.draw();
 			}
 		}
 
@@ -432,26 +455,6 @@ void DanceGraph::draw(double time) {
 	drawInfo(time, dimensions); // Go draw some texts and other interface stuff
 }
 
-void DanceGraph::drawBeats(double time) {
-	UseTexture tex(m_beat);
-	glutil::VertexArray va;
-	float texCoord = 0.0f;
-	float tBeg = 0.0f, tEnd;
-	float w = 0.5 * m_pads * getScale();
-	for (auto it = m_song.beats.begin(); it != m_song.beats.end() && tBeg < future; ++it, texCoord += texCoordStep, tBeg = tEnd) {
-		tEnd = *it - time;
-		//if (tEnd < past) continue;
-		/*if (tEnd > future) {
-			// Crop the end off
-			texCoord -= texCoordStep * (tEnd - future) / (tEnd - tBeg);
-			tEnd = future;
-		}*/
-		glmath::vec4 c(1.0f, 1.0f, 1.0f, time2a(tEnd));
-		va.color(c).normal(0.0f, 1.0f, 0.0f).texCoord(0.0f, texCoord).vertex(-w, time2y(tEnd));
-		va.color(c).normal(0.0f, 1.0f, 0.0f).texCoord(1.0f, texCoord).vertex(w, time2y(tEnd));
-	}
-	va.draw();
-}
 
 /// Draws a single note (or hold)
 void DanceGraph::drawNote(DanceNote& note, double time) {
@@ -460,8 +463,8 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	int arrow_i = note.note.note;
 	bool mine = note.note.type == Note::MINE;
 	float x = panel2x(arrow_i);
-	float yBeg = time2y(tBeg);
-	float yEnd = time2y(tEnd);
+	float yBeg = time2y(tBeg*m_currentSpeedMod);
+	float yEnd = time2y(tEnd*m_currentSpeedMod);
 
 	// Did we hit it?
 	if (note.isHit && (note.releaseTime > 0.0 || std::abs(tEnd) < maxTolerance) && note.hitAnim.getTarget() == 0.0) {
@@ -483,10 +486,17 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 				yEnd = std::max(time2y(0.0), yEnd);
 			}
 			if (note.releaseTime > 0) yBeg = time2y(note.releaseTime - time); // Oh noes, it got released!
+			// Draw begin
+			{
+				// TODO: This code is duplicate with short note, move to a function
+				glmath::mat4 pos = translate(glmath::vec3(x, yBeg, 0.0));
+				glmath::mat4 rot = rotate(arrowRotations[arrow_i], glmath::vec3(0,0,-1));
+				Transform noteTrans(pos * rot);
+				m_arrow_obj.draw();
+			}
+			// Tail
 			us()["noteType"].set(2);
 			us()["position"].set(x, yBeg);
-			// Draw begin
-			drawArrow(arrow_i, m_arrows_hold, 0.0f, 1.0f/3.0f);
 			if (yEnd - yBeg > 0) {
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(m_arrows_hold.type(), m_arrows_hold.id());
@@ -503,9 +513,17 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 		} else {
 			// Draw short note
 			if (mine && note.isHit) yBeg = time2y(0.0);
-			us()["noteType"].set(mine ? 3 : 1);
-			us()["position"].set(x, yBeg);
-			drawArrow((mine ? -1 : arrow_i), (mine ? m_mine : m_arrows));
+			if (mine) {
+				us()["noteType"].set(mine ? 3 : 1);
+				us()["position"].set(x, yBeg);
+				drawArrow(-1, m_mine);
+			} else {
+				// TODO: Change texture color to blue with 8th beats and other colors
+				glmath::mat4 pos = translate(glmath::vec3(x, yBeg, 0.0));
+				glmath::mat4 rot = rotate(arrowRotations[arrow_i], glmath::vec3(0,0,-1));
+				Transform noteTrans(pos * rot);
+				m_arrow_obj.draw();
+			}
 		}
 	}
 

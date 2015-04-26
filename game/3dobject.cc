@@ -48,13 +48,10 @@ void Object3d::loadWavefrontObj(fs::path const& filepath, float scale) {
 			vertices.push_back(glmath::vec3(x*scale, y*scale, z*scale));
 		} else if (row.substr(0,2) == "vt") {  // Texture Coordinates
 			srow >> tempst >> x >> y;
-			texcoords.push_back(glmath::vec2(x, y));
+			texcoords.push_back(glmath::vec2(x, -y));
 		} else if (row.substr(0,2) == "vn") {  // Normals
 			srow >> tempst >> x >> y >> z;
-			double sum = std::abs(x)+std::abs(y)+std::abs(z);
-			if (sum == 0) throw std::runtime_error("Invalid normal in "+filepath.string()+":"+boost::lexical_cast<std::string>(linenumber));
-			x /= sum; y /= sum; z /= sum; // Normalize components
-			normals.push_back(glmath::vec3(x, y, z));
+			normals.push_back(glmath::normalize(glmath::vec3(x, y, z)));
 		} else if (row.substr(0,2) == "f ") {  // Faces
 			Face f;
 			srow >> tempst; // Eat away prefix
@@ -105,11 +102,14 @@ void Object3d::load(fs::path const& filepath, fs::path const& texturepath, float
 }
 
 void Object3d::draw() {
-	UseShader us(getShader("3dobject"));
 	if (m_texture) {
-		UseTexture tex(*m_texture);
+		UseShader us(getShader("3dobject-textured"));
+		// FIXME: Can't use UseTexture class here because it also sets shader
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(m_texture->type(), m_texture->id());
 		m_va.draw(GL_TRIANGLES);
 	} else {
+		UseShader us(getShader("3dobject-basic"));
 		m_va.draw(GL_TRIANGLES);
 	}
 }

@@ -87,9 +87,11 @@ bool SongParser::smParseField(std::string line) {
 			if(difficultyclass == "HARD") danceDifficulty = HARD;
 			if(difficultyclass == "CHALLENGE") danceDifficulty = CHALLENGE;
 
-			//ignoring difficultymeter and radarvalues
+			//ignoring radarvalues
 			//<DifficultyMeter>:
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
+			//TODO have the difficulty-meter show up in the menu
+			std::string difficultymeter = boost::trim_copy(line.substr(0, line.find_first_of(':')));
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
 
 			//<NoteData>:
@@ -100,7 +102,7 @@ bool SongParser::smParseField(std::string line) {
 			if (notestype == "dance-single" || notestype == "dance-double" || notestype == "dance-solo"
 			  || notestype == "pump-single" || notestype == "ez2-single" || notestype == "ez2-real"
 			  || notestype == "para-single") {
-				DanceTrack danceTrack(description, notes);
+				DanceTrack danceTrack(description, notes, std::stoi(difficultymeter));
 				if (m_song.danceTracks.find(notestype) == m_song.danceTracks.end() ) {
 					DanceDifficultyMap danceDifficultyMap;
 					m_song.danceTracks.insert(std::make_pair(notestype, danceDifficultyMap));

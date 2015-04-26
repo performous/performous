@@ -16,7 +16,8 @@ Tapio Vierros <aave000 at users.sourceforge.net>
 
 Niek Nooijens <https://github.com/nieknooijens>
 	* Playlist Support
-	* Webserver support
+	* Emedded Webserver (with help from Lasse Kärkkäinen)
+	* Mobile page design.
 	* SDL2.0 Port
 	* Some minor usability improvements
 	* libavresample port with help from Tobix and Elenril (libav-irc channel)

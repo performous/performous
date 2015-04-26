@@ -144,8 +144,10 @@ public:
 	ConfigItem m_selectedDifficulty; /// menu modifies this to select difficulty
 	ConfigItem m_rejoin; /// menu sets this if we want to re-join
 	ConfigItem m_leftymode; /// switch guitar notes to right-to-left direction
+	ConfigItem m_SpeedModConfigItem;
 	std::string m_trackOpt;
 	std::string m_difficultyOpt;
+	std::string m_SpeedmodDynamicNameString;
 	std::string m_leftyOpt;
 
 	// Misc counters etc.

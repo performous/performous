@@ -103,11 +103,12 @@ public:
 typedef std::map<std::string, VocalTrack> VocalTracks;
 
 struct DanceTrack {
-	DanceTrack(std::string& description, Notes& notes);
+	DanceTrack(std::string& description, Notes& notes, int difficulty);
 	//track description
 	std::string description;
 	//container for the actual note data
 	Notes notes;
+	int difficulty;
 };
 
 enum DanceDifficulty {
@@ -118,6 +119,6 @@ enum DanceDifficulty {
 	CHALLENGE,
 	DIFFICULTYCOUNT
 };
-
+//FIXME!: this is a bug! if the song contains more than 1 "easy" class, only the most difficult one is mapped.
 typedef std::map<DanceDifficulty, DanceTrack> DanceDifficultyMap;
 typedef std::map<std::string, DanceDifficultyMap> DanceTracks;

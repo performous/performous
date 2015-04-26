@@ -1,0 +1,11 @@
+# Blender MTL File: 'arrowoutline.blend'
+# Material Count: 1
+
+newmtl glass
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.230637 0.221949 0.129110
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 0.216495
+illum 2

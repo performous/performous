@@ -51,6 +51,7 @@ ThemeIntro::ThemeIntro():
 	option_selected(findFile("mainmenu_option_selected.svg"), config["graphic/text_lod"].f()),
 	comment(findFile("mainmenu_comment.svg"), config["graphic/text_lod"].f()),
 	short_comment(findFile("mainmenu_short_comment.svg"), config["graphic/text_lod"].f()),
+	WebserverNotice(findFile("intro_webserver_notice.svg"), config["graphic/text_lod"].f()),
 	comment_bg(findFile("mainmenu_comment_bg.svg")),
 	short_comment_bg(findFile("mainmenu_scomment_bg.svg"))
 {}

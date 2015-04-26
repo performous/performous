@@ -47,7 +47,7 @@ double Note::powerFactor(double note) const {
 
 Duration::Duration(): begin(getNaN()), end(getNaN()) {}
 
-DanceTrack::DanceTrack(std::string& description, Notes& notes) : description(description), notes(notes) {}
+DanceTrack::DanceTrack(std::string& description, Notes& notes, int difficulty) : description(description), notes(notes),difficulty(difficulty) {}
 
 VocalTrack::VocalTrack(std::string name) : name(name) {reload();}
 

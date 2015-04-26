@@ -1,61 +1,66 @@
 cmake_minimum_required(VERSION 2.6)
 
-file(GLOB SOURCE_FILES "*.cc" "../common/image.cc")
-file(GLOB HEADER_FILES "*.hh" "../common/image.hh" "libda/*.hpp")
+file(GLOB SOURCE_FILES "*.cc")
+file(GLOB HEADER_FILES "*.hh")
 
 if(WIN32)
-	# We want to support all these version numbers:
-	# 1.0 1.0.1 1.0+ 1.0.1+ 1.0-2-g123abcd 1.0.1-5-g123abcd
-	# We use the 2-3 digits of the version as MAJOR.MINOR.PATCH
-	# and the git patch number as TWEAK
-	string(REGEX REPLACE "\\." ";"  VERSIONING ${PROJECT_VERSION})
-	list(GET VERSIONING -1 LAST_ENTRY)
-	list(REMOVE_AT VERSIONING -1)
-	string(REGEX REPLACE "^([0-9]+)(.*)$" "\\1;\\2"  LAST_ENTRIES ${LAST_ENTRY})
-	list(GET LAST_ENTRIES 0 LAST_ENTRY_NUM)
-	list(GET LAST_ENTRIES 1 LAST_ENTRY_ADD)
-	list(APPEND VERSIONING ${LAST_ENTRY_NUM})
+	if(ENABLE_VERSIONING)
+		set(COMMENTS)
+		string(REGEX MATCHALL "([^\\.,^$]+)(\\.|,|$)"  VERSIONING ${PROJECT_VERSION})
+		set(VERSIONS "MAJOR" "MINOR" "PATCH" "TWEAK")
+		foreach(s ${VERSIONING})
+			# We get the most-right number
+			string(REGEX REPLACE "[^0-9]+$" "" s ${s})#removes most right part non-numeric (like .)
+			# Now we have a string in format <numbers-letters..........numbers>
+			# Take last numbers (if there are)
+			# If string not empty, there are some numbers in right of string
+			# otherwise, set a 0, to be sure that there's a number
+			if(s STREQUAL "")
+				set(s "0")
+			endif()
+			string(REGEX MATCH "[0-9]*$" s ${s})
 
-	list(GET VERSIONING 0 VERSION_MAJOR)
-	list(LENGTH VERSIONING VERSION_LENGTH)
-	if(VERSION_LENGTH GREATER 1)
-		list(GET VERSIONING 1 VERSION_MINOR)
-	endif()
-	if(VERSION_LENGTH GREATER 2)
-		list(GET VERSIONING 2 VERSION_PATCH)
-	endif()
+			foreach(v ${VERSIONS})
+				if(NOT VERSION_${v}_DONE)
+					set(VERSION_${v}_DONE 1)
+					set(VERSION_${v} "${s}")
+					break()
+				endif()
+			endforeach()
+		endforeach()
 
-	string(REGEX REPLACE "^-([0-9]+)-.*$" "\\1" VERSION_TWEAK "${LAST_ENTRY_ADD}")
-
-	set(VERSIONS "MAJOR" "MINOR" "PATCH" "TWEAK")
-	foreach(v ${VERSIONS})
-		if(NOT VERSION_${v} MATCHES "^[0-9]+$")
-			set(VERSION_${v} "0")
-		endif()
-	endforeach()
-	message(STATUS "Setting .exe version: ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_TWEAK}")
-
+		foreach(v ${VERSIONS})
+			if(NOT VERSION_${v}_DONE OR VERSION_${v} STREQUAL "") #For the substitution did before, in VERSION_${v} we have or a empty string (if all letters) or a number
+				set(VERSION_${v} "0")
+			endif()
+		endforeach()
+		message(STATUS "Setting .exe version: ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_TWEAK}")
+	else(ENABLE_VERSIONING)
+		set(COMMENTS "//")
+	endif(ENABLE_VERSIONING)
 	set(RESOURCE_FILES "${CMAKE_BINARY_DIR}/performous.rc")
-	configure_file("../win32/performous.cmake.rc" "${RESOURCE_FILES}")
+	set(RESOURCE_OBJECT)#nothing
 
-	if(MINGW)
+	configure_file("../win32/performous.cmake.rc" "${RESOURCE_FILES}")
+	if(NOT MSVC)
 		# According to MinGW tools, we need to compile the rc file, and then link it into projects:
 		# windres foo.rc foores.o
 		# gcc -o foo.exe foo.o foores.o
-		find_library(WSOCK32_LIBRARY wsock32)
-    		find_library(WS2_32_LIBRARY ws2_32)
 		if(NOT CMAKE_RC_COMPILER)
 			find_program(CMAKE_RC_COMPILER windres)
 		endif()
 		if(NOT CMAKE_RC_COMPILER)
 			message(STATUS "Cannot find windres. Will not create a versioned exe.")
 			set(RESOURCE_FILES)
+			set(RESOURCE_OBJECT)
 		else()
-			set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> <FLAGS> -O coff <DEFINES> -i <SOURCE> -o <OBJECT>")
+			set(RESOURCE_OBJECT "${CMAKE_BINARY_DIR}/performous.rc.o")
+			execute_process(COMMAND "${CMAKE_RC_COMPILER}" "${RESOURCE_FILES}" "${RESOURCE_OBJECT}")
 		endif()
 	endif()
 else()
 	set(RESOURCE_FILES) #nothing
+	set(RESOURCE_OBJECT)#nothing
 endif()
 
 set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES})
@@ -67,9 +72,12 @@ include_directories(${Boost_INCLUDE_DIRS})
 list(APPEND LIBS ${Boost_LIBRARIES})
 
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ LibEpoxy AVFormat AVResample SWScale Z Jpeg Png PortAudio Fontconfig)
+<<<<<<< HEAD
+foreach(lib ${OUR_LIBS} SDL PangoCairo LibRSVG LibXML++ GLEW AVFormat SWScale OpenGL Z Jpeg Png PortAudio Cppnetlib Jsoncpp)
+=======
+foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ GLEW AVFormat SWScale OpenGL Z Jpeg Png PortAudio Fontconfig)
+>>>>>>> refs/remotes/origin/webserver
 	find_package(${lib} REQUIRED)
-	message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
 	include_directories(${${lib}_INCLUDE_DIRS})
 	list(APPEND LIBS ${${lib}_LIBRARIES})
 	add_definitions(${${lib}_DEFINITIONS})
@@ -115,13 +123,22 @@ else()
 	message(STATUS "Webcam support: Disabled (explicitly disabled)")
 endif()
 
-option(ENABLE_WEBSERVER "Enable webserver support (cpp-netlib)." OFF)
-if(ENABLE_WEBSERVER)
-	message(STATUS "Webserver support: Enabled")
-	add_definitions("-DUSE_CPPNETLIB")
+option(ENABLE_TORRENT "Enable torrent downloader support." ON)
+if(ENABLE_TORRENT)
+	find_package(LibTorrent)
+	if(LibTorrent_FOUND)
+		include_directories(${LibTorrent_INCLUDE_DIRS})
+		list(APPEND LIBS ${LibTorrent_LIBRARIES})
+		add_definitions(${LibTorrent_DEFINITIONS})
+		add_definitions("-DUSE_TORRENT")
+		message(STATUS "Torrent support: Enabled")
+	else()
+		message(STATUS "Torrent support: Disabled (libtorrent-rasterbar not found)")
+	endif()
 else()
-	message(STATUS "Webserver support: Disabled")
+	message(STATUS "Torrent support: Disabled (explicitly disabled)")
 endif()
+
 
 if(APPLE)
 	# Needed for ffmpeg.cc to compile cleanly on OSX (it's a (unsigned long) long story)
@@ -142,7 +159,7 @@ if(WIN32)
 			OUTPUT_VARIABLE MXE_HACK_STRING
 		)
 		set(CMAKE_CXX_LINK_EXECUTABLE ${CMAKE_CXX_LINK_EXECUTABLE}${MXE_HACK_STRING})
-		add_definitions(-DBOOST_THREAD_USE_LIB)
+		add_definitions(-DBOOST_THREAD_USE_LIB -DGLEW_STATIC)
 	endif()
 	set(BIN_INSTALL .)  # Straight to Program Files/Performous with no bin subfolder.
 	set(SUBSYSTEM_WIN32 WIN32)
@@ -152,11 +169,7 @@ endif()
 
 # Build main executable
 add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
-if(WIN32)
-  target_link_libraries(performous wsock32 ws2_32)
-endif()
 target_link_libraries(performous ${LIBS})
-
 install(TARGETS performous DESTINATION ${BIN_INSTALL})
 
 set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)  # Store library paths in executable

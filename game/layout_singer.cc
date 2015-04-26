@@ -121,7 +121,7 @@ void LayoutSinger::draw(double time, PositionMode position) {
 		Dimensions pos;
 		switch(position) {
 			case LayoutSinger::FULL:
-				if(config["game/karaoke_mode"].i() >= 2) {
+		if(config["game/karaoke_mode"].i() >= 2) {
 					pos.center(0);
 				} else {
 					pos.screenBottom(-0.1);
@@ -165,7 +165,6 @@ void LayoutSinger::draw(double time, PositionMode position) {
 			}
 		}
 	}
-
 	if (!config["game/karaoke_mode"].i() ) drawScore(position); // draw score if not in karaoke mode
 }
 
