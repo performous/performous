@@ -1,4 +1,5 @@
 #include "webserver.hh"
+#ifdef USE_CPPNETLIB
 #include <boost/network/protocol/http/server.hpp>
 
 namespace http = boost::network::http;
@@ -283,4 +284,8 @@ std::string WebServer::ReplaceCharacters(std::string input, std::string search, 
 	}
 	return output;
 }
-
+#else
+WebServer::WebServer(Songs& songs)
+	: m_songs(songs) {}
+WebServer::~WebServer(){}
+#endif
