@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fs.hh"
 #include "i18n.hh"
 #include "notes.hh"
 #include "util.hh"
@@ -108,8 +109,6 @@ class Song: boost::noncopyable {
 	std::string text; ///< songtext
 	std::string creator; ///< creator
 	std::string language; ///< language
-	std::string DuetP1Name;
-	std::string DuetP2Name;
 	typedef std::map<std::string, fs::path> Music;
 	Music music; ///< music files (background, guitar, rhythm/bass, drums, vocals)
 	fs::path cover; ///< cd cover

@@ -87,13 +87,7 @@ void ScreenSing::enter() {
 		for (unsigned player = 0; player < players; ++player) {
 			ConfigItem& vocalTrack = m_vocalTracks[player];
 			vocalTrack = ConfigItem(0);
-			int trackCounter = 0;
-			for (auto const& track: tracks) {
-				if(trackCounter == 0 && m_song->DuetP1Name.size() > 0) vocalTrack.addEnum(m_song->DuetP1Name);
-				else if(trackCounter == 1 && m_song->DuetP2Name.size() > 0) vocalTrack.addEnum(m_song->DuetP2Name);
-				else vocalTrack.addEnum(track.second.name);
-				trackCounter++;
-			}
+			for (auto const& track: tracks) vocalTrack.addEnum(track.second.name);
 			if (tracks.size() > 1 && player % 2) ++vocalTrack;  // Every other player gets the second track
 			m_menu.add(MenuOption("", _("Change vocal track")).changer(vocalTrack));
 		}

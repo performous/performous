@@ -55,10 +55,6 @@ public:
 	double x() const { return m_x; }
 	/// @return y
 	double y() const { return m_y; }
-	/// @return x_advance
-	double x_advance() const { return m_x_advance; }
-	/// @return y_advance
-	double y_advance() const { return m_y_advance; }
 	/// @returns dimension of texture
 	Dimensions& dimensions() { return m_surface.dimensions; }
 
