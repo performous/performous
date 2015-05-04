@@ -149,18 +149,20 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', end
 	</div>
 	<div data-role="content">
 	<div class="ui-grid-a">
-            <div class="ui-block-a">
-                <div data-role="fieldcontain"> <input type="search" name="searchv2" id="searchv2" placeholder="Search for Songs" />
-	 </div>
+	    <div class="ui-block-a">
+		</br>
+	        <ul id="autocomplete" data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Search for songs" data-filter-theme="d"></ul>
             </div>
-            <div class="ui-block-b"> <a id="databaseSearchButton" data-role="button" href="#page3" data-icon="search">
-			Search
-		</a> </div> </div> <br> <br>
-		<ul data-role="listview" id="searchResultsViewer" data-divider-theme="b">
-			<li data-role="list-divider" role="heading">
-				Available songs:
-			</li>
-		</ul>
+            <div class="ui-block-b">
+		<a id="databaseSearchButton" data-role="button" href="#page3" data-icon="search">Search</a> 
+            </div>
+	</div>
+	<br> <br>
+	<ul data-role="listview" id="searchResultsViewer" data-divider-theme="b">
+		<li data-role="list-divider" role="heading">
+			Available songs:
+		</li>
+	</ul>
 </div>
 </div>
 <!-- dialog -->
@@ -171,12 +173,39 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', end
 	</div>
 </div>
 
-<script>
+<script>	
 	var update = false;
 	var invertedsort = false;
 	var database = {};
 	var songlist = {};
-
+	
+	$("#autocomplete").on("listviewbeforefilter", function ( e, data ) {
+		var $ul = $( this ),
+			$input = $( data.input ),
+			value = $input.val(),
+			html = "";
+		$ul.html("");
+		if ( value && value.length > 2 ) {
+			$("#autocomplete").show();
+			$ul.html("<li><div class='ui-loader'><span class='ui-icon ui-icon-loading'></span></div></li>");
+			$ul.listview("refresh");
+			results = $.post("api/autocomplete",$input.val(), function (data) {
+				database = JSON.parse(data);
+				$.each(database, function(i, val) {
+					html += "<li>" + database[i].Artist + " - " + database[i].Title + "</li>";
+				});
+				$ul.html( html );
+				$ul.listview("refresh");
+				$ul.trigger("updatelayout");
+			});
+		}
+	});
+	$("#autocomplete").on("click", "li", function () {
+	    var text = $(this).text();
+	    $(this).closest("[data-role=listview]").prev("form").find("input").val(text);
+	    $("#autocomplete").hide();
+	    DoQuery();
+	});
 	<!-- Home -->
 
 	$("#databaseRefreshButton").bind ("click", function(event) {
@@ -254,16 +283,19 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', end
 	}
 
 $("#databaseSearchButton").bind ("click", function (event) {
+	$("#autocomplete").hide();
 	DoQuery();
 });
 
 $(document).keypress(function(e) {
     if(e.which == 13) {
-       DoQuery();
+        $("#autocomplete").hide();
+	DoQuery();
     }
 });
 
 	function DoQuery() {
+	$("#autocomplete").prev().find("input").attr("id", "searchv2");
 	var query = $('#searchv2').val();
 		
 	results = $.post("api/search",query, function (data) {
