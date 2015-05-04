@@ -145,7 +145,8 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 		m_songs.setFilter(request.body); //set filter and get the results
 			std:: stringstream JSONDB;
 			JSONDB << "[\n";
-			for (int i=0; i<10; i++) {
+            for (int i=0; i< m_songs.size(); i++) {
+                if(i > 10) break;
 				JSONDB << "\n{\n\"Title\": \"" << escapeCharacters(m_songs[i]->title) << "\",\n\"Artist\": \"";
 				JSONDB << escapeCharacters(m_songs[i]->artist) << "\",\n\"Edition\": \"" << escapeCharacters(m_songs[i]->edition) << "\",\n\"Language\": \"" << escapeCharacters(m_songs[i]->language);
 				JSONDB << "\",\n\"Creator\": \"" << escapeCharacters(m_songs[i]->creator) << "\"\n},";
