@@ -61,17 +61,7 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		return http_server::response::stock_reply(http_server::response::ok, std::string(buf.begin(), buf.end()));
 	} else if (request.destination == "/api/getDataBase.json") { //get database
 		m_songs.setFilter("");
-		std:: stringstream JSONDB;
-		JSONDB << "[\n";
-		for (int i=0; i<m_songs.size(); i++) {
-			JSONDB << "\n{\n\"Title\": \"" << escapeCharacters(m_songs[i]->title) << "\",\n\"Artist\": \"";
-			JSONDB << escapeCharacters(m_songs[i]->artist) << "\",\n\"Edition\": \"" << escapeCharacters(m_songs[i]->edition) << "\",\n\"Language\": \"" << escapeCharacters(m_songs[i]->language);
-			JSONDB << "\",\n\"Creator\": \"" << escapeCharacters(m_songs[i]->creator) << "\"\n},";
-		}
-		std::string output = JSONDB.str(); //remove the last comma
-		output.pop_back(); //remove the last comma
-		output += "\n]";
-		return http_server::response::stock_reply(http_server::response::ok, output);
+		return http_server::response::stock_reply(http_server::response::ok, generateJSONFromCurrentDB());
 	} else if (request.destination == "/api/getCurrentPlaylist.json") { //get playlist
 		Game* gm = Game::getSingletonPtr();
 		std:: stringstream JSONPlayList;
@@ -129,18 +119,7 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 			return http_server::response::stock_reply(http_server::response::ok, "failure");
 		}
 	}else if (request.destination == "/api/search") { //get query
-			m_songs.setFilter(request.body); //set filter and get the results
-			std:: stringstream JSONDB;
-			JSONDB << "[\n";
-			for (int i=0; i<m_songs.size(); i++) {
-				JSONDB << "\n{\n\"Title\": \"" << escapeCharacters(m_songs[i]->title) << "\",\n\"Artist\": \"";
-				JSONDB << escapeCharacters(m_songs[i]->artist) << "\",\n\"Edition\": \"" << escapeCharacters(m_songs[i]->edition) << "\",\n\"Language\": \"" << escapeCharacters(m_songs[i]->language);
-				JSONDB << "\",\n\"Creator\": \"" << escapeCharacters(m_songs[i]->creator) << "\"\n},";
-			}
-			std::string output = JSONDB.str(); //remove the last comma
-			output.pop_back(); //remove the last comma
-			output += "\n]";
-			return http_server::response::stock_reply(http_server::response::ok, output);
+			return http_server::response::stock_reply(http_server::response::ok, generateJSONFromCurrentDB());
 	} else if (request.destination == "/api/moveup") {
 		try {
 			int songToMove = boost::lexical_cast<int>(request.body);
@@ -284,6 +263,28 @@ std::string WebServer::ReplaceCharacters(std::string input, std::string search, 
 	}
 	return output;
 }
+
+std::string WebServer::generateJSONFromCurrentDB() {
+	ptree songstree;
+	ptree children;
+	for (int i=0; i<m_songs.size(); i++) {
+		ptree child;
+		child.put("Title", m_songs[i]->title);
+		child.put("Artist", m_songs[i]->artist);
+		child.put("Edition", m_songs[i]->edition);
+		child.put("Creator", m_songs[i]->creator);
+		child.put("Language", m_songs[i]->language);
+		children.push_back(std::make_pair("",child));
+	}
+	std::ostringstream buf;
+	songstree.add_child("",children);
+	write_json(buf, songstree, false);
+	std::string result = buf.str();
+	result.erase(0,4); //boost::ptree doesn't allow you to create an array as root element, here we remove the control characters.
+
+	return result.substr(0,result.size() -2); //remove the last excess '}'
+}
+
 #else
 WebServer::WebServer(Songs& songs)
 	: m_songs(songs) {}

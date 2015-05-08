@@ -9,6 +9,8 @@
 #include <boost/filesystem/fstream.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 #include <string>
 #include "fs.hh"
 #include "songs.hh"
@@ -20,6 +22,9 @@
 #include "configuration.hh"
 
 using boost::thread;
+using boost::property_tree::ptree;
+using boost::property_tree::read_json;
+using boost::property_tree::write_json;
 
 class WebServer
 {
@@ -46,6 +51,7 @@ public:
 
 private:
 	void StartServer();
+	std::string generateJSONFromCurrentDB();
 	boost::shared_ptr<Song> GetSongFromJSON(std::string JsonDoc);
 	std::string escapeCharacters(std::string input);
 	std::string unEscapeCharacters(std::string input);
