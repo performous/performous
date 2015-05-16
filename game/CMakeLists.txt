@@ -121,7 +121,7 @@ else()
 	message(STATUS "Webcam support: Disabled (explicitly disabled)")
 endif()
 
-option(ENABLE_WEBSERVER "Enable webserver support (cpp-netlib)." OFF)
+option(ENABLE_WEBSERVER "Enable webserver support (cpp-netlib)." ON)
 if(ENABLE_WEBSERVER)
 	message(STATUS "Webserver support: Enabled")
 	add_definitions("-DUSE_CPPNETLIB")
