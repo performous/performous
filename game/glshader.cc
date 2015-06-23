@@ -73,8 +73,11 @@ Shader& Shader::compileFile(fs::path const& filename) {
 
 Shader& Shader::compileCode(std::string const& srccode, GLenum type) {
 	glutil::GLErrorChecker ec("Shader::compile");
-	GLenum new_shader = glCreateShader(type);
+	GLuint new_shader = glCreateShader(type);
 	ec.check("glCreateShader");
+	if (new_shader == 0) {
+		throw std::runtime_error("Couldn't create shader.");
+	}
 	char const* source = srccode.c_str();
 	glShaderSource(new_shader, 1, &source, nullptr);
 	ec.check("glShaderSource");
@@ -98,6 +101,9 @@ Shader& Shader::link() {
 	// Create the program id
 	program = glCreateProgram();
 	ec.check("glCreateProgram");
+	if (program == 0) {
+		throw std::runtime_error("Couldn't create shader program.");
+	}
 	// Attach all compiled shaders to it
 	for (ShaderObjects::const_iterator it = shader_ids.begin(); it != shader_ids.end(); ++it)
 		glAttachShader(program, *it);
