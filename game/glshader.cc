@@ -87,7 +87,7 @@ Shader& Shader::compileCode(std::string const& srccode, GLenum type) {
 	glGetShaderiv(new_shader, GL_COMPILE_STATUS, &gl_response);
 	dumpInfoLog(new_shader);
 	if (gl_response != GL_TRUE) {
-		throw std::runtime_error("Shader compile error");
+		throw std::runtime_error("Shader compile error.");
 	}
 
 	shader_ids.push_back(new_shader);
