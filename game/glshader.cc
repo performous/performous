@@ -66,7 +66,7 @@ Shader& Shader::compileFile(fs::path const& filename) {
 	try {
 		return compileCode(srccode, type);
 	} catch (std::runtime_error& e) {
-		throw std::runtime_error(filename.string() + ": " + e.what());
+		throw std::runtime_error(filename.filename().string() + ": " + e.what());
 	}
 }
 
