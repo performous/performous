@@ -301,7 +301,7 @@ void fatalError(std::string msg, bool hasLog = false, std::string title = "FATAL
 	  errMsg.str().c_str(), NULL);
 	std::cerr << title << ": " << msg << std::endl;
 	if (hasLog) {
-		std::clog << "core/error: " << errMsg.str();
+		std::clog << "core/error: " << errMsg.str() << std::endl;
 	}
 }
 

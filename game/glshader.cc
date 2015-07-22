@@ -66,15 +66,18 @@ Shader& Shader::compileFile(fs::path const& filename) {
 	try {
 		return compileCode(srccode, type);
 	} catch (std::runtime_error& e) {
-		throw std::runtime_error(filename.string() + ": " + e.what());
+		throw std::runtime_error(filename.filename().string() + ": " + e.what());
 	}
 }
 
 
 Shader& Shader::compileCode(std::string const& srccode, GLenum type) {
 	glutil::GLErrorChecker ec("Shader::compile");
-	GLenum new_shader = glCreateShader(type);
+	GLuint new_shader = glCreateShader(type);
 	ec.check("glCreateShader");
+	if (new_shader == 0) {
+		throw std::runtime_error("Couldn't create shader.");
+	}
 	char const* source = srccode.c_str();
 	glShaderSource(new_shader, 1, &source, nullptr);
 	ec.check("glShaderSource");
@@ -84,7 +87,7 @@ Shader& Shader::compileCode(std::string const& srccode, GLenum type) {
 	glGetShaderiv(new_shader, GL_COMPILE_STATUS, &gl_response);
 	dumpInfoLog(new_shader);
 	if (gl_response != GL_TRUE) {
-		throw std::runtime_error("Shader compile error");
+		throw std::runtime_error("Shader compile error.");
 	}
 
 	shader_ids.push_back(new_shader);
@@ -98,6 +101,9 @@ Shader& Shader::link() {
 	// Create the program id
 	program = glCreateProgram();
 	ec.check("glCreateProgram");
+	if (program == 0) {
+		throw std::runtime_error("Couldn't create shader program.");
+	}
 	// Attach all compiled shaders to it
 	for (ShaderObjects::const_iterator it = shader_ids.begin(); it != shader_ids.end(); ++it)
 		glAttachShader(program, *it);
