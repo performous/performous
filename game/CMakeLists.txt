@@ -73,7 +73,7 @@ include_directories(${LibEpoxy_INCLUDE_DIRS})
 list(APPEND LIBS ${LibEpoxy_LIBRARIES})
 
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat AVResample SWScale Z Jpeg Png PortAudio Fontconfig) #add cpp-netlib afterwards
+foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat AVResample SWScale Z Jpeg Png PortAudio Fontconfig jsoncpp) #add cpp-netlib afterwards
 	find_package(${lib} REQUIRED)
 	message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
 	include_directories(${${lib}_INCLUDE_DIRS})
@@ -161,7 +161,7 @@ add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
 if(WIN32)
   target_link_libraries(performous wsock32 ws2_32)
 endif()
-target_link_libraries(performous ${LIBS})
+target_link_libraries(performous ${LIBS} jsoncpp)
 
 install(TARGETS performous DESTINATION ${BIN_INSTALL})
 

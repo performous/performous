@@ -61,30 +61,30 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		return http_server::response::stock_reply(http_server::response::ok, std::string(buf.begin(), buf.end()));
 	} else if (request.destination == "/api/getDataBase.json") { //get database
 		m_songs.setFilter("");
-		std:: stringstream JSONDB;
-		JSONDB << "[\n";
+		Json::Value jsonRoot = Json::arrayValue;
 		for (int i=0; i<m_songs.size(); i++) {
-			JSONDB << "\n{\n\"Title\": \"" << escapeCharacters(m_songs[i]->title) << "\",\n\"Artist\": \"";
-			JSONDB << escapeCharacters(m_songs[i]->artist) << "\",\n\"Edition\": \"" << escapeCharacters(m_songs[i]->edition) << "\",\n\"Language\": \"" << escapeCharacters(m_songs[i]->language);
-			JSONDB << "\",\n\"Creator\": \"" << escapeCharacters(m_songs[i]->creator) << "\"\n},";
+			Json::Value SongObject = Json::objectValue;
+			SongObject["Title"] = m_songs[i]->title;
+			SongObject["Artist"] = m_songs[i]->artist;
+			SongObject["Edition"] = m_songs[i]->edition;
+			SongObject["Language"] = m_songs[i]->language;
+			SongObject["Creator"] = m_songs[i]->creator;
+			jsonRoot.append(SongObject);
 		}
-		std::string output = JSONDB.str(); //remove the last comma
-		output.pop_back(); //remove the last comma
-		output += "\n]";
-		return http_server::response::stock_reply(http_server::response::ok, output);
+		return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
 	} else if (request.destination == "/api/getCurrentPlaylist.json") { //get playlist
 		Game* gm = Game::getSingletonPtr();
-		std:: stringstream JSONPlayList;
-		JSONPlayList << "[\n";
+		Json::Value jsonRoot = Json::arrayValue;
 		for (auto const& song : gm->getCurrentPlayList().getList()) {
-			JSONPlayList << "\n{\n\"Title\": \"" << escapeCharacters(song->title) << "\",\n\"Artist\": \"";
-			JSONPlayList << escapeCharacters(song->artist) << "\",\n\"Edition\": \"" << escapeCharacters(song->edition) << "\",\n\"Language\": \"" << escapeCharacters(song->language);
-			JSONPlayList << "\",\n\"Creator\": \"" << escapeCharacters(song->creator) << "\"\n},";
+				Json::Value SongObject = Json::objectValue;
+				SongObject["Title"] = song->title;
+				SongObject["Artist"] = song->artist;
+				SongObject["Edition"] = song->edition;
+				SongObject["Language"] = song->language;
+				SongObject["Creator"] = song->creator;
+				jsonRoot.append(SongObject);
 		}
-		std::string output = JSONPlayList.str();
-		output.pop_back(); //remove the last comma
-		output += "\n]";
-		return http_server::response::stock_reply(http_server::response::ok, output);
+		return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
 	} else {
 		//other text files
 		try {
@@ -130,31 +130,17 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 		}
 	}else if (request.destination == "/api/search") { //get query
 			m_songs.setFilter(request.body); //set filter and get the results
-			std:: stringstream JSONDB;
-			JSONDB << "[\n";
+			Json::Value jsonRoot = Json::arrayValue;
 			for (int i=0; i<m_songs.size(); i++) {
-				JSONDB << "\n{\n\"Title\": \"" << escapeCharacters(m_songs[i]->title) << "\",\n\"Artist\": \"";
-				JSONDB << escapeCharacters(m_songs[i]->artist) << "\",\n\"Edition\": \"" << escapeCharacters(m_songs[i]->edition) << "\",\n\"Language\": \"" << escapeCharacters(m_songs[i]->language);
-				JSONDB << "\",\n\"Creator\": \"" << escapeCharacters(m_songs[i]->creator) << "\"\n},";
+				Json::Value SongObject = Json::objectValue;
+				SongObject["Title"] = m_songs[i]->title;
+				SongObject["Artist"] = m_songs[i]->artist;
+				SongObject["Edition"] = m_songs[i]->edition;
+				SongObject["Language"] = m_songs[i]->language;
+				SongObject["Creator"] = m_songs[i]->creator;
+				jsonRoot.append(SongObject);
 			}
-			std::string output = JSONDB.str(); //remove the last comma
-			output.pop_back(); //remove the last comma
-			output += "\n]";
-			return http_server::response::stock_reply(http_server::response::ok, output);
-	} else if (request.destination == "/api/autocomplete") {
-		m_songs.setFilter(request.body); //set filter and get the results
-			std:: stringstream JSONDB;
-			JSONDB << "[\n";
-			for (int i=0; i< m_songs.size(); i++) {
-				if (i > 10) break;
-				JSONDB << "\n{\n\"Title\": \"" << escapeCharacters(m_songs[i]->title) << "\",\n\"Artist\": \"";
-				JSONDB << escapeCharacters(m_songs[i]->artist) << "\",\n\"Edition\": \"" << escapeCharacters(m_songs[i]->edition) << "\",\n\"Language\": \"" << escapeCharacters(m_songs[i]->language);
-				JSONDB << "\",\n\"Creator\": \"" << escapeCharacters(m_songs[i]->creator) << "\"\n},";
-			}
-			std::string output = JSONDB.str(); //remove the last comma
-			output.pop_back(); //remove the last comma
-			output += "\n]";
-			return http_server::response::stock_reply(http_server::response::ok, output);
+			return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
 	} else if (request.destination == "/api/moveup") {
 		try {
 			int songToMove = boost::lexical_cast<int>(request.body);
@@ -268,15 +254,6 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 		}
 	}
 	return boost::shared_ptr<Song>();
-}
-
-std::string WebServer::escapeCharacters(std::string input) {
-	std::string output = input;
-	output = ReplaceCharacters(output, "\\", "\\\\");
-	output = ReplaceCharacters(output, "/", "\\/");
-	output = ReplaceCharacters(output, "\t", "\\\t");
-	output = ReplaceCharacters(output, "\"", "\\\"");
-	return output;
 }
 
 
