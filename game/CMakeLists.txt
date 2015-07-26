@@ -67,7 +67,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 list(APPEND LIBS ${Boost_LIBRARIES})
 
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ LibEpoxy AVFormat AVResample SWScale Z Jpeg Png PortAudio Fontconfig)
+foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ LibEpoxy AVFormat AVResample SWScale Z Jpeg Png PortAudio Fontconfig jsoncpp)
 	find_package(${lib} REQUIRED)
 	message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
 	include_directories(${${lib}_INCLUDE_DIRS})
@@ -155,7 +155,7 @@ add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
 if(WIN32)
   target_link_libraries(performous wsock32 ws2_32)
 endif()
-target_link_libraries(performous ${LIBS})
+target_link_libraries(performous ${LIBS} jsoncpp)
 
 install(TARGETS performous DESTINATION ${BIN_INSTALL})
 
