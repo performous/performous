@@ -15,7 +15,11 @@ namespace {
 
 /// 'Magick' to check if this file looks like correct format
 bool SongParser::txtCheck(std::vector<char> const& data) const {
-	return data[0] == '#' && data[1] >= 'A' && data[1] <= 'Z';
+	if (data[0] == '#' && data[1] >= 'A' && data[1] <= 'Z') return true;
+	// ignore UTF-8 BOM while checking
+	else if (data[0] == '\xEF' && data[1] == '\xBB' && data[2] == '\xBF' &&
+				data[3] == '#' && data[4] >= 'A' && data[4] <= 'Z') return true;
+	else return false;
 }
 
 /// Parse header data for Songs screen
