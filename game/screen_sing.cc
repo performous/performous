@@ -124,7 +124,10 @@ void ScreenSing::createPauseMenu() {
 	m_menu.clear();
 	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
 	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning")).screen("Sing"));
-	m_menu.add(MenuOption(_("Skip"), _("Skip current song")).screen("Playlist"));
+	Game* gm = Game::getSingletonPtr();
+	if(!gm->getCurrentPlayList().isEmpty()){
+		m_menu.add(MenuOption(_("Skip"), _("Skip current song")).screen("Playlist"));
+	}
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).call([]() {
 		Game* gm = Game::getSingletonPtr();
 		gm->activateScreen("Songs");
