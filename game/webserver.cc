@@ -141,6 +141,20 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 				jsonRoot.append(SongObject);
 			}
 			return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
+	} else if (request.destination == "/api/autocomplete") {
+			m_songs.setFilter(request.body); //set filter and get the results
+			Json::Value jsonRoot = Json::arrayValue;
+			for (int i=0; i< m_songs.size(); i++) {
+				if(i > 10) break;
+				Json::Value SongObject = Json::objectValue;
+				SongObject["Title"] = m_songs[i]->title;
+				SongObject["Artist"] = m_songs[i]->artist;
+				SongObject["Edition"] = m_songs[i]->edition;
+				SongObject["Language"] = m_songs[i]->language;
+				SongObject["Creator"] = m_songs[i]->creator;
+				jsonRoot.append(SongObject);
+			}
+			return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
 	} else if (request.destination == "/api/moveup") {
 		try {
 			int songToMove = boost::lexical_cast<int>(request.body);
