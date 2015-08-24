@@ -61,30 +61,30 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		return http_server::response::stock_reply(http_server::response::ok, std::string(buf.begin(), buf.end()));
 	} else if (request.destination == "/api/getDataBase.json") { //get database
 		m_songs.setFilter("");
-		std:: stringstream JSONDB;
-		JSONDB << "[\n";
+		Json::Value jsonRoot = Json::arrayValue;
 		for (int i=0; i<m_songs.size(); i++) {
-			JSONDB << "\n{\n\"Title\": \"" << escapeCharacters(m_songs[i]->title) << "\",\n\"Artist\": \"";
-			JSONDB << escapeCharacters(m_songs[i]->artist) << "\",\n\"Edition\": \"" << escapeCharacters(m_songs[i]->edition) << "\",\n\"Language\": \"" << escapeCharacters(m_songs[i]->language);
-			JSONDB << "\",\n\"Creator\": \"" << escapeCharacters(m_songs[i]->creator) << "\"\n},";
+			Json::Value SongObject = Json::objectValue;
+			SongObject["Title"] = m_songs[i]->title;
+			SongObject["Artist"] = m_songs[i]->artist;
+			SongObject["Edition"] = m_songs[i]->edition;
+			SongObject["Language"] = m_songs[i]->language;
+			SongObject["Creator"] = m_songs[i]->creator;
+			jsonRoot.append(SongObject);
 		}
-		std::string output = JSONDB.str(); //remove the last comma
-		output.pop_back(); //remove the last comma
-		output += "\n]";
-		return http_server::response::stock_reply(http_server::response::ok, output);
+		return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
 	} else if (request.destination == "/api/getCurrentPlaylist.json") { //get playlist
 		Game* gm = Game::getSingletonPtr();
-		std:: stringstream JSONPlayList;
-		JSONPlayList << "[\n";
+		Json::Value jsonRoot = Json::arrayValue;
 		for (auto const& song : gm->getCurrentPlayList().getList()) {
-			JSONPlayList << "\n{\n\"Title\": \"" << escapeCharacters(song->title) << "\",\n\"Artist\": \"";
-			JSONPlayList << escapeCharacters(song->artist) << "\",\n\"Edition\": \"" << escapeCharacters(song->edition) << "\",\n\"Language\": \"" << escapeCharacters(song->language);
-			JSONPlayList << "\",\n\"Creator\": \"" << escapeCharacters(song->creator) << "\"\n},";
+				Json::Value SongObject = Json::objectValue;
+				SongObject["Title"] = song->title;
+				SongObject["Artist"] = song->artist;
+				SongObject["Edition"] = song->edition;
+				SongObject["Language"] = song->language;
+				SongObject["Creator"] = song->creator;
+				jsonRoot.append(SongObject);
 		}
-		std::string output = JSONPlayList.str();
-		output.pop_back(); //remove the last comma
-		output += "\n]";
-		return http_server::response::stock_reply(http_server::response::ok, output);
+		return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
 	} else {
 		//other text files
 		try {
@@ -130,22 +130,8 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 		}
 	}else if (request.destination == "/api/search") { //get query
 			m_songs.setFilter(request.body); //set filter and get the results
-			std:: stringstream JSONDB;
-			JSONDB << "[\n";
-			for (int i=0; i<m_songs.size(); i++) {
-				JSONDB << "\n{\n\"Title\": \"" << escapeCharacters(m_songs[i]->title) << "\",\n\"Artist\": \"";
-				JSONDB << escapeCharacters(m_songs[i]->artist) << "\",\n\"Edition\": \"" << escapeCharacters(m_songs[i]->edition) << "\",\n\"Language\": \"" << escapeCharacters(m_songs[i]->language);
-				JSONDB << "\",\n\"Creator\": \"" << escapeCharacters(m_songs[i]->creator) << "\"\n},";
-			}
-			std::string output = JSONDB.str(); //remove the last comma
-			output.pop_back(); //remove the last comma
-			output += "\n]";
-			return http_server::response::stock_reply(http_server::response::ok, output);
-	} else if (request.destination == "/api/autocomplete") {
-			m_songs.setFilter(request.body); //set filter and get the results
 			Json::Value jsonRoot = Json::arrayValue;
-			for (int i=0; i< m_songs.size(); i++) {
-				if(i > 10) break;
+			for (int i=0; i<m_songs.size(); i++) {
 				Json::Value SongObject = Json::objectValue;
 				SongObject["Title"] = m_songs[i]->title;
 				SongObject["Artist"] = m_songs[i]->artist;
@@ -185,118 +171,25 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 }
 
 boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
-	struct JsonSong {
-		std::string edition;
-		std::string title;
-		std::string artist;
-		std::string creator;
-		std::string language;
-		bool operator==(const JsonSong& rhs) {
-			 return title == rhs.title && edition == rhs.edition
-				&& artist == rhs.artist && creator == rhs.creator
-				&& language == rhs.language;
-		}
-	};
-	JsonSong SongToFind;
-
-	if (JsonDoc[0] != '{') return boost::shared_ptr<Song>(); //check if someone did send the correct stuff.
-
-	std::string currentIdentifier;
-	bool ReadingIdentifier = false;
-	bool IdentifierRead = false;
-	bool ReadingContent = false;
-	for (size_t i=0; i <= JsonDoc.length(); i++) {
-		if (JsonDoc[i] == '}') {
-			break;
-		} else if (JsonDoc[i] == '\"' &&JsonDoc[i-1] != '\\' ) { //make sure it's not an escaped character :-)
-			if (IdentifierRead) {
-				ReadingContent = true;
-				IdentifierRead = false;
-			} else if (ReadingIdentifier) {
-				ReadingIdentifier = false;
-				IdentifierRead = true;
-			} else if (ReadingContent) {
-				ReadingContent = false;
-				currentIdentifier = "";
-			} else {
-				ReadingIdentifier = true;
-			}
-		} else {
-			if (ReadingIdentifier) {
-				currentIdentifier += JsonDoc[i];
-			} else if (ReadingContent) {
-				if (currentIdentifier == "Title") {
-					SongToFind.title += JsonDoc[i];
-				} else if (currentIdentifier == "Artist") {
-					SongToFind.artist += JsonDoc[i];
-				} else if (currentIdentifier == "Edition") {
-					SongToFind.edition += JsonDoc[i];
-				} else if (currentIdentifier == "Creator") {
-					SongToFind.creator += JsonDoc[i];
-				} else if (currentIdentifier == "Language") {
-					SongToFind.language += JsonDoc[i];
-				}
-			}
+	Json::Value root;   // will contains the root value after parsing.
+	Json::Reader reader;
+	bool parsingSuccessful = reader.parse(JsonDoc,root);
+	if(!parsingSuccessful) {
+		std::clog << "webserver/error: cannot parse Json Document" <<std::endl;
+		return boost::shared_ptr<Song>();
+	}
+	m_songs.setFilter("");
+	for(int i = 0; i< m_songs.size(); i++) {
+		if(m_songs[i]->title == root["Title"].asString() &&
+				m_songs[i]->artist == root["Artist"].asString() &&
+				m_songs[i]->edition == root["Edition"].asString() &&
+				m_songs[i]->language == root["Language"].asString() &&
+				m_songs[i]->creator == root["Creator"].asString()) {
+			return m_songs[i];
 		}
 	}
-	//remove the json escape chars
-	SongToFind.title = unEscapeCharacters(SongToFind.title);
-	SongToFind.artist = unEscapeCharacters(SongToFind.artist);
-	SongToFind.edition = unEscapeCharacters(SongToFind.edition);
-	SongToFind.creator = unEscapeCharacters(SongToFind.creator);
-	SongToFind.language = unEscapeCharacters(SongToFind.language);
 
-
-	Game* gm = Game::getSingletonPtr();
-	for (int i = 0; i<= m_songs.size(); i++) {
-		///this is to fix the crash when adding the currently-playing song.
-		if (gm->getCurrentPlayList().currentlyActive) {
-			Song const& s = *gm->getCurrentPlayList().currentlyActive;
-			if (s.title == SongToFind.title && s.artist == SongToFind.artist &&
-			  s.creator == SongToFind.creator && s.edition == SongToFind.edition &&
-			  s.language == SongToFind.language)
-			{
-				return gm->getCurrentPlayList().currentlyActive;
-			}
-		}
-		///this is for all other songs.
-		boost::shared_ptr<Song> s = m_songs[i];
-		JsonSong m_compare = {s->edition, s->title, s->artist, s->creator, s->language};
-
-		if (SongToFind == m_compare) {
-			return s;
-		}
-	}
 	return boost::shared_ptr<Song>();
-}
-
-std::string WebServer::escapeCharacters(std::string input) {
-	std::string output = input;
-	output = ReplaceCharacters(output, "\\", "\\\\");
-	output = ReplaceCharacters(output, "/", "\\/");
-	output = ReplaceCharacters(output, "\t", "\\\t");
-	output = ReplaceCharacters(output, "\"", "\\\"");
-	return output;
-}
-
-
-std::string WebServer::unEscapeCharacters(std::string input) {
-	std::string output = input;
-	output = ReplaceCharacters(output, "\\\"", "\"");
-	output = ReplaceCharacters(output, "\\\t", "\t");
-	output = ReplaceCharacters(output, "\\/", "/");
-	output = ReplaceCharacters(output, "\\\\", "\\");
-	return output;
-}
-
-std::string WebServer::ReplaceCharacters(std::string input, std::string search, std::string replace) {
-	size_t pos = 0;
-	std::string output = input;
-	while ((pos = output.find(search, pos)) != std::string::npos) {
-		output.replace(pos, search.length(), replace);
-		pos += replace.length();
-	}
-	return output;
 }
 #else
 WebServer::WebServer(Songs& songs)

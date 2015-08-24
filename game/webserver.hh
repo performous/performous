@@ -9,6 +9,7 @@
 #include <boost/filesystem/fstream.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
+#include <jsoncpp/json/json.h>
 #include <string>
 #include "fs.hh"
 #include "songs.hh"
@@ -47,9 +48,6 @@ public:
 private:
 	void StartServer();
 	boost::shared_ptr<Song> GetSongFromJSON(std::string JsonDoc);
-	std::string escapeCharacters(std::string input);
-	std::string unEscapeCharacters(std::string input);
-	std::string ReplaceCharacters(std::string input, std::string search, std::string replace);
 	boost::shared_ptr<boost::thread> m_serverThread;
 	boost::shared_ptr<http_server> m_server;
 	Songs& m_songs;
