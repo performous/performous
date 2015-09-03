@@ -58,21 +58,18 @@ SongParser::SongParser(Song& s) try:
 	{
 		fs::ifstream f(s.filename, std::ios::binary);
 		if (!f.is_open()) throw SongParserException(s, "Could not open song file", 0);
-		f.seekg(0, std::ios::end);
-		size_t size = f.tellg();
+		m_ss << f.rdbuf();
+		int size = m_ss.str().length();
 		if (size < 10 || size > 100000) throw SongParserException(s, "Does not look like a song file (wrong size)", 1, true);
-		f.seekg(0);
-		std::vector<char> data(size);
-		if (!f.read(&data[0], size)) throw SongParserException(s, "Unexpected I/O error", 0);
-		if (smCheck(data)) type = SM;
-		else if (txtCheck(data)) type = TXT;
-		else if (iniCheck(data)) type = INI;
-		else if (xmlCheck(data)) type = XML;
+		// Convert m_ss; filename supplied for possible warning messages
+		convertToUTF8(m_ss, s.filename.string());
+
+		if (smCheck(m_ss.str())) type = SM;
+		else if (txtCheck(m_ss.str())) type = TXT;
+		else if (iniCheck(m_ss.str())) type = INI;
+		else if (xmlCheck(m_ss.str())) type = XML;
 		else throw SongParserException(s, "Does not look like a song file (wrong header)", 1, true);
-		m_ss.write(&data[0], size);
 	}
-	// Convert m_ss; filename supplied for possible warning messages
-	convertToUTF8(m_ss, s.filename.string());
 	// Header already parsed?
 	if (s.loadStatus == Song::HEADER) {
 		if (type == TXT) txtParse();
