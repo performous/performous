@@ -25,5 +25,6 @@ find_library(LibEpoxy_LIBRARY
 
 set(LibEpoxy_PROCESS_INCLUDES LibEpoxy_INCLUDE_DIR)
 set(LibEpoxy_PROCESS_LIBS LibEpoxy_LIBRARY)
+set(LibEpoxy_VERSION ${LibEpoxy_PKGCONF_VERSION})
 libfind_process(LibEpoxy)
 

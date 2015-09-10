@@ -64,8 +64,14 @@ find_package(Boost 1.36 REQUIRED COMPONENTS thread date_time program_options reg
 include_directories(${Boost_INCLUDE_DIRS})
 list(APPEND LIBS ${Boost_LIBRARIES})
 
+# LibEpoxy < 1.2 crashes with binary drivers (nvidia & fglrx) when creating shaders
+# (see https://github.com/anholt/libepoxy/issues/23 for the exact problem)
+find_package(LibEpoxy 1.2 REQUIRED)
+include_directories(${LibEpoxy_INCLUDE_DIRS})
+list(APPEND LIBS ${LibEpoxy_LIBRARIES})
+
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ LibEpoxy AVFormat AVResample SWScale Z Jpeg Png PortAudio Fontconfig)
+foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat AVResample SWScale Z Jpeg Png PortAudio Fontconfig)
 	find_package(${lib} REQUIRED)
 	message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
 	include_directories(${${lib}_INCLUDE_DIRS})

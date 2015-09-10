@@ -410,3 +410,13 @@ void outputOptionalFeatureStatus() {
 	  << "\n  Webcam support:       " << (Webcam::enabled() ? "Enabled" : "Disabled")
 	  << std::endl;
 }
+
+#if defined(_WIN32)
+// Force high-performance graphics on dual-GPU systems
+extern "C" {
+	// http://developer.download.nvidia.com/devzone/devcenter/gamegraphics/files/OptimusRenderingPolicies.pdf
+	__declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+	// https://community.amd.com/thread/169965
+	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
+#endif
