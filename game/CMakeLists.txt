@@ -161,7 +161,7 @@ add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
 if(WIN32)
   target_link_libraries(performous wsock32 ws2_32)
 endif()
-target_link_libraries(performous ${LIBS} jsoncpp)
+target_link_libraries(performous ${LIBS})
 
 install(TARGETS performous DESTINATION ${BIN_INSTALL})
 
