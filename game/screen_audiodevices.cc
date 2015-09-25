@@ -44,7 +44,7 @@ void ScreenAudioDevices::enter() {
 			if (!countRow("green", *it, countmap["green"])) { ok = false; break; }
 			if (!countRow("yellow", *it, countmap["yellow"])) { ok = false; break; }
 			if(!countRow("fuchsia", *it, countmap["fuchsia"])) { ok = false; break; }
-			if(!countRow("lightgreen", *it, countmap["lightgreen"])) { ok = false; break; }
+			if(!countRow("orange", *it, countmap["orange"])) { ok = false; break; }
 			if(!countRow("purple", *it, countmap["purple"])) { ok = false; break; }
 			if(!countRow("aqua", *it, countmap["aqua"])) { ok = false; break; }
 			if (!countRow("out=", *it, countmap["out="])) { ok = false; break; }
@@ -140,7 +140,7 @@ void ScreenAudioDevices::draw() {
 }
 
 void ScreenAudioDevices::load() {
-	std::string names[] = { "blue", "red", "green", "yellow", "fuchsia", "lightgreen", "purple", "aqua", "OUT" }; //there were 4 colors here
+	std::string names[] = { "blue", "red", "green", "yellow", "fuchsia", "orange", "purple", "aqua", "OUT" }; //there were 4 colors here
 	m_channels.assign(std::begin(names), std::end(names));
 	// Get the currently assigned devices for each channel (FIXME: this is a really stupid algorithm)
 	for (auto const& d: m_audio.devices()) {
