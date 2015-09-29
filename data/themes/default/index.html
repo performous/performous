@@ -179,34 +179,8 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', end
 	var database = {};
 	var songlist = {};
 	
-	$("#autocomplete").on("listviewbeforefilter", function ( e, data ) {
-		var $ul = $( this ),
-			$input = $( data.input ),
-			value = $input.val(),
-			html = "";
-		$ul.html("");
-		if ( value && value.length > 2 ) {
-			$("#autocomplete").show();
-			$ul.html("<li><div class='ui-loader'><span class='ui-icon ui-icon-loading'></span></div></li>");
-			$ul.listview("refresh");
-			results = $.post("api/autocomplete",$input.val(), function (data) {
-				database = JSON.parse(data);
-				for (i in database) {
-				var count = parseInt(i,10) + parseInt(1,10);
-				html += '<li data-theme="c" data-icon="info"><a href="javascript:AddSong(' + i + ')" data-transition="slide"> #' + count + ' ' + database[i].Artist + ' - ' + database[i].Title + '</a></li>\n';
-			}
-				$ul.html( html );
-				$ul.listview("refresh");
-				$ul.trigger("updatelayout");
-			});
-		}
-	});
-	$("#autocomplete").on("click", "li", function () {
-	    var text = $(this).text();
-	    $(this).closest("[data-role=listview]").prev("form").find("input").val(text);
-	    $("#autocomplete").hide();
-	    DoQuery();
-	});
+
+
 	<!-- Home -->
 
 	$("#databaseRefreshButton").bind ("click", function(event) {
@@ -354,7 +328,33 @@ $(document).keypress(function(e) {
 	$('#flipsortmode').bind("change", function (event, ui) {
 		invertedsort = !invertedsort;
 	});
-
+	
+		$("#autocomplete").on("listviewbeforefilter", function ( e, data ) {
+		var $ul = $( this ),
+			$input = $( data.input ),
+			value = $input.val(),
+			html = "";
+		$ul.html("");
+		if ( value && value.length > 2 ) {
+			$("#autocomplete").show();
+			results = $.post("api/autocomplete",$input.val(), function (data) {
+				database = JSON.parse(data);
+				$ul.html("<li><div class='ui-loader'><span class='ui-icon ui-icon-loading'></span></div></li>");
+					for (i in database) {
+					var count = parseInt(i,10) + parseInt(1,10);
+					html += '<li data-theme="c" data-icon="info"><a href="javascript:AddSong(' + i + ')" data-transition="slide">' + ' ' + database[i].Artist + ' - ' + database[i].Title + '</a></li>\n';
+				}
+				$ul.html( html );
+				$ul.listview("refresh");
+				$ul.trigger("updatelayout");
+			});
+		}
+	});	
+	
+		$("#autocomplete").on("click", "li", function () {
+	    $("#autocomplete").hide();
+	    DoQuery();
+	});
 	window.setInterval(function(){
 		if (update) RefreshPlayList();
 	}, 10000);
