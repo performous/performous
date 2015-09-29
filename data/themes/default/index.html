@@ -191,9 +191,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', end
 			$ul.listview("refresh");
 			results = $.post("api/autocomplete",$input.val(), function (data) {
 				database = JSON.parse(data);
-				$.each(database, function(i, val) {
-					html += "<li>" + database[i].Artist + " - " + database[i].Title + "</li>";
-				});
+				for (i in database) {
+				var count = parseInt(i,10) + parseInt(1,10);
+				html += '<li data-theme="c" data-icon="info"><a href="javascript:AddSong(' + i + ')" data-transition="slide"> #' + count + ' ' + database[i].Artist + ' - ' + database[i].Title + '</a></li>\n';
+			}
 				$ul.html( html );
 				$ul.listview("refresh");
 				$ul.trigger("updatelayout");
