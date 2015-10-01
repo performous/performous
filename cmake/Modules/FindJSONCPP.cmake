@@ -25,8 +25,8 @@ EXEC_PROGRAM(${CMAKE_CXX_COMPILER}
 
 SET(JSONCPP_NAMES ${JSONCPP_NAMES} libjson_linux-gcc-${_gcc_COMPILER_VERSION}_libmt.so)
 FIND_LIBRARY(JSONCPP_LIBRARY
-  NAMES ${JSONCPP_NAMES}
-  PATHS /usr/lib /usr/local/lib
+  NAMES ${JSONCPP_NAMES} libjsoncpp.so libjsoncpp.a
+  PATHS /usr/lib /usr/local/lib /usr/lib/x86_64-linux-gnu
   )
 
 IF (JSONCPP_LIBRARY AND JSONCPP_INCLUDE_DIRS)
