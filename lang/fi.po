@@ -2,10 +2,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-28 21:58+0200\n"
-"PO-Revision-Date: \n"
-"Last-Translator: Tapio Vierros\n"
+"POT-Creation-Date: 2015-11-05 19:35+0100\n"
+"PO-Revision-Date: 2014-10-28 23:45:05+0200\n"
+"Last-Translator: Tapio Vierros <tapiovierros@gmail.com>\n"
 "Language-Team: \n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -16,64 +17,54 @@ msgstr ""
 "X-Poedit-SearchPath-0: ../game\n"
 "X-Poedit-SearchPath-1: ../data\n"
 
-#: ../game/screen_intro.cc:24
-msgid "No playback devices could be used.\n"
-msgstr "Äänen ulostulolaitteita ei löytynyt.\n"
+#: ../game/song.hh:25
+msgid "Guitar"
+msgstr "Kitara"
 
-#: ../game/screen_intro.cc:25
-msgid ""
-"\n"
-"Please configure some before playing."
-msgstr ""
-"\n"
-"Säädä ääniasetuksia ennen pelaamista."
+#: ../game/song.hh:25
+msgid "Coop guitar"
+msgstr "Soolokitara"
 
-#: ../game/screen_intro.cc:69
-msgid "Settings saved as system defaults."
-msgstr "Asetukset tallennettu järjestelmän oletuksiksi."
+#: ../game/song.hh:25
+msgid "Rhythm guitar"
+msgstr "Rytmikitara"
 
-#: ../game/screen_intro.cc:69
-msgid "Settings saved."
-msgstr "Asetukset tallennettu."
+#: ../game/song.hh:25
+msgid "Bass"
+msgstr "Basso"
 
-#: ../game/screen_intro.cc:149
-msgid "Ctrl + S to save, Ctrl + R to reset defaults"
-msgstr "Ctrl + S tallentaaksesi, Ctrl + R palauttaaksesi oletusarvot"
+#: ../game/song.hh:25
+msgid "Drums"
+msgstr "Rummut"
 
-#: ../game/screen_intro.cc:166
-msgid "Perform"
-msgstr "Esiinny"
+#: ../game/song.hh:25
+msgid "Vocals"
+msgstr "Laulu"
 
-#: ../game/screen_intro.cc:166 ../game/dancegraph.cc:107
-#: ../game/guitargraph.cc:193
-msgid "Start performing!"
-msgstr "Aloita esiintyminen!"
+#: ../game/song.hh:25
+msgid "Harmonic 1"
+msgstr "Harmonia 1"
 
-#: ../game/screen_intro.cc:167
-msgid "Practice"
-msgstr "Harjoittele"
+#: ../game/song.hh:25
+msgid "Harmonic 2"
+msgstr "Harmonia 2"
 
-#: ../game/screen_intro.cc:167
-msgid "Check your skills or test the microphones"
-msgstr "Tarkista taitosi tai testaa mikrofonit"
+#: ../game/song.hh:25
+msgid "Harmonic 3"
+msgstr "Harmonia 3"
 
-#: ../game/screen_intro.cc:183
-msgid "Configure"
-msgstr "Asetukset"
+#: ../game/configuration.cc:112
+msgid "Enabled"
+msgstr "Päällä"
 
-#: ../game/screen_intro.cc:183
-msgid "Configure audio and game options"
-msgstr "Muokkaa pelin asetuksia"
+#: ../game/configuration.cc:112
+msgid "Disabled"
+msgstr "Pois"
 
-#: ../game/screen_intro.cc:184 ../game/dancegraph.cc:137
-#: ../game/guitargraph.cc:199 ../game/screen_sing.cc:94
-#: ../game/screen_sing.cc:128 ../game/instrumentgraph.cc:59
-msgid "Quit"
-msgstr "Lopeta"
-
-#: ../game/screen_intro.cc:184
-msgid "Leave the game"
-msgstr "Poistu pelistä"
+#: ../game/configuration.cc:116
+#, c-format
+msgid "%d items"
+msgstr "%d kohtaa"
 
 #: ../game/dancegraph.cc:18
 msgid "Beginner"
@@ -99,6 +90,11 @@ msgstr "Haastavin"
 msgid "Ready!"
 msgstr "Valmis!"
 
+#: ../game/dancegraph.cc:107 ../game/guitargraph.cc:193
+#: ../game/screen_intro.cc:166
+msgid "Start performing!"
+msgstr "Aloita esiintyminen!"
+
 #: ../game/dancegraph.cc:118 ../game/guitargraph.cc:182
 msgid "Select track"
 msgstr "Valitse pelimuoto"
@@ -108,8 +104,14 @@ msgid "Select difficulty"
 msgstr "Valitse vaikeusaste"
 
 #: ../game/dancegraph.cc:137 ../game/guitargraph.cc:199
+#: ../game/instrumentgraph.cc:59 ../game/screen_intro.cc:184
 #: ../game/screen_sing.cc:94 ../game/screen_sing.cc:128
-#: ../game/instrumentgraph.cc:59
+msgid "Quit"
+msgstr "Lopeta"
+
+#: ../game/dancegraph.cc:137 ../game/guitargraph.cc:199
+#: ../game/instrumentgraph.cc:59 ../game/screen_sing.cc:94
+#: ../game/screen_sing.cc:128
 msgid "Exit to song browser"
 msgstr "Poistu kappalevalintaan"
 
@@ -169,6 +171,144 @@ msgstr "Rumpufilli!"
 msgid "Solo!"
 msgstr "Soolo!"
 
+#: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:125
+msgid "Resume"
+msgstr "Jatka"
+
+#: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:125
+msgid "Back to performing!"
+msgstr "Takaisin esiintymään!"
+
+#: ../game/instrumentgraph.cc:57
+msgid "Rejoin"
+msgstr "Liity uudelleen"
+
+#: ../game/instrumentgraph.cc:57
+msgid "Change selections"
+msgstr "Vaihda valintoja"
+
+#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:126
+msgid "Restart"
+msgstr "Uudestaan"
+
+#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:126
+msgid ""
+"Start the song\n"
+"from the beginning"
+msgstr ""
+"Aloita kappale\n"
+"alusta uudelleen"
+
+#: ../game/main.cc:151
+msgid "Loading audio samples..."
+msgstr "Ladataan ääniä..."
+
+#: ../game/main.cc:165
+msgid "Creating screens..."
+msgstr "Luodaan näkymät..."
+
+#: ../game/main.cc:175
+msgid "Entering main menu"
+msgstr "Päävalikko..."
+
+#: ../game/main.cc:177 ../game/screen_sing.cc:99
+msgid "Loading complete"
+msgstr "Lataaminen valmis"
+
+#: ../game/main.cc:188
+msgid "Screenshot taken!"
+msgstr "Kuvakaappaus tallennettu!"
+
+#: ../game/main.cc:191
+msgid "Screenshot failed!"
+msgstr "Kuvakaappaus epäonnistui!"
+
+#: ../game/screen_audiodevices.cc:54
+msgid ""
+"It seems you have some manual configurations\n"
+"incompatible with this user interface.\n"
+"Saving these settings will override\n"
+"all existing audio device configuration.\n"
+"Your other options changes will be saved too."
+msgstr ""
+"Näyttäisi, että sinulla on manuaalisia säätöjä,\n"
+"jotka ovat epäyhteensopivia tämän työkalun kanssa.\n"
+"Tallentaminen ylikirjoittaa kaikki aiemmat\n"
+"äänilaitevalintasi. Muut mahdolliset säädöt\n"
+"tallennetaan samalla."
+
+#: ../game/screen_audiodevices.cc:113
+msgid "- Unassigned -"
+msgstr "- Ei asetettu -"
+
+#: ../game/screen_audiodevices.cc:134
+msgid ""
+"Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select "
+"to cancel. Ctrl + R to reset defaults"
+msgstr ""
+"Nuolinäppäimet säätävät. Enter/Start tallentaa ja testaa, Esc/Select "
+"peruuttaa. Ctrl + R palauttaa oletukset."
+
+#: ../game/screen_audiodevices.cc:139
+msgid ""
+"For advanced device configuration, use command line parameter --audio (use --"
+"audiohelp for details)."
+msgstr ""
+"Monimutkaisempia asetuksia halutessasi, käytä --audio komentoriviparametriä "
+"(--audiohelp auttaa)."
+
+#: ../game/screen_audiodevices.cc:187
+msgid "Some devices failed to open!"
+msgstr "Jotkin laitteista eivät olleet saatavilla!"
+
+#: ../game/screen_intro.cc:24
+msgid "No playback devices could be used.\n"
+msgstr "Äänen ulostulolaitteita ei löytynyt.\n"
+
+#: ../game/screen_intro.cc:25
+msgid ""
+"\n"
+"Please configure some before playing."
+msgstr ""
+"\n"
+"Säädä ääniasetuksia ennen pelaamista."
+
+#: ../game/screen_intro.cc:69
+msgid "Settings saved as system defaults."
+msgstr "Asetukset tallennettu järjestelmän oletuksiksi."
+
+#: ../game/screen_intro.cc:69
+msgid "Settings saved."
+msgstr "Asetukset tallennettu."
+
+#: ../game/screen_intro.cc:149
+msgid "Ctrl + S to save, Ctrl + R to reset defaults"
+msgstr "Ctrl + S tallentaaksesi, Ctrl + R palauttaaksesi oletusarvot"
+
+#: ../game/screen_intro.cc:166
+msgid "Perform"
+msgstr "Esiinny"
+
+#: ../game/screen_intro.cc:167
+msgid "Practice"
+msgstr "Harjoittele"
+
+#: ../game/screen_intro.cc:167
+msgid "Check your skills or test the microphones"
+msgstr "Tarkista taitosi tai testaa mikrofonit"
+
+#: ../game/screen_intro.cc:183
+msgid "Configure"
+msgstr "Asetukset"
+
+#: ../game/screen_intro.cc:183
+msgid "Configure audio and game options"
+msgstr "Muokkaa pelin asetuksia"
+
+#: ../game/screen_intro.cc:184
+msgid "Leave the game"
+msgstr "Poistu pelistä"
+
 #: ../game/screen_paths.cc:19
 msgid ""
 "This tool is not yet available.\n"
@@ -190,11 +330,47 @@ msgid "Windows users can also use ConfigureSongDirectory.bat script."
 msgstr ""
 "Windows-käyttäjät voivat myös käyttää ConfigureSongDirectory.bat-skriptiä."
 
+#: ../game/screen_players.cc:117
+msgid "No players found!"
+msgstr "Pelaajia ei löytynyt!"
+
+#: ../game/screen_players.cc:118
+msgid "Enter a name to create a new player."
+msgstr "Syötä nimi luodaksesi uuden pelaajan."
+
+#: ../game/screen_players.cc:120
+msgid "Press enter to create player!"
+msgstr "Paina Enter luodaksesi pelaajan!"
+
+#: ../game/screen_players.cc:124
+msgid "No players worth mentioning!"
+msgstr "Ei maininnan arvoisia pelaajia!"
+
+#: ../game/screen_players.cc:129
+msgid "You reached %1% points!"
+msgstr "Sait %1% pistettä!"
+
+#: ../game/screen_players.cc:130
+msgid "Change player with arrow keys."
+msgstr "Valitse pelaaja nuolinäppäimillä."
+
+#: ../game/screen_players.cc:131
+msgid "Name:"
+msgstr "Nimi:"
+
+#: ../game/screen_players.cc:134
+msgid "Type text to filter or create a new player."
+msgstr "Kirjoita etsiäksesi tai luodaksesi uuden pelaajan."
+
+#: ../game/screen_players.cc:134
+msgid "Search Text:"
+msgstr "Etsi:"
+
 #: ../game/screen_playlist.cc:24 ../game/screen_sing.cc:47
 msgid "Initializing webcam..."
 msgstr "Alustetaan webkameraa..."
 
-#: ../game/screen_playlist.cc:166 ../game/screen_playlist.cc:308
+#: ../game/screen_playlist.cc:166 ../game/screen_playlist.cc:309
 msgid "Continue"
 msgstr "Jatka"
 
@@ -210,7 +386,7 @@ msgstr "Lisää kappaleita"
 msgid "Open the song browser to add more songs"
 msgstr "Avaa musiikkiselain lisätäksesi kappaleita"
 
-#: ../game/screen_playlist.cc:175 ../game/screen_songs.cc:519
+#: ../game/screen_playlist.cc:175 ../game/screen_songs.cc:520
 msgid "Shuffle"
 msgstr "Sekoita"
 
@@ -226,100 +402,192 @@ msgstr "Tyhjennä ja poistu"
 msgid "Remove all the songs from the list"
 msgstr "Poista kaikki kappaleet listasta"
 
-#: ../game/screen_playlist.cc:187 ../game/screen_playlist.cc:349
-#: ../game/screen_songs.cc:532
+#: ../game/screen_playlist.cc:187 ../game/screen_playlist.cc:350
+#: ../game/screen_songs.cc:533
 msgid "Back"
 msgstr "Takaisin"
 
-#: ../game/screen_playlist.cc:187 ../game/screen_playlist.cc:349
+#: ../game/screen_playlist.cc:187 ../game/screen_playlist.cc:350
 msgid "Back to playlist viewer"
 msgstr "Takaisin soittolistaan"
 
-#: ../game/screen_playlist.cc:293
+#: ../game/screen_playlist.cc:294
 msgid "Press enter to view song options"
 msgstr "Paina enter avataksesi kappalevalinnat"
 
-#: ../game/screen_playlist.cc:300
+#: ../game/screen_playlist.cc:301
 msgid "View more options"
 msgstr "Näytä lisää valintoja"
 
-#: ../game/screen_playlist.cc:300
+#: ../game/screen_playlist.cc:301
 msgid "View general playlist settings"
 msgstr "Näytä yleiset soittolista-asetukset"
 
-#: ../game/screen_playlist.cc:308
+#: ../game/screen_playlist.cc:309
 msgid "Play first"
 msgstr "Soita ensimmäinen"
 
-#: ../game/screen_playlist.cc:310
+#: ../game/screen_playlist.cc:311
 msgid "Ignore the playlist's order and play this song first"
 msgstr "Jätä soittolistan järjestys huomioimatta ja soita tämä kappale ensin"
 
-#: ../game/screen_playlist.cc:311
+#: ../game/screen_playlist.cc:312
 msgid "Start the song already!"
 msgstr "Aloita jo!"
 
-#: ../game/screen_playlist.cc:320
+#: ../game/screen_playlist.cc:321
 msgid "Remove"
 msgstr "Poista"
 
-#: ../game/screen_playlist.cc:320
+#: ../game/screen_playlist.cc:321
 msgid "Remove this song from the list"
 msgstr "Poista tämä kappale listasta"
 
-#: ../game/screen_playlist.cc:332
+#: ../game/screen_playlist.cc:333
 msgid "Move up"
 msgstr "Siirrä ylös"
 
-#: ../game/screen_playlist.cc:332
+#: ../game/screen_playlist.cc:333
 msgid "Move this song up the list"
 msgstr "Siirrä tämä kappale ylöspäin listalla"
 
-#: ../game/screen_playlist.cc:342
+#: ../game/screen_playlist.cc:343
 msgid "Move Down"
 msgstr "Siirrä alas"
 
-#: ../game/screen_playlist.cc:342
+#: ../game/screen_playlist.cc:343
 msgid "Move this song down the list"
 msgstr "Siirrä tämä kappale alaspäin listalla"
 
-#: ../game/screen_audiodevices.cc:50
-msgid ""
-"It seems you have some manual configurations\n"
-"incompatible with this user interface.\n"
-"Saving these settings will override\n"
-"all existing audio device configuration.\n"
-"Your other options changes will be saved too."
-msgstr ""
-"Näyttäisi, että sinulla on manuaalisia säätöjä,\n"
-"jotka ovat epäyhteensopivia tämän työkalun kanssa.\n"
-"Tallentaminen ylikirjoittaa kaikki aiemmat\n"
-"äänilaitevalintasi. Muut mahdolliset säädöt\n"
-"tallennetaan samalla."
+#: ../game/screen_sing.cc:54
+msgid "Loading video..."
+msgstr "Ladataan videota..."
 
-#: ../game/screen_audiodevices.cc:109
-msgid "- Unassigned -"
-msgstr "- Ei asetettu -"
+#: ../game/screen_sing.cc:61
+msgid "Loading song..."
+msgstr "Ladataan kappaletta..."
 
-#: ../game/screen_audiodevices.cc:130
-msgid ""
-"Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select "
-"to cancel. Ctrl + R to reset defaults"
-msgstr ""
-"Nuolinäppäimet säätävät. Enter/Start tallentaa ja testaa, Esc/Select "
-"peruuttaa. Ctrl + R palauttaa oletukset."
+#: ../game/screen_sing.cc:68
+msgid "Song contains broken tracks!"
+msgstr "Kappaleessa on rikkinäisiä osia!"
 
-#: ../game/screen_audiodevices.cc:135
-msgid ""
-"For advanced device configuration, use command line parameter --audio (use --"
-"audiohelp for details)."
-msgstr ""
-"Monimutkaisempia asetuksia halutessasi, käytä --audio komentoriviparametriä "
-"(--audiohelp auttaa)."
+#: ../game/screen_sing.cc:73
+msgid "Loading menu..."
+msgstr "Ladataan valikkoa..."
 
-#: ../game/screen_audiodevices.cc:183
-msgid "Some devices failed to open!"
-msgstr "Jotkin laitteista eivät olleet saatavilla!"
+#: ../game/screen_sing.cc:78
+msgid "Start"
+msgstr "Aloita"
+
+#: ../game/screen_sing.cc:78
+msgid "Start performing"
+msgstr "Aloita esiintyminen"
+
+#: ../game/screen_sing.cc:82
+msgid "Duet mode"
+msgstr "Duettotila"
+
+#: ../game/screen_sing.cc:83
+msgid "Normal mode"
+msgstr "Normaalitila"
+
+#: ../game/screen_sing.cc:84
+msgid "Switch between duet and regular singing mode"
+msgstr "Vaihda dueton ja normaalin laulamisen välillä"
+
+#: ../game/screen_sing.cc:92
+msgid "Change vocal track"
+msgstr "Vaihda lauluraita"
+
+#: ../game/screen_sing.cc:127
+msgid "Skip"
+msgstr "Ohita"
+
+#: ../game/screen_sing.cc:127
+msgid "Skip current song"
+msgstr "Hyppää nykyisen kappaleen yli"
+
+#: ../game/screen_sing.cc:279
+msgid "Press UP to join dance!"
+msgstr "Paina YLÖS liittyäksesi tanssiin!"
+
+#: ../game/screen_sing.cc:279
+msgid "Step UP to join!"
+msgstr "Paina YLÖS tanssiaksesi!"
+
+#: ../game/screen_sing.cc:284
+msgid "Press 1 to join guitar!"
+msgstr "Paina 1 liittyäksesi kitaralla!"
+
+#: ../game/screen_sing.cc:284
+msgid "Press GREEN to join!"
+msgstr "Paina VIHREÄÄ liittyäksesi!"
+
+#: ../game/screen_sing.cc:289
+msgid "Press SPACE to join drums!"
+msgstr "Paina VÄLI liittyäksesi rummuilla!"
+
+#: ../game/screen_sing.cc:289
+msgid "KICK to join!"
+msgstr "Paina BASSORUMPUA liittyäksesi!"
+
+#: ../game/screen_sing.cc:517
+msgid "   ENTER to skip instrumental break"
+msgstr "   ENTER hypätäksesi lauluosaan"
+
+#: ../game/screen_sing.cc:521 ../game/screen_sing.cc:535
+msgid "   Autoplay enabled"
+msgstr "  Automaattinen toisto päällä"
+
+#: ../game/screen_sing.cc:524 ../game/screen_sing.cc:532
+msgid "   Remember to wait for grading!"
+msgstr "   Muista odottaa arvostelua!"
+
+#: ../game/screen_sing.cc:662
+msgid "No player!"
+msgstr "Pelaajia ei löytynyt!"
+
+#: ../game/screen_sing.cc:669
+msgid "Hit singer"
+msgstr "Tähti"
+
+#: ../game/screen_sing.cc:670
+msgid "Lead singer"
+msgstr "Solisti"
+
+#: ../game/screen_sing.cc:671 ../game/screen_sing.cc:677
+#: ../game/screen_sing.cc:683
+msgid "Rising star"
+msgstr "Harrastaja"
+
+#: ../game/screen_sing.cc:672 ../game/screen_sing.cc:678
+#: ../game/screen_sing.cc:684
+msgid "Amateur"
+msgstr "Amatööri"
+
+#: ../game/screen_sing.cc:673 ../game/screen_sing.cc:685
+msgid "Tone deaf"
+msgstr "Lahjaton"
+
+#: ../game/screen_sing.cc:675
+msgid "Maniac"
+msgstr "Maanikko"
+
+#: ../game/screen_sing.cc:676
+msgid "Hoofer"
+msgstr "Ekspertti"
+
+#: ../game/screen_sing.cc:679
+msgid "Loser"
+msgstr "Luuseri"
+
+#: ../game/screen_sing.cc:681
+msgid "Virtuoso"
+msgstr "Virtuoosi"
+
+#: ../game/screen_sing.cc:682
+msgid "Rocker"
+msgstr "Rokkari"
 
 #: ../game/screen_songs.cc:288
 msgid "Sorry, no songs match the search!"
@@ -373,240 +641,21 @@ msgstr "aloita soittolista tällä kappaleella"
 msgid "open the playlist menu"
 msgstr "avaa soittolistavalikko"
 
-#: ../game/screen_songs.cc:512
+#: ../game/screen_songs.cc:513
 msgid "Play"
 msgstr "Pelaa"
 
-#: ../game/screen_songs.cc:525
+#: ../game/screen_songs.cc:526
 msgid "View playlist"
 msgstr "Näytä soittolista"
 
-#: ../game/screen_songs.cc:526
+#: ../game/screen_songs.cc:527
 msgid "Clear playlist"
 msgstr "Tyhjennä soittolista"
 
-#: ../game/screen_sing.cc:54
-msgid "Loading video..."
-msgstr "Ladataan videota..."
-
-#: ../game/screen_sing.cc:61
-msgid "Loading song..."
-msgstr "Ladataan kappaletta..."
-
-#: ../game/screen_sing.cc:68
-msgid "Song contains broken tracks!"
-msgstr "Kappaleessa on rikkinäisiä osia!"
-
-#: ../game/screen_sing.cc:73
-msgid "Loading menu..."
-msgstr "Ladataan valikkoa..."
-
-#: ../game/screen_sing.cc:78
-msgid "Start"
-msgstr "Aloita"
-
-#: ../game/screen_sing.cc:78
-msgid "Start performing"
-msgstr "Aloita esiintyminen"
-
-#: ../game/screen_sing.cc:82
-msgid "Duet mode"
-msgstr "Duettotila"
-
-#: ../game/screen_sing.cc:83
-msgid "Normal mode"
-msgstr "Normaalitila"
-
-#: ../game/screen_sing.cc:84
-msgid "Switch between duet and regular singing mode"
-msgstr "Vaihda dueton ja normaalin laulamisen välillä"
-
-#: ../game/screen_sing.cc:92
-msgid "Change vocal track"
-msgstr "Vaihda lauluraita"
-
-#: ../game/screen_sing.cc:99 ../game/main.cc:177
-msgid "Loading complete"
-msgstr "Lataaminen valmis"
-
-#: ../game/screen_sing.cc:125 ../game/instrumentgraph.cc:56
-msgid "Resume"
-msgstr "Jatka"
-
-#: ../game/screen_sing.cc:125 ../game/instrumentgraph.cc:56
-msgid "Back to performing!"
-msgstr "Takaisin esiintymään!"
-
-#: ../game/screen_sing.cc:126 ../game/instrumentgraph.cc:58
-msgid "Restart"
-msgstr "Uudestaan"
-
-#: ../game/screen_sing.cc:126 ../game/instrumentgraph.cc:58
-msgid ""
-"Start the song\n"
-"from the beginning"
-msgstr ""
-"Aloita kappale\n"
-"alusta uudelleen"
-
-#: ../game/screen_sing.cc:127
-msgid "Skip"
-msgstr "Ohita"
-
-#: ../game/screen_sing.cc:127
-msgid "Skip current song"
-msgstr "Hyppää nykyisen kappaleen yli"
-
-#: ../game/screen_sing.cc:279
-msgid "Press UP to join dance!"
-msgstr "Paina YLÖS liittyäksesi tanssiin!"
-
-#: ../game/screen_sing.cc:279
-msgid "Step UP to join!"
-msgstr "Paina YLÖS tanssiaksesi!"
-
-#: ../game/screen_sing.cc:284
-msgid "Press 1 to join guitar!"
-msgstr "Paina 1 liittyäksesi kitaralla!"
-
-#: ../game/screen_sing.cc:284
-msgid "Press GREEN to join!"
-msgstr "Paina VIHREÄÄ liittyäksesi!"
-
-#: ../game/screen_sing.cc:289
-msgid "Press SPACE to join drums!"
-msgstr "Paina VÄLI liittyäksesi rummuilla!"
-
-#: ../game/screen_sing.cc:289
-msgid "KICK to join!"
-msgstr "Paina BASSORUMPUA liittyäksesi!"
-
-#: ../game/screen_sing.cc:512
-msgid "   ENTER to skip instrumental break"
-msgstr "   ENTER hypätäksesi lauluosaan"
-
-#: ../game/screen_sing.cc:516 ../game/screen_sing.cc:530
-msgid "   Autoplay enabled"
-msgstr "  Automaattinen toisto päällä"
-
-#: ../game/screen_sing.cc:519 ../game/screen_sing.cc:527
-msgid "   Remember to wait for grading!"
-msgstr "   Muista odottaa arvostelua!"
-
-#: ../game/screen_sing.cc:656
-msgid "No player!"
-msgstr "Pelaajia ei löytynyt!"
-
-#: ../game/screen_sing.cc:663
-msgid "Hit singer"
-msgstr "Tähti"
-
-#: ../game/screen_sing.cc:664
-msgid "Lead singer"
-msgstr "Solisti"
-
-#: ../game/screen_sing.cc:665 ../game/screen_sing.cc:671
-#: ../game/screen_sing.cc:677
-msgid "Rising star"
-msgstr "Harrastaja"
-
-#: ../game/screen_sing.cc:666 ../game/screen_sing.cc:672
-#: ../game/screen_sing.cc:678
-msgid "Amateur"
-msgstr "Amatööri"
-
-#: ../game/screen_sing.cc:667 ../game/screen_sing.cc:679
-msgid "Tone deaf"
-msgstr "Lahjaton"
-
-#: ../game/screen_sing.cc:669
-msgid "Maniac"
-msgstr "Maanikko"
-
-#: ../game/screen_sing.cc:670
-msgid "Hoofer"
-msgstr "Ekspertti"
-
-#: ../game/screen_sing.cc:673
-msgid "Loser"
-msgstr "Luuseri"
-
-#: ../game/screen_sing.cc:675
-msgid "Virtuoso"
-msgstr "Virtuoosi"
-
-#: ../game/screen_sing.cc:676
-msgid "Rocker"
-msgstr "Rokkari"
-
-#: ../game/screen_players.cc:117
-msgid "No players found!"
-msgstr "Pelaajia ei löytynyt!"
-
-#: ../game/screen_players.cc:118
-msgid "Enter a name to create a new player."
-msgstr "Syötä nimi luodaksesi uuden pelaajan."
-
-#: ../game/screen_players.cc:120
-msgid "Press enter to create player!"
-msgstr "Paina Enter luodaksesi pelaajan!"
-
-#: ../game/screen_players.cc:124
-msgid "No players worth mentioning!"
-msgstr "Ei maininnan arvoisia pelaajia!"
-
-#: ../game/screen_players.cc:129
-msgid "You reached %1% points!"
-msgstr "Sait %1% pistettä!"
-
-#: ../game/screen_players.cc:130
-msgid "Change player with arrow keys."
-msgstr "Valitse pelaaja nuolinäppäimillä."
-
-#: ../game/screen_players.cc:131
-msgid "Name:"
-msgstr "Nimi:"
-
-#: ../game/screen_players.cc:134
-msgid "Type text to filter or create a new player."
-msgstr "Kirjoita etsiäksesi tai luodaksesi uuden pelaajan."
-
-#: ../game/screen_players.cc:134
-msgid "Search Text:"
-msgstr "Etsi:"
-
-#: ../game/main.cc:151
-msgid "Loading audio samples..."
-msgstr "Ladataan ääniä..."
-
-#: ../game/main.cc:165
-msgid "Creating screens..."
-msgstr "Luodaan näkymät..."
-
-#: ../game/main.cc:175
-msgid "Entering main menu"
-msgstr "Päävalikko..."
-
-#: ../game/main.cc:188
-msgid "Screenshot taken!"
-msgstr "Kuvakaappaus tallennettu!"
-
-#: ../game/main.cc:191
-msgid "Screenshot failed!"
-msgstr "Kuvakaappaus epäonnistui!"
-
-#: ../game/configuration.cc:112
-msgid "Enabled"
-msgstr "Päällä"
-
-#: ../game/configuration.cc:112
-msgid "Disabled"
-msgstr "Pois"
-
-#: ../game/configuration.cc:116
-#, c-format
-msgid "%d items"
-msgstr "%d kohtaa"
+#: ../game/songparser-xml.cc:109
+msgid "Together"
+msgstr "Yhdessä"
 
 #: ../game/songs.cc:191
 msgid "show all songs"
@@ -663,54 +712,6 @@ msgstr "järjestetty polun mukaan"
 #: ../game/songs.cc:231
 msgid "sorted by language"
 msgstr "järjestetty kielen mukaan"
-
-#: ../game/songparser-xml.cc:109
-msgid "Together"
-msgstr "Yhdessä"
-
-#: ../game/instrumentgraph.cc:57
-msgid "Rejoin"
-msgstr "Liity uudelleen"
-
-#: ../game/instrumentgraph.cc:57
-msgid "Change selections"
-msgstr "Vaihda valintoja"
-
-#: ../game/song.hh:24
-msgid "Guitar"
-msgstr "Kitara"
-
-#: ../game/song.hh:24
-msgid "Coop guitar"
-msgstr "Soolokitara"
-
-#: ../game/song.hh:24
-msgid "Rhythm guitar"
-msgstr "Rytmikitara"
-
-#: ../game/song.hh:24
-msgid "Bass"
-msgstr "Basso"
-
-#: ../game/song.hh:24
-msgid "Drums"
-msgstr "Rummut"
-
-#: ../game/song.hh:24
-msgid "Vocals"
-msgstr "Laulu"
-
-#: ../game/song.hh:24
-msgid "Harmonic 1"
-msgstr "Harmonia 1"
-
-#: ../game/song.hh:24
-msgid "Harmonic 2"
-msgstr "Harmonia 2"
-
-#: ../game/song.hh:24
-msgid "Harmonic 3"
-msgstr "Harmonia 3"
 
 #: ../data/config/schema.xml:19
 msgid "Game"
@@ -1130,11 +1131,19 @@ msgid "How much voice is amplified compared to the music."
 msgstr ""
 "Kuinka paljon laulun äänenvoimakkuutta kasvatetaan musiikkiin suhteutettuna."
 
-#: ../data/config/schema.xml:286
+#: ../data/config/schema.xml:278
+msgid "Suppress center channel"
+msgstr ""
+
+#: ../data/config/schema.xml:279
+msgid "Suppress audio of center channel (e.g. vocals)."
+msgstr ""
+
+#: ../data/config/schema.xml:290
 msgid "Song folders"
 msgstr "Kappaleiden sijainnit"
 
-#: ../data/config/schema.xml:287
+#: ../data/config/schema.xml:291
 msgid ""
 "Where to recursively look for songs. DATADIR at the beginning means all "
 "Performous data folders."
@@ -1142,11 +1151,11 @@ msgstr ""
 "Mistä etsiä rekursiivisesti kappaleita. DATADIR alussa tarkoittaa kaikkia "
 "Performouksen järjestelmäkansioita."
 
-#: ../data/config/schema.xml:290
+#: ../data/config/schema.xml:294
 msgid "Base folders for data"
 msgstr "Järjestelmäkansiot"
 
-#: ../data/config/schema.xml:291
+#: ../data/config/schema.xml:295
 msgid ""
 "System defaults are included automatically. Additional paths can be added "
 "here."

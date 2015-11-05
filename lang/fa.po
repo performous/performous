@@ -2,10 +2,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-07-12 14:55+0330\n"
-"PO-Revision-Date: \n"
-"Last-Translator: sajjadg <sajjad.gerami@gmail.com>\n"
-"Language-Team: GeramiBros <sajjad.gerami@gmail.com>\n"
+"POT-Creation-Date: 2015-11-05 19:35+0100\n"
+"PO-Revision-Date: 2013-07-12 18:16:21+0430\n"
+"Last-Translator: Sajjad Gerami <sajjad.gerami@gmail.com>\n"
+"Language-Team: Sajjad Gerami <sajjad.gerami@gmail.com>\n"
 "Language: fa_IR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,6 +16,55 @@ msgstr ""
 "X-Generator: Poedit 1.5.4\n"
 "X-Poedit-SearchPath-0: ../game\n"
 "X-Poedit-SearchPath-1: ../data\n"
+
+#: ../game/song.hh:25
+msgid "Guitar"
+msgstr "گیتار"
+
+#: ../game/song.hh:25
+msgid "Coop guitar"
+msgstr "گیتار دوم"
+
+#: ../game/song.hh:25
+msgid "Rhythm guitar"
+msgstr "گیتار ریتم"
+
+#: ../game/song.hh:25
+msgid "Bass"
+msgstr "باس"
+
+#: ../game/song.hh:25
+msgid "Drums"
+msgstr "تمبک"
+
+#: ../game/song.hh:25
+msgid "Vocals"
+msgstr "خوانندگی"
+
+#: ../game/song.hh:25
+msgid "Harmonic 1"
+msgstr "هارمونیک ۱"
+
+#: ../game/song.hh:25
+msgid "Harmonic 2"
+msgstr "هارمونیک ۲"
+
+#: ../game/song.hh:25
+msgid "Harmonic 3"
+msgstr "هارمونیک ۳"
+
+#: ../game/configuration.cc:112
+msgid "Enabled"
+msgstr "فعال شد"
+
+#: ../game/configuration.cc:112
+msgid "Disabled"
+msgstr "غیر فعال شد"
+
+#: ../game/configuration.cc:116
+#, c-format
+msgid "%d items"
+msgstr "مورد %d"
 
 #: ../game/dancegraph.cc:18
 msgid "Beginner"
@@ -38,32 +87,32 @@ msgstr "دشوار"
 msgid "Challenge"
 msgstr "رقابت"
 
-#: ../game/dancegraph.cc:107 ../game/guitargraph.cc:194
+#: ../game/dancegraph.cc:107 ../game/guitargraph.cc:193
 msgid "Ready!"
 msgstr "آماده!"
 
-#: ../game/dancegraph.cc:107 ../game/screen_intro.cc:166
-#: ../game/guitargraph.cc:194
+#: ../game/dancegraph.cc:107 ../game/guitargraph.cc:193
+#: ../game/screen_intro.cc:166
 msgid "Start performing!"
 msgstr "اجرا رو شروع کن!"
 
-#: ../game/dancegraph.cc:118 ../game/guitargraph.cc:183
+#: ../game/dancegraph.cc:118 ../game/guitargraph.cc:182
 msgid "Select track"
 msgstr "انتخاب قطعه"
 
-#: ../game/dancegraph.cc:134 ../game/guitargraph.cc:163
+#: ../game/dancegraph.cc:134 ../game/guitargraph.cc:162
 msgid "Select difficulty"
 msgstr "انتخاب میزان سختی"
 
-#: ../game/dancegraph.cc:137 ../game/screen_intro.cc:184
-#: ../game/instrumentgraph.cc:59 ../game/screen_sing.cc:92
-#: ../game/screen_sing.cc:126 ../game/guitargraph.cc:200
+#: ../game/dancegraph.cc:137 ../game/guitargraph.cc:199
+#: ../game/instrumentgraph.cc:59 ../game/screen_intro.cc:184
+#: ../game/screen_sing.cc:94 ../game/screen_sing.cc:128
 msgid "Quit"
 msgstr "خروج"
 
-#: ../game/dancegraph.cc:137 ../game/instrumentgraph.cc:59
-#: ../game/screen_sing.cc:92 ../game/screen_sing.cc:126
-#: ../game/guitargraph.cc:200
+#: ../game/dancegraph.cc:137 ../game/guitargraph.cc:199
+#: ../game/instrumentgraph.cc:59 ../game/screen_sing.cc:94
+#: ../game/screen_sing.cc:128
 msgid "Exit to song browser"
 msgstr "خروج به مرورگر آهنگ"
 
@@ -73,79 +122,147 @@ msgstr "توقف!"
 
 # نوار باریک
 # خط
-#: ../game/dancegraph.cc:321 ../game/guitargraph.cc:447
+#: ../game/dancegraph.cc:321 ../game/guitargraph.cc:449
 msgid "Streak!"
 msgstr "ماشاالله!"
 
-#: ../game/configuration.cc:112
-msgid "Enabled"
-msgstr "فعال شد"
+#: ../game/guitargraph.cc:14
+msgid "Kids"
+msgstr "بچه ها"
 
-#: ../game/configuration.cc:112
-msgid "Disabled"
-msgstr "غیر فعال شد"
+#: ../game/guitargraph.cc:14
+msgid "Expert"
+msgstr "حرفه ای"
 
-#: ../game/configuration.cc:116
-#, c-format
-msgid "%d items"
-msgstr "مورد %d"
+#: ../game/guitargraph.cc:168 ../game/guitargraph.cc:185
+msgid "Lefty-mode"
+msgstr "چپ دست"
 
-#: ../game/screen_paths.cc:24
+#: ../game/guitargraph.cc:206
+msgid "ON"
+msgstr "روشن"
+
+#: ../game/guitargraph.cc:206
+msgid "OFF"
+msgstr "خاموش"
+
+#: ../game/guitargraph.cc:207
+msgid "Toggle lefty-mode"
+msgstr "تعویض به چپ دست"
+
+#: ../game/guitargraph.cc:461
 msgid ""
-"This tool is not yet available.\n"
-"Configure paths by adding them\n"
-"as command line parameters and\n"
-"then save them in configuration menu."
+"God Mode\n"
+"Activated!"
 msgstr ""
-"این ابزار هنوز موجود نیست.\n"
-"مسیرها را با اضافه کردن آنها به عنوان\n"
-"پارامترهای خط فرمان پیکربندی کنید سپس\n"
-"آنها را در منو پیکربندی(تنظیمات) ذخیره کنید."
+"حالت فوق العده\n"
+"فعال شد!"
 
-#: ../game/screen_paths.cc:70
-msgid "Press any key to exit."
-msgstr "برای خروج کلیدی را بفشارید."
+#: ../game/guitargraph.cc:462
+msgid "Mistakes ignored!"
+msgstr "از اشتباهات صرف نظر شد!"
 
-#: ../game/screen_paths.cc:76
-msgid "Windows users can also use ConfigureSongDirectory.bat script."
+#: ../game/guitargraph.cc:1104
+msgid "God Mode Ready!"
+msgstr "حالت فوق العاده آماده است!"
+
+#: ../game/guitargraph.cc:1105
+msgid "Drum Fill!"
+msgstr "درام پر است!"
+
+#: ../game/guitargraph.cc:1108
+msgid "Solo!"
+msgstr "تک نوازی!"
+
+#: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:125
+msgid "Resume"
+msgstr "ادامه دادن"
+
+#: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:125
+msgid "Back to performing!"
+msgstr "بازگشت به اجرا"
+
+#: ../game/instrumentgraph.cc:57
+msgid "Rejoin"
+msgstr "پیوستن مجدد"
+
+#: ../game/instrumentgraph.cc:57
+msgid "Change selections"
+msgstr "تغییر انتخاب ها"
+
+#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:126
+msgid "Restart"
+msgstr "شروع مجدد"
+
+#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:126
+msgid ""
+"Start the song\n"
+"from the beginning"
 msgstr ""
-"کاربران ویندوز همچنین می توانند از ConfigureSongDirectory.bat استفاده کنند."
+"آهنگ رو از ابتدا\n"
+"شروع کن"
 
-#: ../game/screen_players.cc:115
-msgid "No players found!"
-msgstr "هیچ بازیکنی یافت نشد."
+#: ../game/main.cc:151
+msgid "Loading audio samples..."
+msgstr "در حال بارگزاری آهنگ ..."
 
-#: ../game/screen_players.cc:116
-msgid "Enter a name to create a new player."
-msgstr "برای ایجاد بازیکن جدید نامی را وارد کنید."
+#: ../game/main.cc:165
+msgid "Creating screens..."
+msgstr "در حال ایجاد صفحات ..."
 
-#: ../game/screen_players.cc:118
-msgid "Press enter to create player!"
-msgstr "برای ساختن بازیکن Enter را بزنید!"
+#: ../game/main.cc:175
+msgid "Entering main menu"
+msgstr "ورود به منو اصلی"
 
-#: ../game/screen_players.cc:122
-msgid "No players worth mentioning!"
-msgstr "هیچ بازیکنی یافت نشد."
+#: ../game/main.cc:177 ../game/screen_sing.cc:99
+msgid "Loading complete"
+msgstr "بارگزاری کامل شد"
 
-#: ../game/screen_players.cc:127
-msgid "You reached %1% points!"
-msgstr "به امتیاز %1% رسیدی!"
+#: ../game/main.cc:188
+msgid "Screenshot taken!"
+msgstr "عکس صفحه گرفته شد!"
 
-#: ../game/screen_players.cc:128
-msgid "Change player with arrow keys."
-msgstr "با کلید های جهت نما  بازیکن را تغییر دهید."
+#: ../game/main.cc:191
+msgid "Screenshot failed!"
+msgstr "گرفتن عکس صفحه با شکست مواجه شد!"
 
-#: ../game/screen_players.cc:129
-msgid "Name:"
-msgstr "اسم:"
+#: ../game/screen_audiodevices.cc:54
+msgid ""
+"It seems you have some manual configurations\n"
+"incompatible with this user interface.\n"
+"Saving these settings will override\n"
+"all existing audio device configuration.\n"
+"Your other options changes will be saved too."
+msgstr ""
+"به نظر میرسد که شما کمی تنظیمات دستی دارید\n"
+"که با این رابط کاربری مطابقت ندارد\n"
+"ذخیره کردن این تنظیمات باعث پاک شدن تمام\n"
+"تنظیمات مربوط به دستگاه ها می شود\n"
+"تغییرات دیگر شما در تنظیمات نیز ذخیره می شود."
 
-#: ../game/screen_players.cc:132
-msgid "Type text to filter or create a new player."
-msgstr "برای فیلتر کردن یا ایجاد بازیکن جدید‍‍‍‍ متنی را وارد کنید."
+#: ../game/screen_audiodevices.cc:113
+msgid "- Unassigned -"
+msgstr "-تخصیص نیافته-"
 
-#: ../game/screen_players.cc:132
-msgid "Search Text:"
-msgstr "متن جستجو:"
+#: ../game/screen_audiodevices.cc:134
+msgid ""
+"Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select "
+"to cancel. Ctrl + R to reset defaults"
+msgstr ""
+"از کلیدهای جهت نما جهت پیکربندی استفاده کنید. برای ذخیره Enter/Start و برای "
+"لغو test یا Esc/Select بزنید. Ctrl + R برای بازگشت به حالت اولیه"
+
+#: ../game/screen_audiodevices.cc:139
+msgid ""
+"For advanced device configuration, use command line parameter --audio (use --"
+"audiohelp for details)."
+msgstr ""
+"برای پیکربندی پیشرفته دستگاه از پارامتر audio-- خط فرمان استفاده کنید (برای "
+"اطلاعات بیشتر از audiohelp-- استفاده کنید)."
+
+#: ../game/screen_audiodevices.cc:187
+msgid "Some devices failed to open!"
+msgstr "باز کردن بعضی از دستگاه ها با مشکل مواجه شد!"
 
 #: ../game/screen_intro.cc:24
 msgid "No playback devices could be used.\n"
@@ -195,721 +312,642 @@ msgstr "پیکربندی صوت و تنظیمات بازی"
 msgid "Leave the game"
 msgstr "ترک کردن بازی"
 
-#: ../game/screen_playlist.cc:110 ../game/screen_playlist.cc:252
-msgid "Continue"
-msgstr "ادامه"
-
-#: ../game/screen_playlist.cc:110
-msgid "Continue playing"
-msgstr "ادامه اجرا"
-
-#: ../game/screen_playlist.cc:118
-msgid "Add songs"
-msgstr "اضافه کردن آهنگ"
-
-#: ../game/screen_playlist.cc:118
-msgid "Open the song browser to add more songs"
-msgstr "برای اضافه کردن آهنگ جدید، پویشگر آهنگ را باز کن"
-
-#: ../game/screen_playlist.cc:119 ../game/screen_songs.cc:509
-msgid "Shuffle"
-msgstr "مخلوط کردن"
-
-#: ../game/screen_playlist.cc:119
-msgid "Randomize the order of the playlist"
-msgstr "ترتیب لیست اجرا را بهم بزن"
-
-#: ../game/screen_playlist.cc:125
-msgid "Clear and exit"
-msgstr "پاک کردن و خروج"
-
-#: ../game/screen_playlist.cc:125
-msgid "Remove all the songs from the list"
-msgstr "همه آهنگ ها را از لیست حذف کن"
-
-#: ../game/screen_playlist.cc:131 ../game/screen_playlist.cc:275
-#: ../game/screen_songs.cc:522
-msgid "Back"
-msgstr "بازگشت"
-
-#: ../game/screen_playlist.cc:131 ../game/screen_playlist.cc:275
-msgid "Back to playlist viewer"
-msgstr "بازگشت به لیست نمایش آهنگ ها"
-
-#: ../game/screen_playlist.cc:237
-msgid "Press enter to view song options"
-msgstr "برای دیدن تنظیمات enter بزن"
-
-#: ../game/screen_playlist.cc:244
-msgid "View more options"
-msgstr "تنظیمات بیشتر را ببین"
-
-#: ../game/screen_playlist.cc:244
-msgid "View general playlist settings"
-msgstr "نمایش تنظیمات کلی"
-
-#: ../game/screen_playlist.cc:252
-msgid "Play first"
-msgstr "اول اجرا کن"
-
-#: ../game/screen_playlist.cc:254
-msgid "Ignore the playlist's order and play this song first"
-msgstr "اولویت لیست پخشو بی خیال و این آهنگ رو اول اجرا کن"
-
-#: ../game/screen_playlist.cc:255
-msgid "Start the song already!"
-msgstr "همین الان آهنگ رو اجرا کن"
-
-#: ../game/screen_playlist.cc:264
-msgid "Remove"
-msgstr "حذف"
-
-#: ../game/screen_playlist.cc:264
-msgid "Remove this song from the list"
-msgstr "حذف این آهنگ رو از لیست"
-
-#: ../game/screen_songs.cc:278
-msgid "Sorry, no songs match the search!"
-msgstr "هیچ آهنگی با واژه جستجو شده مطابقت ندارد!"
-
-#: ../game/screen_songs.cc:281
-msgid "Sorry, no songs match the filter!"
-msgstr "ببخشید، هیچ آهنگی با واژه جستجو شده مطابقت ندارد!"
-
-#: ../game/screen_songs.cc:284
-msgid "No songs found!"
-msgstr "هیچ آهنگی یافت نشد!"
-
-#: ../game/screen_songs.cc:285
-msgid "Visit performous.org for free songs"
-msgstr "برای دریافت موسیقی رایگان به سایت www.performous.org مراجعه کنید."
-
-#: ../game/screen_songs.cc:303
-msgid "<type in to search>"
-msgstr "<تایپ کن تا بگردم>"
-
-#: ../game/screen_songs.cc:303
-msgid "songs"
-msgstr "آهنگ ها"
-
-#: ../game/screen_songs.cc:303
-msgid "options"
-msgstr "تنظیمات"
-
-#: ../game/screen_songs.cc:305
-msgid "sort order: "
-msgstr "مرتب سازی اولویت"
-
-#: ../game/screen_songs.cc:306
-msgid "type filter: "
-msgstr "فیلتر رو تایپ کن:"
-
-# \n
-#: ../game/screen_songs.cc:307
-msgid "hiscores"
-msgstr "برترین امتیازات"
-
-#: ../game/screen_songs.cc:307
-msgid "jukebox mode"
-msgstr "حالت جوکباکس"
-
-#: ../game/screen_songs.cc:310
-msgid "start a playlist with this song!"
-msgstr "لیست پخشی با این آهنگ بساز"
-
-#: ../game/screen_songs.cc:310
-msgid "open the playlist menu"
-msgstr "لیست پخش را باز کن"
-
-#: ../game/screen_songs.cc:502
-msgid "Play"
-msgstr "اجرا"
-
-#: ../game/screen_songs.cc:515
-msgid "View playlist"
-msgstr "لیست پخش رو ببین"
-
-#: ../game/screen_songs.cc:516
-msgid "Clear playlist"
-msgstr "لیست پخش را پاک کن"
-
-#: ../game/songs.cc:178
-msgid "show all songs"
-msgstr "نمایش همه آهنگ ها"
-
-#: ../game/songs.cc:179
-msgid "has dance"
-msgstr "رقص دار"
-
-#: ../game/songs.cc:180
-msgid "has vocals"
-msgstr "خوانندگی دار"
-
-#: ../game/songs.cc:181
-msgid "has duet"
-msgstr "دو نوازی دار"
-
-#: ../game/songs.cc:182
-msgid "has guitar"
-msgstr "گیتار دار"
-
-#: ../game/songs.cc:183
-msgid "drums or keytar"
-msgstr "تمبک یا درام"
-
-#: ../game/songs.cc:184
-msgid "full band"
-msgstr "گروه کامل"
-
-#: ../game/songs.cc:212
-msgid "random order"
-msgstr "ترتیب تصادفی"
-
-#: ../game/songs.cc:213
-msgid "sorted by song"
-msgstr "مرتب شده توسط آهنگ"
-
-#: ../game/songs.cc:214
-msgid "sorted by artist"
-msgstr "مرتب شده بر اساس خواننده"
-
-#: ../game/songs.cc:215
-msgid "sorted by edition"
-msgstr "مرتب شده بر اساس ویرایش"
-
-#: ../game/songs.cc:216
-msgid "sorted by genre"
-msgstr "مرتب شده بر اساس سبک"
-
-#: ../game/songs.cc:217
-msgid "sorted by path"
-msgstr "مرتب شده بر اساس مسیر"
-
-#: ../game/songs.cc:218
-msgid "sorted by language"
-msgstr "مرتب شده بر اساس زبان"
-
-#: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:123
-msgid "Resume"
-msgstr "ادامه دادن"
-
-#: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:123
-msgid "Back to performing!"
-msgstr "بازگشت به اجرا"
-
-#: ../game/instrumentgraph.cc:57
-msgid "Rejoin"
-msgstr "پیوستن مجدد"
-
-#: ../game/instrumentgraph.cc:57
-msgid "Change selections"
-msgstr "تغییر انتخاب ها"
-
-#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:124
-msgid "Restart"
-msgstr "شروع مجدد"
-
-#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:124
+#: ../game/screen_paths.cc:19
 msgid ""
-"Start the song\n"
-"from the beginning"
+"This tool is not yet available.\n"
+"Configure paths by adding them\n"
+"as command line parameters and\n"
+"then save them in configuration menu."
 msgstr ""
-"آهنگ رو از ابتدا\n"
-"شروع کن"
+"این ابزار هنوز موجود نیست.\n"
+"مسیرها را با اضافه کردن آنها به عنوان\n"
+"پارامترهای خط فرمان پیکربندی کنید سپس\n"
+"آنها را در منو پیکربندی(تنظیمات) ذخیره کنید."
 
-#: ../game/screen_sing.cc:45
+#: ../game/screen_paths.cc:65
+msgid "Press any key to exit."
+msgstr "برای خروج کلیدی را بفشارید."
+
+#: ../game/screen_paths.cc:71
+msgid "Windows users can also use ConfigureSongDirectory.bat script."
+msgstr ""
+"کاربران ویندوز همچنین می توانند از ConfigureSongDirectory.bat استفاده کنند."
+
+#: ../game/screen_players.cc:117
+msgid "No players found!"
+msgstr "هیچ بازیکنی یافت نشد."
+
+#: ../game/screen_players.cc:118
+msgid "Enter a name to create a new player."
+msgstr "برای ایجاد بازیکن جدید نامی را وارد کنید."
+
+#: ../game/screen_players.cc:120
+msgid "Press enter to create player!"
+msgstr "برای ساختن بازیکن Enter را بزنید!"
+
+#: ../game/screen_players.cc:124
+msgid "No players worth mentioning!"
+msgstr "هیچ بازیکنی یافت نشد."
+
+#: ../game/screen_players.cc:129
+msgid "You reached %1% points!"
+msgstr "به امتیاز %1% رسیدی!"
+
+#: ../game/screen_players.cc:130
+msgid "Change player with arrow keys."
+msgstr "با کلید های جهت نما  بازیکن را تغییر دهید."
+
+#: ../game/screen_players.cc:131
+msgid "Name:"
+msgstr "اسم:"
+
+#: ../game/screen_players.cc:134
+msgid "Type text to filter or create a new player."
+msgstr "برای فیلتر کردن یا ایجاد بازیکن جدید‍‍‍‍ متنی را وارد کنید."
+
+#: ../game/screen_players.cc:134
+msgid "Search Text:"
+msgstr "متن جستجو:"
+
+#: ../game/screen_playlist.cc:24 ../game/screen_sing.cc:47
 msgid "Initializing webcam..."
 msgstr "در حال راه اندازی دوربین..."
 
-#: ../game/screen_sing.cc:52
+#: ../game/screen_playlist.cc:166 ../game/screen_playlist.cc:309
+msgid "Continue"
+msgstr "ادامه"
+
+#: ../game/screen_playlist.cc:166
+msgid "Continue playing"
+msgstr "ادامه اجرا"
+
+#: ../game/screen_playlist.cc:174
+msgid "Add songs"
+msgstr "اضافه کردن آهنگ"
+
+#: ../game/screen_playlist.cc:174
+msgid "Open the song browser to add more songs"
+msgstr "برای اضافه کردن آهنگ جدید، پویشگر آهنگ را باز کن"
+
+#: ../game/screen_playlist.cc:175 ../game/screen_songs.cc:520
+msgid "Shuffle"
+msgstr "مخلوط کردن"
+
+#: ../game/screen_playlist.cc:175
+msgid "Randomize the order of the playlist"
+msgstr "ترتیب لیست اجرا را بهم بزن"
+
+#: ../game/screen_playlist.cc:181
+msgid "Clear and exit"
+msgstr "پاک کردن و خروج"
+
+#: ../game/screen_playlist.cc:181
+msgid "Remove all the songs from the list"
+msgstr "همه آهنگ ها را از لیست حذف کن"
+
+#: ../game/screen_playlist.cc:187 ../game/screen_playlist.cc:350
+#: ../game/screen_songs.cc:533
+msgid "Back"
+msgstr "بازگشت"
+
+#: ../game/screen_playlist.cc:187 ../game/screen_playlist.cc:350
+msgid "Back to playlist viewer"
+msgstr "بازگشت به لیست نمایش آهنگ ها"
+
+#: ../game/screen_playlist.cc:294
+msgid "Press enter to view song options"
+msgstr "برای دیدن تنظیمات enter بزن"
+
+#: ../game/screen_playlist.cc:301
+msgid "View more options"
+msgstr "تنظیمات بیشتر را ببین"
+
+#: ../game/screen_playlist.cc:301
+msgid "View general playlist settings"
+msgstr "نمایش تنظیمات کلی"
+
+#: ../game/screen_playlist.cc:309
+msgid "Play first"
+msgstr "اول اجرا کن"
+
+#: ../game/screen_playlist.cc:311
+msgid "Ignore the playlist's order and play this song first"
+msgstr "اولویت لیست پخشو بی خیال و این آهنگ رو اول اجرا کن"
+
+#: ../game/screen_playlist.cc:312
+msgid "Start the song already!"
+msgstr "همین الان آهنگ رو اجرا کن"
+
+#: ../game/screen_playlist.cc:321
+msgid "Remove"
+msgstr "حذف"
+
+#: ../game/screen_playlist.cc:321
+msgid "Remove this song from the list"
+msgstr "حذف این آهنگ رو از لیست"
+
+#: ../game/screen_playlist.cc:333
+msgid "Move up"
+msgstr ""
+
+#: ../game/screen_playlist.cc:333
+#, fuzzy
+msgid "Move this song up the list"
+msgstr "حذف این آهنگ رو از لیست"
+
+#: ../game/screen_playlist.cc:343
+msgid "Move Down"
+msgstr ""
+
+#: ../game/screen_playlist.cc:343
+#, fuzzy
+msgid "Move this song down the list"
+msgstr "حذف این آهنگ رو از لیست"
+
+#: ../game/screen_sing.cc:54
 msgid "Loading video..."
 msgstr "در حال بارگیری تصویر"
 
-#: ../game/screen_sing.cc:59
+#: ../game/screen_sing.cc:61
 msgid "Loading song..."
 msgstr "در حال بارگذاری آهنگ..."
 
 # آهنگ شامل موردهای خراب است
-#: ../game/screen_sing.cc:66
+#: ../game/screen_sing.cc:68
 msgid "Song contains broken tracks!"
 msgstr "قسمتی از آهنگ خراب است!"
 
-#: ../game/screen_sing.cc:71
+#: ../game/screen_sing.cc:73
 msgid "Loading menu..."
 msgstr "در حال بارگیری فهرست..."
 
-#: ../game/screen_sing.cc:76
+#: ../game/screen_sing.cc:78
 msgid "Start"
 msgstr "شروع"
 
-#: ../game/screen_sing.cc:76
+#: ../game/screen_sing.cc:78
 msgid "Start performing"
 msgstr "شروع اجرا "
 
-#: ../game/screen_sing.cc:80
+#: ../game/screen_sing.cc:82
 msgid "Duet mode"
 msgstr "دونوازی"
 
-#: ../game/screen_sing.cc:81
+#: ../game/screen_sing.cc:83
 msgid "Normal mode"
 msgstr "حالت عادی"
 
-#: ../game/screen_sing.cc:82
+#: ../game/screen_sing.cc:84
 msgid "Switch between duet and regular singing mode"
 msgstr "تغییر بین دونوازی و تک نوازی"
 
-#: ../game/screen_sing.cc:90
+#: ../game/screen_sing.cc:92
 msgid "Change vocal track"
 msgstr "تغییر شیار صوتی"
 
-#: ../game/screen_sing.cc:97 ../game/main.cc:171
-msgid "Loading complete"
-msgstr "بارگزاری کامل شد"
-
-#: ../game/screen_sing.cc:125
+#: ../game/screen_sing.cc:127
 msgid "Skip"
 msgstr "پرش"
 
-#: ../game/screen_sing.cc:125
+#: ../game/screen_sing.cc:127
 msgid "Skip current song"
 msgstr "برش از روی آهنگ فعلی"
 
-#: ../game/screen_sing.cc:391
+#: ../game/screen_sing.cc:279
 msgid "Press UP to join dance!"
 msgstr "واسه رقص بالا را بزن"
 
-#: ../game/screen_sing.cc:391
+#: ../game/screen_sing.cc:279
 msgid "Step UP to join!"
 msgstr "برای ملحق شدن بالا رو بزن"
 
-#: ../game/screen_sing.cc:396
+#: ../game/screen_sing.cc:284
 msgid "Press 1 to join guitar!"
 msgstr "برای اضافه کردن گیتار ۱ رو بزن"
 
-#: ../game/screen_sing.cc:396
+#: ../game/screen_sing.cc:284
 msgid "Press GREEN to join!"
 msgstr "برای ملحق شدن سبز رو بزن"
 
-#: ../game/screen_sing.cc:401
+#: ../game/screen_sing.cc:289
 msgid "Press SPACE to join drums!"
 msgstr "برای اضافه کردن تمبک space بزن"
 
-#: ../game/screen_sing.cc:401
+#: ../game/screen_sing.cc:289
 msgid "KICK to join!"
 msgstr "برای اضافه شدن ضربه بزن"
 
-#: ../game/screen_sing.cc:475
+#: ../game/screen_sing.cc:517
 msgid "   ENTER to skip instrumental break"
 msgstr "برای پخش نشدن صدای خراب کردن ساز کلید Enter بزنید"
 
-#: ../game/screen_sing.cc:476
+#: ../game/screen_sing.cc:521 ../game/screen_sing.cc:535
+msgid "   Autoplay enabled"
+msgstr ""
+
+#: ../game/screen_sing.cc:524 ../game/screen_sing.cc:532
 msgid "   Remember to wait for grading!"
 msgstr "  فراموش نکنید که برای درجه بندی صبر کنید!"
 
-#: ../game/screen_sing.cc:587
+#: ../game/screen_sing.cc:662
 msgid "No player!"
 msgstr "هیچ بازیکنی!"
 
-#: ../game/screen_sing.cc:594
+#: ../game/screen_sing.cc:669
 msgid "Hit singer"
 msgstr "انتخاب خواننده"
 
-#: ../game/screen_sing.cc:595
+#: ../game/screen_sing.cc:670
 msgid "Lead singer"
 msgstr "خواننده را بارگیری کن"
 
-#: ../game/screen_sing.cc:596 ../game/screen_sing.cc:602
-#: ../game/screen_sing.cc:608
+#: ../game/screen_sing.cc:671 ../game/screen_sing.cc:677
+#: ../game/screen_sing.cc:683
 msgid "Rising star"
 msgstr "افزایش ستاره"
 
-#: ../game/screen_sing.cc:597 ../game/screen_sing.cc:603
-#: ../game/screen_sing.cc:609
+#: ../game/screen_sing.cc:672 ../game/screen_sing.cc:678
+#: ../game/screen_sing.cc:684
 msgid "Amateur"
 msgstr "مبتدی"
 
-#: ../game/screen_sing.cc:598 ../game/screen_sing.cc:610
+#: ../game/screen_sing.cc:673 ../game/screen_sing.cc:685
 msgid "Tone deaf"
 msgstr "کر"
 
 # ديوانه‌
 # مجنون
-#: ../game/screen_sing.cc:600
+#: ../game/screen_sing.cc:675
 msgid "Maniac"
 msgstr "ديوانه‌ وار"
 
-#: ../game/screen_sing.cc:601
+#: ../game/screen_sing.cc:676
 msgid "Hoofer"
 msgstr "رقاص‌ حرفه‌ اي‌"
 
-#: ../game/screen_sing.cc:604
+#: ../game/screen_sing.cc:679
 msgid "Loser"
 msgstr "بازنده‌"
 
-#: ../game/screen_sing.cc:606
+#: ../game/screen_sing.cc:681
 msgid "Virtuoso"
 msgstr "هنرشناس‌"
 
-#: ../game/screen_sing.cc:607
+#: ../game/screen_sing.cc:682
 msgid "Rocker"
 msgstr "گیتاریست"
 
-#: ../game/screen_audiodevices.cc:55
-msgid ""
-"It seems you have some manual configurations\n"
-"incompatible with this user interface.\n"
-"Saving these settings will override\n"
-"all existing audio device configuration.\n"
-"Your other options changes will be saved too."
+#: ../game/screen_songs.cc:288
+msgid "Sorry, no songs match the search!"
+msgstr "هیچ آهنگی با واژه جستجو شده مطابقت ندارد!"
+
+#: ../game/screen_songs.cc:291
+msgid "Sorry, no songs match the filter!"
+msgstr "ببخشید، هیچ آهنگی با واژه جستجو شده مطابقت ندارد!"
+
+#: ../game/screen_songs.cc:294
+msgid "No songs found!"
+msgstr "هیچ آهنگی یافت نشد!"
+
+#: ../game/screen_songs.cc:295
+msgid "Visit performous.org for free songs"
+msgstr "برای دریافت موسیقی رایگان به سایت www.performous.org مراجعه کنید."
+
+#: ../game/screen_songs.cc:313
+msgid "<type in to search>"
+msgstr "<تایپ کن تا بگردم>"
+
+#: ../game/screen_songs.cc:313
+msgid "songs"
+msgstr "آهنگ ها"
+
+#: ../game/screen_songs.cc:313
+msgid "options"
+msgstr "تنظیمات"
+
+#: ../game/screen_songs.cc:315
+msgid "sort order: "
+msgstr "مرتب سازی اولویت"
+
+#: ../game/screen_songs.cc:316
+msgid "type filter: "
+msgstr "فیلتر رو تایپ کن:"
+
+# \n
+#: ../game/screen_songs.cc:317
+msgid "hiscores"
+msgstr "برترین امتیازات"
+
+#: ../game/screen_songs.cc:317
+msgid "jukebox mode"
+msgstr "حالت جوکباکس"
+
+#: ../game/screen_songs.cc:320
+msgid "start a playlist with this song!"
+msgstr "لیست پخشی با این آهنگ بساز"
+
+#: ../game/screen_songs.cc:320
+msgid "open the playlist menu"
+msgstr "لیست پخش را باز کن"
+
+#: ../game/screen_songs.cc:513
+msgid "Play"
+msgstr "اجرا"
+
+#: ../game/screen_songs.cc:526
+msgid "View playlist"
+msgstr "لیست پخش رو ببین"
+
+#: ../game/screen_songs.cc:527
+msgid "Clear playlist"
+msgstr "لیست پخش را پاک کن"
+
+#: ../game/songparser-xml.cc:109
+msgid "Together"
 msgstr ""
-"به نظر میرسد که شما کمی تنظیمات دستی دارید\n"
-"که با این رابط کاربری مطابقت ندارد\n"
-"ذخیره کردن این تنظیمات باعث پاک شدن تمام\n"
-"تنظیمات مربوط به دستگاه ها می شود\n"
-"تغییرات دیگر شما در تنظیمات نیز ذخیره می شود."
 
-#: ../game/screen_audiodevices.cc:114
-msgid "- Unassigned -"
-msgstr "-تخصیص نیافته-"
+#: ../game/songs.cc:191
+msgid "show all songs"
+msgstr "نمایش همه آهنگ ها"
 
-#: ../game/screen_audiodevices.cc:135
-msgid ""
-"Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select "
-"to cancel. Ctrl + R to reset defaults"
-msgstr ""
-"از کلیدهای جهت نما جهت پیکربندی استفاده کنید. برای ذخیره Enter/Start و برای "
-"لغو test یا Esc/Select بزنید. Ctrl + R برای بازگشت به حالت اولیه"
+#: ../game/songs.cc:192
+msgid "has dance"
+msgstr "رقص دار"
 
-#: ../game/screen_audiodevices.cc:140
-msgid ""
-"For advanced device configuration, use command line parameter --audio (use --"
-"audiohelp for details)."
-msgstr ""
-"برای پیکربندی پیشرفته دستگاه از پارامتر audio-- خط فرمان استفاده کنید (برای "
-"اطلاعات بیشتر از audiohelp-- استفاده کنید)."
+#: ../game/songs.cc:193
+msgid "has vocals"
+msgstr "خوانندگی دار"
 
-#: ../game/screen_audiodevices.cc:188
-msgid "Some devices failed to open!"
-msgstr "باز کردن بعضی از دستگاه ها با مشکل مواجه شد!"
+#: ../game/songs.cc:194
+msgid "has duet"
+msgstr "دو نوازی دار"
 
-#: ../game/main.cc:145
-msgid "Loading audio samples..."
-msgstr "در حال بارگزاری آهنگ ..."
+#: ../game/songs.cc:195
+msgid "has guitar"
+msgstr "گیتار دار"
 
-#: ../game/main.cc:159
-msgid "Creating screens..."
-msgstr "در حال ایجاد صفحات ..."
+#: ../game/songs.cc:196
+msgid "drums or keytar"
+msgstr "تمبک یا درام"
 
-#: ../game/main.cc:169
-msgid "Entering main menu"
-msgstr "ورود به منو اصلی"
+#: ../game/songs.cc:197
+msgid "full band"
+msgstr "گروه کامل"
 
-#: ../game/main.cc:182
-msgid "Screenshot taken!"
-msgstr "عکس صفحه گرفته شد!"
+#: ../game/songs.cc:225
+msgid "random order"
+msgstr "ترتیب تصادفی"
 
-#: ../game/main.cc:185
-msgid "Screenshot failed!"
-msgstr "گرفتن عکس صفحه با شکست مواجه شد!"
+#: ../game/songs.cc:226
+msgid "sorted by song"
+msgstr "مرتب شده توسط آهنگ"
 
-#: ../game/guitargraph.cc:14
-msgid "Kids"
-msgstr "بچه ها"
+#: ../game/songs.cc:227
+msgid "sorted by artist"
+msgstr "مرتب شده بر اساس خواننده"
 
-#: ../game/guitargraph.cc:14
-msgid "Expert"
-msgstr "حرفه ای"
+#: ../game/songs.cc:228
+msgid "sorted by edition"
+msgstr "مرتب شده بر اساس ویرایش"
 
-#: ../game/guitargraph.cc:169 ../game/guitargraph.cc:186
-msgid "Lefty-mode"
-msgstr "چپ دست"
+#: ../game/songs.cc:229
+msgid "sorted by genre"
+msgstr "مرتب شده بر اساس سبک"
 
-#: ../game/guitargraph.cc:207
-msgid "ON"
-msgstr "روشن"
+#: ../game/songs.cc:230
+msgid "sorted by path"
+msgstr "مرتب شده بر اساس مسیر"
 
-#: ../game/guitargraph.cc:207
-msgid "OFF"
-msgstr "خاموش"
+#: ../game/songs.cc:231
+msgid "sorted by language"
+msgstr "مرتب شده بر اساس زبان"
 
-#: ../game/guitargraph.cc:208
-msgid "Toggle lefty-mode"
-msgstr "تعویض به چپ دست"
-
-#: ../game/guitargraph.cc:459
-msgid ""
-"God Mode\n"
-"Activated!"
-msgstr ""
-"حالت فوق العده\n"
-"فعال شد!"
-
-#: ../game/guitargraph.cc:460
-msgid "Mistakes ignored!"
-msgstr "از اشتباهات صرف نظر شد!"
-
-#: ../game/guitargraph.cc:1102
-msgid "God Mode Ready!"
-msgstr "حالت فوق العاده آماده است!"
-
-#: ../game/guitargraph.cc:1103
-msgid "Drum Fill!"
-msgstr "درام پر است!"
-
-#: ../game/guitargraph.cc:1106
-msgid "Solo!"
-msgstr "تک نوازی!"
-
-#: ../game/song.hh:23
-msgid "Guitar"
-msgstr "گیتار"
-
-#: ../game/song.hh:23
-msgid "Coop guitar"
-msgstr "گیتار دوم"
-
-#: ../game/song.hh:23
-msgid "Rhythm guitar"
-msgstr "گیتار ریتم"
-
-#: ../game/song.hh:23
-msgid "Bass"
-msgstr "باس"
-
-#: ../game/song.hh:23
-msgid "Drums"
-msgstr "تمبک"
-
-#: ../game/song.hh:23
-msgid "Vocals"
-msgstr "خوانندگی"
-
-#: ../game/song.hh:23
-msgid "Harmonic 1"
-msgstr "هارمونیک ۱"
-
-#: ../game/song.hh:23
-msgid "Harmonic 2"
-msgstr "هارمونیک ۲"
-
-#: ../game/song.hh:23
-msgid "Harmonic 3"
-msgstr "هارمونیک ۳"
-
-#: /tmp/xml2gettext.KLMLVC3iaY:2
+#: ../data/config/schema.xml:19
 msgid "Game"
 msgstr "بازی"
 
 # ترجمه جایگزین برای گیم پلی چیست؟
-#: /tmp/xml2gettext.KLMLVC3iaY:3
+#: ../data/config/schema.xml:20
 msgid "Gameplay related options"
 msgstr "تنظیمات مریوط به گیم پلی"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:4
+#: ../data/config/schema.xml:23
 msgid "Graphic"
 msgstr "گرافیک (نگاره)"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:5
+#: ../data/config/schema.xml:24
 msgid "Configure rendering and video settings"
 msgstr "پیکربندی رندر کردن و تنظیمات تصویر"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:6
+#: ../data/config/schema.xml:28
 msgid "Audio Devices"
 msgstr "دستگاه های صوتی"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:7
+#: ../data/config/schema.xml:29
 msgid "Setup microphones and playback"
 msgstr "راه اندازی میکروفن(دهنی) و بازبخش"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:8
+#: ../data/config/schema.xml:32
 msgid "Audio"
 msgstr "صوت"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:9
+#: ../data/config/schema.xml:33
 msgid "Configure general audio settings"
 msgstr "پیکربندی کلی تنظیمات صوتی"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:10
+#: ../data/config/schema.xml:36
 msgid "Paths"
 msgstr "مسیر"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:11
+#: ../data/config/schema.xml:37
 msgid "Setup song and data paths"
 msgstr "راه اندازی آهنگ و مسیرهای داده"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:12
+#: ../data/config/schema.xml:48
 msgid "Karaoke mode"
 msgstr "حالت همخوانی"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:13
+#: ../data/config/schema.xml:49 ../data/config/schema.xml:57
 msgid "Hide pitch wave, notes and scoring."
 msgstr "مخفی کردن دانگ صدا نت ها و امتیازها"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:14
+#: ../data/config/schema.xml:56
+msgid "Lyric highlight style"
+msgstr ""
+
+#: ../data/config/schema.xml:60
+msgid "Autoplay"
+msgstr ""
+
+#: ../data/config/schema.xml:61
+msgid "Keep playing random songs after the playlist is empty."
+msgstr ""
+
+#: ../data/config/schema.xml:64
 msgid "Pitch waves"
 msgstr "دانگ‌ اصوات"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:15
+#: ../data/config/schema.xml:65
 msgid "Enable singing pitch display (when not in karaoke mode)."
 msgstr "فعال کردن نمایش زیر و بمی صدا (زمانی که در حالت همخوانی نیستید)"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:16
+#: ../data/config/schema.xml:70
 msgid "Theme"
 msgstr "پوسته"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:17
+#: ../data/config/schema.xml:71
 msgid "Name of the theme to use."
 msgstr "نام پوسته یا مسیر پوشه ی پوسته ها"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:18
+#: ../data/config/schema.xml:74
 msgid "Keyboard as guitar"
 msgstr "صفحه کلید به جای گیتار"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:19
+#: ../data/config/schema.xml:75
 msgid "Enable keyboard as guitar (Frets on Fire mode)."
 msgstr "فعال کردن صفحه کلید بجای گیتار(حالت Frets on Fire)"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:20
+#: ../data/config/schema.xml:78
 msgid "Keyboard as drumkit"
 msgstr "صفحه کلید بجای درام"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:21
+#: ../data/config/schema.xml:79
 msgid "Enable keyboard as drumkit."
 msgstr "فعال کردن صفحه کلید بجای درام"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:22
+#: ../data/config/schema.xml:82
 msgid "Keyboard as dance pad"
 msgstr "صفحه کلید بجای تخته رقص"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:23
+#: ../data/config/schema.xml:83
 msgid "Enable keyboard as dance pad."
 msgstr "فعال کردن صفحه کلید بجای تخته رقص."
 
-#: /tmp/xml2gettext.KLMLVC3iaY:24
+#: ../data/config/schema.xml:86
 msgid "Keyboard as keytar"
 msgstr "صفحه کلید بجای کیتار."
 
-#: /tmp/xml2gettext.KLMLVC3iaY:25
+#: ../data/config/schema.xml:87
 msgid "Enable keyboard as keytar."
 msgstr "فعال کردن صفحه کلید بجای کیتار."
 
-#: /tmp/xml2gettext.KLMLVC3iaY:26
+#: ../data/config/schema.xml:94
 msgid "Force controller A's type"
 msgstr "مدل A دسته را اعمال کن"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:27
+#: ../data/config/schema.xml:95
 msgid ""
 "Override autodetection and force the first controller to the given type."
 msgstr "شناسایی خودکار را با اولین نوع دسته داده شده جایگزین کن"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:28
+#: ../data/config/schema.xml:102
 msgid "Force controller B's type"
 msgstr "مدل B دسته را اعمال کن"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:29
+#: ../data/config/schema.xml:103
 msgid ""
 "Override autodetection and force the second controller to the given type."
 msgstr "شناسایی خودکار را با دومین نوع دسته داده شده جایگزین کن"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:30
+#: ../data/config/schema.xml:110
 msgid "Force controller C's type"
 msgstr "مدل C دسته را اعمال کن"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:31
+#: ../data/config/schema.xml:111
 msgid ""
 "Override autodetection and force the third controller to the given type."
 msgstr "شناسایی خودکار را با سومین نوع دسته داده شده جایگزین کن"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:32
+#: ../data/config/schema.xml:118
 msgid "Force controller D's type"
 msgstr "مدل D دسته را اعمال کن"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:33
+#: ../data/config/schema.xml:119
 msgid ""
 "Override autodetection and force the fourth controller to the given type."
 msgstr "شناسایی خودکار را با چهارمین نوع دسته داده شده جایگزین کن"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:34
+#: ../data/config/schema.xml:126
 msgid "Joystick configuration"
 msgstr "پیکربندی دسته فرمان"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:35
+#: ../data/config/schema.xml:127
 msgid "Force joystick to some kind of instrument."
 msgstr "اجبار کردن دسته فرمان برای ساز"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:36
+#: ../data/config/schema.xml:130
 msgid "Hardware MIDI input device"
 msgstr "دستگاه سخت افزار ورودی MIDI"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:37
+#: ../data/config/schema.xml:131
 msgid ""
 "Regex for matching the MIDI devices to use. The default is to use all "
 "available devices."
 msgstr "الگوی تطابق دستگاه های MIDI. پیش فرض استفاده از همه دستگاه هاست."
 
-#: /tmp/xml2gettext.KLMLVC3iaY:38
+#: ../data/config/schema.xml:146
 msgid "Fallback song encoding"
 msgstr "رمزگزاری آهنگ جایگزین"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:39
+#: ../data/config/schema.xml:147
 msgid "Pick the text codec used for song files that are not UTF-8."
 msgstr "برای آهنگ هایی که UTF-8 نیستند رمزگشای متن را استفاده کن."
 
-#: /tmp/xml2gettext.KLMLVC3iaY:40
+#: ../data/config/schema.xml:154
 msgid "Windowed width"
 msgstr "عرض صفحه"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:41
+#: ../data/config/schema.xml:155
 msgid "The width of the window."
 msgstr "عرض صفحه"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:42
+#: ../data/config/schema.xml:160
 msgid "Windowed height"
 msgstr "ارتفاع صفحه"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:43
+#: ../data/config/schema.xml:161
 msgid "The height of the window."
 msgstr "ارتفاع صفحه"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:44
+#: ../data/config/schema.xml:164
 msgid "Fullscreen mode"
 msgstr "حالت تمام صفحه"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:45
+#: ../data/config/schema.xml:165
 msgid "Enable fullscreen mode on startup."
 msgstr "فعال کردن حالت تمام صفحه هنگام شروع"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:46
+#: ../data/config/schema.xml:168
 msgid "Stereoscopic 3D"
 msgstr "برجسته بین سه بعدی"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:47
+#: ../data/config/schema.xml:169
 msgid "Enable 3D rendering of Performous."
 msgstr "فعال کردن حالت سه یعدی پرفورمیوس"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:48
+#: ../data/config/schema.xml:177
 msgid "Stereo3D type"
 msgstr "حالت سه بعدی"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:49
+#: ../data/config/schema.xml:178
 msgid "Some modes may only get activated in fullscreen mode."
 msgstr "بعضی از حالات فقط در حالت تمام صفحه فعال می شوند"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:50
+#: ../data/config/schema.xml:183
 msgid "Stereo3D separation"
 msgstr "تفکیک سه بعدی"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:51
+#: ../data/config/schema.xml:184
 msgid ""
 "The strength of the effect. Experiment with different settings for best "
 "results."
 msgstr "قدرت اثر. برای نتیجه بهتر با یک تنظیم دیگر امتحان کنید."
 
-#: /tmp/xml2gettext.KLMLVC3iaY:52
+#: ../data/config/schema.xml:187
 msgid "Video playback"
 msgstr "پخش تصویر"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:53
+#: ../data/config/schema.xml:188
 msgid ""
 "Allows completely disabling background videos. It is recommended to leave "
 "this enabled as Performous will still smoothly fade out the video if your "
@@ -919,11 +957,11 @@ msgstr ""
 "را در حالت فعال قرار دهید چون که اگر رایانه شما به اندازه کافی سریع نباشد "
 "پرفورمیوس تصویر را به نرمی محو می کند."
 
-#: /tmp/xml2gettext.KLMLVC3iaY:54
+#: ../data/config/schema.xml:191
 msgid "Webcam background"
 msgstr "تصویر زمینه دوربین..."
 
-#: /tmp/xml2gettext.KLMLVC3iaY:55
+#: ../data/config/schema.xml:192
 msgid ""
 "Performous can use webcam as a background video. Disable it if Performous "
 "crashes while entering a song."
@@ -931,22 +969,22 @@ msgstr ""
 "پرفورمیوس میتواند از دوربین به عنوان تصویر پس ضمینه استفاده کند. اگر "
 "پرفورمیوس موقع ورود به یک آهنگ متوقف شد این گزینه را غیر فعال کنید."
 
-#: /tmp/xml2gettext.KLMLVC3iaY:56
+#: ../data/config/schema.xml:196
 msgid "Webcam id"
 msgstr "شماره دوربین"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:57
+#: ../data/config/schema.xml:197
 msgid ""
 "Use -1 to autodetect or a number starting from 0 to choose specific device."
 msgstr ""
 "برای شناسایی خودکار -۱ و یا یک عدد که با ۰ شروع می شود را برای انتخاب دستگاه "
 "خاص وارد کنید."
 
-#: /tmp/xml2gettext.KLMLVC3iaY:58
+#: ../data/config/schema.xml:202
 msgid "SVG quality"
 msgstr "کیفیت SVG"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:59
+#: ../data/config/schema.xml:203
 msgid ""
 "Larger numbers cause vector graphics to be rendered in higher resolution. "
 "Decrease this to make navigating in menus faster."
@@ -954,11 +992,11 @@ msgstr ""
 "مقادیر بزرگ باعث می شود که بردارهای گرافیکی با کیفیت بالا نقش شوند. کاهش "
 "مقادیر باعث سرعت منو می شود."
 
-#: /tmp/xml2gettext.KLMLVC3iaY:60
+#: ../data/config/schema.xml:208
 msgid "Text quality"
 msgstr "کیفیت متن"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:61
+#: ../data/config/schema.xml:209
 msgid ""
 "Larger numbers cause text to be rendered in higher resolution. Decrease this "
 "to make everything a little faster."
@@ -966,11 +1004,11 @@ msgstr ""
 "مقادیر بزرگ باعث می شود که متون با کیفیت بالا نقش شوند. کاهش مقادیر باعث "
 "سرعت اندکی در همه چیز می شود."
 
-#: /tmp/xml2gettext.KLMLVC3iaY:62
+#: ../data/config/schema.xml:212
 msgid "Benchmark mode"
 msgstr "حالت محک"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:63
+#: ../data/config/schema.xml:213
 msgid ""
 "Framerate limit of 100 FPS is removed and the game instead renders at full "
 "speed. FPS values are printed to console. Please note that the display "
@@ -980,11 +1018,11 @@ msgstr ""
 "مقادیر FPS در کنسول چاپ می شود. لطفا توجه داشته باشید که درایور صفحه نمایش "
 "هنوز هم ممکن است سرعت نگاره را با سرعت جاروب صفحه نمایش محدود کند."
 
-#: /tmp/xml2gettext.KLMLVC3iaY:64
+#: ../data/config/schema.xml:220
 msgid "Suggested latency"
 msgstr "زمان تاخیر پیشنهادی"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:65
+#: ../data/config/schema.xml:221
 msgid ""
 "This is a hint for the audio engine about the desired latency. Set this as "
 "low as possible while retaining clear audio playback. Requires restart."
@@ -992,11 +1030,11 @@ msgstr ""
 "این یک تذکر برای متور صدا درمورد تاخیر خواسته شده است. اگر کیفیت صدای پایین "
 "دارید این مقدار را پایین بیاورید. نیاز به شروع مجدد دارد."
 
-#: /tmp/xml2gettext.KLMLVC3iaY:66
+#: ../data/config/schema.xml:226
 msgid "Audio/video latency"
 msgstr "تاخیر صدا و تصویر"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:67
+#: ../data/config/schema.xml:227
 msgid ""
 "Affects all modes. Use negative value if your display input lag is greater "
 "than the sound card output latency, positive values in the opposite case and "
@@ -1009,11 +1047,11 @@ msgstr ""
 "باهم برابر است. این مقدار باید تنظیم شود تا نت همان زمانی که صدایش شنیده می "
 "شود از خط عبور کند. از کلید Ctrl+F1/F2 در حال اجرا برای تنظیم استفاده کنید."
 
-#: /tmp/xml2gettext.KLMLVC3iaY:68
+#: ../data/config/schema.xml:232
 msgid "Audio round-trip latency"
 msgstr "تاخیر در رفت و آمد صدا"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:69
+#: ../data/config/schema.xml:233
 msgid ""
 "Affects singing only. The time it takes for Performous playback to reach "
 "your speakers, fly to the microphone and all the way back until Performous "
@@ -1025,11 +1063,11 @@ msgstr ""
 "تحلیل کند. در زمان اجرا Ctrl+S بزنید تا به حالت تنظیم بروید و با Ctrl+F3/F4 "
 "تنظیم کنید."
 
-#: /tmp/xml2gettext.KLMLVC3iaY:70
+#: ../data/config/schema.xml:238
 msgid "Audio/controller latency"
 msgstr "تاخیر در صدا و کنترلر"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:71
+#: ../data/config/schema.xml:239
 msgid ""
 "Affects instruments and dancing only. The total of USB (guitar or dance pad) "
 "latency combined with audio output latency. Adjust so that you can hit the "
@@ -1041,27 +1079,27 @@ msgstr ""
 "شنوید بزنید (نه زمانی که نت را روی صفحه می بینید). از کلید Ctrl+F5/F6 برای "
 "تنظیم حین اجرا استفاده کنید."
 
-#: /tmp/xml2gettext.KLMLVC3iaY:72
+#: ../data/config/schema.xml:246
 msgid "Audio devices"
 msgstr "دستگاه های صوتی"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:73
+#: ../data/config/schema.xml:247
 msgid "List of audio devices to try."
 msgstr "فهرستی از دستگاه های صدا برای آزمایش کردن."
 
-#: /tmp/xml2gettext.KLMLVC3iaY:74
+#: ../data/config/schema.xml:252
 msgid "Menu volume"
 msgstr "میزان صدای منو"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:75
+#: ../data/config/schema.xml:253
 msgid "The volume level of menus, song previews and jukebox mode."
 msgstr "میزان صدای منوها پیش نمایش آهنگ ها و حالت جعبه موزیک"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:76
+#: ../data/config/schema.xml:258
 msgid "Music volume"
 msgstr "میزان صدای آهنگ"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:77
+#: ../data/config/schema.xml:259
 msgid ""
 "The ingame music volume. Values above 90 are not recommended as distortion "
 "may occur."
@@ -1069,11 +1107,11 @@ msgstr ""
 "میزان صدای آهنگ داخل بازی. مقادیر بالاتر از ۹۰ توصیه نمی شوند چون ممکن است "
 "باعث اغتشاش صوتی گردند."
 
-#: /tmp/xml2gettext.KLMLVC3iaY:78
+#: ../data/config/schema.xml:264
 msgid "Failure volume"
 msgstr "میزان صدای خراب کردن آهنگ"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:79
+#: ../data/config/schema.xml:265
 msgid ""
 "The ingame fail sound volume. Values above 90 are not recommended as "
 "distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
@@ -1082,27 +1120,35 @@ msgstr ""
 "ممکن است باعث اغتشاش صوتی گردند. 11 بلندتر از 9 است اما تا ۱۰۰ می رود. 89 "
 "بلندترین"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:80
+#: ../data/config/schema.xml:268
 msgid "Microphone pass-through"
 msgstr "صدای میانی میکروفن"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:81
+#: ../data/config/schema.xml:269
 msgid "Send captured singing voice to speakers."
 msgstr "ارسال صدای خواننده به بلندگو"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:82
+#: ../data/config/schema.xml:274
 msgid "Pass-through volume ratio"
 msgstr "میزان حجم صدای میانی"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:83
+#: ../data/config/schema.xml:275
 msgid "How much voice is amplified compared to the music."
 msgstr "چقدر صدا در مقایسه با موسیقی بلند شده."
 
-#: /tmp/xml2gettext.KLMLVC3iaY:84
+#: ../data/config/schema.xml:278
+msgid "Suppress center channel"
+msgstr ""
+
+#: ../data/config/schema.xml:279
+msgid "Suppress audio of center channel (e.g. vocals)."
+msgstr ""
+
+#: ../data/config/schema.xml:290
 msgid "Song folders"
 msgstr "پوشه آهنگ ها"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:85
+#: ../data/config/schema.xml:291
 msgid ""
 "Where to recursively look for songs. DATADIR at the beginning means all "
 "Performous data folders."
@@ -1110,11 +1156,11 @@ msgstr ""
 "جایی که به صورت بازگشتی به دنبال آهنگ میگردد. DATADIR در آغاز به معنی تمامی "
 "پوشه های پرفورمیوس است."
 
-#: /tmp/xml2gettext.KLMLVC3iaY:86
+#: ../data/config/schema.xml:294
 msgid "Base folders for data"
 msgstr "پوشه اصلی اطلاعات"
 
-#: /tmp/xml2gettext.KLMLVC3iaY:87
+#: ../data/config/schema.xml:295
 msgid ""
 "System defaults are included automatically. Additional paths can be added "
 "here."
