@@ -11,7 +11,7 @@
 using namespace SongParserUtil;
 
 /// 'Magick' to check if this file looks like correct format
-bool SongParser::xmlCheck(std::vector<char> const& data) const {
+bool SongParser::xmlCheck(std::string const& data) const {
 	static const std::string header = "<?";
 	return std::equal(header.begin(), header.end(), data.begin());
 }
@@ -33,18 +33,13 @@ struct SSDom: public xmlpp::DomParser {
 	}
 	void load(std::string const& buf) {
 		set_substitute_entities();
-		try {
-			/*
-			struct DisableLogger {
-				DisableLogger() { disableXMLLogger(); }
-				~DisableLogger() { enableXMLLogger(); }
-			} disabler;
-			*/
-			parse_memory(buf);
-		} catch (...) {
-			std::string buf2 = Glib::convert(buf, "UTF-8", "ISO-8859-1"); // Convert to UTF-8
-			parse_memory(buf2);
-		}
+		/*
+		struct DisableLogger {
+			DisableLogger() { disableXMLLogger(); }
+			~DisableLogger() { enableXMLLogger(); }
+		} disabler;
+		*/
+		parse_memory(buf);
 		nsmap["ss"] = get_document()->get_root_node()->get_namespace_uri();
 	}
 	bool find(xmlpp::Element const& elem, std::string xpath, xmlpp::NodeSet& n) {
