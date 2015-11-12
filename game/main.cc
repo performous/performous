@@ -404,7 +404,6 @@ int main(int argc, char** argv) try {
 
 void outputOptionalFeatureStatus() {
 	std::clog << "core/notice: " PACKAGE " " VERSION " starting..."
-	  << "\n  Build date:           " __DATE__
 	  << "\n  Internationalization: " << (Gettext::enabled() ? "Enabled" : "Disabled")
 	  << "\n  MIDI Hardware I/O:    " << (input::Hardware::midiEnabled() ? "Enabled" : "Disabled")
 	  << "\n  Webcam support:       " << (Webcam::enabled() ? "Enabled" : "Disabled")
