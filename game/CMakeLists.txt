@@ -73,7 +73,7 @@ include_directories(${LibEpoxy_INCLUDE_DIRS})
 list(APPEND LIBS ${LibEpoxy_LIBRARIES})
 
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat AVResample SWScale Z Jpeg Png PortAudio Fontconfig JSONCPP)
+foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat AVResample SWScale Z Jpeg Png PortAudio Fontconfig JSONCPP Cppnetlib Crypto Ssl)
 	find_package(${lib} REQUIRED)
 	message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
 	include_directories(${${lib}_INCLUDE_DIRS})

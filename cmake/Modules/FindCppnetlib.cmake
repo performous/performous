@@ -11,7 +11,6 @@
 include(LibFindMacros)
 
 #Use find_package to detect other libraries that the library depends on
-libfind_package(Cppnetlib Boost)
 libfind_package(Cppnetlib Crypto)
 libfind_package(Cppnetlib Ssl)
 
