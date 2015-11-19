@@ -9,22 +9,6 @@
 # http://www.cmake.org/Wiki/CMake:How_To_Find_Libraries
 
 include(LibFindMacros)
-
-# Use pkg-config to get hints about paths
-libfind_pkg_check_modules(Ssl_PKGCONF openssl)
-
-# Include dir
-find_path(Ssl_INCLUDE_DIR
-  NAMES openssl/ssl.h
-  PATHS ${Ssl_PKGCONF_INCLUDE_DIRS}# /usr/include/
-)
-
-# Finally the library itself
-find_library(Ssl_LIBRARY
-  NAMES ssl
-  PATHS ${Ssl_PKGCONF_LIBRARY_DIRS}
-)
-
-set(Ssl_PROCESS_INCLUDES Ssl_INCLUDE_DIR)
-set(Ssl_PROCESS_LIBS Ssl_LIBRARY)
+libfind_pkg_detect(Ssl libssl FIND_PATH openssl/ssl.h FIND_LIBRARY ssl)
+set(Ssl_VERSION ${Ssl_PKGCONF_VERSION})
 libfind_process(Ssl)
