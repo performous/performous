@@ -72,7 +72,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 		if(width < 200) width = 640; //FIXME: window should have a minimum size
 		if(height < 200) height = 480;
 		screen = SDL_CreateWindow(PACKAGE " " VERSION, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height,
-			(m_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0) | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+			(m_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0) | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL);
 		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
 		SDL_GL_CreateContext(screen);
 
@@ -268,7 +268,7 @@ void Window::view(unsigned num) {
 	// Setup views (with black bars for cropping)
 	int windowWidth;
 	int windowHeight;
-	SDL_GetWindowSize(screen, &windowWidth, &windowHeight);
+	SDL_GL_GetDrawableSize(screen, &windowWidth, &windowHeight);
 	double vx = 0.5f * (windowWidth - s_width);
 	double vy = 0.5f * (windowHeight - s_height);
 	double vw = s_width, vh = s_height;
@@ -301,15 +301,16 @@ void Window::swap() {
 void Window::setFullscreen(bool _fs) {
 	if (m_fullscreen == _fs) return;
 	m_fullscreen = _fs;
-	SDL_SetWindowFullscreen(screen, (m_fullscreen? SDL_WINDOW_FULLSCREEN_DESKTOP : 0 ));
+	SDL_SetWindowFullscreen(screen, (m_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0 ));
 	resize();
 }
 
 void Window::resize() {
 	int windowWidth;
 	int windowHeight;
-	SDL_GetWindowSize(screen, &windowWidth, &windowHeight);
-	glViewport(0,0,windowWidth,windowHeight);
+	SDL_GL_GetDrawableSize(screen, &windowWidth, &windowHeight);
+	//glViewport(0, 0, windowWidth, windowHeight);
+	std::clog << "video/info: Drawable size " << windowWidth << "x" << windowHeight << ", fs=" << m_fullscreen << std::endl; 
 	s_width = windowWidth;
 	s_height = windowHeight;
 	// Enforce aspect ratio limits
