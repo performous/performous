@@ -348,7 +348,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 	double time = m_audio.getPosition();
 	SDL_Scancode key = event.key.keysym.scancode;
 	// Ctrl combinations that can be used while performing (not when score dialog is displayed)
-	if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_CTRL) && !m_score_window.get()) {
+	if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_LCTRL) && !m_score_window.get()) {
 		if (key == SDL_SCANCODE_C) {
 			m_audio.toggleCenterChannelSuppressor();
 			++config["audio/suppress_center_channel"];
@@ -373,12 +373,12 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			if (m_cam) { dispInFlash(++config["graphic/webcam"]); m_cam->pause(!config["graphic/webcam"].b()); }
 		}
 		// Latency settings
-		if (key == SDL_SCANCODE_F1) dispInFlash(--config["audio/video_delay"]);
-		if (key == SDL_SCANCODE_F2) dispInFlash(++config["audio/video_delay"]);
-		if (key == SDL_SCANCODE_F3) dispInFlash(--config["audio/round-trip"]);
-		if (key == SDL_SCANCODE_F4) dispInFlash(++config["audio/round-trip"]);
-		if (key == SDL_SCANCODE_F5) dispInFlash(--config["audio/controller_delay"]);
-		if (key == SDL_SCANCODE_F6) dispInFlash(++config["audio/controller_delay"]);
+		if (key == SDL_SCANCODE_COMMA) dispInFlash(--config["audio/video_delay"]);
+		if (key == SDL_SCANCODE_PERIOD) dispInFlash(++config["audio/video_delay"]);
+		if (key == SDL_SCANCODE_MINUS) dispInFlash(--config["audio/round-trip"]);
+		if (key == SDL_SCANCODE_EQUALS) dispInFlash(++config["audio/round-trip"]);
+		if (key == SDL_SCANCODE_LEFTBRACKET) dispInFlash(--config["audio/controller_delay"]);
+		if (key == SDL_SCANCODE_RIGHTBRACKET) dispInFlash(++config["audio/controller_delay"]);
 		bool seekback = false;
 
 		if (m_song->danceTracks.empty()) { // Seeking backwards is currently not permitted for dance songs

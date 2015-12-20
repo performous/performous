@@ -164,7 +164,6 @@ update_vars(){
 # internal use by generate_overview
 overview_wikify(){
 	I_LANG="$(echo "$1" | sed -re 's:lang/([a-zA-Z_]+)\.po:\1:')"
-	YYYY_MM_DD="$(LC_ALL=C git log -1 --format="%ar" lang/$I_LANG.po)"
 	LONG_LANG="$(get_full_language_name "$I_LANG")"
 	[[ $? -eq 0 ]] || die "$LONG_LANG"
 	update_vars "$I_LANG"
@@ -172,17 +171,18 @@ overview_wikify(){
 	# find overview translation comments (if any)
 	COMMENT="$(get_translator_comment $I_LANG)"
 	PC_COLOR=$(colorize $TPC)
+	GIT_URL="$(current_gitweb_uri "$1")"
 
 	echo "|-"
-	echo "| [[Translations ($LONG_LANG)|$LONG_LANG ($I_LANG)]] || $YYYY_MM_DD || ${PC_COLOR} ${TPC}&nbsp;% || $TOT || $FUZ || ${UNT} || '''$(( $TOT + $UNT + $FUZ ))''' || [$(current_gitweb_uri "$1") $I_LANG.po] || ${COMMENT}"
+	echo "| [[Translations ($LONG_LANG)|$LONG_LANG ($I_LANG)]] || ${PC_COLOR} ${TPC}&nbsp;% || $TOT || $FUZ || ${UNT} || '''$(( $TOT + $UNT + $FUZ ))''' || [$GIT_URL $I_LANG.po] || ${COMMENT}"
 }
 
 generate_overview(){
 	cat <<EOH
 {| border="1" cellspacing="0" cellpadding="5"
-| rowspan="2" | '''Language'''                || rowspan="2" | '''Last update''' || colspan="5" align="center" | '''Progress''' || rowspan="2" | '''Current version''' || rowspan="2" | '''Comment'''
+| rowspan="2" | '''Language'''                || colspan="5" align="center" | '''Progress''' || rowspan="2" | '''Current version''' || rowspan="2" | '''Comment'''
 |-
-|                                                                       '''%''' || '''Translated''' || '''Fuzzy''' || '''Untranslated''' || '''Total'''
+|                                                '''%''' || '''Translated''' || '''Fuzzy''' || '''Untranslated''' || '''Total'''
 EOH
 	for a in $(ls -1 lang/*po) ; do
 		overview_wikify "$a"
@@ -193,7 +193,7 @@ EOH
 }
 
 generate_infoboxes(){
-	I_LANG="$(echo "$1" | sed -re 's:lang/([a-z]+)\.po:\1:')"
+	I_LANG="$(echo "$1" | sed -re 's:lang/([a-zA-Z_]+)\.po:\1:')"
 	YYYY_MM_DD="$(LC_ALL=C git log -1 --format="%ci" lang/$I_LANG.po)"
 
 	OUT="$( LC_ALL=C msgfmt --statistics "$1" 2>&1 )"

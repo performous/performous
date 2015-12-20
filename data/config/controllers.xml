@@ -193,6 +193,27 @@
 				<axis hw="1" negative="pick_up" positive="pick_down" />
 			</mapping>
 		</controller>
+		<controller type="guitar" name="GUITAR_ROCKBAND_WII">
+			<description>RockBand Wii guitar</description>
+			<device regex="Harmonix Guitar Controller for Nintendo Wii" />
+			<mapping>
+				<button hw="0" map="blue" />
+				<button hw="1" map="green" />
+				<button hw="2" map="red" />
+				<button hw="3" map="yellow" />
+				<button hw="4" map="orange" />
+				<button hw="5" map="godmode" />
+				<button hw="8" map="cancel" />
+				<button hw="9" map="start" />
+				<button hw="6" map="godmode" />
+				<button hw="12" />
+				<axis hw="2" map="whammy" />
+				<axis hw="3" />
+				<axis hw="4" negative="left" positive="right" />
+				<axis hw="5" negative="pick_up" positive="pick_down" />
+				<hat hw="0" up="pick_up" down="pick_down" left="left" right="right" />
+        		</mapping>
+    		</controller>
 		<!-- Not managed
 		<controller type="guitar" name="GUITAR_PRO_PS3">
 			<description>Rock Band Pro Guitar for PS3</description>

@@ -116,7 +116,7 @@ void FFmpeg::open() {
 		height = cc->height;
 		m_swsContext = sws_getContext(
 		  cc->width, cc->height, cc->pix_fmt,
-		  width, height, PIX_FMT_RGB24,
+		  width, height, AV_PIX_FMT_RGB24,
 		  SWS_POINT, nullptr, nullptr, nullptr);
 		break;
 	default:  // Should never be reached but avoids compile warnings

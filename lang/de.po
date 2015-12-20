@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-28 20:30+0100\n"
-"PO-Revision-Date: \n"
+"POT-Creation-Date: 2015-11-05 19:35+0100\n"
+"PO-Revision-Date: 2015-11-05 19:40:04+0100\n"
 "Last-Translator: Tobias Gruetzmacher <tobias-git@23.gs>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -12,9 +12,45 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-Basepath: .\n"
-"X-Generator: Poedit 1.6.10\n"
+"X-Generator: Poedit 1.8.6\n"
 "X-Poedit-SearchPath-0: ../game\n"
 "X-Poedit-SearchPath-1: ../data\n"
+
+#: ../game/song.hh:25
+msgid "Guitar"
+msgstr "Gitarre"
+
+#: ../game/song.hh:25
+msgid "Coop guitar"
+msgstr "Coop Gitarre"
+
+#: ../game/song.hh:25
+msgid "Rhythm guitar"
+msgstr "Rhythmusgitarre"
+
+#: ../game/song.hh:25
+msgid "Bass"
+msgstr "Bass"
+
+#: ../game/song.hh:25
+msgid "Drums"
+msgstr "Schlagzeug"
+
+#: ../game/song.hh:25
+msgid "Vocals"
+msgstr "Gesang"
+
+#: ../game/song.hh:25
+msgid "Harmonic 1"
+msgstr "Harmonic 1"
+
+#: ../game/song.hh:25
+msgid "Harmonic 2"
+msgstr "Harmonic 2"
+
+#: ../game/song.hh:25
+msgid "Harmonic 3"
+msgstr "Harmonic 3"
 
 #: ../game/configuration.cc:112
 msgid "Enabled"
@@ -184,7 +220,7 @@ msgstr "Screenshot gemacht!"
 msgid "Screenshot failed!"
 msgstr "Screenshot schlug fehl!"
 
-#: ../game/screen_audiodevices.cc:50
+#: ../game/screen_audiodevices.cc:54
 msgid ""
 "It seems you have some manual configurations\n"
 "incompatible with this user interface.\n"
@@ -198,11 +234,11 @@ msgstr ""
 "existierenden Audio-Geräte-Einstellungen überschrieben.\n"
 "Deine anderen Änderungen werden auch gespeichert."
 
-#: ../game/screen_audiodevices.cc:109
+#: ../game/screen_audiodevices.cc:113
 msgid "- Unassigned -"
 msgstr "- Nicht zugeordnet -"
 
-#: ../game/screen_audiodevices.cc:130
+#: ../game/screen_audiodevices.cc:134
 msgid ""
 "Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select "
 "to cancel. Ctrl + R to reset defaults"
@@ -211,7 +247,7 @@ msgstr ""
 "testen oder Esc/Select zum Abbrechen. Ctrl + R, um auf Standard "
 "zurückzusetzen"
 
-#: ../game/screen_audiodevices.cc:135
+#: ../game/screen_audiodevices.cc:139
 msgid ""
 "For advanced device configuration, use command line parameter --audio (use --"
 "audiohelp for details)."
@@ -219,7 +255,7 @@ msgstr ""
 "Für erweiterte Gerätekonfiguration, benutze den Kommandozeilenparameter --"
 "audio (benutze --audiohelp für Details)."
 
-#: ../game/screen_audiodevices.cc:183
+#: ../game/screen_audiodevices.cc:187
 msgid "Some devices failed to open!"
 msgstr "Einige Geräte konnten nicht geöffnet werden!"
 
@@ -334,7 +370,7 @@ msgstr "Suchtext:"
 msgid "Initializing webcam..."
 msgstr "Initialisiere Webcam..."
 
-#: ../game/screen_playlist.cc:166 ../game/screen_playlist.cc:308
+#: ../game/screen_playlist.cc:166 ../game/screen_playlist.cc:309
 msgid "Continue"
 msgstr "Fortsetzen"
 
@@ -350,7 +386,7 @@ msgstr "Lieder hinzufügen"
 msgid "Open the song browser to add more songs"
 msgstr "Öffne den Liederbrowser, um mehr Lieder hinzuzufügen"
 
-#: ../game/screen_playlist.cc:175 ../game/screen_songs.cc:519
+#: ../game/screen_playlist.cc:175 ../game/screen_songs.cc:520
 msgid "Shuffle"
 msgstr "Mischen"
 
@@ -366,61 +402,61 @@ msgstr "Leeren und beenden"
 msgid "Remove all the songs from the list"
 msgstr "Alle Lieder aus der Liste entfernen"
 
-#: ../game/screen_playlist.cc:187 ../game/screen_playlist.cc:349
-#: ../game/screen_songs.cc:532
+#: ../game/screen_playlist.cc:187 ../game/screen_playlist.cc:350
+#: ../game/screen_songs.cc:533
 msgid "Back"
 msgstr "Zurück"
 
-#: ../game/screen_playlist.cc:187 ../game/screen_playlist.cc:349
+#: ../game/screen_playlist.cc:187 ../game/screen_playlist.cc:350
 msgid "Back to playlist viewer"
 msgstr "Zurück zur Abspiellisten-Ansicht"
 
-#: ../game/screen_playlist.cc:293
+#: ../game/screen_playlist.cc:294
 msgid "Press enter to view song options"
 msgstr "Drücke Enter, um Liedoptionen anzuzeigen"
 
-#: ../game/screen_playlist.cc:300
+#: ../game/screen_playlist.cc:301
 msgid "View more options"
 msgstr "Mehr Optionen anzeigen"
 
-#: ../game/screen_playlist.cc:300
+#: ../game/screen_playlist.cc:301
 msgid "View general playlist settings"
 msgstr "Allgemeine Abspiellisten-Einstellungen anzeigen"
 
-#: ../game/screen_playlist.cc:308
+#: ../game/screen_playlist.cc:309
 msgid "Play first"
 msgstr "Zuerst abspielen"
 
-#: ../game/screen_playlist.cc:310
+#: ../game/screen_playlist.cc:311
 msgid "Ignore the playlist's order and play this song first"
 msgstr ""
 "Ignoriere die Reihenfolge der Abspielliste und spiele dieses Lied als erstes"
 
-#: ../game/screen_playlist.cc:311
+#: ../game/screen_playlist.cc:312
 msgid "Start the song already!"
 msgstr "Spiel das Lied endlich ab!"
 
-#: ../game/screen_playlist.cc:320
+#: ../game/screen_playlist.cc:321
 msgid "Remove"
 msgstr "Entfernen"
 
-#: ../game/screen_playlist.cc:320
+#: ../game/screen_playlist.cc:321
 msgid "Remove this song from the list"
 msgstr "Entferne das Lied von der Abspielliste"
 
-#: ../game/screen_playlist.cc:332
+#: ../game/screen_playlist.cc:333
 msgid "Move up"
 msgstr "Hochschieben"
 
-#: ../game/screen_playlist.cc:332
+#: ../game/screen_playlist.cc:333
 msgid "Move this song up the list"
 msgstr "Schiebe dieses Lied auf der Liste nach oben"
 
-#: ../game/screen_playlist.cc:342
+#: ../game/screen_playlist.cc:343
 msgid "Move Down"
 msgstr "Runterschieben"
 
-#: ../game/screen_playlist.cc:342
+#: ../game/screen_playlist.cc:343
 msgid "Move this song down the list"
 msgstr "Schiebe dieses Lied auf der Liste nach unten"
 
@@ -496,61 +532,61 @@ msgstr "Drücke LEER für Schlagzeug!"
 msgid "KICK to join!"
 msgstr "KICK um teilzunehmen!"
 
-#: ../game/screen_sing.cc:512
+#: ../game/screen_sing.cc:517
 msgid "   ENTER to skip instrumental break"
 msgstr "ENTER um Vorbereitung abzubrechen"
 
-#: ../game/screen_sing.cc:516 ../game/screen_sing.cc:530
+#: ../game/screen_sing.cc:521 ../game/screen_sing.cc:535
 msgid "   Autoplay enabled"
 msgstr "   Automatische Wiedergabe aktiviert"
 
-#: ../game/screen_sing.cc:519 ../game/screen_sing.cc:527
+#: ../game/screen_sing.cc:524 ../game/screen_sing.cc:532
 msgid "   Remember to wait for grading!"
 msgstr "Bitte Warte auf die Bewertung!"
 
-#: ../game/screen_sing.cc:656
+#: ../game/screen_sing.cc:662
 msgid "No player!"
 msgstr "Keine Spieler!"
 
-#: ../game/screen_sing.cc:663
+#: ../game/screen_sing.cc:669
 msgid "Hit singer"
 msgstr "Hitsänger"
 
-#: ../game/screen_sing.cc:664
+#: ../game/screen_sing.cc:670
 msgid "Lead singer"
 msgstr "Leadsänger"
 
-#: ../game/screen_sing.cc:665 ../game/screen_sing.cc:671
-#: ../game/screen_sing.cc:677
+#: ../game/screen_sing.cc:671 ../game/screen_sing.cc:677
+#: ../game/screen_sing.cc:683
 msgid "Rising star"
 msgstr "Nachwuchskünstler"
 
-#: ../game/screen_sing.cc:666 ../game/screen_sing.cc:672
-#: ../game/screen_sing.cc:678
+#: ../game/screen_sing.cc:672 ../game/screen_sing.cc:678
+#: ../game/screen_sing.cc:684
 msgid "Amateur"
 msgstr "Amateur"
 
-#: ../game/screen_sing.cc:667 ../game/screen_sing.cc:679
+#: ../game/screen_sing.cc:673 ../game/screen_sing.cc:685
 msgid "Tone deaf"
 msgstr "Taub"
 
-#: ../game/screen_sing.cc:669
+#: ../game/screen_sing.cc:675
 msgid "Maniac"
 msgstr "Wahnsinniger"
 
-#: ../game/screen_sing.cc:670
+#: ../game/screen_sing.cc:676
 msgid "Hoofer"
 msgstr "Profi-Tänzer"
 
-#: ../game/screen_sing.cc:673
+#: ../game/screen_sing.cc:679
 msgid "Loser"
 msgstr "Verlierer"
 
-#: ../game/screen_sing.cc:675
+#: ../game/screen_sing.cc:681
 msgid "Virtuoso"
 msgstr "Virtuose"
 
-#: ../game/screen_sing.cc:676
+#: ../game/screen_sing.cc:682
 msgid "Rocker"
 msgstr "Rocker"
 
@@ -606,15 +642,15 @@ msgstr "Eine Abspielliste mit diesem Lied anlegen!"
 msgid "open the playlist menu"
 msgstr "Abspiellisten-Menü öffnen"
 
-#: ../game/screen_songs.cc:512
+#: ../game/screen_songs.cc:513
 msgid "Play"
 msgstr "Abspielen"
 
-#: ../game/screen_songs.cc:525
+#: ../game/screen_songs.cc:526
 msgid "View playlist"
 msgstr "Abspielliste anzeigen"
 
-#: ../game/screen_songs.cc:526
+#: ../game/screen_songs.cc:527
 msgid "Clear playlist"
 msgstr "Abspielliste leeren"
 
@@ -677,42 +713,6 @@ msgstr "nach Dateipfad sortiert"
 #: ../game/songs.cc:231
 msgid "sorted by language"
 msgstr "nach Sprache sortiert"
-
-#: ../game/song.hh:24
-msgid "Guitar"
-msgstr "Gitarre"
-
-#: ../game/song.hh:24
-msgid "Coop guitar"
-msgstr "Coop Gitarre"
-
-#: ../game/song.hh:24
-msgid "Rhythm guitar"
-msgstr "Rhythmusgitarre"
-
-#: ../game/song.hh:24
-msgid "Bass"
-msgstr "Bass"
-
-#: ../game/song.hh:24
-msgid "Drums"
-msgstr "Schlagzeug"
-
-#: ../game/song.hh:24
-msgid "Vocals"
-msgstr "Gesang"
-
-#: ../game/song.hh:24
-msgid "Harmonic 1"
-msgstr "Harmonic 1"
-
-#: ../game/song.hh:24
-msgid "Harmonic 2"
-msgstr "Harmonic 2"
-
-#: ../game/song.hh:24
-msgid "Harmonic 3"
-msgstr "Harmonic 3"
 
 #: ../data/config/schema.xml:19
 msgid "Game"
@@ -1140,11 +1140,19 @@ msgstr "Durchleitungslautstärkenverhältnis"
 msgid "How much voice is amplified compared to the music."
 msgstr "Wie stark die Stimmen im Vergleich zur Musik verstärkt werden."
 
-#: ../data/config/schema.xml:286
+#: ../data/config/schema.xml:278
+msgid "Suppress center channel"
+msgstr "Center-Kanal unterdrücken"
+
+#: ../data/config/schema.xml:279
+msgid "Suppress audio of center channel (e.g. vocals)."
+msgstr "Unterdrückt die Mitte des Stereo-Signals (normalerweise Stimmen)."
+
+#: ../data/config/schema.xml:290
 msgid "Song folders"
 msgstr "Liederordner"
 
-#: ../data/config/schema.xml:287
+#: ../data/config/schema.xml:291
 msgid ""
 "Where to recursively look for songs. DATADIR at the beginning means all "
 "Performous data folders."
@@ -1153,11 +1161,11 @@ msgstr ""
 "durchsucht. Die Verwendung von DATADIR bezeichnet hierbei den Datenordner "
 "von Performous."
 
-#: ../data/config/schema.xml:290
+#: ../data/config/schema.xml:294
 msgid "Base folders for data"
 msgstr "Ordner für Daten"
 
-#: ../data/config/schema.xml:291
+#: ../data/config/schema.xml:295
 msgid ""
 "System defaults are included automatically. Additional paths can be added "
 "here."

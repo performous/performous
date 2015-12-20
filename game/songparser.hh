@@ -38,21 +38,21 @@ class SongParser {
 	double m_gap;
 	double m_bpm;
 
-	bool txtCheck(std::vector<char> const& data) const;
+	bool txtCheck(std::string const& data) const;
 	void txtParseHeader();
 	void txtParse();
 	bool txtParseField(std::string const& line);
 	bool txtParseNote(std::string line);
-	bool iniCheck(std::vector<char> const& data) const;
+	bool iniCheck(std::string const& data) const;
 	void iniParseHeader();
-	bool midCheck(std::vector<char> const& data) const;
+	bool midCheck(std::string const& data) const;
 	void midParseHeader();
 	void midParse();
-	bool xmlCheck(std::vector<char> const& data) const;
+	bool xmlCheck(std::string const& data) const;
 	void xmlParseHeader();
 	void xmlParse();
 	Note xmlParseNote(xmlpp::Element const& noteNode, unsigned& ts);
-	bool smCheck(std::vector<char> const& data) const;
+	bool smCheck(std::string const& data) const;
 	void smParseHeader();
 	void smParse();
 	bool smParseField(std::string line);

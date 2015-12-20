@@ -43,7 +43,7 @@ namespace input {
 			}
 			// Convert SDL event into controller Event
 			event.source = SourceId(SOURCETYPE_KEYBOARD, 0);  // FIXME! cmake the device ID zero because in SDL2 it ain't zero!!
-			event.hw = sdlEv.key.keysym.sym;
+			event.hw = sdlEv.key.keysym.scancode;
 			event.value = (sdlEv.type == SDL_KEYDOWN ? 1.0 : 0.0);
 			// Get the modifier keys that we actually use as modifiers
 			unsigned mod = sdlEv.key.keysym.mod & (KMOD_LCTRL | KMOD_LALT);
@@ -57,54 +57,54 @@ namespace input {
 			unsigned button = 0;
 			switch (event.hw) {
 				// Guitar on keyboard
-				case SDLK_BACKSPACE: button = GUITAR_WHAMMY; goto guitar_process;
-				case SDLK_RCTRL: button = GUITAR_GODMODE; goto guitar_process;
-				case SDLK_RSHIFT: button = GUITAR_PICK_UP; goto guitar_process;
-				case SDLK_RETURN: case SDLK_KP_ENTER: button = GUITAR_PICK_DOWN; goto guitar_process;
-				case SDLK_F5: case SDLK_5: case SDLK_b: button++;
-				case SDLK_F4: case SDLK_4: case SDLK_v: button++;
-				case SDLK_F3: case SDLK_3: case SDLK_c: button++;
-				case SDLK_F2: case SDLK_2: case SDLK_x: button++;
-				case SDLK_F1: case SDLK_1: case SDLK_z: case SDLK_w: case SDLK_y:  // Support also French and German layouts
+				case SDL_SCANCODE_BACKSPACE: button = GUITAR_WHAMMY; goto guitar_process;
+				case SDL_SCANCODE_RCTRL: case SDL_SCANCODE_RALT: button = GUITAR_GODMODE; goto guitar_process;
+				case SDL_SCANCODE_RSHIFT: button = GUITAR_PICK_UP; goto guitar_process;
+				case SDL_SCANCODE_RETURN: case SDL_SCANCODE_KP_ENTER: button = GUITAR_PICK_DOWN; goto guitar_process;
+				case SDL_SCANCODE_F5: case SDL_SCANCODE_5: case SDL_SCANCODE_B: button++;
+				case SDL_SCANCODE_F4: case SDL_SCANCODE_4: case SDL_SCANCODE_V: button++;
+				case SDL_SCANCODE_F3: case SDL_SCANCODE_3: case SDL_SCANCODE_C: button++;
+				case SDL_SCANCODE_F2: case SDL_SCANCODE_2: case SDL_SCANCODE_X: button++;
+				case SDL_SCANCODE_F1: case SDL_SCANCODE_1: case SDL_SCANCODE_Z:
 				guitar_process:
 					if (!m_guitar) return;
 					event.devType = DEVTYPE_GUITAR;
 					break;
 
 				// Keytar on keyboard
-				case SDLK_F12: button++;
-				case SDLK_F11: button++;
-				case SDLK_F10: button++;
-				case SDLK_F9: button++;
-				case SDLK_F8: button++;
-				case SDLK_F7:
+				case SDL_SCANCODE_F12: button++;
+				case SDL_SCANCODE_F11: button++;
+				case SDL_SCANCODE_F10: button++;
+				case SDL_SCANCODE_F9: button++;
+				case SDL_SCANCODE_F8: button++;
+				case SDL_SCANCODE_F7:
 					if (!m_keytar) return;
 					event.devType = DEVTYPE_KEYTAR;
 					break;
 
 				// Drums on keyboard
-				case SDLK_8: button = DRUMS_YELLOW_CYMBAL; goto drum_process;
-				case SDLK_9: button = DRUMS_GREEN_CYMBAL; goto drum_process;
-				case SDLK_0: button = DRUMS_BLUE_CYMBAL; goto drum_process;
-				case SDLK_u: button = DRUMS_RED; goto drum_process;
-				case SDLK_i: button = DRUMS_YELLOW_TOM; goto drum_process;
-				case SDLK_o: button = DRUMS_BLUE_TOM; goto drum_process;
-				case SDLK_p: button = DRUMS_GREEN_TOM; goto drum_process;
-				case SDLK_SPACE:
+				case SDL_SCANCODE_8: button = DRUMS_YELLOW_CYMBAL; goto drum_process;
+				case SDL_SCANCODE_9: button = DRUMS_GREEN_CYMBAL; goto drum_process;
+				case SDL_SCANCODE_0: button = DRUMS_BLUE_CYMBAL; goto drum_process;
+				case SDL_SCANCODE_U: button = DRUMS_RED; goto drum_process;
+				case SDL_SCANCODE_I: button = DRUMS_YELLOW_TOM; goto drum_process;
+				case SDL_SCANCODE_O: button = DRUMS_BLUE_TOM; goto drum_process;
+				case SDL_SCANCODE_P: button = DRUMS_GREEN_TOM; goto drum_process;
+				case SDL_SCANCODE_SPACE:
 					drum_process:
 					if (!m_drumkit) return;
 					event.devType = DEVTYPE_DRUMS;
 					break;
 
 				// Dance on keypad
-				case SDLK_KP_9: button++;
-				case SDLK_KP_7: button++;
-				case SDLK_KP_3: button++;
-				case SDLK_KP_1: button++;
-				case SDLK_KP_6: case SDLK_RIGHT: button++;
-				case SDLK_KP_8: case SDLK_UP: button++;
-				case SDLK_KP_2: case SDLK_DOWN: case SDLK_KP_5: button++;
-				case SDLK_KP_4: case SDLK_LEFT:
+				case SDL_SCANCODE_KP_9: button++;
+				case SDL_SCANCODE_KP_7: button++;
+				case SDL_SCANCODE_KP_3: button++;
+				case SDL_SCANCODE_KP_1: button++;
+				case SDL_SCANCODE_KP_6: case SDL_SCANCODE_RIGHT: button++;
+				case SDL_SCANCODE_KP_8: case SDL_SCANCODE_UP: button++;
+				case SDL_SCANCODE_KP_2: case SDL_SCANCODE_DOWN: case SDL_SCANCODE_KP_5: button++;
+				case SDL_SCANCODE_KP_4: case SDL_SCANCODE_LEFT:
 					if (!m_dancepad) return;
 					event.devType = DEVTYPE_DANCEPAD;
 					break;
