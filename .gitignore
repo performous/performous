@@ -8,3 +8,6 @@ dylibbundler.log
 performous-app-build.sh
 osx-utils/out
 osx-utils/Performous.dmg
+osx-utils/CMakeCache.txt
+CMakeCache.txt
+CMakeFiles

@@ -35,7 +35,7 @@ mkdir build
 cd build
 
 cmake -DCMAKE_INSTALL_PREFIX=$TEMPDIR -DENABLE_TOOLS=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=1 -DFreetype_INCLUDE_DIR=/opt/local/include/freetype2 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.7 -DFontconfig_INCLUDE_DIR=/opt/local/include/fontconfig -DPng_INCLUDE_DIR=/opt/local/include/libpng -DAVCodec_INCLUDE_DIR=/opt/local/include/libavcodec -DAVFormat_INCLUDE_DIR=/opt/local/include/libavformat -DSWScale_INCLUDE_DIR=/opt/local/include/libswscale -DFreetype_INCLUDE_DIR=/opt/local/include/freetype2/ -DLibXML2_LIBRARY=/opt/local/lib/libxml2.dylib -DLibXML2_INCLUDE_DIR=/opt/local/include/libxml2 -DLibXML++Config_INCLUDE_DIR=/opt/local/lib/libxml++-2.6/include -DGettext_LIBRARY=/opt/local/lib/libgettextlib.dylib  -DGettext_INCLUDE_DIR=/opt/local/include/ -DGlibmmConfig_INCLUDE_DIR=/opt/local/lib/glibmm-2.4/include -DGlibConfig_INCLUDE_DIR=/opt/local/lib/glib-2.0/include -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -DCMAKE_C_FLAGS="-arch x86_64" -DSHARE_INSTALL=Resources -DLOCALE_DIR=Resources/Locales -DCMAKE_CXX_FLAGS="-Wno-unused-function -Wno-unused-local-typedefs -Wno-ignored-qualifiers -stdlib=libc++ -lc++ -lc++abi -arch x86_64 -L/opt/local/lib -lintl -Wl,-framework -Wl,CoreFoundation,-headerpad_max_install_names" -DCMAKE_EXE_LINKER_FLAGS="-ldl -stdlib=libc++ -lc++ -lc++abi -arch x86_64" -DCMAKE_MODULE_LINKER_FLAGS="-ldl -stdlib=libc++ -lc++ -lc++abi -arch x86_64" -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_SHARED_LINKER_FLAGS="-ldl -stdlib=libc++ -lc++ -lc++abi -arch x86_64" -DCMAKE_STATIC_LINKER_FLAGS="-ldl -stdlib=libc++ -lc++ -lc++abi -arch x86_64" ../..
-make install # You can change the -j value in order to spawn more build threads.
+make -j8 install # You can change the -j value in order to spawn more build threads.
 
 # then create the rest of the app bundle
 
@@ -56,18 +56,18 @@ do
 if [ -f "$BINDIR/$i" ]; then dylibbundler -of -b -x "$BINDIR/$i" -d "$LIBDIR" -p @executable_path/../Resources/lib/; fi
 done
 
-cp -av /opt/local/lib/pango $LIBDIR/
+# cp -av /opt/local/lib/pango $LIBDIR/ Pango modules are toast as of 1.38 and onwards.
 
 OLDPREFIX=/opt/local
 NEWPREFIX=$LIBDIR
 
 mkdir -p $ETCDIR/fonts
 cp -av /opt/local/etc/fonts $ETCDIR
-cp -av /opt/local/etc/pango $ETCDIR
-cd $ETCDIR/pango
+# cp -av /opt/local/etc/pango $ETCDIR pangorc doesn't exist anymore either.
+# cd $ETCDIR/pango
 
-sed -i '' -e "s|$OLDPREFIX\/etc\/pango\/|\.\.\/Resources\/etc\/pango\/|g" pangorc
-sed -i '' -e "s|$OLDPREFIX|\.\.\/\.\.\/\.\.\/\.\.|g" pango.modules
+# sed -i '' -e "s|$OLDPREFIX\/etc\/pango\/|\.\.\/Resources\/etc\/pango\/|g" pangorc
+# sed -i '' -e "s|$OLDPREFIX|\.\.\/\.\.\/\.\.\/\.\.|g" pango.modules
 
 cd $ETCDIR/fonts
 sed -i '' -e 's|\/opt\/local/share|\.\.\/\.\.\/\.\.\/Resources|g' fonts.conf
@@ -75,14 +75,14 @@ sed -i '' -e 's|\/opt\/local/var/cache|\~\/\.cache|g' fonts.conf
 sed -i '' -e 's|\<\!-- Font directory list --\>|\<\!-- Font directory list --\>\
     <dir>\.\.\/\.\.\/pixmaps</dir>|g' fonts.conf
 
-cd $LIBDIR/pango/
-cd `find . -type d -maxdepth 1 -mindepth 1`
-cd `find . -type d -maxdepth 1 -mindepth 1` 
+# cd $LIBDIR/pango/
+# cd `find . -type d -maxdepth 1 -mindepth 1`
+# cd `find . -type d -maxdepth 1 -mindepth 1` 
 
-for if in `pwd`/*.so
-do
-dylibbundler -x "$if" -p @executable_path/../Resources/lib/ -d "$LIBDIR"
-done 
+#for if in `pwd`/*.so
+#do
+#dylibbundler -x "$if" -p @executable_path/../Resources/lib/ -d "$LIBDIR"
+#done 
 
 
 cd "$CURRDIR"
