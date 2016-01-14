@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,13 +14,24 @@
    height="400"
    id="svg1901"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="0.91 r13725"
    sodipodi:docname="warning.svg"
-   sodipodi:docbase="/home/tsoots/ohj/translations/po"
    version="1.0"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs1903">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient4152">
+      <stop
+         style="stop-color:#00b2b5;stop-opacity:1;"
+         offset="0"
+         id="stop4154" />
+      <stop
+         style="stop-color:#00b2b5;stop-opacity:0;"
+         offset="1"
+         id="stop4156" />
+    </linearGradient>
     <linearGradient
        id="linearGradient4769">
       <stop
@@ -58,16 +70,6 @@
        inkscape:vp_z="744.09448 : 526.18109 : 1"
        inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
        id="perspective7" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient4769"
-       id="linearGradient4775"
-       x1="-28.971428"
-       y1="411.42859"
-       x2="14.287568"
-       y2="368.16959"
-       gradientUnits="userSpaceOnUse"
-       spreadMethod="repeat" />
     <filter
        inkscape:collect="always"
        id="filter4825">
@@ -76,6 +78,15 @@
          stdDeviation="8.445"
          id="feGaussianBlur4827" />
     </filter>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4152"
+       id="linearGradient4158"
+       x1="30"
+       y1="340"
+       x2="740"
+       y2="340"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -84,17 +95,18 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.3103852"
-     inkscape:cx="400.00001"
-     inkscape:cy="199.99998"
+     inkscape:zoom="0.92658226"
+     inkscape:cx="307.74277"
+     inkscape:cy="408.27825"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      gridtolerance="10000"
      inkscape:window-width="1920"
-     inkscape:window-height="1125"
+     inkscape:window-height="1056"
      inkscape:window-x="0"
-     inkscape:window-y="25"
-     showgrid="true">
+     inkscape:window-y="24"
+     showgrid="true"
+     inkscape:window-maximized="1">
     <inkscape:grid
        type="xygrid"
        id="grid4789"
@@ -118,25 +130,40 @@
      id="layer1"
      style="opacity:1">
     <rect
-       style="opacity:1;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter4825)"
+       style="opacity:1;fill:#00b2b5;fill-opacity:0.95375723;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter4825)"
        id="rect4791"
        width="760"
        height="360"
        x="20"
        y="20" />
     <rect
-       style="fill:url(#linearGradient4775);fill-opacity:1;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect2380"
-       width="760"
-       height="360"
-       x="20"
-       y="20" />
-    <rect
-       style="fill:#ffff00;fill-opacity:1;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="rect4787"
-       width="720"
-       height="320"
-       x="40"
-       y="40" />
+       style="fill:url(#linearGradient4158);fill-opacity:1"
+       id="rect4150"
+       width="710"
+       height="20"
+       x="30"
+       y="330" />
+    <path
+       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 45.860655,343.12842 c 0,0 -25,-65 0,-65 25,0 10,65 0,65 z"
+       id="path5641"
+       inkscape:connector-curvature="0" />
+    <circle
+       style="fill:#000000;fill-opacity:1"
+       id="path5643"
+       cx="46.939892"
+       cy="365.82651"
+       r="10" />
+    <path
+       style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 758.86614,341.32514 c 0,0 -25,-65 0,-65 25,0 10,65 0,65 z"
+       id="path5641-3"
+       inkscape:connector-curvature="0" />
+    <circle
+       style="opacity:1;fill:#000000;fill-opacity:1"
+       id="path5643-2"
+       cx="759.94537"
+       cy="364.02322"
+       r="10" />
   </g>
 </svg>
