@@ -84,6 +84,7 @@
 				<axis hw="2" positive="whammy" />
 				<axis hw="4" negative="left" positive="right" />
 				<axis hw="5" negative="up" positive="down" />
+				<hat hw="0" up="pick_up" down="pick_down" />
 			</mapping>
 		</controller>
 		<controller type="guitar" name="GUITAR_GUITARHERO_XPLORER">
