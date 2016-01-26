@@ -1,11 +1,48 @@
 set -o errexit
 # the very first step is to check that dylibbundler exists,
 # without it the bundle would be broken
+
+function asksure {
+echo -n "$1"
+while read -r -n 1 -s answer; do
+  if [[ $answer = [YyNn] ]]; then
+    [[ $answer = [Yy] ]] && retval=0
+    [[ $answer = [Nn] ]] && retval=1
+    break
+  fi
+done
+
+echo # just a final linefeed, optics...
+
+return $retval
+}
+
 if which dylibbundler &> /dev/null; then
     echo "dylibbundler found!"
 else
     echo "dylibbundler not found! you need to install it before creating the bundle."
     exit
+fi
+
+if which appdmg &> /dev/null; then
+    echo "appdmg found!"
+    FANCY_DMG=1
+else
+    echo "appdmg not found!"
+if which npm &> /dev/null; then
+    echo "npm found!"
+if asksure "appdmg is not installed, would you like to install it? (y/n)"; then
+ sudo npm install -g https://github.com/LinusU/node-appdmg.git
+FANCY_DMG=1
+else
+echo "Will build DMG without the fancy style then..."
+FANCY_DMG=0
+fi
+else
+echo "npm not found!"
+echo "Will build DMG without the fancy style then..."
+FANCY_DMG=0
+fi
 fi
 
 SOURCE="${BASH_SOURCE[0]}"
@@ -86,10 +123,17 @@ sed -i '' -e 's|\<\!-- Font directory list --\>|\<\!-- Font directory list --\>\
 
 
 cd "$CURRDIR"
+
 # then build the disk image
+
+if $FANCY_DMG == 0 then
 ln -sf /Applications "${CURRDIR}/out/Applications"
+rm "${CURRDIR}/out/.DS_Store"
 /usr/bin/hdiutil create -ov -srcfolder out -volname Performous -fs HFS+ -fsargs "-c c=64,a=16,e=16" -format UDRW RWPerformous.dmg
 /usr/bin/hdiutil convert -ov RWPerformous.dmg -format UDZO -imagekey zlib-level=9 -o Performous.dmg
 rm -f RWPerformous.dmg
-
 cd ..
+elif $FANCY_DMG == 1 then
+rm "${CURRDIR}/Performous.dmg"
+appdmg "${CURRDIR}/resources/dmg_spec.json" "${CURRDIR}/Performous.dmg"
+fi
