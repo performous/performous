@@ -235,6 +235,7 @@
 				<button hw="9" map="start" />
 				<axis hw="4" negative="left" positive="right" />
 				<axis hw="5" negative="up" positive="down" />
+				<hat hw="0" up="up" down="down" left="left" right="right" />
 			</mapping>
 		</controller>
 		<controller type="drumkit" name="DRUMS_ROCKBAND_WII">
