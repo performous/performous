@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Sodipodi ("http://www.sodipodi.com/") -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -15,9 +16,8 @@
    height="800"
    id="svg559"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="0.91 r13725"
    sodipodi:docname="dialog_txt.svg"
-   sodipodi:docbase="/home/pim/tmp/UltraStar-ng/themes/lima"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    sodipodi:modified="true">
   <metadata
@@ -28,11 +28,12 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="1125"
+     inkscape:window-height="1056"
      inkscape:window-width="1920"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -43,13 +44,14 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="0.88479263"
-     inkscape:cx="400.80078"
-     inkscape:cy="473.88589"
+     inkscape:zoom="14.156682"
+     inkscape:cx="482.16408"
+     inkscape:cy="404.82013"
      inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-y="24"
      inkscape:current-layer="svg559"
-     showgrid="false" />
+     showgrid="false"
+     inkscape:window-maximized="1" />
   <defs
      id="defs561">
     <inkscape:perspective
@@ -61,14 +63,15 @@
        id="perspective8" />
   </defs>
   <text
-     x="515.28125"
-     y="402.58807"
-     style="font-size:22px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.58534133000000010;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline;font-family:Goblin;-inkscape-font-specification:Goblin"
+     x="517.4953"
+     y="367.51718"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.25229454px;line-height:125%;font-family:Goblin;-inkscape-font-specification:Goblin;text-align:center;writing-mode:lr-tb;text-anchor:middle;display:inline;opacity:1;fill:#f9f9f9;fill-opacity:1;stroke:#ffffff;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
      id="text10203"
      xml:space="preserve"
-     sodipodi:linespacing="125%"><tspan
-       x="515.28125"
-       y="402.58807"
+     sodipodi:linespacing="125%"
+     transform="scale(0.93224364,1.072681)"><tspan
+       x="517.4953"
+       y="367.51718"
        id="tspan10205"
-       style="font-size:22px;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.58534133000000010;-inkscape-font-specification:Goblin;font-family:Goblin;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Dialog text</tspan></text>
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.25229454px;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;text-align:center;text-anchor:middle;fill:#f9f9f9;fill-opacity:1;stroke:#ffffff;stroke-width:0.1;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none">Dialog text</tspan></text>
 </svg>

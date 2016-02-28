@@ -4,6 +4,7 @@
 #include "fs.hh"
 #include "opengl_text.hh"
 #include "surface.hh"
+#include "animvalue.hh"
 
 /// class for printing dialogues
 class Dialog {
@@ -17,4 +18,7 @@ class Dialog {
 	std::string m_text;
 	Surface m_dialog;
 	SvgTxtTheme m_svgText;
+	AnimValue m_animationVal;
+	enum state {SLIDEIN, IDLE, SLIDEOUT};
+	state m_state;
 };
