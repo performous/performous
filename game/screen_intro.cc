@@ -26,6 +26,10 @@ void ScreenIntro::enter() {
 		m_first = false;
 	}
 	reloadGL();
+	webserversetting = config["game/webserver_access"].i();
+	if(webserversetting) {
+	m_audio.playSample("notice.ogg");
+	}
 }
 
 void ScreenIntro::reloadGL() {
@@ -150,6 +154,19 @@ void ScreenIntro::draw() {
 	}
 	// Menu
 	draw_menu_options();
+	if(m_webserverNoticeTimeout.get() == 0) {
+		m_drawNotice = !m_drawNotice;
+		m_webserverNoticeTimeout.setValue(2);
+	}
+	std::stringstream m_webserverStatusString;
+	if(webserversetting == 1 && m_drawNotice) { //TODO fetch port from config and add it to the string!
+		m_webserverStatusString << _("Webserver active!\n use a webbrowser\nand navigate to localhost:") << config["game/webserver_port"].i();
+		theme->WebserverNotice.draw(m_webserverStatusString.str());
+	}
+	else if(webserversetting == 2 && m_drawNotice) {
+		m_webserverStatusString << _("Webserver active!\n connect to this computer\nusing IP-address:") << config["game/webserver_port"].i();
+		theme->WebserverNotice.draw(m_webserverStatusString.str());
+	}
 }
 
 SvgTxtTheme& ScreenIntro::getTextObject(std::string const& txt) {

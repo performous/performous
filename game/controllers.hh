@@ -8,7 +8,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/smart_ptr/scoped_ptr.hpp>
 
-#include "SDL_events.h"
+#include <SDL2/SDL_events.h>
 
 #include "util.hh"
 #include "xtime.hh"

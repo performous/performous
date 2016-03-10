@@ -97,6 +97,7 @@ class Game: public Singleton <Game> {
 
 private:
 	Window& m_window;
+
 public:
 	input::Controllers controllers;
 

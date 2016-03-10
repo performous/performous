@@ -10,9 +10,6 @@
 #include <sstream>
 #include <boost/format.hpp>
 
-namespace {
-	static const double NEXT_TIMEOUT = 15.0; // go to next song in 15 seconds
-}
 
 ScreenPlaylist::ScreenPlaylist(std::string const& name,Audio& audio, Songs& songs, Backgrounds& bgs):
 	Screen(name), m_audio(audio), m_songs(songs), m_backgrounds(bgs), m_covers(20), keyPressed()
@@ -42,7 +39,9 @@ void ScreenPlaylist::enter() {
 		}
 	}
 	keyPressed = false;
-	m_nextTimer.setValue(NEXT_TIMEOUT);
+	int timervalue = config["game/playlist_screen_timeout"].i();
+	if(timervalue == 0) { timervalue = 1; }
+	m_nextTimer.setValue(timervalue);
 	overlay_menu.close();
 	createSongListMenu();
 	songlist_menu.open();
@@ -124,6 +123,11 @@ void ScreenPlaylist::draw() {
 	//menu on top of everything
 	if (overlay_menu.isOpen()) {
 		drawMenu();
+	}
+	if(needsUpdate) {
+		boost::mutex::scoped_lock l(m_mutex);
+		createSongListMenu();
+		needsUpdate = false;
 	}
 	auto const& playlist = gm->getCurrentPlayList().getList();
 	for (unsigned i = playlist.size() - 1; i < playlist.size(); --i) {
@@ -350,4 +354,9 @@ void ScreenPlaylist::createSongMenu(int songNumber) {
 	overlay_menu.add(MenuOption(_("Back"), _("Back to playlist viewer")).call([this]() {
 		overlay_menu.close();
 	}));
+}
+
+void ScreenPlaylist::triggerSongListUpdate() {
+boost::mutex::scoped_lock l (m_mutex);
+needsUpdate = true;
 }

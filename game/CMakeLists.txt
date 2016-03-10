@@ -42,6 +42,8 @@ if(WIN32)
 		# According to MinGW tools, we need to compile the rc file, and then link it into projects:
 		# windres foo.rc foores.o
 		# gcc -o foo.exe foo.o foores.o
+		find_library(WSOCK32_LIBRARY wsock32)
+    		find_library(WS2_32_LIBRARY ws2_32)
 		if(NOT CMAKE_RC_COMPILER)
 			find_program(CMAKE_RC_COMPILER windres)
 		endif()
@@ -71,7 +73,7 @@ include_directories(${LibEpoxy_INCLUDE_DIRS})
 list(APPEND LIBS ${LibEpoxy_LIBRARIES})
 
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat AVResample SWScale Z Jpeg Png PortAudio Fontconfig)
+foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat AVResample SWScale Z Jpeg Png PortAudio Fontconfig JSONCPP Cppnetlib Crypto Ssl)
 	find_package(${lib} REQUIRED)
 	message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
 	include_directories(${${lib}_INCLUDE_DIRS})
@@ -119,6 +121,13 @@ else()
 	message(STATUS "Webcam support: Disabled (explicitly disabled)")
 endif()
 
+option(ENABLE_WEBSERVER "Enable webserver support (cpp-netlib)." ON)
+if(ENABLE_WEBSERVER)
+	message(STATUS "Webserver support: Enabled")
+	add_definitions("-DUSE_CPPNETLIB")
+else()
+	message(STATUS "Webserver support: Disabled")
+endif()
 
 if(APPLE)
 	# Needed for ffmpeg.cc to compile cleanly on OSX (it's a (unsigned long) long story)
@@ -149,7 +158,11 @@ endif()
 
 # Build main executable
 add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
+if(WIN32)
+  target_link_libraries(performous wsock32 ws2_32)
+endif()
 target_link_libraries(performous ${LIBS})
+
 install(TARGETS performous DESTINATION ${BIN_INSTALL})
 
 set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)  # Store library paths in executable

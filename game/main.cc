@@ -13,6 +13,7 @@
 #include "video_driver.hh"
 #include "webcam.hh"
 #include "xtime.hh"
+#include "webserver.hh"
 
 // Screens
 #include "screen_intro.hh"
@@ -146,6 +147,7 @@ void mainLoop(std::string const& songlist) {
 	Songs songs(database, songlist);
 	loadFonts();
 	Game gm(window);
+	WebServer server(songs);
 	try {
 		// Load audio samples
 		gm.loading(_("Loading audio samples..."), 0.5);
@@ -161,6 +163,7 @@ void mainLoop(std::string const& songlist) {
 		audio.loadSample("guitar fail4", findFile("sounds/guitar_fail4.ogg"));
 		audio.loadSample("guitar fail5", findFile("sounds/guitar_fail5.ogg"));
 		audio.loadSample("guitar fail6", findFile("sounds/guitar_fail6.ogg"));
+		audio.loadSample("notice.ogg",findFile("notice.ogg"));
 		// Load screens
 		gm.loading(_("Creating screens..."), 0.7);
 		gm.addScreen(new ScreenIntro("Intro", audio));
