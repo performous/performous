@@ -290,7 +290,13 @@ void ScreenPlaylist::createSongListMenu() {
 	songlist_menu.clear();
 	SongList& currentList = gm->getCurrentPlayList().getList();
 	for (auto const& song: currentList) {
-		oss_playlist << "#" << count << " : " << song->artist << " - " << song->title;
+		int minutes = 0;
+		int seconds = song->getDurationSeconds();
+		while(seconds > 60) {
+			minutes++;
+			seconds -= 60;
+		}
+		oss_playlist << "#" << count << " : " << song->artist << " - " << song->title << "  +" << minutes << ":" << seconds;
 		std::string songinfo = oss_playlist.str();
 		if (songinfo.length() > 20) {
 			songinfo = songinfo + "                          >"; //FIXME: ugly hack to make the text scale so it fits on screen!

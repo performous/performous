@@ -68,6 +68,8 @@ class Song: boost::noncopyable {
 		}
 		return result;
 	}
+
+	double getDurationSeconds();
 	mutable boost::mutex m_mutex;
 	InstrumentTracks instrumentTracks; ///< guitar etc. notes for this song
 	DanceTracks danceTracks; ///< dance tracks
@@ -107,7 +109,7 @@ class Song: boost::noncopyable {
 	double videoGap; ///< gap with video
 	double start; ///< start of song
 	double preview_start; ///< starting time for the preview
-
+	int64_t m_duration = 0;
 	typedef std::vector<std::pair<double,double> > Stops;
 	Stops stops; ///< related to dance
 	typedef std::vector<double> Beats;

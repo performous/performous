@@ -1,9 +1,12 @@
 #include "song.hh"
-
+#include "config.hh"
 #include "songparser.hh"
 #include "util.hh"
 #include <limits>
 #include <algorithm>
+extern "C" {
+#include AVFORMAT_INCLUDE
+}
 
 void Song::reload(bool errorIgnore) {
 	loadStatus = NONE;
@@ -130,6 +133,23 @@ VocalTrack& Song::getVocalTrack(unsigned idx) {
 	return it->second;
 }
 
+double Song::getDurationSeconds() {
+	if(m_duration == 0) {
+		//  get duration from avcontext and store it in the song class to avoid having to re-load the file from disk again.
+		AVFormatContext* pFormatCtx = avformat_alloc_context();
+		avformat_open_input(&pFormatCtx, music["background"].string().c_str(), NULL, NULL); //HELPME! file path is correctly loaded but duration is negative!
+		int64_t duration = pFormatCtx->duration;
+		m_duration = duration;
+		avformat_close_input(&pFormatCtx);
+		avformat_free_context(pFormatCtx);
+		double dur = duration;
+		return dur/10;
+	} else { //duration is still in memmory that means we already loaded it
+		double preloadedDuration = m_duration;
+		return preloadedDuration / 10;
+	}
+return 0;
+}
 
 
 
