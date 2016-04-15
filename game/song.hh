@@ -56,31 +56,11 @@ class Song: boost::noncopyable {
 	/** Get the song status at a given timestamp **/
 	Status status(double time);
 	int randomIdx; ///< sorting index used for random order
-	void insertVocalTrack(std::string vocalTrack, VocalTrack track) {
-		eraseVocalTrack(vocalTrack);
-		vocalTracks.insert(std::make_pair(vocalTrack, track));
-	}
-	void eraseVocalTrack(std::string vocalTrack = TrackName::LEAD_VOCAL) {
-		vocalTracks.erase(vocalTrack);
-	}
+	void insertVocalTrack(std::string vocalTrack, VocalTrack track);
+	void eraseVocalTrack(std::string vocalTrack = TrackName::LEAD_VOCAL);
 	// Get a selected track, or LEAD_VOCAL if not found or the first one if not found
-	VocalTrack& getVocalTrack(std::string vocalTrack = TrackName::LEAD_VOCAL) {
-		VocalTracks::iterator it = vocalTracks.find(vocalTrack);
-		if (it != vocalTracks.end()) {
-			return it->second;
-		} else {
-			it = vocalTracks.find(TrackName::LEAD_VOCAL);
-			if (it != vocalTracks.end()) return it->second;
-			else if (!vocalTracks.empty()) return vocalTracks.begin()->second;
-			else return dummyVocal;
-		}
-	}
-	VocalTrack& getVocalTrack(unsigned idx) {
-		if (idx >= vocalTracks.size()) throw std::logic_error("Index out of bounds in Song::getVocalTrack");
-		VocalTracks::iterator it = vocalTracks.begin();
-		std::advance(it, idx);
-		return it->second;
-	}
+	VocalTrack& getVocalTrack(std::string vocalTrack = TrackName::LEAD_VOCAL);
+	VocalTrack& getVocalTrack(unsigned idx);
 	std::vector<std::string> getVocalTrackNames() const {
 		std::vector<std::string> result;
 		BOOST_FOREACH(VocalTracks::value_type const &it, vocalTracks) {

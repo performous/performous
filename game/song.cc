@@ -102,3 +102,34 @@ std::ostream& operator<<(std::ostream& os, SongParserException const& e) {
 	return os;
 }
 
+void Song::insertVocalTrack(std::string vocalTrack, VocalTrack track) {
+	eraseVocalTrack(vocalTrack);
+	vocalTracks.insert(std::make_pair(vocalTrack, track));
+}
+
+void Song::eraseVocalTrack(std::string vocalTrack) {
+	vocalTracks.erase(vocalTrack);
+}
+
+VocalTrack& Song::getVocalTrack(std::string vocalTrack) {
+	VocalTracks::iterator it = vocalTracks.find(vocalTrack);
+	if (it != vocalTracks.end()) {
+		return it->second;
+	} else {
+		it = vocalTracks.find(TrackName::LEAD_VOCAL);
+		if (it != vocalTracks.end()) return it->second;
+		else if (!vocalTracks.empty()) return vocalTracks.begin()->second;
+		else return dummyVocal;
+	}
+}
+
+VocalTrack& Song::getVocalTrack(unsigned idx) {
+	if (idx >= vocalTracks.size()) throw std::logic_error("Index out of bounds in Song::getVocalTrack");
+	VocalTracks::iterator it = vocalTracks.begin();
+	std::advance(it, idx);
+	return it->second;
+}
+
+
+
+
