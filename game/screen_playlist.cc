@@ -289,14 +289,19 @@ void ScreenPlaylist::createSongListMenu() {
 	int count = 1;
 	songlist_menu.clear();
 	SongList& currentList = gm->getCurrentPlayList().getList();
+	int totaldurationSeconds = 0;
 	for (auto const& song: currentList) {
+		//timestamp handles
+		totaldurationSeconds += song->getDurationSeconds();
+		totaldurationSeconds += config["game/playlist_screen_timeout"].i();
 		int minutes = 0;
-		int seconds = song->getDurationSeconds();
-		while(seconds > 60) {
+		int seconds = totaldurationSeconds;
+		while(seconds >= 60) {
 			minutes++;
 			seconds -= 60;
 		}
-		oss_playlist << "#" << count << " : " << song->artist << " - " << song->title << "  +" << minutes << ":" << seconds;
+		oss_playlist << "#" << count << " : " << song->artist << " - " << song->title << "  +" <<
+			std::setw(2) << std::setfill('0') << minutes << ":" << std::setw(2) << std::setfill('0') << seconds;
 		std::string songinfo = oss_playlist.str();
 		if (songinfo.length() > 20) {
 			songinfo = songinfo + "                          >"; //FIXME: ugly hack to make the text scale so it fits on screen!
