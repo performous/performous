@@ -249,9 +249,17 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', end
 		$.get("api/getCurrentPlaylist.json", function(data){
 		songlist = JSON.parse(data);
 		$('#playListView').html('<li data-role="list-divider" role="heading">Upcoming songs:</li><li data-theme="c">\n');
+			var totalduration = 0;
 			for (i in songlist) {
 				var count = parseInt(i,10) + parseInt(1,10);
-				$('#playListView').append('<li data-theme="c" data-icon="info"><a href="javascript:ViewInfo(' + i + ')" data-transition="slide"> #' + count + ' ' + songlist[i].Artist + ' - ' + songlist[i].Title + '</a></li>\n');
+				var minutes = 0;
+				var sec = totalduration;
+				while (sec >= 60) {
+					minutes++;
+					sec -=60;				
+				}
+				$('#playListView').append('<li data-theme="c" data-icon="info"><a href="javascript:ViewInfo(' + i + ')" data-transition="slide"> #' + count + ' ' + songlist[i].Artist + ' - ' + songlist[i].Title + '      +' + ("00"+minutes).slice(-2) + ':' + ("0"+sec).slice(-2) + '</a></li>\n');
+				totalduration += songlist[i].Duration + 15;
 			}
 			$('#playListView').listview('refresh');
 		});

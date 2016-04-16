@@ -302,7 +302,7 @@ void ScreenPlaylist::createSongListMenu() {
 			std::setw(2) << std::setfill('0') << minutes << ":" << std::setw(2) << std::setfill('0') << seconds;
 		std::string songinfo = oss_playlist.str();
 		if (songinfo.length() > 20) {
-			songinfo = songinfo + "                          >"; //FIXME: ugly hack to make the text scale so it fits on screen!
+			songinfo = songinfo + "                           >"; //FIXME: ugly hack to make the text scale so it fits on screen!
 		}
 		songlist_menu.add(MenuOption(_(songinfo.c_str()),_("Press enter to view song options")).call([this, count]() {
 			createSongMenu(count);
