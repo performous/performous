@@ -6,6 +6,7 @@
 #include <algorithm>
 extern "C" {
 #include AVFORMAT_INCLUDE
+#include AVCODEC_INCLUDE
 }
 
 void Song::reload(bool errorIgnore) {
@@ -135,18 +136,19 @@ VocalTrack& Song::getVocalTrack(unsigned idx) {
 
 double Song::getDurationSeconds() {
 	if(m_duration == 0) {
-		//  get duration from avcontext and store it in the song class to avoid having to re-load the file from disk again.
-		AVFormatContext* pFormatCtx = avformat_alloc_context();
-		avformat_open_input(&pFormatCtx, music["background"].string().c_str(), NULL, NULL); //HELPME! file path is correctly loaded but duration is negative!
-		int64_t duration = pFormatCtx->duration;
-		m_duration = duration;
+		AVFormatContext *pFormatCtx = avformat_alloc_context();
+		avformat_open_input(&pFormatCtx, music["background"].string().c_str(), NULL, NULL);
+		AVPacket packet;
+		av_init_packet(&packet);
+		int64_t totalduration;
+		while( av_read_frame(pFormatCtx, &packet) == 0 ) {//add up the duration of all the frames
+			if(packet.pts > totalduration) { totalduration = packet.pts; }
+		}
+		m_duration = totalduration / 14222967; //FIXME calculationfactor broken
 		avformat_close_input(&pFormatCtx);
-		avformat_free_context(pFormatCtx);
-		double dur = duration;
-		return dur/10;
+		return m_duration;
 	} else { //duration is still in memmory that means we already loaded it
-		double preloadedDuration = m_duration;
-		return preloadedDuration / 10;
+		return m_duration;
 	}
 return 0;
 }
