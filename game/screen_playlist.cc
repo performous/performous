@@ -292,8 +292,6 @@ void ScreenPlaylist::createSongListMenu() {
 	int totaldurationSeconds = 0;
 	for (auto const& song: currentList) {
 		//timestamp handles
-		totaldurationSeconds += song->getDurationSeconds();
-		totaldurationSeconds += config["game/playlist_screen_timeout"].i();
 		int minutes = 0;
 		int seconds = totaldurationSeconds;
 		while(seconds >= 60) {
