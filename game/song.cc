@@ -134,7 +134,8 @@ VocalTrack& Song::getVocalTrack(unsigned idx) {
 	return it->second;
 }
 
-double Song::getDurationSeconds() { //FIXME make async to avoid waiting for resources from disk on the renderthread
+double Song::getDurationSeconds() {
+	boost::mutex::scoped_lock l(m_mutex);
 	if(m_duration == 0) {
 		AVFormatContext *pFormatCtx = avformat_alloc_context();
 		avformat_open_input(&pFormatCtx, music["background"].string().c_str(), NULL, NULL);

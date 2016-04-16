@@ -82,6 +82,7 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 				SongObject["Edition"] = song->edition;
 				SongObject["Language"] = song->language;
 				SongObject["Creator"] = song->creator;
+				SongObject["Duration"] = song->getDurationSeconds();
 				jsonRoot.append(SongObject);
 		}
 		return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
