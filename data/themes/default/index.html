@@ -258,7 +258,12 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', end
 					minutes++;
 					sec -=60;				
 				}
-				$('#playListView').append('<li data-theme="c" data-icon="info"><a href="javascript:ViewInfo(' + i + ')" data-transition="slide"> #' + count + ' ' + songlist[i].Artist + ' - ' + songlist[i].Title + '      +' + ("00"+minutes).slice(-2) + ':' + ("0"+sec).slice(-2) + '</a></li>\n');
+				var minutestxt = ("00"+minutes).slice(-2);
+				if (minutes >= 100) {
+				("000"+minutes).slice(-3)
+					
+				}
+				$('#playListView').append('<li data-theme="c" data-icon="info"><a href="javascript:ViewInfo(' + i + ')" data-transition="slide"> #' + count + ' ' + songlist[i].Artist + ' - ' + songlist[i].Title + '      +' + minutestxt + ':' + ("0"+sec).slice(-2) + '</a></li>\n');
 				totalduration += songlist[i].Duration + 15;
 			}
 			$('#playListView').listview('refresh');
