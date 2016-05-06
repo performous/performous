@@ -34,6 +34,13 @@
 #include <vector>
 #include <cstdlib>
 
+#if defined(_WIN32)
+extern "C" {
+// For DWORD (see end of file)
+#include "windef.h"
+}
+#endif
+
 // Disable main level exception handling for debug builds (because gdb cannot properly catch throwing otherwise)
 #ifdef NDEBUG
 #define RUNTIME_ERROR std::runtime_error
