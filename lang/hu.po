@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# Skyli <skyli91@gmail.com>, 2015.
+# Skyli <skyli91@gmail.com>, 2015-2016.
 #
 msgid ""
 msgstr ""
@@ -60,16 +60,16 @@ msgstr "Harmonikus 3"
 
 #: ../game/configuration.cc:112
 msgid "Enabled"
-msgstr "Engedélyezve"
+msgstr "Bekapcsolva"
 
 #: ../game/configuration.cc:112
 msgid "Disabled"
-msgstr "Letiltva"
+msgstr "Kikapcsolva"
 
 #: ../game/configuration.cc:116
 #, c-format
 msgid "%d items"
-msgstr "%d elem"
+msgstr "%d eszköz"
 
 #: ../game/dancegraph.cc:18
 msgid "Beginner"
@@ -98,7 +98,7 @@ msgstr "Kész!"
 #: ../game/dancegraph.cc:107 ../game/guitargraph.cc:193
 #: ../game/screen_intro.cc:166
 msgid "Start performing!"
-msgstr "Lépj fel a színpadon!"
+msgstr "Lépj a színpadra!"
 
 #: ../game/dancegraph.cc:118 ../game/guitargraph.cc:182
 msgid "Select track"
@@ -182,7 +182,7 @@ msgstr "Folytatás"
 
 #: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:125
 msgid "Back to performing!"
-msgstr "Játék folytatása!"
+msgstr "Vissza a játékba!"
 
 #: ../game/instrumentgraph.cc:57
 msgid "Rejoin"
@@ -263,7 +263,7 @@ msgstr "Egyes eszközöket nem sikerült betölteni!"
 
 #: ../game/screen_intro.cc:24
 msgid "No playback devices could be used.\n"
-msgstr "Nincs lejátszási eszköz beállítva!\n"
+msgstr "Nincs hozzáadva a hangszóró!\n"
 
 #: ../game/screen_intro.cc:25
 msgid ""
@@ -271,7 +271,7 @@ msgid ""
 "Please configure some before playing."
 msgstr ""
 "\n"
-"Kérlek állítsd be a hangszórót:\n"
+"Kérlek állítsd be, mielőtt elkezdesz játszani:\n"
 "Beállítások > Hangeszközök"
 
 #: ../game/screen_intro.cc:69
@@ -304,7 +304,7 @@ msgstr "Beállítások"
 
 #: ../game/screen_intro.cc:183
 msgid "Configure audio and game options"
-msgstr "Hang- és játékbeállítások konfigurálása"
+msgstr "Hang- és játékbeállítások"
 
 #: ../game/screen_intro.cc:184
 msgid "Leave the game"
@@ -331,7 +331,7 @@ msgstr ""
 
 #: ../game/screen_players.cc:117
 msgid "No players found!"
-msgstr "Játékos nem található!"
+msgstr "Nem található játékos!"
 
 #: ../game/screen_players.cc:118
 msgid "Enter a name to create a new player."
@@ -343,15 +343,15 @@ msgstr "Nyomj entert a játkos létrehozásához."
 
 #: ../game/screen_players.cc:124
 msgid "No players worth mentioning!"
-msgstr "Egyik játékos se említésre méltó..."
+msgstr "Egyik játékos se szerepelt említésre méltóan..."
 
 #: ../game/screen_players.cc:129
 msgid "You reached %1% points!"
-msgstr "%1% pontot értél el!"
+msgstr "%1% pontot szereztél!"
 
 #: ../game/screen_players.cc:130
 msgid "Change player with arrow keys."
-msgstr "Játékos választása a nyilakkal."
+msgstr "Játékos váltása nyilakkal."
 
 #: ../game/screen_players.cc:131
 msgid "Name:"
@@ -496,7 +496,7 @@ msgstr "Választás duett és normál énekmód között"
 
 #: ../game/screen_sing.cc:92
 msgid "Change vocal track"
-msgstr "Énekes kiválasztása"
+msgstr "Duett-énekes kiválasztása"
 
 #: ../game/screen_sing.cc:127
 msgid "Skip"
@@ -786,7 +786,7 @@ msgstr "Téma"
 
 #: ../data/config/schema.xml:71
 msgid "Name of the theme to use."
-msgstr ""
+msgstr "Válassz témát."
 
 #: ../data/config/schema.xml:74
 msgid "Keyboard as guitar"
@@ -794,7 +794,7 @@ msgstr "Billentyűzet, mint gitár"
 
 #: ../data/config/schema.xml:75
 msgid "Enable keyboard as guitar (Frets on Fire mode)."
-msgstr ""
+msgstr "Billentyűzet használata gitárként (Frets on Fire mód)."
 
 #: ../data/config/schema.xml:78
 msgid "Keyboard as drumkit"
@@ -802,7 +802,7 @@ msgstr "Billentyűzet, mint dobfelszerelés"
 
 #: ../data/config/schema.xml:79
 msgid "Enable keyboard as drumkit."
-msgstr ""
+msgstr "Billentyűzet használata, mint dobfelszerelés."
 
 #: ../data/config/schema.xml:82
 msgid "Keyboard as dance pad"
@@ -810,7 +810,7 @@ msgstr "Billentyűzet, mint táncszőnyeg"
 
 #: ../data/config/schema.xml:83
 msgid "Enable keyboard as dance pad."
-msgstr ""
+msgstr "Billentyűzet használata tánszőnyegként."
 
 #: ../data/config/schema.xml:86
 msgid "Keyboard as keytar"
@@ -818,7 +818,7 @@ msgstr "Billentyűzet, mint keytar"
 
 #: ../data/config/schema.xml:87
 msgid "Enable keyboard as keytar."
-msgstr ""
+msgstr "Billentyűzet használata keytarként."
 
 #: ../data/config/schema.xml:94
 msgid "Force controller A's type"
@@ -888,7 +888,7 @@ msgstr "Szélesség"
 
 #: ../data/config/schema.xml:155
 msgid "The width of the window."
-msgstr ""
+msgstr "Az ablak szélessége."
 
 #: ../data/config/schema.xml:160
 msgid "Windowed height"
@@ -896,7 +896,7 @@ msgstr "Magasság"
 
 #: ../data/config/schema.xml:161
 msgid "The height of the window."
-msgstr ""
+msgstr "Az ablak magassága."
 
 #: ../data/config/schema.xml:164
 msgid "Fullscreen mode"
@@ -942,8 +942,8 @@ msgid ""
 "this enabled as Performous will still smoothly fade out the video if your "
 "computer is not fast enough."
 msgstr ""
-"Kikapcsolhatod az összes háttérvideót. Ajánlott bekapcsolva hagyni, mert ha "
-"nem elég gyors a géped, a Performous automatikusan leveszi a videót."
+"Kikapcsolhatod az összes háttérvideót. Ajánlott bekapcsolni, mert ha "
+"nem elég gyors a géped, a automatikusan kikapcsolódik."
 
 #: ../data/config/schema.xml:191
 msgid "Webcam background"
@@ -955,7 +955,7 @@ msgid ""
 "crashes while entering a song."
 msgstr ""
 "Webkamera használata háttérvideóként. Kapcsold ki, ha összeomlik tőle a "
-"performous."
+"játék."
 
 #: ../data/config/schema.xml:196
 msgid "Webcam id"
@@ -992,14 +992,14 @@ msgstr ""
 
 #: ../data/config/schema.xml:212
 msgid "Benchmark mode"
-msgstr "FPS mutatása"
+msgstr "Benchmark mód"
 
 #: ../data/config/schema.xml:213
 msgid ""
 "Framerate limit of 100 FPS is removed and the game instead renders at full "
 "speed. FPS values are printed to console. Please note that the display "
 "drivers may still limit the rendering speed to the screen refresh rate."
-msgstr "FPS érték kijelzése teljesítmény-felméréshez"
+msgstr "100-as FPS limit eltávolítása és FPS érték kijelzése teljesítmény-felméréshez"
 
 #: ../data/config/schema.xml:220
 msgid "Suggested latency"
@@ -1010,12 +1010,12 @@ msgid ""
 "This is a hint for the audio engine about the desired latency. Set this as "
 "low as possible while retaining clear audio playback. Requires restart."
 msgstr ""
-"Tipp az audió-motor késleltetéséhez. Legyen olyan alacsony, amennyire csak "
-"lehet, amíg megmarad a tiszta lejátszás. Újraindítást igényel."
+"Tipp az audió-motornak késleltetéséhez. Legyen olyan alacsony, amennyire csak "
+"lehet, amíg működik a hang. Újraindítást igényel."
 
 #: ../data/config/schema.xml:226
 msgid "Audio/video latency"
-msgstr "Hang/videó késleltetés"
+msgstr "Audió/videó késleltetés"
 
 #: ../data/config/schema.xml:227
 msgid ""
@@ -1026,19 +1026,19 @@ msgid ""
 "performing."
 msgstr ""
 "Minden módra hat. Negatív: ha a megjelenítés késik, a hanghoz képest. "
-"Pozitív: ellenkezőleg. Úgy kell beállítani, hogy a hangjegyek pontosan "
-"zenére jelenjenek meg. Játék közben: Ctrl+F1/F2"
+"A hangjegyek pontosan "
+"zenére jelenjenek meg. Játék közben: Ctrl+,/."
 
 #: ../data/config/schema.xml:232
 msgid "Audio round-trip latency"
-msgstr "Hang oda-vissza késleltetés"
+msgstr "Audió oda-vissza késleltetés"
 
 #: ../data/config/schema.xml:233
 msgid ""
 "Affects singing only. The time it takes for Performous playback to reach "
 "your speakers, fly to the microphone and all the way back until Performous "
 "captures and analyzes it. While performing, press Ctrl+S for synth mode and "
-"adjust with Ctrl+F3/F4."
+"adjust with Ctrl+Ü/Ó."
 msgstr ""
 "Csak az éneklésre hat. Az idő, ami eltelik, amíg a Performousból a "
 "hangszórókon át a mikrofonba és vissza jut a hang. Játék közben: Ctrl+F3/F4"
@@ -1053,7 +1053,7 @@ msgid ""
 "latency combined with audio output latency. Adjust so that you can hit the "
 "notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to "
 "adjust while performing."
-msgstr ""
+msgstr "Csak táncra és hangszerekre hat. Igazítsd a hanghoz (ne a képhez). Ctrl+Ő/Ú"
 
 #: ../data/config/schema.xml:246
 msgid "Audio devices"
@@ -1069,7 +1069,7 @@ msgstr "Háttérzene hangerő"
 
 #: ../data/config/schema.xml:253
 msgid "The volume level of menus, song previews and jukebox mode."
-msgstr ""
+msgstr "Hátterzene, menü, dal előlnézet és zenedoboz-mód hangereje."
 
 #: ../data/config/schema.xml:258
 msgid "Music volume"
@@ -1109,11 +1109,11 @@ msgstr ""
 
 #: ../data/config/schema.xml:278
 msgid "Suppress center channel"
-msgstr "Közép-csatorna némítása (Karaoke mód)"
+msgstr "Közép-csatorna némítása (Énekhang-eltávolító)"
 
 #: ../data/config/schema.xml:279
 msgid "Suppress audio of center channel (e.g. vocals)."
-msgstr "Elnémítja az énekhangot a zene alól."
+msgstr "Elnémítja az énekhangot a zene alól. Játék közben: Ctrl+C"
 
 #: ../data/config/schema.xml:290
 msgid "Song folders"
