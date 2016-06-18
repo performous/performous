@@ -207,6 +207,7 @@ table#songtable {
 	var invertedsort = false;
 	var database = {};
 	var songlist = {};
+	var playlistScreenTimeout = 0;
 	
 
 
@@ -277,6 +278,9 @@ table#songtable {
 	function RefreshPlayList() {
 		$.get("api/getCurrentPlaylist.json", function(data){
 		songlist = JSON.parse(data);
+		if(playlistScreenTimeout == 0) {
+			$.get("/api/getplaylistTimeout", playlistScreenTimeout);
+		}
 		$('#playListView').html('<li data-role="list-divider" role="heading">Upcoming songs:</li><li data-theme="c">\n');
 			var totalduration = 0;
 			for (i in songlist) {
@@ -292,7 +296,7 @@ table#songtable {
 				minutestxt = ("000"+minutes).slice(-3);	
 				}
 				$('#playListView').append('<li data-theme="c" data-icon="info"><a href="javascript:ViewInfo(' + i + ')" data-transition="slide"> #' + count + ' ' + songlist[i].Artist + ' - ' + songlist[i].Title + '      +' + minutestxt + ':' + ("0"+sec).slice(-2) + '</a></li>\n');
-				totalduration += songlist[i].Duration + 15;
+				totalduration += songlist[i].Duration + playlistScreenTimeout;
 			}
 			$('#playListView').listview('refresh');
 		});
