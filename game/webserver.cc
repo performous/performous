@@ -82,9 +82,12 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 				SongObject["Edition"] = song->edition;
 				SongObject["Language"] = song->language;
 				SongObject["Creator"] = song->creator;
+				SongObject["Duration"] = song->getDurationSeconds();
 				jsonRoot.append(SongObject);
 		}
 		return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
+	} else if(request.destination == "/api/getplaylistTimeout") {
+		return http_server::response::stock_reply(http_server::response::ok, std::to_string(config["game/playlist_screen_timeout"].i()));
 	} else {
 		//other text files
 		try {

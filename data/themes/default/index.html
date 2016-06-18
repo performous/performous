@@ -206,7 +206,9 @@ table#songtable {
 	var update = false;
 	var invertedsort = false;
 	var database = {};
+	var AutocompleteList = {};
 	var songlist = {};
+	var playlistScreenTimeout = 0;
 	
 
 
@@ -262,10 +264,17 @@ table#songtable {
     });
 	}
 	
-	function AddSong(number) {
-		$.post("api/add", JSON.stringify(database[number]));
+	function AddSong(number, autocomplete) {
+		if(autocomplete) {
+			$.post("api/add", JSON.stringify(AutocompleteList[number]));
+			$('#searchv2').val("added: " + AutocompleteList[number].Title); 
+		} else {
+			$.post("api/add", JSON.stringify(database[number]));
+			$('#searchv2').val("added: " + database[number].Title); 
+		}
+
 		RefreshPlayList();
-		$('#searchv2').val("added: " + database[number].Title); 
+		
 	}
 
 	<!-- Playlist -->
@@ -277,10 +286,39 @@ table#songtable {
 	function RefreshPlayList() {
 		$.get("api/getCurrentPlaylist.json", function(data){
 		songlist = JSON.parse(data);
+		if(playlistScreenTimeout == 0) {
+		var timeout = "";
+		jQuery.ajaxSetup({async:false});
+			$.get("api/getplaylistTimeout",function (data) { 
+				playlistScreenTimeout = parseInt(data);
+
+			});
+		jQuery.ajaxSetup({async:true});
+		}
 		$('#playListView').html('<li data-role="list-divider" role="heading">Upcoming songs:</li><li data-theme="c">\n');
+			var totalduration = 0;
 			for (i in songlist) {
 				var count = parseInt(i,10) + parseInt(1,10);
-				$('#playListView').append('<li data-theme="c" data-icon="info"><a href="javascript:ViewInfo(' + i + ')" data-transition="slide"> #' + count + ' ' + songlist[i].Artist + ' - ' + songlist[i].Title + '</a></li>\n');
+				var hours = 0;
+				var minutes = 0;
+				var sec = totalduration;
+				while (sec >= 60) {
+					minutes++;
+					sec -=60;				
+				}
+				while (minutes >= 60) {
+					hours++;
+					minutes -=60;				
+				}
+				
+				var durationtext;
+				if (hours > 0) {
+					durationtext = ("00"+hours).slice(-2) + ':' + ("00"+minutes).slice(-2) + ':' + ("0"+sec).slice(-2);
+				} else {
+					durationtext = ("00"+minutes).slice(-2) + ':' + ("0"+sec).slice(-2);
+				}
+				$('#playListView').append('<li data-theme="c" data-icon="info"><a href="javascript:ViewInfo(' + i + ', false)" data-transition="slide"> #' + count + ' ' + songlist[i].Artist + ' - ' + songlist[i].Title + '      +' + durationtext + '</a></li>\n');
+				totalduration += songlist[i].Duration + playlistScreenTimeout;
 			}
 			$('#playListView').listview('refresh');
 		});
@@ -367,11 +405,11 @@ $(document).keypress(function(e) {
 		if ( value && value.length > 2 ) {
 			$("#autocomplete").show();
 			results = $.post("api/autocomplete",$input.val(), function (data) {
-				database = JSON.parse(data);
+				AutocompleteList = JSON.parse(data);
 				$ul.html("<li><div class='ui-loader'><span class='ui-icon ui-icon-loading'></span></div></li>");
-					for (i in database) {
+					for (i in AutocompleteList) {
 					var count = parseInt(i,10) + parseInt(1,10);
-					html += '<li data-theme="c" data-icon="info"><a href="javascript:AddSong(' + i + ')" data-transition="slide">' + ' ' + database[i].Artist + ' - ' + database[i].Title + '</a></li>\n';
+					html += '<li data-theme="c" data-icon="info"><a href="javascript:AddSong(' + i + ',true)" data-transition="slide">' + ' ' + AutocompleteList[i].Artist + ' - ' + AutocompleteList[i].Title + '</a></li>\n';
 				}
 				$ul.html( html );
 				$ul.listview("refresh");

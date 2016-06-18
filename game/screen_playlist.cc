@@ -43,6 +43,7 @@ void ScreenPlaylist::enter() {
 	if(timervalue == 0) { timervalue = 1; }
 	m_nextTimer.setValue(timervalue);
 	overlay_menu.close();
+	gm->loading(_("Loading song timestamps..."), 0.2);
 	createSongListMenu();
 	songlist_menu.open();
 	reloadGL();
@@ -289,18 +290,38 @@ void ScreenPlaylist::createSongListMenu() {
 	int count = 1;
 	songlist_menu.clear();
 	SongList& currentList = gm->getCurrentPlayList().getList();
+	int totaldurationSeconds = 0;
 	for (auto const& song: currentList) {
-		oss_playlist << "#" << count << " : " << song->artist << " - " << song->title;
+		//timestamp handles
+		int hours = 0;
+		int minutes = 0;
+		int seconds = totaldurationSeconds;
+		while(seconds >= 60) {
+			minutes++;
+			seconds -= 60;
+		}
+		while(minutes >= 60) {
+			hours ++;
+			minutes -=60;
+		}
+		oss_playlist << "#" << count << " : " << song->artist << " - " << song->title << "  +";
+		if(hours > 0) {
+			oss_playlist << std::setw(2) << std::setfill('0') << hours << ":";
+		}
+			oss_playlist << std::setw(2) << std::setfill('0') << minutes << ":" << std::setw(2) << std::setfill('0') << seconds;
 		std::string songinfo = oss_playlist.str();
 		if (songinfo.length() > 20) {
-			songinfo = songinfo + "                          >"; //FIXME: ugly hack to make the text scale so it fits on screen!
+			songinfo = songinfo + "                           >"; //FIXME: ugly hack to make the text scale so it fits on screen!
 		}
+		//then add it to the menu:
 		songlist_menu.add(MenuOption(_(songinfo.c_str()),_("Press enter to view song options")).call([this, count]() {
 			createSongMenu(count);
 			overlay_menu.open();
 		}));
 		oss_playlist.str("");
 		count++;
+		totaldurationSeconds += song->getDurationSeconds();
+		totaldurationSeconds += config["game/playlist_screen_timeout"].i();
 	}
 	songlist_menu.add(MenuOption(_("View more options"),_("View general playlist settings")).call([this]() {
 		createEscMenu();
