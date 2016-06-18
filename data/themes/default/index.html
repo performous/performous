@@ -287,23 +287,37 @@ table#songtable {
 		$.get("api/getCurrentPlaylist.json", function(data){
 		songlist = JSON.parse(data);
 		if(playlistScreenTimeout == 0) {
-			$.get("/api/getplaylistTimeout", playlistScreenTimeout);
+		var timeout = "";
+		jQuery.ajaxSetup({async:false});
+			$.get("api/getplaylistTimeout",function (data) { 
+				playlistScreenTimeout = parseInt(data);
+
+			});
+		jQuery.ajaxSetup({async:true});
 		}
 		$('#playListView').html('<li data-role="list-divider" role="heading">Upcoming songs:</li><li data-theme="c">\n');
 			var totalduration = 0;
 			for (i in songlist) {
 				var count = parseInt(i,10) + parseInt(1,10);
+				var hours = 0;
 				var minutes = 0;
 				var sec = totalduration;
 				while (sec >= 60) {
 					minutes++;
 					sec -=60;				
 				}
-				var minutestxt = ("00"+minutes).slice(-2);
-				if (minutes >= 100) {
-				minutestxt = ("000"+minutes).slice(-3);	
+				while (minutes >= 60) {
+					hours++;
+					minutes -=60;				
 				}
-				$('#playListView').append('<li data-theme="c" data-icon="info"><a href="javascript:ViewInfo(' + i + ', false)" data-transition="slide"> #' + count + ' ' + songlist[i].Artist + ' - ' + songlist[i].Title + '      +' + minutestxt + ':' + ("0"+sec).slice(-2) + '</a></li>\n');
+				
+				var durationtext;
+				if (hours > 0) {
+					durationtext = ("00"+hours).slice(-2) + ':' + ("00"+minutes).slice(-2) + ':' + ("0"+sec).slice(-2);
+				} else {
+					durationtext = ("00"+minutes).slice(-2) + ':' + ("0"+sec).slice(-2);
+				}
+				$('#playListView').append('<li data-theme="c" data-icon="info"><a href="javascript:ViewInfo(' + i + ', false)" data-transition="slide"> #' + count + ' ' + songlist[i].Artist + ' - ' + songlist[i].Title + '      +' + durationtext + '</a></li>\n');
 				totalduration += songlist[i].Duration + playlistScreenTimeout;
 			}
 			$('#playListView').listview('refresh');
