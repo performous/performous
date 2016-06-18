@@ -154,19 +154,7 @@ void ScreenIntro::draw() {
 	}
 	// Menu
 	draw_menu_options();
-	if(m_webserverNoticeTimeout.get() == 0) {
-		m_drawNotice = !m_drawNotice;
-		m_webserverNoticeTimeout.setValue(2);
-	}
-	std::stringstream m_webserverStatusString;
-	if(webserversetting == 1 && m_drawNotice) { //TODO fetch port from config and add it to the string!
-		m_webserverStatusString << _("Webserver active!\n use a webbrowser\nand navigate to localhost:") << config["game/webserver_port"].i();
-		theme->WebserverNotice.draw(m_webserverStatusString.str());
-	}
-	else if(webserversetting == 2 && m_drawNotice) {
-		m_webserverStatusString << _("Webserver active!\n connect to this computer\nusing IP-address:") << config["game/webserver_port"].i();
-		theme->WebserverNotice.draw(m_webserverStatusString.str());
-	}
+	draw_webserverNotice();
 }
 
 SvgTxtTheme& ScreenIntro::getTextObject(std::string const& txt) {
@@ -199,4 +187,25 @@ void ScreenIntro::populateMenu() {
 	}
 	m_menu.add(MenuOption(_("Configure"), _("Configure audio and game options"), imgConfig).submenu(configmain));
 	m_menu.add(MenuOption(_("Quit"), _("Leave the game"), imgQuit).screen(""));
+}
+
+void ScreenIntro::draw_webserverNotice() {
+	if(m_webserverNoticeTimeout.get() == 0) {
+		m_drawNotice = !m_drawNotice;
+		m_webserverNoticeTimeout.setValue(2);
+	}
+	std::stringstream m_webserverStatusString;
+	if(webserversetting == 1 && m_drawNotice) { //TODO fetch port from config and add it to the string!
+		m_webserverStatusString << _("Webserver active!\n use a webbrowser\nand navigate to localhost:") << config["game/webserver_port"].i();
+		theme->WebserverNotice.draw(m_webserverStatusString.str());
+	}
+	else if(webserversetting == 2 && m_drawNotice) {
+		m_webserverStatusString << _("Webserver active!\n connect to this computer\nusing IP-address:") << config["game/webserver_port"].i();
+		theme->WebserverNotice.draw(m_webserverStatusString.str());
+	}
+}
+
+
+void ScreenIntro::getIPaddr() {
+
 }

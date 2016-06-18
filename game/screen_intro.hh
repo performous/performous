@@ -5,6 +5,7 @@
 #include "animvalue.hh"
 
 #include <boost/scoped_ptr.hpp>
+#include <boost/asio.hpp>
 
 class Audio;
 class ThemeIntro;
@@ -23,11 +24,12 @@ class ScreenIntro : public Screen {
 	void manageEvent(input::NavEvent const& event);
 	void draw();
 
-	/// draw menu
-	void draw_menu_options();
 
   private:
+	void draw_menu_options();
+	void draw_webserverNotice();
 	void populateMenu();
+	void getIPaddr();
 	SvgTxtTheme& getTextObject(std::string const& txt);
 
 	Audio& m_audio;
