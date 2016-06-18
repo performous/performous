@@ -200,12 +200,29 @@ void ScreenIntro::draw_webserverNotice() {
 		theme->WebserverNotice.draw(m_webserverStatusString.str());
 	}
 	else if(webserversetting == 2 && m_drawNotice) {
-		m_webserverStatusString << _("Webserver active!\n connect to this computer\nusing IP-address:") << config["game/webserver_port"].i();
+		if(m_ipaddr.empty()) {
+			m_ipaddr = getIPaddr();
+		}
+		m_webserverStatusString << _("Webserver active!\n connect to this computer\nusing ") << m_ipaddr << ":" << config["game/webserver_port"].i();
 		theme->WebserverNotice.draw(m_webserverStatusString.str());
 	}
 }
 
 
-void ScreenIntro::getIPaddr() {
+std::string ScreenIntro::getIPaddr() {
+	try {
+		boost::asio::io_service netService;
+		boost::asio::ip::udp::resolver resolver(netService);
+		boost::asio::ip::udp::resolver::query query(boost::asio::ip::udp::v4(), "google.com", ""); //it's a bit of a dirty hack, but it works!
+		boost::asio::ip::udp::resolver::iterator endpoints = resolver.resolve(query);
+		boost::asio::ip::udp::endpoint ep = *endpoints;
+		boost::asio::ip::udp::socket socket(netService);
+		socket.connect(ep);
+		boost::asio::ip::address addr = socket.local_endpoint().address();
+		return addr.to_string();
+	} catch(std::exception& e) {
+			return "cannot obtain IP";
+	}
 
+	return "IP address";
 }
