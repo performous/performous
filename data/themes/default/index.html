@@ -206,6 +206,7 @@ table#songtable {
 	var update = false;
 	var invertedsort = false;
 	var database = {};
+	var AutocompleteList = {};
 	var songlist = {};
 	var playlistScreenTimeout = 0;
 	
@@ -263,10 +264,17 @@ table#songtable {
     });
 	}
 	
-	function AddSong(number) {
-		$.post("api/add", JSON.stringify(database[number]));
+	function AddSong(number, autocomplete) {
+		if(autocomplete) {
+			$.post("api/add", JSON.stringify(AutocompleteList[number]));
+			$('#searchv2').val("added: " + AutocompleteList[number].Title); 
+		} else {
+			$.post("api/add", JSON.stringify(database[number]));
+			$('#searchv2').val("added: " + database[number].Title); 
+		}
+
 		RefreshPlayList();
-		$('#searchv2').val("added: " + database[number].Title); 
+		
 	}
 
 	<!-- Playlist -->
@@ -295,7 +303,7 @@ table#songtable {
 				if (minutes >= 100) {
 				minutestxt = ("000"+minutes).slice(-3);	
 				}
-				$('#playListView').append('<li data-theme="c" data-icon="info"><a href="javascript:ViewInfo(' + i + ')" data-transition="slide"> #' + count + ' ' + songlist[i].Artist + ' - ' + songlist[i].Title + '      +' + minutestxt + ':' + ("0"+sec).slice(-2) + '</a></li>\n');
+				$('#playListView').append('<li data-theme="c" data-icon="info"><a href="javascript:ViewInfo(' + i + ', false)" data-transition="slide"> #' + count + ' ' + songlist[i].Artist + ' - ' + songlist[i].Title + '      +' + minutestxt + ':' + ("0"+sec).slice(-2) + '</a></li>\n');
 				totalduration += songlist[i].Duration + playlistScreenTimeout;
 			}
 			$('#playListView').listview('refresh');
@@ -383,11 +391,11 @@ $(document).keypress(function(e) {
 		if ( value && value.length > 2 ) {
 			$("#autocomplete").show();
 			results = $.post("api/autocomplete",$input.val(), function (data) {
-				database = JSON.parse(data);
+				AutocompleteList = JSON.parse(data);
 				$ul.html("<li><div class='ui-loader'><span class='ui-icon ui-icon-loading'></span></div></li>");
-					for (i in database) {
+					for (i in AutocompleteList) {
 					var count = parseInt(i,10) + parseInt(1,10);
-					html += '<li data-theme="c" data-icon="info"><a href="javascript:AddSong(' + i + ')" data-transition="slide">' + ' ' + database[i].Artist + ' - ' + database[i].Title + '</a></li>\n';
+					html += '<li data-theme="c" data-icon="info"><a href="javascript:AddSong(' + i + ',true)" data-transition="slide">' + ' ' + AutocompleteList[i].Artist + ' - ' + AutocompleteList[i].Title + '</a></li>\n';
 				}
 				$ul.html( html );
 				$ul.listview("refresh");
