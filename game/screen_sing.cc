@@ -604,12 +604,15 @@ void ScreenSing::drawMenu() {
 		txt->dimensions.middle(x).center(y);
 		txt->draw(it->getName());
 		if (it->value == &m_vocalTracks[player]) {
-			Color color = MicrophoneColor::get(analyzers[player].getId());
-			ColorTrans c(color);
-			m_player_icon->dimensions.right(x).fixedHeight(0.040).center(y);
-			m_player_icon->draw();
+			if(player < analyzers.size()) {
+				Color color = MicrophoneColor::get(analyzers[player].getId());
+				ColorTrans c(color);
+				m_player_icon->dimensions.right(x).fixedHeight(0.040).center(y);
+				m_player_icon->draw();
+			}
 			player++;
 		}
+
 		w = std::max(w, txt->w() + 2 * step); // Calculate the widest entry
 		y += step;
 	}
