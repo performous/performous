@@ -8,7 +8,7 @@
 #include "theme.hh"
 #include "menu.hh"
 #include "xtime.hh"
-
+#include "qr_code.hh"
 
 ScreenIntro::ScreenIntro(std::string const& name, Audio& audio): Screen(name), m_audio(audio), m_first(true) {
 }
@@ -202,9 +202,17 @@ void ScreenIntro::draw_webserverNotice() {
 	else if(webserversetting == 2 && m_drawNotice) {
 		if(m_ipaddr.empty()) {
 			m_ipaddr = getIPaddr();
-		}
+			std::stringstream ipaddress;
+			ipaddress << "http://" << m_ipaddr << ":" << config["game/webserver_port"].i();
+			QRCode* qrCode = new QRCode(ipaddress.str().c_str(), getShareDir().string() + "/themes/default/qrCode.bmp");
+		}		
 		m_webserverStatusString << _("Webserver active!\n connect to this computer\nusing ") << m_ipaddr << ":" << config["game/webserver_port"].i();
+		//std::string str(reinterpret_cast<char*>(qrcode->data));
 		theme->WebserverNotice.draw(m_webserverStatusString.str());
+		//Surface cover(findFile("qrCode.bmp"));
+		//Surface* s = cover;
+		//s.dimensions.left(theme->qrCode.dimensions.x1()).top(theme->qrCode.dimensions.y2() + 0.05).fitInside(0.15, 0.15);
+		//cover.draw();
 	}
 }
 
