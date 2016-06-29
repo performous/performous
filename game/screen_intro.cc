@@ -207,12 +207,7 @@ void ScreenIntro::draw_webserverNotice() {
 			QRCode* qrCode = new QRCode(ipaddress.str().c_str(), getShareDir().string() + "/themes/default/qrCode.bmp");
 		}		
 		m_webserverStatusString << _("Webserver active!\n connect to this computer\nusing ") << m_ipaddr << ":" << config["game/webserver_port"].i();
-		//std::string str(reinterpret_cast<char*>(qrcode->data));
 		theme->WebserverNotice.draw(m_webserverStatusString.str());
-		//Surface cover(findFile("qrCode.bmp"));
-		//Surface* s = cover;
-		//s.dimensions.left(theme->qrCode.dimensions.x1()).top(theme->qrCode.dimensions.y2() + 0.05).fitInside(0.15, 0.15);
-		//cover.draw();
 	}
 }
 
