@@ -60,14 +60,16 @@ glmath::vec4 Color::linear() const {
 }
 
 Color MicrophoneColor::get(std::string name) {
-	if (name == "blue") return Color(0.0, 128.0/255.0, 1.0);
+	if (name == "blue") return Color(0.0, 63.75/255.0, 1.0);
 	else if (name == "red") return Color(1, 0.0, 0.0);
 	else if (name == "green") return Color(0.0, 1.0, 0.0);
 	else if (name == "yellow") return Color(1.0, 1.0, 0.0);
-	else if (name == "fuchsia") return Color(128.0/255.0, 0.0, 1.0);
-	else if (name == "orange") return Color(1.0, 85.0/255, 0.0);
-	else if (name == "purple") return Color(132.0/255.0, 0, 1.0);
+	else if (name == "fuchsia") return Color(1.0, 0.0, 127.5/255.0);
+	else if (name == "orange") return Color(1.0, 63.75/255, 0.0);
+	else if (name == "purple") return Color(127.5/255.0, 0, 1.0);
 	else if (name == "aqua") return Color(0.0, 1.0, 1.0);
+	else if (name == "white") return Color(1.0, 1.0, 1.0);
+	else if (name == "silver") return Color(191.250/255.0, 191.250/255.0, 191.250/255.0);
 	else return Color(0.5, 0.5, 0.5);
 }
 
