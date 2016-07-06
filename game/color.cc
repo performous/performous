@@ -69,8 +69,8 @@ Color MicrophoneColor::get(std::string name) {
 	else if (name == "purple") return Color(127.5/255.0, 0, 1.0);
 	else if (name == "aqua") return Color(0.0, 1.0, 1.0);
 	else if (name == "white") return Color(1.0, 1.0, 1.0);
-	else if (name == "gray") return Color(191.250/255.0, 191.250/255.0, 191.250/255.0);
-	else if (name == "black") return Color(32.0/255, 32.0/255, 32.0/255);
+	else if (name == "gray") return Color(127/255.0, 127/255.0, 127/255.0);
+	else if (name == "black") return Color(4.0/255, 4.0/255, 4.0/255);
 	else return Color(0.5, 0.5, 0.5);
 }
 
