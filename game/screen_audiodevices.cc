@@ -48,8 +48,8 @@ void ScreenAudioDevices::enter() {
 			if(!countRow("purple", *it, countmap["purple"])) { ok = false; break; }
 			if(!countRow("aqua", *it, countmap["aqua"])) { ok = false; break; }
 			if(!countRow("white", *it, countmap["white"])) { ok = false; break; }
-			if(!countRow("gray", *it, countmap["silver"])) { ok = false; break; }
-			if(!countRow("gray", *it, countmap["black"])) { ok = false; break; }
+			if(!countRow("gray", *it, countmap["gray"])) { ok = false; break; }
+			if(!countRow("black", *it, countmap["black"])) { ok = false; break; }
 			if (!countRow("out=", *it, countmap["out="])) { ok = false; break; }
 		}
 		if (!ok)
