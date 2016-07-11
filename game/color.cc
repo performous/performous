@@ -16,11 +16,6 @@ namespace {
 		typedef std::map<std::string, Color> Map;
 		Map m;
 		ColorNames() {
-			m["none"] = Color("#00000000");
-			m["black"] = Color("#000000");
-			m["gray"] = Color("#808080");
-			m["silver"] = Color("#C0C0C0");
-			m["white"] = Color("#FFFFFF");
 			m["maroon"] = Color("#800000");
 			m["red"] = Color("#FF0000");
 			m["green"] = Color("#008000");
@@ -33,7 +28,12 @@ namespace {
 			m["yellow"] = Color("#FFFF00");
 			m["teal"] = Color("#008080");
 			m["aqua"] = Color("#00FFFF");
-		}
+			m["white"] = Color("#FFFFFF");
+			m["none"] = Color("#00000000");
+			m["black"] = Color("#000000");
+			m["gray"] = Color("#808080");
+			m["silver"] = Color("#C0C0C0");
+			}
 	} colors;
 
 	// Convert sRGB color component into linear as per OpenGL specs
@@ -60,17 +60,16 @@ glmath::vec4 Color::linear() const {
 }
 
 Color MicrophoneColor::get(std::string name) {
-	if (name == "blue") return Color(0.0, 63.75/255.0, 1.0);
-	else if (name == "red") return Color(1, 0.0, 0.0);
-	else if (name == "green") return Color(0.0, 1.0, 0.0);
-	else if (name == "yellow") return Color(1.0, 1.0, 0.0);
-	else if (name == "fuchsia") return Color(1.0, 0.0, 127.5/255.0);
-	else if (name == "orange") return Color(1.0, 63.75/255, 0.0);
-	else if (name == "purple") return Color(127.5/255.0, 0, 1.0);
-	else if (name == "aqua") return Color(0.0, 1.0, 1.0);
+	if (name == "black") return Color(3.0/255.0, 3.0/255.0, 3.0/255.0);
+	else if (name == "gray") return Color(24.0/255.0, 24.0/255.0, 24.0/255.0);
 	else if (name == "white") return Color(1.0, 1.0, 1.0);
-	else if (name == "gray") return Color(127/255.0, 127/255.0, 127/255.0);
-	else if (name == "black") return Color(4.0/255, 4.0/255, 4.0/255);
+	else if (name == "aqua") return Color(0.0, 1.0, 1.0);
+	else if (name == "purple") return Color(63.0/255.0, 0, 1.0);
+	else if (name == "orange") return Color(1.0, 52.0/255.0, 0.0);
+	else if (name == "fuchsia") return Color(1.0, 0.06, 127/255.0);
+	else if (name == "yellow") return Color(1.0, 1.0, 0.0);
+	else if (name == "green") return Color(0.0, 1.0, 0.0);	
+	else if (name == "red") return Color(1, 0.0, 0.0);
+	else if (name == "blue") return Color(0.0, 43.75/255.0, 1.0);
 	else return Color(0.5, 0.5, 0.5);
 }
-
