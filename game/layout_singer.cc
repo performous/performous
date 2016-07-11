@@ -38,7 +38,12 @@ void LayoutSinger::drawScore(PositionMode position) {
 		switch(position) {
 			case LayoutSinger::FULL:
 				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.125 * j).fixedWidth(0.035).screenTop(0.055);
-				m_score_text[i%4]->dimensions().middle(-0.425 + 0.01 + 0.125 * j).fixedHeight(0.035).screenTop(0.055);
+				if (m_database.cur.size() < 9){
+					m_player_icon->dimensions.left(-0.5 + 0.01 + 0.125 * j).fixedWidth(0.035).screenTop(0.05);
+					m_score_text[i%4]->dimensions().middle(-0.425 + 0.01 + 0.125 * j).fixedHeight(0.035).screenTop(0.055);}			
+				else{
+					m_player_icon->dimensions.left(-0.506 + 0.01 + 0.0905 * j).fixedWidth(0.028).screenTop(0.050);				
+					m_score_text[i%4]->dimensions().middle(-0.519 + 0.08 + 0.0905 * j).fixedHeight(0.029).screenTop(0.053);}
 				break;
 			case LayoutSinger::TOP:
 				m_player_icon->dimensions.right(0.35).fixedHeight(0.050).screenTop(0.025 + 0.050 * j);
