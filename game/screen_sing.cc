@@ -163,6 +163,7 @@ void ScreenSing::exit() {
 	m_song->dropNotes();
 	m_menuTheme.reset();
 	theme.reset();
+    m_audio.fadeout(0);
 	if (m_audio.isPaused()) m_audio.togglePause();
 	Game::getSingletonPtr()->showLogo();
 }
