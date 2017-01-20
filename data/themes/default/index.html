@@ -344,7 +344,7 @@ $(document).keypress(function(e) {
 	database = JSON.parse(data);
 			$('#searchResultsViewer').html('<li data-role="list-divider" role="heading">Available songs:</li> <li data-theme="c">\n');
 			for (i in database) {
-				$('#searchResultsViewer').append('<li data-theme="c" data-icon="plus"><a href="javascript:AddSong('+ i + ')" data-transition="slide">' + database[i].Artist + ' - ' + database[i].Title + '</a></li>\n');
+				$('#searchResultsViewer').append('<li data-theme="c" data-icon="plus"><a href="javascript:AddSong('+ i + ')" data-transition="slide">' + database[i].Artist + ' - ' + database[i].Title + ' | ' + database[i].Language + ' - ' + database[i].Edition + '</a></li>\n');
 			}
 			$('#searchResultsViewer').listview('refresh');
 });
