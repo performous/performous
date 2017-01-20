@@ -46,6 +46,20 @@ void PlayList::swap(int index1, int index2) {
 	m_list[index1] = m_list[index2];
 	m_list[index2] = song1;
 }
+void PlayList::setPosition(unsigned int index1, unsigned int index2) {
+	if(index1 != index2) {	
+		int diff = index1 - index2;
+		if(diff > 0) {
+			// Going to Top
+			swap(index1, index1 - 1);
+			setPosition(index1 - 1, index2);
+		} else {
+			// Going to Bottom
+			swap(index1, index1 + 1);
+			setPosition(index1 + 1, index2);
+		} 
+	}
+}
 
 
 boost::shared_ptr<Song> PlayList::getSong(int index) {

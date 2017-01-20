@@ -169,6 +169,28 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 		} catch(std::exception e) {
 			return http_server::response::stock_reply(http_server::response::ok, "failure");
 		}
+	} else if (request.destination == "/api/setposition") {
+		try {
+				Json::Value root;
+				Json::Reader reader;
+				bool parsingSuccessful = reader.parse(request.body, root);
+				if(!parsingSuccessful) {
+					std::clog << "webserver/error: cannot parse Json Document" <<std::endl;
+					return http_server::response::stock_reply(http_server::response::ok, "cannot parse Json");
+				}
+				unsigned int songToMove = boost::lexical_cast<int>(root["songId"]);
+				unsigned int positionToMoveTo = boost::lexical_cast<int>(root["position"]);
+				if(positionToMoveTo <= gm->getCurrentPlayList().getList().size() -1) {
+					gm->getCurrentPlayList().setPosition(songToMove,positionToMoveTo);
+					ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
+					m_pp->triggerSongListUpdate();
+				} else {
+					return http_server::response::stock_reply(http_server::response::ok, "Not gonna move the song to "+ boost::lexical_cast<std::string>(positionToMoveTo + 1) + " since the list ain't that long.");
+				}
+			return http_server::response::stock_reply(http_server::response::ok, "Succesfuly moved the song from " + boost::lexical_cast<std::string>(songToMove + 1) + " to " + boost::lexical_cast<std::string>(positionToMoveTo + 1));
+		} catch(std::exception e) {
+			return http_server::response::stock_reply(http_server::response::ok, "failure");
+		}
 	} else {
 		return http_server::response::stock_reply(http_server::response::ok, "not yet implemented");
 	}
