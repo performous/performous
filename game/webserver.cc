@@ -176,10 +176,19 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 				bool parsingSuccessful = reader.parse(request.body, root);
 				if(!parsingSuccessful) {
 					std::clog << "webserver/error: cannot parse Json Document" <<std::endl;
-					return http_server::response::stock_reply(http_server::response::ok, "cannot parse Json");
+					return http_server::response::stock_reply(http_server::response::ok, "No valid JSON.");
 				}
 				unsigned int songToMove = boost::lexical_cast<int>(root["songId"]);
 				unsigned int positionToMoveTo = boost::lexical_cast<int>(root["position"]);
+
+				if(gm->getCurrentPlayList().getList().size() == 0) {
+					return http_server::response::stock_reply(http_server::response::ok, "Playlist is empty, can't move the song you've provided: " + boost::lexical_cast<std::string>(songToMove + 1));
+				}
+
+				if(songToMove > gm->getCurrentPlayList().getList().size() -1) {
+					return http_server::response::stock_reply(http_server::response::ok, "Not gonna move the unknown song you've provided: " + boost::lexical_cast<std::string>(songToMove + 1));
+				}
+
 				if(positionToMoveTo <= gm->getCurrentPlayList().getList().size() -1) {
 					gm->getCurrentPlayList().setPosition(songToMove,positionToMoveTo);
 					ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
