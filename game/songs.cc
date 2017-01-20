@@ -57,7 +57,7 @@ void Songs::reload_internal() {
 	}
 	prof("total");
 	if (m_loading) dumpSongs_internal(); // Dump the songlist to file (if requested)
-    std::clog << std::flush;
+	std::clog << std::flush;
 	m_loading = false;
     std::clog << "songs/notice: Done Loading. Loaded " << m_songs.size() << " Songs." << std::endl;
 }
