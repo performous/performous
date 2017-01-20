@@ -60,6 +60,8 @@ void Songs::reload_internal() {
 	std::clog << std::flush;
 	m_loading = false;
 	std::clog << "songs/notice: Done Loading. Loaded " << m_songs.size() << " Songs." << std::endl;
+	Game* gm = Game::getSingletonPtr();
+	gm->dialog(_("Done Loading! Loaded " + std::to_string(m_songs.size()) + " Songs."));	
 }
 
 void Songs::reload_internal(fs::path const& parent) {
