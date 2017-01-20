@@ -59,7 +59,7 @@ void Songs::reload_internal() {
 	if (m_loading) dumpSongs_internal(); // Dump the songlist to file (if requested)
 	std::clog << std::flush;
 	m_loading = false;
-    std::clog << "songs/notice: Done Loading. Loaded " << m_songs.size() << " Songs." << std::endl;
+	std::clog << "songs/notice: Done Loading. Loaded " << m_songs.size() << " Songs." << std::endl;
 }
 
 void Songs::reload_internal(fs::path const& parent) {
