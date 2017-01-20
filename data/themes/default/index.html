@@ -317,7 +317,7 @@ table#songtable {
 				} else {
 					durationtext = ("00"+minutes).slice(-2) + ':' + ("0"+sec).slice(-2);
 				}
-				$('#playListView').append('<li data-theme="c" data-icon="info"><a href="javascript:ViewInfo(' + i + ', false)" data-transition="slide"> #' + count + ' ' + songlist[i].Artist + ' - ' + songlist[i].Title + '      +' + durationtext + '</a></li>\n');
+				$('#playListView').append('<li data-theme="c" data-icon="info"><a href="javascript:ViewInfo(' + i + ', false)" data-transition="slide"> #' + count + ' ' + CreateSongString(songlist[i]) +' +' + durationtext + '</a></li>\n');
 				totalduration += songlist[i].Duration + playlistScreenTimeout;
 			}
 			$('#playListView').listview('refresh');
@@ -336,6 +336,25 @@ $(document).keypress(function(e) {
     }
 });
 
+function CreateSongString(song, showEdition) {
+	$totalString = song.Artist + ' - ' + song.Title;
+	if(showEdition) {
+		if (song.Language && song.Edition) {
+		   	$totalString += ' | ' + song.Language + ' - ' + song.Edition;
+		} else if (song.Language && !song.Edition) {
+			$totalString += ' | ' + song.Language;
+		} else if (!song.Language && song.Edition) {
+			$totalString += ' | ' + song.Edition;
+		}
+    } else {
+		if (song.Language) {
+		   	$totalString += ' | ' + song.Language;
+		}
+	}
+
+	return $totalString;
+}
+
 	function DoQuery() {
 	$("#autocomplete").prev().find("input").attr("id", "searchv2");
 	var query = $('#searchv2').val();
@@ -344,7 +363,8 @@ $(document).keypress(function(e) {
 	database = JSON.parse(data);
 			$('#searchResultsViewer').html('<li data-role="list-divider" role="heading">Available songs:</li> <li data-theme="c">\n');
 			for (i in database) {
-				$('#searchResultsViewer').append('<li data-theme="c" data-icon="plus"><a href="javascript:AddSong('+ i + ')" data-transition="slide">' + database[i].Artist + ' - ' + database[i].Title + ' | ' + database[i].Language + ' - ' + database[i].Edition + '</a></li>\n');
+				
+				$('#searchResultsViewer').append('<li data-theme="c" data-icon="plus"><a href="javascript:AddSong('+ i + ')" data-transition="slide">' + CreateSongString(database[i], true) + '</a></li>');
 			}
 			$('#searchResultsViewer').listview('refresh');
 });
