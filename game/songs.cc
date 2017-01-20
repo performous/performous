@@ -59,6 +59,9 @@ void Songs::reload_internal() {
 	if (m_loading) dumpSongs_internal(); // Dump the songlist to file (if requested)
 	std::clog << std::flush;
 	m_loading = false;
+	std::clog << "songs/notice: Done Loading. Loaded " << m_songs.size() << " Songs." << std::endl;
+	Game* gm = Game::getSingletonPtr();
+	gm->dialog(_("Done Loading! Loaded ") + boost::lexical_cast<std::string>(m_songs.size()) + " Songs.");	
 }
 
 void Songs::reload_internal(fs::path const& parent) {
