@@ -177,7 +177,11 @@ void FFmpeg::decodePacket() {
 		ReadFramePacket(AVFormatContext* s): m_s(s) {
 			if (av_read_frame(s, this) < 0) throw FFmpeg::eof_error();
 		}
-		~ReadFramePacket() { av_free_packet(this); }
+#if LIBAVCODEC_VERSION_INT > (AV_VERSION_INT(55, 0, 0))
+        ~ReadFramePacket() { av_packet_unref(this); } //YES THEY DID IT AGAIN
+#else
+        ~ReadFramePacket() { av_free_packet(this); }
+#endif
 	};
 
 	// Read an AVPacket and decode it into AVFrames
