@@ -405,6 +405,8 @@
         }
 
         function ViewInfo(songnumber) {
+			moveup = songnumber - 1;
+			movedown = songnumber + 1;
             $('#songinfo').html("Title: " + songlist[songnumber].Title + "<br>\nArtist: " + songlist[songnumber].Artist +
                 "<br>\nEdition: " + songlist[songnumber].Edition + "<br>\nLanguage: " + songlist[songnumber].Language + "<br>\nCreator: " +
                 songlist[songnumber].Creator + "<br>\n" + " <div class=\"ui-grid-a\">" +
@@ -415,9 +417,9 @@
                 "Cancel </a> </div> </div> <br> " +
                 "<div class=\"ui-grid-a\">" +
                 "<div class=\"ui-block-a\">" +
-                "<a id=\"btnmoveup\" data-role=\"button\" href=\"javascript:moveUp(" + songnumber + ")\" data-icon=\"arrow-u\">" +
+                "<a id=\"btnmoveup\" data-role=\"button\" href=\"javascript:setPosition(" + songnumber + ", " + moveup + ")\" data-icon=\"arrow-u\">" +
                 "Move up</a></div><div class=\"ui-block-b\"> " +
-                "<a id=\"btnmovedown\" data-role=\"button\" href=\"javascript:moveDown(" + songnumber + ")\" data-icon=\"arrow-d\">" +
+                "<a id=\"btnmovedown\" data-role=\"button\" href=\"javascript:setPosition(" + songnumber + ", " + movedown + ")\" data-icon=\"arrow-d\">" +
                 "Move Down </a> </div> </div> <br>" +
                 "<div class=\"ui-grid-a\">" +
                 "<div class=\"ui-block-a\">" +
@@ -444,20 +446,12 @@
             $.mobile.changePage("#page2");
         }
 
-        function moveUp(songnumber) {
-            $.post("api/moveup", songnumber.toString());
-            RefreshPlayList();
-            $.mobile.changePage("#page2");
-        }
-
-        function moveDown(songnumber) {
-            $.post("api/movedown", songnumber.toString());
-            RefreshPlayList();
-            $.mobile.changePage("#page2");
-        }
-
-        function setPosition(songnumber) {
-            $position = Math.floor($('#position').val() - 1);
+        function setPosition(songnumber, pos) {			
+			if(pos || pos === 0) {
+				$position = pos;
+			} else {
+	            $position = Math.floor($('#position').val() - 1);
+			}
             var data = {
                 "songId": songnumber,
                 "position": $position
