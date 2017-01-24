@@ -145,30 +145,6 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 				jsonRoot.append(SongObject);
 			}
 			return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
-	} else if (request.destination == "/api/moveup") {
-		try {
-			int songToMove = boost::lexical_cast<int>(request.body);
-			if(songToMove > 0) {
-				gm->getCurrentPlayList().swap(songToMove,songToMove -1);
-			}
-			ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
-			m_pp->triggerSongListUpdate(); //trigger live-update
-			return http_server::response::stock_reply(http_server::response::ok, "ok");
-		} catch(std::exception e) {
-			return http_server::response::stock_reply(http_server::response::ok, "failure");
-		}
-	} else if (request.destination == "/api/movedown") {
-		try {
-			unsigned int songToMove = boost::lexical_cast<int>(request.body);
-			if(songToMove < gm->getCurrentPlayList().getList().size() -1) {
-				gm->getCurrentPlayList().swap(songToMove,songToMove + 1);
-			}
-			ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
-			m_pp->triggerSongListUpdate(); //trigger live-update
-			return http_server::response::stock_reply(http_server::response::ok, "ok");
-		} catch(std::exception e) {
-			return http_server::response::stock_reply(http_server::response::ok, "failure");
-		}
 	} else if (request.destination == "/api/setposition") {
 		try {
 				Json::Value root;
