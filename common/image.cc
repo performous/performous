@@ -180,7 +180,7 @@ void loadJPEG(Bitmap& bitmap, fs::path const& filename) {
 	}
 	jpeg_create_decompress(&cinfo);
 	jpeg_mem_src(&cinfo, data.data(), data.size());
-	if (jpeg_read_header(&cinfo, true) != JPEG_HEADER_OK) throw std::runtime_error("Cannot read header of " + filename.string());
+	if (jpeg_read_header(&cinfo, TRUE) != JPEG_HEADER_OK) throw std::runtime_error("Cannot read header of " + filename.string());
 	jpeg_start_decompress(&cinfo);
 	bitmap.resize(cinfo.output_width, cinfo.output_height);
 	unsigned stride = (bitmap.width * 3 + 3) & ~3;  // Number of bytes per row (word-aligned)
