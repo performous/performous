@@ -52,6 +52,39 @@ void ScreenPaths::manageEvent(input::NavEvent const& ev) {
 	}
 }
 
+void ScreenPaths::generateMenuFromPath(fs::path path) {
+    m_menu.clear();
+    bool folderInConfig = false;
+    ConfigItem::StringList& sl = config["paths/songs"].sl();
+    ConfigItem::StringList::iterator position = sl.begin();
+    for(int i=0; i<sl.size(); i++) {
+        std::string pathstring = path.string();
+        if(sl.at(i) == pathstring) {
+            folderInConfig = true;
+            position = sl.begin() + i;
+            break;
+        }
+    }
+    if(folderInConfig) {
+        m_menu.add(MenuOption(_("Remove this folder"),_("Remove current folder from song folders")).call([this, sl, path, position]() {
+            //sl.erase(position); //WHY the fuck is this const??
+            config["paths/songs"].sl() = sl;
+        }));
+    } else {
+        m_menu.add(MenuOption(_("Add this folder"),_("Add current folder to song folders")).call([this, sl, path]() {
+           // sl.push_back(path.string()); //WHY the fuck is this const??
+           config["paths/songs"].sl() = sl;
+        }));
+    }
+    for (fs::directory_iterator dirIt(path), dirEnd; dirIt != dirEnd; ++dirIt) { //loop through files and directories
+        fs::path p = dirIt->path();
+        if (fs::is_directory(p)) {
+            m_menu.add(MenuOption(p.c_str(),_("Open folder")));
+        }
+    }
+}
+
+
 void ScreenPaths::draw() {
 	if (!Game::getSingletonPtr()->isDialogOpen())
 		Game::getSingletonPtr()->activateScreen("Intro"); // FIXME: Remove

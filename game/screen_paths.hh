@@ -2,8 +2,13 @@
 
 #include <map>
 #include <boost/scoped_ptr.hpp>
+#include <boost/filesystem.hpp>
+#include <iostream>
+#include <string>
+#include "menu.hh"
 #include "screen.hh"
 #include "textinput.hh"
+#include "config.hh"
 
 class Audio;
 class ThemeAudioDevices;
@@ -18,10 +23,12 @@ class ScreenPaths: public Screen {
 	void manageEvent(SDL_Event event);
 	void manageEvent(input::NavEvent const& event);
 	void draw();
+    void generateMenuFromPath(fs::path path);
 
   private:
 	Audio& m_audio;
 	boost::scoped_ptr<ThemeAudioDevices> m_theme;
 	TextInput m_txtinp;
+    Menu m_menu;
 };
 
