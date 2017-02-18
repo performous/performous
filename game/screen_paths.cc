@@ -74,9 +74,15 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 	for (fs::directory_iterator dirIt(path), dirEnd; dirIt != dirEnd; ++dirIt) { //loop through files and directories
 		fs::path p = dirIt->path();
 		if (fs::is_directory(p)) {
-			m_menu.add(MenuOption(p.c_str(),_("Open folder")).call([this, p](){
-				generateMenuFromPath(p);
-			}));
+			if(p.filename().c_str()[0] == '.') {
+				continue;
+				std::clog << "screen_paths/notice: Ignoring hidden folder: ." << p.c_str() << std::endl;
+			} else {
+				m_menu.add(MenuOption(p.c_str(),_("Open folder")).call([this, p](){
+					generateMenuFromPath(p);
+				}));
+			}
+
 		}
 	}
 }
