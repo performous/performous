@@ -1,4 +1,4 @@
-#include "screen_paths.hh"
+﻿#include "screen_paths.hh"
 
 #include "configuration.hh"
 #include "controllers.hh"
@@ -13,13 +13,8 @@ ScreenPaths::ScreenPaths(std::string const& name, Audio& audio): Screen(name), m
 void ScreenPaths::enter() {
 	m_theme.reset(new ThemeAudioDevices());
 	m_txtinp.text.clear();
-
-	// FIXME: Temp error message
-	Game::getSingletonPtr()->dialog(
-		_("This tool is not yet available.\n"
-		  "Configure paths by adding them\n"
-		  "as command line parameters and\n"
-		  "then save them in configuration menu."));
+	fs::path homedir(getenv("HOME"));
+	generateMenuFromPath(homedir);
 }
 
 void ScreenPaths::exit() { m_theme.reset(); }
@@ -53,43 +48,70 @@ void ScreenPaths::manageEvent(input::NavEvent const& ev) {
 }
 
 void ScreenPaths::generateMenuFromPath(fs::path path) {
-    m_menu.clear();
-    bool folderInConfig = false;
-    ConfigItem::StringList& sl = config["paths/songs"].sl();
-    ConfigItem::StringList::iterator position = sl.begin();
-    for(int i=0; i<sl.size(); i++) {
-        std::string pathstring = path.string();
-        if(sl.at(i) == pathstring) {
-            folderInConfig = true;
-            position = sl.begin() + i;
-            break;
-        }
-    }
-    if(folderInConfig) {
-        m_menu.add(MenuOption(_("Remove this folder"),_("Remove current folder from song folders")).call([this, sl, path, position]() {
-            //sl.erase(position); //WHY the fuck is this const??
-            config["paths/songs"].sl() = sl;
-        }));
-    } else {
-        m_menu.add(MenuOption(_("Add this folder"),_("Add current folder to song folders")).call([this, sl, path]() {
-           // sl.push_back(path.string()); //WHY the fuck is this const??
-           config["paths/songs"].sl() = sl;
-        }));
-    }
-    for (fs::directory_iterator dirIt(path), dirEnd; dirIt != dirEnd; ++dirIt) { //loop through files and directories
-        fs::path p = dirIt->path();
-        if (fs::is_directory(p)) {
-            m_menu.add(MenuOption(p.c_str(),_("Open folder")));
-        }
-    }
+	m_menu.clear();
+	bool folderInConfig = false;
+	ConfigItem::StringList& sl = config["paths/songs"].sl();
+	ConfigItem::StringList::iterator position = sl.begin();
+	for(unsigned int i=0; i<sl.size(); i++) {
+		std::string pathstring = path.string();
+		if(sl.at(i) == pathstring) {
+			folderInConfig = true;
+			position = sl.begin() + i;
+			break;
+		}
+	}
+	if(folderInConfig) {
+		m_menu.add(MenuOption(_("Remove this folder"),_("Remove current folder from song folders")).call([this, sl, path, position]() {
+			//sl.erase(position); //WHY the fuck is this const??
+			config["paths/songs"].sl() = sl;
+		}));
+	} else {
+		m_menu.add(MenuOption(_("Add this folder"),_("Add current folder to song folders")).call([this, sl, path]() {
+		   // sl.push_back(path.string()); //WHY the fuck is this const??
+		   config["paths/songs"].sl() = sl;
+		}));
+	}
+	for (fs::directory_iterator dirIt(path), dirEnd; dirIt != dirEnd; ++dirIt) { //loop through files and directories
+		fs::path p = dirIt->path();
+		if (fs::is_directory(p)) {
+			m_menu.add(MenuOption(p.c_str(),_("Open folder")).call([this, p](){
+				generateMenuFromPath(p);
+			}));
+		}
+	}
 }
 
 
 void ScreenPaths::draw() {
-	if (!Game::getSingletonPtr()->isDialogOpen())
-		Game::getSingletonPtr()->activateScreen("Intro"); // FIXME: Remove
 
 	m_theme->bg.draw();
+
+	//draw menu:
+	{
+		const size_t showopts = 9; // Show at most 8 options simultaneously
+		const float sel_margin = 0.04;
+		const float x = -0.35;
+		const float start_y = -0.15;
+		double wcounter = 0;
+		const MenuOptions opts = m_menu.getOptions();
+		int start_i = std::min((int)m_menu.curIndex() - 1, (int)opts.size() - (int)showopts
+			+ (m_menu.getSubmenuLevel() == 2 ? 1 : 0)); // Hack to counter side-effects from displaying the value inside the menu
+		if (start_i < 0 || opts.size() == showopts) start_i = 0;
+		for (size_t i = start_i, ii = 0; ii < showopts && i < opts.size(); ++i, ++ii) {
+			MenuOption const& opt = opts[i];
+			if (i == m_menu.curIndex()) {
+				// Animate selection higlight moving
+				wcounter = std::max(wcounter, m_theme->device.w() + 2 * sel_margin); // Calculate the widest entry
+			} else {
+				std::string title = opt.getName();
+				ColorTrans c(Color::alpha(opt.isActive() ? 0.8 : 0.5));
+				m_theme->device.dimensions.left(x).center(start_y + ii*0.05);
+				m_theme->device.draw(title);
+			}
+		}
+	}
+
+
 
 	// Key help
 	m_theme->comment_bg.dimensions.stretch(1.0, 0.025).middle().screenBottom(-0.054);
