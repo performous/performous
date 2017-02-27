@@ -60,6 +60,19 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 			break;
 		}
 	}
+	bool showHiddenfolders = config["paths/showhiddenfolders"].b();
+	if(showHiddenfolders) {
+		m_menu.add(MenuOption(_("hide hidden folders"),_("hide hidden folders")).call([this, sl, path, position]() {
+			config["paths/showhiddenfolders"].b() = false;
+			generateMenuFromPath(path);
+		}));
+	} else {
+		m_menu.add(MenuOption(_("show hidden folders"),_("show hidden folders")).call([this, sl, path, position]() {
+			config["paths/showhiddenfolders"].b() = true;
+			generateMenuFromPath(path);
+		}));
+	}
+
 	if(folderInConfig) {
 		m_menu.add(MenuOption(_("Remove this folder"),_("Remove current folder from song folders")).call([this, sl, path, position]() {
 			//sl.erase(position); //WHY the fuck is this const??
@@ -71,6 +84,8 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 		   config["paths/songs"].sl() = sl;
 		}));
 	}
+
+
 	for (fs::directory_iterator dirIt(path), dirEnd; dirIt != dirEnd; ++dirIt) { //loop through files and directories
 		fs::path p = dirIt->path();
 		if (fs::is_directory(p)) {
