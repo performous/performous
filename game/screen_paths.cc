@@ -12,7 +12,6 @@ ScreenPaths::ScreenPaths(std::string const& name, Audio& audio): Screen(name), m
 
 void ScreenPaths::enter() {
 	m_theme.reset(new ThemeAudioDevices());
-	m_txtinp.text.clear();
 	fs::path homedir(getenv("HOME"));
 	generateMenuFromPath(homedir);
 }
@@ -20,9 +19,7 @@ void ScreenPaths::enter() {
 void ScreenPaths::exit() { m_theme.reset(); }
 
 void ScreenPaths::manageEvent(SDL_Event event) {
-	if (event.type == SDL_TEXTINPUT) {
-		m_txtinp += event.text.text;
-	} else if (event.type == SDL_KEYDOWN) {
+	if (event.type == SDL_KEYDOWN) {
 		SDL_Keycode key = event.key.keysym.scancode;
 		uint16_t modifier = event.key.keysym.mod;
 		// Reset to defaults
@@ -37,13 +34,13 @@ void ScreenPaths::manageEvent(SDL_Event event) {
 void ScreenPaths::manageEvent(input::NavEvent const& ev) {
 	Game* gm = Game::getSingletonPtr();
 	if (ev.button == input::NAV_CANCEL) {
-		if (m_txtinp.text.empty()) gm->activateScreen("Intro");
-		else m_txtinp.text.clear();
+		gm->activateScreen("Intro");
 	}
 	else if (ev.button == input::NAV_PAUSE) m_audio.togglePause();
+	else if (ev.button == input::NAV_DOWN || ev.button == input::NAV_MOREDOWN) m_menu.move(1);
+	else if (ev.button == input::NAV_UP || ev.button == input::NAV_MOREUP) m_menu.move(-1);
 	else if (ev.button == input::NAV_START) { 
-		// TODO: Save config
-		gm->activateScreen("Intro");
+		m_menu.action();
 	}
 }
 
@@ -84,14 +81,16 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 		   config["paths/songs"].sl() = sl;
 		}));
 	}
-
+	m_menu.add(MenuOption(_(".."),_("go up one folder")).call([this, sl, path, position]() {
+		generateMenuFromPath(path.parent_path());
+	}));
 
 	for (fs::directory_iterator dirIt(path), dirEnd; dirIt != dirEnd; ++dirIt) { //loop through files and directories
 		fs::path p = dirIt->path();
 		if (fs::is_directory(p)) {
-			if(p.filename().c_str()[0] == '.') {
-				continue;
+			if(p.filename().c_str()[0] == '.' && !showHiddenfolders) {
 				std::clog << "screen_paths/notice: Ignoring hidden folder: ." << p.c_str() << std::endl;
+				continue;
 			} else {
 				m_menu.add(MenuOption(p.c_str(),_("Open folder")).call([this, p](){
 					generateMenuFromPath(p);
@@ -109,9 +108,11 @@ void ScreenPaths::draw() {
 
 	//draw menu:
 	{
-		const size_t showopts = 9; // Show at most 8 options simultaneously
+		m_theme->back_h.dimensions.fixedHeight(0.065f);
+		m_theme->back_h.dimensions.stretch(m_menu.dimensions.w(), m_theme->back_h.dimensions.h());
+		const size_t showopts = 13; // Show at most 8 options simultaneously
 		const float sel_margin = 0.04;
-		const float x = -0.35;
+		const float x = -0.45;
 		const float start_y = -0.15;
 		double wcounter = 0;
 		const MenuOptions opts = m_menu.getOptions();
@@ -121,29 +122,28 @@ void ScreenPaths::draw() {
 		for (size_t i = start_i, ii = 0; ii < showopts && i < opts.size(); ++i, ++ii) {
 			MenuOption const& opt = opts[i];
 			if (i == m_menu.curIndex()) {
-				// Animate selection higlight moving
+				double selanim = m_selAnim.get() - start_i;
+				if (selanim < 0) selanim = 0;
+				m_theme->back_h.dimensions.left(x - sel_margin).center(start_y + selanim*0.08);
+				m_theme->back_h.draw();
+				// Draw the text, dim if option not available
+				{
+					ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
+					m_theme->device.dimensions.left(x).center(start_y + ii*0.03);
+					m_theme->device.draw(opt.getName());
+				}
 				wcounter = std::max(wcounter, m_theme->device.w() + 2 * sel_margin); // Calculate the widest entry
+				// If this is a config item, show the value below
 			} else {
-				std::string title = opt.getName();
 				ColorTrans c(Color::alpha(opt.isActive() ? 0.8 : 0.5));
-				m_theme->device.dimensions.left(x).center(start_y + ii*0.05);
-				m_theme->device.draw(title);
+				m_theme->device.dimensions.left(x).center(start_y + ii*0.03);
+				m_theme->device.draw(opt.getName());
 			}
 		}
-	}
-
-
-
-	// Key help
-	m_theme->comment_bg.dimensions.stretch(1.0, 0.025).middle().screenBottom(-0.054);
+	} //draw menu
+	m_theme->comment_bg.dimensions.center().screenBottom(-0.01);
 	m_theme->comment_bg.draw();
-	m_theme->comment.dimensions.left(-0.48).screenBottom(-0.067);
-	m_theme->comment.draw(_("Press any key to exit."));
-	// Additional info
-	#ifdef _WIN32
-	m_theme->comment_bg.dimensions.middle().screenBottom(-0.01);
-	m_theme->comment_bg.draw();
-	m_theme->comment.dimensions.left(-0.48).screenBottom(-0.023);
-	m_theme->comment.draw(_("Windows users can also use ConfigureSongDirectory.bat script."));
-	#endif
+	m_theme->comment.dimensions.left(-0.48).screenBottom(-0.028);
+	m_theme->comment.draw(m_menu.current().getComment());
+
 }
