@@ -16,7 +16,10 @@ void ScreenPaths::enter() {
 	generateMenuFromPath(homedir);
 }
 
-void ScreenPaths::exit() { m_theme.reset(); }
+void ScreenPaths::exit() {
+	m_theme.reset();
+	m_songs.reload();
+}
 
 void ScreenPaths::manageEvent(SDL_Event event) {
 	if (event.type == SDL_KEYDOWN) {
