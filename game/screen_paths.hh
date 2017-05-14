@@ -9,6 +9,7 @@
 #include "screen.hh"
 #include "textinput.hh"
 #include "config.hh"
+#include "songs.hh"
 
 class Audio;
 class ThemeAudioDevices;
@@ -17,7 +18,7 @@ class ThemeAudioDevices;
 class ScreenPaths: public Screen {
   public:
 	/// constructor
-	ScreenPaths(std::string const& name, Audio& m_audio);
+	ScreenPaths(std::string const& name, Audio& audio, Songs& songs);
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);
@@ -27,6 +28,7 @@ class ScreenPaths: public Screen {
 
   private:
 	Audio& m_audio;
+	Songs& m_songs;
 	boost::scoped_ptr<ThemeAudioDevices> m_theme;
 	Menu m_menu;
 	AnimValue m_selAnim;

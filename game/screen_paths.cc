@@ -8,7 +8,7 @@
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 
-ScreenPaths::ScreenPaths(std::string const& name, Audio& audio): Screen(name), m_audio(audio) {}
+ScreenPaths::ScreenPaths(std::string const& name, Audio& audio, Songs& songs): Screen(name), m_audio(audio), m_songs(songs) {}
 
 void ScreenPaths::enter() {
 	m_theme.reset(new ThemeAudioDevices());
@@ -27,6 +27,10 @@ void ScreenPaths::manageEvent(SDL_Event event) {
 			config["paths/songs"].reset(modifier & KMOD_ALT);
 			config["paths/system"].reset(modifier & KMOD_ALT);
 			// TODO: Save
+		}else if (key == SDL_SCANCODE_S && modifier & KMOD_CTRL) {
+			writeConfig(modifier & KMOD_ALT);
+			Game::getSingletonPtr()->flashMessage((modifier & KMOD_ALT)
+				? _("Settings saved as system defaults.") : _("Settings saved."));
 		}
 	}
 }
@@ -37,11 +41,11 @@ void ScreenPaths::manageEvent(input::NavEvent const& ev) {
 		gm->activateScreen("Intro");
 	}
 	else if (ev.button == input::NAV_PAUSE) m_audio.togglePause();
-	else if (ev.button == input::NAV_DOWN || ev.button == input::NAV_MOREDOWN) m_menu.move(1);
-	else if (ev.button == input::NAV_UP || ev.button == input::NAV_MOREUP) m_menu.move(-1);
-	else if (ev.button == input::NAV_START) { 
-		m_menu.action();
-	}
+	else if (ev.button == input::NAV_DOWN) m_menu.move(1);
+	else if (ev.button == input::NAV_MOREDOWN) m_menu.move(5);
+	else if (ev.button == input::NAV_UP) m_menu.move(-1);
+	else if (ev.button == input::NAV_MOREUP) m_menu.move(-5);
+	else if (ev.button == input::NAV_START) m_menu.action();
 }
 
 void ScreenPaths::generateMenuFromPath(fs::path path) {
@@ -72,19 +76,21 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 
 	if(folderInConfig) {
 		m_menu.add(MenuOption(_("Remove this folder"),_("Remove current folder from song folders")).call([this, sl, path, position]() {
-			//sl.erase(position); //WHY the fuck is this const??
-			config["paths/songs"].sl() = sl;
+			config["paths/songs"].sl().erase(position); //WHY the fuck is this const??
+			generateMenuFromPath(path);
+			//Reload internal, but that crashes!! rely on the user to press ctrl+r in song selection screen
 		}));
 	} else {
 		m_menu.add(MenuOption(_("Add this folder"),_("Add current folder to song folders")).call([this, sl, path]() {
-		   // sl.push_back(path.string()); //WHY the fuck is this const??
-		   config["paths/songs"].sl() = sl;
+			config["paths/songs"].sl().push_back(path.string()); //WHY the fuck is this const??
+			generateMenuFromPath(path);
+			//Reload internal, but that crashes!! rely on the user to press ctrl+r in song selection screen
 		}));
 	}
 	m_menu.add(MenuOption(_(".."),_("go up one folder")).call([this, sl, path, position]() {
 		generateMenuFromPath(path.parent_path());
 	}));
-
+//todo sort folders
 	for (fs::directory_iterator dirIt(path), dirEnd; dirIt != dirEnd; ++dirIt) { //loop through files and directories
 		fs::path p = dirIt->path();
 		if (fs::is_directory(p)) {
