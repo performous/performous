@@ -311,8 +311,8 @@ to save the current settings to XML.
 		<long>Where to recursively look for songs. DATADIR at the beginning means all Performous data folders.</long>
 	</entry>
 	<entry name="paths/showhiddenfolders" type="bool" value = "false">
-		<short> Show Hidden Folders </short>
-		<long> When true the screen_paths will also show hidden folders </long>
+		<short>Show hidden folders</short>
+		<long>When true the screen_paths will also show hidden folders</long>
 	</entry>
 	<entry name="paths/system" type="string_list">
 		<short>Base folders for data</short>
