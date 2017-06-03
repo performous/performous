@@ -1,4 +1,4 @@
-#include "fs.hh"
+﻿#include "fs.hh"
 
 #include "config.hh"
 #include "configuration.hh"
@@ -195,9 +195,14 @@ Paths const& getPaths() { Lock l(mutex); return cache.paths; }
 Paths getThemePaths() {
 	const fs::path themes = "themes";
 	const fs::path def = "default";
+	const fs::path www = "www";
 	std::string theme = config["game/theme"].getEnumName();
 	Paths paths = getPaths();
-	Paths infixes = { themes / theme, themes / def, fs::path() };
+	Paths infixes = { themes / theme,
+					  themes / def,
+					  themes / theme / www,
+					  themes / def / www,
+					  fs::path() };
 	if (!theme.empty() && theme != def) infixes.push_front(themes / theme);
 	// Build combinations of paths and infixes
 	Paths themePaths;
