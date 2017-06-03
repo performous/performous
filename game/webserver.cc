@@ -21,8 +21,11 @@ struct WebServer::handler {
 			response = http_server::response::stock_reply(
 			http_server::response::ok, "other request");
 		}
-		boost::network::http::response_header_narrow header = {"Content-Type", content_type };
-		response.headers.push_back(header);//this looks uber-dope, but cpp-netlib requires the handler struct scope to assign headers.
+		for(unsigned int i=0; i< response.headers.size(); i++) {
+			if(response.headers.at(i).name == "Content-Type") {
+				response.headers.at(i).value = content_type;
+			}
+		}
 	}
 
 	void log(http_server::string_type const &info) {
