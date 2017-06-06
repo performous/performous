@@ -1,8 +1,9 @@
-#include "webserver.hh"
+﻿#include "webserver.hh"
 #ifdef USE_CPPNETLIB
 #include <boost/network/protocol/http/server.hpp>
 
 namespace http = boost::network::http;
+
 
 typedef http::server<WebServer::handler> http_server;
 
@@ -11,13 +12,19 @@ struct WebServer::handler {
 
 	void operator() (http_server::request const &request, http_server::response &response) {
 		// Destination describes the file to be loaded, by default it's "/"
+		std::string content_type = "text/html";
 		if (request.method == "GET") {
-			response = m_server.GETresponse(request);
+			response = m_server.GETresponse(request, content_type);
 		} else if (request.method == "POST") {
 			response = m_server.POSTresponse(request);
 		} else {
 			response = http_server::response::stock_reply(
 			http_server::response::ok, "other request");
+		}
+		for(unsigned int i=0; i< response.headers.size(); i++) {
+			if(response.headers.at(i).name == "Content-Type") {
+				response.headers.at(i).value = content_type;
+			}
 		}
 	}
 
@@ -55,7 +62,8 @@ WebServer::~WebServer() {
 	m_serverThread->join();
 }
 
-http_server::response WebServer::GETresponse(const http_server::request &request) {
+http_server::response WebServer::GETresponse(const http_server::request &request, std::string& content_type) {
+	content_type = "text/html";
 	if (request.destination == "/") { //default
 		BinaryBuffer buf = readFile(findFile("index.html"));
 		return http_server::response::stock_reply(http_server::response::ok, std::string(buf.begin(), buf.end()));
@@ -96,12 +104,26 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 			while(destination[1] == '.' && destination[2] == '.' && destination[3] == '/') {
 				destination.erase(1,4);
 			}
-			destination.erase(0,1);//remove the first /
-			BinaryBuffer buf = readFile(findFile(destination));
-			return http_server::response::stock_reply(http_server::response::ok, std::string(buf.begin(), buf.end()));
+			destination.erase(0,destination.find_last_of('/') + 1);//we're only intrested in the filename
+			fs::path fileToSend = findFile(destination);
+			BinaryBuffer buf = readFile(fileToSend);
+			http_server::response m_response = http_server::response::stock_reply(http_server::response::ok, std::string(buf.begin(), buf.end()));
+			if(destination.find(".js") != std::string::npos) { //javascript!!
+				content_type = "text/javascript";
+			} else if (destination.find(".css") != std::string::npos) { //stylesheet
+				content_type = "text/css";
+			} else if (destination.find(".png") != std::string::npos) { //other icons
+				content_type = "image/png";
+			} else if (destination.find(".gif") != std::string::npos) { //gif for loading animation
+				content_type = "image/gif";
+			} else if (destination.find(".ico") != std::string::npos) { //ico for page icon
+				 content_type = "image/x-icon";
+			}
+			return m_response;
+
 		}
 		catch(std::exception e) {
-			return http_server::response::stock_reply(http_server::response::ok, "not a text file");
+			return http_server::response::stock_reply(http_server::response::not_found, "notfound");
 		}
 	}
 }
