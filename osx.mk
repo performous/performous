@@ -1,3 +1,17 @@
+# This Makefile allows you to build on osx, using homebrew rather than
+# MacPorts, for reasons that will be obvious to anybody who uses
+# homebrew and has tried to use *both* homebrew and MacPorts on the
+# same box before.
+#
+# Using it is fairly straightforward:
+#
+# Step 1: install homebrew.
+#
+# Step 2: Run make
+# ```
+# make -f osx.mk all
+# ```
+
 all : build dependencies
 	cd build && cmake \
 		-D Crypto_INCLUDE_DIR=/usr/local/Cellar/openssl/1.0.2h_1/include/openssl/ \
