@@ -183,7 +183,7 @@ namespace {
 	};
 
 	/// A helper for easily constructing CmpByField objects
-	template <typename T> CmpByField<T> comparator(T Song::*field) { return CmpByField<T>(field); }
+	template <typename T> CmpByField<T> customComparator(T Song::*field) { return CmpByField<T>(field); }
 
 	static const int types = 7, orders = 7;
 
@@ -246,13 +246,13 @@ void Songs::sortChange(int diff) {
 
 void Songs::sort_internal() {
 	switch (m_order) {
-	  case 0: std::stable_sort(m_filtered.begin(), m_filtered.end(), comparator(&Song::randomIdx)); break;
-	  case 1: std::sort(m_filtered.begin(), m_filtered.end(), comparator(&Song::collateByTitle)); break;
-	  case 2: std::sort(m_filtered.begin(), m_filtered.end(), comparator(&Song::collateByArtist)); break;
-	  case 3: std::sort(m_filtered.begin(), m_filtered.end(), comparator(&Song::edition)); break;
-	  case 4: std::sort(m_filtered.begin(), m_filtered.end(), comparator(&Song::genre)); break;
-	  case 5: std::sort(m_filtered.begin(), m_filtered.end(), comparator(&Song::path)); break;
-	  case 6: std::sort(m_filtered.begin(), m_filtered.end(), comparator(&Song::language)); break;
+	  case 0: std::stable_sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::randomIdx)); break;
+	  case 1: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::collateByTitle)); break;
+	  case 2: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::collateByArtist)); break;
+	  case 3: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::edition)); break;
+	  case 4: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::genre)); break;
+	  case 5: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::path)); break;
+	  case 6: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::language)); break;
 	  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
 	}
 }
@@ -293,7 +293,7 @@ namespace {
 void Songs::dumpSongs_internal() const {
 	if (m_songlist.empty()) return;
 	SongVector svec = m_songs;
-	std::sort(svec.begin(), svec.end(), comparator(&Song::collateByArtist));
+	std::sort(svec.begin(), svec.end(), customComparator(&Song::collateByArtist));
 	fs::path coverpath = fs::path(m_songlist) / "covers";
 	fs::create_directories(coverpath);
 	dumpXML(svec, m_songlist + "/songlist.xml");

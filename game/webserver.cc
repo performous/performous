@@ -2,6 +2,9 @@
 #ifdef USE_CPPNETLIB
 #include <boost/network/protocol/http/server.hpp>
 
+#include <boost/locale.hpp>
+#include <iostream>
+
 namespace http = boost::network::http;
 
 
@@ -96,7 +99,20 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
 	} else if(request.destination == "/api/getplaylistTimeout") {
 		return http_server::response::stock_reply(http_server::response::ok, std::to_string(config["game/playlist_screen_timeout"].i()));
-	} else {
+	} else if(request.destination.find("/api/language") == 0) {
+		map<std::string, std::string> m = GenerateLocaleDict();
+		
+		Json::Value jsonRoot = Json::arrayValue;
+		for (std::map<std::string, std::string>::iterator it=m.begin(); it!=m.end(); ++it) {
+    		Json::Value Translation = Json::objectValue;
+    		Translation["msgid"] = it->first;
+    		Translation["msgstr"] = it->second;
+    		jsonRoot.append(Translation);
+		}
+
+        return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
+}
+	else {
 		//other text files
 		try {
 			std::string destination = request.destination;
@@ -201,6 +217,43 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 	} else {
 		return http_server::response::stock_reply(http_server::response::ok, "not yet implemented");
 	}
+}
+
+std::map<std::string, std::string> WebServer::GenerateLocaleDict() {
+	std::vector<std::string> translationKeys = GetTranslationKeys();
+    
+    map<std::string, std::string> m;
+    for(auto translationKey : translationKeys) {
+		m.insert(pair<std::string, std::string>(translationKey, _(translationKey)));
+	}
+    return m;
+}
+
+std::vector<std::string> WebServer::GetTranslationKeys() {
+	std::vector<std::string> tranlationKeys = { 
+		"Performous web frontend",
+		"View database",
+		"View playlist",
+		"Search & Add",
+		"Sort by:",
+		"Artist",
+		"Title",
+		"Language",
+		"Edition",
+		"Creator",
+		"Sort order:",
+		"Normal",
+		"Inverted",
+		"Refresh database",
+		"Upcoming songs:",
+		"Refresh Playlist",
+		"Web interface by Niek Nooijens & Arjan Speiard, for full credits regarding Performous see /docs/Authors.txt",
+		"Search",
+		"Available songs:",
+		"Search for songs"
+	};
+
+	return tranlationKeys;
 }
 
 boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {

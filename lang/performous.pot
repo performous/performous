@@ -1104,3 +1104,83 @@ msgid ""
 "System defaults are included automatically. Additional paths can be added "
 "here."
 msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "Performous web frontend"
+msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "View database"
+msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "View playlist"
+msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "Search & Add"
+msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "Sort by:"
+msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "Artist"
+msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "Title"
+msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "Language"
+msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "Edition"
+msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "Creator"
+msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "Sort order:"
+msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "Normal"
+msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "Inverted"
+msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "Refresh database"
+msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "Upcoming songs:"
+msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "Refresh Playlist"
+msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "Web interface by Niek Nooijens & Arjan Speiard, for full credits regarding Performous see /docs/Authors.txt"
+msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "Search"
+msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "Available songs:"
+msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "Search for songs"
+msgstr ""
