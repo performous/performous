@@ -1118,11 +1118,11 @@ msgid "View playlist"
 msgstr ""
 
 #: ../data/themes/default/www/index.html
-msgid "Search & Add"
+msgid "Search and Add"
 msgstr ""
 
 #: ../data/themes/default/www/index.html
-msgid "Sort by:"
+msgid "Sort by"
 msgstr ""
 
 #: ../data/themes/default/www/index.html
@@ -1146,7 +1146,7 @@ msgid "Creator"
 msgstr ""
 
 #: ../data/themes/default/www/index.html
-msgid "Sort order:"
+msgid "Sort order"
 msgstr ""
 
 #: ../data/themes/default/www/index.html
@@ -1162,7 +1162,7 @@ msgid "Refresh database"
 msgstr ""
 
 #: ../data/themes/default/www/index.html
-msgid "Upcoming songs:"
+msgid "Upcoming songs"
 msgstr ""
 
 #: ../data/themes/default/www/index.html
@@ -1170,17 +1170,29 @@ msgid "Refresh Playlist"
 msgstr ""
 
 #: ../data/themes/default/www/index.html
-msgid "Web interface by Niek Nooijens & Arjan Speiard, for full credits regarding Performous see /docs/Authors.txt"
-msgstr ""
+msgid "Credits"
+msgstr "Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding Performous see /docs/Authors.txt"
 
 #: ../data/themes/default/www/index.html
 msgid "Search"
 msgstr ""
 
 #: ../data/themes/default/www/index.html
-msgid "Available songs:"
+msgid "Available songs"
 msgstr ""
 
 #: ../data/themes/default/www/index.html
 msgid "Search for songs"
+msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "Update every 10 sec"
+msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "Yes"
+msgstr ""
+
+#: ../data/themes/default/www/index.html
+msgid "No"
 msgstr ""

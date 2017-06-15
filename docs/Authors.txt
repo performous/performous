@@ -22,6 +22,14 @@ Niek Nooijens <https://github.com/nieknooijens>
 	* Emedded Webserver (with help from Lasse Kärkkäinen)
 	* Mobile page design.
 
+Arjan Speiard <https://asgardsings.nl>
+	* WebServer features.
+		* Autocompletion
+		* Localization
+		* Structure
+		* Set song position
+	* Introduced 8 player mode.
+
 
 INACTIVE DEVELOPERS
 -------------------

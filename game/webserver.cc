@@ -102,12 +102,12 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 	} else if(request.destination.find("/api/language") == 0) {
 		map<std::string, std::string> m = GenerateLocaleDict();
 		
-		Json::Value jsonRoot = Json::arrayValue;
+		Json::Value jsonRoot = Json::objectValue;
 		for (std::map<std::string, std::string>::iterator it=m.begin(); it!=m.end(); ++it) {
-    		Json::Value Translation = Json::objectValue;
-    		Translation["msgid"] = it->first;
-    		Translation["msgstr"] = it->second;
-    		jsonRoot.append(Translation);
+			std::string key = it->first;
+			std::replace(key.begin(), key.end(), ' ', '_');
+			boost::to_lower(key);
+    		jsonRoot[key] = it->second;
 		}
 
         return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
@@ -234,23 +234,26 @@ std::vector<std::string> WebServer::GetTranslationKeys() {
 		"Performous web frontend",
 		"View database",
 		"View playlist",
-		"Search & Add",
-		"Sort by:",
+		"Search and Add",
+		"Sort by",
 		"Artist",
 		"Title",
 		"Language",
 		"Edition",
 		"Creator",
-		"Sort order:",
+		"Sort order",
 		"Normal",
 		"Inverted",
+		"Update every 10 sec",
 		"Refresh database",
-		"Upcoming songs:",
+		"Upcoming songs",
 		"Refresh Playlist",
-		"Web interface by Niek Nooijens & Arjan Speiard, for full credits regarding Performous see /docs/Authors.txt",
+		"Credits",
 		"Search",
-		"Available songs:",
-		"Search for songs"
+		"Available songs",
+		"Search for songs",
+		"Yes",
+		"No"
 	};
 
 	return tranlationKeys;

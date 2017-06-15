@@ -1255,3 +1255,91 @@ msgstr ""
 
 #~ msgid "Miscellaneous..."
 #~ msgstr "Diversen..."
+
+#: ../data/themes/default/www/index.html
+msgid "Performous web frontend"
+msgstr "Performous website"
+
+#: ../data/themes/default/www/index.html
+msgid "View database"
+msgstr "Bekijk database"
+
+#: ../data/themes/default/www/index.html
+msgid "Search and Add"
+msgstr "Zoeken & Toevoegen"
+
+#: ../data/themes/default/www/index.html
+msgid "Sort by"
+msgstr "Gesorteerd op"
+
+#: ../data/themes/default/www/index.html
+msgid "Artist"
+msgstr "Artiest"
+
+#: ../data/themes/default/www/index.html
+msgid "Title"
+msgstr "Titel"
+
+#: ../data/themes/default/www/index.html
+msgid "Language"
+msgstr "Taal"
+
+#: ../data/themes/default/www/index.html
+msgid "Edition"
+msgstr "Editie"
+
+#: ../data/themes/default/www/index.html
+msgid "Creator"
+msgstr "Maker"
+
+#: ../data/themes/default/www/index.html
+msgid "Sort order"
+msgstr "Sorteervolgorde"
+
+#: ../data/themes/default/www/index.html
+msgid "Normal"
+msgstr "Normaal"
+
+#: ../data/themes/default/www/index.html
+msgid "Inverted"
+msgstr "Omgekeerd"
+
+#: ../data/themes/default/www/index.html
+msgid "Refresh database"
+msgstr "Ververs database"
+
+#: ../data/themes/default/www/index.html
+msgid "Upcoming songs"
+msgstr "Aankomende liedjes"
+
+#: ../data/themes/default/www/index.html
+msgid "Refresh Playlist"
+msgstr "Vernieuw afspeellijst"
+
+#: ../data/themes/default/www/index.html
+msgid "Credits"
+msgstr "Web interface gemaakt door Niek Nooijens en Arjan Speiard, voor de volledige lijst bekijk /docs/Authors.txt"
+
+#: ../data/themes/default/www/index.html
+msgid "Search"
+msgstr "Zoeken"
+
+#: ../data/themes/default/www/index.html
+msgid "Available songs"
+msgstr "Beschikbare liedjes"
+
+#: ../data/themes/default/www/index.html
+msgid "Search for songs"
+msgstr "Zoek een liedje"
+
+#: ../data/themes/default/www/index.html
+msgid "Update every 10 sec"
+msgstr "Ververs iedere 10 seconden"
+
+#: ../data/themes/default/www/index.html
+msgid "Yes"
+msgstr "Ja"
+
+#: ../data/themes/default/www/index.html
+msgid "No"
+msgstr "Nee"
