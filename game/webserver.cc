@@ -100,16 +100,15 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 	} else if(request.destination == "/api/getplaylistTimeout") {
 		return http_server::response::stock_reply(http_server::response::ok, std::to_string(config["game/playlist_screen_timeout"].i()));
 	} else if(request.destination.find("/api/language") == 0) {
-		map<std::string, std::string> m = GenerateLocaleDict();
+		map<std::string, std::string> localeMap = GenerateLocaleDict();
 		
 		Json::Value jsonRoot = Json::objectValue;
-		for (std::map<std::string, std::string>::iterator it=m.begin(); it!=m.end(); ++it) {
-			std::string key = it->first;
-			std::replace(key.begin(), key.end(), ' ', '_');
+		for (auto const &kv : localeMap) {
+			std::string key = kv.first;
+			std::replace(key.begin(), key.end(), ' ','_');
 			boost::to_lower(key);
-    		jsonRoot[key] = it->second;
+			jsonRoot[key] = kv.second;
 		}
-
         return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
 }
 	else {
@@ -222,11 +221,11 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 std::map<std::string, std::string> WebServer::GenerateLocaleDict() {
 	std::vector<std::string> translationKeys = GetTranslationKeys();
     
-    map<std::string, std::string> m;
-    for(auto translationKey : translationKeys) {
-		m.insert(pair<std::string, std::string>(translationKey, _(translationKey)));
+    map<std::string, std::string> localeMap;
+    for (auto const &translationKey : translationKeys) {
+		localeMap.insert(pair<std::string, std::string>(translationKey, _(translationKey)));
 	}
-    return m;
+    return localeMap;
 }
 
 std::vector<std::string> WebServer::GetTranslationKeys() {
