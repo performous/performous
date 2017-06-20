@@ -1259,3 +1259,91 @@ msgstr ""
 
 #~ msgid "System"
 #~ msgstr "System"
+
+#: ../data/themes/default/www/index.html
+msgid "Performous web frontend"
+msgstr "Performous website"
+
+#: ../data/themes/default/www/index.html
+msgid "View database"
+msgstr "Datenbank anzeigen"
+
+#: ../data/themes/default/www/index.html
+msgid "Search and Add"
+msgstr "Suchen & Hinzufügen"
+
+#: ../data/themes/default/www/index.html
+msgid "Sort by"
+msgstr "Sortieren nach"
+
+#: ../data/themes/default/www/index.html
+msgid "Artist"
+msgstr "Performer"
+
+#: ../data/themes/default/www/index.html
+msgid "Title"
+msgstr "Titel"
+
+#: ../data/themes/default/www/index.html
+msgid "Language"
+msgstr "Sprache"
+
+#: ../data/themes/default/www/index.html
+msgid "Edition"
+msgstr "Version"
+
+#: ../data/themes/default/www/index.html
+msgid "Creator"
+msgstr "Schöpfer"
+
+#: ../data/themes/default/www/index.html
+msgid "Sort order"
+msgstr "Sortierreihenfolge"
+
+#: ../data/themes/default/www/index.html
+msgid "Normal"
+msgstr "Normal"
+
+#: ../data/themes/default/www/index.html
+msgid "Inverted"
+msgstr "Umgekehrt"
+
+#: ../data/themes/default/www/index.html
+msgid "Refresh database"
+msgstr "Datenbank aktualisieren"
+
+#: ../data/themes/default/www/index.html
+msgid "Upcoming songs"
+msgstr "Die nächsten Songs"
+
+#: ../data/themes/default/www/index.html
+msgid "Refresh Playlist"
+msgstr "Playliste aktualisieren"
+
+#: ../data/themes/default/www/index.html
+msgid "Credits"
+msgstr "Web-Schnittstelle erstellt von Niek Nooijens und Arjan Speiard, für die vollständige Liste siehe /docs/Authors.txt"
+
+#: ../data/themes/default/www/index.html
+msgid "Search"
+msgstr "Suchen"
+
+#: ../data/themes/default/www/index.html
+msgid "Available songs"
+msgstr "Verfügbare Songs"
+
+#: ../data/themes/default/www/index.html
+msgid "Search for songs"
+msgstr "Suche nach Liedern"
+
+#: ../data/themes/default/www/index.html
+msgid "Update every 10 sec"
+msgstr "Alle 10 Sekunden aktualisieren"
+
+#: ../data/themes/default/www/index.html
+msgid "Yes"
+msgstr "Ja"
+
+#: ../data/themes/default/www/index.html
+msgid "No"
+msgstr "Nein"
