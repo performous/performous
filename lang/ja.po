@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-21 18:54+0200\n"
-"PO-Revision-Date: 2017-06-21 19:20+0200\n"
-"Last-Translator: niek nooijens <nieknooijens@gmail.com>\n"
+"POT-Creation-Date: 2017-06-21 21:29+0200\n"
+"PO-Revision-Date: 2017-06-21 21:29+0200\n"
+"Last-Translator: Arjan Speiard | Asgard Sings! <arjan.spieard@gmail.com>\n"
 "Language-Team: \n"
 "Language: ja_JP\n"
 "MIME-Version: 1.0\n"
@@ -13,40 +13,9 @@ msgstr ""
 "X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SourceCharset: UTF-8\n"
-"X-Generator: Poedit 2.0.1\n"
+"X-Generator: Poedit 1.8.7.1\n"
 "X-Poedit-SearchPath-0: ../data\n"
 "X-Poedit-SearchPath-1: ../game\n"
-
-# 塩素する = musical performance
-# I think 本番 could work, unless sence 3 of Jim's WWWJDIC is the most common meaning...
-# I get the feeling that 演じろ is more theatrical.
-# パフォーマンスする feels to english imo
-# Perhaps suru should be dropped?
-#: ../data/performous.desktop:3
-#, fuzzy
-#| msgid "Perform"
-msgid "Performous"
-msgstr "演奏する"
-
-# could 開式 be used for this?
-#: ../data/performous.desktop:4
-msgid "A karaoke game"
-msgstr "カラオケ・ゲーム"
-
-# 塩素する = musical performance
-# I think 本番 could work, unless sence 3 of Jim's WWWJDIC is the most common meaning...
-# I get the feeling that 演じろ is more theatrical.
-# パフォーマンスする feels to english imo
-# Perhaps suru should be dropped?
-#: ../data/performous.desktop:13
-#, fuzzy
-#| msgid "Perform"
-msgid "performous"
-msgstr "演奏する"
-
-#: ../data/performous.desktop:17
-msgid "song;music;dance;karaoke;microphone;sound;singing;"
-msgstr "曲;音楽;踊り;カラオケ;マイク;音;歌;"
 
 #: ../game/configuration.cc:112
 msgid "Enabled"
@@ -699,49 +668,13 @@ msgstr "プレイリストメニューを開く"
 msgid "Play"
 msgstr "再生"
 
-#: ../game/screen_songs.cc:526
+#: ../game/screen_songs.cc:526 ../game/webserver.cc:239
 msgid "View playlist"
 msgstr "プレイリストを見る"
 
 #: ../game/screen_songs.cc:527
 msgid "Clear playlist"
 msgstr "プレイリストを消す"
-
-#: ../game/song.hh:26
-msgid "Guitar"
-msgstr "ギタ−"
-
-#: ../game/song.hh:26
-msgid "Coop guitar"
-msgstr "コーオップ・ギター"
-
-#: ../game/song.hh:26
-msgid "Rhythm guitar"
-msgstr "リズムギター"
-
-#: ../game/song.hh:26
-msgid "Bass"
-msgstr "ベースギター"
-
-#: ../game/song.hh:26
-msgid "Drums"
-msgstr "ドラム"
-
-#: ../game/song.hh:26
-msgid "Vocals"
-msgstr "ボーカル"
-
-#: ../game/song.hh:26
-msgid "Harmonic 1"
-msgstr "ハルモニク 1"
-
-#: ../game/song.hh:26
-msgid "Harmonic 2"
-msgstr "ハルモニク 2"
-
-#: ../game/song.hh:26
-msgid "Harmonic 3"
-msgstr "ハルモニク 3"
 
 #: ../game/songparser-xml.cc:104
 msgid "Together"
@@ -803,6 +736,161 @@ msgstr "パス順に並べ替えた"
 #: ../game/songs.cc:234
 msgid "sorted by language"
 msgstr "言語に並べ替え"
+
+#: ../game/webserver.cc:237
+msgid "Performous web frontend"
+msgstr "ペルフォームース・ウエブ・フロントエンド"
+
+#: ../game/webserver.cc:238
+msgid "View database"
+msgstr "ダタベースを見る"
+
+#: ../game/webserver.cc:240
+msgid "Search and Add"
+msgstr "探索と加える"
+
+#: ../game/webserver.cc:241
+msgid "Sort by"
+msgstr "並べ替える"
+
+#: ../game/webserver.cc:242
+msgid "Artist"
+msgstr "歌手"
+
+#: ../game/webserver.cc:243
+msgid "Title"
+msgstr "曲名"
+
+#: ../game/webserver.cc:244
+msgid "Language"
+msgstr "言語"
+
+#: ../game/webserver.cc:245
+msgid "Edition"
+msgstr "版"
+
+#: ../game/webserver.cc:246
+msgid "Creator"
+msgstr "創作者"
+
+#: ../game/webserver.cc:247
+msgid "Sort order"
+msgstr "ソート順"
+
+#: ../game/webserver.cc:248
+msgid "Normal"
+msgstr "普通"
+
+#: ../game/webserver.cc:249
+msgid "Inverted"
+msgstr "反転"
+
+#: ../game/webserver.cc:250
+msgid "Update every 10 sec"
+msgstr "毎十秒更新"
+
+#: ../game/webserver.cc:251
+msgid "Refresh database"
+msgstr "ダタベース更新"
+
+#: ../game/webserver.cc:252
+msgid "Upcoming songs"
+msgstr "今後の曲"
+
+#: ../game/webserver.cc:253
+msgid "Refresh playlist"
+msgstr "プレイリスト更新"
+
+#: ../game/webserver.cc:254
+msgid ""
+"Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding "
+"Performous see /docs/Authors.txt"
+msgstr ""
+"ウェブ・インターフェースはニク・ノーイエンスとアルジャン・スペイアルドによっ"
+"て作られました。創作者は/docs/Authors.txt に書かれています。"
+
+#: ../game/webserver.cc:255
+msgid "Search"
+msgstr "探索"
+
+#: ../game/webserver.cc:256
+msgid "Available songs"
+msgstr "利用可能曲"
+
+#: ../game/webserver.cc:257
+msgid "Search for songs"
+msgstr "曲に探索する"
+
+#: ../game/webserver.cc:258
+msgid "Yes"
+msgstr "はい"
+
+#: ../game/webserver.cc:259
+msgid "No"
+msgstr "いいえ"
+
+#: ../game/song.hh:26
+msgid "Guitar"
+msgstr "ギタ−"
+
+#: ../game/song.hh:26
+msgid "Coop guitar"
+msgstr "コーオップ・ギター"
+
+#: ../game/song.hh:26
+msgid "Rhythm guitar"
+msgstr "リズムギター"
+
+#: ../game/song.hh:26
+msgid "Bass"
+msgstr "ベースギター"
+
+#: ../game/song.hh:26
+msgid "Drums"
+msgstr "ドラム"
+
+#: ../game/song.hh:26
+msgid "Vocals"
+msgstr "ボーカル"
+
+#: ../game/song.hh:26
+msgid "Harmonic 1"
+msgstr "ハルモニク 1"
+
+#: ../game/song.hh:26
+msgid "Harmonic 2"
+msgstr "ハルモニク 2"
+
+#: ../game/song.hh:26
+msgid "Harmonic 3"
+msgstr "ハルモニク 3"
+
+# 塩素する = musical performance
+# I think 本番 could work, unless sence 3 of Jim's WWWJDIC is the most common meaning...
+# I get the feeling that 演じろ is more theatrical.
+# パフォーマンスする feels to english imo
+# Perhaps suru should be dropped?
+#, fuzzy
+#~| msgid "Perform"
+#~ msgid "Performous"
+#~ msgstr "演奏する"
+
+# could 開式 be used for this?
+#~ msgid "A karaoke game"
+#~ msgstr "カラオケ・ゲーム"
+
+# 塩素する = musical performance
+# I think 本番 could work, unless sence 3 of Jim's WWWJDIC is the most common meaning...
+# I get the feeling that 演じろ is more theatrical.
+# パフォーマンスする feels to english imo
+# Perhaps suru should be dropped?
+#, fuzzy
+#~| msgid "Perform"
+#~ msgid "performous"
+#~ msgstr "演奏する"
+
+#~ msgid "song;music;dance;karaoke;microphone;sound;singing;"
+#~ msgstr "曲;音楽;踊り;カラオケ;マイク;音;歌;"
 
 #~ msgid "Game"
 #~ msgstr "ゲーム"
