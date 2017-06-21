@@ -1,4 +1,4 @@
-﻿#include "webserver.hh"
+#include "webserver.hh"
 #ifdef USE_CPPNETLIB
 #include <boost/network/protocol/http/server.hpp>
 
@@ -105,6 +105,10 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		Json::Value jsonRoot = Json::objectValue;
 		for (auto const &kv : localeMap) {
 			std::string key = kv.first;
+			//Hack to get an easy key value pair within the json object.
+			if(key == "Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding Performous see /docs/Authors.txt"){
+				key = "Credits";
+			}
 			std::replace(key.begin(), key.end(), ' ','_');
 			boost::to_lower(key);
 			jsonRoot[key] = kv.second;
@@ -230,29 +234,29 @@ std::map<std::string, std::string> WebServer::GenerateLocaleDict() {
 
 std::vector<std::string> WebServer::GetTranslationKeys() {
 	std::vector<std::string> tranlationKeys = { 
-		"Performous web frontend",
-		"View database",
-		"View playlist",
-		"Search and Add",
-		"Sort by",
-		"Artist",
-		"Title",
-		"Language",
-		"Edition",
-		"Creator",
-		"Sort order",
-		"Normal",
-		"Inverted",
-		"Update every 10 sec",
-		"Refresh database",
-		"Upcoming songs",
-		"Refresh Playlist",
-		"Credits",
-		"Search",
-		"Available songs",
-		"Search for songs",
-		"Yes",
-		"No"
+		gettext_noop("Performous web frontend"),
+	    gettext_noop("View database"),
+	    gettext_noop("View playlist"),
+	    gettext_noop("Search and Add"),
+	    gettext_noop("Sort by"),
+	    gettext_noop("Artist"),
+	    gettext_noop("Title"),
+	    gettext_noop("Language"),
+	    gettext_noop("Edition"),
+	    gettext_noop("Creator"),
+	    gettext_noop("Sort order"),
+	    gettext_noop("Normal"),
+	    gettext_noop("Inverted"),
+	    gettext_noop("Update every 10 sec"),
+	    gettext_noop("Refresh database"),
+	    gettext_noop("Upcoming songs"),
+	    gettext_noop("Refresh playlist"),
+	    gettext_noop("Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding Performous see /docs/Authors.txt"),
+	    gettext_noop("Search"),
+	    gettext_noop("Available songs"),
+	    gettext_noop("Search for songs"),
+	    gettext_noop("Yes"),
+	    gettext_noop("No")
 	};
 
 	return tranlationKeys;

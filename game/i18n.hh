@@ -7,6 +7,7 @@ using namespace std;
 using namespace boost::locale;
 
 #define _(x) translate(x).str()
+#define gettext_noop(x) x
 
 class Gettext {
 	public:
@@ -17,7 +18,7 @@ class Gettext {
 		    gen.add_messages_domain(package);
 		    // Generate locales and imbue them to iostream
 		    locale::global(gen(""));
-		    (void)package;
+		    (void)package;		    
 		};
 		static bool enabled() {
 			return true;
