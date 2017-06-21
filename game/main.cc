@@ -1,5 +1,4 @@
-﻿
-#include "backgrounds.hh"
+﻿#include "backgrounds.hh"
 #include "config.hh"
 #include "controllers.hh"
 #include "database.hh"
