@@ -236,7 +236,7 @@ std::vector<std::string> WebServer::GetTranslationKeys() {
 	std::vector<std::string> tranlationKeys = { 
 		gettext_noop("Performous web frontend"),
 	    gettext_noop("View database"),
-	    gettext_noop("View playlist"),
+	    "View playlist",
 	    gettext_noop("Search and Add"),
 	    gettext_noop("Sort by"),
 	    gettext_noop("Artist"),
