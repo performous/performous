@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-21 19:44+0200\n"
-"PO-Revision-Date: 2017-06-21 19:46+0200\n"
-"Last-Translator: Tobias Gruetzmacher <tobias-git@23.gs>\n"
+"POT-Creation-Date: 2017-06-23 00:32+0200\n"
+"PO-Revision-Date: 2017-06-23 00:35+0200\n"
+"Last-Translator: Arjan Speiard | Asgard Sings! <arjan.spieard@gmail.com>\n"
 "Language-Team: \n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -628,7 +628,7 @@ msgstr "Abspiellisten-Menü öffnen"
 msgid "Play"
 msgstr "Abspielen"
 
-#: ../game/screen_songs.cc:526 ../game/webserver.cc:235
+#: ../game/screen_songs.cc:526
 msgid "View playlist"
 msgstr "Abspielliste anzeigen"
 
@@ -696,71 +696,71 @@ msgstr "nach Dateipfad sortiert"
 msgid "sorted by language"
 msgstr "nach Sprache sortiert"
 
-#: ../game/webserver.cc:233
+#: ../game/webserver.cc:237
 msgid "Performous web frontend"
 msgstr "Performous website"
 
-#: ../game/webserver.cc:234
+#: ../game/webserver.cc:238
 msgid "View database"
 msgstr "Datenbank anzeigen"
 
-#: ../game/webserver.cc:236
+#: ../game/webserver.cc:240
 msgid "Search and Add"
 msgstr "Suchen & Hinzufügen"
 
-#: ../game/webserver.cc:237
+#: ../game/webserver.cc:241
 msgid "Sort by"
 msgstr "Sortieren nach"
 
-#: ../game/webserver.cc:238
+#: ../game/webserver.cc:242
 msgid "Artist"
 msgstr "Performer"
 
-#: ../game/webserver.cc:239
+#: ../game/webserver.cc:243
 msgid "Title"
 msgstr "Titel"
 
-#: ../game/webserver.cc:240
+#: ../game/webserver.cc:244
 msgid "Language"
 msgstr "Sprache"
 
-#: ../game/webserver.cc:241
+#: ../game/webserver.cc:245
 msgid "Edition"
 msgstr "Version"
 
-#: ../game/webserver.cc:242
+#: ../game/webserver.cc:246
 msgid "Creator"
 msgstr "Schöpfer"
 
-#: ../game/webserver.cc:243
+#: ../game/webserver.cc:247
 msgid "Sort order"
 msgstr "Sortierreihenfolge"
 
-#: ../game/webserver.cc:244
+#: ../game/webserver.cc:248
 msgid "Normal"
 msgstr "Normal"
 
-#: ../game/webserver.cc:245
+#: ../game/webserver.cc:249
 msgid "Inverted"
 msgstr "Umgekehrt"
 
-#: ../game/webserver.cc:246
+#: ../game/webserver.cc:250
 msgid "Update every 10 sec"
 msgstr "Alle 10 Sekunden aktualisieren"
 
-#: ../game/webserver.cc:247
+#: ../game/webserver.cc:251
 msgid "Refresh database"
 msgstr "Datenbank aktualisieren"
 
-#: ../game/webserver.cc:248
+#: ../game/webserver.cc:252
 msgid "Upcoming songs"
-msgstr "Die nächsten Songs"
+msgstr "Die nächste Songs"
 
-#: ../game/webserver.cc:249
+#: ../game/webserver.cc:253
 msgid "Refresh playlist"
 msgstr "Abspielliste aktualisieren"
 
-#: ../game/webserver.cc:250
+#: ../game/webserver.cc:254
 msgid ""
 "Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding "
 "Performous see /docs/Authors.txt"
@@ -768,23 +768,23 @@ msgstr ""
 "Web-Interface von Niek Nooijens und Arjan Speiard, für volle Credits in "
 "Bezug auf Performous see /docs/Authors.txt"
 
-#: ../game/webserver.cc:251
+#: ../game/webserver.cc:255
 msgid "Search"
 msgstr "Suchen"
 
-#: ../game/webserver.cc:252
+#: ../game/webserver.cc:256
 msgid "Available songs"
 msgstr "Verfügbare Songs"
 
-#: ../game/webserver.cc:253
+#: ../game/webserver.cc:257
 msgid "Search for songs"
 msgstr "Suche nach Liedern"
 
-#: ../game/webserver.cc:254
+#: ../game/webserver.cc:258
 msgid "Yes"
 msgstr "Ja"
 
-#: ../game/webserver.cc:255
+#: ../game/webserver.cc:259
 msgid "No"
 msgstr "Nein"
 
@@ -824,387 +824,494 @@ msgstr "Harmonic 2"
 msgid "Harmonic 3"
 msgstr "Harmonic 3"
 
-#~ msgid "Game"
-#~ msgstr "Spiel"
-
-#~ msgid "Gameplay related options"
-#~ msgstr "Einstellung, die das Spiel selbst betreffen"
-
-#~ msgid "Graphic"
-#~ msgstr "Grafik"
-
-#~ msgid "Configure rendering and video settings"
-#~ msgstr "Grafik- und Darstellungseinstellungen"
-
-#~ msgid "Audio Devices"
-#~ msgstr "Audiogeräte"
-
-#~ msgid "Setup microphones and playback"
-#~ msgstr "Konfiguriere Mikrofone und Abspielgeräte"
-
-#~ msgid "Audio"
-#~ msgstr "Audio"
-
-#~ msgid "Configure general audio settings"
-#~ msgstr "Konfiguriere algemeine Audioeinstellungen"
-
-#~ msgid "Paths"
-#~ msgstr "Pfade"
-
-#~ msgid "Setup song and data paths"
-#~ msgstr "Richte Lied- und Datenpfade ein"
-
-#~ msgid "Karaoke mode"
-#~ msgstr "Karaoke-Modus"
-
-#~ msgid "Hide pitch wave, notes and scoring."
-#~ msgstr "Verstecke Tonhöhen-Welle, Noten und Punkte."
-
-#~ msgid "Lyric highlight style"
-#~ msgstr "Liedtext-Anzeige-Stil"
-
-#~ msgid "Autoplay"
-#~ msgstr "Automatische Wiedergabe"
-
-#~ msgid "Keep playing random songs after the playlist is empty."
-#~ msgstr "Zufällige Lieder abspielen, wenn die Abspielliste leer ist."
-
-#~ msgid "Pitch waves"
-#~ msgstr "Tonhöhe"
-
-#~ msgid "Enable singing pitch display (when not in karaoke mode)."
-#~ msgstr "Aktiviere Tonhöhen-Welle (wenn nicht im Karaoke-Modus)."
-
-#~ msgid "Theme"
-#~ msgstr "Thema"
-
-#~ msgid "Name of the theme to use."
-#~ msgstr "Name des zu benutzenden Themas."
-
-#~ msgid "Keyboard as guitar"
-#~ msgstr "Tastatur als Gitarre"
-
-#~ msgid "Enable keyboard as guitar (Frets on Fire mode)."
-#~ msgstr "Aktiviere Tastatur als Gitarre (\"Frets on Fire\"-Modus)."
-
-#~ msgid "Keyboard as drumkit"
-#~ msgstr "Tastatur als Schlagzeug nutzen"
-
-#~ msgid "Enable keyboard as drumkit."
-#~ msgstr "Aktiviere Tastatur als Schlagzeug"
-
-#~ msgid "Keyboard as dance pad"
-#~ msgstr "Tastatur als Dancepad nutzen"
-
-#~ msgid "Enable keyboard as dance pad."
-#~ msgstr "Aktiviere Keyboard als Dancepad"
-
-#~ msgid "Keyboard as keytar"
-#~ msgstr "Tastatur als Keytar"
-
-#~ msgid "Enable keyboard as keytar."
-#~ msgstr "Benutze Tastatur als Keytar"
-
-#~ msgid "Force controller A's type"
-#~ msgstr "Erzwinge Typ von Eingabegrät A"
-
-#~ msgid ""
-#~ "Override autodetection and force the first controller to the given type."
-#~ msgstr ""
-#~ "Automatische Erkennung übergehen und immer diesen Typ für das erste "
-#~ "Eingabegerät wählen."
-
-#~ msgid "Force controller B's type"
-#~ msgstr "Erzwinge Typ von Eingabegrät B"
-
-#~ msgid ""
-#~ "Override autodetection and force the second controller to the given type."
-#~ msgstr ""
-#~ "Automatische Erkennung übergehen und immer diesen Typ für das zweite "
-#~ "Eingabegerät wählen."
-
-#~ msgid "Force controller C's type"
-#~ msgstr "Erzwinge Typ von Eingabegrät C"
-
-#~ msgid ""
-#~ "Override autodetection and force the third controller to the given type."
-#~ msgstr ""
-#~ "Automatische Erkennung übergehen und immer diesen Typ für das dritte "
-#~ "Eingabegerät wählen."
-
-#~ msgid "Force controller D's type"
-#~ msgstr "Erzwinge Typ von Eingabegrät D"
-
-#~ msgid ""
-#~ "Override autodetection and force the fourth controller to the given type."
-#~ msgstr ""
-#~ "Automatische Erkennung übergehen und immer diesen Typ für das vierte "
-#~ "Eingabegerät wählen."
-
-#~ msgid "Joystick configuration"
-#~ msgstr "Eingabegeräte konfigurieren"
-
-#~ msgid "Force joystick to some kind of instrument."
-#~ msgstr "Erzwinge Eingabegerät als spezielles Instrument"
-
-#~ msgid "Hardware MIDI input device"
-#~ msgstr "MIDI Eingabegerät"
-
-#~ msgid ""
-#~ "Regex for matching the MIDI devices to use. The default is to use all "
-#~ "available devices."
-#~ msgstr ""
-#~ "Regex, um die zu benutzenden MIDI-Geräte zu wählen. Standardmässig werden "
-#~ "alle verfügbaren Geräte benutzt."
-
-#~ msgid "Fallback song encoding"
-#~ msgstr "Fallback-Lied-Codierung"
-
-#~ msgid "Pick the text codec used for song files that are not UTF-8."
-#~ msgstr "Wähle die Textkodierung für Lieder, die nicht in UTF-8 vorliegen."
-
-#~ msgid "Windowed width"
-#~ msgstr "Fensterbreite"
-
-#~ msgid "The width of the window."
-#~ msgstr "Breite des Fensters"
-
-#~ msgid "Windowed height"
-#~ msgstr "Fensterhöhe"
-
-#~ msgid "The height of the window."
-#~ msgstr "Höhe des Fensters"
-
-#~ msgid "Fullscreen mode"
-#~ msgstr "Vollbildmodus"
-
-#~ msgid "Enable fullscreen mode on startup."
-#~ msgstr "Aktivere Vollbild beim Start"
-
-#~ msgid "Stereoscopic 3D"
-#~ msgstr "Stereoskopisches 3D"
-
-#~ msgid "Enable 3D rendering of Performous."
-#~ msgstr "Aktiviere 3D-Darstellung in Performous."
-
-#~ msgid "Stereo3D type"
-#~ msgstr "Stereo3D-Typ"
-
-#~ msgid "Some modes may only get activated in fullscreen mode."
-#~ msgstr "Einige Modi werden nur im Vollbildmodus aktiv."
-
-#~ msgid "Stereo3D separation"
-#~ msgstr "Stereo3D-Trennung"
-
-#~ msgid ""
-#~ "The strength of the effect. Experiment with different settings for best "
-#~ "results."
-#~ msgstr ""
-#~ "Die Stärke des 3D-Effektes. Experimentiere mit verschiedenen Werten, um "
-#~ "die beste Einstellung zu finden."
-
-#~ msgid "Video playback"
-#~ msgstr "Video-Wiedergabe …"
-
-#~ msgid ""
-#~ "Allows completely disabling background videos. It is recommended to leave "
-#~ "this enabled as Performous will still smoothly fade out the video if your "
-#~ "computer is not fast enough."
-#~ msgstr ""
-#~ "Erlaubt es Hintergrundvideos komplett zu deaktivieren. Es ist "
-#~ "empfehlenswert dies Option aktiviert zu lassen - Performous wird das "
-#~ "Video trotzdem flüssig ausblenden, wenn dein Computer nicht schnell genug "
-#~ "ist."
-
-#~ msgid "Webcam background"
-#~ msgstr "Webcam als Hintergrund"
-
-#~ msgid ""
-#~ "Performous can use webcam as a background video. Disable it if Performous "
-#~ "crashes while entering a song."
-#~ msgstr ""
-#~ "Performous kann eine Webcam für Hintergrundvideos nutzen. Du kannst diese "
-#~ "Option deaktivieren, falls Performous abstürzt, wenn du ein Lied startest."
-
-#~ msgid "Webcam id"
-#~ msgstr "Webcam ID"
-
-#~ msgid ""
-#~ "Use -1 to autodetect or a number starting from 0 to choose specific "
-#~ "device."
-#~ msgstr ""
-#~ "Benutze -1 für Autoerkennung oder wähle eine Zahl für ein spezielles "
-#~ "Geräte"
-
-#~ msgid "SVG quality"
-#~ msgstr "SVG Grafikqualität"
-
-#~ msgid ""
-#~ "Larger numbers cause vector graphics to be rendered in higher resolution. "
-#~ "Decrease this to make navigating in menus faster."
-#~ msgstr ""
-#~ "Bei Hohen Werten rendert Performous Vektorgraphiken in höherer Auflösung. "
-#~ "Niedrigere Werte ermöglichen eine schnellere Navigation in den Menüs."
-
-#~ msgid "Text quality"
-#~ msgstr "Textqualität"
-
-#~ msgid ""
-#~ "Larger numbers cause text to be rendered in higher resolution. Decrease "
-#~ "this to make everything a little faster."
-#~ msgstr ""
-#~ "Bei hohen Werten rendert Performous Texte in höherer Auflösung. "
-#~ "Niedrigere Werte erhöhen die allgemeine Performance ein wenig."
-
-#~ msgid "Benchmark mode"
-#~ msgstr "Benchmarkmodus"
-
-#~ msgid ""
-#~ "Framerate limit of 100 FPS is removed and the game instead renders at "
-#~ "full speed. FPS values are printed to console. Please note that the "
-#~ "display drivers may still limit the rendering speed to the screen refresh "
-#~ "rate."
-#~ msgstr ""
-#~ "Das Limit für die Bildwiederholrate wird aufgehoben und die maximal "
-#~ "möglichen Werte in der Konsole ausgegeben. Bemerkung: Es ist möglich, "
-#~ "dass der Grafiktreiber die Geschwindigkeit immer noch auf die "
-#~ "Bildwiederholrate des Bildschirms beschränkt."
-
-#~ msgid "Suggested latency"
-#~ msgstr "Empfohlene Latenz"
-
-#~ msgid ""
-#~ "This is a hint for the audio engine about the desired latency. Set this "
-#~ "as low as possible while retaining clear audio playback. Requires restart."
-#~ msgstr ""
-#~ "Die Audioengine nutzt diesen Wert für die gewünschte Latenz im Spiel. "
-#~ "Diese Wert beeinflusst die Audiowiedergabequalität im Spiel. Bemerkung: "
-#~ "So niedrig, wie möglich, so hoch wie nötig - Erfordert einen Neustart."
-
-#~ msgid "Audio/video latency"
-#~ msgstr "Audio-/Videolatenz"
-
-#~ msgid ""
-#~ "Affects all modes. Use negative value if your display input lag is "
-#~ "greater than the sound card output latency, positive values in the "
-#~ "opposite case and zero if they are equal. This should be set so that the "
-#~ "notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 "
-#~ "to adjust this while performing."
-#~ msgstr ""
-#~ "Betrifft alle Modi. Verwende negative Werte, wenn dein Bildschirm-Eingabe-"
-#~ "Lag größer ist als die Soundkarten-Ausgabe-Latenz, positive Werte im "
-#~ "umgekehrten Fall und Null, falls sie gleich sind. Dies sollte so "
-#~ "eingestellt sein, dass die Noten den Cursor in dem Moment passieren, wenn "
-#~ "der Ton zu hören ist. Verwende Strg+F1/F2, um dies während deines "
-#~ "Auftritts anzupassen."
-
-#~ msgid "Audio round-trip latency"
-#~ msgstr "Gesangslatenz"
-
-#~ msgid ""
-#~ "Affects singing only. The time it takes for Performous playback to reach "
-#~ "your speakers, fly to the microphone and all the way back until "
-#~ "Performous captures and analyzes it. While performing, press Ctrl+S for "
-#~ "synth mode and adjust with Ctrl+F3/F4."
-#~ msgstr ""
-#~ "Betrifft nur den Gesang. Er markiert die Zeit von der Wiedergabe an den "
-#~ "Lautsprechern, zum Mikrofon und den gesamten Weg bis zur Aufnahme und "
-#~ "Analyse durch Performous. Kann durch während des Spiels direkt durch das "
-#~ "betätigen von Strg+S für den Synth-Modus und durch die Tasten Strg+F3/F4 "
-#~ "reguliert werden."
-
-#~ msgid "Audio/controller latency"
-#~ msgstr "Audio/Controller Latenz"
-
-#~ msgid ""
-#~ "Affects instruments and dancing only. The total of USB (guitar or dance "
-#~ "pad) latency combined with audio output latency. Adjust so that you can "
-#~ "hit the notes best when playing by ear (not looking on screen). Use Ctrl"
-#~ "+F5/F6 to adjust while performing."
-#~ msgstr ""
-#~ "Betrifft nur Instrumente und Tanzpads. So einstellen, dass du die Noten "
-#~ "gut nach Gehör spielen kannst. Es ist möglich, diesen Wert während des "
-#~ "Spiels mit den Tasten Strg+F5/F6 zu regulieren."
-
-#~ msgid "Audio devices"
-#~ msgstr "Wiedergabegeräte"
-
-#~ msgid "List of audio devices to try."
-#~ msgstr "Liste von Audiogeräten, die ausprobiert werden sollen."
-
-#~ msgid "Menu volume"
-#~ msgstr "Menü Lautstärke"
-
-#~ msgid "The volume level of menus, song previews and jukebox mode."
-#~ msgstr "Lautstärke in den Menüs, Lied-Previews und im Jukebox-Modus"
-
-#~ msgid "Music volume"
-#~ msgstr "Musik Lautstärke"
-
-#~ msgid ""
-#~ "The ingame music volume. Values above 90 are not recommended as "
-#~ "distortion may occur."
-#~ msgstr ""
-#~ "Lautstärke im Spiel. Werte über 90 sind nicht zu empfehlen aufgrund von "
-#~ "Verzerrungen und anderen Störungen."
-
-#~ msgid "Failure volume"
-#~ msgstr "Versager Lautstärke"
-
-#~ msgid ""
-#~ "The ingame fail sound volume. Values above 90 are not recommended as "
-#~ "distortion may occur. 11 is louder than 10, but these go to 100. 89 "
-#~ "louder!"
-#~ msgstr ""
-#~ "Die Lautstärke der Musik im Falle des Verspielens. Werte über 90 werden "
-#~ "nicht empfohlen aufgrund von Verzerrungen und anderen Störungen."
-
-#~ msgid "Microphone pass-through"
-#~ msgstr "Mikrofon-Durchleitung"
-
-#~ msgid "Send captured singing voice to speakers."
-#~ msgstr "Sende die aufgezeichnete Singstimme an die Lautsprecher."
-
-#~ msgid "Pass-through volume ratio"
-#~ msgstr "Durchleitungslautstärkenverhältnis"
-
-#~ msgid "How much voice is amplified compared to the music."
-#~ msgstr "Wie stark die Stimmen im Vergleich zur Musik verstärkt werden."
-
-#~ msgid "Suppress center channel"
-#~ msgstr "Center-Kanal unterdrücken"
-
-#~ msgid "Suppress audio of center channel (e.g. vocals)."
-#~ msgstr "Unterdrückt die Mitte des Stereo-Signals (normalerweise Stimmen)."
-
-#~ msgid "Song folders"
-#~ msgstr "Liederordner"
-
-#~ msgid ""
-#~ "Where to recursively look for songs. DATADIR at the beginning means all "
-#~ "Performous data folders."
-#~ msgstr ""
-#~ "Dieser Ordner wird (rekursiv, d.h. mit allen Unterordnern) nach Liedern "
-#~ "durchsucht. Die Verwendung von DATADIR bezeichnet hierbei den Datenordner "
-#~ "von Performous."
-
-#~ msgid "Base folders for data"
-#~ msgstr "Ordner für Daten"
-
-#~ msgid ""
-#~ "System defaults are included automatically. Additional paths can be added "
-#~ "here."
-#~ msgstr ""
-#~ "Standardpfade werden automatisch eingefügt. Hier können Neue hinzugefügt "
-#~ "werden."
-
-#~ msgid "Refresh Playlist"
-#~ msgstr "Playliste aktualisieren"
-
-#~ msgid "Credits"
-#~ msgstr ""
-#~ "Web-Schnittstelle erstellt von Niek Nooijens und Arjan Speiard, für die "
-#~ "vollständige Liste siehe /docs/Authors.txt"
+#: ../data/config/schema.xml:19
+msgid "Game"
+msgstr "Spiel"
+
+#: ../data/config/schema.xml:20
+msgid "Gameplay related options"
+msgstr "Einstellung, die das Spiel selbst betreffen"
+
+#: ../data/config/schema.xml:23
+msgid "Graphic"
+msgstr "Grafik"
+
+#: ../data/config/schema.xml:24
+msgid "Configure rendering and video settings"
+msgstr "Grafik- und Darstellungseinstellungen"
+
+#: ../data/config/schema.xml:28
+msgid "Audio Devices"
+msgstr "Audiogeräte"
+
+#: ../data/config/schema.xml:29
+msgid "Setup microphones and playback"
+msgstr "Konfiguriere Mikrofone und Abspielgeräte"
+
+#: ../data/config/schema.xml:32
+msgid "Audio"
+msgstr "Audio"
+
+#: ../data/config/schema.xml:33
+msgid "Configure general audio settings"
+msgstr "Konfiguriere algemeine Audioeinstellungen"
+
+#: ../data/config/schema.xml:36
+msgid "Paths"
+msgstr "Pfade"
+
+#: ../data/config/schema.xml:37
+msgid "Setup song and data paths"
+msgstr "Richte Lied- und Datenpfade ein"
+
+#: ../data/config/schema.xml:48
+msgid "Karaoke mode"
+msgstr "Karaoke-Modus"
+
+#: ../data/config/schema.xml:49 ../data/config/schema.xml:57
+msgid "Hide pitch wave, notes and scoring."
+msgstr "Verstecke Tonhöhen-Welle, Noten und Punkte."
+
+#: ../data/config/schema.xml:56
+msgid "Lyric highlight style"
+msgstr "Liedtext-Anzeige-Stil"
+
+#: ../data/config/schema.xml:60
+msgid "Autoplay"
+msgstr "Automatische Wiedergabe"
+
+#: ../data/config/schema.xml:61
+msgid "Keep playing random songs after the playlist is empty."
+msgstr "Zufällige Lieder abspielen, wenn die Abspielliste leer ist."
+
+#: ../data/config/schema.xml:64
+msgid "Pitch waves"
+msgstr "Tonhöhe"
+
+#: ../data/config/schema.xml:65
+msgid "Enable singing pitch display (when not in karaoke mode)."
+msgstr "Aktiviere Tonhöhen-Welle (wenn nicht im Karaoke-Modus)."
+
+#: ../data/config/schema.xml:70
+msgid "Theme"
+msgstr "Thema"
+
+#: ../data/config/schema.xml:71
+msgid "Name of the theme to use."
+msgstr "Name des zu benutzenden Themas."
+
+#: ../data/config/schema.xml:75
+msgid "Playlist screen timeout"
+msgstr ""
+
+#: ../data/config/schema.xml:76
+msgid ""
+"How long it will take before the next song in the playlist starts "
+"automatically."
+msgstr ""
+
+#: ../data/config/schema.xml:84
+msgid "Webserver access"
+msgstr ""
+
+#: ../data/config/schema.xml:85
+msgid ""
+"Define if you want to control performous remotely with web interface "
+"(requires restart)."
+msgstr ""
+
+#: ../data/config/schema.xml:90
+msgid "Webserver port"
+msgstr ""
+
+#: ../data/config/schema.xml:91
+msgid ""
+"Port to use for the web server. Choose one that is not used by other "
+"applications."
+msgstr ""
+
+#: ../data/config/schema.xml:94
+msgid "Keyboard as guitar"
+msgstr "Tastatur als Gitarre"
+
+#: ../data/config/schema.xml:95
+msgid "Enable keyboard as guitar (Frets on Fire mode)."
+msgstr "Aktiviere Tastatur als Gitarre (\"Frets on Fire\"-Modus)."
+
+#: ../data/config/schema.xml:98
+msgid "Keyboard as drumkit"
+msgstr "Tastatur als Schlagzeug nutzen"
+
+#: ../data/config/schema.xml:99
+msgid "Enable keyboard as drumkit."
+msgstr "Aktiviere Tastatur als Schlagzeug"
+
+#: ../data/config/schema.xml:102
+msgid "Keyboard as dance pad"
+msgstr "Tastatur als Dancepad nutzen"
+
+#: ../data/config/schema.xml:103
+msgid "Enable keyboard as dance pad."
+msgstr "Aktiviere Keyboard als Dancepad"
+
+#: ../data/config/schema.xml:106
+msgid "Keyboard as keytar"
+msgstr "Tastatur als Keytar"
+
+#: ../data/config/schema.xml:107
+msgid "Enable keyboard as keytar."
+msgstr "Benutze Tastatur als Keytar"
+
+#: ../data/config/schema.xml:114
+msgid "Force controller A's type"
+msgstr "Erzwinge Typ von Eingabegrät A"
+
+#: ../data/config/schema.xml:115
+msgid ""
+"Override autodetection and force the first controller to the given type."
+msgstr ""
+"Automatische Erkennung übergehen und immer diesen Typ für das erste "
+"Eingabegerät wählen."
+
+#: ../data/config/schema.xml:122
+msgid "Force controller B's type"
+msgstr "Erzwinge Typ von Eingabegrät B"
+
+#: ../data/config/schema.xml:123
+msgid ""
+"Override autodetection and force the second controller to the given type."
+msgstr ""
+"Automatische Erkennung übergehen und immer diesen Typ für das zweite "
+"Eingabegerät wählen."
+
+#: ../data/config/schema.xml:130
+msgid "Force controller C's type"
+msgstr "Erzwinge Typ von Eingabegrät C"
+
+#: ../data/config/schema.xml:131
+msgid ""
+"Override autodetection and force the third controller to the given type."
+msgstr ""
+"Automatische Erkennung übergehen und immer diesen Typ für das dritte "
+"Eingabegerät wählen."
+
+#: ../data/config/schema.xml:138
+msgid "Force controller D's type"
+msgstr "Erzwinge Typ von Eingabegrät D"
+
+#: ../data/config/schema.xml:139
+msgid ""
+"Override autodetection and force the fourth controller to the given type."
+msgstr ""
+"Automatische Erkennung übergehen und immer diesen Typ für das vierte "
+"Eingabegerät wählen."
+
+#: ../data/config/schema.xml:146
+msgid "Joystick configuration"
+msgstr "Eingabegeräte konfigurieren"
+
+#: ../data/config/schema.xml:147
+msgid "Force joystick to some kind of instrument."
+msgstr "Erzwinge Eingabegerät als spezielles Instrument"
+
+#: ../data/config/schema.xml:150
+msgid "Hardware MIDI input device"
+msgstr "MIDI Eingabegerät"
+
+#: ../data/config/schema.xml:151
+msgid ""
+"Regex for matching the MIDI devices to use. The default is to use all "
+"available devices."
+msgstr ""
+"Regex, um die zu benutzenden MIDI-Geräte zu wählen. Standardmässig werden "
+"alle verfügbaren Geräte benutzt."
+
+#: ../data/config/schema.xml:166
+msgid "Fallback song encoding"
+msgstr "Fallback-Lied-Codierung"
+
+#: ../data/config/schema.xml:167
+msgid "Pick the text codec used for song files that are not UTF-8."
+msgstr "Wähle die Textkodierung für Lieder, die nicht in UTF-8 vorliegen."
+
+#: ../data/config/schema.xml:174
+msgid "Windowed width"
+msgstr "Fensterbreite"
+
+#: ../data/config/schema.xml:175
+msgid "The width of the window."
+msgstr "Breite des Fensters"
+
+#: ../data/config/schema.xml:180
+msgid "Windowed height"
+msgstr "Fensterhöhe"
+
+#: ../data/config/schema.xml:181
+msgid "The height of the window."
+msgstr "Höhe des Fensters"
+
+#: ../data/config/schema.xml:184
+msgid "Fullscreen mode"
+msgstr "Vollbildmodus"
+
+#: ../data/config/schema.xml:185
+msgid "Enable fullscreen mode on startup."
+msgstr "Aktivere Vollbild beim Start"
+
+#: ../data/config/schema.xml:188
+msgid "Stereoscopic 3D"
+msgstr "Stereoskopisches 3D"
+
+#: ../data/config/schema.xml:189
+msgid "Enable 3D rendering of Performous."
+msgstr "Aktiviere 3D-Darstellung in Performous."
+
+#: ../data/config/schema.xml:197
+msgid "Stereo3D type"
+msgstr "Stereo3D-Typ"
+
+#: ../data/config/schema.xml:198
+msgid "Some modes may only get activated in fullscreen mode."
+msgstr "Einige Modi werden nur im Vollbildmodus aktiv."
+
+#: ../data/config/schema.xml:203
+msgid "Stereo3D separation"
+msgstr "Stereo3D-Trennung"
+
+#: ../data/config/schema.xml:204
+msgid ""
+"The strength of the effect. Experiment with different settings for best "
+"results."
+msgstr ""
+"Die Stärke des 3D-Effektes. Experimentiere mit verschiedenen Werten, um die "
+"beste Einstellung zu finden."
+
+#: ../data/config/schema.xml:207
+msgid "Video playback"
+msgstr "Video-Wiedergabe …"
+
+#: ../data/config/schema.xml:208
+msgid ""
+"Allows completely disabling background videos. It is recommended to leave "
+"this enabled as Performous will still smoothly fade out the video if your "
+"computer is not fast enough."
+msgstr ""
+"Erlaubt es Hintergrundvideos komplett zu deaktivieren. Es ist empfehlenswert "
+"dies Option aktiviert zu lassen - Performous wird das Video trotzdem flüssig "
+"ausblenden, wenn dein Computer nicht schnell genug ist."
+
+#: ../data/config/schema.xml:211
+msgid "Webcam background"
+msgstr "Webcam als Hintergrund"
+
+#: ../data/config/schema.xml:212
+msgid ""
+"Performous can use webcam as a background video. Disable it if Performous "
+"crashes while entering a song."
+msgstr ""
+"Performous kann eine Webcam für Hintergrundvideos nutzen. Du kannst diese "
+"Option deaktivieren, falls Performous abstürzt, wenn du ein Lied startest."
+
+#: ../data/config/schema.xml:216
+msgid "Webcam id"
+msgstr "Webcam ID"
+
+#: ../data/config/schema.xml:217
+msgid ""
+"Use -1 to autodetect or a number starting from 0 to choose specific device."
+msgstr ""
+"Benutze -1 für Autoerkennung oder wähle eine Zahl für ein spezielles Geräte"
+
+#: ../data/config/schema.xml:222
+msgid "SVG quality"
+msgstr "SVG Grafikqualität"
+
+#: ../data/config/schema.xml:223
+msgid ""
+"Larger numbers cause vector graphics to be rendered in higher resolution. "
+"Decrease this to make navigating in menus faster."
+msgstr ""
+"Bei Hohen Werten rendert Performous Vektorgraphiken in höherer Auflösung. "
+"Niedrigere Werte ermöglichen eine schnellere Navigation in den Menüs."
+
+#: ../data/config/schema.xml:228
+msgid "Text quality"
+msgstr "Textqualität"
+
+#: ../data/config/schema.xml:229
+msgid ""
+"Larger numbers cause text to be rendered in higher resolution. Decrease this "
+"to make everything a little faster."
+msgstr ""
+"Bei hohen Werten rendert Performous Texte in höherer Auflösung. Niedrigere "
+"Werte erhöhen die allgemeine Performance ein wenig."
+
+#: ../data/config/schema.xml:232
+msgid "Benchmark mode"
+msgstr "Benchmarkmodus"
+
+#: ../data/config/schema.xml:233
+msgid ""
+"Framerate limit of 100 FPS is removed and the game instead renders at full "
+"speed. FPS values are printed to console. Please note that the display "
+"drivers may still limit the rendering speed to the screen refresh rate."
+msgstr ""
+"Das Limit für die Bildwiederholrate wird aufgehoben und die maximal "
+"möglichen Werte in der Konsole ausgegeben. Bemerkung: Es ist möglich, dass "
+"der Grafiktreiber die Geschwindigkeit immer noch auf die Bildwiederholrate "
+"des Bildschirms beschränkt."
+
+#: ../data/config/schema.xml:240
+msgid "Suggested latency"
+msgstr "Empfohlene Latenz"
+
+#: ../data/config/schema.xml:241
+msgid ""
+"This is a hint for the audio engine about the desired latency. Set this as "
+"low as possible while retaining clear audio playback. Requires restart."
+msgstr ""
+"Die Audioengine nutzt diesen Wert für die gewünschte Latenz im Spiel. Diese "
+"Wert beeinflusst die Audiowiedergabequalität im Spiel. Bemerkung: So "
+"niedrig, wie möglich, so hoch wie nötig - Erfordert einen Neustart."
+
+#: ../data/config/schema.xml:246
+msgid "Audio/video latency"
+msgstr "Audio-/Videolatenz"
+
+#: ../data/config/schema.xml:247
+msgid ""
+"Affects all modes. Use negative value if your display input lag is greater "
+"than the sound card output latency, positive values in the opposite case and "
+"zero if they are equal. This should be set so that the notes pass the cursor "
+"at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while "
+"performing."
+msgstr ""
+"Betrifft alle Modi. Verwende negative Werte, wenn dein Bildschirm-Eingabe-"
+"Lag größer ist als die Soundkarten-Ausgabe-Latenz, positive Werte im "
+"umgekehrten Fall und Null, falls sie gleich sind. Dies sollte so eingestellt "
+"sein, dass die Noten den Cursor in dem Moment passieren, wenn der Ton zu "
+"hören ist. Verwende Strg+F1/F2, um dies während deines Auftritts anzupassen."
+
+#: ../data/config/schema.xml:252
+msgid "Audio round-trip latency"
+msgstr "Gesangslatenz"
+
+#: ../data/config/schema.xml:253
+msgid ""
+"Affects singing only. The time it takes for Performous playback to reach "
+"your speakers, fly to the microphone and all the way back until Performous "
+"captures and analyzes it. While performing, press Ctrl+S for synth mode and "
+"adjust with Ctrl+F3/F4."
+msgstr ""
+"Betrifft nur den Gesang. Er markiert die Zeit von der Wiedergabe an den "
+"Lautsprechern, zum Mikrofon und den gesamten Weg bis zur Aufnahme und "
+"Analyse durch Performous. Kann durch während des Spiels direkt durch das "
+"betätigen von Strg+S für den Synth-Modus und durch die Tasten Strg+F3/F4 "
+"reguliert werden."
+
+#: ../data/config/schema.xml:258
+msgid "Audio/controller latency"
+msgstr "Audio/Controller Latenz"
+
+#: ../data/config/schema.xml:259
+msgid ""
+"Affects instruments and dancing only. The total of USB (guitar or dance pad) "
+"latency combined with audio output latency. Adjust so that you can hit the "
+"notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to "
+"adjust while performing."
+msgstr ""
+"Betrifft nur Instrumente und Tanzpads. So einstellen, dass du die Noten gut "
+"nach Gehör spielen kannst. Es ist möglich, diesen Wert während des Spiels "
+"mit den Tasten Strg+F5/F6 zu regulieren."
+
+#: ../data/config/schema.xml:266
+msgid "Audio devices"
+msgstr "Wiedergabegeräte"
+
+#: ../data/config/schema.xml:267
+msgid "List of audio devices to try."
+msgstr "Liste von Audiogeräten, die ausprobiert werden sollen."
+
+#: ../data/config/schema.xml:272
+msgid "Menu volume"
+msgstr "Menü Lautstärke"
+
+#: ../data/config/schema.xml:273
+msgid "The volume level of menus, song previews and jukebox mode."
+msgstr "Lautstärke in den Menüs, Lied-Previews und im Jukebox-Modus"
+
+#: ../data/config/schema.xml:278
+msgid "Music volume"
+msgstr "Musik Lautstärke"
+
+#: ../data/config/schema.xml:279
+msgid ""
+"The ingame music volume. Values above 90 are not recommended as distortion "
+"may occur."
+msgstr ""
+"Lautstärke im Spiel. Werte über 90 sind nicht zu empfehlen aufgrund von "
+"Verzerrungen und anderen Störungen."
+
+#: ../data/config/schema.xml:284
+msgid "Failure volume"
+msgstr "Versager Lautstärke"
+
+#: ../data/config/schema.xml:285
+msgid ""
+"The ingame fail sound volume. Values above 90 are not recommended as "
+"distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
+msgstr ""
+"Die Lautstärke der Musik im Falle des Verspielens. Werte über 90 werden "
+"nicht empfohlen aufgrund von Verzerrungen und anderen Störungen."
+
+#: ../data/config/schema.xml:288
+msgid "Microphone pass-through"
+msgstr "Mikrofon-Durchleitung"
+
+#: ../data/config/schema.xml:289
+msgid "Send captured singing voice to speakers."
+msgstr "Sende die aufgezeichnete Singstimme an die Lautsprecher."
+
+#: ../data/config/schema.xml:294
+msgid "Pass-through volume ratio"
+msgstr "Durchleitungslautstärkenverhältnis"
+
+#: ../data/config/schema.xml:295
+msgid "How much voice is amplified compared to the music."
+msgstr "Wie stark die Stimmen im Vergleich zur Musik verstärkt werden."
+
+#: ../data/config/schema.xml:298
+msgid "Suppress center channel"
+msgstr "Center-Kanal unterdrücken"
+
+#: ../data/config/schema.xml:299
+msgid "Suppress audio of center channel (e.g. vocals)."
+msgstr "Unterdrückt die Mitte des Stereo-Signals (normalerweise Stimmen)."
+
+#: ../data/config/schema.xml:310
+msgid "Song folders"
+msgstr "Liederordner"
+
+#: ../data/config/schema.xml:311
+msgid ""
+"Where to recursively look for songs. DATADIR at the beginning means all "
+"Performous data folders."
+msgstr ""
+"Dieser Ordner wird (rekursiv, d.h. mit allen Unterordnern) nach Liedern "
+"durchsucht. Die Verwendung von DATADIR bezeichnet hierbei den Datenordner "
+"von Performous."
+
+#: ../data/config/schema.xml:314
+msgid "Base folders for data"
+msgstr "Ordner für Daten"
+
+#: ../data/config/schema.xml:315
+msgid ""
+"System defaults are included automatically. Additional paths can be added "
+"here."
+msgstr ""
+"Standardpfade werden automatisch eingefügt. Hier können Neue hinzugefügt "
+"werden."
 
 #, fuzzy
 #~ msgid "Back to song browser"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-22 23:17+0200\n"
+"POT-Creation-Date: 2017-06-23 00:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -58,7 +58,8 @@ msgstr ""
 msgid "Ready!"
 msgstr ""
 
-#: ../game/dancegraph.cc:107 ../game/guitargraph.cc:193 ../game/screen_intro.cc:171
+#: ../game/dancegraph.cc:107 ../game/guitargraph.cc:193
+#: ../game/screen_intro.cc:171
 msgid "Start performing!"
 msgstr ""
 
@@ -70,12 +71,14 @@ msgstr ""
 msgid "Select difficulty"
 msgstr ""
 
-#: ../game/dancegraph.cc:137 ../game/guitargraph.cc:199 ../game/instrumentgraph.cc:59 ../game/screen_intro.cc:189
+#: ../game/dancegraph.cc:137 ../game/guitargraph.cc:199
+#: ../game/instrumentgraph.cc:59 ../game/screen_intro.cc:189
 #: ../game/screen_sing.cc:94 ../game/screen_sing.cc:131
 msgid "Quit"
 msgstr ""
 
-#: ../game/dancegraph.cc:137 ../game/guitargraph.cc:199 ../game/instrumentgraph.cc:59 ../game/screen_sing.cc:94
+#: ../game/dancegraph.cc:137 ../game/guitargraph.cc:199
+#: ../game/instrumentgraph.cc:59 ../game/screen_sing.cc:94
 #: ../game/screen_sing.cc:131
 msgid "Exit to song browser"
 msgstr ""
@@ -199,11 +202,14 @@ msgstr ""
 
 #: ../game/screen_audiodevices.cc:137
 msgid ""
-"Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select to cancel. Ctrl + R to reset defaults"
+"Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select "
+"to cancel. Ctrl + R to reset defaults"
 msgstr ""
 
 #: ../game/screen_audiodevices.cc:142
-msgid "For advanced device configuration, use command line parameter --audio (use --audiohelp for details)."
+msgid ""
+"For advanced device configuration, use command line parameter --audio (use --"
+"audiohelp for details)."
 msgstr ""
 
 #: ../game/screen_audiodevices.cc:190
@@ -362,7 +368,8 @@ msgstr ""
 msgid "Remove all the songs from the list"
 msgstr ""
 
-#: ../game/screen_playlist.cc:192 ../game/screen_playlist.cc:375 ../game/screen_songs.cc:533
+#: ../game/screen_playlist.cc:192 ../game/screen_playlist.cc:375
+#: ../game/screen_songs.cc:533
 msgid "Back"
 msgstr ""
 
@@ -514,11 +521,13 @@ msgstr ""
 msgid "Lead singer"
 msgstr ""
 
-#: ../game/screen_sing.cc:678 ../game/screen_sing.cc:684 ../game/screen_sing.cc:690
+#: ../game/screen_sing.cc:678 ../game/screen_sing.cc:684
+#: ../game/screen_sing.cc:690
 msgid "Rising star"
 msgstr ""
 
-#: ../game/screen_sing.cc:679 ../game/screen_sing.cc:685 ../game/screen_sing.cc:691
+#: ../game/screen_sing.cc:679 ../game/screen_sing.cc:685
+#: ../game/screen_sing.cc:691
 msgid "Amateur"
 msgstr ""
 
@@ -735,7 +744,9 @@ msgid "Refresh playlist"
 msgstr ""
 
 #: ../game/webserver.cc:254
-msgid "Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding Performous see /docs/Authors.txt"
+msgid ""
+"Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding "
+"Performous see /docs/Authors.txt"
 msgstr ""
 
 #: ../game/webserver.cc:255
@@ -792,4 +803,442 @@ msgstr ""
 
 #: ../game/song.hh:26
 msgid "Harmonic 3"
+msgstr ""
+
+#: ../data/config/schema.xml:19
+msgid "Game"
+msgstr ""
+
+#: ../data/config/schema.xml:20
+msgid "Gameplay related options"
+msgstr ""
+
+#: ../data/config/schema.xml:23
+msgid "Graphic"
+msgstr ""
+
+#: ../data/config/schema.xml:24
+msgid "Configure rendering and video settings"
+msgstr ""
+
+#: ../data/config/schema.xml:28
+msgid "Audio Devices"
+msgstr ""
+
+#: ../data/config/schema.xml:29
+msgid "Setup microphones and playback"
+msgstr ""
+
+#: ../data/config/schema.xml:32
+msgid "Audio"
+msgstr ""
+
+#: ../data/config/schema.xml:33
+msgid "Configure general audio settings"
+msgstr ""
+
+#: ../data/config/schema.xml:36
+msgid "Paths"
+msgstr ""
+
+#: ../data/config/schema.xml:37
+msgid "Setup song and data paths"
+msgstr ""
+
+#: ../data/config/schema.xml:48
+msgid "Karaoke mode"
+msgstr ""
+
+#: ../data/config/schema.xml:49 ../data/config/schema.xml:57
+msgid "Hide pitch wave, notes and scoring."
+msgstr ""
+
+#: ../data/config/schema.xml:56
+msgid "Lyric highlight style"
+msgstr ""
+
+#: ../data/config/schema.xml:60
+msgid "Autoplay"
+msgstr ""
+
+#: ../data/config/schema.xml:61
+msgid "Keep playing random songs after the playlist is empty."
+msgstr ""
+
+#: ../data/config/schema.xml:64
+msgid "Pitch waves"
+msgstr ""
+
+#: ../data/config/schema.xml:65
+msgid "Enable singing pitch display (when not in karaoke mode)."
+msgstr ""
+
+#: ../data/config/schema.xml:70
+msgid "Theme"
+msgstr ""
+
+#: ../data/config/schema.xml:71
+msgid "Name of the theme to use."
+msgstr ""
+
+#: ../data/config/schema.xml:75
+msgid "Playlist screen timeout"
+msgstr ""
+
+#: ../data/config/schema.xml:76
+msgid ""
+"How long it will take before the next song in the playlist starts "
+"automatically."
+msgstr ""
+
+#: ../data/config/schema.xml:84
+msgid "Webserver access"
+msgstr ""
+
+#: ../data/config/schema.xml:85
+msgid ""
+"Define if you want to control performous remotely with web interface "
+"(requires restart)."
+msgstr ""
+
+#: ../data/config/schema.xml:90
+msgid "Webserver port"
+msgstr ""
+
+#: ../data/config/schema.xml:91
+msgid ""
+"Port to use for the web server. Choose one that is not used by other "
+"applications."
+msgstr ""
+
+#: ../data/config/schema.xml:94
+msgid "Keyboard as guitar"
+msgstr ""
+
+#: ../data/config/schema.xml:95
+msgid "Enable keyboard as guitar (Frets on Fire mode)."
+msgstr ""
+
+#: ../data/config/schema.xml:98
+msgid "Keyboard as drumkit"
+msgstr ""
+
+#: ../data/config/schema.xml:99
+msgid "Enable keyboard as drumkit."
+msgstr ""
+
+#: ../data/config/schema.xml:102
+msgid "Keyboard as dance pad"
+msgstr ""
+
+#: ../data/config/schema.xml:103
+msgid "Enable keyboard as dance pad."
+msgstr ""
+
+#: ../data/config/schema.xml:106
+msgid "Keyboard as keytar"
+msgstr ""
+
+#: ../data/config/schema.xml:107
+msgid "Enable keyboard as keytar."
+msgstr ""
+
+#: ../data/config/schema.xml:114
+msgid "Force controller A's type"
+msgstr ""
+
+#: ../data/config/schema.xml:115
+msgid ""
+"Override autodetection and force the first controller to the given type."
+msgstr ""
+
+#: ../data/config/schema.xml:122
+msgid "Force controller B's type"
+msgstr ""
+
+#: ../data/config/schema.xml:123
+msgid ""
+"Override autodetection and force the second controller to the given type."
+msgstr ""
+
+#: ../data/config/schema.xml:130
+msgid "Force controller C's type"
+msgstr ""
+
+#: ../data/config/schema.xml:131
+msgid ""
+"Override autodetection and force the third controller to the given type."
+msgstr ""
+
+#: ../data/config/schema.xml:138
+msgid "Force controller D's type"
+msgstr ""
+
+#: ../data/config/schema.xml:139
+msgid ""
+"Override autodetection and force the fourth controller to the given type."
+msgstr ""
+
+#: ../data/config/schema.xml:146
+msgid "Joystick configuration"
+msgstr ""
+
+#: ../data/config/schema.xml:147
+msgid "Force joystick to some kind of instrument."
+msgstr ""
+
+#: ../data/config/schema.xml:150
+msgid "Hardware MIDI input device"
+msgstr ""
+
+#: ../data/config/schema.xml:151
+msgid ""
+"Regex for matching the MIDI devices to use. The default is to use all "
+"available devices."
+msgstr ""
+
+#: ../data/config/schema.xml:166
+msgid "Fallback song encoding"
+msgstr ""
+
+#: ../data/config/schema.xml:167
+msgid "Pick the text codec used for song files that are not UTF-8."
+msgstr ""
+
+#: ../data/config/schema.xml:174
+msgid "Windowed width"
+msgstr ""
+
+#: ../data/config/schema.xml:175
+msgid "The width of the window."
+msgstr ""
+
+#: ../data/config/schema.xml:180
+msgid "Windowed height"
+msgstr ""
+
+#: ../data/config/schema.xml:181
+msgid "The height of the window."
+msgstr ""
+
+#: ../data/config/schema.xml:184
+msgid "Fullscreen mode"
+msgstr ""
+
+#: ../data/config/schema.xml:185
+msgid "Enable fullscreen mode on startup."
+msgstr ""
+
+#: ../data/config/schema.xml:188
+msgid "Stereoscopic 3D"
+msgstr ""
+
+#: ../data/config/schema.xml:189
+msgid "Enable 3D rendering of Performous."
+msgstr ""
+
+#: ../data/config/schema.xml:197
+msgid "Stereo3D type"
+msgstr ""
+
+#: ../data/config/schema.xml:198
+msgid "Some modes may only get activated in fullscreen mode."
+msgstr ""
+
+#: ../data/config/schema.xml:203
+msgid "Stereo3D separation"
+msgstr ""
+
+#: ../data/config/schema.xml:204
+msgid ""
+"The strength of the effect. Experiment with different settings for best "
+"results."
+msgstr ""
+
+#: ../data/config/schema.xml:207
+msgid "Video playback"
+msgstr ""
+
+#: ../data/config/schema.xml:208
+msgid ""
+"Allows completely disabling background videos. It is recommended to leave "
+"this enabled as Performous will still smoothly fade out the video if your "
+"computer is not fast enough."
+msgstr ""
+
+#: ../data/config/schema.xml:211
+msgid "Webcam background"
+msgstr ""
+
+#: ../data/config/schema.xml:212
+msgid ""
+"Performous can use webcam as a background video. Disable it if Performous "
+"crashes while entering a song."
+msgstr ""
+
+#: ../data/config/schema.xml:216
+msgid "Webcam id"
+msgstr ""
+
+#: ../data/config/schema.xml:217
+msgid ""
+"Use -1 to autodetect or a number starting from 0 to choose specific device."
+msgstr ""
+
+#: ../data/config/schema.xml:222
+msgid "SVG quality"
+msgstr ""
+
+#: ../data/config/schema.xml:223
+msgid ""
+"Larger numbers cause vector graphics to be rendered in higher resolution. "
+"Decrease this to make navigating in menus faster."
+msgstr ""
+
+#: ../data/config/schema.xml:228
+msgid "Text quality"
+msgstr ""
+
+#: ../data/config/schema.xml:229
+msgid ""
+"Larger numbers cause text to be rendered in higher resolution. Decrease this "
+"to make everything a little faster."
+msgstr ""
+
+#: ../data/config/schema.xml:232
+msgid "Benchmark mode"
+msgstr ""
+
+#: ../data/config/schema.xml:233
+msgid ""
+"Framerate limit of 100 FPS is removed and the game instead renders at full "
+"speed. FPS values are printed to console. Please note that the display "
+"drivers may still limit the rendering speed to the screen refresh rate."
+msgstr ""
+
+#: ../data/config/schema.xml:240
+msgid "Suggested latency"
+msgstr ""
+
+#: ../data/config/schema.xml:241
+msgid ""
+"This is a hint for the audio engine about the desired latency. Set this as "
+"low as possible while retaining clear audio playback. Requires restart."
+msgstr ""
+
+#: ../data/config/schema.xml:246
+msgid "Audio/video latency"
+msgstr ""
+
+#: ../data/config/schema.xml:247
+msgid ""
+"Affects all modes. Use negative value if your display input lag is greater "
+"than the sound card output latency, positive values in the opposite case and "
+"zero if they are equal. This should be set so that the notes pass the cursor "
+"at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while "
+"performing."
+msgstr ""
+
+#: ../data/config/schema.xml:252
+msgid "Audio round-trip latency"
+msgstr ""
+
+#: ../data/config/schema.xml:253
+msgid ""
+"Affects singing only. The time it takes for Performous playback to reach "
+"your speakers, fly to the microphone and all the way back until Performous "
+"captures and analyzes it. While performing, press Ctrl+S for synth mode and "
+"adjust with Ctrl+F3/F4."
+msgstr ""
+
+#: ../data/config/schema.xml:258
+msgid "Audio/controller latency"
+msgstr ""
+
+#: ../data/config/schema.xml:259
+msgid ""
+"Affects instruments and dancing only. The total of USB (guitar or dance pad) "
+"latency combined with audio output latency. Adjust so that you can hit the "
+"notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to "
+"adjust while performing."
+msgstr ""
+
+#: ../data/config/schema.xml:266
+msgid "Audio devices"
+msgstr ""
+
+#: ../data/config/schema.xml:267
+msgid "List of audio devices to try."
+msgstr ""
+
+#: ../data/config/schema.xml:272
+msgid "Menu volume"
+msgstr ""
+
+#: ../data/config/schema.xml:273
+msgid "The volume level of menus, song previews and jukebox mode."
+msgstr ""
+
+#: ../data/config/schema.xml:278
+msgid "Music volume"
+msgstr ""
+
+#: ../data/config/schema.xml:279
+msgid ""
+"The ingame music volume. Values above 90 are not recommended as distortion "
+"may occur."
+msgstr ""
+
+#: ../data/config/schema.xml:284
+msgid "Failure volume"
+msgstr ""
+
+#: ../data/config/schema.xml:285
+msgid ""
+"The ingame fail sound volume. Values above 90 are not recommended as "
+"distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
+msgstr ""
+
+#: ../data/config/schema.xml:288
+msgid "Microphone pass-through"
+msgstr ""
+
+#: ../data/config/schema.xml:289
+msgid "Send captured singing voice to speakers."
+msgstr ""
+
+#: ../data/config/schema.xml:294
+msgid "Pass-through volume ratio"
+msgstr ""
+
+#: ../data/config/schema.xml:295
+msgid "How much voice is amplified compared to the music."
+msgstr ""
+
+#: ../data/config/schema.xml:298
+msgid "Suppress center channel"
+msgstr ""
+
+#: ../data/config/schema.xml:299
+msgid "Suppress audio of center channel (e.g. vocals)."
+msgstr ""
+
+#: ../data/config/schema.xml:310
+msgid "Song folders"
+msgstr ""
+
+#: ../data/config/schema.xml:311
+msgid ""
+"Where to recursively look for songs. DATADIR at the beginning means all "
+"Performous data folders."
+msgstr ""
+
+#: ../data/config/schema.xml:314
+msgid "Base folders for data"
+msgstr ""
+
+#: ../data/config/schema.xml:315
+msgid ""
+"System defaults are included automatically. Additional paths can be added "
+"here."
 msgstr ""

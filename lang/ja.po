@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-21 21:29+0200\n"
-"PO-Revision-Date: 2017-06-21 21:29+0200\n"
+"POT-Creation-Date: 2017-06-23 00:42+0200\n"
+"PO-Revision-Date: 2017-06-23 00:42+0200\n"
 "Last-Translator: Arjan Speiard | Asgard Sings! <arjan.spieard@gmail.com>\n"
 "Language-Team: \n"
 "Language: ja_JP\n"
@@ -65,12 +65,12 @@ msgstr "演奏しはじめて"
 # or would トラックにして下さい work?
 #: ../game/dancegraph.cc:118 ../game/guitargraph.cc:182
 msgid "Select track"
-msgstr "曲を選択して下さい"
+msgstr "トラックを決めて下さい"
 
 # or would 難しさにして下さい work?
 #: ../game/dancegraph.cc:134 ../game/guitargraph.cc:162
 msgid "Select difficulty"
-msgstr "難しさを選択して下さい"
+msgstr "難しさを決めて下さい"
 
 #: ../game/dancegraph.cc:137 ../game/guitargraph.cc:199
 #: ../game/instrumentgraph.cc:59 ../game/screen_intro.cc:189
@@ -263,7 +263,7 @@ msgstr "演奏する"
 # not sure this is the best word
 #: ../game/screen_intro.cc:172
 msgid "Practice"
-msgstr "練習"
+msgstr "トレーニング"
 
 #: ../game/screen_intro.cc:172
 msgid "Check your skills or test the microphones"
@@ -287,9 +287,6 @@ msgid ""
 " use a webbrowser\n"
 "and navigate to localhost:"
 msgstr ""
-"ウェブサーバーが起動中です！\n"
-"ウェブブラウサーでこのアドレス\n"
-"に移動して下さい：localhost:"
 
 #: ../game/screen_intro.cc:206
 msgid ""
@@ -297,8 +294,6 @@ msgid ""
 " connect to this computer\n"
 "using "
 msgstr ""
-"ウェブサーバーが起動中です！\n"
-"このパソコンにしたのアドレスで接続できます。"
 
 #: ../game/screen_paths.cc:19
 msgid ""
@@ -312,8 +307,9 @@ msgstr ""
 "コンフィグレーシオンメニユーでセーブして下さい。"
 
 #: ../game/screen_paths.cc:65
+#, fuzzy
 msgid "Press any key to exit."
-msgstr "止める為に何を打って下さい。"
+msgstr "止める為キーを打って下さい。"
 
 #: ../game/screen_paths.cc:71
 msgid "Windows users can also use ConfigureSongDirectory.bat script."
@@ -375,7 +371,7 @@ msgstr "カメラを組み立ています"
 
 #: ../game/screen_playlist.cc:46
 msgid "Loading song timestamps..."
-msgstr "音楽の長さを読み込み中…"
+msgstr ""
 
 #: ../game/screen_playlist.cc:171 ../game/screen_playlist.cc:334
 msgid "Continue"
@@ -427,20 +423,21 @@ msgid "View more options"
 msgstr "もっとの設定をみる"
 
 #: ../game/screen_playlist.cc:326
+#, fuzzy
 msgid "View general playlist settings"
-msgstr "プレーリスト設定を見る"
+msgstr "全般オーディオのオプションを設定する"
 
 #: ../game/screen_playlist.cc:334
 msgid "Play first"
-msgstr "今すぐ再生する"
+msgstr "今すぐプレイする"
 
 #: ../game/screen_playlist.cc:336
 msgid "Ignore the playlist's order and play this song first"
-msgstr "この曲を今すぐ再生する"
+msgstr "この曲を今すぐプレイされます"
 
 #: ../game/screen_playlist.cc:337
 msgid "Start the song already!"
-msgstr "曲を始めよう！"
+msgstr "曲を始めよう"
 
 #: ../game/screen_playlist.cc:346
 msgid "Remove"
@@ -452,19 +449,21 @@ msgstr "この曲はリストから消す。"
 
 #: ../game/screen_playlist.cc:358
 msgid "Move up"
-msgstr "上に移動"
+msgstr ""
 
 #: ../game/screen_playlist.cc:358
+#, fuzzy
 msgid "Move this song up the list"
-msgstr "この曲はリストに一位上に移動する"
+msgstr "この曲はリストから消す。"
 
 #: ../game/screen_playlist.cc:368
 msgid "Move Down"
-msgstr "下に移動"
+msgstr ""
 
 #: ../game/screen_playlist.cc:368
+#, fuzzy
 msgid "Move this song down the list"
-msgstr "この曲はリストに一位下に移動する"
+msgstr "この曲はリストから消す。"
 
 # ます-form (suspended form) + 中 means that something is in progress and is more often used in signs,
 # て+います is more conversational
@@ -485,8 +484,9 @@ msgid "Loading menu..."
 msgstr "メニューを読み込み中…"
 
 #: ../game/screen_sing.cc:78
+#, fuzzy
 msgid "Start"
-msgstr "起動"
+msgstr "再起動"
 
 # See comment about Perform
 #: ../game/screen_sing.cc:78
@@ -505,7 +505,7 @@ msgstr "普通モード"
 
 #: ../game/screen_sing.cc:84
 msgid "Switch between duet and regular singing mode"
-msgstr "二部合唱モードと普通モードと選択できます。"
+msgstr ""
 
 #: ../game/screen_sing.cc:92
 msgid "Change vocal track"
@@ -513,35 +513,35 @@ msgstr "歌手トラックを変更する"
 
 #: ../game/screen_sing.cc:129
 msgid "Skip"
-msgstr "スキップする"
+msgstr ""
 
 #: ../game/screen_sing.cc:129
 msgid "Skip current song"
-msgstr "現在の曲をスキップする"
+msgstr ""
 
 #: ../game/screen_sing.cc:283
 msgid "Press UP to join dance!"
-msgstr "踊りに上を押して下さい"
+msgstr ""
 
 #: ../game/screen_sing.cc:283
 msgid "Step UP to join!"
-msgstr "参加しに上を押して下さい"
+msgstr ""
 
 #: ../game/screen_sing.cc:288
 msgid "Press 1 to join guitar!"
-msgstr "ギターで参加しに１を押して下さい"
+msgstr ""
 
 #: ../game/screen_sing.cc:288
 msgid "Press GREEN to join!"
-msgstr "参加しにみどりボタンを押して下さい。"
+msgstr ""
 
 #: ../game/screen_sing.cc:293
 msgid "Press SPACE to join drums!"
-msgstr "太鼓で参加しにスペースを押して下さい"
+msgstr ""
 
 #: ../game/screen_sing.cc:293
 msgid "KICK to join!"
-msgstr "参加しにキックして下さい"
+msgstr ""
 
 # maybe 無視 instead of skip?
 # is 場合は superflous?
@@ -555,7 +555,7 @@ msgstr "   楽器の休憩をスキップ欲しい場合は、エンターキー
 
 #: ../game/screen_sing.cc:525 ../game/screen_sing.cc:539
 msgid "   Autoplay enabled"
-msgstr "自動プレイ設定中"
+msgstr ""
 
 #: ../game/screen_sing.cc:528 ../game/screen_sing.cc:536
 msgid "   Remember to wait for grading!"
@@ -611,11 +611,11 @@ msgstr "ロッカー"
 
 #: ../game/screen_songs.cc:288
 msgid "Sorry, no songs match the search!"
-msgstr "ごめん検索に一致する曲がありません。"
+msgstr ""
 
 #: ../game/screen_songs.cc:291
 msgid "Sorry, no songs match the filter!"
-msgstr "ごめんフィルターに一致する曲がありません。"
+msgstr ""
 
 #: ../game/screen_songs.cc:294
 msgid "No songs found!"
@@ -627,23 +627,23 @@ msgstr "無料曲をダウンロードに「performous.org」行って下さい"
 
 #: ../game/screen_songs.cc:313
 msgid "<type in to search>"
-msgstr "＜検索する為に打って下さい＞"
+msgstr ""
 
 #: ../game/screen_songs.cc:313
 msgid "songs"
-msgstr "曲々"
+msgstr ""
 
 #: ../game/screen_songs.cc:313
 msgid "options"
-msgstr "設定"
+msgstr ""
 
 #: ../game/screen_songs.cc:315
 msgid "sort order: "
-msgstr "ソート順:"
+msgstr ""
 
 #: ../game/screen_songs.cc:316
 msgid "type filter: "
-msgstr "タイプフィルター:"
+msgstr ""
 
 # ハイスコア or 高得点?
 #: ../game/screen_songs.cc:317
@@ -658,27 +658,27 @@ msgstr "左手モード"
 
 #: ../game/screen_songs.cc:320
 msgid "start a playlist with this song!"
-msgstr "この曲でプレイリストを始めよう！"
+msgstr ""
 
 #: ../game/screen_songs.cc:320
 msgid "open the playlist menu"
-msgstr "プレイリストメニューを開く"
+msgstr ""
 
 #: ../game/screen_songs.cc:513
 msgid "Play"
-msgstr "再生"
+msgstr ""
 
-#: ../game/screen_songs.cc:526 ../game/webserver.cc:239
+#: ../game/screen_songs.cc:526
 msgid "View playlist"
-msgstr "プレイリストを見る"
+msgstr ""
 
 #: ../game/screen_songs.cc:527
 msgid "Clear playlist"
-msgstr "プレイリストを消す"
+msgstr ""
 
 #: ../game/songparser-xml.cc:104
 msgid "Together"
-msgstr "一緒に"
+msgstr ""
 
 #: ../game/songs.cc:194
 msgid "show all songs"
@@ -689,16 +689,18 @@ msgid "has dance"
 msgstr "「踊」がある。"
 
 #: ../game/songs.cc:196
+#, fuzzy
 msgid "has vocals"
-msgstr "ボーカルあり"
+msgstr "ボーカル"
 
 #: ../game/songs.cc:197
 msgid "has duet"
-msgstr "二部合唱あり"
+msgstr "二部合唱がある"
 
 #: ../game/songs.cc:198
+#, fuzzy
 msgid "has guitar"
-msgstr "ギターあり"
+msgstr "リズムギター"
 
 #: ../game/songs.cc:199
 #, fuzzy
@@ -806,7 +808,7 @@ msgid ""
 "Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding "
 "Performous see /docs/Authors.txt"
 msgstr ""
-"ウェブ・インターフェースはニク・ノーイエンスとアルジャン・スペイアルドによっ"
+"ウェブ・インターフェースはニク・ノーイエンスとアルジャン・スペイアルドによっ "
 "て作られました。創作者は/docs/Authors.txt に書かれています。"
 
 #: ../game/webserver.cc:255
@@ -865,66 +867,445 @@ msgstr "ハルモニク 2"
 msgid "Harmonic 3"
 msgstr "ハルモニク 3"
 
-# 塩素する = musical performance
-# I think 本番 could work, unless sence 3 of Jim's WWWJDIC is the most common meaning...
-# I get the feeling that 演じろ is more theatrical.
-# パフォーマンスする feels to english imo
-# Perhaps suru should be dropped?
-#, fuzzy
-#~| msgid "Perform"
-#~ msgid "Performous"
-#~ msgstr "演奏する"
+#: ../data/config/schema.xml:19
+msgid "Game"
+msgstr "ゲーム"
+
+#: ../data/config/schema.xml:20
+msgid "Gameplay related options"
+msgstr ""
+
+#: ../data/config/schema.xml:23
+msgid "Graphic"
+msgstr ""
+
+#: ../data/config/schema.xml:24
+msgid "Configure rendering and video settings"
+msgstr "Ｒｅｎｄｅｒｉｎｇとビデオのオプションを設定する"
+
+#: ../data/config/schema.xml:28
+msgid "Audio Devices"
+msgstr ""
+
+#: ../data/config/schema.xml:29
+msgid "Setup microphones and playback"
+msgstr ""
+
+#: ../data/config/schema.xml:32
+msgid "Audio"
+msgstr "オーディオ"
+
+#: ../data/config/schema.xml:33
+msgid "Configure general audio settings"
+msgstr "全般オーディオのオプションを設定する"
+
+#: ../data/config/schema.xml:36
+msgid "Paths"
+msgstr "パス"
+
+#: ../data/config/schema.xml:37
+msgid "Setup song and data paths"
+msgstr ""
 
 # could 開式 be used for this?
-#~ msgid "A karaoke game"
-#~ msgstr "カラオケ・ゲーム"
+#: ../data/config/schema.xml:48
+msgid "Karaoke mode"
+msgstr "カラオケモード"
 
-# 塩素する = musical performance
-# I think 本番 could work, unless sence 3 of Jim's WWWJDIC is the most common meaning...
-# I get the feeling that 演じろ is more theatrical.
-# パフォーマンスする feels to english imo
-# Perhaps suru should be dropped?
-#, fuzzy
-#~| msgid "Perform"
-#~ msgid "performous"
-#~ msgstr "演奏する"
+#: ../data/config/schema.xml:49 ../data/config/schema.xml:57
+msgid "Hide pitch wave, notes and scoring."
+msgstr ""
 
-#~ msgid "song;music;dance;karaoke;microphone;sound;singing;"
-#~ msgstr "曲;音楽;踊り;カラオケ;マイク;音;歌;"
+#: ../data/config/schema.xml:56
+msgid "Lyric highlight style"
+msgstr ""
 
-#~ msgid "Game"
-#~ msgstr "ゲーム"
+#: ../data/config/schema.xml:60
+msgid "Autoplay"
+msgstr ""
 
-#~ msgid "Configure rendering and video settings"
-#~ msgstr "Ｒｅｎｄｅｒｉｎｇとビデオのオプションを設定する"
+#: ../data/config/schema.xml:61
+msgid "Keep playing random songs after the playlist is empty."
+msgstr ""
 
-#~ msgid "Audio"
-#~ msgstr "オーディオ"
+#: ../data/config/schema.xml:64
+msgid "Pitch waves"
+msgstr ""
 
-#~ msgid "Configure general audio settings"
-#~ msgstr "全般オーディオのオプションを設定する"
-
-#~ msgid "Paths"
-#~ msgstr "パス"
+#: ../data/config/schema.xml:65
+msgid "Enable singing pitch display (when not in karaoke mode)."
+msgstr ""
 
 # Note: skin
-#~ msgid "Theme"
-#~ msgstr "スキン"
+#: ../data/config/schema.xml:70
+msgid "Theme"
+msgstr "スキン"
 
-#~ msgid "SVG quality"
-#~ msgstr "SVGの品質"
+#: ../data/config/schema.xml:71
+msgid "Name of the theme to use."
+msgstr ""
 
-#~ msgid "Text quality"
-#~ msgstr "テクストの品質"
+#: ../data/config/schema.xml:75
+msgid "Playlist screen timeout"
+msgstr ""
 
-#~ msgid "Menu volume"
-#~ msgstr "メニューの音量"
+#: ../data/config/schema.xml:76
+msgid ""
+"How long it will take before the next song in the playlist starts "
+"automatically."
+msgstr ""
 
-#~ msgid "Music volume"
-#~ msgstr "音楽の音量"
+#: ../data/config/schema.xml:84
+msgid "Webserver access"
+msgstr ""
 
-#~ msgid "Failure volume"
-#~ msgstr "失敗の音量"
+#: ../data/config/schema.xml:85
+msgid ""
+"Define if you want to control performous remotely with web interface "
+"(requires restart)."
+msgstr ""
+
+#: ../data/config/schema.xml:90
+msgid "Webserver port"
+msgstr ""
+
+#: ../data/config/schema.xml:91
+msgid ""
+"Port to use for the web server. Choose one that is not used by other "
+"applications."
+msgstr ""
+
+#: ../data/config/schema.xml:94
+msgid "Keyboard as guitar"
+msgstr ""
+
+#: ../data/config/schema.xml:95
+msgid "Enable keyboard as guitar (Frets on Fire mode)."
+msgstr ""
+
+#: ../data/config/schema.xml:98
+msgid "Keyboard as drumkit"
+msgstr ""
+
+#: ../data/config/schema.xml:99
+msgid "Enable keyboard as drumkit."
+msgstr ""
+
+#: ../data/config/schema.xml:102
+msgid "Keyboard as dance pad"
+msgstr ""
+
+#: ../data/config/schema.xml:103
+msgid "Enable keyboard as dance pad."
+msgstr ""
+
+#: ../data/config/schema.xml:106
+msgid "Keyboard as keytar"
+msgstr ""
+
+#: ../data/config/schema.xml:107
+msgid "Enable keyboard as keytar."
+msgstr ""
+
+#: ../data/config/schema.xml:114
+msgid "Force controller A's type"
+msgstr ""
+
+#: ../data/config/schema.xml:115
+msgid ""
+"Override autodetection and force the first controller to the given type."
+msgstr ""
+
+#: ../data/config/schema.xml:122
+msgid "Force controller B's type"
+msgstr ""
+
+#: ../data/config/schema.xml:123
+msgid ""
+"Override autodetection and force the second controller to the given type."
+msgstr ""
+
+#: ../data/config/schema.xml:130
+msgid "Force controller C's type"
+msgstr ""
+
+#: ../data/config/schema.xml:131
+msgid ""
+"Override autodetection and force the third controller to the given type."
+msgstr ""
+
+#: ../data/config/schema.xml:138
+msgid "Force controller D's type"
+msgstr ""
+
+#: ../data/config/schema.xml:139
+msgid ""
+"Override autodetection and force the fourth controller to the given type."
+msgstr ""
+
+#: ../data/config/schema.xml:146
+msgid "Joystick configuration"
+msgstr ""
+
+#: ../data/config/schema.xml:147
+msgid "Force joystick to some kind of instrument."
+msgstr ""
+
+#: ../data/config/schema.xml:150
+msgid "Hardware MIDI input device"
+msgstr ""
+
+#: ../data/config/schema.xml:151
+msgid ""
+"Regex for matching the MIDI devices to use. The default is to use all "
+"available devices."
+msgstr ""
+
+#: ../data/config/schema.xml:166
+msgid "Fallback song encoding"
+msgstr ""
+
+#: ../data/config/schema.xml:167
+msgid "Pick the text codec used for song files that are not UTF-8."
+msgstr ""
+
+#: ../data/config/schema.xml:174
+msgid "Windowed width"
+msgstr ""
+
+#: ../data/config/schema.xml:175
+msgid "The width of the window."
+msgstr ""
+
+#: ../data/config/schema.xml:180
+msgid "Windowed height"
+msgstr ""
+
+#: ../data/config/schema.xml:181
+msgid "The height of the window."
+msgstr ""
+
+#: ../data/config/schema.xml:184
+msgid "Fullscreen mode"
+msgstr ""
+
+#: ../data/config/schema.xml:185
+msgid "Enable fullscreen mode on startup."
+msgstr ""
+
+#: ../data/config/schema.xml:188
+msgid "Stereoscopic 3D"
+msgstr ""
+
+#: ../data/config/schema.xml:189
+msgid "Enable 3D rendering of Performous."
+msgstr ""
+
+#: ../data/config/schema.xml:197
+msgid "Stereo3D type"
+msgstr ""
+
+#: ../data/config/schema.xml:198
+msgid "Some modes may only get activated in fullscreen mode."
+msgstr ""
+
+#: ../data/config/schema.xml:203
+msgid "Stereo3D separation"
+msgstr ""
+
+#: ../data/config/schema.xml:204
+msgid ""
+"The strength of the effect. Experiment with different settings for best "
+"results."
+msgstr ""
+
+#: ../data/config/schema.xml:207
+msgid "Video playback"
+msgstr ""
+
+#: ../data/config/schema.xml:208
+msgid ""
+"Allows completely disabling background videos. It is recommended to leave "
+"this enabled as Performous will still smoothly fade out the video if your "
+"computer is not fast enough."
+msgstr ""
+
+#: ../data/config/schema.xml:211
+msgid "Webcam background"
+msgstr ""
+
+#: ../data/config/schema.xml:212
+msgid ""
+"Performous can use webcam as a background video. Disable it if Performous "
+"crashes while entering a song."
+msgstr ""
+
+#: ../data/config/schema.xml:216
+msgid "Webcam id"
+msgstr ""
+
+#: ../data/config/schema.xml:217
+msgid ""
+"Use -1 to autodetect or a number starting from 0 to choose specific device."
+msgstr ""
+
+#: ../data/config/schema.xml:222
+msgid "SVG quality"
+msgstr "SVGの品質"
+
+#: ../data/config/schema.xml:223
+msgid ""
+"Larger numbers cause vector graphics to be rendered in higher resolution. "
+"Decrease this to make navigating in menus faster."
+msgstr ""
+
+#: ../data/config/schema.xml:228
+msgid "Text quality"
+msgstr "テクストの品質"
+
+#: ../data/config/schema.xml:229
+msgid ""
+"Larger numbers cause text to be rendered in higher resolution. Decrease this "
+"to make everything a little faster."
+msgstr ""
+
+#: ../data/config/schema.xml:232
+msgid "Benchmark mode"
+msgstr ""
+
+#: ../data/config/schema.xml:233
+msgid ""
+"Framerate limit of 100 FPS is removed and the game instead renders at full "
+"speed. FPS values are printed to console. Please note that the display "
+"drivers may still limit the rendering speed to the screen refresh rate."
+msgstr ""
+
+#: ../data/config/schema.xml:240
+msgid "Suggested latency"
+msgstr ""
+
+#: ../data/config/schema.xml:241
+msgid ""
+"This is a hint for the audio engine about the desired latency. Set this as "
+"low as possible while retaining clear audio playback. Requires restart."
+msgstr ""
+
+#: ../data/config/schema.xml:246
+msgid "Audio/video latency"
+msgstr ""
+
+#: ../data/config/schema.xml:247
+msgid ""
+"Affects all modes. Use negative value if your display input lag is greater "
+"than the sound card output latency, positive values in the opposite case and "
+"zero if they are equal. This should be set so that the notes pass the cursor "
+"at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while "
+"performing."
+msgstr ""
+
+#: ../data/config/schema.xml:252
+msgid "Audio round-trip latency"
+msgstr ""
+
+#: ../data/config/schema.xml:253
+msgid ""
+"Affects singing only. The time it takes for Performous playback to reach "
+"your speakers, fly to the microphone and all the way back until Performous "
+"captures and analyzes it. While performing, press Ctrl+S for synth mode and "
+"adjust with Ctrl+F3/F4."
+msgstr ""
+
+#: ../data/config/schema.xml:258
+msgid "Audio/controller latency"
+msgstr ""
+
+#: ../data/config/schema.xml:259
+msgid ""
+"Affects instruments and dancing only. The total of USB (guitar or dance pad) "
+"latency combined with audio output latency. Adjust so that you can hit the "
+"notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to "
+"adjust while performing."
+msgstr ""
+
+#: ../data/config/schema.xml:266
+msgid "Audio devices"
+msgstr ""
+
+#: ../data/config/schema.xml:267
+msgid "List of audio devices to try."
+msgstr ""
+
+#: ../data/config/schema.xml:272
+msgid "Menu volume"
+msgstr "メニューの音量"
+
+#: ../data/config/schema.xml:273
+msgid "The volume level of menus, song previews and jukebox mode."
+msgstr ""
+
+#: ../data/config/schema.xml:278
+msgid "Music volume"
+msgstr "音楽の音量"
+
+#: ../data/config/schema.xml:279
+msgid ""
+"The ingame music volume. Values above 90 are not recommended as distortion "
+"may occur."
+msgstr ""
+
+#: ../data/config/schema.xml:284
+msgid "Failure volume"
+msgstr "失敗の音量"
+
+#: ../data/config/schema.xml:285
+msgid ""
+"The ingame fail sound volume. Values above 90 are not recommended as "
+"distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
+msgstr ""
+
+#: ../data/config/schema.xml:288
+msgid "Microphone pass-through"
+msgstr ""
+
+#: ../data/config/schema.xml:289
+msgid "Send captured singing voice to speakers."
+msgstr ""
+
+#: ../data/config/schema.xml:294
+msgid "Pass-through volume ratio"
+msgstr ""
+
+#: ../data/config/schema.xml:295
+msgid "How much voice is amplified compared to the music."
+msgstr ""
+
+#: ../data/config/schema.xml:298
+msgid "Suppress center channel"
+msgstr ""
+
+#: ../data/config/schema.xml:299
+msgid "Suppress audio of center channel (e.g. vocals)."
+msgstr ""
+
+#: ../data/config/schema.xml:310
+msgid "Song folders"
+msgstr ""
+
+#: ../data/config/schema.xml:311
+msgid ""
+"Where to recursively look for songs. DATADIR at the beginning means all "
+"Performous data folders."
+msgstr ""
+
+#: ../data/config/schema.xml:314
+msgid "Base folders for data"
+msgstr ""
+
+#: ../data/config/schema.xml:315
+msgid ""
+"System defaults are included automatically. Additional paths can be added "
+"here."
+msgstr ""
 
 # could 開式 be used for this?
 #, fuzzy
