@@ -269,8 +269,6 @@ void SvgTxtTheme::draw(std::vector<TZoomText> const& _text) {
 	if (m_align == CENTER) position_x -= 0.5 * m_texture_width;
 	if (m_align == RIGHT) position_x -= m_texture_width;
 
-	if ((position_x + m_texture_width) > 0.5) {
-		m_texture_width = (0.5 - position_x);
 	if ((position_x + m_texture_width) > 0.48) {
 		m_texture_width = (0.48 - position_x);
 	}
