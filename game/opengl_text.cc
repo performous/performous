@@ -271,8 +271,6 @@ void SvgTxtTheme::draw(std::vector<TZoomText> const& _text) {
 
 	if ((position_x + m_texture_width) > 0.5) {
 		m_texture_width = (0.5 - position_x);
-	if ((position_x + m_texture_width) > 0.48) {
-		m_texture_width = (0.48 - position_x);
 	}
 	for (unsigned int i = 0; i < _text.size(); i++ ) {
 		double syllable_x = m_opengl_text[i].x();
@@ -291,6 +289,5 @@ void SvgTxtTheme::draw(std::vector<TZoomText> const& _text) {
 		} else m_opengl_text[i].draw(dim, tex);
 			position_x += syllable_width;
 		}
-	}
 }
 
