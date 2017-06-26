@@ -15,5 +15,6 @@ export PANGO_SYSCONFDIR="${CURRDIR}/../Resources/etc"
 # environment. Apparently it works just fine without it too.
 export GDK_PIXBUF_MODULE_FILE=""
 # TODO: might be a good idea to turn-off all console output
+export LANG=$(defaults read -g AppleLanguages | sed '/"/!d;s/["[:space:]]//g;s/-/_/').UTF-8 # Set locale to default OS languages.
 cd "${CURRDIR}" # pangorc file uses the current folder as the basis for resolving relative paths to pango.modules
 "${CURRDIR}/performous" # Make sure the executable is actually found.
