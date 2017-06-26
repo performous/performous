@@ -2,17 +2,14 @@
 	<div class="col-sm-12">
 		<div class="form-group">
 			<div class="input-group">
-			  <input type="text" class="form-control" placeholder="Search for...">
+			  <input id="search-field" type="text" class="form-control" placeholder="Search for...">
 			  <span class="input-group-btn">
-			    <button class="btn btn-secondary" type="button">search</button>
+			    <button id="search-database" class="btn btn-secondary" type="button">search</button>
 			  </span>
 			</div>
 		</div>
-		<div class="list-group songs">
-		    <a href="#" class="list-group-item">First result<span class="glyphicon glyphicon-plus" title="view_database"></span></a>
-		    <a href="#" class="list-group-item">Second result<span class="glyphicon glyphicon-plus" title="view_database"></span></a>
-		    <a href="#" class="list-group-item">Third result<span class="glyphicon glyphicon-plus" title="view_database"></span></a>
-		    <a href="#" class="list-group-item">Fourth result<span class="glyphicon glyphicon-plus" title="view_database"></span></a>
-		</div>
+	</div>
+	<div class="col-sm-12">
+		<div id="searched-songs" class="list-group songs"></div>
 	</div>
 </div>
