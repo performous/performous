@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-24 14:06-0400\n"
-"PO-Revision-Date: 2017-06-24 19:26-0400\n"
+"PO-Revision-Date: 2017-06-26 13:09-0400\n"
 "Last-Translator: Gregorio Litenstein <g.litenstein@gmail.com>\n"
 "Language-Team: \n"
 "Language: es_ES\n"
@@ -86,7 +86,7 @@ msgstr "¡PARA!"
 
 #: ../game/dancegraph.cc:321 ../game/guitargraph.cc:449
 msgid "Streak!"
-msgstr "Racha!"
+msgstr "¡Racha!"
 
 #: ../game/guitargraph.cc:14
 msgid "Kids"
@@ -198,11 +198,11 @@ msgid ""
 "all existing audio device configuration.\n"
 "Your other options changes will be saved too."
 msgstr ""
-"Parece que tienes alguna configuración manual\n"
-"incompatible con esta interfaz de usuario.\n"
-"Guardando estas opciones sobreescribirás\n"
-"cualquier configuración existente de dispositivos de audio.\n"
-"Tus otros cambios en la configuración también se guardarán."
+"Parece que tienes alguna configuración manual incompatible con esta interfaz "
+"de usuario.\n"
+"Guardando estas opciones sobreescribirás cualquier configuración existente "
+"de dispositivos\n"
+"de audio. Tus otros cambios en la configuración también se guardarán."
 
 #: ../game/screen_audiodevices.cc:116
 msgid "- Unassigned -"
@@ -215,7 +215,7 @@ msgid ""
 msgstr ""
 "Usa las flechas para cambiar la configuración. Presiona Enter/Start para "
 "guardar, y Test o Esc/Select para cancelar.\n"
-"Ctrl+R vuelve a la configuración por defecto"
+"Ctrl+R para restablecer la configuración"
 
 #: ../game/screen_audiodevices.cc:142
 msgid ""
@@ -286,7 +286,7 @@ msgid ""
 "and navigate to localhost:"
 msgstr ""
 "Interfaz web activada!\n"
-" usa un navegador\n"
+"usa un navegador\n"
 "y navega a localhost:"
 
 #: ../game/screen_intro.cc:206
@@ -296,7 +296,7 @@ msgid ""
 "using "
 msgstr ""
 "Interfaz web activada!\n"
-" conéctate a este computador\n"
+"conéctate a este computador\n"
 "usando "
 
 #: ../game/screen_paths.cc:19
@@ -383,11 +383,11 @@ msgstr "Abrir el buscador de canciones para agregar más canciones"
 
 #: ../game/screen_playlist.cc:180 ../game/screen_songs.cc:520
 msgid "Shuffle"
-msgstr "Aleatorizar"
+msgstr "Aleatorio"
 
 #: ../game/screen_playlist.cc:180
 msgid "Randomize the order of the playlist"
-msgstr "Aleatorizar el orden de la lista de reproducción"
+msgstr "Aleatorizar el orden de la playlist"
 
 #: ../game/screen_playlist.cc:186
 msgid "Clear and exit"
@@ -404,7 +404,7 @@ msgstr "Atrás"
 
 #: ../game/screen_playlist.cc:192 ../game/screen_playlist.cc:375
 msgid "Back to playlist viewer"
-msgstr "Volver al visor de lista de reproducción"
+msgstr "Volver al visor de playlist"
 
 #: ../game/screen_playlist.cc:317
 msgid "Press enter to view song options"
@@ -416,17 +416,15 @@ msgstr "Ver más opciones"
 
 #: ../game/screen_playlist.cc:326
 msgid "View general playlist settings"
-msgstr "Ver configuración general de lista de reproducción"
+msgstr "Ver configuración general de playlist"
 
 #: ../game/screen_playlist.cc:334
 msgid "Play first"
-msgstr "Reproducir primero"
+msgstr "Reproducir ahora"
 
 #: ../game/screen_playlist.cc:336
 msgid "Ignore the playlist's order and play this song first"
-msgstr ""
-"Ignorar el orden de la lista de reproducción y reproducir primero esta "
-"canción"
+msgstr "Ignorar el orden de la playlist y reproducir ahora esta canción"
 
 #: ../game/screen_playlist.cc:337
 msgid "Start the song already!"
@@ -506,7 +504,7 @@ msgstr "Saltar la canción actual"
 
 #: ../game/screen_sing.cc:283
 msgid "Press UP to join dance!"
-msgstr "¡Presiona ARRIBA para unirte a bailar!"
+msgstr "¡Presiona ARRIBA para bailar!"
 
 #: ../game/screen_sing.cc:283
 msgid "Step UP to join!"
@@ -514,7 +512,7 @@ msgstr "¡Pisa ARRIBA para unirte!"
 
 #: ../game/screen_sing.cc:288
 msgid "Press 1 to join guitar!"
-msgstr "¡Presiona 1 para unirte con la guitarra!"
+msgstr "¡Presiona 1 para unirte en guitarra!"
 
 #: ../game/screen_sing.cc:288
 msgid "Press GREEN to join!"
@@ -522,7 +520,7 @@ msgstr "¡Presiona VERDE para unirte!"
 
 #: ../game/screen_sing.cc:293
 msgid "Press SPACE to join drums!"
-msgstr "¡Presiona ESPACIO para unirte con la batería!"
+msgstr "¡Presiona ESPACIO para unirte en batería!"
 
 #: ../game/screen_sing.cc:293
 msgid "KICK to join!"
@@ -633,11 +631,11 @@ msgstr "modo tocadiscos"
 
 #: ../game/screen_songs.cc:320
 msgid "start a playlist with this song!"
-msgstr "¡comenzar una lista de reproducción con esta canción!"
+msgstr "¡comenzar una playlist con esta canción!"
 
 #: ../game/screen_songs.cc:320
 msgid "open the playlist menu"
-msgstr "abrir el menú de lista de reproducción"
+msgstr "abrir el menú de playlist"
 
 #: ../game/screen_songs.cc:513
 msgid "Play"
@@ -645,11 +643,11 @@ msgstr "Reproducir"
 
 #: ../game/screen_songs.cc:526
 msgid "View playlist"
-msgstr "Ver lista de reproducción"
+msgstr "Ver playlist"
 
 #: ../game/screen_songs.cc:527
 msgid "Clear playlist"
-msgstr "Limpiar lista de reproducción"
+msgstr "Limpiar playlist"
 
 #: ../game/songparser-xml.cc:104
 msgid "Together"
@@ -685,7 +683,7 @@ msgstr "banda completa"
 
 #: ../game/songs.cc:228
 msgid "random order"
-msgstr "ordenadas aleatoriamente"
+msgstr "aleatorio"
 
 #: ../game/songs.cc:229
 msgid "sorted by song"
@@ -773,7 +771,7 @@ msgstr "Próximas canciones"
 
 #: ../game/webserver.cc:253
 msgid "Refresh playlist"
-msgstr "Actualizar lista de reproducción"
+msgstr "Actualizar playlist"
 
 #: ../game/webserver.cc:254
 msgid ""
@@ -885,7 +883,7 @@ msgstr "Modo karaoke"
 
 #: ../data/config/schema.xml:49 ../data/config/schema.xml:57
 msgid "Hide pitch wave, notes and scoring."
-msgstr "Oculta las ondas de tono, las notas y la puntuación."
+msgstr "Oculta el sonido captado, las notas y la puntuación."
 
 #: ../data/config/schema.xml:56
 msgid "Lyric highlight style"
@@ -897,18 +895,17 @@ msgstr "Comienzo automático"
 
 #: ../data/config/schema.xml:61
 msgid "Keep playing random songs after the playlist is empty."
-msgstr ""
-"Seguir reproduciendo canciones al azar una vez acabada la lista de "
-"reproducción."
+msgstr "Seguir reproduciendo canciones al azar una vez acabada la playlist."
 
 #: ../data/config/schema.xml:64
 msgid "Pitch waves"
-msgstr "Ondas de tono"
+msgstr "Sonido captado"
 
 #: ../data/config/schema.xml:65
 msgid "Enable singing pitch display (when not in karaoke mode)."
 msgstr ""
-"Habilita la representación del tono al cantar (fuera del modo karaoke)."
+"Muestra el tono correspondiente al sonido captado por el micrófono (fuera "
+"del modo karaoke)."
 
 #: ../data/config/schema.xml:70
 msgid "Theme"
@@ -920,7 +917,7 @@ msgstr "Nombre (o ruta absoluta) del tema a usar."
 
 #: ../data/config/schema.xml:75
 msgid "Playlist screen timeout"
-msgstr "Límite de tiempo para pantalla de lista de reproducción"
+msgstr "Tiempo entre canciones"
 
 #: ../data/config/schema.xml:76
 msgid ""
@@ -972,7 +969,7 @@ msgstr "Habilita el teclado como batería."
 
 #: ../data/config/schema.xml:102
 msgid "Keyboard as dance pad"
-msgstr "Teclado como alfombrilla de baile"
+msgstr "Teclado como pad de baile"
 
 #: ../data/config/schema.xml:103
 msgid "Enable keyboard as dance pad."
@@ -1032,7 +1029,7 @@ msgstr "Configuración del Joystick"
 
 #: ../data/config/schema.xml:147
 msgid "Force joystick to some kind of instrument."
-msgstr "Forzar la utilización del joystick como algún tipo de instrumento."
+msgstr "Fuerza el joystick a algún tipo de instrumento."
 
 #: ../data/config/schema.xml:150
 msgid "Hardware MIDI input device"
@@ -1043,12 +1040,12 @@ msgid ""
 "Regex for matching the MIDI devices to use. The default is to use all "
 "available devices."
 msgstr ""
-"Regex para filtrar dispositivos MIDI a usar. Por defecto se usan todos los "
+"Regex para filtrar dispositivos MIDI. Por defecto se usan todos los "
 "dispositivos disponibles."
 
 #: ../data/config/schema.xml:166
 msgid "Fallback song encoding"
-msgstr "Codificación por defecto de las canciones"
+msgstr "Codificación de caracteres"
 
 #: ../data/config/schema.xml:167
 msgid "Pick the text codec used for song files that are not UTF-8."
@@ -1056,19 +1053,19 @@ msgstr "Selecciona la codificación para canciones que no sean UTF-8."
 
 #: ../data/config/schema.xml:174
 msgid "Windowed width"
-msgstr "Ancho en modo ventana"
+msgstr "Ancho de ventana"
 
 #: ../data/config/schema.xml:175
 msgid "The width of the window."
-msgstr "Ancho de la ventana."
+msgstr "Ancho en modo ventana."
 
 #: ../data/config/schema.xml:180
 msgid "Windowed height"
-msgstr "Altura en modo ventana"
+msgstr "Altura de ventana"
 
 #: ../data/config/schema.xml:181
 msgid "The height of the window."
-msgstr "Altura de la ventana."
+msgstr "Altura en modo ventana."
 
 #: ../data/config/schema.xml:184
 msgid "Fullscreen mode"
@@ -1092,19 +1089,19 @@ msgstr "Tipo de 3D Estereoscópico"
 
 #: ../data/config/schema.xml:198
 msgid "Some modes may only get activated in fullscreen mode."
-msgstr "Algunos modos pueden activarse solo en modo pantalla completa."
+msgstr "Algunos modos pueden usarse solo en modo pantalla completa."
 
 #: ../data/config/schema.xml:203
 msgid "Stereo3D separation"
-msgstr "Separación de 3D Estereoscópico"
+msgstr "Distancia interaxial"
 
 #: ../data/config/schema.xml:204
 msgid ""
 "The strength of the effect. Experiment with different settings for best "
 "results."
 msgstr ""
-"Fuerza del efecto. Experimenta con diferentes valores para encontrar el "
-"mejor resultado."
+"Intensidad del efecto. Prueba diferentes valores para encontrar el mejor "
+"resultado."
 
 #: ../data/config/schema.xml:207
 msgid "Video playback"
@@ -1116,9 +1113,10 @@ msgid ""
 "this enabled as Performous will still smoothly fade out the video if your "
 "computer is not fast enough."
 msgstr ""
-"Permite desactivar la reproducción de vídeo de fondo. Se recomienda dejarla "
-"activada ya que Performous se encargará de ello si es necesario para mejorar "
-"el rendimiento."
+"Permite desactivar la reproducción de videos de fondo. Se recomienda dejarla "
+"activada\n"
+" ya que Performous lo hará automáticamente si el computador no es lo "
+"suficientemente rápido."
 
 #: ../data/config/schema.xml:211
 msgid "Webcam background"
@@ -1140,8 +1138,8 @@ msgstr "ID de la cámara web"
 msgid ""
 "Use -1 to autodetect or a number starting from 0 to choose specific device."
 msgstr ""
-"Utilizar -1 para detectar automáticamente o un número mayor o igual que 0 "
-"para escoger un dispositivo en particular."
+"Usa -1 para detectar automáticamente o un número mayor o igual que 0 para "
+"escoger un dispositivo en particular."
 
 #: ../data/config/schema.xml:222
 msgid "SVG quality"
@@ -1178,9 +1176,11 @@ msgid ""
 "drivers may still limit the rendering speed to the screen refresh rate."
 msgstr ""
 "Elimina el límite de 100 cuadros por segundo (FPS) y el juego se ejecuta a "
-"la máxima velocidad. Los valores de FPS son impresos en la consola.\n"
-"Nótese que los controladores de la tarjeta gráfica podrían de todos modos "
-"limitar la velocidad a la tasa de refresco de la pantalla."
+"la máxima velocidad.\n"
+" Los valores de FPS son impresos en la consola. Nótese que los controladores "
+"de la tarjeta gráfica\n"
+" podrían de todos modos limitar la velocidad a la tasa de refresco de la "
+"pantalla."
 
 #: ../data/config/schema.xml:240
 msgid "Suggested latency"
@@ -1192,8 +1192,8 @@ msgid ""
 "low as possible while retaining clear audio playback. Requires restart."
 msgstr ""
 "Es un tip para el sistema de sonido sobre la latencia deseada. Utiliza el "
-"valor más bajo posible que no resulte en sonido distorcionado.\n"
-"Requiere reiniciar la aplicación."
+"valor más bajo posible que\n"
+" no resulte en sonido distorcionado. Requiere reiniciar la aplicación."
 
 #: ../data/config/schema.xml:246
 msgid "Audio/video latency"
@@ -1207,12 +1207,12 @@ msgid ""
 "at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while "
 "performing."
 msgstr ""
-"Afecta a todos los modos. Utiliza un valor negativo si la latencia de tu "
-"pantalla es mayor que la latencia de salida de la tarjeta de sonido, valores "
-"positivos en caso contrario y cero si son iguales.\n"
-"Esto debería ajustarse de forma que las notas pasen el cursor al mismo "
-"tiempo que se escucha el sonido. Puedes ajustar estos valores mientras "
-"juegas con las teclas Ctrl+F1/F2."
+"Afecta a todos los modos. Deber ser 0 si latencias de la pantalla y salida "
+"de sonido son iguales,\n"
+"negativo si la de la pantalla es mayor, positivo en caso contrario. Las "
+"notas deben pasar el cursor\n"
+"al mismo tiempo que se escucha el sonido. Puedes ajustar estos valores "
+"mientras juegas con las teclas Ctrl+F1/F2."
 
 #: ../data/config/schema.xml:252
 msgid "Audio round-trip latency"
@@ -1288,8 +1288,8 @@ msgid ""
 "distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
 msgstr ""
 "Volumen de los sonidos de error. No se recomiendan valores sobre 90, ya que "
-"pueden causar distorción. 11 es más que 10, pero estos llegan a 100. eso es "
-"89 más fuerte!"
+"pueden causar distorción.\n"
+"11 es más que 10, pero estos llegan a 100. eso es 89 más fuerte!"
 
 #: ../data/config/schema.xml:288
 msgid "Microphone pass-through"
