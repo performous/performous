@@ -314,4 +314,11 @@ to save the current settings to XML.
 		<short>Base folders for data</short>
 		<long>System defaults are included automatically. Additional paths can be added here.</long>
 	</entry>
+	<!-- Song ordering -->
+	<entry name="songs/sort-order" type="int" value="0" hidden="true">
+		<ui unit=" pixels" />
+		<limits min="0" max="6" step="1" />
+		<short>Sort order</short>
+		<long>Currently active sort order</long>
+	</entry>
 </performous>
