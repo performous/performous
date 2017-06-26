@@ -1,14 +1,16 @@
 "use strict";
 
-$('#refresh-playlist').bootstrapToggle();
+$('#refresh-playlist-toggle').bootstrapToggle();
 
-$('#refresh-playlist').change(function() {
+$('#refresh-playlist-toggle').change(function() {
     console.log("got event");
 });
 
-$('#playlist .songs a').click(function(){
+$('#playlist-songs').on("click", "a", function() {
+    console.log("clicked");
     var title = $(this).data('modal-title');
     var body = $(this).data('modal-body');
+    console.log(title);
     $('#modal-title').text(title);
     $('#modal-body').text(body);
 });
@@ -24,3 +26,34 @@ $('#refresh-database').click(function() {
         });
     });
 });
+
+$('#refresh-playlist').click(function() {
+    $.get("api/getCurrentPlaylist.json", function(data) {
+        var database = JSON.parse(data);
+        $.get("api/getplaylistTimeout", function(data){
+            var timeout = parseInt(data);
+            var totalTime = 0; 
+
+            clearPlaylist();
+
+            $.each(database, function (iterator, songObject){
+                totalTime += songObject.Duration + timeout;
+                $("#playlist-songs").append("<a href=\"#\" class=\"list-group-item\" data-toggle=\"modal\" data-target=\"#dynamic-modal\" data-modal-title=\"" + songObject.Artist.replace(/\"/g,'') + " - " + songObject.Title.replace(/\"/g,'') + "\" data-modal-body=\"somebody\">" + songObject.Artist + " - " + songObject.Title + " - " + secondsToDate(totalTime) + "<span class=\"glyphicon glyphicon-info-sign\"></span></a>");
+            });
+        });
+    });
+});
+
+
+function clearPlaylist(){
+    var myNode = document.getElementById("playlist-songs");
+    while (myNode.firstChild) {
+        myNode.removeChild(myNode.firstChild);
+    }
+}
+
+function secondsToDate(seconds){
+    var date = new Date(null);
+    date.setSeconds(seconds);
+    return date.toISOString().substr(11, 8);
+}
