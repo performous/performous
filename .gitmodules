@@ -1,0 +1,3 @@
+[submodule "win32/performous-mxe"]
+	path = win32/performous-mxe
+	url = git://github.com/performous/performous-mxe.git
