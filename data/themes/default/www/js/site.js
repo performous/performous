@@ -7,12 +7,21 @@ $('#refresh-playlist-toggle').change(function() {
 });
 
 $('#playlist-songs').on("click", "a", function() {
-    console.log("clicked");
-    var title = $(this).data('modal-title');
-    var body = $(this).data('modal-body');
-    console.log(title);
-    $('#modal-title').text(title);
-    $('#modal-body').text(body);
+    var jsonSongObject = $(this).data("modal-songObject");
+    var songObject = JSON.parse(jsonSongObject);
+    var title = songObject.Artist + " - " + songObject.Title;
+
+    var tempElement = $("<div>");
+    $(tempElement).load("playlist-song-modal-body.html", function(data){
+        window.songObject = songObject;
+        $.ajaxSetup({
+          cache: true
+        });
+        $.getScript("js/playlist-song-modal-body.js",  function() {
+            $('#modal-title').text(title);
+            $('#modal-body').html(data);
+        });        
+    });    
 });
 
 
@@ -22,7 +31,8 @@ $('#refresh-database').click(function() {
         clearTable("#database-songs > tbody");
         $.each(database, function (iterator, songObject){
             var y = "<div>pizza</div>";
-            $("#database-songs").append("<tr><td>" + songObject["Artist"] + "</td><td>" + songObject["Title"] + "</td><td class='hidden-xs'>" + songObject["Language"] + "</td><td class='hidden-xs hidden-sm'>" + songObject["Edition"] + "</td><td class='hidden-xs hidden-sm hidden-md'>" + songObject["Creator"] + "</td><td class='text-right text-nowrap fixed-pixel-glyphicon'><span class='glyphicon glyphicon-plus'></span></td></tr>");
+            $("#database-songs").append("<tr id=\"database-songs-" + iterator + "\"><td>" + songObject.Artist + "</td><td>" + songObject.Title + "</td><td class='hidden-xs'>" + songObject.Language + "</td><td class='hidden-xs hidden-sm'>" + songObject.Edition + "</td><td class='hidden-xs hidden-sm hidden-md'>" + songObject.Creator + "</td><td class='text-right text-nowrap fixed-pixel-glyphicon'><span class='glyphicon glyphicon-plus'></span></td></tr>");
+            $("#database-songs-"+iterator).data("songObject", JSON.stringify(songObject));
         });
     });
 });
@@ -38,7 +48,8 @@ $('#refresh-playlist').click(function() {
 
             $.each(database, function (iterator, songObject){
                 totalTime += songObject.Duration + timeout;
-                $("#playlist-songs").append("<a href=\"#\" class=\"list-group-item\" data-toggle=\"modal\" data-target=\"#dynamic-modal\" data-modal-title=\"" + songObject.Artist.replace(/\"/g,'') + " | " + songObject.Title.replace(/\"/g,'') + "\" data-modal-body=\"somebody\">" + songObject.Artist + " - " + songObject.Title + " - " + secondsToDate(totalTime) + "<span class=\"glyphicon glyphicon-info-sign\"></span></a>");
+                $("#playlist-songs").append("<a id=\"playlist-songs-" + iterator + "\" href=\"#\" class=\"list-group-item\" data-toggle=\"modal\" data-target=\"#dynamic-modal\">" + songObject.Artist + " - " + songObject.Title + " - " + secondsToDate(totalTime) + "<span class=\"glyphicon glyphicon-info-sign\"></span></a>");
+                $("#playlist-songs-"+iterator).data("modal-songObject", JSON.stringify(songObject));
             });
         });
     });
@@ -55,19 +66,20 @@ $('#search-database').click(function() {
             var songMeta = "";
             songMeta += songObject.Language.length > 0 ? " | " + songObject.Language : "";
             songMeta += songObject.Edition.length > 0 ? " | " + songObject.Edition : "";
-            $("#searched-songs").append("<a href=\"#\" id=\"" + iterator + "\" class=\"list-group-item\" >" + songObject.Artist + " - " + songObject.Title + songMeta + "<span class=\"glyphicon glyphicon-plus\"></span></a>");
-            $("#"+iterator).data("songObject", JSON.stringify(songObject));
+            $("#searched-songs").append("<a href=\"#\" id=\"searched-songs-" + iterator + "\" class=\"list-group-item\" >" + songObject.Artist + " - " + songObject.Title + songMeta + "<span class=\"glyphicon glyphicon-plus\"></span></a>");            
+            $("#searched-songs-"+iterator).data("songObject", JSON.stringify(songObject));
         });
     });
 });
 
 $('#searched-songs').on("click", "a", function() {
     var songObjectToSend = $(this).data('songObject');
-    console.log(songObjectToSend);
-    $.post("api/add", songObjectToSend, function() {
-        window.location.href = "#playlist?message=success_added_song&messageType=success"
-        $('a[href="#playlist"]').tab('show');
-    });
+    addSong(songObjectToSend)
+});
+
+$('#database-songs').on("click", "tr", function() {
+    var songObjectToSend = $(this).data('songObject');
+    addSong(songObjectToSend)
 });
 
 $('a[href="#playlist"]').on('shown.bs.tab', function(event){
@@ -93,4 +105,11 @@ function secondsToDate(seconds){
     var date = new Date(null);
     date.setSeconds(seconds);
     return date.toISOString().substr(11, 8);
+}
+
+function addSong(songObjectToSend) {
+    $.post("api/add", songObjectToSend, function() {
+        window.location.href = "#playlist?message=success_added_song&messageType=success"
+        $('a[href="#playlist"]').tab('show');
+    });
 }

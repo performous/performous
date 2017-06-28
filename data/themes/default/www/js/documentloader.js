@@ -3,7 +3,7 @@ $(function () {
 	$(".header").load("header.html", function(){
 		$('.menu').load("menu.html", function(){
 			$('.content').load("content.html", function (){
-				$('#custom-modal').load("dynamic-modal.html", function (){
+				$('#custom-modal').load("generic-modal.html", function (){
 					$('#database').load("database.html", function(){
 						$('#playlist').load("playlist.html", function(){
 							$('#search').load("search.html", function() {
