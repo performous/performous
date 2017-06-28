@@ -1,4 +1,4 @@
-#include "screen_songs.hh"
+﻿#include "screen_songs.hh"
 
 #include "audio.hh"
 #include "configuration.hh"
@@ -63,6 +63,7 @@ void ScreenSongs::exit() {
 	m_songbg_default.reset();
 	m_songbg_ground.reset();
 	m_playing.clear();
+	writeConfig(false);
 }
 
 /// Implement left/right on menu

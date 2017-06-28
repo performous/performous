@@ -1,4 +1,4 @@
-#include "songs.hh"
+﻿#include "songs.hh"
 
 #include "configuration.hh"
 #include "fs.hh"
@@ -18,7 +18,7 @@
 #include <stdexcept>
 #include <cstdlib>
 
-Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), math_cover(), m_database(database), m_type(), m_order(), m_dirty(false), m_loading(false) {
+Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), math_cover(), m_database(database), m_type(), m_order(config["songs/sort-order"].i()), m_dirty(false), m_loading(false) {
 	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
 	reload();
 }
@@ -241,6 +241,7 @@ void Songs::sortChange(int diff) {
 	m_order = (m_order + diff) % orders;
 	if (m_order < 0) m_order += orders;
 	RestoreSel restore(*this);
+	config["songs/sort-order"].i() = m_order;
 	sort_internal();
 }
 
