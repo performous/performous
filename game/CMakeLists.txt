@@ -62,7 +62,7 @@ set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES})
 
 # Libraries
 
-find_package(Boost 1.36 REQUIRED COMPONENTS thread date_time program_options regex filesystem system)
+find_package(Boost 1.36 REQUIRED COMPONENTS thread date_time program_options regex filesystem system locale)
 include_directories(${Boost_INCLUDE_DIRS})
 list(APPEND LIBS ${Boost_LIBRARIES})
 
@@ -80,16 +80,6 @@ foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat AVResample SWS
 	list(APPEND LIBS ${${lib}_LIBRARIES})
 	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
-
-find_package(Gettext)
-if(Gettext_FOUND)
-	include_directories(${Gettext_INCLUDE_DIRS})
-	list(APPEND LIBS ${Gettext_LIBRARIES})
-	add_definitions("-DUSE_GETTEXT")
-	message(STATUS "Internationalization: Enabled")
-else()
-	message(STATUS "Internationalization: Disabled (libintl not found)")
-endif()
 
 option(ENABLE_MIDI "Enable support for MIDI hardware (e-drums with USB/MIDI connection)." ON)
 if(ENABLE_MIDI)

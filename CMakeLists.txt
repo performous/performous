@@ -6,7 +6,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 include(GetGitRevisionDescription)
 git_describe(PROJECT_VERSION --tags)
 if(NOT PROJECT_VERSION)
-	set(PROJECT_VERSION "1.1+")
+	set(PROJECT_VERSION "1.1.3")
 endif()
 
 message("Building ${PROJECT_NAME} ${PROJECT_VERSION}")
