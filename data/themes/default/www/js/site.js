@@ -37,6 +37,27 @@ $('#refresh-database').click(function() {
     });
 });
 
+$("a[id^='sort-by-']").click(function() {
+    var sortOrderToBe = $(this).data('sort-ascending') ? "descending" : "ascending";
+    var sortBy = $(this).attr('id').replace('sort-by-', '');
+    var url = "api/getDataBase.json?sort=" + sortBy + "&order=" + sortOrderToBe;
+
+    $(this).data('sort-ascending', sortOrderToBe === "descending" ? false : true);
+    $(this).find('span').toggleClass('glyphicon-menu-down').toggleClass('glyphicon-menu-up');
+    $(this).parent().siblings().children().each(function (){
+        $(this).find('span').removeClass("glyphicon-menu-up").addClass("glyphicon-menu-down");
+    });
+    $.get(url, function(data) {
+        var database = JSON.parse(data);
+        clearTable("#database-songs > tbody");
+        $.each(database, function (iterator, songObject){
+            var y = "<div>pizza</div>";
+            $("#database-songs").append("<tr id=\"database-songs-" + iterator + "\"><td>" + songObject.Artist + "</td><td>" + songObject.Title + "</td><td class='hidden-xs'>" + songObject.Language + "</td><td class='hidden-xs hidden-sm'>" + songObject.Edition + "</td><td class='hidden-xs hidden-sm hidden-md'>" + songObject.Creator + "</td><td class='text-right text-nowrap fixed-pixel-glyphicon'><span class='glyphicon glyphicon-plus'></span></td></tr>");
+            $("#database-songs-"+iterator).data("songObject", JSON.stringify(songObject));
+        });        
+    });
+});
+
 $('#refresh-playlist').click(function() {
     $.get("api/getCurrentPlaylist.json", function(data) {
         var database = JSON.parse(data);
@@ -78,7 +99,7 @@ $('#searched-songs').on("click", "a", function() {
     addSong(songObjectToSend)
 });
 
-$('#database-songs').on("click", "tr", function() {
+$('#database-songs').on("click", "tr[id^='database-songs-']", function() {
     var songObjectToSend = $(this).data('songObject');
     addSong(songObjectToSend)
 });

@@ -48,6 +48,7 @@ public:
 
 private:
 	void StartServer();
+	Json::Value SongsToJsonObject();
 	std::map<std::string, std::string> GenerateLocaleDict();
 	std::vector<std::string> GetTranslationKeys();
 	boost::shared_ptr<Song> GetSongFromJSON(std::string JsonDoc);
