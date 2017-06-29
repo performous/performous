@@ -34,6 +34,12 @@ td {
     white-space: nowrap;
 }
 
+#playlist-song-modal-body span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .btn:last-child {
     margin-bottom: 15px;
 }

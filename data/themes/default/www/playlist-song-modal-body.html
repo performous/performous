@@ -1,24 +1,24 @@
 <div id="playlist-song-modal-body" class="container-fluid">
 	<div class="form-group row col-sm-12">
-		<div class="col-sm-4">
+		<div id="modal-language-div" class="col-sm-4">
 			<label class="control-label" for="modal-language-value">language</label>
-			<span id="modal-language-value"></span>
+			<span id="modal-language-value" class="show"></span>
 		</div>
-		<div class="col-sm-4">
+		<div id="modal-edition-div" class="col-sm-4">
 			<label class="control-label" for="modal-edition-value">edition</label>
-			<span id="modal-edition-value"></span>
+			<span id="modal-edition-value" class="show"></span>
 		</div>
-		<div class="col-sm-4">
+		<div id="modal-creator-div" class="col-sm-4">
 			<label class="control-label" for="modal-creator-value">creator</label>
-			<span id="modal-creator-value"></span>
+			<span id="modal-creator-value" class="show"></span>
 		</div>
 	</div>
 	<div class="form-group row col-sm-12">
 		<div class="col-sm-6">
-			<button type="submit" class="btn btn-secondary btn-block">move_up<span class="glyphicon glyphicon-menu-up pull-right"></span></button>
+			<button id="modal-move-song-up" class="btn btn-secondary btn-block" data-dismiss="modal">move_up<span class="glyphicon glyphicon-menu-up pull-right"></span></button>
 		</div>
 		<div class="col-sm-6">
-			<button type="submit" class="btn btn-secondary btn-block">move_down<span class="glyphicon glyphicon-menu-down pull-right"></span></button>
+			<button id="modal-move-song-down" class="btn btn-secondary btn-block" data-dismiss="modal">move_down<span class="glyphicon glyphicon-menu-down pull-right"></span></button>
 		</div>
 	</div>
 	<div class="form-group row col-sm-12">
@@ -26,14 +26,14 @@
 			<div class="input-group">
 				<input id="modal-set-position-input" type="text" class="form-control">
 				<span class="input-group-btn">
-					<button class="btn btn-secondary" type="button">set_position</span></button>
+					<button id="modal-set-position-btn" class="btn btn-secondary" type="button" data-dismiss="modal">set_position</span></button>
 				</span>
 			</div>
 		</div>
 	</div>
 	<div class="form-group row col-sm-12">
 		<div class="col-sm-12">
-			<button type="submit" class="btn btn-secondary btn-block">remove_song<span class="glyphicon glyphicon-remove pull-right"></span></button>
+			<button id="modal-remove-song" class="btn btn-secondary btn-block" data-dismiss="modal">remove_song<span class="glyphicon glyphicon-remove pull-right"></span></button>
 		</div>
 	</div>
 </div>

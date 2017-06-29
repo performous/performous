@@ -49,6 +49,7 @@ $('#refresh-playlist').click(function() {
             $.each(database, function (iterator, songObject){
                 totalTime += songObject.Duration + timeout;
                 $("#playlist-songs").append("<a id=\"playlist-songs-" + iterator + "\" href=\"#\" class=\"list-group-item\" data-toggle=\"modal\" data-target=\"#dynamic-modal\">" + songObject.Artist + " - " + songObject.Title + " - " + secondsToDate(totalTime) + "<span class=\"glyphicon glyphicon-info-sign\"></span></a>");
+                songObject.Position = iterator;
                 $("#playlist-songs-"+iterator).data("modal-songObject", JSON.stringify(songObject));
             });
         });
