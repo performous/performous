@@ -1,6 +1,26 @@
 "use strict";
 
 $('#refresh-playlist-toggle').bootstrapToggle('off');
+var list = document.getElementById("playlist-songs");
+Sortable.create(list, {
+    group: "words",
+    animation: 150,
+    onEnd: function(evt){
+        if(evt.oldIndex == evt.newIndex) {
+            return;
+        }
+
+        var data = {
+            "songId": evt.oldIndex,
+            "position": evt.newIndex
+        };
+
+        $.post("api/setposition", JSON.stringify(data), function() {
+            window.location.href = "#playlist?message=succes_changed_position_song&messageType=success"
+            $('#refresh-playlist').click();
+        });
+    }
+});
 
 $('#refresh-playlist-toggle').change(function() {
     if($(this).prop('checked')){

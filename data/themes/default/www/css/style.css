@@ -43,3 +43,15 @@ td {
 .btn:last-child {
     margin-bottom: 15px;
 }
+
+.drag-drop a {
+    background-color: #fff;
+}
+.drag-drop .sortable-ghost {
+    opacity: 0.4;
+    background-color: #F4E2C9;
+}
+
+.drag-drop a:first-letter {
+    text-transform: uppercase;
+}
