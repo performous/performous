@@ -1,9 +1,15 @@
 "use strict";
 
-$('#refresh-playlist-toggle').bootstrapToggle();
+$('#refresh-playlist-toggle').bootstrapToggle('off');
 
 $('#refresh-playlist-toggle').change(function() {
-    console.log("got event");
+    if($(this).prop('checked')){
+        window.IntervalSet = window.setInterval(function () {
+            $("#refresh-playlist").click();
+        }, 10000);
+    } else {
+        window.clearInterval(window.IntervalSet);
+    }
 });
 
 $('#playlist-songs').on("click", "a", function() {
