@@ -48,7 +48,6 @@ namespace {
 
 unsigned int screenW() { return s_width; }
 unsigned int screenH() { return s_height; }
-const unsigned int targetWidth() { return 1366; } // One of the most common desktop resolutions in use today.
 
 Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(width), m_windowH(height), m_fullscreen(fs), screen() {
 	std::atexit(SDL_Quit);

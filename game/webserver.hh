@@ -1,9 +1,8 @@
 ﻿#pragma once
 
-#ifdef USE_CPPNETLIB
-	#include <boost/network/protocol/http/server.hpp>
-	namespace http = boost::network::http;
-#endif
+#ifdef USE_WEBSERVER
+#include <boost/network/protocol/http/server.hpp>
+namespace http = boost::network::http;
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -24,7 +23,6 @@ using boost::thread;
 
 class WebServer
 {
-#ifdef USE_CPPNETLIB
 public:
 	struct handler;
 	typedef http::server<handler> http_server;
@@ -48,16 +46,20 @@ public:
 
 private:
 	void StartServer();
+	Json::Value SongsToJsonObject();
+	std::map<std::string, std::string> GenerateLocaleDict();
+	std::vector<std::string> GetTranslationKeys();
 	boost::shared_ptr<Song> GetSongFromJSON(std::string JsonDoc);
 	boost::shared_ptr<boost::thread> m_serverThread;
 	boost::shared_ptr<http_server> m_server;
 	Songs& m_songs;
-#else
-public:
-	WebServer(Songs& songs);
-	~WebServer();
-private:
-	Songs& m_songs;
-#endif
 };
+#else
+class Songs;
 
+class WebServer
+{
+public:
+	WebServer(Songs&) {}
+};
+#endif

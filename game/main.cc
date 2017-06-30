@@ -1,4 +1,3 @@
-
 #include "backgrounds.hh"
 #include "config.hh"
 #include "controllers.hh"
@@ -7,6 +6,8 @@
 #include "glutil.hh"
 #include "i18n.hh"
 #include "log.hh"
+#include "pi.hh"
+#include "platform.hh"
 #include "profiler.hh"
 #include "screen.hh"
 #include "songs.hh"
@@ -34,12 +35,7 @@
 #include <vector>
 #include <cstdlib>
 
-#if defined(_WIN32)
-extern "C" {
-// For DWORD (see end of file)
-#include "windef.h"
-}
-#endif
+const double m_pi = boost::math::constants::pi<double>();
 
 // Disable main level exception handling for debug builds (because gdb cannot properly catch throwing otherwise)
 #ifdef NDEBUG
@@ -95,7 +91,7 @@ static void checkEvents(Game& gm) {
 				config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].b();
 				continue; // Already handled here...
 			}
-			if (keypressed == SDL_SCANCODE_PRINTSCREEN || (keypressed == SDL_SCANCODE_F12 && (modifier & KMOD_CTRL))) {
+			if (keypressed == SDL_SCANCODE_PRINTSCREEN || (keypressed == SDL_SCANCODE_F12 && (modifier & Platform::shortcutModifier()))) {
 				g_take_screenshot = true;
 				continue; // Already handled here...
 			}
@@ -143,10 +139,11 @@ static void checkEvents(Game& gm) {
 }
 
 void mainLoop(std::string const& songlist) {
+	Platform platform;
 	std::clog << "core/notice: Starting the audio subsystem (errors printed on console may be ignored)." << std::endl;
 	Audio audio;
 	std::clog << "core/info: Loading assets." << std::endl;
-	Gettext localization(PACKAGE);
+	TranslationEngine localization(PACKAGE);
 	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
 	SurfaceLoader m_loader;
 	Backgrounds backgrounds;
@@ -178,7 +175,7 @@ void mainLoop(std::string const& songlist) {
 		gm.addScreen(new ScreenSing("Sing", audio, database, backgrounds));
 		gm.addScreen(new ScreenPractice("Practice", audio));
 		gm.addScreen(new ScreenAudioDevices("AudioDevices", audio));
-		gm.addScreen(new ScreenPaths("Paths", audio));
+		gm.addScreen(new ScreenPaths("Paths", audio, songs));
 		gm.addScreen(new ScreenPlayers("Players", audio, database));
 		gm.addScreen(new ScreenPlaylist("Playlist", audio, songs, backgrounds));
 		gm.activateScreen("Intro");
@@ -414,18 +411,8 @@ int main(int argc, char** argv) try {
 
 void outputOptionalFeatureStatus() {
 	std::clog << "core/notice: " PACKAGE " " VERSION " starting..."
-	  << "\n  Internationalization: " << (Gettext::enabled() ? "Enabled" : "Disabled")
+	  << "\n  Internationalization: " << (TranslationEngine::enabled() ? "Enabled" : "Disabled")
 	  << "\n  MIDI Hardware I/O:    " << (input::Hardware::midiEnabled() ? "Enabled" : "Disabled")
 	  << "\n  Webcam support:       " << (Webcam::enabled() ? "Enabled" : "Disabled")
 	  << std::endl;
 }
-
-#if defined(_WIN32)
-// Force high-performance graphics on dual-GPU systems
-extern "C" {
-	// http://developer.download.nvidia.com/devzone/devcenter/gamegraphics/files/OptimusRenderingPolicies.pdf
-	__declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
-	// https://community.amd.com/thread/169965
-	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
-}
-#endif

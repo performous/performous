@@ -10,6 +10,7 @@
 #include "i18n.hh"
 #include "layout_singer.hh"
 #include "menu.hh"
+#include "platform.hh"
 #include "screen_players.hh"
 #include "songparser.hh"
 #include "util.hh"
@@ -352,7 +353,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 	double time = m_audio.getPosition();
 	SDL_Scancode key = event.key.keysym.scancode;
 	// Ctrl combinations that can be used while performing (not when score dialog is displayed)
-	if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_LCTRL) && !m_score_window.get()) {
+	if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & Platform::shortcutModifier(false)) && !m_score_window.get()) {
 		if (key == SDL_SCANCODE_C) {
 			m_audio.toggleCenterChannelSuppressor();
 			++config["audio/suppress_center_channel"];
@@ -605,7 +606,7 @@ void ScreenSing::drawMenu() {
 		txt->dimensions.middle(x).center(y);
 		txt->draw(it->getName());
 		if (it->value == &m_vocalTracks[player]) {
-			if(player < analyzers.size()) {
+					if(boost::lexical_cast<size_t>(player) < analyzers.size()) {
 				Color color = MicrophoneColor::get(analyzers[player].getId());
 				ColorTrans c(color);
 				m_player_icon->dimensions.right(x).fixedHeight(0.040).center(y);
@@ -669,7 +670,8 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		m_rank = _("No player!");
 	else {
 		// Determine winner
-		ScoreItem winner = *std::min_element(m_database.scores.begin(), m_database.scores.end());  // Note: best score comes first
+		m_database.scores.sort([](ScoreItem i, ScoreItem j) -> bool { return (i.score>j.score); });
+		ScoreItem winner = *std::max_element(m_database.scores.begin(), m_database.scores.end());
 		int topScore = winner.score;
 		// Determine rank
 		if (winner.type == input::DEVTYPE_VOCALS) {

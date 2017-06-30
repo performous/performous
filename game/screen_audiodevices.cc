@@ -1,9 +1,10 @@
-#include "screen_audiodevices.hh"
+﻿#include "screen_audiodevices.hh"
 
+#include "audio.hh"
 #include "configuration.hh"
 #include "controllers.hh"
+#include "platform.hh"
 #include "theme.hh"
-#include "audio.hh"
 #include "i18n.hh"
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
@@ -87,7 +88,7 @@ void ScreenAudioDevices::manageEvent(SDL_Event event) {
 		uint16_t modifier = event.key.keysym.mod;
 		if (m_devs.empty()) return; // The rest work if there are any config options
 		// Reset to defaults
-		else if (key == SDL_SCANCODE_R && modifier & KMOD_CTRL) {
+		else if (key == SDL_SCANCODE_R && modifier & Platform::shortcutModifier()) {
 			config["audio/devices"].reset(modifier & KMOD_ALT);
 			save(true); // Save to disk, reload audio & reload UI to keep stuff consistent
 		}
@@ -101,7 +102,7 @@ void ScreenAudioDevices::draw() {
 	const float xstep = (xoff - 0.5 + xoff) / m_channels.size();
 	const float ystep = yoff*2 / m_devs.size();
 	// Device text & bg
-	m_theme->device_bg.dimensions.stretch(std::abs(xoff*2), m_mic_icon->dimensions.h()*0.9).middle();
+	m_theme->device_bg.dimensions.stretch(std::abs(xoff*2.15), m_mic_icon->dimensions.h()*0.9).middle();
 	m_selector->dimensions.stretch(m_mic_icon->dimensions.w() * 1.75, m_mic_icon->dimensions.h() * 1.75);
 	for (size_t i = 0; i <= m_devs.size(); ++i) {
 		const float y = -yoff + i*ystep;

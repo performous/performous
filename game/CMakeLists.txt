@@ -62,9 +62,14 @@ set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES})
 
 # Libraries
 
-find_package(Boost 1.36 REQUIRED COMPONENTS thread date_time program_options regex filesystem system)
+find_package(Boost 1.36 REQUIRED COMPONENTS thread date_time program_options regex filesystem system locale)
 include_directories(${Boost_INCLUDE_DIRS})
 list(APPEND LIBS ${Boost_LIBRARIES})
+
+if (Boost_VERSION VERSION_LESS 105500)
+	message("-- Using Boost < 1.55: defining BOOST_NO_CXX11_SCOPED_ENUMS")
+	set(CMAKE_CXX_FLAGS "-DBOOST_NO_CXX11_SCOPED_ENUMS ${CMAKE_CXX_FLAGS}")
+endif()
 
 # LibEpoxy < 1.2 crashes with binary drivers (nvidia & fglrx) when creating shaders
 # (see https://github.com/anholt/libepoxy/issues/23 for the exact problem)
@@ -73,23 +78,13 @@ include_directories(${LibEpoxy_INCLUDE_DIRS})
 list(APPEND LIBS ${LibEpoxy_LIBRARIES})
 
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat AVResample SWScale Z Jpeg Png PortAudio Fontconfig JSONCPP Cppnetlib Crypto Ssl)
+foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat AVResample SWScale Z Jpeg Png PortAudio Fontconfig)
 	find_package(${lib} REQUIRED)
 	message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
 	include_directories(${${lib}_INCLUDE_DIRS})
 	list(APPEND LIBS ${${lib}_LIBRARIES})
 	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
-
-find_package(Gettext)
-if(Gettext_FOUND)
-	include_directories(${Gettext_INCLUDE_DIRS})
-	list(APPEND LIBS ${Gettext_LIBRARIES})
-	add_definitions("-DUSE_GETTEXT")
-	message(STATUS "Internationalization: Enabled")
-else()
-	message(STATUS "Internationalization: Disabled (libintl not found)")
-endif()
 
 option(ENABLE_MIDI "Enable support for MIDI hardware (e-drums with USB/MIDI connection)." ON)
 if(ENABLE_MIDI)
@@ -123,10 +118,19 @@ endif()
 
 option(ENABLE_WEBSERVER "Enable webserver support (cpp-netlib)." ON)
 if(ENABLE_WEBSERVER)
-	message(STATUS "Webserver support: Enabled")
-	add_definitions("-DUSE_CPPNETLIB")
+	foreach(lib JSONCPP Cppnetlib)
+		find_package(${lib})
+	endforeach(lib)
+	if(JSONCPP_FOUND AND Cppnetlib_FOUND)
+		include_directories(${JSONCPP_INCLUDE_DIRS} ${Cppnetlib_INCLUDE_DIRS})
+		list(APPEND LIBS ${JSONCPP_LIBRARIES} ${Cppnetlib_LIBRARIES})
+		message(STATUS "Webserver support: Enabled")
+		add_definitions("-DUSE_WEBSERVER")
+	else()
+		message(STATUS "Webserver support: Disabled (cpp-netlib or jsoncpp not found)")
+	endif()
 else()
-	message(STATUS "Webserver support: Disabled")
+	message(STATUS "Webserver support: Disabled (explicitly disabled)")
 endif()
 
 if(APPLE)

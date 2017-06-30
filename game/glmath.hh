@@ -6,11 +6,9 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <boost/math/constants/constants.hpp>
 
-// FIXME: Temporary MinGW fix
-#ifndef M_PI
-#define M_PI 3.1415926535
-#endif
+// extern const double m_pi;
 
 namespace glmath {
 
