@@ -262,8 +262,8 @@ void SvgTxtTheme::draw(std::vector<TZoomText> const& _text) {
 	}
 
 	double texture_ar = text_x / text_y;
-	m_texture_width = std::min(0.96, text_x/1366); // this is the base rendering width, used to project the svg onto a gltexture. currently we're targeting 1366x768 as base resolution.
-	m_texture_height = m_texture_width / texture_ar; //todo: move magic numbers to static const ints to make the code more clear.
+	m_texture_width = std::min(0.96, text_x/ targetWidth()); // targetWidth(), defined in video_driver.cc, is the base rendering width, used to project the svg onto a gltexture. currently we're targeting 1366x768 as base resolution.
+	m_texture_height = m_texture_width / texture_ar; 
 
 	double position_x = dimensions.x1();
 	if (m_align == CENTER) position_x -= 0.5 * m_texture_width;

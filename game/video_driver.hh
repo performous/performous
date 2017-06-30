@@ -8,6 +8,7 @@
 
 unsigned int screenW();
 unsigned int screenH();
+const unsigned int targetWidth();
 static inline float virtH() { return float(screenH()) / screenW(); }
 
 struct SDL_Surface;
