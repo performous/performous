@@ -55,12 +55,26 @@ $('#refresh-database').click(function() {
     $.get("api/getDataBase.json", function(data) {
         var database = JSON.parse(data);
         clearTable("#database-songs > tbody");
+        var rows = "";
         $.each(database, function (iterator, songObject){
             var y = "<div>pizza</div>";
-            $("#database-songs").append("<tr id=\"database-songs-" + iterator + "\"><td>" + songObject.Artist + "</td><td>" + songObject.Title + "</td><td class='hidden-xs'>" + songObject.Language + "</td><td class='hidden-xs hidden-sm'>" + songObject.Edition + "</td><td class='hidden-xs hidden-sm hidden-md'>" + songObject.Creator + "</td><td class='text-right text-nowrap fixed-pixel-glyphicon'><span class='glyphicon glyphicon-plus'></span></td></tr>");
-            $("#database-songs-"+iterator).data("songObject", JSON.stringify(songObject));
+            var row = "<tr id=\"database-songs-" + iterator + "\"><td>" + songObject.Artist + "</td><td>" + songObject.Title + "</td><td class='hidden-xs'>" + songObject.Language + "</td><td class='hidden-xs hidden-sm'>" + songObject.Edition + "</td><td class='hidden-xs hidden-sm hidden-md'>" + songObject.Creator + "</td><td class='text-right text-nowrap fixed-pixel-glyphicon'><span class='glyphicon glyphicon-plus'></span></td></tr>";
+            //$("#database-songs").append("<tr id=\"database-songs-" + iterator + "\"><td>" + songObject.Artist + "</td><td>" + songObject.Title + "</td><td class='hidden-xs'>" + songObject.Language + "</td><td class='hidden-xs hidden-sm'>" + songObject.Edition + "</td><td class='hidden-xs hidden-sm hidden-md'>" + songObject.Creator + "</td><td class='text-right text-nowrap fixed-pixel-glyphicon'><span class='glyphicon glyphicon-plus'></span></td></tr>");
+            //$("#database-songs-"+iterator).data("songObject", JSON.stringify(songObject)); //CAREEEEEEEEEEEEEEEEEEEEEEEEEEE
+            rows = rows +row;
         });
+        $(rows).appendTo("#database-songs");
     });
+});
+
+$('#addonce').on('click', function(){
+    rows='';
+    for (i=0; i<5000; i++)
+    {
+        var row='<tr><td>test</td></tr>';
+        rows=rows+row;
+    }
+    $(rows).appendTo('table');
 });
 
 $("a[id^='sort-by-']").click(function() {
