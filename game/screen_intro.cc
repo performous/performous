@@ -84,7 +84,7 @@ void ScreenIntro::draw_menu_options() {
 	const float sel_margin = 0.03;
 	const MenuOptions opts = m_menu.getOptions();
 	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get()-m_menu.getSubmenuLevel()));
-	theme->back_h.dimensions.fixedHeight(0.065f);
+	theme->back_h.dimensions.fixedHeight(0.038f);
 	theme->back_h.dimensions.stretch(m_menu.dimensions.w(), theme->back_h.dimensions.h());
 	// Determine from which item to start
 	int start_i = std::min((int)m_menu.curIndex() - 1, (int)opts.size() - (int)showopts
