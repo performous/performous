@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-05 19:35+0100\n"
-"PO-Revision-Date: 2013-11-06 09:29+0100\n"
-"Last-Translator: niek nooijens <nieknooijens@gmail.com>\n"
+"POT-Creation-Date: 2017-06-23 00:42+0200\n"
+"PO-Revision-Date: 2017-06-23 00:42+0200\n"
+"Last-Translator: Arjan Speiard | Asgard Sings! <arjan.spieard@gmail.com>\n"
 "Language-Team: \n"
 "Language: ja_JP\n"
 "MIME-Version: 1.0\n"
@@ -13,45 +13,9 @@ msgstr ""
 "X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SourceCharset: UTF-8\n"
-"X-Generator: Poedit 1.5.4\n"
+"X-Generator: Poedit 1.8.7.1\n"
 "X-Poedit-SearchPath-0: ../data\n"
 "X-Poedit-SearchPath-1: ../game\n"
-
-#: ../game/song.hh:25
-msgid "Guitar"
-msgstr "ギタ−"
-
-#: ../game/song.hh:25
-msgid "Coop guitar"
-msgstr "コーオップ・ギター"
-
-#: ../game/song.hh:25
-msgid "Rhythm guitar"
-msgstr "リズムギター"
-
-#: ../game/song.hh:25
-msgid "Bass"
-msgstr "ベースギター"
-
-#: ../game/song.hh:25
-msgid "Drums"
-msgstr "ドラム"
-
-#: ../game/song.hh:25
-msgid "Vocals"
-msgstr "ボーカル"
-
-#: ../game/song.hh:25
-msgid "Harmonic 1"
-msgstr "ハルモニク 1"
-
-#: ../game/song.hh:25
-msgid "Harmonic 2"
-msgstr "ハルモニク 2"
-
-#: ../game/song.hh:25
-msgid "Harmonic 3"
-msgstr "ハルモニク 3"
 
 #: ../game/configuration.cc:112
 msgid "Enabled"
@@ -94,7 +58,7 @@ msgstr "レディー！"
 
 # See comment about Perform
 #: ../game/dancegraph.cc:107 ../game/guitargraph.cc:193
-#: ../game/screen_intro.cc:166
+#: ../game/screen_intro.cc:171
 msgid "Start performing!"
 msgstr "演奏しはじめて"
 
@@ -109,14 +73,14 @@ msgid "Select difficulty"
 msgstr "難しさを決めて下さい"
 
 #: ../game/dancegraph.cc:137 ../game/guitargraph.cc:199
-#: ../game/instrumentgraph.cc:59 ../game/screen_intro.cc:184
-#: ../game/screen_sing.cc:94 ../game/screen_sing.cc:128
+#: ../game/instrumentgraph.cc:59 ../game/screen_intro.cc:189
+#: ../game/screen_sing.cc:94 ../game/screen_sing.cc:131
 msgid "Quit"
 msgstr "終了"
 
 #: ../game/dancegraph.cc:137 ../game/guitargraph.cc:199
 #: ../game/instrumentgraph.cc:59 ../game/screen_sing.cc:94
-#: ../game/screen_sing.cc:128
+#: ../game/screen_sing.cc:131
 msgid "Exit to song browser"
 msgstr "音楽ブラウザに終了する"
 
@@ -204,31 +168,31 @@ msgid ""
 msgstr "初めから曲を開始する"
 
 # note: says "music" instead of "audio samples"
-#: ../game/main.cc:151
+#: ../game/main.cc:160
 msgid "Loading audio samples..."
 msgstr "音楽を読み替えていまうす…"
 
-#: ../game/main.cc:165
+#: ../game/main.cc:175
 msgid "Creating screens..."
 msgstr "画面を作り中"
 
-#: ../game/main.cc:175
+#: ../game/main.cc:185
 msgid "Entering main menu"
 msgstr "メインメニューに入り中"
 
-#: ../game/main.cc:177 ../game/screen_sing.cc:99
+#: ../game/main.cc:187 ../game/screen_sing.cc:99
 msgid "Loading complete"
 msgstr "良い込みできた"
 
-#: ../game/main.cc:188
+#: ../game/main.cc:198
 msgid "Screenshot taken!"
 msgstr "スクリーンショットを取りました"
 
-#: ../game/main.cc:191
+#: ../game/main.cc:201
 msgid "Screenshot failed!"
 msgstr "スクリーンショットを失敗しました"
 
-#: ../game/screen_audiodevices.cc:54
+#: ../game/screen_audiodevices.cc:57
 msgid ""
 "It seems you have some manual configurations\n"
 "incompatible with this user interface.\n"
@@ -240,11 +204,11 @@ msgstr ""
 "この設定をセーブするのは他の機会コンフィグレーションを上書きます。\n"
 "別の設定変更もセーブしますよ。"
 
-#: ../game/screen_audiodevices.cc:113
+#: ../game/screen_audiodevices.cc:116
 msgid "- Unassigned -"
 msgstr "ー　当たらない　ー"
 
-#: ../game/screen_audiodevices.cc:134
+#: ../game/screen_audiodevices.cc:137
 msgid ""
 "Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select "
 "to cancel. Ctrl + R to reset defaults"
@@ -253,13 +217,13 @@ msgstr ""
 "使ってエスケープとセレクトはキャンセルのにつかいます。ctrl+R は設定を戻るのに"
 "使います"
 
-#: ../game/screen_audiodevices.cc:139
+#: ../game/screen_audiodevices.cc:142
 msgid ""
 "For advanced device configuration, use command line parameter --audio (use --"
 "audiohelp for details)."
 msgstr ""
 
-#: ../game/screen_audiodevices.cc:187
+#: ../game/screen_audiodevices.cc:190
 msgid "Some devices failed to open!"
 msgstr "機械をあけません。"
 
@@ -275,15 +239,15 @@ msgstr ""
 "\n"
 " 遊ぶ前に再生装置を設定して下さい。"
 
-#: ../game/screen_intro.cc:69
+#: ../game/screen_intro.cc:73
 msgid "Settings saved as system defaults."
 msgstr "設定はシステム・デファウルトにセーブされました。"
 
-#: ../game/screen_intro.cc:69
+#: ../game/screen_intro.cc:73
 msgid "Settings saved."
 msgstr "設定をセーブしました。"
 
-#: ../game/screen_intro.cc:149
+#: ../game/screen_intro.cc:153
 msgid "Ctrl + S to save, Ctrl + R to reset defaults"
 msgstr "セーブするはCtrl + S で、設定元に戻るはCtrl + Rです。"
 
@@ -292,30 +256,44 @@ msgstr "セーブするはCtrl + S で、設定元に戻るはCtrl + Rです。"
 # I get the feeling that 演じろ is more theatrical.
 # パフォーマンスする feels to english imo
 # Perhaps suru should be dropped?
-#: ../game/screen_intro.cc:166
+#: ../game/screen_intro.cc:171
 msgid "Perform"
 msgstr "演奏する"
 
 # not sure this is the best word
-#: ../game/screen_intro.cc:167
+#: ../game/screen_intro.cc:172
 msgid "Practice"
 msgstr "トレーニング"
 
-#: ../game/screen_intro.cc:167
+#: ../game/screen_intro.cc:172
 msgid "Check your skills or test the microphones"
 msgstr "自分の能力とマイクをテストできます。"
 
-#: ../game/screen_intro.cc:183
+#: ../game/screen_intro.cc:188
 msgid "Configure"
 msgstr "設定"
 
-#: ../game/screen_intro.cc:183
+#: ../game/screen_intro.cc:188
 msgid "Configure audio and game options"
 msgstr "オーディオとゲームのオプションを設定する"
 
-#: ../game/screen_intro.cc:184
+#: ../game/screen_intro.cc:189
 msgid "Leave the game"
 msgstr "ゲームを終了する"
+
+#: ../game/screen_intro.cc:199
+msgid ""
+"Webserver active!\n"
+" use a webbrowser\n"
+"and navigate to localhost:"
+msgstr ""
+
+#: ../game/screen_intro.cc:206
+msgid ""
+"Webserver active!\n"
+" connect to this computer\n"
+"using "
+msgstr ""
 
 #: ../game/screen_paths.cc:19
 msgid ""
@@ -387,98 +365,102 @@ msgstr "新しい選手を作るように字を入力して下さい"
 msgid "Search Text:"
 msgstr "検索条件："
 
-#: ../game/screen_playlist.cc:24 ../game/screen_sing.cc:47
+#: ../game/screen_playlist.cc:21 ../game/screen_sing.cc:47
 msgid "Initializing webcam..."
 msgstr "カメラを組み立ています"
 
-#: ../game/screen_playlist.cc:166 ../game/screen_playlist.cc:309
+#: ../game/screen_playlist.cc:46
+msgid "Loading song timestamps..."
+msgstr ""
+
+#: ../game/screen_playlist.cc:171 ../game/screen_playlist.cc:334
 msgid "Continue"
 msgstr "続く"
 
-#: ../game/screen_playlist.cc:166
+#: ../game/screen_playlist.cc:171
 msgid "Continue playing"
 msgstr "遊び続く"
 
-#: ../game/screen_playlist.cc:174
+#: ../game/screen_playlist.cc:179
 msgid "Add songs"
 msgstr "曲を加え"
 
-#: ../game/screen_playlist.cc:174
+#: ../game/screen_playlist.cc:179
 msgid "Open the song browser to add more songs"
 msgstr "もっと曲を加えるのに曲選択画面へ戻る"
 
-#: ../game/screen_playlist.cc:175 ../game/screen_songs.cc:520
+#: ../game/screen_playlist.cc:180 ../game/screen_songs.cc:520
 msgid "Shuffle"
 msgstr "シャッフル"
 
-#: ../game/screen_playlist.cc:175
+#: ../game/screen_playlist.cc:180
 msgid "Randomize the order of the playlist"
 msgstr "リストの曲を更迭する。"
 
-#: ../game/screen_playlist.cc:181
+#: ../game/screen_playlist.cc:186
 msgid "Clear and exit"
 msgstr "消すと止める。"
 
-#: ../game/screen_playlist.cc:181
+#: ../game/screen_playlist.cc:186
 msgid "Remove all the songs from the list"
 msgstr "全曲をリストから消すと止める。"
 
-#: ../game/screen_playlist.cc:187 ../game/screen_playlist.cc:350
+#: ../game/screen_playlist.cc:192 ../game/screen_playlist.cc:375
 #: ../game/screen_songs.cc:533
 msgid "Back"
 msgstr "戻る"
 
-#: ../game/screen_playlist.cc:187 ../game/screen_playlist.cc:350
+#: ../game/screen_playlist.cc:192 ../game/screen_playlist.cc:375
 msgid "Back to playlist viewer"
 msgstr "リスト画面へ戻る"
 
-#: ../game/screen_playlist.cc:294
+#: ../game/screen_playlist.cc:317
 msgid "Press enter to view song options"
 msgstr "曲設定を見る為にエンターを押して下さい"
 
-#: ../game/screen_playlist.cc:301
+#: ../game/screen_playlist.cc:326
 msgid "View more options"
 msgstr "もっとの設定をみる"
 
-#: ../game/screen_playlist.cc:301
+#: ../game/screen_playlist.cc:326
 #, fuzzy
 msgid "View general playlist settings"
 msgstr "全般オーディオのオプションを設定する"
 
-#: ../game/screen_playlist.cc:309
+#: ../game/screen_playlist.cc:334
 msgid "Play first"
 msgstr "今すぐプレイする"
 
-#: ../game/screen_playlist.cc:311
+#: ../game/screen_playlist.cc:336
 msgid "Ignore the playlist's order and play this song first"
 msgstr "この曲を今すぐプレイされます"
 
-#: ../game/screen_playlist.cc:312
+#: ../game/screen_playlist.cc:337
 msgid "Start the song already!"
 msgstr "曲を始めよう"
 
-#: ../game/screen_playlist.cc:321
+#: ../game/screen_playlist.cc:346
 msgid "Remove"
 msgstr "消す"
 
-#: ../game/screen_playlist.cc:321
+#: ../game/screen_playlist.cc:346
 msgid "Remove this song from the list"
 msgstr "この曲はリストから消す。"
 
-#: ../game/screen_playlist.cc:333
+#: ../game/screen_playlist.cc:358
 msgid "Move up"
 msgstr ""
 
-#: ../game/screen_playlist.cc:333
+#: ../game/screen_playlist.cc:358
 #, fuzzy
 msgid "Move this song up the list"
 msgstr "この曲はリストから消す。"
 
-#: ../game/screen_playlist.cc:343
+#: ../game/screen_playlist.cc:368
 msgid "Move Down"
 msgstr ""
 
-#: ../game/screen_playlist.cc:343
+#: ../game/screen_playlist.cc:368
 #, fuzzy
 msgid "Move this song down the list"
 msgstr "この曲はリストから消す。"
@@ -529,35 +511,35 @@ msgstr ""
 msgid "Change vocal track"
 msgstr "歌手トラックを変更する"
 
-#: ../game/screen_sing.cc:127
+#: ../game/screen_sing.cc:129
 msgid "Skip"
 msgstr ""
 
-#: ../game/screen_sing.cc:127
+#: ../game/screen_sing.cc:129
 msgid "Skip current song"
 msgstr ""
 
-#: ../game/screen_sing.cc:279
+#: ../game/screen_sing.cc:283
 msgid "Press UP to join dance!"
 msgstr ""
 
-#: ../game/screen_sing.cc:279
+#: ../game/screen_sing.cc:283
 msgid "Step UP to join!"
 msgstr ""
 
-#: ../game/screen_sing.cc:284
+#: ../game/screen_sing.cc:288
 msgid "Press 1 to join guitar!"
 msgstr ""
 
-#: ../game/screen_sing.cc:284
+#: ../game/screen_sing.cc:288
 msgid "Press GREEN to join!"
 msgstr ""
 
-#: ../game/screen_sing.cc:289
+#: ../game/screen_sing.cc:293
 msgid "Press SPACE to join drums!"
 msgstr ""
 
-#: ../game/screen_sing.cc:289
+#: ../game/screen_sing.cc:293
 msgid "KICK to join!"
 msgstr ""
 
@@ -567,63 +549,63 @@ msgstr ""
 # or should a のに construction be used?
 # 場合 if a hepothetical situation, とき could be better because it has a wider range of usage
 # 押して下さい is however more polite than 押す
-#: ../game/screen_sing.cc:517
+#: ../game/screen_sing.cc:521
 msgid "   ENTER to skip instrumental break"
 msgstr "   楽器の休憩をスキップ欲しい場合は、エンターキーを押して下さい"
 
-#: ../game/screen_sing.cc:521 ../game/screen_sing.cc:535
+#: ../game/screen_sing.cc:525 ../game/screen_sing.cc:539
 msgid "   Autoplay enabled"
 msgstr ""
 
-#: ../game/screen_sing.cc:524 ../game/screen_sing.cc:532
+#: ../game/screen_sing.cc:528 ../game/screen_sing.cc:536
 msgid "   Remember to wait for grading!"
 msgstr "   採点を待って忘れないで下さい"
 
-#: ../game/screen_sing.cc:662
+#: ../game/screen_sing.cc:669
 msgid "No player!"
 msgstr "選手がいません！"
 
-#: ../game/screen_sing.cc:669
+#: ../game/screen_sing.cc:676
 msgid "Hit singer"
 msgstr "ヒット歌手"
 
-#: ../game/screen_sing.cc:670
+#: ../game/screen_sing.cc:677
 msgid "Lead singer"
 msgstr "歌手一番"
 
-#: ../game/screen_sing.cc:671 ../game/screen_sing.cc:677
-#: ../game/screen_sing.cc:683
+#: ../game/screen_sing.cc:678 ../game/screen_sing.cc:684
+#: ../game/screen_sing.cc:690
 msgid "Rising star"
 msgstr "上がる星"
 
-#: ../game/screen_sing.cc:672 ../game/screen_sing.cc:678
-#: ../game/screen_sing.cc:684
+#: ../game/screen_sing.cc:679 ../game/screen_sing.cc:685
+#: ../game/screen_sing.cc:691
 msgid "Amateur"
 msgstr "素人"
 
 # from dictionary: 音痴 おんち (n,adj-no) (1) tone-deafness; amusia; having no ear for music; (adj-na) (2) tone-deaf; off-key; (suf) (3) having no sense (of something); being hopeless (when it comes to something)
-#: ../game/screen_sing.cc:673 ../game/screen_sing.cc:685
+#: ../game/screen_sing.cc:680 ../game/screen_sing.cc:692
 msgid "Tone deaf"
 msgstr "音痴"
 
-#: ../game/screen_sing.cc:675
+#: ../game/screen_sing.cc:682
 msgid "Maniac"
 msgstr "マニアック"
 
-#: ../game/screen_sing.cc:676
+#: ../game/screen_sing.cc:683
 msgid "Hoofer"
 msgstr "ホーファー"
 
 # 敗者 はいしゃ (n) the defeated; vanquished; loser; could be here as well
-#: ../game/screen_sing.cc:679
+#: ../game/screen_sing.cc:686
 msgid "Loser"
 msgstr "負け犬"
 
-#: ../game/screen_sing.cc:681
+#: ../game/screen_sing.cc:688
 msgid "Virtuoso"
 msgstr "妙手"
 
-#: ../game/screen_sing.cc:682
+#: ../game/screen_sing.cc:689
 msgid "Rocker"
 msgstr "ロッカー"
 
@@ -694,68 +676,196 @@ msgstr ""
 msgid "Clear playlist"
 msgstr ""
 
-#: ../game/songparser-xml.cc:109
+#: ../game/songparser-xml.cc:104
 msgid "Together"
 msgstr ""
 
-#: ../game/songs.cc:191
+#: ../game/songs.cc:194
 msgid "show all songs"
 msgstr "全部の曲を見せて"
 
-#: ../game/songs.cc:192
+#: ../game/songs.cc:195
 msgid "has dance"
 msgstr "「踊」がある。"
 
-#: ../game/songs.cc:193
+#: ../game/songs.cc:196
 #, fuzzy
 msgid "has vocals"
 msgstr "ボーカル"
 
-#: ../game/songs.cc:194
+#: ../game/songs.cc:197
 msgid "has duet"
 msgstr "二部合唱がある"
 
-#: ../game/songs.cc:195
+#: ../game/songs.cc:198
 #, fuzzy
 msgid "has guitar"
 msgstr "リズムギター"
 
-#: ../game/songs.cc:196
+#: ../game/songs.cc:199
 #, fuzzy
 msgid "drums or keytar"
 msgstr "どラムズかキーターか。"
 
-#: ../game/songs.cc:197
+#: ../game/songs.cc:200
 msgid "full band"
 msgstr "全楽団"
 
-#: ../game/songs.cc:225
+#: ../game/songs.cc:228
 msgid "random order"
 msgstr "無作為並べ替え"
 
-#: ../game/songs.cc:226
+#: ../game/songs.cc:229
 msgid "sorted by song"
 msgstr "歌順に並べ替えた"
 
-#: ../game/songs.cc:227
+#: ../game/songs.cc:230
 msgid "sorted by artist"
 msgstr "アーティスト順に並べ替えた"
 
-#: ../game/songs.cc:228
+#: ../game/songs.cc:231
 msgid "sorted by edition"
 msgstr "版順に並べ替えた"
 
-#: ../game/songs.cc:229
+#: ../game/songs.cc:232
 msgid "sorted by genre"
 msgstr "ジャンル順に並べ替えた"
 
-#: ../game/songs.cc:230
+#: ../game/songs.cc:233
 msgid "sorted by path"
 msgstr "パス順に並べ替えた"
 
-#: ../game/songs.cc:231
+#: ../game/songs.cc:234
 msgid "sorted by language"
 msgstr "言語に並べ替え"
+
+#: ../game/webserver.cc:237
+msgid "Performous web frontend"
+msgstr "ペルフォームース・ウエブ・フロントエンド"
+
+#: ../game/webserver.cc:238
+msgid "View database"
+msgstr "ダタベースを見る"
+
+#: ../game/webserver.cc:240
+msgid "Search and Add"
+msgstr "探索と加える"
+
+#: ../game/webserver.cc:241
+msgid "Sort by"
+msgstr "並べ替える"
+
+#: ../game/webserver.cc:242
+msgid "Artist"
+msgstr "歌手"
+
+#: ../game/webserver.cc:243
+msgid "Title"
+msgstr "曲名"
+
+#: ../game/webserver.cc:244
+msgid "Language"
+msgstr "言語"
+
+#: ../game/webserver.cc:245
+msgid "Edition"
+msgstr "版"
+
+#: ../game/webserver.cc:246
+msgid "Creator"
+msgstr "創作者"
+
+#: ../game/webserver.cc:247
+msgid "Sort order"
+msgstr "ソート順"
+
+#: ../game/webserver.cc:248
+msgid "Normal"
+msgstr "普通"
+
+#: ../game/webserver.cc:249
+msgid "Inverted"
+msgstr "反転"
+
+#: ../game/webserver.cc:250
+msgid "Update every 10 sec"
+msgstr "毎十秒更新"
+
+#: ../game/webserver.cc:251
+msgid "Refresh database"
+msgstr "ダタベース更新"
+
+#: ../game/webserver.cc:252
+msgid "Upcoming songs"
+msgstr "今後の曲"
+
+#: ../game/webserver.cc:253
+msgid "Refresh playlist"
+msgstr "プレイリスト更新"
+
+#: ../game/webserver.cc:254
+msgid ""
+"Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding "
+"Performous see /docs/Authors.txt"
+msgstr ""
+"ウェブ・インターフェースはニク・ノーイエンスとアルジャン・スペイアルドによっ "
+"て作られました。創作者は/docs/Authors.txt に書かれています。"
+
+#: ../game/webserver.cc:255
+msgid "Search"
+msgstr "探索"
+
+#: ../game/webserver.cc:256
+msgid "Available songs"
+msgstr "利用可能曲"
+
+#: ../game/webserver.cc:257
+msgid "Search for songs"
+msgstr "曲に探索する"
+
+#: ../game/webserver.cc:258
+msgid "Yes"
+msgstr "はい"
+
+#: ../game/webserver.cc:259
+msgid "No"
+msgstr "いいえ"
+
+#: ../game/song.hh:26
+msgid "Guitar"
+msgstr "ギタ−"
+
+#: ../game/song.hh:26
+msgid "Coop guitar"
+msgstr "コーオップ・ギター"
+
+#: ../game/song.hh:26
+msgid "Rhythm guitar"
+msgstr "リズムギター"
+
+#: ../game/song.hh:26
+msgid "Bass"
+msgstr "ベースギター"
+
+#: ../game/song.hh:26
+msgid "Drums"
+msgstr "ドラム"
+
+#: ../game/song.hh:26
+msgid "Vocals"
+msgstr "ボーカル"
+
+#: ../game/song.hh:26
+msgid "Harmonic 1"
+msgstr "ハルモニク 1"
+
+#: ../game/song.hh:26
+msgid "Harmonic 2"
+msgstr "ハルモニク 2"
+
+#: ../game/song.hh:26
+msgid "Harmonic 3"
+msgstr "ハルモニク 3"
 
 #: ../data/config/schema.xml:19
 msgid "Game"
@@ -835,226 +945,256 @@ msgstr "スキン"
 msgid "Name of the theme to use."
 msgstr ""
 
-#: ../data/config/schema.xml:74
-msgid "Keyboard as guitar"
-msgstr ""
-
 #: ../data/config/schema.xml:75
-msgid "Enable keyboard as guitar (Frets on Fire mode)."
+msgid "Playlist screen timeout"
 msgstr ""
 
-#: ../data/config/schema.xml:78
-msgid "Keyboard as drumkit"
+#: ../data/config/schema.xml:76
+msgid ""
+"How long it will take before the next song in the playlist starts "
+"automatically."
 msgstr ""
 
-#: ../data/config/schema.xml:79
-msgid "Enable keyboard as drumkit."
+#: ../data/config/schema.xml:84
+msgid "Webserver access"
 msgstr ""
 
-#: ../data/config/schema.xml:82
-msgid "Keyboard as dance pad"
+#: ../data/config/schema.xml:85
+msgid ""
+"Define if you want to control performous remotely with web interface "
+"(requires restart)."
 msgstr ""
 
-#: ../data/config/schema.xml:83
-msgid "Enable keyboard as dance pad."
+#: ../data/config/schema.xml:90
+msgid "Webserver port"
 msgstr ""
 
-#: ../data/config/schema.xml:86
-msgid "Keyboard as keytar"
-msgstr ""
-
-#: ../data/config/schema.xml:87
-msgid "Enable keyboard as keytar."
+#: ../data/config/schema.xml:91
+msgid ""
+"Port to use for the web server. Choose one that is not used by other "
+"applications."
 msgstr ""
 
 #: ../data/config/schema.xml:94
-msgid "Force controller A's type"
+msgid "Keyboard as guitar"
 msgstr ""
 
 #: ../data/config/schema.xml:95
+msgid "Enable keyboard as guitar (Frets on Fire mode)."
+msgstr ""
+
+#: ../data/config/schema.xml:98
+msgid "Keyboard as drumkit"
+msgstr ""
+
+#: ../data/config/schema.xml:99
+msgid "Enable keyboard as drumkit."
+msgstr ""
+
+#: ../data/config/schema.xml:102
+msgid "Keyboard as dance pad"
+msgstr ""
+
+#: ../data/config/schema.xml:103
+msgid "Enable keyboard as dance pad."
+msgstr ""
+
+#: ../data/config/schema.xml:106
+msgid "Keyboard as keytar"
+msgstr ""
+
+#: ../data/config/schema.xml:107
+msgid "Enable keyboard as keytar."
+msgstr ""
+
+#: ../data/config/schema.xml:114
+msgid "Force controller A's type"
+msgstr ""
+
+#: ../data/config/schema.xml:115
 msgid ""
 "Override autodetection and force the first controller to the given type."
 msgstr ""
 
-#: ../data/config/schema.xml:102
+#: ../data/config/schema.xml:122
 msgid "Force controller B's type"
 msgstr ""
 
-#: ../data/config/schema.xml:103
+#: ../data/config/schema.xml:123
 msgid ""
 "Override autodetection and force the second controller to the given type."
 msgstr ""
 
-#: ../data/config/schema.xml:110
+#: ../data/config/schema.xml:130
 msgid "Force controller C's type"
 msgstr ""
 
-#: ../data/config/schema.xml:111
+#: ../data/config/schema.xml:131
 msgid ""
 "Override autodetection and force the third controller to the given type."
 msgstr ""
 
-#: ../data/config/schema.xml:118
+#: ../data/config/schema.xml:138
 msgid "Force controller D's type"
 msgstr ""
 
-#: ../data/config/schema.xml:119
+#: ../data/config/schema.xml:139
 msgid ""
 "Override autodetection and force the fourth controller to the given type."
 msgstr ""
 
-#: ../data/config/schema.xml:126
+#: ../data/config/schema.xml:146
 msgid "Joystick configuration"
 msgstr ""
 
-#: ../data/config/schema.xml:127
+#: ../data/config/schema.xml:147
 msgid "Force joystick to some kind of instrument."
 msgstr ""
 
-#: ../data/config/schema.xml:130
+#: ../data/config/schema.xml:150
 msgid "Hardware MIDI input device"
 msgstr ""
 
-#: ../data/config/schema.xml:131
+#: ../data/config/schema.xml:151
 msgid ""
 "Regex for matching the MIDI devices to use. The default is to use all "
 "available devices."
 msgstr ""
 
-#: ../data/config/schema.xml:146
+#: ../data/config/schema.xml:166
 msgid "Fallback song encoding"
 msgstr ""
 
-#: ../data/config/schema.xml:147
+#: ../data/config/schema.xml:167
 msgid "Pick the text codec used for song files that are not UTF-8."
 msgstr ""
 
-#: ../data/config/schema.xml:154
+#: ../data/config/schema.xml:174
 msgid "Windowed width"
 msgstr ""
 
-#: ../data/config/schema.xml:155
+#: ../data/config/schema.xml:175
 msgid "The width of the window."
 msgstr ""
 
-#: ../data/config/schema.xml:160
+#: ../data/config/schema.xml:180
 msgid "Windowed height"
 msgstr ""
 
-#: ../data/config/schema.xml:161
+#: ../data/config/schema.xml:181
 msgid "The height of the window."
 msgstr ""
 
-#: ../data/config/schema.xml:164
+#: ../data/config/schema.xml:184
 msgid "Fullscreen mode"
 msgstr ""
 
-#: ../data/config/schema.xml:165
+#: ../data/config/schema.xml:185
 msgid "Enable fullscreen mode on startup."
 msgstr ""
 
-#: ../data/config/schema.xml:168
+#: ../data/config/schema.xml:188
 msgid "Stereoscopic 3D"
 msgstr ""
 
-#: ../data/config/schema.xml:169
+#: ../data/config/schema.xml:189
 msgid "Enable 3D rendering of Performous."
 msgstr ""
 
-#: ../data/config/schema.xml:177
+#: ../data/config/schema.xml:197
 msgid "Stereo3D type"
 msgstr ""
 
-#: ../data/config/schema.xml:178
+#: ../data/config/schema.xml:198
 msgid "Some modes may only get activated in fullscreen mode."
 msgstr ""
 
-#: ../data/config/schema.xml:183
+#: ../data/config/schema.xml:203
 msgid "Stereo3D separation"
 msgstr ""
 
-#: ../data/config/schema.xml:184
+#: ../data/config/schema.xml:204
 msgid ""
 "The strength of the effect. Experiment with different settings for best "
 "results."
 msgstr ""
 
-#: ../data/config/schema.xml:187
+#: ../data/config/schema.xml:207
 msgid "Video playback"
 msgstr ""
 
-#: ../data/config/schema.xml:188
+#: ../data/config/schema.xml:208
 msgid ""
 "Allows completely disabling background videos. It is recommended to leave "
 "this enabled as Performous will still smoothly fade out the video if your "
 "computer is not fast enough."
 msgstr ""
 
-#: ../data/config/schema.xml:191
+#: ../data/config/schema.xml:211
 msgid "Webcam background"
 msgstr ""
 
-#: ../data/config/schema.xml:192
+#: ../data/config/schema.xml:212
 msgid ""
 "Performous can use webcam as a background video. Disable it if Performous "
 "crashes while entering a song."
 msgstr ""
 
-#: ../data/config/schema.xml:196
+#: ../data/config/schema.xml:216
 msgid "Webcam id"
 msgstr ""
 
-#: ../data/config/schema.xml:197
+#: ../data/config/schema.xml:217
 msgid ""
 "Use -1 to autodetect or a number starting from 0 to choose specific device."
 msgstr ""
 
-#: ../data/config/schema.xml:202
+#: ../data/config/schema.xml:222
 msgid "SVG quality"
 msgstr "SVGの品質"
 
-#: ../data/config/schema.xml:203
+#: ../data/config/schema.xml:223
 msgid ""
 "Larger numbers cause vector graphics to be rendered in higher resolution. "
 "Decrease this to make navigating in menus faster."
 msgstr ""
 
-#: ../data/config/schema.xml:208
+#: ../data/config/schema.xml:228
 msgid "Text quality"
 msgstr "テクストの品質"
 
-#: ../data/config/schema.xml:209
+#: ../data/config/schema.xml:229
 msgid ""
 "Larger numbers cause text to be rendered in higher resolution. Decrease this "
 "to make everything a little faster."
 msgstr ""
 
-#: ../data/config/schema.xml:212
+#: ../data/config/schema.xml:232
 msgid "Benchmark mode"
 msgstr ""
 
-#: ../data/config/schema.xml:213
+#: ../data/config/schema.xml:233
 msgid ""
 "Framerate limit of 100 FPS is removed and the game instead renders at full "
 "speed. FPS values are printed to console. Please note that the display "
 "drivers may still limit the rendering speed to the screen refresh rate."
 msgstr ""
 
-#: ../data/config/schema.xml:220
+#: ../data/config/schema.xml:240
 msgid "Suggested latency"
 msgstr ""
 
-#: ../data/config/schema.xml:221
+#: ../data/config/schema.xml:241
 msgid ""
 "This is a hint for the audio engine about the desired latency. Set this as "
 "low as possible while retaining clear audio playback. Requires restart."
 msgstr ""
 
-#: ../data/config/schema.xml:226
+#: ../data/config/schema.xml:246
 msgid "Audio/video latency"
 msgstr ""
 
-#: ../data/config/schema.xml:227
+#: ../data/config/schema.xml:247
 msgid ""
 "Affects all modes. Use negative value if your display input lag is greater "
 "than the sound card output latency, positive values in the opposite case and "
@@ -1063,11 +1203,11 @@ msgid ""
 "performing."
 msgstr ""
 
-#: ../data/config/schema.xml:232
+#: ../data/config/schema.xml:252
 msgid "Audio round-trip latency"
 msgstr ""
 
-#: ../data/config/schema.xml:233
+#: ../data/config/schema.xml:253
 msgid ""
 "Affects singing only. The time it takes for Performous playback to reach "
 "your speakers, fly to the microphone and all the way back until Performous "
@@ -1075,11 +1215,11 @@ msgid ""
 "adjust with Ctrl+F3/F4."
 msgstr ""
 
-#: ../data/config/schema.xml:238
+#: ../data/config/schema.xml:258
 msgid "Audio/controller latency"
 msgstr ""
 
-#: ../data/config/schema.xml:239
+#: ../data/config/schema.xml:259
 msgid ""
 "Affects instruments and dancing only. The total of USB (guitar or dance pad) "
 "latency combined with audio output latency. Adjust so that you can hit the "
@@ -1087,81 +1227,81 @@ msgid ""
 "adjust while performing."
 msgstr ""
 
-#: ../data/config/schema.xml:246
+#: ../data/config/schema.xml:266
 msgid "Audio devices"
 msgstr ""
 
-#: ../data/config/schema.xml:247
+#: ../data/config/schema.xml:267
 msgid "List of audio devices to try."
 msgstr ""
 
-#: ../data/config/schema.xml:252
+#: ../data/config/schema.xml:272
 msgid "Menu volume"
 msgstr "メニューの音量"
 
-#: ../data/config/schema.xml:253
+#: ../data/config/schema.xml:273
 msgid "The volume level of menus, song previews and jukebox mode."
 msgstr ""
 
-#: ../data/config/schema.xml:258
+#: ../data/config/schema.xml:278
 msgid "Music volume"
 msgstr "音楽の音量"
 
-#: ../data/config/schema.xml:259
+#: ../data/config/schema.xml:279
 msgid ""
 "The ingame music volume. Values above 90 are not recommended as distortion "
 "may occur."
 msgstr ""
 
-#: ../data/config/schema.xml:264
+#: ../data/config/schema.xml:284
 msgid "Failure volume"
 msgstr "失敗の音量"
 
-#: ../data/config/schema.xml:265
+#: ../data/config/schema.xml:285
 msgid ""
 "The ingame fail sound volume. Values above 90 are not recommended as "
 "distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
 msgstr ""
 
-#: ../data/config/schema.xml:268
+#: ../data/config/schema.xml:288
 msgid "Microphone pass-through"
 msgstr ""
 
-#: ../data/config/schema.xml:269
+#: ../data/config/schema.xml:289
 msgid "Send captured singing voice to speakers."
 msgstr ""
 
-#: ../data/config/schema.xml:274
+#: ../data/config/schema.xml:294
 msgid "Pass-through volume ratio"
 msgstr ""
 
-#: ../data/config/schema.xml:275
+#: ../data/config/schema.xml:295
 msgid "How much voice is amplified compared to the music."
 msgstr ""
 
-#: ../data/config/schema.xml:278
+#: ../data/config/schema.xml:298
 msgid "Suppress center channel"
 msgstr ""
 
-#: ../data/config/schema.xml:279
+#: ../data/config/schema.xml:299
 msgid "Suppress audio of center channel (e.g. vocals)."
 msgstr ""
 
-#: ../data/config/schema.xml:290
+#: ../data/config/schema.xml:310
 msgid "Song folders"
 msgstr ""
 
-#: ../data/config/schema.xml:291
+#: ../data/config/schema.xml:311
 msgid ""
 "Where to recursively look for songs. DATADIR at the beginning means all "
 "Performous data folders."
 msgstr ""
 
-#: ../data/config/schema.xml:294
+#: ../data/config/schema.xml:314
 msgid "Base folders for data"
 msgstr ""
 
-#: ../data/config/schema.xml:295
+#: ../data/config/schema.xml:315
 msgid ""
 "System defaults are included automatically. Additional paths can be added "
 "here."
