@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-02 19:04+0200\n"
+"POT-Creation-Date: 2017-07-02 20:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -787,6 +787,50 @@ msgstr ""
 
 #: ../game/webserver.cc:313
 msgid "Cancel"
+msgstr ""
+
+#: ../game/webserver.cc:314
+msgid "Successfully removed song from playlist"
+msgstr ""
+
+#: ../game/webserver.cc:315
+msgid "Failed removing song from playlist"
+msgstr ""
+
+#: ../game/webserver.cc:316
+msgid "Successfully changed position of song"
+msgstr ""
+
+#: ../game/webserver.cc:317
+msgid "Failed changing position of song"
+msgstr ""
+
+#: ../game/webserver.cc:318
+msgid "Successfully moved song up"
+msgstr ""
+
+#: ../game/webserver.cc:319
+msgid "Failed moving song up"
+msgstr ""
+
+#: ../game/webserver.cc:320
+msgid "Successfully moved song down"
+msgstr ""
+
+#: ../game/webserver.cc:321
+msgid "Failed moving song down"
+msgstr ""
+
+#: ../game/webserver.cc:322
+msgid "Successfully added song to the playlist"
+msgstr ""
+
+#: ../game/webserver.cc:323
+msgid "Failed adding song to the playlist"
+msgstr ""
+
+#: ../game/webserver.cc:324
+msgid "No songs found with current filter"
 msgstr ""
 
 #: ../game/song.hh:26

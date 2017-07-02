@@ -43,14 +43,14 @@ $(function (){
 	});
 
 	function moveSongUp(songId) {
-		setSongToPosition(songId, songId - 1, "move_up_song");
+		setSongToPosition(songId, songId - 1, "successfully_moved_song_up", "failed_moving_song_up");
 	}
 
 	function moveSongDown(songId) {
-		setSongToPosition(songId, songId + 1, "move_down_song");
+		setSongToPosition(songId, songId + 1, "successfully_moved_song_down", "failed_moving_song_down");
 	}
 
-	function setSongToPosition(songId, newPosition, message = "changed_position_song") {
+	function setSongToPosition(songId, newPosition, successMessage = "successfully_changed_position_of_song", failureMessage = "failed_changing_position_of_song") {
 		if(newPosition || newPosition === 0) {
 			var position = newPosition;
 		} else {
@@ -63,15 +63,19 @@ $(function (){
 	    };
 
 	    $.post("api/setposition", JSON.stringify(data), function() {
-	    	window.location.href = "#playlist?message=succes_"+message+"&messageType=success"
-        	$('#refresh-playlist').click();
+	        buildAlertMessage(successMessage, "success");
+	        $('#refresh-playlist').click();
+	    }).fail(function() {
+	        buildAlertMessage(failureMessage, "danger");
 	    });
 	}
 
 	function removeSongFromPlaylist(songId) {
 		$.post("api/remove", songId.toString(), function() {
-        	window.location.href = "#playlist?message=success_removed_song&messageType=success"
+			buildAlertMessage("successfully_removed_song_from_playlist", "success")
         	$('#refresh-playlist').click();
-    	});
+    	}).fail(function(){
+    		buildAlertMessage("failed_removing_song_from_playlist", "danger");
+    	})
 	}
 });

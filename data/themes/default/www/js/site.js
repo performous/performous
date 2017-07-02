@@ -124,6 +124,9 @@ $('#search-database').click(function(e, callback) {
             $("#searched-songs-"+iterator).data("songObject", JSON.stringify(songObject));
         });
 
+        if(database.length == 0) {
+            buildAlertMessage("no_songs_found_with_current_filter", "warning")
+        }
         if(typeof callback == "function") {
             callback();
         }
@@ -217,8 +220,10 @@ function secondsToDate(seconds){
 
 function addSong(songObjectToSend) {
     $.post("api/add", songObjectToSend, function() {
-        window.location.href = "#playlist?message=success_added_song&messageType=success"
+        buildAlertMessage("successfully_added_song_to_the_playlist", "success");
         $('a[href="#playlist"]').tab('show');
+    }).fail(function() {
+        buildAlertMessage("failed_adding_song_to_the_playlist", "danger")
     });
 }
 
@@ -243,3 +248,15 @@ function buildTable(database){
 
     return r.join("");
 }
+
+function buildAlertMessage(message, messageType){
+    var innerhtml = "<div class=\"container-fluid\"><div class=\"alert alert-"+messageType+" alert-dismissable\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>"+message+"</div></div>";
+    $("#alert-messages").append(innerhtml);
+    localize();
+    window.setTimeout(function() {
+        $(".alert").fadeTo(500, 0).slideUp(500, function(){
+            $(this).remove(); 
+        });
+    }, 3000);
+}
+

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-02 19:04+0200\n"
-"PO-Revision-Date: 2017-07-02 19:04+0200\n"
+"POT-Creation-Date: 2017-07-02 20:16+0200\n"
+"PO-Revision-Date: 2017-07-02 20:21+0200\n"
 "Last-Translator: Arjan Speiard | Asgard Sings! <arjan.spieard@gmail.com>\n"
 "Language-Team: \n"
 "Language: nl\n"
@@ -813,6 +813,53 @@ msgstr "Gewilde plaats van het liedje"
 #: ../game/webserver.cc:313
 msgid "Cancel"
 msgstr "Annuleren"
+
+#: ../game/webserver.cc:314
+msgid "Successfully removed song from playlist"
+msgstr "Het lied is succesvol verwijderd van de afspeellijst."
+
+#: ../game/webserver.cc:315
+msgid "Failed removing song from playlist"
+msgstr "Er is een fout opgetreden tijdens het verwijderen van het lied."
+
+#: ../game/webserver.cc:316
+msgid "Successfully changed position of song"
+msgstr "De positie van het lied is succesvol veranderd."
+
+#: ../game/webserver.cc:317
+msgid "Failed changing position of song"
+msgstr ""
+"Er is een fout opgetreden tijdens het wijzigen van de positie van het lied."
+
+#: ../game/webserver.cc:318
+msgid "Successfully moved song up"
+msgstr "Het lied is succesvol een plaats naar boven verschoven."
+
+#: ../game/webserver.cc:319
+msgid "Failed moving song up"
+msgstr "Er is een fout opgetreden tijdens het omhoog verplaatsen van het lied."
+
+#: ../game/webserver.cc:320
+msgid "Successfully moved song down"
+msgstr "Het lied is succesvol een plaats naar beneden verschoven."
+
+#: ../game/webserver.cc:321
+msgid "Failed moving song down"
+msgstr "Er is een fout opgetreden tijdens het omlaag verplaatsen van het lied."
+
+#: ../game/webserver.cc:322
+msgid "Successfully added song to the playlist"
+msgstr "Het lied is succesvol toegevoegd aan de afspeellijst."
+
+#: ../game/webserver.cc:323
+msgid "Failed adding song to the playlist"
+msgstr ""
+"Er is een fout opgetreden tijdens het toevoegen van het lied aan de "
+"afspeellijst."
+
+#: ../game/webserver.cc:324
+msgid "No songs found with current filter"
+msgstr "Er zijn geen liedjes gevonden met het huidge filter."
 
 #: ../game/song.hh:26
 msgid "Guitar"

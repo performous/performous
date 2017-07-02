@@ -310,7 +310,18 @@ std::vector<std::string> WebServer::GetTranslationKeys() {
 	    gettext_noop("Set position"),
 	    gettext_noop("Remove song"),
 	    gettext_noop("Desired position of song"),
-	    gettext_noop("Cancel")
+	    gettext_noop("Cancel"),
+	    gettext_noop("Successfully removed song from playlist"),
+	    gettext_noop("Failed removing song from playlist"),
+	    gettext_noop("Successfully changed position of song"),
+	    gettext_noop("Failed changing position of song"),
+	    gettext_noop("Successfully moved song up"),
+	    gettext_noop("Failed moving song up"),
+	    gettext_noop("Successfully moved song down"),
+	    gettext_noop("Failed moving song down"),
+	    gettext_noop("Successfully added song to the playlist"),
+	    gettext_noop("Failed adding song to the playlist"),
+	    gettext_noop("No songs found with current filter")
 	};
 
 	return tranlationKeys;

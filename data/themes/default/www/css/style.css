@@ -55,3 +55,7 @@ td {
 .drag-drop a:first-letter {
     text-transform: uppercase;
 }
+
+.validation-summary-valid.alert-danger {
+    display: none;
+}
