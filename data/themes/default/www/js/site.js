@@ -16,8 +16,10 @@ Sortable.create(list, {
         };
 
         $.post("api/setposition", JSON.stringify(data), function() {
-            window.location.href = "#playlist?message=succes_changed_position_song&messageType=success"
+            buildAlertMessage("successfully_changed_position_of_song", "success");
             $('#refresh-playlist').click();
+        }).fail(function() {
+            buildAlertMessage("failed_changing_position_of_song", "danger");
         });
     }
 });

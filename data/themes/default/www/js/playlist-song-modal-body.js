@@ -76,6 +76,6 @@ $(function (){
         	$('#refresh-playlist').click();
     	}).fail(function(){
     		buildAlertMessage("failed_removing_song_from_playlist", "danger");
-    	})
+    	});
 	}
 });
