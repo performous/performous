@@ -50,32 +50,20 @@ $('#playlist-songs').on("click", "a", function() {
     });    
 });
 
-
 $('#refresh-database').click(function() {
     $.get("api/getDataBase.json", function(data) {
         var database = JSON.parse(data);
         clearTable("#database-songs > tbody");
-        var rows = "";
+
+        var html = buildTable(database);
+        $(html).appendTo("#database-songs");
+
         $.each(database, function (iterator, songObject){
-            var y = "<div>pizza</div>";
-            var row = "<tr id=\"database-songs-" + iterator + "\"><td>" + songObject.Artist + "</td><td>" + songObject.Title + "</td><td class='hidden-xs'>" + songObject.Language + "</td><td class='hidden-xs hidden-sm'>" + songObject.Edition + "</td><td class='hidden-xs hidden-sm hidden-md'>" + songObject.Creator + "</td><td class='text-right text-nowrap fixed-pixel-glyphicon'><span class='glyphicon glyphicon-plus'></span></td></tr>";
-            //$("#database-songs").append("<tr id=\"database-songs-" + iterator + "\"><td>" + songObject.Artist + "</td><td>" + songObject.Title + "</td><td class='hidden-xs'>" + songObject.Language + "</td><td class='hidden-xs hidden-sm'>" + songObject.Edition + "</td><td class='hidden-xs hidden-sm hidden-md'>" + songObject.Creator + "</td><td class='text-right text-nowrap fixed-pixel-glyphicon'><span class='glyphicon glyphicon-plus'></span></td></tr>");
-            //$("#database-songs-"+iterator).data("songObject", JSON.stringify(songObject)); //CAREEEEEEEEEEEEEEEEEEEEEEEEEEE
-            rows = rows +row;
+           $("#database-songs-"+iterator).data("songObject", JSON.stringify(songObject));
         });
-        $(rows).appendTo("#database-songs");
     });
 });
 
-$('#addonce').on('click', function(){
-    rows='';
-    for (i=0; i<5000; i++)
-    {
-        var row='<tr><td>test</td></tr>';
-        rows=rows+row;
-    }
-    $(rows).appendTo('table');
-});
 
 $("a[id^='sort-by-']").click(function() {
     var sortOrderToBe = $(this).data('sort-ascending') ? "descending" : "ascending";
@@ -87,14 +75,18 @@ $("a[id^='sort-by-']").click(function() {
     $(this).parent().siblings().children().each(function (){
         $(this).find('span').removeClass("glyphicon-menu-up").addClass("glyphicon-menu-down");
     });
+
     $.get(url, function(data) {
         var database = JSON.parse(data);
+
         clearTable("#database-songs > tbody");
+
+        var html = buildTable(database);
+        $(html).appendTo("#database-songs");
+        
         $.each(database, function (iterator, songObject){
-            var y = "<div>pizza</div>";
-            $("#database-songs").append("<tr id=\"database-songs-" + iterator + "\"><td>" + songObject.Artist + "</td><td>" + songObject.Title + "</td><td class='hidden-xs'>" + songObject.Language + "</td><td class='hidden-xs hidden-sm'>" + songObject.Edition + "</td><td class='hidden-xs hidden-sm hidden-md'>" + songObject.Creator + "</td><td class='text-right text-nowrap fixed-pixel-glyphicon'><span class='glyphicon glyphicon-plus'></span></td></tr>");
             $("#database-songs-"+iterator).data("songObject", JSON.stringify(songObject));
-        });        
+        });     
     });
 });
 
@@ -117,7 +109,7 @@ $('#refresh-playlist').click(function() {
     });
 });
 
-$('#search-database').click(function() {
+$('#search-database').click(function(e, callback) {
     var query = $('#search-field').val()
     $.post("api/search", query, function(data) {
         var database = JSON.parse(data);
@@ -131,7 +123,35 @@ $('#search-database').click(function() {
             $("#searched-songs").append("<a href=\"#\" id=\"searched-songs-" + iterator + "\" class=\"list-group-item\" >" + songObject.Artist + " - " + songObject.Title + songMeta + "<span class=\"glyphicon glyphicon-plus\"></span></a>");            
             $("#searched-songs-"+iterator).data("songObject", JSON.stringify(songObject));
         });
+
+        if(typeof callback == "function") {
+            callback();
+        }
     });
+});
+
+$("#search-tab").click(function (){
+    $.get("api/getDataBase.json", function(data) {
+        var database = JSON.parse(data);
+        var input = $("#search-field");
+        input.typeahead({
+            source: database,
+            autoSelect: true,
+            items: 10,
+            updater: function(item) {
+                input.val(item.name);
+                $('#search-database').trigger("click", function(){
+                    $("#searched-songs").children().first().click();
+                }); 
+            }
+        });
+    });
+});
+
+$('#search-field').keypress(function (e) {
+    if (e.which == 13) {
+        $('#search-database').click();
+    }
 });
 
 $('#searched-songs').on("click", "a", function() {
@@ -174,4 +194,26 @@ function addSong(songObjectToSend) {
         window.location.href = "#playlist?message=success_added_song&messageType=success"
         $('a[href="#playlist"]').tab('show');
     });
+}
+
+function buildTable(database){
+    var r = new Array();
+    var j = -1;
+    for (var key=0, size=database.length; key<size; key++){
+        r[++j] ="<tr id='database-songs-" + key +"'><td>";
+        r[++j] = database[key].Artist;
+        r[++j] = "</td><td>";
+        r[++j] = database[key].Title;
+        r[++j] = "</td><td class='hidden-xs'>";
+        r[++j] = database[key].Language;
+        r[++j] = "</td><td class='hidden-xs hidden-sm'>";
+        r[++j] = database[key].Edition;
+        r[++j] = "</td><td class='hidden-xs hidden-sm hidden-md'>";
+        r[++j] = database[key].Creator;
+        r[++j] = "</td><td class='text-right text-nowrap fixed-pixel-glyphicon'>";
+        r[++j] = "<span class='glyphicon glyphicon-plus'></span>";
+        r[++j] = "</td></tr>"
+    }
+
+    return r.join("");
 }
