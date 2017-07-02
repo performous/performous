@@ -10,6 +10,7 @@
 .navbar-nav li {
     width: 33.3333333%;
     text-align: center;
+    margin: 0 auto;
 }
 
 .glyph-centered {
