@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-23 00:21+0200\n"
+"POT-Creation-Date: 2017-07-02 19:04+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -352,7 +352,7 @@ msgstr ""
 msgid "Open the song browser to add more songs"
 msgstr ""
 
-#: ../game/screen_playlist.cc:180 ../game/screen_songs.cc:520
+#: ../game/screen_playlist.cc:180 ../game/screen_songs.cc:521
 msgid "Shuffle"
 msgstr ""
 
@@ -369,7 +369,7 @@ msgid "Remove all the songs from the list"
 msgstr ""
 
 #: ../game/screen_playlist.cc:192 ../game/screen_playlist.cc:375
-#: ../game/screen_songs.cc:533
+#: ../game/screen_songs.cc:534
 msgid "Back"
 msgstr ""
 
@@ -409,7 +409,7 @@ msgstr ""
 msgid "Remove this song from the list"
 msgstr ""
 
-#: ../game/screen_playlist.cc:358
+#: ../game/screen_playlist.cc:358 ../game/webserver.cc:308
 msgid "Move up"
 msgstr ""
 
@@ -555,67 +555,67 @@ msgstr ""
 msgid "Rocker"
 msgstr ""
 
-#: ../game/screen_songs.cc:288
+#: ../game/screen_songs.cc:289
 msgid "Sorry, no songs match the search!"
 msgstr ""
 
-#: ../game/screen_songs.cc:291
+#: ../game/screen_songs.cc:292
 msgid "Sorry, no songs match the filter!"
 msgstr ""
 
-#: ../game/screen_songs.cc:294
+#: ../game/screen_songs.cc:295
 msgid "No songs found!"
 msgstr ""
 
-#: ../game/screen_songs.cc:295
+#: ../game/screen_songs.cc:296
 msgid "Visit performous.org for free songs"
 msgstr ""
 
-#: ../game/screen_songs.cc:313
+#: ../game/screen_songs.cc:314
 msgid "<type in to search>"
 msgstr ""
 
-#: ../game/screen_songs.cc:313
+#: ../game/screen_songs.cc:314
 msgid "songs"
 msgstr ""
 
-#: ../game/screen_songs.cc:313
+#: ../game/screen_songs.cc:314
 msgid "options"
 msgstr ""
 
-#: ../game/screen_songs.cc:315
+#: ../game/screen_songs.cc:316
 msgid "sort order: "
 msgstr ""
 
-#: ../game/screen_songs.cc:316
+#: ../game/screen_songs.cc:317
 msgid "type filter: "
 msgstr ""
 
-#: ../game/screen_songs.cc:317
+#: ../game/screen_songs.cc:318
 msgid "hiscores"
 msgstr ""
 
-#: ../game/screen_songs.cc:317
+#: ../game/screen_songs.cc:318
 msgid "jukebox mode"
 msgstr ""
 
-#: ../game/screen_songs.cc:320
+#: ../game/screen_songs.cc:321
 msgid "start a playlist with this song!"
 msgstr ""
 
-#: ../game/screen_songs.cc:320
+#: ../game/screen_songs.cc:321
 msgid "open the playlist menu"
 msgstr ""
 
-#: ../game/screen_songs.cc:513
+#: ../game/screen_songs.cc:514
 msgid "Play"
 msgstr ""
 
-#: ../game/screen_songs.cc:526
+#: ../game/screen_songs.cc:527
 msgid "View playlist"
 msgstr ""
 
-#: ../game/screen_songs.cc:527
+#: ../game/screen_songs.cc:528
 msgid "Clear playlist"
 msgstr ""
 
@@ -679,94 +679,114 @@ msgstr ""
 msgid "sorted by language"
 msgstr ""
 
-#: ../game/webserver.cc:237
+#: ../game/webserver.cc:285
 msgid "Performous web frontend"
 msgstr ""
 
-#: ../game/webserver.cc:238
+#: ../game/webserver.cc:286
 msgid "View database"
 msgstr ""
 
-#: ../game/webserver.cc:240
+#: ../game/webserver.cc:288
 msgid "Search and Add"
 msgstr ""
 
-#: ../game/webserver.cc:241
+#: ../game/webserver.cc:289
 msgid "Sort by"
 msgstr ""
 
-#: ../game/webserver.cc:242
+#: ../game/webserver.cc:290
 msgid "Artist"
 msgstr ""
 
-#: ../game/webserver.cc:243
+#: ../game/webserver.cc:291
 msgid "Title"
 msgstr ""
 
-#: ../game/webserver.cc:244
+#: ../game/webserver.cc:292
 msgid "Language"
 msgstr ""
 
-#: ../game/webserver.cc:245
+#: ../game/webserver.cc:293
 msgid "Edition"
 msgstr ""
 
-#: ../game/webserver.cc:246
+#: ../game/webserver.cc:294
 msgid "Creator"
 msgstr ""
 
-#: ../game/webserver.cc:247
+#: ../game/webserver.cc:295 ../data/config/schema.xml:321
 msgid "Sort order"
 msgstr ""
 
-#: ../game/webserver.cc:248
+#: ../game/webserver.cc:296
 msgid "Normal"
 msgstr ""
 
-#: ../game/webserver.cc:249
+#: ../game/webserver.cc:297
 msgid "Inverted"
 msgstr ""
 
-#: ../game/webserver.cc:250
+#: ../game/webserver.cc:298
 msgid "Update every 10 sec"
 msgstr ""
 
-#: ../game/webserver.cc:251
+#: ../game/webserver.cc:299
 msgid "Refresh database"
 msgstr ""
 
-#: ../game/webserver.cc:252
+#: ../game/webserver.cc:300
 msgid "Upcoming songs"
 msgstr ""
 
-#: ../game/webserver.cc:253
+#: ../game/webserver.cc:301
 msgid "Refresh playlist"
 msgstr ""
 
-#: ../game/webserver.cc:254
+#: ../game/webserver.cc:302
 msgid ""
 "Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding "
 "Performous see /docs/Authors.txt"
 msgstr ""
 
-#: ../game/webserver.cc:255
+#: ../game/webserver.cc:303
 msgid "Search"
 msgstr ""
 
-#: ../game/webserver.cc:256
+#: ../game/webserver.cc:304
 msgid "Available songs"
 msgstr ""
 
-#: ../game/webserver.cc:257
+#: ../game/webserver.cc:305
 msgid "Search for songs"
 msgstr ""
 
-#: ../game/webserver.cc:258
+#: ../game/webserver.cc:306
 msgid "Yes"
 msgstr ""
 
-#: ../game/webserver.cc:259
+#: ../game/webserver.cc:307
 msgid "No"
+msgstr ""
+
+#: ../game/webserver.cc:309
+msgid "Move down"
+msgstr ""
+
+#: ../game/webserver.cc:310
+msgid "Set position"
+msgstr ""
+
+#: ../game/webserver.cc:311
+msgid "Remove song"
+msgstr ""
+
+#: ../game/webserver.cc:312
+msgid "Desired position of song"
+msgstr ""
+
+#: ../game/webserver.cc:313
+msgid "Cancel"
 msgstr ""
 
 #: ../game/song.hh:26
@@ -1241,4 +1261,8 @@ msgstr ""
 msgid ""
 "System defaults are included automatically. Additional paths can be added "
 "here."
+msgstr ""
+
+#: ../data/config/schema.xml:322
+msgid "Currently active sort order"
 msgstr ""

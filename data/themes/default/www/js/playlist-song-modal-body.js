@@ -3,6 +3,8 @@ $(function (){
 	var songObject = window.songObject;
 	window.songObject = null;
 
+	localize();
+
 	if(songObject.Language.length > 1) {
 		$("#playlist-song-modal-body #modal-language-div").show();
 		$("#playlist-song-modal-body #modal-language-value").text(songObject.Language);

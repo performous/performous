@@ -304,7 +304,13 @@ std::vector<std::string> WebServer::GetTranslationKeys() {
 	    gettext_noop("Available songs"),
 	    gettext_noop("Search for songs"),
 	    gettext_noop("Yes"),
-	    gettext_noop("No")
+	    gettext_noop("No"),
+	    gettext_noop("Move up"),
+	    gettext_noop("Move down"),
+	    gettext_noop("Set position"),
+	    gettext_noop("Remove song"),
+	    gettext_noop("Desired position of song"),
+	    gettext_noop("Cancel")
 	};
 
 	return tranlationKeys;

@@ -169,26 +169,30 @@ $('a[href="#playlist"]').on('shown.bs.tab', function(event){
 });
 
 $(function () {
+    localize();
+});
+
+function localize() {
     $.get("api/language", function(data) {
         var localizer = JSON.parse(data);
         $.each( localizer, function( key, value ) { 
             var $textNodes = $("*").contents().filter(function() {
-                return this.nodeType === Node.TEXT_NODE && this.textContent.match(key);
+                return this.nodeType === Node.TEXT_NODE && this.textContent.trim() == key;
             });
 
             $textNodes.each(function() {                
                  this.textContent = value;                                    
             });
 
-            $('input[type=text]').each(function(ev)
-            {
-                if($(this).attr('placeholder').match(key)) { 
+            $('input[type=text]').each(function()
+            {   
+                if($(this).attr('placeholder') == key) { 
                     $(this).attr("placeholder", value);
                 }
             });
         });
     });
-})
+};
 
 
 function clearList(selector){
