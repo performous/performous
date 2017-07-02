@@ -168,6 +168,28 @@ $('a[href="#playlist"]').on('shown.bs.tab', function(event){
     $('#refresh-playlist').click();
 });
 
+$(function () {
+    $.get("api/language", function(data) {
+        var localizer = JSON.parse(data);
+        $.each( localizer, function( key, value ) { 
+            var $textNodes = $("*").contents().filter(function() {
+                return this.nodeType === Node.TEXT_NODE && this.textContent.match(key);
+            });
+
+            $textNodes.each(function() {                
+                 this.textContent = value;                                    
+            });
+
+            $('input[type=text]').each(function(ev)
+            {
+                if($(this).attr('placeholder').match(key)) { 
+                    $(this).attr("placeholder", value);
+                }
+            });
+        });
+    });
+})
+
 
 function clearList(selector){
     var myNode = document.getElementById(selector);
