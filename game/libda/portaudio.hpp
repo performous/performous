@@ -50,8 +50,62 @@ namespace portaudio {
 		int idx;
 		int in, out;
 	};
+	
+	struct BackendInfo {
+		BackendInfo(int id, PaHostApiTypeId type, std::string n = std::string(), int n_dev = 0): idx(id), name(n), type(type), devices(n_dev) {}
+		int idx;
+		std::string name;
+		int type;
+		int devices;
+		std::string desc () const {
+		std::ostringstream oss;
+		oss << "#" << idx << ": " << name << " (" << devices << " devices)";
+		return oss.str();
+		}
+	};
 
 	typedef std::vector<DeviceInfo> DeviceInfos;
+	typedef std::vector<BackendInfo> BackendInfos;
+	
+	struct AudioBackends {
+	static int count() { return Pa_GetHostApiCount(); }
+	AudioBackends () {
+		if (count() < 1) throw std::runtime_error("No suitable audio backends found.");
+		for (unsigned i = 0, end = Pa_GetHostApiCount(); i != end; ++i) {
+			PaHostApiInfo const* info = Pa_GetHostApiInfo(i);
+			if (!info || info->deviceCount < 1) continue;
+			/*
+			Constant, unique identifier for each audio backend past alpha status.
+				1 = DirectSound
+				2 = MME
+				3 = ASIO
+				4 = SoundManager
+				5 = CoreAudio
+				7 = OSS
+				8 = ALSA
+				9 = AL
+				10 = BeOS
+				11 = WDMKS
+				12 = JACK
+				13 = WASAPI
+				14 = AudioScienceHPI
+				0 = Backend currently being developed.
+			*/
+			PaHostApiTypeId apiID = info->type;
+			std::string name = convertToUTF8(info->name);
+			backends.push_back(BackendInfo(i, apiID, name, info->deviceCount));		
+		}
+	};
+		BackendInfos backends;
+		
+		std::string dump() const {
+		std::ostringstream oss;
+		oss << "PortAudio backends:" << std::endl;
+		for (auto const& b: backends) oss << b.desc();
+			oss << std::endl;
+			return oss.str();
+		}
+	};
 
 	struct AudioDevices {
 		static int count() { return Pa_GetDeviceCount(); }
