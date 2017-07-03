@@ -240,6 +240,14 @@ to save the current settings to XML.
 		<short>Suggested latency</short>
 		<long>This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart.</long>
 	</entry>
+	<entry name="audio/backend" type="int" value="0">
+		<limits>
+		<enum>Auto</enum>
+		<!-- enum options will be added dynamically according to detected interfaces. -->
+		</limits>
+		<short>Audio Backend</short>
+		<long>Configure which audio backend to use; not all backends will be supported on all platforms. Requires restart.</long>
+	</entry>
 	<entry name="audio/video_delay" type="float" value="0.06">
 		<ui unit=" ms" multiplier="1000" />
 		<limits min="-0.5" max="0.5" step="0.01" />
