@@ -101,7 +101,7 @@ namespace portaudio {
 		std::string dump() const {
 		std::ostringstream oss;
 		oss << "PortAudio backends:" << std::endl;
-		for (auto const& b: backends) oss << b.desc();
+		for (auto const& b: backends) oss << b.desc() << std::endl;
 			oss << std::endl;
 			return oss.str();
 		}
