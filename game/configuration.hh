@@ -78,5 +78,7 @@ struct MenuEntry {
 	std::vector<std::string> items; ///< selectable options
 };
 
+int PaHostApiNameToHostApiTypeId(std::string);
+
 typedef std::vector<MenuEntry> ConfigMenu;
 extern ConfigMenu configMenu;

@@ -352,6 +352,24 @@ void readConfigXML(fs::path const& file, int mode) {
 	}
 }
 
+int PaHostApiNameToHostApiTypeId (std::string name) {
+	if (name == "Direct Sound") return 1;
+	if (name == "MME") return 2;			
+	if (name == "ASIO") return 3;
+	if (name == "Sound Manager") return 4;
+	if (name == "Core Audio") return 5;
+	if (name == "OSS") return 7; // Not an error, stupid PortAudio.
+	if (name == "ALSA") return 8;
+	if (name == "AL") return 9;
+	if (name == "BeOS") return 10;
+	if (name == "WDMKS") return 11;
+	if (name == "JACK") return 12;
+	if (name == "WASAPI") return 13;
+	if (name == "AudioScienceHPI") return 14;
+	throw std::runtime_error("Invalid PortAudio HostApiTypeId Specified.");
+}
+
+
 void readConfig() {
 	// Find config schema
 	fs::path schemaFile = getSchemaFilename();
