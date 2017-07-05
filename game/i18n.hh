@@ -7,11 +7,11 @@ using namespace std;
 using namespace boost::locale;
 
 #define _(x) translate(x).str()
-#define gettext_noop(x) x
+#define translation_noop(x) x
 
-class Gettext {
+class TranslationEngine {
 	public:
-		Gettext(const char *package) {
+		TranslationEngine(const char *package) {
 			generator gen;
 		    // Specify location of dictionaries
 		    gen.add_messages_path(getLocaleDir().string());
