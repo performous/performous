@@ -30,7 +30,7 @@ void ScreenPaths::manageEvent(SDL_Event event) {
 			config["paths/songs"].reset(modifier & KMOD_ALT);
 			config["paths/system"].reset(modifier & KMOD_ALT);
 			// TODO: Save
-		}else if (key == SDL_SCANCODE_S && modifier & KMOD_CTRL) {
+		} else if (key == SDL_SCANCODE_S && modifier & KMOD_CTRL) {
 			writeConfig(modifier & KMOD_ALT);
 			Game::getSingletonPtr()->flashMessage((modifier & KMOD_ALT)
 				? _("Settings saved as system defaults.") : _("Settings saved."));
@@ -44,11 +44,11 @@ void ScreenPaths::manageEvent(input::NavEvent const& ev) {
 		gm->activateScreen("Intro");
 	}
 	else if (ev.button == input::NAV_PAUSE) m_audio.togglePause();
-	else if (ev.button == input::NAV_DOWN) m_menu.move(1);
-	else if (ev.button == input::NAV_MOREDOWN) m_menu.move(5);
-	else if (ev.button == input::NAV_UP) m_menu.move(-1);
-	else if (ev.button == input::NAV_MOREUP) m_menu.move(-5);
-	else if (ev.button == input::NAV_START) m_menu.action();
+	else if (ev.button == input::NAV_DOWN) m_menu.move(1); //one down
+	else if (ev.button == input::NAV_MOREDOWN) m_menu.move(5); //five down (page-dwon-key)
+	else if (ev.button == input::NAV_UP) m_menu.move(-1); //one up
+	else if (ev.button == input::NAV_MOREUP) m_menu.move(-5); //five up (page up key)
+	else if (ev.button == input::NAV_START) m_menu.action(); //enter: execute currently selected option.
 }
 
 void ScreenPaths::generateMenuFromPath(fs::path path) {
@@ -127,12 +127,12 @@ void ScreenPaths::draw() {
 		const MenuOptions opts = m_menu.getOptions();
 		int start_i = std::min((int)m_menu.curIndex() - 1, (int)opts.size() - (int)showopts
 			+ (m_menu.getSubmenuLevel() == 2 ? 1 : 0)); // Hack to counter side-effects from displaying the value inside the menu
-		if (start_i < 0 || opts.size() == showopts) start_i = 0;
+		if (start_i < 0 || opts.size() == showopts) { start_i = 0; }
 		for (size_t i = start_i, ii = 0; ii < showopts && i < opts.size(); ++i, ++ii) {
 			MenuOption const& opt = opts[i];
 			if (i == m_menu.curIndex()) {
 				double selanim = m_selAnim.get() - start_i;
-				if (selanim < 0) selanim = 0;
+				if (selanim < 0) { selanim = 0; }
 				m_theme->back_h.dimensions.left(x - sel_margin).center(start_y + selanim*0.08);
 				m_theme->back_h.draw();
 				// Draw the text, dim if option not available
@@ -140,7 +140,7 @@ void ScreenPaths::draw() {
 					ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
 					m_theme->device.dimensions.left(x).center(start_y + ii*0.03);
 					m_theme->device.draw(opt.getName());
-				}
+				} // to make the colortrans object go out of scope
 				wcounter = std::max(wcounter, m_theme->device.w() + 2 * sel_margin); // Calculate the widest entry
 				// If this is a config item, show the value below
 			} else {
