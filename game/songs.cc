@@ -86,8 +86,10 @@ void Songs::reload_internal(fs::path const& parent) {
 				}
 				if(AdditionalFileIndex > 0) { //TODO: add it to existing song
 					std::clog << "songs/info: >>> not yet implemented " << std::endl;
+					s->getDurationSeconds();
 					m_songs.push_back(s); // will make it appear double!!
 				} else {
+					s->getDurationSeconds();
 					m_songs.push_back(s); //put it in the database
 				}
 				m_dirty = true;
