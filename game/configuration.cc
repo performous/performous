@@ -273,7 +273,12 @@ void writeConfig(bool system) {
 		entryNode->set_attribute("name", name);
 		std::string type = item.get_type();
 		entryNode->set_attribute("type", type);
-		if (type == "int") entryNode->set_attribute("value",boost::lexical_cast<std::string>(item.i()));
+		if (name == "audio/backend") {
+		int newValue = PaHostApiNameToHostApiTypeId(item.getEnumName());
+		std::clog << "audio/debug: Will now change value of audio backend. New Value: " << newValue << std::endl;
+			entryNode->set_attribute("value", boost::lexical_cast<std::string>(newValue));
+		}
+		else if (type == "int") entryNode->set_attribute("value",boost::lexical_cast<std::string>(item.i()));
 		else if (type == "bool") entryNode->set_attribute("value", item.b() ? "true" : "false");
 		else if (type == "float") entryNode->set_attribute("value",boost::lexical_cast<std::string>(item.f()));
 		else if (item.get_type() == "string") entryNode->add_child("stringvalue")->add_child_text(item.s());
@@ -367,19 +372,16 @@ void readConfigXML(fs::path const& file, int mode) {
 }
 
 int PaHostApiNameToHostApiTypeId (std::string name) {
-	if (name == "Direct Sound") return 1;
+	if (name == "Auto") return 1337;
+	if (name == "Windows DirectSound") return 1;
 	if (name == "MME") return 2;			
 	if (name == "ASIO") return 3;
-	if (name == "Sound Manager") return 4;
-	if (name == "Core Audio") return 5;
+	if (name == "Core Audio" || name == "CoreAudio") return 5;
 	if (name == "OSS") return 7; // Not an error, stupid PortAudio.
 	if (name == "ALSA") return 8;
-	if (name == "AL") return 9;
-	if (name == "BeOS") return 10;
-	if (name == "WDMKS") return 11;
-	if (name == "JACK") return 12;
-	if (name == "WASAPI") return 13;
-	if (name == "AudioScienceHPI") return 14;
+	if (name == "Windows WDM-KS") return 11;
+	if (name == "JACK Audio Connection Kit") return 12;
+	if (name == "Windows WASAPI") return 13;
 	throw std::runtime_error("Invalid PortAudio HostApiTypeId Specified.");
 }
 
