@@ -70,7 +70,7 @@ namespace portaudio {
 	struct AudioBackends {
 	static int count() { return Pa_GetHostApiCount(); }
 	AudioBackends () {
-		if (count() < 1) throw std::runtime_error("No suitable audio backends found.");
+		if (count() == 0) throw std::runtime_error("No suitable audio backends found."); // Check specifically for 0 because it returns a negative error code if Pa is not initialized.
 		for (unsigned i = 0, end = Pa_GetHostApiCount(); i != end; ++i) {
 			PaHostApiInfo const* info = Pa_GetHostApiInfo(i);
 			if (!info || info->deviceCount < 1) continue;
