@@ -12,6 +12,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <cmath>
+#include "audio.hh"
 
 Config config;
 
@@ -102,7 +103,20 @@ namespace {
 	}
 }
 
-std::string ConfigItem::getValue() const {
+std::string ConfigItem::getValue(bool checkingBackend) const {
+	if (checkingBackend == true) {
+		int val = boost::get<int>(m_value);
+		std::clog << "audio/info: ConfigItem::getValue(true), value of config entry is: " << val << std::endl;
+		int hostApi = Pa_HostApiTypeIdToHostApiIndex(PaHostApiTypeId(val));
+		std::clog << "audio/info: casting to PaHostApiTypeId, value of config entry is: " << hostApi << std::endl;
+		if (hostApi != paHostApiNotFound) {
+		std::string backendName = Pa_GetHostApiInfo(hostApi)->name;
+		std::clog << "audio/info: Currently selected audio backend is: " << backendName << std::endl;
+		return backendName;
+		}
+		else std::clog << "audio/warning: Currently selected audio backend is unavailable on this system, will default to Auto." << std::endl;
+		return "Auto";
+	}
 	if (m_type == "int") {
 		int val = boost::get<int>(m_value);
 		if (val >= 0 && val < int(m_enums.size())) return m_enums[val];

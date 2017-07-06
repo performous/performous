@@ -144,8 +144,9 @@ static void checkEvents(Game& gm) {
 void mainLoop(std::string const& songlist) {
 	std::clog << "core/notice: Starting the audio subsystem (errors printed on console may be ignored)." << std::endl;
 	Audio audio;
-	ConfigItem& backendEnums = config["audio/backend"];
-	for (std::string const& backend: portaudio::AudioBackends().getBackends()) backendEnums.addEnum(backend);
+	ConfigItem& backendConfig = config["audio/backend"];
+	for (std::string const& backend: portaudio::AudioBackends().getBackends()) backendConfig.addEnum(backend);
+	backendConfig.selectEnum(backendConfig.getValue(true));
 	std::clog << "core/info: Loading assets." << std::endl;
 	TranslationEngine localization(PACKAGE);
 	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());

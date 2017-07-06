@@ -34,7 +34,7 @@ class ConfigItem {
 	void select(int i); ///< Set optionlist selected item index
 	void reset(bool factory = false) { m_value = factory ? m_factoryDefaultValue : m_defaultValue; } ///< Reset to default
 	void makeSystem() { m_defaultValue = m_value; } ///< Make current value the system default (used when saving system config)
-	std::string getValue() const; ///< Get a human-readable representation of the current value
+	std::string getValue(bool checkingBackend = false) const; ///< Get a human-readable representation of the current value
 	std::string const& getShortDesc() const { return m_shortDesc; } ///< get the short description for this ConfigItem
 	std::string const& getLongDesc() const { return m_longDesc; } ///< get the long description for this ConfigItem
 	void addEnum(std::string name); ///< Dynamically adds an enum to all values
