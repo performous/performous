@@ -133,9 +133,13 @@ namespace portaudio {
 			#endif
 		}
 		/// Constructor gets the PA devices into a vector
-		AudioDevices() {
-			for (unsigned i = 0, end = Pa_GetDeviceCount(); i != end; ++i) {
-				PaDeviceInfo const* info = Pa_GetDeviceInfo(i);
+		AudioDevices(PaHostApiTypeId const backend = PaHostApiTypeId(1337)) {
+		PaHostApiIndex backendIndex = Pa_HostApiTypeIdToHostApiIndex((backend == PaHostApiTypeId(1337) ? defaultBackEnd() : backend));
+		if (backendIndex == paHostApiNotFound) backendIndex = Pa_HostApiTypeIdToHostApiIndex(defaultBackEnd());
+				std::clog << "audio/debug: backendIndex is " << backendIndex << std::endl;
+
+			for (unsigned i = 0, end = Pa_GetHostApiInfo(backendIndex)->deviceCount; i != end; ++i) {
+				PaDeviceInfo const* info = Pa_GetDeviceInfo(Pa_HostApiDeviceIndexToDeviceIndex(backendIndex, i));
 				if (!info) continue;
 				std::string name = convertToUTF8(info->name);
 				/// Omit some useless legacy devices of PortAudio/ALSA from our list
