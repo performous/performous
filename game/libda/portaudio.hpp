@@ -112,10 +112,10 @@ namespace portaudio {
 				bends.insert(temp.name);
 			}
 			//TODO: REMOVE THESE, currently using them for debugging.
-			bends.insert(std::string("Windows WASAPI"));
-			bends.insert(std::string("ALSA"));
-			bends.insert(std::string("Windows WDM-KS"));
-			bends.insert(std::string("JACK Audio Connection Kit"));
+// 			bends.insert(std::string("Windows WASAPI"));
+// 			bends.insert(std::string("ALSA"));
+// 			bends.insert(std::string("Windows WDM-KS"));
+// 			bends.insert(std::string("JACK Audio Connection Kit"));
 			
 			return std::list<std::string>(bends.begin(),bends.end());
 		}
