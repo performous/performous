@@ -181,7 +181,7 @@ namespace portaudio {
 		/// Get a printable dump of the devices
 		std::string dump() const {
 			std::ostringstream oss;
-			oss << "PortAudio devices:" << std::endl;
+			oss << "audio/info: PortAudio devices:" << std::endl;
 			for (auto const& d: devices) oss << "  #" << d.idx << " " << d.desc() << std::endl;
 			oss << std::endl;
 			return oss.str();
