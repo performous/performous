@@ -434,6 +434,9 @@ struct Audio::Impl {
 	bool playback;
 	Impl(): init(), playback() {
 		std::clog << "audio/info: " << portaudio::AudioBackends().dump() << std::flush;
+	ConfigItem& backendConfig = config["audio/backend"];
+	for (std::string const& backend: portaudio::AudioBackends().getBackends()) backendConfig.addEnum(backend);
+	backendConfig.selectEnum(backendConfig.getValue(true));
 		std::clog << "audio/info: " << portaudio::AudioDevices().dump() << std::flush;
 		// Parse audio devices from config
 		ConfigItem::StringList devs = config["audio/devices"].sl();
