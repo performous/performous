@@ -123,6 +123,15 @@ namespace portaudio {
 
 	struct AudioDevices {
 		static int count() { return Pa_GetDeviceCount(); }
+		static PaHostApiTypeId defaultBackEnd() {
+			#ifdef _WIN32
+				return PaHostApiTypeId(13); // WASAPI
+			#elif __APPLE__
+				return PaHostApiTypeId(5); // CoreAudio
+			#elif __linux__
+				return PaHostApiTypeId(8); // ALSA
+			#endif
+		}
 		/// Constructor gets the PA devices into a vector
 		AudioDevices() {
 			for (unsigned i = 0, end = Pa_GetDeviceCount(); i != end; ++i) {
