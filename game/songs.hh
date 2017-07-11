@@ -67,6 +67,7 @@ class Songs: boost::noncopyable {
 	std::string sortDesc() const;
 	/// Change sorting mode (diff is normally -1 or 1)
 	void sortChange(int diff);
+	void sortSpecificChange(int sortOrder, bool descending = false);
 	/// parses file into Song &tmp
 	void parseFile(Song& tmp);
 
@@ -85,7 +86,7 @@ class Songs: boost::noncopyable {
 	void reload_internal(fs::path const& p);
 	void randomize_internal();
 	void filter_internal();
-	void sort_internal();
+	void sort_internal(bool descending = false);
 	volatile bool m_dirty;
 	volatile bool m_loading;
 	boost::scoped_ptr<boost::thread> m_thread;

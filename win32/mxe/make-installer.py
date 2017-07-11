@@ -86,7 +86,7 @@ RequestExecutionLevel admin
 !insertmacro MUI_LANGUAGE "English"
 
 Section
-''' % version)
+''' % '1.1.3')
 
 for root, dirs, files in os.walk('.'):
     makensis.stdin.write('  SetOutPath "$INSTDIR\\%s"\n' % instpath(root))
@@ -143,4 +143,4 @@ if makensis.wait() != 0:
     print >>sys.stderr, 'Installer compilation failed.'
     sys.exit(1)
 else:
-    print '\ndist/Performous-%s.exe is ready.' % version
+    print '\ndist/Performous-%s.exe is ready.' % '1.1.3'

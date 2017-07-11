@@ -4,6 +4,6 @@ sudo apt-get install git-core
 git clone -b master https://github.com/mxe/mxe.git
 cp settings.mk ./mxe/settings.mk
 cd mxe
-make
+#make
 cd ..
 echo "mxe has been build please run the make-performous script"

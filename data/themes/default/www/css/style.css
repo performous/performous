@@ -1,0 +1,62 @@
+.header {
+    background: #000000;
+    color: #FFFFFF;
+}
+
+.navbar-nav {
+    width:100%;
+}
+
+.navbar-nav li {
+    width: 33.3333333%;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.glyph-centered {
+    display:block;
+    text-align:center;
+}
+
+.list-group-item .glyphicon {
+    text-align: right;
+    float:right;
+    width:14px;
+}
+
+.fixed-pixel-glyphicon {
+    width: 31px;
+}
+
+td {
+    max-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#playlist-song-modal-body span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.btn:last-child {
+    margin-bottom: 15px;
+}
+
+.drag-drop a {
+    background-color: #fff;
+}
+.drag-drop .sortable-ghost {
+    opacity: 0.4;
+    background-color: #F4E2C9;
+}
+
+.drag-drop a:first-letter {
+    text-transform: uppercase;
+}
+
+.validation-summary-valid.alert-danger {
+    display: none;
+}
