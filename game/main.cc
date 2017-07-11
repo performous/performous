@@ -145,7 +145,7 @@ void mainLoop(std::string const& songlist) {
 	std::clog << "core/notice: Starting the audio subsystem (errors printed on console may be ignored)." << std::endl;
 	Audio audio;
 	std::clog << "core/info: Loading assets." << std::endl;
-	Gettext localization(PACKAGE);
+	TranslationEngine localization(PACKAGE);
 	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
 	SurfaceLoader m_loader;
 	Backgrounds backgrounds;
@@ -413,7 +413,7 @@ int main(int argc, char** argv) try {
 
 void outputOptionalFeatureStatus() {
 	std::clog << "core/notice: " PACKAGE " " VERSION " starting..."
-	  << "\n  Internationalization: " << (Gettext::enabled() ? "Enabled" : "Disabled")
+	  << "\n  Internationalization: " << (TranslationEngine::enabled() ? "Enabled" : "Disabled")
 	  << "\n  MIDI Hardware I/O:    " << (input::Hardware::midiEnabled() ? "Enabled" : "Disabled")
 	  << "\n  Webcam support:       " << (Webcam::enabled() ? "Enabled" : "Disabled")
 	  << std::endl;
