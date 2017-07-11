@@ -22,6 +22,20 @@ Niek Nooijens <https://github.com/nieknooijens>
 	* Emedded Webserver (with help from Lasse Kärkkäinen)
 	* Mobile page design.
 
+Arjan Speiard <https://asgardsings.nl>
+	* WebServer features.
+		* Autocompletion
+		* Localization
+		* Structure
+		* Set song position
+	* Introduced 8 player mode.
+	
+Gregorio Litenstein <http://www.fail.cl>
+	* macOS builds, fixes and testing.
+	* Spanish localization.
+	* Very occasional contributions in other areas.
+	* A doctor, not an engineer; goddamn it, Jim.
+
 
 INACTIVE DEVELOPERS
 -------------------
