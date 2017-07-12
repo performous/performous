@@ -3,7 +3,7 @@ $(function (){
 	var songObject = window.songObject;
 	window.songObject = null;
 
-	localize();
+	localize("#dynamic-modal", true);
 
 	if(songObject.Language.length > 1) {
 		$("#playlist-song-modal-body #modal-language-div").show();

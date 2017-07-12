@@ -135,7 +135,7 @@ $('#search-database').click(function(e, callback) {
     });
 });
 
-$("#search-tab").click(function (){
+/*$("#search-tab").click(function (){
     $.get("api/getDataBase.json", function(data) {
         var database = JSON.parse(data);
         var input = $("#search-field");
@@ -151,7 +151,7 @@ $("#search-tab").click(function (){
             }
         });
     });
-});
+});*/
 
 $('#search-field').keypress(function (e) {
     if (e.which == 13) {
@@ -174,30 +174,42 @@ $('a[href="#playlist"]').on('shown.bs.tab', function(event){
 });
 
 $(function () {
-    localize();
+    localize("body", false);
 });
 
-function localize() {
-    $.get("api/language", function(data) {
-        var localizer = JSON.parse(data);
-        $.each( localizer, function( key, value ) { 
-            var $textNodes = $("*").contents().filter(function() {
-                return this.nodeType === Node.TEXT_NODE && this.textContent.trim() == key;
-            });
-
-            $textNodes.each(function() {                
-                 this.textContent = value;                                    
-            });
-
-            $('input[type=text]').each(function()
-            {   
-                if($(this).attr('placeholder') == key) { 
-                    $(this).attr("placeholder", value);
-                }
+function localize(selector, fromCache = true) {
+    if(fromCache){
+        $.each( localStorage, function( key, value ) { 
+            localizeInternal(selector, key, value);
+        });
+    } else {
+        $.get("api/language", function(data) {
+            var localizer = JSON.parse(data);
+            $.each( localizer, function( key, value ) { 
+                localizeInternal(selector, key, value);
+                localStorage.setItem(key,value);
             });
         });
-    });
+    }
+    
 };
+
+function localizeInternal(selector, key, value) {
+    var textNodes = $(selector).find("*").contents().filter(function() {
+        return this.nodeType === Node.TEXT_NODE && this.textContent.trim() == key;
+    });
+
+    textNodes.each(function() {                
+         this.textContent = value;                                    
+    });
+
+    $('input[type=text]').each(function()
+    {   
+        if($(this).attr('placeholder') == key) { 
+            $(this).attr("placeholder", value);
+        }
+    });
+}
 
 
 function clearList(selector){
@@ -252,9 +264,9 @@ function buildTable(database){
 }
 
 function buildAlertMessage(message, messageType){
-    var innerhtml = "<div class=\"container-fluid\"><div class=\"alert alert-"+messageType+" alert-dismissable\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>"+message+"</div></div>";
+    var localizedMessage = localStorage.getItem(message);
+    var innerhtml = "<div class=\"container-fluid\"><div class=\"alert alert-"+messageType+" alert-dismissable\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>"+localizedMessage+"</div></div>";
     $("#alert-messages").append(innerhtml);
-    localize();
     window.setTimeout(function() {
         $(".alert").fadeTo(500, 0).slideUp(500, function(){
             $(this).remove(); 
