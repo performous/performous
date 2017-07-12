@@ -7,7 +7,7 @@ using namespace std;
 using namespace boost::locale;
 
 #define _(x) translate(x).str()
-#define translation_noop(x) x
+#define gettext_noop(x) x
 
 class TranslationEngine {
 	public:
