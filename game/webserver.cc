@@ -2,9 +2,6 @@
 #ifdef USE_CPPNETLIB
 #include <boost/network/protocol/http/server.hpp>
 
-#include <boost/locale.hpp>
-#include <iostream>
-
 namespace http = boost::network::http;
 
 
@@ -234,29 +231,29 @@ std::map<std::string, std::string> WebServer::GenerateLocaleDict() {
 
 std::vector<std::string> WebServer::GetTranslationKeys() {
 	std::vector<std::string> tranlationKeys = { 
-		translation_noop("Performous web frontend"),
-	    translation_noop("View database"),
-	    translation_noop("View playlist"),
-	    translation_noop("Search and Add"),
-	    translation_noop("Sort by"),
-	    translation_noop("Artist"),
-	    translation_noop("Title"),
-	    translation_noop("Language"),
-	    translation_noop("Edition"),
-	    translation_noop("Creator"),
-	    translation_noop("Sort order"),
-	    translation_noop("Normal"),
-	    translation_noop("Inverted"),
-	    translation_noop("Update every 10 sec"),
-	    translation_noop("Refresh database"),
-	    translation_noop("Upcoming songs"),
-	    translation_noop("Refresh playlist"),
-	    translation_noop("Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding Performous see /docs/Authors.txt"),
-	    translation_noop("Search"),
-	    translation_noop("Available songs"),
-	    translation_noop("Search for songs"),
-	    translation_noop("Yes"),
-	    translation_noop("No")
+		translate_noop("Performous web frontend"),
+	    translate_noop("View database"),
+	    translate_noop("View playlist"),
+	    translate_noop("Search and Add"),
+	    translate_noop("Sort by"),
+	    translate_noop("Artist"),
+	    translate_noop("Title"),
+	    translate_noop("Language"),
+	    translate_noop("Edition"),
+	    translate_noop("Creator"),
+	    translate_noop("Sort order"),
+	    translate_noop("Normal"),
+	    translate_noop("Inverted"),
+	    translate_noop("Update every 10 sec"),
+	    translate_noop("Refresh database"),
+	    translate_noop("Upcoming songs"),
+	    translate_noop("Refresh playlist"),
+	    translate_noop("Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding Performous see /docs/Authors.txt"),
+	    translate_noop("Search"),
+	    translate_noop("Available songs"),
+	    translate_noop("Search for songs"),
+	    translate_noop("Yes"),
+	    translate_noop("No")
 	};
 
 	return tranlationKeys;

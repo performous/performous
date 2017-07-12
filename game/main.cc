@@ -1,5 +1,4 @@
-
-#include "backgrounds.hh"
+﻿#include "backgrounds.hh"
 #include "config.hh"
 #include "controllers.hh"
 #include "database.hh"
@@ -178,7 +177,7 @@ void mainLoop(std::string const& songlist) {
 		gm.addScreen(new ScreenSing("Sing", audio, database, backgrounds));
 		gm.addScreen(new ScreenPractice("Practice", audio));
 		gm.addScreen(new ScreenAudioDevices("AudioDevices", audio));
-		gm.addScreen(new ScreenPaths("Paths", audio));
+		gm.addScreen(new ScreenPaths("Paths", audio, songs));
 		gm.addScreen(new ScreenPlayers("Players", audio, database));
 		gm.addScreen(new ScreenPlaylist("Playlist", audio, songs, backgrounds));
 		gm.activateScreen("Intro");

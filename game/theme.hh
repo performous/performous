@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "opengl_text.hh"
 #include "surface.hh"
@@ -72,6 +72,8 @@ public:
 	SvgTxtTheme comment;
 	/// comment background
 	Surface comment_bg;
+	/// back highlight for selected option
+	Surface back_h;
 };
 
 /// theme for intro screen
