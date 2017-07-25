@@ -104,8 +104,8 @@ namespace {
 
 std::string ConfigItem::getValue(bool checkingBackend) const {
 	if (checkingBackend == true) {
-		int val = boost::get<int>(m_value);
 		int AutoBackendType = 1337;
+		static int val = boost::get<int>(m_value);
 		std::clog << "audio/debug: Value of selected audio backend in config.xml is: " << val << std::endl;
 		int hostApi = Pa_HostApiTypeIdToHostApiIndex(PaHostApiTypeId(val));
 		std::ostringstream oss;
@@ -126,19 +126,19 @@ std::string ConfigItem::getValue(bool checkingBackend) const {
 		else std::clog << "audio/warning: Currently selected audio backend is unavailable on this system, will default to Auto." << std::endl;
 		return "Auto";
 	}
-	if (m_type == "int") {
+	else if (m_type == "int") {
 		int val = boost::get<int>(m_value);
 		if (val >= 0 && val < int(m_enums.size())) return m_enums[val];
 		return numericFormat<int>(m_value, m_multiplier, m_step) + m_unit;
 	}
-	if (m_type == "float") return numericFormat<double>(m_value, m_multiplier, m_step) + m_unit;
-	if (m_type == "bool") return boost::get<bool>(m_value) ? _("Enabled") : _("Disabled");
-	if (m_type == "string") return boost::get<std::string>(m_value);
-	if (m_type == "string_list") {
+	else if (m_type == "float") return numericFormat<double>(m_value, m_multiplier, m_step) + m_unit;
+	else if (m_type == "bool") return boost::get<bool>(m_value) ? _("Enabled") : _("Disabled");
+	else if (m_type == "string") return boost::get<std::string>(m_value);
+	else if (m_type == "string_list") {
 		StringList const& sl = boost::get<StringList>(m_value);
 		return sl.size() == 1 ? "{" + sl[0] + "}" : (boost::format(_("%d items")) % sl.size()).str();
 	}
-	if (m_type == "option_list") return boost::get<OptionList>(m_value).at(m_sel);
+	else if (m_type == "option_list") return boost::get<OptionList>(m_value).at(m_sel);
 	throw std::logic_error("ConfigItem::getValue doesn't know type '" + m_type + "'");
 }
 
@@ -380,7 +380,7 @@ void readConfigXML(fs::path const& file, int mode) {
 	}
 }
 
-int PaHostApiNameToHostApiTypeId (std::string name) {
+int PaHostApiNameToHostApiTypeId (const std::string& name) {
 	if (name == "Auto") return 1337;
 	if (name == "Windows DirectSound") return 1;
 	if (name == "MME") return 2;			
@@ -408,5 +408,13 @@ void readConfig() {
 	ConfigItem& ci = config["game/theme"];
 	for (std::string const& theme: getThemes()) ci.addEnum(theme);
 	if (ci.i() == -1) ci.selectEnum("default");  // Select the default theme if nothing is selected
+}
+
+void populateBackends (const std::list<std::string>& backendList) {
+		ConfigItem& backendConfig = config["audio/backend"];
+		for (std::string const& backend: backendList) backendConfig.addEnum(backend);
+		static const std::string selectedBackend = backendConfig.getValue(true);
+		backendConfig.selectEnum(selectedBackend);
+		std::clog << "config/debug: Will now select enum case: " << selectedBackend << std::endl;
 }
 

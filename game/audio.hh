@@ -42,9 +42,12 @@ struct Device {
 	}
 };
 
+extern PaHostApiTypeId getBackend();
 
 /** @short High level audio playback API **/
 class Audio {
+	friend PaHostApiTypeId getBackend();
+	static ConfigItem& backendConfig();
 	struct Impl;
 	boost::scoped_ptr<Impl> self;
 public:
@@ -102,4 +105,3 @@ public:
 	/** Get sample rate */
 	double getSR() const { return 48000.0; }
 };
-

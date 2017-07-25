@@ -67,6 +67,7 @@ extern Config config; ///< A global variable that contains all config items
 
 /** Read config schema and configuration from XML files **/
 void readConfig();
+void populateBackends(const std::list<std::string>& backendList);
 
 /** Write modified config options to user's or system-wide config XML **/
 void writeConfig(bool system = false);
@@ -79,7 +80,7 @@ struct MenuEntry {
 	std::vector<std::string> items; ///< selectable options
 };
 
-int PaHostApiNameToHostApiTypeId(std::string);
+int PaHostApiNameToHostApiTypeId(const std::string& name);
 
 typedef std::vector<MenuEntry> ConfigMenu;
 extern ConfigMenu configMenu;

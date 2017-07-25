@@ -423,18 +423,15 @@ int Device::operator()(void const* input, void* output, unsigned long frames, co
 	return paAbort;
 }
 
-
-
 struct Audio::Impl {
 	Output output;
 	portaudio::Init init;
 	boost::ptr_vector<Analyzer> analyzers;
 	boost::ptr_vector<Device> devices;
 	bool playback;
+	std::string selectedBackend = Audio::backendConfig().getValue(true);
 	Impl(): init(), playback() {
-	ConfigItem& backendConfig = config["audio/backend"];
-	for (std::string const& backend: portaudio::AudioBackends().getBackends()) backendConfig.addEnum(backend);
-	backendConfig.selectEnum(backendConfig.getValue(true));
+	populateBackends(portaudio::AudioBackends().getBackends());
 	std::clog << "audio/debug: Audio::Impl, selectedBackend is: " << selectedBackend << std::endl;
 	std::clog << portaudio::AudioBackends().dump() << std::flush; // Dump PortAudio backends and devices to log.
 		// Parse audio devices from config
@@ -471,7 +468,7 @@ struct Audio::Impl {
 				// Sync mics/in settings together
 				if (params.in == 0) params.in = params.mics.size();
 				else params.mics.resize(params.in);
-				portaudio::AudioDevices ad;
+				portaudio::AudioDevices ad(PaHostApiTypeId(PaHostApiNameToHostApiTypeId(selectedBackend)));
 				auto const& info = ad.find(params.dev);
 				std::clog << "audio/info: Trying audio device \"" << params.dev << "\", idx: " << info.idx
 					<< ", in: " << params.in << ", out: " << params.out << std::endl;
@@ -520,6 +517,11 @@ struct Audio::Impl {
 
 Audio::Audio(): self(new Impl) {}
 Audio::~Audio() {}
+
+ConfigItem& Audio::backendConfig() {
+	static ConfigItem& backend = config["audio/backend"];
+	return backend;
+}
 
 void Audio::restart() { self.reset(new Impl); }
 void Audio::close() { self.reset(); }
