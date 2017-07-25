@@ -12,6 +12,7 @@
 #include "notes.hh"
 #include "pitch.hh"
 #include "util.hh"
+#include "configuration.hh"
 
 const unsigned AUDIO_MAX_ANALYZERS = 11;
 

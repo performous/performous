@@ -1,4 +1,4 @@
-#include "configuration.hh"
+#include "audio.hh" // audio.hh includes configuration.hh
 
 #include "fs.hh"
 #include "util.hh"
@@ -12,7 +12,6 @@
 #include <stdexcept>
 #include <iostream>
 #include <cmath>
-#include "audio.hh"
 
 Config config;
 

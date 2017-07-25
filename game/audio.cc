@@ -9,7 +9,6 @@
 #include <iostream>
 #include <map>
 
-#include "configuration.hh"
 #include "libda/fft.hpp"  // For M_PI
 #include "libda/portaudio.hpp"
 #include "util.hh"

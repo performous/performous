@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <list>
 
 namespace xmlpp { class Element; }  // Forward declaration for libxml++ stuff
 
