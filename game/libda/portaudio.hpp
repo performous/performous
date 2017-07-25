@@ -50,78 +50,8 @@ namespace portaudio {
 		int idx;
 		int in, out;
 	};
-	
-	struct BackendInfo {
-		BackendInfo(int id, PaHostApiTypeId type, std::string n = std::string(), int n_dev = 0): idx(id), name(n), type(type), devices(n_dev) {}
-		int idx;
-		std::string name;
-		int type;
-		int devices;
-		std::string desc () const {
-		std::ostringstream oss;
-		oss << "#" << idx << ": " << name << " (" << devices << " devices)";
-		return oss.str();
-		}
-	};
-
-	typedef std::vector<DeviceInfo> DeviceInfos;
-	typedef std::vector<BackendInfo> BackendInfos;
-	
-	struct AudioBackends {
-	static int count() { return Pa_GetHostApiCount(); }
-	AudioBackends () {
-		if (count() == 0) throw std::runtime_error("No suitable audio backends found."); // Check specifically for 0 because it returns a negative error code if Pa is not initialized.
-		for (unsigned i = 0, end = Pa_GetHostApiCount(); i != end; ++i) {
-			PaHostApiInfo const* info = Pa_GetHostApiInfo(i);
-			if (!info || info->deviceCount < 1) continue;
-			/*
-			Constant, unique identifier for each audio backend past alpha status.
-				1 = DirectSound
-				2 = MME
-				3 = ASIO
-				4 = SoundManager
-				5 = CoreAudio
-				7 = OSS
-				8 = ALSA
-				9 = AL
-				10 = BeOS
-				11 = WDMKS
-				12 = JACK
-				13 = WASAPI
-				14 = AudioScienceHPI
-				0 = Backend currently being developed.
-			*/
-			PaHostApiTypeId apiID = info->type;
-			std::string name = convertToUTF8(info->name);
-			backends.push_back(BackendInfo(i, apiID, name, info->deviceCount));		
-		}
-	};
-		BackendInfos backends;
-		
-		std::string dump() const {
-		std::ostringstream oss;
-		oss << "PortAudio backends:" << std::endl;
-		for (auto const& b: backends) oss << b.desc() << std::endl;
-			oss << std::endl;
-			return oss.str();
-		}
-		std::list<std::string> getBackends() {
-			std::set<std::string> bends;
-			for (auto const& temp: backends) {
-				std::clog << "audio/debug: getBackends() found audio backend " << temp.name << "." << std::endl;
-				bends.insert(temp.name);
-			}
-			//TODO: REMOVE THESE, currently using them for debugging.
-// 			bends.insert(std::string("Windows WASAPI"));
-// 			bends.insert(std::string("ALSA"));
-// 			bends.insert(std::string("Windows WDM-KS"));
-// 			bends.insert(std::string("JACK Audio Connection Kit"));
-			
-			return std::list<std::string>(bends.begin(),bends.end());
-		}
-	};
-
-	struct AudioDevices {
+		typedef std::vector<DeviceInfo> DeviceInfos;
+		struct AudioDevices {
 		static int count() { return Pa_GetDeviceCount(); }
 		static PaHostApiTypeId defaultBackEnd() {
 			#ifdef _WIN32
@@ -197,6 +127,69 @@ namespace portaudio {
 			throw std::runtime_error("No such device.");
 		}
 		DeviceInfos devices;
+	};
+	
+	struct BackendInfo {
+		BackendInfo(int id, PaHostApiTypeId type, std::string n = std::string(), int n_dev = 0): idx(id), name(n), type(type), devices(n_dev) {}
+		int idx;
+		std::string name;
+		PaHostApiTypeId type;
+		int devices;
+		std::string desc () const {
+		std::ostringstream oss;
+		oss << "  #" << idx << ": " << name << " (" << devices << " devices):" << std::endl;
+		oss << portaudio::AudioDevices(type).dump();
+		return oss.str();
+		}
+	};
+
+	typedef std::vector<BackendInfo> BackendInfos;
+	
+	struct AudioBackends {
+	static int count() { return Pa_GetHostApiCount(); }
+	AudioBackends () {
+		if (count() == 0) throw std::runtime_error("No suitable audio backends found."); // Check specifically for 0 because it returns a negative error code if Pa is not initialized.
+		for (unsigned i = 0, end = Pa_GetHostApiCount(); i != end; ++i) {
+			PaHostApiInfo const* info = Pa_GetHostApiInfo(i);
+			if (!info || info->deviceCount < 1) continue;
+			/*
+			Constant, unique identifier for each audio backend past alpha status.
+				1 = DirectSound
+				2 = MME
+				3 = ASIO
+				4 = SoundManager
+				5 = CoreAudio
+				7 = OSS
+				8 = ALSA
+				9 = AL
+				10 = BeOS
+				11 = WDMKS
+				12 = JACK
+				13 = WASAPI
+				14 = AudioScienceHPI
+				0 = Backend currently being developed.
+			*/
+			PaHostApiTypeId apiID = info->type;
+			std::string name = convertToUTF8(info->name);
+			backends.push_back(BackendInfo(i, apiID, name, info->deviceCount));		
+		}
+	};
+		BackendInfos backends;
+		
+		std::string dump() const {
+		std::ostringstream oss;
+		oss << "audio/info: PortAudio backends:" << std::endl;
+		for (auto const& b: backends) oss << b.desc() << std::endl;
+			return oss.str();
+		}
+		std::list<std::string> getBackends() {
+			std::set<std::string> bends;
+			for (auto const& temp: backends) {
+				std::clog << "audio/debug: getBackends() found audio backend " << temp.name << " (hostApi type: " << temp.type << ")." << std::endl;
+				bends.insert(temp.name);
+			}
+			return std::list<std::string>(bends.begin(),bends.end());
+		}
 	};
 
 	struct Init {
