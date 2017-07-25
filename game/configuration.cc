@@ -165,10 +165,21 @@ namespace {
 
 void ConfigItem::addEnum(std::string name) {
 	verifyType("int");
-	m_enums.push_back(name);
-	m_min = 0;
-	m_max = int(m_enums.size() - 1);
-	m_step = 1;
+	std::clog << "config/debug: addEnum() on enum with shortDesc: " << this->getShortDesc() << std::endl;
+	std::ostringstream oss;
+	oss << "config/debug: addEnum() already got cases: " << std::endl;
+		for (std::string const& enumCase: m_enums) oss << enumCase << std::endl;
+		std::clog << oss.str();
+		if (find(m_enums.begin(),m_enums.end(),name) == m_enums.end()) {
+		std::clog << "config/debug: addEnum()... adding case: " << name << std::endl;	
+		m_enums.push_back(name);
+		}
+		else {
+		std::clog << "config/debug: addEnum()... case: " << name << " already exists..." << std::endl;	
+		}
+		m_min = 0;
+		m_max = int(m_enums.size() - 1);
+		m_step = 1;
 }
 
 void ConfigItem::selectEnum(std::string const& name) {
