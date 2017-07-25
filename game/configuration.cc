@@ -107,6 +107,7 @@ std::string ConfigItem::getValue(bool checkingBackend) const {
 	if (checkingBackend == true) {
 		int val = boost::get<int>(m_value);
 		std::clog << "audio/info: ConfigItem::getValue(true), value of config entry is: " << val << std::endl;
+		int AutoBackendType = 1337;
 		int hostApi = Pa_HostApiTypeIdToHostApiIndex(PaHostApiTypeId(val));
 		std::clog << "audio/info: casting to PaHostApiIndex, value of config entry is: " << hostApi << std::endl;
 		if (hostApi != paHostApiNotFound) {

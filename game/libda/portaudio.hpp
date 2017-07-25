@@ -53,6 +53,7 @@ namespace portaudio {
 		typedef std::vector<DeviceInfo> DeviceInfos;
 		struct AudioDevices {
 		static int count() { return Pa_GetDeviceCount(); }
+		static const PaHostApiTypeId AutoBackendType = PaHostApiTypeId(1337);
 		static PaHostApiTypeId defaultBackEnd() {
 			#ifdef _WIN32
 				return PaHostApiTypeId(13); // WASAPI
@@ -63,8 +64,8 @@ namespace portaudio {
 			#endif
 		}
 		/// Constructor gets the PA devices into a vector
-		AudioDevices(PaHostApiTypeId const backend = PaHostApiTypeId(1337)) {
-		PaHostApiIndex backendIndex = Pa_HostApiTypeIdToHostApiIndex((backend == PaHostApiTypeId(1337) ? defaultBackEnd() : backend));
+		AudioDevices(PaHostApiTypeId backend = AutoBackendType) {
+		PaHostApiIndex backendIndex = Pa_HostApiTypeIdToHostApiIndex((backend == AutoBackendType ? defaultBackEnd() : backend));
 		if (backendIndex == paHostApiNotFound) backendIndex = Pa_HostApiTypeIdToHostApiIndex(defaultBackEnd());
 				std::clog << "audio/debug: backendIndex is " << backendIndex << std::endl;
 
