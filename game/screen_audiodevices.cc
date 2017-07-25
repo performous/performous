@@ -20,6 +20,12 @@ namespace {
 	}
 }
 
+PaHostApiTypeId getBackend() {
+	static std::string selectedBackend = Audio::backendConfig().getValue(true);
+	return PaHostApiTypeId(PaHostApiNameToHostApiTypeId(selectedBackend));
+}
+
+
 ScreenAudioDevices::ScreenAudioDevices(std::string const& name, Audio& audio): Screen(name), m_audio(audio) {
 	m_selector.reset(new Surface(findFile("device_selector.svg")));
 	m_mic_icon.reset(new Surface(findFile("sing_pbox.svg")));
@@ -28,7 +34,7 @@ ScreenAudioDevices::ScreenAudioDevices(std::string const& name, Audio& audio): S
 
 void ScreenAudioDevices::enter() {
 	m_theme.reset(new ThemeAudioDevices());
-	portaudio::AudioDevices ads;
+	portaudio::AudioDevices ads(getBackend());
 	m_devs = ads.devices;
 	// FIXME: Something more elegant, like a warning box
 	if (m_devs.empty()) throw std::runtime_error("No audio devices found!");
