@@ -65,10 +65,9 @@ namespace portaudio {
 		}
 		/// Constructor gets the PA devices into a vector
 		AudioDevices(PaHostApiTypeId backend = AutoBackendType) {
+		std::clog << "audio/debug: AudioDevices constructor initializing with backend type: " << backend << std::endl;
 		PaHostApiIndex backendIndex = Pa_HostApiTypeIdToHostApiIndex((backend == AutoBackendType ? defaultBackEnd() : backend));
 		if (backendIndex == paHostApiNotFound) backendIndex = Pa_HostApiTypeIdToHostApiIndex(defaultBackEnd());
-				std::clog << "audio/debug: backendIndex is " << backendIndex << std::endl;
-
 			for (unsigned i = 0, end = Pa_GetHostApiInfo(backendIndex)->deviceCount; i != end; ++i) {
 				PaDeviceInfo const* info = Pa_GetDeviceInfo(Pa_HostApiDeviceIndexToDeviceIndex(backendIndex, i));
 				if (!info) continue;
@@ -112,9 +111,7 @@ namespace portaudio {
 		/// Get a printable dump of the devices
 		std::string dump() const {
 			std::ostringstream oss;
-			oss << "audio/info: PortAudio devices:" << std::endl;
-			for (auto const& d: devices) oss << "  #" << d.idx << " " << d.desc() << std::endl;
-			oss << std::endl;
+			for (auto const& d: devices) oss << "    #" << d.idx << " " << d.desc() << std::endl;
 			return oss.str();
 		}
 		DeviceInfo const& find(std::string const& name) {

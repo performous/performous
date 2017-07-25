@@ -433,11 +433,11 @@ struct Audio::Impl {
 	boost::ptr_vector<Device> devices;
 	bool playback;
 	Impl(): init(), playback() {
-		std::clog << "audio/info: " << portaudio::AudioBackends().dump() << std::flush;
 	ConfigItem& backendConfig = config["audio/backend"];
 	for (std::string const& backend: portaudio::AudioBackends().getBackends()) backendConfig.addEnum(backend);
 	backendConfig.selectEnum(backendConfig.getValue(true));
-		std::clog << "audio/info: " << portaudio::AudioDevices().dump() << std::flush;
+	std::clog << "audio/debug: Audio::Impl, selectedBackend is: " << selectedBackend << std::endl;
+	std::clog << portaudio::AudioBackends().dump() << std::flush; // Dump PortAudio backends and devices to log.
 		// Parse audio devices from config
 		ConfigItem::StringList devs = config["audio/devices"].sl();
 		for (ConfigItem::StringList::const_iterator it = devs.begin(), end = devs.end(); it != end; ++it) {

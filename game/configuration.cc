@@ -106,12 +106,21 @@ namespace {
 std::string ConfigItem::getValue(bool checkingBackend) const {
 	if (checkingBackend == true) {
 		int val = boost::get<int>(m_value);
-		std::clog << "audio/info: ConfigItem::getValue(true), value of config entry is: " << val << std::endl;
 		int AutoBackendType = 1337;
+		std::clog << "audio/debug: Value of selected audio backend in config.xml is: " << val << std::endl;
 		int hostApi = Pa_HostApiTypeIdToHostApiIndex(PaHostApiTypeId(val));
-		std::clog << "audio/info: casting to PaHostApiIndex, value of config entry is: " << hostApi << std::endl;
-		if (hostApi != paHostApiNotFound) {
-		std::string backendName = Pa_GetHostApiInfo(hostApi)->name;
+		std::ostringstream oss;
+		oss << "audio/debug: Trying the selected Portaudio backend...";
+		if (val != AutoBackendType) {
+			oss << " found at index: " << hostApi;
+		}
+		else {
+			oss << " not found; but this is normal when Auto is selected."; // Auto is not a real PaHostApiTypeId, so it will always return paHostApiNotFound
+		}
+		oss << std::endl;
+		std::clog << oss.str();
+		if ((hostApi != paHostApiNotFound) || (val == AutoBackendType)) {
+		std::string backendName = (val != AutoBackendType) ? Pa_GetHostApiInfo(hostApi)->name : "Auto";
 		std::clog << "audio/info: Currently selected audio backend is: " << backendName << std::endl;
 		return backendName;
 		}
