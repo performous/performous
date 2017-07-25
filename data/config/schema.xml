@@ -240,7 +240,7 @@ to save the current settings to XML.
 		<short>Suggested latency</short>
 		<long>This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart.</long>
 	</entry>
-	<entry name="audio/backend" type="int" value="0">
+	<entry name="audio/backend" type="int" value="1337">
 		<limits>
 		<enum>Auto</enum>
 		<!-- enum options will be added dynamically according to detected interfaces. -->
