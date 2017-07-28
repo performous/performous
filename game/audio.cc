@@ -429,7 +429,7 @@ struct Audio::Impl {
 	boost::ptr_vector<Analyzer> analyzers;
 	boost::ptr_vector<Device> devices;
 	bool playback;
-	std::string selectedBackend = Audio::backendConfig().getValue(true);
+	std::string selectedBackend = Audio::backendConfig().getValue();
 	Impl(): init(), playback() {
 	populateBackends(portaudio::AudioBackends().getBackends());
 	std::clog << portaudio::AudioBackends().dump() << std::flush; // Dump PortAudio backends and devices to log.

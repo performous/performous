@@ -101,8 +101,8 @@ namespace {
 	}
 }
 
-std::string ConfigItem::getValue(bool checkingBackend) const {
-	if (checkingBackend == true) {
+std::string const& ConfigItem::getValue() const {
+	if (this->getShortDesc() == config["audio/backend"].getShortDesc()) {
 		int AutoBackendType = 1337;
 		static int val = boost::get<int>(m_value);
 		std::clog << "audio/debug: Value of selected audio backend in config.xml is: " << val << std::endl;
@@ -414,7 +414,8 @@ void readConfig() {
 void populateBackends (const std::list<std::string>& backendList) {
 		ConfigItem& backendConfig = config["audio/backend"];
 		for (std::string const& backend: backendList) backendConfig.addEnum(backend);
-		static const std::string selectedBackend = backendConfig.getValue(true);
+		static std::string selectedBackend = "";
+		selectedBackend = backendConfig.getValue();
 		backendConfig.selectEnum(selectedBackend);
 }
 
