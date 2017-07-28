@@ -43,6 +43,7 @@ struct Device {
 };
 
 extern int getBackend();
+class ConfigItem;
 
 /** @short High level audio playback API **/
 class Audio {

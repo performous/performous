@@ -7,6 +7,7 @@
 #include <list>
 
 namespace xmlpp { class Element; }  // Forward declaration for libxml++ stuff
+class Audio;
 
 /// configuration option
 class ConfigItem {
@@ -70,7 +71,7 @@ void readConfig();
 void populateBackends(const std::list<std::string>& backendList);
 
 /** Write modified config options to user's or system-wide config XML **/
-void writeConfig(bool system = false);
+void writeConfig(Audio& m_audio, bool system = false);
 
 /// struct for entries in menu
 struct MenuEntry {

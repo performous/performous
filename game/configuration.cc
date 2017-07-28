@@ -3,6 +3,7 @@
 #include "fs.hh"
 #include "util.hh"
 #include "i18n.hh"
+#include "screen_intro.hh"
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
@@ -105,6 +106,7 @@ std::string const& ConfigItem::getValue() const {
 	if (this->getShortDesc() == config["audio/backend"].getShortDesc()) {
 		int AutoBackendType = 1337;
 		static int val = boost::get<int>(m_value);
+		if (val != boost::get<int>(m_value)) val = PaHostApiNameToHostApiTypeId(this->getEnumName()); // In the case of the audio backend, val is the real value while m_value is the enum case for its cosmetic name.
 		std::clog << "audio/debug: Value of selected audio backend in config.xml is: " << val << std::endl;
 		int hostApi = Pa_HostApiTypeIdToHostApiIndex(PaHostApiTypeId(val));
 		std::ostringstream oss;
@@ -123,7 +125,7 @@ std::string const& ConfigItem::getValue() const {
 		return backendName;
 		}
 		else std::clog << "audio/warning: Currently selected audio backend is unavailable on this system, will default to Auto." << std::endl;
-		return "Auto";
+		return std::string("Auto");
 	}
 	else if (m_type == "int") {
 		int val = boost::get<int>(m_value);
@@ -270,7 +272,7 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 fs::path systemConfFile;
 fs::path userConfFile;
 
-void writeConfig(bool system) {
+void writeConfig(Audio& m_audio, bool system) {
 	xmlpp::Document doc;
 	xmlpp::Node* nodeRoot = doc.create_root_node("performous");
 	bool dirty = false;
@@ -287,6 +289,14 @@ void writeConfig(bool system) {
 		int newValue = PaHostApiNameToHostApiTypeId(item.getEnumName());
 		std::clog << "audio/debug: Will now change value of audio backend. New Value: " << newValue << std::endl;
 			entryNode->set_attribute("value", boost::lexical_cast<std::string>(newValue));
+		std::clog << "audio/info: Audio backend changed; will now restart audio subsystem." << std::endl;
+		
+		Audio::backendConfig().selectEnum(item.getEnumName());
+		boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(m_audio)));
+		if (!audiokiller.timed_join(boost::posix_time::milliseconds(2500)))
+		Game::getSingletonPtr()->fatalError("Audio hung for some reason.\nPlease restart Performous.");
+		m_audio.restart();
+		m_audio.playMusic(findFile("menu.ogg"), true); // Start music again
 		}
 		else if (type == "int") entryNode->set_attribute("value",boost::lexical_cast<std::string>(item.i()));
 		else if (type == "bool") entryNode->set_attribute("value", item.b() ? "true" : "false");

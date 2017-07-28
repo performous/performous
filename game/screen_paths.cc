@@ -31,7 +31,7 @@ void ScreenPaths::manageEvent(SDL_Event event) {
 			config["paths/system"].reset(modifier & KMOD_ALT);
 			// TODO: Save
 		} else if (key == SDL_SCANCODE_S && modifier & KMOD_CTRL) {
-			writeConfig(modifier & KMOD_ALT);
+			writeConfig(m_audio, modifier & KMOD_ALT);
 			Game::getSingletonPtr()->flashMessage((modifier & KMOD_ALT)
 				? _("Settings saved as system defaults.") : _("Settings saved."));
 		}

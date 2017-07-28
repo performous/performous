@@ -187,7 +187,7 @@ bool ScreenAudioDevices::save(bool skip_ui_config) {
 		}
 		config["audio/devices"].sl() = devconf;
 	}
-	writeConfig(); // Save the new config
+	writeConfig(m_audio,false); // Save the new config
 	// Give audio a little time to shutdown but then just quit
 	boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(m_audio)));
 	if (!audiokiller.timed_join(boost::posix_time::milliseconds(2500)))

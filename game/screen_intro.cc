@@ -68,7 +68,7 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 		if (key == SDL_SCANCODE_R && modifier & KMOD_CTRL && m_menu.current().value) {
 			m_menu.current().value->reset(modifier & KMOD_ALT);
 		} else if (key == SDL_SCANCODE_S && modifier & KMOD_CTRL) {
-			writeConfig(modifier & KMOD_ALT);
+			writeConfig(m_audio, modifier & KMOD_ALT);
 			Game::getSingletonPtr()->flashMessage((modifier & KMOD_ALT)
 				? _("Settings saved as system defaults.") : _("Settings saved."));
 		}
