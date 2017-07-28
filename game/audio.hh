@@ -47,11 +47,11 @@ extern PaHostApiTypeId getBackend();
 /** @short High level audio playback API **/
 class Audio {
 	friend PaHostApiTypeId getBackend();
-	static ConfigItem& backendConfig();
 	struct Impl;
 	boost::scoped_ptr<Impl> self;
 public:
 	typedef std::map<std::string, fs::path> Files;
+	static ConfigItem& backendConfig();
 	Audio();
 	~Audio();
 	void restart();
