@@ -42,11 +42,11 @@ struct Device {
 	}
 };
 
-extern PaHostApiTypeId getBackend();
+extern int getBackend();
 
 /** @short High level audio playback API **/
 class Audio {
-	friend PaHostApiTypeId getBackend();
+	friend int getBackend();
 	struct Impl;
 	boost::scoped_ptr<Impl> self;
 public:

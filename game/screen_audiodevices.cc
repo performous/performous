@@ -1,4 +1,4 @@
-﻿#include "screen_audiodevices.hh"
+#include "screen_audiodevices.hh"
 
 #include "configuration.hh"
 #include "controllers.hh"
@@ -20,9 +20,9 @@ namespace {
 	}
 }
 
-PaHostApiTypeId getBackend() {
-	static std::string selectedBackend = Audio::backendConfig().getValue(true);
-	return PaHostApiTypeId(PaHostApiNameToHostApiTypeId(selectedBackend));
+int getBackend() {
+	static std::string selectedBackend = Audio::backendConfig().getValue();
+	return PaHostApiNameToHostApiTypeId(selectedBackend);
 }
 
 
@@ -33,8 +33,11 @@ ScreenAudioDevices::ScreenAudioDevices(std::string const& name, Audio& audio): S
 }
 
 void ScreenAudioDevices::enter() {
+	int bend = getBackend();
+	std::clog << "audio-devices/debug: Entering audio Devices... backend has been detected as: " << bend << std::endl;
 	m_theme.reset(new ThemeAudioDevices());
-	portaudio::AudioDevices ads(getBackend());
+	PaHostApiTypeId backend = PaHostApiTypeId(bend);
+	portaudio::AudioDevices ads(backend);
 	m_devs = ads.devices;
 	// FIXME: Something more elegant, like a warning box
 	if (m_devs.empty()) throw std::runtime_error("No audio devices found!");
