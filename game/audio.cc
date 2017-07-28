@@ -432,7 +432,6 @@ struct Audio::Impl {
 	std::string selectedBackend = Audio::backendConfig().getValue(true);
 	Impl(): init(), playback() {
 	populateBackends(portaudio::AudioBackends().getBackends());
-	std::clog << "audio/debug: Audio::Impl, selectedBackend is: " << selectedBackend << std::endl;
 	std::clog << portaudio::AudioBackends().dump() << std::flush; // Dump PortAudio backends and devices to log.
 		// Parse audio devices from config
 		ConfigItem::StringList devs = config["audio/devices"].sl();

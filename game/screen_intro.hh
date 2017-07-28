@@ -24,7 +24,6 @@ class ScreenIntro : public Screen {
 	void manageEvent(input::NavEvent const& event);
 	void draw();
 
-
   private:
 	void draw_menu_options();
 	void draw_webserverNotice();

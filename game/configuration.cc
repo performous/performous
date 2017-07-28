@@ -15,7 +15,6 @@
 
 Config config;
 
-
 ConfigItem::ConfigItem(bool bval): m_type("bool"), m_value(bval), m_sel() { }
 
 ConfigItem::ConfigItem(int ival): m_type("int"), m_value(ival), m_sel() { }
@@ -417,6 +416,5 @@ void populateBackends (const std::list<std::string>& backendList) {
 		for (std::string const& backend: backendList) backendConfig.addEnum(backend);
 		static const std::string selectedBackend = backendConfig.getValue(true);
 		backendConfig.selectEnum(selectedBackend);
-		std::clog << "config/debug: Will now select enum case: " << selectedBackend << std::endl;
 }
 
