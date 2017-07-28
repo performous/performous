@@ -27,6 +27,7 @@ class ConfigItem {
 	bool isDefault(bool factory = false) const { return isDefaultImpl(factory ? m_factoryDefaultValue : m_defaultValue); }
 	std::string get_type() const { return m_type; } ///< get the field type
 	int& i(); ///< Access integer item
+	int const& i() const; ///< Access integer item
 	bool& b(); ///< Access boolean item
 	double& f(); ///< Access floating-point item
 	std::string& s(); ///< Access string item
@@ -41,7 +42,7 @@ class ConfigItem {
 	std::string const& getLongDesc() const { return m_longDesc; } ///< get the long description for this ConfigItem
 	void addEnum(std::string name); ///< Dynamically adds an enum to all values
 	void selectEnum(std::string const& name); ///< Set integer value by enum name
-	std::string getEnumName(); ///< Returns the selected enum option's text
+	std::string const& getEnumName() const; ///< Returns the selected enum option's text
 
   private:
 	template <typename T> void updateNumeric(xmlpp::Element& elem, int mode); ///< Used internally for loading XML

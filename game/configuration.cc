@@ -68,6 +68,7 @@ void ConfigItem::verifyType(std::string const& type) const {
 }
 
 int& ConfigItem::i() { verifyType("int"); return boost::get<int>(m_value); }
+int const& ConfigItem::i() const { verifyType("int"); return boost::get<int>(m_value); }
 bool& ConfigItem::b() { verifyType("bool"); return boost::get<bool>(m_value); }
 double& ConfigItem::f() { verifyType("float"); return boost::get<double>(m_value); }
 std::string& ConfigItem::s() { verifyType("string"); return boost::get<std::string>(m_value); }
@@ -181,8 +182,8 @@ void ConfigItem::selectEnum(std::string const& name) {
 }
 
 
-std::string ConfigItem::getEnumName() {
-	int val = i();
+std::string const& ConfigItem::getEnumName() const {
+	int const& val = i();
 	if (val >= 0 && val < int(m_enums.size())) return m_enums[val];
 	return "";
 }
