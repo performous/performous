@@ -103,7 +103,7 @@ namespace {
 	}
 }
 
-std::string const& ConfigItem::getValue() const {
+std::string const ConfigItem::getValue() const {
 	if (this->getShortDesc() == config["audio/backend"].getShortDesc()) {
 		int AutoBackendType = 1337;
 		static int val = boost::get<int>(m_value);
@@ -126,7 +126,7 @@ std::string const& ConfigItem::getValue() const {
 		return backendName;
 		}
 		else std::clog << "audio/warning: Currently selected audio backend is unavailable on this system, will default to Auto." << std::endl;
-		return std::string("Auto");
+		return "Auto";
 	}
 	else if (m_type == "int") {
 		int val = boost::get<int>(m_value);
@@ -182,7 +182,7 @@ void ConfigItem::selectEnum(std::string const& name) {
 }
 
 
-std::string const& ConfigItem::getEnumName() const {
+std::string const ConfigItem::getEnumName() const {
 	int const& val = i();
 	if (val >= 0 && val < int(m_enums.size())) return m_enums[val];
 	return "";

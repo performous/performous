@@ -37,12 +37,12 @@ class ConfigItem {
 	void select(int i); ///< Set optionlist selected item index
 	void reset(bool factory = false) { m_value = factory ? m_factoryDefaultValue : m_defaultValue; } ///< Reset to default
 	void makeSystem() { m_defaultValue = m_value; } ///< Make current value the system default (used when saving system config)
-	std::string const& getValue() const; ///< Get a human-readable representation of the current value
+	std::string const getValue() const; ///< Get a human-readable representation of the current value
 	std::string const& getShortDesc() const { return m_shortDesc; } ///< get the short description for this ConfigItem
 	std::string const& getLongDesc() const { return m_longDesc; } ///< get the long description for this ConfigItem
 	void addEnum(std::string name); ///< Dynamically adds an enum to all values
 	void selectEnum(std::string const& name); ///< Set integer value by enum name
-	std::string const& getEnumName() const; ///< Returns the selected enum option's text
+	std::string const getEnumName() const; ///< Returns the selected enum option's text
 
   private:
 	template <typename T> void updateNumeric(xmlpp::Element& elem, int mode); ///< Used internally for loading XML
