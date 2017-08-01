@@ -26,6 +26,13 @@ void ScreenPaths::manageEvent(SDL_Event event) {
 		SDL_Keycode key = event.key.keysym.scancode;
 		uint16_t modifier = event.key.keysym.mod;
 		// Reset to defaults
+		#ifdef __APPLE__
+		if (key == SDL_SCANCODE_R && modifier & KMOD_GUI) {
+			config["paths/songs"].reset(modifier & KMOD_ALT);
+			config["paths/system"].reset(modifier & KMOD_ALT);
+			// TODO: Save
+		} else if (key == SDL_SCANCODE_S && modifier & KMOD_GUI) {
+		#else
 		if (key == SDL_SCANCODE_R && modifier & KMOD_CTRL) {
 			config["paths/songs"].reset(modifier & KMOD_ALT);
 			config["paths/system"].reset(modifier & KMOD_ALT);

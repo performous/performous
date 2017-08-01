@@ -65,6 +65,11 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 		// These are only available in config menu
 		int key = event.key.keysym.scancode;
 		uint16_t modifier = event.key.keysym.mod;
+		#ifdef __APPLE__
+		if (key == SDL_SCANCODE_R && modifier & KMOD_GUI && m_menu.current().value) {
+			m_menu.current().value->reset(modifier & KMOD_ALT);
+		} else if (key == SDL_SCANCODE_S && modifier & KMOD_GUI) {
+		#else
 		if (key == SDL_SCANCODE_R && modifier & KMOD_CTRL && m_menu.current().value) {
 			m_menu.current().value->reset(modifier & KMOD_ALT);
 		} else if (key == SDL_SCANCODE_S && modifier & KMOD_CTRL) {

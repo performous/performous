@@ -87,7 +87,11 @@ void ScreenAudioDevices::manageEvent(SDL_Event event) {
 		uint16_t modifier = event.key.keysym.mod;
 		if (m_devs.empty()) return; // The rest work if there are any config options
 		// Reset to defaults
+		#ifdef __APPLE__
+		else if (key == SDL_SCANCODE_R && modifier & KMOD_GUI) {
+		#else
 		else if (key == SDL_SCANCODE_R && modifier & KMOD_CTRL) {
+		#endif
 			config["audio/devices"].reset(modifier & KMOD_ALT);
 			save(true); // Save to disk, reload audio & reload UI to keep stuff consistent
 		}
