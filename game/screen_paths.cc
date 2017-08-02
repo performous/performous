@@ -28,16 +28,18 @@ void ScreenPaths::manageEvent(SDL_Event event) {
 		// Reset to defaults
 		#ifdef __APPLE__
 		if (key == SDL_SCANCODE_R && modifier & KMOD_GUI) {
-			config["paths/songs"].reset(modifier & KMOD_ALT);
-			config["paths/system"].reset(modifier & KMOD_ALT);
-			// TODO: Save
-		} else if (key == SDL_SCANCODE_S && modifier & KMOD_GUI) {
 		#else
 		if (key == SDL_SCANCODE_R && modifier & KMOD_CTRL) {
+		#endif
 			config["paths/songs"].reset(modifier & KMOD_ALT);
 			config["paths/system"].reset(modifier & KMOD_ALT);
 			// TODO: Save
-		} else if (key == SDL_SCANCODE_S && modifier & KMOD_CTRL) {
+		}
+		#ifdef __APPLE__
+		else if (key == SDL_SCANCODE_S && modifier & KMOD_GUI) {
+		#else
+		else if (key == SDL_SCANCODE_S && modifier & KMOD_CTRL) {
+		#endif
 			writeConfig(modifier & KMOD_ALT);
 			Game::getSingletonPtr()->flashMessage((modifier & KMOD_ALT)
 				? _("Settings saved as system defaults.") : _("Settings saved."));

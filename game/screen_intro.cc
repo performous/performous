@@ -67,12 +67,16 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 		uint16_t modifier = event.key.keysym.mod;
 		#ifdef __APPLE__
 		if (key == SDL_SCANCODE_R && modifier & KMOD_GUI && m_menu.current().value) {
-			m_menu.current().value->reset(modifier & KMOD_ALT);
-		} else if (key == SDL_SCANCODE_S && modifier & KMOD_GUI) {
 		#else
 		if (key == SDL_SCANCODE_R && modifier & KMOD_CTRL && m_menu.current().value) {
+		#endif
 			m_menu.current().value->reset(modifier & KMOD_ALT);
-		} else if (key == SDL_SCANCODE_S && modifier & KMOD_CTRL) {
+		}
+		#ifdef __APPLE__
+		else if (key == SDL_SCANCODE_S && modifier & KMOD_GUI) {
+		#else
+		else if (key == SDL_SCANCODE_S && modifier & KMOD_CTRL) {
+		#endif
 			writeConfig(modifier & KMOD_ALT);
 			Game::getSingletonPtr()->flashMessage((modifier & KMOD_ALT)
 				? _("Settings saved as system defaults.") : _("Settings saved."));
