@@ -110,16 +110,16 @@ namespace portaudio {
 		/// Get a printable dump of the devices
 		std::string dump() const {
 			std::ostringstream oss;
-			for (auto const& d: devices) oss << "    #" << d.idx << " " << d.desc() << std::endl;
+			for (auto const& d: devices) { oss << "    #" << d.idx << " " << d.desc() << std::endl; }
 			return oss.str();
 		}
 		DeviceInfo const& find(std::string const& name) {
 			// Try name search with full match
-			for (auto const& dev: devices) if (dev.name == name) return dev;
+			for (auto const& dev: devices) { if (dev.name == name) { return dev;  } }
 			// Try name search with partial/flexible match
 			for (auto const& dev: devices) {
-				if (dev.name.find(name) != std::string::npos) return dev;
-				if (dev.flex.find(name) != std::string::npos) return dev;
+				if (dev.name.find(name) != std::string::npos) { return dev; }
+				if (dev.flex.find(name) != std::string::npos) { return dev; }
 			}
 			throw std::runtime_error("No such device.");
 		}
@@ -176,7 +176,7 @@ namespace portaudio {
 		std::string dump() const {
 		std::ostringstream oss;
 		oss << "audio/info: PortAudio backends:" << std::endl;
-		for (auto const& b: backends) oss << b.desc() << std::endl;
+		for (auto const& b: backends) { oss << b.desc() << std::endl; }
 			return oss.str();
 		}
 		std::list<std::string> getBackends() {
