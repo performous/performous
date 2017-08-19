@@ -673,7 +673,8 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		m_rank = _("No player!");
 	else {
 		// Determine winner
-		ScoreItem winner = *std::min_element(m_database.scores.begin(), m_database.scores.end());  // Note: best score comes first
+		m_database.scores.sort([](ScoreItem i, ScoreItem j) -> bool { return (i.score>j.score); });
+		ScoreItem winner = *std::max_element(m_database.scores.begin(), m_database.scores.end());
 		int topScore = winner.score;
 		// Determine rank
 		if (winner.type == input::DEVTYPE_VOCALS) {
