@@ -110,11 +110,10 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 				std::clog << "screen_paths/notice: Ignoring hidden folder: ." << p.c_str() << std::endl;
 				continue;
 			} else {
-				m_menu.add(MenuOption(p.c_str(),_("Open folder")).call([this, p](){
-					generateMenuFromPath(p);
+				m_menu.add(MenuOption(boost::lexical_cast<std::string>(p),_("Open folder")).call([this, p](){ generateMenuFromPath(p);
 				}));
 			}
-
+			
 		}
 	}
 }
