@@ -74,7 +74,7 @@ Json::Value WebServer::SongsToJsonObject(){
 		SongObject["Edition"] = m_songs[i]->edition;
 		SongObject["Language"] = m_songs[i]->language;
 		SongObject["Creator"] = m_songs[i]->creator;
-		SongObject["Duration"] = m_songs[i]->getDurationSeconds();
+		//SongObject["Duration"] = m_songs[i]->getDurationSeconds();
 		SongObject["name"] = m_songs[i]->artist + " - " + m_songs[i]->title;
 		jsonRoot.append(SongObject);
 	}
