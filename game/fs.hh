@@ -6,6 +6,10 @@
 namespace fs = boost::filesystem;
 
 std::list<std::string> getThemes();  ///< Find all theme folders and return theme names.
+
+/// Recursively copies a folder, throws on error.
+void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destinationDir);
+
 /// Determine where the important system paths and most importantly the config schema are. Must be run before any of the functions below.
 void pathBootstrap();
 
