@@ -34,13 +34,6 @@
 #include <vector>
 #include <cstdlib>
 
-#if defined(_WIN32)
-extern "C" {
-// For DWORD (see end of file)
-#include "windef.h"
-}
-#endif
-
 // Disable main level exception handling for debug builds (because gdb cannot properly catch throwing otherwise)
 #ifdef NDEBUG
 #define RUNTIME_ERROR std::runtime_error
@@ -420,13 +413,3 @@ void outputOptionalFeatureStatus() {
 	  << "\n  Webcam support:       " << (Webcam::enabled() ? "Enabled" : "Disabled")
 	  << std::endl;
 }
-
-#if defined(_WIN32)
-// Force high-performance graphics on dual-GPU systems
-extern "C" {
-	// http://developer.download.nvidia.com/devzone/devcenter/gamegraphics/files/OptimusRenderingPolicies.pdf
-	__declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
-	// https://community.amd.com/thread/169965
-	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
-}
-#endif
