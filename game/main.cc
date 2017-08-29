@@ -6,6 +6,7 @@
 #include "glutil.hh"
 #include "i18n.hh"
 #include "log.hh"
+#include "platform.hh"
 #include "profiler.hh"
 #include "screen.hh"
 #include "songs.hh"
@@ -142,6 +143,7 @@ static void checkEvents(Game& gm) {
 }
 
 void mainLoop(std::string const& songlist) {
+	Platform platform;
 	std::clog << "core/notice: Starting the audio subsystem (errors printed on console may be ignored)." << std::endl;
 	Audio audio;
 	std::clog << "core/info: Loading assets." << std::endl;
