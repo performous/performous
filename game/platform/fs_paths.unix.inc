@@ -23,7 +23,7 @@
 			}
 			// System-wide config files
 			{
-				sysConf = "/etc/xdg/performous";
+				sysConf = (Platform::currentOS() == Platform::macos) ? "/Library/Preferences/Performous" : "/etc/xdg/performous";
 			}
 			
 			// Home
@@ -34,21 +34,35 @@
 			
 			// Config
 			{
-				char const* p = getenv("XDG_CONFIG_HOME");
-				conf = (p ? p : home / ".config");
-
-				conf /= performous;
+				if (Platform::currentOS() == Platform::macos) {
+					conf = (home / "Library/Preferences/Performous");
+				}
+				else {
+					char const* p = getenv("XDG_CONFIG_HOME");
+					conf = (p ? p : home / ".config");
+					conf /= performous;
+				}
 			}
 			
 			// Data
 			{
+				if (Platform::currentOS() == Platform::macos) {
+					data = share;
+				}
+				else {
 				char const* p = getenv("XDG_DATA_HOME");
 				data = (p ? p / performous : home / ".local" / SHARED_DATA_DIR);
+				}
 			}
 			// Cache
 			{
+				if (Platform::currentOS() == Platform::macos) {
+					cache = (home / "Library/Caches/Performous"); 
+				}
+				else {
 				char const* p = getenv("XDG_CACHE_HOME");
 				cache = (p ? p / performous : home / ".cache" / performous);
+				}
 			}
 			pathInit();
 		}
