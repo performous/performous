@@ -6,6 +6,7 @@
 #include "glutil.hh"
 #include "i18n.hh"
 #include "log.hh"
+#include "pi.hh"
 #include "platform.hh"
 #include "profiler.hh"
 #include "screen.hh"
