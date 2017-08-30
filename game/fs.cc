@@ -31,7 +31,7 @@ namespace {
 
 	struct PathCache {
 		Paths paths;
-		
+		bool didMigrateConfig = false;
 		fs::path base, share, locale, sysConf, home, conf, data, cache;
 		/// Expand a path specifier as a list of actual paths. Expands ~ (home) and DATADIR (Performous search path).
 	Paths pathExpand(fs::path p) {
@@ -66,11 +66,7 @@ void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destina
     {
         throw std::runtime_error("Source directory " + sourceDir.string() + " does not exist or is not a directory");
     }
-    if (fs::exists(destinationDir))
-    {
-        throw std::runtime_error("Destination directory " + destinationDir.string() + " already exists");
-    }
-    if (!fs::create_directory(destinationDir))
+    if (!fs::create_directory(destinationDir) && !fs::exists(destinationDir))
     {
         throw std::runtime_error("Cannot create destination directory " + destinationDir.string());
     }
@@ -80,7 +76,13 @@ void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destina
         const auto& path = dirEnt.path();
         auto relativePathStr = path.string();
         boost::algorithm::replace_first(relativePathStr, sourceDir.string(), "");
-        fs::copy(path, destinationDir / relativePathStr);
+        try { 
+        if (!fs::is_directory(path)) { fs::copy_file(path, destinationDir / relativePathStr); }
+        else { fs::copy_directory(path, destinationDir / relativePathStr); }
+        }
+        catch (...) {
+        throw std::runtime_error("Cannot copy file " + path.string() + ", because it already exists in the destination folder.");
+        }
     }
 }
 

@@ -84,21 +84,24 @@
 			}
 				if (Platform::currentOS() == Platform::macos) {
 				char const* p = getenv("XDG_CONFIG_HOME");
-				fs::path oldConf = (p ? p : home / ".config");
-				oldConf /= performous;
-				if (is_directory(oldConf)) {
-				std::clog << "fs/info: Configuration files found in old path: ~/.config/performous" << std::endl;
+				fs::path oldConf = (p ? p : home / ".config/performous");
+				if (fs::is_directory(oldConf)) {
+				std::clog << "fs/info: Configuration files found in old path, " << oldConf << std::endl;
 				conf = (home / "/Library/Preferences/Performous");
-				try {
-					copyDirectoryRecursively(oldConf, conf);
-					fs::remove_all(oldConf);
-					fs::path oldCache = (home / ".cache/performous");
-					fs::remove_all(oldCache);
-				std::clog << "fs/info: Succesfully moved configuration files to their new location: " << conf.string() << std::endl;
-				} catch (...) {
-				throw std::runtime_error("Unable to move configuration data to " + conf.string());
+					if (bootstrapping) {
+						copyDirectoryRecursively(oldConf, conf);
+					try {
+						fs::remove_all(oldConf);
+						fs::path oldCache = (home / ".cache/performous");
+						fs::remove_all(oldCache);
+						didMigrateConfig = true;
+					}
+					catch (...) {
+						throw std::runtime_error("There was an error migrating configuration to " + conf.string());
+					}
+					}
 				}
-				}
+				if (didMigrateConfig) { std::clog << "fs/info: Succesfully moved configuration files to their new location: " << conf.string() << std::endl; }
 				}
 			// Data dirs
 			std::string logmsg = "fs/info: Determining data dirs (search path):\n";
