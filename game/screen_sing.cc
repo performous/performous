@@ -605,7 +605,7 @@ void ScreenSing::drawMenu() {
 		txt->dimensions.middle(x).center(y);
 		txt->draw(it->getName());
 		if (it->value == &m_vocalTracks[player]) {
-			if(player < analyzers.size()) {
+					if(boost::lexical_cast<size_t>(player) < analyzers.size()) {
 				Color color = MicrophoneColor::get(analyzers[player].getId());
 				ColorTrans c(color);
 				m_player_icon->dimensions.right(x).fixedHeight(0.040).center(y);
@@ -669,7 +669,8 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		m_rank = _("No player!");
 	else {
 		// Determine winner
-		ScoreItem winner = *std::min_element(m_database.scores.begin(), m_database.scores.end());  // Note: best score comes first
+		m_database.scores.sort([](ScoreItem i, ScoreItem j) -> bool { return (i.score>j.score); });
+		ScoreItem winner = *std::max_element(m_database.scores.begin(), m_database.scores.end());
 		int topScore = winner.score;
 		// Determine rank
 		if (winner.type == input::DEVTYPE_VOCALS) {

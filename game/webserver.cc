@@ -96,7 +96,23 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
 	} else if(request.destination == "/api/getplaylistTimeout") {
 		return http_server::response::stock_reply(http_server::response::ok, std::to_string(config["game/playlist_screen_timeout"].i()));
-	} else {
+	} else if(request.destination.find("/api/language") == 0) {
+		map<std::string, std::string> localeMap = GenerateLocaleDict();
+		
+		Json::Value jsonRoot = Json::objectValue;
+		for (auto const &kv : localeMap) {
+			std::string key = kv.first;
+			//Hack to get an easy key value pair within the json object.
+			if(key == "Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding Performous see /docs/Authors.txt"){
+				key = "Credits";
+			}
+			std::replace(key.begin(), key.end(), ' ','_');
+			boost::to_lower(key);
+			jsonRoot[key] = kv.second;
+		}
+        return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
+}
+	else {
 		//other text files
 		try {
 			std::string destination = request.destination;
@@ -203,6 +219,46 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 	}
 }
 
+std::map<std::string, std::string> WebServer::GenerateLocaleDict() {
+	std::vector<std::string> translationKeys = GetTranslationKeys();
+    
+    map<std::string, std::string> localeMap;
+    for (auto const &translationKey : translationKeys) {
+		localeMap.insert(pair<std::string, std::string>(translationKey, _(translationKey)));
+	}
+    return localeMap;
+}
+
+std::vector<std::string> WebServer::GetTranslationKeys() {
+	std::vector<std::string> tranlationKeys = { 
+		translate_noop("Performous web frontend"),
+	    translate_noop("View database"),
+	    translate_noop("View playlist"),
+	    translate_noop("Search and Add"),
+	    translate_noop("Sort by"),
+	    translate_noop("Artist"),
+	    translate_noop("Title"),
+	    translate_noop("Language"),
+	    translate_noop("Edition"),
+	    translate_noop("Creator"),
+	    translate_noop("Sort order"),
+	    translate_noop("Normal"),
+	    translate_noop("Inverted"),
+	    translate_noop("Update every 10 sec"),
+	    translate_noop("Refresh database"),
+	    translate_noop("Upcoming songs"),
+	    translate_noop("Refresh playlist"),
+	    translate_noop("Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding Performous see /docs/Authors.txt"),
+	    translate_noop("Search"),
+	    translate_noop("Available songs"),
+	    translate_noop("Search for songs"),
+	    translate_noop("Yes"),
+	    translate_noop("No")
+	};
+
+	return tranlationKeys;
+}
+
 boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 	Json::Value root;   // will contains the root value after parsing.
 	Json::Reader reader;
@@ -224,4 +280,8 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 
 	return boost::shared_ptr<Song>();
 }
+#else
+WebServer::WebServer(Songs& songs)
+	: m_songs(songs) {}
+WebServer::~WebServer(){}
 #endif
