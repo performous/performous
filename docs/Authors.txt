@@ -143,4 +143,3 @@ Ville Virkkala <vvirkkal at cc.hut.fi>
 	
 Tuomas Perälä <tuomas.perala at hut.fi>
 	* Silky Strings Qt-based launcher
-
