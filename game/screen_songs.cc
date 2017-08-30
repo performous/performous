@@ -5,6 +5,7 @@
 #include "database.hh"
 #include "hiscore.hh"
 #include "i18n.hh"
+#include "platform.hh"
 #include "screen_sing.hh"
 #include "screen_playlist.hh"
 #include "songs.hh"
@@ -156,11 +157,7 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			m_songs.setFilter(m_search.text);
 		}
 		else if (!m_jukebox) {
-		#ifdef __APPLE__
-			if (key == SDL_SCANCODE_R && mod & KMOD_GUI) {
-		#else
-			if (key == SDL_SCANCODE_R && mod & KMOD_CTRL) {
-		#endif
+			if (key == SDL_SCANCODE_R && mod & Platform::shortcutModifier()) {
 				m_songs.reload();
 				m_songs.setFilter(m_search.text);
 				}

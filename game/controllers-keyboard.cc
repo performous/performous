@@ -1,4 +1,5 @@
 #include "controllers.hh"
+#include "platform.hh"
 
 #include <set>
 
@@ -46,11 +47,7 @@ namespace input {
 			event.hw = sdlEv.key.keysym.scancode;
 			event.value = (sdlEv.type == SDL_KEYDOWN ? 1.0 : 0.0);
 			// Get the modifier keys that we actually use as modifiers
-			#ifdef __APPLE__
-			unsigned mod = sdlEv.key.keysym.mod & (KMOD_LGUI | KMOD_LALT);
-			#else
-			unsigned mod = sdlEv.key.keysym.mod & (KMOD_LCTRL | KMOD_LALT);
-			#endif
+			unsigned mod = sdlEv.key.keysym.mod & (Platform::shortcutModifier(false) | KMOD_LALT);
 			// Map to keyboard instruments (sets event.button if matching)
 			if (!mod) mapping(event);
 			// Map to menu navigation
@@ -130,11 +127,7 @@ namespace input {
 				if (k == SDL_SCANCODE_PAGEDOWN) return GENERIC_MOREDOWN;
 				if (k == SDL_SCANCODE_PAUSE) return GENERIC_PAUSE;
 			}
-			#ifdef __APPLE__
-			else if (mod == KMOD_LGUI) {
-			#else
-			else if (mod == KMOD_LCTRL) {
-			#endif
+			else if (mod == Platform::shortcutModifier(false)) {
 				if (k == SDL_SCANCODE_UP) return GENERIC_VOLUME_UP;
 				if (k == SDL_SCANCODE_DOWN) return GENERIC_VOLUME_DOWN;
 				if (k == SDL_SCANCODE_P) return GENERIC_PAUSE;

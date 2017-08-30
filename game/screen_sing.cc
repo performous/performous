@@ -10,6 +10,7 @@
 #include "i18n.hh"
 #include "layout_singer.hh"
 #include "menu.hh"
+#include "platform.hh"
 #include "screen_players.hh"
 #include "songparser.hh"
 #include "util.hh"
@@ -352,11 +353,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 	double time = m_audio.getPosition();
 	SDL_Scancode key = event.key.keysym.scancode;
 	// Ctrl combinations that can be used while performing (not when score dialog is displayed)
-	#ifdef __APPLE__
-	if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_LGUI) && !m_score_window.get()) {
-	#else
-	if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & KMOD_LCTRL) && !m_score_window.get()) {
-	#endif
+	if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & Platform::shortcutModifier(false)) && !m_score_window.get()) {
 		if (key == SDL_SCANCODE_C) {
 			m_audio.toggleCenterChannelSuppressor();
 			++config["audio/suppress_center_channel"];

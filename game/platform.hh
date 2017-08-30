@@ -13,11 +13,14 @@
 #endif
 
 #include <boost/filesystem.hpp>
+#include <SDL2/SDL_events.h>
 
 struct Platform {
 enum platforms { windows, linux, macos, bsd, solaris, unix };
 Platform();
 static platforms currentOS();
+static uint16_t shortcutModifier(bool eitherSide = true);
+
 
 private:
 static const std::array<const char*,6> platformNames;
