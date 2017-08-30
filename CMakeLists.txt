@@ -40,6 +40,11 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	endif()
 endif()
 
+if (Boost_VERSION VERSION_LESS 105500)
+	message("-- Using Boost < 1.55: defining BOOST_NO_CXX11_SCOPED_ENUMS")
+	set(CMAKE_CXX_FLAGS "-DBOOST_NO_CXX11_SCOPED_ENUMS ${CMAKE_CXX_FLAGS}")
+endif()
+
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra ${CMAKE_CXX_FLAGS}")
 endif()
