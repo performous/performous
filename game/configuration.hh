@@ -9,7 +9,7 @@
 namespace xmlpp { class Element; }  // Forward declaration for libxml++ stuff
 class Audio;
 
-/// configuration option
+// configuration option
 class ConfigItem {
   public:
 	typedef std::vector<std::string> StringList; ///< a list of strings
