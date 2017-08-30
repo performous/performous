@@ -6,6 +6,7 @@
 #include "glutil.hh"
 #include "i18n.hh"
 #include "log.hh"
+#include "pi.hh"
 #include "profiler.hh"
 #include "screen.hh"
 #include "songs.hh"
@@ -26,6 +27,7 @@
 
 #include <boost/bind.hpp>
 #include <boost/format.hpp>
+#include <boost/math/constants/constants.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
 #include <csignal>
@@ -39,6 +41,8 @@ extern "C" {
 #include "windef.h"
 }
 #endif
+
+const double m_pi = boost::math::constants::pi<double>();
 
 // Disable main level exception handling for debug builds (because gdb cannot properly catch throwing otherwise)
 #ifdef NDEBUG
