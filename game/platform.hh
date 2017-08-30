@@ -5,7 +5,7 @@
 
 #include <array>
 #include <iostream>
-#include <boost/predef/os.h>
+#include <boost/predef.h>
 #include <boost/filesystem.hpp>
 
 struct Platform {
