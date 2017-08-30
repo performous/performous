@@ -1,284 +1,276 @@
-var update = false;
-var invertedsort = false;
-var database = {};
-var AutocompleteList = {};
-var songlist = {};
-var playlistScreenTimeout = 0;
-var localizer = {};
+"use strict";
 
-
-
-<!-- Home -->
-
-$("#databaseRefreshButton").bind("click", function(event) {
-    $.get("api/getDataBase.json", function(data) {
-        database = JSON.parse(data);
-
-        var s = $('input[name=radio-choice-Sort]:checked', '#radioButtonForm').val();
-        switch (s) {
-            case '1':
-                database = sortByKey(database, 'Title');
-                database = sortByKey(database, 'Artist');
-                break;
-            case '2':
-                database = sortByKey(database, 'Artist');
-                database = sortByKey(database, 'Title');
-                break;
-            case '3':
-                database = sortByKey(database, 'Artist');
-                database = sortByKey(database, 'Language');
-                break;
-            case '4':
-                database = sortByKey(database, 'Artist');
-                database = sortByKey(database, 'Edition');
-                break;
-            case '5':
-                database = sortByKey(database, 'Artist');
-                database = sortByKey(database, 'Creator');
-                break;
+$('#refresh-playlist-toggle').bootstrapToggle('off');
+var list = document.getElementById("playlist-songs");
+Sortable.create(list, {
+    group: "words",
+    animation: 150,
+    onEnd: function(evt){
+        if(evt.oldIndex == evt.newIndex) {
+            return;
         }
-        var table = document.getElementById("songtable");
-        for (var i = table.rows.length - 1; i > 0; i--) {
-            table.deleteRow(i);
-        }
-        if (invertedsort) {
-            for (var i = database.length - 1; i >= 0; i--) {
-                $("#songtable").last().append("<tr><td>" + database[i].Artist + "</td><td>" + database[i].Title + "</td><td>" + database[i].Language + "</td><td>" + database[i].Edition + "</td><td>" + database[i].Creator + "</td> </tr>");
-            }
-        } else {
-            for (i in database) {
-                $("#songtable").last().append("<tr><td>" + database[i].Artist + "</td><td>" + database[i].Title + "</td><td>" + database[i].Language + "</td><td>" + database[i].Edition + "</td><td>" + database[i].Creator + "</td> </tr>");
-            }
-        }
-    });
-});
 
-function sortByKey(array, key) {
-    return array.sort(function(a, b) {
-        var x = a[key];
-        var y = b[key];
-        return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-    });
-}
+        var data = {
+            "songId": evt.oldIndex,
+            "position": evt.newIndex
+        };
 
-function AddSong(number, autocomplete) {
-    if (autocomplete) {
-        $.post("api/add", JSON.stringify(AutocompleteList[number]));
-        $('#searchv2').val("added: " + AutocompleteList[number].Title);
-    } else {
-        $.post("api/add", JSON.stringify(database[number]));
-        $('#searchv2').val("added: " + database[number].Title);
-    }
-
-    RefreshPlayList();
-
-}
-
-<!-- Playlist -->
-
-$("#playlistRefreshButton").bind("click", function(event) {
-    RefreshPlayList();
-});
-
-function RefreshPlayList() {
-    $.get("api/getCurrentPlaylist.json", function(data) {
-        songlist = JSON.parse(data);
-        if (playlistScreenTimeout == 0) {
-            var timeout = "";
-            jQuery.ajaxSetup({
-                async: false
-            });
-            $.get("api/getplaylistTimeout", function(data) {
-                playlistScreenTimeout = parseInt(data);
-
-            });
-            jQuery.ajaxSetup({
-                async: true
-            });
-        }
-        $('#playListView').html('<li data-role="list-divider" role="heading">Upcoming songs:</li><li data-theme="c">\n');
-        var totalduration = 0;
-        for (i in songlist) {
-            var count = parseInt(i, 10) + parseInt(1, 10);
-            var hours = 0;
-            var minutes = 0;
-            var sec = totalduration;
-            while (sec >= 60) {
-                minutes++;
-                sec -= 60;
-            }
-            while (minutes >= 60) {
-                hours++;
-                minutes -= 60;
-            }
-
-            var durationtext;
-            if (hours > 0) {
-                durationtext = ("00" + hours).slice(-2) + ':' + ("00" + minutes).slice(-2) + ':' + ("0" + sec).slice(-2);
-            } else {
-                durationtext = ("00" + minutes).slice(-2) + ':' + ("0" + sec).slice(-2);
-            }
-            $('#playListView').append('<li data-theme="c" data-icon="info"><a href="javascript:ViewInfo(' + i + ', false)" data-transition="slide"> #' + count + ' ' + CreateSongString(songlist[i]) + ' +' + durationtext + '</a></li>\n');
-            totalduration += songlist[i].Duration + playlistScreenTimeout;
-        }
-        $('#playListView').listview('refresh');
-    });
-}
-
-$("#databaseSearchButton").bind("click", function(event) {
-    $("#autocomplete").hide();
-    DoQuery();
-});
-
-$(document).keypress(function(e) {
-    if (e.which == 13) {
-        $("#autocomplete").hide();
-        DoQuery();
-    }
-});
-
-function CreateSongString(song, showEdition) {
-    $totalString = song.Artist + ' - ' + song.Title;
-    if (showEdition) {
-        if (song.Language && song.Edition) {
-            $totalString += ' | ' + song.Language + ' - ' + song.Edition;
-        } else if (song.Language && !song.Edition) {
-            $totalString += ' | ' + song.Language;
-        } else if (!song.Language && song.Edition) {
-            $totalString += ' | ' + song.Edition;
-        }
-    } else {
-        if (song.Language) {
-            $totalString += ' | ' + song.Language;
-        }
-    }
-
-    return $totalString;
-}
-
-function DoQuery() {
-    $("#autocomplete").prev().find("input").attr("id", "searchv2");
-    var query = $('#searchv2').val();
-
-    results = $.post("api/search", query, function(data) {
-        database = JSON.parse(data);
-        $('#searchResultsViewer').html('<li data-role="list-divider" role="heading">Available songs:</li> <li data-theme="c">\n');
-        for (i in database) {
-
-            $('#searchResultsViewer').append('<li data-theme="c" data-icon="plus"><a href="javascript:AddSong(' + i + ')" data-transition="slide">' + CreateSongString(database[i], true) + '</a></li>');
-        }
-        $('#searchResultsViewer').listview('refresh');
-    });
-}
-
-function ViewInfo(songnumber) {
-	moveup = songnumber - 1;
-	movedown = songnumber + 1;
-    $('#songinfo').html("Title: " + songlist[songnumber].Title + "<br>\nArtist: " + songlist[songnumber].Artist +
-        "<br>\nEdition: " + songlist[songnumber].Edition + "<br>\nLanguage: " + songlist[songnumber].Language + "<br>\nCreator: " +
-        songlist[songnumber].Creator + "<br>\n" + " <div class=\"ui-grid-a\">" +
-        "<div class=\"ui-block-a\">" +
-        "<a id=\"btnremove\" data-role=\"button\" href=\"javascript:removeSong(" + songnumber + ")\" data-icon=\"delete\">" +
-        "Remove song </a> </div>" +
-        "<div class=\"ui-block-b\"> <a id=\"btncancel\" data-role=\"button\" href=\"#page2\" data-icon=\"back\">" +
-        "Cancel </a> </div> </div> <br> " +
-        "<div class=\"ui-grid-a\">" +
-        "<div class=\"ui-block-a\">" +
-        "<a id=\"btnmoveup\" data-role=\"button\" href=\"javascript:setPosition(" + songnumber + ", " + moveup + ")\" data-icon=\"arrow-u\">" +
-        "Move up</a></div><div class=\"ui-block-b\"> " +
-        "<a id=\"btnmovedown\" data-role=\"button\" href=\"javascript:setPosition(" + songnumber + ", " + movedown + ")\" data-icon=\"arrow-d\">" +
-        "Move Down </a> </div> </div> <br>" +
-        "<div class=\"ui-grid-a\">" +
-        "<div class=\"ui-block-a\">" +
-        "<input id=\"position\" placeholder=\"Add a position\" type=\"number\" min=\"1\" max=\"" + songlist.length + "\" data-clear-btn=\"true\" pattern=\"[0-9]*\" /></div><div class=\"ui-block-b\"> " +
-        "<a id=\"btnposition\" data-role=\"button\" href=\"javascript:setPosition(" + songnumber + ")\" data-icon=\"recycle\">" +
-        "Set Position </a> </div> </div>"
-    );
-    <!--refresh the buttons so they are rendered correctly-->
-    $('#btnremove').button();
-    $('#btnmoveup').button();
-    $('#btnmovedown').button();
-    $('#btncancel').button();
-    $('#btnposition').button();
-    $('#position').textinput();
-    $.mobile.changePage("#page4", {
-        role: "dialog"
-    });
-
-}
-
-function removeSong(songnumber) {
-    $.post("api/remove", songnumber.toString());
-    RefreshPlayList();
-    $.mobile.changePage("#page2");
-}
-
-function setPosition(songnumber, pos) {			
-	if(pos || pos === 0) {
-		$position = pos;
-	} else {
-        $position = Math.floor($('#position').val() - 1);
-	}
-    var data = {
-        "songId": songnumber,
-        "position": $position
-    };
-    $.post("api/setposition", JSON.stringify(data));
-    RefreshPlayList();
-    $.mobile.changePage("#page2");
-}
-
-$('#flipupdate').bind("change", function(event, ui) {
-    update = !update;
-});
-
-$('#flipsortmode').bind("change", function(event, ui) {
-    invertedsort = !invertedsort;
-});
-
-$("#autocomplete").on("listviewbeforefilter", function(e, data) {
-    var $ul = $(this),
-        $input = $(data.input),
-        value = $input.val(),
-        html = "";
-    $ul.html("");
-    if (value && value.length > 2) {
-        $("#autocomplete").show();
-        results = $.post("api/autocomplete", $input.val(), function(data) {
-            AutocompleteList = JSON.parse(data);
-            $ul.html("<li><div class='ui-loader'><span class='ui-icon ui-icon-loading'></span></div></li>");
-            for (i in AutocompleteList) {
-                var count = parseInt(i, 10) + parseInt(1, 10);
-                html += '<li data-theme="c" data-icon="info"><a href="javascript:AddSong(' + i + ',true)" data-transition="slide">' + ' ' + AutocompleteList[i].Artist + ' - ' + AutocompleteList[i].Title + '</a></li>\n';
-            }
-            $ul.html(html);
-            $ul.listview("refresh");
-            $ul.trigger("updatelayout");
+        $.post("api/setposition", JSON.stringify(data), function() {
+            buildAlertMessage("successfully_changed_position_of_song", "success");
+            $('#refresh-playlist').click();
+        }).fail(function() {
+            buildAlertMessage("failed_changing_position_of_song", "danger");
         });
     }
 });
 
-$("#autocomplete").on("click", "li", function() {
-    $("#autocomplete").hide();
-    DoQuery();
+$('#refresh-playlist-toggle').change(function() {
+    if($(this).prop('checked')){
+        window.IntervalSet = window.setInterval(function () {
+            $("#refresh-playlist").click();
+        }, 10000);
+    } else {
+        window.clearInterval(window.IntervalSet);
+    }
 });
-window.setInterval(function() {
-    if (update) RefreshPlayList();
-}, 10000);
+
+$('#playlist-songs').on("click", "a", function() {
+    var jsonSongObject = $(this).data("modal-songObject");
+    var songObject = JSON.parse(jsonSongObject);
+    var title = songObject.Artist + " - " + songObject.Title;
+
+    var tempElement = $("<div>");
+    $(tempElement).load("playlist-song-modal-body.html", function(data){
+        window.songObject = songObject;
+        $.ajaxSetup({
+          cache: true
+        });
+        $.getScript("js/playlist-song-modal-body.js",  function() {
+            $('#modal-title').text(title);
+            $('#modal-body').html(data);
+        });        
+    });    
+});
+
+$('#refresh-database').click(function() {
+    $.get("api/getDataBase.json", function(data) {
+        var database = JSON.parse(data);
+        clearTable("#database-songs > tbody");
+
+        var html = buildTable(database);
+        $(html).appendTo("#database-songs");
+
+        $.each(database, function (iterator, songObject){
+           $("#database-songs-"+iterator).data("songObject", JSON.stringify(songObject));
+        });
+    });
+});
+
+
+$("a[id^='sort-by-']").click(function() {
+    var sortOrderToBe = $(this).data('sort-ascending') ? "descending" : "ascending";
+    var sortBy = $(this).attr('id').replace('sort-by-', '');
+    var url = "api/getDataBase.json?sort=" + sortBy + "&order=" + sortOrderToBe;
+
+    $(this).data('sort-ascending', sortOrderToBe === "descending" ? false : true);
+    $(this).find('span').toggleClass('glyphicon-menu-down').toggleClass('glyphicon-menu-up');
+    $(this).parent().siblings().children().each(function (){
+        $(this).find('span').removeClass("glyphicon-menu-up").addClass("glyphicon-menu-down");
+    });
+
+    $.get(url, function(data) {
+        var database = JSON.parse(data);
+
+        clearTable("#database-songs > tbody");
+
+        var html = buildTable(database);
+        $(html).appendTo("#database-songs");
+        
+        $.each(database, function (iterator, songObject){
+            $("#database-songs-"+iterator).data("songObject", JSON.stringify(songObject));
+        });     
+    });
+});
+
+$('#refresh-playlist').click(function() {
+    $.get("api/getCurrentPlaylist.json", function(data) {
+        var database = JSON.parse(data);
+        $.get("api/getplaylistTimeout", function(data){
+            var timeout = parseInt(data);
+            var totalTime = 0; 
+
+            clearList("playlist-songs");
+
+            $.each(database, function (iterator, songObject){
+                totalTime += songObject.Duration + timeout;
+                $("#playlist-songs").append("<a id=\"playlist-songs-" + iterator + "\" href=\"#\" class=\"list-group-item\" data-toggle=\"modal\" data-target=\"#dynamic-modal\">" + songObject.Artist + " - " + songObject.Title + " - " + secondsToDate(totalTime) + "<span class=\"glyphicon glyphicon-info-sign\"></span></a>");
+                songObject.Position = iterator;
+                $("#playlist-songs-"+iterator).data("modal-songObject", JSON.stringify(songObject));
+            });
+        });
+    });
+});
+
+$('#search-database').click(function(e, callback) {
+    var query = $('#search-field').val()
+    $.post("api/search", query, function(data) {
+        var database = JSON.parse(data);
+
+        clearList("searched-songs");
+
+        $.each(database, function (iterator, songObject){
+            var songMeta = "";
+            songMeta += songObject.Language.length > 0 ? " | " + songObject.Language : "";
+            songMeta += songObject.Edition.length > 0 ? " | " + songObject.Edition : "";
+            $("#searched-songs").append("<a href=\"#\" id=\"searched-songs-" + iterator + "\" class=\"list-group-item\" >" + songObject.Artist + " - " + songObject.Title + songMeta + "<span class=\"glyphicon glyphicon-plus\"></span></a>");            
+            $("#searched-songs-"+iterator).data("songObject", JSON.stringify(songObject));
+        });
+
+        if(database.length == 0) {
+            buildAlertMessage("no_songs_found_with_current_filter", "warning")
+        }
+        if(typeof callback == "function") {
+            callback();
+        }
+    });
+});
+
+$("#search-tab").click(function (){
+    $.get("api/getDataBase.json", function(data) {
+        var database = JSON.parse(data);
+        var input = $("#search-field");
+        input.typeahead({
+            source: database,
+            autoSelect: true,
+            items: 10,
+            updater: function(item) {
+                input.val(item.name);
+                $('#search-database').trigger("click", function(){
+                    $("#searched-songs").children().first().click();
+                }); 
+            }
+        });
+    });
+});
+
+$('#search-field').keypress(function (e) {
+    if (e.which == 13) {
+        $('#search-database').click();
+    }
+});
+
+$('#searched-songs').on("click", "a", function() {
+    var songObjectToSend = $(this).data('songObject');
+    addSong(songObjectToSend)
+});
+
+$('#database-songs').on("click", "tr[id^='database-songs-']", function() {
+    var songObjectToSend = $(this).data('songObject');
+    addSong(songObjectToSend)
+});
+
+$('a[href="#playlist"]').on('shown.bs.tab', function(event){
+    $('#refresh-playlist').click();
+});
 
 $(function () {
-    $.get("api/language", function(data) {
-        localizer = JSON.parse(data);
-        $.each( localizer, function( key, value ) { 
+    localize("body", false);
+});
 
-            // this is quite an expensive method....  
-            var $textNodes = $("*").contents().filter(function() {
-                return this.nodeType === Node.TEXT_NODE && this.textContent.match(key);
-            });
-
-            $textNodes.each(function() {                
-                 this.textContent = value;                                    
+function localize(selector, fromCache = true) {
+    if(fromCache){
+        $.each( localStorage, function( key, value ) { 
+            localizeInternal(selector, key, value);
+        });
+    } else {
+        $.get("api/language", function(data) {
+            var localizer = JSON.parse(data);
+            $.each( localizer, function( key, value ) { 
+                localizeInternal(selector, key, value);
+                localStorage.setItem(key,value);
             });
         });
+    }
+    
+};
+
+function localizeInternal(selector, key, value) {
+    var textNodes = $(selector).find("*").contents().filter(function() {
+        return this.nodeType === Node.TEXT_NODE && this.textContent.trim() == key;
     });
-})
+
+    textNodes.each(function() {                
+         this.textContent = value;                                    
+    });
+
+    $('input[type=text]').each(function()
+    {   
+        if($(this).attr('placeholder') == key) { 
+            $(this).attr("placeholder", value);
+        }
+    });
+}
+
+
+function clearList(selector){
+    var myNode = document.getElementById(selector);
+    while (myNode.firstChild) {
+        myNode.removeChild(myNode.firstChild);
+    }
+}
+
+function clearTable(selector) {
+    var tbody = $(selector);
+    while (tbody.children().length > 1) {
+        tbody.children().last().remove();
+    }
+}
+
+function secondsToDate(seconds){
+    var date = new Date(null);
+    date.setSeconds(seconds);
+    return date.toISOString().substr(11, 8);
+}
+
+function addSong(songObjectToSend) {
+    $.post("api/add", songObjectToSend, function() {
+        buildAlertMessage("successfully_added_song_to_the_playlist", "success");
+        $('a[href="#playlist"]').tab('show');
+    }).fail(function() {
+        buildAlertMessage("failed_adding_song_to_the_playlist", "danger")
+    });
+}
+
+function buildTable(database){
+    var r = new Array();
+    var j = -1;
+    for (var key=0, size=database.length; key<size; key++){
+        r[++j] ="<tr id='database-songs-" + key +"'><td>";
+        r[++j] = database[key].Artist;
+        r[++j] = "</td><td>";
+        r[++j] = database[key].Title;
+        r[++j] = "</td><td class='hidden-xs'>";
+        r[++j] = database[key].Language;
+        r[++j] = "</td><td class='hidden-xs hidden-sm'>";
+        r[++j] = database[key].Edition;
+        r[++j] = "</td><td class='hidden-xs hidden-sm hidden-md'>";
+        r[++j] = database[key].Creator;
+        r[++j] = "</td><td class='text-right text-nowrap fixed-pixel-glyphicon'>";
+        r[++j] = "<span class='glyphicon glyphicon-plus'></span>";
+        r[++j] = "</td></tr>"
+    }
+
+    return r.join("");
+}
+
+function buildAlertMessage(message, messageType){
+    var localizedMessage = localStorage.getItem(message);
+    var innerhtml = "<div class=\"container-fluid\"><div class=\"alert alert-"+messageType+" alert-dismissable\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">&times;</a>"+localizedMessage+"</div></div>";
+    $("#alert-messages").append(innerhtml);
+    window.setTimeout(function() {
+        $(".alert").fadeTo(500, 0).slideUp(500, function(){
+            $(this).remove(); 
+        });
+    }, 3000);
+}
+
