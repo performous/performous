@@ -97,7 +97,11 @@ static void checkEvents(Game& gm) {
 				config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].b();
 				continue; // Already handled here...
 			}
+			#ifdef __APPLE__
+			if (keypressed == SDL_SCANCODE_PRINTSCREEN || (keypressed == SDL_SCANCODE_F12 && (modifier & KMOD_GUI))) {
+			#else
 			if (keypressed == SDL_SCANCODE_PRINTSCREEN || (keypressed == SDL_SCANCODE_F12 && (modifier & KMOD_CTRL))) {
+			#endif
 				g_take_screenshot = true;
 				continue; // Already handled here...
 			}

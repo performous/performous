@@ -156,7 +156,11 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			m_songs.setFilter(m_search.text);
 		}
 		else if (!m_jukebox) {
+		#ifdef __APPLE__
+			if (key == SDL_SCANCODE_R && mod & KMOD_GUI) {
+		#else
 			if (key == SDL_SCANCODE_R && mod & KMOD_CTRL) {
+		#endif
 				m_songs.reload();
 				m_songs.setFilter(m_search.text);
 				}
