@@ -11,3 +11,4 @@ osx-utils/Performous.dmg
 osx-utils/CMakeCache.txt
 CMakeCache.txt
 CMakeFiles
+*.xcodeproj
