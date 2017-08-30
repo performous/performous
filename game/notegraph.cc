@@ -5,6 +5,8 @@
 #include "engine.hh"
 #include "player.hh"
 
+extern const double m_pi;
+
 Dimensions dimensions; // Make a public member variable
 
 NoteGraph::NoteGraph(VocalTrack const& vocal):
@@ -132,7 +134,7 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 			float hh = -m_noteUnit;
 			float centery = m_baseY + (it->note + 0.4) * m_noteUnit; // Star is 0.4 notes higher than current note
 			float centerx = x + w - (player_star_offset + 1.2) * hh; // Star is 1.2 units from end
-			float rot = fmod(time * 5.0, 2.0 * M_PI); // They rotate!
+			float rot = fmod(time * 5.0, 2.0 * m_pi); // They rotate!
 			bool smallerNoteGraph = ((position == NoteGraph::TOP) || (position == NoteGraph::BOTTOM));
 			float zoom = (std::abs((rot-180) / 360.0f) * 0.8f + 0.6f) * (smallerNoteGraph ? 2.3 : 2.0) * hh;
 			using namespace glmath;
