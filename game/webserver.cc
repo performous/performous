@@ -1,5 +1,5 @@
 ﻿#include "webserver.hh"
-#ifdef USE_CPPNETLIB
+#ifdef USE_WEBSERVER
 #include <boost/network/protocol/http/server.hpp>
 
 namespace http = boost::network::http;

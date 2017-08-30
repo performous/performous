@@ -60,12 +60,11 @@ set(LOCALE_DIR "${LOCALE_DIR_DEFAULT}" CACHE STRING "Locale file install path. M
 mark_as_advanced(LOCALE_DIR)
 
 find_package(Gettext)
-find_package(Msgfmt)
-if(Gettext_FOUND AND Msgfmt_FOUND)
+if(Gettext_FOUND)
 	message(STATUS "Localization enabled: Building and installing .mo files")
 	add_subdirectory(lang)
 else()
-	message(STATUS "Localization disabled: Gettext or Msgfmt missing")
+	message(STATUS "Localization disabled: Gettext tools (msgfmt) missing")
 endif()
 
 add_subdirectory(data)
