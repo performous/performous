@@ -27,7 +27,6 @@
 
 #include <boost/bind.hpp>
 #include <boost/format.hpp>
-#include <boost/math/constants/constants.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
 #include <csignal>
