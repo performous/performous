@@ -76,7 +76,11 @@ void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destina
     for (fs::recursive_directory_iterator dirEnt(sourceDir); dirEnt !=fs::recursive_directory_iterator(); ++dirEnt)
 #endif
     {
+    #if ((BOOST_VERSION / 100 % 1000) >= 55)
         const auto& path = dirEnt.path();
+    #else
+        const auto& path = dirEnt->path();    
+    #endif
         auto relativePathStr = path.string();
         boost::algorithm::replace_first(relativePathStr, sourceDir.string(), "");
         try { 
