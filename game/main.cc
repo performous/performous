@@ -35,6 +35,8 @@
 #include <vector>
 #include <cstdlib>
 
+const double m_pi = boost::math::constants::pi<double>();
+
 // Disable main level exception handling for debug builds (because gdb cannot properly catch throwing otherwise)
 #ifdef NDEBUG
 #define RUNTIME_ERROR std::runtime_error
