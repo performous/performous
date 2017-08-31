@@ -4,11 +4,11 @@
 #include "platform.hh"
 
 #include <boost/algorithm/string/replace.hpp>
-#include <boost/filesystem/fstream.hpp>
-#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/range.hpp>
+#include <boost/thread.hpp>
 #include <cstdlib>
 
-#include <boost/thread.hpp>
 #include <set>
 #include <sstream>
 #include <algorithm>
@@ -71,7 +71,7 @@ void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destina
         throw std::runtime_error("Cannot create destination directory " + destinationDir.string());
     }
 
-    for (const boost::filesystem::recursive_directory_iterator& dirEnt : fs::recursive_directory_iterator{sourceDir})
+    for (const auto& dirEnt : fs::recursive_directory_iterator{sourceDir})
     {
         const auto& path = dirEnt.path();
         auto relativePathStr = path.string();
