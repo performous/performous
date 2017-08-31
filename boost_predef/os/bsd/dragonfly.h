@@ -39,12 +39,12 @@ http://www.boost.org/LICENSE_1_0.txt)
 
 #if BOOST_OS_BSD_DRAGONFLY
 #   define BOOST_OS_BSD_DRAGONFLY_AVAILABLE
-#   include "../detail/os_detected.h"
+#   include "../../detail/os_detected.h"
 #endif
 
 #define BOOST_OS_BSD_DRAGONFLY_NAME "DragonFly BSD"
 
 #endif
 
-#include "../detail/test.h"
+#include "../../detail/test.h"
 BOOST_PREDEF_DECLARE_TEST(BOOST_OS_BSD_DRAGONFLY,BOOST_OS_BSD_DRAGONFLY_NAME)
