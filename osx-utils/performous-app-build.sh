@@ -122,34 +122,17 @@ then dylibbundler -of -b -x "$BINDIR/$i" -d "$LIBDIR" -p @executable_path/../Res
 fi
 done
 
-# cp -av /opt/local/lib/pango $LIBDIR/ Pango modules are toast as of 1.38 and onwards.
-
 OLDPREFIX=/opt/local
 NEWPREFIX=$LIBDIR
 
 mkdir -p $ETCDIR/fonts
-cp -av /opt/local/etc/fonts $ETCDIR
-# cp -av /opt/local/etc/pango $ETCDIR pangorc doesn't exist anymore either.
-# cd $ETCDIR/pango
-
-# sed -i '' -e "s|$OLDPREFIX\/etc\/pango\/|\.\.\/Resources\/etc\/pango\/|g" pangorc
-# sed -i '' -e "s|$OLDPREFIX|\.\.\/\.\.\/\.\.\/\.\.|g" pango.modules
+cp -pLR /opt/local/etc/fonts $ETCDIR
 
 cd $ETCDIR/fonts
 sed -i '' -e 's|\/opt\/local/share|\.\.\/\.\.\/\.\.\/Resources|g' fonts.conf
 sed -i '' -e 's|\/opt\/local/var/cache|\~\/\.cache|g' fonts.conf
 sed -i '' -e 's|\<\!-- Font directory list --\>|\<\!-- Font directory list --\>\
     <dir>\.\.\/\.\.\/pixmaps</dir>|g' fonts.conf
-
-# cd $LIBDIR/pango/
-# cd `find . -type d -maxdepth 1 -mindepth 1`
-# cd `find . -type d -maxdepth 1 -mindepth 1` 
-
-#for if in `pwd`/*.so
-#do
-#dylibbundler -x "$if" -p @executable_path/../Resources/lib/ -d "$LIBDIR"
-#done 
-
 
 cd "$CURRDIR"
 
