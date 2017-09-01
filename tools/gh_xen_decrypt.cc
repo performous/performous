@@ -27,8 +27,7 @@ int main(int argc, char** argv) {
 	unsigned char cpKey[KEY_LEN] = "5atu6w4zaw";
 
 	// Check params
-	if (argc != 3) throw std::runtime_error(std::string("Usage: ") + argv[0] + " <Input> <Output>");
-
+	if (argc == 3) {
 	// Open files
 	std::ofstream outputFile(argv[2], std::ofstream::binary);
 	std::ifstream inputFile(argv[1], std::ios::binary);
@@ -64,5 +63,6 @@ int main(int argc, char** argv) {
 	std::cout << "DONE!" << std::endl;
 
 	return EXIT_SUCCESS;
+	}
+	else { std::cout << "Usage: " << argv[0] << " <Input> <Output>" << std::endl; return 1; }
 }
-
