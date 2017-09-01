@@ -143,6 +143,7 @@ function main {
 	mv "${TEMPDIR}/bin" "${BINDIR}"
 
 	cp ../resources/performous-launcher "${BINDIR}"
+	if [[ "${DEBUG}" = 1 ]] && sed -i '' -e 's|"\${CURRDIR}\/performous"|"\${CURRDIR}\/performous" --log debug|g' "$BINDIR/performous-launcher" # enable debug logging.
 	cp ../resources/performous.icns "${RESDIR}"
 	cp ../resources/Info.plist "${TEMPDIR}"
 
