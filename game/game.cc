@@ -10,6 +10,8 @@
 #include <stdexcept>
 #include <cstdlib>
 
+extern const double m_pi;
+
 template<> Game* Singleton<Game>::ms_Singleton = nullptr;
 
 Game::Game(Window& _window):
@@ -113,7 +115,7 @@ bool Game::closeDialog() {
 }
 
 void Game::drawLogo() {
-	double v = 0.5 - 0.5 * std::cos(M_PI * m_logoAnim.get());
+	double v = 0.5 - 0.5 * std::cos(m_pi * m_logoAnim.get());
 	m_logo.dimensions.fixedHeight(0.1).left(-0.45).screenTop(-0.1 + 0.11 * v);
 	m_logo.draw();
 }

@@ -9,11 +9,9 @@
 #include <cstddef>
 #include <vector>
 
-#ifndef M_PI
-#define M_PI 3.141592653589793
-#endif
+extern const double m_pi;
 
-#define M_TAU (2.0 * M_PI)
+const double m_tau = (2.0 * m_pi);
 
 namespace da {
 
@@ -34,7 +32,7 @@ namespace da {
 				const std::complex<T> temp = data[i + M] * w;
 				data[M + i] = data[i] - temp;
 				data[i] += temp;
-				w *= std::polar<T>(1.0, -M_TAU / N);
+				w *= std::polar<T>(1.0, -m_tau / N);
 			}
 		}
 	};
