@@ -15,6 +15,7 @@
 #include <sstream>
 #include <boost/format.hpp>
 
+extern const double m_pi;
 static const double IDLE_TIMEOUT = 45.0; // seconds
 
 ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Database& database):
@@ -364,12 +365,12 @@ void ScreenSongs::drawCovers() {
 		Song& song = *m_songs[baseidx + i];
 		Surface& s = getCover(song);
 		// Calculate dimensions for cover and instrument markers
-		double diff = 0.5 * (1.0 + std::cos(std::min(M_PI, std::abs(i - shift))));  // 0..1 for current cover hilight level
+		double diff = 0.5 * (1.0 + std::cos(std::min(m_pi, std::abs(i - shift))));  // 0..1 for current cover hilight level
 		double y = 0.5 * virtH();
 		using namespace glmath;
 		Transform trans(
 		  translate(vec3(-0.2 + 0.20 * (i - shift), y, -0.2 - 0.3 * (1.0 - diff)))
-		  * rotate(0.4 * std::sin(std::min(M_PI, i - shift)), vec3(0.0, 1.0, 0.0))
+		  * rotate(0.4 * std::sin(std::min(m_pi, i - shift)), vec3(0.0, 1.0, 0.0))
 		);
 		double c = 0.4 + 0.6 * diff;
 		if (m_menuPos == 1 /* Cover browser */ && baseidx + i == currentId) c = beat;

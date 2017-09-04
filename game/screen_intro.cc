@@ -9,6 +9,7 @@
 #include "menu.hh"
 #include "xtime.hh"
 
+extern const double m_pi;
 
 ScreenIntro::ScreenIntro(std::string const& name, Audio& audio): Screen(name), m_audio(audio), m_first(true) {
 }
@@ -143,7 +144,7 @@ void ScreenIntro::draw() {
 	glutil::GLErrorChecker glerror("ScreenIntro::draw()");
 	{
 		float anim = SDL_GetTicks() % 20000 / 20000.0;
-		ColorTrans c(glmath::rotate(2.0 * M_PI * anim, glmath::vec3(1.0, 1.0, 1.0)));
+		ColorTrans c(glmath::rotate(2.0 * m_pi * anim, glmath::vec3(1.0, 1.0, 1.0)));
 		theme->bg.draw();
 	}
 	glerror.check("bg");
