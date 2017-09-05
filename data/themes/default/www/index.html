@@ -1,167 +1,35 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <title>performous_web_frontend</title>
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <title>Performous web frontend</title>
+        <!-- STYLES -->
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css.map">
+        <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css.map">
+        <link rel="stylesheet" type="text/css" href="css/bootstrap-toggle.min.css">
+        <link rel="stylesheet" type="text/css" href="css/style.css">
 
-    <link rel="stylesheet" type="text/css" href="/css/jquery.mobile-1.3.2.min.css">
-    <link rel="stylesheet" type="text/css" href="/css/style.css">
-    <script src="js/jquery-1.9.1.min.js"></script>
-    <script src="js/jquery.mobile-1.3.2.min.js"></script>
-    <script src="js/site.js"></script>
-</head>
-
-<body>
-    <!-- Home -->
-    <div data-role="page" id="page1">
-        <div data-theme="a" data-role="header">
-            <h3>performous_web_frontend</h3>
-            <div data-role="navbar" data-iconpos="top">
-                <ul>
-                    <li><a href="#page1" data-transition="flow" data-theme="" data-icon="info" data-iconpos="top" class="ui-btn-active ui-state-persist">
-                    view_database
-                </a></li>
-                    <li><a href="#page2" data-transition="flow" data-theme="" data-icon="grid" data-iconpos="top">
-                    view_playlist
-                </a></li>
-                    <li><a href="#page3" data-transition="flow" data-theme="" data-icon="search" data-iconpos="top">
-                    search_and_add
-                </a>
-                    </li>
-                </ul>
-            </div>
+        <!-- SCRIPTS -->
+        <script src="js/jquery-3.2.1.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/bootstrap-toggle.min.js"></script>
+        <script src="js/sortable.min.js"></script>
+        <script src="js/typeahead.min.js"></script>
+        <script src="js/documentloader.js"></script>
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="row header"></div>
+            <div class="row menu"></div>
+            <div class="row content"></div>
+            <div class="row footer"></div>
         </div>
-        <div data-role="content">
-            <div class="ui-grid-a">
-                <div class="ui-block-a" style="width:70%">
-                    <form id="radioButtonForm">
-                        <fieldset data-role="controlgroup" data-type="horizontal">
-                            <legend>sort_by</legend>
-                            <input name="radio-choice-Sort" id="radio-choice-Artist" value="1" checked="checked" type="radio">
-                            <label for="radio-choice-Artist">artist</label>
-                            <input name="radio-choice-Sort" id="radio-choice-Title" value="2" type="radio">
-                            <label for="radio-choice-Title">title</label>
-                            <input name="radio-choice-Sort" id="radio-choice-Language" value="3" type="radio">
-                            <label for="radio-choice-Language">language</label>
-                            <input name="radio-choice-Sort" id="radio-choice-Edition" value="4" type="radio">
-                            <label for="radio-choice-Edition">edition</label>
-                            <input name="radio-choice-Sort" id="radio-choice-Creator" value="5" type="radio">
-                            <label for="radio-choice-Creator">creator</label>
-                        </fieldset>
-                    </form>
-                </div>
-                <div class="ui-block-b" style="width:30%">
-                    <div data-role="fieldcontain">
-                        <label for="flipsortmode">sort_order</label>
-                        <select name="flipsortmode" id="flipsortmode" data-role="slider" data-mini="false">
-                <option value="off">normal</option>
-                <option value="on">inverted</option>
-            </select>
-                    </div>
-                </div>
-            </div>
-            <a id="databaseRefreshButton" data-role="button" href="#page1" data-icon="refresh">refresh_database</a>
-            <table id="songtable" border="1">
-                <tr>
-                    <th>artist</th>
-                    <th>title</th>
-                    <th>language</th>
-                    <th>edition</th>
-                    <th>creator</th>
-                </tr>
-            </table>
-        </div>
-    </div>
-
-    <!-- Playlist -->
-    <div data-role="page" id="page2">
-        <div data-theme="a" data-role="header">
-            <h3>performous_web_frontend</h3>
-            <div data-role="navbar" data-iconpos="top">
-                <ul>
-                    <li><a href="#page1" data-transition="flow" data-theme="" data-icon="info" data-iconpos="top" data-direction="reverse">
-                    view_database
-                </a></li>
-                    <li><a href="#page2" data-transition="flow" data-theme="" data-icon="grid" data-iconpos="top" class="ui-btn-active ui-state-persist">
-                    view_playlist
-                </a></li>
-                    <li><a href="#page3" data-transition="flow" data-theme="" data-icon="search" data-iconpos="top">
-                    search_and_add
-                </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <div data-role="content">
-            <ul data-role="listview" id="playListView" data-divider-theme="b">
-                <li data-role="list-divider" role="heading">
-                    upcoming_songs
-                </li>
-            </ul>
-            <br> <br>
-
-            <div class="ui-block-d1">
-                <a id="playlistRefreshButton" data-role="button" href="#page2" data-icon="refresh" data-iconpos="top">refresh_playlist</a>
-            </div>
-            <br>
-            <div data-role="fieldcontain">
-                <label for="flipupdate">update_every_10_sec</label>
-                <select name="flipupdate" id="flipupdate" data-role="slider" data-mini="false">
-                <option value="off">no</option>
-                <option value="on">yes</option>
-            </select>
-            </div>
-            <small>credits</small>
-        </div>
-    </div>
-    <!-- Search system -->
-    <div data-role="page" id="page3">
-        <div data-theme="a" data-role="header">
-            <h3>performous_web_frontend</h3>
-            <div data-role="navbar" data-iconpos="top">
-                <ul>
-                    <li><a href="#page1" data-transition="flow" data-theme="" data-icon="info" data-iconpos="top" data-direction="reverse">
-                    view_database
-                </a></li>
-                    <li><a href="#page2" data-transition="flow" data-theme="" data-icon="grid" data-iconpos="top" data-direction="reverse">
-                    view_playlist
-                </a></li>
-                    <li><a href="#page3" data-transition="flip" data-theme="" data-icon="search" data-iconpos="top" class="ui-btn-active ui-state-persist">
-                    search_and_add
-                </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <div data-role="content">
-            <div class="ui-grid-a">
-                <div class="ui-block-a">
-                    </br>
-                    <ul id="autocomplete" data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Search for songs" data-filter-theme="d"></ul>
-                </div>
-                <div class="ui-block-b">
-                    <a id="databaseSearchButton" data-role="button" href="#page3" data-icon="search">search</a>
-                </div>
-            </div>
-            <br> <br>
-            <ul data-role="listview" id="searchResultsViewer" data-divider-theme="b">
-                <li data-role="list-divider" role="heading">
-                    available_songs
-                </li>
-            </ul>
-        </div>
-    </div>
-    <!-- dialog -->
-    <div data-role="page" id="page4">
-        <div data-role="content">
-            <div id="songinfo">
-            </div>
-        </div>
-    </div>
-</body>
-
+        <script id="custom-scripts" type="text/javascript"></script>
+    </body>
 </html>

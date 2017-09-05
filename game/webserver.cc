@@ -58,8 +58,27 @@ WebServer::WebServer(Songs& songs)
 }
 
 WebServer::~WebServer() {
-	m_server->stop();
-	m_serverThread->join();
+	if ( m_server ) {
+		m_server->stop();
+		m_serverThread->join();
+	}
+}
+
+Json::Value WebServer::SongsToJsonObject(){
+	Json::Value jsonRoot = Json::arrayValue;
+	for (int i=0; i<m_songs.size(); i++) {
+		Json::Value SongObject = Json::objectValue;
+		SongObject["Title"] = m_songs[i]->title;
+		SongObject["Artist"] = m_songs[i]->artist;
+		SongObject["Edition"] = m_songs[i]->edition;
+		SongObject["Language"] = m_songs[i]->language;
+		SongObject["Creator"] = m_songs[i]->creator;
+		//SongObject["Duration"] = m_songs[i]->getDurationSeconds();
+		SongObject["name"] = m_songs[i]->artist + " - " + m_songs[i]->title;
+		jsonRoot.append(SongObject);
+	}
+
+	return jsonRoot;
 }
 
 http_server::response WebServer::GETresponse(const http_server::request &request, std::string& content_type) {
@@ -69,16 +88,47 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 		return http_server::response::stock_reply(http_server::response::ok, std::string(buf.begin(), buf.end()));
 	} else if (request.destination == "/api/getDataBase.json") { //get database
 		m_songs.setFilter("");
-		Json::Value jsonRoot = Json::arrayValue;
-		for (int i=0; i<m_songs.size(); i++) {
-			Json::Value SongObject = Json::objectValue;
-			SongObject["Title"] = m_songs[i]->title;
-			SongObject["Artist"] = m_songs[i]->artist;
-			SongObject["Edition"] = m_songs[i]->edition;
-			SongObject["Language"] = m_songs[i]->language;
-			SongObject["Creator"] = m_songs[i]->creator;
-			jsonRoot.append(SongObject);
-		}
+		Json::Value jsonRoot = SongsToJsonObject();
+		return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
+	} else if (request.destination == "/api/getDataBase.json?sort=artist&order=ascending") { //get database
+		m_songs.setFilter("");
+		m_songs.sortSpecificChange(2);
+		Json::Value jsonRoot = SongsToJsonObject();
+		return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
+	} else if (request.destination == "/api/getDataBase.json?sort=artist&order=descending") { //get database
+		m_songs.setFilter("");
+		m_songs.sortSpecificChange(2, true);
+		Json::Value jsonRoot = SongsToJsonObject();
+		return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
+	} else if (request.destination == "/api/getDataBase.json?sort=title&order=ascending") { //get database
+		m_songs.setFilter("");
+		m_songs.sortSpecificChange(1);
+		Json::Value jsonRoot = SongsToJsonObject();
+		return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
+	} else if (request.destination == "/api/getDataBase.json?sort=title&order=descending") { //get database
+		m_songs.setFilter("");
+		m_songs.sortSpecificChange(1, true);
+		Json::Value jsonRoot = SongsToJsonObject();
+		return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
+	} else if (request.destination == "/api/getDataBase.json?sort=language&order=ascending") { //get database
+		m_songs.setFilter("");
+		m_songs.sortSpecificChange(6);
+		Json::Value jsonRoot = SongsToJsonObject();
+		return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
+	} else if (request.destination == "/api/getDataBase.json?sort=language&order=descending") { //get database
+		m_songs.setFilter("");
+		m_songs.sortSpecificChange(6, true);
+		Json::Value jsonRoot = SongsToJsonObject();
+		return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
+	}else if (request.destination == "/api/getDataBase.json?sort=edition&order=ascending") { //get database
+		m_songs.setFilter("");
+		m_songs.sortSpecificChange(3);
+		Json::Value jsonRoot = SongsToJsonObject();
+		return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
+	} else if (request.destination == "/api/getDataBase.json?sort=edition&order=descending") { //get database
+		m_songs.setFilter("");
+		m_songs.sortSpecificChange(3, true);
+		Json::Value jsonRoot = SongsToJsonObject();
 		return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
 	} else if (request.destination == "/api/getCurrentPlaylist.json") { //get playlist
 		Game* gm = Game::getSingletonPtr();
@@ -253,7 +303,24 @@ std::vector<std::string> WebServer::GetTranslationKeys() {
 	    translate_noop("Available songs"),
 	    translate_noop("Search for songs"),
 	    translate_noop("Yes"),
-	    translate_noop("No")
+	    translate_noop("No"),
+	    translate_noop("Move up"),
+	    translate_noop("Move down"),
+	    translate_noop("Set position"),
+	    translate_noop("Remove song"),
+	    translate_noop("Desired position of song"),
+	    translate_noop("Cancel"),
+	    translate_noop("Successfully removed song from playlist"),
+	    translate_noop("Failed removing song from playlist"),
+	    translate_noop("Successfully changed position of song"),
+	    translate_noop("Failed changing position of song"),
+	    translate_noop("Successfully moved song up"),
+	    translate_noop("Failed moving song up"),
+	    translate_noop("Successfully moved song down"),
+	    translate_noop("Failed moving song down"),
+	    translate_noop("Successfully added song to the playlist"),
+	    translate_noop("Failed adding song to the playlist"),
+	    translate_noop("No songs found with current filter")
 	};
 
 	return tranlationKeys;

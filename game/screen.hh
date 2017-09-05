@@ -47,7 +47,7 @@ class Game: public Singleton <Game> {
   public:
 	/// constructor
     Game(Window& window);
-    ~Game() { if (currentScreen) currentScreen->exit(); }
+    ~Game();
 	/// Adds a screen to the manager
 	void addScreen(Screen* s) { std::string tmp = s->getName(); screens.insert(tmp, s); }
 	/// Switches active screen
@@ -85,9 +85,9 @@ class Game: public Singleton <Game> {
 	void drawNotifications();
 
 	/// Sets finished to true
-	void finished() { m_finished = true; }
+	void finished();
 	/// Returns finished state
-	bool isFinished() { return m_finished; }
+	bool isFinished();
 	/// Show performous logo
 	void showLogo(bool show = true) { m_logoAnim.setTarget(show ? 1.0 : 0.0); }
 	/// Draw the logo
