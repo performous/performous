@@ -216,7 +216,7 @@ std::string ScreenIntro::getIPaddr() {
 	try {
 		boost::asio::io_service netService;
 		boost::asio::ip::udp::resolver resolver(netService);
-		boost::asio::ip::udp::resolver::query query(boost::asio::ip::udp::v4(), "google.com", ""); //it's a bit of a dirty hack, but it works!
+		boost::asio::ip::udp::resolver::query query(boost::asio::ip::udp::v4(), "8.8.8.8", "80"); //it's a bit of a dirty hack, but it works!
 		boost::asio::ip::udp::resolver::iterator endpoints = resolver.resolve(query);
 		boost::asio::ip::udp::endpoint ep = *endpoints;
 		boost::asio::ip::udp::socket socket(netService);
@@ -226,6 +226,5 @@ std::string ScreenIntro::getIPaddr() {
 	} catch(std::exception& e) {
 			return "cannot obtain IP";
 	}
-
 	return "IP address";
 }

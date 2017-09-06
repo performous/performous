@@ -2,55 +2,539 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Perf try\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-05 19:35+0100\n"
-"PO-Revision-Date: 2013-05-24 12:47+0100\n"
-"Last-Translator: Tapio Vierros <tapiovierros@gmail.com>\n"
+"POT-Creation-Date: 2017-08-30 22:35+0200\n"
+"PO-Revision-Date: 2017-08-30 22:35+0200\n"
+"Last-Translator: Arjan Speiard | Asgard Sings! <arjan.spieard@gmail.com>\n"
 "Language-Team: \n"
-"Language: \n"
+"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
+"X-Poedit-KeywordsList: _;translate_noop\n"
 "X-Poedit-Basepath: .\n"
-"X-Generator: Poedit 1.5.4\n"
+"X-Generator: Poedit 2.0.1\n"
 "X-Poedit-SearchPath-0: ../game\n"
 "X-Poedit-SearchPath-1: ../data\n"
 
-#: ../game/song.hh:25
-msgid "Guitar"
-msgstr "Chitarra"
+#: ../data/config/schema.xml:19
+msgid "Game"
+msgstr "Gioco"
 
-#: ../game/song.hh:25
-msgid "Coop guitar"
-msgstr "Chitarra coop"
+#: ../data/config/schema.xml:20
+msgid "Gameplay related options"
+msgstr "Opzione relative al Gameplay"
 
-#: ../game/song.hh:25
-msgid "Rhythm guitar"
-msgstr "Chitarra ritmica"
+#: ../data/config/schema.xml:23
+msgid "Graphic"
+msgstr "Grafica"
 
-#: ../game/song.hh:25
-msgid "Bass"
-msgstr "Basso"
+#: ../data/config/schema.xml:24
+msgid "Configure rendering and video settings"
+msgstr "Impostazioni video e rendering"
 
-#: ../game/song.hh:25
-msgid "Drums"
-msgstr "Batteria"
+#: ../data/config/schema.xml:28
+msgid "Audio Devices"
+msgstr "Dispositivi audio"
 
-#: ../game/song.hh:25
-msgid "Vocals"
-msgstr "Cantato"
+#: ../data/config/schema.xml:29
+msgid "Setup microphones and playback"
+msgstr "Imposta microfoni e riproduzione"
 
-#: ../game/song.hh:25
-msgid "Harmonic 1"
-msgstr "Armonico 1"
+#: ../data/config/schema.xml:32
+msgid "Audio"
+msgstr "Audio"
 
-#: ../game/song.hh:25
-msgid "Harmonic 2"
-msgstr "Armonico 2"
+#: ../data/config/schema.xml:33
+#, fuzzy
+msgid "Configure general audio settings"
+msgstr "Impostazioni video e rendering"
 
-#: ../game/song.hh:25
-msgid "Harmonic 3"
-msgstr "Armonico 3"
+#: ../data/config/schema.xml:36
+msgid "Paths"
+msgstr "Percorsi (path)"
+
+#: ../data/config/schema.xml:37
+msgid "Setup song and data paths"
+msgstr "Imposta percorsi (path) canzoni e dati"
+
+#: ../data/config/schema.xml:48
+#, fuzzy
+msgid "Karaoke mode"
+msgstr "Modalità benchmark"
+
+#: ../data/config/schema.xml:49 ../data/config/schema.xml:57
+msgid "Hide pitch wave, notes and scoring."
+msgstr "Nascondi pitch wave, note e punteggio"
+
+#: ../data/config/schema.xml:56
+msgid "Lyric highlight style"
+msgstr ""
+
+#: ../data/config/schema.xml:60
+msgid "Autoplay"
+msgstr ""
+
+#: ../data/config/schema.xml:61
+msgid "Keep playing random songs after the playlist is empty."
+msgstr ""
+
+#: ../data/config/schema.xml:64
+msgid "Pitch waves"
+msgstr "Pitch wave"
+
+#: ../data/config/schema.xml:65
+msgid "Enable singing pitch display (when not in karaoke mode)."
+msgstr ""
+"Abilita la visualizzazione dinamica delle note da cantare (quando non si è "
+"in modalità karaoke)"
+
+#: ../data/config/schema.xml:70
+msgid "Theme"
+msgstr "Tema"
+
+#: ../data/config/schema.xml:71
+#, fuzzy
+msgid "Name of the theme to use."
+msgstr "Nome del tema da usare oppure la path assoluta alla cartella del tema"
+
+#: ../data/config/schema.xml:75
+msgid "Playlist screen timeout"
+msgstr ""
+
+#: ../data/config/schema.xml:76
+msgid ""
+"How long it will take before the next song in the playlist starts "
+"automatically."
+msgstr ""
+
+#: ../data/config/schema.xml:84
+msgid "Webserver access"
+msgstr ""
+
+#: ../data/config/schema.xml:85
+msgid ""
+"Define if you want to control performous remotely with web interface "
+"(requires restart)."
+msgstr ""
+
+#: ../data/config/schema.xml:90
+msgid "Webserver port"
+msgstr ""
+
+#: ../data/config/schema.xml:91
+msgid ""
+"Port to use for the web server. Choose one that is not used by other "
+"applications."
+msgstr ""
+
+#: ../data/config/schema.xml:94
+msgid "Keyboard as guitar"
+msgstr "Tastiera come chitarra"
+
+#: ../data/config/schema.xml:95
+msgid "Enable keyboard as guitar (Frets on Fire mode)."
+msgstr "Abilita la tastiera come chitarra (modalità Frets on Fire)."
+
+#: ../data/config/schema.xml:98
+msgid "Keyboard as drumkit"
+msgstr "Tastiera come drumkit"
+
+#: ../data/config/schema.xml:99
+msgid "Enable keyboard as drumkit."
+msgstr "Abilita la tastiera come drumkit"
+
+#: ../data/config/schema.xml:102
+msgid "Keyboard as dance pad"
+msgstr "Tastiera come dance pad"
+
+#: ../data/config/schema.xml:103
+msgid "Enable keyboard as dance pad."
+msgstr "Abilita la tastiera come dance pad"
+
+#: ../data/config/schema.xml:106
+#, fuzzy
+msgid "Keyboard as keytar"
+msgstr "Tastiera come chitarra"
+
+#: ../data/config/schema.xml:107
+#, fuzzy
+msgid "Enable keyboard as keytar."
+msgstr "Abilita la tastiera come dance pad"
+
+#: ../data/config/schema.xml:114
+msgid "Force controller A's type"
+msgstr ""
+
+#: ../data/config/schema.xml:115
+msgid ""
+"Override autodetection and force the first controller to the given type."
+msgstr ""
+
+#: ../data/config/schema.xml:122
+msgid "Force controller B's type"
+msgstr ""
+
+#: ../data/config/schema.xml:123
+msgid ""
+"Override autodetection and force the second controller to the given type."
+msgstr ""
+
+#: ../data/config/schema.xml:130
+msgid "Force controller C's type"
+msgstr ""
+
+#: ../data/config/schema.xml:131
+msgid ""
+"Override autodetection and force the third controller to the given type."
+msgstr ""
+
+#: ../data/config/schema.xml:138
+msgid "Force controller D's type"
+msgstr ""
+
+#: ../data/config/schema.xml:139
+msgid ""
+"Override autodetection and force the fourth controller to the given type."
+msgstr ""
+
+#: ../data/config/schema.xml:146
+msgid "Joystick configuration"
+msgstr "Configurazione joystick"
+
+#: ../data/config/schema.xml:147
+msgid "Force joystick to some kind of instrument."
+msgstr "Forza il joystick a qualche tipo di strumento"
+
+#: ../data/config/schema.xml:150
+msgid "Hardware MIDI input device"
+msgstr "Dispositivo hardware di input MIDI"
+
+#: ../data/config/schema.xml:151
+msgid ""
+"Regex for matching the MIDI devices to use. The default is to use all "
+"available devices."
+msgstr ""
+
+#: ../data/config/schema.xml:166
+msgid "Fallback song encoding"
+msgstr ""
+
+#: ../data/config/schema.xml:167
+msgid "Pick the text codec used for song files that are not UTF-8."
+msgstr ""
+
+#: ../data/config/schema.xml:174
+msgid "Windowed width"
+msgstr "Larghezza finestra"
+
+#: ../data/config/schema.xml:175
+msgid "The width of the window."
+msgstr "La larghezza della finestra"
+
+#: ../data/config/schema.xml:180
+msgid "Windowed height"
+msgstr "Altezza finestra"
+
+#: ../data/config/schema.xml:181
+msgid "The height of the window."
+msgstr "L'altezza della finestra"
+
+#: ../data/config/schema.xml:184
+msgid "Fullscreen mode"
+msgstr "Fullscreen"
+
+#: ../data/config/schema.xml:185
+msgid "Enable fullscreen mode on startup."
+msgstr "Abilita fullscreen all'avvio."
+
+#: ../data/config/schema.xml:188
+msgid "Stereoscopic 3D"
+msgstr ""
+
+#: ../data/config/schema.xml:189
+msgid "Enable 3D rendering of Performous."
+msgstr ""
+
+#: ../data/config/schema.xml:197
+msgid "Stereo3D type"
+msgstr ""
+
+#: ../data/config/schema.xml:198
+msgid "Some modes may only get activated in fullscreen mode."
+msgstr ""
+
+#: ../data/config/schema.xml:203
+msgid "Stereo3D separation"
+msgstr ""
+
+#: ../data/config/schema.xml:204
+msgid ""
+"The strength of the effect. Experiment with different settings for best "
+"results."
+msgstr ""
+
+#: ../data/config/schema.xml:207
+msgid "Video playback"
+msgstr "Riproduzione video"
+
+#: ../data/config/schema.xml:208
+msgid ""
+"Allows completely disabling background videos. It is recommended to leave "
+"this enabled as Performous will still smoothly fade out the video if your "
+"computer is not fast enough."
+msgstr ""
+"Abilita la completa disabilitazione del video di background. Si raccomanda "
+"di lasciare questa opzione attivata perchè Performous farà svanire il video "
+"se il computer non è abbastanza veloce."
+
+#: ../data/config/schema.xml:211
+msgid "Webcam background"
+msgstr "Sfondo della webcam"
+
+#: ../data/config/schema.xml:212
+#, fuzzy
+msgid ""
+"Performous can use webcam as a background video. Disable it if Performous "
+"crashes while entering a song."
+msgstr ""
+"Performous può provare ad usare la webcam come video di background. Lo puoi "
+"disabilitare se ti dà fastidio."
+
+#: ../data/config/schema.xml:216
+msgid "Webcam id"
+msgstr "Webcam id"
+
+#: ../data/config/schema.xml:217
+msgid ""
+"Use -1 to autodetect or a number starting from 0 to choose specific device."
+msgstr ""
+"Usa -1 per la rilevazione automatica oppure un numero che parte da 0 per "
+"selezionare uno specifico dispositivo."
+
+#: ../data/config/schema.xml:222
+msgid "SVG quality"
+msgstr "Qualità SVG"
+
+#: ../data/config/schema.xml:223
+msgid ""
+"Larger numbers cause vector graphics to be rendered in higher resolution. "
+"Decrease this to make navigating in menus faster."
+msgstr ""
+"Numeri grandi aumentanno la risoluzione di visualizzazione delle immagini. "
+"Diminuisci questo per navigare nei menu più rapidamente."
+
+#: ../data/config/schema.xml:228
+msgid "Text quality"
+msgstr "Qualità testo"
+
+#: ../data/config/schema.xml:229
+msgid ""
+"Larger numbers cause text to be rendered in higher resolution. Decrease this "
+"to make everything a little faster."
+msgstr ""
+"Numeri grandi aumenteranno la risoluzione di visualizzazione del testo. "
+"Diminuisci questo per rendere tutto un po' più veloce."
+
+#: ../data/config/schema.xml:232
+msgid "Benchmark mode"
+msgstr "Modalità benchmark"
+
+#: ../data/config/schema.xml:233
+msgid ""
+"Framerate limit of 100 FPS is removed and the game instead renders at full "
+"speed. FPS values are printed to console. Please note that the display "
+"drivers may still limit the rendering speed to the screen refresh rate."
+msgstr ""
+"Il limite di framerate di 100 FPS è rimosso e il gioco gira a piena potenza. "
+"I valori degli FPS sono stampati su console. Da notare che i driver della "
+"scheda video potrebbero ancora limitare la velocità di rendering alla "
+"velocità di refresh dello schermo."
+
+#: ../data/config/schema.xml:240
+msgid "Suggested latency"
+msgstr "Latenza suggerita"
+
+#: ../data/config/schema.xml:241
+msgid ""
+"This is a hint for the audio engine about the desired latency. Set this as "
+"low as possible while retaining clear audio playback. Requires restart."
+msgstr ""
+"Questo è un consiglio per il motore audio relativo alla latenza desiderata. "
+"Imposta questo valore il più piccolo valore possibile per avere un buon "
+"playback audio. Richiede riavvio."
+
+#: ../data/config/schema.xml:246
+msgid "Audio/video latency"
+msgstr "Latenza audio/video"
+
+#: ../data/config/schema.xml:247
+msgid ""
+"Affects all modes. Use negative value if your display input lag is greater "
+"than the sound card output latency, positive values in the opposite case and "
+"zero if they are equal. This should be set so that the notes pass the cursor "
+"at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while "
+"performing."
+msgstr ""
+"Influisce su tutte le modalità. Usa dei valori negativi se il lag del "
+"display è maggiore della latenza della scheda audio, positivi nel caso "
+"opposto e zero se sono uguali. Questo parametro dovrebbe essere impostato in "
+"maniera tale che le note passino sotto al cursore nell stesso tempo che si "
+"sente l'audio. Usare Ctrl+F1/F2 per regolare mentre si è in performing."
+
+#: ../data/config/schema.xml:252
+msgid "Audio round-trip latency"
+msgstr "Latenza audio di ritorno"
+
+#: ../data/config/schema.xml:253
+msgid ""
+"Affects singing only. The time it takes for Performous playback to reach "
+"your speakers, fly to the microphone and all the way back until Performous "
+"captures and analyzes it. While performing, press Ctrl+S for synth mode and "
+"adjust with Ctrl+F3/F4."
+msgstr ""
+"Influisce solo la parte cantata. Il tempo che serve al playback di "
+"Performous per raggiungere gli altoparlandi, volare al microfono e tutta la "
+"strada indietro finchè Performous non lo cattura e lo analizza. Mentre si è "
+"in performing, premere Ctrl+S per la modalità synth e regolare con Ctrl+F3/"
+"F4."
+
+#: ../data/config/schema.xml:258
+msgid "Audio/controller latency"
+msgstr "Latenza audio/controller."
+
+#: ../data/config/schema.xml:259
+msgid ""
+"Affects instruments and dancing only. The total of USB (guitar or dance pad) "
+"latency combined with audio output latency. Adjust so that you can hit the "
+"notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to "
+"adjust while performing."
+msgstr ""
+"Influisce solo strumenti e danza. Il totale della latenza USB (chitarra o "
+"dance pad) combinata con la latenza di output audio. Regolala in maniera "
+"tale che puoi colpire le note meglio quando si suona ad orecchio (senza "
+"guardare lo schermo). Usa Ctrl+F5/F6 per regolare mentre si è in performing."
+
+#: ../data/config/schema.xml:266
+msgid "Audio devices"
+msgstr "Dispositivi audio"
+
+#: ../data/config/schema.xml:267
+msgid "List of audio devices to try."
+msgstr "Lista dei dispositivi audio da provare."
+
+#: ../data/config/schema.xml:272
+msgid "Menu volume"
+msgstr "Volume menu"
+
+#: ../data/config/schema.xml:273
+msgid "The volume level of menus, song previews and jukebox mode."
+msgstr ""
+"Il livello del volume dei menu, anteprima delle canzoni e modalità jukebox."
+
+#: ../data/config/schema.xml:278
+msgid "Music volume"
+msgstr "Volume musica"
+
+#: ../data/config/schema.xml:279
+msgid ""
+"The ingame music volume. Values above 90 are not recommended as distortion "
+"may occur."
+msgstr ""
+"Il volume della musica nel gioco. Valori sopra 90 sono sconsigliati perchè "
+"potrebbero verificarsi distorsioni."
+
+#: ../data/config/schema.xml:284
+msgid "Failure volume"
+msgstr "Volume errore"
+
+#: ../data/config/schema.xml:285
+msgid ""
+"The ingame fail sound volume. Values above 90 are not recommended as "
+"distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
+msgstr ""
+"Il volume del suono dell'errore nel gioco. Valori sopra 90 sono sconsigliati "
+"perchè potrebbero verificarsi distorsioni. 11 è più alto di 10, ma questi "
+"vanno a 100. 89 il più alto!"
+
+#: ../data/config/schema.xml:288
+msgid "Microphone pass-through"
+msgstr ""
+
+#: ../data/config/schema.xml:289
+msgid "Send captured singing voice to speakers."
+msgstr ""
+
+#: ../data/config/schema.xml:294
+msgid "Pass-through volume ratio"
+msgstr ""
+
+#: ../data/config/schema.xml:295
+msgid "How much voice is amplified compared to the music."
+msgstr ""
+
+#: ../data/config/schema.xml:298
+msgid "Suppress center channel"
+msgstr ""
+
+#: ../data/config/schema.xml:299
+msgid "Suppress audio of center channel (e.g. vocals)."
+msgstr ""
+
+#: ../data/config/schema.xml:310
+msgid "Song folders"
+msgstr "Cartella canzoni"
+
+#: ../data/config/schema.xml:311
+msgid ""
+"Where to recursively look for songs. DATADIR at the beginning means all "
+"Performous data folders."
+msgstr ""
+"Dove guardare ricorsivamente per tutte le canzoni. DATADIR all'inizio vuol "
+"dire tutte le cartelle dei dati di Performous."
+
+#: ../data/config/schema.xml:314 ../game/screen_paths.cc:74
+msgid "Show hidden folders"
+msgstr ""
+
+#: ../data/config/schema.xml:315
+msgid "When true the screen_paths will also show hidden folders"
+msgstr ""
+
+#: ../data/config/schema.xml:318
+msgid "Base folders for data"
+msgstr "Cartelle basi per i dati"
+
+#: ../data/config/schema.xml:319
+msgid ""
+"System defaults are included automatically. Additional paths can be added "
+"here."
+msgstr ""
+"Le predefinite di sistema sono incluse automaticamente. Path addizionali "
+"possono essere aggiunte qui."
+
+#: ../data/config/schema.xml:325 ../game/webserver.cc:294
+msgid "Sort order"
+msgstr ""
+
+#: ../data/config/schema.xml:326
+msgid "Currently active sort order"
+msgstr ""
+
+#: ../data/performous.desktop:3
+msgid "Performous"
+msgstr ""
+
+#: ../data/performous.desktop:4
+msgid "A karaoke game"
+msgstr ""
+
+#: ../data/performous.desktop:13
+msgid "performous"
+msgstr ""
+
+#: ../data/performous.desktop:17
+msgid "song;music;dance;karaoke;microphone;sound;singing;"
+msgstr ""
 
 #: ../game/configuration.cc:112
 msgid "Enabled"
@@ -90,7 +574,7 @@ msgid "Ready!"
 msgstr "Pronto!"
 
 #: ../game/dancegraph.cc:107 ../game/guitargraph.cc:193
-#: ../game/screen_intro.cc:166
+#: ../game/screen_intro.cc:172
 msgid "Start performing!"
 msgstr "Comincia il performing!"
 
@@ -103,14 +587,14 @@ msgid "Select difficulty"
 msgstr "Seleziona la difficoltà"
 
 #: ../game/dancegraph.cc:137 ../game/guitargraph.cc:199
-#: ../game/instrumentgraph.cc:59 ../game/screen_intro.cc:184
-#: ../game/screen_sing.cc:94 ../game/screen_sing.cc:128
+#: ../game/instrumentgraph.cc:59 ../game/screen_intro.cc:190
+#: ../game/screen_sing.cc:94 ../game/screen_sing.cc:131
 msgid "Quit"
 msgstr "Esci"
 
 #: ../game/dancegraph.cc:137 ../game/guitargraph.cc:199
 #: ../game/instrumentgraph.cc:59 ../game/screen_sing.cc:94
-#: ../game/screen_sing.cc:128
+#: ../game/screen_sing.cc:131
 msgid "Exit to song browser"
 msgstr "Ritorna alle canzoni"
 
@@ -198,31 +682,31 @@ msgstr ""
 "Comincia la canzone\n"
 "dall'inizio"
 
-#: ../game/main.cc:151
+#: ../game/main.cc:162
 msgid "Loading audio samples..."
 msgstr "Caricamento canzoni di esempio..."
 
-#: ../game/main.cc:165
+#: ../game/main.cc:177
 msgid "Creating screens..."
 msgstr "Creazione dele schermate..."
 
-#: ../game/main.cc:175
+#: ../game/main.cc:187
 msgid "Entering main menu"
 msgstr "Entrando nel menu principale"
 
-#: ../game/main.cc:177 ../game/screen_sing.cc:99
+#: ../game/main.cc:189 ../game/screen_sing.cc:99
 msgid "Loading complete"
 msgstr "Caricamento completato"
 
-#: ../game/main.cc:188
+#: ../game/main.cc:200
 msgid "Screenshot taken!"
 msgstr "Screenshot eseguito!"
 
-#: ../game/main.cc:191
+#: ../game/main.cc:203
 msgid "Screenshot failed!"
 msgstr "Screenshot fallito!"
 
-#: ../game/screen_audiodevices.cc:54
+#: ../game/screen_audiodevices.cc:57
 msgid ""
 "It seems you have some manual configurations\n"
 "incompatible with this user interface.\n"
@@ -236,11 +720,11 @@ msgstr ""
 "tutte le impostazioni di configurazione dei dispositivi audio.\n"
 "Saranno salvate anche le tue altre opzioni."
 
-#: ../game/screen_audiodevices.cc:113
+#: ../game/screen_audiodevices.cc:116
 msgid "- Unassigned -"
 msgstr "- Non assegnato -"
 
-#: ../game/screen_audiodevices.cc:134
+#: ../game/screen_audiodevices.cc:137
 msgid ""
 "Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select "
 "to cancel. Ctrl + R to reset defaults"
@@ -249,7 +733,7 @@ msgstr ""
 "fare il test oppure Esc/Select per cancellare. Crtl + R per tornare ai "
 "parametri originali"
 
-#: ../game/screen_audiodevices.cc:139
+#: ../game/screen_audiodevices.cc:142
 msgid ""
 "For advanced device configuration, use command line parameter --audio (use --"
 "audiohelp for details)."
@@ -257,15 +741,15 @@ msgstr ""
 "Per la configurazione avanzata, usa il parametro --audio nella riga di "
 "comando (--audiohelp per i dettagli)"
 
-#: ../game/screen_audiodevices.cc:187
+#: ../game/screen_audiodevices.cc:190
 msgid "Some devices failed to open!"
 msgstr "Errore di apertura su qualche dispositivo!"
 
-#: ../game/screen_intro.cc:24
+#: ../game/screen_intro.cc:25
 msgid "No playback devices could be used.\n"
 msgstr "Nessun dispositivo di playback può essere usato.\n"
 
-#: ../game/screen_intro.cc:25
+#: ../game/screen_intro.cc:26
 msgid ""
 "\n"
 "Please configure some before playing."
@@ -273,64 +757,87 @@ msgstr ""
 "\n"
 "Per favore configura qualcosa prima di giocare."
 
-#: ../game/screen_intro.cc:69
+#: ../game/screen_intro.cc:74 ../game/screen_paths.cc:36
 msgid "Settings saved as system defaults."
 msgstr "Impostazioni salvate come default di sistema."
 
-#: ../game/screen_intro.cc:69
+#: ../game/screen_intro.cc:74 ../game/screen_paths.cc:36
 msgid "Settings saved."
 msgstr "Impostazioni salvate."
 
-#: ../game/screen_intro.cc:149
+#: ../game/screen_intro.cc:154
 msgid "Ctrl + S to save, Ctrl + R to reset defaults"
 msgstr "Ctrl + S per salvare, Ctrl + R per tornare al default"
 
-#: ../game/screen_intro.cc:166
+#: ../game/screen_intro.cc:172
 msgid "Perform"
 msgstr "Gioca"
 
-#: ../game/screen_intro.cc:167
+#: ../game/screen_intro.cc:173
 msgid "Practice"
 msgstr "Pratica"
 
-#: ../game/screen_intro.cc:167
+#: ../game/screen_intro.cc:173
 msgid "Check your skills or test the microphones"
 msgstr "Controlla la tua bravura! / Test microfono"
 
-#: ../game/screen_intro.cc:183
+#: ../game/screen_intro.cc:189
 msgid "Configure"
 msgstr "Configura"
 
-#: ../game/screen_intro.cc:183
+#: ../game/screen_intro.cc:189
 msgid "Configure audio and game options"
 msgstr "Impostazioni audio e gioco"
 
-#: ../game/screen_intro.cc:184
+#: ../game/screen_intro.cc:190
 msgid "Leave the game"
 msgstr "Lascia il gioco"
 
-#: ../game/screen_paths.cc:19
+#: ../game/screen_intro.cc:200
 msgid ""
-"This tool is not yet available.\n"
-"Configure paths by adding them\n"
-"as command line parameters and\n"
-"then save them in configuration menu."
+"Webserver active!\n"
+" use a webbrowser\n"
+"and navigate to localhost:"
 msgstr ""
-"Questo strumento non è ancora disponibile.\n"
-"Configura le path aggiungendole\n"
-"come parametro da linea di comando\n"
-"e salvale nel menu di configurazione."
 
-#: ../game/screen_paths.cc:65
-msgid "Press any key to exit."
-msgstr "Premi qualsiasi tasto per uscire."
-
-#: ../game/screen_paths.cc:71
-#, fuzzy
-msgid "Windows users can also use ConfigureSongDirectory.bat script."
+#: ../game/screen_intro.cc:207
+msgid ""
+"Webserver active!\n"
+" connect to this computer\n"
+"using "
 msgstr ""
-"Gli utenti Windows possono anche usare ConfigureSongDirectory.bat nella "
-"cartella bin."
+
+#: ../game/screen_paths.cc:69
+msgid "Hide hidden folders"
+msgstr ""
+
+#: ../game/screen_paths.cc:81
+msgid "Remove this folder"
+msgstr ""
+
+#: ../game/screen_paths.cc:81
+msgid "Remove current folder from song folders"
+msgstr ""
+
+#: ../game/screen_paths.cc:87
+msgid "Add this folder"
+msgstr ""
+
+#: ../game/screen_paths.cc:87
+msgid "Add current folder to song folders"
+msgstr ""
+
+#: ../game/screen_paths.cc:93
+msgid ".."
+msgstr ""
+
+#: ../game/screen_paths.cc:93
+msgid "Go up one folder"
+msgstr ""
+
+#: ../game/screen_paths.cc:104
+msgid "Open folder"
+msgstr ""
 
 #: ../game/screen_players.cc:117
 msgid "No players found!"
@@ -369,97 +876,101 @@ msgstr "Inserisci un nome per selezionare un giocatore o crearne uno nuovo."
 msgid "Search Text:"
 msgstr "Testo di ricerca"
 
-#: ../game/screen_playlist.cc:24 ../game/screen_sing.cc:47
+#: ../game/screen_playlist.cc:21 ../game/screen_sing.cc:47
 msgid "Initializing webcam..."
 msgstr "Inizializzazione webcam..."
 
-#: ../game/screen_playlist.cc:166 ../game/screen_playlist.cc:309
+#: ../game/screen_playlist.cc:46
+msgid "Loading song timestamps..."
+msgstr ""
+
+#: ../game/screen_playlist.cc:171 ../game/screen_playlist.cc:334
 msgid "Continue"
 msgstr ""
 
-#: ../game/screen_playlist.cc:166
+#: ../game/screen_playlist.cc:171
 msgid "Continue playing"
 msgstr ""
 
-#: ../game/screen_playlist.cc:174
+#: ../game/screen_playlist.cc:179
 msgid "Add songs"
 msgstr ""
 
-#: ../game/screen_playlist.cc:174
+#: ../game/screen_playlist.cc:179
 msgid "Open the song browser to add more songs"
 msgstr ""
 
-#: ../game/screen_playlist.cc:175 ../game/screen_songs.cc:520
+#: ../game/screen_playlist.cc:180 ../game/screen_songs.cc:522
 msgid "Shuffle"
 msgstr ""
 
-#: ../game/screen_playlist.cc:175
+#: ../game/screen_playlist.cc:180
 msgid "Randomize the order of the playlist"
 msgstr ""
 
-#: ../game/screen_playlist.cc:181
+#: ../game/screen_playlist.cc:186
 msgid "Clear and exit"
 msgstr ""
 
-#: ../game/screen_playlist.cc:181
+#: ../game/screen_playlist.cc:186
 msgid "Remove all the songs from the list"
 msgstr ""
 
-#: ../game/screen_playlist.cc:187 ../game/screen_playlist.cc:350
-#: ../game/screen_songs.cc:533
+#: ../game/screen_playlist.cc:192 ../game/screen_playlist.cc:375
+#: ../game/screen_songs.cc:535
 msgid "Back"
 msgstr ""
 
-#: ../game/screen_playlist.cc:187 ../game/screen_playlist.cc:350
+#: ../game/screen_playlist.cc:192 ../game/screen_playlist.cc:375
 msgid "Back to playlist viewer"
 msgstr ""
 
-#: ../game/screen_playlist.cc:294
+#: ../game/screen_playlist.cc:317
 msgid "Press enter to view song options"
 msgstr ""
 
-#: ../game/screen_playlist.cc:301
+#: ../game/screen_playlist.cc:326
 msgid "View more options"
 msgstr ""
 
-#: ../game/screen_playlist.cc:301
+#: ../game/screen_playlist.cc:326
 #, fuzzy
 msgid "View general playlist settings"
 msgstr "Impostazioni generali audio"
 
-#: ../game/screen_playlist.cc:309
+#: ../game/screen_playlist.cc:334
 msgid "Play first"
 msgstr ""
 
-#: ../game/screen_playlist.cc:311
+#: ../game/screen_playlist.cc:336
 msgid "Ignore the playlist's order and play this song first"
 msgstr ""
 
-#: ../game/screen_playlist.cc:312
+#: ../game/screen_playlist.cc:337
 msgid "Start the song already!"
 msgstr ""
 
-#: ../game/screen_playlist.cc:321
+#: ../game/screen_playlist.cc:346
 msgid "Remove"
 msgstr ""
 
-#: ../game/screen_playlist.cc:321
+#: ../game/screen_playlist.cc:346
 msgid "Remove this song from the list"
 msgstr ""
 
-#: ../game/screen_playlist.cc:333
+#: ../game/screen_playlist.cc:358 ../game/webserver.cc:307
 msgid "Move up"
 msgstr ""
 
-#: ../game/screen_playlist.cc:333
+#: ../game/screen_playlist.cc:358
 msgid "Move this song up the list"
 msgstr ""
 
-#: ../game/screen_playlist.cc:343
+#: ../game/screen_playlist.cc:368
 msgid "Move Down"
 msgstr ""
 
-#: ../game/screen_playlist.cc:343
+#: ../game/screen_playlist.cc:368
 msgid "Move this song down the list"
 msgstr ""
 
@@ -510,686 +1021,434 @@ msgstr ""
 "Cambia traccia vocale\n"
 "(riavvio richiesto)"
 
-#: ../game/screen_sing.cc:127
+#: ../game/screen_sing.cc:129
 msgid "Skip"
 msgstr ""
 
-#: ../game/screen_sing.cc:127
+#: ../game/screen_sing.cc:129
 msgid "Skip current song"
 msgstr ""
 
-#: ../game/screen_sing.cc:279
+#: ../game/screen_sing.cc:283
 msgid "Press UP to join dance!"
 msgstr ""
 
-#: ../game/screen_sing.cc:279
+#: ../game/screen_sing.cc:283
 msgid "Step UP to join!"
 msgstr ""
 
-#: ../game/screen_sing.cc:284
+#: ../game/screen_sing.cc:288
 msgid "Press 1 to join guitar!"
 msgstr ""
 
-#: ../game/screen_sing.cc:284
+#: ../game/screen_sing.cc:288
 msgid "Press GREEN to join!"
 msgstr ""
 
-#: ../game/screen_sing.cc:289
+#: ../game/screen_sing.cc:293
 msgid "Press SPACE to join drums!"
 msgstr ""
 
-#: ../game/screen_sing.cc:289
+#: ../game/screen_sing.cc:293
 msgid "KICK to join!"
 msgstr ""
 
-#: ../game/screen_sing.cc:517
+#: ../game/screen_sing.cc:521
 msgid "   ENTER to skip instrumental break"
 msgstr "   INVIO per saltare la pausa strumentale"
 
-#: ../game/screen_sing.cc:521 ../game/screen_sing.cc:535
+#: ../game/screen_sing.cc:525 ../game/screen_sing.cc:539
 msgid "   Autoplay enabled"
 msgstr ""
 
-#: ../game/screen_sing.cc:524 ../game/screen_sing.cc:532
+#: ../game/screen_sing.cc:528 ../game/screen_sing.cc:536
 msgid "   Remember to wait for grading!"
 msgstr "   Ricordati di aspettare per il punteggio!"
 
-#: ../game/screen_sing.cc:662
+#: ../game/screen_sing.cc:669
 msgid "No player!"
 msgstr "Nessun giocatore trovato!"
 
-#: ../game/screen_sing.cc:669
+#: ../game/screen_sing.cc:677
 msgid "Hit singer"
 msgstr "Star"
 
-#: ../game/screen_sing.cc:670
+#: ../game/screen_sing.cc:678
 msgid "Lead singer"
 msgstr "Cantante"
 
-#: ../game/screen_sing.cc:671 ../game/screen_sing.cc:677
-#: ../game/screen_sing.cc:683
+#: ../game/screen_sing.cc:679 ../game/screen_sing.cc:685
+#: ../game/screen_sing.cc:691
 msgid "Rising star"
 msgstr "Dilettante"
 
-#: ../game/screen_sing.cc:672 ../game/screen_sing.cc:678
-#: ../game/screen_sing.cc:684
+#: ../game/screen_sing.cc:680 ../game/screen_sing.cc:686
+#: ../game/screen_sing.cc:692
 msgid "Amateur"
 msgstr "Amatore"
 
-#: ../game/screen_sing.cc:673 ../game/screen_sing.cc:685
+#: ../game/screen_sing.cc:681 ../game/screen_sing.cc:693
 msgid "Tone deaf"
 msgstr "Stonato"
 
-#: ../game/screen_sing.cc:675
+#: ../game/screen_sing.cc:683
 msgid "Maniac"
 msgstr "Maniaco"
 
-#: ../game/screen_sing.cc:676
+#: ../game/screen_sing.cc:684
 msgid "Hoofer"
 msgstr "Professionista"
 
-#: ../game/screen_sing.cc:679
+#: ../game/screen_sing.cc:687
 msgid "Loser"
 msgstr "Perdente"
 
-#: ../game/screen_sing.cc:681
+#: ../game/screen_sing.cc:689
 msgid "Virtuoso"
 msgstr "Virtuoso"
 
-#: ../game/screen_sing.cc:682
+#: ../game/screen_sing.cc:690
 msgid "Rocker"
 msgstr "Rockstar"
 
-#: ../game/screen_songs.cc:288
+#: ../game/screen_songs.cc:290
 #, fuzzy
 msgid "Sorry, no songs match the search!"
 msgstr "nessuna canzone trovata"
 
-#: ../game/screen_songs.cc:291
+#: ../game/screen_songs.cc:293
 #, fuzzy
 msgid "Sorry, no songs match the filter!"
 msgstr "nessuna canzone trovata"
 
-#: ../game/screen_songs.cc:294
+#: ../game/screen_songs.cc:296
 msgid "No songs found!"
 msgstr "Nessuna canzone trovata!"
 
-#: ../game/screen_songs.cc:295
+#: ../game/screen_songs.cc:297
 #, fuzzy
 msgid "Visit performous.org for free songs"
 msgstr ""
 "Visita performous.org\n"
 "per canzoni gratuite"
 
-#: ../game/screen_songs.cc:313
+#: ../game/screen_songs.cc:315
 msgid "<type in to search>"
 msgstr "<premi qualche lettera per cercare>"
 
-#: ../game/screen_songs.cc:313
+#: ../game/screen_songs.cc:315
 msgid "songs"
 msgstr ""
 
-#: ../game/screen_songs.cc:313
+#: ../game/screen_songs.cc:315
 msgid "options"
 msgstr ""
 
-#: ../game/screen_songs.cc:315
+#: ../game/screen_songs.cc:317
 msgid "sort order: "
 msgstr ""
 
-#: ../game/screen_songs.cc:316
+#: ../game/screen_songs.cc:318
 msgid "type filter: "
 msgstr ""
 
-#: ../game/screen_songs.cc:317
+#: ../game/screen_songs.cc:319
 #, fuzzy
 msgid "hiscores"
 msgstr "Highscore per %1%\n"
 
-#: ../game/screen_songs.cc:317
+#: ../game/screen_songs.cc:319
 #, fuzzy
 msgid "jukebox mode"
 msgstr "Modalità Lefty"
 
-#: ../game/screen_songs.cc:320
+#: ../game/screen_songs.cc:322
 msgid "start a playlist with this song!"
 msgstr ""
 
-#: ../game/screen_songs.cc:320
+#: ../game/screen_songs.cc:322
 msgid "open the playlist menu"
 msgstr ""
 
-#: ../game/screen_songs.cc:513
+#: ../game/screen_songs.cc:515
 msgid "Play"
 msgstr ""
 
-#: ../game/screen_songs.cc:526
+#: ../game/screen_songs.cc:528 ../game/webserver.cc:286
 msgid "View playlist"
 msgstr ""
 
-#: ../game/screen_songs.cc:527
+#: ../game/screen_songs.cc:529
 msgid "Clear playlist"
 msgstr ""
 
-#: ../game/songparser-xml.cc:109
+#: ../game/song.hh:26
+msgid "Guitar"
+msgstr "Chitarra"
+
+#: ../game/song.hh:26
+msgid "Coop guitar"
+msgstr "Chitarra coop"
+
+#: ../game/song.hh:26
+msgid "Rhythm guitar"
+msgstr "Chitarra ritmica"
+
+#: ../game/song.hh:26
+msgid "Bass"
+msgstr "Basso"
+
+#: ../game/song.hh:26
+msgid "Drums"
+msgstr "Batteria"
+
+#: ../game/song.hh:26
+msgid "Vocals"
+msgstr "Cantato"
+
+#: ../game/song.hh:26
+msgid "Harmonic 1"
+msgstr "Armonico 1"
+
+#: ../game/song.hh:26
+msgid "Harmonic 2"
+msgstr "Armonico 2"
+
+#: ../game/song.hh:26
+msgid "Harmonic 3"
+msgstr "Armonico 3"
+
+#: ../game/songparser-xml.cc:104
 msgid "Together"
 msgstr ""
 
-#: ../game/songs.cc:191
+#: ../game/songs.cc:196
 msgid "show all songs"
 msgstr ""
 
-#: ../game/songs.cc:192
+#: ../game/songs.cc:197
 msgid "has dance"
 msgstr ""
 
-#: ../game/songs.cc:193
+#: ../game/songs.cc:198
 #, fuzzy
 msgid "has vocals"
 msgstr "Cantato"
 
-#: ../game/songs.cc:194
+#: ../game/songs.cc:199
 msgid "has duet"
 msgstr ""
 
-#: ../game/songs.cc:195
+#: ../game/songs.cc:200
 #, fuzzy
 msgid "has guitar"
 msgstr "Chitarra ritmica"
 
-#: ../game/songs.cc:196
+#: ../game/songs.cc:201
 msgid "drums or keytar"
 msgstr ""
 
-#: ../game/songs.cc:197
+#: ../game/songs.cc:202
 msgid "full band"
 msgstr ""
 
-#: ../game/songs.cc:225
+#: ../game/songs.cc:230
 msgid "random order"
 msgstr "ordine casuale"
 
-#: ../game/songs.cc:226
+#: ../game/songs.cc:231
 msgid "sorted by song"
 msgstr "ordinato per canzone"
 
-#: ../game/songs.cc:227
+#: ../game/songs.cc:232
 msgid "sorted by artist"
 msgstr "ordinato per artista"
 
-#: ../game/songs.cc:228
+#: ../game/songs.cc:233
 msgid "sorted by edition"
 msgstr "ordinato per edizione"
 
-#: ../game/songs.cc:229
+#: ../game/songs.cc:234
 msgid "sorted by genre"
 msgstr "ordinato per genere"
 
-#: ../game/songs.cc:230
+#: ../game/songs.cc:235
 msgid "sorted by path"
 msgstr "ordinato per percorso"
 
-#: ../game/songs.cc:231
+#: ../game/songs.cc:236
 msgid "sorted by language"
 msgstr "ordinato per lingua"
 
-#: ../data/config/schema.xml:19
-msgid "Game"
-msgstr "Gioco"
+#: ../game/webserver.cc:284
+msgid "Performous web frontend"
+msgstr ""
 
-#: ../data/config/schema.xml:20
-msgid "Gameplay related options"
-msgstr "Opzione relative al Gameplay"
+#: ../game/webserver.cc:285
+msgid "View database"
+msgstr ""
 
-#: ../data/config/schema.xml:23
-msgid "Graphic"
-msgstr "Grafica"
+#: ../game/webserver.cc:287
+msgid "Search and Add"
+msgstr ""
 
-#: ../data/config/schema.xml:24
-msgid "Configure rendering and video settings"
-msgstr "Impostazioni video e rendering"
+#: ../game/webserver.cc:288
+msgid "Sort by"
+msgstr ""
 
-#: ../data/config/schema.xml:28
-msgid "Audio Devices"
-msgstr "Dispositivi audio"
+#: ../game/webserver.cc:289
+msgid "Artist"
+msgstr ""
 
-#: ../data/config/schema.xml:29
-msgid "Setup microphones and playback"
-msgstr "Imposta microfoni e riproduzione"
+#: ../game/webserver.cc:290
+msgid "Title"
+msgstr ""
 
-#: ../data/config/schema.xml:32
-msgid "Audio"
-msgstr "Audio"
+#: ../game/webserver.cc:291
+msgid "Language"
+msgstr ""
 
-#: ../data/config/schema.xml:33
+#: ../game/webserver.cc:292
+msgid "Edition"
+msgstr ""
+
+#: ../game/webserver.cc:293
+msgid "Creator"
+msgstr ""
+
+#: ../game/webserver.cc:295
+msgid "Normal"
+msgstr ""
+
+#: ../game/webserver.cc:296
+msgid "Inverted"
+msgstr ""
+
+#: ../game/webserver.cc:297
+msgid "Update every 10 sec"
+msgstr ""
+
+#: ../game/webserver.cc:298
+msgid "Refresh database"
+msgstr ""
+
+#: ../game/webserver.cc:299
+msgid "Upcoming songs"
+msgstr ""
+
+#: ../game/webserver.cc:300
+msgid "Refresh playlist"
+msgstr ""
+
+#: ../game/webserver.cc:301
+msgid ""
+"Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding "
+"Performous see /docs/Authors.txt"
+msgstr ""
+
+#: ../game/webserver.cc:302
+msgid "Search"
+msgstr ""
+
+#: ../game/webserver.cc:303
+msgid "Available songs"
+msgstr ""
+
+#: ../game/webserver.cc:304
+msgid "Search for songs"
+msgstr ""
+
+#: ../game/webserver.cc:305
+msgid "Yes"
+msgstr ""
+
+#: ../game/webserver.cc:306
+msgid "No"
+msgstr ""
+
+#: ../game/webserver.cc:308
+msgid "Move down"
+msgstr ""
+
+#: ../game/webserver.cc:309
+msgid "Set position"
+msgstr ""
+
+#: ../game/webserver.cc:310
+msgid "Remove song"
+msgstr ""
+
+#: ../game/webserver.cc:311
+msgid "Desired position of song"
+msgstr ""
+
+#: ../game/webserver.cc:312
+msgid "Cancel"
+msgstr ""
+
+#: ../game/webserver.cc:313
+msgid "Successfully removed song from playlist"
+msgstr ""
+
+#: ../game/webserver.cc:314
+msgid "Failed removing song from playlist"
+msgstr ""
+
+#: ../game/webserver.cc:315
+msgid "Successfully changed position of song"
+msgstr ""
+
+#: ../game/webserver.cc:316
+msgid "Failed changing position of song"
+msgstr ""
+
+#: ../game/webserver.cc:317
+msgid "Successfully moved song up"
+msgstr ""
+
+#: ../game/webserver.cc:318
+msgid "Failed moving song up"
+msgstr ""
+
+#: ../game/webserver.cc:319
+msgid "Successfully moved song down"
+msgstr ""
+
+#: ../game/webserver.cc:320
+msgid "Failed moving song down"
+msgstr ""
+
+#: ../game/webserver.cc:321
+msgid "Successfully added song to the playlist"
+msgstr ""
+
+#: ../game/webserver.cc:322
+msgid "Failed adding song to the playlist"
+msgstr ""
+
+#: ../game/webserver.cc:323
+msgid "No songs found with current filter"
+msgstr ""
+
+#~ msgid ""
+#~ "This tool is not yet available.\n"
+#~ "Configure paths by adding them\n"
+#~ "as command line parameters and\n"
+#~ "then save them in configuration menu."
+#~ msgstr ""
+#~ "Questo strumento non è ancora disponibile.\n"
+#~ "Configura le path aggiungendole\n"
+#~ "come parametro da linea di comando\n"
+#~ "e salvale nel menu di configurazione."
+
+#~ msgid "Press any key to exit."
+#~ msgstr "Premi qualsiasi tasto per uscire."
+
 #, fuzzy
-msgid "Configure general audio settings"
-msgstr "Impostazioni video e rendering"
-
-#: ../data/config/schema.xml:36
-msgid "Paths"
-msgstr "Percorsi (path)"
-
-#: ../data/config/schema.xml:37
-msgid "Setup song and data paths"
-msgstr "Imposta percorsi (path) canzoni e dati"
-
-#: ../data/config/schema.xml:48
-#, fuzzy
-msgid "Karaoke mode"
-msgstr "Modalità benchmark"
-
-#: ../data/config/schema.xml:49 ../data/config/schema.xml:57
-msgid "Hide pitch wave, notes and scoring."
-msgstr "Nascondi pitch wave, note e punteggio"
-
-#: ../data/config/schema.xml:56
-msgid "Lyric highlight style"
-msgstr ""
-
-#: ../data/config/schema.xml:60
-msgid "Autoplay"
-msgstr ""
-
-#: ../data/config/schema.xml:61
-msgid "Keep playing random songs after the playlist is empty."
-msgstr ""
-
-#: ../data/config/schema.xml:64
-msgid "Pitch waves"
-msgstr "Pitch wave"
-
-#: ../data/config/schema.xml:65
-msgid "Enable singing pitch display (when not in karaoke mode)."
-msgstr ""
-"Abilita la visualizzazione dinamica delle note da cantare (quando non si è "
-"in modalità karaoke)"
-
-#: ../data/config/schema.xml:70
-msgid "Theme"
-msgstr "Tema"
-
-#: ../data/config/schema.xml:71
-#, fuzzy
-msgid "Name of the theme to use."
-msgstr "Nome del tema da usare oppure la path assoluta alla cartella del tema"
-
-#: ../data/config/schema.xml:74
-msgid "Keyboard as guitar"
-msgstr "Tastiera come chitarra"
-
-#: ../data/config/schema.xml:75
-msgid "Enable keyboard as guitar (Frets on Fire mode)."
-msgstr "Abilita la tastiera come chitarra (modalità Frets on Fire)."
-
-#: ../data/config/schema.xml:78
-msgid "Keyboard as drumkit"
-msgstr "Tastiera come drumkit"
-
-#: ../data/config/schema.xml:79
-msgid "Enable keyboard as drumkit."
-msgstr "Abilita la tastiera come drumkit"
-
-#: ../data/config/schema.xml:82
-msgid "Keyboard as dance pad"
-msgstr "Tastiera come dance pad"
-
-#: ../data/config/schema.xml:83
-msgid "Enable keyboard as dance pad."
-msgstr "Abilita la tastiera come dance pad"
-
-#: ../data/config/schema.xml:86
-#, fuzzy
-msgid "Keyboard as keytar"
-msgstr "Tastiera come chitarra"
-
-#: ../data/config/schema.xml:87
-#, fuzzy
-msgid "Enable keyboard as keytar."
-msgstr "Abilita la tastiera come dance pad"
-
-#: ../data/config/schema.xml:94
-msgid "Force controller A's type"
-msgstr ""
-
-#: ../data/config/schema.xml:95
-msgid ""
-"Override autodetection and force the first controller to the given type."
-msgstr ""
-
-#: ../data/config/schema.xml:102
-msgid "Force controller B's type"
-msgstr ""
-
-#: ../data/config/schema.xml:103
-msgid ""
-"Override autodetection and force the second controller to the given type."
-msgstr ""
-
-#: ../data/config/schema.xml:110
-msgid "Force controller C's type"
-msgstr ""
-
-#: ../data/config/schema.xml:111
-msgid ""
-"Override autodetection and force the third controller to the given type."
-msgstr ""
-
-#: ../data/config/schema.xml:118
-msgid "Force controller D's type"
-msgstr ""
-
-#: ../data/config/schema.xml:119
-msgid ""
-"Override autodetection and force the fourth controller to the given type."
-msgstr ""
-
-#: ../data/config/schema.xml:126
-msgid "Joystick configuration"
-msgstr "Configurazione joystick"
-
-#: ../data/config/schema.xml:127
-msgid "Force joystick to some kind of instrument."
-msgstr "Forza il joystick a qualche tipo di strumento"
-
-#: ../data/config/schema.xml:130
-msgid "Hardware MIDI input device"
-msgstr "Dispositivo hardware di input MIDI"
-
-#: ../data/config/schema.xml:131
-msgid ""
-"Regex for matching the MIDI devices to use. The default is to use all "
-"available devices."
-msgstr ""
-
-#: ../data/config/schema.xml:146
-msgid "Fallback song encoding"
-msgstr ""
-
-#: ../data/config/schema.xml:147
-msgid "Pick the text codec used for song files that are not UTF-8."
-msgstr ""
-
-#: ../data/config/schema.xml:154
-msgid "Windowed width"
-msgstr "Larghezza finestra"
-
-#: ../data/config/schema.xml:155
-msgid "The width of the window."
-msgstr "La larghezza della finestra"
-
-#: ../data/config/schema.xml:160
-msgid "Windowed height"
-msgstr "Altezza finestra"
-
-#: ../data/config/schema.xml:161
-msgid "The height of the window."
-msgstr "L'altezza della finestra"
-
-#: ../data/config/schema.xml:164
-msgid "Fullscreen mode"
-msgstr "Fullscreen"
-
-#: ../data/config/schema.xml:165
-msgid "Enable fullscreen mode on startup."
-msgstr "Abilita fullscreen all'avvio."
-
-#: ../data/config/schema.xml:168
-msgid "Stereoscopic 3D"
-msgstr ""
-
-#: ../data/config/schema.xml:169
-msgid "Enable 3D rendering of Performous."
-msgstr ""
-
-#: ../data/config/schema.xml:177
-msgid "Stereo3D type"
-msgstr ""
-
-#: ../data/config/schema.xml:178
-msgid "Some modes may only get activated in fullscreen mode."
-msgstr ""
-
-#: ../data/config/schema.xml:183
-msgid "Stereo3D separation"
-msgstr ""
-
-#: ../data/config/schema.xml:184
-msgid ""
-"The strength of the effect. Experiment with different settings for best "
-"results."
-msgstr ""
-
-#: ../data/config/schema.xml:187
-msgid "Video playback"
-msgstr "Riproduzione video"
-
-#: ../data/config/schema.xml:188
-msgid ""
-"Allows completely disabling background videos. It is recommended to leave "
-"this enabled as Performous will still smoothly fade out the video if your "
-"computer is not fast enough."
-msgstr ""
-"Abilita la completa disabilitazione del video di background. Si raccomanda "
-"di lasciare questa opzione attivata perchè Performous farà svanire il video "
-"se il computer non è abbastanza veloce."
-
-#: ../data/config/schema.xml:191
-msgid "Webcam background"
-msgstr "Sfondo della webcam"
-
-#: ../data/config/schema.xml:192
-#, fuzzy
-msgid ""
-"Performous can use webcam as a background video. Disable it if Performous "
-"crashes while entering a song."
-msgstr ""
-"Performous può provare ad usare la webcam come video di background. Lo puoi "
-"disabilitare se ti dà fastidio."
-
-#: ../data/config/schema.xml:196
-msgid "Webcam id"
-msgstr "Webcam id"
-
-#: ../data/config/schema.xml:197
-msgid ""
-"Use -1 to autodetect or a number starting from 0 to choose specific device."
-msgstr ""
-"Usa -1 per la rilevazione automatica oppure un numero che parte da 0 per "
-"selezionare uno specifico dispositivo."
-
-#: ../data/config/schema.xml:202
-msgid "SVG quality"
-msgstr "Qualità SVG"
-
-#: ../data/config/schema.xml:203
-msgid ""
-"Larger numbers cause vector graphics to be rendered in higher resolution. "
-"Decrease this to make navigating in menus faster."
-msgstr ""
-"Numeri grandi aumentanno la risoluzione di visualizzazione delle immagini. "
-"Diminuisci questo per navigare nei menu più rapidamente."
-
-#: ../data/config/schema.xml:208
-msgid "Text quality"
-msgstr "Qualità testo"
-
-#: ../data/config/schema.xml:209
-msgid ""
-"Larger numbers cause text to be rendered in higher resolution. Decrease this "
-"to make everything a little faster."
-msgstr ""
-"Numeri grandi aumenteranno la risoluzione di visualizzazione del testo. "
-"Diminuisci questo per rendere tutto un po' più veloce."
-
-#: ../data/config/schema.xml:212
-msgid "Benchmark mode"
-msgstr "Modalità benchmark"
-
-#: ../data/config/schema.xml:213
-msgid ""
-"Framerate limit of 100 FPS is removed and the game instead renders at full "
-"speed. FPS values are printed to console. Please note that the display "
-"drivers may still limit the rendering speed to the screen refresh rate."
-msgstr ""
-"Il limite di framerate di 100 FPS è rimosso e il gioco gira a piena potenza. "
-"I valori degli FPS sono stampati su console. Da notare che i driver della "
-"scheda video potrebbero ancora limitare la velocità di rendering alla "
-"velocità di refresh dello schermo."
-
-#: ../data/config/schema.xml:220
-msgid "Suggested latency"
-msgstr "Latenza suggerita"
-
-#: ../data/config/schema.xml:221
-msgid ""
-"This is a hint for the audio engine about the desired latency. Set this as "
-"low as possible while retaining clear audio playback. Requires restart."
-msgstr ""
-"Questo è un consiglio per il motore audio relativo alla latenza desiderata. "
-"Imposta questo valore il più piccolo valore possibile per avere un buon "
-"playback audio. Richiede riavvio."
-
-#: ../data/config/schema.xml:226
-msgid "Audio/video latency"
-msgstr "Latenza audio/video"
-
-#: ../data/config/schema.xml:227
-msgid ""
-"Affects all modes. Use negative value if your display input lag is greater "
-"than the sound card output latency, positive values in the opposite case and "
-"zero if they are equal. This should be set so that the notes pass the cursor "
-"at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while "
-"performing."
-msgstr ""
-"Influisce su tutte le modalità. Usa dei valori negativi se il lag del "
-"display è maggiore della latenza della scheda audio, positivi nel caso "
-"opposto e zero se sono uguali. Questo parametro dovrebbe essere impostato in "
-"maniera tale che le note passino sotto al cursore nell stesso tempo che si "
-"sente l'audio. Usare Ctrl+F1/F2 per regolare mentre si è in performing."
-
-#: ../data/config/schema.xml:232
-msgid "Audio round-trip latency"
-msgstr "Latenza audio di ritorno"
-
-#: ../data/config/schema.xml:233
-msgid ""
-"Affects singing only. The time it takes for Performous playback to reach "
-"your speakers, fly to the microphone and all the way back until Performous "
-"captures and analyzes it. While performing, press Ctrl+S for synth mode and "
-"adjust with Ctrl+F3/F4."
-msgstr ""
-"Influisce solo la parte cantata. Il tempo che serve al playback di "
-"Performous per raggiungere gli altoparlandi, volare al microfono e tutta la "
-"strada indietro finchè Performous non lo cattura e lo analizza. Mentre si è "
-"in performing, premere Ctrl+S per la modalità synth e regolare con Ctrl+F3/"
-"F4."
-
-#: ../data/config/schema.xml:238
-msgid "Audio/controller latency"
-msgstr "Latenza audio/controller."
-
-#: ../data/config/schema.xml:239
-msgid ""
-"Affects instruments and dancing only. The total of USB (guitar or dance pad) "
-"latency combined with audio output latency. Adjust so that you can hit the "
-"notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to "
-"adjust while performing."
-msgstr ""
-"Influisce solo strumenti e danza. Il totale della latenza USB (chitarra o "
-"dance pad) combinata con la latenza di output audio. Regolala in maniera "
-"tale che puoi colpire le note meglio quando si suona ad orecchio (senza "
-"guardare lo schermo). Usa Ctrl+F5/F6 per regolare mentre si è in performing."
-
-#: ../data/config/schema.xml:246
-msgid "Audio devices"
-msgstr "Dispositivi audio"
-
-#: ../data/config/schema.xml:247
-msgid "List of audio devices to try."
-msgstr "Lista dei dispositivi audio da provare."
-
-#: ../data/config/schema.xml:252
-msgid "Menu volume"
-msgstr "Volume menu"
-
-#: ../data/config/schema.xml:253
-msgid "The volume level of menus, song previews and jukebox mode."
-msgstr ""
-"Il livello del volume dei menu, anteprima delle canzoni e modalità jukebox."
-
-#: ../data/config/schema.xml:258
-msgid "Music volume"
-msgstr "Volume musica"
-
-#: ../data/config/schema.xml:259
-msgid ""
-"The ingame music volume. Values above 90 are not recommended as distortion "
-"may occur."
-msgstr ""
-"Il volume della musica nel gioco. Valori sopra 90 sono sconsigliati perchè "
-"potrebbero verificarsi distorsioni."
-
-#: ../data/config/schema.xml:264
-msgid "Failure volume"
-msgstr "Volume errore"
-
-#: ../data/config/schema.xml:265
-msgid ""
-"The ingame fail sound volume. Values above 90 are not recommended as "
-"distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
-msgstr ""
-"Il volume del suono dell'errore nel gioco. Valori sopra 90 sono sconsigliati "
-"perchè potrebbero verificarsi distorsioni. 11 è più alto di 10, ma questi "
-"vanno a 100. 89 il più alto!"
-
-#: ../data/config/schema.xml:268
-msgid "Microphone pass-through"
-msgstr ""
-
-#: ../data/config/schema.xml:269
-msgid "Send captured singing voice to speakers."
-msgstr ""
-
-#: ../data/config/schema.xml:274
-msgid "Pass-through volume ratio"
-msgstr ""
-
-#: ../data/config/schema.xml:275
-msgid "How much voice is amplified compared to the music."
-msgstr ""
-
-#: ../data/config/schema.xml:278
-msgid "Suppress center channel"
-msgstr ""
-
-#: ../data/config/schema.xml:279
-msgid "Suppress audio of center channel (e.g. vocals)."
-msgstr ""
-
-#: ../data/config/schema.xml:290
-msgid "Song folders"
-msgstr "Cartella canzoni"
-
-#: ../data/config/schema.xml:291
-msgid ""
-"Where to recursively look for songs. DATADIR at the beginning means all "
-"Performous data folders."
-msgstr ""
-"Dove guardare ricorsivamente per tutte le canzoni. DATADIR all'inizio vuol "
-"dire tutte le cartelle dei dati di Performous."
-
-#: ../data/config/schema.xml:294
-msgid "Base folders for data"
-msgstr "Cartelle basi per i dati"
-
-#: ../data/config/schema.xml:295
-msgid ""
-"System defaults are included automatically. Additional paths can be added "
-"here."
-msgstr ""
-"Le predefinite di sistema sono incluse automaticamente. Path addizionali "
-"possono essere aggiunte qui."
+#~ msgid "Windows users can also use ConfigureSongDirectory.bat script."
+#~ msgstr ""
+#~ "Gli utenti Windows possono anche usare ConfigureSongDirectory.bat nella "
+#~ "cartella bin."
 
 #, fuzzy
 #~ msgid "Back to song browser"

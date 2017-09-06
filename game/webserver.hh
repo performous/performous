@@ -46,6 +46,9 @@ public:
 
 private:
 	void StartServer();
+	Json::Value SongsToJsonObject();
+	std::map<std::string, std::string> GenerateLocaleDict();
+	std::vector<std::string> GetTranslationKeys();
 	boost::shared_ptr<Song> GetSongFromJSON(std::string JsonDoc);
 	boost::shared_ptr<boost::thread> m_serverThread;
 	boost::shared_ptr<http_server> m_server;
@@ -60,4 +63,3 @@ public:
 	WebServer(Songs&) {}
 };
 #endif
-

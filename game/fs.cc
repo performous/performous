@@ -110,12 +110,27 @@ Paths getThemePaths() {
 	const fs::path themes = "themes";
 	const fs::path def = "default";
 	const fs::path www = "www";
+	const fs::path js = "js";
+	const fs::path css = "css";
+	const fs::path images = "images";
+	const fs::path fonts = "fonts";
+
 	std::string theme = config["game/theme"].getEnumName();
 	Paths paths = getPaths();
-	Paths infixes = { themes / theme,
-					  themes / def,
+	Paths infixes = { 
+					  themes / theme,
 					  themes / theme / www,
-					  themes / def / www,
+					  themes / theme / www / js,
+					  themes / theme / www / css,
+					  themes / theme / www / images,
+					  themes / theme / www / fonts,
+
+					  themes / def,
+					  themes / def / www,					  
+					  themes / def / www / js,
+					  themes / def / www / css,				  
+					  themes / def / www / images,			  
+					  themes / def / www / fonts,
 					  fs::path() };
 	if (!theme.empty() && theme != def) infixes.push_front(themes / theme);
 	// Build combinations of paths and infixes
@@ -184,4 +199,3 @@ Paths getPathsConfig(std::string const& confOption) {
 	}
 	return ret;
 }
-
