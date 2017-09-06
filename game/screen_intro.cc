@@ -5,6 +5,7 @@
 #include "audio.hh"
 #include "i18n.hh"
 #include "controllers.hh"
+#include "platform.hh"
 #include "theme.hh"
 #include "menu.hh"
 #include "xtime.hh"
@@ -66,10 +67,11 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 		// These are only available in config menu
 		int key = event.key.keysym.scancode;
 		uint16_t modifier = event.key.keysym.mod;
-		if (key == SDL_SCANCODE_R && modifier & KMOD_CTRL && m_menu.current().value) {
+		if (key == SDL_SCANCODE_R && modifier & Platform::shortcutModifier() && m_menu.current().value) {
 			m_menu.current().value->reset(modifier & KMOD_ALT);
-		} else if (key == SDL_SCANCODE_S && modifier & KMOD_CTRL) {
-			writeConfig(m_audio, modifier & KMOD_ALT);
+		}
+		else if (key == SDL_SCANCODE_S && modifier & Platform::shortcutModifier()) {
+			writeConfig(modifier & KMOD_ALT);
 			Game::getSingletonPtr()->flashMessage((modifier & KMOD_ALT)
 				? _("Settings saved as system defaults.") : _("Settings saved."));
 		}
@@ -214,7 +216,7 @@ std::string ScreenIntro::getIPaddr() {
 	try {
 		boost::asio::io_service netService;
 		boost::asio::ip::udp::resolver resolver(netService);
-		boost::asio::ip::udp::resolver::query query(boost::asio::ip::udp::v4(), "google.com", ""); //it's a bit of a dirty hack, but it works!
+		boost::asio::ip::udp::resolver::query query(boost::asio::ip::udp::v4(), "8.8.8.8", "80"); //it's a bit of a dirty hack, but it works!
 		boost::asio::ip::udp::resolver::iterator endpoints = resolver.resolve(query);
 		boost::asio::ip::udp::endpoint ep = *endpoints;
 		boost::asio::ip::udp::socket socket(netService);
@@ -224,6 +226,5 @@ std::string ScreenIntro::getIPaddr() {
 	} catch(std::exception& e) {
 			return "cannot obtain IP";
 	}
-
 	return "IP address";
 }

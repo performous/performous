@@ -138,19 +138,15 @@ double Song::getDurationSeconds() {
 	boost::mutex::scoped_lock l(m_mutex);
 	if(m_duration == 0) {
 		AVFormatContext *pFormatCtx = avformat_alloc_context();
-		avformat_open_input(&pFormatCtx, music["background"].string().c_str(), NULL, NULL);
-		AVPacket packet;
-		av_init_packet(&packet);
-		int64_t totalduration = 0;
-		AVStream * streams = *pFormatCtx->streams;
-		while( av_read_frame(pFormatCtx, &packet) == 0 ) {//add up the duration of all the frames
-			if(packet.pts > totalduration) { totalduration = packet.pts; }
+		if (avformat_open_input(&pFormatCtx, music["background"].string().c_str(), NULL, NULL) == 0) {
+			avformat_find_stream_info(pFormatCtx, NULL);
+			m_duration = pFormatCtx->duration / AV_TIME_BASE;
+			avformat_close_input(&pFormatCtx);
+			avformat_free_context(pFormatCtx);
+			return m_duration;
 		}
-		AVRational timeBase = streams[0].time_base;
-
-		m_duration = totalduration * av_q2d(timeBase);
-		avformat_close_input(&pFormatCtx);
-		return m_duration;
+		std::clog << "song/info: >>> Couldn't open file for calculating duration." << std::endl;
+		return 0;
 	} else { //duration is still in memmory that means we already loaded it
 		return m_duration;
 	}

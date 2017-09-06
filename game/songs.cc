@@ -86,8 +86,10 @@ void Songs::reload_internal(fs::path const& parent) {
 				}
 				if(AdditionalFileIndex > 0) { //TODO: add it to existing song
 					std::clog << "songs/info: >>> not yet implemented " << std::endl;
+					s->getDurationSeconds();
 					m_songs.push_back(s); // will make it appear double!!
 				} else {
+					s->getDurationSeconds();
 					m_songs.push_back(s); //put it in the database
 				}
 				m_dirty = true;
@@ -245,16 +247,42 @@ void Songs::sortChange(int diff) {
 	sort_internal();
 }
 
-void Songs::sort_internal() {
-	switch (m_order) {
-	  case 0: std::stable_sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::randomIdx)); break;
-	  case 1: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::collateByTitle)); break;
-	  case 2: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::collateByArtist)); break;
-	  case 3: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::edition)); break;
-	  case 4: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::genre)); break;
-	  case 5: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::path)); break;
-	  case 6: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::language)); break;
-	  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
+void Songs::sortSpecificChange(int sortOrder, bool descending) {
+	if(sortOrder < 0) {
+		m_order = 0;
+	} else if(sortOrder <= 6) {
+		m_order = sortOrder;
+	} else {
+		m_order = 0;
+	}
+	RestoreSel restore(*this);
+	config["songs/sort-order"].i() = m_order;
+	sort_internal(descending);
+}
+
+void Songs::sort_internal(bool descending) {
+	if(descending) {
+		switch (m_order) {
+		  case 0: std::stable_sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::randomIdx)); break;
+		  case 1: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::collateByTitle)); break;
+		  case 2: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::collateByArtist)); break;
+		  case 3: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::edition)); break;
+		  case 4: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::genre)); break;
+		  case 5: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::path)); break;
+		  case 6: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::language)); break;
+		  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
+		}
+	} else {
+		switch (m_order) {
+		  case 0: std::stable_sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::randomIdx)); break;
+		  case 1: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::collateByTitle)); break;
+		  case 2: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::collateByArtist)); break;
+		  case 3: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::edition)); break;
+		  case 4: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::genre)); break;
+		  case 5: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::path)); break;
+		  case 6: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::language)); break;
+		  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
+		}
 	}
 }
 

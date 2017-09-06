@@ -1,4 +1,4 @@
-﻿#include "backgrounds.hh"
+#include "backgrounds.hh"
 #include "config.hh"
 #include "controllers.hh"
 #include "database.hh"
@@ -7,6 +7,7 @@
 #include "i18n.hh"
 #include "log.hh"
 #include "pi.hh"
+#include "platform.hh"
 #include "profiler.hh"
 #include "screen.hh"
 #include "songs.hh"
@@ -33,13 +34,6 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
-
-#if defined(_WIN32)
-extern "C" {
-// For DWORD (see end of file)
-#include "windef.h"
-}
-#endif
 
 const double m_pi = boost::math::constants::pi<double>();
 
@@ -97,7 +91,7 @@ static void checkEvents(Game& gm) {
 				config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].b();
 				continue; // Already handled here...
 			}
-			if (keypressed == SDL_SCANCODE_PRINTSCREEN || (keypressed == SDL_SCANCODE_F12 && (modifier & KMOD_CTRL))) {
+			if (keypressed == SDL_SCANCODE_PRINTSCREEN || (keypressed == SDL_SCANCODE_F12 && (modifier & Platform::shortcutModifier()))) {
 				g_take_screenshot = true;
 				continue; // Already handled here...
 			}
@@ -145,6 +139,7 @@ static void checkEvents(Game& gm) {
 }
 
 void mainLoop(std::string const& songlist) {
+	Platform platform;
 	std::clog << "core/notice: Starting the audio subsystem (errors printed on console may be ignored)." << std::endl;
 	Audio audio;
 	std::clog << "core/info: Loading assets." << std::endl;
@@ -420,13 +415,3 @@ void outputOptionalFeatureStatus() {
 	  << "\n  Webcam support:       " << (Webcam::enabled() ? "Enabled" : "Disabled")
 	  << std::endl;
 }
-
-#if defined(_WIN32)
-// Force high-performance graphics on dual-GPU systems
-extern "C" {
-	// http://developer.download.nvidia.com/devzone/devcenter/gamegraphics/files/OptimusRenderingPolicies.pdf
-	__declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
-	// https://community.amd.com/thread/169965
-	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
-}
-#endif

@@ -1,56 +1,18 @@
-#include "execname.hh"
+#include "platform.hh"
+#include "fs.hh"
 
-#if defined(_WIN32)
-#include <windows.h>
-fs::path execname() {
-	char buf[1024];
-	DWORD ret = GetModuleFileName(NULL, buf, sizeof(buf));
-	if (ret == 0 || ret == sizeof(buf)) return std::string();
-	return buf;
-}
-#elif defined(__APPLE__)
-#include <mach-o/dyld.h>
-fs::path execname() {
-	char buf[1024];
-	uint32_t size = sizeof(buf);
-	int ret = _NSGetExecutablePath(buf, &size);
-	if (ret != 0) return fs::path();
-	return buf;
-}
-#elif defined(sun) || defined(__sun)
-#include <stdlib.h>
-fs::path execname() {
-	return getexecname();
-}
-#elif defined(__FreeBSD__)
-#include <sys/sysctl.h>
-fs::path execname() {
-	int mib[4];
-	mib[0] = CTL_KERN;
-	mib[1] = KERN_PROC;
-	mib[2] = KERN_PROC_PATHNAME;
-	mib[3] = -1;
-	char buf[1024];
-	size_t maxchars = sizeof(buf) - 1;
-	size_t size = maxchars;
-	sysctl(mib, 4, buf, &size, NULL, 0);
-	if (size == 0 || size >= maxchars) return fs::path();
-	buf[size] = '\0';
-	return buf;
-}
-#elif defined(__linux__)
-#include <unistd.h>
-fs::path execname() {
-	char buf[1024];
-	ssize_t maxchars = sizeof(buf) - 1;
-	ssize_t size = readlink("/proc/self/exe", buf, sizeof(buf));
-	if (size <= 0 || size >= maxchars) return fs::path();
-	buf[size] = '\0';
-	return buf;
-}
+/// Get the current executable name with path. Returns empty path if the name cannot be found. May return absolute or relative paths.
+
+#if (BOOST_OS_WINDOWS)
+#include "platform/execname.win.inc"
+#elif (BOOST_OS_MACOS)
+#include "platform/execname.mac.inc"
+#elif (BOOST_OS_BSD)
+#include "platform/execname.bsd.inc"
+#elif (BOOST_OS_SOLARIS)
+#include "platform/execname.sun.inc"
+#elif (BOOST_OS_LINUX)
+#include "platform/execname.unix.inc"
 #else
-fs::path execname() {
 	return fs::path();
-}
-#endif
-
+#endif // BOOST_OS_WINDOWS
