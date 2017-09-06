@@ -5,6 +5,7 @@
 #include "audio.hh"
 #include "i18n.hh"
 #include "controllers.hh"
+#include "platform.hh"
 #include "theme.hh"
 #include "menu.hh"
 #include "xtime.hh"
@@ -66,9 +67,10 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 		// These are only available in config menu
 		int key = event.key.keysym.scancode;
 		uint16_t modifier = event.key.keysym.mod;
-		if (key == SDL_SCANCODE_R && modifier & KMOD_CTRL && m_menu.current().value) {
+		if (key == SDL_SCANCODE_R && modifier & Platform::shortcutModifier() && m_menu.current().value) {
 			m_menu.current().value->reset(modifier & KMOD_ALT);
-		} else if (key == SDL_SCANCODE_S && modifier & KMOD_CTRL) {
+		}
+		else if (key == SDL_SCANCODE_S && modifier & Platform::shortcutModifier()) {
 			writeConfig(modifier & KMOD_ALT);
 			Game::getSingletonPtr()->flashMessage((modifier & KMOD_ALT)
 				? _("Settings saved as system defaults.") : _("Settings saved."));
