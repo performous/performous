@@ -1,4 +1,4 @@
-﻿#include "opengl_text.hh"
+#include "opengl_text.hh"
 
 #include <boost/lexical_cast.hpp>
 #include "fontconfig/fontconfig.h"
@@ -262,16 +262,18 @@ void SvgTxtTheme::draw(std::vector<TZoomText> const& _text) {
 	}
 
 	double texture_ar = text_x / text_y;
-	m_texture_width = std::min(0.96, text_x/800.);
-	m_texture_height = m_texture_width / texture_ar;
+	m_texture_width = std::min(0.96, text_x/1366); // this is the base rendering width, used to project the svg onto a gltexture. currently we're targeting 1366x768 as base resolution.
+	m_texture_height = m_texture_width / texture_ar; //todo: move magic numbers to static const ints to make the code more clear.
 
 	double position_x = dimensions.x1();
 	if (m_align == CENTER) position_x -= 0.5 * m_texture_width;
 	if (m_align == RIGHT) position_x -= m_texture_width;
 
-	if ((position_x + m_texture_width) > 0.5) {
-		m_texture_width = (0.5 - position_x);
+	if ((position_x + m_texture_width) > 0.48) { 
+		m_texture_width = (0.48 - position_x);
+		m_texture_height = m_texture_width / texture_ar; // Keep aspect ratio.
 	}
+	
 	for (unsigned int i = 0; i < _text.size(); i++ ) {
 		double syllable_x = m_opengl_text[i].x();
 		double syllable_width = syllable_x *  m_texture_width / text_x;
