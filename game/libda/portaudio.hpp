@@ -12,6 +12,7 @@
 #include <stdint.h>
 
 #include "../unicode.hh"
+#include "../platform.hh"
 
 #define PORTAUDIO_CHECKED(func, args) portaudio::internal::check(func args, #func)
 
@@ -55,13 +56,7 @@ namespace portaudio {
 		static int count() { return Pa_GetDeviceCount(); }
 		static const PaHostApiTypeId AutoBackendType = PaHostApiTypeId(1337);
 		static PaHostApiTypeId defaultBackEnd() {
-			#ifdef _WIN32
-				return PaHostApiTypeId(13); // WASAPI
-			#elif __APPLE__
-				return PaHostApiTypeId(5); // CoreAudio
-			#elif __linux__
-				return PaHostApiTypeId(8); // ALSA
-			#endif
+			return PaHostApiTypeId(Platform::defaultBackEnd());
 		}
 		/// Constructor gets the PA devices into a vector
 		AudioDevices(PaHostApiTypeId backend = AutoBackendType) {

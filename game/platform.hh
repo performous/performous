@@ -20,7 +20,7 @@ enum platforms { windows, linux, macos, bsd, solaris, unix };
 Platform();
 static platforms currentOS();
 static uint16_t shortcutModifier(bool eitherSide = true);
-
+static int defaultBackEnd();
 
 private:
 static const std::array<const char*,6> platformNames;
