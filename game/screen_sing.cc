@@ -619,7 +619,7 @@ void ScreenSing::drawMenu() {
 		y += step;
 	}
 	if (cur->getComment() != "") {
-		th.comment.dimensions.middle(0).screenBottom(-0.12);
+		th.comment.dimensions.middle(0).screenBottom(-0.08);
 		th.comment.draw(cur->getComment());
 	}
 	m_menu.dimensions.stretch(w, h);
