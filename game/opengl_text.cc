@@ -1,4 +1,4 @@
-#include "opengl_text.hh"
+﻿#include "opengl_text.hh"
 
 #include <boost/lexical_cast.hpp>
 #include "fontconfig/fontconfig.h"
@@ -285,8 +285,7 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text) {
 	if ((position_x + m_texture_width) > 0.48) { 
 		m_texture_width = (0.48 - position_x);
 	}
-		m_texture_height = m_texture_width / texture_ar; // Keep aspect ratio.
-		
+	m_texture_height = m_texture_width / texture_ar; // Keep aspect ratio.
 	for (unsigned int i = 0; i < _text.size(); i++ ) {
 		double syllable_x = m_opengl_text[i].x();
 		double syllable_width = syllable_x *  m_texture_width / text_x;
@@ -303,7 +302,7 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text) {
 			m_opengl_text[i].draw(dim, tex);
 		} 
 		else { m_opengl_text[i].draw(dim, tex); }
-			position_x += syllable_width;
-		}
+		position_x += syllable_width;
+	}
 }
 
