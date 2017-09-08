@@ -219,18 +219,19 @@ void SvgTxtTheme::setHighlight(fs::path const& themeFile) {
 	parseTheme(themeFile, m_text_highlight, a, b, c, d, e);
 }
 
-void SvgTxtTheme::draw(std::vector<std::string> const& _text) {
-	std::vector<TZoomText> tmp;
-
-	for (auto const& str: _text) {
-		TZoomText t;
-		t.string = str;
-		t.factor = 1.0;
-		tmp.push_back(t);
-	}
-
-	draw(tmp);
-}
+// void SvgTxtTheme::draw(std::vector<std::string> const& _text) {
+// 	std::vector<TZoomText> tmp;
+// 	
+// 	for (auto const& str: _text) {		
+// 		TZoomText t;
+// 		t.string = str;
+// 		t.factor = 1.0;
+// 		
+// 		tmp.push_back(t);
+// 	}
+// 	std::clog << "text/debug: This function did get called." << std::endl;
+// 	draw(tmp);
+// }
 
 void SvgTxtTheme::draw(std::string _text) {
 	std::vector<TZoomText> tmp;
