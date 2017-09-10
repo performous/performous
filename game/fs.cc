@@ -13,6 +13,11 @@
 #include <sstream>
 #include <algorithm>
 
+#if (BOOST_OS_WINDOWS)
+#include <windows.h>
+#include <shlobj.h>
+#endif
+
 namespace {
 	/// Test if a path begins with name and if so, remove that element and return true
 	/// Mostly a workaround for fs::path's crippled API that makes this operation difficult

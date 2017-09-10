@@ -1,6 +1,3 @@
-#include <windows.h>
-#include <shlobj.h>
-
 		// 2. pathBootstrap is called to find out static system paths (critical for logging and for loading config files)
 		void pathBootstrap() {
 			if (!base.empty()) return;  // Only bootstrap once
