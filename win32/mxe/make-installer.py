@@ -18,6 +18,7 @@
 import os
 import subprocess
 import sys
+import shutil
 
 try:
     makensis = subprocess.Popen([os.environ['MAKENSIS'], '-'], stdin=subprocess.PIPE)
@@ -50,7 +51,26 @@ for windres in [custom_windres, 'i686-pc-mingw32-windres', 'i686-w64-mingw32.sha
         version = 'unknown'
     break
 
+if os.path.exists('~/.fonts.conf'):
+	if os.path.isdir('~/.fonts.conf.d'):
+		fcconfpath = ['~/.fonts.conf','~/.fonts.conf.d']
+	elif os.path.isdir('/etc/fonts/conf.d'):
+		fcconfpath = ['~/.fonts.conf','/etc/fonts/conf.d']
+elif os.path.isdir('/opt/local/etc/fonts'):
+	fcconfpath = ['/opt/local/etc/fonts/fonts.conf', '/opt/local/etc/fonts/conf.d']
+elif os.path.isdir('/etc/fonts'):
+	fcconfpath = ['/etc/fonts/fonts.conf', '/etc/fonts/conf.d']
 
+dest = os.getcwd()
+for path in fcconfpath:
+	print 'Copying fontconfig configuration files from:', path
+	if not os.path.exists(os.path.join(dest,'etc')):
+		os.mkdir(os.path.join(dest,'etc'))
+	if os.path.isfile(path):
+		shutil.copy(path,os.path.join(dest,'etc'))
+	else:
+		shutil.copytree(path,os.path.join(dest,'etc',os.path.basename(path)))
+		
 def instpath(*elements):
     return os.path.join(*elements).replace('/', '\\').replace('.\\', '')
 
