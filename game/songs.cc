@@ -303,11 +303,11 @@ namespace {
 	template <typename SongVector> void dumpXML(SongVector const& svec, std::string const& filename) {
 		xmlpp::Document doc;
 		xmlpp::Element* songlist = doc.create_root_node("songlist");
-		songlist->set_attribute("size", boost::lexical_cast<std::string>(svec.size()));
+		songlist->set_attribute("size", std::to_string(svec.size()));
 		for (size_t i = 0; i < svec.size(); ++i) {
 			Song const& s = *svec[i];
 			xmlpp::Element* song = songlist->add_child("song");
-			song->set_attribute("num", boost::lexical_cast<std::string>(i + 1));
+			song->set_attribute("num", std::to_string(i + 1));
 			xmlpp::Element* collate = song->add_child("collate");
 			collate->add_child("artist")->set_child_text(s.collateByArtist);
 			collate->add_child("title")->set_child_text(s.collateByTitle);
