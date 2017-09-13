@@ -1,4 +1,5 @@
-#include "audio.hh" // audio.hh includes configuration.hh
+#include "audio.hh"
+#include "configuration.hh"
 
 #include "fs.hh"
 #include "util.hh"
@@ -299,9 +300,9 @@ void writeConfig(Audio& m_audio, bool system) {
             m_audio.restart();
             m_audio.playMusic(findFile("menu.ogg"), true); // Start music again
         }
-        else if (type == "int") entryNode->set_attribute("value",boost::lexical_cast<std::string>(item.i()));
+        else if (type == "int") entryNode->set_attribute("value",std::to_string(item.i()));
         else if (type == "bool") entryNode->set_attribute("value", item.b() ? "true" : "false");
-        else if (type == "float") entryNode->set_attribute("value",boost::lexical_cast<std::string>(item.f()));
+        else if (type == "float") entryNode->set_attribute("value",std::to_string(item.f()));
         else if (item.get_type() == "string") entryNode->add_child("stringvalue")->add_child_text(item.s());
         else if (item.get_type() == "string_list") {
             for (auto const& str: item.sl()) entryNode->add_child("stringvalue")->add_child_text(str);
