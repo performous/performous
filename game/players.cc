@@ -42,7 +42,7 @@ void Players::save(xmlpp::Element *players) {
 	for (auto const& p: m_players) {
 		xmlpp::Element* player = players->add_child("player");
 		player->set_attribute("name", p.name);
-		player->set_attribute("id", boost::lexical_cast<std::string>(p.id));
+		player->set_attribute("id", std::to_string(p.id));
 		if (p.picture != "")
 		{
 			xmlpp::Element* picture = player->add_child("picture");

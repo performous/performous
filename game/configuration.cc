@@ -259,9 +259,9 @@ void writeConfig(bool system) {
 		entryNode->set_attribute("name", name);
 		std::string type = item.get_type();
 		entryNode->set_attribute("type", type);
-		if (type == "int") entryNode->set_attribute("value",boost::lexical_cast<std::string>(item.i()));
+		if (type == "int") entryNode->set_attribute("value",std::to_string(item.i()));
 		else if (type == "bool") entryNode->set_attribute("value", item.b() ? "true" : "false");
-		else if (type == "float") entryNode->set_attribute("value",boost::lexical_cast<std::string>(item.f()));
+		else if (type == "float") entryNode->set_attribute("value",std::to_string(item.f()));
 		else if (item.get_type() == "string") entryNode->add_child("stringvalue")->add_child_text(item.s());
 		else if (item.get_type() == "string_list") {
 			for (auto const& str: item.sl()) entryNode->add_child("stringvalue")->add_child_text(str);

@@ -710,7 +710,7 @@ void ScoreWindow::draw() {
 		double x = spacing * (0.5 + i - 0.5 * m_database.scores.size());
 		m_scoreBar.dimensions.fixedWidth(0.09).middle(x).bottom(0.20);
 		m_scoreBar.draw(score / 10000.0);
-		m_score_text.render(boost::lexical_cast<std::string>(score));
+		m_score_text.render(std::to_string(score));
 		m_score_text.dimensions().middle(x).top(0.24).fixedHeight(0.042);
 		m_score_text.draw();
 		m_score_text.render(p->track_simple);

@@ -30,7 +30,7 @@ void SongItems::load(xmlpp::NodeSet const& n) {
 void SongItems::save(xmlpp::Element* songs) {
 	for (auto const& song: m_songs) {
 		xmlpp::Element* element = songs->add_child("song");
-		element->set_attribute("id", boost::lexical_cast<std::string>(song.id));
+		element->set_attribute("id", std::to_string(song.id));
 		element->set_attribute("artist", song.artist);
 		element->set_attribute("title", song.title);
 	}
