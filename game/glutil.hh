@@ -77,7 +77,7 @@ namespace glutil {
 			return m_vertices.empty();
 		}
 
-		unsigned size() const {
+		size_t size() const {
 			return m_vertices.size();
 		}
 

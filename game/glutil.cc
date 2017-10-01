@@ -12,9 +12,9 @@ void VertexArray::generateVBO() {
 
 void VertexArray::draw(GLint mode, bool OGLText) {
 	if (empty()) return;
-	unsigned stride = sizeof(VertexInfo);
 	if (OGLText != false) std::clog << "opengl/debug: VertexArray::Draw called from OpenGLTexture template." << std::endl;
 	glutil::GLErrorChecker glerror("VertexArray::draw");
+	size_t stride = sizeof(VertexInfo);
 	GLint program;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &program);
 	std::clog << "gl/debug: GL_CURRENT_PROGRAM: " << program;
