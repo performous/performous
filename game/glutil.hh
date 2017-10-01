@@ -71,7 +71,7 @@ namespace glutil {
 			return *this;
 		}
 
-		void draw(GLint mode = GL_TRIANGLE_STRIP);
+		void draw(GLint mode = GL_TRIANGLE_STRIP, bool OGLText = false);
 
 		bool empty() const {
 			return m_vertices.empty();

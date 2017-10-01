@@ -163,6 +163,8 @@ void Window::updateStereo(float sepFactor) {
 void Window::updateColor() {
 	for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
 		Shader& sh = *it->second;
+		glutil::GLErrorChecker ec("Window::updateColor");
+		std::clog << "opengl/debug: Shader... name: " << sh.getName() << ", program: " << sh.getProgram() << std::endl;
 		sh["colorMatrix"].setMat4(g_color);
 	}
 }
@@ -257,13 +259,19 @@ void Window::view(unsigned num) {
 	glutil::GLErrorChecker glerror("Window::view");
 	// Set flags
 	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
+// 	glutil::GLErrorChecker ec("glclearcolor");
 	glDisable(GL_DEPTH_TEST);
+// 	glutil::GLErrorChecker ec1("gldisable_depth_test");
 	glDisable(GL_CULL_FACE);
+// 	glutil::GLErrorChecker ec2("gldisable_cull_face");
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-	glShadeModel(GL_SMOOTH);
+// 	glutil::GLErrorChecker ec3("blendfunc");
+
 	glEnable(GL_BLEND);
+// 	glutil::GLErrorChecker ec6("gl_blend");
 	if (GL_EXT_framebuffer_sRGB) glEnable(GL_FRAMEBUFFER_SRGB);
+// 		std::clog << "gl/debug: Will try to bind shader color now... calling glError before the call to bind." << std::endl;
+// 	glutil::GLErrorChecker ec7("Window::view");
 	shader("color").bind();
 	// Setup views (with black bars for cropping)
 	int windowWidth;
@@ -345,15 +353,18 @@ void Window::screenshot() {
 ColorTrans::ColorTrans(Color const& c): m_old(g_color) {
 	using namespace glmath;
 	g_color = g_color * mat4::diagonal(c.linear());
+	glutil::GLErrorChecker ec("ColorTrans::ColorTrans (color)");
 	Game::getSingletonPtr()->window().updateColor();
 }
 
 ColorTrans::ColorTrans(glmath::mat4 const& mat): m_old(g_color) {
+	glutil::GLErrorChecker ec("ColorTrans::ColorTrans (mat4)");
 	g_color = g_color * mat;
 	Game::getSingletonPtr()->window().updateColor();
 }
 
 ColorTrans::~ColorTrans() {
+	glutil::GLErrorChecker ec("ColorTrans::~ColorTrans");
 	g_color = m_old;
 	Game::getSingletonPtr()->window().updateColor();
 }

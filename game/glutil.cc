@@ -10,16 +10,25 @@ void VertexArray::generateVBO() {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void VertexArray::draw(GLint mode) {
+void VertexArray::draw(GLint mode, bool OGLText) {
 	if (empty()) return;
 	unsigned stride = sizeof(VertexInfo);
+	if (OGLText != false) std::clog << "opengl/debug: VertexArray::Draw called from OpenGLTexture template." << std::endl;
+	glutil::GLErrorChecker glerror("VertexArray::draw");
 	GLint program;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &program);
+	std::clog << "gl/debug: GL_CURRENT_PROGRAM: " << program;
 	GLint vertPos = glGetAttribLocation(program, "vertPos");
+	std::clog << ", vertPos: " << vertPos;
 	GLint vertTexCoord = glGetAttribLocation(program, "vertTexCoord");
+	std::clog << ", vertTexCoord: " << vertTexCoord;
 	GLint vertNormal = glGetAttribLocation(program, "vertNormal");
+	std::clog << ", vertNormal: " << vertNormal;
 	GLint vertColor = glGetAttribLocation(program, "vertColor");
+	std::clog << ", vertColor: " << vertColor;
+	std::clog << ", stride: " << stride;
 	if (m_vbo) glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	std::clog << ", m_vbo: " << m_vbo << std::endl;	
 	if (vertPos != -1) {
 		const GLvoid* ptr = m_vbo ? (GLvoid*)offsetof(VertexInfo, position) : &m_vertices[0].position;
 		glEnableVertexAttribArray(vertPos);

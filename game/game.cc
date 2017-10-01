@@ -66,6 +66,7 @@ void Game::loading(std::string const& message, float progress) {
 
 void Game::drawLoading() {
 	drawLogo();
+	glutil::GLErrorChecker ec("Game::drawLoading() after logo");
 	drawNotifications();
 	const int maxi = 20;
 	const double x = 0.3;

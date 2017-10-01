@@ -141,7 +141,13 @@ class UseTexture: boost::noncopyable {
   public:
 	/// constructor
 	template <GLenum Type> UseTexture(OpenGLTexture<Type> const& tex):
-	  m_shader(/* hack of the year */ (glutil::GLErrorChecker("UseTexture"), glActiveTexture(GL_TEXTURE0), glBindTexture(Type, tex.id()), tex.shader())) {}
+	  m_shader(
+	  	(glutil::GLErrorChecker("UseTexture"),
+	  		glActiveTexture(GL_TEXTURE0),
+	  		glBindTexture(Type, tex.id()),
+	  		tex.shader()
+	  	)
+	  ) {}
 
   private:
 	UseShader m_shader;
@@ -161,8 +167,8 @@ template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, Tex
 	va.texCoord(tex.x2, tex.y1).vertex(dim.x2(), dim.y1());
 	va.texCoord(tex.x1, tex.y2).vertex(dim.x1(), dim.y2());
 	va.texCoord(tex.x2, tex.y2).vertex(dim.x2(), dim.y2());
-
-	va.draw();
+	std::clog << "opengl/debug: OpenGLTexture will call va.draw()" << std::endl;
+	va.draw(GL_TRIANGLE_STRIP, true);
 }
 
 template <GLenum Type> void OpenGLTexture<Type>::drawCropped(Dimensions const& orig, TexCoords const& tex) const {

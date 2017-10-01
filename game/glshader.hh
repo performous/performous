@@ -39,7 +39,8 @@ struct Shader: public boost::noncopyable {
 	Shader& compileCode(std::string const& srccode, GLenum type);
 	/** Links all compiled shaders to a shader program. */
 	Shader& link();
-
+	std::string getName() const { return name; };
+	int getProgram() const { return program; };
 	/** Binds the shader into use. */
 	Shader& bind();
 
