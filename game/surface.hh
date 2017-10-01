@@ -160,9 +160,8 @@ template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, Tex
 
 	// The texture wraps over at the edges (repeat)
 	const bool repeating = tex.outOfBounds();
-	glTexParameterf(type(), GL_TEXTURE_WRAP_S, repeating ? GL_REPEAT : GL_CLAMP);
-	glTexParameterf(type(), GL_TEXTURE_WRAP_T, repeating ? GL_REPEAT : GL_CLAMP);
-
+	glTexParameterf(type(), GL_TEXTURE_WRAP_S, repeating ? GL_REPEAT : GL_CLAMP_TO_BORDER);
+	glTexParameterf(type(), GL_TEXTURE_WRAP_T, repeating ? GL_REPEAT : GL_CLAMP_TO_BORDER);
 	va.texCoord(tex.x1, tex.y1).vertex(dim.x1(), dim.y1());
 	va.texCoord(tex.x2, tex.y1).vertex(dim.x2(), dim.y1());
 	va.texCoord(tex.x1, tex.y2).vertex(dim.x1(), dim.y2());
