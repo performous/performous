@@ -114,8 +114,13 @@ Shader& Shader::link() {
 		throw std::runtime_error("Couldn't create shader program.");
 	}
 	// Attach all compiled shaders to it
-	for (ShaderObjects::const_iterator it = shader_ids.begin(); it != shader_ids.end(); ++it)
+	for (ShaderObjects::const_iterator it = shader_ids.begin(); it != shader_ids.end(); ++it) 	{
+	glBindAttribLocation(program, 0, "vertPos");
+	glBindAttribLocation(program, 1, "vertTexCoord");
+	glBindAttribLocation(program, 2, "vertNormal");
+	glBindAttribLocation(program, 3, "vertColor");
 		glAttachShader(program, *it);
+}
 	ec.check("glAttachShader");
 
 	// Link and check status
