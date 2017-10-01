@@ -13,6 +13,10 @@ void VertexArray::generateVBO() {
 void VertexArray::draw(GLint mode, bool OGLText) {
 	if (empty()) return;
 	if (OGLText != false) std::clog << "opengl/debug: VertexArray::Draw called from OpenGLTexture template." << std::endl;
+	if (!m_vao) { 
+	glGenVertexArrays(1, &m_vao);
+	glBindVertexArray(m_vao);
+	}
 	glutil::GLErrorChecker glerror("VertexArray::draw");
 	size_t stride = sizeof(VertexInfo);
 	GLint program;
@@ -27,8 +31,8 @@ void VertexArray::draw(GLint mode, bool OGLText) {
 	GLint vertColor = glGetAttribLocation(program, "vertColor");
 	std::clog << ", vertColor: " << vertColor;
 	std::clog << ", stride: " << stride;
-	if (m_vbo) glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	std::clog << ", m_vbo: " << m_vbo << std::endl;	
+		if (m_vbo) glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	if (vertPos != -1) {
 		const GLvoid* ptr = m_vbo ? (GLvoid*)offsetof(VertexInfo, position) : &m_vertices[0].position;
 		glEnableVertexAttribArray(vertPos);

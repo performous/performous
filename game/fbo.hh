@@ -43,7 +43,7 @@ class FBO: boost::noncopyable {
 	}
 
   private:
-	GLuint m_fbo;
+	GLuint m_fbo = 0;
 	OpenGLTexture<GL_TEXTURE_RECTANGLE> m_texture;
 	OpenGLTexture<GL_TEXTURE_RECTANGLE> m_depth;
 };

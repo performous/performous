@@ -29,9 +29,10 @@ namespace glutil {
 	  private:
 		std::vector<VertexInfo> m_vertices;
 		VertexInfo m_vert;
-		GLuint m_vbo = 0;
+		GLuint m_vbo;
+		GLuint m_vao;
 	  public:
-		VertexArray() {}
+		VertexArray() { }
 
 		~VertexArray() { clear(); }
 
