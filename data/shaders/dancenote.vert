@@ -1,4 +1,4 @@
-#version 120
+#version 330
 
 uniform mat4 projMatrix;
 uniform mat4 mvMatrix;
@@ -9,22 +9,22 @@ uniform float clock;
 uniform float scale;
 uniform vec2 position;
 
-attribute vec3 vertPos;
-attribute vec2 vertTexCoord;
-attribute vec3 vertNormal;
-attribute vec4 vertColor;
+layout(location = 0) in vec3 vertPos;
+layout(location = 1) in vec2 vertTexCoord;
+layout(location = 2) in vec3 vertNormal;
+layout(location = 3) in vec4 vertColor;
 
 // Per-vextex for fragment shader (if no geometry shader)
-varying vec2 texCoord;
-varying vec3 lightDir;
-varying vec3 vLightDir;
-varying vec3 normal;
-varying vec4 color;
+// out vec2 texCoord;
+// out vec3 lightDir;
+out vec3 vLightDir;
+// out vec3 normal;
+// out vec4 color;
 
 // Per-vertex for geometry shader (if one exists)
-varying vec2 vTexCoord;
-varying vec3 vNormal;
-varying vec4 vColor;
+out vec2 vTexCoord;
+out vec3 vNormal;
+out vec4 vColor;
 
 mat4 scaleMat(in float sc) {
 	return mat4(sc,  0,  0,  0,
@@ -43,12 +43,17 @@ mat4 rotMat(in float ang) {
 }
 
 void main() {
-	vTexCoord = texCoord = vertTexCoord;
-	vNormal = normal = normalMatrix * vertNormal;
-	vColor = color = vertColor;
-	vLightDir = lightDir;
+	const vec3 lightPos = vec3(-10.0, 2.0, 15.0);
+	vTexCoord = vertTexCoord;
+	vNormal = normalMatrix * vertNormal;
+	vColor = vertColor;
+	
+	
+// 	vLightDir = lightDir;
 
 	mat4 trans = scaleMat(scale);
+	vec4 posEye = mvMatrix * (vec4(position, 0, 0) + trans * vec4(vertPos, 1.0));  // Vertex position in eye space
+	vLightDir = lightPos - posEye.xyz / posEye.w;  // Light position relative to vertex
 
 	// Cursor arrows
 	if (noteType == 0) {
@@ -71,14 +76,13 @@ void main() {
 
 	// Glow color for regular arrows or holds
 	if (noteType == 1 || noteType == 2) {
-		vColor = color = vec4(
-		  min(color.r + hitAnim *.5, 1.0),
-		  min(color.g + hitAnim *.5, 1.0),
-		  min(color.b + hitAnim *.5, 1.0),
-		  max(color.a - hitAnim, 0.0)
+		vColor = vec4(
+		  min(vColor.r + hitAnim *.5, 1.0),
+		  min(vColor.g + hitAnim *.5, 1.0),
+		  min(vColor.b + hitAnim *.5, 1.0),
+		  max(vColor.a - hitAnim, 0.0)
 		);
 	}
 
 	gl_Position = projMatrix * mvMatrix * (vec4(position, 0, 0) + trans * vec4(vertPos, 1.0));
 }
-
