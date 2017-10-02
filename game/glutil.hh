@@ -77,7 +77,7 @@ namespace glutil {
 			return m_vertices.empty();
 		}
 
-		size_t size() const {
+		GLsizei size() const {
 			return m_vertices.size();
 		}
 
