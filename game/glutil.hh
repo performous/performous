@@ -30,7 +30,6 @@ namespace glutil {
 		std::vector<VertexInfo> m_vertices;
 		VertexInfo m_vert;
 		GLuint m_vbo;
-		GLuint m_vao;
 	  public:
 		VertexArray() { }
 

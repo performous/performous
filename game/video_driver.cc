@@ -93,7 +93,9 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	//std::clog << "video/info: GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl;
 
 	if (epoxy_gl_version() < 21) throw std::runtime_error("OpenGL 2.1 is required but not available");
-
+	GLuint m_vao;
+	glGenVertexArrays(1, &m_vao);
+	glBindVertexArray(m_vao);
 	// The Stereo3D shader needs OpenGL 3.3 and GL_ARB_viewport_array, some Intel drivers support GL 3.3,
 	// but not GL_ARB_viewport_array, so we just check for the extension here.
 	if (epoxy_has_gl_extension("GL_ARB_viewport_array")) {
