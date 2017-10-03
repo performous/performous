@@ -96,7 +96,6 @@ void Object3d::loadWavefrontObj(fs::path const& filepath, float scale) {
 		}
 	}
 	// Models loaded from disk are assumed static, so optimized with a VBO
-	m_va.generateVBO();
 }
 
 void Object3d::load(fs::path const& filepath, fs::path const& texturepath, float scale) {
