@@ -4,23 +4,25 @@
 
 uniform mat4 colorMatrix;
 
-in vec3 vNormal;
-in vec3 vLightDir;
-in vec4 vColor;
+in vec2 gTexCoord;
+in vec3 gNormal;
+in vec3 gLightDir;
+in vec4 gColor;
 
 #ifdef ENABLE_BOGUS
 in float bogus;  // Workaround for http://www.nvnews.net/vbulletin/showthread.php?p=2401097
 #endif
 
-out vec3 outNormal;
+
 out vec4 outColor;
 
 #ifdef ENABLE_LIGHTING
-out vec3 outLightDir;
+vec3 normal = gNormal;
+vec3 lightDir = gLightDir;
 #endif
 
 #if defined(ENABLE_TEXTURING) || defined(ENABLE_SPECULAR_MAP) || defined(ENABLE_EMISSION_MAP)
-out vec2 texCoord;
+vec2 texCoord = gTexCoord;
 #endif
 
 #ifdef ENABLE_TEXTURING
@@ -55,16 +57,16 @@ void main() {
 #endif
 
 #ifdef ENABLE_VERTEX_COLOR
-	frag *= vColor;
+	frag *= gColor;
 #endif
 
 #ifdef ENABLE_LIGHTING
-	vec3 n = normalize(vNormal);
-	vec3 l = normalize(vLightDir);
+	vec3 n = normalize(normal);
+	vec3 l = normalize(lightDir);
 
 	// Diffuse
 	float diff = max(dot(n, l), 0.0);
-	float power = 1.0 - 0.02 * length(outLightDir);
+	float power = 1.0 - 0.02 * length(lightDir);
 	frag = vec4(frag.rgb * power * diff, frag.a);
 #endif
 

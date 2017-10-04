@@ -15,6 +15,10 @@ out vec3 vLightDir;
 out vec2 vTexCoord;
 out vec3 vNormal;
 out vec4 vColor;
+out vec3 gLightDir;
+out vec2 gTexCoord;
+out vec3 gNormal;
+out vec4 gColor;
 
 void main() {
 	const vec3 lightPos = vec3(-10.0, 2.0, 15.0);
@@ -25,4 +29,8 @@ void main() {
 	vTexCoord = vertTexCoord;
 	vNormal = normalize(normalMatrix * vertNormal);
 	vColor = vertColor;
+    gLightDir = vLightDir;
+    gTexCoord = vTexCoord;
+    gNormal = vNormal;
+    gColor = vColor;
 }

@@ -13,19 +13,19 @@ in vec3 vNormal[];
 in vec4 vColor[];
 
 out float bogus;  // Workaround for http://www.nvnews.net/vbulletin/showthread.php?p=2401097
-out vec3 lightDir;
-out vec2 texCoord;
-out vec3 normal;
-out vec4 color;
+out vec3 gLightDir;
+out vec2 gTexCoord;
+out vec3 gNormal;
+out vec4 gColor;
 
 int i;
 
 void passthru() {
 	gl_Position = gl_in[i].gl_Position;
-	lightDir = vLightDir[i];
-	texCoord = vTexCoord[i];
-	normal = vNormal[i];
-	color = vColor[i];
+	gLightDir = vLightDir[i];
+	gTexCoord = vTexCoord[i];
+	gNormal = vNormal[i];
+	gColor = vColor[i];
 }
 
 // Process all the vertices, applying code to them before emitting (do-while to convince Nvidia of the code getting executed)
