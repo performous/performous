@@ -198,7 +198,7 @@ void ScreenIntro::draw_webserverNotice() {
 		m_webserverNoticeTimeout.setValue(2);
 	}
 	std::stringstream m_webserverStatusString;
-	if(webserversetting == 1 && m_drawNotice) { //TODO fetch port from config and add it to the string!
+	if(webserversetting == 1 && m_drawNotice) {
 		m_webserverStatusString << _("Webserver active!\n use a webbrowser\nand navigate to localhost:") << config["game/webserver_port"].i();
 		theme->WebserverNotice.draw(m_webserverStatusString.str());
 	}
@@ -216,7 +216,7 @@ std::string ScreenIntro::getIPaddr() {
 	try {
 		boost::asio::io_service netService;
 		boost::asio::ip::udp::resolver resolver(netService);
-		boost::asio::ip::udp::resolver::query query(boost::asio::ip::udp::v4(), "8.8.8.8", "80"); //it's a bit of a dirty hack, but it works!
+		boost::asio::ip::udp::resolver::query query(boost::asio::ip::udp::v4(), "8.8.8.8", "80");
 		boost::asio::ip::udp::resolver::iterator endpoints = resolver.resolve(query);
 		boost::asio::ip::udp::endpoint ep = *endpoints;
 		boost::asio::ip::udp::socket socket(netService);
@@ -224,7 +224,7 @@ std::string ScreenIntro::getIPaddr() {
 		boost::asio::ip::address addr = socket.local_endpoint().address();
 		return addr.to_string();
 	} catch(std::exception& e) {
-			return "cannot obtain IP";
+		std::string ip = boost::asio::ip::host_name();
+		return ip.empty() ? "localhost" : ip;
 	}
-	return "IP address";
 }
