@@ -30,12 +30,13 @@ namespace glutil {
 		std::vector<VertexInfo> m_vertices;
 		VertexInfo m_vert;
 		GLuint* m_vbo_ids = new GLuint[2];
+		GLuint m_vao;
 	  public:
-		VertexArray() { generateVBO(); }
+		VertexArray() { initBuffers(); }
 
 		~VertexArray() { clear(); }
-
-		void generateVBO();
+		
+		void initBuffers();
 
 		VertexArray& vertex(float x, float y, float z = 0.0f) {
 			return vertex(glmath::vec3(x, y, z));
