@@ -15,7 +15,11 @@ uint16_t Platform::shortcutModifier(bool eitherSide) {
 	else { return eitherSide ? KMOD_CTRL : KMOD_LCTRL; }
 }
 
-Platform::Platform() {}
+Platform::Platform() {
+	#if (BOOST_OS_WINDOWS)
+	_putenv_s("FONTCONFIG_PATH",".\\etc\\");
+	#endif
+}
 
 const std::array<const char*,6> Platform::platformNames = {{ "Windows", "Linux", "MacOS", "BSD", "Solaris", "Unix" }}; // Relevant for debug only.
 
