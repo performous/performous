@@ -27,9 +27,9 @@ int Platform::defaultBackEnd() {
 		switch (Platform::currentOS()) {
 			case windows: return 13; // WASAPI
 			case macos: return 5; // CoreAudio
-			case solaris:
+			case solaris: return 7; // OSS
 			case bsd: return 7; // OSS
-			case linux:
+			case linux: return 8; // ALSA
 			case unix: return 8; // ALSA
 			default: break;
 		}
