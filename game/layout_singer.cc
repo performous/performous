@@ -129,9 +129,9 @@ void LayoutSinger::draw(double time, PositionMode position) {
 				if(config["game/karaoke_mode"].i() >= 2) {
 					pos.center(0);
 				} else {
-					pos.screenBottom(-0.1);
+					pos.screenBottom(-0.07);
 				}
-				linespacing = 0.06;
+				linespacing = 0.04;
 				break;
 			case LayoutSinger::TOP:
 				pos.center(-0.06);

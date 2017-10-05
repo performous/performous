@@ -38,13 +38,10 @@ class LyricRow {
 			sentence.push_back(TZoomText(it->syllable));
 			if(!config["game/Textstyle"].i()) {
 			bool current = (time >= it->begin && time < it->end);
-			sentence.back().factor = current ? 1.2 - 0.2 * (time - it->begin) / (it->end - it->begin) : 1.0; ///what the hell is the logic behind this?
+			sentence.back().factor = current ? 1.1 - 0.1 * (time - it->begin) / (it->end - it->begin) : 1.0; // Zoom-in and out while it's the current syllable.
 			} else {
 			bool current = time >=it->begin;
-				if(current)
-				sentence.back().factor = 1.1;
-				else
-				sentence.back().factor = 1.0;
+			sentence.back().factor = current ? std::min(1 + (0.15 * (time - it->begin) / (it->end - it->begin)), 1.1) : 1.0; // Zoom-in and out syllable proportionally to their length.
 			}
 		}
 		ColorTrans c(Color::alpha(fade.get()));

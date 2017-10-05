@@ -102,7 +102,7 @@ void ScreenAudioDevices::draw() {
 	const float xstep = (xoff - 0.5 + xoff) / m_channels.size();
 	const float ystep = yoff*2 / m_devs.size();
 	// Device text & bg
-	m_theme->device_bg.dimensions.stretch(std::abs(xoff*2), m_mic_icon->dimensions.h()*0.9).middle();
+	m_theme->device_bg.dimensions.stretch(std::abs(xoff*2.15), m_mic_icon->dimensions.h()*0.9).middle();
 	m_selector->dimensions.stretch(m_mic_icon->dimensions.w() * 1.75, m_mic_icon->dimensions.h() * 1.75);
 	for (size_t i = 0; i <= m_devs.size(); ++i) {
 		const float y = -yoff + i*ystep;

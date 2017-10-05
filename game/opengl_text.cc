@@ -219,18 +219,19 @@ void SvgTxtTheme::setHighlight(fs::path const& themeFile) {
 	parseTheme(themeFile, m_text_highlight, a, b, c, d, e);
 }
 
-void SvgTxtTheme::draw(std::vector<std::string> const& _text) {
-	std::vector<TZoomText> tmp;
-
-	for (auto const& str: _text) {
-		TZoomText t;
-		t.string = str;
-		t.factor = 1.0;
-		tmp.push_back(t);
-	}
-
-	draw(tmp);
-}
+// void SvgTxtTheme::draw(std::vector<std::string> const& _text) {
+// 	std::vector<TZoomText> tmp;
+// 	
+// 	for (auto const& str: _text) {		
+// 		TZoomText t;
+// 		t.string = str;
+// 		t.factor = 1.0;
+// 		
+// 		tmp.push_back(t);
+// 	}
+// 	std::clog << "text/debug: This function did get called." << std::endl;
+// 	draw(tmp);
+// }
 
 void SvgTxtTheme::draw(std::string _text) {
 	std::vector<TZoomText> tmp;
@@ -241,14 +242,27 @@ void SvgTxtTheme::draw(std::string _text) {
 	draw(tmp);
 }
 
-void SvgTxtTheme::draw(std::vector<TZoomText> const& _text) {
+void SvgTxtTheme::draw(std::vector<TZoomText>& _text) {
 	std::string tmp;
-	for (auto& zt: _text) tmp += zt.string;
+
+	for (auto& zt: _text) { 
+		bool wordBoundaryCheck = false;
+	// Check whether current syllable begins or previous syllable ends with a space.
+		if (_text.size() > 1) {
+			wordBoundaryCheck = (zt.string.front() == ' ');
+			if (wordBoundaryCheck == false && tmp.size() > 0) {
+				wordBoundaryCheck = (tmp.back() == ' ');
+			}
+		zt.updateWordStart(wordBoundaryCheck);	
+		}
+		tmp += zt.string;
+	}
 
 	if (m_opengl_text.size() != _text.size() || m_cache_text != tmp) {
 		m_cache_text = tmp;
 		m_opengl_text.clear();
 		for (auto& zt: _text) {
+			if (zt.wordStart == true) { zt.addSpace(); } // If it's a different word, add an extra space to account for lyrics zooming in.
 			m_text.text = zt.string;
 			m_opengl_text.push_back(new OpenGLText(m_text, m_factor));
 		}
@@ -262,16 +276,16 @@ void SvgTxtTheme::draw(std::vector<TZoomText> const& _text) {
 	}
 
 	double texture_ar = text_x / text_y;
-	m_texture_width = std::min(0.96, text_x/800.);
-	m_texture_height = m_texture_width / texture_ar;
-
+	m_texture_width = std::min(0.96, text_x / targetWidth); // targetWidth is defined in video_driver.cc, it's the base rendering width, used to project the svg onto a gltexture. currently we're targeting 1366x768 as base resolution.
+	
 	double position_x = dimensions.x1();
 	if (m_align == CENTER) position_x -= 0.5 * m_texture_width;
 	if (m_align == RIGHT) position_x -= m_texture_width;
 
-	if ((position_x + m_texture_width) > 0.48) {
+	if ((position_x + m_texture_width) > 0.48) { 
 		m_texture_width = (0.48 - position_x);
 	}
+	m_texture_height = m_texture_width / texture_ar; // Keep aspect ratio.
 	for (unsigned int i = 0; i < _text.size(); i++ ) {
 		double syllable_x = m_opengl_text[i].x();
 		double syllable_width = syllable_x *  m_texture_width / text_x;
@@ -286,8 +300,9 @@ void SvgTxtTheme::draw(std::vector<TZoomText> const& _text) {
 			ColorTrans c(Color(m_text_highlight.fill_col.r, m_text_highlight.fill_col.g, m_text_highlight.fill_col.b));
 			dim.fixedWidth(dim.w() * factor);
 			m_opengl_text[i].draw(dim, tex);
-		} else m_opengl_text[i].draw(dim, tex);
-			position_x += syllable_width;
-		}
+		} 
+		else { m_opengl_text[i].draw(dim, tex); }
+		position_x += syllable_width;
+	}
 }
 

@@ -15,8 +15,12 @@ struct TZoomText {
 	std::string string;
 	/// zoomfactor
 	double factor;
+	/// start of word?
+	bool wordStart;
 	/// constructor
-	TZoomText(std::string const& str = std::string()): string(str), factor(1.0) {}
+	TZoomText(std::string const& str = std::string()): string(str), factor(1.0), wordStart(false) {}
+	void updateWordStart (bool param = false) { wordStart = param; };
+	void addSpace () { string = " " + string; };
 };
 
 /// Special theme for creating opengl themed surfaces
@@ -137,9 +141,9 @@ public:
 	/// constructor
 	SvgTxtTheme(fs::path const& themeFile, double factor = 1.0);
 	/// draws text with alpha
-	void draw(std::vector<TZoomText> const& _text);
+	void draw(std::vector<TZoomText>& _text);
 	/// draw texts
-	void draw(std::vector<std::string> const& _text);
+// 	void draw(std::vector<std::string> const& _text);
 	/// draw text with alpha
 	void draw(std::string _text);
 	/// sets highlight
