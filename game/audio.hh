@@ -12,6 +12,7 @@
 #include "notes.hh"
 #include "pitch.hh"
 #include "util.hh"
+#include "configuration.hh"
 
 const unsigned AUDIO_MAX_ANALYZERS = 11;
 
@@ -41,13 +42,17 @@ struct Device {
 	}
 };
 
+extern int getBackend();
+class ConfigItem;
 
 /** @short High level audio playback API **/
 class Audio {
+	friend int getBackend();
 	struct Impl;
 	boost::scoped_ptr<Impl> self;
 public:
 	typedef std::map<std::string, fs::path> Files;
+	static ConfigItem& backendConfig();
 	Audio();
 	~Audio();
 	void restart();
@@ -101,4 +106,3 @@ public:
 	/** Get sample rate */
 	double getSR() const { return 48000.0; }
 };
-

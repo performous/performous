@@ -12,6 +12,7 @@
 #include <stdint.h>
 
 #include "../unicode.hh"
+#include "../platform.hh"
 
 #define PORTAUDIO_CHECKED(func, args) portaudio::internal::check(func args, #func)
 
@@ -50,15 +51,19 @@ namespace portaudio {
 		int idx;
 		int in, out;
 	};
-
-	typedef std::vector<DeviceInfo> DeviceInfos;
-
-	struct AudioDevices {
+		typedef std::vector<DeviceInfo> DeviceInfos;
+		struct AudioDevices {
 		static int count() { return Pa_GetDeviceCount(); }
+		static const PaHostApiTypeId AutoBackendType = PaHostApiTypeId(1337);
+		static PaHostApiTypeId defaultBackEnd() {
+			return PaHostApiTypeId(Platform::defaultBackEnd());
+		}
 		/// Constructor gets the PA devices into a vector
-		AudioDevices() {
-			for (unsigned i = 0, end = Pa_GetDeviceCount(); i != end; ++i) {
-				PaDeviceInfo const* info = Pa_GetDeviceInfo(i);
+		AudioDevices(PaHostApiTypeId backend = AutoBackendType) {
+		PaHostApiIndex backendIndex = Pa_HostApiTypeIdToHostApiIndex((backend == AutoBackendType ? defaultBackEnd() : backend));
+		if (backendIndex == paHostApiNotFound) backendIndex = Pa_HostApiTypeIdToHostApiIndex(defaultBackEnd());
+			for (unsigned i = 0, end = Pa_GetHostApiInfo(backendIndex)->deviceCount; i != end; ++i) {
+				PaDeviceInfo const* info = Pa_GetDeviceInfo(Pa_HostApiDeviceIndexToDeviceIndex(backendIndex, i));
 				if (!info) continue;
 				std::string name = convertToUTF8(info->name);
 				/// Omit some useless legacy devices of PortAudio/ALSA from our list
@@ -100,22 +105,82 @@ namespace portaudio {
 		/// Get a printable dump of the devices
 		std::string dump() const {
 			std::ostringstream oss;
-			oss << "PortAudio devices:" << std::endl;
-			for (auto const& d: devices) oss << "  #" << d.idx << " " << d.desc() << std::endl;
-			oss << std::endl;
+			for (auto const& d: devices) { oss << "    #" << d.idx << " " << d.desc() << std::endl; }
 			return oss.str();
 		}
 		DeviceInfo const& find(std::string const& name) {
 			// Try name search with full match
-			for (auto const& dev: devices) if (dev.name == name) return dev;
+			for (auto const& dev: devices) { if (dev.name == name) { return dev;  } }
 			// Try name search with partial/flexible match
 			for (auto const& dev: devices) {
-				if (dev.name.find(name) != std::string::npos) return dev;
-				if (dev.flex.find(name) != std::string::npos) return dev;
+				if (dev.name.find(name) != std::string::npos) { return dev; }
+				if (dev.flex.find(name) != std::string::npos) { return dev; }
 			}
 			throw std::runtime_error("No such device.");
 		}
 		DeviceInfos devices;
+	};
+	
+	struct BackendInfo {
+		BackendInfo(int id, PaHostApiTypeId type, std::string n = std::string(), int n_dev = 0): idx(id), name(n), type(type), devices(n_dev) {}
+		int idx;
+		std::string name;
+		PaHostApiTypeId type;
+		int devices;
+		std::string desc () const {
+		std::ostringstream oss;
+		oss << "  #" << idx << ": " << name << " (" << devices << " devices):" << std::endl;
+		oss << portaudio::AudioDevices(type).dump();
+		return oss.str();
+		}
+	};
+
+	typedef std::vector<BackendInfo> BackendInfos;
+	
+	struct AudioBackends {
+	static int count() { return Pa_GetHostApiCount(); }
+	AudioBackends () {
+		if (count() == 0) throw std::runtime_error("No suitable audio backends found."); // Check specifically for 0 because it returns a negative error code if Pa is not initialized.
+		for (unsigned i = 0, end = Pa_GetHostApiCount(); i != end; ++i) {
+			PaHostApiInfo const* info = Pa_GetHostApiInfo(i);
+			if (!info || info->deviceCount < 1) continue;
+			/*
+			Constant, unique identifier for each audio backend past alpha status.
+				1 = DirectSound
+				2 = MME
+				3 = ASIO
+				4 = SoundManager
+				5 = CoreAudio
+				7 = OSS
+				8 = ALSA
+				9 = AL
+				10 = BeOS
+				11 = WDMKS
+				12 = JACK
+				13 = WASAPI
+				14 = AudioScienceHPI
+				0 = Backend currently being developed.
+			*/
+			PaHostApiTypeId apiID = info->type;
+			std::string name = convertToUTF8(info->name);
+			backends.push_back(BackendInfo(i, apiID, name, info->deviceCount));		
+		}
+	};
+		BackendInfos backends;
+		
+		std::string dump() const {
+		std::ostringstream oss;
+		oss << "audio/info: PortAudio backends:" << std::endl;
+		for (auto const& b: backends) { oss << b.desc() << std::endl; }
+			return oss.str();
+		}
+		std::list<std::string> getBackends() {
+			std::set<std::string> bends;
+			for (auto const& temp: backends) {
+				bends.insert(temp.name);
+			}
+			return std::list<std::string>(bends.begin(),bends.end());
+		}
 	};
 
 	struct Init {

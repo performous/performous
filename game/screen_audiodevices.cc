@@ -1,4 +1,4 @@
-﻿#include "screen_audiodevices.hh"
+#include "screen_audiodevices.hh"
 
 #include "audio.hh"
 #include "configuration.hh"
@@ -21,6 +21,12 @@ namespace {
 	}
 }
 
+int getBackend() {
+	static std::string selectedBackend = Audio::backendConfig().getValue();
+	return PaHostApiNameToHostApiTypeId(selectedBackend);
+}
+
+
 ScreenAudioDevices::ScreenAudioDevices(std::string const& name, Audio& audio): Screen(name), m_audio(audio) {
 	m_selector.reset(new Surface(findFile("device_selector.svg")));
 	m_mic_icon.reset(new Surface(findFile("sing_pbox.svg")));
@@ -28,8 +34,11 @@ ScreenAudioDevices::ScreenAudioDevices(std::string const& name, Audio& audio): S
 }
 
 void ScreenAudioDevices::enter() {
+	int bend = getBackend();
+	std::clog << "audio-devices/debug: Entering audio Devices... backend has been detected as: " << bend << std::endl;
 	m_theme.reset(new ThemeAudioDevices());
-	portaudio::AudioDevices ads;
+	PaHostApiTypeId backend = PaHostApiTypeId(bend);
+	portaudio::AudioDevices ads(backend);
 	m_devs = ads.devices;
 	// FIXME: Something more elegant, like a warning box
 	if (m_devs.empty()) throw std::runtime_error("No audio devices found!");
@@ -179,7 +188,7 @@ bool ScreenAudioDevices::save(bool skip_ui_config) {
 		}
 		config["audio/devices"].sl() = devconf;
 	}
-	writeConfig(); // Save the new config
+	writeConfig(m_audio,false); // Save the new config
 	// Give audio a little time to shutdown but then just quit
 	boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(m_audio)));
 	if (!audiokiller.timed_join(boost::posix_time::milliseconds(2500)))

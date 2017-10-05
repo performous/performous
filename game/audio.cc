@@ -8,7 +8,6 @@
 #include <cmath>
 #include <iostream>
 #include <map>
-
 #include "configuration.hh"
 #include "libda/portaudio.hpp"
 #include "util.hh"
@@ -424,16 +423,16 @@ int Device::operator()(void const* input, void* output, unsigned long frames, co
 	return paAbort;
 }
 
-
-
 struct Audio::Impl {
 	Output output;
 	portaudio::Init init;
 	boost::ptr_vector<Analyzer> analyzers;
 	boost::ptr_vector<Device> devices;
 	bool playback;
+	std::string selectedBackend = Audio::backendConfig().getValue();
 	Impl(): init(), playback() {
-		std::clog << "audio/info: " << portaudio::AudioDevices().dump() << std::flush;
+	populateBackends(portaudio::AudioBackends().getBackends());
+	std::clog << portaudio::AudioBackends().dump() << std::flush; // Dump PortAudio backends and devices to log.
 		// Parse audio devices from config
 		ConfigItem::StringList devs = config["audio/devices"].sl();
 		for (ConfigItem::StringList::const_iterator it = devs.begin(), end = devs.end(); it != end; ++it) {
@@ -468,7 +467,7 @@ struct Audio::Impl {
 				// Sync mics/in settings together
 				if (params.in == 0) params.in = params.mics.size();
 				else params.mics.resize(params.in);
-				portaudio::AudioDevices ad;
+				portaudio::AudioDevices ad(PaHostApiTypeId(PaHostApiNameToHostApiTypeId(selectedBackend)));
 				auto const& info = ad.find(params.dev);
 				std::clog << "audio/info: Trying audio device \"" << params.dev << "\", idx: " << info.idx
 					<< ", in: " << params.in << ", out: " << params.out << std::endl;
@@ -517,6 +516,11 @@ struct Audio::Impl {
 
 Audio::Audio(): self(new Impl) {}
 Audio::~Audio() {}
+
+ConfigItem& Audio::backendConfig() {
+	static ConfigItem& backend = config["audio/backend"];
+	return backend;
+}
 
 void Audio::restart() { self.reset(new Impl); }
 void Audio::close() { self.reset(); }

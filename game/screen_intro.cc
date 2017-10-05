@@ -71,7 +71,7 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 			m_menu.current().value->reset(modifier & KMOD_ALT);
 		}
 		else if (key == SDL_SCANCODE_S && modifier & Platform::shortcutModifier()) {
-			writeConfig(modifier & KMOD_ALT);
+			writeConfig(m_audio, modifier & KMOD_ALT);
 			Game::getSingletonPtr()->flashMessage((modifier & KMOD_ALT)
 				? _("Settings saved as system defaults.") : _("Settings saved."));
 		}

@@ -23,6 +23,19 @@ Platform::Platform() {
 
 const std::array<const char*,6> Platform::platformNames = {{ "Windows", "Linux", "MacOS", "BSD", "Solaris", "Unix" }}; // Relevant for debug only.
 
+int Platform::defaultBackEnd() {
+		switch (Platform::currentOS()) {
+			case windows: return 13; // WASAPI
+			case macos: return 5; // CoreAudio
+			case solaris: return 7; // OSS
+			case bsd: return 7; // OSS
+			case linux: return 8; // ALSA
+			case unix: return 8; // ALSA
+			default: break;
+		}
+	throw std::runtime_error("Unable to determine a default Audio backend.");
+}
+
 #if (BOOST_OS_WINDOWS)
 extern "C" {
 // For DWORD (see end of file)
