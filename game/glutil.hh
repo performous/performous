@@ -23,6 +23,17 @@ namespace glutil {
 		  color(1.0, 1.0, 1.0, 1.0)
 		{}
 	};
+	
+	struct GLBuffers {
+		static GLuint* m_vao;
+		static GLuint* m_vbo_ids;
+		
+		void init() {
+			GLuint* m_vao = new GLuint;
+			GLuint* m_vbo_ids = new GLuint[3];
+		}
+		GLBuffers() { init(); }
+	};
 
 	/// Handy vertex array capable of drawing itself
 	class VertexArray {

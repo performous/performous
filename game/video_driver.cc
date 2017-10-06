@@ -77,6 +77,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
 		SDL_GL_CreateContext(screen);
 
+		glutil::GLBuffers GLBuffers;
 	}
 	if (!m_fullscreen) {
 		config["graphic/window_width"].i() = s_width;
