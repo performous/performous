@@ -198,11 +198,11 @@ void Surface::load(Bitmap const& bitmap) {
 	glGenerateMipmap(type());
 }
 
-void Surface::draw() const {
+void Surface::draw(glutil::VBOTarget vbo) const {
 	if (empty()) return;
 	// FIXME: This gets image alpha handling right but our ColorMatrix system always assumes premultiplied alpha
 	// (will produce incorrect results for fade effects)
 	glBlendFunc(m_premultiplied ? GL_ONE : GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	draw(dimensions, TexCoords(tex.x1, tex.y1, tex.x2, tex.y2));
+	draw(dimensions, TexCoords(tex.x1, tex.y1, tex.x2, tex.y2), vbo);
 }
 

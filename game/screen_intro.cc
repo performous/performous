@@ -105,7 +105,7 @@ void ScreenIntro::draw_menu_options() {
 			double selanim = m_selAnim.get() - start_i;
 			if (selanim < 0) selanim = 0;
 			theme->back_h.dimensions.left(x - sel_margin).center(start_y + selanim*0.08);
-			theme->back_h.draw();
+			theme->back_h.draw(glutil::VBO_SURFACE);
 			// Draw the text, dim if option not available
 			{
 				ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
@@ -138,20 +138,20 @@ void ScreenIntro::draw() {
 	{
 		float anim = SDL_GetTicks() % 20000 / 20000.0;
 		ColorTrans c(glmath::rotate(2.0 * m_pi * anim, glmath::vec3(1.0, 1.0, 1.0)));
-		theme->bg.draw();
+		theme->bg.draw(glutil::VBO_SURFACE);
 	}
 	glerror.check("bg");
-	if (m_menu.current().image) m_menu.current().image->draw();
+	if (m_menu.current().image) m_menu.current().image->draw(glutil::VBO_SURFACE);
 	// Comment
 	theme->comment_bg.dimensions.center().screenBottom(-0.01);
-	theme->comment_bg.draw();
+	theme->comment_bg.draw(glutil::VBO_SURFACE);
 	theme->comment.dimensions.left(-0.48).screenBottom(-0.028);
 	theme->comment.draw(m_menu.current().getComment());
 	// Key help for config
 	if (m_menu.getSubmenuLevel() > 0) {
 		theme->short_comment_bg.dimensions.stretch(theme->short_comment.w() + 0.08, 0.025);
 		theme->short_comment_bg.dimensions.left(-0.54).screenBottom(-0.054);
-		theme->short_comment_bg.draw();
+		theme->short_comment_bg.draw(glutil::VBO_SURFACE);
 		theme->short_comment.dimensions.left(-0.48).screenBottom(-0.067);
 		theme->short_comment.draw(_("Ctrl + S to save, Ctrl + R to reset defaults"));
 	}

@@ -244,7 +244,7 @@ void ScreenSongs::drawJukebox() {
 		if (cover && !cover->empty()) {
 			Surface& s = *cover;
 			s.dimensions.left(theme->song.dimensions.x1()).top(theme->song.dimensions.y2() + 0.05).fitInside(0.15, 0.15);
-			s.draw();
+			s.draw(glutil::VBO_SURFACE);
 		}
 		// Format && draw the song information text
 		std::ostringstream oss_song;
@@ -258,24 +258,24 @@ void ScreenSongs::drawMultimedia() {
 		Transform ft(farTransform());  // 3D effect
 		double length = m_audio.getLength();
 		double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
-		m_songbg_default->draw();   // Default bg
+		m_songbg_default->draw(glutil::VBO_MEDIA);   // Default bg
 		if (m_songbg.get() && !m_video.get()) {
 			if (m_songbg->width() > 512 && m_songbg->dimensions.ar() > 1.1) {
 				// Full screen mode
 				float s = sin(m_clock.get()) * 0.15 + 1.15;
 				Transform sc(scale(glmath::vec3(s, s, s)));
-				m_songbg->draw();
+				m_songbg->draw(glutil::VBO_MEDIA);
 			} else {
 				// Low res texture or cover image, render in tiled mode
 				double x = 0.05 * m_clock.get();
-				m_songbg->draw(m_songbg->dimensions, TexCoords(x, 0.0, x + 5.0, 5.0));
+				m_songbg->draw(m_songbg->dimensions, TexCoords(x, 0.0, x + 5.0, 5.0), glutil::VBO_MEDIA);
 			}
 		}
 		if (m_video.get()) m_video->render(time);
 	}
 	if (!m_jukebox) {
-		m_songbg_ground->draw();
-		theme->bg.draw();
+		m_songbg_ground->draw(glutil::VBO_MEDIA);
+		theme->bg.draw(glutil::VBO_MEDIA);
 		drawCovers();
 	}
 }
@@ -374,11 +374,11 @@ void ScreenSongs::drawCovers() {
 		ColorTrans c1(Color(c, c, c));
 		s.dimensions.middle().screenCenter().bottom().fitInside(0.17, 0.17);
 		// Draw the cover normally
-		s.draw();
+		s.draw(glutil::VBO_MEDIA);
 		// Draw the reflection
 		Transform transMirror(scale(vec3(1.0f, -1.0f, 1.0f)));
 		ColorTrans c2(Color::alpha(0.4));
-		s.draw();
+		s.draw(glutil::VBO_MEDIA);
 	}
 	// Draw the playlist
     Game* gm = Game::getSingletonPtr();
@@ -394,7 +394,7 @@ void ScreenSongs::drawCovers() {
 		  * rotate(-0.0, vec3(0.0, 1.0, 0.0))
 		);
 		s.dimensions.middle().screenBottom(-0.06).fitInside(0.08, 0.08);
-		s.draw();
+		s.draw(glutil::VBO_MEDIA);
 	}
 }
 
@@ -430,7 +430,7 @@ namespace {
 		va.texCoord(getIconTex(i), 1.0f).vertex(dim.x1(), dim.y2());
 		va.texCoord(getIconTex(i + 1), 0.0f).vertex(dim.x2(), dim.y1());
 		va.texCoord(getIconTex(i + 1), 1.0f).vertex(dim.x2(), dim.y2());
-		va.draw();
+		va.draw(glutil::VBO_MEDIA);
 	}
 }
 
@@ -490,7 +490,7 @@ void ScreenSongs::drawMenu() {
 	float x = -w * .5f + step;
 	// Background
 	th.bg.dimensions.middle(0).center(0).stretch(w, h);
-	th.bg.draw();
+	th.bg.draw(glutil::VBO_SURFACE);
 	// Loop through menu items
 	w = 0;
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it) {

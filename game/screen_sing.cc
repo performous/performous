@@ -192,7 +192,7 @@ void ScreenSing::instrumentLayout(double time) {
 	} else if (time < -0.5) {
 		// Display help if no-one has joined yet
 		ColorTrans c(Color::alpha(clamp(-1.0 - 2.0 * time)));
-		m_help->draw();
+		m_help->draw(glutil::VBO_TEXT);
 	}
 	double iw = std::min(0.5, 1.0 / count_alive);
 	typedef std::pair<unsigned, double> CountSum;
@@ -432,7 +432,7 @@ namespace {
 		va.texCoord(0,0).vertex(dim.x1(), dim.y2());
 		va.texCoord(0,0).vertex(dim.x2(), dim.y2());
 		getShader("texture").bind();
-		va.draw();
+		va.draw(glutil::VBO_SURFACE);
 	}
 }
 
@@ -477,7 +477,7 @@ void ScreenSing::draw() {
 		if (!m_background || m_background->empty()) m_background.reset(new Surface(m_backgrounds.getRandom()));
 		ar = m_background->dimensions.ar();
 		if (ar > arMax || (m_video && ar > arMin)) fillBG();  // Fill white background to avoid black borders
-		m_background->draw();
+		m_background->draw(glutil::VBO_SURFACE);
 		// Webcam
 		if (m_cam && config["graphic/webcam"].b()) m_cam->render();
 		// Video
@@ -488,9 +488,9 @@ void ScreenSing::draw() {
 		ar = clamp(ar, arMin, arMax);
 		double offset = 0.5 / ar + 0.2;
 		theme->bg_bottom.dimensions.fixedWidth(1.0).bottom(offset);
-		theme->bg_bottom.draw();
+		theme->bg_bottom.draw(glutil::VBO_SURFACE);
 		theme->bg_top.dimensions.fixedWidth(1.0).top(-offset);
-		theme->bg_top.draw();
+		theme->bg_top.draw(glutil::VBO_SURFACE);
 	}
 
 	for (unsigned i = 0; i < m_layout_singer.size(); ++i) m_layout_singer[i].hideLyrics(m_audio.isPaused());
@@ -592,7 +592,7 @@ void ScreenSing::drawMenu() {
 	float x = -w * .5f + step;
 	// Background
 	th.bg.dimensions.middle(0).center(0).stretch(w, h);
-	th.bg.draw();
+	th.bg.draw(glutil::VBO_SURFACE);
 	// Loop through menu items
 	w = 0;
 	int player = 0;
@@ -700,7 +700,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 void ScoreWindow::draw() {
 	using namespace glmath;
 	Transform trans(translate(vec3(0.0, m_pos.get(), 0.0)));
-	m_bg.draw();
+	m_bg.draw(glutil::VBO_SURFACE);
 	const double spacing = 0.1 + 0.1 / m_database.scores.size();
 	unsigned i = 0;
 

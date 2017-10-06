@@ -61,7 +61,7 @@ void LayoutSinger::drawScore(PositionMode position) {
 		}
 		{
 			ColorTrans c(color);
-			m_player_icon->draw();
+			m_player_icon->draw(glutil::VBO_MEDIA);
 			m_score_text[i%4]->draw();
 		}
 		// Give some feedback on how well the last lyrics row went

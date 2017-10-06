@@ -24,6 +24,14 @@ namespace glutil {
 		{}
 	};
 	
+	enum VBOTarget { 
+		VBO_SURFACE = 0,
+		VBO_TEXT = 1,
+		VBO_MEDIA = 2,
+		VBO_INSTRUMENT = 3,
+		VBO_MODELS = 4
+	};
+	
 	struct GLBuffers {
 		static GLuint m_vao;
 		static GLuint m_vbo_ids[5];

@@ -58,7 +58,7 @@ void ScreenPractice::manageEvent(input::NavEvent const& event) {
 }
 
 void ScreenPractice::draw() {
-	theme->bg.draw();
+	theme->bg.draw(glutil::VBO_SURFACE);
 	this->draw_analyzers();
 }
 
@@ -96,11 +96,11 @@ void ScreenPractice::draw_analyzers() {
 				float posYnote = -0.03 - line * 0.015;  // On treble key (C4), plus offset (lines)
 
 				theme->note.dimensions.left(posXnote).center(posYnote);
-				theme->note.draw();
+				theme->note.draw(glutil::VBO_INSTRUMENT);
 				// Draw # for sharp notes
 				if (scale.isSharp()) {
 					theme->sharp.dimensions.right(posXnote).center(posYnote);
-					theme->sharp.draw();
+					theme->sharp.draw(glutil::VBO_SURFACE);
 				}
 			}
 		}

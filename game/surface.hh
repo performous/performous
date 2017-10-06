@@ -129,7 +129,7 @@ template <GLenum Type> class OpenGLTexture: boost::noncopyable {
 	/// returns id
 	GLuint id() const { return m_id; };
 	/// draw in given dimensions, with given texture coordinates
-	void draw(Dimensions const& dim, TexCoords const& tex = TexCoords()) const;
+	void draw(Dimensions const& dim, TexCoords const& tex = TexCoords(), glutil::VBOTarget vbo = glutil::VBO_SURFACE) const;
 	/// draw a subsection of the orig dimensions, cropping by tex
 	void drawCropped(Dimensions const& orig, TexCoords const& tex) const;
   private:
@@ -153,7 +153,7 @@ class UseTexture: boost::noncopyable {
 	UseShader m_shader;
 };
 
-template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex) const {
+template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex, glutil::VBOTarget vbo) const {
 	glutil::VertexArray va;
 
 	UseTexture texture(*this);
@@ -167,7 +167,7 @@ template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, Tex
 	va.texCoord(tex.x1, tex.y2).vertex(dim.x1(), dim.y2());
 	va.texCoord(tex.x2, tex.y2).vertex(dim.x2(), dim.y2());
 	std::clog << "opengl/debug: OpenGLTexture will call va.draw()" << std::endl;
-	va.draw(GL_TRIANGLE_STRIP, true);
+	va.draw(vbo);
 }
 
 template <GLenum Type> void OpenGLTexture<Type>::drawCropped(Dimensions const& orig, TexCoords const& tex) const {
@@ -198,7 +198,7 @@ public:
 	~Surface();
 	bool empty() const { return m_width * m_height == 0; } ///< Test if the loading has failed
 	/// draws surface
-	void draw() const;
+	void draw(glutil::VBOTarget vbo = glutil::VBO_SURFACE) const;
 	using OpenGLTexture<GL_TEXTURE_2D>::draw;
 	/// loads surface into buffer
 	void load(Bitmap const& bitmap);

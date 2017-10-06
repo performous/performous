@@ -54,6 +54,8 @@ public:
 	void render(boost::function<void (void)> drawFunc);
 	/// clears window
 	void blank();
+	// Reference to VBOs and VAO.
+	glutil::GLBuffers& glbuffers() { return m_glbuffer; }
 	/// swaps buffers
 	void swap();
 	/// Handler for SDL_VIDEORESIZE event (window resized by the user)
@@ -91,6 +93,7 @@ private:
 	void updateStereo(float separation);
 	unsigned int m_windowW, m_windowH;
 	bool m_fullscreen;
+	glutil::GLBuffers m_glbuffer; 
 	typedef boost::ptr_map<std::string, Shader> ShaderMap;
 	ShaderMap m_shaders; ///< Shader programs by name
 	SDL_Window *screen;

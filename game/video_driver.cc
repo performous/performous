@@ -62,7 +62,10 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	}
 
 	{ // Setup GL attributes for context creation
+		GLattrSetter attr_vers_maj(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+		GLattrSetter attr_vers_min(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 		GLattrSetter attr_prof(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+// 		GLattrSetter attr_fwd_comp(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
 		GLattrSetter attr_r(SDL_GL_RED_SIZE, 8);
 		GLattrSetter attr_g(SDL_GL_GREEN_SIZE, 8);
 		GLattrSetter attr_b(SDL_GL_BLUE_SIZE, 8);
@@ -76,8 +79,8 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 			(m_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0) | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL);
 		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
 		SDL_GL_CreateContext(screen);
-
-		glutil::GLBuffers GLBuffers;
+		m_glbuffer = glutil::GLBuffers();
+		m_glbuffer.m_vao = 0;
 	}
 	if (!m_fullscreen) {
 		config["graphic/window_width"].i() = s_width;
@@ -253,7 +256,7 @@ void Window::render(boost::function<void (void)> drawFunc) {
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_ONE, GL_ONE);
 		}
-		fbo.getTexture().draw(dim, TexCoords(0.0, h, w, 0));
+		fbo.getTexture().draw(dim, TexCoords(0.0, h, w, 0), glutil::VBO_SURFACE);
 	}
 	glerror.check("FBO->FB postcondition");
 }

@@ -60,7 +60,7 @@ namespace {
 		va.texCoord(1.0f, 0.0f).vertex(x + w, yend);
 		va.texCoord(1.0f, 1.0f).vertex(x + w, yend + h);
 
-		va.draw();
+		va.draw(glutil::VBO_INSTRUMENT);
 	}
 }
 
@@ -141,9 +141,9 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 			Transform trans(translate(vec3(centerx, centery, 0.0f)) * rotate(rot, vec3(0.0f, 0.0f, 1.0f)));
 			{
 				ColorTrans c(Color(it_col->r, it_col->g, it_col->b, it_col->a));
-				m_star_hl.draw(Dimensions().stretch(zoom*1.2, zoom*1.2).center().middle(), TexCoords());
+				m_star_hl.draw(Dimensions().stretch(zoom*1.2, zoom*1.2).center().middle(), TexCoords(), glutil::VBO_INSTRUMENT);
 			}
-			m_star.draw(Dimensions().stretch(zoom, zoom).center().middle(), TexCoords());
+			m_star.draw(Dimensions().stretch(zoom, zoom).center().middle(), TexCoords(), glutil::VBO_INSTRUMENT);
 			player_star_offset += 0.8;
 		}
 	}
@@ -151,7 +151,7 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 
 void NoteGraph::drawNotes() {
 	// Draw note lines
-	m_notelines.draw(Dimensions().stretch(dimensions.w(), (m_max - m_min - 13) * m_noteUnit).middle(dimensions.xc()).center(dimensions.yc()), TexCoords(0.0, (-m_min - 7.0) / 12.0f, 1.0, (-m_max + 6.0) / 12.0f));
+	m_notelines.draw(Dimensions().stretch(dimensions.w(), (m_max - m_min - 13) * m_noteUnit).middle(dimensions.xc()).center(dimensions.yc()), TexCoords(0.0, (-m_min - 7.0) / 12.0f, 1.0, (-m_max + 6.0) / 12.0f), glutil::VBO_INSTRUMENT);
 
 	// Draw notes
 	for (auto it = m_songit; it != m_vocal.notes.end() && it->begin < m_time - (baseLine - 0.5) / pixUnit; ++it) {
@@ -167,10 +167,10 @@ void NoteGraph::drawNotes() {
 				Dimensions dim;
 				dim.middle(m_baseX + 0.5 * (it->begin + it->end) * pixUnit).center(m_baseY + it->note * m_noteUnit).stretch((it->end - it->begin) * pixUnit, -m_noteUnit * 12.0);
 				float xoffset = 0.1 * m_time / m_notebarfs.dimensions.ar();
-				m_notebarfs.draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs.dimensions.ar(), 1.0));
+				m_notebarfs.draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs.dimensions.ar(), 1.0), glutil::VBO_INSTRUMENT);
 				if (alpha > 0.0) {
 					float xoffset = rand() / double(RAND_MAX);
-					m_notebarfs_hl.draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs_hl.dimensions.ar(), 1.0));
+					m_notebarfs_hl.draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs_hl.dimensions.ar(), 1.0), glutil::VBO_INSTRUMENT);
 				}
 			}
 			continue;
@@ -191,7 +191,7 @@ void NoteGraph::drawNotes() {
 
 namespace {
 	void strip(glutil::VertexArray& va) {
-		if (va.size() > 3) va.draw();
+		if (va.size() > 3) va.draw(glutil::VBO_INSTRUMENT);
 		va.clear();
 	}
 }

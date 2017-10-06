@@ -104,9 +104,9 @@ void ScreenPlayers::draw() {
 	m_players.update(); // Poll for new players
 	double length = m_audio.getLength();
 	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
-	if (m_songbg.get()) m_songbg->draw();
+	if (m_songbg.get()) m_songbg->draw(glutil::VBO_SURFACE);
 	if (m_video.get()) m_video->render(time);
-	theme->bg.draw();
+	theme->bg.draw(glutil::VBO_SURFACE);
 	std::string music, songbg, video;
 	double videoGap = 0.0;
 	std::ostringstream oss_song, oss_order;
@@ -153,12 +153,12 @@ void ScreenPlayers::draw() {
 			double diff = (i == 0 ? (0.5 - fabs(shift)) * 0.07 : 0.0);
 			double y = 0.27 + 0.5 * diff;
 			// Draw the cover
-			s.dimensions.middle(-0.2 + 0.17 * (i - shift)).bottom(y - 0.2 * diff).fitInside(0.14 + diff, 0.14 + diff); s.draw();
+			s.dimensions.middle(-0.2 + 0.17 * (i - shift)).bottom(y - 0.2 * diff).fitInside(0.14 + diff, 0.14 + diff); s.draw(glutil::VBO_SURFACE);
 			// Draw the reflection
 			s.dimensions.top(y + 0.2 * diff); s.tex = TexCoords(0, 1, 1, 0);
 			{
 				ColorTrans c(Color::alpha(0.4));
-				s.draw();
+				s.draw(glutil::VBO_SURFACE);
 			}
 			s.tex = TexCoords();
 		}

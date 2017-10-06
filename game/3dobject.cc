@@ -107,9 +107,9 @@ void Object3d::draw() {
 	UseShader us(getShader("3dobject"));
 	if (m_texture) {
 		UseTexture tex(*m_texture);
-		m_va.draw(GL_TRIANGLES);
+		m_va.draw(glutil::VBO_MODELS);
 	} else {
-		m_va.draw(GL_TRIANGLES);
+		m_va.draw(glutil::VBO_MODELS);
 	}
 }
 

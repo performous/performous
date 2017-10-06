@@ -857,7 +857,7 @@ void GuitarGraph::drawNeckStuff(double time) {
 			va.normal(0.0f, 1.0f, 0.0f).color(c).texCoord(0.0f, texCoord).vertex(-w, time2y(tEnd));
 			va.normal(0.0f, 1.0f, 0.0f).color(c).texCoord(1.0f, texCoord).vertex(w, time2y(tEnd));
 		}
-		va.draw();
+		va.draw(glutil::VBO_INSTRUMENT);
 	}
 
 	if (!menuOpen()) {
@@ -875,13 +875,13 @@ void GuitarGraph::drawNeckStuff(double time) {
 			{
 				ColorTrans c(colorize(color(fret), time)); // Get a color for the fret and adjust it if GodMode is on
 				m_button.dimensions.center(time2y(0.0)).middle(x);
-				m_button.draw();
+				m_button.draw(glutil::VBO_INSTRUMENT);
 			}
 			// Tap note indicator
 			{
 				ColorTrans c(Color(l, l, l));
 				m_tap.dimensions = m_button.dimensions;
-				m_tap.draw();
+				m_tap.draw(glutil::VBO_INSTRUMENT);
 			}
 		}
 	}
@@ -910,7 +910,7 @@ void GuitarGraph::drawNeckStuff(double time) {
 			va.texCoord(1.0f, 1.0f).color(c).vertex(x + fretWid, time2y(0.0f), 0.0f);
 			va.texCoord(0.0f, 0.0f).color(c).vertex(x - fretWid, time2y(0.0f), h);
 			va.texCoord(1.0f, 0.0f).color(c).vertex(x + fretWid, time2y(0.0f), h);
-			va.draw();
+			va.draw(glutil::VBO_INSTRUMENT);
 			++it;
 		}
 	}
@@ -930,7 +930,7 @@ void GuitarGraph::drawNeckStuff(double time) {
 		va.color(c).texCoord(0,0).vertex(x, y + maxsize);
 		va.color(c).texCoord(0,0).vertex(x - thickness, y - maxsize);
 		va.color(c).texCoord(0,0).vertex(x, y - maxsize);
-		va.draw();
+		va.draw(glutil::VBO_INSTRUMENT);
 	}
 	// Indicator bar
 	float error = m_errorMeter.get();
@@ -945,7 +945,7 @@ void GuitarGraph::drawNeckStuff(double time) {
 		va.color(c).texCoord(0,0).vertex(x, y1 + y);
 		va.color(c).texCoord(0,0).vertex(x - thickness, y2 + y);
 		va.color(c).texCoord(0,0).vertex(x, y2 + y);
-		va.draw();
+		va.draw(glutil::VBO_INSTRUMENT);
 	}
 }
 
@@ -961,7 +961,7 @@ void GuitarGraph::draw(double time) {
 		using namespace glmath;
 		ColorTrans c(glmath::mat4::diagonal(m_neckglowColor));
 		m_neckglow.dimensions.screenBottom(0.0).middle().fixedWidth(neckWidth());
-		m_neckglow.draw();
+		m_neckglow.draw(glutil::VBO_INSTRUMENT);
 	}
 
 	drawInfo(time); // Go draw some texts and other interface stuff
@@ -1015,7 +1015,7 @@ void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float 
 		vertexPair(va, x, y, color, doanim ? tc(y + t) : 0.20f);
 		vertexPair(va, x, yEnd, color, doanim ? tc(yEnd + t) : 0.0f);
 		glDisable(GL_DEPTH_TEST);
-		va.draw();
+		va.draw(glutil::VBO_INSTRUMENT);
 		glEnable(GL_DEPTH_TEST);
 		// Render the fret object
 		{
@@ -1067,7 +1067,7 @@ void GuitarGraph::drawDrumfill(float tBeg, float tEnd) {
 			vertexPair(va, x, yEnd + 2.0 * fretWid, c, 0.25f);
 		}
 		vertexPair(va, x, yEnd, c, tcEnd); // Last vertex pair
-		va.draw();
+		va.draw(glutil::VBO_INSTRUMENT);
 	}
 }
 
@@ -1121,7 +1121,7 @@ void GuitarGraph::drawBar(double time, float h) {
 	va.normal(0.0f, 1.0f, 0.0f).texCoord(0,0).vertex(-2.5f, time2y(time - h));
 	va.normal(0.0f, 1.0f, 0.0f).texCoord(0,0).vertex(2.5f, time2y(time - h));
 
-	va.draw();
+	va.draw(glutil::VBO_INSTRUMENT);
 }
 
 bool GuitarGraph::updateTom(unsigned int tomTrack, unsigned int fretId) {

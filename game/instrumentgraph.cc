@@ -106,7 +106,7 @@ void InstrumentGraph::drawMenu() {
 	float xx = w*.5f - step - button_margin;
 	// Background
 	th.bg.dimensions.middle().center().stretch(w, h);
-	th.bg.draw();
+	th.bg.draw(glutil::VBO_INSTRUMENT);
 	// Loop through menu items
 	w = 0;
 	unsigned i = 0;
@@ -128,18 +128,18 @@ void InstrumentGraph::drawMenu() {
 				m_arrow_left.dimensions.middle(x - button_margin).center(y);
 				m_arrow_right.dimensions.middle(xx + button_margin).center(y);
 			}
-			m_arrow_left.draw();
-			m_arrow_right.draw();
+			m_arrow_left.draw(glutil::VBO_INSTRUMENT);
+			m_arrow_right.draw(glutil::VBO_INSTRUMENT);
 
 			// Up/down icons
 			if (getGraphType() != input::DEVTYPE_GUITAR) {
 				if (i > 0) { // Up
 					m_arrow_up.dimensions.middle(x - button_margin).center(y - step);
-					m_arrow_up.draw();
+					m_arrow_up.draw(glutil::VBO_INSTRUMENT);
 				}
 				if (i < m_menu.getOptions().size()-1) { // Down
 					m_arrow_down.dimensions.middle(x - button_margin).center(y + step);
-					m_arrow_down.draw();
+					m_arrow_down.draw(glutil::VBO_INSTRUMENT);
 				}
 			}
 

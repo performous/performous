@@ -96,7 +96,7 @@ void ScreenAudioDevices::manageEvent(SDL_Event event) {
 }
 
 void ScreenAudioDevices::draw() {
-	m_theme->bg.draw();
+	m_theme->bg.draw(glutil::VBO_SURFACE);
 	if (m_devs.empty()) return;
 	// Calculate spacing between columns/rows
 	const float xstep = (xoff - 0.5 + xoff) / m_channels.size();
@@ -111,7 +111,7 @@ void ScreenAudioDevices::draw() {
 		if (m_channels[m_selected_column].name == "OUT" && !m_devs[i].out) alpha = 0.5f;
 		else if (m_channels[m_selected_column].name != "OUT" && !m_devs[i].in) alpha = 0.5f;
 		m_theme->device_bg.dimensions.center(y);
-		m_theme->device_bg.draw();
+		m_theme->device_bg.draw(glutil::VBO_SURFACE);
 		ColorTrans c(Color::alpha(alpha));
 		m_theme->device.dimensions.middle(-xstep*0.5).center(y);
 		m_theme->device.draw(i < m_devs.size() ? m_devs[i].desc() : _("- Unassigned -"));
@@ -124,21 +124,21 @@ void ScreenAudioDevices::draw() {
 			int pos = m_channels[i].pos;
 			if (pos == unassigned_id) pos = m_devs.size();  // Transform -1 to the bottom of the list
 			srf.dimensions.middle(-xoff + xstep*0.5 + i*xstep).center(-yoff+pos*ystep);
-			srf.draw();
+			srf.draw(glutil::VBO_SURFACE);
 		}
 		// Selection indicator
 		if (m_selected_column == i)
 			m_selector->dimensions.middle(srf.dimensions.xc()).center(srf.dimensions.yc());
 	}
-	m_selector->draw(); // Position already set in the loop
+	m_selector->draw(glutil::VBO_SURFACE); // Position already set in the loop
 	// Key help
 	m_theme->comment_bg.dimensions.stretch(1.0, 0.025).middle().screenBottom(-0.054);
-	m_theme->comment_bg.draw();
+	m_theme->comment_bg.draw(glutil::VBO_SURFACE);
 	m_theme->comment.dimensions.left(-0.48).screenBottom(-0.067);
 	m_theme->comment.draw(_("Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select to cancel. Ctrl + R to reset defaults"));
 	// Additional info
 	m_theme->comment_bg.dimensions.middle().screenBottom(-0.01);
-	m_theme->comment_bg.draw();
+	m_theme->comment_bg.draw(glutil::VBO_SURFACE);
 	m_theme->comment.dimensions.left(-0.48).screenBottom(-0.023);
 	m_theme->comment.draw(_("For advanced device configuration, use command line parameter --audio (use --audiohelp for details)."));
 }

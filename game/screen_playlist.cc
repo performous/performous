@@ -111,7 +111,7 @@ void ScreenPlaylist::manageEvent(SDL_Event) {
 void ScreenPlaylist::draw() {
 	Game* gm = Game::getSingletonPtr();
 	if (!m_background || m_background->empty()) m_background.reset(new Surface(m_backgrounds.getRandom()));
-	m_background->draw();
+	m_background->draw(glutil::VBO_SURFACE);
 	if (m_nextTimer.get() == 0.0 && keyPressed == false) {
 		Screen* s = gm->getScreen("Sing");
 		ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
@@ -141,7 +141,7 @@ void ScreenPlaylist::draw() {
 			  * rotate(-0.0, vec3(0.0, 1.0, 0.0))
 			);
 			s.dimensions.middle().screenBottom(-0.06).fitInside(0.08, 0.08);
-			s.draw();
+			s.draw(glutil::VBO_SURFACE);
 		}
 	}
 }
@@ -207,7 +207,7 @@ void ScreenPlaylist::drawMenu() {
 	float x = -w * .5f + step;
 	// Background
 	th.bg.dimensions.middle(0).center(0).stretch(w, h);
-	th.bg.draw();
+	th.bg.draw(glutil::VBO_SURFACE);
 	// Loop through menu items
 	w = 0;
 	for (MenuOptions::const_iterator it = overlay_menu.begin(); it != overlay_menu.end(); ++it) {
