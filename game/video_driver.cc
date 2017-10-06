@@ -65,7 +65,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 		GLattrSetter attr_vers_maj(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 		GLattrSetter attr_vers_min(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 		GLattrSetter attr_prof(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-// 		GLattrSetter attr_fwd_comp(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+		GLattrSetter attr_fwd_comp(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
 		GLattrSetter attr_r(SDL_GL_RED_SIZE, 8);
 		GLattrSetter attr_g(SDL_GL_GREEN_SIZE, 8);
 		GLattrSetter attr_b(SDL_GL_BLUE_SIZE, 8);
