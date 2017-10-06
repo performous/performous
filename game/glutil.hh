@@ -27,6 +27,10 @@ namespace glutil {
 	/// Handy vertex array capable of drawing itself
 	class VertexArray {
 	  private:
+		static constexpr GLint vertPos = 0;
+		static constexpr GLint vertTexCoord = 1;
+		static constexpr GLint vertNormal = 2;
+		static constexpr GLint vertColor = 3;
 		std::vector<VertexInfo> m_vertices;
 		VertexInfo m_vert;
 		GLuint* m_vbo_ids = new GLuint[2];
