@@ -1,13 +1,10 @@
 #include "glutil.hh"
+#include "screen.hh"
 
 namespace glutil {
 
-void VertexArray::initBuffers() {
-	glutil::GLErrorChecker glerror("VertexArray::generateVBO()");
-	glGenVertexArrays(1, &m_vao);
-	glBindVertexArray(m_vao);
-	glGenBuffers(2, m_vbo_ids);
-}
+GLuint GLBuffers::m_vao = 0;
+GLuint GLBuffers::m_vbo_ids[5] = { 0 };
 
 void VertexArray::draw(GLint mode, bool OGLText) {
 	if (empty()) return;

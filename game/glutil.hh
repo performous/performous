@@ -25,14 +25,17 @@ namespace glutil {
 	};
 	
 	struct GLBuffers {
-		static GLuint* m_vao;
-		static GLuint* m_vbo_ids;
-		
-		void init() {
-			GLuint* m_vao = new GLuint;
-			GLuint* m_vbo_ids = new GLuint[3];
+		static GLuint m_vao;
+		static GLuint m_vbo_ids[5];
+
+		void initBuffers() {
+			glGenVertexArrays(1, &m_vao);
+			glBindVertexArray(m_vao);
+			glGenBuffers(5, m_vbo_ids);
+			glBindVertexArray(0);
 		}
-		GLBuffers() { init(); }
+		
+		GLBuffers() { }
 	};
 
 	/// Handy vertex array capable of drawing itself
@@ -47,11 +50,9 @@ namespace glutil {
 		GLuint* m_vbo_ids = new GLuint[2];
 		GLuint m_vao;
 	  public:
-		VertexArray() { initBuffers(); }
+		VertexArray() { }
 
 		~VertexArray() { clear(); }
-		
-		void initBuffers();
 
 		VertexArray& vertex(float x, float y, float z = 0.0f) {
 			return vertex(glmath::vec3(x, y, z));
@@ -87,7 +88,7 @@ namespace glutil {
 			return *this;
 		}
 
-		void draw(GLint mode = GL_TRIANGLE_STRIP, bool OGLText = false);
+		void draw(VBOTarget = VBO_SURFACE);
 
 		bool empty() const {
 			return m_vertices.empty();
