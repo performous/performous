@@ -118,6 +118,6 @@ void Webcam::render() {
 	}
 	using namespace glmath;
 	Transform trans(scale(vec3(-1.0, 1.0, 1.0)));
-	m_surface.draw(glutil::VBO_MEDIA); // Draw
+	m_surface.draw(); // Draw
 	#endif
 }

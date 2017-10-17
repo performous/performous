@@ -244,7 +244,7 @@ void ScreenSongs::drawJukebox() {
 		if (cover && !cover->empty()) {
 			Surface& s = *cover;
 			s.dimensions.left(theme->song.dimensions.x1()).top(theme->song.dimensions.y2() + 0.05).fitInside(0.15, 0.15);
-			s.draw(glutil::VBO_SURFACE);
+			s.draw();
 		}
 		// Format && draw the song information text
 		std::ostringstream oss_song;
@@ -275,7 +275,7 @@ void ScreenSongs::drawMultimedia() {
 	}
 	if (!m_jukebox) {
 		m_songbg_ground->draw(glutil::VBO_MEDIA);
-		theme->bg.draw(glutil::VBO_MEDIA);
+		theme->bg.draw();
 		drawCovers();
 	}
 }
@@ -374,11 +374,11 @@ void ScreenSongs::drawCovers() {
 		ColorTrans c1(Color(c, c, c));
 		s.dimensions.middle().screenCenter().bottom().fitInside(0.17, 0.17);
 		// Draw the cover normally
-		s.draw(glutil::VBO_MEDIA);
+		s.draw();
 		// Draw the reflection
 		Transform transMirror(scale(vec3(1.0f, -1.0f, 1.0f)));
 		ColorTrans c2(Color::alpha(0.4));
-		s.draw(glutil::VBO_MEDIA);
+		s.draw();
 	}
 	// Draw the playlist
     Game* gm = Game::getSingletonPtr();
@@ -394,7 +394,7 @@ void ScreenSongs::drawCovers() {
 		  * rotate(-0.0, vec3(0.0, 1.0, 0.0))
 		);
 		s.dimensions.middle().screenBottom(-0.06).fitInside(0.08, 0.08);
-		s.draw(glutil::VBO_MEDIA);
+		s.draw();
 	}
 }
 
@@ -430,7 +430,7 @@ namespace {
 		va.texCoord(getIconTex(i), 1.0f).vertex(dim.x1(), dim.y2());
 		va.texCoord(getIconTex(i + 1), 0.0f).vertex(dim.x2(), dim.y1());
 		va.texCoord(getIconTex(i + 1), 1.0f).vertex(dim.x2(), dim.y2());
-		va.draw(glutil::VBO_MEDIA);
+		va.draw();
 	}
 }
 
@@ -490,7 +490,7 @@ void ScreenSongs::drawMenu() {
 	float x = -w * .5f + step;
 	// Background
 	th.bg.dimensions.middle(0).center(0).stretch(w, h);
-	th.bg.draw(glutil::VBO_SURFACE);
+	th.bg.draw();
 	// Loop through menu items
 	w = 0;
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it) {

@@ -60,7 +60,7 @@ namespace {
 		va.texCoord(1.0f, 0.0f).vertex(x + w, yend);
 		va.texCoord(1.0f, 1.0f).vertex(x + w, yend + h);
 
-		va.draw(glutil::VBO_INSTRUMENT);
+		va.draw();
 	}
 }
 
@@ -191,7 +191,7 @@ void NoteGraph::drawNotes() {
 
 namespace {
 	void strip(glutil::VertexArray& va) {
-		if (va.size() > 3) va.draw(glutil::VBO_INSTRUMENT);
+		if (va.size() > 3) va.draw();
 		va.clear();
 	}
 }

@@ -15,7 +15,6 @@ void VertexArray::draw(VBOTarget vbo_target) {
 	GLint program;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &program);
 	std::clog << "gl/debug: GL_CURRENT_PROGRAM: " << program;
-	glBindVertexArray(buffer.m_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer.m_vbo_ids[vbo_target]);
 	glBufferData(GL_ARRAY_BUFFER, stride * size(), &m_vertices[0], (vbo_target == VBO_MODELS) ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW);
 	std::clog << "opengl/debug: GL_CURRENT_PROGRAM: " << program;

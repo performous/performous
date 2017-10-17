@@ -121,13 +121,13 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 }
 
 void OpenGLText::draw() {
-	m_surface.draw(glutil::VBO_TEXT);
+	m_surface.draw();
 }
 
 void OpenGLText::draw(Dimensions &_dim, TexCoords &_tex) {
 	m_surface.dimensions = _dim;
 	m_surface.tex = _tex;
-	m_surface.draw(glutil::VBO_TEXT);
+	m_surface.draw();
 }
 
 namespace {

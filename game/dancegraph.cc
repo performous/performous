@@ -383,7 +383,7 @@ void DanceGraph::drawArrow(int arrow_i, Texture& tex, float ty1, float ty2) {
 	glutil::VertexArray va;
 	vertexPair(va, arrow_i, -arrowSize, ty1);
 	vertexPair(va, arrow_i,  arrowSize, ty2);
-	va.draw(glutil::VBO_INSTRUMENT);
+	va.draw();
 }
 
 /// Draws the dance graph
@@ -450,7 +450,7 @@ void DanceGraph::drawBeats(double time) {
 		va.color(c).normal(0.0f, 1.0f, 0.0f).texCoord(0.0f, texCoord).vertex(-w, time2y(tEnd));
 		va.color(c).normal(0.0f, 1.0f, 0.0f).texCoord(1.0f, texCoord).vertex(w, time2y(tEnd));
 	}
-	va.draw(glutil::VBO_INSTRUMENT);
+	va.draw();
 }
 
 /// Draws a single note (or hold)
@@ -498,7 +498,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 				vertexPair(va, arrow_i, yMid, 2.0f/3.0f);
 				// End
 				vertexPair(va, arrow_i, l, 1.0f);
-				va.draw(glutil::VBO_INSTRUMENT);
+				va.draw();
 			}
 		} else {
 			// Draw short note

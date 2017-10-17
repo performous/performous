@@ -83,7 +83,7 @@ void Game::drawLoading() {
 		va.vertex(cx + r, cy + r);
 		va.vertex(cx - r, cy - r);
 		va.vertex(cx + r, cy - r);
-		va.draw(glutil::VBO_TEXT);
+		va.draw();
 	}
 }
 
@@ -118,7 +118,7 @@ bool Game::closeDialog() {
 void Game::drawLogo() {
 	double v = 0.5 - 0.5 * std::cos(m_pi * m_logoAnim.get());
 	m_logo.dimensions.fixedHeight(0.1).left(-0.45).screenTop(-0.1 + 0.11 * v);
-	m_logo.draw(glutil::VBO_TEXT);
+	m_logo.draw();
 }
 
 void Game::drawNotifications() {

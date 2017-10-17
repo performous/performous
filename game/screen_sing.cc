@@ -432,7 +432,7 @@ namespace {
 		va.texCoord(0,0).vertex(dim.x1(), dim.y2());
 		va.texCoord(0,0).vertex(dim.x2(), dim.y2());
 		getShader("texture").bind();
-		va.draw(glutil::VBO_SURFACE);
+		va.draw();
 	}
 }
 
@@ -488,9 +488,9 @@ void ScreenSing::draw() {
 		ar = clamp(ar, arMin, arMax);
 		double offset = 0.5 / ar + 0.2;
 		theme->bg_bottom.dimensions.fixedWidth(1.0).bottom(offset);
-		theme->bg_bottom.draw(glutil::VBO_SURFACE);
+		theme->bg_bottom.draw();
 		theme->bg_top.dimensions.fixedWidth(1.0).top(-offset);
-		theme->bg_top.draw(glutil::VBO_SURFACE);
+		theme->bg_top.draw();
 	}
 
 	for (unsigned i = 0; i < m_layout_singer.size(); ++i) m_layout_singer[i].hideLyrics(m_audio.isPaused());
@@ -592,7 +592,7 @@ void ScreenSing::drawMenu() {
 	float x = -w * .5f + step;
 	// Background
 	th.bg.dimensions.middle(0).center(0).stretch(w, h);
-	th.bg.draw(glutil::VBO_SURFACE);
+	th.bg.draw();
 	// Loop through menu items
 	w = 0;
 	int player = 0;
@@ -700,7 +700,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 void ScoreWindow::draw() {
 	using namespace glmath;
 	Transform trans(translate(vec3(0.0, m_pos.get(), 0.0)));
-	m_bg.draw(glutil::VBO_SURFACE);
+	m_bg.draw();
 	const double spacing = 0.1 + 0.1 / m_database.scores.size();
 	unsigned i = 0;
 

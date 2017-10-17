@@ -31,6 +31,6 @@ void Video::render(double time) {
 	double alpha = clamp(m_alpha.get());
 	if (alpha == 0.0) return;
 	ColorTrans c(Color::alpha(alpha));
-	m_surface.draw(glutil::VBO_MEDIA);
+	m_surface.draw();
 }
 

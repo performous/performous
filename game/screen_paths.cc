@@ -114,7 +114,7 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 
 void ScreenPaths::draw() {
 
-	m_theme->bg.draw(glutil::VBO_SURFACE);
+	m_theme->bg.draw();
 
 	//draw menu:
 	{
@@ -135,7 +135,7 @@ void ScreenPaths::draw() {
 				double selanim = m_selAnim.get() - start_i;
 				if (selanim < 0) { selanim = 0; }
 				m_theme->back_h.dimensions.left(x - sel_margin).center(start_y + selanim*0.08);
-				m_theme->back_h.draw(glutil::VBO_SURFACE);
+				m_theme->back_h.draw();
 				// Draw the text, dim if option not available
 				{
 					ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
@@ -152,7 +152,7 @@ void ScreenPaths::draw() {
 		}
 	} //draw menu
 	m_theme->comment_bg.dimensions.center().screenBottom(-0.01);
-	m_theme->comment_bg.draw(glutil::VBO_SURFACE);
+	m_theme->comment_bg.draw();
 	m_theme->comment.dimensions.left(-0.48).screenBottom(-0.028);
 	m_theme->comment.draw(m_menu.current().getComment());
 

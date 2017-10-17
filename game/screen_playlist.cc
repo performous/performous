@@ -141,7 +141,7 @@ void ScreenPlaylist::draw() {
 			  * rotate(-0.0, vec3(0.0, 1.0, 0.0))
 			);
 			s.dimensions.middle().screenBottom(-0.06).fitInside(0.08, 0.08);
-			s.draw(glutil::VBO_SURFACE);
+			s.draw();
 		}
 	}
 }
@@ -207,7 +207,7 @@ void ScreenPlaylist::drawMenu() {
 	float x = -w * .5f + step;
 	// Background
 	th.bg.dimensions.middle(0).center(0).stretch(w, h);
-	th.bg.draw(glutil::VBO_SURFACE);
+	th.bg.draw();
 	// Loop through menu items
 	w = 0;
 	for (MenuOptions::const_iterator it = overlay_menu.begin(); it != overlay_menu.end(); ++it) {

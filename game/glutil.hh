@@ -26,21 +26,17 @@ namespace glutil {
 	
 	enum VBOTarget { 
 		VBO_SURFACE = 0,
-		VBO_TEXT = 1,
-		VBO_MEDIA = 2,
-		VBO_INSTRUMENT = 3,
-		VBO_MODELS = 4
+		VBO_MODELS = 1
 	};
 	
 	struct GLBuffers {
 		static GLuint m_vao;
-		static GLuint m_vbo_ids[5];
+		static GLuint m_vbo_ids[2];
 
 		void initBuffers() {
 			glGenVertexArrays(1, &m_vao);
 			glBindVertexArray(m_vao);
-			glGenBuffers(5, m_vbo_ids);
-			glBindVertexArray(0);
+			glGenBuffers(2, m_vbo_ids);
 		}
 		
 		GLBuffers() { }
@@ -110,6 +106,7 @@ namespace glutil {
 			m_vertices.clear();
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glDeleteBuffers(2, m_vbo_ids);
+			glBindVertexArray(0);
 		}
 
 	};
