@@ -14,7 +14,7 @@
    height="800"
    id="svg3465"
    sodipodi:version="0.32"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
    sodipodi:docname="sing-songinfo.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
@@ -30,7 +30,7 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="1056"
+     inkscape:window-height="1025"
      inkscape:window-width="1920"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -43,10 +43,10 @@
      id="base"
      showgrid="false"
      inkscape:zoom="10.82"
-     inkscape:cx="14.619393"
+     inkscape:cx="10.356132"
      inkscape:cy="58.017773"
      inkscape:window-x="0"
-     inkscape:window-y="24"
+     inkscape:window-y="27"
      inkscape:current-layer="svg3465"
      inkscape:window-maximized="1" />
   <defs
@@ -60,17 +60,16 @@
        id="perspective9" />
   </defs>
   <text
-     sodipodi:linespacing="125%"
      xml:space="preserve"
      id="timer_text"
-     style="font-size:6.53677082px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.18157697;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline;font-family:Droid Sans Mono"
-     y="855.92041"
-     x="5.7089458"
-     transform="scale(1.1354379,0.8807175)"><tspan
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.45777512px;line-height:0%;font-family:'Droid Sans Mono';text-align:start;text-anchor:start;display:inline;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.34604928;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     y="911.35938"
+     x="5.0858607"
+     transform="scale(1.2106374,0.82601117)"><tspan
        id="tspan4717"
-       y="857.18573"
-       x="5.7089458"
-       style="font-size:7.26307869px;text-align:start;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.18157697;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none">00:00</tspan></text>
+       y="913.77081"
+       x="5.0858607"
+       style="font-size:13.8419733px;text-align:start;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.34604928;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">00:00</tspan></text>
   <!--       style="font-size:25px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;opacity:1;fill:black;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.56078384;display:inline;font-family:Droid Sans Mono"
 -->
 </svg>
