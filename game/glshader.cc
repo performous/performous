@@ -39,20 +39,15 @@ void Shader::dumpInfoLog(GLuint id) {
 	if (std::equal(infoLog, infoLog + infoLogLength, "Vertex shader(s) linked, fragment shader(s) linked, geometry shader(s) linked.")) return;
 
 	// FIXME: The logging facility probably won't handle this right, especially when infoLog contains many lines.
-	std::clog << "opengl/error: Shader " << name << ": " << infoLog << std::endl;
 }
 
 Shader::Shader(std::string const& name): name(name), program(0) {}
 
 Shader::~Shader() {
-// 	glDeleteProgram(program);
 	for (const size_t& id: shader_ids) {
 	glDetachShader(id, program);
 	glDeleteShader(id);
-	std::clog << "shader/info: Detached shader " << id << " from program " << program << " (" << name << ")" << std::endl;
-// 	std::clog << "shader/info: Shader program " << program << " deleted." << std::endl;
 	glDeleteProgram(program);
-	std::clog << "shader/info: Shader program " << program << " deleted." << std::endl;
 	}
 // 	std::for_each(shader_ids.begin(), shader_ids.end(), glDeleteShader);
 }
@@ -71,7 +66,6 @@ Shader& Shader::compileFile(fs::path const& filename) {
 		if (pos != std::string::npos) srccode = srccode.substr(0, pos) + defs + srccode.substr(pos + 9);
 	}
 	try {
-	std::clog << "gl/debug: Will now try to create shader : " << filename.filename().string();
 		return compileCode(srccode, type);
 	} catch (std::runtime_error& e) {
 		throw std::runtime_error(filename.filename().string() + ": " + e.what());
@@ -82,7 +76,6 @@ Shader& Shader::compileFile(fs::path const& filename) {
 Shader& Shader::compileCode(std::string const& srccode, GLenum type) {
 	glutil::GLErrorChecker ec("Shader::compile");
 	GLuint new_shader = glCreateShader(type);
-	std::clog << ", with id: " << new_shader << std::endl;
 	ec.check("glCreateShader");
 	if (new_shader == 0) {
 		throw std::runtime_error("Couldn't create shader.");
@@ -130,8 +123,6 @@ Shader& Shader::link() {
 
 
 Shader& Shader::bind() {
-	std::clog << "opengl/debug: Will now call GLErrorChecker..." << std::endl;
-	std::clog << "opengl/debug: Shader: " << program << ", name: " << name << std::endl;
 	glutil::GLErrorChecker ec("Shader::bind");
 	glUseProgram(program);
 	return *this;
@@ -139,8 +130,6 @@ Shader& Shader::bind() {
 
 
 Uniform Shader::operator[](const std::string& uniform) {
-	std::clog << "opengl/debug: Uniform shader... " << uniform << std::endl;
-	glutil::GLErrorChecker ec("binding shader accessed via subscript");
 	bind();
 	// Try to use a cached value
 	auto it = uniforms.find(uniform);

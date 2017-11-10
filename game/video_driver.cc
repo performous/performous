@@ -265,19 +265,12 @@ void Window::view(unsigned num) {
 	glutil::GLErrorChecker glerror("Window::view");
 	// Set flags
 	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
-// 	glutil::GLErrorChecker ec("glclearcolor");
 	glDisable(GL_DEPTH_TEST);
-// 	glutil::GLErrorChecker ec1("gldisable_depth_test");
 	glDisable(GL_CULL_FACE);
-// 	glutil::GLErrorChecker ec2("gldisable_cull_face");
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-// 	glutil::GLErrorChecker ec3("blendfunc");
 
 	glEnable(GL_BLEND);
-// 	glutil::GLErrorChecker ec6("gl_blend");
 	if (GL_EXT_framebuffer_sRGB) glEnable(GL_FRAMEBUFFER_SRGB);
-// 		std::clog << "gl/debug: Will try to bind shader color now... calling glError before the call to bind." << std::endl;
-// 	glutil::GLErrorChecker ec7("Window::view");
 	shader("color").bind();
 	// Setup views (with black bars for cropping)
 	int windowWidth;
