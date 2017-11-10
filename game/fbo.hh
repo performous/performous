@@ -18,16 +18,16 @@ class FBO: boost::noncopyable {
 			glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_DEPTH_COMPONENT, w, h, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
 		}
 		// Create FBO
-		glGenFramebuffers(1, &m_fbo);
+		glGenFramebuffersEXT(1, &m_fbo);
 		// Bind texture as COLOR_ATTACHMENT0
 		bind();
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_RECTANGLE, m_texture.id(), 0);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_RECTANGLE, m_depth.id(), 0);
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_RECTANGLE, m_texture.id(), 0);
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_RECTANGLE, m_depth.id(), 0);
 		unbind();
 	}
 	/// Handle clean-up
 	~FBO() {
-		if (m_fbo) glDeleteFramebuffers(1, &m_fbo);
+		if (m_fbo) glDeleteFramebuffersEXT(1, &m_fbo);
 	}
 	/// Returns a reference to the attached texture
 	OpenGLTexture<GL_TEXTURE_RECTANGLE>& getTexture() {
@@ -35,11 +35,11 @@ class FBO: boost::noncopyable {
 	}
 	/// Bind the FBO into use
 	void bind() {
-		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_fbo);
 	}
 	/// Unbind any FBO
 	static void unbind() {
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 	}
 
   private:
