@@ -49,6 +49,25 @@ namespace {
 unsigned int screenW() { return s_width; }
 unsigned int screenH() { return s_height; }
 
+void Window::initBuffers() {
+			glGenVertexArrays(1, &Window::m_vao);
+			glBindVertexArray(Window::m_vao);
+			glGenBuffers(1, &Window::m_vbo);
+			GLsizei stride = glutil::VertexArray::stride();
+			
+			glBindBuffer(GL_ARRAY_BUFFER, Window::m_vbo);			
+			glEnableVertexAttribArray(vertPos);
+			glVertexAttribPointer(vertPos, 3, GL_FLOAT, GL_FALSE, stride, NULL);
+			glEnableVertexAttribArray(vertTexCoord);
+			glVertexAttribPointer(vertTexCoord, 2, GL_FLOAT, GL_FALSE, stride, NULL);
+			glEnableVertexAttribArray(vertNormal);
+			glVertexAttribPointer(vertNormal, 3, GL_FLOAT, GL_FALSE, stride, NULL);
+			glEnableVertexAttribArray(vertColor);
+			glVertexAttribPointer(vertColor, 4, GL_FLOAT, GL_FALSE, stride, NULL);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindVertexArray(0);
+}
+
 Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(width), m_windowH(height), m_fullscreen(fs), screen() {
 	std::atexit(SDL_Quit);
 	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK))
@@ -79,8 +98,10 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 			(m_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0) | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL);
 		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
 		SDL_GL_CreateContext(screen);
-		m_glbuffer = glutil::GLBuffers();
-		m_glbuffer.m_vao = 0;
+		glutil::GLErrorChecker error("Initializing buffers");
+		{
+		initBuffers();
+		}
 	}
 	if (!m_fullscreen) {
 		config["graphic/window_width"].i() = s_width;
@@ -148,6 +169,9 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	updateColor();
 	view(0);  // For loading screens
 }
+
+GLuint Window::m_vao = 0;
+GLuint Window::m_vbo = 0;
 
 Window::~Window() { }
 
@@ -316,7 +340,7 @@ void Window::resize() {
 	int windowWidth;
 	int windowHeight;
 	SDL_GL_GetDrawableSize(screen, &windowWidth, &windowHeight);
-	//glViewport(0, 0, windowWidth, windowHeight);
+	glViewport(0, 0, windowWidth, windowHeight);
 	std::clog << "video/info: Drawable size " << windowWidth << "x" << windowHeight << ", fs=" << m_fullscreen << std::endl; 
 	s_width = windowWidth;
 	s_height = windowHeight;

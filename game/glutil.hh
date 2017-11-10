@@ -28,31 +28,12 @@ namespace glutil {
 		VBO_SURFACE = 0,
 		VBO_MODELS = 1
 	};
-	
-	struct GLBuffers {
-		static GLuint m_vao;
-		static GLuint m_vbo_ids[2];
-
-		void initBuffers() {
-			glGenVertexArrays(1, &m_vao);
-			glBindVertexArray(m_vao);
-			glGenBuffers(2, m_vbo_ids);
-		}
-		
-		GLBuffers() { }
-	};
 
 	/// Handy vertex array capable of drawing itself
 	class VertexArray {
 	  private:
-		static constexpr GLint vertPos = 0;
-		static constexpr GLint vertTexCoord = 1;
-		static constexpr GLint vertNormal = 2;
-		static constexpr GLint vertColor = 3;
 		std::vector<VertexInfo> m_vertices;
 		VertexInfo m_vert;
-		GLuint* m_vbo_ids = new GLuint[2];
-		GLuint m_vao;
 	  public:
 		VertexArray() { }
 
@@ -105,8 +86,6 @@ namespace glutil {
 		void clear() {
 			m_vertices.clear();
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			glDeleteBuffers(2, m_vbo_ids);
-			glBindVertexArray(0);
 		}
 
 	};

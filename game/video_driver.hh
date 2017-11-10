@@ -52,6 +52,8 @@ public:
 	/// destructor
 	~Window();
 	void render(boost::function<void (void)> drawFunc);
+	GLuint const& VAO() const { return m_vao; }
+	GLuint const& VBO() const { return m_vbo; }
 	/// clears window
 	void blank();
 	/// swaps buffers
@@ -85,8 +87,15 @@ public:
 	void updateColor();
 	void updateTransforms();
 private:
+	const GLuint vertPos = 0;
+	const GLuint vertTexCoord = 1;
+	const GLuint vertNormal = 2;
+	const GLuint vertColor = 3;
 	/// Setup everything for drawing a view.
 	/// @param num 0 = no stereo, 1 = left eye, 2 = right eye
+	static GLuint m_vao;
+	static GLuint m_vbo;
+	void initBuffers();
 	void view(unsigned num);
 	void updateStereo(float separation);
 	unsigned int m_windowW, m_windowH;
