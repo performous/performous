@@ -111,7 +111,7 @@ void ScreenPlaylist::manageEvent(SDL_Event) {
 void ScreenPlaylist::draw() {
 	Game* gm = Game::getSingletonPtr();
 	if (!m_background || m_background->empty()) m_background.reset(new Surface(m_backgrounds.getRandom()));
-	m_background->draw(glutil::VBO_SURFACE);
+	m_background->draw();
 	if (m_nextTimer.get() == 0.0 && keyPressed == false) {
 		Screen* s = gm->getScreen("Sing");
 		ScreenSing* ss = dynamic_cast<ScreenSing*> (s);

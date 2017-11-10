@@ -12,7 +12,7 @@ void ProgressBar::draw(float value) {
 	value = clamp(value);
 	float scale = 1.0f - m_begin - m_end;
 	float off = (1.0f - value) * scale;  // Offset for sliding mode
-	m_bg.draw(dimensions,NULL,glutil::VBO_TEXT);
+	m_bg.draw(dimensions,NULL,glutil::VBO_SURFACE);
 	switch (m_mode) {
 	  case HORIZONTAL:
 		{

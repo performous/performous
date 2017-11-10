@@ -258,23 +258,23 @@ void ScreenSongs::drawMultimedia() {
 		Transform ft(farTransform());  // 3D effect
 		double length = m_audio.getLength();
 		double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
-		m_songbg_default->draw(glutil::VBO_MEDIA);   // Default bg
+		m_songbg_default->draw();   // Default bg
 		if (m_songbg.get() && !m_video.get()) {
 			if (m_songbg->width() > 512 && m_songbg->dimensions.ar() > 1.1) {
 				// Full screen mode
 				float s = sin(m_clock.get()) * 0.15 + 1.15;
 				Transform sc(scale(glmath::vec3(s, s, s)));
-				m_songbg->draw(glutil::VBO_MEDIA);
+				m_songbg->draw();
 			} else {
 				// Low res texture or cover image, render in tiled mode
 				double x = 0.05 * m_clock.get();
-				m_songbg->draw(m_songbg->dimensions, TexCoords(x, 0.0, x + 5.0, 5.0), glutil::VBO_MEDIA);
+				m_songbg->draw(m_songbg->dimensions, TexCoords(x, 0.0, x + 5.0, 5.0), glutil::VBO_SURFACE);
 			}
 		}
 		if (m_video.get()) m_video->render(time);
 	}
 	if (!m_jukebox) {
-		m_songbg_ground->draw(glutil::VBO_MEDIA);
+		m_songbg_ground->draw();
 		theme->bg.draw();
 		drawCovers();
 	}

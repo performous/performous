@@ -104,7 +104,7 @@ void ScreenPlayers::draw() {
 	m_players.update(); // Poll for new players
 	double length = m_audio.getLength();
 	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
-	if (m_songbg.get()) m_songbg->draw(glutil::VBO_SURFACE);
+	if (m_songbg.get()) m_songbg->draw();
 	if (m_video.get()) m_video->render(time);
 	theme->bg.draw();
 	std::string music, songbg, video;

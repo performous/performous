@@ -130,7 +130,7 @@ void ScreenAudioDevices::draw() {
 		if (m_selected_column == i)
 			m_selector->dimensions.middle(srf.dimensions.xc()).center(srf.dimensions.yc());
 	}
-	m_selector->draw(glutil::VBO_SURFACE); // Position already set in the loop
+	m_selector->draw(); // Position already set in the loop
 	// Key help
 	m_theme->comment_bg.dimensions.stretch(1.0, 0.025).middle().screenBottom(-0.054);
 	m_theme->comment_bg.draw();

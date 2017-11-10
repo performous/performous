@@ -192,7 +192,7 @@ void ScreenSing::instrumentLayout(double time) {
 	} else if (time < -0.5) {
 		// Display help if no-one has joined yet
 		ColorTrans c(Color::alpha(clamp(-1.0 - 2.0 * time)));
-		m_help->draw(glutil::VBO_TEXT);
+		m_help->draw();
 	}
 	double iw = std::min(0.5, 1.0 / count_alive);
 	typedef std::pair<unsigned, double> CountSum;
@@ -477,7 +477,7 @@ void ScreenSing::draw() {
 		if (!m_background || m_background->empty()) m_background.reset(new Surface(m_backgrounds.getRandom()));
 		ar = m_background->dimensions.ar();
 		if (ar > arMax || (m_video && ar > arMin)) fillBG();  // Fill white background to avoid black borders
-		m_background->draw(glutil::VBO_SURFACE);
+		m_background->draw();
 		// Webcam
 		if (m_cam && config["graphic/webcam"].b()) m_cam->render();
 		// Video

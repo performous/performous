@@ -141,7 +141,7 @@ void ScreenIntro::draw() {
 		theme->bg.draw();
 	}
 	glerror.check("bg");
-	if (m_menu.current().image) m_menu.current().image->draw(glutil::VBO_SURFACE);
+	if (m_menu.current().image) m_menu.current().image->draw();
 	// Comment
 	theme->comment_bg.dimensions.center().screenBottom(-0.01);
 	theme->comment_bg.draw();
