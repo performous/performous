@@ -12,15 +12,15 @@ namespace glutil {
 
 	// Note: if you reorder or otherwise change the contents of this, VertexArray::Draw() must be modified accordingly
 	struct VertexInfo {
-		glmath::vec3 position;
-		glmath::vec2 texCoord;
-		glmath::vec3 normal;
-		glmath::vec4 color;
+		glmath::vec3 vertPos;
+		glmath::vec2 vertTexCoord;
+		glmath::vec3 vertNormal;
+		glmath::vec4 vertColor;
 		VertexInfo():
-		  position(0.0, 0.0, 0.0),
-		  texCoord(0.0, 0.0),
-		  normal(0.0, 0.0, 0.0),
-		  color(1.0, 1.0, 1.0, 1.0)
+		  vertPos(0.0, 0.0, 0.0),
+		  vertTexCoord(0.0, 0.0),
+		  vertNormal(0.0, 0.0, 0.0),
+		  vertColor(1.0, 1.0, 1.0, 1.0)
 		{}
 	};
 	
@@ -44,7 +44,7 @@ namespace glutil {
 		}
 
 		VertexArray& vertex(glmath::vec3 const& v) {
-			m_vert.position = v;
+			m_vert.vertPos = v;
 			m_vertices.push_back(m_vert);
 			m_vert = VertexInfo();
 			return *this;
@@ -55,7 +55,7 @@ namespace glutil {
 		}
 
 		VertexArray& normal(glmath::vec3 const& v) {
-			m_vert.normal = v;
+			m_vert.vertNormal = v;
 			return *this;
 		}
 
@@ -64,12 +64,12 @@ namespace glutil {
 		}
 
 		VertexArray& texCoord(glmath::vec2 const& v) {
-			m_vert.texCoord = v;
+			m_vert.vertTexCoord = v;
 			return *this;
 		}
 
 		VertexArray& color(glmath::vec4 const& v) {
-			m_vert.color = v;
+			m_vert.vertColor = v;
 			return *this;
 		}
 
@@ -82,6 +82,8 @@ namespace glutil {
 		GLsizei size() const {
 			return m_vertices.size();
 		}
+		
+	  	static GLsizei stride() { return sizeof(VertexInfo); }
 
 		void clear() {
 			m_vertices.clear();
@@ -89,19 +91,6 @@ namespace glutil {
 		}
 
 	};
-
-	/// Wrapper struct for RAII
-	struct UseDepthTest {
-		/// enable depth test (for 3d objects)
-		UseDepthTest() {
-			glClear(GL_DEPTH_BUFFER_BIT);
-			glEnable(GL_DEPTH_TEST);
-		}
-		~UseDepthTest() {
-			glDisable(GL_DEPTH_TEST);
-		}
-	};
-
 	/// Checks for OpenGL error and displays it with given location info
 	struct GLErrorChecker {
 		std::string info;
@@ -125,6 +114,18 @@ namespace glutil {
 				case GL_OUT_OF_MEMORY: return "Out of memory";
 				default: return "Unknown error";
 			}
+		}
+	};
+
+	/// Wrapper struct for RAII
+	struct UseDepthTest {
+		/// enable depth test (for 3d objects)
+		UseDepthTest() {
+			glClear(GL_DEPTH_BUFFER_BIT);
+			glEnable(GL_DEPTH_TEST);
+		}
+		~UseDepthTest() {
+			glDisable(GL_DEPTH_TEST);
 		}
 	};
 }
