@@ -57,13 +57,13 @@ void Window::initBuffers() {
 			
 			glBindBuffer(GL_ARRAY_BUFFER, Window::m_vbo);			
 			glEnableVertexAttribArray(vertPos);
-			glVertexAttribPointer(vertPos, 3, GL_FLOAT, GL_FALSE, stride, NULL);
+			glVertexAttribPointer(vertPos, 3, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(glutil::VertexInfo, vertPos));
 			glEnableVertexAttribArray(vertTexCoord);
-			glVertexAttribPointer(vertTexCoord, 2, GL_FLOAT, GL_FALSE, stride, NULL);
+			glVertexAttribPointer(vertTexCoord, 2, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(glutil::VertexInfo, vertTexCoord));
 			glEnableVertexAttribArray(vertNormal);
-			glVertexAttribPointer(vertNormal, 3, GL_FLOAT, GL_FALSE, stride, NULL);
+			glVertexAttribPointer(vertNormal, 3, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(glutil::VertexInfo, vertNormal));
 			glEnableVertexAttribArray(vertColor);
-			glVertexAttribPointer(vertColor, 4, GL_FLOAT, GL_FALSE, stride, NULL);
+			glVertexAttribPointer(vertColor, 4, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(glutil::VertexInfo, vertColor));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindVertexArray(0);
 }
