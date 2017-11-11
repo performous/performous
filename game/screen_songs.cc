@@ -268,7 +268,7 @@ void ScreenSongs::drawMultimedia() {
 			} else {
 				// Low res texture or cover image, render in tiled mode
 				double x = 0.05 * m_clock.get();
-				m_songbg->draw(m_songbg->dimensions, TexCoords(x, 0.0, x + 5.0, 5.0), glutil::VBO_SURFACE);
+				m_songbg->draw(m_songbg->dimensions, TexCoords(x, 0.0, x + 5.0, 5.0));
 			}
 		}
 		if (m_video.get()) m_video->render(time);

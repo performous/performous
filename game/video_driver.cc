@@ -280,7 +280,7 @@ void Window::render(boost::function<void (void)> drawFunc) {
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_ONE, GL_ONE);
 		}
-		fbo.getTexture().draw(dim, TexCoords(0.0, h, w, 0), glutil::VBO_SURFACE);
+		fbo.getTexture().draw(dim, TexCoords(0.0, h, w, 0));
 	}
 	glerror.check("FBO->FB postcondition");
 }

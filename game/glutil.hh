@@ -73,7 +73,7 @@ namespace glutil {
 			return *this;
 		}
 
-		void draw(VBOTarget = VBO_SURFACE);
+		void draw(GLEnum mode = GL_TRIANGLE_STRIP);
 
 		bool empty() const {
 			return m_vertices.empty();
