@@ -13,16 +13,15 @@ in vec4 gColor;
 in float bogus;  // Workaround for http://www.nvnews.net/vbulletin/showthread.php?p=2401097
 #endif
 
-
-out vec4 outColor;
+out vec4 fColor;
+out vec3 fNormal;
 
 #ifdef ENABLE_LIGHTING
-vec3 normal = gNormal;
-vec3 lightDir = gLightDir;
+out vec3 fLightDir;
 #endif
 
 #if defined(ENABLE_TEXTURING) || defined(ENABLE_SPECULAR_MAP) || defined(ENABLE_EMISSION_MAP)
-vec2 texCoord = gTexCoord;
+out vec2 fTexCoord;
 #endif
 
 #ifdef ENABLE_TEXTURING
@@ -33,7 +32,7 @@ uniform sampler2D tex;
 #else
 #error Unknown texturing mode in ENABLE_TEXTURING
 #endif
-#define TEXFUNC texture(tex, texCoord)
+#define TEXFUNC texture(tex, gTexCoord)
 #endif
 
 #ifndef TEXFUNC
@@ -50,6 +49,7 @@ uniform sampler2D emissionTex;
 
 
 void main() {
+
 	vec4 frag = TEXFUNC;
 
 #ifdef ENABLE_BOGUS
@@ -61,12 +61,12 @@ void main() {
 #endif
 
 #ifdef ENABLE_LIGHTING
-	vec3 n = normalize(normal);
-	vec3 l = normalize(lightDir);
+	vec3 n = normalize(gNormal);
+	vec3 l = normalize(gLightDir);
 
 	// Diffuse
 	float diff = max(dot(n, l), 0.0);
-	float power = 1.0 - 0.02 * length(lightDir);
+	float power = 1.0 - 0.02 * length(gLightDir);
 	frag = vec4(frag.rgb * power * diff, frag.a);
 #endif
 
@@ -79,16 +79,16 @@ void main() {
 	if (power > 0.0) {
 		power *= pow(spec, 100);
 		#ifdef ENABLE_SPECULAR_MAP
-		power *= texture(specularTex, texCoord);
+		power *= texture(specularTex, gTexCoord);
 		#endif
 		frag.rgb += vec3(power, power, power);
 	}
 
 	#ifdef ENABLE_EMISSION_MAP
-	frag.xyz += texture(emissionTex, texCoord);
+	frag.xyz += texture(emissionTex, gTexCoord);
 	#endif
 #endif
 
-	outColor = frag;
+	fColor = frag;
 }
 

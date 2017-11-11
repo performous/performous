@@ -34,10 +34,10 @@ void Shader::dumpInfoLog(GLuint id) {
 
 	if (glIsShader(id)) glGetShaderInfoLog(id, maxLength, &infoLogLength, infoLog);
 	else glGetProgramInfoLog(id, maxLength, &infoLogLength, infoLog);
-
+	
+	std::clog << "shader/error: " << infoLog << std::flush;
 	// Ignore success messages that the Radeon driver always seems to give
 	if (std::equal(infoLog, infoLog + infoLogLength, "Vertex shader(s) linked, fragment shader(s) linked, geometry shader(s) linked.")) return;
-
 	// FIXME: The logging facility probably won't handle this right, especially when infoLog contains many lines.
 }
 
@@ -87,8 +87,8 @@ Shader& Shader::compileCode(std::string const& srccode, GLenum type) {
 	glCompileShader(new_shader);
 	ec.check("glCompileShader");
 	glGetShaderiv(new_shader, GL_COMPILE_STATUS, &gl_response);
-	dumpInfoLog(new_shader);
 	if (gl_response != GL_TRUE) {
+		dumpInfoLog(new_shader);
 		throw std::runtime_error("Shader compile error.");
 	}
 

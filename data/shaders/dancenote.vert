@@ -15,14 +15,10 @@ layout(location = 2) in vec3 vertNormal;
 layout(location = 3) in vec4 vertColor;
 
 // Per-vextex for fragment shader (if no geometry shader)
-out vec3 vLightDir;
-out vec2 vTexCoord;
-out vec3 vNormal;
-out vec4 vColor;
-out vec3 gLightDir;
-out vec2 gTexCoord;
-out vec3 gNormal;
-out vec4 gColor;
+out vec3 vLightDir, gLightDir;
+out vec2 vTexCoord, gTexCoord;
+out vec3 vNormal, gNormal;
+out vec4 vColor, gColor;
 
 mat4 scaleMat(in float sc) {
 	return mat4(sc,  0,  0,  0,
@@ -42,16 +38,20 @@ mat4 rotMat(in float ang) {
 
 void main() {
 	const vec3 lightPos = vec3(-10.0, 2.0, 15.0);
-	gTexCoord = vTexCoord = vertTexCoord;
-	gNormal = vNormal = normalMatrix * vertNormal;
+	
+	vTexCoord = vertTexCoord;
+	gTexCoord = vTexCoord;
+	
+	vNormal = normalMatrix * vertNormal;
+	gNormal = vNormal;
+	
 	vColor = vertColor;
-	
-	
-// 	vLightDir = lightDir;
 
 	mat4 trans = scaleMat(scale);
 	vec4 posEye = mvMatrix * (vec4(position, 0, 0) + trans * vec4(vertPos, 1.0));  // Vertex position in eye space
-	gLightDir = vLightDir = lightPos - posEye.xyz / posEye.w;  // Light position relative to vertex
+	
+	vLightDir = lightPos - posEye.xyz / posEye.w;  // Light position relative to vertex
+	gLightDir = vLightDir;
 
 	// Cursor arrows
 	if (noteType == 0) {
@@ -82,5 +82,6 @@ void main() {
 		);
 	}
     gColor = vColor;
+    
 	gl_Position = projMatrix * mvMatrix * (vec4(position, 0, 0) + trans * vec4(vertPos, 1.0));
 }
