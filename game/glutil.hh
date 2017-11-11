@@ -73,7 +73,7 @@ namespace glutil {
 			return *this;
 		}
 
-		void draw(GLEnum mode = GL_TRIANGLE_STRIP);
+		void draw(GLenum mode = GL_TRIANGLE_STRIP);
 
 		bool empty() const {
 			return m_vertices.empty();
