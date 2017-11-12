@@ -60,8 +60,7 @@ void Songs::reload_internal() {
 	std::clog << std::flush;
 	m_loading = false;
 	std::clog << "songs/notice: Done Loading. Loaded " << m_songs.size() << " Songs." << std::endl;
-	Game* gm = Game::getSingletonPtr();
-    //gm->dialog(_("Done Loading!\n Loaded ") + boost::lexical_cast<std::string>(m_songs.size()) + " Songs.");	//crashes on ubuntu 16.10 but not on 16.04
+	doneLoading = true;
 }
 
 void Songs::reload_internal(fs::path const& parent) {
