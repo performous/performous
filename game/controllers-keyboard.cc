@@ -1,4 +1,4 @@
-#include "controllers.hh"
+﻿#include "controllers.hh"
 #include "platform.hh"
 
 #include <set>
@@ -73,11 +73,11 @@ namespace input {
 					break;
 
 				// Keytar on keyboard
-				case SDL_SCANCODE_F12: button++;
-				case SDL_SCANCODE_F11: button++;
-				case SDL_SCANCODE_F10: button++;
-				case SDL_SCANCODE_F9: button++;
-				case SDL_SCANCODE_F8: button++;
+				case SDL_SCANCODE_F12: button++; /* Falls through. */
+				case SDL_SCANCODE_F11: button++; /* Falls through. */
+				case SDL_SCANCODE_F10: button++; /* Falls through. */
+				case SDL_SCANCODE_F9: button++; /* Falls through. */
+				case SDL_SCANCODE_F8: button++; /* Falls through. */
 				case SDL_SCANCODE_F7:
 					if (!m_keytar) return;
 					event.devType = DEVTYPE_KEYTAR;
@@ -98,14 +98,14 @@ namespace input {
 					break;
 
 				// Dance on keypad
-				case SDL_SCANCODE_KP_9: button++;
-				case SDL_SCANCODE_KP_7: button++;
-				case SDL_SCANCODE_KP_3: button++;
-				case SDL_SCANCODE_KP_1: button++;
-				case SDL_SCANCODE_KP_6: case SDL_SCANCODE_RIGHT: button++;
-				case SDL_SCANCODE_KP_8: case SDL_SCANCODE_UP: button++;
-				case SDL_SCANCODE_KP_2: case SDL_SCANCODE_DOWN: case SDL_SCANCODE_KP_5: button++;
-				case SDL_SCANCODE_KP_4: case SDL_SCANCODE_LEFT:
+				case SDL_SCANCODE_KP_9: button++; /* Falls through. */
+				case SDL_SCANCODE_KP_7: button++; /* Falls through. */
+				case SDL_SCANCODE_KP_3: button++; /* Falls through. */
+				case SDL_SCANCODE_KP_1: button++; /* Falls through. */
+				case SDL_SCANCODE_KP_6: case SDL_SCANCODE_RIGHT: button++; /* Falls through. */
+				case SDL_SCANCODE_KP_8: case SDL_SCANCODE_UP: button++; /* Falls through. */
+				case SDL_SCANCODE_KP_2: case SDL_SCANCODE_DOWN: case SDL_SCANCODE_KP_5: button++; /* Falls through. */
+				case SDL_SCANCODE_KP_4: case SDL_SCANCODE_LEFT: /* Falls through. */
 					if (!m_dancepad) return;
 					event.devType = DEVTYPE_DANCEPAD;
 					break;
