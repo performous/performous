@@ -1,4 +1,4 @@
-#include "ffmpeg.hh"
+﻿#include "ffmpeg.hh"
 
 #include "config.hh"
 #include "util.hh"
@@ -92,7 +92,8 @@ void FFmpeg::open() {
 	m_streamId = av_find_best_stream(m_formatContext, (AVMediaType)m_mediaType, -1, -1, &codec, 0);
 	if (m_streamId < 0) throw std::runtime_error("No suitable track found");
 
-	AVCodecContext* cc = m_formatContext->streams[m_streamId]->codec;
+	AVCodecContext* cc = avcodec_alloc_context3(codec);
+	avcodec_parameters_to_context(cc, m_formatContext->streams[m_streamId]->codecpar);
 	if (avcodec_open2(cc, codec, nullptr) < 0) throw std::runtime_error("Cannot open codec");
 	cc->workaround_bugs = FF_BUG_AUTODETECT;
 	m_codecContext = cc;
