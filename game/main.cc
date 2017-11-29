@@ -189,9 +189,9 @@ void mainLoop(std::string const& songlist) {
 		while (!gm.isFinished()) {
 			Profiler prof("mainloop");
 			bool benchmarking = config["graphic/fps"].b();
-			if (songs.doneLoading == true && songs.shownFinishDialog == false) {
+			if (songs.doneLoading == true && songs.displayedAlert == false) {
 				gm.dialog(_("Done Loading!\n Loaded ") + std::to_string(songs.loadedSongs()) + " Songs.");
-				songs.shownFinishDialog = true;
+				songs.displayedAlert = true;
 			}
 			if( g_take_screenshot ) {
 				try {
