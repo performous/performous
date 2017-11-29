@@ -30,6 +30,10 @@ Songs::~Songs() {
 
 void Songs::reload() {
 	if (m_loading) return;
+	if (doneLoading == true) {
+		doneLoading = false;
+		displayedAlert = false;
+	}
 	// Run loading thread
 	m_loading = true;
 	m_thread.reset(new boost::thread(boost::bind(&Songs::reload_internal, boost::ref(*this))));

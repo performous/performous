@@ -71,7 +71,7 @@ class Songs: boost::noncopyable {
 	/// parses file into Song &tmp
 	void parseFile(Song& tmp);
 	volatile bool doneLoading = false;
-	volatile bool shownFinishDialog = false;
+	volatile bool displayedAlert = false;
 	size_t loadedSongs() const { return m_songs.size(); }
 
   private:
