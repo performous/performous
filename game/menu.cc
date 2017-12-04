@@ -39,7 +39,7 @@ void Menu::move(int dir) {
 	else if (dir < 0 && selection_stack.back() > 0) --selection_stack.back();
 }
 
-void Menu::select(unsigned sel) {
+void Menu::select(size_t sel) {
 	if (sel < menu_stack.back()->size()) selection_stack.back() = sel;
 }
 

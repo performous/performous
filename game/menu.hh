@@ -71,7 +71,7 @@ public:
 	/// move the selection
 	void move(int dir = 1);
 	/// set selection
-	void select(unsigned sel);
+	void select(size_t sel);
 	/// adjust the selected value
 	void action(int dir = 1);
 	/// clear items
