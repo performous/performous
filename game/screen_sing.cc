@@ -61,7 +61,6 @@ void ScreenSing::enter() {
 	if (!m_song->video.empty() && config["graphic/video"].b()) {
 		m_video.reset(new Video(m_song->video, m_song->videoGap));
 	}
-	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
 	reloadGL();
 	// Load song notes
 	gm->loading(_("Loading song..."), 0.4);
@@ -78,16 +77,26 @@ void ScreenSing::enter() {
 	m_audio.playMusic(m_song->music, false, 0.0, setup_delay);
 	gm->loading(_("Loading menu..."), 0.7);
 	{
+		m_duet = ConfigItem(0);
+		prepareVoicesMenu();
+		if (m_song->vocalTracks.size() <= 1) setupVocals();  // No duet menu
+	}
+	gm->showLogo(false);
+	gm->loading(_("Loading complete"), 1.0);
+}
+
+void ScreenSing::prepareVoicesMenu(size_t moveSelectionTo) {
+		boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
 		VocalTracks const& tracks = m_song->vocalTracks;
 		unsigned players = analyzers.size();
 		m_menu.clear();
 		m_menu.add(MenuOption(_("Start"), _("Start performing")).call(std::bind(&ScreenSing::setupVocals, this)));
-		m_duet = ConfigItem(0);
+
 		if (players == 0) players = 1;  // No mic? We display lyrics anyway
 		if (players > 1) { // Duet toggle
 			m_duet.addEnum(_("Duet mode"));
 			m_duet.addEnum(_("Normal mode"));
-			m_menu.add(MenuOption("", _("Switch between duet and regular singing mode")).changer(m_duet));
+			m_menu.add(MenuOption("", _("Switch between duet and regular singing mode")).changer(m_duet,"song/duet"));
 		}
 		// Add vocal track selector for each player
 		for (unsigned player = 0; player < players; ++player) {
@@ -96,13 +105,11 @@ void ScreenSing::enter() {
 			for (auto const& track: tracks) vocalTrack.addEnum(track.second.name);
 			if (tracks.size() > 1 && player % 2) ++vocalTrack;  // Every other player gets the second track
 			m_menu.add(MenuOption("", _("Change vocal track")).changer(vocalTrack));
+			if (m_duet.i() == 1) break; // If duet mode is disabled, the vocal track selection for players beyond the first is ignored anyway.
 		}
 		m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
+		m_menu.select(moveSelectionTo);
 		m_menu.open();
-		if (tracks.size() <= 1) setupVocals();  // No duet menu
-	}
-	gm->showLogo(false);
-	gm->loading(_("Loading complete"), 1.0);
 }
 
 void ScreenSing::setupVocals() {
@@ -264,6 +271,8 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	m_quitTimer.setValue(QUIT_TIMEOUT);
 	double time = m_audio.getPosition();
 	Song::Status status = m_song->status(time);
+	std::clog << "song/debug: Has Duet?: " << std::to_string(m_song->hasDuet());
+	std::clog << ", is duet enabled?: " << std::to_string(m_duet.i()) << std::endl;
 	// When score window is displayed
 	if (m_score_window.get()) {
 		if (nav == input::NAV_START || nav == input::NAV_CANCEL) activateNextScreen();
@@ -322,6 +331,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 
 		if (do_action != 0) {
 			m_menu.action(do_action);
+			if (m_menu.current().getVirtName() == "song/duet") { std::clog << "screen_sing/debug: Will re-reun prepareVoicesMenu();" << std::endl; prepareVoicesMenu(m_menu.curIndex()); }
 			// Did the action close the menu?
 			if (!m_menu.isOpen() && m_audio.isPaused()) {
 				m_audio.togglePause();
