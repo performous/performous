@@ -105,6 +105,7 @@ class ScreenSing: public Screen {
 	ConfigItem m_vocalTracks[AUDIO_MAX_ANALYZERS];
 	ConfigItem m_duet;
 	bool singingDuet();
+	int selectedVocalTrack;
 	bool m_displayAutoPlay = false;
 	bool keyPressed = false;
 };

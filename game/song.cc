@@ -68,17 +68,17 @@ namespace {
 	bool noteEndLessThan(Note const& a, Note const& b) { return a.end < b.end; }
 }
 
-Song::Status Song::status(double time) {
+Song::Status Song::status(double time, bool duetSinging, int selectedVocals) {
 	Note target; target.end = time;
 	Notes s1, s2, notes;
 	Notes::const_iterator it;
-	if (hasDuet()) {
+	if (duetSinging) {
 		s1 = getVocalTrack(0).notes;
 		s2 = getVocalTrack(1).notes;
 		std::merge(s1.begin(), s1.end(), s2.begin(), s2.end(), std::back_inserter(notes), Note::ltBegin);
 	}
 	else {
-		notes = getVocalTrack().notes;
+		notes = getVocalTrack(selectedVocals).notes;
 	}
 	it = std::lower_bound(notes.begin(), notes.end(), target, noteEndLessThan);
 	if (it == notes.end()) return FINISHED;
