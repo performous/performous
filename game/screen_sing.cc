@@ -40,6 +40,11 @@ ScreenSing::ScreenSing(std::string const& name, Audio& audio, Database& database
 	m_selectedTrack(TrackName::LEAD_VOCAL)
 {}
 
+bool ScreenSing::singingDuet() {
+return false;
+// 	return (m_song.hasDuet() && m_duet == 0 && )
+}
+
 void ScreenSing::enter() {
 	keyPressed = false;
 	m_DuetTimeout.setValue(10);

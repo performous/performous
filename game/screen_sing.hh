@@ -103,6 +103,7 @@ class ScreenSing: public Screen {
 	std::string m_selectedTrackLocalized;
 	ConfigItem m_vocalTracks[AUDIO_MAX_ANALYZERS];
 	ConfigItem m_duet;
+	bool singingDuet();
 	bool m_displayAutoPlay = false;
 	bool keyPressed = false;
 };
