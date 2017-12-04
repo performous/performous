@@ -79,7 +79,6 @@ void ScreenSing::enter() {
 	{
 		m_duet = ConfigItem(0);
 		prepareVoicesMenu();
-		if (m_song->vocalTracks.size() <= 1) setupVocals();  // No duet menu
 	}
 	gm->showLogo(false);
 	gm->loading(_("Loading complete"), 1.0);
@@ -110,6 +109,7 @@ void ScreenSing::prepareVoicesMenu(size_t moveSelectionTo) {
 		m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
 		m_menu.select(moveSelectionTo);
 		m_menu.open();
+		if (tracks.size() <= 1) setupVocals();  // No duet menu
 }
 
 void ScreenSing::setupVocals() {
@@ -330,8 +330,9 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 		else if (nav == input::NAV_UP) { m_menu.move(-1); return; }
 
 		if (do_action != 0) {
+			std::string currentOption = m_menu.current().getVirtName();
 			m_menu.action(do_action);
-			if (m_menu.current().getVirtName() == "song/duet") { std::clog << "screen_sing/debug: Will re-reun prepareVoicesMenu();" << std::endl; prepareVoicesMenu(m_menu.curIndex()); }
+			if (currentOption == "song/duet") { prepareVoicesMenu(m_menu.curIndex()); }
 			// Did the action close the menu?
 			if (!m_menu.isOpen() && m_audio.isPaused()) {
 				m_audio.togglePause();
