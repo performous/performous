@@ -76,12 +76,11 @@ Song::Status Song::status(double time) {
 		s1 = getVocalTrack(0).notes;
 		s2 = getVocalTrack(1).notes;
 		std::merge(s1.begin(), s1.end(), s2.begin(), s2.end(), std::back_inserter(notes), Note::ltBegin);
-		it = std::lower_bound(notes.begin(), notes.end(), target, noteEndLessThan);
 	}
 	else {
 		notes = getVocalTrack().notes;
-		it = std::lower_bound(getVocalTrack().notes.begin(), getVocalTrack().notes.end(),target, noteEndLessThan);
 	}
+	it = std::lower_bound(notes.begin(), notes.end(), target, noteEndLessThan);
 	if (it == notes.end()) return FINISHED;
 	if (it->begin > time + 4.0) return INSTRUMENTAL_BREAK;
 	return NORMAL;
