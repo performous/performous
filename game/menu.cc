@@ -15,6 +15,11 @@ std::string MenuOption::getName() const {
 	return "";
 }
 
+std::string MenuOption::getVirtName() const {
+	if (!virtualName.empty()) return virtualName;
+	return std::string();
+}
+
 const std::string& MenuOption::getComment() const { return commentPtr ? *commentPtr : comment; }
 
 bool MenuOption::isActive() const {

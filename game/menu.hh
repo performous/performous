@@ -29,7 +29,12 @@ public:
 	MenuOption(const std::string& nm, const std::string& comm, MenuImage img = MenuImage());
 
 	/// Make the option change values of a ConfigItem.
-	MenuOption& changer(ConfigItem& val) { type = CHANGE_VALUE; value = &val; return *this; }
+	MenuOption& changer(ConfigItem& val, std::string virtOptName = std::string()) {
+		type = CHANGE_VALUE;
+		value = &val;
+		if (!virtOptName.empty()) virtualName = virtOptName;
+		return *this;
+		}
 	/// Make the option set a given value for ConfigItem and close the menu.
 	MenuOption& setter(ConfigItem& val, ConfigItem newval) { type = SET_AND_CLOSE; value = &val; newValue = newval; return *this; }
 	/// Make the option open a submenu
@@ -44,6 +49,8 @@ public:
 	MenuOption& setDynamicComment(std::string& comm) { commentPtr = &comm; return *this; }
 	/// Return name
 	std::string getName() const;
+	/// Return virtual name (for options living only inside the screen)
+	std::string getVirtName() const;
 	/// Return comment
 	const std::string& getComment() const;
 	/// Check if this option can be selected
@@ -54,6 +61,7 @@ public:
 	MenuOptionCallback callback;  ///< Callback function
 	MenuImage image;  ///< Image to use with option
 private:
+	std::string virtualName; ///< Non-localized name for referring to options that exist only on-screen.
 	std::string name;        ///< Option name (it will be displayed as this)
 	std::string comment;     ///< Extended information about the option displayed usually when selected
 	std::string* namePtr;    ///< Optional pointer to dynamically changing name
