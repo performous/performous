@@ -324,8 +324,14 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	if (m_menu.isOpen()) {
 		int do_action = 0;
 		if (nav == input::NAV_START) { do_action = 1; }
-		else if (nav == input::NAV_LEFT) { do_action = -1; }
-		else if (nav == input::NAV_RIGHT) { do_action = 1; }
+		else if (nav == input::NAV_LEFT) {
+			if (m_menu.current().type == MenuOption::CHANGE_VALUE) { do_action = -1; }
+			else { m_menu.move(-1); return; }
+		}
+		else if (nav == input::NAV_RIGHT) {
+			if (m_menu.current().type == MenuOption::CHANGE_VALUE) { do_action = 1; }
+			else { m_menu.move(1); return; }
+			}
 		else if (nav == input::NAV_DOWN) { m_menu.move(1); return; }
 		else if (nav == input::NAV_UP) { m_menu.move(-1); return; }
 
