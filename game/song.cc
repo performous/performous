@@ -70,18 +70,19 @@ namespace {
 
 Song::Status Song::status(double time) {
 	Note target; target.end = time;
-	Notes::const_iterator it;	
+	Notes s1, s2, notes;
+	Notes::const_iterator it;
 	if (hasDuet()) {
-		Notes s1 = getVocalTrack(0).notes;
-		Notes s2 = getVocalTrack(1).notes;
-		Notes notes;
+		s1 = getVocalTrack(0).notes;
+		s2 = getVocalTrack(1).notes;
 		std::merge(s1.begin(), s1.end(), s2.begin(), s2.end(), std::back_inserter(notes), Note::ltBegin);
 		it = std::lower_bound(notes.begin(), notes.end(), target, noteEndLessThan);
 	}
 	else {
+		notes = getVocalTrack().notes;
 		it = std::lower_bound(getVocalTrack().notes.begin(), getVocalTrack().notes.end(),target, noteEndLessThan);
 	}
-	if (it == getVocalTrack().notes.end()) return FINISHED;
+	if (it == notes.end()) return FINISHED;
 	if (it->begin > time + 4.0) return INSTRUMENTAL_BREAK;
 	return NORMAL;
 }
@@ -138,7 +139,6 @@ VocalTrack& Song::getVocalTrack(std::string vocalTrack) {
 }
 
 VocalTrack& Song::getVocalTrack(unsigned idx) {
-	std::clog << "song/debug: vocalTracks.size(): " << vocalTracks.size() << std::endl;
 	if (idx >= vocalTracks.size()) throw std::logic_error("Index out of bounds in Song::getVocalTrack");
 	VocalTracks::iterator it = vocalTracks.begin();
 	std::advance(it, idx);
