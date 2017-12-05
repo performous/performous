@@ -156,24 +156,20 @@ void Songs::filter_internal() {
 	m_dirty = false;
 	RestoreSel restore(*this);
 	try {
-	SongVector filtered;
-	icu::UnicodeString filter = icu::UnicodeString::fromUTF8(m_filter);
-		for (SongVector::const_iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
-			if (m_filter == std::string() && m_type == 0) {  filtered = m_songs; break; }
-			Song& s = **it;
-			// All, Dance, Vocals, Duet, Guitar, Band
-			if (m_type == 1 && !s.hasDance()) continue;
-			if (m_type == 2 && !s.hasVocals()) continue;
-			if (m_type == 3 && !s.hasDuet()) continue;
-			if (m_type == 4 && !s.hasGuitars()) continue;
-			if (m_type == 5 && !s.hasDrums() && !s.hasKeyboard()) continue;
-			if (m_type == 6 && (!s.hasVocals() || !s.hasGuitars() || (!s.hasDrums() && !s.hasKeyboard()))) continue;
-			icu::UnicodeString string = icu::UnicodeString::fromUTF8(s.strFull());
-			icu::StringSearch search = icu::StringSearch(filter, string, &icuCollator, NULL, m_icuError);
-			
-			if (search.first(m_icuError) != USEARCH_DONE) filtered.push_back(*it);
-			else if (U_FAILURE(m_icuError)) std::clog << "songs/error: Error in StringSearch: " << u_errorName(m_icuError) << std::endl;
-		}
+		SongVector filtered;
+		icu::UnicodeString filter = icu::UnicodeString::fromUTF8(m_filter);
+		if (m_filter == std::string() && m_type == 0) {  filtered = m_songs; break; }
+		icu::UnicodeString string = icu::UnicodeString::fromUTF8(s.strFull());
+		icu::StringSearch search = icu::StringSearch(filter, string, &icuCollator, NULL, m_icuError);
+		std::copy_if (m_songs.begin(), m_songs.end(), std::back_inserter(filtered), [&](boost::shared_ptr<Song> it){
+			if (m_type == 1 && !(*it).hasDance()) return false;
+			if (m_type == 2 && !(*it).hasVocals()) return false;
+			if (m_type == 3 && !(*it).hasDuet()) return false;
+			if (m_type == 4 && !(*it).hasGuitars()) return false;
+			if (m_type == 5 && !(*it).hasDrums() && !(*it).hasKeyboard()) return false;
+			if (m_type == 6 && (!(*it).hasVocals() || !(*it).hasGuitars() || (!(*it).hasDrums() && !(*it).hasKeyboard()))) return false;
+			return (search.first(m_icuError) != USEARCH_DONE)
+		} );
 		m_filtered.swap(filtered);
 	} catch (...) {
 		SongVector(m_songs.begin(), m_songs.end()).swap(m_filtered);  // Invalid regex => copy everything
