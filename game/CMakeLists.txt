@@ -71,6 +71,10 @@ if (Boost_VERSION VERSION_LESS 105500)
 	set(CMAKE_CXX_FLAGS "-DBOOST_NO_CXX11_SCOPED_ENUMS ${CMAKE_CXX_FLAGS}")
 endif()
 
+find_package(ICU REQUIRED uc data i18n)
+include_directories(${ICU_INCLUDE_DIRS})
+list(APPEND LIBS ${ICU_LIBRARIES})
+
 # LibEpoxy < 1.2 crashes with binary drivers (nvidia & fglrx) when creating shaders
 # (see https://github.com/anholt/libepoxy/issues/23 for the exact problem)
 find_package(LibEpoxy 1.2 REQUIRED)
