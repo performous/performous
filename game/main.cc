@@ -126,7 +126,7 @@ static void checkEvents(Game& gm) {
 			continue; // Already handled here...
 		}
 		// If a dialog is open, any nav event will close it
-		if (gm.isDialogOpen()) { gm.closeDialog(); continue; }
+		if (gm.isDialogOpen()) { gm.closeDialog(); }
 		// Let the current screen handle other events
 		gm.getCurrentScreen()->manageEvent(event);
 	}
