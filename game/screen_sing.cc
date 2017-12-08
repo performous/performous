@@ -284,8 +284,6 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	m_quitTimer.setValue(QUIT_TIMEOUT);
 	double time = m_audio.getPosition();
 	Song::Status status = m_song->status(time, singingDuet(), selectedVocalTrack);
-	std::clog << "song/debug: Has Duet?: " << std::to_string(m_song->hasDuet());
-	std::clog << ", is duet enabled?: " << std::to_string(m_duet.i()) << std::endl;
 	// When score window is displayed
 	if (m_score_window.get()) {
 		if (nav == input::NAV_START || nav == input::NAV_CANCEL) activateNextScreen();
