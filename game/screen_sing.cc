@@ -293,7 +293,8 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	}
 	// Instant quit with CANCEL at the very beginning
 	if (nav == input::NAV_CANCEL && time < 1.0) {
-		Game::getSingletonPtr()->activateScreen("Playlist");
+		if (m_menu.isOpen()) m_menu.moveToLast(); 
+		else Game::getSingletonPtr()->activateScreen(config["game/autoplay"].b() ? "Songs" : "Playlist");
 		return;
 	}
 
