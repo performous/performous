@@ -157,12 +157,11 @@ void Songs::filter_internal() {
 	RestoreSel restore(*this);
 	try {
 		SongVector filtered;
-		icu::UnicodeString filter = icu::UnicodeString::fromUTF8(m_filter);
 		if (m_filter == std::string() && m_type == 0) filtered = m_songs;
 		else {
+			icu::UnicodeString filter = icu::UnicodeString::fromUTF8(m_filter);
 			std::copy_if (m_songs.begin(), m_songs.end(), std::back_inserter(filtered), [&](boost::shared_ptr<Song> it){
-			icu::UnicodeString string = icu::UnicodeString::fromUTF8((*it).strFull());
-			icu::StringSearch search = icu::StringSearch(filter, string, &icuCollator, NULL, m_icuError);
+			icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8((*it).strFull()), &icuCollator, NULL, m_icuError);
 				if (m_type == 1 && !(*it).hasDance()) return false;
 				if (m_type == 2 && !(*it).hasVocals()) return false;
 				if (m_type == 3 && !(*it).hasDuet()) return false;
