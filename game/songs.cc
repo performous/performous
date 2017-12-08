@@ -7,16 +7,17 @@
 #include "i18n.hh"
 #include "profiler.hh"
 
+#include <algorithm>
+#include <iostream>
+#include <stdexcept>
+#include <cstdlib>
+
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <libxml++/libxml++.h>
-#include <algorithm>
-#include <iostream>
-#include <stdexcept>
-#include <cstdlib>
 
 Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), math_cover(), m_database(database), m_type(), m_order(config["songs/sort-order"].i()), m_dirty(false), m_loading(false) {
 	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
