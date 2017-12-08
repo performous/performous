@@ -7,8 +7,10 @@
 #include <stdexcept>
 
 #include <boost/noncopyable.hpp>
+#include <unicode/tblcoll.h>
+#include <unicode/unistr.h>
+#include <unicode/utypes.h>
 
-//#include "fs.hh"
 #include "player.hh"
 #include "animvalue.hh"
 
@@ -103,4 +105,6 @@ class Players: boost::noncopyable {
   private:
 	int assign_id_internal(); /// returns the next available id
 	void filter_internal();
+	static UErrorCode m_icuError;
+	static icu::RuleBasedCollator icuCollator;
 };

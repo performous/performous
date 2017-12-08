@@ -2,9 +2,15 @@
 
 #include "configuration.hh"
 #include "fs.hh"
+
+#include <algorithm>
 #include <boost/regex.hpp>
 #include <boost/lexical_cast.hpp>
 #include <libxml++/libxml++.h>
+#include <unicode/stsearch.h>
+
+UErrorCode Players::m_icuError = U_ZERO_ERROR;
+icu::RuleBasedCollator Players::icuCollator = icu::RuleBasedCollator(icu::UnicodeString(""), icu::Collator::PRIMARY, m_icuError);
 
 Players::Players():
 	m_players(),
@@ -118,9 +124,17 @@ void Players::filter_internal() {
 
 	try {
 		fplayers_t filtered;
-		for (auto const& p: m_players) {
-			if (regex_search(p.name, boost::regex(m_filter, boost::regex_constants::icase))) filtered.push_back(p);
+		if (m_filter == std::string()) filtered = fplayers_t(m_players.begin(), m_players.end());
+		else {
+			icu::UnicodeString filter = icu::UnicodeString::fromUTF8(m_filter);
+			std::copy_if (m_players.begin(), m_players.end(), std::back_inserter(filtered), [&](PlayerItem it){
+			icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8(it.name), &icuCollator, NULL, m_icuError);
+			return (search.first(m_icuError) != USEARCH_DONE);
+			});
 		}
+// 		for (auto const& p: m_players) {
+// 			if (regex_search(p.name, boost::regex(m_filter, boost::regex_constants::icase))) filtered.push_back(p);
+// 		}
 		m_filtered.swap(filtered);
 	} catch (...) {
 		fplayers_t(m_players.begin(), m_players.end()).swap(m_filtered);  // Invalid regex => copy everything
