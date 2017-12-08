@@ -18,8 +18,13 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <libxml++/libxml++.h>
+#include <unicode/stsearch.h>
+
+UErrorCode Songs::m_icuError = U_ZERO_ERROR;
+icu::RuleBasedCollator Songs::icuCollator = icu::RuleBasedCollator(icu::UnicodeString(""), icu::Collator::PRIMARY, m_icuError);
 
 Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), math_cover(), m_database(database), m_type(), m_order(config["songs/sort-order"].i()), m_dirty(false), m_loading(false) {
+	if (U_FAILURE(m_icuError)) std::clog << "songs/error: Error creating Unicode collator: " << u_errorName(m_icuError) << std::endl;
 	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
 	reload();
 }
@@ -151,8 +156,10 @@ void Songs::filter_internal() {
 	m_dirty = false;
 	RestoreSel restore(*this);
 	try {
-		SongVector filtered;
+	SongVector filtered;
+	icu::UnicodeString filter = icu::UnicodeString::fromUTF8(m_filter);
 		for (SongVector::const_iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
+			if (m_filter == std::string() && m_type == 0) {  filtered = m_songs; break; }
 			Song& s = **it;
 			// All, Dance, Vocals, Duet, Guitar, Band
 			if (m_type == 1 && !s.hasDance()) continue;
@@ -161,7 +168,11 @@ void Songs::filter_internal() {
 			if (m_type == 4 && !s.hasGuitars()) continue;
 			if (m_type == 5 && !s.hasDrums() && !s.hasKeyboard()) continue;
 			if (m_type == 6 && (!s.hasVocals() || !s.hasGuitars() || (!s.hasDrums() && !s.hasKeyboard()))) continue;
-			if (regex_search(s.strFull(), boost::regex(m_filter, boost::regex_constants::icase))) filtered.push_back(*it);
+			icu::UnicodeString string = icu::UnicodeString::fromUTF8(s.strFull());
+			icu::StringSearch search = icu::StringSearch(filter, string, &icuCollator, NULL, m_icuError);
+			
+			if (search.first(m_icuError) != USEARCH_DONE) filtered.push_back(*it);
+			else if (U_FAILURE(m_icuError)) std::clog << "songs/error: Error in StringSearch: " << u_errorName(m_icuError) << std::endl;
 		}
 		m_filtered.swap(filtered);
 	} catch (...) {
