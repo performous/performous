@@ -151,17 +151,15 @@ void Songs::filter_internal() {
 	RestoreSel restore(*this);
 	try {
 		SongVector filtered;
-		for (SongVector::const_iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
-			Song& s = **it;
-			// All, Dance, Vocals, Duet, Guitar, Band
-			if (m_type == 1 && !s.hasDance()) continue;
-			if (m_type == 2 && !s.hasVocals()) continue;
-			if (m_type == 3 && !s.hasDuet()) continue;
-			if (m_type == 4 && !s.hasGuitars()) continue;
-			if (m_type == 5 && !s.hasDrums() && !s.hasKeyboard()) continue;
-			if (m_type == 6 && (!s.hasVocals() || !s.hasGuitars() || (!s.hasDrums() && !s.hasKeyboard()))) continue;
-			if (regex_search(s.strFull(), boost::regex(m_filter, boost::regex_constants::icase))) filtered.push_back(*it);
-		}
+		std::copy_if (m_songs.begin(), m_songs.end(), std::back_inserter(filtered), [&](boost::shared_ptr<Song> it){
+			if (m_type == 1 && !(*it).hasDance()) return false;
+			if (m_type == 2 && !(*it).hasVocals()) return false;
+			if (m_type == 3 && !(*it).hasDuet()) return false;
+			if (m_type == 4 && !(*it).hasGuitars()) return false;
+			if (m_type == 5 && !(*it).hasDrums() && !(*it).hasKeyboard()) return false;
+			if (m_type == 6 && (!(*it).hasVocals() || !(*it).hasGuitars() || (!(*it).hasDrums() && !(*it).hasKeyboard()))) return false;
+			return regex_search((*it).strFull(), boost::regex(m_filter, boost::regex_constants::icase));
+		} );
 		m_filtered.swap(filtered);
 	} catch (...) {
 		SongVector(m_songs.begin(), m_songs.end()).swap(m_filtered);  // Invalid regex => copy everything
