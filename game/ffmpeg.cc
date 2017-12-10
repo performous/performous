@@ -187,9 +187,6 @@ void FFmpeg::decodePacket() {
 
 	// Read an AVPacket and decode it into AVFrames
 	ReadFramePacket packet(m_formatContext);
-	int packetSize = packet.size;
-	while (packetSize) {
-		if (packetSize < 0) throw std::logic_error("negative packet size?!");
 		if (m_quit || m_seekTarget == m_seekTarget) return;
 		if (packet.stream_index != m_streamId) return;
 #if (LIBAVCODEC_VERSION_INT) < (AV_VERSION_INT(55,0,0))
@@ -197,21 +194,19 @@ void FFmpeg::decodePacket() {
 #else
 		boost::shared_ptr<AVFrame> frame(av_frame_alloc(), [](AVFrame* ptr) { av_frame_free(&ptr); });
 #endif
-		int frameFinished = 0;
-		int decodeSize = (m_mediaType == AVMEDIA_TYPE_VIDEO ?
-		  avcodec_decode_video2(m_codecContext, frame.get(), &frameFinished, &packet) :
-		  avcodec_decode_audio4(m_codecContext, frame.get(), &frameFinished, &packet));
-		if (decodeSize < 0) return; // Packet didn't produce any output (could be waiting for B frames or something)
-		packetSize -= decodeSize; // Move forward within the packet
-		if (!frameFinished) continue;
-		// Update current position if timecode is available
-		if (frame->pkt_pts != int64_t(AV_NOPTS_VALUE)) {
-			m_position = double(frame->pkt_pts) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
+		if(avcodec_send_packet(m_codecContext,&packet)!= 0) {
+			std::clog << "ffmpeg/error: " << "can't send packet" << std::endl;
+		}
+		if(avcodec_receive_frame(m_codecContext, frame.get()) != 0) { //failure
+			std::clog << "ffmpeg/error: " << "can't receive frame" << std::endl;
+			return;
+		}
+		if (frame->pts != int64_t(AV_NOPTS_VALUE)) {
+			m_position = double(frame->pts) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
 			if (m_formatContext->start_time != int64_t(AV_NOPTS_VALUE))
 				m_position -= double(m_formatContext->start_time) / AV_TIME_BASE;
 		}
 		if (m_mediaType == AVMEDIA_TYPE_VIDEO) processVideo(frame.get()); else processAudio(frame.get());
-	}
 }
 
 void FFmpeg::processVideo(AVFrame* frame) {
