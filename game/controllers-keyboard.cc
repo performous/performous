@@ -62,10 +62,10 @@ namespace input {
 				case SDL_SCANCODE_RCTRL: case SDL_SCANCODE_RALT: button = GUITAR_GODMODE; goto guitar_process;
 				case SDL_SCANCODE_RSHIFT: button = GUITAR_PICK_UP; goto guitar_process;
 				case SDL_SCANCODE_RETURN: case SDL_SCANCODE_KP_ENTER: button = GUITAR_PICK_DOWN; goto guitar_process;
-				case SDL_SCANCODE_F5: case SDL_SCANCODE_5: case SDL_SCANCODE_B: button++;
-				case SDL_SCANCODE_F4: case SDL_SCANCODE_4: case SDL_SCANCODE_V: button++;
-				case SDL_SCANCODE_F3: case SDL_SCANCODE_3: case SDL_SCANCODE_C: button++;
-				case SDL_SCANCODE_F2: case SDL_SCANCODE_2: case SDL_SCANCODE_X: button++;
+				case SDL_SCANCODE_F5: case SDL_SCANCODE_5: case SDL_SCANCODE_B: button++; /* Falls through. */
+				case SDL_SCANCODE_F4: case SDL_SCANCODE_4: case SDL_SCANCODE_V: button++; /* Falls through. */
+				case SDL_SCANCODE_F3: case SDL_SCANCODE_3: case SDL_SCANCODE_C: button++; /* Falls through. */
+				case SDL_SCANCODE_F2: case SDL_SCANCODE_2: case SDL_SCANCODE_X: button++; /* Falls through. */
 				case SDL_SCANCODE_F1: case SDL_SCANCODE_1: case SDL_SCANCODE_Z:
 				guitar_process:
 					if (!m_guitar) return;
