@@ -59,7 +59,7 @@ void Menu::action(int dir) {
 			break;
 		}
 		case MenuOption::SET_AND_CLOSE: { /* Falls through. */
-			if (current().value) *(current().value) = current().newValue;
+			if (current().value) *(current().value) = current().newValue; /* Falls through. */
 			/* Falls through. */
 		}
 		case MenuOption::CLOSE_SUBMENU: {

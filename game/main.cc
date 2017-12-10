@@ -126,7 +126,7 @@ static void checkEvents(Game& gm) {
 			continue; // Already handled here...
 		}
 		// If a dialog is open, any nav event will close it
-		if (gm.isDialogOpen()) { gm.closeDialog(); continue; }
+		if (gm.isDialogOpen()) { gm.closeDialog(); }
 		// Let the current screen handle other events
 		gm.getCurrentScreen()->manageEvent(event);
 	}
@@ -189,6 +189,10 @@ void mainLoop(std::string const& songlist) {
 		while (!gm.isFinished()) {
 			Profiler prof("mainloop");
 			bool benchmarking = config["graphic/fps"].b();
+			if (songs.doneLoading == true && songs.displayedAlert == false) {
+				gm.dialog(_("Done Loading!\n Loaded ") + std::to_string(songs.loadedSongs()) + " Songs.");
+				songs.displayedAlert = true;
+			}
 			if( g_take_screenshot ) {
 				try {
 					window.screenshot();
