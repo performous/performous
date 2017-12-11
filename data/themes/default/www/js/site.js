@@ -1,10 +1,12 @@
 "use strict";
 
 $('#refresh-playlist-toggle').bootstrapToggle('off');
-var list = document.getElementById("playlist-songs");
+var list = document.getElementById("playlist-songs-sortable");
 Sortable.create(list, {
     group: "words",
     animation: 150,
+    scroll: true,
+    scrollSensitivity: 150,
     onEnd: function(evt){
         if(evt.oldIndex == evt.newIndex) {
             return;
@@ -100,12 +102,15 @@ $('#refresh-playlist').click(function() {
             var totalTime = 0; 
 
             clearList("playlist-songs");
+            clearList("playlist-songs-sortable");
 
             $.each(database, function (iterator, songObject){
                 totalTime += songObject.Duration + timeout;
                 $("#playlist-songs").append("<a id=\"playlist-songs-" + iterator + "\" href=\"#\" class=\"list-group-item\" data-toggle=\"modal\" data-target=\"#dynamic-modal\">" + songObject.Artist + " - " + songObject.Title + " - " + secondsToDate(totalTime) + "<span class=\"glyphicon glyphicon-info-sign\"></span></a>");
+                $("#playlist-songs-sortable").append("<a id=\"playlist-songs-sortable-" + iterator + "\" href=\"#\" class=\"list-group-item\" data-toggle=\"modal\" data-target=\"#dynamic-modal\">" + songObject.Artist + " - " + songObject.Title + " - " + secondsToDate(totalTime) + "<span class=\"glyphicon glyphicon-info-sign\"></span></a>");
                 songObject.Position = iterator;
                 $("#playlist-songs-"+iterator).data("modal-songObject", JSON.stringify(songObject));
+                $("#playlist-songs-sortable-"+iterator).data("modal-songObject", JSON.stringify(songObject));
             });
         });
     });
