@@ -39,22 +39,18 @@ ScreenSing::ScreenSing(std::string const& name, Audio& audio, Database& database
 {}
 
 bool ScreenSing::singingDuet() {
-	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
-	size_t players = analyzers.size();
 	bool sameVoice = true;
-	for (size_t player = 0; player < players; ++player) {
+	for (size_t player = 0; player < players(); ++player) {
 		ConfigItem& vocalTrack = m_vocalTracks[player];
 		if (player == 0) selectedVocalTrack = vocalTrack.i();
 		if (vocalTrack.i() != selectedVocalTrack) { sameVoice = false; break; }
 	}
 	std::string getVocalTrackTest = m_song->getVocalTrack(selectedVocalTrack).name;
-	return (m_song->hasDuet() && m_duet.i() == 0 && players > 1 && sameVoice != true);
+	return (m_song->hasDuet() && m_duet.i() == 0 && players() > 1 && sameVoice != true);
 }
 
 void ScreenSing::enter() {
 	keyPressed = false;
-	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
-	size_t players = analyzers.size();
 	m_DuetTimeout.setValue(10);
 	Game* gm = Game::getSingletonPtr();
 	// Initialize webcam
@@ -86,7 +82,7 @@ void ScreenSing::enter() {
 	gm->loading(_("Loading menu..."), 0.7);
 	{
 		m_duet = ConfigItem(0);
-		for (size_t player = 0; player < players; ++player) {
+		for (size_t player = 0; player < players(); ++player) {
 					ConfigItem& vocalTrack = m_vocalTracks[player];
 					vocalTrack = ConfigItem(0);
 		}
@@ -97,20 +93,17 @@ void ScreenSing::enter() {
 }
 
 void ScreenSing::prepareVoicesMenu(size_t moveSelectionTo) {
-		boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
 		VocalTracks const& tracks = m_song->vocalTracks;
-		size_t players = analyzers.size();
 		m_menu.clear();
 		m_menu.add(MenuOption(_("Start"), _("Start performing")).call(std::bind(&ScreenSing::setupVocals, this)));
 
-		if (players == 0) players = 1;  // No mic? We display lyrics anyway
-		if (players > 1) { // Duet toggle
+		if (players() > 1) { // Duet toggle
 			m_duet.addEnum(_("Duet mode"));
 			m_duet.addEnum(_("Normal mode"));
 			m_menu.add(MenuOption("", _("Switch between duet and regular singing mode")).changer(m_duet,"song/duet"));
 		}
 		// Add vocal track selector for each player
-		for (size_t player = 0; player < players; ++player) {
+		for (size_t player = 0; player < players(); ++player) {
 			ConfigItem& vocalTrack = m_vocalTracks[player];
 			for (auto const& track: tracks) vocalTrack.addEnum(track.second.name);
 			if (tracks.size() > 1 && player % 2) ++vocalTrack;  // Every other player gets the second track
@@ -128,9 +121,9 @@ void ScreenSing::setupVocals() {
 		m_layout_singer.clear();
 		Engine::VocalTrackPtrs selectedTracks;
 		boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
-		unsigned players = (analyzers.empty() ? 1 : analyzers.size());  // Always at least 1; should be number of mics
+// 		size_t players = (analyzers.empty() ? 1 : analyzers.size());  // Always at least 1; should be number of mics
 		std::set<VocalTrack*> shownTracks;  // Tracks to be included in layout_singer (stored by name for proper sorting and merging duplicates)
-		for (unsigned player = 0; player < players; ++player) {
+		for (size_t player = 0; player < players(); ++player) {
 			VocalTrack* vocal = &m_song->getVocalTrack(m_vocalTracks[(m_duet.i() == 0 ? player : 0)].i());
 			selectedTracks.push_back(vocal);
 			shownTracks.insert(vocal);
