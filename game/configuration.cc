@@ -91,12 +91,12 @@ namespace {
         fmter % boost::io::group(std::setprecision(precision), double(m) * boost::get<T>(value));
         return fmter.str();
     }
-    
+
     std::string getText(xmlpp::Element const& elem) {
         xmlpp::TextNode const* n = elem.get_child_text();  // Returns NULL if there is no text
         return n ? std::string(n->get_content()) : std::string();
     }
-    
+
     std::string getText(xmlpp::Element const& elem, std::string const& path) {
         xmlpp::NodeSet ns = elem.find(path);
         if (ns.empty()) return std::string();
@@ -290,9 +290,9 @@ void writeConfig(Audio& m_audio, bool system) {
         if (name == "audio/backend") {
             int newValue = PaHostApiNameToHostApiTypeId(item.getEnumName());
             std::clog << "audio/debug: Will now change value of audio backend. New Value: " << newValue << std::endl;
-            entryNode->set_attribute("value", boost::lexical_cast<std::string>(newValue));
+            entryNode->set_attribute("value", std::to_string(newValue));
             std::clog << "audio/info: Audio backend changed; will now restart audio subsystem." << std::endl;
-            
+
             Audio::backendConfig().selectEnum(item.getEnumName());
             boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(m_audio)));
             if (!audiokiller.timed_join(boost::posix_time::milliseconds(2500)))
@@ -396,7 +396,7 @@ void readConfigXML(fs::path const& file, int mode) {
 int PaHostApiNameToHostApiTypeId (const std::string& name) {
     if (name == "Auto") return 1337;
     if (name == "Windows DirectSound") return 1;
-    if (name == "MME") return 2;			
+    if (name == "MME") return 2;
     if (name == "ASIO") return 3;
     if (name == "Core Audio" || name == "CoreAudio") return 5;
     if (name == "OSS") return 7; // Not an error, stupid PortAudio.
@@ -430,4 +430,3 @@ void populateBackends (const std::list<std::string>& backendList) {
     selectedBackend = backendConfig.getValue();
     backendConfig.selectEnum(selectedBackend);
 }
-
