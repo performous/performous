@@ -26,8 +26,6 @@
 #include <utility>
 
 namespace {
-	static const double QUIT_TIMEOUT = 20.0; // Return to songs screen after 20 seconds in score screen
-
 	/// Add a flash message about the state of a config item
 	void dispInFlash(ConfigItem& ci) {
 		Game* gm = Game::getSingletonPtr();
@@ -281,7 +279,7 @@ void ScreenSing::activateNextScreen()
 void ScreenSing::manageEvent(input::NavEvent const& event) {
 	keyPressed = true;
 	input::NavButton nav = event.button;
-	m_quitTimer.setValue(QUIT_TIMEOUT);
+	m_quitTimer.setValue(config["game/results_timeout"].i());
 	double time = m_audio.getPosition();
 	Song::Status status = m_song->status(time, singingDuet(), selectedVocalTrack);
 	// When score window is displayed
@@ -597,7 +595,7 @@ void ScreenSing::draw() {
 		else if (!m_audio.isPlaying() || (status == Song::FINISHED
 		  && m_audio.getLength() - time <= (m_song->instrumentTracks.empty() && m_song->danceTracks.empty() ? 3.0 : 0.2) )) {
 			// Time to create the score window
-			m_quitTimer.setValue(QUIT_TIMEOUT);
+			m_quitTimer.setValue(config["game/results_timeout"].i());
 			if (m_engine) m_engine->kill(); // kill the engine thread (to avoid consuming memory)
 			m_score_window.reset(new ScoreWindow(m_instruments, m_database));
 		}

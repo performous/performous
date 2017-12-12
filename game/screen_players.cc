@@ -24,13 +24,14 @@ ScreenPlayers::ScreenPlayers(std::string const& name, Audio& audio, Database& da
 }
 
 void ScreenPlayers::enter() {
+	keyPressed = false;
 	m_layout_singer.reset(new LayoutSinger(m_song->getVocalTrack(), m_database));
-
 	theme.reset(new ThemeSongs());
 	m_emptyCover.reset(new Surface(findFile("no_player_image.svg")));
 	m_search.text.clear();
 	m_players.setFilter(m_search.text);
 	m_audio.fadeout();
+	m_quitTimer.setValue(config["game/highscore_timeout"].i());
 	if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
 		Game::getSingletonPtr()->activateScreen("Playlist");
 	}
@@ -51,6 +52,7 @@ void ScreenPlayers::exit() {
 }
 
 void ScreenPlayers::manageEvent(input::NavEvent const& event) {
+	keyPressed = true;
 	Game* gm = Game::getSingletonPtr();
 	input::NavButton nav = event.button;
 	if (nav == input::NAV_CANCEL) {
@@ -87,6 +89,7 @@ void ScreenPlayers::manageEvent(input::NavEvent const& event) {
 }
 
 void ScreenPlayers::manageEvent(SDL_Event event) {
+	keyPressed = true;
 	if (event.type == SDL_TEXTINPUT) {
 		m_search += event.text.text;
 		m_players.setFilter(m_search.text);
@@ -175,6 +178,7 @@ void ScreenPlayers::draw() {
 
 	// Schedule playback change if the chosen song has changed
 	if (music != m_playReq) { m_playReq = music; m_playTimer.setValue(0.0); }
+	if (m_quitTimer.get() == 0.0 && !keyPressed) { Game::getSingletonPtr()->activateScreen("Playlist"); return; }
 	// Play/stop preview playback (if it is the time)
 	if (music != m_playing && m_playTimer.get() > 0.4) {
 		m_songbg.reset(); m_video.reset();

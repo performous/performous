@@ -46,8 +46,10 @@ class ScreenPlayers : public Screen {
 	std::string m_playing;
 	std::string m_playReq;
 	AnimValue m_playTimer;
+	AnimValue m_quitTimer;
 	TextInput m_search;
 	boost::scoped_ptr<Surface> m_emptyCover;
 	Cachemap<fs::path, Surface> m_covers;
 	boost::scoped_ptr<LayoutSinger> m_layout_singer;
+	bool keyPressed = false;
 };
