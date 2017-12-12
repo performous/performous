@@ -12,7 +12,7 @@ void convertToUTF8(std::stringstream &_stream, std::string _filename) {
 		std::string data = _stream.str();
 		Glib::convert(data, "UTF-8", "UTF-8"); // Test if input is UTF-8
 		if (data.substr(0, 3) == "\xEF\xBB\xBF") {
-// 			std::clog << "unicode/warning: " << _filename << " UTF-8 BOM ignored. Please avoid editors that use BOMs (e.g. Notepad)." << std::endl;
+			if (config["game/bom_warnings"].b()) std::clog << "unicode/warning: " << _filename << " UTF-8 BOM ignored. Please avoid editors that use BOMs (e.g. Notepad)." << std::endl;
 			_stream.str(data.substr(3)); // Remove BOM if there is one
 		}
 	} catch(...) {
