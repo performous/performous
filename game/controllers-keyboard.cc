@@ -85,8 +85,8 @@ namespace input {
 
 				// Drums on keyboard
 				case SDL_SCANCODE_8: button = DRUMS_YELLOW_CYMBAL; goto drum_process;
-				case SDL_SCANCODE_9: button = DRUMS_GREEN_CYMBAL; goto drum_process;
-				case SDL_SCANCODE_0: button = DRUMS_BLUE_CYMBAL; goto drum_process;
+				case SDL_SCANCODE_9: button = DRUMS_BLUE_CYMBAL; goto drum_process;
+				case SDL_SCANCODE_0: button = DRUMS_GREEN_CYMBAL; goto drum_process;
 				case SDL_SCANCODE_U: button = DRUMS_RED; goto drum_process;
 				case SDL_SCANCODE_I: button = DRUMS_YELLOW_TOM; goto drum_process;
 				case SDL_SCANCODE_O: button = DRUMS_BLUE_TOM; goto drum_process;

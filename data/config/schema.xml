@@ -98,6 +98,10 @@ to save the current settings to XML.
 		<short>Keyboard as drumkit</short>
 		<long>Enable keyboard as drumkit.</long>
 	</entry>
+	<entry name="game/drum_promode" type="bool" value="true">
+		<short>Drums use Pro mode</short>
+		<long>Drums use Pro mode (toms are not cymbals)</long>
+	</entry>
 	<entry name="game/keyboard_dancepad" type="bool" value="true">
 		<short>Keyboard as dance pad</short>
 		<long>Enable keyboard as dance pad.</long>
