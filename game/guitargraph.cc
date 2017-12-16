@@ -116,6 +116,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, input::DevicePtr dev, i
   m_soloScore(),
   m_solo(),
   m_hasTomTrack(false),
+  m_proMode(config["game/drum_promode"].b()),
   m_whammy(0)
 {
 	if(m_drums) {
@@ -371,7 +372,7 @@ void GuitarGraph::engine() {
 
 		// Playing
 		if (m_drums) {
-			if (ev.pressed() && ev.button.layer() < 8 && ev.button.num() < m_pads) drumHit(time, ev.button.num());
+			if (ev.pressed() && ev.button.layer() < 8 && ev.button.num() < m_pads) drumHit(time, ev.button.layer(), ev.button.num());
 		} else {
 			guitarPlay(time, ev);
 		}
@@ -549,7 +550,8 @@ void GuitarGraph::updateDrumFill(double time) {
 }
 
 /// Handle drum hit scoring
-void GuitarGraph::drumHit(double time, unsigned fret) {
+void GuitarGraph::drumHit(double time, unsigned layer, unsigned fret) {
+	std::cout << "drumHit: " << time << " layer:" << layer << " fret:" << fret << std::endl;
 	// Handle drum fills
 	if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin - maxTolerance
 	  && time <= m_dfIt->end + maxTolerance) {
@@ -582,6 +584,12 @@ void GuitarGraph::drumHit(double time, unsigned fret) {
 			// all that matters is that there is still a missing note in that chord
 			if (m_chordIt->status == m_chordIt->polyphony) continue;
 		} else if (m_notes[it->dur[fret]]) continue;  // invalid fret/hit or already played
+
+		// Check Pro Mode stuff...
+		if ( m_proMode ) {
+			if ( fret > 1 && it->fret_cymbal[fret] && layer != 2 ) continue; // require cymbal if it's a cymbal.
+			if ( fret > 1 && !it->fret_cymbal[fret] && layer != 1 ) continue; // require not a cymbal if it's not a cymbal.
+		}
 
 		double error = std::abs(it->begin - time);
 		if (error < tolerance) {
@@ -765,9 +773,9 @@ void GuitarGraph::drawNotes(double time) {
 		}
 	}
 	if (time != time) return;  // Check that time is not NaN
-	
+
 	glmath::vec4 neckglow;  // Used for calculating the average neck color
-	
+
 	// Iterate chords
 	for (auto& chord: m_chords) {
 		float tBeg = chord.begin - time;
