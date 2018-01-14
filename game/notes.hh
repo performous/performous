@@ -79,7 +79,13 @@ struct Note {
 	/// How precisely the note is hit (always 1.0 for freestyle, 0..1 for others)
 	double powerFactor(double note) const;
 	/// Compares begin of two notes
-	static bool ltBegin(Note const& a, Note const& b) { return a.begin < b.begin; }
+	static bool ltBegin(Note const& a, Note const& b) {
+		if (a.begin == b.begin) {
+			if (a.type == Note::SLEEP) return true;
+			if (b.type == Note::SLEEP) return false;			
+		}
+		return a.begin < b.begin; 
+	}
 	/// Compares end of two notes
 	static bool ltEnd(Note const& a, Note const& b) { return a.end < b.end; }
   private:
