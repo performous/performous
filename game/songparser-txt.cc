@@ -10,7 +10,7 @@
 using namespace SongParserUtil;
 
 namespace {
-	const std::string DUET_P2 = "Duet singer"; // FIXME
+
 }
 
 /// 'Magick' to check if this file looks like correct format
@@ -37,7 +37,6 @@ void SongParser::txtParse() {
 	while (getline(line) && txtParseField(line)) {} // Parse the header again
 	resetNoteParsingState();
 	while (txtParseNote(line) && getline(line)) {} // Parse notes
-
 	// Workaround for the terminating : 1 0 0 line, written by some converters
 	// FIXME: Should we do this for all tracks?
 	for (auto const& name: { TrackName::LEAD_VOCAL, DUET_P2 }) {
@@ -46,7 +45,6 @@ void SongParser::txtParse() {
 		if (!notes.empty() && it->type != Note::SLEEP && it->begin == it->end) notes.pop_back();
 		if (notes.empty()) m_song.eraseVocalTrack(name);
 	}
-
 }
 
 bool SongParser::txtParseField(std::string const& line) {
