@@ -83,7 +83,7 @@ SongParser::SongParser(Song& s) try:
 		s1 = m_song.getVocalTrack(TrackName::LEAD_VOCAL).notes;
 		s2 = m_song.getVocalTrack(SongParserUtil::DUET_P2).notes;
 		std::merge(s1.begin(), s1.end(), s2.begin(), s2.end(), std::back_inserter(notes), Note::ltBegin);
-		
+	
 		std::clog << "Songparser/debug: Singer 1 has: " << s1.size() << " notes. Singer 2 has: " << s2.size() << " notes. And together they have: " << notes.size() << " notes." << std::endl;
 		VocalTracks const& tracks = m_song.vocalTracks;
 		std::string duetName = tracks.at(TrackName::LEAD_VOCAL).name + " & " + tracks.at(SongParserUtil::DUET_P2).name;
@@ -91,65 +91,56 @@ SongParser::SongParser(Song& s) try:
 		m_song.insertVocalTrack(SongParserUtil::DUET_BOTH, duetName);
 		VocalTrack& track = m_song.getVocalTrack(SongParserUtil::DUET_BOTH);
 		Notes& duetNotes = track.notes;
-
-			std::clog << "songparser/debug: Checking programmatic duet track..." << std::endl;
-			std::string message;
-			Notes finalDuet;
-			bool skip;
-			for (auto ndbg: notes) {
+		std::clog << "songparser/debug: Checking programmatic duet track..." << std::endl;
+		std::string message;
+		Notes finalDuet;
+		bool skip;
+		for (auto ndbg: notes) {
 			skip = false;
-			if (ndbg.type == Note::SLEEP) message = "Break. Beginning: " + std::to_string(ndbg.begin) + ", Ending: " + std::to_string(ndbg.end);
+		if (ndbg.type == Note::SLEEP) { message = "Break. Beginning: " + std::to_string(ndbg.begin) + ", Ending: " + std::to_string(ndbg.end); }
+		else { message = "Note: " + ndbg.syllable + ". Beginning: " + std::to_string(ndbg.begin) + ", Ending: " + std::to_string(ndbg.end); }
+		std::clog << "songparser/debug: " << message << std::endl;
+		if (!finalDuet.empty()) { 
+			if (ndbg.type == Note::SLEEP) {
+				auto prevToLast = finalDuet.rbegin();
+				std::advance(prevToLast,1);
+				if (prevToLast->type == Note::SLEEP) { std::clog << "songparser/debug: Current note is a break, and previous to last is also a break." << std::endl; skip = true; }
+			}
 			else {
-			message = "Note: " + ndbg.syllable + ". Beginning: " + std::to_string(ndbg.begin) + ", Ending: " + std::to_string(ndbg.end);
-			}
-			std::clog << "songparser/debug: " << message << std::endl;
-			if (!finalDuet.empty()) { 
-				if (ndbg.type == Note::SLEEP) {
-					auto prevToLast = finalDuet.rbegin();
-					std::advance(prevToLast,1);
-					if (prevToLast->type == Note::SLEEP) { std::clog << "songparser/debug: Current note is a break, and previous to last is also a break." << std::endl; skip = true; }
-				}
-				else {
 				if (Note::overlapping(finalDuet.back(),ndbg)) {
-				std::clog << "songparser/debug: There's an overlap, probably our fault?" << std::endl;
-				Note lineBreak = Note();
-				lineBreak.type = Note::SLEEP;
-				
-				double beatDur = getBPM(finalDuet.back().begin).step;
-				double newEnd = (ndbg.begin - beatDur);
-				lineBreak.begin = lineBreak.end = newEnd;
-				if (finalDuet.back().type != Note::SLEEP) {
-				std::clog << "songparser/debug: Will add extra linebreak at: " << lineBreak.begin << std::endl;
-				finalDuet.back().end = newEnd;
-				if (!skip) finalDuet.push_back(lineBreak);
+					std::clog << "songparser/debug: There's an overlap, probably our fault?" << std::endl;
+					Note lineBreak = Note();
+					lineBreak.type = Note::SLEEP;
+					double beatDur = getBPM(finalDuet.back().begin).step;
+					double newEnd = (ndbg.begin - beatDur);
+					lineBreak.begin = lineBreak.end = newEnd;
+					if (finalDuet.back().type != Note::SLEEP) {
+						std::clog << "songparser/debug: Will add extra linebreak at: " << lineBreak.begin << std::endl;
+						finalDuet.back().end = newEnd;
+						if (!skip) { finalDuet.push_back(lineBreak); }
+					}
+					else { std::clog << "songparser/debug: Won't add extra line-break to avoid one-syllable phrase." << std::endl; }
 				}
-				else std::clog << "songparser/debug: Won't add extra line-break to avoid one-syllable phrase." << std::endl;
-				}
-			}
-			
-			}
-			if (!skip) finalDuet.push_back(ndbg);
-			else std::clog << "songparser/debug: Previous to last note is also a break... this looks like an error, we'll skip this break." << std::endl;
-			}
+			}	
+		}
+		if (!skip) { finalDuet.push_back(ndbg); }
+		else { std::clog << "songparser/debug: Previous to last note is also a break... this looks like an error, we'll skip this break." << std::endl; }
+		}
 		std::clog << "songparser/debug: Programmatic duet second pass..." << std::endl;
 		for (auto test: finalDuet) {
-			if (test.type == Note::SLEEP) message = "Break. Beginning: " + std::to_string(test.begin) + ", Ending: " + std::to_string(test.end);
-			else {
-			message = "Note: " + test.syllable + ". Beginning: " + std::to_string(test.begin) + ", Ending: " + std::to_string(test.end);
-			}
-				std::clog << "songparser/debug: " << message << std::endl;
-
+			if (test.type == Note::SLEEP) { message = "Break. Beginning: " + std::to_string(test.begin) + ", Ending: " + std::to_string(test.end); }
+			else { message = "Note: " + test.syllable + ". Beginning: " + std::to_string(test.begin) + ", Ending: " + std::to_string(test.end); }
+			std::clog << "songparser/debug: " << message << std::endl;
 		}		
 			
-			std::unique(finalDuet.begin(), finalDuet.end(), Note::equal);
+		std::unique(finalDuet.begin(), finalDuet.end(), Note::equal);
 		duetNotes.swap(finalDuet);	
-				track.noteMin = std::min(m_song.getVocalTrack(TrackName::LEAD_VOCAL).noteMin, m_song.getVocalTrack(SongParserUtil::DUET_P2).noteMin);
+		track.noteMin = std::min(m_song.getVocalTrack(TrackName::LEAD_VOCAL).noteMin, m_song.getVocalTrack(SongParserUtil::DUET_P2).noteMin);
 		track.noteMax = std::max(m_song.getVocalTrack(TrackName::LEAD_VOCAL).noteMax, m_song.getVocalTrack(SongParserUtil::DUET_P2).noteMax);
 	}
-	
-		finalize(); // Do some adjusting to the notes
-		s.loadStatus = Song::FULL;
-		return;
+	finalize(); // Do some adjusting to the notes
+	s.loadStatus = Song::FULL;
+	return;
 	}
 	// Parse only header to speed up loading and conserve memory
 	if (type == TXT) txtParseHeader();
@@ -290,11 +281,11 @@ void SongParser::finalize() {
 		VocalTrack& vocal = nt.second;
 		// Remove empty sentences
 		{
-			Note::Type lastType = Note::NORMAL;
+		Note::Type lastType = Note::NORMAL;
 		std::clog << "songparser/debug: In " << m_song.artist << " - " << m_song.title << std::endl;
-			for (auto itn = vocal.notes.begin(); itn != vocal.notes.end();) {
-			if (itn->type == Note::SLEEP) { itn->end = itn->begin; ++itn; continue; }
-			auto next = (itn +1);
+		for (auto itn = vocal.notes.begin(); itn != vocal.notes.end();) {
+		if (itn->type == Note::SLEEP) { itn->end = itn->begin; ++itn; continue; }
+		auto next = (itn +1);
 
 		// Try to fix overlapping syllables.
 		std::clog << "songparser/debug: Current note (" << itn->syllable << ") begins at: " << itn->begin << ", ends at: " << itn->end << ", for a length of: " << (itn->end - itn->begin) << ", the next begins at: " << next->begin << std::endl;
@@ -302,7 +293,7 @@ void SongParser::finalize() {
 			double beatDur = getBPM(itn->begin).step;
 			double newEnd = (next->begin - beatDur);
 			std::clog << "songparser/info: Trying to correct duration of overlapping notes (" << itn->syllable << " & " << next->syllable << ")..." << std::endl;
-			if ((newEnd - itn->begin) >= beatDur) itn->end = newEnd;				
+			if ((newEnd - itn->begin) >= beatDur) { itn->end = newEnd; }
 			else if (next->type != Note::SLEEP) {
 				std::clog << "songparser/info: Resulting note would be too short, will combine them instead." << std::endl;
 				itn->syllable += std::string("-") += next->syllable;
@@ -310,13 +301,11 @@ void SongParser::finalize() {
 				vocal.notes.erase(next);
 			}
 		}
-				Note::Type type = itn->type;
-				if(type == Note::SLEEP && lastType == Note::SLEEP) {
-					std::clog << "songparser/info: " + m_song.filename.string() + ": Discarding empty sentence" << std::endl;
-					itn = vocal.notes.erase(itn);
-				} else {
-					++itn;
-				}
+			Note::Type type = itn->type;
+			if(type == Note::SLEEP && lastType == Note::SLEEP) {
+				std::clog << "songparser/info: " + m_song.filename.string() + ": Discarding empty sentence" << std::endl;
+				itn = vocal.notes.erase(itn);
+			} else { ++itn; }
 				lastType = type;
 			}
 		}

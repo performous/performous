@@ -42,7 +42,7 @@ bool ScreenSing::singingDuet() {
 	bool sameVoice = true;
 	for (size_t player = 0; player < players(); ++player) {
 		ConfigItem& vocalTrack = m_vocalTracks[player];
-		if (player == 0) selectedVocalTrack = vocalTrack.i();
+		if (player == 0) { selectedVocalTrack = vocalTrack.i(); }
 		if (vocalTrack.i() != selectedVocalTrack) { sameVoice = false; break; }
 	}
 	std::string getVocalTrackTest = m_song->getVocalTrack(selectedVocalTrack).name;
@@ -83,8 +83,8 @@ void ScreenSing::enter() {
 	{
 		m_duet = ConfigItem(0);
 		for (size_t player = 0; player < players(); ++player) {
-					ConfigItem& vocalTrack = m_vocalTracks[player];
-					vocalTrack = ConfigItem(0);
+			ConfigItem& vocalTrack = m_vocalTracks[player];
+			vocalTrack = ConfigItem(0);
 		}
 		prepareVoicesMenu();
 	}
@@ -288,8 +288,8 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	}
 	// Instant quit with CANCEL at the very beginning
 	if (nav == input::NAV_CANCEL && time < 1.0) {
-		if (m_menu.isOpen()) m_menu.moveToLast(); 
-		else Game::getSingletonPtr()->activateScreen(config["game/autoplay"].b() ? "Songs" : "Playlist");
+		if (m_menu.isOpen()) { m_menu.moveToLast(); }
+		else { Game::getSingletonPtr()->activateScreen(config["game/autoplay"].b() ? "Songs" : "Playlist"); }
 		return;
 	}
 

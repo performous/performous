@@ -32,7 +32,7 @@ public:
 	MenuOption& changer(ConfigItem& val, std::string virtOptName = std::string()) {
 		type = CHANGE_VALUE;
 		value = &val;
-		if (!virtOptName.empty()) virtualName = virtOptName;
+		if (!virtOptName.empty()) { virtualName = virtOptName; }
 		return *this;
 		}
 	/// Make the option set a given value for ConfigItem and close the menu.

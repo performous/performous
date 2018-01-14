@@ -16,7 +16,7 @@ std::string MenuOption::getName() const {
 }
 
 std::string MenuOption::getVirtName() const {
-	return !virtualName.empty() ? virtualName : std::string();
+	return virtualName.empty() ? std::string() : virtualName;
 }
 
 const std::string& MenuOption::getComment() const { return commentPtr ? *commentPtr : comment; }
