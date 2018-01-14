@@ -76,71 +76,9 @@ SongParser::SongParser(Song& s) try:
 		else if (type == INI) midParse();  // INI doesn't contain notes, parse those from MIDI
 		else if (type == XML) xmlParse();
 		else if (type == SM) smParse();
-	std::clog << "songparser/debug: vocalTracks.size(): " << s.vocalTracks.size() << std::endl;
-	if (s.hasDuet()) {
-		Notes s1, s2, notes;
-		std::clog << "Song/debug: Duet song has " << s.vocalTracks.size() << " vocal tracks." << std::endl;
-		s1 = m_song.getVocalTrack(TrackName::LEAD_VOCAL).notes;
-		s2 = m_song.getVocalTrack(SongParserUtil::DUET_P2).notes;
-		std::merge(s1.begin(), s1.end(), s2.begin(), s2.end(), std::back_inserter(notes), Note::ltBegin);
-	
-		std::clog << "Songparser/debug: Singer 1 has: " << s1.size() << " notes. Singer 2 has: " << s2.size() << " notes. And together they have: " << notes.size() << " notes." << std::endl;
-		VocalTracks const& tracks = m_song.vocalTracks;
-		std::string duetName = tracks.at(TrackName::LEAD_VOCAL).name + " & " + tracks.at(SongParserUtil::DUET_P2).name;
-		std::clog << "SongParser/debug: Will add a third vocal track with name: " << duetName << std::endl;
-		m_song.insertVocalTrack(SongParserUtil::DUET_BOTH, duetName);
-		VocalTrack& track = m_song.getVocalTrack(SongParserUtil::DUET_BOTH);
-		Notes& duetNotes = track.notes;
-		std::clog << "songparser/debug: Checking programmatic duet track..." << std::endl;
-		std::string message;
-		Notes finalDuet;
-		bool skip;
-		for (auto ndbg: notes) {
-			skip = false;
-		if (ndbg.type == Note::SLEEP) { message = "Break. Beginning: " + std::to_string(ndbg.begin) + ", Ending: " + std::to_string(ndbg.end); }
-		else { message = "Note: " + ndbg.syllable + ". Beginning: " + std::to_string(ndbg.begin) + ", Ending: " + std::to_string(ndbg.end); }
-		std::clog << "songparser/debug: " << message << std::endl;
-		if (!finalDuet.empty()) { 
-			if (ndbg.type == Note::SLEEP) {
-				auto prevToLast = finalDuet.rbegin();
-				std::advance(prevToLast,1);
-				if (prevToLast->type == Note::SLEEP) { std::clog << "songparser/debug: Current note is a break, and previous to last is also a break." << std::endl; skip = true; }
-			}
-			else {
-				if (Note::overlapping(finalDuet.back(),ndbg)) {
-					std::clog << "songparser/debug: There's an overlap, probably our fault?" << std::endl;
-					Note lineBreak = Note();
-					lineBreak.type = Note::SLEEP;
-					double beatDur = getBPM(finalDuet.back().begin).step;
-					double newEnd = (ndbg.begin - beatDur);
-					lineBreak.begin = lineBreak.end = newEnd;
-					if (finalDuet.back().type != Note::SLEEP) {
-						std::clog << "songparser/debug: Will add extra linebreak at: " << lineBreak.begin << std::endl;
-						finalDuet.back().end = newEnd;
-						if (!skip) { finalDuet.push_back(lineBreak); }
-					}
-					else { std::clog << "songparser/debug: Won't add extra line-break to avoid one-syllable phrase." << std::endl; }
-				}
-			}	
-		}
-		if (!skip) { finalDuet.push_back(ndbg); }
-		else { std::clog << "songparser/debug: Previous to last note is also a break... this looks like an error, we'll skip this break." << std::endl; }
-		}
-		std::clog << "songparser/debug: Programmatic duet second pass..." << std::endl;
-		for (auto test: finalDuet) {
-			if (test.type == Note::SLEEP) { message = "Break. Beginning: " + std::to_string(test.begin) + ", Ending: " + std::to_string(test.end); }
-			else { message = "Note: " + test.syllable + ". Beginning: " + std::to_string(test.begin) + ", Ending: " + std::to_string(test.end); }
-			std::clog << "songparser/debug: " << message << std::endl;
-		}		
-			
-		std::unique(finalDuet.begin(), finalDuet.end(), Note::equal);
-		duetNotes.swap(finalDuet);	
-		track.noteMin = std::min(m_song.getVocalTrack(TrackName::LEAD_VOCAL).noteMin, m_song.getVocalTrack(SongParserUtil::DUET_P2).noteMin);
-		track.noteMax = std::max(m_song.getVocalTrack(TrackName::LEAD_VOCAL).noteMax, m_song.getVocalTrack(SongParserUtil::DUET_P2).noteMax);
-	}
-	finalize(); // Do some adjusting to the notes
-	s.loadStatus = Song::FULL;
-	return;
+		finalize(); // Do some adjusting to the notes
+		s.loadStatus = Song::FULL;
+		return;
 	}
 	// Parse only header to speed up loading and conserve memory
 	if (type == TXT) txtParseHeader();
