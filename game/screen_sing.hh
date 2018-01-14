@@ -104,7 +104,7 @@ class ScreenSing: public Screen {
 	std::string m_selectedTrackLocalized;
 	ConfigItem m_vocalTracks[AUDIO_MAX_ANALYZERS];
 	ConfigItem m_duet;
-	size_t players() const { 	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers(); return (analyzers.empty() ? 1 : analyzers.size()); } // Always have at least one player to display lyrics and prevent crashes.
+	size_t players() const { auto& analyzers = m_audio.analyzers(); return (analyzers.empty() ? 1 : analyzers.size()); } // Always have at least one player to display lyrics and prevent crashes.
 	bool singingDuet();
 	int selectedVocalTrack;
 	bool m_displayAutoPlay = false;
