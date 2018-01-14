@@ -164,12 +164,14 @@ bool SongParser::txtParseNote(std::string line) {
 				if (p2.end < n.begin) p.begin = p.end = n.begin;
 			}
 			// Can we just make the previous note shorter?
-			if (p.begin <= n.begin) p.end = n.begin;
-			else if (m_song.b0rked.empty()) { // Cannot fix, warn and skip
-				std::string msg = "Skipped overlapping notes.\n";
-				m_song.b0rked = msg;
+			if (p.begin >= n.begin) {
+// 				if (m_song.b0rked.empty()) { // Cannot fix, warn and skip
+				std::string msg = "Skipped overlapping notes:\n" + p.syllable + ", " + n.syllable + "\n";
+				m_song.b0rked += msg;
 				std::clog << "songparser/notice: " + m_song.filename.string() + ": " + msg << std::endl;
 				return true;
+// 			}
+// 			else { m_song.b0rked += "\ }
 			}
 		} else throw std::runtime_error("The first note has negative timestamp");
 	}
