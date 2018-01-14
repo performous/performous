@@ -226,7 +226,7 @@ void SongParser::finalize() {
 		auto next = (itn +1);
 
 		// Try to fix overlapping syllables.
-		std::clog << "songparser/debug: Current note (" << itn->syllable << ") begins at: " << itn->begin << ", ends at: " << itn->end << ", for a length of: " << (itn->end - itn->begin) << ", the next begins at: " << next->begin << std::endl;
+		std::clog << "songparser/debug: Current note (" << itn->syllable << ") begins at: " << itn->begin << ", ends at: " << itn->end << ", length: " << (itn->end - itn->begin) << ", the next begins at: " << next->begin << std::endl;
 		if (next != vocal.notes.end() && Note::overlapping(*itn, *next)) {
 			double beatDur = getBPM(itn->begin).step;
 			double newEnd = (next->begin - beatDur);
@@ -238,6 +238,7 @@ void SongParser::finalize() {
 				itn->end = next->end;
 				vocal.notes.erase(next);
 			}
+			else { next->begin = next->end = itn->end; }
 		}
 			Note::Type type = itn->type;
 			if(type == Note::SLEEP && lastType == Note::SLEEP) {
