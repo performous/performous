@@ -447,7 +447,7 @@ void ScreenSongs::drawInstruments(Dimensions dim) const {
 		have_drums = song.hasDrums();
 		have_dance = song.hasDance();
 		//is_karaoke = (song.music.find("vocals") != song.music.end());
-		vocalCount = song.getVocalTrackNames().size();
+		if (song.hasVocals()) vocalCount = song.hasDuet() ? 2 : 1; // Make sure our generated duet track is not counted as a third vocal track for drawing.
 		if (isTrackInside(song.instrumentTracks,TrackName::GUITAR)) guitarCount++;
 		if (isTrackInside(song.instrumentTracks,TrackName::GUITAR_COOP)) guitarCount++;
 		if (isTrackInside(song.instrumentTracks,TrackName::GUITAR_RHYTHM)) guitarCount++;

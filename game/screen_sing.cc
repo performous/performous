@@ -106,9 +106,15 @@ void ScreenSing::prepareVoicesMenu(size_t moveSelectionTo) {
 		for (size_t player = 0; player < players(); ++player) {
 			ConfigItem& vocalTrack = m_vocalTracks[player];
 			for (auto const& track: tracks) vocalTrack.addEnum(track.second.name);
-			if (tracks.size() > 1 && player % 2) ++vocalTrack;  // Every other player gets the second track
+			if (tracks.size() > 1) {
+			if (player % 2) vocalTrack.selectEnum(m_song->getVocalTrack(SongParserUtil::DUET_P2).name);  // Every other player gets the second track
+			else vocalTrack.selectEnum(m_song->getVocalTrack(TrackName::LEAD_VOCAL).name);
+			}
 			m_menu.add(MenuOption("", _("Change vocal track")).changer(vocalTrack));
-			if (m_duet.i() == 1) break; // If duet mode is disabled, the vocal track selection for players beyond the first is ignored anyway.
+			if (m_duet.i() == 1) {
+				vocalTrack.selectEnum(m_song->getVocalTrack(SongParserUtil::DUET_BOTH).name);
+				break; // If duet mode is disabled, the vocal track selection for players beyond the first is ignored anyway.
+				}
 		}
 		m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
 		m_menu.select(moveSelectionTo);
