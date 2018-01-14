@@ -188,6 +188,7 @@ bool SongParser::txtParseNote(std::string line) {
 		{
 			unsigned int length = 0;
 			if (!(iss >> ts >> length >> n.note)) throw std::runtime_error("Invalid note line format");
+			if (length < 1) throw std::runtime_error("Notes must have positive durations.");
 			n.notePrev = n.note; // No slide notes in TXT yet.
 			if (m_relative) ts += m_relativeShift;
 			if (iss.get() == ' ') std::getline(iss, n.syllable);
@@ -216,27 +217,17 @@ bool SongParser::txtParseNote(std::string line) {
 	if (m_relative && notes.empty()) m_relativeShift = ts;
 	m_prevts = ts;
 	// FIXME: These work-arounds don't work for P3 (both singers) case
+	Note& p;
 	if (n.begin < m_prevtime) {
 		// Oh no, overlapping notes (b0rked file)
 		// Can't do this because too many songs are b0rked: throw std::runtime_error("Note overlaps with previous note");
 		if (notes.size() >= 1) {
-			Note& p = notes.back();
-			// Workaround for songs that use semi-random timestamps for sleep
-			if (p.type == Note::SLEEP) {
-				p.end = p.begin;
-				auto it = notes.rbegin();
-				Note& p2 = *++it;
-				if (p2.end < n.begin) p.begin = p.end = n.begin;
-			}
-			// Can we just make the previous note shorter?
-			if (p.begin >= n.begin) {
-// 				if (m_song.b0rked.empty()) { // Cannot fix, warn and skip
+			p = notes.back();
+			if (p.begin > n.begin) {
 				std::string msg = "Skipped overlapping notes:\n" + p.syllable + ", " + n.syllable + "\n";
 				m_song.b0rked += msg;
 				std::clog << "songparser/notice: " + m_song.filename.string() + ": " + msg << std::endl;
 				return true;
-// 			}
-// 			else { m_song.b0rked += "\ }
 			}
 		} else throw std::runtime_error("The first note has negative timestamp");
 	}
@@ -248,11 +239,15 @@ bool SongParser::txtParseNote(std::string line) {
 	}
 	if (n.type == Note::SLEEP) {
 		if (notes.empty()) return true; // Ignore sleeps at song beginning
-		n.begin = n.end = prevtime; // Normalize sleep notes
+		else {
+			p = notes.back();
+			n.begin = n.end = prevtime; // Normalize sleep notes
+			
+			if (p.type == Note::SLEEP) return true; // Ignore consecutive sleeps
+		}
 	}
 	notes.push_back(n);
-	if (m_curSinger == BOTH)
-		m_song.getVocalTrack(DUET_P2).notes.push_back(n);
+	if (m_curSinger == BOTH) { m_song.getVocalTrack(DUET_P2).notes.push_back(n); }
 	return true;
 }
 
