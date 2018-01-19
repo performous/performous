@@ -146,13 +146,12 @@ $("#search-tab").click(function (){
         var input = $("#search-field");
         input.typeahead({
             source: database,
-            autoSelect: true,
+            autoSelect: false,
             items: 10,
-            updater: function(item) {
-                input.val(item.name);
-                $('#search-database').trigger("click", function(){
-                    $("#searched-songs").children().first().click();
-                }); 
+            select: function () {
+                var val = this.$menu.find('.active').data('value');
+                addSong(JSON.stringify(val));
+                $("#search-field").val('');                
             }
         });
     });
@@ -161,6 +160,7 @@ $("#search-tab").click(function (){
 $('#search-field').keypress(function (e) {
     if (e.which == 13) {
         $('#search-database').click();
+
     }
 });
 
