@@ -36,7 +36,7 @@ $('#refresh-playlist-toggle').change(function() {
     }
 });
 
-$('#playlist-songs').on("click", "a", function() {
+$("[id^=playlist-songs]").on("click", "a", function() {
     var jsonSongObject = $(this).data("modal-songObject");
     var songObject = JSON.parse(jsonSongObject);
     var title = songObject.Artist + " - " + songObject.Title;
