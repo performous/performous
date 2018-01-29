@@ -22,22 +22,19 @@ SRC_URI="songs? (
 	)"
 
 PATCHES=(
-	"${FILESDIR}"/${PN}-20130811-gentoo.patch
-	"${FILESDIR}"/${PN}-20140927-libav.patch
-	"${FILESDIR}"/${PN}-20140927-linguas.patch
 )
 
 if [ "$PV" != "9999" ]; then
     SRC_URI="https://github.com/performous/performous/archive/${PV}.tar.gz -> ${P}.tar.gz $SRC_URI"
 	PATCHES=(
 		$PATCHES
-		"${FILESDIR}"/${PN}-20140927-cmake.patch
+		"${FILESDIR}"/${PN}-gentoo.patch
 	)
 else
     EGIT_REPO_URI="git://github.com/performous/performous.git"
 	PATCHES=(
 		$PATCHES
-		"${FILESDIR}"/${PN}-20141104-cmake.patch
+		"${FILESDIR}"/${P}-gentoo.patch
 	)
 fi
 
@@ -51,7 +48,7 @@ KEYWORDS="~amd64 ~x86"
 IUSE="midi songs tools webcam"
 
 RDEPEND="dev-cpp/glibmm
-	dev-cpp/libxmlpp
+	dev-cpp/libxmlpp:2.6
 	media-libs/portaudio
 	dev-libs/boost[threads(+)]
 	dev-libs/glib
