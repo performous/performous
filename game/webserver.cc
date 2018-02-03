@@ -1,9 +1,9 @@
 ﻿#include "webserver.hh"
 #ifdef USE_WEBSERVER
 #include <boost/network/protocol/http/server.hpp>
-
+#include <thread>
+#include <chrono>
 namespace http = boost::network::http;
-
 
 typedef http::server<WebServer::handler> http_server;
 
@@ -34,17 +34,41 @@ struct WebServer::handler {
 };
 
 
-void WebServer::StartServer() {
+void WebServer::StartServer(int tried, bool fallbackPortInUse = false) {
+	if(tried > 2) {
+		if(fallbackPortInUse == false) {
+			std::clog << "webserver/error: Couldn't start webserver tried 3 times. Trying fallbackport.." << std::endl;
+			StartServer(0, true);
+			return;
+		}
+
+		std::clog << "webserver/error: Couldn't start webserver tried 3 times using normal port and 3 times using fallback port. Stopping webserver." << std::endl; 
+		if(m_server) {
+			m_server->stop();
+		}
+		return;
+	}
+
 	handler handler_{*this};
 	http_server::options options(handler_);
+	std::string portToUse = fallbackPortInUse ? std::to_string(config["game/webserver_fallback_port"].i()) : std::to_string(config["game/webserver_port"].i());
 	if(config["game/webserver_access"].i() == 1) {
-		std::clog << "webserver/notice: Starting local server." << std::endl;
-		m_server.reset(new http_server(options.address("127.0.0.1").port(std::to_string(config["game/webserver_port"].i()))));
+		std::clog << "webserver/notice: Starting local server..." << std::endl;
+		m_server.reset(new http_server(options.address("127.0.0.1").port(portToUse)));
 	} else {
-		m_server.reset(new http_server(options.address("0.0.0.0").port(std::to_string(config["game/webserver_port"].i()))));
-		std::clog << "webserver/notice: Starting public server." << std::endl;
+		m_server.reset(new http_server(options.address("0.0.0.0").port(portToUse)));
+		std::clog << "webserver/notice: Starting public server..." << std::endl;
 	}
-	m_server->run();
+	try {
+		m_server->run();
+	}
+	catch (exception& e)
+	{
+		tried = tried + 1;
+		std::clog << "webserver/error: " << e.what() << " Trying again... (tried " << tried << " times)." << std::endl;
+		std::this_thread::sleep_for(std::chrono::seconds(20));
+		StartServer(tried, fallbackPortInUse);
+	}
 }
 
 WebServer::WebServer(Songs& songs)
@@ -53,7 +77,7 @@ WebServer::WebServer(Songs& songs)
 	if(config["game/webserver_access"].i() == 0) {
 		std::clog << "webserver/notice: Not starting webserver." << std::endl;
 	} else {
-		m_serverThread.reset(new boost::thread(boost::bind(&WebServer::StartServer,boost::ref(*this))));
+		m_serverThread.reset(new boost::thread(boost::bind(&WebServer::StartServer, boost::ref(*this), 0, false)));
 	}
 }
 

@@ -94,6 +94,12 @@ to save the current settings to XML.
 		<short>Webserver port</short>
 		<long>Port to use for the web server. Choose one that is not used by other applications.</long>
 	</entry>
+	<entry name="game/webserver_fallback_port" type="int" value="8001">
+		<!-- maximum of 16 bit is 65536, so 60000 should be a nice upper-limit -->
+		<limits min="0" max="60000" step="1" />
+		<short>Webserver fallback port</short>
+		<long>Port to use in case original webserver port is in use. Choose one that you know for sure is not used by other applications.</long>
+	</entry>
 	<entry name="game/keyboard_guitar" type="bool" value="true">
 		<short>Keyboard as guitar</short>
 		<long>Enable keyboard as guitar (Frets on Fire mode).</long>

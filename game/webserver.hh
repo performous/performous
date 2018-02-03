@@ -45,7 +45,7 @@ public:
 	http_server::response POSTresponse(http_server::request const &request);
 
 private:
-	void StartServer();
+	void StartServer(int tried, bool fallbackPortInUse);
 	Json::Value SongsToJsonObject();
 	std::map<std::string, std::string> GenerateLocaleDict();
 	std::vector<std::string> GetTranslationKeys();
