@@ -35,8 +35,7 @@ void Players::load(xmlpp::NodeSet const& n) {
 		std::string picture;
 		if (!n2.empty()) // optional picture element
 		{
-			xmlpp::Element& element2 =dynamic_cast<xmlpp::Element&>(**n2.begin());
-			xmlpp::TextNode* tn = element2.get_child_text();
+			auto tn = xmlpp::get_first_child_text(dynamic_cast<xmlpp::Element&>(**n2.begin()));
 			picture = tn->get_content();
 		}
 		addPlayer(a_name->get_value(), picture, id);

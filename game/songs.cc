@@ -306,7 +306,7 @@ namespace {
 				std::string coverlink = "covers/" + (boost::format("%|04|") % num).str() + ext;
 				if (fs::is_symlink(coverlink)) fs::remove(coverlink);
 				create_symlink(s.cover, coverlink);
-				xmlpp::add_child_element(song, "cover")->set_child_text(coverlink);
+				xmlpp::set_first_child_text(xmlpp::add_child_element(song, "cover"), coverlink);
 			}
 		} catch (std::exception& e) {
 			std::cerr << "Songlist error handling cover image: " << e.what() << std::endl;
@@ -321,10 +321,10 @@ namespace {
 			xmlpp::Element* song = xmlpp::add_child_element(songlist, "song");
 			song->set_attribute("num", std::to_string(i + 1));
 			xmlpp::Element* collate = xmlpp::add_child_element(song, "collate");
-			xmlpp::add_child_element(collate, "artist")->set_child_text(s.collateByArtist);
-			xmlpp::add_child_element(collate, "title")->set_child_text(s.collateByTitle);
-			xmlpp::add_child_element(song, "artist")->set_child_text(s.artist);
-			xmlpp::add_child_element(song, "title")->set_child_text(s.title);
+			xmlpp::set_first_child_text(xmlpp::add_child_element(collate, "artist"), s.collateByArtist);
+			xmlpp::set_first_child_text(xmlpp::add_child_element(collate, "title"), s.collateByTitle);
+			xmlpp::set_first_child_text(xmlpp::add_child_element(song, "artist"), s.artist);
+			xmlpp::set_first_child_text(xmlpp::add_child_element(song, "title"), s.title);
 			if (!s.cover.empty()) dumpCover(song, s, i + 1);
 		}
 		doc.write_to_file_formatted(filename, "UTF-8");

@@ -56,7 +56,7 @@ void Hiscore::load(xmlpp::NodeSet const& nodes) {
 		int playerid = boost::lexical_cast<int>(a_playerid->get_value());
 		int songid = boost::lexical_cast<int>(a_songid->get_value());
 
-		xmlpp::TextNode* tn = element.get_child_text();
+		auto tn = xmlpp::get_first_child_text(element);
 		if (!tn) throw std::runtime_error("Score not found");
 		int score = boost::lexical_cast<int>(tn->get_content());
 

@@ -93,7 +93,7 @@ namespace {
     }
 
     std::string getText(xmlpp::Element const& elem) {
-        xmlpp::TextNode const* n = elem.get_child_text();  // Returns NULL if there is no text
+        auto n = xmlpp::get_first_child_text(elem);  // Returns NULL if there is no text
         return n ? std::string(n->get_content()) : std::string();
     }
 

@@ -53,7 +53,7 @@ struct SSDom: public xmlpp::DomParser {
 	bool getValue(std::string const& xpath, std::string& result) {
 		xmlpp::const_NodeSet n;
 		if (!find(xpath, n)) return false;
-		result = dynamic_cast<xmlpp::Element&>(*n[0]).get_child_text()->get_content();
+		result = xmlpp::get_first_child_text(dynamic_cast<const xmlpp::Element&>(*n[0]))->get_content();
 		return true;
 	}
 };
