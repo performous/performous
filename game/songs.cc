@@ -6,6 +6,7 @@
 #include "database.hh"
 #include "i18n.hh"
 #include "profiler.hh"
+#include "libxml++-impl.hh"
 
 #include <algorithm>
 #include <iostream>
@@ -17,7 +18,6 @@
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
-#include <libxml++/libxml++.h>
 #include <unicode/stsearch.h>
 
 UErrorCode Songs::m_icuError = U_ZERO_ERROR;

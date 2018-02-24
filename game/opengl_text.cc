@@ -1,8 +1,9 @@
 ﻿#include "opengl_text.hh"
 
+#include "libxml++-impl.hh"
+
 #include <boost/lexical_cast.hpp>
 #include "fontconfig/fontconfig.h"
-#include <libxml++/libxml++.h>
 #include <pango/pangocairo.h>
 #include <cmath>
 #include <iostream>

@@ -1,5 +1,6 @@
 #include "audio.hh"
 #include "configuration.hh"
+#include "libxml++-impl.hh"
 
 #include "fs.hh"
 #include "util.hh"
@@ -8,7 +9,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
-#include <libxml++/libxml++.h>
 #include <algorithm>
 #include <iomanip>
 #include <stdexcept>

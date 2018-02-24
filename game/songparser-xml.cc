@@ -1,6 +1,7 @@
 #include "songparser.hh"
 
 #include "util.hh"
+#include "libxml++-impl.hh"
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 #include <stdexcept>
@@ -16,7 +17,6 @@ bool SongParser::xmlCheck(std::string const& data) const {
 	return std::equal(header.begin(), header.end(), data.begin());
 }
 
-#include <libxml++/libxml++.h>
 #include <glibmm/convert.h>
 
 /*

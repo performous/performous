@@ -2,14 +2,14 @@
 
 #include "song.hh"
 
+#include "libxml++.hh"
+
 #include <set>
 #include <vector>
 #include <string>
 #include <stdexcept>
 
 #include <boost/shared_ptr.hpp>
-
-namespace xmlpp { class Node; class Element; typedef std::vector<Node*>NodeSet; }
 
 /**Exception which will be thrown when loading or
   saving Players fails.*/

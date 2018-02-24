@@ -2,11 +2,11 @@
 
 #include "configuration.hh"
 #include "fs.hh"
+#include "libxml++-impl.hh"
 
 #include <algorithm>
 #include <boost/regex.hpp>
 #include <boost/lexical_cast.hpp>
-#include <libxml++/libxml++.h>
 #include <unicode/stsearch.h>
 
 UErrorCode Players::m_icuError = U_ZERO_ERROR;

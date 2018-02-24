@@ -1,4 +1,5 @@
 #include "controllers.hh"
+#include "libxml++-impl.hh"
 
 #include "fs.hh"
 #include <boost/algorithm/string.hpp>
@@ -6,7 +7,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <boost/smart_ptr/weak_ptr.hpp>
-#include <libxml++/libxml++.h>
 #include <SDL2/SDL_joystick.h>
 #include <deque>
 #include <stdexcept>

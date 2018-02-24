@@ -1,10 +1,11 @@
 #include "hiscore.hh"
 
+#include "libxml++-impl.hh"
+
 #include <algorithm>
 #include <sstream>
 #include <stdexcept>
 #include <boost/lexical_cast.hpp>
-#include <libxml++/libxml++.h>
 
 bool Hiscore::reachedHiscore(unsigned score, unsigned songid, std::string const& track) const {
 	if (score > 10000) throw std::logic_error("Invalid score value");

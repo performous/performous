@@ -1,12 +1,13 @@
 #pragma once
 
+#include "libxml++.hh"
+
 #include <boost/variant.hpp>
 #include <map>
 #include <string>
 #include <vector>
 #include <list>
 
-namespace xmlpp { class Element; }  // Forward declaration for libxml++ stuff
 class Audio;
 
 // configuration option
