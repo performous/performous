@@ -85,7 +85,7 @@ struct Match {
 	}
 };
 
-void saveTxtFile(xmlpp::NodeSet &sentence, const fs::path &path, const Song &song, const std::string singer = "") {
+void saveTxtFile(xmlpp::const_NodeSet &sentence, const fs::path &path, const Song &song, const std::string singer = "") {
 	fs::path file_path;
 
 	if( singer.empty() ) {
@@ -145,7 +145,7 @@ struct Process {
 				}
 			}
 			if (song.tempo == 0.0) {
-				xmlpp::NodeSet n;
+				xmlpp::const_NodeSet n;
 				dom.find("/ss:MELODY", n) || dom.find("/MELODY", n);
 				if (n.empty()) throw std::runtime_error("Unable to find BPM info");
 				xmlpp::Element& e = dynamic_cast<xmlpp::Element&>(*n[0]);
@@ -225,13 +225,13 @@ struct Process {
 
 			if (g_createtxt) {
 				std::cerr << ">>> Extracting lyrics to notes.txt" << std::endl;
-				xmlpp::NodeSet sentences;
+				xmlpp::const_NodeSet sentences;
 				if(dom.find("/ss:MELODY/ss:SENTENCE", sentences)) {
 					// Sentences not inside tracks (normal songs)
 					std::cerr << "  >>> Solo track" << std::endl;
 					saveTxtFile(sentences, path, song);
 				} else {
-					xmlpp::NodeSet tracks;
+					xmlpp::const_NodeSet tracks;
 					if (!dom.find("/ss:MELODY/ss:TRACK", tracks)) throw std::runtime_error("Unable to find any sentences in melody XML");
 					for (auto it = tracks.begin(); it != tracks.end(); ++it ) {
 						xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**it);
@@ -320,7 +320,7 @@ struct FindSongs {
 		SSDom dom(p.second);  // Read song XML
 
 
-		xmlpp::NodeSet n;
+		xmlpp::const_NodeSet n;
 		dom.find("/ss:SONG_SET/ss:SONG", n);
 		Song s;
 		s.dataPakName = dvdPath + "/pak_iop" + name[name.size() - 5] + ".pak";
@@ -335,7 +335,7 @@ struct FindSongs {
 			get_node(node, s.genre, s.year); // get the values for genre and year
 			// Get video FPS
 			double fps = 25.0;
-			xmlpp::NodeSet fr;
+			xmlpp::const_NodeSet fr;
 			if (dom.find(elem, "ss:VIDEO/@FRAME_RATE", fr))
 			  fps = boost::lexical_cast<double>(dynamic_cast<xmlpp::Attribute&>(*fr[0]).get_value().c_str());
 			if (fps == 25.0) s.pal = true;

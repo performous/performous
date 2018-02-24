@@ -16,6 +16,15 @@ std::string filename(boost::filesystem::path const& p) { return *--p.end(); }
 std::string filename(boost::filesystem::path const& p) { return p.filename().string(); }
 #endif
 
+namespace xmlpp {
+	// typedef Node::const_NodeSet const_NodeSet; // correct libxml++ 3.0 implementation
+	typedef NodeSet const_NodeSet; // implementation to satisfy libxml++ 2.6 API
+
+	static inline const TextNode* get_first_child_text(const Element& element) {
+		return element.get_child_text();
+	}
+}
+
 /** Fix Singstar's b0rked XML **/
 std::string xmlFix(std::vector<char> const& data) {
 	std::string ret;
@@ -48,18 +57,18 @@ struct SSDom: public xmlpp::DomParser {
 		}
 		nsmap["ss"] = get_document()->get_root_node()->get_namespace_uri();
 	}
-	bool find(xmlpp::Element& elem, std::string xpath, xmlpp::NodeSet& n) {
+	bool find(xmlpp::Element& elem, std::string xpath, xmlpp::const_NodeSet& n) {
 		if (nsmap["ss"].empty()) boost::erase_all(xpath, "ss:");
 		n = elem.find(xpath, nsmap);
 		return !n.empty();
 	}
-	bool find(std::string const& xpath, xmlpp::NodeSet& n) {
+	bool find(std::string const& xpath, xmlpp::const_NodeSet& n) {
 		return find(*get_document()->get_root_node(), xpath, n);
 	}
 	bool getValue(std::string const& xpath, std::string& result) {
-		xmlpp::NodeSet n;
+		xmlpp::const_NodeSet n;
 		if (!find(xpath, n)) return false;
-		result = dynamic_cast<xmlpp::Element&>(*n[0]).get_child_text()->get_content();
+		result = xmlpp::get_first_child_text(dynamic_cast<xmlpp::Element&>(*n[0]))->get_content();
 		return true;
 	}
 };
