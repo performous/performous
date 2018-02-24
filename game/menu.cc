@@ -1,4 +1,4 @@
-#include "menu.hh"
+﻿#include "menu.hh"
 #include "screen.hh"
 #include "surface.hh"
 #include "fs.hh"
@@ -58,9 +58,9 @@ void Menu::action(int dir) {
 			}
 			break;
 		}
-		case MenuOption::SET_AND_CLOSE: {
-			if (current().value) *(current().value) = current().newValue;
-			// Fall-through to closing
+		case MenuOption::SET_AND_CLOSE: { /* Falls through. */
+			if (current().value) *(current().value) = current().newValue; /* Falls through. */
+			/* Falls through. */
 		}
 		case MenuOption::CLOSE_SUBMENU: {
 			closeSubmenu();
