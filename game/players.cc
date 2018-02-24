@@ -46,12 +46,12 @@ void Players::load(xmlpp::NodeSet const& n) {
 
 void Players::save(xmlpp::Element *players) {
 	for (auto const& p: m_players) {
-		xmlpp::Element* player = players->add_child("player");
+		xmlpp::Element* player = xmlpp::add_child_element(players, "player");
 		player->set_attribute("name", p.name);
 		player->set_attribute("id", std::to_string(p.id));
 		if (p.picture != "")
 		{
-			xmlpp::Element* picture = player->add_child("picture");
+			xmlpp::Element* picture = xmlpp::add_child_element(player, "picture");
 			picture->add_child_text(p.picture.string());
 		}
 	}

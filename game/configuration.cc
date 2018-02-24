@@ -283,7 +283,7 @@ void writeConfig(Audio& m_audio, bool system) {
         std::string name = elem.first;
         if (item.isDefault(system)) continue; // No need to save settings with default values
         dirty = true;
-        xmlpp::Element* entryNode = nodeRoot->add_child("entry");
+        xmlpp::Element* entryNode = xmlpp::add_child_element(nodeRoot, "entry");
         entryNode->set_attribute("name", name);
         std::string type = item.get_type();
         entryNode->set_attribute("type", type);
@@ -303,13 +303,13 @@ void writeConfig(Audio& m_audio, bool system) {
         else if (type == "int") entryNode->set_attribute("value",std::to_string(item.i()));
         else if (type == "bool") entryNode->set_attribute("value", item.b() ? "true" : "false");
         else if (type == "float") entryNode->set_attribute("value",std::to_string(item.f()));
-        else if (item.get_type() == "string") entryNode->add_child("stringvalue")->add_child_text(item.s());
+        else if (item.get_type() == "string") xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(item.s());
         else if (item.get_type() == "string_list") {
-            for (auto const& str: item.sl()) entryNode->add_child("stringvalue")->add_child_text(str);
+            for (auto const& str: item.sl()) xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(str);
         }
         else if (item.get_type() == "option_list") {
             //TODO: Write selected also (as attribute?)
-            for (auto const& str: item.ol()) entryNode->add_child("stringvalue")->add_child_text(str);
+            for (auto const& str: item.ol()) xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(str);
         }
     }
     fs::path const& conf = system ? systemConfFile : userConfFile;

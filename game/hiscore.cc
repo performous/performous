@@ -66,7 +66,7 @@ void Hiscore::load(xmlpp::NodeSet const& nodes) {
 
 void Hiscore::save(xmlpp::Element *hiscores) {
 	for (auto const& h: m_hiscore) {
-		xmlpp::Element* hiscore = hiscores->add_child("hiscore");
+		xmlpp::Element* hiscore = xmlpp::add_child_element(hiscores, "hiscore");
 		hiscore->set_attribute("playerid", boost::lexical_cast<std::string>(h.playerid));
 		hiscore->set_attribute("songid", boost::lexical_cast<std::string>(h.songid));
 		hiscore->set_attribute("track", h.track);
