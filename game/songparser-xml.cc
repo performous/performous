@@ -94,7 +94,7 @@ void SongParser::xmlParseHeader() {
 	for (auto const& elem: tracks) {
 		auto const& trackNode = dynamic_cast<xmlpp::Element const&>(*elem);
 		std::string name = trackNode.get_attribute("Name")->get_value();  // "Player1" or "Player2"
-		xmlpp::Attribute* attr = trackNode.get_attribute("Artist");
+		auto attr = trackNode.get_attribute("Artist");
 		std::string artist = attr ? std::string(attr->get_value()) : name;  // Singer name
 		if (attr) singers += (singers.empty() ? "" : " & ") + artist;
 		m_song.insertVocalTrack(name, VocalTrack(artist));
@@ -149,11 +149,11 @@ void SongParser::xmlParse() {
 		xmlpp::NodeSet sentences;
 		dom.find(trackElem, "ss:SENTENCE", sentences);
 		unsigned ts = 0;
-		for (xmlpp::NodeSet::const_iterator it = sentences.begin(); it != sentences.end(); ++it ) {
+		for (auto it = sentences.begin(); it != sentences.end(); ++it ) {
 			auto const& sentenceNode = dynamic_cast<xmlpp::Element const&>(**it);
 			// Check if SENTENCE has new attributes
 			{
-				xmlpp::Attribute* attr = sentenceNode.get_attribute("Part");
+				auto attr = sentenceNode.get_attribute("Part");
 				if (attr) m_song.songsections.push_back(Song::SongSection(attr->get_value(), tsTime(ts)));
 				attr = sentenceNode.get_attribute("Singer");
 				if (attr) sentenceSinger = attr->get_value();

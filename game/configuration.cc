@@ -98,7 +98,7 @@ namespace {
     }
 
     std::string getText(xmlpp::Element const& elem, std::string const& path) {
-        xmlpp::NodeSet ns = elem.find(path);
+        auto ns = elem.find(path);
         if (ns.empty()) return std::string();
         return getText(dynamic_cast<xmlpp::Element const&>(*ns[0]));
     }
@@ -190,7 +190,7 @@ std::string const ConfigItem::getEnumName() const {
 }
 
 template <typename T> void ConfigItem::updateNumeric(xmlpp::Element& elem, int mode) {
-    xmlpp::NodeSet ns = elem.find("limits");
+    auto ns = elem.find("limits");
     if (!ns.empty()) setLimits<T>(dynamic_cast<xmlpp::Element&>(*ns[0]), m_min, m_max, m_step);
     else if (mode == 0) throw XMLError(elem, "child element limits missing");
     ns = elem.find("ui");
@@ -235,9 +235,9 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
         if (!value_string.empty()) m_value = boost::lexical_cast<int>(value_string);
             // Enum handling
             if (mode == 0) {
-                xmlpp::NodeSet n2 = elem.find("limits/enum");
+                auto n2 = elem.find("limits/enum");
                 if (!n2.empty()) {
-                    for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
+                    for (auto it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
                         xmlpp::Element& elem2 = dynamic_cast<xmlpp::Element&>(**it2);
                         m_enums.push_back(getText(elem2));
                     }
@@ -256,8 +256,8 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
             } else if (m_type == "string_list" || m_type == "option_list") {
                 //TODO: Option list should also update selection (from attribute?)
                 std::vector<std::string> value;
-                xmlpp::NodeSet n2 = elem.find("stringvalue");
-                for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
+                auto n2 = elem.find("stringvalue");
+                for (auto it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
                     value.push_back(getText(dynamic_cast<xmlpp::Element const&>(**it2)));
                 }
                 m_value = value;
@@ -276,7 +276,7 @@ fs::path userConfFile;
 
 void writeConfig(Audio& m_audio, bool system) {
     xmlpp::Document doc;
-    xmlpp::Node* nodeRoot = doc.create_root_node("performous");
+    auto nodeRoot = doc.create_root_node("performous");
     bool dirty = false;
     for (auto& elem: config) {
         ConfigItem& item = elem.second;
@@ -353,13 +353,13 @@ void readConfigXML(fs::path const& file, int mode) {
     std::clog << "config/info: Parsing " << file << std::endl;
     xmlpp::DomParser domParser(file.string());
     try {
-        xmlpp::NodeSet n = domParser.get_document()->get_root_node()->find("/performous/menu/entry");
+        auto n = domParser.get_document()->get_root_node()->find("/performous/menu/entry");
         if (!n.empty()) {
             configMenu.clear();
             std::for_each(n.begin(), n.end(), readMenuXML);
         }
         n = domParser.get_document()->get_root_node()->find("/performous/entry");
-        for (xmlpp::NodeSet::const_iterator nodeit = n.begin(), end = n.end(); nodeit != end; ++nodeit) {
+        for (auto nodeit = n.begin(), end = n.end(); nodeit != end; ++nodeit) {
             xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**nodeit);
             std::string name = getAttribute(elem, "name");
             if (name.empty()) throw std::runtime_error(file.string() + " element Entry missing name attribute");

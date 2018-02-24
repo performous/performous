@@ -87,7 +87,7 @@ SingstarCover::SingstarCover(const std::string pak_file, unsigned int track_id) 
 	xmlpp::DomParser dom;
 	std::string tmp( buf.begin(), buf.end() );
 	dom.parse_memory(tmp);
-	xmlpp::NodeSet n = dom.get_document()->get_root_node()->find(xpath, nsmap);
+	auto n = dom.get_document()->get_root_node()->find(xpath, nsmap);
 	if (n.empty()) {
 		std::string xpath_old = std::string("/TPAGE_BIT_SET/TPAGE_BIT[@NAME='") + id + "']";
 		n = dom.get_document()->get_root_node()->find(xpath_old, nsmap);

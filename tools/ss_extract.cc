@@ -70,7 +70,7 @@ void parseSentence(xmlpp::Node* node) {
 	// FIXME: Get rid of this or use SSDom's find
 	xmlpp::Node::PrefixNsMap nsmap;
 	nsmap["ss"] = "http://www.singstargame.com";
-	xmlpp::NodeSet n = elem.find("ss:NOTE", nsmap);
+	auto n = elem.find("ss:NOTE", nsmap);
 	if (n.empty()) n = elem.find("NOTE");
 	if (sleepts != -1) sleepts = ts;
 	std::for_each(n.begin(), n.end(), parseNote);
@@ -233,7 +233,7 @@ struct Process {
 				} else {
 					xmlpp::NodeSet tracks;
 					if (!dom.find("/ss:MELODY/ss:TRACK", tracks)) throw std::runtime_error("Unable to find any sentences in melody XML");
-					for (xmlpp::NodeSet::iterator it = tracks.begin(); it != tracks.end(); ++it ) {
+					for (auto it = tracks.begin(); it != tracks.end(); ++it ) {
 						xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**it);
 						std::string singer = elem.get_attribute("Artist")->get_value();
 						std::cerr << "  >>> Track from " << singer << std::endl;
@@ -271,8 +271,8 @@ void get_node(const xmlpp::Node* node, std::string& genre, std::string& year)
 		//A normal Element node:
 
 		//Print attributes:
-		const xmlpp::Element::AttributeList& attributes = nodeElement->get_attributes();
-		for(xmlpp::Element::AttributeList::const_iterator iter = attributes.begin(); iter != attributes.end(); ++iter)
+		auto attributes = nodeElement->get_attributes();
+		for(auto iter = attributes.begin(); iter != attributes.end(); ++iter)
 		{
 			const xmlpp::Attribute* attribute = *iter;
 			if (attribute->get_name() == "GENRE") genre = normalize(attribute->get_value());
@@ -283,8 +283,8 @@ void get_node(const xmlpp::Node* node, std::string& genre, std::string& year)
 	if(!nodeContent)
 	{
 		//Recurse through child nodes:
-		xmlpp::Node::NodeList list = node->get_children();
-		for(xmlpp::Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter)
+		auto list = node->get_children();
+		for(auto iter = list.begin(); iter != list.end(); ++iter)
 		{
 			get_node(*iter, genre, year); //recursive
 		}
@@ -325,7 +325,7 @@ struct FindSongs {
 		Song s;
 		s.dataPakName = dvdPath + "/pak_iop" + name[name.size() - 5] + ".pak";
 		s.edition = edition;
-		for (xmlpp::NodeSet::const_iterator it = n.begin(), end = n.end(); it != end; ++it) {
+		for (auto it = n.begin(), end = n.end(); it != end; ++it) {
 			// Extract song info
 			xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**it);
 			s.title = elem.get_attribute("TITLE")->get_value();
