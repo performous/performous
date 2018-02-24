@@ -4,6 +4,7 @@
 #include <libxml++/libxml++.h>
 #include <glibmm/convert.h>
 #include "pak.h"
+#include "config.hh"
 
 // LibXML2 logging facility
 extern "C" void xmlLogger(void* logger, char const* msg, ...) { if (logger) *(std::ostream*)logger << msg; }
@@ -17,12 +18,19 @@ std::string filename(boost::filesystem::path const& p) { return p.filename().str
 #endif
 
 namespace xmlpp {
-	// typedef Node::const_NodeSet const_NodeSet; // correct libxml++ 3.0 implementation
+#if LIBXMLPP_VERSION_2_6
 	typedef NodeSet const_NodeSet; // implementation to satisfy libxml++ 2.6 API
 
 	static inline const TextNode* get_first_child_text(const Element& element) {
 		return element.get_child_text();
 	}
+#elif LIBXMLPP_VERSION_3_0
+	typedef Node::NodeSet const_NodeSet; // correct libxml++ 3.0 implementation
+
+	static inline const TextNode* get_first_child_text(const Element& element) {
+		return element.get_first_child_text();
+	}
+#endif
 }
 
 /** Fix Singstar's b0rked XML **/
