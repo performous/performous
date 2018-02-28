@@ -2,11 +2,11 @@
 
 #include "configuration.hh"
 #include "fs.hh"
+#include "libxml++-impl.hh"
 
 #include <algorithm>
 #include <boost/regex.hpp>
 #include <boost/lexical_cast.hpp>
-#include <libxml++/libxml++.h>
 #include <unicode/stsearch.h>
 
 UErrorCode Players::m_icuError = U_ZERO_ERROR;
@@ -35,8 +35,7 @@ void Players::load(xmlpp::NodeSet const& n) {
 		std::string picture;
 		if (!n2.empty()) // optional picture element
 		{
-			xmlpp::Element& element2 =dynamic_cast<xmlpp::Element&>(**n2.begin());
-			xmlpp::TextNode* tn = element2.get_child_text();
+			auto tn = xmlpp::get_first_child_text(dynamic_cast<xmlpp::Element&>(**n2.begin()));
 			picture = tn->get_content();
 		}
 		addPlayer(a_name->get_value(), picture, id);
@@ -46,12 +45,12 @@ void Players::load(xmlpp::NodeSet const& n) {
 
 void Players::save(xmlpp::Element *players) {
 	for (auto const& p: m_players) {
-		xmlpp::Element* player = players->add_child("player");
+		xmlpp::Element* player = xmlpp::add_child_element(players, "player");
 		player->set_attribute("name", p.name);
 		player->set_attribute("id", std::to_string(p.id));
 		if (p.picture != "")
 		{
-			xmlpp::Element* picture = player->add_child("picture");
+			xmlpp::Element* picture = xmlpp::add_child_element(player, "picture");
 			picture->add_child_text(p.picture.string());
 		}
 	}

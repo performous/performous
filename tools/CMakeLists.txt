@@ -61,3 +61,5 @@ else()
 	install(TARGETS ${targets} DESTINATION bin)
 endif()
 
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
+include_directories("${CMAKE_CURRENT_BINARY_DIR}")

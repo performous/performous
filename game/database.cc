@@ -1,8 +1,8 @@
 #include "database.hh"
 
+#include "libxml++-impl.hh"
 #include "i18n.hh"
 #include <boost/filesystem.hpp>
-#include <libxml++/libxml++.h>
 #include <iostream>
 
 Database::Database(fs::path const& filename): m_filename(filename) {
@@ -33,10 +33,10 @@ void Database::save() {
 		fs::path tmp = m_filename.string() + ".tmp";
 		{
 			xmlpp::Document doc;
-			xmlpp::Node* nodeRoot = doc.create_root_node("performous");
-			m_players.save(nodeRoot->add_child("players"));
-			m_songs.save(nodeRoot->add_child("songs"));
-			m_hiscores.save(nodeRoot->add_child("hiscores"));
+			auto nodeRoot = doc.create_root_node("performous");
+			m_players.save(xmlpp::add_child_element(nodeRoot, "players"));
+			m_songs.save(xmlpp::add_child_element(nodeRoot, "songs"));
+			m_hiscores.save(xmlpp::add_child_element(nodeRoot, "hiscores"));
 			doc.write_to_file_formatted(tmp.string(), "UTF-8");
 		}
 		rename(tmp, m_filename);

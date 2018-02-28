@@ -13,8 +13,7 @@
 
 #include "player.hh"
 #include "animvalue.hh"
-
-namespace xmlpp { class Node; class Element; typedef std::vector<Node*>NodeSet; }
+#include "libxml++.hh"
 
 /**Exception which will be thrown when loading or
   saving Players fails.*/

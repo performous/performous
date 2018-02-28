@@ -1,8 +1,9 @@
 ﻿#include "opengl_text.hh"
 
+#include "libxml++-impl.hh"
+
 #include <boost/lexical_cast.hpp>
 #include "fontconfig/fontconfig.h"
-#include <libxml++/libxml++.h>
 #include <pango/pangocairo.h>
 #include <cmath>
 #include <iostream>
@@ -135,9 +136,8 @@ namespace {
 		xmlpp::Node::PrefixNsMap nsmap;
 		nsmap["svg"] = "http://www.w3.org/2000/svg";
 		xmlpp::DomParser dom(themeFile.string());
-		xmlpp::NodeSet n;
 		// Parse width attribute
-		n = dom.get_document()->get_root_node()->find("/svg:svg/@width",nsmap);
+		auto n = dom.get_document()->get_root_node()->find("/svg:svg/@width",nsmap);
 		if (n.empty()) throw std::runtime_error("Unable to find text theme info width in "+themeFile.string());
 		xmlpp::Attribute& width = dynamic_cast<xmlpp::Attribute&>(*n[0]);
 		_width = boost::lexical_cast<double>(width.get_value());

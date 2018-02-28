@@ -4,6 +4,7 @@
 #include <libxml++/libxml++.h>
 #include <glibmm/convert.h>
 #include "pak.h"
+#include "config.hh"
 
 // LibXML2 logging facility
 extern "C" void xmlLogger(void* logger, char const* msg, ...) { if (logger) *(std::ostream*)logger << msg; }
@@ -15,6 +16,22 @@ std::string filename(boost::filesystem::path const& p) { return *--p.end(); }
 #else
 std::string filename(boost::filesystem::path const& p) { return p.filename().string(); }
 #endif
+
+namespace xmlpp {
+#if LIBXMLPP_VERSION_2_6
+	typedef NodeSet const_NodeSet; // implementation to satisfy libxml++ 2.6 API
+
+	static inline const TextNode* get_first_child_text(const Element& element) {
+		return element.get_child_text();
+	}
+#elif LIBXMLPP_VERSION_3_0
+	typedef Node::NodeSet const_NodeSet; // correct libxml++ 3.0 implementation
+
+	static inline const TextNode* get_first_child_text(const Element& element) {
+		return element.get_first_child_text();
+	}
+#endif
+}
 
 /** Fix Singstar's b0rked XML **/
 std::string xmlFix(std::vector<char> const& data) {
@@ -48,18 +65,18 @@ struct SSDom: public xmlpp::DomParser {
 		}
 		nsmap["ss"] = get_document()->get_root_node()->get_namespace_uri();
 	}
-	bool find(xmlpp::Element& elem, std::string xpath, xmlpp::NodeSet& n) {
+	bool find(xmlpp::Element& elem, std::string xpath, xmlpp::const_NodeSet& n) {
 		if (nsmap["ss"].empty()) boost::erase_all(xpath, "ss:");
 		n = elem.find(xpath, nsmap);
 		return !n.empty();
 	}
-	bool find(std::string const& xpath, xmlpp::NodeSet& n) {
+	bool find(std::string const& xpath, xmlpp::const_NodeSet& n) {
 		return find(*get_document()->get_root_node(), xpath, n);
 	}
 	bool getValue(std::string const& xpath, std::string& result) {
-		xmlpp::NodeSet n;
+		xmlpp::const_NodeSet n;
 		if (!find(xpath, n)) return false;
-		result = dynamic_cast<xmlpp::Element&>(*n[0]).get_child_text()->get_content();
+		result = xmlpp::get_first_child_text(dynamic_cast<xmlpp::Element&>(*n[0]))->get_content();
 		return true;
 	}
 };

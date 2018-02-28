@@ -1,4 +1,5 @@
 #include "controllers.hh"
+#include "libxml++-impl.hh"
 
 #include "fs.hh"
 #include <boost/algorithm/string.hpp>
@@ -6,7 +7,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <boost/smart_ptr/weak_ptr.hpp>
-#include <libxml++/libxml++.h>
 #include <SDL2/SDL_joystick.h>
 #include <deque>
 #include <stdexcept>
@@ -166,9 +166,9 @@ struct Controllers::Impl {
 	}
 
 	void parseControllers(xmlpp::DomParser const& dom, std::string const& path, SourceType sourceType) {
-		xmlpp::NodeSet n = dom.get_document()->get_root_node()->find(path);
-		for (xmlpp::NodeSet::const_iterator nodeit = n.begin(), end = n.end(); nodeit != end; ++nodeit) {
-			xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**nodeit);
+		auto n = dom.get_document()->get_root_node()->find(path);
+		for (auto nodeit = n.begin(), end = n.end(); nodeit != end; ++nodeit) {
+			const xmlpp::Element& elem = dynamic_cast<const xmlpp::Element&>(**nodeit);
 			ControllerDef def;
 			def.name = getAttribute(elem, "name");
 			def.sourceType = sourceType;
@@ -185,14 +185,13 @@ struct Controllers::Impl {
 					continue;
 				}
 			}
-			xmlpp::NodeSet ns;
 			// Device description
-			ns = elem.find("description/text()");
-			if (ns.size() == 1) def.description = dynamic_cast<xmlpp::TextNode&>(*ns[0]).get_content();
+			auto ns = elem.find("description/text()");
+			if (ns.size() == 1) def.description = dynamic_cast<const xmlpp::TextNode&>(*ns[0]).get_content();
 			// Read filtering rules
 			ns = elem.find("device");
 			if (ns.size() == 1) {
-				xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(*ns[0]);
+				const xmlpp::Element& elem = dynamic_cast<const xmlpp::Element&>(*ns[0]);
 				std::string regex;
 				if (tryGetAttribute(elem, "regex", regex)) def.deviceRegex = regex;
 				parse(def.deviceMinMax, elem);
@@ -200,11 +199,11 @@ struct Controllers::Impl {
 				if (tryGetAttribute(elem, "latency", latency)) def.latency = latency;
 			}
 			ns = elem.find("channel");
-			if (ns.size() == 1) parse(def.channelMinMax, dynamic_cast<xmlpp::Element&>(*ns[0]));
+			if (ns.size() == 1) parse(def.channelMinMax, dynamic_cast<const xmlpp::Element&>(*ns[0]));
 			// Read button mapping
 			ns = elem.find("mapping/*");
-			for (xmlpp::NodeSet::const_iterator nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
-				xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**nodeit2);
+			for (auto nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
+				const xmlpp::Element& elem = dynamic_cast<const xmlpp::Element&>(**nodeit2);
 				HWButton hw;
 				if (!tryGetAttribute(elem, "hw", hw)) throw XMLError(elem, "Mandatory attribute hw is missing or invalid");
 				// Axes and hats use different HWButton ranges internally

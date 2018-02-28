@@ -1,10 +1,10 @@
 #pragma once
 
+#include "libxml++.hh"
+
 #include <set>
 #include <string>
 #include <vector>
-
-namespace xmlpp { class Node; class Element; typedef std::vector<Node*> NodeSet; }
 
 /// This struct holds together information for a single item of a highscore.
 struct HiscoreItem {

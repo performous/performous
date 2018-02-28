@@ -2,6 +2,7 @@
 
 #include "song.hh"
 #include "unicode.hh"
+#include "libxml++.hh"
 #include <sstream>
 #include <boost/filesystem.hpp>
 
@@ -17,8 +18,6 @@ namespace SongParserUtil {
 	/// Erase last character if it matches
 	void eraseLast(std::string& s, char ch = ' ');
 }
-
-namespace xmlpp { class Element; };
 
 /// parses songfiles
 class SongParser {
