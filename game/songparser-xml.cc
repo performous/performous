@@ -17,7 +17,6 @@ bool SongParser::xmlCheck(std::string const& data) const {
 	return std::equal(header.begin(), header.end(), data.begin());
 }
 
-#include <glibmm/convert.h>
 
 /*
 // LibXML2 logging facility

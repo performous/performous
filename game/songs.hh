@@ -8,9 +8,6 @@
 #include <boost/thread/thread.hpp>
 #include <set>
 #include <sstream>
-#include <unicode/tblcoll.h>
-#include <unicode/unistr.h>
-#include <unicode/utypes.h>
 #include <vector>
 #include "screen.hh"
 
@@ -97,7 +94,5 @@ class Songs: boost::noncopyable {
 	volatile bool m_loading;
 	boost::scoped_ptr<boost::thread> m_thread;
 	mutable boost::mutex m_mutex;
-	static UErrorCode m_icuError;
-	static icu::RuleBasedCollator icuCollator;
 };
 
