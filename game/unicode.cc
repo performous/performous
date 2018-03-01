@@ -9,19 +9,22 @@
 #include <stdexcept>
 
 UErrorCode UnicodeUtil::m_icuError = U_ZERO_ERROR;
-icu::RuleBasedCollator UnicodeUtil::m_dummyCollator = icu::RuleBasedCollator(icu::UnicodeString(""), icu::Collator::PRIMARY, m_icuError);
-LocalUCharsetDetectorPointer UnicodeUtil::m_chardet = LocalUCharsetDetectorPointer(ucsdet_open(&UnicodeUtil::m_icuError));
+icu::RuleBasedCollator UnicodeUtil::m_dummyCollator(icu::UnicodeString(""), icu::Collator::PRIMARY, m_icuError);
+LocalUCharsetDetectorPointer UnicodeUtil::m_chardet(ucsdet_open(&UnicodeUtil::m_icuError));
 
 MatchResult UnicodeUtil::getCharset (std::string const& str) {
 	MatchResult retval;
 	auto string = str.c_str();
-	try {
 		ucsdet_setText(UnicodeUtil::m_chardet.getAlias(), string, -1, &m_icuError);
+		if (U_FAILURE(UnicodeUtil::m_icuError)) {
+		std::string err = std::string("unicode/error: Couldn't pass text to CharsetDetector: ");
+		err.append(u_errorName(m_icuError));
+		throw std::runtime_error(err);
+		}
+		else {
 		const UCharsetMatch* match = ucsdet_detect(UnicodeUtil::m_chardet.getAlias(), &m_icuError);
-		return std::pair<const char*,int>(ucsdet_getName(match, &m_icuError), ucsdet_getConfidence(match, &m_icuError));	
-	} catch (...) {
-		std::clog << "unicode/error: Couldn't pass text to CharsetDetector: " << u_errorName(m_icuError);
-	}
+		return std::pair<const char*,int>(ucsdet_getName(match, &m_icuError), ucsdet_getConfidence(match, &m_icuError));
+		}
 }
 
 void convertToUTF8(std::stringstream &_stream, std::string _filename) {
@@ -50,7 +53,6 @@ void convertToUTF8(std::stringstream &_stream, std::string _filename) {
 			std::string tmp;
 			for (char ch; _stream.get(ch);) tmp += (ch >= 0x20 && ch < 0x7F) ? ch : '?';
 		}
-	std::clog << "unicode/info: Finished UTF8 conversion: " << _stream.str() << std::endl;
 }
 
 std::string convertToUTF8(std::string const& str) {
