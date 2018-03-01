@@ -12,6 +12,8 @@
 #include "libda/portaudio.hpp"
 #include "util.hh"
 
+#include <unordered_map>
+
 extern const double m_pi;
 using namespace boost::posix_time;
 
@@ -142,8 +144,7 @@ class Music {
 		float pitchFactor;
         Track(fs::path const& filename, unsigned int sr): mpeg(filename, sr), fadeLevel(1.0f), pitchFactor(0.0f) {}
 	};
-	typedef boost::ptr_map<std::string, Track> Tracks;
-	Tracks tracks; ///< Audio decoders
+	std::unordered_map<std::string, std::unique_ptr<Track>> tracks; ///< Audio decoders
 	double srate; ///< Sample rate
 	int64_t m_pos; ///< Current sample position
 	bool m_preview;
@@ -159,7 +160,8 @@ public:
 	{
 		for (auto const& tf /* trackname-filename pair */: files) {
 			if (tf.second.empty()) continue; // Skip tracks with no filenames; FIXME: Why do we even have those here, shouldn't they be eliminated earlier?
-			tracks.insert(tf.first, std::auto_ptr<Track>(new Track(tf.second, sr)));
+			tracks.emplace(tf.first, std::unique_ptr<Track>(new Track(tf.second, sr)));
+			//tracks.insert(tf.first, std::auto_ptr<Track>(new Track(tf.second, sr)));
 		}
 		suppressCenterChannel = config["audio/suppress_center_channel"].b();
 	}
@@ -169,7 +171,7 @@ public:
 		m_clock.timeSync(durationOf(m_pos), durationOf(samples)); // Keep the clock synced
 		bool eof = true;
 		Buffer mixbuf(end - begin);
-		for (Tracks::iterator it = tracks.begin(), itend = tracks.end(); it != itend; ++it) {
+		for (auto it = tracks.begin(); it != tracks.end(); ++it) {
 			Track& t = *it->second;
 // FIXME: Include this code bit once there is a sane pitch shifting algorithm
 #if 0
@@ -215,7 +217,7 @@ public:
 	double pos() const { return m_clock.pos(); }
 	double duration() const {
 		double dur = 0.0;
-		for (Tracks::const_iterator it = tracks.begin(), itend = tracks.end(); it != itend; ++it) {
+		for (auto it = tracks.begin(); it != tracks.end(); ++it) {
 			dur = std::max(dur, it->second->mpeg.audioQueue.duration());
 		}
 		return dur;
@@ -223,7 +225,7 @@ public:
 	/// Prepare (seek) all tracks to current position, return true when done (nonblocking)
 	bool prepare() {
 		bool ready = true;
-		for (Tracks::iterator it = tracks.begin(), itend = tracks.end(); it != itend; ++it) {
+		for (auto it = tracks.begin(); it != tracks.end(); ++it) {
 			FFmpeg& mpeg = it->second->mpeg;
 			if (mpeg.terminating()) continue;  // Song loading failed or other error, won't ever get ready
 			if (mpeg.audioQueue.prepare(m_pos)) continue;  // Buffering done
@@ -233,12 +235,12 @@ public:
 		return ready;
 	}
 	void trackFade(std::string const& name, double fadeLevel) {
-		Tracks::iterator it = tracks.find(name);
+		auto it = tracks.find(name);
 		if (it == tracks.end()) return;
 		it->second->fadeLevel = fadeLevel;
 	}
 	void trackPitchBend(std::string const& name, double pitchFactor) {
-		Tracks::iterator it = tracks.find(name);
+		auto it = tracks.find(name);
 		if (it == tracks.end()) return;
 		it->second->pitchFactor = pitchFactor;
 	}
