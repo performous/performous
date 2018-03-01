@@ -314,11 +314,11 @@ struct Output {
 	boost::mutex mutex;
 	boost::mutex samples_mutex;
 	boost::mutex synth_mutex;
-	std::auto_ptr<Synth> synth;
+	std::unique_ptr<Synth> synth;
 	std::auto_ptr<Music> preloading;
 	boost::ptr_vector<Music> playing, disposing;
 	std::vector<Analyzer*> mics;  // Used for audio pass-through
-	boost::ptr_map<std::string, Sample> samples;
+	std::unordered_map<std::string, std::unique_ptr<Sample>> samples;
 	std::vector<Command> commands;
 	volatile bool paused;
 	Output(): paused(false) {}
@@ -341,7 +341,7 @@ struct Output {
 				if (!playing.empty()) playing[0].trackPitchBend(cmd.track, cmd.factor);
 				break;
 			case Command::SAMPLE_RESET:
-				boost::ptr_map<std::string, Sample>::iterator it = samples.find(cmd.track);
+				auto it = samples.find(cmd.track);
 				if (it != samples.end())
 					it->second->reset();
 				break;
@@ -378,7 +378,7 @@ struct Output {
 			// samples should not be created/destroyed on the fly
 			boost::mutex::scoped_try_lock l(samples_mutex, boost::defer_lock);
 			if(l.try_lock()) {
-				for(boost::ptr_map<std::string, Sample>::iterator it = samples.begin() ; it != samples.end() ; ++it) {
+				for(auto it = samples.begin() ; it != samples.end() ; ++it) {
 					(*it->second)(begin, end);
 				}
 			}
@@ -539,7 +539,7 @@ bool Audio::hasPlayback() const {
 
 void Audio::loadSample(std::string const& streamId, fs::path const& filename) {
 	boost::mutex::scoped_lock l(self->output.samples_mutex);
-	self->output.samples.insert(streamId, std::auto_ptr<Sample>(new Sample(filename, getSR())));
+	self->output.samples.emplace(streamId, std::unique_ptr<Sample>(new Sample(filename, getSR())));
 }
 
 void Audio::playSample(std::string const& streamId) {
