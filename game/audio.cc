@@ -167,17 +167,11 @@ public:
 	}
 	/// Sums the stream to output sample range, returns true if the stream still has audio left afterwards.
 	bool operator()(float* begin, float* end) {
-		if (tracks.size() > 1) std::clog << "operator()/debug: Entered operator()." << std::endl;
 		size_t samples = end - begin;
 		m_clock.timeSync(durationOf(m_pos), durationOf(samples)); // Keep the clock synced
 		bool eof = true;
 		Buffer mixbuf(end - begin);
-		if (tracks.size() > 1) std::clog << "operator()/debug: Before loopings tracks. We've got " << tracks.size() << " tracks." << std::endl;
-		int j = 0;
 		for (auto it = tracks.begin(); it != tracks.end(); ++it) {
-			std::string iname = it->first;
-			if (tracks.size() > 1) std::clog << "operator()/debug: Iteration number: " << j << "in loop: " << iname << std::endl;
-			++j;
 			Track& t = *it->second;
 // FIXME: Include this code bit once there is a sane pitch shifting algorithm
 #if 0
@@ -361,15 +355,17 @@ struct Output {
 		std::fill(begin, end, 0.0f);
 		if (paused) return;
 		// Mix in from the streams currently playing
-		for (auto i = playing.begin(); i != playing.end(); ++i) {
+		auto arrayEnd = playing.end();
+		for (auto i = playing.begin(); i != arrayEnd;) {
 			bool keep = (*i->get())(begin, end);  // Do the actual mixing
 			boost::mutex::scoped_try_lock l(mutex, boost::defer_lock);
 			if (!keep && l.try_lock()) {
 				// Dispose streams no longer needed by moving them to another container (that will be cleared by another thread).
 				disposing.push_back(std::move(*i));
-				playing.erase(i);
-				continue;
+				i = playing.erase(i);
+				arrayEnd = playing.end();
 			}
+			else { ++i; }
 		}
 		// Mix in microphones (if pass-through is enabled)
 		if (mics.size() > 0 && config["audio/pass-through"].b()) {
