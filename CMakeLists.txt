@@ -26,22 +26,19 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
 	add_definitions("-DNDEBUG")
 endif()
 
-# Enable C++11 support and other compiler flags...
+# Enable C++17 support and other compiler flags...
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
 	message("Detected GCC version ${GCC_VERSION}")
-	if (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7)
-		set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -fcx-limited-range ${CMAKE_CXX_FLAGS}")
-	elseif (GCC_VERSION VERSION_GREATER 4.6 OR GCC_VERSION VERSION_EQUAL 4.6)
-		set(CMAKE_CXX_FLAGS "-std=c++0x -Wall -Wextra -fcx-limited-range ${CMAKE_CXX_FLAGS}")
-		add_definitions("-Doverride=")  # Hack: GCC 4.6 doesn't understand C++11 "override" keyword
+	if (GCC_VERSION VERSION_GREATER 5.4 OR GCC_VERSION VERSION_EQUAL 5.4)
+		set(CMAKE_CXX_FLAGS "-std=c++17 -Wall -Wextra -fcx-limited-range ${CMAKE_CXX_FLAGS}")
 	else()
-		message(FATAL_ERROR "Your GCC compiler does not support c++11, please install at least gcc 4.6")
+		message(FATAL_ERROR "Your C++ compiler is too old, please install at least gcc 5.4")
 	endif()
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra ${CMAKE_CXX_FLAGS}")
+	set(CMAKE_CXX_FLAGS "-std=c++17 -Wall -Wextra ${CMAKE_CXX_FLAGS}")
 endif()
 
 if(WIN32)
