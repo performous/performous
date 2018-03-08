@@ -41,7 +41,7 @@ namespace SongParserUtil {
 
 
 /// constructor
-SongParser::SongParser(Song& s) try:
+SongParser::SongParser(Song& s):
   m_song(s),
   m_linenum(),
   m_relative(),
@@ -53,51 +53,53 @@ SongParser::SongParser(Song& s) try:
   m_tsPerBeat(),
   m_tsEnd()
 {
-	enum { NONE, TXT, XML, INI, SM } type = NONE;
-	// Read the file, determine the type and do some initial validation checks
-	{
-		fs::ifstream f(s.filename, std::ios::binary);
-		if (!f.is_open()) throw SongParserException(s, "Could not open song file", 0);
-		m_ss << f.rdbuf();
-		int size = m_ss.str().length();
-		if (size < 10 || size > 100000) throw SongParserException(s, "Does not look like a song file (wrong size)", 1, true);
-		// Convert m_ss; filename supplied for possible warning messages
-		convertToUTF8(m_ss, s.filename.string());
+	try {
+		enum { NONE, TXT, XML, INI, SM } type = NONE;
+		// Read the file, determine the type and do some initial validation checks
+		{
+			fs::ifstream f(s.filename, std::ios::binary);
+			if (!f.is_open()) throw SongParserException(s, "Could not open song file", 0);
+			m_ss << f.rdbuf();
+			int size = m_ss.str().length();
+			if (size < 10 || size > 100000) throw SongParserException(s, "Does not look like a song file (wrong size)", 1, true);
+			// Convert m_ss; filename supplied for possible warning messages
+			convertToUTF8(m_ss, s.filename.string());
 
-		if (smCheck(m_ss.str())) type = SM;
-		else if (txtCheck(m_ss.str())) type = TXT;
-		else if (iniCheck(m_ss.str())) type = INI;
-		else if (xmlCheck(m_ss.str())) type = XML;
-		else throw SongParserException(s, "Does not look like a song file (wrong header)", 1, true);
+			if (smCheck(m_ss.str())) type = SM;
+			else if (txtCheck(m_ss.str())) type = TXT;
+			else if (iniCheck(m_ss.str())) type = INI;
+			else if (xmlCheck(m_ss.str())) type = XML;
+			else throw SongParserException(s, "Does not look like a song file (wrong header)", 1, true);
+		}
+		// Header already parsed?
+		if (s.loadStatus == Song::HEADER) {
+			if (type == TXT) txtParse();
+			else if (type == INI) midParse();  // INI doesn't contain notes, parse those from MIDI
+			else if (type == XML) xmlParse();
+			else if (type == SM) smParse();
+			finalize(); // Do some adjusting to the notes
+			s.loadStatus = Song::FULL;
+			return;
+		}
+		// Parse only header to speed up loading and conserve memory
+		if (type == TXT) txtParseHeader();
+		else if (type == INI) iniParseHeader();
+		else if (type == XML) xmlParseHeader();
+		else if (type == SM) { smParseHeader(); s.dropNotes(); } // Hack: drop notes here
+		// Default for preview position if none was specified in header
+		if (s.preview_start != s.preview_start) s.preview_start = (type == INI ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
+
+		guessFiles();
+		if (!m_song.midifilename.empty()) midParseHeader();
+
+		s.loadStatus = Song::HEADER;
+	} catch (SongParserException&) {
+		throw;
+	} catch (std::runtime_error& e) {
+		throw SongParserException(m_song, e.what(), m_linenum);
+	} catch (std::exception& e) {
+		throw SongParserException(m_song, "Internal error: " + std::string(e.what()), m_linenum);
 	}
-	// Header already parsed?
-	if (s.loadStatus == Song::HEADER) {
-		if (type == TXT) txtParse();
-		else if (type == INI) midParse();  // INI doesn't contain notes, parse those from MIDI
-		else if (type == XML) xmlParse();
-		else if (type == SM) smParse();
-		finalize(); // Do some adjusting to the notes
-		s.loadStatus = Song::FULL;
-		return;
-	}
-	// Parse only header to speed up loading and conserve memory
-	if (type == TXT) txtParseHeader();
-	else if (type == INI) iniParseHeader();
-	else if (type == XML) xmlParseHeader();
-	else if (type == SM) { smParseHeader(); s.dropNotes(); } // Hack: drop notes here
-	// Default for preview position if none was specified in header
-	if (s.preview_start != s.preview_start) s.preview_start = (type == INI ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
-
-	guessFiles();
-	if (!m_song.midifilename.empty()) midParseHeader();
-
-	s.loadStatus = Song::HEADER;
-} catch (SongParserException&) {
-	throw;
-} catch (std::runtime_error& e) {
-	throw SongParserException(m_song, e.what(), m_linenum);
-} catch (std::exception& e) {
-	throw SongParserException(m_song, "Internal error: " + std::string(e.what()), m_linenum);
 }
 
 void SongParser::guessFiles() {
