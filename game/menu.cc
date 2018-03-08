@@ -59,9 +59,8 @@ void Menu::action(int dir) {
 			break;
 		}
 		case MenuOption::SET_AND_CLOSE:
-			// Fall-through to closing
 			if (current().value) *(current().value) = current().newValue;
-			[[gnu::fallthrough]] // hint GCC that we want to fallthrough (C++11 and C++14)
+			[[fallthrough]];  // Continuing to CLOSE_SUBMENU is intentional
 		case MenuOption::CLOSE_SUBMENU: {
 			closeSubmenu();
 			break;
