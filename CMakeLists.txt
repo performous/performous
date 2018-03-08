@@ -38,7 +38,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	set(CMAKE_CXX_FLAGS "-std=c++17 -Wall -Wextra ${CMAKE_CXX_FLAGS}")
+	set(CMAKE_CXX_FLAGS "-std=c++1z -Wall -Wextra ${CMAKE_CXX_FLAGS}")
 endif()
 
 if(WIN32)
