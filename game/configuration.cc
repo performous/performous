@@ -157,11 +157,11 @@ namespace {
     }
     template <typename T, typename V> void setLimits(xmlpp::Element& e, V& min, V& max, V& step) {
         xmlpp::Attribute* a = e.get_attribute("min");
-        if (a) min = std::stod(a->get_value());
+        if (a) min = sconv<T>(a->get_value());
         a = e.get_attribute("max");
-        if (a) max = std::stod(a->get_value());
+        if (a) max = sconv<T>(a->get_value());
         a = e.get_attribute("step");
-        if (a) step = std::stod(a->get_value());
+        if (a) step = sconv<T>(a->get_value());
     }
 }
 
@@ -204,7 +204,7 @@ template <typename T> void ConfigItem::updateNumeric(xmlpp::Element& elem, int m
         std::string m;
         try {
             m = getAttribute(e, "multiplier");
-            m_multiplier = static_cast<T>(std::stod(m));
+            m_multiplier = sconv<T>(m);
         } catch (XMLError&) {}
         catch (std::exception&) { throw XMLError(e, "attribute multiplier='" + m + "' value invalid"); }
     }

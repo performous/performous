@@ -23,12 +23,6 @@ namespace {
 		if (!a) throw XMLError(elem, "attribute " + attr + " not found");
 		return a->get_value();
 	}
-	template <typename T> T sconv(std::string const& s);
-	template <> int sconv(std::string const& s) { return std::stoi(s); }
-	template <> unsigned int sconv(std::string const& s) { return std::stoul(s); }
-	template <> double sconv(std::string const& s) { return std::stod(s); }
-	template <> std::string sconv(std::string const& s) { return s; }
-	
 	template <typename T> bool tryGetAttribute(xmlpp::Element const& elem, std::string const& attr, T& var) {
 		xmlpp::Attribute const* a = elem.get_attribute(attr);
 		if (!a) return false;
