@@ -26,14 +26,14 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
 	add_definitions("-DNDEBUG")
 endif()
 
-# Enable C++17 support and other compiler flags...
+# Enable C++14 support and other compiler flags...
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
 	message("Detected GCC version ${GCC_VERSION}")
 	if (GCC_VERSION VERSION_GREATER 7 OR GCC_VERSION VERSION_EQUAL 7)
-		set(CMAKE_CXX_FLAGS "-std=c++17 -Wall -Wextra -fcx-limited-range ${CMAKE_CXX_FLAGS}")
-	elseif (GCC_VERSION VERSION_GREATER 5.4 OR GCC_VERSION VERSION_EQUAL 5.4)
-		set(CMAKE_CXX_FLAGS "-std=c++17 -Wall -Wextra -Wno-attributes -Wno-deprecated-declarations -fcx-limited-range ${CMAKE_CXX_FLAGS}")
+		set(CMAKE_CXX_FLAGS "-std=c++14 -Wall -Wextra -fcx-limited-range ${CMAKE_CXX_FLAGS}")
+	elseif (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
+		set(CMAKE_CXX_FLAGS "-std=c++1y -Wall -Wextra -Wno-attributes -Wno-deprecated-declarations -fcx-limited-range ${CMAKE_CXX_FLAGS}")
 		message(WARNING "Your GCC is rather old, disabling some useful compiler warnings (GCC 7+ or Clang 5+ recommended for proper C++17 support).")
 	else()
 		message(FATAL_ERROR "Your C++ compiler is too old, please upgrade.")
