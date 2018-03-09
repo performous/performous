@@ -62,7 +62,7 @@ void WebServer::StartServer(int tried, bool fallbackPortInUse = false) {
 	try {
 		m_server->run();
 	}
-	catch (exception& e)
+	catch (std::exception& e)
 	{
 		tried = tried + 1;
 		std::clog << "webserver/error: " << e.what() << " Trying again... (tried " << tried << " times)." << std::endl;
@@ -171,7 +171,7 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 	} else if(request.destination == "/api/getplaylistTimeout") {
 		return http_server::response::stock_reply(http_server::response::ok, std::to_string(config["game/playlist_screen_timeout"].i()));
 	} else if(request.destination.find("/api/language") == 0) {
-		map<std::string, std::string> localeMap = GenerateLocaleDict();
+		auto localeMap = GenerateLocaleDict();
 		
 		Json::Value jsonRoot = Json::objectValue;
 		for (auto const &kv : localeMap) {
@@ -296,9 +296,9 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 std::map<std::string, std::string> WebServer::GenerateLocaleDict() {
 	std::vector<std::string> translationKeys = GetTranslationKeys();
     
-    map<std::string, std::string> localeMap;
+    std::map<std::string, std::string> localeMap;
     for (auto const &translationKey : translationKeys) {
-		localeMap.insert(pair<std::string, std::string>(translationKey, _(translationKey)));
+		localeMap[translationKey] = _(translationKey);
 	}
     return localeMap;
 }
