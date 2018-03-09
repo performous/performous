@@ -4,7 +4,6 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/lexical_cast.hpp>
 #include <cmath>
 #include <iostream>
 #include <map>

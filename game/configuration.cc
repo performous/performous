@@ -8,7 +8,6 @@
 #include "screen_intro.hh"
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
-#include <boost/lexical_cast.hpp>
 #include <algorithm>
 #include <iomanip>
 #include <stdexcept>
@@ -158,11 +157,11 @@ namespace {
     }
     template <typename T, typename V> void setLimits(xmlpp::Element& e, V& min, V& max, V& step) {
         xmlpp::Attribute* a = e.get_attribute("min");
-        if (a) min = boost::lexical_cast<T>(a->get_value());
+        if (a) min = std::stod(a->get_value());
         a = e.get_attribute("max");
-        if (a) max = boost::lexical_cast<T>(a->get_value());
+        if (a) max = std::stod(a->get_value());
         a = e.get_attribute("step");
-        if (a) step = boost::lexical_cast<T>(a->get_value());
+        if (a) step = std::stod(a->get_value());
     }
 }
 
@@ -205,9 +204,9 @@ template <typename T> void ConfigItem::updateNumeric(xmlpp::Element& elem, int m
         std::string m;
         try {
             m = getAttribute(e, "multiplier");
-            m_multiplier = boost::lexical_cast<T>(m);
+            m_multiplier = static_cast<T>(std::stod(m));
         } catch (XMLError&) {}
-        catch (boost::bad_lexical_cast&) { throw XMLError(e, "attribute multiplier='" + m + "' value invalid"); }
+        catch (std::exception&) { throw XMLError(e, "attribute multiplier='" + m + "' value invalid"); }
     }
 }
 
@@ -232,7 +231,7 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
         m_value = value;
     } else if (m_type == "int") {
         std::string value_string = getAttribute(elem, "value");
-        if (!value_string.empty()) m_value = boost::lexical_cast<int>(value_string);
+        if (!value_string.empty()) m_value = std::stoi(value_string);
             // Enum handling
             if (mode == 0) {
                 auto n2 = elem.find("limits/enum");
@@ -249,7 +248,7 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
         updateNumeric<int>(elem, mode);
     } else if (m_type == "float") {
         std::string value_string = getAttribute(elem, "value");
-        if (!value_string.empty()) m_value = boost::lexical_cast<double>(value_string);
+        if (!value_string.empty()) m_value = std::stod(value_string);
             updateNumeric<double>(elem, mode);
             } else if (m_type == "string") {
                 m_value = getText(elem, "stringvalue");
@@ -267,7 +266,7 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
         if (mode < 2) m_defaultValue = m_value;
             } catch (std::exception& e) {
                 int line = elem.get_line();
-                throw std::runtime_error(boost::lexical_cast<std::string>(line) + ": Error while reading entry: " + e.what());
+                throw std::runtime_error(std::to_string(line) + ": Error while reading entry: " + e.what());
             }
 
 // These are set in readConfig, once the paths have been bootstrapped.
@@ -387,7 +386,7 @@ void readConfigXML(fs::path const& file, int mode) {
     } catch (XMLError& e) {
         int line = e.elem.get_line();
         std::string name = e.elem.get_name();
-        throw std::runtime_error(file.string() + ":" + boost::lexical_cast<std::string>(line) + " element " + name + " " + e.message);
+        throw std::runtime_error(file.string() + ":" + std::to_string(line) + " element " + name + " " + e.message);
     } catch (std::exception& e) {
         throw std::runtime_error(file.string() + ":" + e.what());
     }

@@ -6,7 +6,6 @@
 #include "util.hh"
 
 #include <boost/thread.hpp>
-#include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <cstdlib>
 
@@ -57,7 +56,7 @@ void Game::drawScreen() {
 
 void Game::loading(std::string const& message, float progress) {
 	// TODO: Create a better one, this is quite ugly
-	flashMessage(message + " " + boost::lexical_cast<std::string>(int(round(progress*100))) + "%", 0.0f, 0.5f, 0.2f);
+	flashMessage(message + " " + std::to_string(int(round(progress*100))) + "%", 0.0f, 0.5f, 0.2f);
 	m_loadingProgress = progress;
 	m_window.blank();
 	m_window.render(boost::bind(&Game::drawLoading, this));

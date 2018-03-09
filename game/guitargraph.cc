@@ -6,7 +6,6 @@
 #include <cmath>
 #include <cstdlib>
 #include <stdexcept>
-#include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 
 namespace {
@@ -154,7 +153,7 @@ void GuitarGraph::setupJoinMenuDifficulty() {
 	// Add difficulties to the option list
 	for (int level = 0; level < DIFFICULTYCOUNT; ++level) {
 		if (difficulty(Difficulty(level), true)) {
-			ol.push_back(boost::lexical_cast<std::string>(level));
+			ol.push_back(std::to_string(level));
 			if (Difficulty(level) == m_level) cur = ol.size()-1;
 		}
 	}
@@ -342,8 +341,8 @@ void GuitarGraph::engine() {
 			}
 			// See if anything changed
 			if (!m_drums && m_selectedTrack.so() != m_track_index->first) setTrack(m_selectedTrack.so());
-			else if (boost::lexical_cast<int>(m_selectedDifficulty.so()) != m_level)
-				difficulty(Difficulty(boost::lexical_cast<int>(m_selectedDifficulty.so())));
+			else if (std::stoi(m_selectedDifficulty.so()) != m_level)
+				difficulty(Difficulty(std::stoi(m_selectedDifficulty.so())));
 			else if (m_rejoin.b()) { unjoin(); setupJoinMenu(); m_dev->pushEvent(input::Event()); /* FIXME: HACK! */ }
 			// Sync menu items & captions
 			updateJoinMenu();
@@ -390,7 +389,7 @@ void GuitarGraph::engine() {
 		if (m_solo) { m_soloScore += m_chordIt->score; m_soloTotal += m_chordIt->polyphony * points(0);
 		// Solo just ended?
 		} else if (m_soloTotal > 0) {
-			m_popups.push_back(Popup(boost::lexical_cast<std::string>(unsigned(m_soloScore / m_soloTotal * 100)) + " %",
+			m_popups.push_back(Popup(std::to_string(unsigned(m_soloScore / m_soloTotal * 100)) + " %",
 			  Color(0.0, 0.8, 0.0), 1.0, m_popupText.get()));
 			m_soloScore = 0;
 			m_soloTotal = 0;
@@ -447,7 +446,7 @@ void GuitarGraph::engine() {
 	if (m_streak >= getNextBigStreak(m_bigStreak)) {
 		m_bigStreak = getNextBigStreak(m_bigStreak);
 		m_starmeter += streakStarBonus;
-		m_popups.push_back(Popup(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\n" + _("Streak!"),
+		m_popups.push_back(Popup(std::to_string(unsigned(m_bigStreak)) + "\n" + _("Streak!"),
 		  Color(1.0, 0.0, 0.0), 1.0, m_popupText.get()));
 	}
 	// During GodMode, correctness is full, no matter what
@@ -1098,8 +1097,8 @@ void GuitarGraph::drawInfo(double time) {
 		// Draw streak counter
 		{
 			ColorTrans c(Color(0.6, 0.6, 0.7, 0.95));
-			m_streakText->render(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/"
-			  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
+			m_streakText->render(std::to_string(unsigned(m_streak)) + "/"
+			  + std::to_string(unsigned(m_longestStreak)));
 			m_streakText->dimensions().middle(-xcor).fixedHeight(h*0.75).screenBottom(-0.18);
 			m_streakText->draw();
 		}
