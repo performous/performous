@@ -412,6 +412,11 @@ void Device::start() {
 	if (err != paNoError) throw std::runtime_error(std::string("Pa_StartStream: ") + Pa_GetErrorText(err));
 }
 
+void Device::stop() {
+	PaError err = Pa_StopStream(stream);
+	if (err != paNoError) throw std::runtime_error(std::string("Pa_StopStream: ") + Pa_GetErrorText(err));
+}
+
 int Device::operator()(void const* input, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags) try {
 	float const* inbuf = static_cast<float const*>(input);
 	float* outbuf = static_cast<float*>(output);
@@ -515,6 +520,14 @@ struct Audio::Impl {
 		// Assign mic buffers to the output for pass-through
 		for (size_t i = 0; i < analyzers.size(); ++i)
 			output.mics.push_back(&analyzers[i]);
+	}
+	~Impl() {
+		// stop all audio streams befor destoying the object.
+		// else portaudio will keep sending data to those destroyed
+		// objects.
+		for (auto device: devices) {
+			device.stop();
+		}
 	}
 };
 

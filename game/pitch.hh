@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <cmath>
 
+#include <boost/noncopyable.hpp>
+
 /// struct to represent tones
 struct Tone {
 	static const std::size_t MAXHARM = 48; ///< The maximum number of harmonics tracked
@@ -15,7 +17,7 @@ struct Tone {
 	double stabledb; ///< Stable level, useful for graphics rendering
 	double harmonics[MAXHARM]; ///< Harmonics' levels
 	std::size_t age; ///< How many times the tone has been detected in row
-	Tone(); 
+	Tone();
 	void print() const; ///< Prints Tone to std::cout
 	bool operator==(double f) const; ///< Compare for rough frequency match
 	/// Less-than compare by levels (instead of frequencies like operator< does)
@@ -67,7 +69,7 @@ private:
 /// analyzer class
  /** class to analyze input audio and transform it into useable data
  */
-class Analyzer {
+class Analyzer: boost::noncopyable {
 public:
 	/// fast fourier transform vector
 	typedef std::vector<std::complex<float> > fft_t;
