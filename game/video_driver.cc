@@ -54,13 +54,6 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK))
 		throw std::runtime_error(std::string("SDL_Init failed: ") + SDL_GetError());
 	SDL_JoystickEventState(SDL_ENABLE);
-	SDL_SetWindowTitle(screen, PACKAGE " " VERSION);
-	{
-		SDL_Surface* icon = SDL_LoadBMP(findFile("icon.bmp").string().c_str());
-		SDL_SetWindowIcon(screen,icon);
-		SDL_FreeSurface(icon);
-	}
-
 	{ // Setup GL attributes for context creation
 		GLattrSetter attr_r(SDL_GL_RED_SIZE, 8);
 		GLattrSetter attr_g(SDL_GL_GREEN_SIZE, 8);
@@ -77,6 +70,12 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 		SDL_GL_CreateContext(screen);
 
 	}
+// 	{
+// 		SDL_Surface* icon = SDL_LoadBMP(findFile("icon.bmp").string().c_str());
+// 		SDL_SetWindowIcon(screen,icon);
+// 		SDL_FreeSurface(icon);
+// 	}
+
 	if (!m_fullscreen) {
 		config["graphic/window_width"].i() = s_width;
 		config["graphic/window_height"].i() = s_height;
