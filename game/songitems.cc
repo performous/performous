@@ -6,7 +6,6 @@
 #include <string>
 
 #include <boost/shared_ptr.hpp>
-#include <boost/lexical_cast.hpp>
 
 
 void SongItems::load(xmlpp::NodeSet const& n) {
@@ -22,7 +21,7 @@ void SongItems::load(xmlpp::NodeSet const& n) {
 		xmlpp::Attribute* a_title = element.get_attribute("title");
 		if (!a_title) throw SongItemsException("No attribute title");
 
-		addSongItem(a_artist->get_value(), a_title->get_value(), boost::lexical_cast<int>(a_id->get_value()));
+		addSongItem(a_artist->get_value(), a_title->get_value(), std::stoi(a_id->get_value()));
 	}
 }
 

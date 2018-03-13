@@ -2,7 +2,6 @@
 #include "song.hh"
 #include "i18n.hh"
 
-#include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <algorithm>
 
@@ -124,7 +123,7 @@ void DanceGraph::setupJoinMenu() {
 		// Add difficulties to the option list
 		for (int level = 0; level < DIFFICULTYCOUNT; ++level) {
 			if (difficulty(DanceDifficulty(level), true)) {
-				ol.push_back(boost::lexical_cast<std::string>(level));
+				ol.push_back(std::to_string(level));
 				if (DanceDifficulty(level) == m_level) cur = i;
 				++i;
 			}
@@ -268,8 +267,8 @@ void DanceGraph::engine() {
 			difficulty_changed = true;
 			// See if anything changed
 			if (m_selectedTrack.so() != m_gamingMode) setTrack(m_selectedTrack.so());
-			else if (boost::lexical_cast<int>(m_selectedDifficulty.so()) != m_level)
-				difficulty(DanceDifficulty(boost::lexical_cast<int>(m_selectedDifficulty.so())));
+			else if (std::stoi(m_selectedDifficulty.so()) != m_level)
+				difficulty(DanceDifficulty(std::stoi(m_selectedDifficulty.so())));
 			else if (m_rejoin.b()) { unjoin(); setupJoinMenu(); m_dev->pushEvent(input::Event()); /* FIXME: HACK? */ }
 			// Sync dynamic stuff
 			updateJoinMenu();
@@ -318,7 +317,7 @@ void DanceGraph::engine() {
 	// Check if a long streak goal has been reached
 	if (m_streak >= getNextBigStreak(m_bigStreak)) {
 		m_bigStreak = getNextBigStreak(m_bigStreak);
-		m_popups.push_back(Popup(boost::lexical_cast<std::string>(unsigned(m_bigStreak)) + "\n" + _("Streak!"),
+		m_popups.push_back(Popup(std::to_string(unsigned(m_bigStreak)) + "\n" + _("Streak!"),
 		  Color(1.0, 0.0, 0.0), 1.0, m_popupText.get()));
 	}
 }
@@ -535,10 +534,10 @@ void DanceGraph::drawInfo(double /*time*/, Dimensions dimensions) {
 	if (!menuOpen()) {
 		// Draw scores
 		m_text.dimensions.screenBottom(-0.35).middle(0.32 * dimensions.w());
-		m_text.draw(boost::lexical_cast<std::string>(unsigned(getScore())));
+		m_text.draw(std::to_string(unsigned(getScore())));
 		m_text.dimensions.screenBottom(-0.32).middle(0.32 * dimensions.w());
-		m_text.draw(boost::lexical_cast<std::string>(unsigned(m_streak)) + "/"
-		  + boost::lexical_cast<std::string>(unsigned(m_longestStreak)));
+		m_text.draw(std::to_string(unsigned(m_streak)) + "/"
+		  + std::to_string(unsigned(m_longestStreak)));
 	}
 	drawPopups();
 }

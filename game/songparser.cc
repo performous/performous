@@ -2,21 +2,20 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem/fstream.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 
 
 namespace SongParserUtil {
 	void assign(int& var, std::string const& str) {
 		try {
-			var = boost::lexical_cast<int>(str);
+			var = std::stoi(str);
 		} catch (...) {
 			throw std::runtime_error("\"" + str + "\" is not valid integer value");
 		}
 	}
 	void assign(unsigned& var, std::string const& str) {
 		try {
-			var = boost::lexical_cast<int>(str);
+			var = std::stoi(str);
 		} catch (...) {
 			throw std::runtime_error("\"" + str + "\" is not valid unsigned integer value");
 		}
@@ -24,7 +23,7 @@ namespace SongParserUtil {
 	void assign(double& var, std::string str) {
 		std::replace(str.begin(), str.end(), ',', '.'); // Fix decimal separators
 		try {
-			var = boost::lexical_cast<double>(str);
+			var = std::stod(str);
 		} catch (...) {
 			throw std::runtime_error("\"" + str + "\" is not valid floating point value");
 		}

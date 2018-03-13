@@ -16,7 +16,6 @@
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <unicode/stsearch.h>
 

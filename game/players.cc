@@ -6,7 +6,6 @@
 
 #include <algorithm>
 #include <boost/regex.hpp>
-#include <boost/lexical_cast.hpp>
 #include <unicode/stsearch.h>
 
 UErrorCode Players::m_icuError = U_ZERO_ERROR;
@@ -30,7 +29,7 @@ void Players::load(xmlpp::NodeSet const& n) {
 		xmlpp::Attribute* a_id = element.get_attribute("id");
 		if (!a_id) throw PlayersException("Attribute id not found");
 		int id = -1;
-		try {id = boost::lexical_cast<int>(a_id->get_value());} catch (boost::bad_lexical_cast const&) { }
+		try { id = std::stoi(a_id->get_value()); } catch (std::exception&) { }
 		xmlpp::NodeSet n2 = element.find("picture");
 		std::string picture;
 		if (!n2.empty()) // optional picture element
