@@ -24,5 +24,4 @@ static MatchResult getCharset(std::string const& str);
 private:
 static UErrorCode m_icuError;
 static icu::RuleBasedCollator m_dummyCollator;
-static LocalUCharsetDetectorPointer m_chardet;
 };

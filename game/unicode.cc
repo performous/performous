@@ -10,19 +10,19 @@
 
 UErrorCode UnicodeUtil::m_icuError = U_ZERO_ERROR;
 icu::RuleBasedCollator UnicodeUtil::m_dummyCollator(icu::UnicodeString(""), icu::Collator::PRIMARY, m_icuError);
-LocalUCharsetDetectorPointer UnicodeUtil::m_chardet(ucsdet_open(&UnicodeUtil::m_icuError));
 
 MatchResult UnicodeUtil::getCharset (std::string const& str) {
 	MatchResult retval;
+	LocalUCharsetDetectorPointer m_chardet(ucsdet_open(&UnicodeUtil::m_icuError));
 	auto string = str.c_str();
-		ucsdet_setText(UnicodeUtil::m_chardet.getAlias(), string, -1, &m_icuError);
+		ucsdet_setText(m_chardet.getAlias(), string, -1, &m_icuError);
 		if (U_FAILURE(UnicodeUtil::m_icuError)) {
 		std::string err = std::string("unicode/error: Couldn't pass text to CharsetDetector: ");
 		err.append(u_errorName(m_icuError));
 		throw std::runtime_error(err);
 		}
 		else {
-		const UCharsetMatch* match = ucsdet_detect(UnicodeUtil::m_chardet.getAlias(), &m_icuError);
+		const UCharsetMatch* match = ucsdet_detect(m_chardet.getAlias(), &m_icuError);
 		return std::pair<const char*,int>(ucsdet_getName(match, &m_icuError), ucsdet_getConfidence(match, &m_icuError));
 		}
 }
