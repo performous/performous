@@ -18,16 +18,16 @@ if(LibXML++_PKGCONF_3_0_FOUND)
   set(LibXML++_VERSION "3.0")
   set(LibXML++_VERSION_2_6 "0")
   set(LibXML++_VERSION_3_0 "1")
-  set(libXML++_PKGCONF_INCLUDE_DIRS ${LibXML++PKGCONF_3_0_INCLUDE_DIRS})
-  set(libXML++_PKGCONF_LIBRARY_DIRS ${LibXML++PKGCONF_3_0_LIBRARY_DIRS})
+  set(LibXML++_PKGCONF_INCLUDE_DIRS ${LibXML++_PKGCONF_3_0_INCLUDE_DIRS})
+  set(LibXML++_PKGCONF_LIBRARY_DIRS ${LibXML++_PKGCONF_3_0_LIBRARY_DIRS})
 else(LixXML++_PKGCONF_3_0_FOUND)
   libfind_pkg_check_modules(LibXML++_PKGCONF_2_6 libxml++-2.6)
   if(LibXML++_PKGCONF_2_6_FOUND)
     set(LibXML++_VERSION "2.6")
     set(LibXML++_VERSION_2_6 "1")
     set(LibXML++_VERSION_3_0 "0")
-    set(libXML++_PKGCONF_INCLUDE_DIRS ${LibXML++PKGCONF_2_6_INCLUDE_DIRS})
-    set(libXML++_PKGCONF_LIBRARY_DIRS ${LibXML++PKGCONF_2_6_LIBRARY_DIRS})
+    set(LibXML++_PKGCONF_INCLUDE_DIRS ${LibXML++_PKGCONF_2_6_INCLUDE_DIRS})
+    set(LibXML++_PKGCONF_LIBRARY_DIRS ${LibXML++_PKGCONF_2_6_LIBRARY_DIRS})
   endif(LibXML++_PKGCONF_2_6_FOUND)
 endif(LibXML++_PKGCONF_3_0_FOUND)
 
@@ -41,7 +41,7 @@ find_path(LibXML++_INCLUDE_DIR
 # Glib-related libraries also use a separate config header, which is in lib dir
 find_path(LibXML++Config_INCLUDE_DIR
   NAMES libxml++config.h
-  HINTS ${LibXML++_PKGCONF_INCLUDE_DIRS} /usr
+  HINTS ${LibXML++_PKGCONF_INCLUDE_DIRS} /usr /usr/lib/x86_64-linux-gnu/libxml++-${LibXML++_VERSION}/include/
   PATH_SUFFIXES lib/libxml++-${LibXML++_VERSION}/include ../lib/libxml++-${LibXML++_VERSION}/include
 )
 

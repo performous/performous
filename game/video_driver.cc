@@ -4,7 +4,7 @@
 #include "fbo.hh"
 #include "fs.hh"
 #include "glmath.hh"
-#include "../common/image.hh"
+#include "image.hh"
 #include "util.hh"
 #include "controllers.hh"
 #include "screen.hh"
@@ -309,7 +309,6 @@ void Window::resize() {
 	int windowWidth;
 	int windowHeight;
 	SDL_GL_GetDrawableSize(screen, &windowWidth, &windowHeight);
-	//glViewport(0, 0, windowWidth, windowHeight);
 	std::clog << "video/info: Drawable size " << windowWidth << "x" << windowHeight << ", fs=" << m_fullscreen << std::endl; 
 	s_width = windowWidth;
 	s_height = windowHeight;

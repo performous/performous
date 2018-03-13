@@ -115,7 +115,9 @@ function(_ICU_FIND)
           CACHE PATH "Location of the ICU installation" FORCE)
     endif()
   endif()
-
+  # Try also MacOS homebrew install path
+  list(APPEND icu_roots "/usr/local/opt/icu4c")
+  
   if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     # 64-bit binary directory
     set(_bin64 "bin64")

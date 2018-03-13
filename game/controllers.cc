@@ -4,7 +4,6 @@
 #include "fs.hh"
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <boost/smart_ptr/weak_ptr.hpp>
 #include <SDL2/SDL_joystick.h>
@@ -28,7 +27,7 @@ namespace {
 		xmlpp::Attribute const* a = elem.get_attribute(attr);
 		if (!a) return false;
 		try {
-			var = boost::lexical_cast<T>(a->get_value());
+			var = sconv<T>(a->get_value());
 		} catch (std::exception&) {
 			throw XMLError(elem, "attribute " + attr + " value invalid: " + a->get_value());
 		}
@@ -161,7 +160,7 @@ struct Controllers::Impl {
 		} catch (XMLError& e) {
 			int line = e.elem.get_line();
 			std::string name = e.elem.get_name();
-			throw std::runtime_error(file.string() + ":" + boost::lexical_cast<std::string>(line) + " element " + name + " " + e.message);
+			throw std::runtime_error(file.string() + ":" + std::to_string(line) + " element " + name + " " + e.message);
 		}
 	}
 

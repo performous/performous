@@ -2,7 +2,7 @@
 
 #include "cache.hh"
 #include "configuration.hh"
-#include "../common/image.hh"
+#include "image.hh"
 
 #include <librsvg/rsvg.h>
 #include <iostream>

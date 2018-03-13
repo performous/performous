@@ -19,7 +19,6 @@
 #include "screen_songs.hh"
 
 #include <boost/format.hpp>
-#include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <stdexcept>
 #include <cmath>
@@ -595,7 +594,7 @@ void ScreenSing::drawMenu() {
 	th.bg.draw();
 	// Loop through menu items
 	w = 0;
-	int player = 0;
+	std::size_t player = 0;
 	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it) {
 		// Pick the font object
@@ -606,7 +605,7 @@ void ScreenSing::drawMenu() {
 		txt->dimensions.middle(x).center(y);
 		txt->draw(it->getName());
 		if (it->value == &m_vocalTracks[player]) {
-					if(boost::lexical_cast<size_t>(player) < analyzers.size()) {
+			if (player < analyzers.size()) {
 				Color color = MicrophoneColor::get(analyzers[player].getId());
 				ColorTrans c(color);
 				m_player_icon->dimensions.right(x).fixedHeight(0.040).center(y);

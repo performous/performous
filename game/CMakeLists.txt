@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
-file(GLOB SOURCE_FILES "*.cc" "../common/image.cc")
-file(GLOB HEADER_FILES "*.hh" "../common/image.hh" "libda/*.hpp")
+file(GLOB SOURCE_FILES "*.cc")
+file(GLOB HEADER_FILES "*.hh" "libda/*.hpp")
 
 if(WIN32)
 	# We want to support all these version numbers:
@@ -137,16 +137,11 @@ else()
 	message(STATUS "Webserver support: Disabled (explicitly disabled)")
 endif()
 
-if(APPLE)
-	# Needed for ffmpeg.cc to compile cleanly on OSX (it's a (unsigned long) long story)
-	add_definitions("-D__STDC_CONSTANT_MACROS")
-endif(APPLE)
-
-if(UNIX)
+if(UNIX AND NOT APPLE)
 	# Note: cannot use list APPEND here because it inserts semicolons instead of spaces
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
-endif(UNIX)
+endif()
 
 if(WIN32)
 	option(MXE_HACK "Features horrible hacks, but is able to compile a static performous.exe (that may not work)." OFF)

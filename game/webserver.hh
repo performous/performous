@@ -7,7 +7,6 @@ namespace http = boost::network::http;
 #include <boost/thread/mutex.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/lexical_cast.hpp>
 #include <json/json.h>
 #include <string>
 #include "fs.hh"
@@ -60,9 +59,6 @@ class Songs;
 class WebServer
 {
 public:
-	WebServer(Songs&);
-	~WebServer();
-private:
-	Songs& m_songs;
+	WebServer(Songs&) {}
 };
 #endif

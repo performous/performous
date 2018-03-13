@@ -92,10 +92,19 @@ void FFmpeg::open() {
 	m_streamId = av_find_best_stream(m_formatContext, (AVMediaType)m_mediaType, -1, -1, &codec, 0);
 	if (m_streamId < 0) throw std::runtime_error("No suitable track found");
 
+#if (LIBAVCODEC_VERSION_INT) >= (AV_VERSION_INT(57,0,0))
+	AVCodec* pCodec = avcodec_find_decoder(m_formatContext->streams[m_streamId]->codecpar->codec_id);
+	AVCodecContext* pCodecCtx = avcodec_alloc_context3(pCodec);
+	avcodec_parameters_to_context(pCodecCtx, m_formatContext->streams[m_streamId]->codecpar);
+	if (avcodec_open2(pCodecCtx, pCodec, nullptr) < 0) throw std::runtime_error("Cannot open codec");
+	pCodecCtx->workaround_bugs = FF_BUG_AUTODETECT;
+	m_codecContext = pCodecCtx;
+#else
 	AVCodecContext* cc = m_formatContext->streams[m_streamId]->codec;
 	if (avcodec_open2(cc, codec, nullptr) < 0) throw std::runtime_error("Cannot open codec");
 	cc->workaround_bugs = FF_BUG_AUTODETECT;
 	m_codecContext = cc;
+#endif
 
 	switch (m_mediaType) {
 	case AVMEDIA_TYPE_AUDIO:
@@ -112,10 +121,10 @@ void FFmpeg::open() {
 		break;
 	case AVMEDIA_TYPE_VIDEO:
 		// Setup software scaling context for YUV to RGB conversion
-		width = cc->width;
-		height = cc->height;
+		width = m_codecContext->width;
+		height = m_codecContext->height;
 		m_swsContext = sws_getContext(
-		  cc->width, cc->height, cc->pix_fmt,
+		  m_codecContext->width, m_codecContext->height, m_codecContext->pix_fmt,
 		  width, height, AV_PIX_FMT_RGB24,
 		  SWS_POINT, nullptr, nullptr, nullptr);
 		break;
@@ -172,6 +181,35 @@ void FFmpeg::seek_internal() {
 }
 
 void FFmpeg::decodePacket() {
+#if LIBAVCODEC_VERSION_INT >= (AV_VERSION_INT(57, 37, 0))
+	AVPacket pkt;
+	while (av_read_frame(m_formatContext, &pkt) >= 0) {
+		if (m_quit || m_seekTarget == m_seekTarget) return; // something weird required
+		if (pkt.stream_index != m_streamId) return; // wrong stream
+		int ret = avcodec_send_packet(m_codecContext, &pkt);
+		if (ret < 0 || ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+			// error
+			break;
+		}
+		while (ret >= 0) {
+			boost::shared_ptr<AVFrame> frame(av_frame_alloc(), [](AVFrame* ptr) { av_frame_free(&ptr); });
+			ret = avcodec_receive_frame(m_codecContext, frame.get());
+			if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+				break;
+			}
+			// frame is available here
+			if (frame->pts != int64_t(AV_NOPTS_VALUE)) {
+				m_position = double(frame->pts) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
+				if (m_formatContext->start_time != int64_t(AV_NOPTS_VALUE))
+					m_position -= double(m_formatContext->start_time) / AV_TIME_BASE;
+			}
+			if (m_mediaType == AVMEDIA_TYPE_VIDEO) processVideo(frame.get()); else processAudio(frame.get());
+			//av_frame_free(&frame);
+		}
+		av_packet_unref(&pkt);
+	}
+	return;
+#else
 	struct ReadFramePacket: public AVPacket {
 		AVFormatContext* m_s;
 		ReadFramePacket(AVFormatContext* s): m_s(s) {
@@ -211,6 +249,7 @@ void FFmpeg::decodePacket() {
 		}
 		if (m_mediaType == AVMEDIA_TYPE_VIDEO) processVideo(frame.get()); else processAudio(frame.get());
 	}
+#endif
 }
 
 void FFmpeg::processVideo(AVFrame* frame) {

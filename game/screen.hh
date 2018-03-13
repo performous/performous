@@ -123,3 +123,6 @@ private:
 	boost::scoped_ptr<Dialog> m_dialog;
 };
 
+// Declaration for the singleton pointer defined in game.cc
+template<> Game* Singleton<Game>::ms_Singleton;
+

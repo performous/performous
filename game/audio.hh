@@ -30,6 +30,8 @@ struct Device {
 	Device(unsigned int in, unsigned int out, double rate, unsigned int dev);
 	/// Start
 	void start();
+	/// Stop
+	void stop();
 	/// Callback
 	int operator()(void const* input, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags);
 	/// Returns true if this device is opened for output

@@ -62,7 +62,7 @@ void WebServer::StartServer(int tried, bool fallbackPortInUse = false) {
 	try {
 		m_server->run();
 	}
-	catch (exception& e)
+	catch (std::exception& e)
 	{
 		tried = tried + 1;
 		std::clog << "webserver/error: " << e.what() << " Trying again... (tried " << tried << " times)." << std::endl;
@@ -171,7 +171,7 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 	} else if(request.destination == "/api/getplaylistTimeout") {
 		return http_server::response::stock_reply(http_server::response::ok, std::to_string(config["game/playlist_screen_timeout"].i()));
 	} else if(request.destination.find("/api/language") == 0) {
-		map<std::string, std::string> localeMap = GenerateLocaleDict();
+		auto localeMap = GenerateLocaleDict();
 		
 		Json::Value jsonRoot = Json::objectValue;
 		for (auto const &kv : localeMap) {
@@ -235,7 +235,7 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 		}
 	} else if(request.destination == "/api/remove") {
 		try { // this is for those idiots that send text instead of numbers.
-			int songToDelete = boost::lexical_cast<int>(request.body);
+			int songToDelete = std::stoi(request.body);
 			gm->getCurrentPlayList().removeSong(songToDelete);
 			ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
 			m_pp->triggerSongListUpdate(); //this way the screen_playlist does a live-update just like the screen_songs
@@ -266,15 +266,15 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 					std::clog << "webserver/error: cannot parse Json Document" <<std::endl;
 					return http_server::response::stock_reply(http_server::response::ok, "No valid JSON.");
 				}
-				unsigned int songToMove = boost::lexical_cast<int>(root["songId"]);
-				unsigned int positionToMoveTo = boost::lexical_cast<int>(root["position"]);
+				unsigned int songToMove = root["songId"].asUInt();
+				unsigned int positionToMoveTo = root["position"].asUInt();
 
 				if(gm->getCurrentPlayList().getList().size() == 0) {
-					return http_server::response::stock_reply(http_server::response::ok, "Playlist is empty, can't move the song you've provided: " + boost::lexical_cast<std::string>(songToMove + 1));
+					return http_server::response::stock_reply(http_server::response::ok, "Playlist is empty, can't move the song you've provided: " + std::to_string(songToMove + 1));
 				}
 
 				if(songToMove > gm->getCurrentPlayList().getList().size() -1) {
-					return http_server::response::stock_reply(http_server::response::ok, "Not gonna move the unknown song you've provided: " + boost::lexical_cast<std::string>(songToMove + 1));
+					return http_server::response::stock_reply(http_server::response::ok, "Not gonna move the unknown song you've provided: " + std::to_string(songToMove + 1));
 				}
 
 				if(positionToMoveTo <= gm->getCurrentPlayList().getList().size() -1) {
@@ -282,9 +282,9 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 					ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
 					m_pp->triggerSongListUpdate();
 				} else {
-					return http_server::response::stock_reply(http_server::response::ok, "Not gonna move the song to "+ boost::lexical_cast<std::string>(positionToMoveTo + 1) + " since the list ain't that long.");
+					return http_server::response::stock_reply(http_server::response::ok, "Not gonna move the song to "+ std::to_string(positionToMoveTo + 1) + " since the list ain't that long.");
 				}
-			return http_server::response::stock_reply(http_server::response::ok, "Succesfuly moved the song from " + boost::lexical_cast<std::string>(songToMove + 1) + " to " + boost::lexical_cast<std::string>(positionToMoveTo + 1));
+			return http_server::response::stock_reply(http_server::response::ok, "Succesfuly moved the song from " + std::to_string(songToMove + 1) + " to " + std::to_string(positionToMoveTo + 1));
 		} catch(std::exception e) {
 			return http_server::response::stock_reply(http_server::response::ok, "failure");
 		}
@@ -296,9 +296,9 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 std::map<std::string, std::string> WebServer::GenerateLocaleDict() {
 	std::vector<std::string> translationKeys = GetTranslationKeys();
     
-    map<std::string, std::string> localeMap;
+    std::map<std::string, std::string> localeMap;
     for (auto const &translationKey : translationKeys) {
-		localeMap.insert(pair<std::string, std::string>(translationKey, _(translationKey)));
+		localeMap[translationKey] = _(translationKey);
 	}
     return localeMap;
 }
@@ -371,8 +371,4 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 
 	return boost::shared_ptr<Song>();
 }
-#else
-WebServer::WebServer(Songs& songs)
-	: m_songs(songs) {}
-WebServer::~WebServer(){}
 #endif
