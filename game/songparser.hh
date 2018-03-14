@@ -4,9 +4,12 @@
 #include "unicode.hh"
 #include "libxml++.hh"
 #include <sstream>
+#include <boost/range/adaptor/reversed.hpp>
 #include <boost/filesystem.hpp>
 
 namespace SongParserUtil {
+	const std::string DUET_P2 = "Duet singer"; // FIXME
+	const std::string DUET_BOTH = "Both singers"; // FIXME
 	/// Parse an int from string and assign it to a variable
 	void assign(int& var, std::string const& str);
 	/// Parse an unsigned int from string and assign it to a variable
@@ -71,6 +74,15 @@ class SongParser {
 	bpms_t m_bpms;
 	unsigned m_tsPerBeat;  ///< The ts increment per beat
 	unsigned m_tsEnd;  ///< The ending ts of the song
+	BPM getBPM(double ts) {
+		for (auto& itb: boost::adaptors::reverse(m_bpms)) {
+			if (itb.begin >= ts) continue;
+			else {
+			return itb;
+			}
+		}
+		throw std::runtime_error("No BPM definition prior to this note...");
+	}
 	void addBPM(double ts, double bpm) {
 		if (!(bpm >= 1.0 && bpm < 1e12)) throw std::runtime_error("Invalid BPM value");
 		if (!m_bpms.empty() && m_bpms.back().ts >= ts) {

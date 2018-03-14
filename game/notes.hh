@@ -79,9 +79,22 @@ struct Note {
 	/// How precisely the note is hit (always 1.0 for freestyle, 0..1 for others)
 	double powerFactor(double note) const;
 	/// Compares begin of two notes
-	static bool ltBegin(Note const& a, Note const& b) { return a.begin < b.begin; }
+	static bool ltBegin(Note const& a, Note const& b) {
+		if (a.begin == b.begin) {
+			if (a.type == Note::SLEEP) return true;
+			if (b.type == Note::SLEEP) return false;			
+		}
+		return a.begin < b.begin; 
+	}
 	/// Compares end of two notes
 	static bool ltEnd(Note const& a, Note const& b) { return a.end < b.end; }
+	/// Compare equality of two notes, used for deleting duplicates when programatically creating the duet track.
+	static bool equal(Note const& a, Note const& b) { 
+		if (a.type == Note::SLEEP) return (a.type == b.type);
+		return (a.begin == b.begin && a.end == b.end && a.note == b.note && a.type == b.type);
+	}
+	/// Check if two notes overlap
+	static bool overlapping(Note const& a, Note const& b) { return (a.end >= b.begin && a.type != Note::SLEEP && b.type != Note::SLEEP); }
   private:
 	double scoreMultiplier() const;
 };

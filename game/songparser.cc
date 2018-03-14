@@ -220,15 +220,32 @@ void SongParser::finalize() {
 		VocalTrack& vocal = nt.second;
 		// Remove empty sentences
 		{
-			Note::Type lastType = Note::NORMAL;
-			for (auto itn = vocal.notes.begin(); itn != vocal.notes.end();) {
-				Note::Type type = itn->type;
-				if(type == Note::SLEEP && lastType == Note::SLEEP) {
-					std::clog << "songparser/info: " + m_song.filename.string() + ": Discarding empty sentence" << std::endl;
-					itn = vocal.notes.erase(itn);
-				} else {
-					++itn;
-				}
+		Note::Type lastType = Note::NORMAL;
+		std::clog << "songparser/debug: In " << m_song.artist << " - " << m_song.title << std::endl;
+		for (auto itn = vocal.notes.begin(); itn != vocal.notes.end();) {
+		if (itn->type == Note::SLEEP) { itn->end = itn->begin; ++itn; continue; }
+		auto next = (itn +1);
+
+		// Try to fix overlapping syllables.
+		if (next != vocal.notes.end() && Note::overlapping(*itn, *next)) {
+			double beatDur = getBPM(itn->begin).step;
+			double newEnd = (next->begin - beatDur);
+			std::clog << "songparser/info: Trying to correct duration of overlapping notes (" << itn->syllable << " & " << next->syllable << ")..." << std::endl;
+			std::clog << "songparser/info: Changing ending to: " << newEnd << ", will give a length of: " << (newEnd - (itn->begin)) << std::endl;
+			if ((newEnd - itn->begin) >= beatDur) { itn->end = newEnd; }
+			else if (next->type != Note::SLEEP) {
+				std::clog << "songparser/info: Resulting note would be too short, will combine them instead." << std::endl;
+				itn->syllable += std::string("-") += next->syllable;
+				itn->end = next->end;
+				vocal.notes.erase(next);
+			}
+			else { next->begin = next->end = itn->end; }
+		}
+			Note::Type type = itn->type;
+			if(type == Note::SLEEP && lastType == Note::SLEEP) {
+				std::clog << "songparser/info: " + m_song.filename.string() + ": Discarding empty sentence" << std::endl;
+				itn = vocal.notes.erase(itn);
+			} else { ++itn; }
 				lastType = type;
 			}
 		}

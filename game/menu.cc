@@ -15,6 +15,10 @@ std::string MenuOption::getName() const {
 	return "";
 }
 
+std::string MenuOption::getVirtName() const {
+	return virtualName.empty() ? std::string() : virtualName;
+}
+
 const std::string& MenuOption::getComment() const { return commentPtr ? *commentPtr : comment; }
 
 bool MenuOption::isActive() const {
@@ -39,7 +43,7 @@ void Menu::move(int dir) {
 	else if (dir < 0 && selection_stack.back() > 0) --selection_stack.back();
 }
 
-void Menu::select(unsigned sel) {
+void Menu::select(size_t sel) {
 	if (sel < menu_stack.back()->size()) selection_stack.back() = sel;
 }
 

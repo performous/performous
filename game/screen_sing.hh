@@ -77,6 +77,7 @@ class ScreenSing: public Screen {
 	void instrumentLayout(double time);
 	void createPauseMenu();
 	void drawMenu();
+	void prepareVoicesMenu(size_t moveSelectionTo = 0);
 	bool devCanParticipate(input::DevType const& devType) const;
 	Audio& m_audio;
 	Database& m_database;
@@ -103,6 +104,9 @@ class ScreenSing: public Screen {
 	std::string m_selectedTrackLocalized;
 	ConfigItem m_vocalTracks[AUDIO_MAX_ANALYZERS];
 	ConfigItem m_duet;
+	size_t players() const { auto& analyzers = m_audio.analyzers(); return (analyzers.empty() ? 1 : analyzers.size()); } // Always have at least one player to display lyrics and prevent crashes.
+	bool singingDuet();
+	int selectedVocalTrack;
 	bool m_displayAutoPlay = false;
 	bool keyPressed = false;
 };
