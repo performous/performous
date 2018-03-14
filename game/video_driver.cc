@@ -70,11 +70,6 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 		SDL_GL_CreateContext(screen);
 
 	}
-// 	{
-// 		SDL_Surface* icon = SDL_LoadBMP(findFile("icon.bmp").string().c_str());
-// 		SDL_SetWindowIcon(screen,icon);
-// 		SDL_FreeSurface(icon);
-// 	}
 
 	if (!m_fullscreen) {
 		config["graphic/window_width"].i() = s_width;
