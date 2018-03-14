@@ -6,19 +6,22 @@
 #include "database.hh"
 #include "i18n.hh"
 #include "profiler.hh"
+#include "libxml++-impl.hh"
+#include "unicode.hh"
 
-#include <boost/bind.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/format.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/regex.hpp>
-#include <libxml++/libxml++.h>
 #include <algorithm>
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
 
+#include <boost/bind.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/format.hpp>
+#include <boost/regex.hpp>
+#include <unicode/stsearch.h>
+
 Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), math_cover(), m_database(database), m_type(), m_order(config["songs/sort-order"].i()), m_dirty(false), m_loading(false) {
+	if (U_FAILURE(UnicodeUtil::m_icuError)) std::clog << "songs/error: Error creating Unicode collator: " << u_errorName(UnicodeUtil::m_icuError) << std::endl;
 	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
 	reload();
 }
@@ -151,16 +154,21 @@ void Songs::filter_internal() {
 	RestoreSel restore(*this);
 	try {
 		SongVector filtered;
-		for (SongVector::const_iterator it = m_songs.begin(); it != m_songs.end(); ++it) {
-			Song& s = **it;
-			// All, Dance, Vocals, Duet, Guitar, Band
-			if (m_type == 1 && !s.hasDance()) continue;
-			if (m_type == 2 && !s.hasVocals()) continue;
-			if (m_type == 3 && !s.hasDuet()) continue;
-			if (m_type == 4 && !s.hasGuitars()) continue;
-			if (m_type == 5 && !s.hasDrums() && !s.hasKeyboard()) continue;
-			if (m_type == 6 && (!s.hasVocals() || !s.hasGuitars() || (!s.hasDrums() && !s.hasKeyboard()))) continue;
-			if (regex_search(s.strFull(), boost::regex(m_filter, boost::regex_constants::icase))) filtered.push_back(*it);
+		if (m_filter == std::string() && m_type == 0) filtered = m_songs;
+		else {
+			MatchResult match = UnicodeUtil::getCharset(m_filter);
+			std::string charset = match.first;
+			icu::UnicodeString filter = ((charset == "UTF-8") ? icu::UnicodeString::fromUTF8(m_filter) : icu::UnicodeString(m_filter.c_str(), charset.c_str()));
+			std::copy_if (m_songs.begin(), m_songs.end(), std::back_inserter(filtered), [&](boost::shared_ptr<Song> it){
+			icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8((*it).strFull()), &UnicodeUtil::m_dummyCollator, NULL, UnicodeUtil::m_icuError);
+				if (m_type == 1 && !(*it).hasDance()) return false;
+				if (m_type == 2 && !(*it).hasVocals()) return false;
+				if (m_type == 3 && !(*it).hasDuet()) return false;
+				if (m_type == 4 && !(*it).hasGuitars()) return false;
+				if (m_type == 5 && !(*it).hasDrums() && !(*it).hasKeyboard()) return false;
+				if (m_type == 6 && (!(*it).hasVocals() || !(*it).hasGuitars() || (!(*it).hasDrums() && !(*it).hasKeyboard()))) return false;
+				return (search.first(UnicodeUtil::m_icuError) != USEARCH_DONE);
+			});
 		}
 		m_filtered.swap(filtered);
 	} catch (...) {
@@ -297,7 +305,7 @@ namespace {
 				std::string coverlink = "covers/" + (boost::format("%|04|") % num).str() + ext;
 				if (fs::is_symlink(coverlink)) fs::remove(coverlink);
 				create_symlink(s.cover, coverlink);
-				song->add_child("cover")->set_child_text(coverlink);
+				xmlpp::set_first_child_text(xmlpp::add_child_element(song, "cover"), coverlink);
 			}
 		} catch (std::exception& e) {
 			std::cerr << "Songlist error handling cover image: " << e.what() << std::endl;
@@ -309,13 +317,13 @@ namespace {
 		songlist->set_attribute("size", std::to_string(svec.size()));
 		for (size_t i = 0; i < svec.size(); ++i) {
 			Song const& s = *svec[i];
-			xmlpp::Element* song = songlist->add_child("song");
+			xmlpp::Element* song = xmlpp::add_child_element(songlist, "song");
 			song->set_attribute("num", std::to_string(i + 1));
-			xmlpp::Element* collate = song->add_child("collate");
-			collate->add_child("artist")->set_child_text(s.collateByArtist);
-			collate->add_child("title")->set_child_text(s.collateByTitle);
-			song->add_child("artist")->set_child_text(s.artist);
-			song->add_child("title")->set_child_text(s.title);
+			xmlpp::Element* collate = xmlpp::add_child_element(song, "collate");
+			xmlpp::set_first_child_text(xmlpp::add_child_element(collate, "artist"), s.collateByArtist);
+			xmlpp::set_first_child_text(xmlpp::add_child_element(collate, "title"), s.collateByTitle);
+			xmlpp::set_first_child_text(xmlpp::add_child_element(song, "artist"), s.artist);
+			xmlpp::set_first_child_text(xmlpp::add_child_element(song, "title"), s.title);
 			if (!s.cover.empty()) dumpCover(song, s, i + 1);
 		}
 		doc.write_to_file_formatted(filename, "UTF-8");

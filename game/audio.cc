@@ -4,13 +4,14 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/lexical_cast.hpp>
 #include <cmath>
 #include <iostream>
 #include <map>
 #include "configuration.hh"
 #include "libda/portaudio.hpp"
 #include "util.hh"
+
+#include <unordered_map>
 
 extern const double m_pi;
 using namespace boost::posix_time;
@@ -142,8 +143,7 @@ class Music {
 		float pitchFactor;
         Track(fs::path const& filename, unsigned int sr): mpeg(filename, sr), fadeLevel(1.0f), pitchFactor(0.0f) {}
 	};
-	typedef boost::ptr_map<std::string, Track> Tracks;
-	Tracks tracks; ///< Audio decoders
+	std::unordered_map<std::string, std::unique_ptr<Track>> tracks; ///< Audio decoders
 	double srate; ///< Sample rate
 	int64_t m_pos; ///< Current sample position
 	bool m_preview;
@@ -159,7 +159,8 @@ public:
 	{
 		for (auto const& tf /* trackname-filename pair */: files) {
 			if (tf.second.empty()) continue; // Skip tracks with no filenames; FIXME: Why do we even have those here, shouldn't they be eliminated earlier?
-			tracks.insert(tf.first, std::auto_ptr<Track>(new Track(tf.second, sr)));
+			tracks.emplace(tf.first, std::unique_ptr<Track>(new Track(tf.second, sr)));
+			//tracks.insert(tf.first, std::auto_ptr<Track>(new Track(tf.second, sr)));
 		}
 		suppressCenterChannel = config["audio/suppress_center_channel"].b();
 	}
@@ -169,7 +170,7 @@ public:
 		m_clock.timeSync(durationOf(m_pos), durationOf(samples)); // Keep the clock synced
 		bool eof = true;
 		Buffer mixbuf(end - begin);
-		for (Tracks::iterator it = tracks.begin(), itend = tracks.end(); it != itend; ++it) {
+		for (auto it = tracks.begin(); it != tracks.end(); ++it) {
 			Track& t = *it->second;
 // FIXME: Include this code bit once there is a sane pitch shifting algorithm
 #if 0
@@ -215,7 +216,7 @@ public:
 	double pos() const { return m_clock.pos(); }
 	double duration() const {
 		double dur = 0.0;
-		for (Tracks::const_iterator it = tracks.begin(), itend = tracks.end(); it != itend; ++it) {
+		for (auto it = tracks.begin(); it != tracks.end(); ++it) {
 			dur = std::max(dur, it->second->mpeg.audioQueue.duration());
 		}
 		return dur;
@@ -223,7 +224,7 @@ public:
 	/// Prepare (seek) all tracks to current position, return true when done (nonblocking)
 	bool prepare() {
 		bool ready = true;
-		for (Tracks::iterator it = tracks.begin(), itend = tracks.end(); it != itend; ++it) {
+		for (auto it = tracks.begin(); it != tracks.end(); ++it) {
 			FFmpeg& mpeg = it->second->mpeg;
 			if (mpeg.terminating()) continue;  // Song loading failed or other error, won't ever get ready
 			if (mpeg.audioQueue.prepare(m_pos)) continue;  // Buffering done
@@ -233,12 +234,12 @@ public:
 		return ready;
 	}
 	void trackFade(std::string const& name, double fadeLevel) {
-		Tracks::iterator it = tracks.find(name);
+		auto it = tracks.find(name);
 		if (it == tracks.end()) return;
 		it->second->fadeLevel = fadeLevel;
 	}
 	void trackPitchBend(std::string const& name, double pitchFactor) {
-		Tracks::iterator it = tracks.find(name);
+		auto it = tracks.find(name);
 		if (it == tracks.end()) return;
 		it->second->pitchFactor = pitchFactor;
 	}
@@ -312,11 +313,11 @@ struct Output {
 	boost::mutex mutex;
 	boost::mutex samples_mutex;
 	boost::mutex synth_mutex;
-	std::auto_ptr<Synth> synth;
-	std::auto_ptr<Music> preloading;
-	boost::ptr_vector<Music> playing, disposing;
+	std::unique_ptr<Synth> synth;
+	std::unique_ptr<Music> preloading;
+	std::vector<std::unique_ptr<Music>> playing, disposing;
 	std::vector<Analyzer*> mics;  // Used for audio pass-through
-	boost::ptr_map<std::string, Sample> samples;
+	std::unordered_map<std::string, std::unique_ptr<Sample>> samples;
 	std::vector<Command> commands;
 	volatile bool paused;
 	Output(): paused(false) {}
@@ -326,20 +327,20 @@ struct Output {
 		if (!l.owns_lock()) return;  // No update now, try again later (cannot stop and wait for mutex to be released)
 		// Move from preloading to playing, if ready
 		if (preloading.get() && preloading->prepare()) {
-			if (!playing.empty()) playing[0].fadeRate = -preloading->fadeRate;  // Fade out the old music
-			playing.insert(playing.begin(), preloading);
+			if (!playing.empty()) playing[0]->fadeRate = -preloading->fadeRate;  // Fade out the old music
+			playing.insert(playing.begin(), std::move(preloading));
 		}
 		// Process commands
 		for (auto const& cmd: commands) {
 			switch (cmd.type) {
 			case Command::TRACK_FADE:
-				if (!playing.empty()) playing[0].trackFade(cmd.track, cmd.factor);
+				if (!playing.empty()) playing[0]->trackFade(cmd.track, cmd.factor);
 				break;
 			case Command::TRACK_PITCHBEND:
-				if (!playing.empty()) playing[0].trackPitchBend(cmd.track, cmd.factor);
+				if (!playing.empty()) playing[0]->trackPitchBend(cmd.track, cmd.factor);
 				break;
 			case Command::SAMPLE_RESET:
-				boost::ptr_map<std::string, Sample>::iterator it = samples.find(cmd.track);
+				auto it = samples.find(cmd.track);
 				if (it != samples.end())
 					it->second->reset();
 				break;
@@ -353,15 +354,17 @@ struct Output {
 		std::fill(begin, end, 0.0f);
 		if (paused) return;
 		// Mix in from the streams currently playing
-		for (size_t i = 0; i < playing.size();) {
-			bool keep = playing[i](begin, end);  // Do the actual mixing
+		auto arrayEnd = playing.end();
+		for (auto i = playing.begin(); i != arrayEnd;) {
+			bool keep = (*i->get())(begin, end);  // Do the actual mixing
 			boost::mutex::scoped_try_lock l(mutex, boost::defer_lock);
 			if (!keep && l.try_lock()) {
 				// Dispose streams no longer needed by moving them to another container (that will be cleared by another thread).
-				disposing.transfer(disposing.end(), playing.begin() + i, playing);
-				continue;
+				disposing.push_back(std::move(*i));
+				i = playing.erase(i);
+				arrayEnd = playing.end();
 			}
-			++i;
+			else { ++i; }
 		}
 		// Mix in microphones (if pass-through is enabled)
 		if (mics.size() > 0 && config["audio/pass-through"].b()) {
@@ -376,7 +379,7 @@ struct Output {
 			// samples should not be created/destroyed on the fly
 			boost::mutex::scoped_try_lock l(samples_mutex, boost::defer_lock);
 			if(l.try_lock()) {
-				for(boost::ptr_map<std::string, Sample>::iterator it = samples.begin() ; it != samples.end() ; ++it) {
+				for(auto it = samples.begin() ; it != samples.end() ; ++it) {
 					(*it->second)(begin, end);
 				}
 			}
@@ -385,7 +388,7 @@ struct Output {
 		{
 			boost::mutex::scoped_try_lock l(synth_mutex, boost::defer_lock);
 			if(l.try_lock() && synth.get() && !playing.empty()) {
-				(*synth.get())(begin, end, playing[0].pos());
+				(*synth.get())(begin, end, playing[0]->pos());
 			}
 		}
 	}
@@ -406,6 +409,11 @@ Device::Device(unsigned int in, unsigned int out, double rate, unsigned int dev)
 void Device::start() {
 	PaError err = Pa_StartStream(stream);
 	if (err != paNoError) throw std::runtime_error(std::string("Pa_StartStream: ") + Pa_GetErrorText(err));
+}
+
+void Device::stop() {
+	PaError err = Pa_StopStream(stream);
+	if (err != paNoError) throw std::runtime_error(std::string("Pa_StopStream: ") + Pa_GetErrorText(err));
 }
 
 int Device::operator()(void const* input, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags) try {
@@ -512,6 +520,14 @@ struct Audio::Impl {
 		for (size_t i = 0; i < analyzers.size(); ++i)
 			output.mics.push_back(&analyzers[i]);
 	}
+	~Impl() {
+		// stop all audio streams befor destoying the object.
+		// else portaudio will keep sending data to those destroyed
+		// objects.
+		for (auto device: devices) {
+			device.stop();
+		}
+	}
 };
 
 Audio::Audio(): self(new Impl) {}
@@ -537,7 +553,7 @@ bool Audio::hasPlayback() const {
 
 void Audio::loadSample(std::string const& streamId, fs::path const& filename) {
 	boost::mutex::scoped_lock l(self->output.samples_mutex);
-	self->output.samples.insert(streamId, std::auto_ptr<Sample>(new Sample(filename, getSR())));
+	self->output.samples.emplace(streamId, std::unique_ptr<Sample>(new Sample(filename, getSR())));
 }
 
 void Audio::playSample(std::string const& streamId) {
@@ -592,13 +608,13 @@ void Audio::fadeout(double fadeTime) {
 double Audio::getPosition() const {
 	Output& o = self->output;
 	boost::mutex::scoped_lock l(o.mutex);
-	return (o.playing.empty() || o.preloading.get()) ? getNaN() : o.playing[0].pos();
+	return (o.playing.empty() || o.preloading.get()) ? getNaN() : o.playing[0]->pos();
 }
 
 double Audio::getLength() const {
 	Output& o = self->output;
 	boost::mutex::scoped_lock l(o.mutex);
-	return (o.playing.empty() || o.preloading.get()) ? getNaN() : o.playing[0].duration();
+	return (o.playing.empty() || o.preloading.get()) ? getNaN() : o.playing[0]->duration();
 }
 
 bool Audio::isPlaying() const {
@@ -610,14 +626,14 @@ bool Audio::isPlaying() const {
 void Audio::seek(double offset) {
 	Output& o = self->output;
 	boost::mutex::scoped_lock l(o.mutex);
-	for (auto& trk: o.playing) trk.seek(clamp(trk.pos() + offset, 0.0, trk.duration()));
+	for (auto& trk: o.playing) trk->seek(clamp(trk->pos() + offset, 0.0, trk->duration()));
 	pause(false);
 }
 
 void Audio::seekPos(double pos) {
 	Output& o = self->output;
 	boost::mutex::scoped_lock l(o.mutex);
-	for (auto& trk: o.playing) trk.seek(pos);
+	for (auto& trk: o.playing) trk->seek(pos);
 	pause(false);
 }
 
@@ -648,7 +664,7 @@ void Audio::toggleCenterChannelSuppressor() {
 	Output& o = self->output;
 	boost::mutex::scoped_lock l(o.mutex);
 	for (size_t i = 0; i < o.playing.size(); i++) {
-		o.playing[i].suppressCenterChannel = !o.playing[i].suppressCenterChannel;
+		o.playing[i]->suppressCenterChannel = !o.playing[i]->suppressCenterChannel;
 	}
 }
 

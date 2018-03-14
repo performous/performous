@@ -1,6 +1,7 @@
 #include "songparser.hh"
 
 #include "util.hh"
+#include "libxml++-impl.hh"
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 #include <stdexcept>
@@ -16,8 +17,6 @@ bool SongParser::xmlCheck(std::string const& data) const {
 	return std::equal(header.begin(), header.end(), data.begin());
 }
 
-#include <libxml++/libxml++.h>
-#include <glibmm/convert.h>
 
 /*
 // LibXML2 logging facility
@@ -42,18 +41,18 @@ struct SSDom: public xmlpp::DomParser {
 		parse_memory(buf);
 		nsmap["ss"] = get_document()->get_root_node()->get_namespace_uri();
 	}
-	bool find(xmlpp::Element const& elem, std::string xpath, xmlpp::NodeSet& n) {
+	bool find(xmlpp::Element const& elem, std::string xpath, xmlpp::const_NodeSet& n) {
 		if (nsmap["ss"].empty()) boost::erase_all(xpath, "ss:");
 		n = elem.find(xpath, nsmap);
 		return !n.empty();
 	}
-	bool find(std::string const& xpath, xmlpp::NodeSet& n) {
+	bool find(std::string const& xpath, xmlpp::const_NodeSet& n) {
 		return find(*get_document()->get_root_node(), xpath, n);
 	}
 	bool getValue(std::string const& xpath, std::string& result) {
-		xmlpp::NodeSet n;
+		xmlpp::const_NodeSet n;
 		if (!find(xpath, n)) return false;
-		result = dynamic_cast<xmlpp::Element&>(*n[0]).get_child_text()->get_content();
+		result = xmlpp::get_first_child_text(dynamic_cast<const xmlpp::Element&>(*n[0]))->get_content();
 		return true;
 	}
 };
@@ -77,7 +76,7 @@ void SongParser::xmlParseHeader() {
 	SSDom dom(m_ss);
 	// Extract artist and title from XML comments
 	{
-		xmlpp::NodeSet comments;
+		xmlpp::const_NodeSet comments;
 		// Comments inside or before root element
 		dom.find("/ss:MELODY/comment()", comments) || dom.find("/ss:MELODY/../comment()", comments);
 		for (auto const& node: comments) {
@@ -89,12 +88,12 @@ void SongParser::xmlParseHeader() {
 	}
 	// Read TRACK elements (singer names), if available
 	std::string singers;  // Only used for "Together" track
-	xmlpp::NodeSet tracks;
+	xmlpp::const_NodeSet tracks;
 	dom.find("/ss:MELODY/ss:TRACK", tracks);
 	for (auto const& elem: tracks) {
 		auto const& trackNode = dynamic_cast<xmlpp::Element const&>(*elem);
 		std::string name = trackNode.get_attribute("Name")->get_value();  // "Player1" or "Player2"
-		xmlpp::Attribute* attr = trackNode.get_attribute("Artist");
+		auto attr = trackNode.get_attribute("Artist");
 		std::string artist = attr ? std::string(attr->get_value()) : name;  // Singer name
 		if (attr) singers += (singers.empty() ? "" : " & ") + artist;
 		m_song.insertVocalTrack(name, VocalTrack(artist));
@@ -122,7 +121,7 @@ void SongParser::xmlParse() {
 	Song& s = m_song;
 	// Extract tempo
 	{
-		xmlpp::NodeSet n;
+		xmlpp::const_NodeSet n;
 		if (!dom.find("/ss:MELODY", n)) throw std::runtime_error("Unable to find BPM info");
 		auto const& e = dynamic_cast<xmlpp::Element const&>(*n[0]);
 		std::string res = e.get_attribute("Resolution")->get_value();
@@ -134,7 +133,7 @@ void SongParser::xmlParse() {
 	addBPM(0, m_bpm);
 
 	// Parse each track...
-	xmlpp::NodeSet tracks;
+	xmlpp::const_NodeSet tracks;
 	// First try version 1 (MELODY/SENTENCE), fallback to version 2/4 (MELODY/TRACK/SENTENCE).
 	dom.find("/ss:MELODY[ss:SENTENCE]", tracks) || dom.find("/ss:MELODY/ss:TRACK[ss:SENTENCE]", tracks);
 	if (tracks.empty()) throw std::runtime_error("No valid tracks or sentences found");
@@ -146,14 +145,14 @@ void SongParser::xmlParse() {
 		VocalTrack& vocal = vocalIt->second;
 		auto const& trackElem = dynamic_cast<xmlpp::Element const&>(*tracks[player % tracks.size()]);
 		std::string sentenceSinger = "Solo 1";  // The default value
-		xmlpp::NodeSet sentences;
+		xmlpp::const_NodeSet sentences;
 		dom.find(trackElem, "ss:SENTENCE", sentences);
 		unsigned ts = 0;
-		for (xmlpp::NodeSet::const_iterator it = sentences.begin(); it != sentences.end(); ++it ) {
+		for (auto it = sentences.begin(); it != sentences.end(); ++it ) {
 			auto const& sentenceNode = dynamic_cast<xmlpp::Element const&>(**it);
 			// Check if SENTENCE has new attributes
 			{
-				xmlpp::Attribute* attr = sentenceNode.get_attribute("Part");
+				auto attr = sentenceNode.get_attribute("Part");
 				if (attr) m_song.songsections.push_back(Song::SongSection(attr->get_value(), tsTime(ts)));
 				attr = sentenceNode.get_attribute("Singer");
 				if (attr) sentenceSinger = attr->get_value();
@@ -166,7 +165,7 @@ void SongParser::xmlParse() {
 				addNoteToTrack(vocal, sleep);
 			}
 			// Notes of a sentence
-			xmlpp::NodeSet notes;
+			xmlpp::const_NodeSet notes;
 			dom.find(sentenceNode, "ss:NOTE", notes);
 			for (auto const& elem: notes) {
 				auto const& noteNode = dynamic_cast<xmlpp::Element const&>(*elem);

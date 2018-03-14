@@ -62,10 +62,10 @@ namespace input {
 				case SDL_SCANCODE_RCTRL: case SDL_SCANCODE_RALT: button = GUITAR_GODMODE; goto guitar_process;
 				case SDL_SCANCODE_RSHIFT: button = GUITAR_PICK_UP; goto guitar_process;
 				case SDL_SCANCODE_RETURN: case SDL_SCANCODE_KP_ENTER: button = GUITAR_PICK_DOWN; goto guitar_process;
-				case SDL_SCANCODE_F5: case SDL_SCANCODE_5: case SDL_SCANCODE_B: button++;
-				case SDL_SCANCODE_F4: case SDL_SCANCODE_4: case SDL_SCANCODE_V: button++;
-				case SDL_SCANCODE_F3: case SDL_SCANCODE_3: case SDL_SCANCODE_C: button++;
-				case SDL_SCANCODE_F2: case SDL_SCANCODE_2: case SDL_SCANCODE_X: button++;
+				case SDL_SCANCODE_F5: case SDL_SCANCODE_5: case SDL_SCANCODE_B: button++; [[fallthrough]];
+				case SDL_SCANCODE_F4: case SDL_SCANCODE_4: case SDL_SCANCODE_V: button++; [[fallthrough]];
+				case SDL_SCANCODE_F3: case SDL_SCANCODE_3: case SDL_SCANCODE_C: button++; [[fallthrough]];
+				case SDL_SCANCODE_F2: case SDL_SCANCODE_2: case SDL_SCANCODE_X: button++; [[fallthrough]];
 				case SDL_SCANCODE_F1: case SDL_SCANCODE_1: case SDL_SCANCODE_Z:
 				guitar_process:
 					if (!m_guitar) return;
@@ -73,11 +73,11 @@ namespace input {
 					break;
 
 				// Keytar on keyboard
-				case SDL_SCANCODE_F12: button++;
-				case SDL_SCANCODE_F11: button++;
-				case SDL_SCANCODE_F10: button++;
-				case SDL_SCANCODE_F9: button++;
-				case SDL_SCANCODE_F8: button++;
+				case SDL_SCANCODE_F12: button++; [[fallthrough]];
+				case SDL_SCANCODE_F11: button++; [[fallthrough]];
+				case SDL_SCANCODE_F10: button++; [[fallthrough]];
+				case SDL_SCANCODE_F9: button++; [[fallthrough]];
+				case SDL_SCANCODE_F8: button++; [[fallthrough]];
 				case SDL_SCANCODE_F7:
 					if (!m_keytar) return;
 					event.devType = DEVTYPE_KEYTAR;
@@ -85,8 +85,8 @@ namespace input {
 
 				// Drums on keyboard
 				case SDL_SCANCODE_8: button = DRUMS_YELLOW_CYMBAL; goto drum_process;
-				case SDL_SCANCODE_9: button = DRUMS_GREEN_CYMBAL; goto drum_process;
-				case SDL_SCANCODE_0: button = DRUMS_BLUE_CYMBAL; goto drum_process;
+				case SDL_SCANCODE_9: button = DRUMS_BLUE_CYMBAL; goto drum_process;
+				case SDL_SCANCODE_0: button = DRUMS_GREEN_CYMBAL; goto drum_process;
 				case SDL_SCANCODE_U: button = DRUMS_RED; goto drum_process;
 				case SDL_SCANCODE_I: button = DRUMS_YELLOW_TOM; goto drum_process;
 				case SDL_SCANCODE_O: button = DRUMS_BLUE_TOM; goto drum_process;
@@ -98,13 +98,13 @@ namespace input {
 					break;
 
 				// Dance on keypad
-				case SDL_SCANCODE_KP_9: button++;
-				case SDL_SCANCODE_KP_7: button++;
-				case SDL_SCANCODE_KP_3: button++;
-				case SDL_SCANCODE_KP_1: button++;
-				case SDL_SCANCODE_KP_6: case SDL_SCANCODE_RIGHT: button++;
-				case SDL_SCANCODE_KP_8: case SDL_SCANCODE_UP: button++;
-				case SDL_SCANCODE_KP_2: case SDL_SCANCODE_DOWN: case SDL_SCANCODE_KP_5: button++;
+				case SDL_SCANCODE_KP_9: button++; [[fallthrough]];
+				case SDL_SCANCODE_KP_7: button++; [[fallthrough]];
+				case SDL_SCANCODE_KP_3: button++; [[fallthrough]];
+				case SDL_SCANCODE_KP_1: button++; [[fallthrough]];
+				case SDL_SCANCODE_KP_6: case SDL_SCANCODE_RIGHT: button++; [[fallthrough]];
+				case SDL_SCANCODE_KP_8: case SDL_SCANCODE_UP: button++; [[fallthrough]];
+				case SDL_SCANCODE_KP_2: case SDL_SCANCODE_DOWN: case SDL_SCANCODE_KP_5: button++; [[fallthrough]];
 				case SDL_SCANCODE_KP_4: case SDL_SCANCODE_LEFT:
 					if (!m_dancepad) return;
 					event.devType = DEVTYPE_DANCEPAD;

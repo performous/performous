@@ -7,7 +7,6 @@ namespace http = boost::network::http;
 #include <boost/thread/mutex.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/lexical_cast.hpp>
 #include <json/json.h>
 #include <string>
 #include "fs.hh"
@@ -45,7 +44,7 @@ public:
 	http_server::response POSTresponse(http_server::request const &request);
 
 private:
-	void StartServer();
+	void StartServer(int tried, bool fallbackPortInUse);
 	Json::Value SongsToJsonObject();
 	std::map<std::string, std::string> GenerateLocaleDict();
 	std::vector<std::string> GetTranslationKeys();

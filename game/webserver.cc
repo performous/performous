@@ -1,9 +1,9 @@
 ﻿#include "webserver.hh"
 #ifdef USE_WEBSERVER
 #include <boost/network/protocol/http/server.hpp>
-
+#include <thread>
+#include <chrono>
 namespace http = boost::network::http;
-
 
 typedef http::server<WebServer::handler> http_server;
 
@@ -34,17 +34,41 @@ struct WebServer::handler {
 };
 
 
-void WebServer::StartServer() {
+void WebServer::StartServer(int tried, bool fallbackPortInUse = false) {
+	if(tried > 2) {
+		if(fallbackPortInUse == false) {
+			std::clog << "webserver/error: Couldn't start webserver tried 3 times. Trying fallbackport.." << std::endl;
+			StartServer(0, true);
+			return;
+		}
+
+		std::clog << "webserver/error: Couldn't start webserver tried 3 times using normal port and 3 times using fallback port. Stopping webserver." << std::endl; 
+		if(m_server) {
+			m_server->stop();
+		}
+		return;
+	}
+
 	handler handler_{*this};
 	http_server::options options(handler_);
+	std::string portToUse = fallbackPortInUse ? std::to_string(config["game/webserver_fallback_port"].i()) : std::to_string(config["game/webserver_port"].i());
 	if(config["game/webserver_access"].i() == 1) {
-		std::clog << "webserver/notice: Starting local server." << std::endl;
-		m_server.reset(new http_server(options.address("127.0.0.1").port(std::to_string(config["game/webserver_port"].i()))));
+		std::clog << "webserver/notice: Starting local server..." << std::endl;
+		m_server.reset(new http_server(options.address("127.0.0.1").port(portToUse)));
 	} else {
-		m_server.reset(new http_server(options.address("0.0.0.0").port(std::to_string(config["game/webserver_port"].i()))));
-		std::clog << "webserver/notice: Starting public server." << std::endl;
+		m_server.reset(new http_server(options.address("0.0.0.0").port(portToUse)));
+		std::clog << "webserver/notice: Starting public server..." << std::endl;
 	}
-	m_server->run();
+	try {
+		m_server->run();
+	}
+	catch (std::exception& e)
+	{
+		tried = tried + 1;
+		std::clog << "webserver/error: " << e.what() << " Trying again... (tried " << tried << " times)." << std::endl;
+		std::this_thread::sleep_for(std::chrono::seconds(20));
+		StartServer(tried, fallbackPortInUse);
+	}
 }
 
 WebServer::WebServer(Songs& songs)
@@ -53,7 +77,7 @@ WebServer::WebServer(Songs& songs)
 	if(config["game/webserver_access"].i() == 0) {
 		std::clog << "webserver/notice: Not starting webserver." << std::endl;
 	} else {
-		m_serverThread.reset(new boost::thread(boost::bind(&WebServer::StartServer,boost::ref(*this))));
+		m_serverThread.reset(new boost::thread(boost::bind(&WebServer::StartServer, boost::ref(*this), 0, false)));
 	}
 }
 
@@ -147,7 +171,7 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 	} else if(request.destination == "/api/getplaylistTimeout") {
 		return http_server::response::stock_reply(http_server::response::ok, std::to_string(config["game/playlist_screen_timeout"].i()));
 	} else if(request.destination.find("/api/language") == 0) {
-		map<std::string, std::string> localeMap = GenerateLocaleDict();
+		auto localeMap = GenerateLocaleDict();
 		
 		Json::Value jsonRoot = Json::objectValue;
 		for (auto const &kv : localeMap) {
@@ -211,7 +235,7 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 		}
 	} else if(request.destination == "/api/remove") {
 		try { // this is for those idiots that send text instead of numbers.
-			int songToDelete = boost::lexical_cast<int>(request.body);
+			int songToDelete = std::stoi(request.body);
 			gm->getCurrentPlayList().removeSong(songToDelete);
 			ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
 			m_pp->triggerSongListUpdate(); //this way the screen_playlist does a live-update just like the screen_songs
@@ -242,15 +266,15 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 					std::clog << "webserver/error: cannot parse Json Document" <<std::endl;
 					return http_server::response::stock_reply(http_server::response::ok, "No valid JSON.");
 				}
-				unsigned int songToMove = boost::lexical_cast<int>(root["songId"]);
-				unsigned int positionToMoveTo = boost::lexical_cast<int>(root["position"]);
+				unsigned int songToMove = root["songId"].asUInt();
+				unsigned int positionToMoveTo = root["position"].asUInt();
 
 				if(gm->getCurrentPlayList().getList().size() == 0) {
-					return http_server::response::stock_reply(http_server::response::ok, "Playlist is empty, can't move the song you've provided: " + boost::lexical_cast<std::string>(songToMove + 1));
+					return http_server::response::stock_reply(http_server::response::ok, "Playlist is empty, can't move the song you've provided: " + std::to_string(songToMove + 1));
 				}
 
 				if(songToMove > gm->getCurrentPlayList().getList().size() -1) {
-					return http_server::response::stock_reply(http_server::response::ok, "Not gonna move the unknown song you've provided: " + boost::lexical_cast<std::string>(songToMove + 1));
+					return http_server::response::stock_reply(http_server::response::ok, "Not gonna move the unknown song you've provided: " + std::to_string(songToMove + 1));
 				}
 
 				if(positionToMoveTo <= gm->getCurrentPlayList().getList().size() -1) {
@@ -258,9 +282,9 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 					ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
 					m_pp->triggerSongListUpdate();
 				} else {
-					return http_server::response::stock_reply(http_server::response::ok, "Not gonna move the song to "+ boost::lexical_cast<std::string>(positionToMoveTo + 1) + " since the list ain't that long.");
+					return http_server::response::stock_reply(http_server::response::ok, "Not gonna move the song to "+ std::to_string(positionToMoveTo + 1) + " since the list ain't that long.");
 				}
-			return http_server::response::stock_reply(http_server::response::ok, "Succesfuly moved the song from " + boost::lexical_cast<std::string>(songToMove + 1) + " to " + boost::lexical_cast<std::string>(positionToMoveTo + 1));
+			return http_server::response::stock_reply(http_server::response::ok, "Succesfuly moved the song from " + std::to_string(songToMove + 1) + " to " + std::to_string(positionToMoveTo + 1));
 		} catch(std::exception e) {
 			return http_server::response::stock_reply(http_server::response::ok, "failure");
 		}
@@ -272,9 +296,9 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 std::map<std::string, std::string> WebServer::GenerateLocaleDict() {
 	std::vector<std::string> translationKeys = GetTranslationKeys();
     
-    map<std::string, std::string> localeMap;
+    std::map<std::string, std::string> localeMap;
     for (auto const &translationKey : translationKeys) {
-		localeMap.insert(pair<std::string, std::string>(translationKey, _(translationKey)));
+		localeMap[translationKey] = _(translationKey);
 	}
     return localeMap;
 }
@@ -347,8 +371,4 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 
 	return boost::shared_ptr<Song>();
 }
-#else
-WebServer::WebServer(Songs& songs)
-	: m_songs(songs) {}
-WebServer::~WebServer(){}
 #endif

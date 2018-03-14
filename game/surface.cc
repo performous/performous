@@ -53,11 +53,11 @@ class SurfaceLoader::Impl {
 		}
 	}
 	volatile bool m_quit;
-	boost::thread m_thread;
 	boost::mutex m_mutex;
 	boost::condition m_condition;
 	typedef std::map<void const*, Job> Jobs;
 	Jobs m_jobs;
+	boost::thread m_thread;
 public:
 	Impl(): m_quit(), m_thread(&Impl::run, this) {}
 	~Impl() { m_quit = true; m_condition.notify_one(); m_thread.join(); }

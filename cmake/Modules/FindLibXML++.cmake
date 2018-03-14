@@ -1,4 +1,4 @@
-# - Try to find LibXML++ 2.6
+# - Try to find LibXML++ 3.0 or 2.6 (defaulting)
 # Once done, this will define
 #
 #  LibXML++_FOUND - system has LibXML++
@@ -12,25 +12,42 @@ libfind_package(LibXML++ LibXML2)
 libfind_package(LibXML++ Glibmm)
 
 # Use pkg-config to get hints about paths
-libfind_pkg_check_modules(LibXML++_PKGCONF libxml++-2.6)
+libfind_pkg_check_modules(LibXML++_PKGCONF_3_0 libxml++-3.0)
+
+if(LibXML++_PKGCONF_3_0_FOUND)
+  set(LibXML++_VERSION "3.0")
+  set(LibXML++_VERSION_2_6 "0")
+  set(LibXML++_VERSION_3_0 "1")
+  set(LibXML++_PKGCONF_INCLUDE_DIRS ${LibXML++_PKGCONF_3_0_INCLUDE_DIRS})
+  set(LibXML++_PKGCONF_LIBRARY_DIRS ${LibXML++_PKGCONF_3_0_LIBRARY_DIRS})
+else(LixXML++_PKGCONF_3_0_FOUND)
+  libfind_pkg_check_modules(LibXML++_PKGCONF_2_6 libxml++-2.6)
+  if(LibXML++_PKGCONF_2_6_FOUND)
+    set(LibXML++_VERSION "2.6")
+    set(LibXML++_VERSION_2_6 "1")
+    set(LibXML++_VERSION_3_0 "0")
+    set(LibXML++_PKGCONF_INCLUDE_DIRS ${LibXML++_PKGCONF_2_6_INCLUDE_DIRS})
+    set(LibXML++_PKGCONF_LIBRARY_DIRS ${LibXML++_PKGCONF_2_6_LIBRARY_DIRS})
+  endif(LibXML++_PKGCONF_2_6_FOUND)
+endif(LibXML++_PKGCONF_3_0_FOUND)
 
 # Main include dir
 find_path(LibXML++_INCLUDE_DIR
   NAMES libxml++/libxml++.h
   HINTS ${LibXML++_PKGCONF_INCLUDE_DIRS}
-  PATH_SUFFIXES libxml++-2.6
+  PATH_SUFFIXES libxml++-${LibXML++_VERSION}
 )
 
 # Glib-related libraries also use a separate config header, which is in lib dir
 find_path(LibXML++Config_INCLUDE_DIR
   NAMES libxml++config.h
-  HINTS ${LibXML++_PKGCONF_INCLUDE_DIRS} /usr
-  PATH_SUFFIXES lib/libxml++-2.6/include ../lib/libxml++-2.6/include
+  HINTS ${LibXML++_PKGCONF_INCLUDE_DIRS} /usr /usr/lib/x86_64-linux-gnu/libxml++-${LibXML++_VERSION}/include/
+  PATH_SUFFIXES lib/libxml++-${LibXML++_VERSION}/include ../lib/libxml++-${LibXML++_VERSION}/include
 )
 
 # Finally the library itself
 find_library(LibXML++_LIBRARY
-  NAMES xml++-2.6
+  NAMES xml++-${LibXML++_VERSION}
   HINTS ${LibXML++_PKGCONF_LIBRARY_DIRS}
 )
 

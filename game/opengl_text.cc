@@ -1,8 +1,8 @@
 ﻿#include "opengl_text.hh"
 
-#include <boost/lexical_cast.hpp>
+#include "libxml++-impl.hh"
+
 #include "fontconfig/fontconfig.h"
-#include <libxml++/libxml++.h>
 #include <pango/pangocairo.h>
 #include <cmath>
 #include <iostream>
@@ -135,17 +135,16 @@ namespace {
 		xmlpp::Node::PrefixNsMap nsmap;
 		nsmap["svg"] = "http://www.w3.org/2000/svg";
 		xmlpp::DomParser dom(themeFile.string());
-		xmlpp::NodeSet n;
 		// Parse width attribute
-		n = dom.get_document()->get_root_node()->find("/svg:svg/@width",nsmap);
+		auto n = dom.get_document()->get_root_node()->find("/svg:svg/@width",nsmap);
 		if (n.empty()) throw std::runtime_error("Unable to find text theme info width in "+themeFile.string());
 		xmlpp::Attribute& width = dynamic_cast<xmlpp::Attribute&>(*n[0]);
-		_width = boost::lexical_cast<double>(width.get_value());
+		_width = std::stod(width.get_value());
 		// Parse height attribute
 		n = dom.get_document()->get_root_node()->find("/svg:svg/@height",nsmap);
 		if (n.empty()) throw std::runtime_error("Unable to find text theme info height in "+themeFile.string());
 		xmlpp::Attribute& height = dynamic_cast<xmlpp::Attribute&>(*n[0]);
-		_height = boost::lexical_cast<double>(height.get_value());
+		_height = std::stod(height.get_value());
 		// Parse text style attribute (CSS rules)
 		n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@style",nsmap);
 		if (n.empty()) throw std::runtime_error("Unable to find text theme info style in "+themeFile.string());
@@ -182,11 +181,11 @@ namespace {
 		n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@x",nsmap);
 		if (n.empty()) throw std::runtime_error("Unable to find text theme info x in "+themeFile.string());
 		xmlpp::Attribute& x = dynamic_cast<xmlpp::Attribute&>(*n[0]);
-		_x = boost::lexical_cast<double>(x.get_value());
+		_x = std::stod(x.get_value());
 		n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@y",nsmap);
 		if (n.empty()) throw std::runtime_error("Unable to find text theme info y in "+themeFile.string());
 		xmlpp::Attribute& y = dynamic_cast<xmlpp::Attribute&>(*n[0]);
-		_y = boost::lexical_cast<double>(y.get_value());
+		_y = std::stod(y.get_value());
 	}
 }
 

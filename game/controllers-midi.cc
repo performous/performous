@@ -3,9 +3,8 @@
 #include "controllers.hh"
 #include "portmidi.hh"
 #include "fs.hh"
-#include <boost/lexical_cast.hpp>
-#include <boost/ptr_container/ptr_map.hpp>
 #include <boost/regex.hpp>
+#include <unordered_map>
 
 namespace input {
 
@@ -21,7 +20,7 @@ namespace input {
 					std::string name = getName(dev);
 					if (!re.empty() && !regex_search(name, re)) continue;
 					// Now actually open the device
-					m_streams.insert(dev, std::auto_ptr<pm::Input>(new pm::Input(dev)));
+					m_streams.emplace(dev, std::unique_ptr<pm::Input>(new pm::Input(dev)));
 					std::clog << "controller-midi/info: Opened MIDI device " << name << std::endl;
 				} catch (std::runtime_error& e) {
 					std::clog << "controller-midi/warning: " << e.what() << std::endl;
@@ -37,8 +36,8 @@ namespace input {
 		}
 		bool process(Event& event) override {
 			PmEvent ev;
-			for (auto kv: m_streams) {
-				if (Pm_Read(*kv.second, &ev, 1) != 1) continue;
+			for (auto it = m_streams.begin(); it != m_streams.end(); ++it) {
+				if (Pm_Read(*it->second, &ev, 1) != 1) continue;
 				unsigned char evnt = ev.message & 0xF0;
 				unsigned char note = ev.message >> 8;
 				unsigned char vel  = ev.message >> 16;
@@ -46,7 +45,7 @@ namespace input {
 				if (evnt == 0x80 /* NOTE OFF */) { evnt = 0x90; vel = 0; }  // Translate NOTE OFF into NOTE ON with zero-velocity
 				if (evnt != 0x90 /* NOTE ON */) continue;  // Ignore anything that isn't NOTE ON/OFF
 				std::clog << "controller-midi/info: MIDI NOTE ON/OFF event: ch=" << unsigned(chan) << " note=" << unsigned(note) << " vel=" << unsigned(vel) << std::endl;
-				event.source = SourceId(SOURCETYPE_MIDI, kv.first, chan);
+				event.source = SourceId(SOURCETYPE_MIDI, it->first, chan);
 				event.hw = note;
 				event.value = vel / 127.0;
 				return true;
@@ -55,7 +54,7 @@ namespace input {
 		}
 	private:
 		pm::Initialize m_init;
-		boost::ptr_map<unsigned, pm::Input> m_streams;
+		std::unordered_map<unsigned, std::unique_ptr<pm::Input>> m_streams;
 	};
 
 	Hardware::ptr constructMidi() { return Hardware::ptr(new Midi()); }
@@ -72,4 +71,3 @@ namespace input {
 }
 
 #endif
-

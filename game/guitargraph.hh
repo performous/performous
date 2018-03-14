@@ -77,7 +77,7 @@ class GuitarGraph: public InstrumentGraph {
 	void endBRE();
 	void endStreak() { m_streak = 0; m_bigStreak = 0; }
 	void updateDrumFill(double time);
-	void drumHit(double time, unsigned pad);
+	void drumHit(double time, unsigned layer, unsigned pad);
 	void guitarPlay(double time, input::Event const& ev);
 
 	// Media
@@ -155,6 +155,6 @@ class GuitarGraph: public InstrumentGraph {
 	double m_soloScore; /// score during solo
 	bool m_solo; /// are we currently playing a solo
 	bool m_hasTomTrack; /// true if the track has at least one tom track
+	bool m_proMode; /// true if pro drums. (it would be better to split guitar/trum tracks into sep classes)
 	double m_whammy; /// whammy value for pitch shift
 };
-

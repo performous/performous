@@ -1,10 +1,10 @@
 #include "hiscore.hh"
 
+#include "libxml++-impl.hh"
+
 #include <algorithm>
 #include <sstream>
 #include <stdexcept>
-#include <boost/lexical_cast.hpp>
-#include <libxml++/libxml++.h>
 
 bool Hiscore::reachedHiscore(unsigned score, unsigned songid, std::string const& track) const {
 	if (score > 10000) throw std::logic_error("Invalid score value");
@@ -52,12 +52,12 @@ void Hiscore::load(xmlpp::NodeSet const& nodes) {
 		if (!a_songid) throw std::runtime_error("Attribute songid not found");
 		xmlpp::Attribute* a_track = element.get_attribute("track");
 
-		int playerid = boost::lexical_cast<int>(a_playerid->get_value());
-		int songid = boost::lexical_cast<int>(a_songid->get_value());
+		int playerid = std::stoi(a_playerid->get_value());
+		int songid = std::stoi(a_songid->get_value());
 
-		xmlpp::TextNode* tn = element.get_child_text();
+		auto tn = xmlpp::get_first_child_text(element);
 		if (!tn) throw std::runtime_error("Score not found");
-		int score = boost::lexical_cast<int>(tn->get_content());
+		int score = std::stoi(tn->get_content());
 
 		addHiscore(score, playerid, songid, a_track ? a_track->get_value() : "vocals");
 	}
@@ -65,9 +65,9 @@ void Hiscore::load(xmlpp::NodeSet const& nodes) {
 
 void Hiscore::save(xmlpp::Element *hiscores) {
 	for (auto const& h: m_hiscore) {
-		xmlpp::Element* hiscore = hiscores->add_child("hiscore");
-		hiscore->set_attribute("playerid", boost::lexical_cast<std::string>(h.playerid));
-		hiscore->set_attribute("songid", boost::lexical_cast<std::string>(h.songid));
+		xmlpp::Element* hiscore = xmlpp::add_child_element(hiscores, "hiscore");
+		hiscore->set_attribute("playerid", std::to_string(h.playerid));
+		hiscore->set_attribute("songid", std::to_string(h.songid));
 		hiscore->set_attribute("track", h.track);
 		hiscore->add_child_text(std::to_string(h.score));
 	}

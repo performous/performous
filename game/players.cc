@@ -2,9 +2,14 @@
 
 #include "configuration.hh"
 #include "fs.hh"
+#include "libxml++-impl.hh"
+
+#include <algorithm>
 #include <boost/regex.hpp>
-#include <boost/lexical_cast.hpp>
-#include <libxml++/libxml++.h>
+#include <unicode/stsearch.h>
+
+UErrorCode Players::m_icuError = U_ZERO_ERROR;
+icu::RuleBasedCollator Players::icuCollator = icu::RuleBasedCollator(icu::UnicodeString(""), icu::Collator::PRIMARY, m_icuError);
 
 Players::Players():
 	m_players(),
@@ -24,13 +29,12 @@ void Players::load(xmlpp::NodeSet const& n) {
 		xmlpp::Attribute* a_id = element.get_attribute("id");
 		if (!a_id) throw PlayersException("Attribute id not found");
 		int id = -1;
-		try {id = boost::lexical_cast<int>(a_id->get_value());} catch (boost::bad_lexical_cast const&) { }
+		try { id = std::stoi(a_id->get_value()); } catch (std::exception&) { }
 		xmlpp::NodeSet n2 = element.find("picture");
 		std::string picture;
 		if (!n2.empty()) // optional picture element
 		{
-			xmlpp::Element& element2 =dynamic_cast<xmlpp::Element&>(**n2.begin());
-			xmlpp::TextNode* tn = element2.get_child_text();
+			auto tn = xmlpp::get_first_child_text(dynamic_cast<xmlpp::Element&>(**n2.begin()));
 			picture = tn->get_content();
 		}
 		addPlayer(a_name->get_value(), picture, id);
@@ -40,12 +44,12 @@ void Players::load(xmlpp::NodeSet const& n) {
 
 void Players::save(xmlpp::Element *players) {
 	for (auto const& p: m_players) {
-		xmlpp::Element* player = players->add_child("player");
+		xmlpp::Element* player = xmlpp::add_child_element(players, "player");
 		player->set_attribute("name", p.name);
 		player->set_attribute("id", std::to_string(p.id));
 		if (p.picture != "")
 		{
-			xmlpp::Element* picture = player->add_child("picture");
+			xmlpp::Element* picture = xmlpp::add_child_element(player, "picture");
 			picture->add_child_text(p.picture.string());
 		}
 	}
@@ -118,9 +122,17 @@ void Players::filter_internal() {
 
 	try {
 		fplayers_t filtered;
-		for (auto const& p: m_players) {
-			if (regex_search(p.name, boost::regex(m_filter, boost::regex_constants::icase))) filtered.push_back(p);
+		if (m_filter == std::string()) filtered = fplayers_t(m_players.begin(), m_players.end());
+		else {
+			icu::UnicodeString filter = icu::UnicodeString::fromUTF8(m_filter);
+			std::copy_if (m_players.begin(), m_players.end(), std::back_inserter(filtered), [&](PlayerItem it){
+			icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8(it.name), &icuCollator, NULL, m_icuError);
+			return (search.first(m_icuError) != USEARCH_DONE);
+			});
 		}
+// 		for (auto const& p: m_players) {
+// 			if (regex_search(p.name, boost::regex(m_filter, boost::regex_constants::icase))) filtered.push_back(p);
+// 		}
 		m_filtered.swap(filtered);
 	} catch (...) {
 		fplayers_t(m_players.begin(), m_players.end()).swap(m_filtered);  // Invalid regex => copy everything

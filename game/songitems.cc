@@ -1,13 +1,11 @@
 #include "songitems.hh"
 
 #include "unicode.hh"
+#include "libxml++-impl.hh"
 
 #include <string>
 
 #include <boost/shared_ptr.hpp>
-#include <boost/lexical_cast.hpp>
-
-#include <libxml++/libxml++.h>
 
 
 void SongItems::load(xmlpp::NodeSet const& n) {
@@ -23,13 +21,13 @@ void SongItems::load(xmlpp::NodeSet const& n) {
 		xmlpp::Attribute* a_title = element.get_attribute("title");
 		if (!a_title) throw SongItemsException("No attribute title");
 
-		addSongItem(a_artist->get_value(), a_title->get_value(), boost::lexical_cast<int>(a_id->get_value()));
+		addSongItem(a_artist->get_value(), a_title->get_value(), std::stoi(a_id->get_value()));
 	}
 }
 
 void SongItems::save(xmlpp::Element* songs) {
 	for (auto const& song: m_songs) {
-		xmlpp::Element* element = songs->add_child("song");
+		xmlpp::Element* element = xmlpp::add_child_element(songs, "song");
 		element->set_attribute("id", std::to_string(song.id));
 		element->set_attribute("artist", song.artist);
 		element->set_attribute("title", song.title);

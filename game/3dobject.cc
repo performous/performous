@@ -1,7 +1,6 @@
 #include "3dobject.hh"
 
 #include <boost/filesystem/fstream.hpp>
-#include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <sstream>
 
@@ -52,7 +51,7 @@ void Object3d::loadWavefrontObj(fs::path const& filepath, float scale) {
 		} else if (row.substr(0,2) == "vn") {  // Normals
 			srow >> tempst >> x >> y >> z;
 			double sum = std::abs(x)+std::abs(y)+std::abs(z);
-			if (sum == 0) throw std::runtime_error("Invalid normal in "+filepath.string()+":"+boost::lexical_cast<std::string>(linenumber));
+			if (sum == 0) throw std::runtime_error("Invalid normal in "+filepath.string()+":"+std::to_string(linenumber));
 			x /= sum; y /= sum; z /= sum; // Normalize components
 			normals.push_back(glmath::vec3(x, y, z));
 		} else if (row.substr(0,2) == "f ") {  // Faces
@@ -64,7 +63,7 @@ void Object3d::loadWavefrontObj(fs::path const& filepath, float scale) {
 					std::string st_id(getWord(fpoint,i,'/'));
 					if (!st_id.empty()) {
 						// Vertex indices are 1-based in the file
-						int v_id = boost::lexical_cast<int>(st_id) - 1;
+						int v_id = std::stoi(st_id) - 1;
 						switch (i) {
 							case 1: f.vertices.push_back(v_id); break;
 							case 2: f.texcoords.push_back(v_id); break;
@@ -74,14 +73,14 @@ void Object3d::loadWavefrontObj(fs::path const& filepath, float scale) {
 				}
 			}
 			if (!f.vertices.empty() && f.vertices.size() != 3)
-				throw std::runtime_error("Only triangle faces allowed in "+filepath.string()+":"+boost::lexical_cast<std::string>(linenumber));
+				throw std::runtime_error("Only triangle faces allowed in "+filepath.string()+":"+std::to_string(linenumber));
 			// Face must have equal number of v, vt, vn or none of a kind
 			if (!f.vertices.empty()
 			  && (f.texcoords.empty() || (f.texcoords.size() == f.vertices.size()))
 			  && (f.normals.empty()   || (f.normals.size() == f.vertices.size()))) {
 				m_faces.push_back(f);
 			} else {
-				throw std::runtime_error("Invalid face in "+filepath.string()+":"+boost::lexical_cast<std::string>(linenumber));
+				throw std::runtime_error("Invalid face in "+filepath.string()+":"+std::to_string(linenumber));
 			}
 		}
 	}

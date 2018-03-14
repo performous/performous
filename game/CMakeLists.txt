@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
-file(GLOB SOURCE_FILES "*.cc" "../common/image.cc")
-file(GLOB HEADER_FILES "*.hh" "../common/image.hh" "libda/*.hpp")
+file(GLOB SOURCE_FILES "*.cc")
+file(GLOB HEADER_FILES "*.hh" "libda/*.hpp")
 
 if(WIN32)
 	# We want to support all these version numbers:
@@ -71,6 +71,10 @@ if (Boost_VERSION VERSION_LESS 105500)
 	set(CMAKE_CXX_FLAGS "-DBOOST_NO_CXX11_SCOPED_ENUMS ${CMAKE_CXX_FLAGS}")
 endif()
 
+find_package(ICU REQUIRED uc data i18n io)
+include_directories(${ICU_INCLUDE_DIRS})
+list(APPEND LIBS ${ICU_LIBRARIES})
+
 # LibEpoxy < 1.2 crashes with binary drivers (nvidia & fglrx) when creating shaders
 # (see https://github.com/anholt/libepoxy/issues/23 for the exact problem)
 find_package(LibEpoxy 1.2 REQUIRED)
@@ -78,7 +82,7 @@ include_directories(${LibEpoxy_INCLUDE_DIRS})
 list(APPEND LIBS ${LibEpoxy_LIBRARIES})
 
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat AVResample SWScale Z Jpeg Png PortAudio Fontconfig)
+foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat AVResample SWScale ZLIB JPEG PNG PortAudio Fontconfig)
 	find_package(${lib} REQUIRED)
 	message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
 	include_directories(${${lib}_INCLUDE_DIRS})
@@ -133,16 +137,11 @@ else()
 	message(STATUS "Webserver support: Disabled (explicitly disabled)")
 endif()
 
-if(APPLE)
-	# Needed for ffmpeg.cc to compile cleanly on OSX (it's a (unsigned long) long story)
-	add_definitions("-D__STDC_CONSTANT_MACROS")
-endif(APPLE)
-
-if(UNIX)
+if(UNIX AND NOT APPLE)
 	# Note: cannot use list APPEND here because it inserts semicolons instead of spaces
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
-endif(UNIX)
+endif()
 
 if(WIN32)
 	option(MXE_HACK "Features horrible hacks, but is able to compile a static performous.exe (that may not work)." OFF)

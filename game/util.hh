@@ -5,6 +5,9 @@
 #include <vector>
 #include <stdexcept>
 
+/** Templated conversion functions for string to T, specializations defined in util.cc **/
+template <typename T> T sconv(std::string const& s);
+
 /** Limit val to range [min, max] **/
 template <typename T> T clamp(T val, T min = 0, T max = 1) {
 	if (min > max) throw std::logic_error("min > max");

@@ -126,7 +126,7 @@ static void checkEvents(Game& gm) {
 			continue; // Already handled here...
 		}
 		// If a dialog is open, any nav event will close it
-		if (gm.isDialogOpen()) { gm.closeDialog(); continue; }
+		if (gm.isDialogOpen()) { gm.closeDialog(); }
 		// Let the current screen handle other events
 		gm.getCurrentScreen()->manageEvent(event);
 	}
@@ -145,6 +145,7 @@ void mainLoop(std::string const& songlist) {
 	std::clog << "core/info: Loading assets." << std::endl;
 	TranslationEngine localization(PACKAGE);
 	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
+	UnicodeUtil m_unicode;
 	SurfaceLoader m_loader;
 	Backgrounds backgrounds;
 	Database database(getConfigDir() / "database.xml");

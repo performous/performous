@@ -65,8 +65,6 @@ public:
 private:
 	double m_x;
 	double m_y;
-	double m_x_advance;
-	double m_y_advance;
 	Surface m_surface;
 };
 

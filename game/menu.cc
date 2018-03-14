@@ -62,10 +62,9 @@ void Menu::action(int dir) {
 			}
 			break;
 		}
-		case MenuOption::SET_AND_CLOSE: {
+		case MenuOption::SET_AND_CLOSE:
 			if (current().value) *(current().value) = current().newValue;
-			// Fall-through to closing
-		}
+			[[fallthrough]];  // Continuing to CLOSE_SUBMENU is intentional
 		case MenuOption::CLOSE_SUBMENU: {
 			closeSubmenu();
 			break;

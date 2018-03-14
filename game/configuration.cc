@@ -1,5 +1,6 @@
 #include "audio.hh"
 #include "configuration.hh"
+#include "libxml++-impl.hh"
 
 #include "fs.hh"
 #include "util.hh"
@@ -7,8 +8,6 @@
 #include "screen_intro.hh"
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
-#include <boost/lexical_cast.hpp>
-#include <libxml++/libxml++.h>
 #include <algorithm>
 #include <iomanip>
 #include <stdexcept>
@@ -91,14 +90,14 @@ namespace {
         fmter % boost::io::group(std::setprecision(precision), double(m) * boost::get<T>(value));
         return fmter.str();
     }
-    
+
     std::string getText(xmlpp::Element const& elem) {
-        xmlpp::TextNode const* n = elem.get_child_text();  // Returns NULL if there is no text
+        auto n = xmlpp::get_first_child_text(elem);  // Returns NULL if there is no text
         return n ? std::string(n->get_content()) : std::string();
     }
-    
+
     std::string getText(xmlpp::Element const& elem, std::string const& path) {
-        xmlpp::NodeSet ns = elem.find(path);
+        auto ns = elem.find(path);
         if (ns.empty()) return std::string();
         return getText(dynamic_cast<xmlpp::Element const&>(*ns[0]));
     }
@@ -158,11 +157,11 @@ namespace {
     }
     template <typename T, typename V> void setLimits(xmlpp::Element& e, V& min, V& max, V& step) {
         xmlpp::Attribute* a = e.get_attribute("min");
-        if (a) min = boost::lexical_cast<T>(a->get_value());
+        if (a) min = sconv<T>(a->get_value());
         a = e.get_attribute("max");
-        if (a) max = boost::lexical_cast<T>(a->get_value());
+        if (a) max = sconv<T>(a->get_value());
         a = e.get_attribute("step");
-        if (a) step = boost::lexical_cast<T>(a->get_value());
+        if (a) step = sconv<T>(a->get_value());
     }
 }
 
@@ -190,7 +189,7 @@ std::string const ConfigItem::getEnumName() const {
 }
 
 template <typename T> void ConfigItem::updateNumeric(xmlpp::Element& elem, int mode) {
-    xmlpp::NodeSet ns = elem.find("limits");
+    auto ns = elem.find("limits");
     if (!ns.empty()) setLimits<T>(dynamic_cast<xmlpp::Element&>(*ns[0]), m_min, m_max, m_step);
     else if (mode == 0) throw XMLError(elem, "child element limits missing");
     ns = elem.find("ui");
@@ -205,9 +204,9 @@ template <typename T> void ConfigItem::updateNumeric(xmlpp::Element& elem, int m
         std::string m;
         try {
             m = getAttribute(e, "multiplier");
-            m_multiplier = boost::lexical_cast<T>(m);
+            m_multiplier = sconv<T>(m);
         } catch (XMLError&) {}
-        catch (boost::bad_lexical_cast&) { throw XMLError(e, "attribute multiplier='" + m + "' value invalid"); }
+        catch (std::exception&) { throw XMLError(e, "attribute multiplier='" + m + "' value invalid"); }
     }
 }
 
@@ -232,12 +231,12 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
         m_value = value;
     } else if (m_type == "int") {
         std::string value_string = getAttribute(elem, "value");
-        if (!value_string.empty()) m_value = boost::lexical_cast<int>(value_string);
+        if (!value_string.empty()) m_value = std::stoi(value_string);
             // Enum handling
             if (mode == 0) {
-                xmlpp::NodeSet n2 = elem.find("limits/enum");
+                auto n2 = elem.find("limits/enum");
                 if (!n2.empty()) {
-                    for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
+                    for (auto it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
                         xmlpp::Element& elem2 = dynamic_cast<xmlpp::Element&>(**it2);
                         m_enums.push_back(getText(elem2));
                     }
@@ -249,15 +248,15 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
         updateNumeric<int>(elem, mode);
     } else if (m_type == "float") {
         std::string value_string = getAttribute(elem, "value");
-        if (!value_string.empty()) m_value = boost::lexical_cast<double>(value_string);
+        if (!value_string.empty()) m_value = std::stod(value_string);
             updateNumeric<double>(elem, mode);
             } else if (m_type == "string") {
                 m_value = getText(elem, "stringvalue");
             } else if (m_type == "string_list" || m_type == "option_list") {
                 //TODO: Option list should also update selection (from attribute?)
                 std::vector<std::string> value;
-                xmlpp::NodeSet n2 = elem.find("stringvalue");
-                for (xmlpp::NodeSet::const_iterator it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
+                auto n2 = elem.find("stringvalue");
+                for (auto it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
                     value.push_back(getText(dynamic_cast<xmlpp::Element const&>(**it2)));
                 }
                 m_value = value;
@@ -267,7 +266,7 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
         if (mode < 2) m_defaultValue = m_value;
             } catch (std::exception& e) {
                 int line = elem.get_line();
-                throw std::runtime_error(boost::lexical_cast<std::string>(line) + ": Error while reading entry: " + e.what());
+                throw std::runtime_error(std::to_string(line) + ": Error while reading entry: " + e.what());
             }
 
 // These are set in readConfig, once the paths have been bootstrapped.
@@ -276,23 +275,23 @@ fs::path userConfFile;
 
 void writeConfig(Audio& m_audio, bool system) {
     xmlpp::Document doc;
-    xmlpp::Node* nodeRoot = doc.create_root_node("performous");
+    auto nodeRoot = doc.create_root_node("performous");
     bool dirty = false;
     for (auto& elem: config) {
         ConfigItem& item = elem.second;
         std::string name = elem.first;
         if (item.isDefault(system)) continue; // No need to save settings with default values
         dirty = true;
-        xmlpp::Element* entryNode = nodeRoot->add_child("entry");
+        xmlpp::Element* entryNode = xmlpp::add_child_element(nodeRoot, "entry");
         entryNode->set_attribute("name", name);
         std::string type = item.get_type();
         entryNode->set_attribute("type", type);
         if (name == "audio/backend") {
             int newValue = PaHostApiNameToHostApiTypeId(item.getEnumName());
             std::clog << "audio/debug: Will now change value of audio backend. New Value: " << newValue << std::endl;
-            entryNode->set_attribute("value", boost::lexical_cast<std::string>(newValue));
+            entryNode->set_attribute("value", std::to_string(newValue));
             std::clog << "audio/info: Audio backend changed; will now restart audio subsystem." << std::endl;
-            
+
             Audio::backendConfig().selectEnum(item.getEnumName());
             boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(m_audio)));
             if (!audiokiller.timed_join(boost::posix_time::milliseconds(2500)))
@@ -303,13 +302,13 @@ void writeConfig(Audio& m_audio, bool system) {
         else if (type == "int") entryNode->set_attribute("value",std::to_string(item.i()));
         else if (type == "bool") entryNode->set_attribute("value", item.b() ? "true" : "false");
         else if (type == "float") entryNode->set_attribute("value",std::to_string(item.f()));
-        else if (item.get_type() == "string") entryNode->add_child("stringvalue")->add_child_text(item.s());
+        else if (item.get_type() == "string") xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(item.s());
         else if (item.get_type() == "string_list") {
-            for (auto const& str: item.sl()) entryNode->add_child("stringvalue")->add_child_text(str);
+            for (auto const& str: item.sl()) xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(str);
         }
         else if (item.get_type() == "option_list") {
             //TODO: Write selected also (as attribute?)
-            for (auto const& str: item.ol()) entryNode->add_child("stringvalue")->add_child_text(str);
+            for (auto const& str: item.ol()) xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(str);
         }
     }
     fs::path const& conf = system ? systemConfFile : userConfFile;
@@ -353,13 +352,13 @@ void readConfigXML(fs::path const& file, int mode) {
     std::clog << "config/info: Parsing " << file << std::endl;
     xmlpp::DomParser domParser(file.string());
     try {
-        xmlpp::NodeSet n = domParser.get_document()->get_root_node()->find("/performous/menu/entry");
+        auto n = domParser.get_document()->get_root_node()->find("/performous/menu/entry");
         if (!n.empty()) {
             configMenu.clear();
             std::for_each(n.begin(), n.end(), readMenuXML);
         }
         n = domParser.get_document()->get_root_node()->find("/performous/entry");
-        for (xmlpp::NodeSet::const_iterator nodeit = n.begin(), end = n.end(); nodeit != end; ++nodeit) {
+        for (auto nodeit = n.begin(), end = n.end(); nodeit != end; ++nodeit) {
             xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**nodeit);
             std::string name = getAttribute(elem, "name");
             if (name.empty()) throw std::runtime_error(file.string() + " element Entry missing name attribute");
@@ -387,7 +386,7 @@ void readConfigXML(fs::path const& file, int mode) {
     } catch (XMLError& e) {
         int line = e.elem.get_line();
         std::string name = e.elem.get_name();
-        throw std::runtime_error(file.string() + ":" + boost::lexical_cast<std::string>(line) + " element " + name + " " + e.message);
+        throw std::runtime_error(file.string() + ":" + std::to_string(line) + " element " + name + " " + e.message);
     } catch (std::exception& e) {
         throw std::runtime_error(file.string() + ":" + e.what());
     }
@@ -396,7 +395,7 @@ void readConfigXML(fs::path const& file, int mode) {
 int PaHostApiNameToHostApiTypeId (const std::string& name) {
     if (name == "Auto") return 1337;
     if (name == "Windows DirectSound") return 1;
-    if (name == "MME") return 2;			
+    if (name == "MME") return 2;
     if (name == "ASIO") return 3;
     if (name == "Core Audio" || name == "CoreAudio") return 5;
     if (name == "OSS") return 7; // Not an error, stupid PortAudio.
@@ -430,4 +429,3 @@ void populateBackends (const std::list<std::string>& backendList) {
     selectedBackend = backendConfig.getValue();
     backendConfig.selectEnum(selectedBackend);
 }
-

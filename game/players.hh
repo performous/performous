@@ -7,12 +7,13 @@
 #include <stdexcept>
 
 #include <boost/noncopyable.hpp>
+#include <unicode/tblcoll.h>
+#include <unicode/unistr.h>
+#include <unicode/utypes.h>
 
-//#include "fs.hh"
 #include "player.hh"
 #include "animvalue.hh"
-
-namespace xmlpp { class Node; class Element; typedef std::vector<Node*>NodeSet; }
+#include "libxml++.hh"
 
 /**Exception which will be thrown when loading or
   saving Players fails.*/
@@ -103,4 +104,6 @@ class Players: boost::noncopyable {
   private:
 	int assign_id_internal(); /// returns the next available id
 	void filter_internal();
+	static UErrorCode m_icuError;
+	static icu::RuleBasedCollator icuCollator;
 };
