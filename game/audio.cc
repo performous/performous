@@ -487,7 +487,10 @@ struct Audio::Impl {
 				// Start capture/playback on this device (likely to throw due to audio system errors)
 				// NOTE: When it throws we want to keep the device in devices to avoid calling ~Device
 				// which often would hit the Pa_CloseStream hang bug and terminate the application.
+				// Assign playback output for the first available stereo output
+				if (!playback && d->out == 2) { d->outptr = &output; Pa_Sleep(100); }
 				d->start();
+				if (!playback && d->out == 2) { playback = true; }
 				// Assign mics for all channels of the device
 				int assigned_mics = 0;
 				for (unsigned int j = 0; j < params.in; ++j) {
@@ -506,8 +509,6 @@ struct Audio::Impl {
 					d->mics[j] = a;
 					++assigned_mics;
 				}
-				// Assign playback output for the first available stereo output
-				if (!playback && d->out == 2) { d->outptr = &output; playback = true; }
 				std::clog << "audio/info: Using audio device: " << info.desc();
 				if (assigned_mics) std::clog << ", input channels: " << assigned_mics;
 				if (params.out) std::clog << ", output channels: " << params.out;
