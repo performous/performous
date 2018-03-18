@@ -25,7 +25,7 @@ ScreenPlayers::ScreenPlayers(std::string const& name, Audio& audio, Database& da
 
 void ScreenPlayers::enter() {
 	keyPressed = false;
-	m_layout_singer.reset(new LayoutSinger(m_song->getVocalTrack(), m_database));
+	m_layout_singer.reset(new LayoutSinger(m_song->getVocalTrack(0), m_database));
 	theme.reset(new ThemeSongs());
 	m_emptyCover.reset(new Surface(findFile("no_player_image.svg")));
 	m_search.text.clear();
