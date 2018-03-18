@@ -6,62 +6,62 @@
 
 
 namespace SongParserUtil {
-	void assign(int& var, std::string const& str) {
-		try {
-			var = std::stoi(str);
-		} catch (...) {
-			throw std::runtime_error("\"" + str + "\" is not valid integer value");
-		}
-	}
-	void assign(unsigned& var, std::string const& str) {
-		try {
-			var = std::stoi(str);
-		} catch (...) {
-			throw std::runtime_error("\"" + str + "\" is not valid unsigned integer value");
-		}
-	}
-	void assign(double& var, std::string str) {
-		std::replace(str.begin(), str.end(), ',', '.'); // Fix decimal separators
-		try {
-			var = std::stod(str);
-		} catch (...) {
-			throw std::runtime_error("\"" + str + "\" is not valid floating point value");
-		}
-	}
-	void assign(bool& var, std::string const& str) {
-		if (str == "YES" || str == "yes" || str == "1") var = true;
-		else if (str == "NO" || str == "no" || str == "0") var = false;
-		else throw std::runtime_error("Invalid boolean value: " + str);
-	}
-	void eraseLast(std::string& s, char ch) {
-		if (!s.empty() && *s.rbegin() == ch) s.erase(s.size() - 1);
-	}
+    void assign(int& var, std::string const& str) {
+        try {
+            var = std::stoi(str);
+        } catch (...) {
+            throw std::runtime_error("\"" + str + "\" is not valid integer value");
+        }
+    }
+    void assign(unsigned& var, std::string const& str) {
+        try {
+            var = std::stoi(str);
+        } catch (...) {
+            throw std::runtime_error("\"" + str + "\" is not valid unsigned integer value");
+        }
+    }
+    void assign(double& var, std::string str) {
+        std::replace(str.begin(), str.end(), ',', '.'); // Fix decimal separators
+        try {
+            var = std::stod(str);
+        } catch (...) {
+            throw std::runtime_error("\"" + str + "\" is not valid floating point value");
+        }
+    }
+    void assign(bool& var, std::string const& str) {
+        if (str == "YES" || str == "yes" || str == "1") var = true;
+        else if (str == "NO" || str == "no" || str == "0") var = false;
+        else throw std::runtime_error("Invalid boolean value: " + str);
+    }
+    void eraseLast(std::string& s, char ch) {
+        if (!s.empty() && *s.rbegin() == ch) s.erase(s.size() - 1);
+    }
 }
 
 
 /// constructor
 SongParser::SongParser(Song& s):
-  m_song(s),
-  m_linenum(),
-  m_relative(),
-  m_gap(),
-  m_bpm(),
-  m_prevtime(),
-  m_prevts(),
-  m_relativeShift(),
-  m_tsPerBeat(),
-  m_tsEnd()
+m_song(s),
+m_linenum(),
+m_relative(),
+m_gap(),
+m_bpm(),
+m_prevtime(),
+m_prevts(),
+m_relativeShift(),
+m_tsPerBeat(),
+m_tsEnd()
 {
-	try {
-		enum { NONE, TXT, XML, INI, SM } type = NONE;
-		// Read the file, determine the type and do some initial validation checks
-		{
-			fs::ifstream f(s.filename, std::ios::binary);
-			if (!f.is_open()) throw SongParserException(s, "Could not open song file", 0);
-			m_ss << f.rdbuf();
-			int size = m_ss.str().length();
-			if (size < 10 || size > 100000) throw SongParserException(s, "Does not look like a song file (wrong size)", 1, true);
-			// Convert m_ss; filename supplied for possible warning messages
+    try {
+        enum { NONE, TXT, XML, INI, SM } type = NONE;
+        // Read the file, determine the type and do some initial validation checks
+        {
+            fs::ifstream f(s.filename, std::ios::binary);
+            if (!f.is_open()) throw SongParserException(s, "Could not open song file", 0);
+            m_ss << f.rdbuf();
+            int size = m_ss.str().length();
+            if (size < 10 || size > 100000) throw SongParserException(s, "Does not look like a song file (wrong size)", 1, true);
+            // Convert m_ss; filename supplied for possible warning messages
             if (xmlCheck(m_ss.str())) type = XML; // XMLPP should deal with encoding so we don't have to.
             else {
                 convertToUTF8(m_ss, s.filename.string());
@@ -70,36 +70,36 @@ SongParser::SongParser(Song& s):
                 else if (iniCheck(m_ss.str())) type = INI;
                 else throw SongParserException(s, "Does not look like a song file (wrong header)", 1, true);
             }
-		}
-		// Header already parsed?
-		if (s.loadStatus == Song::HEADER) {
-			if (type == TXT) txtParse();
-			else if (type == INI) midParse();  // INI doesn't contain notes, parse those from MIDI
-			else if (type == XML) xmlParse();
-			else if (type == SM) smParse();
-			finalize(); // Do some adjusting to the notes
-			s.loadStatus = Song::FULL;
-			return;
-		}
-		// Parse only header to speed up loading and conserve memory
-		if (type == TXT) txtParseHeader();
-		else if (type == INI) iniParseHeader();
-		else if (type == XML) xmlParseHeader();
-		else if (type == SM) { smParseHeader(); s.dropNotes(); } // Hack: drop notes here
-		// Default for preview position if none was specified in header
-		if (s.preview_start != s.preview_start) s.preview_start = (type == INI ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
-
-		guessFiles();
-		if (!m_song.midifilename.empty()) midParseHeader();
-
-		s.loadStatus = Song::HEADER;
-	} catch (SongParserException&) {
-		throw;
-	} catch (std::runtime_error& e) {
-		throw SongParserException(m_song, e.what(), m_linenum);
-	} catch (std::exception& e) {
-		throw SongParserException(m_song, "Internal error: " + std::string(e.what()), m_linenum);
-	}
+        }
+        // Header already parsed?
+        if (s.loadStatus == Song::HEADER) {
+            if (type == TXT) txtParse();
+            else if (type == INI) midParse();  // INI doesn't contain notes, parse those from MIDI
+            else if (type == XML) xmlParse();
+            else if (type == SM) smParse();
+            finalize(); // Do some adjusting to the notes
+            s.loadStatus = Song::FULL;
+            return;
+        }
+        // Parse only header to speed up loading and conserve memory
+        if (type == TXT) txtParseHeader();
+        else if (type == INI) iniParseHeader();
+        else if (type == XML) xmlParseHeader();
+        else if (type == SM) { smParseHeader(); s.dropNotes(); } // Hack: drop notes here
+        // Default for preview position if none was specified in header
+        if (s.preview_start != s.preview_start) s.preview_start = (type == INI ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
+        
+        guessFiles();
+        if (!m_song.midifilename.empty()) midParseHeader();
+        
+        s.loadStatus = Song::HEADER;
+    } catch (SongParserException&) {
+        throw;
+    } catch (std::runtime_error& e) {
+        throw SongParserException(m_song, e.what(), m_linenum);
+    } catch (std::exception& e) {
+        throw SongParserException(m_song, "Internal error: " + std::string(e.what()), m_linenum);
+    }
 }
 
 void SongParser::guessFiles() {
@@ -216,60 +216,60 @@ void SongParser::vocalsTogether() {
 }
 
 void SongParser::finalize() {
-	vocalsTogether();
-	for (auto& nt: m_song.vocalTracks) {
-		VocalTrack& vocal = nt.second;
-		// Remove empty sentences
-		{
-		Note::Type lastType = Note::NORMAL;
-		std::clog << "songparser/debug: In " << m_song.artist << " - " << m_song.title << std::endl;
-		for (auto itn = vocal.notes.begin(); itn != vocal.notes.end();) {
-		if (itn->type == Note::SLEEP) { itn->end = itn->begin; ++itn; continue; }
-		auto next = (itn +1);
-
-		// Try to fix overlapping syllables.
-		if (next != vocal.notes.end() && Note::overlapping(*itn, *next)) {
-			double beatDur = getBPM(itn->begin).step;
-			double newEnd = (next->begin - beatDur);
-			std::clog << "songparser/info: Trying to correct duration of overlapping notes (" << itn->syllable << " & " << next->syllable << ")..." << std::endl;
-			std::clog << "songparser/info: Changing ending to: " << newEnd << ", will give a length of: " << (newEnd - (itn->begin)) << std::endl;
-			if ((newEnd - itn->begin) >= beatDur) { itn->end = newEnd; }
-			else if (next->type != Note::SLEEP) {
-				std::clog << "songparser/info: Resulting note would be too short, will combine them instead." << std::endl;
-				itn->syllable += std::string("-") += next->syllable;
-				itn->end = next->end;
-				vocal.notes.erase(next);
-			}
-			else { next->begin = next->end = itn->end; }
-		}
-			Note::Type type = itn->type;
-			if(type == Note::SLEEP && lastType == Note::SLEEP) {
-				std::clog << "songparser/info: " + m_song.filename.string() + ": Discarding empty sentence" << std::endl;
-				itn = vocal.notes.erase(itn);
-			} else { ++itn; }
-				lastType = type;
-			}
-		}
-		// Adjust negative notes
-		if (vocal.noteMin <= 0) {
-			unsigned int shift = (1 - vocal.noteMin / 12) * 12;
-			vocal.noteMin += shift;
-			vocal.noteMax += shift;
-			for (auto& elem: vocal.notes) {
-				elem.note += shift;
-				elem.notePrev += shift;
-			}
-		}
-		// Set begin/end times
-		if (!vocal.notes.empty()) vocal.beginTime = vocal.notes.front().begin, vocal.endTime = vocal.notes.back().end;
-		else vocal.beginTime = vocal.endTime = 0.0;
-		// Compute maximum score
-		double max_score = 0.0;
-		for (auto& note: vocal.notes) max_score += note.maxScore();
-		vocal.m_scoreFactor = 1.0 / max_score;
-	}
-	if (m_tsPerBeat) {
-		// Add song beat markers
-		for (unsigned ts = 0; ts < m_tsEnd; ts += m_tsPerBeat) m_song.beats.push_back(tsTime(ts));
-	}
+    vocalsTogether();
+    for (auto& nt: m_song.vocalTracks) {
+        VocalTrack& vocal = nt.second;
+        // Remove empty sentences
+        {
+            Note::Type lastType = Note::NORMAL;
+            std::clog << "songparser/debug: In " << m_song.artist << " - " << m_song.title << std::endl;
+            for (auto itn = vocal.notes.begin(); itn != vocal.notes.end();) {
+                if (itn->type == Note::SLEEP) { itn->end = itn->begin; ++itn; continue; }
+                auto next = (itn +1);
+                
+                // Try to fix overlapping syllables.
+                if (next != vocal.notes.end() && Note::overlapping(*itn, *next)) {
+                    double beatDur = getBPM(itn->begin).step;
+                    double newEnd = (next->begin - beatDur);
+                    std::clog << "songparser/info: Trying to correct duration of overlapping notes (" << itn->syllable << " & " << next->syllable << ")..." << std::endl;
+                    std::clog << "songparser/info: Changing ending to: " << newEnd << ", will give a length of: " << (newEnd - (itn->begin)) << std::endl;
+                    if ((newEnd - itn->begin) >= beatDur) { itn->end = newEnd; }
+                    else if (next->type != Note::SLEEP) {
+                        std::clog << "songparser/info: Resulting note would be too short, will combine them instead." << std::endl;
+                        itn->syllable += std::string("-") += next->syllable;
+                        itn->end = next->end;
+                        vocal.notes.erase(next);
+                    }
+                    else { next->begin = next->end = itn->end; }
+                }
+                Note::Type type = itn->type;
+                if(type == Note::SLEEP && lastType == Note::SLEEP) {
+                    std::clog << "songparser/info: " + m_song.filename.string() + ": Discarding empty sentence" << std::endl;
+                    itn = vocal.notes.erase(itn);
+                } else { ++itn; }
+                lastType = type;
+            }
+        }
+        // Adjust negative notes
+        if (vocal.noteMin <= 0) {
+            unsigned int shift = (1 - vocal.noteMin / 12) * 12;
+            vocal.noteMin += shift;
+            vocal.noteMax += shift;
+            for (auto& elem: vocal.notes) {
+                elem.note += shift;
+                elem.notePrev += shift;
+            }
+        }
+        // Set begin/end times
+        if (!vocal.notes.empty()) vocal.beginTime = vocal.notes.front().begin, vocal.endTime = vocal.notes.back().end;
+        else vocal.beginTime = vocal.endTime = 0.0;
+        // Compute maximum score
+        double max_score = 0.0;
+        for (auto& note: vocal.notes) max_score += note.maxScore();
+        vocal.m_scoreFactor = 1.0 / max_score;
+    }
+    if (m_tsPerBeat) {
+        // Add song beat markers
+        for (unsigned ts = 0; ts < m_tsEnd; ts += m_tsPerBeat) m_song.beats.push_back(tsTime(ts));
+    }
 }
