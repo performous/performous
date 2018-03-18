@@ -30,7 +30,13 @@ MatchResult UnicodeUtil::getCharset (std::string const& str) {
 
 void convertToUTF8(std::stringstream &_stream, std::string _filename) {
 		std::string data = _stream.str();
-		MatchResult match = UnicodeUtil::getCharset(data);
+    MatchResult match;
+		if (!_filename.empty()) {
+		match = UnicodeUtil::getCharset(data);
+		}
+		else {
+            match = std::pair<std::string,int>("UTF-8",100); // If there's no filename, assume it's internal text and thus utf-8.
+		}
 		icu::UnicodeString ustring;
 		if (match.second >= 50) { // fairly good match?
 			std::string charset = match.first;
