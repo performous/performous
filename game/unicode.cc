@@ -14,6 +14,7 @@ icu::RuleBasedCollator UnicodeUtil::m_dummyCollator(icu::UnicodeString(""), icu:
 MatchResult UnicodeUtil::getCharset (std::string const& str) {
 	MatchResult retval;
 	LocalUCharsetDetectorPointer m_chardet(ucsdet_open(&UnicodeUtil::m_icuError));
+	ucsdet_enableInputFilter(m_chardet.getAlias(), true); 
 	auto string = str.c_str();
 		ucsdet_setText(m_chardet.getAlias(), string, -1, &m_icuError);
 		if (U_FAILURE(UnicodeUtil::m_icuError)) {
