@@ -37,17 +37,6 @@ ScreenSing::ScreenSing(std::string const& name, Audio& audio, Database& database
 	m_selectedTrack(TrackName::LEAD_VOCAL)
 {}
 
-bool ScreenSing::singingDuet() {
-	bool sameVoice = true;
-	for (size_t player = 0; player < players(); ++player) {
-		ConfigItem& vocalTrack = m_vocalTracks[player];
-		if (player == 0) { selectedVocalTrack = vocalTrack.i(); }
-		if (vocalTrack.i() != selectedVocalTrack) { sameVoice = false; break; }
-	}
-	std::string getVocalTrackTest = m_song->getVocalTrack(selectedVocalTrack).name;
-	return (m_song->hasDuet() && m_duet.i() == 0 && players() > 1 && sameVoice != true);
-}
-
 void ScreenSing::enter() {
 	keyPressed = false;
 	m_DuetTimeout.setValue(10);
@@ -139,6 +128,14 @@ void ScreenSing::setupVocals() {
 		if (!analyzers.empty()) m_engine.reset(new Engine(m_audio, selectedTracks, m_database));
 	}
 	createPauseMenu();
+	bool sameVoice = true;
+	for (size_t player = 0; player < players(); ++player) {
+		ConfigItem& vocalTrack = m_vocalTracks[player];
+		if (player == 0) { m_selectedVocal = vocalTrack.i(); }
+		if (vocalTrack.i() != m_selectedVocal) { sameVoice = false; break; }
+	}
+	m_singingDuet = (m_song->hasDuet() && m_duet.i() == 0 && players() > 1 && sameVoice != true);
+	std::clog << "ScreenSing/debug: singingDuet() is: " << singingDuet() << std::endl;
 	m_audio.pause(false);
 }
 
