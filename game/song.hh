@@ -27,6 +27,7 @@ namespace TrackName {
 	#endif
 }
 
+class ScreenSing;
 /// class to load and parse songfiles
 class Song: boost::noncopyable {
 	friend class SongParser;
@@ -54,7 +55,7 @@ class Song: boost::noncopyable {
 	/// status of song
 	enum Status { NORMAL, INSTRUMENTAL_BREAK, FINISHED };
 	/** Get the song status at a given timestamp **/
-	Status status(double time, bool duetSinging = false, int selectedVocals = 0);
+	Status status(double time, ScreenSing* song);
 	int randomIdx; ///< sorting index used for random order
 	void insertVocalTrack(std::string vocalTrack, VocalTrack track);
 	void eraseVocalTrack(std::string vocalTrack = TrackName::LEAD_VOCAL);
