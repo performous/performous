@@ -59,6 +59,8 @@ class ScreenSing: public Screen {
 	void prepare();
 	void draw();
 
+	int selectedVocalTrack() const { return m_selectedVocal; }
+	bool singingDuet() const { return m_singingDuet; }
 	void setupVocals();
 
 	void setSong (boost::shared_ptr<Song> song_)
@@ -105,8 +107,8 @@ class ScreenSing: public Screen {
 	ConfigItem m_vocalTracks[AUDIO_MAX_ANALYZERS];
 	ConfigItem m_duet;
 	size_t players() const { auto& analyzers = m_audio.analyzers(); return (analyzers.empty() ? 1 : analyzers.size()); } // Always have at least one player to display lyrics and prevent crashes.
-	bool singingDuet();
-	int selectedVocalTrack;
+	bool m_singingDuet;
+	int m_selectedVocal;
 	bool m_displayAutoPlay = false;
 	bool keyPressed = false;
 };
