@@ -62,13 +62,14 @@ SongParser::SongParser(Song& s):
 			int size = m_ss.str().length();
 			if (size < 10 || size > 100000) throw SongParserException(s, "Does not look like a song file (wrong size)", 1, true);
 			// Convert m_ss; filename supplied for possible warning messages
-			convertToUTF8(m_ss, s.filename.string());
-
-			if (smCheck(m_ss.str())) type = SM;
-			else if (txtCheck(m_ss.str())) type = TXT;
-			else if (iniCheck(m_ss.str())) type = INI;
-			else if (xmlCheck(m_ss.str())) type = XML;
-			else throw SongParserException(s, "Does not look like a song file (wrong header)", 1, true);
+            if (xmlCheck(m_ss.str())) type = XML; // XMLPP should deal with encoding so we don't have to.
+            else {
+                convertToUTF8(m_ss, s.filename.string());
+                if (smCheck(m_ss.str())) type = SM;
+                else if (txtCheck(m_ss.str())) type = TXT;
+                else if (iniCheck(m_ss.str())) type = INI;
+                else throw SongParserException(s, "Does not look like a song file (wrong header)", 1, true);
+            }
 		}
 		// Header already parsed?
 		if (s.loadStatus == Song::HEADER) {
