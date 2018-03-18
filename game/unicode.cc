@@ -24,7 +24,7 @@ MatchResult UnicodeUtil::getCharset (std::string const& str) {
 		}
 		else {
 		const UCharsetMatch* match = ucsdet_detect(m_chardet.getAlias(), &m_icuError);
-		return std::pair<const char*,int>(ucsdet_getName(match, &m_icuError), ucsdet_getConfidence(match, &m_icuError));
+            return std::pair<std::string,int>(ucsdet_getName(match, &m_icuError), ucsdet_getConfidence(match, &m_icuError));
 		}
 }
 
