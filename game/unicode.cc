@@ -38,17 +38,23 @@ void convertToUTF8(std::stringstream &_stream, std::string _filename) {
             match = std::pair<std::string,int>("UTF-8",100); // If there's no filename, assume it's internal text and thus utf-8.
 		}
 		icu::UnicodeString ustring;
+        if (data.substr(0, 3) == "\xEF\xBB\xBF") {
+            if (config["game/bom_warnings"].b()) {
+                std::clog << "unicode/warning: " << _filename << " UTF-8 BOM ignored. Please avoid editors that add a BOM to UTF-8 (e.g. Notepad)." << std::endl;
+            }
+        match.first = "UTF-8";
+        match.second = 100;
+        _stream.str(data.substr(3)); // Remove BOM if there is one
+        }
+        if (match.second >= 30 && match.second < 50) { 
+        	if (match.first == "ISO-8859-1" || match.first == "ISO-8859-2") {
+				match.first = "UTF-8";
+				match.second = 75;	// Mostly western characters. Let's treat it as a UTF-8 false-negative.
+        	}
+        }
 		if (match.second >= 50) { // fairly good match?
 			std::string charset = match.first;
-			if (charset == "UTF-8") {
-				if (data.substr(0, 3) == "\xEF\xBB\xBF") {
-					if (config["game/bom_warnings"].b()) {
-						std::clog << "unicode/warning: " << _filename << " UTF-8 BOM ignored. Please avoid editors that add a BOM to UTF-8 (e.g. Notepad)." << std::endl;
-						}
-					_stream.str(data.substr(3)); // Remove BOM if there is one
-				}
-			}
-			else {
+			if (charset != "UTF-8") {
 				if (!_filename.empty()) { std::clog << "unicode/warning: " << _filename << " is not UTF-8... (" << charset << ") detected. Use a text-editor or other utility to convert your files." << std::endl; }
 				std::string _str;
 				const char* tmp = data.c_str();
@@ -56,7 +62,8 @@ void convertToUTF8(std::stringstream &_stream, std::string _filename) {
 				_stream.str(ustring.toUTF8String(_str));
 			}
 		}
-		else { 			// If we're not confident in any particular charset, filter out anything but ASCIIw
+		else {
+		// If we're not confident in any particular charset, filter out anything but ASCIIw
 			std::string tmp;
 			for (char ch; _stream.get(ch);) tmp += (ch >= 0x20 && ch < 0x7F) ? ch : '?';
 		}
