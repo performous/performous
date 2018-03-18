@@ -276,7 +276,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	input::NavButton nav = event.button;
 	m_quitTimer.setValue(config["game/results_timeout"].i());
 	double time = m_audio.getPosition();
-	Song::Status status = m_song->status(time, singingDuet(), selectedVocalTrack);
+	Song::Status status = m_song->status(time, this);
 	// When score window is displayed
 	if (m_score_window.get()) {
 		if (nav == input::NAV_START || nav == input::NAV_CANCEL) activateNextScreen();
@@ -529,7 +529,7 @@ void ScreenSing::draw() {
 		m_layout_singer[i].draw(time, fullSinger ? LayoutSinger::FULL : (i == 0 ? LayoutSinger::TOP : LayoutSinger::BOTTOM));
 	}
 
-	Song::Status status = m_song->status(time, singingDuet(), selectedVocalTrack);
+	Song::Status status = m_song->status(time, this);
 
 	// Compute and draw the timer and the progressbar
 	{
