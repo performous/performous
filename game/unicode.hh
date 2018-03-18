@@ -11,7 +11,7 @@ void convertToUTF8(std::stringstream &_stream, std::string _filename);
 std::string convertToUTF8(std::string const& str);
 std::string unicodeCollate(std::string const& str);
 
-typedef std::pair<const char*, int> MatchResult;
+typedef std::pair<std::string, int> MatchResult;
 
 struct UnicodeUtil {
 
