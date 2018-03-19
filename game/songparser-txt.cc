@@ -62,8 +62,8 @@ void SongParser::txtParse() {
                 if (currentNote.type == Note::SLEEP) {
                     auto prevToLast = ++(finalDuet.rbegin());
                     if (prevToLast->type == Note::SLEEP) {
-                    std::clog << "songparser/info: Phrase formed by a single syllable is most likely our fault, We'll skip the break." << std::endl;
-                    skip = true;
+                        std::clog << "songparser/info: Phrase formed by a single syllable is most likely our fault, We'll skip the break." << std::endl;
+                        skip = true;
                     }
                 }
                 else {
