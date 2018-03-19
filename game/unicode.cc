@@ -75,7 +75,7 @@ std::string unicodeCollate(std::string const& str) {
 	ConfigItem::StringList termsToCollate = config["game/sorting_ignore"].sl();
 	std::string pattern = std::string("^((");
 	for (auto term: termsToCollate) {
-        	if (term != termsToCollate.front()) { pattern += std::string("|"); }
+		if (term != termsToCollate.front()) { pattern += std::string("|"); }
         	pattern += term;
         	if (term == termsToCollate.back()) { pattern += std::string(")\\s(.+))$"); }
 	}	
