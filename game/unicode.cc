@@ -1,7 +1,7 @@
 #include "unicode.hh"
 #include "configuration.hh"
 
-#include <boost/regex.hpp>
+#include <regex>
 #include <boost/scoped_ptr.hpp>
 #include <unicode/unistr.h>
 #include <unicode/ustream.h>
@@ -19,7 +19,7 @@ MatchResult UnicodeUtil::getCharset (std::string const& str) {
     ucsdet_setText(m_chardet.getAlias(), string, -1, &m_icuError);
     if (U_FAILURE(UnicodeUtil::m_icuError)) {
         std::string err = std::string("unicode/error: Couldn't pass text to CharsetDetector: ");
-        err.append(u_errorName(m_icuError));
+        err += u_errorName(m_icuError);
         throw std::runtime_error(err);
     }
     else {
@@ -75,10 +75,10 @@ std::string unicodeCollate(std::string const& str) {
     ConfigItem::StringList termsToCollate = config["game/sorting_ignore"].sl();
     std::string pattern = std::string("^((");
     for (auto term: termsToCollate) {
-        if (term != termsToCollate.front()) { pattern.append(std::string("|")); }
-        pattern.append(term);
-        if (term == termsToCollate.back()) { pattern.append(std::string(")\\s(.+))$")); }
+        if (term != termsToCollate.front()) { pattern += std::string("|"); }
+        pattern += term;
+        if (term == termsToCollate.back()) { pattern += std::string(")\\s(.+))$"); }
     }	
-    std::string collated = boost::regex_replace(convertToUTF8(str), boost::regex(pattern), "\\3 \\2");
+    std::string collated = std::regex_replace(convertToUTF8(str), std::regex(pattern), "\\3 \\2");
     return collated;
 }
