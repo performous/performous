@@ -56,7 +56,7 @@ void convertToUTF8(std::stringstream &_stream, std::string _filename) {
     if (match.second >= 50) { // fairly good match?
         std::string charset = match.first;
         if (charset != "UTF-8") {
-            if (!_filename.empty()) { std::clog << "unicode/warning: " << _filename << " is not UTF-8... (" << charset << ") detected. Use a text-editor or other utility to convert your files." << std::endl; }
+            if (!_filename.empty()) { std::clog << "unicode/warning: " << _filename << " does not appear to be UTF-8... (" << charset << ") detected." << std::endl; }
             std::string _str;
             const char* tmp = data.c_str();
             icu::UnicodeString ustring = icu::UnicodeString(tmp, charset.c_str());
