@@ -76,7 +76,7 @@ class SongParser {
 	unsigned m_tsEnd;  ///< The ending ts of the song
 	BPM getBPM(double ts) {
 		for (auto& itb: boost::adaptors::reverse(m_bpms)) {
-			if (itb.begin >= ts) continue;
+			if (itb.begin > ts) continue;
 			else {
 			return itb;
 			}
