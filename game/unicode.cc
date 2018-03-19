@@ -79,6 +79,6 @@ std::string unicodeCollate(std::string const& str) {
         pattern += term;
         if (term == termsToCollate.back()) { pattern += std::string(")\\s(.+))$"); }
     }	
-    std::string collated = std::regex_replace(convertToUTF8(str), std::regex(pattern), "\\3 \\2");
+    std::string collated = std::regex_replace(convertToUTF8(str), std::regex(pattern, std::regex_constants::icase), "\\3 \\2");
     return collated;
 }
