@@ -3,7 +3,7 @@
 #include "controllers.hh"
 #include "portmidi.hh"
 #include "fs.hh"
-#include <boost/regex.hpp>
+#include <regex>
 #include <unordered_map>
 
 namespace input {
@@ -11,7 +11,7 @@ namespace input {
 	class Midi: public Hardware {
 	public:
 		Midi() {
-			boost::regex re(config["game/midi_input"].s());
+			std::regex re(config["game/midi_input"].s());
 			for (int dev = 0; dev < Pm_CountDevices(); ++dev) {
 				try {
 					PmDeviceInfo const* info = Pm_GetDeviceInfo(dev);

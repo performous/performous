@@ -3,7 +3,7 @@
 #include "util.hh"
 #include "libxml++-impl.hh"
 #include <boost/algorithm/string.hpp>
-#include <boost/regex.hpp>
+#include <regex>
 #include <stdexcept>
 
 /// @file

@@ -1,7 +1,7 @@
 #include "unicode.hh"
 #include "configuration.hh"
 
-#include <boost/regex.hpp>
+#include <regex>
 #include <boost/scoped_ptr.hpp>
 #include <unicode/unistr.h>
 #include <unicode/ustream.h>
@@ -69,6 +69,6 @@ std::string unicodeCollate(std::string const& str) {
 		pattern.append(term);
 		if (term == termsToCollate.back()) { pattern.append(std::string(")\\s(.+))$")); }
 	}	
-	std::string collated = boost::regex_replace(convertToUTF8(str), boost::regex(pattern), "\\3 \\2");
+	std::string collated = std::regex_replace(convertToUTF8(str), std::regex(pattern), "\\3 \\2");
 	return collated;
 }
