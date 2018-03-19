@@ -46,7 +46,8 @@ void convertToUTF8(std::stringstream &_stream, std::string _filename) {
         match.second = 100;
         _stream.str(data.substr(3)); // Remove BOM if there is one
     }
-    if (match.second >= 30 && match.second < 50) { 
+    std::clog << "unicode/debug: Detected encoding, " << match.first << ", confidence for encoding is: " << match.second << std::endl;
+    if (match.second > 10 && match.second < 50) { // 50 is a really good match, 10 means an encoding that could be conceivably used to display the text.
         if (match.first == "ISO-8859-1" || match.first == "ISO-8859-2") {
             match.first = "UTF-8";
             match.second = 75;	// Mostly western characters. Let's treat it as a UTF-8 false-negative.
@@ -61,11 +62,6 @@ void convertToUTF8(std::stringstream &_stream, std::string _filename) {
             icu::UnicodeString ustring = icu::UnicodeString(tmp, charset.c_str());
             _stream.str(ustring.toUTF8String(_str));
         }
-    }
-    else {
-        // If we're not confident in any particular charset, filter out anything but ASCIIw
-        std::string tmp;
-        for (char ch; _stream.get(ch);) tmp += (ch >= 0x20 && ch < 0x7F) ? ch : '?';
     }
 }
 
