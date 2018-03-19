@@ -46,7 +46,6 @@ void convertToUTF8(std::stringstream &_stream, std::string _filename) {
         match.second = 100;
         _stream.str(data.substr(3)); // Remove BOM if there is one
     }
-    std::clog << "unicode/debug: Detected encoding, " << match.first << ", confidence for encoding is: " << match.second << std::endl;
     if (match.second > 10 && match.second < 50) { // 50 is a really good match, 10 means an encoding that could be conceivably used to display the text.
         if (match.first == "ISO-8859-1" || match.first == "ISO-8859-2") {
             match.first = "UTF-8";
