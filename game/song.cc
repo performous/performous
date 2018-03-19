@@ -1,5 +1,6 @@
 #include "song.hh"
 #include "config.hh"
+#include "screen_sing.hh"
 #include "songparser.hh"
 #include "util.hh"
 #include <limits>
@@ -68,17 +69,17 @@ namespace {
 	bool noteEndLessThan(Note const& a, Note const& b) { return a.end < b.end; }
 }
 
-Song::Status Song::status(double time, bool duetSinging, int selectedVocals) {
+Song::Status Song::status(double time, ScreenSing* song) {
 	Note target; target.end = time;
 	Notes s1, s2, notes;
 	Notes::const_iterator it;
-	if (duetSinging) {
+	if (song->singingDuet()) {
 		s1 = getVocalTrack(0).notes;
 		s2 = getVocalTrack(1).notes;
 		std::merge(s1.begin(), s1.end(), s2.begin(), s2.end(), std::back_inserter(notes), Note::ltBegin);
 	}
 	else {
-		notes = getVocalTrack(selectedVocals).notes;
+		notes = getVocalTrack(song->selectedVocalTrack()).notes;
 	}
 	it = std::lower_bound(notes.begin(), notes.end(), target, noteEndLessThan);
 	if (it == notes.end()) return FINISHED;

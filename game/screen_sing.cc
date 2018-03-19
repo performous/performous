@@ -37,17 +37,6 @@ ScreenSing::ScreenSing(std::string const& name, Audio& audio, Database& database
 	m_selectedTrack(TrackName::LEAD_VOCAL)
 {}
 
-bool ScreenSing::singingDuet() {
-	bool sameVoice = true;
-	for (size_t player = 0; player < players(); ++player) {
-		ConfigItem& vocalTrack = m_vocalTracks[player];
-		if (player == 0) { selectedVocalTrack = vocalTrack.i(); }
-		if (vocalTrack.i() != selectedVocalTrack) { sameVoice = false; break; }
-	}
-	std::string getVocalTrackTest = m_song->getVocalTrack(selectedVocalTrack).name;
-	return (m_song->hasDuet() && m_duet.i() == 0 && players() > 1 && sameVoice != true);
-}
-
 void ScreenSing::enter() {
 	keyPressed = false;
 	m_DuetTimeout.setValue(10);
@@ -139,6 +128,14 @@ void ScreenSing::setupVocals() {
 		if (!analyzers.empty()) m_engine.reset(new Engine(m_audio, selectedTracks, m_database));
 	}
 	createPauseMenu();
+	bool sameVoice = true;
+	for (size_t player = 0; player < players(); ++player) {
+		ConfigItem& vocalTrack = m_vocalTracks[player];
+		if (player == 0) { m_selectedVocal = vocalTrack.i(); }
+		if (vocalTrack.i() != m_selectedVocal) { sameVoice = false; break; }
+	}
+	m_singingDuet = (m_song->hasDuet() && m_duet.i() == 0 && players() > 1 && sameVoice != true);
+	std::clog << "ScreenSing/debug: singingDuet() is: " << singingDuet() << std::endl;
 	m_audio.pause(false);
 }
 
@@ -279,7 +276,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	input::NavButton nav = event.button;
 	m_quitTimer.setValue(config["game/results_timeout"].i());
 	double time = m_audio.getPosition();
-	Song::Status status = m_song->status(time, singingDuet(), selectedVocalTrack);
+	Song::Status status = m_song->status(time, this);
 	// When score window is displayed
 	if (m_score_window.get()) {
 		if (nav == input::NAV_START || nav == input::NAV_CANCEL) activateNextScreen();
@@ -532,7 +529,7 @@ void ScreenSing::draw() {
 		m_layout_singer[i].draw(time, fullSinger ? LayoutSinger::FULL : (i == 0 ? LayoutSinger::TOP : LayoutSinger::BOTTOM));
 	}
 
-	Song::Status status = m_song->status(time, singingDuet(), selectedVocalTrack);
+	Song::Status status = m_song->status(time, this);
 
 	// Compute and draw the timer and the progressbar
 	{
