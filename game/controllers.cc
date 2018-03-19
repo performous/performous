@@ -101,7 +101,6 @@ struct ControllerDef {
 	DevType devType;
 	double latency;
 	std::regex deviceRegex;
-	bool regexPresent = false;
 	MinMax<unsigned> deviceMinMax;
 	MinMax<unsigned> channelMinMax;
 	ButtonMapping mapping;
@@ -110,7 +109,7 @@ struct ControllerDef {
 		if (ev.source.type != sourceType) return false;
 		if (!deviceMinMax.matches(ev.source.device)) return false;
 		if (!channelMinMax.matches(ev.source.channel)) return false;
-		if (regexPresent && !regex_search(devName, deviceRegex)) return false;
+		if (!regex_search(devName, deviceRegex)) return false;
 		return true;
 	}
 };
@@ -193,7 +192,7 @@ struct Controllers::Impl {
 			if (ns.size() == 1) {
 				const xmlpp::Element& elem = dynamic_cast<const xmlpp::Element&>(*ns[0]);
 				std::string regex;
-				if (tryGetAttribute(elem, "regex", regex)) { def.deviceRegex = regex; def.regexPresent = true; }
+				if (tryGetAttribute(elem, "regex", regex)) { def.deviceRegex = regex; }
 				parse(def.deviceMinMax, elem);
 				double latency;
 				if (tryGetAttribute(elem, "latency", latency)) def.latency = latency;

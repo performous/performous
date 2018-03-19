@@ -1,7 +1,6 @@
 #include "songparser.hh"
 
 #include <boost/algorithm/string.hpp>
-#include <regex>
 #include <stdexcept>
 #include "midifile.hh"
 

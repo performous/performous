@@ -18,7 +18,7 @@ namespace input {
 					if (!info->input) continue;  // Not an input device
 					if (info->opened) continue;  // Already opened
 					std::string name = getName(dev);
-					if (!config["game/midi_input"].s().empty() && !regex_search(name, re)) continue;
+					if (!regex_search(name, re)) continue;
 					// Now actually open the device
 					m_streams.emplace(dev, std::unique_ptr<pm::Input>(new pm::Input(dev)));
 					std::clog << "controller-midi/info: Opened MIDI device " << name << std::endl;
