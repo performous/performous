@@ -1,4 +1,4 @@
-﻿#include "screen_songs.hh"
+#include "screen_songs.hh"
 
 #include "audio.hh"
 #include "configuration.hh"
@@ -20,7 +20,7 @@ extern const double m_pi;
 static const double IDLE_TIMEOUT = 45.0; // seconds
 
 ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Database& database):
-  Screen(name), m_audio(audio), m_songs(songs), m_database(database), m_covers(50)
+Screen(name), m_audio(audio), m_songs(songs), m_database(database), m_covers(50)
 {
 	m_songs.setAnimMargins(5.0, 5.0);
 	// Using AnimValues as a simple timers counting seconds
@@ -160,7 +160,7 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			if (key == SDL_SCANCODE_R && mod & Platform::shortcutModifier()) {
 				m_songs.reload();
 				m_songs.setFilter(m_search.text);
-				}
+			}
 			// Shortcut keys for accessing different type filter modes
 			if (key == SDL_SCANCODE_TAB) m_songs.sortChange(1);
 			if (key == SDL_SCANCODE_F5) m_songs.typeCycle(2);
@@ -309,22 +309,22 @@ void ScreenSongs::draw() {
 		char const* ENTER = "\xe2\x86\xb5 ";  // ↵
 		char const* PAD = "   ";
 		switch (m_menuPos) {
-		case 1:
-			if (!m_search.text.empty()) oss_order << m_search.text;
-			else if (m_songs.typeNum()) oss_order << m_songs.typeDesc();
-			else if (m_songs.sortNum()) oss_order << m_songs.sortDesc();
-			else oss_order << _("<type in to search>") << PAD << HORIZ_ARROW << _("songs") << PAD << VERT_ARROW << _("options");
-			break;
-		case 2: oss_order << HORIZ_ARROW << _("sort order: ") << m_songs.sortDesc(); break;
-		case 3: oss_order << HORIZ_ARROW << _("type filter: ") << m_songs.typeDesc(); break;
-		case 4: oss_order << HORIZ_ARROW << _("hiscores") << PAD << ENTER << _("jukebox mode"); break;
-		case 0:
-			bool empty = Game::getSingletonPtr()->getCurrentPlayList().isEmpty();
-			oss_order << ENTER << (empty ? _("start a playlist with this song!") : _("open the playlist menu"));
-			break;
+			case 1:
+				if (!m_search.text.empty()) oss_order << m_search.text;
+				else if (m_songs.typeNum()) oss_order << m_songs.typeDesc();
+				else if (m_songs.sortNum()) oss_order << m_songs.sortDesc();
+				else oss_order << _("<type in to search>") << PAD << HORIZ_ARROW << _("songs") << PAD << VERT_ARROW << _("options");
+				break;
+			case 2: oss_order << HORIZ_ARROW << _("sort order: ") << m_songs.sortDesc(); break;
+			case 3: oss_order << HORIZ_ARROW << _("type filter: ") << m_songs.typeDesc(); break;
+			case 4: oss_order << HORIZ_ARROW << _("hiscores") << PAD << ENTER << _("jukebox mode"); break;
+			case 0:
+				bool empty = Game::getSingletonPtr()->getCurrentPlayList().isEmpty();
+				oss_order << ENTER << (empty ? _("start a playlist with this song!") : _("open the playlist menu"));
+				break;
 		}
 	}
-
+	
 	if (m_jukebox) drawJukebox();
 	else {
 		// Draw song and order texts
@@ -366,9 +366,9 @@ void ScreenSongs::drawCovers() {
 		double y = 0.5 * virtH();
 		using namespace glmath;
 		Transform trans(
-		  translate(vec3(-0.2 + 0.20 * (i - shift), y, -0.2 - 0.3 * (1.0 - diff)))
-		  * rotate(0.4 * std::sin(std::min(m_pi, i - shift)), vec3(0.0, 1.0, 0.0))
-		);
+						translate(vec3(-0.2 + 0.20 * (i - shift), y, -0.2 - 0.3 * (1.0 - diff)))
+						* rotate(0.4 * std::sin(std::min(m_pi, i - shift)), vec3(0.0, 1.0, 0.0))
+						);
 		double c = 0.4 + 0.6 * diff;
 		if (m_menuPos == 1 /* Cover browser */ && baseidx + i == currentId) c = beat;
 		ColorTrans c1(Color(c, c, c));
@@ -381,7 +381,7 @@ void ScreenSongs::drawCovers() {
 		s.draw();
 	}
 	// Draw the playlist
-    Game* gm = Game::getSingletonPtr();
+	Game* gm = Game::getSingletonPtr();
 	auto const& playlist = gm->getCurrentPlayList().getList();
 	double c = (m_menuPos == 0 /* Playlist */ ? beat : 1.0);
 	ColorTrans c1(Color(c, c, c));
@@ -390,9 +390,9 @@ void ScreenSongs::drawCovers() {
 		double pos =  i / std::max<double>(5.0, playlist.size());
 		using namespace glmath;
 		Transform trans(
-		  translate(vec3(-0.35 + 0.06 * pos, 0.0, 0.3 - 0.2 * pos))
-		  * rotate(-0.0, vec3(0.0, 1.0, 0.0))
-		);
+						translate(vec3(-0.35 + 0.06 * pos, 0.0, 0.3 - 0.2 * pos))
+						* rotate(-0.0, vec3(0.0, 1.0, 0.0))
+						);
 		s.dimensions.middle().screenBottom(-0.06).fitInside(0.08, 0.08);
 		s.draw();
 	}
@@ -453,7 +453,7 @@ void ScreenSongs::drawInstruments(Dimensions dim) const {
 		if (isTrackInside(song.instrumentTracks,TrackName::GUITAR_RHYTHM)) guitarCount++;
 		if (isTrackInside(song.instrumentTracks,TrackName::BASS)) { guitarCount++; have_bass = true; }
 	}
-
+	
 	UseTexture tex(*m_instrumentList);
 	double x = dim.x1();
 	// dancing

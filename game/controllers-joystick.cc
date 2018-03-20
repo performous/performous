@@ -10,10 +10,10 @@ namespace input {
 				JoyPtr joy(SDL_JoystickOpen(id), SDL_JoystickClose);
 				std::ostringstream oss;
 				oss << "controller-joystick/info: Opened joystick " << id << ": " << getName(id) << " ("
-				  << SDL_JoystickNumButtons(joy.get()) << " buttons, "
-				  << SDL_JoystickNumAxes(joy.get()) << " axes, "
-				  << SDL_JoystickNumHats(joy.get()) << " hats, "
-				  << SDL_JoystickNumBalls(joy.get()) << " balls)";
+				<< SDL_JoystickNumButtons(joy.get()) << " buttons, "
+				<< SDL_JoystickNumAxes(joy.get()) << " axes, "
+				<< SDL_JoystickNumHats(joy.get()) << " hats, "
+				<< SDL_JoystickNumBalls(joy.get()) << " balls)";
 				std::clog << oss.str() << std::endl;  // Logging system barks if this is not one atomic write (thus the ostringstream).
 				m_joysticks.push_back(joy);
 			}
@@ -41,9 +41,9 @@ namespace input {
 		}
 		typedef boost::shared_ptr<SDL_Joystick> JoyPtr;
 		std::vector<JoyPtr> m_joysticks;
-
+		
 	};
-
+	
 	Hardware::ptr constructJoysticks() { return Hardware::ptr(new Joysticks()); }
 }
 
@@ -55,7 +55,7 @@ namespace input {
 void init() {
 	std::map<unsigned int, Instrument> forced_type;
 	ConfigItem::StringList instruments = config["game/instruments"].sl();
-
+	
 	// Populate controller forcing config items
 	ConfigItem& ci0 = config["game/instrument0"];
 	ConfigItem& ci1 = config["game/instrument1"];
@@ -75,7 +75,7 @@ void init() {
 		if (i == ci2.i()-1) instruments.push_back("2:" + it->first);
 		if (i == ci3.i()-1) instruments.push_back("3:" + it->first);
 	}
-
+	
 	// Check all forced instruments
 	for (ConfigItem::StringList::const_iterator it = instruments.begin(); it != instruments.end(); ++it) {
 		std::istringstream iss(*it);
@@ -97,6 +97,6 @@ void init() {
 			if (!found) std::clog << "controllers/error: Controller type \"" << type << "\" unknown" << std::endl;
 		}
 	}
-
+	
 #endif
-
+	

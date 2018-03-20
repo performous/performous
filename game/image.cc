@@ -15,7 +15,7 @@ namespace {
 	void writePngHelper(png_structp pngPtr, png_bytep data, png_size_t length) {
 		static_cast<std::ostream*>(png_get_io_ptr(pngPtr))->write((char*)data, length);
 	}
-
+	
 	void readPngHelper(png_structp pngPtr, png_bytep data, png_size_t length) {
 		static_cast<std::istream*>(png_get_io_ptr(pngPtr))->read((char*)data, length);
 	}
@@ -32,7 +32,7 @@ namespace {
 		for (unsigned y = 0; y < bitmap.height; ++y) rows[y] = reinterpret_cast<png_bytep>(&bitmap.buf[y * bitmap.width * 4]);
 		png_read_image(pngPtr, &rows[0]);
 	}
-
+	
 	static void writePNG_internal(png_structp pngPtr, png_infop infoPtr, ofstream& file, unsigned w, unsigned h, int colorType, std::vector<png_bytep>& rows) {
 		// There must be no objects initialized within this function because longjmp will mess them up
 		if (setjmp(png_jmpbuf(pngPtr))) throw std::runtime_error("Writing PNG failed");
@@ -42,24 +42,24 @@ namespace {
 		png_write_image(pngPtr, &rows[0]);
 		png_write_end(pngPtr, NULL);
 	}
-
+	
 	struct my_jpeg_error_mgr {
 		struct jpeg_error_mgr pub;	/* "public" fields */
 		jmp_buf setjmp_buffer;	/* for return to caller */
 	};
-
+	
 	typedef struct my_jpeg_error_mgr * my_jpeg_error_mgr_ptr;
-
+	
 	static inline void my_jpeg_error_exit(j_common_ptr cinfo) {
 		my_jpeg_error_mgr_ptr myerr = (my_jpeg_error_mgr_ptr) cinfo->err;
 		(*cinfo->err->output_message) (cinfo);
 		longjmp(myerr->setjmp_buffer, 1);
 	}
-
-	#if JPEG_LIB_VERSION < 80 && !defined(MEM_SRCDST_SUPPORTED)
+	
+#if JPEG_LIB_VERSION < 80 && !defined(MEM_SRCDST_SUPPORTED)
 	// Implementation of jpeg_mem_src from
 	// http://stackoverflow.com/questions/5280756/libjpeg-ver-6b-jpeg-stdio-src-vs-jpeg-mem-src 
-
+	
 	/* Read JPEG image from a memory segment */
 	static void init_source(j_decompress_ptr /*cinfo*/) {}
 	static boolean fill_input_buffer(j_decompress_ptr /*cinfo*/) {
@@ -77,8 +77,8 @@ namespace {
 	static void jpeg_mem_src(j_decompress_ptr cinfo, void* buffer, long nbytes) {
 		if (!cinfo->src) {   /* first time for this JPEG object? */
 			cinfo->src = static_cast<jpeg_source_mgr*>(
-			  (*cinfo->mem->alloc_small) ((j_common_ptr)cinfo, JPOOL_PERMANENT, sizeof(jpeg_source_mgr))
-			);
+													   (*cinfo->mem->alloc_small) ((j_common_ptr)cinfo, JPOOL_PERMANENT, sizeof(jpeg_source_mgr))
+													   );
 		}
 		auto src = static_cast<jpeg_source_mgr*>(cinfo->src);
 		src->init_source = init_source;
@@ -89,10 +89,10 @@ namespace {
 		src->bytes_in_buffer = nbytes;
 		src->next_input_byte = static_cast<JOCTET*>(buffer);
 	}
-	#endif
-
+#endif
+	
 	typedef std::vector<std::uint8_t> BinaryBuffer;
-
+	
 	BinaryBuffer readFile(fs::path const& path) {
 		BinaryBuffer ret;
 		fs::ifstream f(path, std::ios::binary);
@@ -196,16 +196,16 @@ void Bitmap::crop(const unsigned width, const unsigned height, const unsigned x,
 	if (ptr) throw std::logic_error("Cannot Bitmap::crop foreign pointers.");
 	if (x + width > this->width || y+ height > this->height)
 		throw std::logic_error("Cannot crop to a size bigger then source image.");
-
+	
 	unsigned char bpp;
 	switch (fmt) {
-	case pix::INT_ARGB: bpp = 4; break; // Correct?
-	case pix::BGR: bpp = 3; break;
-	case pix::RGB: bpp = 3; break;
-	case pix::CHAR_RGBA: bpp = 4; break;
-	default: throw std::logic_error("Unsupported picture format.");
+		case pix::INT_ARGB: bpp = 4; break; // Correct?
+		case pix::BGR: bpp = 3; break;
+		case pix::RGB: bpp = 3; break;
+		case pix::CHAR_RGBA: bpp = 4; break;
+		default: throw std::logic_error("Unsupported picture format.");
 	}
-
+	
 	unsigned newpos = 0;
 	for (unsigned row = y; row < y + height; row++) {
 		for (unsigned col = x; col < x + width; col++) {

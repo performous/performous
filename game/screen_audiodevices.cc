@@ -13,7 +13,7 @@ namespace {
 	static const int unassigned_id = -1;  // mic.dev value for unassigned
 	static const float yoff = 0.18; // Offset from center where to place top row
 	static const float xoff = 0.45; // Offset from middle where to place first column
-
+	
 	bool countRow(std::string needle, std::string const& haystack, int& count) {
 		if (haystack.find(needle) != std::string::npos) ++count;
 		if (count > 1) return false;
@@ -64,7 +64,7 @@ void ScreenAudioDevices::enter() {
 		}
 		if (!ok)
 			Game::getSingletonPtr()->dialog(
-				_("It seems you have some manual configurations\nincompatible with this user interface.\nSaving these settings will override\nall existing audio device configuration.\nYour other options changes will be saved too."));
+											_("It seems you have some manual configurations\nincompatible with this user interface.\nSaving these settings will override\nall existing audio device configuration.\nYour other options changes will be saved too."));
 	}
 	// Populate the mics vector and check open devices
 	load();
@@ -209,7 +209,7 @@ bool ScreenAudioDevices::verify() {
 		// Find the device
 		for (auto const& d: m_audio.devices()) if (d.isChannel(c.name)) goto found;
 		return false;
-		found:;
+	found:;
 	}
 	return true;
 }

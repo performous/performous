@@ -25,19 +25,19 @@ namespace {
 /// Dumps Shader/Program InfoLog
 void Shader::dumpInfoLog(GLuint id) {
 	int maxLength;
-
+	
 	if (glIsShader(id)) glGetShaderiv(id, GL_INFO_LOG_LENGTH, &maxLength);
 	else glGetProgramiv(id, GL_INFO_LOG_LENGTH, &maxLength);
-
+	
 	char infoLog[maxLength];
 	int infoLogLength = 0;
-
+	
 	if (glIsShader(id)) glGetShaderInfoLog(id, maxLength, &infoLogLength, infoLog);
 	else glGetProgramInfoLog(id, maxLength, &infoLogLength, infoLog);
-
+	
 	// Ignore success messages that the Radeon driver always seems to give
 	if (std::equal(infoLog, infoLog + infoLogLength, "Vertex shader(s) linked, fragment shader(s) linked, geometry shader(s) linked.")) return;
-
+	
 	// FIXME: The logging facility probably won't handle this right, especially when infoLog contains many lines.
 	std::clog << "opengl/error: Shader " << name << ": " << infoLog << std::endl;
 }
@@ -81,7 +81,7 @@ Shader& Shader::compileCode(std::string const& srccode, GLenum type) {
 	char const* source = srccode.c_str();
 	glShaderSource(new_shader, 1, &source, nullptr);
 	ec.check("glShaderSource");
-
+	
 	glCompileShader(new_shader);
 	ec.check("glCompileShader");
 	glGetShaderiv(new_shader, GL_COMPILE_STATUS, &gl_response);
@@ -89,7 +89,7 @@ Shader& Shader::compileCode(std::string const& srccode, GLenum type) {
 	if (gl_response != GL_TRUE) {
 		throw std::runtime_error("Shader compile error.");
 	}
-
+	
 	shader_ids.push_back(new_shader);
 	return *this;
 }
@@ -108,7 +108,7 @@ Shader& Shader::link() {
 	for (ShaderObjects::const_iterator it = shader_ids.begin(); it != shader_ids.end(); ++it)
 		glAttachShader(program, *it);
 	ec.check("glAttachShader");
-
+	
 	// Link and check status
 	glLinkProgram(program);
 	glGetProgramiv(program, GL_LINK_STATUS, &gl_response);
@@ -117,7 +117,7 @@ Shader& Shader::link() {
 		throw std::runtime_error("Something went wrong linking the shader program.");
 	}
 	ec.check("glLinkProgram");
-
+	
 	return *this;
 }
 

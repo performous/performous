@@ -1,4 +1,4 @@
-﻿#include "screen_paths.hh"
+#include "screen_paths.hh"
 
 #include "configuration.hh"
 #include "controllers.hh"
@@ -35,7 +35,7 @@ void ScreenPaths::manageEvent(SDL_Event event) {
 		else if (key == SDL_SCANCODE_S && modifier & Platform::shortcutModifier()) {
 			writeConfig(m_audio, modifier & KMOD_ALT);
 			Game::getSingletonPtr()->flashMessage((modifier & KMOD_ALT)
-				? _("Settings saved as system defaults.") : _("Settings saved."));
+												  ? _("Settings saved as system defaults.") : _("Settings saved."));
 		}
 	}
 }
@@ -78,7 +78,7 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 			generateMenuFromPath(path);
 		}));
 	}
-
+	
 	if(folderInConfig) {
 		m_menu.add(MenuOption(_("Remove this folder"),_("Remove current folder from song folders")).call([this, sl, path, position]() {
 			config["paths/songs"].sl().erase(position); //WHY the fuck is this const??
@@ -95,7 +95,7 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 	m_menu.add(MenuOption(_(".."),_("Go up one folder")).call([this, sl, path, position]() {
 		generateMenuFromPath(path.parent_path());
 	}));
-//todo sort folders
+	//todo sort folders
 	for (fs::directory_iterator dirIt(path), dirEnd; dirIt != dirEnd; ++dirIt) { //loop through files and directories
 		fs::path p = dirIt->path();
 		if (fs::is_directory(p)) {
@@ -113,9 +113,9 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 
 
 void ScreenPaths::draw() {
-
+	
 	m_theme->bg.draw();
-
+	
 	//draw menu:
 	{
 		m_theme->back_h.dimensions.fixedHeight(0.065f);
@@ -127,7 +127,7 @@ void ScreenPaths::draw() {
 		double wcounter = 0;
 		const MenuOptions opts = m_menu.getOptions();
 		int start_i = std::min((int)m_menu.curIndex() - 1, (int)opts.size() - (int)showopts
-			+ (m_menu.getSubmenuLevel() == 2 ? 1 : 0)); // Hack to counter side-effects from displaying the value inside the menu
+							   + (m_menu.getSubmenuLevel() == 2 ? 1 : 0)); // Hack to counter side-effects from displaying the value inside the menu
 		if (start_i < 0 || opts.size() == showopts) { start_i = 0; }
 		for (size_t i = start_i, ii = 0; ii < showopts && i < opts.size(); ++i, ++ii) {
 			MenuOption const& opt = opts[i];
@@ -155,5 +155,5 @@ void ScreenPaths::draw() {
 	m_theme->comment_bg.draw();
 	m_theme->comment.dimensions.left(-0.48).screenBottom(-0.028);
 	m_theme->comment.draw(m_menu.current().getComment());
-
+	
 }

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #ifdef USE_WEBSERVER
 #include <boost/network/protocol/http/server.hpp>
@@ -26,7 +26,7 @@ public:
 	struct handler;
 	typedef http::server<handler> http_server;
 	typedef std::vector<std::uint8_t> BinaryBuffer;
-
+	
 	BinaryBuffer readFile(fs::path const& path) {
 		BinaryBuffer ret;
 		fs::ifstream f(path, std::ios::binary);
@@ -42,7 +42,7 @@ public:
 	// This looks silly but this stuff has to be public or they won't be accessible from the handler struct
 	http_server::response GETresponse(http_server::request const &request, std::string& content_type);
 	http_server::response POSTresponse(http_server::request const &request);
-
+	
 private:
 	void StartServer(int tried, bool fallbackPortInUse);
 	Json::Value SongsToJsonObject();

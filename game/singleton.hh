@@ -2,11 +2,11 @@
 
 /// template for creating singletons
 template <class T> class Singleton {
-  protected:
+protected:
 	/// pointer to object
 	static T* ms_Singleton;
-
-  public:
+	
+public:
 	Singleton() { ms_Singleton = static_cast<T*>(this); }
 	~Singleton() { ms_Singleton = 0; }
 	/// gets reference to singleton object

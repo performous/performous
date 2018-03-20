@@ -19,7 +19,7 @@ namespace pm {
 		void abort() { Pm_Abort(m_handle); m_handle = NULL; }
 		~Stream() { if (m_handle) Pm_Close(m_handle); }
 	};
-
+	
 	class Input: public Stream {
 	public:
 		Input(int devId) {

@@ -39,11 +39,11 @@ namespace {
 	}
 	// Return a NavButton corresponding to an Event
 	NavButton navigation(Event const& ev) {
-		#define DEFINE_BUTTON(dt, btn, num, nav) if ((DEVTYPE_##dt == DEVTYPE_GENERIC || ev.devType == DEVTYPE_##dt) && ev.button == dt##_##btn) return nav;
-		#include "controllers-buttons.ii"
+#define DEFINE_BUTTON(dt, btn, num, nav) if ((DEVTYPE_##dt == DEVTYPE_GENERIC || ev.devType == DEVTYPE_##dt) && ev.button == dt##_##btn) return nav;
+#include "controllers-buttons.ii"
 		return NAV_NONE;
 	}
-
+	
 	std::ostream& operator<<(std::ostream& os, SourceId const& source) {
 		switch (source.type) {
 			case SOURCETYPE_NONE: return os << "(none)";
@@ -55,9 +55,9 @@ namespace {
 		throw std::logic_error("Unknown SOURCETYPE in controllers.cc SourceId operator<<");
 	}
 	std::string buttonDebug(DevType type, Button b) {
-		#define DEFINE_BUTTON(dt, btn, num, nav) if ((DEVTYPE_##dt == DEVTYPE_GENERIC || type == DEVTYPE_##dt) && b == dt##_##btn) \
-		  return #dt " " #btn " (" #nav ")";
-		#include "controllers-buttons.ii"
+#define DEFINE_BUTTON(dt, btn, num, nav) if ((DEVTYPE_##dt == DEVTYPE_GENERIC || type == DEVTYPE_##dt) && b == dt##_##btn) \
+return #dt " " #btn " (" #nav ")";
+#include "controllers-buttons.ii"
 		throw std::logic_error("Invalid Button value in controllers.cc buttonDebug");
 	}
 	std::ostream& operator<<(std::ostream& os, Event const& ev) {
@@ -117,16 +117,16 @@ struct ControllerDef {
 struct Controllers::Impl {
 	typedef std::map<std::string, ControllerDef> ControllerDefs;
 	ControllerDefs m_controllerDefs;
-
+	
 	typedef std::map<std::string, Button> NameToButton;
 	NameToButton m_buttons[DEVTYPE_N];
-
+	
 	typedef std::map<SourceId, ControllerDef const*> Assignments;
 	Assignments m_assignments;
 	
 	typedef std::map<SourceType, Hardware::ptr> HW;
 	HW m_hw;
-
+	
 	std::deque<NavEvent> m_navEvents;
 	std::map<SourceId, DevicePtr> m_orphans;
 	std::map<SourceId, boost::weak_ptr<Device> > m_devices;
@@ -134,12 +134,12 @@ struct Controllers::Impl {
 	
 	typedef std::pair<SourceId, ButtonId> UniqueButton;
 	std::map<UniqueButton, double> m_values;
-
+	
 	std::map<NavButton, NavEvent> m_navRepeat;
 	
 	Impl(): m_eventsEnabled() {
-		#define DEFINE_BUTTON(devtype, button, num, nav) m_buttons[DEVTYPE_##devtype][#button] = devtype##_##button;
-		#include "controllers-buttons.ii"
+#define DEFINE_BUTTON(devtype, button, num, nav) m_buttons[DEVTYPE_##devtype][#button] = devtype##_##button;
+#include "controllers-buttons.ii"
 		readControllers(getShareDir() / "config/controllers.xml");
 		readControllers(getConfigDir() / "controllers.xml");
 		m_hw[SOURCETYPE_KEYBOARD] = constructKeyboard();
@@ -163,7 +163,7 @@ struct Controllers::Impl {
 			throw std::runtime_error(file.string() + ":" + std::to_string(line) + " element " + name + " " + e.message);
 		}
 	}
-
+	
 	void parseControllers(xmlpp::DomParser const& dom, std::string const& path, SourceType sourceType) {
 		auto n = dom.get_document()->get_root_node()->find(path);
 		for (auto nodeit = n.begin(), end = n.end(); nodeit != end; ++nodeit) {
@@ -220,7 +220,7 @@ struct Controllers::Impl {
 			}
 			// Add/replace the controller definition
 			std::clog << "controllers/info: " << (m_controllerDefs.find(def.name) == m_controllerDefs.end() ? "Controller" : "Overriding")
-			  << " definition: " << def.name << ": " << def.description << std::endl;
+			<< " definition: " << def.name << ": " << def.description << std::endl;
 			m_controllerDefs[def.name] = def;
 		}
 	}
@@ -238,7 +238,7 @@ struct Controllers::Impl {
 		boost::algorithm::replace_all(name, "-", "_");
 		// Try getting button first from devtype-specific, then generic names
 		buttonByName(type, name, button) || buttonByName(DEVTYPE_GENERIC, name, button) ||
-		  std::clog << "controllers/warning: " << name << ": Unknown button name in controllers.xml." << std::endl;
+		std::clog << "controllers/warning: " << name << ": Unknown button name in controllers.xml." << std::endl;
 		return button;
 	}
 	/// Try to find button of specific type

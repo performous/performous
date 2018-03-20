@@ -21,12 +21,12 @@ bool SongParser::smCheck(std::string const& data) const {
 }
 
 /* Parsing the note data is separated into three different functions: smParse, smParseField and smParseNote.
-- smParse only begins a loop which continues as long as there is something to read in the file. It also checks if the needed information
-could be read.
-- smParseField reads all data beginning with '#'. That is, all but the actual notes. This function calls smParseNotes every time it
-reaches value #NOTES.
-- smParseNotes reads the notes into vector called notes which is a vector of structs (Note);
-*/
+ - smParse only begins a loop which continues as long as there is something to read in the file. It also checks if the needed information
+ could be read.
+ - smParseField reads all data beginning with '#'. That is, all but the actual notes. This function calls smParseNotes every time it
+ reaches value #NOTES.
+ - smParseNotes reads the notes into vector called notes which is a vector of structs (Note);
+ */
 
 /// Parse header data for Songs screen
 // TODO: This actually parses the whole thing
@@ -56,7 +56,7 @@ bool SongParser::smParseField(std::string line) {
 	if (line.empty()) return true;
 	if (line.substr(0, 2) == "//") return true; //jump over possible comments
 	if (line[0] == ';') return true; // HACK: Skip ; left over from previous field
-
+	
 	//Here the data contained by the current line is separated in key and value.
 	//However, because of the differing format of notedata the value is analyzed only if key is not NOTES
 	std::string::size_type pos = line.find(':');
@@ -64,11 +64,11 @@ bool SongParser::smParseField(std::string line) {
 	std::string key = boost::trim_copy(line.substr(1, pos - 1));
 	if (key == "NOTES") {
 		/*All remaining data is parsed here.
-			All five lines of note metadata is read first and then smParseNotes is called to read
-			the actual note data.
-			All data is read into m_song.danceTracks map container.
-		*/
-
+		 All five lines of note metadata is read first and then smParseNotes is called to read
+		 the actual note data.
+		 All data is read into m_song.danceTracks map container.
+		 */
+		
 		while (getline(line)) {
 			//<NotesType>:
 			std::string notestype = boost::trim_copy(line.substr(0, line.find_first_of(':')));
@@ -86,20 +86,20 @@ bool SongParser::smParseField(std::string line) {
 			if(difficultyclass == "MEDIUM") danceDifficulty = MEDIUM;
 			if(difficultyclass == "HARD") danceDifficulty = HARD;
 			if(difficultyclass == "CHALLENGE") danceDifficulty = CHALLENGE;
-
+			
 			//ignoring difficultymeter and radarvalues
 			//<DifficultyMeter>:
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
-
+			
 			//<NoteData>:
 			Notes notes = smParseNotes(line);
-
+			
 			//Here all note data from the current track is inserted into containers
 			// TODO: support other track types. For now all others are simply ignored.
 			if (notestype == "dance-single" || notestype == "dance-double" || notestype == "dance-solo"
-			  || notestype == "pump-single" || notestype == "ez2-single" || notestype == "ez2-real"
-			  || notestype == "para-single") {
+				|| notestype == "pump-single" || notestype == "ez2-single" || notestype == "ez2-real"
+				|| notestype == "para-single") {
 				DanceTrack danceTrack(description, notes);
 				if (m_song.danceTracks.find(notestype) == m_song.danceTracks.end() ) {
 					DanceDifficultyMap danceDifficultyMap;
@@ -119,31 +119,31 @@ bool SongParser::smParseField(std::string line) {
 	}
 	value = value.substr(0, value.size() - 1);	//Here the end character(';') is eliminated
 	if (value.empty()) return true;
-
+	
 	// Parse header data that is stored in SongParser rather than in song (and thus needs to be read every time)
 	if (key == "OFFSET") { assign(m_gap, value); m_gap *= -1; }
 	else if (key == "BPMS"){
-			std::istringstream iss(value);
-			double ts, bpm;
-			char chr;
-			while (iss >> ts >> chr >> bpm) {
-				if (ts == 0.0) m_bpm = bpm;
-				addBPM(ts * 4.0, bpm);
-				if (!(iss >> chr)) break;
-			}
+		std::istringstream iss(value);
+		double ts, bpm;
+		char chr;
+		while (iss >> ts >> chr >> bpm) {
+			if (ts == 0.0) m_bpm = bpm;
+			addBPM(ts * 4.0, bpm);
+			if (!(iss >> chr)) break;
+		}
 	}
 	else if (key == "STOPS"){
-			std::istringstream iss(value);
-			double beat, sec;
-			char chr;
-			while (iss >> beat >> chr >> sec) {
-				m_stops.push_back(std::make_pair(beat * 4.0, sec));
-				if (!(iss >> chr)) break;
-			}
+		std::istringstream iss(value);
+		double beat, sec;
+		char chr;
+		while (iss >> beat >> chr >> sec) {
+			m_stops.push_back(std::make_pair(beat * 4.0, sec));
+			if (!(iss >> chr)) break;
+		}
 	}
-
+	
 	if (m_song.loadStatus >= Song::HEADER) return true;  // Only re-parsing now, skip any other data
-
+	
 	// Parse header data that is directly stored in m_song
 	if (key == "TITLE") m_song.title = value.substr(value.find_first_not_of(" :"));
 	else if (key == "ARTIST") m_song.artist = value.substr(value.find_first_not_of(" "));
@@ -152,17 +152,17 @@ bool SongParser::smParseField(std::string line) {
 	else if (key == "BACKGROUND") m_song.background = fs::absolute(value, m_song.path);
 	else if (key == "SAMPLESTART") assign(m_song.preview_start, value);
 	/*.sm fileformat has also the following constants but they are ignored in this version of the parser:
-	#SUBTITLE
-	#TITLETRANSLIT
-	#SUBTITLETRANSLIT
-	#ARTISTTRANSLIT
-	#CREDIT
-	#CDTITLE
-	#SAMPLESTART
-		#SAMPLELENGTH
-	#SELECTABLE
-	#BGCHANGE
-	*/
+	 #SUBTITLE
+	 #TITLETRANSLIT
+	 #SUBTITLETRANSLIT
+	 #ARTISTTRANSLIT
+	 #CREDIT
+	 #CDTITLE
+	 #SAMPLESTART
+	 #SAMPLELENGTH
+	 #SELECTABLE
+	 #BGCHANGE
+	 */
 	// Add beat info to song
 	return true;
 }
@@ -174,15 +174,15 @@ Notes SongParser::smParseNotes(std::string line) {
 	//container for dance songs
 	typedef std::map<int, Note> DanceChord;	//int indicates "arrow" position (cmp. fret in guitar)
 	typedef std::vector<DanceChord> DanceChords;
-
+	
 	DanceChords chords;	//temporary container for notes
 	Notes notes;
 	unsigned measure = 1;
 	double begin = 0.0;
 	bool forceMeasure = false;
-
+	
 	std::map<int, int> holdMarks; // Keeps track of hold notes not yet terminated
-
+	
 	while (forceMeasure || getline(line)) {
 		if (forceMeasure) { line = ";"; forceMeasure = false; }
 		boost::trim(line); // Remove whitespace
@@ -222,9 +222,9 @@ Notes SongParser::smParseNotes(std::string line) {
 			continue;
 		}
 		/*Note data is read into temporary container chords before
-		finally reading it into vector notes. This is done so that the bpm and time stamp values
-		would be easier to count afterwards.
-		*/
+		 finally reading it into vector notes. This is done so that the bpm and time stamp values
+		 would be easier to count afterwards.
+		 */
 		DanceChord chord;
 		// Deal with ; or , being on a same line
 		if (line[line.size()-1] == ';' || line[line.size()-1] == ',') {

@@ -5,7 +5,7 @@
 #include <stdexcept>
 
 ProgressBar::ProgressBar(fs::path const& bg, fs::path const& bar, Mode mode, float begin, float end, bool sliding):
-  m_bg(bg), m_bar(bar), m_mode(mode), m_begin(begin), m_end(end), m_sliding(sliding), dimensions(m_bg.dimensions)
+m_bg(bg), m_bar(bar), m_mode(mode), m_begin(begin), m_end(end), m_sliding(sliding), dimensions(m_bg.dimensions)
 {}
 
 void ProgressBar::draw(float value) {
@@ -14,7 +14,7 @@ void ProgressBar::draw(float value) {
 	float off = (1.0f - value) * scale;  // Offset for sliding mode
 	m_bg.draw(dimensions);
 	switch (m_mode) {
-	  case HORIZONTAL:
+		case HORIZONTAL:
 		{
 			Dimensions dim = dimensions;
 			TexCoords tex;
@@ -22,8 +22,8 @@ void ProgressBar::draw(float value) {
 			else { tex.x1 = m_begin; tex.x2 = tex.x1 + value * scale; }
 			m_bar.drawCropped(dim, tex);
 		}
-		break;
-	  case VERTICAL:
+			break;
+		case VERTICAL:
 		{
 			Dimensions dim = dimensions;
 			TexCoords tex;
@@ -31,14 +31,14 @@ void ProgressBar::draw(float value) {
 			else { tex.y2 = 1.0f - m_begin; tex.y1 = tex.y2 - value * scale; }
 			m_bar.drawCropped(dim, tex);
 		}
-		break;
-	  case CIRCULAR:
+			break;
+		case CIRCULAR:
 		{
 			UseTexture texblock(m_bar);
 			throw std::logic_error("ProgressBar::draw(): CIRCULAR not implemented yet");  // TODO: Implement
 		}
-		break;
-	  default: throw std::logic_error("ProgressBar::draw(): unknown m_mode value");
+			break;
+		default: throw std::logic_error("ProgressBar::draw(): unknown m_mode value");
 	}
 	// Reset dimensions due to async image loading
 	dimensions = m_bg.dimensions;

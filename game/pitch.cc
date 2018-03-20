@@ -11,10 +11,10 @@ static const double FFT_MINFREQ = 45.0;
 static const double FFT_MAXFREQ = 5000.0;
 
 Tone::Tone():
-  freq(0.0),
-  db(-getInf()),
-  stabledb(-getInf()),
-  age()
+freq(0.0),
+db(-getInf()),
+stabledb(-getInf()),
+age()
 {
 	for (auto& h: harmonics) h = -getInf();
 }
@@ -31,15 +31,15 @@ bool Tone::operator==(double f) const {
 }
 
 Analyzer::Analyzer(double rate, std::string id, std::size_t step):
-  m_step(step),
-  m_resampleFactor(1.0),
-  m_resamplePos(),
-  m_rate(rate),
-  m_id(id),
-  m_window(FFT_N),
-  m_fftLastPhase(FFT_N / 2),
-  m_peak(0.0),
-  m_oldfreq(0.0)
+m_step(step),
+m_resampleFactor(1.0),
+m_resamplePos(),
+m_rate(rate),
+m_id(id),
+m_window(FFT_N),
+m_fftLastPhase(FFT_N / 2),
+m_peak(0.0),
+m_oldfreq(0.0)
 {
 	if (m_step > FFT_N) throw std::logic_error("Analyzer step is larger that FFT_N (ideally it should be less than a fourth of FFT_N).");
 	// Hamming window
@@ -86,7 +86,7 @@ namespace {
 		double db;
 		bool harm[Tone::MAXHARM];
 		Peak(double _freq = 0.0, double _db = -getInf()):
-		  freq(_freq), db(_db)
+		freq(_freq), db(_db)
 		{
 			for (auto& h: harm) h = false;
 		}
@@ -95,7 +95,7 @@ namespace {
 			db = -getInf();
 		}
 	};
-
+	
 	Peak& match(std::vector<Peak>& peaks, std::size_t pos) {
 		std::size_t best = pos;
 		if (peaks[pos - 1].db > peaks[best].db) best = pos - 1;

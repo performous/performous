@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <map>
 #include <boost/scoped_ptr.hpp>
@@ -16,7 +16,7 @@ class ThemeAudioDevices;
 
 /// options dialogue
 class ScreenPaths: public Screen {
-  public:
+public:
 	/// constructor
 	ScreenPaths(std::string const& name, Audio& audio, Songs& songs);
 	void enter();
@@ -25,8 +25,8 @@ class ScreenPaths: public Screen {
 	void manageEvent(input::NavEvent const& event);
 	void draw();
 	void generateMenuFromPath(fs::path path);
-
-  private:
+	
+private:
 	Audio& m_audio;
 	Songs& m_songs;
 	boost::scoped_ptr<ThemeAudioDevices> m_theme;

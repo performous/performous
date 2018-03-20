@@ -61,7 +61,7 @@ public:
 	double y() const { return m_y; }
 	/// @returns dimension of texture
 	Dimensions& dimensions() { return m_surface.dimensions; }
-
+	
 private:
 	double m_x;
 	double m_y;
@@ -79,7 +79,7 @@ public:
 	void draw();
 	/// gets dimensions
 	Dimensions& dimensions() { return m_opengl_text->dimensions(); }
-
+	
 private:
 	boost::scoped_ptr<OpenGLText> m_opengl_text;
 	std::string m_cache_text;
@@ -141,7 +141,7 @@ public:
 	/// draws text with alpha
 	void draw(std::vector<TZoomText>& _text);
 	/// draw texts
-// 	void draw(std::vector<std::string> const& _text);
+	// 	void draw(std::vector<std::string> const& _text);
 	/// draw text with alpha
 	void draw(std::string _text);
 	/// sets highlight
@@ -152,7 +152,7 @@ public:
 	double h() const { return m_texture_height; }
 	/// set align
 	void setAlign(Align align) { m_align = align; }
-
+	
 private:
 	boost::ptr_vector<OpenGLText> m_opengl_text;
 	Align m_align;

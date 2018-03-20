@@ -8,4 +8,3 @@ public:
 	~Logger();
 	static void teardown();
 };
-

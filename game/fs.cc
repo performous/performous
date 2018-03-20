@@ -1,4 +1,4 @@
-﻿#include "config.hh"
+#include "config.hh"
 #include "configuration.hh"
 #include "fs.hh"
 #include "platform.hh"
@@ -30,16 +30,16 @@ namespace {
 		p = ret;
 		return true;
 	}
-
+	
 	const fs::path performous = "performous";
 	const fs::path configSchema = "config/schema.xml";	
-
+	
 	struct PathCache {
 		Paths paths;
 		bool didMigrateConfig = false;
 		fs::path base, share, locale, sysConf, home, conf, data, cache;
 		/// Expand a path specifier as a list of actual paths. Expands ~ (home) and DATADIR (Performous search path).
-	Paths pathExpand(fs::path p) {
+		Paths pathExpand(fs::path p) {
 			Paths ret;
 			if (pathRootHack(p, "~")) ret.push_back(home / p);
 			else if (pathRootHack(p, "DATADIR")) {
@@ -54,48 +54,48 @@ namespace {
 		// 2. pathBootstrap is called to find out static system paths (critical for logging and for loading config files)
 		// 3. pathInit is called to process the full search path, using config settings
 		
-	#if (BOOST_OS_WINDOWS)
-	#include "platform/fs_paths.win.inc"
-	#else
-	#include "platform/fs_paths.unix.inc"
-	#endif
+#if (BOOST_OS_WINDOWS)
+#include "platform/fs_paths.win.inc"
+#else
+#include "platform/fs_paths.unix.inc"
+#endif
 	} cache;
-
+	
 	boost::mutex mutex;
 	typedef boost::lock_guard<boost::mutex> Lock;
 }
 
 void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destinationDir)
 {
-    if (!fs::exists(sourceDir) || !fs::is_directory(sourceDir))
-    {
-        throw std::runtime_error("Source directory " + sourceDir.string() + " does not exist or is not a directory");
-    }
-    if (!fs::create_directory(destinationDir) && !fs::exists(destinationDir))
-    {
-        throw std::runtime_error("Cannot create destination directory " + destinationDir.string());
-    }
+	if (!fs::exists(sourceDir) || !fs::is_directory(sourceDir))
+	{
+		throw std::runtime_error("Source directory " + sourceDir.string() + " does not exist or is not a directory");
+	}
+	if (!fs::create_directory(destinationDir) && !fs::exists(destinationDir))
+	{
+		throw std::runtime_error("Cannot create destination directory " + destinationDir.string());
+	}
 #if ((BOOST_VERSION / 100 % 1000) >= 55)
-    for (const auto& dirEnt : fs::recursive_directory_iterator{sourceDir})
+	for (const auto& dirEnt : fs::recursive_directory_iterator{sourceDir})
 #else
-    for (fs::recursive_directory_iterator dirEnt(sourceDir); dirEnt !=fs::recursive_directory_iterator(); ++dirEnt)
+		for (fs::recursive_directory_iterator dirEnt(sourceDir); dirEnt !=fs::recursive_directory_iterator(); ++dirEnt)
 #endif
-    {
-    #if ((BOOST_VERSION / 100 % 1000) >= 55)
-        const auto& path = dirEnt.path();
-    #else
-        const auto& path = dirEnt->path();    
-    #endif
-        auto relativePathStr = path.string();
-        boost::algorithm::replace_first(relativePathStr, sourceDir.string(), "");
-        try { 
-        if (!fs::is_directory(path)) { fs::copy_file(path, destinationDir / relativePathStr); }
-        else { fs::copy_directory(path, destinationDir / relativePathStr); }
-        }
-        catch (...) {
-        throw std::runtime_error("Cannot copy file " + path.string() + ", because it already exists in the destination folder.");
-        }
-    }
+		{
+#if ((BOOST_VERSION / 100 % 1000) >= 55)
+			const auto& path = dirEnt.path();
+#else
+			const auto& path = dirEnt->path();    
+#endif
+			auto relativePathStr = path.string();
+			boost::algorithm::replace_first(relativePathStr, sourceDir.string(), "");
+			try { 
+				if (!fs::is_directory(path)) { fs::copy_file(path, destinationDir / relativePathStr); }
+				else { fs::copy_directory(path, destinationDir / relativePathStr); }
+			}
+			catch (...) {
+				throw std::runtime_error("Cannot copy file " + path.string() + ", because it already exists in the destination folder.");
+			}
+		}
 }
 
 void pathBootstrap() { Lock l(mutex); cache.pathBootstrap(); }
@@ -119,24 +119,24 @@ Paths getThemePaths() {
 	const fs::path css = "css";
 	const fs::path images = "images";
 	const fs::path fonts = "fonts";
-
+	
 	std::string theme = config["game/theme"].getEnumName();
 	Paths paths = getPaths();
 	Paths infixes = { 
-					  themes / theme,
-					  themes / theme / www,
-					  themes / theme / www / js,
-					  themes / theme / www / css,
-					  themes / theme / www / images,
-					  themes / theme / www / fonts,
-
-					  themes / def,
-					  themes / def / www,					  
-					  themes / def / www / js,
-					  themes / def / www / css,				  
-					  themes / def / www / images,			  
-					  themes / def / www / fonts,
-					  fs::path() };
+		themes / theme,
+		themes / theme / www,
+		themes / theme / www / js,
+		themes / theme / www / css,
+		themes / theme / www / images,
+		themes / theme / www / fonts,
+		
+		themes / def,
+		themes / def / www,					  
+		themes / def / www / js,
+		themes / def / www / css,				  
+		themes / def / www / images,			  
+		themes / def / www / fonts,
+		fs::path() };
 	if (!theme.empty() && theme != def) infixes.push_front(themes / theme);
 	// Build combinations of paths and infixes
 	Paths themePaths;

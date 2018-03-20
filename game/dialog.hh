@@ -8,13 +8,13 @@
 
 /// class for printing dialogues
 class Dialog {
-  public:
+public:
 	/// constructor
 	Dialog(std::string const& text);
 	/// draws dialogue
 	void draw();
-
-  private:
+	
+private:
 	std::string m_text;
 	Surface m_dialog;
 	SvgTxtTheme m_svgText;

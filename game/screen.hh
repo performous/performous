@@ -15,7 +15,7 @@
 
 /// Abstract Class for screens
 class Screen {
-  public:
+public:
 	/// counstructor
 	Screen(std::string const& name): m_name(name) {}
 	virtual ~Screen() {}
@@ -35,7 +35,7 @@ class Screen {
 	virtual void reloadGL() { exit(); enter(); }
 	/// returns screen name
 	std::string getName() const { return m_name; }
-  private:
+private:
 	std::string m_name;
 };
 
@@ -44,10 +44,10 @@ class Screen {
  * @see Singleton
  */
 class Game: public Singleton <Game> {
-  public:
+public:
 	/// constructor
-    Game(Window& window);
-    ~Game();
+	Game(Window& window);
+	~Game();
 	/// Adds a screen to the manager
 	void addScreen(Screen* s) { std::string tmp = s->getName(); screens.insert(tmp, s); }
 	/// Switches active screen
@@ -66,7 +66,7 @@ class Game: public Singleton <Game> {
 	Screen* getScreen(std::string const& name);
 	/// Returns a reference to the window
 	Window& window() { return m_window; }
-
+	
 	/// Draw a loading progress indication
 	void loading(std::string const& message, float progress);
 	/// Internal rendering function for loading indicator
@@ -83,7 +83,7 @@ class Game: public Singleton <Game> {
 	bool isDialogOpen() { return !!m_dialog; }
 	/// Draw dialogs & flash messages, called automatically by drawScreen
 	void drawNotifications();
-
+	
 	/// Sets finished to true
 	void finished();
 	/// Returns finished state
@@ -94,13 +94,13 @@ class Game: public Singleton <Game> {
 	void drawLogo();
 	///global playlist access
 	PlayList& getCurrentPlayList() { return currentPlaylist; }
-
+	
 private:
 	Window& m_window;
-
+	
 public:
 	input::Controllers controllers;
-
+	
 private:
 	bool m_finished;
 	typedef boost::ptr_map<std::string, Screen> screenmap_t;

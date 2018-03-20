@@ -30,13 +30,13 @@ typedef boost::ptr_vector<InstrumentGraph> Instruments;
 
 /// shows score at end of song
 class ScoreWindow {
-  public:
+public:
 	/// constructor
 	ScoreWindow(Instruments& instruments, Database& database);
 	/// draws ScoreWindow
 	void draw();
 	bool empty();
-  private:
+private:
 	Database& m_database;
 	AnimValue m_pos;
 	Surface m_bg;
@@ -48,7 +48,7 @@ class ScoreWindow {
 
 /// class for actual singing screen
 class ScreenSing: public Screen {
-  public:
+public:
 	/// constructor
 	ScreenSing(std::string const& name, Audio& audio, Database& database, Backgrounds& bgs);
 	void enter();
@@ -58,23 +58,23 @@ class ScreenSing: public Screen {
 	void manageEvent(input::NavEvent const& event);
 	void prepare();
 	void draw();
-
+	
 	int selectedVocalTrack() const { return m_selectedVocal; }
 	bool singingDuet() const { return m_singingDuet; }
 	void setupVocals();
-
+	
 	void setSong (boost::shared_ptr<Song> song_)
 	{
 		m_song = song_;
 	}
-
-  private:
+	
+private:
 	/**Activates Songs Screen or Players Screen.
-	  This depends on
-	  - the configuration (is Hiscore enabled)
-	  - did a player reach a new hiscore
-	  - is the hiscore file writable
-	  */
+	 This depends on
+	 - the configuration (is Hiscore enabled)
+	 - did a player reach a new hiscore
+	 - is the hiscore file writable
+	 */
 	void activateNextScreen();
 	void instrumentLayout(double time);
 	void createPauseMenu();

@@ -54,7 +54,7 @@ namespace {
 		if (!key.empty()) ret[key] = value;
 		return ret;
 	}
-
+	
 	/**
 	 * Pitch shifter.
 	 * @param begin start of the buffer
@@ -68,17 +68,17 @@ namespace {
 	}
 }
 /**
-* Advanced audio sync code.
-* Produces precise monotonic clock synced to audio output callback (which may suffer of major jitter).
-* Uses system clock as timebase but the clock is skewed (made slower or faster) depending on whether
-* it is late or early. The clock is also stopped if audio output pauses.
-**/
+ * Advanced audio sync code.
+ * Produces precise monotonic clock synced to audio output callback (which may suffer of major jitter).
+ * Uses system clock as timebase but the clock is skewed (made slower or faster) depending on whether
+ * it is late or early. The clock is also stopped if audio output pauses.
+ **/
 class AudioClock {
 	static ptime getTime() { return microsec_clock::universal_time(); }
 	// Conversion helpers
 	static double getSeconds(time_duration t) { return 1e-6 * t.total_microseconds(); }
 	static time_duration getDuration(double seconds) { return microseconds(1e6 * seconds); }
-
+	
 	mutable boost::mutex m_mutex;
 	ptime m_baseTime; ///< A reference time (corresponds to m_basePos)
 	double m_basePos; ///< A reference position in song
@@ -92,10 +92,10 @@ class AudioClock {
 public:
 	AudioClock(): m_baseTime(), m_basePos(), m_skew(), m_max() {}
 	/**
-	* Called from audio callback to keep the clock synced.
-	* @param audioPos the current position in the song
-	* @param length the duration of the current audio block
-	*/
+	 * Called from audio callback to keep the clock synced.
+	 * @param audioPos the current position in the song
+	 * @param length the duration of the current audio block
+	 */
 	void timeSync(time_duration audioPos, time_duration length) {
 		constexpr double maxError = 0.1;  // Step the clock instead of skewing if over 100 ms off
 		// Full correction requires locking, but we can update max without lock too
@@ -141,7 +141,7 @@ class Music {
 		FFmpeg mpeg;
 		float fadeLevel;
 		float pitchFactor;
-        Track(fs::path const& filename, unsigned int sr): mpeg(filename, sr), fadeLevel(1.0f), pitchFactor(0.0f) {}
+		Track(fs::path const& filename, unsigned int sr): mpeg(filename, sr), fadeLevel(1.0f), pitchFactor(0.0f) {}
 	};
 	std::unordered_map<std::string, std::unique_ptr<Track>> tracks; ///< Audio decoders
 	double srate; ///< Sample rate
@@ -155,7 +155,7 @@ public:
 	double fadeRate;
 	typedef std::vector<float> Buffer;
 	Music(Audio::Files const& files, unsigned int sr, bool preview):
-	  srate(sr), m_pos(), m_preview(preview), fadeLevel(), fadeRate()
+	srate(sr), m_pos(), m_preview(preview), fadeLevel(), fadeRate()
 	{
 		for (auto const& tf /* trackname-filename pair */: files) {
 			if (tf.second.empty()) continue; // Skip tracks with no filenames; FIXME: Why do we even have those here, shouldn't they be eliminated earlier?
@@ -172,9 +172,9 @@ public:
 		Buffer mixbuf(end - begin);
 		for (auto it = tracks.begin(); it != tracks.end(); ++it) {
 			Track& t = *it->second;
-// FIXME: Include this code bit once there is a sane pitch shifting algorithm
+			// FIXME: Include this code bit once there is a sane pitch shifting algorithm
 #if 0
-//			if (it->first == "guitar") std::cout << t.pitchFactor << std::endl;
+			//			if (it->first == "guitar") std::cout << t.pitchFactor << std::endl;
 			if (t.pitchFactor != 0) { // Pitch shift
 				Buffer tempbuf(end - begin);
 				// Get audio to temp buffer
@@ -186,10 +186,10 @@ public:
 				Buffer::iterator b = tempbuf.begin();
 				while (b != tempbuf.end())
 					*m++ += (*b++);
-			// Otherwise just get the audio and mix it straight away
+				// Otherwise just get the audio and mix it straight away
 			} else
 #endif
-			if (t.mpeg.audioQueue(&*mixbuf.begin(), &*mixbuf.end(), m_pos, t.fadeLevel)) eof = false;
+				if (t.mpeg.audioQueue(&*mixbuf.begin(), &*mixbuf.end(), m_pos, t.fadeLevel)) eof = false;
 		}
 		m_pos += samples;
 		for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
@@ -246,11 +246,11 @@ public:
 };
 
 struct Sample {
-  private:
+private:
 	double m_pos;
 	FFmpeg mpeg;
 	bool eof;
-  public:
+public:
 	Sample(fs::path const& filename, unsigned sr) : m_pos(), mpeg(filename, sr), eof(true) { }
 	void operator()(float* begin, float* end) {
 		if(eof) {
@@ -273,18 +273,18 @@ struct Sample {
 };
 
 struct Synth {
-  private:
+private:
 	Notes m_notes;
 	double srate; ///< Sample rate
-  public:
+public:
 	Synth(Notes const& notes, unsigned int sr) : m_notes(notes), srate(sr) {}
 	void operator()(float* begin, float* end, double position) {
 		static double phase = 0.0;
 		for (float *i = begin; i < end; ++i) *i *= 0.3; // Decrease music volume
-
+		
 		std::vector<float> mixbuf(end - begin);
 		Notes::const_iterator it = m_notes.begin();
-
+		
 		while (it != m_notes.end() && it->end < position) ++it;
 		if (it == m_notes.end() || it->type == Note::SLEEP || it->begin > position) { phase = 0.0; return; }
 		int note = it->note % 12;
@@ -321,7 +321,7 @@ struct Output {
 	std::vector<Command> commands;
 	volatile bool paused;
 	Output(): paused(false) {}
-
+	
 	void callbackUpdate() {
 		boost::mutex::scoped_try_lock l(mutex);
 		if (!l.owns_lock()) return;  // No update now, try again later (cannot stop and wait for mutex to be released)
@@ -333,22 +333,22 @@ struct Output {
 		// Process commands
 		for (auto const& cmd: commands) {
 			switch (cmd.type) {
-			case Command::TRACK_FADE:
-				if (!playing.empty()) playing[0]->trackFade(cmd.track, cmd.factor);
-				break;
-			case Command::TRACK_PITCHBEND:
-				if (!playing.empty()) playing[0]->trackPitchBend(cmd.track, cmd.factor);
-				break;
-			case Command::SAMPLE_RESET:
-				auto it = samples.find(cmd.track);
-				if (it != samples.end())
-					it->second->reset();
-				break;
+				case Command::TRACK_FADE:
+					if (!playing.empty()) playing[0]->trackFade(cmd.track, cmd.factor);
+					break;
+				case Command::TRACK_PITCHBEND:
+					if (!playing.empty()) playing[0]->trackPitchBend(cmd.track, cmd.factor);
+					break;
+				case Command::SAMPLE_RESET:
+					auto it = samples.find(cmd.track);
+					if (it != samples.end())
+						it->second->reset();
+					break;
 			}
 		}
 		commands.clear();
 	}
-
+	
 	void callback(float* begin, float* end, double rate) {
 		callbackUpdate();
 		std::fill(begin, end, 0.0f);
@@ -396,14 +396,14 @@ struct Output {
 
 
 Device::Device(unsigned int in, unsigned int out, double rate, unsigned int dev):
-  in(in), out(out), rate(rate), dev(dev),
-  stream(
-    *this,
-    portaudio::Params().channelCount(in).device(dev).suggestedLatency(config["audio/latency"].f()),
-	portaudio::Params().channelCount(out).device(dev).suggestedLatency(config["audio/latency"].f()),
-	rate),
-  mics(in, nullptr),
-  outptr()
+in(in), out(out), rate(rate), dev(dev),
+stream(
+	   *this,
+	   portaudio::Params().channelCount(in).device(dev).suggestedLatency(config["audio/latency"].f()),
+	   portaudio::Params().channelCount(out).device(dev).suggestedLatency(config["audio/latency"].f()),
+	   rate),
+mics(in, nullptr),
+outptr()
 {}
 
 void Device::start() {
@@ -425,249 +425,249 @@ int Device::operator()(void const* input, void* output, unsigned long frames, co
 		mics[i]->input(it, it + frames);
 	}
 	if (outptr) outptr->callback(outbuf, outbuf + 2 * frames, rate);
-	return paContinue;
+		return paContinue;
 } catch (std::exception& e) {
 	std::cerr << "Exception in audio callback: " << e.what() << std::endl;
 	return paAbort;
-}
-
-struct Audio::Impl {
-	Output output;
-	portaudio::Init init;
-	boost::ptr_vector<Analyzer> analyzers;
-	boost::ptr_vector<Device> devices;
-	bool playback;
-	std::string selectedBackend = Audio::backendConfig().getValue();
-	Impl(): init(), playback() {
-	populateBackends(portaudio::AudioBackends().getBackends());
-	std::clog << portaudio::AudioBackends().dump() << std::flush; // Dump PortAudio backends and devices to log.
-		// Parse audio devices from config
-		ConfigItem::StringList devs = config["audio/devices"].sl();
-		for (ConfigItem::StringList::const_iterator it = devs.begin(), end = devs.end(); it != end; ++it) {
-			try {
-				struct Params {
-					unsigned out, in;
-					unsigned int rate;
-					std::string dev;
-					std::vector<std::string> mics;
-				} params = Params();
-				params.out = 0;
-				params.in = 0;
-				params.rate = 48000;
-				// Break into tokens:
-				std::map<std::string, std::string> keyvalues = parseKeyValuePairs(*it);
-				for (std::map<std::string, std::string>::const_iterator it2 = keyvalues.begin();
-				  it2 != keyvalues.end(); ++it2) {
-					// Handle keys
-					std::string key = it2->first;
-					std::istringstream iss(it2->second);
-					if (key == "out") iss >> params.out;
-					else if (key == "in") iss >> params.in;
-					else if (key == "rate") iss >> params.rate;
-					else if (key == "dev") std::getline(iss, params.dev);
-					else if (key == "mics") {
-						// Parse a comma-separated list of mics
-						for (std::string mic; std::getline(iss, mic, ','); params.mics.push_back(mic)) {}
+	}
+	
+	struct Audio::Impl {
+		Output output;
+		portaudio::Init init;
+		boost::ptr_vector<Analyzer> analyzers;
+		boost::ptr_vector<Device> devices;
+		bool playback;
+		std::string selectedBackend = Audio::backendConfig().getValue();
+		Impl(): init(), playback() {
+			populateBackends(portaudio::AudioBackends().getBackends());
+			std::clog << portaudio::AudioBackends().dump() << std::flush; // Dump PortAudio backends and devices to log.
+			// Parse audio devices from config
+			ConfigItem::StringList devs = config["audio/devices"].sl();
+			for (ConfigItem::StringList::const_iterator it = devs.begin(), end = devs.end(); it != end; ++it) {
+				try {
+					struct Params {
+						unsigned out, in;
+						unsigned int rate;
+						std::string dev;
+						std::vector<std::string> mics;
+					} params = Params();
+					params.out = 0;
+					params.in = 0;
+					params.rate = 48000;
+					// Break into tokens:
+					std::map<std::string, std::string> keyvalues = parseKeyValuePairs(*it);
+					for (std::map<std::string, std::string>::const_iterator it2 = keyvalues.begin();
+						 it2 != keyvalues.end(); ++it2) {
+						// Handle keys
+						std::string key = it2->first;
+						std::istringstream iss(it2->second);
+						if (key == "out") iss >> params.out;
+						else if (key == "in") iss >> params.in;
+						else if (key == "rate") iss >> params.rate;
+						else if (key == "dev") std::getline(iss, params.dev);
+						else if (key == "mics") {
+							// Parse a comma-separated list of mics
+							for (std::string mic; std::getline(iss, mic, ','); params.mics.push_back(mic)) {}
+						}
+						else throw std::runtime_error("Unknown device parameter " + key);
+						if (!iss.eof()) throw std::runtime_error("Syntax error parsing device parameter " + key);
 					}
-					else throw std::runtime_error("Unknown device parameter " + key);
-					if (!iss.eof()) throw std::runtime_error("Syntax error parsing device parameter " + key);
-				}
-				// Sync mics/in settings together
-				if (params.in == 0) params.in = params.mics.size();
-				else params.mics.resize(params.in);
-				portaudio::AudioDevices ad(PaHostApiTypeId(PaHostApiNameToHostApiTypeId(selectedBackend)));
-				auto const& info = ad.find(params.dev);
-				std::clog << "audio/info: Trying audio device \"" << params.dev << "\", idx: " << info.idx
+					// Sync mics/in settings together
+					if (params.in == 0) params.in = params.mics.size();
+					else params.mics.resize(params.in);
+					portaudio::AudioDevices ad(PaHostApiTypeId(PaHostApiNameToHostApiTypeId(selectedBackend)));
+					auto const& info = ad.find(params.dev);
+					std::clog << "audio/info: Trying audio device \"" << params.dev << "\", idx: " << info.idx
 					<< ", in: " << params.in << ", out: " << params.out << std::endl;
-				if (info.in < int(params.mics.size())) throw std::runtime_error("Device doesn't have enough input channels");
-				if (info.out < int(params.out)) throw std::runtime_error("Device doesn't have enough output channels");
-				// Match found if we got here, construct a device
-				auto d = new Device(params.in, params.out, params.rate, info.idx);
-				devices.push_back(d);
-				// Start capture/playback on this device (likely to throw due to audio system errors)
-				// NOTE: When it throws we want to keep the device in devices to avoid calling ~Device
-				// which often would hit the Pa_CloseStream hang bug and terminate the application.
-				d->start();
-				// Assign mics for all channels of the device
-				int assigned_mics = 0;
-				for (unsigned int j = 0; j < params.in; ++j) {
-					if (analyzers.size() >= AUDIO_MAX_ANALYZERS) break; // Too many mics
-					std::string const& m = params.mics[j];
-					if (m.empty()) continue; // Input channel not used
-					// Check that the color is not already taken
-					bool mic_used = false;
-					for (size_t mi = 0; mi < analyzers.size(); ++mi) {
-						if (analyzers[mi].getId() == m) { mic_used = true; break; }
+					if (info.in < int(params.mics.size())) throw std::runtime_error("Device doesn't have enough input channels");
+					if (info.out < int(params.out)) throw std::runtime_error("Device doesn't have enough output channels");
+					// Match found if we got here, construct a device
+					auto d = new Device(params.in, params.out, params.rate, info.idx);
+					devices.push_back(d);
+					// Start capture/playback on this device (likely to throw due to audio system errors)
+					// NOTE: When it throws we want to keep the device in devices to avoid calling ~Device
+					// which often would hit the Pa_CloseStream hang bug and terminate the application.
+					d->start();
+					// Assign mics for all channels of the device
+					int assigned_mics = 0;
+					for (unsigned int j = 0; j < params.in; ++j) {
+						if (analyzers.size() >= AUDIO_MAX_ANALYZERS) break; // Too many mics
+						std::string const& m = params.mics[j];
+						if (m.empty()) continue; // Input channel not used
+						// Check that the color is not already taken
+						bool mic_used = false;
+						for (size_t mi = 0; mi < analyzers.size(); ++mi) {
+							if (analyzers[mi].getId() == m) { mic_used = true; break; }
+						}
+						if (mic_used) continue;
+						// Add the new analyzer
+						Analyzer* a = new Analyzer(d->rate, m);
+						analyzers.push_back(a);
+						d->mics[j] = a;
+						++assigned_mics;
 					}
-					if (mic_used) continue;
-					// Add the new analyzer
-					Analyzer* a = new Analyzer(d->rate, m);
-					analyzers.push_back(a);
-					d->mics[j] = a;
-					++assigned_mics;
+					// Assign playback output for the first available stereo output
+					if (!playback && d->out == 2) { d->outptr = &output; playback = true; }
+					std::clog << "audio/info: Using audio device: " << info.desc();
+					if (assigned_mics) std::clog << ", input channels: " << assigned_mics;
+					if (params.out) std::clog << ", output channels: " << params.out;
+					std::clog << std::endl;
+				} catch(std::runtime_error& e) {
+					std::clog << "audio/error: Audio device '" << *it << "': " << e.what() << std::endl;
 				}
-				// Assign playback output for the first available stereo output
-				if (!playback && d->out == 2) { d->outptr = &output; playback = true; }
-				std::clog << "audio/info: Using audio device: " << info.desc();
-				if (assigned_mics) std::clog << ", input channels: " << assigned_mics;
-				if (params.out) std::clog << ", output channels: " << params.out;
-				std::clog << std::endl;
-			} catch(std::runtime_error& e) {
-				std::clog << "audio/error: Audio device '" << *it << "': " << e.what() << std::endl;
+			}
+			// Assign mic buffers to the output for pass-through
+			for (size_t i = 0; i < analyzers.size(); ++i)
+				output.mics.push_back(&analyzers[i]);
+		}
+		~Impl() {
+			// stop all audio streams befor destoying the object.
+			// else portaudio will keep sending data to those destroyed
+			// objects.
+			for (auto device: devices) {
+				device.stop();
 			}
 		}
-		// Assign mic buffers to the output for pass-through
-		for (size_t i = 0; i < analyzers.size(); ++i)
-			output.mics.push_back(&analyzers[i]);
+	};
+	
+	Audio::Audio(): self(new Impl) {}
+	Audio::~Audio() {}
+	
+	ConfigItem& Audio::backendConfig() {
+		static ConfigItem& backend = config["audio/backend"];
+		return backend;
 	}
-	~Impl() {
-		// stop all audio streams befor destoying the object.
-		// else portaudio will keep sending data to those destroyed
-		// objects.
-		for (auto device: devices) {
-			device.stop();
+	
+	void Audio::restart() { self.reset(new Impl); }
+	void Audio::close() { self.reset(); }
+	
+	bool Audio::isOpen() const {
+		return !self->devices.empty();
+	}
+	
+	bool Audio::hasPlayback() const {
+		for (size_t i = 0; i < self->devices.size(); ++i)
+			if (self->devices[i].isOutput()) return true;
+		return false;
+	}
+	
+	void Audio::loadSample(std::string const& streamId, fs::path const& filename) {
+		boost::mutex::scoped_lock l(self->output.samples_mutex);
+		self->output.samples.emplace(streamId, std::unique_ptr<Sample>(new Sample(filename, getSR())));
+	}
+	
+	void Audio::playSample(std::string const& streamId) {
+		Output& o = self->output;
+		boost::mutex::scoped_lock l(o.mutex);
+		Command cmd = { Command::SAMPLE_RESET, streamId, 0.0 };
+		o.commands.push_back(cmd);
+	}
+	
+	void Audio::unloadSample(std::string const& streamId) {
+		boost::mutex::scoped_lock l(self->output.samples_mutex);
+		self->output.samples.erase(streamId);
+	}
+	
+	void Audio::playMusic(Audio::Files const& filenames, bool preview, double fadeTime, double startPos) {
+		Output& o = self->output;
+		boost::mutex::scoped_lock l(o.mutex);
+		o.disposing.clear();  // Delete disposed streams
+		o.preloading.reset(new Music(filenames, getSR(), preview));
+		Music& m = *o.preloading.get();
+		m.seek(startPos);
+		m.fadeRate = 1.0 / getSR() / fadeTime;
+		o.commands.clear();  // Remove old unprocessed commands (they should not apply to the new music)
+	}
+	
+	void Audio::playMusic(fs::path const& filename, bool preview, double fadeTime, double startPos) {
+		Audio::Files m;
+		m["MAIN"] = filename;
+		playMusic(m, preview, fadeTime, startPos);
+	}
+	
+	void Audio::stopMusic() {
+		playMusic(Audio::Files(), false, 0.0);
+		{
+			Output& o = self->output;
+			// stop synth when music is stopped
+			boost::mutex::scoped_lock l(o.synth_mutex);
+			o.synth.reset();
 		}
 	}
-};
-
-Audio::Audio(): self(new Impl) {}
-Audio::~Audio() {}
-
-ConfigItem& Audio::backendConfig() {
-	static ConfigItem& backend = config["audio/backend"];
-	return backend;
-}
-
-void Audio::restart() { self.reset(new Impl); }
-void Audio::close() { self.reset(); }
-
-bool Audio::isOpen() const {
-	return !self->devices.empty();
-}
-
-bool Audio::hasPlayback() const {
-	for (size_t i = 0; i < self->devices.size(); ++i)
-		if (self->devices[i].isOutput()) return true;
-	return false;
-}
-
-void Audio::loadSample(std::string const& streamId, fs::path const& filename) {
-	boost::mutex::scoped_lock l(self->output.samples_mutex);
-	self->output.samples.emplace(streamId, std::unique_ptr<Sample>(new Sample(filename, getSR())));
-}
-
-void Audio::playSample(std::string const& streamId) {
-	Output& o = self->output;
-	boost::mutex::scoped_lock l(o.mutex);
-	Command cmd = { Command::SAMPLE_RESET, streamId, 0.0 };
-	o.commands.push_back(cmd);
-}
-
-void Audio::unloadSample(std::string const& streamId) {
-	boost::mutex::scoped_lock l(self->output.samples_mutex);
-	self->output.samples.erase(streamId);
-}
-
-void Audio::playMusic(Audio::Files const& filenames, bool preview, double fadeTime, double startPos) {
-	Output& o = self->output;
-	boost::mutex::scoped_lock l(o.mutex);
-	o.disposing.clear();  // Delete disposed streams
-	o.preloading.reset(new Music(filenames, getSR(), preview));
-	Music& m = *o.preloading.get();
-	m.seek(startPos);
-	m.fadeRate = 1.0 / getSR() / fadeTime;
-	o.commands.clear();  // Remove old unprocessed commands (they should not apply to the new music)
-}
-
-void Audio::playMusic(fs::path const& filename, bool preview, double fadeTime, double startPos) {
-	Audio::Files m;
-	m["MAIN"] = filename;
-	playMusic(m, preview, fadeTime, startPos);
-}
-
-void Audio::stopMusic() {
-	playMusic(Audio::Files(), false, 0.0);
-	{
+	
+	void Audio::fadeout(double fadeTime) {
+		playMusic(Audio::Files(), false, fadeTime);
+		{
+			Output& o = self->output;
+			// stop synth when music is stopped
+			boost::mutex::scoped_lock l(o.synth_mutex);
+			o.synth.reset();
+		}
+	}
+	
+	double Audio::getPosition() const {
 		Output& o = self->output;
-		// stop synth when music is stopped
-		boost::mutex::scoped_lock l(o.synth_mutex);
-		o.synth.reset();
+		boost::mutex::scoped_lock l(o.mutex);
+		return (o.playing.empty() || o.preloading.get()) ? getNaN() : o.playing[0]->pos();
 	}
-}
-
-void Audio::fadeout(double fadeTime) {
-	playMusic(Audio::Files(), false, fadeTime);
-	{
+	
+	double Audio::getLength() const {
 		Output& o = self->output;
-		// stop synth when music is stopped
+		boost::mutex::scoped_lock l(o.mutex);
+		return (o.playing.empty() || o.preloading.get()) ? getNaN() : o.playing[0]->duration();
+	}
+	
+	bool Audio::isPlaying() const {
+		Output& o = self->output;
+		boost::mutex::scoped_lock l(o.mutex);
+		return o.preloading.get() || !o.playing.empty();
+	}
+	
+	void Audio::seek(double offset) {
+		Output& o = self->output;
+		boost::mutex::scoped_lock l(o.mutex);
+		for (auto& trk: o.playing) trk->seek(clamp(trk->pos() + offset, 0.0, trk->duration()));
+		pause(false);
+	}
+	
+	void Audio::seekPos(double pos) {
+		Output& o = self->output;
+		boost::mutex::scoped_lock l(o.mutex);
+		for (auto& trk: o.playing) trk->seek(pos);
+		pause(false);
+	}
+	
+	void Audio::pause(bool state) { self->output.paused = state; }
+	bool Audio::isPaused() const { return self->output.paused; }
+	
+	void Audio::streamFade(std::string track, double fadeLevel) {
+		Output& o = self->output;
+		boost::mutex::scoped_lock l(o.mutex);
+		Command cmd = { Command::TRACK_FADE, track, fadeLevel };
+		o.commands.push_back(cmd);
+	}
+	
+	void Audio::streamBend(std::string track, double pitchFactor) {
+		Output& o = self->output;
+		boost::mutex::scoped_lock l(o.mutex);
+		Command cmd = { Command::TRACK_PITCHBEND, track, pitchFactor };
+		o.commands.push_back(cmd);
+	}
+	
+	void Audio::toggleSynth(Notes const& notes) {
+		Output& o = self->output;
 		boost::mutex::scoped_lock l(o.synth_mutex);
-		o.synth.reset();
+		o.synth.get() ?  o.synth.reset() : o.synth.reset(new Synth(notes, getSR()));
 	}
-}
-
-double Audio::getPosition() const {
-	Output& o = self->output;
-	boost::mutex::scoped_lock l(o.mutex);
-	return (o.playing.empty() || o.preloading.get()) ? getNaN() : o.playing[0]->pos();
-}
-
-double Audio::getLength() const {
-	Output& o = self->output;
-	boost::mutex::scoped_lock l(o.mutex);
-	return (o.playing.empty() || o.preloading.get()) ? getNaN() : o.playing[0]->duration();
-}
-
-bool Audio::isPlaying() const {
-	Output& o = self->output;
-	boost::mutex::scoped_lock l(o.mutex);
-	return o.preloading.get() || !o.playing.empty();
-}
-
-void Audio::seek(double offset) {
-	Output& o = self->output;
-	boost::mutex::scoped_lock l(o.mutex);
-	for (auto& trk: o.playing) trk->seek(clamp(trk->pos() + offset, 0.0, trk->duration()));
-	pause(false);
-}
-
-void Audio::seekPos(double pos) {
-	Output& o = self->output;
-	boost::mutex::scoped_lock l(o.mutex);
-	for (auto& trk: o.playing) trk->seek(pos);
-	pause(false);
-}
-
-void Audio::pause(bool state) { self->output.paused = state; }
-bool Audio::isPaused() const { return self->output.paused; }
-
-void Audio::streamFade(std::string track, double fadeLevel) {
-	Output& o = self->output;
-	boost::mutex::scoped_lock l(o.mutex);
-	Command cmd = { Command::TRACK_FADE, track, fadeLevel };
-	o.commands.push_back(cmd);
-}
-
-void Audio::streamBend(std::string track, double pitchFactor) {
-	Output& o = self->output;
-	boost::mutex::scoped_lock l(o.mutex);
-	Command cmd = { Command::TRACK_PITCHBEND, track, pitchFactor };
-	o.commands.push_back(cmd);
-}
-
-void Audio::toggleSynth(Notes const& notes) {
-	Output& o = self->output;
-	boost::mutex::scoped_lock l(o.synth_mutex);
-	o.synth.get() ?  o.synth.reset() : o.synth.reset(new Synth(notes, getSR()));
-}
-
-void Audio::toggleCenterChannelSuppressor() {
-	Output& o = self->output;
-	boost::mutex::scoped_lock l(o.mutex);
-	for (size_t i = 0; i < o.playing.size(); i++) {
-		o.playing[i]->suppressCenterChannel = !o.playing[i]->suppressCenterChannel;
+	
+	void Audio::toggleCenterChannelSuppressor() {
+		Output& o = self->output;
+		boost::mutex::scoped_lock l(o.mutex);
+		for (size_t i = 0; i < o.playing.size(); i++) {
+			o.playing[i]->suppressCenterChannel = !o.playing[i]->suppressCenterChannel;
+		}
 	}
-}
-
-boost::ptr_vector<Analyzer>& Audio::analyzers() { return self->analyzers; }
-
-boost::ptr_vector<Device>& Audio::devices() { return self->devices; }
+	
+	boost::ptr_vector<Analyzer>& Audio::analyzers() { return self->analyzers; }
+	
+	boost::ptr_vector<Device>& Audio::devices() { return self->devices; }

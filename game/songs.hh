@@ -16,7 +16,7 @@ class Database;
 
 /// songs class for songs screen
 class Songs: boost::noncopyable {
-  public:
+public:
 	/// constructor
 	Songs(Database& database, std::string const& songlist = std::string());
 	~Songs();
@@ -73,8 +73,8 @@ class Songs: boost::noncopyable {
 	volatile bool doneLoading = false;
 	volatile bool displayedAlert = false;
 	size_t loadedSongs() const { return m_songs.size(); }
-
-  private:
+	
+private:
 	class RestoreSel;
 	typedef std::vector<boost::shared_ptr<Song> > SongVector;
 	std::string m_songlist;

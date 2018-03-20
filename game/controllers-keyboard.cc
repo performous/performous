@@ -57,7 +57,7 @@ namespace input {
 		void mapping(Event& event) {
 			unsigned button = 0;
 			switch (event.hw) {
-				// Guitar on keyboard
+					// Guitar on keyboard
 				case SDL_SCANCODE_BACKSPACE: button = GUITAR_WHAMMY; goto guitar_process;
 				case SDL_SCANCODE_RCTRL: case SDL_SCANCODE_RALT: button = GUITAR_GODMODE; goto guitar_process;
 				case SDL_SCANCODE_RSHIFT: button = GUITAR_PICK_UP; goto guitar_process;
@@ -71,8 +71,8 @@ namespace input {
 					if (!m_guitar) return;
 					event.devType = DEVTYPE_GUITAR;
 					break;
-
-				// Keytar on keyboard
+					
+					// Keytar on keyboard
 				case SDL_SCANCODE_F12: button++; [[fallthrough]];
 				case SDL_SCANCODE_F11: button++; [[fallthrough]];
 				case SDL_SCANCODE_F10: button++; [[fallthrough]];
@@ -82,8 +82,8 @@ namespace input {
 					if (!m_keytar) return;
 					event.devType = DEVTYPE_KEYTAR;
 					break;
-
-				// Drums on keyboard
+					
+					// Drums on keyboard
 				case SDL_SCANCODE_8: button = DRUMS_YELLOW_CYMBAL; goto drum_process;
 				case SDL_SCANCODE_9: button = DRUMS_BLUE_CYMBAL; goto drum_process;
 				case SDL_SCANCODE_0: button = DRUMS_GREEN_CYMBAL; goto drum_process;
@@ -92,12 +92,12 @@ namespace input {
 				case SDL_SCANCODE_O: button = DRUMS_BLUE_TOM; goto drum_process;
 				case SDL_SCANCODE_P: button = DRUMS_GREEN_TOM; goto drum_process;
 				case SDL_SCANCODE_SPACE:
-					drum_process:
+				drum_process:
 					if (!m_drumkit) return;
 					event.devType = DEVTYPE_DRUMS;
 					break;
-
-				// Dance on keypad
+					
+					// Dance on keypad
 				case SDL_SCANCODE_KP_9: button++; [[fallthrough]];
 				case SDL_SCANCODE_KP_7: button++; [[fallthrough]];
 				case SDL_SCANCODE_KP_3: button++; [[fallthrough]];
@@ -109,7 +109,7 @@ namespace input {
 					if (!m_dancepad) return;
 					event.devType = DEVTYPE_DANCEPAD;
 					break;
-
+					
 				default: return;
 			}
 			event.button = ButtonId(button);
@@ -135,7 +135,7 @@ namespace input {
 			return GENERIC_UNASSIGNED;
 		}
 	};
-
+	
 	void Hardware::enableKeyboardInstruments(bool state) { g_enableInstruments = state; }
 	Hardware::ptr constructKeyboard() { return Hardware::ptr(new Keyboard()); }
 	

@@ -4,10 +4,10 @@
 
 
 Player::Player(VocalTrack& vocal, Analyzer& analyzer, size_t frames):
-	  m_vocal(vocal), m_analyzer(analyzer), m_pitch(frames, std::make_pair(getNaN(),
-	  -getInf())), m_pos(), m_score(), m_noteScore(), m_lineScore(), m_maxLineScore(),
-	  m_prevLineScore(-1), m_feedbackFader(0.0, 2.0), m_activitytimer(),
-	  m_scoreIt(m_vocal.notes.begin())
+m_vocal(vocal), m_analyzer(analyzer), m_pitch(frames, std::make_pair(getNaN(),
+																	 -getInf())), m_pos(), m_score(), m_noteScore(), m_lineScore(), m_maxLineScore(),
+m_prevLineScore(-1), m_feedbackFader(0.0, 2.0), m_activitytimer(),
+m_scoreIt(m_vocal.notes.begin())
 {
 	// Initialize note powers
 	for (Notes::const_iterator it = m_vocal.notes.begin(); it != m_vocal.notes.end(); ++it) it->power = 0.0f;
@@ -52,7 +52,7 @@ void Player::update() {
 		if (endTime < m_scoreIt->end) break;  // The note continues past this timestep
 		// Check if we got a star
 		if ((m_scoreIt->type == Note::NORMAL || m_scoreIt->type == Note::SLIDE || m_scoreIt->type == Note::GOLDEN)
-		  && (m_noteScore / m_vocal.m_scoreFactor / m_scoreIt->maxScore() > 0.8)) {
+			&& (m_noteScore / m_vocal.m_scoreFactor / m_scoreIt->maxScore() > 0.8)) {
 			m_scoreIt->stars.push_back(m_color);
 		}
 		m_noteScore = 0; // Reset noteScore as we are moving on to the next one

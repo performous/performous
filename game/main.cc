@@ -81,32 +81,32 @@ static void checkEvents(Game& gm) {
 		boost::xtime eventTime = now();
 		gm.controllers.pushEvent(event, eventTime);
 		switch(event.type) {
-		  case SDL_QUIT:
-			gm.finished();
-			break;
-		  case SDL_KEYDOWN: {
-			int keypressed  = event.key.keysym.scancode;
-			uint16_t modifier = event.key.keysym.mod;
-			if (((keypressed == SDL_SCANCODE_RETURN || keypressed == SDL_SCANCODE_KP_ENTER) && modifier & KMOD_ALT) || keypressed == SDL_SCANCODE_F11) {
-				config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].b();
-				continue; // Already handled here...
-			}
-			if (keypressed == SDL_SCANCODE_PRINTSCREEN || (keypressed == SDL_SCANCODE_F12 && (modifier & Platform::shortcutModifier()))) {
-				g_take_screenshot = true;
-				continue; // Already handled here...
-			}
-			if (keypressed == SDL_SCANCODE_F4 && modifier & KMOD_ALT) {
+			case SDL_QUIT:
 				gm.finished();
-				continue; // Already handled here...
-			}
-			break;
-		  }
-		case SDL_WINDOWEVENT:
-			switch (event.window.event) {
-			  case SDL_WINDOWEVENT_RESIZED:
-				gm.window().resize(event.window.data1, event.window.data2);
+				break;
+			case SDL_KEYDOWN: {
+				int keypressed  = event.key.keysym.scancode;
+				uint16_t modifier = event.key.keysym.mod;
+				if (((keypressed == SDL_SCANCODE_RETURN || keypressed == SDL_SCANCODE_KP_ENTER) && modifier & KMOD_ALT) || keypressed == SDL_SCANCODE_F11) {
+					config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].b();
+					continue; // Already handled here...
+				}
+				if (keypressed == SDL_SCANCODE_PRINTSCREEN || (keypressed == SDL_SCANCODE_F12 && (modifier & Platform::shortcutModifier()))) {
+					g_take_screenshot = true;
+					continue; // Already handled here...
+				}
+				if (keypressed == SDL_SCANCODE_F4 && modifier & KMOD_ALT) {
+					gm.finished();
+					continue; // Already handled here...
+				}
 				break;
 			}
+			case SDL_WINDOWEVENT:
+				switch (event.window.event) {
+					case SDL_WINDOWEVENT_RESIZED:
+						gm.window().resize(event.window.data1, event.window.data2);
+						break;
+				}
 		}
 		// Screens always receive SDL events that were not already handled here
 		gm.getCurrentScreen()->manageEvent(event);
@@ -118,7 +118,7 @@ static void checkEvents(Game& gm) {
 			std::string curS = gm.getCurrentScreen()->getName();
 			// Pick proper setting
 			std::string which_vol = (curS == "Sing" || curS == "Practice")
-			  ? "audio/music_volume" : "audio/preview_volume";
+			? "audio/music_volume" : "audio/preview_volume";
 			// Adjust value
 			if (nav == input::NAV_VOLUME_UP) ++config[which_vol]; else --config[which_vol];
 			// Show message
@@ -130,7 +130,7 @@ static void checkEvents(Game& gm) {
 		// Let the current screen handle other events
 		gm.getCurrentScreen()->manageEvent(event);
 	}
-
+	
 	// Need to toggle full screen mode?
 	if (config["graphic/fullscreen"].b() != gm.window().getFullscreen()) {
 		gm.window().setFullscreen(config["graphic/fullscreen"].b());
@@ -305,9 +305,9 @@ void fatalError(std::string msg, bool hasLog = false, std::string title = "FATAL
 		errMsg << std::endl << "More details might be available in " << getLogFilename() << ".";
 	}
 	errMsg << std::endl << "If you think this is a bug in Performous, please report it at "
-	  << std::endl << "  https://github.com/performous/performous/issues";
+	<< std::endl << "  https://github.com/performous/performous/issues";
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title.c_str(),
-	  errMsg.str().c_str(), NULL);
+							 errMsg.str().c_str(), NULL);
 	std::cerr << title << ": " << msg << std::endl;
 	if (hasLog) {
 		std::clog << "core/error: " << errMsg.str() << std::endl;
@@ -325,18 +325,18 @@ int main(int argc, char** argv) try {
 	std::string songlist;
 	std::string loglevel;
 	opt1.add_options()
-	  ("help,h", "you are viewing it")
-	  ("log,l", po::value<std::string>(&loglevel), "subsystem name or minimum level to log")
-	  ("version,v", "display version number")
-	  ("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder");
+	("help,h", "you are viewing it")
+	("log,l", po::value<std::string>(&loglevel), "subsystem name or minimum level to log")
+	("version,v", "display version number")
+	("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder");
 	po::options_description opt2("Configuration options");
 	opt2.add_options()
-	  ("audio", po::value<std::vector<std::string> >(&devices)->composing(), "specify an audio device to use")
-	  ("audiohelp", "print audio related information")
-	  ("jstest", "utility to get joystick button mappings");
+	("audio", po::value<std::vector<std::string> >(&devices)->composing(), "specify an audio device to use")
+	("audiohelp", "print audio related information")
+	("jstest", "utility to get joystick button mappings");
 	po::options_description opt3("Hidden options");
 	opt3.add_options()
-	  ("songdir", po::value<std::vector<std::string> >(&songdirs)->composing(), "");
+	("songdir", po::value<std::vector<std::string> >(&songdirs)->composing(), "");
 	// Process flagless options as songdirs
 	po::positional_options_description p;
 	p.add("songdir", -1);
@@ -352,71 +352,71 @@ int main(int argc, char** argv) try {
 		std::cerr << cmdline << std::endl;
 		std::cerr << "ERROR: " << e.what() << std::endl;
 		return EXIT_FAILURE;
-	}
-	po::notify(vm);
-
-	if (vm.count("version")) {
-		std::cout << PACKAGE " " VERSION << std::endl;
-		return EXIT_SUCCESS;
-	}
-	if (vm.count("help")) {
-		std::cout << cmdline << "  any arguments without a switch are interpreted as song folders.\n" << std::endl;
-		return EXIT_SUCCESS;
-	}
-
-	Logger logger(loglevel);
-	try {
-		outputOptionalFeatureStatus();
-
-		// Read config files
-		readConfig();
-
-		if (vm.count("audiohelp")) {
-			std::clog << "core/notice: Starting audio subsystem for audiohelp (errors printed on console may be ignored)." << std::endl;
-			Audio audio;
-			// Print the devices
-			std::cout << portaudio::AudioBackends().dump();
-			// Some examples
-			std::cout << "Example --audio parameters" << std::endl;
-			std::cout << "  --audio \"out=2\"         # Pick first working two-channel playback device" << std::endl;
-			std::cout << "  --audio \"dev=1 out=2\"   # Pick device id 1 and assign stereo playback" << std::endl;
-			std::cout << "  --audio 'dev=\"HDA Intel\" mics=blue,red'   # HDA Intel with two mics" << std::endl;
-			std::cout << "  --audio 'dev=pulse out=2 mics=blue'       # PulseAudio with input and output" << std::endl;
-			// Give audio a little time to shutdown but then just quit
-			boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(audio)));
-			if (!audiokiller.timed_join(boost::posix_time::milliseconds(2000)))
-			  std::clog << "core/warning: Closing audio hung for over two seconds." << std::endl;
+		}
+		po::notify(vm);
+		
+		if (vm.count("version")) {
+			std::cout << PACKAGE " " VERSION << std::endl;
 			return EXIT_SUCCESS;
 		}
-		// Override XML config for options that were specified from commandline or performous.conf
-		confOverride(songdirs, "paths/songs");
-		confOverride(devices, "audio/devices");
-		getPaths(); // Initialize paths before other threads start
-		if (vm.count("jstest")) { // Joystick test program
-			std::clog << "core/notice: Starting jstest input test utility." << std::endl;
-			std::cout << std::endl << "Joystick utility - Touch your joystick to see buttons here" << std::endl
-			<< "Hit ESC (window focused) to quit" << std::endl << std::endl;
-			jstestLoop();
+		if (vm.count("help")) {
+			std::cout << cmdline << "  any arguments without a switch are interpreted as song folders.\n" << std::endl;
 			return EXIT_SUCCESS;
 		}
-		// Run the game init and main loop
-		mainLoop(songlist);
-
-		return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
-	} catch (EXCEPTION& e) {
-		// After logging is initialized, we can also inform the user about the log file.
-		fatalError(e.what(), true);
-		return EXIT_FAILURE;
-	}
-} catch (EXCEPTION& e) {
-	fatalError(e.what());
-	return EXIT_FAILURE;
-}
-
-void outputOptionalFeatureStatus() {
-	std::clog << "core/notice: " PACKAGE " " VERSION " starting..."
-	  << "\n  Internationalization: " << (TranslationEngine::enabled() ? "Enabled" : "Disabled")
-	  << "\n  MIDI Hardware I/O:    " << (input::Hardware::midiEnabled() ? "Enabled" : "Disabled")
-	  << "\n  Webcam support:       " << (Webcam::enabled() ? "Enabled" : "Disabled")
-	  << std::endl;
-}
+		
+		Logger logger(loglevel);
+		try {
+			outputOptionalFeatureStatus();
+			
+			// Read config files
+			readConfig();
+			
+			if (vm.count("audiohelp")) {
+				std::clog << "core/notice: Starting audio subsystem for audiohelp (errors printed on console may be ignored)." << std::endl;
+				Audio audio;
+				// Print the devices
+				std::cout << portaudio::AudioBackends().dump();
+				// Some examples
+				std::cout << "Example --audio parameters" << std::endl;
+				std::cout << "  --audio \"out=2\"         # Pick first working two-channel playback device" << std::endl;
+				std::cout << "  --audio \"dev=1 out=2\"   # Pick device id 1 and assign stereo playback" << std::endl;
+				std::cout << "  --audio 'dev=\"HDA Intel\" mics=blue,red'   # HDA Intel with two mics" << std::endl;
+				std::cout << "  --audio 'dev=pulse out=2 mics=blue'       # PulseAudio with input and output" << std::endl;
+				// Give audio a little time to shutdown but then just quit
+				boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(audio)));
+				if (!audiokiller.timed_join(boost::posix_time::milliseconds(2000)))
+					std::clog << "core/warning: Closing audio hung for over two seconds." << std::endl;
+				return EXIT_SUCCESS;
+			}
+			// Override XML config for options that were specified from commandline or performous.conf
+			confOverride(songdirs, "paths/songs");
+			confOverride(devices, "audio/devices");
+			getPaths(); // Initialize paths before other threads start
+			if (vm.count("jstest")) { // Joystick test program
+				std::clog << "core/notice: Starting jstest input test utility." << std::endl;
+				std::cout << std::endl << "Joystick utility - Touch your joystick to see buttons here" << std::endl
+				<< "Hit ESC (window focused) to quit" << std::endl << std::endl;
+				jstestLoop();
+				return EXIT_SUCCESS;
+			}
+			// Run the game init and main loop
+			mainLoop(songlist);
+			
+			return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
+		} catch (EXCEPTION& e) {
+			// After logging is initialized, we can also inform the user about the log file.
+			fatalError(e.what(), true);
+			return EXIT_FAILURE;
+		}
+		} catch (EXCEPTION& e) {
+			fatalError(e.what());
+			return EXIT_FAILURE;
+		}
+		
+		void outputOptionalFeatureStatus() {
+			std::clog << "core/notice: " PACKAGE " " VERSION " starting..."
+			<< "\n  Internationalization: " << (TranslationEngine::enabled() ? "Enabled" : "Disabled")
+			<< "\n  MIDI Hardware I/O:    " << (input::Hardware::midiEnabled() ? "Enabled" : "Disabled")
+			<< "\n  Webcam support:       " << (Webcam::enabled() ? "Enabled" : "Disabled")
+			<< std::endl;
+		}

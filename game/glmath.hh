@@ -11,13 +11,13 @@
 // extern const double m_pi;
 
 namespace glmath {
-
+	
 	template <typename T> T mix(T const& a, T const& b, double blend) {
 		return (1.0-blend) * a + blend * b;
 	}
-
+	
 	struct vec4;
-
+	
 	struct vec2 {
 		GLfloat x, y;
 		explicit vec2(GLfloat const* arr) { std::copy(arr, arr + 2, &x); }
@@ -25,7 +25,7 @@ namespace glmath {
 		GLfloat& operator[](unsigned j) { return (&x)[j]; }
 		GLfloat const& operator[](unsigned j) const { return (&x)[j]; }
 	};
-
+	
 	struct vec3 {
 		GLfloat x, y, z;
 		explicit vec3(GLfloat const* arr) { std::copy(arr, arr + 3, &x); }
@@ -34,7 +34,7 @@ namespace glmath {
 		GLfloat& operator[](unsigned j) { return (&x)[j]; }
 		GLfloat const& operator[](unsigned j) const { return (&x)[j]; }
 	};
-
+	
 	struct vec4 {
 		GLfloat x, y, z, w;
 		explicit vec4(GLfloat const* arr) { std::copy(arr, arr + 4, &x); }
@@ -43,30 +43,30 @@ namespace glmath {
 		GLfloat& operator[](unsigned j) { return (&x)[j]; }
 		GLfloat const& operator[](unsigned j) const { return (&x)[j]; }
 	};
-
+	
 	inline vec3::vec3(vec4 const& v): x(v.x), y(v.y), z(v.z) {}
-
+	
 	// Template functions to allow them to work with different types of floating-point values
-
+	
 	template <typename Scalar> static inline vec2 operator*(Scalar k, vec2 const& v) { return vec2(k * v.x, k * v.y); }
 	template <typename Scalar> static inline vec3 operator*(Scalar k, vec3 const& v) { return vec3(k * v.x, k * v.y, k * v.z); }
 	template <typename Scalar> static inline vec4 operator*(Scalar k, vec4 const& v) { return vec4(k * v.x, k * v.y, k * v.z, k * v.w); }
-
+	
 	static inline vec3 operator+(vec3 const& a, vec4 const& b) { return vec3(a.x + b.x, a.y + b.y, a.z + b.z); }
 	static inline vec4 operator+(vec4 const& a, vec4 const& b) { return vec4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w); }
-
+	
 	static inline float dot(vec2 const& a, vec2 const& b) {
 		return a.x * b.x + a.y * b.y;
 	}
 	static inline float dot(vec3 const& a, vec3 const& b) {
 		return a.x * b.x + a.y * b.y + a.z * b.z;
 	}
-
+	
 	static inline float len(vec2 const& v) { return std::sqrt(dot(v, v)); }
 	static inline float len(vec3 const& v) { return std::sqrt(dot(v, v)); }
 	static inline vec2 normalize(vec2 const& v) { return (1 / len(v)) * v; }
 	static inline vec3 normalize(vec3 const& v) { return (1 / len(v)) * v; }
-
+	
 	template <typename Vector> struct mat {
 		typedef Vector vector_type;
 		static const unsigned dimension = sizeof(Vector) / sizeof(GLfloat);
@@ -105,7 +105,7 @@ namespace glmath {
 		}
 		return os << oss.str() << std::endl;
 	}
-
+	
 	template <typename Vec> static inline mat<Vec> operator*(mat<Vec> const& a, mat<Vec> const& b) {
 		mat<Vec> ret = mat<Vec>::zero();
 		for (unsigned i = 0; i < ret.dimension; ++i) {
@@ -119,10 +119,10 @@ namespace glmath {
 		}
 		return ret;
 	}
-
+	
 	typedef mat<vec3> mat3;
 	typedef mat<vec4> mat4;
-
+	
 	static inline mat4 translate(vec3 const& v) {
 		mat4 ret = mat4::identity();
 		ret(0,3) = v.x;
@@ -130,7 +130,7 @@ namespace glmath {
 		ret(2,3) = v.z;
 		return ret;
 	}
-
+	
 	static inline mat4 scale(vec3 const& v) {
 		mat4 ret = mat4::identity();
 		ret(0,0) = v.x;
@@ -138,9 +138,9 @@ namespace glmath {
 		ret(2,2) = v.z;
 		return ret;
 	}
-
+	
 	static inline mat4 scale(float k) { return scale(vec3(k, k, k)); }
-
+	
 	static inline mat4 rotate(float rad, vec3 axis) {
 		mat4 ret = mat4::identity();
 		vec3 u = normalize(axis);
@@ -162,7 +162,7 @@ namespace glmath {
 		ret(2,2) = c + u.z * u.z * nc;
 		return ret;
 	}
-
+	
 	static inline mat4 frustum(float l, float r, float b, float t, float n, float f) {
 		float w = r - l;
 		float h = t - b;

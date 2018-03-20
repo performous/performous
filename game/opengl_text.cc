@@ -1,4 +1,4 @@
-﻿#include "opengl_text.hh"
+#include "opengl_text.hh"
 
 #include "libxml++-impl.hh"
 
@@ -18,9 +18,9 @@ void loadFonts() {
 	if (!FcConfigBuildFonts(config))
 		throw std::logic_error("Could not build font database.");
 	FcConfigSetCurrent(config);
-
+	
 	// This would all be very useless if pango+cairo didn't use the fontconfig+freetype backend:
-
+	
 	PangoCairoFontMap *map = PANGO_CAIRO_FONT_MAP(pango_cairo_font_map_get_default());
 	std::clog << "font/info: PangoCairo is using font map " << G_OBJECT_TYPE_NAME(map) << std::endl;
 	if (pango_cairo_font_map_get_font_type(map) != CAIRO_FONT_TYPE_FT) {
@@ -40,14 +40,14 @@ namespace {
 		if (fontalign == "end") return PANGO_ALIGN_RIGHT;
 		throw std::logic_error(fontalign + ": Unknown font alignment (opengl_text.cc)");
 	}
-
+	
 	PangoWeight parseWeight(std::string const& fontweight) {
 		if (fontweight == "normal") return PANGO_WEIGHT_NORMAL;
 		if (fontweight == "bold") return PANGO_WEIGHT_BOLD;
 		if (fontweight == "bolder") return PANGO_WEIGHT_ULTRABOLD;
 		throw std::logic_error(fontweight + ": Unknown font weight (opengl_text.cc)");
 	}
-
+	
 	PangoStyle parseStyle(std::string const& fontstyle) {
 		if (fontstyle == "normal") return PANGO_STYLE_NORMAL;
 		if (fontstyle == "italic") return PANGO_STYLE_ITALIC;
@@ -61,8 +61,8 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	// Setup font settings
 	PangoAlignment alignment = parseAlignment(_text.fontalign);
 	std::shared_ptr<PangoFontDescription> desc(
-	  pango_font_description_new(),
-	  pango_font_description_free);
+											   pango_font_description_new(),
+											   pango_font_description_free);
 	pango_font_description_set_weight(desc.get(), parseWeight(_text.fontweight));
 	pango_font_description_set_style(desc.get(), parseStyle(_text.fontstyle));
 	pango_font_description_set_family(desc.get(), _text.fontfamily.c_str());
@@ -70,11 +70,11 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	double border = _text.stroke_width * m;
 	// Setup Pango context and layout
 	std::shared_ptr<PangoContext> ctx(
-	  pango_font_map_create_context(pango_cairo_font_map_get_default()),
-	  g_object_unref);
+									  pango_font_map_create_context(pango_cairo_font_map_get_default()),
+									  g_object_unref);
 	std::shared_ptr<PangoLayout> layout(
-	  pango_layout_new(ctx.get()),
-	  g_object_unref);
+										pango_layout_new(ctx.get()),
+										g_object_unref);
 	pango_layout_set_alignment(layout.get(), alignment);
 	pango_layout_set_font_description(layout.get(), desc.get());
 	pango_layout_set_text(layout.get(), _text.text.c_str(), -1);
@@ -87,11 +87,11 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	}
 	// Create Cairo surface and drawing context
 	std::shared_ptr<cairo_surface_t> surface(
-	  cairo_image_surface_create(CAIRO_FORMAT_ARGB32, m_x, m_y),
-	  cairo_surface_destroy);
+											 cairo_image_surface_create(CAIRO_FORMAT_ARGB32, m_x, m_y),
+											 cairo_surface_destroy);
 	std::shared_ptr<cairo_t> dc(
-	  cairo_create(surface.get()),
-	  cairo_destroy);
+								cairo_create(surface.get()),
+								cairo_destroy);
 	// Keep things sharp and fast, we scale with OpenGL anyway...
 	cairo_set_antialias(dc.get(), CAIRO_ANTIALIAS_NONE);
 	// Add Pango line and path to proper position on the DC
@@ -243,20 +243,20 @@ void SvgTxtTheme::draw(std::string _text) {
 
 void SvgTxtTheme::draw(std::vector<TZoomText>& _text) {
 	std::string tmp;
-
+	
 	for (auto& zt: _text) { 
 		bool wordBoundaryCheck = false;
-	// Check whether current syllable begins or previous syllable ends with a space.
+		// Check whether current syllable begins or previous syllable ends with a space.
 		if (_text.size() > 1) {
 			wordBoundaryCheck = (zt.string.front() == ' ');
 			if (wordBoundaryCheck == false && tmp.size() > 0) {
 				wordBoundaryCheck = (tmp.back() == ' ');
 			}
-		zt.updateWordStart(wordBoundaryCheck);	
+			zt.updateWordStart(wordBoundaryCheck);	
 		}
 		tmp += zt.string;
 	}
-
+	
 	if (m_opengl_text.size() != _text.size() || m_cache_text != tmp) {
 		m_cache_text = tmp;
 		m_opengl_text.clear();
@@ -273,14 +273,14 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text) {
 		text_x += m_opengl_text[i].x();
 		text_y = std::max(text_y, m_opengl_text[i].y());
 	}
-
+	
 	double texture_ar = text_x / text_y;
 	m_texture_width = std::min(0.96, text_x / targetWidth); // targetWidth is defined in video_driver.cc, it's the base rendering width, used to project the svg onto a gltexture. currently we're targeting 1366x768 as base resolution.
 	
 	double position_x = dimensions.x1();
 	if (m_align == CENTER) position_x -= 0.5 * m_texture_width;
 	if (m_align == RIGHT) position_x -= m_texture_width;
-
+	
 	if ((position_x + m_texture_width) > 0.48) { 
 		m_texture_width = (0.48 - position_x);
 	}

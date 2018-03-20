@@ -26,13 +26,13 @@ namespace input {
 	};
 	/// Alternative orientation-agnostic mapping where A axis is the one that is easiest to access (e.g. guitar pick) and B might not be available on all devices
 	enum NavMenu { NAVMENU_NONE, NAVMENU_A_PREV, NAVMENU_A_NEXT, NAVMENU_B_PREV, NAVMENU_B_NEXT };
-
+	
 	enum ButtonId: unsigned {
 		// Button constants for each DevType
-		#define DEFINE_BUTTON(devtype, button, num, nav) devtype##_##button = num,
-		#include "controllers-buttons.ii"
+#define DEFINE_BUTTON(devtype, button, num, nav) devtype##_##button = num,
+#include "controllers-buttons.ii"
 	};
-
+	
 	struct Button {
 		ButtonId id;
 		Button(ButtonId id = GENERIC_UNASSIGNED): id(id) {}
@@ -42,7 +42,7 @@ namespace input {
 		unsigned num() const { return id & 0xFF; }
 		bool generic() const { return layer() == 0x100; }
 	};
-
+	
 	typedef unsigned HWButton;
 	static const MinMax<HWButton> hwIsAxis(0x10000000u, 0x1000FFFFu);
 	static const MinMax<HWButton> hwIsHat(0x11000000u, 0x1100FFFFu);
@@ -69,7 +69,7 @@ namespace input {
 		Event(): source(), hw(), nav(NAV_NONE), value(), time(), devType() {}
 		bool pressed() const { return value != 0.0; }
 	};
-
+	
 	/// NavEvent is a menu navigation event, generalized for all controller type so that the user doesn't need to know about controllers.
 	struct NavEvent {
 		SourceId source;
@@ -94,7 +94,7 @@ namespace input {
 		void pushEvent(Event const&);
 	};
 	typedef boost::shared_ptr<Device> DevicePtr;
-
+	
 	/// The main controller class that contains everything
 	class Controllers: boost::noncopyable {
 	public:
@@ -114,7 +114,7 @@ namespace input {
 		struct Impl;
 		boost::scoped_ptr<Impl> self;
 	};
-
+	
 	/// Base class for different types of hardware backends.
 	class Hardware: boost::noncopyable {
 	public:

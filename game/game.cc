@@ -14,10 +14,10 @@ extern const double m_pi;
 template<> Game* Singleton<Game>::ms_Singleton = nullptr;
 
 Game::Game(Window& _window):
-  m_window(_window), m_finished(false), newScreen(), currentScreen(), currentPlaylist(),
-  m_timeToFadeIn(), m_timeToFadeOut(), m_timeToShow(), m_message(),
-  m_messagePopup(0.0, 1.0), m_textMessage(findFile("message_text.svg"), config["graphic/text_lod"].f()),
-  m_loadingProgress(0.0f), m_logo(findFile("logo.svg")), m_logoAnim(0.0, 0.5)
+m_window(_window), m_finished(false), newScreen(), currentScreen(), currentPlaylist(),
+m_timeToFadeIn(), m_timeToFadeOut(), m_timeToShow(), m_message(),
+m_messagePopup(0.0, 1.0), m_textMessage(findFile("message_text.svg"), config["graphic/text_lod"].f()),
+m_loadingProgress(0.0f), m_logo(findFile("logo.svg")), m_logoAnim(0.0, 0.5)
 {
 	m_textMessage.dimensions.middle().center(-0.05);
 }
@@ -125,14 +125,14 @@ void Game::drawNotifications() {
 		bool haveToFadeIn = time <= (m_timeToFadeIn); // Is this fade in?
 		bool haveToFadeOut = time >= (m_messagePopup.getTarget() - m_timeToFadeOut); // Is this fade out?
 		float fadeValue = 1.0f;
-
+		
 		if (haveToFadeIn) { // Fade in
 			fadeValue = float(time / m_timeToFadeIn); // Calculate animation value
 		} else if (haveToFadeOut) { // Fade out
 			fadeValue = float((m_messagePopup.getTarget() - time) / m_timeToFadeOut); // Calculate animation value
 			if (time >= m_messagePopup.getTarget()) m_messagePopup.setTarget(0.0, true); // Reset if fade out finished
 		}
-
+		
 		ColorTrans c(Color::alpha(fadeValue));
 		m_textMessage.draw(m_message); // Draw the message
 	}
@@ -145,15 +145,15 @@ void Game::drawNotifications() {
 
 void Game::finished()
 {
-    m_finished = true;
+	m_finished = true;
 }
- 
+
 Game::~Game()
 {
-    if (currentScreen) currentScreen->exit();
+	if (currentScreen) currentScreen->exit();
 }
- 
+
 bool Game::isFinished()
 {
-    return m_finished;
+	return m_finished;
 }

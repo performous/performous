@@ -19,11 +19,11 @@ bool SongParser::xmlCheck(std::string const& data) const {
 
 
 /*
-// LibXML2 logging facility
-extern "C" void xmlLogger(void* logger, char const* msg, ...) { if (logger) *(std::ostream*)logger << msg; }
-void enableXMLLogger(std::ostream& os = std::cerr) { xmlSetGenericErrorFunc(&os, xmlLogger); }
-void disableXMLLogger() { xmlSetGenericErrorFunc(NULL, xmlLogger); }
-*/
+ // LibXML2 logging facility
+ extern "C" void xmlLogger(void* logger, char const* msg, ...) { if (logger) *(std::ostream*)logger << msg; }
+ void enableXMLLogger(std::ostream& os = std::cerr) { xmlSetGenericErrorFunc(&os, xmlLogger); }
+ void disableXMLLogger() { xmlSetGenericErrorFunc(NULL, xmlLogger); }
+ */
 
 struct SSDom: public xmlpp::DomParser {
 	xmlpp::Node::PrefixNsMap nsmap;
@@ -33,11 +33,11 @@ struct SSDom: public xmlpp::DomParser {
 	void load(std::string const& buf) {
 		set_substitute_entities();
 		/*
-		struct DisableLogger {
-			DisableLogger() { disableXMLLogger(); }
-			~DisableLogger() { enableXMLLogger(); }
-		} disabler;
-		*/
+		 struct DisableLogger {
+		 DisableLogger() { disableXMLLogger(); }
+		 ~DisableLogger() { enableXMLLogger(); }
+		 } disabler;
+		 */
 		parse_memory(buf);
 		nsmap["ss"] = get_document()->get_root_node()->get_namespace_uri();
 	}
@@ -62,8 +62,8 @@ namespace {
 	bool parseComment(std::string const& str, std::string const& header, std::string& result) {
 		if (!boost::starts_with(str, header)) return false;
 		result = boost::replace_all_copy(
-		  boost::trim_left_copy(str.substr(header.size())),
-		  "&amp;", "&");
+										 boost::trim_left_copy(str.substr(header.size())),
+										 "&amp;", "&");
 		return true;
 	}
 }
@@ -71,7 +71,7 @@ namespace {
 /// Parse header data for Songs screen
 void SongParser::xmlParseHeader() {
 	Song& s = m_song;
-
+	
 	// Parse notes.xml
 	SSDom dom(m_ss);
 	// Extract artist and title from XML comments
@@ -131,7 +131,7 @@ void SongParser::xmlParse() {
 		else throw std::runtime_error("Unknown tempo resolution: " + res);
 	}
 	addBPM(0, m_bpm);
-
+	
 	// Parse each track...
 	xmlpp::const_NodeSet tracks;
 	// First try version 1 (MELODY/SENTENCE), fallback to version 2/4 (MELODY/TRACK/SENTENCE).
@@ -197,14 +197,14 @@ Note SongParser::xmlParseNote(xmlpp::Element const& noteNode, unsigned& ts) {
 	if (noteNode.get_attribute("FreeStyle")) n.type = Note::FREESTYLE;
 	else if (noteNode.get_attribute("Bonus")) n.type = Note::GOLDEN;
 	else n.type = Note::NORMAL;
-
+	
 	n.begin = tsTime(ts);
 	ts += duration;
 	n.end = tsTime(ts);
 	n.syllable = lyric;
 	n.note = note;
 	n.notePrev = note;
-
+	
 	return n;
 }
 

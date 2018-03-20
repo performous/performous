@@ -7,7 +7,7 @@
 #include <unordered_map>
 
 namespace input {
-
+	
 	class Midi: public Hardware {
 	public:
 		Midi() {
@@ -56,7 +56,7 @@ namespace input {
 		pm::Initialize m_init;
 		std::unordered_map<unsigned, std::unique_ptr<pm::Input>> m_streams;
 	};
-
+	
 	Hardware::ptr constructMidi() { return Hardware::ptr(new Midi()); }
 	bool Hardware::midiEnabled() { return true; }
 }

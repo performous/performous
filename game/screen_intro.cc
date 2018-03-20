@@ -30,7 +30,7 @@ void ScreenIntro::enter() {
 	reloadGL();
 	webserversetting = config["game/webserver_access"].i();
 	if(webserversetting) {
-	m_audio.playSample("notice.ogg");
+		m_audio.playSample("notice.ogg");
 	}
 }
 
@@ -73,7 +73,7 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 		else if (key == SDL_SCANCODE_S && modifier & Platform::shortcutModifier()) {
 			writeConfig(m_audio, modifier & KMOD_ALT);
 			Game::getSingletonPtr()->flashMessage((modifier & KMOD_ALT)
-				? _("Settings saved as system defaults.") : _("Settings saved."));
+												  ? _("Settings saved as system defaults.") : _("Settings saved."));
 		}
 	}
 }
@@ -91,14 +91,14 @@ void ScreenIntro::draw_menu_options() {
 	theme->back_h.dimensions.stretch(m_menu.dimensions.w(), theme->back_h.dimensions.h());
 	// Determine from which item to start
 	int start_i = std::min((int)m_menu.curIndex() - 1, (int)opts.size() - (int)showopts
-		+ (m_menu.getSubmenuLevel() == 2 ? 1 : 0)); // Hack to counter side-effects from displaying the value inside the menu
+						   + (m_menu.getSubmenuLevel() == 2 ? 1 : 0)); // Hack to counter side-effects from displaying the value inside the menu
 	if (start_i < 0 || opts.size() == showopts) start_i = 0;
-
+	
 	// Loop the currently visible options
 	for (size_t i = start_i, ii = 0; ii < showopts && i < opts.size(); ++i, ++ii) {
 		MenuOption const& opt = opts[i];
 		ColorTrans c(Color::alpha(submenuanim));
-
+		
 		// Selection
 		if (i == m_menu.curIndex()) {
 			// Animate selection higlight moving
@@ -119,8 +119,8 @@ void ScreenIntro::draw_menu_options() {
 				theme->option_selected.dimensions.left(x + sel_margin).center(-0.1 + (selanim+1)*0.065);
 				theme->option_selected.draw("<  " + opt.value->getValue() + "  >");
 			}
-
-		// Regular option (not selected)
+			
+			// Regular option (not selected)
 		} else {
 			std::string title = opt.getName();
 			SvgTxtTheme& txt = getTextObject(title);

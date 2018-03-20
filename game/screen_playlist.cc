@@ -12,7 +12,7 @@
 
 
 ScreenPlaylist::ScreenPlaylist(std::string const& name,Audio& audio, Songs& songs, Backgrounds& bgs):
-	Screen(name), m_audio(audio), m_songs(songs), m_backgrounds(bgs), m_covers(20), keyPressed()
+Screen(name), m_audio(audio), m_songs(songs), m_backgrounds(bgs), m_covers(20), keyPressed()
 {}
 
 void ScreenPlaylist::enter() {
@@ -76,10 +76,10 @@ void ScreenPlaylist::exit() {
 void ScreenPlaylist::manageEvent(input::NavEvent const& event) {
 	input::NavButton nav = event.button;
 	Menu& menu = overlay_menu.isOpen() ? overlay_menu : songlist_menu;
-
+	
 	if (keyPressed == false)
 		keyPressed = true;
-
+	
 	if (nav == input::NAV_CANCEL) {
 		if(overlay_menu.isOpen()) {
 			overlay_menu.close();
@@ -137,9 +137,9 @@ void ScreenPlaylist::draw() {
 			double pos =  i / std::max<double>(9, 9);
 			using namespace glmath;
 			Transform trans(
-			  translate(vec3(-0.4 + 0.9 * pos, 0.045)) //vec3(horizontal-offset-from-center, vertical offset from screen_bottom)
-			  * rotate(-0.0, vec3(0.0, 1.0, 0.0))
-			);
+							translate(vec3(-0.4 + 0.9 * pos, 0.045)) //vec3(horizontal-offset-from-center, vertical offset from screen_bottom)
+							* rotate(-0.0, vec3(0.0, 1.0, 0.0))
+							);
 			s.dimensions.middle().screenBottom(-0.06).fitInside(0.08, 0.08);
 			s.draw();
 		}
@@ -239,14 +239,14 @@ void ScreenPlaylist::draw_menu_options() {
 	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get()-songlist_menu.getSubmenuLevel()));
 	// Determine from which item to start
 	int start_i = std::min((int)songlist_menu.curIndex() - 1, (int)opts.size() - (int)showopts
-		+ (songlist_menu.getSubmenuLevel() == 2 ? 1 : 0)); // Hack to counter side-effects from displaying the value inside the menu
+						   + (songlist_menu.getSubmenuLevel() == 2 ? 1 : 0)); // Hack to counter side-effects from displaying the value inside the menu
 	if (start_i < 0 || opts.size() == showopts) start_i = 0;
-
+	
 	// Loop the currently visible options
 	for (size_t i = start_i, ii = 0; ii < showopts && i < opts.size(); ++i, ++ii) {
 		MenuOption const& opt = opts[i];
 		ColorTrans c(Color::alpha(submenuanim));
-
+		
 		// Selection
 		if (i == songlist_menu.curIndex()) {
 			// Animate selection higlight moving
@@ -265,8 +265,8 @@ void ScreenPlaylist::draw_menu_options() {
 				theme->option_selected.dimensions.left(x + sel_margin).center(-0.1 + (selanim+1)*0.08);
 				theme->option_selected.draw("<  " + opt.value->getValue() + "  >");
 			}
-
-		// Regular option (not selected)
+			
+			// Regular option (not selected)
 		} else {
 			std::string title = opt.getName();
 			SvgTxtTheme& txt = getTextObject(title);
@@ -308,7 +308,7 @@ void ScreenPlaylist::createSongListMenu() {
 		if(hours > 0) {
 			oss_playlist << std::setw(2) << std::setfill('0') << hours << ":";
 		}
-			oss_playlist << std::setw(2) << std::setfill('0') << minutes << ":" << std::setw(2) << std::setfill('0') << seconds;
+		oss_playlist << std::setw(2) << std::setfill('0') << minutes << ":" << std::setw(2) << std::setfill('0') << seconds;
 		std::string songinfo = oss_playlist.str();
 		if (songinfo.length() > 20) {
 			songinfo = songinfo + "                           >"; //FIXME: ugly hack to make the text scale so it fits on screen!
@@ -333,8 +333,8 @@ void ScreenPlaylist::createSongMenu(int songNumber) {
 	overlay_menu.clear();
 	std::string firstOption = songNumber >= 2 ? _("Play first") : _("Continue");
 	std::string firstDesc = songNumber >= 2 ?
-		_("Ignore the playlist's order and play this song first") :
-		_("Start the song already!");
+	_("Ignore the playlist's order and play this song first") :
+	_("Start the song already!");
 	overlay_menu.add(MenuOption(firstOption, firstDesc).call([this, songNumber]() {
 		Game* gm = Game::getSingletonPtr();
 		Screen* s = gm->getScreen("Sing");
@@ -378,6 +378,6 @@ void ScreenPlaylist::createSongMenu(int songNumber) {
 }
 
 void ScreenPlaylist::triggerSongListUpdate() {
-boost::mutex::scoped_lock l (m_mutex);
-needsUpdate = true;
+	boost::mutex::scoped_lock l (m_mutex);
+	needsUpdate = true;
 }

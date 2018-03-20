@@ -17,7 +17,7 @@
 #include <boost/format.hpp>
 
 ScreenPlayers::ScreenPlayers(std::string const& name, Audio& audio, Database& database):
-  Screen(name), m_audio(audio), m_database(database), m_players(database.m_players), m_covers(20)
+Screen(name), m_audio(audio), m_database(database), m_players(database.m_players), m_covers(20)
 {
 	m_players.setAnimMargins(5.0, 5.0);
 	m_playTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
@@ -39,7 +39,7 @@ void ScreenPlayers::enter() {
 
 void ScreenPlayers::exit() {
 	m_layout_singer.reset();
-
+	
 	m_covers.clear();
 	m_emptyCover.reset();
 	theme.reset();
@@ -47,7 +47,7 @@ void ScreenPlayers::exit() {
 	m_songbg.reset();
 	m_playing.clear();
 	m_playReq.clear();
-
+	
 	m_database.save();
 }
 
@@ -67,7 +67,7 @@ void ScreenPlayers::manageEvent(input::NavEvent const& event) {
 		}
 		m_database.addHiscore(m_song);
 		m_database.scores.pop_front();
-
+		
 		if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
 			// no more highscore, we are now finished
 			gm->activateScreen("Playlist");
@@ -131,13 +131,13 @@ void ScreenPlayers::draw() {
 		// TODO: use boost::format
 		oss_song << boost::format(_("You reached %1% points!")) % m_database.scores.front().score;
 		oss_order << _("Change player with arrow keys.") << '\n'
-			<< _("Name:") << ' ' << m_players.current().name << '\n';
+		<< _("Name:") << ' ' << m_players.current().name << '\n';
 		//m_database.queryPerPlayerHiscore(oss_order);
 		oss_order << '\n'
-			<< (m_search.text.empty() ? _("Type text to filter or create a new player.") : std::string(_("Search Text:")) + " " + m_search.text)
-			<< '\n';
+		<< (m_search.text.empty() ? _("Type text to filter or create a new player.") : std::string(_("Search Text:")) + " " + m_search.text)
+		<< '\n';
 		double spos = m_players.currentPosition(); // This needs to be polled to run the animation
-
+		
 		// Draw the covers
 		std::size_t ss = m_players.size();
 		int baseidx = spos + 1.5; --baseidx; // Round correctly
@@ -166,16 +166,16 @@ void ScreenPlayers::draw() {
 			s.tex = TexCoords();
 		}
 		/*
-		if (!song.music.empty()) music = song.music[0]; // FIXME: support multiple tracks
-		if (!song.background.empty()) songbg = song.path + song.background;
-		if (!song.video.empty()) { video = song.path + song.video; videoGap = song.videoGap; }
-		*/
+		 if (!song.music.empty()) music = song.music[0]; // FIXME: support multiple tracks
+		 if (!song.background.empty()) songbg = song.path + song.background;
+		 if (!song.video.empty()) { video = song.path + song.video; videoGap = song.videoGap; }
+		 */
 	}
-
+	
 	// Draw song and order texts
 	theme->song.draw(oss_song.str());
 	theme->order.draw(oss_order.str());
-
+	
 	// Schedule playback change if the chosen song has changed
 	if (music != m_playReq) { m_playReq = music; m_playTimer.setValue(0.0); }
 	if (m_quitTimer.get() == 0.0 && !keyPressed) { Game::getSingletonPtr()->activateScreen("Playlist"); return; }

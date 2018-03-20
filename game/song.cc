@@ -161,7 +161,7 @@ double Song::getDurationSeconds() {
 	} else { //duration is still in memmory that means we already loaded it
 		return m_duration;
 	}
-return 0;
+	return 0;
 }
 
 

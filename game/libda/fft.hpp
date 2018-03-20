@@ -14,7 +14,7 @@ extern const double m_pi;
 const double m_tau = (2.0 * m_pi);
 
 namespace da {
-
+	
 	// With g++ optimization -fcx-limited-range should be used for 5x performance boost.
 	
 	// Based on the description of Volodymyr Myrnyy in
@@ -36,9 +36,9 @@ namespace da {
 			}
 		}
 	};
-
+	
 	template<typename T> struct DanielsonLanczos<0, T> { static void apply(std::complex<T>*) {} };
-
+	
 	/** Perform FFT on data. **/
 	template<unsigned P, typename T> void fft(std::complex<T>* data) {
 		// Perform bit-reversal sorting of sample data.
@@ -53,7 +53,7 @@ namespace da {
 		// Do the actual calculation
 		DanielsonLanczos<P, T>::apply(data);
 	}
-
+	
 	/** Perform FFT on data from floating point iterator, windowing the input. **/
 	template<unsigned P, typename InIt, typename Window> std::vector<std::complex<float> > fft(InIt begin, Window window) {
 		std::vector<std::complex<float> > data(1 << P);
@@ -70,7 +70,7 @@ namespace da {
 		DanielsonLanczos<P, float>::apply(&data[0]);
 		return data;
 	}
-
+	
 	template<unsigned P, typename T> void ifft(std::complex<T>* data) {
 		constexpr std::size_t N = 1 << P;
 		for (std::size_t i = 0; i < N; ++i) data[i] = std::conj(data[i]);  // Invert phase so that we can use FFT to do IFFT

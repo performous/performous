@@ -15,10 +15,10 @@
 
 /// Represents popup messages
 class Popup {
-  public:
+public:
 	/// Constructor
 	Popup(std::string msg, Color c, double speed, SvgTxtThemeSimple* popupText, std::string info = "", SvgTxtTheme* infoText = NULL):
-	  m_msg(msg), m_color(c), m_anim(AnimValue(0.0, speed)), m_popupText(popupText), m_info(info), m_infoText(infoText)
+	m_msg(msg), m_color(c), m_anim(AnimValue(0.0, speed)), m_popupText(popupText), m_info(info), m_infoText(infoText)
 	{
 		m_anim.setTarget(1.0, false);
 	}
@@ -44,7 +44,7 @@ class Popup {
 		if (anim > 0.999) m_anim.setTarget(0.0, true);
 		return true;
 	}
-  private:
+private:
 	std::string m_msg;  /// Popup text
 	Color m_color;  /// Color
 	AnimValue m_anim;  /// Animation timer
@@ -66,7 +66,7 @@ public:
 	InstrumentGraph(Audio& audio, Song const& song, input::DevicePtr dev);
 	/// Virtual destructor
 	virtual ~InstrumentGraph();
-
+	
 	// Interface functions
 	virtual void draw(double time) = 0;
 	virtual void engine() = 0;
@@ -76,7 +76,7 @@ public:
 	virtual std::string getModeId() const = 0;
 	virtual void changeTrack(int dir = 1) = 0;
 	virtual void changeDifficulty(int dir = 1) = 0;
-
+	
 	// General shared functions
 	bool dead() const;
 	void setupPauseMenu();
@@ -86,7 +86,7 @@ public:
 	void togglePause(int);
 	void quit(int) { Game::getSingletonPtr()->activateScreen("Songs"); }
 	void unjoin();
-
+	
 	// General getters
 	bool joining(double time) const { return time < m_jointime; }
 	bool ready() const { return m_ready; };
@@ -98,8 +98,8 @@ public:
 	input::DevType getGraphType() const { return m_dev->type; }
 	virtual double getWhammy() const { return 0; }
 	bool isKeyboard() const { return m_dev->source.isKeyboard(); }
-
-  protected:
+	
+protected:
 	// Core stuff
 	Audio& m_audio;
 	Song const& m_song;
@@ -121,14 +121,14 @@ public:
 	typedef std::vector<Popup> Popups;
 	Popups m_popups;
 	Menu m_menu;
-
+	
 	// Shared functions for derived classes
 	void drawPopups();
 	void handleCountdown(double time, double beginTime);
-
+	
 	// Functions not really shared, but needed here
 	Color const& color(unsigned fret) const;
-
+	
 	// Media
 	Surface m_button;
 	Surface m_arrow_up;
@@ -138,7 +138,7 @@ public:
 	SvgTxtTheme m_text;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
 	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
-
+	
 	// Dynamic stuff for join menu
 	ConfigItem m_selectedTrack; /// menu modifies this to select track
 	ConfigItem m_selectedDifficulty; /// menu modifies this to select difficulty
@@ -147,7 +147,7 @@ public:
 	std::string m_trackOpt;
 	std::string m_difficultyOpt;
 	std::string m_leftyOpt;
-
+	
 	// Misc counters etc.
 	unsigned m_pads; /// how many panels the current gaming mode uses
 	bool m_pressed[max_panels]; /// is certain panel pressed currently

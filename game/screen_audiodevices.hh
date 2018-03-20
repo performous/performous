@@ -11,7 +11,7 @@ class ThemeAudioDevices;
 
 /// options dialogue
 class ScreenAudioDevices: public Screen {
-  public:
+public:
 	/// constructor
 	ScreenAudioDevices(std::string const& name, Audio& m_audio);
 	void enter();
@@ -19,8 +19,8 @@ class ScreenAudioDevices: public Screen {
 	void manageEvent(SDL_Event event);
 	void manageEvent(input::NavEvent const& event);
 	void draw();
-
-  private:
+	
+private:
 	struct Channel {
 		Channel(std::string const& name): name(name), pos(-1) {}
 		std::string name;
@@ -29,7 +29,7 @@ class ScreenAudioDevices: public Screen {
 	void load(); ///< Check what devices are open
 	bool save(bool skip_ui_config = false); ///< Save the config to disk xml and then reload
 	bool verify(); ///< Check that all were opened after audio reset
-
+	
 	Audio& m_audio;
 	boost::scoped_ptr<ThemeAudioDevices> m_theme;
 	unsigned int m_selected_column;

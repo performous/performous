@@ -23,5 +23,5 @@ public:
 	static bool enabled() {
 		return true;
 	};
-
+	
 };

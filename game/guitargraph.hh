@@ -45,7 +45,7 @@ static inline bool operator==(GuitarChord const& a, GuitarChord const& b) {
 
 /// handles drawing of notes and waves
 class GuitarGraph: public InstrumentGraph {
-  public:
+public:
 	/// constructor
 	GuitarGraph(Audio& audio, Song const& song, input::DevicePtr dev, int number);
 	/** draws GuitarGraph
@@ -59,8 +59,8 @@ class GuitarGraph: public InstrumentGraph {
 	void changeTrack(int dir = 1);
 	void changeDifficulty(int dir = 1);
 	double getWhammy() const { return m_whammy; }
-
-  private:
+	
+private:
 	// refactoring methods
 	void initDrums();
 	void initGuitar();
@@ -79,7 +79,7 @@ class GuitarGraph: public InstrumentGraph {
 	void updateDrumFill(double time);
 	void drumHit(double time, unsigned layer, unsigned pad);
 	void guitarPlay(double time, input::Event const& ev);
-
+	
 	// Media
 	Texture m_tail;
 	Texture m_tail_glow;
@@ -95,10 +95,10 @@ class GuitarGraph: public InstrumentGraph {
 	boost::scoped_ptr<Texture> m_neck; /// necks
 	boost::scoped_ptr<SvgTxtThemeSimple> m_scoreText;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_streakText;
-
+	
 	// Flags
 	bool m_drums; /// are we using drums?
-
+	
 	// Track stuff
 	enum Difficulty {
 		DIFFICULTY_KIDS,     // Kids
@@ -117,7 +117,7 @@ class GuitarGraph: public InstrumentGraph {
 	InstrumentTracksConstPtr m_instrumentTracks; /// tracks
 	InstrumentTracksConstPtr::const_iterator m_track_index;
 	unsigned m_holds[max_panels]; /// active hold notes
-
+	
 	// Graphics functions
 	Color const colorize(Color c, double time) const;
 	void drawNeckStuff(double time);  ///< Anything in neck coordinates
@@ -140,7 +140,7 @@ class GuitarGraph: public InstrumentGraph {
 	std::vector<Duration> m_solos; /// holds guitar solos
 	std::vector<Duration> m_drumfills; /// holds drum fills (used for activating GodMode)
 	Durations::const_iterator m_dfIt; /// current drum fill
-
+	
 	// Animation & misc score keeping
 	std::vector<AnimValue> m_flames[max_panels]; /// flame effect queues for each fret
 	AnimValue m_errorMeter;

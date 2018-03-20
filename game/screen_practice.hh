@@ -11,7 +11,7 @@ class ThemePractice;
 
 /// screen for practice mode
 class ScreenPractice : public Screen {
-  public:
+public:
 	/// constructor
 	ScreenPractice(std::string const& name, Audio& audio);
 	void enter();
@@ -19,11 +19,11 @@ class ScreenPractice : public Screen {
 	void reloadGL();
 	void manageEvent(input::NavEvent const& event);
 	void draw();
-
+	
 	/// draw analyzers
 	void draw_analyzers();
-
-  private:
+	
+private:
 	Audio& m_audio;
 	std::vector<std::string> m_samples;
 	boost::ptr_vector<ProgressBar> m_vumeters;

@@ -12,36 +12,36 @@ namespace {
 
 
 InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevicePtr dev):
-  m_audio(audio), m_song(song),
-  m_stream(),
-  m_dev(dev),
-  m_cx(0.0, 0.2), m_width(0.5, 0.4),
-  m_menu(),
-  m_button(findFile("button.svg")),
-  m_arrow_up(findFile("arrow_button_up.svg")),
-  m_arrow_down(findFile("arrow_button_down.svg")),
-  m_arrow_left(findFile("arrow_button_left.svg")),
-  m_arrow_right(findFile("arrow_button_right.svg")),
-  m_text(findFile("sing_timetxt.svg"), config["graphic/text_lod"].f()),
-  m_selectedTrack(""),
-  m_selectedDifficulty(0),
-  m_rejoin(false),
-  m_leftymode(false),
-  m_pads(),
-  m_correctness(1.0, 5.0),
-  m_score(),
-  m_scoreFactor(),
-  m_starmeter(),
-  m_streak(),
-  m_longestStreak(),
-  m_bigStreak(),
-  m_countdown(3), // Display countdown 3 secs before note start
-  m_dead(),
-  m_ready()
+m_audio(audio), m_song(song),
+m_stream(),
+m_dev(dev),
+m_cx(0.0, 0.2), m_width(0.5, 0.4),
+m_menu(),
+m_button(findFile("button.svg")),
+m_arrow_up(findFile("arrow_button_up.svg")),
+m_arrow_down(findFile("arrow_button_down.svg")),
+m_arrow_left(findFile("arrow_button_left.svg")),
+m_arrow_right(findFile("arrow_button_right.svg")),
+m_text(findFile("sing_timetxt.svg"), config["graphic/text_lod"].f()),
+m_selectedTrack(""),
+m_selectedDifficulty(0),
+m_rejoin(false),
+m_leftymode(false),
+m_pads(),
+m_correctness(1.0, 5.0),
+m_score(),
+m_scoreFactor(),
+m_starmeter(),
+m_streak(),
+m_longestStreak(),
+m_bigStreak(),
+m_countdown(3), // Display countdown 3 secs before note start
+m_dead(),
+m_ready()
 {
 	double time = m_audio.getPosition();
 	m_jointime = time < 0.0 ? -1.0 : time + join_delay;
-
+	
 	m_popupText.reset(new SvgTxtThemeSimple(findFile("sing_popup_text.svg"), config["graphic/text_lod"].f()));
 	m_menuTheme.reset(new ThemeInstrumentMenu());
 	for (auto& elem: m_pressed) elem = false;
@@ -98,7 +98,7 @@ void InstrumentGraph::drawMenu() {
 	// All these vars are ultimately affected by the scaling matrix
 	const float txth = th.option_selected.h();
 	const float button_margin = m_arrow_up.dimensions.w()
-		* (isKeyboard() && getGraphType() != input::DEVTYPE_DANCEPAD ? 2.0f : 1.0f);
+	* (isKeyboard() && getGraphType() != input::DEVTYPE_DANCEPAD ? 2.0f : 1.0f);
 	const float step = txth * 0.7f;
 	const float h = m_menu.getOptions().size() * step + step;
 	float y = -h * .5f + step;
@@ -113,11 +113,11 @@ void InstrumentGraph::drawMenu() {
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it, ++i) {
 		std::string menutext = it->getName();
 		SvgTxtTheme* txt = &th.option_selected; // Default: font for selected menu item
-
+		
 		if (cur != &*it) { // Unselected menuoption
 			txt = &(th.getCachedOption(menutext));
-
-		// Selected item
+			
+			// Selected item
 		} else {
 			// Left/right Icons
 			if (getGraphType() == input::DEVTYPE_DRUMS) {
@@ -130,7 +130,7 @@ void InstrumentGraph::drawMenu() {
 			}
 			m_arrow_left.draw();
 			m_arrow_right.draw();
-
+			
 			// Up/down icons
 			if (getGraphType() != input::DEVTYPE_GUITAR) {
 				if (i > 0) { // Up
@@ -142,7 +142,7 @@ void InstrumentGraph::drawMenu() {
 					m_arrow_down.draw();
 				}
 			}
-
+			
 			// Draw the key letters for keyboard (not for dancepad)
 			if (isKeyboard() && getGraphType() != input::DEVTYPE_DANCEPAD) {
 				float leftx = x - button_margin*0.75f;
@@ -203,9 +203,9 @@ void InstrumentGraph::drawPopups() {
 void InstrumentGraph::handleCountdown(double time, double beginTime) {
 	if (!dead() && time < beginTime && time >= beginTime - m_countdown - 1) {
 		m_popups.push_back(Popup(m_countdown > 0 ?
-		  std::string("- ") +std::to_string(unsigned(m_countdown))+" -" : "Rock On!",
-		  Color(0.0, 0.0, 1.0), 2.0, m_popupText.get()));
-		  --m_countdown;
+								 std::string("- ") +std::to_string(unsigned(m_countdown))+" -" : "Rock On!",
+								 Color(0.0, 0.0, 1.0), 2.0, m_popupText.get()));
+		--m_countdown;
 	}
 }
 

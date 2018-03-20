@@ -26,7 +26,7 @@ struct Device {
 	portaudio::Stream stream;
 	std::vector<Analyzer*> mics;
 	Output* outptr;
-
+	
 	Device(unsigned int in, unsigned int out, double rate, unsigned int dev);
 	/// Start
 	void start();

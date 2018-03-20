@@ -60,7 +60,7 @@ void Database::addHiscore(boost::shared_ptr<Song> s) {
 	int score = scores.front().score;
 	std::string track = scores.front().track;
 	int songid = m_songs.lookup(s);
-
+	
 	m_hiscores.addHiscore(score, playerid, songid, track);
 	std::clog << "database/info: Added new hiscore " << score << " points on track " << track << " of songid " << songid << std::endl;
 }
@@ -69,7 +69,7 @@ bool Database::reachedHiscore(boost::shared_ptr<Song> s) const {
 	int score = scores.front().score;
 	std::string track = scores.front().track;
 	int songid = m_songs.lookup(s);
-
+	
 	return m_hiscores.reachedHiscore(score, songid, track);
 }
 
@@ -77,10 +77,10 @@ void Database::queryOverallHiscore(std::ostream & os, std::string const& track) 
 	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore (10, -1, -1, track);
 	for (size_t i=0; i<hi.size(); ++i) {
 		os << i+1 << ".\t"
-		   << m_players.lookup(hi[i].playerid) << "\t"
-		   << m_songs.lookup(hi[i].songid) << "\t"
+		<< m_players.lookup(hi[i].playerid) << "\t"
+		<< m_songs.lookup(hi[i].songid) << "\t"
 		// << hi[i].track << "\t"
-		   << hi[i].score << "\n";
+		<< hi[i].score << "\n";
 	}
 }
 
@@ -104,9 +104,9 @@ void Database::queryPerPlayerHiscore(std::ostream & os, std::string const& track
 	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore(3, playerid, -1, track);
 	for (size_t i=0; i<hi.size(); ++i) {
 		os << i+1 << ".\t"
-		   << m_songs.lookup(hi[i].songid) << "\t"
-		   << hi[i].score << "\t"
-		   << "(" << hi[i].track << ")\n";
+		<< m_songs.lookup(hi[i].songid) << "\t"
+		<< hi[i].score << "\t"
+		<< "(" << hi[i].track << ")\n";
 	}
 }
 

@@ -31,16 +31,16 @@ namespace {
 		SDL_GLattr m_attr;
 		int m_value;
 	};
-
+	
 	double getSeparation() {
 		return config["graphic/stereo3d"].b() ? 0.001f * config["graphic/stereo3dseparation"].f() : 0.0;
 	}
-
+	
 	// stump: under MSVC, near and far are #defined to nothing for compatibility with ancient code, hence the underscores.
 	const float near_ = 0.1f; // This determines the near clipping distance (must be > 0)
 	const float far_ = 110.0f; // How far away can things be seen
 	const float z0 = 1.5f; // This determines FOV: the value is your distance from the monitor (the unit being the width of the Performous window)
-
+	
 	glmath::mat4 g_color = glmath::mat4::identity();
 	glmath::mat4 g_projection = glmath::mat4::identity();
 	glmath::mat4 g_modelview =  glmath::mat4::identity();
@@ -65,28 +65,28 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 		if(width < 200) width = 854; //FIXME: window should have a minimum size
 		if(height < 200) height = 480;
 		screen = SDL_CreateWindow(PACKAGE " " VERSION, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height,
-			(m_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0) | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL);
+								  (m_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0) | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL);
 		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
 		SDL_GL_CreateContext(screen);
-
+		
 	}
-
+	
 	if (!m_fullscreen) {
 		config["graphic/window_width"].i() = s_width;
 		config["graphic/window_height"].i() = s_height;
 	}
 	resize();
 	SDL_ShowCursor(SDL_DISABLE);
-
+	
 	// Dump some OpenGL info
 	std::clog << "video/info: GL_VENDOR:     " << glGetString(GL_VENDOR) << std::endl;
 	std::clog << "video/info: GL_VERSION:    " << glGetString(GL_VERSION) << std::endl;
 	std::clog << "video/info: GL_RENDERER:   " << glGetString(GL_RENDERER) << std::endl;
 	// Extensions would need more complex outputting, otherwise they will break clog.
 	//std::clog << "video/info: GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl;
-
+	
 	if (epoxy_gl_version() < 21) throw std::runtime_error("OpenGL 2.1 is required but not available");
-
+	
 	// The Stereo3D shader needs OpenGL 3.3 and GL_ARB_viewport_array, some Intel drivers support GL 3.3,
 	// but not GL_ARB_viewport_array, so we just check for the extension here.
 	if (epoxy_has_gl_extension("GL_ARB_viewport_array")) {
@@ -104,35 +104,35 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 			}
 		}
 	}
-
+	
 	shader("color")
-	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
-	  .compileFile(findFile("shaders/core.vert"))
-	  .compileFile(findFile("shaders/core.frag"))
-	  .link();
+	.addDefines("#define ENABLE_VERTEX_COLOR\n")
+	.compileFile(findFile("shaders/core.vert"))
+	.compileFile(findFile("shaders/core.frag"))
+	.link();
 	shader("surface")
-	  .addDefines("#define ENABLE_TEXTURING 1\n")
-	  .compileFile(findFile("shaders/core.vert"))
-	  .compileFile(findFile("shaders/core.frag"))
-	  .link();
+	.addDefines("#define ENABLE_TEXTURING 1\n")
+	.compileFile(findFile("shaders/core.vert"))
+	.compileFile(findFile("shaders/core.frag"))
+	.link();
 	shader("texture")
-	  .addDefines("#define ENABLE_TEXTURING 2\n")
-	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
-	  .compileFile(findFile("shaders/core.vert"))
-	  .compileFile(findFile("shaders/core.frag"))
-	  .link();
+	.addDefines("#define ENABLE_TEXTURING 2\n")
+	.addDefines("#define ENABLE_VERTEX_COLOR\n")
+	.compileFile(findFile("shaders/core.vert"))
+	.compileFile(findFile("shaders/core.frag"))
+	.link();
 	shader("3dobject")
-	  .addDefines("#define ENABLE_LIGHTING\n")
-	  .compileFile(findFile("shaders/core.vert"))
-	  .compileFile(findFile("shaders/core.frag"))
-	  .link();
+	.addDefines("#define ENABLE_LIGHTING\n")
+	.compileFile(findFile("shaders/core.vert"))
+	.compileFile(findFile("shaders/core.frag"))
+	.link();
 	shader("dancenote")
-	  .addDefines("#define ENABLE_TEXTURING 2\n")
-	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
-	  .compileFile(findFile("shaders/dancenote.vert"))
-	  .compileFile(findFile("shaders/core.frag"))
-	  .link();
-
+	.addDefines("#define ENABLE_TEXTURING 2\n")
+	.addDefines("#define ENABLE_VERTEX_COLOR\n")
+	.compileFile(findFile("shaders/dancenote.vert"))
+	.compileFile(findFile("shaders/core.frag"))
+	.link();
+	
 	updateColor();
 	view(0);  // For loading screens
 }
@@ -180,16 +180,16 @@ void Window::render(boost::function<void (void)> drawFunc) {
 	ViewTrans trans;  // Default frustum
 	bool stereo = config["graphic/stereo3d"].b();
 	int type = config["graphic/stereo3dtype"].i();
-
+	
 	if (stereo && !epoxy_has_gl_extension("GL_ARB_viewport_array")) {
 		config["graphic/stereo3d"].b() = stereo = false;
 		std::clog << "video/warning: Your GPU does not support Stereo3D mode (OpenGL extension ARB_viewport_array is required)" << std::endl;
 		// TODO: Flash message on UI?
 	}
-
+	
 	// Over/under only available in fullscreen
 	if (stereo && type == 2 && !m_fullscreen) stereo = false;
-
+	
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	updateStereo(stereo ? getSeparation() : 0.0);
 	glerror.check("setup");
@@ -285,7 +285,7 @@ void Window::view(unsigned num) {
 			glViewportIndexedf(2, 0, 0, vw, vh / 2);  // Bottom half of the drawable area
 		}
 	}
-
+	
 }
 
 void Window::swap() {
@@ -365,7 +365,7 @@ ViewTrans::ViewTrans(double offsetX, double offsetY, double frac): m_old(g_proje
 	y1 -= persY; y2 -= persY;
 	// Perspective projection + the rest of the offset in eye (world) space
 	g_projection = frustum(f * x1, f * x2, f * y1, f * y2, near_, far_)
-	  * translate(vec3(offsetX - persX, offsetY - persY, -z0));
+	* translate(vec3(offsetX - persX, offsetY - persY, -z0));
 	Game::getSingletonPtr()->window().updateTransforms();
 }
 

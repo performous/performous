@@ -11,16 +11,16 @@
 void SongItems::load(xmlpp::NodeSet const& n) {
 	for (auto const& elem: n) {
 		xmlpp::Element& element = dynamic_cast<xmlpp::Element&>(*elem);
-
+		
 		xmlpp::Attribute* a_id = element.get_attribute("id");
 		if (!a_id) throw SongItemsException("No attribute id");
-
+		
 		xmlpp::Attribute* a_artist = element.get_attribute("artist");
 		if (!a_artist) throw SongItemsException("No attribute artist");
-
+		
 		xmlpp::Attribute* a_title = element.get_attribute("title");
 		if (!a_title) throw SongItemsException("No attribute title");
-
+		
 		addSongItem(a_artist->get_value(), a_title->get_value(), std::stoi(a_id->get_value()));
 	}
 }
@@ -40,7 +40,7 @@ int SongItems::addSongItem(std::string const& artist, std::string const& title, 
 	si.id = id;
 	si.artist = unicodeCollate(artist);
 	si.title = unicodeCollate(title);
-
+	
 	std::pair<songs_t::iterator, bool> ret = m_songs.insert(si);
 	if (!ret.second)
 	{
@@ -56,18 +56,18 @@ void SongItems::addSong(boost::shared_ptr<Song> song) {
 	{
 		id = addSongItem(song->artist, song->title);
 	}
-
+	
 	SongItem si;
 	si.id = id;
 	auto it = m_songs.find(si);
 	if (it == m_songs.end()) throw SongItemsException("Cant find song which was added just before");
 	// it->song.reset(song); // does not work, it is a read only structure...
-
+	
 	// fill up the rest of the information
 	si.artist = it->artist;
 	si.title = it->title;
 	si.song = song;
-
+	
 	m_songs.erase(it);
 	m_songs.insert(si);
 }

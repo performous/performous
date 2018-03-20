@@ -11,7 +11,7 @@ class Database;
 
 /// handles songlyrics
 class LyricRow {
-  public:
+public:
 	AnimValue extraspacing; ///< extraspacing for lyrics (used when the previous line is removed)
 	AnimValue fade; ///< fade
 	/// iterator
@@ -37,24 +37,24 @@ class LyricRow {
 		for (Iterator it = m_begin; it != m_end; ++it) {
 			sentence.push_back(TZoomText(it->syllable));
 			if(!config["game/Textstyle"].i()) {
-			bool current = (time >= it->begin && time < it->end);
-			sentence.back().factor = current ? 1.1 - 0.1 * (time - it->begin) / (it->end - it->begin) : 1.0; // Zoom-in and out while it's the current syllable.
+				bool current = (time >= it->begin && time < it->end);
+				sentence.back().factor = current ? 1.1 - 0.1 * (time - it->begin) / (it->end - it->begin) : 1.0; // Zoom-in and out while it's the current syllable.
 			} else {
-			bool current = time >=it->begin;
-			sentence.back().factor = current ? std::min(1 + (0.15 * (time - it->begin) / (it->end - it->begin)), 1.1) : 1.0; // Zoom-in and out syllable proportionally to their length.
+				bool current = time >=it->begin;
+				sentence.back().factor = current ? std::min(1 + (0.15 * (time - it->begin) / (it->end - it->begin)), 1.1) : 1.0; // Zoom-in and out syllable proportionally to their length.
 			}
 		}
 		ColorTrans c(Color::alpha(fade.get()));
 		txt.dimensions = dim;
 		txt.draw(sentence);
 	}
-
-  private:
+	
+private:
 	Iterator m_begin, m_end;
 };
 
 class LayoutSinger {
-  public:
+public:
 	enum PositionMode {FULL, TOP, BOTTOM, LEFT, RIGHT};
 	/// ThemeSing is optional if you want to use drawScore only
 	LayoutSinger(VocalTrack& vocal, Database& database, boost::shared_ptr<ThemeSing> theme = boost::shared_ptr<ThemeSing>());
@@ -64,7 +64,7 @@ class LayoutSinger {
 	void drawScore(PositionMode position);
 	double lyrics_begin() const;
 	void hideLyrics(bool hide = true) { m_hideLyrics = hide; }
-  private:
+private:
 	VocalTrack& m_vocal;
 	NoteGraph m_noteGraph;
 	Notes::const_iterator m_lyricit;

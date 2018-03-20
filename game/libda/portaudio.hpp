@@ -20,9 +20,9 @@ namespace portaudio {
 	class Error: public std::runtime_error {
 	public:
 		Error(PaError code_, char const* func_):
-		  runtime_error(std::string(func_) + " failed: " + Pa_GetErrorText(code_)),
-		  m_code(code_),
-		  m_func(func_)
+		runtime_error(std::string(func_) + " failed: " + Pa_GetErrorText(code_)),
+		m_code(code_),
+		m_func(func_)
 		{}
 		PaError code() const { return m_code; }
 		std::string func() const { return m_func; }
@@ -30,11 +30,11 @@ namespace portaudio {
 		PaError m_code;
 		char const* m_func;
 	};
-
+	
 	namespace internal {
 		void inline check(PaError code, char const* func) { if (code != paNoError) throw Error(code, func); }
 	}
-
+	
 	struct DeviceInfo {
 		DeviceInfo(int id, std::string n = std::string(), int i = 0, int o = 0): name(n), flex(n), idx(id), in(i), out(o) {}
 		std::string desc() const {
@@ -51,8 +51,8 @@ namespace portaudio {
 		int idx;
 		int in, out;
 	};
-		typedef std::vector<DeviceInfo> DeviceInfos;
-		struct AudioDevices {
+	typedef std::vector<DeviceInfo> DeviceInfos;
+	struct AudioDevices {
 		static int count() { return Pa_GetDeviceCount(); }
 		static const PaHostApiTypeId AutoBackendType = PaHostApiTypeId(1337);
 		static PaHostApiTypeId defaultBackEnd() {
@@ -60,8 +60,8 @@ namespace portaudio {
 		}
 		/// Constructor gets the PA devices into a vector
 		AudioDevices(PaHostApiTypeId backend = AutoBackendType) {
-		PaHostApiIndex backendIndex = Pa_HostApiTypeIdToHostApiIndex((backend == AutoBackendType ? defaultBackEnd() : backend));
-		if (backendIndex == paHostApiNotFound) backendIndex = Pa_HostApiTypeIdToHostApiIndex(defaultBackEnd());
+			PaHostApiIndex backendIndex = Pa_HostApiTypeIdToHostApiIndex((backend == AutoBackendType ? defaultBackEnd() : backend));
+			if (backendIndex == paHostApiNotFound) backendIndex = Pa_HostApiTypeIdToHostApiIndex(defaultBackEnd());
 			for (unsigned i = 0, end = Pa_GetHostApiInfo(backendIndex)->deviceCount; i != end; ++i) {
 				PaDeviceInfo const* info = Pa_GetDeviceInfo(Pa_HostApiDeviceIndexToDeviceIndex(backendIndex, i));
 				if (!info) continue;
@@ -128,50 +128,50 @@ namespace portaudio {
 		PaHostApiTypeId type;
 		int devices;
 		std::string desc () const {
-		std::ostringstream oss;
-		oss << "  #" << idx << ": " << name << " (" << devices << " devices):" << std::endl;
-		oss << portaudio::AudioDevices(type).dump();
-		return oss.str();
+			std::ostringstream oss;
+			oss << "  #" << idx << ": " << name << " (" << devices << " devices):" << std::endl;
+			oss << portaudio::AudioDevices(type).dump();
+			return oss.str();
 		}
 	};
-
+	
 	typedef std::vector<BackendInfo> BackendInfos;
 	
 	struct AudioBackends {
-	static int count() { return Pa_GetHostApiCount(); }
-	AudioBackends () {
-		if (count() == 0) throw std::runtime_error("No suitable audio backends found."); // Check specifically for 0 because it returns a negative error code if Pa is not initialized.
-		for (unsigned i = 0, end = Pa_GetHostApiCount(); i != end; ++i) {
-			PaHostApiInfo const* info = Pa_GetHostApiInfo(i);
-			if (!info || info->deviceCount < 1) continue;
-			/*
-			Constant, unique identifier for each audio backend past alpha status.
-				1 = DirectSound
-				2 = MME
-				3 = ASIO
-				4 = SoundManager
-				5 = CoreAudio
-				7 = OSS
-				8 = ALSA
-				9 = AL
-				10 = BeOS
-				11 = WDMKS
-				12 = JACK
-				13 = WASAPI
-				14 = AudioScienceHPI
-				0 = Backend currently being developed.
-			*/
-			PaHostApiTypeId apiID = info->type;
-			std::string name = convertToUTF8(info->name);
-			backends.push_back(BackendInfo(i, apiID, name, info->deviceCount));		
-		}
-	};
+		static int count() { return Pa_GetHostApiCount(); }
+		AudioBackends () {
+			if (count() == 0) throw std::runtime_error("No suitable audio backends found."); // Check specifically for 0 because it returns a negative error code if Pa is not initialized.
+			for (unsigned i = 0, end = Pa_GetHostApiCount(); i != end; ++i) {
+				PaHostApiInfo const* info = Pa_GetHostApiInfo(i);
+				if (!info || info->deviceCount < 1) continue;
+				/*
+				 Constant, unique identifier for each audio backend past alpha status.
+				 1 = DirectSound
+				 2 = MME
+				 3 = ASIO
+				 4 = SoundManager
+				 5 = CoreAudio
+				 7 = OSS
+				 8 = ALSA
+				 9 = AL
+				 10 = BeOS
+				 11 = WDMKS
+				 12 = JACK
+				 13 = WASAPI
+				 14 = AudioScienceHPI
+				 0 = Backend currently being developed.
+				 */
+				PaHostApiTypeId apiID = info->type;
+				std::string name = convertToUTF8(info->name);
+				backends.push_back(BackendInfo(i, apiID, name, info->deviceCount));		
+			}
+		};
 		BackendInfos backends;
 		
 		std::string dump() const {
-		std::ostringstream oss;
-		oss << "audio/info: PortAudio backends:" << std::endl;
-		for (auto const& b: backends) { oss << b.desc() << std::endl; }
+			std::ostringstream oss;
+			oss << "audio/info: PortAudio backends:" << std::endl;
+			for (auto const& b: backends) { oss << b.desc() << std::endl; }
 			return oss.str();
 		}
 		std::list<std::string> getBackends() {
@@ -182,12 +182,12 @@ namespace portaudio {
 			return std::list<std::string>(bends.begin(),bends.end());
 		}
 	};
-
+	
 	struct Init {
 		Init() { PORTAUDIO_CHECKED(Pa_Initialize, ()); }
 		~Init() { Pa_Terminate(); }
 	};
-
+	
 	struct Params {
 		PaStreamParameters params;
 		Params(PaStreamParameters const& init = PaStreamParameters()): params(init) {
@@ -201,36 +201,36 @@ namespace portaudio {
 		Params& hostApiSpecificStreamInfo(void* val) { params.hostApiSpecificStreamInfo = val; return *this; }
 		operator PaStreamParameters const*() const { return params.channelCount > 0 ? &params : nullptr; }
 	};
-
+	
 	template <typename Functor> int functorCallback(void const* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData) {
 		Functor* ptr = *reinterpret_cast<Functor**>(&userData);
 		return (*ptr)(input, output, frameCount, timeInfo, statusFlags);
 	}
-
+	
 	class Stream {
 		PaStream* m_handle;
 	public:
 		/// Construct a stream as with Pa_OpenStream
 		Stream(
-		  PaStreamParameters const* input,
-		  PaStreamParameters const* output,
-		  double sampleRate,
-		  unsigned long framesPerBuffer = paFramesPerBufferUnspecified,
-		  PaStreamFlags flags = paNoFlag,
-		  PaStreamCallback* callback = NULL,
-		  void* userData = NULL)
+			   PaStreamParameters const* input,
+			   PaStreamParameters const* output,
+			   double sampleRate,
+			   unsigned long framesPerBuffer = paFramesPerBufferUnspecified,
+			   PaStreamFlags flags = paNoFlag,
+			   PaStreamCallback* callback = NULL,
+			   void* userData = NULL)
 		{
 			PORTAUDIO_CHECKED(Pa_OpenStream, (&m_handle, input, output, sampleRate, framesPerBuffer, flags, callback, userData));
 		}
 		/// Construct stream using a C++ functor as callback
 		template <typename Functor> Stream(
-		  Functor& functor,
-		  PaStreamParameters const* input,
-		  PaStreamParameters const* output,
-		  double sampleRate,
-		  unsigned long framesPerBuffer = paFramesPerBufferUnspecified,
-		  PaStreamFlags flags = paNoFlag
-		): Stream(input, output, sampleRate, framesPerBuffer, flags, functorCallback<Functor>, (void*)(intptr_t)&functor) {}
+										   Functor& functor,
+										   PaStreamParameters const* input,
+										   PaStreamParameters const* output,
+										   double sampleRate,
+										   unsigned long framesPerBuffer = paFramesPerBufferUnspecified,
+										   PaStreamFlags flags = paNoFlag
+										   ): Stream(input, output, sampleRate, framesPerBuffer, flags, functorCallback<Functor>, (void*)(intptr_t)&functor) {}
 		~Stream() {
 			// Give audio a little time to shutdown but then just quit
 			boost::thread audiokiller(Pa_CloseStream, m_handle);
@@ -241,5 +241,5 @@ namespace portaudio {
 		}
 		operator PaStream*() { return m_handle; }
 	};
-
+	
 }

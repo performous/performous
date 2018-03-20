@@ -39,7 +39,7 @@ public:
 	void drawCovers(); ///< draw the cover browser
 	Surface& getCover(Song const& song); ///< get appropriate cover image for the song (incl. no cover)
 	void drawJukebox(); ///< draw the songbrowser in jukebox mode (fullscreen, full previews, ...)
-
+	
 private:
 	void manageSharedKey(input::NavEvent const& event); ///< same behaviour for jukebox and normal mode
 	void drawInstruments(Dimensions dim) const;
@@ -49,7 +49,7 @@ private:
 	bool addSong(); ///< Add current song to playlist. Returns true if the playlist was empty.
 	void sing(); ///< Enter singing screen with current playlist.
 	void createPlaylistMenu();
-
+	
 	Audio& m_audio;
 	Songs& m_songs;
 	Database& m_database;

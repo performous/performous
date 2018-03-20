@@ -39,7 +39,7 @@ class Profiler {
 	std::string m_name;
 	boost::xtime m_time;
 	static bool cmpFunc(Pair const& a, Pair const& b) { return a.second.total > b.second.total; }
-  public:
+public:
 	/// Start a profiler with the given name
 	Profiler(std::string const& name): m_name(name), m_time(now()) {}
 	~Profiler() { dump(); }

@@ -7,10 +7,10 @@
 #include <stdexcept>
 
 namespace cache {
-
+	
 	/** Builds the full path and file name for the SVG cache resource **/
 	fs::path constructSVGCacheFileName(fs::path const& svgfilename, double factor);
-
+	
 	/** Load an SVG from the cache, if loading fails invalid_cache_error is thrown **/
 	template <typename T> bool loadSVG(T& target, fs::path const& source_filename, double factor) {
 		fs::path const cache_filename = cache::constructSVGCacheFileName(source_filename, factor);

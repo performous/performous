@@ -15,7 +15,7 @@
 
 /// class for geometry stuff
 class Dimensions {
-  public:
+public:
 	/** Initialize with aspect ratio but no size, centered at screen center. **/
 	Dimensions(float ar_ = 0.0f): m_ar(ar_), m_x(), m_y(), m_w(), m_h(), m_xAnchor(), m_yAnchor(), m_screenAnchor() {}
 	/** Initialize with top-left corner and width & height **/
@@ -57,18 +57,18 @@ class Dimensions {
 	/// returns left
 	float x1() const {
 		switch (m_xAnchor) {
-		  case LEFT: return m_x;
-		  case MIDDLE: return m_x - 0.5 * m_w;
-		  case RIGHT: return m_x - m_w;
+			case LEFT: return m_x;
+			case MIDDLE: return m_x - 0.5 * m_w;
+			case RIGHT: return m_x - m_w;
 		}
 		throw std::logic_error("Unknown value in Dimensions::m_xAnchor");
 	}
 	/// returns top
 	float y1() const {
 		switch (m_yAnchor) {
-		  case TOP: return screenY() + m_y;
-		  case CENTER: return screenY() + m_y - 0.5 * m_h;
-		  case BOTTOM: return screenY() + m_y - m_h;
+			case TOP: return screenY() + m_y;
+			case CENTER: return screenY() + m_y - 0.5 * m_h;
+			case BOTTOM: return screenY() + m_y - m_h;
 		}
 		throw std::logic_error("Unknown value in Dimensions::m_yAnchor");
 	}
@@ -84,8 +84,8 @@ class Dimensions {
 	float w() const { return m_w; }
 	/// returns height
 	float h() const { return m_h; }
-
-  private:
+	
+private:
 	float screenY() const;
 	float m_ar;
 	float m_x, m_y, m_w, m_h;
@@ -96,12 +96,12 @@ class Dimensions {
 /// texture coordinates
 struct TexCoords {
 	float x1, ///< left
-	      y1, ///< top
-	      x2, ///< right
-	      y2; ///< bottom
+	y1, ///< top
+	x2, ///< right
+	y2; ///< bottom
 	/// constructor
 	TexCoords(float x1_ = 0.0, float y1_ = 0.0, float x2_ = 1.0, float y2_ = 1.0):
-	  x1(x1_), y1(y1_), x2(x2_), y2(y2_) {}
+	x1(x1_), y1(y1_), x2(x2_), y2(y2_) {}
 	bool outOfBounds() const {
 		return test(x1) || test(y1) || test(x2) || test(y2);
 	}
@@ -114,13 +114,13 @@ Shader& getShader(std::string const& name);
 
 /** @short A RAII wrapper for allocating/deallocating OpenGL texture ID **/
 template <GLenum Type> class OpenGLTexture: boost::noncopyable {
-  public:
+public:
 	/// return Type
 	static GLenum type() { return Type; };
 	static Shader& shader() {
 		switch (Type) {
-		case GL_TEXTURE_2D: return getShader("texture");
-		case GL_TEXTURE_RECTANGLE: return getShader("surface");
+			case GL_TEXTURE_2D: return getShader("texture");
+			case GL_TEXTURE_RECTANGLE: return getShader("surface");
 		}
 		throw std::logic_error("Unknown texture type");
 	}
@@ -132,54 +132,54 @@ template <GLenum Type> class OpenGLTexture: boost::noncopyable {
 	void draw(Dimensions const& dim, TexCoords const& tex = TexCoords()) const;
 	/// draw a subsection of the orig dimensions, cropping by tex
 	void drawCropped(Dimensions const& orig, TexCoords const& tex) const;
-  private:
+private:
 	GLuint m_id;
 };
 
 /** @short A RAII wrapper for binding to a texture (using it, modifying it) **/
 class UseTexture: boost::noncopyable {
-  public:
+public:
 	/// constructor
 	template <GLenum Type> UseTexture(OpenGLTexture<Type> const& tex):
-	  m_shader(/* hack of the year */ (glutil::GLErrorChecker("UseTexture"), glActiveTexture(GL_TEXTURE0), glBindTexture(Type, tex.id()), tex.shader())) {}
-
-  private:
+	m_shader(/* hack of the year */ (glutil::GLErrorChecker("UseTexture"), glActiveTexture(GL_TEXTURE0), glBindTexture(Type, tex.id()), tex.shader())) {}
+	
+private:
 	UseShader m_shader;
 };
 
 template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex) const {
 	glutil::VertexArray va;
-
+	
 	UseTexture texture(*this);
-
+	
 	// The texture wraps over at the edges (repeat)
 	const bool repeating = tex.outOfBounds();
 	glTexParameterf(type(), GL_TEXTURE_WRAP_S, repeating ? GL_REPEAT : GL_CLAMP);
 	glTexParameterf(type(), GL_TEXTURE_WRAP_T, repeating ? GL_REPEAT : GL_CLAMP);
-
+	
 	va.texCoord(tex.x1, tex.y1).vertex(dim.x1(), dim.y1());
 	va.texCoord(tex.x2, tex.y1).vertex(dim.x2(), dim.y1());
 	va.texCoord(tex.x1, tex.y2).vertex(dim.x1(), dim.y2());
 	va.texCoord(tex.x2, tex.y2).vertex(dim.x2(), dim.y2());
-
+	
 	va.draw();
 }
 
 template <GLenum Type> void OpenGLTexture<Type>::drawCropped(Dimensions const& orig, TexCoords const& tex) const {
 	Dimensions dim(
-	  orig.x1() + tex.x1 * orig.w(),
-	  orig.y1() + tex.y1 * orig.h(),
-	  orig.w() * (tex.x2 - tex.x1),
-	  orig.h() * (tex.y2 - tex.y1)
-	);
+				   orig.x1() + tex.x1 * orig.w(),
+				   orig.y1() + tex.y1 * orig.h(),
+				   orig.w() * (tex.x2 - tex.x1),
+				   orig.h() * (tex.y2 - tex.y1)
+				   );
 	draw(dim, tex);
 }
 
 void updateSurfaces();
 
 /**
-* @short High level surface/image wrapper on top of OpenGLTexture
-**/
+ * @short High level surface/image wrapper on top of OpenGLTexture
+ **/
 class Surface: public OpenGLTexture<GL_TEXTURE_2D> {
 public:
 	struct Impl;

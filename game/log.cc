@@ -44,7 +44,7 @@ boost::mutex log_lock;
 
 /** \internal The implementation of the stream filter that handles the message filtering. **/
 class VerboseMessageSink : public boost::iostreams::sink {
-  public:
+public:
 	std::streamsize write(const char* s, std::streamsize n);
 };
 

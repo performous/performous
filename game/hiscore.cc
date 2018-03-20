@@ -9,7 +9,7 @@
 bool Hiscore::reachedHiscore(unsigned score, unsigned songid, std::string const& track) const {
 	if (score > 10000) throw std::logic_error("Invalid score value");
 	if (score < 2000) return false; // come on, did you even try to sing?
-
+	
 	unsigned position = 0;
 	for (auto const& elem: m_hiscore) {
 		if (elem.songid != songid) continue;
@@ -51,14 +51,14 @@ void Hiscore::load(xmlpp::NodeSet const& nodes) {
 		xmlpp::Attribute* a_songid = element.get_attribute("songid");
 		if (!a_songid) throw std::runtime_error("Attribute songid not found");
 		xmlpp::Attribute* a_track = element.get_attribute("track");
-
+		
 		int playerid = std::stoi(a_playerid->get_value());
 		int songid = std::stoi(a_songid->get_value());
-
+		
 		auto tn = xmlpp::get_first_child_text(element);
 		if (!tn) throw std::runtime_error("Score not found");
 		int score = std::stoi(tn->get_content());
-
+		
 		addHiscore(score, playerid, songid, a_track ? a_track->get_value() : "vocals");
 	}
 }

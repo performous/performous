@@ -75,7 +75,7 @@ public:
 	bool getFullscreen() const { return m_fullscreen; }
 	/// take a screenshot
 	void screenshot();
-
+	
 	/// Construct a new shader or return an existing one by name
 	Shader& shader(std::string const& name) {
 		ShaderMap::iterator it = m_shaders.find(name);

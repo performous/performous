@@ -21,20 +21,20 @@ typedef boost::shared_ptr<Surface> MenuImage;
 class MenuOption {
 public:
 	enum Type { CLOSE_SUBMENU, OPEN_SUBMENU, CHANGE_VALUE, SET_AND_CLOSE, ACTIVATE_SCREEN, CALLBACK_FUNCTION } type;
-
+	
 	/// Construct a menu option. Default function is to close the menu.
 	/// @param nm Name (menu item title)
 	/// @param comm Comment
 	/// @param img Image filename
 	MenuOption(const std::string& nm, const std::string& comm, MenuImage img = MenuImage());
-
+	
 	/// Make the option change values of a ConfigItem.
 	MenuOption& changer(ConfigItem& val, std::string virtOptName = std::string()) {
 		type = CHANGE_VALUE;
 		value = &val;
 		if (!virtOptName.empty()) { virtualName = virtOptName; }
 		return *this;
-		}
+	}
 	/// Make the option set a given value for ConfigItem and close the menu.
 	MenuOption& setter(ConfigItem& val, ConfigItem newval) { type = SET_AND_CLOSE; value = &val; newValue = newval; return *this; }
 	/// Make the option open a submenu
@@ -86,7 +86,7 @@ public:
 	void clear(bool save_root = false);
 	/// closes submenu or if in root menu, closes the whole menu
 	void closeSubmenu();
-
+	
 	bool empty() const { return (menu_stack.empty() || (menu_stack.size() == 1 && menu_stack.back()->empty())); }
 	bool isOpen() const { return m_open; }
 	size_t getSubmenuLevel() const { return menu_stack.size() - 1; }
@@ -94,20 +94,20 @@ public:
 	void close() { m_open = false; }
 	void toggle() { m_open = !m_open; }
 	void moveToLast() { selection_stack.back() = menu_stack.back()->size() - 1; }
-
+	
 	size_t curIndex() { return selection_stack.back(); }
 	MenuOption& current() { return menu_stack.back()->at(selection_stack.back()); }
 	MenuOption& back() { return root_options.back(); }
 	const MenuOptions::const_iterator begin() const { return menu_stack.back()->begin(); }
 	const MenuOptions::const_iterator end() const { return menu_stack.back()->end(); }
 	const MenuOptions getOptions() const { return *menu_stack.back(); }
-
+	
 	Dimensions dimensions;
-
+	
 private:
 	MenuOptions root_options;
 	SubmenuStack menu_stack;
 	std::vector<size_t> selection_stack;
-
+	
 	bool m_open;
 };

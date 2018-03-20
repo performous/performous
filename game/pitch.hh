@@ -67,7 +67,7 @@ private:
 };
 
 /// analyzer class
- /** class to analyze input audio and transform it into useable data
+/** class to analyze input audio and transform it into useable data
  */
 class Analyzer: boost::noncopyable {
 public:
@@ -112,7 +112,7 @@ public:
 	void output(float* begin, float* end, double rate);
 	/** Returns the id (color name) of the mic */
 	std::string const& getId() const { return m_id; }
-
+	
 private:
 	const std::size_t m_step;
 	RingBuffer<2 * FFT_N> m_buf;  // Twice the FFT size should give enough room for sliding window and for engine delays

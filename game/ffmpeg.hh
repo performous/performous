@@ -30,7 +30,7 @@ struct AudioFrame {
 
 /// Video queue
 class VideoFifo {
-  public:
+public:
 	VideoFifo(): m_timestamp(), m_eof() {}
 	/// trys to pop a video frame from queue
 	bool tryPop(Bitmap& f) {
@@ -61,8 +61,8 @@ class VideoFifo {
 	double position() const { return m_timestamp; }
 	/// Tests if EOF has already been reached
 	double eof() const { return m_eof; }
-
-  private:
+	
+private:
 	boost::ptr_deque<Bitmap> m_queue;
 	mutable boost::mutex m_mutex;
 	boost::condition m_cond;
@@ -73,7 +73,7 @@ class VideoFifo {
 
 class AudioBuffer {
 	typedef boost::recursive_mutex mutex;
-  public:
+public:
 	AudioBuffer(size_t size = 1000000): m_data(size), m_pos(), m_posReq(), m_sps(), m_duration(getNaN()), m_quit() {}
 	/// Reset from FFMPEG side (seeking to beginning or terminate stream)
 	void reset() {
@@ -138,7 +138,7 @@ class AudioBuffer {
 		// Are we already past the requested position? (need to seek backward or back to beginning)
 		return m_posReq > 0 && m_posReq + m_sps * 2 /* seconds tolerance */ + m_data.size() < m_pos;
 	}
-  private:
+private:
 	/// Handle waking up of input thread etc. whenever m_posReq is changed.
 	void wakeups() {
 		if (wantSeek()) reset();
@@ -159,22 +159,22 @@ class AudioBuffer {
 
 // ffmpeg forward declarations
 extern "C" {
-  struct AVCodecContext;
-  struct AVFormatContext;
-  struct AVFrame;
-  struct AVAudioResampleContext;
-  struct SwsContext;
+	struct AVCodecContext;
+	struct AVFormatContext;
+	struct AVFrame;
+	struct AVAudioResampleContext;
+	struct SwsContext;
 }
 
 /// ffmpeg class
 class FFmpeg {
-  public:
+public:
 	/// Decode file; if no rate is specified, decode video, otherwise decode audio.
 	FFmpeg(fs::path const& file, unsigned int rate = 0);
 	~FFmpeg();
 	void operator()(); ///< Thread runs here, don't call directly
 	unsigned width, ///< width of video
-	         height; ///< height of video
+	height; ///< height of video
 	/// queue for video
 	VideoFifo  videoQueue;
 	/// queue for audio
@@ -184,9 +184,9 @@ class FFmpeg {
 	/// duration
 	double duration() const;
 	bool terminating() const { return m_quit; }
-
+	
 	class eof_error: public std::exception {};
-  private:
+private:
 	void seek_internal();
 	void open();
 	void decodePacket();

@@ -8,7 +8,7 @@
 
 /// class for simple/linear animation/transition of values
 class AnimValue {
-  public:
+public:
 	/// constructor
 	AnimValue(double value = 0.0, double rate = 1.0): m_value(value), m_target(value), m_rate(rate), m_time(now()) {}
 	/// move animation forward by diff
@@ -34,8 +34,8 @@ class AnimValue {
 		if (diff > 0.0) m_value -= adj; else m_value += adj;
 		return m_value;
 	}
-
-  private:
+	
+private:
 	double duration() const {
 		boost::xtime newtime = now();
 		double t = newtime - m_time;
@@ -50,7 +50,7 @@ class AnimValue {
 
 /// easing animations
 class AnimAcceleration {
-  public:
+public:
 	/// constructor
 	AnimAcceleration(): m_target(), m_songs(), m_position(), m_velocity(), m_marginLeft(), m_marginRight(), m_time() {}
 	/// set margins
@@ -106,8 +106,8 @@ class AnimAcceleration {
 	void reset() { setTarget(0, 0); }
 	/// get current velocity
 	double getVelocity() const { return m_velocity; }
-
-  private:
+	
+private:
 	unsigned int m_target;
 	unsigned int m_songs;
 	double m_position;

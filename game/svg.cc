@@ -36,8 +36,8 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	bitmap.linearPremul = true;
 	// Raster with Cairo
 	boost::shared_ptr<cairo_surface_t> surface(
-	  cairo_image_surface_create_for_data(&bitmap.buf[0], CAIRO_FORMAT_ARGB32, bitmap.width, bitmap.height, bitmap.width * 4),
-	  cairo_surface_destroy);
+											   cairo_image_surface_create_for_data(&bitmap.buf[0], CAIRO_FORMAT_ARGB32, bitmap.width, bitmap.height, bitmap.width * 4),
+											   cairo_surface_destroy);
 	boost::shared_ptr<cairo_t> dc(cairo_create(surface.get()), cairo_destroy);
 	cairo_scale(dc.get(), factor, factor);
 	rsvg_handle_render_cairo(svgHandle.get(), dc.get());

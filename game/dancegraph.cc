@@ -13,9 +13,9 @@ namespace {
 	static const int mapping7[max_panels] = {0, 2, 4, 6, 1, 5, 3,-1,-1,-1};
 	static const int mapping8[max_panels] = {0, 3, 4, 7, 1, 6, 2, 5,-1,-1};
 	static const int mapping10[max_panels]= {0, 3, 4, 7, 1, 6, 2, 5,-1,-1};
-	#if 0 // Here is some dummy gettext calls to populate the dictionary
+#if 0 // Here is some dummy gettext calls to populate the dictionary
 	_("Beginner") _("Easy") _("Medium") _("Hard") _("Challenge")
-	#endif
+#endif
 	const std::string diffv[] = { "Beginner", "Easy", "Medium", "Hard", "Challenge" };
 	const float past = -0.3f; // Relative time from cursor that is considered past (out of screen)
 	const float future = 2.0f; // Relative time from cursor that is considered future (out of screen)
@@ -29,10 +29,10 @@ namespace {
 	}
 	const double maxTolerance = 0.15; // Maximum error in seconds
 	int getNextBigStreak(int prev) { return prev + 10; }
-
+	
 	/// Get an accuracy value [0, 1] for the error offset (in seconds)
 	double accuracy(double error) { return 1.0 - (std::abs(error) / maxTolerance); };
-
+	
 	/// Gives points based on error from a perfect hit
 	double points(double error) {
 		double ac = accuracy(error);
@@ -44,7 +44,7 @@ namespace {
 		if (ac > .20) return 10.0;  // Late/Early
 		return 5.0;  // Way off
 	}
-
+	
 	std::string getRank(double error) {
 		double ac = accuracy(error);
 		if (error < 0.0) {
@@ -65,7 +65,7 @@ namespace {
 			return "Way off!";
 		}
 	}
-
+	
 	struct lessEnd {
 		bool operator()(const DanceNote& left, const DanceNote& right) {
 			return left.note.end < right.note.end;
@@ -76,14 +76,14 @@ namespace {
 
 /// Constructor
 DanceGraph::DanceGraph(Audio& audio, Song const& song, input::DevicePtr dev):
-  InstrumentGraph(audio, song, dev),
-  m_level(BEGINNER),
-  m_beat(findFile("dancebeat.svg")),
-  m_arrows(findFile("arrows.svg")),
-  m_arrows_cursor(findFile("arrows_cursor.svg")),
-  m_arrows_hold(findFile("arrows_hold.svg")),
-  m_mine(findFile("mine.svg")),
-  m_insideStop()
+InstrumentGraph(audio, song, dev),
+m_level(BEGINNER),
+m_beat(findFile("dancebeat.svg")),
+m_arrows(findFile("arrows.svg")),
+m_arrows_cursor(findFile("arrows_cursor.svg")),
+m_arrows_hold(findFile("arrows_hold.svg")),
+m_mine(findFile("mine.svg")),
+m_insideStop()
 {
 	// Initialize some arrays
 	for (size_t i = 0; i < max_panels; i++) {
@@ -91,7 +91,7 @@ DanceGraph::DanceGraph(Audio& audio, Song const& song, input::DevicePtr dev):
 		m_pressed_anim[i] = AnimValue(0.0, 4.0);
 		m_arrow_map[i] = -1;
 	}
-
+	
 	if(m_song.danceTracks.empty())
 		throw std::runtime_error("Could not find any dance tracks.");
 	changeTrack(0); // Get an initial game mode and notes for it
@@ -182,7 +182,7 @@ void DanceGraph::finalizeTrackChange() {
 	else if (gm == "ez2-real") { m_pads = 7; std::copy(mapping7, mapping7+max_panels, m_arrow_map); }
 	else if (gm == "para-single") { m_pads = 5; std::copy(mapping5, mapping5+max_panels, m_arrow_map); }
 	else throw std::runtime_error("Unknown track " + gm);
-
+	
 	changeDifficulty(0); // Construct new notes
 	setupJoinMenu();
 	m_menu.select(1); // Restore selection to the track item
@@ -272,7 +272,7 @@ void DanceGraph::engine() {
 			else if (m_rejoin.b()) { unjoin(); setupJoinMenu(); m_dev->pushEvent(input::Event()); /* FIXME: HACK? */ }
 			// Sync dynamic stuff
 			updateJoinMenu();
-		// Open Menu
+			// Open Menu
 		} else if (!menuOpen() && ev.value != 0.0) {
 			if (ev.nav == input::NAV_CANCEL || ev.nav == input::NAV_START) m_menu.open();
 		}
@@ -289,10 +289,10 @@ void DanceGraph::engine() {
 			}
 		}
 	}
-
+	
 	// Countdown to start
 	handleCountdown(time, time < getNotesBeginTime() ? getNotesBeginTime() : m_jointime+1);
-
+	
 	// Notes gone by
 	for (DanceNotes::iterator& it = m_notesIt; it != m_notes.end() && time > it->note.end + maxTolerance; it++) {
 		if(!it->isHit) { // Missed
@@ -304,21 +304,21 @@ void DanceGraph::engine() {
 		if (!joining(time)) ++m_dead;  // Increment dead counter (but not while joining)
 	}
 	if (difficulty_changed) m_dead = 0; // if difficulty is changed, m_dead would get incorrect
-
+	
 	// Holding button when mine comes?
 	for (auto it = m_notesIt; it != m_notes.end() && time <= it->note.begin + maxTolerance; ++it) {
 		if(!it->isHit && it->note.type == Note::MINE && m_pressed[it->note.note] &&
-		  it->note.begin >= time - maxTolerance && it->note.end <= time + maxTolerance) {
+		   it->note.begin >= time - maxTolerance && it->note.end <= time + maxTolerance) {
 			it->isHit = true;
 			m_score -= points(0);
 		}
 	}
-
+	
 	// Check if a long streak goal has been reached
 	if (m_streak >= getNextBigStreak(m_bigStreak)) {
 		m_bigStreak = getNextBigStreak(m_bigStreak);
 		m_popups.push_back(Popup(std::to_string(unsigned(m_bigStreak)) + "\n" + _("Streak!"),
-		  Color(1.0, 0.0, 0.0), 1.0, m_popupText.get()));
+								 Color(1.0, 0.0, 0.0), 1.0, m_popupText.get()));
 	}
 }
 
@@ -336,7 +336,7 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 		}
 		return;
 	}
-
+	
 	// So it was a PRESS event
 	for (auto it = m_notesIt; it != m_notes.end() && time <= it->note.end + maxTolerance; ++it) {
 		if(!it->isHit && std::abs(time - it->note.begin) <= maxTolerance && ev.button == unsigned(it->note.note)) {
@@ -360,7 +360,7 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 namespace {
 	const float arrowSize = 0.4f; // Half width of an arrow
 	const float one_arrow_tex_w = 1.0 / 8.0; // Width of a single arrow in texture coordinates
-
+	
 	/// Create a symmetric vertex pair for arrow drawing
 	void vertexPair(glutil::VertexArray& va, int arrow_i, float y, float ty) {
 		if (arrow_i < 0) {
@@ -392,7 +392,7 @@ void DanceGraph::draw(double time) {
 		if (time < stop.first + stop.second) { time = stop.first; break; } // Inside stop
 		time -= stop.second;
 	}
-
+	
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
 	dimensions.screenTop().middle(m_cx.get()).stretch(m_width.get(), 1.0);
 	ViewTrans view(0.5 * (dimensions.x1() + dimensions.x2()), 0.0, 0.75);  // Apply a per-player local perspective
@@ -401,10 +401,10 @@ void DanceGraph::draw(double time) {
 		// Some matrix magic to get the viewport right
 		float temp_s = dimensions.w() / 8.0f; // Allow for 8 pads to fit on a track
 		Transform trans(translate(vec3(0.0f, dimensions.y1(), 0.0)) * scale(temp_s));
-
+		
 		// Draw the "neck" graph (beat lines)
 		drawBeats(time);
-
+		
 		// Arrows on cursor
 		{
 			UseShader us(getShader("dancenote"));
@@ -418,7 +418,7 @@ void DanceGraph::draw(double time) {
 				drawArrow(arrow_i, m_arrows_cursor);
 			}
 		}
-
+		
 		// Draw the notes
 		if (time == time) { // Check that time is not NaN
 			for (auto& n: m_notes) {
@@ -441,10 +441,10 @@ void DanceGraph::drawBeats(double time) {
 		tEnd = *it - time;
 		//if (tEnd < past) continue;
 		/*if (tEnd > future) {
-			// Crop the end off
-			texCoord -= texCoordStep * (tEnd - future) / (tEnd - tBeg);
-			tEnd = future;
-		}*/
+		 // Crop the end off
+		 texCoord -= texCoordStep * (tEnd - future) / (tEnd - tBeg);
+		 tEnd = future;
+		 }*/
 		glmath::vec4 c(1.0f, 1.0f, 1.0f, time2a(tEnd));
 		va.color(c).normal(0.0f, 1.0f, 0.0f).texCoord(0.0f, texCoord).vertex(-w, time2y(tEnd));
 		va.color(c).normal(0.0f, 1.0f, 0.0f).texCoord(1.0f, texCoord).vertex(w, time2y(tEnd));
@@ -461,20 +461,20 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	float x = panel2x(arrow_i);
 	float yBeg = time2y(tBeg);
 	float yEnd = time2y(tEnd);
-
+	
 	// Did we hit it?
 	if (note.isHit && (note.releaseTime > 0.0 || std::abs(tEnd) < maxTolerance) && note.hitAnim.getTarget() == 0.0) {
 		if (mine) note.hitAnim.setRate(1.0);
 		note.hitAnim.setTarget(1.0, false);
 	}
 	double glow = note.hitAnim.get();
-
+	
 	{
 		UseShader us(getShader("dancenote"));
 		us()["hitAnim"].set(float(glow));
 		us()["clock"].set(float(time));
 		us()["scale"].set(getScale());
-
+		
 		if (yEnd - yBeg > arrowSize) {
 			// Draw holds
 			if (note.isHit && note.releaseTime <= 0) { // The note is being held down
@@ -507,7 +507,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			drawArrow((mine ? -1 : arrow_i), (mine ? m_mine : m_arrows));
 		}
 	}
-
+	
 	// Draw a text telling how well we hit
 	double alpha = 1.0 - glow;
 	if (!mine && note.isHit) {
@@ -537,7 +537,7 @@ void DanceGraph::drawInfo(double /*time*/, Dimensions dimensions) {
 		m_text.draw(std::to_string(unsigned(getScore())));
 		m_text.dimensions.screenBottom(-0.32).middle(0.32 * dimensions.w());
 		m_text.draw(std::to_string(unsigned(m_streak)) + "/"
-		  + std::to_string(unsigned(m_longestStreak)));
+					+ std::to_string(unsigned(m_longestStreak)));
 	}
 	drawPopups();
 }

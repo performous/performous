@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "opengl_text.hh"
 #include "surface.hh"

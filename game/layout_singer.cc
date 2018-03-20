@@ -9,7 +9,7 @@
 #include <boost/format.hpp>
 
 LayoutSinger::LayoutSinger(VocalTrack& vocal, Database& database, boost::shared_ptr<ThemeSing> theme):
-  m_vocal(vocal), m_noteGraph(vocal),m_lyricit(vocal.notes.begin()), m_lyrics(), m_database(database), m_theme(theme), m_hideLyrics() {
+m_vocal(vocal), m_noteGraph(vocal),m_lyricit(vocal.notes.begin()), m_lyrics(), m_database(database), m_theme(theme), m_hideLyrics() {
 	m_score_text[0].reset(new SvgTxtThemeSimple(findFile("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[1].reset(new SvgTxtThemeSimple(findFile("sing_score_text.svg"), config["graphic/text_lod"].f()));
 	m_score_text[2].reset(new SvgTxtThemeSimple(findFile("sing_score_text.svg"), config["graphic/text_lod"].f()));
@@ -119,7 +119,7 @@ void LayoutSinger::draw(double time, PositionMode position) {
 				break;
 		}
 	}
-
+	
 	// Draw the lyrics
 	if (!m_hideLyrics) {
 		double linespacing = 0.0;
@@ -170,7 +170,7 @@ void LayoutSinger::draw(double time, PositionMode position) {
 			}
 		}
 	}
-
+	
 	if (!config["game/karaoke_mode"].i() ) drawScore(position); // draw score if not in karaoke mode
 }
 

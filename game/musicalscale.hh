@@ -4,12 +4,12 @@
 
 /// Conversions for the C major musical scale
 class MusicalScale {
-  private:
+private:
 	double m_baseFreq;
 	static const int m_baseId = 69;  ///< MIDI note that corresponds to baseFreq
 	double m_freq;
 	double m_note;
-  public:
+public:
 	MusicalScale(double baseFreq = 440.0): m_baseFreq(baseFreq) { clear(); }  ///< Construct a C major scale (no others are currently implemented)
 	MusicalScale& clear();  ///< Clear current note/freq values
 	MusicalScale& setFreq(double freq);  ///< Set note by frequency

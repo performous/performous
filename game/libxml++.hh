@@ -8,4 +8,3 @@ namespace xmlpp {
 	class Element;
 	typedef std::vector<Node*> NodeSet;
 }
-

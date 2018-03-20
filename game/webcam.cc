@@ -17,9 +17,9 @@ namespace cv {
 #endif
 
 Webcam::Webcam(int cam_id):
-  m_thread(), m_capture(), m_writer(), m_frameAvailable(false), m_running(false), m_quit(false)
-  {
-	#ifdef USE_OPENCV
+m_thread(), m_capture(), m_writer(), m_frameAvailable(false), m_running(false), m_quit(false)
+{
+#ifdef USE_OPENCV
 	// Initialize the capture device
 	m_capture.reset(new cv::VideoCapture(cam_id));
 	if (!m_capture->isOpened()) {
@@ -32,17 +32,17 @@ Webcam::Webcam(int cam_id):
 	}
 	// Try to get at least VGA resolution
 	if (m_capture->get(CV_CAP_PROP_FRAME_WIDTH) < 640
-	  || m_capture->get(CV_CAP_PROP_FRAME_HEIGHT) < 480) {
+		|| m_capture->get(CV_CAP_PROP_FRAME_HEIGHT) < 480) {
 		m_capture->set(CV_CAP_PROP_FRAME_WIDTH, 640);
 		m_capture->set(CV_CAP_PROP_FRAME_HEIGHT, 480);
 	}
 	// Print actual values
 	std::cout << "Webcam frame properties: "
-	  << m_capture->get(CV_CAP_PROP_FRAME_WIDTH) << "x"
-	  << m_capture->get(CV_CAP_PROP_FRAME_HEIGHT) << std::endl;
-
+	<< m_capture->get(CV_CAP_PROP_FRAME_WIDTH) << "x"
+	<< m_capture->get(CV_CAP_PROP_FRAME_HEIGHT) << std::endl;
+	
 	// Initialize the video writer
-	#ifdef SAVE_WEBCAM_VIDEO
+#ifdef SAVE_WEBCAM_VIDEO
 	float fps = m_capture->get(CV_CAP_PROP_FPS);
 	int framew = m_capture->get(CV_CAP_PROP_FRAME_WIDTH);
 	int frameh = m_capture->get(CV_CAP_PROP_FRAME_HEIGHT);
@@ -53,23 +53,23 @@ Webcam::Webcam(int cam_id):
 		std::cout << "Could not initialize webcam video saving!" << std::endl;
 		m_writer.reset();
 	}
-	#endif
+#endif
 	// Start thread
 	m_thread.reset(new boost::thread(boost::ref(*this)));
-	#else
+#else
 	(void)cam_id; // Avoid unused warning
-	#endif
+#endif
 }
 
 Webcam::~Webcam() {
 	m_quit = true;
-	#ifdef USE_OPENCV
+#ifdef USE_OPENCV
 	if (m_thread) m_thread->join();
-	#endif
+#endif
 }
 
 void Webcam::operator()() {
-	#ifdef USE_OPENCV
+#ifdef USE_OPENCV
 	m_running = true;
 	while (!m_quit) {
 		if (m_running) {
@@ -90,19 +90,19 @@ void Webcam::operator()() {
 		// Sleep a little, much if the cam isn't active
 		boost::thread::sleep(now() + (m_running ? 0.015 : 0.5));
 	}
-	#endif
+#endif
 }
 
 void Webcam::pause(bool do_pause) {
-	#ifdef USE_OPENCV
+#ifdef USE_OPENCV
 	boost::mutex::scoped_lock l(m_mutex);
-	#endif
+#endif
 	m_running = !do_pause;
 	m_frameAvailable = false;
 }
 
 void Webcam::render() {
-	#ifdef USE_OPENCV
+#ifdef USE_OPENCV
 	if (!m_capture || !m_running) return;
 	// Do we have a new frame available?
 	if (m_frameAvailable && !m_frame.data.empty()) {
@@ -119,5 +119,5 @@ void Webcam::render() {
 	using namespace glmath;
 	Transform trans(scale(vec3(-1.0, 1.0, 1.0)));
 	m_surface.draw(); // Draw
-	#endif
+#endif
 }

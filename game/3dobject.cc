@@ -76,8 +76,8 @@ void Object3d::loadWavefrontObj(fs::path const& filepath, float scale) {
 				throw std::runtime_error("Only triangle faces allowed in "+filepath.string()+":"+std::to_string(linenumber));
 			// Face must have equal number of v, vt, vn or none of a kind
 			if (!f.vertices.empty()
-			  && (f.texcoords.empty() || (f.texcoords.size() == f.vertices.size()))
-			  && (f.normals.empty()   || (f.normals.size() == f.vertices.size()))) {
+				&& (f.texcoords.empty() || (f.texcoords.size() == f.vertices.size()))
+				&& (f.normals.empty()   || (f.normals.size() == f.vertices.size()))) {
 				m_faces.push_back(f);
 			} else {
 				throw std::runtime_error("Invalid face in "+filepath.string()+":"+std::to_string(linenumber));

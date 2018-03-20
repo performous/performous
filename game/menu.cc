@@ -5,7 +5,7 @@
 
 
 MenuOption::MenuOption(std::string const& nm, std::string const& comm, MenuImage img):
-  type(), value(), newValue(), callback(), image(img), name(nm), comment(comm), namePtr(), commentPtr()
+type(), value(), newValue(), callback(), image(img), name(nm), comment(comm), namePtr(), commentPtr()
 {}
 
 std::string MenuOption::getName() const {

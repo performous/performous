@@ -10,7 +10,7 @@
 /// stores duration of a note
 struct Duration {
 	double begin, ///< beginning timestamp in seconds
-	       end;   ///< ending timestamp in seconds
+	end;   ///< ending timestamp in seconds
 	Duration();
 	/// create a new Duration object and initialize begin and end
 	Duration(double b, double e): begin(b), end(e) {}
@@ -52,7 +52,7 @@ static inline bool isTrackInside(InstrumentTracks const& track_map, std::string 
 struct Note {
 	Note();
 	double begin, ///< begin time
-	       end; ///< end time
+	end; ///< end time
 	double phase; /// Position within a measure, [0, 1)
 	// FIXME: Remove gameplay variables from here (Note should be immutable).
 	/// power of note (how well it is being hit right now)
@@ -61,7 +61,7 @@ struct Note {
 	mutable std::vector<Color> stars;
 	/// note type
 	enum Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', SLIDE = '+', SLEEP = '-',
-	  TAP = '1', HOLDBEGIN = '2', HOLDEND = '3', ROLL = '4', MINE = 'M', LIFT = 'L'} type;
+		TAP = '1', HOLDBEGIN = '2', HOLDEND = '3', ROLL = '4', MINE = 'M', LIFT = 'L'} type;
 	int note; ///< MIDI pitch of the note (at the end for slide notes)
 	int notePrev; ///< MIDI pitch of the previous note (should be same as note for everything but SLIDE)
 	/// lyrics syllable for that note
@@ -95,7 +95,7 @@ struct Note {
 	}
 	/// Check if two notes overlap
 	static bool overlapping(Note const& a, Note const& b) { return (a.end >= b.begin && a.type != Note::SLEEP && b.type != Note::SLEEP); }
-  private:
+private:
 	double scoreMultiplier() const;
 };
 

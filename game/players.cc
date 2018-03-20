@@ -12,11 +12,11 @@ UErrorCode Players::m_icuError = U_ZERO_ERROR;
 icu::RuleBasedCollator Players::icuCollator = icu::RuleBasedCollator(icu::UnicodeString(""), icu::Collator::PRIMARY, m_icuError);
 
 Players::Players():
-	m_players(),
-	m_filtered(),
-	m_filter(),
-	math_cover(),
-	m_dirty(false)
+m_players(),
+m_filtered(),
+m_filter(),
+math_cover(),
+m_dirty(false)
 {}
 
 Players::~Players() {}
@@ -63,7 +63,7 @@ int Players::lookup(std::string const& name) const {
 	for (auto const& p: m_players) {
 		if (p.name == name) return p.id;
 	}
-
+	
 	return -1;
 }
 
@@ -81,10 +81,10 @@ void Players::addPlayer (std::string const& name, std::string const& picture, in
 	pi.name = name;
 	pi.picture = picture;
 	pi.path = "";
-
-
+	
+	
 	if (pi.id == -1) pi.id = assign_id_internal();
-
+	
 	if (pi.picture != "") // no picture, so don't search path
 	{
 		try {
@@ -94,7 +94,7 @@ void Players::addPlayer (std::string const& name, std::string const& picture, in
 			std::cerr << e.what() << std::endl;
 		}
 	}
-
+	
 	m_dirty = true;
 	std::pair<players_t::iterator, bool> ret = m_players.insert(pi);
 	if (!ret.second)
@@ -119,26 +119,26 @@ int Players::assign_id_internal() {
 void Players::filter_internal() {
 	m_dirty = false;
 	PlayerItem selection = current();
-
+	
 	try {
 		fplayers_t filtered;
 		if (m_filter == std::string()) filtered = fplayers_t(m_players.begin(), m_players.end());
 		else {
 			icu::UnicodeString filter = icu::UnicodeString::fromUTF8(m_filter);
 			std::copy_if (m_players.begin(), m_players.end(), std::back_inserter(filtered), [&](PlayerItem it){
-			icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8(it.name), &icuCollator, NULL, m_icuError);
-			return (search.first(m_icuError) != USEARCH_DONE);
+				icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8(it.name), &icuCollator, NULL, m_icuError);
+				return (search.first(m_icuError) != USEARCH_DONE);
 			});
 		}
-// 		for (auto const& p: m_players) {
-// 			if (regex_search(p.name, boost::regex(m_filter, boost::regex_constants::icase))) filtered.push_back(p);
-// 		}
+		// 		for (auto const& p: m_players) {
+		// 			if (regex_search(p.name, boost::regex(m_filter, boost::regex_constants::icase))) filtered.push_back(p);
+		// 		}
 		m_filtered.swap(filtered);
 	} catch (...) {
 		fplayers_t(m_players.begin(), m_players.end()).swap(m_filtered);  // Invalid regex => copy everything
 	}
 	math_cover.reset();
-
+	
 	// Restore old selection
 	int pos = 0;
 	if (selection.name != "") {

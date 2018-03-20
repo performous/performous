@@ -12,7 +12,7 @@ class Audio;
 
 // configuration option
 class ConfigItem {
-  public:
+public:
 	typedef std::vector<std::string> StringList; ///< a list of strings
 	typedef std::vector<std::string> OptionList; ///< a list of string options
 	ConfigItem() : m_sel() {}
@@ -44,15 +44,15 @@ class ConfigItem {
 	void addEnum(std::string name); ///< Dynamically adds an enum to all values
 	void selectEnum(std::string const& name); ///< Set integer value by enum name
 	std::string const getEnumName() const; ///< Returns the selected enum option's text
-
-  private:
+	
+private:
 	template <typename T> void updateNumeric(xmlpp::Element& elem, int mode); ///< Used internally for loading XML
 	void verifyType(std::string const& t) const; ///< throws std::logic_error if t != type
 	ConfigItem& incdec(int dir); ///< Increment/decrement by dir steps (must be -1 or 1)
 	std::string m_type;
 	std::string m_shortDesc;
 	std::string m_longDesc;
-
+	
 	typedef boost::variant<bool, int, double, std::string, StringList> Value;
 	bool isDefaultImpl(Value const& defaultValue) const;
 	Value m_value; ///< The current value

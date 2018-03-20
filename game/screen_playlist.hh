@@ -69,5 +69,3 @@ private:
 	boost::scoped_ptr<Surface> m_danceCover;
 	boost::scoped_ptr<Webcam> m_cam;
 };
-
-

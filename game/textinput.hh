@@ -29,7 +29,7 @@ struct TextInput {
 		text += cr;
 		return *this;
 	}
-
+	
 	/// deletes last char
 	void backspace() {
 		if (text.empty()) return;

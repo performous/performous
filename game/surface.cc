@@ -22,9 +22,9 @@ Shader& getShader(std::string const& name) {
 
 float Dimensions::screenY() const {
 	switch (m_screenAnchor) {
-	  case CENTER: return 0.0;
-	  case TOP: return -0.5 * virtH();
-	  case BOTTOM: return 0.5 * virtH();
+		case CENTER: return 0.0;
+		case TOP: return -0.5 * virtH();
+		case BOTTOM: return 0.5 * virtH();
 	}
 	throw std::logic_error("Dimensions::screenY(): unknown m_screenAnchor value");
 }
@@ -184,13 +184,13 @@ void Surface::load(Bitmap const& bitmap) {
 	glTexParameterf(type(), GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameterf(type(), GL_TEXTURE_MAX_LEVEL, 4);
 	glerror.check("glTexParameterf");
-
+	
 	// Anisotropy is potential trouble maker
 	if (epoxy_has_gl_extension("GL_EXT_texture_filter_anisotropic")) {
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);
 		glerror.check("MAX_ANISOTROPY_EXT");
 	}
-
+	
 	// Load the data into texture
 	PixFmt const& f = getPixFmt(bitmap.fmt);
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);

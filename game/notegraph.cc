@@ -10,13 +10,13 @@ extern const double m_pi;
 Dimensions dimensions; // Make a public member variable
 
 NoteGraph::NoteGraph(VocalTrack const& vocal):
-  m_vocal(vocal),
-  m_notelines(findFile("notelines.svg")), m_wave(findFile("wave.png")),
-  m_star(findFile("star.svg")), m_star_hl(findFile("star_glow.svg")),
-  m_notebar(findFile("notebar.svg")), m_notebar_hl(findFile("notebar_hi.svg")),
-  m_notebarfs(findFile("notebarfs.svg")), m_notebarfs_hl(findFile("notebarfs-hl.png")),
-  m_notebargold(findFile("notebargold.svg")), m_notebargold_hl(findFile("notebargold_hi.svg")),
-  m_notealpha(0.0f), m_nlTop(0.0, 4.0), m_nlBottom(0.0, 4.0), m_time()
+m_vocal(vocal),
+m_notelines(findFile("notelines.svg")), m_wave(findFile("wave.png")),
+m_star(findFile("star.svg")), m_star_hl(findFile("star_glow.svg")),
+m_notebar(findFile("notebar.svg")), m_notebar_hl(findFile("notebar_hi.svg")),
+m_notebarfs(findFile("notebarfs.svg")), m_notebarfs_hl(findFile("notebarfs-hl.png")),
+m_notebargold(findFile("notebargold.svg")), m_notebargold_hl(findFile("notebargold_hi.svg")),
+m_notealpha(0.0f), m_nlTop(0.0, 4.0), m_nlBottom(0.0, 4.0), m_time()
 {
 	dimensions.stretch(1.0, 0.5); // Initial dimensions, probably overridden from somewhere
 	m_nlTop.setTarget(m_vocal.noteMax, true);
@@ -33,7 +33,7 @@ namespace {
 	void drawNotebar(Texture const& texture, double x, double ybeg, double yend, double w, double h) {
 		glutil::VertexArray va;
 		UseTexture tblock(texture);
-
+		
 		// The front cap begins
 		va.texCoord(0.0f, 0.0f).vertex(x, ybeg);
 		va.texCoord(0.0f, 1.0f).vertex(x, ybeg + h);
@@ -59,7 +59,7 @@ namespace {
 		// The rear cap ends
 		va.texCoord(1.0f, 0.0f).vertex(x + w, yend);
 		va.texCoord(1.0f, 1.0f).vertex(x + w, yend + h);
-
+		
 		va.draw();
 	}
 }
@@ -72,7 +72,7 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 	m_time = time;
 	// Update m_songit (which note to start the rendering from)
 	while (m_songit != m_vocal.notes.end() && (m_songit->type == Note::SLEEP || m_songit->end < time - (baseLine + 0.5) / pixUnit)) ++m_songit;
-
+	
 	// Automatically zooming notelines
 	{
 		int low = m_vocal.noteMax;
@@ -114,17 +114,17 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 	m_noteUnit = -dimensions.h() / std::max(48.0 * dimensions.h(), m_max - m_min);
 	m_baseY = -0.5 * (m_min + m_max) * m_noteUnit + dimensions.yc();
 	m_baseX = baseLine - m_time * pixUnit + dimensions.xc();  // FIXME: Moving in X direction requires additional love (is b0rked now, keep it centered at zero)
-
+	
 	// Fading notelines handing
 	if (m_songit == m_vocal.notes.end() || m_songit->begin > m_time + 3.0) m_notealpha -= 0.02f;
 	else if (m_notealpha < 1.0f) m_notealpha += 0.02f;
 	if (m_notealpha <= 0.0f) { m_notealpha = 0.0f; return; }
-
+	
 	ColorTrans c(Color::alpha(m_notealpha));
-
+	
 	drawNotes();
 	if (config["game/pitch"].b()) drawWaves(database);
-
+	
 	// Draw a star for well sung notes
 	for (auto it = m_songit; it != m_vocal.notes.end() && it->begin < m_time - (baseLine - 0.5) / pixUnit; ++it) {
 		float player_star_offset = 0;
@@ -152,7 +152,7 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 void NoteGraph::drawNotes() {
 	// Draw note lines
 	m_notelines.draw(Dimensions().stretch(dimensions.w(), (m_max - m_min - 13) * m_noteUnit).middle(dimensions.xc()).center(dimensions.yc()), TexCoords(0.0, (-m_min - 7.0) / 12.0f, 1.0, (-m_max + 6.0) / 12.0f));
-
+	
 	// Draw notes
 	for (auto it = m_songit; it != m_vocal.notes.end() && it->begin < m_time - (baseLine - 0.5) / pixUnit; ++it) {
 		if (it->type == Note::SLEEP) continue;
@@ -160,9 +160,9 @@ void NoteGraph::drawNotes() {
 		Texture* t1;
 		Texture* t2;
 		switch (it->type) {
-		  case Note::NORMAL: case Note::SLIDE: t1 = &m_notebar; t2 = &m_notebar_hl; break;
-		  case Note::GOLDEN: t1 = &m_notebargold; t2 = &m_notebargold_hl; break;
-		  case Note::FREESTYLE:  // Freestyle notes use custom handling
+			case Note::NORMAL: case Note::SLIDE: t1 = &m_notebar; t2 = &m_notebar_hl; break;
+			case Note::GOLDEN: t1 = &m_notebargold; t2 = &m_notebargold_hl; break;
+			case Note::FREESTYLE:  // Freestyle notes use custom handling
 			{
 				Dimensions dim;
 				dim.middle(m_baseX + 0.5 * (it->begin + it->end) * pixUnit).center(m_baseY + it->note * m_noteUnit).stretch((it->end - it->begin) * pixUnit, -m_noteUnit * 12.0);
@@ -173,8 +173,8 @@ void NoteGraph::drawNotes() {
 					m_notebarfs_hl.draw(dim, TexCoords(xoffset, 0.0, xoffset + dim.ar() / m_notebarfs_hl.dimensions.ar(), 1.0));
 				}
 			}
-			continue;
-		  default: throw std::logic_error("Unknown note type: don't know how to render");
+				continue;
+			default: throw std::logic_error("Unknown note type: don't know how to render");
 		}
 		double x = m_baseX + it->begin * pixUnit + m_noteUnit; // left x coordinate: begin minus border (side borders -noteUnit wide)
 		double ybeg = m_baseY + (it->notePrev + 1) * m_noteUnit; // top y coordinate (on the one higher note line)

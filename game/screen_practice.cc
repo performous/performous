@@ -8,7 +8,7 @@
 #include "progressbar.hh"
 
 ScreenPractice::ScreenPractice(std::string const& name, Audio& audio):
-  Screen(name), m_audio(audio)
+Screen(name), m_audio(audio)
 {}
 
 void ScreenPractice::enter() {
@@ -70,7 +70,7 @@ void ScreenPractice::draw_analyzers() {
 	MusicalScale scale;
 	double textPower = -getInf();
 	double textFreq = 0.0;
-
+	
 	for (unsigned int i = 0; i < analyzers.size(); ++i) {
 		Analyzer& analyzer = analyzers[i];
 		analyzer.process();
@@ -84,17 +84,17 @@ void ScreenPractice::draw_analyzers() {
 		// Normalizing to [0,1], where 0 is -43 dB or less (to match the vumeter graphic)
 		m_vumeters[i].dimensions.screenBottom().left(-0.4 + i * 0.08).fixedWidth(0.04); //0.08 was originally 0.2. Now 11 in a row fits
 		m_vumeters[i].draw(analyzer.getPeak() / 43.0 + 1.0);
-
+		
 		if (freq != 0.0) {
 			Analyzer::tones_t tones = analyzer.getTones();
-
+			
 			for (Analyzer::tones_t::const_iterator t = tones.begin(); t != tones.end(); ++t) {
 				if (t->age < Tone::MINAGE) continue;
 				if (!scale.setFreq(t->freq).isValid()) continue;
 				double line = scale.getNoteLine() + 0.4 * scale.getNoteOffset();
 				float posXnote = -0.25 + 0.2 * i + 0.002 * t->stabledb;  // Wiggle horizontally based on volume
 				float posYnote = -0.03 - line * 0.015;  // On treble key (C4), plus offset (lines)
-
+				
 				theme->note.dimensions.left(posXnote).center(posYnote);
 				theme->note.draw();
 				// Draw # for sharp notes

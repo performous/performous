@@ -14,14 +14,14 @@ std::string unicodeCollate(std::string const& str);
 typedef std::pair<std::string, int> MatchResult;
 
 struct UnicodeUtil {
-    
-    UnicodeUtil() {};
-    ~UnicodeUtil() {};
-    friend class Songs;
-    
-    static MatchResult getCharset(std::string const& str);
-    
+	
+	UnicodeUtil() {};
+	~UnicodeUtil() {};
+	friend class Songs;
+	
+	static MatchResult getCharset(std::string const& str);
+	
 private:
-    static UErrorCode m_icuError;
-    static icu::RuleBasedCollator m_dummyCollator;
+	static UErrorCode m_icuError;
+	static icu::RuleBasedCollator m_dummyCollator;
 };

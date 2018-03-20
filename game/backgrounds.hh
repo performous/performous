@@ -11,7 +11,7 @@
 
 /// songs class for songs screen
 class Backgrounds: boost::noncopyable {
-  public:
+public:
 	/// constructor
 	Backgrounds(): m_bgiter(0), m_dirty(false), m_loading(false)
 	{
@@ -31,8 +31,8 @@ class Backgrounds: boost::noncopyable {
 	int empty() const { return m_bgs.empty(); };
 	/// returns random background
 	std::string getRandom();
-
-  private:
+	
+private:
 	typedef std::vector<std::string> BGVector;
 	BGVector m_bgs;
 	int m_bgiter;

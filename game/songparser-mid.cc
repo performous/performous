@@ -79,7 +79,7 @@ void SongParser::midParseHeader() {
 void SongParser::midParse() {
 	Song& s = m_song;
 	s.instrumentTracks.clear();
-
+	
 	MidiFileParser midi(s.midifilename);
 	int reversedNoteCount = 0;
 	for (uint32_t ts = 0, end = midi.ts_last + midi.division; ts < end; ts += midi.division) s.beats.push_back(midi.get_seconds(ts)+s.start);

@@ -6,7 +6,7 @@
 
 /// Frame Buffer Object class
 class FBO: boost::noncopyable {
-  public:
+public:
 	/// Generate the FBO and attach a fresh texture to it
 	FBO(unsigned w, unsigned h) {
 		{
@@ -41,8 +41,8 @@ class FBO: boost::noncopyable {
 	static void unbind() {
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 	}
-
-  private:
+	
+private:
 	GLuint m_fbo;
 	OpenGLTexture<GL_TEXTURE_RECTANGLE> m_texture;
 	OpenGLTexture<GL_TEXTURE_RECTANGLE> m_depth;
