@@ -1,7 +1,7 @@
 #include "glutil.hh"
 
 namespace glutil {
-	
+
 	void VertexArray::generateVBO() {
 		if (m_vbo != 0) glDeleteBuffers(1, &m_vbo);
 		glGenBuffers(1, &m_vbo);
@@ -9,7 +9,7 @@ namespace glutil {
 		glBufferData(GL_ARRAY_BUFFER, sizeof(VertexInfo) * size(), &m_vertices.front(), GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
-	
+
 	void VertexArray::draw(GLint mode) {
 		if (empty()) return;
 		unsigned stride = sizeof(VertexInfo);
@@ -41,12 +41,12 @@ namespace glutil {
 			glVertexAttribPointer(vertColor, 4, GL_FLOAT, GL_FALSE, stride, ptr);
 		}
 		glDrawArrays(mode, 0, size());
-		
+
 		if (vertPos != -1) glDisableVertexAttribArray(vertPos);
 		if (vertTexCoord != -1) glDisableVertexAttribArray(vertTexCoord);
 		if (vertNormal != -1) glDisableVertexAttribArray(vertNormal);
 		if (vertColor != -1) glDisableVertexAttribArray(vertColor);
 		if (m_vbo) glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
-	
+
 }

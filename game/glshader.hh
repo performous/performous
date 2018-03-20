@@ -28,10 +28,10 @@ struct Shader: public boost::noncopyable {
 	/// Print compile errors and such
 	/// @param id of shader or program
 	void dumpInfoLog(GLuint id);
-	
+
 	Shader(std::string const& name);
 	~Shader();
-	/// Set a string that will replace "//DEFINES" in anything loaded by compileFile
+	/// Set a string that will replace "///DEFINES" in anything loaded by compileFile
 	Shader& addDefines(std::string const& defines) { defs += defines; return *this; }
 	/// Load shader from file
 	Shader& compileFile(fs::path const& filename);
@@ -39,35 +39,33 @@ struct Shader: public boost::noncopyable {
 	Shader& compileCode(std::string const& srccode, GLenum type);
 	/** Links all compiled shaders to a shader program. */
 	Shader& link();
-	
+
 	/** Binds the shader into use. */
 	Shader& bind();
-	
+
 	/** Allow setting uniforms in a chain. Shader needs to be in use.*/
-	
-	
+
 	/** Get uniform location. Uses caching internally. */
 	Uniform operator[](const std::string& uniform);
-	
-	// Some operators
+
+	/// Some operators
 	bool operator==(const Shader& rhs) const { return program == rhs.program; }
 	bool operator!=(const Shader& rhs) const { return program != rhs.program; }
-	
+
 private:
 	std::string name; ///< for debugging purposes only
 	GLuint program; ///< shader program object id
 	int gl_response; ///< save last return state
-	
+
 	std::string defs;
-	
+
 	typedef std::vector<GLuint> ShaderObjects;
 	ShaderObjects shader_ids;
-	
+
 	typedef std::map<std::string, GLint> UniformMap;
 	UniformMap uniforms; ///< Cached uniform locations, use operator[] to access
-	
-};
 
+};
 
 /** Temporarily switch shader in a RAII manner. */
 struct UseShader {
@@ -78,7 +76,7 @@ struct UseShader {
 	~UseShader() { glUseProgram(m_old); }
 	/// Access the bound shader
 	Shader& operator()() { return m_shader; }
-	
+
 private:
 	Shader& m_shader;
 	GLint m_old;

@@ -19,14 +19,14 @@ const unsigned AUDIO_MAX_ANALYZERS = 11;
 struct Output;
 
 struct Device {
-	// Init
+	/// Init
 	const unsigned int in, out;
 	const double rate;
 	const unsigned int dev;
 	portaudio::Stream stream;
 	std::vector<Analyzer*> mics;
 	Output* outptr;
-	
+
 	Device(unsigned int in, unsigned int out, double rate, unsigned int dev);
 	/// Start
 	void start();

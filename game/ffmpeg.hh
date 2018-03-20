@@ -25,7 +25,7 @@ struct AudioFrame {
 	std::vector<int16_t> data;
 	/// constructor
 	template <typename InIt> AudioFrame(double ts, InIt begin, InIt end): timestamp(ts), data(begin, end) {}
-	AudioFrame(): timestamp(getInf()) {} // EOF marker
+	AudioFrame(): timestamp(getInf()) {} /// EOF marker
 };
 
 /// Video queue
@@ -35,7 +35,7 @@ public:
 	/// trys to pop a video frame from queue
 	bool tryPop(Bitmap& f) {
 		boost::mutex::scoped_lock l(m_mutex);
-		if (m_queue.empty()) return false; // Nothing to deliver
+		if (m_queue.empty()) return false; /// Nothing to deliver
 		if (m_queue.begin()->buf.empty()) { m_eof = true; return false; }
 		f.swap(*m_queue.begin());
 		m_queue.pop_front();
@@ -61,7 +61,7 @@ public:
 	double position() const { return m_timestamp; }
 	/// Tests if EOF has already been reached
 	double eof() const { return m_eof; }
-	
+
 private:
 	boost::ptr_deque<Bitmap> m_queue;
 	mutable boost::mutex m_mutex;
@@ -101,7 +101,7 @@ public:
 			std::clog << "ffmpeg/warning: Negative audio timestamp " << timestamp << " seconds, frame ignored." << std::endl;
 			return;
 		}
-		// Insert silence at the beginning if the stream starts later than 0.0
+		/// Insert silence at the beginning if the stream starts later than 0.0
 		if (m_pos == 0 && timestamp > 0.0) {
 			m_pos = timestamp * m_sps;
 			m_data.resize(m_pos, 0);
@@ -111,12 +111,12 @@ public:
 	}
 	bool prepare(int64_t pos) {
 		mutex::scoped_try_lock l(m_mutex);
-		if (!l.owns_lock()) return false;  // Didn't get lock, give up for now
+		if (!l.owns_lock()) return false;  /// Didn't get lock, give up for now
 		if (eof(pos)) return true;
 		if (pos < 0) pos = 0;
 		m_posReq = pos;
 		wakeups();
-		// Has enough been prebuffered already and is the requested position still within buffer
+		/// Has enough been prebuffered already and is the requested position still within buffer
 		return m_pos > m_posReq + m_data.capacity() / 16 && m_pos <= m_posReq + m_data.size();
 	}
 	bool operator()(float* begin, float* end, int64_t pos, float volume = 1.0f) {
@@ -135,7 +135,7 @@ public:
 	double duration() const { return m_duration; }
 	void setDuration(double seconds) { m_duration = seconds; }
 	bool wantSeek() {
-		// Are we already past the requested position? (need to seek backward or back to beginning)
+		/// Are we already past the requested position? (need to seek backward or back to beginning)
 		return m_posReq > 0 && m_posReq + m_sps * 2 /* seconds tolerance */ + m_data.size() < m_pos;
 	}
 private:
@@ -157,7 +157,7 @@ private:
 	bool m_quit;
 };
 
-// ffmpeg forward declarations
+/// ffmpeg forward declarations
 extern "C" {
 	struct AVCodecContext;
 	struct AVFormatContext;
@@ -184,7 +184,7 @@ public:
 	/// duration
 	double duration() const;
 	bool terminating() const { return m_quit; }
-	
+
 	class eof_error: public std::exception {};
 private:
 	void seek_internal();
@@ -198,15 +198,15 @@ private:
 	volatile double m_seekTarget;
 	double m_position;
 	double m_duration;
-	// libav-specific variables
+	/// libav-specific variables
 	int m_streamId;
-	int m_mediaType;  // enum AVMediaType
+	int m_mediaType;  /// enum AVMediaType
 	AVFormatContext* m_formatContext;
 	AVCodecContext* m_codecContext;
 	AVAudioResampleContext* m_resampleContext;
 	SwsContext* m_swsContext;
-	// Make sure the thread starts only after initializing everything else
+	/// Make sure the thread starts only after initializing everything else
 	boost::scoped_ptr<boost::thread> m_thread;
-	static boost::mutex s_avcodec_mutex; // Used for avcodec_open/close (which use some static crap and are thus not thread-safe)
+	static boost::mutex s_avcodec_mutex; /// Used for avcodec_open/close (which use some static crap and are thus not thread-safe)
 };
 

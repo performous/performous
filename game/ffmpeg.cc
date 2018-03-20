@@ -37,7 +37,6 @@ namespace {
 	}
 }
 
-
 FFmpeg::FFmpeg(fs::path const& _filename, unsigned int rate):
 width(), height(), m_filename(_filename), m_rate(rate), m_quit(),
 m_seekTarget(getNaN()), m_position(), m_duration(), m_streamId(-1),
@@ -87,11 +86,11 @@ void FFmpeg::open() {
 	if (avformat_open_input(&m_formatContext, m_filename.string().c_str(), nullptr, nullptr)) throw std::runtime_error("Cannot open input file");
 	if (avformat_find_stream_info(m_formatContext, nullptr) < 0) throw std::runtime_error("Cannot find stream information");
 	m_formatContext->flags |= AVFMT_FLAG_GENPTS;
-	// Find a track and open the codec
+	/// Find a track and open the codec
 	AVCodec* codec = nullptr;
 	m_streamId = av_find_best_stream(m_formatContext, (AVMediaType)m_mediaType, -1, -1, &codec, 0);
 	if (m_streamId < 0) throw std::runtime_error("No suitable track found");
-	
+
 #if (LIBAVCODEC_VERSION_INT) >= (AV_VERSION_INT(57,0,0))
 	AVCodec* pCodec = avcodec_find_decoder(m_formatContext->streams[m_streamId]->codecpar->codec_id);
 	AVCodecContext* pCodecCtx = avcodec_alloc_context3(pCodec);
@@ -105,7 +104,7 @@ void FFmpeg::open() {
 	cc->workaround_bugs = FF_BUG_AUTODETECT;
 	m_codecContext = cc;
 #endif
-	
+
 	switch (m_mediaType) {
 		case AVMEDIA_TYPE_AUDIO:
 			m_resampleContext = avresample_alloc_context();
@@ -120,7 +119,7 @@ void FFmpeg::open() {
 			audioQueue.setSamplesPerSecond(AUDIO_CHANNELS * m_rate);
 			break;
 		case AVMEDIA_TYPE_VIDEO:
-			// Setup software scaling context for YUV to RGB conversion
+			/// Setup software scaling context for YUV to RGB conversion
 			width = m_codecContext->width;
 			height = m_codecContext->height;
 			m_swsContext = sws_getContext(
@@ -128,7 +127,7 @@ void FFmpeg::open() {
 										  width, height, AV_PIX_FMT_RGB24,
 										  SWS_POINT, nullptr, nullptr, nullptr);
 			break;
-		default:  // Should never be reached but avoids compile warnings
+		default:  /// Should never be reached but avoids compile warnings
 			abort();
 	}
 }
@@ -145,7 +144,7 @@ void FFmpeg::operator()() {
 			decodePacket();
 			errors = 0;
 		} catch (eof_error&) {
-			videoQueue.push(new Bitmap()); // EOF marker
+			videoQueue.push(new Bitmap()); /// EOF marker
 			boost::thread::sleep(now() + 0.1);
 		} catch (std::exception& e) {
 			std::clog << "ffmpeg/error: " << m_filename << ": " << e.what() << std::endl;
@@ -154,8 +153,8 @@ void FFmpeg::operator()() {
 	}
 	audioQueue.reset();
 	videoQueue.reset();
-	// TODO: use RAII for freeing resources (to prevent memory leaks)
-	boost::mutex::scoped_lock l(s_avcodec_mutex); // avcodec_close is not thread-safe
+	/// TODO: use RAII for freeing resources (to prevent memory leaks)
+	boost::mutex::scoped_lock l(s_avcodec_mutex); /// avcodec_close is not thread-safe
 	if (m_resampleContext) avresample_close(m_resampleContext);
 	if (m_codecContext) avcodec_close(m_codecContext);
 #if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53, 17, 0)
@@ -167,7 +166,7 @@ void FFmpeg::operator()() {
 
 void FFmpeg::seek(double time, bool wait) {
 	m_seekTarget = time;
-	videoQueue.reset(); audioQueue.reset(); // Empty these to unblock the internals in case buffers were full
+	videoQueue.reset(); audioQueue.reset(); /// Empty these to unblock the internals in case buffers were full
 	if (wait) while (!m_quit && m_seekTarget == m_seekTarget) boost::thread::sleep(now() + 0.01);
 }
 
@@ -177,18 +176,18 @@ void FFmpeg::seek_internal() {
 	int flags = 0;
 	if (m_seekTarget < m_position) flags |= AVSEEK_FLAG_BACKWARD;
 	av_seek_frame(m_formatContext, -1, m_seekTarget * AV_TIME_BASE, flags);
-	m_seekTarget = getNaN(); // Signal that seeking is done
+	m_seekTarget = getNaN(); /// Signal that seeking is done
 }
 
 void FFmpeg::decodePacket() {
 #if LIBAVCODEC_VERSION_INT >= (AV_VERSION_INT(57, 37, 0))
 	AVPacket pkt;
 	while (av_read_frame(m_formatContext, &pkt) >= 0) {
-		if (m_quit || m_seekTarget == m_seekTarget) return; // something weird required
-		if (pkt.stream_index != m_streamId) return; // wrong stream
+		if (m_quit || m_seekTarget == m_seekTarget) return; /// something weird required
+		if (pkt.stream_index != m_streamId) return; /// wrong stream
 		int ret = avcodec_send_packet(m_codecContext, &pkt);
 		if (ret < 0 || ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-			// error
+			/// error
 			break;
 		}
 		while (ret >= 0) {
@@ -197,14 +196,14 @@ void FFmpeg::decodePacket() {
 			if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
 				break;
 			}
-			// frame is available here
+			/// frame is available here
 			if (frame->pts != int64_t(AV_NOPTS_VALUE)) {
 				m_position = double(frame->pts) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
 				if (m_formatContext->start_time != int64_t(AV_NOPTS_VALUE))
 					m_position -= double(m_formatContext->start_time) / AV_TIME_BASE;
 			}
 			if (m_mediaType == AVMEDIA_TYPE_VIDEO) processVideo(frame.get()); else processAudio(frame.get());
-			//av_frame_free(&frame);
+			///av_frame_free(&frame);
 		}
 		av_packet_unref(&pkt);
 	}
@@ -216,13 +215,13 @@ void FFmpeg::decodePacket() {
 			if (av_read_frame(s, this) < 0) throw FFmpeg::eof_error();
 		}
 #if LIBAVCODEC_VERSION_INT > (AV_VERSION_INT(55, 0, 0))
-		~ReadFramePacket() { av_packet_unref(this); } //YES THEY DID IT AGAIN
+		~ReadFramePacket() { av_packet_unref(this); } ///YES THEY DID IT AGAIN
 #else
 		~ReadFramePacket() { av_free_packet(this); }
 #endif
 	};
-	
-	// Read an AVPacket and decode it into AVFrames
+
+	/// Read an AVPacket and decode it into AVFrames
 	ReadFramePacket packet(m_formatContext);
 	int packetSize = packet.size;
 	while (packetSize) {
@@ -238,10 +237,10 @@ void FFmpeg::decodePacket() {
 		int decodeSize = (m_mediaType == AVMEDIA_TYPE_VIDEO ?
 						  avcodec_decode_video2(m_codecContext, frame.get(), &frameFinished, &packet) :
 						  avcodec_decode_audio4(m_codecContext, frame.get(), &frameFinished, &packet));
-		if (decodeSize < 0) return; // Packet didn't produce any output (could be waiting for B frames or something)
-		packetSize -= decodeSize; // Move forward within the packet
+		if (decodeSize < 0) return; /// Packet didn't produce any output (could be waiting for B frames or something)
+		packetSize -= decodeSize; /// Move forward within the packet
 		if (!frameFinished) continue;
-		// Update current position if timecode is available
+		/// Update current position if timecode is available
 		if (frame->pkt_pts != int64_t(AV_NOPTS_VALUE)) {
 			m_position = double(frame->pkt_pts) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
 			if (m_formatContext->start_time != int64_t(AV_NOPTS_VALUE))
@@ -253,7 +252,7 @@ void FFmpeg::decodePacket() {
 }
 
 void FFmpeg::processVideo(AVFrame* frame) {
-	// Convert into RGB and scale the data
+	/// Convert into RGB and scale the data
 	int w = (m_codecContext->width+15)&~15;
 	int h = m_codecContext->height;
 	auto bitmap = new Bitmap();
@@ -265,11 +264,11 @@ void FFmpeg::processVideo(AVFrame* frame) {
 		int linesize = w * 3;
 		sws_scale(m_swsContext, frame->data, frame->linesize, 0, h, &data, &linesize);
 	}
-	videoQueue.push(bitmap);  // Takes ownership and may block until there is space
+	videoQueue.push(bitmap);  /// Takes ownership and may block until there is space
 }
 
 void FFmpeg::processAudio(AVFrame* frame) {
-	// resample to output
+	/// resample to output
 	int16_t *output;
 	int out_linesize;
 	int out_samples = avresample_available(m_resampleContext) +
@@ -279,7 +278,7 @@ void FFmpeg::processAudio(AVFrame* frame) {
 					 AV_SAMPLE_FMT_S16, 0);
 	out_samples = avresample_convert(m_resampleContext, (uint8_t**)&output, 0, out_samples,
 									 &frame->data[0], 0, frame->nb_samples);
-	// The output is now an interleaved array of 16-bit samples
+	/// The output is now an interleaved array of 16-bit samples
 	std::vector<int16_t> m_output(output, output+out_samples*AUDIO_CHANNELS);
 	audioQueue.push(m_output,m_position);
 	av_freep(&output);

@@ -46,25 +46,25 @@ void ScreenIntro::exit() {
 void ScreenIntro::manageEvent(input::NavEvent const& event) {
 	input::NavButton nav = event.button;
 	if (nav == input::NAV_CANCEL) {
-		if (m_menu.getSubmenuLevel() == 0) m_menu.moveToLast();  // Move cursor to quit in main menu
-		else m_menu.closeSubmenu(); // One menu level up
+		if (m_menu.getSubmenuLevel() == 0) m_menu.moveToLast();  /// Move cursor to quit in main menu
+		else m_menu.closeSubmenu(); /// One menu level up
 	}
 	else if (nav == input::NAV_DOWN || nav == input::NAV_MOREDOWN) m_menu.move(1);
 	else if (nav == input::NAV_UP || nav == input::NAV_MOREUP) m_menu.move(-1);
-	else if (nav == input::NAV_RIGHT && m_menu.getSubmenuLevel() >= 2) m_menu.action(1); // Config menu
-	else if (nav == input::NAV_LEFT && m_menu.getSubmenuLevel() >= 2) m_menu.action(-1); // Config menu
-	else if (nav == input::NAV_RIGHT && m_menu.getSubmenuLevel() < 2) m_menu.move(1); // Instrument nav hack
-	else if (nav == input::NAV_LEFT && m_menu.getSubmenuLevel() < 2) m_menu.move(-1); // Instrument nav hack
+	else if (nav == input::NAV_RIGHT && m_menu.getSubmenuLevel() >= 2) m_menu.action(1); /// Config menu
+	else if (nav == input::NAV_LEFT && m_menu.getSubmenuLevel() >= 2) m_menu.action(-1); /// Config menu
+	else if (nav == input::NAV_RIGHT && m_menu.getSubmenuLevel() < 2) m_menu.move(1); /// Instrument nav hack
+	else if (nav == input::NAV_LEFT && m_menu.getSubmenuLevel() < 2) m_menu.move(-1); /// Instrument nav hack
 	else if (nav == input::NAV_START) m_menu.action();
 	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
-	// Animation targets
+	/// Animation targets
 	m_selAnim.setTarget(m_menu.curIndex());
 	m_submenuAnim.setTarget(m_menu.getSubmenuLevel());
 }
 
 void ScreenIntro::manageEvent(SDL_Event event) {
 	if (event.type == SDL_KEYDOWN && m_menu.getSubmenuLevel() > 0) {
-		// These are only available in config menu
+		/// These are only available in config menu
 		int key = event.key.keysym.scancode;
 		uint16_t modifier = event.key.keysym.mod;
 		if (key == SDL_SCANCODE_R && modifier & Platform::shortcutModifier() && m_menu.current().value) {
@@ -79,9 +79,9 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 }
 
 void ScreenIntro::draw_menu_options() {
-	// Variables used for positioning and other stuff
+	/// Variables used for positioning and other stuff
 	double wcounter = 0;
-	const size_t showopts = 5; // Show at most 5 options simultaneously
+	const size_t showopts = 5; /// Show at most 5 options simultaneously
 	const float x = -0.35;
 	const float start_y = -0.1;
 	const float sel_margin = 0.03;
@@ -89,45 +89,45 @@ void ScreenIntro::draw_menu_options() {
 	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get()-m_menu.getSubmenuLevel()));
 	theme->back_h.dimensions.fixedHeight(0.038f);
 	theme->back_h.dimensions.stretch(m_menu.dimensions.w(), theme->back_h.dimensions.h());
-	// Determine from which item to start
+	/// Determine from which item to start
 	int start_i = std::min((int)m_menu.curIndex() - 1, (int)opts.size() - (int)showopts
-						   + (m_menu.getSubmenuLevel() == 2 ? 1 : 0)); // Hack to counter side-effects from displaying the value inside the menu
+						   + (m_menu.getSubmenuLevel() == 2 ? 1 : 0)); /// Hack to counter side-effects from displaying the value inside the menu
 	if (start_i < 0 || opts.size() == showopts) start_i = 0;
-	
-	// Loop the currently visible options
+
+	/// Loop the currently visible options
 	for (size_t i = start_i, ii = 0; ii < showopts && i < opts.size(); ++i, ++ii) {
 		MenuOption const& opt = opts[i];
 		ColorTrans c(Color::alpha(submenuanim));
-		
-		// Selection
+
+		/// Selection
 		if (i == m_menu.curIndex()) {
-			// Animate selection higlight moving
+			/// Animate selection higlight moving
 			double selanim = m_selAnim.get() - start_i;
 			if (selanim < 0) selanim = 0;
 			theme->back_h.dimensions.left(x - sel_margin).center(start_y + selanim*0.065);
 			theme->back_h.draw();
-			// Draw the text, dim if option not available
+			/// Draw the text, dim if option not available
 			{
 				ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
 				theme->option_selected.dimensions.left(x).center(start_y + ii*0.065);
 				theme->option_selected.draw(opt.getName());
 			}
-			wcounter = std::max(wcounter, theme->option_selected.w() + 2 * sel_margin); // Calculate the widest entry
-			// If this is a config item, show the value below
+			wcounter = std::max(wcounter, theme->option_selected.w() + 2 * sel_margin); /// Calculate the widest entry
+			/// If this is a config item, show the value below
 			if (opt.type == MenuOption::CHANGE_VALUE) {
-				++ii; // Use a slot for the value
+				++ii; /// Use a slot for the value
 				theme->option_selected.dimensions.left(x + sel_margin).center(-0.1 + (selanim+1)*0.065);
 				theme->option_selected.draw("<  " + opt.value->getValue() + "  >");
 			}
-			
-			// Regular option (not selected)
+
+			/// Regular option (not selected)
 		} else {
 			std::string title = opt.getName();
 			SvgTxtTheme& txt = getTextObject(title);
 			ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
 			txt.dimensions.left(x).center(start_y + ii*0.065);
 			txt.draw(title);
-			wcounter = std::max(wcounter, txt.w() + 2 * sel_margin); // Calculate the widest entry
+			wcounter = std::max(wcounter, txt.w() + 2 * sel_margin); /// Calculate the widest entry
 		}
 	}
 	m_menu.dimensions.stretch(wcounter, 1);
@@ -142,12 +142,12 @@ void ScreenIntro::draw() {
 	}
 	glerror.check("bg");
 	if (m_menu.current().image) m_menu.current().image->draw();
-	// Comment
+	/// Comment
 	theme->comment_bg.dimensions.center().screenBottom(-0.01);
 	theme->comment_bg.draw();
 	theme->comment.dimensions.left(-0.48).screenBottom(-0.028);
 	theme->comment.draw(m_menu.current().getComment());
-	// Key help for config
+	/// Key help for config
 	if (m_menu.getSubmenuLevel() > 0) {
 		theme->short_comment_bg.dimensions.stretch(theme->short_comment.w() + 0.065, 0.025);
 		theme->short_comment_bg.dimensions.left(-0.54).screenBottom(-0.054);
@@ -155,7 +155,7 @@ void ScreenIntro::draw() {
 		theme->short_comment.dimensions.left(-0.48).screenBottom(-0.067);
 		theme->short_comment.draw(_("Ctrl + S to save, Ctrl + R to reset defaults"));
 	}
-	// Menu
+	/// Menu
 	draw_menu_options();
 	draw_webserverNotice();
 }
@@ -173,12 +173,12 @@ void ScreenIntro::populateMenu() {
 	m_menu.clear();
 	m_menu.add(MenuOption(_("Perform"), _("Start performing!"), imgSing).screen("Songs"));
 	m_menu.add(MenuOption(_("Practice"), _("Check your skills or test the microphones"), imgPractice).screen("Practice"));
-	// Configure menu + submenu options
+	/// Configure menu + submenu options
 	MenuOptions configmain;
 	for (MenuEntry const& submenu: configMenu) {
 		if (!submenu.items.empty()) {
 			MenuOptions opts;
-			// Process items that belong to that submenu
+			/// Process items that belong to that submenu
 			for (std::string const& item: submenu.items) {
 				ConfigItem& c = config[item];
 				opts.push_back(MenuOption(_(c.getShortDesc().c_str()), _(c.getLongDesc().c_str())).changer(c));
@@ -210,7 +210,6 @@ void ScreenIntro::draw_webserverNotice() {
 		theme->WebserverNotice.draw(m_webserverStatusString.str());
 	}
 }
-
 
 std::string ScreenIntro::getIPaddr() {
 	try {

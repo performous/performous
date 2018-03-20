@@ -8,17 +8,17 @@ Video::Video(fs::path const& _videoFile, double videoGap): m_mpeg(_videoFile), m
 void Video::prepare(double time) {
 	time += m_videoGap;
 	Bitmap& fr = m_videoFrame;
-	// Time to switch frame?
+	/// Time to switch frame?
 	if (!fr.buf.empty() && time >= fr.timestamp) {
 		m_surface.load(fr);
 		m_surfaceTime = fr.timestamp;
 		fr.resize(0, 0);
 	}
-	// Preload the next future frame
+	/// Preload the next future frame
 	if (fr.buf.empty()) while (m_mpeg.videoQueue.tryPop(fr) && fr.timestamp < time) {};
-	// Do a seek before next render, if required
+	/// Do a seek before next render, if required
 	if (time < m_lastTime - 1.0 || (!fr.buf.empty() && time > fr.timestamp + 7.0)) {
-		m_mpeg.seek(std::max(0.0, time - 5.0));  // -5 to workaround ffmpeg inaccurate seeking
+		m_mpeg.seek(std::max(0.0, time - 5.0));  /// -5 to workaround ffmpeg inaccurate seeking
 		fr.buf.clear();
 	}
 	m_lastTime = time;

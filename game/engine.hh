@@ -14,7 +14,7 @@ class Engine {
 	volatile bool m_quit;
 	Database& m_database;
 	boost::scoped_ptr<boost::thread> m_thread;
-	
+
 public:
 	typedef std::vector<VocalTrack*> VocalTrackPtrs;
 	static const double TIMESTEP;  ///< The duration of one engine time step in seconds

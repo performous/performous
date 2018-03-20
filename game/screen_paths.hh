@@ -25,7 +25,7 @@ public:
 	void manageEvent(input::NavEvent const& event);
 	void draw();
 	void generateMenuFromPath(fs::path path);
-	
+
 private:
 	Audio& m_audio;
 	Songs& m_songs;

@@ -48,11 +48,11 @@ public:
 	std::streamsize write(const char* s, std::streamsize n);
 };
 
-// defining them in main() causes segfault at exit as they apparently got free'd before we're done using them
-static boost::iostreams::stream_buffer<VerboseMessageSink> sb; //!< \internal
-static VerboseMessageSink vsm; //!< \internal
+/// defining them in main() causes segfault at exit as they apparently got free'd before we're done using them
+static boost::iostreams::stream_buffer<VerboseMessageSink> sb; ///!< \internal
+static VerboseMessageSink vsm; ///!< \internal
 
-//! \internal used to store the default/original clog buffer.
+///! \internal used to store the default/original clog buffer.
 static std::streambuf* default_ClogBuf = nullptr;
 
 fs::ofstream file;
@@ -76,8 +76,8 @@ int numeric(std::string const& level) {
 }
 
 std::streamsize VerboseMessageSink::write(const char* s, std::streamsize n) {
-	std::string line(s, n);  // Note: s is *not* a c-string, thus we must stop after n chars.
-	// Parse prefix as subsystem/level:...
+	std::string line(s, n);  /// Note: s is *not* a c-string, thus we must stop after n chars.
+	/// Parse prefix as subsystem/level:...
 	size_t slash = line.find('/');
 	size_t colon = line.find(": ", slash);
 	if (slash == std::string::npos || colon == std::string::npos) {
@@ -102,21 +102,21 @@ std::streamsize VerboseMessageSink::write(const char* s, std::streamsize n) {
 Logger::Logger(std::string const& level) {
 	if (default_ClogBuf) throw std::logic_error("Multiple loggers constructed. There can only be one.");
 	if (level.find_first_of(":/_* ") != std::string::npos) throw std::runtime_error("Invalid logging level specified. Specify either a subsystem name or a level (debug, info, notice, warning, error).");
-	pathBootstrap();  // So that log filename is known...
+	pathBootstrap();  /// So that log filename is known...
 	std::string msg = "logger/notice: Logging ";
 	{
 		boost::mutex::scoped_lock l(log_lock);
 		if (level.empty()) {
-			minLevel = 2;  // Display all notices, warnings and errors
+			minLevel = 2;  /// Display all notices, warnings and errors
 			msg += "all notices, warnings and errors.";
 		} else if (level == "none") {
 			minLevel = 100;
-			msg += "disabled.";  // No-one will see this, so what's the point? :)
+			msg += "disabled.";  /// No-one will see this, so what's the point? :)
 		} else {
 			minLevel = numeric(level);
 			if (minLevel == -1 /* Not a valid level name */) {
-				minLevel = 4;  // Display errors from any subsystem
-				target = level;  // All messages from the given subsystem
+				minLevel = 4;  /// Display errors from any subsystem
+				target = level;  /// All messages from the given subsystem
 				msg += "everything from subsystem " + target + " and all errors.";
 			} else {
 				msg += "any events of " + level + " or higher level.";

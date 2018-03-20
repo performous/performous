@@ -4,12 +4,11 @@
 #include "theme.hh"
 
 namespace {
-	const double join_delay = 3.0; // Time after join menu before playing when joining mid-game
-	const unsigned death_delay = 20; // Delay in notes after which the player is hidden
+	const double join_delay = 3.0; /// Time after join menu before playing when joining mid-game
+	const unsigned death_delay = 20; /// Delay in notes after which the player is hidden
 }
 
-//const unsigned InstrumentGraph::max_panels = 10; // Maximum number of arrow lines / guitar frets
-
+///const unsigned InstrumentGraph::max_panels = 10; /// Maximum number of arrow lines / guitar frets
 
 InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevicePtr dev):
 m_audio(audio), m_song(song),
@@ -35,19 +34,19 @@ m_starmeter(),
 m_streak(),
 m_longestStreak(),
 m_bigStreak(),
-m_countdown(3), // Display countdown 3 secs before note start
+m_countdown(3), /// Display countdown 3 secs before note start
 m_dead(),
 m_ready()
 {
 	double time = m_audio.getPosition();
 	m_jointime = time < 0.0 ? -1.0 : time + join_delay;
-	
+
 	m_popupText.reset(new SvgTxtThemeSimple(findFile("sing_popup_text.svg"), config["graphic/text_lod"].f()));
 	m_menuTheme.reset(new ThemeInstrumentMenu());
 	for (auto& elem: m_pressed) elem = false;
 }
 
-InstrumentGraph::~InstrumentGraph() {}  // For destruction of scoped_ptrs (only forward-declared in header)
+InstrumentGraph::~InstrumentGraph() {}  /// For destruction of scoped_ptrs (only forward-declared in header)
 
 bool InstrumentGraph::dead() const { return m_jointime != m_jointime || m_dead >= death_delay; }
 
@@ -58,7 +57,6 @@ void InstrumentGraph::setupPauseMenu() {
 	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning")).screen("Sing"));
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
 }
-
 
 void InstrumentGraph::doUpdates() {
 	if (!menuOpen() && !m_ready) {
@@ -77,11 +75,10 @@ void InstrumentGraph::toggleMenu(int forcestate) {
 	m_menu.toggle();
 }
 
-
 void InstrumentGraph::drawMenu() {
-	ViewTrans view(m_cx.get(), 0.0, 0.75);  // Apply a per-player local perspective
+	ViewTrans view(m_cx.get(), 0.0, 0.75);  /// Apply a per-player local perspective
 	if (m_menu.empty()) return;
-	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
+	Dimensions dimensions(1.0); /// FIXME: bogus aspect ratio (is this fixable?)
 	if (getGraphType() == input::DEVTYPE_DANCEPAD) dimensions.screenTop().middle().stretch(m_width.get(), 1.0);
 	else dimensions.screenBottom().middle().fixedWidth(std::min(m_width.get(), 0.5));
 	ThemeInstrumentMenu& th = *m_menuTheme;
@@ -93,9 +90,9 @@ void InstrumentGraph::drawMenu() {
 	const auto cur = &m_menu.current();
 	double w = m_menu.dimensions.w();
 	const float s = std::min(m_width.get(), 0.5) / w;
-	Transform trans(glmath::scale(s));  // Fit better menu on screen
-	// We need to multiply offset by inverse scale factor to keep it always constant
-	// All these vars are ultimately affected by the scaling matrix
+	Transform trans(glmath::scale(s));  /// Fit better menu on screen
+	/// We need to multiply offset by inverse scale factor to keep it always constant
+	/// All these vars are ultimately affected by the scaling matrix
 	const float txth = th.option_selected.h();
 	const float button_margin = m_arrow_up.dimensions.w()
 	* (isKeyboard() && getGraphType() != input::DEVTYPE_DANCEPAD ? 2.0f : 1.0f);
@@ -104,24 +101,24 @@ void InstrumentGraph::drawMenu() {
 	float y = -h * .5f + step;
 	float x = -w*.5f + step + button_margin;
 	float xx = w*.5f - step - button_margin;
-	// Background
+	/// Background
 	th.bg.dimensions.middle().center().stretch(w, h);
 	th.bg.draw();
-	// Loop through menu items
+	/// Loop through menu items
 	w = 0;
 	unsigned i = 0;
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it, ++i) {
 		std::string menutext = it->getName();
-		SvgTxtTheme* txt = &th.option_selected; // Default: font for selected menu item
-		
-		if (cur != &*it) { // Unselected menuoption
+		SvgTxtTheme* txt = &th.option_selected; /// Default: font for selected menu item
+
+		if (cur != &*it) { /// Unselected menuoption
 			txt = &(th.getCachedOption(menutext));
-			
-			// Selected item
+
+			/// Selected item
 		} else {
-			// Left/right Icons
+			/// Left/right Icons
 			if (getGraphType() == input::DEVTYPE_DRUMS) {
-				// Drum colors are mirrored
+				/// Drum colors are mirrored
 				m_arrow_left.dimensions.middle(xx + button_margin).center(y);
 				m_arrow_right.dimensions.middle(x - button_margin).center(y);
 			} else {
@@ -130,20 +127,20 @@ void InstrumentGraph::drawMenu() {
 			}
 			m_arrow_left.draw();
 			m_arrow_right.draw();
-			
-			// Up/down icons
+
+			/// Up/down icons
 			if (getGraphType() != input::DEVTYPE_GUITAR) {
-				if (i > 0) { // Up
+				if (i > 0) { /// Up
 					m_arrow_up.dimensions.middle(x - button_margin).center(y - step);
 					m_arrow_up.draw();
 				}
-				if (i < m_menu.getOptions().size()-1) { // Down
+				if (i < m_menu.getOptions().size()-1) { /// Down
 					m_arrow_down.dimensions.middle(x - button_margin).center(y + step);
 					m_arrow_down.draw();
 				}
 			}
-			
-			// Draw the key letters for keyboard (not for dancepad)
+
+			/// Draw the key letters for keyboard (not for dancepad)
 			if (isKeyboard() && getGraphType() != input::DEVTYPE_DANCEPAD) {
 				float leftx = x - button_margin*0.75f;
 				float rightx = xx + button_margin*0.25f;
@@ -158,14 +155,14 @@ void InstrumentGraph::drawMenu() {
 					hintfont.dimensions.right(rightx).center(y);
 					hintfont.draw(hintletter);
 				}
-				// Only drums has up/down
+				/// Only drums has up/down
 				if (getGraphType() == input::DEVTYPE_DRUMS) {
-					if (i > 0) {  // Up
+					if (i > 0) {  /// Up
 						SvgTxtTheme& hintfont = th.getCachedOption("I");
 						hintfont.dimensions.left(leftx).center(y - step);
 						hintfont.draw("I");
 					}
-					if (i < m_menu.getOptions().size()-1) {  // Down
+					if (i < m_menu.getOptions().size()-1) {  /// Down
 						SvgTxtTheme& hintfont = th.getCachedOption("O");
 						hintfont.dimensions.left(leftx).center(y + step);
 						hintfont.draw("O");
@@ -173,24 +170,23 @@ void InstrumentGraph::drawMenu() {
 				}
 			}
 		}
-		// Finally we are at the actual menu item text drawing
+		/// Finally we are at the actual menu item text drawing
 		ColorTrans c(Color::alpha(it->isActive() ? 1.0 : 0.5));
 		txt->dimensions.middle(x).center(y);
 		txt->draw(menutext);
-		w = std::max(w, txt->w() + 2 * step + button_margin * 2); // Calculate the widest entry
-		y += step; // Move draw position down for the next option
+		w = std::max(w, txt->w() + 2 * step + button_margin * 2); /// Calculate the widest entry
+		y += step; /// Move draw position down for the next option
 	}
-	// Draw comment text
+	/// Draw comment text
 	if (cur->getComment() != "") {
-		//th.comment_bg.dimensions.middle().screenBottom(-0.2);
-		//th.comment_bg.draw();
+		///th.comment_bg.dimensions.middle().screenBottom(-0.2);
+		///th.comment_bg.draw();
 		th.comment.dimensions.middle().screenBottom(-0.12);
 		th.comment.draw(cur->getComment());
 	}
-	// Save the calculated menu dimensions
+	/// Save the calculated menu dimensions
 	m_menu.dimensions.stretch(w, h);
 }
-
 
 void InstrumentGraph::drawPopups() {
 	for (auto it = m_popups.begin(); it != m_popups.end(); ) {
@@ -198,7 +194,6 @@ void InstrumentGraph::drawPopups() {
 		++it;
 	}
 }
-
 
 void InstrumentGraph::handleCountdown(double time, double beginTime) {
 	if (!dead() && time < beginTime && time >= beginTime - m_countdown - 1) {
@@ -208,7 +203,6 @@ void InstrumentGraph::handleCountdown(double time, double beginTime) {
 		--m_countdown;
 	}
 }
-
 
 Color const& InstrumentGraph::color(unsigned fret) const {
 	static Color fretColors[5] = {
@@ -225,7 +219,6 @@ Color const& InstrumentGraph::color(unsigned fret) const {
 	}
 	return fretColors[fret];
 }
-
 
 void InstrumentGraph::unjoin() {
 	m_jointime = getNaN();

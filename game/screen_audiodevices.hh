@@ -19,7 +19,7 @@ public:
 	void manageEvent(SDL_Event event);
 	void manageEvent(input::NavEvent const& event);
 	void draw();
-	
+
 private:
 	struct Channel {
 		Channel(std::string const& name): name(name), pos(-1) {}
@@ -29,7 +29,7 @@ private:
 	void load(); ///< Check what devices are open
 	bool save(bool skip_ui_config = false); ///< Save the config to disk xml and then reload
 	bool verify(); ///< Check that all were opened after audio reset
-	
+
 	Audio& m_audio;
 	boost::scoped_ptr<ThemeAudioDevices> m_theme;
 	unsigned int m_selected_column;

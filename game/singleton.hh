@@ -5,7 +5,7 @@ template <class T> class Singleton {
 protected:
 	/// pointer to object
 	static T* ms_Singleton;
-	
+
 public:
 	Singleton() { ms_Singleton = static_cast<T*>(this); }
 	~Singleton() { ms_Singleton = 0; }

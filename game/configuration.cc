@@ -26,7 +26,6 @@ ConfigItem::ConfigItem(std::string sval): m_type("string"), m_value(sval), m_sel
 
 ConfigItem::ConfigItem(OptionList opts): m_type("option_list"), m_value(opts), m_sel() { }
 
-
 ConfigItem& ConfigItem::incdec(int dir) {
 	if (m_type == "int") {
 		int& val = boost::get<int>(m_value);
@@ -59,7 +58,7 @@ bool ConfigItem::isDefaultImpl(ConfigItem::Value const& defaultValue) const {
 void ConfigItem::verifyType(std::string const& type) const {
 	if (type == m_type) return;
 	std::string name = "unknown";
-	// Try to find this item in the config map
+	/// Try to find this item in the config map
 	for (Config::const_iterator it = config.begin(); it != config.end(); ++it) {
 		if (&it->second == this) { name = it->first; break; }
 	}
@@ -81,21 +80,21 @@ void ConfigItem::select(int i) { verifyType("option_list"); m_sel = clamp<int>(i
 namespace {
 	template <typename T, typename VariantAll, typename VariantNum> std::string numericFormat(VariantAll const& value, VariantNum const& multiplier, VariantNum const& step) {
 		T m = boost::get<T>(multiplier);
-		// Find suitable precision (not very useful for integers, but this code is generic...)
+		/// Find suitable precision (not very useful for integers, but this code is generic...)
 		T s = std::abs(m * boost::get<T>(step));
 		unsigned precision = 0;
 		while (s > 0.0 && (s *= 10) < 10) ++precision;
-		// Format the output
+		/// Format the output
 		boost::format fmter("%f");
 		fmter % boost::io::group(std::setprecision(precision), double(m) * boost::get<T>(value));
 		return fmter.str();
 	}
-	
+
 	std::string getText(xmlpp::Element const& elem) {
-		auto n = xmlpp::get_first_child_text(elem);  // Returns NULL if there is no text
+		auto n = xmlpp::get_first_child_text(elem);  /// Returns NULL if there is no text
 		return n ? std::string(n->get_content()) : std::string();
 	}
-	
+
 	std::string getText(xmlpp::Element const& elem, std::string const& path) {
 		auto ns = elem.find(path);
 		if (ns.empty()) return std::string();
@@ -107,7 +106,7 @@ std::string const ConfigItem::getValue() const {
 	if (this->getShortDesc() == config["audio/backend"].getShortDesc()) {
 		int AutoBackendType = 1337;
 		static int val = boost::get<int>(m_value);
-		if (val != boost::get<int>(m_value)) val = PaHostApiNameToHostApiTypeId(this->getEnumName()); // In the case of the audio backend, val is the real value while m_value is the enum case for its cosmetic name.
+		if (val != boost::get<int>(m_value)) val = PaHostApiNameToHostApiTypeId(this->getEnumName()); /// In the case of the audio backend, val is the real value while m_value is the enum case for its cosmetic name.
 		std::clog << "audio/debug: Value of selected audio backend in config.xml is: " << val << std::endl;
 		int hostApi = Pa_HostApiTypeIdToHostApiIndex(PaHostApiTypeId(val));
 		std::ostringstream oss;
@@ -116,7 +115,7 @@ std::string const ConfigItem::getValue() const {
 			oss << " found at index: " << hostApi;
 		}
 		else {
-			oss << " not found; but this is normal when Auto is selected."; // Auto is not a real PaHostApiTypeId, so it will always return paHostApiNotFound
+			oss << " not found; but this is normal when Auto is selected."; /// Auto is not a real PaHostApiTypeId, so it will always return paHostApiNotFound
 		}
 		oss << std::endl;
 		std::clog << oss.str();
@@ -181,7 +180,6 @@ void ConfigItem::selectEnum(std::string const& name) {
 	i() = it - m_enums.begin();
 }
 
-
 std::string const ConfigItem::getEnumName() const {
 	int const& val = i();
 	if (val >= 0 && val < int(m_enums.size())) { return m_enums[val]; }
@@ -193,7 +191,7 @@ template <typename T> void ConfigItem::updateNumeric(xmlpp::Element& elem, int m
 	if (!ns.empty()) setLimits<T>(dynamic_cast<xmlpp::Element&>(*ns[0]), m_min, m_max, m_step);
 	else if (mode == 0) throw XMLError(elem, "child element limits missing");
 	ns = elem.find("ui");
-	// Default values
+	/// Default values
 	if (mode == 0) {
 		m_unit.clear();
 		m_multiplier = static_cast<T>(1);
@@ -210,12 +208,11 @@ template <typename T> void ConfigItem::updateNumeric(xmlpp::Element& elem, int m
 	}
 }
 
-
 void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 	if (mode == 0) {
 		m_type = getAttribute(elem, "type");
 		if (m_type.empty()) throw std::runtime_error("Entry type attribute is missing");
-		// Menu text
+		/// Menu text
 		m_shortDesc = getText(elem, "short");
 		m_longDesc = getText(elem, "long");
 	} else {
@@ -232,7 +229,7 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 	} else if (m_type == "int") {
 		std::string value_string = getAttribute(elem, "value");
 		if (!value_string.empty()) m_value = std::stoi(value_string);
-			// Enum handling
+			/// Enum handling
 			if (mode == 0) {
 				auto n2 = elem.find("limits/enum");
 				if (!n2.empty()) {
@@ -253,7 +250,7 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 			} else if (m_type == "string") {
 				m_value = getText(elem, "stringvalue");
 			} else if (m_type == "string_list" || m_type == "option_list") {
-				//TODO: Option list should also update selection (from attribute?)
+				///TODO: Option list should also update selection (from attribute?)
 				std::vector<std::string> value;
 				auto n2 = elem.find("stringvalue");
 				for (auto it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
@@ -261,7 +258,7 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 				}
 				m_value = value;
 			} else if (!m_type.empty()) throw std::runtime_error("Invalid value type in config schema: " + m_type);
-	// Schema sets all defaults, system config sets the system default
+	/// Schema sets all defaults, system config sets the system default
 	if (mode < 1) m_factoryDefaultValue = m_defaultValue = m_value;
 		if (mode < 2) m_defaultValue = m_value;
 			} catch (std::exception& e) {
@@ -269,7 +266,7 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 				throw std::runtime_error(std::to_string(line) + ": Error while reading entry: " + e.what());
 			}
 
-// These are set in readConfig, once the paths have been bootstrapped.
+/// These are set in readConfig, once the paths have been bootstrapped.
 fs::path systemConfFile;
 fs::path userConfFile;
 
@@ -280,7 +277,7 @@ void writeConfig(Audio& m_audio, bool system) {
 	for (auto& elem: config) {
 		ConfigItem& item = elem.second;
 		std::string name = elem.first;
-		if (item.isDefault(system)) continue; // No need to save settings with default values
+		if (item.isDefault(system)) continue; /// No need to save settings with default values
 		dirty = true;
 		xmlpp::Element* entryNode = xmlpp::add_child_element(nodeRoot, "entry");
 		entryNode->set_attribute("name", name);
@@ -291,13 +288,13 @@ void writeConfig(Audio& m_audio, bool system) {
 			std::clog << "audio/debug: Will now change value of audio backend. New Value: " << newValue << std::endl;
 			entryNode->set_attribute("value", std::to_string(newValue));
 			std::clog << "audio/info: Audio backend changed; will now restart audio subsystem." << std::endl;
-			
+
 			Audio::backendConfig().selectEnum(item.getEnumName());
 			boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(m_audio)));
 			if (!audiokiller.timed_join(boost::posix_time::milliseconds(2500)))
 				Game::getSingletonPtr()->fatalError("Audio hung for some reason.\nPlease restart Performous.");
 			m_audio.restart();
-			m_audio.playMusic(findFile("menu.ogg"), true); // Start music again
+			m_audio.playMusic(findFile("menu.ogg"), true); /// Start music again
 		}
 		else if (type == "int") entryNode->set_attribute("value",std::to_string(item.i()));
 		else if (type == "bool") entryNode->set_attribute("value", item.b() ? "true" : "false");
@@ -307,7 +304,7 @@ void writeConfig(Audio& m_audio, bool system) {
 			for (auto const& str: item.sl()) xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(str);
 		}
 		else if (item.get_type() == "option_list") {
-			//TODO: Write selected also (as attribute?)
+			///TODO: Write selected also (as attribute?)
 			for (auto const& str: item.ol()) xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(str);
 		}
 	}
@@ -327,9 +324,9 @@ void writeConfig(Audio& m_audio, bool system) {
 		throw std::runtime_error("Unable to save " + conf.string());
 	}
 	if (!system) return;
-	// Tell the items that we have changed the system default
+	/// Tell the items that we have changed the system default
 	for (auto& elem: config) elem.second.makeSystem();
-	// User config is no longer needed
+	/// User config is no longer needed
 	if (exists(userConfFile)) remove(userConfFile);
 }
 
@@ -363,10 +360,10 @@ void readConfigXML(fs::path const& file, int mode) {
 			std::string name = getAttribute(elem, "name");
 			if (name.empty()) throw std::runtime_error(file.string() + " element Entry missing name attribute");
 			auto it = config.find(name);
-			if (mode == 0) { // Schema
+			if (mode == 0) { /// Schema
 				if (it != config.end()) throw std::runtime_error("Configuration schema contains the same value twice: " + name);
 				config[name].update(elem, 0);
-				// Add the item to menu, if not hidden
+				/// Add the item to menu, if not hidden
 				bool hidden = false;
 				try { if (getAttribute(elem, "hidden") == "true") hidden = true; } catch (XMLError&) {}
 				if (!hidden) {
@@ -398,7 +395,7 @@ int PaHostApiNameToHostApiTypeId (const std::string& name) {
 	if (name == "MME") return 2;
 	if (name == "ASIO") return 3;
 	if (name == "Core Audio" || name == "CoreAudio") return 5;
-	if (name == "OSS") return 7; // Not an error, stupid PortAudio.
+	if (name == "OSS") return 7; /// Not an error, stupid PortAudio.
 	if (name == "ALSA") return 8;
 	if (name == "Windows WDM-KS") return 11;
 	if (name == "JACK Audio Connection Kit") return 12;
@@ -406,20 +403,19 @@ int PaHostApiNameToHostApiTypeId (const std::string& name) {
 	throw std::runtime_error("Invalid PortAudio HostApiTypeId Specified.");
 }
 
-
 void readConfig() {
-	// Find config schema
+	/// Find config schema
 	fs::path schemaFile = getSchemaFilename();
 	systemConfFile = getSysConfigDir() / "config.xml";
 	userConfFile = getConfigDir() / "config.xml";
-	readConfigXML(schemaFile, 0);  // Read schema and defaults
-	readConfigXML(systemConfFile, 1);  // Update defaults with system config
-	readConfigXML(userConfFile, 2);  // Read user settings
+	readConfigXML(schemaFile, 0);  /// Read schema and defaults
+	readConfigXML(systemConfFile, 1);  /// Update defaults with system config
+	readConfigXML(userConfFile, 2);  /// Read user settings
 	pathInit();
-	// Populate themes
+	/// Populate themes
 	ConfigItem& ci = config["game/theme"];
 	for (std::string const& theme: getThemes()) ci.addEnum(theme);
-	if (ci.i() == -1) ci.selectEnum("default");  // Select the default theme if nothing is selected
+	if (ci.i() == -1) ci.selectEnum("default");  /// Select the default theme if nothing is selected
 }
 
 void populateBackends (const std::list<std::string>& backendList) {

@@ -13,7 +13,7 @@ template <typename Key, typename Value> class Cachemap {
 		while (m_history.size() >= m_size) { m_map.erase(m_history.front()); m_history.pop_front(); }
 		m_history.push_back(key);
 	}
-	
+
 public:
 	/// constructor
 	Cachemap(std::size_t size): m_size(size) {}

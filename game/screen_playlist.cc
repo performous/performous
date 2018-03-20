@@ -10,14 +10,13 @@
 #include <sstream>
 #include <boost/format.hpp>
 
-
 ScreenPlaylist::ScreenPlaylist(std::string const& name,Audio& audio, Songs& songs, Backgrounds& bgs):
 Screen(name), m_audio(audio), m_songs(songs), m_backgrounds(bgs), m_covers(20), keyPressed()
 {}
 
 void ScreenPlaylist::enter() {
 	Game* gm = Game::getSingletonPtr();
-	// Initialize webcam
+	/// Initialize webcam
 	gm->loading(_("Initializing webcam..."), 0.1);
 	if (config["graphic/webcam"].b() && Webcam::enabled()) {
 		try {
@@ -72,14 +71,13 @@ void ScreenPlaylist::exit() {
 	m_cam.reset();
 }
 
-
 void ScreenPlaylist::manageEvent(input::NavEvent const& event) {
 	input::NavButton nav = event.button;
 	Menu& menu = overlay_menu.isOpen() ? overlay_menu : songlist_menu;
-	
+
 	if (keyPressed == false)
 		keyPressed = true;
-	
+
 	if (nav == input::NAV_CANCEL) {
 		if(overlay_menu.isOpen()) {
 			overlay_menu.close();
@@ -121,7 +119,7 @@ void ScreenPlaylist::draw() {
 	}
 	if (m_cam && config["graphic/webcam"].b()) m_cam->render();
 	draw_menu_options();
-	//menu on top of everything
+	///menu on top of everything
 	if (overlay_menu.isOpen()) {
 		drawMenu();
 	}
@@ -132,12 +130,12 @@ void ScreenPlaylist::draw() {
 	}
 	auto const& playlist = gm->getCurrentPlayList().getList();
 	for (unsigned i = playlist.size() - 1; i < playlist.size(); --i) {
-		if(i < 9) { //only draw the first 9 covers
+		if(i < 9) { ///only draw the first 9 covers
 			Surface& s = getCover(*playlist[i]);
 			double pos =  i / std::max<double>(9, 9);
 			using namespace glmath;
 			Transform trans(
-							translate(vec3(-0.4 + 0.9 * pos, 0.045)) //vec3(horizontal-offset-from-center, vertical offset from screen_bottom)
+							translate(vec3(-0.4 + 0.9 * pos, 0.045)) ///vec3(horizontal-offset-from-center, vertical offset from screen_bottom)
 							* rotate(-0.0, vec3(0.0, 1.0, 0.0))
 							);
 			s.dimensions.middle().screenBottom(-0.06).fitInside(0.08, 0.08);
@@ -147,11 +145,11 @@ void ScreenPlaylist::draw() {
 }
 Surface& ScreenPlaylist::getCover(Song const& song) {
 	Surface* cover = nullptr;
-	// Fetch cover image from cache or try loading it
+	/// Fetch cover image from cache or try loading it
 	if (!song.cover.empty()) try { cover = &m_covers[song.cover]; } catch (std::exception const&) {}
-	// Fallback to background image as cover if needed
+	/// Fallback to background image as cover if needed
 	if (!cover && !song.background.empty()) try { cover = &m_covers[song.background]; } catch (std::exception const&) {}
-	// Use empty cover
+	/// Use empty cover
 	if (!cover) {
 		if(song.hasDance()) {
 			cover = m_danceCover.get();
@@ -196,7 +194,7 @@ void ScreenPlaylist::createEscMenu() {
 
 void ScreenPlaylist::drawMenu() {
 	if (overlay_menu.empty()) return;
-	// Some helper vars
+	/// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
 	const auto cur = &overlay_menu.current();
 	double w = overlay_menu.dimensions.w();
@@ -205,20 +203,20 @@ void ScreenPlaylist::drawMenu() {
 	const float h = overlay_menu.getOptions().size() * step + step;
 	float y = -h * .5f + step;
 	float x = -w * .5f + step;
-	// Background
+	/// Background
 	th.bg.dimensions.middle(0).center(0).stretch(w, h);
 	th.bg.draw();
-	// Loop through menu items
+	/// Loop through menu items
 	w = 0;
 	for (MenuOptions::const_iterator it = overlay_menu.begin(); it != overlay_menu.end(); ++it) {
-		// Pick the font object
+		/// Pick the font object
 		SvgTxtTheme* txt = &th.option_selected;
 		if (cur != &*it)
 			txt = &(th.getCachedOption(it->getName()));
-		// Set dimensions and draw
+		/// Set dimensions and draw
 		txt->dimensions.middle(x).center(y);
 		txt->draw(it->getName());
-		w = std::max(w, txt->w() + 2 * step); // Calculate the widest entry
+		w = std::max(w, txt->w() + 2 * step); /// Calculate the widest entry
 		y += step;
 	}
 	if (cur->getComment() != "") {
@@ -229,51 +227,51 @@ void ScreenPlaylist::drawMenu() {
 }
 
 void ScreenPlaylist::draw_menu_options() {
-	// Variables used for positioning and other stuff
+	/// Variables used for positioning and other stuff
 	double wcounter = 0;
-	const size_t showopts = 7; // Show at most 8 options simultaneously
-	const float x = -0.35; // x xcoordinate from screen center, the menu should be aligned left of the center therefore it´s negative.n
+	const size_t showopts = 7; /// Show at most 8 options simultaneously
+	const float x = -0.35; /// x xcoordinate from screen center, the menu should be aligned left of the center therefore it´s negative.n
 	const float start_y = -0.15;
 	const float sel_margin = 0.04;
 	const MenuOptions opts = songlist_menu.getOptions();
 	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get()-songlist_menu.getSubmenuLevel()));
-	// Determine from which item to start
+	/// Determine from which item to start
 	int start_i = std::min((int)songlist_menu.curIndex() - 1, (int)opts.size() - (int)showopts
-						   + (songlist_menu.getSubmenuLevel() == 2 ? 1 : 0)); // Hack to counter side-effects from displaying the value inside the menu
+						   + (songlist_menu.getSubmenuLevel() == 2 ? 1 : 0)); /// Hack to counter side-effects from displaying the value inside the menu
 	if (start_i < 0 || opts.size() == showopts) start_i = 0;
-	
-	// Loop the currently visible options
+
+	/// Loop the currently visible options
 	for (size_t i = start_i, ii = 0; ii < showopts && i < opts.size(); ++i, ++ii) {
 		MenuOption const& opt = opts[i];
 		ColorTrans c(Color::alpha(submenuanim));
-		
-		// Selection
+
+		/// Selection
 		if (i == songlist_menu.curIndex()) {
-			// Animate selection higlight moving
+			/// Animate selection higlight moving
 			double selanim = m_selAnim.get() - start_i;
 			if (selanim < 0) selanim = 0;
-			// Draw the text, dim if option not available
+			/// Draw the text, dim if option not available
 			{
 				ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
 				theme->option_selected.dimensions.left(x).center(start_y + ii*0.049);
 				theme->option_selected.draw(opt.getName());
 			}
-			wcounter = std::max(wcounter, theme->option_selected.w() + 2 * sel_margin); // Calculate the widest entry
-			// If this is a config item, show the value below
+			wcounter = std::max(wcounter, theme->option_selected.w() + 2 * sel_margin); /// Calculate the widest entry
+			/// If this is a config item, show the value below
 			if (opt.type == MenuOption::CHANGE_VALUE) {
-				++ii; // Use a slot for the value
+				++ii; /// Use a slot for the value
 				theme->option_selected.dimensions.left(x + sel_margin).center(-0.1 + (selanim+1)*0.08);
 				theme->option_selected.draw("<  " + opt.value->getValue() + "  >");
 			}
-			
-			// Regular option (not selected)
+
+			/// Regular option (not selected)
 		} else {
 			std::string title = opt.getName();
 			SvgTxtTheme& txt = getTextObject(title);
 			ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
 			txt.dimensions.left(x).center(start_y + ii*0.05);
 			txt.draw(title);
-			wcounter = std::max(wcounter, txt.w() + 2 * sel_margin); // Calculate the widest entry
+			wcounter = std::max(wcounter, txt.w() + 2 * sel_margin); /// Calculate the widest entry
 		}
 	}
 	songlist_menu.dimensions.stretch(wcounter, 1);
@@ -292,7 +290,7 @@ void ScreenPlaylist::createSongListMenu() {
 	SongList& currentList = gm->getCurrentPlayList().getList();
 	int totaldurationSeconds = 0;
 	for (auto const& song: currentList) {
-		//timestamp handles
+		///timestamp handles
 		int hours = 0;
 		int minutes = 0;
 		int seconds = totaldurationSeconds;
@@ -311,9 +309,9 @@ void ScreenPlaylist::createSongListMenu() {
 		oss_playlist << std::setw(2) << std::setfill('0') << minutes << ":" << std::setw(2) << std::setfill('0') << seconds;
 		std::string songinfo = oss_playlist.str();
 		if (songinfo.length() > 20) {
-			songinfo = songinfo + "                           >"; //FIXME: ugly hack to make the text scale so it fits on screen!
+			songinfo = songinfo + "                           >"; ///FIXME: ugly hack to make the text scale so it fits on screen!
 		}
-		//then add it to the menu:
+		///then add it to the menu:
 		songlist_menu.add(MenuOption(_(songinfo.c_str()),_("Press enter to view song options")).call([this, count]() {
 			createSongMenu(count);
 			overlay_menu.open();
@@ -345,7 +343,7 @@ void ScreenPlaylist::createSongMenu(int songNumber) {
 	}));
 	overlay_menu.add(MenuOption(_("Remove"), _("Remove this song from the list")).call([this, songNumber]() {
 		Game* gm = Game::getSingletonPtr();
-		// Minus 1 so it doesn´t remove #2 when you´ve selected #1
+		/// Minus 1 so it doesn´t remove #2 when you´ve selected #1
 		gm->getCurrentPlayList().removeSong(songNumber - 1);
 		overlay_menu.close();
 		if (gm->getCurrentPlayList().isEmpty()) {
@@ -354,7 +352,7 @@ void ScreenPlaylist::createSongMenu(int songNumber) {
 			createSongListMenu();
 		}
 	}));
-	if (songNumber >= 2) { //can't move up first song
+	if (songNumber >= 2) { ///can't move up first song
 		overlay_menu.add(MenuOption(_("Move up"), _("Move this song up the list")).call([this, songNumber]() {
 			Game* gm = Game::getSingletonPtr();
 			gm->getCurrentPlayList().swap(songNumber -1, songNumber -2);
@@ -364,7 +362,7 @@ void ScreenPlaylist::createSongMenu(int songNumber) {
 	}
 	Game* gm = Game::getSingletonPtr();
 	int size = gm->getCurrentPlayList().getList().size();
-	if (songNumber < size) { //can't move down the last song
+	if (songNumber < size) { ///can't move down the last song
 		overlay_menu.add(MenuOption(_("Move Down"), _("Move this song down the list")).call([this, songNumber]() {
 			Game* gm = Game::getSingletonPtr();
 			gm->getCurrentPlayList().swap(songNumber -1, songNumber);

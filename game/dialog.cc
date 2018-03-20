@@ -21,7 +21,7 @@ void Dialog::draw() {
 			}
 			break;
 		case SLIDEIN :
-			verticaloffset = 1.0 - 1.0 * (1.0-m_animationVal.get()); //TODO animate dialog
+			verticaloffset = 1.0 - 1.0 * (1.0-m_animationVal.get()); ///TODO animate dialog
 			if(m_animationVal.get() == 0) {
 				m_state = IDLE;
 				m_animationVal.setValue(6);
@@ -31,8 +31,7 @@ void Dialog::draw() {
 			verticaloffset = 1.0 - 1.0 * m_animationVal.get();
 			break;
 	}
-	
-	
+
 	m_dialog.dimensions.fixedHeight(0.15).right(0.5).screenTop(-0.10 + 0.11 - verticaloffset);
 	m_dialog.draw();
 	m_svgText.dimensions.right(0.35).screenTop(0.08 - 0.10 + 0.11 - verticaloffset);

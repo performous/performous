@@ -35,7 +35,7 @@ void convertToUTF8(std::stringstream &_stream, std::string _filename) {
 		match = UnicodeUtil::getCharset(data);
 	}
 	else {
-		match = std::pair<std::string,int>("UTF-8",100); // If there's no filename, assume it's internal text and thus utf-8.
+		match = std::pair<std::string,int>("UTF-8",100); /// If there's no filename, assume it's internal text and thus utf-8.
 	}
 	icu::UnicodeString ustring;
 	if (data.substr(0, 3) == "\xEF\xBB\xBF") {
@@ -44,15 +44,15 @@ void convertToUTF8(std::stringstream &_stream, std::string _filename) {
 		}
 		match.first = "UTF-8";
 		match.second = 100;
-		_stream.str(data.substr(3)); // Remove BOM if there is one
+		_stream.str(data.substr(3)); /// Remove BOM if there is one
 	}
-	if (match.second > 10 && match.second < 50) { // 50 is a really good match, 10 means an encoding that could be conceivably used to display the text.
+	if (match.second > 10 && match.second < 50) { /// 50 is a really good match, 10 means an encoding that could be conceivably used to display the text.
 		if (match.first == "ISO-8859-1" || match.first == "ISO-8859-2") {
 			match.first = "UTF-8";
-			match.second = 75;	// Mostly western characters. Let's treat it as a UTF-8 false-negative.
+			match.second = 75;	/// Mostly western characters. Let's treat it as a UTF-8 false-negative.
 		}
 	}
-	if (match.second >= 50) { // fairly good match?
+	if (match.second >= 50) { /// fairly good match?
 		std::string charset = match.first;
 		if (charset != "UTF-8") {
 			if (!_filename.empty()) { std::clog << "unicode/warning: " << _filename << " does not appear to be UTF-8... (" << charset << ") detected." << std::endl; }

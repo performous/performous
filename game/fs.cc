@@ -24,16 +24,16 @@ namespace {
 	bool pathRootHack(fs::path& p, std::string const& name) {
 		if (p.empty() || p.begin()->string() != name) return false;
 		fs::path ret;
-		// Add all but first element
+		/// Add all but first element
 		for (auto dir = ++p.begin(); dir != p.end(); ++dir)
 			ret /= *dir;
 		p = ret;
 		return true;
 	}
-	
+
 	const fs::path performous = "performous";
 	const fs::path configSchema = "config/schema.xml";	
-	
+
 	struct PathCache {
 		Paths paths;
 		bool didMigrateConfig = false;
@@ -43,24 +43,24 @@ namespace {
 			Paths ret;
 			if (pathRootHack(p, "~")) ret.push_back(home / p);
 			else if (pathRootHack(p, "DATADIR")) {
-				// Add all data paths with p appended to them
+				/// Add all data paths with p appended to them
 				for (auto const& path: paths) ret.push_back(path / p);
 			}
 			else ret.push_back(p);
 			return ret;
 		}
-		// Note: three-phase init:
-		// 1. Default constructor runs in static context (before main) and cannot do much
-		// 2. pathBootstrap is called to find out static system paths (critical for logging and for loading config files)
-		// 3. pathInit is called to process the full search path, using config settings
-		
+		/// Note: three-phase init:
+		/// 1. Default constructor runs in static context (before main) and cannot do much
+		/// 2. pathBootstrap is called to find out static system paths (critical for logging and for loading config files)
+		/// 3. pathInit is called to process the full search path, using config settings
+
 #if (BOOST_OS_WINDOWS)
 #include "platform/fs_paths.win.inc"
 #else
 #include "platform/fs_paths.unix.inc"
 #endif
 	} cache;
-	
+
 	boost::mutex mutex;
 	typedef boost::lock_guard<boost::mutex> Lock;
 }
@@ -119,7 +119,7 @@ Paths getThemePaths() {
 	const fs::path css = "css";
 	const fs::path images = "images";
 	const fs::path fonts = "fonts";
-	
+
 	std::string theme = config["game/theme"].getEnumName();
 	Paths paths = getPaths();
 	Paths infixes = { 
@@ -129,7 +129,7 @@ Paths getThemePaths() {
 		themes / theme / www / css,
 		themes / theme / www / images,
 		themes / theme / www / fonts,
-		
+
 		themes / def,
 		themes / def / www,					  
 		themes / def / www / js,
@@ -138,7 +138,7 @@ Paths getThemePaths() {
 		themes / def / www / fonts,
 		fs::path() };
 	if (!theme.empty() && theme != def) infixes.push_front(themes / theme);
-	// Build combinations of paths and infixes
+	/// Build combinations of paths and infixes
 	Paths themePaths;
 	for (fs::path const& infix: infixes) {
 		for (fs::path p: paths) {
@@ -166,15 +166,15 @@ fs::path findFile(fs::path const& filename) {
 
 Paths listFiles(fs::path const& dir) {
 	if (dir.is_absolute()) throw std::logic_error("listFiles expects a folder name without path.");
-	std::set<fs::path> found;  // Filenames already found
-	Paths files;  // Full paths of files found
+	std::set<fs::path> found;  /// Filenames already found
+	Paths files;  /// Full paths of files found
 	for (fs::path path: getThemePaths()) {
 		fs::path subdir = path / dir;
 		if (!fs::is_directory(subdir))
 			continue;
 		for (fs::recursive_directory_iterator dirIt(subdir), dirEnd; dirIt != dirEnd; ++dirIt) {
-			fs::path name = dirIt->path().filename();  // FIXME: Extract full path from current folder, not just the filename
-			// If successfully inserted to "found", it wasn't found before, so add to paths.
+			fs::path name = dirIt->path().filename();  /// FIXME: Extract full path from current folder, not just the filename
+			/// If successfully inserted to "found", it wasn't found before, so add to paths.
 			if (found.insert(name).second) files.push_back(*dirIt);
 		}
 	}
@@ -183,11 +183,11 @@ Paths listFiles(fs::path const& dir) {
 
 std::list<std::string> getThemes() {
 	std::set<std::string> themes;
-	// Search all paths for themes folders and add them
+	/// Search all paths for themes folders and add them
 	for (auto p: getPaths()) {
 		p /= "themes";
 		if (!fs::is_directory(p)) continue;
-		// Gather the themes in this folder
+		/// Gather the themes in this folder
 		for (fs::directory_iterator dirIt(p), dirEnd; dirIt != dirEnd; ++dirIt) {
 			fs::path p2 = dirIt->path();
 			if (fs::is_directory(p2)) themes.insert(p2.filename().string());
@@ -200,7 +200,7 @@ Paths getPathsConfig(std::string const& confOption) {
 	Lock l(mutex);
 	Paths ret;
 	for (auto const& str: config[confOption].sl()) {
-		ret.splice(ret.end(), cache.pathExpand(str));  // Add expanded paths to ret.
+		ret.splice(ret.end(), cache.pathExpand(str));  /// Add expanded paths to ret.
 	}
 	return ret;
 }

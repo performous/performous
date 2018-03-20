@@ -62,11 +62,11 @@ back_h(findFile("instrumentmenu_back_highlight.svg")),
 options(30),
 option_selected(findFile("instrumentmenu_option_selected.svg"), config["graphic/text_lod"].f()),
 comment(findFile("instrumentmenu_comment.svg"), config["graphic/text_lod"].f())
-//comment_bg(findFile("menu_comment_bg.svg"))
+///comment_bg(findFile("menu_comment_bg.svg"))
 {
 	comment.setAlign(SvgTxtTheme::CENTER);
 }
-//at the moment just a copy of themeSong
+///at the moment just a copy of themeSong
 ThemePlaylistScreen::ThemePlaylistScreen():
 Theme(findFile("songs_bg.svg")),
 options(30),

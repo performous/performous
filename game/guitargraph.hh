@@ -14,8 +14,8 @@ struct GuitarChord {
 	Duration const* dur[5];
 	int polyphony;
 	bool tappable;
-	bool passed; // Set to true for notes that should not re-appear when rewinding
-	int status; // Guitar: 0 = not played, 1 = tapped, 2 = picked, drums: number of pads hit
+	bool passed; /// Set to true for notes that should not re-appear when rewinding
+	int status; /// Guitar: 0 = not played, 1 = tapped, 2 = picked, drums: number of pads hit
 	int score;
 	AnimValue hitAnim[5];
 	double releaseTimes[5];
@@ -59,15 +59,15 @@ public:
 	void changeTrack(int dir = 1);
 	void changeDifficulty(int dir = 1);
 	double getWhammy() const { return m_whammy; }
-	
+
 private:
-	// refactoring methods
+	/// refactoring methods
 	void initDrums();
 	void initGuitar();
 	void setupJoinMenuDifficulty();
 	void setupJoinMenuDrums();
 	void setupJoinMenuGuitar();
-	// Engine / scoring utils
+	/// Engine / scoring utils
 	void updateNeck();
 	bool canActivateStarpower() { return (m_starmeter > 6000); }
 	void activateStarpower();
@@ -79,8 +79,8 @@ private:
 	void updateDrumFill(double time);
 	void drumHit(double time, unsigned layer, unsigned pad);
 	void guitarPlay(double time, input::Event const& ev);
-	
-	// Media
+
+	/// Media
 	Texture m_tail;
 	Texture m_tail_glow;
 	Texture m_tail_drumfill;
@@ -95,17 +95,17 @@ private:
 	boost::scoped_ptr<Texture> m_neck; /// necks
 	boost::scoped_ptr<SvgTxtThemeSimple> m_scoreText;
 	boost::scoped_ptr<SvgTxtThemeSimple> m_streakText;
-	
-	// Flags
+
+	/// Flags
 	bool m_drums; /// are we using drums?
-	
-	// Track stuff
+
+	/// Track stuff
 	enum Difficulty {
-		DIFFICULTY_KIDS,     // Kids
-		DIFFICULTY_SUPAEASY, // Easy
-		DIFFICULTY_EASY,     // Medium
-		DIFFICULTY_MEDIUM,   // Hard
-		DIFFICULTY_AMAZING,  // Expert
+		DIFFICULTY_KIDS,     /// Kids
+		DIFFICULTY_SUPAEASY, /// Easy
+		DIFFICULTY_EASY,     /// Medium
+		DIFFICULTY_MEDIUM,   /// Hard
+		DIFFICULTY_AMAZING,  /// Expert
 		DIFFICULTYCOUNT
 	} m_level;
 	void setupJoinMenu();
@@ -117,8 +117,8 @@ private:
 	InstrumentTracksConstPtr m_instrumentTracks; /// tracks
 	InstrumentTracksConstPtr::const_iterator m_track_index;
 	unsigned m_holds[max_panels]; /// active hold notes
-	
-	// Graphics functions
+
+	/// Graphics functions
 	Color const colorize(Color c, double time) const;
 	void drawNeckStuff(double time);  ///< Anything in neck coordinates
 	void drawNotes(double time);  ///< Frets etc.
@@ -128,20 +128,20 @@ private:
 	void drawInfo(double time);
 	float getFretX(int fret) { return (-2.0f + fret- (m_drums ? 0.5 : 0)) * (m_leftymode.b() ? -1 : 1); }
 	double neckWidth() const; ///< Get the currently effective neck width (0.5 or less)
-	// Chords & notes
+	/// Chords & notes
 	void updateChords();
-	bool updateTom(unsigned int tomTrack, unsigned int fretId); // returns true if this tom track exists
+	bool updateTom(unsigned int tomTrack, unsigned int fretId); /// returns true if this tom track exists
 	double getNotesBeginTime() const { return m_chords.front().begin; }
 	typedef std::vector<GuitarChord> Chords;
 	Chords m_chords;
 	Chords::iterator m_chordIt;
-	typedef std::map<Duration const*, unsigned> NoteStatus; // Note in song to m_events[unsigned - 1] or 0 for not played
+	typedef std::map<Duration const*, unsigned> NoteStatus; /// Note in song to m_events[unsigned - 1] or 0 for not played
 	NoteStatus m_notes;
 	std::vector<Duration> m_solos; /// holds guitar solos
 	std::vector<Duration> m_drumfills; /// holds drum fills (used for activating GodMode)
 	Durations::const_iterator m_dfIt; /// current drum fill
-	
-	// Animation & misc score keeping
+
+	/// Animation & misc score keeping
 	std::vector<AnimValue> m_flames[max_panels]; /// flame effect queues for each fret
 	AnimValue m_errorMeter;
 	AnimValue m_errorMeterFlash;

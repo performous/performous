@@ -28,10 +28,10 @@ void Game::activateScreen(std::string const& name) {
 
 void Game::updateScreen() {
 	if (!newScreen) return;
-	Screen* s = newScreen;  // A local copy in case exit() or enter() want to change screens again
+	Screen* s = newScreen;  /// A local copy in case exit() or enter() want to change screens again
 	newScreen = nullptr;
 	if (currentScreen) currentScreen->exit();
-	currentScreen = nullptr;  // Exception safety, do not remove
+	currentScreen = nullptr;  /// Exception safety, do not remove
 	s->enter();
 	currentScreen = s;
 }
@@ -55,7 +55,7 @@ void Game::drawScreen() {
 }
 
 void Game::loading(std::string const& message, float progress) {
-	// TODO: Create a better one, this is quite ugly
+	/// TODO: Create a better one, this is quite ugly
 	flashMessage(message + " " + std::to_string(int(round(progress*100))) + "%", 0.0f, 0.5f, 0.2f);
 	m_loadingProgress = progress;
 	m_window.blank();
@@ -122,21 +122,21 @@ void Game::drawLogo() {
 void Game::drawNotifications() {
 	double time = m_messagePopup.get();
 	if (time != 0.0) {
-		bool haveToFadeIn = time <= (m_timeToFadeIn); // Is this fade in?
-		bool haveToFadeOut = time >= (m_messagePopup.getTarget() - m_timeToFadeOut); // Is this fade out?
+		bool haveToFadeIn = time <= (m_timeToFadeIn); /// Is this fade in?
+		bool haveToFadeOut = time >= (m_messagePopup.getTarget() - m_timeToFadeOut); /// Is this fade out?
 		float fadeValue = 1.0f;
-		
-		if (haveToFadeIn) { // Fade in
-			fadeValue = float(time / m_timeToFadeIn); // Calculate animation value
-		} else if (haveToFadeOut) { // Fade out
-			fadeValue = float((m_messagePopup.getTarget() - time) / m_timeToFadeOut); // Calculate animation value
-			if (time >= m_messagePopup.getTarget()) m_messagePopup.setTarget(0.0, true); // Reset if fade out finished
+
+		if (haveToFadeIn) { /// Fade in
+			fadeValue = float(time / m_timeToFadeIn); /// Calculate animation value
+		} else if (haveToFadeOut) { /// Fade out
+			fadeValue = float((m_messagePopup.getTarget() - time) / m_timeToFadeOut); /// Calculate animation value
+			if (time >= m_messagePopup.getTarget()) m_messagePopup.setTarget(0.0, true); /// Reset if fade out finished
 		}
-		
+
 		ColorTrans c(Color::alpha(fadeValue));
-		m_textMessage.draw(m_message); // Draw the message
+		m_textMessage.draw(m_message); /// Draw the message
 	}
-	// Dialog
+	/// Dialog
 	if (m_dialog) {
 		m_dialog->draw();
 		if(m_dialogTimeOut.get() == 0) closeDialog();

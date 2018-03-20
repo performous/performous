@@ -17,9 +17,9 @@ public:
 			UseTexture tex(m_depth);
 			glTexImage2D(GL_TEXTURE_RECTANGLE, 0, GL_DEPTH_COMPONENT, w, h, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
 		}
-		// Create FBO
+		/// Create FBO
 		glGenFramebuffersEXT(1, &m_fbo);
-		// Bind texture as COLOR_ATTACHMENT0
+		/// Bind texture as COLOR_ATTACHMENT0
 		bind();
 		glFramebufferTexture2DEXT(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_RECTANGLE, m_texture.id(), 0);
 		glFramebufferTexture2DEXT(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_RECTANGLE, m_depth.id(), 0);
@@ -41,7 +41,7 @@ public:
 	static void unbind() {
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 	}
-	
+
 private:
 	GLuint m_fbo;
 	OpenGLTexture<GL_TEXTURE_RECTANGLE> m_texture;

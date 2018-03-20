@@ -21,16 +21,16 @@ Platform::Platform() {
 #endif
 }
 
-const std::array<const char*,6> Platform::platformNames = {{ "Windows", "Linux", "MacOS", "BSD", "Solaris", "Unix" }}; // Relevant for debug only.
+const std::array<const char*,6> Platform::platformNames = {{ "Windows", "Linux", "MacOS", "BSD", "Solaris", "Unix" }}; /// Relevant for debug only.
 
 int Platform::defaultBackEnd() {
 	switch (Platform::currentOS()) {
-		case windows: return 13; // WASAPI
-		case macos: return 5; // CoreAudio
-		case solaris: return 7; // OSS
-		case bsd: return 7; // OSS
-		case linux: return 8; // ALSA
-		case unix: return 8; // ALSA
+		case windows: return 13; /// WASAPI
+		case macos: return 5; /// CoreAudio
+		case solaris: return 7; /// OSS
+		case bsd: return 7; /// OSS
+		case linux: return 8; /// ALSA
+		case unix: return 8; /// ALSA
 		default: break;
 	}
 	throw std::runtime_error("Unable to determine a default Audio backend.");
@@ -38,12 +38,12 @@ int Platform::defaultBackEnd() {
 
 #if (BOOST_OS_WINDOWS)
 extern "C" {
-	// For DWORD (see end of file)
+	/// For DWORD (see end of file)
 #include "windef.h"
-	// Force high-performance graphics on dual-GPU systems
-	// http://developer.download.nvidia.com/devzone/devcenter/gamegraphics/files/OptimusRenderingPolicies.pdf
+	/// Force high-performance graphics on dual-GPU systems
+	/// http:///developer.download.nvidia.com/devzone/devcenter/gamegraphics/files/OptimusRenderingPolicies.pdf
 	__declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
-	// https://community.amd.com/thread/169965
+	/// https:///community.amd.com/thread/169965
 	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
 #endif

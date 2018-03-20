@@ -10,10 +10,10 @@
 class PlayList
 {
 public:
-	//needs function that returns the song properties in a list for display on screen
-	
+	///needs function that returns the song properties in a list for display on screen
+
 	typedef std::vector< boost::shared_ptr<Song> > SongList;
-	
+
 	/// Adds a new song to the queue
 	void addSong(boost::shared_ptr<Song> song);
 	/// Returns the next song and removes it from the queue

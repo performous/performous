@@ -7,8 +7,8 @@
 #include "fs.hh"
 #include "glutil.hh"
 
-// TODO: Exception handling
-// TODO: Texture loading
+/// TODO: Exception handling
+/// TODO: Texture loading
 
 class Surface;
 

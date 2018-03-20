@@ -8,8 +8,8 @@
 #include <boost/filesystem.hpp>
 
 namespace SongParserUtil {
-	const std::string DUET_P2 = "Duet singer"; // FIXME
-	const std::string DUET_BOTH = "Both singers"; // FIXME
+	const std::string DUET_P2 = "Duet singer"; /// FIXME
+	const std::string DUET_BOTH = "Both singers"; /// FIXME
 	/// Parse an int from string and assign it to a variable
 	void assign(int& var, std::string const& str);
 	/// Parse an unsigned int from string and assign it to a variable
@@ -31,7 +31,7 @@ private:
 	void finalize();
 	void vocalsTogether();
 	void guessFiles();
-	
+
 	Song& m_song;
 	std::stringstream m_ss;
 	unsigned int m_linenum;
@@ -39,7 +39,7 @@ private:
 	bool m_relative;
 	double m_gap;
 	double m_bpm;
-	
+
 	bool txtCheck(std::string const& data) const;
 	void txtParseHeader();
 	void txtParse();
@@ -66,8 +66,8 @@ private:
 	enum CurrentSinger { P1 = 1, P2 = 2, BOTH = P1 | P2 } m_curSinger;
 	struct BPM {
 		BPM(double _begin, double _ts, double bpm): begin(_begin), step(0.25 * 60.0 / bpm), ts(_ts) {}
-		double begin; // Time in seconds
-		double step; // Seconds per quarter note
+		double begin; /// Time in seconds
+		double step; /// Seconds per quarter note
 		double ts;
 	};
 	typedef std::vector<BPM> bpms_t;
@@ -87,7 +87,7 @@ private:
 		if (!(bpm >= 1.0 && bpm < 1e12)) throw std::runtime_error("Invalid BPM value");
 		if (!m_bpms.empty() && m_bpms.back().ts >= ts) {
 			if (m_bpms.back().ts < ts) throw std::runtime_error("Invalid BPM timestamp");
-			m_bpms.pop_back(); // Some ITG songs contain repeated BPM definitions...
+			m_bpms.pop_back(); /// Some ITG songs contain repeated BPM definitions...
 		}
 		m_bpms.push_back(BPM(tsTime(ts), ts, bpm));
 	}

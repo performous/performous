@@ -1,6 +1,6 @@
 #pragma once
 
-// CMake uses config.cmake.hh to generate config.hh within the build folder.
+/// CMake uses config.cmake.hh to generate config.hh within the build folder.
 #ifndef PERFORMOUS_CONFIG_HH
 #define PERFORMOUS_CONFIG_HH
 
@@ -11,17 +11,17 @@
 
 #define SHARED_DATA_DIR "@SHARE_INSTALL@"
 
-// FFMPEG/libav libraries use changing include file names... Get them from CMake.
+/// FFMPEG/libav libraries use changing include file names... Get them from CMake.
 #define AVCODEC_INCLUDE <@AVCodec_INCLUDE@>
 #define AVFORMAT_INCLUDE <@AVFormat_INCLUDE@>
 #define SWSCALE_INCLUDE <@SWScale_INCLUDE@>
-//libav 0.9 fix
+///libav 0.9 fix
 #define AVRESAMPLE_INCLUDE <@AVResample_INCLUDE@>
 #define AVUTIL_INCLUDE <@AVUtil_INCLUDE@>
-#define AVUTIL_OPT_INCLUDE <@AVUtil_INCLUDE_DIRS@/libavutil/opt.h> //HACK to get AVOption class!
+#define AVUTIL_OPT_INCLUDE <@AVUtil_INCLUDE_DIRS@/libavutil/opt.h> ///HACK to get AVOption class!
 #define AVUTIL_MATH_INCLUDE <@AVUtil_INCLUDE_DIRS@/libavutil/mathematics.h>
 
-// libxml++ version
+/// libxml++ version
 #define LIBXMLPP_VERSION_2_6 @LibXML++_VERSION_2_6@
 #define LIBXMLPP_VERSION_3_0 @LibXML++_VERSION_3_0@
 

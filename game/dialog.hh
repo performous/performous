@@ -13,7 +13,7 @@ public:
 	Dialog(std::string const& text);
 	/// draws dialogue
 	void draw();
-	
+
 private:
 	std::string m_text;
 	Surface m_dialog;

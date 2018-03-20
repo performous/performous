@@ -19,10 +19,10 @@ public:
 	void reloadGL();
 	void manageEvent(input::NavEvent const& event);
 	void draw();
-	
+
 	/// draw analyzers
 	void draw_analyzers();
-	
+
 private:
 	Audio& m_audio;
 	std::vector<std::string> m_samples;

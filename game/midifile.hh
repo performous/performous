@@ -19,7 +19,7 @@ public:
 	 * @param time Time, absolute time in seconds. Tells when the event should happen.
 	 */
 	MidiEvent(int f, unsigned char e, double t): fret(f), event(e), time(t) {}
-	
+
 	int fret; ///< Tells the quitar fret where the event is linked.
 	unsigned char event; ///< MIDI event type
 	double time; ///< Time in seconds
@@ -35,7 +35,7 @@ class MidiStream;
 
 class MidiFileParser {
 public:
-	
+
 	/** Constructor
 	 *
 	 * Creates a MidiFileParser which contains	information of given midifile.
@@ -43,7 +43,7 @@ public:
 	 * @param name Name of midifile, which want to be read
 	 */
 	MidiFileParser(fs::path const& name);
-	
+
 	struct TempoChange {
 		uint32_t miditime;
 		uint32_t value;
@@ -92,7 +92,7 @@ public:
 	uint16_t format;
 	typedef std::vector<std::string> CommandEvents;
 	CommandEvents cmdevents;
-	
+
 	/** Ticks per beat == number of divisions per every quarter note **/
 	uint16_t division;
 	uint32_t ts_last;

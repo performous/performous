@@ -16,7 +16,6 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 
-
 class Audio;
 class Database;
 class Song;

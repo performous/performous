@@ -1,7 +1,7 @@
 #pragma once
 
 #include "animvalue.hh"
-#include "audio.hh" // for AUDIO_MAX_ANALYZERS
+#include "audio.hh" /// for AUDIO_MAX_ANALYZERS
 #include "configuration.hh"
 #include "menu.hh"
 #include "opengl_text.hh"
@@ -58,16 +58,16 @@ public:
 	void manageEvent(input::NavEvent const& event);
 	void prepare();
 	void draw();
-	
+
 	int selectedVocalTrack() const { return m_selectedVocal; }
 	bool singingDuet() const { return m_singingDuet; }
 	void setupVocals();
-	
+
 	void setSong (boost::shared_ptr<Song> song_)
 	{
 		m_song = song_;
 	}
-	
+
 private:
 	/**Activates Songs Screen or Players Screen.
 	 This depends on
@@ -106,7 +106,7 @@ private:
 	std::string m_selectedTrackLocalized;
 	ConfigItem m_vocalTracks[AUDIO_MAX_ANALYZERS];
 	ConfigItem m_duet;
-	size_t players() const { auto& analyzers = m_audio.analyzers(); return (analyzers.empty() ? 1 : analyzers.size()); } // Always have at least one player to display lyrics and prevent crashes.
+	size_t players() const { auto& analyzers = m_audio.analyzers(); return (analyzers.empty() ? 1 : analyzers.size()); } /// Always have at least one player to display lyrics and prevent crashes.
 	bool m_singingDuet;
 	int m_selectedVocal;
 	bool m_displayAutoPlay = false;

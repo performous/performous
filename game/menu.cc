@@ -3,7 +3,6 @@
 #include "surface.hh"
 #include "fs.hh"
 
-
 MenuOption::MenuOption(std::string const& nm, std::string const& comm, MenuImage img):
 type(), value(), newValue(), callback(), image(img), name(nm), comment(comm), namePtr(), commentPtr()
 {}
@@ -30,12 +29,11 @@ bool MenuOption::isActive() const {
 	return true;
 }
 
-
 Menu::Menu(): dimensions(), m_open(true) { clear(); }
 
 void Menu::add(MenuOption opt) {
 	root_options.push_back(opt);
-	clear(true); // Adding resets menu stack
+	clear(true); /// Adding resets menu stack
 }
 
 void Menu::move(int dir) {
@@ -64,7 +62,7 @@ void Menu::action(int dir) {
 		}
 		case MenuOption::SET_AND_CLOSE:
 			if (current().value) *(current().value) = current().newValue;
-			[[fallthrough]];  // Continuing to CLOSE_SUBMENU is intentional
+			[[fallthrough]];  /// Continuing to CLOSE_SUBMENU is intentional
 		case MenuOption::CLOSE_SUBMENU: {
 			closeSubmenu();
 			break;

@@ -60,7 +60,7 @@ void Database::addHiscore(boost::shared_ptr<Song> s) {
 	int score = scores.front().score;
 	std::string track = scores.front().track;
 	int songid = m_songs.lookup(s);
-	
+
 	m_hiscores.addHiscore(score, playerid, songid, track);
 	std::clog << "database/info: Added new hiscore " << score << " points on track " << track << " of songid " << songid << std::endl;
 }
@@ -69,7 +69,7 @@ bool Database::reachedHiscore(boost::shared_ptr<Song> s) const {
 	int score = scores.front().score;
 	std::string track = scores.front().track;
 	int songid = m_songs.lookup(s);
-	
+
 	return m_hiscores.reachedHiscore(score, songid, track);
 }
 
@@ -79,15 +79,15 @@ void Database::queryOverallHiscore(std::ostream & os, std::string const& track) 
 		os << i+1 << ".\t"
 		<< m_players.lookup(hi[i].playerid) << "\t"
 		<< m_songs.lookup(hi[i].songid) << "\t"
-		// << hi[i].track << "\t"
+		/// << hi[i].track << "\t"
 		<< hi[i].score << "\n";
 	}
 }
 
 void Database::queryPerSongHiscore(std::ostream & os, boost::shared_ptr<Song> s, std::string const& track) const {
 	int songid = m_songs.lookup(s);
-	if (songid == -1) return;  // Song not included in database (yet)
-	// Reorder hiscores by track / score
+	if (songid == -1) return;  /// Song not included in database (yet)
+	/// Reorder hiscores by track / score
 	std::map<std::string, std::multiset<HiscoreItem>> scoresByTrack;
 	for (HiscoreItem const& hi: m_hiscores.queryHiscore(-1, -1, songid, track)) scoresByTrack[hi.track].insert(hi);
 	for (auto const& hiv: scoresByTrack) {

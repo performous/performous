@@ -10,12 +10,12 @@
 #include "audio.hpp"
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/recursive_mutex.hpp>
-//#include <boost/thread/mutex.hpp>
+///#include <boost/thread/mutex.hpp>
 #include <algorithm>
 #include <memory>
 
 namespace da {
-	
+
 	template <typename T> class shared_reference_wrapper {
 	public:
 		typedef T type;
@@ -23,20 +23,19 @@ namespace da {
 		bool operator()(pcm_data data) { return get()(data); }
 		operator T&() const { return *m_ptr; }
 		T& get() const { return *m_ptr; }
-		//T* get_pointer() const { return m_ptr; }
+		///T* get_pointer() const { return m_ptr; }
 	private:
 		boost::shared_ptr<T> m_ptr;
 	};
-	
+
 	template <typename T> shared_reference_wrapper<T> shared_ref(T* ptr) {
 		return shared_reference_wrapper<T>(boost::shared_ptr<T>(ptr));
 	}
-	
+
 	template <typename T> shared_reference_wrapper<T> shared_ref(boost::shared_ptr<T> const& ptr) {
 		return shared_reference_wrapper<T>(ptr);
 	}
-	
-	
+
 	class chain: boost::noncopyable {
 	public:
 		typedef std::vector<callback_t> streams_t;
@@ -54,7 +53,7 @@ namespace da {
 		streams_t streams;
 	private:
 	};
-	
+
 	namespace {
 		bool voidOp(pcm_data const&) { return true; }
 		bool zero(pcm_data& data) {
@@ -62,7 +61,7 @@ namespace da {
 			return true;
 		}
 	}
-	
+
 	class accumulate: boost::noncopyable {
 	public:
 		typedef std::vector<callback_t> streams_t;
@@ -86,7 +85,7 @@ namespace da {
 		streams_t streams;
 	private:
 	};
-	
+
 	class buffer: boost::noncopyable {
 	public:
 		explicit buffer(std::size_t s): m_data(s) {}
@@ -95,7 +94,7 @@ namespace da {
 	private:
 		std::vector<sample_t> m_data;
 	};
-	
+
 	class stream: boost::noncopyable {
 	public:
 		stream(): m_pos() {}
@@ -113,7 +112,7 @@ namespace da {
 		boost::shared_ptr<buffer> m_buffer;
 		int64_t m_pos;
 	};
-	
+
 	class fadeinOp: boost::noncopyable {
 	public:
 		fadeinOp(double time = 1.0, int64_t pos = 0): m_pos(pos), m_time(time) {}
@@ -132,7 +131,7 @@ namespace da {
 		int64_t m_pos;
 		double m_time;
 	};
-	
+
 	class fadeoutOp: boost::noncopyable {
 	public:
 		fadeoutOp(callback_t cb, double time = 1.0, int64_t pos = 0): m_stream(cb), m_pos(pos), m_time(time) {}
@@ -152,7 +151,7 @@ namespace da {
 		int64_t m_pos;
 		double m_time;
 	};
-	
+
 	class volume {
 	public:
 		volume(sample_t level = 1.0f): m_level(level) {}
@@ -165,12 +164,12 @@ namespace da {
 	private:
 		sample_t m_level;
 	};
-	
+
 	class scoped_lock: public boost::recursive_mutex::scoped_lock {
 	public:
 		template <typename T> scoped_lock(T& obj): boost::recursive_mutex::scoped_lock(obj.m_mutex) {}
 	};
-	
+
 	class mutex_stream: boost::noncopyable {
 	public:
 		mutex_stream(callback_t const& stream): m_stream(stream) {}
@@ -188,9 +187,9 @@ namespace da {
 		mutable boost::recursive_mutex m_mutex;
 		friend class scoped_lock;
 	};
-	
+
 	typedef std::auto_ptr<scoped_lock> lock_holder;
-	
+
 	template <typename Key> class select {
 		typedef std::map<Key, callback_t> streams;
 	public:
@@ -212,13 +211,13 @@ namespace da {
 		Key m_key;
 		callback_t m_stream;
 	};
-	
+
 	class mixer {
 	public:
 		mixer(): m_mutex(boost::ref(m_select)) { init(); }
 		mixer(settings& s): m_mutex(boost::ref(m_select)) { init(); start(s); }
 		~mixer() {
-			// Make sure that all processing has stopped before exiting
+			/// Make sure that all processing has stopped before exiting
 			scoped_lock l(m_mutex);
 			m_mutex.clear();
 			m_playback.reset();
@@ -238,19 +237,19 @@ namespace da {
 		void fadein(callback_t const& cb, double time, double startpos = 0.0) {
 			scoped_lock l(m_mutex);
 			if (m_user.streams.size() <= 1) {
-				// The simple case
+				/// The simple case
 				m_user.add(cb);
 				m_user.add(shared_ref(new fadeinOp(time)));
 				return;
 			}
-			// Make a new chain that produces the same output as the old one
+			/// Make a new chain that produces the same output as the old one
 			boost::shared_ptr<chain> origch(new chain());
 			origch->streams.insert(origch->streams.end(), m_user.streams.begin() + 1, m_user.streams.end());
-			// Make a new chain for cb + fade
+			/// Make a new chain for cb + fade
 			boost::shared_ptr<chain> fadech(new chain());
 			fadech->add(cb);
 			fadech->add(shared_ref(new fadeinOp(time, startpos * m_settings.rate() * m_settings.channels())));
-			// Replace the output with accumulate of both chains
+			/// Replace the output with accumulate of both chains
 			clear();
 			boost::shared_ptr<accumulate> accu(new accumulate());
 			accu->add(shared_ref(origch));
@@ -260,10 +259,10 @@ namespace da {
 		void fadeout(double time, double startpos = 0.0) {
 			scoped_lock l(m_mutex);
 			if (m_user.streams.size() <= 1) return;
-			// Make a new chain that produces the same output as the old one
+			/// Make a new chain that produces the same output as the old one
 			boost::shared_ptr<chain> ch(new chain());
 			ch->streams.insert(ch->streams.end(), m_user.streams.begin() + 1, m_user.streams.end());
-			// Replace the output with our new stream (with fade)
+			/// Replace the output with our new stream (with fade)
 			clear();
 			add(shared_ref(new fadeoutOp(shared_ref(ch), time, startpos * m_settings.rate() * m_settings.channels())));
 		}

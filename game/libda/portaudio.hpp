@@ -30,11 +30,11 @@ namespace portaudio {
 		PaError m_code;
 		char const* m_func;
 	};
-	
+
 	namespace internal {
 		void inline check(PaError code, char const* func) { if (code != paNoError) throw Error(code, func); }
 	}
-	
+
 	struct DeviceInfo {
 		DeviceInfo(int id, std::string n = std::string(), int i = 0, int o = 0): name(n), flex(n), idx(id), in(i), out(o) {}
 		std::string desc() const {
@@ -70,8 +70,8 @@ namespace portaudio {
 				for (auto const& dev: { "front", "surround40", "surround41", "surround50", "surround51", "surround71", "iec958", "spdif", "dmix" }) {
 					if (name.find(dev) != std::string::npos) name.clear();
 				}
-				if (name.empty()) continue;  // No acceptable device found
-				// Verify that the name is unique (haven't seen duplicate names occur though)
+				if (name.empty()) continue;  /// No acceptable device found
+				/// Verify that the name is unique (haven't seen duplicate names occur though)
 				std::string n = name;
 				while (true) {
 					int num = 1;
@@ -85,19 +85,19 @@ namespace portaudio {
 				devices.push_back(DeviceInfo(i, name, info->maxInputChannels, info->maxOutputChannels));
 			}
 			for (auto& dev: devices) {
-				// Array of regex - replacement pairs
+				/// Array of regex - replacement pairs
 				static char const* const replacements[][2] = {
-					{ "\\(hw:\\d+,", "(hw:," },  // Remove ALSA device numbers
-					{ " \\(.*\\)", "" },  // Remove the parenthesis part entirely
+					{ "\\(hw:\\d+,", "(hw:," },  /// Remove ALSA device numbers
+					{ " \\(.*\\)", "" },  /// Remove the parenthesis part entirely
 				};
 				for (auto const& rep: replacements) {
 					std::string flex = boost::regex_replace(dev.flex, boost::regex(rep[0]), rep[1]);
-					if (flex == dev.flex) continue;  // Nothing changed
-					// Verify that flex doesn't find any wrong devices
+					if (flex == dev.flex) continue;  /// Nothing changed
+					/// Verify that flex doesn't find any wrong devices
 					bool fail = false;
 					try {
 						if (find(flex).idx != dev.idx) fail = true;
-					} catch (...) {}  // Failure to find anything is success
+					} catch (...) {}  /// Failure to find anything is success
 					if (!fail) dev.flex = flex;
 				}
 			}
@@ -109,9 +109,9 @@ namespace portaudio {
 			return oss.str();
 		}
 		DeviceInfo const& find(std::string const& name) {
-			// Try name search with full match
+			/// Try name search with full match
 			for (auto const& dev: devices) { if (dev.name == name) { return dev;  } }
-			// Try name search with partial/flexible match
+			/// Try name search with partial/flexible match
 			for (auto const& dev: devices) {
 				if (dev.name.find(name) != std::string::npos) { return dev; }
 				if (dev.flex.find(name) != std::string::npos) { return dev; }
@@ -120,7 +120,7 @@ namespace portaudio {
 		}
 		DeviceInfos devices;
 	};
-	
+
 	struct BackendInfo {
 		BackendInfo(int id, PaHostApiTypeId type, std::string n = std::string(), int n_dev = 0): idx(id), name(n), type(type), devices(n_dev) {}
 		int idx;
@@ -134,13 +134,13 @@ namespace portaudio {
 			return oss.str();
 		}
 	};
-	
+
 	typedef std::vector<BackendInfo> BackendInfos;
-	
+
 	struct AudioBackends {
 		static int count() { return Pa_GetHostApiCount(); }
 		AudioBackends () {
-			if (count() == 0) throw std::runtime_error("No suitable audio backends found."); // Check specifically for 0 because it returns a negative error code if Pa is not initialized.
+			if (count() == 0) throw std::runtime_error("No suitable audio backends found."); /// Check specifically for 0 because it returns a negative error code if Pa is not initialized.
 			for (unsigned i = 0, end = Pa_GetHostApiCount(); i != end; ++i) {
 				PaHostApiInfo const* info = Pa_GetHostApiInfo(i);
 				if (!info || info->deviceCount < 1) continue;
@@ -167,7 +167,7 @@ namespace portaudio {
 			}
 		};
 		BackendInfos backends;
-		
+
 		std::string dump() const {
 			std::ostringstream oss;
 			oss << "audio/info: PortAudio backends:" << std::endl;
@@ -182,16 +182,16 @@ namespace portaudio {
 			return std::list<std::string>(bends.begin(),bends.end());
 		}
 	};
-	
+
 	struct Init {
 		Init() { PORTAUDIO_CHECKED(Pa_Initialize, ()); }
 		~Init() { Pa_Terminate(); }
 	};
-	
+
 	struct Params {
 		PaStreamParameters params;
 		Params(PaStreamParameters const& init = PaStreamParameters()): params(init) {
-			// Some useful defaults so that things just work (channel count must be set by user anyway)
+			/// Some useful defaults so that things just work (channel count must be set by user anyway)
 			if (params.channelCount == 0) sampleFormat(paFloat32).suggestedLatency(0.05);
 		}
 		Params& channelCount(int val) { params.channelCount = val; return *this; }
@@ -201,12 +201,12 @@ namespace portaudio {
 		Params& hostApiSpecificStreamInfo(void* val) { params.hostApiSpecificStreamInfo = val; return *this; }
 		operator PaStreamParameters const*() const { return params.channelCount > 0 ? &params : nullptr; }
 	};
-	
+
 	template <typename Functor> int functorCallback(void const* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData) {
 		Functor* ptr = *reinterpret_cast<Functor**>(&userData);
 		return (*ptr)(input, output, frameCount, timeInfo, statusFlags);
 	}
-	
+
 	class Stream {
 		PaStream* m_handle;
 	public:
@@ -232,14 +232,14 @@ namespace portaudio {
 										   PaStreamFlags flags = paNoFlag
 										   ): Stream(input, output, sampleRate, framesPerBuffer, flags, functorCallback<Functor>, (void*)(intptr_t)&functor) {}
 		~Stream() {
-			// Give audio a little time to shutdown but then just quit
+			/// Give audio a little time to shutdown but then just quit
 			boost::thread audiokiller(Pa_CloseStream, m_handle);
 			if (!audiokiller.timed_join(boost::posix_time::milliseconds(5000))) {
 				std::cout << "PortAudio BUG: Pa_CloseStream hung for more than five seconds. Aborting." << std::endl;
-				std::abort();  // Crash. Calling exit() is prone to hang.
+				std::abort();  /// Crash. Calling exit() is prone to hang.
 			}
 		}
 		operator PaStream*() { return m_handle; }
 	};
-	
+
 }

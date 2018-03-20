@@ -7,7 +7,7 @@
 #include <unordered_map>
 
 namespace input {
-	
+
 	class Midi: public Hardware {
 	public:
 		Midi() {
@@ -15,11 +15,11 @@ namespace input {
 			for (int dev = 0; dev < Pm_CountDevices(); ++dev) {
 				try {
 					PmDeviceInfo const* info = Pm_GetDeviceInfo(dev);
-					if (!info->input) continue;  // Not an input device
-					if (info->opened) continue;  // Already opened
+					if (!info->input) continue;  /// Not an input device
+					if (info->opened) continue;  /// Already opened
 					std::string name = getName(dev);
 					if (!re.empty() && !regex_search(name, re)) continue;
-					// Now actually open the device
+					/// Now actually open the device
 					m_streams.emplace(dev, std::unique_ptr<pm::Input>(new pm::Input(dev)));
 					std::clog << "controller-midi/info: Opened MIDI device " << name << std::endl;
 				} catch (std::runtime_error& e) {
@@ -41,9 +41,9 @@ namespace input {
 				unsigned char evnt = ev.message & 0xF0;
 				unsigned char note = ev.message >> 8;
 				unsigned char vel  = ev.message >> 16;
-				unsigned chan = (ev.message & 0x0F) + 1;  // It is conventional to use one-based indexing
-				if (evnt == 0x80 /* NOTE OFF */) { evnt = 0x90; vel = 0; }  // Translate NOTE OFF into NOTE ON with zero-velocity
-				if (evnt != 0x90 /* NOTE ON */) continue;  // Ignore anything that isn't NOTE ON/OFF
+				unsigned chan = (ev.message & 0x0F) + 1;  /// It is conventional to use one-based indexing
+				if (evnt == 0x80 /* NOTE OFF */) { evnt = 0x90; vel = 0; }  /// Translate NOTE OFF into NOTE ON with zero-velocity
+				if (evnt != 0x90 /* NOTE ON */) continue;  /// Ignore anything that isn't NOTE ON/OFF
 				std::clog << "controller-midi/info: MIDI NOTE ON/OFF event: ch=" << unsigned(chan) << " note=" << unsigned(note) << " vel=" << unsigned(vel) << std::endl;
 				event.source = SourceId(SOURCETYPE_MIDI, it->first, chan);
 				event.hw = note;
@@ -56,7 +56,7 @@ namespace input {
 		pm::Initialize m_init;
 		std::unordered_map<unsigned, std::unique_ptr<pm::Input>> m_streams;
 	};
-	
+
 	Hardware::ptr constructMidi() { return Hardware::ptr(new Midi()); }
 	bool Hardware::midiEnabled() { return true; }
 }

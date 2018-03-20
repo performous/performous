@@ -66,7 +66,7 @@ public:
 	Screen* getScreen(std::string const& name);
 	/// Returns a reference to the window
 	Window& window() { return m_window; }
-	
+
 	/// Draw a loading progress indication
 	void loading(std::string const& message, float progress);
 	/// Internal rendering function for loading indicator
@@ -83,7 +83,7 @@ public:
 	bool isDialogOpen() { return !!m_dialog; }
 	/// Draw dialogs & flash messages, called automatically by drawScreen
 	void drawNotifications();
-	
+
 	/// Sets finished to true
 	void finished();
 	/// Returns finished state
@@ -94,13 +94,13 @@ public:
 	void drawLogo();
 	///global playlist access
 	PlayList& getCurrentPlayList() { return currentPlaylist; }
-	
+
 private:
 	Window& m_window;
-	
+
 public:
 	input::Controllers controllers;
-	
+
 private:
 	bool m_finished;
 	typedef boost::ptr_map<std::string, Screen> screenmap_t;
@@ -108,7 +108,7 @@ private:
 	Screen* newScreen;
 	Screen* currentScreen;
 	PlayList currentPlaylist;
-	// Flash messages members
+	/// Flash messages members
 	float m_timeToFadeIn;
 	float m_timeToFadeOut;
 	float m_timeToShow;
@@ -119,10 +119,10 @@ private:
 	Surface m_logo;
 	AnimValue m_logoAnim;
 	AnimValue m_dialogTimeOut;
-	// Dialog members
+	/// Dialog members
 	boost::scoped_ptr<Dialog> m_dialog;
 };
 
-// Declaration for the singleton pointer defined in game.cc
+/// Declaration for the singleton pointer defined in game.cc
 template<> Game* Singleton<Game>::ms_Singleton;
 

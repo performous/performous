@@ -6,8 +6,8 @@
 
 #include "surface.hh"
 
-// TODO: test & fix faces that doesn't have texcoords in the file
-// TODO: group handling for loader
+/// TODO: test & fix faces that doesn't have texcoords in the file
+/// TODO: group handling for loader
 
 namespace {
 	/// Returns a word (delimited by delim) in a string st at position pos (1-based)
@@ -42,27 +42,27 @@ void Object3d::loadWavefrontObj(fs::path const& filepath, float scale) {
 		std::istringstream srow(row);
 		float x,y,z;
 		std::string tempst;
-		if (row.substr(0,2) == "v ") {  // Vertices
+		if (row.substr(0,2) == "v ") {  /// Vertices
 			srow >> tempst >> x >> y >> z;
 			vertices.push_back(glmath::vec3(x*scale, y*scale, z*scale));
-		} else if (row.substr(0,2) == "vt") {  // Texture Coordinates
+		} else if (row.substr(0,2) == "vt") {  /// Texture Coordinates
 			srow >> tempst >> x >> y;
 			texcoords.push_back(glmath::vec2(x, y));
-		} else if (row.substr(0,2) == "vn") {  // Normals
+		} else if (row.substr(0,2) == "vn") {  /// Normals
 			srow >> tempst >> x >> y >> z;
 			double sum = std::abs(x)+std::abs(y)+std::abs(z);
 			if (sum == 0) throw std::runtime_error("Invalid normal in "+filepath.string()+":"+std::to_string(linenumber));
-			x /= sum; y /= sum; z /= sum; // Normalize components
+			x /= sum; y /= sum; z /= sum; /// Normalize components
 			normals.push_back(glmath::vec3(x, y, z));
-		} else if (row.substr(0,2) == "f ") {  // Faces
+		} else if (row.substr(0,2) == "f ") {  /// Faces
 			Face f;
-			srow >> tempst; // Eat away prefix
-			// Parse face point's coordinate references
+			srow >> tempst; /// Eat away prefix
+			/// Parse face point's coordinate references
 			for (std::string fpoint; srow >> fpoint; ) {
 				for (size_t i = 1; i <= 3; ++i) {
 					std::string st_id(getWord(fpoint,i,'/'));
 					if (!st_id.empty()) {
-						// Vertex indices are 1-based in the file
+						/// Vertex indices are 1-based in the file
 						int v_id = std::stoi(st_id) - 1;
 						switch (i) {
 							case 1: f.vertices.push_back(v_id); break;
@@ -74,7 +74,7 @@ void Object3d::loadWavefrontObj(fs::path const& filepath, float scale) {
 			}
 			if (!f.vertices.empty() && f.vertices.size() != 3)
 				throw std::runtime_error("Only triangle faces allowed in "+filepath.string()+":"+std::to_string(linenumber));
-			// Face must have equal number of v, vt, vn or none of a kind
+			/// Face must have equal number of v, vt, vn or none of a kind
 			if (!f.vertices.empty()
 				&& (f.texcoords.empty() || (f.texcoords.size() == f.vertices.size()))
 				&& (f.normals.empty()   || (f.normals.size() == f.vertices.size()))) {
@@ -84,7 +84,7 @@ void Object3d::loadWavefrontObj(fs::path const& filepath, float scale) {
 			}
 		}
 	}
-	// Construct a vertex array
+	/// Construct a vertex array
 	for (std::vector<Face>::const_iterator i = m_faces.begin(); i != m_faces.end(); ++i) {
 		bool hasNormals = !i->normals.empty();
 		bool hasTexCoords = !i->texcoords.empty();
@@ -94,7 +94,7 @@ void Object3d::loadWavefrontObj(fs::path const& filepath, float scale) {
 			m_va.vertex(vertices[i->vertices[j]]);
 		}
 	}
-	// Models loaded from disk are assumed static, so optimized with a VBO
+	/// Models loaded from disk are assumed static, so optimized with a VBO
 	m_va.generateVBO();
 }
 
@@ -115,6 +115,6 @@ void Object3d::draw() {
 
 void Object3d::draw(float x, float y, float z, float s) {
 	using namespace glmath;
-	Transform trans(translate(vec3(x, y, z)) * scale(s));  // Move to position and scale
+	Transform trans(translate(vec3(x, y, z)) * scale(s));  /// Move to position and scale
 	draw();
 }

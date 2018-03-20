@@ -29,12 +29,12 @@ public:
 	void manageEvent(SDL_Event event);
 	void manageEvent(input::NavEvent const& event);
 	void draw();
-	
+
 	void setSong (boost::shared_ptr<Song> song_)
 	{
 		m_song = song_;
 	}
-	
+
 private:
 	Audio& m_audio;
 	Database& m_database;

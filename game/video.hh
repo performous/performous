@@ -16,7 +16,7 @@ public:
 	Dimensions& dimensions() { return m_surface.dimensions; }
 	/// returns Dimensions of video clip
 	Dimensions const& dimensions() const { return m_surface.dimensions; }
-	
+
 private:
 	FFmpeg m_mpeg;
 	double m_videoGap;

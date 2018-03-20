@@ -84,7 +84,7 @@ public:
 	float w() const { return m_w; }
 	/// returns height
 	float h() const { return m_h; }
-	
+
 private:
 	float screenY() const;
 	float m_ar;
@@ -142,26 +142,26 @@ public:
 	/// constructor
 	template <GLenum Type> UseTexture(OpenGLTexture<Type> const& tex):
 	m_shader(/* hack of the year */ (glutil::GLErrorChecker("UseTexture"), glActiveTexture(GL_TEXTURE0), glBindTexture(Type, tex.id()), tex.shader())) {}
-	
+
 private:
 	UseShader m_shader;
 };
 
 template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex) const {
 	glutil::VertexArray va;
-	
+
 	UseTexture texture(*this);
-	
-	// The texture wraps over at the edges (repeat)
+
+	/// The texture wraps over at the edges (repeat)
 	const bool repeating = tex.outOfBounds();
 	glTexParameterf(type(), GL_TEXTURE_WRAP_S, repeating ? GL_REPEAT : GL_CLAMP);
 	glTexParameterf(type(), GL_TEXTURE_WRAP_T, repeating ? GL_REPEAT : GL_CLAMP);
-	
+
 	va.texCoord(tex.x1, tex.y1).vertex(dim.x1(), dim.y1());
 	va.texCoord(tex.x2, tex.y1).vertex(dim.x2(), dim.y1());
 	va.texCoord(tex.x1, tex.y2).vertex(dim.x1(), dim.y2());
 	va.texCoord(tex.x2, tex.y2).vertex(dim.x2(), dim.y2());
-	
+
 	va.draw();
 }
 
@@ -206,7 +206,7 @@ private:
 	OpenGLTexture<GL_TEXTURE_2D> m_texture;
 };
 
-typedef Surface Texture;  // Backwards compatibility
+typedef Surface Texture;  /// Backwards compatibility
 
 /// A RAII wrapper for surface loading worker thread. There must be exactly one (global) instance whenever any Surfaces exist.
 class SurfaceLoader {

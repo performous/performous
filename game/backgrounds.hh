@@ -1,8 +1,8 @@
 #pragma once
 
-//#include "animvalue.hh"
+///#include "animvalue.hh"
 #include "fs.hh"
-//#include "song.hh"
+///#include "song.hh"
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/mutex.hpp>
@@ -18,7 +18,7 @@ public:
 		reload();
 	}
 	~Backgrounds() {
-		m_loading = false; // Terminate loading if currently in progress
+		m_loading = false; /// Terminate loading if currently in progress
 		m_thread->join();
 	}
 	/// reloads backgrounds list
@@ -31,7 +31,7 @@ public:
 	int empty() const { return m_bgs.empty(); };
 	/// returns random background
 	std::string getRandom();
-	
+
 private:
 	typedef std::vector<std::string> BGVector;
 	BGVector m_bgs;

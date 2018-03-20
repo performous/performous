@@ -26,27 +26,27 @@ typedef std::map<int, Durations> NoteMap;
 /// Sort by instrument track name
 struct CompInstrumentTrack {
 	bool operator()(std::string const& l, std::string const& r) const {
-		// TODO: Sort other guitar tracks (coop / rhythm) properly
+		/// TODO: Sort other guitar tracks (coop / rhythm) properly
 		return l > r;
 	}
 };
 
 struct InstrumentTrack {
-	// TODO: name should not be needed here (contained into the map)
+	/// TODO: name should not be needed here (contained into the map)
 	InstrumentTrack(std::string n): name(n) {}
 	std::string name;
 	NoteMap nm;
 };
 
-// keep these ones
+/// keep these ones
 typedef std::map<std::string, InstrumentTrack, CompInstrumentTrack> InstrumentTracks;
-typedef std::map<std::string, InstrumentTrack const*, CompInstrumentTrack> InstrumentTracksConstPtr; // this one really needed ? can't we save only the map key for comparison ?
+typedef std::map<std::string, InstrumentTrack const*, CompInstrumentTrack> InstrumentTracksConstPtr; /// this one really needed ? can't we save only the map key for comparison ?
 
 static inline bool isTrackInside(InstrumentTracks const& track_map, std::string const& name) {
 	return track_map.find(name) != track_map.end();
 }
 
-// TODO: Make Note use Duration
+/// TODO: Make Note use Duration
 
 /// note read from songfile
 struct Note {
@@ -54,7 +54,7 @@ struct Note {
 	double begin, ///< begin time
 	end; ///< end time
 	double phase; /// Position within a measure, [0, 1)
-	// FIXME: Remove gameplay variables from here (Note should be immutable).
+	/// FIXME: Remove gameplay variables from here (Note should be immutable).
 	/// power of note (how well it is being hit right now)
 	mutable double power;
 	/// which players sung well
@@ -117,9 +117,9 @@ typedef std::map<std::string, VocalTrack> VocalTracks;
 
 struct DanceTrack {
 	DanceTrack(std::string& description, Notes& notes);
-	//track description
+	///track description
 	std::string description;
-	//container for the actual note data
+	///container for the actual note data
 	Notes notes;
 };
 

@@ -41,6 +41,6 @@ private:
 	Notes::const_iterator m_songit;
 	double m_time;
 	double m_max, m_min, m_noteUnit, m_baseY, m_baseX;
-	
+
 };
 

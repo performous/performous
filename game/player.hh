@@ -64,12 +64,12 @@ struct Player {
 
 /** Static Information of a player, not
  dependent from current song.
- 
+
  Used for Players Management.
  */
 struct PlayerItem {
 	int id; ///< unique identifier for this PlayerItem, Link to hiscore
-	
+
 	std::string name; ///< name displayed and used for searching the player
 	fs::path picture; ///< the filename which was passed from xml (and is written back)
 	fs::path path; ///< a full path to a picture shown, generated from picture above
@@ -77,14 +77,14 @@ struct PlayerItem {
 	 std::string displayedName; /// artist name, short name, nick (can be changed)
 	 std::map<std::string, int> scores; /// map between a Song and the highest score the Player achieved
 	 */
-	
+
 	/**For insertion in set.
 	 Provides ordering and ensures id is unique.*/
 	bool operator< (PlayerItem const& pi) const
 	{
 		return id < pi.id;
 	}
-	
+
 	/**Checks if a player has the same name.
 	 Used to find a PlayerItem with the same name.*/
 	bool operator== (PlayerItem const& pi) const
