@@ -15,10 +15,10 @@
 
 /// Represents popup messages
 class Popup {
-  public:
+public:
 	/// Constructor
 	Popup(std::string msg, Color c, double speed, SvgTxtThemeSimple* popupText, std::string info = "", SvgTxtTheme* infoText = NULL):
-	  m_msg(msg), m_color(c), m_anim(AnimValue(0.0, speed)), m_popupText(popupText), m_info(info), m_infoText(infoText)
+	m_msg(msg), m_color(c), m_anim(AnimValue(0.0, speed)), m_popupText(popupText), m_info(info), m_infoText(infoText)
 	{
 		m_anim.setTarget(1.0, false);
 	}
@@ -44,7 +44,7 @@ class Popup {
 		if (anim > 0.999) m_anim.setTarget(0.0, true);
 		return true;
 	}
-  private:
+private:
 	std::string m_msg;  /// Popup text
 	Color m_color;  /// Color
 	AnimValue m_anim;  /// Animation timer
@@ -53,8 +53,7 @@ class Popup {
 	SvgTxtTheme* m_infoText;  /// Font for the additional text
 };
 
-
-const unsigned max_panels = 10; // Maximum number of arrow lines / guitar frets
+const unsigned max_panels = 10; /// Maximum number of arrow lines / guitar frets
 
 class Audio;
 class Song;
@@ -67,7 +66,7 @@ public:
 	/// Virtual destructor
 	virtual ~InstrumentGraph();
 
-	// Interface functions
+	/// Interface functions
 	virtual void draw(double time) = 0;
 	virtual void engine() = 0;
 	virtual void process(input::Event const&) {}
@@ -77,17 +76,17 @@ public:
 	virtual void changeTrack(int dir = 1) = 0;
 	virtual void changeDifficulty(int dir = 1) = 0;
 
-	// General shared functions
+	/// General shared functions
 	bool dead() const;
 	void setupPauseMenu();
 	void doUpdates();
 	void drawMenu();
-	void toggleMenu(int forcestate = -1); // 0 = close, 1 = open, -1 = auto/toggle
+	void toggleMenu(int forcestate = -1); /// 0 = close, 1 = open, -1 = auto/toggle
 	void togglePause(int);
 	void quit(int) { Game::getSingletonPtr()->activateScreen("Songs"); }
 	void unjoin();
 
-	// General getters
+	/// General getters
 	bool joining(double time) const { return time < m_jointime; }
 	bool ready() const { return m_ready; };
 	bool menuOpen() const { return m_menu.isOpen(); }
@@ -99,8 +98,8 @@ public:
 	virtual double getWhammy() const { return 0; }
 	bool isKeyboard() const { return m_dev->source.isKeyboard(); }
 
-  protected:
-	// Core stuff
+protected:
+	/// Core stuff
 	Audio& m_audio;
 	Song const& m_song;
 	std::size_t m_stream; /// audio stream number
@@ -110,7 +109,7 @@ public:
 		double time;
 		AnimValue glow;
 		AnimValue whammy;
-		int type; // 0 = miss (pick), 1 = tap, 2 = pick
+		int type; /// 0 = miss (pick), 1 = tap, 2 = pick
 		int fret;
 		Duration const* dur;
 		double holdTime;
@@ -122,14 +121,14 @@ public:
 	Popups m_popups;
 	Menu m_menu;
 
-	// Shared functions for derived classes
+	/// Shared functions for derived classes
 	void drawPopups();
 	void handleCountdown(double time, double beginTime);
 
-	// Functions not really shared, but needed here
+	/// Functions not really shared, but needed here
 	Color const& color(unsigned fret) const;
 
-	// Media
+	/// Media
 	Surface m_button;
 	Surface m_arrow_up;
 	Surface m_arrow_down;
@@ -139,7 +138,7 @@ public:
 	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
 	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
 
-	// Dynamic stuff for join menu
+	/// Dynamic stuff for join menu
 	ConfigItem m_selectedTrack; /// menu modifies this to select track
 	ConfigItem m_selectedDifficulty; /// menu modifies this to select difficulty
 	ConfigItem m_rejoin; /// menu sets this if we want to re-join
@@ -148,7 +147,7 @@ public:
 	std::string m_difficultyOpt;
 	std::string m_leftyOpt;
 
-	// Misc counters etc.
+	/// Misc counters etc.
 	unsigned m_pads; /// how many panels the current gaming mode uses
 	bool m_pressed[max_panels]; /// is certain panel pressed currently
 	AnimValue m_pressed_anim[max_panels]; /// animation for panel pressing

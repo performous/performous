@@ -25,7 +25,7 @@ unsigned MusicalScale::getNoteId() const {
 	return round(m_note);
 }
 
-// NOTE: Only C major scale is currently implemented.
+/// NOTE: Only C major scale is currently implemented.
 
 static const char* const noteNames[12] = {"C ","C#","D ","D#","E ","F ","F#","G ","G#","A ","A#","B "};
 static const int noteLines[12] = { 0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6 };
@@ -42,6 +42,6 @@ int MusicalScale::getNoteLine() const {
 }
 
 bool MusicalScale::isSharp() const {
-	return noteNames[getNum()][1] == '#';  // Uses the second character of noteNames!
+	return noteNames[getNum()][1] == '#';  /// Uses the second character of noteNames!
 }
 

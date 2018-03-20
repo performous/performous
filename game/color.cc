@@ -33,10 +33,10 @@ namespace {
 			m["black"] = Color("#000000");
 			m["gray"] = Color("#808080");
 			m["silver"] = Color("#C0C0C0");
-			}
+		}
 	} colors;
 
-	// Convert sRGB color component into linear as per OpenGL specs
+	/// Convert sRGB color component into linear as per OpenGL specs
 	double lin(double sRGB) {
 		if (sRGB <= 0.04045) return sRGB / 12.92;
 		return std::pow((sRGB + 0.055)/1.055, 2.4);

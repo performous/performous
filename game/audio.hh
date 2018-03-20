@@ -19,7 +19,7 @@ const unsigned AUDIO_MAX_ANALYZERS = 11;
 struct Output;
 
 struct Device {
-	// Init
+	/// Init
 	const unsigned int in, out;
 	const double rate;
 	const unsigned int dev;

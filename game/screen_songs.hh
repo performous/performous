@@ -4,14 +4,13 @@
 #include "cachemap.hh"
 #include "controllers.hh"
 #include "screen.hh"
-#include "song.hh" // for Music class
+#include "song.hh" /// for Music class
 #include "textinput.hh"
 #include "video.hh"
 #include "playlist.hh"
 #include "menu.hh"
 
 #include <boost/scoped_ptr.hpp>
-
 
 class Audio;
 class Database;

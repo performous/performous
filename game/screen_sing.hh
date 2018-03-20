@@ -1,7 +1,7 @@
 #pragma once
 
 #include "animvalue.hh"
-#include "audio.hh" // for AUDIO_MAX_ANALYZERS
+#include "audio.hh" /// for AUDIO_MAX_ANALYZERS
 #include "configuration.hh"
 #include "menu.hh"
 #include "opengl_text.hh"
@@ -30,13 +30,13 @@ typedef boost::ptr_vector<InstrumentGraph> Instruments;
 
 /// shows score at end of song
 class ScoreWindow {
-  public:
+public:
 	/// constructor
 	ScoreWindow(Instruments& instruments, Database& database);
 	/// draws ScoreWindow
 	void draw();
 	bool empty();
-  private:
+private:
 	Database& m_database;
 	AnimValue m_pos;
 	Surface m_bg;
@@ -48,7 +48,7 @@ class ScoreWindow {
 
 /// class for actual singing screen
 class ScreenSing: public Screen {
-  public:
+public:
 	/// constructor
 	ScreenSing(std::string const& name, Audio& audio, Database& database, Backgrounds& bgs);
 	void enter();
@@ -68,13 +68,13 @@ class ScreenSing: public Screen {
 		m_song = song_;
 	}
 
-  private:
+private:
 	/**Activates Songs Screen or Players Screen.
-	  This depends on
-	  - the configuration (is Hiscore enabled)
-	  - did a player reach a new hiscore
-	  - is the hiscore file writable
-	  */
+	 This depends on
+	 - the configuration (is Hiscore enabled)
+	 - did a player reach a new hiscore
+	 - is the hiscore file writable
+	 */
 	void activateNextScreen();
 	void instrumentLayout(double time);
 	void createPauseMenu();
@@ -106,7 +106,7 @@ class ScreenSing: public Screen {
 	std::string m_selectedTrackLocalized;
 	ConfigItem m_vocalTracks[AUDIO_MAX_ANALYZERS];
 	ConfigItem m_duet;
-	size_t players() const { auto& analyzers = m_audio.analyzers(); return (analyzers.empty() ? 1 : analyzers.size()); } // Always have at least one player to display lyrics and prevent crashes.
+	size_t players() const { auto& analyzers = m_audio.analyzers(); return (analyzers.empty() ? 1 : analyzers.size()); } /// Always have at least one player to display lyrics and prevent crashes.
 	bool m_singingDuet;
 	int m_selectedVocal;
 	bool m_displayAutoPlay = false;

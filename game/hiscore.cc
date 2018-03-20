@@ -8,16 +8,16 @@
 
 bool Hiscore::reachedHiscore(unsigned score, unsigned songid, std::string const& track) const {
 	if (score > 10000) throw std::logic_error("Invalid score value");
-	if (score < 2000) return false; // come on, did you even try to sing?
+	if (score < 2000) return false; /// come on, did you even try to sing?
 
 	unsigned position = 0;
 	for (auto const& elem: m_hiscore) {
 		if (elem.songid != songid) continue;
 		if (elem.track != track) continue;
-		if (score > elem.score) return true; // seems like you are in top 3!
-		if (++position == 3) return false; // not in top 3 -> leave
+		if (score > elem.score) return true; /// seems like you are in top 3!
+		if (++position == 3) return false; /// not in top 3 -> leave
 	}
-	return true; // nothing found for that song -> true
+	return true; /// nothing found for that song -> true
 }
 
 void Hiscore::addHiscore(unsigned score, unsigned playerid, unsigned songid, std::string const& track) {

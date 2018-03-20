@@ -4,7 +4,7 @@
 #include <boost/thread/xtime.hpp>
 #include <cmath>
 
-// Boost WTF time format, directly from C...
+/// Boost WTF time format, directly from C...
 static inline boost::xtime& operator+=(boost::xtime& time, double seconds) {
 	double nsec = 1e9 * (time.sec + seconds) + time.nsec;
 	time.sec = boost::xtime::xtime_sec_t(nsec / 1e9);

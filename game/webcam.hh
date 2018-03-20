@@ -8,7 +8,7 @@
 #include "surface.hh"
 
 namespace cv {
-	// Forward declarations
+	/// Forward declarations
 	class VideoCapture;
 	class VideoWriter;
 }
@@ -20,7 +20,7 @@ struct CamFrame {
 };
 
 class Webcam {
-  public:
+public:
 	/// cam_id -1 means pick any device
 	Webcam(int cam_id = -1);
 
@@ -39,7 +39,7 @@ class Webcam {
 	Dimensions& dimensions() { return m_surface.dimensions; }
 	Dimensions const& dimensions() const { return m_surface.dimensions; }
 
-  private:
+private:
 	boost::scoped_ptr<boost::thread> m_thread;
 	mutable boost::mutex m_mutex;
 	boost::scoped_ptr<cv::VideoCapture> m_capture;
@@ -50,12 +50,12 @@ class Webcam {
 	volatile bool m_running;
 	volatile bool m_quit;
 
-  public:
+public:
 	static bool enabled() {
-		#ifdef USE_OPENCV
+#ifdef USE_OPENCV
 		return true;
-		#else
+#else
 		return false;
-		#endif
+#endif
 	}
 };

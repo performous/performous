@@ -10,7 +10,7 @@
 class PlayList
 {
 public:
-    //needs function that returns the song properties in a list for display on screen
+	///needs function that returns the song properties in a list for display on screen
 
 	typedef std::vector< boost::shared_ptr<Song> > SongList;
 

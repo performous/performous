@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "color.hh"
 #include "glmath.hh"
 #include <epoxy/gl.h>
@@ -10,27 +9,27 @@
 
 namespace glutil {
 
-	// Note: if you reorder or otherwise change the contents of this, VertexArray::Draw() must be modified accordingly
+	/// Note: if you reorder or otherwise change the contents of this, VertexArray::Draw() must be modified accordingly
 	struct VertexInfo {
 		glmath::vec3 position;
 		glmath::vec2 texCoord;
 		glmath::vec3 normal;
 		glmath::vec4 color;
 		VertexInfo():
-		  position(0.0, 0.0, 0.0),
-		  texCoord(0.0, 0.0),
-		  normal(0.0, 0.0, 0.0),
-		  color(1.0, 1.0, 1.0, 1.0)
+		position(0.0, 0.0, 0.0),
+		texCoord(0.0, 0.0),
+		normal(0.0, 0.0, 0.0),
+		color(1.0, 1.0, 1.0, 1.0)
 		{}
 	};
 
 	/// Handy vertex array capable of drawing itself
 	class VertexArray {
-	  private:
+	private:
 		std::vector<VertexInfo> m_vertices;
 		VertexInfo m_vert;
 		GLuint m_vbo = 0;
-	  public:
+	public:
 		VertexArray() {}
 
 		~VertexArray() { clear(); }
@@ -129,5 +128,4 @@ namespace glutil {
 		}
 	};
 }
-
 

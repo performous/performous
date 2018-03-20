@@ -15,7 +15,7 @@
 
 /// Abstract Class for screens
 class Screen {
-  public:
+public:
 	/// counstructor
 	Screen(std::string const& name): m_name(name) {}
 	virtual ~Screen() {}
@@ -35,7 +35,7 @@ class Screen {
 	virtual void reloadGL() { exit(); enter(); }
 	/// returns screen name
 	std::string getName() const { return m_name; }
-  private:
+private:
 	std::string m_name;
 };
 
@@ -44,10 +44,10 @@ class Screen {
  * @see Singleton
  */
 class Game: public Singleton <Game> {
-  public:
+public:
 	/// constructor
-    Game(Window& window);
-    ~Game();
+	Game(Window& window);
+	~Game();
 	/// Adds a screen to the manager
 	void addScreen(Screen* s) { std::string tmp = s->getName(); screens.insert(tmp, s); }
 	/// Switches active screen
@@ -108,7 +108,7 @@ private:
 	Screen* newScreen;
 	Screen* currentScreen;
 	PlayList currentPlaylist;
-	// Flash messages members
+	/// Flash messages members
 	float m_timeToFadeIn;
 	float m_timeToFadeOut;
 	float m_timeToShow;
@@ -119,10 +119,10 @@ private:
 	Surface m_logo;
 	AnimValue m_logoAnim;
 	AnimValue m_dialogTimeOut;
-	// Dialog members
+	/// Dialog members
 	boost::scoped_ptr<Dialog> m_dialog;
 };
 
-// Declaration for the singleton pointer defined in game.cc
+/// Declaration for the singleton pointer defined in game.cc
 template<> Game* Singleton<Game>::ms_Singleton;
 

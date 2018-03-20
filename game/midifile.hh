@@ -12,12 +12,12 @@ using std::uint64_t;
 #if 0
 
 class MidiEvent {
-  public:
+public:
 	/** Constructs new MidiEvent
-	* @param fret Fret(1,2,3,4,5) in which the event is connected.
-	* @param evt Tells the type of midievent Noteon or Noteoff.
-	* @param time Time, absolute time in seconds. Tells when the event should happen.
-	*/
+	 * @param fret Fret(1,2,3,4,5) in which the event is connected.
+	 * @param evt Tells the type of midievent Noteon or Noteoff.
+	 * @param time Time, absolute time in seconds. Tells when the event should happen.
+	 */
 	MidiEvent(int f, unsigned char e, double t): fret(f), event(e), time(t) {}
 
 	int fret; ///< Tells the quitar fret where the event is linked.

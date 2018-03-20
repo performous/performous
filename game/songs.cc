@@ -1,4 +1,4 @@
-﻿#include "songs.hh"
+#include "songs.hh"
 
 #include "configuration.hh"
 #include "fs.hh"
@@ -22,12 +22,12 @@
 
 Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), math_cover(), m_database(database), m_type(), m_order(config["songs/sort-order"].i()), m_dirty(false), m_loading(false) {
 	if (U_FAILURE(UnicodeUtil::m_icuError)) std::clog << "songs/error: Error creating Unicode collator: " << u_errorName(UnicodeUtil::m_icuError) << std::endl;
-	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
+	m_updateTimer.setTarget(getInf()); /// Using this as a simple timer counting seconds
 	reload();
 }
 
 Songs::~Songs() {
-	m_loading = false; // Terminate song loading if currently in progress
+	m_loading = false; /// Terminate song loading if currently in progress
 	m_thread->join();
 }
 
@@ -37,7 +37,7 @@ void Songs::reload() {
 		doneLoading = false;
 		displayedAlert = false;
 	}
-	// Run loading thread
+	/// Run loading thread
 	m_loading = true;
 	m_thread.reset(new boost::thread(boost::bind(&Songs::reload_internal, boost::ref(*this))));
 }
@@ -50,7 +50,7 @@ void Songs::reload_internal() {
 	}
 	Profiler prof("songloader");
 	Paths paths = getPathsConfig("paths/songs");
-	for (auto it = paths.begin(); m_loading && it != paths.end(); ++it) { //loop through stored directories from config
+	for (auto it = paths.begin(); m_loading && it != paths.end(); ++it) { ///loop through stored directories from config
 		try {
 			if (!fs::is_directory(*it)) { std::clog << "songs/info: >>> Not scanning: " << *it << " (no such directory)\n"; continue; }
 			std::clog << "songs/info: >>> Scanning " << *it << std::endl;
@@ -63,7 +63,7 @@ void Songs::reload_internal() {
 		}
 	}
 	prof("total");
-	if (m_loading) dumpSongs_internal(); // Dump the songlist to file (if requested)
+	if (m_loading) dumpSongs_internal(); /// Dump the songlist to file (if requested)
 	std::clog << std::flush;
 	m_loading = false;
 	std::clog << "songs/notice: Done Loading. Loaded " << m_songs.size() << " Songs." << std::endl;
@@ -74,29 +74,29 @@ void Songs::reload_internal(fs::path const& parent) {
 	if (std::distance(parent.begin(), parent.end()) > 20) { std::clog << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)\n"; return; }
 	try {
 		boost::regex expression(R"((\.txt|^song\.ini|^notes\.xml|\.sm)$)", boost::regex_constants::icase);
-		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) { //loop through files
+		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) { ///loop through files
 			fs::path p = dirIt->path();
-			if (fs::is_directory(p)) { reload_internal(p); continue; } //if the file is a folder redo this function with this folder as path
-			if (!regex_search(p.filename().string(), expression)) continue; //if the folder does not contain any of the requested files, ignore it
-			try { //found song file, make a new song with it.
+			if (fs::is_directory(p)) { reload_internal(p); continue; } ///if the file is a folder redo this function with this folder as path
+			if (!regex_search(p.filename().string(), expression)) continue; ///if the folder does not contain any of the requested files, ignore it
+			try { ///found song file, make a new song with it.
 				boost::shared_ptr<Song>s(new Song(p.parent_path(), p));
-				s->randomIdx = rand(); //give it a random identifier
+				s->randomIdx = rand(); ///give it a random identifier
 				boost::mutex::scoped_lock l(m_mutex);
 				int AdditionalFileIndex = -1;
 				for(unsigned int i = 0; i< m_songs.size(); i++) {
 					if(s->filename.extension() != m_songs[i]->filename.extension() && s->filename.stem() == m_songs[i]->filename.stem() &&
-							s->title == m_songs[i]->title && s->artist == m_songs[i]->artist) {
+					   s->title == m_songs[i]->title && s->artist == m_songs[i]->artist) {
 						std::clog << "songs/info: >>> Found additional song file: " << s->filename << " for: " << m_songs[i]->filename << std::endl;
 						AdditionalFileIndex = i;
 					}
 				}
-				if(AdditionalFileIndex > 0) { //TODO: add it to existing song
+				if(AdditionalFileIndex > 0) { ///TODO: add it to existing song
 					std::clog << "songs/info: >>> not yet implemented " << std::endl;
 					s->getDurationSeconds();
-					m_songs.push_back(s); // will make it appear double!!
+					m_songs.push_back(s); /// will make it appear double!!
 				} else {
 					s->getDurationSeconds();
-					m_songs.push_back(s); //put it in the database
+					m_songs.push_back(s); ///put it in the database
 				}
 				m_dirty = true;
 			} catch (SongParserException& e) {
@@ -108,7 +108,7 @@ void Songs::reload_internal(fs::path const& parent) {
 	}
 }
 
-// Make std::find work with shared_ptrs and regular pointers
+/// Make std::find work with shared_ptrs and regular pointers
 static bool operator==(boost::shared_ptr<Song> const& a, Song const* b) { return a.get() == b; }
 
 /// Store currently selected song on construction and restore the selection on destruction
@@ -117,7 +117,7 @@ static bool operator==(boost::shared_ptr<Song> const& a, Song const* b) { return
 class Songs::RestoreSel {
 	Songs& m_s;
 	Song const* m_sel;
-  public:
+public:
 	/// constructor
 	RestoreSel(Songs& s): m_s(s), m_sel(s.empty() ? nullptr : &s.current()) {}
 	/// resets song to given song
@@ -135,8 +135,8 @@ class Songs::RestoreSel {
 };
 
 void Songs::update() {
-	if (m_dirty && m_updateTimer.get() > 0.5) filter_internal(); // Update with newly loaded songs
-	// A hack to move to the first song when the song screen is entered the first time
+	if (m_dirty && m_updateTimer.get() > 0.5) filter_internal(); /// Update with newly loaded songs
+	/// A hack to move to the first song when the song screen is entered the first time
 	static bool first = true;
 	if (first) { first = false; math_cover.reset(); math_cover.setTarget(0, size()); }
 }
@@ -160,7 +160,7 @@ void Songs::filter_internal() {
 			std::string charset = match.first;
 			icu::UnicodeString filter = ((charset == "UTF-8") ? icu::UnicodeString::fromUTF8(m_filter) : icu::UnicodeString(m_filter.c_str(), charset.c_str()));
 			std::copy_if (m_songs.begin(), m_songs.end(), std::back_inserter(filtered), [&](boost::shared_ptr<Song> it){
-			icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8((*it).strFull()), &UnicodeUtil::m_dummyCollator, NULL, UnicodeUtil::m_icuError);
+				icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8((*it).strFull()), &UnicodeUtil::m_dummyCollator, NULL, UnicodeUtil::m_icuError);
 				if (m_type == 1 && !(*it).hasDance()) return false;
 				if (m_type == 2 && !(*it).hasVocals()) return false;
 				if (m_type == 3 && !(*it).hasDuet()) return false;
@@ -172,7 +172,7 @@ void Songs::filter_internal() {
 		}
 		m_filtered.swap(filtered);
 	} catch (...) {
-		SongVector(m_songs.begin(), m_songs.end()).swap(m_filtered);  // Invalid regex => copy everything
+		SongVector(m_songs.begin(), m_songs.end()).swap(m_filtered);  /// Invalid regex => copy everything
 	}
 	sort_internal();
 }
@@ -182,12 +182,12 @@ namespace {
 	/// A functor that compares songs based on a selected member field of them.
 	template<typename Field> class CmpByField {
 		Field Song::* m_field;
-	  public:
+	public:
 		/** @param field a pointer to the field to use (pointer to member) **/
 		CmpByField(Field Song::* field): m_field(field) {}
 		/// Compare left < right
 		bool operator()(Song const& left , Song const& right) {
-		    return left.*m_field < right.*m_field;
+			return left.*m_field < right.*m_field;
 		}
 		/// Compare *left < *right
 		bool operator()(boost::shared_ptr<Song> const& left, boost::shared_ptr<Song> const& right) {
@@ -226,7 +226,7 @@ void Songs::typeChange(int diff) {
 
 void Songs::typeCycle(int cat) {
 	static const int categories[types] = { 0, 1, 2, 2, 3, 3, 4 };
-	// Find the next matching category
+	/// Find the next matching category
 	int type = 0;
 	for (int t = (categories[m_type] == cat ? m_type + 1 : 0); t < types; ++t) {
 		if (categories[t] == cat) { type = t; break; }
@@ -238,14 +238,14 @@ void Songs::typeCycle(int cat) {
 std::string Songs::sortDesc() const {
 	std::string str;
 	switch (m_order) {
-	  case 0: str = _("random order"); break;
-	  case 1: str = _("sorted by song"); break;
-	  case 2: str = _("sorted by artist"); break;
-	  case 3: str = _("sorted by edition"); break;
-	  case 4: str = _("sorted by genre"); break;
-	  case 5: str = _("sorted by path"); break;
-	  case 6: str = _("sorted by language"); break;
-	  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortDesc");
+		case 0: str = _("random order"); break;
+		case 1: str = _("sorted by song"); break;
+		case 2: str = _("sorted by artist"); break;
+		case 3: str = _("sorted by edition"); break;
+		case 4: str = _("sorted by genre"); break;
+		case 5: str = _("sorted by path"); break;
+		case 6: str = _("sorted by language"); break;
+		default: throw std::logic_error("Internal error: unknown sort order in Songs::sortDesc");
 	}
 	return str;
 }
@@ -274,25 +274,25 @@ void Songs::sortSpecificChange(int sortOrder, bool descending) {
 void Songs::sort_internal(bool descending) {
 	if(descending) {
 		switch (m_order) {
-		  case 0: std::stable_sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::randomIdx)); break;
-		  case 1: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::collateByTitle)); break;
-		  case 2: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::collateByArtist)); break;
-		  case 3: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::edition)); break;
-		  case 4: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::genre)); break;
-		  case 5: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::path)); break;
-		  case 6: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::language)); break;
-		  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
+			case 0: std::stable_sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::randomIdx)); break;
+			case 1: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::collateByTitle)); break;
+			case 2: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::collateByArtist)); break;
+			case 3: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::edition)); break;
+			case 4: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::genre)); break;
+			case 5: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::path)); break;
+			case 6: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::language)); break;
+			default: throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
 		}
 	} else {
 		switch (m_order) {
-		  case 0: std::stable_sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::randomIdx)); break;
-		  case 1: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::collateByTitle)); break;
-		  case 2: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::collateByArtist)); break;
-		  case 3: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::edition)); break;
-		  case 4: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::genre)); break;
-		  case 5: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::path)); break;
-		  case 6: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::language)); break;
-		  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
+			case 0: std::stable_sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::randomIdx)); break;
+			case 1: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::collateByTitle)); break;
+			case 2: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::collateByArtist)); break;
+			case 3: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::edition)); break;
+			case 4: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::genre)); break;
+			case 5: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::path)); break;
+			case 6: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::language)); break;
+			default: throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
 		}
 	}
 }

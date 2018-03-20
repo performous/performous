@@ -1,4 +1,4 @@
-﻿#include "screen_songs.hh"
+#include "screen_songs.hh"
 
 #include "audio.hh"
 #include "configuration.hh"
@@ -17,13 +17,13 @@
 #include <boost/format.hpp>
 
 extern const double m_pi;
-static const double IDLE_TIMEOUT = 45.0; // seconds
+static const double IDLE_TIMEOUT = 45.0; /// seconds
 
 ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Database& database):
-  Screen(name), m_audio(audio), m_songs(songs), m_database(database), m_covers(50)
+Screen(name), m_audio(audio), m_songs(songs), m_database(database), m_covers(50)
 {
 	m_songs.setAnimMargins(5.0, 5.0);
-	// Using AnimValues as a simple timers counting seconds
+	/// Using AnimValues as a simple timers counting seconds
 	m_clock.setTarget(getInf());
 	m_idleTimer.setTarget(getInf());
 }
@@ -82,8 +82,8 @@ void ScreenSongs::menuBrowse(int dir) {
 void ScreenSongs::manageEvent(input::NavEvent const& event) {
 	Game* gm = Game::getSingletonPtr();
 	input::NavButton nav = event.button;
-	// Handle basic navigational input that is possible also with instruments
-	m_idleTimer.setValue(0.0);  // Reset idle timer
+	/// Handle basic navigational input that is possible also with instruments
+	m_idleTimer.setValue(0.0);  /// Reset idle timer
 	if (nav == input::NAV_PAUSE) m_audio.togglePause();
 	else if (event.menu == input::NAVMENU_A_PREV) {
 		if (m_menu.isOpen()) m_menu.move(-1);
@@ -103,19 +103,19 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 		else if (nav == input::NAV_MOREUP) m_audio.seek(-30);
 		else if (nav == input::NAV_MOREDOWN) m_audio.seek(30);
 	} else if (nav == input::NAV_CANCEL) {
-		if (m_menuPos != 1) m_menuPos = 1;  // Exit menu (back to song selection)
-		else if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }  // Clear search
-		else if (m_songs.typeNum()) m_songs.typeChange(0);  // Clear type filter
+		if (m_menuPos != 1) m_menuPos = 1;  /// Exit menu (back to song selection)
+		else if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }  /// Clear search
+		else if (m_songs.typeNum()) m_songs.typeChange(0);  /// Clear type filter
 		else gm->activateScreen("Intro");
 	}
-	// The rest are only available when there are songs available
+	/// The rest are only available when there are songs available
 	else if (m_songs.empty()) return;
 	else if (nav == input::NAV_START) {
 		if (m_menu.isOpen()) {
 			m_menu.action();
 		}
 		else if (m_menuPos == 1 /* Cover browser */) {
-			if (addSong()) sing();  // Add song and sing if it was the first to be added
+			if (addSong()) sing();  /// Add song and sing if it was the first to be added
 		}
 		else if (m_menuPos == 4) {
 			m_menuPos = 1;
@@ -142,7 +142,7 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 }
 
 void ScreenSongs::manageEvent(SDL_Event event) {
-	// Handle less common, keyboard only keys
+	/// Handle less common, keyboard only keys
 	if (event.type == SDL_TEXTINPUT) {
 		m_search += event.text.text;
 		m_songs.setFilter(m_search.text);
@@ -160,8 +160,8 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			if (key == SDL_SCANCODE_R && mod & Platform::shortcutModifier()) {
 				m_songs.reload();
 				m_songs.setFilter(m_search.text);
-				}
-			// Shortcut keys for accessing different type filter modes
+			}
+			/// Shortcut keys for accessing different type filter modes
 			if (key == SDL_SCANCODE_TAB) m_songs.sortChange(1);
 			if (key == SDL_SCANCODE_F5) m_songs.typeCycle(2);
 			if (key == SDL_SCANCODE_F6) m_songs.typeCycle(3);
@@ -175,31 +175,31 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 void ScreenSongs::update() {
 	Game* sm = Game::getSingletonPtr();
 	sm->showLogo(!m_jukebox);
-	if (m_idleTimer.get() < 0.3) return;  // Only update when the user gives us a break
-	m_songs.update(); // Poll for new songs
-	bool songChange = false;  // Do we need to switch songs?
-	// Automatic song browsing
+	if (m_idleTimer.get() < 0.3) return;  /// Only update when the user gives us a break
+	m_songs.update(); /// Poll for new songs
+	bool songChange = false;  /// Do we need to switch songs?
+	/// Automatic song browsing
 	if (!m_audio.isPaused() && m_idleTimer.get() > 1.0) {
-		// If playback has ended or hasn't started
+		/// If playback has ended or hasn't started
 		if (!m_audio.isPlaying() || m_audio.getPosition() > m_audio.getLength()) {
-			songChange = true;  // Force reload even if the music happens to stay the same
+			songChange = true;  /// Force reload even if the music happens to stay the same
 		}
-		// If the above, or if in regular mode and idle too long, advance to next song
+		/// If the above, or if in regular mode and idle too long, advance to next song
 		if (songChange || (!m_jukebox && m_idleTimer.get() > IDLE_TIMEOUT)) {
 			m_songs.advance(1);
 			m_idleTimer.setValue(0.0);
 		}
 	}
-	// Check out if the music has changed
+	/// Check out if the music has changed
 	boost::shared_ptr<Song> song = m_songs.currentPtr();
 	Song::Music music;
 	if (song) music = song->music;
 	if (m_playing != music) songChange = true;
-	// Switch songs if needed, only when the user is not browsing for a moment
+	/// Switch songs if needed, only when the user is not browsing for a moment
 	if (!songChange) return;
-	if (song) song->loadNotes();  // Needed for BPM info; TODO: drop notes when switching to another song.
+	if (song) song->loadNotes();  /// Needed for BPM info; TODO: drop notes when switching to another song.
 	m_playing = music;
-	// Clear the old content and load new content if available
+	/// Clear the old content and load new content if available
 	m_songbg.reset(); m_video.reset();
 	double pstart = (!m_jukebox && song ? song->preview_start : 0.0);
 	m_audio.playMusic(music, true, 1.0, pstart);
@@ -234,11 +234,11 @@ void ScreenSongs::drawJukebox() {
 	double pos = m_audio.getPosition();
 	double len = m_audio.getLength();
 	double diff = len - pos;
-	if (pos < diff) diff = pos;  // Diff from beginning instead of from end
-	if (!m_songbg.get() && !m_video.get()) diff = 0.0;  // Always display song name if there is no background
+	if (pos < diff) diff = pos;  /// Diff from beginning instead of from end
+	if (!m_songbg.get() && !m_video.get()) diff = 0.0;  /// Always display song name if there is no background
 	if (diff < 3.0) {
 		Song& song = m_songs.current();
-		// Draw the cover
+		/// Draw the cover
 		Surface* cover = NULL;
 		if (!song.cover.empty()) try { cover = &m_covers[song.cover]; } catch (std::exception const&) {}
 		if (cover && !cover->empty()) {
@@ -246,7 +246,7 @@ void ScreenSongs::drawJukebox() {
 			s.dimensions.left(theme->song.dimensions.x1()).top(theme->song.dimensions.y2() + 0.05).fitInside(0.15, 0.15);
 			s.draw();
 		}
-		// Format && draw the song information text
+		/// Format && draw the song information text
 		std::ostringstream oss_song;
 		oss_song << song.title << '\n' << song.artist;
 		theme->song.draw(oss_song.str());
@@ -255,18 +255,18 @@ void ScreenSongs::drawJukebox() {
 
 void ScreenSongs::drawMultimedia() {
 	if (!m_songs.empty()) {
-		Transform ft(farTransform());  // 3D effect
+		Transform ft(farTransform());  /// 3D effect
 		double length = m_audio.getLength();
 		double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
-		m_songbg_default->draw();   // Default bg
+		m_songbg_default->draw();   /// Default bg
 		if (m_songbg.get() && !m_video.get()) {
 			if (m_songbg->width() > 512 && m_songbg->dimensions.ar() > 1.1) {
-				// Full screen mode
+				/// Full screen mode
 				float s = sin(m_clock.get()) * 0.15 + 1.15;
 				Transform sc(scale(glmath::vec3(s, s, s)));
 				m_songbg->draw();
 			} else {
-				// Low res texture or cover image, render in tiled mode
+				/// Low res texture or cover image, render in tiled mode
 				double x = 0.05 * m_clock.get();
 				m_songbg->draw(m_songbg->dimensions, TexCoords(x, 0.0, x + 5.0, 5.0));
 			}
@@ -284,9 +284,9 @@ void ScreenSongs::draw() {
 	update();
 	drawMultimedia();
 	std::ostringstream oss_song, oss_order, oss_hiscore;
-	// Test if there are no songs
+	/// Test if there are no songs
 	if (m_songs.empty()) {
-		// Format the song information text
+		/// Format the song information text
 		if (!m_search.text.empty()) {
 			oss_song << _("Sorry, no songs match the search!");
 			oss_order << m_search.text;
@@ -299,54 +299,54 @@ void ScreenSongs::draw() {
 		}
 	} else {
 		Song& song = m_songs.current();
-		// Format the song information text
+		/// Format the song information text
 		oss_song << song.artist << ": " << song.title;
-		// Get hiscores from database
+		/// Get hiscores from database
 		m_database.queryPerSongHiscore(oss_hiscore, m_songs.currentPtr());
-		// Escaped bytes of UTF-8 must be used here for compatibility with Windows (MSVC, mingw)
-		char const* VERT_ARROW = "\xe2\x86\x95 ";  // ↕
-		char const* HORIZ_ARROW = "\xe2\x86\x94 ";  // ↔
-		char const* ENTER = "\xe2\x86\xb5 ";  // ↵
+		/// Escaped bytes of UTF-8 must be used here for compatibility with Windows (MSVC, mingw)
+		char const* VERT_ARROW = "\xe2\x86\x95 ";  /// ↕
+		char const* HORIZ_ARROW = "\xe2\x86\x94 ";  /// ↔
+		char const* ENTER = "\xe2\x86\xb5 ";  /// ↵
 		char const* PAD = "   ";
 		switch (m_menuPos) {
-		case 1:
-			if (!m_search.text.empty()) oss_order << m_search.text;
-			else if (m_songs.typeNum()) oss_order << m_songs.typeDesc();
-			else if (m_songs.sortNum()) oss_order << m_songs.sortDesc();
-			else oss_order << _("<type in to search>") << PAD << HORIZ_ARROW << _("songs") << PAD << VERT_ARROW << _("options");
-			break;
-		case 2: oss_order << HORIZ_ARROW << _("sort order: ") << m_songs.sortDesc(); break;
-		case 3: oss_order << HORIZ_ARROW << _("type filter: ") << m_songs.typeDesc(); break;
-		case 4: oss_order << HORIZ_ARROW << _("hiscores") << PAD << ENTER << _("jukebox mode"); break;
-		case 0:
-			bool empty = Game::getSingletonPtr()->getCurrentPlayList().isEmpty();
-			oss_order << ENTER << (empty ? _("start a playlist with this song!") : _("open the playlist menu"));
-			break;
+			case 1:
+				if (!m_search.text.empty()) oss_order << m_search.text;
+				else if (m_songs.typeNum()) oss_order << m_songs.typeDesc();
+				else if (m_songs.sortNum()) oss_order << m_songs.sortDesc();
+				else oss_order << _("<type in to search>") << PAD << HORIZ_ARROW << _("songs") << PAD << VERT_ARROW << _("options");
+				break;
+			case 2: oss_order << HORIZ_ARROW << _("sort order: ") << m_songs.sortDesc(); break;
+			case 3: oss_order << HORIZ_ARROW << _("type filter: ") << m_songs.typeDesc(); break;
+			case 4: oss_order << HORIZ_ARROW << _("hiscores") << PAD << ENTER << _("jukebox mode"); break;
+			case 0:
+				bool empty = Game::getSingletonPtr()->getCurrentPlayList().isEmpty();
+				oss_order << ENTER << (empty ? _("start a playlist with this song!") : _("open the playlist menu"));
+				break;
 		}
 	}
 
 	if (m_jukebox) drawJukebox();
 	else {
-		// Draw song and order texts
+		/// Draw song and order texts
 		theme->song.draw(oss_song.str());
 		theme->order.draw(oss_order.str());
 		drawInstruments(Dimensions(1.0).fixedHeight(0.09).right(0.45).screenTop(0.02));
 		theme->hiscores.draw(oss_hiscore.str());
 	}
-	// Menus on top of everything
+	/// Menus on top of everything
 	if (m_menu.isOpen()) drawMenu();
 }
 
 void ScreenSongs::drawCovers() {
-	double spos = m_songs.currentPosition(); // This needs to be polled to run the animation
+	double spos = m_songs.currentPosition(); /// This needs to be polled to run the animation
 	std::size_t ss = m_songs.size();
 	int currentId = m_songs.currentId();
-	int baseidx = spos + 1.5; --baseidx; // Round correctly
+	int baseidx = spos + 1.5; --baseidx; /// Round correctly
 	double shift = spos - baseidx;
-	// Calculate beat
-	double beat = 0.5 + m_idleTimer.get() / 2.0;  // 30 BPM
+	/// Calculate beat
+	double beat = 0.5 + m_idleTimer.get() / 2.0;  /// 30 BPM
 	if (ss > 0) {
-		// Use actual song BPM. FIXME: Should only do this if currentId is also playing.
+		/// Use actual song BPM. FIXME: Should only do this if currentId is also playing.
 		double t = m_audio.getPosition() - config["audio/video_delay"].f();
 		Song::Beats const& beats = m_songs.current().beats;
 		auto it = std::lower_bound(beats.begin(), beats.end(), t);
@@ -355,33 +355,33 @@ void ScreenSongs::drawCovers() {
 			beat = (t - t1) / (t2 - t1);
 		}
 	}
-	beat = 1.0 + std::pow(std::abs(std::cos(3.141592 * beat)), 10.0);  // Overdrive pulse
-	// Draw covers and reflections
+	beat = 1.0 + std::pow(std::abs(std::cos(3.141592 * beat)), 10.0);  /// Overdrive pulse
+	/// Draw covers and reflections
 	for (int i = -2; i < 6; ++i) {
 		if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
 		Song& song = *m_songs[baseidx + i];
 		Surface& s = getCover(song);
-		// Calculate dimensions for cover and instrument markers
-		double diff = 0.5 * (1.0 + std::cos(std::min(m_pi, std::abs(i - shift))));  // 0..1 for current cover hilight level
+		/// Calculate dimensions for cover and instrument markers
+		double diff = 0.5 * (1.0 + std::cos(std::min(m_pi, std::abs(i - shift))));  /// 0..1 for current cover hilight level
 		double y = 0.5 * virtH();
 		using namespace glmath;
 		Transform trans(
-		  translate(vec3(-0.2 + 0.20 * (i - shift), y, -0.2 - 0.3 * (1.0 - diff)))
-		  * rotate(0.4 * std::sin(std::min(m_pi, i - shift)), vec3(0.0, 1.0, 0.0))
-		);
+						translate(vec3(-0.2 + 0.20 * (i - shift), y, -0.2 - 0.3 * (1.0 - diff)))
+						* rotate(0.4 * std::sin(std::min(m_pi, i - shift)), vec3(0.0, 1.0, 0.0))
+						);
 		double c = 0.4 + 0.6 * diff;
 		if (m_menuPos == 1 /* Cover browser */ && baseidx + i == currentId) c = beat;
 		ColorTrans c1(Color(c, c, c));
 		s.dimensions.middle().screenCenter().bottom().fitInside(0.17, 0.17);
-		// Draw the cover normally
+		/// Draw the cover normally
 		s.draw();
-		// Draw the reflection
+		/// Draw the reflection
 		Transform transMirror(scale(vec3(1.0f, -1.0f, 1.0f)));
 		ColorTrans c2(Color::alpha(0.4));
 		s.draw();
 	}
-	// Draw the playlist
-    Game* gm = Game::getSingletonPtr();
+	/// Draw the playlist
+	Game* gm = Game::getSingletonPtr();
 	auto const& playlist = gm->getCurrentPlayList().getList();
 	double c = (m_menuPos == 0 /* Playlist */ ? beat : 1.0);
 	ColorTrans c1(Color(c, c, c));
@@ -390,9 +390,9 @@ void ScreenSongs::drawCovers() {
 		double pos =  i / std::max<double>(5.0, playlist.size());
 		using namespace glmath;
 		Transform trans(
-		  translate(vec3(-0.35 + 0.06 * pos, 0.0, 0.3 - 0.2 * pos))
-		  * rotate(-0.0, vec3(0.0, 1.0, 0.0))
-		);
+						translate(vec3(-0.35 + 0.06 * pos, 0.0, 0.3 - 0.2 * pos))
+						* rotate(-0.0, vec3(0.0, 1.0, 0.0))
+						);
 		s.dimensions.middle().screenBottom(-0.06).fitInside(0.08, 0.08);
 		s.draw();
 	}
@@ -400,11 +400,11 @@ void ScreenSongs::drawCovers() {
 
 Surface& ScreenSongs::getCover(Song const& song) {
 	Surface* cover = nullptr;
-	// Fetch cover image from cache or try loading it
+	/// Fetch cover image from cache or try loading it
 	if (!song.cover.empty()) try { cover = &m_covers[song.cover]; } catch (std::exception const&) {}
-	// Fallback to background image as cover if needed
+	/// Fallback to background image as cover if needed
 	if (!cover && !song.background.empty()) try { cover = &m_covers[song.background]; } catch (std::exception const&) {}
-	// Use empty cover
+	/// Use empty cover
 	if (!cover) {
 		if(song.hasDance()) {
 			cover = m_danceCover.get();
@@ -438,16 +438,16 @@ void ScreenSongs::drawInstruments(Dimensions dim) const {
 	bool have_bass = false;
 	bool have_drums = false;
 	bool have_dance = false;
-	// TODO: Do something with is_karaoke
-	//bool is_karaoke = false;
+	/// TODO: Do something with is_karaoke
+	///bool is_karaoke = false;
 	int guitarCount = 0;
 	int vocalCount = 0;
 	if( !m_songs.empty() ) {
 		Song const& song = m_songs.current();
 		have_drums = song.hasDrums();
 		have_dance = song.hasDance();
-		//is_karaoke = (song.music.find("vocals") != song.music.end());
-		if (song.hasVocals()) vocalCount = song.hasDuet() ? 2 : 1; // Make sure our generated duet track is not counted as a third vocal track for drawing.
+		///is_karaoke = (song.music.find("vocals") != song.music.end());
+		if (song.hasVocals()) vocalCount = song.hasDuet() ? 2 : 1; /// Make sure our generated duet track is not counted as a third vocal track for drawing.
 		if (isTrackInside(song.instrumentTracks,TrackName::GUITAR)) guitarCount++;
 		if (isTrackInside(song.instrumentTracks,TrackName::GUITAR_COOP)) guitarCount++;
 		if (isTrackInside(song.instrumentTracks,TrackName::GUITAR_RHYTHM)) guitarCount++;
@@ -456,17 +456,17 @@ void ScreenSongs::drawInstruments(Dimensions dim) const {
 
 	UseTexture tex(*m_instrumentList);
 	double x = dim.x1();
-	// dancing
+	/// dancing
 	if (have_dance) {
 		drawIcon(6, dim.left(x));
 		x -= dim.w();
 	}
-	// drums
+	/// drums
 	if (have_drums) {
 		drawIcon(4, dim.left(x));
 		x -= dim.w();
 	}
-	// guitars & bass
+	/// guitars & bass
 	for (int i = guitarCount-1; i >= 0; i--) {
 		drawIcon(i == 0 && have_bass ? 3 : 2, dim.left(x));
 		x -= (i > 0 ? 0.3 : 1.0) * dim.w();
@@ -479,7 +479,7 @@ void ScreenSongs::drawInstruments(Dimensions dim) const {
 
 void ScreenSongs::drawMenu() {
 	if (m_menu.empty()) return;
-	// Some helper vars
+	/// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
 	const auto cur = &m_menu.current();
 	double w = m_menu.dimensions.w();
@@ -488,20 +488,20 @@ void ScreenSongs::drawMenu() {
 	const float h = m_menu.getOptions().size() * step + step;
 	float y = -h * .5f + step;
 	float x = -w * .5f + step;
-	// Background
+	/// Background
 	th.bg.dimensions.middle(0).center(0).stretch(w, h);
 	th.bg.draw();
-	// Loop through menu items
+	/// Loop through menu items
 	w = 0;
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it) {
-		// Pick the font object
+		/// Pick the font object
 		SvgTxtTheme* txt = &th.option_selected;
 		if (cur != &*it)
 			txt = &(th.getCachedOption(it->getName()));
-		// Set dimensions and draw
+		/// Set dimensions and draw
 		txt->dimensions.middle(x).center(y);
 		txt->draw(it->getName());
-		w = std::max(w, txt->w() + 2 * step); // Calculate the widest entry
+		w = std::max(w, txt->w() + 2 * step); /// Calculate the widest entry
 		y += step;
 	}
 	if (cur->getComment() != "") {

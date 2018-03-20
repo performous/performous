@@ -8,30 +8,30 @@
 #include <boost/filesystem.hpp>
 
 namespace SongParserUtil {
-    const std::string DUET_P2 = "Duet singer"; // FIXME
-    const std::string DUET_BOTH = "Both singers"; // FIXME
-    /// Parse an int from string and assign it to a variable
-    void assign(int& var, std::string const& str);
-    /// Parse an unsigned int from string and assign it to a variable
-    void assign(unsigned& var, std::string const& str);
-    /// Parse a double from string and assign it to a variable
-    void assign(double& var, std::string str);
-    /// Parse a boolean from string and assign it to a variable
-    void assign(bool& var, std::string const& str);
-    /// Erase last character if it matches
-    void eraseLast(std::string& s, char ch = ' ');
+	const std::string DUET_P2 = "Duet singer"; /// FIXME
+	const std::string DUET_BOTH = "Both singers"; /// FIXME
+	/// Parse an int from string and assign it to a variable
+	void assign(int& var, std::string const& str);
+	/// Parse an unsigned int from string and assign it to a variable
+	void assign(unsigned& var, std::string const& str);
+	/// Parse a double from string and assign it to a variable
+	void assign(double& var, std::string str);
+	/// Parse a boolean from string and assign it to a variable
+	void assign(bool& var, std::string const& str);
+	/// Erase last character if it matches
+	void eraseLast(std::string& s, char ch = ' ');
 }
 
 /// parses songfiles
 class SongParser {
-  public:
+public:
 	/// constructor
 	SongParser(Song& s);
-  private:
+private:
 	void finalize();
 	void vocalsTogether();
 	void guessFiles();
-	
+
 	Song& m_song;
 	std::stringstream m_ss;
 	unsigned int m_linenum;
@@ -66,8 +66,8 @@ class SongParser {
 	enum CurrentSinger { P1 = 1, P2 = 2, BOTH = P1 | P2 } m_curSinger;
 	struct BPM {
 		BPM(double _begin, double _ts, double bpm): begin(_begin), step(0.25 * 60.0 / bpm), ts(_ts) {}
-		double begin; // Time in seconds
-		double step; // Seconds per quarter note
+		double begin; /// Time in seconds
+		double step; /// Seconds per quarter note
 		double ts;
 	};
 	typedef std::vector<BPM> bpms_t;
@@ -78,7 +78,7 @@ class SongParser {
 		for (auto& itb: boost::adaptors::reverse(m_bpms)) {
 			if (itb.begin > ts) continue;
 			else {
-			return itb;
+				return itb;
 			}
 		}
 		throw std::runtime_error("No BPM definition prior to this note...");
@@ -87,7 +87,7 @@ class SongParser {
 		if (!(bpm >= 1.0 && bpm < 1e12)) throw std::runtime_error("Invalid BPM value");
 		if (!m_bpms.empty() && m_bpms.back().ts >= ts) {
 			if (m_bpms.back().ts < ts) throw std::runtime_error("Invalid BPM timestamp");
-			m_bpms.pop_back(); // Some ITG songs contain repeated BPM definitions...
+			m_bpms.pop_back(); /// Some ITG songs contain repeated BPM definitions...
 		}
 		m_bpms.push_back(BPM(tsTime(ts), ts, bpm));
 	}

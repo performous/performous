@@ -7,7 +7,7 @@ struct TextInput {
 	/// text to operate on
 	std::string text;
 	/// appends unicode symbol
-	TextInput& operator+=(unsigned int ucs) { //don't know if this is still relevant since SDL2 handles unicode
+	TextInput& operator+=(unsigned int ucs) { ///don't know if this is still relevant since SDL2 handles unicode
 		if (ucs < 0x80) {
 			text += ucs;
 		} else if (ucs < 0x800) {

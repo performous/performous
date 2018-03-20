@@ -11,7 +11,7 @@ class ThemeAudioDevices;
 
 /// options dialogue
 class ScreenAudioDevices: public Screen {
-  public:
+public:
 	/// constructor
 	ScreenAudioDevices(std::string const& name, Audio& m_audio);
 	void enter();
@@ -20,7 +20,7 @@ class ScreenAudioDevices: public Screen {
 	void manageEvent(input::NavEvent const& event);
 	void draw();
 
-  private:
+private:
 	struct Channel {
 		Channel(std::string const& name): name(name), pos(-1) {}
 		std::string name;

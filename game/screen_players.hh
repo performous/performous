@@ -17,11 +17,11 @@ class ThemeSongs;
 class LayoutSinger;
 
 /** Player hiscore addition screen.
-  Database is passed as argument, but only the players is stored
-  and used everywhere.
+ Database is passed as argument, but only the players is stored
+ and used everywhere.
  */
 class ScreenPlayers : public Screen {
-  public:
+public:
 	/// constructor
 	ScreenPlayers(std::string const& name, Audio& audio, Database& database);
 	void enter();
@@ -35,7 +35,7 @@ class ScreenPlayers : public Screen {
 		m_song = song_;
 	}
 
-  private:
+private:
 	Audio& m_audio;
 	Database& m_database;
 	Players& m_players;

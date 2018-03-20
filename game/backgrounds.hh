@@ -1,8 +1,8 @@
 #pragma once
 
-//#include "animvalue.hh"
+///#include "animvalue.hh"
 #include "fs.hh"
-//#include "song.hh"
+///#include "song.hh"
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/mutex.hpp>
@@ -11,14 +11,14 @@
 
 /// songs class for songs screen
 class Backgrounds: boost::noncopyable {
-  public:
+public:
 	/// constructor
 	Backgrounds(): m_bgiter(0), m_dirty(false), m_loading(false)
 	{
 		reload();
 	}
 	~Backgrounds() {
-		m_loading = false; // Terminate loading if currently in progress
+		m_loading = false; /// Terminate loading if currently in progress
 		m_thread->join();
 	}
 	/// reloads backgrounds list
@@ -32,7 +32,7 @@ class Backgrounds: boost::noncopyable {
 	/// returns random background
 	std::string getRandom();
 
-  private:
+private:
 	typedef std::vector<std::string> BGVector;
 	BGVector m_bgs;
 	int m_bgiter;

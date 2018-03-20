@@ -14,5 +14,5 @@
 #elif (BOOST_OS_LINUX)
 #include "platform/execname.unix.inc"
 #else
-	return fs::path();
-#endif // BOOST_OS_WINDOWS
+return fs::path();
+#endif /// BOOST_OS_WINDOWS

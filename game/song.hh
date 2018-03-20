@@ -22,16 +22,16 @@ namespace TrackName {
 	const std::string KEYBOARD = "Keyboard";
 	const std::string DRUMS = "Drums";
 	const std::string LEAD_VOCAL = "Vocals";
-	#if 0 // Here is some dummy gettext calls to populate the dictionary
+#if 0 /// Here is some dummy gettext calls to populate the dictionary
 	_("Guitar") _("Coop guitar") _("Rhythm guitar") _("Bass") _("Drums") _("Vocals")  _("Harmonic 1") _("Harmonic 2") _("Harmonic 3")
-	#endif
+#endif
 }
 
 class ScreenSing;
 /// class to load and parse songfiles
 class Song: boost::noncopyable {
 	friend class SongParser;
-  public:
+public:
 	VocalTracks vocalTracks; ///< notes for the sing part
 	VocalTrack dummyVocal; ///< notes for the sing part
 	/// constructor
@@ -48,8 +48,8 @@ class Song: boost::noncopyable {
 	std::string str() const { return title + "  by  " + artist; }
 	/** Get full song information (used by the search function). **/
 	std::string strFull() const {
-	boost::mutex::scoped_lock l(m_mutex);
-	return title + "\n" + artist + "\n" + genre + "\n" + edition + "\n" + path.string(); }
+		boost::mutex::scoped_lock l(m_mutex);
+		return title + "\n" + artist + "\n" + genre + "\n" + edition + "\n" + path.string(); }
 	/// Is the song parsed from the file yet?
 	enum LoadStatus { NONE, HEADER, FULL } loadStatus;
 	/// status of song
@@ -59,7 +59,7 @@ class Song: boost::noncopyable {
 	int randomIdx; ///< sorting index used for random order
 	void insertVocalTrack(std::string vocalTrack, VocalTrack track);
 	void eraseVocalTrack(std::string vocalTrack = TrackName::LEAD_VOCAL);
-	// Get a selected track, or LEAD_VOCAL if not found or the first one if not found
+	/// Get a selected track, or LEAD_VOCAL if not found or the first one if not found
 	VocalTrack& getVocalTrack(std::string vocalTrack = TrackName::LEAD_VOCAL);
 	VocalTrack& getVocalTrack(unsigned idx);
 	std::vector<std::string> getVocalTrackNames() const {

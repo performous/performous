@@ -22,13 +22,13 @@ void SongParser::iniParseHeader() {
 	std::string line;
 	while (getline(line)) {
 		if (line.empty()) continue;
-		if (line[0] == '[') continue; // Section header
+		if (line[0] == '[') continue; /// Section header
 		std::istringstream iss(line);
 		std::string key, value;
 		if (!std::getline(iss, key, '=') || !std::getline(iss, value)) std::runtime_error("Invalid format, should be key=value");
 		boost::trim(key); boost::to_lower(key);
 		boost::trim(value);
-		// Supported tags
+		/// Supported tags
 		if (key == "name") s.title = value;
 		else if (key == "artist") s.artist = value;
 		else if (key == "cover") s.cover = fs::absolute(value, s.path);
@@ -39,7 +39,7 @@ void SongParser::iniParseHeader() {
 		else if (key == "delay") { assign(s.start, value); s.start/=1000.0; }
 		else if (key == "video_start_time") { assign(s.videoGap, value); s.videoGap/=1000.0; }
 		else if (key == "preview_start_time") { assign(s.preview_start, value); s.preview_start/=1000.0; }
-		// Before adding other tags: they should be checked with the already-existing tags in FoF format; in case any tag doesn't exist there, it should be discussed with FoFiX developers before adding it here.
+		/// Before adding other tags: they should be checked with the already-existing tags in FoF format; in case any tag doesn't exist there, it should be discussed with FoFiX developers before adding it here.
 	}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 }

@@ -141,7 +141,7 @@ public:
 	/// draws text with alpha
 	void draw(std::vector<TZoomText>& _text);
 	/// draw texts
-// 	void draw(std::vector<std::string> const& _text);
+	/// 	void draw(std::vector<std::string> const& _text);
 	/// draw text with alpha
 	void draw(std::string _text);
 	/// sets highlight

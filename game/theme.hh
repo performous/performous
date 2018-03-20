@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "opengl_text.hh"
 #include "surface.hh"
@@ -111,12 +111,12 @@ public:
 	/// menu comment text
 	SvgTxtTheme comment;
 	/// menu comment background
-	//Surface comment_bg;
+	///Surface comment_bg;
 	/// get a cached option test
 	SvgTxtTheme& getCachedOption(const std::string& text);
 };
 
-//at the moment just a copy of ThemeSongs
+///at the moment just a copy of ThemeSongs
 class ThemePlaylistScreen: public Theme {
 public:
 	ThemePlaylistScreen();

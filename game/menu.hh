@@ -34,7 +34,7 @@ public:
 		value = &val;
 		if (!virtOptName.empty()) { virtualName = virtOptName; }
 		return *this;
-		}
+	}
 	/// Make the option set a given value for ConfigItem and close the menu.
 	MenuOption& setter(ConfigItem& val, ConfigItem newval) { type = SET_AND_CLOSE; value = &val; newValue = newval; return *this; }
 	/// Make the option open a submenu
@@ -67,7 +67,6 @@ private:
 	std::string* namePtr;    ///< Optional pointer to dynamically changing name
 	std::string* commentPtr; ///< Optional pointer to dynamically changing comment
 };
-
 
 /// Menu for selecting difficulty etc.
 class Menu {

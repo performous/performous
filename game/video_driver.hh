@@ -8,7 +8,7 @@
 
 unsigned int screenW();
 unsigned int screenH();
-const unsigned int targetWidth = 1366; // One of the most common desktop resolutions in use today.
+const unsigned int targetWidth = 1366; /// One of the most common desktop resolutions in use today.
 static inline float virtH() { return float(screenH()) / screenW(); }
 
 struct SDL_Surface;
@@ -62,7 +62,7 @@ public:
 	 * @param height the new height
 	 */
 	void resize(unsigned width, unsigned height) {
-		if (m_fullscreen) return;  // Ignore window resize events when in fullscreen (gives bogus size on Gnome 3 and others).
+		if (m_fullscreen) return;  /// Ignore window resize events when in fullscreen (gives bogus size on Gnome 3 and others).
 		m_windowW = width; m_windowH = height;
 		resize();
 	}
@@ -80,7 +80,7 @@ public:
 	Shader& shader(std::string const& name) {
 		ShaderMap::iterator it = m_shaders.find(name);
 		if (it != m_shaders.end()) return *it->second;
-		// const_cast required to workaround ptr_map's protection against construction of temporaries
+		/// const_cast required to workaround ptr_map's protection against construction of temporaries
 		return *m_shaders.insert(const_cast<std::string&>(name), new Shader(name)).first->second;
 	}
 	void updateColor();

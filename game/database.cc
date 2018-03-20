@@ -77,17 +77,17 @@ void Database::queryOverallHiscore(std::ostream & os, std::string const& track) 
 	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore (10, -1, -1, track);
 	for (size_t i=0; i<hi.size(); ++i) {
 		os << i+1 << ".\t"
-		   << m_players.lookup(hi[i].playerid) << "\t"
-		   << m_songs.lookup(hi[i].songid) << "\t"
-		// << hi[i].track << "\t"
-		   << hi[i].score << "\n";
+		<< m_players.lookup(hi[i].playerid) << "\t"
+		<< m_songs.lookup(hi[i].songid) << "\t"
+		/// << hi[i].track << "\t"
+		<< hi[i].score << "\n";
 	}
 }
 
 void Database::queryPerSongHiscore(std::ostream & os, boost::shared_ptr<Song> s, std::string const& track) const {
 	int songid = m_songs.lookup(s);
-	if (songid == -1) return;  // Song not included in database (yet)
-	// Reorder hiscores by track / score
+	if (songid == -1) return;  /// Song not included in database (yet)
+	/// Reorder hiscores by track / score
 	std::map<std::string, std::multiset<HiscoreItem>> scoresByTrack;
 	for (HiscoreItem const& hi: m_hiscores.queryHiscore(-1, -1, songid, track)) scoresByTrack[hi.track].insert(hi);
 	for (auto const& hiv: scoresByTrack) {
@@ -104,9 +104,9 @@ void Database::queryPerPlayerHiscore(std::ostream & os, std::string const& track
 	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore(3, playerid, -1, track);
 	for (size_t i=0; i<hi.size(); ++i) {
 		os << i+1 << ".\t"
-		   << m_songs.lookup(hi[i].songid) << "\t"
-		   << hi[i].score << "\t"
-		   << "(" << hi[i].track << ")\n";
+		<< m_songs.lookup(hi[i].songid) << "\t"
+		<< hi[i].score << "\t"
+		<< "(" << hi[i].track << ")\n";
 	}
 }
 

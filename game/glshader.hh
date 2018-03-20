@@ -31,7 +31,7 @@ struct Shader: public boost::noncopyable {
 
 	Shader(std::string const& name);
 	~Shader();
-	/// Set a string that will replace "//DEFINES" in anything loaded by compileFile
+	/// Set a string that will replace "///DEFINES" in anything loaded by compileFile
 	Shader& addDefines(std::string const& defines) { defs += defines; return *this; }
 	/// Load shader from file
 	Shader& compileFile(fs::path const& filename);
@@ -45,11 +45,10 @@ struct Shader: public boost::noncopyable {
 
 	/** Allow setting uniforms in a chain. Shader needs to be in use.*/
 
-
 	/** Get uniform location. Uses caching internally. */
 	Uniform operator[](const std::string& uniform);
 
-	// Some operators
+	/// Some operators
 	bool operator==(const Shader& rhs) const { return program == rhs.program; }
 	bool operator!=(const Shader& rhs) const { return program != rhs.program; }
 
@@ -68,7 +67,6 @@ private:
 
 };
 
-
 /** Temporarily switch shader in a RAII manner. */
 struct UseShader {
 	UseShader(Shader& new_shader): m_shader(new_shader) {
@@ -79,7 +77,7 @@ struct UseShader {
 	/// Access the bound shader
 	Shader& operator()() { return m_shader; }
 
-  private:
+private:
 	Shader& m_shader;
 	GLint m_old;
 };

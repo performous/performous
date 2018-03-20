@@ -15,7 +15,7 @@ class Engine {
 	Database& m_database;
 	boost::scoped_ptr<boost::thread> m_thread;
 
-  public:
+public:
 	typedef std::vector<VocalTrack*> VocalTrackPtrs;
 	static const double TIMESTEP;  ///< The duration of one engine time step in seconds
 	/// Construct an engine thread with vocal tracks and players specified by parameters

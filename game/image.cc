@@ -23,10 +23,10 @@ namespace {
 		if (setjmp(png_jmpbuf(pngPtr))) throw std::runtime_error("Reading PNG failed");
 		png_set_read_fn(pngPtr,(png_voidp)&file, readPngHelper);
 		png_read_info(pngPtr, infoPtr);
-		png_set_expand(pngPtr);  // Expand everything to RGB(A)
-		png_set_strip_16(pngPtr);  // Strip everything down to 8 bit/component
-		png_set_gray_to_rgb(pngPtr);  // Convert even grayscale to RGB(A)
-		png_set_filler(pngPtr, 0xFF, PNG_FILLER_AFTER); // Add alpha channel if it is missing
+		png_set_expand(pngPtr);  /// Expand everything to RGB(A)
+		png_set_strip_16(pngPtr);  /// Strip everything down to 8 bit/component
+		png_set_gray_to_rgb(pngPtr);  /// Convert even grayscale to RGB(A)
+		png_set_filler(pngPtr, 0xFF, PNG_FILLER_AFTER); /// Add alpha channel if it is missing
 		bitmap.resize(png_get_image_width(pngPtr, infoPtr), png_get_image_height(pngPtr, infoPtr));
 		rows.resize(bitmap.height);
 		for (unsigned y = 0; y < bitmap.height; ++y) rows[y] = reinterpret_cast<png_bytep>(&bitmap.buf[y * bitmap.width * 4]);
@@ -34,7 +34,7 @@ namespace {
 	}
 
 	static void writePNG_internal(png_structp pngPtr, png_infop infoPtr, ofstream& file, unsigned w, unsigned h, int colorType, std::vector<png_bytep>& rows) {
-		// There must be no objects initialized within this function because longjmp will mess them up
+		/// There must be no objects initialized within this function because longjmp will mess them up
 		if (setjmp(png_jmpbuf(pngPtr))) throw std::runtime_error("Writing PNG failed");
 		png_set_write_fn(pngPtr, &file, writePngHelper, NULL);
 		png_set_IHDR(pngPtr, infoPtr, w, h, 8, colorType, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
@@ -56,14 +56,14 @@ namespace {
 		longjmp(myerr->setjmp_buffer, 1);
 	}
 
-	#if JPEG_LIB_VERSION < 80 && !defined(MEM_SRCDST_SUPPORTED)
-	// Implementation of jpeg_mem_src from
-	// http://stackoverflow.com/questions/5280756/libjpeg-ver-6b-jpeg-stdio-src-vs-jpeg-mem-src 
+#if JPEG_LIB_VERSION < 80 && !defined(MEM_SRCDST_SUPPORTED)
+	/// Implementation of jpeg_mem_src from
+	/// http:///stackoverflow.com/questions/5280756/libjpeg-ver-6b-jpeg-stdio-src-vs-jpeg-mem-src 
 
 	/* Read JPEG image from a memory segment */
 	static void init_source(j_decompress_ptr /*cinfo*/) {}
 	static boolean fill_input_buffer(j_decompress_ptr /*cinfo*/) {
-		//ERREXIT(cinfo, JERR_INPUT_EMPTY);
+		///ERREXIT(cinfo, JERR_INPUT_EMPTY);
 		return true;
 	}
 	static void skip_input_data(j_decompress_ptr cinfo, long num_bytes) {
@@ -77,8 +77,8 @@ namespace {
 	static void jpeg_mem_src(j_decompress_ptr cinfo, void* buffer, long nbytes) {
 		if (!cinfo->src) {   /* first time for this JPEG object? */
 			cinfo->src = static_cast<jpeg_source_mgr*>(
-			  (*cinfo->mem->alloc_small) ((j_common_ptr)cinfo, JPOOL_PERMANENT, sizeof(jpeg_source_mgr))
-			);
+													   (*cinfo->mem->alloc_small) ((j_common_ptr)cinfo, JPOOL_PERMANENT, sizeof(jpeg_source_mgr))
+													   );
 		}
 		auto src = static_cast<jpeg_source_mgr*>(cinfo->src);
 		src->init_source = init_source;
@@ -89,7 +89,7 @@ namespace {
 		src->bytes_in_buffer = nbytes;
 		src->next_input_byte = static_cast<JOCTET*>(buffer);
 	}
-	#endif
+#endif
 
 	typedef std::vector<std::uint8_t> BinaryBuffer;
 
@@ -107,20 +107,20 @@ namespace {
 
 void writePNG(fs::path const& filename, Bitmap const& img, unsigned stride) {
 	fs::path name = filename;
-	// We use PNG in a non-standard way, with premultiplied alpha, signified by .premul.png extension.
+	/// We use PNG in a non-standard way, with premultiplied alpha, signified by .premul.png extension.
 	std::clog << "image/debug: Saving PNG: " + name.string() << std::endl;
 	std::vector<png_bytep> rows(img.height);
-	// Determine color type and bytes per pixel
+	/// Determine color type and bytes per pixel
 	unsigned char bpp;
 	int colorType;
 	switch (img.fmt) {
 		case pix::RGB: bpp = 3; colorType = PNG_COLOR_TYPE_RGB; break;
 		case pix::CHAR_RGBA: bpp = 4; colorType = PNG_COLOR_TYPE_RGBA; break;
 		default:
-			// Byte order would need to be changed for other formats and we don't currently need them...
+			/// Byte order would need to be changed for other formats and we don't currently need them...
 			throw std::logic_error("Unsupported pixel format in writePNG_internal");
 	}
-	// Construct row pointers
+	/// Construct row pointers
 	bool reverse = img.bottomFirst;
 	if (stride == 0) stride = img.width * bpp;
 	unsigned pos = reverse ? img.height * stride : -stride;
@@ -128,7 +128,7 @@ void writePNG(fs::path const& filename, Bitmap const& img, unsigned stride) {
 		pos += (reverse ? -stride : stride);
 		rows[y] = (png_bytep)(&img.data()[pos]);
 	}
-	// Initialize libpng structures
+	/// Initialize libpng structures
 	png_structp pngPtr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if (!pngPtr) throw std::runtime_error("png_create_read_struct failed");
 	png_infop infoPtr = NULL;
@@ -141,14 +141,14 @@ void writePNG(fs::path const& filename, Bitmap const& img, unsigned stride) {
 	infoPtr = png_create_info_struct(pngPtr);
 	if (!infoPtr) throw std::runtime_error("png_create_info_struct failed");
 	png_set_gAMA(pngPtr, infoPtr, img.linearPremul ? 1.0 : 2.2);
-	// Write file
+	/// Write file
 	ofstream file(name, std::ios::binary);
 	writePNG_internal(pngPtr, infoPtr, file, img.width, img.height, colorType, rows);
 }
 
 void loadPNG(Bitmap& bitmap, fs::path const& filename) {
 	std::clog << "image/debug: Loading PNG: " + filename.string() << std::endl;
-	// A hack to assume linear premultiplied data if file extension is .premul.png (used for cached SVGs)
+	/// A hack to assume linear premultiplied data if file extension is .premul.png (used for cached SVGs)
 	if (filename.stem().extension() == "premul") bitmap.linearPremul = true;
 	ifstream file(filename, std::ios::binary);
 	png_structp pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
@@ -183,7 +183,7 @@ void loadJPEG(Bitmap& bitmap, fs::path const& filename) {
 	if (jpeg_read_header(&cinfo, TRUE) != JPEG_HEADER_OK) throw std::runtime_error("Cannot read header of " + filename.string());
 	jpeg_start_decompress(&cinfo);
 	bitmap.resize(cinfo.output_width, cinfo.output_height);
-	unsigned stride = (bitmap.width * 3 + 3) & ~3;  // Number of bytes per row (word-aligned)
+	unsigned stride = (bitmap.width * 3 + 3) & ~3;  /// Number of bytes per row (word-aligned)
 	unsigned char* ptr = &bitmap.buf[0];
 	while (cinfo.output_scanline < bitmap.height) {
 		jpeg_read_scanlines(&cinfo, &ptr, 1);
@@ -199,11 +199,11 @@ void Bitmap::crop(const unsigned width, const unsigned height, const unsigned x,
 
 	unsigned char bpp;
 	switch (fmt) {
-	case pix::INT_ARGB: bpp = 4; break; // Correct?
-	case pix::BGR: bpp = 3; break;
-	case pix::RGB: bpp = 3; break;
-	case pix::CHAR_RGBA: bpp = 4; break;
-	default: throw std::logic_error("Unsupported picture format.");
+		case pix::INT_ARGB: bpp = 4; break; /// Correct?
+		case pix::BGR: bpp = 3; break;
+		case pix::RGB: bpp = 3; break;
+		case pix::CHAR_RGBA: bpp = 4; break;
+		default: throw std::logic_error("Unsupported picture format.");
 	}
 
 	unsigned newpos = 0;

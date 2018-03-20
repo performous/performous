@@ -28,9 +28,9 @@ namespace input {
 	enum NavMenu { NAVMENU_NONE, NAVMENU_A_PREV, NAVMENU_A_NEXT, NAVMENU_B_PREV, NAVMENU_B_NEXT };
 
 	enum ButtonId: unsigned {
-		// Button constants for each DevType
-		#define DEFINE_BUTTON(devtype, button, num, nav) devtype##_##button = num,
-		#include "controllers-buttons.ii"
+		/// Button constants for each DevType
+#define DEFINE_BUTTON(devtype, button, num, nav) devtype##_##button = num,
+#include "controllers-buttons.ii"
 	};
 
 	struct Button {
@@ -46,7 +46,7 @@ namespace input {
 	typedef unsigned HWButton;
 	static const MinMax<HWButton> hwIsAxis(0x10000000u, 0x1000FFFFu);
 	static const MinMax<HWButton> hwIsHat(0x11000000u, 0x1100FFFFu);
-	
+
 	/// Each controller has unique SourceId that can be used for telling players apart etc.
 	struct SourceId {
 		SourceId(SourceType type = SOURCETYPE_NONE, unsigned device = 0, unsigned channel = 0): type(type), device(device), channel(channel) {
@@ -57,7 +57,7 @@ namespace input {
 		operator unsigned() const { return unsigned(type)<<20 | device<<10 | channel; }
 		bool isKeyboard() const { return type == SOURCETYPE_KEYBOARD; }  ///< This is so common test that a helper is provided
 	};
-	
+
 	struct Event {
 		SourceId source; ///< Where did it originate from
 		HWButton hw; ///< Hardware button number (for internal use and debugging only)
@@ -81,7 +81,7 @@ namespace input {
 		NavEvent(): source(), devType(), button(), menu(), time(), repeat() {}
 		explicit NavEvent(Event const& ev): source(ev.source), devType(ev.devType), button(ev.nav), menu(), time(ev.time), repeat() {}
 	};
-	
+
 	/// A handle for receiving device events
 	class Device: boost::noncopyable {
 		typedef std::deque<Event> Events;
@@ -127,13 +127,12 @@ namespace input {
 		virtual bool process(Event&) { return false; }
 		/// Convert an SDL event into Event. The Event is pre-initialized with event's time. Returns false if SDL_Event was not handled.
 		virtual bool process(Event&, SDL_Event const&) { return false; }
-		// Note: process functions are expected to return Event with source, hw and value set and possibly with time adjusted.
+		/// Note: process functions are expected to return Event with source, hw and value set and possibly with time adjusted.
 		typedef boost::shared_ptr<Hardware> ptr;
 	};
-	
+
 	Hardware::ptr constructKeyboard();
 	Hardware::ptr constructJoysticks();
 	Hardware::ptr constructMidi();
 }
-
 

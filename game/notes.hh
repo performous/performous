@@ -10,7 +10,7 @@
 /// stores duration of a note
 struct Duration {
 	double begin, ///< beginning timestamp in seconds
-	       end;   ///< ending timestamp in seconds
+	end;   ///< ending timestamp in seconds
 	Duration();
 	/// create a new Duration object and initialize begin and end
 	Duration(double b, double e): begin(b), end(e) {}
@@ -26,42 +26,42 @@ typedef std::map<int, Durations> NoteMap;
 /// Sort by instrument track name
 struct CompInstrumentTrack {
 	bool operator()(std::string const& l, std::string const& r) const {
-		// TODO: Sort other guitar tracks (coop / rhythm) properly
+		/// TODO: Sort other guitar tracks (coop / rhythm) properly
 		return l > r;
 	}
 };
 
 struct InstrumentTrack {
-	// TODO: name should not be needed here (contained into the map)
+	/// TODO: name should not be needed here (contained into the map)
 	InstrumentTrack(std::string n): name(n) {}
 	std::string name;
 	NoteMap nm;
 };
 
-// keep these ones
+/// keep these ones
 typedef std::map<std::string, InstrumentTrack, CompInstrumentTrack> InstrumentTracks;
-typedef std::map<std::string, InstrumentTrack const*, CompInstrumentTrack> InstrumentTracksConstPtr; // this one really needed ? can't we save only the map key for comparison ?
+typedef std::map<std::string, InstrumentTrack const*, CompInstrumentTrack> InstrumentTracksConstPtr; /// this one really needed ? can't we save only the map key for comparison ?
 
 static inline bool isTrackInside(InstrumentTracks const& track_map, std::string const& name) {
 	return track_map.find(name) != track_map.end();
 }
 
-// TODO: Make Note use Duration
+/// TODO: Make Note use Duration
 
 /// note read from songfile
 struct Note {
 	Note();
 	double begin, ///< begin time
-	       end; ///< end time
+	end; ///< end time
 	double phase; /// Position within a measure, [0, 1)
-	// FIXME: Remove gameplay variables from here (Note should be immutable).
+	/// FIXME: Remove gameplay variables from here (Note should be immutable).
 	/// power of note (how well it is being hit right now)
 	mutable double power;
 	/// which players sung well
 	mutable std::vector<Color> stars;
 	/// note type
 	enum Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', SLIDE = '+', SLEEP = '-',
-	  TAP = '1', HOLDBEGIN = '2', HOLDEND = '3', ROLL = '4', MINE = 'M', LIFT = 'L'} type;
+		TAP = '1', HOLDBEGIN = '2', HOLDEND = '3', ROLL = '4', MINE = 'M', LIFT = 'L'} type;
 	int note; ///< MIDI pitch of the note (at the end for slide notes)
 	int notePrev; ///< MIDI pitch of the previous note (should be same as note for everything but SLIDE)
 	/// lyrics syllable for that note
@@ -95,7 +95,7 @@ struct Note {
 	}
 	/// Check if two notes overlap
 	static bool overlapping(Note const& a, Note const& b) { return (a.end >= b.begin && a.type != Note::SLEEP && b.type != Note::SLEEP); }
-  private:
+private:
 	double scoreMultiplier() const;
 };
 
@@ -117,9 +117,9 @@ typedef std::map<std::string, VocalTrack> VocalTracks;
 
 struct DanceTrack {
 	DanceTrack(std::string& description, Notes& notes);
-	//track description
+	///track description
 	std::string description;
-	//container for the actual note data
+	///container for the actual note data
 	Notes notes;
 };
 

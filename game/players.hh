@@ -16,10 +16,10 @@
 #include "libxml++.hh"
 
 /**Exception which will be thrown when loading or
-  saving Players fails.*/
+ saving Players fails.*/
 struct PlayersException: public std::runtime_error {
 	PlayersException (std::string const& msg) :
-		runtime_error(msg)
+	runtime_error(msg)
 	{}
 };
 
@@ -36,11 +36,11 @@ struct PlayersException: public std::runtime_error {
  the screen_players.
  */
 class Players: boost::noncopyable {
-  private:
+private:
 	typedef std::set<PlayerItem> players_t;
 	typedef std::vector<PlayerItem> fplayers_t;
 
-  private:
+private:
 	players_t m_players;
 	fplayers_t m_filtered;
 
@@ -49,7 +49,7 @@ class Players: boost::noncopyable {
 
 	bool m_dirty;
 
-  public:
+public:
 	Players();
 	~Players();
 
@@ -62,8 +62,8 @@ class Players: boost::noncopyable {
 	int lookup(std::string const& name) const;
 
 	/** lookup a players name using the playerid.
-	  @return the players name or "Unknown Player"
-	  */
+	 @return the players name or "Unknown Player"
+	 */
 	std::string lookup(int id) const;
 
 	/// add a player with a displayed name and an optional picture; if no id is given one will be assigned
@@ -81,7 +81,7 @@ class Players: boost::noncopyable {
 	/// advances to next player
 	void advance(int diff) {
 		int size = m_filtered.size();
-		if (size == 0) return;  // Do nothing if no songs are available
+		if (size == 0) return;  /// Do nothing if no songs are available
 		int _current = size ? (int(math_cover.getTarget()) + diff) % size : 0;
 		if (_current < 0) _current += m_filtered.size();
 		math_cover.setTarget(_current,this->size());
@@ -101,7 +101,7 @@ class Players: boost::noncopyable {
 	}
 	/// filters playerlist by regular expression
 	void setFilter(std::string const& regex);
-  private:
+private:
 	int assign_id_internal(); /// returns the next available id
 	void filter_internal();
 	static UErrorCode m_icuError;

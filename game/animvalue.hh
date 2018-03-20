@@ -8,7 +8,7 @@
 
 /// class for simple/linear animation/transition of values
 class AnimValue {
-  public:
+public:
 	/// constructor
 	AnimValue(double value = 0.0, double rate = 1.0): m_value(value), m_target(value), m_rate(rate), m_time(now()) {}
 	/// move animation forward by diff
@@ -35,7 +35,7 @@ class AnimValue {
 		return m_value;
 	}
 
-  private:
+private:
 	double duration() const {
 		boost::xtime newtime = now();
 		double t = newtime - m_time;
@@ -50,45 +50,45 @@ class AnimValue {
 
 /// easing animations
 class AnimAcceleration {
-  public:
+public:
 	/// constructor
 	AnimAcceleration(): m_target(), m_songs(), m_position(), m_velocity(), m_marginLeft(), m_marginRight(), m_time() {}
 	/// set margins
 	void setMargins(double left, double right) { m_marginLeft = left; m_marginRight = right; }
 	/// get current value
 	double getValue() {
-		const double acceleration = 50.0; // the coefficient of velocity changes (animation speed)
-		const double overshoot = 0.95; // Over 1.0 decelerates too late, less than 1.0 decelerates too early
+		const double acceleration = 50.0; /// the coefficient of velocity changes (animation speed)
+		const double overshoot = 0.95; /// Over 1.0 decelerates too late, less than 1.0 decelerates too early
 		if (m_songs == 0) return m_target;
 		double num = m_marginLeft + m_songs + m_marginRight;
 		boost::xtime curtime = now();
 		double duration = seconds(curtime) - seconds(m_time);
 		m_time = curtime;
-		if (!(duration > 0.0)) return m_position; // Negative value or NaN, or no songs - skip processing
+		if (!(duration > 0.0)) return m_position; /// Negative value or NaN, or no songs - skip processing
 		if (duration > 1.0) {
-			// More than one second has elapsed, assume that we have stopped on target already
+			/// More than one second has elapsed, assume that we have stopped on target already
 			m_velocity = 0.0;
 			return m_position = m_target;
 		}
-		std::size_t rounds = 1.0 + 1000.0 * duration; // 1 ms or shorter timesteps
+		std::size_t rounds = 1.0 + 1000.0 * duration; /// 1 ms or shorter timesteps
 		double t = duration / rounds;
 		for (std::size_t i = 0; i < rounds; ++i) {
-			double d = remainder(m_target - m_position, num); // Distance (via shortest way)
-			// Allow it to stop nicely, without jitter
+			double d = remainder(m_target - m_position, num); /// Distance (via shortest way)
+			/// Allow it to stop nicely, without jitter
 			if (std::abs(m_velocity) < 0.1 && std::abs(d) < 0.001) {
 				m_velocity = 0.0;
 				m_position = m_target;
 				break;
 			}
-			double a = d > 0.0 ? acceleration : -acceleration; // Acceleration vector
-			// Are we going to right direction && can we stop in time if we start decelerating now?
+			double a = d > 0.0 ? acceleration : -acceleration; /// Acceleration vector
+			/// Are we going to right direction && can we stop in time if we start decelerating now?
 			if (d * m_velocity > 0.0 && std::abs(m_velocity) > 2.0 * overshoot * acceleration * d / m_velocity) a *= -1.0;
-			// Apply Newtonian mechanics
+			/// Apply Newtonian mechanics
 			m_velocity += t * a;
 			m_position += t * m_velocity;
 		}
-		if ((m_position = fmod(m_position, num)) < 0.0) m_position += num; // Normalize to [0, num]
-		if (m_position > m_marginLeft + m_songs) m_position -= num; // Normalize to [-m_marginLeft, songs + m_marginRight]
+		if ((m_position = fmod(m_position, num)) < 0.0) m_position += num; /// Normalize to [0, num]
+		if (m_position > m_marginLeft + m_songs) m_position -= num; /// Normalize to [-m_marginLeft, songs + m_marginRight]
 		return m_position;
 	}
 	/// get target
@@ -97,7 +97,7 @@ class AnimAcceleration {
 	void setTarget(unsigned int target, unsigned int songs) {
 		m_target = target;
 		if (m_songs == songs) return;
-		// Number of songs has changed => reset animation
+		/// Number of songs has changed => reset animation
 		m_songs = songs;
 		m_position = target;
 		m_velocity = 0.0;
@@ -107,7 +107,7 @@ class AnimAcceleration {
 	/// get current velocity
 	double getVelocity() const { return m_velocity; }
 
-  private:
+private:
 	unsigned int m_target;
 	unsigned int m_songs;
 	double m_position;

@@ -14,7 +14,7 @@ template <typename Key, typename Value> class Cachemap {
 		m_history.push_back(key);
 	}
 
-  public:
+public:
 	/// constructor
 	Cachemap(std::size_t size): m_size(size) {}
 	/// inserts key:value pairs

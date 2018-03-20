@@ -12,11 +12,11 @@ UErrorCode Players::m_icuError = U_ZERO_ERROR;
 icu::RuleBasedCollator Players::icuCollator = icu::RuleBasedCollator(icu::UnicodeString(""), icu::Collator::PRIMARY, m_icuError);
 
 Players::Players():
-	m_players(),
-	m_filtered(),
-	m_filter(),
-	math_cover(),
-	m_dirty(false)
+m_players(),
+m_filtered(),
+m_filter(),
+math_cover(),
+m_dirty(false)
 {}
 
 Players::~Players() {}
@@ -32,7 +32,7 @@ void Players::load(xmlpp::NodeSet const& n) {
 		try { id = std::stoi(a_id->get_value()); } catch (std::exception&) { }
 		xmlpp::NodeSet n2 = element.find("picture");
 		std::string picture;
-		if (!n2.empty()) // optional picture element
+		if (!n2.empty()) /// optional picture element
 		{
 			auto tn = xmlpp::get_first_child_text(dynamic_cast<xmlpp::Element&>(**n2.begin()));
 			picture = tn->get_content();
@@ -82,10 +82,9 @@ void Players::addPlayer (std::string const& name, std::string const& picture, in
 	pi.picture = picture;
 	pi.path = "";
 
-
 	if (pi.id == -1) pi.id = assign_id_internal();
 
-	if (pi.picture != "") // no picture, so don't search path
+	if (pi.picture != "") /// no picture, so don't search path
 	{
 		try {
 			pi.path =  findFile(fs::path("pictures") / pi.picture);
@@ -100,7 +99,7 @@ void Players::addPlayer (std::string const& name, std::string const& picture, in
 	if (!ret.second)
 	{
 		pi.id = assign_id_internal();
-		m_players.insert(pi); // now do the insert with the fresh id
+		m_players.insert(pi); /// now do the insert with the fresh id
 	}
 }
 
@@ -113,7 +112,7 @@ void Players::setFilter(std::string const& val) {
 int Players::assign_id_internal() {
 	auto it = m_players.rbegin();
 	if (it != m_players.rend()) return it->id+1;
-	else return 1; // empty set
+	else return 1; /// empty set
 }
 
 void Players::filter_internal() {
@@ -126,20 +125,20 @@ void Players::filter_internal() {
 		else {
 			icu::UnicodeString filter = icu::UnicodeString::fromUTF8(m_filter);
 			std::copy_if (m_players.begin(), m_players.end(), std::back_inserter(filtered), [&](PlayerItem it){
-			icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8(it.name), &icuCollator, NULL, m_icuError);
-			return (search.first(m_icuError) != USEARCH_DONE);
+				icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8(it.name), &icuCollator, NULL, m_icuError);
+				return (search.first(m_icuError) != USEARCH_DONE);
 			});
 		}
-// 		for (auto const& p: m_players) {
-// 			if (regex_search(p.name, boost::regex(m_filter, boost::regex_constants::icase))) filtered.push_back(p);
-// 		}
+		/// 		for (auto const& p: m_players) {
+		/// 			if (regex_search(p.name, boost::regex(m_filter, boost::regex_constants::icase))) filtered.push_back(p);
+		/// 		}
 		m_filtered.swap(filtered);
 	} catch (...) {
-		fplayers_t(m_players.begin(), m_players.end()).swap(m_filtered);  // Invalid regex => copy everything
+		fplayers_t(m_players.begin(), m_players.end()).swap(m_filtered);  /// Invalid regex => copy everything
 	}
 	math_cover.reset();
 
-	// Restore old selection
+	/// Restore old selection
 	int pos = 0;
 	if (selection.name != "") {
 		auto it = std::find(m_filtered.begin(), m_filtered.end(), selection);

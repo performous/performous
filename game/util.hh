@@ -30,7 +30,7 @@ static inline double getInf() { return std::numeric_limits<double>::infinity(); 
 
 static inline bool isPow2(unsigned int val) {
 	if (val == 0) return false;
-	if ((val & (val-1)) == 0) return true; // From Wikipedia: Power_of_two
+	if ((val & (val-1)) == 0) return true; /// From Wikipedia: Power_of_two
 	return false;
 }
 

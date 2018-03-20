@@ -23,7 +23,7 @@ namespace pm {
 	class Input: public Stream {
 	public:
 		Input(int devId) {
-			// Errors must be handled here because otherwise PortMidi will just exit() the program...
+			/// Errors must be handled here because otherwise PortMidi will just exit() the program...
 			if (devId < 0 || devId >= Pm_CountDevices()) throw std::runtime_error("Invalid PortMidi device ID");
 			PmDeviceInfo const* info = Pm_GetDeviceInfo(devId);
 			if (!info->input) throw std::runtime_error(std::string(info->name) + ": The PortMidi device is an output device (input device needed)");

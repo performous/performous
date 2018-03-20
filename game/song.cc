@@ -65,7 +65,7 @@ std::string Song::collate(std::string const& str) {
 }
 
 namespace {
-	// Cannot simply take double as its second argument because of a C++ defect
+	/// Cannot simply take double as its second argument because of a C++ defect
 	bool noteEndLessThan(Note const& a, Note const& b) { return a.end < b.end; }
 }
 
@@ -94,19 +94,19 @@ bool Song::getNextSection(double pos, SongSection &section) {
 			return true;
 		}
 	}
-	// returning false here will jump forward 5s (see screen_sing.cc)
+	/// returning false here will jump forward 5s (see screen_sing.cc)
 	return false;
 }
 
 bool Song::getPrevSection(double pos, SongSection &section) {
 	for (auto it = songsections.rbegin(); it != songsections.rend(); ++it) {
-		// subtract 1 second so we can jump across a section
+		/// subtract 1 second so we can jump across a section
 		if (it->begin < pos - 1.0) {
 			section = *it;
 			return true;
 		}
 	}
-	// returning false here will jump backwards by 5s (see screen_sing.cc)
+	/// returning false here will jump backwards by 5s (see screen_sing.cc)
 	return false;
 }
 
@@ -158,11 +158,9 @@ double Song::getDurationSeconds() {
 		}
 		std::clog << "song/info: >>> Couldn't open file for calculating duration." << std::endl;
 		return 0;
-	} else { //duration is still in memmory that means we already loaded it
+	} else { ///duration is still in memmory that means we already loaded it
 		return m_duration;
 	}
-return 0;
+	return 0;
 }
-
-
 

@@ -8,7 +8,7 @@
 #include <sstream>
 #include <boost/math/constants/constants.hpp>
 
-// extern const double m_pi;
+/// extern const double m_pi;
 
 namespace glmath {
 
@@ -46,7 +46,7 @@ namespace glmath {
 
 	inline vec3::vec3(vec4 const& v): x(v.x), y(v.y), z(v.z) {}
 
-	// Template functions to allow them to work with different types of floating-point values
+	/// Template functions to allow them to work with different types of floating-point values
 
 	template <typename Scalar> static inline vec2 operator*(Scalar k, vec2 const& v) { return vec2(k * v.x, k * v.y); }
 	template <typename Scalar> static inline vec3 operator*(Scalar k, vec3 const& v) { return vec3(k * v.x, k * v.y, k * v.z); }
@@ -92,7 +92,7 @@ namespace glmath {
 	private:
 		mat() {}
 	};
-	
+
 	template <typename Vec> static inline std::ostream& operator<<(std::ostream& os, mat<Vec> const& m) {
 		std::ostringstream oss;
 		oss << std::setprecision(3) << std::fixed;
@@ -144,19 +144,19 @@ namespace glmath {
 	static inline mat4 rotate(float rad, vec3 axis) {
 		mat4 ret = mat4::identity();
 		vec3 u = normalize(axis);
-		// Based on http://en.wikipedia.org/wiki/Rotation_mat4#Rotation_mat4_from_axis_and_angle
+		/// Based on http:///en.wikipedia.org/wiki/Rotation_mat4#Rotation_mat4_from_axis_and_angle
 		float s = std::sin(rad);
 		float c = std::cos(rad);
 		float nc = 1 - c;
-		// Column 0
+		/// Column 0
 		ret(0,0) = c + u.x * u.x * nc;
 		ret(1,0) = u.y * u.x * nc + u.z * s;
 		ret(2,0) = u.z * u.x * nc - u.y * s;
-		// Column 1
+		/// Column 1
 		ret(0,1) = u.x * u.y * nc - u.z * s;
 		ret(1,1) = c + u.y * u.y * nc;
 		ret(2,1) = u.z * u.y * nc + u.x * s;
-		// Column 2
+		/// Column 2
 		ret(0,2) = u.x * u.z * nc + u.y * s;
 		ret(1,2) = u.y * u.z * nc - u.x * s;
 		ret(2,2) = c + u.z * u.z * nc;
