@@ -38,8 +38,10 @@ void convertToUTF8(std::stringstream &_stream, std::string _filename) {
         match = std::pair<std::string,int>("UTF-8",100); // If there's no filename, assume it's internal text and thus utf-8.
     }
     icu::UnicodeString ustring;
-	// Test for UTF-8 BOM (a three-byte sequence at the beginning of a file)
     if (data.substr(0, 3) == "\xEF\xBB\xBF") {
+        if (config["game/bom_warnings"].b()) {
+            std::clog << "unicode/warning: " << _filename << " UTF-8 BOM ignored. Please avoid editors that add a BOM to UTF-8 (e.g. Notepad)." << std::endl;
+        }
         match.first = "UTF-8";
         match.second = 100;
         _stream.str(data.substr(3)); // Remove BOM if there is one
