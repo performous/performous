@@ -39,10 +39,6 @@ to save the current settings to XML.
 	</menu>
 
 	<!-- Gameplay preferences -->
-	<entry name="game/bom_warnings" type="bool" value="false">
-		<short>Warn about UTF-8 BOM.</short>
-		<long>Dump warnings to game log when a BOM is present.</long>
-	</entry>
 	<entry name="game/karaoke_mode" type="int" value="0">
 		<limits>
 			<enum>Off</enum>
