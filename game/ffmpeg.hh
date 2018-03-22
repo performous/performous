@@ -173,8 +173,8 @@ class FFmpeg {
 	FFmpeg(fs::path const& file, unsigned int rate = 0);
 	~FFmpeg();
 	void operator()(); ///< Thread runs here, don't call directly
-	unsigned width, ///< width of video
-	         height; ///< height of video
+	unsigned width; ///< width of video
+	unsigned height; ///< height of video
 	/// queue for video
 	VideoFifo  videoQueue;
 	/// queue for audio

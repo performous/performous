@@ -381,7 +381,7 @@ void ScreenSongs::drawCovers() {
 		s.draw();
 	}
 	// Draw the playlist
-    Game* gm = Game::getSingletonPtr();
+	Game* gm = Game::getSingletonPtr();
 	auto const& playlist = gm->getCurrentPlayList().getList();
 	double c = (m_menuPos == 0 /* Playlist */ ? beat : 1.0);
 	ColorTrans c1(Color(c, c, c));

@@ -167,7 +167,7 @@ void ScreenSing::reloadGL() {
 }
 
 void ScreenSing::exit() {
-    Game::getSingletonPtr()->controllers.enableEvents(false);
+	Game::getSingletonPtr()->controllers.enableEvents(false);
 	m_engine.reset();
 	m_score_window.reset();
 	m_menu.clear();
@@ -182,7 +182,7 @@ void ScreenSing::exit() {
 	m_song->dropNotes();
 	m_menuTheme.reset();
 	theme.reset();
-    m_audio.fadeout(0);
+	m_audio.fadeout(0);
 	if (m_audio.isPaused()) m_audio.togglePause();
 	Game::getSingletonPtr()->showLogo();
 }
@@ -256,7 +256,7 @@ void ScreenSing::activateNextScreen()
 	m_database.addSong(m_song);
 	if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
 		// if no highscore reached..
-	    gm->activateScreen("Playlist");
+		gm->activateScreen("Playlist");
 	}
 
 	// Score window visible -> Enter quits to Players Screen

@@ -187,7 +187,7 @@ namespace {
 		CmpByField(Field Song::* field): m_field(field) {}
 		/// Compare left < right
 		bool operator()(Song const& left , Song const& right) {
-		    return left.*m_field < right.*m_field;
+			return left.*m_field < right.*m_field;
 		}
 		/// Compare *left < *right
 		bool operator()(boost::shared_ptr<Song> const& left, boost::shared_ptr<Song> const& right) {
