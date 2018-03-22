@@ -95,10 +95,10 @@ class Dimensions {
 
 /// texture coordinates
 struct TexCoords {
-	float x1, ///< left
-	      y1, ///< top
-	      x2, ///< right
-	      y2; ///< bottom
+	float x1; ///< left
+	float y1; ///< top
+	float x2; ///< right
+	float y2; ///< bottom
 	/// constructor
 	TexCoords(float x1_ = 0.0, float y1_ = 0.0, float x2_ = 1.0, float y2_ = 1.0):
 	  x1(x1_), y1(y1_), x2(x2_), y2(y2_) {}

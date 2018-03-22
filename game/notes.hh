@@ -9,8 +9,8 @@
 
 /// stores duration of a note
 struct Duration {
-	double begin, ///< beginning timestamp in seconds
-	       end;   ///< ending timestamp in seconds
+	double begin; ///< beginning timestamp in seconds
+	double end;   ///< ending timestamp in seconds
 	Duration();
 	/// create a new Duration object and initialize begin and end
 	Duration(double b, double e): begin(b), end(e) {}
@@ -51,8 +51,8 @@ static inline bool isTrackInside(InstrumentTracks const& track_map, std::string 
 /// note read from songfile
 struct Note {
 	Note();
-	double begin, ///< begin time
-	       end; ///< end time
+	double begin; ///< begin time
+	double end; ///< end time
 	double phase; /// Position within a measure, [0, 1)
 	// FIXME: Remove gameplay variables from here (Note should be immutable).
 	/// power of note (how well it is being hit right now)

@@ -145,15 +145,15 @@ void Game::drawNotifications() {
 
 void Game::finished()
 {
-    m_finished = true;
+	m_finished = true;
 }
  
 Game::~Game()
 {
-    if (currentScreen) currentScreen->exit();
+	if (currentScreen) currentScreen->exit();
 }
  
 bool Game::isFinished()
 {
-    return m_finished;
+	return m_finished;
 }

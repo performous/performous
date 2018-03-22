@@ -175,101 +175,101 @@ void SongParser::resetNoteParsingState() {
 }
 
 void SongParser::vocalsTogether() {
-	auto togetherIt = m_song.vocalTracks.find("Together");
-	if (togetherIt == m_song.vocalTracks.end()) return;
-	Notes& together = togetherIt->second.notes;
-	if (!together.empty()) return;
-	Notes notes;
-	// Collect usable vocal tracks
-	struct TrackInfo {
-		typedef Notes::const_iterator It;
-		It it, end;
-		TrackInfo(It begin, It end): it(begin), end(end) {}
-	};
-	std::vector<TrackInfo> tracks;
-	for (auto& nt: m_song.vocalTracks) {
-		togetherIt->second.noteMin = std::min(togetherIt->second.noteMin, nt.second.noteMin);
-		togetherIt->second.noteMax = std::max(togetherIt->second.noteMax, nt.second.noteMax);
-
-		Notes& n = nt.second.notes;
-		if (!n.empty()) tracks.push_back(TrackInfo(n.begin(), n.end()));
-	}
-	if (tracks.empty()) return;
-	// Combine notes
-	// FIXME: This should do combining on sentence level rather than note-by-note
-	TrackInfo* trk = &tracks.front();
-	while (trk) {
-		Note const& n = *trk->it;
-		//std::cerr << " " << n.syllable << ": " << n.begin << "-" << n.end << std::endl;
-		notes.push_back(n);
-		++trk->it;
-		trk = nullptr;
-		// Iterate all tracks past the processed note and find the new earliest track
-		for (TrackInfo& trk2: tracks) {
-			// Skip until a sentence that begins after the note ended
-			while (trk2.it != trk2.end && trk2.it->begin < n.end) ++trk2.it;
-			if (trk2.it == trk2.end) continue;
-			if (!trk || trk2.it->begin < trk->it->begin) trk = &trk2;
-		}
-	}
-	together.swap(notes);
+    auto togetherIt = m_song.vocalTracks.find("Together");
+    if (togetherIt == m_song.vocalTracks.end()) return;
+    Notes& together = togetherIt->second.notes;
+    if (!together.empty()) return;
+    Notes notes;
+    // Collect usable vocal tracks
+    struct TrackInfo {
+        typedef Notes::const_iterator It;
+        It it, end;
+        TrackInfo(It begin, It end): it(begin), end(end) {}
+    };
+    std::vector<TrackInfo> tracks;
+    for (auto& nt: m_song.vocalTracks) {
+        togetherIt->second.noteMin = std::min(togetherIt->second.noteMin, nt.second.noteMin);
+        togetherIt->second.noteMax = std::max(togetherIt->second.noteMax, nt.second.noteMax);
+        
+        Notes& n = nt.second.notes;
+        if (!n.empty()) tracks.push_back(TrackInfo(n.begin(), n.end()));
+    }
+    if (tracks.empty()) return;
+    // Combine notes
+    // FIXME: This should do combining on sentence level rather than note-by-note
+    TrackInfo* trk = &tracks.front();
+    while (trk) {
+        Note const& n = *trk->it;
+        //std::cerr << " " << n.syllable << ": " << n.begin << "-" << n.end << std::endl;
+        notes.push_back(n);
+        ++trk->it;
+        trk = nullptr;
+        // Iterate all tracks past the processed note and find the new earliest track
+        for (TrackInfo& trk2: tracks) {
+            // Skip until a sentence that begins after the note ended
+            while (trk2.it != trk2.end && trk2.it->begin < n.end) ++trk2.it;
+            if (trk2.it == trk2.end) continue;
+            if (!trk || trk2.it->begin < trk->it->begin) trk = &trk2;
+        }
+    }
+    together.swap(notes);
 }
 
 void SongParser::finalize() {
-    vocalsTogether();
-    for (auto& nt: m_song.vocalTracks) {
-        VocalTrack& vocal = nt.second;
-        // Remove empty sentences
-        {
-            Note::Type lastType = Note::NORMAL;
-            std::clog << "songparser/debug: In " << m_song.artist << " - " << m_song.title << std::endl;
-            for (auto itn = vocal.notes.begin(); itn != vocal.notes.end();) {
-                if (itn->type == Note::SLEEP) { itn->end = itn->begin; ++itn; continue; }
-                auto next = (itn +1);
-                
-                // Try to fix overlapping syllables.
-                if (next != vocal.notes.end() && Note::overlapping(*itn, *next)) {
-                    double beatDur = getBPM(itn->begin).step;
-                    double newEnd = (next->begin - beatDur);
-                    std::clog << "songparser/info: Trying to correct duration of overlapping notes (" << itn->syllable << " & " << next->syllable << ")..." << std::endl;
-                    std::clog << "songparser/info: Changing ending to: " << newEnd << ", will give a length of: " << (newEnd - (itn->begin)) << std::endl;
-                    if ((newEnd - itn->begin) >= beatDur) { itn->end = newEnd; }
-                    else if (next->type != Note::SLEEP) {
-                        std::clog << "songparser/info: Resulting note would be too short, will combine them instead." << std::endl;
-                        itn->syllable += std::string("-") += next->syllable;
-                        itn->end = next->end;
-                        vocal.notes.erase(next);
-                    }
-                    else { next->begin = next->end = itn->end; }
-                }
-                Note::Type type = itn->type;
-                if(type == Note::SLEEP && lastType == Note::SLEEP) {
-                    std::clog << "songparser/info: " + m_song.filename.string() + ": Discarding empty sentence" << std::endl;
-                    itn = vocal.notes.erase(itn);
-                } else { ++itn; }
-                lastType = type;
-            }
-        }
-        // Adjust negative notes
-        if (vocal.noteMin <= 0) {
-            unsigned int shift = (1 - vocal.noteMin / 12) * 12;
-            vocal.noteMin += shift;
-            vocal.noteMax += shift;
-            for (auto& elem: vocal.notes) {
-                elem.note += shift;
-                elem.notePrev += shift;
-            }
-        }
-        // Set begin/end times
-        if (!vocal.notes.empty()) vocal.beginTime = vocal.notes.front().begin, vocal.endTime = vocal.notes.back().end;
-        else vocal.beginTime = vocal.endTime = 0.0;
-        // Compute maximum score
-        double max_score = 0.0;
-        for (auto& note: vocal.notes) max_score += note.maxScore();
-        vocal.m_scoreFactor = 1.0 / max_score;
-    }
-    if (m_tsPerBeat) {
-        // Add song beat markers
-        for (unsigned ts = 0; ts < m_tsEnd; ts += m_tsPerBeat) m_song.beats.push_back(tsTime(ts));
-    }
+	vocalsTogether();
+	for (auto& nt: m_song.vocalTracks) {
+		VocalTrack& vocal = nt.second;
+		// Remove empty sentences
+		{
+			Note::Type lastType = Note::NORMAL;
+			std::clog << "songparser/debug: In " << m_song.artist << " - " << m_song.title << std::endl;
+			for (auto itn = vocal.notes.begin(); itn != vocal.notes.end();) {
+				if (itn->type == Note::SLEEP) { itn->end = itn->begin; ++itn; continue; }
+				auto next = (itn +1);
+				
+				// Try to fix overlapping syllables.
+				if (next != vocal.notes.end() && Note::overlapping(*itn, *next)) {
+					double beatDur = getBPM(itn->begin).step;
+					double newEnd = (next->begin - beatDur);
+					std::clog << "songparser/info: Trying to correct duration of overlapping notes (" << itn->syllable << " & " << next->syllable << ")..." << std::endl;
+					std::clog << "songparser/info: Changing ending to: " << newEnd << ", will give a length of: " << (newEnd - (itn->begin)) << std::endl;
+					if ((newEnd - itn->begin) >= beatDur) { itn->end = newEnd; }
+					else if (next->type != Note::SLEEP) {
+						std::clog << "songparser/info: Resulting note would be too short, will combine them instead." << std::endl;
+						itn->syllable += std::string("-") += next->syllable;
+						itn->end = next->end;
+						vocal.notes.erase(next);
+					}
+					else { next->begin = next->end = itn->end; }
+				}
+				Note::Type type = itn->type;
+				if(type == Note::SLEEP && lastType == Note::SLEEP) {
+					std::clog << "songparser/info: " + m_song.filename.string() + ": Discarding empty sentence" << std::endl;
+					itn = vocal.notes.erase(itn);
+				} else { ++itn; }
+				lastType = type;
+			}
+		}
+		// Adjust negative notes
+		if (vocal.noteMin <= 0) {
+			unsigned int shift = (1 - vocal.noteMin / 12) * 12;
+			vocal.noteMin += shift;
+			vocal.noteMax += shift;
+			for (auto& elem: vocal.notes) {
+				elem.note += shift;
+				elem.notePrev += shift;
+			}
+		}
+		// Set begin/end times
+		if (!vocal.notes.empty()) vocal.beginTime = vocal.notes.front().begin, vocal.endTime = vocal.notes.back().end;
+		else vocal.beginTime = vocal.endTime = 0.0;
+		// Compute maximum score
+		double max_score = 0.0;
+		for (auto& note: vocal.notes) max_score += note.maxScore();
+		vocal.m_scoreFactor = 1.0 / max_score;
+	}
+	if (m_tsPerBeat) {
+		// Add song beat markers
+		for (unsigned ts = 0; ts < m_tsEnd; ts += m_tsPerBeat) m_song.beats.push_back(tsTime(ts));
+	}
 }
