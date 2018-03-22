@@ -184,9 +184,8 @@ http_server::response WebServer::GETresponse(const http_server::request &request
 			boost::to_lower(key);
 			jsonRoot[key] = kv.second;
 		}
-        return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
-}
-	else {
+		return http_server::response::stock_reply(http_server::response::ok, jsonRoot.toStyledString());
+	} else {
 		//other text files
 		try {
 			std::string destination = request.destination;
@@ -295,56 +294,55 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 
 std::map<std::string, std::string> WebServer::GenerateLocaleDict() {
 	std::vector<std::string> translationKeys = GetTranslationKeys();
-    
-    std::map<std::string, std::string> localeMap;
-    for (auto const &translationKey : translationKeys) {
+	std::map<std::string, std::string> localeMap;
+	for (auto const &translationKey : translationKeys) {
 		localeMap[translationKey] = _(translationKey);
 	}
-    return localeMap;
+	return localeMap;
 }
 
 std::vector<std::string> WebServer::GetTranslationKeys() {
 	std::vector<std::string> tranlationKeys = { 
 		translate_noop("Performous web frontend"),
-	    translate_noop("View database"),
-	    translate_noop("View playlist"),
-	    translate_noop("Search and Add"),
-	    translate_noop("Sort by"),
-	    translate_noop("Artist"),
-	    translate_noop("Title"),
-	    translate_noop("Language"),
-	    translate_noop("Edition"),
-	    translate_noop("Creator"),
-	    translate_noop("Sort order"),
-	    translate_noop("Normal"),
-	    translate_noop("Inverted"),
-	    translate_noop("Update every 10 sec"),
-	    translate_noop("Refresh database"),
-	    translate_noop("Upcoming songs"),
-	    translate_noop("Refresh playlist"),
-	    translate_noop("Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding Performous see /docs/Authors.txt"),
-	    translate_noop("Search"),
-	    translate_noop("Available songs"),
-	    translate_noop("Search for songs"),
-	    translate_noop("Yes"),
-	    translate_noop("No"),
-	    translate_noop("Move up"),
-	    translate_noop("Move down"),
-	    translate_noop("Set position"),
-	    translate_noop("Remove song"),
-	    translate_noop("Desired position of song"),
-	    translate_noop("Cancel"),
-	    translate_noop("Successfully removed song from playlist"),
-	    translate_noop("Failed removing song from playlist"),
-	    translate_noop("Successfully changed position of song"),
-	    translate_noop("Failed changing position of song"),
-	    translate_noop("Successfully moved song up"),
-	    translate_noop("Failed moving song up"),
-	    translate_noop("Successfully moved song down"),
-	    translate_noop("Failed moving song down"),
-	    translate_noop("Successfully added song to the playlist"),
-	    translate_noop("Failed adding song to the playlist"),
-	    translate_noop("No songs found with current filter")
+		translate_noop("View database"),
+		translate_noop("View playlist"),
+		translate_noop("Search and Add"),
+		translate_noop("Sort by"),
+		translate_noop("Artist"),
+		translate_noop("Title"),
+		translate_noop("Language"),
+		translate_noop("Edition"),
+		translate_noop("Creator"),
+		translate_noop("Sort order"),
+		translate_noop("Normal"),
+		translate_noop("Inverted"),
+		translate_noop("Update every 10 sec"),
+		translate_noop("Refresh database"),
+		translate_noop("Upcoming songs"),
+		translate_noop("Refresh playlist"),
+		translate_noop("Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding Performous see /docs/Authors.txt"),
+		translate_noop("Search"),
+		translate_noop("Available songs"),
+		translate_noop("Search for songs"),
+		translate_noop("Yes"),
+		translate_noop("No"),
+		translate_noop("Move up"),
+		translate_noop("Move down"),
+		translate_noop("Set position"),
+		translate_noop("Remove song"),
+		translate_noop("Desired position of song"),
+		translate_noop("Cancel"),
+		translate_noop("Successfully removed song from playlist"),
+		translate_noop("Failed removing song from playlist"),
+		translate_noop("Successfully changed position of song"),
+		translate_noop("Failed changing position of song"),
+		translate_noop("Successfully moved song up"),
+		translate_noop("Failed moving song up"),
+		translate_noop("Successfully moved song down"),
+		translate_noop("Failed moving song down"),
+		translate_noop("Successfully added song to the playlist"),
+		translate_noop("Failed adding song to the playlist"),
+		translate_noop("No songs found with current filter")
 	};
 
 	return tranlationKeys;

@@ -216,9 +216,9 @@ void FFmpeg::decodePacket() {
 			if (av_read_frame(s, this) < 0) throw FFmpeg::eof_error();
 		}
 #if LIBAVCODEC_VERSION_INT > (AV_VERSION_INT(55, 0, 0))
-        ~ReadFramePacket() { av_packet_unref(this); } //YES THEY DID IT AGAIN
+		~ReadFramePacket() { av_packet_unref(this); } //YES THEY DID IT AGAIN
 #else
-        ~ReadFramePacket() { av_free_packet(this); }
+		~ReadFramePacket() { av_free_packet(this); }
 #endif
 	};
 

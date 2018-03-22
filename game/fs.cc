@@ -67,35 +67,32 @@ namespace {
 
 void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destinationDir)
 {
-    if (!fs::exists(sourceDir) || !fs::is_directory(sourceDir))
-    {
-        throw std::runtime_error("Source directory " + sourceDir.string() + " does not exist or is not a directory");
-    }
-    if (!fs::create_directory(destinationDir) && !fs::exists(destinationDir))
-    {
-        throw std::runtime_error("Cannot create destination directory " + destinationDir.string());
-    }
+	if (!fs::exists(sourceDir) || !fs::is_directory(sourceDir)) {
+		throw std::runtime_error("Source directory " + sourceDir.string() + " does not exist or is not a directory");
+	}
+	if (!fs::create_directory(destinationDir) && !fs::exists(destinationDir)) {
+		throw std::runtime_error("Cannot create destination directory " + destinationDir.string());
+	}
 #if ((BOOST_VERSION / 100 % 1000) >= 55)
-    for (const auto& dirEnt : fs::recursive_directory_iterator{sourceDir})
+	for (const auto& dirEnt : fs::recursive_directory_iterator{sourceDir})
 #else
-    for (fs::recursive_directory_iterator dirEnt(sourceDir); dirEnt !=fs::recursive_directory_iterator(); ++dirEnt)
+	for (fs::recursive_directory_iterator dirEnt(sourceDir); dirEnt !=fs::recursive_directory_iterator(); ++dirEnt)
 #endif
-    {
-    #if ((BOOST_VERSION / 100 % 1000) >= 55)
-        const auto& path = dirEnt.path();
-    #else
-        const auto& path = dirEnt->path();    
-    #endif
-        auto relativePathStr = path.string();
-        boost::algorithm::replace_first(relativePathStr, sourceDir.string(), "");
-        try { 
-        if (!fs::is_directory(path)) { fs::copy_file(path, destinationDir / relativePathStr); }
-        else { fs::copy_directory(path, destinationDir / relativePathStr); }
-        }
-        catch (...) {
-        throw std::runtime_error("Cannot copy file " + path.string() + ", because it already exists in the destination folder.");
-        }
-    }
+	{
+#if ((BOOST_VERSION / 100 % 1000) >= 55)
+		const auto& path = dirEnt.path();
+#else
+		const auto& path = dirEnt->path();
+#endif
+		auto relativePathStr = path.string();
+		boost::algorithm::replace_first(relativePathStr, sourceDir.string(), "");
+		try { 
+			if (!fs::is_directory(path)) { fs::copy_file(path, destinationDir / relativePathStr); }
+			else { fs::copy_directory(path, destinationDir / relativePathStr); }
+		} catch (...) {
+			throw std::runtime_error("Cannot copy file " + path.string() + ", because it already exists in the destination folder.");
+		}
+	}
 }
 
 void pathBootstrap() { Lock l(mutex); cache.pathBootstrap(); }

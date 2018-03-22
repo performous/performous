@@ -43,7 +43,7 @@ if(WIN32)
 		# windres foo.rc foores.o
 		# gcc -o foo.exe foo.o foores.o
 		find_library(WSOCK32_LIBRARY wsock32)
-    		find_library(WS2_32_LIBRARY ws2_32)
+		find_library(WS2_32_LIBRARY ws2_32)
 		if(NOT CMAKE_RC_COMPILER)
 			find_program(CMAKE_RC_COMPILER windres)
 		endif()

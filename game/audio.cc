@@ -141,7 +141,7 @@ class Music {
 		FFmpeg mpeg;
 		float fadeLevel;
 		float pitchFactor;
-        Track(fs::path const& filename, unsigned int sr): mpeg(filename, sr), fadeLevel(1.0f), pitchFactor(0.0f) {}
+		Track(fs::path const& filename, unsigned int sr): mpeg(filename, sr), fadeLevel(1.0f), pitchFactor(0.0f) {}
 	};
 	std::unordered_map<std::string, std::unique_ptr<Track>> tracks; ///< Audio decoders
 	double srate; ///< Sample rate
@@ -397,11 +397,9 @@ struct Output {
 
 Device::Device(unsigned int in, unsigned int out, double rate, unsigned int dev):
   in(in), out(out), rate(rate), dev(dev),
-  stream(
-    *this,
-    portaudio::Params().channelCount(in).device(dev).suggestedLatency(config["audio/latency"].f()),
-	portaudio::Params().channelCount(out).device(dev).suggestedLatency(config["audio/latency"].f()),
-	rate),
+  stream(*this,
+  portaudio::Params().channelCount(in).device(dev).suggestedLatency(config["audio/latency"].f()),
+  portaudio::Params().channelCount(out).device(dev).suggestedLatency(config["audio/latency"].f()), rate),
   mics(in, nullptr),
   outptr()
 {}

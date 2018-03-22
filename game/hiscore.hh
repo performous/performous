@@ -29,8 +29,8 @@ public:
 
 	  @param score is a value between 0 and 10000. values below 2000 will lead to instant disqualification.
 	  @return true if the score make it into the list
-	  @return false if addNewHiscore does not make sense
-	    for that score.*/
+	  @return false if addNewHiscore does not make sense for that score.
+	  */
 	bool reachedHiscore(unsigned score, unsigned songid, std::string const& track) const;
 
 	/**Add a specific highscore into the list.
