@@ -20,6 +20,7 @@
 #define AVUTIL_INCLUDE <@AVUtil_INCLUDE@>
 #define AVUTIL_OPT_INCLUDE <@AVUtil_INCLUDE_DIRS@/libavutil/opt.h> //HACK to get AVOption class!
 #define AVUTIL_MATH_INCLUDE <@AVUtil_INCLUDE_DIRS@/libavutil/mathematics.h>
+#define AVUTIL_ERROR_INCLUDE <@AVUtil_INCLUDE_DIRS@/libavutil/error.h>
 
 // libxml++ version
 #define LIBXMLPP_VERSION_2_6 @LibXML++_VERSION_2_6@
