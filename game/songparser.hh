@@ -77,12 +77,14 @@ class SongParser {
 		unsigned m_tsEnd;	// /< The ending ts of the song
 		BPM getBPM (double ts) {
 			for (auto& itb : boost::adaptors::reverse (m_bpms)) {
-				if (itb.begin > ts) { continue; } else {
+				if (itb.begin > ts) { 
+					continue; 
+				} else {
 					return itb;
-					}
 				}
-			throw std::runtime_error("No BPM definition prior to this note...");
 			}
+			throw std::runtime_error("No BPM definition prior to this note...");
+		}
 		void addBPM (double ts, double bpm) {
 			if (!(( bpm >= 1.0) && ( bpm < 1e12) )) { throw std::runtime_error("Invalid BPM value"); }
 			if (!m_bpms.empty() && ( m_bpms.back().ts >= ts) ) {
