@@ -1,4 +1,6 @@
+<!-- Modal on the playlist tab. This shows the player info about the song and they may change the position or remove the song. -->
 <div id="playlist-song-modal-body" class="container-fluid">
+	<!-- Generic info about the song -->
 	<div class="form-group row col-sm-12">
 		<div id="modal-language-div" class="col-sm-4">
 			<label class="control-label" for="modal-language-value">language</label>
@@ -13,6 +15,7 @@
 			<span id="modal-creator-value" class="show"></span>
 		</div>
 	</div>
+	<!-- Simple buttons to move the song one position up or down. -->
 	<div class="form-group row col-sm-12">
 		<div class="col-sm-6">
 			<button id="modal-move-song-up" class="btn btn-secondary btn-block" data-dismiss="modal">move_up<span class="glyphicon glyphicon-menu-up pull-right"></span></button>
@@ -21,6 +24,7 @@
 			<button id="modal-move-song-down" class="btn btn-secondary btn-block" data-dismiss="modal">move_down<span class="glyphicon glyphicon-menu-down pull-right"></span></button>
 		</div>
 	</div>
+	<!-- Input field to move the song to a desired position. -->
 	<div class="form-group row col-sm-12">
 		<div class="col-sm-12">
 			<div class="input-group">
@@ -31,6 +35,7 @@
 			</div>
 		</div>
 	</div>
+	<!-- Button to remove the song from the current playlist. -->
 	<div class="form-group row col-sm-12">
 		<div class="col-sm-12">
 			<button id="modal-remove-song" class="btn btn-secondary btn-block" data-dismiss="modal">remove_song<span class="glyphicon glyphicon-remove pull-right"></span></button>

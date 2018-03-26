@@ -1,7 +1,14 @@
+<!-- Database tab. This shows our whole collection of songs. -->
 <div class="container-fluid">
+	<!-- Button to refresh our database. Use with care if you have a large library. -->
 	<div class="col-sm-12">
 		<button id="refresh-database" class="btn btn-secondary btn-block" type="button"><span class="glyphicon glyphicon-refresh glyph-centered"></span>refresh_database</button>
 	</div>
+	<!-- 
+		Div to contain a reponsive table with all of our songs as content.
+		Clicking on a row makes it add the clicked song to the playlist.
+		One can sort the table by clicking the header columns.
+	-->
 	<div class="col-sm-12">
 		<div class="table-responsive">
 			<table id="database-songs" class="table table-striped table-hover">
