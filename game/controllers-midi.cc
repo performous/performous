@@ -3,7 +3,7 @@
 #include "controllers.hh"
 #include "portmidi.hh"
 #include "fs.hh"
-#include <boost/regex.hpp>
+#include <regex>
 #include <unordered_map>
 
 namespace input {
@@ -11,14 +11,14 @@ namespace input {
 	class Midi: public Hardware {
 	public:
 		Midi() {
-			boost::regex re(config["game/midi_input"].s());
+			std::regex re(config["game/midi_input"].s());
 			for (int dev = 0; dev < Pm_CountDevices(); ++dev) {
 				try {
 					PmDeviceInfo const* info = Pm_GetDeviceInfo(dev);
 					if (!info->input) continue;  // Not an input device
 					if (info->opened) continue;  // Already opened
 					std::string name = getName(dev);
-					if (!re.empty() && !regex_search(name, re)) continue;
+					if (!regex_search(name, re)) continue;
 					// Now actually open the device
 					m_streams.emplace(dev, std::unique_ptr<pm::Input>(new pm::Input(dev)));
 					std::clog << "controller-midi/info: Opened MIDI device " << name << std::endl;

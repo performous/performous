@@ -4,7 +4,7 @@
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
-#include <boost/regex.hpp>
+#include <regex>
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
@@ -49,7 +49,7 @@ void Backgrounds::reload_internal(fs::path const& parent) {
 	if (std::distance(parent.begin(), parent.end()) > 20) { std::clog << "backgrounds/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
 	try {
 		// Find suitable file formats
-		boost::regex expression(R"(\.(png|jpeg|jpg|svg)$)", boost::regex_constants::icase);
+		std::regex expression(R"(\.(png|jpeg|jpg|svg)$)", std::regex_constants::icase);
 		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) {
 			fs::path p = dirIt->path();
 			if (fs::is_directory(p)) { reload_internal(p); continue; }
