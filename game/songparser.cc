@@ -21,7 +21,7 @@ namespace SongParserUtil {
 		}
 	}
 	void assign (double& var, std::string str) {
-		std::replace (str.begin(), str.end(), ',', '.');// Fix decimal separators
+		std::replace (str.begin(), str.end(), ',', '.');  // Fix decimal separators
 		try {
 			var = std::stod (str);
 		} catch (...) {
@@ -88,7 +88,7 @@ SongParser::SongParser(Song& s): m_song(s) {
 
 		// Default for preview position if none was specified in header
 		if (s.preview_start != s.preview_start) {
-			s.preview_start = (type == INI ? 5.0 : 30.0);	// 5 s for band mode, 30 s for others
+			s.preview_start = (type == INI ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
 		}
 		guessFiles();
 		if (!m_song.midifilename.empty()) {midParseHeader(); }
@@ -149,18 +149,16 @@ void SongParser::guessFiles () {
 		fs::path& field = *fields[i].first;
 		if (field.empty()) {
 			for (fs::path const& f : files) {
-				std::string name = f.filename().string();																																																																// File basename
-				if (!regex_search (name, regexps[i])) {
-					continue;																																																																// No match for current file
-				}
+				std::string name = f.filename().string();  // File basename
+				if (!regex_search(name, regexps[i])) continue;  // No match for current file
 				field = f;
 				logFound += "  " + name;
 			}
 		}
-		files.erase (field);	// Remove from available options
+		files.erase (field);  // Remove from available options
 	}
 	
-	m_song.music[TrackName::PREVIEW].clear();																																																																// We don't currently support preview tracks (TODO: proper handling in audio.cc).
+	m_song.music[TrackName::PREVIEW].clear();  // We don't currently support preview tracks (TODO: proper handling in audio.cc).
 	
 	if (logFound.empty() && logMissing.empty()) {
 		return;
