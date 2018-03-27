@@ -27,7 +27,7 @@ void SongParser::txtParseHeader() {
 /// Parse notes
 void SongParser::txtParse() {
 	std::string line;
-	m_curSinger = P1;
+	m_curSinger = CurrentSinger::P1;
 	m_song.insertVocalTrack(TrackName::LEAD_VOCAL, VocalTrack(TrackName::LEAD_VOCAL));
 	m_song.insertVocalTrack(DUET_P2, VocalTrack(DUET_P2));
 	while (getline(line) && txtParseField(line)) {} // Parse the header again
@@ -147,13 +147,13 @@ bool SongParser::txtParseNote(std::string line) {
 		if (m_relative) // FIXME?
 			throw std::runtime_error("Relative note timing not supported with multiple singers");
 		if (line.size() < 2) throw std::runtime_error("Invalid player info line [too short]: " + line);
-		else if (line[1] == '1') m_curSinger = P1;
-		else if (line[1] == '2') m_curSinger = P2;
-		else if (line[1] == '3') m_curSinger = BOTH;
+		else if (line[1] == '1') m_curSinger = CurrentSinger::P1;
+		else if (line[1] == '2') m_curSinger = CurrentSinger::P2;
+		else if (line[1] == '3') m_curSinger = CurrentSinger::BOTH;
 		else if (line.size() < 3) throw std::runtime_error("Invalid player info line [too short]: " + line);
-		else if (line[2] == '1') m_curSinger = P1;
-		else if (line[2] == '2') m_curSinger = P2;
-		else if (line[2] == '3') m_curSinger = BOTH;
+		else if (line[2] == '1') m_curSinger = CurrentSinger::P1;
+		else if (line[2] == '2') m_curSinger = CurrentSinger::P2;
+		else if (line[2] == '3') m_curSinger = CurrentSinger::BOTH;
 		else throw std::runtime_error("Invalid player info line [malformed]: " + line);
 		resetNoteParsingState();
 		return true;
@@ -190,9 +190,7 @@ bool SongParser::txtParseNote(std::string line) {
 		default: throw std::runtime_error("Unknown note type");
 	}
 	n.begin = tsTime(ts);
-	VocalTrack& vocal = (m_curSinger & P1)
-	? m_song.getVocalTrack(TrackName::LEAD_VOCAL)
-	: m_song.getVocalTrack(DUET_P2);
+	VocalTrack& vocal = m_song.getVocalTrack(m_curSinger == CurrentSinger::P1 ? TrackName::LEAD_VOCAL: DUET_P2);
 	Notes& notes = vocal.notes;
 	if (m_relative && notes.empty()) m_relativeShift = ts;
 	m_prevts = ts;
@@ -226,7 +224,7 @@ bool SongParser::txtParseNote(std::string line) {
 		}
 	}
 	notes.push_back(n);
-	if (m_curSinger == BOTH) { m_song.getVocalTrack(DUET_P2).notes.push_back(n); }
+	if (m_curSinger == CurrentSinger::BOTH) { m_song.getVocalTrack(DUET_P2).notes.push_back(n); }
 	return true;
 }
 

@@ -39,20 +39,7 @@ namespace SongParserUtil {
 	}
 }
 
-
-// / constructor
-SongParser::SongParser(Song& s) :
-m_song(s),
-m_linenum(),
-m_relative(),
-m_gap(),
-m_bpm(),
-m_prevtime(),
-m_prevts(),
-m_relativeShift(),
-m_tsPerBeat(),
-m_tsEnd()
-{
+SongParser::SongParser(Song& s): m_song(s) {
 	try {
 		enum { NONE, TXT, XML, INI, SM } type = NONE;
 		// Read the file, determine the type and do some initial validation checks
@@ -83,29 +70,21 @@ m_tsEnd()
 		}
 		// Header already parsed?
 		if (s.loadStatus == Song::HEADER) {
-			if (type == TXT) {txtParse(); } else if (type == INI) {
-				midParse();																																																																// INI doesn't contain notes, parse those from MIDI
-			}
-			else if (type == XML)           {
-				xmlParse();
-			}
-			else if (type == SM)           {
-				smParse();
-			}
-			finalize();																																																																// Do some adjusting to the notes
+			if (type == TXT) txtParse();
+			else if (type == INI) midParse();  // INI doesn't contain notes, parse those from MIDI
+			else if (type == XML) xmlParse();
+			else if (type == SM) smParse();
+			finalize();  // Do some adjusting to the notes
 			s.loadStatus = Song::FULL;
 			return;
 		}
 		// Parse only header to speed up loading and conserve memory
-		if (type == TXT) {
-			txtParseHeader();
-		} else if (type == INI) {
-			iniParseHeader();
-		} else if (type == XML) {
-			xmlParseHeader();
-		} else if (type == SM) {
-			smParseHeader(); s.dropNotes();
-		}// Hack: drop notes here
+		if (type == TXT) txtParseHeader();
+		else if (type == INI) iniParseHeader();
+		else if (type == XML) xmlParseHeader();
+		else if (type == SM) {
+			smParseHeader(); s.dropNotes();  // Hack: drop notes here (load again when playing the song)
+		}
 
 		// Default for preview position if none was specified in header
 		if (s.preview_start != s.preview_start) {
