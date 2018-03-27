@@ -142,7 +142,7 @@ bool SongParser::smParseField(std::string line) {
 			}
 	}
 
-	if (m_song.loadStatus >= Song::HEADER) return true;  // Only re-parsing now, skip any other data
+	if (m_song.loadStatus >= Song::LoadStatus::HEADER) return true;  // Only re-parsing now, skip any other data
 
 	// Parse header data that is directly stored in m_song
 	if (key == "TITLE") m_song.title = value.substr(value.find_first_not_of(" :"));

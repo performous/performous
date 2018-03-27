@@ -69,13 +69,13 @@ SongParser::SongParser(Song& s): m_song(s) {
 			}
 		}
 		// Header already parsed?
-		if (s.loadStatus == Song::HEADER) {
+		if (s.loadStatus == Song::LoadStatus::HEADER) {
 			if (type == TXT) txtParse();
 			else if (type == INI) midParse();  // INI doesn't contain notes, parse those from MIDI
 			else if (type == XML) xmlParse();
 			else if (type == SM) smParse();
 			finalize();  // Do some adjusting to the notes
-			s.loadStatus = Song::FULL;
+			s.loadStatus = Song::LoadStatus::FULL;
 			return;
 		}
 		// Parse only header to speed up loading and conserve memory
@@ -93,7 +93,7 @@ SongParser::SongParser(Song& s): m_song(s) {
 		guessFiles();
 		if (!m_song.midifilename.empty()) {midParseHeader(); }
 		
-		s.loadStatus = Song::HEADER;
+		s.loadStatus = Song::LoadStatus::HEADER;
 	} catch (SongParserException&) {
 		throw;
 	} catch (std::runtime_error& e) {

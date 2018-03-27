@@ -109,7 +109,7 @@ bool SongParser::txtParseField(std::string const& line) {
 	// Strong hint that this is a duet, so it will be readily displayed with two singers in browser and properly filtered
 	else if (key == "DUETSINGERP2" || key == "P2") m_song.insertVocalTrack(DUET_P2, VocalTrack(value.substr(value.find_first_not_of(" "))));
 	
-	if (m_song.loadStatus >= Song::HEADER) return true;  // Only re-parsing now, skip any other data
+	if (m_song.loadStatus >= Song::LoadStatus::HEADER) return true;  // Only re-parsing now, skip any other data
 	
 	// Parse header data that is directly stored in m_song
 	if (key == "TITLE") m_song.title = value.substr(value.find_first_not_of(" :"));

@@ -11,7 +11,7 @@ extern "C" {
 }
 
 void Song::reload(bool errorIgnore) {
-	loadStatus = NONE;
+	loadStatus = LoadStatus::NONE;
 	vocalTracks.clear();
 	instrumentTracks.clear();
 	beats.clear();
@@ -41,7 +41,7 @@ void Song::reload(bool errorIgnore) {
 }
 
 void Song::loadNotes(bool errorIgnore) {
-	if (loadStatus == Song::FULL) return;
+	if (loadStatus == LoadStatus::FULL) return;
 	try { SongParser(*this); } catch (...) { if (!errorIgnore) throw; }
 }
 
@@ -50,7 +50,7 @@ void Song::dropNotes() {
 	for (auto& trk: instrumentTracks) trk.second.nm.clear();
 	for (auto& trk: danceTracks) trk.second.clear();
 	b0rked.clear();
-	loadStatus = HEADER;
+	loadStatus = LoadStatus::HEADER;
 }
 
 void Song::collateUpdate() {
@@ -82,9 +82,9 @@ Song::Status Song::status(double time, ScreenSing* song) {
 		notes = getVocalTrack(song->selectedVocalTrack()).notes;
 	}
 	it = std::lower_bound(notes.begin(), notes.end(), target, noteEndLessThan);
-	if (it == notes.end()) return FINISHED;
-	if (it->begin > time + 4.0) return INSTRUMENTAL_BREAK;
-	return NORMAL;
+	if (it == notes.end()) return Status::FINISHED;
+	if (it->begin > time + 4.0) return Status::INSTRUMENTAL_BREAK;
+	return Status::NORMAL;
 }
 
 bool Song::getNextSection(double pos, SongSection &section) {

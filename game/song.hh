@@ -51,9 +51,9 @@ class Song: boost::noncopyable {
 	boost::mutex::scoped_lock l(m_mutex);
 	return title + "\n" + artist + "\n" + genre + "\n" + edition + "\n" + path.string(); }
 	/// Is the song parsed from the file yet?
-	enum LoadStatus { NONE, HEADER, FULL } loadStatus;
+	enum class LoadStatus { NONE, HEADER, FULL } loadStatus = LoadStatus::NONE;
 	/// status of song
-	enum Status { NORMAL, INSTRUMENTAL_BREAK, FINISHED };
+	enum class Status { NORMAL, INSTRUMENTAL_BREAK, FINISHED };
 	/** Get the song status at a given timestamp **/
 	Status status(double time, ScreenSing* song);
 	int randomIdx; ///< sorting index used for random order
@@ -122,8 +122,7 @@ class Song: boost::noncopyable {
 		double begin;
 		SongSection(std::string const& name, const double begin): name(name), begin(begin) {}
 	};
-	typedef std::vector<SongSection> SongSections;
-	SongSections songsections; ///< vector of song sections
+	std::vector<SongSection> songsections; ///< vector of song sections
 	bool getNextSection(double pos, SongSection &section);
 	bool getPrevSection(double pos, SongSection &section);
 };
@@ -136,7 +135,7 @@ struct SongParserException: public std::runtime_error {
 	SongParserException(Song& s, std::string const& msg, unsigned int linenum, bool sil = false): runtime_error(msg), m_filename(s.filename), m_linenum(linenum), m_silent(sil) {
 		if (!sil) s.b0rked += msg + '\n';
 	}
-	~SongParserException() throw() {}
+	~SongParserException() noexcept = default;
 	fs::path const& file() const { return m_filename; } ///< file in which the error occured
 	unsigned int line() const { return m_linenum; } ///< line in which the error occured
 	bool silent() const { return m_silent; } ///< if the error should not be printed to user (file skipped)
