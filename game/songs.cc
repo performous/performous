@@ -80,7 +80,6 @@ void Songs::reload_internal(fs::path const& parent) {
 			if (!regex_search(p.filename().string(), expression)) continue; //if the folder does not contain any of the requested files, ignore it
 			try { //found song file, make a new song with it.
 				boost::shared_ptr<Song>s(new Song(p.parent_path(), p));
-				s->randomIdx = rand(); //give it a random identifier
 				boost::mutex::scoped_lock l(m_mutex);
 				int AdditionalFileIndex = -1;
 				for(unsigned int i = 0; i< m_songs.size(); i++) {
