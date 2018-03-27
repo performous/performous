@@ -59,36 +59,9 @@ private:
 	void vocalsTogether();
 	void guessFiles();
 	bool getline (std::string& line) { ++m_linenum; return (bool) std::getline (m_ss, line); }
-	BPM getBPM (double ts) {
-		for (auto& itb : boost::adaptors::reverse (m_bpms)) {
-			if (itb.begin <= ts) return itb;
-		}
-		throw std::runtime_error("No BPM definition prior to this note...");
-	}
-	void addBPM (double ts, double bpm) {
-		if (!(( bpm >= 1.0) && ( bpm < 1e12) )) { throw std::runtime_error("Invalid BPM value"); }
-		if (!m_bpms.empty() && ( m_bpms.back().ts >= ts) ) {
-			if (m_bpms.back().ts < ts) { throw std::runtime_error("Invalid BPM timestamp"); }
-			m_bpms.pop_back();	// Some ITG songs contain repeated BPM definitions...
-		}
-		m_bpms.push_back (BPM (tsTime (ts), ts, bpm));
-	}
-	/// Convert a timestamp (beats) into time (seconds)
-	double tsTime (double ts) const {
-		if (m_bpms.empty()) {
-			if (ts != 0) { throw std::runtime_error("BPM data missing"); }
-			return m_gap;
-		}
-		for (std::vector<BPM>::const_reverse_iterator it = m_bpms.rbegin(); it != m_bpms.rend(); ++it) {
-			if (it->ts <= ts) { return it->begin + (ts - it->ts) * it->step; }
-		}
-		throw std::logic_error("INTERNAL ERROR: BPM data invalid");
-	}
-	/// Convert a stop into <time, duration> (as stored in the song)
-	std::pair<double, double> stopConvert (std::pair<double, double> s) {
-		s.first = tsTime(s.first);
-		return s;
-	}
+	BPM getBPM(double ts) const;
+	void addBPM(double ts, double bpm);
+	double tsTime(double ts) const;  ///< Convert a timestamp (beats) into time (seconds)
 	bool txtCheck(std::string const& data) const;
 	void txtParseHeader();
 	void txtParse();
@@ -109,4 +82,5 @@ private:
 	void smParse();
 	bool smParseField(std::string line);
 	Notes smParseNotes(std::string line);
+	std::pair<double, double> smStopConvert(std::pair<double, double> s);
 };

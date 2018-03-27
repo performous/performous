@@ -40,7 +40,7 @@ void SongParser::smParseHeader() {
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 	// Convert stops to the format required in Song
 	s.stops.resize(m_stops.size());
-	for (std::size_t i = 0; i < m_stops.size(); ++i) s.stops[i] = stopConvert(m_stops[i]);
+	for (std::size_t i = 0; i < m_stops.size(); ++i) s.stops[i] = smStopConvert(m_stops[i]);
 	m_tsPerBeat = 4;
 }
 
@@ -251,4 +251,10 @@ Notes SongParser::smParseNotes(std::string line) {
 	}
 	m_tsEnd = std::max(m_tsEnd, measure * 16);
 	return notes;
+}
+
+/// Convert a stop into <time, duration> (as stored in the song)
+std::pair<double, double> SongParser::smStopConvert(std::pair<double, double> s) {
+	s.first = tsTime(s.first);
+	return s;
 }

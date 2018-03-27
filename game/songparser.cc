@@ -276,3 +276,30 @@ void SongParser::finalize () {
 		for (unsigned ts = 0; ts < m_tsEnd; ts += m_tsPerBeat) { m_song.beats.push_back (tsTime (ts)); }
 	}
 }
+
+SongParser::BPM SongParser::getBPM(double ts) const {
+	for (auto& itb: boost::adaptors::reverse(m_bpms)) {
+		if (itb.begin <= ts) return itb;
+	}
+	throw std::runtime_error("No BPM definition prior to this note...");
+}
+
+void SongParser::addBPM(double ts, double bpm) {
+	if (!(( bpm >= 1.0) && ( bpm < 1e12) )) { throw std::runtime_error("Invalid BPM value"); }
+	if (!m_bpms.empty() && ( m_bpms.back().ts >= ts) ) {
+		if (m_bpms.back().ts < ts) { throw std::runtime_error("Invalid BPM timestamp"); }
+		m_bpms.pop_back();	// Some ITG songs contain repeated BPM definitions...
+	}
+	m_bpms.push_back (BPM (tsTime (ts), ts, bpm));
+}
+
+double SongParser::tsTime(double ts) const {
+	if (m_bpms.empty()) {
+		if (ts != 0) { throw std::runtime_error("BPM data missing"); }
+		return m_gap;
+	}
+	for (std::vector<BPM>::const_reverse_iterator it = m_bpms.rbegin(); it != m_bpms.rend(); ++it) {
+		if (it->ts <= ts) { return it->begin + (ts - it->ts) * it->step; }
+	}
+	throw std::logic_error("INTERNAL ERROR: BPM data invalid");
+}
