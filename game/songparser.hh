@@ -10,15 +10,15 @@
 namespace SongParserUtil {
 	const std::string DUET_P2 = "Duet singer";	// FIXME
 	const std::string DUET_BOTH = "Both singers";	// FIXME
-	// / Parse an int from string and assign it to a variable
+	/// Parse an int from string and assign it to a variable
 	void assign(int& var, std::string const& str);
-	// / Parse an unsigned int from string and assign it to a variable
+	/// Parse an unsigned int from string and assign it to a variable
 	void assign(unsigned& var, std::string const& str);
-	// / Parse a double from string and assign it to a variable
+	/// Parse a double from string and assign it to a variable
 	void assign(double& var, std::string str);
-	// / Parse a boolean from string and assign it to a variable
+	/// Parse a boolean from string and assign it to a variable
 	void assign(bool& var, std::string const& str);
-	// / Erase last character if it matches
+	/// Erase last character if it matches
 	void eraseLast(std::string& s, char ch = ' ');
 }
 
@@ -73,7 +73,7 @@ private:
 		}
 		m_bpms.push_back (BPM (tsTime (ts), ts, bpm));
 	}
-	// / Convert a timestamp (beats) into time (seconds)
+	/// Convert a timestamp (beats) into time (seconds)
 	double tsTime (double ts) const {
 		if (m_bpms.empty()) {
 			if (ts != 0) { throw std::runtime_error("BPM data missing"); }
@@ -84,7 +84,7 @@ private:
 		}
 		throw std::logic_error("INTERNAL ERROR: BPM data invalid");
 	}
-	// / Convert a stop into <time, duration> (as stored in the song)
+	/// Convert a stop into <time, duration> (as stored in the song)
 	std::pair<double, double> stopConvert (std::pair<double, double> s) {
 		s.first = tsTime(s.first);
 		return s;
