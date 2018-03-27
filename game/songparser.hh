@@ -36,12 +36,9 @@ private:
 	bool m_relative = false;
 	double m_gap = 0.0;
 	double m_bpm = 0.0;
-	double m_prevtime = 0.0;
-	unsigned m_prevts = 0;
-	unsigned m_relativeShift = 0;
-	unsigned m_tsPerBeat = 0;  // /< The ts increment per beat
-	unsigned m_tsEnd = 0;  // /< The ending ts of the song
-	enum class CurrentSinger { P1 = 1, P2 = 2, BOTH = P1 | P2 } m_curSinger = CurrentSinger::P1;
+	unsigned m_tsPerBeat = 0;  ///< The ts increment per beat
+	unsigned m_tsEnd = 0;  ///< The ending ts of the song
+	enum class CurrentSinger { P1, P2, BOTH } m_curSinger = CurrentSinger::P1;
 	struct BPM {
 		BPM (double _begin, double _ts, double bpm) :
 		begin (_begin), step (0.25 * 60.0 / bpm), ts (_ts) {}
@@ -51,12 +48,17 @@ private:
 	};
 	std::vector<BPM> m_bpms;
 	Song::Stops m_stops;  ///< Stops stored in <ts, duration> format
+	/// The following struct is cleared between tracks
+	struct TXTState {
+		double prevtime = 0.0;
+		unsigned prevts = 0;
+		unsigned relativeShift = 0;
+	} m_txt;
 	// Functions
 	void finalize();
 	void vocalsTogether();
 	void guessFiles();
 	bool getline (std::string& line) { ++m_linenum; return (bool) std::getline (m_ss, line); }
-	void resetNoteParsingState();
 	BPM getBPM (double ts) {
 		for (auto& itb : boost::adaptors::reverse (m_bpms)) {
 			if (itb.begin <= ts) return itb;
@@ -92,6 +94,7 @@ private:
 	void txtParse();
 	bool txtParseField(std::string const& line);
 	bool txtParseNote(std::string line);
+	void txtResetState();
 	bool iniCheck(std::string const& data) const;
 	void iniParseHeader();
 	bool midCheck(std::string const& data) const;

@@ -175,16 +175,6 @@ void SongParser::guessFiles () {
 	std::clog << std::flush;
 }
 
-void SongParser::resetNoteParsingState () {
-	m_prevtime = 0;
-	m_prevts = 0;
-	m_relativeShift = 0;
-	m_tsPerBeat = 0;
-	m_tsEnd = 0;
-	m_bpms.clear();
-	if (m_bpm != 0.0) { addBPM (0, m_bpm); }
-}
-
 void SongParser::vocalsTogether () {
 	auto togetherIt = m_song.vocalTracks.find ("Together");
 	if (togetherIt == m_song.vocalTracks.end()) {return; }
