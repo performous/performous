@@ -94,7 +94,7 @@ struct Note {
 		return (a.begin == b.begin && a.end == b.end && a.note == b.note && a.type == b.type);
 	}
 	/// Check if two notes overlap
-	static bool overlapping(Note const& a, Note const& b) { return (a.end >= b.begin && a.type != Note::SLEEP && b.type != Note::SLEEP); }
+	static bool overlapping(Note const& a, Note const& b) { return (a.end > b.begin && a.type != Note::SLEEP && b.type != Note::SLEEP); }
   private:
 	double scoreMultiplier() const;
 };
