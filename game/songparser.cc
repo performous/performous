@@ -21,7 +21,7 @@ namespace SongParserUtil {
 		}
 	}
 	void assign (double& var, std::string str) {
-		std::replace (str.begin(), str.end(), ',', '.');// Fix decimal separators
+		std::replace (str.begin(), str.end(), ',', '.');  // Fix decimal separators
 		try {
 			var = std::stod (str);
 		} catch (...) {
@@ -39,20 +39,7 @@ namespace SongParserUtil {
 	}
 }
 
-
-// / constructor
-SongParser::SongParser(Song& s) :
-m_song(s),
-m_linenum(),
-m_relative(),
-m_gap(),
-m_bpm(),
-m_prevtime(),
-m_prevts(),
-m_relativeShift(),
-m_tsPerBeat(),
-m_tsEnd()
-{
+SongParser::SongParser(Song& s): m_song(s) {
 	try {
 		enum { NONE, TXT, XML, INI, SM } type = NONE;
 		// Read the file, determine the type and do some initial validation checks
@@ -82,39 +69,31 @@ m_tsEnd()
 			}
 		}
 		// Header already parsed?
-		if (s.loadStatus == Song::HEADER) {
-			if (type == TXT) {txtParse(); } else if (type == INI) {
-				midParse();																																																																// INI doesn't contain notes, parse those from MIDI
-			}
-			else if (type == XML)           {
-				xmlParse();
-			}
-			else if (type == SM)           {
-				smParse();
-			}
-			finalize();																																																																// Do some adjusting to the notes
-			s.loadStatus = Song::FULL;
+		if (s.loadStatus == Song::LoadStatus::HEADER) {
+			if (type == TXT) txtParse();
+			else if (type == INI) midParse();  // INI doesn't contain notes, parse those from MIDI
+			else if (type == XML) xmlParse();
+			else if (type == SM) smParse();
+			finalize();  // Do some adjusting to the notes
+			s.loadStatus = Song::LoadStatus::FULL;
 			return;
 		}
 		// Parse only header to speed up loading and conserve memory
-		if (type == TXT) {
-			txtParseHeader();
-		} else if (type == INI) {
-			iniParseHeader();
-		} else if (type == XML) {
-			xmlParseHeader();
-		} else if (type == SM) {
-			smParseHeader(); s.dropNotes();
-		}// Hack: drop notes here
+		if (type == TXT) txtParseHeader();
+		else if (type == INI) iniParseHeader();
+		else if (type == XML) xmlParseHeader();
+		else if (type == SM) {
+			smParseHeader(); s.dropNotes();  // Hack: drop notes here (load again when playing the song)
+		}
 
 		// Default for preview position if none was specified in header
 		if (s.preview_start != s.preview_start) {
-			s.preview_start = (type == INI ? 5.0 : 30.0);	// 5 s for band mode, 30 s for others
+			s.preview_start = (type == INI ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
 		}
 		guessFiles();
 		if (!m_song.midifilename.empty()) {midParseHeader(); }
 		
-		s.loadStatus = Song::HEADER;
+		s.loadStatus = Song::LoadStatus::HEADER;
 	} catch (SongParserException&) {
 		throw;
 	} catch (std::runtime_error& e) {
@@ -170,18 +149,16 @@ void SongParser::guessFiles () {
 		fs::path& field = *fields[i].first;
 		if (field.empty()) {
 			for (fs::path const& f : files) {
-				std::string name = f.filename().string();																																																																// File basename
-				if (!regex_search (name, regexps[i])) {
-					continue;																																																																// No match for current file
-				}
+				std::string name = f.filename().string();  // File basename
+				if (!regex_search(name, regexps[i])) continue;  // No match for current file
 				field = f;
 				logFound += "  " + name;
 			}
 		}
-		files.erase (field);	// Remove from available options
+		files.erase (field);  // Remove from available options
 	}
 	
-	m_song.music[TrackName::PREVIEW].clear();																																																																// We don't currently support preview tracks (TODO: proper handling in audio.cc).
+	m_song.music[TrackName::PREVIEW].clear();  // We don't currently support preview tracks (TODO: proper handling in audio.cc).
 	
 	if (logFound.empty() && logMissing.empty()) {
 		return;
@@ -194,16 +171,6 @@ void SongParser::guessFiles () {
 		std::clog << "  Autodetected: " + logFound + "\n";
 	}
 	std::clog << std::flush;
-}
-
-void SongParser::resetNoteParsingState () {
-	m_prevtime = 0;
-	m_prevts = 0;
-	m_relativeShift = 0;
-	m_tsPerBeat = 0;
-	m_tsEnd = 0;
-	m_bpms.clear();
-	if (m_bpm != 0.0) { addBPM (0, m_bpm); }
 }
 
 void SongParser::vocalsTogether () {
@@ -308,4 +275,31 @@ void SongParser::finalize () {
 		// Add song beat markers
 		for (unsigned ts = 0; ts < m_tsEnd; ts += m_tsPerBeat) { m_song.beats.push_back (tsTime (ts)); }
 	}
+}
+
+SongParser::BPM SongParser::getBPM(double ts) const {
+	for (auto& itb: boost::adaptors::reverse(m_bpms)) {
+		if (itb.begin <= ts) return itb;
+	}
+	throw std::runtime_error("No BPM definition prior to this note...");
+}
+
+void SongParser::addBPM(double ts, double bpm) {
+	if (!(( bpm >= 1.0) && ( bpm < 1e12) )) { throw std::runtime_error("Invalid BPM value"); }
+	if (!m_bpms.empty() && ( m_bpms.back().ts >= ts) ) {
+		if (m_bpms.back().ts < ts) { throw std::runtime_error("Invalid BPM timestamp"); }
+		m_bpms.pop_back();	// Some ITG songs contain repeated BPM definitions...
+	}
+	m_bpms.push_back (BPM (tsTime (ts), ts, bpm));
+}
+
+double SongParser::tsTime(double ts) const {
+	if (m_bpms.empty()) {
+		if (ts != 0) { throw std::runtime_error("BPM data missing"); }
+		return m_gap;
+	}
+	for (std::vector<BPM>::const_reverse_iterator it = m_bpms.rbegin(); it != m_bpms.rend(); ++it) {
+		if (it->ts <= ts) { return it->begin + (ts - it->ts) * it->step; }
+	}
+	throw std::logic_error("INTERNAL ERROR: BPM data invalid");
 }

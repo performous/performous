@@ -28,59 +28,19 @@ namespace TrackName {
 }
 
 class ScreenSing;
-/// class to load and parse songfiles
-class Song: boost::noncopyable {
+
+/// Song object contains all information about a song (headers, notes)
+class Song {
 	friend class SongParser;
-  public:
+public:
+	/// Is the song parsed from the file yet?
+	enum class LoadStatus { NONE, HEADER, FULL } loadStatus = LoadStatus::NONE;
+	/// status of song
+	enum class Status { NORMAL, INSTRUMENTAL_BREAK, FINISHED };
 	VocalTracks vocalTracks; ///< notes for the sing part
 	VocalTrack dummyVocal; ///< notes for the sing part
-	/// constructor
-	Song(fs::path const& path_, fs::path const& filename_): dummyVocal(TrackName::LEAD_VOCAL), path(path_), filename(filename_) { reload(false); }
-	/// reload song
-	void reload(bool errorIgnore = true);
-	/// parse field
-	bool parseField(std::string const& line);
-	/// Load notes (when only header has been loaded)
-	void loadNotes(bool errorIgnore = true);
-	/// drop notes (to conserve memory), but keep info about available tracks
-	void dropNotes();
-	/** Get formatted song label. **/
-	std::string str() const { return title + "  by  " + artist; }
-	/** Get full song information (used by the search function). **/
-	std::string strFull() const {
-	boost::mutex::scoped_lock l(m_mutex);
-	return title + "\n" + artist + "\n" + genre + "\n" + edition + "\n" + path.string(); }
-	/// Is the song parsed from the file yet?
-	enum LoadStatus { NONE, HEADER, FULL } loadStatus;
-	/// status of song
-	enum Status { NORMAL, INSTRUMENTAL_BREAK, FINISHED };
-	/** Get the song status at a given timestamp **/
-	Status status(double time, ScreenSing* song);
-	int randomIdx; ///< sorting index used for random order
-	void insertVocalTrack(std::string vocalTrack, VocalTrack track);
-	void eraseVocalTrack(std::string vocalTrack = TrackName::LEAD_VOCAL);
-	// Get a selected track, or LEAD_VOCAL if not found or the first one if not found
-	VocalTrack& getVocalTrack(std::string vocalTrack = TrackName::LEAD_VOCAL);
-	VocalTrack& getVocalTrack(unsigned idx);
-	std::vector<std::string> getVocalTrackNames() const {
-		std::vector<std::string> result;
-		BOOST_FOREACH(VocalTracks::value_type const &it, vocalTracks) {
-			result.push_back(it.first);
-		}
-		return result;
-	}
-
-	double getDurationSeconds();
-	mutable boost::mutex m_mutex;
 	InstrumentTracks instrumentTracks; ///< guitar etc. notes for this song
 	DanceTracks danceTracks; ///< dance tracks
-	bool hasDance() const { return !danceTracks.empty(); }
-	bool hasDrums() const { return instrumentTracks.find(TrackName::DRUMS) != instrumentTracks.end(); }
-	bool hasKeyboard() const { return instrumentTracks.find(TrackName::KEYBOARD) != instrumentTracks.end(); }
-	bool hasGuitars() const { return instrumentTracks.size() - hasDrums() - hasKeyboard(); }
-	bool hasVocals() const { return !vocalTracks.empty(); }
-	bool hasDuet() const { return vocalTracks.size() > 1; }
-	bool hasControllers() const { return !danceTracks.empty() || !instrumentTracks.empty(); }
 	fs::path path; ///< path of songfile
 	fs::path filename; ///< name of songfile
 	fs::path midifilename; ///< name of midi file in FoF format
@@ -92,40 +52,61 @@ class Song: boost::noncopyable {
 	std::string text; ///< songtext
 	std::string creator; ///< creator
 	std::string language; ///< language
-	typedef std::map<std::string, fs::path> Music;
+	using Music = std::map<std::string, fs::path>;
 	Music music; ///< music files (background, guitar, rhythm/bass, drums, vocals)
 	fs::path cover; ///< cd cover
 	fs::path background; ///< background image
 	fs::path video; ///< video
-	/// Variables used for comparisons (sorting)
-	std::string collateByTitle;
-	std::string collateByTitleOnly;
-	/// Variables used for comparisons (sorting)
-	std::string collateByArtist;
-	std::string collateByArtistOnly;
-	/** Rebuild collate variables from other strings **/
-	void collateUpdate();
-	/** Convert a string to its collate form **/
-	static std::string collate(std::string const& str);
-	double videoGap; ///< gap with video
-	double start; ///< start of song
-	double preview_start; ///< starting time for the preview
+	std::string collateByTitle;  ///< String for sorting by title, artist
+	std::string collateByTitleOnly;  ///< String for sorting by title only
+	std::string collateByArtist;  ///< String for sorting by artist, title
+	std::string collateByArtistOnly;  ///< String for sorting by artist only
+	double videoGap = 0.0; ///< gap with video
+	double start = 0.0; ///< start of song
+	double preview_start = getNaN(); ///< starting time for the preview
 	int64_t m_duration = 0;
-	typedef std::vector<std::pair<double,double> > Stops;
+	using Stops = std::vector<std::pair<double,double> >;
 	Stops stops; ///< related to dance
-	typedef std::vector<double> Beats;
+	using Beats = std::vector<double>;
 	Beats beats; ///< related to instrument and dance
-	bool hasBRE; ///< is there a Big Rock Ending? (used for drums only)
+	bool hasBRE = false; ///< is there a Big Rock Ending? (used for drums only)
 	std::string b0rked; ///< Is something broken? (so that user can be notified)
 	struct SongSection {
 		std::string name;
 		double begin;
 		SongSection(std::string const& name, const double begin): name(name), begin(begin) {}
 	};
-	typedef std::vector<SongSection> SongSections;
-	SongSections songsections; ///< vector of song sections
+	std::vector<SongSection> songsections; ///< vector of song sections
+	int randomIdx = 0; ///< sorting index used for random order
+
+	// Functions only below this line
+
+	Song(fs::path const& path, fs::path const& filename);  ///< Load song from specified path and filename
+	void reload(bool errorIgnore = true);  ///< Reset and reload the entire song from file
+	void loadNotes(bool errorIgnore = true);  ///< Load note data (called when entering singing screen, headers preloaded).
+	void dropNotes();  ///< Remove note data (when exiting singing screen), to conserve RAM
+	void insertVocalTrack(std::string vocalTrack, VocalTrack track);
+	void eraseVocalTrack(std::string vocalTrack = TrackName::LEAD_VOCAL);
+	std::string str() const;  ///< Return "title by artist" string for UI
+	std::string strFull() const;  ///< Return multi-line full song info (used for searching)
+	/** Get the song status at a given timestamp **/
+	Status status(double time, ScreenSing* song);
+	// Get a selected track, or LEAD_VOCAL if not found or the first one if not found
+	VocalTrack& getVocalTrack(std::string vocalTrack = TrackName::LEAD_VOCAL);
+	VocalTrack& getVocalTrack(unsigned idx);
+	std::vector<std::string> getVocalTrackNames() const;
+	double getDurationSeconds();
+	bool hasDance() const { return !danceTracks.empty(); }
+	bool hasDrums() const { return instrumentTracks.find(TrackName::DRUMS) != instrumentTracks.end(); }
+	bool hasKeyboard() const { return instrumentTracks.find(TrackName::KEYBOARD) != instrumentTracks.end(); }
+	bool hasGuitars() const { return instrumentTracks.size() - hasDrums() - hasKeyboard(); }
+	bool hasVocals() const { return !vocalTracks.empty(); }
+	bool hasDuet() const { return vocalTracks.size() > 1; }
+	bool hasControllers() const { return !danceTracks.empty() || !instrumentTracks.empty(); }
 	bool getNextSection(double pos, SongSection &section);
 	bool getPrevSection(double pos, SongSection &section);
+private:
+	void collateUpdate();   ///< Rebuild collate variables (used for sorting) from other strings
 };
 
 static inline bool operator<(Song const& l, Song const& r) { return l.collateByArtist < r.collateByArtist; }
@@ -136,7 +117,7 @@ struct SongParserException: public std::runtime_error {
 	SongParserException(Song& s, std::string const& msg, unsigned int linenum, bool sil = false): runtime_error(msg), m_filename(s.filename), m_linenum(linenum), m_silent(sil) {
 		if (!sil) s.b0rked += msg + '\n';
 	}
-	~SongParserException() throw() {}
+	~SongParserException() noexcept = default;
 	fs::path const& file() const { return m_filename; } ///< file in which the error occured
 	unsigned int line() const { return m_linenum; } ///< line in which the error occured
 	bool silent() const { return m_silent; } ///< if the error should not be printed to user (file skipped)

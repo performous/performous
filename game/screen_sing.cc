@@ -354,12 +354,12 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	// Start button has special functions for skipping things (only in singing for now)
 	if (nav == input::NAV_START && m_instruments.empty() && !m_layout_singer.empty() && !m_audio.isPaused()) {
 		// Open score dialog early
-		if (status == Song::FINISHED) {
+		if (status == Song::Status::FINISHED) {
 			if (m_engine) m_engine->kill(); // Kill the engine thread
 			m_score_window.reset(new ScoreWindow(m_instruments, m_database)); // Song finished, but no score window -> show it
 		}
 		// Skip instrumental breaks
-		else if (status == Song::INSTRUMENTAL_BREAK) {
+		else if (status == Song::Status::INSTRUMENTAL_BREAK) {
 			if (time < 0) m_audio.seek(0.0);
 			else {
 				// TODO: Instead of calculating here, calculate instrumental breaks right after song loading and store in Song data structures
@@ -546,8 +546,8 @@ void ScreenSing::draw() {
 		} else  statustxt = (boost::format("%02u:%02u") % (t / 60) % (t % 60)).str();
 
 		if (!m_score_window.get() && m_instruments.empty() && !m_layout_singer.empty()) {
-			if (status == Song::INSTRUMENTAL_BREAK)  statustxt += _("   ENTER to skip instrumental break");
-			if (status == Song::FINISHED && !config["game/karaoke_mode"].i()) {
+			if (status == Song::Status::INSTRUMENTAL_BREAK)  statustxt += _("   ENTER to skip instrumental break");
+			if (status == Song::Status::FINISHED && !config["game/karaoke_mode"].i()) {
 				if(config["game/autoplay"].b()) {
 					if(m_displayAutoPlay) {
 						statustxt += _("   Autoplay enabled");
@@ -563,7 +563,7 @@ void ScreenSing::draw() {
 					} else {
 					statustxt += _("   Remember to wait for grading!");
 				}
-			} else if(status == Song::FINISHED && config["game/autoplay"].b()) {
+			} else if(status == Song::Status::FINISHED && config["game/autoplay"].b()) {
 				statustxt += _("   Autoplay enabled");
 			}
 		}
@@ -587,7 +587,7 @@ void ScreenSing::draw() {
 				m_score_window->draw();
 			}
 		}
-		else if (!m_audio.isPlaying() || (status == Song::FINISHED
+		else if (!m_audio.isPlaying() || (status == Song::Status::FINISHED
 		  && m_audio.getLength() - time <= (m_song->instrumentTracks.empty() && m_song->danceTracks.empty() ? 3.0 : 0.2) )) {
 			// Time to create the score window
 			m_quitTimer.setValue(config["game/results_timeout"].i());

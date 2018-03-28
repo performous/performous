@@ -10,38 +10,19 @@ extern "C" {
 #include AVCODEC_INCLUDE
 }
 
-void Song::reload(bool errorIgnore) {
-	loadStatus = NONE;
-	vocalTracks.clear();
-	instrumentTracks.clear();
-	beats.clear();
-	midifilename.clear();
-	category.clear();
-	genre.clear();
-	edition.clear();
-	title.clear();
-	artist.clear();
-	collateByTitle.clear();
-	collateByTitleOnly.clear();
-	collateByArtist.clear();
-	collateByArtistOnly.clear();
-	text.clear();
-	creator.clear();
-	music.clear();
-	cover.clear();
-	background.clear();
-	video.clear();
-	videoGap = 0.0;
-	start = 0.0;
-	preview_start = getNaN();
-	hasBRE = false;
-	b0rked.clear();
-	try { SongParser(*this); } catch (...) { if (!errorIgnore) throw; }
+Song::Song(fs::path const& path, fs::path const& filename):
+  dummyVocal(TrackName::LEAD_VOCAL), path(path), filename(filename), randomIdx(rand())
+{
+	SongParser(*this);
 	collateUpdate();
 }
 
+void Song::reload(bool errorIgnore) {
+	try { *this = Song(path, filename); } catch (...) { if (!errorIgnore) throw; }
+}
+
 void Song::loadNotes(bool errorIgnore) {
-	if (loadStatus == Song::FULL) return;
+	if (loadStatus == LoadStatus::FULL) return;
 	try { SongParser(*this); } catch (...) { if (!errorIgnore) throw; }
 }
 
@@ -50,23 +31,14 @@ void Song::dropNotes() {
 	for (auto& trk: instrumentTracks) trk.second.nm.clear();
 	for (auto& trk: danceTracks) trk.second.clear();
 	b0rked.clear();
-	loadStatus = HEADER;
+	loadStatus = LoadStatus::HEADER;
 }
 
 void Song::collateUpdate() {
-	collateByTitle = collate(title + artist) + '\0' + filename.string();
-	collateByTitleOnly = collate(title);
-	collateByArtist = collate(artist + title) + '\0' + filename.string();
-	collateByArtistOnly = collate(artist);
-}
-
-std::string Song::collate(std::string const& str) {
-	return unicodeCollate(str);
-}
-
-namespace {
-	// Cannot simply take double as its second argument because of a C++ defect
-	bool noteEndLessThan(Note const& a, Note const& b) { return a.end < b.end; }
+	collateByTitle = unicodeCollate(title + artist) + '\0' + filename.string();
+	collateByTitleOnly = unicodeCollate(title);
+	collateByArtist = unicodeCollate(artist + title) + '\0' + filename.string();
+	collateByArtistOnly = unicodeCollate(artist);
 }
 
 Song::Status Song::status(double time, ScreenSing* song) {
@@ -81,10 +53,10 @@ Song::Status Song::status(double time, ScreenSing* song) {
 	else {
 		notes = getVocalTrack(song->selectedVocalTrack()).notes;
 	}
-	it = std::lower_bound(notes.begin(), notes.end(), target, noteEndLessThan);
-	if (it == notes.end()) return FINISHED;
-	if (it->begin > time + 4.0) return INSTRUMENTAL_BREAK;
-	return NORMAL;
+	it = std::lower_bound(notes.begin(), notes.end(), target, [](Note const& a, Note const& b) { return a.end < b.end; });
+	if (it == notes.end()) return Status::FINISHED;
+	if (it->begin > time + 4.0) return Status::INSTRUMENTAL_BREAK;
+	return Status::NORMAL;
 }
 
 bool Song::getNextSection(double pos, SongSection &section) {
@@ -146,7 +118,6 @@ VocalTrack& Song::getVocalTrack(unsigned idx) {
 }
 
 double Song::getDurationSeconds() {
-	boost::mutex::scoped_lock l(m_mutex);
 	if(m_duration == 0) {
 		AVFormatContext *pFormatCtx = avformat_alloc_context();
 		if (avformat_open_input(&pFormatCtx, music["background"].string().c_str(), NULL, NULL) == 0) {
@@ -161,8 +132,18 @@ double Song::getDurationSeconds() {
 	} else { //duration is still in memmory that means we already loaded it
 		return m_duration;
 	}
-return 0;
+	return 0;
 }
 
+std::string Song::str() const { return title + "  by  " + artist; }
 
+std::string Song::strFull() const {
+	return title + "\n" + artist + "\n" + genre + "\n" + edition + "\n" + path.string();
+}
+
+std::vector<std::string> Song::getVocalTrackNames() const {
+	std::vector<std::string> result;
+	for (auto const& kv: vocalTracks) result.push_back(kv.first);
+	return result;
+}
 
