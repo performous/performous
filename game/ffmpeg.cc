@@ -195,20 +195,17 @@ void FFmpeg::seek_internal() {
 	m_seekTarget = getNaN(); // Signal that seeking is done
 }
 
-class FfmpegError: public std::system_error {
+class FfmpegError: public std::runtime_error {
 public:
-	FfmpegError(int errorValue) {
+	FfmpegError(int errorValue): runtime_error(msgFmt(errorValue)) {}
+private:
+	static std::string msgFmt(int errorValue) {
 		char message[AV_ERROR_MAX_STRING_SIZE];
 		av_strerror(errorValue, message, AV_ERROR_MAX_STRING_SIZE);
 		std::ostringstream oss;
 		oss << "FfmpegError: code=" << errorValue << ", error=" << message;
-		_what = oss.str();
+		return oss.str();
 	}
-	const char *what() {
-		return _what.c_str();
-	}
-private:
-	std::string _what;
 };
 
 void FFmpeg::decodePacket() {
