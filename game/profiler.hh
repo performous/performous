@@ -1,6 +1,6 @@
 #pragma once
 
-#include "xtime.hh"
+#include "chrono.hh"
 #include <iomanip>
 #include <iostream>
 #include <map>
@@ -37,18 +37,18 @@ class Profiler {
 	typedef std::pair<std::string, ProfCP> Pair;
 	Checkpoints m_checkpoints;
 	std::string m_name;
-	boost::xtime m_time;
+	Time m_time;
 	static bool cmpFunc(Pair const& a, Pair const& b) { return a.second.total > b.second.total; }
   public:
 	/// Start a profiler with the given name
-	Profiler(std::string const& name): m_name(name), m_time(now()) {}
+	Profiler(std::string const& name): m_name(name), m_time(Clock::now()) {}
 	~Profiler() { dump(); }
 	/// Profiling checkpoint: record the duration since construction or previous checkpoint.
 	/// If no tag is specified, no recording is done.
 	void operator()(std::string const& tag = std::string()) {
-		boost::xtime n = now();
+		auto n = Clock::now();
 		std::swap(n, m_time);
-		double t = m_time - n;
+		double t = Seconds(m_time - n).count();
 		m_checkpoints[tag].add(t);
 	}
 	/// Dump current stats to log and reset

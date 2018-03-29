@@ -1,4 +1,5 @@
 #include "backgrounds.hh"
+#include "chrono.hh"
 #include "config.hh"
 #include "controllers.hh"
 #include "database.hh"
@@ -13,7 +14,6 @@
 #include "songs.hh"
 #include "video_driver.hh"
 #include "webcam.hh"
-#include "xtime.hh"
 #include "webserver.hh"
 
 // Screens
@@ -30,10 +30,11 @@
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
+#include <cstdlib>
 #include <csignal>
 #include <string>
+#include <thread>
 #include <vector>
-#include <cstdlib>
 
 const double m_pi = boost::math::constants::pi<double>();
 
@@ -78,7 +79,7 @@ static void checkEvents(Game& gm) {
 	SDL_Event event;
 	while(SDL_PollEvent(&event) == 1) {
 		// Let the navigation system grab any and all SDL events
-		boost::xtime eventTime = now();
+		auto eventTime = Clock::now();
 		gm.controllers.pushEvent(event, eventTime);
 		switch(event.type) {
 		  case SDL_QUIT:
@@ -184,7 +185,7 @@ void mainLoop(std::string const& songlist) {
 		gm.updateScreen();  // exit/enter, any exception is fatal error
 		gm.loading(_("Loading complete"), 1.0);
 		// Main loop
-		boost::xtime time = now();
+		auto time = Clock::now();
 		unsigned frames = 0;
 		std::clog << "core/info: Assets loaded, entering main loop." << std::endl;
 		while (!gm.isFinished()) {
@@ -219,21 +220,21 @@ void mainLoop(std::string const& songlist) {
 				if (benchmarking) { glFinish(); prof("surfaces"); }
 				if (benchmarking) {
 					++frames;
-					if (now() - time > 1.0) {
+					if (Clock::now() - time > 1s) {
 						std::ostringstream oss;
 						oss << frames << " FPS";
 						gm.flashMessage(oss.str());
-						time += 1.0;
+						time += 1s;
 						frames = 0;
 					}
 				} else {
-					boost::thread::sleep(time + 0.01); // Max 100 FPS
-					time = now();
+					std::this_thread::sleep_until(time + 10ms); // Max 100 FPS
+					time = Clock::now();
 					frames = 0;
 				}
 				if (benchmarking) prof("fpsctrl");
 				// Process events for the next frame
-				gm.controllers.process(now());
+				gm.controllers.process(Clock::now());
 				checkEvents(gm);
 				if (benchmarking) prof("events");
 			} catch (RUNTIME_ERROR& e) {
@@ -255,7 +256,7 @@ void jstestLoop() {
 	try {
 		Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), false);
 		// Main loop
-		boost::xtime time = now();
+		auto time = Clock::now();
 		int oldjoy = -1, oldaxis = -1, oldvalue = -1;
 		while (true) {
 			SDL_Event e;
@@ -278,8 +279,8 @@ void jstestLoop() {
 				}
 			}
 			window.blank(); window.swap();
-			boost::thread::sleep(time + 0.01); // Max 100 FPS
-			time = now();
+			std::this_thread::sleep_until(time + 10ms); // Max 100 FPS
+			time = Clock::now();
 		}
 	} catch (EXCEPTION& e) {
 		std::cerr << "ERROR: " << e.what() << std::endl;

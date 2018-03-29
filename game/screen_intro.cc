@@ -8,7 +8,6 @@
 #include "platform.hh"
 #include "theme.hh"
 #include "menu.hh"
-#include "xtime.hh"
 
 extern const double m_pi;
 

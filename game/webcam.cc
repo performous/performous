@@ -1,9 +1,10 @@
+#include "webcam.hh"
+
+#include "chrono.hh"
+#include "fs.hh"
 #include <iostream>
 #include <stdexcept>
-
-#include "webcam.hh"
-#include "xtime.hh"
-#include "fs.hh"
+#include <thread>
 
 #ifdef USE_OPENCV
 #include <opencv2/opencv.hpp>
@@ -88,7 +89,7 @@ void Webcam::operator()() {
 			} catch (std::exception&) { std::cerr << "Error capturing webcam frame!" << std::endl; }
 		}
 		// Sleep a little, much if the cam isn't active
-		boost::thread::sleep(now() + (m_running ? 0.015 : 0.5));
+		std::this_thread::sleep_for(m_running ? 10ms : 500ms);
 	}
 	#endif
 }

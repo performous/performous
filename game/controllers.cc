@@ -1,13 +1,14 @@
 #include "controllers.hh"
-#include "libxml++-impl.hh"
 
+#include "chrono.hh"
 #include "fs.hh"
+#include "libxml++-impl.hh"
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
-#include <regex>
 #include <boost/smart_ptr/weak_ptr.hpp>
 #include <SDL2/SDL_joystick.h>
 #include <deque>
+#include <regex>
 #include <stdexcept>
 
 using namespace input;
@@ -273,7 +274,7 @@ struct Controllers::Impl {
 		}
 	}
 	/// Do internal event processing (poll for MIDI events etc)
-	void process(boost::xtime const& now) {
+	void process(Time now) {
 		for (auto& typehw: m_hw) {
 			while (true) {
 				Event event;
@@ -284,18 +285,19 @@ struct Controllers::Impl {
 		}
 		for (auto& kv: m_navRepeat) {
 			NavEvent& ne = kv.second;
-			double delay = 2.0 / (10 + ne.repeat);
-			if (now - ne.time < delay) continue;  // Not yet time to repeat
+			Seconds delay(2.0 / (10 + ne.repeat));
+			Seconds since = now - ne.time;
+			if (since < delay) continue;  // Not yet time to repeat
 			// Emit auto-repeated event
 			// Note: We intentionally only emit one per frame (call to process) to avoid surprises when latency spikes occur.
 			++ne.repeat;
-			ne.time += delay;  // Increment rather than set to now, so that repeating is smoother.
-			std::clog << "controllers/debug: NavEvent auto repeat " << ne.repeat << " next=" << now - ne.time << " delay=" << delay << std::endl;
+			ne.time += clockDur(delay);  // Increment rather than set to now, so that repeating is smoother.
+			std::clog << "controllers/debug: NavEvent auto repeat " << ne.repeat << " after " << since.count() << " s, next delay " << delay.count() << "s " << std::endl;
 			m_navEvents.push_back(ne);
 		}
 	}
 	/// Handle an incoming SDL event
-	bool pushEvent(SDL_Event const& sdlEv, boost::xtime const& t) {
+	bool pushEvent(SDL_Event const& sdlEv, Time t) {
 		for (auto& typehw: m_hw) {
 			Event event;
 			event.time = t;
@@ -325,7 +327,7 @@ struct Controllers::Impl {
 			pushMappedEvent(event);  // This is for keyboard events mainly (they have no ControllerDefs)
 			return;
 		}
-		event.time += -def->latency;
+		event.time -= clockDur(def->latency * 1s);
 		event.devType = def->devType;
 		// Mapping from controllers.xml
 		auto it = def->mapping.find(event.hw);
@@ -402,8 +404,8 @@ Controllers::~Controllers() {}
 bool Controllers::getNav(NavEvent& ev) { return self->getNav(ev); }
 DevicePtr Controllers::registerDevice(SourceId const& source) { return self->registerDevice(source); }
 void Controllers::enableEvents(bool state) { self->enableEvents(state); }
-void Controllers::process(boost::xtime const& now) { self->process(now); }
-bool Controllers::pushEvent(SDL_Event const& ev, boost::xtime const& t) { return self->pushEvent(ev, t); }
+void Controllers::process(Time now) { self->process(now); }
+bool Controllers::pushEvent(SDL_Event const& ev, Time t) { return self->pushEvent(ev, t); }
 
 bool Device::getEvent(Event& ev) {
 	if (m_events.empty()) return false;

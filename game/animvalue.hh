@@ -1,16 +1,15 @@
 #pragma once
 
+#include "chrono.hh"
+#include "util.hh"
 #include <cmath>
 #include <stdexcept>
-
-#include "util.hh"
-#include "xtime.hh"
 
 /// class for simple/linear animation/transition of values
 class AnimValue {
   public:
 	/// constructor
-	AnimValue(double value = 0.0, double rate = 1.0): m_value(value), m_target(value), m_rate(rate), m_time(now()) {}
+	AnimValue(double value = 0.0, double rate = 1.0): m_value(value), m_target(value), m_rate(rate), m_time(Clock::now()) {}
 	/// move animation forward by diff
 	void move(double diff) { m_value += diff; }
 	/// gets animition target
@@ -37,15 +36,15 @@ class AnimValue {
 
   private:
 	double duration() const {
-		boost::xtime newtime = now();
-		double t = newtime - m_time;
+		auto newtime = Clock::now();
+		Seconds t = newtime - m_time;
 		m_time = newtime;
-		return clamp(t, 0.0, 1.0);
+		return clamp(t.count());
 	}
 	mutable double m_value;
 	double m_target;
 	double m_rate;
-	mutable boost::xtime m_time;
+	mutable Time m_time;
 };
 
 /// easing animations
@@ -61,8 +60,8 @@ class AnimAcceleration {
 		const double overshoot = 0.95; // Over 1.0 decelerates too late, less than 1.0 decelerates too early
 		if (m_songs == 0) return m_target;
 		double num = m_marginLeft + m_songs + m_marginRight;
-		boost::xtime curtime = now();
-		double duration = seconds(curtime) - seconds(m_time);
+		auto curtime = Clock::now();
+		double duration = Seconds(curtime - m_time).count();
 		m_time = curtime;
 		if (!(duration > 0.0)) return m_position; // Negative value or NaN, or no songs - skip processing
 		if (duration > 1.0) {
@@ -114,5 +113,5 @@ class AnimAcceleration {
 	double m_velocity;
 	double m_marginLeft;
 	double m_marginRight;
-	boost::xtime m_time;
+	Time m_time;
 };
