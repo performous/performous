@@ -5,7 +5,8 @@
 #include "glmath.hh"
 #include "util.hh"
 
-#include <boost/thread.hpp>
+#include <boost/bind.hpp>
+#include <thread>
 #include <stdexcept>
 #include <cstdlib>
 
@@ -90,7 +91,7 @@ void Game::fatalError(std::string const& message) {
 	m_window.blank();
 	m_window.render(boost::bind(&Game::drawNotifications, this));
 	m_window.swap();
-	boost::thread::sleep(now() + 4.0);
+	std::this_thread::sleep_for(4s);
 }
 
 void Game::flashMessage(std::string const& message, float fadeIn, float hold, float fadeOut) {

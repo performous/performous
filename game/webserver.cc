@@ -1,8 +1,9 @@
 ﻿#include "webserver.hh"
 #ifdef USE_WEBSERVER
+#include "chrono.hh"
 #include <boost/network/protocol/http/server.hpp>
 #include <thread>
-#include <chrono>
+
 namespace http = boost::network::http;
 
 typedef http::server<WebServer::handler> http_server;
@@ -66,7 +67,7 @@ void WebServer::StartServer(int tried, bool fallbackPortInUse = false) {
 	{
 		tried = tried + 1;
 		std::clog << "webserver/error: " << e.what() << " Trying again... (tried " << tried << " times)." << std::endl;
-		std::this_thread::sleep_for(std::chrono::seconds(20));
+		std::this_thread::sleep_for(20s);
 		StartServer(tried, fallbackPortInUse);
 	}
 }

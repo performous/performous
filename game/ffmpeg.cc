@@ -1,15 +1,14 @@
 #include "ffmpeg.hh"
 
+#include "chrono.hh"
 #include "config.hh"
 #include "util.hh"
-#include "xtime.hh"
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
-#include <thread>
-#include <chrono>
 #include <system_error>
+#include <thread>
 
 extern "C" {
 #include AVCODEC_INCLUDE
@@ -150,7 +149,7 @@ void FFmpeg::operator()() {
 	bool eof = false;
 	while (!m_quit) {
 		if(eof) {
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			std::this_thread::sleep_for(100ms);
 			continue;
 		}
 		try {
@@ -183,7 +182,7 @@ void FFmpeg::operator()() {
 void FFmpeg::seek(double time, bool wait) {
 	m_seekTarget = time;
 	videoQueue.reset(); audioQueue.reset(); // Empty these to unblock the internals in case buffers were full
-	if (wait) while (!m_quit && m_seekTarget == m_seekTarget) boost::thread::sleep(now() + 0.01);
+	if (wait) while (!m_quit && m_seekTarget == m_seekTarget) std::this_thread::sleep_for(5ms);
 }
 
 void FFmpeg::seek_internal() {
