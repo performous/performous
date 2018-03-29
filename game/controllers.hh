@@ -91,7 +91,7 @@ namespace input {
 		bool getEvent(Event&);
 		void pushEvent(Event const&);
 	};
-	typedef boost::shared_ptr<Device> DevicePtr;
+	typedef std::shared_ptr<Device> DevicePtr;
 
 	/// The main controller class that contains everything
 	class Controllers: boost::noncopyable {
@@ -126,7 +126,7 @@ namespace input {
 		/// Convert an SDL event into Event. The Event is pre-initialized with event's time. Returns false if SDL_Event was not handled.
 		virtual bool process(Event&, SDL_Event const&) { return false; }
 		// Note: process functions are expected to return Event with source, hw and value set and possibly with time adjusted.
-		typedef boost::shared_ptr<Hardware> ptr;
+		typedef std::shared_ptr<Hardware> ptr;
 	};
 	
 	Hardware::ptr constructKeyboard();

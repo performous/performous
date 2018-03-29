@@ -191,7 +191,7 @@ void ScreenSongs::update() {
 		}
 	}
 	// Check out if the music has changed
-	boost::shared_ptr<Song> song = m_songs.currentPtr();
+	std::shared_ptr<Song> song = m_songs.currentPtr();
 	Song::Music music;
 	if (song) music = song->music;
 	if (m_playing != music) songChange = true;

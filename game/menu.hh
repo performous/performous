@@ -3,8 +3,8 @@
 #include "opengl_text.hh"
 #include "configuration.hh"
 #include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
 #include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -15,7 +15,7 @@ class Menu;
 typedef std::vector<MenuOption> MenuOptions;
 typedef std::vector<MenuOptions*> SubmenuStack;
 typedef std::function<void ()> MenuOptionCallback;
-typedef boost::shared_ptr<Surface> MenuImage;
+typedef std::shared_ptr<Surface> MenuImage;
 
 /// Struct for menu options
 class MenuOption {

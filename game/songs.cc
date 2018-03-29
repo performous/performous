@@ -79,7 +79,7 @@ void Songs::reload_internal(fs::path const& parent) {
 			if (fs::is_directory(p)) { reload_internal(p); continue; } //if the file is a folder redo this function with this folder as path
 			if (!regex_search(p.filename().string(), expression)) continue; //if the folder does not contain any of the requested files, ignore it
 			try { //found song file, make a new song with it.
-				boost::shared_ptr<Song>s(new Song(p.parent_path(), p));
+				std::shared_ptr<Song>s(new Song(p.parent_path(), p));
 				boost::mutex::scoped_lock l(m_mutex);
 				int AdditionalFileIndex = -1;
 				for(unsigned int i = 0; i< m_songs.size(); i++) {
@@ -108,7 +108,7 @@ void Songs::reload_internal(fs::path const& parent) {
 }
 
 // Make std::find work with shared_ptrs and regular pointers
-static bool operator==(boost::shared_ptr<Song> const& a, Song const* b) { return a.get() == b; }
+static bool operator==(std::shared_ptr<Song> const& a, Song const* b) { return a.get() == b; }
 
 /// Store currently selected song on construction and restore the selection on destruction
 /// Assumes that m_filtered has been modified and finds the old selection by pointer value.
@@ -158,7 +158,7 @@ void Songs::filter_internal() {
 			MatchResult match = UnicodeUtil::getCharset(m_filter);
 			std::string charset = match.first;
 			icu::UnicodeString filter = ((charset == "UTF-8") ? icu::UnicodeString::fromUTF8(m_filter) : icu::UnicodeString(m_filter.c_str(), charset.c_str()));
-			std::copy_if (m_songs.begin(), m_songs.end(), std::back_inserter(filtered), [&](boost::shared_ptr<Song> it){
+			std::copy_if (m_songs.begin(), m_songs.end(), std::back_inserter(filtered), [&](std::shared_ptr<Song> it){
 			icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8((*it).strFull()), &UnicodeUtil::m_dummyCollator, NULL, UnicodeUtil::m_icuError);
 				if (m_type == 1 && !(*it).hasDance()) return false;
 				if (m_type == 2 && !(*it).hasVocals()) return false;
@@ -189,7 +189,7 @@ namespace {
 			return left.*m_field < right.*m_field;
 		}
 		/// Compare *left < *right
-		bool operator()(boost::shared_ptr<Song> const& left, boost::shared_ptr<Song> const& right) {
+		bool operator()(std::shared_ptr<Song> const& left, std::shared_ptr<Song> const& right) {
 			return operator()(*left, *right);
 		}
 	};

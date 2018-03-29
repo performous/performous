@@ -2,10 +2,8 @@
 
 #include "unicode.hh"
 #include "libxml++-impl.hh"
-
+#include <memory>
 #include <string>
-
-#include <boost/shared_ptr.hpp>
 
 
 void SongItems::load(xmlpp::NodeSet const& n) {
@@ -50,7 +48,7 @@ int SongItems::addSongItem(std::string const& artist, std::string const& title, 
 	return si.id;
 }
 
-void SongItems::addSong(boost::shared_ptr<Song> song) {
+void SongItems::addSong(std::shared_ptr<Song> song) {
 	int id = lookup(song);
 	if (id == -1)
 	{
@@ -72,7 +70,7 @@ void SongItems::addSong(boost::shared_ptr<Song> song) {
 	m_songs.insert(si);
 }
 
-int SongItems::lookup(boost::shared_ptr<Song> song) const {
+int SongItems::lookup(std::shared_ptr<Song> song) const {
 	for (auto const& s: m_songs) {
 		if (song->collateByArtistOnly == s.artist && song->collateByTitleOnly == s.title) return s.id;
 	}

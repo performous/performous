@@ -57,7 +57,7 @@ class LayoutSinger {
   public:
 	enum PositionMode {FULL, TOP, BOTTOM, LEFT, RIGHT};
 	/// ThemeSing is optional if you want to use drawScore only
-	LayoutSinger(VocalTrack& vocal, Database& database, boost::shared_ptr<ThemeSing> theme = boost::shared_ptr<ThemeSing>());
+	LayoutSinger(VocalTrack& vocal, Database& database, std::shared_ptr<ThemeSing> theme = std::shared_ptr<ThemeSing>());
 	~LayoutSinger();
 	void reset();
 	void draw(double time, PositionMode position = LayoutSinger::FULL);
@@ -73,7 +73,7 @@ class LayoutSinger {
 	boost::scoped_ptr<SvgTxtThemeSimple> m_score_text[4];
 	boost::scoped_ptr<SvgTxtThemeSimple> m_line_rank_text[4];
 	Database& m_database;
-	boost::shared_ptr<ThemeSing> m_theme;
+	std::shared_ptr<ThemeSing> m_theme;
 	AnimValue m_feedbackFader;
 	bool m_hideLyrics;
 };

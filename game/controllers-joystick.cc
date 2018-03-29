@@ -1,6 +1,7 @@
 #include "controllers.hh"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
+#include <sstream>
 #include <vector>
 
 namespace input {
@@ -39,7 +40,7 @@ namespace input {
 			event.source = SourceId(SOURCETYPE_JOYSTICK, sdlEv.jbutton.which);  // All j* structures have .which at the same position as jbutton
 			return true;
 		}
-		typedef boost::shared_ptr<SDL_Joystick> JoyPtr;
+		typedef std::shared_ptr<SDL_Joystick> JoyPtr;
 		std::vector<JoyPtr> m_joysticks;
 
 	};
