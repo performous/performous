@@ -7,6 +7,9 @@
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <thread>
+#include <chrono>
+#include <system_error>
 
 extern "C" {
 #include AVCODEC_INCLUDE
@@ -16,10 +19,16 @@ extern "C" {
 #include AVUTIL_INCLUDE
 #include AVUTIL_OPT_INCLUDE
 #include AVUTIL_MATH_INCLUDE
+#include AVUTIL_ERROR_INCLUDE
 }
 
 #if (LIBAVCODEC_VERSION_INT) < (AV_VERSION_INT(52,94,3))
 #	define AV_SAMPLE_FMT_S16 SAMPLE_FMT_S16
+#endif
+
+// Some versions of libav does not contain this definition.
+#ifndef AV_ERROR_MAX_STRING_SIZE
+#	define AV_ERROR_MAX_STRING_SIZE 64
 #endif
 
 #define AUDIO_CHANNELS 2
@@ -138,7 +147,12 @@ void FFmpeg::operator()() {
 	m_duration = m_formatContext->duration / double(AV_TIME_BASE);
 	audioQueue.setDuration(m_duration);
 	int errors = 0;
+	bool eof = false;
 	while (!m_quit) {
+		if(eof) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			continue;
+		}
 		try {
 			if (audioQueue.wantSeek()) m_seekTarget = 0.0;
 			if (m_seekTarget == m_seekTarget) seek_internal();
@@ -146,7 +160,8 @@ void FFmpeg::operator()() {
 			errors = 0;
 		} catch (eof_error&) {
 			videoQueue.push(new Bitmap()); // EOF marker
-			boost::thread::sleep(now() + 0.1);
+			eof = true;
+			std::clog << "ffmpeg/debug: done loading " << m_filename << std::endl;
 		} catch (std::exception& e) {
 			std::clog << "ffmpeg/error: " << m_filename << ": " << e.what() << std::endl;
 			if (++errors > 2) { std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl; m_quit = true; }
@@ -180,22 +195,57 @@ void FFmpeg::seek_internal() {
 	m_seekTarget = getNaN(); // Signal that seeking is done
 }
 
+class FfmpegError: public std::system_error {
+public:
+	FfmpegError(int errorValue) {
+		char message[AV_ERROR_MAX_STRING_SIZE];
+		av_strerror(errorValue, message, AV_ERROR_MAX_STRING_SIZE);
+		std::ostringstream oss;
+		oss << "FfmpegError: code=" << errorValue << ", error=" << message;
+		_what = oss.str();
+	}
+	const char *what() {
+		return _what.c_str();
+	}
+private:
+	std::string _what;
+};
+
 void FFmpeg::decodePacket() {
 #if LIBAVCODEC_VERSION_INT >= (AV_VERSION_INT(57, 37, 0))
 	AVPacket pkt;
-	while (av_read_frame(m_formatContext, &pkt) >= 0) {
+	while (true) {
+		// FIXME: we might want to take a look at m_quit.
+		int ret = av_read_frame(m_formatContext, &pkt);
+		if(ret == AVERROR_EOF) {
+			// End of file: no more data to read.
+			throw FFmpeg::eof_error();
+		} else if(ret < 0) {
+			throw FfmpegError(ret);
+		}
 		if (m_quit || m_seekTarget == m_seekTarget) return; // something weird required
 		if (pkt.stream_index != m_streamId) return; // wrong stream
-		int ret = avcodec_send_packet(m_codecContext, &pkt);
-		if (ret < 0 || ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-			// error
-			break;
+		ret = avcodec_send_packet(m_codecContext, &pkt);
+		if(ret == AVERROR_EOF) {
+			// End of file: no more data to read.
+			throw FFmpeg::eof_error();
+		} else if(ret == AVERROR(EAGAIN)) {
+			// not enough data for decoder, read more
+			continue;
+		} else if(ret < 0) {
+			throw FfmpegError(ret);
 		}
 		while (ret >= 0) {
 			boost::shared_ptr<AVFrame> frame(av_frame_alloc(), [](AVFrame* ptr) { av_frame_free(&ptr); });
 			ret = avcodec_receive_frame(m_codecContext, frame.get());
-			if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+			if(ret == AVERROR_EOF) {
+				// End of file: no more data.
+				throw FFmpeg::eof_error();
+			} else if(ret == AVERROR(EAGAIN)) {
+				// not enough data to decode a frame, go read more and feed more to the decoder
 				break;
+			} else if(ret < 0) {
+				throw FfmpegError(ret);
 			}
 			// frame is available here
 			if (frame->pts != int64_t(AV_NOPTS_VALUE)) {
