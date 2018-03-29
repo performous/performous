@@ -51,11 +51,11 @@ void Database::addPlayer(std::string const& name, std::string const& picture, in
 	m_players.addPlayer(name, picture, id);
 }
 
-void Database::addSong(boost::shared_ptr<Song> s) {
+void Database::addSong(std::shared_ptr<Song> s) {
 	m_songs.addSong(s);
 }
 
-void Database::addHiscore(boost::shared_ptr<Song> s) {
+void Database::addHiscore(std::shared_ptr<Song> s) {
 	int playerid = m_players.lookup(m_players.current().name);
 	int score = scores.front().score;
 	std::string track = scores.front().track;
@@ -65,7 +65,7 @@ void Database::addHiscore(boost::shared_ptr<Song> s) {
 	std::clog << "database/info: Added new hiscore " << score << " points on track " << track << " of songid " << songid << std::endl;
 }
 
-bool Database::reachedHiscore(boost::shared_ptr<Song> s) const {
+bool Database::reachedHiscore(std::shared_ptr<Song> s) const {
 	int score = scores.front().score;
 	std::string track = scores.front().track;
 	int songid = m_songs.lookup(s);
@@ -84,7 +84,7 @@ void Database::queryOverallHiscore(std::ostream & os, std::string const& track) 
 	}
 }
 
-void Database::queryPerSongHiscore(std::ostream & os, boost::shared_ptr<Song> s, std::string const& track) const {
+void Database::queryPerSongHiscore(std::ostream & os, std::shared_ptr<Song> s, std::string const& track) const {
 	int songid = m_songs.lookup(s);
 	if (songid == -1) return;  // Song not included in database (yet)
 	// Reorder hiscores by track / score

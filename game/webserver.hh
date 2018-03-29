@@ -6,8 +6,8 @@ namespace http = boost::network::http;
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/filesystem/fstream.hpp>
-#include <boost/shared_ptr.hpp>
 #include <json/json.h>
+#include <memory>
 #include <string>
 #include "fs.hh"
 #include "songs.hh"
@@ -48,9 +48,9 @@ private:
 	Json::Value SongsToJsonObject();
 	std::map<std::string, std::string> GenerateLocaleDict();
 	std::vector<std::string> GetTranslationKeys();
-	boost::shared_ptr<Song> GetSongFromJSON(std::string JsonDoc);
-	boost::shared_ptr<boost::thread> m_serverThread;
-	boost::shared_ptr<http_server> m_server;
+	std::shared_ptr<Song> GetSongFromJSON(std::string JsonDoc);
+	std::shared_ptr<boost::thread> m_serverThread;
+	std::shared_ptr<http_server> m_server;
 	Songs& m_songs;
 };
 #else

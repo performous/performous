@@ -2,10 +2,10 @@
 
 #include "animvalue.hh"
 #include "fs.hh"
-#include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
+#include <memory>
 #include <set>
 #include <sstream>
 #include <vector>
@@ -25,7 +25,7 @@ class Songs: boost::noncopyable {
 	/// reloads songlist
 	void reload();
 	/// array access
-	boost::shared_ptr<Song> operator[](std::size_t pos) { return m_filtered[pos]; }
+	std::shared_ptr<Song> operator[](std::size_t pos) { return m_filtered[pos]; }
 	/// number of songs
 	int size() const { return m_filtered.size(); }
 	/// true if empty
@@ -47,7 +47,7 @@ class Songs: boost::noncopyable {
 	/// sets margins for animation
 	void setAnimMargins(double left, double right) { math_cover.setMargins(left, right); }
 	/// @return current song
-	boost::shared_ptr<Song> currentPtr() { return m_filtered.empty() ? boost::shared_ptr<Song>() : m_filtered[math_cover.getTarget()]; }
+	std::shared_ptr<Song> currentPtr() { return m_filtered.empty() ? std::shared_ptr<Song>() : m_filtered[math_cover.getTarget()]; }
 	/// @return current song
 	Song& current() { return *m_filtered[math_cover.getTarget()]; }
 	/// @return current Song
@@ -76,7 +76,7 @@ class Songs: boost::noncopyable {
 
   private:
 	class RestoreSel;
-	typedef std::vector<boost::shared_ptr<Song> > SongVector;
+	typedef std::vector<std::shared_ptr<Song> > SongVector;
 	std::string m_songlist;
 	SongVector m_songs, m_filtered;
 	AnimValue m_updateTimer;

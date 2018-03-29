@@ -222,7 +222,7 @@ http_server::response WebServer::POSTresponse(const http_server::request &reques
 	Game * gm = Game::getSingletonPtr();
 	if (request.destination == "/api/add") {
 			m_songs.setFilter("");
-		boost::shared_ptr<Song> pointer = GetSongFromJSON(request.body);
+		std::shared_ptr<Song> pointer = GetSongFromJSON(request.body);
 		if (!pointer) {
 			return http_server::response::stock_reply(
 			http_server::response::ok, "failure");
@@ -349,13 +349,13 @@ std::vector<std::string> WebServer::GetTranslationKeys() {
 	return tranlationKeys;
 }
 
-boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
+std::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 	Json::Value root;   // will contains the root value after parsing.
 	Json::Reader reader;
 	bool parsingSuccessful = reader.parse(JsonDoc,root);
 	if(!parsingSuccessful) {
 		std::clog << "webserver/error: cannot parse Json Document" <<std::endl;
-		return boost::shared_ptr<Song>();
+		return std::shared_ptr<Song>();
 	}
 	m_songs.setFilter("");
 	for(int i = 0; i< m_songs.size(); i++) {
@@ -368,6 +368,6 @@ boost::shared_ptr<Song> WebServer::GetSongFromJSON(std::string JsonDoc) {
 		}
 	}
 
-	return boost::shared_ptr<Song>();
+	return std::shared_ptr<Song>();
 }
 #endif

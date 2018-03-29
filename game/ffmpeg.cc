@@ -3,7 +3,7 @@
 #include "chrono.hh"
 #include "config.hh"
 #include "util.hh"
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -232,7 +232,7 @@ void FFmpeg::decodePacket() {
 			throw FfmpegError(ret);
 		}
 		while (ret >= 0) {
-			boost::shared_ptr<AVFrame> frame(av_frame_alloc(), [](AVFrame* ptr) { av_frame_free(&ptr); });
+			std::shared_ptr<AVFrame> frame(av_frame_alloc(), [](AVFrame* ptr) { av_frame_free(&ptr); });
 			ret = avcodec_receive_frame(m_codecContext, frame.get());
 			if(ret == AVERROR_EOF) {
 				// End of file: no more data.
@@ -276,9 +276,9 @@ void FFmpeg::decodePacket() {
 		if (m_quit || m_seekTarget == m_seekTarget) return;
 		if (packet.stream_index != m_streamId) return;
 #if (LIBAVCODEC_VERSION_INT) < (AV_VERSION_INT(55,0,0))
-		boost::shared_ptr<AVFrame> frame(avcodec_alloc_frame(), &av_free);
+		std::shared_ptr<AVFrame> frame(avcodec_alloc_frame(), &av_free);
 #else
-		boost::shared_ptr<AVFrame> frame(av_frame_alloc(), [](AVFrame* ptr) { av_frame_free(&ptr); });
+		std::shared_ptr<AVFrame> frame(av_frame_alloc(), [](AVFrame* ptr) { av_frame_free(&ptr); });
 #endif
 		int frameFinished = 0;
 		int decodeSize = (m_mediaType == AVMEDIA_TYPE_VIDEO ?

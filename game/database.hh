@@ -78,21 +78,21 @@ public: // methods for database management
 	/**A facade for Players::addPlayer.*/
 	void addPlayer(std::string const& name, std::string const& picture = "", int id = -1);
 	/**A facade for SongItems::addSong.*/
-	void addSong(boost::shared_ptr<Song> s);
+	void addSong(std::shared_ptr<Song> s);
 	/**A facade for Hiscore::addHiscore.
 	 The ids will be looked up first by using the songs and current players data.
 	 */
-	void addHiscore(boost::shared_ptr<Song> s);
+	void addHiscore(std::shared_ptr<Song> s);
 
 public: // methods for database queries
 	/**A facade for Hiscore::reachedHiscore.
 	  Queries if the current player with current score has reached a new hiscore
 	  for the song s.
 	 */
-	bool reachedHiscore(boost::shared_ptr<Song> s) const;
+	bool reachedHiscore(std::shared_ptr<Song> s) const;
 
 	void queryOverallHiscore(std::ostream & os, std::string const& track = std::string()) const;
-	void queryPerSongHiscore(std::ostream & os, boost::shared_ptr<Song> s, std::string const& track = std::string()) const;
+	void queryPerSongHiscore(std::ostream & os, std::shared_ptr<Song> s, std::string const& track = std::string()) const;
 	void queryPerPlayerHiscore(std::ostream & os, std::string const& track = std::string()) const;
 
 	bool hasHiscore(Song& s) const;

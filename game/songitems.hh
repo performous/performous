@@ -4,12 +4,11 @@
 
 #include "libxml++.hh"
 
+#include <memory>
 #include <set>
 #include <vector>
 #include <string>
 #include <stdexcept>
-
-#include <boost/shared_ptr.hpp>
 
 /**Exception which will be thrown when loading or
   saving Players fails.*/
@@ -35,7 +34,7 @@ struct SongItem
 	  E.g. the full artist information can be accessed using
 	  this pointer.
 	 */
-	boost::shared_ptr<Song> song;
+	std::shared_ptr<Song> song;
 
 	bool operator< (SongItem const& other) const
 	{
@@ -77,11 +76,11 @@ public:
 
 	  lookup is used internally to achieve that.
 	  */
-	void addSong(boost::shared_ptr<Song> song);
+	void addSong(std::shared_ptr<Song> song);
 
 	/**Lookup a songid for a specific song.
 	  @return -1 if no song found.*/
-	int lookup(boost::shared_ptr<Song> song) const;
+	int lookup(std::shared_ptr<Song> song) const;
 	int lookup(Song& song) const;
 
 	/**Lookup the artist + title for a specific song.

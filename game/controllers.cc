@@ -5,7 +5,6 @@
 #include "libxml++-impl.hh"
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
 #include <SDL2/SDL_joystick.h>
 #include <deque>
 #include <regex>
@@ -130,7 +129,7 @@ struct Controllers::Impl {
 
 	std::deque<NavEvent> m_navEvents;
 	std::map<SourceId, DevicePtr> m_orphans;
-	std::map<SourceId, boost::weak_ptr<Device> > m_devices;
+	std::map<SourceId, std::weak_ptr<Device> > m_devices;
 	bool m_eventsEnabled;
 	
 	typedef std::pair<SourceId, ButtonId> UniqueButton;

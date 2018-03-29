@@ -30,7 +30,7 @@ class ScreenPlayers : public Screen {
 	void manageEvent(input::NavEvent const& event);
 	void draw();
 
-	void setSong (boost::shared_ptr<Song> song_)
+	void setSong (std::shared_ptr<Song> song_)
 	{
 		m_song = song_;
 	}
@@ -39,7 +39,7 @@ class ScreenPlayers : public Screen {
 	Audio& m_audio;
 	Database& m_database;
 	Players& m_players;
-	boost::shared_ptr<Song> m_song; /// Pointer to the current song
+	std::shared_ptr<Song> m_song; /// Pointer to the current song
 	boost::scoped_ptr<Surface> m_songbg;
 	boost::scoped_ptr<Video> m_video;
 	boost::scoped_ptr<ThemeSongs> theme;

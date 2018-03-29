@@ -22,7 +22,7 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	g_type_init();
 #endif
 	GError* pError = NULL;
-	boost::shared_ptr<RsvgHandle> svgHandle(rsvg_handle_new_from_file(filename.string().c_str(), &pError), g_object_unref);
+	std::shared_ptr<RsvgHandle> svgHandle(rsvg_handle_new_from_file(filename.string().c_str(), &pError), g_object_unref);
 	if (pError) {
 		g_error_free(pError);
 		throw std::runtime_error("Unable to load " + filename.string());
@@ -35,10 +35,10 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	bitmap.fmt = pix::INT_ARGB;
 	bitmap.linearPremul = true;
 	// Raster with Cairo
-	boost::shared_ptr<cairo_surface_t> surface(
+	std::shared_ptr<cairo_surface_t> surface(
 	  cairo_image_surface_create_for_data(&bitmap.buf[0], CAIRO_FORMAT_ARGB32, bitmap.width, bitmap.height, bitmap.width * 4),
 	  cairo_surface_destroy);
-	boost::shared_ptr<cairo_t> dc(cairo_create(surface.get()), cairo_destroy);
+	std::shared_ptr<cairo_t> dc(cairo_create(surface.get()), cairo_destroy);
 	cairo_scale(dc.get(), factor, factor);
 	rsvg_handle_render_cairo(svgHandle.get(), dc.get());
 	// Change byte order from BGRA to RGBA

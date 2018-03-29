@@ -63,7 +63,7 @@ class ScreenSing: public Screen {
 	bool singingDuet() const { return m_singingDuet; }
 	void setupVocals();
 
-	void setSong (boost::shared_ptr<Song> song_)
+	void setSong (std::shared_ptr<Song> song_)
 	{
 		m_song = song_;
 	}
@@ -84,7 +84,7 @@ class ScreenSing: public Screen {
 	Audio& m_audio;
 	Database& m_database;
 	Backgrounds& m_backgrounds;
-	boost::shared_ptr<Song> m_song; /// Pointer to the current song
+	std::shared_ptr<Song> m_song; /// Pointer to the current song
 	boost::scoped_ptr<ScoreWindow> m_score_window;
 	boost::scoped_ptr<ProgressBar> m_progress;
 	boost::scoped_ptr<Surface> m_background;
@@ -98,7 +98,7 @@ class ScreenSing: public Screen {
 	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
 	Menu m_menu;
 	Instruments m_instruments;
-	boost::shared_ptr<ThemeSing> theme;
+	std::shared_ptr<ThemeSing> theme;
 	AnimValue m_quitTimer;
 	AnimValue m_statusTextSwitch;
 	AnimValue m_DuetTimeout;
