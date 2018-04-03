@@ -5,8 +5,6 @@
 #include "screen.hh"
 #include "textinput.hh"
 
-#include <boost/scoped_ptr.hpp>
-
 class Song;
 class Audio;
 class Video;

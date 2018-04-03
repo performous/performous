@@ -8,9 +8,7 @@
 #include "progressbar.hh"
 #include "screen.hh"
 #include "surface.hh"
-
 #include <boost/ptr_container/ptr_vector.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <deque>
 
 class Audio;

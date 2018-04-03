@@ -1,8 +1,7 @@
 #pragma once
 
-#include <boost/scoped_ptr.hpp>
-#include "screen.hh"
 #include "controllers.hh"
+#include "screen.hh"
 
 class Audio;
 class Sample;

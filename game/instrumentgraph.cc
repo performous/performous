@@ -47,7 +47,7 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevicePt
 	for (auto& elem: m_pressed) elem = false;
 }
 
-InstrumentGraph::~InstrumentGraph() {}  // For destruction of scoped_ptrs (only forward-declared in header)
+InstrumentGraph::~InstrumentGraph() = default;  // For destruction of unique_ptrs (only forward-declared in header)
 
 bool InstrumentGraph::dead() const { return m_jointime != m_jointime || m_dead >= death_delay; }
 

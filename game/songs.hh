@@ -3,6 +3,7 @@
 #include "animvalue.hh"
 #include "fs.hh"
 #include <memory>
+#include <mutex>
 #include <set>
 #include <sstream>
 #include <thread>

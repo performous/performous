@@ -2,7 +2,6 @@
 
 #include "color.hh"
 #include "surface.hh"
-#include <boost/scoped_ptr.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <vector>
 

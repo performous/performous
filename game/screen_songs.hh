@@ -10,9 +10,6 @@
 #include "playlist.hh"
 #include "menu.hh"
 
-#include <boost/scoped_ptr.hpp>
-
-
 class Audio;
 class Database;
 class Song;

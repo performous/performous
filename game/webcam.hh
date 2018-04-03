@@ -1,6 +1,7 @@
 #pragma once
 
 #include "surface.hh"
+#include <mutex>
 #include <thread>
 #include <vector>
 

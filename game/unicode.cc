@@ -1,8 +1,6 @@
-#include "configuration.hh"
 #include "unicode.hh"
 
-#include <regex>
-#include <boost/scoped_ptr.hpp>
+#include "configuration.hh"
 #include <regex>
 #include <sstream>
 #include <stdexcept>
