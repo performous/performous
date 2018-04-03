@@ -10,15 +10,15 @@
 
 LayoutSinger::LayoutSinger(VocalTrack& vocal, Database& database, std::shared_ptr<ThemeSing> theme):
   m_vocal(vocal), m_noteGraph(vocal),m_lyricit(vocal.notes.begin()), m_lyrics(), m_database(database), m_theme(theme), m_hideLyrics() {
-	m_score_text[0].reset(new SvgTxtThemeSimple(findFile("sing_score_text.svg"), config["graphic/text_lod"].f()));
-	m_score_text[1].reset(new SvgTxtThemeSimple(findFile("sing_score_text.svg"), config["graphic/text_lod"].f()));
-	m_score_text[2].reset(new SvgTxtThemeSimple(findFile("sing_score_text.svg"), config["graphic/text_lod"].f()));
-	m_score_text[3].reset(new SvgTxtThemeSimple(findFile("sing_score_text.svg"), config["graphic/text_lod"].f()));
-	m_line_rank_text[0].reset(new SvgTxtThemeSimple(findFile("sing_score_text.svg"), config["graphic/text_lod"].f()));
-	m_line_rank_text[1].reset(new SvgTxtThemeSimple(findFile("sing_score_text.svg"), config["graphic/text_lod"].f()));
-	m_line_rank_text[2].reset(new SvgTxtThemeSimple(findFile("sing_score_text.svg"), config["graphic/text_lod"].f()));
-	m_line_rank_text[3].reset(new SvgTxtThemeSimple(findFile("sing_score_text.svg"), config["graphic/text_lod"].f()));
-	m_player_icon.reset(new Surface(findFile("sing_pbox.svg")));
+	m_score_text[0] = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f());
+	m_score_text[1] = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f());
+	m_score_text[2] = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f());
+	m_score_text[3] = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f());
+	m_line_rank_text[0] = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f());
+	m_line_rank_text[1] = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f());
+	m_line_rank_text[2] = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f());
+	m_line_rank_text[3] = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f());
+	m_player_icon = std::make_unique<Surface>(findFile("sing_pbox.svg"));
 }
 
 LayoutSinger::~LayoutSinger() {}

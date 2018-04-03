@@ -21,7 +21,7 @@ void ScreenPlaylist::enter() {
 	gm->loading(_("Initializing webcam..."), 0.1);
 	if (config["graphic/webcam"].b() && Webcam::enabled()) {
 		try {
-			m_cam.reset(new Webcam(config["graphic/webcamid"].i()));
+			m_cam = std::make_unique<Webcam>(config["graphic/webcamid"].i());
 		} catch (std::exception& e) { std::cout << e.what() << std::endl; };
 	}
 	m_audio.togglePause();
@@ -54,12 +54,12 @@ void ScreenPlaylist::prepare() {
 }
 
 void ScreenPlaylist::reloadGL() {
-	theme.reset(new ThemePlaylistScreen());
-	m_menuTheme.reset(new ThemeInstrumentMenu());
-	m_singCover.reset(new Surface(findFile("no_cover.svg")));
-	m_instrumentCover.reset(new Surface(findFile("instrument_cover.svg")));
-	m_bandCover.reset(new Surface(findFile("band_cover.svg")));
-	m_danceCover.reset(new Surface(findFile("dance_cover.svg")));
+	theme = std::make_unique<ThemePlaylistScreen>();
+	m_menuTheme = std::make_unique<ThemeInstrumentMenu>();
+	m_singCover = std::make_unique<Surface>(findFile("no_cover.svg"));
+	m_instrumentCover = std::make_unique<Surface>(findFile("instrument_cover.svg"));
+	m_bandCover = std::make_unique<Surface>(findFile("band_cover.svg"));
+	m_danceCover = std::make_unique<Surface>(findFile("dance_cover.svg"));
 }
 
 void ScreenPlaylist::exit() {
@@ -110,7 +110,7 @@ void ScreenPlaylist::manageEvent(SDL_Event) {
 
 void ScreenPlaylist::draw() {
 	Game* gm = Game::getSingletonPtr();
-	if (!m_background || m_background->empty()) m_background.reset(new Surface(m_backgrounds.getRandom()));
+	if (!m_background || m_background->empty()) m_background = std::make_unique<Surface>(m_backgrounds.getRandom());
 	m_background->draw();
 	if (m_nextTimer.get() == 0.0 && keyPressed == false) {
 		Screen* s = gm->getScreen("Sing");

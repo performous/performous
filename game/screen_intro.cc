@@ -34,7 +34,7 @@ void ScreenIntro::enter() {
 }
 
 void ScreenIntro::reloadGL() {
-	theme.reset(new ThemeIntro());
+	theme = std::make_unique<ThemeIntro>();
 }
 
 void ScreenIntro::exit() {

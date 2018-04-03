@@ -99,7 +99,7 @@ void Object3d::loadWavefrontObj(fs::path const& filepath, float scale) {
 }
 
 void Object3d::load(fs::path const& filepath, fs::path const& texturepath, float scale) {
-	if (!texturepath.empty()) m_texture.reset(new Texture(texturepath));
+	if (!texturepath.empty()) m_texture = std::make_unique<Texture>(texturepath);
 	loadWavefrontObj(filepath, scale);
 }
 

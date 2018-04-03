@@ -26,15 +26,15 @@ int getBackend() {
 
 
 ScreenAudioDevices::ScreenAudioDevices(std::string const& name, Audio& audio): Screen(name), m_audio(audio) {
-	m_selector.reset(new Surface(findFile("device_selector.svg")));
-	m_mic_icon.reset(new Surface(findFile("sing_pbox.svg")));
-	m_pdev_icon.reset(new Surface(findFile("icon_pdev.svg")));
+	m_selector = std::make_unique<Surface>(findFile("device_selector.svg"));
+	m_mic_icon = std::make_unique<Surface>(findFile("sing_pbox.svg"));
+	m_pdev_icon = std::make_unique<Surface>(findFile("icon_pdev.svg"));
 }
 
 void ScreenAudioDevices::enter() {
 	int bend = getBackend();
 	std::clog << "audio-devices/debug: Entering audio Devices... backend has been detected as: " << bend << std::endl;
-	m_theme.reset(new ThemeAudioDevices());
+	m_theme = std::make_unique<ThemeAudioDevices>();
 	PaHostApiTypeId backend = PaHostApiTypeId(bend);
 	portaudio::AudioDevices ads(backend);
 	m_devs = ads.devices;

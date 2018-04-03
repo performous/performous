@@ -39,15 +39,15 @@ void ScreenSongs::enter() {
 }
 
 void ScreenSongs::reloadGL() {
-	theme.reset(new ThemeSongs());
-	m_menuTheme.reset(new ThemeInstrumentMenu());
-	m_songbg_default.reset(new Surface(findFile("songs_bg_default.svg")));
-	m_songbg_ground.reset(new Surface(findFile("songs_bg_ground.svg")));
-	m_singCover.reset(new Surface(findFile("no_cover.svg")));
-	m_instrumentCover.reset(new Surface(findFile("instrument_cover.svg")));
-	m_bandCover.reset(new Surface(findFile("band_cover.svg")));
-	m_danceCover.reset(new Surface(findFile("dance_cover.svg")));
-	m_instrumentList.reset(new Texture(findFile("instruments.svg")));
+	theme = std::make_unique<ThemeSongs>();
+	m_menuTheme = std::make_unique<ThemeInstrumentMenu>();
+	m_songbg_default = std::make_unique<Surface>(findFile("songs_bg_default.svg"));
+	m_songbg_ground = std::make_unique<Surface>(findFile("songs_bg_ground.svg"));
+	m_singCover = std::make_unique<Surface>(findFile("no_cover.svg"));
+	m_instrumentCover = std::make_unique<Surface>(findFile("instrument_cover.svg"));
+	m_bandCover = std::make_unique<Surface>(findFile("band_cover.svg"));
+	m_danceCover = std::make_unique<Surface>(findFile("dance_cover.svg"));
+	m_instrumentList = std::make_unique<Texture>(findFile("instruments.svg"));
 }
 
 void ScreenSongs::exit() {
@@ -205,8 +205,8 @@ void ScreenSongs::update() {
 	m_audio.playMusic(music, true, 1.0, pstart);
 	if (song) {
 		fs::path const& background = song->background.empty() ? song->cover : song->background;
-		if (!background.empty()) try { m_songbg.reset(new Surface(background)); } catch (std::exception const&) {}
-		if (!song->video.empty() && config["graphic/video"].b()) m_video.reset(new Video(song->video, song->videoGap));
+		if (!background.empty()) try { m_songbg = std::make_unique<Surface>(background); } catch (std::exception const&) {}
+		if (!song->video.empty() && config["graphic/video"].b()) m_video = std::make_unique<Video>(song->video, song->videoGap);
 	}
 }
 

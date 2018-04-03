@@ -120,7 +120,7 @@ std::unique_ptr<SurfaceLoader::Impl> ldr = nullptr;
 
 SurfaceLoader::SurfaceLoader() {
 	if (ldr) throw std::logic_error("Surface Loader initialized twice. There can be only one.");
-	ldr.reset(new Impl());
+	ldr = std::make_unique<Impl>();
 }
 
 SurfaceLoader::~SurfaceLoader() { ldr.reset(); }

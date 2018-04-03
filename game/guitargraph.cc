@@ -127,8 +127,8 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, input::DevicePtr dev, i
 	m_fretObj.load(findFile("fret.obj"));
 	m_tappableObj.load(findFile("fret_tap.obj"));
 	// Score calculator (TODO a better one)
-	m_scoreText.reset(new SvgTxtThemeSimple(findFile("sing_score_text.svg"), config["graphic/text_lod"].f()));
-	m_streakText.reset(new SvgTxtThemeSimple(findFile("sing_score_text.svg"), config["graphic/text_lod"].f()));
+	m_scoreText = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f());
+	m_streakText = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f());
 	for (size_t i = 0; i < max_panels; ++i) {
 		m_pressed_anim[i].setRate(5.0);
 		m_holds[i] = 0;
@@ -211,10 +211,10 @@ void GuitarGraph::updateJoinMenu() {
 void GuitarGraph::updateNeck() {
 	// TODO: Optimize with texture cache
 	std::string index = m_track_index->first;
-	if (index == TrackName::DRUMS) m_neck.reset(new Texture(findFile("drumneck.svg")));
-	else if (index == TrackName::KEYBOARD) m_neck.reset(new Texture(findFile("guitarneck.svg")));
-	else if (index == TrackName::BASS) m_neck.reset(new Texture(findFile("bassneck.svg")));
-	else m_neck.reset(new Texture(findFile("guitarneck.svg")));
+	if (index == TrackName::DRUMS) m_neck = std::make_unique<Texture>(findFile("drumneck.svg"));
+	else if (index == TrackName::KEYBOARD) m_neck = std::make_unique<Texture>(findFile("guitarneck.svg"));
+	else if (index == TrackName::BASS) m_neck = std::make_unique<Texture>(findFile("bassneck.svg"));
+	else m_neck = std::make_unique<Texture>(findFile("guitarneck.svg"));
 }
 
 /// Cycle through the different tracks
