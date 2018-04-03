@@ -8,6 +8,7 @@
 #include "libda/portaudio.hpp"
 #include <boost/date_time.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
+#include <atomic>
 #include <map>
 #include <memory>
 #include <string>
