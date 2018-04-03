@@ -1,7 +1,6 @@
 #include "backgrounds.hh"
 
 #include "configuration.hh"
-#include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <regex>
@@ -15,7 +14,7 @@ void Backgrounds::reload() {
 	if (m_loading) return;
 	// Run loading thread
 	m_loading = true;
-	m_thread.reset(new std::thread(boost::bind(&Backgrounds::reload_internal, boost::ref(*this))));
+	m_thread = std::make_unique<std::thread>([this] { reload_internal(); });
 }
 
 void Backgrounds::reload_internal() {

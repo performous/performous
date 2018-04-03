@@ -78,7 +78,7 @@ WebServer::WebServer(Songs& songs)
 	if(config["game/webserver_access"].i() == 0) {
 		std::clog << "webserver/notice: Not starting webserver." << std::endl;
 	} else {
-		m_serverThread.reset(new std::thread(boost::bind(&WebServer::StartServer, boost::ref(*this), 0, false)));
+		m_serverThread = std::make_unique<std::thread>([this] { StartServer(0, false); });
 	}
 }
 

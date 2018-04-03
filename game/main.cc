@@ -26,7 +26,6 @@
 #include "screen_players.hh"
 #include "screen_playlist.hh"
 
-#include <boost/bind.hpp>
 #include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <cstdlib>
@@ -209,7 +208,7 @@ void mainLoop(std::string const& songlist) {
 			try {
 				window.blank();
 				// Draw
-				window.render(boost::bind(&Game::drawScreen, &gm));
+				window.render([&gm]{ gm.drawScreen(); });
 				if (benchmarking) { glFinish(); prof("draw"); }
 				// Display (and wait until next frame)
 				window.swap();
