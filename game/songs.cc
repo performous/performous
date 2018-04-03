@@ -1,4 +1,4 @@
-﻿#include "songs.hh"
+#include "songs.hh"
 
 #include "configuration.hh"
 #include "fs.hh"

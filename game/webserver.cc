@@ -1,4 +1,4 @@
-﻿#include "webserver.hh"
+#include "webserver.hh"
 #ifdef USE_WEBSERVER
 #include "chrono.hh"
 #include <boost/network/protocol/http/server.hpp>

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #ifdef USE_WEBSERVER
 #include "fs.hh"
