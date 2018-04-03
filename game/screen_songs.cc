@@ -1,4 +1,4 @@
-﻿#include "screen_songs.hh"
+#include "screen_songs.hh"
 
 #include "audio.hh"
 #include "configuration.hh"

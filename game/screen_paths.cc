@@ -1,4 +1,4 @@
-﻿#include "screen_paths.hh"
+#include "screen_paths.hh"
 
 #include "configuration.hh"
 #include "controllers.hh"

@@ -1,4 +1,4 @@
-﻿#include "opengl_text.hh"
+#include "opengl_text.hh"
 
 #include "libxml++-impl.hh"
 

@@ -1,4 +1,4 @@
-﻿#include "fs.hh"
+#include "fs.hh"
 
 #include "config.hh"
 #include "configuration.hh"
