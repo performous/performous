@@ -6,7 +6,6 @@
 #include "configuration.hh"
 #include <iostream>
 #include <list>
-#include <vector>
 
 const double Engine::TIMESTEP = 0.01;
 
