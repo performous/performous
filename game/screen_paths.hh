@@ -29,7 +29,7 @@ class ScreenPaths: public Screen {
   private:
 	Audio& m_audio;
 	Songs& m_songs;
-	boost::scoped_ptr<ThemeAudioDevices> m_theme;
+	std::unique_ptr<ThemeAudioDevices> m_theme;
 	Menu m_menu;
 	AnimValue m_selAnim;
 };

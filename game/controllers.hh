@@ -4,11 +4,11 @@
 #include "configuration.hh"
 #include "util.hh"
 #include <boost/noncopyable.hpp>
-#include <boost/smart_ptr/scoped_ptr.hpp>
 #include <SDL2/SDL_events.h>
 #include <climits>
 #include <deque>
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <vector>
 
@@ -110,7 +110,7 @@ namespace input {
 		bool pushEvent(SDL_Event const& sdlEv, Time now);
 	private:
 		struct Impl;
-		boost::scoped_ptr<Impl> self;
+		std::unique_ptr<Impl> self;
 	};
 
 	/// Base class for different types of hardware backends.

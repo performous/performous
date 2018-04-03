@@ -1,11 +1,10 @@
 #pragma once
 
-#include <boost/scoped_ptr.hpp>
-#include <boost/noncopyable.hpp>
-#include <string>
-
 #include "fs.hh"
 #include "glutil.hh"
+#include <boost/noncopyable.hpp>
+#include <memory>
+#include <string>
 
 // TODO: Exception handling
 // TODO: Texture loading
@@ -17,7 +16,7 @@ class Surface;
 class Object3d: boost::noncopyable {
   private:
 	glutil::VertexArray m_va;
-	boost::scoped_ptr<Surface> m_texture; /// texture
+	std::unique_ptr<Surface> m_texture; /// texture
 	/// load a Wavefront .obj 3d object file
 	void loadWavefrontObj(fs::path const& filepath, float scale = 1.0);
   public:

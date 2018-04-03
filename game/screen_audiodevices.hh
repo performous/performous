@@ -31,12 +31,12 @@ class ScreenAudioDevices: public Screen {
 	bool verify(); ///< Check that all were opened after audio reset
 
 	Audio& m_audio;
-	boost::scoped_ptr<ThemeAudioDevices> m_theme;
+	std::unique_ptr<ThemeAudioDevices> m_theme;
 	unsigned int m_selected_column;
 	portaudio::DeviceInfos m_devs;
 	std::vector<Channel> m_channels;
-	boost::scoped_ptr<Surface> m_selector;
-	boost::scoped_ptr<Surface> m_mic_icon;
-	boost::scoped_ptr<Surface> m_pdev_icon;
+	std::unique_ptr<Surface> m_selector;
+	std::unique_ptr<Surface> m_mic_icon;
+	std::unique_ptr<Surface> m_pdev_icon;
 };
 

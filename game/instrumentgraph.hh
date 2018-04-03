@@ -136,8 +136,8 @@ public:
 	Surface m_arrow_left;
 	Surface m_arrow_right;
 	SvgTxtTheme m_text;
-	boost::scoped_ptr<SvgTxtThemeSimple> m_popupText;
-	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
+	std::unique_ptr<SvgTxtThemeSimple> m_popupText;
+	std::unique_ptr<ThemeInstrumentMenu> m_menuTheme;
 
 	// Dynamic stuff for join menu
 	ConfigItem m_selectedTrack; /// menu modifies this to select track

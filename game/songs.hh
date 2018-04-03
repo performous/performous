@@ -92,7 +92,7 @@ class Songs: boost::noncopyable {
 	void sort_internal(bool descending = false);
 	volatile bool m_dirty;
 	volatile bool m_loading;
-	boost::scoped_ptr<boost::thread> m_thread;
+	std::unique_ptr<boost::thread> m_thread;
 	mutable boost::mutex m_mutex;
 };
 

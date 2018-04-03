@@ -120,7 +120,7 @@ private:
 	AnimValue m_logoAnim;
 	AnimValue m_dialogTimeOut;
 	// Dialog members
-	boost::scoped_ptr<Dialog> m_dialog;
+	std::unique_ptr<Dialog> m_dialog;
 };
 
 // Declaration for the singleton pointer defined in game.cc

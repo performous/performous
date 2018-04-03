@@ -81,7 +81,7 @@ public:
 	Dimensions& dimensions() { return m_opengl_text->dimensions(); }
 
 private:
-	boost::scoped_ptr<OpenGLText> m_opengl_text;
+	std::unique_ptr<OpenGLText> m_opengl_text;
 	std::string m_cache_text;
 	TextStyle m_text;
 	double m_factor;

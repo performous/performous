@@ -40,10 +40,10 @@ class Webcam {
 	Dimensions const& dimensions() const { return m_surface.dimensions; }
 
   private:
-	boost::scoped_ptr<boost::thread> m_thread;
+	std::unique_ptr<boost::thread> m_thread;
 	mutable boost::mutex m_mutex;
-	boost::scoped_ptr<cv::VideoCapture> m_capture;
-	boost::scoped_ptr<cv::VideoWriter> m_writer;
+	std::unique_ptr<cv::VideoCapture> m_capture;
+	std::unique_ptr<cv::VideoWriter> m_writer;
 	CamFrame m_frame;
 	Surface m_surface;
 	bool m_frameAvailable;

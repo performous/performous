@@ -85,17 +85,17 @@ class ScreenSing: public Screen {
 	Database& m_database;
 	Backgrounds& m_backgrounds;
 	std::shared_ptr<Song> m_song; /// Pointer to the current song
-	boost::scoped_ptr<ScoreWindow> m_score_window;
-	boost::scoped_ptr<ProgressBar> m_progress;
-	boost::scoped_ptr<Surface> m_background;
-	boost::scoped_ptr<Video> m_video;
-	boost::scoped_ptr<Webcam> m_cam;
-	boost::scoped_ptr<Surface> m_pause_icon;
-	boost::scoped_ptr<Surface> m_player_icon;
-	boost::scoped_ptr<Surface> m_help;
-	boost::scoped_ptr<Engine> m_engine;
+	std::unique_ptr<ScoreWindow> m_score_window;
+	std::unique_ptr<ProgressBar> m_progress;
+	std::unique_ptr<Surface> m_background;
+	std::unique_ptr<Video> m_video;
+	std::unique_ptr<Webcam> m_cam;
+	std::unique_ptr<Surface> m_pause_icon;
+	std::unique_ptr<Surface> m_player_icon;
+	std::unique_ptr<Surface> m_help;
+	std::unique_ptr<Engine> m_engine;
 	boost::ptr_vector<LayoutSinger> m_layout_singer;
-	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
+	std::unique_ptr<ThemeInstrumentMenu> m_menuTheme;
 	Menu m_menu;
 	Instruments m_instruments;
 	std::shared_ptr<ThemeSing> theme;
