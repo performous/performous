@@ -8,11 +8,9 @@
  */
 
 #include "audio.hpp"
-#include <boost/scoped_ptr.hpp>
-#include <boost/thread/recursive_mutex.hpp>
-//#include <boost/thread/mutex.hpp>
 #include <algorithm>
 #include <memory>
+#include <mutex>
 
 namespace da {
 
@@ -166,27 +164,21 @@ namespace da {
 		sample_t m_level;
 	};
 
-	class scoped_lock: public boost::recursive_mutex::scoped_lock {
-	  public:
-		template <typename T> scoped_lock(T& obj): boost::recursive_mutex::scoped_lock(obj.m_mutex) {}
-	};
-
 	class mutex_stream: boost::noncopyable {
 	  public:
 		mutex_stream(callback_t const& stream): m_stream(stream) {}
 		bool operator()(pcm_data& data) {
-			scoped_lock l(*this);
+			std::lock_guard<std::recursive_mutex> l(m_mutex);
 			if (!m_stream) return false;
 			return m_stream(data);
 		}
 		void clear() {
-			scoped_lock l(*this);
+			std::lock_guard<std::recursive_mutex> l(m_mutex);
 			m_stream.clear();
 		}
 	  private:
 		callback_t m_stream;
-		mutable boost::recursive_mutex m_mutex;
-		friend class scoped_lock;
+		mutable std::recursive_mutex m_mutex;
 	};
 
 	typedef std::auto_ptr<scoped_lock> lock_holder;
@@ -298,6 +290,6 @@ namespace da {
 		select<std::string> m_select;
 		mutex_stream m_mutex;
 		settings m_settings;
-		boost::scoped_ptr<playback> m_playback;
+		std::unique_ptr<playback> m_playback;
 	};
 }

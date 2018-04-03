@@ -6,7 +6,6 @@
 #include "util.hh"
 #include <boost/foreach.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/thread/mutex.hpp>
 #include <stdexcept>
 #include <string>
 

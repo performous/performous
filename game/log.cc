@@ -4,8 +4,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/iostreams/stream_buffer.hpp>
-#include <boost/thread/mutex.hpp>
 #include <iostream>
+#include <mutex>
 #include <stdexcept>
 
 /** \file
@@ -40,7 +40,7 @@
  * Guard to ensure we're atomically printing to cerr.
  * \attention This only guards from multiple clog interleaving, not other console I/O.
  */
-boost::mutex log_lock;
+std::mutex log_lock;
 
 /** \internal The implementation of the stream filter that handles the message filtering. **/
 class VerboseMessageSink : public boost::iostreams::sink {
@@ -61,7 +61,7 @@ std::string target;
 int minLevel;
 
 void writeLog(std::string const& msg) {
-	boost::mutex::scoped_lock l(log_lock);
+	std::lock_guard<std::mutex> l(log_lock);
 	std::cerr << msg << std::flush;
 	file << msg << std::flush;
 }
@@ -105,7 +105,7 @@ Logger::Logger(std::string const& level) {
 	pathBootstrap();  // So that log filename is known...
 	std::string msg = "logger/notice: Logging ";
 	{
-		boost::mutex::scoped_lock l(log_lock);
+		std::lock_guard<std::mutex> l(log_lock);
 		if (level.empty()) {
 			minLevel = 2;  // Display all notices, warnings and errors
 			msg += "all notices, warnings and errors.";
@@ -140,7 +140,7 @@ Logger::~Logger() { teardown(); }
 
 void Logger::teardown() {
 	if (default_ClogBuf) std::clog << "logger/info: Exiting normally." << std::endl;
-	boost::mutex::scoped_lock l(log_lock);
+	std::lock_guard<std::mutex> l(log_lock);
 	if (!default_ClogBuf) return;
 	std::clog.rdbuf(default_ClogBuf);
 	sb.close();

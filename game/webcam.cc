@@ -79,7 +79,7 @@ void Webcam::operator()() {
 				cv::Mat frame;
 				*m_capture >> frame;
 				if (m_writer) *m_writer << frame;
-				boost::mutex::scoped_lock l(m_mutex);
+				std::lock_guard<std::mutex> l(m_mutex);
 				// Copy the frame to storage
 				m_frame.width = frame.cols;
 				m_frame.height = frame.rows;
@@ -96,7 +96,7 @@ void Webcam::operator()() {
 
 void Webcam::pause(bool do_pause) {
 	#ifdef USE_OPENCV
-	boost::mutex::scoped_lock l(m_mutex);
+	std::lock_guard<std::mutex> l(m_mutex);
 	#endif
 	m_running = !do_pause;
 	m_frameAvailable = false;
@@ -107,7 +107,7 @@ void Webcam::render() {
 	if (!m_capture || !m_running) return;
 	// Do we have a new frame available?
 	if (m_frameAvailable && !m_frame.data.empty()) {
-		boost::mutex::scoped_lock l(m_mutex);
+		std::lock_guard<std::mutex> l(m_mutex);
 		// Load the image
 		Bitmap bitmap;
 		bitmap.fmt = pix::BGR;

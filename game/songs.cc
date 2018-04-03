@@ -45,7 +45,7 @@ void Songs::reload() {
 
 void Songs::reload_internal() {
 	{
-		boost::mutex::scoped_lock l(m_mutex);
+		std::lock_guard<std::mutex> l(m_mutex);
 		m_songs.clear();
 		m_dirty = true;
 	}
@@ -81,7 +81,7 @@ void Songs::reload_internal(fs::path const& parent) {
 			if (!regex_search(p.filename().string(), expression)) continue; //if the folder does not contain any of the requested files, ignore it
 			try { //found song file, make a new song with it.
 				std::shared_ptr<Song>s(new Song(p.parent_path(), p));
-				boost::mutex::scoped_lock l(m_mutex);
+				std::lock_guard<std::mutex> l(m_mutex);
 				int AdditionalFileIndex = -1;
 				for(unsigned int i = 0; i< m_songs.size(); i++) {
 					if(s->filename.extension() != m_songs[i]->filename.extension() && s->filename.stem() == m_songs[i]->filename.stem() &&
@@ -149,7 +149,7 @@ void Songs::setFilter(std::string const& val) {
 
 void Songs::filter_internal() {
 	m_updateTimer.setValue(0.0);
-	boost::mutex::scoped_lock l(m_mutex);
+	std::lock_guard<std::mutex> l(m_mutex);
 	m_dirty = false;
 	RestoreSel restore(*this);
 	try {

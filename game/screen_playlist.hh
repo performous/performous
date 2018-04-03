@@ -12,10 +12,9 @@
 #include "surface.hh"
 #include "webcam.hh"
 #include "configuration.hh"
-#include <vector>
 #include <boost/scoped_ptr.hpp>
-#include <boost/thread/mutex.hpp>
-
+#include <mutex>
+#include <vector>
 
 class Audio;
 class Database;
@@ -61,7 +60,7 @@ private:
 	void draw_menu_options();
 	bool keyPressed;
 	bool needsUpdate = false;
-	mutable boost::mutex m_mutex;
+	mutable std::mutex m_mutex;
 	Surface& getCover(Song const& song);
 	std::unique_ptr<Surface> m_singCover;
 	std::unique_ptr<Surface> m_instrumentCover;

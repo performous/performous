@@ -6,9 +6,8 @@
 #include "svg.hh"
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/thread/mutex.hpp>
 #include <cctype>
+#include <condition_variable>
 #include <stdexcept>
 #include <sstream>
 #include <thread>
@@ -53,8 +52,8 @@ class SurfaceLoader::Impl {
 		}
 	}
 	volatile bool m_quit;
-	boost::mutex m_mutex;
-	boost::condition m_condition;
+	std::mutex m_mutex;
+	std::condition_variable m_condition;
 	typedef std::map<void const*, Job> Jobs;
 	Jobs m_jobs;
 	std::thread m_thread;
@@ -68,7 +67,7 @@ public:
 			fs::path name;
 			{
 				// Poll for jobs to be done
-				boost::mutex::scoped_lock l(m_mutex);
+				std::unique_lock<std::mutex> l(m_mutex);
 				for (auto& job: m_jobs) {
 					if (job.second.name.empty()) continue;  // Job already done
 					name = job.second.name;
@@ -85,7 +84,7 @@ public:
 			Bitmap bitmap;
 			load(bitmap, name);
 			// Store the result
-			boost::mutex::scoped_lock l(m_mutex);
+			std::lock_guard<std::mutex> l(m_mutex);
 			auto it = m_jobs.find(target);
 			if (it == m_jobs.end()) continue;  // The job has been removed already
 			it->second.name.clear();  // Mark the job completed
@@ -94,18 +93,18 @@ public:
 	}
 	/// Add a new job, using calling Surface's address as unique ID.
 	void push(void const* t, Job const& job) {
-		boost::mutex::scoped_lock l(m_mutex);
+		std::lock_guard<std::mutex> l(m_mutex);
 		m_jobs[t] = job;
 		m_condition.notify_one();
 	}
 	/// Cancel a job in progress (no effect if the job has already completed)
 	void remove(void const* t) {
-		boost::mutex::scoped_lock l(m_mutex);
+		std::lock_guard<std::mutex> l(m_mutex);
 		m_jobs.erase(t);
 	}
 	/// Upload all completed jobs to OpenGL (must be called from a valid OpenGL context)
 	void apply() {
-		boost::mutex::scoped_lock l(m_mutex);
+		std::lock_guard<std::mutex> l(m_mutex);
 		for (auto it = m_jobs.begin(); it != m_jobs.end();) {
 			{
 				Job& j = it->second;
