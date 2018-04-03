@@ -1,10 +1,9 @@
 #pragma once
 
-#include <map>
-#include <boost/scoped_ptr.hpp>
 #include "screen.hh"
 #include "glutil.hh"
 #include "libda/portaudio.hpp"
+#include <map>
 
 class Audio;
 class ThemeAudioDevices;

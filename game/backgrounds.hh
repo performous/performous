@@ -2,6 +2,7 @@
 
 #include "fs.hh"
 #include <memory>
+#include <mutex>
 #include <thread>
 #include <vector>
 

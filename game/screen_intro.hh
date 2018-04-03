@@ -1,10 +1,8 @@
 #pragma once
 
-#include "screen.hh"
-#include "menu.hh"
 #include "animvalue.hh"
-
-#include <boost/scoped_ptr.hpp>
+#include "menu.hh"
+#include "screen.hh"
 #include <boost/asio.hpp>
 
 class Audio;

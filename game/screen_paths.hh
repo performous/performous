@@ -1,15 +1,14 @@
 #pragma once
 
-#include <map>
-#include <boost/scoped_ptr.hpp>
-#include <boost/filesystem.hpp>
-#include <iostream>
-#include <string>
+#include "config.hh"
 #include "menu.hh"
 #include "screen.hh"
-#include "textinput.hh"
-#include "config.hh"
 #include "songs.hh"
+#include "textinput.hh"
+#include <boost/filesystem.hpp>
+#include <iostream>
+#include <map>
+#include <string>
 
 class Audio;
 class ThemeAudioDevices;

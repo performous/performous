@@ -9,7 +9,6 @@
 #include "playlist.hh"
 #include "fbo.hh"
 #include <boost/ptr_container/ptr_map.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <SDL2/SDL.h>
 #include <string>
 

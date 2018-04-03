@@ -12,7 +12,6 @@
 #include "surface.hh"
 #include "webcam.hh"
 #include "configuration.hh"
-#include <boost/scoped_ptr.hpp>
 #include <mutex>
 #include <vector>
 
