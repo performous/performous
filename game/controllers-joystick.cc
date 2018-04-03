@@ -1,5 +1,6 @@
 #include "controllers.hh"
 
+#include <cmath>  // For std::abs
 #include <memory>
 #include <sstream>
 #include <vector>
@@ -30,7 +31,7 @@ namespace input {
 			else if (sdlEv.type == SDL_JOYAXISMOTION) {
 				event.hw = hwIsAxis.min + sdlEv.jaxis.axis;
 				event.value = (sdlEv.jaxis.value + 0.5) / 32767.5;  // Convert to -1.0 .. 1.0 range
-				if (event.value * event.value < 0.001 * 0.001) event.value = 0.0;  // Some dead zone around zero
+				if (std::abs(event.value) < 0.001) event.value = 0.0;  // Some dead zone around zero
 			}
 			else if (sdlEv.type == SDL_JOYHATMOTION) {
 				event.hw = hwIsHat.min + sdlEv.jhat.hat;
