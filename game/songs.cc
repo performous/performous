@@ -39,7 +39,8 @@ void Songs::reload() {
 	}
 	// Run loading thread
 	m_loading = true;
-	m_thread.reset(new std::thread([this]{ reload_internal(); }));
+	if (m_thread) m_thread->join();
+	m_thread = std::make_unique<std::thread>([this]{ reload_internal(); });
 }
 
 void Songs::reload_internal() {
