@@ -56,7 +56,7 @@ Webcam::Webcam(int cam_id):
 	}
 	#endif
 	// Start thread
-	m_thread.reset(new boost::thread(boost::ref(*this)));
+	m_thread.reset(new std::thread(std::ref(*this)));
 	#else
 	(void)cam_id; // Avoid unused warning
 	#endif

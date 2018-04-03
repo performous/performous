@@ -8,10 +8,10 @@
 #include <boost/filesystem.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
 #include <cctype>
 #include <stdexcept>
 #include <sstream>
+#include <thread>
 #include <vector>
 
 using std::uint32_t;
@@ -57,7 +57,7 @@ class SurfaceLoader::Impl {
 	boost::condition m_condition;
 	typedef std::map<void const*, Job> Jobs;
 	Jobs m_jobs;
-	boost::thread m_thread;
+	std::thread m_thread;
 public:
 	Impl(): m_quit(), m_thread(&Impl::run, this) {}
 	~Impl() { m_quit = true; m_condition.notify_one(); m_thread.join(); }
@@ -135,7 +135,7 @@ template <typename T> void loader(T* target, fs::path const& name) {
 	bitmap.resize(1, 1);
 	target->load(bitmap);
 	// Ask the loader to retrieve the image
-	ldr->push(target, Job(name, boost::bind(&T::load, target, _1)));
+	ldr->push(target, Job(name, [target](Bitmap& bitmap){ target->load(bitmap); }));
 }
 
 Surface::Surface(fs::path const& filename) { loader(this, filename); }

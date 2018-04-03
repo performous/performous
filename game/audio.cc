@@ -1,16 +1,17 @@
 #include "audio.hh"
 
+#include "chrono.hh"
+#include "configuration.hh"
+#include "libda/portaudio.hpp"
+#include "util.hh"
 #include <boost/ptr_container/ptr_map.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <boost/thread/mutex.hpp>
 #include <cmath>
+#include <future>
 #include <iostream>
 #include <map>
-#include "configuration.hh"
-#include "libda/portaudio.hpp"
-#include "util.hh"
-
 #include <unordered_map>
 
 extern const double m_pi;
@@ -529,15 +530,22 @@ struct Audio::Impl {
 };
 
 Audio::Audio(): self(new Impl) {}
-Audio::~Audio() {}
+Audio::~Audio() { close(); }
 
 ConfigItem& Audio::backendConfig() {
 	static ConfigItem& backend = config["audio/backend"];
 	return backend;
 }
 
-void Audio::restart() { self.reset(new Impl); }
-void Audio::close() { self.reset(); }
+void Audio::restart() { close(); self.reset(new Impl); }
+
+void Audio::close() {
+	// Only wait a limited time for closing of audio devices because it often hangs (on Linux)
+	auto audiokiller = std::async(std::launch::async, [this]{ self.reset(); });
+	if (audiokiller.wait_for(2.5s) == std::future_status::ready) return;
+	// FIXME: Make this do Game::fatalError or something else? Will fix this in another commit...
+	throw std::runtime_error("Audio hung for some reason.\nPlease restart Performous.");
+}
 
 bool Audio::isOpen() const {
 	return !self->devices.empty();

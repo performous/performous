@@ -15,7 +15,7 @@ void Backgrounds::reload() {
 	if (m_loading) return;
 	// Run loading thread
 	m_loading = true;
-	m_thread.reset(new boost::thread(boost::bind(&Backgrounds::reload_internal, boost::ref(*this))));
+	m_thread.reset(new std::thread(boost::bind(&Backgrounds::reload_internal, boost::ref(*this))));
 }
 
 void Backgrounds::reload_internal() {

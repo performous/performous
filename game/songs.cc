@@ -39,7 +39,7 @@ void Songs::reload() {
 	}
 	// Run loading thread
 	m_loading = true;
-	m_thread.reset(new boost::thread(boost::bind(&Songs::reload_internal, boost::ref(*this))));
+	m_thread.reset(new std::thread([this]{ reload_internal(); }));
 }
 
 void Songs::reload_internal() {

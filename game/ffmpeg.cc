@@ -51,7 +51,7 @@ FFmpeg::FFmpeg(fs::path const& _filename, unsigned int rate):
   m_seekTarget(getNaN()), m_position(), m_duration(), m_streamId(-1),
   m_mediaType(rate ? AVMEDIA_TYPE_AUDIO : AVMEDIA_TYPE_VIDEO),
   m_formatContext(), m_codecContext(), m_resampleContext(), m_swsContext(),
-  m_thread(new boost::thread(boost::ref(*this)))
+  m_thread(new std::thread(std::ref(*this)))
 {
 	static bool versionChecked = false;
 	if (!versionChecked) {

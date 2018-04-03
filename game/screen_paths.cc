@@ -6,8 +6,6 @@
 #include "theme.hh"
 #include "audio.hh"
 #include "i18n.hh"
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
 
 ScreenPaths::ScreenPaths(std::string const& name, Audio& audio, Songs& songs): Screen(name), m_audio(audio), m_songs(songs) {}
 

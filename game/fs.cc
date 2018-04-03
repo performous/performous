@@ -1,17 +1,17 @@
-﻿#include "config.hh"
-#include "configuration.hh"
-#include "fs.hh"
-#include "platform.hh"
+﻿#include "fs.hh"
 
+#include "config.hh"
+#include "configuration.hh"
+#include "platform.hh"
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/range.hpp>
-#include <boost/thread.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/lock_guard.hpp>
+#include <algorithm>
 #include <cstdlib>
-
 #include <set>
 #include <sstream>
-#include <algorithm>
 
 #if (BOOST_OS_WINDOWS)
 #include <windows.h>
