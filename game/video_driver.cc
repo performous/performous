@@ -1,16 +1,14 @@
 #include "video_driver.hh"
 
+#include "chrono.hh"
 #include "config.hh"
+#include "controllers.hh"
 #include "fbo.hh"
 #include "fs.hh"
 #include "glmath.hh"
 #include "image.hh"
-#include "util.hh"
-#include "controllers.hh"
 #include "screen.hh"
-
-#include <boost/date_time.hpp>
-
+#include "util.hh"
 
 namespace {
 	unsigned s_width;
@@ -329,7 +327,10 @@ void Window::screenshot() {
 	// Get pixel data from OpenGL
 	glReadPixels(0, 0, img.width, img.height, GL_RGB, GL_UNSIGNED_BYTE, img.data());
 	// Compose filename from timestamp
-	fs::path filename = getHomeDir() / ("Performous_" + to_iso_string(boost::posix_time::second_clock::local_time()) + ".png");
+	auto t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+	std::ostringstream oss;
+	oss << std::put_time(std::localtime(&t), "%FT%T");
+	fs::path filename = getHomeDir() / ("Performous_" + oss.str() + ".png");
 	// Save to disk
 	writePNG(filename.string(), img, stride);
 	std::clog << "video/info: Screenshot taken: " << filename << " (" << img.width << "x" << img.height << ")" << std::endl;
