@@ -14,7 +14,6 @@
 #include <unordered_map>
 
 extern const double m_pi;
-using namespace boost::posix_time;
 
 namespace {
 	/**
@@ -74,41 +73,35 @@ namespace {
 * it is late or early. The clock is also stopped if audio output pauses.
 **/
 class AudioClock {
-	static ptime getTime() { return microsec_clock::universal_time(); }
-	// Conversion helpers
-	static double getSeconds(time_duration t) { return 1e-6 * t.total_microseconds(); }
-	static time_duration getDuration(double seconds) { return microseconds(1e6 * seconds); }
-
 	mutable std::mutex m_mutex;
-	ptime m_baseTime; ///< A reference time (corresponds to m_basePos)
-	double m_basePos; ///< A reference position in song
-	double m_skew; ///< The skew ratio applied to system time (since baseTime)
-	volatile float m_max; ///< Maximum output value for the clock (end of the current audio block)
+	Time m_baseTime; ///< A reference time (corresponds to m_basePos)
+	double m_basePos = 0.0; ///< A reference position in song
+	double m_skew = 0.0; ///< The skew ratio applied to system time (since baseTime)
+	std::atomic<double> m_max; ///< Maximum output value for the clock (end of the current audio block)
 	/// Get the current position (current time via parameter, no locking)
-	double pos_internal(ptime now) const {
-		double t = m_basePos + (1.0 + m_skew) * getSeconds(now - m_baseTime);
+	double pos_internal(Time now) const {
+		double t = m_basePos + (1.0 + m_skew) * Seconds(now - m_baseTime).count();
 		return std::min<double>(t, m_max);
 	}
 public:
-	AudioClock(): m_baseTime(), m_basePos(), m_skew(), m_max() {}
 	/**
 	* Called from audio callback to keep the clock synced.
 	* @param audioPos the current position in the song
 	* @param length the duration of the current audio block
 	*/
-	void timeSync(time_duration audioPos, time_duration length) {
+	void timeSync(Seconds audioPos, Seconds length) {
 		constexpr double maxError = 0.1;  // Step the clock instead of skewing if over 100 ms off
 		// Full correction requires locking, but we can update max without lock too
 		std::unique_lock<std::mutex> l(m_mutex, std::defer_lock);
-		double max = getSeconds(audioPos + length);
+		double max = (audioPos + length).count();
 		if (!l.try_lock()) {
 			if (max > m_max) m_max = max; // Allow increasing m_max
 			return;
 		}
 		// Mutex locked - do a full update
-		ptime now = getTime();
+		auto now = Clock::now();
 		const double sys = pos_internal(now);  // Current position (based on system clock + corrections)
-		const double audio = getSeconds(audioPos);  // Audio time
+		const double audio = Seconds(audioPos).count();  // Audio time
 		const double diff = audio - sys;
 		// Skew-based correction only if going forward and relatively well synced
 		if (max > m_max && std::abs(diff) < maxError) {
@@ -117,7 +110,7 @@ public:
 			m_baseTime = now;
 			m_basePos = sys;
 			// Apply a VERY ARTIFICIAL correction for clock!
-			const double valadj = getSeconds(length) * 0.1 * rand() / RAND_MAX;  // Dither
+			const double valadj = length.count() * 0.1 * rand() / RAND_MAX;  // Dither
 			m_skew += (diff < valadj ? -1.0 : 1.0) * fudgeFactor;
 			// Limits to keep things sane in abnormal situations
 			m_skew = clamp(m_skew, -0.01, 0.01);
@@ -132,7 +125,7 @@ public:
 	/// Get the current position in seconds
 	double pos() const {
 		std::lock_guard<std::mutex> l(m_mutex);
-		return pos_internal(getTime());
+		return pos_internal(Clock::now());
 	}
 };
 
@@ -148,7 +141,7 @@ class Music {
 	int64_t m_pos; ///< Current sample position
 	bool m_preview;
 	AudioClock m_clock;
-	time_duration durationOf(int64_t samples) const { return microseconds(1e6 * samples / srate / 2.0); }
+	Seconds durationOf(int64_t samples) const { return 1.0s * samples / srate / 2.0; }
 public:
 	bool suppressCenterChannel;
 	double fadeLevel;
