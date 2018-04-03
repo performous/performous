@@ -4,15 +4,14 @@
  * @file portaudio.hpp OOP / RAII wrappers & utilities for PortAudio library.
  */
 
-#include <boost/thread.hpp>
-#include <regex>
-#include <portaudio.h>
-#include <cstdlib>
-#include <stdexcept>
-#include <stdint.h>
-
 #include "../unicode.hh"
 #include "../platform.hh"
+#include <portaudio.h>
+#include <cstdlib>
+#include <future>
+#include <regex>
+#include <stdexcept>
+#include <stdint.h>
 
 #define PORTAUDIO_CHECKED(func, args) portaudio::internal::check(func args, #func)
 
@@ -233,11 +232,10 @@ namespace portaudio {
 		): Stream(input, output, sampleRate, framesPerBuffer, flags, functorCallback<Functor>, (void*)(intptr_t)&functor) {}
 		~Stream() {
 			// Give audio a little time to shutdown but then just quit
-			boost::thread audiokiller(Pa_CloseStream, m_handle);
-			if (!audiokiller.timed_join(boost::posix_time::milliseconds(5000))) {
-				std::cout << "PortAudio BUG: Pa_CloseStream hung for more than five seconds. Aborting." << std::endl;
-				std::abort();  // Crash. Calling exit() is prone to hang.
-			}
+			auto audiokiller = std::async(std::launch::async, Pa_CloseStream, m_handle);
+			if (audiokiller.wait_for(std::chrono::seconds(5)) == std::future_status::ready) return;
+			std::cerr << "PortAudio BUG: Pa_CloseStream hung for more than five seconds. Aborting." << std::endl;
+			abort();  // Crash. Calling exit() is prone to hang.
 		}
 		operator PaStream*() { return m_handle; }
 	};

@@ -1,11 +1,8 @@
 #pragma once
 
-#include <boost/scoped_ptr.hpp>
-#include <boost/thread/mutex.hpp>
+#include "surface.hh"
 #include <thread>
 #include <vector>
-
-#include "surface.hh"
 
 namespace cv {
 	// Forward declarations
@@ -41,7 +38,7 @@ class Webcam {
 
   private:
 	std::unique_ptr<std::thread> m_thread;
-	mutable boost::mutex m_mutex;
+	mutable std::mutex m_mutex;
 	std::unique_ptr<cv::VideoCapture> m_capture;
 	std::unique_ptr<cv::VideoWriter> m_writer;
 	CamFrame m_frame;

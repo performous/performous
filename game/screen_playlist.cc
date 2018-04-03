@@ -126,7 +126,7 @@ void ScreenPlaylist::draw() {
 		drawMenu();
 	}
 	if(needsUpdate) {
-		boost::mutex::scoped_lock l(m_mutex);
+		std::lock_guard<std::mutex> l(m_mutex);
 		createSongListMenu();
 		needsUpdate = false;
 	}
@@ -378,6 +378,6 @@ void ScreenPlaylist::createSongMenu(int songNumber) {
 }
 
 void ScreenPlaylist::triggerSongListUpdate() {
-boost::mutex::scoped_lock l (m_mutex);
+std::lock_guard<std::mutex> l (m_mutex);
 needsUpdate = true;
 }

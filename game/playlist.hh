@@ -1,11 +1,10 @@
 
 #pragma once
 
-#include <vector>
 #include "song.hh"
-#include <boost/thread/mutex.hpp>
 #include <memory>
 #include <sstream>
+#include <vector>
 
 class PlayList
 {
@@ -39,6 +38,6 @@ public:
 	std::shared_ptr<Song> currentlyActive;
 private:
 	SongList m_list;
-	mutable boost::mutex m_mutex;
+	mutable std::mutex m_mutex;
 };
 

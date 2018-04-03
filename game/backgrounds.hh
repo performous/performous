@@ -1,7 +1,6 @@
 #pragma once
 
 #include "fs.hh"
-#include <boost/thread/mutex.hpp>
 #include <memory>
 #include <thread>
 #include <vector>
@@ -38,6 +37,6 @@ class Backgrounds: boost::noncopyable {
 	volatile bool m_dirty;
 	volatile bool m_loading;
 	std::unique_ptr<std::thread> m_thread;
-	mutable boost::mutex m_mutex;
+	mutable std::mutex m_mutex;
 };
 

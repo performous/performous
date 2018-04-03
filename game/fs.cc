@@ -6,8 +6,6 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/range.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/lock_guard.hpp>
 #include <algorithm>
 #include <cstdlib>
 #include <set>
@@ -61,8 +59,8 @@ namespace {
 	#endif
 	} cache;
 
-	boost::mutex mutex;
-	typedef boost::lock_guard<boost::mutex> Lock;
+	std::mutex mutex;
+	using Lock = std::lock_guard<std::mutex>;
 }
 
 void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destinationDir)

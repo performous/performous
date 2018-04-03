@@ -32,7 +32,7 @@ extern "C" {
 
 #define AUDIO_CHANNELS 2
 
-/*static*/ boost::mutex FFmpeg::s_avcodec_mutex;
+/*static*/ std::mutex FFmpeg::s_avcodec_mutex;
 
 namespace {
 	std::string ffversion(unsigned ver) {
@@ -89,7 +89,7 @@ FFmpeg::~FFmpeg() {
 }
 
 void FFmpeg::open() {
-	boost::mutex::scoped_lock l(s_avcodec_mutex);
+	std::lock_guard<std::mutex> l(s_avcodec_mutex);
 	av_register_all();
 	av_log_set_level(AV_LOG_ERROR);
 	if (avformat_open_input(&m_formatContext, m_filename.string().c_str(), nullptr, nullptr)) throw std::runtime_error("Cannot open input file");
@@ -169,7 +169,7 @@ void FFmpeg::operator()() {
 	audioQueue.reset();
 	videoQueue.reset();
 	// TODO: use RAII for freeing resources (to prevent memory leaks)
-	boost::mutex::scoped_lock l(s_avcodec_mutex); // avcodec_close is not thread-safe
+	std::lock_guard<std::mutex> l(s_avcodec_mutex); // avcodec_close is not thread-safe
 	if (m_resampleContext) avresample_close(m_resampleContext);
 	if (m_codecContext) avcodec_close(m_codecContext);
 #if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53, 17, 0)

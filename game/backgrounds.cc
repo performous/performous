@@ -20,7 +20,7 @@ void Backgrounds::reload() {
 
 void Backgrounds::reload_internal() {
 	{	// Remove old ones
-		boost::mutex::scoped_lock l(m_mutex);
+		std::lock_guard<std::mutex> l(m_mutex);
 		m_bgs.clear();
 		m_dirty = true;
 	}
@@ -38,7 +38,7 @@ void Backgrounds::reload_internal() {
 	}
 	m_loading = false;
 	{	// Randomize the order
-		boost::mutex::scoped_lock l(m_mutex);
+		std::lock_guard<std::mutex> l(m_mutex);
 		random_shuffle(m_bgs.begin(), m_bgs.end());
 		m_dirty = false;
 		m_bgiter = 0;
@@ -58,7 +58,7 @@ void Backgrounds::reload_internal(fs::path const& parent) {
 			path.erase(path.size() - name.size());
 			if (!regex_search(name, expression)) continue;
 			{
-				boost::mutex::scoped_lock l(m_mutex);
+				std::lock_guard<std::mutex> l(m_mutex);
 				m_bgs.push_back(path + name); // Add the background
 				m_dirty = true;
 			}

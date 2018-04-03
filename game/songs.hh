@@ -2,8 +2,6 @@
 
 #include "animvalue.hh"
 #include "fs.hh"
-#include <boost/scoped_ptr.hpp>
-#include <boost/thread/mutex.hpp>
 #include <memory>
 #include <set>
 #include <sstream>
@@ -93,6 +91,6 @@ class Songs: boost::noncopyable {
 	volatile bool m_dirty;
 	volatile bool m_loading;
 	std::unique_ptr<std::thread> m_thread;
-	mutable boost::mutex m_mutex;
+	mutable std::mutex m_mutex;
 };
 

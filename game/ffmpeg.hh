@@ -5,9 +5,7 @@
 #include "libda/sample.hpp"
 #include <boost/circular_buffer.hpp>
 #include <boost/ptr_container/ptr_deque.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/recursive_mutex.hpp>
+#include <condition_variable>
 #include <memory>
 #include <thread>
 #include <vector>
@@ -34,7 +32,7 @@ class VideoFifo {
 	VideoFifo(): m_timestamp(), m_eof() {}
 	/// trys to pop a video frame from queue
 	bool tryPop(Bitmap& f) {
-		boost::mutex::scoped_lock l(m_mutex);
+		std::unique_lock<std::mutex> l(m_mutex);
 		if (m_queue.empty()) return false; // Nothing to deliver
 		if (m_queue.begin()->buf.empty()) { m_eof = true; return false; }
 		f.swap(*m_queue.begin());
@@ -45,14 +43,14 @@ class VideoFifo {
 	}
 	/// Add frame to queue
 	void push(Bitmap* f) {
-		boost::mutex::scoped_lock l(m_mutex);
-		while (m_queue.size() > m_max) m_cond.wait(l);
+		std::unique_lock<std::mutex> l(m_mutex);
+		m_cond.wait(l, [this]{ return m_queue.size() < m_max; });
 		if (m_queue.empty()) m_timestamp = f->timestamp;
 		m_queue.push_back(f);
 	}
 	/// Clear and unlock the queue
 	void reset() {
-		boost::mutex::scoped_lock l(m_mutex);
+		std::unique_lock<std::mutex> l(m_mutex);
 		m_queue.clear();
 		m_cond.notify_all();
 		m_eof = false;
@@ -64,29 +62,28 @@ class VideoFifo {
 
   private:
 	boost::ptr_deque<Bitmap> m_queue;
-	mutable boost::mutex m_mutex;
-	boost::condition m_cond;
+	mutable std::mutex m_mutex;
+	std::condition_variable m_cond;
 	double m_timestamp;
 	bool m_eof;
 	static const unsigned m_max = 20;
 };
 
 class AudioBuffer {
-	typedef boost::recursive_mutex mutex;
+	typedef std::recursive_mutex mutex;
   public:
-	AudioBuffer(size_t size = 1000000): m_data(size), m_pos(), m_posReq(), m_sps(), m_duration(getNaN()), m_quit() {}
+	AudioBuffer(size_t size = 1000000): m_data(size) {}
 	/// Reset from FFMPEG side (seeking to beginning or terminate stream)
 	void reset() {
-		mutex::scoped_lock l(m_mutex);
-		m_data.clear();
-		m_pos = 0;
-		l.unlock();
+		{
+			std::unique_lock<mutex> l(m_mutex);
+			m_data.clear();
+			m_pos = 0;
+		}
 		m_cond.notify_one();
 	}
 	void quit() {
-		mutex::scoped_lock l(m_mutex);
-		m_quit = true;
-		l.unlock();
+		m_quit.store(true);
 		m_cond.notify_one();
 	}
 	/// set samples per second
@@ -94,8 +91,8 @@ class AudioBuffer {
 	/// get samples per second
 	unsigned getSamplesPerSecond() const { return m_sps; }
 	void push(std::vector<int16_t> const& data, double timestamp) {
-		mutex::scoped_lock l(m_mutex);
-		while (!condition()) m_cond.wait(l);
+		std::unique_lock<mutex> l(m_mutex);
+		m_cond.wait(l, [this]{ return condition(); });
 		if (m_quit) return;
 		if (timestamp < 0.0) {
 			std::clog << "ffmpeg/warning: Negative audio timestamp " << timestamp << " seconds, frame ignored." << std::endl;
@@ -110,7 +107,7 @@ class AudioBuffer {
 		m_pos += data.size();
 	}
 	bool prepare(int64_t pos) {
-		mutex::scoped_try_lock l(m_mutex);
+		std::unique_lock<mutex> l(m_mutex, std::try_to_lock);
 		if (!l.owns_lock()) return false;  // Didn't get lock, give up for now
 		if (eof(pos)) return true;
 		if (pos < 0) pos = 0;
@@ -120,7 +117,7 @@ class AudioBuffer {
 		return m_pos > m_posReq + m_data.capacity() / 16 && m_pos <= m_posReq + m_data.size();
 	}
 	bool operator()(float* begin, float* end, int64_t pos, float volume = 1.0f) {
-		mutex::scoped_lock l(m_mutex);
+		std::unique_lock<mutex> l(m_mutex);
 		size_t idx = pos + m_data.size() - m_pos;
 		size_t samples = end - begin;
 		for (size_t s = 0; s < samples; ++s, ++idx) {
@@ -146,15 +143,15 @@ class AudioBuffer {
 	}
 	bool wantMore() { return m_pos < m_posReq + m_data.capacity() / 2; }
 	/// Should the input stop waiting?
-	bool condition() { return m_quit || wantMore() || wantSeek(); }
+	bool condition() { return m_quit.load() || wantMore() || wantSeek(); }
 	mutable mutex m_mutex;
-	boost::condition m_cond;
+	std::condition_variable_any m_cond;
 	boost::circular_buffer<int16_t> m_data;
-	size_t m_pos;
-	int64_t m_posReq;
-	unsigned m_sps;
-	double m_duration;
-	bool m_quit;
+	size_t m_pos = 0;
+	int64_t m_posReq = 0;
+	unsigned m_sps = 0;
+	double m_duration = getNaN();
+	std::atomic<bool> m_quit = false;
 };
 
 // ffmpeg forward declarations
@@ -207,6 +204,6 @@ class FFmpeg {
 	SwsContext* m_swsContext;
 	// Make sure the thread starts only after initializing everything else
 	std::unique_ptr<std::thread> m_thread;
-	static boost::mutex s_avcodec_mutex; // Used for avcodec_open/close (which use some static crap and are thus not thread-safe)
+	static std::mutex s_avcodec_mutex; // Used for avcodec_open/close (which use some static crap and are thus not thread-safe)
 };
 
