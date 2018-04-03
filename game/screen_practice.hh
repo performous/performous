@@ -27,5 +27,5 @@ class ScreenPractice : public Screen {
 	Audio& m_audio;
 	std::vector<std::string> m_samples;
 	boost::ptr_vector<ProgressBar> m_vumeters;
-	boost::scoped_ptr<ThemePractice> theme;
+	std::unique_ptr<ThemePractice> theme;
 };

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <boost/scoped_ptr.hpp>
 #include <boost/thread/thread.hpp>
+#include <memory>
 
 class Audio;
 class Database;
@@ -13,7 +13,7 @@ class Engine {
 	double m_time;
 	volatile bool m_quit;
 	Database& m_database;
-	boost::scoped_ptr<boost::thread> m_thread;
+	std::unique_ptr<boost::thread> m_thread;
 
   public:
 	typedef std::vector<VocalTrack*> VocalTrackPtrs;

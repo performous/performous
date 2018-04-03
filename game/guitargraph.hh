@@ -92,9 +92,9 @@ class GuitarGraph: public InstrumentGraph {
 	Object3d m_fretObj; /// 3d object for regular note
 	Object3d m_tappableObj; /// 3d object for the HOPO note cap
 	std::vector<std::string> m_samples; /// sound effects
-	boost::scoped_ptr<Texture> m_neck; /// necks
-	boost::scoped_ptr<SvgTxtThemeSimple> m_scoreText;
-	boost::scoped_ptr<SvgTxtThemeSimple> m_streakText;
+	std::unique_ptr<Texture> m_neck; /// necks
+	std::unique_ptr<SvgTxtThemeSimple> m_scoreText;
+	std::unique_ptr<SvgTxtThemeSimple> m_streakText;
 
 	// Flags
 	bool m_drums; /// are we using drums?

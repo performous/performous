@@ -32,7 +32,7 @@ class ScreenIntro : public Screen {
 	SvgTxtTheme& getTextObject(std::string const& txt);
 
 	Audio& m_audio;
-	boost::scoped_ptr<ThemeIntro> theme;
+	std::unique_ptr<ThemeIntro> theme;
 	Menu m_menu;
 	bool m_first;
 	bool m_drawNotice = false;

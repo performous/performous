@@ -53,9 +53,9 @@ private:
 	void createMenuFromPlaylist();
 	Backgrounds& m_backgrounds;
 	Cachemap<fs::path, Surface> m_covers;
-	boost::scoped_ptr<ThemeInstrumentMenu> m_menuTheme;
-	boost::scoped_ptr<ThemePlaylistScreen> theme;
-	boost::scoped_ptr<Surface> m_background;
+	std::unique_ptr<ThemeInstrumentMenu> m_menuTheme;
+	std::unique_ptr<ThemePlaylistScreen> theme;
+	std::unique_ptr<Surface> m_background;
 	SvgTxtTheme& getTextObject(std::string const& txt);
 	AnimValue m_nextTimer;
 	void draw_menu_options();
@@ -63,11 +63,11 @@ private:
 	bool needsUpdate = false;
 	mutable boost::mutex m_mutex;
 	Surface& getCover(Song const& song);
-	boost::scoped_ptr<Surface> m_singCover;
-	boost::scoped_ptr<Surface> m_instrumentCover;
-	boost::scoped_ptr<Surface> m_bandCover;
-	boost::scoped_ptr<Surface> m_danceCover;
-	boost::scoped_ptr<Webcam> m_cam;
+	std::unique_ptr<Surface> m_singCover;
+	std::unique_ptr<Surface> m_instrumentCover;
+	std::unique_ptr<Surface> m_bandCover;
+	std::unique_ptr<Surface> m_danceCover;
+	std::unique_ptr<Webcam> m_cam;
 };
 
 

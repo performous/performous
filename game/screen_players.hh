@@ -40,16 +40,16 @@ class ScreenPlayers : public Screen {
 	Database& m_database;
 	Players& m_players;
 	std::shared_ptr<Song> m_song; /// Pointer to the current song
-	boost::scoped_ptr<Surface> m_songbg;
-	boost::scoped_ptr<Video> m_video;
-	boost::scoped_ptr<ThemeSongs> theme;
+	std::unique_ptr<Surface> m_songbg;
+	std::unique_ptr<Video> m_video;
+	std::unique_ptr<ThemeSongs> theme;
 	std::string m_playing;
 	std::string m_playReq;
 	AnimValue m_playTimer;
 	AnimValue m_quitTimer;
 	TextInput m_search;
-	boost::scoped_ptr<Surface> m_emptyCover;
+	std::unique_ptr<Surface> m_emptyCover;
 	Cachemap<fs::path, Surface> m_covers;
-	boost::scoped_ptr<LayoutSinger> m_layout_singer;
+	std::unique_ptr<LayoutSinger> m_layout_singer;
 	bool keyPressed = false;
 };

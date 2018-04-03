@@ -69,9 +69,9 @@ class LayoutSinger {
 	NoteGraph m_noteGraph;
 	Notes::const_iterator m_lyricit;
 	std::deque<LyricRow> m_lyrics;
-	boost::scoped_ptr<Surface> m_player_icon;
-	boost::scoped_ptr<SvgTxtThemeSimple> m_score_text[4];
-	boost::scoped_ptr<SvgTxtThemeSimple> m_line_rank_text[4];
+	std::unique_ptr<Surface> m_player_icon;
+	std::unique_ptr<SvgTxtThemeSimple> m_score_text[4];
+	std::unique_ptr<SvgTxtThemeSimple> m_line_rank_text[4];
 	Database& m_database;
 	std::shared_ptr<ThemeSing> m_theme;
 	AnimValue m_feedbackFader;

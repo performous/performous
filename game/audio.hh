@@ -1,18 +1,17 @@
 #pragma once
 
-#include <boost/date_time.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <map>
-#include <string>
-#include <vector>
-
+#include "configuration.hh"
 #include "ffmpeg.hh"
-#include "libda/portaudio.hpp"
 #include "notes.hh"
 #include "pitch.hh"
 #include "util.hh"
-#include "configuration.hh"
+#include "libda/portaudio.hpp"
+#include <boost/date_time.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
+#include <map>
+#include <memory>
+#include <string>
+#include <vector>
 
 const unsigned AUDIO_MAX_ANALYZERS = 11;
 
@@ -51,7 +50,7 @@ class ConfigItem;
 class Audio {
 	friend int getBackend();
 	struct Impl;
-	boost::scoped_ptr<Impl> self;
+	std::unique_ptr<Impl> self;
 public:
 	typedef std::map<std::string, fs::path> Files;
 	static ConfigItem& backendConfig();

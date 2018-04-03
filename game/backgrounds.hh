@@ -1,9 +1,6 @@
 #pragma once
 
-//#include "animvalue.hh"
 #include "fs.hh"
-//#include "song.hh"
-#include <boost/scoped_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
 #include <memory>
@@ -40,7 +37,7 @@ class Backgrounds: boost::noncopyable {
 	void reload_internal(fs::path const& p);
 	volatile bool m_dirty;
 	volatile bool m_loading;
-	boost::scoped_ptr<boost::thread> m_thread;
+	std::unique_ptr<boost::thread> m_thread;
 	mutable boost::mutex m_mutex;
 };
 
