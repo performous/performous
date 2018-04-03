@@ -152,7 +152,7 @@ class AudioBuffer {
 	int64_t m_posReq = 0;
 	unsigned m_sps = 0;
 	double m_duration = getNaN();
-	std::atomic<bool> m_quit = false;
+	std::atomic<bool> m_quit;
 };
 
 // ffmpeg forward declarations
