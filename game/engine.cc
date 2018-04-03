@@ -4,7 +4,6 @@
 #include "song.hh"
 #include "database.hh"
 #include "configuration.hh"
-#include <boost/bind.hpp>
 #include <iostream>
 #include <list>
 
@@ -30,12 +29,12 @@ Engine::Engine(Audio& audio, VocalTrackPtrs vocals, Database& database):
 
 void Engine::operator()() {
 	while (!m_quit) {
-		std::for_each(m_database.cur.begin(), m_database.cur.end(), boost::bind(&Player::prepare, _1));
+		for (Player& player: m_database.cur) player.prepare();
 		double t = m_audio.getPosition() - config["audio/round-trip"].f();
 		double timeLeft = m_time - t;
 		if (timeLeft != timeLeft || timeLeft > 1.0) timeLeft = 1.0;  // FIXME: Workaround for NaN values and other weirdness (should fix the weirdness instead)
 		if (timeLeft > 0.0) { std::this_thread::sleep_for(std::min(TIMESTEP, timeLeft) * 1s); continue; }
-		std::for_each(m_database.cur.begin(), m_database.cur.end(), boost::bind(&Player::update, _1));
+		for (Player& player: m_database.cur) player.update();
 		m_time += TIMESTEP;
 	}
 }

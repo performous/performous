@@ -14,7 +14,6 @@
 #include <stdexcept>
 #include <cstdlib>
 
-#include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <regex>

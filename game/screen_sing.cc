@@ -83,7 +83,7 @@ void ScreenSing::enter() {
 void ScreenSing::prepareVoicesMenu(size_t moveSelectionTo) {
 		VocalTracks const& tracks = m_song->vocalTracks;
 		m_menu.clear();
-		m_menu.add(MenuOption(_("Start"), _("Start performing")).call(std::bind(&ScreenSing::setupVocals, this)));
+		m_menu.add(MenuOption(_("Start"), _("Start performing")).call([this]{ setupVocals(); }));
 
 		if (players() > 1) { // Duet toggle
 			m_duet.addEnum(_("Duet mode"));

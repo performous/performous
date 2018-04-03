@@ -5,7 +5,6 @@
 #include "glmath.hh"
 #include "util.hh"
 
-#include <boost/bind.hpp>
 #include <thread>
 #include <stdexcept>
 #include <cstdlib>
@@ -60,7 +59,7 @@ void Game::loading(std::string const& message, float progress) {
 	flashMessage(message + " " + std::to_string(int(round(progress*100))) + "%", 0.0f, 0.5f, 0.2f);
 	m_loadingProgress = progress;
 	m_window.blank();
-	m_window.render(boost::bind(&Game::drawLoading, this));
+	m_window.render([this] { drawLoading(); });
 	m_window.swap();
 }
 
@@ -89,7 +88,7 @@ void Game::drawLoading() {
 void Game::fatalError(std::string const& message) {
 	dialog("FATAL ERROR\n\n" + message);
 	m_window.blank();
-	m_window.render(boost::bind(&Game::drawNotifications, this));
+	m_window.render([this] { drawNotifications(); });
 	m_window.swap();
 	std::this_thread::sleep_for(4s);
 }
