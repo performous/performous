@@ -542,7 +542,6 @@ void Audio::close() {
 	// Only wait a limited time for closing of audio devices because it often hangs (on Linux)
 	auto audiokiller = std::async(std::launch::async, [this]{ self.reset(); });
 	if (audiokiller.wait_for(2.5s) == std::future_status::ready) return;
-	// FIXME: Make this do Game::fatalError or something else? Will fix this in another commit...
 	throw std::runtime_error("Audio hung for some reason.\nPlease restart Performous.");
 }
 

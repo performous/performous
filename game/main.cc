@@ -381,7 +381,6 @@ int main(int argc, char** argv) try {
 			std::cout << "  --audio \"dev=1 out=2\"   # Pick device id 1 and assign stereo playback" << std::endl;
 			std::cout << "  --audio 'dev=\"HDA Intel\" mics=blue,red'   # HDA Intel with two mics" << std::endl;
 			std::cout << "  --audio 'dev=pulse out=2 mics=blue'       # PulseAudio with input and output" << std::endl;
-			// FIXME: audiokiller: std::clog << "core/warning: Closing audio hung for over two seconds." << std::endl;
 			return EXIT_SUCCESS;
 		}
 		// Override XML config for options that were specified from commandline or performous.conf
