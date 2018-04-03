@@ -7,11 +7,12 @@
 #include "../unicode.hh"
 #include "../platform.hh"
 #include <portaudio.h>
+#include <cstdint>
 #include <cstdlib>
 #include <future>
 #include <regex>
+#include <set>
 #include <stdexcept>
-#include <stdint.h>
 
 #define PORTAUDIO_CHECKED(func, args) portaudio::internal::check(func args, #func)
 
