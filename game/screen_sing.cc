@@ -95,14 +95,14 @@ void ScreenSing::prepareVoicesMenu(size_t moveSelectionTo) {
 			ConfigItem& vocalTrack = m_vocalTracks[player];
 			for (auto const& track: tracks) vocalTrack.addEnum(track.second.name);
 			if (tracks.size() > 1) {
-			if (player % 2) vocalTrack.selectEnum(m_song->getVocalTrack(SongParserUtil::DUET_P2).name);  // Every other player gets the second track
-			else vocalTrack.selectEnum(m_song->getVocalTrack(TrackName::LEAD_VOCAL).name);
+				if (player % 2) vocalTrack.selectEnum(m_song->getVocalTrack(SongParserUtil::DUET_P2).name);  // Every other player gets the second track
+				else vocalTrack.selectEnum(m_song->getVocalTrack(TrackName::LEAD_VOCAL).name);
 			}
 			m_menu.add(MenuOption("", _("Change vocal track")).changer(vocalTrack));
 			if (m_duet.i() == 1) {
 				vocalTrack.selectEnum(m_song->getVocalTrack(SongParserUtil::DUET_BOTH).name);
 				break; // If duet mode is disabled, the vocal track selection for players beyond the first is ignored anyway.
-				}
+			}
 		}
 		m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
 		m_menu.select(moveSelectionTo);
@@ -115,7 +115,7 @@ void ScreenSing::setupVocals() {
 		m_layout_singer.clear();
 		Engine::VocalTrackPtrs selectedTracks;
 		boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
-// 		size_t players = (analyzers.empty() ? 1 : analyzers.size());  // Always at least 1; should be number of mics
+		//size_t players = (analyzers.empty() ? 1 : analyzers.size());  // Always at least 1; should be number of mics
 		std::set<VocalTrack*> shownTracks;  // Tracks to be included in layout_singer (stored by name for proper sorting and merging duplicates)
 		for (size_t player = 0; player < players(); ++player) {
 			VocalTrack* vocal = &m_song->getVocalTrack(m_vocalTracks[(m_duet.i() == 0 ? player : 0)].i());
