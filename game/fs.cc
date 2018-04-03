@@ -8,6 +8,7 @@
 #include <boost/range.hpp>
 #include <algorithm>
 #include <cstdlib>
+#include <mutex>
 #include <set>
 #include <sstream>
 
