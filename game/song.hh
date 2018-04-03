@@ -4,7 +4,6 @@
 #include "i18n.hh"
 #include "notes.hh"
 #include "util.hh"
-#include <boost/foreach.hpp>
 #include <boost/noncopyable.hpp>
 #include <stdexcept>
 #include <string>
