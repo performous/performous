@@ -159,7 +159,7 @@ public:
 	{
 		for (auto const& tf /* trackname-filename pair */: files) {
 			if (tf.second.empty()) continue; // Skip tracks with no filenames; FIXME: Why do we even have those here, shouldn't they be eliminated earlier?
-			tracks.emplace(tf.first, std::unique_ptr<Track>(new Track(tf.second, sr)));
+			tracks.emplace(tf.first, std::make_unique<Track>(tf.second, sr));
 			//tracks.insert(tf.first, std::auto_ptr<Track>(new Track(tf.second, sr)));
 		}
 		suppressCenterChannel = config["audio/suppress_center_channel"].b();
@@ -528,7 +528,7 @@ struct Audio::Impl {
 	}
 };
 
-Audio::Audio(): self(new Impl) {}
+Audio::Audio(): self(std::make_unique<Impl>()) {}
 Audio::~Audio() { close(); }
 
 ConfigItem& Audio::backendConfig() {
@@ -536,7 +536,7 @@ ConfigItem& Audio::backendConfig() {
 	return backend;
 }
 
-void Audio::restart() { close(); self.reset(new Impl); }
+void Audio::restart() { close(); self = std::make_unique<Impl>(); }
 
 void Audio::close() {
 	// Only wait a limited time for closing of audio devices because it often hangs (on Linux)
@@ -577,7 +577,7 @@ void Audio::playMusic(Audio::Files const& filenames, bool preview, double fadeTi
 	Output& o = self->output;
 	std::lock_guard<std::mutex> l(o.mutex);
 	o.disposing.clear();  // Delete disposed streams
-	o.preloading.reset(new Music(filenames, getSR(), preview));
+	o.preloading = std::make_unique<Music>(filenames, getSR(), preview);
 	Music& m = *o.preloading.get();
 	m.seek(startPos);
 	m.fadeRate = 1.0 / getSR() / fadeTime;
@@ -662,7 +662,8 @@ void Audio::streamBend(std::string track, double pitchFactor) {
 void Audio::toggleSynth(Notes const& notes) {
 	Output& o = self->output;
 	std::lock_guard<std::mutex> l(o.synth_mutex);
-	o.synth.get() ?  o.synth.reset() : o.synth.reset(new Synth(notes, getSR()));
+	if (o.synth.get()) o.synth.reset();
+	else o.synth = std::make_unique<Synth>(notes, getSR());
 }
 
 void Audio::toggleCenterChannelSuppressor() {

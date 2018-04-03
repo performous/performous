@@ -42,8 +42,8 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevicePt
 	double time = m_audio.getPosition();
 	m_jointime = time < 0.0 ? -1.0 : time + join_delay;
 
-	m_popupText.reset(new SvgTxtThemeSimple(findFile("sing_popup_text.svg"), config["graphic/text_lod"].f()));
-	m_menuTheme.reset(new ThemeInstrumentMenu());
+	m_popupText = std::make_unique<SvgTxtThemeSimple>(findFile("sing_popup_text.svg"), config["graphic/text_lod"].f());
+	m_menuTheme = std::make_unique<ThemeInstrumentMenu>();
 	for (auto& elem: m_pressed) elem = false;
 }
 

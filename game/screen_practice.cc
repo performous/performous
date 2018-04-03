@@ -28,7 +28,7 @@ void ScreenPractice::enter() {
 }
 
 void ScreenPractice::reloadGL() {
-	theme.reset(new ThemePractice());
+	theme = std::make_unique<ThemePractice>();
 }
 
 void ScreenPractice::exit() {

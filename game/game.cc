@@ -104,7 +104,7 @@ void Game::flashMessage(std::string const& message, float fadeIn, float hold, fl
 
 void Game::dialog(std::string const& text) {
 	m_dialogTimeOut.setValue(10);
-	m_dialog.reset(new Dialog(text));
+	m_dialog = std::make_unique<Dialog>(text);
 }
 
 bool Game::closeDialog() {

@@ -45,13 +45,13 @@ void ScreenSing::enter() {
 	gm->loading(_("Initializing webcam..."), 0.1);
 	if (config["graphic/webcam"].b() && Webcam::enabled()) {
 		try {
-			m_cam.reset(new Webcam(config["graphic/webcamid"].i()));
+			m_cam = std::make_unique<Webcam>(config["graphic/webcamid"].i());
 		} catch (std::exception& e) { std::cout << e.what() << std::endl; };
 	}
 	// Load video
 	gm->loading(_("Loading video..."), 0.2);
 	if (!m_song->video.empty() && config["graphic/video"].b()) {
-		m_video.reset(new Video(m_song->video, m_song->videoGap));
+		m_video = std::make_unique<Video>(m_song->video, m_song->videoGap);
 	}
 	reloadGL();
 	// Load song notes
@@ -125,7 +125,7 @@ void ScreenSing::setupVocals() {
 		//if (shownTracks.size() > 2) throw std::runtime_error("Too many tracks chosen. Only two vocal tracks can be used simultaneously.");
 		for (auto const& trk: shownTracks) m_layout_singer.push_back(new LayoutSinger(*trk, m_database, theme));
 		// Note: Engine maps tracks with analyzers 1:1. If user doesn't have mics, we still want to have singer layout enabled but without engine...
-		if (!analyzers.empty()) m_engine.reset(new Engine(m_audio, selectedTracks, m_database));
+		if (!analyzers.empty()) m_engine = std::make_unique<Engine>(m_audio, selectedTracks, m_database);
 	}
 	createPauseMenu();
 	bool sameVoice = true;
@@ -156,14 +156,14 @@ void ScreenSing::createPauseMenu() {
 
 void ScreenSing::reloadGL() {
 	// Load UI graphics
-	theme.reset(new ThemeSing());
-	m_menuTheme.reset(new ThemeInstrumentMenu());
-	m_pause_icon.reset(new Surface(findFile("sing_pause.svg")));
-	m_player_icon.reset(new Surface(findFile("sing_pbox.svg"))); // For duet menu
-	m_help.reset(new Surface(findFile("instrumenthelp.svg")));
-	m_progress.reset(new ProgressBar(findFile("sing_progressbg.svg"), findFile("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true));
+	theme = std::make_unique<ThemeSing>();
+	m_menuTheme = std::make_unique<ThemeInstrumentMenu>();
+	m_pause_icon = std::make_unique<Surface>(findFile("sing_pause.svg"));
+	m_player_icon = std::make_unique<Surface>(findFile("sing_pbox.svg")); // For duet menu
+	m_help = std::make_unique<Surface>(findFile("instrumenthelp.svg"));
+	m_progress = std::make_unique<ProgressBar>(findFile("sing_progressbg.svg"), findFile("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true);
 	// Load background
-	if (!m_song->background.empty()) m_background.reset(new Surface(m_song->background));
+	if (!m_song->background.empty()) m_background = std::make_unique<Surface>(m_song->background);
 }
 
 void ScreenSing::exit() {
@@ -356,7 +356,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 		// Open score dialog early
 		if (status == Song::Status::FINISHED) {
 			if (m_engine) m_engine->kill(); // Kill the engine thread
-			m_score_window.reset(new ScoreWindow(m_instruments, m_database)); // Song finished, but no score window -> show it
+			m_score_window = std::make_unique<ScoreWindow>(m_instruments, m_database); // Song finished, but no score window -> show it
 		}
 		// Skip instrumental breaks
 		else if (status == Song::Status::INSTRUMENTAL_BREAK) {
@@ -401,7 +401,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		// Toggle webcam
 		if (key == SDL_SCANCODE_A && Webcam::enabled()) {
 			// Initialize if we haven't done that already
-			if (!m_cam) { try { m_cam.reset(new Webcam(config["graphic/webcamid"].i())); } catch (...) { }; }
+			if (!m_cam) { try { m_cam = std::make_unique<Webcam>(config["graphic/webcamid"].i()); } catch (...) { }; }
 			if (m_cam) { dispInFlash(++config["graphic/webcam"]); m_cam->pause(!config["graphic/webcam"].b()); }
 		}
 		// Latency settings
@@ -501,7 +501,7 @@ void ScreenSing::draw() {
 		Transform ft(farTransform());
 		double ar = arMax;
 		// Background image
-		if (!m_background || m_background->empty()) m_background.reset(new Surface(m_backgrounds.getRandom()));
+		if (!m_background || m_background->empty()) m_background = std::make_unique<Surface>(m_backgrounds.getRandom());
 		ar = m_background->dimensions.ar();
 		if (ar > arMax || (m_video && ar > arMin)) fillBG();  // Fill white background to avoid black borders
 		m_background->draw();
@@ -592,7 +592,7 @@ void ScreenSing::draw() {
 			// Time to create the score window
 			m_quitTimer.setValue(config["game/results_timeout"].i());
 			if (m_engine) m_engine->kill(); // kill the engine thread (to avoid consuming memory)
-			m_score_window.reset(new ScoreWindow(m_instruments, m_database));
+			m_score_window = std::make_unique<ScoreWindow>(m_instruments, m_database);
 		}
 	}
 

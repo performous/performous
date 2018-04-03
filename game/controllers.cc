@@ -377,7 +377,7 @@ struct Controllers::Impl {
 			// Emit Event and construct a new Device first if needed
 			DevicePtr ptr = m_devices[ev.source].lock();
 			if (!ptr) {
-				ptr.reset(new Device(ev.source, ev.devType));
+				ptr = std::make_unique<Device>(ev.source, ev.devType);
 				m_orphans[ev.source] = ptr;
 				m_devices[ev.source] = ptr;
 			}
