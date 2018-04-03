@@ -5,6 +5,7 @@
 #include "libda/sample.hpp"
 #include <boost/circular_buffer.hpp>
 #include <boost/ptr_container/ptr_deque.hpp>
+#include <atomic>
 #include <condition_variable>
 #include <memory>
 #include <thread>
