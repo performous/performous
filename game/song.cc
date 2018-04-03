@@ -42,6 +42,7 @@ void Song::collateUpdate() {
 }
 
 Song::Status Song::status(double time, ScreenSing* song) {
+	if (vocalTracks.empty()) return Status::NORMAL;  // To avoid crash with non-vocal songs (dance, guitar) -- FIXME: what should we actually do?
 	Note target; target.end = time;
 	Notes s1, s2, notes;
 	Notes::const_iterator it;
