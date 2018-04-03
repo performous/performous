@@ -9,6 +9,8 @@
 #include "image.hh"
 #include "screen.hh"
 #include "util.hh"
+#include <iomanip>
+#include <sstream>
 
 namespace {
 	unsigned s_width;
