@@ -9,8 +9,7 @@
 #include "image.hh"
 #include "screen.hh"
 #include "util.hh"
-#include <iomanip>
-#include <sstream>
+#include <boost/filesystem.hpp>
 
 namespace {
 	unsigned s_width;
@@ -328,11 +327,12 @@ void Window::screenshot() {
 	img.bottomFirst = true;
 	// Get pixel data from OpenGL
 	glReadPixels(0, 0, img.width, img.height, GL_RGB, GL_UNSIGNED_BYTE, img.data());
-	// Compose filename from timestamp
-	auto t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-	std::ostringstream oss;
-	oss << std::put_time(std::localtime(&t), "%FT%T");
-	fs::path filename = getHomeDir() / ("Performous_" + oss.str() + ".png");
+	// Compose filename with first available number
+	fs::path filename;
+	for (unsigned i = 1;; ++i) {
+		filename = getHomeDir() / ("Performous_" + std::to_string(i) + ".png");
+		if (!fs::exists(filename)) break;
+	}
 	// Save to disk
 	writePNG(filename.string(), img, stride);
 	std::clog << "video/info: Screenshot taken: " << filename << " (" << img.width << "x" << img.height << ")" << std::endl;
