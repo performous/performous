@@ -75,13 +75,13 @@ namespace {
 class AudioClock {
 	mutable std::mutex m_mutex;
 	Time m_baseTime; ///< A reference time (corresponds to m_basePos)
-	double m_basePos = 0.0; ///< A reference position in song
+	Seconds m_basePos = 0.0s; ///< A reference position in song
 	double m_skew = 0.0; ///< The skew ratio applied to system time (since baseTime)
-	std::atomic<double> m_max; ///< Maximum output value for the clock (end of the current audio block)
+	std::atomic<Seconds> m_max; ///< Maximum output value for the clock (end of the current audio block)
 	/// Get the current position (current time via parameter, no locking)
-	double pos_internal(Time now) const {
-		double t = m_basePos + (1.0 + m_skew) * Seconds(now - m_baseTime).count();
-		return std::min<double>(t, m_max);
+	Seconds pos_internal(Time now) const {
+		Seconds t = m_basePos + (1.0 + m_skew) * (now - m_baseTime);
+		return std::min<Seconds>(t, m_max);
 	}
 public:
 	/**
@@ -90,27 +90,27 @@ public:
 	* @param length the duration of the current audio block
 	*/
 	void timeSync(Seconds audioPos, Seconds length) {
-		constexpr double maxError = 0.1;  // Step the clock instead of skewing if over 100 ms off
+		constexpr Seconds maxError = 100ms;  // Step the clock instead of skewing if over 100 ms off
 		// Full correction requires locking, but we can update max without lock too
 		std::unique_lock<std::mutex> l(m_mutex, std::defer_lock);
-		double max = (audioPos + length).count();
+		Seconds max = audioPos + length;
 		if (!l.try_lock()) {
-			if (max > m_max) m_max = max; // Allow increasing m_max
+			if (max > m_max.load()) m_max = max; // Allow increasing m_max
 			return;
 		}
 		// Mutex locked - do a full update
 		auto now = Clock::now();
-		const double sys = pos_internal(now);  // Current position (based on system clock + corrections)
-		const double audio = Seconds(audioPos).count();  // Audio time
-		const double diff = audio - sys;
+		const Seconds sys = pos_internal(now);  // Current position (based on system clock + corrections)
+		const Seconds audio = audioPos;  // Audio time
+		const Seconds diff = audio - sys;
 		// Skew-based correction only if going forward and relatively well synced
-		if (max > m_max && std::abs(diff) < maxError) {
+		if (max > m_max.load() && std::abs(diff.count()) < maxError.count()) {
 			constexpr double fudgeFactor = 0.001;  // Adjustment ratio
 			// Update base position (this should not affect the clock)
 			m_baseTime = now;
 			m_basePos = sys;
 			// Apply a VERY ARTIFICIAL correction for clock!
-			const double valadj = length.count() * 0.1 * rand() / RAND_MAX;  // Dither
+			const Seconds valadj = length * 0.1 * rand() / RAND_MAX;  // Dither
 			m_skew += (diff < valadj ? -1.0 : 1.0) * fudgeFactor;
 			// Limits to keep things sane in abnormal situations
 			m_skew = clamp(m_skew, -0.01, 0.01);
@@ -123,7 +123,7 @@ public:
 		m_max = max;
 	}
 	/// Get the current position in seconds
-	double pos() const {
+	Seconds pos() const {
 		std::lock_guard<std::mutex> l(m_mutex);
 		return pos_internal(Clock::now());
 	}
@@ -206,7 +206,7 @@ public:
 	}
 	void seek(double time) { m_pos = time * srate * 2.0; }
 	/// Get the current position in seconds
-	double pos() const { return m_clock.pos(); }
+	double pos() const { return m_clock.pos().count(); }
 	double duration() const {
 		double dur = 0.0;
 		for (auto it = tracks.begin(); it != tracks.end(); ++it) {
