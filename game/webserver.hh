@@ -1,14 +1,6 @@
 ﻿#pragma once
 
 #ifdef USE_WEBSERVER
-#include <boost/network/protocol/http/server.hpp>
-namespace http = boost::network::http;
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/filesystem/fstream.hpp>
-#include <json/json.h>
-#include <memory>
-#include <string>
 #include "fs.hh"
 #include "songs.hh"
 #include "song.hh"
@@ -17,8 +9,14 @@ namespace http = boost::network::http;
 #include "screen_playlist.hh"
 #include "controllers.hh"
 #include "configuration.hh"
+#include <boost/network/protocol/http/server.hpp>
+#include <boost/filesystem/fstream.hpp>
+#include <json/json.h>
+#include <memory>
+#include <string>
+#include <thread>
 
-using boost::thread;
+namespace http = boost::network::http;
 
 class WebServer
 {
@@ -49,7 +47,7 @@ private:
 	std::map<std::string, std::string> GenerateLocaleDict();
 	std::vector<std::string> GetTranslationKeys();
 	std::shared_ptr<Song> GetSongFromJSON(std::string JsonDoc);
-	std::shared_ptr<boost::thread> m_serverThread;
+	std::shared_ptr<std::thread> m_serverThread;
 	std::shared_ptr<http_server> m_server;
 	Songs& m_songs;
 };

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <boost/thread/thread.hpp>
 #include <memory>
+#include <thread>
 
 class Audio;
 class Database;
@@ -13,7 +13,7 @@ class Engine {
 	double m_time;
 	volatile bool m_quit;
 	Database& m_database;
-	std::unique_ptr<boost::thread> m_thread;
+	std::unique_ptr<std::thread> m_thread;
 
   public:
 	typedef std::vector<VocalTrack*> VocalTrackPtrs;
@@ -23,6 +23,6 @@ class Engine {
 	~Engine() { kill(); }
 	/// Terminates processing
 	void kill() { m_quit = true; m_thread->join(); }
-	/** Used internally for boost::thread. Do not call this yourself. (boost::thread requires this to be public). **/
+	/** Used internally for std::thread. Do not call this yourself. (std::thread requires this to be public). **/
 	void operator()();
 };

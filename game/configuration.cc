@@ -9,6 +9,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <algorithm>
+#include <future>
 #include <iomanip>
 #include <stdexcept>
 #include <iostream>
@@ -293,9 +294,6 @@ void writeConfig(Audio& m_audio, bool system) {
 			std::clog << "audio/info: Audio backend changed; will now restart audio subsystem." << std::endl;
 
 			Audio::backendConfig().selectEnum(item.getEnumName());
-			boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(m_audio)));
-			if (!audiokiller.timed_join(boost::posix_time::milliseconds(2500)))
-				Game::getSingletonPtr()->fatalError("Audio hung for some reason.\nPlease restart Performous.");
 			m_audio.restart();
 			m_audio.playMusic(findFile("menu.ogg"), true); // Start music again
 		}

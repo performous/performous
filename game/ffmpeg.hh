@@ -8,8 +8,8 @@
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
-#include <boost/thread/thread.hpp>
 #include <memory>
+#include <thread>
 #include <vector>
 #include <iostream>
 
@@ -206,7 +206,7 @@ class FFmpeg {
 	AVAudioResampleContext* m_resampleContext;
 	SwsContext* m_swsContext;
 	// Make sure the thread starts only after initializing everything else
-	std::unique_ptr<boost::thread> m_thread;
+	std::unique_ptr<std::thread> m_thread;
 	static boost::mutex s_avcodec_mutex; // Used for avcodec_open/close (which use some static crap and are thus not thread-safe)
 };
 

@@ -2,7 +2,7 @@
 
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
+#include <thread>
 #include <vector>
 
 #include "surface.hh"
@@ -40,7 +40,7 @@ class Webcam {
 	Dimensions const& dimensions() const { return m_surface.dimensions; }
 
   private:
-	std::unique_ptr<boost::thread> m_thread;
+	std::unique_ptr<std::thread> m_thread;
 	mutable boost::mutex m_mutex;
 	std::unique_ptr<cv::VideoCapture> m_capture;
 	std::unique_ptr<cv::VideoWriter> m_writer;

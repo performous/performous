@@ -2,8 +2,8 @@
 
 #include "fs.hh"
 #include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
 #include <memory>
+#include <thread>
 #include <vector>
 
 /// songs class for songs screen
@@ -37,7 +37,7 @@ class Backgrounds: boost::noncopyable {
 	void reload_internal(fs::path const& p);
 	volatile bool m_dirty;
 	volatile bool m_loading;
-	std::unique_ptr<boost::thread> m_thread;
+	std::unique_ptr<std::thread> m_thread;
 	mutable boost::mutex m_mutex;
 };
 

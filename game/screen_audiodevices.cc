@@ -6,8 +6,6 @@
 #include "platform.hh"
 #include "theme.hh"
 #include "i18n.hh"
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
 
 namespace {
 	static const int unassigned_id = -1;  // mic.dev value for unassigned
@@ -189,10 +187,6 @@ bool ScreenAudioDevices::save(bool skip_ui_config) {
 		config["audio/devices"].sl() = devconf;
 	}
 	writeConfig(m_audio,false); // Save the new config
-	// Give audio a little time to shutdown but then just quit
-	boost::thread audiokiller(boost::bind(&Audio::close, boost::ref(m_audio)));
-	if (!audiokiller.timed_join(boost::posix_time::milliseconds(2500)))
-		Game::getSingletonPtr()->fatalError("Audio hung for some reason.\nPlease restart Performous.");
 	m_audio.restart(); // Reload audio to take the new settings into use
 	m_audio.playMusic(findFile("menu.ogg"), true); // Start music again
 	// Check that all went well

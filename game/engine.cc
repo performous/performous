@@ -7,7 +7,6 @@
 #include <boost/bind.hpp>
 #include <iostream>
 #include <list>
-#include <thread>
 
 const double Engine::TIMESTEP = 0.01;
 
@@ -26,7 +25,7 @@ Engine::Engine(Audio& audio, VocalTrackPtrs vocals, Database& database):
 		m_database.cur.push_back(Player(*vocals[i], a, frames));
 		++i;
 	}
-	m_thread.reset(new boost::thread(boost::ref(*this)));
+	m_thread.reset(new std::thread(std::ref(*this)));
 }
 
 void Engine::operator()() {
