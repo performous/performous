@@ -196,7 +196,8 @@ class FFmpeg {
 	unsigned int m_rate;
 	std::promise<void> m_quit;
 	std::future<void> m_quit_future = m_quit.get_future();
-	volatile double m_seekTarget;
+	std::atomic<bool> m_quit;
+	std::atomic<double> m_seekTarget;
 	double m_position;
 	double m_duration;
 	// libav-specific variables

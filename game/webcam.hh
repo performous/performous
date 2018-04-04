@@ -45,8 +45,8 @@ class Webcam {
 	CamFrame m_frame;
 	Surface m_surface;
 	bool m_frameAvailable;
-	volatile bool m_running;
-	volatile bool m_quit;
+	std::atomic<bool> m_running;
+	std::atomic<bool> m_quit;
 
   public:
 	static bool enabled() {

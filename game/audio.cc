@@ -312,7 +312,7 @@ struct Output {
 	std::vector<Analyzer*> mics;  // Used for audio pass-through
 	std::unordered_map<std::string, std::unique_ptr<Sample>> samples;
 	std::vector<Command> commands;
-	volatile bool paused;
+	std::atomic<bool> paused;
 	Output(): paused(false) {}
 
 	void callbackUpdate() {

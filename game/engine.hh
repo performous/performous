@@ -12,7 +12,7 @@ class VocalTrack;
 class Engine {
 	Audio& m_audio;
 	double m_time;
-	volatile bool m_quit;
+	std::atomic<bool> m_quit;
 	Database& m_database;
 	std::unique_ptr<std::thread> m_thread;
 

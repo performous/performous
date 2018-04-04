@@ -63,7 +63,7 @@ public:
 private:
 	static unsigned modulo(unsigned idx) { return (SIZE + idx) % SIZE; }  ///< Modulo operation with proper rounding (handles slightly "negative" idx as well)
 	float m_buf[SIZE];
-	volatile size_t m_read, m_write;  ///< The indices of the next read/write operations. read == write implies that buffer is empty.
+	std::atomic<unsigned> m_read, m_write;  ///< The indices of the next read/write operations. read == write implies that buffer is empty.
 };
 
 /// analyzer class
