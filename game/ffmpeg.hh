@@ -4,7 +4,7 @@
 #include "util.hh"
 #include "libda/sample.hpp"
 #include <boost/circular_buffer.hpp>
-#include <boost/ptr_container/ptr_deque.hpp>
+#include <deque>
 #include <atomic>
 #include <condition_variable>
 #include <memory>
@@ -45,7 +45,7 @@ class VideoFifo {
 		std::unique_lock<std::mutex> l(m_mutex);
 		m_cond.wait(l, [this]{ return m_queue.size() < m_max; });
 		if (m_queue.empty()) m_timestamp = f->timestamp;
-		m_queue.push_back(f);
+		m_queue.push_back(*f);
 	}
 	/// Clear and unlock the queue
 	void reset() {
@@ -60,7 +60,8 @@ class VideoFifo {
 	double eof() const { return m_eof; }
 
   private:
-	boost::ptr_deque<Bitmap> m_queue;
+	//boost::ptr_deque<Bitmap> m_queue;
+	std::deque<Bitmap> m_queue;
 	mutable std::mutex m_mutex;
 	std::condition_variable m_cond;
 	double m_timestamp;
