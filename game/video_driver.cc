@@ -180,10 +180,15 @@ void Window::render(boost::function<void (void)> drawFunc) {
 	bool stereo = config["graphic/stereo3d"].b();
 	int type = config["graphic/stereo3dtype"].i();
 
+	static bool warn3d = false;
+	if (!stereo) warn3d = false;
 	if (stereo && !epoxy_has_gl_extension("GL_ARB_viewport_array")) {
-		config["graphic/stereo3d"].b() = stereo = false;
-		std::clog << "video/warning: Your GPU does not support Stereo3D mode (OpenGL extension ARB_viewport_array is required)" << std::endl;
-		// TODO: Flash message on UI?
+		stereo = false;
+		if (!warn3d) {
+			warn3d = true;
+			std::clog << "video/warning: Your GPU does not support Stereo3D mode (OpenGL extension ARB_viewport_array is required)" << std::endl;
+			Game::getSingletonPtr()->flashMessage("Your GPU does not support Stereo3D mode");
+		}
 	}
 
 	// Over/under only available in fullscreen
