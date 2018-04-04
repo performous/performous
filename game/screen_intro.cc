@@ -191,6 +191,9 @@ void ScreenIntro::populateMenu() {
 	m_menu.add(MenuOption(_("Quit"), _("Leave the game"), imgQuit).screen(""));
 }
 
+#ifdef USE_WEBSERVER
+// FIXME: Move most of this code to webserver.cc. In particular, print the IP address you actually bind to, not something else.
+
 void ScreenIntro::draw_webserverNotice() {
 	if(m_webserverNoticeTimeout.get() == 0) {
 		m_drawNotice = !m_drawNotice;
@@ -227,3 +230,6 @@ std::string ScreenIntro::getIPaddr() {
 		return ip.empty() ? "localhost" : ip;
 	}
 }
+#else
+void ScreenIntro::draw_webserverNotice() {}
+#endif
