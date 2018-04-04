@@ -41,7 +41,8 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	set(CMAKE_CXX_FLAGS "-std=c++1z -Wall -Wextra ${CMAKE_CXX_FLAGS}")
+	# Note: AUTO_PTR is for Boost which won't compile with C++17 otherwise (fixed in Boost git but not in 1.66)
+	set(CMAKE_CXX_FLAGS "-std=c++1z -Wall -Wextra -D_LIBCPP_ENABLE_CXX17_REMOVED_AUTO_PTR ${CMAKE_CXX_FLAGS}")
 endif()
 
 if(WIN32)
