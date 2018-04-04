@@ -168,7 +168,7 @@ Surface& ScreenPlaylist::getCover(Song const& song) {
 
 void ScreenPlaylist::createEscMenu() {
 	overlay_menu.clear();
-	overlay_menu.add(MenuOption(_("Continue"), _("Continue playing")).call([this]() {
+	overlay_menu.add(MenuOption(_("Continue"), _("Continue playing")).call([]() {
 		Game* gm = Game::getSingletonPtr();
 		Screen* s = gm->getScreen("Sing");
 		ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
@@ -335,7 +335,7 @@ void ScreenPlaylist::createSongMenu(int songNumber) {
 	std::string firstDesc = songNumber >= 2 ?
 		_("Ignore the playlist's order and play this song first") :
 		_("Start the song already!");
-	overlay_menu.add(MenuOption(firstOption, firstDesc).call([this, songNumber]() {
+	overlay_menu.add(MenuOption(firstOption, firstDesc).call([songNumber]() {
 		Game* gm = Game::getSingletonPtr();
 		Screen* s = gm->getScreen("Sing");
 		ScreenSing* ss = dynamic_cast<ScreenSing*>(s);

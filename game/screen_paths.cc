@@ -66,12 +66,12 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 	}
 	bool showHiddenfolders = config["paths/showhiddenfolders"].b();
 	if(showHiddenfolders) {
-		m_menu.add(MenuOption(_("Hide hidden folders"),_("Hide hidden folders")).call([this, sl, path, position]() {
+		m_menu.add(MenuOption(_("Hide hidden folders"),_("Hide hidden folders")).call([this, sl, path]() {
 			config["paths/showhiddenfolders"].b() = false;
 			generateMenuFromPath(path);
 		}));
 	} else {
-		m_menu.add(MenuOption(_("Show hidden folders"),_("Show hidden folders")).call([this, sl, path, position]() {
+		m_menu.add(MenuOption(_("Show hidden folders"),_("Show hidden folders")).call([this, sl, path]() {
 			config["paths/showhiddenfolders"].b() = true;
 			generateMenuFromPath(path);
 		}));
@@ -90,7 +90,7 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 			//Reload internal, but that crashes!! rely on the user to press ctrl+r in song selection screen
 		}));
 	}
-	m_menu.add(MenuOption(_(".."),_("Go up one folder")).call([this, sl, path, position]() {
+	m_menu.add(MenuOption(_(".."),_("Go up one folder")).call([this, sl, path]() {
 		generateMenuFromPath(path.parent_path());
 	}));
 //todo sort folders
