@@ -25,7 +25,7 @@ MatchResult UnicodeUtil::getCharset (std::string const& str) {
 		const UCharsetMatch* match = ucsdet_detect (m_chardet.getAlias(), &m_icuError);
 		return std::pair<std::string,int>(ucsdet_getName(match, &m_icuError), ucsdet_getConfidence(match, &m_icuError));
 	}
-	}
+}
 
 void convertToUTF8 (std::stringstream &_stream, std::string _filename) {
 	std::string data = _stream.str();
@@ -59,13 +59,13 @@ void convertToUTF8 (std::stringstream &_stream, std::string _filename) {
 			_stream.str(ustring.toUTF8String(_str));
 		}
 	}
-	}
+}
 
 std::string convertToUTF8 (std::string const& str) {
 	std::stringstream ss (str);
 	convertToUTF8 (ss, std::string());
 	return ss.str();
-	}
+}
 
 std::string unicodeCollate (std::string const& str) {
 	ConfigItem::StringList termsToCollate = config["game/sorting_ignore"].sl();
@@ -81,4 +81,4 @@ std::string unicodeCollate (std::string const& str) {
 	}
 	std::string collated = std::regex_replace(convertToUTF8(str), std::regex(pattern, std::regex_constants::icase), "\\3 \\2");
 	return collated;
-	}
+}
