@@ -51,7 +51,7 @@ class SurfaceLoader::Impl {
 			std::clog << "image/error: " << e.what() << std::endl;
 		}
 	}
-	volatile bool m_quit;
+	std::atomic<bool> m_quit;
 	std::mutex m_mutex;
 	std::condition_variable m_condition;
 	typedef std::map<void const*, Job> Jobs;

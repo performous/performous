@@ -192,8 +192,8 @@ class FFmpeg {
 	void processAudio(AVFrame* frame);
 	fs::path m_filename;
 	unsigned int m_rate;
-	volatile bool m_quit;
-	volatile double m_seekTarget;
+	std::atomic<bool> m_quit;
+	std::atomic<double> m_seekTarget;
 	double m_position;
 	double m_duration;
 	// libav-specific variables

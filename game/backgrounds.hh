@@ -35,8 +35,8 @@ class Backgrounds: boost::noncopyable {
 	int m_bgiter;
 	void reload_internal();
 	void reload_internal(fs::path const& p);
-	volatile bool m_dirty;
-	volatile bool m_loading;
+	std::atomic<bool> m_dirty;
+	std::atomic<bool> m_loading;
 	std::unique_ptr<std::thread> m_thread;
 	mutable std::mutex m_mutex;
 };

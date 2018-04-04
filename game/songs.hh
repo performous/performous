@@ -69,8 +69,8 @@ class Songs: boost::noncopyable {
 	void sortSpecificChange(int sortOrder, bool descending = false);
 	/// parses file into Song &tmp
 	void parseFile(Song& tmp);
-	volatile bool doneLoading = false;
-	volatile bool displayedAlert = false;
+	std::atomic<bool> doneLoading = false;
+	std::atomic<bool> displayedAlert = false;
 	size_t loadedSongs() const { return m_songs.size(); }
 
   private:
@@ -89,8 +89,8 @@ class Songs: boost::noncopyable {
 	void randomize_internal();
 	void filter_internal();
 	void sort_internal(bool descending = false);
-	volatile bool m_dirty;
-	volatile bool m_loading;
+	std::atomic<bool> m_dirty;
+	std::atomic<bool> m_loading;
 	std::unique_ptr<std::thread> m_thread;
 	mutable std::mutex m_mutex;
 };
