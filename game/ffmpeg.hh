@@ -12,17 +12,14 @@
 #include <vector>
 #include <mutex>
 #include <iostream>
-
-using boost::uint8_t;
-using boost::int16_t;
-using boost::int64_t;
+#include <cstdint>
 
 /// single audio frame
 struct AudioFrame {
 	/// timestamp of audio frame
 	double timestamp;
 	/// audio data
-	std::vector<int16_t> data;
+	std::vector<std::int16_t> data;
 	/// constructor
 	template <typename InIt> AudioFrame(double ts, InIt begin, InIt end): timestamp(ts), data(begin, end) {}
 	AudioFrame(): timestamp(getInf()) {} // EOF marker
@@ -92,7 +89,7 @@ class AudioBuffer {
 	void setSamplesPerSecond(unsigned sps) { m_sps = sps; }
 	/// get samples per second
 	unsigned getSamplesPerSecond() const { return m_sps; }
-	void push(std::vector<int16_t> const& data, double timestamp) {
+	void push(std::vector<std::int16_t> const& data, double timestamp) {
 		std::unique_lock<mutex> l(m_mutex);
 		m_cond.wait(l, [this]{ return condition(); });
 		if (m_quit) return;
@@ -108,7 +105,7 @@ class AudioBuffer {
 		m_data.insert(m_data.end(), data.begin(), data.end());
 		m_pos += data.size();
 	}
-	bool prepare(int64_t pos) {
+	bool prepare(std::int64_t pos) {
 		std::unique_lock<mutex> l(m_mutex, std::try_to_lock);
 		if (!l.owns_lock()) return false;  // Didn't get lock, give up for now
 		if (eof(pos)) return true;
@@ -118,18 +115,18 @@ class AudioBuffer {
 		// Has enough been prebuffered already and is the requested position still within buffer
 		return m_pos > m_posReq + m_data.capacity() / 16 && m_pos <= m_posReq + m_data.size();
 	}
-	bool operator()(float* begin, float* end, int64_t pos, float volume = 1.0f) {
+	bool operator()(float* begin, float* end, std::int64_t pos, float volume = 1.0f) {
 		std::unique_lock<mutex> l(m_mutex);
 		size_t idx = pos + m_data.size() - m_pos;
 		size_t samples = end - begin;
 		for (size_t s = 0; s < samples; ++s, ++idx) {
 			if (idx < m_data.size()) begin[s] += volume * da::conv_from_s16(m_data[idx]);
 		}
-		m_posReq = std::max<int64_t>(0, pos + samples);
+		m_posReq = std::max<std::int64_t>(0, pos + samples);
 		wakeups();
 		return !eof(pos);
 	}
-	bool eof(int64_t pos) const { return double(pos) / m_sps >= m_duration; }
+	bool eof(std::int64_t pos) const { return double(pos) / m_sps >= m_duration; }
 	void setEof() { m_duration = double(m_pos) / m_sps; }
 	double duration() const { return m_duration; }
 	void setDuration(double seconds) { m_duration = seconds; }
@@ -148,9 +145,9 @@ class AudioBuffer {
 	bool condition() { return m_quit.load() || wantMore() || wantSeek(); }
 	mutable mutex m_mutex;
 	std::condition_variable_any m_cond;
-	boost::circular_buffer<int16_t> m_data;
+	boost::circular_buffer<std::int16_t> m_data;
 	size_t m_pos = 0;
-	int64_t m_posReq = 0;
+	std::int64_t m_posReq = 0;
 	unsigned m_sps = 0;
 	double m_duration = getNaN();
 	std::atomic<bool> m_quit{ false };
