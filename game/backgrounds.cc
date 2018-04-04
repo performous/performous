@@ -3,12 +3,12 @@
 #include "configuration.hh"
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
-#include <regex>
 #include <algorithm>
-#include <cstdlib>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <random>
+#include <regex>
 
 void Backgrounds::reload() {
 	if (m_loading) return;
@@ -38,7 +38,7 @@ void Backgrounds::reload_internal() {
 	m_loading = false;
 	{	// Randomize the order
 		std::lock_guard<std::mutex> l(m_mutex);
-		random_shuffle(m_bgs.begin(), m_bgs.end());
+		std::shuffle(m_bgs.begin(), m_bgs.end(), std::mt19937(std::random_device()()));
 		m_dirty = false;
 		m_bgiter = 0;
 	}

@@ -1,6 +1,7 @@
 #include "playlist.hh"
 #include "song.hh"
 #include <algorithm>
+#include <random>
 
 void PlayList::addSong(std::shared_ptr<Song> song) {
 	std::lock_guard<std::mutex> l(m_mutex);
@@ -28,7 +29,7 @@ bool PlayList::isEmpty() {
 
 void PlayList::shuffle() {
 	std::lock_guard<std::mutex> l(m_mutex);
-	std::random_shuffle(m_list.begin(), m_list.end());
+	std::shuffle(m_list.begin(), m_list.end(), std::mt19937(std::random_device()()));
 }
 
 void PlayList::clear() {
