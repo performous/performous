@@ -1,5 +1,6 @@
 #pragma once
 
+#include "chrono.hh"
 #include "surface.hh"
 #include "util.hh"
 #include "libda/sample.hpp"
@@ -7,6 +8,7 @@
 #include <boost/ptr_container/ptr_deque.hpp>
 #include <atomic>
 #include <condition_variable>
+#include <future>
 #include <memory>
 #include <thread>
 #include <vector>
@@ -181,7 +183,7 @@ class FFmpeg {
 	void seek(double time, bool wait = true);
 	/// duration
 	double duration() const;
-	bool terminating() const { return m_quit; }
+	bool terminating() { return m_quit_future.wait_for(0s) == std::future_status::ready; }
 
 	class eof_error: public std::exception {};
   private:
@@ -192,7 +194,8 @@ class FFmpeg {
 	void processAudio(AVFrame* frame);
 	fs::path m_filename;
 	unsigned int m_rate;
-	volatile bool m_quit;
+	std::promise<void> m_quit;
+	std::future<void> m_quit_future = m_quit.get_future();
 	volatile double m_seekTarget;
 	double m_position;
 	double m_duration;
