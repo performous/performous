@@ -2,12 +2,19 @@
 
 namespace glutil {
 
-void VertexArray::generateVBO() {
-	if (m_vbo != 0) glDeleteBuffers(1, &m_vbo);
+VertexArray::VertexArray() {
+	glGenVertexArrays(1, &m_vao);
 	glGenBuffers(1, &m_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexInfo) * size(), &m_vertices.front(), GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+VertexArray::~VertexArray() {
+	clear();
+	glDeleteVertexArrays(1, &m_vao);
+	glDeleteBuffers(1, &m_vbo);
+}
+
+void VertexArray::clear() {
+	m_vertices.clear();
 }
 
 void VertexArray::draw(GLint mode) {
@@ -21,10 +28,13 @@ void VertexArray::draw(GLint mode) {
 	GLint vertNormal = glGetAttribLocation(program, "vertNormal");
 	GLint vertColor = glGetAttribLocation(program, "vertColor");
 	glerror.check("program and attribs");
-	if (m_vbo) glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBindVertexArray(m_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexInfo) * size(), &m_vertices.front(), GL_STATIC_DRAW);
+	glerror.check("bind");
 	if (vertPos != -1) {
-		const GLvoid* ptr = m_vbo ? (GLvoid*)offsetof(VertexInfo, position) : &m_vertices[0].position;
 		glEnableVertexAttribArray(vertPos);
+		const GLvoid* ptr = m_vbo ? (GLvoid*)offsetof(VertexInfo, position) : &m_vertices[0].position;
 		glVertexAttribPointer(vertPos, 3, GL_FLOAT, GL_FALSE, stride, ptr);
 	}
 	if (vertTexCoord != -1) {
@@ -42,7 +52,7 @@ void VertexArray::draw(GLint mode) {
 		glEnableVertexAttribArray(vertColor);
 		glVertexAttribPointer(vertColor, 4, GL_FLOAT, GL_FALSE, stride, ptr);
 	}
-	glerror.check("attribs connect");
+	glerror.check("enable arrays");
 	glDrawArrays(mode, 0, size());
 
 	if (vertPos != -1) glDisableVertexAttribArray(vertPos);
@@ -50,6 +60,7 @@ void VertexArray::draw(GLint mode) {
 	if (vertNormal != -1) glDisableVertexAttribArray(vertNormal);
 	if (vertColor != -1) glDisableVertexAttribArray(vertColor);
 	if (m_vbo) glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 }
 
 GLErrorChecker::GLErrorChecker(std::string const& info): info(info) {

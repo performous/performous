@@ -12,30 +12,21 @@ namespace glutil {
 
 	// Note: if you reorder or otherwise change the contents of this, VertexArray::Draw() must be modified accordingly
 	struct VertexInfo {
-		glmath::vec3 position;
-		glmath::vec2 texCoord;
-		glmath::vec3 normal;
-		glmath::vec4 color;
-		VertexInfo():
-		  position(0.0, 0.0, 0.0),
-		  texCoord(0.0, 0.0),
-		  normal(0.0, 0.0, 0.0),
-		  color(1.0, 1.0, 1.0, 1.0)
-		{}
+		glmath::vec3 position{};
+		glmath::vec2 texCoord{};
+		glmath::vec3 normal{};
+		glmath::vec4 color{ 1.0, 1.0, 1.0, 1.0 };
 	};
 
 	/// Handy vertex array capable of drawing itself
 	class VertexArray {
-	  private:
+	private:
 		std::vector<VertexInfo> m_vertices;
 		VertexInfo m_vert;
-		GLuint m_vbo = 0;
-	  public:
-		VertexArray() {}
-
-		~VertexArray() { clear(); }
-
-		void generateVBO();
+		GLuint m_vbo = 0, m_vao = 0;
+	public:
+		VertexArray();
+		~VertexArray();
 
 		VertexArray& vertex(float x, float y, float z = 0.0f) {
 			return vertex(glmath::vec3(x, y, z));
@@ -81,14 +72,7 @@ namespace glutil {
 			return m_vertices.size();
 		}
 
-		void clear() {
-			m_vertices.clear();
-			if (m_vbo) {
-				glDeleteBuffers(1, &m_vbo);
-				m_vbo = 0;
-			}
-		}
-
+		void clear();
 	};
 
 	/// Wrapper struct for RAII

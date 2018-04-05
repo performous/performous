@@ -1,4 +1,4 @@
-#version 120
+#version 330 core
 
 //DEFINES
 
@@ -6,19 +6,19 @@ uniform mat4 projMatrix;
 uniform mat4 mvMatrix;
 uniform mat3 normalMatrix;
 
-attribute vec3 vertPos;
-attribute vec2 vertTexCoord;
-attribute vec3 vertNormal;
-attribute vec4 vertColor;
+in vec3 vertPos;
+in vec2 vertTexCoord;
+in vec3 vertNormal;
+in vec4 vertColor;
 
-varying vec3 lightDir;
-varying vec3 vLightDir;
-varying vec2 texCoord;
-varying vec2 vTexCoord;
-varying vec3 normal;
-varying vec3 vNormal;
-varying vec4 color;
-varying vec4 vColor;
+out vec3 lightDir;
+out vec3 vLightDir;
+out vec2 texCoord;
+out vec2 vTexCoord;
+out vec3 normal;
+out vec3 vNormal;
+out vec4 color;
+out vec4 vColor;
 
 void main() {
 	//const vec3 lightPos = vec3(0.0, -2.94, 1.0);

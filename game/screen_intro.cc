@@ -139,7 +139,6 @@ void ScreenIntro::draw() {
 		ColorTrans c(glmath::rotate(2.0 * m_pi * anim, glmath::vec3(1.0, 1.0, 1.0)));
 		theme->bg.draw();
 	}
-	glerror.check("bg");
 	if (m_menu.current().image) m_menu.current().image->draw();
 	// Comment
 	theme->comment_bg.dimensions.center().screenBottom(-0.01);

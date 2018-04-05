@@ -61,6 +61,9 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 		GLattrSetter attr_buf(SDL_GL_BUFFER_SIZE, 32);
 		GLattrSetter attr_d(SDL_GL_DEPTH_SIZE, 24);
 		GLattrSetter attr_db(SDL_GL_DOUBLEBUFFER, 1);
+		GLattrSetter attr_glmaj(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+		GLattrSetter attr_glmin(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+		GLattrSetter attr_glprof(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 		if(width < 200) width = 854; //FIXME: window should have a minimum size
 		if(height < 200) height = 480;
 		screen = SDL_CreateWindow(PACKAGE " " VERSION, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height,
@@ -110,12 +113,12 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	  .compileFile(findFile("shaders/core.frag"))
 	  .link();
 	shader("surface")
-	  .addDefines("#define ENABLE_TEXTURING 1\n")
+	  .addDefines("#define ENABLE_TEXTURING\n")
 	  .compileFile(findFile("shaders/core.vert"))
 	  .compileFile(findFile("shaders/core.frag"))
 	  .link();
 	shader("texture")
-	  .addDefines("#define ENABLE_TEXTURING 2\n")
+	  .addDefines("#define ENABLE_TEXTURING\n")
 	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
 	  .compileFile(findFile("shaders/core.vert"))
 	  .compileFile(findFile("shaders/core.frag"))
@@ -126,7 +129,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	  .compileFile(findFile("shaders/core.frag"))
 	  .link();
 	shader("dancenote")
-	  .addDefines("#define ENABLE_TEXTURING 2\n")
+	  .addDefines("#define ENABLE_TEXTURING\n")
 	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
 	  .compileFile(findFile("shaders/dancenote.vert"))
 	  .compileFile(findFile("shaders/core.frag"))
@@ -201,6 +204,7 @@ void Window::render(boost::function<void (void)> drawFunc) {
 	glerror.check("FBO");
 	{
 		UseFBO user(fbo);
+		blank();
 		view(0);
 		glViewportIndexedf(1, 0, h / 2, w, h / 2);
 		glViewportIndexedf(2, 0, 0, w, h / 2);
@@ -241,9 +245,8 @@ void Window::render(boost::function<void (void)> drawFunc) {
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_ONE, GL_ONE);
 		}
-		fbo.getTexture().draw(dim, TexCoords(0.0, h, w, 0));
+		fbo.getTexture().draw(dim, TexCoords(0.0, 1.0, 1.0, 0));
 	}
-	glerror.check("FBO->FB postcondition");
 }
 
 void Window::view(unsigned num) {
@@ -253,10 +256,9 @@ void Window::view(unsigned num) {
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-	glShadeModel(GL_SMOOTH);
 	glEnable(GL_BLEND);
 	if (GL_EXT_framebuffer_sRGB) glEnable(GL_FRAMEBUFFER_SRGB);
+	glerror.check("setup");
 	shader("color").bind();
 	// Setup views (with black bars for cropping)
 	int windowWidth;
