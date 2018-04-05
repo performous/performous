@@ -145,6 +145,7 @@ void FFmpeg::operator()() {
 	audioQueue.setDuration(m_duration);
 	int errors = 0;
 	bool eof = false;
+	std::clog << "audio/debug: FFmpeg processing " << m_filename.filename().string() << std::endl;
 	while (!terminating()) {
 		if (eof) break;
 		try {
