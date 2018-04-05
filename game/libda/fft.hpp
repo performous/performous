@@ -12,7 +12,7 @@
 
 namespace da {
 
-	constexpr inline double TAU = 2.0 * 3.141592653589793238462643383279502884;
+	constexpr double TAU = 2.0 * 3.141592653589793238462643383279502884;
 
 	// With g++ optimization -fcx-limited-range should be used for 5x performance boost.
 	

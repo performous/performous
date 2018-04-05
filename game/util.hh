@@ -5,7 +5,7 @@
 #include <vector>
 #include <stdexcept>
 
-constexpr inline double m_pi = 3.141592653589793238462643383279502884;
+constexpr double m_pi = 3.141592653589793238462643383279502884;
 
 /** Templated conversion functions for string to T, specializations defined in util.cc **/
 template <typename T> T sconv(std::string const& s);
