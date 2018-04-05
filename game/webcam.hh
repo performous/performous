@@ -1,6 +1,7 @@
 #pragma once
 
 #include "surface.hh"
+#include <atomic>
 #include <mutex>
 #include <thread>
 #include <vector>
@@ -12,8 +13,8 @@ namespace cv {
 }
 
 struct CamFrame {
-	int width;
-	int height;
+	int width = 0;
+	int height = 0;
 	std::vector<boost::uint8_t> data;
 };
 
@@ -21,7 +22,6 @@ class Webcam {
   public:
 	/// cam_id -1 means pick any device
 	Webcam(int cam_id = -1);
-
 	~Webcam();
 
 	/// Thread runs here, don't call directly
@@ -45,8 +45,8 @@ class Webcam {
 	CamFrame m_frame;
 	Surface m_surface;
 	bool m_frameAvailable;
-	volatile bool m_running;
-	volatile bool m_quit;
+	std::atomic<bool> m_running{ false };
+	std::atomic<bool> m_quit{ false };
 
   public:
 	static bool enabled() {

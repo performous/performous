@@ -6,6 +6,7 @@
 #include "svg.hh"
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/filesystem.hpp>
+#include <atomic>
 #include <cctype>
 #include <condition_variable>
 #include <stdexcept>
@@ -51,7 +52,7 @@ class SurfaceLoader::Impl {
 			std::clog << "image/error: " << e.what() << std::endl;
 		}
 	}
-	volatile bool m_quit;
+	std::atomic<bool> m_quit{ false };
 	std::mutex m_mutex;
 	std::condition_variable m_condition;
 	typedef std::map<void const*, Job> Jobs;

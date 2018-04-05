@@ -1,5 +1,6 @@
 #pragma once
 
+#include "chrono.hh"
 #include "surface.hh"
 #include "util.hh"
 #include "libda/sample.hpp"
@@ -7,6 +8,7 @@
 #include <boost/ptr_container/ptr_deque.hpp>
 #include <atomic>
 #include <condition_variable>
+#include <future>
 #include <memory>
 #include <thread>
 #include <vector>
@@ -153,7 +155,7 @@ class AudioBuffer {
 	int64_t m_posReq = 0;
 	unsigned m_sps = 0;
 	double m_duration = getNaN();
-	std::atomic<bool> m_quit;
+	std::atomic<bool> m_quit{ false };
 };
 
 // ffmpeg forward declarations
@@ -172,8 +174,8 @@ class FFmpeg {
 	FFmpeg(fs::path const& file, unsigned int rate = 0);
 	~FFmpeg();
 	void operator()(); ///< Thread runs here, don't call directly
-	unsigned width; ///< width of video
-	unsigned height; ///< height of video
+	unsigned width = 0; ///< width of video
+	unsigned height = 0; ///< height of video
 	/// queue for video
 	VideoFifo  videoQueue;
 	/// queue for audio
@@ -182,7 +184,7 @@ class FFmpeg {
 	void seek(double time, bool wait = true);
 	/// duration
 	double duration() const;
-	bool terminating() const { return m_quit; }
+	bool terminating() { return m_quit_future.wait_for(0s) == std::future_status::ready; }
 
 	class eof_error: public std::exception {};
   private:
@@ -192,18 +194,19 @@ class FFmpeg {
 	void processVideo(AVFrame* frame);
 	void processAudio(AVFrame* frame);
 	fs::path m_filename;
-	unsigned int m_rate;
-	volatile bool m_quit;
-	volatile double m_seekTarget;
-	double m_position;
-	double m_duration;
+	unsigned int m_rate = 0;
+	std::promise<void> m_quit;
+	std::future<void> m_quit_future = m_quit.get_future();
+	std::atomic<double> m_seekTarget{ getNaN() };
+	double m_position = 0.0;
+	double m_duration = 0.0;
 	// libav-specific variables
-	int m_streamId;
+	int m_streamId = -1;
 	int m_mediaType;  // enum AVMediaType
-	AVFormatContext* m_formatContext;
-	AVCodecContext* m_codecContext;
-	AVAudioResampleContext* m_resampleContext;
-	SwsContext* m_swsContext;
+	AVFormatContext* m_formatContext = nullptr;
+	AVCodecContext* m_codecContext = nullptr;
+	AVAudioResampleContext* m_resampleContext = nullptr;
+	SwsContext* m_swsContext = nullptr;
 	// Make sure the thread starts only after initializing everything else
 	std::unique_ptr<std::thread> m_thread;
 	static std::mutex s_avcodec_mutex; // Used for avcodec_open/close (which use some static crap and are thus not thread-safe)
