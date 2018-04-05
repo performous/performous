@@ -33,8 +33,8 @@ class VideoFifo {
 	bool tryPop(Bitmap& f) {
 		std::unique_lock<std::mutex> l(m_mutex);
 		if (m_queue.empty()) return false; // Nothing to deliver
-		if (m_queue.begin()->buf.empty()) { m_eof = true; return false; }
-		f.swap(*m_queue.begin());
+		if ((*m_queue.begin())->buf.empty()) { m_eof = true; return false; }
+		f.swap(*(m_queue.begin())->get());
 		m_queue.pop_front();
 		m_cond.notify_all();
 		m_timestamp = f.timestamp;
@@ -45,7 +45,7 @@ class VideoFifo {
 		std::unique_lock<std::mutex> l(m_mutex);
 		m_cond.wait(l, [this]{ return m_queue.size() < m_max; });
 		if (m_queue.empty()) m_timestamp = f->timestamp;
-		m_queue.push_back(*f);
+		m_queue.push_back(std::unique_ptr<Bitmap>(f));
 	}
 	/// Clear and unlock the queue
 	void reset() {
@@ -60,8 +60,7 @@ class VideoFifo {
 	double eof() const { return m_eof; }
 
   private:
-	//boost::ptr_deque<Bitmap> m_queue;
-	std::deque<Bitmap> m_queue;
+	std::deque<std::unique_ptr<Bitmap>> m_queue;
 	mutable std::mutex m_mutex;
 	std::condition_variable m_cond;
 	double m_timestamp;
