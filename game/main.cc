@@ -46,7 +46,7 @@ namespace { struct Nothing { char const* what() const { return NULL; } }; }
 #define EXCEPTION Nothing
 #endif
 
-volatile bool g_quit = false;
+std::atomic<bool> g_quit{ false };
 
 bool g_take_screenshot = false;
 

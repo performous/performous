@@ -2,6 +2,7 @@
 
 #include "animvalue.hh"
 #include "fs.hh"
+#include <atomic>
 #include <memory>
 #include <mutex>
 #include <set>
@@ -69,8 +70,8 @@ class Songs: boost::noncopyable {
 	void sortSpecificChange(int sortOrder, bool descending = false);
 	/// parses file into Song &tmp
 	void parseFile(Song& tmp);
-	volatile bool doneLoading = false;
-	volatile bool displayedAlert = false;
+	std::atomic<bool> doneLoading{ false };
+	std::atomic<bool> displayedAlert{ false };
 	size_t loadedSongs() const { return m_songs.size(); }
 
   private:
@@ -82,15 +83,16 @@ class Songs: boost::noncopyable {
 	AnimAcceleration math_cover;
 	std::string m_filter;
 	Database & m_database;
-	int m_type, m_order;
+	int m_type = 0;
+	int m_order;  // Set by constructor
 	void dumpSongs_internal() const;
 	void reload_internal();
 	void reload_internal(fs::path const& p);
 	void randomize_internal();
 	void filter_internal();
 	void sort_internal(bool descending = false);
-	volatile bool m_dirty;
-	volatile bool m_loading;
+	std::atomic<bool> m_dirty{ false };
+	std::atomic<bool> m_loading{ false };
 	std::unique_ptr<std::thread> m_thread;
 	mutable std::mutex m_mutex;
 };
