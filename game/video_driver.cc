@@ -98,13 +98,6 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 		shader("texture").compileFile(findFile("shaders/stereo3d.geom"));
 		shader("3dobject").compileFile(findFile("shaders/stereo3d.geom"));
 		shader("dancenote").compileFile(findFile("shaders/stereo3d.geom"));
-		if (epoxy_gl_version() < 41) {
-			// Enable bugfix for some older Nvidia cards
-			for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
-				Shader& sh = *it->second;
-				sh.addDefines("#define ENABLE_BOGUS\n");
-			}
-		}
 	}
 
 	shader("color")
