@@ -7,7 +7,7 @@
 #include "util.hh"
 #include "libda/portaudio.hpp"
 #include <boost/date_time.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
+#include <deque>
 #include <map>
 #include <memory>
 #include <string>
@@ -58,8 +58,8 @@ public:
 	~Audio();
 	void restart();
 	void close();
-	boost::ptr_vector<Analyzer>& analyzers();
-	boost::ptr_vector<Device>& devices();
+	std::deque<Analyzer>& analyzers();
+	std::deque<Device>& devices();
 	bool isOpen() const;
 	bool hasPlayback() const;
 	/** Play a song beginning at startPos (defaults to 0)

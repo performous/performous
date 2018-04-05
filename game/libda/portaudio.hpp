@@ -210,6 +210,9 @@ namespace portaudio {
 	class Stream {
 		PaStream* m_handle;
 	public:
+		// We are non-copyable
+		Stream(Stream const&) = delete;
+		Stream& operator=(Stream const&) = delete;
 		/// Construct a stream as with Pa_OpenStream
 		Stream(
 		  PaStreamParameters const* input,
@@ -232,6 +235,7 @@ namespace portaudio {
 		  PaStreamFlags flags = paNoFlag
 		): Stream(input, output, sampleRate, framesPerBuffer, flags, functorCallback<Functor>, (void*)(intptr_t)&functor) {}
 		~Stream() {
+			if (!m_handle) return;
 			// Give audio a little time to shutdown but then just quit
 			auto audiokiller = std::async(std::launch::async, Pa_CloseStream, m_handle);
 			if (audiokiller.wait_for(std::chrono::seconds(5)) == std::future_status::ready) return;

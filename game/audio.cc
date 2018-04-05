@@ -2,11 +2,8 @@
 
 #include "chrono.hh"
 #include "configuration.hh"
-#include "libda/portaudio.hpp"
 #include "util.hh"
-#include <boost/ptr_container/ptr_map.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
-#include <boost/range/iterator_range.hpp>
+#include "libda/portaudio.hpp"
 #include <cmath>
 #include <future>
 #include <iostream>
@@ -425,8 +422,8 @@ int Device::operator()(void const* input, void* output, unsigned long frames, co
 struct Audio::Impl {
 	Output output;
 	portaudio::Init init;
-	boost::ptr_vector<Analyzer> analyzers;
-	boost::ptr_vector<Device> devices;
+	std::deque<Analyzer> analyzers;
+	std::deque<Device> devices;
 	bool playback = false;
 	std::string selectedBackend = Audio::backendConfig().getValue();
 	Impl() {
@@ -471,12 +468,12 @@ struct Audio::Impl {
 				if (info.in < int(params.mics.size())) throw std::runtime_error("Device doesn't have enough input channels");
 				if (info.out < int(params.out)) throw std::runtime_error("Device doesn't have enough output channels");
 				// Match found if we got here, construct a device
-				auto d = new Device(params.in, params.out, params.rate, info.idx);
-				devices.push_back(d);
+				devices.emplace_back(params.in, params.out, params.rate, info.idx);
+				Device& d = devices.back();
 				// Start capture/playback on this device (likely to throw due to audio system errors)
 				// NOTE: When it throws we want to keep the device in devices to avoid calling ~Device
 				// which often would hit the Pa_CloseStream hang bug and terminate the application.
-				d->start();
+				d.start();
 				// Assign mics for all channels of the device
 				int assigned_mics = 0;
 				for (unsigned int j = 0; j < params.in; ++j) {
@@ -490,13 +487,12 @@ struct Audio::Impl {
 					}
 					if (mic_used) continue;
 					// Add the new analyzer
-					Analyzer* a = new Analyzer(d->rate, m);
-					analyzers.push_back(a);
-					d->mics[j] = a;
+					analyzers.emplace_back(d.rate, m);
+					d.mics[j] = &analyzers.back();
 					++assigned_mics;
 				}
 				// Assign playback output for the first available stereo output
-				if (!playback && d->out == 2) { d->outptr = &output; playback = true; }
+				if (!playback && d.out == 2) { d.outptr = &output; playback = true; }
 				std::clog << "audio/info: Using audio device: " << info.desc();
 				if (assigned_mics) std::clog << ", input channels: " << assigned_mics;
 				if (params.out) std::clog << ", output channels: " << params.out;
@@ -513,9 +509,7 @@ struct Audio::Impl {
 		// stop all audio streams befor destoying the object.
 		// else portaudio will keep sending data to those destroyed
 		// objects.
-		for (auto device: devices) {
-			device.stop();
-		}
+		for (auto& device: devices) device.stop();
 	}
 };
 
@@ -664,6 +658,5 @@ void Audio::toggleCenterChannelSuppressor() {
 	}
 }
 
-boost::ptr_vector<Analyzer>& Audio::analyzers() { return self->analyzers; }
-
-boost::ptr_vector<Device>& Audio::devices() { return self->devices; }
+std::deque<Analyzer>& Audio::analyzers() { return self->analyzers; }
+std::deque<Device>& Audio::devices() { return self->devices; }
