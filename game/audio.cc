@@ -427,11 +427,11 @@ struct Audio::Impl {
 	portaudio::Init init;
 	boost::ptr_vector<Analyzer> analyzers;
 	boost::ptr_vector<Device> devices;
-	bool playback;
+	bool playback = false;
 	std::string selectedBackend = Audio::backendConfig().getValue();
-	Impl(): init(), playback() {
-	populateBackends(portaudio::AudioBackends().getBackends());
-	std::clog << portaudio::AudioBackends().dump() << std::flush; // Dump PortAudio backends and devices to log.
+	Impl() {
+		populateBackends(portaudio::AudioBackends().getBackends());
+		std::clog << portaudio::AudioBackends().dump() << std::flush; // Dump PortAudio backends and devices to log.
 		// Parse audio devices from config
 		ConfigItem::StringList devs = config["audio/devices"].sl();
 		for (ConfigItem::StringList::const_iterator it = devs.begin(), end = devs.end(); it != end; ++it) {
@@ -446,12 +446,10 @@ struct Audio::Impl {
 				params.in = 0;
 				params.rate = 48000;
 				// Break into tokens:
-				std::map<std::string, std::string> keyvalues = parseKeyValuePairs(*it);
-				for (std::map<std::string, std::string>::const_iterator it2 = keyvalues.begin();
-				  it2 != keyvalues.end(); ++it2) {
+				for (auto& kv: parseKeyValuePairs(*it)) {
 					// Handle keys
-					std::string key = it2->first;
-					std::istringstream iss(it2->second);
+					std::string key = kv.first;
+					std::istringstream iss(kv.second);
 					if (key == "out") iss >> params.out;
 					else if (key == "in") iss >> params.in;
 					else if (key == "rate") iss >> params.rate;
