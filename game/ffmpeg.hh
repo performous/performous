@@ -4,15 +4,15 @@
 #include "util.hh"
 #include "libda/sample.hpp"
 #include <boost/circular_buffer.hpp>
-#include <deque>
 #include <atomic>
 #include <condition_variable>
+#include <cstdint>
+#include <deque>
+#include <iostream>
 #include <memory>
+#include <mutex>
 #include <thread>
 #include <vector>
-#include <mutex>
-#include <iostream>
-#include <cstdint>
 
 /// single audio frame
 struct AudioFrame {
