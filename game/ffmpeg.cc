@@ -82,7 +82,7 @@ FFmpeg::FFmpeg(fs::path const& _filename, unsigned int rate):
 }
 
 FFmpeg::~FFmpeg() {
-	m_quit = true;
+	m_quit.set_value();
 	videoQueue.reset();
 	audioQueue.quit();
 	m_thread->join();
@@ -142,16 +142,13 @@ void FFmpeg::open() {
 }
 
 void FFmpeg::operator()() {
-	try { open(); } catch (std::exception const& e) { std::clog << "ffmpeg/error: Failed to open " << m_filename << ": " << e.what() << std::endl; m_quit = true; return; }
+	try { open(); } catch (std::exception const& e) { std::clog << "ffmpeg/error: Failed to open " << m_filename << ": " << e.what() << std::endl; return; }
 	m_duration = m_formatContext->duration / double(AV_TIME_BASE);
 	audioQueue.setDuration(m_duration);
 	int errors = 0;
 	bool eof = false;
-	while (!m_quit) {
-		if(eof) {
-			std::this_thread::sleep_for(100ms);
-			continue;
-		}
+	while (!terminating()) {
+		if (eof) break;
 		try {
 			if (audioQueue.wantSeek()) m_seekTarget = 0.0;
 			if (m_seekTarget == m_seekTarget) seek_internal();
@@ -163,9 +160,10 @@ void FFmpeg::operator()() {
 			std::clog << "ffmpeg/debug: done loading " << m_filename << std::endl;
 		} catch (std::exception& e) {
 			std::clog << "ffmpeg/error: " << m_filename << ": " << e.what() << std::endl;
-			if (++errors > 2) { std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl; m_quit = true; }
+			if (++errors > 2) { std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl; break; }
 		}
 	}
+	m_quit_future.wait();  // Wait until we are requested to quit before clearing queues
 	audioQueue.reset();
 	videoQueue.reset();
 	// TODO: use RAII for freeing resources (to prevent memory leaks)
@@ -182,7 +180,7 @@ void FFmpeg::operator()() {
 void FFmpeg::seek(double time, bool wait) {
 	m_seekTarget = time;
 	videoQueue.reset(); audioQueue.reset(); // Empty these to unblock the internals in case buffers were full
-	if (wait) while (!m_quit && m_seekTarget == m_seekTarget) std::this_thread::sleep_for(5ms);
+	if (wait) while (!terminating() && m_seekTarget == m_seekTarget) std::this_thread::sleep_for(5ms);
 }
 
 void FFmpeg::seek_internal() {
@@ -219,7 +217,7 @@ void FFmpeg::decodePacket() {
 		} else if(ret < 0) {
 			throw FfmpegError(ret);
 		}
-		if (m_quit || m_seekTarget == m_seekTarget) return; // something weird required
+		if (terminating() || m_seekTarget == m_seekTarget) return; // something weird required
 		if (pkt.stream_index != m_streamId) return; // wrong stream
 		ret = avcodec_send_packet(m_codecContext, &pkt);
 		if(ret == AVERROR_EOF) {
@@ -273,7 +271,7 @@ void FFmpeg::decodePacket() {
 	int packetSize = packet.size;
 	while (packetSize) {
 		if (packetSize < 0) throw std::logic_error("negative packet size?!");
-		if (m_quit || m_seekTarget == m_seekTarget) return;
+		if (terminating() || m_seekTarget == m_seekTarget) return;
 		if (packet.stream_index != m_streamId) return;
 #if (LIBAVCODEC_VERSION_INT) < (AV_VERSION_INT(55,0,0))
 		std::shared_ptr<AVFrame> frame(avcodec_alloc_frame(), &av_free);
