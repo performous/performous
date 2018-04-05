@@ -271,7 +271,7 @@ void FFmpeg::decodePacket() {
 	int packetSize = packet.size;
 	while (packetSize) {
 		if (packetSize < 0) throw std::logic_error("negative packet size?!");
-		if (m_quit || m_seekTarget == m_seekTarget) return;
+		if (terminating() || m_seekTarget == m_seekTarget) return;
 		if (packet.stream_index != m_streamId) return;
 #if (LIBAVCODEC_VERSION_INT) < (AV_VERSION_INT(55,0,0))
 		std::shared_ptr<AVFrame> frame(avcodec_alloc_frame(), &av_free);
