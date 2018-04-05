@@ -38,8 +38,15 @@ void Shader::dumpInfoLog(GLuint id) {
 	// Ignore success messages that the Radeon driver always seems to give
 	if (std::equal(infoLog, infoLog + infoLogLength, "Vertex shader(s) linked, fragment shader(s) linked, geometry shader(s) linked.")) return;
 
-	// FIXME: The logging facility probably won't handle this right, especially when infoLog contains many lines.
-	std::clog << "opengl/error: Shader " << name << ": " << infoLog << std::endl;
+	// Format a (possibly multi-line) log message
+	std::string prefix = "opengl/error: Shader " + name + ": ";
+	std::string logmsg = prefix;
+	for (char ch: std::string(infoLog)) {
+		if (logmsg.back() == '\n') logmsg += prefix;
+		logmsg += ch;
+	}
+	if (logmsg.back() != '\n') logmsg += '\n';
+	std::clog << logmsg << std::flush;
 }
 
 Shader::Shader(std::string const& name): name(name), program(0) {}

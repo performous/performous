@@ -104,29 +104,16 @@ namespace glutil {
 	};
 
 	/// Checks for OpenGL error and displays it with given location info
-	struct GLErrorChecker {
+	class GLErrorChecker {
+		static thread_local std::vector<std::string> stack;
 		std::string info;
-		GLErrorChecker(std::string const& info): info(info) { check("precondition"); }
-		~GLErrorChecker() { check("postcondition"); }
-		void check(std::string const& what = "check()") {
-			GLenum err = glGetError();
-			if (err == GL_NO_ERROR) return;
-			std::clog << "opengl/error: " << msg(err) << " in " << info << " " << what << std::endl;
-		}
-		static void reset() { glGetError(); }
-		static std::string msg(GLenum err) {
-			switch(err) {
-				case GL_NO_ERROR: return std::string();
-				case GL_INVALID_ENUM: return "Invalid enum";
-				case GL_INVALID_VALUE: return "Invalid value";
-				case GL_INVALID_OPERATION: return "Invalid operation";
-				case GL_INVALID_FRAMEBUFFER_OPERATION: return "FBO is not complete";
-				case GL_STACK_OVERFLOW: return "Stack overflow";
-				case GL_STACK_UNDERFLOW: return "Stack underflow";
-				case GL_OUT_OF_MEMORY: return "Out of memory";
-				default: return "Unknown error";
-			}
-		}
+		void setWhat(std::string what);
+	public:
+		GLErrorChecker(std::string const& info);
+		~GLErrorChecker();
+		void check(std::string const& what = "check()");  ///< An error-check milestone; will log and clear any active GL errors
+		static void reset() { glGetError(); }  ///< Ignore any existing error
+		static std::string msg(GLenum err);
 	};
 }
 
