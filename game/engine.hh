@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <memory>
 #include <thread>
 #include <vector>
@@ -12,7 +13,7 @@ class VocalTrack;
 class Engine {
 	Audio& m_audio;
 	double m_time;
-	std::atomic<bool> m_quit;
+	std::atomic<bool> m_quit{ false };
 	Database& m_database;
 	std::unique_ptr<std::thread> m_thread;
 

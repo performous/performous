@@ -19,7 +19,7 @@
 #include <regex>
 #include <unicode/stsearch.h>
 
-Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), math_cover(), m_database(database), m_type(), m_order(config["songs/sort-order"].i()), m_dirty(false), m_loading(false) {
+Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), m_database(database), m_order(config["songs/sort-order"].i()) {
 	if (U_FAILURE(UnicodeUtil::m_icuError)) std::clog << "songs/error: Error creating Unicode collator: " << u_errorName(UnicodeUtil::m_icuError) << std::endl;
 	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
 	reload();

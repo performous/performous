@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fs.hh"
+#include <atomic>
 #include <memory>
 #include <mutex>
 #include <thread>
@@ -10,8 +11,7 @@
 class Backgrounds: boost::noncopyable {
   public:
 	/// constructor
-	Backgrounds(): m_bgiter(0), m_dirty(false), m_loading(false)
-	{
+	Backgrounds() {
 		reload();
 	}
 	~Backgrounds() {
@@ -32,11 +32,11 @@ class Backgrounds: boost::noncopyable {
   private:
 	typedef std::vector<std::string> BGVector;
 	BGVector m_bgs;
-	int m_bgiter;
+	int m_bgiter = 0;
 	void reload_internal();
 	void reload_internal(fs::path const& p);
-	std::atomic<bool> m_dirty;
-	std::atomic<bool> m_loading;
+	std::atomic<bool> m_dirty{ false };
+	std::atomic<bool> m_loading{ false };
 	std::unique_ptr<std::thread> m_thread;
 	mutable std::mutex m_mutex;
 };

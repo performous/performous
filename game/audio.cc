@@ -77,7 +77,7 @@ class AudioClock {
 	Time m_baseTime; ///< A reference time (corresponds to m_basePos)
 	Seconds m_basePos = 0.0s; ///< A reference position in song
 	double m_skew = 0.0; ///< The skew ratio applied to system time (since baseTime)
-	std::atomic<Seconds> m_max; ///< Maximum output value for the clock (end of the current audio block)
+	std::atomic<Seconds> m_max{ 0.0s }; ///< Maximum output value for the clock (end of the current audio block)
 	/// Get the current position (current time via parameter, no locking)
 	Seconds pos_internal(Time now) const {
 		Seconds t = m_basePos + (1.0 + m_skew) * (now - m_baseTime);
@@ -312,7 +312,7 @@ struct Output {
 	std::vector<Analyzer*> mics;  // Used for audio pass-through
 	std::unordered_map<std::string, std::unique_ptr<Sample>> samples;
 	std::vector<Command> commands;
-	std::atomic<bool> paused;
+	std::atomic<bool> paused{ false };
 	Output(): paused(false) {}
 
 	void callbackUpdate() {
