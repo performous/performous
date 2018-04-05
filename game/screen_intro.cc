@@ -9,13 +9,12 @@
 #include "theme.hh"
 #include "menu.hh"
 
-extern const double m_pi;
-
 ScreenIntro::ScreenIntro(std::string const& name, Audio& audio): Screen(name), m_audio(audio), m_first(true) {
 }
 
 void ScreenIntro::enter() {
 	Game::getSingletonPtr()->showLogo();
+
 	m_audio.playMusic(findFile("menu.ogg"), true);
 	m_selAnim = AnimValue(0.0, 10.0);
 	m_submenuAnim = AnimValue(0.0, 3.0);
@@ -27,10 +26,7 @@ void ScreenIntro::enter() {
 		m_first = false;
 	}
 	reloadGL();
-	webserversetting = config["game/webserver_access"].i();
-	if(webserversetting) {
 	m_audio.playSample("notice.ogg");
-	}
 }
 
 void ScreenIntro::reloadGL() {

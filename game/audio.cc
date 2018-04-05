@@ -10,8 +10,6 @@
 #include <map>
 #include <unordered_map>
 
-extern const double m_pi;
-
 namespace {
 	/**
 	 * A function to parse key=value pairs with quoting capabilites.

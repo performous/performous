@@ -7,7 +7,6 @@
 #include "glutil.hh"
 #include "i18n.hh"
 #include "log.hh"
-#include "pi.hh"
 #include "platform.hh"
 #include "profiler.hh"
 #include "screen.hh"
@@ -33,8 +32,6 @@
 #include <string>
 #include <thread>
 #include <vector>
-
-const double m_pi = boost::math::constants::pi<double>();
 
 // Disable main level exception handling for debug builds (because gdb cannot properly catch throwing otherwise)
 #ifdef NDEBUG

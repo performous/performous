@@ -5,8 +5,6 @@
 #include "engine.hh"
 #include "player.hh"
 
-extern const double m_pi;
-
 Dimensions dimensions; // Make a public member variable
 
 NoteGraph::NoteGraph(VocalTrack const& vocal):

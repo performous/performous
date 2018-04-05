@@ -16,7 +16,6 @@
 #include <sstream>
 #include <boost/format.hpp>
 
-extern const double m_pi;
 static const double IDLE_TIMEOUT = 45.0; // seconds
 
 ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Database& database):

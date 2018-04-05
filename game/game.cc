@@ -9,8 +9,6 @@
 #include <stdexcept>
 #include <cstdlib>
 
-extern const double m_pi;
-
 template<> Game* Singleton<Game>::ms_Singleton = nullptr;
 
 Game::Game(Window& _window):
