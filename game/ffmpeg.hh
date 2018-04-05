@@ -10,6 +10,7 @@
 #include <memory>
 #include <thread>
 #include <vector>
+#include <mutex>
 #include <iostream>
 
 using boost::uint8_t;
