@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <complex>
 #include <vector>
 #include <list>
@@ -63,7 +64,9 @@ public:
 private:
 	static unsigned modulo(unsigned idx) { return (SIZE + idx) % SIZE; }  ///< Modulo operation with proper rounding (handles slightly "negative" idx as well)
 	float m_buf[SIZE];
-	std::atomic<unsigned> m_read, m_write;  ///< The indices of the next read/write operations. read == write implies that buffer is empty.
+	// The indices of the next read/write operations. read == write implies that buffer is empty.
+	std::atomic<unsigned> m_read{ 0 };
+	std::atomic<unsigned> m_write{ 0 };
 };
 
 /// analyzer class
