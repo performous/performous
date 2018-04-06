@@ -465,10 +465,6 @@ struct Audio::Impl {
 				// Match found if we got here, construct a device
 				devices.emplace_back(params.in, params.out, params.rate, info.idx);
 				Device& d = devices.back();
-				// Start capture/playback on this device (likely to throw due to audio system errors)
-				// NOTE: When it throws we want to keep the device in devices to avoid calling ~Device
-				// which often would hit the Pa_CloseStream hang bug and terminate the application.
-				d.start();
 				// Assign mics for all channels of the device
 				int assigned_mics = 0;
 				for (unsigned int j = 0; j < params.in; ++j) {
@@ -492,6 +488,10 @@ struct Audio::Impl {
 				if (assigned_mics) std::clog << ", input channels: " << assigned_mics;
 				if (params.out) std::clog << ", output channels: " << params.out;
 				std::clog << std::endl;
+				// Start capture/playback on this device (likely to throw due to audio system errors)
+				// NOTE: When it throws we want to keep the device in devices to avoid calling ~Device
+				// which often would hit the Pa_CloseStream hang bug and terminate the application.
+				d.start();
 			} catch(std::runtime_error& e) {
 				std::clog << "audio/error: Audio device '" << *it << "': " << e.what() << std::endl;
 			}
