@@ -279,7 +279,7 @@ struct Synth {
 		for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
 			if (i % 2 == 0) {
 				value = d * 0.2 * std::sin(phase) + 0.2 * std::sin(2 * phase) + (1.0 - d) * 0.2 * std::sin(4 * phase);
-				phase += 2.0 * m_pi * freq / srate;
+				phase += TAU * freq / srate;
 			}
 			begin[i] += value;
 		}
