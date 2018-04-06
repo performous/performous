@@ -64,7 +64,6 @@ void ScreenSongs::exit() {
 	m_songbg_default.reset();
 	m_songbg_ground.reset();
 	m_playing.clear();
-	writeConfig(m_audio, false);
 }
 
 /// Implement left/right on menu
