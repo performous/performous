@@ -267,10 +267,6 @@ struct Controllers::Impl {
 	void enableEvents(bool state) {
 		m_eventsEnabled = state;
 		Hardware::enableKeyboardInstruments(state);
-		if (!state) {
-			m_orphans.clear();
-			m_devices.clear();
-		}
 	}
 	/// Do internal event processing (poll for MIDI events etc)
 	void process(Time now) {
@@ -377,7 +373,7 @@ struct Controllers::Impl {
 			// Emit Event and construct a new Device first if needed
 			DevicePtr ptr = m_devices[ev.source].lock();
 			if (!ptr) {
-				ptr = std::make_unique<Device>(ev.source, ev.devType);
+				ptr = std::make_shared<Device>(ev.source, ev.devType);
 				m_orphans[ev.source] = ptr;
 				m_devices[ev.source] = ptr;
 			}
