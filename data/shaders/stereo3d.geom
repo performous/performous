@@ -1,4 +1,4 @@
-#version 330
+#version 330 core
 #extension GL_ARB_viewport_array : require
 
 uniform float sepFactor;
@@ -12,7 +12,6 @@ in vec2 vTexCoord[];
 in vec3 vNormal[];
 in vec4 vColor[];
 
-out float bogus;  // Workaround for http://www.nvnews.net/vbulletin/showthread.php?p=2401097
 out vec3 lightDir;
 out vec2 texCoord;
 out vec3 normal;
@@ -32,7 +31,6 @@ void passthru() {
 #define PROCESS(code) i = 0; do { passthru(); code; EmitVertex(); } while (++i < 3); EndPrimitive();
 
 void main() {
-	bogus = 0.0;
 	if (sepFactor == 0.0) {
 		gl_ViewportIndex = 0; PROCESS(;); // No stereo
 	} else {
