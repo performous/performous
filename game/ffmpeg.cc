@@ -154,7 +154,7 @@ void FFmpeg::operator()() {
 			decodePacket();
 			errors = 0;
 		} catch (eof_error&) {
-			videoQueue.push(new Bitmap()); // EOF marker
+			videoQueue.push(Bitmap()); // EOF marker
 			eof = true;
 			std::clog << "ffmpeg/debug: done loading " << m_filename << std::endl;
 		} catch (std::exception& e) {
@@ -299,16 +299,16 @@ void FFmpeg::processVideo(AVFrame* frame) {
 	// Convert into RGB and scale the data
 	int w = (m_codecContext->width+15)&~15;
 	int h = m_codecContext->height;
-	auto bitmap = new Bitmap();
-	bitmap->timestamp = m_position;
-	bitmap->fmt = pix::RGB;
-	bitmap->resize(w, h);
+	Bitmap f;
+	f.timestamp = m_position;
+	f.fmt = pix::RGB;
+	f.resize(w, h);
 	{
-		uint8_t* data = bitmap->data();
+		uint8_t* data = f.data();
 		int linesize = w * 3;
 		sws_scale(m_swsContext, frame->data, frame->linesize, 0, h, &data, &linesize);
 	}
-	videoQueue.push(bitmap);  // Takes ownership and may block until there is space
+	videoQueue.push(std::move(f));  // Takes ownership and may block until there is space
 }
 
 void FFmpeg::processAudio(AVFrame* frame) {
