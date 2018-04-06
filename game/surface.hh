@@ -148,14 +148,17 @@ class UseTexture: boost::noncopyable {
 };
 
 template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex) const {
+	glutil::GLErrorChecker glerror("OpenGLTexture::draw()");
 	glutil::VertexArray va;
 
 	UseTexture texture(*this);
+	glerror.check("texture");
 
 	// The texture wraps over at the edges (repeat)
 	const bool repeating = tex.outOfBounds();
-	glTexParameterf(type(), GL_TEXTURE_WRAP_S, repeating ? GL_REPEAT : GL_CLAMP);
-	glTexParameterf(type(), GL_TEXTURE_WRAP_T, repeating ? GL_REPEAT : GL_CLAMP);
+	glTexParameterf(type(), GL_TEXTURE_WRAP_S, repeating ? GL_REPEAT : GL_CLAMP_TO_EDGE);
+	glTexParameterf(type(), GL_TEXTURE_WRAP_T, repeating ? GL_REPEAT : GL_CLAMP_TO_EDGE);
+	glerror.check("repeat mode");
 
 	va.texCoord(tex.x1, tex.y1).vertex(dim.x1(), dim.y1());
 	va.texCoord(tex.x2, tex.y1).vertex(dim.x2(), dim.y1());

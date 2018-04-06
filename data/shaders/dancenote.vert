@@ -1,4 +1,4 @@
-#version 120
+#version 330 core
 
 uniform mat4 projMatrix;
 uniform mat4 mvMatrix;
@@ -9,22 +9,22 @@ uniform float clock;
 uniform float scale;
 uniform vec2 position;
 
-attribute vec3 vertPos;
-attribute vec2 vertTexCoord;
-attribute vec3 vertNormal;
-attribute vec4 vertColor;
+in vec3 vertPos;
+in vec2 vertTexCoord;
+in vec3 vertNormal;
+in vec4 vertColor;
 
 // Per-vextex for fragment shader (if no geometry shader)
-varying vec2 texCoord;
-varying vec3 lightDir;
-varying vec3 vLightDir;
-varying vec3 normal;
-varying vec4 color;
+out vec2 texCoord;
+out vec3 lightDir;
+out vec3 vLightDir;
+out vec3 normal;
+out vec4 color;
 
 // Per-vertex for geometry shader (if one exists)
-varying vec2 vTexCoord;
-varying vec3 vNormal;
-varying vec4 vColor;
+out vec2 vTexCoord;
+out vec3 vNormal;
+out vec4 vColor;
 
 mat4 scaleMat(in float sc) {
 	return mat4(sc,  0,  0,  0,
