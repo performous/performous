@@ -1,28 +1,27 @@
 #pragma once
 
+#include "chrono.hh"
 #include "surface.hh"
 #include "util.hh"
 #include "libda/sample.hpp"
 #include <boost/circular_buffer.hpp>
-#include <boost/ptr_container/ptr_deque.hpp>
 #include <atomic>
 #include <condition_variable>
+#include <cstdint>
+#include <future>
+#include <deque>
+#include <iostream>
 #include <memory>
+#include <mutex>
 #include <thread>
 #include <vector>
-#include <mutex>
-#include <iostream>
-
-using boost::uint8_t;
-using boost::int16_t;
-using boost::int64_t;
 
 /// single audio frame
 struct AudioFrame {
 	/// timestamp of audio frame
 	double timestamp;
 	/// audio data
-	std::vector<int16_t> data;
+	std::vector<std::int16_t> data;
 	/// constructor
 	template <typename InIt> AudioFrame(double ts, InIt begin, InIt end): timestamp(ts), data(begin, end) {}
 	AudioFrame(): timestamp(getInf()) {} // EOF marker
@@ -36,19 +35,19 @@ class VideoFifo {
 	bool tryPop(Bitmap& f) {
 		std::unique_lock<std::mutex> l(m_mutex);
 		if (m_queue.empty()) return false; // Nothing to deliver
-		if (m_queue.begin()->buf.empty()) { m_eof = true; return false; }
-		f.swap(*m_queue.begin());
+		if (m_queue.front().buf.empty()) { m_eof = true; return false; }
+		f = std::move(m_queue.front());
 		m_queue.pop_front();
 		m_cond.notify_all();
 		m_timestamp = f.timestamp;
 		return true;
 	}
 	/// Add frame to queue
-	void push(Bitmap* f) {
+	void push(Bitmap&& f) {
 		std::unique_lock<std::mutex> l(m_mutex);
 		m_cond.wait(l, [this]{ return m_queue.size() < m_max; });
-		if (m_queue.empty()) m_timestamp = f->timestamp;
-		m_queue.push_back(f);
+		if (m_queue.empty()) m_timestamp = f.timestamp;
+		m_queue.emplace_back(std::move(f));
 	}
 	/// Clear and unlock the queue
 	void reset() {
@@ -63,7 +62,7 @@ class VideoFifo {
 	double eof() const { return m_eof; }
 
   private:
-	boost::ptr_deque<Bitmap> m_queue;
+	std::deque<Bitmap> m_queue;
 	mutable std::mutex m_mutex;
 	std::condition_variable m_cond;
 	double m_timestamp;
@@ -92,7 +91,7 @@ class AudioBuffer {
 	void setSamplesPerSecond(unsigned sps) { m_sps = sps; }
 	/// get samples per second
 	unsigned getSamplesPerSecond() const { return m_sps; }
-	void push(std::vector<int16_t> const& data, double timestamp) {
+	void push(std::vector<std::int16_t> const& data, double timestamp) {
 		std::unique_lock<mutex> l(m_mutex);
 		m_cond.wait(l, [this]{ return condition(); });
 		if (m_quit) return;
@@ -108,7 +107,7 @@ class AudioBuffer {
 		m_data.insert(m_data.end(), data.begin(), data.end());
 		m_pos += data.size();
 	}
-	bool prepare(int64_t pos) {
+	bool prepare(std::int64_t pos) {
 		std::unique_lock<mutex> l(m_mutex, std::try_to_lock);
 		if (!l.owns_lock()) return false;  // Didn't get lock, give up for now
 		if (eof(pos)) return true;
@@ -118,18 +117,18 @@ class AudioBuffer {
 		// Has enough been prebuffered already and is the requested position still within buffer
 		return m_pos > m_posReq + m_data.capacity() / 16 && m_pos <= m_posReq + m_data.size();
 	}
-	bool operator()(float* begin, float* end, int64_t pos, float volume = 1.0f) {
+	bool operator()(float* begin, float* end, std::int64_t pos, float volume = 1.0f) {
 		std::unique_lock<mutex> l(m_mutex);
 		size_t idx = pos + m_data.size() - m_pos;
 		size_t samples = end - begin;
 		for (size_t s = 0; s < samples; ++s, ++idx) {
 			if (idx < m_data.size()) begin[s] += volume * da::conv_from_s16(m_data[idx]);
 		}
-		m_posReq = std::max<int64_t>(0, pos + samples);
+		m_posReq = std::max<std::int64_t>(0, pos + samples);
 		wakeups();
 		return !eof(pos);
 	}
-	bool eof(int64_t pos) const { return double(pos) / m_sps >= m_duration; }
+	bool eof(std::int64_t pos) const { return double(pos) / m_sps >= m_duration; }
 	void setEof() { m_duration = double(m_pos) / m_sps; }
 	double duration() const { return m_duration; }
 	void setDuration(double seconds) { m_duration = seconds; }
@@ -148,9 +147,9 @@ class AudioBuffer {
 	bool condition() { return m_quit.load() || wantMore() || wantSeek(); }
 	mutable mutex m_mutex;
 	std::condition_variable_any m_cond;
-	boost::circular_buffer<int16_t> m_data;
+	boost::circular_buffer<std::int16_t> m_data;
 	size_t m_pos = 0;
-	int64_t m_posReq = 0;
+	std::int64_t m_posReq = 0;
 	unsigned m_sps = 0;
 	double m_duration = getNaN();
 	std::atomic<bool> m_quit{ false };
@@ -182,7 +181,7 @@ class FFmpeg {
 	void seek(double time, bool wait = true);
 	/// duration
 	double duration() const;
-	bool terminating() const { return m_quit; }
+	bool terminating() { return m_quit_future.wait_for(0s) == std::future_status::ready; }
 
 	class eof_error: public std::exception {};
   private:
@@ -193,7 +192,8 @@ class FFmpeg {
 	void processAudio(AVFrame* frame);
 	fs::path m_filename;
 	unsigned int m_rate = 0;
-	std::atomic<bool> m_quit{ false };
+	std::promise<void> m_quit;
+	std::future<void> m_quit_future = m_quit.get_future();
 	std::atomic<double> m_seekTarget{ getNaN() };
 	double m_position = 0.0;
 	double m_duration = 0.0;

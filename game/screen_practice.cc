@@ -65,7 +65,7 @@ void ScreenPractice::draw() {
 void ScreenPractice::draw_analyzers() {
 	theme->note.dimensions.fixedHeight(0.03f);
 	theme->sharp.dimensions.fixedHeight(0.09f);
-	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
+	auto& analyzers = m_audio.analyzers();
 	if (analyzers.empty()) return;
 	MusicalScale scale;
 	double textPower = -getInf();

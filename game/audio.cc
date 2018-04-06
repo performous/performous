@@ -2,18 +2,13 @@
 
 #include "chrono.hh"
 #include "configuration.hh"
-#include "libda/portaudio.hpp"
 #include "util.hh"
-#include <boost/ptr_container/ptr_map.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
-#include <boost/range/iterator_range.hpp>
+#include "libda/portaudio.hpp"
 #include <cmath>
 #include <future>
 #include <iostream>
 #include <map>
 #include <unordered_map>
-
-extern const double m_pi;
 
 namespace {
 	/**
@@ -132,24 +127,22 @@ public:
 class Music {
 	struct Track {
 		FFmpeg mpeg;
-		float fadeLevel;
-		float pitchFactor;
-		Track(fs::path const& filename, unsigned int sr): mpeg(filename, sr), fadeLevel(1.0f), pitchFactor(0.0f) {}
+		float fadeLevel = 1.0f;
+		float pitchFactor = 0.0f;
+		template <typename... Args> Track(Args&&... args): mpeg(args...) {}
 	};
 	std::unordered_map<std::string, std::unique_ptr<Track>> tracks; ///< Audio decoders
 	double srate; ///< Sample rate
-	int64_t m_pos; ///< Current sample position
+	int64_t m_pos = 0; ///< Current sample position
 	bool m_preview;
 	AudioClock m_clock;
 	Seconds durationOf(int64_t samples) const { return 1.0s * samples / srate / 2.0; }
 public:
-	bool suppressCenterChannel;
-	double fadeLevel;
-	double fadeRate;
-	typedef std::vector<float> Buffer;
-	Music(Audio::Files const& files, unsigned int sr, bool preview):
-	  srate(sr), m_pos(), m_preview(preview), fadeLevel(), fadeRate()
-	{
+	bool suppressCenterChannel = false;
+	double fadeLevel = 0.0;
+	double fadeRate = 0.0;
+	using Buffer = std::vector<float>;
+	Music(Audio::Files const& files, unsigned int sr, bool preview): srate(sr), m_preview(preview) {
 		for (auto const& tf /* trackname-filename pair */: files) {
 			if (tf.second.empty()) continue; // Skip tracks with no filenames; FIXME: Why do we even have those here, shouldn't they be eliminated earlier?
 			tracks.emplace(tf.first, std::make_unique<Track>(tf.second, sr));
@@ -162,9 +155,9 @@ public:
 		size_t samples = end - begin;
 		m_clock.timeSync(durationOf(m_pos), durationOf(samples)); // Keep the clock synced
 		bool eof = true;
-		Buffer mixbuf(end - begin);
-		for (auto it = tracks.begin(); it != tracks.end(); ++it) {
-			Track& t = *it->second;
+		Buffer mixbuf(samples);
+		for (auto& kv: tracks) {
+			Track& t = *kv.second;
 // FIXME: Include this code bit once there is a sane pitch shifting algorithm
 #if 0
 //			if (it->first == "guitar") std::cout << t.pitchFactor << std::endl;
@@ -209,16 +202,14 @@ public:
 	double pos() const { return m_clock.pos().count(); }
 	double duration() const {
 		double dur = 0.0;
-		for (auto it = tracks.begin(); it != tracks.end(); ++it) {
-			dur = std::max(dur, it->second->mpeg.audioQueue.duration());
-		}
+		for (auto& kv: tracks) dur = std::max(dur, kv.second->mpeg.audioQueue.duration());
 		return dur;
 	}
 	/// Prepare (seek) all tracks to current position, return true when done (nonblocking)
 	bool prepare() {
 		bool ready = true;
-		for (auto it = tracks.begin(); it != tracks.end(); ++it) {
-			FFmpeg& mpeg = it->second->mpeg;
+		for (auto& kv: tracks) {
+			FFmpeg& mpeg = kv.second->mpeg;
 			if (mpeg.terminating()) continue;  // Song loading failed or other error, won't ever get ready
 			if (mpeg.audioQueue.prepare(m_pos)) continue;  // Buffering done
 			ready = false;  // Need to wait for buffering
@@ -288,7 +279,7 @@ struct Synth {
 		for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
 			if (i % 2 == 0) {
 				value = d * 0.2 * std::sin(phase) + 0.2 * std::sin(2 * phase) + (1.0 - d) * 0.2 * std::sin(4 * phase);
-				phase += 2.0 * m_pi * freq / srate;
+				phase += TAU * freq / srate;
 			}
 			begin[i] += value;
 		}
@@ -319,7 +310,8 @@ struct Output {
 		std::unique_lock<std::mutex> l(mutex, std::try_to_lock);
 		if (!l.owns_lock()) return;  // No update now, try again later (cannot stop and wait for mutex to be released)
 		// Move from preloading to playing, if ready
-		if (preloading.get() && preloading->prepare()) {
+		if (preloading && preloading->prepare()) {
+			std::clog << "audio/debug: preload done -> playing " << preloading.get() << std::endl;
 			if (!playing.empty()) playing[0]->fadeRate = -preloading->fadeRate;  // Fade out the old music
 			playing.insert(playing.begin(), std::move(preloading));
 		}
@@ -425,8 +417,8 @@ int Device::operator()(void const* input, void* output, unsigned long frames, co
 struct Audio::Impl {
 	Output output;
 	portaudio::Init init;
-	boost::ptr_vector<Analyzer> analyzers;
-	boost::ptr_vector<Device> devices;
+	std::deque<Analyzer> analyzers;
+	std::deque<Device> devices;
 	bool playback = false;
 	std::string selectedBackend = Audio::backendConfig().getValue();
 	Impl() {
@@ -471,12 +463,8 @@ struct Audio::Impl {
 				if (info.in < int(params.mics.size())) throw std::runtime_error("Device doesn't have enough input channels");
 				if (info.out < int(params.out)) throw std::runtime_error("Device doesn't have enough output channels");
 				// Match found if we got here, construct a device
-				auto d = new Device(params.in, params.out, params.rate, info.idx);
-				devices.push_back(d);
-				// Start capture/playback on this device (likely to throw due to audio system errors)
-				// NOTE: When it throws we want to keep the device in devices to avoid calling ~Device
-				// which often would hit the Pa_CloseStream hang bug and terminate the application.
-				d->start();
+				devices.emplace_back(params.in, params.out, params.rate, info.idx);
+				Device& d = devices.back();
 				// Assign mics for all channels of the device
 				int assigned_mics = 0;
 				for (unsigned int j = 0; j < params.in; ++j) {
@@ -490,17 +478,20 @@ struct Audio::Impl {
 					}
 					if (mic_used) continue;
 					// Add the new analyzer
-					Analyzer* a = new Analyzer(d->rate, m);
-					analyzers.push_back(a);
-					d->mics[j] = a;
+					analyzers.emplace_back(d.rate, m);
+					d.mics[j] = &analyzers.back();
 					++assigned_mics;
 				}
 				// Assign playback output for the first available stereo output
-				if (!playback && d->out == 2) { d->outptr = &output; playback = true; }
+				if (!playback && d.out == 2) { d.outptr = &output; playback = true; }
 				std::clog << "audio/info: Using audio device: " << info.desc();
 				if (assigned_mics) std::clog << ", input channels: " << assigned_mics;
 				if (params.out) std::clog << ", output channels: " << params.out;
 				std::clog << std::endl;
+				// Start capture/playback on this device (likely to throw due to audio system errors)
+				// NOTE: When it throws we want to keep the device in devices to avoid calling ~Device
+				// which often would hit the Pa_CloseStream hang bug and terminate the application.
+				d.start();
 			} catch(std::runtime_error& e) {
 				std::clog << "audio/error: Audio device '" << *it << "': " << e.what() << std::endl;
 			}
@@ -513,9 +504,7 @@ struct Audio::Impl {
 		// stop all audio streams befor destoying the object.
 		// else portaudio will keep sending data to those destroyed
 		// objects.
-		for (auto device: devices) {
-			device.stop();
-		}
+		for (auto& device: devices) device.stop();
 	}
 };
 
@@ -565,12 +554,19 @@ void Audio::unloadSample(std::string const& streamId) {
 
 void Audio::playMusic(Audio::Files const& filenames, bool preview, double fadeTime, double startPos) {
 	Output& o = self->output;
+	auto m = std::make_unique<Music>(filenames, getSR(), preview);
+	m->seek(startPos);
+	m->fadeRate = 1.0 / getSR() / fadeTime;
+	// Format debug message
+	std::string logmsg = "audio/debug: playMusic(";
+	for (auto& kv: filenames) logmsg += kv.first + "=" + kv.second.filename().string() + ", ";
+	logmsg += ") -> ";
+	std::clog << logmsg << m.get() << std::endl;
+	// Send to audio playback thread
 	std::lock_guard<std::mutex> l(o.mutex);
+	if (o.preloading) std::clog << "audio/debug: earlier music still preloading, disposing " << o.preloading.get() << std::endl;
+	o.preloading = std::move(m);
 	o.disposing.clear();  // Delete disposed streams
-	o.preloading = std::make_unique<Music>(filenames, getSR(), preview);
-	Music& m = *o.preloading.get();
-	m.seek(startPos);
-	m.fadeRate = 1.0 / getSR() / fadeTime;
 	o.commands.clear();  // Remove old unprocessed commands (they should not apply to the new music)
 }
 
@@ -615,7 +611,7 @@ double Audio::getLength() const {
 bool Audio::isPlaying() const {
 	Output& o = self->output;
 	std::lock_guard<std::mutex> l(o.mutex);
-	return o.preloading.get() || !o.playing.empty();
+	return o.preloading || !o.playing.empty();
 }
 
 void Audio::seek(double offset) {
@@ -664,6 +660,5 @@ void Audio::toggleCenterChannelSuppressor() {
 	}
 }
 
-boost::ptr_vector<Analyzer>& Audio::analyzers() { return self->analyzers; }
-
-boost::ptr_vector<Device>& Audio::devices() { return self->devices; }
+std::deque<Analyzer>& Audio::analyzers() { return self->analyzers; }
+std::deque<Device>& Audio::devices() { return self->devices; }

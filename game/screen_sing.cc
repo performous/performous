@@ -114,7 +114,7 @@ void ScreenSing::setupVocals() {
 	if (!m_song->vocalTracks.empty()) {
 		m_layout_singer.clear();
 		Engine::VocalTrackPtrs selectedTracks;
-		boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
+		auto& analyzers = m_audio.analyzers();
 		//size_t players = (analyzers.empty() ? 1 : analyzers.size());  // Always at least 1; should be number of mics
 		std::set<VocalTrack*> shownTracks;  // Tracks to be included in layout_singer (stored by name for proper sorting and merging duplicates)
 		for (size_t player = 0; player < players(); ++player) {
@@ -623,7 +623,7 @@ void ScreenSing::drawMenu() {
 	// Loop through menu items
 	w = 0;
 	std::size_t player = 0;
-	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
+	auto& analyzers = m_audio.analyzers();
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it) {
 		// Pick the font object
 		SvgTxtTheme* txt = &th.option_selected;

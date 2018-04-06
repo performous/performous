@@ -5,6 +5,7 @@
 #include <cmath>
 #include <iostream>
 #include <iomanip>
+#include <stdexcept>
 
 // Limit the range to avoid noise and useless computation
 static const double FFT_MINFREQ = 45.0;
@@ -44,7 +45,7 @@ Analyzer::Analyzer(double rate, std::string id, std::size_t step):
 	if (m_step > FFT_N) throw std::logic_error("Analyzer step is larger that FFT_N (ideally it should be less than a fourth of FFT_N).");
 	// Hamming window
 	for (size_t i=0; i < FFT_N; i++) {
-		m_window[i] = 0.53836 - 0.46164 * std::cos(2.0 * m_pi * i / (FFT_N - 1));
+		m_window[i] = 0.53836 - 0.46164 * std::cos(TAU * i / (FFT_N - 1));
 	}
 }
 
@@ -123,7 +124,7 @@ bool Analyzer::calcFFT() {
 void Analyzer::calcTones() {
 	// Precalculated constants
 	const double freqPerBin = m_rate / FFT_N;
-	const double phaseStep = 2.0 * m_pi * m_step / FFT_N;
+	const double phaseStep = TAU * m_step / FFT_N;
 	const double normCoeff = 1.0 / FFT_N;
 	const double minMagnitude = pow(10, -100.0 / 20.0) / normCoeff; // -100 dB
 	// Limit frequency range of processing
@@ -137,7 +138,7 @@ void Analyzer::calcTones() {
 		double delta = phase - m_fftLastPhase[k];
 		m_fftLastPhase[k] = phase;
 		delta -= k * phaseStep;  // subtract expected phase difference
-		delta = remainder(delta, 2.0 * m_pi);  // map delta phase into +/- m_pi interval
+		delta = std::remainder(delta, TAU);  // map delta phase into +/- pi interval
 		delta /= phaseStep;  // calculate diff from bin center frequency
 		double freq = (k + delta) * freqPerBin;  // calculate the true frequency
 		if (freq > 1.0 && magnitude > minMagnitude) {

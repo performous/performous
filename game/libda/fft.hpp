@@ -9,11 +9,10 @@
 #include <cstddef>
 #include <vector>
 
-extern const double m_pi;
-
-const double m_tau = (2.0 * m_pi);
 
 namespace da {
+
+	constexpr double TAU = 2.0 * 3.141592653589793238462643383279502884;
 
 	// With g++ optimization -fcx-limited-range should be used for 5x performance boost.
 	
@@ -32,7 +31,7 @@ namespace da {
 				const std::complex<T> temp = data[i + M] * w;
 				data[M + i] = data[i] - temp;
 				data[i] += temp;
-				w *= std::polar<T>(1.0, -m_tau / N);
+				w *= std::polar<T>(1.0, - TAU / N);
 			}
 		}
 	};

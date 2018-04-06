@@ -12,7 +12,7 @@ const double Engine::TIMESTEP = 0.01;
 Engine::Engine(Audio& audio, VocalTrackPtrs vocals, Database& database):
   m_audio(audio), m_time(), m_quit(), m_database(database)
 {
-	boost::ptr_vector<Analyzer>& analyzers = m_audio.analyzers();
+	auto& analyzers = m_audio.analyzers();
 	if (analyzers.size() != vocals.size()) throw std::logic_error("Engine requires the same number of vocal tracks as there are analyzers.");
 	// Clear old player information
 	m_database.cur.clear();

@@ -1,5 +1,4 @@
 #include "util.hh"
-#include <string>
 
 // Only conversion types used in Performous are provided
 template <> int sconv(std::string const& s) { return std::stoi(s); }
