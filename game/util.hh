@@ -3,7 +3,6 @@
 #include <cstdint>
 #include <limits>
 #include <vector>
-#include <stdexcept>
 
 constexpr double TAU = 2.0 * 3.141592653589793238462643383279502884;  // https://tauday.com/tau-manifesto
 
@@ -12,10 +11,7 @@ template <typename T> T sconv(std::string const& s);
 
 /** Limit val to range [min, max] **/
 template <typename T> constexpr T clamp(T val, T min = 0, T max = 1) {
-	if (min > max) throw std::logic_error("min > max");
-	if (val < min) return min;
-	if (val > max) return max;
-	return val;
+	return (val < min) ? min : (val > max) ? max : val;
 }
 
 template <typename Numeric> struct MinMax {
