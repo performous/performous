@@ -5,6 +5,7 @@
 #include <cmath>
 #include <iostream>
 #include <iomanip>
+#include <stdexcept>
 
 // Limit the range to avoid noise and useless computation
 static const double FFT_MINFREQ = 45.0;
