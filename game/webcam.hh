@@ -15,7 +15,7 @@ namespace cv {
 struct CamFrame {
 	int width = 0;
 	int height = 0;
-	std::vector<boost::uint8_t> data;
+	std::vector<std::uint8_t> data;
 };
 
 class Webcam {
