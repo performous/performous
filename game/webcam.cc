@@ -2,6 +2,7 @@
 
 #include "chrono.hh"
 #include "fs.hh"
+#include <cstdint>
 #include <iostream>
 #include <stdexcept>
 #include <thread>
