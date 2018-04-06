@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <limits>
+#include <string>
 #include <vector>
 
 constexpr double TAU = 2.0 * 3.141592653589793238462643383279502884;  // https://tauday.com/tau-manifesto
