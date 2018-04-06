@@ -28,10 +28,10 @@ static inline constexpr double getNaN() { return std::numeric_limits<double>::qu
 static inline constexpr double getInf() { return std::numeric_limits<double>::infinity(); }
 
 /** OpenGL smoothstep function **/
-template <typename T> constexpr T smoothstep(T edge0, T edge1, T x) {
+template <typename T> T smoothstep(T edge0, T edge1, T x) {
 	x = clamp((x - edge0) / (edge1 - edge0));
 	return x * x * (3 - 2 * x);
 }
 
 /** Convenience smoothstep wrapper with edges at 0 and 1 **/
-template <typename T> constexpr T smoothstep(T x) { return smoothstep<T>(0, 1, x); }
+template <typename T> T smoothstep(T x) { return smoothstep<T>(0, 1, x); }
