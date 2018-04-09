@@ -136,7 +136,9 @@ struct Controllers::Impl {
 	std::map<UniqueButton, double> m_values;
 
 	std::map<NavButton, NavEvent> m_navRepeat;
-	
+
+	Time m_prevProcess{};
+
 	Impl(): m_eventsEnabled() {
 		#define DEFINE_BUTTON(devtype, button, num, nav) m_buttons[DEVTYPE_##devtype][#button] = devtype##_##button;
 		#include "controllers-buttons.ii"
@@ -278,6 +280,12 @@ struct Controllers::Impl {
 				pushHWEvent(event);
 			}
 		}
+		// Reset all key repeat timers if there is a latency spike
+		if (now - m_prevProcess > 50ms) {
+			for (auto& kv: m_navRepeat) kv.second.time = now;
+		}
+		m_prevProcess = now;
+		// Spawn key repeat events when holding buttons
 		for (auto& kv: m_navRepeat) {
 			NavEvent& ne = kv.second;
 			Seconds delay(2.0 / (10 + ne.repeat));
