@@ -55,7 +55,7 @@ public:
 	void blank();
 	/// swaps buffers
 	void swap();
-	void sizeChanged() { m_needResize = true; }  ///< Handle window size changed event
+	void event();  ///< Handle window events
 	void resize();	/// Resize window (contents) / toggle full screen according to config. Returns true if resized.
 	/// take a screenshot
 	void screenshot();
@@ -80,6 +80,8 @@ private:
 	bool m_fullscreen;
 	bool m_needResize = true;
 	bool m_needReload = true;
+	int m_windowX = 0;
+	int m_windowY = 0;
 	typedef boost::ptr_map<std::string, Shader> ShaderMap;
 	ShaderMap m_shaders; ///< Shader programs by name
 	SDL_Window* screen = nullptr;

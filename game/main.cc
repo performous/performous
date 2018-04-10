@@ -77,13 +77,7 @@ static void checkEvents(Game& gm, Time eventTime) {
 		// Let the navigation system grab any and all SDL events
 		gm.controllers.pushEvent(event, eventTime);
 		auto type = event.type;
-		if (type == SDL_WINDOWEVENT) {
-			auto t = event.window.event;
-			// Note: Full screen toggle via MacOS green titlebar button sends MAXIMIZED and MOVED but no RESTORED
-			if (t == SDL_WINDOWEVENT_MAXIMIZED && Platform::currentOS() == Platform::macos) config["graphic/fullscreen"].b() = true;
-			if (t == SDL_WINDOWEVENT_MOVED && event.window.data1 != 0) config["graphic/fullscreen"].b() = false;
-			if (t == SDL_WINDOWEVENT_RESIZED) window.sizeChanged();
-		}
+		if (type == SDL_WINDOWEVENT) window.event();
 		if (type == SDL_QUIT) gm.finished();
 		if (type == SDL_KEYDOWN) {
 			auto key  = event.key.keysym.scancode;
