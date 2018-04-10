@@ -6,20 +6,18 @@ out vec4 fragColor;
 
 uniform mat4 colorMatrix;
 
-in vec3 normal;
-in vec4 color;
+struct vData {
+	vec3 lightDir;
+	vec2 texCoord;
+	vec3 normal;
+	vec4 color;
+};
 
-#ifdef ENABLE_LIGHTING
-in vec3 lightDir;
-#endif
-
-#if defined(ENABLE_TEXTURING) || defined(ENABLE_SPECULAR_MAP) || defined(ENABLE_EMISSION_MAP)
-in vec2 texCoord;
-#endif
+in vData fragv;
 
 #ifdef ENABLE_TEXTURING
 uniform sampler2D tex;
-#define TEXFUNC texture(tex, texCoord)
+#define TEXFUNC texture(tex, fragv.texCoord)
 #else
 #define TEXFUNC vec4(1,1,1,1)
 #endif
@@ -36,16 +34,16 @@ void main() {
 	vec4 frag = TEXFUNC;
 
 #ifdef ENABLE_VERTEX_COLOR
-	frag *= color;
+	frag *= fragv.color;
 #endif
 
 #ifdef ENABLE_LIGHTING
-	vec3 n = normalize(normal);
-	vec3 l = normalize(lightDir);
+	vec3 n = normalize(fragv.normal);
+	vec3 l = normalize(fragv.lightDir);
 
 	// Diffuse
 	float diff = max(dot(n, l), 0.0);
-	float power = 1.0 - 0.02 * length(lightDir);
+	float power = 1.0 - 0.02 * length(fragv.lightDir);
 	frag = vec4(frag.rgb * power * diff, frag.a);
 #endif
 
@@ -58,7 +56,7 @@ void main() {
 	if (power > 0.0) {
 		power *= pow(spec, 100);
 		#ifdef ENABLE_SPECULAR_MAP
-		power *= texture(specularTex, texCoord);
+		power *= texture(specularTex, fragv.texCoord);
 		#endif
 		frag.rgb += vec3(power, power, power);
 	}

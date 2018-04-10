@@ -7,30 +7,26 @@ uniform float z0;
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 6) out;
 
-in vec3 vLightDir[];
-in vec2 vTexCoord[];
-in vec3 vNormal[];
-in vec4 vColor[];
+struct vData {
+	vec3 lightDir;
+	vec2 texCoord;
+	vec3 normal;
+	vec4 color;
+};
 
-out vec3 lightDir;
-out vec2 texCoord;
-out vec3 normal;
-out vec4 color;
+in vData vertex[];
+out vData fragv;
 
-int i;
-
-void passthru() {
+void passthru(int i) {
 	gl_Position = gl_in[i].gl_Position;
-	lightDir = vLightDir[i];
-	texCoord = vTexCoord[i];
-	normal = vNormal[i];
-	color = vColor[i];
+	fragv = vertex[i];
 }
 
 // Process all the vertices, applying code to them before emitting (do-while to convince Nvidia of the code getting executed)
-#define PROCESS(code) i = 0; do { passthru(); code; EmitVertex(); } while (++i < 3); EndPrimitive();
+#define PROCESS(code) i = 0; do { passthru(i); code; EmitVertex(); } while (++i < 3); EndPrimitive();
 
 void main() {
+	int i = 0;
 	if (sepFactor == 0.0) {
 		gl_ViewportIndex = 0; PROCESS(;); // No stereo
 	} else {

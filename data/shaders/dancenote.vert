@@ -14,17 +14,14 @@ in vec2 vertTexCoord;
 in vec3 vertNormal;
 in vec4 vertColor;
 
-// Per-vextex for fragment shader (if no geometry shader)
-out vec2 texCoord;
-out vec3 lightDir;
-out vec3 vLightDir;
-out vec3 normal;
-out vec4 color;
+struct vData {
+	vec3 lightDir;
+	vec2 texCoord;
+	vec3 normal;
+	vec4 color;
+};
 
-// Per-vertex for geometry shader (if one exists)
-out vec2 vTexCoord;
-out vec3 vNormal;
-out vec4 vColor;
+out vData vertex;
 
 mat4 scaleMat(in float sc) {
 	return mat4(sc,  0,  0,  0,
@@ -43,10 +40,10 @@ mat4 rotMat(in float ang) {
 }
 
 void main() {
-	vTexCoord = texCoord = vertTexCoord;
-	vNormal = normal = normalMatrix * vertNormal;
-	vColor = color = vertColor;
-	vLightDir = lightDir;
+	vertex.texCoord = vertTexCoord;
+	vertex.normal = normalMatrix * vertNormal;
+	vertex.color = vertColor;
+	vertex.lightDir = vec3(1,0,0);
 
 	mat4 trans = scaleMat(scale);
 
@@ -71,11 +68,11 @@ void main() {
 
 	// Glow color for regular arrows or holds
 	if (noteType == 1 || noteType == 2) {
-		vColor = color = vec4(
-		  min(color.r + hitAnim *.5, 1.0),
-		  min(color.g + hitAnim *.5, 1.0),
-		  min(color.b + hitAnim *.5, 1.0),
-		  max(color.a - hitAnim, 0.0)
+		vertex.color = vec4(
+		  min(vertColor.r + hitAnim *.5, 1.0),
+		  min(vertColor.g + hitAnim *.5, 1.0),
+		  min(vertColor.b + hitAnim *.5, 1.0),
+		  max(vertColor.a - hitAnim, 0.0)
 		);
 	}
 

@@ -11,14 +11,14 @@ in vec2 vertTexCoord;
 in vec3 vertNormal;
 in vec4 vertColor;
 
-out vec3 lightDir;
-out vec3 vLightDir;
-out vec2 texCoord;
-out vec2 vTexCoord;
-out vec3 normal;
-out vec3 vNormal;
-out vec4 color;
-out vec4 vColor;
+struct vData {
+	vec3 lightDir;
+	vec2 texCoord;
+	vec3 normal;
+	vec4 color;
+};
+
+out vData vertex;
 
 void main() {
 	//const vec3 lightPos = vec3(0.0, -2.94, 1.0);
@@ -26,9 +26,9 @@ void main() {
 
 	vec4 posEye = mvMatrix * vec4(vertPos, 1.0);  // Vertex position in eye space
 	gl_Position = projMatrix * posEye;  // Vertex position in normalized device coordinates
-	vLightDir = lightDir = lightPos - posEye.xyz / posEye.w;  // Light position relative to vertex
-	vTexCoord = texCoord = vertTexCoord;
-	vNormal = normal = normalize(normalMatrix * vertNormal);
-	vColor = color = vertColor;
+	vertex.lightDir = lightPos - posEye.xyz / posEye.w;  // Light position relative to vertex
+	vertex.texCoord = vertTexCoord;
+	vertex.normal = normalize(normalMatrix * vertNormal);
+	vertex.color = vertColor;
 }
 
