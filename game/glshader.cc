@@ -39,7 +39,7 @@ void Shader::dumpInfoLog(GLuint id) {
 	if (std::equal(infoLog, infoLog + infoLogLength, "Vertex shader(s) linked, fragment shader(s) linked, geometry shader(s) linked.")) return;
 
 	// Format a (possibly multi-line) log message
-	std::string prefix = "opengl/error: Shader " + name + ": ";
+	std::string prefix = "video/error: Shader " + name + ": ";
 	std::string logmsg = prefix;
 	for (char ch: std::string(infoLog)) {
 		if (logmsg.back() == '\n') logmsg += prefix;

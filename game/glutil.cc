@@ -76,7 +76,7 @@ void GLErrorChecker::check(std::string const& what) {
 	if (err != GL_NO_ERROR) {
 		stack.back() = info + " " + what;
 		// Prefix with all currently active GLErrorChecker contexts
-		std::string logmsg = "opengl/error: ";
+		std::string logmsg = "video/error: ";
 		for (auto s: stack) logmsg += s + ": ";
 		logmsg += msg(err) + "\n";
 		std::clog << logmsg << std::flush;
