@@ -3,8 +3,11 @@
 #include "fs.hh"
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
+#include <boost/iostreams/device/file_descriptor.hpp>
+#include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/stream_buffer.hpp>
 #include <iostream>
+#include <memory>
 #include <mutex>
 #include <stdexcept>
 
@@ -41,6 +44,46 @@
  * \attention This only guards from multiple clog interleaving, not other console I/O.
  */
 std::mutex log_lock;
+
+// Capture stderr spam from other libraries and log it properly
+// Note: std::cerr retains its normal functionality but other means of writing stderr get redirected to std::clog
+#if defined(__unix__) || defined(__APPLE__)
+#include <unistd.h>
+#include <future>
+struct StderrGrabber {
+	boost::iostreams::stream<boost::iostreams::file_descriptor_sink> stream;
+	std::streambuf* backup;
+	std::future<void> logger;
+	StderrGrabber(): stream(dup(STDERR_FILENO), boost::iostreams::close_handle), backup(std::cerr.rdbuf()) {
+		std::cerr.rdbuf(stream.rdbuf());  // Make std::cerr write to our stream (which connects to normal stderr)
+		int fd[2];
+		pipe(fd);  // Create pipe fd[1]->fd[0]
+		dup2(fd[1], STDERR_FILENO);  // Close stderr and replace it with a copy of pipe begin
+		close(fd[1]);  // Close the original pipe begin
+		std::clog << "stderr/info: Standard error output redirected here\n" << std::flush;
+		logger = std::async(std::launch::async, [fdpipe = fd[0]] {
+			std::string line;
+			unsigned count = 0;
+			for (char ch; read(fdpipe, &ch, 1) == 1;) {
+				line += ch;
+				if (ch != '\n') continue;
+				std::clog << "stderr/info: " + line << std::flush;
+				line.clear(); ++count;
+			}
+			close(fdpipe);  // Close this end of pipe
+			if (count > 0) std::clog << "stderr/notice: " << count << " messages logged to stderr/info\n" << std::flush;
+		});
+	}
+	~StderrGrabber() {
+		dup2(stream->handle(), STDERR_FILENO);  // Restore stderr (closes the pipe, terminating the thread)
+		std::cerr.rdbuf(backup);  // Restore original rdbuf (that writes to normal stderr)
+	}
+};
+#else
+struct StderrGrabber {};  // Not supported on Windows
+#endif
+
+std::unique_ptr<StderrGrabber> grabber;
 
 /** \internal The implementation of the stream filter that handles the message filtering. **/
 class VerboseMessageSink : public boost::iostreams::sink {
@@ -101,7 +144,7 @@ std::streamsize VerboseMessageSink::write(const char* s, std::streamsize n) {
 
 Logger::Logger(std::string const& level) {
 	if (default_ClogBuf) throw std::logic_error("Multiple loggers constructed. There can only be one.");
-	if (level.find_first_of(":/_* ") != std::string::npos) throw std::runtime_error("Invalid logging level specified. Specify either a subsystem name or a level (debug, info, notice, warning, error).");
+	if (level.find_first_of(":/_* ") != std::string::npos) throw std::runtime_error("Invalid logging level specified. Specify either a subsystem name (e.g. logger) or a level (debug, info, notice, warning, error).");
 	pathBootstrap();  // So that log filename is known...
 	std::string msg = "logger/notice: Logging ";
 	{
@@ -134,11 +177,13 @@ Logger::Logger(std::string const& level) {
 		atexit(Logger::teardown);
 	}
 	std::clog << msg << std::endl;
+	grabber = std::make_unique<StderrGrabber>();
 }
 
 Logger::~Logger() { teardown(); }
 
 void Logger::teardown() {
+	grabber.reset();
 	if (default_ClogBuf) std::clog << "logger/info: Exiting normally." << std::endl;
 	std::lock_guard<std::mutex> l(log_lock);
 	if (!default_ClogBuf) return;

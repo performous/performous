@@ -7,6 +7,7 @@
 #include "fs.hh"
 #include "glmath.hh"
 #include "image.hh"
+#include "platform.hh"
 #include "screen.hh"
 #include "util.hh"
 #include <boost/filesystem.hpp>
@@ -48,7 +49,10 @@ namespace {
 unsigned int screenW() { return s_width; }
 unsigned int screenH() { return s_height; }
 
-Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(width), m_windowH(height), m_fullscreen(fs), screen() {
+Window::Window() {
+	m_fullscreen = config["graphic/fullscreen"].b();
+	int width = config["graphic/window_width"].i();
+	int height = config["graphic/window_height"].i();
 	std::atexit(SDL_Quit);
 	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK))
 		throw std::runtime_error(std::string("SDL_Init failed: ") + SDL_GetError());
@@ -64,21 +68,14 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 		GLattrSetter attr_glmaj(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 		GLattrSetter attr_glmin(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 		GLattrSetter attr_glprof(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-		if(width < 200) width = 854; //FIXME: window should have a minimum size
-		if(height < 200) height = 480;
-		screen = SDL_CreateWindow(PACKAGE " " VERSION, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height,
-			(m_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0) | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL);
+		auto flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL;
+		screen = SDL_CreateWindow(PACKAGE " " VERSION, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
 		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
 		SDL_GL_CreateContext(screen);
-
 	}
-
-	if (!m_fullscreen) {
-		config["graphic/window_width"].i() = s_width;
-		config["graphic/window_height"].i() = s_height;
-	}
+	SDL_SetWindowMinimumSize(screen, 400, 250);
 	resize();
-	SDL_ShowCursor(SDL_DISABLE);
+	SDL_ShowWindow(screen);
 
 	// Dump some OpenGL info
 	std::clog << "video/info: GL_VENDOR:     " << glGetString(GL_VENDOR) << std::endl;
@@ -87,7 +84,7 @@ Window::Window(unsigned int width, unsigned int height, bool fs): m_windowW(widt
 	// Extensions would need more complex outputting, otherwise they will break clog.
 	//std::clog << "video/info: GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl;
 
-	if (epoxy_gl_version() < 21) throw std::runtime_error("OpenGL 2.1 is required but not available");
+	if (epoxy_gl_version() < 33) throw std::runtime_error("OpenGL 3.3 is required but not available");
 
 	// The Stereo3D shader needs OpenGL 3.3 and GL_ARB_viewport_array, some Intel drivers support GL 3.3,
 	// but not GL_ARB_viewport_array, so we just check for the extension here.
@@ -259,22 +256,22 @@ void Window::view(unsigned num) {
 	glerror.check("setup");
 	shader("color").bind();
 	// Setup views (with black bars for cropping)
-	int windowWidth;
-	int windowHeight;
-	SDL_GL_GetDrawableSize(screen, &windowWidth, &windowHeight);
-	double vx = 0.5f * (windowWidth - s_width);
-	double vy = 0.5f * (windowHeight - s_height);
+	int nativeW;
+	int nativeH;
+	SDL_GL_GetDrawableSize(screen, &nativeW, &nativeH);
+	double vx = 0.5f * (nativeW - s_width);
+	double vy = 0.5f * (nativeH - s_height);
 	double vw = s_width, vh = s_height;
 	if (num == 0) {
 		glViewport(vx, vy, vw, vh);  // Drawable area of the window (excluding black bars)
 	} else {
 		// Splitscreen stereo3d
-		if (windowWidth == 1280 && windowHeight == 1470) {  // HDMI 720p 3D mode
+		if (nativeW == 1280 && nativeH == 1470) {  // HDMI 720p 3D mode
 			glViewportIndexedf(1, 0, 750, 1280, 720);
 			glViewportIndexedf(2, 0, 0, 1280, 720);
 			s_width = 1280;
 			s_height = 720;
-		} else if (windowWidth == 1920 && windowHeight == 2205) {  // HDMI 1080p 3D mode
+		} else if (nativeW == 1920 && nativeH == 2205) {  // HDMI 1080p 3D mode
 			glViewportIndexedf(1, 0, 1125, 1920, 1080);
 			glViewportIndexedf(2, 0, 0, 1920, 1080);
 			s_width = 1920;
@@ -291,36 +288,73 @@ void Window::swap() {
 	SDL_GL_SwapWindow(screen);
 }
 
-void Window::setFullscreen(bool _fs) {
-	if (m_fullscreen == _fs) return;
-	m_fullscreen = _fs;
-	SDL_SetWindowFullscreen(screen, (m_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0 ));
-	resize();
+void Window::event() {
+	m_needResize = true;
+	// Update config option with any fullscreen toggles done via OS (e.g. MacOS green titlebar button)
+	bool macos = Platform::currentOS() == Platform::macos;
+	config["graphic/fullscreen"].b() = SDL_GetWindowFlags(screen) & (macos ? SDL_WINDOW_MAXIMIZED : SDL_WINDOW_FULLSCREEN_DESKTOP);
+}
+
+void Window::setFullscreen() {
+	if (m_fullscreen == config["graphic/fullscreen"].b()) return;  // We are done here
+	m_fullscreen = config["graphic/fullscreen"].b();
+	std::clog << "video/info: Toggle into " << (m_fullscreen ? "FULL SCREEN MODE" : "WINDOWED MODE") << std::endl;
+	// MacOS uses window maximizing (green button fullscreen mode) instead of SetWindowFullscreen.
+	if (Platform::currentOS() == Platform::macos) {
+		bool maximized = SDL_GetWindowFlags(screen) & SDL_WINDOW_MAXIMIZED;
+		if (maximized != m_fullscreen) (m_fullscreen ? SDL_MaximizeWindow : SDL_RestoreWindow)(screen);
+	} else {
+		auto ret = SDL_SetWindowFullscreen(screen, (m_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0 ));
+		if (ret < 0) std::clog << "video/error: SDL_SetWindowFullscreen returned " << ret << std::endl;
+	}
+	// Resize window to old size and position (if windowed now)
+	if (!m_fullscreen) {
+		int w = config["graphic/window_width"].i();
+		int h = config["graphic/window_height"].i();
+		std::clog << "video/debug: Restoring window size " << w << "x" << h << " and position " << m_windowX << "," << m_windowY << std::endl;
+		SDL_SetWindowSize(screen, w, h);
+		SDL_SetWindowPosition(screen, m_windowX, m_windowY);
+	}
+	m_needResize = m_needReload = true;
 }
 
 void Window::resize() {
-	int windowWidth;
-	int windowHeight;
-	SDL_GL_GetDrawableSize(screen, &windowWidth, &windowHeight);
-	std::clog << "video/info: Drawable size " << windowWidth << "x" << windowHeight << ", fs=" << m_fullscreen << std::endl; 
-	s_width = windowWidth;
-	s_height = windowHeight;
+	setFullscreen();
+	if (!m_needResize) return;
+	m_needResize = false;
+	// Get nominal window dimensions
+	int w, h;
+	SDL_GetWindowSize(screen, &w, &h);
+	if (m_fullscreen) {
+		SDL_ShowCursor(SDL_DISABLE);
+		SDL_DisableScreenSaver();
+	} else {
+		SDL_ShowCursor(SDL_TRUE);
+		SDL_EnableScreenSaver();
+		config["graphic/window_width"].i() = w;
+		config["graphic/window_height"].i() = h;
+		SDL_GetWindowPosition(screen, &m_windowX, &m_windowY);
+	}
+	// Get actual resolution
+	int nativeW, nativeH;
+	SDL_GL_GetDrawableSize(screen, &nativeW, &nativeH);
+	s_width = nativeW;
+	s_height = nativeH;
 	// Enforce aspect ratio limits
 	if (s_height < 0.56f * s_width) s_width = round(s_height / 0.56f);
 	if (s_height > 0.8f * s_width) s_height = round(0.8f * s_width);
-	if (!m_fullscreen) {
-		config["graphic/window_width"].i() = s_width;
-		config["graphic/window_height"].i() = s_height;
-	}
+	std::clog << "video/info: Window size " << w << "x" << h;
+	if (w != nativeW) std::clog << " (HiDPI " << nativeW << "x" << nativeH << ")";
+	std::clog << ", rendering in " << s_width << "x" << s_height << std::endl;
 }
 
 void Window::screenshot() {
 	Bitmap img;
-	int windowWidth;
-	int windowHeight;
-	SDL_GetWindowSize(screen, &windowWidth, &windowHeight);
-	img.width = windowWidth;
-	img.height = windowHeight;
+	int nativeW;
+	int nativeH;
+	SDL_GetWindowSize(screen, &nativeW, &nativeH);
+	img.width = nativeW;
+	img.height = nativeH;
 	unsigned stride = (img.width * 3 + 3) & ~3;  // Rows are aligned to 4 byte boundaries
 	img.buf.resize(stride * img.height);
 	img.fmt = pix::RGB;

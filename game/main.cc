@@ -66,42 +66,35 @@ static void signalSetup() {
 /// can be thrown as an exception to quit the game
 struct QuitNow {};
 
-static void checkEvents(Game& gm) {
+static void checkEvents(Game& gm, Time eventTime) {
 	if (g_quit) {
 		std::cerr << "Terminating, please wait... (or kill the process)" << std::endl;
 		throw QuitNow();
 	}
+	Window& window = gm.window();
 	SDL_Event event;
-	while(SDL_PollEvent(&event) == 1) {
+	while (SDL_PollEvent(&event) == 1) {
 		// Let the navigation system grab any and all SDL events
-		auto eventTime = Clock::now();
 		gm.controllers.pushEvent(event, eventTime);
-		switch(event.type) {
-		  case SDL_QUIT:
-			gm.finished();
-			break;
-		  case SDL_KEYDOWN: {
-			int keypressed  = event.key.keysym.scancode;
-			uint16_t modifier = event.key.keysym.mod;
-			if (((keypressed == SDL_SCANCODE_RETURN || keypressed == SDL_SCANCODE_KP_ENTER) && modifier & KMOD_ALT) || keypressed == SDL_SCANCODE_F11) {
+		auto type = event.type;
+		if (type == SDL_WINDOWEVENT) window.event();
+		if (type == SDL_QUIT) gm.finished();
+		if (type == SDL_KEYDOWN) {
+			auto key  = event.key.keysym.scancode;
+			auto mod = event.key.keysym.mod;
+			bool altEnter = (key == SDL_SCANCODE_RETURN || key == SDL_SCANCODE_KP_ENTER) && mod & KMOD_ALT;  // Alt+Enter
+			bool modF = key == SDL_SCANCODE_F && mod & KMOD_CTRL && mod & KMOD_GUI;  // MacOS Ctrl+Cmd+F
+			if (altEnter || modF || key == SDL_SCANCODE_F11) {
 				config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].b();
 				continue; // Already handled here...
 			}
-			if (keypressed == SDL_SCANCODE_PRINTSCREEN || (keypressed == SDL_SCANCODE_F12 && (modifier & Platform::shortcutModifier()))) {
+			if (key == SDL_SCANCODE_PRINTSCREEN || (key == SDL_SCANCODE_F12 && (mod & Platform::shortcutModifier()))) {
 				g_take_screenshot = true;
 				continue; // Already handled here...
 			}
-			if (keypressed == SDL_SCANCODE_F4 && modifier & KMOD_ALT) {
+			if (key == SDL_SCANCODE_F4 && mod & KMOD_ALT) {
 				gm.finished();
 				continue; // Already handled here...
-			}
-			break;
-		  }
-		case SDL_WINDOWEVENT:
-			switch (event.window.event) {
-			  case SDL_WINDOWEVENT_RESIZED:
-				gm.window().resize(event.window.data1, event.window.data2);
-				break;
 			}
 		}
 		// Screens always receive SDL events that were not already handled here
@@ -127,11 +120,9 @@ static void checkEvents(Game& gm) {
 		gm.getCurrentScreen()->manageEvent(event);
 	}
 
-	// Need to toggle full screen mode?
-	if (config["graphic/fullscreen"].b() != gm.window().getFullscreen()) {
-		gm.window().setFullscreen(config["graphic/fullscreen"].b());
-		gm.reloadGL();
-	}
+	// Need to toggle full screen mode or adjust resolution?
+	window.resize();
+	if (window.needReload()) gm.reloadGL();
 }
 
 void mainLoop(std::string const& songlist) {
@@ -140,7 +131,7 @@ void mainLoop(std::string const& songlist) {
 	Audio audio;
 	std::clog << "core/info: Loading assets." << std::endl;
 	TranslationEngine localization(PACKAGE);
-	Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), config["graphic/fullscreen"].b());
+	Window window;
 	UnicodeUtil m_unicode;
 	SurfaceLoader m_loader;
 	Backgrounds backgrounds;
@@ -229,8 +220,9 @@ void mainLoop(std::string const& songlist) {
 				}
 				if (benchmarking) prof("fpsctrl");
 				// Process events for the next frame
-				gm.controllers.process(Clock::now());
-				checkEvents(gm);
+				auto eventTime = Clock::now();
+				gm.controllers.process(eventTime);
+				checkEvents(gm, eventTime);
 				if (benchmarking) prof("events");
 			} catch (RUNTIME_ERROR& e) {
 				std::cerr << "ERROR: " << e.what() << std::endl;
@@ -249,9 +241,11 @@ void mainLoop(std::string const& songlist) {
 /// Simple test utility to make mapping of joystick buttons/axes easier
 void jstestLoop() {
 	try {
-		Window window(config["graphic/window_width"].i(), config["graphic/window_height"].i(), false);
+		config["graphic/fullscreen"].b() = false;
+		config["graphic/window_width"].i() = 400;
+		config["graphic/window_height"].i() = 250;
+		Window window;
 		// Main loop
-		auto time = Clock::now();
 		int oldjoy = -1, oldaxis = -1, oldvalue = -1;
 		while (true) {
 			SDL_Event e;
@@ -274,8 +268,7 @@ void jstestLoop() {
 				}
 			}
 			window.blank(); window.swap();
-			std::this_thread::sleep_until(time + 10ms); // Max 100 FPS
-			time = Clock::now();
+			std::this_thread::sleep_for(10ms); // Max 100 FPS
 		}
 	} catch (EXCEPTION& e) {
 		std::cerr << "ERROR: " << e.what() << std::endl;
