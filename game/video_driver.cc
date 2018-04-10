@@ -50,9 +50,6 @@ unsigned int screenW() { return s_width; }
 unsigned int screenH() { return s_height; }
 
 Window::Window() {
-	m_fullscreen = config["graphic/fullscreen"].b();
-	int width = config["graphic/window_width"].i();
-	int height = config["graphic/window_height"].i();
 	std::atexit(SDL_Quit);
 	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK))
 		throw std::runtime_error(std::string("SDL_Init failed: ") + SDL_GetError());
@@ -69,11 +66,15 @@ Window::Window() {
 		GLattrSetter attr_glmin(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 		GLattrSetter attr_glprof(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 		auto flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL;
+		int width = config["graphic/window_width"].i();
+		int height = config["graphic/window_height"].i();
+		std::clog << "video/info: Create window " << width << "x" << height << std::endl;
 		screen = SDL_CreateWindow(PACKAGE " " VERSION, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
 		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
 		SDL_GL_CreateContext(screen);
 	}
 	SDL_SetWindowMinimumSize(screen, 400, 250);
+	SDL_GetWindowPosition(screen, &m_windowX, &m_windowY);
 	resize();
 	SDL_ShowWindow(screen);
 
@@ -299,14 +300,8 @@ void Window::setFullscreen() {
 	if (m_fullscreen == config["graphic/fullscreen"].b()) return;  // We are done here
 	m_fullscreen = config["graphic/fullscreen"].b();
 	std::clog << "video/info: Toggle into " << (m_fullscreen ? "FULL SCREEN MODE" : "WINDOWED MODE") << std::endl;
-	// MacOS uses window maximizing (green button fullscreen mode) instead of SetWindowFullscreen.
-	if (Platform::currentOS() == Platform::macos) {
-		bool maximized = SDL_GetWindowFlags(screen) & SDL_WINDOW_MAXIMIZED;
-		if (maximized != m_fullscreen) (m_fullscreen ? SDL_MaximizeWindow : SDL_RestoreWindow)(screen);
-	} else {
-		auto ret = SDL_SetWindowFullscreen(screen, (m_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0 ));
-		if (ret < 0) std::clog << "video/error: SDL_SetWindowFullscreen returned " << ret << std::endl;
-	}
+	auto ret = SDL_SetWindowFullscreen(screen, (m_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0 ));
+	if (ret < 0) std::clog << "video/error: SDL_SetWindowFullscreen returned " << ret << std::endl;
 	// Resize window to old size and position (if windowed now)
 	if (!m_fullscreen) {
 		int w = config["graphic/window_width"].i();
