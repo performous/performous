@@ -13,7 +13,7 @@ icu::RuleBasedCollator UnicodeUtil::m_dummyCollator (icu::UnicodeString (""), ic
 MatchResult UnicodeUtil::getCharset (std::string const& str) {
 	MatchResult retval;
 	icu::LocalUCharsetDetectorPointer m_chardet (ucsdet_open (&UnicodeUtil::m_icuError));
-	ucsdet_enableInputFilter(m_chardet.getAlias(), true); 
+	ucsdet_enableInputFilter(m_chardet.getAlias(), true);
 	auto string = str.c_str();
 	ucsdet_setText(m_chardet.getAlias(), string, -1, &m_icuError);
 	if (U_FAILURE(UnicodeUtil::m_icuError)) {
@@ -52,7 +52,7 @@ void convertToUTF8 (std::stringstream &_stream, std::string _filename) {
 	if (match.second >= 50) { // fairly good match?
 		std::string charset = match.first;
 		if (charset != "UTF-8") {
-			if (!_filename.empty()) { std::clog << "unicode/warning: " << _filename << " does not appear to be UTF-8... (" << charset << ") detected." << std::endl; }
+			if (!_filename.empty()) { std::clog << "unicode/info: " << _filename << " does not appear to be UTF-8... (" << charset << ") detected." << std::endl; }
 			std::string _str;
 			const char* tmp = data.c_str();
 			icu::UnicodeString ustring = icu::UnicodeString(tmp, charset.c_str());
@@ -71,7 +71,7 @@ std::string unicodeCollate (std::string const& str) {
 	ConfigItem::StringList termsToCollate = config["game/sorting_ignore"].sl();
 	std::string pattern = std::string ("^((");
 	for (auto term : termsToCollate) {
-		if (term != termsToCollate.front()) { 
+		if (term != termsToCollate.front()) {
 			pattern += std::string("|");
 		}
 		pattern += term;
