@@ -77,7 +77,7 @@ private:
 	/// @param num 0 = no stereo, 1 = left eye, 2 = right eye
 	void view(unsigned num);
 	void updateStereo(float separation);
-	bool m_fullscreen;
+	bool m_fullscreen = false;
 	bool m_needResize = true;
 	bool m_needReload = true;
 	int m_windowX = 0;
