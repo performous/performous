@@ -79,12 +79,9 @@ static void checkEvents(Game& gm, Time eventTime) {
 		auto type = event.type;
 		if (type == SDL_WINDOWEVENT) {
 			auto t = event.window.event;
-#ifdef __APPLE__
-			// Sent by MacOS green button (full screen mode)
-			if (t == SDL_WINDOWEVENT_MAXIMIZED) config["graphic/fullscreen"].b() = true;
-			// After restoring via green button
+			// Note: Full screen toggle via MacOS green titlebar button sends MAXIMIZED and MOVED but no RESTORED
+			if (t == SDL_WINDOWEVENT_MAXIMIZED && Platform::currentOS() == Platform::macos) config["graphic/fullscreen"].b() = true;
 			if (t == SDL_WINDOWEVENT_MOVED && event.window.data1 != 0) config["graphic/fullscreen"].b() = false;
-#endif
 			if (t == SDL_WINDOWEVENT_RESIZED) window.sizeChanged();
 		}
 		if (type == SDL_QUIT) gm.finished();
