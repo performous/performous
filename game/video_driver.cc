@@ -147,10 +147,7 @@ void Window::updateStereo(float sepFactor) {
 }
 
 void Window::updateColor() {
-	for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
-		Shader& sh = *it->second;
-		sh["colorMatrix"].setMat4(g_color);
-	}
+	for (auto kv: m_shaders) (*kv.second)["colorMatrix"].setMat4(g_color);
 }
 
 void Window::updateTransforms() {
@@ -172,6 +169,7 @@ void Window::render(boost::function<void (void)> drawFunc) {
 	ViewTrans trans;  // Default frustum
 	bool stereo = config["graphic/stereo3d"].b();
 	int type = config["graphic/stereo3dtype"].i();
+	for (auto kv: m_shaders) (*kv.second)["stereomode"].set(type);
 
 	static bool warn3d = false;
 	if (!stereo) warn3d = false;
@@ -191,7 +189,7 @@ void Window::render(boost::function<void (void)> drawFunc) {
 	updateStereo(stereo ? getSeparation() : 0.0);
 	glerror.check("setup");
 	// Can we do direct to framebuffer rendering (no FBO)?
-	if (!stereo || type == 2) { view(stereo); drawFunc(); return; }
+	if (!stereo || type >= 2) { view(stereo); drawFunc(); return; }
 	// Render both eyes to FBO (full resolution top/bottom for anaglyph)
 	unsigned w = s_width;
 	unsigned h = 2 * s_height;
@@ -262,9 +260,10 @@ void Window::view(unsigned num) {
 	double vx = 0.5f * (nativeW - s_width);
 	double vy = 0.5f * (nativeH - s_height);
 	double vw = s_width, vh = s_height;
+	int type = config["graphic/stereo3dtype"].i();
 	if (num == 0) {
 		glViewport(vx, vy, vw, vh);  // Drawable area of the window (excluding black bars)
-	} else {
+	} else if (type == 2) {
 		// Splitscreen stereo3d
 		if (nativeW == 1280 && nativeH == 1470) {  // HDMI 720p 3D mode
 			glViewportIndexedf(1, 0, 750, 1280, 720);
@@ -277,11 +276,13 @@ void Window::view(unsigned num) {
 			s_width = 1920;
 			s_height = 1080;
 		} else {  // Regular top/bottom 3d
-			//glViewportIndexedf(1, 0, vh / 2, vw, vh / 2);  // Top half of the drawable area
-			//glViewportIndexedf(2, 0, 0, vw, vh / 2);  // Bottom half of the drawable area
-			glViewportIndexedf(1, 0, 0, vw, vh);  // Top half of the drawable area
-			glViewportIndexedf(2, 0, 0, vw, vh);  // Bottom half of the drawable area
+			glViewportIndexedf(1, 0, vh / 2, vw, vh / 2);  // Top half of the drawable area
+			glViewportIndexedf(2, 0, 0, vw, vh / 2);  // Bottom half of the drawable area
 		}
+	} else {
+		// Rastered/interlace modes are handled in fragment shader
+		glViewportIndexedf(1, vx, vy, vw, vh);  // Top half of the drawable area
+		glViewportIndexedf(2, vx, vy, vw, vh);  // Bottom half of the drawable area
 	}
 
 }

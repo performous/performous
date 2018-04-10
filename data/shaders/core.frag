@@ -5,6 +5,7 @@ out vec4 fragColor;
 //DEFINES
 
 uniform mat4 colorMatrix;
+uniform int stereomode;
 
 struct vData {
 	vec3 lightDir;
@@ -32,7 +33,14 @@ uniform sampler2D emissionTex;
 #endif
 
 void main() {
-	if (viewp > 0 && int(gl_FragCoord.y) % 2 == viewp - 1) discard;
+	// Interlace/checkerboard stereo3d modes discard other eye's pixels
+	if (stereomode > 2 && viewp > 0) {
+		int eye = viewp - 1;
+		int test = int(gl_FragCoord.y);
+		if (stereomode == 4) test += int(gl_FragCoord.x);
+		if (test % 2 != eye) discard;
+	}
+
 	vec4 frag = TEXFUNC;
 
 #ifdef ENABLE_VERTEX_COLOR
