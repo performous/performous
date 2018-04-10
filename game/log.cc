@@ -3,6 +3,8 @@
 #include "fs.hh"
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
+#include <boost/iostreams/device/file_descriptor.hpp>
+#include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/stream_buffer.hpp>
 #include <iostream>
 #include <memory>
@@ -44,13 +46,16 @@
 std::mutex log_lock;
 
 // Capture stderr spam from other libraries and log it properly
+// Note: std::cerr retains its normal functionality but other means of writing stderr get redirected to std::clog
 #if defined(__unix__) || defined(__APPLE__)
 #include <unistd.h>
 #include <future>
 struct StderrGrabber {
+	boost::iostreams::stream<boost::iostreams::file_descriptor_sink> stream;
+	std::streambuf* backup;
 	std::future<void> logger;
-	int stderrCopy;
-	StderrGrabber(): stderrCopy(dup(STDERR_FILENO)) {
+	StderrGrabber(): stream(dup(STDERR_FILENO), boost::iostreams::close_handle), backup(std::cerr.rdbuf()) {
+		std::cerr.rdbuf(stream.rdbuf());  // Make std::cerr write to our stream (which connects to normal stderr)
 		int fd[2];
 		pipe(fd);  // Create pipe fd[1]->fd[0]
 		dup2(fd[1], STDERR_FILENO);  // Close stderr and replace it with a copy of pipe begin
@@ -70,9 +75,8 @@ struct StderrGrabber {
 		});
 	}
 	~StderrGrabber() {
-		dup2(stderrCopy, STDERR_FILENO);  // Restore stderr (closes the pipe, terminating the thread)
-		close(stderrCopy);  // Close our copy
-		// std::cerr << "Testing that stderr is still working!\n";
+		dup2(stream->handle(), STDERR_FILENO);  // Restore stderr (closes the pipe, terminating the thread)
+		std::cerr.rdbuf(backup);  // Restore original rdbuf (that writes to normal stderr)
 	}
 };
 #else
@@ -101,7 +105,7 @@ int minLevel;
 
 void writeLog(std::string const& msg) {
 	std::lock_guard<std::mutex> l(log_lock);
-	std::cout << msg << std::flush;
+	std::cerr << msg << std::flush;
 	file << msg << std::flush;
 }
 
