@@ -113,6 +113,8 @@ bool Game::closeDialog() {
 
 void Game::drawLogo() {
 	m_logo.dimensions.fixedHeight(0.1).left(-0.45).screenTop(-0.1 + 0.11 * smoothstep(m_logoAnim.get()));
+	using namespace glmath;
+	Transform trans(translate(vec3(0.0, 0.0, 0.05)));
 	m_logo.draw();
 }
 
@@ -144,12 +146,12 @@ void Game::finished()
 {
 	m_finished = true;
 }
- 
+
 Game::~Game()
 {
 	if (currentScreen) currentScreen->exit();
 }
- 
+
 bool Game::isFinished()
 {
 	return m_finished;
