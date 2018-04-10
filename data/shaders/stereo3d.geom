@@ -16,10 +16,12 @@ struct vData {
 
 in vData vertex[];
 out vData fragv;
+flat out int viewp;
 
 void passthru(int i) {
 	gl_Position = gl_in[i].gl_Position;
 	fragv = vertex[i];
+	viewp = gl_ViewportIndex;
 }
 
 // Process all the vertices, applying code to them before emitting (do-while to convince Nvidia of the code getting executed)

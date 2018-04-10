@@ -277,8 +277,10 @@ void Window::view(unsigned num) {
 			s_width = 1920;
 			s_height = 1080;
 		} else {  // Regular top/bottom 3d
-			glViewportIndexedf(1, 0, vh / 2, vw, vh / 2);  // Top half of the drawable area
-			glViewportIndexedf(2, 0, 0, vw, vh / 2);  // Bottom half of the drawable area
+			//glViewportIndexedf(1, 0, vh / 2, vw, vh / 2);  // Top half of the drawable area
+			//glViewportIndexedf(2, 0, 0, vw, vh / 2);  // Bottom half of the drawable area
+			glViewportIndexedf(1, 0, 0, vw, vh);  // Top half of the drawable area
+			glViewportIndexedf(2, 0, 0, vw, vh);  // Bottom half of the drawable area
 		}
 	}
 

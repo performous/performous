@@ -14,6 +14,7 @@ struct vData {
 };
 
 in vData fragv;
+flat in int viewp;
 
 #ifdef ENABLE_TEXTURING
 uniform sampler2D tex;
@@ -31,6 +32,7 @@ uniform sampler2D emissionTex;
 #endif
 
 void main() {
+	if (viewp > 0 && int(gl_FragCoord.y) % 2 == viewp - 1) discard;
 	vec4 frag = TEXFUNC;
 
 #ifdef ENABLE_VERTEX_COLOR
