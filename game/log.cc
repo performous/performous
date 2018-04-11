@@ -7,6 +7,7 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/stream_buffer.hpp>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <stdexcept>
@@ -42,7 +43,7 @@
 struct StreamRedirect {
 	std::ios& stream;
 	std::streambuf* backup;
-	StreamRedirect(std::ios& stream, std::ios& other): stream(stream), backup(stream.rdbuf()) { stream.rdbuf(other.rdbuf()); }
+	StreamRedirect(std::ios& stream, std::streambuf* other): stream(stream), backup(stream.rdbuf()) { stream.rdbuf(other); }
 	~StreamRedirect() { stream.rdbuf(backup); }
 };
 
@@ -70,7 +71,7 @@ struct StderrGrabber {
 		Stream(): stream(dup(STDERR_FILENO), boost::iostreams::close_handle) {}
 		~Stream() { (void)dup2((*this)->handle(), STDERR_FILENO); }
 	} stream;
-	StreamRedirect redirect{ std::cerr, stream };  // Make std::cerr output to our copy of real stderr
+	StreamRedirect redirect{ std::cerr, stream.rdbuf() };  // Make std::cerr output to our copy of real stderr
 	StderrGrabber() {
 		Pipe pipefd;
 		// Replace STDERR_FILENO with a duplicate of pipefd.send
@@ -89,51 +90,38 @@ struct StderrGrabber {
 			if (count > 0) std::clog << "stderr/notice: " << count << " messages logged to stderr/info\n" << std::flush;
 		});
 	}
+	~StderrGrabber() { close(STDERR_FILENO); }
 };
 #else
 struct StderrGrabber {};  // Not supported on Windows
 #endif
 
-/** \internal The implementation of the stream filter that handles the message filtering. **/
-class VerboseMessageSink : public boost::iostreams::sink {
-  public:
+/// Receives strings written to boost::iostreams::stream_buffer<VerboseMessageSink>
+struct VerboseMessageSink: boost::iostreams::sink {
 	std::streamsize write(const char* s, std::streamsize n);
 };
 
 static struct Impl {
-	/** \internal
-	* Guard to ensure we're atomically printing to cerr.
-	* \attention This only guards from multiple clog interleaving, not other console I/O.
-	*/
-	std::mutex log_lock;
-	std::unique_ptr<StderrGrabber> grabber;
-	// defining them in main() causes segfault at exit as they apparently got free'd before we're done using them
-	boost::iostreams::stream_buffer<VerboseMessageSink> sb; //!< \internal
-	VerboseMessageSink vsm; //!< \internal
-
-	std::unique_ptr<StreamRedirect> clogRedirect;
-	std::streambuf* default_ClogBuf;
+	const std::map<std::string, int> numeric = {
+		{ "debug", 0 },
+		{ "info", 1 },
+		{ "notice", 2 },
+		{ "warning", 3 },
+		{ "error", 4 },
+	};
+	std::mutex mutex;
+	using Lock = std::lock_guard<std::mutex>;
+	struct Redirects {
+		VerboseMessageSink vsm;
+		boost::iostreams::stream_buffer<VerboseMessageSink> sb{vsm};
+		StreamRedirect clogRedirect{std::clog, &sb};
+		StderrGrabber grabber;
+	};
+	std::unique_ptr<Redirects> redirects;
 	fs::ofstream file;
-
 	std::string target;
 	int minLevel;
-	void writeLog(std::string const& msg) {
-		std::lock_guard<std::mutex> l(log_lock);
-		std::cerr << msg << std::flush;
-		file << msg << std::flush;
-	}
-
-
 } self;
-
-int numeric(std::string const& level) {
-	if (level == "debug") return 0;
-	if (level == "info") return 1;
-	if (level == "notice") return 2;
-	if (level == "warning") return 3;
-	if (level == "error") return 4;
-	return -1;
-}
 
 std::streamsize VerboseMessageSink::write(const char* s, std::streamsize n) {
 	std::string line(s, n);  // Note: s is *not* a c-string, thus we must stop after n chars.
@@ -141,72 +129,65 @@ std::streamsize VerboseMessageSink::write(const char* s, std::streamsize n) {
 	size_t slash = line.find('/');
 	size_t colon = line.find(": ", slash);
 	if (slash == std::string::npos || colon == std::string::npos) {
-		std::string msg = "logger/error: Invalid log prefix on line [[[\n" + line + "]]]\n";
-		write(msg.data(), msg.size());
+		line = "logger/error: Invalid log prefix on line [[[\n" + line + "]]]\n";
+		write(line.data(), line.size());
 		return n;
 	}
 	std::string subsystem(line, 0, slash);
 	std::string level(line, slash + 1, colon - slash - 1);
-	int lev = numeric(level);
-	if (lev == -1) {
-		std::string msg = "logger/error: Invalid level '" + level + "' line [[[\n" + line + "]]]\n";
-		write(msg.data(), msg.size());
+	auto num = self.numeric.find(level);
+	if (num == self.numeric.end()) {
+		line = "logger/error: Invalid level '" + level + "' line [[[\n" + line + "]]]\n";
+		write(line.data(), line.size());
 		return n;
 	}
-	if (lev >= self.minLevel || (!self.target.empty() && subsystem.find(self.target) != std::string::npos)) {
-		self.writeLog(line);
+	// Write to file & stderr those messages that pass the filtering
+	if (num->second >= self.minLevel || (!self.target.empty() && subsystem.find(self.target) != std::string::npos)) {
+		Impl::Lock l(self.mutex);
+		std::cerr << line << std::flush;
+		self.file << line << std::flush;
 	}
 	return n;
 }
 
 Logger::Logger(std::string const& level) {
-	if (self.default_ClogBuf) throw std::logic_error("Multiple loggers constructed. There can only be one.");
+	if (self.redirects) throw std::logic_error("Multiple loggers constructed. There can only be one.");
 	if (level.find_first_of(":/_* ") != std::string::npos) throw std::runtime_error("Invalid logging level specified. Specify either a subsystem name (e.g. logger) or a level (debug, info, notice, warning, error).");
 	pathBootstrap();  // So that log filename is known...
 	std::string msg = "logger/notice: Logging ";
-	{
-		std::lock_guard<std::mutex> l(self.log_lock);
-		if (level.empty()) {
-			self.minLevel = 2;  // Display all notices, warnings and errors
-			msg += "all notices, warnings and errors.";
-		} else if (level == "none") {
-			self.minLevel = 100;
-			msg += "disabled.";  // No-one will see this, so what's the point? :)
+	if (level.empty()) {
+		self.minLevel = 2;  // Display all notices, warnings and errors
+		msg += "all notices, warnings and errors.";
+	} else if (level == "none") {
+		self.minLevel = 100;
+		msg += "disabled.";  // No-one will see this, so what's the point? :)
+	} else {
+		auto num = self.numeric.find(level);
+		if (num == self.numeric.end() /* Not a valid level name */) {
+			self.minLevel = 4;  // Display errors from any subsystem
+			self.target = level;  // All messages from the given subsystem
+			msg += "everything from subsystem " + self.target + " and all errors.";
 		} else {
-			self.minLevel = numeric(level);
-			if (self.minLevel == -1 /* Not a valid level name */) {
-				self.minLevel = 4;  // Display errors from any subsystem
-				self.target = level;  // All messages from the given subsystem
-				msg += "everything from subsystem " + self.target + " and all errors.";
-			} else {
-				msg += "any events of " + level + " or higher level.";
-			}
+			self.minLevel = num->second;
+			msg += "any events of " + level + " or higher level.";
 		}
-		if (self.minLevel < 100) {
-			fs::path name = getLogFilename();
-			fs::create_directories(name.parent_path());
-			self.file.open(name);
-			msg += " Log file: " + name.string();
-		}
-		self.sb.open(self.vsm);
-		self.default_ClogBuf = std::clog.rdbuf();
-		std::clog.rdbuf(&self.sb);
-		atexit(Logger::teardown);
 	}
+	if (self.minLevel < 100) {
+		fs::path name = getLogFilename();
+		fs::create_directories(name.parent_path());
+		self.file.open(name);
+		msg += " Log file: " + name.string();
+	}
+	self.redirects = std::make_unique<Impl::Redirects>();
+	atexit(Logger::teardown);
 	std::clog << msg << std::endl;
-	self.grabber = std::make_unique<StderrGrabber>();
 }
 
 Logger::~Logger() { teardown(); }
 
 void Logger::teardown() {
-	self.grabber.reset();
-	if (self.default_ClogBuf) std::clog << "logger/info: Exiting normally." << std::endl;
-	std::lock_guard<std::mutex> l(self.log_lock);
-	if (!self.default_ClogBuf) return;
-	std::clog.rdbuf(self.default_ClogBuf);
-	self.sb.close();
+	if (!self.redirects) return;
+	std::clog << "logger/info: Exiting normally.\n" << std::flush;
+	self.redirects.reset();
 	self.file.close();
-	self.default_ClogBuf = nullptr;
 }
-
