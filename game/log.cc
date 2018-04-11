@@ -45,38 +45,55 @@
  */
 std::mutex log_lock;
 
+struct StreamRedirect {
+	std::ios& stream;
+	std::streambuf* backup;
+	StreamRedirect(std::ios& stream, std::ios& other): stream(stream), backup(stream.rdbuf()) { stream.rdbuf(other.rdbuf()); }
+	~StreamRedirect() { stream.rdbuf(backup); }
+};
+
 // Capture stderr spam from other libraries and log it properly
 // Note: std::cerr retains its normal functionality but other means of writing stderr get redirected to std::clog
 #if defined(__unix__) || defined(__APPLE__)
 #include <unistd.h>
 #include <future>
 struct StderrGrabber {
-	boost::iostreams::stream<boost::iostreams::file_descriptor_sink> stream;
-	std::streambuf* backup;
+	struct FD: boost::noncopyable {
+		int fd = -1;
+		FD() = default;
+		FD(FD&& other): fd(other.fd) { other.fd = -1; }
+		~FD() { if (fd != -1) (void)close(fd); }
+		operator int&() { return fd; }
+	};
+	struct Pipe {
+		FD recv, send;
+		Pipe() { if (pipe(reinterpret_cast<int*>(this)) != 0) throw std::runtime_error("pipe()"); }
+	};
+	static_assert(std::is_standard_layout<Pipe>::value, "struct Pipe must use standard layout");
 	std::future<void> logger;
-	StderrGrabber(): stream(dup(STDERR_FILENO), boost::iostreams::close_handle), backup(std::cerr.rdbuf()) {
-		std::cerr.rdbuf(stream.rdbuf());  // Make std::cerr write to our stream (which connects to normal stderr)
-		int fd[2];
-		pipe(fd);  // Create pipe fd[1]->fd[0]
-		dup2(fd[1], STDERR_FILENO);  // Close stderr and replace it with a copy of pipe begin
-		close(fd[1]);  // Close the original pipe begin
+	/// Duplicate the real stderr into another fd and bind that to boost iostream, restore on exit
+	struct Stream: boost::iostreams::stream<boost::iostreams::file_descriptor_sink> {
+		Stream(): stream(dup(STDERR_FILENO), boost::iostreams::close_handle) {}
+		~Stream() { (void)dup2((*this)->handle(), STDERR_FILENO); }
+	} stream;
+	StreamRedirect redirect{ std::cerr, stream };  // Make std::cerr output to our copy of real stderr
+	StderrGrabber() {
+		Pipe pipefd;
+		// Replace STDERR_FILENO with a duplicate of pipefd.send
+		if (dup2(pipefd.send, STDERR_FILENO) == -1) throw std::runtime_error("dup2()");
 		std::clog << "stderr/info: Standard error output redirected here\n" << std::flush;
-		logger = std::async(std::launch::async, [fdpipe = fd[0]] {
+		// Start a thread that logs messages from pipe; this is terminated when ~Stream restores STDERR_FILENO (closing the sending end)
+		logger = std::async(std::launch::async, [fd = std::move(pipefd.recv)]() mutable {
 			std::string line;
 			unsigned count = 0;
-			for (char ch; read(fdpipe, &ch, 1) == 1;) {
+			for (char ch; read(fd, &ch, 1) == 1;) {
 				line += ch;
 				if (ch != '\n') continue;
 				std::clog << "stderr/info: " + line << std::flush;
 				line.clear(); ++count;
 			}
-			close(fdpipe);  // Close this end of pipe
 			if (count > 0) std::clog << "stderr/notice: " << count << " messages logged to stderr/info\n" << std::flush;
 		});
-	}
-	~StderrGrabber() {
-		dup2(stream->handle(), STDERR_FILENO);  // Restore stderr (closes the pipe, terminating the thread)
-		std::cerr.rdbuf(backup);  // Restore original rdbuf (that writes to normal stderr)
 	}
 };
 #else
