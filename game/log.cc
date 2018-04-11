@@ -39,12 +39,6 @@
  *
  **/
 
-/** \internal
- * Guard to ensure we're atomically printing to cerr.
- * \attention This only guards from multiple clog interleaving, not other console I/O.
- */
-std::mutex log_lock;
-
 struct StreamRedirect {
 	std::ios& stream;
 	std::streambuf* backup;
@@ -100,31 +94,37 @@ struct StderrGrabber {
 struct StderrGrabber {};  // Not supported on Windows
 #endif
 
-std::unique_ptr<StderrGrabber> grabber;
-
 /** \internal The implementation of the stream filter that handles the message filtering. **/
 class VerboseMessageSink : public boost::iostreams::sink {
   public:
 	std::streamsize write(const char* s, std::streamsize n);
 };
 
-// defining them in main() causes segfault at exit as they apparently got free'd before we're done using them
-static boost::iostreams::stream_buffer<VerboseMessageSink> sb; //!< \internal
-static VerboseMessageSink vsm; //!< \internal
+static struct Impl {
+	/** \internal
+	* Guard to ensure we're atomically printing to cerr.
+	* \attention This only guards from multiple clog interleaving, not other console I/O.
+	*/
+	std::mutex log_lock;
+	std::unique_ptr<StderrGrabber> grabber;
+	// defining them in main() causes segfault at exit as they apparently got free'd before we're done using them
+	boost::iostreams::stream_buffer<VerboseMessageSink> sb; //!< \internal
+	VerboseMessageSink vsm; //!< \internal
 
-//! \internal used to store the default/original clog buffer.
-static std::streambuf* default_ClogBuf = nullptr;
+	std::unique_ptr<StreamRedirect> clogRedirect;
+	std::streambuf* default_ClogBuf;
+	fs::ofstream file;
 
-fs::ofstream file;
+	std::string target;
+	int minLevel;
+	void writeLog(std::string const& msg) {
+		std::lock_guard<std::mutex> l(log_lock);
+		std::cerr << msg << std::flush;
+		file << msg << std::flush;
+	}
 
-std::string target;
-int minLevel;
 
-void writeLog(std::string const& msg) {
-	std::lock_guard<std::mutex> l(log_lock);
-	std::cerr << msg << std::flush;
-	file << msg << std::flush;
-}
+} self;
 
 int numeric(std::string const& level) {
 	if (level == "debug") return 0;
@@ -153,60 +153,60 @@ std::streamsize VerboseMessageSink::write(const char* s, std::streamsize n) {
 		write(msg.data(), msg.size());
 		return n;
 	}
-	if (lev >= minLevel || (!target.empty() && subsystem.find(target) != std::string::npos)) {
-		writeLog(line);
+	if (lev >= self.minLevel || (!self.target.empty() && subsystem.find(self.target) != std::string::npos)) {
+		self.writeLog(line);
 	}
 	return n;
 }
 
 Logger::Logger(std::string const& level) {
-	if (default_ClogBuf) throw std::logic_error("Multiple loggers constructed. There can only be one.");
+	if (self.default_ClogBuf) throw std::logic_error("Multiple loggers constructed. There can only be one.");
 	if (level.find_first_of(":/_* ") != std::string::npos) throw std::runtime_error("Invalid logging level specified. Specify either a subsystem name (e.g. logger) or a level (debug, info, notice, warning, error).");
 	pathBootstrap();  // So that log filename is known...
 	std::string msg = "logger/notice: Logging ";
 	{
-		std::lock_guard<std::mutex> l(log_lock);
+		std::lock_guard<std::mutex> l(self.log_lock);
 		if (level.empty()) {
-			minLevel = 2;  // Display all notices, warnings and errors
+			self.minLevel = 2;  // Display all notices, warnings and errors
 			msg += "all notices, warnings and errors.";
 		} else if (level == "none") {
-			minLevel = 100;
+			self.minLevel = 100;
 			msg += "disabled.";  // No-one will see this, so what's the point? :)
 		} else {
-			minLevel = numeric(level);
-			if (minLevel == -1 /* Not a valid level name */) {
-				minLevel = 4;  // Display errors from any subsystem
-				target = level;  // All messages from the given subsystem
-				msg += "everything from subsystem " + target + " and all errors.";
+			self.minLevel = numeric(level);
+			if (self.minLevel == -1 /* Not a valid level name */) {
+				self.minLevel = 4;  // Display errors from any subsystem
+				self.target = level;  // All messages from the given subsystem
+				msg += "everything from subsystem " + self.target + " and all errors.";
 			} else {
 				msg += "any events of " + level + " or higher level.";
 			}
 		}
-		if (minLevel < 100) {
+		if (self.minLevel < 100) {
 			fs::path name = getLogFilename();
 			fs::create_directories(name.parent_path());
-			file.open(name);
+			self.file.open(name);
 			msg += " Log file: " + name.string();
 		}
-		sb.open(vsm);
-		default_ClogBuf = std::clog.rdbuf();
-		std::clog.rdbuf(&sb);
+		self.sb.open(self.vsm);
+		self.default_ClogBuf = std::clog.rdbuf();
+		std::clog.rdbuf(&self.sb);
 		atexit(Logger::teardown);
 	}
 	std::clog << msg << std::endl;
-	grabber = std::make_unique<StderrGrabber>();
+	self.grabber = std::make_unique<StderrGrabber>();
 }
 
 Logger::~Logger() { teardown(); }
 
 void Logger::teardown() {
-	grabber.reset();
-	if (default_ClogBuf) std::clog << "logger/info: Exiting normally." << std::endl;
-	std::lock_guard<std::mutex> l(log_lock);
-	if (!default_ClogBuf) return;
-	std::clog.rdbuf(default_ClogBuf);
-	sb.close();
-	file.close();
-	default_ClogBuf = nullptr;
+	self.grabber.reset();
+	if (self.default_ClogBuf) std::clog << "logger/info: Exiting normally." << std::endl;
+	std::lock_guard<std::mutex> l(self.log_lock);
+	if (!self.default_ClogBuf) return;
+	std::clog.rdbuf(self.default_ClogBuf);
+	self.sb.close();
+	self.file.close();
+	self.default_ClogBuf = nullptr;
 }
 
