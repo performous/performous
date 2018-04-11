@@ -38,6 +38,11 @@
  * substring search) to be monitored all the way down to debug level, in which case only errors from any other
  * subsystems will be printed.
  *
+ * For thread-safety, messages must be written as a single string, e.g.
+ *   std::clog << "sys/info: message " + std::to_string(num) + "\n" << std::flush;
+ *
+ * For multi-line formatted messages, \r may be used in place of inner newlines to avoid repeating the prefix.
+ *
  **/
 
 struct StreamRedirect {
@@ -87,7 +92,7 @@ struct StderrGrabber {
 				std::clog << "stderr/info: " + line << std::flush;
 				line.clear(); ++count;
 			}
-			if (count > 0) std::clog << "stderr/notice: " << count << " messages logged to stderr/info\n" << std::flush;
+			if (count > 0) std::clog << "stderr/notice: " + std::to_string(count) + " messages logged to stderr/info\n" << std::flush;
 		});
 	}
 	~StderrGrabber() { close(STDERR_FILENO); }
@@ -112,8 +117,8 @@ static struct Impl {
 	std::mutex mutex;
 	using Lock = std::lock_guard<std::mutex>;
 	struct Redirects {
-		VerboseMessageSink vsm;
-		boost::iostreams::stream_buffer<VerboseMessageSink> sb{vsm};
+		VerboseMessageSink vms;
+		boost::iostreams::stream_buffer<VerboseMessageSink> sb{vms};
 		StreamRedirect clogRedirect{std::clog, &sb};
 		StderrGrabber grabber;
 	};
@@ -121,32 +126,43 @@ static struct Impl {
 	fs::ofstream file;
 	std::string target;
 	int minLevel;
+	std::string buffer;
+	void parse(std::string&& text) {
+		Lock l(mutex);
+		buffer += text;
+		// Split into lines
+		for (std::string::size_type pos; (pos = buffer.find('\n')) != std::string::npos; ) {
+			++pos;
+			parseLine(buffer.substr(0, pos));
+			buffer.erase(0, pos);
+		}
+	}
+	void parseLine(std::string&& line) {
+		// Parse prefix as subsystem/level:...
+		auto slash = line.find('/');
+		auto colon = line.find(": ", slash);
+		if (slash == std::string::npos || colon == std::string::npos) {
+			parseLine("logger/error: Invalid log prefix on line: " + line);
+			return;
+		}
+		std::string subsystem(line, 0, slash);
+		std::string level(line, slash + 1, colon - slash - 1);
+		auto num = numeric.find(level);
+		if (num == numeric.end()) {
+			parseLine("logger/error: Invalid level '" + level + "' line: " + line);
+			return;
+		}
+		// Write to file & stderr those messages that pass the filtering
+		if (num->second < minLevel && (target.empty() || subsystem.find(target) == std::string::npos)) return;
+		for (char& ch: line) if (ch == '\r') ch = '\n';  // Hack for multi-line log messages
+		std::cerr << line << std::flush;
+		file << line << std::flush;
+	}
+
 } self;
 
 std::streamsize VerboseMessageSink::write(const char* s, std::streamsize n) {
-	std::string line(s, n);  // Note: s is *not* a c-string, thus we must stop after n chars.
-	// Parse prefix as subsystem/level:...
-	size_t slash = line.find('/');
-	size_t colon = line.find(": ", slash);
-	if (slash == std::string::npos || colon == std::string::npos) {
-		line = "logger/error: Invalid log prefix on line [[[\n" + line + "]]]\n";
-		write(line.data(), line.size());
-		return n;
-	}
-	std::string subsystem(line, 0, slash);
-	std::string level(line, slash + 1, colon - slash - 1);
-	auto num = self.numeric.find(level);
-	if (num == self.numeric.end()) {
-		line = "logger/error: Invalid level '" + level + "' line [[[\n" + line + "]]]\n";
-		write(line.data(), line.size());
-		return n;
-	}
-	// Write to file & stderr those messages that pass the filtering
-	if (num->second >= self.minLevel || (!self.target.empty() && subsystem.find(self.target) != std::string::npos)) {
-		Impl::Lock l(self.mutex);
-		std::cerr << line << std::flush;
-		self.file << line << std::flush;
-	}
+	self.parse(std::string(s, n)); // Note: s is *not* a c-string, thus we must stop after n chars.
 	return n;
 }
 
@@ -186,8 +202,15 @@ Logger::Logger(std::string const& level) {
 Logger::~Logger() { teardown(); }
 
 void Logger::teardown() {
+	std::vector<std::future<void>> jobs;
+	for (int i = 0; i < 20; ++i) {
+		jobs.push_back(std::async(std::launch::async, [i] {
+			std::clog << "logger/xxx: thread " + std::to_string(i) + " test message\n" << std::flush;
+		}));
+	}
 	if (!self.redirects) return;
 	std::clog << "logger/info: Exiting normally.\n" << std::flush;
 	self.redirects.reset();
 	self.file.close();
+	jobs.clear();
 }

@@ -54,19 +54,19 @@
 		void pathInit() {
 			bool bootstrapping = paths.empty();  // The first run (during bootstrap)
 			if (!bootstrapping) {
-				std::string logmsg = "fs/info: Found system paths:\n";
-				logmsg += "  base:     " + base.string() + '\n';
-				logmsg += "  share:    " + share.string() + '\n';
-				logmsg += "  locale:   " + locale.string() + '\n';
-				logmsg += "  sysConf:  " + sysConf.string() + '\n';
-				logmsg += "  home:     " + home.string() + '\n';
-				logmsg += "  config:   " + conf.string() + '\n';
-				logmsg += "  data:     " + data.string() + '\n';
+				std::string logmsg = "fs/info: Found system paths:\r";
+				logmsg += "  base:     " + base.string() + '\r';
+				logmsg += "  share:    " + share.string() + '\r';
+				logmsg += "  locale:   " + locale.string() + '\r';
+				logmsg += "  sysConf:  " + sysConf.string() + '\r';
+				logmsg += "  home:     " + home.string() + '\r';
+				logmsg += "  config:   " + conf.string() + '\r';
+				logmsg += "  data:     " + data.string() + '\r';
 				logmsg += "  cache:    " + cache.string() + '\n';
 				std::clog << logmsg << std::flush;
 			}
 			// Data dirs
-			std::string logmsg = "fs/info: Determining data dirs (search path):\n";
+			std::string logmsg = "fs/info: Determining data dirs (search path):";
 			{
 				Paths dirs;
 				dirs.push_back(data);  // Adding user's data dir
@@ -83,10 +83,10 @@
 				for (auto dir: dirs) {
 					dir = fs::absolute(dir);
 					if (used.find(dir) != used.end()) continue;
-					logmsg += "  " + dir.string() + '\n';
+					logmsg += "\r  " + dir.string();
 					paths.push_back(dir);
 					used.insert(dir);
 				}
 			}
-			if (!bootstrapping) std::clog << logmsg << std::flush;
+			if (!bootstrapping) std::clog << logmsg + "\n" << std::flush;
 		}

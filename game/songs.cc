@@ -20,7 +20,7 @@
 #include <unicode/stsearch.h>
 
 Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), m_database(database), m_order(config["songs/sort-order"].i()) {
-	if (U_FAILURE(UnicodeUtil::m_icuError)) std::clog << "songs/error: Error creating Unicode collator: " << u_errorName(UnicodeUtil::m_icuError) << std::endl;
+	if (U_FAILURE(UnicodeUtil::m_icuError)) std::clog << std::string("songs/error: Error creating Unicode collator: ") + u_errorName(UnicodeUtil::m_icuError) + "\n" << std::flush;
 	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
 	reload();
 }
@@ -52,26 +52,28 @@ void Songs::reload_internal() {
 	Paths paths = getPathsConfig("paths/songs");
 	for (auto it = paths.begin(); m_loading && it != paths.end(); ++it) { //loop through stored directories from config
 		try {
-			if (!fs::is_directory(*it)) { std::clog << "songs/info: >>> Not scanning: " << *it << " (no such directory)\n"; continue; }
-			std::clog << "songs/info: >>> Scanning " << *it << std::endl;
+			if (!fs::is_directory(*it)) { std::clog << "songs/info: >>> Not scanning: " + it->string() + " (no such directory)\n" << std::flush; continue; }
+			std::clog << "songs/info: >>> Scanning " + it->string() + "\n" << std::flush;
 			size_t count = m_songs.size();
 			reload_internal(*it);
 			size_t diff = m_songs.size() - count;
-			if (diff > 0 && m_loading) std::clog << "songs/info: " << diff << " songs loaded\n";
+			if (diff > 0 && m_loading) std::clog << "songs/info: " + std::to_string(diff) + " songs loaded\n" << std::flush;
 		} catch (std::exception& e) {
-			std::clog << "songs/error: >>> Error scanning " << *it << ": " << e.what() << '\n';
+			std::clog << "songs/error: >>> Error scanning " + it->string() + ": " + e.what() + "\n" << std::flush;
 		}
 	}
 	prof("total");
 	if (m_loading) dumpSongs_internal(); // Dump the songlist to file (if requested)
-	std::clog << std::flush;
 	m_loading = false;
-	std::clog << "songs/notice: Done Loading. Loaded " << m_songs.size() << " Songs." << std::endl;
+	std::clog << "songs/notice: Done Loading. Loaded " + std::to_string(m_songs.size()) + " Songs.\n" << std::flush;
 	doneLoading = true;
 }
 
 void Songs::reload_internal(fs::path const& parent) {
-	if (std::distance(parent.begin(), parent.end()) > 20) { std::clog << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)\n"; return; }
+	if (std::distance(parent.begin(), parent.end()) > 20) {
+		std::clog << "songs/info: >>> Not scanning: " + parent.string() + " (maximum depth reached, possibly due to cyclic symlinks)\n" << std::flush;
+		return;
+	}
 	try {
 		std::regex expression(R"((\.txt|^song\.ini|^notes\.xml|\.sm)$)", std::regex_constants::icase);
 		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) { //loop through files
@@ -85,12 +87,12 @@ void Songs::reload_internal(fs::path const& parent) {
 				for(unsigned int i = 0; i< m_songs.size(); i++) {
 					if(s->filename.extension() != m_songs[i]->filename.extension() && s->filename.stem() == m_songs[i]->filename.stem() &&
 							s->title == m_songs[i]->title && s->artist == m_songs[i]->artist) {
-						std::clog << "songs/info: >>> Found additional song file: " << s->filename << " for: " << m_songs[i]->filename << std::endl;
+						std::clog << "songs/info: >>> Found additional song file: " + s->filename.string() << " for: " + m_songs[i]->filename.string() + "\n" << std::flush;
 						AdditionalFileIndex = i;
 					}
 				}
 				if(AdditionalFileIndex > 0) { //TODO: add it to existing song
-					std::clog << "songs/info: >>> not yet implemented " << std::endl;
+					std::clog << "songs/info: >>> not yet implemented\n" << std::flush;
 					s->getDurationSeconds();
 					m_songs.push_back(s); // will make it appear double!!
 				} else {
@@ -99,11 +101,11 @@ void Songs::reload_internal(fs::path const& parent) {
 				}
 				m_dirty = true;
 			} catch (SongParserException& e) {
-				std::clog << e;
+				e.log();
 			}
 		}
 	} catch (std::exception const& e) {
-		std::clog << "songs/error: Error accessing " << parent << ": " << e.what() << '\n';
+		std::clog << "songs/error: Error accessing " + parent.string() + ": " + e.what() + "\n" << std::flush;
 	}
 }
 
@@ -307,7 +309,7 @@ namespace {
 				xmlpp::set_first_child_text(xmlpp::add_child_element(song, "cover"), coverlink);
 			}
 		} catch (std::exception& e) {
-			std::cerr << "Songlist error handling cover image: " << e.what() << std::endl;
+			std::clog << std::string("songs/warning: Songlist error handling cover image: ") + e.what() + "\n" << std::flush;
 		}
 	}
 	template <typename SongVector> void dumpXML(SongVector const& svec, std::string const& filename) {

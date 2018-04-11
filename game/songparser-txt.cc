@@ -62,13 +62,13 @@ void SongParser::txtParse() {
 				if (currentNote.type == Note::SLEEP) {
 					auto prevToLast = ++(finalDuet.rbegin());
 					if (prevToLast->type == Note::SLEEP) {
-						std::clog << "songparser/info: Phrase formed by a single syllable is most likely our fault, We'll skip the break." << std::endl;
+						std::clog << "songs/info: Phrase formed by a single syllable is most likely our fault, We'll skip the break." << std::endl;
 						skip = true;
 					}
 				}
 				else {
 					if (Note::overlapping(finalDuet.back(),currentNote)) {
-						std::clog << "songparser/info: Will try to fix overlap (most likely between both singers) with a linebreak." << std::endl;
+						std::clog << "songs/info: Will try to fix overlap (most likely between both singers) with a linebreak." << std::endl;
 						Note lineBreak = Note();
 						lineBreak.type = Note::SLEEP;
 						double beatDur = getBPM(finalDuet.back().begin).step;
@@ -168,7 +168,7 @@ bool SongParser::txtParseNote(std::string line) {
 		{
 			unsigned int length = 0;
 			if (!(iss >> ts >> length >> n.note)) throw std::runtime_error("Invalid note line format");
-			if (length < 1) std::clog << "songparser/info: Notes must have positive durations." << std::endl;
+			if (length < 1) std::clog << "songs/info: Notes must have positive durations." << std::endl;
 			n.notePrev = n.note; // No slide notes in TXT yet.
 			if (m_relative) ts += m_txt.relativeShift;
 			if (iss.get() == ' ') std::getline(iss, n.syllable);
@@ -205,7 +205,7 @@ bool SongParser::txtParseNote(std::string line) {
 			if (p.begin > n.begin) {
 				std::string msg = "Skipped overlapping notes:\n" + p.syllable + ", " + n.syllable + "\n";
 				m_song.b0rked += msg;
-				std::clog << "songparser/notice: " + m_song.filename.string() + ": " + msg << std::endl;
+				std::clog << "songs/notice: " + m_song.filename.string() + ": " + msg << std::endl;
 				return true;
 			}
 		} else throw std::runtime_error("The first note has negative timestamp");

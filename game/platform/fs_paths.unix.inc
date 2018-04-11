@@ -25,13 +25,13 @@
 			{
 				sysConf = (Platform::currentOS() == Platform::macos) ? "/Library/Preferences/Performous" : "/etc/xdg/performous";
 			}
-			
+
 			// Home
 			{
 			char const* p = getenv("HOME");
 				if (p) home = p;
 			}
-			
+
 			// Config
 			{
 				if (Platform::currentOS() == Platform::macos) {
@@ -43,7 +43,7 @@
 					conf /= performous;
 				}
 			}
-			
+
 			// Data
 			{
 				if (Platform::currentOS() == Platform::macos) {
@@ -57,7 +57,7 @@
 			// Cache
 			{
 				if (Platform::currentOS() == Platform::macos) {
-					cache = (home / "Library/Caches/Performous"); 
+					cache = (home / "Library/Caches/Performous");
 				}
 				else {
 				char const* p = getenv("XDG_CACHE_HOME");
@@ -66,19 +66,19 @@
 			}
 			pathInit();
 		}
-		
+
 		/// Initialize/reset data dirs (search path).
 		void pathInit() {
 			bool bootstrapping = paths.empty();  // The first run (during bootstrap)
 			if (!bootstrapping) {
-				std::string logmsg = "fs/info: Found system paths:\n";
-				logmsg += "  base:     " + base.string() + '\n';
-				logmsg += "  share:    " + share.string() + '\n';
-				logmsg += "  locale:   " + locale.string() + '\n';
-				logmsg += "  sysConf:  " + sysConf.string() + '\n';
-				logmsg += "  home:     " + home.string() + '\n';
-				logmsg += "  config:   " + conf.string() + '\n';
-				logmsg += "  data:     " + data.string() + '\n';
+				std::string logmsg = "fs/info: Found system paths:\r";
+				logmsg += "  base:     " + base.string() + '\r';
+				logmsg += "  share:    " + share.string() + '\r';
+				logmsg += "  locale:   " + locale.string() + '\r';
+				logmsg += "  sysConf:  " + sysConf.string() + '\r';
+				logmsg += "  home:     " + home.string() + '\r';
+				logmsg += "  config:   " + conf.string() + '\r';
+				logmsg += "  data:     " + data.string() + '\r';
 				logmsg += "  cache:    " + cache.string() + '\n';
 				std::clog << logmsg << std::flush;
 			}
@@ -86,7 +86,7 @@
 				char const* p = getenv("XDG_CONFIG_HOME");
 				fs::path oldConf = (p ? p : home / ".config/performous");
 				if (fs::is_directory(oldConf)) {
-				std::clog << "fs/info: Configuration files found in old path, " << oldConf << std::endl;
+				std::clog << std::string("fs/info: Configuration files found in old path, ") + oldConf.string() + "\n" << std::flush;
 				conf = (home / "/Library/Preferences/Performous");
 					if (bootstrapping) {
 						copyDirectoryRecursively(oldConf, conf);
@@ -101,15 +101,15 @@
 					}
 					}
 				}
-				if (didMigrateConfig) { std::clog << "fs/info: Succesfully moved configuration files to their new location: " << conf.string() << std::endl; }
+				if (didMigrateConfig) { std::clog << "fs/info: Succesfully moved configuration files to their new location: " + conf.string() + "\n" << std::flush; }
 				}
 			// Data dirs
-			std::string logmsg = "fs/info: Determining data dirs (search path):\n";
+			std::string logmsg = "fs/info: Determining data dirs (search path):";
 			{
 				Paths dirs;
 				dirs.push_back(data);  // Adding user's data dir
 				dirs.push_back(share);  // Adding system data dir (relative to performous executable or PERFORMOUS_ROOT)
-				
+
 				// Adding XDG_DATA_DIRS
 				{
 					char const* xdg_data_dirs = getenv("XDG_DATA_DIRS");
@@ -127,10 +127,10 @@
 				for (auto dir: dirs) {
 					dir = fs::absolute(dir);
 					if (used.find(dir) != used.end()) continue;
-					logmsg += "  " + dir.string() + '\n';
+					logmsg += "\r  " + dir.string();
 					paths.push_back(dir);
 					used.insert(dir);
 				}
 			}
-			if (!bootstrapping) std::clog << logmsg << std::flush;
+			if (!bootstrapping) std::clog << logmsg + "\n" << std::flush;
 		}

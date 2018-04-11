@@ -83,13 +83,6 @@ bool Song::getPrevSection(double pos, SongSection &section) {
 	return false;
 }
 
-std::ostream& operator<<(std::ostream& os, SongParserException const& e) {
-	os << (e.silent() ? "songparser/debug: " : "songparser/warning: ") << e.file().string();
-	if (e.line()) os << ":" << e.line();
-	os << ":\n  " << e.what() << std::endl;
-	return os;
-}
-
 void Song::insertVocalTrack(std::string vocalTrack, VocalTrack track) {
 	eraseVocalTrack(vocalTrack);
 	vocalTracks.insert(std::make_pair(vocalTrack, track));
@@ -128,7 +121,7 @@ double Song::getDurationSeconds() {
 			avformat_free_context(pFormatCtx);
 			return m_duration;
 		}
-		std::clog << "song/info: >>> Couldn't open file for calculating duration." << std::endl;
+		std::clog << "songs/info: >>> Couldn't open file for calculating duration." << std::endl;
 		return 0;
 	} else { //duration is still in memmory that means we already loaded it
 		return m_duration;
@@ -148,3 +141,14 @@ std::vector<std::string> Song::getVocalTrackNames() const {
 	return result;
 }
 
+std::string SongParserException::string() const {
+	auto ret = std::string(silent() ? "songs/debug: " : "songs/warning: ") + file().string();
+	if (line()) ret += ":" + std::to_string(line());
+	return ret + ":\n  " + what();
+}
+
+void SongParserException::log() const {
+	std::string logmsg = "songs/info: ";
+	for (char ch: string()) logmsg += (ch == '\n' ? '\r' : ch);
+	std::clog << logmsg + "\n" << std::flush;
+}

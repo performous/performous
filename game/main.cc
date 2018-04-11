@@ -406,9 +406,9 @@ int main(int argc, char** argv) try {
 }
 
 void outputOptionalFeatureStatus() {
-	std::clog << "core/notice: " PACKAGE " " VERSION " starting..."
-	  << "\n  Internationalization: " << (TranslationEngine::enabled() ? "Enabled" : "Disabled")
-	  << "\n  MIDI Hardware I/O:    " << (input::Hardware::midiEnabled() ? "Enabled" : "Disabled")
-	  << "\n  Webcam support:       " << (Webcam::enabled() ? "Enabled" : "Disabled")
-	  << std::endl;
+	std::clog << std::string("core/notice: " PACKAGE " " VERSION " starting...") +
+	  "\r  Internationalization: " + (TranslationEngine::enabled() ? "Enabled" : "Disabled") +
+	  "\r  MIDI Hardware I/O:    " + (input::Hardware::midiEnabled() ? "Enabled" : "Disabled") +
+	  "\r  Webcam support:       " + (Webcam::enabled() ? "Enabled" : "Disabled") +
+	  "\n" << std::flush;
 }

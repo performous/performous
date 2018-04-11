@@ -58,7 +58,7 @@ void ScreenSing::enter() {
 	gm->loading(_("Loading song..."), 0.4);
 	try { m_song->loadNotes(false /* don't ignore errors */); }
 	catch (SongParserException& e) {
-		std::clog << e;
+		e.log();
 		gm->activateScreen("Songs");
 	}
 	// Notify about broken tracks
@@ -485,7 +485,7 @@ bool ScreenSing::devCanParticipate(input::DevType const& devType) const {
 	if (devType == input::DEVTYPE_DANCEPAD && m_song->hasDance()) return true;
 	if (devType == input::DEVTYPE_GUITAR && m_song->hasGuitars()) return true;
 	if (devType == input::DEVTYPE_DRUMS && m_song->hasDrums()) return true;
-	return false;	
+	return false;
 }
 
 

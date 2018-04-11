@@ -119,12 +119,11 @@ struct SongParserException: public std::runtime_error {
 	fs::path const& file() const { return m_filename; } ///< file in which the error occured
 	unsigned int line() const { return m_linenum; } ///< line in which the error occured
 	bool silent() const { return m_silent; } ///< if the error should not be printed to user (file skipped)
+	std::string string() const;  ///< Formatted string
+	void log() const;  ///< Write a log message
 private:
 	fs::path m_filename;
 	unsigned int m_linenum;
 	bool m_silent;
 };
-
-/// Print a SongParserException in a format suitable for the logging system.
-std::ostream& operator<<(std::ostream& os, SongParserException const& e);
 

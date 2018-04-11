@@ -423,7 +423,12 @@ struct Audio::Impl {
 	std::string selectedBackend = Audio::backendConfig().getValue();
 	Impl() {
 		populateBackends(portaudio::AudioBackends().getBackends());
-		std::clog << portaudio::AudioBackends().dump() << std::flush; // Dump PortAudio backends and devices to log.
+		{
+			std::string logmsg = "audio/notice: Audio backends:\r";
+			for (char ch: portaudio::AudioBackends().dump()) logmsg += (ch == '\n' ? '\r' : ch);
+			logmsg.back() = '\n';
+			std::clog << logmsg << std::flush;
+		}
 		// Parse audio devices from config
 		ConfigItem::StringList devs = config["audio/devices"].sl();
 		for (ConfigItem::StringList::const_iterator it = devs.begin(), end = devs.end(); it != end; ++it) {
@@ -493,7 +498,7 @@ struct Audio::Impl {
 				// which often would hit the Pa_CloseStream hang bug and terminate the application.
 				d.start();
 			} catch(std::runtime_error& e) {
-				std::clog << "audio/error: Audio device '" << *it << "': " << e.what() << std::endl;
+				std::clog << "audio/error: Audio device '" + *it + "': " + e.what() << std::endl;
 			}
 		}
 		// Assign mic buffers to the output for pass-through
