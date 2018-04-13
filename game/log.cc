@@ -202,15 +202,8 @@ Logger::Logger(std::string const& level) {
 Logger::~Logger() { teardown(); }
 
 void Logger::teardown() {
-	std::vector<std::future<void>> jobs;
-	for (int i = 0; i < 20; ++i) {
-		jobs.push_back(std::async(std::launch::async, [i] {
-			std::clog << "logger/xxx: thread " + std::to_string(i) + " test message\n" << std::flush;
-		}));
-	}
 	if (!self.redirects) return;
 	std::clog << "logger/info: Exiting normally.\n" << std::flush;
 	self.redirects.reset();
 	self.file.close();
-	jobs.clear();
 }
