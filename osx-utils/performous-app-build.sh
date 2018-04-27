@@ -3,6 +3,13 @@ set -o errexit
 # the very first step is to check that dylibbundler exists,
 # without it the bundle would be broken
 
+PREFIXDIR="/opt/local" # By default, the default prefix for macports, change this if you're using a different path or package manager.
+DEPLOYMENT_TARGET="10.9" # Change this if you want to target a different version of macOS.
+MAKE_JOBS=8 # Change this to change the number of jobs spawned.
+CCPATH="/usr/bin/clang" # Path to system Clang, change if you want another compiler.
+CXXPATH="/usr/bin/clang++" # Path to system Clang, change if you want another compiler.
+
+
 args=("$@")
 debug="^(--debug|--DEBUG|-d|-D)$"
 
@@ -129,9 +136,6 @@ function main {
 	BINDIR="${TEMPDIR}/MacOS"
 	ETCDIR="${RESDIR}/etc"
 
-	DEPLOYMENT_TARGET="10.9"
-	MAKE_JOBS=8
-
 	rm -rf "${TEMPDIR}"
 	mkdir -p "${TEMPDIR}"
 
@@ -139,9 +143,8 @@ function main {
 	mkdir build
 	cd build
 
-	cmake -DCMAKE_INSTALL_PREFIX=$TEMPDIR -DENABLE_TOOLS=${ENABLE_TOOLS} -DCMAKE_BUILD_TYPE=${RELTYPE} -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DFreetype_INCLUDE_DIR=/opt/local/include/freetype2 -DCMAKE_OSX_DEPLOYMENT_TARGET=${DEPLOYMENT_TARGET} -DFontconfig_INCLUDE_DIR=/opt/local/include/fontconfig -DPng_INCLUDE_DIR=/opt/local/include/libpng -DAVCodec_INCLUDE_DIR=/opt/local/include/libavcodec -DAVFormat_INCLUDE_DIR=/opt/local/include/libavformat -DSWScale_INCLUDE_DIR=/opt/local/include/libswscale -DFreetype_INCLUDE_DIR=/opt/local/include/freetype2/ -DLibXML2_LIBRARY=/opt/local/lib/libxml2.dylib -DLibXML2_INCLUDE_DIR=/opt/local/include/libxml2 -DGlibmmConfig_INCLUDE_DIR=/opt/local/lib/glibmm-2.4/include -DGlibConfig_INCLUDE_DIR=/opt/local/lib/glib-2.0/include -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -DCMAKE_C_FLAGS="-arch x86_64" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DSHARE_INSTALL=Resources -DLOCALE_DIR=Resources/Locales -DCMAKE_CXX_FLAGS="-std=c++1z -Wall -Wextra -stdlib=libc++ -arch x86_64" -DCMAKE_EXE_LINKER_FLAGS="-stdlib=libc++ -lc++ -lc++abi -arch x86_64" -DCMAKE_OSX_ARCHITECTURES="x86_64" ../..
+	cmake -DCMAKE_INSTALL_PREFIX=$TEMPDIR -DCMAKE_BUILD_TYPE=${RELTYPE} -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DFreetype_INCLUDE_DIR="${PREFIXDIR}"/include/freetype2 -DCMAKE_OSX_DEPLOYMENT_TARGET=${DEPLOYMENT_TARGET} -DFontconfig_INCLUDE_DIR="${PREFIXDIR}"/include/fontconfig -DPng_INCLUDE_DIR="${PREFIXDIR}"/include/libpng -DAVCodec_INCLUDE_DIR="${PREFIXDIR}"/include/libavcodec -DAVFormat_INCLUDE_DIR="${PREFIXDIR}"/include/libavformat -DSWScale_INCLUDE_DIR="${PREFIXDIR}"/include/libswscale -DFreetype_INCLUDE_DIR="${PREFIXDIR}"/include/freetype2/ -DLibXML2_LIBRARY="${PREFIXDIR}"/lib/libxml2.dylib -DLibXML2_INCLUDE_DIR="${PREFIXDIR}"/include/libxml2 -DGlibmmConfig_INCLUDE_DIR="${PREFIXDIR}"/lib/glibmm-2.4/include -DGlibConfig_INCLUDE_DIR="${PREFIXDIR}"/lib/glib-2.0/include -DCMAKE_C_COMPILER="${CCPATH}" -DCMAKE_CXX_COMPILER="${CXXPATH}" -DCMAKE_C_FLAGS="-arch x86_64" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DSHARE_INSTALL=Resources -DLOCALE_DIR=Resources/Locales -DCMAKE_CXX_FLAGS="-std=c++1y -Wall -Wextra -stdlib=libc++ -arch x86_64" -DCMAKE_EXE_LINKER_FLAGS="-stdlib=libc++ -lc++ -lc++abi -arch x86_64" -DCMAKE_OSX_ARCHITECTURES="x86_64" ../..
 	
-# 	-DLibXML++Config_INCLUDE_DIR=/opt/local/lib/libxml++-2.6/include
 	make -j${MAKE_JOBS} install # You can change the -j value in order to spawn more build threads.
 
 # then create the rest of the app bundle
@@ -167,7 +170,7 @@ function main {
 	fi
 
 	mkdir -p "${ETCDIR}"/fonts
-	cp -pLR /opt/local/etc/fonts "${ETCDIR}"
+	cp -pLR "${PREFIXDIR}"/etc/fonts "${ETCDIR}"
 
 	cd $ETCDIR/fonts
 	sed -i '' -e 's|\/opt\/local/share|\.\.\/\.\.\/\.\.\/Resources|g' fonts.conf
