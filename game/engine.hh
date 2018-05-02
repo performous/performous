@@ -24,7 +24,10 @@ class Engine {
 	Engine(Audio& audio, VocalTrackPtrs vocals, Database& database);
 	~Engine() { kill(); }
 	/// Terminates processing
-	void kill() { m_quit = true; m_thread->join(); }
+	void kill() { 
+		m_quit = true;
+		if (m_thread->joinable()) m_thread->join();
+		}
 	/** Used internally for std::thread. Do not call this yourself. (std::thread requires this to be public). **/
 	void operator()();
 };
