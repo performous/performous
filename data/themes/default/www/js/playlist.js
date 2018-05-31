@@ -13,9 +13,9 @@
 */
 $("#refresh-playlist").click(function () {
     $.get("api/getCurrentPlaylist.json", function (data) {
-        var database = JSON.parse(data);
-        $.get("api/getplaylistTimeout", function (data) {
-            var timeout = parseInt(data);
+        var database = data;//JSON.parse(data);
+        $.get("api/getplaylistTimeout", function (playlistTimeOut) {
+            var timeout = parseInt(playlistTimeOut);
             var totalTime = 0;
 
             clearList("playlist-songs");
@@ -103,16 +103,31 @@ $("a[href='#playlist']").on("shown.bs.tab", function () {
                 return;
             }
 
+            var songId = parseInt(evt.oldIndex);
+            var position = parseInt(evt.newIndex);
+
+            if(isNaN(songId) || isNaN(position)) {
+                buildAlertMessage("failed_changing_position_of_song", "danger");
+                return;
+            }
+
             var data = {
-                "songId": evt.oldIndex,
-                "position": evt.newIndex
+                "songId": songId,
+                "position": position
             };
 
-            $.post("api/setposition", JSON.stringify(data), function () {
-                buildAlertMessage("successfully_changed_position_of_song", "success");
-                $("#refresh-playlist").click();
-            }).fail(function () {
-                buildAlertMessage("failed_changing_position_of_song", "danger");
+            $.ajax({
+                url: "api/setposition",
+                type: "POST",
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                success: function(data, textStatus, jqXHR) {
+                    buildAlertMessage("successfully_changed_position_of_song", "success");
+                    $("#refresh-playlist").click();
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    buildAlertMessage("failed_changing_position_of_song", "danger");
+                }
             });
         }
     });
