@@ -37,8 +37,9 @@ function buildTable(database) {
     This function is used within 'database.js'.
 */
 function clearTable(selector) {
-    var tbody = $(selector);
-    while (tbody.children().length > 1) {
-        tbody.children().last().remove();
-    }
+    var tbody = document.getElementById(selector).getElementsByTagName('tbody')[0];
+    var tbodyHeader = document.getElementById("table-header");
+    var newTbody = document.createElement('tbody');
+    newTbody.appendChild(tbodyHeader);
+    tbody.parentNode.replaceChild(newTbody, tbody);
 }
