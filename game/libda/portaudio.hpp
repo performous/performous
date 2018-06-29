@@ -229,9 +229,12 @@ namespace portaudio {
 		  double sampleRate,
 		  unsigned long framesPerBuffer = paFramesPerBufferUnspecified,
 		  PaStreamFlags flags = paNoFlag,
-		  PaStreamCallback* callback = NULL,
-		  void* userData = NULL)
+		  PaStreamCallback* callback = nullptr,
+		  void* userData = nullptr)
 		{
+			if (output != nullptr) {
+				if (output->channelCount > 0) { flags = paPrimeOutputBuffersUsingStreamCallback; }
+			}
 			PORTAUDIO_CHECKED(Pa_OpenStream, (&m_handle, input, output, sampleRate, framesPerBuffer, flags, callback, userData));
 		}
 		/// Construct stream using a C++ functor as callback

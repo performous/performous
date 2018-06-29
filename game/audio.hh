@@ -34,7 +34,7 @@ struct Device {
 	/// Callback
 	int operator()(void const* input, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags);
 	/// Returns true if this device is opened for output
-	bool isOutput() const { return outptr != NULL; }
+	bool isOutput() const { return outptr != nullptr; }
 	/// Returns true if this device is assigned to the named channel (mic color or "OUT")
 	bool isChannel(std::string const& name) const {
 		if (name == "OUT") return isOutput();
