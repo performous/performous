@@ -36,7 +36,7 @@ namespace portaudio {
 	}
 
 	struct DeviceInfo {
-		DeviceInfo(int id, std::string n = std::string(), int i = 0, int o = 0): name(n), flex(n), idx(id), in(i), out(o) {}
+		DeviceInfo(int id, std::string n = std::string(), int i = 0, int o = 0, unsigned index = 0): name(n), flex(n), idx(id), in(i), out(o), index(index) {}
 		std::string desc() const {
 			std::ostringstream oss;
 			oss << name << " (";
@@ -50,6 +50,7 @@ namespace portaudio {
 		std::string flex;  ///< Modified name that is less specific but still unique (allow device numbers to change)
 		int idx;
 		int in, out;
+		unsigned index;
 	};
 		typedef std::vector<DeviceInfo> DeviceInfos;
 		struct AudioDevices {
@@ -82,7 +83,7 @@ namespace portaudio {
 					oss << name << " #" << ++num;
 					n = oss.str();
 				};
-				devices.push_back(DeviceInfo(i, name, info->maxInputChannels, info->maxOutputChannels));
+				devices.push_back(DeviceInfo(i, name, info->maxInputChannels, info->maxOutputChannels, Pa_HostApiDeviceIndexToDeviceIndex(backendIndex, i)));
 			}
 			for (auto& dev: devices) {
 				// Array of regex - replacement pairs
