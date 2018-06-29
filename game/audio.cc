@@ -448,14 +448,14 @@ struct Audio::Impl {
 					else if (key == "dev") std::getline(iss, params.dev);
 					else if (key == "mics") {
 						// Parse a comma-separated list of mics
-						for (std::string mic; std::getline(iss, mic, ','); params.mics.push_back(mic)) {}
+						for (std::string mic; std::getline(iss, mic, ','); params.mics.push_back(mic)) {
+							++params.in;
+						}
 					}
+					if (params.mics.size() < params.in) { params.mics.resize(params.in); }
 					else throw std::runtime_error("Unknown device parameter " + key);
 					if (!iss.eof()) throw std::runtime_error("Syntax error parsing device parameter " + key);
 				}
-				// Sync mics/in settings together
-				if (params.in == 0) params.in = params.mics.size();
-				else params.mics.resize(params.in);
 				portaudio::AudioDevices ad(PaHostApiTypeId(PaHostApiNameToHostApiTypeId(selectedBackend)));
 				auto const& info = ad.find(params.dev);
 				std::clog << "audio/info: Trying audio device \"" << params.dev << "\", idx: " << info.idx
