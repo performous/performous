@@ -17,7 +17,7 @@
 class Popup {
   public:
 	/// Constructor
-	Popup(std::string msg, Color c, double speed, SvgTxtThemeSimple* popupText, std::string info = "", SvgTxtTheme* infoText = NULL):
+	Popup(std::string msg, Color c, double speed, SvgTxtThemeSimple* popupText, std::string info = "", SvgTxtTheme* infoText = nullptr):
 	  m_msg(msg), m_color(c), m_anim(AnimValue(0.0, speed)), m_popupText(popupText), m_info(info), m_infoText(infoText)
 	{
 		m_anim.setTarget(1.0, false);
@@ -114,7 +114,7 @@ public:
 		int fret;
 		Duration const* dur;
 		double holdTime;
-		Event(double t, int ty, int f = -1, Duration const* d = NULL): time(t), glow(0.0, 5.0), whammy(0.0, 0.5), type(ty), fret(f), dur(d), holdTime(d ? d->begin : getNaN()) { if (type > 0) glow.setValue(1.0); }
+		Event(double t, int ty, int f = -1, Duration const* d = nullptr): time(t), glow(0.0, 5.0), whammy(0.0, 0.5), type(ty), fret(f), dur(d), holdTime(d ? d->begin : getNaN()) { if (type > 0) glow.setValue(1.0); }
 	};
 	typedef std::vector<Event> Events;
 	Events m_events;

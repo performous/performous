@@ -36,11 +36,11 @@ namespace {
 	static void writePNG_internal(png_structp pngPtr, png_infop infoPtr, ofstream& file, unsigned w, unsigned h, int colorType, std::vector<png_bytep>& rows) {
 		// There must be no objects initialized within this function because longjmp will mess them up
 		if (setjmp(png_jmpbuf(pngPtr))) throw std::runtime_error("Writing PNG failed");
-		png_set_write_fn(pngPtr, &file, writePngHelper, NULL);
+		png_set_write_fn(pngPtr, &file, writePngHelper, nullptr);
 		png_set_IHDR(pngPtr, infoPtr, w, h, 8, colorType, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 		png_write_info(pngPtr, infoPtr);
 		png_write_image(pngPtr, &rows[0]);
-		png_write_end(pngPtr, NULL);
+		png_write_end(pngPtr, nullptr);
 	}
 
 	struct my_jpeg_error_mgr {
@@ -129,9 +129,9 @@ void writePNG(fs::path const& filename, Bitmap const& img, unsigned stride) {
 		rows[y] = (png_bytep)(&img.data()[pos]);
 	}
 	// Initialize libpng structures
-	png_structp pngPtr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	png_structp pngPtr = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
 	if (!pngPtr) throw std::runtime_error("png_create_read_struct failed");
-	png_infop infoPtr = NULL;
+	png_infop infoPtr = nullptr;
 	struct Cleanup {
 		png_structpp pngPP;
 		png_infopp infoPP;
@@ -151,14 +151,14 @@ void loadPNG(Bitmap& bitmap, fs::path const& filename) {
 	// A hack to assume linear premultiplied data if file extension is .premul.png (used for cached SVGs)
 	if (filename.stem().extension() == "premul") bitmap.linearPremul = true;
 	ifstream file(filename, std::ios::binary);
-	png_structp pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	png_structp pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
 	if (!pngPtr) throw std::runtime_error("png_create_read_struct failed");
-	png_infop infoPtr = NULL;
+	png_infop infoPtr = nullptr;
 	struct Cleanup {
 		png_structpp pngPP;
 		png_infopp infoPP;
 		Cleanup(png_structp& pngP, png_infop& infoP): pngPP(&pngP), infoPP(&infoP) {}
-		~Cleanup() { png_destroy_read_struct(pngPP, infoPP, (png_infopp)NULL); }
+		~Cleanup() { png_destroy_read_struct(pngPP, infoPP, (png_infopp)nullptr); }
 	} cleanup(pngPtr, infoPtr);
 	infoPtr = png_create_info_struct(pngPtr);
 	if (!infoPtr) throw std::runtime_error("png_create_info_struct failed");

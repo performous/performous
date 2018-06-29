@@ -25,7 +25,7 @@ struct Bitmap {
 	pix::Format fmt;
 	bool linearPremul;  // Is the data linear RGB and premultiplied (as opposed to sRGB and non-premultiplied)
 	bool bottomFirst;  // Upside-down (only used for taking screenshots)
-	Bitmap(unsigned char* ptr = NULL): ptr(ptr), width(), height(), ar(), timestamp(), fmt(pix::CHAR_RGBA), linearPremul(), bottomFirst() {}
+	Bitmap(unsigned char* ptr = nullptr): ptr(ptr), width(), height(), ar(), timestamp(), fmt(pix::CHAR_RGBA), linearPremul(), bottomFirst() {}
 	void resize(unsigned w, unsigned h) {
 		if (!ptr) buf.resize(w * h * 4); else buf.clear();
 		width = w;
