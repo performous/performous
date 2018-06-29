@@ -132,7 +132,7 @@ function main {
 	RESDIR="${TEMPDIR}/Resources"
 	LIBDIR="${RESDIR}/lib"
 	LOCALEDIR="${RESDIR}/Locales"
-	FRAMEWORKDIR="{$RESDIR}/Frameworks"
+	FRAMEWORKDIR="${RESDIR}/Frameworks"
 	BINDIR="${TEMPDIR}/MacOS"
 	ETCDIR="${RESDIR}/etc"
 
