@@ -463,7 +463,7 @@ struct Audio::Impl {
 				if (info.in < int(params.mics.size())) throw std::runtime_error("Device doesn't have enough input channels");
 				if (info.out < int(params.out)) throw std::runtime_error("Device doesn't have enough output channels");
 				// Match found if we got here, construct a device
-				devices.emplace_back(params.in, params.out, params.rate, info.idx);
+				devices.emplace_back(params.in, params.out, params.rate, info.index);
 				Device& d = devices.back();
 				// Assign mics for all channels of the device
 				int assigned_mics = 0;
