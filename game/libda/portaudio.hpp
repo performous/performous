@@ -121,12 +121,10 @@ namespace portaudio {
 			throw std::runtime_error("No such device.");
 		}
 		DeviceInfo const& findByChannels(bool output, unsigned num) {
-			// Try name search with full match
 			for (auto const& dev: devices) {
-			unsigned reqChannels = output ? dev.out : dev.in;
-			if (reqChannels >= num) { return dev;  }
+				unsigned reqChannels = output ? dev.out : dev.in;
+				if (reqChannels >= num) { return dev;  }
 			}
-			// Try name search with partial/flexible match
 			throw std::runtime_error("No such device.");
 		}
 		DeviceInfos devices;
