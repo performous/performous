@@ -237,7 +237,7 @@ void ScreenSongs::drawJukebox() {
 	if (diff < 3.0) {
 		Song& song = m_songs.current();
 		// Draw the cover
-		Surface* cover = NULL;
+		Surface* cover = nullptr;
 		if (!song.cover.empty()) try { cover = &m_covers[song.cover]; } catch (std::exception const&) {}
 		if (cover && !cover->empty()) {
 			Surface& s = *cover;

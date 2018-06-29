@@ -21,7 +21,7 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 #if !GLIB_CHECK_VERSION(2, 36, 0)   // Avoid deprecation warnings
 	g_type_init();
 #endif
-	GError* pError = NULL;
+	GError* pError = nullptr;
 	std::shared_ptr<RsvgHandle> svgHandle(rsvg_handle_new_from_file(filename.string().c_str(), &pError), g_object_unref);
 	if (pError) {
 		g_error_free(pError);

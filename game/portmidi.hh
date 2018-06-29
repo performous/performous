@@ -16,7 +16,7 @@ namespace pm {
 	protected:
 		PortMidiStream* m_handle;
 		Stream(): m_handle() {}
-		void abort() { Pm_Abort(m_handle); m_handle = NULL; }
+		void abort() { Pm_Abort(m_handle); m_handle = nullptr; }
 		~Stream() { if (m_handle) Pm_Close(m_handle); }
 	};
 
