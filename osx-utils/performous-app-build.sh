@@ -5,7 +5,7 @@ set -o errexit
 
 PREFIXDIR="/opt/local" # By default, the default prefix for macports, change this if you're using a different path or package manager.
 DEPLOYMENT_TARGET="10.9" # Change this if you want to target a different version of macOS.
-MAKE_JOBS=8 # Change this to change the number of jobs spawned.
+MAKE_JOBS=$(sysctl -n hw.ncpu)
 CCPATH="/usr/bin/clang" # Path to system Clang, change if you want another compiler.
 CXXPATH="/usr/bin/clang++" # Path to system Clang, change if you want another compiler.
 
