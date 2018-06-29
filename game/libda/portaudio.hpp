@@ -97,7 +97,7 @@ namespace portaudio {
 					// Verify that flex doesn't find any wrong devices
 					bool fail = false;
 					try {
-						if (find(flex).idx != dev.idx) fail = true;
+						if (find(flex, false, 0).idx != dev.idx) fail = true;
 					} catch (...) {}  // Failure to find anything is success
 					if (!fail) dev.flex = flex;
 				}
@@ -109,7 +109,8 @@ namespace portaudio {
 			for (auto const& d: devices) { oss << "    #" << d.idx << " " << d.desc() << std::endl; }
 			return oss.str();
 		}
-		DeviceInfo const& find(std::string const& name) {
+		DeviceInfo const& find(std::string const& name, bool output, unsigned num) {
+			if (name.empty()) { return findByChannels(output, num); }
 			// Try name search with full match
 			for (auto const& dev: devices) { if (dev.name == name) { return dev;  } }
 			// Try name search with partial/flexible match
@@ -117,6 +118,15 @@ namespace portaudio {
 				if (dev.name.find(name) != std::string::npos) { return dev; }
 				if (dev.flex.find(name) != std::string::npos) { return dev; }
 			}
+			throw std::runtime_error("No such device.");
+		}
+		DeviceInfo const& findByChannels(bool output, unsigned num) {
+			// Try name search with full match
+			for (auto const& dev: devices) {
+			unsigned reqChannels = output ? dev.out : dev.in;
+			if (reqChannels >= num) { return dev;  }
+			}
+			// Try name search with partial/flexible match
 			throw std::runtime_error("No such device.");
 		}
 		DeviceInfos devices;

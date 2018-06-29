@@ -457,9 +457,23 @@ struct Audio::Impl {
 					if (!iss.eof()) throw std::runtime_error("Syntax error parsing device parameter " + key);
 				}
 				portaudio::AudioDevices ad(PaHostApiTypeId(PaHostApiNameToHostApiTypeId(selectedBackend)));
-				auto const& info = ad.find(params.dev);
-				std::clog << "audio/info: Trying audio device \"" << params.dev << "\", idx: " << info.idx
-					<< ", in: " << params.in << ", out: " << params.out << std::endl;
+					bool wantOutput = (params.in == 0) ? true : false;
+					unsigned num;
+					std::string msg = "audio/info: Device string empty; will look for a device with at least ";
+					if (wantOutput) {
+						msg += std::to_string(params.out) + " output channels.";
+						num = params.out;
+					}
+					else {
+						msg += std::to_string(params.in) + " input channels.";
+						num = params.in;
+					}
+					if (!params.dev.empty()) {
+					std::clog << "audio/debug: Will try to find device matching dev: " << params.dev << std::endl;
+					}
+					else { std::clog << msg << std::endl; }
+					portaudio::DeviceInfo const& info = ad.find(params.dev, wantOutput, num);
+					std::clog << "audio/info: Found: " << info.name << ", in: " << info.in << ", out: " << info.out << std::endl;
 				if (info.in < int(params.mics.size())) throw std::runtime_error("Device doesn't have enough input channels");
 				if (info.out < int(params.out)) throw std::runtime_error("Device doesn't have enough output channels");
 				// Match found if we got here, construct a device
