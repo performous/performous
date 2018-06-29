@@ -148,6 +148,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 if(WIN32)
+	add_definitions("-DEPOXY_SHARED")
 	option(MXE_HACK "Features horrible hacks, but is able to compile a static performous.exe (that may not work)." OFF)
 	mark_as_advanced(MXE_HACK)
 	if(MXE_HACK)
