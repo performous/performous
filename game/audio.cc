@@ -452,10 +452,10 @@ struct Audio::Impl {
 							++params.in;
 						}
 					}
-					if (params.mics.size() < params.in) { params.mics.resize(params.in); }
 					else throw std::runtime_error("Unknown device parameter " + key);
 					if (!iss.eof()) throw std::runtime_error("Syntax error parsing device parameter " + key);
 				}
+				if (params.mics.size() < params.in) { params.mics.resize(params.in); }
 				portaudio::AudioDevices ad(PaHostApiTypeId(PaHostApiNameToHostApiTypeId(selectedBackend)));
 					bool wantOutput = (params.in == 0) ? true : false;
 					unsigned num;
