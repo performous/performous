@@ -94,6 +94,10 @@ to save the current settings to XML.
 		<short>Webserver access</short>
 		<long>Define if you want to control performous remotely with web interface (requires restart).</long>
 	</entry>
+	<entry name="game/case-sorting" type="bool" value="false">
+		<short>Case-sensitive sorting.</short>
+		<long>Make a difference between uppercase and lowercase letters when sorting.</long>
+	</entry>
 	<entry name="game/webserver_port" type="int" value="8000">
 		<!-- maximum of 16 bit is 65536, so 60000 should be a nice upper-limit -->
 		<limits min="0" max="60000" step="1" />
