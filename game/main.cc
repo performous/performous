@@ -128,11 +128,11 @@ static void checkEvents(Game& gm, Time eventTime) {
 void mainLoop(std::string const& songlist) {
 	Platform platform;
 	std::clog << "core/notice: Starting the audio subsystem (errors printed on console may be ignored)." << std::endl;
+	UnicodeUtil m_unicode;
 	Audio audio;
 	std::clog << "core/info: Loading assets." << std::endl;
 	TranslationEngine localization(PACKAGE);
 	Window window;
-	UnicodeUtil m_unicode;
 	SurfaceLoader m_loader;
 	Backgrounds backgrounds;
 	Database database(getConfigDir() / "database.xml");
