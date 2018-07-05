@@ -1,4 +1,5 @@
 #include "players.hh"
+#include "unicode.hh"
 
 #include "configuration.hh"
 #include "fs.hh"
@@ -9,7 +10,6 @@
 #include <unicode/stsearch.h>
 
 UErrorCode Players::m_icuError = U_ZERO_ERROR;
-icu::RuleBasedCollator Players::icuCollator = icu::RuleBasedCollator(icu::UnicodeString(""), icu::Collator::PRIMARY, m_icuError);
 
 Players::Players():
 	m_players(),
@@ -126,7 +126,7 @@ void Players::filter_internal() {
 		else {
 			icu::UnicodeString filter = icu::UnicodeString::fromUTF8(m_filter);
 			std::copy_if (m_players.begin(), m_players.end(), std::back_inserter(filtered), [&](PlayerItem it){
-			icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8(it.name), &icuCollator, nullptr, m_icuError);
+			icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8(it.name), &UnicodeUtil::m_dummyCollator, nullptr, m_icuError);
 			return (search.first(m_icuError) != USEARCH_DONE);
 			});
 		}

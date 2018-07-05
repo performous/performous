@@ -60,10 +60,14 @@ void Song::dropNotes() {
 }
 
 void Song::collateUpdate() {
-	collateByTitle = unicodeCollate(title + artist) + '\0' + filename.string();
-	collateByTitleOnly = unicodeCollate(title);
-	collateByArtist = unicodeCollate(artist + title) + '\0' + filename.string();
-	collateByArtistOnly = unicodeCollate(artist);
+	songMetadata collateInfo {{"artist", artist}, {"title", title}};
+	UnicodeUtil::collate(collateInfo);	
+	
+	collateByTitle = collateInfo["title"] + "__" + collateInfo["artist"] + "__" + filename.string();
+	collateByTitleOnly = collateInfo["title"];
+	
+	collateByArtist = collateInfo["artist"] + "__" + collateInfo["title"] + "__" + filename.string();
+	collateByArtistOnly = collateInfo["artist"];
 }
 
 Song::Status Song::status(double time, ScreenSing* song) {

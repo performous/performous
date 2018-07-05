@@ -281,18 +281,18 @@ void Songs::filter_internal() {
 		SongVector filtered;
 		if (m_filter == std::string() && m_type == 0) filtered = m_songs;
 		else {
-			MatchResult match = UnicodeUtil::getCharset(m_filter);
-			std::string charset = match.first;
+			std::string charset = UnicodeUtil::getCharset(m_filter);
 			icu::UnicodeString filter = ((charset == "UTF-8") ? icu::UnicodeString::fromUTF8(m_filter) : icu::UnicodeString(m_filter.c_str(), charset.c_str()));
+			UErrorCode icuError = U_ZERO_ERROR;
 			std::copy_if (m_songs.begin(), m_songs.end(), std::back_inserter(filtered), [&](std::shared_ptr<Song> it){
-			icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8((*it).strFull()), &UnicodeUtil::m_dummyCollator, nullptr, UnicodeUtil::m_icuError);
+			icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8((*it).strFull()), &UnicodeUtil::m_dummyCollator, nullptr, icuError);
 				if (m_type == 1 && !(*it).hasDance()) return false;
 				if (m_type == 2 && !(*it).hasVocals()) return false;
 				if (m_type == 3 && !(*it).hasDuet()) return false;
 				if (m_type == 4 && !(*it).hasGuitars()) return false;
 				if (m_type == 5 && !(*it).hasDrums() && !(*it).hasKeyboard()) return false;
 				if (m_type == 6 && (!(*it).hasVocals() || !(*it).hasGuitars() || (!(*it).hasDrums() && !(*it).hasKeyboard()))) return false;
-				return (search.first(UnicodeUtil::m_icuError) != USEARCH_DONE);
+				return (search.first(icuError) != USEARCH_DONE);
 			});
 		}
 		m_filtered.swap(filtered);
@@ -319,10 +319,33 @@ namespace {
 			return operator()(*left, *right);
 		}
 	};
+	
+	template<> class CmpByField<std::string> {
+		std::string Song::* m_field;
+	  public:
+		/** @param field a pointer to the field to use (pointer to member) **/
+		CmpByField(std::string Song::* field): m_field(field) {}
+		/// Compare left < right
+		bool operator()(Song const& left , Song const& right) {
+			icu::UnicodeString leftVal = icu::UnicodeString::fromUTF8(left.*m_field);
+			icu::UnicodeString rightVal = icu::UnicodeString::fromUTF8(right.*m_field);
+			UErrorCode sortError = U_ZERO_ERROR;
+			UCollationResult result = UnicodeUtil::m_sortCollator.compare(leftVal, rightVal, sortError);
+			if (U_SUCCESS(sortError)) {
+			return (result == UCOL_LESS);
+			}
+			else {
+			throw std::runtime_error("unicode/error: Sorting comparison error in CmpByField<std::string> ");
+			}
+		}
+		/// Compare *left < *right
+		bool operator()(std::shared_ptr<Song> const& left, std::shared_ptr<Song> const& right) {
+			return operator()(*left, *right);
+		}
+	};
 
 	/// A helper for easily constructing CmpByField objects
 	template <typename T> CmpByField<T> customComparator(T Song::*field) { return CmpByField<T>(field); }
-
 	static const int types = 7, orders = 7;
 
 }
@@ -380,6 +403,19 @@ void Songs::sortChange(int diff) {
 	if (m_order < 0) m_order += orders;
 	RestoreSel restore(*this);
 	config["songs/sort-order"].i() = m_order;
+	switch (m_order) {
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 6:
+			UErrorCode collatorError = U_ZERO_ERROR;
+			UnicodeUtil::m_sortCollator.setAttribute(UCOL_STRENGTH, (config["game/case-sorting"].b()) ? UCOL_TERTIARY : UCOL_SECONDARY, collatorError);
+			if (U_FAILURE(collatorError)) {
+				std::clog << "sorting/error: Unable to change collator strength." << std::endl;
+			}
+			break;		
+		}
 	sort_internal();
 }
 

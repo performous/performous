@@ -57,7 +57,7 @@ SongParser::SongParser(Song& s): m_song(s) {
 			type = XML;	// XMLPP should deal with encoding so we don't have to.
 		}
 		else {
-			convertToUTF8(m_ss, s.filename.string());
+			UnicodeUtil::convertToUTF8(m_ss, s.filename.string());
 			if (smCheck (m_ss.str())) {type = SM; } else if (txtCheck (m_ss.str())) {
 				type = TXT;
 			}

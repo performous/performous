@@ -66,7 +66,7 @@ namespace portaudio {
 			for (unsigned i = 0, end = Pa_GetHostApiInfo(backendIndex)->deviceCount; i != end; ++i) {
 				PaDeviceInfo const* info = Pa_GetDeviceInfo(Pa_HostApiDeviceIndexToDeviceIndex(backendIndex, i));
 				if (!info) continue;
-				std::string name = convertToUTF8(info->name);
+				std::string name = UnicodeUtil::convertToUTF8(info->name);
 				/// Omit some useless legacy devices of PortAudio/ALSA from our list
 				for (auto const& dev: { "front", "surround40", "surround41", "surround50", "surround51", "surround71", "iec958", "spdif", "dmix" }) {
 					if (name.find(dev) != std::string::npos) name.clear();
@@ -171,7 +171,7 @@ namespace portaudio {
 				0 = Backend currently being developed.
 			*/
 			PaHostApiTypeId apiID = info->type;
-			std::string name = convertToUTF8(info->name);
+			std::string name = UnicodeUtil::convertToUTF8(info->name);
 			backends.push_back(BackendInfo(i, apiID, name, info->deviceCount));		
 		}
 	};
