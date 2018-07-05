@@ -57,6 +57,9 @@ void Menu::action(int dir) {
 		}
 		case MenuOption::CHANGE_VALUE: {
 			if (current().value) {
+				if (current().value->getShortDesc() == config["audio/backend"].getShortDesc()) {
+					current().value->oldValue = current().value->getValue();
+				}
 				if (dir > 0) ++(*(current().value));
 				else if (dir < 0) --(*(current().value));
 			}
