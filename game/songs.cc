@@ -405,9 +405,13 @@ void Songs::sortChange(int diff) {
 	config["songs/sort-order"].i() = m_order;
 	switch (m_order) {
 		case 1:
+		 [[fallthrough]];
 		case 2:
+		 [[fallthrough]];
 		case 3:
+		 [[fallthrough]];
 		case 4:
+		 [[fallthrough]];
 		case 6:
 			UErrorCode collatorError = U_ZERO_ERROR;
 			UnicodeUtil::m_sortCollator.setAttribute(UCOL_STRENGTH, (config["game/case-sorting"].b()) ? UCOL_TERTIARY : UCOL_SECONDARY, collatorError);
