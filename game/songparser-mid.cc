@@ -128,7 +128,7 @@ void SongParser::midParse() {
 					n.type = Note::NORMAL;
 				{
 					std::stringstream ss(lyric.lyric);
-					convertToUTF8(ss, std::string());
+					UnicodeUtil::convertToUTF8(ss, std::string());
 					n.syllable = ss.str();
 				}
 				std::string& syl = n.syllable;

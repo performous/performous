@@ -36,9 +36,10 @@ int SongItems::addSongItem(std::string const& artist, std::string const& title, 
 	SongItem si;
 	if (id==-1) id = assign_id_internal();
 	si.id = id;
-	si.artist = unicodeCollate(artist);
-	si.title = unicodeCollate(title);
-
+	songMetadata collateInfo {{"artist", artist}, {"title", title}};
+	UnicodeUtil::collate(collateInfo);		
+	si.artist = collateInfo["artist"];
+	si.title = collateInfo["title"];
 	std::pair<songs_t::iterator, bool> ret = m_songs.insert(si);
 	if (!ret.second)
 	{
