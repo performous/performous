@@ -10,20 +10,19 @@
 #include "unicode.hh"
 
 #include <algorithm>
-#include <iostream>
-#include <stdexcept>
 #include <cstdlib>
+#include <iostream>
+#include <regex>
+#include <stdexcept>
 
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
-#include <regex>
+#include <cpprest/json.h>
 #include <unicode/stsearch.h>
 
-#include "cpprest/json.h"
 #include <sys/stat.h>
 
 Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), m_database(database), m_order(config["songs/sort-order"].i()) {
-	if (U_FAILURE(UnicodeUtil::m_icuError)) std::clog << "songs/error: Error creating Unicode collator: " << u_errorName(UnicodeUtil::m_icuError) << std::endl;
 	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
 	reload();
 }

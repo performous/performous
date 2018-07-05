@@ -2,9 +2,12 @@
 #include "config.hh"
 #include "screen_sing.hh"
 #include "songparser.hh"
+#include "unicode.hh"
 #include "util.hh"
-#include <limits>
+
 #include <algorithm>
+#include <limits>
+
 extern "C" {
 #include AVFORMAT_INCLUDE
 #include AVCODEC_INCLUDE

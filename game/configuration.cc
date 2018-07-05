@@ -109,10 +109,9 @@ std::string const ConfigItem::getValue() const {
 		int AutoBackendType = 1337;
 		static int val = boost::get<int>(m_value);
 		if (val != boost::get<int>(m_value)) val = PaHostApiNameToHostApiTypeId(this->getEnumName()); // In the case of the audio backend, val is the real value while m_value is the enum case for its cosmetic name.
-		std::clog << "audio/debug: Value of selected audio backend in config.xml is: " << val << std::endl;
 		int hostApi = Pa_HostApiTypeIdToHostApiIndex(PaHostApiTypeId(val));
 		std::ostringstream oss;
-		oss << "audio/debug: Trying the selected Portaudio backend...";
+		oss << "audio/info: Trying the selected Portaudio backend...";
 		if (val != AutoBackendType) {
 			oss << " found at index: " << hostApi;
 		}
@@ -289,11 +288,10 @@ void writeConfig(Audio& m_audio, bool system) {
 		entryNode->set_attribute("type", type);
 		if (name == "audio/backend") {
 			int newValue = PaHostApiNameToHostApiTypeId(item.getEnumName());
-			std::clog << "audio/debug: Will now change value of audio backend. New Value: " << newValue << std::endl;
 			entryNode->set_attribute("value", std::to_string(newValue));
-			std::clog << "audio/info: Audio backend changed; will now restart audio subsystem." << std::endl;
 
 			Audio::backendConfig().selectEnum(item.getEnumName());
+			std::clog << "audio/info: Audio backend changed; will now restart audio subsystem." << std::endl;
 			m_audio.restart();
 			m_audio.playMusic(findFile("menu.ogg"), true); // Start music again
 		}
