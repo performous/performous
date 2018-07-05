@@ -417,6 +417,7 @@ void Songs::sortChange(int diff) {
 			break;		
 		}
 	sort_internal();
+	writeConfig(false);
 }
 
 void Songs::sortSpecificChange(int sortOrder, bool descending) {
