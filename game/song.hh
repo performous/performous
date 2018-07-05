@@ -4,11 +4,11 @@
 #include "i18n.hh"
 #include "notes.hh"
 #include "util.hh"
+
 #include <boost/noncopyable.hpp>
+#include <cpprest/json.h>
 #include <stdexcept>
 #include <string>
-
-#include "cpprest/json.h"
 
 class SongParser;
 
@@ -108,8 +108,6 @@ public:
 private:
 	void collateUpdate();   ///< Rebuild collate variables (used for sorting) from other strings
 };
-
-static inline bool operator<(Song const& l, Song const& r) { return l.collateByArtist < r.collateByArtist; }
 
 /// Thrown by SongParser when there is an error
 struct SongParserException: public std::runtime_error {
