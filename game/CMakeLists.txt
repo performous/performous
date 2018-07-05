@@ -170,6 +170,7 @@ if(WIN32)
   target_link_libraries(performous wsock32 ws2_32)
 endif()
 target_link_libraries(performous ${LIBS})
+target_link_libraries(performous ced)
 
 install(TARGETS performous DESTINATION ${BIN_INSTALL})
 

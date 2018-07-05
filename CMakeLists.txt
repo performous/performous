@@ -68,8 +68,11 @@ else()
 	message(STATUS "Localization disabled: Gettext tools (msgfmt) missing")
 endif()
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ced)
+
 add_subdirectory(data)
 add_subdirectory(game)
+add_subdirectory(ced)
 add_subdirectory(docs)
 
 if(WIN32)
