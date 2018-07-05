@@ -273,27 +273,28 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 fs::path systemConfFile;
 fs::path userConfFile;
 
-void writeConfig(Audio& m_audio, bool system) {
+void writeConfig(bool system) {
 	xmlpp::Document doc;
 	auto nodeRoot = doc.create_root_node("performous");
 	bool dirty = false;
 	for (auto& elem: config) {
 		ConfigItem& item = elem.second;
 		std::string name = elem.first;
-		if (item.isDefault(system)) continue; // No need to save settings with default values
+		if (item.isDefault(system) && name != "audio/backend") continue; // No need to save settings with default values
 		dirty = true;
 		xmlpp::Element* entryNode = xmlpp::add_child_element(nodeRoot, "entry");
 		entryNode->set_attribute("name", name);
 		std::string type = item.get_type();
 		entryNode->set_attribute("type", type);
 		if (name == "audio/backend") {
+			std::string currentBackEnd = Audio::backendConfig().oldValue;
 			int newValue = PaHostApiNameToHostApiTypeId(item.getEnumName());
-			entryNode->set_attribute("value", std::to_string(newValue));
-
-			Audio::backendConfig().selectEnum(item.getEnumName());
-			std::clog << "audio/info: Audio backend changed; will now restart audio subsystem." << std::endl;
-			m_audio.restart();
-			m_audio.playMusic(findFile("menu.ogg"), true); // Start music again
+			if (currentBackEnd != item.getEnumName()) {
+				entryNode->set_attribute("value", std::to_string(newValue));
+				std::clog << "audio/info: Audio backend changed; will now restart audio subsystem." << std::endl;
+				Audio::backendConfig().selectEnum(item.getEnumName());
+				Game::getSingletonPtr()->restartAudio();
+			}
 		}
 		else if (type == "int") entryNode->set_attribute("value",std::to_string(item.i()));
 		else if (type == "bool") entryNode->set_attribute("value", item.b() ? "true" : "false");

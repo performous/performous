@@ -12,6 +12,8 @@
 #include <SDL2/SDL.h>
 #include <string>
 
+class Audio;
+
 /// Abstract Class for screens
 class Screen {
   public:
@@ -45,7 +47,7 @@ class Screen {
 class Game: public Singleton <Game> {
   public:
 	/// constructor
-	Game(Window& window);
+	Game(Window& window, Audio& audio);
 	~Game();
 	/// Adds a screen to the manager
 	void addScreen(Screen* s) { std::string tmp = s->getName(); screens.insert(tmp, s); }
@@ -65,6 +67,9 @@ class Game: public Singleton <Game> {
 	Screen* getScreen(std::string const& name);
 	/// Returns a reference to the window
 	Window& window() { return m_window; }
+
+	/// Restarts Audio subsystem and begins playing menu music.
+	void restartAudio();
 
 	/// Draw a loading progress indication
 	void loading(std::string const& message, float progress);
@@ -95,6 +100,7 @@ class Game: public Singleton <Game> {
 	PlayList& getCurrentPlayList() { return currentPlaylist; }
 
 private:
+	Audio& m_audio;
 	Window& m_window;
 
 public:

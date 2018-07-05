@@ -8,8 +8,6 @@
 #include <vector>
 #include <list>
 
-class Audio;
-
 // configuration option
 class ConfigItem {
   public:
@@ -74,7 +72,7 @@ void readConfig();
 void populateBackends(const std::list<std::string>& backendList);
 
 /** Write modified config options to user's or system-wide config XML **/
-void writeConfig(Audio& m_audio, bool system = false);
+void writeConfig(bool system = false);
 
 /// struct for entries in menu
 struct MenuEntry {
