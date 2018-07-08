@@ -8,7 +8,6 @@
 #include "profiler.hh"
 #include "libxml++-impl.hh"
 #include "unicode.hh"
-#include "platform.hh"
 
 #include <algorithm>
 #include <cstdlib>
@@ -18,7 +17,6 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
-#include <cpprest/json.h>
 #include <unicode/stsearch.h>
 
 Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), m_database(database), m_order(config["songs/sort-order"].i()) {
@@ -49,9 +47,6 @@ void Songs::reload_internal() {
 		m_songs.clear();
 		m_dirty = true;
 	}
-	LoadCache();
-	std::clog << "songs/notice: Done loading the cache. You now have " << m_songs.size() << " songs in your list." << std::endl;
-	std::clog << "songs/notice: Starting to load all songs from disk, to update the cache." << std::endl;
 	Profiler prof("songloader");
 	Paths paths = getPathsConfig("paths/songs");
 	for (auto it = paths.begin(); m_loading && it != paths.end(); ++it) { //loop through stored directories from config
@@ -71,125 +66,7 @@ void Songs::reload_internal() {
 	std::clog << std::flush;
 	m_loading = false;
 	std::clog << "songs/notice: Done Loading. Loaded " << m_songs.size() << " Songs." << std::endl;
-	CacheSonglist();
-	std::clog << "songs/notice: Done Caching." << std::endl;
 	doneLoading = true;
-}
-
-void Songs::LoadCache() {
-	fs::path songsMetaFile = getCacheDir() / "Songs-Metadata.json";
-	std::ifstream file(songsMetaFile.string());
-	web::json::value jsonRoot;
-    if (file)
-    {
-    	try {
-	        std::stringstream buffer;
-	        buffer << file.rdbuf();
-	        file.close();
-	        jsonRoot = web::json::value::parse(buffer);
-    	} catch(std::exception const& e) {
-			std::clog << "songs/error: " << e.what() << std::endl;
-			return;
-    	}
-    } else {
-    	std::clog << "songs/info: Could not open songs meta cache file " << songsMetaFile.string() << std::endl;
-    	return;
-    }
-
-    auto stringList = config["paths/songs"].sl();
-
-    for(auto const& song : jsonRoot.as_array()) {
-    	struct stat buffer;
-    	auto songPath = song.at("TxtFile").as_string();
-    	auto isSongPathInConfiguredPaths = std::find_if(
-                                                        stringList.begin(), 
-                                                        stringList.end(), 
-														[songPath](const std::string& stringListItem) { 
-															return songPath.find(stringListItem) != std::string::npos;
-														 }) != stringList.end();
-    	if(_STAT(songPath.c_str(), &buffer) == 0 && isSongPathInConfiguredPaths) {
-    		std::shared_ptr<Song> realSong(new Song(song));
-    		m_songs.push_back(realSong);
-    	}  	
-    }
-}
-
-void Songs::CacheSonglist() {
-    web::json::value jsonRoot = web::json::value::array();
-    auto i = 0;
-	for (auto const& song : m_songs)
-    {  
-        web::json::value songObject = web::json::value::object();
-        if(!song->path.string().empty()) {
-        	songObject["TxtFileFolder"] = web::json::value::string(song->path.string());
-        }
-        if(!song->filename.string().empty()) {
-        	songObject["TxtFile"] = web::json::value::string(song->filename.string());
-        }
-        if(!song->title.empty()) {
-        	songObject["Title"] = web::json::value::string(song->title);
-    	}
-		if(!song->artist.empty()) {
-        	songObject["Artist"] = web::json::value::string(song->artist);
-    	}
-        if(!song->edition.empty()) {
-        	songObject["Edition"] = web::json::value::string(song->edition);
-    	}
-    	if(!song->language.empty()) {
-        	songObject["Language"] = web::json::value::string(song->language);
-        }
-        if(!song->creator.empty()) {
-        	songObject["Creator"] = web::json::value::string(song->creator);
-    	}
-    	if(!song->genre.empty()) {
-        	songObject["Genre"] = web::json::value::string(song->genre);
-    	}
-    	if(!song->cover.string().empty()) {
-        	songObject["Cover"] = web::json::value::string(song->cover.string());
-    	}
-    	if(!song->background.string().empty()) {
-	        songObject["Background"] = web::json::value::string(song->background.string());
-	    }
-    	if(!song->music["background"].string().empty()) {
-	        songObject["SongFile"] = web::json::value::string(song->music["background"].string());
-	    }
-    	if(!song->video.string().empty()) {
-	        songObject["VideoFile"] = web::json::value::string(song->video.string());
-	    }
-    	if(!std::isnan(song->start)) {
-	        songObject["Start"] = web::json::value(song->start);
-	    }
-    	if(!std::isnan(song->videoGap)) {
-	        songObject["VideoGap"] = web::json::value(song->videoGap);
-	    }
-    	if(!std::isnan(song->preview_start)) {
-	        songObject["PreviewStart"] = web::json::value::number(song->preview_start);
-	    }
-    	if(!song->music["vocals"].string().empty()) {
-	        songObject["Vocals"] = web::json::value::string(song->music["vocals"].string());
-	    }
-    	auto duration = song->getDurationSeconds();
-    	if(!std::isnan(duration)) {
-	    	songObject["Duration"] = web::json::value(duration);
-	    }
-	    if(songObject != web::json::value::object()) {
-        	jsonRoot[i] = songObject;
-        	i++;
-    	}
-	}
-
-	fs::path cacheDir = getCacheDir() / "Songs-Metadata.json";
-
-	try {
-		std::stringstream stream;
-		jsonRoot.serialize(stream);
-		std::ofstream outFile(cacheDir.string());
-    	outFile << stream.rdbuf();
-    	outFile.close();
-	} catch (std::exception const& e) {
-		std::clog << "songs/error: Could not save " + cacheDir.string() + ": " + e.what() << std::endl;
-		return;
-	}
 }
 
 void Songs::reload_internal(fs::path const& parent) {
@@ -201,17 +78,6 @@ void Songs::reload_internal(fs::path const& parent) {
 			if (fs::is_directory(p)) { reload_internal(p); continue; } //if the file is a folder redo this function with this folder as path
 			if (!regex_search(p.filename().string(), expression)) continue; //if the folder does not contain any of the requested files, ignore it
 			try { //found song file, make a new song with it.
-				auto it = std::find_if(m_songs.begin(), m_songs.end(), [p](std::shared_ptr<Song> n) {
-					return n->filename == p;
-				});
-				auto alreadyInCache = it != m_songs.end();
-
-				if(alreadyInCache) { 
-					continue;
-				}
-
-				std::clog << "songs/notice: Found song not which was not in the cache: " << p.string() << std::endl;
-
 				std::shared_ptr<Song>s(new Song(p.parent_path(), p));
 				std::lock_guard<std::mutex> l(m_mutex);
 				int AdditionalFileIndex = -1;
@@ -221,8 +87,7 @@ void Songs::reload_internal(fs::path const& parent) {
 						std::clog << "songs/info: >>> Found additional song file: " << s->filename << " for: " << m_songs[i]->filename << std::endl;
 						AdditionalFileIndex = i;
 					}
-				}				
-
+				}
 				if(AdditionalFileIndex > 0) { //TODO: add it to existing song
 					std::clog << "songs/info: >>> not yet implemented " << std::endl;
 					s->getDurationSeconds();

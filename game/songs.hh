@@ -77,9 +77,6 @@ class Songs {
 	size_t loadedSongs() const { return m_songs.size(); }
 
   private:
-  	void LoadCache();
-	void CacheSonglist();
-
 	class RestoreSel;
 	typedef std::vector<std::shared_ptr<Song> > SongVector;
 	std::string m_songlist;
