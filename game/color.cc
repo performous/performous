@@ -37,7 +37,7 @@ namespace {
 	} colors;
 
 	// Convert sRGB color component into linear as per OpenGL specs
-	double lin(double sRGB) {
+	float lin(float sRGB) {
 		if (sRGB <= 0.04045) return sRGB / 12.92;
 		return std::pow((sRGB + 0.055)/1.055, 2.4);
 	}

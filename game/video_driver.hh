@@ -26,7 +26,7 @@ public:
 	/// Apply a translation on top of current viewport translation
 	ViewTrans(glmath::mat4 const& m);
 	/// Apply a subviewport with different perspective projection
-	ViewTrans(double offsetX = 0.0, double offsetY = 0.0, double frac = 1.0);
+	ViewTrans(float offsetX = 0.0, float offsetY = 0.0, float frac = 1.0);
 	~ViewTrans();
 private:
 	glmath::mat4 m_old;

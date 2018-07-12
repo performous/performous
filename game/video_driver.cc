@@ -32,7 +32,7 @@ namespace {
 		int m_value;
 	};
 
-	double getSeparation() {
+	float getSeparation() {
 		return config["graphic/stereo3d"].b() ? 0.001f * config["graphic/stereo3dseparation"].f() : 0.0;
 	}
 
@@ -41,9 +41,9 @@ namespace {
 	const float far_ = 110.0f; // How far away can things be seen
 	const float z0 = 1.5f; // This determines FOV: the value is your distance from the monitor (the unit being the width of the Performous window)
 
-	glmath::mat4 g_color = glmath::mat4::identity();
-	glmath::mat4 g_projection = glmath::mat4::identity();
-	glmath::mat4 g_modelview =  glmath::mat4::identity();
+	glmath::mat4 g_color = glmath::mat4();
+	glmath::mat4 g_projection = glmath::mat4();
+	glmath::mat4 g_modelview = glmath::mat4();
 }
 
 unsigned int screenW() { return s_width; }
@@ -211,7 +211,7 @@ void Window::render(std::function<void (void)> drawFunc) {
 	UseTexture use(fbo.getTexture());
 	view(0);  // Viewport for drawable area
 	glDisable(GL_BLEND);
-	glmath::mat4 colorMatrix = glmath::mat4::identity();
+	glmath::mat4 colorMatrix = glmath::mat4();
 	updateStereo(0.0);  // Disable stereo mode while we composite
 	glerror.check("FBO->FB setup");
 	for (int num = 0; num < 2; ++num) {
@@ -226,15 +226,15 @@ void Window::render(std::function<void (void)> drawFunc) {
 			if (type == 1 && num == 1) { out[0] = out[2] = true; }  // Magenta
 			for (unsigned i = 0; i < 3; ++i) {
 				for (unsigned j = 0; j < 3; ++j) {
-					double val = 0.0;
+					float val = 0.0;
 					if (out[i]) val = (i == j ? col : gry);
-					colorMatrix(i, j) = val;
+					colorMatrix[j][i] = val;
 				}
 			}
 		}
 		// Render FBO with 1:1 pixels, properly filtered/positioned for 3d
 		ColorTrans c(colorMatrix);
-		Dimensions dim = Dimensions(double(w) / h).fixedWidth(1.0);
+		Dimensions dim = Dimensions(w / h).fixedWidth(1.0);
 		dim.center((num == 0 ? 0.25 : -0.25) * dim.h());
 		if (num == 1) {
 			// Right eye blends over the left eye
@@ -260,9 +260,9 @@ void Window::view(unsigned num) {
 	int nativeW;
 	int nativeH;
 	SDL_GL_GetDrawableSize(screen, &nativeW, &nativeH);
-	double vx = 0.5f * (nativeW - s_width);
-	double vy = 0.5f * (nativeH - s_height);
-	double vw = s_width, vh = s_height;
+	float vx = 0.5f * (nativeW - s_width);
+	float vy = 0.5f * (nativeH - s_height);
+	float vw = s_width, vh = s_height;
 	if (num == 0) {
 		glViewport(vx, vy, vw, vh);  // Drawable area of the window (excluding black bars)
 	} else {
@@ -369,7 +369,7 @@ void Window::screenshot() {
 
 ColorTrans::ColorTrans(Color const& c): m_old(g_color) {
 	using namespace glmath;
-	g_color = g_color * mat4::diagonal(c.linear());
+	g_color = g_color * diagonal(c.linear());
 	Game::getSingletonPtr()->window().updateColor();
 }
 
@@ -383,20 +383,20 @@ ColorTrans::~ColorTrans() {
 	Game::getSingletonPtr()->window().updateColor();
 }
 
-ViewTrans::ViewTrans(double offsetX, double offsetY, double frac): m_old(g_projection) {
+ViewTrans::ViewTrans(float offsetX, float offsetY, float frac): m_old(g_projection) {
 	// Setup the projection matrix for 2D translates
 	using namespace glmath;
-	double h = virtH();
-	const double f = near_ / z0;  // z0 to nearplane conversion factor
+	float h = virtH();
+	const float f = near_ / z0;  // z0 to nearplane conversion factor
 	// Corners of the screen at z0
-	double x1 = -0.5, x2 = 0.5;
-	double y1 = 0.5 * h, y2 = -0.5 * h;
+	float x1 = -0.5, x2 = 0.5;
+	float y1 = 0.5 * h, y2 = -0.5 * h;
 	// Move the perspective point by frac of offset (i.e. move the image)
-	double persX = frac * offsetX, persY = frac * offsetY;
+	float persX = frac * offsetX, persY = frac * offsetY;
 	x1 -= persX; x2 -= persX;
 	y1 -= persY; y2 -= persY;
 	// Perspective projection + the rest of the offset in eye (world) space
-	g_projection = frustum(f * x1, f * x2, f * y1, f * y2, near_, far_)
+	g_projection = glm::frustum(f * x1, f * x2, f * y1, f * y2, near_, far_)
 	  * translate(vec3(offsetX - persX, offsetY - persY, -z0));
 	Game::getSingletonPtr()->window().updateTransforms();
 }
