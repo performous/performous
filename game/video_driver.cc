@@ -84,18 +84,26 @@ Window::Window() {
 	std::clog << "video/info: GL_RENDERER:   " << glGetString(GL_RENDERER) << std::endl;
 	// Extensions would need more complex outputting, otherwise they will break clog.
 	//std::clog << "video/info: GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl;
-
 	if (epoxy_gl_version() < 33) throw std::runtime_error("OpenGL 3.3 is required but not available");
+	createShaders();
+}
 
+void Window::createShaders() {
 	// The Stereo3D shader needs OpenGL 3.3 and GL_ARB_viewport_array, some Intel drivers support GL 3.3,
 	// but not GL_ARB_viewport_array, so we just check for the extension here.
-	if (epoxy_has_gl_extension("GL_ARB_viewport_array")) {
+	if (config["graphic/stereo3d"].b()) {
+		if (epoxy_has_gl_extension("GL_ARB_viewport_array")) {
 		// Compile geometry shaders when stereo is requested
 		shader("color").compileFile(findFile("shaders/stereo3d.geom"));
 		shader("surface").compileFile(findFile("shaders/stereo3d.geom"));
 		shader("texture").compileFile(findFile("shaders/stereo3d.geom"));
 		shader("3dobject").compileFile(findFile("shaders/stereo3d.geom"));
 		shader("dancenote").compileFile(findFile("shaders/stereo3d.geom"));
+		}
+		else { 
+		std::clog << "video/warning: Stereo3D was enabled but the 'GL_ARB_viewport_array' extension is unsupported; will now disable Stereo3D." << std::endl;
+		config["graphic/stereo3d"].b() = false;
+		}
 	}
 
 	shader("color")
@@ -125,7 +133,6 @@ Window::Window() {
 	  .compileFile(findFile("shaders/dancenote.vert"))
 	  .compileFile(findFile("shaders/core.frag"))
 	  .link();
-
 	updateColor();
 	view(0);  // For loading screens
 }

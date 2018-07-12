@@ -280,12 +280,19 @@ void writeConfig(bool system) {
 	for (auto& elem: config) {
 		ConfigItem& item = elem.second;
 		std::string name = elem.first;
-		if (item.isDefault(system) && name != "audio/backend") continue; // No need to save settings with default values
+		if (item.isDefault(system) && name != "audio/backend" && name != "graphic/stereo3d") continue; // No need to save settings with default values
 		dirty = true;
 		xmlpp::Element* entryNode = xmlpp::add_child_element(nodeRoot, "entry");
 		entryNode->set_attribute("name", name);
 		std::string type = item.get_type();
 		entryNode->set_attribute("type", type);
+		if (name == "graphic/stereo3d") {
+			std::string prev3DState = item.oldValue;
+			if (prev3DState != std::to_string(item.b()) && !prev3DState.empty()) {
+				std::clog << "video/info: Stereo 3D configuration changed, will reset shaders." << std::endl;
+				Game::getSingletonPtr()->window().resetShaders();
+			}
+		}
 		if (name == "audio/backend") {
 			std::string currentBackEnd = Audio::backendConfig().oldValue;
 			int oldValue = PaHostApiNameToHostApiTypeId(currentBackEnd);

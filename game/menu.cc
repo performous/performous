@@ -60,6 +60,9 @@ void Menu::action(int dir) {
 				if (current().value->getShortDesc() == config["audio/backend"].getShortDesc()) {
 					current().value->oldValue = current().value->getValue();
 				}
+				else if (current().value->getShortDesc() == config["graphic/stereo3d"].getShortDesc()) {
+					current().value->oldValue = (current().value->getValue() == _("Disabled")) ? "0" : "1";
+				}
 				if (dir > 0) ++(*(current().value));
 				else if (dir < 0) --(*(current().value));
 			}
