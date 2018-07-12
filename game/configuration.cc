@@ -288,13 +288,15 @@ void writeConfig(bool system) {
 		entryNode->set_attribute("type", type);
 		if (name == "audio/backend") {
 			std::string currentBackEnd = Audio::backendConfig().oldValue;
+			int oldValue = PaHostApiNameToHostApiTypeId(currentBackEnd);
 			int newValue = PaHostApiNameToHostApiTypeId(item.getEnumName());
-			if (currentBackEnd != item.getEnumName()) {
+			if (currentBackEnd != item.getEnumName() && !currentBackEnd.empty()) {
 				entryNode->set_attribute("value", std::to_string(newValue));
 				std::clog << "audio/info: Audio backend changed; will now restart audio subsystem." << std::endl;
 				Audio::backendConfig().selectEnum(item.getEnumName());
 				Game::getSingletonPtr()->restartAudio();
 			}
+			else { 	entryNode->set_attribute("value", std::to_string(oldValue)); }
 		}
 		else if (type == "int") entryNode->set_attribute("value",std::to_string(item.i()));
 		else if (type == "bool") entryNode->set_attribute("value", item.b() ? "true" : "false");
@@ -425,4 +427,5 @@ void populateBackends (const std::list<std::string>& backendList) {
 	static std::string selectedBackend = std::string();
 	selectedBackend = backendConfig.getValue();
 	backendConfig.selectEnum(selectedBackend);
+	backendConfig.oldValue = backendConfig.getEnumName();
 }

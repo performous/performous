@@ -138,7 +138,6 @@ void ScreenSing::setupVocals() {
 		if (vocalTrack.i() != m_selectedVocal) { sameVoice = false; break; }
 	}
 	m_singingDuet = (m_song->hasDuet() && m_duet.i() == 0 && players() > 1 && sameVoice != true);
-	std::clog << "ScreenSing/debug: singingDuet() is: " << singingDuet() << std::endl;
 	m_audio.pause(false);
 }
 

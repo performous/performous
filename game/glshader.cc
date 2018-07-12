@@ -54,7 +54,6 @@ Shader::Shader(std::string const& name): name(name), program(0) {}
 Shader::~Shader() {
 	glDeleteProgram(program);
 	std::for_each(shader_ids.begin(), shader_ids.end(), glDeleteShader);
-	//std::clog << "shader/info: Shader program " << (unsigned)program << " deleted." << std::endl;
 }
 
 Shader& Shader::compileFile(fs::path const& filename) {
