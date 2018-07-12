@@ -80,7 +80,7 @@ MidiStream::Riff::Riff(MidiStream& ms): ms(ms), name(ms.read_bytes(4)), size(ms.
 
 MidiStream::Riff::~Riff() {
 #if MIDI_DEBUG_LEVEL > 0
-	if (has_more_data()) std::clog << "MidiStream/warning: Only " << offset << " of " << size << " bytes read of RIFF chunk " << name << std::endl;
+	if (has_more_data()) std::clog << "midistream/warning: Only " << offset << " of " << size << " bytes read of RIFF chunk " << name << std::endl;
 #endif
 	ms.f.seekg(pos + size);
 }
