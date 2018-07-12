@@ -1,7 +1,6 @@
 #pragma once
 
 #include "fs.hh"
-#include "glmath.hh"
 #include "glutil.hh"
 #include <string>
 #include <map>
