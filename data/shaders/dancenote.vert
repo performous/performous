@@ -14,38 +14,36 @@ in vec2 vertTexCoord;
 in vec3 vertNormal;
 in vec4 vertColor;
 
-struct vData {
-	vec3 lightDir;
-	vec2 texCoord;
-	vec3 normal;
-	vec4 color;
-};
+out vData {
+	 vec3 lightDir;
+	 vec2 texCoord;
+	 vec3 normal;
+	 vec4 color;
+} vertex;
 
-out vData vertex;
-
-mat4 scaleMat(in float sc) {
-	return mat4(sc,  0,  0,  0,
-	             0, sc,  0,  0,
-	             0,  0, sc,  0,
-	             0,  0,  0,  1);
+ mat4 scaleMat(in float sc) {
+	return mat4(sc, 0, 0, 0,
+	       0, sc, 0, 0,
+	       0, 0, sc, 0,
+	       0, 0, 0, 1);
 }
 
-mat4 rotMat(in float ang) {
-	float ca = cos(ang);
-	float sa = sin(ang);
+ mat4 rotMat(in float ang) {
+	 float ca = cos(ang);
+	 float sa = sin(ang);
 	return mat4(ca, -sa, 0, 0,
-	            sa,  ca, 0, 0,
-	             0,   0, 1, 0,
-	             0,   0, 0, 1);
+	      sa, ca, 0, 0,
+	       0,  0, 1, 0,
+	       0,  0, 0, 1);
 }
 
 void main() {
 	vertex.texCoord = vertTexCoord;
 	vertex.normal = normalMatrix * vertNormal;
 	vertex.color = vertColor;
-	vertex.lightDir = vec3(1,0,0);
+	vertex.lightDir = vec3(1,0,0);	
 
-	mat4 trans = scaleMat(scale);
+	 mat4 trans = scaleMat(scale);
 
 	// Cursor arrows
 	if (noteType == 0) {
@@ -62,17 +60,17 @@ void main() {
 	// Mines
 	} else if (noteType == 3) {
 		trans *= scaleMat(1.0 + hitAnim);
-		float r = radians(mod(clock*360.0, 360.0)); // They rotate!
+		 float r = radians(mod(clock*360.0, 360.0)); // They rotate!
 		trans *= rotMat(r);
 	}
 
 	// Glow color for regular arrows or holds
 	if (noteType == 1 || noteType == 2) {
 		vertex.color = vec4(
-		  min(vertColor.r + hitAnim *.5, 1.0),
-		  min(vertColor.g + hitAnim *.5, 1.0),
-		  min(vertColor.b + hitAnim *.5, 1.0),
-		  max(vertColor.a - hitAnim, 0.0)
+		 min(vertColor.r + hitAnim *.5, 1.0),
+		 min(vertColor.g + hitAnim *.5, 1.0),
+		 min(vertColor.b + hitAnim *.5, 1.0),
+		 max(vertColor.a - hitAnim, 0.0)
 		);
 	}
 
