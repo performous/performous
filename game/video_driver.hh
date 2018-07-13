@@ -75,6 +75,10 @@ public:
 	/// Check if resizing (full screen toggle) caused OpenGL context to be lost, in which case textures etc. need reloading.
 	bool needReload() { bool tmp = m_needReload; m_needReload = false; return tmp; }
 private:
+	const GLuint vertPos = 0;
+	const GLuint vertTexCoord = 1;
+	const GLuint vertNormal = 2;
+	const GLuint vertColor = 3;
 	void setFullscreen();
 	/// Setup everything for drawing a view.
 	/// @param num 0 = no stereo, 1 = left eye, 2 = right eye
