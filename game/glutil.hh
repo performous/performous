@@ -68,10 +68,12 @@ namespace glutil {
 			return m_vertices.empty();
 		}
 
-		unsigned size() const {
+		GLsizei size() const {
 			return m_vertices.size();
 		}
-
+		
+		static GLsizei stride() { return sizeof(VertexInfo); }
+		
 		void clear();
 	};
 

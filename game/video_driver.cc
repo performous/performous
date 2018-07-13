@@ -49,6 +49,9 @@ namespace {
 unsigned int screenW() { return s_width; }
 unsigned int screenH() { return s_height; }
 
+GLuint Window::m_vao = 0;
+GLuint Window::m_vbo = 0;
+
 Window::Window() {
 	std::atexit(SDL_Quit);
 	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK))
@@ -72,6 +75,10 @@ Window::Window() {
 		screen = SDL_CreateWindow(PACKAGE " " VERSION, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
 		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
 		SDL_GL_CreateContext(screen);
+		glutil::GLErrorChecker error("Initializing buffers");
+		{
+			initBuffers();
+		}
 	}
 	SDL_SetWindowMinimumSize(screen, 400, 250);
 	SDL_GetWindowPosition(screen, &m_windowX, &m_windowY);
@@ -137,7 +144,29 @@ void Window::createShaders() {
 	view(0);  // For loading screens
 }
 
-Window::~Window() { }
+void Window::initBuffers() {
+	glGenVertexArrays(1, &Window::m_vao);
+	glBindVertexArray(Window::m_vao);
+	glGenBuffers(1, &Window::m_vbo);
+	GLsizei stride = glutil::VertexArray::stride();
+
+	glBindBuffer(GL_ARRAY_BUFFER, Window::m_vbo);			
+	glEnableVertexAttribArray(vertPos);
+	glVertexAttribPointer(vertPos, 3, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(glutil::VertexInfo, vertPos));
+	glEnableVertexAttribArray(vertTexCoord);
+	glVertexAttribPointer(vertTexCoord, 2, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(glutil::VertexInfo, vertTexCoord));
+	glEnableVertexAttribArray(vertNormal);
+	glVertexAttribPointer(vertNormal, 3, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(glutil::VertexInfo, vertNormal));
+	glEnableVertexAttribArray(vertColor);
+	glVertexAttribPointer(vertColor, 4, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(glutil::VertexInfo, vertColor));
+}
+
+Window::~Window() {
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	glDeleteVertexArrays(1, &m_vao);
+	glDeleteBuffers(1, &m_vbo);
+}
 
 void Window::blank() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

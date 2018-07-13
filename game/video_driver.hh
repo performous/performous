@@ -53,13 +53,18 @@ public:
 	void render(boost::function<void (void)> drawFunc);
 	/// clears window
 	void blank();
+	/// Initialize VAO and VBO.
+	void initBuffers();
 	/// swaps buffers
 	void swap();
 	void event();  ///< Handle window events
 	void resize();	/// Resize window (contents) / toggle full screen according to config. Returns true if resized.
 	/// take a screenshot
 	void screenshot();
-
+	
+	GLuint const& VAO() const { return m_vao; }
+	GLuint const& VBO() const { return m_vbo; }
+	
 	/// Construct a new shader or return an existing one by name
 	Shader& shader(std::string const& name) {
 		ShaderMap::iterator it = m_shaders.find(name);
@@ -87,6 +92,8 @@ private:
 	bool m_fullscreen = false;
 	bool m_needResize = true;
 	bool m_needReload = true;
+	static GLuint m_vao;
+	static GLuint m_vbo;
 	int m_windowX = 0;
 	int m_windowY = 0;
 	using ShaderMap = std::map<std::string, std::unique_ptr<Shader>>;
