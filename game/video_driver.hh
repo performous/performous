@@ -58,8 +58,10 @@ public:
 	void initBuffers();
 	/// swaps buffers
 	void swap();
-	void event();  ///< Handle window events
-	void resize();	/// Resize window (contents) / toggle full screen according to config. Returns true if resized.
+	/// Handle window events
+	void event();
+	/// Resize window (contents) / toggle full screen according to config. Returns true if resized.
+	void resize();
 	/// take a screenshot
 	void screenshot();
 	
