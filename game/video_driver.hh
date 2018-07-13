@@ -13,6 +13,7 @@ static inline float virtH() { return float(screenH()) / screenW(); }
 
 struct SDL_Surface;
 struct SDL_Window;
+class FBO;
 
 struct ColorTrans {
 	ColorTrans(Color const& c);
@@ -94,10 +95,13 @@ private:
 	bool m_needReload = true;
 	static GLuint m_vao;
 	static GLuint m_vbo;
+	std::unique_ptr<FBO> m_fbo;
 	int m_windowX = 0;
 	int m_windowY = 0;
 	using ShaderMap = std::map<std::string, std::unique_ptr<Shader>>;
 	ShaderMap m_shaders; ///< Shader programs by name
 	SDL_Window* screen = nullptr;
+	public:
+	FBO& getFBO() { return *m_fbo; }
 };
 

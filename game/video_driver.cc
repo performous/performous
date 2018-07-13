@@ -3,7 +3,6 @@
 #include "chrono.hh"
 #include "config.hh"
 #include "controllers.hh"
-#include "fbo.hh"
 #include "fs.hh"
 #include "glmath.hh"
 #include "image.hh"
@@ -106,6 +105,8 @@ void Window::createShaders() {
 		shader("texture").compileFile(findFile("shaders/stereo3d.geom"));
 		shader("3dobject").compileFile(findFile("shaders/stereo3d.geom"));
 		shader("dancenote").compileFile(findFile("shaders/stereo3d.geom"));
+		
+		if (m_fbo == nullptr) { m_fbo = std::make_unique<FBO>(s_width, 2 * s_height); }
 		}
 		else { 
 		std::clog << "video/warning: Stereo3D was enabled but the 'GL_ARB_viewport_array' extension is unsupported; will now disable Stereo3D." << std::endl;
@@ -230,21 +231,20 @@ void Window::render(std::function<void (void)> drawFunc) {
 	// Can we do direct to framebuffer rendering (no FBO)?
 	if (!stereo || type == 2) { view(stereo); drawFunc(); return; }
 	// Render both eyes to FBO (full resolution top/bottom for anaglyph)
-	unsigned w = s_width;
-	unsigned h = 2 * s_height;
-	FBO fbo(w, h);
+	
 	glerror.check("FBO");
 	{
-		UseFBO user(fbo);
+		if (m_fbo == nullptr) { m_fbo = std::make_unique<FBO>(s_width, 2 * s_height); }
+		UseFBO user(getFBO());
 		blank();
 		view(0);
-		glViewportIndexedf(1, 0, h / 2, w, h / 2);
-		glViewportIndexedf(2, 0, 0, w, h / 2);
+		glViewportIndexedf(1, 0, getFBO().height() / 2, getFBO().width(), getFBO().height() / 2);
+		glViewportIndexedf(2, 0, 0, getFBO().width(), getFBO().height() / 2);
 		drawFunc();
 	}
 	glerror.check("Render to FBO");
 	// Render to actual framebuffer from FBOs
-	UseTexture use(fbo.getTexture());
+	UseTexture use(getFBO().getTexture());
 	view(0);  // Viewport for drawable area
 	glDisable(GL_BLEND);
 	glmath::mat4 colorMatrix = glmath::mat4();
@@ -270,14 +270,14 @@ void Window::render(std::function<void (void)> drawFunc) {
 		}
 		// Render FBO with 1:1 pixels, properly filtered/positioned for 3d
 		ColorTrans c(colorMatrix);
-		Dimensions dim = Dimensions(w / h).fixedWidth(1.0);
+		Dimensions dim = Dimensions(getFBO().width() / getFBO().height()).fixedWidth(1.0);
 		dim.center((num == 0 ? 0.25 : -0.25) * dim.h());
 		if (num == 1) {
 			// Right eye blends over the left eye
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_ONE, GL_ONE);
 		}
-		fbo.getTexture().draw(dim, TexCoords(0.0, 1.0, 1.0, 0));
+		getFBO().getTexture().draw(dim, TexCoords(0.0, 1.0, 1.0, 0));
 	}
 }
 
@@ -377,6 +377,7 @@ void Window::resize() {
 	std::clog << "video/info: Window size " << w << "x" << h;
 	if (w != nativeW) std::clog << " (HiDPI " << nativeW << "x" << nativeH << ")";
 	std::clog << ", rendering in " << s_width << "x" << s_height << std::endl;
+	if (m_fbo != nullptr) { m_fbo->resize(s_width, 2 * s_height); }
 }
 
 void Window::screenshot() {
