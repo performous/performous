@@ -31,20 +31,20 @@ void passthru(int vp, int i) {
 
 void main() {
 // Render the left eye
-		for (int i=0; i < gl_in.length(); i++) {
-	passthru(1, i);
-	gl_Position = gl_in[i].gl_Position;
-	gl_Position.x -= (sepFactor * (gl_in[i].gl_Position.z - z0));
-	EmitVertex();	
+	for (int i=0; i < gl_in.length(); i++) {
+		passthru(1, i);
+		gl_Position = gl_in[i].gl_Position;
+		gl_Position.x -= (sepFactor * (gl_in[i].gl_Position.z - z0));
+		EmitVertex();	
 	}
 	EndPrimitive();
 	
 // Render the right eye
-		for (int i=0; i < gl_in.length(); i++) {
-	passthru(2, i);
-	gl_Position = gl_in[i].gl_Position;
-	gl_Position.x += (sepFactor * (gl_in[i].gl_Position.z - z0));
-	EmitVertex();	
+	for (int i=0; i < gl_in.length(); i++) {
+		passthru(2, i);
+		gl_Position = gl_in[i].gl_Position;
+		gl_Position.x += (sepFactor * (gl_in[i].gl_Position.z - z0));
+		EmitVertex();	
 	}
 	EndPrimitive();
 }
