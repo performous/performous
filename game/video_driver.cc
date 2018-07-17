@@ -324,10 +324,11 @@ void Window::swap() {
 }
 
 void Window::event() {
-	m_needResize = true;
 	// Update config option with any fullscreen toggles done via OS (e.g. MacOS green titlebar button)
 	bool macos = Platform::currentOS() == Platform::macos;
+	bool wasFullscreen = config["graphic/fullscreen"].b();
 	config["graphic/fullscreen"].b() = SDL_GetWindowFlags(screen) & (macos ? SDL_WINDOW_MAXIMIZED : SDL_WINDOW_FULLSCREEN_DESKTOP);
+	if (config["graphic/fullscreen"].b() != wasFullscreen) { m_needResize = true; }
 }
 
 FBO& Window::getFBO() {
