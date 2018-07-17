@@ -11,12 +11,11 @@ class FBO {
 	/// Generate the FBO and attach a fresh texture to it
 	FBO(float w, float h): m_w(w), m_h(h) {
 		// Create FBO
-		if (glIsFramebuffer(m_fbo) != GL_TRUE) { std::clog << "fbo/debug: Generating new framebuffer." << std::endl; glGenFramebuffers(1, &m_fbo); }
+		if (glIsFramebuffer(m_fbo) != GL_TRUE) glGenFramebuffers(1, &m_fbo);
 		update();
 	}
 	/// Handle clean-up
 	~FBO() {
-		std::clog << "fbo/debug: destroying FBO." << std::endl;
 		if (m_fbo) glDeleteFramebuffers(1, &m_fbo);
 	}
 	/// Returns a reference to the attached texture

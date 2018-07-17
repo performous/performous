@@ -105,8 +105,6 @@ void Window::createShaders() {
 		shader("texture").compileFile(findFile("shaders/stereo3d.geom"));
 		shader("3dobject").compileFile(findFile("shaders/stereo3d.geom"));
 		shader("dancenote").compileFile(findFile("shaders/stereo3d.geom"));
-		
-// 		if (!m_fbo) { std::clog << "fbo/debug: Creating m_fbo pointer (createShaders)" << std::endl; m_fbo = std::make_unique<FBO>(s_width, 2 * s_height); }
 		}
 		else { 
 		std::clog << "video/warning: Stereo3D was enabled but the 'GL_ARB_viewport_array' extension is unsupported; will now disable Stereo3D." << std::endl;
@@ -234,7 +232,6 @@ void Window::render(std::function<void (void)> drawFunc) {
 	
 	glerror.check("FBO");
 	{
-// 		if (!m_fbo) { std::clog << "fbo/debug: Creating m_fbo pointer" << std::endl; m_fbo = std::make_unique<FBO>(s_width, 2 * s_height); }
 		getFBO();
 		UseFBO user(getFBO());
 		blank();
@@ -382,7 +379,7 @@ void Window::resize() {
 	std::clog << "video/info: Window size " << w << "x" << h;
 	if (w != nativeW) std::clog << " (HiDPI " << nativeW << "x" << nativeH << ")";
 	std::clog << ", rendering in " << s_width << "x" << s_height << std::endl;
-	if (m_fbo) { std::clog << "fbo/debug: Resizing fbo" << std::endl; m_fbo->resize(s_width, 2 * s_height); }
+	if (m_fbo) { m_fbo->resize(s_width, 2 * s_height); }
 }
 
 void Window::screenshot() {
