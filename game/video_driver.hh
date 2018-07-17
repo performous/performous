@@ -6,9 +6,9 @@
 #include <boost/function.hpp>
 #include <map>
 
-unsigned int screenW();
-unsigned int screenH();
-const unsigned int targetWidth = 1366; // One of the most common desktop resolutions in use today.
+float screenW();
+float screenH();
+const float targetWidth = 1366.0f; // One of the most common desktop resolutions in use today.
 static inline float virtH() { return float(screenH()) / screenW(); }
 
 struct SDL_Surface;

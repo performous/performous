@@ -12,8 +12,8 @@
 #include <boost/filesystem.hpp>
 
 namespace {
-	unsigned s_width;
-	unsigned s_height;
+	float s_width;
+	float s_height;
 	/// Attempt to set attribute and report errors.
 	/// Tests for success when destoryed.
 	struct GLattrSetter {
@@ -45,8 +45,8 @@ namespace {
 	glmath::mat4 g_modelview = glmath::mat4();
 }
 
-unsigned int screenW() { return s_width; }
-unsigned int screenH() { return s_height; }
+float screenW() { return s_width; }
+float screenH() { return s_height; }
 
 GLuint Window::m_vao = 0;
 GLuint Window::m_vbo = 0;
