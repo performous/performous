@@ -10,17 +10,13 @@ class FBO {
   	const FBO& operator=(const FBO&) = delete;
 	/// Generate the FBO and attach a fresh texture to it
 	FBO(unsigned w, unsigned h): m_w(w), m_h(h) {
-		update();
 		// Create FBO
-		glGenFramebuffers(1, &m_fbo);
-		// Bind texture as COLOR_ATTACHMENT0
-		bind();
-		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texture.id(), 0);
-		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth.id(), 0);
-		unbind();
+		if (glIsFramebuffer(m_fbo) != GL_TRUE) { std::clog << "fbo/debug: Generating new framebuffer." << std::endl; glGenFramebuffers(1, &m_fbo); }
+		update();
 	}
 	/// Handle clean-up
 	~FBO() {
+		std::clog << "fbo/debug: destroying FBO." << std::endl;
 		if (m_fbo) glDeleteFramebuffers(1, &m_fbo);
 	}
 	/// Returns a reference to the attached texture
@@ -51,8 +47,13 @@ class FBO {
 		{
 			UseTexture tex(m_depth);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_w, m_h, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);	
 		}
+		// Bind texture as COLOR_ATTACHMENT0
+		bind();
+		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texture.id(), 0);
+		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth.id(), 0);
+		unbind();
 	}
   private:
   	unsigned m_w;

@@ -106,7 +106,7 @@ void Window::createShaders() {
 		shader("3dobject").compileFile(findFile("shaders/stereo3d.geom"));
 		shader("dancenote").compileFile(findFile("shaders/stereo3d.geom"));
 		
-		if (m_fbo == nullptr) { m_fbo = std::make_unique<FBO>(s_width, 2 * s_height); }
+// 		if (!m_fbo) { std::clog << "fbo/debug: Creating m_fbo pointer (createShaders)" << std::endl; m_fbo = std::make_unique<FBO>(s_width, 2 * s_height); }
 		}
 		else { 
 		std::clog << "video/warning: Stereo3D was enabled but the 'GL_ARB_viewport_array' extension is unsupported; will now disable Stereo3D." << std::endl;
@@ -234,12 +234,13 @@ void Window::render(std::function<void (void)> drawFunc) {
 	
 	glerror.check("FBO");
 	{
-		if (m_fbo == nullptr) { m_fbo = std::make_unique<FBO>(s_width, 2 * s_height); }
+// 		if (!m_fbo) { std::clog << "fbo/debug: Creating m_fbo pointer" << std::endl; m_fbo = std::make_unique<FBO>(s_width, 2 * s_height); }
+		getFBO();
 		UseFBO user(getFBO());
 		blank();
 		view(0);
-		glViewportIndexedf(1, 0, getFBO().height() / 2, getFBO().width(), getFBO().height() / 2);
-		glViewportIndexedf(2, 0, 0, getFBO().width(), getFBO().height() / 2);
+		glViewportIndexedf(1, 0, (getFBO().height() / 2), getFBO().width(), (getFBO().height() / 2));
+		glViewportIndexedf(2, 0, 0, getFBO().width(), (getFBO().height() / 2));
 		drawFunc();
 	}
 	glerror.check("Render to FBO");
@@ -318,7 +319,6 @@ void Window::view(unsigned num) {
 			glViewportIndexedf(2, 0, 0, vw, vh / 2);  // Bottom half of the drawable area
 		}
 	}
-
 }
 
 void Window::swap() {
@@ -330,6 +330,11 @@ void Window::event() {
 	// Update config option with any fullscreen toggles done via OS (e.g. MacOS green titlebar button)
 	bool macos = Platform::currentOS() == Platform::macos;
 	config["graphic/fullscreen"].b() = SDL_GetWindowFlags(screen) & (macos ? SDL_WINDOW_MAXIMIZED : SDL_WINDOW_FULLSCREEN_DESKTOP);
+}
+
+FBO& Window::getFBO() {
+	if (!m_fbo) m_fbo = std::make_unique<FBO>(s_width, (2 * s_height));
+	return *m_fbo;
 }
 
 void Window::setFullscreen() {
@@ -377,7 +382,7 @@ void Window::resize() {
 	std::clog << "video/info: Window size " << w << "x" << h;
 	if (w != nativeW) std::clog << " (HiDPI " << nativeW << "x" << nativeH << ")";
 	std::clog << ", rendering in " << s_width << "x" << s_height << std::endl;
-	if (m_fbo != nullptr) { m_fbo->resize(s_width, 2 * s_height); }
+	if (m_fbo) { std::clog << "fbo/debug: Resizing fbo" << std::endl; m_fbo->resize(s_width, 2 * s_height); }
 }
 
 void Window::screenshot() {
