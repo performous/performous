@@ -91,6 +91,7 @@ Window::Window() {
 	// Extensions would need more complex outputting, otherwise they will break clog.
 	//std::clog << "video/info: GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl;
 	if (epoxy_gl_version() < 33) throw std::runtime_error("OpenGL 3.3 is required but not available");
+	if (config["graphic/fullscreen"].b()) { m_needResize = m_needReload = true; }
 	createShaders();
 }
 
