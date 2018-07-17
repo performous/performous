@@ -31,7 +31,7 @@ float Dimensions::screenY() const {
 
 struct Job {
 	fs::path name;
-	typedef boost::function<void (Bitmap& bitmap)> ApplyFunc;
+	typedef std::function<void (Bitmap& bitmap)> ApplyFunc;
 	ApplyFunc apply;
 	Bitmap bitmap;
 	Job() {}

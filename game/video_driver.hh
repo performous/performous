@@ -3,7 +3,7 @@
 #include "glmath.hh"
 #include "glshader.hh"
 #include "glutil.hh"
-#include <boost/function.hpp>
+#include <map>
 
 unsigned int screenW();
 unsigned int screenH();
@@ -49,7 +49,7 @@ class Window {
 public:
 	Window();
 	~Window();
-	void render(boost::function<void (void)> drawFunc);
+	void render(std::function<void (void)> drawFunc);
 	/// clears window
 	void blank();
 	/// swaps buffers

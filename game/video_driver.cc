@@ -168,7 +168,7 @@ void Window::updateTransforms() {
 	}
 }
 
-void Window::render(boost::function<void (void)> drawFunc) {
+void Window::render(std::function<void (void)> drawFunc) {
 	glutil::GLErrorChecker glerror("Window::render");
 	ViewTrans trans;  // Default frustum
 	bool stereo = config["graphic/stereo3d"].b();
