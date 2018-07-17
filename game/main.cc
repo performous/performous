@@ -228,6 +228,7 @@ void mainLoop(std::string const& songlist) {
 				gm.flashMessage(std::string("ERROR: ") + e.what());
 			}
 		}
+		writeConfig();
 	} catch (EXCEPTION& e) {
 		std::clog << "core/error: Exiting due to fatal error: " << e.what() << std::endl;
 		gm.fatalError(e.what());  // Notify the user
