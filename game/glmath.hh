@@ -1,5 +1,6 @@
 #pragma once
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <epoxy/gl.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_access.hpp>
