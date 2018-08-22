@@ -12,10 +12,10 @@ namespace glutil {
 
 	// Note: if you reorder or otherwise change the contents of this, VertexArray::Draw() must be modified accordingly
 	struct VertexInfo {
-		glmath::vec3 vertPos{};
-		glmath::vec2 vertTexCoord{};
-		glmath::vec3 vertNormal{};
-		glmath::vec4 vertColor{ 1.0, 1.0, 1.0, 1.0 };
+		glmath::vec3 vertPos = glmath::vec3(0.0f);
+		glmath::vec2 vertTexCoord = glmath::vec2(0.0f);
+		glmath::vec3 vertNormal = glmath::vec3(0.0f);
+		glmath::vec4 vertColor = glmath::vec4(1.0f);
 	};
 
 	/// Handy vertex array capable of drawing itself
