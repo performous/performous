@@ -32,11 +32,11 @@ typedef glm::highp_mat4 mat4;
 		return (1.0-blend) * a + blend * b;
 	}
 	
-	static inline mat4 translate(vec3 const& v) { return glm::translate(mat4(), v); }
-	static inline mat4 scale(vec3 const& v) { return glm::scale(glm::mat4(), v); }
-	static inline mat4 scale(float k) { return glm::scale(mat4(),vec3(k, k, k)); }
+	static inline mat4 translate(vec3 const& v) { return glm::translate(mat4(1.0f), v); }
+	static inline mat4 scale(vec3 const& v) { return glm::scale(glm::mat4(1.0f), v); }
+	static inline mat4 scale(float k) { return glm::scale(mat4(1.0f),vec3(k, k, k)); }
 	static inline mat4 diagonal(vec4 const& v) { return glm::diagonal4x4(v); }	
-	static inline mat4 rotate(float rad, vec3 axis) { return glm::rotate(mat4(), rad, glm::normalize(axis)); }
+	static inline mat4 rotate(float rad, vec3 axis) { return glm::rotate(mat4(1.0f), rad, glm::normalize(axis)); }
 	
 }
 

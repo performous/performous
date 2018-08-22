@@ -40,9 +40,9 @@ namespace {
 	const float far_ = 110.0f; // How far away can things be seen
 	const float z0 = 1.5f; // This determines FOV: the value is your distance from the monitor (the unit being the width of the Performous window)
 
-	glmath::mat4 g_color = glmath::mat4();
-	glmath::mat4 g_projection = glmath::mat4();
-	glmath::mat4 g_modelview = glmath::mat4();
+	glmath::mat4 g_color = glmath::mat4(1.0f);
+	glmath::mat4 g_projection = glmath::mat4(1.0f);
+	glmath::mat4 g_modelview = glmath::mat4(1.0f);
 }
 
 float screenW() { return s_width; }
@@ -245,7 +245,7 @@ void Window::render(std::function<void (void)> drawFunc) {
 	UseTexture use(getFBO().getTexture());
 	view(0);  // Viewport for drawable area
 	glDisable(GL_BLEND);
-	glmath::mat4 colorMatrix = glmath::mat4();
+	glmath::mat4 colorMatrix = glmath::mat4(1.0f);
 	updateStereo(0.0);  // Disable stereo mode while we composite
 	glerror.check("FBO->FB setup");
 	for (int num = 0; num < 2; ++num) {
