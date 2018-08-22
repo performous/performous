@@ -233,7 +233,6 @@ void Window::render(std::function<void (void)> drawFunc) {
 	
 	glerror.check("FBO");
 	{
-		getFBO();
 		UseFBO user(getFBO());
 		blank();
 		view(0);
