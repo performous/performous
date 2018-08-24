@@ -36,7 +36,7 @@ namespace portaudio {
 	}
 
 	struct DeviceInfo {
-		DeviceInfo(int id, std::string n = std::string(), int i = 0, int o = 0): name(n), flex(n), idx(id), in(i), out(o) {}
+		DeviceInfo(int id, std::string n = std::string(), int i = 0, int o = 0, unsigned index = 0): name(n), flex(n), idx(id), in(i), out(o), index(index) {}
 		std::string desc() const {
 			std::ostringstream oss;
 			oss << name << " (";
@@ -50,6 +50,7 @@ namespace portaudio {
 		std::string flex;  ///< Modified name that is less specific but still unique (allow device numbers to change)
 		int idx;
 		int in, out;
+		unsigned index;
 	};
 		typedef std::vector<DeviceInfo> DeviceInfos;
 		struct AudioDevices {
@@ -82,7 +83,7 @@ namespace portaudio {
 					oss << name << " #" << ++num;
 					n = oss.str();
 				};
-				devices.push_back(DeviceInfo(i, name, info->maxInputChannels, info->maxOutputChannels));
+				devices.push_back(DeviceInfo(i, name, info->maxInputChannels, info->maxOutputChannels, Pa_HostApiDeviceIndexToDeviceIndex(backendIndex, i)));
 			}
 			for (auto& dev: devices) {
 				// Array of regex - replacement pairs
@@ -96,7 +97,7 @@ namespace portaudio {
 					// Verify that flex doesn't find any wrong devices
 					bool fail = false;
 					try {
-						if (find(flex).idx != dev.idx) fail = true;
+						if (find(flex, false, 0).idx != dev.idx) fail = true;
 					} catch (...) {}  // Failure to find anything is success
 					if (!fail) dev.flex = flex;
 				}
@@ -108,13 +109,21 @@ namespace portaudio {
 			for (auto const& d: devices) { oss << "    #" << d.idx << " " << d.desc() << std::endl; }
 			return oss.str();
 		}
-		DeviceInfo const& find(std::string const& name) {
+		DeviceInfo const& find(std::string const& name, bool output, unsigned num) {
+			if (name.empty()) { return findByChannels(output, num); }
 			// Try name search with full match
 			for (auto const& dev: devices) { if (dev.name == name) { return dev;  } }
 			// Try name search with partial/flexible match
 			for (auto const& dev: devices) {
 				if (dev.name.find(name) != std::string::npos) { return dev; }
 				if (dev.flex.find(name) != std::string::npos) { return dev; }
+			}
+			throw std::runtime_error("No such device.");
+		}
+		DeviceInfo const& findByChannels(bool output, unsigned num) {
+			for (auto const& dev: devices) {
+				unsigned reqChannels = output ? dev.out : dev.in;
+				if (reqChannels >= num) { return dev;  }
 			}
 			throw std::runtime_error("No such device.");
 		}
@@ -220,9 +229,12 @@ namespace portaudio {
 		  double sampleRate,
 		  unsigned long framesPerBuffer = paFramesPerBufferUnspecified,
 		  PaStreamFlags flags = paNoFlag,
-		  PaStreamCallback* callback = NULL,
-		  void* userData = NULL)
+		  PaStreamCallback* callback = nullptr,
+		  void* userData = nullptr)
 		{
+			if (output != nullptr) {
+				if (output->channelCount > 0) { flags = paPrimeOutputBuffersUsingStreamCallback; }
+			}
 			PORTAUDIO_CHECKED(Pa_OpenStream, (&m_handle, input, output, sampleRate, framesPerBuffer, flags, callback, userData));
 		}
 		/// Construct stream using a C++ functor as callback

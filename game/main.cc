@@ -38,7 +38,7 @@
 #define RUNTIME_ERROR std::runtime_error
 #define EXCEPTION std::exception
 #else
-namespace { struct Nothing { char const* what() const { return NULL; } }; }
+namespace { struct Nothing { char const* what() const { return nullptr; } }; }
 #define RUNTIME_ERROR Nothing
 #define EXCEPTION Nothing
 #endif
@@ -296,7 +296,7 @@ void fatalError(std::string msg, bool hasLog = false, std::string title = "FATAL
 	errMsg << std::endl << "If you think this is a bug in Performous, please report it at "
 	  << std::endl << "  https://github.com/performous/performous/issues";
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title.c_str(),
-	  errMsg.str().c_str(), NULL);
+	  errMsg.str().c_str(), nullptr);
 	std::cerr << title << ": " << msg << std::endl;
 	if (hasLog) {
 		std::clog << "core/error: " << errMsg.str() << std::endl;

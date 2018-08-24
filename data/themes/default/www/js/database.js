@@ -12,8 +12,8 @@
 */
 $("#refresh-database").click(function () {
     $.get("api/getDataBase.json", function (data) {
-        var database = JSON.parse(data);
-        clearTable("#database-songs > tbody");
+        var database = data;
+        clearTable("database-songs");
 
         var html = buildTable(database);
         $(html).appendTo("#database-songs");
@@ -42,9 +42,9 @@ $("a[id^='sort-by-']").click(function () {
     });
 
     $.get(url, function (data) {
-        var database = JSON.parse(data);
+        var database = data;
 
-        clearTable("#database-songs > tbody");
+        clearTable("database-songs");
 
         var html = buildTable(database);
         $(html).appendTo("#database-songs");

@@ -448,22 +448,36 @@ struct Audio::Impl {
 					else if (key == "dev") std::getline(iss, params.dev);
 					else if (key == "mics") {
 						// Parse a comma-separated list of mics
-						for (std::string mic; std::getline(iss, mic, ','); params.mics.push_back(mic)) {}
+						for (std::string mic; std::getline(iss, mic, ','); params.mics.push_back(mic)) {
+							++params.in;
+						}
 					}
 					else throw std::runtime_error("Unknown device parameter " + key);
 					if (!iss.eof()) throw std::runtime_error("Syntax error parsing device parameter " + key);
 				}
-				// Sync mics/in settings together
-				if (params.in == 0) params.in = params.mics.size();
-				else params.mics.resize(params.in);
+				if (params.mics.size() < params.in) { params.mics.resize(params.in); }
 				portaudio::AudioDevices ad(PaHostApiTypeId(PaHostApiNameToHostApiTypeId(selectedBackend)));
-				auto const& info = ad.find(params.dev);
-				std::clog << "audio/info: Trying audio device \"" << params.dev << "\", idx: " << info.idx
-					<< ", in: " << params.in << ", out: " << params.out << std::endl;
+					bool wantOutput = (params.in == 0) ? true : false;
+					unsigned num;
+					std::string msg = "audio/info: Device string empty; will look for a device with at least ";
+					if (wantOutput) {
+						msg += std::to_string(params.out) + " output channels.";
+						num = params.out;
+					}
+					else {
+						msg += std::to_string(params.in) + " input channels.";
+						num = params.in;
+					}
+					if (!params.dev.empty()) {
+					std::clog << "audio/debug: Will try to find device matching dev: " << params.dev << std::endl;
+					}
+					else { std::clog << msg << std::endl; }
+					portaudio::DeviceInfo const& info = ad.find(params.dev, wantOutput, num);
+					std::clog << "audio/info: Found: " << info.name << ", in: " << info.in << ", out: " << info.out << std::endl;
 				if (info.in < int(params.mics.size())) throw std::runtime_error("Device doesn't have enough input channels");
 				if (info.out < int(params.out)) throw std::runtime_error("Device doesn't have enough output channels");
 				// Match found if we got here, construct a device
-				devices.emplace_back(params.in, params.out, params.rate, info.idx);
+				devices.emplace_back(params.in, params.out, params.rate, info.index);
 				Device& d = devices.back();
 				// Assign mics for all channels of the device
 				int assigned_mics = 0;

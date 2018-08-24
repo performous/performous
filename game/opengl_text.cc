@@ -81,7 +81,7 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	// Compute text extents
 	{
 		PangoRectangle rec;
-		pango_layout_get_pixel_extents(layout.get(), NULL, &rec);
+		pango_layout_get_pixel_extents(layout.get(), nullptr, &rec);
 		m_x = rec.width + border;  // Add twice half a border for margins
 		m_y = rec.height + border;
 	}

@@ -98,18 +98,18 @@
       <feGaussianBlur
          id="feGaussianBlur3088"
          in="SourceAlpha"
-         stdDeviation="4,000000"
+         stdDeviation="4.000000"
          result="blur" />
       <feColorMatrix
          id="feColorMatrix3090"
          result="bluralpha"
          type="matrix"
-         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 0,500000 0 " />
+         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 0.500000 0 " />
       <feOffset
          id="feOffset3092"
          in="bluralpha"
-         dx="0,000000"
-         dy="0,000000"
+         dx="0.000000"
+         dy="0.000000"
          result="offsetBlur" />
       <feMerge
          id="feMerge3094"

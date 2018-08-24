@@ -22,7 +22,7 @@ struct GuitarChord {
 	GuitarChord(): begin(), end(), polyphony(), tappable(), passed(), status(), score() {
 		std::fill(fret, fret + 5, false);
 		std::fill(fret_cymbal, fret_cymbal + 5, false);
-		std::fill(dur, dur + 5, static_cast<Duration const*>(NULL));
+		std::fill(dur, dur + 5, static_cast<Duration const*>(nullptr));
 		std::fill(hitAnim, hitAnim + 5, AnimValue(0.0, 1.5));
 		std::fill(releaseTimes, releaseTimes + 5, 0.0);
 	}
