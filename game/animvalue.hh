@@ -4,6 +4,7 @@
 #include "util.hh"
 #include <cmath>
 #include <stdexcept>
+#include <algorithm>
 
 /// class for simple/linear animation/transition of values
 class AnimValue {

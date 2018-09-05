@@ -29,7 +29,7 @@ void Shader::dumpInfoLog(GLuint id) {
 	if (glIsShader(id)) glGetShaderiv(id, GL_INFO_LOG_LENGTH, &maxLength);
 	else glGetProgramiv(id, GL_INFO_LOG_LENGTH, &maxLength);
 
-	char infoLog[maxLength];
+	char* infoLog = new char[maxLength];
 	int infoLogLength = 0;
 
 	if (glIsShader(id)) glGetShaderInfoLog(id, maxLength, &infoLogLength, infoLog);
@@ -47,6 +47,8 @@ void Shader::dumpInfoLog(GLuint id) {
 	}
 	if (logmsg.back() != '\n') logmsg += '\n';
 	std::clog << logmsg << std::flush;
+
+	delete[] infoLog;
 }
 
 Shader::Shader(std::string const& name): name(name), program(0) {}

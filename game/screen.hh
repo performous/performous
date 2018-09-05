@@ -133,6 +133,7 @@ private:
 	std::unique_ptr<Dialog> m_dialog;
 };
 
+#ifndef _MSC_VER
 // Declaration for the singleton pointer defined in game.cc
 template<> Game* Singleton<Game>::ms_Singleton;
-
+#endif
