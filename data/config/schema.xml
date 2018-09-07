@@ -303,7 +303,7 @@ to save the current settings to XML.
 		<short>Audio/controller latency</short>
 		<long>Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing.</long>
 	</entry>
-	<entry name="audio/devices" type="string_list">
+	<entry name="audio/devices" type="string_list" hidden="true">
 		<stringvalue>dev="USBMIC" mics="blue,red"</stringvalue><!-- SingStar mics -->
 		<stringvalue>dev="Microphone" mics="*"</stringvalue><!-- Rock Band branded Logitech mic -->
 		<stringvalue>mics="blue"</stringvalue><!-- Any other microphone (only if blue is still free) -->
