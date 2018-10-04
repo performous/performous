@@ -160,7 +160,7 @@ extern "C" {
   struct AVCodecContext;
   struct AVFormatContext;
   struct AVFrame;
-  struct AVAudioResampleContext;
+  struct SwrContext;
   struct SwsContext;
 }
 
@@ -202,7 +202,7 @@ class FFmpeg {
 	int m_mediaType;  // enum AVMediaType
 	AVFormatContext* m_formatContext = nullptr;
 	AVCodecContext* m_codecContext = nullptr;
-	AVAudioResampleContext* m_resampleContext = nullptr;
+	SwrContext* m_resampleContext = nullptr;
 	SwsContext* m_swsContext = nullptr;
 	// Make sure the thread starts only after initializing everything else
 	std::unique_ptr<std::thread> m_thread;
