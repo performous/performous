@@ -3,7 +3,6 @@
 #include "chrono.hh"
 #include "configuration.hh"
 #include "util.hh"
-#include <boost/noncopyable.hpp>
 #include <SDL2/SDL_events.h>
 #include <climits>
 #include <deque>
@@ -81,10 +80,12 @@ namespace input {
 	};
 	
 	/// A handle for receiving device events
-	class Device: boost::noncopyable {
+	class Device {
 		typedef std::deque<Event> Events;
 		Events m_events;
 	public:
+		Device(const Device&) = delete;
+  		const Device& operator=(const Device&) = delete;
 		const SourceId source;
 		const DevType type;
 		Device(SourceId const& source, DevType type): source(source), type(type) {}
@@ -94,8 +95,10 @@ namespace input {
 	typedef std::shared_ptr<Device> DevicePtr;
 
 	/// The main controller class that contains everything
-	class Controllers: boost::noncopyable {
+	class Controllers {
 	public:
+		Controllers(const Controllers&) = delete;
+  		const Controllers& operator=(const Controllers&) = delete;
 		Controllers();
 		~Controllers();
 		/// Return true and a nav event if there are any in queue. Otherwise return false.
@@ -114,10 +117,13 @@ namespace input {
 	};
 
 	/// Base class for different types of hardware backends.
-	class Hardware: boost::noncopyable {
+	class Hardware {
 	public:
+		Hardware(const Hardware&) = delete;
+  		const Hardware& operator=(const Hardware&) = delete;
 		static bool midiEnabled();
 		static void enableKeyboardInstruments(bool state);
+		Hardware() {}
 		virtual ~Hardware() {}
 		/// Get the name of a specific device of this type
 		virtual std::string getName(unsigned) const { return std::string(); }

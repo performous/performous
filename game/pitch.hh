@@ -7,8 +7,6 @@
 #include <algorithm>
 #include <cmath>
 
-#include <boost/noncopyable.hpp>
-
 /// struct to represent tones
 struct Tone {
 	static const std::size_t MAXHARM = 48; ///< The maximum number of harmonics tracked
@@ -72,8 +70,10 @@ private:
 /// analyzer class
  /** class to analyze input audio and transform it into useable data
  */
-class Analyzer: boost::noncopyable {
+class Analyzer {
 public:
+	Analyzer(const Analyzer&) = delete;
+  	const Analyzer& operator=(const Analyzer&) = delete;
 	/// fast fourier transform vector
 	typedef std::vector<std::complex<float> > fft_t;
 	/// list of tones

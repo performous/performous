@@ -6,7 +6,6 @@
 #include <string>
 #include <stdexcept>
 
-#include <boost/noncopyable.hpp>
 #include <unicode/tblcoll.h>
 #include <unicode/unistr.h>
 #include <unicode/utypes.h>
@@ -35,7 +34,7 @@ struct PlayersException: public std::runtime_error {
  The filtered list is used to show players in
  the screen_players.
  */
-class Players: boost::noncopyable {
+class Players {
   private:
 	typedef std::set<PlayerItem> players_t;
 	typedef std::vector<PlayerItem> fplayers_t;
@@ -50,6 +49,8 @@ class Players: boost::noncopyable {
 	bool m_dirty;
 
   public:
+	Players(const Players&) = delete;
+  	const Players& operator=(const Players&) = delete;
 	Players();
 	~Players();
 

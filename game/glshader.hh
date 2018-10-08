@@ -7,7 +7,6 @@
 #include <map>
 #include <vector>
 #include <epoxy/gl.h>
-#include <boost/noncopyable.hpp>
 
 struct Uniform {
 	GLint id;
@@ -24,7 +23,9 @@ struct Uniform {
 	void setMat4(GLfloat const* m) { glUniformMatrix4fv(id, 1, GL_FALSE, m); }
 };
 
-struct Shader: public boost::noncopyable {
+struct Shader {
+	Shader(const Shader&) = delete;
+  	const Shader& operator=(const Shader&) = delete;
 	/// Print compile errors and such
 	/// @param id of shader or program
 	void dumpInfoLog(GLuint id);
