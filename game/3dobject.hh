@@ -2,7 +2,6 @@
 
 #include "fs.hh"
 #include "glutil.hh"
-#include <boost/noncopyable.hpp>
 #include <memory>
 #include <string>
 
@@ -13,13 +12,15 @@ class Surface;
 
 /// A class representing 3d object
 /// Non-copyable because of display lists getting messed up
-class Object3d: boost::noncopyable {
+class Object3d {
   private:
 	glutil::VertexArray m_va;
 	std::unique_ptr<Surface> m_texture; /// texture
 	/// load a Wavefront .obj 3d object file
 	void loadWavefrontObj(fs::path const& filepath, float scale = 1.0);
   public:
+  	Object3d(const Object3d&) = delete;
+  	const Object3d& operator=(const Object3d&) = delete;
 	Object3d() {}
 	Object3d(fs::path const& filepath, fs::path const& texturepath = fs::path(), float scale = 1.0) {
 		load(filepath, texturepath, scale);

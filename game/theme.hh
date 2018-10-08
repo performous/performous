@@ -3,12 +3,13 @@
 #include "opengl_text.hh"
 #include "surface.hh"
 #include "cachemap.hh"
-#include <boost/noncopyable.hpp>
 #include <string>
 
 /// abstract theme class
-class Theme: boost::noncopyable {
+class Theme {
 protected:
+	Theme(const Theme&) = delete;
+  	const Theme& operator=(const Theme&) = delete;
 	Theme();
 	Theme(fs::path const& path); ///< creates theme from path
 public:
