@@ -8,6 +8,7 @@
 #include "profiler.hh"
 #include "libxml++-impl.hh"
 #include "unicode.hh"
+#include "platform.hh"
 
 #include <algorithm>
 #include <cstdlib>
@@ -19,8 +20,6 @@
 #include <boost/format.hpp>
 #include <cpprest/json.h>
 #include <unicode/stsearch.h>
-
-#include <sys/stat.h>
 
 Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), m_database(database), m_order(config["songs/sort-order"].i()) {
 	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
@@ -97,9 +96,18 @@ void Songs::LoadCache() {
     	return;
     }
 
+    auto stringList = config["paths/songs"].sl();
+
     for(auto const& song : jsonRoot.as_array()) {
     	struct stat buffer;
-    	if(stat(song.at("TxtFile").as_string().c_str(), &buffer) == 0) {
+    	auto songPath = song.at("TxtFile").as_string();
+    	auto isSongPathInConfiguredPaths = std::find_if(
+                                                        stringList.begin(), 
+                                                        stringList.end(), 
+														[songPath](const std::string& stringListItem) { 
+															return songPath.find(stringListItem) != std::string::npos;
+														 }) != stringList.end();
+    	if(_STAT(songPath.c_str(), &buffer) == 0 && isSongPathInConfiguredPaths) {
     		std::shared_ptr<Song> realSong(new Song(song));
     		m_songs.push_back(realSong);
     	}  	
