@@ -77,7 +77,7 @@ static void checkEvents(Game& gm, Time eventTime) {
 		// Let the navigation system grab any and all SDL events
 		gm.controllers.pushEvent(event, eventTime);
 		auto type = event.type;
-		if (type == SDL_WINDOWEVENT) window.event();
+		if (type == SDL_WINDOWEVENT) window.event(event.window.event);
 		if (type == SDL_QUIT) gm.finished();
 		if (type == SDL_KEYDOWN) {
 			auto key  = event.key.keysym.scancode;

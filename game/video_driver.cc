@@ -81,18 +81,17 @@ Window::Window() {
 	}
 	SDL_SetWindowMinimumSize(screen, 640, 360);
 	SDL_GetWindowPosition(screen, &m_windowX, &m_windowY);
-	resize();
-	SDL_ShowWindow(screen);
-
 	// Dump some OpenGL info
 	std::clog << "video/info: GL_VENDOR:     " << glGetString(GL_VENDOR) << std::endl;
 	std::clog << "video/info: GL_VERSION:    " << glGetString(GL_VERSION) << std::endl;
 	std::clog << "video/info: GL_RENDERER:   " << glGetString(GL_RENDERER) << std::endl;
 	// Extensions would need more complex outputting, otherwise they will break clog.
 	//std::clog << "video/info: GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl;
-	if (epoxy_gl_version() < 33) throw std::runtime_error("OpenGL 3.3 is required but not available");
-	if (config["graphic/fullscreen"].b()) { m_needResize = m_needReload = true; }
+	if (epoxy_gl_version() < 33) throw std::runtime_error("OpenGL 3.3 is required but not available");	
 	createShaders();
+	resize();
+	SDL_ShowWindow(screen);
+	m_fullscreen = !config["graphic/fullscreen"].b();
 }
 
 void Window::createShaders() {
@@ -322,12 +321,23 @@ void Window::swap() {
 	SDL_GL_SwapWindow(screen);
 }
 
-void Window::event() {
-	// Update config option with any fullscreen toggles done via OS (e.g. MacOS green titlebar button)
-	bool macos = Platform::currentOS() == Platform::macos;
-	bool wasFullscreen = config["graphic/fullscreen"].b();
-	config["graphic/fullscreen"].b() = SDL_GetWindowFlags(screen) & (macos ? SDL_WINDOW_MAXIMIZED : SDL_WINDOW_FULLSCREEN_DESKTOP);
-	if (config["graphic/fullscreen"].b() != wasFullscreen) { m_needResize = true; }
+void Window::event(Uint8 const& eventID) {
+	switch (eventID) {
+		case SDL_WINDOWEVENT_MAXIMIZED:
+			config["graphic/fullscreen"].b() = true;
+			break;	
+		case SDL_WINDOWEVENT_RESTORED:
+			config["graphic/fullscreen"].b() = false;
+			break;	
+		case SDL_WINDOWEVENT_RESIZED:
+			[[fallthrough]];
+		case SDL_WINDOWEVENT_SHOWN:
+			[[fallthrough]];
+		case SDL_WINDOWEVENT_SIZE_CHANGED:
+			m_needResize = true;
+			break;
+		default: break;
+	}	
 }
 
 FBO& Window::getFBO() {
