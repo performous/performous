@@ -349,7 +349,6 @@ void Window::setFullscreen() {
 		SDL_SetWindowSize(screen, w, h);
 		SDL_SetWindowPosition(screen, m_windowX, m_windowY);
 	}
-	m_needResize = m_needReload = true;
 }
 
 void Window::resize() {

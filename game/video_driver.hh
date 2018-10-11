@@ -79,8 +79,6 @@ public:
 	void resetShaders() { m_shaders.clear(); createShaders(); };
 	void updateColor();
 	void updateTransforms();
-	/// Check if resizing (full screen toggle) caused OpenGL context to be lost, in which case textures etc. need reloading.
-	bool needReload() { bool tmp = m_needReload; m_needReload = false; return tmp; }
 private:
 	const GLuint vertPos = 0;
 	const GLuint vertTexCoord = 1;
@@ -93,7 +91,6 @@ private:
 	void updateStereo(float separation);
 	bool m_fullscreen = false;
 	bool m_needResize = true;
-	bool m_needReload = true;
 	static GLuint m_vao;
 	static GLuint m_vbo;
 	std::unique_ptr<FBO> m_fbo;

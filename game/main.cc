@@ -122,7 +122,6 @@ static void checkEvents(Game& gm, Time eventTime) {
 
 	// Need to toggle full screen mode or adjust resolution?
 	window.resize();
-	if (window.needReload()) gm.reloadGL();
 }
 
 void mainLoop(std::string const& songlist) {
