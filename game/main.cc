@@ -242,8 +242,8 @@ void mainLoop(std::string const& songlist) {
 void jstestLoop() {
 	try {
 		config["graphic/fullscreen"].b() = false;
-		config["graphic/window_width"].i() = 400;
-		config["graphic/window_height"].i() = 250;
+		config["graphic/window_width"].i() = 640;
+		config["graphic/window_height"].i() = 360;
 		Window window;
 		// Main loop
 		int oldjoy = -1, oldaxis = -1, oldvalue = -1;

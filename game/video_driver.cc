@@ -79,7 +79,7 @@ Window::Window() {
 			initBuffers();
 		}
 	}
-	SDL_SetWindowMinimumSize(screen, 400, 250);
+	SDL_SetWindowMinimumSize(screen, 640, 360);
 	SDL_GetWindowPosition(screen, &m_windowX, &m_windowY);
 	resize();
 	SDL_ShowWindow(screen);

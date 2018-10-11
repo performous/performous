@@ -205,13 +205,13 @@ to save the current settings to XML.
 	</entry>
 
 	<!-- Graphic preferences -->
-	<entry name="graphic/window_width" type="int" value="800" hidden="true">
+	<entry name="graphic/window_width" type="int" value="1366" hidden="true">
 		<ui unit=" pixels" />
 		<limits min="320" max="4096" step="16" />
 		<short>Windowed width</short>
 		<long>The width of the window.</long>
 	</entry>
-	<entry name="graphic/window_height" type="int" value="600" hidden="true">
+	<entry name="graphic/window_height" type="int" value="768" hidden="true">
 		<ui unit=" pixels" />
 		<limits min="240" max="2048" step="8" />
 		<short>Windowed height</short>
