@@ -8,9 +8,11 @@
 #include <vector>
 
 /// songs class for songs screen
-class Backgrounds: boost::noncopyable {
+class Backgrounds {
   public:
 	/// constructor
+	Backgrounds(const Backgrounds&) = delete;
+  	const Backgrounds& operator=(const Backgrounds&) = delete;
 	Backgrounds() {
 		reload();
 	}

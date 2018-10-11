@@ -1,12 +1,13 @@
 #pragma once
 
-#include <boost/noncopyable.hpp>
 #include "surface.hh"
 #include "video_driver.hh"
 
 /// Frame Buffer Object class
-class FBO: boost::noncopyable {
+class FBO {
   public:
+	FBO(const FBO&) = delete;
+  	const FBO& operator=(const FBO&) = delete;
 	/// Generate the FBO and attach a fresh texture to it
 	FBO(unsigned w, unsigned h) {
 		{

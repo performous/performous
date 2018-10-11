@@ -26,21 +26,15 @@ void ScreenPlaylist::enter() {
 	}
 	m_audio.togglePause();
 	if (gm->getCurrentPlayList().isEmpty()) {
-		if(config["game/autoplay"].b()) {
-			m_songs.setFilter("");
-			Screen* s = gm->getScreen("Sing");
-			ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
-			assert(ss);
-			int randomsong = std::rand() % m_songs.size();
-			ss->setSong(m_songs[randomsong]);
-			gm->activateScreen("Sing");
-		} else {
+		if(!config["game/autoplay"].b()) {
 			gm->activateScreen("Songs");
 		}
 	}
 	keyPressed = false;
-	int timervalue = config["game/playlist_screen_timeout"].i();
-	if(timervalue == 0) { timervalue = 1; }
+	auto timervalue = config["game/playlist_screen_timeout"].i();
+	if(timervalue < 0.0) {
+		timervalue = 0.0;
+	}
 	m_nextTimer.setValue(timervalue);
 	overlay_menu.close();
 	gm->loading(_("Loading song timestamps..."), 0.2);
@@ -116,7 +110,13 @@ void ScreenPlaylist::draw() {
 		Screen* s = gm->getScreen("Sing");
 		ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
 		assert(ss);
-		ss->setSong(gm->getCurrentPlayList().getNext());
+		if(gm->getCurrentPlayList().isEmpty()) {
+			m_songs.setFilter("");
+			auto randomsong = std::rand() % m_songs.size();
+			ss->setSong(m_songs[randomsong]);
+		} else {
+			ss->setSong(gm->getCurrentPlayList().getNext());
+		}
 		gm->activateScreen("Sing");
 	}
 	if (m_cam && config["graphic/webcam"].b()) m_cam->render();

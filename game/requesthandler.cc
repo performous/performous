@@ -1,4 +1,6 @@
+#include <boost/algorithm/string/case_conv.hpp>
 #include "requesthandler.hh"
+
 #ifdef USE_WEBSERVER
 RequestHandler::RequestHandler(Songs& songs):m_songs(songs)
 {

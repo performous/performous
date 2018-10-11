@@ -4,7 +4,6 @@
 #include "image.hh"
 #include "video_driver.hh"
 
-#include <boost/noncopyable.hpp>
 #include <cairo.h>
 
 #include <algorithm>
@@ -113,9 +112,11 @@ private:
 Shader& getShader(std::string const& name);
 
 /** @short A RAII wrapper for allocating/deallocating OpenGL texture ID **/
-template <GLenum Type> class OpenGLTexture: boost::noncopyable {
+template <GLenum Type> class OpenGLTexture {
   public:
 	/// return Type
+	OpenGLTexture(const OpenGLTexture&) = delete;
+  	const OpenGLTexture& operator=(const OpenGLTexture&) = delete;
 	static GLenum type() { return Type; };
 	static Shader& shader() {
 		switch (Type) {
@@ -137,8 +138,10 @@ template <GLenum Type> class OpenGLTexture: boost::noncopyable {
 };
 
 /** @short A RAII wrapper for binding to a texture (using it, modifying it) **/
-class UseTexture: boost::noncopyable {
+class UseTexture {
   public:
+  	UseTexture(const UseTexture&) = delete;
+  	const UseTexture& operator=(const UseTexture&) = delete;
 	/// constructor
 	template <GLenum Type> UseTexture(OpenGLTexture<Type> const& tex):
 	  m_shader(/* hack of the year */ (glutil::GLErrorChecker("UseTexture"), glActiveTexture(GL_TEXTURE0), glBindTexture(Type, tex.id()), tex.shader())) {}

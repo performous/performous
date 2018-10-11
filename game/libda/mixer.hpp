@@ -35,8 +35,10 @@ namespace da {
 	}
 
 
-	class chain: boost::noncopyable {
+	class chain {
 	  public:
+	  	chain(const chain&) = delete;
+  		const chain& operator=(const chain&) = delete;
 		typedef std::vector<callback_t> streams_t;
 		void add(callback_t const& cb) { streams.push_back(cb); }
 		void clear() { streams.clear(); }
@@ -61,8 +63,10 @@ namespace da {
 		}
 	}
 
-	class accumulate: boost::noncopyable {
+	class accumulate {
 	  public:
+	  	accumulate(const accumulate&) = delete;
+  		const accumulate& operator=(const accumulate&) = delete;
 		typedef std::vector<callback_t> streams_t;
 		void add(callback_t const& cb) { streams.push_back(cb); }
 		void clear() { streams.clear(); }
@@ -85,8 +89,10 @@ namespace da {
 	  private:
 	};
 
-	class buffer: boost::noncopyable {
+	class buffer {
 	  public:
+	  	buffer(const buffer&) = delete;
+  		const buffer& operator=(const buffer&) = delete;
 		explicit buffer(std::size_t s): m_data(s) {}
 		sample_t* begin() { return &m_data[0]; }
 		sample_t* end() { return begin() + m_data.size(); }
@@ -94,8 +100,10 @@ namespace da {
 		std::vector<sample_t> m_data;
 	};
 
-	class stream: boost::noncopyable {
+	class stream {
 	  public:
+	  	stream(const stream&) = delete;
+  		const stream& operator=(const stream&) = delete;
 		stream(): m_pos() {}
 		bool operator()(pcm_data& data) {
 			sample_t* b = m_buffer->begin();
@@ -112,8 +120,10 @@ namespace da {
 		int64_t m_pos;
 	};
 
-	class fadeinOp: boost::noncopyable {
+	class fadeinOp {
 	  public:
+	  	fadeinOp(const fadeinOp&) = delete;
+  		const fadeinOp& operator=(const fadeinOp&) = delete;
 		fadeinOp(double time = 1.0, int64_t pos = 0): m_pos(pos), m_time(time) {}
 		bool operator()(pcm_data& data) {
 			size_t end = m_time * data.rate;
@@ -131,8 +141,10 @@ namespace da {
 		double m_time;
 	};
 
-	class fadeoutOp: boost::noncopyable {
+	class fadeoutOp {
 	  public:
+	  	fadeoutOp(const fadeoutOp&) = delete;
+  		const fadeoutOp& operator=(const fadeoutOp&) = delete;
 		fadeoutOp(callback_t cb, double time = 1.0, int64_t pos = 0): m_stream(cb), m_pos(pos), m_time(time) {}
 		bool operator()(pcm_data& data) {
 			bool ret = m_stream(data);
@@ -164,8 +176,10 @@ namespace da {
 		sample_t m_level;
 	};
 
-	class mutex_stream: boost::noncopyable {
+	class mutex_stream{
 	  public:
+	  	mutex_stream(const mutex_stream&) = delete;
+  		const mutex_stream& operator=(const mutex_stream&) = delete;
 		mutex_stream(callback_t const& stream): m_stream(stream) {}
 		bool operator()(pcm_data& data) {
 			std::lock_guard<std::recursive_mutex> l(m_mutex);

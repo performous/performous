@@ -2,7 +2,6 @@
 
 #include "opengl_text.hh"
 #include "configuration.hh"
-#include <boost/noncopyable.hpp>
 #include <functional>
 #include <memory>
 #include <string>

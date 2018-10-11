@@ -15,8 +15,10 @@ class Song;
 class Database;
 
 /// songs class for songs screen
-class Songs: boost::noncopyable {
+class Songs {
   public:
+  	Songs(const Songs&) = delete;
+  	const Songs& operator=(const Songs&) = delete;
 	/// constructor
 	Songs(Database& database, std::string const& songlist = std::string());
 	~Songs();
