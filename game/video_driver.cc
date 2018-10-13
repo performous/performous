@@ -67,7 +67,8 @@ Window::Window() {
 		GLattrSetter attr_glmaj(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 		GLattrSetter attr_glmin(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 		GLattrSetter attr_glprof(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-		auto flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL;
+		auto flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL;
+		if (config["graphic/highdpi"].b()) { flags |= SDL_WINDOW_ALLOW_HIGHDPI; }
 		int width = config["graphic/window_width"].i();
 		int height = config["graphic/window_height"].i();
 		std::clog << "video/info: Create window " << width << "x" << height << std::endl;
