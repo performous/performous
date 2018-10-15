@@ -8,7 +8,7 @@
 #include "dialog.hh"
 #include "playlist.hh"
 #include "fbo.hh"
-#include <boost/ptr_container/ptr_map.hpp>
+// #include <boost/ptr_container/ptr_map.hpp>
 #include <SDL2/SDL.h>
 #include <string>
 

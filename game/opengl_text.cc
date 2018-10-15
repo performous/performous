@@ -263,15 +263,16 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text) {
 		for (auto& zt: _text) {
 			if (zt.wordStart == true) { zt.addSpace(); } // If it's a different word, add an extra space to account for lyrics zooming in.
 			m_text.text = zt.string;
-			m_opengl_text.push_back(new OpenGLText(m_text, m_factor));
+			auto openGlPtr = std::unique_ptr<OpenGLText>(std::make_unique<OpenGLText>(m_text, m_factor));
+			m_opengl_text.push_back(std::move(openGlPtr));
 		}
 	}
 	double text_x = 0.0;
 	double text_y = 0.0;
 	// First compute maximum height and whole length
 	for (unsigned int i = 0; i < _text.size(); i++ ) {
-		text_x += m_opengl_text[i].x();
-		text_y = std::max(text_y, m_opengl_text[i].y());
+		text_x += m_opengl_text[i]->x();
+		text_y = std::max(text_y, m_opengl_text[i]->y());
 	}
 
 	double texture_ar = text_x / text_y;
@@ -286,7 +287,7 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text) {
 	}
 	m_texture_height = m_texture_width / texture_ar; // Keep aspect ratio.
 	for (unsigned int i = 0; i < _text.size(); i++ ) {
-		double syllable_x = m_opengl_text[i].x();
+		double syllable_x = m_opengl_text[i]->x();
 		double syllable_width = syllable_x *  m_texture_width / text_x;
 		double syllable_height = m_texture_height;
 		double syllable_ar = syllable_width / syllable_height;
@@ -298,9 +299,9 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text) {
 		if (factor > 1.0) {
 			ColorTrans c(Color(m_text_highlight.fill_col.r, m_text_highlight.fill_col.g, m_text_highlight.fill_col.b));
 			dim.fixedWidth(dim.w() * factor);
-			m_opengl_text[i].draw(dim, tex);
+			m_opengl_text[i]->draw(dim, tex);
 		} 
-		else { m_opengl_text[i].draw(dim, tex); }
+		else { m_opengl_text[i]->draw(dim, tex); }
 		position_x += syllable_width;
 	}
 }

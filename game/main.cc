@@ -25,7 +25,6 @@
 #include "screen_players.hh"
 #include "screen_playlist.hh"
 
-#include <boost/format.hpp>
 #include <boost/program_options.hpp>
 #include <cstdlib>
 #include <csignal>

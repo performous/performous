@@ -8,7 +8,6 @@
 #include "progressbar.hh"
 #include "screen.hh"
 #include "surface.hh"
-#include <boost/ptr_container/ptr_vector.hpp>
 #include <deque>
 
 class Audio;
@@ -24,7 +23,7 @@ class ThemeSing;
 class Video;
 class Webcam;
 
-typedef boost::ptr_vector<InstrumentGraph> Instruments;
+typedef std::vector<std::unique_ptr<InstrumentGraph>> Instruments;
 
 /// shows score at end of song
 class ScoreWindow {
@@ -92,7 +91,7 @@ class ScreenSing: public Screen {
 	std::unique_ptr<Surface> m_player_icon;
 	std::unique_ptr<Surface> m_help;
 	std::unique_ptr<Engine> m_engine;
-	boost::ptr_vector<LayoutSinger> m_layout_singer;
+	std::vector<std::unique_ptr<LayoutSinger>> m_layout_singer;
 	std::unique_ptr<ThemeInstrumentMenu> m_menuTheme;
 	Menu m_menu;
 	Instruments m_instruments;

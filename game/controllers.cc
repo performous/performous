@@ -9,6 +9,7 @@
 #include <deque>
 #include <regex>
 #include <stdexcept>
+#include <algorithm>
 
 using namespace input;
 
@@ -237,7 +238,7 @@ struct Controllers::Impl {
 		Button button = GENERIC_UNASSIGNED;
 		if (name.empty()) return button;
 		boost::algorithm::to_upper(name);
-		boost::algorithm::replace_all(name, "-", "_");
+		std::replace( name.begin(), name.end(), '-', '_');
 		// Try getting button first from devtype-specific, then generic names
 		buttonByName(type, name, button) || buttonByName(DEVTYPE_GENERIC, name, button) ||
 		  std::clog << "controllers/warning: " << name << ": Unknown button name in controllers.xml." << std::endl;
