@@ -2,7 +2,6 @@
 
 #include "configuration.hh"
 #include <boost/filesystem.hpp>
-#include <boost/format.hpp>
 #include <algorithm>
 #include <iostream>
 #include <sstream>

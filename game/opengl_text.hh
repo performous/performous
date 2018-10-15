@@ -2,7 +2,6 @@
 
 #include "color.hh"
 #include "surface.hh"
-#include <boost/ptr_container/ptr_vector.hpp>
 #include <vector>
 
 /// Load custom fonts from current theme and data folders
@@ -153,7 +152,7 @@ public:
 	void setAlign(Align align) { m_align = align; }
 
 private:
-	boost::ptr_vector<OpenGLText> m_opengl_text;
+	std::vector<std::unique_ptr<OpenGLText>> m_opengl_text;
 	Align m_align;
 	double m_x;
 	double m_y;

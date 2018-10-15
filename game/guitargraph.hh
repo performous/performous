@@ -1,7 +1,5 @@
 #pragma once
 
-#include <boost/ptr_container/ptr_map.hpp>
-
 #include "instrumentgraph.hh"
 #include "3dobject.hh"
 

@@ -122,8 +122,11 @@ void ScreenSing::setupVocals() {
 			selectedTracks.push_back(vocal);
 			shownTracks.insert(vocal);
 		}
-		//if (shownTracks.size() > 2) throw std::runtime_error("Too many tracks chosen. Only two vocal tracks can be used simultaneously.");
-		for (auto const& trk: shownTracks) m_layout_singer.push_back(new LayoutSinger(*trk, m_database, theme));
+		//if (shownTracks.size() > 2) throw std::runtime_error("Too many tracks chosen. Only two vocal tracks can be used simultaneously.")
+		for (auto const& trk: shownTracks) {
+			auto layoutSingerPtr = std::unique_ptr<LayoutSinger>(std::make_unique<LayoutSinger>(*trk, m_database, theme));
+			m_layout_singer.push_back(std::move(layoutSingerPtr));
+		}
 		// Note: Engine maps tracks with analyzers 1:1. If user doesn't have mics, we still want to have singer layout enabled but without engine...
 		if (!analyzers.empty()) m_engine = std::make_unique<Engine>(m_audio, selectedTracks, m_database);
 	}
@@ -195,12 +198,12 @@ void ScreenSing::instrumentLayout(double time) {
 	int count_alive = 0, count_menu = 0, i = 0;
 	// Remove dead instruments and do the counting
 	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ) {
-		if (it->dead()) {
+		if ((*it)->dead()) {
 			it = m_instruments.erase(it);
 			continue;
 		}
 		++count_alive;
-		if (it->menuOpen()) ++count_menu;
+		if ((*it)->menuOpen()) ++count_menu;
 		++it;
 	}
 	if (count_alive > 0) {
@@ -217,17 +220,17 @@ void ScreenSing::instrumentLayout(double time) {
 	std::map<std::string, CountSum> volume; // Stream id to (count, sum)
 	std::map<std::string, CountSum> pitchbend; // Stream id to (count, sum)
 	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it, ++i) {
-		it->engine();
-		it->position((0.5 + i - 0.5 * count_alive) * iw, iw); // Do layout stuff
-		it->draw(time);
+		(*it)->engine();
+		(*it)->position((0.5 + i - 0.5 * count_alive) * iw, iw); // Do layout stuff
+		(*it)->draw(time);
 		{
-			CountSum& cs = volume[it->getTrack()];
+			CountSum& cs = volume[(*it)->getTrack()];
 			cs.first++;
-			cs.second += it->correctness();
+			cs.second += (*it)->correctness();
 		}{
-			CountSum& cs = pitchbend[it->getTrack()];
+			CountSum& cs = pitchbend[(*it)->getTrack()];
 			cs.first++;
-			cs.second += it->getWhammy();
+			cs.second += (*it)->getWhammy();
 		}
 	}
 	// Set volume levels (averages of all instruments playing that track)
@@ -314,8 +317,8 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 				}
 			}
 			if (!msg.empty()) gm->flashMessage(msg, 0.0, 0.1, 0.1);
-			else if (type == input::DEVTYPE_DANCEPAD) m_instruments.push_back(new DanceGraph(m_audio, *m_song, dev));
-			else if (type != input::DEVTYPE_GENERIC) m_instruments.push_back(new GuitarGraph(m_audio, *m_song, dev, m_instruments.size()));
+			else if (type == input::DEVTYPE_DANCEPAD) m_instruments.push_back(std::move(std::unique_ptr<DanceGraph>(new DanceGraph(m_audio, *m_song, dev))));
+			else if (type != input::DEVTYPE_GENERIC) m_instruments.push_back(std::move(std::unique_ptr<GuitarGraph>(new GuitarGraph(m_audio, *m_song, dev, m_instruments.size()))));
 		}
 	}
 
@@ -365,7 +368,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 				// TODO: Instead of calculating here, calculate instrumental breaks right after song loading and store in Song data structures
 				double diff = getNaN();
 				for (size_t i = 0; i < m_layout_singer.size(); ++i) {
-					double d = m_layout_singer[i].lyrics_begin() - 3.0 - time;
+					double d = m_layout_singer[i]->lyrics_begin() - 3.0 - time;
 					if (!(d > diff)) diff = d;  // Store smallest d in diff (notice NaN handling)
 				}
 				if (diff > 0.0) m_audio.seek(diff);
@@ -437,7 +440,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		// Some things must be reset after seeking backwards
 		if (seekback)
 			for (unsigned i = 0; i < m_layout_singer.size(); ++i)
-				m_layout_singer[i].reset();
+				m_layout_singer[i]->reset();
 		// Reload current song
 		if (key == SDL_SCANCODE_R) {
 			exit(); m_song->reload(); enter();
@@ -474,7 +477,7 @@ void ScreenSing::prepare() {
 	// except for joining, in which case global menu is closed
 	if (m_menu.isOpen()) {
 		for (auto& i: m_instruments) {
-			if (i.joining(time)) m_menu.close(); else i.toggleMenu(0);
+			if (i->joining(time)) m_menu.close(); else i->toggleMenu(0);
 		}
 	}
 }
@@ -520,13 +523,13 @@ void ScreenSing::draw() {
 		theme->bg_top.draw();
 	}
 
-	for (unsigned i = 0; i < m_layout_singer.size(); ++i) m_layout_singer[i].hideLyrics(m_audio.isPaused());
+	for (unsigned i = 0; i < m_layout_singer.size(); ++i) m_layout_singer[i]->hideLyrics(m_audio.isPaused());
 
 	instrumentLayout(time);
 
 	bool fullSinger = m_instruments.empty() && m_layout_singer.size() <= 1;
 	for (unsigned i = 0; i < m_layout_singer.size(); ++i) {
-		m_layout_singer[i].draw(time, fullSinger ? LayoutSinger::FULL : (i == 0 ? LayoutSinger::TOP : LayoutSinger::BOTTOM));
+		m_layout_singer[i]->draw(time, fullSinger ? LayoutSinger::FULL : (i == 0 ? LayoutSinger::TOP : LayoutSinger::BOTTOM));
 	}
 
 	Song::Status status = m_song->status(time, this);
@@ -597,7 +600,7 @@ void ScreenSing::draw() {
 	}
 
 	// Menus on top of everything
-	for (auto& i: m_instruments) if (i.menuOpen()) i.drawMenu();
+	for (auto& i: m_instruments) if (i->menuOpen()) i->drawMenu();
 	if (m_menu.isOpen()) drawMenu();
 	if(!keyPressed && m_DuetTimeout.get() == 0) {
 		m_menu.action();
@@ -679,11 +682,11 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 	// Instruments
 	for (Instruments::iterator it = instruments.begin(); it != instruments.end();) {
 		ScoreItem item;
-		item.type = it->getGraphType();
-		item.score = it->getScore();
+		item.type = (*it)->getGraphType();
+		item.score = (*it)->getScore();
 		if (item.score < 100) { it = instruments.erase(it); continue; } // Dead
-		item.track_simple = it->getTrack();
-		item.track = it->getModeId();
+		item.track_simple = (*it)->getTrack();
+		item.track = (*it)->getModeId();
 		item.track[0] = toupper(item.track[0]); // Capitalize
 		if (item.track_simple == TrackName::DRUMS) item.color = Color(0.1, 0.1, 0.1);
 		else if (item.track_simple == TrackName::BASS) item.color = Color(0.5, 0.3, 0.1);

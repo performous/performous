@@ -14,7 +14,6 @@
 #include "playlist.hh"
 #include <iostream>
 #include <sstream>
-#include <boost/format.hpp>
 
 static const double IDLE_TIMEOUT = 45.0; // seconds
 
