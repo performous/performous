@@ -18,7 +18,7 @@
 static const double IDLE_TIMEOUT = 45.0; // seconds
 
 ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Database& database):
-  Screen(name), m_audio(audio), m_songs(songs), m_database(database), m_covers(50)
+  Screen(name), m_audio(audio), m_songs(songs), m_database(database)
 {
 	m_songs.setAnimMargins(5.0, 5.0);
 	// Using AnimValues as a simple timers counting seconds
@@ -237,7 +237,7 @@ void ScreenSongs::drawJukebox() {
 		Song& song = m_songs.current();
 		// Draw the cover
 		Surface* cover = nullptr;
-		if (!song.cover.empty()) try { cover = &m_covers[song.cover]; } catch (std::exception const&) {}
+		if (!song.cover.empty()) cover = loadSurfaceFromMap(song.cover);
 		if (cover && !cover->empty()) {
 			Surface& s = *cover;
 			s.dimensions.left(theme->song.dimensions.x1()).top(theme->song.dimensions.y2() + 0.05).fitInside(0.15, 0.15);
@@ -401,12 +401,23 @@ void ScreenSongs::drawCovers() {
 	}
 }
 
+Surface* ScreenSongs::loadSurfaceFromMap(fs::path path) {
+	if(m_covers.find(path) == m_covers.end()) {
+		std::pair<fs::path, std::unique_ptr<Surface>> kv = std::make_pair(path, std::make_unique<Surface>(path));
+		m_covers.insert(std::move(kv));
+	}
+	try {
+		return m_covers.at(path).get();
+	} catch (std::exception const&) {}
+	return nullptr;
+}
+
 Surface& ScreenSongs::getCover(Song const& song) {
 	Surface* cover = nullptr;
 	// Fetch cover image from cache or try loading it
-	if (!song.cover.empty()) try { cover = &m_covers[song.cover]; } catch (std::exception const&) {}
+	if (!song.cover.empty()) cover = loadSurfaceFromMap(song.cover);
 	// Fallback to background image as cover if needed
-	if (!cover && !song.background.empty()) try { cover = &m_covers[song.background]; } catch (std::exception const&) {}
+	if (!cover && !song.background.empty()) cover = loadSurfaceFromMap(song.background);
 	// Use empty cover
 	if (!cover) {
 		if(song.hasDance()) {

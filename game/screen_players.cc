@@ -17,7 +17,7 @@
 #include <boost/format.hpp>
 
 ScreenPlayers::ScreenPlayers(std::string const& name, Audio& audio, Database& database):
-  Screen(name), m_audio(audio), m_database(database), m_players(database.m_players), m_covers(20)
+  Screen(name), m_audio(audio), m_database(database), m_players(database.m_players)
 {
 	m_players.setAnimMargins(5.0, 5.0);
 	m_playTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
@@ -103,6 +103,17 @@ void ScreenPlayers::manageEvent(SDL_Event event) {
 	}
 }
 
+Surface* ScreenPlayers::loadSurfaceFromMap(fs::path path) {
+	if(m_covers.find(path) == m_covers.end()) {
+		std::pair<fs::path, std::unique_ptr<Surface>> kv = std::make_pair(path, std::make_unique<Surface>(path));
+		m_covers.insert(std::move(kv));
+	}
+	try {
+		return m_covers.at(path).get();
+	} catch (std::exception const&) {}
+	return nullptr;
+}
+
 void ScreenPlayers::draw() {
 	m_players.update(); // Poll for new players
 	double length = m_audio.getLength();
@@ -146,13 +157,8 @@ void ScreenPlayers::draw() {
 		for (int i = -2; i < 5; ++i) {
 			PlayerItem player_display = m_players[baseidx + i];
 			if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
-			Surface* cover = nullptr;
-			if (player_display.path != "")
-			{
-				try { cover = &m_covers[player_display.path]; }
-				catch (std::exception const&) {}
-			}
-			Surface& s = (cover ? *cover : *m_emptyCover);
+			
+			Surface& s = !player_display.path.empty() ? *loadSurfaceFromMap(player_display.path) : *m_emptyCover;
 			double diff = (i == 0 ? (0.5 - fabs(shift)) * 0.07 : 0.0);
 			double y = 0.27 + 0.5 * diff;
 			// Draw the cover

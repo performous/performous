@@ -2,7 +2,6 @@
 
 #include "opengl_text.hh"
 #include "surface.hh"
-#include "cachemap.hh"
 #include <string>
 
 /// abstract theme class
@@ -84,7 +83,7 @@ public:
 	/// back highlight for selected option
 	Surface back_h;
 	/// menu option texts
-	Cachemap<std::string, SvgTxtTheme> options;
+	std::map<std::string, std::unique_ptr<SvgTxtTheme>> options;
 	/// selected menu option text
 	SvgTxtTheme option_selected;
 	/// menu comment text
@@ -106,7 +105,7 @@ public:
 	/// back highlight for selected option
 	Surface back_h;
 	/// menu option texts
-	Cachemap<std::string, SvgTxtTheme> options;
+	std::map<std::string, std::unique_ptr<SvgTxtTheme>> options;
 	/// menu selected option text
 	SvgTxtTheme option_selected;
 	/// menu comment text
@@ -122,7 +121,7 @@ class ThemePlaylistScreen: public Theme {
 public:
 	ThemePlaylistScreen();
 	/// menu option texts
-	Cachemap<std::string, SvgTxtTheme> options;
+	std::map<std::string, std::unique_ptr<SvgTxtTheme>> options;
 	/// selected menu option text
 	SvgTxtTheme option_selected;
 	/// menu comment text

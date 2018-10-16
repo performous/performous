@@ -10,7 +10,7 @@
 #include <sstream>
 
 ScreenPlaylist::ScreenPlaylist(std::string const& name,Audio& audio, Songs& songs, Backgrounds& bgs):
-	Screen(name), m_audio(audio), m_songs(songs), m_backgrounds(bgs), m_covers(20), keyPressed()
+	Screen(name), m_audio(audio), m_songs(songs), m_backgrounds(bgs), keyPressed()
 {}
 
 void ScreenPlaylist::enter() {
@@ -143,12 +143,24 @@ void ScreenPlaylist::draw() {
 		}
 	}
 }
+
+Surface* ScreenPlaylist::loadSurfaceFromMap(fs::path path) {
+	if(m_covers.find(path) == m_covers.end()) {
+		std::pair<fs::path, std::unique_ptr<Surface>> kv = std::make_pair(path, std::make_unique<Surface>(path));
+		m_covers.insert(std::move(kv));
+	}
+	try {
+		return m_covers.at(path).get();
+	} catch (std::exception const&) {}
+	return nullptr;
+}
+
 Surface& ScreenPlaylist::getCover(Song const& song) {
 	Surface* cover = nullptr;
 	// Fetch cover image from cache or try loading it
-	if (!song.cover.empty()) try { cover = &m_covers[song.cover]; } catch (std::exception const&) {}
+	if (!song.cover.empty()) cover = loadSurfaceFromMap(song.cover);
 	// Fallback to background image as cover if needed
-	if (!cover && !song.background.empty()) try { cover = &m_covers[song.background]; } catch (std::exception const&) {}
+	if (!cover && !song.background.empty()) cover = loadSurfaceFromMap(song.background);
 	// Use empty cover
 	if (!cover) {
 		if(song.hasDance()) {
@@ -278,8 +290,10 @@ void ScreenPlaylist::draw_menu_options() {
 }
 
 SvgTxtTheme& ScreenPlaylist::getTextObject(std::string const& txt) {
-	if (theme->options.contains(txt)) return theme->options[txt];
-	return *theme->options.insert(txt, new SvgTxtTheme(findFile("mainmenu_option.svg"), config["graphic/text_lod"].f()))->second;
+	if (theme->options.find(txt) != theme->options.end()) return (*theme->options.at(txt).get());
+	std::pair<std::string, std::unique_ptr<SvgTxtTheme>> kv = std::make_pair(txt, std::make_unique<SvgTxtTheme>(findFile("mainmenu_option.svg"), config["graphic/text_lod"].f()));
+	theme->options.insert(std::move(kv));
+	return (*theme->options.at(txt).get());
 }
 
 void ScreenPlaylist::createSongListMenu() {

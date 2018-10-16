@@ -47,7 +47,7 @@ ThemeAudioDevices::ThemeAudioDevices():
 ThemeIntro::ThemeIntro():
 	Theme(findFile("intro_bg.svg")),
 	back_h(findFile("mainmenu_back_highlight.svg")),
-	options(30),
+	options(),
 	option_selected(findFile("mainmenu_option_selected.svg"), config["graphic/text_lod"].f()),
 	comment(findFile("mainmenu_comment.svg"), config["graphic/text_lod"].f()),
 	short_comment(findFile("mainmenu_short_comment.svg"), config["graphic/text_lod"].f()),
@@ -59,7 +59,7 @@ ThemeIntro::ThemeIntro():
 ThemeInstrumentMenu::ThemeInstrumentMenu():
 	Theme(findFile("instrumentmenu_bg.svg")),
 	back_h(findFile("instrumentmenu_back_highlight.svg")),
-	options(30),
+	options(),
 	option_selected(findFile("instrumentmenu_option_selected.svg"), config["graphic/text_lod"].f()),
 	comment(findFile("instrumentmenu_comment.svg"), config["graphic/text_lod"].f())
 	//comment_bg(findFile("menu_comment_bg.svg"))
@@ -69,7 +69,7 @@ ThemeInstrumentMenu::ThemeInstrumentMenu():
 //at the moment just a copy of themeSong
 ThemePlaylistScreen::ThemePlaylistScreen():
 	Theme(findFile("songs_bg.svg")),
-	options(30),
+	options(),
 	option_selected(findFile("mainmenu_option_selected.svg"), config["graphic/text_lod"].f()),
 	comment(findFile("mainmenu_comment.svg"), config["graphic/text_lod"].f()),
 	short_comment(findFile("mainmenu_short_comment.svg"), config["graphic/text_lod"].f()),
@@ -78,6 +78,8 @@ ThemePlaylistScreen::ThemePlaylistScreen():
 {}
 
 SvgTxtTheme& ThemeInstrumentMenu::getCachedOption(const std::string& text) {
-	if (options.contains(text)) return options[text];
-	return *options.insert(text, new SvgTxtTheme(findFile("instrumentmenu_option.svg"), config["graphic/text_lod"].f()))->second;
+	if (options.find(text) != options.end()) return (*options.at(text).get());
+	std::pair<std::string, std::unique_ptr<SvgTxtTheme>> kv = std::make_pair(text, std::make_unique<SvgTxtTheme>(findFile("instrumentmenu_option.svg"), config["graphic/text_lod"].f()));
+	options.insert(std::move(kv));
+	return (*options.at(text).get());
 }
