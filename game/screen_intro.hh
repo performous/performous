@@ -3,6 +3,8 @@
 #include "animvalue.hh"
 #include "menu.hh"
 #include "screen.hh"
+#include "theme.hh"
+
 #include <boost/asio.hpp>
 
 class Audio;

@@ -8,6 +8,9 @@
 #include "progressbar.hh"
 #include "screen.hh"
 #include "surface.hh"
+#include "theme.hh"
+#include "instrumentgraph.hh"
+
 #include <deque>
 
 class Audio;

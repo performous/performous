@@ -4,6 +4,7 @@
 #include "cachemap.hh"
 #include "controllers.hh"
 #include "screen.hh"
+#include "theme.hh"
 #include "song.hh" // for Music class
 #include "textinput.hh"
 #include "video.hh"

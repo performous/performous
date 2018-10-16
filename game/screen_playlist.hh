@@ -11,6 +11,7 @@
 #include "songs.hh"
 #include "surface.hh"
 #include "webcam.hh"
+#include "theme.hh"
 #include "configuration.hh"
 #include <mutex>
 #include <vector>

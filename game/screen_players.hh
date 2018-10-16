@@ -3,7 +3,9 @@
 #include "animvalue.hh"
 #include "cachemap.hh"
 #include "screen.hh"
+#include "theme.hh"
 #include "textinput.hh"
+#include "layout_singer.hh"
 
 class Song;
 class Audio;

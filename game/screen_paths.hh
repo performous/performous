@@ -5,6 +5,7 @@
 #include "screen.hh"
 #include "songs.hh"
 #include "textinput.hh"
+#include "theme.hh"
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include <map>

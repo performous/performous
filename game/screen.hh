@@ -8,9 +8,10 @@
 #include "dialog.hh"
 #include "playlist.hh"
 #include "fbo.hh"
-// #include <boost/ptr_container/ptr_map.hpp>
+
 #include <SDL2/SDL.h>
 #include <string>
+#include <memory>
 
 class Audio;
 
@@ -50,7 +51,11 @@ class Game: public Singleton <Game> {
 	Game(Window& window, Audio& audio);
 	~Game();
 	/// Adds a screen to the manager
-	void addScreen(Screen* s) { std::string tmp = s->getName(); screens.insert(tmp, s); }
+	void addScreen(std::unique_ptr<Screen> s) { 
+		std::string screenName = s.get()->getName(); 
+		std::pair<std::string, std::unique_ptr<Screen>> kv = std::make_pair(screenName, std::move(s));
+		screens.insert(std::move(kv));
+	}
 	/// Switches active screen
 	void activateScreen(std::string const& name);
 	/// Does actual switching of screens (if necessary)
@@ -108,7 +113,7 @@ public:
 
 private:
 	bool m_finished;
-	typedef boost::ptr_map<std::string, Screen> screenmap_t;
+	typedef std::map<std::string, std::unique_ptr<Screen>> screenmap_t;
 	screenmap_t screens;
 	Screen* newScreen;
 	Screen* currentScreen;
