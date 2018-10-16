@@ -2,7 +2,6 @@
 
 #include "backgrounds.hh"
 #include "screen.hh"
-#include "cachemap.hh"
 #include "menu.hh"
 #include "song.hh"
 #include "animvalue.hh"
@@ -50,8 +49,9 @@ private:
 	void createSongMenu(int songNumber);
 	void drawMenu();
 	void createMenuFromPlaylist();
+	Surface* loadSurfaceFromMap(fs::path path);
 	Backgrounds& m_backgrounds;
-	Cachemap<fs::path, Surface> m_covers;
+	std::map<fs::path, std::unique_ptr<Surface>> m_covers;
 	std::unique_ptr<ThemeInstrumentMenu> m_menuTheme;
 	std::unique_ptr<ThemePlaylistScreen> theme;
 	std::unique_ptr<Surface> m_background;

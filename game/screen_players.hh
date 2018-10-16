@@ -1,7 +1,6 @@
 #pragma once
 
 #include "animvalue.hh"
-#include "cachemap.hh"
 #include "screen.hh"
 #include "theme.hh"
 #include "textinput.hh"
@@ -36,7 +35,8 @@ class ScreenPlayers : public Screen {
 	}
 
   private:
-	Audio& m_audio;
+	Surface* loadSurfaceFromMap(fs::path path);
+  	Audio& m_audio;
 	Database& m_database;
 	Players& m_players;
 	std::shared_ptr<Song> m_song; /// Pointer to the current song
@@ -49,7 +49,7 @@ class ScreenPlayers : public Screen {
 	AnimValue m_quitTimer;
 	TextInput m_search;
 	std::unique_ptr<Surface> m_emptyCover;
-	Cachemap<fs::path, Surface> m_covers;
+	std::map<fs::path, std::unique_ptr<Surface>> m_covers;
 	std::unique_ptr<LayoutSinger> m_layout_singer;
 	bool keyPressed = false;
 };

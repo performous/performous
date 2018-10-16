@@ -1,7 +1,6 @@
 #pragma once
 
 #include "animvalue.hh"
-#include "cachemap.hh"
 #include "controllers.hh"
 #include "screen.hh"
 #include "theme.hh"
@@ -47,6 +46,7 @@ private:
 	bool addSong(); ///< Add current song to playlist. Returns true if the playlist was empty.
 	void sing(); ///< Enter singing screen with current playlist.
 	void createPlaylistMenu();
+	Surface* loadSurfaceFromMap(fs::path path);
 
 	Audio& m_audio;
 	Songs& m_songs;
@@ -64,7 +64,7 @@ private:
 	std::unique_ptr<Surface> m_danceCover;
 	std::unique_ptr<Texture> m_instrumentList;
 	std::unique_ptr<ThemeInstrumentMenu> m_menuTheme;
-	Cachemap<fs::path, Surface> m_covers;
+	std::map<fs::path, std::unique_ptr<Surface>> m_covers;
 	int m_menuPos, m_infoPos;
 	bool m_jukebox;
 	bool show_hiscores;
