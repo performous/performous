@@ -2,6 +2,7 @@
 
 #include "controllers.hh"
 #include "screen.hh"
+#include "theme.hh"
 
 class Audio;
 class Sample;

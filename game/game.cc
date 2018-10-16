@@ -36,11 +36,11 @@ void Game::updateScreen() {
 }
 
 Screen* Game::getScreen(std::string const& name) {
-	try {
-		return &screens.at(name);
-	} catch (boost::bad_ptr_container_operation&) {
-		throw std::invalid_argument("Screen " + name + " does not exist");
+	auto it = screens.find(name);
+	if (it != screens.end()){
+		return it->second.get();
 	}
+	throw std::invalid_argument("Screen " + name + " does not exist");
 }
 
 void Game::prepareScreen() {

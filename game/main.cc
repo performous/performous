@@ -3,6 +3,7 @@
 #include "config.hh"
 #include "controllers.hh"
 #include "database.hh"
+#include "engine.hh"
 #include "fs.hh"
 #include "glutil.hh"
 #include "i18n.hh"
@@ -156,14 +157,14 @@ void mainLoop(std::string const& songlist) {
 		audio.loadSample("notice.ogg",findFile("notice.ogg"));
 		// Load screens
 		gm.loading(_("Creating screens..."), 0.7);
-		gm.addScreen(new ScreenIntro("Intro", audio));
-		gm.addScreen(new ScreenSongs("Songs", audio, songs, database));
-		gm.addScreen(new ScreenSing("Sing", audio, database, backgrounds));
-		gm.addScreen(new ScreenPractice("Practice", audio));
-		gm.addScreen(new ScreenAudioDevices("AudioDevices", audio));
-		gm.addScreen(new ScreenPaths("Paths", audio, songs));
-		gm.addScreen(new ScreenPlayers("Players", audio, database));
-		gm.addScreen(new ScreenPlaylist("Playlist", audio, songs, backgrounds));
+		gm.addScreen(std::make_unique<ScreenIntro>("Intro", audio));
+		gm.addScreen(std::make_unique<ScreenSongs>("Songs", audio, songs, database));
+		gm.addScreen(std::make_unique<ScreenSing>("Sing", audio, database, backgrounds));
+		gm.addScreen(std::make_unique<ScreenPractice>("Practice", audio));
+		gm.addScreen(std::make_unique<ScreenAudioDevices>("AudioDevices", audio));
+		gm.addScreen(std::make_unique<ScreenPaths>("Paths", audio, songs));
+		gm.addScreen(std::make_unique<ScreenPlayers>("Players", audio, database));
+		gm.addScreen(std::make_unique<ScreenPlaylist>("Playlist", audio, songs, backgrounds));
 		gm.activateScreen("Intro");
 		gm.loading(_("Entering main menu"), 0.8);
 		gm.updateScreen();  // exit/enter, any exception is fatal error

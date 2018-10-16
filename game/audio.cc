@@ -9,6 +9,7 @@
 #include <iostream>
 #include <map>
 #include <unordered_map>
+#include <boost/range/iterator_range.hpp>
 
 namespace {
 	/**
