@@ -316,8 +316,8 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 				}
 			}
 			if (!msg.empty()) gm->flashMessage(msg, 0.0, 0.1, 0.1);
-			else if (type == input::DEVTYPE_DANCEPAD) m_instruments.push_back(std::move(std::unique_ptr<DanceGraph>(new DanceGraph(m_audio, *m_song, dev))));
-			else if (type != input::DEVTYPE_GENERIC) m_instruments.push_back(std::move(std::unique_ptr<GuitarGraph>(new GuitarGraph(m_audio, *m_song, dev, m_instruments.size()))));
+			else if (type == input::DEVTYPE_DANCEPAD) m_instruments.push_back(std::make_unique<DanceGraph>(m_audio, *m_song, dev));
+			else if (type != input::DEVTYPE_GENERIC) m_instruments.push_back(std::make_unique<GuitarGraph>(m_audio, *m_song, dev, m_instruments.size()));
 		}
 	}
 
