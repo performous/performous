@@ -773,7 +773,7 @@ void GuitarGraph::drawNotes(double time) {
 	}
 	if (time != time) return;  // Check that time is not NaN
 
-	glmath::vec4 neckglow;  // Used for calculating the average neck color
+	glmath::dvec4 neckglow;  // Used for calculating the average neck color
 
 	// Iterate chords
 	for (auto& chord: m_chords) {
@@ -811,7 +811,7 @@ void GuitarGraph::drawNotes(double time) {
 			if (!joining(time)) {
 				// Get a color for the fret and adjust it if GodMode is on
 				c = colorize(color(fret), chord.begin);
-				if (glow > 0.1f) { neckglow = neckglow + glmath::vec4(c.r, c.g, c.b, 1.0); } // neck glow tracking
+				if (glow > 0.1f) { neckglow = neckglow + glmath::dvec4(c.r, c.g, c.b, 1.0); } // neck glow tracking
 				// Further adjust the color if the note is hit
 				c.r += glow * 0.2f;
 				c.g += glow * 0.2f;
@@ -966,7 +966,7 @@ void GuitarGraph::draw(double time) {
 	if (m_neckglowColor.w > 0.0) {
 		// Neck glow drawing
 		using namespace glmath;
-		ColorTrans c(glmath::mat4::diagonal(m_neckglowColor));
+		ColorTrans c(glmath::diagonal(m_neckglowColor));
 		m_neckglow.dimensions.screenBottom(0.0).middle().fixedWidth(neckWidth());
 		m_neckglow.draw();
 	}

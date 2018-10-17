@@ -77,7 +77,7 @@ static void checkEvents(Game& gm, Time eventTime) {
 		// Let the navigation system grab any and all SDL events
 		gm.controllers.pushEvent(event, eventTime);
 		auto type = event.type;
-		if (type == SDL_WINDOWEVENT) window.event();
+		if (type == SDL_WINDOWEVENT) window.event(event.window.event);
 		if (type == SDL_QUIT) gm.finished();
 		if (type == SDL_KEYDOWN) {
 			auto key  = event.key.keysym.scancode;
@@ -122,7 +122,6 @@ static void checkEvents(Game& gm, Time eventTime) {
 
 	// Need to toggle full screen mode or adjust resolution?
 	window.resize();
-	if (window.needReload()) gm.reloadGL();
 }
 
 void mainLoop(std::string const& songlist) {
@@ -228,6 +227,7 @@ void mainLoop(std::string const& songlist) {
 				gm.flashMessage(std::string("ERROR: ") + e.what());
 			}
 		}
+		writeConfig();
 	} catch (EXCEPTION& e) {
 		std::clog << "core/error: Exiting due to fatal error: " << e.what() << std::endl;
 		gm.fatalError(e.what());  // Notify the user
@@ -241,8 +241,8 @@ void mainLoop(std::string const& songlist) {
 void jstestLoop() {
 	try {
 		config["graphic/fullscreen"].b() = false;
-		config["graphic/window_width"].i() = 400;
-		config["graphic/window_height"].i() = 250;
+		config["graphic/window_width"].i() = 640;
+		config["graphic/window_height"].i() = 360;
 		Window window;
 		// Main loop
 		int oldjoy = -1, oldaxis = -1, oldvalue = -1;

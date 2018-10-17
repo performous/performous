@@ -3,7 +3,6 @@
 #include "fs.hh"
 #include "configuration.hh"
 #include "glutil.hh"
-#include "glmath.hh"
 #include "util.hh"
 
 #include <thread>
@@ -141,18 +140,15 @@ void Game::drawNotifications() {
 	}
 }
 
-void Game::finished()
-{
+void Game::finished() {
 	m_finished = true;
 }
  
-Game::~Game()
-{
+Game::~Game() {
 	if (currentScreen) currentScreen->exit();
 }
  
-bool Game::isFinished()
-{
+bool Game::isFinished() {
 	return m_finished;
 }
 

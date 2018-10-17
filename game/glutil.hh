@@ -12,10 +12,10 @@ namespace glutil {
 
 	// Note: if you reorder or otherwise change the contents of this, VertexArray::Draw() must be modified accordingly
 	struct VertexInfo {
-		glmath::vec3 position{};
-		glmath::vec2 texCoord{};
-		glmath::vec3 normal{};
-		glmath::vec4 color{ 1.0, 1.0, 1.0, 1.0 };
+		glmath::vec3 vertPos = glmath::vec3(0.0f);
+		glmath::vec2 vertTexCoord = glmath::vec2(0.0f);
+		glmath::vec3 vertNormal = glmath::vec3(0.0f);
+		glmath::vec4 vertColor = glmath::vec4(1.0f);
 	};
 
 	/// Handy vertex array capable of drawing itself
@@ -33,7 +33,7 @@ namespace glutil {
 		}
 
 		VertexArray& vertex(glmath::vec3 const& v) {
-			m_vert.position = v;
+			m_vert.vertPos = v;
 			m_vertices.push_back(m_vert);
 			m_vert = VertexInfo();
 			return *this;
@@ -44,7 +44,7 @@ namespace glutil {
 		}
 
 		VertexArray& normal(glmath::vec3 const& v) {
-			m_vert.normal = v;
+			m_vert.vertNormal = v;
 			return *this;
 		}
 
@@ -53,12 +53,12 @@ namespace glutil {
 		}
 
 		VertexArray& texCoord(glmath::vec2 const& v) {
-			m_vert.texCoord = v;
+			m_vert.vertTexCoord = v;
 			return *this;
 		}
 
 		VertexArray& color(glmath::vec4 const& v) {
-			m_vert.color = v;
+			m_vert.vertColor = v;
 			return *this;
 		}
 
@@ -68,10 +68,12 @@ namespace glutil {
 			return m_vertices.empty();
 		}
 
-		unsigned size() const {
+		GLsizei size() const {
 			return m_vertices.size();
 		}
-
+		
+		static GLsizei stride() { return sizeof(VertexInfo); }
+		
 		void clear();
 	};
 
@@ -95,7 +97,7 @@ namespace glutil {
 	public:
 		GLErrorChecker(std::string const& info);
 		~GLErrorChecker();
-		void check(std::string const& what = "check()");  ///< An error-check milestone; will log and clear any active GL errors
+		void check(std::string const& what = "check()");  ///< An error-check milestone; will log and  any active GL errors
 		static void reset() { glGetError(); }  ///< Ignore any existing error
 		static std::string msg(GLenum err);
 	};

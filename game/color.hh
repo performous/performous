@@ -5,16 +5,16 @@
 
 /// A struct for holding RGBA color in non-premultiplied linear RGB format (and conversions)
 struct Color {
-	double r;
-	double g;
-	double b;
-	double a;
+	float r;
+	float g;
+	float b;
+	float a;
 	/// Default-construct white
 	Color(): r(1.0), g(1.0), b(1.0), a(1.0) {}
 	/// Construct using RGB(A)
-	Color(double red, double grn, double blu, double alp = 1.0): r(red), g(grn), b(blu), a(alp) {}
+	Color(float red, float grn, float blu, float alp = 1.0): r(red), g(grn), b(blu), a(alp) {}
 	/// Construct white color with alpha
-	static Color alpha(double alp) { return Color(1.0, 1.0, 1.0, alp); }
+	static Color alpha(float alp) { return Color(1.0, 1.0, 1.0, alp); }
 	/// Parse CSS color string (sRGB)
 	explicit Color(std::string const& str);
 	/// Return premultiplied linear color suitable for use with OpenGL

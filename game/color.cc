@@ -37,7 +37,7 @@ namespace {
 	} colors;
 
 	// Convert sRGB color component into linear as per OpenGL specs
-	double lin(double sRGB) {
+	float lin(float sRGB) {
 		if (sRGB <= 0.04045) return sRGB / 12.92;
 		return std::pow((sRGB + 0.055)/1.055, 2.4);
 	}
@@ -51,7 +51,7 @@ Color::Color(std::string const& str) {
 	}
 	ColorNames::Map::const_iterator it = colors.m.find(str);
 	if (it != colors.m.end()) { *this = it->second; return; }
-	std::clog << "Color/warning: Unknown color: " << str << " (using magenta to hilight)" << std::endl;
+	std::clog << "color/warning: Unknown color: " << str << " (using magenta to hilight)" << std::endl;
 	*this = Color(1.0, 0.0, 1.0);
 }
 

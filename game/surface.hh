@@ -204,10 +204,10 @@ public:
 	/// loads surface into buffer
 	void load(Bitmap const& bitmap);
 	Shader& shader() { return m_texture.shader(); }
-	unsigned width() const { return m_width; }
-	unsigned height() const { return m_height; }
+	float width() const { return m_width; }
+	float height() const { return m_height; }
 private:
-	unsigned m_width, m_height;
+	float m_width, m_height;
 	bool m_premultiplied;
 	OpenGLTexture<GL_TEXTURE_2D> m_texture;
 };

@@ -132,11 +132,11 @@ void ScreenPlaylist::draw() {
 	for (unsigned i = playlist.size() - 1; i < playlist.size(); --i) {
 		if(i < 9) { //only draw the first 9 covers
 			Surface& s = getCover(*playlist[i]);
-			double pos =  i / std::max<double>(9, 9);
+			float pos =  i / std::max<float>(9, 9);
 			using namespace glmath;
 			Transform trans(
-			  translate(vec3(-0.4 + 0.9 * pos, 0.045)) //vec3(horizontal-offset-from-center, vertical offset from screen_bottom)
-			  * rotate(-0.0, vec3(0.0, 1.0, 0.0))
+			  translate(vec3(-0.4f + 0.9f * pos, 0.045f, 0.0f)) //vec3(horizontal-offset-from-center, vertical offset from screen_bottom)
+			  * rotate(-0.0f, vec3(0.0f, 1.0f, 0.0f))
 			);
 			s.dimensions.middle().screenBottom(-0.06).fitInside(0.08, 0.08);
 			s.draw();
