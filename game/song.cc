@@ -71,6 +71,7 @@ void Song::collateUpdate() {
 }
 
 Song::Status Song::status(double time, ScreenSing* song) {
+	if (song->getMenu().isOpen()) return Status::NORMAL; // This should prevent querying getVocalTrack with an out-of-bounds/uninitialized index.
 	if (vocalTracks.empty()) return Status::NORMAL;  // To avoid crash with non-vocal songs (dance, guitar) -- FIXME: what should we actually do?
 	Note target; target.end = time;
 	Notes s1, s2, notes;
@@ -140,8 +141,10 @@ VocalTrack& Song::getVocalTrack(std::string vocalTrack) {
 	}
 }
 
-	if (idx >= vocalTracks.size()) throw std::logic_error("Index out of bounds in Song::getVocalTrack");
 VocalTrack& Song::getVocalTrack(size_t idx) {
+	if (idx >= vocalTracks.size()) {
+		throw std::logic_error("Index " + std::to_string(idx) + " out of bounds in Song::getVocalTrack (size: " + std::to_string(vocalTracks.size()) +").");
+		}
 	VocalTracks::iterator it = vocalTracks.begin();
 	std::advance(it, idx);
 	return it->second;
