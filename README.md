@@ -1,3 +1,4 @@
+![alt text](http://performous.org/imgs/title.png "Performous")
 Performous
 ==========
 
