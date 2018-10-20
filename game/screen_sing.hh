@@ -56,6 +56,7 @@ class ScreenSing: public Screen {
 	void reloadGL();
 	void manageEvent(SDL_Event event);
 	void manageEvent(input::NavEvent const& event);
+	Menu const& getMenu() const { return m_menu; }
 	void prepare();
 	void draw();
 
