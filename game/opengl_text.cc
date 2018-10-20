@@ -256,7 +256,7 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text) {
 	double text_x = 0.0;
 	double text_y = 0.0;
 	// First compute maximum height and whole length
-	for (unsigned int i = 0; i < _text.size(); i++ ) {
+	for (size_t i = 0; i < _text.size(); i++ ) {
 		text_x += m_opengl_text[i]->x();
 		text_y = std::max(text_y, m_opengl_text[i]->y());
 	}
@@ -272,7 +272,7 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text) {
 		m_texture_width = (0.48 - position_x);
 	}
 	m_texture_height = m_texture_width / texture_ar; // Keep aspect ratio.
-	for (unsigned int i = 0; i < _text.size(); i++ ) {
+	for (size_t i = 0; i < _text.size(); i++) {
 		double syllable_x = m_opengl_text[i]->x();
 		double syllable_width = syllable_x *  m_texture_width / text_x;
 		double syllable_height = m_texture_height;

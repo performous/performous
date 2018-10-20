@@ -140,8 +140,8 @@ VocalTrack& Song::getVocalTrack(std::string vocalTrack) {
 	}
 }
 
-VocalTrack& Song::getVocalTrack(unsigned idx) {
 	if (idx >= vocalTracks.size()) throw std::logic_error("Index out of bounds in Song::getVocalTrack");
+VocalTrack& Song::getVocalTrack(size_t idx) {
 	VocalTracks::iterator it = vocalTracks.begin();
 	std::advance(it, idx);
 	return it->second;
