@@ -46,7 +46,7 @@ class LyricRow {
 		}
 		ColorTrans c(Color::alpha(fade.get()));
 		txt.dimensions = dim;
-		txt.draw(sentence);
+		txt.draw(sentence, true);
 	}
 
   private:

@@ -227,27 +227,14 @@ void SvgTxtTheme::draw(std::string _text) {
 	draw(tmp);
 }
 
-void SvgTxtTheme::draw(std::vector<TZoomText>& _text) {
+void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool lyrics) {
+
 	std::string tmp;
-
-	for (auto& zt: _text) { 
-		bool wordBoundaryCheck = false;
-	// Check whether current syllable begins or previous syllable ends with a space.
-		if (_text.size() > 1) {
-			wordBoundaryCheck = (zt.string.front() == ' ');
-			if (wordBoundaryCheck == false && tmp.size() > 0) {
-				wordBoundaryCheck = (tmp.back() == ' ');
-			}
-		zt.updateWordStart(wordBoundaryCheck);	
-		}
-		tmp += zt.string;
-	}
-
+	for (auto& zt: _text) { tmp += zt.string; }
 	if (m_opengl_text.size() != _text.size() || m_cache_text != tmp) {
 		m_cache_text = tmp;
 		m_opengl_text.clear();
 		for (auto& zt: _text) {
-			if (zt.wordStart == true) { zt.addSpace(); } // If it's a different word, add an extra space to account for lyrics zooming in.
 			m_text.text = zt.string;
 			auto openGlPtr = std::unique_ptr<OpenGLText>(std::make_unique<OpenGLText>(m_text, m_factor));
 			m_opengl_text.push_back(std::move(openGlPtr));
@@ -274,8 +261,8 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text) {
 	m_texture_height = m_texture_width / texture_ar; // Keep aspect ratio.
 	for (size_t i = 0; i < _text.size(); i++) {
 		double syllable_x = m_opengl_text[i]->x();
-		double syllable_width = syllable_x *  m_texture_width / text_x;
-		double syllable_height = m_texture_height;
+		double syllable_width = syllable_x *  m_texture_width / text_x * _text[i].factor;
+		double syllable_height = m_texture_height * _text[i].factor;
 		double syllable_ar = syllable_width / syllable_height;
 		Dimensions dim(syllable_ar);
 		dim.fixedHeight(m_texture_height).center(dimensions.y1());
@@ -288,7 +275,7 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text) {
 			m_opengl_text[i]->draw(dim, tex);
 		} 
 		else { m_opengl_text[i]->draw(dim, tex); }
-		position_x += syllable_width;
+		position_x += (syllable_width / factor) * (lyrics ? 1.1 : 1.0);
 	}
 }
 
