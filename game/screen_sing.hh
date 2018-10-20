@@ -59,7 +59,7 @@ class ScreenSing: public Screen {
 	void prepare();
 	void draw();
 
-	int selectedVocalTrack() const { return m_selectedVocal; }
+	size_t selectedVocalTrack() const { return m_selectedVocal; }
 	bool singingDuet() const { return m_singingDuet; }
 	void setupVocals();
 
@@ -108,7 +108,7 @@ class ScreenSing: public Screen {
 	ConfigItem m_duet;
 	size_t players() const { auto& analyzers = m_audio.analyzers(); return (analyzers.empty() ? 1 : analyzers.size()); } // Always have at least one player to display lyrics and prevent crashes.
 	bool m_singingDuet;
-	int m_selectedVocal;
+	size_t m_selectedVocal;
 	bool m_displayAutoPlay = false;
 	bool keyPressed = false;
 };

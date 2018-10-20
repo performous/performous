@@ -135,7 +135,7 @@ void ScreenSing::setupVocals() {
 	for (size_t player = 0; player < players(); ++player) {
 		ConfigItem& vocalTrack = m_vocalTracks[player];
 		if (player == 0) { m_selectedVocal = vocalTrack.i(); }
-		if (vocalTrack.i() != m_selectedVocal) { sameVoice = false; break; }
+		if (vocalTrack.i() != static_cast<int>(m_selectedVocal)) { sameVoice = false; break; }
 	}
 	m_singingDuet = (m_song->hasDuet() && m_duet.i() == 0 && players() > 1 && sameVoice != true);
 	m_audio.pause(false);
