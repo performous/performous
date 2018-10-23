@@ -42,7 +42,7 @@ $("a[id^='sort-by-']").click(function () {
     });
 
     $.get(url, function (data) {
-        var database = data;
+        var database = data; //JSON.parse(data);
 
         clearTable("database-songs");
 
