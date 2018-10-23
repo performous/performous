@@ -35,7 +35,7 @@ function localize(selector, fromCache = true) {
         });
     } else {
         $.get("api/language", function (data) {
-            var localizer = data;
+            var localizer = JSON.parse(data);
             $.each(localizer, function (key, value) {
                 localizeInternal(selector, key, value);
                 localStorage.setItem(key, value);

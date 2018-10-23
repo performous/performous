@@ -14,8 +14,8 @@
     The autocomplete makes use of the TypeAhead library.
 */
 $("#search-tab").click(function (){
-    $.get("api/getDataBase.json?sort=artist&order=ascending", function (data) {
-        var database = data;
+    $.get("api/getDataBase.json", function (data) {
+        var database = JSON.parse(data);
         var input = $("#search-field");
         input.typeahead({
             source: database,
@@ -44,59 +44,24 @@ $("#search-tab").click(function (){
 */
 $("#search-database").click(function (e, callback) {
     var query = $("#search-field").val();
-    if(query.length == 0) {
-        $.get("api/getDataBase.json?sort=artist&order=ascending", function (data) {
-            var database = data;
-            clearList("searched-songs");
+    $.post("api/search", query, function (data) {
+        var database = JSON.parse(data);
 
-            $.each(database, function (iterator, songObject){
-                var songMeta = "";
-                songMeta += songObject.Language.length > 0 ? " | " + songObject.Language : "";
-                songMeta += songObject.Edition.length > 0 ? " | " + songObject.Edition : "";
-                $("#searched-songs").append("<a href=\"#\" id=\"searched-songs-" + iterator + "\" class=\"list-group-item\" >" + songObject.Artist + " - " + songObject.Title + songMeta + "<span class=\"glyphicon glyphicon-plus\"></span></a>");
-                $("#searched-songs-"+iterator).data("songObject", JSON.stringify(songObject));
-            });
+        clearList("searched-songs");
 
-            if(database.length === 0) {
-                buildAlertMessage("no_songs_found_with_current_filter", "warning");
-            }
-            if(typeof callback === "function") {
-                callback();
-            }
+        $.each(database, function (iterator, songObject){
+            var songMeta = "";
+            songMeta += songObject.Language.length > 0 ? " | " + songObject.Language : "";
+            songMeta += songObject.Edition.length > 0 ? " | " + songObject.Edition : "";
+            $("#searched-songs").append("<a href=\"#\" id=\"searched-songs-" + iterator + "\" class=\"list-group-item\" >" + songObject.Artist + " - " + songObject.Title + songMeta + "<span class=\"glyphicon glyphicon-plus\"></span></a>");
+            $("#searched-songs-"+iterator).data("songObject", JSON.stringify(songObject));
         });
-        return;
-    }
-    var searchData = {
-        "query": query,
-    };
 
-    $.ajax({
-        url: "api/search",
-        type: "POST",
-        data: JSON.stringify(searchData),
-        contentType: "application/json; charset=utf-8",
-        success: function(data, textStatus, jqXHR) {
-            var database = data;
-
-            clearList("searched-songs");
-
-            $.each(database, function (iterator, songObject){
-                var songMeta = "";
-                songMeta += songObject.Language.length > 0 ? " | " + songObject.Language : "";
-                songMeta += songObject.Edition.length > 0 ? " | " + songObject.Edition : "";
-                $("#searched-songs").append("<a href=\"#\" id=\"searched-songs-" + iterator + "\" class=\"list-group-item\" >" + songObject.Artist + " - " + songObject.Title + songMeta + "<span class=\"glyphicon glyphicon-plus\"></span></a>");
-                $("#searched-songs-"+iterator).data("songObject", JSON.stringify(songObject));
-            });
-
-            if(database.length === 0) {
-                buildAlertMessage("no_songs_found_with_current_filter", "warning");
-            }
-            if(typeof callback === "function") {
-                callback();
-            }
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            
+        if(database.length === 0) {
+            buildAlertMessage("no_songs_found_with_current_filter", "warning");
+        }
+        if(typeof callback === "function") {
+            callback();
         }
     });
 });
