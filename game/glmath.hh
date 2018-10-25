@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/matrix_operation.hpp>
 #include <algorithm>
 #include <cmath>
