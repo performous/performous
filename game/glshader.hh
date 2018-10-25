@@ -18,6 +18,7 @@ struct Uniform {
 	void set(float x, float y, float z) { glUniform3f(id, x, y, z); }
 	void set(int x, int y, int z, int w) { glUniform4i(id, x, y, z, w); }
 	void set(float x, float y, float z, float w) { glUniform4f(id, x, y, z, w); }
+	void set(glmath::vec4 const& v) { glUniform4fv(id, 1, glm::value_ptr(v)); }
 	void setMat3(glmath::mat3 const& m) { glUniformMatrix3fv(id, 1, GL_FALSE, &m[0][0]); }
 	void setMat4(glmath::mat4 const& m) { glUniformMatrix4fv(id, 1, GL_FALSE, &m[0][0]); }
 };
