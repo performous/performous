@@ -158,7 +158,7 @@ void ScreenSing::createPauseMenu() {
 
 void ScreenSing::reloadGL() {
 	// Load UI graphics
-	theme = std::make_unique<ThemeSing>();
+	theme = std::make_shared<ThemeSing>();
 	m_menuTheme = std::make_unique<ThemeInstrumentMenu>();
 	m_pause_icon = std::make_unique<Surface>(findFile("sing_pause.svg"));
 	m_player_icon = std::make_unique<Surface>(findFile("sing_pbox.svg")); // For duet menu
