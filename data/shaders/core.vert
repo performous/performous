@@ -19,7 +19,6 @@ out vData {
 } vertex;
 
 void main() {
-	//const vec3 lightPos = vec3(0.0, -2.94, 1.0);
 	const vec3 lightPos = vec3(-10.0, 2.0, 15.0);
 
 	vec4 posEye = mvMatrix * vec4(vertPos, 1.0); // Vertex position in eye space
