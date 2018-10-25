@@ -88,7 +88,9 @@ FFmpeg::~FFmpeg() {
 
 void FFmpeg::open() {
 	std::lock_guard<std::mutex> l(s_avcodec_mutex);
+#if	(LIBAVFORMAT_VERSION_INT) < (AV_VERSION_INT(58,0,0))
 	av_register_all();
+#endif
 	av_log_set_level(AV_LOG_ERROR);
 	if (avformat_open_input(&m_formatContext, m_filename.string().c_str(), nullptr, nullptr)) throw std::runtime_error("Cannot open input file");
 	if (avformat_find_stream_info(m_formatContext, nullptr) < 0) throw std::runtime_error("Cannot find stream information");
