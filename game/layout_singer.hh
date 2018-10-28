@@ -41,7 +41,7 @@ class LyricRow {
 			sentence.back().factor = current ? 1.1 - 0.1 * (time - it->begin) / (it->end - it->begin) : 1.0; // Zoom-in and out while it's the current syllable.
 			} else {
 			bool current = time >=it->begin;
-			sentence.back().factor = current ? std::min(1 + (0.15 * (time - it->begin) / (it->end - it->begin)), 1.1) : 1.0; // Zoom-in and out syllable proportionally to their length.
+			sentence.back().factor = current ? std::min(1.0 + (0.15 * (time - it->begin) / (it->end - it->begin)), 1.1) : 1.0; // Zoom-in and out syllable proportionally to their length.
 			}
 		}
 		ColorTrans c(Color::alpha(fade.get()));
