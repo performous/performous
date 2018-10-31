@@ -2,49 +2,49 @@
 
 namespace glutil {
 
-VertexArray::VertexArray() {
-	glGenVertexArrays(1, &m_vao);
-	glGenBuffers(1, &m_vbo);
-}
-
-VertexArray::~VertexArray() {
-	clear();
-}
-
-void VertexArray::clear() {
-	m_vertices.clear();
-}
-
-void VertexArray::draw(GLint mode) {
-	GLErrorChecker glerror("VertexArray::draw");
-	if (empty()) return;
-	
-	glBufferData(GL_ARRAY_BUFFER, stride() * size(), &m_vertices.front(), GL_STATIC_DRAW);
-
-	glerror.check("draw arrays");
-	glDrawArrays(mode, 0, size());
-}
-
-GLErrorChecker::GLErrorChecker(std::string const& info): info(info) {
-	stack.push_back(std::string());
-	check("before starting");
-	stack.back() = info;
-}
-
-GLErrorChecker::~GLErrorChecker() { check("after finishing"); stack.pop_back(); }
-
-void GLErrorChecker::check(std::string const& what) {
-	GLenum err = glGetError();
-	if (err != GL_NO_ERROR) {
-		stack.back() = info + " " + what;
-		// Prefix with all currently active GLErrorChecker contexts
-		std::string logmsg = "opengl/error: ";
-		for (auto s: stack) logmsg += s + ": ";
-		logmsg += msg(err) + "\n";
-		std::clog << logmsg << std::flush;
+	VertexArray::VertexArray() {
+		glGenVertexArrays(1, &m_vao);
+		glGenBuffers(1, &m_vbo);
 	}
-	stack.back() = info + " after " + what;
-}
+
+	VertexArray::~VertexArray() {
+		clear();
+	}
+
+	void VertexArray::clear() {
+		m_vertices.clear();
+	}
+
+	void VertexArray::draw(GLint mode) {
+		GLErrorChecker glerror("VertexArray::draw");
+		if (empty()) return;
+	
+		glBufferData(GL_ARRAY_BUFFER, stride() * size(), &m_vertices.front(), GL_DYNAMIC_DRAW);
+
+		glerror.check("draw arrays");
+		glDrawArrays(mode, 0, size());
+	}
+
+	GLErrorChecker::GLErrorChecker(std::string const& info): info(info) {
+		stack.push_back(std::string());
+		check("before starting");
+		stack.back() = info;
+	}
+
+	GLErrorChecker::~GLErrorChecker() { check("after finishing"); stack.pop_back(); }
+
+	void GLErrorChecker::check(std::string const& what) {
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			stack.back() = info + " " + what;
+			// Prefix with all currently active GLErrorChecker contexts
+			std::string logmsg = "opengl/error: ";
+			for (auto s: stack) logmsg += s + ": ";
+			logmsg += msg(err) + "\n";
+			std::clog << logmsg << std::flush;
+		}
+		stack.back() = info + " after " + what;
+	}
 
 /* static */ std::string GLErrorChecker::msg(GLenum err) {
 	switch(err) {
