@@ -197,6 +197,18 @@ void Window::updateColor() {
 	glBufferSubData(GL_UNIFORM_BUFFER, (glutil::shaderMatrices::offset() + offsetof(glutil::shaderMatrices, colorMatrix)), sizeof(glmath::mat4), &m_matrixUniforms.colorMatrix);
 }
 
+void Window::updateLyricHighlight(glmath::vec4 const& fill, glmath::vec4 const& stroke, glmath::vec4 const& newFill, glmath::vec4 const& newStroke) {
+	m_lyricColorUniforms.origFill = fill;
+	m_lyricColorUniforms.origStroke = stroke;
+	m_lyricColorUniforms.newFill = newFill;
+	m_lyricColorUniforms.newStroke = newStroke;
+	glBufferSubData(GL_UNIFORM_BUFFER, m_lyricColorUniforms.offset(), m_lyricColorUniforms.size(), &m_lyricColorUniforms);
+}
+
+void Window::updateLyricHighlight(glmath::vec4 const& fill, glmath::vec4 const& stroke) {
+	m_lyricColorUniforms.newFill = fill;
+	m_lyricColorUniforms.newStroke = stroke;
+	glBufferSubData(GL_UNIFORM_BUFFER, m_lyricColorUniforms.offset(), m_lyricColorUniforms.size(), &m_lyricColorUniforms);
 }
 
 void Window::updateTransforms() {
@@ -425,6 +437,16 @@ ColorTrans::ColorTrans(Color const& c): m_old(g_color) {
 	using namespace glmath;
 	g_color = g_color * diagonal(c.linear());
 	Game::getSingletonPtr()->window().updateColor();
+}
+
+LyricColorTrans::LyricColorTrans(Color const& fill, Color const& stroke, Color const& newFill, Color const& newStroke) {
+	oldFill = fill.linear();
+	oldStroke = stroke.linear();
+	Game::getSingletonPtr()->window().updateLyricHighlight(fill.linear(), stroke.linear(), newFill.linear(), newStroke.linear());
+}
+
+LyricColorTrans::~LyricColorTrans() {
+	Game::getSingletonPtr()->window().updateLyricHighlight(oldFill, oldStroke);
 }
 
 ColorTrans::ColorTrans(glmath::mat4 const& mat): m_old(g_color) {
