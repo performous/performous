@@ -114,7 +114,7 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	bitmap.fmt = pix::INT_ARGB;
 	bitmap.linearPremul = true;
 	bitmap.resize(cairo_image_surface_get_width(surface.get()), cairo_image_surface_get_height(surface.get()));
-	m_surface.load(bitmap);
+	m_surface.load(bitmap, true);
 	// We don't want text quality multiplier m to affect rendering size...
 	m_x /= m;
 	m_y /= m;

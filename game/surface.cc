@@ -171,7 +171,7 @@ namespace {
 	}
 }
 
-void Surface::load(Bitmap const& bitmap) {
+void Surface::load(Bitmap const& bitmap, bool isText) {
 	glutil::GLErrorChecker glerror("Surface::load");
 	// Initialize dimensions
 	m_width = bitmap.width; m_height = bitmap.height;
@@ -179,10 +179,10 @@ void Surface::load(Bitmap const& bitmap) {
 	m_premultiplied = bitmap.linearPremul;
 	UseTexture texture(*this);
 	// When texture area is small, bilinear filter the closest mipmap
-	glTexParameterf(type(), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+	glTexParameterf(type(), GL_TEXTURE_MIN_FILTER, isText ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR_MIPMAP_NEAREST);
 	// When texture area is large, bilinear filter the original
-	glTexParameterf(type(), GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameterf(type(), GL_TEXTURE_MAX_LEVEL, 4);
+	glTexParameterf(type(), GL_TEXTURE_MAG_FILTER, isText ? GL_NEAREST : GL_LINEAR);
+	glTexParameterf(type(), GL_TEXTURE_MAX_LEVEL, 12);
 	glerror.check("glTexParameterf");
 
 	// Anisotropy is potential trouble maker
