@@ -67,6 +67,22 @@ std::string UnicodeUtil::convertToUTF8 (std::string const& str) {
 	return ss.str();
 }
 
+std::string UnicodeUtil::toLower (std::string const& str) {
+	std::stringstream ss (str);
+	convertToUTF8 (ss, std::string());
+	std::string ret;
+	icu::UnicodeString::fromUTF8(ss.str()).toLower().toUTF8String(ret);
+	return ret;
+}
+
+std::string UnicodeUtil::toUpper (std::string const& str) {
+	std::stringstream ss (str);
+	convertToUTF8 (ss, std::string());
+	std::string ret;
+	icu::UnicodeString::fromUTF8(ss.str()).toLower().toUTF8String(ret);
+	return ret;
+}
+
 void UnicodeUtil::collate (songMetadata& stringmap) {
 	for (auto& kv: stringmap) { 
 		ConfigItem::StringList termsToCollate = config["game/sorting_ignore"].sl();
