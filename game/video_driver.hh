@@ -23,6 +23,14 @@ private:
 	glmath::mat4 m_old;
 };
 
+struct LyricColorTrans {
+	LyricColorTrans(Color const& fill, Color const& stroke, Color const& newFill, Color const& newStroke);
+	~LyricColorTrans();
+	private:
+	glmath::vec4 oldFill;
+	glmath::vec4 oldStroke;
+};
+
 class ViewTrans {
 public:
 	/// Apply a translation on top of current viewport translation
@@ -85,6 +93,8 @@ public:
 	void createShaders();
 	void resetShaders() { m_shaders.clear(); createShaders(); };
 	void updateColor();
+	void updateLyricHighlight(glmath::vec4 const& fill, glmath::vec4 const& stroke, glmath::vec4 const& newFill, glmath::vec4 const& newStroke);
+	void updateLyricHighlight(glmath::vec4 const& fill, glmath::vec4 const& stroke);
 	void updateTransforms();
 private:
 	const GLuint vertPos = 0;
