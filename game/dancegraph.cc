@@ -408,13 +408,14 @@ void DanceGraph::draw(double time) {
 		// Arrows on cursor
 		{
 			UseShader us(getShader("dancenote"));
-			us()["clock"].set(float(time));
-			us()["noteType"].set(0);
-			us()["scale"].set(getScale());
+			m_uniforms.clock = static_cast<float>(time);
+			m_uniforms.noteType = 0;
+			m_uniforms.scale = getScale();
 			for (unsigned arrow_i = 0; arrow_i < m_pads; ++arrow_i) {
 				float l = m_pressed_anim[arrow_i].get();
-				us()["hitAnim"].set(l);
-				us()["position"].set(panel2x(arrow_i), time2y(0.0));
+				m_uniforms.hitAnim = l;
+				m_uniforms.position = glmath::vec2(panel2x(arrow_i), time2y(0.0));
+				glBufferSubData(GL_UNIFORM_BUFFER, m_uniforms.offset(), m_uniforms.size(), &m_uniforms);
 				drawArrow(arrow_i, m_arrows_cursor);
 			}
 		}
@@ -471,9 +472,9 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 
 	{
 		UseShader us(getShader("dancenote"));
-		us()["hitAnim"].set(float(glow));
-		us()["clock"].set(float(time));
-		us()["scale"].set(getScale());
+		m_uniforms.hitAnim = static_cast<float>(glow);
+		m_uniforms.clock = static_cast<float>(time);
+		m_uniforms.scale = getScale();
 
 		if (yEnd - yBeg > arrowSize) {
 			// Draw holds
@@ -482,8 +483,9 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 				yEnd = std::max(time2y(0.0), yEnd);
 			}
 			if (note.releaseTime > 0) yBeg = time2y(note.releaseTime - time); // Oh noes, it got released!
-			us()["noteType"].set(2);
-			us()["position"].set(x, yBeg);
+			m_uniforms.noteType = 2;
+			m_uniforms.position = glmath::vec2(x, yBeg);
+			glBufferSubData(GL_UNIFORM_BUFFER, m_uniforms.offset(), m_uniforms.size(), &m_uniforms);
 			// Draw begin
 			drawArrow(arrow_i, m_arrows_hold, 0.0f, 1.0f/3.0f);
 			if (yEnd - yBeg > 0) {
@@ -502,8 +504,9 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 		} else {
 			// Draw short note
 			if (mine && note.isHit) yBeg = time2y(0.0);
-			us()["noteType"].set(mine ? 3 : 1);
-			us()["position"].set(x, yBeg);
+			m_uniforms.noteType = (mine ? 3 : 1);
+			m_uniforms.position = glmath::vec2(x, yBeg);
+			glBufferSubData(GL_UNIFORM_BUFFER, m_uniforms.offset(), m_uniforms.size(), &m_uniforms);
 			drawArrow((mine ? -1 : arrow_i), (mine ? m_mine : m_arrows));
 		}
 	}

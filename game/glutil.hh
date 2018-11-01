@@ -10,6 +10,8 @@
 
 namespace glutil {
 
+	GLintptr alignOffset(GLintptr offset);
+
 	// Note: if you reorder or otherwise change the contents of this, VertexArray::Draw() must be modified accordingly
 	struct VertexInfo {
 		glmath::vec3 vertPos = glmath::vec3(0.0f);
@@ -17,6 +19,61 @@ namespace glutil {
 		glmath::vec3 vertNormal = glmath::vec3(0.0f);
 		glmath::vec4 vertColor = glmath::vec4(1.0f);
 	};
+	
+	// Uniform block structs
+	struct shaderMatrices {
+		glmath::mat4 projMatrix; // 0 --- Equals vec4[4].
+		glmath::mat4 mvMatrix; // 64 --- Equals vec4[4].
+		glmath::mat4 normalMatrix; // 128 --- Equals vec4[4], but this one should be converted to mat3 in the shader.
+		glmath::mat4 colorMatrix; // 192 --- Equals vec4[4].
+		
+		static GLsizeiptr size() { return sizeof(shaderMatrices); };
+		static GLintptr offset() { return 0; };
+		shaderMatrices() {};
+		shaderMatrices(const shaderMatrices&) = delete;
+		shaderMatrices& operator=(const shaderMatrices&) = delete;
+	}; // 256 bytes
+	
+	struct stereo3dParams {
+		float sepFactor; // 256
+		float z0; // 260
+		float padding[2] = {7.0, 13.0}; // 264
+		
+		static GLsizeiptr size() { return sizeof(stereo3dParams); };
+		static GLintptr offset() { return alignOffset(shaderMatrices::size()); };
+		stereo3dParams() {};
+		stereo3dParams(const stereo3dParams&) = delete;
+		stereo3dParams& operator=(const stereo3dParams&) = delete;
+	}; // 16 bytes
+	
+	struct lyricColorUniforms {
+		glmath::vec4 origFill; // 272
+		glmath::vec4 origStroke; // 288
+		glmath::vec4 newFill; // 304
+		glmath::vec4 newStroke; // 320
+
+		static GLsizeiptr size() { return sizeof(lyricColorUniforms); };
+		static GLintptr offset() { return alignOffset(stereo3dParams::offset() + stereo3dParams::size()); };
+		lyricColorUniforms() {};
+		lyricColorUniforms(const lyricColorUniforms&) = delete;
+		lyricColorUniforms& operator=(const lyricColorUniforms&) = delete;
+	}; // 64 bytes
+	
+	struct danceNoteUniforms {
+		int noteType; // 336
+		float hitAnim; // 340
+		float clock; // 344
+		float scale; // 348
+		glmath::vec2 position; // 352
+		float padding[2] = {7.0, 13.0};
+
+		static GLsizeiptr size() { return sizeof(danceNoteUniforms); };
+		static GLintptr offset() { return alignOffset(lyricColorUniforms::offset() + lyricColorUniforms::size()); };
+		danceNoteUniforms() {};
+		danceNoteUniforms(const danceNoteUniforms&) = delete;
+		danceNoteUniforms& operator=(const danceNoteUniforms&) = delete;
+	}; // 32 bytes
+	// Total 368 bytes
 
 	/// Handy vertex array capable of drawing itself
 	class VertexArray {

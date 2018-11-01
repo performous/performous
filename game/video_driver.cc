@@ -48,8 +48,10 @@ namespace {
 float screenW() { return s_width; }
 float screenH() { return s_height; }
 
+GLuint Window::m_ubo = 0;
 GLuint Window::m_vao = 0;
 GLuint Window::m_vbo = 0;
+GLint Window::bufferOffsetAlignment = -1;
 
 Window::Window() {
 	std::atexit(SDL_Quit);
@@ -117,40 +119,48 @@ void Window::createShaders() {
 	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
 	  .compileFile(findFile("shaders/core.vert"))
 	  .compileFile(findFile("shaders/core.frag"))
-	  .link();
+	  .link()
+	  .bindUniformBlocks();
 	shader("surface")
 	  .addDefines("#define ENABLE_TEXTURING\n")
 	  .compileFile(findFile("shaders/core.vert"))
 	  .compileFile(findFile("shaders/core.frag"))
-	  .link();
+	  .link()
+	  .bindUniformBlocks();
 	shader("texture")
 	  .addDefines("#define ENABLE_TEXTURING\n")
 	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
 	  .compileFile(findFile("shaders/core.vert"))
 	  .compileFile(findFile("shaders/core.frag"))
-	  .link();
+	  .link()
+	  .bindUniformBlocks();
 	shader("3dobject")
 	  .addDefines("#define ENABLE_LIGHTING\n")
 	  .compileFile(findFile("shaders/core.vert"))
 	  .compileFile(findFile("shaders/core.frag"))
-	  .link();
+	  .link()
+	  .bindUniformBlocks();
 	shader("dancenote")
 	  .addDefines("#define ENABLE_TEXTURING\n")
 	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
 	  .compileFile(findFile("shaders/dancenote.vert"))
 	  .compileFile(findFile("shaders/core.frag"))
-	  .link();
+	  .link()
+	  .bindUniformBlocks();
+	
 	updateColor();
 	view(0);  // For loading screens
 }
 
 void Window::initBuffers() {
-	glGenVertexArrays(1, &Window::m_vao);
+	glGenVertexArrays(1, &Window::m_vao); // Create VAO.
 	glBindVertexArray(Window::m_vao);
-	glGenBuffers(1, &Window::m_vbo);
-	GLsizei stride = glutil::VertexArray::stride();
+	glGenBuffers(1, &Window::m_vbo); // Create VBO.
+	glGenBuffers(1, &Window::m_ubo); // Create UBO.	
 
-	glBindBuffer(GL_ARRAY_BUFFER, Window::m_vbo);			
+	GLsizei stride = glutil::VertexArray::stride();
+	glBindBuffer(GL_ARRAY_BUFFER, Window::m_vbo);
+	
 	glEnableVertexAttribArray(vertPos);
 	glVertexAttribPointer(vertPos, 3, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(glutil::VertexInfo, vertPos));
 	glEnableVertexAttribArray(vertTexCoord);
@@ -163,9 +173,11 @@ void Window::initBuffers() {
 
 Window::~Window() {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	glBindVertexArray(0);
-	glDeleteVertexArrays(1, &m_vao);
 	glDeleteBuffers(1, &m_vbo);
+	glDeleteBuffers(1, &m_ubo);
+	glDeleteVertexArrays(1, &m_vao);
 }
 
 void Window::blank() {
@@ -173,35 +185,27 @@ void Window::blank() {
 }
 
 void Window::updateStereo(float sepFactor) {
-	for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
-		Shader& sh = *it->second;
-		sh.bind();
 		try {
-			sh["sepFactor"].set(sepFactor);
-			sh["z0"].set(z0 - 2.0f * near_);  // Why minus two times zNear, I have no idea -Tronic
-		} catch(...) {}  // Not fatal if 3d shader is missing
-	}
+			m_stereoUniforms.sepFactor = sepFactor;
+			m_stereoUniforms.z0 = (z0 - 2.0f * near_);
+			glBufferSubData(GL_UNIFORM_BUFFER, m_stereoUniforms.offset(), m_stereoUniforms.size(), &m_stereoUniforms);
+		} catch(...) {}  // Not fatal if 3d shader is missing		
 }
 
-void Window::updateColor() {
-	for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
-		Shader& sh = *it->second;
-		sh["colorMatrix"].setMat4(g_color);
-	}
+void Window::updateColor() {	
+	m_matrixUniforms.colorMatrix = g_color;
+	glBufferSubData(GL_UNIFORM_BUFFER, (glutil::shaderMatrices::offset() + offsetof(glutil::shaderMatrices, colorMatrix)), sizeof(glmath::mat4), &m_matrixUniforms.colorMatrix);
+}
+
 }
 
 void Window::updateTransforms() {
 	using namespace glmath;
-	mat3 normal(g_modelview);
-	for (ShaderMap::iterator it = m_shaders.begin(); it != m_shaders.end(); ++it) {
-		Shader& sh = *it->second;
-		sh.bind();
-		sh["projMatrix"].setMat4(g_projection);
-		sh["mvMatrix"].setMat4(g_modelview);
-		try {
-			sh["normalMatrix"].setMat3(normal);
-		} catch(...) {}  // Not fatal if normalMatrix is missing (only 3d objects use it)
-	}
+	mat4 normal(g_modelview);
+	m_matrixUniforms.projMatrix = g_projection;
+	m_matrixUniforms.mvMatrix = g_modelview;
+	m_matrixUniforms.normalMatrix = normal;	
+	glBufferSubData(GL_UNIFORM_BUFFER, m_matrixUniforms.offset(), m_matrixUniforms.size(), &m_matrixUniforms);
 }
 
 void Window::render(std::function<void (void)> drawFunc) {

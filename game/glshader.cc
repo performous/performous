@@ -1,6 +1,7 @@
 #include "glshader.hh"
 
 #include "glutil.hh"
+#include "video_driver.hh"
 #include <boost/filesystem/fstream.hpp>
 #include <algorithm>
 #include <stdexcept>
@@ -38,6 +39,7 @@ void Shader::dumpInfoLog(GLuint id) {
 	// Ignore success messages that the Radeon driver always seems to give
 	if (std::equal(infoLog, infoLog + infoLogLength, "Vertex shader(s) linked, fragment shader(s) linked, geometry shader(s) linked.")) return;
 
+	if (maxLength == 0) return;
 	// Format a (possibly multi-line) log message
 	std::string prefix = "opengl/error: Shader " + name + ": ";
 	std::string logmsg = prefix;
@@ -47,6 +49,40 @@ void Shader::dumpInfoLog(GLuint id) {
 	}
 	if (logmsg.back() != '\n') logmsg += '\n';
 	std::clog << logmsg << std::flush;
+}
+
+void Shader::bindUniformBlocks() {
+	glUseProgram(program);
+	glBindBuffer(GL_UNIFORM_BUFFER,Window::UBO());
+	GLsizei bufferSize = glutil::danceNoteUniforms::offset() + glutil::danceNoteUniforms::size();
+	glBufferData(GL_UNIFORM_BUFFER, bufferSize, NULL, GL_DYNAMIC_DRAW);
+	for (std::pair<std::string, unsigned int> const& uniformBlock: Shader::m_uniformblocks) {
+			GLuint blockIndex = glGetUniformBlockIndex(program, uniformBlock.first.c_str());
+			if (blockIndex != GL_INVALID_INDEX) {
+		glutil::GLErrorChecker ec("Shader::bindUniformBlocks");
+		ec.check("glBindBufferRange()");
+		{
+				switch (uniformBlock.second) {
+				case 7:
+					glBindBufferRange(GL_UNIFORM_BUFFER, 7, Window::UBO(), glutil::shaderMatrices::offset(), sizeof(glutil::shaderMatrices));
+					break;
+				case 8:
+					glBindBufferRange(GL_UNIFORM_BUFFER, 8, Window::UBO(), glutil::stereo3dParams::offset(), sizeof(glutil::stereo3dParams));
+					break;
+				case 9:
+					glBindBufferRange(GL_UNIFORM_BUFFER, 9, Window::UBO(), glutil::lyricColorUniforms::offset(), sizeof(glutil::lyricColorUniforms));
+					break;
+				case 10:
+					glBindBufferRange(GL_UNIFORM_BUFFER, 10, Window::UBO(), glutil::danceNoteUniforms::offset(), sizeof(glutil::danceNoteUniforms));
+					break;
+				}
+			}
+		ec.check("glUniformBlockBinding()");
+		{
+				glUniformBlockBinding(program, blockIndex, uniformBlock.second);
+		}
+		}
+	}
 }
 
 Shader::Shader(std::string const& name): name(name), program(0) {}
@@ -75,6 +111,15 @@ Shader& Shader::compileFile(fs::path const& filename) {
 		throw std::runtime_error(filename.filename().string() + ": " + e.what());
 	}
 }
+
+const std::forward_list<std::pair<std::string, unsigned int>> Shader::m_uniformblocks = {
+// Holds the block names for our uniform blocks, this list will be iterated on Shader::link to assign valid bindings to each of these.
+// Make sure to update this if ever the uniform block names change in GLSL.
+	{"shaderMatrices", 7},
+	{"stereoParams", 8},
+	{"lyricColors", 9},
+	{"danceNote", 10}
+};
 
 
 Shader& Shader::compileCode(std::string const& srccode, GLenum type) {

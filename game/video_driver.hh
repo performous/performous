@@ -65,8 +65,14 @@ public:
 	/// take a screenshot
 	void screenshot();
 	
-	GLuint const& VAO() const { return m_vao; }
-	GLuint const& VBO() const { return m_vbo; }
+	/// Return reference to Uniform Buffer Object.
+	static GLuint const& UBO() { return Window::m_ubo; }	
+	/// Return reference to Vertex Array Object.
+	GLuint const& VAO() const { return Window::m_vao; }
+	/// Return reference to Vertex Buffer Object.
+	GLuint const& VBO() const { return Window::m_vbo; }
+	/// Store value of GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT.
+	static GLint bufferOffsetAlignment;
 	
 	/// Construct a new shader or return an existing one by name
 	Shader& shader(std::string const& name) {
@@ -92,8 +98,12 @@ private:
 	void updateStereo(float separation);
 	bool m_fullscreen = false;
 	bool m_needResize = true;
+	static GLuint m_ubo;
 	static GLuint m_vao;
 	static GLuint m_vbo;
+	glutil::stereo3dParams m_stereoUniforms;
+	glutil::shaderMatrices m_matrixUniforms;
+	glutil::lyricColorUniforms m_lyricColorUniforms;
 	std::unique_ptr<FBO> m_fbo;
 	int m_windowX = 0;
 	int m_windowY = 0;
