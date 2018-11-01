@@ -1,7 +1,18 @@
 #include "glutil.hh"
+#include "video_driver.hh"
 
 namespace glutil {
 
+	GLintptr alignOffset(GLintptr offset) {
+		if (Window::bufferOffsetAlignment == -1) {
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &Window::bufferOffsetAlignment);
+		}
+		float result;
+		result = std::ceil(static_cast<float>(offset) / static_cast<float>(Window::bufferOffsetAlignment));
+		result *= Window::bufferOffsetAlignment;
+		return result;
+	}
+		
 	VertexArray::VertexArray() {
 		glGenVertexArrays(1, &m_vao);
 		glGenBuffers(1, &m_vbo);

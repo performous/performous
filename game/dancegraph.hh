@@ -57,6 +57,7 @@ class DanceGraph: public InstrumentGraph {
 	float panel2x(int i) const { return getScale() * (-(m_pads * 0.5f) + m_arrow_map[i] + 0.5f); } /// Get x for an arrow line
 	float getScale() const { return 1.0f / m_pads * 8.0f; }
 	double getNotesBeginTime() const { return m_notes.front().note.begin; }
+	glutil::danceNoteUniforms m_uniforms;
 
 	// Note stuff
 	DanceNotes m_notes; /// contains the dancing notes for current game mode and difficulty

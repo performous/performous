@@ -2,8 +2,9 @@
 
 #include "fs.hh"
 #include "glutil.hh"
-#include <string>
+#include <forward_list>
 #include <map>
+#include <string>
 #include <vector>
 #include <epoxy/gl.h>
 
@@ -29,6 +30,9 @@ struct Shader {
 	/// Print compile errors and such
 	/// @param id of shader or program
 	void dumpInfoLog(GLuint id);
+
+	/// Bind uniform blocks to their respective indexes.
+	void bindUniformBlocks();
 
 	Shader(std::string const& name);
 	~Shader();
@@ -58,6 +62,8 @@ private:
 	std::string name; ///< for debugging purposes only
 	GLuint program; ///< shader program object id
 	int gl_response; ///< save last return state
+	
+	const static std::forward_list<std::pair<std::string, unsigned int>> m_uniformblocks;
 
 	std::string defs;
 
