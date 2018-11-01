@@ -25,7 +25,7 @@ layout (std140) uniform lyricColors {
 	vec4 newStroke;
 };
 
-const vec4 epsilon = vec4(1e-10);
+const vec4 epsilon = vec4(1.96e-3);
 
 #ifdef ENABLE_TEXTURING
 uniform sampler2D tex;
