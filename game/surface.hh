@@ -202,7 +202,7 @@ public:
 	void draw() const;
 	using OpenGLTexture<GL_TEXTURE_2D>::draw;
 	/// loads surface into buffer
-	void load(Bitmap const& bitmap);
+	void load(Bitmap const& bitmap, bool isText = false);
 	Shader& shader() { return m_texture.shader(); }
 	float width() const { return m_width; }
 	float height() const { return m_height; }
