@@ -160,12 +160,12 @@ void ScreenSing::reloadGL() {
 	// Load UI graphics
 	theme = std::make_shared<ThemeSing>();
 	m_menuTheme = std::make_unique<ThemeInstrumentMenu>();
-	m_pause_icon = std::make_unique<Surface>(findFile("sing_pause.svg"));
-	m_player_icon = std::make_unique<Surface>(findFile("sing_pbox.svg")); // For duet menu
-	m_help = std::make_unique<Surface>(findFile("instrumenthelp.svg"));
+	m_pause_icon = std::make_unique<Texture>(findFile("sing_pause.svg"));
+	m_player_icon = std::make_unique<Texture>(findFile("sing_pbox.svg")); // For duet menu
+	m_help = std::make_unique<Texture>(findFile("instrumenthelp.svg"));
 	m_progress = std::make_unique<ProgressBar>(findFile("sing_progressbg.svg"), findFile("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true);
 	// Load background
-	if (!m_song->background.empty()) m_background = std::make_unique<Surface>(m_song->background);
+	if (!m_song->background.empty()) m_background = std::make_unique<Texture>(m_song->background);
 }
 
 void ScreenSing::exit() {
@@ -503,7 +503,7 @@ void ScreenSing::draw() {
 		Transform ft(farTransform());
 		double ar = arMax;
 		// Background image
-		if (!m_background || m_background->empty()) m_background = std::make_unique<Surface>(m_backgrounds.getRandom());
+		if (!m_background || m_background->empty()) m_background = std::make_unique<Texture>(m_backgrounds.getRandom());
 		ar = m_background->dimensions.ar();
 		if (ar > arMax || (m_video && ar > arMin)) fillBG();  // Fill white background to avoid black borders
 		m_background->draw();

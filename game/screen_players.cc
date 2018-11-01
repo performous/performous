@@ -27,7 +27,7 @@ void ScreenPlayers::enter() {
 	keyPressed = false;
 	m_layout_singer = std::make_unique<LayoutSinger>(m_song->getVocalTrack(0), m_database);
 	theme = std::make_unique<ThemeSongs>();
-	m_emptyCover = std::make_unique<Surface>(findFile("no_player_image.svg"));
+	m_emptyCover = std::make_unique<Texture>(findFile("no_player_image.svg"));
 	m_search.text.clear();
 	m_players.setFilter(m_search.text);
 	m_audio.fadeout();
@@ -103,9 +103,9 @@ void ScreenPlayers::manageEvent(SDL_Event event) {
 	}
 }
 
-Surface* ScreenPlayers::loadSurfaceFromMap(fs::path path) {
+Texture* ScreenPlayers::loadTextureFromMap(fs::path path) {
 	if(m_covers.find(path) == m_covers.end()) {
-		std::pair<fs::path, std::unique_ptr<Surface>> kv = std::make_pair(path, std::make_unique<Surface>(path));
+		std::pair<fs::path, std::unique_ptr<Texture>> kv = std::make_pair(path, std::make_unique<Texture>(path));
 		m_covers.insert(std::move(kv));
 	}
 	try {
@@ -158,7 +158,7 @@ void ScreenPlayers::draw() {
 			PlayerItem player_display = m_players[baseidx + i];
 			if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
 			
-			Surface& s = !player_display.path.empty() ? *loadSurfaceFromMap(player_display.path) : *m_emptyCover;
+			Texture& s = !player_display.path.empty() ? *loadTextureFromMap(player_display.path) : *m_emptyCover;
 			double diff = (i == 0 ? (0.5 - fabs(shift)) * 0.07 : 0.0);
 			double y = 0.27 + 0.5 * diff;
 			// Draw the cover
@@ -189,7 +189,7 @@ void ScreenPlayers::draw() {
 	if (music != m_playing && m_playTimer.get() > 0.4) {
 		m_songbg.reset(); m_video.reset();
 		if (music.empty()) m_audio.fadeout(1.0); else m_audio.playMusic(music, true, 2.0);
-		if (!songbg.empty()) try { m_songbg = std::make_unique<Surface>(songbg); } catch (std::exception const&) {}
+		if (!songbg.empty()) try { m_songbg = std::make_unique<Texture>(songbg); } catch (std::exception const&) {}
 		if (!video.empty() && config["graphic/video"].b()) m_video = std::make_unique<Video>(video, videoGap);
 		m_playing = music;
 	}

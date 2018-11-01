@@ -1,4 +1,4 @@
-#include "surface.hh"
+#include "texture.hh"
 
 #include "configuration.hh"
 #include "video_driver.hh"
@@ -38,7 +38,7 @@ struct Job {
 	Job(fs::path const& n, ApplyFunc const& a): name(n), apply(a) {}
 };
 
-class SurfaceLoader::Impl {
+class TextureLoader::Impl {
 	/// Load a file from disk into a buffer
 	static void load(Bitmap& bitmap, fs::path const& name) {
 		try {
@@ -92,7 +92,7 @@ public:
 			it->second.bitmap.swap(bitmap);  // Store the bitmap (if we got any)
 		}
 	}
-	/// Add a new job, using calling Surface's address as unique ID.
+	/// Add a new job, using calling Texture's address as unique ID.
 	void push(void const* t, Job const& job) {
 		std::lock_guard<std::mutex> l(m_mutex);
 		m_jobs[t] = job;
@@ -117,16 +117,16 @@ public:
 	}
 };
 
-std::unique_ptr<SurfaceLoader::Impl> ldr = nullptr;
+std::unique_ptr<TextureLoader::Impl> ldr = nullptr;
 
-SurfaceLoader::SurfaceLoader() {
-	if (ldr) throw std::logic_error("Surface Loader initialized twice. There can be only one.");
+TextureLoader::TextureLoader() {
+	if (ldr) throw std::logic_error("Texture Loader initialized twice. There can be only one.");
 	ldr = std::make_unique<Impl>();
 }
 
-SurfaceLoader::~SurfaceLoader() { ldr.reset(); }
+TextureLoader::~TextureLoader() { ldr.reset(); }
 
-void updateSurfaces() { ldr->apply(); }
+void updateTextures() { ldr->apply(); }
 
 template <typename T> void loader(T* target, fs::path const& name) {
 	// Temporarily add 1x1 pixel black texture
@@ -138,8 +138,8 @@ template <typename T> void loader(T* target, fs::path const& name) {
 	ldr->push(target, Job(name, [target](Bitmap& bitmap){ target->load(bitmap); }));
 }
 
-Surface::Surface(fs::path const& filename) { loader(this, filename); }
-Surface::~Surface() { ldr->remove(this); }
+Texture::Texture(fs::path const& filename) { loader(this, filename); }
+Texture::~Texture() { ldr->remove(this); }
 
 // Stuff for converting pix::Format into OpenGL enum values & other flags
 namespace {
@@ -171,8 +171,8 @@ namespace {
 	}
 }
 
-void Surface::load(Bitmap const& bitmap, bool isText) {
-	glutil::GLErrorChecker glerror("Surface::load");
+void Texture::load(Bitmap const& bitmap, bool isText) {
+	glutil::GLErrorChecker glerror("Texture::load");
 	// Initialize dimensions
 	m_width = bitmap.width; m_height = bitmap.height;
 	dimensions = Dimensions(bitmap.ar).fixedWidth(1.0f);
@@ -198,7 +198,7 @@ void Surface::load(Bitmap const& bitmap, bool isText) {
 	glGenerateMipmap(type());
 }
 
-void Surface::draw() const {
+void Texture::draw() const {
 	if (empty()) return;
 	// FIXME: This gets image alpha handling right but our ColorMatrix system always assumes premultiplied alpha
 	// (will produce incorrect results for fade effects)

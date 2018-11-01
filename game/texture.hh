@@ -114,17 +114,11 @@ Shader& getShader(std::string const& name);
 /** @short A RAII wrapper for allocating/deallocating OpenGL texture ID **/
 template <GLenum Type> class OpenGLTexture {
   public:
-	/// return Type
 	OpenGLTexture(const OpenGLTexture&) = delete;
   	const OpenGLTexture& operator=(const OpenGLTexture&) = delete;
+	/// return Type
 	static GLenum type() { return Type; };
-	static Shader& shader() {
-		switch (Type) {
-		case GL_TEXTURE_2D: return getShader("texture");
-		case GL_TEXTURE_RECTANGLE: return getShader("surface");
-		}
-		throw std::logic_error("Unknown texture type");
-	}
+	static Shader& shader() { return getShader("texture"); }
 	OpenGLTexture(): m_id() { glGenTextures(1, &m_id); }
 	~OpenGLTexture() { glDeleteTextures(1, &m_id); }
 	/// returns id
@@ -181,27 +175,27 @@ template <GLenum Type> void OpenGLTexture<Type>::drawCropped(Dimensions const& o
 	draw(dim, tex);
 }
 
-void updateSurfaces();
+void updateTextures();
 
 /**
-* @short High level surface/image wrapper on top of OpenGLTexture
+* @short High level texture/image wrapper on top of OpenGLTexture
 **/
-class Surface: public OpenGLTexture<GL_TEXTURE_2D> {
+class Texture: public OpenGLTexture<GL_TEXTURE_2D> {
 public:
 	struct Impl;
 	/// dimensions
 	Dimensions dimensions;
 	/// texture coordinates
 	TexCoords tex;
-	Surface(): m_width(0), m_height(0), m_premultiplied(true) {}
-	/// creates surface from file
-	Surface(fs::path const& filename);
-	~Surface();
+	Texture(): m_width(0), m_height(0), m_premultiplied(true) {}
+	/// creates texture from file
+	Texture(fs::path const& filename);
+	~Texture();
 	bool empty() const { return m_width * m_height == 0; } ///< Test if the loading has failed
-	/// draws surface
+	/// draws texture
 	void draw() const;
 	using OpenGLTexture<GL_TEXTURE_2D>::draw;
-	/// loads surface into buffer
+	/// loads texture into buffer
 	void load(Bitmap const& bitmap, bool isText = false);
 	Shader& shader() { return m_texture.shader(); }
 	float width() const { return m_width; }
@@ -212,13 +206,11 @@ private:
 	OpenGLTexture<GL_TEXTURE_2D> m_texture;
 };
 
-typedef Surface Texture;  // Backwards compatibility
-
-/// A RAII wrapper for surface loading worker thread. There must be exactly one (global) instance whenever any Surfaces exist.
-class SurfaceLoader {
+/// A RAII wrapper for texture loading worker thread. There must be exactly one (global) instance whenever any Textures exist.
+class TextureLoader {
 public:
-	SurfaceLoader();
-	~SurfaceLoader();
+	TextureLoader();
+	~TextureLoader();
 	class Impl;
 };
 

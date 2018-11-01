@@ -3,15 +3,15 @@
 #include "util.hh"
 #include <cmath>
 
-Video::Video(fs::path const& _videoFile, double videoGap): m_mpeg(_videoFile), m_videoGap(videoGap), m_surfaceTime(), m_lastTime(), m_alpha(-0.5, 1.5) {}
+Video::Video(fs::path const& _videoFile, double videoGap): m_mpeg(_videoFile), m_videoGap(videoGap), m_textureTime(), m_lastTime(), m_alpha(-0.5, 1.5) {}
 
 void Video::prepare(double time) {
 	time += m_videoGap;
 	Bitmap& fr = m_videoFrame;
 	// Time to switch frame?
 	if (!fr.buf.empty() && time >= fr.timestamp) {
-		m_surface.load(fr);
-		m_surfaceTime = fr.timestamp;
+		m_texture.load(fr);
+		m_textureTime = fr.timestamp;
 		fr.resize(0, 0);
 	}
 	// Preload the next future frame
@@ -26,11 +26,11 @@ void Video::prepare(double time) {
 
 void Video::render(double time) {
 	time += m_videoGap;
-	double tdist = std::abs(m_surfaceTime - time);
+	double tdist = std::abs(m_textureTime - time);
 	m_alpha.setTarget(tdist < 0.4 ? 1.2f : -0.5f);
 	double alpha = clamp(m_alpha.get());
 	if (alpha == 0.0) return;
 	ColorTrans c(Color::alpha(alpha));
-	m_surface.draw();
+	m_texture.draw();
 }
 

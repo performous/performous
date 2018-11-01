@@ -1,7 +1,7 @@
 #pragma once
 
 #include "animvalue.hh"
-#include "surface.hh"
+#include "texture.hh"
 #include "notes.hh"
 
 class Song;

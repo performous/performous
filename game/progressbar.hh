@@ -1,6 +1,6 @@
 #pragma once
 
-#include "surface.hh"
+#include "texture.hh"
 
 /// simple progressbar class
 class ProgressBar {

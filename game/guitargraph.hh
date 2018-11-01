@@ -84,8 +84,8 @@ class GuitarGraph: public InstrumentGraph {
 	Texture m_tail_drumfill;
 	Texture m_flame;
 	Texture m_flame_godmode;
-	Surface m_tap; /// image for 2d HOPO note cap
-	Surface m_neckglow; /// image for the glow from the bottom of the neck
+	Texture m_tap; /// image for 2d HOPO note cap
+	Texture m_neckglow; /// image for the glow from the bottom of the neck
 	glmath::dvec4 m_neckglowColor;
 	Object3d m_fretObj; /// 3d object for regular note
 	Object3d m_tappableObj; /// 3d object for the HOPO note cap

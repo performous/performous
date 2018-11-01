@@ -10,7 +10,7 @@ class Song;
 class Audio;
 class Video;
 class Players;
-class Surface;
+class Texture;
 class Database;
 class ThemeSongs;
 class LayoutSinger;
@@ -35,12 +35,12 @@ class ScreenPlayers : public Screen {
 	}
 
   private:
-	Surface* loadSurfaceFromMap(fs::path path);
+	Texture* loadTextureFromMap(fs::path path);
   	Audio& m_audio;
 	Database& m_database;
 	Players& m_players;
 	std::shared_ptr<Song> m_song; /// Pointer to the current song
-	std::unique_ptr<Surface> m_songbg;
+	std::unique_ptr<Texture> m_songbg;
 	std::unique_ptr<Video> m_video;
 	std::unique_ptr<ThemeSongs> theme;
 	std::string m_playing;
@@ -48,8 +48,8 @@ class ScreenPlayers : public Screen {
 	AnimValue m_playTimer;
 	AnimValue m_quitTimer;
 	TextInput m_search;
-	std::unique_ptr<Surface> m_emptyCover;
-	std::map<fs::path, std::unique_ptr<Surface>> m_covers;
+	std::unique_ptr<Texture> m_emptyCover;
+	std::map<fs::path, std::unique_ptr<Texture>> m_covers;
 	std::unique_ptr<LayoutSinger> m_layout_singer;
 	bool keyPressed = false;
 };

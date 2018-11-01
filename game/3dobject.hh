@@ -8,14 +8,14 @@
 // TODO: Exception handling
 // TODO: Texture loading
 
-class Surface;
+class Texture;
 
 /// A class representing 3d object
 /// Non-copyable because of display lists getting messed up
 class Object3d {
   private:
 	glutil::VertexArray m_va;
-	std::unique_ptr<Surface> m_texture; /// texture
+	std::unique_ptr<Texture> m_texture; /// texture
 	/// load a Wavefront .obj 3d object file
 	void loadWavefrontObj(fs::path const& filepath, float scale = 1.0);
   public:

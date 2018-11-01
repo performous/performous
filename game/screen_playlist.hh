@@ -8,7 +8,7 @@
 #include "playlist.hh"
 #include "controllers.hh"
 #include "songs.hh"
-#include "surface.hh"
+#include "texture.hh"
 #include "webcam.hh"
 #include "theme.hh"
 #include "configuration.hh"
@@ -18,7 +18,7 @@
 class Audio;
 class Database;
 class Song;
-class Surface;
+class Texture;
 class ThemePlaylistScreen;
 class Backgrounds;
 class ThemeInstrumentMenu;
@@ -49,23 +49,23 @@ private:
 	void createSongMenu(int songNumber);
 	void drawMenu();
 	void createMenuFromPlaylist();
-	Surface* loadSurfaceFromMap(fs::path path);
+	Texture* loadTextureFromMap(fs::path path);
 	Backgrounds& m_backgrounds;
-	std::map<fs::path, std::unique_ptr<Surface>> m_covers;
+	std::map<fs::path, std::unique_ptr<Texture>> m_covers;
 	std::unique_ptr<ThemeInstrumentMenu> m_menuTheme;
 	std::unique_ptr<ThemePlaylistScreen> theme;
-	std::unique_ptr<Surface> m_background;
+	std::unique_ptr<Texture> m_background;
 	SvgTxtTheme& getTextObject(std::string const& txt);
 	AnimValue m_nextTimer;
 	void draw_menu_options();
 	bool keyPressed;
 	bool needsUpdate = false;
 	mutable std::mutex m_mutex;
-	Surface& getCover(Song const& song);
-	std::unique_ptr<Surface> m_singCover;
-	std::unique_ptr<Surface> m_instrumentCover;
-	std::unique_ptr<Surface> m_bandCover;
-	std::unique_ptr<Surface> m_danceCover;
+	Texture& getCover(Song const& song);
+	std::unique_ptr<Texture> m_singCover;
+	std::unique_ptr<Texture> m_instrumentCover;
+	std::unique_ptr<Texture> m_bandCover;
+	std::unique_ptr<Texture> m_danceCover;
 	std::unique_ptr<Webcam> m_cam;
 };
 

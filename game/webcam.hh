@@ -1,6 +1,6 @@
 #pragma once
 
-#include "surface.hh"
+#include "texture.hh"
 #include <atomic>
 #include <mutex>
 #include <thread>
@@ -34,8 +34,8 @@ class Webcam {
 	/// Display frame
 	void render();
 
-	Dimensions& dimensions() { return m_surface.dimensions; }
-	Dimensions const& dimensions() const { return m_surface.dimensions; }
+	Dimensions& dimensions() { return m_texture.dimensions; }
+	Dimensions const& dimensions() const { return m_texture.dimensions; }
 
   private:
 	std::unique_ptr<std::thread> m_thread;
@@ -43,7 +43,7 @@ class Webcam {
 	std::unique_ptr<cv::VideoCapture> m_capture;
 	std::unique_ptr<cv::VideoWriter> m_writer;
 	CamFrame m_frame;
-	Surface m_surface;
+	Texture m_texture;
 	bool m_frameAvailable;
 	std::atomic<bool> m_running{ false };
 	std::atomic<bool> m_quit{ false };

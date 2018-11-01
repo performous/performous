@@ -14,7 +14,7 @@ class Audio;
 class Database;
 class Song;
 class Songs;
-class Surface;
+class Texture;
 class ThemeSongs;
 
 class Backgrounds;
@@ -34,7 +34,7 @@ public:
 	void prepare();
 	void draw();
 	void drawCovers(); ///< draw the cover browser
-	Surface& getCover(Song const& song); ///< get appropriate cover image for the song (incl. no cover)
+	Texture& getCover(Song const& song); ///< get appropriate cover image for the song (incl. no cover)
 	void drawJukebox(); ///< draw the songbrowser in jukebox mode (fullscreen, full previews, ...)
 
 private:
@@ -46,25 +46,25 @@ private:
 	bool addSong(); ///< Add current song to playlist. Returns true if the playlist was empty.
 	void sing(); ///< Enter singing screen with current playlist.
 	void createPlaylistMenu();
-	Surface* loadSurfaceFromMap(fs::path path);
+	Texture* loadTextureFromMap(fs::path path);
 
 	Audio& m_audio;
 	Songs& m_songs;
 	Database& m_database;
-	std::unique_ptr<Surface> m_songbg, m_songbg_ground, m_songbg_default;
+	std::unique_ptr<Texture> m_songbg, m_songbg_ground, m_songbg_default;
 	std::unique_ptr<Video> m_video;
 	std::unique_ptr<ThemeSongs> theme;
 	Song::Music m_playing;
 	AnimValue m_clock;
 	AnimValue m_idleTimer;
 	TextInput m_search;
-	std::unique_ptr<Surface> m_singCover;
-	std::unique_ptr<Surface> m_instrumentCover;
-	std::unique_ptr<Surface> m_bandCover;
-	std::unique_ptr<Surface> m_danceCover;
+	std::unique_ptr<Texture> m_singCover;
+	std::unique_ptr<Texture> m_instrumentCover;
+	std::unique_ptr<Texture> m_bandCover;
+	std::unique_ptr<Texture> m_danceCover;
 	std::unique_ptr<Texture> m_instrumentList;
 	std::unique_ptr<ThemeInstrumentMenu> m_menuTheme;
-	std::map<fs::path, std::unique_ptr<Surface>> m_covers;
+	std::map<fs::path, std::unique_ptr<Texture>> m_covers;
 	int m_menuPos, m_infoPos;
 	bool m_jukebox;
 	bool show_hiscores;

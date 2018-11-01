@@ -1,7 +1,7 @@
 #pragma once
 
 #include "chrono.hh"
-#include "surface.hh"
+#include "texture.hh"
 #include "util.hh"
 #include "libda/sample.hpp"
 #include <boost/circular_buffer.hpp>

@@ -126,7 +126,7 @@ private:
 	AnimValue m_messagePopup;
 	SvgTxtTheme m_textMessage;
 	float m_loadingProgress;
-	Surface m_logo;
+	Texture m_logo;
 	AnimValue m_logoAnim;
 	AnimValue m_dialogTimeOut;
 	// Dialog members

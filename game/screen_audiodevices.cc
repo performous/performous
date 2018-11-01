@@ -26,9 +26,9 @@ int getBackend() {
 
 
 ScreenAudioDevices::ScreenAudioDevices(std::string const& name, Audio& audio): Screen(name), m_audio(audio) {
-	m_selector = std::make_unique<Surface>(findFile("device_selector.svg"));
-	m_mic_icon = std::make_unique<Surface>(findFile("sing_pbox.svg"));
-	m_pdev_icon = std::make_unique<Surface>(findFile("icon_pdev.svg"));
+	m_selector = std::make_unique<Texture>(findFile("device_selector.svg"));
+	m_mic_icon = std::make_unique<Texture>(findFile("sing_pbox.svg"));
+	m_pdev_icon = std::make_unique<Texture>(findFile("icon_pdev.svg"));
 }
 
 void ScreenAudioDevices::enter() {
@@ -125,7 +125,7 @@ void ScreenAudioDevices::draw() {
 	}
 	// Icons
 	for (size_t i = 0; i < m_channels.size(); ++i) {
-		Surface& srf = (i < m_channels.size()-1) ? *m_mic_icon : *m_pdev_icon;
+		Texture& srf = (i < m_channels.size()-1) ? *m_mic_icon : *m_pdev_icon;
 		{
 			ColorTrans c(MicrophoneColor::get(m_channels[i].name));
 			int pos = m_channels[i].pos;
