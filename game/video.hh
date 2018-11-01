@@ -1,7 +1,7 @@
 #pragma once
 
 #include "animvalue.hh"
-#include "surface.hh"
+#include "texture.hh"
 #include "ffmpeg.hh"
 #include <string>
    
@@ -13,16 +13,16 @@ class Video {
 	void prepare(double time);  ///< Load the current video frame into a texture
 	void render(double time);  ///< Render the prepared video frame
 	/// returns Dimensions of video clip
-	Dimensions& dimensions() { return m_surface.dimensions; }
+	Dimensions& dimensions() { return m_texture.dimensions; }
 	/// returns Dimensions of video clip
-	Dimensions const& dimensions() const { return m_surface.dimensions; }
+	Dimensions const& dimensions() const { return m_texture.dimensions; }
 
   private:
 	FFmpeg m_mpeg;
 	double m_videoGap;
 	Bitmap m_videoFrame;
-	Surface m_surface;
-	double m_surfaceTime;
+	Texture m_texture;
+	double m_textureTime;
 	double m_lastTime;
 	AnimValue m_alpha;
 };

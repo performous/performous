@@ -48,10 +48,10 @@ void ScreenPlaylist::prepare() {
 void ScreenPlaylist::reloadGL() {
 	theme = std::make_unique<ThemePlaylistScreen>();
 	m_menuTheme = std::make_unique<ThemeInstrumentMenu>();
-	m_singCover = std::make_unique<Surface>(findFile("no_cover.svg"));
-	m_instrumentCover = std::make_unique<Surface>(findFile("instrument_cover.svg"));
-	m_bandCover = std::make_unique<Surface>(findFile("band_cover.svg"));
-	m_danceCover = std::make_unique<Surface>(findFile("dance_cover.svg"));
+	m_singCover = std::make_unique<Texture>(findFile("no_cover.svg"));
+	m_instrumentCover = std::make_unique<Texture>(findFile("instrument_cover.svg"));
+	m_bandCover = std::make_unique<Texture>(findFile("band_cover.svg"));
+	m_danceCover = std::make_unique<Texture>(findFile("dance_cover.svg"));
 }
 
 void ScreenPlaylist::exit() {
@@ -102,7 +102,7 @@ void ScreenPlaylist::manageEvent(SDL_Event) {
 
 void ScreenPlaylist::draw() {
 	Game* gm = Game::getSingletonPtr();
-	if (!m_background || m_background->empty()) m_background = std::make_unique<Surface>(m_backgrounds.getRandom());
+	if (!m_background || m_background->empty()) m_background = std::make_unique<Texture>(m_backgrounds.getRandom());
 	m_background->draw();
 	if (m_nextTimer.get() == 0.0 && keyPressed == false) {
 		Screen* s = gm->getScreen("Sing");
@@ -131,7 +131,7 @@ void ScreenPlaylist::draw() {
 	auto const& playlist = gm->getCurrentPlayList().getList();
 	for (unsigned i = playlist.size() - 1; i < playlist.size(); --i) {
 		if(i < 9) { //only draw the first 9 covers
-			Surface& s = getCover(*playlist[i]);
+			Texture& s = getCover(*playlist[i]);
 			float pos =  i / std::max<float>(9, 9);
 			using namespace glmath;
 			Transform trans(
@@ -144,9 +144,9 @@ void ScreenPlaylist::draw() {
 	}
 }
 
-Surface* ScreenPlaylist::loadSurfaceFromMap(fs::path path) {
+Texture* ScreenPlaylist::loadTextureFromMap(fs::path path) {
 	if(m_covers.find(path) == m_covers.end()) {
-		std::pair<fs::path, std::unique_ptr<Surface>> kv = std::make_pair(path, std::make_unique<Surface>(path));
+		std::pair<fs::path, std::unique_ptr<Texture>> kv = std::make_pair(path, std::make_unique<Texture>(path));
 		m_covers.insert(std::move(kv));
 	}
 	try {
@@ -155,12 +155,12 @@ Surface* ScreenPlaylist::loadSurfaceFromMap(fs::path path) {
 	return nullptr;
 }
 
-Surface& ScreenPlaylist::getCover(Song const& song) {
-	Surface* cover = nullptr;
+Texture& ScreenPlaylist::getCover(Song const& song) {
+	Texture* cover = nullptr;
 	// Fetch cover image from cache or try loading it
-	if (!song.cover.empty()) cover = loadSurfaceFromMap(song.cover);
+	if (!song.cover.empty()) cover = loadTextureFromMap(song.cover);
 	// Fallback to background image as cover if needed
-	if (!cover && !song.background.empty()) cover = loadSurfaceFromMap(song.background);
+	if (!cover && !song.background.empty()) cover = loadTextureFromMap(song.background);
 	// Use empty cover
 	if (!cover) {
 		if(song.hasDance()) {

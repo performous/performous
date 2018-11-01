@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <sstream>
 
-#include "surface.hh"
+#include "texture.hh"
 
 // TODO: test & fix faces that doesn't have texcoords in the file
 // TODO: group handling for loader

@@ -69,7 +69,7 @@ class LayoutSinger {
 	NoteGraph m_noteGraph;
 	Notes::const_iterator m_lyricit;
 	std::deque<LyricRow> m_lyrics;
-	std::unique_ptr<Surface> m_player_icon;
+	std::unique_ptr<Texture> m_player_icon;
 	std::unique_ptr<SvgTxtThemeSimple> m_score_text[4];
 	std::unique_ptr<SvgTxtThemeSimple> m_line_rank_text[4];
 	Database& m_database;

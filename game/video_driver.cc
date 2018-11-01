@@ -104,7 +104,6 @@ void Window::createShaders() {
 		if (epoxy_has_gl_extension("GL_ARB_viewport_array")) {
 		// Compile geometry shaders when stereo is requested
 		shader("color").compileFile(findFile("shaders/stereo3d.geom"));
-		shader("surface").compileFile(findFile("shaders/stereo3d.geom"));
 		shader("texture").compileFile(findFile("shaders/stereo3d.geom"));
 		shader("3dobject").compileFile(findFile("shaders/stereo3d.geom"));
 		shader("dancenote").compileFile(findFile("shaders/stereo3d.geom"));
@@ -117,12 +116,6 @@ void Window::createShaders() {
 
 	shader("color")
 	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
-	  .compileFile(findFile("shaders/core.vert"))
-	  .compileFile(findFile("shaders/core.frag"))
-	  .link()
-	  .bindUniformBlocks();
-	shader("surface")
-	  .addDefines("#define ENABLE_TEXTURING\n")
 	  .compileFile(findFile("shaders/core.vert"))
 	  .compileFile(findFile("shaders/core.frag"))
 	  .link()

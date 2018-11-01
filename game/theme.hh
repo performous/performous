@@ -1,7 +1,7 @@
 #pragma once
 
 #include "opengl_text.hh"
-#include "surface.hh"
+#include "texture.hh"
 #include <string>
 
 /// abstract theme class
@@ -13,7 +13,7 @@ protected:
 	Theme(fs::path const& path); ///< creates theme from path
 public:
 	/// background image for theme
-	Surface bg;
+	Texture bg;
 };
 
 /// theme for song selection
@@ -35,9 +35,9 @@ class ThemePractice: public Theme {
 public:
 	ThemePractice();
 	/// note
-	Surface note;
+	Texture note;
 	/// sharp sign
-	Surface sharp;
+	Texture sharp;
 	/// note name text
 	SvgTxtTheme note_txt;
 };
@@ -47,9 +47,9 @@ class ThemeSing: public Theme {
 public:
 	ThemeSing();
 	/// top background
-	Surface bg_top;
+	Texture bg_top;
 	/// bottom background
-	Surface bg_bottom;
+	Texture bg_bottom;
 	/// current lyrics line
 	SvgTxtTheme lyrics_now;
 	/// next lyrics line
@@ -67,13 +67,13 @@ public:
 	/// device item
 	SvgTxtTheme device;
 	/// device item background
-	Surface device_bg;
+	Texture device_bg;
 	/// comment text
 	SvgTxtTheme comment;
 	/// comment background
-	Surface comment_bg;
+	Texture comment_bg;
 	/// back highlight for selected option
-	Surface back_h;
+	Texture back_h;
 };
 
 /// theme for intro screen
@@ -81,7 +81,7 @@ class ThemeIntro: public Theme {
 public:
 	ThemeIntro();
 	/// back highlight for selected option
-	Surface back_h;
+	Texture back_h;
 	/// menu option texts
 	std::map<std::string, std::unique_ptr<SvgTxtTheme>> options;
 	/// selected menu option text
@@ -93,9 +93,9 @@ public:
 	/// notice to remind people the webserver is active
 	SvgTxtTheme WebserverNotice;
 	/// configuration comment background
-	Surface comment_bg;
+	Texture comment_bg;
 	/// configuration comment background (short tip)
-	Surface short_comment_bg;
+	Texture short_comment_bg;
 };
 
 /// theme for instrument menu
@@ -103,7 +103,7 @@ class ThemeInstrumentMenu: public Theme {
 public:
 	ThemeInstrumentMenu();
 	/// back highlight for selected option
-	Surface back_h;
+	Texture back_h;
 	/// menu option texts
 	std::map<std::string, std::unique_ptr<SvgTxtTheme>> options;
 	/// menu selected option text
@@ -111,7 +111,7 @@ public:
 	/// menu comment text
 	SvgTxtTheme comment;
 	/// menu comment background
-	//Surface comment_bg;
+	//Texture comment_bg;
 	/// get a cached option test
 	SvgTxtTheme& getCachedOption(const std::string& text);
 };
@@ -129,7 +129,7 @@ public:
 	/// configuration comment text (short tip)
 	SvgTxtTheme short_comment;
 	/// configuration comment background
-	Surface comment_bg;
+	Texture comment_bg;
 	/// configuration comment background (short tip)
-	Surface short_comment_bg;
+	Texture short_comment_bg;
 };

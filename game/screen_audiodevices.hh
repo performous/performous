@@ -35,8 +35,8 @@ class ScreenAudioDevices: public Screen {
 	unsigned int m_selected_column;
 	portaudio::DeviceInfos m_devs;
 	std::vector<Channel> m_channels;
-	std::unique_ptr<Surface> m_selector;
-	std::unique_ptr<Surface> m_mic_icon;
-	std::unique_ptr<Surface> m_pdev_icon;
+	std::unique_ptr<Texture> m_selector;
+	std::unique_ptr<Texture> m_mic_icon;
+	std::unique_ptr<Texture> m_pdev_icon;
 };
 

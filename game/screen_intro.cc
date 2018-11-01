@@ -163,10 +163,10 @@ SvgTxtTheme& ScreenIntro::getTextObject(std::string const& txt) {
 }
 
 void ScreenIntro::populateMenu() {
-	MenuImage imgSing(new Surface(findFile("intro_sing.svg")));
-	MenuImage imgPractice(new Surface(findFile("intro_practice.svg")));
-	MenuImage imgConfig(new Surface(findFile("intro_configure.svg")));
-	MenuImage imgQuit(new Surface(findFile("intro_quit.svg")));
+	MenuImage imgSing(new Texture(findFile("intro_sing.svg")));
+	MenuImage imgPractice(new Texture(findFile("intro_practice.svg")));
+	MenuImage imgConfig(new Texture(findFile("intro_configure.svg")));
+	MenuImage imgQuit(new Texture(findFile("intro_quit.svg")));
 	m_menu.clear();
 	m_menu.add(MenuOption(_("Perform"), _("Start performing!"), imgSing).screen("Songs"));
 	m_menu.add(MenuOption(_("Practice"), _("Check your skills or test the microphones"), imgPractice).screen("Practice"));

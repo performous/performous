@@ -7,14 +7,14 @@
 #include <string>
 #include <vector>
 
-class Surface;
+class Texture;
 class MenuOption;
 class Menu;
 
 typedef std::vector<MenuOption> MenuOptions;
 typedef std::vector<MenuOptions*> SubmenuStack;
 typedef std::function<void ()> MenuOptionCallback;
-typedef std::shared_ptr<Surface> MenuImage;
+typedef std::shared_ptr<Texture> MenuImage;
 
 /// Struct for menu options
 class MenuOption {

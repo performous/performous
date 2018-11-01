@@ -7,7 +7,7 @@
 #include "opengl_text.hh"
 #include "progressbar.hh"
 #include "screen.hh"
-#include "surface.hh"
+#include "texture.hh"
 #include "theme.hh"
 #include "instrumentgraph.hh"
 
@@ -39,7 +39,7 @@ class ScoreWindow {
   private:
 	Database& m_database;
 	AnimValue m_pos;
-	Surface m_bg;
+	Texture m_bg;
 	ProgressBar m_scoreBar;
 	SvgTxtThemeSimple m_score_text;
 	SvgTxtTheme m_score_rank;
@@ -88,12 +88,12 @@ class ScreenSing: public Screen {
 	std::shared_ptr<Song> m_song; /// Pointer to the current song
 	std::unique_ptr<ScoreWindow> m_score_window;
 	std::unique_ptr<ProgressBar> m_progress;
-	std::unique_ptr<Surface> m_background;
+	std::unique_ptr<Texture> m_background;
 	std::unique_ptr<Video> m_video;
 	std::unique_ptr<Webcam> m_cam;
-	std::unique_ptr<Surface> m_pause_icon;
-	std::unique_ptr<Surface> m_player_icon;
-	std::unique_ptr<Surface> m_help;
+	std::unique_ptr<Texture> m_pause_icon;
+	std::unique_ptr<Texture> m_player_icon;
+	std::unique_ptr<Texture> m_help;
 	std::unique_ptr<Engine> m_engine;
 	std::vector<std::unique_ptr<LayoutSinger>> m_layout_singer;
 	std::unique_ptr<ThemeInstrumentMenu> m_menuTheme;

@@ -6,7 +6,7 @@
 #include "animvalue.hh"
 #include "notes.hh"
 #include "controllers.hh"
-#include "surface.hh"
+#include "texture.hh"
 #include "opengl_text.hh"
 #include "glutil.hh"
 #include "menu.hh"
@@ -130,11 +130,11 @@ public:
 	Color const& color(unsigned fret) const;
 
 	// Media
-	Surface m_button;
-	Surface m_arrow_up;
-	Surface m_arrow_down;
-	Surface m_arrow_left;
-	Surface m_arrow_right;
+	Texture m_button;
+	Texture m_arrow_up;
+	Texture m_arrow_down;
+	Texture m_arrow_left;
+	Texture m_arrow_right;
 	SvgTxtTheme m_text;
 	std::unique_ptr<SvgTxtThemeSimple> m_popupText;
 	std::unique_ptr<ThemeInstrumentMenu> m_menuTheme;

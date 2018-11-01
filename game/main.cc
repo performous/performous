@@ -131,7 +131,7 @@ void mainLoop(std::string const& songlist) {
 	std::clog << "core/info: Loading assets." << std::endl;
 	TranslationEngine localization(PACKAGE);
 	Window window;
-	SurfaceLoader m_loader;
+	TextureLoader m_loader;
 	Backgrounds backgrounds;
 	Database database(getConfigDir() / "database.xml");
 	Songs songs(database, songlist);
@@ -199,9 +199,9 @@ void mainLoop(std::string const& songlist) {
 				// Display (and wait until next frame)
 				window.swap();
 				if (benchmarking) { glFinish(); prof("swap"); }
-				updateSurfaces();
+				updateTextures();
 				gm.prepareScreen();
-				if (benchmarking) { glFinish(); prof("surfaces"); }
+				if (benchmarking) { glFinish(); prof("textures"); }
 				if (benchmarking) {
 					++frames;
 					if (Clock::now() - time > 1s) {

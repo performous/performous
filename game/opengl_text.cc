@@ -118,25 +118,25 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	cairo_pop_group_to_source (dc.get());
 	cairo_set_operator(dc.get(),CAIRO_OPERATOR_OVER);
 	cairo_paint (dc.get());
-	// Load into m_surface (OpenGL texture)
+	// Load into m_texture (OpenGL texture)
 	Bitmap bitmap(cairo_image_surface_get_data(surface.get()));
 	bitmap.fmt = pix::INT_ARGB;
 	bitmap.linearPremul = true;
 	bitmap.resize(cairo_image_surface_get_width(surface.get()), cairo_image_surface_get_height(surface.get()));
-	m_surface.load(bitmap, true);
+	m_texture.load(bitmap, true);
 	// We don't want text quality multiplier m to affect rendering size...
 	m_x /= m;
 	m_y /= m;
 }
 
 void OpenGLText::draw() {
-	m_surface.draw();
+	m_texture.draw();
 }
 
 void OpenGLText::draw(Dimensions &_dim, TexCoords &_tex) {
-	m_surface.dimensions = _dim;
-	m_surface.tex = _tex;
-	m_surface.draw();
+	m_texture.dimensions = _dim;
+	m_texture.tex = _tex;
+	m_texture.draw();
 }
 
 namespace {

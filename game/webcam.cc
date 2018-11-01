@@ -114,12 +114,12 @@ void Webcam::render() {
 		bitmap.fmt = pix::BGR;
 		bitmap.buf.swap(m_frame.data);
 		bitmap.resize(m_frame.width, m_frame.height);
-		m_surface.load(bitmap);
+		m_texture.load(bitmap);
 		bitmap.buf.swap(m_frame.data);  // Get back our buffer (FIXME: do we need to?)
 		m_frameAvailable = false;
 	}
 	using namespace glmath;
 	Transform trans(scale(vec3(-1.0, 1.0, 1.0)));
-	m_surface.draw(); // Draw
+	m_texture.draw(); // Draw
 	#endif
 }

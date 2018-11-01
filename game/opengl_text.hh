@@ -1,7 +1,7 @@
 #pragma once
 
 #include "color.hh"
-#include "surface.hh"
+#include "texture.hh"
 #include "unicode.hh"
 #include <pango/pangocairo.h>
 #include <vector>
@@ -69,12 +69,12 @@ public:
 	/// @return y
 	double y() const { return m_y; }
 	/// @returns dimension of texture
-	Dimensions& dimensions() { return m_surface.dimensions; }
+	Dimensions& dimensions() { return m_texture.dimensions; }
 
 private:
 	double m_x;
 	double m_y;
-	Surface m_surface;
+	Texture m_texture;
 };
 
 /// themed svg texts (simple)

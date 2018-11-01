@@ -1,6 +1,6 @@
 #pragma once
 
-#include "surface.hh"
+#include "texture.hh"
 #include "video_driver.hh"
 
 /// Frame Buffer Object class
