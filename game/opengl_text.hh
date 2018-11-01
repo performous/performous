@@ -2,6 +2,8 @@
 
 #include "color.hh"
 #include "surface.hh"
+#include "unicode.hh"
+#include <pango/pangocairo.h>
 #include <vector>
 
 /// Load custom fonts from current theme and data folders
@@ -24,16 +26,29 @@ struct TZoomText {
  * the font{family,style,weight,align} are the one found into SVGs
  */
 struct TextStyle {
+	cairo_line_join_t LineJoin() {	///< convert svg string to cairo enum.
+		if (UnicodeUtil::toLower(stroke_linejoin) == "round") return CAIRO_LINE_JOIN_ROUND;
+		if (UnicodeUtil::toLower(stroke_linejoin) == "bevel") return CAIRO_LINE_JOIN_BEVEL;	
+		return CAIRO_LINE_JOIN_MITER;
+	};
+	cairo_line_cap_t LineCap() {	///< convert svg string to cairo enum.
+		if (UnicodeUtil::toLower(stroke_linecap) == "round") return CAIRO_LINE_CAP_ROUND;
+		if (UnicodeUtil::toLower(stroke_linecap) == "square") return CAIRO_LINE_CAP_SQUARE;	
+		return CAIRO_LINE_CAP_BUTT;
+	};
 	Color fill_col; ///< fill color
 	Color stroke_col; ///< stroke color
 	double stroke_width; ///< stroke thickness
+	double stroke_miterlimit; ///< stroke miter limit
 	double fontsize; ///< fontsize
 	std::string fontfamily; ///< fontfamily
 	std::string fontstyle; ///< fontstyle
 	std::string fontweight; ///< fontweight
 	std::string fontalign; ///< alignment
+	std::string	stroke_linejoin; ///< stroke line-join type
+	std::string	stroke_linecap; ///< stroke line-join type
 	std::string text; ///< text
-	TextStyle(): stroke_width(), fontsize() {}
+	TextStyle(): stroke_width(), stroke_miterlimit(1.0), fontsize() {}
 };
 
 /// this class will enable to create a texture from a themed text structure

@@ -3,7 +3,6 @@
 #include "libxml++-impl.hh"
 
 #include "fontconfig/fontconfig.h"
-#include <pango/pangocairo.h>
 #include <cmath>
 #include <iostream>
 #include <sstream>
@@ -107,6 +106,11 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	}
 	// Render text border
 	if (_text.stroke_col.a > 0.0) {
+		// Use proper line-joins and caps.
+		cairo_set_line_join (dc.get(), _text.LineJoin());
+		cairo_set_line_cap (dc.get(), _text.LineCap());
+		cairo_set_line_join (dc.get(), _text.LineJoin());
+		cairo_set_miter_limit(dc.get(), _text.stroke_miterlimit);
 		cairo_set_line_width(dc.get(), border);
 		cairo_set_source_rgba(dc.get(), _text.stroke_col.r, _text.stroke_col.g, _text.stroke_col.b, _text.stroke_col.a);
 		cairo_stroke(dc.get());
@@ -170,6 +174,9 @@ namespace {
 			else if (token == "font-weight") std::getline(iss2, _theme.fontweight);
 			else if (token == "stroke-width") iss2 >> _theme.stroke_width;
 			else if (token == "stroke-opacity") iss2 >> _theme.stroke_col.a;
+			else if (token == "stroke-linejoin") iss2 >> _theme.stroke_linejoin;
+			else if (token == "stroke-miterlimit") iss2 >> _theme.stroke_miterlimit;
+			else if (token == "stroke-linecap") iss2 >> _theme.stroke_linecap;
 			else if (token == "fill-opacity") iss2 >> _theme.fill_col.a;
 			else if (token == "fill") iss2 >> _theme.fill_col;
 			else if (token == "stroke") iss2 >> _theme.stroke_col;
