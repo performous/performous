@@ -63,7 +63,7 @@
     <text
        x="400"
        y="575.25488"
-       style="font-size:30px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#d3d7cf;stroke:#00ff00;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;display:inline;font-family:Goblin"
+       style="font-size:30px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#d3d7cf;stroke:#000000ff;stroke-width:2.0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:1.0;stroke-dasharray:none;stroke-dashoffset:0;display:inline;font-family:Goblin"
        id="text6611"
        xml:space="preserve"><tspan
          x="400"
