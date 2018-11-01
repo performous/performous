@@ -94,6 +94,8 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	  cairo_destroy);
 	// Keep things sharp and fast, we scale with OpenGL anyway...
 	cairo_set_antialias(dc.get(), CAIRO_ANTIALIAS_NONE);
+	cairo_push_group_with_content (dc.get(), CAIRO_CONTENT_COLOR_ALPHA);
+	cairo_set_operator(dc.get(),CAIRO_OPERATOR_SOURCE);
 	// Add Pango line and path to proper position on the DC
 	cairo_move_to(dc.get(), 0.5 * border, 0.5 * border);  // Margins needed for border stroke to fit in
 	pango_cairo_update_layout(dc.get(), layout.get());
@@ -109,6 +111,9 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 		cairo_set_source_rgba(dc.get(), _text.stroke_col.r, _text.stroke_col.g, _text.stroke_col.b, _text.stroke_col.a);
 		cairo_stroke(dc.get());
 	}
+	cairo_pop_group_to_source (dc.get());
+	cairo_set_operator(dc.get(),CAIRO_OPERATOR_OVER);
+	cairo_paint (dc.get());
 	// Load into m_surface (OpenGL texture)
 	Bitmap bitmap(cairo_image_surface_get_data(surface.get()));
 	bitmap.fmt = pix::INT_ARGB;
