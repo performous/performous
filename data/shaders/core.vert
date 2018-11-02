@@ -10,7 +10,7 @@ layout(location = 3) in vec4 vertColor;
 layout (std140) uniform shaderMatrices {
 	mat4 projMatrix;
 	mat4 mvMatrix;
-	mat3 normalMatrix;
+	mat4 normalMatrix;
 	mat4 colorMatrix;
 };
 
@@ -27,7 +27,7 @@ void main() {
 	gl_Position = projMatrix * posEye; // Vertex position in normalized device coordinates
 	vertex.lightDir = lightPos - posEye.xyz / posEye.w; // Light position relative to vertex
 	vertex.texCoord = vertTexCoord;
-	vertex.normal = normalize(normalMatrix * vertNormal);
+	vertex.normal = normalize(mat3(normalMatrix) * vertNormal);
 	vertex.color = vertColor;
 }
 

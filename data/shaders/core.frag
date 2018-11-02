@@ -14,7 +14,7 @@ out vec4 fragColor;
 layout (std140) uniform shaderMatrices {
 	mat4 projMatrix;
 	mat4 mvMatrix;
-	mat3 normalMatrix;
+	mat4 normalMatrix;
 	mat4 colorMatrix;
 };
 

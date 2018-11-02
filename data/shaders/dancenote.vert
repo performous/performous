@@ -8,7 +8,7 @@ layout(location = 3) in vec4 vertColor;
 layout (std140) uniform shaderMatrices {
 	mat4 projMatrix;
 	mat4 mvMatrix;
-	mat3 normalMatrix;
+	mat4 normalMatrix;
 	mat4 colorMatrix;
 };
 
@@ -46,7 +46,7 @@ out vData {
 
 void main() {
 	vertex.texCoord = vertTexCoord;
-	vertex.normal = shaderMatrices.normalMatrix * vertNormal;
+	vertex.normal = mat3(normalMatrix) * vertNormal;
 	vertex.color = vertColor;
 	vertex.lightDir = vec3(1,0,0);	
 	mat4 trans = scaleMat(scale);
