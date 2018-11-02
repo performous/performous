@@ -413,12 +413,13 @@ void Window::screenshot() {
 	Bitmap img;
 	int nativeW;
 	int nativeH;
-	SDL_GetWindowSize(screen, &nativeW, &nativeH);
+	SDL_GL_GetDrawableSize(screen, &nativeW, &nativeH);
 	img.width = nativeW;
 	img.height = nativeH;
 	unsigned stride = (img.width * 3 + 3) & ~3;  // Rows are aligned to 4 byte boundaries
 	img.buf.resize(stride * img.height);
 	img.fmt = pix::RGB;
+	img.linearPremul = true; // Not really, but this will use correct gamma.
 	img.bottomFirst = true;
 	// Get pixel data from OpenGL
 	glReadPixels(0, 0, img.width, img.height, GL_RGB, GL_UNSIGNED_BYTE, img.data());
