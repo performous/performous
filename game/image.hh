@@ -20,7 +20,7 @@ struct Bitmap {
 	std::vector<unsigned char> buf;  // Pixel data if owned by Bitmap
 	unsigned char* ptr;  // Pixel data if owned by someone else
 	unsigned width, height;
-	double ar;  // Aspect ratio
+	float ar;  // Aspect ratio
 	double timestamp;  // Used for video frames
 	pix::Format fmt;
 	bool linearPremul;  // Is the data linear RGB and premultiplied (as opposed to sRGB and non-premultiplied)
@@ -30,7 +30,7 @@ struct Bitmap {
 		if (!ptr) buf.resize(w * h * 4); else buf.clear();
 		width = w;
 		height = h;
-		ar = double(w) / h;
+		ar = float(w) / float(h);
 	}
 	void swap(Bitmap& b) {
 		if (ptr || b.ptr) throw std::logic_error("Cannot Bitmap::swap foreign pointers.");
