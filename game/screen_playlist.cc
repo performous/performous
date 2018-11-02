@@ -1,4 +1,4 @@
-#include "screen_playlist.hh"
+﻿#include "screen_playlist.hh"
 #include "menu.hh"
 #include "screen_sing.hh"
 #include "playlist.hh"
@@ -178,12 +178,18 @@ Surface& ScreenPlaylist::getCover(Song const& song) {
 
 void ScreenPlaylist::createEscMenu() {
 	overlay_menu.clear();
-	overlay_menu.add(MenuOption(_("Continue"), _("Continue playing")).call([]() {
+	overlay_menu.add(MenuOption(_("Continue"), _("Continue playing")).call([this]() {
 		Game* gm = Game::getSingletonPtr();
 		Screen* s = gm->getScreen("Sing");
 		ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
 		assert(ss);
-		ss->setSong(gm->getCurrentPlayList().getNext());
+		if(!gm->getCurrentPlayList().isEmpty()) {
+			ss->setSong(gm->getCurrentPlayList().getNext());
+		} else {
+			m_songs.setFilter("");
+			auto randomsong = std::rand() % m_songs.size();
+			ss->setSong(m_songs[randomsong]);
+		}
 		gm->activateScreen("Sing");
 	}));
 	overlay_menu.add(MenuOption(_("Add songs"), _("Open the song browser to add more songs")).screen("Songs"));
