@@ -92,7 +92,7 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	  cairo_create(surface.get()),
 	  cairo_destroy);
 	// Keep things sharp and fast, we scale with OpenGL anyway...
-	cairo_set_antialias(dc.get(), CAIRO_ANTIALIAS_NONE);
+	cairo_set_antialias(dc.get(), CAIRO_ANTIALIAS_FAST);
 	cairo_push_group_with_content (dc.get(), CAIRO_CONTENT_COLOR_ALPHA);
 	cairo_set_operator(dc.get(),CAIRO_OPERATOR_SOURCE);
 	// Add Pango line and path to proper position on the DC
