@@ -1,18 +1,25 @@
 #version 330 core
 
-uniform mat4 projMatrix;
-uniform mat4 mvMatrix;
-uniform mat3 normalMatrix;
-uniform int noteType;
-uniform float hitAnim;
-uniform float clock;
-uniform float scale;
-uniform vec2 position;
-
 layout(location = 0) in vec3 vertPos;
 layout(location = 1) in vec2 vertTexCoord;
 layout(location = 2) in vec3 vertNormal;
 layout(location = 3) in vec4 vertColor;
+
+layout (std140) uniform shaderMatrices {
+	mat4 projMatrix;
+	mat4 mvMatrix;
+	mat3 normalMatrix;
+	mat4 colorMatrix;
+};
+
+layout (std140) uniform danceNote {
+	int noteType;
+	float hitAnim;
+	float clock;
+	float scale;
+	vec2 position;
+	float padding[2];
+};
 
 out vData {
 	vec3 lightDir;
@@ -39,7 +46,7 @@ out vData {
 
 void main() {
 	vertex.texCoord = vertTexCoord;
-	vertex.normal = normalMatrix * vertNormal;
+	vertex.normal = shaderMatrices.normalMatrix * vertNormal;
 	vertex.color = vertColor;
 	vertex.lightDir = vec3(1,0,0);	
 	mat4 trans = scaleMat(scale);
