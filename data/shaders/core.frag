@@ -1,10 +1,6 @@
 #version 330 core
 
-out vec4 fragColor;
-
 //DEFINES
-
-uniform mat4 colorMatrix;
 
 in vData {
 	vec3 lightDir;
@@ -13,11 +9,29 @@ in vData {
 	vec4 color;
 } fragIn;
 
+out vec4 fragColor;
+
+layout (std140) uniform shaderMatrices {
+	mat4 projMatrix;
+	mat4 mvMatrix;
+	mat3 normalMatrix;
+	mat4 colorMatrix;
+};
+
+layout (std140) uniform lyricColors {
+	vec4 origFill;
+	vec4 origStroke;
+	vec4 newFill;
+	vec4 newStroke;
+};
+
+const vec4 epsilon = vec4(1e-10);
+
 #ifdef ENABLE_TEXTURING
 uniform sampler2D tex;
 #define TEXFUNC texture(tex, fragIn.texCoord)
 #else
-#define TEXFUNC vec4(1,1,1,1)
+#define TEXFUNC vec4(1.0)
 #endif
 
 #ifdef ENABLE_SPECULAR_MAP
@@ -29,6 +43,7 @@ uniform sampler2D emissionTex;
 #endif
 
 void main() {
+	mat4 colorMatrixInternal = colorMatrix;
 	vec4 frag = TEXFUNC;
 
 #ifdef ENABLE_VERTEX_COLOR
@@ -44,8 +59,9 @@ void main() {
 	float power = 1.0 - 0.02 * length(fragIn.lightDir);
 	frag = vec4(frag.rgb * power * diff, frag.a);
 #endif
-
-	frag = colorMatrix * frag; // Colorize
+	if (all(lessThanEqual(abs(frag - origFill),epsilon))) { frag = newFill; }
+	else if (all(lessThanEqual(abs(frag - origStroke),epsilon))) { frag = newStroke; }
+	else { frag = frag * colorMatrixInternal; }
 
 #ifdef ENABLE_LIGHTING
 	// Specular

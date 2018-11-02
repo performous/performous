@@ -1,8 +1,11 @@
 #version 330 core
 #extension GL_ARB_viewport_array : require
 
-uniform float sepFactor;
-uniform float z0;
+layout (std140) uniform stereoParams {
+	float sepFactor;
+	float z0;
+	float padding[2];
+};
 
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 6) out;
@@ -35,7 +38,7 @@ void main() {
 		passthru(1, i);
 		gl_Position = gl_in[i].gl_Position;
 		gl_Position.x -= (sepFactor * (gl_in[i].gl_Position.z - z0));
-		EmitVertex();	
+		EmitVertex();
 	}
 	EndPrimitive();
 	
@@ -44,7 +47,7 @@ void main() {
 		passthru(2, i);
 		gl_Position = gl_in[i].gl_Position;
 		gl_Position.x += (sepFactor * (gl_in[i].gl_Position.z - z0));
-		EmitVertex();	
+		EmitVertex();
 	}
 	EndPrimitive();
 }
