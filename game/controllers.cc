@@ -3,7 +3,7 @@
 #include "chrono.hh"
 #include "fs.hh"
 #include "libxml++-impl.hh"
-#include <boost/algorithm/string.hpp>
+#include "unicode.hh"
 #include <boost/filesystem.hpp>
 #include <SDL2/SDL_joystick.h>
 #include <deque>
@@ -237,7 +237,7 @@ struct Controllers::Impl {
 	Button findButton(DevType type, std::string name) {
 		Button button = GENERIC_UNASSIGNED;
 		if (name.empty()) return button;
-		boost::algorithm::to_upper(name);
+		name = UnicodeUtil::toUpper(name);
 		std::replace( name.begin(), name.end(), '-', '_');
 		// Try getting button first from devtype-specific, then generic names
 		buttonByName(type, name, button) || buttonByName(DEVTYPE_GENERIC, name, button) ||

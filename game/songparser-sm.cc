@@ -1,4 +1,5 @@
 #include "songparser.hh"
+#include "unicode.hh"
 
 #include <boost/algorithm/string.hpp>
 #include <algorithm>
@@ -72,14 +73,14 @@ bool SongParser::smParseField(std::string line) {
 		while (getline(line)) {
 			//<NotesType>:
 			std::string notestype = boost::trim_copy(line.substr(0, line.find_first_of(':')));
-			boost::to_lower(notestype);
+			notestype = UnicodeUtil::toLower(notestype);
 			//<Description>:
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
 			std::string description = boost::trim_copy(line.substr(0, line.find_first_of(':')));
 			//<DifficultyClass>:
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
 			std::string difficultyclass = boost::trim_copy(line.substr(0, line.find_first_of(':')));
-			boost::to_upper(difficultyclass);
+			difficultyclass = UnicodeUtil::toUpper(difficultyclass);
 			DanceDifficulty danceDifficulty = DIFFICULTYCOUNT;
 			if(difficultyclass == "BEGINNER") danceDifficulty = BEGINNER;
 			if(difficultyclass == "EASY") danceDifficulty = EASY;
