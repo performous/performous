@@ -59,6 +59,7 @@ Window::Window() {
 		throw std::runtime_error(std::string("SDL_Init failed: ") + SDL_GetError());
 	SDL_JoystickEventState(SDL_ENABLE);
 	{ // Setup GL attributes for context creation
+		SDL_SetHintWithPriority("SDL_HINT_VIDEO_HIGHDPI_DISABLED", "0", SDL_HINT_DEFAULT);
 		GLattrSetter attr_r(SDL_GL_RED_SIZE, 8);
 		GLattrSetter attr_g(SDL_GL_GREEN_SIZE, 8);
 		GLattrSetter attr_b(SDL_GL_BLUE_SIZE, 8);
@@ -71,6 +72,7 @@ Window::Window() {
 		GLattrSetter attr_glprof(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 		auto flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL;
 		if (config["graphic/highdpi"].b()) { flags |= SDL_WINDOW_ALLOW_HIGHDPI; }
+		else { SDL_SetHintWithPriority("SDL_HINT_VIDEO_HIGHDPI_DISABLED", "1", SDL_HINT_OVERRIDE); }
 		int width = config["graphic/window_width"].i();
 		int height = config["graphic/window_height"].i();
 		std::clog << "video/info: Create window " << width << "x" << height << std::endl;
@@ -302,7 +304,10 @@ void Window::view(unsigned num) {
 	// Setup views (with black bars for cropping)
 	int nativeW;
 	int nativeH;
-	SDL_GL_GetDrawableSize(screen, &nativeW, &nativeH);
+	if (std::stoi(SDL_GetHint("SDL_HINT_VIDEO_HIGHDPI_DISABLED")) == 1) {
+		SDL_GetWindowSize(screen, &nativeW, &nativeH);
+	}
+	else { SDL_GL_GetDrawableSize(screen, &nativeW, &nativeH); }
 	float vx = 0.5f * (nativeW - s_width);
 	float vy = 0.5f * (nativeH - s_height);
 	float vw = s_width, vh = s_height;
@@ -390,7 +395,11 @@ void Window::resize() {
 	}
 	// Get actual resolution
 	int nativeW, nativeH;
-	SDL_GL_GetDrawableSize(screen, &nativeW, &nativeH);
+
+	if (std::stoi(SDL_GetHint("SDL_HINT_VIDEO_HIGHDPI_DISABLED")) == 1) {
+		SDL_GetWindowSize(screen, &nativeW, &nativeH);
+	}
+	else { SDL_GL_GetDrawableSize(screen, &nativeW, &nativeH); }
 	s_width = nativeW;
 	s_height = nativeH;
 	// Enforce aspect ratio limits
@@ -406,7 +415,10 @@ void Window::screenshot() {
 	Bitmap img;
 	int nativeW;
 	int nativeH;
-	SDL_GL_GetDrawableSize(screen, &nativeW, &nativeH);
+	if (std::stoi(SDL_GetHint("SDL_HINT_VIDEO_HIGHDPI_DISABLED")) == 1) {
+		SDL_GetWindowSize(screen, &nativeW, &nativeH);
+	}
+	else { SDL_GL_GetDrawableSize(screen, &nativeW, &nativeH); }
 	img.width = nativeW;
 	img.height = nativeH;
 	unsigned stride = (img.width * 3 + 3) & ~3;  // Rows are aligned to 4 byte boundaries
