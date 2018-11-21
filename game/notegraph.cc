@@ -9,7 +9,7 @@ Dimensions dimensions; // Make a public member variable
 
 NoteGraph::NoteGraph(VocalTrack const& vocal):
   m_vocal(vocal),
-  m_notelines(findFile("notelines.svg")), m_wave(findFile("wave.png")),
+  m_notelines(findFile("notelines.svg")), m_wave(findFile("wave.svg")),
   m_star(findFile("star.svg")), m_star_hl(findFile("star_glow.svg")),
   m_notebar(findFile("notebar.svg")), m_notebar_hl(findFile("notebar_hi.svg")),
   m_notebarfs(findFile("notebarfs.svg")), m_notebarfs_hl(findFile("notebarfs-hl.png")),
