@@ -210,7 +210,7 @@ void Songs::reload_internal(fs::path const& parent) {
 					continue;
 				}
 
-				std::clog << "songs/notice: Found song not which was not in the cache: " << p.string() << std::endl;
+				std::clog << "songs/notice: Found song which was not in the cache: " << p.string() << std::endl;
 
 				std::shared_ptr<Song>s(new Song(p.parent_path(), p));
 				std::lock_guard<std::mutex> l(m_mutex);
