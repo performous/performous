@@ -6,132 +6,113 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-05 19:35+0100\n"
-"PO-Revision-Date: 2018-11-05 11:29+0100\n"
+"POT-Creation-Date: 2018-12-24 11:32+0100\n"
+"PO-Revision-Date: 2018-12-24 11:36+0100\n"
+"Last-Translator: Jose Riha <jose1711@gmail.com>\n"
 "Language-Team: \n"
+"Language: sk_SK\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _\n"
 "X-Poedit-Basepath: .\n"
 "X-Generator: Poedit 2.2\n"
-"Last-Translator: Jose Riha <jose1711@gmail.com> \n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n>=2 && n<=4 ? 1 : 2);\n"
-"Language: sk_SK\n"
 "X-Poedit-SearchPath-0: ../game\n"
 "X-Poedit-SearchPath-1: ../data\n"
 
-#: ../game/song.hh:25
-msgid "Guitar"
-msgstr "Gitara"
+#: ../data/performous.desktop:3
+msgid "Performous"
+msgstr "Performous"
 
-#: ../game/song.hh:25
-msgid "Coop guitar"
-msgstr "Gitara (režim spolupráce)"
+#: ../data/performous.desktop:4
+msgid "A karaoke game"
+msgstr "Karaoke hra"
 
-#: ../game/song.hh:25
-msgid "Rhythm guitar"
-msgstr "Rytmická gitara"
+#: ../data/performous.desktop:13
+#| msgid "Perform"
+msgid "performous"
+msgstr "performous"
 
-#: ../game/song.hh:25
-msgid "Bass"
-msgstr "Basová"
+#: ../data/performous.desktop:17
+msgid "song;music;dance;karaoke;microphone;sound;singing;"
+msgstr "song;music;dance;karaoke;microphone;sound;singing;"
 
-#: ../game/song.hh:25
-msgid "Drums"
-msgstr "Bicie"
-
-#: ../game/song.hh:25
-msgid "Vocals"
-msgstr "Spev"
-
-#: ../game/song.hh:25
-msgid "Harmonic 1"
-msgstr "Harmonika 1"
-
-#: ../game/song.hh:25
-msgid "Harmonic 2"
-msgstr "Harmonika 2"
-
-#: ../game/song.hh:25
-msgid "Harmonic 3"
-msgstr "Harmonika 3"
-
-#: ../game/configuration.cc:112
+#: ../game/configuration.cc:137
 msgid "Enabled"
 msgstr "Zapnuté"
 
-#: ../game/configuration.cc:112
+#: ../game/configuration.cc:137 ../game/menu.cc:64
 msgid "Disabled"
 msgstr "Vypnuté"
 
-#: ../game/configuration.cc:116
+#: ../game/configuration.cc:141
 #, c-format
 msgid "%d items"
 msgstr "%d položiek"
 
-#: ../game/dancegraph.cc:18
+#: ../game/dancegraph.cc:17
 msgid "Beginner"
 msgstr "Začiatočník"
 
-#: ../game/dancegraph.cc:18 ../game/guitargraph.cc:14
+#: ../game/dancegraph.cc:17 ../game/guitargraph.cc:13
 msgid "Easy"
 msgstr "Ľahké"
 
-#: ../game/dancegraph.cc:18 ../game/guitargraph.cc:14
+#: ../game/dancegraph.cc:17 ../game/guitargraph.cc:13
 msgid "Medium"
 msgstr "Stredne ťažké"
 
-#: ../game/dancegraph.cc:18 ../game/guitargraph.cc:14
+#: ../game/dancegraph.cc:17 ../game/guitargraph.cc:13
 msgid "Hard"
 msgstr "Ťažké"
 
-#: ../game/dancegraph.cc:18
+#: ../game/dancegraph.cc:17
 msgid "Challenge"
 msgstr "Výzva"
 
-#: ../game/dancegraph.cc:107 ../game/guitargraph.cc:193
+#: ../game/dancegraph.cc:106 ../game/guitargraph.cc:193
 msgid "Ready!"
 msgstr "Pripravený!"
 
-#: ../game/dancegraph.cc:107 ../game/guitargraph.cc:193
-#: ../game/screen_intro.cc:166
+#: ../game/dancegraph.cc:106 ../game/guitargraph.cc:193
+#: ../game/screen_intro.cc:171
 msgid "Start performing!"
 msgstr "Predveďte sa!"
 
-#: ../game/dancegraph.cc:118 ../game/guitargraph.cc:182
+#: ../game/dancegraph.cc:117 ../game/guitargraph.cc:182
 msgid "Select track"
 msgstr "Vyberte stopu"
 
-#: ../game/dancegraph.cc:134 ../game/guitargraph.cc:162
+#: ../game/dancegraph.cc:133 ../game/guitargraph.cc:162
 msgid "Select difficulty"
 msgstr "Vyber náročnosť"
 
-#: ../game/dancegraph.cc:137 ../game/guitargraph.cc:199
-#: ../game/instrumentgraph.cc:59 ../game/screen_intro.cc:184
-#: ../game/screen_sing.cc:94 ../game/screen_sing.cc:128
+#: ../game/dancegraph.cc:136 ../game/guitargraph.cc:199
+#: ../game/instrumentgraph.cc:59 ../game/screen_intro.cc:189
+#: ../game/screen_sing.cc:107 ../game/screen_sing.cc:152
 msgid "Quit"
 msgstr "Ukončiť"
 
-#: ../game/dancegraph.cc:137 ../game/guitargraph.cc:199
-#: ../game/instrumentgraph.cc:59 ../game/screen_sing.cc:94
-#: ../game/screen_sing.cc:128
+#: ../game/dancegraph.cc:136 ../game/guitargraph.cc:199
+#: ../game/instrumentgraph.cc:59 ../game/screen_sing.cc:107
+#: ../game/screen_sing.cc:152
 msgid "Exit to song browser"
 msgstr "Vrátiť sa na výber skladby"
 
-#: ../game/dancegraph.cc:248
+#: ../game/dancegraph.cc:247
 msgid "STOP!"
 msgstr "ZASTAV!"
 
-#: ../game/dancegraph.cc:321 ../game/guitargraph.cc:449
+#: ../game/dancegraph.cc:320 ../game/guitargraph.cc:449
 msgid "Streak!"
 msgstr "Šnúra!"
 
-#: ../game/guitargraph.cc:14
+#: ../game/guitargraph.cc:13
 msgid "Kids"
 msgstr "Deti"
 
-#: ../game/guitargraph.cc:14
+#: ../game/guitargraph.cc:13
 msgid "Expert"
 msgstr "Expert"
 
@@ -163,23 +144,23 @@ msgstr ""
 msgid "Mistakes ignored!"
 msgstr "Chyby ignorované!"
 
-#: ../game/guitargraph.cc:1104
+#: ../game/guitargraph.cc:1111
 msgid "God Mode Ready!"
 msgstr "Režim pre bohov pripravený!"
 
-#: ../game/guitargraph.cc:1105
+#: ../game/guitargraph.cc:1112
 msgid "Drum Fill!"
 msgstr "Dávka bicích!"
 
-#: ../game/guitargraph.cc:1108
+#: ../game/guitargraph.cc:1115
 msgid "Solo!"
 msgstr "Sólo!"
 
-#: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:125
+#: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:146
 msgid "Resume"
 msgstr "Pokračovať"
 
-#: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:125
+#: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:146
 msgid "Back to performing!"
 msgstr "Nazad k vystúpeniu!"
 
@@ -191,11 +172,11 @@ msgstr "Znova sa pripojiť"
 msgid "Change selections"
 msgstr "Zmena výberu"
 
-#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:126
+#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:147
 msgid "Restart"
 msgstr "Reštart"
 
-#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:126
+#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:147
 msgid ""
 "Start the song\n"
 "from the beginning"
@@ -203,31 +184,39 @@ msgstr ""
 "Spustiť skladbu\n"
 "od začiatku"
 
-#: ../game/main.cc:151
+#: ../game/main.cc:143
 msgid "Loading audio samples..."
 msgstr "Nahrávam zvukové vzorky..."
 
-#: ../game/main.cc:165
+#: ../game/main.cc:158
 msgid "Creating screens..."
 msgstr "Vytváram obrazovky..."
 
-#: ../game/main.cc:175
+#: ../game/main.cc:168
 msgid "Entering main menu"
 msgstr "Vstupujem do hlavnej ponuky"
 
-#: ../game/main.cc:177 ../game/screen_sing.cc:99
+#: ../game/main.cc:170 ../game/screen_sing.cc:80
 msgid "Loading complete"
 msgstr "Nahrávanie dokončené"
 
-#: ../game/main.cc:188
+#: ../game/main.cc:179
+msgid ""
+"Done Loading!\n"
+" Loaded "
+msgstr ""
+"Koniec načítavania!\n"
+" Načítaných "
+
+#: ../game/main.cc:185
 msgid "Screenshot taken!"
 msgstr "Snímka obrazovky vytvorená!"
 
-#: ../game/main.cc:191
+#: ../game/main.cc:188
 msgid "Screenshot failed!"
 msgstr "Chyba pri vytváraní snímky obrazovky!"
 
-#: ../game/screen_audiodevices.cc:54
+#: ../game/screen_audiodevices.cc:65
 msgid ""
 "It seems you have some manual configurations\n"
 "incompatible with this user interface.\n"
@@ -241,11 +230,11 @@ msgstr ""
 "všetky existujúce nastavenia audio zariadení.\n"
 "Zvyšné nastavenia sa uložia takisto."
 
-#: ../game/screen_audiodevices.cc:113
+#: ../game/screen_audiodevices.cc:124
 msgid "- Unassigned -"
 msgstr "- Nepriradené -"
 
-#: ../game/screen_audiodevices.cc:134
+#: ../game/screen_audiodevices.cc:145
 msgid ""
 "Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select "
 "to cancel. Ctrl + R to reset defaults"
@@ -254,7 +243,7 @@ msgstr ""
 "test konfigurácie a Esc/Select pre jej zrušenie. Ctrl - R pre reštart "
 "nastavení na východzie hodnoty"
 
-#: ../game/screen_audiodevices.cc:139
+#: ../game/screen_audiodevices.cc:150
 msgid ""
 "For advanced device configuration, use command line parameter --audio (use --"
 "audiohelp for details)."
@@ -262,7 +251,7 @@ msgstr ""
 "Pre pokročilú konfiguráciu zariadení použite prepínač --audio v príkazovom "
 "riadku (--audiohelp zobrazí podrobnosti)."
 
-#: ../game/screen_audiodevices.cc:187
+#: ../game/screen_audiodevices.cc:194
 msgid "Some devices failed to open!"
 msgstr "Chyba pri prístupe k niektorým zariadeniam!"
 
@@ -278,319 +267,358 @@ msgstr ""
 "\n"
 "Prosím nastavte nejaké pred tým, ako začnete hrať."
 
-#: ../game/screen_intro.cc:69
+#: ../game/screen_intro.cc:72 ../game/screen_paths.cc:36
 msgid "Settings saved as system defaults."
 msgstr "Nastavenia boli uložené ako východzie."
 
-#: ../game/screen_intro.cc:69
+#: ../game/screen_intro.cc:72 ../game/screen_paths.cc:36
 msgid "Settings saved."
 msgstr "Nastavenia uložené."
 
-#: ../game/screen_intro.cc:149
+#: ../game/screen_intro.cc:151
 msgid "Ctrl + S to save, Ctrl + R to reset defaults"
 msgstr "Ctrl + S pre uloženie, Ctrl + R pre reštart na východzie hodnoty"
 
-#: ../game/screen_intro.cc:166
+#: ../game/screen_intro.cc:171
 msgid "Perform"
 msgstr "Ukážte sa"
 
-#: ../game/screen_intro.cc:167
+#: ../game/screen_intro.cc:172
 msgid "Practice"
 msgstr "Cvičte"
 
-#: ../game/screen_intro.cc:167
+#: ../game/screen_intro.cc:172
 msgid "Check your skills or test the microphones"
 msgstr "Vyskúšajte svoje schopnosti alebo otestujte mikrofóny"
 
-#: ../game/screen_intro.cc:183
+#: ../game/screen_intro.cc:188
 msgid "Configure"
 msgstr "Nastavenia"
 
-#: ../game/screen_intro.cc:183
+#: ../game/screen_intro.cc:188
 msgid "Configure audio and game options"
 msgstr "Nastavenia zvuku a hry"
 
-#: ../game/screen_intro.cc:184
+#: ../game/screen_intro.cc:189
 msgid "Leave the game"
 msgstr "Opustiť hru"
 
-#: ../game/screen_paths.cc:19
+#: ../game/screen_intro.cc:202
 msgid ""
-"This tool is not yet available.\n"
-"Configure paths by adding them\n"
-"as command line parameters and\n"
-"then save them in configuration menu."
+"Webserver active!\n"
+" use a webbrowser\n"
+"and navigate to localhost:"
 msgstr ""
-"Tento nástroj ešte nie je dostupný.\n"
-"Nastavte cesty tak, že ich pridáte\n"
-"ako parametre v príkazovom riadku a\n"
-"potom ich uložte v ponuke s nastaveniami."
+"Webserver zapnutý!\n"
+" použite webový prehliadač\n"
+"a otvorte umiestnenie localhost:"
 
-#: ../game/screen_paths.cc:65
-msgid "Press any key to exit."
-msgstr "Ľubovoľný kláves ukončí hru."
-
-#: ../game/screen_paths.cc:71
-msgid "Windows users can also use ConfigureSongDirectory.bat script."
+#: ../game/screen_intro.cc:209
+msgid ""
+"Webserver active!\n"
+" connect to this computer\n"
+"using "
 msgstr ""
-"Používatelia Windows môžu tiež použiť skript ConfigureSongDirectory.bat."
+"Webserver zapnutý!\n"
+" pripojte sa k tomuto počítaču\n"
+"použitím "
 
-#: ../game/screen_players.cc:117
+#: ../game/screen_paths.cc:69
+msgid "Hide hidden folders"
+msgstr "Nezobrazovať skryté priečinky"
+
+#: ../game/screen_paths.cc:74
+msgid "Show hidden folders"
+msgstr "Zobrazovať skryté priečinky"
+
+#: ../game/screen_paths.cc:81
+msgid "Remove this folder"
+msgstr "Odstrániť tento priečinok"
+
+#: ../game/screen_paths.cc:81
+msgid "Remove current folder from song folders"
+msgstr "Odstrániť aktuálny priečinok zo zoznamu sledovaných priečinkov"
+
+#: ../game/screen_paths.cc:87
+msgid "Add this folder"
+msgstr "Pridať tento priečinok"
+
+#: ../game/screen_paths.cc:87
+msgid "Add current folder to song folders"
+msgstr "Pridať aktuálny priečinok ku sledovaným"
+
+#: ../game/screen_paths.cc:93
+msgid ".."
+msgstr ".. (vyššie)"
+
+#: ../game/screen_paths.cc:93
+msgid "Go up one folder"
+msgstr "Ísť o úroveň vyššie"
+
+#: ../game/screen_paths.cc:104
+msgid "Open folder"
+msgstr "Otvoriť priečinok"
+
+#: ../game/screen_players.cc:131
 msgid "No players found!"
 msgstr "Nenašiel som žiadnych hráčov!"
 
-#: ../game/screen_players.cc:118
+#: ../game/screen_players.cc:132
 msgid "Enter a name to create a new player."
 msgstr "Zadajte meno pre vytvorenie nového hráča."
 
-#: ../game/screen_players.cc:120
+#: ../game/screen_players.cc:134
 msgid "Press enter to create player!"
 msgstr "Stlačte Enter pre vytvorenie hráča!"
 
-#: ../game/screen_players.cc:124
+#: ../game/screen_players.cc:138
 msgid "No players worth mentioning!"
 msgstr "Žiadni hráči, ktorí by stáli za zmienku!"
 
-#: ../game/screen_players.cc:129
+#: ../game/screen_players.cc:143
 msgid "You reached %1% points!"
 msgstr "Dosiahli ste %1% bodov!"
 
-#: ../game/screen_players.cc:130
+#: ../game/screen_players.cc:144
 msgid "Change player with arrow keys."
 msgstr "Hráčov vymeníte pomocou kurzorových šípok."
 
-#: ../game/screen_players.cc:131
+#: ../game/screen_players.cc:145
 msgid "Name:"
 msgstr "Meno:"
 
-#: ../game/screen_players.cc:134
+#: ../game/screen_players.cc:148
 msgid "Type text to filter or create a new player."
 msgstr "Zadajte text pre filtrovanie alebo vytvorenie nového hráča."
 
-#: ../game/screen_players.cc:134
+#: ../game/screen_players.cc:148
 msgid "Search Text:"
 msgstr "Text pre hľadanie:"
 
-#: ../game/screen_playlist.cc:24 ../game/screen_sing.cc:47
+#: ../game/screen_playlist.cc:19 ../game/screen_sing.cc:45
 msgid "Initializing webcam..."
 msgstr "Nastavujem webovú kameru..."
 
-#: ../game/screen_playlist.cc:166 ../game/screen_playlist.cc:309
+#: ../game/screen_playlist.cc:38
+msgid "Loading song timestamps..."
+msgstr "Nahrávam časové značky piesne..."
+
+#: ../game/screen_playlist.cc:181 ../game/screen_playlist.cc:352
 msgid "Continue"
 msgstr "Pokračovať"
 
-#: ../game/screen_playlist.cc:166
+#: ../game/screen_playlist.cc:181
 msgid "Continue playing"
 msgstr "Pokračovať v hre"
 
-#: ../game/screen_playlist.cc:174
+#: ../game/screen_playlist.cc:195
 msgid "Add songs"
 msgstr "Pridať skladby"
 
-#: ../game/screen_playlist.cc:174
+#: ../game/screen_playlist.cc:195
 msgid "Open the song browser to add more songs"
 msgstr "Otvoriť prehliadač skladieb a umožniť ich pridanie"
 
-#: ../game/screen_playlist.cc:175 ../game/screen_songs.cc:520
+#: ../game/screen_playlist.cc:196 ../game/screen_songs.cc:537
 msgid "Shuffle"
 msgstr "Zamiešať"
 
-#: ../game/screen_playlist.cc:175
+#: ../game/screen_playlist.cc:196
 msgid "Randomize the order of the playlist"
 msgstr "Náhodne zamiešať poradie skladieb v playliste"
 
-#: ../game/screen_playlist.cc:181
+#: ../game/screen_playlist.cc:202
 msgid "Clear and exit"
 msgstr "Vyčistiť a ukončiť"
 
-#: ../game/screen_playlist.cc:181
+#: ../game/screen_playlist.cc:202
 msgid "Remove all the songs from the list"
 msgstr "Odstrániť všetky skladby zo zoznamu"
 
-#: ../game/screen_playlist.cc:187 ../game/screen_playlist.cc:350
-#: ../game/screen_songs.cc:533
+#: ../game/screen_playlist.cc:208 ../game/screen_playlist.cc:393
+#: ../game/screen_songs.cc:550
 msgid "Back"
 msgstr "Naspäť"
 
-#: ../game/screen_playlist.cc:187 ../game/screen_playlist.cc:350
+#: ../game/screen_playlist.cc:208 ../game/screen_playlist.cc:393
 msgid "Back to playlist viewer"
 msgstr "Naspäť do režimu zobrazenia playlistu"
 
-#: ../game/screen_playlist.cc:294
+#: ../game/screen_playlist.cc:335
 msgid "Press enter to view song options"
 msgstr "Stlačte Enter pre zobrazenie možností skladby"
 
-#: ../game/screen_playlist.cc:301
+#: ../game/screen_playlist.cc:344
 msgid "View more options"
 msgstr "Zobraziť dalšie možnosti"
 
-#: ../game/screen_playlist.cc:301
+#: ../game/screen_playlist.cc:344
 msgid "View general playlist settings"
 msgstr "Zobraziť všeobecné nastavenia playlistu"
 
-#: ../game/screen_playlist.cc:309
+#: ../game/screen_playlist.cc:352
 msgid "Play first"
 msgstr "Hrať ako prvú"
 
-#: ../game/screen_playlist.cc:311
+#: ../game/screen_playlist.cc:354
 msgid "Ignore the playlist's order and play this song first"
 msgstr "Ignorovať poradie v playliste a túto skladbu hrať ako prvú"
 
-#: ../game/screen_playlist.cc:312
+#: ../game/screen_playlist.cc:355
 msgid "Start the song already!"
 msgstr "Spusti už tú skladbu!"
 
-#: ../game/screen_playlist.cc:321
+#: ../game/screen_playlist.cc:364
 msgid "Remove"
 msgstr "Odstrániť"
 
-#: ../game/screen_playlist.cc:321
+#: ../game/screen_playlist.cc:364
 msgid "Remove this song from the list"
 msgstr "Odstrániť skladbu zo zoznamu"
 
-#: ../game/screen_playlist.cc:333
+#: ../game/screen_playlist.cc:376
 msgid "Move up"
 msgstr "Presunúť vyššie"
 
-#: ../game/screen_playlist.cc:333
+#: ../game/screen_playlist.cc:376
 msgid "Move this song up the list"
 msgstr "Presunúť skladbu v zozname o pozíciu vyššie"
 
-#: ../game/screen_playlist.cc:343
+#: ../game/screen_playlist.cc:386
 msgid "Move Down"
 msgstr "Presunúť nižšie"
 
-#: ../game/screen_playlist.cc:343
+#: ../game/screen_playlist.cc:386
 msgid "Move this song down the list"
 msgstr "Presunúť skladbu v zozname o pozíciu nižšie"
 
-#: ../game/screen_sing.cc:54
+#: ../game/screen_sing.cc:52
 msgid "Loading video..."
 msgstr "Nahrávam video..."
 
-#: ../game/screen_sing.cc:61
+#: ../game/screen_sing.cc:58
 msgid "Loading song..."
 msgstr "Nahrávam skladbu..."
 
-#: ../game/screen_sing.cc:68
+#: ../game/screen_sing.cc:65
 msgid "Song contains broken tracks!"
 msgstr "Skladba obsahuje rozbité stopy!"
 
-#: ../game/screen_sing.cc:73
+#: ../game/screen_sing.cc:70
 msgid "Loading menu..."
 msgstr "Nahrávam ponuku..."
 
-#: ../game/screen_sing.cc:78
+#: ../game/screen_sing.cc:86
 msgid "Start"
 msgstr "Štart"
 
-#: ../game/screen_sing.cc:78
+#: ../game/screen_sing.cc:86
 msgid "Start performing"
 msgstr "Spusti hru"
 
-#: ../game/screen_sing.cc:82
+#: ../game/screen_sing.cc:89
 msgid "Duet mode"
 msgstr "Režim duetu"
 
-#: ../game/screen_sing.cc:83
+#: ../game/screen_sing.cc:90
 msgid "Normal mode"
 msgstr "Normálny režim"
 
-#: ../game/screen_sing.cc:84
+#: ../game/screen_sing.cc:91
 msgid "Switch between duet and regular singing mode"
 msgstr "Prepnúť medzi duetom a klasickým spevom"
 
-#: ../game/screen_sing.cc:92
+#: ../game/screen_sing.cc:101
 msgid "Change vocal track"
 msgstr "Zmeniť stopu so spevom"
 
-#: ../game/screen_sing.cc:127
+#: ../game/screen_sing.cc:150
 msgid "Skip"
 msgstr "Preskočiť"
 
-#: ../game/screen_sing.cc:127
+#: ../game/screen_sing.cc:150
 msgid "Skip current song"
 msgstr "Preskočiť aktuálnu skladbu"
 
-#: ../game/screen_sing.cc:279
+#: ../game/screen_sing.cc:305
 msgid "Press UP to join dance!"
 msgstr "Stlačte HORE a pridajte sa k tancu!"
 
-#: ../game/screen_sing.cc:279
+#: ../game/screen_sing.cc:305
 msgid "Step UP to join!"
 msgstr "Stlačte HORE  a pridajte sa!"
 
-#: ../game/screen_sing.cc:284
+#: ../game/screen_sing.cc:310
 msgid "Press 1 to join guitar!"
 msgstr "Stlačte 1 a pridajte sa k hre na gitaru!"
 
-#: ../game/screen_sing.cc:284
+#: ../game/screen_sing.cc:310
 msgid "Press GREEN to join!"
 msgstr "Stlačte ZELENÚ a pridajte sa!"
 
-#: ../game/screen_sing.cc:289
+#: ../game/screen_sing.cc:315
 msgid "Press SPACE to join drums!"
 msgstr "Stlačte MEDZERU a pridajte sa s bicími!"
 
-#: ../game/screen_sing.cc:289
+#: ../game/screen_sing.cc:315
 msgid "KICK to join!"
 msgstr "KOPNITE a pridajte sa!"
 
-#: ../game/screen_sing.cc:517
+#: ../game/screen_sing.cc:551
 msgid "   ENTER to skip instrumental break"
 msgstr " Inštrumentálnu časť preskočíte ENTEROM"
 
-#: ../game/screen_sing.cc:521 ../game/screen_sing.cc:535
+#: ../game/screen_sing.cc:555 ../game/screen_sing.cc:569
 msgid "   Autoplay enabled"
 msgstr " Automatické prehrávanie zapnuté"
 
-#: ../game/screen_sing.cc:524 ../game/screen_sing.cc:532
+#: ../game/screen_sing.cc:558 ../game/screen_sing.cc:566
 msgid "   Remember to wait for grading!"
 msgstr " Počkajte ešte na hodnotenie!"
 
-#: ../game/screen_sing.cc:662
+#: ../game/screen_sing.cc:699
 msgid "No player!"
 msgstr "Žiaden hráč!"
 
-#: ../game/screen_sing.cc:669
+#: ../game/screen_sing.cc:707
 msgid "Hit singer"
 msgstr "Spevák hitov"
 
-#: ../game/screen_sing.cc:670
+#: ../game/screen_sing.cc:708
 msgid "Lead singer"
 msgstr "Popredný spevák"
 
-#: ../game/screen_sing.cc:671 ../game/screen_sing.cc:677
-#: ../game/screen_sing.cc:683
+#: ../game/screen_sing.cc:709 ../game/screen_sing.cc:715
+#: ../game/screen_sing.cc:721
 msgid "Rising star"
 msgstr "Vychádzajúca hviezda"
 
-#: ../game/screen_sing.cc:672 ../game/screen_sing.cc:678
-#: ../game/screen_sing.cc:684
+#: ../game/screen_sing.cc:710 ../game/screen_sing.cc:716
+#: ../game/screen_sing.cc:722
 msgid "Amateur"
 msgstr "Amatér"
 
-#: ../game/screen_sing.cc:673 ../game/screen_sing.cc:685
+#: ../game/screen_sing.cc:711 ../game/screen_sing.cc:723
 msgid "Tone deaf"
 msgstr "Bez hudobného sluchu"
 
-#: ../game/screen_sing.cc:675
+#: ../game/screen_sing.cc:713
 msgid "Maniac"
 msgstr "Maniak"
 
-#: ../game/screen_sing.cc:676
+#: ../game/screen_sing.cc:714
 msgid "Hoofer"
 msgstr "Profík"
 
-#: ../game/screen_sing.cc:679
+#: ../game/screen_sing.cc:717
 msgid "Loser"
 msgstr "Lúzer"
 
-#: ../game/screen_sing.cc:681
+#: ../game/screen_sing.cc:719
 msgid "Virtuoso"
 msgstr "Virtuóz"
 
-#: ../game/screen_sing.cc:682
+#: ../game/screen_sing.cc:720
 msgid "Rocker"
 msgstr "Rocker"
 
@@ -646,515 +674,462 @@ msgstr "playlist začať touto skladbou!"
 msgid "open the playlist menu"
 msgstr "otvoriť ponuku playlistu"
 
-#: ../game/screen_songs.cc:513
+#: ../game/screen_songs.cc:530
 msgid "Play"
 msgstr "Hrať"
 
-#: ../game/screen_songs.cc:526
+#: ../game/screen_songs.cc:543
 msgid "View playlist"
 msgstr "Otvoriť playlist"
 
-#: ../game/screen_songs.cc:527
+#: ../game/screen_songs.cc:544
 msgid "Clear playlist"
 msgstr "Vymazať playlist"
 
-#: ../game/songparser-xml.cc:109
+#: ../game/song.hh:25
+msgid "Guitar"
+msgstr "Gitara"
+
+#: ../game/song.hh:25
+msgid "Coop guitar"
+msgstr "Gitara (režim spolupráce)"
+
+#: ../game/song.hh:25
+msgid "Rhythm guitar"
+msgstr "Rytmická gitara"
+
+#: ../game/song.hh:25
+msgid "Bass"
+msgstr "Basová"
+
+#: ../game/song.hh:25
+msgid "Drums"
+msgstr "Bicie"
+
+#: ../game/song.hh:25
+msgid "Vocals"
+msgstr "Spev"
+
+#: ../game/song.hh:25
+msgid "Harmonic 1"
+msgstr "Harmonika 1"
+
+#: ../game/song.hh:25
+msgid "Harmonic 2"
+msgstr "Harmonika 2"
+
+#: ../game/song.hh:25
+msgid "Harmonic 3"
+msgstr "Harmonika 3"
+
+#: ../game/songparser-xml.cc:102
 msgid "Together"
 msgstr "Spolu"
 
-#: ../game/songs.cc:191
+#: ../game/songs.cc:363
 msgid "show all songs"
 msgstr "zobraziť všetky skladby"
 
-#: ../game/songs.cc:192
+#: ../game/songs.cc:364
 msgid "has dance"
 msgstr "má tanec"
 
-#: ../game/songs.cc:193
+#: ../game/songs.cc:365
 msgid "has vocals"
 msgstr "má spev"
 
-#: ../game/songs.cc:194
+#: ../game/songs.cc:366
 msgid "has duet"
 msgstr "má duet"
 
-#: ../game/songs.cc:195
+#: ../game/songs.cc:367
 msgid "has guitar"
 msgstr "má gitaru"
 
-#: ../game/songs.cc:196
+#: ../game/songs.cc:368
 msgid "drums or keytar"
 msgstr "bicie alebo keytara"
 
-#: ../game/songs.cc:197
+#: ../game/songs.cc:369
 msgid "full band"
 msgstr "celá skupina"
 
-#: ../game/songs.cc:225
+#: ../game/songs.cc:397
 msgid "random order"
 msgstr "náhodné poradie"
 
-#: ../game/songs.cc:226
+#: ../game/songs.cc:398
 msgid "sorted by song"
 msgstr "zoradené podľa názvu skladby"
 
-#: ../game/songs.cc:227
+#: ../game/songs.cc:399
 msgid "sorted by artist"
 msgstr "zoradené podľa autora"
 
-#: ../game/songs.cc:228
+#: ../game/songs.cc:400
 msgid "sorted by edition"
 msgstr "zoradené podľa edície"
 
-#: ../game/songs.cc:229
+#: ../game/songs.cc:401
 msgid "sorted by genre"
 msgstr "zoradené podľa žánru"
 
-#: ../game/songs.cc:230
+#: ../game/songs.cc:402
 msgid "sorted by path"
 msgstr "zoradené podľa cesty"
 
-#: ../game/songs.cc:231
+#: ../game/songs.cc:403
 msgid "sorted by language"
 msgstr "zoradené podľa jazyku"
 
-#: ../data/config/schema.xml:19
-msgid "Game"
-msgstr "Hra"
-
-#: ../data/config/schema.xml:20
-msgid "Gameplay related options"
-msgstr "Voľby súvisiace s hrou"
-
-#: ../data/config/schema.xml:23
-msgid "Graphic"
-msgstr "Grafika"
-
-#: ../data/config/schema.xml:24
-msgid "Configure rendering and video settings"
-msgstr "Nastaviť vykresľovanie a prehrávanie videa"
-
-#: ../data/config/schema.xml:28
-msgid "Audio Devices"
-msgstr "Zvukové zariadenia"
-
-#: ../data/config/schema.xml:29
-msgid "Setup microphones and playback"
-msgstr "Nastaviť mikrofóny a prehrávanie audia"
-
-#: ../data/config/schema.xml:32
-msgid "Audio"
-msgstr "Audio"
-
-#: ../data/config/schema.xml:33
-msgid "Configure general audio settings"
-msgstr "Nastaviť všeobecné voľby audia"
-
-#: ../data/config/schema.xml:36
-msgid "Paths"
-msgstr "Cesty"
-
-#: ../data/config/schema.xml:37
-msgid "Setup song and data paths"
-msgstr "Nastaviť cesty pre skladby a údaje"
-
-#: ../data/config/schema.xml:48
-msgid "Karaoke mode"
-msgstr "Režim karaoke"
-
-#: ../data/config/schema.xml:49 ../data/config/schema.xml:57
-msgid "Hide pitch wave, notes and scoring."
-msgstr "Nezobrazovať vizualizáciu hlasu, noty a skóre."
-
-#: ../data/config/schema.xml:56
-msgid "Lyric highlight style"
-msgstr "Štýl zvýrazňovania textu"
-
-#: ../data/config/schema.xml:60
-msgid "Autoplay"
-msgstr "Automatické prehrávanie"
-
-#: ../data/config/schema.xml:61
-msgid "Keep playing random songs after the playlist is empty."
-msgstr "Po vyprázdnení playlistu pokračovať v prehrávaní náhodných skladieb."
-
-#: ../data/config/schema.xml:64
-msgid "Pitch waves"
-msgstr "Vizualizácia hlasu"
-
-#: ../data/config/schema.xml:65
-msgid "Enable singing pitch display (when not in karaoke mode)."
-msgstr "Povoliť zobrazenie výšky hlasu (ak nie je zapnutý režim karaoke)."
-
-#: ../data/config/schema.xml:70
-msgid "Theme"
-msgstr "Téma"
-
-#: ../data/config/schema.xml:71
-msgid "Name of the theme to use."
-msgstr "Názov témy, ktorá sa má použiť."
-
-#: ../data/config/schema.xml:74
-msgid "Keyboard as guitar"
-msgstr "Klávesnica miesto gitary"
-
-#: ../data/config/schema.xml:75
-msgid "Enable keyboard as guitar (Frets on Fire mode)."
-msgstr "Použiť klávesnicu ako gitaru (režim ako vo Frets on Fire)"
-
-#: ../data/config/schema.xml:78
-msgid "Keyboard as drumkit"
-msgstr "Klávesnica ako sada bicích"
-
-#: ../data/config/schema.xml:79
-msgid "Enable keyboard as drumkit."
-msgstr "Použiť klávesnicu ako sadu bicích."
-
-#: ../data/config/schema.xml:82
-msgid "Keyboard as dance pad"
-msgstr "Klávesnica ako tanečná podložka"
-
-#: ../data/config/schema.xml:83
-msgid "Enable keyboard as dance pad."
-msgstr "Použiť klávesnicu miesto tanečnej podložky."
-
-#: ../data/config/schema.xml:86
-msgid "Keyboard as keytar"
-msgstr "Klávesnica ako keytara"
-
-#: ../data/config/schema.xml:87
-msgid "Enable keyboard as keytar."
-msgstr "Použiť klávesnicu miesto keytary."
-
-#: ../data/config/schema.xml:94
-msgid "Force controller A's type"
-msgstr "Vynútiť typ ovládača A"
-
-#: ../data/config/schema.xml:95
-msgid ""
-"Override autodetection and force the first controller to the given type."
-msgstr ""
-"Ignorovať automatickú detekciu a vynútiť použitie prvého ovládača pre "
-"vybraný typ."
-
-#: ../data/config/schema.xml:102
-msgid "Force controller B's type"
-msgstr "Vynútiť typ ovládača B"
-
-#: ../data/config/schema.xml:103
-msgid ""
-"Override autodetection and force the second controller to the given type."
-msgstr ""
-"Ignorovať automatickú detekciu a vynútiť použitie druhého ovládača pre "
-"vybraný typ."
-
-#: ../data/config/schema.xml:110
-msgid "Force controller C's type"
-msgstr "Vynútiť typ ovládača C"
-
-#: ../data/config/schema.xml:111
-msgid ""
-"Override autodetection and force the third controller to the given type."
-msgstr ""
-"Ignorovať automatickú detekciu a vynútiť použitie tretieho ovládača pre "
-"vybraný typ."
-
-#: ../data/config/schema.xml:118
-msgid "Force controller D's type"
-msgstr "Vynútiť typ ovládača D"
-
-#: ../data/config/schema.xml:119
-msgid ""
-"Override autodetection and force the fourth controller to the given type."
-msgstr ""
-"Ignorovať automatickú detekciu a vynútiť použitie štvrtého ovládača pre "
-"vybraný typ."
-
-#: ../data/config/schema.xml:126
-msgid "Joystick configuration"
-msgstr "Konfigurácia joysticku"
-
-#: ../data/config/schema.xml:127
-msgid "Force joystick to some kind of instrument."
-msgstr "Vynútiť použitie joysticku pre nejaký druh nástroja."
-
-#: ../data/config/schema.xml:130
-msgid "Hardware MIDI input device"
-msgstr "Vstupné zariadenie MIDI"
-
-#: ../data/config/schema.xml:131
-msgid ""
-"Regex for matching the MIDI devices to use. The default is to use all "
-"available devices."
-msgstr ""
-"Regulárny výraz pre výber MIDI zariadenia. Štandardne sa použijú všetky "
-"dostupné zariadenia."
-
-#: ../data/config/schema.xml:146
-msgid "Fallback song encoding"
-msgstr "Záložné kódovanie textu"
-
-#: ../data/config/schema.xml:147
-msgid "Pick the text codec used for song files that are not UTF-8."
-msgstr "Vyberte kódovanie textu pre piesne, ktoré nie sú v kódovaní UTF-8."
-
-#: ../data/config/schema.xml:154
-msgid "Windowed width"
-msgstr "Šírka pri zobrazení v okne"
-
-#: ../data/config/schema.xml:155
-msgid "The width of the window."
-msgstr "Šírka okna."
-
-#: ../data/config/schema.xml:160
-msgid "Windowed height"
-msgstr "Výška pri zobrazení v okne"
-
-#: ../data/config/schema.xml:161
-msgid "The height of the window."
-msgstr "Výška okna."
-
-#: ../data/config/schema.xml:164
-msgid "Fullscreen mode"
-msgstr "Režim celej obrazovky"
-
-#: ../data/config/schema.xml:165
-msgid "Enable fullscreen mode on startup."
-msgstr "Zapnúť celoobrazovkový režim pri štarte."
-
-#: ../data/config/schema.xml:168
-msgid "Stereoscopic 3D"
-msgstr "Stereoskopické 3D"
-
-#: ../data/config/schema.xml:169
-msgid "Enable 3D rendering of Performous."
-msgstr "Zapnúť 3D zobrazovanie."
-
-#: ../data/config/schema.xml:177
-msgid "Stereo3D type"
-msgstr "Typ Stereo3D"
-
-#: ../data/config/schema.xml:178
-msgid "Some modes may only get activated in fullscreen mode."
-msgstr ""
-"Niektoré režimy 3D zobrazenia je možne aktivovať len v režime celej "
-"obrazovky."
-
-#: ../data/config/schema.xml:183
-msgid "Stereo3D separation"
-msgstr "Stereo3D separovanie"
-
-#: ../data/config/schema.xml:184
-msgid ""
-"The strength of the effect. Experiment with different settings for best "
-"results."
-msgstr ""
-"Intenzita efektu. Vyskúšajte viac nastavení a nájdite tak to, ktoré vám "
-"vyhovuje najviac."
-
-#: ../data/config/schema.xml:187
-msgid "Video playback"
-msgstr "Prehrávanie videa"
-
-#: ../data/config/schema.xml:188
-msgid ""
-"Allows completely disabling background videos. It is recommended to leave "
-"this enabled as Performous will still smoothly fade out the video if your "
-"computer is not fast enough."
-msgstr ""
-
-#: ../data/config/schema.xml:191
-msgid "Webcam background"
-msgstr "Pozadie webkamery"
-
-#: ../data/config/schema.xml:192
-msgid ""
-"Performous can use webcam as a background video. Disable it if Performous "
-"crashes while entering a song."
-msgstr ""
-"Performous môže ako pozadie použiť obraz vašej webkamery. Vypnite túto "
-"voľbu, ak Performous spadne pri spúšťaní skladby."
-
-#: ../data/config/schema.xml:196
-msgid "Webcam id"
-msgstr "Id webkamery"
-
-#: ../data/config/schema.xml:197
-msgid ""
-"Use -1 to autodetect or a number starting from 0 to choose specific device."
-msgstr "Zadajte -1 pre automatickú detekciu, kamery sú číslovane od nuly."
-
-#: ../data/config/schema.xml:202
-msgid "SVG quality"
-msgstr "Kvalita SVG"
-
-#: ../data/config/schema.xml:203
-msgid ""
-"Larger numbers cause vector graphics to be rendered in higher resolution. "
-"Decrease this to make navigating in menus faster."
-msgstr ""
-"Vyššie čísla znamenajú, že vektorová grafika bude vykreslená vo vyššom "
-"rozlíšení. Nižšie umožňujú plynulejší pohyb v ponuke."
-
-#: ../data/config/schema.xml:208
-msgid "Text quality"
-msgstr "Kvalita textu"
-
-#: ../data/config/schema.xml:209
-msgid ""
-"Larger numbers cause text to be rendered in higher resolution. Decrease this "
-"to make everything a little faster."
-msgstr ""
-"Vyššie čísla vykreslia text v lepšom rozlíšení. Použite nižšie čísla pre "
-"celkové zrýchlenie hry."
-
-#: ../data/config/schema.xml:212
-msgid "Benchmark mode"
-msgstr "Režim benchmarku"
-
-#: ../data/config/schema.xml:213
-msgid ""
-"Framerate limit of 100 FPS is removed and the game instead renders at full "
-"speed. FPS values are printed to console. Please note that the display "
-"drivers may still limit the rendering speed to the screen refresh rate."
-msgstr ""
-"Obmedzenie FPS na 100 je vypnuté a hra tak používa vykreslenie najvyššou "
-"rýchlosťou. Hodnoty FPS sú vypisované do konzoly. Uvedomte si však, že "
-"niektoré ovládače grafiky môžu stále obmedzovať rýchlosť vykresľovania podľa "
-"obnovovacej frekvencie obrazovky."
-
-#: ../data/config/schema.xml:220
-msgid "Suggested latency"
-msgstr "Navrhovaná latencia"
-
-#: ../data/config/schema.xml:221
-msgid ""
-"This is a hint for the audio engine about the desired latency. Set this as "
-"low as possible while retaining clear audio playback. Requires restart."
-msgstr ""
-
-#: ../data/config/schema.xml:226
-msgid "Audio/video latency"
-msgstr "Audio/video latencia"
-
-#: ../data/config/schema.xml:227
-msgid ""
-"Affects all modes. Use negative value if your display input lag is greater "
-"than the sound card output latency, positive values in the opposite case and "
-"zero if they are equal. This should be set so that the notes pass the cursor "
-"at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while "
-"performing."
-msgstr ""
-
-#: ../data/config/schema.xml:232
-msgid "Audio round-trip latency"
-msgstr ""
-
-#: ../data/config/schema.xml:233
-msgid ""
-"Affects singing only. The time it takes for Performous playback to reach "
-"your speakers, fly to the microphone and all the way back until Performous "
-"captures and analyzes it. While performing, press Ctrl+S for synth mode and "
-"adjust with Ctrl+F3/F4."
-msgstr ""
-
-#: ../data/config/schema.xml:238
-msgid "Audio/controller latency"
-msgstr "Latencia pre audio/ovládač"
-
-#: ../data/config/schema.xml:239
-msgid ""
-"Affects instruments and dancing only. The total of USB (guitar or dance pad) "
-"latency combined with audio output latency. Adjust so that you can hit the "
-"notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to "
-"adjust while performing."
-msgstr ""
-
-#: ../data/config/schema.xml:246
-msgid "Audio devices"
-msgstr "Audio zariadenia"
-
-#: ../data/config/schema.xml:247
-msgid "List of audio devices to try."
-msgstr "Zoznam audio zariadení na vyskúšanie."
-
-#: ../data/config/schema.xml:252
-msgid "Menu volume"
-msgstr "Hlasitosť v ponuke"
-
-#: ../data/config/schema.xml:253
-msgid "The volume level of menus, song previews and jukebox mode."
-msgstr "Hlasitosť v ponukách, náhľadoch skladieb a režime jukeboxu."
-
-#: ../data/config/schema.xml:258
-msgid "Music volume"
-msgstr "Hlasitosť hudby"
-
-#: ../data/config/schema.xml:259
-msgid ""
-"The ingame music volume. Values above 90 are not recommended as distortion "
-"may occur."
-msgstr ""
-"Hlasitosť hudby v hre. Hodnoty nad 90 nie sú odporúčané nakoľko môže "
-"dochádzať ku skresleniu."
-
-#: ../data/config/schema.xml:264
-msgid "Failure volume"
-msgstr "Hlasitosť chyby"
-
-#: ../data/config/schema.xml:265
-msgid ""
-"The ingame fail sound volume. Values above 90 are not recommended as "
-"distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
-msgstr ""
-"Hlasitosť pri chybe. Hodnoty nad 90 nie sú odporúčané, pretože môže dojsť ku "
-"skresleniu. Úroveň 11 je hlasnejšia ako 10, ale hodnoty idú až ku stovke. 89 "
-"je naozaj nahlas!"
-
-#: ../data/config/schema.xml:268
-msgid "Microphone pass-through"
-msgstr "Pass-through mikrofónu"
-
-#: ../data/config/schema.xml:269
-msgid "Send captured singing voice to speakers."
-msgstr "Poslať zosnímaný hlas spevu do reproduktorov."
-
-#: ../data/config/schema.xml:274
-msgid "Pass-through volume ratio"
-msgstr "Pomer hlasitosti pre pass-through"
-
-#: ../data/config/schema.xml:275
-msgid "How much voice is amplified compared to the music."
-msgstr "Koľkokrát je zvuk oproti hudbe zosilnený."
-
-#: ../data/config/schema.xml:278
-msgid "Suppress center channel"
-msgstr "Potlačiť stredový kanál"
-
-#: ../data/config/schema.xml:279
-msgid "Suppress audio of center channel (e.g. vocals)."
-msgstr "Potlačiť výstup pre stredný kanál (napr. spev)"
-
-#: ../data/config/schema.xml:290
-msgid "Song folders"
-msgstr "Priečinky so skladbami"
-
-#: ../data/config/schema.xml:291
-msgid ""
-"Where to recursively look for songs. DATADIR at the beginning means all "
-"Performous data folders."
-msgstr ""
-"Ktoré priečinky rekurzívne prehľadávať. DATADIR na začiatku znamená všetky "
-"dátové priečinky Performous."
-
-#: ../data/config/schema.xml:294
-msgid "Base folders for data"
-msgstr "Základný priečinok pre dáta"
-
-#: ../data/config/schema.xml:295
-msgid ""
-"System defaults are included automatically. Additional paths can be added "
-"here."
-msgstr ""
-"Východzie nastavenia sú automaticky prevzaté zo systému. Tu môžete pridať "
-"dodatočné cesty."
+#~ msgid ""
+#~ "This tool is not yet available.\n"
+#~ "Configure paths by adding them\n"
+#~ "as command line parameters and\n"
+#~ "then save them in configuration menu."
+#~ msgstr ""
+#~ "Tento nástroj ešte nie je dostupný.\n"
+#~ "Nastavte cesty tak, že ich pridáte\n"
+#~ "ako parametre v príkazovom riadku a\n"
+#~ "potom ich uložte v ponuke s nastaveniami."
+
+#~ msgid "Press any key to exit."
+#~ msgstr "Ľubovoľný kláves ukončí hru."
+
+#~ msgid "Windows users can also use ConfigureSongDirectory.bat script."
+#~ msgstr ""
+#~ "Používatelia Windows môžu tiež použiť skript ConfigureSongDirectory.bat."
+
+#~ msgid "Game"
+#~ msgstr "Hra"
+
+#~ msgid "Gameplay related options"
+#~ msgstr "Voľby súvisiace s hrou"
+
+#~ msgid "Graphic"
+#~ msgstr "Grafika"
+
+#~ msgid "Configure rendering and video settings"
+#~ msgstr "Nastaviť vykresľovanie a prehrávanie videa"
+
+#~ msgid "Audio Devices"
+#~ msgstr "Zvukové zariadenia"
+
+#~ msgid "Setup microphones and playback"
+#~ msgstr "Nastaviť mikrofóny a prehrávanie audia"
+
+#~ msgid "Audio"
+#~ msgstr "Audio"
+
+#~ msgid "Configure general audio settings"
+#~ msgstr "Nastaviť všeobecné voľby audia"
+
+#~ msgid "Paths"
+#~ msgstr "Cesty"
+
+#~ msgid "Setup song and data paths"
+#~ msgstr "Nastaviť cesty pre skladby a údaje"
+
+#~ msgid "Hide pitch wave, notes and scoring."
+#~ msgstr "Nezobrazovať vizualizáciu hlasu, noty a skóre."
+
+#~ msgid "Lyric highlight style"
+#~ msgstr "Štýl zvýrazňovania textu"
+
+#~ msgid "Autoplay"
+#~ msgstr "Automatické prehrávanie"
+
+#~ msgid "Keep playing random songs after the playlist is empty."
+#~ msgstr ""
+#~ "Po vyprázdnení playlistu pokračovať v prehrávaní náhodných skladieb."
+
+#~ msgid "Pitch waves"
+#~ msgstr "Vizualizácia hlasu"
+
+#~ msgid "Enable singing pitch display (when not in karaoke mode)."
+#~ msgstr "Povoliť zobrazenie výšky hlasu (ak nie je zapnutý režim karaoke)."
+
+#~ msgid "Theme"
+#~ msgstr "Téma"
+
+#~ msgid "Name of the theme to use."
+#~ msgstr "Názov témy, ktorá sa má použiť."
+
+#~ msgid "Keyboard as guitar"
+#~ msgstr "Klávesnica miesto gitary"
+
+#~ msgid "Enable keyboard as guitar (Frets on Fire mode)."
+#~ msgstr "Použiť klávesnicu ako gitaru (režim ako vo Frets on Fire)"
+
+#~ msgid "Keyboard as drumkit"
+#~ msgstr "Klávesnica ako sada bicích"
+
+#~ msgid "Enable keyboard as drumkit."
+#~ msgstr "Použiť klávesnicu ako sadu bicích."
+
+#~ msgid "Keyboard as dance pad"
+#~ msgstr "Klávesnica ako tanečná podložka"
+
+#~ msgid "Enable keyboard as dance pad."
+#~ msgstr "Použiť klávesnicu miesto tanečnej podložky."
+
+#~ msgid "Keyboard as keytar"
+#~ msgstr "Klávesnica ako keytara"
+
+#~ msgid "Enable keyboard as keytar."
+#~ msgstr "Použiť klávesnicu miesto keytary."
+
+#~ msgid "Force controller A's type"
+#~ msgstr "Vynútiť typ ovládača A"
+
+#~ msgid ""
+#~ "Override autodetection and force the first controller to the given type."
+#~ msgstr ""
+#~ "Ignorovať automatickú detekciu a vynútiť použitie prvého ovládača pre "
+#~ "vybraný typ."
+
+#~ msgid "Force controller B's type"
+#~ msgstr "Vynútiť typ ovládača B"
+
+#~ msgid ""
+#~ "Override autodetection and force the second controller to the given type."
+#~ msgstr ""
+#~ "Ignorovať automatickú detekciu a vynútiť použitie druhého ovládača pre "
+#~ "vybraný typ."
+
+#~ msgid "Force controller C's type"
+#~ msgstr "Vynútiť typ ovládača C"
+
+#~ msgid ""
+#~ "Override autodetection and force the third controller to the given type."
+#~ msgstr ""
+#~ "Ignorovať automatickú detekciu a vynútiť použitie tretieho ovládača pre "
+#~ "vybraný typ."
+
+#~ msgid "Force controller D's type"
+#~ msgstr "Vynútiť typ ovládača D"
+
+#~ msgid ""
+#~ "Override autodetection and force the fourth controller to the given type."
+#~ msgstr ""
+#~ "Ignorovať automatickú detekciu a vynútiť použitie štvrtého ovládača pre "
+#~ "vybraný typ."
+
+#~ msgid "Joystick configuration"
+#~ msgstr "Konfigurácia joysticku"
+
+#~ msgid "Force joystick to some kind of instrument."
+#~ msgstr "Vynútiť použitie joysticku pre nejaký druh nástroja."
+
+#~ msgid "Hardware MIDI input device"
+#~ msgstr "Vstupné zariadenie MIDI"
+
+#~ msgid ""
+#~ "Regex for matching the MIDI devices to use. The default is to use all "
+#~ "available devices."
+#~ msgstr ""
+#~ "Regulárny výraz pre výber MIDI zariadenia. Štandardne sa použijú všetky "
+#~ "dostupné zariadenia."
+
+#~ msgid "Fallback song encoding"
+#~ msgstr "Záložné kódovanie textu"
+
+#~ msgid "Pick the text codec used for song files that are not UTF-8."
+#~ msgstr "Vyberte kódovanie textu pre piesne, ktoré nie sú v kódovaní UTF-8."
+
+#~ msgid "Windowed width"
+#~ msgstr "Šírka pri zobrazení v okne"
+
+#~ msgid "The width of the window."
+#~ msgstr "Šírka okna."
+
+#~ msgid "Windowed height"
+#~ msgstr "Výška pri zobrazení v okne"
+
+#~ msgid "The height of the window."
+#~ msgstr "Výška okna."
+
+#~ msgid "Fullscreen mode"
+#~ msgstr "Režim celej obrazovky"
+
+#~ msgid "Enable fullscreen mode on startup."
+#~ msgstr "Zapnúť celoobrazovkový režim pri štarte."
+
+#~ msgid "Stereoscopic 3D"
+#~ msgstr "Stereoskopické 3D"
+
+#~ msgid "Enable 3D rendering of Performous."
+#~ msgstr "Zapnúť 3D zobrazovanie."
+
+#~ msgid "Stereo3D type"
+#~ msgstr "Typ Stereo3D"
+
+#~ msgid "Some modes may only get activated in fullscreen mode."
+#~ msgstr ""
+#~ "Niektoré režimy 3D zobrazenia je možne aktivovať len v režime celej "
+#~ "obrazovky."
+
+#~ msgid "Stereo3D separation"
+#~ msgstr "Stereo3D separovanie"
+
+#~ msgid ""
+#~ "The strength of the effect. Experiment with different settings for best "
+#~ "results."
+#~ msgstr ""
+#~ "Intenzita efektu. Vyskúšajte viac nastavení a nájdite tak to, ktoré vám "
+#~ "vyhovuje najviac."
+
+#~ msgid "Video playback"
+#~ msgstr "Prehrávanie videa"
+
+#~ msgid "Webcam background"
+#~ msgstr "Pozadie webkamery"
+
+#~ msgid ""
+#~ "Performous can use webcam as a background video. Disable it if Performous "
+#~ "crashes while entering a song."
+#~ msgstr ""
+#~ "Performous môže ako pozadie použiť obraz vašej webkamery. Vypnite túto "
+#~ "voľbu, ak Performous spadne pri spúšťaní skladby."
+
+#~ msgid "Webcam id"
+#~ msgstr "Id webkamery"
+
+#~ msgid ""
+#~ "Use -1 to autodetect or a number starting from 0 to choose specific "
+#~ "device."
+#~ msgstr "Zadajte -1 pre automatickú detekciu, kamery sú číslovane od nuly."
+
+#~ msgid "SVG quality"
+#~ msgstr "Kvalita SVG"
+
+#~ msgid ""
+#~ "Larger numbers cause vector graphics to be rendered in higher resolution. "
+#~ "Decrease this to make navigating in menus faster."
+#~ msgstr ""
+#~ "Vyššie čísla znamenajú, že vektorová grafika bude vykreslená vo vyššom "
+#~ "rozlíšení. Nižšie umožňujú plynulejší pohyb v ponuke."
+
+#~ msgid "Text quality"
+#~ msgstr "Kvalita textu"
+
+#~ msgid ""
+#~ "Larger numbers cause text to be rendered in higher resolution. Decrease "
+#~ "this to make everything a little faster."
+#~ msgstr ""
+#~ "Vyššie čísla vykreslia text v lepšom rozlíšení. Použite nižšie čísla pre "
+#~ "celkové zrýchlenie hry."
+
+#~ msgid "Benchmark mode"
+#~ msgstr "Režim benchmarku"
+
+#~ msgid ""
+#~ "Framerate limit of 100 FPS is removed and the game instead renders at "
+#~ "full speed. FPS values are printed to console. Please note that the "
+#~ "display drivers may still limit the rendering speed to the screen refresh "
+#~ "rate."
+#~ msgstr ""
+#~ "Obmedzenie FPS na 100 je vypnuté a hra tak používa vykreslenie najvyššou "
+#~ "rýchlosťou. Hodnoty FPS sú vypisované do konzoly. Uvedomte si však, že "
+#~ "niektoré ovládače grafiky môžu stále obmedzovať rýchlosť vykresľovania "
+#~ "podľa obnovovacej frekvencie obrazovky."
+
+#~ msgid "Suggested latency"
+#~ msgstr "Navrhovaná latencia"
+
+#~ msgid "Audio/video latency"
+#~ msgstr "Audio/video latencia"
+
+#~ msgid ""
+#~ "Affects singing only. The time it takes for Performous playback to reach "
+#~ "your speakers, fly to the microphone and all the way back until "
+#~ "Performous captures and analyzes it. While performing, press Ctrl+S for "
+#~ "synth mode and adjust with Ctrl+F3/F4."
+#~ msgstr ""
+#~ "Má vplyv iba na spievanie. Čas, ktorý uplynie od okamihu, kedy signál z "
+#~ "Performous dorazí do vašich reproduktorov, do vášho mikrofonu a zasa "
+#~ "naspäť, kde ho Performous odchytí a zanalyzuje. Počas vystupovania stlačt "
+#~ "Ctrl+S pre režim syntetizátora a upravte nastavenie pomocou Ctrl+F3/F4."
+
+#~ msgid "Audio/controller latency"
+#~ msgstr "Latencia pre audio/ovládač"
+
+#~ msgid ""
+#~ "Affects instruments and dancing only. The total of USB (guitar or dance "
+#~ "pad) latency combined with audio output latency. Adjust so that you can "
+#~ "hit the notes best when playing by ear (not looking on screen). Use Ctrl"
+#~ "+F5/F6 to adjust while performing."
+#~ msgstr ""
+#~ "Má vplyv iba na hudobné nástroje a tanec. Súčet USB latencie (gitary "
+#~ "alebo tanečnej podložky) a latencie audio výstupu. Upravte tak, aby ste "
+#~ "triafali noty len pomocou sluchu (bez pozerania sa na obrazovku. Použite "
+#~ "Ctrl+F5/F6 na úpravu nastavenia počas vystúpenia."
+
+#~ msgid "Audio devices"
+#~ msgstr "Audio zariadenia"
+
+#~ msgid "List of audio devices to try."
+#~ msgstr "Zoznam audio zariadení na vyskúšanie."
+
+#~ msgid "Menu volume"
+#~ msgstr "Hlasitosť v ponuke"
+
+#~ msgid "The volume level of menus, song previews and jukebox mode."
+#~ msgstr "Hlasitosť v ponukách, náhľadoch skladieb a režime jukeboxu."
+
+#~ msgid "Music volume"
+#~ msgstr "Hlasitosť hudby"
+
+#~ msgid ""
+#~ "The ingame music volume. Values above 90 are not recommended as "
+#~ "distortion may occur."
+#~ msgstr ""
+#~ "Hlasitosť hudby v hre. Hodnoty nad 90 nie sú odporúčané nakoľko môže "
+#~ "dochádzať ku skresleniu."
+
+#~ msgid "Failure volume"
+#~ msgstr "Hlasitosť chyby"
+
+#~ msgid ""
+#~ "The ingame fail sound volume. Values above 90 are not recommended as "
+#~ "distortion may occur. 11 is louder than 10, but these go to 100. 89 "
+#~ "louder!"
+#~ msgstr ""
+#~ "Hlasitosť pri chybe. Hodnoty nad 90 nie sú odporúčané, pretože môže dojsť "
+#~ "ku skresleniu. Úroveň 11 je hlasnejšia ako 10, ale hodnoty idú až ku "
+#~ "stovke. 89 je naozaj nahlas!"
+
+#~ msgid "Microphone pass-through"
+#~ msgstr "Pass-through mikrofónu"
+
+#~ msgid "Send captured singing voice to speakers."
+#~ msgstr "Poslať zosnímaný hlas spevu do reproduktorov."
+
+#~ msgid "Pass-through volume ratio"
+#~ msgstr "Pomer hlasitosti pre pass-through"
+
+#~ msgid "How much voice is amplified compared to the music."
+#~ msgstr "Koľkokrát je zvuk oproti hudbe zosilnený."
+
+#~ msgid "Suppress center channel"
+#~ msgstr "Potlačiť stredový kanál"
+
+#~ msgid "Suppress audio of center channel (e.g. vocals)."
+#~ msgstr "Potlačiť výstup pre stredný kanál (napr. spev)"
+
+#~ msgid ""
+#~ "Where to recursively look for songs. DATADIR at the beginning means all "
+#~ "Performous data folders."
+#~ msgstr ""
+#~ "Ktoré priečinky rekurzívne prehľadávať. DATADIR na začiatku znamená "
+#~ "všetky dátové priečinky Performous."
+
+#~ msgid "Base folders for data"
+#~ msgstr "Základný priečinok pre dáta"
+
+#~ msgid ""
+#~ "System defaults are included automatically. Additional paths can be added "
+#~ "here."
+#~ msgstr ""
+#~ "Východzie nastavenia sú automaticky prevzaté zo systému. Tu môžete pridať "
+#~ "dodatočné cesty."
