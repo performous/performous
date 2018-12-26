@@ -38,7 +38,7 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
     
 	// Raster with Cairo
 	std::shared_ptr<cairo_surface_t> surface(
-	  cairo_image_surface_create_for_data(&bitmap.buf[0], CAIRO_FORMAT_ARGB32, bitmap.width, bitmap.height, bitmap.width * 4),
+	  cairo_image_surface_create(CAIRO_FORMAT_ARGB32, bitmap.width, bitmap.height),
 	  cairo_surface_destroy);
 	std::shared_ptr<cairo_t> dc(cairo_create(surface.get()), cairo_destroy);
 	cairo_scale(dc.get(), factor, factor);
