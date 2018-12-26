@@ -4,13 +4,9 @@
 #include "configuration.hh"
 #include "image.hh"
 
-#include <librsvg/rsvg.h>
 #include <iostream>
-
-// Avoid deprecation messages with new versions since Ubuntu 12.10.
-#if LIBRSVG_MAJOR_VERSION * 10000 + LIBRSVG_MINOR_VERSION * 100 + LIBRSVG_MICRO_VERSION < 23602
-#include <librsvg/rsvg-cairo.h>
-#endif
+#include <gio/gio.h>
+#include <librsvg/rsvg.h>
 
 void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	double factor = config["graphic/svg_lod"].f();
