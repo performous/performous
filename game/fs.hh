@@ -5,6 +5,8 @@
 
 namespace fs = boost::filesystem;
 
+typedef std::vector<std::uint8_t> BinaryBuffer;
+
 std::list<std::string> getThemes();  ///< Find all theme folders and return theme names.
 
 /// Recursively copies a folder, throws on error.
@@ -42,6 +44,9 @@ struct pathCache {
 };
 
 fs::path findFile(fs::path const& filename);  ///< Look for the specified file in theme and data folders.
+
+BinaryBuffer readFile(fs::path const& path); ///< Reads a file into a buffer. 
+
 Paths listFiles(fs::path const& dir);  ///< List contents of specified folder in theme and data folders (omit duplicates).
 
 Paths const& getPaths();  ///< Get the data file search path
