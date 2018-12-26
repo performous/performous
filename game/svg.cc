@@ -46,6 +46,9 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	cairo_scale(dc.get(), factor, factor);
     cairo_translate (dc.get(), -pos.x, -pos.y);
     rsvg_handle_render_cairo_sub(svgHandle.get(), dc.get(), nullptr);
+	// Copy rendered image to our buffer.
+	if (bitmap.ptr) throw std::logic_error("Bitmap shouldn't point to a foreign object.");
+	bitmap.copyFromCairo(surface.get());
 
 	// Change byte order from BGRA to RGBA
 	for (uint32_t *ptr = reinterpret_cast<uint32_t*>(&*bitmap.buf.begin()), *end = ptr + bitmap.buf.size() / 4; ptr < end; ++ptr) {
