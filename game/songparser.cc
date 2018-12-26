@@ -87,8 +87,8 @@ SongParser::SongParser(Song& s): m_song(s) {
 		}
 
 		// Default for preview position if none was specified in header
-		if (s.preview_start != s.preview_start) {
-			s.preview_start = (type == INI ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
+		if (std::isnan(s.preview_start)) {
+			s.preview_start = ((type == INI || s.getDurationSeconds() < 50.0) ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
 		}
 		guessFiles();
 		if (!m_song.midifilename.empty()) {midParseHeader(); }
