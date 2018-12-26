@@ -221,3 +221,10 @@ void Bitmap::crop(const unsigned width, const unsigned height, const unsigned x,
 	this->width = width;
 	this->height = height;
 }
+
+void Bitmap::copyFromCairo(cairo_surface_t* surface) {
+	size_t width = cairo_image_surface_get_width(surface);
+	size_t height = cairo_image_surface_get_height(surface);
+	resize(width, height);
+	std::memcpy(&buf[0], cairo_image_surface_get_data(surface), buf.size());
+}
