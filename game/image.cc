@@ -1,3 +1,4 @@
+#include "fs.hh"
 #include "image.hh"
 
 #include <boost/filesystem/fstream.hpp>
@@ -91,18 +92,6 @@ namespace {
 	}
 	#endif
 
-	typedef std::vector<std::uint8_t> BinaryBuffer;
-
-	BinaryBuffer readFile(fs::path const& path) {
-		BinaryBuffer ret;
-		fs::ifstream f(path, std::ios::binary);
-		f.seekg(0, std::ios::end);
-		ret.resize(f.tellg());
-		f.seekg(0);
-		f.read(reinterpret_cast<char*>(ret.data()), ret.size());
-		if (!f) throw std::runtime_error("File cannot be read: " + path.string());
-		return ret;
-	}
 }
 
 void writePNG(fs::path const& filename, Bitmap const& img, unsigned stride) {
