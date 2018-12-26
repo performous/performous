@@ -36,13 +36,16 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	bitmap.fmt = pix::INT_ARGB;
 	bitmap.linearPremul = true;
     
+    RsvgPositionData pos;
+    rsvg_handle_get_position_sub (svgHandle.get(), &pos, nullptr);
 	// Raster with Cairo
 	std::shared_ptr<cairo_surface_t> surface(
 	  cairo_image_surface_create(CAIRO_FORMAT_ARGB32, bitmap.width, bitmap.height),
 	  cairo_surface_destroy);
 	std::shared_ptr<cairo_t> dc(cairo_create(surface.get()), cairo_destroy);
 	cairo_scale(dc.get(), factor, factor);
-	rsvg_handle_render_cairo(svgHandle.get(), dc.get());
+    cairo_translate (dc.get(), -pos.x, -pos.y);
+    rsvg_handle_render_cairo_sub(svgHandle.get(), dc.get(), nullptr);
 
 	// Change byte order from BGRA to RGBA
 	for (uint32_t *ptr = reinterpret_cast<uint32_t*>(&*bitmap.buf.begin()), *end = ptr + bitmap.buf.size() / 4; ptr < end; ++ptr) {
