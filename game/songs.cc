@@ -287,22 +287,30 @@ void Songs::filter_internal() {
 	RestoreSel restore(*this);
 	try {
 		SongVector filtered;
+		// if filter text is blank and no type filter is set, just display all songs.
 		if (m_filter == std::string() && m_type == 0) filtered = m_songs;
 		else {
 			std::string charset = UnicodeUtil::getCharset(m_filter);
 			icu::UnicodeString filter = ((charset == "UTF-8") ? icu::UnicodeString::fromUTF8(m_filter) : icu::UnicodeString(m_filter.c_str(), charset.c_str()));
 			UErrorCode icuError = U_ZERO_ERROR;
+			
 			std::copy_if (m_songs.begin(), m_songs.end(), std::back_inserter(filtered), [&](std::shared_ptr<Song> it){
+			// Filter by type first.	
 				if (m_type == 1 && !(*it).hasDance()) return false;
 				if (m_type == 2 && !(*it).hasVocals()) return false;
 				if (m_type == 3 && !(*it).hasDuet()) return false;
 				if (m_type == 4 && !(*it).hasGuitars()) return false;
 				if (m_type == 5 && !(*it).hasDrums() && !(*it).hasKeyboard()) return false;
 				if (m_type == 6 && (!(*it).hasVocals() || !(*it).hasGuitars() || (!(*it).hasDrums() && !(*it).hasKeyboard()))) return false;
+				
+		  // If search is not empty, filter by search term.	
 				if (!m_filter.empty()) {
 					icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8((*it).strFull()), &UnicodeUtil::m_dummyCollator, nullptr, icuError);
 					return (search.first(icuError) != USEARCH_DONE);
 					}
+					
+		// If we still haven't returned, it must be a type match with an empty search string.			
+				return true;
 			});
 		}
 		m_filtered.swap(filtered);
