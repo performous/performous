@@ -293,14 +293,16 @@ void Songs::filter_internal() {
 			icu::UnicodeString filter = ((charset == "UTF-8") ? icu::UnicodeString::fromUTF8(m_filter) : icu::UnicodeString(m_filter.c_str(), charset.c_str()));
 			UErrorCode icuError = U_ZERO_ERROR;
 			std::copy_if (m_songs.begin(), m_songs.end(), std::back_inserter(filtered), [&](std::shared_ptr<Song> it){
-			icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8((*it).strFull()), &UnicodeUtil::m_dummyCollator, nullptr, icuError);
 				if (m_type == 1 && !(*it).hasDance()) return false;
 				if (m_type == 2 && !(*it).hasVocals()) return false;
 				if (m_type == 3 && !(*it).hasDuet()) return false;
 				if (m_type == 4 && !(*it).hasGuitars()) return false;
 				if (m_type == 5 && !(*it).hasDrums() && !(*it).hasKeyboard()) return false;
 				if (m_type == 6 && (!(*it).hasVocals() || !(*it).hasGuitars() || (!(*it).hasDrums() && !(*it).hasKeyboard()))) return false;
-				return (search.first(icuError) != USEARCH_DONE);
+				if (!m_filter.empty()) {
+					icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8((*it).strFull()), &UnicodeUtil::m_dummyCollator, nullptr, icuError);
+					return (search.first(icuError) != USEARCH_DONE);
+					}
 			});
 		}
 		m_filtered.swap(filtered);
