@@ -89,6 +89,7 @@ void SongParser::xmlParseHeader() {
 	std::string singers;  // Only used for "Together" track
 	xmlpp::const_NodeSet tracks;
 	dom.find("/ss:MELODY/ss:TRACK", tracks);
+	if (!m_song.vocalTracks.empty()) { m_song.vocalTracks.clear(); }
 	for (auto const& elem: tracks) {
 		auto const& trackNode = dynamic_cast<xmlpp::Element const&>(*elem);
 		std::string name = trackNode.get_attribute("Name")->get_value();  // "Player1" or "Player2"
