@@ -20,7 +20,10 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 #endif
 
 	GError* pError = nullptr;
-	std::shared_ptr<RsvgHandle> svgHandle(rsvg_handle_new_from_file(filename.string().c_str(), &pError), g_object_unref);
+    GFile *svgFile;
+	svgFile = g_file_new_for_path (filename.string().c_str());	
+	RsvgHandleFlags svgFlags = (RsvgHandleFlags) (RSVG_HANDLE_FLAG_UNLIMITED | RSVG_HANDLE_FLAG_KEEP_IMAGE_DATA);
+	std::shared_ptr<RsvgHandle> svgHandle(rsvg_handle_new_from_gfile_sync(svgFile, svgFlags, NULL, &pError), g_object_unref);
 	if (pError) {
 		g_error_free(pError);
 		throw std::runtime_error("Unable to load " + filename.string());
