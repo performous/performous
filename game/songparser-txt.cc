@@ -28,6 +28,7 @@ void SongParser::txtParseHeader() {
 void SongParser::txtParse() {
 	std::string line;
 	m_curSinger = CurrentSinger::P1;
+	if (!m_song.vocalTracks.empty()) { m_song.vocalTracks.clear(); }
 	m_song.insertVocalTrack(TrackName::LEAD_VOCAL, VocalTrack(TrackName::LEAD_VOCAL));
 	m_song.insertVocalTrack(DUET_P2, VocalTrack(DUET_P2));
 	while (getline(line) && txtParseField(line)) {} // Parse the header again
