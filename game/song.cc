@@ -32,6 +32,28 @@ Song::Song(web::json::value const& song): dummyVocal(TrackName::LEAD_VOCAL), ran
 	music["background"] = song.has_field("SongFile") ? fs::path(song.at("SongFile").as_string()) : "";
 	music["vocals"] = song.has_field("Vocals") ? fs::path(song.at("Vocals").as_string()) : "";
 	loadStatus = Song::LoadStatus::HEADER;
+	
+	if (song.has_field("VocalTracks")) {
+		for (unsigned i = 0; i < song.at("VocalTracks").as_number().to_uint32(); i++) {
+			std::string track = "DummyTrack" + std::to_string(i);
+			insertVocalTrack(track, VocalTrack(track));
+		}
+	}
+	
+	if (song.has_field("KeyboardTracks")) {
+			instrumentTracks.insert(make_pair(TrackName::KEYBOARD, InstrumentTrack(TrackName::KEYBOARD)));
+	}
+	
+	if (song.has_field("DrumTracks")) {
+			instrumentTracks.insert(make_pair(TrackName::DRUMS, InstrumentTrack(TrackName::DRUMS)));
+	}		
+	if (song.has_field("DanceTracks")) {
+		DanceDifficultyMap danceDifficultyMap;
+			danceTracks.insert(std::make_pair("dance-single", danceDifficultyMap));
+	}		
+	if (song.has_field("GuitarTracks")) {
+			instrumentTracks.insert(std::make_pair(TrackName::GUITAR, InstrumentTrack(TrackName::GUITAR)));
+	}		
 	collateUpdate();
 }
 

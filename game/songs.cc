@@ -172,6 +172,26 @@ void Songs::CacheSonglist() {
     	if(!std::isnan(duration)) {
 	    	songObject["Duration"] = web::json::value(duration);
 	    }
+
+		// Cache songtype also.
+		if(song->hasVocals()) {
+			uint32_t vocals = song->vocalTracks.size();
+        	songObject["VocalTracks"] = web::json::value::number(vocals);
+    	}
+		if(song->hasKeyboard()) {
+        	songObject["KeyboardTracks"] = web::json::value::number(1);
+    	}
+		if(song->hasDrums()) {
+        	songObject["DrumTracks"] = web::json::value::number(1);
+    	}
+		if(song->hasDance()) {
+			uint32_t dance = song->danceTracks.size();
+        	songObject["DanceTracks"] = web::json::value::number(dance);
+    	}
+		if(song->hasGuitars()) {
+			uint32_t guitars = song->instrumentTracks.size() - song->hasDrums() - song->hasKeyboard();
+        	songObject["GuitarTracks"] = web::json::value::number(guitars);
+    	}
 	    if(songObject != web::json::value::object()) {
         	jsonRoot[i] = songObject;
         	i++;
