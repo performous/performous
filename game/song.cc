@@ -53,7 +53,10 @@ Song::Song(web::json::value const& song): dummyVocal(TrackName::LEAD_VOCAL), ran
 	}		
 	if (song.has_field("GuitarTracks")) {
 			instrumentTracks.insert(std::make_pair(TrackName::GUITAR, InstrumentTrack(TrackName::GUITAR)));
-	}		
+	}
+	if (song.has_field("BPM")) {
+			m_bpms.push_back(BPM(0, 0, song.at("BPM").as_number().to_double()));
+	}
 	collateUpdate();
 }
 #endif
