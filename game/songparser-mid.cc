@@ -74,6 +74,8 @@ void SongParser::midParseHeader() {
 			}
 		}
 	}
+	addBPM(0, (6e7 / midi.tempochanges.front().value));
+	std::clog << "songparser-mid/debug: Got a bpm: " << (6e7 / midi.tempochanges.front().value) << std::endl;
 }
 
 /// Parse notes
