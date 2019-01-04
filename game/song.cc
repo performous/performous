@@ -12,7 +12,7 @@ extern "C" {
 #include AVFORMAT_INCLUDE
 #include AVCODEC_INCLUDE
 }
-
+#ifdef USE_WEBSERVER
 Song::Song(web::json::value const& song): dummyVocal(TrackName::LEAD_VOCAL), randomIdx(rand()) {
 	path = song.has_field("TxtFileFolder") ? fs::path(song.at("TxtFileFolder").as_string().substr(0, song.at("TxtFileFolder").as_string().find_last_of("/\\"))) : "";
 	filename = song.has_field("TxtFile") ? fs::path(song.at("TxtFile").as_string()) : "";
@@ -56,6 +56,7 @@ Song::Song(web::json::value const& song): dummyVocal(TrackName::LEAD_VOCAL), ran
 	}		
 	collateUpdate();
 }
+#endif
 
 Song::Song(fs::path const& path, fs::path const& filename):
   dummyVocal(TrackName::LEAD_VOCAL), path(path), filename(filename), randomIdx(rand())
