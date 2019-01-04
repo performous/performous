@@ -96,7 +96,7 @@ Window::Window() {
 	createShaders();
 	resize();
 	SDL_ShowWindow(screen);
-	m_fullscreen = !config["graphic/fullscreen"].b();
+	m_fullscreen = config["graphic/fullscreen"].b();
 }
 
 void Window::createShaders() {
@@ -339,11 +339,9 @@ void Window::swap() {
 void Window::event(Uint8 const& eventID) {
 	switch (eventID) {
 		case SDL_WINDOWEVENT_MAXIMIZED:
-			config["graphic/fullscreen"].b() = true;
-			break;	
+			[[fallthrough]];
 		case SDL_WINDOWEVENT_RESTORED:
-			config["graphic/fullscreen"].b() = false;
-			break;	
+			[[fallthrough]];
 		case SDL_WINDOWEVENT_RESIZED:
 			[[fallthrough]];
 		case SDL_WINDOWEVENT_SHOWN:
