@@ -53,7 +53,10 @@ void Songs::reload_internal() {
 	std::clog << "songs/notice: Done loading the cache. You now have " << m_songs.size() << " songs in your list." << std::endl;
 	std::clog << "songs/notice: Starting to load all songs from disk, to update the cache." << std::endl;
 	Profiler prof("songloader");
+	Paths systemSongs = getPathsConfig("paths/system-songs");
 	Paths paths = getPathsConfig("paths/songs");
+	paths.insert(paths.begin(), systemSongs.begin(), systemSongs.end());
+
 	for (auto it = paths.begin(); m_loading && it != paths.end(); ++it) { //loop through stored directories from config
 		try {
 			if (!fs::is_directory(*it)) { std::clog << "songs/info: >>> Not scanning: " << *it << " (no such directory)\n"; continue; }
@@ -96,17 +99,24 @@ void Songs::LoadCache() {
     	return;
     }
 
-    auto stringList = config["paths/songs"].sl();
+	Paths systemSongs = getPathsConfig("paths/system-songs");
+	Paths localPaths = getPathsConfig("paths/songs");
+	localPaths.insert(localPaths.begin(), systemSongs.begin(), systemSongs.end());
+
+	std::vector<std::string> userSongs;
+	for(const fs::path& userSong : localPaths) {
+		userSongs.push_back(userSong.string());
+	}
 
     for(auto const& song : jsonRoot.as_array()) {
     	struct stat buffer;
     	auto songPath = song.at("TxtFile").as_string();
     	auto isSongPathInConfiguredPaths = std::find_if(
-                                                        stringList.begin(), 
-                                                        stringList.end(), 
-														[songPath](const std::string& stringListItem) { 
-															return songPath.find(stringListItem) != std::string::npos;
-														 }) != stringList.end();
+                                                        userSongs.begin(), 
+                                                        userSongs.end(), 
+														[songPath](const std::string& userSongItem) { 
+															return songPath.find(userSongItem) != std::string::npos;
+														 }) != userSongs.end();
     	if(_STAT(songPath.c_str(), &buffer) == 0 && isSongPathInConfiguredPaths) {
     		std::shared_ptr<Song> realSong(new Song(song));
     		m_songs.push_back(realSong);
