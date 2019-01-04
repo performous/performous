@@ -67,7 +67,7 @@ public:
 	/// swaps buffers
 	void swap();
 	/// Handle window events
-	void event(Uint8 const& eventID);
+	void event(Uint8 const& eventID, Sint32 const& data1, Sint32 const& data2);
 	/// Resize window (contents) / toggle full screen according to config. Returns true if resized.
 	void resize();
 	/// take a screenshot
@@ -101,6 +101,7 @@ private:
 	const GLuint vertTexCoord = 1;
 	const GLuint vertNormal = 2;
 	const GLuint vertColor = 3;
+	void setWindowPosition(const Sint32& x, const Sint32& y);
 	void setFullscreen();
 	/// Setup everything for drawing a view.
 	/// @param num 0 = no stereo, 1 = left eye, 2 = right eye
