@@ -5,8 +5,6 @@
 #include "screen.hh"
 #include "theme.hh"
 
-#include <boost/asio.hpp>
-
 class Audio;
 class ThemeIntro;
 class SvgTxtTheme;
@@ -28,7 +26,6 @@ class ScreenIntro : public Screen {
 	void draw_menu_options();
 	void draw_webserverNotice();
 	void populateMenu();
-	std::string getIPaddr();
 	SvgTxtTheme& getTextObject(std::string const& txt);
 
 	Audio& m_audio;
@@ -40,5 +37,4 @@ class ScreenIntro : public Screen {
 	AnimValue m_submenuAnim;
 	AnimValue m_webserverNoticeTimeout;
 	int webserversetting = 0;
-	std::string m_ipaddr = "";
 };
