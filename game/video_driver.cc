@@ -96,7 +96,6 @@ Window::Window() {
 	createShaders();
 	resize();
 	SDL_ShowWindow(screen);
-	m_fullscreen = config["graphic/fullscreen"].b();
 }
 
 void Window::createShaders() {
@@ -339,14 +338,22 @@ void Window::swap() {
 void Window::event(Uint8 const& eventID) {
 	switch (eventID) {
 		case SDL_WINDOWEVENT_MAXIMIZED:
-			[[fallthrough]];
+			if (Platform::currentOS() == Platform::macos) {
+				config["graphic/fullscreen"].b() = true;
+				}
+			else { m_needResize = true; }
+			break;	
 		case SDL_WINDOWEVENT_RESTORED:
-			[[fallthrough]];
-		case SDL_WINDOWEVENT_RESIZED:
-			[[fallthrough]];
+			if (Platform::currentOS() == Platform::macos) {
+				config["graphic/fullscreen"].b() = false;
+				}
+			else { m_needResize = true; }
+			break;	
 		case SDL_WINDOWEVENT_SHOWN:
 			[[fallthrough]];
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
+			[[fallthrough]];
+		case SDL_WINDOWEVENT_RESIZED:
 			m_needResize = true;
 			break;
 		default: break;
