@@ -33,21 +33,21 @@ Webcam::Webcam(int cam_id):
 			throw std::runtime_error("Could not initialize webcam capturing!");
 	}
 	// Try to get at least VGA resolution
-	if (m_capture->get(CV_CAP_PROP_FRAME_WIDTH) < 640
-	  || m_capture->get(CV_CAP_PROP_FRAME_HEIGHT) < 480) {
-		m_capture->set(CV_CAP_PROP_FRAME_WIDTH, 640);
-		m_capture->set(CV_CAP_PROP_FRAME_HEIGHT, 480);
+	if (m_capture->get(cv::CAP_PROP_FRAME_WIDTH) < 640
+	  || m_capture->get(cv::CAP_PROP_FRAME_HEIGHT) < 480) {
+		m_capture->set(cv::CAP_PROP_FRAME_WIDTH, 640);
+		m_capture->set(cv::CAP_PROP_FRAME_HEIGHT, 480);
 	}
 	// Print actual values
 	std::cout << "Webcam frame properties: "
-	  << m_capture->get(CV_CAP_PROP_FRAME_WIDTH) << "x"
-	  << m_capture->get(CV_CAP_PROP_FRAME_HEIGHT) << std::endl;
+	  << m_capture->get(cv::CAP_PROP_FRAME_WIDTH) << "x"
+	  << m_capture->get(cv::CAP_PROP_FRAME_HEIGHT) << std::endl;
 
 	// Initialize the video writer
 	#ifdef SAVE_WEBCAM_VIDEO
-	float fps = m_capture->get(CV_CAP_PROP_FPS);
-	int framew = m_capture->get(CV_CAP_PROP_FRAME_WIDTH);
-	int frameh = m_capture->get(CV_CAP_PROP_FRAME_HEIGHT);
+	float fps = m_capture->get(cv::CAP_PROP_FPS);
+	int framew = m_capture->get(cv::CAP_PROP_FRAME_WIDTH);
+	int frameh = m_capture->get(cv::CAP_PROP_FRAME_HEIGHT);
 	int codec = CV_FOURCC('P','I','M','1'); // MPEG-1
 	std::string out_file = (getHomeDir() / "performous-webcam_out.mpg").string();
 	m_writer.reset(new cv::VideoWriter(out_file.c_str(), codec, fps > 0 ? fps : 30.0f, cvSize(framew,frameh)));
