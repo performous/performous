@@ -1,5 +1,6 @@
 #include "songparser.hh"
 
+#include "unicode.hh"
 #include <boost/algorithm/string.hpp>
 #include <stdexcept>
 #include "midifile.hh"
@@ -25,7 +26,7 @@ void SongParser::iniParseHeader() {
 		std::istringstream iss(line);
 		std::string key, value;
 		if (!std::getline(iss, key, '=') || !std::getline(iss, value)) std::runtime_error("Invalid format, should be key=value");
-		boost::trim(key); boost::to_lower(key);
+		boost::trim(key); key = UnicodeUtil::toLower(key);
 		boost::trim(value);
 		// Supported tags
 		if (key == "name") s.title = value;

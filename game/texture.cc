@@ -179,10 +179,10 @@ void Texture::load(Bitmap const& bitmap, bool isText) {
 	m_premultiplied = bitmap.linearPremul;
 	UseTexture texture(*this);
 	// When texture area is small, bilinear filter the closest mipmap
-	glTexParameterf(type(), GL_TEXTURE_MIN_FILTER, isText ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR_MIPMAP_NEAREST);
+	glTexParameterf(type(), GL_TEXTURE_MIN_FILTER, isText ? GL_LINEAR : GL_LINEAR_MIPMAP_NEAREST);
 	// When texture area is large, bilinear filter the original
 	glTexParameterf(type(), GL_TEXTURE_MAG_FILTER, isText ? GL_NEAREST : GL_LINEAR);
-	glTexParameterf(type(), GL_TEXTURE_MAX_LEVEL, 12);
+	if (!isText) glTexParameterf(type(), GL_TEXTURE_MAX_LEVEL, 4);
 	glerror.check("glTexParameterf");
 
 	// Anisotropy is potential trouble maker
@@ -195,7 +195,7 @@ void Texture::load(Bitmap const& bitmap, bool isText) {
 	PixFmt const& f = getPixFmt(bitmap.fmt);
 	glPixelStorei(GL_UNPACK_SWAP_BYTES, f.swap);
 	glTexImage2D(type(), 0, internalFormat(bitmap.linearPremul), bitmap.width, bitmap.height, 0, f.format, f.type, bitmap.data());
-	glGenerateMipmap(type());
+	if (!isText) glGenerateMipmap(type());
 }
 
 void Texture::draw() const {

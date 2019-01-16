@@ -686,7 +686,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		if (item.score < 100) { it = instruments.erase(it); continue; } // Dead
 		item.track_simple = (*it)->getTrack();
 		item.track = (*it)->getModeId();
-		item.track[0] = toupper(item.track[0]); // Capitalize
+		item.track = UnicodeUtil::toUpper(item.track, 1); // Capitalize
 		if (item.track_simple == TrackName::DRUMS) item.color = Color(0.1, 0.1, 0.1);
 		else if (item.track_simple == TrackName::BASS) item.color = Color(0.5, 0.3, 0.1);
 		else item.color = Color(1.0, 0.0, 0.0);

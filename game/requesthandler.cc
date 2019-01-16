@@ -1,5 +1,5 @@
-#include <boost/algorithm/string/case_conv.hpp>
 #include "requesthandler.hh"
+#include "unicode.hh"
 
 #ifdef USE_WEBSERVER
 RequestHandler::RequestHandler(Songs& songs):m_songs(songs)
@@ -110,7 +110,7 @@ void RequestHandler::Get(web::http::http_request request)
                     key = "Credits";
                 }
                 std::replace(key.begin(), key.end(), ' ','_');
-                boost::to_lower(key);
+                key = UnicodeUtil::toLower(key);;
                 jsonRoot[key] = web::json::value(kv.second);
             }
         request.reply(web::http::status_codes::OK, jsonRoot);
