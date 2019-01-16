@@ -35,6 +35,7 @@ reaches value #NOTES.
 void SongParser::smParseHeader() {
 	Song& s = m_song;
 	std::string line;
+	if (!m_song.danceTracks.empty()) { m_song.danceTracks.clear(); }
 	// Parse the the entire file
 	while (getline(line) && smParseField(line)) {}
 	if (m_song.danceTracks.empty() ) throw std::runtime_error("No note data in the file");

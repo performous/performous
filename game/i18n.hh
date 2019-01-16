@@ -14,7 +14,7 @@ public:
 		gen.add_messages_path(getLocaleDir().string());
 		gen.add_messages_domain(package);
 		try {
-			std::locale::global(gen(""));
+			std::locale::global(gen(boost::locale::util::get_system_locale(true)));
 		} catch (...) {
 			std::clog << "locale/warning: Unable to detect locale, will try to fallback to en_US.UTF-8" << std::endl;
 			std::locale::global(gen("en_US.UTF-8"));

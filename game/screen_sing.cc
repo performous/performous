@@ -545,25 +545,36 @@ void ScreenSing::draw() {
 		std::string statustxt;
 		if (m_song->getPrevSection(t - 1.0, section)) {
 			statustxt = (boost::format("%02u:%02u - %s") % (t / 60) % (t % 60) % section.name).str();
-		} else  statustxt = (boost::format("%02u:%02u") % (t / 60) % (t % 60)).str();
+		} else {
+			statustxt = (boost::format("%02u:%02u") % (t / 60) % (t % 60)).str();
+		}
 
 		if (!m_score_window.get() && m_instruments.empty() && !m_layout_singer.empty()) {
-			if (status == Song::Status::INSTRUMENTAL_BREAK)  statustxt += _("   ENTER to skip instrumental break");
+			if (status == Song::Status::INSTRUMENTAL_BREAK) {
+				statustxt += _("   ENTER to skip instrumental break");
+			}
 			if (status == Song::Status::FINISHED && !config["game/karaoke_mode"].i()) {
 				if(config["game/autoplay"].b()) {
 					if(m_displayAutoPlay) {
 						statustxt += _("   Autoplay enabled");
-					}
-					else {
-						 statustxt += _("   Remember to wait for grading!");
+					} else {
+						if(!m_audio.analyzers().empty()) {
+							statustxt += _("   Remember to wait for grading!");
+						} else {
+							statustxt += _("   Prepare for the next song!");
+						}
 					}
 
 					if(m_statusTextSwitch.get() == 0) {
-					m_displayAutoPlay = !m_displayAutoPlay;
-					m_statusTextSwitch.setValue(1);
+						m_displayAutoPlay = !m_displayAutoPlay;
+						m_statusTextSwitch.setValue(1);
 					}
+				} else {
+					if(!m_audio.analyzers().empty()) {
+						statustxt += _("   Remember to wait for grading!");
 					} else {
-					statustxt += _("   Remember to wait for grading!");
+						statustxt += _("   Choose your next song!");
+					}
 				}
 			} else if(status == Song::Status::FINISHED && config["game/autoplay"].b()) {
 				statustxt += _("   Autoplay enabled");

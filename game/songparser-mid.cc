@@ -55,6 +55,8 @@ namespace {
 
 void SongParser::midParseHeader() {
 	Song& s = m_song;
+	if (!m_song.vocalTracks.empty()) { m_song.vocalTracks.clear(); }
+	if (!m_song.instrumentTracks.empty()) { m_song.instrumentTracks.clear(); }
 	// Parse tracks from midi
 	MidiFileParser midi(s.midifilename);
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {

@@ -75,8 +75,10 @@ Window::Window() {
 		else { SDL_SetHintWithPriority("SDL_HINT_VIDEO_HIGHDPI_DISABLED", "1", SDL_HINT_OVERRIDE); }
 		int width = config["graphic/window_width"].i();
 		int height = config["graphic/window_height"].i();
-		std::clog << "video/info: Create window " << width << "x" << height << std::endl;
-		screen = SDL_CreateWindow(PACKAGE " " VERSION, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
+		int windowPosX = config["graphic/window_pos_x"].i();
+		int windowPosY = config["graphic/window_pos_y"].i();
+		std::clog << "video/info: Create window dimensions: " << width << "x" << height << " on screen position: " << windowPosX << "x" << windowPosY << std::endl;
+		screen = SDL_CreateWindow(PACKAGE " " VERSION, windowPosX, windowPosY, width, height, flags);
 		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
 		SDL_GL_CreateContext(screen);
 		glutil::GLErrorChecker error("Initializing buffers");
@@ -96,7 +98,6 @@ Window::Window() {
 	createShaders();
 	resize();
 	SDL_ShowWindow(screen);
-	m_fullscreen = !config["graphic/fullscreen"].b();
 }
 
 void Window::createShaders() {
@@ -336,23 +337,38 @@ void Window::swap() {
 	SDL_GL_SwapWindow(screen);
 }
 
-void Window::event(Uint8 const& eventID) {
+void Window::event(Uint8 const& eventID, Sint32 const& data1, Sint32 const& data2) {
 	switch (eventID) {
+		case SDL_WINDOWEVENT_MOVED:
+			setWindowPosition(data1, data2);
+			break;
 		case SDL_WINDOWEVENT_MAXIMIZED:
-			config["graphic/fullscreen"].b() = true;
+			if (Platform::currentOS() == Platform::macos) {
+				config["graphic/fullscreen"].b() = true;
+				}
+			else { m_needResize = true; }
 			break;	
 		case SDL_WINDOWEVENT_RESTORED:
-			config["graphic/fullscreen"].b() = false;
+			if (Platform::currentOS() == Platform::macos) {
+				config["graphic/fullscreen"].b() = false;
+				}
+			else { m_needResize = true; }
 			break;	
-		case SDL_WINDOWEVENT_RESIZED:
-			[[fallthrough]];
 		case SDL_WINDOWEVENT_SHOWN:
 			[[fallthrough]];
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
+			[[fallthrough]];
+		case SDL_WINDOWEVENT_RESIZED:
 			m_needResize = true;
 			break;
 		default: break;
-	}	
+	}
+}
+
+void Window::setWindowPosition(const Sint32& x, const Sint32& y)
+{
+	config["graphic/window_pos_x"].i() = x;
+	config["graphic/window_pos_y"].i() = y;
 }
 
 FBO& Window::getFBO() {

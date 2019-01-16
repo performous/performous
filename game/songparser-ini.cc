@@ -19,6 +19,8 @@ bool SongParser::iniCheck(std::string const& data) const {
 /// Parse header data for Songs screen
 void SongParser::iniParseHeader() {
 	Song& s = m_song;
+	if (!m_song.vocalTracks.empty()) { m_song.vocalTracks.clear(); }
+	if (!m_song.instrumentTracks.empty()) { m_song.instrumentTracks.clear(); }
 	std::string line;
 	while (getline(line)) {
 		if (line.empty()) continue;
