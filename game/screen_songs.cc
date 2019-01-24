@@ -189,7 +189,7 @@ void ScreenSongs::update() {
 	}
 	// Check out if the music has changed
 	std::shared_ptr<Song> song = m_songs.currentPtr();
-	Song::Music music;
+	Song::MusicFiles music;
 	if (song) music = song->music;
 	if (m_playing != music) songChange = true;
 	// Switch songs if needed, only when the user is not browsing for a moment
