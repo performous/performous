@@ -74,7 +74,7 @@ public:
 	double videoGap = 0.0; ///< gap with video
 	double start = 0.0; ///< start of song
 	double preview_start = getNaN(); ///< starting time for the preview
-	int64_t m_duration = 0;
+	double m_duration = 0.0;
 	using Stops = std::vector<std::pair<double,double> >;
 	Stops stops; ///< related to dance
 	using Beats = std::vector<double>;
