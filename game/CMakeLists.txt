@@ -71,7 +71,7 @@ if (Boost_VERSION VERSION_LESS 105500)
 	set(CMAKE_CXX_FLAGS "-DBOOST_NO_CXX11_SCOPED_ENUMS ${CMAKE_CXX_FLAGS}")
 endif()
 
-find_package(ICU REQUIRED uc data i18n io)
+find_package(ICU 60 REQUIRED uc data i18n io)
 include_directories(${ICU_INCLUDE_DIRS})
 list(APPEND LIBS ${ICU_LIBRARIES})
 
