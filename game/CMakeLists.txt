@@ -169,8 +169,15 @@ add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
 if(WIN32)
   target_link_libraries(performous wsock32 ws2_32)
 endif()
-target_link_libraries(performous ${LIBS})
+
 target_link_libraries(performous ced)
+list(APPEND LIBS ${AUBIO_INSTALL_DIR}/lib/libaubio.a)
+list(APPEND LIBS ${FFTW3_LIBRARIES})
+list(APPEND LIBS ${BLAS_LIBRARIES})
+
+target_link_libraries(performous ${LIBS})
+
+target_include_directories(performous PRIVATE "${AUBIO_INSTALL_DIR}/include/")
 
 install(TARGETS performous DESTINATION ${BIN_INSTALL})
 
