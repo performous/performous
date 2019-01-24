@@ -4,6 +4,7 @@
 #include "texture.hh"
 #include "util.hh"
 #include "libda/sample.hpp"
+#include "aubio/aubio.h"
 #include <boost/circular_buffer.hpp>
 #include <atomic>
 #include <condition_variable>
@@ -54,7 +55,7 @@ class VideoFifo {
 class AudioBuffer {
 	typedef std::recursive_mutex mutex;
   public:
-	AudioBuffer(size_t size = 1000000): m_data(size) {}
+	AudioBuffer(size_t size = 4320000): m_data(size) {}
 	/// Reset from FFMPEG side (seeking to beginning or terminate stream)
 	void reset();
 	void quit();
@@ -62,6 +63,7 @@ class AudioBuffer {
 	void setSamplesPerSecond(unsigned sps) { m_sps = sps; }
 	/// get samples per second
 	unsigned getSamplesPerSecond() const { return m_sps; }
+	fvec_t* makePreviewBuffer();
 	void push(std::vector<std::int16_t> const& data, double timestamp);
 	bool prepare(std::int64_t pos);
 	bool operator()(float* begin, float* end, std::int64_t pos, float volume = 1.0f);
@@ -121,6 +123,8 @@ class FFmpeg {
 	bool terminating() { return m_quit_future.wait_for(0s) == std::future_status::ready; }
 
 	class eof_error: public std::exception {};
+	/// Returns filename; only used for debugging.
+	fs::path const& getFilename() const { return m_filename; }
   private:
 	void seek_internal();
 	void open();

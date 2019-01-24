@@ -9,6 +9,7 @@
 #include "video.hh"
 #include "playlist.hh"
 #include "menu.hh"
+#include <aubio/fvec.h>
 
 class Audio;
 class Database;
@@ -31,12 +32,14 @@ public:
 	void menuBrowse(int dir); ///< Left/Right on menu options
 	void manageEvent(SDL_Event event);
 	void manageEvent(input::NavEvent const& event);
+	Songs& getSongs() const { return m_songs; }
 	void prepare();
 	void draw();
 	void drawCovers(); ///< draw the cover browser
 	Texture& getCover(Song const& song); ///< get appropriate cover image for the song (incl. no cover)
 	void drawJukebox(); ///< draw the songbrowser in jukebox mode (fullscreen, full previews, ...)
-
+	static std::unique_ptr<fvec_t, void(*)(fvec_t*)> previewSamplesBuffer;
+	static std::unique_ptr<fvec_t, void(*)(fvec_t*)> previewBeatsBuffer;
 private:
 	void manageSharedKey(input::NavEvent const& event); ///< same behaviour for jukebox and normal mode
 	void drawInstruments(Dimensions dim) const;
