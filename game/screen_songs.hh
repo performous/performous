@@ -4,7 +4,7 @@
 #include "controllers.hh"
 #include "screen.hh"
 #include "theme.hh"
-#include "song.hh" // for Music class
+#include "song.hh" // for MusicFiles class
 #include "textinput.hh"
 #include "video.hh"
 #include "playlist.hh"
@@ -54,7 +54,7 @@ private:
 	std::unique_ptr<Texture> m_songbg, m_songbg_ground, m_songbg_default;
 	std::unique_ptr<Video> m_video;
 	std::unique_ptr<ThemeSongs> theme;
-	Song::Music m_playing;
+	Song::MusicFiles m_playing;
 	AnimValue m_clock;
 	AnimValue m_idleTimer;
 	TextInput m_search;
