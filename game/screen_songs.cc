@@ -194,7 +194,7 @@ void ScreenSongs::update() {
 	if (m_playing != music) songChange = true;
 	// Switch songs if needed, only when the user is not browsing for a moment
 	if (!songChange) return;
-	if (song) song->loadNotes();  // Needed for BPM info; TODO: drop notes when switching to another song.
+	if (song && song->hasControllers()) { song->loadNotes(); } // Needed for BPM info.
 	m_playing = music;
 	// Clear the old content and load new content if available
 	m_songbg.reset(); m_video.reset();
@@ -344,12 +344,24 @@ void ScreenSongs::drawCovers() {
 	double beat = 0.5 + m_idleTimer.get() / 2.0;  // 30 BPM
 	if (ss > 0) {
 		// Use actual song BPM. FIXME: Should only do this if currentId is also playing.
-		double t = m_audio.getPosition() - config["audio/video_delay"].f();
-		Song::Beats const& beats = m_songs.current().beats;
-		auto it = std::lower_bound(beats.begin(), beats.end(), t);
-		if (it != beats.begin() && it != beats.end()) {
-			double t1 = *(it - 1), t2 = *it;
-			beat = (t - t1) / (t2 - t1);
+		if (m_songs.currentPtr()->music == m_playing) {
+				if (m_songs.currentPtr()->hasControllers() || !m_songs.currentPtr()->beats.empty()) {
+				double t = m_audio.getPosition() - config["audio/video_delay"].f();
+				Song::Beats const& beats = m_songs.current().beats;
+				auto it = std::lower_bound(m_songs.currentPtr()->hasControllers() ? beats.begin() : (beats.begin() + 1), beats.end(), t);
+				if (it != beats.begin() && it != beats.end()) {
+					double t1 = *(it - 1), t2 = *it;
+					beat = (t - t1) / (t2 - t1);
+				}
+			}
+			else {
+				double tempo = (m_songs.currentPtr()->m_bpms.front().step * 4.0);
+				if (int(tempo) <= 100.0) tempo *= 2.0;
+				else if (int(tempo)  > 190.0) tempo /= 2.0;
+				else if (int(tempo) > 300.0) tempo /= 3.0;
+				else if (int(tempo) > 400.0) tempo /= 4.0;
+				beat = 0.5 + m_idleTimer.get() / tempo;
+			}
 		}
 	}
 	beat = 1.0 + std::pow(std::abs(std::cos(0.5 * TAU * beat)), 10.0);  // Overdrive pulse

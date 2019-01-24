@@ -70,7 +70,11 @@ SongParser::SongParser(Song& s): m_song(s) {
 		}
 		// Header already parsed?
 		if (s.loadStatus == Song::LoadStatus::HEADER) {
-			if (!s.m_bpms.empty()) s.m_bpms.clear();
+			if (!s.m_bpms.empty()) {
+				s.m_bpms.clear();
+				double bpm = (15 / s.m_bpms.front().step);
+				addBPM(0, bpm);
+			}
 			if (type == TXT) txtParse();
 			else if (type == INI) midParse();  // INI doesn't contain notes, parse those from MIDI
 			else if (type == XML) xmlParse();
