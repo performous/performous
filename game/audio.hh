@@ -5,6 +5,7 @@
 #include "notes.hh"
 #include "pitch.hh"
 #include "libda/portaudio.hpp"
+#include "aubio/aubio.h"
 #include <deque>
 #include <map>
 #include <memory>
@@ -131,6 +132,10 @@ public:
 	void streamBend(std::string track, double pitchFactor);
 	/** Get sample rate */
 	static double getSR() { return 48000.0; }
+	static unsigned aubio_hop_size;
+	static unsigned aubio_win_size;
+};
+
 class Music {
 struct Track {
 	FFmpeg mpeg;
@@ -138,6 +143,9 @@ struct Track {
 	float pitchFactor = 0.0f;
 	template <typename... Args> Track(Args&&... args): mpeg(args...) {}
 };	
+	friend class ScreenSongs;
+	static std::unique_ptr<aubio_tempo_t, void(*)(aubio_tempo_t*)> aubioTempo;
+	static std::recursive_mutex aubio_mutex;
 	public:
 	std::unordered_map<std::string, std::unique_ptr<Track>> tracks; ///< Audio decoders
 	double srate; ///< Sample rate

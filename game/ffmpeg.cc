@@ -2,7 +2,10 @@
 
 #include "chrono.hh"
 #include "config.hh"
+#include "screen_songs.hh"
 #include "util.hh"
+
+#include "aubio/aubio.h"
 #include <memory>
 #include <iostream>
 #include <sstream>
@@ -83,6 +86,19 @@ void AudioBuffer::quit() {
 	m_quit.store(true);
 	m_cond.notify_one();
 }
+
+fvec_t* AudioBuffer::makePreviewBuffer() {
+	{
+		std::unique_lock<mutex> l(m_mutex);
+		ScreenSongs::previewSamplesBuffer.reset(new_fvec(m_data.size() / 2));
+		float previewVol = float(config["audio/preview_volume"].i()) / 100;
+		for (size_t rpos = 0, bpos = 0; rpos < m_data.size(); rpos += 2, bpos ++) {
+			ScreenSongs::previewSamplesBuffer->data[bpos] = (((da::conv_from_s16(m_data[rpos]) + da::conv_from_s16(m_data[rpos + 1])) / 2) / previewVol);
+		}
+	}
+	m_cond.notify_one();
+	return ScreenSongs::previewSamplesBuffer.get();
+};
 
 void AudioBuffer::push(std::vector<std::int16_t> const& data, double timestamp) {
 	std::unique_lock<mutex> l(m_mutex);

@@ -12,10 +12,13 @@
 #include "theme.hh"
 #include "util.hh"
 #include "playlist.hh"
+
+#include "aubio/aubio.h"
 #include <iostream>
+#include <mutex>
 #include <sstream>
 
-static const double IDLE_TIMEOUT = 45.0; // seconds
+static const double IDLE_TIMEOUT = 35.0; // seconds
 
 ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Database& database):
   Screen(name), m_audio(audio), m_songs(songs), m_database(database)
@@ -194,6 +197,11 @@ void ScreenSongs::update() {
 	if (m_playing != music) songChange = true;
 	// Switch songs if needed, only when the user is not browsing for a moment
 	if (!songChange) return;
+	ScreenSongs::previewBeatsBuffer.reset(new_fvec(1));
+	{
+	std::lock_guard<std::recursive_mutex> l(Music::aubio_mutex);	
+	Music::aubioTempo.reset(new_aubio_tempo("default", Audio::aubio_win_size, Audio::aubio_hop_size, Audio::getSR()));
+	}
 	if (song && song->hasControllers()) { song->loadNotes(); } // Needed for BPM info.
 	m_playing = music;
 	// Clear the old content and load new content if available
@@ -536,6 +544,9 @@ void ScreenSongs::drawMenu() {
 	}
 	m_menu.dimensions.stretch(w, h);
 }
+
+std::unique_ptr<fvec_t, void(*)(fvec_t*)> ScreenSongs::previewSamplesBuffer = std::unique_ptr<fvec_t, void(*)(fvec_t*)>(new_fvec(1), [](fvec_t* p){del_fvec(p);});
+std::unique_ptr<fvec_t, void(*)(fvec_t*)> ScreenSongs::previewBeatsBuffer = std::unique_ptr<fvec_t, void(*)(fvec_t*)>(new_fvec(1), [](fvec_t* p){del_fvec(p);});
 
 void ScreenSongs::createPlaylistMenu() {
 	m_menu.clear();
