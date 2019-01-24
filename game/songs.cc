@@ -182,9 +182,9 @@ void Songs::CacheSonglist() {
     	if(!song->music["vocals"].string().empty()) {
 	        songObject["Vocals"] = web::json::value::string(song->music["vocals"].string());
 	    }
-    	auto duration = song->getDurationSeconds();
+    	double duration = song->getDurationSeconds();
     	if(!std::isnan(duration)) {
-	    	songObject["Duration"] = web::json::value(duration);
+	    	songObject["Duration"] = web::json::value::number(duration);
 	    }
 	    if (!song->m_bpms.empty()) {
 			songObject["BPM"] = web::json::value::number(15 / song->m_bpms.front().step);
