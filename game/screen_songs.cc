@@ -365,9 +365,9 @@ void ScreenSongs::drawCovers() {
 			else {
 				double tempo = (m_songs.currentPtr()->m_bpms.front().step * 4.0);
 				if (int(tempo) <= 100.0) tempo *= 2.0;
-				else if (int(tempo)  > 190.0) tempo /= 2.0;
-				else if (int(tempo) > 300.0) tempo /= 3.0;
 				else if (int(tempo) > 400.0) tempo /= 4.0;
+				else if (int(tempo) > 300.0) tempo /= 3.0;
+				else if (int(tempo) > 190.0) tempo /= 2.0;
 				beat = 0.5 + m_idleTimer.get() / tempo;
 			}
 		}
