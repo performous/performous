@@ -123,8 +123,6 @@ class FFmpeg {
 	bool terminating() { return m_quit_future.wait_for(0s) == std::future_status::ready; }
 
 	class eof_error: public std::exception {};
-	/// Returns filename; only used for debugging.
-	fs::path const& getFilename() const { return m_filename; }
   private:
 	void seek_internal();
 	void open();
