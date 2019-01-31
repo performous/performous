@@ -198,7 +198,6 @@ bool Music::prepare() {
 				intptr_t readptr = 0;
 				fvec_t* tempoSamplePtr = new_fvec(Audio::aubio_hop_size);
 				std::lock_guard<std::recursive_mutex> l(Music::aubio_mutex);
-// 				std::clog << "audio/debug: file: " << mpeg.getFilename().filename().string() << std::endl;
 				Game* gm = Game::getSingletonPtr();
 				ScreenSongs* sSongs = static_cast<ScreenSongs *>(gm->getScreen("Songs"));
 				double pstart = sSongs->getSongs().currentPtr()->preview_start;
@@ -208,7 +207,6 @@ bool Music::prepare() {
 				Song::Beats& beats = sSongs->getSongs().currentPtr()->beats;
 				if (!sSongs->getSongs().currentPtr()->hasControllers()) {
 				while (readptr < previewSamples->length) {
-// 						std::clog << "audio/debug: readptr: " << readptr << std::endl;
 					tempoSamplePtr->data = &previewSamples->data[readptr];
 					aubio_tempo_do(aubioTempo.get(),tempoSamplePtr,previewBeats);
 					if (previewBeats->data[0] != 0) {
@@ -218,14 +216,12 @@ bool Music::prepare() {
 								first_period = aubio_tempo_get_period_s(aubioTempo.get());
 							}
 						beats.push_back(beatSecs + pstart);
-//						std::clog << "aubio/debug: beat at: " << aubio_tempo_get_last_ms(aubioTempo.get()) << "ms (" << aubio_tempo_get_last_s(aubioTempo.get()) << "s). frame: " <<  aubio_tempo_get_last(aubioTempo.get()) << ", period: " << aubio_tempo_get_period_s(aubioTempo.get()) << ", BPM: " << aubio_tempo_get_bpm(aubioTempo.get()) << ", confidence: " << double(aubio_tempo_get_confidence(aubioTempo.get())) << std::endl;
 					}
 					readptr += Audio::aubio_hop_size;
 				}
 					if (!beats.empty()) {
 						double newBeat = first_beat - first_period;
 						while (newBeat > 0.0) {
-// 							std::clog << "aubio/debug: Extrapolated a beat at: " << newBeat << "s." << std::endl;
 							extra_beats.push_back(newBeat + pstart);
 							newBeat -= first_period;
 						}
