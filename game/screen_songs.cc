@@ -362,7 +362,7 @@ void ScreenSongs::drawCovers() {
 					beat = (t - t1) / (t2 - t1);
 				}
 			}
-			else {
+			else if (m_songs.currentPtr() && !m_songs.currentPtr()->m_bpms.empty()) {
 				double tempo = (m_songs.currentPtr()->m_bpms.front().step * 4.0);
 				if (int(tempo) <= 100.0) tempo *= 2.0;
 				else if (int(tempo) > 400.0) tempo /= 4.0;
