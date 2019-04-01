@@ -14,5 +14,6 @@
 #elif (BOOST_OS_LINUX)
 #include "platform/execname.unix.inc"
 #else
-	return fs::path();
+	#error execname function undefined on your OS, please port it
+//	return fs::path();
 #endif // BOOST_OS_WINDOWS
