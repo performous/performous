@@ -361,19 +361,31 @@ to save the current settings to XML.
 	</entry>
 
 	<!-- Paths -->
-	<entry name="paths/songs" type="string_list">
-		<stringvalue>DATADIR/songs/</stringvalue>
-		<stringvalue>/usr/local/share/games/ultrastar/songs/</stringvalue>
-		<stringvalue>/usr/local/share/games/fretsonfire/data/songs/</stringvalue>
-		<stringvalue>/usr/share/games/ultrastar/songs/</stringvalue>
-		<stringvalue>/usr/share/games/fretsonfire/data/songs/</stringvalue>
-		<stringvalue>~/.ultrastar/songs/</stringvalue>
+	<entry name="paths/songs" type="string_list" hidden="false">
 		<short>Song folders</short>
 		<long>Where to recursively look for songs. DATADIR at the beginning means all Performous data folders.</long>
 	</entry>
-	<entry name="paths/showhiddenfolders" type="bool" value = "false">
+	<entry name="paths/showhiddenfolders" type="bool" value="false">
 		<short>Show hidden folders</short>
 		<long>When true the screen_paths will also show hidden folders</long>
+	</entry>
+	<entry name="paths/system-songs" type="string_list">
+		<stringvalue>DATADIR/songs</stringvalue>
+		<stringvalue>/usr/local/share/games/ultrastar/songs</stringvalue>
+		<stringvalue>/usr/local/share/games/fretsonfire/data/songs</stringvalue>
+		<stringvalue>/usr/share/games/ultrastar/songs</stringvalue>
+		<stringvalue>/usr/share/games/fretsonfire/data/songs</stringvalue>
+		<stringvalue>~/.ultrastar/songs</stringvalue>
+		<stringvalue>/usr/local/share/performous/songs</stringvalue>
+		<stringvalue>/usr/share/performous/songs</stringvalue>
+		<stringvalue>~/.local/share/games/performous</stringvalue>
+		<stringvalue>~/.local/share/performous</stringvalue>
+		<stringvalue>%USERPROFILE%\AppData\Roaming\performous</stringvalue>
+		<stringvalue>~\AppData\Roaming\performous</stringvalue>
+		<stringvalue>%HOMEDRIVE%%HOMEPATH%\Application Data\performous</stringvalue>
+		<stringvalue>~\Application Data\performous</stringvalue>
+		<short>Default Song folders</short>
+		<long>Where to recursively look for songs. DATADIR at the beginning means all Performous data folders.</long>
 	</entry>
 	<entry name="paths/system" type="string_list">
 		<short>Base folders for data</short>
