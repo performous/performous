@@ -10,6 +10,8 @@
 #include "screen.hh"
 #include "util.hh"
 #include <boost/filesystem.hpp>
+#include <SDL2/SDL_rect.h>
+#include <SDL2/SDL_video.h>
 
 namespace {
 	float s_width;
@@ -77,8 +79,58 @@ Window::Window() {
 		int height = config["graphic/window_height"].i();
 		int windowPosX = config["graphic/window_pos_x"].i();
 		int windowPosY = config["graphic/window_pos_y"].i();
-		std::clog << "video/info: Create window dimensions: " << width << "x" << height << " on screen position: " << windowPosX << "x" << windowPosY << std::endl;
-		screen = SDL_CreateWindow(PACKAGE " " VERSION, windowPosX, windowPosY, width, height, flags);
+		int displayCount = SDL_GetNumVideoDisplays();
+		if (displayCount <= 0) {
+			throw std::runtime_error(std::string("video/error: SDL_GetNumVideoDisplays failed: ") + SDL_GetError());
+		}
+		SDL_Rect totalSize;
+		if (displayCount > 1) {
+			totalSize.x = 0;
+			totalSize.y = 0;
+			totalSize.w = 0;
+			totalSize.h = 0;
+			int displayNum = 0;
+			SDL_Rect displaySize;
+			SDL_Rect prevTotal;
+			while (displayNum < displayCount) {
+				if (SDL_GetDisplayBounds(displayNum, &displaySize) != 0) {
+					throw std::runtime_error(std::string("video/error: SDL_GetDisplayBounds failed: ") + SDL_GetError());
+				}
+				prevTotal.x = totalSize.x;
+				prevTotal.y = totalSize.y;
+				prevTotal.w = totalSize.w;
+				prevTotal.h = totalSize.h;
+				SDL_UnionRect(&prevTotal, &displaySize, &totalSize);
+				++displayNum;
+			}
+		}
+		else {
+			if (SDL_GetDisplayBounds(0, &totalSize) != 0) {
+				throw std::runtime_error(std::string("video/error: SDL_GetDisplayBounds failed: ") + SDL_GetError());
+			}
+		}
+		SDL_Point winOrigin {windowPosX, windowPosY};
+		if (SDL_PointInRect(&winOrigin, &totalSize) == SDL_FALSE) {
+			if (winOrigin.x < totalSize.x) { winOrigin.x = totalSize.x; }
+			else if (winOrigin.x > totalSize.w) { winOrigin.x = (totalSize.w - width); }
+			if (winOrigin.y < totalSize.y) { winOrigin.y = totalSize.y; }
+			else if (winOrigin.y > totalSize.h) { winOrigin.y = (totalSize.h - height); }
+			std::clog << "video/info: Saved window position outside of current display set-up; resetting to " << winOrigin.x << "," << winOrigin.y << std::endl;
+		}
+		SDL_Point winEnd {(winOrigin.x + width), (winOrigin.y + height)};
+		if (SDL_PointInRect(&winEnd, &totalSize) == SDL_FALSE) {
+			if (winEnd.x > totalSize.w) {
+			width = totalSize.w;
+			winOrigin.x = (totalSize.w - width);
+			}
+			if (winEnd.y > totalSize.h) {
+			height = totalSize.h;
+			winOrigin.y = (totalSize.y - height);
+			}
+			std::clog << "video/info: Saved window size outside of current display set-up; resetting to " << width << "x" << height << std::endl;
+		}		
+		std::clog << "video/info: Create window dimensions: " << width << "x" << height << " on screen position: " << winOrigin.x << "x" << winOrigin.y << std::endl;
+		screen = SDL_CreateWindow(PACKAGE " " VERSION, winOrigin.x, winOrigin.y, width, height, flags);
 		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
 		SDL_GL_CreateContext(screen);
 		glutil::GLErrorChecker error("Initializing buffers");

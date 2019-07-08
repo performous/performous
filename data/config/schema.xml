@@ -219,13 +219,13 @@ to save the current settings to XML.
 	</entry>
 	<entry name="graphic/window_pos_x" type="int" value="0" hidden="true">
 		<ui unit=" pixels" />
-		<limits min="0" max="65000" step="256" />
+		<limits min="0" max="16384" step="8" />
 		<short>X-Position of the window</short>
 		<long>The X-Position of the window.</long>
 	</entry>
 	<entry name="graphic/window_pos_y" type="int" value="0" hidden="true">
 		<ui unit=" pixels" />
-		<limits min="0" max="65000" step="256" />
+		<limits min="0" max="16384" step="8" />
 		<short>Y-Position of the window</short>
 		<long>The Y-Position of the window.</long>
 	</entry>
