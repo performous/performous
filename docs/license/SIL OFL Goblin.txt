@@ -1,3 +1,11 @@
+Copyright: Riccardo De Franceschi (www.rdftype.it)
+           Sorkin Type Co. (www.sorkintype.com)
+Goblin is a trademark of Sorkin Type Co.
+
+----------------------------------------------------
+SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+----------------------------------------------------
+
 PREAMBLE
 The goals of the Open Font License (OFL) are to stimulate worldwide
 development of collaborative font projects, to support the font creation
@@ -7,7 +15,7 @@ with others.
 
 The OFL allows the licensed fonts to be used, studied, modified and
 redistributed freely as long as they are not sold by themselves. The
-fonts, including any derivative works, can be bundled, embedded, 
+fonts, including any derivative works, can be bundled, embedded,
 redistributed and/or sold with any software provided that any reserved
 names are not used by derivative works. The fonts and derivatives,
 however, cannot be released under any other type of license. The
@@ -15,25 +23,25 @@ requirement for fonts to remain under this license does not apply
 to any document created using the fonts or their derivatives.
 
 DEFINITIONS
-&quot;Font Software&quot; refers to the set of files released by the Copyright
+"Font Software" refers to the set of files released by the Copyright
 Holder(s) under this license and clearly marked as such. This may
 include source files, build scripts and documentation.
 
-&quot;Reserved Font Name&quot; refers to any names specified as such after the
+"Reserved Font Name" refers to any names specified as such after the
 copyright statement(s).
 
-&quot;Original Version&quot; refers to the collection of Font Software components as
+"Original Version" refers to the collection of Font Software components as
 distributed by the Copyright Holder(s).
 
-&quot;Modified Version&quot; refers to any derivative made by adding to, deleting,
+"Modified Version" refers to any derivative made by adding to, deleting,
 or substituting -- in part or in whole -- any of the components of the
 Original Version, by changing formats or by porting the Font Software to a
 new environment.
 
-&quot;Author&quot; refers to any designer, engineer, programmer, technical
+"Author" refers to any designer, engineer, programmer, technical
 writer or other person who contributed to the Font Software.
 
-PERMISSION &amp; CONDITIONS
+PERMISSION & CONDITIONS
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of the Font Software, to use, study, copy, merge, embed, modify,
 redistribute, and sell modified and unmodified copies of the Font
@@ -71,7 +79,7 @@ This license becomes null and void if any of the above conditions are
 not met.
 
 DISCLAIMER
-THE FONT SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
 MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
 OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE

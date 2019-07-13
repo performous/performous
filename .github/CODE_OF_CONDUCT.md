@@ -72,3 +72,5 @@ available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.ht
 
 [homepage]: https://www.contributor-covenant.org
 
+The Contributor Covenant is © 2014 Coraline Ada Ehmke and
+published under CC-BY-4.0.
