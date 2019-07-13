@@ -360,17 +360,17 @@ void ScreenSongs::drawCovers() {
 		Texture& s = getCover(song);
 		// Calculate dimensions for cover and instrument markers
 		double pos = i - shift;
-		// Function for hilight effect (offset = 0 for current cover), returns 0..1 hilight level
-		auto hilightf = [=](double offset) { return smoothstep(3.5, 0.0, std::abs(pos + offset)); };
+		// Function for highlight effect (offset = 0 for current cover), returns 0..1 highlight level
+		auto highlightf = [=](double offset) { return smoothstep(3.5, 0.0, std::abs(pos + offset)); };
 		// Coordinate translations (pos and offset in cover units to z and x in OpenGL space)
-		auto ztrans = [=](double offset) { return -0.5 + 0.3 * hilightf(offset); };
+		auto ztrans = [=](double offset) { return -0.5 + 0.3 * highlightf(offset); };
 		auto xtrans = [=](double offset) { return -0.2 + 0.20 * (pos + offset); };
 		// A cover is angled to a line between the surrounding gaps (offset +- 0.5 covers)
 		double angle = -std::atan2(ztrans(0.5) - ztrans(-0.5), xtrans(0.5) - xtrans(-0.5));
 		double y = 0.5 * virtH();
 		double x = xtrans(0.0);
 		double z = ztrans(0.0);
-		double c = 0.4 + 0.6 * hilightf(0.0);
+		double c = 0.4 + 0.6 * highlightf(0.0);
 		if (m_menuPos == 1 /* Cover browser */ && baseidx + i == currentId) c = beat;
 		using namespace glmath;
 		Transform trans(translate(vec3(x, y, z)) * rotate(angle, vec3(0.0, 1.0, 0.0)));

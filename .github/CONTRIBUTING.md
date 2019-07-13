@@ -57,7 +57,7 @@ yum install git cmake gcc-c++ gettext cairo-devel librsvg2-devel libsigc++20-dev
 
 ### MacOS
 
-These instructions will walk you through building Performous for macOS (10.9+) and bundling and packaging it inside a DMG ready to install. By default these instructions build the internal webserver, the extra tools (such as Singstar extractor; note, not all are currently working in macOS, even if they all do build succesfully), and support for webcam (via OpenCV)
+These instructions will walk you through building Performous for macOS (10.9+) and bundling and packaging it inside a DMG ready to install. By default these instructions build the internal webserver, the extra tools (such as Singstar extractor; note, not all are currently working in macOS, even if they all do build successfully), and support for webcam (via OpenCV)
 
 * These instruction have been tested with macOS 10.12.5 and XCode 8.3.3.
 
