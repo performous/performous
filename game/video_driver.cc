@@ -10,6 +10,8 @@
 #include "screen.hh"
 #include "util.hh"
 #include <boost/filesystem.hpp>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_hints.h>
 #include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_video.h>
 
@@ -131,8 +133,10 @@ Window::Window() {
 		}		
 		std::clog << "video/info: Create window dimensions: " << width << "x" << height << " on screen position: " << winOrigin.x << "x" << winOrigin.y << std::endl;
 		screen = SDL_CreateWindow(PACKAGE " " VERSION, winOrigin.x, winOrigin.y, width, height, flags);
-		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
-		SDL_GL_CreateContext(screen);
+		if (!screen) throw std::runtime_error(std::string("SDL_CreateWindow failed: ") + SDL_GetError());
+		SDL_GLContext glContext = SDL_GL_CreateContext(screen);
+		if (glContext == nullptr) throw std::runtime_error(std::string("SDL_GL_CreateContext failed with error: ") + SDL_GetError());
+		if (epoxy_gl_version() < 33) throw std::runtime_error("Performous needs at least OpenGL 3.3+ Core profile to run.");
 		glutil::GLErrorChecker error("Initializing buffers");
 		{
 			initBuffers();
@@ -146,7 +150,6 @@ Window::Window() {
 	std::clog << "video/info: GL_RENDERER:   " << glGetString(GL_RENDERER) << std::endl;
 	// Extensions would need more complex outputting, otherwise they will break clog.
 	//std::clog << "video/info: GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl;
-	if (epoxy_gl_version() < 33) throw std::runtime_error("OpenGL 3.3 is required but not available");	
 	createShaders();
 	resize();
 	SDL_ShowWindow(screen);
