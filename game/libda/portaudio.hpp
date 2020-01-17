@@ -48,12 +48,12 @@ namespace portaudio {
 		}
 		std::string name;  ///< Full device name in UTF-8
 		std::string flex;  ///< Modified name that is less specific but still unique (allow device numbers to change)
-		int idx;
-		int in, out;
+		unsigned idx;
+		unsigned in, out;
 		unsigned index;
 	};
-		typedef std::vector<DeviceInfo> DeviceInfos;
-		struct AudioDevices {
+	typedef std::vector<DeviceInfo> DeviceInfos;
+	struct AudioDevices {
 		static int count() { return Pa_GetDeviceCount(); }
 		static const PaHostApiTypeId AutoBackendType = PaHostApiTypeId(1337);
 		static PaHostApiTypeId defaultBackEnd() {
@@ -61,8 +61,8 @@ namespace portaudio {
 		}
 		/// Constructor gets the PA devices into a vector
 		AudioDevices(PaHostApiTypeId backend = AutoBackendType) {
-		PaHostApiIndex backendIndex = Pa_HostApiTypeIdToHostApiIndex((backend == AutoBackendType ? defaultBackEnd() : backend));
-		if (backendIndex == paHostApiNotFound) backendIndex = Pa_HostApiTypeIdToHostApiIndex(defaultBackEnd());
+			PaHostApiIndex backendIndex = Pa_HostApiTypeIdToHostApiIndex((backend == AutoBackendType ? defaultBackEnd() : backend));
+			if (backendIndex == paHostApiNotFound) backendIndex = Pa_HostApiTypeIdToHostApiIndex(defaultBackEnd());
 			for (unsigned i = 0, end = Pa_GetHostApiInfo(backendIndex)->deviceCount; i != end; ++i) {
 				PaDeviceInfo const* info = Pa_GetDeviceInfo(Pa_HostApiDeviceIndexToDeviceIndex(backendIndex, i));
 				if (!info) continue;
@@ -112,9 +112,13 @@ namespace portaudio {
 		DeviceInfo const& find(std::string const& name, bool output, unsigned num) {
 			if (name.empty()) { return findByChannels(output, num); }
 			// Try name search with full match
-			for (auto const& dev: devices) { if (dev.name == name) { return dev;  } }
+			for (auto const& dev: devices) {
+				if ((output ? dev.out : dev.in) < num) continue;
+				if (dev.name == name) return dev;
+			}
 			// Try name search with partial/flexible match
 			for (auto const& dev: devices) {
+				if ((output ? dev.out : dev.in) < num) continue;
 				if (dev.name.find(name) != std::string::npos) { return dev; }
 				if (dev.flex.find(name) != std::string::npos) { return dev; }
 			}
@@ -129,7 +133,7 @@ namespace portaudio {
 		}
 		DeviceInfos devices;
 	};
-	
+
 	struct BackendInfo {
 		BackendInfo(int id, PaHostApiTypeId type, std::string n = std::string(), int n_dev = 0): idx(id), name(n), type(type), devices(n_dev) {}
 		int idx;
@@ -145,7 +149,7 @@ namespace portaudio {
 	};
 
 	typedef std::vector<BackendInfo> BackendInfos;
-	
+
 	struct AudioBackends {
 	static int count() { return Pa_GetHostApiCount(); }
 	AudioBackends () {
@@ -172,11 +176,11 @@ namespace portaudio {
 			*/
 			PaHostApiTypeId apiID = info->type;
 			std::string name = UnicodeUtil::convertToUTF8(info->name);
-			backends.push_back(BackendInfo(i, apiID, name, info->deviceCount));		
+			backends.push_back(BackendInfo(i, apiID, name, info->deviceCount));
 		}
 	};
 		BackendInfos backends;
-		
+
 		std::string dump() const {
 		std::ostringstream oss;
 		oss << "audio/info: PortAudio backends:" << std::endl;
