@@ -475,8 +475,8 @@ struct Audio::Impl {
 					else { std::clog << msg << std::endl; }
 					portaudio::DeviceInfo const& info = ad.find(params.dev, wantOutput, num);
 					std::clog << "audio/info: Found: " << info.name << ", in: " << info.in << ", out: " << info.out << std::endl;
-				if (info.in < int(params.mics.size())) throw std::runtime_error("Device doesn't have enough input channels");
-				if (info.out < int(params.out)) throw std::runtime_error("Device doesn't have enough output channels");
+				if (info.in < params.mics.size()) throw std::runtime_error("Device doesn't have enough input channels");
+				if (info.out < params.out) throw std::runtime_error("Device doesn't have enough output channels");
 				// Match found if we got here, construct a device
 				devices.emplace_back(params.in, params.out, params.rate, info.index);
 				Device& d = devices.back();
