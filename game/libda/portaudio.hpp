@@ -151,34 +151,34 @@ namespace portaudio {
 	typedef std::vector<BackendInfo> BackendInfos;
 
 	struct AudioBackends {
-	static int count() { return Pa_GetHostApiCount(); }
-	AudioBackends () {
-		if (count() == 0) throw std::runtime_error("No suitable audio backends found."); // Check specifically for 0 because it returns a negative error code if Pa is not initialized.
-		for (unsigned i = 0, end = Pa_GetHostApiCount(); i != end; ++i) {
-			PaHostApiInfo const* info = Pa_GetHostApiInfo(i);
-			if (!info || info->deviceCount < 1) continue;
-			/*
-			Constant, unique identifier for each audio backend past alpha status.
-				1 = DirectSound
-				2 = MME
-				3 = ASIO
-				4 = SoundManager
-				5 = CoreAudio
-				7 = OSS
-				8 = ALSA
-				9 = AL
-				10 = BeOS
-				11 = WDMKS
-				12 = JACK
-				13 = WASAPI
-				14 = AudioScienceHPI
-				0 = Backend currently being developed.
-			*/
-			PaHostApiTypeId apiID = info->type;
-			std::string name = UnicodeUtil::convertToUTF8(info->name);
-			backends.push_back(BackendInfo(i, apiID, name, info->deviceCount));
-		}
-	};
+		static int count() { return Pa_GetHostApiCount(); }
+		AudioBackends () {
+			if (count() == 0) throw std::runtime_error("No suitable audio backends found."); // Check specifically for 0 because it returns a negative error code if Pa is not initialized.
+			for (unsigned i = 0, end = Pa_GetHostApiCount(); i != end; ++i) {
+				PaHostApiInfo const* info = Pa_GetHostApiInfo(i);
+				if (!info || info->deviceCount < 1) continue;
+				/*
+				Constant, unique identifier for each audio backend past alpha status.
+					1 = DirectSound
+					2 = MME
+					3 = ASIO
+					4 = SoundManager
+					5 = CoreAudio
+					7 = OSS
+					8 = ALSA
+					9 = AL
+					10 = BeOS
+					11 = WDMKS
+					12 = JACK
+					13 = WASAPI
+					14 = AudioScienceHPI
+					0 = Backend currently being developed.
+				*/
+				PaHostApiTypeId apiID = info->type;
+				std::string name = UnicodeUtil::convertToUTF8(info->name);
+				backends.push_back(BackendInfo(i, apiID, name, info->deviceCount));
+			}
+		};
 		BackendInfos backends;
 
 		std::string dump() const {
