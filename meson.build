@@ -18,14 +18,26 @@ opencv = dependency('opencv4', required : false)
 if opencv.found()
   add_project_arguments('-DUSE_OPENCV', language : 'cpp')
 else
-  message('⚠️ OpenCV not found:    Webcam support DISABLED')
+  warning('OpenCV not found:    Webcam support DISABLED')
 endif
 
 portmidi = dependency('PortMidi', required : false, cmake_module_path : 'cmake/Modules/')
 if portmidi.found()
   add_project_arguments('-DUSE_PORTMIDI', language: 'cpp')
 else
-  message('⚠️ PORTMIDI not found:  MIDI drum support DISABLED')
+  warning('PORTMIDI not found:  MIDI drum support DISABLED')
+endif
+
+# This could in principle work, but doesn't in practice, at least not on my system
+# - cpprestsdk doesn't support pkg-config
+# - FindCppRest.cmake shipped with Performous doesn't find it for some reason
+# - The library's installed cpprestsdk-config.cmake is not in path
+# - This build script doesn't add the required extra Boost components to build
+cpprest = dependency('CppRest', required : false, cmake_module_path : 'cmake/Modules/')
+if cpprest.found()
+  add_project_arguments('-DUSE_WEBSERVER', language: 'cpp')
+else
+  warning('CppRestSdk not found:  WEBSERVER support DISABLED')
 endif
 
 configure_file(input : 'game/config.hh.in', output : 'config.hh', configuration : conf)
@@ -57,6 +69,7 @@ dependencies = [
   libxmlpp,
   opencv,
   portmidi,
+  cpprest,
 ]
 ced = static_library('ced', [
   'ced/compact_enc_det/compact_enc_det.cc',
