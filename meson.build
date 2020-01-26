@@ -21,11 +21,7 @@ else
   message('⚠️ OpenCV not found:    Webcam support DISABLED')
 endif
 
-portmidi = dependency(
-  'PortMidi',
-  required : true,
-  cmake_module_path : 'cmake/Modules/',
-)
+portmidi = dependency('PortMidi', required : false, cmake_module_path : 'cmake/Modules/')
 if portmidi.found()
   add_project_arguments('-DUSE_PORTMIDI', language: 'cpp')
 else
