@@ -93,6 +93,12 @@ foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWS
 	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
 
+if(LibXML++_VERSION_2_6)
+  set(LIBXMLPP_VERSION 2)
+else()
+  set(LIBXMLPP_VERSION 3)
+endif()
+
 option(ENABLE_MIDI "Enable support for MIDI hardware (e-drums with USB/MIDI connection)." ON)
 if(ENABLE_MIDI)
 	find_package(PortMidi)

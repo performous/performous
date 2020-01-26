@@ -5,6 +5,15 @@ conf.set('CMAKE_PROJECT_NAME', 'Performous')
 conf.set('PROJECT_VERSION', 'git-meson')
 conf.set('LOCALE_DIR', 'share/locale')
 conf.set('SHARE_INSTALL', 'share/games/performous')
+
+libxmlpp = dependency('libxml++-3.0', required : false)
+if libxmlpp.found()
+  conf.set('LIBXMLPP_VERSION', 3)
+else
+  libxmlpp = dependency('libxml++-2.6')
+  conf.set('LIBXMLPP_VERSION', 2)
+endif
+
 configure_file(input : 'game/config.hh.in', output : 'config.hh', configuration : conf)
 
 dependencies = [
@@ -24,7 +33,6 @@ dependencies = [
   dependency('libpng'),
   dependency('libjpeg'),
   dependency('librsvg-2.0'),
-  dependency('libxml++-3.0'),
   dependency('libavcodec'),
   dependency('libavformat'),
   dependency('libavutil'),
@@ -32,6 +40,7 @@ dependencies = [
   dependency('libswresample'),
   dependency('portaudio-2.0'),
   dependency('fontconfig'),
+  libxmlpp,
 ]
 ced = static_library('ced', [
   'ced/compact_enc_det/compact_enc_det.cc',
