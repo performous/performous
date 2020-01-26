@@ -14,6 +14,24 @@ else
   conf.set('LIBXMLPP_VERSION', 2)
 endif
 
+opencv = dependency('opencv4', required : false)
+if opencv.found()
+  add_project_arguments('-DUSE_OPENCV', language : 'cpp')
+else
+  message('⚠️ OpenCV not found:    Webcam support DISABLED')
+endif
+
+portmidi = dependency(
+  'PortMidi',
+  required : true,
+  cmake_module_path : 'cmake/Modules/',
+)
+if portmidi.found()
+  add_project_arguments('-DUSE_PORTMIDI', language: 'cpp')
+else
+  message('⚠️ PORTMIDI not found:  MIDI drum support DISABLED')
+endif
+
 configure_file(input : 'game/config.hh.in', output : 'config.hh', configuration : conf)
 
 dependencies = [
@@ -41,6 +59,8 @@ dependencies = [
   dependency('portaudio-2.0'),
   dependency('fontconfig'),
   libxmlpp,
+  opencv,
+  portmidi,
 ]
 ced = static_library('ced', [
   'ced/compact_enc_det/compact_enc_det.cc',
