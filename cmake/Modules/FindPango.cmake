@@ -8,6 +8,7 @@
 include(LibFindMacros)
 
 # Dependencies
+libfind_package(Pango Harfbuzz)
 libfind_package(Pango Freetype)
 libfind_package(Pango Glib)
 libfind_package(Pango GObject)
