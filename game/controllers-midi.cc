@@ -3,8 +3,10 @@
 #include "controllers.hh"
 #include "portmidi.hh"
 #include "fs.hh"
+
 #include <regex>
 #include <unordered_map>
+#include <sstream>
 
 namespace input {
 
