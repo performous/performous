@@ -165,7 +165,7 @@ public:
 			if (t.pitchFactor != 0) { // Pitch shift
 				Buffer tempbuf(end - begin);
 				// Get audio to temp buffer
-				if (t.mpeg.audioQueue(&*tempbuf.begin(), &*tempbuf.end(), m_pos, t.fadeLevel)) eof = false;
+				if (t.mpeg.audioQueue(tempbuf.data(), tempbuf.data() + tempbuf.size(), m_pos, t.fadeLevel)) eof = false;
 				// Do the magic
 				PitchShift(&*tempbuf.begin(), &*tempbuf.end(), t.pitchFactor);
 				// Mix with other tracks
@@ -176,7 +176,7 @@ public:
 			// Otherwise just get the audio and mix it straight away
 			} else
 #endif
-			if (t.mpeg.audioQueue(&*mixbuf.begin(), &*mixbuf.end(), m_pos, t.fadeLevel)) eof = false;
+			if (t.mpeg.audioQueue(mixbuf.data(), mixbuf.data() + mixbuf.size(), m_pos, t.fadeLevel)) eof = false;
 		}
 		m_pos += samples;
 		for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
@@ -242,8 +242,8 @@ struct Sample {
 			// No more data to play in this sample
 			return;
 		}
-		std::vector<float> mixbuf(end - begin);
-		if(!mpeg.audioQueue(&*mixbuf.begin(), &*mixbuf.end(), m_pos, 1.0)) {
+		std::vector<float> mixbuf(end - begin); //TODO: seems there is no need in additinal buffer
+		if(!mpeg.audioQueue(mixbuf.data(), mixbuf.data() + mixbuf.size(), m_pos, 1.0)) {
 			eof = true;
 		}
 		for (size_t i = 0, iend = end - begin; i != iend; ++i) {
