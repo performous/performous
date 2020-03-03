@@ -135,7 +135,13 @@ template <typename T> void loader(T* target, fs::path const& name) {
 	bitmap.resize(1, 1);
 	target->load(bitmap);
 	// Ask the loader to retrieve the image
-	ldr->push(target, Job(name, [target](Bitmap& bitmap){ target->load(bitmap); }));
+	ldr->push(target, Job(name, [target, filename = name.string()](Bitmap& bitmap)
+	{
+	if (bitmap.data())
+		target->load(bitmap);
+	else //TODO: probably we could handle invalid image right after loading, but now it's most conveniently  place :)
+		std::clog << "texture/error: can't read data from " << filename << std::endl;
+	}));
 }
 
 Texture::Texture(fs::path const& filename) { loader(this, filename); }
