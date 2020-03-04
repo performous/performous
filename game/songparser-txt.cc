@@ -168,7 +168,7 @@ bool SongParser::txtParseNote(std::string line) {
 	}
 	Note n;
 	n.type = Note::Type(iss.get());
-	long ts = m_txt.prevts;
+	int ts = m_txt.prevts;
 	switch (n.type) {
 		case Note::NORMAL:
 		case Note::FREESTYLE:
