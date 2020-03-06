@@ -61,11 +61,12 @@ public:
 private: // will be bypassed by above friend declaration
 	typedef std::list<Player> cur_players_t;
 	typedef std::list<ScoreItem> cur_scores_t;
+	typedef std::map <std::string, PlayerId> players_devices_t;
 
 	//This fields are misused as additional parameters
 	cur_players_t cur;
 	cur_scores_t scores;
-
+	players_devices_t playersByDevices;
 public: // methods for database management
 
 	/**A facade for Players::addPlayer.*/
