@@ -59,18 +59,21 @@ void Database::addSong(std::shared_ptr<Song> s) {
 
 void Database::addHiscore(std::shared_ptr<Song> s) {
 	int playerid = m_players.lookup(m_players.current().name);
-	int score = scores.front().score;
-	std::string track = scores.front().track;
-	int songid = m_songs.lookup(s);
+	int songid = m_songs.lookup(*s);
 	unsigned level = config["game/difficulty"].i();
-	m_hiscores.addHiscore(score, playerid, songid, level, track);
-	std::clog << "database/info: Added new hiscore " << score << " points on track " << track << " of songid " << songid << " level "<< level<< std::endl;
+
+	ScoreItem const& hiscore = scores.front();
+
+	//just remember, who was selected this playerid
+	playersByDevices[hiscore.player_id] = playerid;
+	m_hiscores.addHiscore(hiscore.score, playerid, songid, level, hiscore.track);
+	std::clog << "database/info: Added new hiscore " << hiscore.score << " points on track " << hiscore.track << " of songid " << songid << std::endl;
 }
 
 bool Database::reachedHiscore(std::shared_ptr<Song> s) const {
 	int score = scores.front().score;
 	std::string track = scores.front().track;
-	int songid = m_songs.lookup(s);
+	int songid = m_songs.lookup(*s);
 	unsigned level = config["game/difficulty"].i();
 	return m_hiscores.reachedHiscore(score, songid, level, track);
 }
@@ -87,7 +90,7 @@ void Database::queryOverallHiscore(std::ostream & os, std::string const& track) 
 }
 
 void Database::queryPerSongHiscore(std::ostream & os, std::shared_ptr<Song> s, std::string const& track) const {
-	int songid = m_songs.lookup(s);
+	int songid = m_songs.lookup(*s);
 	if (songid == -1) return;  // Song not included in database (yet)
 	// Reorder hiscores by track / score
 	std::map<std::string, std::multiset<HiscoreItem>> scoresByTrack;
