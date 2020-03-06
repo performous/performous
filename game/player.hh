@@ -12,7 +12,7 @@
 class Song;
 class Analyzer;
 
-/// player class
+/// TODO: rename to Vocalist or something like that
 struct Player {
 	/// currently played vocal track
 	VocalTrack& m_vocal;
@@ -44,6 +44,9 @@ struct Player {
 	Notes::const_iterator m_scoreIt;
 	/// constructor
 	Player(VocalTrack& vocal, Analyzer& analyzer, size_t frames);
+
+	std::string const& getId() const { return m_analyzer.getId(); }
+
 	/// prepares analyzer
 	void prepare();
 	/// updates player stats

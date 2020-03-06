@@ -68,16 +68,17 @@ void Database::addHiscore(std::shared_ptr<Song> s) {
 		return;
 	}
 	auto playerid = maybe_playerid.value();
-	unsigned score = scores.front().score;
-	std::string track = scores.front().track;
+	ScoreItem const& hiscore = scores.front();
 	const auto songid = m_songs.lookup(s);
 	if(!songid.has_value()) {
 		SpdLogger::error(LogSystem::DATABASE, "Invalid song ID for song: artist={}, title={}", s->artist, s->title);
 		return;
 	}
 	unsigned short level = config["game/difficulty"].ui();
-	m_hiscores.addHiscore(score, playerid, songid.value(), level, track);
-	SpdLogger::info(LogSystem::DATABASE, "Added new hiscore. Score={} on track={} for song id={}, on level={}", score, track, songid.value(), level);
+	m_hiscores.addHiscore(hiscore.score, playerid, songid.value(), level, hiscore.track);
+	// Remember which player was selected for this score's source device, so it can be pre-selected next time.
+	if (!hiscore.player_id.empty()) playersByDevices[hiscore.player_id] = playerid;
+	SpdLogger::info(LogSystem::DATABASE, "Added new hiscore. Score={} on track={} for song id={}, on level={}", hiscore.score, hiscore.track, songid.value(), level);
 }
 
 bool Database::reachedHiscore(std::shared_ptr<Song> s) const {
@@ -142,4 +143,3 @@ std::vector<HiscoreItem> Database::getHiscores(SongPtr const& s) const {
 		throw;
 	}
 }
-

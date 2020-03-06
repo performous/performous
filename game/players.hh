@@ -66,6 +66,8 @@ class Players {
 	bool isEmpty() const { return m_filtered.empty(); }
 	/// advances to next player
 	void advance(std::ptrdiff_t diff);
+	/// Advances to the player with the given id. Does nothing if the id is not present in the filtered list.
+	void advanceToId(PlayerId id);
 	/// get current id
 	std::optional<PlayerId> currentId() const { return static_cast<unsigned>(math_cover.getTarget()); }
 	/// gets current position
@@ -78,7 +80,7 @@ class Players {
 	PlayerItem current() const;
 	/// filters playerlist by regular expression
 	void setFilter(std::string const& regex);
-  
+
 private:
 	PlayerId assign_id_internal(); /// returns the next available id
 	void filter_internal();
