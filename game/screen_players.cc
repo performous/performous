@@ -35,9 +35,8 @@ void ScreenPlayers::enter() {
 	m_players.setFilter(m_search.text);
 	m_audio.fadeout(getGame());
 	m_quitTimer.setValue(config["game/highscore_timeout"].ui());
-	if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
-		getGame().activateScreen("Playlist");
-	}
+
+	checkoutNewScore();
 }
 
 void ScreenPlayers::exit() {
@@ -67,18 +66,11 @@ void ScreenPlayers::manageEvent(input::NavEvent const& event) {
 			m_players.update();
 			// the current player is the new created one
 		}
+
 		m_database.addHiscore(m_song);
 		m_database.scores.pop_front();
 
-		if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
-			// no more highscore, we are now finished
-			getGame().activateScreen("Playlist");
-		} else {
-			m_search.text.clear();
-			m_players.setFilter("");
-			// add all players which reach highscore because if score is very near or same it might be
-			// frustrating for second one that he cannot enter, so better go for next one...
-		}
+		checkoutNewScore();
 	}
 	else if (m_players.isEmpty()) return;
 	else if (nav == input::NavButton::PAUSE) m_audio.togglePause();
@@ -101,6 +93,28 @@ void ScreenPlayers::manageEvent(SDL_Event event) {
 		if (key == SDL_SCANCODE_BACKSPACE) {
 			m_search.backspace();
 			m_players.setFilter(m_search.text);
+		}
+	}
+}
+
+void ScreenPlayers::checkoutNewScore() {
+	if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
+		// no more highscore, we are now finished
+		getGame().activateScreen("Playlist");
+	}
+	else {
+		m_search.text.clear();
+		m_players.setFilter("");
+		// add all players which reach highscore because if score is very near or same it might be
+		// frustrating for second one that he cannot enter, so better go for next one...
+
+		// Pre-select the player that was previously used with this score's source device, if known.
+		std::string const& deviceId = m_database.scores.front().player_id;
+		if (!deviceId.empty()) {
+			auto knownPlayerIt = m_database.playersByDevices.find(deviceId);
+			if (knownPlayerIt != m_database.playersByDevices.end()) {
+				m_players.advanceToId(knownPlayerIt->second);
+			}
 		}
 	}
 }

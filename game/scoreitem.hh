@@ -8,6 +8,7 @@ struct ScoreItem {
 	input::DevType type;
 	std::string track;  ///< includes difficulty
 	std::string track_simple; ///< no difficulty
+	std::string player_id; ///< identifies the score's source device (microphone name or similar), used to remember player selections
 	Color color;
 
 	ScoreItem() = default;
