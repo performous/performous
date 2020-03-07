@@ -85,6 +85,20 @@ void SongParser::xmlParseHeader() {
 		}
 		if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 	}
+	
+	// Extract tempo
+	{
+		xmlpp::const_NodeSet n;
+		if (!dom.find("/ss:MELODY", n)) throw std::runtime_error("Unable to find BPM info");
+		auto const& e = dynamic_cast<xmlpp::Element const&>(*n[0]);
+		std::string res = e.get_attribute("Resolution")->get_value();
+		SongParserUtil::assign(m_bpm, e.get_attribute("Tempo")->get_value().c_str());
+		if (res == "Semiquaver") {}
+		else if (res == "Demisemiquaver") m_bpm *= 2.0;
+		else throw std::runtime_error("Unknown tempo resolution: " + res);
+	}
+	addBPM(0, m_bpm);
+	
 	// Read TRACK elements (singer names), if available
 	std::string singers;  // Only used for "Together" track
 	xmlpp::const_NodeSet tracks;
@@ -119,18 +133,6 @@ void SongParser::xmlParse() {
 	// Parse notes.xml
 	SSDom dom(m_ss);
 	Song& s = m_song;
-	// Extract tempo
-	{
-		xmlpp::const_NodeSet n;
-		if (!dom.find("/ss:MELODY", n)) throw std::runtime_error("Unable to find BPM info");
-		auto const& e = dynamic_cast<xmlpp::Element const&>(*n[0]);
-		std::string res = e.get_attribute("Resolution")->get_value();
-		SongParserUtil::assign(m_bpm, e.get_attribute("Tempo")->get_value().c_str());
-		if (res == "Semiquaver") {}
-		else if (res == "Demisemiquaver") m_bpm *= 2.0;
-		else throw std::runtime_error("Unknown tempo resolution: " + res);
-	}
-	addBPM(0, m_bpm);
 
 	// Parse each track...
 	xmlpp::const_NodeSet tracks;
