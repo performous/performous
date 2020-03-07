@@ -1,3 +1,6 @@
 [submodule "ced"]
 	path = ced
 	url = https://github.com/performous/compact_enc_det
+[submodule "3rdparty/aubio"]
+	path = 3rdparty/aubio
+	url = git@github.com:performous/aubio.git

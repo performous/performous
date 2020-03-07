@@ -73,7 +73,7 @@ void SongParser::txtParse() {
 						std::clog << "songparser/info: Will try to fix overlap (most likely between both singers) with a linebreak." << std::endl;
 						Note lineBreak = Note();
 						lineBreak.type = Note::SLEEP;
-						double beatDur = getBPM(finalDuet.back().begin).step;
+						double beatDur = getBPM(m_song, finalDuet.back().begin).step;
 						double newEnd = (currentNote.begin - 2*beatDur);
 						lineBreak.begin = lineBreak.end = newEnd;
 						if (finalDuet.back().type != Note::SLEEP) {
@@ -234,7 +234,7 @@ bool SongParser::txtParseNote(std::string line) {
 
 void SongParser::txtResetState() {
 	m_txt = TXTState();
-	m_bpms.clear();
+	m_song.m_bpms.clear();
 	if (m_bpm != 0.0) { addBPM (0, m_bpm); }
 }
 
