@@ -1,10 +1,10 @@
 version: v1.0
-name: Performous Build on Ubuntu 18.04 
+name: Performous Build on Ubuntu 18.04
 agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
-blocks:    
+blocks:
   - name: Ubuntu 18.04 Build
     task:
       prologue:
@@ -15,15 +15,15 @@ blocks:
       jobs:
         - name: GCC-7 Build
           env_vars:
-             - name: CC
-               value: gcc-7
-             - name: CXX
-               value: g++-7
+            - name: CC
+              value: gcc-7
+            - name: CXX
+              value: g++-7
           commands:
-             - checkout
-             - git submodule init && git submodule update
-             - mkdir build.gcc && cd build.gcc && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
-             - make VERBOSE=1
+            - checkout
+            - git submodule init && git submodule update
+            - mkdir build.gcc && cd build.gcc && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
+            - make VERBOSE=1
         - name: Clang-6.0 Build
           env_vars:
             - name: CC
@@ -31,7 +31,7 @@ blocks:
             - name: CXX
               value: clang++
           commands:
-             - checkout
-             - git submodule init && git submodule update
-             - mkdir build.clang && cd build.clang && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
-             - make VERBOSE=1
+            - checkout
+            - git submodule init && git submodule update
+            - mkdir build.clang && cd build.clang && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
+            - make VERBOSE=1
