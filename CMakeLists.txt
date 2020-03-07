@@ -91,6 +91,12 @@ if(NOT FFTW3_FOUND OR NOT BLAS_FOUND)
 	message(ERROR "fftw3 or BLAS required to build aubio, but they cannot be found.")
 endif()
 
+if (BLAS_FOUND)
+	if (UNIX AND NOT APPLE)
+		set(AUBIO_CFLAGS "${AUBIO_CFLAGS} -DHAVE_CBLAS_H")
+	endif()
+endif()
+
 include(ExternalProject)
 ExternalProject_Add(aubio
 	SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/aubio/
