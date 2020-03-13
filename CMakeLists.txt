@@ -26,6 +26,11 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
 	add_definitions("-DNDEBUG")
 endif()
 
+if (USE_BOOST_REGEX)
+        add_definitions(-DUSE_BOOST_REGEX)
+endif()
+
+
 # Enable C++14 support and other compiler flags...
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
