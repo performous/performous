@@ -4,9 +4,8 @@
 #include "fs.hh"
 #include "libxml++-impl.hh"
 #include "unicode.hh"
-#include <boost/filesystem.hpp>
-#include <SDL2/SDL_joystick.h>
 #include "regex.hh"
+#include <SDL2/SDL_joystick.h>
 
 #include <deque>
 #include <stdexcept>

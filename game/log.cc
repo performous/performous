@@ -1,7 +1,6 @@
 #include "log.hh"
 
 #include "fs.hh"
-#include <boost/filesystem.hpp>
 #include <boost/iostreams/device/file_descriptor.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <fstream>
