@@ -1,15 +1,12 @@
 #include "image.hh"
 
-#include <boost/filesystem/fstream.hpp>
 #include <boost/filesystem/path.hpp>
 #include <jpeglib.h>
 #include <png.h>
 
+#include <fstream>
 #include <iostream>
 #include <string>
-
-using fs::ofstream;
-using fs::ifstream;
 
 namespace {
 	void writePngHelper(png_structp pngPtr, png_bytep data, png_size_t length) {
@@ -19,7 +16,7 @@ namespace {
 	void readPngHelper(png_structp pngPtr, png_bytep data, png_size_t length) {
 		static_cast<std::istream*>(png_get_io_ptr(pngPtr))->read((char*)data, length);
 	}
-	void loadPNG_internal(png_structp pngPtr, png_infop infoPtr, ifstream& file, Bitmap& bitmap, std::vector<png_bytep>& rows) {
+	void loadPNG_internal(png_structp pngPtr, png_infop infoPtr, std::ifstream& file, Bitmap& bitmap, std::vector<png_bytep>& rows) {
 		if (setjmp(png_jmpbuf(pngPtr))) throw std::runtime_error("Reading PNG failed");
 		png_set_read_fn(pngPtr,(png_voidp)&file, readPngHelper);
 		png_read_info(pngPtr, infoPtr);
@@ -33,7 +30,7 @@ namespace {
 		png_read_image(pngPtr, &rows[0]);
 	}
 
-	static void writePNG_internal(png_structp pngPtr, png_infop infoPtr, ofstream& file, unsigned w, unsigned h, int colorType, std::vector<png_bytep>& rows) {
+	static void writePNG_internal(png_structp pngPtr, png_infop infoPtr, std::ofstream& file, unsigned w, unsigned h, int colorType, std::vector<png_bytep>& rows) {
 		// There must be no objects initialized within this function because longjmp will mess them up
 		if (setjmp(png_jmpbuf(pngPtr))) throw std::runtime_error("Writing PNG failed");
 		png_set_write_fn(pngPtr, &file, writePngHelper, nullptr);
@@ -95,7 +92,7 @@ namespace {
 
 	BinaryBuffer readFile(fs::path const& path) {
 		BinaryBuffer ret;
-		fs::ifstream f(path, std::ios::binary);
+		std::ifstream f(path, std::ios::binary);
 		f.seekg(0, std::ios::end);
 		ret.resize(f.tellg());
 		f.seekg(0);
@@ -142,7 +139,7 @@ void writePNG(fs::path const& filename, Bitmap const& img, unsigned stride) {
 	if (!infoPtr) throw std::runtime_error("png_create_info_struct failed");
 	png_set_gAMA(pngPtr, infoPtr, img.linearPremul ? 1.0 : 2.2);
 	// Write file
-	ofstream file(name, std::ios::binary);
+	std::ofstream file(name, std::ios::binary);
 	writePNG_internal(pngPtr, infoPtr, file, img.width, img.height, colorType, rows);
 }
 
@@ -150,7 +147,7 @@ void loadPNG(Bitmap& bitmap, fs::path const& filename) {
 	std::clog << "image/debug: Loading PNG: " + filename.string() << std::endl;
 	// A hack to assume linear premultiplied data if file extension is .premul.png (used for cached SVGs)
 	if (filename.stem().extension() == "premul") bitmap.linearPremul = true;
-	ifstream file(filename, std::ios::binary);
+	std::ifstream file(filename, std::ios::binary);
 	png_structp pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
 	if (!pngPtr) throw std::runtime_error("png_create_read_struct failed");
 	png_infop infoPtr = nullptr;
