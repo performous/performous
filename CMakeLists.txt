@@ -30,6 +30,11 @@ if (USE_BOOST_REGEX)
         add_definitions(-DUSE_BOOST_REGEX)
 endif()
 
+option(USE_BOOST_FS "Whether to use boost filsystem instead of c++17" FALSE)
+
+if (USE_BOOST_FS)
+        add_definitions(-DUSE_BOOST_FS)
+endif()
 
 # Enable C++14 support and other compiler flags...
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
