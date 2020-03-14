@@ -12,7 +12,6 @@
 #include "../boost_predef/os.h"
 #endif
 
-#include <boost/filesystem.hpp>
 #include <SDL2/SDL_events.h>
 
 #if (BOOST_OS_WINDOWS) 
