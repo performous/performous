@@ -9,7 +9,7 @@
 #include "platform.hh"
 #include "screen.hh"
 #include "util.hh"
-#include <boost/filesystem.hpp>
+#include "fs.hh"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_hints.h>
 #include <SDL2/SDL_rect.h>

@@ -87,7 +87,7 @@
 				fs::path oldConf = (p ? p : home / ".config/performous");
 				if (fs::is_directory(oldConf)) {
 				std::clog << "fs/info: Configuration files found in old path, " << oldConf << std::endl;
-				conf = (home / "/Library/Preferences/Performous");
+				conf = home / "Library" / "Preferences" / "Performous";
 					if (bootstrapping) {
 						copyDirectoryRecursively(oldConf, conf);
 					try {
