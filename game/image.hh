@@ -1,14 +1,12 @@
 #pragma once
 
-#include <boost/filesystem/path.hpp>
+#include "fs.hh"
 #include <cairo/cairo.h>
 
 #include <algorithm>
 #include <cstddef>
 #include <stdexcept>
 #include <vector>
-
-namespace fs = boost::filesystem;
 
 namespace pix { enum Format {
 	INT_ARGB,  // Cairo's pixel format (SVG, text): premultiplied linear RGB (BGRA byte order)

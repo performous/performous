@@ -4,10 +4,11 @@
 #include "configuration.hh"
 #include "platform.hh"
 #include <boost/algorithm/string/replace.hpp>
-#include <boost/filesystem.hpp>
+#include "fs.hh"
 #include <boost/range.hpp>
 #include <algorithm>
 #include <cstdlib>
+#include <fstream>
 #include <mutex>
 #include <set>
 #include <sstream>
@@ -83,22 +84,18 @@ void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destina
 	if (!fs::create_directory(destinationDir) && !fs::exists(destinationDir)) {
 		throw std::runtime_error("Cannot create destination directory " + destinationDir.string());
 	}
-#if ((BOOST_VERSION / 100 % 1000) >= 55)
-	for (const auto& dirEnt : fs::recursive_directory_iterator{sourceDir})
-#else
-	for (fs::recursive_directory_iterator dirEnt(sourceDir); dirEnt !=fs::recursive_directory_iterator(); ++dirEnt)
-#endif
-	{
-#if ((BOOST_VERSION / 100 % 1000) >= 55)
-		const auto& path = dirEnt.path();
-#else
+#if ((BOOST_VERSION / 100 % 1000) < 55)
+	for (fs::recursive_directory_iterator dirEnt(sourceDir); dirEnt !=fs::recursive_directory_iterator(); ++dirEnt) {
 		const auto& path = dirEnt->path();
+#else
+	for (const auto& dirEnt : fs::recursive_directory_iterator{sourceDir}) {
+		const auto& path = dirEnt.path();
 #endif
 		auto relativePathStr = path.string();
 		boost::algorithm::replace_first(relativePathStr, sourceDir.string(), "");
 		try { 
 			if (!fs::is_directory(path)) { fs::copy_file(path, destinationDir / relativePathStr); }
-			else { fs::copy_directory(path, destinationDir / relativePathStr); }
+			else { create_directory(path, destinationDir / relativePathStr); }
 		} catch (...) {
 			throw std::runtime_error("Cannot copy file " + path.string() + ", because it already exists in the destination folder.");
 		}
@@ -179,10 +176,10 @@ Paths listFiles(fs::path const& dir) {
 		fs::path subdir = path / dir;
 		if (!fs::is_directory(subdir))
 			continue;
-		for (fs::recursive_directory_iterator dirIt(subdir), dirEnd; dirIt != dirEnd; ++dirIt) {
-			fs::path name = dirIt->path().filename();  // FIXME: Extract full path from current folder, not just the filename
+		for (const auto &d : fs::recursive_directory_iterator(subdir)) {
+			fs::path name = d.path().filename();  // FIXME: Extract full path from current folder, not just the filename
 			// If successfully inserted to "found", it wasn't found before, so add to paths.
-			if (found.insert(name).second) files.push_back(*dirIt);
+			if (found.insert(name).second) files.push_back(d);
 		}
 	}
 	return files;
@@ -195,8 +192,8 @@ std::list<std::string> getThemes() {
 		p /= "themes";
 		if (!fs::is_directory(p)) continue;
 		// Gather the themes in this folder
-		for (fs::directory_iterator dirIt(p), dirEnd; dirIt != dirEnd; ++dirIt) {
-			fs::path p2 = dirIt->path();
+		for (const auto &dir : fs::directory_iterator(p)) {
+			fs::path p2 = dir.path();
 			if (fs::is_directory(p2)) themes.insert(p2.filename().string());
 		}
 	}
