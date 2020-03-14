@@ -6,7 +6,7 @@
 #include "songs.hh"
 #include "textinput.hh"
 #include "theme.hh"
-#include <boost/filesystem.hpp>
+#include "fs.hh"
 #include <iostream>
 #include <map>
 #include <string>
