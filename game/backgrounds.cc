@@ -7,7 +7,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <random>
-#include <regex>
+#include "regex.hh"
 
 void Backgrounds::reload() {
 	if (m_loading) return;
@@ -47,7 +47,7 @@ void Backgrounds::reload_internal(fs::path const& parent) {
 	if (std::distance(parent.begin(), parent.end()) > 20) { std::clog << "backgrounds/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
 	try {
 		// Find suitable file formats
-		std::regex expression(R"(\.(png|jpeg|jpg|svg)$)", std::regex_constants::icase);
+		regex expression(R"(\.(png|jpeg|jpg|svg)$)", regex_constants::icase);
 		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) {
 			fs::path p = dirIt->path();
 			if (fs::is_directory(p)) { reload_internal(p); continue; }
