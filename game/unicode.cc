@@ -1,7 +1,7 @@
 #include "unicode.hh"
 
 #include "configuration.hh"
-#include <regex>
+#include "regex.hh"
 #include <sstream>
 #include <stdexcept>
 #include <unicode/unistr.h>
@@ -102,8 +102,8 @@ void UnicodeUtil::collate (songMetadata& stringmap) {
 				pattern += std::string(")\\s(.+))$");
 			}
 		}
-		std::string collatedString = std::regex_replace(convertToUTF8(kv.second),
-		std::regex(pattern, std::regex_constants::icase), "$3,$2");
+		std::string collatedString = regex_replace(convertToUTF8(kv.second),
+		regex(pattern, regex_constants::icase), "$3,$2");
 		stringmap[kv.first] = collatedString;
 	}
 }
