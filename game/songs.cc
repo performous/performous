@@ -140,61 +140,64 @@ void Songs::CacheSonglist() {
         }
         if(!song->filename.string().empty()) {
         	songObject[utility::conversions::to_string_t("TxtFile")] = web::json::value::string(utility::conversions::to_string_t(song->filename.string()));
-		}
-		if (!song->title.empty()) {
-			songObject[utility::conversions::to_string_t("Title")] = web::json::value::string(utility::conversions::to_string_t(song->title));
-		}
+        }
+        if (!song->title.empty()) {
+        	songObject[utility::conversions::to_string_t("Title")] = web::json::value::string(utility::conversions::to_string_t(song->title));
+    	}
 		if (!song->artist.empty()) {
-			songObject[utility::conversions::to_string_t("Artist")] = web::json::value::string(utility::conversions::to_string_t(song->artist));
-		}
-		if (!song->edition.empty()) {
-			songObject[utility::conversions::to_string_t("Edition")] = web::json::value::string(utility::conversions::to_string_t(song->edition));
-		}
-		if (!song->language.empty()) {
-			songObject[utility::conversions::to_string_t("Language")] = web::json::value::string(utility::conversions::to_string_t(song->language));
-		}
-		if (!song->creator.empty()) {
-			songObject[utility::conversions::to_string_t("Creator")] = web::json::value::string(utility::conversions::to_string_t(song->creator));
-		}
-		if (!song->genre.empty()) {
-			songObject[utility::conversions::to_string_t("Genre")] = web::json::value::string(utility::conversions::to_string_t(song->genre));
-		}
-		if (!song->cover.string().empty()) {
-			songObject[utility::conversions::to_string_t("Cover")] = web::json::value::string(utility::conversions::to_string_t(song->cover.string()));
-		}
-		if (!song->background.string().empty()) {
-			songObject[utility::conversions::to_string_t("Background")] = web::json::value::string(utility::conversions::to_string_t(song->background.string()));
-		}
-		if (!song->music["background"].string().empty()) {
-			songObject[utility::conversions::to_string_t("SongFile")] = web::json::value::string(utility::conversions::to_string_t(song->music["background"].string()));
-		}
-		if (!song->video.string().empty()) {
-			songObject[utility::conversions::to_string_t("VideoFile")] = web::json::value::string(utility::conversions::to_string_t(song->video.string()));
-		}
-		if (!std::isnan(song->start)) {
-			songObject[utility::conversions::to_string_t("Start")] = web::json::value(song->start);
-		}
-		if (!std::isnan(song->videoGap)) {
-			songObject[utility::conversions::to_string_t("VideoGap")] = web::json::value(song->videoGap);
-		}
-		if (!std::isnan(song->preview_start)) {
-			songObject[utility::conversions::to_string_t("PreviewStart")] = web::json::value::number(song->preview_start);
-		}
-		if (!song->music["vocals"].string().empty()) {
-			songObject[utility::conversions::to_string_t("Vocals")] = web::json::value::string(utility::conversions::to_string_t(song->music["vocals"].string()));
-		}
-		auto duration = song->getDurationSeconds();
-		if (!std::isnan(duration)) {
-			songObject[utility::conversions::to_string_t("Duration")] = web::json::value(duration);
+        	songObject[utility::conversions::to_string_t("Artist")] = web::json::value::string(utility::conversions::to_string_t(song->artist));
+    	}
+        if (!song->edition.empty()) {
+        	songObject[utility::conversions::to_string_t("Edition")] = web::json::value::string(utility::conversions::to_string_t(song->edition));
+    	}
+    	if (!song->language.empty()) {
+        	songObject[utility::conversions::to_string_t("Language")] = web::json::value::string(utility::conversions::to_string_t(song->language));
+        }
+        if (!song->creator.empty()) {
+        	songObject[utility::conversions::to_string_t("Creator")] = web::json::value::string(utility::conversions::to_string_t(song->creator));
+    	}
+    	if (!song->genre.empty()) {
+        	songObject[utility::conversions::to_string_t("Genre")] = web::json::value::string(utility::conversions::to_string_t(song->genre));
+    	}
+    	if (!song->cover.string().empty()) {
+        	songObject[utility::conversions::to_string_t("Cover")] = web::json::value::string(utility::conversions::to_string_t(song->cover.string()));
+    	}
+    	if (!song->background.string().empty()) {
+	        songObject[utility::conversions::to_string_t("Background")] = web::json::value::string(utility::conversions::to_string_t(song->background.string()));
 	    }
-
+    	if (!song->music["background"].string().empty()) {
+	        songObject[utility::conversions::to_string_t("SongFile")] = web::json::value::string(utility::conversions::to_string_t(song->music["background"].string()));
+	    }
+    	if (!song->video.string().empty()) {
+	        songObject[utility::conversions::to_string_t("VideoFile")] = web::json::value::string(utility::conversions::to_string_t(song->video.string()));
+	    }
+    	if (!std::isnan(song->start)) {
+	        songObject[utility::conversions::to_string_t("Start")] = web::json::value(song->start);
+	    }
+    	if (!std::isnan(song->videoGap)) {
+	        songObject[utility::conversions::to_string_t("VideoGap")] = web::json::value(song->videoGap);
+	    }
+    	if (!std::isnan(song->preview_start)) {
+	        songObject[utility::conversions::to_string_t("PreviewStart")] = web::json::value::number(song->preview_start);
+	    }
+    	if (!song->music["vocals"].string().empty()) {
+	        songObject[utility::conversions::to_string_t("Vocals")] = web::json::value::string(utility::conversions::to_string_t(song->music["vocals"].string()));
+	    }
+    	double duration = song->getDurationSeconds();
+    	if(!std::isnan(duration)) {
+	    	songObject[utility::conversions::to_string_t("Duration")] = web::json::value::number(duration);
+	    }
+	    if (!song->m_bpms.empty()) {
+			songObject[utility::conversions::to_string_t("BPM")] = web::json::value::number(15 / song->m_bpms.front().step);
+		}
+			
 		// Cache songtype also.
 		if(song->hasVocals()) {
 			uint32_t vocals = song->vocalTracks.size();
-        	songObject[utility::conversions::to_string_t("VocalTracks")] = web::json::value::number(vocals);
+        	songObject[utility::conversions::to_string_t(utility::conversions::to_string_t("VocalTracks")] = web::json::value::number(vocals);
 		}
 		if (song->hasKeyboard()) {
-			songObject[utility::conversions::to_string_t("KeyboardTracks")] = web::json::value::number(1);
+			songObject[utility::conversions::to_string_t(utility::conversions::to_string_t("KeyboardTracks")] = web::json::value::number(1);
 		}
 		if (song->hasDrums()) {
 			songObject[utility::conversions::to_string_t("DrumTracks")] = web::json::value::number(1);
