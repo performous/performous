@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
-#include <regex>
+#include "regex.hh"
 #include <stdexcept>
 
 #include <boost/filesystem.hpp>
@@ -182,11 +182,14 @@ void Songs::CacheSonglist() {
     	if(!song->music["vocals"].string().empty()) {
 	        songObject["Vocals"] = web::json::value::string(song->music["vocals"].string());
 	    }
-    	auto duration = song->getDurationSeconds();
+    	double duration = song->getDurationSeconds();
     	if(!std::isnan(duration)) {
-	    	songObject["Duration"] = web::json::value(duration);
+	    	songObject["Duration"] = web::json::value::number(duration);
 	    }
-
+	    if (!song->m_bpms.empty()) {
+			songObject["BPM"] = web::json::value::number(15 / song->m_bpms.front().step);
+		}
+			
 		// Cache songtype also.
 		if(song->hasVocals()) {
 			uint32_t vocals = song->vocalTracks.size();
@@ -233,7 +236,7 @@ void Songs::CacheSonglist() { }
 void Songs::reload_internal(fs::path const& parent) {
 	if (std::distance(parent.begin(), parent.end()) > 20) { std::clog << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)\n"; return; }
 	try {
-		std::regex expression(R"((\.txt|^song\.ini|^notes\.xml|\.sm)$)", std::regex_constants::icase);
+		regex expression(R"((\.txt|^song\.ini|^notes\.xml|\.sm)$)", regex_constants::icase);
 		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) { //loop through files
 			fs::path p = dirIt->path();
 			if (fs::is_directory(p)) { reload_internal(p); continue; } //if the file is a folder redo this function with this folder as path
