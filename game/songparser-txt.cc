@@ -47,10 +47,12 @@ void SongParser::txtParse() {
 	
 	if (m_song.hasDuet()) {
 		bool skip;
-		Notes s1, s2, merged, finalDuet;
-		s1 = m_song.getVocalTrack(TrackName::LEAD_VOCAL).notes;
-		s2 = m_song.getVocalTrack(SongParserUtil::DUET_P2).notes;
+		Notes merged, finalDuet;
+		Notes const& s1 = m_song.getVocalTrack(TrackName::LEAD_VOCAL).notes;
+		Notes const& s2 = m_song.getVocalTrack(SongParserUtil::DUET_P2).notes;
+
 		std::merge(s1.begin(), s1.end(), s2.begin(), s2.end(), std::back_inserter(merged), Note::ltBegin);
+
 		VocalTracks const& tracks = m_song.vocalTracks;
 		std::string duetName = tracks.at(TrackName::LEAD_VOCAL).name + " & " + tracks.at(SongParserUtil::DUET_P2).name;
 		m_song.insertVocalTrack(SongParserUtil::DUET_BOTH, duetName);
@@ -60,12 +62,15 @@ void SongParser::txtParse() {
 		
 		for (auto currentNote: merged) {
 			skip = false;
-			if (!finalDuet.empty()) { 
+			if (!finalDuet.empty()){ 
 				if (currentNote.type == Note::SLEEP) {
-					auto prevToLast = ++(finalDuet.rbegin());
-					if (prevToLast->type == Note::SLEEP) {
-						std::clog << "songparser/info: Phrase formed by a single syllable is most likely our fault, We'll skip the break." << std::endl;
-						skip = true;
+					if (finalDuet.size() > 1)
+					{
+						auto prevToLast = ++(finalDuet.rbegin());
+						if (prevToLast->type == Note::SLEEP) {
+							std::clog << "songparser/info: Phrase formed by a single syllable is most likely our fault, We'll skip the break." << std::endl;
+							skip = true;
+						}
 					}
 				}
 				else {
@@ -82,12 +87,13 @@ void SongParser::txtParse() {
 							if (!skip) { finalDuet.push_back(lineBreak); }
 						}
 					}
-				}	
+				}
 			}
 			if (!skip) { finalDuet.push_back(currentNote); }
 		}
 		auto finalNote = std::unique(finalDuet.begin(), finalDuet.end(), Note::equal);
 		finalDuet.erase(finalNote, finalDuet.end());
+
 		duetNotes.swap(finalDuet);
 		duetTrack.noteMin = std::min(m_song.getVocalTrack(TrackName::LEAD_VOCAL).noteMin, m_song.getVocalTrack(SongParserUtil::DUET_P2).noteMin);
 		duetTrack.noteMax = std::max(m_song.getVocalTrack(TrackName::LEAD_VOCAL).noteMax, m_song.getVocalTrack(SongParserUtil::DUET_P2).noteMax);
@@ -162,7 +168,7 @@ bool SongParser::txtParseNote(std::string line) {
 	}
 	Note n;
 	n.type = Note::Type(iss.get());
-	unsigned int ts = m_txt.prevts;
+	int ts = m_txt.prevts;
 	switch (n.type) {
 		case Note::NORMAL:
 		case Note::FREESTYLE:
@@ -170,6 +176,9 @@ bool SongParser::txtParseNote(std::string line) {
 		{
 			unsigned int length = 0;
 			if (!(iss >> ts >> length >> n.note)) throw std::runtime_error("Invalid note line format");
+			if (ts < 0) //ignore negative note position which could appears at some songs 
+				return true;
+
 			if (length < 1) std::clog << "songparser/info: Notes must have positive durations." << std::endl;
 			n.notePrev = n.note; // No slide notes in TXT yet.
 			if (m_relative) ts += m_txt.relativeShift;
@@ -181,6 +190,9 @@ bool SongParser::txtParseNote(std::string line) {
 		{
 			unsigned int end;
 			if (!(iss >> ts >> end)) end = ts;
+			if (ts < 0) //ignore negative note position which could appears at some songs 
+				return true;
+
 			if (m_relative) {
 				ts += m_txt.relativeShift;
 				end += m_txt.relativeShift;
