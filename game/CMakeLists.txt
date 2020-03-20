@@ -82,7 +82,7 @@ include_directories(${LibEpoxy_INCLUDE_DIRS})
 list(APPEND LIBS ${LibEpoxy_LIBRARIES})
 
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM)
+foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM Aubio FFTW3 BLAS)
 	find_package(${lib} REQUIRED)
 	message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
 	include_directories(${${lib}_INCLUDE_DIRS})
@@ -171,13 +171,8 @@ if(WIN32)
 endif()
 
 target_link_libraries(performous ced)
-list(APPEND LIBS ${AUBIO_INSTALL_DIR}/lib/libaubio.a)
-list(APPEND LIBS ${FFTW3_LIBRARIES})
-list(APPEND LIBS ${BLAS_LIBRARIES})
 
 target_link_libraries(performous ${LIBS})
-
-target_include_directories(performous PRIVATE "${AUBIO_INSTALL_DIR}/include/")
 
 install(TARGETS performous DESTINATION ${BIN_INSTALL})
 
