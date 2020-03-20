@@ -71,7 +71,7 @@ if (Boost_VERSION VERSION_LESS 105500)
 	set(CMAKE_CXX_FLAGS "-DBOOST_NO_CXX11_SCOPED_ENUMS ${CMAKE_CXX_FLAGS}")
 endif()
 
-find_package(ICU REQUIRED uc data i18n io)
+find_package(ICU 60 REQUIRED uc data i18n io)
 include_directories(${ICU_INCLUDE_DIRS})
 list(APPEND LIBS ${ICU_LIBRARIES})
 
@@ -175,8 +175,15 @@ add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
 if(WIN32)
   target_link_libraries(performous wsock32 ws2_32)
 endif()
-target_link_libraries(performous ${LIBS})
+
 target_link_libraries(performous ced)
+list(APPEND LIBS ${AUBIO_INSTALL_DIR}/lib/libaubio.a)
+list(APPEND LIBS ${FFTW3_LIBRARIES})
+list(APPEND LIBS ${BLAS_LIBRARIES})
+
+target_link_libraries(performous ${LIBS})
+
+target_include_directories(performous PRIVATE "${AUBIO_INSTALL_DIR}/include/")
 
 install(TARGETS performous DESTINATION ${BIN_INSTALL})
 

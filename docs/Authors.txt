@@ -29,7 +29,7 @@ Arjan Speiard <https://asgardsings.nl>
 		* Structure
 		* Set song position
 	* Introduced 8 player mode.
-	
+
 Gregorio Litenstein <http://www.fail.cl>
 	* macOS builds, fixes and testing.
 	* Spanish localization.
@@ -81,7 +81,7 @@ Markus Raab <ich at markus-raab.org>
 
 Matti Kemppainen <mpkemppa at users.sf.net>
 	* Prototyping dance game
-	
+
 Jaakko Nikkola <jnikkola at users.sourceforge.net>
 	* Dance game developer
 
@@ -96,7 +96,8 @@ These guys have provided some important part for the game, but have never been
 directly involved in the project.
 
 Tryad <http://tryad.org/>
-	* The menu song (CC-by-sa)
+	* The menu song (CC-BY-SA 3.0),
+	  by john holowach, “\//\\/” (Vavrek), rjmarshall
 
 Oxetti choir <http://www.oxetti.info/>
 	* Practice background vocalization (recorded for this project)
@@ -140,6 +141,6 @@ Olli Salli <osalli at cc.hut.fi>
 Ville Virkkala <vvirkkal at cc.hut.fi>
 	* Silky Strings original MIDI parser
 	* Silky Strings game logic
-	
+
 Tuomas Perälä <tuomas.perala at hut.fi>
 	* Silky Strings Qt-based launcher

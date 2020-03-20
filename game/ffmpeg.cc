@@ -2,7 +2,10 @@
 
 #include "chrono.hh"
 #include "config.hh"
+#include "screen_songs.hh"
 #include "util.hh"
+
+#include "aubio/aubio.h"
 #include <memory>
 #include <iostream>
 #include <sstream>
@@ -41,6 +44,97 @@ namespace {
 	}
 }
 
+bool VideoFifo::tryPop(Bitmap& f) {
+	std::unique_lock<std::mutex> l(m_mutex);
+	if (m_queue.empty()) return false; // Nothing to deliver
+	if (m_queue.front().buf.empty()) { m_eof = true; return false; }
+	f = std::move(m_queue.front());
+	m_queue.pop_front();
+	m_cond.notify_all();
+	m_timestamp = f.timestamp;
+	return true;
+}
+
+void VideoFifo::push(Bitmap&& f) {
+	std::unique_lock<std::mutex> l(m_mutex);
+	m_cond.wait(l, [this]{ return m_queue.size() < m_max; });
+	if (m_queue.empty()) m_timestamp = f.timestamp;
+	m_queue.emplace_back(std::move(f));
+}
+
+void VideoFifo::reset() {
+	std::unique_lock<std::mutex> l(m_mutex);
+	m_queue.clear();
+	m_cond.notify_all();
+	m_eof = false;
+}
+
+void AudioBuffer::reset() {
+	{
+		std::unique_lock<mutex> l(m_mutex);
+		m_data.clear();
+		m_pos = 0;
+	}
+	m_cond.notify_one();
+}
+
+void AudioBuffer::quit() {
+	m_quit.store(true);
+	m_cond.notify_one();
+}
+
+fvec_t* AudioBuffer::makePreviewBuffer() {
+	{
+		std::unique_lock<mutex> l(m_mutex);
+		ScreenSongs::previewSamplesBuffer.reset(new_fvec(m_data.size() / 2));
+		float previewVol = float(config["audio/preview_volume"].i()) / 100;
+		for (size_t rpos = 0, bpos = 0; rpos < m_data.size(); rpos += 2, bpos ++) {
+			ScreenSongs::previewSamplesBuffer->data[bpos] = (((da::conv_from_s16(m_data[rpos]) + da::conv_from_s16(m_data[rpos + 1])) / 2) / previewVol);
+		}
+	}
+	m_cond.notify_one();
+	return ScreenSongs::previewSamplesBuffer.get();
+};
+
+void AudioBuffer::push(std::vector<std::int16_t> const& data, double timestamp) {
+	std::unique_lock<mutex> l(m_mutex);
+	m_cond.wait(l, [this]{ return condition(); });
+	if (m_quit) return;
+	if (timestamp < 0.0) {
+		std::clog << "ffmpeg/warning: Negative audio timestamp " << timestamp << " seconds, frame ignored." << std::endl;
+		return;
+	}
+	// Insert silence at the beginning if the stream starts later than 0.0
+	if (m_pos == 0 && timestamp > 0.0) {
+		m_pos = timestamp * m_sps;
+		m_data.resize(m_pos, 0);
+	}
+	m_data.insert(m_data.end(), data.begin(), data.end());
+	m_pos += data.size();
+}
+
+bool AudioBuffer::prepare(std::int64_t pos) {
+	std::unique_lock<mutex> l(m_mutex, std::try_to_lock);
+	if (!l.owns_lock()) return false;  // Didn't get lock, give up for now
+	if (eof(pos)) return true;
+	if (pos < 0) pos = 0;
+	m_posReq = pos;
+	wakeups();
+	// Has enough been prebuffered already and is the requested position still within buffer
+	return m_pos > m_posReq + m_data.capacity() / 16 && m_pos <= m_posReq + m_data.size();
+}
+
+bool AudioBuffer::operator()(float* begin, float* end, std::int64_t pos, float volume) {
+	std::unique_lock<mutex> l(m_mutex);
+	size_t idx = pos + m_data.size() - m_pos;
+	size_t samples = end - begin;
+	for (size_t s = 0; s < samples; ++s, ++idx) {
+		if (idx < m_data.size()) begin[s] += volume * da::conv_from_s16(m_data[idx]);
+	}
+	m_posReq = std::max<std::int64_t>(0, pos + samples);
+	wakeups();
+	return !eof(pos);
+}
 
 FFmpeg::FFmpeg(fs::path const& _filename, unsigned int rate):
   m_filename(_filename), m_rate(rate),
