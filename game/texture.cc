@@ -5,7 +5,7 @@
 #include "screen.hh"
 #include "svg.hh"
 #include <boost/algorithm/string/case_conv.hpp>
-#include <boost/filesystem.hpp>
+
 #include <atomic>
 #include <cctype>
 #include <condition_variable>

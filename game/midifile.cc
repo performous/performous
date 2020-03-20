@@ -1,7 +1,7 @@
 #include "midifile.hh"
 
-#include <boost/filesystem/fstream.hpp>
 #include <algorithm>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <stdexcept>
@@ -25,7 +25,7 @@ class MidiStream {
 	 * @param file MidiFile to be read
 	 */
 	MidiStream(fs::path const& file) {
-		fs::ifstream ifs(file, std::ios::binary);
+		std::ifstream ifs(file, std::ios::binary);
 #if MIDI_DEBUG_LEVEL > 1
 		std::cout << "Opening file: " << file << std::endl;
 #endif

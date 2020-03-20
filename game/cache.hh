@@ -2,7 +2,6 @@
 
 #include "configuration.hh"
 #include "fs.hh"
-#include <boost/filesystem.hpp>
 #include <cstring>
 #include <stdexcept>
 

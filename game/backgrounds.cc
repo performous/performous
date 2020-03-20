@@ -1,7 +1,7 @@
 #include "backgrounds.hh"
+#include "fs.hh"
 
 #include "configuration.hh"
-#include <boost/filesystem.hpp>
 #include <algorithm>
 #include <iostream>
 #include <sstream>
