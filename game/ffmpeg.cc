@@ -14,19 +14,15 @@
 #include <thread>
 
 extern "C" {
-#include AVCODEC_INCLUDE
-#include AVFORMAT_INCLUDE
-#include SWSCALE_INCLUDE
-#include SWRESAMPLE_INCLUDE
-#include AVUTIL_INCLUDE
-#include AVUTIL_OPT_INCLUDE
-#include AVUTIL_MATH_INCLUDE
-#include AVUTIL_ERROR_INCLUDE
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libswscale/swscale.h>
+#include <libswresample/swresample.h>
+#include <libavutil/avutil.h>
+#include <libavutil/opt.h>
+#include <libavutil/mathematics.h>
+#include <libavutil/error.h>
 }
-
-#if (LIBAVCODEC_VERSION_INT) < (AV_VERSION_INT(52,94,3))
-#	define AV_SAMPLE_FMT_S16 SAMPLE_FMT_S16
-#endif
 
 // Some versions of libav does not contain this definition.
 #ifndef AV_ERROR_MAX_STRING_SIZE
@@ -422,4 +418,3 @@ void FFmpeg::processAudio(AVFrame* frame) {
 	av_freep(&output);
 	m_position += double(out_samples)/m_rate;
 }
-
