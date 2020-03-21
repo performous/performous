@@ -73,7 +73,7 @@ else()
 	message(STATUS "Localization disabled: Gettext tools (msgfmt) missing")
 endif()
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ced)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/ced)
 
 if (APPLE)
 	set_property(GLOBAL PROPERTY BLA_VENDOR APPLE)
@@ -114,7 +114,7 @@ ExternalProject_Get_Property(aubio INSTALL_DIR)
 set (AUBIO_INSTALL_DIR ${INSTALL_DIR})
 
 add_subdirectory(game)
-add_subdirectory(ced)
+add_subdirectory(3rdparty/ced)
 add_subdirectory(docs)
 
 if(WIN32)
