@@ -170,8 +170,9 @@ if(WIN32)
   target_link_libraries(performous wsock32 ws2_32)
 endif()
 
-target_link_libraries(performous ced)
-list(APPEND LIBS ${AUBIO_INSTALL_DIR}/lib/libaubio.a)
+target_link_libraries(performous ced aubio)
+target_link_directories(performous BEFORE PRIVATE ${AUBIO_INSTALL_DIR}/lib/)
+
 list(APPEND LIBS ${FFTW3_LIBRARIES})
 list(APPEND LIBS ${BLAS_LIBRARIES})
 
