@@ -91,20 +91,26 @@ if(NOT FFTW3_FOUND OR NOT BLAS_FOUND)
 	message(ERROR "fftw3 or BLAS required to build aubio, but they cannot be found.")
 endif()
 
-if (BLAS_FOUND)
-	if (UNIX AND NOT APPLE)
-		set(AUBIO_CFLAGS "${AUBIO_CFLAGS} -DHAVE_CBLAS_H")
-	endif()
-endif()
+include(FindPkgConfig)
+
+pkg_check_modules(LIBCBLAS REQUIRED cblas)
 
 include(ExternalProject)
 ExternalProject_Add(aubio
 	SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/aubio/
-	DOWNLOAD_COMMAND ""
-    UPDATE_COMMAND ""
-	TMP_DIR tmp
-	CONFIGURE_COMMAND "${CMAKE_SOURCE_DIR}/3rdparty/build_aubio.sh" ${ACCELERATE_COMMAND} <INSTALL_DIR> ${AUBIO_CFLAGS}
-	BUILD_COMMAND ""
+        BINARY_DIR ${CMAKE_BINARY_DIR}/3rdparty/aubio-build/
+        INSTALL_DIR ${CMAKE_BINARY_DIR}/3rdparty/aubio-install/
+        UPDATE_COMMAND ""
+	TMP_DIR ${CMAKE_BINARY_DIR}/3rdparty/aubio-build/tmp/
+	CONFIGURE_COMMAND ""
+	BUILD_COMMAND cmake -E env CFLAGS="-I${LIBCBLAS_INCLUDE_DIRS}" ${CMAKE_SOURCE_DIR}/3rdparty/aubio/waf --disable-tests --notests --verbose
+                  --enable-fftw3f --disable-sndfile --disable-avcodec --disable-double
+                  --disable-samplerate --disable-docs --disable-wavread --disable-wavwrite
+                  --disable-tests --notests --disable-examples --disable-apple-audio
+                  --disable-fat --disable-jack --libdir=lib
+                  --prefix=${CMAKE_BINARY_DIR}/3rdparty/aubio-install/
+                  --top=${CMAKE_SOURCE_DIR}/3rdparty/aubio/
+                  --out=${CMAKE_BINARY_DIR}/3rdparty/aubio-build/ configure build install
 	INSTALL_COMMAND ""
 )
 
