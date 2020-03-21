@@ -1,6 +1,6 @@
-[submodule "ced"]
+[submodule "compact_enc_dec"]
 	path = 3rdparty/ced
 	url = ../compact_enc_det
-[submodule "3rdparty/aubio"]
+[submodule "aubio"]
 	path = 3rdparty/aubio
 	url = ../aubio
