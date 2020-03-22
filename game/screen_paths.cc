@@ -90,7 +90,9 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 			//Reload internal, but that crashes!! rely on the user to press ctrl+r in song selection screen
 		}));
 	}
-	m_menu.add(MenuOption(_(".."),_("Go up one folder")).call([this, sl, path]() {
+	auto parent = path.parent_path();
+	if (!parent.empty() && parent != path)
+		m_menu.add(MenuOption(_(".."),_("Go up one folder")).call([this, sl, path]() {
 		generateMenuFromPath(path.parent_path());
 	}));
 //todo sort folders
