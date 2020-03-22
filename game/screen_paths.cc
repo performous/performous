@@ -93,20 +93,13 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 	auto parent = path.parent_path();
 	if (!parent.empty() && parent != path)
 		m_menu.add(MenuOption(_(".."),_("Go up one folder")).call([this, sl, path]() {
-		generateMenuFromPath(path.parent_path());
+					generateMenuFromPath(path.parent_path());
 	}));
-
-	for (fs::directory_iterator dirIt(path), dirEnd; dirIt != dirEnd; ++dirIt) { //loop through files and directories
-		fs::path p = dirIt->path();
-		if (fs::is_directory(p)) {
-			if(p.filename().c_str()[0] == '.' && !showHiddenfolders) {
-				std::clog << "screen_paths/notice: Ignoring hidden folder: ." << p.c_str() << std::endl;
-				continue;
-			} else {
-				m_menu.add(MenuOption(p.string(),_("Open folder")).call([this, p](){ generateMenuFromPath(p);
-				}));
-			}
-			
+	
+        for (const auto &di : fs::directory_iterator(path)) {
+                auto &p = di.path();
+		if (fs::is_directory(p) && (showHiddenfolders || p.filename().c_str()[0] != '.')) {
+			m_menu.add(MenuOption(p.string(), _("Open folder")).call([this, p] { generateMenuFromPath(p); }));
 		}
 	}
 	m_menu.sortOptions();
