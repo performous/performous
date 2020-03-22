@@ -95,7 +95,7 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 		m_menu.add(MenuOption(_(".."),_("Go up one folder")).call([this, sl, path]() {
 		generateMenuFromPath(path.parent_path());
 	}));
-//todo sort folders
+
 	for (fs::directory_iterator dirIt(path), dirEnd; dirIt != dirEnd; ++dirIt) { //loop through files and directories
 		fs::path p = dirIt->path();
 		if (fs::is_directory(p)) {
@@ -109,6 +109,7 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 			
 		}
 	}
+	m_menu.sortOptions();
 }
 
 
