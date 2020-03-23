@@ -55,7 +55,7 @@ class VideoFifo {
 class AudioBuffer {
 	typedef std::recursive_mutex mutex;
   public:
-	AudioBuffer(size_t size = 4320000): m_data(size) {}
+	AudioBuffer(size_t size = 4320256): m_data(size) {}
 	/// Reset from FFMPEG side (seeking to beginning or terminate stream)
 	void reset();
 	void quit();

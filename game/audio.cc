@@ -206,7 +206,7 @@ bool Music::prepare() {
 				std::vector<double> extra_beats;
 				Song::Beats& beats = sSongs->getSongs().currentPtr()->beats;
 				if (!sSongs->getSongs().currentPtr()->hasControllers()) {
-				while (readptr < previewSamples->length) {
+				while ((readptr + Audio::aubio_hop_size) <= previewSamples->length) {
 					tempoSamplePtr->data = &previewSamples->data[readptr];
 					aubio_tempo_do(aubioTempo.get(),tempoSamplePtr,previewBeats);
 					if (previewBeats->data[0] != 0) {
