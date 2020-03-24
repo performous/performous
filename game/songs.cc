@@ -194,10 +194,10 @@ void Songs::CacheSonglist() {
 		// Cache songtype also.
 		if(song->hasVocals()) {
 			uint32_t vocals = song->vocalTracks.size();
-        	songObject[utility::conversions::to_string_t(utility::conversions::to_string_t("VocalTracks")] = web::json::value::number(vocals);
+        	songObject[utility::conversions::to_string_t("VocalTracks")] = web::json::value::number(vocals);
 		}
 		if (song->hasKeyboard()) {
-			songObject[utility::conversions::to_string_t(utility::conversions::to_string_t("KeyboardTracks")] = web::json::value::number(1);
+			songObject[utility::conversions::to_string_t("KeyboardTracks")] = web::json::value::number(1);
 		}
 		if (song->hasDrums()) {
 			songObject[utility::conversions::to_string_t("DrumTracks")] = web::json::value::number(1);
