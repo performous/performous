@@ -80,7 +80,8 @@ if (APPLE)
 	set(ACCELERATE_COMMAND "--enable-accelerate")
 	set(AUBIO_CFLAGS "${CMAKE_C_FLAGS} -iframeworkwithsysroot /System/Library/Frameworks/ -mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET} -isysroot '${CMAKE_OSX_SYSROOT}/'")
 else()
-	set(ACCELERATE_COMMAND "--enable-blas")
+	set(ACCELERATE_COMMAND "--enable-atlas")
+        set_property(GLOBAL PROPERTY BLA_VENDOR OpenBLAS)
 	set(AUBIO_CFLAGS "${CMAKE_C_FLAGS}")
 endif()
 
@@ -91,28 +92,37 @@ if(NOT FFTW3_FOUND OR NOT BLAS_FOUND)
 	message(ERROR "fftw3 or BLAS required to build aubio, but they cannot be found.")
 endif()
 
-if (BLAS_FOUND)
-	if (UNIX AND NOT APPLE)
-		set(AUBIO_CFLAGS "${AUBIO_CFLAGS} -DHAVE_CBLAS_H")
-	endif()
+if(WIN32)
+  include(ExternalProject)
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/3rdparty/aubio/win-build-out ${CMAKE_BINARY_DIR}/3rdparty/aubio-install)
+  set (AUBIO_INSTALL_DIR ${CMAKE_BINARY_DIR}/3rdparty/aubio-install)
+else()
+  include(ExternalProject)
+  ExternalProject_Add(aubio
+	  SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/aubio/
+          BINARY_DIR ${CMAKE_BINARY_DIR}/3rdparty/aubio-build/
+          INSTALL_DIR ${CMAKE_BINARY_DIR}/3rdparty/aubio-install/
+          UPDATE_COMMAND ""
+	  TMP_DIR ${CMAKE_BINARY_DIR}/3rdparty/aubio-build/tmp/
+	  CONFIGURE_COMMAND ""
+	  BUILD_COMMAND CC=x86_64-w64-mingw32-gcc ${CMAKE_COMMAND} -E env CFLAGS=${AUBIO_CFLAGS} ${CMAKE_SOURCE_DIR}/3rdparty/aubio/waf -j 4
+	  --with-target-platform='win64' --disable-intelipp --disable-complex --disable-jack --disable-jack --disable-sndfile  --disable-avcodec --disable-samplerate --disable-memcpy --disable-double --disable-fat --enable-accelerate --disable-apple-audio --disable-blas --disable-atlas --disable-wavread --disable-wavwrite --disable-docs --disable-tests --disable-examples
+                    #${ACCELERATE_COMMAND} --disable-tests --notests
+                    #--enable-fftw3f --disable-sndfile --disable-avcodec --disable-double
+                    #--disable-samplerate --disable-docs --disable-wavread --disable-wavwrite
+                    #--disable-tests --notests --disable-examples --disable-apple-audio
+                    #--disable-fat --disable-jack --libdir=lib
+				    #--with-target-platform=win32z
+                    --prefix=${CMAKE_BINARY_DIR}/3rdparty/aubio-install/
+                    --top=${CMAKE_SOURCE_DIR}/3rdparty/aubio/
+                    --out=${CMAKE_BINARY_DIR}/3rdparty/aubio-build/ configure build install
+	  INSTALL_COMMAND ""
+  )
+  ExternalProject_Get_Property(aubio INSTALL_DIR)
+  set (AUBIO_INSTALL_DIR ${INSTALL_DIR})
 endif()
 
-include(ExternalProject)
-ExternalProject_Add(aubio
-	SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/aubio/
-	DOWNLOAD_COMMAND ""
-    UPDATE_COMMAND ""
-	TMP_DIR tmp
-	CONFIGURE_COMMAND "${CMAKE_SOURCE_DIR}/3rdparty/build_aubio.sh" ${ACCELERATE_COMMAND} <INSTALL_DIR> ${AUBIO_CFLAGS}
-	BUILD_COMMAND ""
-	INSTALL_COMMAND ""
-)
-
 add_subdirectory(data)
-
-ExternalProject_Get_Property(aubio INSTALL_DIR)
-set (AUBIO_INSTALL_DIR ${INSTALL_DIR})
-
 add_subdirectory(game)
 add_subdirectory(3rdparty/ced)
 add_subdirectory(docs)
