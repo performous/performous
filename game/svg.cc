@@ -42,7 +42,7 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	cairo_scale(dc.get(), factor, factor);
 	rsvg_handle_render_cairo(svgHandle.get(), dc.get());
 	// Change byte order from BGRA to RGBA
-	for (uint32_t *ptr = reinterpret_cast<uint32_t*>(&*bitmap.buf.begin()), *end = ptr + bitmap.buf.size() / 4; ptr < end; ++ptr) {
+	for (uint32_t *ptr = reinterpret_cast<uint32_t*>(bitmap.buf.data()), *end = ptr + bitmap.buf.size() / 4; ptr < end; ++ptr) {
 		uint8_t* pixel = reinterpret_cast<uint8_t*>(ptr);
 		uint8_t r = pixel[2], g = pixel[1], b = pixel[0], a = pixel[3];
 		pixel[0] = r; pixel[1] = g; pixel[2] = b; pixel[3] = a;
