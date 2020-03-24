@@ -100,22 +100,11 @@ else()
   include(ExternalProject)
   ExternalProject_Add(aubio
 	  SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/aubio/
-          BINARY_DIR ${CMAKE_BINARY_DIR}/3rdparty/aubio-build/
-          INSTALL_DIR ${CMAKE_BINARY_DIR}/3rdparty/aubio-install/
-          UPDATE_COMMAND ""
-	  TMP_DIR ${CMAKE_BINARY_DIR}/3rdparty/aubio-build/tmp/
-	  CONFIGURE_COMMAND ""
-	  BUILD_COMMAND CC=x86_64-w64-mingw32-gcc ${CMAKE_COMMAND} -E env CFLAGS=${AUBIO_CFLAGS} ${CMAKE_SOURCE_DIR}/3rdparty/aubio/waf -j 4
-	  --with-target-platform='win64' --disable-intelipp --disable-complex --disable-jack --disable-jack --disable-sndfile  --disable-avcodec --disable-samplerate --disable-memcpy --disable-double --disable-fat --enable-accelerate --disable-apple-audio --disable-blas --disable-atlas --disable-wavread --disable-wavwrite --disable-docs --disable-tests --disable-examples
-                    #${ACCELERATE_COMMAND} --disable-tests --notests
-                    #--enable-fftw3f --disable-sndfile --disable-avcodec --disable-double
-                    #--disable-samplerate --disable-docs --disable-wavread --disable-wavwrite
-                    #--disable-tests --notests --disable-examples --disable-apple-audio
-                    #--disable-fat --disable-jack --libdir=lib
-				    #--with-target-platform=win32z
-                    --prefix=${CMAKE_BINARY_DIR}/3rdparty/aubio-install/
-                    --top=${CMAKE_SOURCE_DIR}/3rdparty/aubio/
-                    --out=${CMAKE_BINARY_DIR}/3rdparty/aubio-build/ configure build install
+	  DOWNLOAD_COMMAND ""
+      UPDATE_COMMAND ""
+	  TMP_DIR tmp
+	  CONFIGURE_COMMAND "${CMAKE_SOURCE_DIR}/3rdparty/build_aubio.sh" ${ACCELERATE_COMMAND} <INSTALL_DIR> ${AUBIO_CFLAGS}
+	  BUILD_COMMAND ""
 	  INSTALL_COMMAND ""
   )
   ExternalProject_Get_Property(aubio INSTALL_DIR)
