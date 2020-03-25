@@ -172,32 +172,47 @@ FFmpeg::~FFmpeg() {
 	m_thread->join();
 }
 
+void FFmpeg::avformat_close_input(AVFormatContext *fctx) {
+	if (fctx) ::avformat_close_input(&fctx);
+}
+void FFmpeg::avcodec_free_context(AVCodecContext *avctx) {
+#if (LIBAVCODEC_VERSION_INT) >= (AV_VERSION_INT(57,0,0))
+    ::avcodec_free_context(&avctx);
+#else
+    (void) avctx;
+#endif
+}
+
 void FFmpeg::open() {
 	std::lock_guard<std::mutex> l(s_avcodec_mutex);
 #if	(LIBAVFORMAT_VERSION_INT) < (AV_VERSION_INT(58,0,0))
 	av_register_all();
 #endif
 	av_log_set_level(AV_LOG_ERROR);
-	if (avformat_open_input(&m_formatContext, m_filename.string().c_str(), nullptr, nullptr)) throw std::runtime_error("Cannot open input file");
-	if (avformat_find_stream_info(m_formatContext, nullptr) < 0) throw std::runtime_error("Cannot find stream information");
+        {
+            AVFormatContext *avfctx = nullptr;
+            if (avformat_open_input(&avfctx, m_filename.string().c_str(), nullptr, nullptr)) throw std::runtime_error("Cannot open input file");
+            m_formatContext.reset(avfctx);
+        }
+	if (avformat_find_stream_info(m_formatContext.get(), nullptr) < 0) throw std::runtime_error("Cannot find stream information");
 	m_formatContext->flags |= AVFMT_FLAG_GENPTS;
 	// Find a track and open the codec
 	AVCodec* codec = nullptr;
-	m_streamId = av_find_best_stream(m_formatContext, (AVMediaType)m_mediaType, -1, -1, &codec, 0);
+	m_streamId = av_find_best_stream(m_formatContext.get(), (AVMediaType)m_mediaType, -1, -1, &codec, 0);
 	if (m_streamId < 0) throw std::runtime_error("No suitable track found");
 
 #if (LIBAVCODEC_VERSION_INT) >= (AV_VERSION_INT(57,0,0))
 	AVCodec* pCodec = avcodec_find_decoder(m_formatContext->streams[m_streamId]->codecpar->codec_id);
-	AVCodecContext* pCodecCtx = avcodec_alloc_context3(pCodec);
-	avcodec_parameters_to_context(pCodecCtx, m_formatContext->streams[m_streamId]->codecpar);
-	if (avcodec_open2(pCodecCtx, pCodec, nullptr) < 0) throw std::runtime_error("Cannot open codec");
+	std::unique_ptr<AVCodecContext, decltype(&avcodec_free_context)> pCodecCtx{avcodec_alloc_context3(pCodec), avcodec_free_context};
+	avcodec_parameters_to_context(pCodecCtx.get(), m_formatContext->streams[m_streamId]->codecpar);
+	if (avcodec_open2(pCodecCtx.get(), pCodec, nullptr) < 0) throw std::runtime_error("Cannot open codec");
 	pCodecCtx->workaround_bugs = FF_BUG_AUTODETECT;
-	m_codecContext = pCodecCtx;
+	m_codecContext = std::move(pCodecCtx);
 #else
 	AVCodecContext* cc = m_formatContext->streams[m_streamId]->codec;
 	if (avcodec_open2(cc, codec, nullptr) < 0) throw std::runtime_error("Cannot open codec");
 	cc->workaround_bugs = FF_BUG_AUTODETECT;
-	m_codecContext = cc;
+	m_codecContext.reset(cc);
 #endif
 
 	switch (m_mediaType) {
@@ -256,8 +271,7 @@ void FFmpeg::operator()() {
 	// TODO: use RAII for freeing resources (to prevent memory leaks)
 	std::lock_guard<std::mutex> l(s_avcodec_mutex); // avcodec_close is not thread-safe
 	if (m_resampleContext) swr_close(m_resampleContext);
-	if (m_codecContext) avcodec_close(m_codecContext);
-	if (m_formatContext) avformat_close_input(&m_formatContext);
+	if (m_codecContext) avcodec_close(m_codecContext.get());
 }
 
 void FFmpeg::seek(double time, bool wait) {
@@ -271,7 +285,7 @@ void FFmpeg::seek_internal() {
 	audioQueue.reset();
 	int flags = 0;
 	if (m_seekTarget < m_position) flags |= AVSEEK_FLAG_BACKWARD;
-	av_seek_frame(m_formatContext, -1, m_seekTarget * AV_TIME_BASE, flags);
+	av_seek_frame(m_formatContext.get(), -1, m_seekTarget * AV_TIME_BASE, flags);
 	m_seekTarget = getNaN(); // Signal that seeking is done
 }
 
@@ -293,7 +307,7 @@ void FFmpeg::decodePacket() {
 	AVPacket pkt;
 	while (true) {
 		// FIXME: we might want to take a look at m_quit.
-		int ret = av_read_frame(m_formatContext, &pkt);
+		int ret = av_read_frame(m_formatContext.get(), &pkt);
 		if(ret == AVERROR_EOF) {
 			// End of file: no more data to read.
 			throw FFmpeg::eof_error();
@@ -302,7 +316,7 @@ void FFmpeg::decodePacket() {
 		}
 		if (terminating() || m_seekTarget == m_seekTarget) return; // something weird required
 		if (pkt.stream_index != m_streamId) return; // wrong stream
-		ret = avcodec_send_packet(m_codecContext, &pkt);
+		ret = avcodec_send_packet(m_codecContext.get(), &pkt);
 		if(ret == AVERROR_EOF) {
 			// End of file: no more data to read.
 			throw FFmpeg::eof_error();
@@ -314,7 +328,7 @@ void FFmpeg::decodePacket() {
 		}
 		while (ret >= 0) {
 			std::shared_ptr<AVFrame> frame(av_frame_alloc(), [](AVFrame* ptr) { av_frame_free(&ptr); });
-			ret = avcodec_receive_frame(m_codecContext, frame.get());
+			ret = avcodec_receive_frame(m_codecContext.get(), frame.get());
 			if(ret == AVERROR_EOF) {
 				// End of file: no more data.
 				throw FFmpeg::eof_error();
@@ -346,7 +360,7 @@ void FFmpeg::decodePacket() {
 	};
 
 	// Read an AVPacket and decode it into AVFrames
-	ReadFramePacket packet(m_formatContext);
+	ReadFramePacket packet(m_formatContext.get());
 	int packetSize = packet.size;
 	while (packetSize) {
 		if (packetSize < 0) throw std::logic_error("negative packet size?!");
@@ -355,8 +369,8 @@ void FFmpeg::decodePacket() {
 		std::shared_ptr<AVFrame> frame(av_frame_alloc(), [](AVFrame* ptr) { av_frame_free(&ptr); });
 		int frameFinished = 0;
 		int decodeSize = (m_mediaType == AVMEDIA_TYPE_VIDEO ?
-		  avcodec_decode_video2(m_codecContext, frame.get(), &frameFinished, &packet) :
-		  avcodec_decode_audio4(m_codecContext, frame.get(), &frameFinished, &packet));
+		  avcodec_decode_video2(m_codecContext.get(), frame.get(), &frameFinished, &packet) :
+		  avcodec_decode_audio4(m_codecContext.get(), frame.get(), &frameFinished, &packet));
 		if (decodeSize < 0) return; // Packet didn't produce any output (could be waiting for B frames or something)
 		packetSize -= decodeSize; // Move forward within the packet
 		if (!frameFinished) continue;
