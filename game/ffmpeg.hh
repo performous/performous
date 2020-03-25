@@ -129,6 +129,9 @@ class FFmpeg {
 	void decodePacket();
 	void processVideo(AVFrame* frame);
 	void processAudio(AVFrame* frame);
+        static void avformat_close_input(AVFormatContext *fctx);
+        static void avcodec_free_context(AVCodecContext *avctx);
+
 	fs::path m_filename;
 	unsigned int m_rate = 0;
 	std::promise<void> m_quit;
@@ -139,8 +142,8 @@ class FFmpeg {
 	// libav-specific variables
 	int m_streamId = -1;
 	int m_mediaType;  // enum AVMediaType
-	AVFormatContext* m_formatContext = nullptr;
-	AVCodecContext* m_codecContext = nullptr;
+	std::unique_ptr<AVFormatContext, decltype(&avformat_close_input)> m_formatContext{nullptr, avformat_close_input};
+	std::unique_ptr<AVCodecContext, decltype(&avcodec_free_context)> m_codecContext{nullptr, avcodec_free_context};
 	SwrContext* m_resampleContext = nullptr;
 	SwsContext* m_swsContext = nullptr;
 	// Make sure the thread starts only after initializing everything else
