@@ -118,8 +118,6 @@ Music::Music(Audio::Files const& files, unsigned int sr, bool preview): srate(sr
 		tracks.emplace(tf.first, std::make_unique<Track>(tf.second, sr));
 	}
 	suppressCenterChannel = config["audio/suppress_center_channel"].b();
-	aubio_tempo_set_silence(aubioTempo.get(), -41.0);
-	aubio_tempo_set_threshold(aubioTempo.get(), 1.25);
 }
 
 unsigned Audio::aubio_win_size = 2048;
@@ -130,7 +128,7 @@ std::unique_ptr<aubio_tempo_t, void(*)(aubio_tempo_t*)> Music::aubioTempo = std:
 		del_aubio_tempo(p);
 	}
 });
-std::recursive_mutex Music::aubio_mutex;
+std::recursive_mutex Audio::aubio_mutex;
 
 bool Music::operator()(float* begin, float* end) {
 	size_t samples = end - begin;
@@ -197,7 +195,7 @@ bool Music::prepare() {
 				fvec_t* previewBeats = ScreenSongs::previewBeatsBuffer.get();
 				intptr_t readptr = 0;
 				fvec_t* tempoSamplePtr = new_fvec(Audio::aubio_hop_size);
-				std::lock_guard<std::recursive_mutex> l(Music::aubio_mutex);
+				std::lock_guard<std::recursive_mutex> l(Audio::aubio_mutex);
 				Game* gm = Game::getSingletonPtr();
 				ScreenSongs* sSongs = static_cast<ScreenSongs *>(gm->getScreen("Songs"));
 				double pstart = sSongs->getSongs().currentPtr()->preview_start;
@@ -208,12 +206,12 @@ bool Music::prepare() {
 				if (!sSongs->getSongs().currentPtr()->hasControllers()) {
 				while ((readptr + Audio::aubio_hop_size) <= previewSamples->length) {
 					tempoSamplePtr->data = &previewSamples->data[readptr];
-					aubio_tempo_do(aubioTempo.get(),tempoSamplePtr,previewBeats);
+					aubio_tempo_do(Audio::aubioTempo.get(),tempoSamplePtr,previewBeats);
 					if (previewBeats->data[0] != 0) {
-						double beatSecs = aubio_tempo_get_last_s(aubioTempo.get());
+						double beatSecs = aubio_tempo_get_last_s(Audio::aubioTempo.get());
 							if (beats.empty()) { // Store time and period of first detected beat.
 								first_beat = beatSecs;
-								first_period = aubio_tempo_get_period_s(aubioTempo.get());
+								first_period = aubio_tempo_get_period_s(Audio::aubioTempo.get());
 							}
 						beats.push_back(beatSecs + pstart);
 					}
@@ -542,7 +540,10 @@ struct Audio::Impl {
 	}
 };
 
-Audio::Audio(): self(std::make_unique<Impl>()) {}
+Audio::Audio(): self(std::make_unique<Impl>()) {
+	aubio_tempo_set_silence(Audio::aubioTempo.get(), -50.0);
+	aubio_tempo_set_threshold(Audio::aubioTempo.get(), 0.4);
+}
 Audio::~Audio() { close(); }
 
 ConfigItem& Audio::backendConfig() {
