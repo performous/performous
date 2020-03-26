@@ -216,14 +216,14 @@ void FFmpeg::open() {
 
 	switch (m_mediaType) {
 	case AVMEDIA_TYPE_AUDIO:
-		m_resampleContext = swr_alloc();
-		av_opt_set_int(m_resampleContext, "in_channel_layout", m_codecContext->channel_layout ? m_codecContext->channel_layout : av_get_default_channel_layout(m_codecContext->channels), 0);
-		av_opt_set_int(m_resampleContext, "out_channel_layout", av_get_default_channel_layout(AUDIO_CHANNELS), 0);
-		av_opt_set_int(m_resampleContext, "in_sample_rate", m_codecContext->sample_rate, 0);
-		av_opt_set_int(m_resampleContext, "out_sample_rate", m_rate, 0);
-		av_opt_set_int(m_resampleContext, "in_sample_fmt", m_codecContext->sample_fmt, 0);
-		av_opt_set_int(m_resampleContext, "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
-		swr_init(m_resampleContext);
+		m_resampleContext.reset(swr_alloc());
+		av_opt_set_int(m_resampleContext.get(), "in_channel_layout", m_codecContext->channel_layout ? m_codecContext->channel_layout : av_get_default_channel_layout(m_codecContext->channels), 0);
+		av_opt_set_int(m_resampleContext.get(), "out_channel_layout", av_get_default_channel_layout(AUDIO_CHANNELS), 0);
+		av_opt_set_int(m_resampleContext.get(), "in_sample_rate", m_codecContext->sample_rate, 0);
+		av_opt_set_int(m_resampleContext.get(), "out_sample_rate", m_rate, 0);
+		av_opt_set_int(m_resampleContext.get(), "in_sample_fmt", m_codecContext->sample_fmt, 0);
+		av_opt_set_int(m_resampleContext.get(), "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
+		swr_init(m_resampleContext.get());
 		if (!m_resampleContext) throw std::runtime_error("Cannot create resampling context");
 		audioQueue.setSamplesPerSecond(AUDIO_CHANNELS * m_rate);
 		break;
@@ -231,10 +231,10 @@ void FFmpeg::open() {
 		// Setup software scaling context for YUV to RGB conversion
 		width = m_codecContext->width;
 		height = m_codecContext->height;
-		m_swsContext = sws_getContext(
+		m_swsContext.reset(sws_getContext(
 		  m_codecContext->width, m_codecContext->height, m_codecContext->pix_fmt,
 		  width, height, AV_PIX_FMT_RGB24,
-		  SWS_POINT, nullptr, nullptr, nullptr);
+		  SWS_POINT, nullptr, nullptr, nullptr));
 		break;
 	default:  // Should never be reached but avoids compile warnings
 		abort();
@@ -269,7 +269,6 @@ void FFmpeg::operator()() {
 	videoQueue.reset();
 	// TODO: use RAII for freeing resources (to prevent memory leaks)
 	std::lock_guard<std::mutex> l(s_avcodec_mutex); // avcodec_close is not thread-safe
-	if (m_resampleContext) swr_close(m_resampleContext);
 	if (m_codecContext) avcodec_close(m_codecContext.get());
 }
 
@@ -395,7 +394,7 @@ void FFmpeg::processVideo(AVFrame* frame) {
 	{
 		uint8_t* data = f.data();
 		int linesize = w * 3;
-		sws_scale(m_swsContext, frame->data, frame->linesize, 0, h, &data, &linesize);
+		sws_scale(m_swsContext.get(), frame->data, frame->linesize, 0, h, &data, &linesize);
 	}
 	videoQueue.push(std::move(f));  // Takes ownership and may block until there is space
 }
@@ -404,10 +403,10 @@ void FFmpeg::processAudio(AVFrame* frame) {
 	// resample to output
 	int16_t *output;
 	int out_linesize;
-	int out_samples = swr_get_out_samples(m_resampleContext, frame->nb_samples);
+	int out_samples = swr_get_out_samples(m_resampleContext.get(), frame->nb_samples);
 	av_samples_alloc((uint8_t**)&output, &out_linesize, AUDIO_CHANNELS, out_samples,
 		AV_SAMPLE_FMT_S16, 0);
-	out_samples = swr_convert(m_resampleContext, (uint8_t**)&output, out_samples,
+	out_samples = swr_convert(m_resampleContext.get(), (uint8_t**)&output, out_samples,
 		(const uint8_t**)&frame->data[0], frame->nb_samples);
 	// The output is now an interleaved array of 16-bit samples
 	std::vector<int16_t> m_output(output, output+out_samples*AUDIO_CHANNELS);
