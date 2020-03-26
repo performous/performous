@@ -77,6 +77,9 @@ class Audio {
 	friend int getBackend();
 	struct Impl;
 	std::unique_ptr<Impl> self;
+	friend class ScreenSongs;
+	friend class Music;
+	static std::recursive_mutex aubio_mutex;
 public:
 	typedef std::map<std::string, fs::path> Files;
 	static ConfigItem& backendConfig();
@@ -134,6 +137,7 @@ public:
 	static double getSR() { return 48000.0; }
 	static unsigned aubio_hop_size;
 	static unsigned aubio_win_size;
+	static std::unique_ptr<aubio_tempo_t, void(*)(aubio_tempo_t*)> aubioTempo;
 };
 
 class Music {
@@ -144,8 +148,6 @@ struct Track {
 	template <typename... Args> Track(Args&&... args): mpeg(args...) {}
 };	
 	friend class ScreenSongs;
-	static std::unique_ptr<aubio_tempo_t, void(*)(aubio_tempo_t*)> aubioTempo;
-	static std::recursive_mutex aubio_mutex;
 	public:
 	std::unordered_map<std::string, std::unique_ptr<Track>> tracks; ///< Audio decoders
 	double srate; ///< Sample rate

@@ -199,8 +199,8 @@ void ScreenSongs::update() {
 	if (!songChange) return;
 	ScreenSongs::previewBeatsBuffer.reset(new_fvec(1));
 	{
-	std::lock_guard<std::recursive_mutex> l(Music::aubio_mutex);	
-	Music::aubioTempo.reset(new_aubio_tempo("default", Audio::aubio_win_size, Audio::aubio_hop_size, Audio::getSR()));
+	std::lock_guard<std::recursive_mutex> l(Audio::aubio_mutex);	
+	Audio::aubioTempo.reset(new_aubio_tempo("default", Audio::aubio_win_size, Audio::aubio_hop_size, Audio::getSR()));
 	}
 	if (song && song->hasControllers()) { song->loadNotes(); } // Needed for BPM info.
 	m_playing = music;

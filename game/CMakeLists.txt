@@ -172,6 +172,9 @@ endif()
 
 target_link_libraries(performous ced)
 list(APPEND LIBS ${AUBIO_INSTALL_DIR}/lib/libaubio.a)
+if(APPLE)
+	list(APPEND LIBS "-framework Accelerate")
+endif()
 list(APPEND LIBS ${FFTW3_LIBRARIES})
 list(APPEND LIBS ${BLAS_LIBRARIES})
 
