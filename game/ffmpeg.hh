@@ -100,7 +100,10 @@ extern "C" {
   struct AVFormatContext;
   struct AVFrame;
   struct SwrContext;
+  void swr_free(struct SwrContext **);
+  void swr_close(struct SwrContext *);
   struct SwsContext;
+  void sws_freeContext(struct SwsContext *);
 }
 
 /// ffmpeg class
@@ -144,8 +147,8 @@ class FFmpeg {
 	int m_mediaType;  // enum AVMediaType
 	std::unique_ptr<AVFormatContext, decltype(&avformat_close_input)> m_formatContext{nullptr, avformat_close_input};
 	std::unique_ptr<AVCodecContext, decltype(&avcodec_free_context)> m_codecContext{nullptr, avcodec_free_context};
-	SwrContext* m_resampleContext = nullptr;
-	SwsContext* m_swsContext = nullptr;
+	std::unique_ptr<SwrContext, void(*)(SwrContext*)> m_resampleContext{nullptr, [] (auto p) { swr_close(p); swr_free(&p); }};
+	std::unique_ptr<SwsContext, void(*)(SwsContext*)> m_swsContext{nullptr, sws_freeContext};
 	// Make sure the thread starts only after initializing everything else
 	std::unique_ptr<std::thread> m_thread;
 	static std::mutex s_avcodec_mutex; // Used for avcodec_open/close (which use some static crap and are thus not thread-safe)
