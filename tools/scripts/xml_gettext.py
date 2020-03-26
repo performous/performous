@@ -33,8 +33,10 @@ class Parser(ET.XMLParser):
         return element
 
 _, pofile, *xmlfiles = sys.argv
-assert pofile.endswith(".po"), pofile
+assert pofile.lower().endswith(".po") or pofile.lower().endswith(".pot"), pofile
 assert xmlfiles
+for fn in xmlfiles:
+    assert fn.lower().endswith(".xml"), fn
 
 # Collect unique msgids in this dict
 po = {}
