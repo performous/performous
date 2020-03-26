@@ -120,14 +120,22 @@ Music::Music(Audio::Files const& files, unsigned int sr, bool preview): srate(sr
 	suppressCenterChannel = config["audio/suppress_center_channel"].b();
 }
 
-unsigned Audio::aubio_win_size = 2048;
-unsigned Audio::aubio_hop_size = 1024;
+unsigned Audio::aubio_win_size = 1536;
+unsigned Audio::aubio_hop_size = 768;
 
-std::unique_ptr<aubio_tempo_t, void(*)(aubio_tempo_t*)> Music::aubioTempo = std::unique_ptr<aubio_tempo_t, void(*)(aubio_tempo_t*)>(new_aubio_tempo("default", Audio::aubio_win_size, Audio::aubio_hop_size, Audio::getSR()),[](aubio_tempo_t* p) {
-	if (p != nullptr) {
-		del_aubio_tempo(p);
-	}
-});
+std::unique_ptr<aubio_tempo_t, void(*)(aubio_tempo_t*)> Audio::aubioTempo =
+					std::unique_ptr<aubio_tempo_t, void(*)(aubio_tempo_t*)>(
+						new_aubio_tempo(
+							"default",
+							Audio::aubio_win_size,
+							Audio::aubio_hop_size,
+							Audio::getSR()),[](aubio_tempo_t* p) {
+							if (p != nullptr) {
+								del_aubio_tempo(p);
+								}
+							}
+					);
+
 std::recursive_mutex Audio::aubio_mutex;
 
 bool Music::operator()(float* begin, float* end) {
@@ -219,7 +227,7 @@ bool Music::prepare() {
 				}
 					if (!beats.empty()) {
 						double newBeat = first_beat - first_period;
-						while (newBeat > 0.0) {
+						while (newBeat > 0.02) {
 							extra_beats.push_back(newBeat + pstart);
 							newBeat -= first_period;
 						}
