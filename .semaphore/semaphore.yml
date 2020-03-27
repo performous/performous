@@ -6,12 +6,52 @@ agent:
     os_image: ubuntu1804
 blocks:
   - name: Ubuntu 18.04 Build
+    dependencies: []
     task:
       prologue:
         commands:
-          - echo "Installing Performous Dependencies..."
+          - echo "Installing Performous dependencies..."
           - sudo apt -y update
           - sudo apt -y install cmake gettext help2man clang gcc-7 g++-7 libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libopencv-dev libportmidi-dev libqrencode-dev libicu-dev libcpprest-dev libglm-dev libopenblas-dev libfftw3-dev
+      jobs:
+        - name: GCC-7 Build
+          env_vars:
+            - name: CC
+              value: gcc-7
+            - name: CXX
+              value: g++-7
+          commands:
+            - checkout
+            - git submodule init && git submodule update
+            - mkdir build.gcc && cd build.gcc && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
+            - make VERBOSE=1
+        - name: Clang-6.0 Build
+          env_vars:
+            - name: CC
+              value: clang
+            - name: CXX
+              value: clang++
+          commands:
+            - checkout
+            - git submodule init && git submodule update
+            - mkdir build.clang && cd build.clang && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
+            - make VERBOSE=1
+  - name: MacOS 10.14.6 Build
+    dependencies: []
+    task:
+      agent:
+        machine:
+          type: a1-standard-4
+          os_image: macos-mojave-xcode11
+      prologue:
+        commands:
+          - echo "Installing Performous dependencies..."
+          - curl --output -s macports.pkg https://github.com/macports/macports-base/releases/download/v2.6.2/MacPorts-2.6.2-10.14-Mojave.pkg
+          - ls -la
+          - sudo installer -pkg ./macports.pkg -target /
+          - export PATH=$PATH:/opt/local/bin
+          - sudo port selfupdate
+          - sudo port install npm boost libxmlxx2 libsdl2 ffmpeg cmake jsoncpp help2man libepoxy librsvg portaudio portmidi opencv
       jobs:
         - name: GCC-7 Build
           env_vars:
