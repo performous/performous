@@ -24,15 +24,6 @@ extern "C" {
 #include AVUTIL_ERROR_INCLUDE
 }
 
-#if (LIBAVCODEC_VERSION_INT) < (AV_VERSION_INT(52,94,3))
-#	define AV_SAMPLE_FMT_S16 SAMPLE_FMT_S16
-#endif
-
-// Some versions of libav does not contain this definition.
-#ifndef AV_ERROR_MAX_STRING_SIZE
-#	define AV_ERROR_MAX_STRING_SIZE 64
-#endif
-
 #define AUDIO_CHANNELS 2
 
 /*static*/ std::mutex FFmpeg::s_avcodec_mutex;
@@ -266,11 +257,7 @@ void FFmpeg::operator()() {
 	std::lock_guard<std::mutex> l(s_avcodec_mutex); // avcodec_close is not thread-safe
 	if (m_resampleContext) swr_close(m_resampleContext);
 	if (m_codecContext) avcodec_close(m_codecContext);
-#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53, 17, 0)
 	if (m_formatContext) avformat_close_input(&m_formatContext);
-#else
-	if (m_formatContext) av_close_input_file(m_formatContext);
-#endif
 }
 
 void FFmpeg::seek(double time, bool wait) {
@@ -355,11 +342,7 @@ void FFmpeg::decodePacket() {
 		ReadFramePacket(AVFormatContext* s): m_s(s) {
 			if (av_read_frame(s, this) < 0) throw FFmpeg::eof_error();
 		}
-#if LIBAVCODEC_VERSION_INT > (AV_VERSION_INT(55, 0, 0))
-		~ReadFramePacket() { av_packet_unref(this); } //YES THEY DID IT AGAIN
-#else
-		~ReadFramePacket() { av_free_packet(this); }
-#endif
+		~ReadFramePacket() { av_packet_unref(this); }
 	};
 
 	// Read an AVPacket and decode it into AVFrames
@@ -369,11 +352,7 @@ void FFmpeg::decodePacket() {
 		if (packetSize < 0) throw std::logic_error("negative packet size?!");
 		if (terminating() || m_seekTarget == m_seekTarget) return;
 		if (packet.stream_index != m_streamId) return;
-#if (LIBAVCODEC_VERSION_INT) < (AV_VERSION_INT(55,0,0))
-		std::shared_ptr<AVFrame> frame(avcodec_alloc_frame(), &av_free);
-#else
 		std::shared_ptr<AVFrame> frame(av_frame_alloc(), [](AVFrame* ptr) { av_frame_free(&ptr); });
-#endif
 		int frameFinished = 0;
 		int decodeSize = (m_mediaType == AVMEDIA_TYPE_VIDEO ?
 		  avcodec_decode_video2(m_codecContext, frame.get(), &frameFinished, &packet) :
