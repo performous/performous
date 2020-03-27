@@ -5,6 +5,7 @@
 #include "portmidi.hh"
 #include "regex.hh"
 #include <unordered_map>
+#include <sstream>
 
 namespace input {
 
