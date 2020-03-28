@@ -8,7 +8,7 @@
 #include <unicode/ustream.h>
 #include "../ced/compact_enc_det/compact_enc_det.h"
 
-UErrorCode UnicodeUtil::m_staticIcuError = U_ZERO_ERROR;
+UErrorCode UnicodeUtil::m_staticIcuError = UErrorCode::U_ZERO_ERROR;
 icu::RuleBasedCollator UnicodeUtil::m_dummyCollator (icu::UnicodeString (""), icu::Collator::PRIMARY, m_staticIcuError);
 icu::RuleBasedCollator UnicodeUtil::m_sortCollator  (nullptr, icu::Collator::SECONDARY, m_staticIcuError);
 
@@ -20,8 +20,8 @@ std::string UnicodeUtil::getCharset (std::string const& str) {
 	Encoding encoding = CompactEncDet::DetectEncoding(
         text, strlen(text),
         nullptr, nullptr, nullptr,
-        UNKNOWN_ENCODING,
-        UNKNOWN_LANGUAGE,
+        Encoding::UNKNOWN_ENCODING,
+        Language::UNKNOWN_LANGUAGE,
         CompactEncDet::WEB_CORPUS,
         true,
         &bytes_consumed,
