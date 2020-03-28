@@ -71,7 +71,6 @@ class Songs {
 	void sortChange(int diff);
 	void sortSpecificChange(int sortOrder, bool descending = false);
 	/// parses file into Song &tmp
-	void parseFile(Song& tmp);
 	std::atomic<bool> doneLoading{ false };
 	std::atomic<bool> displayedAlert{ false };
 	size_t loadedSongs() const { return m_songs.size(); }
@@ -93,7 +92,6 @@ class Songs {
 	void dumpSongs_internal() const;
 	void reload_internal();
 	void reload_internal(fs::path const& p);
-	void randomize_internal();
 	void filter_internal();
 	void sort_internal(bool descending = false);
 	std::atomic<bool> m_dirty{ false };
