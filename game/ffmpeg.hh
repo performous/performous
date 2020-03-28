@@ -99,8 +99,12 @@ extern "C" {
   struct AVCodecContext;
   struct AVFormatContext;
   struct AVFrame;
+  void av_frame_free(AVFrame **);
   struct SwrContext;
+  void swr_free(struct SwrContext **);
+  void swr_close(struct SwrContext *);
   struct SwsContext;
+  void sws_freeContext(struct SwsContext *);
 }
 
 /// ffmpeg class
@@ -126,9 +130,15 @@ class FFmpeg {
   private:
 	void seek_internal();
 	void open();
-	void decodePacket();
-	void processVideo(AVFrame* frame);
-	void processAudio(AVFrame* frame);
+        struct Packet;
+	void decodePacket(Packet &);
+	static void frameDeleter(AVFrame *f) { if (f) av_frame_free(&f); }
+	using uFrame = std::unique_ptr<AVFrame, std::integral_constant<decltype(&frameDeleter), &frameDeleter>>;
+	void processVideo(uFrame frame);
+	void processAudio(uFrame frame);
+	static void avformat_close_input(AVFormatContext *fctx);
+	static void avcodec_free_context(AVCodecContext *avctx);
+
 	fs::path m_filename;
 	unsigned int m_rate = 0;
 	std::promise<void> m_quit;
@@ -139,10 +149,10 @@ class FFmpeg {
 	// libav-specific variables
 	int m_streamId = -1;
 	int m_mediaType;  // enum AVMediaType
-	AVFormatContext* m_formatContext = nullptr;
-	AVCodecContext* m_codecContext = nullptr;
-	SwrContext* m_resampleContext = nullptr;
-	SwsContext* m_swsContext = nullptr;
+	std::unique_ptr<AVFormatContext, decltype(&avformat_close_input)> m_formatContext{nullptr, avformat_close_input};
+	std::unique_ptr<AVCodecContext, decltype(&avcodec_free_context)> m_codecContext{nullptr, avcodec_free_context};
+	std::unique_ptr<SwrContext, void(*)(SwrContext*)> m_resampleContext{nullptr, [] (auto p) { swr_close(p); swr_free(&p); }};
+	std::unique_ptr<SwsContext, void(*)(SwsContext*)> m_swsContext{nullptr, sws_freeContext};
 	// Make sure the thread starts only after initializing everything else
 	std::unique_ptr<std::thread> m_thread;
 	static std::mutex s_avcodec_mutex; // Used for avcodec_open/close (which use some static crap and are thus not thread-safe)
