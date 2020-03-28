@@ -130,7 +130,8 @@ class FFmpeg {
   private:
 	void seek_internal();
 	void open();
-	void decodePacket();
+        struct ReadFramePacket;
+	void decodePacket(ReadFramePacket &);
 	static void frameDeleter(AVFrame *f) { if (f) av_frame_free(&f); };
 	using uFrame = std::unique_ptr<AVFrame, std::integral_constant<decltype(&frameDeleter), &frameDeleter>>;
 	void processVideo(uFrame frame);
