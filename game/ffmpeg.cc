@@ -227,6 +227,10 @@ void FFmpeg::open() {
 	}
 }
 
+struct FFmpeg::ReadFramePacket: public AVPacket {
+	~ReadFramePacket() { av_packet_unref(this); }
+};
+
 void FFmpeg::operator()() {
 	try { open(); } catch (std::exception const& e) { std::clog << "ffmpeg/error: Failed to open " << m_filename << ": " << e.what() << std::endl; return; }
 	m_duration = m_formatContext->duration / double(AV_TIME_BASE);
@@ -237,9 +241,10 @@ void FFmpeg::operator()() {
 	while (!terminating()) {
 		if (eof) break;
 		try {
+                    ReadFramePacket pkt;
 			if (audioQueue.wantSeek()) m_seekTarget = 0.0;
 			if (m_seekTarget == m_seekTarget) seek_internal();
-			decodePacket();
+			decodePacket(pkt);
 			errors = 0;
 		} catch (eof_error&) {
 			videoQueue.push(Bitmap()); // EOF marker
@@ -286,12 +291,7 @@ private:
 	}
 };
 
-struct ReadFramePacket: public AVPacket {
-	~ReadFramePacket() { av_packet_unref(this); }
-};
-
-void FFmpeg::decodePacket() {
-    ReadFramePacket pkt;
+void FFmpeg::decodePacket(ReadFramePacket &pkt) {
 
     auto ret = av_read_frame(m_formatContext.get(), &pkt);
     if(ret == AVERROR_EOF) {
