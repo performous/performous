@@ -64,7 +64,7 @@ ThemeInstrumentMenu::ThemeInstrumentMenu():
 	comment(findFile("instrumentmenu_comment.svg"), config["graphic/text_lod"].f())
 	//comment_bg(findFile("menu_comment_bg.svg"))
 {
-	comment.setAlign(SvgTxtTheme::CENTER);
+	comment.setAlign(SvgTxtTheme::Align::CENTER);
 }
 //at the moment just a copy of themeSong
 ThemePlaylistScreen::ThemePlaylistScreen():
