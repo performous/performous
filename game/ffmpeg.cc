@@ -228,6 +228,19 @@ void FFmpeg::open() {
 	}
 }
 
+class FfmpegError: public std::runtime_error {
+public:
+	FfmpegError(int errorValue): runtime_error(msgFmt(errorValue)) {}
+private:
+	static std::string msgFmt(int errorValue) {
+		char message[AV_ERROR_MAX_STRING_SIZE];
+		av_strerror(errorValue, message, AV_ERROR_MAX_STRING_SIZE);
+		std::ostringstream oss;
+		oss << "FfmpegError: code=" << errorValue << ", error=" << message;
+		return oss.str();
+	}
+};
+
 struct FFmpeg::ReadFramePacket: public AVPacket {
 	~ReadFramePacket() { av_packet_unref(this); }
 };
@@ -243,6 +256,14 @@ void FFmpeg::operator()() {
 		if (eof) break;
 		try {
                     ReadFramePacket pkt;
+                    auto ret = av_read_frame(m_formatContext.get(), &pkt);
+                    if(ret == AVERROR_EOF) {
+                        // End of file: no more data to read.
+                        throw FFmpeg::eof_error();
+                    } else if(ret < 0) {
+                        throw FfmpegError(ret);
+                    }
+
 			if (audioQueue.wantSeek()) m_seekTarget = 0.0;
 			if (m_seekTarget == m_seekTarget) seek_internal();
 			decodePacket(pkt);
@@ -279,31 +300,10 @@ void FFmpeg::seek_internal() {
 	m_seekTarget = getNaN(); // Signal that seeking is done
 }
 
-class FfmpegError: public std::runtime_error {
-public:
-	FfmpegError(int errorValue): runtime_error(msgFmt(errorValue)) {}
-private:
-	static std::string msgFmt(int errorValue) {
-		char message[AV_ERROR_MAX_STRING_SIZE];
-		av_strerror(errorValue, message, AV_ERROR_MAX_STRING_SIZE);
-		std::ostringstream oss;
-		oss << "FfmpegError: code=" << errorValue << ", error=" << message;
-		return oss.str();
-	}
-};
-
 void FFmpeg::decodePacket(ReadFramePacket &pkt) {
 
-    auto ret = av_read_frame(m_formatContext.get(), &pkt);
-    if(ret == AVERROR_EOF) {
-        // End of file: no more data to read.
-        throw FFmpeg::eof_error();
-    } else if(ret < 0) {
-        throw FfmpegError(ret);
-    }
-
     if (pkt.stream_index != m_streamId) return; // wrong stream
-    ret = avcodec_send_packet(m_codecContext.get(), &pkt);
+    auto ret = avcodec_send_packet(m_codecContext.get(), &pkt);
     if(ret == AVERROR_EOF) {
         // End of file: no more data to read.
         throw FFmpeg::eof_error();
