@@ -287,23 +287,22 @@ private:
 };
 
 struct ReadFramePacket: public AVPacket {
-	AVFormatContext* m_s;
-	ReadFramePacket(AVFormatContext* s): m_s(s) {
-		auto ret = av_read_frame(s, this);
-		if(ret == AVERROR_EOF) {
-			// End of file: no more data to read.
-			throw FFmpeg::eof_error();
-		} else if(ret < 0) {
-			throw FfmpegError(ret);
-		}
-	}
 	~ReadFramePacket() { av_packet_unref(this); }
 };
 
 void FFmpeg::decodePacket() {
-    ReadFramePacket pkt(m_formatContext.get());
+    ReadFramePacket pkt;
+
+    auto ret = av_read_frame(m_formatContext.get(), &pkt);
+    if(ret == AVERROR_EOF) {
+        // End of file: no more data to read.
+        throw FFmpeg::eof_error();
+    } else if(ret < 0) {
+        throw FfmpegError(ret);
+    }
+
     if (pkt.stream_index != m_streamId) return; // wrong stream
-    auto ret = avcodec_send_packet(m_codecContext.get(), &pkt);
+    ret = avcodec_send_packet(m_codecContext.get(), &pkt);
     if(ret == AVERROR_EOF) {
         // End of file: no more data to read.
         throw FFmpeg::eof_error();
