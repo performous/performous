@@ -120,7 +120,7 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	cairo_paint (dc.get());
 	// Load into m_texture (OpenGL texture)
 	Bitmap bitmap(cairo_image_surface_get_data(surface.get()));
-	bitmap.fmt = pix::INT_ARGB;
+	bitmap.fmt = pix::Format::INT_ARGB;
 	bitmap.linearPremul = true;
 	bitmap.resize(cairo_image_surface_get_width(surface.get()), cairo_image_surface_get_height(surface.get()));
 	m_texture.load(bitmap, true);
