@@ -202,18 +202,15 @@ void FFmpeg::open() {
 	if (m_streamId < 0) throw std::runtime_error("No suitable track found");
 
 #if (LIBAVCODEC_VERSION_INT) >= (AV_VERSION_INT(57,0,0))
-	AVCodec* pCodec = avcodec_find_decoder(m_formatContext->streams[m_streamId]->codecpar->codec_id);
-	std::unique_ptr<AVCodecContext, decltype(&avcodec_free_context)> pCodecCtx{avcodec_alloc_context3(pCodec), avcodec_free_context};
+	decltype(m_codecContext) pCodecCtx{avcodec_alloc_context3(codec), avcodec_free_context};
 	avcodec_parameters_to_context(pCodecCtx.get(), m_formatContext->streams[m_streamId]->codecpar);
-	if (avcodec_open2(pCodecCtx.get(), pCodec, nullptr) < 0) throw std::runtime_error("Cannot open codec");
-	pCodecCtx->workaround_bugs = FF_BUG_AUTODETECT;
-	m_codecContext = std::move(pCodecCtx);
 #else
 	AVCodecContext* cc = m_formatContext->streams[m_streamId]->codec;
-	if (avcodec_open2(cc, codec, nullptr) < 0) throw std::runtime_error("Cannot open codec");
-	cc->workaround_bugs = FF_BUG_AUTODETECT;
-	m_codecContext.reset(cc);
+        decltype(m_codecContext) pCodecCtx{cc, avcodec_free_context};
 #endif
+	if (avcodec_open2(pCodecCtx.get(), codec, nullptr) < 0) throw std::runtime_error("Cannot open codec");
+	pCodecCtx->workaround_bugs = FF_BUG_AUTODETECT;
+	m_codecContext = std::move(pCodecCtx);
 
 	switch (m_mediaType) {
 	case AVMEDIA_TYPE_AUDIO:
@@ -301,21 +298,28 @@ private:
 	}
 };
 
-void FFmpeg::decodePacket() {
-#if LIBAVCODEC_VERSION_INT >= (AV_VERSION_INT(57, 37, 0))
-	AVPacket pkt;
-	while (true) {
-		// FIXME: we might want to take a look at m_quit.
-		int ret = av_read_frame(m_formatContext.get(), &pkt);
+struct ReadFramePacket: public AVPacket {
+	AVFormatContext* m_s;
+	ReadFramePacket(AVFormatContext* s): m_s(s) {
+		auto ret = av_read_frame(s, this);
 		if(ret == AVERROR_EOF) {
 			// End of file: no more data to read.
 			throw FFmpeg::eof_error();
 		} else if(ret < 0) {
 			throw FfmpegError(ret);
 		}
+	}
+	~ReadFramePacket() { av_packet_unref(this); }
+};
+
+void FFmpeg::decodePacket() {
+#if LIBAVCODEC_VERSION_INT >= (AV_VERSION_INT(57, 37, 0))
+	while (true) {
+		// FIXME: we might want to take a look at m_quit.
+                ReadFramePacket pkt(m_formatContext.get());
 		if (terminating() || m_seekTarget == m_seekTarget) return; // something weird required
 		if (pkt.stream_index != m_streamId) return; // wrong stream
-		ret = avcodec_send_packet(m_codecContext.get(), &pkt);
+		auto ret = avcodec_send_packet(m_codecContext.get(), &pkt);
 		if(ret == AVERROR_EOF) {
 			// End of file: no more data to read.
 			throw FFmpeg::eof_error();
@@ -346,18 +350,9 @@ void FFmpeg::decodePacket() {
 			if (m_mediaType == AVMEDIA_TYPE_VIDEO) processVideo(frame.get()); else processAudio(frame.get());
 			//av_frame_free(&frame);
 		}
-		av_packet_unref(&pkt);
 	}
 	return;
 #else
-	struct ReadFramePacket: public AVPacket {
-		AVFormatContext* m_s;
-		ReadFramePacket(AVFormatContext* s): m_s(s) {
-			if (av_read_frame(s, this) < 0) throw FFmpeg::eof_error();
-		}
-		~ReadFramePacket() { av_packet_unref(this); }
-	};
-
 	// Read an AVPacket and decode it into AVFrames
 	ReadFramePacket packet(m_formatContext.get());
 	int packetSize = packet.size;
