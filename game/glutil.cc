@@ -30,7 +30,8 @@ namespace glutil {
 		GLErrorChecker glerror("VertexArray::draw");
 		if (empty()) return;
 	
-		glBufferData(GL_ARRAY_BUFFER, stride() * size(), &m_vertices.front(), GL_DYNAMIC_DRAW);
+		auto strideTimesSize = stride() * size();
+		glBufferData(GL_ARRAY_BUFFER, strideTimesSize, &m_vertices.front(), GL_DYNAMIC_DRAW);
 
 		glerror.check("draw arrays");
 		glDrawArrays(mode, 0, size());

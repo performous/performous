@@ -77,7 +77,7 @@ namespace {
 /// Constructor
 DanceGraph::DanceGraph(Audio& audio, Song const& song, input::DevicePtr dev):
   InstrumentGraph(audio, song, dev),
-  m_level(BEGINNER),
+  m_level(DanceDifficulty::BEGINNER),
   m_beat(findFile("dancebeat.svg")),
   m_arrows(findFile("arrows.svg")),
   m_arrows_cursor(findFile("arrows_cursor.svg")),
@@ -121,7 +121,7 @@ void DanceGraph::setupJoinMenu() {
 		ConfigItem::OptionList ol;
 		int i = 0, cur = 0;
 		// Add difficulties to the option list
-		for (int level = 0; level < DIFFICULTYCOUNT; ++level) {
+		for (int level = 0; level < DanceDifficulty::DIFFICULTYCOUNT; ++level) {
 			if (difficulty(DanceDifficulty(level), true)) {
 				ol.push_back(std::to_string(level));
 				if (DanceDifficulty(level) == m_level) cur = i;
@@ -206,7 +206,7 @@ std::string DanceGraph::getModeId() const {
 /// Attempt to change the difficulty by a step
 void DanceGraph::changeDifficulty(int delta) {
 	int newLevel = m_level + delta;
-	if(newLevel >= DIFFICULTYCOUNT || newLevel < 0) return; // Out of bounds
+	if(newLevel >= DanceDifficulty::DIFFICULTYCOUNT || newLevel < 0) return; // Out of bounds
 	auto it = m_song.danceTracks.find(m_gamingMode);
 	if(it->second.find((DanceDifficulty)newLevel) != it->second.end())
 		difficulty((DanceDifficulty)newLevel);
@@ -259,11 +259,11 @@ void DanceGraph::engine() {
 		m_dead = 0; // Keep alive
 		// Menu keys
 		if (menuOpen() && ev.value != 0.0) {
-			if (ev.nav == input::NAV_START || ev.nav == input::NAV_CANCEL) m_menu.close();
-			else if (ev.nav == input::NAV_RIGHT) m_menu.action(1);
-			else if (ev.nav == input::NAV_LEFT) m_menu.action(-1);
-			else if (ev.nav == input::NAV_UP) m_menu.move(-1);
-			else if (ev.nav == input::NAV_DOWN) m_menu.move(1);
+			if (ev.nav == input::NavButton::NAV_START || ev.nav == input::NavButton::NAV_CANCEL) m_menu.close();
+			else if (ev.nav == input::NavButton::NAV_RIGHT) m_menu.action(1);
+			else if (ev.nav == input::NavButton::NAV_LEFT) m_menu.action(-1);
+			else if (ev.nav == input::NavButton::NAV_UP) m_menu.move(-1);
+			else if (ev.nav == input::NavButton::NAV_DOWN) m_menu.move(1);
 			difficulty_changed = true;
 			// See if anything changed
 			if (m_selectedTrack.so() != m_gamingMode) setTrack(m_selectedTrack.so());
@@ -274,7 +274,7 @@ void DanceGraph::engine() {
 			updateJoinMenu();
 		// Open Menu
 		} else if (!menuOpen() && ev.value != 0.0) {
-			if (ev.nav == input::NAV_CANCEL || ev.nav == input::NAV_START) m_menu.open();
+			if (ev.nav == input::NavButton::NAV_CANCEL || ev.nav == input::NavButton::NAV_START) m_menu.open();
 		}
 		if (ev.button < max_panels) {
 			// Gaming controls
@@ -296,9 +296,9 @@ void DanceGraph::engine() {
 	// Notes gone by
 	for (DanceNotes::iterator& it = m_notesIt; it != m_notes.end() && time > it->note.end + maxTolerance; it++) {
 		if(!it->isHit) { // Missed
-			if (it->note.type != Note::MINE) m_streak = 0;
+			if (it->note.type != Note::Type::MINE) m_streak = 0;
 		} else { // Hit, add score
-			if(it->note.type != Note::MINE) m_score += it->score;
+			if(it->note.type != Note::Type::MINE) m_score += it->score;
 			if(!it->releaseTime) it->releaseTime = time;
 		}
 		if (!joining(time)) ++m_dead;  // Increment dead counter (but not while joining)
@@ -307,7 +307,7 @@ void DanceGraph::engine() {
 
 	// Holding button when mine comes?
 	for (auto it = m_notesIt; it != m_notes.end() && time <= it->note.begin + maxTolerance; ++it) {
-		if(!it->isHit && it->note.type == Note::MINE && m_pressed[it->note.note] &&
+		if(!it->isHit && it->note.type == Note::Type::MINE && m_pressed[it->note.note] &&
 		  it->note.begin >= time - maxTolerance && it->note.end <= time + maxTolerance) {
 			it->isHit = true;
 			m_score -= points(0);
@@ -341,7 +341,7 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 	for (auto it = m_notesIt; it != m_notes.end() && time <= it->note.end + maxTolerance; ++it) {
 		if(!it->isHit && std::abs(time - it->note.begin) <= maxTolerance && ev.button == unsigned(it->note.note)) {
 			it->isHit = true;
-			if (it->note.type != Note::MINE) {
+			if (it->note.type != Note::Type::MINE) {
 				it->score = points(it->note.begin - time);
 				it->error = it->note.begin - time;
 				m_streak++;
@@ -458,7 +458,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	float tBeg = note.note.begin - time;
 	float tEnd = note.note.end - time;
 	int arrow_i = note.note.note;
-	bool mine = note.note.type == Note::MINE;
+	bool mine = note.note.type == Note::Type::MINE;
 	float x = panel2x(arrow_i);
 	float yBeg = time2y(tBeg);
 	float yEnd = time2y(tEnd);
