@@ -137,18 +137,12 @@ FFmpeg::FFmpeg(fs::path const& _filename, unsigned int rate):
   m_mediaType(rate ? AVMEDIA_TYPE_AUDIO : AVMEDIA_TYPE_VIDEO),
   m_thread(std::make_unique<std::thread>(std::ref(*this)))
 {
-#if (LIBAVFORMAT_VERSION_INT) < (AV_VERSION_INT(58,0,0))
-    static std::once_flag flag1
-    std::call_once(flag1, av_register_all);
-#endif
-	static bool versionChecked = false;
-	if (!versionChecked) {
-		versionChecked = true;
-		bool matches =
-		  LIBAVUTIL_VERSION_INT == avutil_version() &&
-		  LIBAVCODEC_VERSION_INT == avcodec_version() &&
-		  LIBAVFORMAT_VERSION_INT == avformat_version() &&
-		  LIBSWSCALE_VERSION_INT == swscale_version();
+    static std::once_flag static_infos;
+    std::call_once(static_infos, [] {
+		bool matches = LIBAVUTIL_VERSION_INT == avutil_version() &&
+                                LIBAVCODEC_VERSION_INT == avcodec_version() &&
+                                LIBAVFORMAT_VERSION_INT == avformat_version() &&
+                                LIBSWSCALE_VERSION_INT == swscale_version();
 		if (matches) {
 			std::clog << "ffmpeg/info: "
 			  " avutil:" + ffversion(LIBAVUTIL_VERSION_INT) +
@@ -166,7 +160,10 @@ FFmpeg::FFmpeg(fs::path const& _filename, unsigned int rate):
 			  " swscale:" + ffversion(LIBSWSCALE_VERSION_INT) + "/" + ffversion(swscale_version())
 			  << std::endl;
 		}
-	}
+#if (LIBAVFORMAT_VERSION_INT) < (AV_VERSION_INT(58,0,0))
+                av_register_all();
+#endif
+	});
 }
 
 FFmpeg::~FFmpeg() {
