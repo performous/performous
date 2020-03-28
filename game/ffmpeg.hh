@@ -99,6 +99,7 @@ extern "C" {
   struct AVCodecContext;
   struct AVFormatContext;
   struct AVFrame;
+  void av_frame_free(AVFrame **);
   struct SwrContext;
   void swr_free(struct SwrContext **);
   void swr_close(struct SwrContext *);
@@ -130,10 +131,12 @@ class FFmpeg {
 	void seek_internal();
 	void open();
 	void decodePacket();
-	void processVideo(AVFrame* frame);
-	void processAudio(AVFrame* frame);
-        static void avformat_close_input(AVFormatContext *fctx);
-        static void avcodec_free_context(AVCodecContext *avctx);
+	static void frameDeleter(AVFrame *f) { if (f) av_frame_free(&f); };
+	using uFrame = std::unique_ptr<AVFrame, std::integral_constant<decltype(&frameDeleter), &frameDeleter>>;
+	void processVideo(uFrame frame);
+	void processAudio(uFrame frame);
+	static void avformat_close_input(AVFormatContext *fctx);
+	static void avcodec_free_context(AVCodecContext *avctx);
 
 	fs::path m_filename;
 	unsigned int m_rate = 0;

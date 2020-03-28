@@ -137,6 +137,10 @@ FFmpeg::FFmpeg(fs::path const& _filename, unsigned int rate):
   m_mediaType(rate ? AVMEDIA_TYPE_AUDIO : AVMEDIA_TYPE_VIDEO),
   m_thread(std::make_unique<std::thread>(std::ref(*this)))
 {
+#if (LIBAVFORMAT_VERSION_INT) < (AV_VERSION_INT(58,0,0))
+    static std::once_flag flag1
+    std::call_once(flag1, av_register_all);
+#endif
 	static bool versionChecked = false;
 	if (!versionChecked) {
 		versionChecked = true;
@@ -177,23 +181,20 @@ void FFmpeg::avformat_close_input(AVFormatContext *fctx) {
 }
 void FFmpeg::avcodec_free_context(AVCodecContext *avctx) {
 #if (LIBAVCODEC_VERSION_INT) >= (AV_VERSION_INT(57,0,0))
-    ::avcodec_free_context(&avctx);
+	::avcodec_free_context(&avctx);
 #else
-    (void) avctx;
+	(void) avctx;
 #endif
 }
 
 void FFmpeg::open() {
 	std::lock_guard<std::mutex> l(s_avcodec_mutex);
-#if	(LIBAVFORMAT_VERSION_INT) < (AV_VERSION_INT(58,0,0))
-	av_register_all();
-#endif
 	av_log_set_level(AV_LOG_ERROR);
-        {
-            AVFormatContext *avfctx = nullptr;
-            if (avformat_open_input(&avfctx, m_filename.string().c_str(), nullptr, nullptr)) throw std::runtime_error("Cannot open input file");
-            m_formatContext.reset(avfctx);
-        }
+	{
+		AVFormatContext *avfctx = nullptr;
+		if (avformat_open_input(&avfctx, m_filename.string().c_str(), nullptr, nullptr)) throw std::runtime_error("Cannot open input file");
+		m_formatContext.reset(avfctx);
+	}
 	if (avformat_find_stream_info(m_formatContext.get(), nullptr) < 0) throw std::runtime_error("Cannot find stream information");
 	m_formatContext->flags |= AVFMT_FLAG_GENPTS;
 	// Find a track and open the codec
@@ -330,7 +331,7 @@ void FFmpeg::decodePacket() {
 			throw FfmpegError(ret);
 		}
 		while (ret >= 0) {
-			std::shared_ptr<AVFrame> frame(av_frame_alloc(), [](AVFrame* ptr) { av_frame_free(&ptr); });
+			uFrame frame{av_frame_alloc()};
 			ret = avcodec_receive_frame(m_codecContext.get(), frame.get());
 			if(ret == AVERROR_EOF) {
 				// End of file: no more data.
@@ -347,8 +348,7 @@ void FFmpeg::decodePacket() {
 				if (m_formatContext->start_time != int64_t(AV_NOPTS_VALUE))
 					m_position -= double(m_formatContext->start_time) / AV_TIME_BASE;
 			}
-			if (m_mediaType == AVMEDIA_TYPE_VIDEO) processVideo(frame.get()); else processAudio(frame.get());
-			//av_frame_free(&frame);
+			if (m_mediaType == AVMEDIA_TYPE_VIDEO) processVideo(std::move(frame)); else processAudio(std::move(frame));
 		}
 	}
 	return;
@@ -360,7 +360,7 @@ void FFmpeg::decodePacket() {
 		if (packetSize < 0) throw std::logic_error("negative packet size?!");
 		if (terminating() || m_seekTarget == m_seekTarget) return;
 		if (packet.stream_index != m_streamId) return;
-		std::shared_ptr<AVFrame> frame(av_frame_alloc(), [](AVFrame* ptr) { av_frame_free(&ptr); });
+                uFrame frame{av_frame_alloc()};
 		int frameFinished = 0;
 		int decodeSize = (m_mediaType == AVMEDIA_TYPE_VIDEO ?
 		  avcodec_decode_video2(m_codecContext.get(), frame.get(), &frameFinished, &packet) :
@@ -374,12 +374,12 @@ void FFmpeg::decodePacket() {
 			if (m_formatContext->start_time != int64_t(AV_NOPTS_VALUE))
 				m_position -= double(m_formatContext->start_time) / AV_TIME_BASE;
 		}
-		if (m_mediaType == AVMEDIA_TYPE_VIDEO) processVideo(frame.get()); else processAudio(frame.get());
+		if (m_mediaType == AVMEDIA_TYPE_VIDEO) processVideo(std::move(frame)); else processAudio(std::move(frame));
 	}
 #endif
 }
 
-void FFmpeg::processVideo(AVFrame* frame) {
+void FFmpeg::processVideo(uFrame frame) {
 	// Convert into RGB and scale the data
 	int w = (m_codecContext->width+15)&~15;
 	int h = m_codecContext->height;
@@ -395,7 +395,7 @@ void FFmpeg::processVideo(AVFrame* frame) {
 	videoQueue.push(std::move(f));  // Takes ownership and may block until there is space
 }
 
-void FFmpeg::processAudio(AVFrame* frame) {
+void FFmpeg::processAudio(uFrame frame) {
 	// resample to output
 	int16_t *output;
 	int out_linesize;
