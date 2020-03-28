@@ -177,11 +177,7 @@ void FFmpeg::avformat_close_input(AVFormatContext *fctx) {
 	if (fctx) ::avformat_close_input(&fctx);
 }
 void FFmpeg::avcodec_free_context(AVCodecContext *avctx) {
-#if (LIBAVCODEC_VERSION_INT) >= (AV_VERSION_INT(57,0,0))
 	::avcodec_free_context(&avctx);
-#else
-	(void) avctx;
-#endif
 }
 
 void FFmpeg::open() {
@@ -199,13 +195,8 @@ void FFmpeg::open() {
 	m_streamId = av_find_best_stream(m_formatContext.get(), (AVMediaType)m_mediaType, -1, -1, &codec, 0);
 	if (m_streamId < 0) throw std::runtime_error("No suitable track found");
 
-#if (LIBAVCODEC_VERSION_INT) >= (AV_VERSION_INT(57,0,0))
 	decltype(m_codecContext) pCodecCtx{avcodec_alloc_context3(codec), avcodec_free_context};
 	avcodec_parameters_to_context(pCodecCtx.get(), m_formatContext->streams[m_streamId]->codecpar);
-#else
-	AVCodecContext* cc = m_formatContext->streams[m_streamId]->codec;
-        decltype(m_codecContext) pCodecCtx{cc, avcodec_free_context};
-#endif
 	if (avcodec_open2(pCodecCtx.get(), codec, nullptr) < 0) throw std::runtime_error("Cannot open codec");
 	pCodecCtx->workaround_bugs = FF_BUG_AUTODETECT;
 	m_codecContext = std::move(pCodecCtx);
@@ -311,7 +302,6 @@ struct ReadFramePacket: public AVPacket {
 };
 
 void FFmpeg::decodePacket() {
-#if LIBAVCODEC_VERSION_INT >= (AV_VERSION_INT(57, 37, 0))
 	while (true) {
 		// FIXME: we might want to take a look at m_quit.
                 ReadFramePacket pkt(m_formatContext.get());
@@ -348,32 +338,6 @@ void FFmpeg::decodePacket() {
 			if (m_mediaType == AVMEDIA_TYPE_VIDEO) processVideo(std::move(frame)); else processAudio(std::move(frame));
 		}
 	}
-	return;
-#else
-	// Read an AVPacket and decode it into AVFrames
-	ReadFramePacket packet(m_formatContext.get());
-	int packetSize = packet.size;
-	while (packetSize) {
-		if (packetSize < 0) throw std::logic_error("negative packet size?!");
-		if (terminating() || m_seekTarget == m_seekTarget) return;
-		if (packet.stream_index != m_streamId) return;
-                uFrame frame{av_frame_alloc()};
-		int frameFinished = 0;
-		int decodeSize = (m_mediaType == AVMEDIA_TYPE_VIDEO ?
-		  avcodec_decode_video2(m_codecContext.get(), frame.get(), &frameFinished, &packet) :
-		  avcodec_decode_audio4(m_codecContext.get(), frame.get(), &frameFinished, &packet));
-		if (decodeSize < 0) return; // Packet didn't produce any output (could be waiting for B frames or something)
-		packetSize -= decodeSize; // Move forward within the packet
-		if (!frameFinished) continue;
-		// Update current position if timecode is available
-		if (frame->pkt_pts != int64_t(AV_NOPTS_VALUE)) {
-			m_position = double(frame->pkt_pts) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
-			if (m_formatContext->start_time != int64_t(AV_NOPTS_VALUE))
-				m_position -= double(m_formatContext->start_time) / AV_TIME_BASE;
-		}
-		if (m_mediaType == AVMEDIA_TYPE_VIDEO) processVideo(std::move(frame)); else processAudio(std::move(frame));
-	}
-#endif
 }
 
 void FFmpeg::processVideo(uFrame frame) {
