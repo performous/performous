@@ -27,14 +27,14 @@ struct TZoomText {
  */
 struct TextStyle {
 	cairo_line_join_t LineJoin() {	///< convert svg string to cairo enum.
-		if (UnicodeUtil::toLower(stroke_linejoin) == "round") return CAIRO_LINE_JOIN_ROUND;
-		if (UnicodeUtil::toLower(stroke_linejoin) == "bevel") return CAIRO_LINE_JOIN_BEVEL;	
-		return CAIRO_LINE_JOIN_MITER;
+		if (UnicodeUtil::toLower(stroke_linejoin) == "round") return _cairo_line_join::CAIRO_LINE_JOIN_ROUND;
+		if (UnicodeUtil::toLower(stroke_linejoin) == "bevel") return _cairo_line_join::CAIRO_LINE_JOIN_BEVEL;
+		return _cairo_line_join::CAIRO_LINE_JOIN_MITER;
 	};
 	cairo_line_cap_t LineCap() {	///< convert svg string to cairo enum.
-		if (UnicodeUtil::toLower(stroke_linecap) == "round") return CAIRO_LINE_CAP_ROUND;
-		if (UnicodeUtil::toLower(stroke_linecap) == "square") return CAIRO_LINE_CAP_SQUARE;	
-		return CAIRO_LINE_CAP_BUTT;
+		if (UnicodeUtil::toLower(stroke_linecap) == "round") return _cairo_line_cap::CAIRO_LINE_CAP_ROUND;
+		if (UnicodeUtil::toLower(stroke_linecap) == "square") return _cairo_line_cap::CAIRO_LINE_CAP_SQUARE;
+		return _cairo_line_cap::CAIRO_LINE_CAP_BUTT;
 	};
 	Color fill_col; ///< fill color
 	Color stroke_col; ///< stroke color
@@ -136,13 +136,13 @@ public:
 	 *   SE: (x1,y1)</pre>
 	 */
 	/// TODO anchors
-	enum Gravity {NW,N,NE,W,C,E,SW,S,SE};
+	enum class Gravity {NW,N,NE,W,C,E,SW,S,SE};
 	/// where to position when space is too small
-	enum Fitting {F_ASIS, INSIDE, OUTSIDE, FORCE_INSIDE, FORCE_OUTSIDE};
+	enum class Fitting {F_ASIS, INSIDE, OUTSIDE, FORCE_INSIDE, FORCE_OUTSIDE};
 	/// vertical align
-	enum VAlign {V_ASIS, TOP, MIDDLE, BOTTOM};
+	enum class VAlign {V_ASIS, TOP, MIDDLE, BOTTOM};
 	/// horizontal align
-	enum Align {A_ASIS, LEFT, CENTER, RIGHT};
+	enum class Align {A_ASIS, LEFT, CENTER, RIGHT};
 	/// dimensions, what else
 	Dimensions dimensions;
 	/// constructor
