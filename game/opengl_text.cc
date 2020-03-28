@@ -120,7 +120,7 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	cairo_paint (dc.get());
 	// Load into m_texture (OpenGL texture)
 	Bitmap bitmap(cairo_image_surface_get_data(surface.get()));
-	bitmap.fmt = pix::INT_ARGB;
+	bitmap.fmt = pix::Format::INT_ARGB;
 	bitmap.linearPremul = true;
 	bitmap.resize(cairo_image_surface_get_width(surface.get()), cairo_image_surface_get_height(surface.get()));
 	m_texture.load(bitmap, true);
@@ -184,9 +184,9 @@ namespace {
 				std::string value;
 				std::getline(iss2, value);
 				_theme.fontalign = value;
-				if (value == "start") _align = SvgTxtTheme::LEFT;
-				else if (value == "middle") _align = SvgTxtTheme::CENTER;
-				else if (value == "end") _align = SvgTxtTheme::RIGHT;
+				if (value == "start") _align = SvgTxtTheme::Align::LEFT;
+				else if (value == "middle") _align = SvgTxtTheme::Align::CENTER;
+				else if (value == "end") _align = SvgTxtTheme::Align::RIGHT;
 			}
 		}
 		// Parse x and y attributes
@@ -264,8 +264,8 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool lyrics) {
 	m_texture_width = std::min(0.96, text_x / targetWidth); // targetWidth is defined in video_driver.cc, it's the base rendering width, used to project the svg onto a gltexture. currently we're targeting 1366x768 as base resolution.
 	
 	double position_x = dimensions.x1();
-	if (m_align == CENTER) position_x -= 0.5 * m_texture_width;
-	if (m_align == RIGHT) position_x -= m_texture_width;
+	if (m_align == SvgTxtTheme::Align::CENTER) position_x -= 0.5 * m_texture_width;
+	if (m_align == SvgTxtTheme::Align::RIGHT) position_x -= m_texture_width;
 
 	if ((position_x + m_texture_width) > 0.48) { 
 		m_texture_width = (0.48 - position_x);
