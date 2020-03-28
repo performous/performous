@@ -33,15 +33,15 @@ Webcam::Webcam(int cam_id):
 			throw std::runtime_error("Could not initialize webcam capturing!");
 	}
 	// Try to get at least VGA resolution
-	if (m_capture->get(cv::CAP_PROP_FRAME_WIDTH) < 640
-	  || m_capture->get(cv::CAP_PROP_FRAME_HEIGHT) < 480) {
-		m_capture->set(cv::CAP_PROP_FRAME_WIDTH, 640);
-		m_capture->set(cv::CAP_PROP_FRAME_HEIGHT, 480);
+	if (m_capture->get(cv::VideoCaptureProperties::CAP_PROP_FRAME_WIDTH) < 640
+	  || m_capture->get(cv::VideoCaptureProperties::CAP_PROP_FRAME_HEIGHT) < 480) {
+		m_capture->set(cv::VideoCaptureProperties::CAP_PROP_FRAME_WIDTH, 640);
+		m_capture->set(cv::VideoCaptureProperties::CAP_PROP_FRAME_HEIGHT, 480);
 	}
 	// Print actual values
 	std::cout << "Webcam frame properties: "
-	  << m_capture->get(cv::CAP_PROP_FRAME_WIDTH) << "x"
-	  << m_capture->get(cv::CAP_PROP_FRAME_HEIGHT) << std::endl;
+		<< m_capture->get(cv::VideoCaptureProperties::CAP_PROP_FRAME_WIDTH) << "x"
+		<< m_capture->get(cv::VideoCaptureProperties::CAP_PROP_FRAME_HEIGHT) << std::endl;
 
 	// Initialize the video writer
 	#ifdef SAVE_WEBCAM_VIDEO
@@ -84,7 +84,8 @@ void Webcam::operator()() {
 				// Copy the frame to storage
 				m_frame.width = frame.cols;
 				m_frame.height = frame.rows;
-				m_frame.data.assign(frame.data, frame.data + (m_frame.width * m_frame.height * 3));
+				auto frameDims = m_frame.width * m_frame.height * 3;
+				m_frame.data.assign(frame.data, frame.data + (frameDims));
 				// Notify renderer
 				m_frameAvailable = true;
 			} catch (std::exception&) { std::cerr << "Error capturing webcam frame!" << std::endl; }
@@ -111,7 +112,7 @@ void Webcam::render() {
 		std::lock_guard<std::mutex> l(m_mutex);
 		// Load the image
 		Bitmap bitmap;
-		bitmap.fmt = pix::BGR;
+		bitmap.fmt = pix::Format::BGR;
 		bitmap.buf.swap(m_frame.data);
 		bitmap.resize(m_frame.width, m_frame.height);
 		m_texture.load(bitmap);
