@@ -301,42 +301,37 @@ struct ReadFramePacket: public AVPacket {
 };
 
 void FFmpeg::decodePacket() {
-	while (true) {
-		// FIXME: we might want to take a look at m_quit.
-                ReadFramePacket pkt(m_formatContext.get());
-		if (terminating() || m_seekTarget == m_seekTarget) return; // something weird required
-		if (pkt.stream_index != m_streamId) return; // wrong stream
-		auto ret = avcodec_send_packet(m_codecContext.get(), &pkt);
-		if(ret == AVERROR_EOF) {
-			// End of file: no more data to read.
-			throw FFmpeg::eof_error();
-		} else if(ret == AVERROR(EAGAIN)) {
-			// not enough data for decoder, read more
-			continue;
-		} else if(ret < 0) {
-			throw FfmpegError(ret);
-		}
-		while (ret >= 0) {
-			uFrame frame{av_frame_alloc()};
-			ret = avcodec_receive_frame(m_codecContext.get(), frame.get());
-			if(ret == AVERROR_EOF) {
-				// End of file: no more data.
-				throw FFmpeg::eof_error();
-			} else if(ret == AVERROR(EAGAIN)) {
-				// not enough data to decode a frame, go read more and feed more to the decoder
-				break;
-			} else if(ret < 0) {
-				throw FfmpegError(ret);
-			}
-			// frame is available here
-			if (frame->pts != int64_t(AV_NOPTS_VALUE)) {
-				m_position = double(frame->pts) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
-				if (m_formatContext->start_time != int64_t(AV_NOPTS_VALUE))
-					m_position -= double(m_formatContext->start_time) / AV_TIME_BASE;
-			}
-			if (m_mediaType == AVMEDIA_TYPE_VIDEO) processVideo(std::move(frame)); else processAudio(std::move(frame));
-		}
-	}
+    ReadFramePacket pkt(m_formatContext.get());
+    if (pkt.stream_index != m_streamId) return; // wrong stream
+    auto ret = avcodec_send_packet(m_codecContext.get(), &pkt);
+    if(ret == AVERROR_EOF) {
+        // End of file: no more data to read.
+        throw FFmpeg::eof_error();
+    } else if(ret == AVERROR(EAGAIN)) {
+        // not enough data for decoder, read more
+    } else if(ret < 0) {
+        throw FfmpegError(ret);
+    }
+    while (ret >= 0) {
+        uFrame frame{av_frame_alloc()};
+        ret = avcodec_receive_frame(m_codecContext.get(), frame.get());
+        if(ret == AVERROR_EOF) {
+            // End of file: no more data.
+            throw FFmpeg::eof_error();
+        } else if(ret == AVERROR(EAGAIN)) {
+            // not enough data to decode a frame, go read more and feed more to the decoder
+            break;
+        } else if(ret < 0) {
+            throw FfmpegError(ret);
+        }
+        // frame is available here
+        if (frame->pts != int64_t(AV_NOPTS_VALUE)) {
+            m_position = double(frame->pts) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
+            if (m_formatContext->start_time != int64_t(AV_NOPTS_VALUE))
+                m_position -= double(m_formatContext->start_time) / AV_TIME_BASE;
+        }
+        if (m_mediaType == AVMEDIA_TYPE_VIDEO) processVideo(std::move(frame)); else processAudio(std::move(frame));
+    }
 }
 
 void FFmpeg::processVideo(uFrame frame) {
