@@ -14,7 +14,7 @@ void ProgressBar::draw(float value) {
 	float off = (1.0f - value) * scale;  // Offset for sliding mode
 	m_bg.draw(dimensions);
 	switch (m_mode) {
-	  case HORIZONTAL:
+	  case Mode::HORIZONTAL:
 		{
 			Dimensions dim = dimensions;
 			TexCoords tex;
@@ -23,7 +23,7 @@ void ProgressBar::draw(float value) {
 			m_bar.drawCropped(dim, tex);
 		}
 		break;
-	  case VERTICAL:
+	  case Mode::VERTICAL:
 		{
 			Dimensions dim = dimensions;
 			TexCoords tex;
@@ -32,7 +32,7 @@ void ProgressBar::draw(float value) {
 			m_bar.drawCropped(dim, tex);
 		}
 		break;
-	  case CIRCULAR:
+	  case Mode::CIRCULAR:
 		{
 			UseTexture texblock(m_bar);
 			throw std::logic_error("ProgressBar::draw(): CIRCULAR not implemented yet");  // TODO: Implement
