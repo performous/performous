@@ -24,21 +24,21 @@ namespace input {
 			return SDL_JoystickNameForIndex(device);
 		}
 		bool process(Event& event, SDL_Event const& sdlEv) override {
-			if (sdlEv.type == SDL_JOYBUTTONDOWN || sdlEv.type == SDL_JOYBUTTONUP) {
+			if (sdlEv.type == SDL_EventType::SDL_JOYBUTTONDOWN || sdlEv.type == SDL_EventType::SDL_JOYBUTTONUP) {
 				event.hw = sdlEv.jbutton.button;
-				event.value = (sdlEv.type == SDL_JOYBUTTONDOWN ? 1.0 : 0.0);
+				event.value = (sdlEv.type == SDL_EventType::SDL_JOYBUTTONDOWN ? 1.0 : 0.0);
 			}
-			else if (sdlEv.type == SDL_JOYAXISMOTION) {
+			else if (sdlEv.type == SDL_EventType::SDL_JOYAXISMOTION) {
 				event.hw = hwIsAxis.min + sdlEv.jaxis.axis;
 				event.value = (sdlEv.jaxis.value + 0.5) / 32767.5;  // Convert to -1.0 .. 1.0 range
 				if (std::abs(event.value) < 0.001) event.value = 0.0;  // Some dead zone around zero
 			}
-			else if (sdlEv.type == SDL_JOYHATMOTION) {
+			else if (sdlEv.type == SDL_EventType::SDL_JOYHATMOTION) {
 				event.hw = hwIsHat.min + sdlEv.jhat.hat;
 				event.value = sdlEv.jhat.value;
 			}
 			else return false;
-			event.source = SourceId(SOURCETYPE_JOYSTICK, sdlEv.jbutton.which);  // All j* structures have .which at the same position as jbutton
+			event.source = SourceId(SourceType::SOURCETYPE_JOYSTICK, sdlEv.jbutton.which);  // All j* structures have .which at the same position as jbutton
 			return true;
 		}
 		typedef std::shared_ptr<SDL_Joystick> JoyPtr;

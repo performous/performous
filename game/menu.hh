@@ -19,7 +19,7 @@ typedef std::shared_ptr<Texture> MenuImage;
 /// Struct for menu options
 class MenuOption {
 public:
-	enum Type { CLOSE_SUBMENU, OPEN_SUBMENU, CHANGE_VALUE, SET_AND_CLOSE, ACTIVATE_SCREEN, CALLBACK_FUNCTION } type;
+	enum class Type { CLOSE_SUBMENU, OPEN_SUBMENU, CHANGE_VALUE, SET_AND_CLOSE, ACTIVATE_SCREEN, CALLBACK_FUNCTION } type;
 
 	/// Construct a menu option. Default function is to close the menu.
 	/// @param nm Name (menu item title)
@@ -29,19 +29,19 @@ public:
 
 	/// Make the option change values of a ConfigItem.
 	MenuOption& changer(ConfigItem& val, std::string virtOptName = std::string()) {
-		type = CHANGE_VALUE;
+		type = Type::CHANGE_VALUE;
 		value = &val;
 		if (!virtOptName.empty()) { virtualName = virtOptName; }
 		return *this;
 		}
 	/// Make the option set a given value for ConfigItem and close the menu.
-	MenuOption& setter(ConfigItem& val, ConfigItem newval) { type = SET_AND_CLOSE; value = &val; newValue = newval; return *this; }
+	MenuOption& setter(ConfigItem& val, ConfigItem newval) { type = Type::SET_AND_CLOSE; value = &val; newValue = newval; return *this; }
 	/// Make the option open a submenu
-	MenuOption& submenu(MenuOptions opts) { type = OPEN_SUBMENU; options = opts; return *this; }
+	MenuOption& submenu(MenuOptions opts) { type = Type::OPEN_SUBMENU; options = opts; return *this; }
 	/// Make the option activate a screeen
-	MenuOption& screen(std::string const& scrn) { type = ACTIVATE_SCREEN; newValue = scrn; return *this; }
+	MenuOption& screen(std::string const& scrn) { type = Type::ACTIVATE_SCREEN; newValue = scrn; return *this; }
 	/// Make the option call a callback
-	MenuOption& call(MenuOptionCallback f) { type = CALLBACK_FUNCTION; callback = f; return *this; }
+	MenuOption& call(MenuOptionCallback f) { type = Type::CALLBACK_FUNCTION; callback = f; return *this; }
 	/// Sets name to follow a reference
 	MenuOption& setDynamicName(std::string& nm) { namePtr = &nm; return *this; }
 	/// Sets comment to follow a reference
