@@ -118,9 +118,9 @@ void SongParser::xmlParseHeader() {
 }
 
 void addNoteToTrack(VocalTrack& vocal, const Note& note) {
-	if (note.type == Note::SLEEP) {
+	if (note.type == Note::Type::SLEEP) {
 		// Skip extra sleep notes
-		if (vocal.notes.empty() || vocal.notes.back().type == Note::SLEEP) return;
+		if (vocal.notes.empty() || vocal.notes.back().type == Note::Type::SLEEP) return;
 	} else {
 		vocal.noteMin = std::min(vocal.noteMin, note.note);
 		vocal.noteMax = std::max(vocal.noteMax, note.note);
@@ -162,7 +162,7 @@ void SongParser::xmlParse() {
 			// Begin each sentence with sleep (extras will be purged in addNoteToTrack)
 			{
 				Note sleep;
-				sleep.type = Note::SLEEP;
+				sleep.type = Note::Type::SLEEP;
 				sleep.begin = sleep.end = tsTime(ts);
 				addNoteToTrack(vocal, sleep);
 			}
@@ -196,9 +196,9 @@ Note SongParser::xmlParseNote(xmlpp::Element const& noteNode, unsigned& ts) {
 	unsigned note, duration;
 	SongParserUtil::assign(note, noteNode.get_attribute("MidiNote")->get_value().c_str());
 	SongParserUtil::assign(duration, noteNode.get_attribute("Duration")->get_value().c_str());
-	if (noteNode.get_attribute("FreeStyle")) n.type = Note::FREESTYLE;
-	else if (noteNode.get_attribute("Bonus")) n.type = Note::GOLDEN;
-	else n.type = Note::NORMAL;
+	if (noteNode.get_attribute("FreeStyle")) n.type = Note::Type::FREESTYLE;
+	else if (noteNode.get_attribute("Bonus")) n.type = Note::Type::GOLDEN;
+	else n.type = Note::Type::NORMAL;
 
 	n.begin = tsTime(ts);
 	ts += duration;
