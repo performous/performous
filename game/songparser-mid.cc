@@ -123,28 +123,28 @@ void SongParser::midParse() {
 				n.begin = midi.get_seconds(lyric.begin)+s.start;
 				n.end = midi.get_seconds(lyric.end)+s.start;
 				n.notePrev = n.note = lyric.note;
-				n.type = n.note > 100 ? Note::SLEEP : Note::NORMAL;
+				n.type = n.note > 100 ? Note::Type::SLEEP : Note::Type::NORMAL;
 				if(n.note == 116 || n.note == 103 || n.note == 124)
 					continue; // managed in the next loop (GOLDEN/FREESTYLE notes)
 				else if(n.note > 100) // is it always 105 ?
-					n.type = Note::SLEEP;
+					n.type = Note::Type::SLEEP;
 				else
-					n.type = Note::NORMAL;
+					n.type = Note::Type::NORMAL;
 				{
 					std::stringstream ss(lyric.lyric);
 					UnicodeUtil::convertToUTF8(ss, std::string());
 					n.syllable = ss.str();
 				}
 				std::string& syl = n.syllable;
-				if (n.type != Note::SLEEP) {
+				if (n.type != Note::Type::SLEEP) {
 					if (!syl.empty()) {
 						bool erase = false;
 						// Examine note styles (specified by the last character of the syllable)
 						{
 							char& ch = *syl.rbegin();
-							if (ch == '#') { n.type = Note::FREESTYLE; erase = true; }
-							if (ch == '^') { n.type = Note::GOLDEN; erase = true; }
-							if (ch == '+') { n.type = Note::SLIDE; ch = '~'; }
+							if (ch == '#') { n.type = Note::Type::FREESTYLE; erase = true; }
+							if (ch == '^') { n.type = Note::Type::GOLDEN; erase = true; }
+							if (ch == '+') { n.type = Note::Type::SLIDE; ch = '~'; }
 						}
 						if (erase) syl.erase(syl.size() - 1);
 						// Add spaces between words, remove hyphens
@@ -156,9 +156,9 @@ void SongParser::midParse() {
 						}
 					}
 					// Special processing for slides (which depend on the previous note)
-					if (n.type == Note::SLIDE) {
+					if (n.type == Note::Type::SLIDE) {
 						auto prev = vocal.notes.rbegin();
-						while (prev != vocal.notes.rend() && prev->type == Note::SLEEP) ++prev;
+						while (prev != vocal.notes.rend() && prev->type == Note::Type::SLEEP) ++prev;
 						if (prev == vocal.notes.rend()) throw std::runtime_error("The song begins with a slide note");
 						eraseLast(prev->syllable); // Erase the space if there is any
 						{
@@ -168,7 +168,7 @@ void SongParser::midParse() {
 							inter.end = n.begin;
 							inter.notePrev = prev->note;
 							inter.note = n.note;
-							inter.type = Note::SLIDE;
+							inter.type = Note::Type::SLIDE;
 							inter.syllable = std::string("~");
 							vocal.noteMin = std::min(vocal.noteMin, inter.note);
 							vocal.noteMax = std::max(vocal.noteMax,inter.note);
@@ -176,13 +176,13 @@ void SongParser::midParse() {
 						}
 						{
 							// modifying current note to be normal again
-							n.type = Note::NORMAL;
+							n.type = Note::Type::NORMAL;
 						}
 					}
 					vocal.noteMin = std::min(vocal.noteMin, n.note);
 					vocal.noteMax = std::max(vocal.noteMax, n.note);
 					vocal.notes.push_back(n);
-				} else if (!vocal.notes.empty() && vocal.notes.back().type != Note::SLEEP) {
+				} else if (!vocal.notes.empty() && vocal.notes.back().type != Note::Type::SLEEP) {
 					eraseLast(vocal.notes.back().syllable);
 					vocal.notes.push_back(n);
 				}
@@ -190,11 +190,11 @@ void SongParser::midParse() {
 			for (auto const& lyric: it->lyrics) {
 				if(lyric.note == 116 || lyric.note == 103 || lyric.note == 124) {
 					for (auto& n: vocal.notes) {
-						if (n.begin == midi.get_seconds(lyric.begin) + s.start && n.type == Note::NORMAL) {
+						if (n.begin == midi.get_seconds(lyric.begin) + s.start && n.type == Note::Type::NORMAL) {
 							if (lyric.note == 124) {
-								n.type = Note::FREESTYLE;
+								n.type = Note::Type::FREESTYLE;
 							} else {
-								n.type = Note::GOLDEN;
+								n.type = Note::Type::GOLDEN;
 							}
 							break;
 						}
