@@ -99,7 +99,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, input::DevicePtr dev, i
   m_tap(findFile("tap.svg")),
   m_neckglow(findFile("neck_glow.svg")),
   m_neckglowColor(),
-  m_drums(dev->type == input::DEVTYPE_DRUMS),
+  m_drums(dev->type == input::DevType::DEVTYPE_DRUMS),
   m_level(),
   m_track_index(m_instrumentTracks.end()),
   m_dfIt(m_drumfills.end()),
@@ -138,10 +138,10 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, input::DevicePtr dev, i
 	while (number--)
 		if (++m_track_index == m_instrumentTracks.end()) m_track_index = m_instrumentTracks.begin();
 	// Pick a nice default difficulty (note: the execution of || stops when true is returned)
-	difficulty(DIFFICULTY_EASY) ||
-	difficulty(DIFFICULTY_SUPAEASY) ||
-	difficulty(DIFFICULTY_MEDIUM) ||
-	difficulty(DIFFICULTY_AMAZING) ||
+	difficulty(Difficulty::DIFFICULTY_EASY) ||
+	difficulty(Difficulty::DIFFICULTY_SUPAEASY) ||
+	difficulty(Difficulty::DIFFICULTY_MEDIUM) ||
+	difficulty(Difficulty::DIFFICULTY_AMAZING) ||
 	(difficultyAuto(), true);
 	updateNeck();
 	setupJoinMenu();
@@ -151,7 +151,7 @@ void GuitarGraph::setupJoinMenuDifficulty() {
 	ConfigItem::OptionList ol;
 	int cur = 0;
 	// Add difficulties to the option list
-	for (int level = 0; level < DIFFICULTYCOUNT; ++level) {
+	for (int level = 0; level < static_cast<int>(Difficulty::DIFFICULTYCOUNT); ++level) {
 		if (difficulty(Difficulty(level), true)) {
 			ol.push_back(std::to_string(level));
 			if (Difficulty(level) == m_level) cur = ol.size()-1;
@@ -245,25 +245,26 @@ std::string GuitarGraph::getTrack() const {
 
 /// Get the difficulty as displayable string
 std::string GuitarGraph::getDifficultyString() const {
-	return _(diffv[m_level].name.c_str());
+	return _(diffv[static_cast<int>(m_level)].name.c_str());
 }
 
 /// Get a string id for track and difficulty
 std::string GuitarGraph::getModeId() const {
-	return m_track_index->first + " - " + diffv[m_level].name;
+	return m_track_index->first + " - " + diffv[static_cast<int>(m_level)].name;
 }
 
 /// Cycle through difficulties
 void GuitarGraph::changeDifficulty(int dir) {
-	for (int level = ((int)m_level + dir) % DIFFICULTYCOUNT; level != m_level;
-	  level = (level+dir) % DIFFICULTYCOUNT)
+	auto difficultyCount = static_cast<int>(Difficulty::DIFFICULTYCOUNT);
+	for (int level = ((int)m_level + dir) % difficultyCount; level != static_cast<int>(m_level);
+	  level = (level+dir) % difficultyCount)
 		if (difficulty(Difficulty(level))) return;
 }
 
 /// Find an initial difficulty level to use
 void GuitarGraph::difficultyAuto(bool tryKeep) {
 	if (tryKeep && difficulty(Difficulty(m_level))) return;
-	for (int level = 0; level < DIFFICULTYCOUNT; ++level) if (difficulty(Difficulty(level))) return;
+	for (int level = 0; level < static_cast<int>(Difficulty::DIFFICULTYCOUNT); ++level) if (difficulty(Difficulty(level))) return;
 	throw std::runtime_error("No difficulty levels found for track " + m_track_index->first);
 }
 
@@ -275,7 +276,7 @@ bool GuitarGraph::difficulty(Difficulty level, bool check_only) {
 		if (&track == &elem.second) break;
 	}
 	// Check if the difficulty level is available
-	uint8_t basepitch = diffv[level].basepitch;
+	uint8_t basepitch = diffv[static_cast<int>(level)].basepitch;
 	NoteMap const& nm = track.nm;
 	unsigned fail = 0;
 	for (unsigned fret = 0; fret < m_pads; ++fret) if (nm.find(basepitch + fret) == nm.end()) ++fail;
@@ -304,7 +305,7 @@ void GuitarGraph::engine() {
 	// Handle all events
 	for (input::Event ev; m_dev->getEvent(ev); ) {
 		// Lefty mode flip of buttons
-		if (m_leftymode.b() && m_drums && ev.source.type != input::SOURCETYPE_MIDI) {
+		if (m_leftymode.b() && m_drums && ev.source.type != input::SourceType::SOURCETYPE_MIDI) {
 			unsigned layer = ev.button.layer(), num = ev.button.num();
 			// Layers 0-1: reverse all but kick; layer 2: swap yellow and blue cymbals
 			if ((layer < 2 && num >= 1 && num <= 4) || (layer == 2 && num >= 2 && num <= 3)) ev.button = input::Button(layer, 5 - num);
@@ -328,12 +329,12 @@ void GuitarGraph::engine() {
 		if (menuOpen()) {
 			// Check first regular keys
 			if (ev.pressed()) {
-				if (ev.nav == input::NAV_START) m_menu.action();
-				else if (ev.nav == input::NAV_LEFT) m_menu.action(-1);
-				else if (ev.nav == input::NAV_UP) m_menu.move(-1);
-				else if (ev.nav == input::NAV_DOWN) m_menu.move(1);
-				else if (ev.nav == input::NAV_RIGHT) m_menu.action(1);
-				else if (ev.nav == input::NAV_CANCEL) m_menu.close();
+				if (ev.nav == input::NavButton::NAV_START) m_menu.action();
+				else if (ev.nav == input::NavButton::NAV_LEFT) m_menu.action(-1);
+				else if (ev.nav == input::NavButton::NAV_UP) m_menu.move(-1);
+				else if (ev.nav == input::NavButton::NAV_DOWN) m_menu.move(1);
+				else if (ev.nav == input::NavButton::NAV_RIGHT) m_menu.action(1);
+				else if (ev.nav == input::NavButton::NAV_CANCEL) m_menu.close();
 				if (!m_drums) {
 					if (ev.button == input::GUITAR_GREEN) m_menu.action(-1);
 					else if (ev.button == input::GUITAR_RED) m_menu.action(1);
@@ -341,7 +342,7 @@ void GuitarGraph::engine() {
 			}
 			// See if anything changed
 			if (!m_drums && m_selectedTrack.so() != m_track_index->first) setTrack(m_selectedTrack.so());
-			else if (std::stoi(m_selectedDifficulty.so()) != m_level)
+			else if (std::stoi(m_selectedDifficulty.so()) != static_cast<int>(m_level))
 				difficulty(Difficulty(std::stoi(m_selectedDifficulty.so())));
 			else if (m_rejoin.b()) { unjoin(); setupJoinMenu(); m_dev->pushEvent(input::Event()); /* FIXME: HACK! */ }
 			// Sync menu items & captions
@@ -504,7 +505,7 @@ void GuitarGraph::fail(double time, int fret) {
 		// remove equivalent of 1 perfect hit for every note
 		// kids tend to play a lot of extra notes just for the fun of it.
 		// need to make sure they don't end up with a score of zero
-		m_score -= (m_level == DIFFICULTY_KIDS) ? points(0)/2.0 : points(0);
+		m_score -= (m_level == Difficulty::DIFFICULTY_KIDS) ? points(0)/2.0 : points(0);
 		m_correctness.setTarget(0.0, true);  // Instantly fail correctness
 	}
 	endStreak();
@@ -578,7 +579,7 @@ void GuitarGraph::drumHit(double time, unsigned layer, unsigned fret) {
 	for (auto it = m_chordIt; it != m_chords.end() && it->begin <= time + tolerance; ++it) {
 		// it->dur[fret]          == NULL for a chord that doesn't include the fret played (pad hit)
 		// m_notes[it->dur[fret]] != 0    when the fret played (pad hit) was already played
-		if (m_level == DIFFICULTY_KIDS) {
+		if (m_level == Difficulty::DIFFICULTY_KIDS) {
 			// in kiddy mode we don't care about the correct pad
 			// all that matters is that there is still a missing note in that chord
 			if (m_chordIt->status == m_chordIt->polyphony) continue;
@@ -613,7 +614,7 @@ void GuitarGraph::drumHit(double time, unsigned layer, unsigned fret) {
 		m_events.push_back(Event(time, 1, fret, dur));
 		m_notes[dur] = m_events.size();
 		// Scoring - be a little more generous for kids
-		double score = (m_level == DIFFICULTY_KIDS) ? points(tolerance/2.0) : points(tolerance);
+		double score = (m_level == Difficulty::DIFFICULTY_KIDS) ? points(tolerance/2.0) : points(tolerance);
 		m_chordIt->score += score;
 		m_score += score;
 		if (!m_drumfills.empty()) m_starmeter += score; // Only add starmeter if it's possible to activate GodMode
@@ -1154,7 +1155,7 @@ void GuitarGraph::updateChords() {
 	Durations::size_type pos[5] = {}, size[5] = {};
 	Durations const* durations[5] = {};
 	for (unsigned fret = 0; fret < m_pads; ++fret) {
-		int basepitch = diffv[m_level].basepitch;
+		int basepitch = diffv[static_cast<int>(m_level)].basepitch;
 		auto it = nm.find(basepitch + fret);
 		if (it == nm.end()) continue;
 		durations[fret] = &it->second;
