@@ -131,7 +131,7 @@ void Players::filter_internal() {
 			});
 		}
 // 		for (auto const& p: m_players) {
-// 			if (regex_search(p.name, regex(m_filter, regex_constants::icase))) filtered.push_back(p);
+// 			if (regex_search(p.name, regex(m_filter, regex_constants::syntax_option_type::icase))) filtered.push_back(p);
 // 		}
 		m_filtered.swap(filtered);
 	} catch (...) {

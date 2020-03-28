@@ -32,7 +32,7 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	rsvg_handle_get_dimensions(svgHandle.get(), &svgDimension);
 	// Prepare the pixel buffer
 	bitmap.resize(svgDimension.width*factor, svgDimension.height*factor);
-	bitmap.fmt = pix::INT_ARGB;
+	bitmap.fmt = pix::Format::INT_ARGB;
 	bitmap.linearPremul = true;
 	// Raster with Cairo
 	std::shared_ptr<cairo_surface_t> surface(
@@ -47,7 +47,7 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 		uint8_t r = pixel[2], g = pixel[1], b = pixel[0], a = pixel[3];
 		pixel[0] = r; pixel[1] = g; pixel[2] = b; pixel[3] = a;
 	}
-	bitmap.fmt = pix::CHAR_RGBA;
+	bitmap.fmt = pix::Format::CHAR_RGBA;
 	// Write to cache so that it can be loaded faster the next time
 	fs::path cache_filename = cache::constructSVGCacheFileName(filename, factor);
 	fs::create_directories(cache_filename.parent_path());
