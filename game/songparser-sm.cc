@@ -204,14 +204,14 @@ Notes SongParser::smParseNotes(std::string line) {
 					n.begin = n.end = t;
 					n.phase = phase;
 					// TODO: Proper LIFT handling
-					if (n.type == Note::TAP || n.type == Note::MINE || n.type == Note::LIFT) notes.push_back(n);
+					if (n.type == Note::Type::TAP || n.type == Note::Type::MINE || n.type == Note::Type::LIFT) notes.push_back(n);
 					// TODO: Proper ROLL handling
-					if (n.type == Note::HOLDBEGIN || n.type == Note::ROLL) {
+					if (n.type == Note::Type::HOLDBEGIN || n.type == Note::Type::ROLL) {
 						notes.push_back(n);  // Note added now, end time will be fixed later
 						holdIdx = notes.size(); // Store index in notes plus one
 						continue;
 					}
-					if (n.type == Note::HOLDEND) {
+					if (n.type == Note::Type::HOLDEND) {
 						if (holdIdx == 0) throw std::runtime_error("Hold end without beginning");
 						notes[holdIdx - 1].end = t;
 					}
@@ -237,14 +237,14 @@ Notes SongParser::smParseNotes(std::string line) {
 			char notetype = line[i];
 			if (notetype == '0') continue;
 			Note note;
-			if(notetype == '1') note.type = Note::TAP;
-			else if(notetype == '2') note.type = Note::HOLDBEGIN;
-			else if(notetype == '3') note.type = Note::HOLDEND;
-			else if(notetype == '4') note.type = Note::ROLL;
-			else if(notetype == 'M') note.type = Note::MINE;
-			else if(notetype == 'L') note.type = Note::LIFT;
-			else if(notetype >= 'a' && notetype <= 'z') note.type = Note::TAP;
-			else if(notetype >= 'A' && notetype <= 'Z') note.type = Note::TAP;
+			if(notetype == '1') note.type = Note::Type::TAP;
+			else if(notetype == '2') note.type = Note::Type::HOLDBEGIN;
+			else if(notetype == '3') note.type = Note::Type::HOLDEND;
+			else if(notetype == '4') note.type = Note::Type::ROLL;
+			else if(notetype == 'M') note.type = Note::Type::MINE;
+			else if(notetype == 'L') note.type = Note::Type::LIFT;
+			else if(notetype >= 'a' && notetype <= 'z') note.type = Note::Type::TAP;
+			else if(notetype >= 'A' && notetype <= 'Z') note.type = Note::Type::TAP;
 			else throw std::runtime_error(std::string("Invalid note command: ") + notetype);
 			note.note = i;
 			chord[i] = note;
