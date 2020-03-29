@@ -184,7 +184,6 @@ void FFmpeg::avcodec_free_context(AVCodecContext *avctx) {
 }
 
 void FFmpeg::open() {
-	std::lock_guard<std::mutex> l(s_avcodec_mutex);
 	av_log_set_level(AV_LOG_ERROR);
 	{
 		AVFormatContext *avfctx = nullptr;
@@ -200,7 +199,11 @@ void FFmpeg::open() {
 
 	decltype(m_codecContext) pCodecCtx{avcodec_alloc_context3(codec), avcodec_free_context};
 	avcodec_parameters_to_context(pCodecCtx.get(), m_formatContext->streams[m_streamId]->codecpar);
-	if (avcodec_open2(pCodecCtx.get(), codec, nullptr) < 0) throw std::runtime_error("Cannot open codec");
+	{
+		// ffmpeg documentation is clear on the fact that avcodec_open2 is not thread safe.
+		std::lock_guard<std::mutex> l(s_avcodec_mutex);
+		if (avcodec_open2(pCodecCtx.get(), codec, nullptr) < 0) throw std::runtime_error("Cannot open codec");
+	}
 	pCodecCtx->workaround_bugs = FF_BUG_AUTODETECT;
 	m_codecContext = std::move(pCodecCtx);
 
