@@ -135,7 +135,7 @@ bool AudioBuffer::operator()(float* begin, float* end, std::int64_t pos, float v
 FFmpeg::FFmpeg(fs::path const& _filename, unsigned int rate):
   m_filename(_filename), m_rate(rate),
   m_mediaType(rate ? AVMEDIA_TYPE_AUDIO : AVMEDIA_TYPE_VIDEO),
-  m_thread(std::make_unique<std::thread>(std::ref(*this)))
+  m_thread(std::async(std::launch::async, std::ref(*this)))
 {
     static std::once_flag static_infos;
     std::call_once(static_infos, [] {
@@ -170,7 +170,11 @@ FFmpeg::~FFmpeg() {
 	m_quit.set_value();
 	videoQueue.reset();
 	audioQueue.quit();
-	m_thread->join();
+	m_thread.get();
+        {
+            std::lock_guard<std::mutex> l(s_avcodec_mutex); // avcodec_close is not thread-safe
+            if (m_codecContext) avcodec_close(m_codecContext.get());
+        }
 }
 
 void FFmpeg::avformat_close_input(AVFormatContext *fctx) {
@@ -286,12 +290,6 @@ void FFmpeg::operator()() {
 		}
 		av_packet_unref(&pkt);
 	}
-	m_quit_future.wait();  // Wait until we are requested to quit before clearing queues
-	audioQueue.reset();
-	videoQueue.reset();
-	// TODO: use RAII for freeing resources (to prevent memory leaks)
-	std::lock_guard<std::mutex> l(s_avcodec_mutex); // avcodec_close is not thread-safe
-	if (m_codecContext) avcodec_close(m_codecContext.get());
 }
 
 void FFmpeg::seek(double time, bool wait) {
@@ -321,7 +319,7 @@ void FFmpeg::decodePacket(Packet &pkt) {
 	} else if(ret < 0) {
 		throw FfmpegError(ret);
 	}
-	while (ret >= 0) {
+	while (!terminating() && ret >= 0) {
 		uFrame frame{av_frame_alloc()};
 		ret = avcodec_receive_frame(m_codecContext.get(), frame.get());
 		if(ret == AVERROR_EOF) {

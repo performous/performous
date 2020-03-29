@@ -154,7 +154,7 @@ class FFmpeg {
 	std::unique_ptr<SwrContext, void(*)(SwrContext*)> m_resampleContext{nullptr, [] (auto p) { swr_close(p); swr_free(&p); }};
 	std::unique_ptr<SwsContext, void(*)(SwsContext*)> m_swsContext{nullptr, sws_freeContext};
 	// Make sure the thread starts only after initializing everything else
-	std::unique_ptr<std::thread> m_thread;
+	std::future<void> m_thread;
 	static std::mutex s_avcodec_mutex; // Used for avcodec_open/close (which use some static crap and are thus not thread-safe)
 };
 
