@@ -1,6 +1,5 @@
 #pragma once
 
-#include "fs.hh"
 #include "log.hh"
 
 #include <array>
