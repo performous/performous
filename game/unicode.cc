@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <unicode/unistr.h>
 #include <unicode/ustream.h>
-#include "../ced/compact_enc_det/compact_enc_det.h"
+#include "../3rdparty/ced/compact_enc_det/compact_enc_det.h"
 
 UErrorCode UnicodeUtil::m_staticIcuError = U_ZERO_ERROR;
 icu::RuleBasedCollator UnicodeUtil::m_dummyCollator (icu::UnicodeString (""), icu::Collator::PRIMARY, m_staticIcuError);
