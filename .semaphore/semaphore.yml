@@ -47,23 +47,25 @@ blocks:
         - name: boost_portfile
       prologue:
         commands:
-          - cache restore macports
           - echo "Installing MacPorts..."
           - curl -LJO https://github.com/macports/macports-base/releases/download/v2.6.2/MacPorts-2.6.2-10.14-Mojave.pkg
           - export PATH="/opt/local/bin:/opt/local/sbin:${PATH}"
           - sudo installer -pkg MacPorts-2.6.2-10.14-Mojave.pkg -target /
           - pushd /opt/
-          - sudo curl -LJO https://github.com/performous/macos_ci_files/raw/master/macports_ci_stuff.tar && sudo tar -xvf ./macports_ci_stuff.tar
+          - sudo -E cache restore performous-ci-libs
+          - test -e /opt/macports_ci_stuff.tar || sudo curl -LJO https://www.dropbox.com/s/754hkwrooa1an0k/macports_ci_stuff.tar?dl=1
+          - sudo tar -xf ./macports_ci_stuff.tar
+          - cd ./local/var/macports/sources/rsync.macports.org/macports/release/tarballs
+          - sudo rm -Rf ./ports/
+          - sudo tar -xf ./ports.tar
           - sudo mv /Users/semaphore/macos-ci-pubkey.pem /opt/local/share/macports/
-          - cd portfiles && sudo portindex
+          - cd /opt/portfiles && sudo portindex
           - popd
           - echo "Will serve ourselves some previously-built binary packages to save time"
-          - sudo port -N install lighttpd
+          - sudo port -N install lighttpd | cat
           - lighttpd -D -f /opt/local/share/macports/macports-lighttpd.conf &
           - echo "Installing Performous dependencies..."
           - sudo port -Np install autoconf automake boost libxmlxx3 libsdl2 -x11 harfbuzz harfbuzz-icu librsvg +quartz-x11 ffmpeg -x11 gdk-pixbuf2 -x11 glib2 +quartz-x11  cmake help2man libepoxy portaudio portmidi opencv icu libsigcxx2 openexr fontconfig freetype pango +quartz-x11 cairo +quartz-x11 libxml2 glm fftw-3-single graphviz +pangocairo-x11 gd2 -x11 cpprestsdk | cat
-          - port installed
-          - cache store macports /opt/local
       jobs:
         - name: Generate app bundle
           commands:
@@ -72,3 +74,4 @@ blocks:
             - cd osx-utils
             - sudo chmod +x ./performous-app-build.sh
             - ./performous-app-build.sh -D
+            - cache store performous-ci-libs /opt/macports_ci_stuff.tar
