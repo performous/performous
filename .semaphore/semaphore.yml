@@ -52,9 +52,15 @@ blocks:
           - export PATH="/opt/local/bin:/opt/local/sbin:${PATH}"
           - sudo installer -pkg MacPorts-2.6.2-10.14-Mojave.pkg -target /
           - pushd /opt/
-          - sudo curl -LJO https://github.com/performous/macos_ci_files/raw/master/macports_ci_stuff.tar && sudo tar -xvf ./macports_ci_stuff.tar
+          - sudo cache restore performous-ci-libs
+          - test -e macports_ci_stuff.tar || sudo curl -LJO https://www.dropbox.com/s/754hkwrooa1an0k/macports_ci_stuff.tar?dl=1
+          - sudo cache store performous-ci-libs ./macports_ci_stuff.tar
+          - sudo tar -xvf ./macports_ci_stuff.tar
+          - cd ./local/var/macports/sources/rsync.macports.org/macports/release/tarballs
+          - sudo rm -Rfv ./ports/
+          - sudo tar -xvf ./ports.tar
           - sudo mv /Users/semaphore/macos-ci-pubkey.pem /opt/local/share/macports/
-          - cd portfiles && sudo portindex
+          - cd /opt/portfiles && sudo portindex
           - popd
           - echo "Will serve ourselves some previously-built binary packages to save time"
           - sudo port -N install lighttpd
