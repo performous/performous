@@ -36,7 +36,7 @@ blocks:
             - git submodule init && git submodule update
             - mkdir build.clang && cd build.clang && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
             - make VERBOSE=1
-  - name: MacOS 10.14.6 Build
+  - name: MacOS 10.14.6 Build    
     dependencies: []
     task:
       agent:
@@ -44,31 +44,24 @@ blocks:
           type: a1-standard-4
           os_image: macos-mojave-xcode11
       secrets:
-        - name: boost_portfile
+        - name: macos-ci-pubkey
+        - name: check-deps-script
       prologue:
         commands:
-          - cache restore macports
-          - echo "Installing MacPorts..."
-          - curl -LJO https://github.com/macports/macports-base/releases/download/v2.6.2/MacPorts-2.6.2-10.14-Mojave.pkg
-          - export PATH="/opt/local/bin:/opt/local/sbin:${PATH}"
-          - sudo installer -pkg MacPorts-2.6.2-10.14-Mojave.pkg -target /
-          - pushd /opt/
-          - sudo curl -LJO https://github.com/performous/macos_ci_files/raw/master/macports_ci_stuff.tar && sudo tar -xvf ./macports_ci_stuff.tar
-          - sudo mv /Users/semaphore/macos-ci-pubkey.pem /opt/local/share/macports/
-          - cd portfiles && sudo portindex
-          - popd
-          - echo "Will serve ourselves some previously-built binary packages to save time"
-          - sudo port -N install lighttpd
-          - lighttpd -D -f /opt/local/share/macports/macports-lighttpd.conf &
-          - echo "Installing Performous dependencies..."
-          - sudo port -Np install autoconf automake boost libxmlxx3 libsdl2 -x11 harfbuzz harfbuzz-icu librsvg +quartz-x11 ffmpeg -x11 gdk-pixbuf2 -x11 glib2 +quartz-x11  cmake help2man libepoxy portaudio portmidi opencv icu libsigcxx2 openexr fontconfig freetype pango +quartz-x11 cairo +quartz-x11 libxml2 glm fftw-3-single graphviz +pangocairo-x11 gd2 -x11 cpprestsdk | cat
-          - port installed
-          - cache store macports /opt/local
+          - echo Trying to restore cache...
+          - ssh-keyscan -p 29920 66.185.20.68 >> ~/.ssh/known_hosts
+          - chmod 400 ~/.ssh/semaphore_cache_key
+          - cache restore macports-prefix
+          - sudo chmod +x /Users/semaphore/check-install-macports.sh
+          - export PATH="/Users/semaphore/local/bin:/Users/semaphore/local/sbin:$PATH"
+          - test -e /Users/semaphore/local/.deps_installed || /Users/semaphore/check-install-macports.sh | cat 2>&1
       jobs:
         - name: Generate app bundle
           commands:
             - checkout
             - git submodule init && git submodule update
             - cd osx-utils
-            - sudo chmod +x ./performous-app-build.sh
+            - chmod +x ./performous-app-build.sh
             - ./performous-app-build.sh -D
+            - tar -cpf macos-ci-stuff.tar /Users/semaphore/local /Users/semaphore/portfiles
+            - cache store macports-prefix /Users/semaphore/macos-ci-stuff.tar
