@@ -6,10 +6,11 @@ agent:
     os_image: ubuntu1804
 blocks:
   - name: Ubuntu 18.04 Build
+    dependencies: []
     task:
       prologue:
         commands:
-          - echo "Installing Performous Dependencies..."
+          - echo "Installing Performous dependencies..."
           - sudo apt -y update
           - sudo apt -y install cmake gettext help2man clang gcc-7 g++-7 libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libopencv-dev libportmidi-dev libqrencode-dev libicu-dev libcpprest-dev libglm-dev libopenblas-dev libfftw3-dev
       jobs:
@@ -35,3 +36,42 @@ blocks:
             - git submodule init && git submodule update
             - mkdir build.clang && cd build.clang && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
             - make VERBOSE=1
+  - name: MacOS 10.14.6 Build
+    dependencies: []
+    task:
+      agent:
+        machine:
+          type: a1-standard-4
+          os_image: macos-mojave-xcode11
+      secrets:
+        - name: boost_portfile
+      prologue:
+        commands:
+          - echo "Installing MacPorts..."
+          - curl -LJO https://github.com/macports/macports-base/releases/download/v2.6.2/MacPorts-2.6.2-10.14-Mojave.pkg
+          - export PATH="/opt/local/bin:/opt/local/sbin:${PATH}"
+          - sudo installer -pkg MacPorts-2.6.2-10.14-Mojave.pkg -target /
+          - pushd /opt/
+          - sudo -E cache restore performous-ci-libs
+          - test -e macports_ci_stuff.tar || sudo curl -LJO https://www.dropbox.com/s/754hkwrooa1an0k/macports_ci_stuff.tar?dl=1
+          - sudo -E cache store performous-ci-libs ./macports_ci_stuff.tar
+          - sudo tar -xf ./macports_ci_stuff.tar
+          - cd ./local/var/macports/sources/rsync.macports.org/macports/release/tarballs
+          - sudo rm -Rf ./ports/
+          - sudo tar -xf ./ports.tar
+          - sudo mv /Users/semaphore/macos-ci-pubkey.pem /opt/local/share/macports/
+          - cd /opt/portfiles && sudo portindex
+          - popd
+          - echo "Will serve ourselves some previously-built binary packages to save time"
+          - sudo port -N install lighttpd | cat
+          - lighttpd -D -f /opt/local/share/macports/macports-lighttpd.conf &
+          - echo "Installing Performous dependencies..."
+          - sudo port -Np install autoconf automake boost libxmlxx3 libsdl2 -x11 harfbuzz harfbuzz-icu librsvg +quartz-x11 ffmpeg -x11 gdk-pixbuf2 -x11 glib2 +quartz-x11  cmake help2man libepoxy portaudio portmidi opencv icu libsigcxx2 openexr fontconfig freetype pango +quartz-x11 cairo +quartz-x11 libxml2 glm fftw-3-single graphviz +pangocairo-x11 gd2 -x11 cpprestsdk | cat
+      jobs:
+        - name: Generate app bundle
+          commands:
+            - checkout
+            - git submodule init && git submodule update
+            - cd osx-utils
+            - sudo chmod +x ./performous-app-build.sh
+            - ./performous-app-build.sh -D
