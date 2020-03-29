@@ -47,7 +47,6 @@ blocks:
         - name: boost_portfile
       prologue:
         commands:
-          - cache restore macports
           - echo "Installing MacPorts..."
           - curl -LJO https://github.com/macports/macports-base/releases/download/v2.6.2/MacPorts-2.6.2-10.14-Mojave.pkg
           - export PATH="/opt/local/bin:/opt/local/sbin:${PATH}"
@@ -62,8 +61,6 @@ blocks:
           - lighttpd -D -f /opt/local/share/macports/macports-lighttpd.conf &
           - echo "Installing Performous dependencies..."
           - sudo port -Np install autoconf automake boost libxmlxx3 libsdl2 -x11 harfbuzz harfbuzz-icu librsvg +quartz-x11 ffmpeg -x11 gdk-pixbuf2 -x11 glib2 +quartz-x11  cmake help2man libepoxy portaudio portmidi opencv icu libsigcxx2 openexr fontconfig freetype pango +quartz-x11 cairo +quartz-x11 libxml2 glm fftw-3-single graphviz +pangocairo-x11 gd2 -x11 cpprestsdk | cat
-          - port installed
-          - cache store macports /opt/local
       jobs:
         - name: Generate app bundle
           commands:
