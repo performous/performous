@@ -5,33 +5,87 @@ agent:
     type: e1-standard-2
     os_image: ubuntu1804
 blocks:
-  - name: Ubuntu 18.04 Build
+  # - name: Ubuntu 18.04 Build
+  #   dependencies: []
+  #   task:
+  #     prologue:
+  #       commands:
+  #         - echo "Installing Performous dependencies..."
+  #         - sudo apt -y update
+  #         - sudo apt -y install cmake gettext help2man clang gcc-7 g++-7 libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libopencv-dev libportmidi-dev libqrencode-dev libicu-dev libcpprest-dev libglm-dev libopenblas-dev libfftw3-dev
+  #     jobs:
+  #       - name: GCC-7 Build
+  #         env_vars:
+  #           - name: CC
+  #             value: gcc-7
+  #           - name: CXX
+  #             value: g++-7
+  #         commands:
+  #           - checkout
+  #           - git submodule init && git submodule update
+  #           - mkdir build.gcc && cd build.gcc && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
+  #           - make VERBOSE=1
+  #       - name: Clang-6.0 Build
+  #         env_vars:
+  #           - name: CC
+  #             value: clang
+  #           - name: CXX
+  #             value: clang++
+  #         commands:
+  #           - checkout
+  #           - git submodule init && git submodule update
+  #           - mkdir build.clang && cd build.clang && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
+  #           - make VERBOSE=1
+  - name: MacOS 10.14.6 Build    
+    dependencies: []
     task:
+      agent:
+        machine:
+          type: a1-standard-4
+          os_image: macos-mojave-xcode11
+      secrets:
+        - name: macos-ci-pubkey
+        - name: check-deps-script
+      #env_vars:
+      #  - name: SEMAPHORE_CACHE_URL
+      #    value: 66.185.20.68:29920
+      #  - name: SEMAPHORE_CACHE_USERNAME
+      #    value: M6IIKS4FG
+      #  - name: SEMAPHORE_CACHE_PRIVATE_KEY_PATH
+      #    value: ~/.ssh/private-key.txt
       prologue:
         commands:
-          - echo "Installing Performous Dependencies..."
-          - sudo apt -y update
-          - sudo apt -y install cmake gettext help2man clang gcc-7 g++-7 libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libopencv-dev libportmidi-dev libqrencode-dev libicu-dev libcpprest-dev libglm-dev libopenblas-dev libfftw3-dev
+          - curl -LJO https://github.com/macports/macports-base/releases/download/v2.6.2/MacPorts-2.6.2-10.14-Mojave.pkg
+          - mkdir -p /Users/semaphore/local
+          - sudo ln -sf /Users/semaphore/local /opt/local
+          - sudo ln -sf /Users/semaphore/portfiles /opt/portfiles
+          #- ssh-keyscan -p 29920 66.185.20.68 >> ~/.ssh/known_hostschmod 400 ~/.ssh/private-key.txt
+          - cache list
+          #- cache has_key performous-ci-libs
+          #- cache has_key macports-prefix
+          - cache restore performous-ci-libs
+          - test -e /opt/local/.deps_installed || exit 1
+          - cache restore macports-prefix
+          - test -e ./macports_ci_stuff.tar || curl -LJO https://www.dropbox.com/s/754hkwrooa1an0k/macports_ci_stuff.tar?dl=1
+          - echo "Installing MacPorts..."
+          - export PATH="/opt/local/bin:/opt/local/sbin:${PATH}"
+          - sudo installer -pkg ./MacPorts-2.6.2-10.14-Mojave.pkg -target /
+          - sudo tar -xpvf ./macports_ci_stuff.tar
+          #- cache restore macports-prefix
       jobs:
-        - name: GCC-7 Build
-          env_vars:
-            - name: CC
-              value: gcc-7
-            - name: CXX
-              value: g++-7
+        - name: Generate app bundle
           commands:
+            - chmod +x ~/check-install-macports.sh && ~/check-install-macports.sh 
             - checkout
             - git submodule init && git submodule update
-            - mkdir build.gcc && cd build.gcc && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
-            - make VERBOSE=1
-        - name: Clang-6.0 Build
-          env_vars:
-            - name: CC
-              value: clang
-            - name: CXX
-              value: clang++
-          commands:
-            - checkout
-            - git submodule init && git submodule update
-            - mkdir build.clang && cd build.clang && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
-            - make VERBOSE=1
+            - cd osx-utils
+            - chmod +x ./performous-app-build.sh
+            - ./performous-app-build.sh -D
+            #- ssh-keyscan -p 29920 66.185.20.68 >> ~/.ssh/known_hostschmod 400 ~/.ssh/private-key.txt
+      epilogue:
+        commands:
+          - pwd
+          - cache store performous-ci-libs /Users/semaphore/macports_ci_stuff.tar
+          - cache store macports-prefix /Users/semaphore/local
+          - cache has_key performous-ci-libs
+          - cache has_key macports-prefix
