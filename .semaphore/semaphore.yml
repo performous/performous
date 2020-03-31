@@ -48,17 +48,13 @@ blocks:
         - name: check-deps-script
       prologue:
         commands:
-          - echo "Downloading Performous MacOS 10.14.6 dependencies."
-          - curl -LJO https://asgardsings.nl/performous-preinstalled-deps-macos.tar
-          - echo "Creating directories and symlinks..."
-          - mkdir -p /Users/semaphore/local
-          - sudo ln -sf /Users/semaphore/local /opt/local
-          - sudo ln -sf /Users/semaphore/portfiles /opt/portfiles
-          - export PATH="/opt/local/bin:/opt/local/sbin:${PATH}"
-          - echo "Untarring the tarbal..."
-          - sudo tar xfpz ./performous-preinstalled-deps-macos.tar
-          - echo "Test if all deps are installed else fail the job."
-          - test -e /opt/local/.deps_installed || exit 1
+          - echo Trying to restore cache...
+          - ssh-keyscan -p 29920 66.185.20.68 >> ~/.ssh/known_hosts
+          - chmod 400 ~/.ssh/semaphore_cache_key
+          - cache restore macports-prefix
+          - sudo chmod +x /Users/semaphore/check-install-macports.sh
+          - export PATH="/Users/semaphore/local/bin:/Users/semaphore/local/sbin:$PATH"
+          - test -e /Users/semaphore/local/.deps_installed || /Users/semaphore/check-install-macports.sh | cat 2>&1
       jobs:
         - name: Generate app bundle
           commands:
@@ -67,3 +63,5 @@ blocks:
             - cd osx-utils
             - chmod +x ./performous-app-build.sh
             - ./performous-app-build.sh -D
+            - tar -cpf macos-ci-stuff.tar /Users/semaphore/local /Users/semaphore/portfiles
+            - cache store macports-prefix /Users/semaphore/macos-ci-stuff.tar
