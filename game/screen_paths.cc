@@ -96,13 +96,31 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 					generateMenuFromPath(path.parent_path());
 	}));
 	
-        for (const auto &di : fs::directory_iterator(path)) {
-                auto &p = di.path();
+	// Extract list of all directories
+	std::list<fs::path> directories;
+	for (const auto &di : fs::directory_iterator(path)) {
+		auto &p = di.path();
 		if (fs::is_directory(p) && (showHiddenfolders || p.filename().c_str()[0] != '.')) {
-			m_menu.add(MenuOption(p.string(), _("Open folder")).call([this, p] { generateMenuFromPath(p); }));
+			directories.emplace_back(p);
 		}
 	}
-	m_menu.sortOptions();
+
+	// sort the directory list
+	directories.sort(
+			[] (const auto &a, const auto &b) {
+				const auto &an = a.filename();
+				const auto &bn = b.filename();
+				/* If two entries have the same name, take the address of object as
+				 * sort criterion as they can only be equal IIF they are the same */
+				if (an == bn)
+					return &a < &b;
+				return an < bn;
+			});
+
+	// Add entries to menu
+	for (const auto &p : directories) {
+		m_menu.add(MenuOption(p.string(), _("Open folder")).call([this, p] { generateMenuFromPath(p); }));
+	}
 }
 
 

@@ -33,19 +33,6 @@ bool MenuOption::isActive() const {
 
 Menu::Menu(): dimensions(), m_open(true) { clear(); }
 
-void Menu::sortOptions() {
-    std::sort(std::begin(root_options), std::end(root_options),
-    [] (const auto &a, const auto &b) {
-            const auto &an = a.getName();
-            const auto &bn = b.getName();
-            /* If two entries have the same name, take the address of object as
-             * sort criterion as they can only be equal IIF they are the same */
-            if (an == bn)
-                return &a < &b;
-            return an < bn;
-    });
-}
-
 void Menu::add(MenuOption opt) {
 	root_options.push_back(opt);
 	clear(true); // Adding resets menu stack
