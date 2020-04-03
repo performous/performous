@@ -37,7 +37,7 @@ static const std::size_t FFT_N = 1 << FFT_P;
 template <size_t SIZE> class RingBuffer {
 public:
 	constexpr static size_t capacity = SIZE;
-	RingBuffer(): m_read(), m_write() {}  ///< Initialize empty buffer
+	RingBuffer(): m_buf(), m_read(), m_write() {}  ///< Initialize empty buffer
 	template <typename InIt> void insert(InIt begin, InIt end) {
 		unsigned r = m_read;  // The read position
 		unsigned w = m_write;  // The write position
