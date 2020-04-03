@@ -19,3 +19,15 @@ foreach(file ${files})
     message(STATUS "File $ENV{DESTDIR}${file} does not exist.")
   endif()
 endforeach()
+
+if(IS_SYMLINK "@CMAKE_INSTALL_PREFIX@/@SHARE_INSTALL@" OR EXISTS "@CMAKE_INSTALL_PREFIX@/@SHARE_INSTALL@")
+  message(STATUS "Uninstalling directory and all empty folders: @CMAKE_INSTALL_PREFIX@/@SHARE_INSTALL@")
+  exec_program(
+    "@CMAKE_COMMAND@" ARGS "-E remove_directory \"@CMAKE_INSTALL_PREFIX@/@SHARE_INSTALL@\""
+    OUTPUT_VARIABLE rm_out
+    RETURN_VALUE rm_retval
+    )
+  if(NOT "${rm_retval}" STREQUAL 0)
+    message(FATAL_ERROR "Problem when removing @CMAKE_INSTALL_PREFIX@/@SHARE_INSTALL@")
+  endif()
+endif()
