@@ -25,7 +25,7 @@
 #endif
 
 struct Platform {
-enum platforms { windows, linux, macos, bsd, solaris, unix };
+enum class platforms { windows, linux, macos, bsd, solaris, unix };
 Platform();
 static platforms currentOS();
 static uint16_t shortcutModifier(bool eitherSide = true);
