@@ -202,7 +202,7 @@ bool Music::prepare() {
 				ScreenSongs* sSongs = static_cast<ScreenSongs *>(gm->getScreen("Songs"));
 				double pstart = sSongs->getSongs().currentPtr()->preview_start;
 				pstart = (std::isnan(pstart) ? 0.0 : pstart);
-				double first_period, first_beat;
+				double first_period, first_beat = 0.0;
 				std::vector<double> extra_beats;
 				Song::Beats& beats = sSongs->getSongs().currentPtr()->beats;
 				if (!sSongs->getSongs().currentPtr()->hasControllers()) {
@@ -290,7 +290,7 @@ struct Synth {
 		Notes::const_iterator it = m_notes.begin();
 
 		while (it != m_notes.end() && it->end < position) ++it;
-		if (it == m_notes.end() || it->type == Note::SLEEP || it->begin > position) { phase = 0.0; return; }
+		if (it == m_notes.end() || it->type == Note::Type::SLEEP || it->begin > position) { phase = 0.0; return; }
 		int note = it->note % 12;
 		double d = (note + 1) / 13.0;
 		double freq = MusicalScale().setNote(note + 4 * 12).getFreq();
@@ -307,7 +307,7 @@ struct Synth {
 };
 
 struct Command {
-	enum { TRACK_FADE, TRACK_PITCHBEND, SAMPLE_RESET } type;
+	enum class command { TRACK_FADE, TRACK_PITCHBEND, SAMPLE_RESET } type;
 	std::string track;
 	double factor;
 };
@@ -338,13 +338,13 @@ struct Output {
 		// Process commands
 		for (auto const& cmd: commands) {
 			switch (cmd.type) {
-			case Command::TRACK_FADE:
+			case Command::command::TRACK_FADE:
 				if (!playing.empty()) playing[0]->trackFade(cmd.track, cmd.factor);
 				break;
-			case Command::TRACK_PITCHBEND:
+			case Command::command::TRACK_PITCHBEND:
 				if (!playing.empty()) playing[0]->trackPitchBend(cmd.track, cmd.factor);
 				break;
-			case Command::SAMPLE_RESET:
+			case Command::command::SAMPLE_RESET:
 				auto it = samples.find(cmd.track);
 				if (it != samples.end())
 					it->second->reset();
@@ -577,7 +577,7 @@ void Audio::loadSample(std::string const& streamId, fs::path const& filename) {
 void Audio::playSample(std::string const& streamId) {
 	Output& o = self->output;
 	std::lock_guard<std::mutex> l(o.mutex);
-	Command cmd = { Command::SAMPLE_RESET, streamId, 0.0 };
+	Command cmd = { Command::command::SAMPLE_RESET, streamId, 0.0 };
 	o.commands.push_back(cmd);
 }
 
@@ -668,14 +668,14 @@ bool Audio::isPaused() const { return self->output.paused; }
 void Audio::streamFade(std::string track, double fadeLevel) {
 	Output& o = self->output;
 	std::lock_guard<std::mutex> l(o.mutex);
-	Command cmd = { Command::TRACK_FADE, track, fadeLevel };
+	Command cmd = { Command::command::TRACK_FADE, track, fadeLevel };
 	o.commands.push_back(cmd);
 }
 
 void Audio::streamBend(std::string track, double pitchFactor) {
 	Output& o = self->output;
 	std::lock_guard<std::mutex> l(o.mutex);
-	Command cmd = { Command::TRACK_PITCHBEND, track, pitchFactor };
+	Command cmd = { Command::command::TRACK_PITCHBEND, track, pitchFactor };
 	o.commands.push_back(cmd);
 }
 

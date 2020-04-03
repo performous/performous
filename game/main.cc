@@ -77,22 +77,22 @@ static void checkEvents(Game& gm, Time eventTime) {
 		// Let the navigation system grab any and all SDL events
 		gm.controllers.pushEvent(event, eventTime);
 		auto type = event.type;
-		if (type == SDL_WINDOWEVENT) window.event(event.window.event, event.window.data1, event.window.data2);
-		if (type == SDL_QUIT) gm.finished();
-		if (type == SDL_KEYDOWN) {
+		if (type == SDL_EventType::SDL_WINDOWEVENT) window.event(event.window.event, event.window.data1, event.window.data2);
+		if (type == SDL_EventType::SDL_QUIT) gm.finished();
+		if (type == SDL_EventType::SDL_KEYDOWN) {
 			auto key  = event.key.keysym.scancode;
 			auto mod = event.key.keysym.mod;
-			bool altEnter = (key == SDL_SCANCODE_RETURN || key == SDL_SCANCODE_KP_ENTER) && mod & KMOD_ALT;  // Alt+Enter
-			bool modF = key == SDL_SCANCODE_F && mod & KMOD_CTRL && mod & KMOD_GUI;  // MacOS Ctrl+Cmd+F
-			if (altEnter || modF || key == SDL_SCANCODE_F11) {
+			bool altEnter = (key == SDL_Scancode::SDL_SCANCODE_RETURN || key == SDL_Scancode::SDL_SCANCODE_KP_ENTER) && mod & KMOD_ALT;  // Alt+Enter
+			bool modF = key == SDL_Scancode::SDL_SCANCODE_F && mod & KMOD_CTRL && mod & KMOD_GUI;  // MacOS Ctrl+Cmd+F
+			if (altEnter || modF || key == SDL_Scancode::SDL_SCANCODE_F11) {
 				config["graphic/fullscreen"].b() = !config["graphic/fullscreen"].b();
 				continue; // Already handled here...
 			}
-			if (key == SDL_SCANCODE_PRINTSCREEN || (key == SDL_SCANCODE_F12 && (mod & Platform::shortcutModifier()))) {
+			if (key == SDL_Scancode::SDL_SCANCODE_PRINTSCREEN || (key == SDL_Scancode::SDL_SCANCODE_F12 && (mod & Platform::shortcutModifier()))) {
 				g_take_screenshot = true;
 				continue; // Already handled here...
 			}
-			if (key == SDL_SCANCODE_F4 && mod & KMOD_ALT) {
+			if (key == SDL_Scancode::SDL_SCANCODE_F4 && mod & KMOD_ALT) {
 				gm.finished();
 				continue; // Already handled here...
 			}
@@ -103,13 +103,13 @@ static void checkEvents(Game& gm, Time eventTime) {
 	for (input::NavEvent event; gm.controllers.getNav(event); ) {
 		input::NavButton nav = event.button;
 		// Volume control
-		if (nav == input::NAV_VOLUME_UP || nav == input::NAV_VOLUME_DOWN) {
+		if (nav == input::NavButton::NAV_VOLUME_UP || nav == input::NavButton::NAV_VOLUME_DOWN) {
 			std::string curS = gm.getCurrentScreen()->getName();
 			// Pick proper setting
 			std::string which_vol = (curS == "Sing" || curS == "Practice")
 			  ? "audio/music_volume" : "audio/preview_volume";
 			// Adjust value
-			if (nav == input::NAV_VOLUME_UP) ++config[which_vol]; else --config[which_vol];
+			if (nav == input::NavButton::NAV_VOLUME_UP) ++config[which_vol]; else --config[which_vol];
 			// Show message
 			gm.flashMessage(config[which_vol].getShortDesc() + ": " + config[which_vol].getValue());
 			continue; // Already handled here...
@@ -134,7 +134,7 @@ void mainLoop(std::string const& songlist) {
 	TextureLoader m_loader;
 	Backgrounds backgrounds;
 	Database database(getConfigDir() / "database.xml");
-	Songs songs(database, songlist);
+	Songs songs(songlist);
 	loadFonts();
 	try {
 		window = std::make_unique<Window>();
@@ -254,20 +254,20 @@ void jstestLoop() {
 		while (true) {
 			SDL_Event e;
 			while(SDL_PollEvent(&e) == 1) {
-				if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE)) {
+				if (e.type == SDL_EventType::SDL_QUIT || (e.type == SDL_EventType::SDL_KEYDOWN && e.key.keysym.scancode == SDL_Scancode::SDL_SCANCODE_ESCAPE)) {
 					return;
-				} else if (e.type == SDL_KEYDOWN) {
+				} else if (e.type == SDL_EventType::SDL_KEYDOWN) {
 					std::cout << "Keyboard key: " << int(e.key.keysym.scancode) << ", mod: " << int(e.key.keysym.mod) << std::endl;
-				} else if (e.type == SDL_JOYBUTTONDOWN) {
+				} else if (e.type == SDL_EventType::SDL_JOYBUTTONDOWN) {
 					std::cout << "JoyID: " << int(e.jbutton.which) << ", button: " << int(e.jbutton.button) << ", state: " << int(e.jbutton.state) << std::endl;
-				} else if (e.type == SDL_JOYAXISMOTION) {
+				} else if (e.type == SDL_EventType::SDL_JOYAXISMOTION) {
 					if ((oldjoy != int(e.jaxis.which)) || (oldaxis != int(e.jaxis.axis)) || (oldvalue != int(e.jaxis.value))) {
 						std::cout << "JoyID: " << int(e.jaxis.which) << ", axis: " << int(e.jaxis.axis) << ", value: " << int(e.jaxis.value) << std::endl;
 						oldjoy = int(e.jaxis.which);
 						oldaxis = int(e.jaxis.axis);
 						oldvalue = int(e.jaxis.value);
 					}
-				} else if (e.type == SDL_JOYHATMOTION) {
+				} else if (e.type == SDL_EventType::SDL_JOYHATMOTION) {
 					std::cout << "JoyID: " << int(e.jhat.which) << ", hat: " << int(e.jhat.hat) << ", value: " << int(e.jhat.value) << std::endl;
 				}
 			}
@@ -299,7 +299,7 @@ void fatalError(std::string msg, bool hasLog = false, std::string title = "FATAL
 	}
 	errMsg << std::endl << "If you think this is a bug in Performous, please report it at "
 	  << std::endl << "  https://github.com/performous/performous/issues";
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title.c_str(),
+	SDL_ShowSimpleMessageBox(SDL_MessageBoxFlags::SDL_MESSAGEBOX_ERROR, title.c_str(),
 	  errMsg.str().c_str(), nullptr);
 	std::cerr << title << ": " << msg << std::endl;
 	if (hasLog) {
