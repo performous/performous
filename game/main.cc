@@ -134,7 +134,7 @@ void mainLoop(std::string const& songlist) {
 	TextureLoader m_loader;
 	Backgrounds backgrounds;
 	Database database(getConfigDir() / "database.xml");
-	Songs songs(database, songlist);
+	Songs songs(songlist);
 	loadFonts();
 	try {
 		window = std::make_unique<Window>();

@@ -12,7 +12,6 @@
 #include "screen.hh"
 
 class Song;
-class Database;
 
 /// songs class for songs screen
 class Songs {
@@ -20,7 +19,7 @@ class Songs {
   	Songs(const Songs&) = delete;
   	const Songs& operator=(const Songs&) = delete;
 	/// constructor
-	Songs(Database& database, std::string const& songlist = std::string());
+	Songs(std::string const& songlist = std::string());
 	~Songs();
 	/// updates filtered songlist
 	void update();
@@ -86,7 +85,6 @@ class Songs {
 	AnimValue m_updateTimer;
 	AnimAcceleration math_cover;
 	std::string m_filter;
-	Database & m_database;
 	int m_type = 0;
 	int m_order;  // Set by constructor
 	void dumpSongs_internal() const;

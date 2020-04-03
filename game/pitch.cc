@@ -15,8 +15,8 @@ Tone::Tone():
   freq(0.0),
   db(-getInf()),
   stabledb(-getInf()),
-  age(),
-  harmonics()
+  harmonics(),
+  age()
 {
 	for (auto& h: harmonics) h = -getInf();
 }
