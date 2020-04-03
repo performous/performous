@@ -6,7 +6,7 @@
 class ProgressBar {
   public:
 	/// type of progressbar
-	enum Mode { HORIZONTAL, VERTICAL, CIRCULAR };
+	enum class Mode { HORIZONTAL, VERTICAL, CIRCULAR };
 	/**
 	* Construct a new progress bar.
 	* @param bg filename of background image
@@ -16,7 +16,7 @@ class ProgressBar {
 	* @param end margin after the bar ends [0, 1]
 	* @param sliding makes the bar move; the texture is anchored at bar end rather than at bar beginning
 	**/
-	ProgressBar(fs::path const& bg, fs::path const& bar, Mode mode = HORIZONTAL, float begin = 0.0f, float end = 0.0f, bool sliding = false);
+	ProgressBar(fs::path const& bg, fs::path const& bar, Mode mode = Mode::HORIZONTAL, float begin = 0.0f, float end = 0.0f, bool sliding = false);
 	/** Draw a progress bar with the given percentage [0, 1] **/
 	void draw(float value);
   private:
