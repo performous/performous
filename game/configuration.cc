@@ -165,6 +165,24 @@ namespace {
 	}
 }
 
+std::string ConfigItem::getEnumStringValueAtIndex(unsigned int index) {
+	try {
+		auto item = m_enums.at(index);
+		return item;
+	} catch (const std::out_of_range& e) {
+        std::clog << "configuration/error: Out of Range error." << e.what() << std::endl;
+		throw std::runtime_error("Enum Index not found in enumeration.");
+	}
+}
+
+std::vector<std::string> ConfigItem::getAllEnumStringValues() {
+	std::vector<std::string> allEnumStringValues;
+	for(auto& item : m_enums) {
+		allEnumStringValues.push_back(item);
+	}
+	return allEnumStringValues;
+}
+
 void ConfigItem::addEnum(std::string name) {
 	verifyType("int");
 	if (find(m_enums.begin(),m_enums.end(),name) == m_enums.end()) {
@@ -291,6 +309,16 @@ void writeConfig(bool system) {
 			if (prev3DState != std::to_string(item.b()) && !prev3DState.empty()) {
 				std::clog << "video/info: Stereo 3D configuration changed, will reset shaders." << std::endl;
 				Game::getSingletonPtr()->window().resetShaders();
+			}
+		}
+		if(name == "game/language") {
+			std::string oldValue = Game::getSingletonPtr()->getCurrentLanguage();
+			std::string newValue = item.getEnumName();
+			if(oldValue != newValue) {
+				std::cout << "Wanting to change something, old value: '" << oldValue << "' new value: '" << newValue <<"'" <<std::endl;
+				Game::getSingletonPtr()->setLanguage(newValue);
+				Game::getSingletonPtr()->getCurrentScreen()->exit();
+				Game::getSingletonPtr()->activateScreen("Intro");
 			}
 		}
 		if (name == "audio/backend") {
