@@ -202,7 +202,7 @@ bool Music::prepare() {
 				ScreenSongs* sSongs = static_cast<ScreenSongs *>(gm->getScreen("Songs"));
 				double pstart = sSongs->getSongs().currentPtr()->preview_start;
 				pstart = (std::isnan(pstart) ? 0.0 : pstart);
-				double first_period, first_beat;
+				double first_period = 0.0, first_beat = 0.0;
 				std::vector<double> extra_beats;
 				Song::Beats& beats = sSongs->getSongs().currentPtr()->beats;
 				if (!sSongs->getSongs().currentPtr()->hasControllers()) {
