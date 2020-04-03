@@ -12,7 +12,6 @@
 #include "screen.hh"
 
 class Song;
-class Database;
 
 /// songs class for songs screen
 class Songs {
@@ -20,7 +19,7 @@ class Songs {
   	Songs(const Songs&) = delete;
   	const Songs& operator=(const Songs&) = delete;
 	/// constructor
-	Songs(Database& database, std::string const& songlist = std::string());
+	Songs(std::string const& songlist = std::string());
 	~Songs();
 	/// updates filtered songlist
 	void update();
@@ -71,7 +70,6 @@ class Songs {
 	void sortChange(int diff);
 	void sortSpecificChange(int sortOrder, bool descending = false);
 	/// parses file into Song &tmp
-	void parseFile(Song& tmp);
 	std::atomic<bool> doneLoading{ false };
 	std::atomic<bool> displayedAlert{ false };
 	size_t loadedSongs() const { return m_songs.size(); }
@@ -87,13 +85,11 @@ class Songs {
 	AnimValue m_updateTimer;
 	AnimAcceleration math_cover;
 	std::string m_filter;
-	Database & m_database;
 	int m_type = 0;
 	int m_order;  // Set by constructor
 	void dumpSongs_internal() const;
 	void reload_internal();
 	void reload_internal(fs::path const& p);
-	void randomize_internal();
 	void filter_internal();
 	void sort_internal(bool descending = false);
 	std::atomic<bool> m_dirty{ false };
