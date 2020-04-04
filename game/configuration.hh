@@ -42,6 +42,8 @@ class ConfigItem {
 	void addEnum(std::string name); ///< Dynamically adds an enum to all values
 	void selectEnum(std::string const& name); ///< Set integer value by enum name
 	std::string const getEnumName() const; ///< Returns the selected enum option's text
+	std::vector<std::string> getAllEnumStringValues();
+	std::string getEnumStringValueAtIndex(unsigned int index);
 	std::string oldValue;
 	
   private:
