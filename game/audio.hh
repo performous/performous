@@ -145,7 +145,7 @@ struct Track {
 	FFmpeg mpeg;
 	float fadeLevel = 1.0f;
 	float pitchFactor = 0.0f;
-	template <typename... Args> Track(Args&&... args): mpeg(args...) {}
+	template <typename... Args> Track(Args&&... args): mpeg(std::forward<Args>(args)...) {}
 };	
 	friend class ScreenSongs;
 	public:
