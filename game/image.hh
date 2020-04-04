@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/filesystem/path.hpp>
+#include <cairo/cairo.h>
 
 #include <algorithm>
 #include <cstddef>
@@ -43,7 +44,7 @@ struct Bitmap {
 	}
 	unsigned char const* data() const { return ptr ? ptr : &buf[0]; }
 	unsigned char* data() { return ptr ? ptr : &buf[0]; }
-
+	void copyFromCairo(cairo_surface_t* surface);
 	void crop(const unsigned width, const unsigned height, const unsigned x, const unsigned y);
 };
 
