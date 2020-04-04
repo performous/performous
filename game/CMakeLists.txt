@@ -193,6 +193,9 @@ else()
   target_link_libraries(performous ced aubio)
 endif()
 
+if(APPLE)
+	list(APPEND LIBS "-framework Accelerate")
+endif()
 list(APPEND LIBS ${FFTW3_LIBRARIES})
 list(APPEND LIBS ${BLAS_LIBRARIES})
 

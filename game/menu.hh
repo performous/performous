@@ -94,9 +94,6 @@ public:
 	void toggle() { m_open = !m_open; }
 	void moveToLast() { selection_stack.back() = menu_stack.back()->size() - 1; }
 
-        /* sort Option on their name */
-	void sortOptions();
-
 	size_t curIndex() { return selection_stack.back(); }
 	MenuOption& current() { return menu_stack.back()->at(selection_stack.back()); }
 	MenuOption& back() { return root_options.back(); }

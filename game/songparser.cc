@@ -71,8 +71,8 @@ SongParser::SongParser(Song& s): m_song(s) {
 		// Header already parsed?
 		if (s.loadStatus == Song::LoadStatus::HEADER) {
 			if (!s.m_bpms.empty()) {
-				s.m_bpms.clear();
 				double bpm = (15 / s.m_bpms.front().step);
+				s.m_bpms.clear();
 				addBPM(0, bpm);
 			}
 			if (type == TXT) txtParse();
