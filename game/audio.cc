@@ -161,7 +161,7 @@ bool Music::operator()(float* begin, float* end) {
 // 			// Otherwise just get the audio and mix it straight away
 // 			} else
 // #endif
-		if (t.mpeg.audioQueue(mixbuf.data(), mixbuf.data() + mixbuf.size(), m_pos, t.fadeLevel)) eof = false;
+		if (t.mpeg.audioQueue(mixbuf.data(), mixbuf.size(), m_pos, t.fadeLevel)) eof = false;
 		
 	}
 	m_pos += samples;
@@ -268,7 +268,7 @@ struct Sample {
 			return;
 		}
 		std::vector<float> mixbuf(end - begin);
-		if(!mpeg.audioQueue(mixbuf.data(), mixbuf.data() + mixbuf.size(), m_pos, 1.0)) {
+		if(!mpeg.audioQueue(mixbuf.data(), mixbuf.size(), m_pos, 1.0)) {
 			eof = true;
 		}
 		for (size_t i = 0, iend = end - begin; i != iend; ++i) {
