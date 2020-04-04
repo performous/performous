@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-31 20:19+0200\n"
-"PO-Revision-Date: 2020-03-31 20:20+0200\n"
+"POT-Creation-Date: 2020-04-05 00:53+0200\n"
+"PO-Revision-Date: 2020-04-05 01:01+0200\n"
 "Last-Translator: Arjan Speiard | Asgard Sings! <arjan.spieard@gmail.com>\n"
 "Language-Team: \n"
 "Language: nl\n"
@@ -12,79 +12,79 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _;translate_noop\n"
 "X-Poedit-Basepath: .\n"
-"X-Generator: Poedit 2.3\n"
+"X-Generator: Poedit 2.2.1\n"
 "X-Poedit-SearchPath-0: ../game\n"
 "X-Poedit-SearchPath-1: ../data\n"
 
 #. Game
-#. Gameplay related options
+#. Gameplay related options.
 #. name: game
 #: ../data/config/schema.xml:19
 msgid "Game"
 msgstr "Spel"
 
 #. Game
-#. Gameplay related options
+#. Gameplay related options.
 #. name: game
 #: ../data/config/schema.xml:20
-msgid "Gameplay related options"
-msgstr "Aan spel gerelateerde opties"
+msgid "Gameplay related options."
+msgstr "Aan spel gerelateerde opties."
 
 #. Graphic
-#. Configure rendering and video settings
+#. Configure rendering and video settings.
 #. name: graphic
 #: ../data/config/schema.xml:23
 msgid "Graphic"
 msgstr "Grafisch"
 
 #. Graphic
-#. Configure rendering and video settings
+#. Configure rendering and video settings.
 #. name: graphic
 #: ../data/config/schema.xml:24
-msgid "Configure rendering and video settings"
-msgstr "Aanpassen render- en video-instellingen"
+msgid "Configure rendering and video settings."
+msgstr "Aanpassen render- en video-instellingen."
 
 #. Audio Devices
-#. Setup microphones and playback
+#. Setup microphones and playback.
 #. name: AudioDevices
 #: ../data/config/schema.xml:28
 msgid "Audio Devices"
 msgstr "Geluidsapparaten"
 
 #. Audio Devices
-#. Setup microphones and playback
+#. Setup microphones and playback.
 #. name: AudioDevices
 #: ../data/config/schema.xml:29
-msgid "Setup microphones and playback"
-msgstr "Regel microfoons en afspelen"
+msgid "Setup microphones and playback."
+msgstr "Regel microfoons en afspelen."
 
 #. Audio
-#. Configure general audio settings
+#. Configure general audio settings.
 #. name: audio
 #: ../data/config/schema.xml:32
 msgid "Audio"
 msgstr "Geluid"
 
 #. Audio
-#. Configure general audio settings
+#. Configure general audio settings.
 #. name: audio
 #: ../data/config/schema.xml:33
-msgid "Configure general audio settings"
-msgstr "Aanpassen algemene geluidsinstellingen"
+msgid "Configure general audio settings."
+msgstr "Aanpassen algemene geluidsinstellingen."
 
 #. Paths
-#. Setup song and data paths
+#. Setup song and data paths.
 #. name: Paths
 #: ../data/config/schema.xml:36
 msgid "Paths"
 msgstr "Locaties"
 
 #. Paths
-#. Setup song and data paths
+#. Setup song and data paths.
 #. name: Paths
 #: ../data/config/schema.xml:37
-msgid "Setup song and data paths"
-msgstr "Aanpassen locatie van liedjes en bestanden"
+msgid "Setup song and data paths."
+msgstr "Aanpassen locatie van liedjes en bestanden."
 
 #. Karaoke mode
 #. Hide pitch wave, notes and scoring.
@@ -270,7 +270,7 @@ msgstr ""
 "Maakt het verschil tussen het sorteren van hoofdletters en kleine letters."
 
 #. Webserver port
-#. Port to use for the web server. Choose one that is not used by other applications.
+#. Port to use for the webserver. Choose one that is not used by other applications.
 #. name: game/webserver_port
 #. type: int
 #. value: 8000
@@ -279,13 +279,13 @@ msgid "Webserver port"
 msgstr "Poort"
 
 #. Webserver port
-#. Port to use for the web server. Choose one that is not used by other applications.
+#. Port to use for the webserver. Choose one that is not used by other applications.
 #. name: game/webserver_port
 #. type: int
 #. value: 8000
 #: ../data/config/schema.xml:105
 msgid ""
-"Port to use for the web server. Choose one that is not used by other "
+"Port to use for the webserver. Choose one that is not used by other "
 "applications."
 msgstr ""
 "De poort om te gebruiken voor de webserver. Kies een die nog niet in gebruik "
@@ -350,7 +350,7 @@ msgid "Enable keyboard as drumkit."
 msgstr "Gebruik toetsenbord als drumstel."
 
 #. Drums use Pro mode
-#. Drums use Pro mode (toms are not cymbals)
+#. Drums use Pro mode (toms are not cymbals).
 #. name: game/drum_promode
 #. type: bool
 #. value: true
@@ -359,13 +359,13 @@ msgid "Drums use Pro mode"
 msgstr "Drums gebruiken Pro modus"
 
 #. Drums use Pro mode
-#. Drums use Pro mode (toms are not cymbals)
+#. Drums use Pro mode (toms are not cymbals).
 #. name: game/drum_promode
 #. type: bool
 #. value: true
 #: ../data/config/schema.xml:123
-msgid "Drums use Pro mode (toms are not cymbals)"
-msgstr "Drums gebruiken Pro modus (toms zijn geen bekken)"
+msgid "Drums use Pro mode (toms are not cymbals)."
+msgstr "Drums gebruiken Pro modus (toms zijn geen bekken)."
 
 #. Keyboard as dance pad
 #. Enable keyboard as dance pad.
@@ -892,7 +892,7 @@ msgstr ""
 "wordt ondersteund op elk besturingssysteem."
 
 #. Audio/video latency
-#. Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing.
+#. Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use 'Ctrl + ,' or 'Ctrl + .' to adjust this while performing.
 #. name: audio/video_delay
 #. type: float
 #. value: 0.06
@@ -901,7 +901,7 @@ msgid "Audio/video latency"
 msgstr "Geluid/video latency"
 
 #. Audio/video latency
-#. Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing.
+#. Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use 'Ctrl + ,' or 'Ctrl + .' to adjust this while performing.
 #. name: audio/video_delay
 #. type: float
 #. value: 0.06
@@ -910,18 +910,18 @@ msgid ""
 "Affects all modes. Use negative value if your display input lag is greater "
 "than the sound card output latency, positive values in the opposite case and "
 "zero if they are equal. This should be set so that the notes pass the cursor "
-"at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while "
-"performing."
+"at the same time the audio is heard. Use 'Ctrl + ,' or 'Ctrl + .' to adjust "
+"this while performing."
 msgstr ""
-"Heeft effect op alle modussen. Gebruik negatieve waarden als je "
-"scherminvoervertraging groter is dan de geluidskaard outputlatency, gebruik "
+"Heeft effect op alle modi. Gebruik negatieve waarden als je "
+"scherminvoervertraging groter is dan de geluidskaart outputlatency, gebruik "
 "positieve waarden in het omgekeerde geval en nul als ze gelijk zijn. Dit zou "
 "zo gezet moeten worden dat de noten de cursor passeren op hetzelfde moment "
-"dat het geluid te horen is. Gebruik Ctrl+F1/F2 om aan te passen tijdens het "
-"opvoeren."
+"dat het geluid te horen is. Gebruik 'Ctrl + ,' of 'Ctrl + .' om aan te "
+"passen tijdens het opvoeren."
 
 #. Audio round-trip latency
-#. Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4.
+#. Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with 'Ctrl + -' or 'Ctrl + ='.
 #. name: audio/round-trip
 #. type: float
 #. value: 0.09
@@ -930,7 +930,7 @@ msgid "Audio round-trip latency"
 msgstr "Geluid round-trip latency"
 
 #. Audio round-trip latency
-#. Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4.
+#. Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with 'Ctrl + -' or 'Ctrl + ='.
 #. name: audio/round-trip
 #. type: float
 #. value: 0.09
@@ -939,15 +939,16 @@ msgid ""
 "Affects singing only. The time it takes for Performous playback to reach "
 "your speakers, fly to the microphone and all the way back until Performous "
 "captures and analyzes it. While performing, press Ctrl+S for synth mode and "
-"adjust with Ctrl+F3/F4."
+"adjust with 'Ctrl + -' or 'Ctrl + ='."
 msgstr ""
 "Heeft enkel effect tijdens het zingen. De tijd die het Performousgeluid "
 "nodig heeft om de luidsprekers te bereiken, naar de microfoons te vliegen en "
 "de ganse weg terug tot Performous het opvangt en analyseert. Gebruik Ctrl+S "
-"voor synth mode en Ctrl+F3/F4 om aan te passen tijdens het opvoeren."
+"voor synth mode en 'Ctrl + -' of 'Ctrl + =' om aan te passen tijdens het "
+"opvoeren."
 
 #. Audio/controller latency
-#. Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing.
+#. Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use 'Ctrl + [' or 'Ctrl + ]' to adjust while performing.
 #. name: audio/controller_delay
 #. type: float
 #. value: 0.08
@@ -956,7 +957,7 @@ msgid "Audio/controller latency"
 msgstr "Geluid/controller latency"
 
 #. Audio/controller latency
-#. Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing.
+#. Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use 'Ctrl + [' or 'Ctrl + ]' to adjust while performing.
 #. name: audio/controller_delay
 #. type: float
 #. value: 0.08
@@ -964,13 +965,14 @@ msgstr "Geluid/controller latency"
 msgid ""
 "Affects instruments and dancing only. The total of USB (guitar or dance pad) "
 "latency combined with audio output latency. Adjust so that you can hit the "
-"notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to "
-"adjust while performing."
+"notes best when playing by ear (not looking on screen). Use 'Ctrl + [' or "
+"'Ctrl + ]' to adjust while performing."
 msgstr ""
 "Heeft enkel effect op instrumenten en dansen. De totale USB- (gitaar of "
 "dancepad) latency, gecombineerd met de geluidlatency. Aanpassen zodat je de "
 "noten goed kunt treffen tijdens het spelen op gehoor (zonder te kijken op "
-"het scherm). Gebruik Ctrl+F5/F6 om aan te passen tijdens het opvoeren."
+"het scherm). Gebruik 'Ctrl + [' of 'Ctrl + ]' om aan te passen tijdens het "
+"opvoeren."
 
 #. Audio devices
 #. List of audio devices to try.
@@ -1129,7 +1131,7 @@ msgstr ""
 "alle Performous mappen voor data."
 
 #. Show hidden folders
-#. When true the screen_paths will also show hidden folders
+#. When true the screen 'Paths' will also show hidden folders.
 #. name: paths/showhiddenfolders
 #. type: bool
 #. value: false
@@ -1138,13 +1140,14 @@ msgid "Show hidden folders"
 msgstr "Toon verborgen mappen"
 
 #. Show hidden folders
-#. When true the screen_paths will also show hidden folders
+#. When true the screen 'Paths' will also show hidden folders.
 #. name: paths/showhiddenfolders
 #. type: bool
 #. value: false
 #: ../data/config/schema.xml:370
-msgid "When true the screen_paths will also show hidden folders"
-msgstr "Wanneer WAAR dan zal screen_paths verborgen mappen laten zien"
+msgid "When true the screen 'Paths' will also show hidden folders."
+msgstr ""
+"Wanneer WAAR dan zal het scherm 'Locaties' verborgen mappen laten zien."
 
 #. Default Song folders
 #. Where to recursively look for songs. DATADIR at the beginning means all Performous data folders.
@@ -1175,7 +1178,7 @@ msgstr ""
 "kunnen hier toegevoegd worden."
 
 #. Sort order
-#. Currently active sort order
+#. Currently active sort order.
 #. name: songs/sort-order
 #. type: int
 #. value: 0
@@ -1185,14 +1188,14 @@ msgid "Sort order"
 msgstr "Sorteervolgorde"
 
 #. Sort order
-#. Currently active sort order
+#. Currently active sort order.
 #. name: songs/sort-order
 #. type: int
 #. value: 0
 #. hidden: true
 #: ../data/config/schema.xml:399
-msgid "Currently active sort order"
-msgstr "Actieve sorteervolgorde"
+msgid "Currently active sort order."
+msgstr "Actieve sorteervolgorde."
 
 #: ../data/performous.desktop:3
 msgid "Performous"
@@ -1214,7 +1217,7 @@ msgstr "liedje;muziek;dansen;karaoke;microfoon;geluid;zingen;"
 msgid "Enabled"
 msgstr "Ingeschakeld"
 
-#: ../game/configuration.cc:137 ../game/menu.cc:77
+#: ../game/configuration.cc:137 ../game/menu.cc:64
 msgid "Disabled"
 msgstr "Uitgeschakeld"
 
@@ -1433,12 +1436,12 @@ msgid "Creating screens..."
 msgstr "Schermen aanmaken..."
 
 #: ../game/main.cc:173
-msgid "Entering main menu"
-msgstr "Hoofdmenu tonen"
+msgid "Entering main menu..."
+msgstr "Hoofdmenu tonen..."
 
-#: ../game/main.cc:175 ../game/screen_sing.cc:80
-msgid "Loading complete"
-msgstr "Laden afgerond"
+#: ../game/main.cc:175
+msgid "Loading complete!"
+msgstr "Laden afgerond!"
 
 #: ../game/main.cc:184
 msgid ""
@@ -1469,8 +1472,8 @@ msgid "View playlist"
 msgstr "Bekijk afspeellijst"
 
 #: ../game/requesthandler.cc:334
-msgid "Search and Add"
-msgstr "Zoeken & Toevoegen"
+msgid "Search and add"
+msgstr "Zoeken & toevoegen"
 
 #: ../game/requesthandler.cc:335
 msgid "Sort by"
@@ -1552,7 +1555,7 @@ msgstr "Nee"
 msgid "Move up"
 msgstr "Omhoog"
 
-#: ../game/requesthandler.cc:355
+#: ../game/requesthandler.cc:355 ../game/screen_playlist.cc:386
 msgid "Move down"
 msgstr "Omlaag"
 
@@ -1573,56 +1576,56 @@ msgid "Cancel"
 msgstr "Annuleren"
 
 #: ../game/requesthandler.cc:360
-msgid "Successfully removed song from playlist"
-msgstr "Sucecsvol verwijderd van de afspeellijst"
+msgid "Successfully removed song from playlist."
+msgstr "Sucecsvol verwijderd van de afspeellijst."
 
 #: ../game/requesthandler.cc:361
-msgid "Failed removing song from playlist"
+msgid "Failed removing song from playlist!"
 msgstr ""
 "Er is een probleem opgetreden tijden het verwijderen van een liedje uit de "
-"playlist"
+"playlist!"
 
 #: ../game/requesthandler.cc:362
-msgid "Successfully changed position of song"
-msgstr "Succesvol de positie gewijzigd van het liedje"
+msgid "Successfully changed position of song."
+msgstr "Succesvol de positie gewijzigd van het liedje."
 
 #: ../game/requesthandler.cc:363
-msgid "Failed changing position of song"
+msgid "Failed changing position of song!"
 msgstr ""
 "Er is een probleem opgetreden tijdens het wijzigen van de positie van een "
-"liedje"
+"liedje!"
 
 #: ../game/requesthandler.cc:364
-msgid "Successfully moved song up"
-msgstr "Succesvol het liedje omhoog verplaatst"
+msgid "Successfully moved song up."
+msgstr "Succesvol het liedje omhoog verplaatst."
 
 #: ../game/requesthandler.cc:365
-msgid "Failed moving song up"
+msgid "Failed moving song up!"
 msgstr ""
-"Er is een probleem opgetreden tijdens het omhoog verplaatsen van het liedje"
+"Er is een probleem opgetreden tijdens het omhoog verplaatsen van het liedje!"
 
 #: ../game/requesthandler.cc:366
-msgid "Successfully moved song down"
-msgstr "Succes het liedje omlaag verplaatst"
+msgid "Successfully moved song down."
+msgstr "Succesvol het liedje omlaag verplaatst."
 
 #: ../game/requesthandler.cc:367
-msgid "Failed moving song down"
+msgid "Failed moving song down!"
 msgstr ""
-"Er is een probleem opgetreden tijdens het omlaag verplaatsen van het liedje"
+"Er is een probleem opgetreden tijdens het omlaag verplaatsen van het liedje!"
 
 #: ../game/requesthandler.cc:368
-msgid "Successfully added song to the playlist"
-msgstr "Succesvol het liedje toegevoegd aan de afspeellijst"
+msgid "Successfully added song to the playlist."
+msgstr "Succesvol het liedje toegevoegd aan de afspeellijst."
 
 #: ../game/requesthandler.cc:369
-msgid "Failed adding song to the playlist"
+msgid "Failed adding song to the playlist!"
 msgstr ""
 "Er is een probleem opgetreden tijdens het toevoegen van een liedje aan de "
-"afspeellijst"
+"afspeellijst!"
 
 #: ../game/requesthandler.cc:370
-msgid "No songs found with current filter"
-msgstr "Geen liedjes gevonden met het huidige filter"
+msgid "No songs found with current filter."
+msgstr "Geen liedjes gevonden met het huidige filter."
 
 #: ../game/screen_audiodevices.cc:65
 msgid ""
@@ -1696,20 +1699,20 @@ msgid "Practice"
 msgstr "Oefenen"
 
 #: ../game/screen_intro.cc:174
-msgid "Check your skills or test the microphones"
-msgstr "Je vaardigheden testen en de microfoons controleren"
+msgid "Check your skills or test the microphones."
+msgstr "Je vaardigheden testen en de microfoons controleren."
 
 #: ../game/screen_intro.cc:190
 msgid "Configure"
 msgstr "Opties"
 
 #: ../game/screen_intro.cc:190
-msgid "Configure audio and game options"
-msgstr "Aanpassen geluids- en spelinstellingen"
+msgid "Configure audio and game options."
+msgstr "Aanpassen geluids- en spelinstellingen."
 
 #: ../game/screen_intro.cc:191
-msgid "Leave the game"
-msgstr "Spel verlaten"
+msgid "Leave the game."
+msgstr "Spel verlaten."
 
 #: ../game/screen_intro.cc:204
 msgid ""
@@ -1746,10 +1749,10 @@ msgid ".."
 msgstr ".."
 
 #: ../game/screen_paths.cc:95
-msgid "Go up one folder"
+msgid "Go to parent folder"
 msgstr "Een map naar boven"
 
-#: ../game/screen_paths.cc:102
+#: ../game/screen_paths.cc:122
 msgid "Open folder"
 msgstr "Open map"
 
@@ -1875,10 +1878,6 @@ msgid "Move this song up the list"
 msgstr "Verplaats dit lied omhoog in de lijst"
 
 #: ../game/screen_playlist.cc:386
-msgid "Move Down"
-msgstr "Omlaag"
-
-#: ../game/screen_playlist.cc:386
 msgid "Move this song down the list"
 msgstr "Verplaats dit lied omlaag in de lijst"
 
@@ -1897,6 +1896,10 @@ msgstr "Liedje bevat kapotte tracks!"
 #: ../game/screen_sing.cc:70
 msgid "Loading menu..."
 msgstr "Menu wordt geladen..."
+
+#: ../game/screen_sing.cc:80
+msgid "Loading complete"
+msgstr "Laden afgerond"
 
 #: ../game/screen_sing.cc:86
 msgid "Start"
@@ -2175,6 +2178,9 @@ msgstr "gesorteerd op pad"
 #: ../game/songs.cc:454
 msgid "sorted by language"
 msgstr "gesorteerd op taal"
+
+#~ msgid "Move Down"
+#~ msgstr "Omlaag"
 
 #~ msgid "Fallback song encoding"
 #~ msgstr "Reserve lied codering"
