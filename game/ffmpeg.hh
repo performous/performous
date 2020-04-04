@@ -68,7 +68,7 @@ class AudioBuffer {
 	uFvec makePreviewBuffer();
 	void push(std::vector<std::int16_t> const& data, double timestamp);
 	bool prepare(std::int64_t pos);
-	bool operator()(float* begin, float* end, std::int64_t pos, float volume = 1.0f);
+	bool operator()(float* begin, size_t count, std::int64_t pos, float volume = 1.0f);
 	bool eof(std::int64_t pos) const { return double(pos) / m_sps >= m_duration; }
 	void setEof() { m_duration = double(m_pos) / m_sps; }
 	double duration() const { return m_duration; }
