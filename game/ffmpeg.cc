@@ -82,7 +82,7 @@ fvec_t* AudioBuffer::makePreviewBuffer() {
 	{
 		std::unique_lock<mutex> l(m_mutex);
 		ScreenSongs::previewSamplesBuffer.reset(new_fvec(m_data.size() / 2));
-		float previewVol = float(config["audio/preview_volume"].i()) / 100;
+		float previewVol = float(config["audio/preview_volume"].i()) / 100.0;
 		for (size_t rpos = 0, bpos = 0; rpos < m_data.size(); rpos += 2, bpos ++) {
 			ScreenSongs::previewSamplesBuffer->data[bpos] = (((da::conv_from_s16(m_data[rpos]) + da::conv_from_s16(m_data[rpos + 1])) / 2) / previewVol);
 		}
@@ -100,8 +100,9 @@ void AudioBuffer::push(std::vector<std::int16_t> const& data, double timestamp) 
 		return;
 	}
 	// Insert silence at the beginning if the stream starts later than 0.0
-	if (m_pos == 0 && timestamp > 0.0) {
-		m_pos = timestamp * m_sps;
+	if (m_pos == 0 && timestamp >= 0.0) {
+		m_pos = std::round(float(timestamp * getSamplesPerSecond()));
+		if (m_pos % 2 == 1) { m_pos++; timestamp = float(m_pos) / getSamplesPerSecond(); }
 		m_data.resize(m_pos, 0);
 	}
 	m_data.insert(m_data.end(), data.begin(), data.end());
