@@ -41,7 +41,7 @@ void SongParser::txtParse() {
 	for (auto const& name: { TrackName::LEAD_VOCAL, DUET_P2 }) {
 		Notes& notes = m_song.getVocalTrack(name).notes;
 		auto it = notes.rbegin();
-		if (!notes.empty() && it->type != Note::SLEEP && it->begin == it->end) notes.pop_back();
+		if (!notes.empty() && it->type != Note::Type::SLEEP && it->begin == it->end) notes.pop_back();
 		if (notes.empty()) m_song.eraseVocalTrack(name);
 	}
 	
@@ -61,9 +61,9 @@ void SongParser::txtParse() {
 		for (auto currentNote: merged) {
 			skip = false;
 			if (!finalDuet.empty()) { 
-				if (currentNote.type == Note::SLEEP) {
+				if (currentNote.type == Note::Type::SLEEP) {
 					auto prevToLast = ++(finalDuet.rbegin());
-					if (prevToLast->type == Note::SLEEP) {
+					if (prevToLast->type == Note::Type::SLEEP) {
 						std::clog << "songparser/info: Phrase formed by a single syllable is most likely our fault, We'll skip the break." << std::endl;
 						skip = true;
 					}
@@ -72,13 +72,13 @@ void SongParser::txtParse() {
 					if (Note::overlapping(finalDuet.back(),currentNote)) {
 						std::clog << "songparser/info: Will try to fix overlap (most likely between both singers) with a linebreak." << std::endl;
 						Note lineBreak = Note();
-						lineBreak.type = Note::SLEEP;
+						lineBreak.type = Note::Type::SLEEP;
 						double beatDur = getBPM(m_song, finalDuet.back().begin).step;
 						double newEnd = (currentNote.begin - 2*beatDur);
 						lineBreak.begin = lineBreak.end = newEnd;
-						if (finalDuet.back().type != Note::SLEEP) {
+						if (finalDuet.back().type != Note::Type::SLEEP) {
 							finalDuet.back().end = newEnd;
-							if (currentNote.type == Note::SLEEP) { skip = true; }
+							if (currentNote.type == Note::Type::SLEEP) { skip = true; }
 							if (!skip) { finalDuet.push_back(lineBreak); }
 						}
 					}
@@ -164,9 +164,9 @@ bool SongParser::txtParseNote(std::string line) {
 	n.type = Note::Type(iss.get());
 	unsigned int ts = m_txt.prevts;
 	switch (n.type) {
-		case Note::NORMAL:
-		case Note::FREESTYLE:
-		case Note::GOLDEN:
+		case Note::Type::NORMAL:
+		case Note::Type::FREESTYLE:
+		case Note::Type::GOLDEN:
 		{
 			unsigned int length = 0;
 			if (!(iss >> ts >> length >> n.note)) throw std::runtime_error("Invalid note line format");
@@ -177,7 +177,7 @@ bool SongParser::txtParseNote(std::string line) {
 			n.end = tsTime(ts + length);
 		}
 			break;
-		case Note::SLEEP:
+		case Note::Type::SLEEP:
 		{
 			unsigned int end;
 			if (!(iss >> ts >> end)) end = ts;
@@ -214,17 +214,17 @@ bool SongParser::txtParseNote(std::string line) {
 	}
 	double prevtime = m_txt.prevtime;
 	m_txt.prevtime = n.end;
-	if (n.type != Note::SLEEP && n.end > n.begin) {
+	if (n.type != Note::Type::SLEEP && n.end > n.begin) {
 		vocal.noteMin = std::min(vocal.noteMin, n.note);
 		vocal.noteMax = std::max(vocal.noteMax, n.note);
 	}
-	if (n.type == Note::SLEEP) {
+	if (n.type == Note::Type::SLEEP) {
 		if (notes.empty()) return true; // Ignore sleeps at song beginning
 		else {
 			Note& p = notes.back();
 			n.begin = n.end = prevtime; // Normalize sleep notes
 			
-			if (p.type == Note::SLEEP) return true; // Ignore consecutive sleeps
+			if (p.type == Note::Type::SLEEP) return true; // Ignore consecutive sleeps
 		}
 	}
 	notes.push_back(n);
