@@ -1,15 +1,16 @@
 version: v1.0
-name: Performous Build on Ubuntu 18.04
+name: Performous Build
 agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
 blocks:
   - name: Ubuntu 18.04 Build
+    dependencies: []
     task:
       prologue:
         commands:
-          - echo "Installing Performous Dependencies..."
+          - echo "Installing Performous dependencies..."
           - sudo apt -y update
           - sudo apt -y install cmake gettext help2man clang gcc-7 g++-7 libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libopencv-dev libportmidi-dev libqrencode-dev libicu-dev libcpprest-dev libglm-dev libopenblas-dev libfftw3-dev
       jobs:
@@ -35,3 +36,31 @@ blocks:
             - git submodule init && git submodule update
             - mkdir build.clang && cd build.clang && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
             - make VERBOSE=1
+  - name: MacOS 10.14.6 Build
+    dependencies: []
+    task:
+      agent:
+        machine:
+          type: a1-standard-4
+          os_image: macos-mojave-xcode11
+      prologue:
+        commands:
+          - echo "Downloading Performous MacOS 10.14.6 dependencies."
+          - curl -LJO https://asgardsings.nl/performous-preinstalled-deps-macos.tar
+          - echo "Creating directories and symlinks..."
+          - mkdir -p /Users/semaphore/local
+          - sudo ln -sf /Users/semaphore/local /opt/local
+          - sudo ln -sf /Users/semaphore/portfiles /opt/portfiles
+          - export PATH="/opt/local/bin:/opt/local/sbin:${PATH}"
+          - echo "Untarring the tarbal..."
+          - sudo tar xfpz ./performous-preinstalled-deps-macos.tar
+          - echo "Test if all deps are installed else fail the job."
+          - test -e /opt/local/.deps_installed || exit 1
+      jobs:
+        - name: Generate app bundle
+          commands:
+            - checkout
+            - git submodule init && git submodule update
+            - cd osx-utils
+            - chmod +x ./performous-app-build.sh
+            - ./performous-app-build.sh -D
