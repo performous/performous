@@ -28,7 +28,7 @@ public:
 	};
 
 	void setLanguage(const std::string& language) { 
-		auto path = getLocaleDir().native();
+		auto path = getLocaleDir().string();
 		boost::locale::generator gen;
 		gen.add_messages_path(path);
 		gen.add_messages_domain(m_package);
