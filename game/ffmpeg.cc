@@ -121,10 +121,9 @@ bool AudioBuffer::prepare(std::int64_t pos) {
 	return m_pos > m_posReq + m_data.capacity() / 16 && m_pos <= m_posReq + m_data.size();
 }
 
-bool AudioBuffer::operator()(float* begin, float* end, std::int64_t pos, float volume) {
+bool AudioBuffer::operator()(float* begin, size_t samples, std::int64_t pos, float volume) {
 	std::unique_lock<mutex> l(m_mutex);
 	size_t idx = pos + m_data.size() - m_pos;
-	size_t samples = end - begin;
 	for (size_t s = 0; s < samples; ++s, ++idx) {
 		if (idx < m_data.size()) begin[s] += volume * da::conv_from_s16(m_data[idx]);
 	}
