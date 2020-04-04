@@ -54,6 +54,8 @@ blocks:
           - cache restore macports-prefix
           - sudo chmod +x /Users/semaphore/check-install-macports.sh
           - export PATH="/Users/semaphore/local/bin:/Users/semaphore/local/sbin:$PATH"
+          - mkdir ./local
+          - sudo ln -sf /Users/semaphore/local/ /opt/local
           - test -e /Users/semaphore/local/.deps_installed || /Users/semaphore/check-install-macports.sh | cat 2>&1
       jobs:
         - name: Generate app bundle
