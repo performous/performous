@@ -150,9 +150,9 @@ bool Music::operator()(float* begin, float* end) {
 // 			if (t.pitchFactor != 0) { // Pitch shift
 // 				Buffer tempbuf(end - begin);
 // 				// Get audio to temp buffer
-// 				if (t.mpeg.audioQueue(&*tempbuf.begin(), &*tempbuf.end(), m_pos, t.fadeLevel)) eof = false;
+// 				if (t.mpeg.audioQueue(tempbuf.data(), tempbuf.data() + tempbuf.size(), m_pos, t.fadeLevel)) eof = false;
 // 				// Do the magic
-// 				PitchShift(&*tempbuf.begin(), &*tempbuf.end(), t.pitchFactor);
+// 				PitchShift(tempbuf.begin(), tempbuf.end(), t.pitchFactor);
 // 				// Mix with other tracks
 // 				Buffer::iterator m = mixbuf.begin();
 // 				Buffer::iterator b = tempbuf.begin();
@@ -161,18 +161,18 @@ bool Music::operator()(float* begin, float* end) {
 // 			// Otherwise just get the audio and mix it straight away
 // 			} else
 // #endif
-		if (t.mpeg.audioQueue(&*mixbuf.begin(), &*mixbuf.end(), m_pos, t.fadeLevel)) eof = false;
-		
+		if (t.mpeg.audioQueue(mixbuf.data(), mixbuf.data() + mixbuf.size(), m_pos, t.fadeLevel)) eof = false;
 	}
 	m_pos += samples;
 	
+	const float volume = static_cast<float>(m_preview ? config["audio/preview_volume"].i() : config["audio/music_volume"].i())/100.0;
 	for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
 		if (i % 2 == 0) {
 			fadeLevel += fadeRate;
 			if (fadeLevel <= 0.0) return false;
 			if (fadeLevel > 1.0) { fadeLevel = 1.0; fadeRate = 0.0; }
 		}
-		begin[i] += mixbuf[i] * fadeLevel * static_cast<float>(m_preview ? config["audio/preview_volume"].i() : config["audio/music_volume"].i())/100.0;
+		begin[i] += mixbuf[i] * fadeLevel * volume;
 	}
 	// suppress center channel vocals
 	if(suppressCenterChannel && !m_preview) {
@@ -268,11 +268,12 @@ struct Sample {
 			return;
 		}
 		std::vector<float> mixbuf(end - begin);
-		if(!mpeg.audioQueue(&*mixbuf.begin(), &*mixbuf.end(), m_pos, 1.0)) {
+		if(!mpeg.audioQueue(mixbuf.data(), mixbuf.data() + mixbuf.size(), m_pos, 1.0)) {
 			eof = true;
 		}
+		const auto failVolume = static_cast<float>(config["audio/fail_volume"].i())/100.0f;
 		for (size_t i = 0, iend = end - begin; i != iend; ++i) {
-			begin[i] += mixbuf[i] * static_cast<float>(config["audio/fail_volume"].i())/100.0;
+			begin[i] += mixbuf[i] * failVolume;
 		}
 		m_pos += end - begin;
 	}
