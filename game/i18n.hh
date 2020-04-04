@@ -11,7 +11,7 @@
 
 class TranslationEngine {
 public:
-	TranslationEngine(const char *package) : m_package(package) {
+	TranslationEngine(std::string package) : m_package(package) {
 		auto lang = boost::locale::util::get_system_locale(true);
 
 		std::clog << "locale/debug: Checking if language is set in config." << std::endl;
@@ -71,5 +71,5 @@ public:
 	std::vector<std::string> GetAllLanguages() { return config["game/language"].getAllEnumStringValues(); }
 private:
 	std::string m_currentLanguage;
-	const char *m_package;
+	std::string m_package;
 };
