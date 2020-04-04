@@ -169,8 +169,7 @@ std::string ConfigItem::getEnumStringValueAtIndex(unsigned int index) {
 	try {
 		auto item = m_enums.at(index);
 		return item;
-	} catch (const std::out_of_range& e) {
-        std::clog << "configuration/error: Out of Range error." << e.what() << std::endl;
+	} catch (const std::out_of_range&) {
 		throw std::runtime_error("Enum Index not found in enumeration.");
 	}
 }
@@ -311,10 +310,10 @@ void writeConfig(bool system) {
 				Game::getSingletonPtr()->window().resetShaders();
 			}
 		}
-		if(name == "game/language") {
+		if (name == "game/language") {
 			std::string oldValue = Game::getSingletonPtr()->getCurrentLanguage();
 			std::string newValue = item.getEnumName();
-			if(oldValue != newValue) {
+			if (oldValue != newValue) {
 				std::cout << "Wanting to change something, old value: '" << oldValue << "' new value: '" << newValue <<"'" <<std::endl;
 				Game::getSingletonPtr()->setLanguage(newValue);
 				Game::getSingletonPtr()->getCurrentScreen()->exit();
