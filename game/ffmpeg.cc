@@ -79,17 +79,19 @@ void AudioBuffer::quit() {
 	m_cond.notify_one();
 }
 
-fvec_t* AudioBuffer::makePreviewBuffer() {
+AudioBuffer::uFvec AudioBuffer::makePreviewBuffer() {
+        uFvec fvec;
 	{
 		std::unique_lock<mutex> l(m_mutex);
-		ScreenSongs::previewSamplesBuffer.reset(new_fvec(m_data.size() / 2));
+                m_cond.wait(l, [this]{ return !m_data.empty(); });
+		fvec.reset(new_fvec(m_data.size() / 2));
 		float previewVol = float(config["audio/preview_volume"].i()) / 100.0;
 		for (size_t rpos = 0, bpos = 0; rpos < m_data.size(); rpos += 2, bpos ++) {
-			ScreenSongs::previewSamplesBuffer->data[bpos] = (((da::conv_from_s16(m_data[rpos]) + da::conv_from_s16(m_data[rpos + 1])) / 2) / previewVol);
+			fvec->data[bpos] = (((da::conv_from_s16(m_data[rpos]) + da::conv_from_s16(m_data[rpos + 1])) / 2) / previewVol);
 		}
 	}
 	m_cond.notify_one();
-	return ScreenSongs::previewSamplesBuffer.get();
+	return fvec;
 };
 
 void AudioBuffer::push(std::vector<std::int16_t> const& data, double timestamp) {
