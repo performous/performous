@@ -199,7 +199,7 @@ bool Music::prepare() {
 		if (mpeg.terminating()) continue;  // Song loading failed or other error, won't ever get ready
 		if (mpeg.audioQueue.prepare(m_pos)) {
 			if (kv.first == "background" && m_preview && m_pos > 0) {
-				fvec_t* previewSamples = mpeg.audioQueue.makePreviewBuffer();
+				auto previewSamples = mpeg.audioQueue.makePreviewBuffer();
 				fvec_t* previewBeats = ScreenSongs::previewBeatsBuffer.get();
 				intptr_t readptr = 0;
 				fvec_t* tempoSamplePtr = new_fvec(Audio::aubio_hop_size);
