@@ -22,6 +22,7 @@
 #define AVUTIL_MATH_INCLUDE <@AVUtil_INCLUDE_DIRS@/libavutil/mathematics.h>
 #define AVUTIL_ERROR_INCLUDE <@AVUtil_INCLUDE_DIRS@/libavutil/error.h>
 
+
 // libxml++ version
 #define LIBXMLPP_VERSION_2_6 @LibXML++_VERSION_2_6@
 #define LIBXMLPP_VERSION_3_0 @LibXML++_VERSION_3_0@

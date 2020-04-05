@@ -22,6 +22,7 @@ extern "C" {
 #include AVUTIL_OPT_INCLUDE
 #include AVUTIL_MATH_INCLUDE
 #include AVUTIL_ERROR_INCLUDE
+#include </usr/include/ffmpeg/libavutil/timestamp.h>
 }
 
 #define AUDIO_CHANNELS 2
@@ -312,6 +313,18 @@ void FFmpeg::seek_internal() {
 
 void FFmpeg::decodePacket(Packet &pkt) {
 
+    AVRational *time_base = &m_formatContext->streams[pkt.stream_index]->time_base;
+    char p1[AV_TS_MAX_STRING_SIZE];
+    char p2[AV_TS_MAX_STRING_SIZE];
+    char p3[AV_TS_MAX_STRING_SIZE];
+    char p4[AV_TS_MAX_STRING_SIZE];
+    char p5[AV_TS_MAX_STRING_SIZE];
+    char p6[AV_TS_MAX_STRING_SIZE];
+    printf("pts:%s pts_time:%s dts:%s dts_time:%s duration:%s duration_time:%s stream_index:%d\n",
+            av_ts_make_string(p1, pkt.pts), av_ts_make_time_string(p6, pkt.pts, time_base),
+            av_ts_make_string(p2, pkt.dts), av_ts_make_time_string(p4, pkt.dts, time_base),
+            av_ts_make_string(p3, pkt.duration), av_ts_make_time_string(p5, pkt.duration, time_base),
+            pkt.stream_index);
 	auto ret = avcodec_send_packet(m_codecContext.get(), &pkt);
 	if(ret == AVERROR_EOF) {
 		// End of file: no more data to read.
