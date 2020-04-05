@@ -6,6 +6,7 @@
 #include "util.hh"
 
 #ifdef USE_WEBSERVER
+#define _TURN_OFF_PLATFORM_STRING
 #include <cpprest/json.h>
 #endif
 
