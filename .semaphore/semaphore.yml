@@ -55,6 +55,7 @@ blocks:
           - sudo chmod +x /Users/semaphore/check-install-macports.sh
           - export PATH="/Users/semaphore/local/bin:/Users/semaphore/local/sbin:$PATH"
           - mkdir ./local
+          - test -e ./macports-prefix-cache.tar && tar -xf ./macports-prefix-cache.tar || echo "Couldn't restore macports install from cache."
           - sudo ln -sf /Users/semaphore/local/ /opt/local
           - test -e /Users/semaphore/local/.deps_installed || /Users/semaphore/check-install-macports.sh | cat 2>&1
       jobs:
@@ -65,5 +66,6 @@ blocks:
             - cd osx-utils
             - chmod +x ./performous-app-build.sh
             - ./performous-app-build.sh -D
-            - tar -cpf macos-ci-stuff.tar /Users/semaphore/local /Users/semaphore/portfiles
-            - cache store macports-prefix /Users/semaphore/macos-ci-stuff.tar
+            - cd /Users/semaphore
+            - tar -cpf ./macports-prefix-cache.tar ./local ./portfiles
+            - cache store macports-prefix /Users/semaphore/macports-prefix-cache.tar
