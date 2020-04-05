@@ -292,7 +292,7 @@ void FFmpeg::operator()() {
 			std::clog << "ffmpeg/debug: done loading " << m_filename << std::endl;
 		} catch (std::exception& e) {
 			std::clog << "ffmpeg/error: " << m_filename << ": " << e.what() << std::endl;
-			if (++errors > 2) { std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl; break; }
+			//if (++errors > 2) { std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl; break; }
 		}
 		av_packet_unref(&pkt);
 	}
@@ -315,18 +315,20 @@ void FFmpeg::seek_internal() {
 
 void FFmpeg::decodePacket(Packet &pkt) {
 
-    AVRational *time_base = &m_formatContext->streams[pkt.stream_index]->time_base;
-    char p1[AV_TS_MAX_STRING_SIZE];
-    char p2[AV_TS_MAX_STRING_SIZE];
-    char p3[AV_TS_MAX_STRING_SIZE];
-    char p4[AV_TS_MAX_STRING_SIZE];
-    char p5[AV_TS_MAX_STRING_SIZE];
-    char p6[AV_TS_MAX_STRING_SIZE];
-    printf("pts:%s pts_time:%s dts:%s dts_time:%s duration:%s duration_time:%s stream_index:%d\n",
-            av_ts_make_string(p1, pkt.pts), av_ts_make_time_string(p6, pkt.pts, time_base),
-            av_ts_make_string(p2, pkt.dts), av_ts_make_time_string(p4, pkt.dts, time_base),
-            av_ts_make_string(p3, pkt.duration), av_ts_make_time_string(p5, pkt.duration, time_base),
-            pkt.stream_index);
+    if (pkt.stream_index > 1) {
+        AVRational *time_base = &m_formatContext->streams[pkt.stream_index]->time_base;
+        char p1[AV_TS_MAX_STRING_SIZE];
+        char p2[AV_TS_MAX_STRING_SIZE];
+        char p3[AV_TS_MAX_STRING_SIZE];
+        char p4[AV_TS_MAX_STRING_SIZE];
+        char p5[AV_TS_MAX_STRING_SIZE];
+        char p6[AV_TS_MAX_STRING_SIZE];
+        printf("pts:%s pts_time:%s dts:%s dts_time:%s duration:%s duration_time:%s stream_index:%d % s\n",
+                av_ts_make_string(p1, pkt.pts), av_ts_make_time_string(p6, pkt.pts, time_base),
+                av_ts_make_string(p2, pkt.dts), av_ts_make_time_string(p4, pkt.dts, time_base),
+                av_ts_make_string(p3, pkt.duration), av_ts_make_time_string(p5, pkt.duration, time_base),
+                pkt.stream_index, m_filename.c_str());
+    }
 	auto ret = avcodec_send_packet(m_codecContext.get(), &pkt);
 	if(ret == AVERROR_EOF) {
 		// End of file: no more data to read.
@@ -351,9 +353,15 @@ void FFmpeg::decodePacket(Packet &pkt) {
 		}
 		// frame is available here
 		if (frame->pts != int64_t(AV_NOPTS_VALUE)) {
-			m_position = double(frame->pts) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
-			if (m_formatContext->start_time != int64_t(AV_NOPTS_VALUE))
-				m_position -= double(m_formatContext->start_time) / AV_TIME_BASE;
+			auto new_position = double(frame->pts) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
+			if (m_formatContext->streams[m_streamId]->start_time != int64_t(AV_NOPTS_VALUE))
+				new_position -= double(m_formatContext->streams[m_streamId]->start_time) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
+			//if (m_formatContext->streams[m_streamId]->first_pts != int64_t(AV_NOPTS_VALUE))
+			//	m_position -= double(m_formatContext->streams[m_streamId]->first_pts) / AV_TIME_BASE;
+                        if (new_position > 0)
+                            m_position = new_position;
+
+                        
 		}
 		if (m_mediaType == AVMEDIA_TYPE_VIDEO) processVideo(std::move(frame)); else processAudio(std::move(frame));
 	}
@@ -386,7 +394,7 @@ void FFmpeg::processAudio(uFrame frame) {
 		(const uint8_t**)&frame->data[0], frame->nb_samples);
 	// The output is now an interleaved array of 16-bit samples
 	std::vector<int16_t> m_output(output, output+out_samples*AUDIO_CHANNELS);
-	audioQueue.push(m_output,m_position);
+	audioQueue.push(m_output, m_position);
 	av_freep(&output);
 	m_position += double(out_samples)/m_rate;
 }
