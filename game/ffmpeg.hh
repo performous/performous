@@ -55,6 +55,8 @@ class VideoFifo {
 class AudioBuffer {
 	typedef std::recursive_mutex mutex;
   public:
+        using uFvec = std::unique_ptr<fvec_t, std::integral_constant<decltype(&del_fvec), &del_fvec>>;
+
 	AudioBuffer(size_t size = 4320256): m_data(size) {}
 	/// Reset from FFMPEG side (seeking to beginning or terminate stream)
 	void reset();
@@ -63,7 +65,7 @@ class AudioBuffer {
 	void setSamplesPerSecond(unsigned sps) { m_sps = sps; }
 	/// get samples per second
 	unsigned getSamplesPerSecond() const { return m_sps; }
-	fvec_t* makePreviewBuffer();
+	uFvec makePreviewBuffer();
 	void push(std::vector<std::int16_t> const& data, double timestamp);
 	bool prepare(std::int64_t pos);
 	bool operator()(float* begin, float* end, std::int64_t pos, float volume = 1.0f);
