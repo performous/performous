@@ -110,6 +110,7 @@ void AudioBuffer::push(std::vector<std::int16_t> const& data, double timestamp) 
 	}
 	m_data.insert(m_data.end(), data.begin(), data.end());
 	m_pos += data.size();
+	m_cond.notify_one();
 }
 
 bool AudioBuffer::prepare(std::int64_t pos) {
