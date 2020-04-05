@@ -51,10 +51,10 @@ blocks:
           - echo Trying to restore cache...
           - ssh-keyscan -p 29920 66.185.20.68 >> ~/.ssh/known_hosts
           - chmod 400 ~/.ssh/semaphore_cache_key
-          - cache restore macports-prefix
+          - cache restore new-macports-prefix
           - sudo chmod +x /Users/semaphore/check-install-macports.sh
           - export PATH="/Users/semaphore/local/bin:/Users/semaphore/local/sbin:$PATH"
-          - mkdir ./local
+          - mkdir -p ./local
           - sudo ln -sf /Users/semaphore/local/ /opt/local
           - test -e /Users/semaphore/local/.deps_installed || /Users/semaphore/check-install-macports.sh | cat 2>&1
       jobs:
@@ -65,5 +65,6 @@ blocks:
             - cd osx-utils
             - chmod +x ./performous-app-build.sh
             - ./performous-app-build.sh -D
-            - tar -cpf macos-ci-stuff.tar /Users/semaphore/local /Users/semaphore/portfiles
-            - cache store macports-prefix /Users/semaphore/macos-ci-stuff.tar
+            - cd /Users/semaphore
+            - rm -rf /Users/semaphore/local/var/macports/distfiles/* /Users/semaphore/local/var/macports/software/* /Users/semaphore/local/var/macports/sources/*
+            - cache store new-macports-prefix ./local
