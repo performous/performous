@@ -64,6 +64,17 @@ namespace {
 	using Lock = std::lock_guard<std::mutex>;
 }
 
+	BinaryBuffer readFile(fs::path const& path) {
+		BinaryBuffer ret;
+		fs::ifstream f(path, std::ios::binary);
+		f.seekg(0, std::ios::end);
+		ret.resize(f.tellg());
+		f.seekg(0);
+		f.read(reinterpret_cast<char*>(ret.data()), ret.size());
+		if (!f) throw std::runtime_error("File cannot be read: " + path.string());
+		return ret;
+	}
+
 void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destinationDir)
 {
 	if (!fs::exists(sourceDir) || !fs::is_directory(sourceDir)) {
