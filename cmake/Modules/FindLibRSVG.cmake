@@ -9,7 +9,7 @@ include(LibFindMacros)
 libfind_package(LibRSVG Cairo)
 libfind_package(LibRSVG GDK-PixBuf)
 libfind_pkg_detect(LibRSVG librsvg-2.0
-  FIND_PATH librsvg/rsvg.h PATH_SUFFIXES librsvg-2
+  FIND_PATH librsvg/rsvg.h PATH_SUFFIXES librsvg-2 librsvg-2.0
   FIND_LIBRARY rsvg-2
 )
 libfind_process(LibRSVG)
