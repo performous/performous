@@ -30,26 +30,6 @@ if (USE_BOOST_REGEX)
         add_definitions(-DUSE_BOOST_REGEX)
 endif()
 
-
-# Enable C++14 support and other compiler flags...
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-	message("Detected GCC version ${GCC_VERSION}")
-	if (GCC_VERSION VERSION_GREATER 7 OR GCC_VERSION VERSION_EQUAL 7)
-		set(CMAKE_CXX_FLAGS "-std=c++14 -Wall -Wextra -fcx-limited-range ${CMAKE_CXX_FLAGS}")
-	elseif (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
-		set(CMAKE_CXX_FLAGS "-std=c++1y -Wall -Wextra -Wno-attributes -Wno-deprecated-declarations -fcx-limited-range ${CMAKE_CXX_FLAGS}")
-		message(WARNING "Your GCC is rather old, disabling some useful compiler warnings (GCC 7+ or Clang 5+ recommended for proper C++17 support).")
-	else()
-		message(FATAL_ERROR "Your C++ compiler is too old, please upgrade.")
-	endif()
-endif()
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	# Note: AUTO_PTR is for Boost which won't compile with C++17 otherwise (fixed in Boost git but not in 1.66)
-	set(CMAKE_CXX_FLAGS "-std=c++1z -Wall -Wextra -D_LIBCPP_ENABLE_CXX17_REMOVED_AUTO_PTR ${CMAKE_CXX_FLAGS}")
-endif()
-
 if(WIN32)
 	set(CMAKE_CXX_FLAGS "-DWIN32_LEAN_AND_MEAN ${CMAKE_CXX_FLAGS}")
 	set(SHARE_INSTALL_DEFAULT ".")
