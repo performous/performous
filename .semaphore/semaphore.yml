@@ -1,5 +1,5 @@
 version: v1.0
-name: Performous Build on Ubuntu 18.04
+name: Performous build
 agent:
   machine:
     type: e1-standard-2
