@@ -14,14 +14,12 @@
 #include <thread>
 
 extern "C" {
-#include AVCODEC_INCLUDE
-#include AVFORMAT_INCLUDE
-#include SWSCALE_INCLUDE
-#include SWRESAMPLE_INCLUDE
-#include AVUTIL_INCLUDE
-#include AVUTIL_OPT_INCLUDE
-#include AVUTIL_MATH_INCLUDE
-#include AVUTIL_ERROR_INCLUDE
+	#include <libavcodec/avcodec.h>
+	#include <libavformat/avformat.h>
+	#include <libavutil/avutil.h>
+	#include <libavutil/opt.h>
+	#include <libswresample/swresample.h>
+	#include <libswscale/swscale.h>
 }
 
 #if (LIBAVCODEC_VERSION_INT) < (AV_VERSION_INT(52,94,3))
