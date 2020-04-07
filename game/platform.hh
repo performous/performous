@@ -21,12 +21,10 @@
 #endif
 
 struct Platform {
-enum platforms { windows, linux, macos, bsd, solaris, unix };
+enum class Host_OS { Performous_OS_Win32, Performous_OS_Linux, Performous_OS_macOS, Performous_OS_BSD, Performous_OS_Solaris, Performous_OS_Unix };
 Platform();
-static platforms currentOS();
+static Host_OS currentOS();
 static uint16_t shortcutModifier(bool eitherSide = true);
 static int defaultBackEnd();
 
-private:
-static const std::array<const char*,6> platformNames;
 };
