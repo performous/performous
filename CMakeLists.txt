@@ -128,15 +128,17 @@ if(WIN32)
 	install(FILES win32/ConfigureSongDirectory.bat DESTINATION .)
 endif()
 
-# uninstall target
-if(NOT TARGET uninstall)
-  configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake/uninstall.cmake"
-    IMMEDIATE @ONLY)
+if(NOT APPLE)
+  # uninstall target
+  if(NOT TARGET uninstall)
+    configure_file(
+      "${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake.in"
+      "${CMAKE_CURRENT_BINARY_DIR}/cmake/uninstall.cmake"
+      IMMEDIATE @ONLY)
 
-  add_custom_target(uninstall
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake/uninstall.cmake)
+    add_custom_target(uninstall
+      COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake/uninstall.cmake)
+  endif()
 endif()
 
 #CPACK variables
