@@ -539,6 +539,10 @@ struct Audio::Impl {
 		// Assign mic buffers to the output for pass-through
 		for (size_t i = 0; i < analyzers.size(); ++i)
 			output.mics.push_back(&analyzers[i]);
+		
+		aubio_tempo_set_silence(Audio::aubioTempo.get(), -50.0);
+		aubio_tempo_set_threshold(Audio::aubioTempo.get(), 0.4);
+
 	}
 	~Impl() {
 		// stop all audio streams befor destoying the object.
@@ -548,10 +552,7 @@ struct Audio::Impl {
 	}
 };
 
-Audio::Audio(): self(std::make_unique<Impl>()) {
-	aubio_tempo_set_silence(Audio::aubioTempo.get(), -50.0);
-	aubio_tempo_set_threshold(Audio::aubioTempo.get(), 0.4);
-}
+Audio::Audio(): self(std::make_unique<Impl>()) {}
 Audio::~Audio() { close(); }
 
 ConfigItem& Audio::backendConfig() {
