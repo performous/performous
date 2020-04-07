@@ -102,14 +102,9 @@ endif()
 
 # Libraries
 
-find_package(Boost 1.36 REQUIRED COMPONENTS program_options filesystem iostreams system locale)
+find_package(Boost 1.55 REQUIRED COMPONENTS program_options filesystem iostreams system locale)
 include_directories(${Boost_INCLUDE_DIRS})
 list(APPEND LIBS ${Boost_LIBRARIES})
-
-if (Boost_VERSION VERSION_LESS 105500)
-	message("-- Using Boost < 1.55: defining BOOST_NO_CXX11_SCOPED_ENUMS")
-	set(CMAKE_CXX_FLAGS "-DBOOST_NO_CXX11_SCOPED_ENUMS ${CMAKE_CXX_FLAGS}")
-endif()
 
 find_package(ICU 60 REQUIRED uc data i18n io)
 include_directories(${ICU_INCLUDE_DIRS})

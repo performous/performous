@@ -21,8 +21,6 @@ Platform::Platform() {
 	#endif
 }
 
-const std::array<const char*,6> Platform::platformNames = {{ "Windows", "MacOS", "BSD", "Solaris", "Linux", "Unix" }}; // Relevant for debug only.
-
 int Platform::defaultBackEnd() {
 		switch (Platform::currentOS()) {
 			case Host_OS::Performous_OS_Win32: return 13; // WASAPI
