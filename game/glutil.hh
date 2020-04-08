@@ -29,7 +29,7 @@ namespace glutil {
 		
 		static GLsizeiptr size() { return sizeof(shaderMatrices); };
 		static GLintptr offset() { return 0; };
-		shaderMatrices(): projMatrix(0), mvMatrix(64), normalMatrix(128), colorMatrix(192) {};
+		shaderMatrices(): projMatrix(), mvMatrix(), normalMatrix(), colorMatrix() {};
 		shaderMatrices(const shaderMatrices&) = delete;
 		shaderMatrices& operator=(const shaderMatrices&) = delete;
 	}; // 256 bytes
@@ -41,7 +41,7 @@ namespace glutil {
 		
 		static GLsizeiptr size() { return sizeof(stereo3dParams); };
 		static GLintptr offset() { return alignOffset(shaderMatrices::size()); };
-		stereo3dParams(): sepFactor(256), z0(260) {};
+		stereo3dParams(): sepFactor(), z0() {};
 		stereo3dParams(const stereo3dParams&) = delete;
 		stereo3dParams& operator=(const stereo3dParams&) = delete;
 	}; // 16 bytes
@@ -54,7 +54,7 @@ namespace glutil {
 
 		static GLsizeiptr size() { return sizeof(lyricColorUniforms); };
 		static GLintptr offset() { return alignOffset(stereo3dParams::offset() + stereo3dParams::size()); };
-		lyricColorUniforms(): origFill(272), origStroke(288), newFill(304), newStroke(320) {};
+		lyricColorUniforms(): origFill(), origStroke(), newFill(), newStroke() {};
 		lyricColorUniforms(const lyricColorUniforms&) = delete;
 		lyricColorUniforms& operator=(const lyricColorUniforms&) = delete;
 	}; // 64 bytes
@@ -69,7 +69,7 @@ namespace glutil {
 
 		static GLsizeiptr size() { return sizeof(danceNoteUniforms); };
 		static GLintptr offset() { return alignOffset(lyricColorUniforms::offset() + lyricColorUniforms::size()); };
-		danceNoteUniforms(): noteType(336), hitAnim(340), clock(344), scale(348), position(352) {};
+		danceNoteUniforms(): noteType(), hitAnim(), clock(), scale(), position() {};
 		danceNoteUniforms(const danceNoteUniforms&) = delete;
 		danceNoteUniforms& operator=(const danceNoteUniforms&) = delete;
 	}; // 32 bytes
