@@ -80,7 +80,7 @@ to save the current settings to XML.
 		<short>Song results timeout</short>
 		<long>How long the scores will be displayed for after finishing a song.</long>
 	</entry>
-	<entry name="game/language" type="int" value="0">
+	<entry name="game/language" type="int" value="-1">
 		<limits>
 			<enum>en_US.UTF-8</enum>
 			<enum>nl_NL.UTF-8</enum>
