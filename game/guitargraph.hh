@@ -98,13 +98,13 @@ class GuitarGraph: public InstrumentGraph {
 	bool m_drums; /// are we using drums?
 
 	// Track stuff
-	enum Difficulty {
-		DIFFICULTY_KIDS,     // Kids
-		DIFFICULTY_SUPAEASY, // Easy
-		DIFFICULTY_EASY,     // Medium
-		DIFFICULTY_MEDIUM,   // Hard
-		DIFFICULTY_AMAZING,  // Expert
-		DIFFICULTYCOUNT
+	enum class Difficulty {
+		KIDS,     // Kids
+		SUPAEASY, // Easy
+		EASY,     // Medium
+		MEDIUM,   // Hard
+		AMAZING,  // Expert
+		COUNT
 	} m_level;
 	void setupJoinMenu();
 	void updateJoinMenu();
