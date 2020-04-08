@@ -3,7 +3,7 @@ Performous
 ==========
 
 Build status
-[![Build Status](https://semaphoreci.com/api/v1/performous/performous/branches/master/badge.svg)](https://semaphoreci.com/performous/performous)
+[![Build Status](https://performous.semaphoreci.com/badges/performous.svg)](https://performous.semaphoreci.com/projects/performous)
 
 An open-source karaoke, band and dancing game where one or more players perform a song and the game scores their performances. Supports songs in UltraStar, Frets on Fire and StepMania formats. Microphones and instruments from SingStar, Guitar Hero and Rock Band as well as some dance pads are autodetected.
 
