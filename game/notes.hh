@@ -81,8 +81,8 @@ struct Note {
 	/// Compares begin of two notes
 	static bool ltBegin(Note const& a, Note const& b) {
 		if (a.begin == b.begin) {
-			if (a.type == Note::Type::SLEEP) return true;
-			if (b.type == Note::Type::SLEEP) return false;			
+			if (a.type == Type::SLEEP) return true;
+			if (b.type == Type::SLEEP) return false;			
 		}
 		return a.begin < b.begin; 
 	}
@@ -90,11 +90,11 @@ struct Note {
 	static bool ltEnd(Note const& a, Note const& b) { return a.end < b.end; }
 	/// Compare equality of two notes, used for deleting duplicates when programatically creating the duet track.
 	static bool equal(Note const& a, Note const& b) { 
-		if (a.type == Note::Type::SLEEP) return (a.type == b.type);
+		if (a.type == Type::SLEEP) return (a.type == b.type);
 		return (a.begin == b.begin && a.end == b.end && a.note == b.note && a.type == b.type);
 	}
 	/// Check if two notes overlap
-	static bool overlapping(Note const& a, Note const& b) { return (a.end > b.begin && a.type != Note::Type::SLEEP && b.type != Note::Type::SLEEP); }
+	static bool overlapping(Note const& a, Note const& b) { return (a.end > b.begin && a.type != Type::SLEEP && b.type != Type::SLEEP); }
   private:
 	double scoreMultiplier() const;
 };
