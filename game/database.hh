@@ -96,7 +96,6 @@ public: // methods for database queries
 	void queryPerPlayerHiscore(std::ostream & os, std::string const& track = std::string()) const;
 
 	bool hasHiscore(Song& s) const;
-	bool noPlayers() const;
 
 private:
 	fs::path m_filename;
