@@ -72,7 +72,7 @@ if (Boost_VERSION VERSION_LESS 105500)
 endif()
 
 find_package(ICU 60 REQUIRED uc data i18n io)
-include_directories(SYSTEM ${ICU_INCLUDE_DIRS})
+include_directories(${ICU_INCLUDE_DIRS})
 list(APPEND LIBS ${ICU_LIBRARIES})
 
 # LibEpoxy < 1.2 crashes with binary drivers (nvidia & fglrx) when creating shaders
@@ -199,4 +199,3 @@ endif()
 # Generate config.hh
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
-
