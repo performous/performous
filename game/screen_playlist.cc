@@ -72,7 +72,7 @@ void ScreenPlaylist::manageEvent(input::NavEvent const& event) {
 	if (keyPressed == false)
 		keyPressed = true;
 
-	if (nav == input::NAV_CANCEL) {
+	if (nav == input::NavButton::NAV_CANCEL) {
 		if(overlay_menu.isOpen()) {
 			overlay_menu.close();
 		} else {
@@ -80,17 +80,17 @@ void ScreenPlaylist::manageEvent(input::NavEvent const& event) {
 			overlay_menu.open();
 		}
 	} else {
-		if (nav == input::NAV_PAUSE) {
+		if (nav == input::NavButton::NAV_PAUSE) {
 			m_audio.togglePause();
-		} else if (nav == input::NAV_START) {
+		} else if (nav == input::NavButton::NAV_START) {
 			menu.action();
-		} else if (event.menu == input::NAVMENU_A_PREV) {
+		} else if (event.menu == input::NavMenu::NAVMENU_A_PREV) {
 			menu.move(-1);
-		} else if (event.menu == input::NAVMENU_A_NEXT) {
+		} else if (event.menu == input::NavMenu::NAVMENU_A_NEXT) {
 			menu.move(1);
-		} else if (event.menu == input::NAVMENU_B_PREV) {
+		} else if (event.menu == input::NavMenu::NAVMENU_B_PREV) {
 			menu.move(-1);
-		} else if (event.menu == input::NAVMENU_B_NEXT) {
+		} else if (event.menu == input::NavMenu::NAVMENU_B_NEXT) {
 			menu.move(1);
 		}
 	}
@@ -276,7 +276,7 @@ void ScreenPlaylist::draw_menu_options() {
 			}
 			wcounter = std::max(wcounter, theme->option_selected.w() + 2 * sel_margin); // Calculate the widest entry
 			// If this is a config item, show the value below
-			if (opt.type == MenuOption::CHANGE_VALUE) {
+			if (opt.type == MenuOption::Type::CHANGE_VALUE) {
 				++ii; // Use a slot for the value
 				theme->option_selected.dimensions.left(x + sel_margin).center(-0.1 + (selanim+1)*0.08);
 				theme->option_selected.draw("<  " + opt.value->getValue() + "  >");
