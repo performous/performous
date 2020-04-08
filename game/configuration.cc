@@ -165,12 +165,15 @@ namespace {
 	}
 }
 
-std::string ConfigItem::getEnumStringValueAtIndex(unsigned int index) {
+std::string ConfigItem::getEnumStringValueAtIndex(int index) {
+	if(index < 0) return m_enums.at(0);
+	
 	try {
 		auto item = m_enums.at(index);
 		return item;
 	} catch (const std::out_of_range&) {
-		throw std::runtime_error("Enum Index not found in enumeration.");
+		std::clog << "configuration/warning: Enum Index not found in enumeration. Falling back to English." << std::endl;
+		return m_enums.at(0);
 	}
 }
 
