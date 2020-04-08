@@ -3,11 +3,11 @@ set -o errexit
 # the very first step is to check that dylibbundler exists,
 # without it the bundle would be broken
 
-PREFIXDIR="/opt/local" # By default, the default prefix for macports, change this if you're using a different path or package manager.
-DEPLOYMENT_TARGET="10.9" # Change this if you want to target a different version of macOS.
+test -z ${PREFIXDIR} && PREFIXDIR="/opt/local" # By default, the default prefix for macports, change this if you're using a different path or package manager.
+test -z ${DEPLOYMENT_TARGET} && DEPLOYMENT_TARGET="10.12" # Change this if you want to target a different version of macOS.
 MAKE_JOBS=$(sysctl -n hw.ncpu)
-CCPATH="/usr/bin/clang" # Path to system Clang, change if you want another compiler.
-CXXPATH="/usr/bin/clang++" # Path to system Clang, change if you want another compiler.
+test -z ${CC} && CCPATH="/usr/bin/clang" # Path to system Clang, change if you want another compiler.
+test -z ${CXX} && CXXPATH="/usr/bin/clang++" # Path to system Clang, change if you want another compiler.
 
 
 args=("$@")
@@ -186,8 +186,9 @@ function main {
 	cp -pLR "${PREFIXDIR}"/etc/fonts "${ETCDIR}"
 
 	cd $ETCDIR/fonts
-	sed -i '' -e 's|\/opt\/local/share|\.\.\/\.\.\/\.\.\/Resources|g' fonts.conf
-	sed -i '' -e 's|\/opt\/local/var/cache|\~\/\.cache|g' fonts.conf
+	PREFIX_REGEX=$(echo ${PREFIXDIR} | sed -e 's|\/|\\\/|g')
+	sed -i '' -e "s|${PREFIX_REGEX}\/share|\.\.\/\.\.\/\.\.\/Resources|g" fonts.conf
+	sed -i '' -e "s|${PREFIX_REGEX}\/var\/cache|\~\/\.cache|g" fonts.conf
 	sed -i '' -e 's|\<\!-- Font directory list --\>|\<\!-- Font directory list --\>\
     <dir>\.\.\/\.\.\/pixmaps</dir>|g' fonts.conf
 
