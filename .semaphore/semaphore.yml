@@ -36,6 +36,14 @@ blocks:
             - git submodule init && git submodule update
             - mkdir build.clang && cd build.clang && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
             - make VERBOSE=1
+      epilogue:
+        commands:
+          - echo "Making linux releases"
+          - cd build.gcc && tar -czf performous-gcc7.tar.gz * && cd ..
+          - cd build.clang && tar -czf performous-clang6.tar.gz * && cd ..
+          - artifact push project --expire-in 1d build.gcc/performous-gcc7.tar.gz --force -d performous-1.1.${SEMAPHORE_GIT_SHA}-gcc.tar.gz
+          - artifact push project --expire-in 1d build.gcc/performous-clang6.tar.gz --force -d performous-1.1.${SEMAPHORE_GIT_SHA}-clang.tar.gz
+
   - name: MacOS 10.14.6 Build    
     dependencies: []
     task:
@@ -68,3 +76,9 @@ blocks:
             - cd /Users/semaphore
             - rm -rf /Users/semaphore/local/var/macports/distfiles/* /Users/semaphore/local/var/macports/software/* /Users/semaphore/local/var/macports/sources/*
             - cache store new-macports-prefix ./local
+      epilogue:
+        commands:
+          - echo "Making osx release"
+          - cd performous/osx-utils/out/Performous.app 
+          - tar -czf performous-clang.tar.gz * && cd ..
+          - artifact push project --expire-in 1d performous/osx-utils/out/Performous.app/performous-clang.tar.gz --force -d performous-1.1.${SEMAPHORE_GIT_SHA}-gcc.tar.gz
