@@ -83,7 +83,7 @@ AudioBuffer::uFvec AudioBuffer::makePreviewBuffer() {
         uFvec fvec;
 	{
 		std::unique_lock<mutex> l(m_mutex);
-                m_cond.wait(l, [this]{ return !m_data.empty(); });
+                //m_cond.wait(l, [this]{ return !m_data.empty(); });
 		fvec.reset(new_fvec(m_data.size() / 2));
 		float previewVol = float(config["audio/preview_volume"].i()) / 100.0;
 		for (size_t rpos = 0, bpos = 0; rpos < m_data.size(); rpos += 2, bpos ++) {
@@ -124,7 +124,7 @@ bool AudioBuffer::prepare(std::int64_t pos) {
 	return m_pos > m_posReq + m_data.capacity() / 16 && m_pos <= m_posReq + m_data.size();
 }
 
-bool AudioBuffer::operator()(float* begin, size_t samples, std::int64_t pos, float volume) {
+bool AudioBuffer::read(float* begin, size_t samples, std::int64_t pos, float volume) {
 	std::unique_lock<mutex> l(m_mutex);
 	size_t idx = pos + m_data.size() - m_pos;
 	for (size_t s = 0; s < samples; ++s, ++idx) {
@@ -135,10 +135,14 @@ bool AudioBuffer::operator()(float* begin, size_t samples, std::int64_t pos, flo
 	return !eof(pos);
 }
 
-FFmpeg::FFmpeg(fs::path const& _filename, unsigned int rate):
-  m_filename(_filename), m_rate(rate),
-  m_mediaType(rate ? AVMEDIA_TYPE_AUDIO : AVMEDIA_TYPE_VIDEO),
-  m_thread(std::async(std::launch::async, std::ref(*this)))
+AudioBuffer::~AudioBuffer() {
+    reset();
+}
+
+FFmpeg::FFmpeg(fs::path const& _filename, AudioBuffer *audioBuffer):
+  m_filename(_filename),
+  audioBuffer(audioBuffer),
+  m_mediaType(audioBuffer ? AVMEDIA_TYPE_AUDIO : AVMEDIA_TYPE_VIDEO)
 {
     static std::once_flag static_infos;
     std::call_once(static_infos, [] {
@@ -167,13 +171,16 @@ FFmpeg::FFmpeg(fs::path const& _filename, unsigned int rate):
                 av_register_all();
 #endif
 	});
+	
+        try { open(); } catch (std::exception const& e) { throw std::runtime_error("ffmpeg/error: Failed to open " + m_filename.string() + ": " + e.what()); }
+	m_duration = m_formatContext->duration / double(AV_TIME_BASE);
+        m_thread = std::async(std::launch::async, std::ref(*this));
 }
 
 FFmpeg::~FFmpeg() {
 	m_quit.set_value();
 	videoQueue.reset();
-	audioQueue.quit();
-	m_thread.get();
+	if (m_thread.valid()) m_thread.get();
         {
             std::lock_guard<std::mutex> l(s_avcodec_mutex); // avcodec_close is not thread-safe
             if (m_codecContext) avcodec_close(m_codecContext.get());
@@ -213,6 +220,7 @@ void FFmpeg::open() {
 
 	switch (m_mediaType) {
 	case AVMEDIA_TYPE_AUDIO:
+            m_rate = audioBuffer->getSamplesPerSecond() / AUDIO_CHANNELS;
 		m_resampleContext.reset(swr_alloc());
 		av_opt_set_int(m_resampleContext.get(), "in_channel_layout", m_codecContext->channel_layout ? m_codecContext->channel_layout : av_get_default_channel_layout(m_codecContext->channels), 0);
 		av_opt_set_int(m_resampleContext.get(), "out_channel_layout", av_get_default_channel_layout(AUDIO_CHANNELS), 0);
@@ -222,7 +230,6 @@ void FFmpeg::open() {
 		av_opt_set_int(m_resampleContext.get(), "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
 		swr_init(m_resampleContext.get());
 		if (!m_resampleContext) throw std::runtime_error("Cannot create resampling context");
-		audioQueue.setSamplesPerSecond(AUDIO_CHANNELS * m_rate);
 		break;
 	case AVMEDIA_TYPE_VIDEO:
 		// Setup software scaling context for YUV to RGB conversion
@@ -262,9 +269,6 @@ struct FFmpeg::Packet: public AVPacket {
 };
 
 void FFmpeg::operator()() {
-	try { open(); } catch (std::exception const& e) { std::clog << "ffmpeg/error: Failed to open " << m_filename << ": " << e.what() << std::endl; return; }
-	m_duration = m_formatContext->duration / double(AV_TIME_BASE);
-	audioQueue.setDuration(m_duration);
 	int errors = 0;
 	bool eof = false;
 	std::clog << "audio/debug: FFmpeg processing " << m_filename.filename().string() << std::endl;
@@ -281,7 +285,7 @@ void FFmpeg::operator()() {
 
 			if (pkt.stream_index == m_streamId) {
 
-				if (audioQueue.wantSeek()) m_seekTarget = 0.0;
+				if (audioBuffer && audioBuffer->wantSeek()) m_seekTarget = 0.0;
 				if (m_seekTarget == m_seekTarget) seek_internal();
 				decodePacket(pkt);
 				errors = 0;
@@ -292,7 +296,7 @@ void FFmpeg::operator()() {
 			std::clog << "ffmpeg/debug: done loading " << m_filename << std::endl;
 		} catch (std::exception& e) {
 			std::clog << "ffmpeg/error: " << m_filename << ": " << e.what() << std::endl;
-			//if (++errors > 2) { std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl; break; }
+			if (++errors > 2) { std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl; break; }
 		}
 		av_packet_unref(&pkt);
 	}
@@ -300,13 +304,14 @@ void FFmpeg::operator()() {
 
 void FFmpeg::seek(double time, bool wait) {
 	m_seekTarget = time;
-	videoQueue.reset(); audioQueue.reset(); // Empty these to unblock the internals in case buffers were full
+	videoQueue.reset(); 
+        if (audioBuffer) audioBuffer->reset(); // Empty these to unblock the internals in case buffers were full
 	if (wait) while (!terminating() && m_seekTarget == m_seekTarget) std::this_thread::sleep_for(5ms);
 }
 
 void FFmpeg::seek_internal() {
 	videoQueue.reset();
-	audioQueue.reset();
+        if (audioBuffer) audioBuffer->reset();
 	int flags = 0;
 	if (m_seekTarget < m_position) flags |= AVSEEK_FLAG_BACKWARD;
 	av_seek_frame(m_formatContext.get(), -1, m_seekTarget * AV_TIME_BASE, flags);
@@ -394,7 +399,7 @@ void FFmpeg::processAudio(uFrame frame) {
 		(const uint8_t**)&frame->data[0], frame->nb_samples);
 	// The output is now an interleaved array of 16-bit samples
 	std::vector<int16_t> m_output(output, output+out_samples*AUDIO_CHANNELS);
-	audioQueue.push(m_output, m_position);
+	audioBuffer->push(m_output, m_position);
 	av_freep(&output);
 	m_position += double(out_samples)/m_rate;
 }
