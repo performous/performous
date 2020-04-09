@@ -74,6 +74,8 @@ class FFmpeg {
 	FFmpeg(fs::path const& file, AudioBuffer *audioBuffer = nullptr);
 	~FFmpeg();
 	void operator()(); ///< Thread runs here, don't call directly
+        void handleOneFrame();
+
 	unsigned width = 0; ///< width of video
 	unsigned height = 0; ///< height of video
 	/// queue for video
@@ -123,9 +125,7 @@ class AudioBuffer {
   public:
         using uFvec = std::unique_ptr<fvec_t, std::integral_constant<decltype(&del_fvec), &del_fvec>>;
 
-	AudioBuffer(fs::path const& file, unsigned int rate, size_t size = 4320256): m_sps(rate * 2/* AUDIO_CHANNELS*/), m_data(size), ffmpeg(file, this) {
-            setDuration(ffmpeg.duration());
-        }
+	AudioBuffer(fs::path const& file, unsigned int rate, size_t size = 4320256);
         ~AudioBuffer();
 	/// Reset from FFMPEG side (seeking to beginning or terminate stream)
 	void reset();
@@ -165,5 +165,6 @@ class AudioBuffer {
 	double m_duration = getNaN();
 	std::atomic<bool> m_quit{ false };
 	FFmpeg ffmpeg;
+	std::future<void> reader_thread;
 };
 

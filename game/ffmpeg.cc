@@ -121,7 +121,10 @@ bool AudioBuffer::prepare(std::int64_t pos) {
 	m_posReq = pos;
 	wakeups();
 	// Has enough been prebuffered already and is the requested position still within buffer
-	return m_pos > m_posReq + m_data.capacity() / 16 && m_pos <= m_posReq + m_data.size();
+	bool need_seek = m_pos > m_posReq + m_data.capacity() / 16 && m_pos <= m_posReq + m_data.size();
+        if (!need_seek)
+                ffmpeg.seek(m_posReq / double(AV_TIME_BASE), false);
+        return need_seek;
 }
 
 bool AudioBuffer::read(float* begin, size_t samples, std::int64_t pos, float volume) {
@@ -135,8 +138,26 @@ bool AudioBuffer::read(float* begin, size_t samples, std::int64_t pos, float vol
 	return !eof(pos);
 }
 
+AudioBuffer::AudioBuffer(fs::path const& file, unsigned int rate, size_t size): m_sps(rate * AUDIO_CHANNELS), m_data(size), ffmpeg(file, this) {
+    setDuration(ffmpeg.duration());
+    reader_thread = std::async(std::launch::async, [this] { 
+            while (!m_quit) try {
+                    ffmpeg.handleOneFrame();
+             } catch (FFmpeg::eof_error&) {
+                std::unique_lock<mutex> l(m_mutex);
+                m_cond.wait(l, [this]{ return  m_quit.load() || wantSeek();  });
+	        
+             } catch (std::exception& e) {
+			m_quit = true;
+                        m_cond.notify_all();
+                        }
+    });
+}
 AudioBuffer::~AudioBuffer() {
+    m_quit = true;
+    m_cond.notify_all();
     reset();
+    reader_thread.get();
 }
 
 FFmpeg::FFmpeg(fs::path const& _filename, AudioBuffer *audioBuffer):
@@ -174,7 +195,8 @@ FFmpeg::FFmpeg(fs::path const& _filename, AudioBuffer *audioBuffer):
 	
         try { open(); } catch (std::exception const& e) { throw std::runtime_error("ffmpeg/error: Failed to open " + m_filename.string() + ": " + e.what()); }
 	m_duration = m_formatContext->duration / double(AV_TIME_BASE);
-        m_thread = std::async(std::launch::async, std::ref(*this));
+        if (audioBuffer == nullptr)
+            m_thread = std::async(std::launch::async, std::ref(*this));
 }
 
 FFmpeg::~FFmpeg() {
@@ -268,28 +290,35 @@ struct FFmpeg::Packet: public AVPacket {
 	~Packet() { av_packet_unref(this); }
 };
 
+void FFmpeg::handleOneFrame() {
+	bool read_one = false;
+	do {
+		Packet pkt;
+		auto ret = av_read_frame(m_formatContext.get(), &pkt);
+		if(ret == AVERROR_EOF) {
+			// End of file: no more data to read.
+			throw FFmpeg::eof_error();
+		} else if(ret < 0) {
+			throw FfmpegError(ret);
+		}
+
+		if (pkt.stream_index == m_streamId) {
+
+			if (audioBuffer && audioBuffer->wantSeek()) m_seekTarget = 0.0;
+			if (m_seekTarget == m_seekTarget) seek_internal();
+			decodePacket(pkt);
+			read_one = true;
+		}
+	} while (!read_one);
+}
+
 void FFmpeg::operator()() {
 	int errors = 0;
 	bool eof = false;
 	std::clog << "audio/debug: FFmpeg processing " << m_filename.filename().string() << std::endl;
-	Packet pkt;
 	while (!terminating() && !eof) {
 		try {
-			auto ret = av_read_frame(m_formatContext.get(), &pkt);
-			if(ret == AVERROR_EOF) {
-				// End of file: no more data to read.
-				throw FFmpeg::eof_error();
-			} else if(ret < 0) {
-				throw FfmpegError(ret);
-			}
-
-			if (pkt.stream_index == m_streamId) {
-
-				if (audioBuffer && audioBuffer->wantSeek()) m_seekTarget = 0.0;
-				if (m_seekTarget == m_seekTarget) seek_internal();
-				decodePacket(pkt);
-				errors = 0;
-			}
+			handleOneFrame();
 		} catch (eof_error&) {
 			videoQueue.push(Bitmap()); // EOF marker
 			eof = true;
@@ -298,14 +327,13 @@ void FFmpeg::operator()() {
 			std::clog << "ffmpeg/error: " << m_filename << ": " << e.what() << std::endl;
 			if (++errors > 2) { std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl; break; }
 		}
-		av_packet_unref(&pkt);
+		errors = 0;
 	}
 }
 
 void FFmpeg::seek(double time, bool wait) {
 	m_seekTarget = time;
 	videoQueue.reset(); 
-        if (audioBuffer) audioBuffer->reset(); // Empty these to unblock the internals in case buffers were full
 	if (wait) while (!terminating() && m_seekTarget == m_seekTarget) std::this_thread::sleep_for(5ms);
 }
 
