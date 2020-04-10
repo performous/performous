@@ -9,6 +9,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 include(GetGitRevisionDescription)
 git_describe(PROJECT_VERSION --tags)
+
 if(NOT PROJECT_VERSION)
 	set(PROJECT_VERSION "1.1+")
 endif()
@@ -154,11 +155,35 @@ if(NOT APPLE)
 endif()
 
 #CPACK variables
-include(CPack)
-SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Niek Nooijens")
-SET(CPACK_PACKAGE_CONTACT "nieknooijens@gmail.com")
-SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libavcodec54, libavformat54, libswresample2, libsdl2-2.0-0, libportaudiocpp0, libboost-all-dev, libswscale2, libxml++2.6-2, libopencv-dev, librsvg2-2, libpango-1.0-0, libcairo2, libjpeg8, libpng12-0, libportmidi0, libicu-dev, libglm-dev libopenblas-dev libfftw3-dev")
-SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION_SUMMARY "A free music rhythm game similar to SingStar, Guitar Hero and DDR")
-SET(CPACK_DEBIAN_PACKAGE_VERSION ${PROJECT_VERSION})
-SET(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
+include(InstallRequiredSystemLibraries)
+# Project definition
+SET(CPACK_PACKAGE_VENDOR "Performous")
+SET(CPACK_PACKAGE_DESCRIPTION "Karaoke, band games and dancing in the same package. Performous lets you perform great songs, improve your musical skills and simply have fun! No special hardware required, you may play guitar on your PC keyboard, sing on your laptop microphone and so on. If you do have SingStar microphones, Guitar Hero or Rock Band instruments, or dance pads, just plug them into your USB ports and start rocking!")
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "An open-source music and rhythm game.")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/licence.txt")
+if(WIN32)
+	SET(CPACK_PACKAGE_EXECUTABLES "Performous")
+else()
+	SET(CPACK_PACKAGE_EXECUTABLES "performous")
+endif()
+SET(CPACK_PACKAGE_CONTACT "Arjan Speiard | Asgard Sings! <info@asgardsings.nl>")
+
+if(NOT CPACK_PACKAGE_VERSION)
+	set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+endif()
 SET(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CMAKE_BINARY_DIR};${PROJECT_NAME};ALL;/")
+SET(CPACK_GENERATOR "TGZ;ZIP;DEB;RPM")
+
+# Debian specific settings
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+SET(CPACK_DEBIAN_PACKAGE_SECTION "Games")
+
+# RPM specific settings
+SET(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
+SET(CPACK_RPM_PACKAGE_AUTOREQ ON)
+SET(CPACK_RPM_PACKAGE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/licence.txt")
+SET(CPACK_RPM_PACKAGE_DESCRIPTION "${CPACK_PACKAGE_DESCRIPTION}")
+SET(CPACK_RPM_PACKAGE_URL "https://github.com/performous/performous")
+
+include(CPack)
