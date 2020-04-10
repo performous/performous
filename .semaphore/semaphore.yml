@@ -64,6 +64,7 @@ blocks:
             - git submodule init && git submodule update
             - cd osx-utils
             - chmod +x ./performous-app-build.sh
+            - sed -e 's|cmake |cmake -DCMAKE_IGNORE_PATH="\/usr\/local\/opt\/" |g' -i '' ./performous-app-build.sh
             - ./performous-app-build.sh -D
             - cd /Users/semaphore
             - rm -rf /Users/semaphore/local/var/macports/distfiles/* /Users/semaphore/local/var/macports/software/* /Users/semaphore/local/var/macports/sources/*
