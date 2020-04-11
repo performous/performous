@@ -65,14 +65,6 @@ void VideoFifo::reset() {
 	m_eof = false;
 }
 
-void AudioBuffer::reset() {
-	{
-		std::unique_lock<mutex> l(m_mutex);
-		m_data.clear();
-		m_pos = 0;
-	}
-	m_cond.notify_one();
-}
 
 void AudioBuffer::quit() {
 	m_quit.store(true);
@@ -94,69 +86,143 @@ AudioBuffer::uFvec AudioBuffer::makePreviewBuffer() {
 	return fvec;
 };
 
+bool AudioBuffer::terminating() {
+    return ffmpeg.terminating();
+}
+/// Handle waking up of input thread etc. whenever m_read_pos is changed.
+void AudioBuffer::wakeups() {
+    m_cond.notify_all();
+}
+
+bool AudioBuffer::wantMore() {
+  return m_write_pos < m_read_pos + m_data.size() / 2;
+}
+
+/// Should the input stop waiting?
+bool AudioBuffer::condition() {
+    return m_quit.load() || wantMore();
+}
+
 void AudioBuffer::push(std::vector<std::int16_t> const& data, double timestamp) {
 	std::unique_lock<mutex> l(m_mutex);
-	m_cond.wait(l, [this]{ return condition(); });
-	if (m_quit) return;
+	m_cond.wait(l, [this]{ return m_seek_asked || condition(); });
+	if (m_quit || m_seek_asked) return;
 	if (timestamp < 0.0) {
 		std::clog << "ffmpeg/warning: Negative audio timestamp " << timestamp << " seconds, frame ignored." << std::endl;
 		return;
 	}
+        #if 0
 	// Insert silence at the beginning if the stream starts later than 0.0
-	if (m_pos == 0 && timestamp >= 0.0) {
-		m_pos = std::round(float(timestamp * getSamplesPerSecond()));
-		if (m_pos % 2 == 1) { m_pos++; timestamp = float(m_pos) / getSamplesPerSecond(); }
-		m_data.resize(m_pos, 0);
+	if (m_write_pos == 0 && timestamp > 0.0) {
+                std::vector<std::int16_t> empty(data.size()); 
+                while (m_write_pos < timestamp * m_sps) {
+                    m_data.insert(m_data.end(), empty.begin(), empty.end());
+                    m_write_pos += empty.size();
+                    m_cond.notify_one();
+                    m_cond.wait(l, [this]{ return condition(); });
+                }
 	}
-	m_data.insert(m_data.end(), data.begin(), data.end());
-	m_pos += data.size();
-	m_cond.notify_one();
+        #endif
+
+        std::clog << "ffmpeg/warning: push " << m_write_pos << " new=" << timestamp * m_sps << " posreq= " << m_read_pos << std::endl;
+
+        m_write_pos = timestamp * m_sps;
+        auto write_pos_in_ring = m_write_pos % m_data.size();
+        auto fst_hunk = std::min(data.size(), m_data.size() - write_pos_in_ring);
+	m_data.insert(m_data.begin() + write_pos_in_ring, data.begin(), data.begin() + fst_hunk);
+	m_data.insert(m_data.begin(), data.begin() + fst_hunk, data.end());
+	m_write_pos += data.size();
+	m_cond.notify_all();
 }
 
 bool AudioBuffer::prepare(std::int64_t pos) {
+#if 0
 	std::unique_lock<mutex> l(m_mutex, std::try_to_lock);
 	if (!l.owns_lock()) return false;  // Didn't get lock, give up for now
 	if (eof(pos)) return true;
 	if (pos < 0) pos = 0;
-	m_posReq = pos;
+	m_read_pos = pos;
 	wakeups();
 	// Has enough been prebuffered already and is the requested position still within buffer
-	bool need_seek = m_pos > m_posReq + m_data.capacity() / 16 && m_pos <= m_posReq + m_data.size();
-        if (!need_seek)
-                ffmpeg.seek(m_posReq / double(AV_TIME_BASE), false);
-        return need_seek;
+	return m_write_pos > m_read_pos + m_data.size() / 16 && m_write_pos <= m_read_pos + m_data.size();
+#else
+return true;
+#endif
+
 }
 
+// pos may be negative because upper layer may request 'extra time' before
+// starting the play back. In this case, the buffer is filled of zero.
+//
 bool AudioBuffer::read(float* begin, size_t samples, std::int64_t pos, float volume) {
+       std::clog << "ffmpeg/warning: " << this <<" read @ " << pos  << " m_write_pos=" << m_write_pos << " posreq=" << m_read_pos << std::endl;
+       if (eof(pos))
+           return false;
+
 	std::unique_lock<mutex> l(m_mutex);
-	size_t idx = pos + m_data.size() - m_pos;
-	for (size_t s = 0; s < samples; ++s, ++idx) {
-		if (idx < m_data.size()) begin[s] += volume * da::conv_from_s16(m_data[idx]);
-	}
-	m_posReq = std::max<std::int64_t>(0, pos + samples);
+        if (pos < 0) {
+            std::fill(begin, begin + samples, 0); 
+            return true;
+        }
+        if (pos >= m_read_pos + m_data.size() || pos < (std::int64_t)m_read_pos) {
+            // in case request position is not in the current possible range, we trigger a seek
+            // Note: m_write_pos is not checked on purpose: if pos is after
+            // m_write_pos, zeros present in buffer will be returned
+            std::fill(begin, begin + samples, 0); 
+            m_read_pos = pos + samples;
+            m_seek_asked = true;
+            std::fill(m_data.begin(), m_data.end(), 0); 
+            m_cond.notify_all();
+            return true; 
+        }
+        for (size_t s = 0; s < samples; ++s) {
+            begin[s] += volume * da::conv_from_s16(m_data[(m_read_pos + s) % m_data.size()]);
+        }
+	m_read_pos = pos + samples;
 	wakeups();
-	return !eof(pos);
+	return true;
 }
 
 AudioBuffer::AudioBuffer(fs::path const& file, unsigned int rate, size_t size): m_sps(rate * AUDIO_CHANNELS), m_data(size), ffmpeg(file, this) {
     setDuration(ffmpeg.duration());
     reader_thread = std::async(std::launch::async, [this] { 
-            while (!m_quit) try {
-                    ffmpeg.handleOneFrame();
-             } catch (FFmpeg::eof_error&) {
-                std::unique_lock<mutex> l(m_mutex);
-                m_cond.wait(l, [this]{ return  m_quit.load() || wantSeek();  });
-	        
-             } catch (std::exception& e) {
-			m_quit = true;
+            std::unique_lock<mutex> l(m_mutex);
+            while (!m_quit) {
+                 try {
+                        if (m_seek_asked) {
+                             ffmpeg.seek(m_read_pos / double(AV_TIME_BASE), false);
+                             m_seek_asked = false;
+                             m_write_pos = m_read_pos;
+                             l.unlock();
+                             ffmpeg.seek_internal();
+                        } else 
+                             l.unlock();
+                          
+                        ffmpeg.handleOneFrame();
+
+                        l.lock();
+                 } catch (FFmpeg::eof_error&) {
+                        l.lock();
+                        // Wait here on eof: either quit is asked, either a new seek
+                        // was asked and return back reading frames
+                        m_cond.wait(l, [this]{ return m_quit || m_seek_asked; });
+                 } catch (std::exception& e) {
+                        l.lock();
+                        m_quit = true;
                         m_cond.notify_all();
-                        }
+                 }
+             }
     });
 }
 AudioBuffer::~AudioBuffer() {
-    m_quit = true;
+    {
+	std::unique_lock<mutex> l(m_mutex);
+        m_read_pos = 0;
+        m_write_pos = 0;
+        m_data.clear();
+        m_quit = true;
+    }
     m_cond.notify_all();
-    reset();
     reader_thread.get();
 }
 
@@ -242,7 +308,7 @@ void FFmpeg::open() {
 
 	switch (m_mediaType) {
 	case AVMEDIA_TYPE_AUDIO:
-            m_rate = audioBuffer->getSamplesPerSecond() / AUDIO_CHANNELS;
+            m_rate = audioBuffer->getSamplesPerSecond() / double(AUDIO_CHANNELS);
 		m_resampleContext.reset(swr_alloc());
 		av_opt_set_int(m_resampleContext.get(), "in_channel_layout", m_codecContext->channel_layout ? m_codecContext->channel_layout : av_get_default_channel_layout(m_codecContext->channels), 0);
 		av_opt_set_int(m_resampleContext.get(), "out_channel_layout", av_get_default_channel_layout(AUDIO_CHANNELS), 0);
@@ -304,7 +370,6 @@ void FFmpeg::handleOneFrame() {
 
 		if (pkt.stream_index == m_streamId) {
 
-			if (audioBuffer && audioBuffer->wantSeek()) m_seekTarget = 0.0;
 			if (m_seekTarget == m_seekTarget) seek_internal();
 			decodePacket(pkt);
 			read_one = true;
@@ -339,7 +404,6 @@ void FFmpeg::seek(double time, bool wait) {
 
 void FFmpeg::seek_internal() {
 	videoQueue.reset();
-        if (audioBuffer) audioBuffer->reset();
 	int flags = 0;
 	if (m_seekTarget < m_position) flags |= AVSEEK_FLAG_BACKWARD;
 	av_seek_frame(m_formatContext.get(), -1, m_seekTarget * AV_TIME_BASE, flags);
@@ -391,10 +455,7 @@ void FFmpeg::decodePacket(Packet &pkt) {
 				new_position -= double(m_formatContext->streams[m_streamId]->start_time) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
 			//if (m_formatContext->streams[m_streamId]->first_pts != int64_t(AV_NOPTS_VALUE))
 			//	m_position -= double(m_formatContext->streams[m_streamId]->first_pts) / AV_TIME_BASE;
-                        if (new_position > 0)
-                            m_position = new_position;
-
-                        
+                        m_position = new_position;
 		}
 		if (m_mediaType == AVMEDIA_TYPE_VIDEO) processVideo(std::move(frame)); else processAudio(std::move(frame));
 	}

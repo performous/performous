@@ -88,8 +88,8 @@ class FFmpeg {
 	bool terminating() { return m_quit_future.wait_for(0s) == std::future_status::ready; }
 
 	class eof_error: public std::exception {};
-  private:
 	void seek_internal();
+  private:
 	void open();
         struct Packet;
 	void decodePacket(Packet &);
@@ -137,31 +137,25 @@ class AudioBuffer {
 	bool prepare(std::int64_t pos);
 	bool read(float* begin, size_t count, std::int64_t pos, float volume = 1.0f);
 	bool eof(std::int64_t pos) const { return double(pos) / m_sps >= m_duration; }
-	void setEof() { m_duration = double(m_pos) / m_sps; }
+	void setEof() { m_duration = double(m_write_pos) / m_sps; }
 	double duration() const { return m_duration; }
 	void setDuration(double seconds) { m_duration = seconds; }
-	bool wantSeek() {
-		// Are we already past the requested position? (need to seek backward or back to beginning)
-		return m_posReq > 0 && m_posReq + m_sps * 2 /* seconds tolerance */ + m_data.size() < m_pos;
-	}
-        bool terminating() {
-            return ffmpeg.terminating();
-        }
+	bool wantSeek();
+        bool terminating();
   private:
 	/// Handle waking up of input thread etc. whenever m_posReq is changed.
-	void wakeups() {
-		if (wantSeek()) reset();
-		else if (condition()) m_cond.notify_one();
-	}
-	bool wantMore() { return m_pos < m_posReq + m_data.capacity() / 2; }
+	void wakeups();
+	bool wantMore();
 	/// Should the input stop waiting?
-	bool condition() { return m_quit.load() || wantMore() || wantSeek(); }
+	bool condition();
+
 	mutable mutex m_mutex;
 	std::condition_variable_any m_cond;
 	unsigned m_sps = 0;
-	boost::circular_buffer<std::int16_t> m_data;
-	size_t m_pos = 0;
-	std::int64_t m_posReq = 0;
+	std::vector<std::int16_t> m_data;
+	size_t m_write_pos = 0;
+	std::int64_t m_read_pos = 0;
+        bool m_seek_asked { false };
 	double m_duration = getNaN();
 	std::atomic<bool> m_quit{ false };
 	FFmpeg ffmpeg;
