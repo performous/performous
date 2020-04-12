@@ -108,6 +108,7 @@ class FFmpeg {
 	std::atomic<double> m_seekTarget{ getNaN() };
 	double m_position = 0.0;
 	double m_duration = 0.0;
+        int64_t m_position_in_48k_frames = -1;
 	// libav-specific variables
 	int m_streamId = -1;
 	int m_mediaType;  // enum AVMediaType
@@ -133,7 +134,7 @@ class AudioBuffer {
 	/// get samples per second
 	unsigned getSamplesPerSecond() const { return m_sps; }
 	uFvec makePreviewBuffer();
-	void push(std::vector<std::int16_t> const& data, double timestamp);
+	void push(std::vector<std::int16_t> const& data, int64_t sample_position);
 	bool prepare(std::int64_t pos);
 	bool read(float* begin, size_t count, std::int64_t pos, float volume = 1.0f);
 	bool eof(std::int64_t pos) const { return double(pos) / m_sps >= m_duration; }
