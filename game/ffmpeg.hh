@@ -52,48 +52,6 @@ class VideoFifo {
 	static const unsigned m_max = 20;
 };
 
-class AudioBuffer {
-	typedef std::recursive_mutex mutex;
-  public:
-	AudioBuffer(size_t size = 4320256): m_data(size) {}
-	/// Reset from FFMPEG side (seeking to beginning or terminate stream)
-	void reset();
-	void quit();
-	/// set samples per second
-	void setSamplesPerSecond(unsigned sps) { m_sps = sps; }
-	/// get samples per second
-	unsigned getSamplesPerSecond() const { return m_sps; }
-	fvec_t* makePreviewBuffer();
-	void push(std::vector<std::int16_t> const& data, double timestamp);
-	bool prepare(std::int64_t pos);
-	bool operator()(float* begin, float* end, std::int64_t pos, float volume = 1.0f);
-	bool eof(std::int64_t pos) const { return double(pos) / m_sps >= m_duration; }
-	void setEof() { m_duration = double(m_pos) / m_sps; }
-	double duration() const { return m_duration; }
-	void setDuration(double seconds) { m_duration = seconds; }
-	bool wantSeek() {
-		// Are we already past the requested position? (need to seek backward or back to beginning)
-		return m_posReq > 0 && m_posReq + m_sps * 2 /* seconds tolerance */ + m_data.size() < m_pos;
-	}
-  private:
-	/// Handle waking up of input thread etc. whenever m_posReq is changed.
-	void wakeups() {
-		if (wantSeek()) reset();
-		else if (condition()) m_cond.notify_one();
-	}
-	bool wantMore() { return m_pos < m_posReq + m_data.capacity() / 2; }
-	/// Should the input stop waiting?
-	bool condition() { return m_quit.load() || wantMore() || wantSeek(); }
-	mutable mutex m_mutex;
-	std::condition_variable_any m_cond;
-	boost::circular_buffer<std::int16_t> m_data;
-	size_t m_pos = 0;
-	std::int64_t m_posReq = 0;
-	unsigned m_sps = 0;
-	double m_duration = getNaN();
-	std::atomic<bool> m_quit{ false };
-};
-
 // ffmpeg forward declarations
 extern "C" {
   struct AVCodecContext;
@@ -107,28 +65,31 @@ extern "C" {
   void sws_freeContext(struct SwsContext *);
 }
 
+class AudioBuffer;
+
 /// ffmpeg class
 class FFmpeg {
   public:
 	/// Decode file; if no rate is specified, decode video, otherwise decode audio.
-	FFmpeg(fs::path const& file, unsigned int rate = 0);
+	FFmpeg(fs::path const& file, AudioBuffer *audioBuffer = nullptr);
 	~FFmpeg();
 	void operator()(); ///< Thread runs here, don't call directly
+        void handleOneFrame();
+
 	unsigned width = 0; ///< width of video
 	unsigned height = 0; ///< height of video
 	/// queue for video
 	VideoFifo  videoQueue;
-	/// queue for audio
-	AudioBuffer  audioQueue;
-	/** Seek to the chosen time. Will block until the seek is done, if wait is true. **/
+	
+        /** Seek to the chosen time. Will block until the seek is done, if wait is true. **/
 	void seek(double time, bool wait = true);
 	/// duration
-	double duration() const;
+	double duration() const { return m_duration; }
 	bool terminating() { return m_quit_future.wait_for(0s) == std::future_status::ready; }
 
 	class eof_error: public std::exception {};
-  private:
 	void seek_internal();
+  private:
 	void open();
         struct Packet;
 	void decodePacket(Packet &);
@@ -140,12 +101,14 @@ class FFmpeg {
 	static void avcodec_free_context(AVCodecContext *avctx);
 
 	fs::path m_filename;
+        AudioBuffer *audioBuffer = nullptr;
 	unsigned int m_rate = 0;
 	std::promise<void> m_quit;
 	std::future<void> m_quit_future = m_quit.get_future();
 	std::atomic<double> m_seekTarget{ getNaN() };
 	double m_position = 0.0;
 	double m_duration = 0.0;
+        int64_t m_position_in_48k_frames = -1;
 	// libav-specific variables
 	int m_streamId = -1;
 	int m_mediaType;  // enum AVMediaType
@@ -156,5 +119,48 @@ class FFmpeg {
 	// Make sure the thread starts only after initializing everything else
 	std::future<void> m_thread;
 	static std::mutex s_avcodec_mutex; // Used for avcodec_open/close (which use some static crap and are thus not thread-safe)
+};
+
+class AudioBuffer {
+	typedef std::recursive_mutex mutex;
+  public:
+        using uFvec = std::unique_ptr<fvec_t, std::integral_constant<decltype(&del_fvec), &del_fvec>>;
+
+	AudioBuffer(fs::path const& file, unsigned int rate, size_t size = 4320256);
+        ~AudioBuffer();
+	
+	void quit();
+	/// get samples per second
+	unsigned getSamplesPerSecond() const { return m_sps; }
+	uFvec makePreviewBuffer();
+	void push(std::vector<std::int16_t> const& data, int64_t sample_position);
+	bool prepare(std::int64_t pos);
+	bool read(float* begin, size_t count, std::int64_t pos, float volume = 1.0f);
+	bool eof(std::int64_t pos) const { return double(pos) / m_sps >= m_duration; }
+        bool terminating();
+	double duration() const { return m_duration; }
+
+  private:
+	bool wantSeek();
+	bool wantMore();
+	/// Should the input stop waiting?
+	bool condition();
+
+	mutable mutex m_mutex;
+	std::condition_variable_any m_cond;
+	
+	std::vector<std::int16_t> m_data;
+	size_t m_write_pos = 0;
+	std::int64_t m_read_pos = 0;
+
+	const unsigned m_sps;
+
+        FFmpeg ffmpeg;
+	const double m_duration;
+
+        bool m_seek_asked { false };
+
+	bool m_quit{ false };
+	std::future<void> reader_thread;
 };
 
