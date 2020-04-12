@@ -22,7 +22,6 @@ extern "C" {
 #include AVUTIL_OPT_INCLUDE
 #include AVUTIL_MATH_INCLUDE
 #include AVUTIL_ERROR_INCLUDE
-#include </usr/include/ffmpeg/libavutil/timestamp.h>
 }
 
 #define AUDIO_CHANNELS 2
@@ -481,4 +480,3 @@ void FFmpeg::processAudio(uFrame frame) {
         m_position_in_48k_frames += out_samples;
 	m_position += frame->nb_samples * av_q2d(m_formatContext->streams[m_streamId]->time_base);
 }
-
