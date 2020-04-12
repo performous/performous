@@ -67,18 +67,16 @@ void VideoFifo::reset() {
 
 
 void AudioBuffer::quit() {
-	m_quit.store(true);
+	m_quit = true;
 	m_cond.notify_one();
 }
 
 AudioBuffer::uFvec AudioBuffer::makePreviewBuffer() {
         uFvec fvec;
 	{
-		std::unique_lock<mutex> l(m_mutex);
-                //m_cond.wait(l, [this]{ return !m_data.empty(); });
 		fvec.reset(new_fvec(m_data.size() / 2));
-		float previewVol = float(config["audio/preview_volume"].i()) / 100;
 		float previewVol = float(config["audio/preview_volume"].i()) / 100.0;
+		std::lock_guard<mutex> l(m_mutex);
 		for (size_t rpos = 0, bpos = 0; rpos < m_data.size(); rpos += 2, bpos ++) {
 			fvec->data[bpos] = (((da::conv_from_s16(m_data.at(rpos)) + da::conv_from_s16(m_data.at(rpos + 1))) / 2) / previewVol);
 		}
@@ -90,10 +88,6 @@ AudioBuffer::uFvec AudioBuffer::makePreviewBuffer() {
 bool AudioBuffer::terminating() {
     return ffmpeg.terminating();
 }
-/// Handle waking up of input thread etc. whenever m_read_pos is changed.
-void AudioBuffer::wakeups() {
-    m_cond.notify_all();
-}
 
 bool AudioBuffer::wantMore() {
   return m_write_pos < m_read_pos + m_data.size() / 2;
@@ -101,7 +95,7 @@ bool AudioBuffer::wantMore() {
 
 /// Should the input stop waiting?
 bool AudioBuffer::condition() {
-    return m_quit.load() || m_seek_asked || wantMore();
+    return m_quit || m_seek_asked || wantMore();
 }
 
 void AudioBuffer::push(std::vector<std::int16_t> const& data, int64_t sample_position) {
@@ -109,8 +103,13 @@ void AudioBuffer::push(std::vector<std::int16_t> const& data, int64_t sample_pos
                std::clog << "ffmpeg/warning: Negative audio sample_position " << sample_position << " seconds, frame ignored." << std::endl;
                return;
        }
-
+       
 	std::unique_lock<mutex> l(m_mutex);
+       if (sample_position <  m_read_pos) {
+           // frame to be dropped as being before read... arrived too last or due to a seek.
+           return;
+       }
+
 	m_cond.wait(l, [this]{ return  condition(); });
 	if (m_quit || m_seek_asked) return;
 	
@@ -129,26 +128,20 @@ void AudioBuffer::push(std::vector<std::int16_t> const& data, int64_t sample_pos
 }
 
 bool AudioBuffer::prepare(std::int64_t pos) {
-#if 0
+	if (pos < 0) pos = 0;
 	std::unique_lock<mutex> l(m_mutex, std::try_to_lock);
 	if (!l.owns_lock()) return false;  // Didn't get lock, give up for now
 	if (eof(pos)) return true;
-	if (pos < 0) pos = 0;
 	m_read_pos = pos;
-	wakeups();
+	m_cond.notify_all();
 	// Has enough been prebuffered already and is the requested position still within buffer
 	return m_write_pos > m_read_pos + m_data.size() / 16 && m_write_pos <= m_read_pos + m_data.size();
-#else
-return true;
-#endif
-
 }
 
 // pos may be negative because upper layer may request 'extra time' before
 // starting the play back. In this case, the buffer is filled of zero.
 //
 bool AudioBuffer::read(float* begin, size_t samples, std::int64_t pos, float volume) {
-       std::clog << "ffmpeg/warning: " << this <<" read @ " << pos  << " m_write_pos=" << m_write_pos << " posreq=" << m_read_pos << std::endl;
        if (eof(pos))
            return false;
 
@@ -186,13 +179,13 @@ bool AudioBuffer::read(float* begin, size_t samples, std::int64_t pos, float vol
         }
 
 	m_read_pos = pos + samples;
-	wakeups();
+	m_cond.notify_all();
 	return true;
 }
 
-AudioBuffer::AudioBuffer(fs::path const& file, unsigned int rate, size_t size): m_sps(rate * AUDIO_CHANNELS), m_data(size), ffmpeg(file, this) {
-    setDuration(ffmpeg.duration());
-    reader_thread = std::async(std::launch::async, [this] { 
+AudioBuffer::AudioBuffer(fs::path const& file, unsigned int rate, size_t size):
+          m_data(size), m_sps(rate * AUDIO_CHANNELS), ffmpeg(file, this), m_duration(ffmpeg.duration()) {
+                  reader_thread = std::async(std::launch::async, [this] { 
             std::unique_lock<mutex> l(m_mutex);
             while (!m_quit) {
                  try {
@@ -221,6 +214,7 @@ AudioBuffer::AudioBuffer(fs::path const& file, unsigned int rate, size_t size): 
              }
     });
 }
+
 AudioBuffer::~AudioBuffer() {
     {
 	std::unique_lock<mutex> l(m_mutex);
@@ -387,7 +381,6 @@ void FFmpeg::handleOneFrame() {
 void FFmpeg::operator()() {
 	int errors = 0;
 	bool eof = false;
-	std::clog << "audio/debug: FFmpeg processing " << m_filename.filename().string() << std::endl;
 	while (!terminating() && !eof) {
 		try {
 			handleOneFrame();
@@ -419,21 +412,6 @@ void FFmpeg::seek_internal() {
 }
 
 void FFmpeg::decodePacket(Packet &pkt) {
-
-    if (pkt.stream_index > 1) {
-        AVRational *time_base = &m_formatContext->streams[pkt.stream_index]->time_base;
-        char p1[AV_TS_MAX_STRING_SIZE];
-        char p2[AV_TS_MAX_STRING_SIZE];
-        char p3[AV_TS_MAX_STRING_SIZE];
-        char p4[AV_TS_MAX_STRING_SIZE];
-        char p5[AV_TS_MAX_STRING_SIZE];
-        char p6[AV_TS_MAX_STRING_SIZE];
-        printf("pts:%s pts_time:%s dts:%s dts_time:%s duration:%s duration_time:%s stream_index:%d % s\n",
-                av_ts_make_string(p1, pkt.pts), av_ts_make_time_string(p6, pkt.pts, time_base),
-                av_ts_make_string(p2, pkt.dts), av_ts_make_time_string(p4, pkt.dts, time_base),
-                av_ts_make_string(p3, pkt.duration), av_ts_make_time_string(p5, pkt.duration, time_base),
-                pkt.stream_index, m_filename.c_str());
-    }
 	auto ret = avcodec_send_packet(m_codecContext.get(), &pkt);
 	if(ret == AVERROR_EOF) {
 		// End of file: no more data to read.
@@ -488,16 +466,14 @@ void FFmpeg::processVideo(uFrame frame) {
 void FFmpeg::processAudio(uFrame frame) {
 	// resample to output
 	int16_t *output;
-	int out_linesize;
 	int out_samples = swr_get_out_samples(m_resampleContext.get(), frame->nb_samples);
-	av_samples_alloc((uint8_t**)&output, &out_linesize, AUDIO_CHANNELS, out_samples,
+	av_samples_alloc((uint8_t**)&output, nullptr, AUDIO_CHANNELS, out_samples,
 		AV_SAMPLE_FMT_S16, 0);
 	out_samples = swr_convert(m_resampleContext.get(), (uint8_t**)&output, out_samples,
 		(const uint8_t**)&frame->data[0], frame->nb_samples);
 	// The output is now an interleaved array of 16-bit samples
 	std::vector<int16_t> m_output(output, output+out_samples*AUDIO_CHANNELS);
         if (m_position_in_48k_frames == -1) {
-            std::clog << "audio/debug: =======================================================================  reseting" << std::endl;
                 m_position_in_48k_frames = m_position * m_rate + 0.5;
         }
 	audioBuffer->push(m_output, m_position_in_48k_frames * AUDIO_CHANNELS /* pass in samples */);

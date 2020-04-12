@@ -128,8 +128,7 @@ class AudioBuffer {
 
 	AudioBuffer(fs::path const& file, unsigned int rate, size_t size = 4320256);
         ~AudioBuffer();
-	/// Reset from FFMPEG side (seeking to beginning or terminate stream)
-	void reset();
+	
 	void quit();
 	/// get samples per second
 	unsigned getSamplesPerSecond() const { return m_sps; }
@@ -138,28 +137,30 @@ class AudioBuffer {
 	bool prepare(std::int64_t pos);
 	bool read(float* begin, size_t count, std::int64_t pos, float volume = 1.0f);
 	bool eof(std::int64_t pos) const { return double(pos) / m_sps >= m_duration; }
-	void setEof() { m_duration = double(m_write_pos) / m_sps; }
-	double duration() const { return m_duration; }
-	void setDuration(double seconds) { m_duration = seconds; }
-	bool wantSeek();
         bool terminating();
+	double duration() const { return m_duration; }
+
   private:
-	/// Handle waking up of input thread etc. whenever m_posReq is changed.
-	void wakeups();
+	bool wantSeek();
 	bool wantMore();
 	/// Should the input stop waiting?
 	bool condition();
 
 	mutable mutex m_mutex;
 	std::condition_variable_any m_cond;
-	unsigned m_sps = 0;
+	
 	std::vector<std::int16_t> m_data;
 	size_t m_write_pos = 0;
 	std::int64_t m_read_pos = 0;
+
+	const unsigned m_sps;
+
+        FFmpeg ffmpeg;
+	const double m_duration;
+
         bool m_seek_asked { false };
-	double m_duration = getNaN();
-	std::atomic<bool> m_quit{ false };
-	FFmpeg ffmpeg;
+
+	bool m_quit{ false };
 	std::future<void> reader_thread;
 };
 
