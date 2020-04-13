@@ -118,9 +118,12 @@ private:
 	std::unique_ptr<FBO> m_fbo;
 	int m_windowX = 0;
 	int m_windowY = 0;
+	std::unique_ptr<SDL_Window, void (*)(SDL_Window*)> screen;
+	std::unique_ptr<std::remove_pointer_t<SDL_GLContext> /* SDL_GLContext is a void* */, void (*)(SDL_GLContext)> glContext;
 	using ShaderMap = std::map<std::string, std::unique_ptr<Shader>>;
+	// Careful, Shaders depends on SDL_Window, thus m_shaders need to be
+	// destroyed before screen (and thus be creater after)
 	ShaderMap m_shaders; ///< Shader programs by name
-	SDL_Window* screen = nullptr;
 	public:
 	FBO& getFBO();
 };
