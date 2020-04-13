@@ -46,6 +46,7 @@ blocks:
       secrets:
         - name: macos-ci-pubkey
         - name: check-deps-script
+        - name: ignore-ci-homebrew
       prologue:
         commands:
           - echo Trying to restore cache...
@@ -62,6 +63,7 @@ blocks:
           commands:
             - checkout
             - git submodule init && git submodule update
+            - patch --verbose -ui /Users/semaphore/patch-cmake-ignore-CI-homebrew.patch
             - cd osx-utils
             - chmod +x ./performous-app-build.sh
             - ./performous-app-build.sh -D
