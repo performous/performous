@@ -7,6 +7,10 @@ cmake_minimum_required(VERSION 2.8)
 
 file(GLOB _languages *.po)
 set(_mofiles)
+
+set(LANGUAGE_DIRS)
+set(LC_MESSAGES_DIRS)
+
 foreach(_pofile ${_languages})
 	get_filename_component(_language ${_pofile} NAME_WE)
 	set(_mofile ${CMAKE_CURRENT_BINARY_DIR}/${_language}.mo)
@@ -17,7 +21,8 @@ foreach(_pofile ${_languages})
 		COMMENT "Building ${_language} locale"
 		VERBATIM)
 	install(FILES ${_mofile} DESTINATION ${LOCALE_DIR}/${_language}/LC_MESSAGES RENAME ${CMAKE_PROJECT_NAME}.mo)
-	set(_mofiles ${_mofiles} ${_mofile})
+	set(LANGUAGE_DIRS ${LANGUAGE_DIRS} ${LOCALE_DIR}/${_language})
+	set(LC_MESSAGES_DIRS ${LC_MESSAGES_DIRS} ${LOCALE_DIR}/${_language}/LC_MESSAGES)
 endforeach()
 
 add_custom_target(translations ALL DEPENDS ${_mofiles})
