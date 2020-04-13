@@ -168,6 +168,8 @@ Shader& Shader::link() {
 		throw std::runtime_error("Something went wrong linking the shader program.");
 	}
 	ec.check("glLinkProgram");
+	for (ShaderObjects::const_iterator it = shader_ids.begin(); it != shader_ids.end(); ++it)
+		glDetachShader(program, *it);
 
 	return *this;
 }
