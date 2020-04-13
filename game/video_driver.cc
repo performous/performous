@@ -64,19 +64,19 @@ Window::Window() {
 	SDL_JoystickEventState(SDL_ENABLE);
 	{ // Setup GL attributes for context creation
 		SDL_SetHintWithPriority("SDL_HINT_VIDEO_HIGHDPI_DISABLED", "0", SDL_HINT_DEFAULT);
-		GLattrSetter attr_r(SDL_GL_RED_SIZE, 8);
-		GLattrSetter attr_g(SDL_GL_GREEN_SIZE, 8);
-		GLattrSetter attr_b(SDL_GL_BLUE_SIZE, 8);
-		GLattrSetter attr_a(SDL_GL_ALPHA_SIZE, 8);
-		GLattrSetter attr_buf(SDL_GL_BUFFER_SIZE, 32);
-		GLattrSetter attr_d(SDL_GL_DEPTH_SIZE, 24);
-		GLattrSetter attr_db(SDL_GL_DOUBLEBUFFER, 1);
-		GLattrSetter attr_glmaj(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-		GLattrSetter attr_glmin(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-		GLattrSetter attr_glprof(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-		auto flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL;
-		if (config["graphic/highdpi"].b()) { flags |= SDL_WINDOW_ALLOW_HIGHDPI; }
-		else { SDL_SetHintWithPriority("SDL_HINT_VIDEO_HIGHDPI_DISABLED", "1", SDL_HINT_OVERRIDE); }
+		GLattrSetter attr_r(SDL_GLattr::SDL_GL_RED_SIZE, 8);
+		GLattrSetter attr_g(SDL_GLattr::SDL_GL_GREEN_SIZE, 8);
+		GLattrSetter attr_b(SDL_GLattr::SDL_GL_BLUE_SIZE, 8);
+		GLattrSetter attr_a(SDL_GLattr::SDL_GL_ALPHA_SIZE, 8);
+		GLattrSetter attr_buf(SDL_GLattr::SDL_GL_BUFFER_SIZE, 32);
+		GLattrSetter attr_d(SDL_GLattr::SDL_GL_DEPTH_SIZE, 24);
+		GLattrSetter attr_db(SDL_GLattr::SDL_GL_DOUBLEBUFFER, 1);
+		GLattrSetter attr_glmaj(SDL_GLattr::SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+		GLattrSetter attr_glmin(SDL_GLattr::SDL_GL_CONTEXT_MINOR_VERSION, 3);
+		GLattrSetter attr_glprof(SDL_GLattr::SDL_GL_CONTEXT_PROFILE_MASK, SDL_GLprofile::SDL_GL_CONTEXT_PROFILE_CORE);
+		auto flags = SDL_WindowFlags::SDL_WINDOW_HIDDEN | SDL_WindowFlags::SDL_WINDOW_RESIZABLE | SDL_WindowFlags::SDL_WINDOW_OPENGL;
+		if (config["graphic/highdpi"].b()) { flags |= SDL_WindowFlags::SDL_WINDOW_ALLOW_HIGHDPI; }
+		else { SDL_SetHintWithPriority("SDL_HINT_VIDEO_HIGHDPI_DISABLED", "1", SDL_HintPriority::SDL_HINT_OVERRIDE); }
 		int width = config["graphic/window_width"].i();
 		int height = config["graphic/window_height"].i();
 		int windowPosX = config["graphic/window_pos_x"].i();
@@ -112,7 +112,7 @@ Window::Window() {
 			}
 		}
 		SDL_Point winOrigin {windowPosX, windowPosY};
-		if (SDL_PointInRect(&winOrigin, &totalSize) == SDL_FALSE) {
+		if (SDL_PointInRect(&winOrigin, &totalSize) == SDL_bool::SDL_FALSE) {
 			if (winOrigin.x < totalSize.x) { winOrigin.x = totalSize.x; }
 			else if (winOrigin.x > totalSize.w) { winOrigin.x = (totalSize.w - width); }
 			if (winOrigin.y < totalSize.y) { winOrigin.y = totalSize.y; }
@@ -120,7 +120,7 @@ Window::Window() {
 			std::clog << "video/info: Saved window position outside of current display set-up; resetting to " << winOrigin.x << "," << winOrigin.y << std::endl;
 		}
 		SDL_Point winEnd {(winOrigin.x + width), (winOrigin.y + height)};
-		if (SDL_PointInRect(&winEnd, &totalSize) == SDL_FALSE) {
+		if (SDL_PointInRect(&winEnd, &totalSize) == SDL_bool::SDL_FALSE) {
 			if (winEnd.x > totalSize.w) {
 			width = totalSize.w;
 			winOrigin.x = (totalSize.w - width);
@@ -394,26 +394,26 @@ void Window::swap() {
 
 void Window::event(Uint8 const& eventID, Sint32 const& data1, Sint32 const& data2) {
 	switch (eventID) {
-		case SDL_WINDOWEVENT_MOVED:
+	    case SDL_WindowEventID::SDL_WINDOWEVENT_MOVED:
 			setWindowPosition(data1, data2);
 			break;
-		case SDL_WINDOWEVENT_MAXIMIZED:
-			if (Platform::currentOS() == Platform::macos) {
+		case SDL_WindowEventID::SDL_WINDOWEVENT_MAXIMIZED:
+			if (Platform::currentOS() == Platform::platforms::macos) {
 				config["graphic/fullscreen"].b() = true;
 				}
 			else { m_needResize = true; }
 			break;	
-		case SDL_WINDOWEVENT_RESTORED:
-			if (Platform::currentOS() == Platform::macos) {
+		case SDL_WindowEventID::SDL_WINDOWEVENT_RESTORED:
+			if (Platform::currentOS() == Platform::platforms::macos) {
 				config["graphic/fullscreen"].b() = false;
 				}
 			else { m_needResize = true; }
 			break;	
-		case SDL_WINDOWEVENT_SHOWN:
+		case SDL_WindowEventID::SDL_WINDOWEVENT_SHOWN:
 			[[fallthrough]];
-		case SDL_WINDOWEVENT_SIZE_CHANGED:
+		case SDL_WindowEventID::SDL_WINDOWEVENT_SIZE_CHANGED:
 			[[fallthrough]];
-		case SDL_WINDOWEVENT_RESIZED:
+		case SDL_WindowEventID::SDL_WINDOWEVENT_RESIZED:
 			m_needResize = true;
 			break;
 		default: break;
@@ -435,7 +435,7 @@ void Window::setFullscreen() {
 	if (m_fullscreen == config["graphic/fullscreen"].b()) return;  // We are done here
 	m_fullscreen = config["graphic/fullscreen"].b();
 	std::clog << "video/info: Toggle into " << (m_fullscreen ? "FULL SCREEN MODE" : "WINDOWED MODE") << std::endl;
-	auto ret = SDL_SetWindowFullscreen(screen, (m_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0 ));
+	auto ret = SDL_SetWindowFullscreen(screen, (m_fullscreen ? SDL_WindowFlags::SDL_WINDOW_FULLSCREEN_DESKTOP : 0 ));
 	if (ret < 0) std::clog << "video/error: SDL_SetWindowFullscreen returned " << ret << std::endl;
 	// Resize window to old size and position (if windowed now)
 	if (!m_fullscreen) {
@@ -494,7 +494,7 @@ void Window::screenshot() {
 	img.height = nativeH;
 	unsigned stride = (img.width * 3 + 3) & ~3;  // Rows are aligned to 4 byte boundaries
 	img.buf.resize(stride * img.height);
-	img.fmt = pix::RGB;
+	img.fmt = pix::Format::RGB;
 	img.linearPremul = true; // Not really, but this will use correct gamma.
 	img.bottomFirst = true;
 	// Get pixel data from OpenGL

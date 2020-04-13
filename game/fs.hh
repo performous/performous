@@ -20,10 +20,6 @@ void pathBootstrap();
 /// - Logging and config must be running before pathInit (pathInit is first called from configuration.cc).
 void pathInit();
 
-/// Test if a path begins with name and if so, remove that element and return true
-/// Mostly a workaround for fs::path's crippled API that makes this operation difficult
-bool pathRootHack(fs::path& p, std::string const& name);
-
 fs::path execname(); ///< Get the path and filename of the main executable.
 fs::path getLogFilename();  ///< Get the log filename.
 fs::path getSchemaFilename();  ///< Get the config schema filename.
@@ -36,12 +32,6 @@ fs::path getShareDir();  ///< Get Performous system-level data folder.
 fs::path getLocaleDir();  ///< Get the system local folder.
 
 typedef std::list<fs::path> Paths;
-
-struct pathCache {
-	Paths pathExpand(fs::path p);
-	void pathBootstrap();
-	void pathInit();
-};
 
 fs::path findFile(fs::path const& filename);  ///< Look for the specified file in theme and data folders.
 

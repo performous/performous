@@ -12,8 +12,8 @@
 #include <vector>
 
 namespace input {
-	enum SourceType { SOURCETYPE_NONE, SOURCETYPE_JOYSTICK, SOURCETYPE_MIDI, SOURCETYPE_KEYBOARD, SOURCETYPE_N };
-	enum DevType { DEVTYPE_GENERIC, DEVTYPE_VOCALS, DEVTYPE_GUITAR, DEVTYPE_DRUMS, DEVTYPE_KEYTAR, DEVTYPE_PIANO, DEVTYPE_DANCEPAD, DEVTYPE_N };
+	enum class SourceType { SOURCETYPE_NONE, SOURCETYPE_JOYSTICK, SOURCETYPE_MIDI, SOURCETYPE_KEYBOARD, SOURCETYPE_N };
+	enum class DevType { DEVTYPE_GENERIC, DEVTYPE_VOCALS, DEVTYPE_GUITAR, DEVTYPE_DRUMS, DEVTYPE_KEYTAR, DEVTYPE_PIANO, DEVTYPE_DANCEPAD, DEVTYPE_N };
 	/// Generalized mapping of navigation actions
 	enum NavButton {
 		NAV_NONE /* No NavEvent emitted */, NAV_SOME /* Major gameplay button with no direct nav function, used for joining instruments */,
@@ -32,7 +32,7 @@ namespace input {
 
 	struct Button {
 		ButtonId id;
-		Button(ButtonId id = GENERIC_UNASSIGNED): id(id) {}
+		Button(ButtonId id = ButtonId::GENERIC_UNASSIGNED): id(id) {}
 		Button(unsigned layer, unsigned num): id(ButtonId(layer << 8 | num)) {}
 		operator ButtonId() const { return id; }
 		unsigned layer() const { return id >> 8; }
@@ -46,13 +46,13 @@ namespace input {
 	
 	/// Each controller has unique SourceId that can be used for telling players apart etc.
 	struct SourceId {
-		SourceId(SourceType type = SOURCETYPE_NONE, unsigned device = 0, unsigned channel = 0): type(type), device(device), channel(channel) {
+		SourceId(SourceType type = SourceType::SOURCETYPE_NONE, unsigned device = 0, unsigned channel = 0): type(type), device(device), channel(channel) {
 		}
 		SourceType type;
-		unsigned device, channel;  ///< Device number and channel (0..1023)
+		unsigned device, channel; ///< Device number and channel (0..1023)
 		/// Provide numeric conversion for comparison and ordered containers
 		operator unsigned() const { return unsigned(type)<<20 | device<<10 | channel; }
-		bool isKeyboard() const { return type == SOURCETYPE_KEYBOARD; }  ///< This is so common test that a helper is provided
+		bool isKeyboard() const { return type == SourceType::SOURCETYPE_KEYBOARD; }  ///< This is so common test that a helper is provided
 	};
 	
 	struct Event {
@@ -63,7 +63,7 @@ namespace input {
 		double value; ///< Zero for button release, up to 1.0 for press (e.g. velocity value), or axis value (-1.0 .. 1.0)
 		Time time; ///< When did the event occur
 		DevType devType; ///< Device type
-		Event(): source(), hw(), nav(NAV_NONE), value(), time(), devType() {}
+		Event(): source(), hw(), nav(NavButton::NAV_NONE), value(), time(), devType() {}
 		bool pressed() const { return value != 0.0; }
 	};
 

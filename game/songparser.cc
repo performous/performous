@@ -41,7 +41,7 @@ namespace SongParserUtil {
 
 SongParser::SongParser(Song& s): m_song(s) {
 	try {
-		enum { NONE, TXT, XML, INI, SM } type = NONE;
+		enum class Type { NONE, TXT, XML, INI, SM } type = Type::NONE;
 		// Read the file, determine the type and do some initial validation checks
 		fs::ifstream f (s.filename, std::ios::binary);
 		if (!f.is_open()) {
@@ -54,15 +54,15 @@ SongParser::SongParser(Song& s): m_song(s) {
 		}
 		// Convert m_ss; filename supplied for possible warning messages
 		if (xmlCheck (m_ss.str())) {
-			type = XML;	// XMLPP should deal with encoding so we don't have to.
+			type = Type::XML;	// XMLPP should deal with encoding so we don't have to.
 		}
 		else {
 			UnicodeUtil::convertToUTF8(m_ss, s.filename.string());
-			if (smCheck (m_ss.str())) {type = SM; } else if (txtCheck (m_ss.str())) {
-				type = TXT;
+			if (smCheck (m_ss.str())) {type = Type::SM; } else if (txtCheck (m_ss.str())) {
+				type = Type::TXT;
 			}
 			else if (iniCheck (m_ss.str())) {
-				type = INI;
+				type = Type::INI;
 			}
 			else { 
 				throw SongParserException (s, "Does not look like a song file (wrong header)", 1, true);
@@ -75,25 +75,25 @@ SongParser::SongParser(Song& s): m_song(s) {
 				s.m_bpms.clear();
 				addBPM(0, bpm);
 			}
-			if (type == TXT) txtParse();
-			else if (type == INI) midParse();  // INI doesn't contain notes, parse those from MIDI
-			else if (type == XML) xmlParse();
-			else if (type == SM) smParse();
+			if (type == Type::TXT) txtParse();
+			else if (type == Type::INI) midParse();  // INI doesn't contain notes, parse those from MIDI
+			else if (type == Type::XML) xmlParse();
+			else if (type == Type::SM) smParse();
 			finalize();  // Do some adjusting to the notes
 			s.loadStatus = Song::LoadStatus::FULL;
 			return;
 		}
 		// Parse only header to speed up loading and conserve memory
-		if (type == TXT) txtParseHeader();
-		else if (type == INI) iniParseHeader();
-		else if (type == XML) xmlParseHeader();
-		else if (type == SM) {
+		if (type == Type::TXT) txtParseHeader();
+		else if (type == Type::INI) iniParseHeader();
+		else if (type == Type::XML) xmlParseHeader();
+		else if (type == Type::SM) {
 			smParseHeader(); s.dropNotes();  // Hack: drop notes here (load again when playing the song)
 		}
 
 		// Default for preview position if none was specified in header
 		if (std::isnan(s.preview_start)) {
-			s.preview_start = ((type == INI || s.getDurationSeconds() < 50.0) ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
+			s.preview_start = ((type == Type::INI || s.getDurationSeconds() < 50.0) ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
 		}
 		guessFiles();
 		if (!m_song.midifilename.empty()) {midParseHeader(); }
@@ -226,10 +226,10 @@ void SongParser::finalize () {
 		VocalTrack& vocal = nt.second;
 		// Remove empty sentences
 		{
-			Note::Type lastType = Note::NORMAL;
+			Note::Type lastType = Note::Type::NORMAL;
 			std::clog << "songparser/debug: In " << m_song.artist << " - " << m_song.title << std::endl;
 			for (auto itn = vocal.notes.begin(); itn != vocal.notes.end();) {
-				if (itn->type == Note::SLEEP) { itn->end = itn->begin; ++itn; continue; }
+				if (itn->type == Note::Type::SLEEP) { itn->end = itn->begin; ++itn; continue; }
 				auto next = (itn +1);
 				
 				// Try to fix overlapping syllables.
@@ -240,7 +240,7 @@ void SongParser::finalize () {
 					std::clog << "songparser/info: Changing ending to: " << newEnd << ", will give a length of: " << (newEnd - (itn->begin)) << std::endl;
 					if ((newEnd - itn->begin) >= beatDur) {
 						itn->end = newEnd;
-					} else if (next->type != Note::SLEEP) {
+					} else if (next->type != Note::Type::SLEEP) {
 						std::clog << "songparser/info: Resulting note would be too short, will combine them instead." << std::endl;
 						itn->syllable += std::string("-") += next->syllable;
 						itn->end = next->end;
@@ -250,7 +250,7 @@ void SongParser::finalize () {
 					}
 				}
 				Note::Type type = itn->type;
-				if(type == Note::SLEEP && lastType == Note::SLEEP) {
+				if(type == Note::Type::SLEEP && lastType == Note::Type::SLEEP) {
 					std::clog << "songparser/info: " + m_song.filename.string() + ": Discarding empty sentence" << std::endl;
 					itn = vocal.notes.erase(itn);
 				} else {

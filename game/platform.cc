@@ -2,16 +2,16 @@
 #include "fs.hh"
 
 Platform::platforms Platform::currentOS() {
-if (BOOST_OS_WINDOWS != 0) { return windows; }
-else if (BOOST_OS_LINUX != 0) { return linux; }
-else if (BOOST_OS_MACOS != 0) { return macos; }
-else if (BOOST_OS_BSD != 0) { return bsd; }
-else if (BOOST_OS_SOLARIS != 0) { return solaris; }
-else if (BOOST_OS_UNIX != 0) { return unix; }
+if (BOOST_OS_WINDOWS != 0) { return platforms::windows; }
+else if (BOOST_OS_LINUX != 0) { return platforms::linux; }
+else if (BOOST_OS_MACOS != 0) { return platforms::macos; }
+else if (BOOST_OS_BSD != 0) { return platforms::bsd; }
+else if (BOOST_OS_SOLARIS != 0) { return platforms::solaris; }
+else if (BOOST_OS_UNIX != 0) { return platforms::unix; }
 }
 
 uint16_t Platform::shortcutModifier(bool eitherSide) {
-	if (currentOS() == macos) { return eitherSide ? KMOD_GUI : KMOD_LGUI; }
+	if (currentOS() == platforms::macos) { return eitherSide ? KMOD_GUI : KMOD_LGUI; }
 	else { return eitherSide ? KMOD_CTRL : KMOD_LCTRL; }
 }
 
@@ -25,12 +25,12 @@ const std::array<const char*,6> Platform::platformNames = {{ "Windows", "Linux",
 
 int Platform::defaultBackEnd() {
 		switch (Platform::currentOS()) {
-			case windows: return 13; // WASAPI
-			case macos: return 5; // CoreAudio
-			case solaris: return 7; // OSS
-			case bsd: return 7; // OSS
-			case linux: return 8; // ALSA
-			case unix: return 8; // ALSA
+			case platforms::windows: return 13; // WASAPI
+			case platforms::macos: return 5; // CoreAudio
+			case platforms::solaris: return 7; // OSS
+			case platforms::bsd: return 7; // OSS
+			case platforms::linux: return 8; // ALSA
+			case platforms::unix: return 8; // ALSA
 			default: break;
 		}
 	throw std::runtime_error("Unable to determine a default Audio backend.");

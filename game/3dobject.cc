@@ -50,7 +50,7 @@ void Object3d::loadWavefrontObj(fs::path const& filepath, float scale) {
 			texcoords.push_back(glmath::vec2(x, y));
 		} else if (row.substr(0,2) == "vn") {  // Normals
 			srow >> tempst >> x >> y >> z;
-			double sum = std::abs(x)+std::abs(y)+std::abs(z);
+			auto sum = std::abs(x)+std::abs(y)+std::abs(z);
 			if (sum == 0) throw std::runtime_error("Invalid normal in "+filepath.string()+":"+std::to_string(linenumber));
 			x /= sum; y /= sum; z /= sum; // Normalize components
 			normals.push_back(glmath::vec3(x, y, z));

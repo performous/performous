@@ -24,7 +24,7 @@
 #include <cpprest/json.h>
 #endif
 
-Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), m_database(database), m_order(config["songs/sort-order"].i()) {
+Songs::Songs(std::string const& songlist): m_songlist(songlist), m_order(config["songs/sort-order"].i()) {
 	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
 	reload();
 }
