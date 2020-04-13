@@ -162,6 +162,11 @@ Shader& Shader::link() {
 
 	// Link and check status
 	glLinkProgram(program);
+
+	// always detach shaders, linked or not, they need to be detached
+	for (auto id : shader_ids)
+		glDetachShader(program, id);
+
 	glGetProgramiv(program, GL_LINK_STATUS, &gl_response);
 	dumpInfoLog(program);
 	if (gl_response != GL_TRUE) {
