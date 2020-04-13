@@ -161,7 +161,7 @@ bool Music::operator()(float* begin, float* end) {
 // 			// Otherwise just get the audio and mix it straight away
 // 			} else
 // #endif
-		if (t.mpeg.audioQueue(mixbuf.data(), mixbuf.size(), m_pos, t.fadeLevel)) eof = false;
+		if (t.audioBuffer.read(mixbuf.data(), mixbuf.size(), m_pos, t.fadeLevel)) eof = false;
 		
 	}
 	m_pos += samples;
@@ -188,18 +188,18 @@ bool Music::operator()(float* begin, float* end) {
 
 double Music::duration() const {
 	double dur = 0.0;
-	for (auto& kv: tracks) dur = std::max(dur, kv.second->mpeg.audioQueue.duration());
+	for (auto& kv: tracks) dur = std::max(dur, kv.second->audioBuffer.duration());
 	return dur;
 }
 
 bool Music::prepare() {
 	bool ready = true;
 	for (auto& kv: tracks) {
-		FFmpeg& mpeg = kv.second->mpeg;
-		if (mpeg.terminating()) continue;  // Song loading failed or other error, won't ever get ready
-		if (mpeg.audioQueue.prepare(m_pos)) {
+		auto& audioBuffer = kv.second->audioBuffer;
+		if (audioBuffer.terminating()) continue;  // Song loading failed or other error, won't ever get ready
+		if (audioBuffer.prepare(m_pos)) {
 			if (kv.first == "background" && m_preview && m_pos > 0) {
-				auto previewSamples = mpeg.audioQueue.makePreviewBuffer();
+				auto previewSamples = audioBuffer.makePreviewBuffer();
 				fvec_t* previewBeats = ScreenSongs::previewBeatsBuffer.get();
 				intptr_t readptr = 0;
 				fvec_t* tempoSamplePtr = new_fvec(Audio::aubio_hop_size);
@@ -258,17 +258,17 @@ void Music::trackPitchBend(std::string const& name, double pitchFactor) {
 struct Sample {
   private:
 	double m_pos;
-	FFmpeg mpeg;
+	AudioBuffer audioBuffer;
 	bool eof;
   public:
-	Sample(fs::path const& filename, unsigned sr) : m_pos(), mpeg(filename, sr), eof(true) { }
+	Sample(fs::path const& filename, unsigned sr) : m_pos(), audioBuffer(filename, sr), eof(true) { }
 	void operator()(float* begin, float* end) {
 		if(eof) {
 			// No more data to play in this sample
 			return;
 		}
 		std::vector<float> mixbuf(end - begin);
-		if(!mpeg.audioQueue(mixbuf.data(), mixbuf.size(), m_pos, 1.0)) {
+		if(!audioBuffer.read(mixbuf.data(), mixbuf.size(), m_pos, 1.0)) {
 			eof = true;
 		}
 		for (size_t i = 0, iend = end - begin; i != iend; ++i) {
