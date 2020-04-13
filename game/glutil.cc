@@ -24,6 +24,8 @@ namespace glutil {
 
 	void VertexArray::clear() {
 		m_vertices.clear();
+		glDeleteVertexArrays(1, &m_vao);
+		glDeleteBuffers(1, &m_vbo);
 	}
 
 	void VertexArray::draw(GLint mode) {
