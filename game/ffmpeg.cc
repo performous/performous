@@ -64,78 +64,171 @@ void VideoFifo::reset() {
 	m_eof = false;
 }
 
-void AudioBuffer::reset() {
-	{
-		std::unique_lock<mutex> l(m_mutex);
-		m_data.clear();
-		m_pos = 0;
-	}
-	m_cond.notify_one();
-}
 
 void AudioBuffer::quit() {
-	m_quit.store(true);
+	m_quit = true;
 	m_cond.notify_one();
 }
 
 AudioBuffer::uFvec AudioBuffer::makePreviewBuffer() {
-        uFvec fvec;
+        uFvec fvec(new_fvec(m_data.size() / 2));
+        float previewVol = float(config["audio/preview_volume"].i()) / 100.0;
 	{
-		std::unique_lock<mutex> l(m_mutex);
-		fvec.reset(new_fvec(m_data.size() / 2));
-		float previewVol = float(config["audio/preview_volume"].i()) / 100.0;
+		std::lock_guard<mutex> l(m_mutex);
 		for (size_t rpos = 0, bpos = 0; rpos < m_data.size(); rpos += 2, bpos ++) {
-			fvec->data[bpos] = (((da::conv_from_s16(m_data[rpos]) + da::conv_from_s16(m_data[rpos + 1])) / 2) / previewVol);
+			fvec->data[bpos] = (((da::conv_from_s16(m_data.at(rpos)) + da::conv_from_s16(m_data.at(rpos + 1))) / 2) / previewVol);
 		}
 	}
 	m_cond.notify_one();
 	return fvec;
 };
 
-void AudioBuffer::push(std::vector<std::int16_t> const& data, double timestamp) {
-	std::unique_lock<mutex> l(m_mutex);
-	m_cond.wait(l, [this]{ return condition(); });
-	if (m_quit) return;
-	if (timestamp < 0.0) {
-		std::clog << "ffmpeg/warning: Negative audio timestamp " << timestamp << " seconds, frame ignored." << std::endl;
-		return;
-	}
-	// Insert silence at the beginning if the stream starts later than 0.0
-	if (m_pos == 0 && timestamp >= 0.0) {
-		m_pos = std::round(float(timestamp * getSamplesPerSecond()));
-		if (m_pos % 2 == 1) { m_pos++; timestamp = float(m_pos) / getSamplesPerSecond(); }
-		m_data.resize(m_pos, 0);
-	}
-	m_data.insert(m_data.end(), data.begin(), data.end());
-	m_pos += data.size();
+bool AudioBuffer::terminating() {
+    return ffmpeg.terminating();
+}
+
+bool AudioBuffer::wantMore() {
+  return m_write_pos < m_read_pos + m_data.size() / 2;
+}
+
+/// Should the input stop waiting?
+bool AudioBuffer::condition() {
+    return m_quit || m_seek_asked || wantMore();
+}
+
+void AudioBuffer::push(std::vector<std::int16_t> const& data, int64_t sample_position) {
+       if (sample_position < 0) {
+               std::clog << "ffmpeg/warning: Negative audio sample_position " << sample_position << " seconds, frame ignored." << std::endl;
+               return;
+       }
+       
+       std::unique_lock<mutex> l(m_mutex);
+       if (sample_position < m_read_pos) {
+           // frame to be dropped as being before read... arrived too last or due to a seek.
+           return;
+       }
+
+	m_cond.wait(l, [this]{ return  condition(); });
+	if (m_quit || m_seek_asked) return;
+	
+        if (m_write_pos != sample_position) {
+            std::clog << "ffmpeg/debug: Gap in audio: expected=" << m_write_pos << " received=" << sample_position << '\n';
+        }
+
+        m_write_pos = sample_position;
+        auto write_pos_in_ring = m_write_pos % m_data.size();
+        auto first_hunk_size = std::min(data.size(), m_data.size() - write_pos_in_ring);
+	std::copy(data.begin(), data.begin() + first_hunk_size, m_data.begin() + write_pos_in_ring);
+        // second part is when data wrapped in the ring buffer
+	std::copy(data.begin() + first_hunk_size, data.end(), m_data.begin());
+	m_write_pos += data.size();
+	m_cond.notify_all();
 }
 
 bool AudioBuffer::prepare(std::int64_t pos) {
+	if (pos < 0) pos = 0;
 	std::unique_lock<mutex> l(m_mutex, std::try_to_lock);
 	if (!l.owns_lock()) return false;  // Didn't get lock, give up for now
 	if (eof(pos)) return true;
-	if (pos < 0) pos = 0;
-	m_posReq = pos;
-	wakeups();
+	m_read_pos = pos;
+	m_cond.notify_all();
 	// Has enough been prebuffered already and is the requested position still within buffer
-	return m_pos > m_posReq + m_data.capacity() / 16 && m_pos <= m_posReq + m_data.size();
+	return m_write_pos > m_read_pos + m_data.size() / 16 && m_write_pos <= m_read_pos + m_data.size();
 }
 
-bool AudioBuffer::operator()(float* begin, size_t samples, std::int64_t pos, float volume) {
+// pos may be negative because upper layer may request 'extra time' before
+// starting the play back. In this case, the buffer is filled of zero.
+//
+bool AudioBuffer::read(float* begin, size_t samples, std::int64_t pos, float volume) {
+       if (eof(pos))
+           return false;
+
+        if (pos < 0) {
+            size_t negative_samples;
+            if (static_cast<std::int64_t>(samples) + pos > 0) negative_samples = samples - (samples + pos);
+            else negative_samples = samples;
+
+            // put zeros to negative positions
+            std::fill(begin, begin + negative_samples, 0); 
+
+            if (negative_samples == samples) return true;
+
+            // if there are remaining samples to read in positive land, do the 'normal' read
+            pos = 0;
+            samples -= negative_samples;
+        }
+
 	std::unique_lock<mutex> l(m_mutex);
-	size_t idx = pos + m_data.size() - m_pos;
-	for (size_t s = 0; s < samples; ++s, ++idx) {
-		if (idx < m_data.size()) begin[s] += volume * da::conv_from_s16(m_data[idx]);
-	}
-	m_posReq = std::max<std::int64_t>(0, pos + samples);
-	wakeups();
-	return !eof(pos);
+        if (static_cast<std::uint64_t>(pos) >= m_read_pos + m_data.size()
+            || static_cast<std::uint64_t>(pos) < m_read_pos) {
+            // in case request position is not in the current possible range, we trigger a seek
+            // Note: m_write_pos is not checked on purpose: if pos is after
+            // m_write_pos, zeros present in buffer will be returned
+            std::fill(begin, begin + samples, 0); 
+            m_read_pos = pos + samples;
+            m_seek_asked = true;
+            std::fill(m_data.begin(), m_data.end(), 0); 
+            m_cond.notify_all();
+            return true; 
+        }
+
+        for (size_t s = 0; s < samples; ++s) {
+            begin[s] += volume * da::conv_from_s16(m_data[(m_read_pos + s) % m_data.size()]);
+        }
+
+	m_read_pos = pos + samples;
+	m_cond.notify_all();
+	return true;
 }
 
-FFmpeg::FFmpeg(fs::path const& _filename, unsigned int rate):
-  m_filename(_filename), m_rate(rate),
-  m_mediaType(rate ? AVMEDIA_TYPE_AUDIO : AVMEDIA_TYPE_VIDEO),
-  m_thread(std::async(std::launch::async, std::ref(*this)))
+AudioBuffer::AudioBuffer(fs::path const& file, unsigned int rate, size_t size):
+          m_data(size), m_sps(rate * AUDIO_CHANNELS), ffmpeg(file, this), m_duration(ffmpeg.duration()) {
+                  reader_thread = std::async(std::launch::async, [this] { 
+            std::unique_lock<mutex> l(m_mutex);
+            while (!m_quit) {
+                 try {
+                        if (m_seek_asked) {
+                             ffmpeg.seek(m_read_pos / double(AV_TIME_BASE), false);
+                             m_seek_asked = false;
+                             m_write_pos = m_read_pos;
+                             l.unlock();
+                             ffmpeg.seek_internal();
+                        } else 
+                             l.unlock();
+                          
+                        ffmpeg.handleOneFrame();
+
+                        l.lock();
+                 } catch (FFmpeg::eof_error&) {
+                        l.lock();
+                        // Wait here on eof: either quit is asked, either a new seek
+                        // was asked and return back reading frames
+                        m_cond.wait(l, [this]{ return m_quit || m_seek_asked; });
+                 } catch (std::exception& e) {
+                        l.lock();
+                        m_quit = true;
+                        m_cond.notify_all();
+                 }
+             }
+    });
+}
+
+AudioBuffer::~AudioBuffer() {
+    {
+	std::unique_lock<mutex> l(m_mutex);
+        m_read_pos = 0;
+        m_write_pos = 0;
+        m_data.clear();
+        m_quit = true;
+    }
+    m_cond.notify_all();
+    reader_thread.get();
+}
+
+FFmpeg::FFmpeg(fs::path const& _filename, AudioBuffer *audioBuffer):
+  m_filename(_filename),
+  audioBuffer(audioBuffer),
+  m_mediaType(audioBuffer ? AVMEDIA_TYPE_AUDIO : AVMEDIA_TYPE_VIDEO)
 {
     static std::once_flag static_infos;
     std::call_once(static_infos, [] {
@@ -164,13 +257,17 @@ FFmpeg::FFmpeg(fs::path const& _filename, unsigned int rate):
                 av_register_all();
 #endif
 	});
+	
+        try { open(); } catch (std::exception const& e) { throw std::runtime_error("ffmpeg/error: Failed to open " + m_filename.string() + ": " + e.what()); }
+	m_duration = m_formatContext->duration / double(AV_TIME_BASE);
+        if (audioBuffer == nullptr)
+            m_thread = std::async(std::launch::async, std::ref(*this));
 }
 
 FFmpeg::~FFmpeg() {
 	m_quit.set_value();
 	videoQueue.reset();
-	audioQueue.quit();
-	m_thread.get();
+	if (m_thread.valid()) m_thread.get();
         {
             std::lock_guard<std::mutex> l(s_avcodec_mutex); // avcodec_close is not thread-safe
             if (m_codecContext) avcodec_close(m_codecContext.get());
@@ -210,6 +307,7 @@ void FFmpeg::open() {
 
 	switch (m_mediaType) {
 	case AVMEDIA_TYPE_AUDIO:
+            m_rate = audioBuffer->getSamplesPerSecond() / double(AUDIO_CHANNELS);
 		m_resampleContext.reset(swr_alloc());
 		av_opt_set_int(m_resampleContext.get(), "in_channel_layout", m_codecContext->channel_layout ? m_codecContext->channel_layout : av_get_default_channel_layout(m_codecContext->channels), 0);
 		av_opt_set_int(m_resampleContext.get(), "out_channel_layout", av_get_default_channel_layout(AUDIO_CHANNELS), 0);
@@ -219,7 +317,6 @@ void FFmpeg::open() {
 		av_opt_set_int(m_resampleContext.get(), "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
 		swr_init(m_resampleContext.get());
 		if (!m_resampleContext) throw std::runtime_error("Cannot create resampling context");
-		audioQueue.setSamplesPerSecond(AUDIO_CHANNELS * m_rate);
 		break;
 	case AVMEDIA_TYPE_VIDEO:
 		// Setup software scaling context for YUV to RGB conversion
@@ -258,31 +355,33 @@ struct FFmpeg::Packet: public AVPacket {
 	~Packet() { av_packet_unref(this); }
 };
 
+void FFmpeg::handleOneFrame() {
+	bool read_one = false;
+	do {
+		Packet pkt;
+		auto ret = av_read_frame(m_formatContext.get(), &pkt);
+		if(ret == AVERROR_EOF) {
+			// End of file: no more data to read.
+			throw FFmpeg::eof_error();
+		} else if(ret < 0) {
+			throw FfmpegError(ret);
+		}
+
+		if (pkt.stream_index == m_streamId) {
+
+			if (m_seekTarget == m_seekTarget) seek_internal();
+			decodePacket(pkt);
+			read_one = true;
+		}
+	} while (!read_one);
+}
+
 void FFmpeg::operator()() {
-	try { open(); } catch (std::exception const& e) { std::clog << "ffmpeg/error: Failed to open " << m_filename << ": " << e.what() << std::endl; return; }
-	m_duration = m_formatContext->duration / double(AV_TIME_BASE);
-	audioQueue.setDuration(m_duration);
 	int errors = 0;
 	bool eof = false;
-	std::clog << "audio/debug: FFmpeg processing " << m_filename.filename().string() << std::endl;
-	Packet pkt;
 	while (!terminating() && !eof) {
 		try {
-			auto ret = av_read_frame(m_formatContext.get(), &pkt);
-			if(ret == AVERROR_EOF) {
-				// End of file: no more data to read.
-				throw FFmpeg::eof_error();
-			} else if(ret < 0) {
-				throw FfmpegError(ret);
-			}
-
-			if (pkt.stream_index == m_streamId) {
-
-				if (audioQueue.wantSeek()) m_seekTarget = 0.0;
-				if (m_seekTarget == m_seekTarget) seek_internal();
-				decodePacket(pkt);
-				errors = 0;
-			}
+			handleOneFrame();
 		} catch (eof_error&) {
 			videoQueue.push(Bitmap()); // EOF marker
 			eof = true;
@@ -291,27 +390,26 @@ void FFmpeg::operator()() {
 			std::clog << "ffmpeg/error: " << m_filename << ": " << e.what() << std::endl;
 			if (++errors > 2) { std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl; break; }
 		}
-		av_packet_unref(&pkt);
+		errors = 0;
 	}
 }
 
 void FFmpeg::seek(double time, bool wait) {
 	m_seekTarget = time;
-	videoQueue.reset(); audioQueue.reset(); // Empty these to unblock the internals in case buffers were full
+	videoQueue.reset(); 
 	if (wait) while (!terminating() && m_seekTarget == m_seekTarget) std::this_thread::sleep_for(5ms);
 }
 
 void FFmpeg::seek_internal() {
 	videoQueue.reset();
-	audioQueue.reset();
 	int flags = 0;
 	if (m_seekTarget < m_position) flags |= AVSEEK_FLAG_BACKWARD;
 	av_seek_frame(m_formatContext.get(), -1, m_seekTarget * AV_TIME_BASE, flags);
+        m_position_in_48k_frames = -1; //kill previous position
 	m_seekTarget = getNaN(); // Signal that seeking is done
 }
 
 void FFmpeg::decodePacket(Packet &pkt) {
-
 	auto ret = avcodec_send_packet(m_codecContext.get(), &pkt);
 	if(ret == AVERROR_EOF) {
 		// End of file: no more data to read.
@@ -336,9 +434,12 @@ void FFmpeg::decodePacket(Packet &pkt) {
 		}
 		// frame is available here
 		if (frame->pts != int64_t(AV_NOPTS_VALUE)) {
-			m_position = double(frame->pts) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
-			if (m_formatContext->start_time != int64_t(AV_NOPTS_VALUE))
-				m_position -= double(m_formatContext->start_time) / AV_TIME_BASE;
+			auto new_position = double(frame->pts) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
+			if (m_formatContext->streams[m_streamId]->start_time != int64_t(AV_NOPTS_VALUE))
+				new_position -= double(m_formatContext->streams[m_streamId]->start_time) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
+			//if (m_formatContext->streams[m_streamId]->first_pts != int64_t(AV_NOPTS_VALUE))
+			//	m_position -= double(m_formatContext->streams[m_streamId]->first_pts) / AV_TIME_BASE;
+                        m_position = new_position;
 		}
 		if (m_mediaType == AVMEDIA_TYPE_VIDEO) processVideo(std::move(frame)); else processAudio(std::move(frame));
 	}
@@ -363,16 +464,19 @@ void FFmpeg::processVideo(uFrame frame) {
 void FFmpeg::processAudio(uFrame frame) {
 	// resample to output
 	int16_t *output;
-	int out_linesize;
 	int out_samples = swr_get_out_samples(m_resampleContext.get(), frame->nb_samples);
-	av_samples_alloc((uint8_t**)&output, &out_linesize, AUDIO_CHANNELS, out_samples,
+	av_samples_alloc((uint8_t**)&output, nullptr, AUDIO_CHANNELS, out_samples,
 		AV_SAMPLE_FMT_S16, 0);
 	out_samples = swr_convert(m_resampleContext.get(), (uint8_t**)&output, out_samples,
 		(const uint8_t**)&frame->data[0], frame->nb_samples);
 	// The output is now an interleaved array of 16-bit samples
 	std::vector<int16_t> m_output(output, output+out_samples*AUDIO_CHANNELS);
-	audioQueue.push(m_output,m_position);
+        if (m_position_in_48k_frames == -1) {
+                m_position_in_48k_frames = m_position * m_rate + 0.5;
+        }
+	audioBuffer->push(m_output, m_position_in_48k_frames * AUDIO_CHANNELS /* pass in samples */);
 	av_freep(&output);
-	m_position += double(out_samples)/m_rate;
+        m_position_in_48k_frames += out_samples;
+	m_position += frame->nb_samples * av_q2d(m_formatContext->streams[m_streamId]->time_base);
 }
 
