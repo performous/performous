@@ -181,8 +181,13 @@ SET(CPACK_DEBIAN_PACKAGE_SECTION "Games")
 
 # RPM specific settings
 SET(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
-SET(CPACK_RPM_PACKAGE_AUTOREQ ON)
+
+SET(CPACK_RPM_PACKAGE_REQUIRES "cairo-devel, librsvg2-devel, glibmm24-devel, libxml++-devel, boost-devel, SDL2-devel, libepoxy-devel, ffmpeg-devel, portaudio-devel, opencv-devel, portmidi-devel, libjpeg-turbo-devel, pango-devel, libpng-devel, glm-devel, openblas-devel, fftw-devel, cpprest-devel")
 SET(CPACK_RPM_PACKAGE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/licence.txt")
+message("${LC_MESSAGES_DIRS}")
+message("HOOOOOI")
+set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
+    "${LC_MESSAGES_DIRS}")
 SET(CPACK_RPM_PACKAGE_DESCRIPTION "${CPACK_PACKAGE_DESCRIPTION}")
 SET(CPACK_RPM_PACKAGE_URL "https://github.com/performous/performous")
 
