@@ -140,6 +140,7 @@ private:
 #endif
 };
 
+#if !(_MSC_VER && !__INTEL_COMPILER) //MSVC does not supports redefintions of specialized static member varables
 // Declaration for the singleton pointer defined in game.cc
 template<> Game* Singleton<Game>::ms_Singleton;
-
+#endif
