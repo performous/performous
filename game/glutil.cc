@@ -13,15 +13,6 @@ namespace glutil {
 		return result;
 	}
 		
-	VertexArray::VertexArray() {
-		glGenVertexArrays(1, &m_vao);
-		glGenBuffers(1, &m_vbo);
-	}
-
-	VertexArray::~VertexArray() {
-		clear();
-	}
-
 	void VertexArray::clear() {
 		m_vertices.clear();
 	}
