@@ -156,12 +156,15 @@ Shader& Shader::link() {
 		throw std::runtime_error("Couldn't create shader program.");
 	}
 	// Attach all compiled shaders to it
-	for (ShaderObjects::const_iterator it = shader_ids.begin(); it != shader_ids.end(); ++it)
-		glAttachShader(program, *it);
+	for (auto id : shader_ids) glAttachShader(program, id);
 	ec.check("glAttachShader");
 
 	// Link and check status
 	glLinkProgram(program);
+
+	// always detach shaders, linked or not, they need to be detached
+	for (auto id : shader_ids) glDetachShader(program, id);
+
 	glGetProgramiv(program, GL_LINK_STATUS, &gl_response);
 	dumpInfoLog(program);
 	if (gl_response != GL_TRUE) {
