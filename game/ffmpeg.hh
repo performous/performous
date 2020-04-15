@@ -82,7 +82,7 @@ class FFmpeg {
 	VideoFifo  videoQueue;
 	
         /** Seek to the chosen time. Will block until the seek is done, if wait is true. **/
-	void seek(double time, bool wait = true);
+	void seek(double time);
 	/// duration
 	double duration() const { return m_duration; }
 	bool terminating() { return m_quit_future.wait_for(0s) == std::future_status::ready; }

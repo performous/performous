@@ -188,7 +188,7 @@ AudioBuffer::AudioBuffer(fs::path const& file, unsigned int rate, size_t size):
             while (!m_quit) {
                  try {
                         if (m_seek_asked) {
-                             ffmpeg.seek(m_read_pos / double(AV_TIME_BASE), false);
+                             ffmpeg.seek(m_read_pos / double(AV_TIME_BASE));
                              m_seek_asked = false;
                              m_write_pos = m_read_pos;
                              l.unlock();
@@ -394,10 +394,9 @@ void FFmpeg::operator()() {
 	}
 }
 
-void FFmpeg::seek(double time, bool wait) {
+void FFmpeg::seek(double time) {
 	m_seekTarget = time;
 	videoQueue.reset(); 
-	if (wait) while (!terminating() && m_seekTarget == m_seekTarget) std::this_thread::sleep_for(5ms);
 }
 
 void FFmpeg::seek_internal() {
