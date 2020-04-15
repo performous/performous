@@ -136,11 +136,11 @@ class AudioBuffer {
 	void push(std::vector<std::int16_t> const& data, int64_t sample_position);
 	bool prepare(std::int64_t pos);
 	bool read(float* begin, size_t count, std::int64_t pos, float volume = 1.0f);
-	bool eof(std::int64_t pos) const { return double(pos) / m_sps >= m_duration; }
         bool terminating();
 	double duration() const { return m_duration; }
 
   private:
+	bool eof(std::int64_t pos) const { return double(pos) / m_sps >= m_duration; }
 	bool wantSeek();
 	bool wantMore();
 	/// Should the input stop waiting?
