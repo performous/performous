@@ -4,6 +4,7 @@
 #include "texture.hh"
 #include "util.hh"
 #include "libda/sample.hpp"
+#include "aubio/aubio.h"
 #include <boost/circular_buffer.hpp>
 #include <atomic>
 #include <condition_variable>
@@ -32,30 +33,11 @@ class VideoFifo {
   public:
 	VideoFifo(): m_timestamp(), m_eof() {}
 	/// trys to pop a video frame from queue
-	bool tryPop(Bitmap& f) {
-		std::unique_lock<std::mutex> l(m_mutex);
-		if (m_queue.empty()) return false; // Nothing to deliver
-		if (m_queue.front().buf.empty()) { m_eof = true; return false; }
-		f = std::move(m_queue.front());
-		m_queue.pop_front();
-		m_cond.notify_all();
-		m_timestamp = f.timestamp;
-		return true;
-	}
+	bool tryPop(Bitmap& f);
 	/// Add frame to queue
-	void push(Bitmap&& f) {
-		std::unique_lock<std::mutex> l(m_mutex);
-		m_cond.wait(l, [this]{ return m_queue.size() < m_max; });
-		if (m_queue.empty()) m_timestamp = f.timestamp;
-		m_queue.emplace_back(std::move(f));
-	}
+	void push(Bitmap&& f);
 	/// Clear and unlock the queue
-	void reset() {
-		std::unique_lock<std::mutex> l(m_mutex);
-		m_queue.clear();
-		m_cond.notify_all();
-		m_eof = false;
-	}
+	void reset();
 	/// Returns the current position (seconds)
 	double position() const { return m_timestamp; }
 	/// Tests if EOF has already been reached
@@ -73,61 +55,18 @@ class VideoFifo {
 class AudioBuffer {
 	typedef std::recursive_mutex mutex;
   public:
-	AudioBuffer(size_t size = 1000000): m_data(size) {}
+	AudioBuffer(size_t size = 4320256): m_data(size) {}
 	/// Reset from FFMPEG side (seeking to beginning or terminate stream)
-	void reset() {
-		{
-			std::unique_lock<mutex> l(m_mutex);
-			m_data.clear();
-			m_pos = 0;
-		}
-		m_cond.notify_one();
-	}
-	void quit() {
-		m_quit.store(true);
-		m_cond.notify_one();
-	}
+	void reset();
+	void quit();
 	/// set samples per second
 	void setSamplesPerSecond(unsigned sps) { m_sps = sps; }
 	/// get samples per second
 	unsigned getSamplesPerSecond() const { return m_sps; }
-	void push(std::vector<std::int16_t> const& data, double timestamp) {
-		std::unique_lock<mutex> l(m_mutex);
-		m_cond.wait(l, [this]{ return condition(); });
-		if (m_quit) return;
-		if (timestamp < 0.0) {
-			std::clog << "ffmpeg/warning: Negative audio timestamp " << timestamp << " seconds, frame ignored." << std::endl;
-			return;
-		}
-		// Insert silence at the beginning if the stream starts later than 0.0
-		if (m_pos == 0 && timestamp > 0.0) {
-			m_pos = timestamp * m_sps;
-			m_data.resize(m_pos, 0);
-		}
-		m_data.insert(m_data.end(), data.begin(), data.end());
-		m_pos += data.size();
-	}
-	bool prepare(std::int64_t pos) {
-		std::unique_lock<mutex> l(m_mutex, std::try_to_lock);
-		if (!l.owns_lock()) return false;  // Didn't get lock, give up for now
-		if (eof(pos)) return true;
-		if (pos < 0) pos = 0;
-		m_posReq = pos;
-		wakeups();
-		// Has enough been prebuffered already and is the requested position still within buffer
-		return m_pos > m_posReq + m_data.capacity() / 16 && m_pos <= m_posReq + m_data.size();
-	}
-	bool operator()(float* begin, float* end, std::int64_t pos, float volume = 1.0f) {
-		std::unique_lock<mutex> l(m_mutex);
-		size_t idx = pos + m_data.size() - m_pos;
-		size_t samples = end - begin;
-		for (size_t s = 0; s < samples; ++s, ++idx) {
-			if (idx < m_data.size()) begin[s] += volume * da::conv_from_s16(m_data[idx]);
-		}
-		m_posReq = std::max<std::int64_t>(0, pos + samples);
-		wakeups();
-		return !eof(pos);
-	}
+	fvec_t* makePreviewBuffer();
+	void push(std::vector<std::int16_t> const& data, double timestamp);
+	bool prepare(std::int64_t pos);
+	bool operator()(float* begin, float* end, std::int64_t pos, float volume = 1.0f);
 	bool eof(std::int64_t pos) const { return double(pos) / m_sps >= m_duration; }
 	void setEof() { m_duration = double(m_pos) / m_sps; }
 	double duration() const { return m_duration; }
@@ -160,8 +99,12 @@ extern "C" {
   struct AVCodecContext;
   struct AVFormatContext;
   struct AVFrame;
+  void av_frame_free(AVFrame **);
   struct SwrContext;
+  void swr_free(struct SwrContext **);
+  void swr_close(struct SwrContext *);
   struct SwsContext;
+  void sws_freeContext(struct SwsContext *);
 }
 
 /// ffmpeg class
@@ -187,9 +130,15 @@ class FFmpeg {
   private:
 	void seek_internal();
 	void open();
-	void decodePacket();
-	void processVideo(AVFrame* frame);
-	void processAudio(AVFrame* frame);
+        struct Packet;
+	void decodePacket(Packet &);
+	static void frameDeleter(AVFrame *f) { if (f) av_frame_free(&f); }
+	using uFrame = std::unique_ptr<AVFrame, std::integral_constant<decltype(&frameDeleter), &frameDeleter>>;
+	void processVideo(uFrame frame);
+	void processAudio(uFrame frame);
+	static void avformat_close_input(AVFormatContext *fctx);
+	static void avcodec_free_context(AVCodecContext *avctx);
+
 	fs::path m_filename;
 	unsigned int m_rate = 0;
 	std::promise<void> m_quit;
@@ -200,12 +149,12 @@ class FFmpeg {
 	// libav-specific variables
 	int m_streamId = -1;
 	int m_mediaType;  // enum AVMediaType
-	AVFormatContext* m_formatContext = nullptr;
-	AVCodecContext* m_codecContext = nullptr;
-	SwrContext* m_resampleContext = nullptr;
-	SwsContext* m_swsContext = nullptr;
+	std::unique_ptr<AVFormatContext, decltype(&avformat_close_input)> m_formatContext{nullptr, avformat_close_input};
+	std::unique_ptr<AVCodecContext, decltype(&avcodec_free_context)> m_codecContext{nullptr, avcodec_free_context};
+	std::unique_ptr<SwrContext, void(*)(SwrContext*)> m_resampleContext{nullptr, [] (auto p) { swr_close(p); swr_free(&p); }};
+	std::unique_ptr<SwsContext, void(*)(SwsContext*)> m_swsContext{nullptr, sws_freeContext};
 	// Make sure the thread starts only after initializing everything else
-	std::unique_ptr<std::thread> m_thread;
+	std::future<void> m_thread;
 	static std::mutex s_avcodec_mutex; // Used for avcodec_open/close (which use some static crap and are thus not thread-safe)
 };
 

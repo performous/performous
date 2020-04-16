@@ -12,10 +12,13 @@
 #include "theme.hh"
 #include "util.hh"
 #include "playlist.hh"
+
+#include "aubio/aubio.h"
 #include <iostream>
+#include <mutex>
 #include <sstream>
 
-static const double IDLE_TIMEOUT = 45.0; // seconds
+static const double IDLE_TIMEOUT = 35.0; // seconds
 
 ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Database& database):
   Screen(name), m_audio(audio), m_songs(songs), m_database(database)
@@ -189,12 +192,17 @@ void ScreenSongs::update() {
 	}
 	// Check out if the music has changed
 	std::shared_ptr<Song> song = m_songs.currentPtr();
-	Song::Music music;
+	Song::MusicFiles music;
 	if (song) music = song->music;
 	if (m_playing != music) songChange = true;
 	// Switch songs if needed, only when the user is not browsing for a moment
 	if (!songChange) return;
-	if (song) song->loadNotes();  // Needed for BPM info; TODO: drop notes when switching to another song.
+	ScreenSongs::previewBeatsBuffer.reset(new_fvec(1));
+	{
+	std::lock_guard<std::recursive_mutex> l(Audio::aubio_mutex);	
+	Audio::aubioTempo.reset(new_aubio_tempo("default", Audio::aubio_win_size, Audio::aubio_hop_size, Audio::getSR()));
+	}
+	if (song && song->hasControllers()) { song->loadNotes(); } // Needed for BPM info.
 	m_playing = music;
 	// Clear the old content and load new content if available
 	m_songbg.reset(); m_video.reset();
@@ -344,12 +352,24 @@ void ScreenSongs::drawCovers() {
 	double beat = 0.5 + m_idleTimer.get() / 2.0;  // 30 BPM
 	if (ss > 0) {
 		// Use actual song BPM. FIXME: Should only do this if currentId is also playing.
-		double t = m_audio.getPosition() - config["audio/video_delay"].f();
-		Song::Beats const& beats = m_songs.current().beats;
-		auto it = std::lower_bound(beats.begin(), beats.end(), t);
-		if (it != beats.begin() && it != beats.end()) {
-			double t1 = *(it - 1), t2 = *it;
-			beat = (t - t1) / (t2 - t1);
+		if (m_songs.currentPtr()->music == m_playing) {
+				if (m_songs.currentPtr()->hasControllers() || !m_songs.currentPtr()->beats.empty()) {
+				double t = m_audio.getPosition() - config["audio/video_delay"].f();
+				Song::Beats const& beats = m_songs.current().beats;
+				auto it = std::lower_bound(m_songs.currentPtr()->hasControllers() ? beats.begin() : (beats.begin() + 1), beats.end(), t);
+				if (it != beats.begin() && it != beats.end()) {
+					double t1 = *(it - 1), t2 = *it;
+					beat = (t - t1) / (t2 - t1);
+				}
+			}
+			else if (m_songs.currentPtr() && !m_songs.currentPtr()->m_bpms.empty()) {
+				double tempo = (m_songs.currentPtr()->m_bpms.front().step * 4.0);
+				if (int(tempo) <= 100.0) tempo *= 2.0;
+				else if (int(tempo) > 400.0) tempo /= 4.0;
+				else if (int(tempo) > 300.0) tempo /= 3.0;
+				else if (int(tempo) > 190.0) tempo /= 2.0;
+				beat = 0.5 + m_idleTimer.get() / tempo;
+			}
 		}
 	}
 	beat = 1.0 + std::pow(std::abs(std::cos(0.5 * TAU * beat)), 10.0);  // Overdrive pulse
@@ -524,6 +544,9 @@ void ScreenSongs::drawMenu() {
 	}
 	m_menu.dimensions.stretch(w, h);
 }
+
+std::unique_ptr<fvec_t, void(*)(fvec_t*)> ScreenSongs::previewSamplesBuffer = std::unique_ptr<fvec_t, void(*)(fvec_t*)>(new_fvec(1), [](fvec_t* p){del_fvec(p);});
+std::unique_ptr<fvec_t, void(*)(fvec_t*)> ScreenSongs::previewBeatsBuffer = std::unique_ptr<fvec_t, void(*)(fvec_t*)>(new_fvec(1), [](fvec_t* p){del_fvec(p);});
 
 void ScreenSongs::createPlaylistMenu() {
 	m_menu.clear();
