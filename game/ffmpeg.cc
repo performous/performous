@@ -201,13 +201,15 @@ AudioBuffer::AudioBuffer(fs::path const& file, unsigned int rate, size_t size):
                         l.lock();
                  } catch (FFmpeg::eof_error&) {
                         l.lock();
+                        // now we know exact eof_pos
+                        m_eof_pos = m_write_pos;
                         // Wait here on eof: either quit is asked, either a new seek
                         // was asked and return back reading frames
                         m_cond.wait(l, [this]{ return m_quit || m_seek_asked; });
                  } catch (std::exception& e) {
                         l.lock();
-                        m_quit = true;
-                        m_cond.notify_all();
+                        m_eof_pos = m_write_pos;
+                        m_cond.wait(l, [this]{ return m_quit || m_seek_asked; });
                  }
              }
     });

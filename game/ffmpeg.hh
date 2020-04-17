@@ -17,17 +17,6 @@
 #include <thread>
 #include <vector>
 
-/// single audio frame
-struct AudioFrame {
-	/// timestamp of audio frame
-	double timestamp;
-	/// audio data
-	std::vector<std::int16_t> data;
-	/// constructor
-	template <typename InIt> AudioFrame(double ts, InIt begin, InIt end): timestamp(ts), data(begin, end) {}
-	AudioFrame(): timestamp(getInf()) {} // EOF marker
-};
-
 /// Video queue
 class VideoFifo {
   public:
@@ -137,10 +126,10 @@ class AudioBuffer {
 	bool prepare(std::int64_t pos);
 	bool read(float* begin, size_t count, std::int64_t pos, float volume = 1.0f);
         bool terminating();
-	double duration() const { return m_duration; }
+        auto duration() { return ffmpeg.duration(); }
 
   private:
-	bool eof(std::int64_t pos) const { return double(pos) / m_sps >= m_duration; }
+	bool eof(std::int64_t pos) const { return m_eof_pos != -1 && pos >= m_eof_pos || (double(pos) / m_sps >= m_duration); }
 	bool wantSeek();
 	bool wantMore();
 	/// Should the input stop waiting?
@@ -152,11 +141,12 @@ class AudioBuffer {
 	std::vector<std::int16_t> m_data;
 	size_t m_write_pos = 0;
 	std::int64_t m_read_pos = 0;
+	std::int64_t m_eof_pos = -1; // -1 until we get the read end from ffmpeg
 
 	const unsigned m_sps;
 
         FFmpeg ffmpeg;
-	const double m_duration;
+        const double m_duration;
 
         bool m_seek_asked { false };
 
