@@ -81,8 +81,8 @@ find_package(LibEpoxy 1.2 REQUIRED)
 include_directories(${LibEpoxy_INCLUDE_DIRS})
 list(APPEND LIBS ${LibEpoxy_LIBRARIES})
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(deps REQUIRED IMPORTED_TARGET glib-2.0 gio-2.0 gobject-2.0)
+find_package(GLIB REQUIRED COMPONENTS glib-2.0 gio-2.0 gobject-2.0)
+list(APPEND LIBS ${GLIB_LIBRARIES})
 
 # Find all the libs that don't require extra parameters
 foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM)
@@ -203,8 +203,6 @@ endif()
 list(APPEND LIBS ${FFTW3_LIBRARIES})
 list(APPEND LIBS ${BLAS_LIBRARIES})
 
-
-target_link_libraries(performous PkgConfig::deps)
 target_link_libraries(performous ${LIBS})
 
 if(WIN32)
