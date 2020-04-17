@@ -1,6 +1,9 @@
 #pragma once
 #ifdef USE_WEBSERVER
 
+#define _TURN_OFF_PLATFORM_STRING
+
+
 #include <cpprest/http_listener.h>
 #include <cpprest/filestream.h>
 
