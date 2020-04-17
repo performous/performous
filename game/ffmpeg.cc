@@ -322,11 +322,9 @@ void FFmpeg::open() {
 		break;
 	case AVMEDIA_TYPE_VIDEO:
 		// Setup software scaling context for YUV to RGB conversion
-		width = m_codecContext->width;
-		height = m_codecContext->height;
 		m_swsContext.reset(sws_getContext(
 		  m_codecContext->width, m_codecContext->height, m_codecContext->pix_fmt,
-		  width, height, AV_PIX_FMT_RGB24,
+		  m_codecContext->width, m_codecContext->height, AV_PIX_FMT_RGB24,
 		  SWS_POINT, nullptr, nullptr, nullptr));
 		break;
 	default:  // Should never be reached but avoids compile warnings
@@ -448,8 +446,8 @@ void FFmpeg::decodePacket(Packet &pkt) {
 
 void FFmpeg::processVideo(uFrame frame) {
 	// Convert into RGB and scale the data
-	int w = (m_codecContext->width+15)&~15;
-	int h = m_codecContext->height;
+	int w = (m_codecContext->width + 15) & ~15;
+	auto h = m_codecContext->height;
 	Bitmap f;
 	f.timestamp = m_position;
 	f.fmt = pix::RGB;

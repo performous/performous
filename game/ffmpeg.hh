@@ -65,8 +65,6 @@ class FFmpeg {
 	void operator()(); ///< Thread runs here, don't call directly
         void handleOneFrame();
 
-	unsigned width = 0; ///< width of video
-	unsigned height = 0; ///< height of video
 	/// queue for video
 	VideoFifo  videoQueue;
 	
