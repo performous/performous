@@ -45,6 +45,7 @@ configure_file(input : 'game/config.hh.in', output : 'config.hh', configuration 
 dependencies = [
   dependency('pangocairo'),
   dependency('sdl2'),
+  dependency('aubio'),
   dependency('boost', modules : [
     'filesystem',
     'iostreams',
