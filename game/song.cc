@@ -14,48 +14,49 @@ extern "C" {
 }
 #ifdef USE_WEBSERVER
 Song::Song(web::json::value const& song): dummyVocal(TrackName::LEAD_VOCAL), randomIdx(rand()) {
-	path = song.has_field("TxtFileFolder") ? fs::path(song.at("TxtFileFolder").as_string().substr(0, song.at("TxtFileFolder").as_string().find_last_of("/\\"))) : "";
-	filename = song.has_field("TxtFile") ? fs::path(song.at("TxtFile").as_string()) : "";
-	artist = song.has_field("Artist") ? song.at("Artist").as_string() : "";
-	title = song.has_field("Title") ? song.at("Title").as_string() : "";
-	language = song.has_field("Language") ? song.at("Language").as_string() : "";
-	edition = song.has_field("Edition") ? song.at("Edition").as_string() : "";
-	creator = song.has_field("Creator") ? song.at("Creator").as_string() : "";
-	genre = song.has_field("Genre") ? song.at("Genre").as_string() : "";
-	cover = song.has_field("Cover") ? song.at("Cover").as_string() : "";
-	background = song.has_field("Background") ? song.at("Background").as_string() : "";
-	video = song.has_field("VideoFile") ? fs::path(song.at("VideoFile").as_string()) : "";
-	videoGap = song.has_field("VideoGap") ? song.at("VideoGap").as_number().to_double() : 0.0;
-	start = song.has_field("Start") ? song.at("Start").as_number().to_double() : 0.0;
-	preview_start = song.has_field("PreviewStart") ? song.at("PreviewStart").as_number().to_double() : 0.0;
-	m_duration = song.has_field("Duration") ? song.at("Duration").as_number().to_double() : 0.0;
-	music["background"] = song.has_field("SongFile") ? fs::path(song.at("SongFile").as_string()) : "";
-	music["vocals"] = song.has_field("Vocals") ? fs::path(song.at("Vocals").as_string()) : "";
+	std::string emptyStr = "";
+	path = song.has_field(utility::conversions::to_string_t("TxtFileFolder")) ? fs::path(song.at(utility::conversions::to_string_t("TxtFileFolder")).as_string().substr(0, utility::conversions::to_utf8string(song.at(utility::conversions::to_string_t("TxtFileFolder")).as_string()).find_last_of("/\\"))) : emptyStr;
+	filename = song.has_field(utility::conversions::to_string_t("TxtFile")) ? fs::path(song.at(utility::conversions::to_string_t("TxtFile")).as_string()) : emptyStr;
+	artist = song.has_field(utility::conversions::to_string_t("Artist")) ? utility::conversions::to_utf8string(song.at(utility::conversions::to_string_t("Artist")).as_string()) : emptyStr;
+	title = song.has_field(utility::conversions::to_string_t("Title")) ? utility::conversions::to_utf8string(song.at(utility::conversions::to_string_t("Title")).as_string()) : emptyStr;
+	language = song.has_field(utility::conversions::to_string_t("Language")) ? utility::conversions::to_utf8string(song.at(utility::conversions::to_string_t("Language")).as_string()) : emptyStr;
+	edition = song.has_field(utility::conversions::to_string_t("Edition")) ? utility::conversions::to_utf8string(song.at(utility::conversions::to_string_t("Edition")).as_string()) : emptyStr;
+	creator = song.has_field(utility::conversions::to_string_t("Creator")) ? utility::conversions::to_utf8string(song.at(utility::conversions::to_string_t("Creator")).as_string()) : emptyStr;
+	genre = song.has_field(utility::conversions::to_string_t("Genre")) ? utility::conversions::to_utf8string(song.at(utility::conversions::to_string_t("Genre")).as_string()) : emptyStr;
+	cover = song.has_field(utility::conversions::to_string_t("Cover")) ? utility::conversions::to_utf8string(song.at(utility::conversions::to_string_t("Cover")).as_string()) : emptyStr;
+	background = song.has_field(utility::conversions::to_string_t("Background")) ? utility::conversions::to_utf8string(song.at(utility::conversions::to_string_t("Background")).as_string()) : emptyStr;
+	video = song.has_field(utility::conversions::to_string_t("VideoFile")) ? fs::path(song.at(utility::conversions::to_string_t("VideoFile")).as_string()) : emptyStr;
+	videoGap = song.has_field(utility::conversions::to_string_t("VideoGap")) ? song.at(utility::conversions::to_string_t("VideoGap")).as_number().to_double() : 0.0;
+	start = song.has_field(utility::conversions::to_string_t("Start")) ? song.at(utility::conversions::to_string_t("Start")).as_number().to_double() : 0.0;
+	preview_start = song.has_field(utility::conversions::to_string_t("PreviewStart")) ? song.at(utility::conversions::to_string_t("PreviewStart")).as_number().to_double() : 0.0;
+	m_duration = song.has_field(utility::conversions::to_string_t("Duration")) ? song.at(utility::conversions::to_string_t("Duration")).as_number().to_double() : 0.0;
+	music["background"] = song.has_field(utility::conversions::to_string_t("SongFile")) ? fs::path(song.at(utility::conversions::to_string_t("SongFile")).as_string()) : emptyStr;
+	music["vocals"] = song.has_field(utility::conversions::to_string_t("Vocals")) ? fs::path(song.at(utility::conversions::to_string_t("Vocals")).as_string()) : emptyStr;
 	loadStatus = Song::LoadStatus::HEADER;
 	
-	if (song.has_field("VocalTracks")) {
-		for (unsigned i = 0; i < song.at("VocalTracks").as_number().to_uint32(); i++) {
+	if (song.has_field(utility::conversions::to_string_t("VocalTracks"))) {
+		for (unsigned i = 0; i < song.at(utility::conversions::to_string_t("VocalTracks")).as_number().to_uint32(); i++) {
 			std::string track = "DummyTrack" + std::to_string(i);
 			insertVocalTrack(track, VocalTrack(track));
 		}
 	}
 	
-	if (song.has_field("KeyboardTracks")) {
+	if (song.has_field(utility::conversions::to_string_t("KeyboardTracks"))) {
 			instrumentTracks.insert(make_pair(TrackName::KEYBOARD, InstrumentTrack(TrackName::KEYBOARD)));
 	}
 	
-	if (song.has_field("DrumTracks")) {
+	if (song.has_field(utility::conversions::to_string_t("DrumTracks"))) {
 			instrumentTracks.insert(make_pair(TrackName::DRUMS, InstrumentTrack(TrackName::DRUMS)));
 	}		
-	if (song.has_field("DanceTracks")) {
+	if (song.has_field(utility::conversions::to_string_t("DanceTracks"))) {
 		DanceDifficultyMap danceDifficultyMap;
 			danceTracks.insert(std::make_pair("dance-single", danceDifficultyMap));
 	}		
-	if (song.has_field("GuitarTracks")) {
+	if (song.has_field(utility::conversions::to_string_t("GuitarTracks"))) {
 			instrumentTracks.insert(std::make_pair(TrackName::GUITAR, InstrumentTrack(TrackName::GUITAR)));
 	}
-	if (song.has_field("BPM")) {
-			m_bpms.push_back(BPM(0, 0, song.at("BPM").as_number().to_double()));
+	if (song.has_field(utility::conversions::to_string_t("BPM"))) {
+			m_bpms.push_back(BPM(0, 0, song.at(utility::conversions::to_string_t("BPM")).as_number().to_double()));
 	}
 	collateUpdate();
 }
@@ -100,18 +101,17 @@ Song::Status Song::status(double time, ScreenSing* song) {
 	if (song->getMenu().isOpen()) return Status::NORMAL; // This should prevent querying getVocalTrack with an out-of-bounds/uninitialized index.
 	if (vocalTracks.empty()) return Status::NORMAL;  // To avoid crash with non-vocal songs (dance, guitar) -- FIXME: what should we actually do?
 	Note target; target.end = time;
-	Notes s1, s2, notes;
+	Notes* notes = nullptr;
 	Notes::const_iterator it;
+
 	if (song->singingDuet()) {
-		s1 = getVocalTrack(0).notes;
-		s2 = getVocalTrack(1).notes;
-		std::merge(s1.begin(), s1.end(), s2.begin(), s2.end(), std::back_inserter(notes), Note::ltBegin);
+		notes = &getVocalTrack(SongParserUtil::DUET_BOTH).notes;
 	}
 	else {
-		notes = getVocalTrack(song->selectedVocalTrack()).notes;
+		notes = &getVocalTrack(song->selectedVocalTrack()).notes;
 	}
-	it = std::lower_bound(notes.begin(), notes.end(), target, [](Note const& a, Note const& b) { return a.end < b.end; });
-	if (it == notes.end()) return Status::FINISHED;
+	it = std::lower_bound(notes->begin(), notes->end(), target, [](Note const& a, Note const& b) { return a.end < b.end; });
+	if (it == notes->end()) return Status::FINISHED;
 	if (it->begin > time + 4.0) return Status::INSTRUMENTAL_BREAK;
 	return Status::NORMAL;
 }
