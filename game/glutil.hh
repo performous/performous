@@ -80,11 +80,7 @@ namespace glutil {
 	private:
 		std::vector<VertexInfo> m_vertices;
 		VertexInfo m_vert;
-		GLuint m_vbo = 0, m_vao = 0;
 	public:
-		VertexArray();
-		~VertexArray();
-
 		VertexArray& vertex(float x, float y, float z = 0.0f) {
 			return vertex(glmath::vec3(x, y, z));
 		}
