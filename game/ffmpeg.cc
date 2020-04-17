@@ -14,14 +14,14 @@
 #include <thread>
 
 extern "C" {
-#include AVCODEC_INCLUDE
-#include AVFORMAT_INCLUDE
-#include SWSCALE_INCLUDE
-#include SWRESAMPLE_INCLUDE
-#include AVUTIL_INCLUDE
-#include AVUTIL_OPT_INCLUDE
-#include AVUTIL_MATH_INCLUDE
-#include AVUTIL_ERROR_INCLUDE
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libswscale/swscale.h>
+#include <libswresample/swresample.h>
+#include <libavutil/avutil.h>
+#include <libavutil/opt.h>
+#include <libavutil/mathematics.h>
+#include <libavutil/error.h>
 }
 
 #define AUDIO_CHANNELS 2
@@ -375,4 +375,3 @@ void FFmpeg::processAudio(uFrame frame) {
 	av_freep(&output);
 	m_position += double(out_samples)/m_rate;
 }
-
