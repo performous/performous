@@ -71,7 +71,7 @@ if (Boost_VERSION VERSION_LESS 105500)
 	set(CMAKE_CXX_FLAGS "-DBOOST_NO_CXX11_SCOPED_ENUMS ${CMAKE_CXX_FLAGS}")
 endif()
 
-find_package(ICU REQUIRED uc data i18n io)
+find_package(ICU 60 REQUIRED uc data i18n io)
 include_directories(${ICU_INCLUDE_DIRS})
 list(APPEND LIBS ${ICU_LIBRARIES})
 
@@ -80,6 +80,9 @@ list(APPEND LIBS ${ICU_LIBRARIES})
 find_package(LibEpoxy 1.2 REQUIRED)
 include_directories(${LibEpoxy_INCLUDE_DIRS})
 list(APPEND LIBS ${LibEpoxy_LIBRARIES})
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(deps REQUIRED IMPORTED_TARGET glib-2.0 gio-2.0 gobject-2.0)
 
 # Find all the libs that don't require extra parameters
 foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM)
@@ -175,8 +178,19 @@ add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
 if(WIN32)
   target_link_libraries(performous wsock32 ws2_32)
 endif()
+
+target_link_libraries(performous ced aubio)
+
+if(APPLE)
+	list(APPEND LIBS "-framework Accelerate")
+endif()
+list(APPEND LIBS ${FFTW3_LIBRARIES})
+list(APPEND LIBS ${BLAS_LIBRARIES})
+
+target_link_libraries(performous PkgConfig::deps)
 target_link_libraries(performous ${LIBS})
-target_link_libraries(performous ced)
+
+target_include_directories(performous PRIVATE "${AUBIO_INSTALL_DIR}/include/")
 
 install(TARGETS performous DESTINATION ${BIN_INSTALL})
 

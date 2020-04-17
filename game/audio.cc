@@ -2,14 +2,19 @@
 
 #include "chrono.hh"
 #include "configuration.hh"
-#include "util.hh"
 #include "libda/portaudio.hpp"
+#include "screen_songs.hh"
+#include "songs.hh"
+#include "util.hh"
+
+#include "aubio/aubio.h"
+#include <boost/range/iterator_range.hpp>
+
 #include <cmath>
 #include <future>
 #include <iostream>
 #include <map>
 #include <unordered_map>
-#include <boost/range/iterator_range.hpp>
 
 namespace {
 	/**
@@ -62,173 +67,193 @@ namespace {
 			*i *= factor * factor; // Decrease music volume
 	}
 }
-/**
-* Advanced audio sync code.
-* Produces precise monotonic clock synced to audio output callback (which may suffer of major jitter).
-* Uses system clock as timebase but the clock is skewed (made slower or faster) depending on whether
-* it is late or early. The clock is also stopped if audio output pauses.
-**/
-class AudioClock {
-	mutable std::mutex m_mutex;
-	Time m_baseTime; ///< A reference time (corresponds to m_basePos)
-	Seconds m_basePos = 0.0s; ///< A reference position in song
-	double m_skew = 0.0; ///< The skew ratio applied to system time (since baseTime)
-	std::atomic<Seconds> m_max{ 0.0s }; ///< Maximum output value for the clock (end of the current audio block)
-	/// Get the current position (current time via parameter, no locking)
-	Seconds pos_internal(Time now) const {
-		Seconds t = m_basePos + (1.0 + m_skew) * (now - m_baseTime);
-		return std::min<Seconds>(t, m_max);
-	}
-public:
-	/**
-	* Called from audio callback to keep the clock synced.
-	* @param audioPos the current position in the song
-	* @param length the duration of the current audio block
-	*/
-	void timeSync(Seconds audioPos, Seconds length) {
-		constexpr Seconds maxError = 100ms;  // Step the clock instead of skewing if over 100 ms off
-		// Full correction requires locking, but we can update max without lock too
-		std::unique_lock<std::mutex> l(m_mutex, std::defer_lock);
-		Seconds max = audioPos + length;
-		if (!l.try_lock()) {
-			if (max > m_max.load()) m_max = max; // Allow increasing m_max
-			return;
-		}
-		// Mutex locked - do a full update
-		auto now = Clock::now();
-		const Seconds sys = pos_internal(now);  // Current position (based on system clock + corrections)
-		const Seconds audio = audioPos;  // Audio time
-		const Seconds diff = audio - sys;
-		// Skew-based correction only if going forward and relatively well synced
-		if (max > m_max.load() && std::abs(diff.count()) < maxError.count()) {
-			constexpr double fudgeFactor = 0.001;  // Adjustment ratio
-			// Update base position (this should not affect the clock)
-			m_baseTime = now;
-			m_basePos = sys;
-			// Apply a VERY ARTIFICIAL correction for clock!
-			const Seconds valadj = length * 0.1 * rand() / RAND_MAX;  // Dither
-			m_skew += (diff < valadj ? -1.0 : 1.0) * fudgeFactor;
-			// Limits to keep things sane in abnormal situations
-			m_skew = clamp(m_skew, -0.01, 0.01);
-		} else {
-			// Off too much, step to correct time
-			m_baseTime = now;
-			m_basePos = audio;
-			m_skew = 0.0;
-		}
-		m_max = max;
-	}
-	/// Get the current position in seconds
-	Seconds pos() const {
-		std::lock_guard<std::mutex> l(m_mutex);
-		return pos_internal(Clock::now());
-	}
-};
 
-class Music {
-	struct Track {
-		FFmpeg mpeg;
-		float fadeLevel = 1.0f;
-		float pitchFactor = 0.0f;
-		template <typename... Args> Track(Args&&... args): mpeg(args...) {}
-	};
-	std::unordered_map<std::string, std::unique_ptr<Track>> tracks; ///< Audio decoders
-	double srate; ///< Sample rate
-	int64_t m_pos = 0; ///< Current sample position
-	bool m_preview;
-	AudioClock m_clock;
-	Seconds durationOf(int64_t samples) const { return 1.0s * samples / srate / 2.0; }
-public:
-	bool suppressCenterChannel = false;
-	double fadeLevel = 0.0;
-	double fadeRate = 0.0;
-	using Buffer = std::vector<float>;
-	Music(Audio::Files const& files, unsigned int sr, bool preview): srate(sr), m_preview(preview) {
-		for (auto const& tf /* trackname-filename pair */: files) {
-			if (tf.second.empty()) continue; // Skip tracks with no filenames; FIXME: Why do we even have those here, shouldn't they be eliminated earlier?
-			tracks.emplace(tf.first, std::make_unique<Track>(tf.second, sr));
-			//tracks.insert(tf.first, std::auto_ptr<Track>(new Track(tf.second, sr)));
+void AudioClock::timeSync(Seconds audioPos, Seconds length) {
+	constexpr Seconds maxError = 100ms;  // Step the clock instead of skewing if over 100 ms off
+	// Full correction requires locking, but we can update max without lock too
+	std::unique_lock<std::mutex> l(m_mutex, std::defer_lock);
+	Seconds max = audioPos + length;
+	if (!l.try_lock()) {
+		if (max > m_max.load()) m_max = max; // Allow increasing m_max
+		return;
+	}
+	// Mutex locked - do a full update
+	auto now = Clock::now();
+	const Seconds sys = pos_internal(now);  // Current position (based on system clock + corrections)
+	const Seconds audio = audioPos;  // Audio time
+	const Seconds diff = audio - sys;
+	// Skew-based correction only if going forward and relatively well synced
+	if (max > m_max.load() && std::abs(diff.count()) < maxError.count()) {
+		constexpr double fudgeFactor = 0.001;  // Adjustment ratio
+		// Update base position (this should not affect the clock)
+		m_baseTime = now;
+		m_basePos = sys;
+		// Apply a VERY ARTIFICIAL correction for clock!
+		const Seconds valadj = length * 0.1 * rand() / RAND_MAX;  // Dither
+		m_skew += (diff < valadj ? -1.0 : 1.0) * fudgeFactor;
+		// Limits to keep things sane in abnormal situations
+		m_skew = clamp(m_skew, -0.01, 0.01);
+	} else {
+		// Off too much, step to correct time
+		m_baseTime = now;
+		m_basePos = audio;
+		m_skew = 0.0;
+	}
+	m_max = max;
+}
+
+Seconds AudioClock::pos_internal(Time now) const {
+	Seconds t = m_basePos + (1.0 + m_skew) * (now - m_baseTime);
+	return std::min<Seconds>(t, m_max);
+}
+
+Seconds AudioClock::pos() const {
+	std::lock_guard<std::mutex> l(m_mutex);
+	return pos_internal(Clock::now());
+}
+
+Music::Music(Audio::Files const& files, unsigned int sr, bool preview): srate(sr), m_preview(preview) {
+	for (auto const& tf /* trackname-filename pair */: files) {
+		if (tf.second.empty()) continue; // Skip tracks with no filenames; FIXME: Why do we even have those here, shouldn't they be eliminated earlier?
+		tracks.emplace(tf.first, std::make_unique<Track>(tf.second, sr));
+	}
+	suppressCenterChannel = config["audio/suppress_center_channel"].b();
+}
+
+unsigned Audio::aubio_win_size = 1536;
+unsigned Audio::aubio_hop_size = 768;
+
+std::unique_ptr<aubio_tempo_t, void(*)(aubio_tempo_t*)> Audio::aubioTempo =
+					std::unique_ptr<aubio_tempo_t, void(*)(aubio_tempo_t*)>(
+						new_aubio_tempo(
+							"default",
+							Audio::aubio_win_size,
+							Audio::aubio_hop_size,
+							Audio::getSR()),[](aubio_tempo_t* p) {
+							if (p != nullptr) {
+								del_aubio_tempo(p);
+								}
+							}
+					);
+
+std::recursive_mutex Audio::aubio_mutex;
+
+bool Music::operator()(float* begin, float* end) {
+	size_t samples = end - begin;
+	m_clock.timeSync(durationOf(m_pos), durationOf(samples)); // Keep the clock synced
+	bool eof = true;
+	Buffer mixbuf(samples);
+	for (auto& kv: tracks) {
+		Track& t = *kv.second;
+// #if 0 // FIXME: Include this code bit once there is a sane pitch shifting algorithm
+// //			if (it->first == "guitar") std::cout << t.pitchFactor << std::endl;
+// 			if (t.pitchFactor != 0) { // Pitch shift
+// 				Buffer tempbuf(end - begin);
+// 				// Get audio to temp buffer
+// 				if (t.mpeg.audioQueue(&*tempbuf.begin(), &*tempbuf.end(), m_pos, t.fadeLevel)) eof = false;
+// 				// Do the magic
+// 				PitchShift(&*tempbuf.begin(), &*tempbuf.end(), t.pitchFactor);
+// 				// Mix with other tracks
+// 				Buffer::iterator m = mixbuf.begin();
+// 				Buffer::iterator b = tempbuf.begin();
+// 				while (b != tempbuf.end())
+// 					*m++ += (*b++);
+// 			// Otherwise just get the audio and mix it straight away
+// 			} else
+// #endif
+		if (t.mpeg.audioQueue(mixbuf.data(), mixbuf.data() + mixbuf.size(), m_pos, t.fadeLevel)) eof = false;
+		
+	}
+	m_pos += samples;
+	
+	for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
+		if (i % 2 == 0) {
+			fadeLevel += fadeRate;
+			if (fadeLevel <= 0.0) return false;
+			if (fadeLevel > 1.0) { fadeLevel = 1.0; fadeRate = 0.0; }
 		}
-		suppressCenterChannel = config["audio/suppress_center_channel"].b();
+		begin[i] += mixbuf[i] * fadeLevel * static_cast<float>(m_preview ? config["audio/preview_volume"].i() : config["audio/music_volume"].i())/100.0;
 	}
-	/// Sums the stream to output sample range, returns true if the stream still has audio left afterwards.
-	bool operator()(float* begin, float* end) {
-		size_t samples = end - begin;
-		m_clock.timeSync(durationOf(m_pos), durationOf(samples)); // Keep the clock synced
-		bool eof = true;
-		Buffer mixbuf(samples);
-		for (auto& kv: tracks) {
-			Track& t = *kv.second;
-// FIXME: Include this code bit once there is a sane pitch shifting algorithm
-#if 0
-//			if (it->first == "guitar") std::cout << t.pitchFactor << std::endl;
-			if (t.pitchFactor != 0) { // Pitch shift
-				Buffer tempbuf(end - begin);
-				// Get audio to temp buffer
-				if (t.mpeg.audioQueue(&*tempbuf.begin(), &*tempbuf.end(), m_pos, t.fadeLevel)) eof = false;
-				// Do the magic
-				PitchShift(&*tempbuf.begin(), &*tempbuf.end(), t.pitchFactor);
-				// Mix with other tracks
-				Buffer::iterator m = mixbuf.begin();
-				Buffer::iterator b = tempbuf.begin();
-				while (b != tempbuf.end())
-					*m++ += (*b++);
-			// Otherwise just get the audio and mix it straight away
-			} else
-#endif
-			if (t.mpeg.audioQueue(&*mixbuf.begin(), &*mixbuf.end(), m_pos, t.fadeLevel)) eof = false;
+	// suppress center channel vocals
+	if(suppressCenterChannel && !m_preview) {
+		float diffLR;
+		for (size_t i=0; i<mixbuf.size(); i+=2) {
+			diffLR = begin[i] - begin[i+1];
+			begin[i] = diffLR;
+			begin[i+1] = diffLR;
 		}
-		m_pos += samples;
-		for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
-			if (i % 2 == 0) {
-				fadeLevel += fadeRate;
-				if (fadeLevel <= 0.0) return false;
-				if (fadeLevel > 1.0) { fadeLevel = 1.0; fadeRate = 0.0; }
-			}
-			begin[i] += mixbuf[i] * fadeLevel * static_cast<float>(m_preview ? config["audio/preview_volume"].i() : config["audio/music_volume"].i())/100.0;
+	}
+	return !eof;
+}
+
+double Music::duration() const {
+	double dur = 0.0;
+	for (auto& kv: tracks) dur = std::max(dur, kv.second->mpeg.audioQueue.duration());
+	return dur;
+}
+
+bool Music::prepare() {
+	bool ready = true;
+	for (auto& kv: tracks) {
+		FFmpeg& mpeg = kv.second->mpeg;
+		if (mpeg.terminating()) continue;  // Song loading failed or other error, won't ever get ready
+		if (mpeg.audioQueue.prepare(m_pos)) {
+			if (kv.first == "background" && m_preview && m_pos > 0) {
+				fvec_t* previewSamples = mpeg.audioQueue.makePreviewBuffer();
+				fvec_t* previewBeats = ScreenSongs::previewBeatsBuffer.get();
+				intptr_t readptr = 0;
+				fvec_t* tempoSamplePtr = new_fvec(Audio::aubio_hop_size);
+				std::lock_guard<std::recursive_mutex> l(Audio::aubio_mutex);
+				Game* gm = Game::getSingletonPtr();
+				ScreenSongs* sSongs = static_cast<ScreenSongs *>(gm->getScreen("Songs"));
+				double pstart = sSongs->getSongs().currentPtr()->preview_start;
+				pstart = (std::isnan(pstart) ? 0.0 : pstart);
+				double first_period, first_beat;
+				std::vector<double> extra_beats;
+				Song::Beats& beats = sSongs->getSongs().currentPtr()->beats;
+				if (!sSongs->getSongs().currentPtr()->hasControllers()) {
+				while ((readptr + Audio::aubio_hop_size) <= previewSamples->length) {
+					tempoSamplePtr->data = &previewSamples->data[readptr];
+					aubio_tempo_do(Audio::aubioTempo.get(),tempoSamplePtr,previewBeats);
+					if (previewBeats->data[0] != 0) {
+						double beatSecs = aubio_tempo_get_last_s(Audio::aubioTempo.get());
+							if (beats.empty()) { // Store time and period of first detected beat.
+								first_beat = beatSecs;
+								first_period = aubio_tempo_get_period_s(Audio::aubioTempo.get());
+							}
+						beats.push_back(beatSecs + pstart);
+					}
+					readptr += Audio::aubio_hop_size;
+				}
+					if (!beats.empty()) {
+						double newBeat = first_beat - first_period;
+						while (newBeat > 0.02) {
+							extra_beats.push_back(newBeat + pstart);
+							newBeat -= first_period;
+						}
+						beats.insert(beats.begin(),extra_beats.rbegin(),extra_beats.rend());
+					}
+				}
+			}	
+		continue;  // Buffering done
 		}
-		// suppress center channel vocals
-		if(suppressCenterChannel && !m_preview) {
-			float diffLR;
-			for (size_t i=0; i<mixbuf.size(); i+=2) {
-				diffLR = begin[i] - begin[i+1];
-				begin[i] = diffLR;
-				begin[i+1] = diffLR;
-			}
-		}
-		return !eof;
+		ready = false;  // Need to wait for buffering
+		break;
 	}
-	void seek(double time) { m_pos = time * srate * 2.0; }
-	/// Get the current position in seconds
-	double pos() const { return m_clock.pos().count(); }
-	double duration() const {
-		double dur = 0.0;
-		for (auto& kv: tracks) dur = std::max(dur, kv.second->mpeg.audioQueue.duration());
-		return dur;
-	}
-	/// Prepare (seek) all tracks to current position, return true when done (nonblocking)
-	bool prepare() {
-		bool ready = true;
-		for (auto& kv: tracks) {
-			FFmpeg& mpeg = kv.second->mpeg;
-			if (mpeg.terminating()) continue;  // Song loading failed or other error, won't ever get ready
-			if (mpeg.audioQueue.prepare(m_pos)) continue;  // Buffering done
-			ready = false;  // Need to wait for buffering
-			break;
-		}
-		return ready;
-	}
-	void trackFade(std::string const& name, double fadeLevel) {
-		auto it = tracks.find(name);
-		if (it == tracks.end()) return;
-		it->second->fadeLevel = fadeLevel;
-	}
-	void trackPitchBend(std::string const& name, double pitchFactor) {
-		auto it = tracks.find(name);
-		if (it == tracks.end()) return;
-		it->second->pitchFactor = pitchFactor;
-	}
-};
+	return ready;
+}
+
+void Music::trackFade(std::string const& name, double fadeLevel) {
+	auto it = tracks.find(name);
+	if (it == tracks.end()) return;
+	it->second->fadeLevel = fadeLevel;
+}
+
+void Music::trackPitchBend(std::string const& name, double pitchFactor) {
+	auto it = tracks.find(name);
+	if (it == tracks.end()) return;
+	it->second->pitchFactor = pitchFactor;
+}
 
 struct Sample {
   private:
@@ -243,7 +268,7 @@ struct Sample {
 			return;
 		}
 		std::vector<float> mixbuf(end - begin);
-		if(!mpeg.audioQueue(&*mixbuf.begin(), &*mixbuf.end(), m_pos, 1.0)) {
+		if(!mpeg.audioQueue(mixbuf.data(), mixbuf.data() + mixbuf.size(), m_pos, 1.0)) {
 			eof = true;
 		}
 		for (size_t i = 0, iend = end - begin; i != iend; ++i) {
@@ -523,7 +548,10 @@ struct Audio::Impl {
 	}
 };
 
-Audio::Audio(): self(std::make_unique<Impl>()) {}
+Audio::Audio(): self(std::make_unique<Impl>()) {
+	aubio_tempo_set_silence(Audio::aubioTempo.get(), -50.0);
+	aubio_tempo_set_threshold(Audio::aubioTempo.get(), 0.4);
+}
 Audio::~Audio() { close(); }
 
 ConfigItem& Audio::backendConfig() {

@@ -27,7 +27,7 @@ These steps enable translation of the XML locate bits.
   3. Click the New button and fill out the form like this:
        Language: Performous XML
        List of extensions: *.xml
-       Parser command: $SOURCE_ROOT/tools/scripts/xml_gettext.sh %o %F
+       Parser command: $SOURCE_ROOT/lang/xml_gettext.py %o %F
        An item in keywords list:
        An item in input files list: %f
        Source code charset:
@@ -51,7 +51,7 @@ from there (in which case you can skip these steps.)
    9. Enter _ (that's underscore), press enter
   10. Enter translate_noop and press enter
   11. Click Okay
-  12. Choose a name for your .po file (performous) 
+  12. Choose a name for your .po file (performous)
   13. Follow the instructions above to enable XML translation
 
 REMEMBER TO SAVE WITH YOU LOCALE NAME

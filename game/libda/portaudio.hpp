@@ -10,7 +10,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <future>
-#include <regex>
+#include "../regex.hh"
 #include <set>
 #include <stdexcept>
 
@@ -92,7 +92,7 @@ namespace portaudio {
 					{ " \\(.*\\)", "" },  // Remove the parenthesis part entirely
 				};
 				for (auto const& rep: replacements) {
-					std::string flex = std::regex_replace(dev.flex, std::regex(rep[0]), rep[1]);
+					std::string flex = regex_replace(dev.flex, regex(rep[0]), rep[1]);
 					if (flex == dev.flex) continue;  // Nothing changed
 					// Verify that flex doesn't find any wrong devices
 					bool fail = false;

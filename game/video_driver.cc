@@ -10,6 +10,10 @@
 #include "screen.hh"
 #include "util.hh"
 #include <boost/filesystem.hpp>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_hints.h>
+#include <SDL2/SDL_rect.h>
+#include <SDL2/SDL_video.h>
 
 namespace {
 	float s_width;
@@ -53,7 +57,7 @@ GLuint Window::m_vao = 0;
 GLuint Window::m_vbo = 0;
 GLint Window::bufferOffsetAlignment = -1;
 
-Window::Window() {
+Window::Window() : screen(nullptr, &SDL_DestroyWindow), glContext(nullptr, &SDL_GL_DeleteContext) {
 	std::atexit(SDL_Quit);
 	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK))
 		throw std::runtime_error(std::string("SDL_Init failed: ") + SDL_GetError());
@@ -77,27 +81,78 @@ Window::Window() {
 		int height = config["graphic/window_height"].i();
 		int windowPosX = config["graphic/window_pos_x"].i();
 		int windowPosY = config["graphic/window_pos_y"].i();
-		std::clog << "video/info: Create window dimensions: " << width << "x" << height << " on screen position: " << windowPosX << "x" << windowPosY << std::endl;
-		screen = SDL_CreateWindow(PACKAGE " " VERSION, windowPosX, windowPosY, width, height, flags);
-		if (!screen) throw std::runtime_error(std::string("SDL_SetVideoMode failed: ") + SDL_GetError());
-		SDL_GL_CreateContext(screen);
+		int displayCount = SDL_GetNumVideoDisplays();
+		if (displayCount <= 0) {
+			throw std::runtime_error(std::string("video/error: SDL_GetNumVideoDisplays failed: ") + SDL_GetError());
+		}
+		SDL_Rect totalSize;
+		if (displayCount > 1) {
+			totalSize.x = 0;
+			totalSize.y = 0;
+			totalSize.w = 0;
+			totalSize.h = 0;
+			int displayNum = 0;
+			SDL_Rect displaySize;
+			SDL_Rect prevTotal;
+			while (displayNum < displayCount) {
+				if (SDL_GetDisplayBounds(displayNum, &displaySize) != 0) {
+					throw std::runtime_error(std::string("video/error: SDL_GetDisplayBounds failed: ") + SDL_GetError());
+				}
+				prevTotal.x = totalSize.x;
+				prevTotal.y = totalSize.y;
+				prevTotal.w = totalSize.w;
+				prevTotal.h = totalSize.h;
+				SDL_UnionRect(&prevTotal, &displaySize, &totalSize);
+				++displayNum;
+			}
+		}
+		else {
+			if (SDL_GetDisplayBounds(0, &totalSize) != 0) {
+				throw std::runtime_error(std::string("video/error: SDL_GetDisplayBounds failed: ") + SDL_GetError());
+			}
+		}
+		SDL_Point winOrigin {windowPosX, windowPosY};
+		if (SDL_PointInRect(&winOrigin, &totalSize) == SDL_FALSE) {
+			if (winOrigin.x < totalSize.x) { winOrigin.x = totalSize.x; }
+			else if (winOrigin.x > totalSize.w) { winOrigin.x = (totalSize.w - width); }
+			if (winOrigin.y < totalSize.y) { winOrigin.y = totalSize.y; }
+			else if (winOrigin.y > totalSize.h) { winOrigin.y = (totalSize.h - height); }
+			std::clog << "video/info: Saved window position outside of current display set-up; resetting to " << winOrigin.x << "," << winOrigin.y << std::endl;
+		}
+		SDL_Point winEnd {(winOrigin.x + width), (winOrigin.y + height)};
+		if (SDL_PointInRect(&winEnd, &totalSize) == SDL_FALSE) {
+			if (winEnd.x > totalSize.w) {
+			width = totalSize.w;
+			winOrigin.x = (totalSize.w - width);
+			}
+			if (winEnd.y > totalSize.h) {
+			height = totalSize.h;
+			winOrigin.y = (totalSize.y - height);
+			}
+			std::clog << "video/info: Saved window size outside of current display set-up; resetting to " << width << "x" << height << std::endl;
+		}		
+		std::clog << "video/info: Create window dimensions: " << width << "x" << height << " on screen position: " << winOrigin.x << "x" << winOrigin.y << std::endl;
+		screen.reset(SDL_CreateWindow(PACKAGE " " VERSION, winOrigin.x, winOrigin.y, width, height, flags));
+		if (!screen) throw std::runtime_error(std::string("SDL_CreateWindow failed: ") + SDL_GetError());
+		glContext.reset(SDL_GL_CreateContext(screen.get()));
+		if (glContext == nullptr) throw std::runtime_error(std::string("SDL_GL_CreateContext failed with error: ") + SDL_GetError());
+		if (epoxy_gl_version() < 33) throw std::runtime_error("Performous needs at least OpenGL 3.3+ Core profile to run.");
 		glutil::GLErrorChecker error("Initializing buffers");
 		{
 			initBuffers();
 		}
 	}
-	SDL_SetWindowMinimumSize(screen, 640, 360);
-	SDL_GetWindowPosition(screen, &m_windowX, &m_windowY);
+	SDL_SetWindowMinimumSize(screen.get(), 640, 360);
+	SDL_GetWindowPosition(screen.get(), &m_windowX, &m_windowY);
 	// Dump some OpenGL info
 	std::clog << "video/info: GL_VENDOR:     " << glGetString(GL_VENDOR) << std::endl;
 	std::clog << "video/info: GL_VERSION:    " << glGetString(GL_VERSION) << std::endl;
 	std::clog << "video/info: GL_RENDERER:   " << glGetString(GL_RENDERER) << std::endl;
 	// Extensions would need more complex outputting, otherwise they will break clog.
 	//std::clog << "video/info: GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl;
-	if (epoxy_gl_version() < 33) throw std::runtime_error("OpenGL 3.3 is required but not available");	
 	createShaders();
 	resize();
-	SDL_ShowWindow(screen);
+	SDL_ShowWindow(screen.get());
 }
 
 void Window::createShaders() {
@@ -306,9 +361,9 @@ void Window::view(unsigned num) {
 	int nativeW;
 	int nativeH;
 	if (std::stoi(SDL_GetHint("SDL_HINT_VIDEO_HIGHDPI_DISABLED")) == 1) {
-		SDL_GetWindowSize(screen, &nativeW, &nativeH);
+		SDL_GetWindowSize(screen.get(), &nativeW, &nativeH);
 	}
-	else { SDL_GL_GetDrawableSize(screen, &nativeW, &nativeH); }
+	else { SDL_GL_GetDrawableSize(screen.get(), &nativeW, &nativeH); }
 	float vx = 0.5f * (nativeW - s_width);
 	float vy = 0.5f * (nativeH - s_height);
 	float vw = s_width, vh = s_height;
@@ -334,7 +389,7 @@ void Window::view(unsigned num) {
 }
 
 void Window::swap() {
-	SDL_GL_SwapWindow(screen);
+	SDL_GL_SwapWindow(screen.get());
 }
 
 void Window::event(Uint8 const& eventID, Sint32 const& data1, Sint32 const& data2) {
@@ -380,15 +435,15 @@ void Window::setFullscreen() {
 	if (m_fullscreen == config["graphic/fullscreen"].b()) return;  // We are done here
 	m_fullscreen = config["graphic/fullscreen"].b();
 	std::clog << "video/info: Toggle into " << (m_fullscreen ? "FULL SCREEN MODE" : "WINDOWED MODE") << std::endl;
-	auto ret = SDL_SetWindowFullscreen(screen, (m_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0 ));
+	auto ret = SDL_SetWindowFullscreen(screen.get(), (m_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0 ));
 	if (ret < 0) std::clog << "video/error: SDL_SetWindowFullscreen returned " << ret << std::endl;
 	// Resize window to old size and position (if windowed now)
 	if (!m_fullscreen) {
 		int w = config["graphic/window_width"].i();
 		int h = config["graphic/window_height"].i();
 		std::clog << "video/debug: Restoring window size " << w << "x" << h << " and position " << m_windowX << "," << m_windowY << std::endl;
-		SDL_SetWindowSize(screen, w, h);
-		SDL_SetWindowPosition(screen, m_windowX, m_windowY);
+		SDL_SetWindowSize(screen.get(), w, h);
+		SDL_SetWindowPosition(screen.get(), m_windowX, m_windowY);
 	}
 }
 
@@ -398,7 +453,7 @@ void Window::resize() {
 	m_needResize = false;
 	// Get nominal window dimensions
 	int w, h;
-	SDL_GetWindowSize(screen, &w, &h);
+	SDL_GetWindowSize(screen.get(), &w, &h);
 	if (m_fullscreen) {
 		SDL_ShowCursor(SDL_DISABLE);
 		SDL_DisableScreenSaver();
@@ -407,15 +462,15 @@ void Window::resize() {
 		SDL_EnableScreenSaver();
 		config["graphic/window_width"].i() = w;
 		config["graphic/window_height"].i() = h;
-		SDL_GetWindowPosition(screen, &m_windowX, &m_windowY);
+		SDL_GetWindowPosition(screen.get(), &m_windowX, &m_windowY);
 	}
 	// Get actual resolution
 	int nativeW, nativeH;
 
 	if (std::stoi(SDL_GetHint("SDL_HINT_VIDEO_HIGHDPI_DISABLED")) == 1) {
-		SDL_GetWindowSize(screen, &nativeW, &nativeH);
+		SDL_GetWindowSize(screen.get(), &nativeW, &nativeH);
 	}
-	else { SDL_GL_GetDrawableSize(screen, &nativeW, &nativeH); }
+	else { SDL_GL_GetDrawableSize(screen.get(), &nativeW, &nativeH); }
 	s_width = nativeW;
 	s_height = nativeH;
 	// Enforce aspect ratio limits
@@ -432,9 +487,9 @@ void Window::screenshot() {
 	int nativeW;
 	int nativeH;
 	if (std::stoi(SDL_GetHint("SDL_HINT_VIDEO_HIGHDPI_DISABLED")) == 1) {
-		SDL_GetWindowSize(screen, &nativeW, &nativeH);
+		SDL_GetWindowSize(screen.get(), &nativeW, &nativeH);
 	}
-	else { SDL_GL_GetDrawableSize(screen, &nativeW, &nativeH); }
+	else { SDL_GL_GetDrawableSize(screen.get(), &nativeW, &nativeH); }
 	img.width = nativeW;
 	img.height = nativeH;
 	unsigned stride = (img.width * 3 + 3) & ~3;  // Rows are aligned to 4 byte boundaries
