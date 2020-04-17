@@ -81,6 +81,8 @@ struct Note {
 	/// Compares begin of two notes
 	static bool ltBegin(Note const& a, Note const& b) {
 		if (a.begin == b.begin) {
+			if (a.type == b.type) return false;
+
 			if (a.type == Note::SLEEP) return true;
 			if (b.type == Note::SLEEP) return false;			
 		}
