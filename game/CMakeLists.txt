@@ -81,7 +81,7 @@ find_package(LibEpoxy 1.2 REQUIRED)
 include_directories(${LibEpoxy_INCLUDE_DIRS})
 list(APPEND LIBS ${LibEpoxy_LIBRARIES})
 
-find_package(GLIB REQUIRED COMPONENTS glib-2.0 gio-2.0 gobject-2.0)
+find_package(Glib REQUIRED COMPONENTS glib-2.0 gio-2.0 gobject-2.0)
 list(APPEND LIBS ${GLIB_LIBRARIES})
 
 # Find all the libs that don't require extra parameters
