@@ -311,6 +311,7 @@ void FFmpeg::open() {
 	case AVMEDIA_TYPE_AUDIO:
             m_rate = audioBuffer->getSamplesPerSecond() / double(AUDIO_CHANNELS);
 		m_resampleContext.reset(swr_alloc());
+		if (!m_resampleContext) throw std::runtime_error("Cannot create resampling context");
 		av_opt_set_int(m_resampleContext.get(), "in_channel_layout", m_codecContext->channel_layout ? m_codecContext->channel_layout : av_get_default_channel_layout(m_codecContext->channels), 0);
 		av_opt_set_int(m_resampleContext.get(), "out_channel_layout", av_get_default_channel_layout(AUDIO_CHANNELS), 0);
 		av_opt_set_int(m_resampleContext.get(), "in_sample_rate", m_codecContext->sample_rate, 0);
@@ -318,7 +319,6 @@ void FFmpeg::open() {
 		av_opt_set_int(m_resampleContext.get(), "in_sample_fmt", m_codecContext->sample_fmt, 0);
 		av_opt_set_int(m_resampleContext.get(), "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
 		swr_init(m_resampleContext.get());
-		if (!m_resampleContext) throw std::runtime_error("Cannot create resampling context");
 		break;
 	case AVMEDIA_TYPE_VIDEO:
 		// Setup software scaling context for YUV to RGB conversion
