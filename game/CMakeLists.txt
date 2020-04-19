@@ -93,6 +93,12 @@ foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWS
 	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
 
+if(LibXML++_VERSION_2_6)
+  set(LIBXMLPP_VERSION 2)
+else()
+  set(LIBXMLPP_VERSION 3)
+endif()
+
 option(ENABLE_MIDI "Enable support for MIDI hardware (e-drums with USB/MIDI connection)." ON)
 if(ENABLE_MIDI)
 	find_package(PortMidi)
@@ -197,6 +203,5 @@ if(WIN32)
 endif()
 
 # Generate config.hh
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.hh.in" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
-

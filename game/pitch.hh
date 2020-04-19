@@ -9,12 +9,10 @@
 
 /// struct to represent tones
 struct Tone {
-	static const std::size_t MAXHARM = 48; ///< The maximum number of harmonics tracked
 	static const std::size_t MINAGE = 2; ///< The minimum age required for a tone to be output
 	double freq; ///< Frequency (Hz)
 	double db; ///< Level (dB)
 	double stabledb; ///< Stable level, useful for graphics rendering
-	double harmonics[MAXHARM]; ///< Harmonics' levels
 	std::size_t age; ///< How many times the tone has been detected in row
 	Tone();
 	void print() const; ///< Prints Tone to std::cout
