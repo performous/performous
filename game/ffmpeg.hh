@@ -32,10 +32,6 @@ extern "C" {
 
 class AudioBuffer;
 
-struct AudioTrait;
-
-struct VideoTrait;
-
 /// ffmpeg class
 class FFmpeg {
   public:
