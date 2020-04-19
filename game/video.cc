@@ -1,5 +1,6 @@
 #include "video.hh"
 
+#include "ffmpeg.hh"
 #include "util.hh"
 #include <cmath>
 
@@ -44,9 +45,10 @@ Video::~Video() {
     m_grabber.get();
 }
 
-Video::Video(fs::path const& _videoFile, double videoGap): m_mpeg(_videoFile, 0, nullptr, [this] (auto f) { push(std::move(f)); }), m_videoGap(videoGap), m_textureTime(), m_alpha(-0.5, 1.5) {
+Video::Video(fs::path const& _videoFile, double videoGap): m_videoGap(videoGap), m_textureTime(), m_alpha(-0.5, 1.5) {
    
-   m_grabber = std::async(std::launch::async, [this, file = _videoFile] {
+	auto ffmpeg = std::make_unique<FFmpeg>(_videoFile, 0, nullptr, [this] (auto f) { push(std::move(f)); });
+   m_grabber = std::async(std::launch::async, [this, file = _videoFile, ffmpeg = std::move(ffmpeg)] {
 	int errors = 0;
 	std::unique_lock<std::mutex> l(m_mutex);
 	while (!m_quit) {
@@ -58,12 +60,12 @@ Video::Video(fs::path const& _videoFile, double videoGap): m_mpeg(_videoFile, 0,
                     // discard all outdated frame. Do it here to avoid races between clean and push, because push are done in this thread.
                     m_queue.clear();
                     l.unlock();
-                    m_mpeg.seek(std::max(0.0, seek_pos - 5.0));  // -5 to workaround ffmpeg inaccurate seeking
+                    ffmpeg->seek(std::max(0.0, seek_pos - 5.0));  // -5 to workaround ffmpeg inaccurate seeking
                 }
                 else l.unlock();
 
 		try {
-			m_mpeg.handleOneFrame();
+			ffmpeg->handleOneFrame();
 		} catch (FFmpeg::eof_error&) {
 			push(Bitmap()); // EOF marker
 			std::clog << "ffmpeg/debug: done loading " << file << std::endl;

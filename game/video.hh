@@ -2,7 +2,7 @@
 
 #include "animvalue.hh"
 #include "texture.hh"
-#include "ffmpeg.hh"
+#include <deque>
 #include <future>
 #include <string>
    
@@ -18,7 +18,6 @@ class Video {
 	Dimensions const& dimensions() const { return m_texture.dimensions; }
 
   private:
-	FFmpeg m_mpeg;
 	const double m_videoGap;
 	Bitmap m_videoFrame;
 	Texture m_texture;
