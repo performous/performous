@@ -119,9 +119,10 @@ void Analyzer::calcTones() {
 		double phase = std::arg(m_fft[k]) / TAU;
 		double delta = phase - m_fftLastPhase[k];
 		m_fftLastPhase[k] = phase;
+		if (magnitude < minMagnitude) continue;
 		// Use phase difference over a step to calculate what the frequency must be
 		double freq = stepRate * (std::round(k * phaseStep - delta) + delta);
-		if (magnitude > minMagnitude && std::abs(freq / freqPerBin - k) <= 0.7) {
+		if (std::abs(freq / freqPerBin - k) <= 1.5) {
 			freqs[freq] = magnitude;
 		}
 	}
@@ -132,18 +133,14 @@ void Analyzer::calcTones() {
 		double f = kv.first;
 		double p = kv.second * kv.second;
 		if (powerSum > 0.0 && abs(f - freqSum / powerSum) > 10.0 /* Hz */) {
-			freqSum /= powerSum;
-			size_t k = freqSum / freqPerBin;
-			if (k >= 1 && k < kMax) {
-				Peak p;
-				p.freq = freqSum;
-				p.power = powerSum;
-				peaks.push_back(p);
-			}
+			peaks.emplace_back(freqSum / powerSum, powerSum);
 			freqSum = powerSum = 0.0;
 		}
 		freqSum += p * f;
 		powerSum += p;
+	}
+	if (powerSum > 0.0) {
+		peaks.emplace_back(freqSum / powerSum, powerSum);
 	}
 	// Combine peaks into tones
 	tones_t tones;
