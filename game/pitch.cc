@@ -5,6 +5,7 @@
 #include <cmath>
 #include <iostream>
 #include <iomanip>
+#include <map>
 #include <stdexcept>
 
 // Limit the range to avoid noise and useless computation
@@ -16,14 +17,11 @@ Tone::Tone():
   db(-getInf()),
   stabledb(-getInf()),
   age()
-{
-	for (auto& h: harmonics) h = -getInf();
-}
+{}
 
 void Tone::print() const {
 	if (age < Tone::MINAGE) return;
 	std::cout << std::fixed << std::setprecision(1) << freq << " Hz, age " << age << ", " << db << " dB:";
-	for (std::size_t i = 0; i < 8; ++i) std::cout << " " << harmonics[i];
 	std::cout << std::endl;
 }
 
@@ -43,9 +41,11 @@ Analyzer::Analyzer(double rate, std::string id, std::size_t step):
   m_oldfreq(0.0)
 {
 	if (m_step > FFT_N) throw std::logic_error("Analyzer step is larger that FFT_N (ideally it should be less than a fourth of FFT_N).");
-	// Hamming window
 	for (size_t i=0; i < FFT_N; i++) {
-		m_window[i] = 0.53836 - 0.46164 * std::cos(TAU * i / (FFT_N - 1));
+		// Hamming window with unitary power
+		m_window[i] = 0.613 * (0.53836 - 0.46164 * std::cos(TAU * i / (FFT_N - 1)));
+		// FFT normalization (preserving signal power)
+		m_window[i] *= std::sqrt(2.0) / FFT_N;
 	}
 }
 
@@ -83,26 +83,9 @@ void Analyzer::output(float* begin, float* end, double rate) {
 
 namespace {
 	struct Peak {
-		double freq;
-		double db;
-		bool harm[Tone::MAXHARM];
-		Peak(double _freq = 0.0, double _db = -getInf()):
-		  freq(_freq), db(_db)
-		{
-			for (auto& h: harm) h = false;
-		}
-		void clear() {
-			freq = 0.0;
-			db = -getInf();
-		}
+		double freq, power;
+		Peak(double _freq = 0.0, double _power = 0.0): freq(_freq), power(_power) {}
 	};
-
-	Peak& match(std::vector<Peak>& peaks, std::size_t pos) {
-		std::size_t best = pos;
-		if (peaks[pos - 1].db > peaks[best].db) best = pos - 1;
-		if (peaks[pos + 1].db > peaks[best].db) best = pos + 1;
-		return peaks[best];
-	}
 }
 
 bool Analyzer::calcFFT() {
@@ -124,81 +107,83 @@ bool Analyzer::calcFFT() {
 void Analyzer::calcTones() {
 	// Precalculated constants
 	const double freqPerBin = m_rate / FFT_N;
-	const double phaseStep = TAU * m_step / FFT_N;
-	const double normCoeff = 1.0 / FFT_N;
-	const double minMagnitude = pow(10, -100.0 / 20.0) / normCoeff; // -100 dB
+	const double stepRate = m_rate / m_step;  // Steps per second
+	const double phaseStep = double(m_step) / FFT_N;
+	const double minMagnitude = pow(10, -80.0 / 20.0); // -80 dB
 	// Limit frequency range of processing
 	const size_t kMin = std::max(size_t(1), size_t(FFT_MINFREQ / freqPerBin));
 	const size_t kMax = std::min(FFT_N / 2, size_t(FFT_MAXFREQ / freqPerBin));
-	std::vector<Peak> peaks(kMax + 1); // One extra to simplify loops
-	for (size_t k = 1; k <= kMax; ++k) {
+	std::map<double, double> freqs;  // <freq, magnitude>
+	for (size_t k = kMin; k <= kMax; ++k) {
 		double magnitude = std::abs(m_fft[k]);
-		double phase = std::arg(m_fft[k]);
-		// process phase difference
+		double phase = std::arg(m_fft[k]) / TAU;
 		double delta = phase - m_fftLastPhase[k];
 		m_fftLastPhase[k] = phase;
-		delta -= k * phaseStep;  // subtract expected phase difference
-		delta = std::remainder(delta, TAU);  // map delta phase into +/- pi interval
-		delta /= phaseStep;  // calculate diff from bin center frequency
-		double freq = (k + delta) * freqPerBin;  // calculate the true frequency
-		if (freq > 1.0 && magnitude > minMagnitude) {
-			peaks[k].freq = freq;
-			peaks[k].db = 20.0 * log10(normCoeff * magnitude);
+		if (magnitude < minMagnitude) continue;
+		// Use phase difference over a step to calculate what the frequency must be
+		double freq = stepRate * (std::round(k * phaseStep - delta) + delta);
+		if (std::abs(freq / freqPerBin - k) <= 1.5) {
+			freqs[freq] = magnitude;
 		}
 	}
-	// Prefilter peaks
-	double prevdb = peaks[0].db;
-	for (size_t k = 1; k < kMax; ++k) {
-		double db = peaks[k].db;
-		if (db > prevdb) peaks[k - 1].clear();
-		if (db < prevdb) peaks[k].clear();
-		prevdb = db;
+	// Group multiple bins' identical frequencies together by total power
+	double freqSum = 0.0, powerSum = 0.0;
+	std::vector<Peak> peaks;
+	for (auto const& kv: freqs) {
+		double f = kv.first;
+		double p = kv.second * kv.second;
+		if (powerSum > 0.0 && abs(f - freqSum / powerSum) > 10.0 /* Hz */) {
+			peaks.emplace_back(freqSum / powerSum, powerSum);
+			freqSum = powerSum = 0.0;
+		}
+		freqSum += p * f;
+		powerSum += p;
 	}
-	// Find the tones (collections of harmonics) from the array of peaks
+	if (powerSum > 0.0) {
+		peaks.emplace_back(freqSum / powerSum, powerSum);
+	}
+	// Combine peaks into tones
 	tones_t tones;
-	for (size_t k = kMax - 1; k >= kMin; --k) {
-		if (peaks[k].db < -70.0) continue;
-		// Find the best divider for getting the fundamental from peaks[k]
-		std::size_t bestDiv = 1;
-		int bestScore = 0;
-		for (std::size_t div = 2; div <= Tone::MAXHARM && k / div > 1; ++div) {
-			double freq = peaks[k].freq / div; // Fundamental
-			int score = 0;
-			for (std::size_t n = 1; n < div && n < 8; ++n) {
-				Peak& p = match(peaks, k * n / div);
-				--score;
-				if (p.db < -90.0 || std::abs(p.freq / n / freq - 1.0) > .03) continue;
-				if (n == 1) score += 4; // Extra for fundamental
-				score += 2;
-			}
-			if (score > bestScore) {
-				bestScore = score;
-				bestDiv = div;
+	while (!peaks.empty()) {
+		// Find the best possible match of any peak being any harmonic
+		double bestScore = 0.0;
+		double bestFreq = NAN;
+		for (Peak const& p : peaks) {
+			for (size_t den = 1; den < 6; ++den) {
+				double freq = p.freq / den;
+				if (freq < 60.0) break;
+				double score = 0.0;
+				double freqSum = 0.0;
+				for (Peak const& p2: peaks) {
+					double f = p2.freq / std::round(p2.freq / freq);
+					if (abs(f / freq - 1.0) > 0.05) continue;
+					score += p2.power;
+					freqSum += p2.power * f;
+				}
+				score /= std::sqrt(den);
+				if (score > bestScore) {
+					bestScore = score;
+					bestFreq = freqSum / score;
+				}
 			}
 		}
-		// Construct a Tone by combining the fundamental frequency (freq) and all harmonics
+		if (bestScore == 0.0) break;
+		// Construct a Tone out of the best match, erasing mathing peaks.
+		double power = 0.0;
+		for (auto it = peaks.begin(); it != peaks.end();) {
+			std::size_t harm = std::round(it->freq / bestFreq);
+			if (abs(it->freq / harm / bestFreq - 1.0) < 0.1) {
+				power += it->power;
+				it = peaks.erase(it);
+			} else {
+				++it;
+			}
+		}
 		Tone t;
-		std::size_t count = 0;
-		double freq = peaks[k].freq / bestDiv;
-		t.db = peaks[k].db;
-		for (std::size_t n = 1; n <= bestDiv; ++n) {
-			// Find the peak for n'th harmonic
-			Peak& p = match(peaks, k * n / bestDiv);
-			if (std::abs(p.freq / n / freq - 1.0) > .03) continue; // Does it match the fundamental freq?
-			if (p.db > t.db - 10.0) {
-				t.db = std::max(t.db, p.db);
-				++count;
-				t.freq += p.freq / n;
-			}
-			t.harmonics[n - 1] = p.db;
-			p.clear();
-		}
-		t.freq /= count;
-		// If the tone seems strong enough, add it (-3 dB compensation for each harmonic)
-		if (t.db > -50.0 - 3.0 * count) {
-			t.stabledb = t.db;
-			tones.push_back(t);
-		}
+		t.freq = bestFreq;
+		t.db = t.stabledb = 10.0 * std::log10(power);
+		if (t.db < -40.0) break;
+		tones.push_back(t);
 	}
 	mergeWithOld(tones);
 	m_tones.swap(tones);
@@ -230,5 +215,3 @@ void Analyzer::process() {
 	// Try calculating FFT and calculate tones until no more data in input buffer
 	while (calcFFT()) calcTones();
 }
-
-
