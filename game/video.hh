@@ -15,8 +15,6 @@ class Video {
 	void prepare(double time);  ///< Load the current video frame into a texture
 	void render(double time);  ///< Render the prepared video frame
 	/// returns Dimensions of video clip
-	Dimensions& dimensions() { return m_texture.dimensions; }
-	/// returns Dimensions of video clip
 	Dimensions const& dimensions() const { return m_texture.dimensions; }
 
   private:
