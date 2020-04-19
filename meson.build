@@ -152,4 +152,19 @@ executable('performous', [
   dependencies : dependencies,
   include_directories : include_directories('3rdparty/ced'),
   link_with: ced,
+  install: true,
 )
+
+datapaths = [
+  'data/backgrounds',
+  'data/config',
+  'data/fonts',
+  'data/shaders',
+  'data/sounds',
+  'data/themes',
+  'data/xsl',
+]
+
+foreach dp: datapaths
+  install_subdir(dp, install_dir: 'share/games/performous')
+endforeach
