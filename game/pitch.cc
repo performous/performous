@@ -17,14 +17,11 @@ Tone::Tone():
   db(-getInf()),
   stabledb(-getInf()),
   age()
-{
-	for (auto& h: harmonics) h = -getInf();
-}
+{}
 
 void Tone::print() const {
 	if (age < Tone::MINAGE) return;
 	std::cout << std::fixed << std::setprecision(1) << freq << " Hz, age " << age << ", " << db << " dB:";
-	for (std::size_t i = 0; i < 8; ++i) std::cout << " " << harmonics[i];
 	std::cout << std::endl;
 }
 
@@ -86,27 +83,9 @@ void Analyzer::output(float* begin, float* end, double rate) {
 
 namespace {
 	struct Peak {
-		double freq;
-		double db;
-		bool harm[Tone::MAXHARM];
-		Peak(double _freq = 0.0, double _db = -getInf()):
-		  freq(_freq), db(_db)
-		{
-			for (auto& h: harm) h = false;
-		}
-		void clear() {
-			freq = 0.0;
-			db = -getInf();
-		}
+		double freq, power;
+		Peak(double _freq = 0.0, double _power = 0.0): freq(_freq), power(_power) {}
 	};
-
-	Peak& match(std::vector<Peak>& peaks, double freq, double freqPerBin) {
-		std::size_t best = std::floor(freq / freqPerBin);
-		if (best + 2 > peaks.size()) return peaks[0];
-		double d0 = std::abs(peaks[best].freq - freq);
-		double d1 = std::abs(peaks[best + 1].freq - freq);
-		return d0 < d1 ? peaks[best] : peaks[best + 1];
-	}
 }
 
 bool Analyzer::calcFFT() {
@@ -135,7 +114,7 @@ void Analyzer::calcTones() {
 	const size_t kMin = std::max(size_t(1), size_t(FFT_MINFREQ / freqPerBin));
 	const size_t kMax = std::min(FFT_N / 2, size_t(FFT_MAXFREQ / freqPerBin));
 	std::map<double, double> freqs;  // <freq, magnitude>
-	for (size_t k = 1; k <= kMax; ++k) {
+	for (size_t k = kMin; k <= kMax; ++k) {
 		double magnitude = std::abs(m_fft[k]);
 		double phase = std::arg(m_fft[k]) / TAU;
 		double delta = phase - m_fftLastPhase[k];
@@ -148,7 +127,7 @@ void Analyzer::calcTones() {
 	}
 	// Group multiple bins' identical frequencies together by total power
 	double freqSum = 0.0, powerSum = 0.0;
-	std::vector<Peak> peaks(kMax + 1);	// One extra to simplify loops
+	std::vector<Peak> peaks;
 	for (auto const& kv: freqs) {
 		double f = kv.first;
 		double p = kv.second * kv.second;
@@ -156,58 +135,58 @@ void Analyzer::calcTones() {
 			freqSum /= powerSum;
 			size_t k = freqSum / freqPerBin;
 			if (k >= 1 && k < kMax) {
-				double db = 10.0 * log10(powerSum);
-				if (db > peaks[k].db) {
-					peaks[k].freq = freqSum;
-					peaks[k].db = db;
-				}
+				Peak p;
+				p.freq = freqSum;
+				p.power = powerSum;
+				peaks.push_back(p);
 			}
 			freqSum = powerSum = 0.0;
 		}
 		freqSum += p * f;
 		powerSum += p;
 	}
-
-	// Find the tones (collections of harmonics) from the array of peaks
+	// Combine peaks into tones
 	tones_t tones;
-	for (size_t k = kMax - 1; k >= kMin; --k) {
-		if (peaks[k].db < -60.0) continue;
-		// Find the best divider for getting the fundamental from peaks[k]
-		std::size_t bestDiv = 1;
-		int bestScore = 0;
-		for (std::size_t div = 2; div <= Tone::MAXHARM && k / div > 1; ++div) {
-			double freq = peaks[k].freq / div; // Fundamental
-			int score = 0;
-			for (std::size_t n = 1; n < div && n < 8; ++n) {
-				Peak& p = match(peaks, n * freq, freqPerBin);
-				if (std::abs(p.freq / n / freq - 1.0) > .03) continue;
-				score += n == 1 ? 6 : 2;  // 6p for fundamental, 2p for other harmonics
-			}
-			if (score > bestScore) {
-				bestScore = score;
-				bestDiv = div;
+	while (!peaks.empty()) {
+		// Find the best possible match of any peak being any harmonic
+		double bestScore = 0.0;
+		double bestFreq = NAN;
+		for (Peak const& p : peaks) {
+			for (size_t den = 1; den < 6; ++den) {
+				double freq = p.freq / den;
+				if (freq < 60.0) break;
+				double score = 0.0;
+				double freqSum = 0.0;
+				for (Peak const& p2: peaks) {
+					double f = p2.freq / std::round(p2.freq / freq);
+					if (abs(f / freq - 1.0) > 0.05) continue;
+					score += p2.power;
+					freqSum += p2.power * f;
+				}
+				score /= std::sqrt(den);
+				if (score > bestScore) {
+					bestScore = score;
+					bestFreq = freqSum / score;
+				}
 			}
 		}
-		// Construct a Tone by combining the fundamental frequency (freq) and all harmonics
+		if (bestScore == 0.0) break;
+		// Construct a Tone out of the best match, erasing mathing peaks.
+		double power = 0.0;
+		for (auto it = peaks.begin(); it != peaks.end();) {
+			std::size_t harm = std::round(it->freq / bestFreq);
+			if (abs(it->freq / harm / bestFreq - 1.0) < 0.1) {
+				power += it->power;
+				it = peaks.erase(it);
+			} else {
+				++it;
+			}
+		}
 		Tone t;
-		std::size_t count = 0;
-		double freq = peaks[k].freq / bestDiv;
-		t.db = peaks[k].db;
-		for (std::size_t n = 1; n <= bestDiv; ++n) {
-			// Find the peak for n'th harmonic
-			Peak& p = match(peaks, n * freq, freqPerBin);
-			if (std::abs(p.freq / n / freq - 1.0) > .03) continue; // Does it match the fundamental freq?
-			t.db = std::max(t.db, p.db);
-			t.freq += p.freq / n;
-			++count;
-			t.harmonics[n - 1] = p.db;
-			p.clear();
-		}
-		if (t.db > -40) {
-			t.freq /= count;
-			t.stabledb = t.db;
-			tones.push_back(t);
-		}
+		t.freq = bestFreq;
+		t.db = t.stabledb = 10.0 * std::log10(power);
+		if (t.db < -40.0) break;
+		tones.push_back(t);
 	}
 	mergeWithOld(tones);
 	m_tones.swap(tones);
