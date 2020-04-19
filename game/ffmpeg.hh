@@ -5,10 +5,10 @@
 #include "util.hh"
 #include "libda/sample.hpp"
 #include "aubio/aubio.h"
-#include <boost/circular_buffer.hpp>
 #include <atomic>
 #include <condition_variable>
 #include <cstdint>
+#include <exception>
 #include <future>
 #include <deque>
 #include <iostream>
@@ -16,30 +16,6 @@
 #include <mutex>
 #include <thread>
 #include <vector>
-
-/// Video queue
-class VideoFifo {
-  public:
-	VideoFifo(): m_timestamp(), m_eof() {}
-	/// trys to pop a video frame from queue
-	bool tryPop(Bitmap& f);
-	/// Add frame to queue
-	void push(Bitmap&& f);
-	/// Clear and unlock the queue
-	void reset();
-	/// Returns the current position (seconds)
-	double position() const { return m_timestamp; }
-	/// Tests if EOF has already been reached
-	double eof() const { return m_eof; }
-
-  private:
-	std::deque<Bitmap> m_queue;
-	mutable std::mutex m_mutex;
-	std::condition_variable m_cond;
-	double m_timestamp;
-	bool m_eof;
-	static const unsigned m_max = 20;
-};
 
 // ffmpeg forward declarations
 extern "C" {
@@ -56,26 +32,26 @@ extern "C" {
 
 class AudioBuffer;
 
+struct AudioTrait;
+
+struct VideoTrait;
+
 /// ffmpeg class
 class FFmpeg {
   public:
-	/// Decode file; if no rate is specified, decode video, otherwise decode audio.
-	FFmpeg(fs::path const& file, AudioBuffer *audioBuffer = nullptr);
-	~FFmpeg();
-	void operator()(); ///< Thread runs here, don't call directly
+        using AudioCb = std::function<void(const std::int16_t *data, size_t count, int64_t sample_position)>;
+        using VideoCb = std::function<void(Bitmap)>;
+
+	/// Decode file; if rate is 0, decode video, otherwise decode audio.
+	FFmpeg(fs::path const& file, unsigned int rate, AudioCb audiocb, VideoCb videocb);
         void handleOneFrame();
 
-	/// queue for video
-	VideoFifo  videoQueue;
-	
         /** Seek to the chosen time. Will block until the seek is done, if wait is true. **/
 	void seek(double time);
 	/// duration
-	double duration() const { return m_duration; }
-	bool terminating() { return m_quit_future.wait_for(0s) == std::future_status::ready; }
+	double duration() const;
 
 	class eof_error: public std::exception {};
-	void seek_internal();
   private:
 	void open();
         struct Packet;
@@ -88,10 +64,9 @@ class FFmpeg {
 	static void avcodec_free_context(AVCodecContext *avctx);
 
 	fs::path m_filename;
-        AudioBuffer *audioBuffer = nullptr;
 	unsigned int m_rate = 0;
-	std::promise<void> m_quit;
-	std::future<void> m_quit_future = m_quit.get_future();
+        AudioCb handleAudioData;
+        VideoCb handleVideoData;
 	std::atomic<double> m_seekTarget{ getNaN() };
 	double m_position = 0.0;
 	double m_duration = 0.0;
@@ -103,9 +78,6 @@ class FFmpeg {
 	std::unique_ptr<AVCodecContext, decltype(&avcodec_free_context)> m_codecContext{nullptr, avcodec_free_context};
 	std::unique_ptr<SwrContext, void(*)(SwrContext*)> m_resampleContext{nullptr, [] (auto p) { swr_close(p); swr_free(&p); }};
 	std::unique_ptr<SwsContext, void(*)(SwsContext*)> m_swsContext{nullptr, sws_freeContext};
-	// Make sure the thread starts only after initializing everything else
-	std::future<void> m_thread;
-	static std::mutex s_avcodec_mutex; // Used for avcodec_open/close (which use some static crap and are thus not thread-safe)
 };
 
 class AudioBuffer {
@@ -120,7 +92,7 @@ class AudioBuffer {
 	/// get samples per second
 	unsigned getSamplesPerSecond() const { return m_sps; }
 	uFvec makePreviewBuffer();
-	void push(std::vector<std::int16_t> const& data, int64_t sample_position);
+	void operator()(const std::int16_t *data, size_t count, int64_t sample_position);
 	bool prepare(std::int64_t pos);
 	bool read(float* begin, size_t count, std::int64_t pos, float volume = 1.0f);
         bool terminating();
