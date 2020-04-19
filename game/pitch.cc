@@ -125,7 +125,7 @@ void Analyzer::calcTones() {
 	// Precalculated constants
 	const double freqPerBin = m_rate / FFT_N;
 	const double stepRate = m_rate / m_step;  // Steps per second
-	const double phaseStep = m_step / FFT_N;
+	const double phaseStep = double(m_step) / FFT_N;
 	const double normCoeff = 1.0 / FFT_N;
 	const double minMagnitude = pow(10, -100.0 / 20.0) / normCoeff; // -100 dB
 	// Limit frequency range of processing
