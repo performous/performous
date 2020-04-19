@@ -7,7 +7,9 @@ bool Video::tryPop(Bitmap& f, double timestamp) {
 	std::unique_lock<std::mutex> l(m_mutex);
         
         // if timestamp is out of the queue's range, ask a seek
-        m_seek_asked = timestamp > m_readPosition + 7 || timestamp < m_readPosition;
+        // FIXME 4 should be linked to queue depth: we know the frame rate, thus how
+        // many frames needed for an arbitrary duration
+        m_seek_asked = timestamp > m_readPosition + 4 || timestamp < m_readPosition;
 
         m_readPosition = timestamp;
 
@@ -30,7 +32,6 @@ void Video::push(Bitmap&& f) {
 	std::unique_lock<std::mutex> l(m_mutex);
 	m_cond.wait(l, [this]{ return m_quit || m_seek_asked || m_queue.size() < m_max; });
         if (m_quit || m_seek_asked) return; // Drop frame when seek/quit asked
-        std::clog << "ffmpeg/debug: push " << f.timestamp << std::endl;
 	m_queue.emplace_back(std::move(f));
 }
 
@@ -83,7 +84,7 @@ void Video::prepare(double time) {
         time += m_videoGap;
 
         // Time to switch frame?
-        if (!tryPop(m_videoFrame, time)) return;
+        tryPop(m_videoFrame, time);
 
         if (!m_videoFrame.buf.empty()) {
             m_texture.load(m_videoFrame);

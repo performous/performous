@@ -19,7 +19,7 @@ class Video {
 
   private:
 	FFmpeg m_mpeg;
-	double m_videoGap;
+	const double m_videoGap;
 	Bitmap m_videoFrame;
 	Texture m_texture;
 	double m_textureTime;
