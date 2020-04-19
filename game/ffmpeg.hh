@@ -77,7 +77,6 @@ class FFmpeg {
 };
 
 class AudioBuffer {
-	typedef std::recursive_mutex mutex;
   public:
         using uFvec = std::unique_ptr<fvec_t, std::integral_constant<decltype(&del_fvec), &del_fvec>>;
 
@@ -95,13 +94,17 @@ class AudioBuffer {
         auto duration() { return ffmpeg.duration(); }
 
   private:
-	bool eof(std::int64_t pos) const { return m_eof_pos != -1 && pos >= m_eof_pos || (double(pos) / m_sps >= m_duration); }
+	// must be called holding the mutex
+	bool eof(std::int64_t pos) const {
+		return m_eof_pos != -1 && pos >= m_eof_pos || (double(pos) / m_sps >= m_duration);
+	}
+
 	bool wantSeek();
 	bool wantMore();
 	/// Should the input stop waiting?
 	bool condition();
 
-	mutable mutex m_mutex;
+	mutable std::mutex m_mutex;
 	std::condition_variable_any m_cond;
 	
 	std::vector<std::int16_t> m_data;

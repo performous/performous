@@ -47,7 +47,7 @@ AudioBuffer::uFvec AudioBuffer::makePreviewBuffer() {
         uFvec fvec(new_fvec(m_data.size() / 2));
         float previewVol = float(config["audio/preview_volume"].i()) / 100.0;
 	{
-		std::lock_guard<mutex> l(m_mutex);
+		std::lock_guard<std::mutex> l(m_mutex);
 		for (size_t rpos = 0, bpos = 0; rpos < m_data.size(); rpos += 2, bpos ++) {
 			fvec->data[bpos] = (((da::conv_from_s16(m_data.at(rpos)) + da::conv_from_s16(m_data.at(rpos + 1))) / 2) / previewVol);
 		}
@@ -71,7 +71,7 @@ void AudioBuffer::operator()(const std::int16_t *data, size_t count, int64_t sam
                return;
        }
        
-       std::unique_lock<mutex> l(m_mutex);
+       std::unique_lock<std::mutex> l(m_mutex);
        if (sample_position < m_read_pos) {
            // frame to be dropped as being before read... arrived too last or due to a seek.
            return;
@@ -96,7 +96,7 @@ void AudioBuffer::operator()(const std::int16_t *data, size_t count, int64_t sam
 
 bool AudioBuffer::prepare(std::int64_t pos) {
 	if (pos < 0) pos = 0;
-	std::unique_lock<mutex> l(m_mutex, std::try_to_lock);
+	std::unique_lock<std::mutex> l(m_mutex, std::try_to_lock);
 	if (!l.owns_lock()) return false;  // Didn't get lock, give up for now
 	if (eof(pos)) return true;
 	m_read_pos = pos;
@@ -127,7 +127,7 @@ bool AudioBuffer::read(float* begin, size_t samples, std::int64_t pos, float vol
             samples -= negative_samples;
         }
 
-	std::unique_lock<mutex> l(m_mutex);
+	std::unique_lock<std::mutex> l(m_mutex);
         if (static_cast<std::uint64_t>(pos) >= m_read_pos + m_data.size()
             || static_cast<std::uint64_t>(pos) < m_read_pos) {
             // in case request position is not in the current possible range, we trigger a seek
@@ -153,7 +153,7 @@ bool AudioBuffer::read(float* begin, size_t samples, std::int64_t pos, float vol
 AudioBuffer::AudioBuffer(fs::path const& file, unsigned int rate, size_t size):
           m_data(size), m_sps(rate * AUDIO_CHANNELS), ffmpeg(file, rate, std::ref(*this), nullptr), m_duration(ffmpeg.duration()) {
                   reader_thread = std::async(std::launch::async, [this] { 
-            std::unique_lock<mutex> l(m_mutex);
+            std::unique_lock<std::mutex> l(m_mutex);
             while (!m_quit) {
                  try {
                         if (m_seek_asked) {
@@ -186,7 +186,7 @@ AudioBuffer::AudioBuffer(fs::path const& file, unsigned int rate, size_t size):
 
 AudioBuffer::~AudioBuffer() {
     {
-	std::unique_lock<mutex> l(m_mutex);
+	std::unique_lock<std::mutex> l(m_mutex);
         m_read_pos = 0;
         m_write_pos = 0;
         m_data.clear();
