@@ -196,7 +196,6 @@ bool Music::prepare() {
 	bool ready = true;
 	for (auto& kv: tracks) {
 		auto& audioBuffer = kv.second->audioBuffer;
-		if (audioBuffer.terminating()) continue;  // Song loading failed or other error, won't ever get ready
 		if (audioBuffer.prepare(m_pos)) {
 			if (kv.first == "background" && m_preview && m_pos > 0) {
 				auto previewSamples = audioBuffer.makePreviewBuffer();
