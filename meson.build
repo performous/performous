@@ -73,12 +73,12 @@ dependencies = [
   cpprest,
 ]
 ced = static_library('ced', [
-  'ced/compact_enc_det/compact_enc_det.cc',
-  'ced/compact_enc_det/compact_enc_det_hint_code.cc',
-  'ced/util/encodings/encodings.cc',
-  'ced/util/languages/languages.cc',
+  '3rdparty/ced/compact_enc_det/compact_enc_det.cc',
+  '3rdparty/ced/compact_enc_det/compact_enc_det_hint_code.cc',
+  '3rdparty/ced/util/encodings/encodings.cc',
+  '3rdparty/ced/util/languages/languages.cc',
 ],
-  include_directories : include_directories('ced'),
+  include_directories : include_directories('3rdparty/ced'),
   cpp_args : ['-Wno-narrowing', '-Wno-unused-variable'],
 )
 executable('performous', [
@@ -150,6 +150,6 @@ executable('performous', [
   'game/webserver.cc',
 ],
   dependencies : dependencies,
-  include_directories : include_directories('ced'),
+  include_directories : include_directories('3rdparty/ced'),
   link_with: ced,
 )
