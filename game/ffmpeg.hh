@@ -96,7 +96,7 @@ class AudioBuffer {
   private:
 	// must be called holding the mutex
 	bool eof(std::int64_t pos) const {
-		return m_eof_pos != -1 && pos >= m_eof_pos || (double(pos) / m_sps >= m_duration);
+		return (m_eof_pos != -1 && pos >= m_eof_pos) || (double(pos) / m_sps >= m_duration);
 	}
 
 	bool wantSeek();
