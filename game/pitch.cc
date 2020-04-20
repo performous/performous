@@ -109,7 +109,7 @@ void Analyzer::calcTones() {
 	const double freqPerBin = m_rate / FFT_N;
 	const double stepRate = m_rate / m_step;  // Steps per second
 	const double phaseStep = double(m_step) / FFT_N;
-	const double minMagnitude = pow(10, -80.0 / 20.0); // -80 dB noise cut
+	const double minMagnitude = pow(10, -70.0 / 20.0); // -70 dB noise cut
 	// Limit frequency range of processing
 	const size_t kMin = std::max(size_t(1), size_t(FFT_MINFREQ / freqPerBin));
 	const size_t kMax = std::min(FFT_N / 2, size_t(FFT_MAXFREQ / freqPerBin));
@@ -134,7 +134,7 @@ void Analyzer::calcTones() {
 		std::vector<Peak> p;
 		double freqSum = 0.0, powerSum = 0.0;
 		for (auto [freq, power] : peaks) {
-			if (powerSum > 0.0 && abs(freq - freqSum / powerSum) > 10.0 /* Hz */) {
+			if (powerSum > 0.0 && abs(freq / (freqSum / powerSum) - 1.0) > 0.03 /* +- quartertone */) {
 				p.emplace_back(freqSum / powerSum, powerSum);
 				freqSum = powerSum = 0.0;
 			}
@@ -158,18 +158,18 @@ void Analyzer::calcTones() {
 			for (size_t den = 1; den <= 3; ++den) {
 				double freq = p.freq / den;
 				if (freq < FFT_MINFREQ) break;
-				double score = 0.0;
+				double powerSum = 0.0;
 				double freqSum = 0.0;
 				for (Peak const& p2: peaks) {
 					double f = p2.freq / std::round(p2.freq / freq);
 					if (abs(f / freq - 1.0) > 0.06) continue;  // Max. offset +-semitone
-					score += p2.power;
+					powerSum += p2.power;
 					freqSum += p2.power * f;
 				}
-				score /= 5 + den;
+				double score = powerSum / (5 + den);
 				if (score > bestScore) {
 					bestScore = score;
-					bestFreq = freqSum / score;
+					bestFreq = freqSum / powerSum;
 				}
 			}
 		}
@@ -185,7 +185,7 @@ void Analyzer::calcTones() {
 		Tone t;
 		t.freq = bestFreq;
 		t.db = 10.0 * std::log10(power);
-		double min = tones.empty() ? -50.0 : std::max(-50.0, tones.front().db - 20.0);
+		double min = tones.empty() ? -40.0 : std::max(-40.0, tones.front().db - 10.0);
 		if (t.db < min) break;
 		tones.push_back(t);
 	}
