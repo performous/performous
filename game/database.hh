@@ -14,6 +14,7 @@ struct ScoreItem {
 	input::DevType type;
 	std::string track;  ///< includes difficulty
 	std::string track_simple; ///< no difficulty
+	std::string player_id; ///< some string to identify player's source device (microphone name or something like it)
 	Color color;
 	bool operator<(ScoreItem const& other) const { return score < other.score; }
 };
@@ -68,11 +69,12 @@ public:
 private: // will be bypassed by above friend declaration
 	typedef std::list<Player> cur_players_t;
 	typedef std::list<ScoreItem> cur_scores_t;
+	typedef std::map<std::string, int> players_devices_t;
 
 	//This fields are misused as additional parameters
 	cur_players_t cur;
 	cur_scores_t scores;
-
+	players_devices_t playersByDevices;
 public: // methods for database management
 
 	/**A facade for Players::addPlayer.*/
@@ -96,7 +98,6 @@ public: // methods for database queries
 	void queryPerPlayerHiscore(std::ostream & os, std::string const& track = std::string()) const;
 
 	bool hasHiscore(Song& s) const;
-	bool noPlayers() const;
 
 private:
 	fs::path m_filename;
