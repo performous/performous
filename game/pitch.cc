@@ -227,3 +227,23 @@ void Analyzer::process() {
 	// Try calculating FFT and calculate tones until no more data in input buffer
 	while (calcFFT()) calcTones();
 }
+
+Tone const* Analyzer::findTone(double minfreq, double maxfreq) const {
+	if (m_tones.empty()) {
+		m_oldfreq = 0.0;
+		return nullptr;
+	}
+	Tone const* best = nullptr;
+	double bestscore = 0;
+	for (Tone const& t : m_tones) {
+		if (t.freq < minfreq || t.age < Tone::MINAGE) continue;
+		if (t.freq > maxfreq) break;
+		double score = t.db - std::max(180.0, std::abs(t.freq - 300.0)) / 10.0;
+		if (m_oldfreq != 0.0 && std::abs(t.freq / m_oldfreq - 1.0) < 0.1) score += 10.0;
+		if (best && bestscore > score) break;
+		best = &t;
+		bestscore = score;
+	}
+	m_oldfreq = (best ? best->freq : 0.0);
+	return best;
+}
