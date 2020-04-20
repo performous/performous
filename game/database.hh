@@ -69,7 +69,7 @@ public:
 private: // will be bypassed by above friend declaration
 	typedef std::list<Player> cur_players_t;
 	typedef std::list<ScoreItem> cur_scores_t;
-	typedef std::map <std::string, int> players_devices_t;
+	typedef std::map<std::string, int> players_devices_t;
 
 	//This fields are misused as additional parameters
 	cur_players_t cur;
