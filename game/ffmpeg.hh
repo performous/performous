@@ -49,13 +49,15 @@ class FFmpeg {
 
 	class eof_error: public std::exception {};
   private:
-	void open();
         struct Packet;
 	void decodePacket(Packet &);
 	static void frameDeleter(AVFrame *f) { if (f) av_frame_free(&f); }
 	using uFrame = std::unique_ptr<AVFrame, std::integral_constant<decltype(&frameDeleter), &frameDeleter>>;
 	void processVideo(uFrame frame);
 	void processAudio(uFrame frame);
+        
+        void(FFmpeg::*m_processingFn)(uFrame frame);
+
 	static void avformat_close_input(AVFormatContext *fctx);
 	static void avcodec_free_context(AVCodecContext *avctx);
 
@@ -69,9 +71,9 @@ class FFmpeg {
         int64_t m_position_in_48k_frames = -1;
 	// libav-specific variables
 	int m_streamId = -1;
-	int m_mediaType;  // enum AVMediaType
 	std::unique_ptr<AVFormatContext, decltype(&avformat_close_input)> m_formatContext{nullptr, avformat_close_input};
 	std::unique_ptr<AVCodecContext, decltype(&avcodec_free_context)> m_codecContext{nullptr, avcodec_free_context};
+
 	std::unique_ptr<SwrContext, void(*)(SwrContext*)> m_resampleContext{nullptr, [] (auto p) { swr_close(p); swr_free(&p); }};
 	std::unique_ptr<SwsContext, void(*)(SwsContext*)> m_swsContext{nullptr, sws_freeContext};
 };

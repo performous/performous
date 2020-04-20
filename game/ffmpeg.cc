@@ -196,56 +196,42 @@ AudioBuffer::~AudioBuffer() {
     reader_thread.get();
 }
 
-FFmpeg::FFmpeg(fs::path const& _filename, unsigned int rate, AudioCb audiocb, VideoCb videocb = nullptr):
+static void printFFmpegInfo() {
+	bool matches = LIBAVUTIL_VERSION_INT == avutil_version() &&
+		LIBAVCODEC_VERSION_INT == avcodec_version() &&
+		LIBAVFORMAT_VERSION_INT == avformat_version() &&
+		LIBSWSCALE_VERSION_INT == swscale_version();
+	if (matches) {
+		std::clog << "ffmpeg/info: "
+			" avutil:" + ffversion(LIBAVUTIL_VERSION_INT) +
+			" avcodec:" + ffversion(LIBAVCODEC_VERSION_INT) +
+			" avformat:" + ffversion(LIBAVFORMAT_VERSION_INT) +
+			" swresample:" + ffversion(LIBSWRESAMPLE_VERSION_INT) +
+			" swscale:" + ffversion(LIBSWSCALE_VERSION_INT)
+			<< std::endl;
+	} else {
+		std::clog << "ffmpeg/error: header/lib version mismatch:"
+			" avutil:" + ffversion(LIBAVUTIL_VERSION_INT) + "/" + ffversion(avutil_version()) +
+			" avcodec:" + ffversion(LIBAVCODEC_VERSION_INT) + "/" + ffversion(avcodec_version()) +
+			" avformat:" + ffversion(LIBAVFORMAT_VERSION_INT) + "/" + ffversion(avformat_version()) +
+			" swresample:" + ffversion(LIBSWRESAMPLE_VERSION_INT) + "/" + ffversion(swresample_version()) +
+			" swscale:" + ffversion(LIBSWSCALE_VERSION_INT) + "/" + ffversion(swscale_version())
+			<< std::endl;
+	}
+#if (LIBAVFORMAT_VERSION_INT) < (AV_VERSION_INT(58,0,0))
+	av_register_all();
+#endif
+};
+
+FFmpeg::FFmpeg(fs::path const& _filename, unsigned int rate, AudioCb audiocb, VideoCb videocb = nullptr) :
   m_filename(_filename),
   m_rate(rate),
   handleAudioData(audiocb),
-  handleVideoData(videocb),
-  m_mediaType(m_rate ? AVMEDIA_TYPE_AUDIO : AVMEDIA_TYPE_VIDEO)
-{
-    static std::once_flag static_infos;
-    std::call_once(static_infos, [] {
-		bool matches = LIBAVUTIL_VERSION_INT == avutil_version() &&
-                                LIBAVCODEC_VERSION_INT == avcodec_version() &&
-                                LIBAVFORMAT_VERSION_INT == avformat_version() &&
-                                LIBSWSCALE_VERSION_INT == swscale_version();
-		if (matches) {
-			std::clog << "ffmpeg/info: "
-			  " avutil:" + ffversion(LIBAVUTIL_VERSION_INT) +
-			  " avcodec:" + ffversion(LIBAVCODEC_VERSION_INT) +
-			  " avformat:" + ffversion(LIBAVFORMAT_VERSION_INT) +
-			  " swresample:" + ffversion(LIBSWRESAMPLE_VERSION_INT) +
-			  " swscale:" + ffversion(LIBSWSCALE_VERSION_INT)
-			  << std::endl;
-		} else {
-			std::clog << "ffmpeg/error: header/lib version mismatch:"
-			  " avutil:" + ffversion(LIBAVUTIL_VERSION_INT) + "/" + ffversion(avutil_version()) +
-			  " avcodec:" + ffversion(LIBAVCODEC_VERSION_INT) + "/" + ffversion(avcodec_version()) +
-			  " avformat:" + ffversion(LIBAVFORMAT_VERSION_INT) + "/" + ffversion(avformat_version()) +
-			  " swresample:" + ffversion(LIBSWRESAMPLE_VERSION_INT) + "/" + ffversion(swresample_version()) +
-			  " swscale:" + ffversion(LIBSWSCALE_VERSION_INT) + "/" + ffversion(swscale_version())
-			  << std::endl;
-		}
-#if (LIBAVFORMAT_VERSION_INT) < (AV_VERSION_INT(58,0,0))
-                av_register_all();
-#endif
-	});
-	
-        try { open(); } catch (std::exception const& e) { throw std::runtime_error("ffmpeg/error: Failed to open " + m_filename.string() + ": " + e.what()); }
-}
+  handleVideoData(videocb) {
+      static std::once_flag static_infos;
+      std::call_once(static_infos, &printFFmpegInfo);
 
-double FFmpeg::duration() const { return m_formatContext->duration / double(AV_TIME_BASE); }
-
-void FFmpeg::avformat_close_input(AVFormatContext *fctx) {
-	if (fctx) ::avformat_close_input(&fctx);
-}
-void FFmpeg::avcodec_free_context(AVCodecContext *avctx) {
-         if (avctx == nullptr) return;
-         avcodec_close(avctx);
-         ::avcodec_free_context(&avctx);
-}
-
-void FFmpeg::open() {
+        auto mediaType = m_rate ? AVMEDIA_TYPE_AUDIO : AVMEDIA_TYPE_VIDEO;
 	av_log_set_level(AV_LOG_ERROR);
 	{
 		AVFormatContext *avfctx = nullptr;
@@ -256,7 +242,7 @@ void FFmpeg::open() {
 	m_formatContext->flags |= AVFMT_FLAG_GENPTS;
 	// Find a track and open the codec
 	AVCodec* codec = nullptr;
-	m_streamId = av_find_best_stream(m_formatContext.get(), (AVMediaType)m_mediaType, -1, -1, &codec, 0);
+	m_streamId = av_find_best_stream(m_formatContext.get(), mediaType, -1, -1, &codec, 0);
 	if (m_streamId < 0) throw std::runtime_error("No suitable track found");
 
 	decltype(m_codecContext) pCodecCtx{avcodec_alloc_context3(codec), avcodec_free_context};
@@ -270,7 +256,9 @@ void FFmpeg::open() {
 	pCodecCtx->workaround_bugs = FF_BUG_AUTODETECT;
 	m_codecContext = std::move(pCodecCtx);
 
-	switch (m_mediaType) {
+        m_processingFn = (mediaType == AVMEDIA_TYPE_AUDIO) ? &FFmpeg::processAudio : &FFmpeg::processVideo;
+
+	switch (mediaType) {
 	case AVMEDIA_TYPE_AUDIO:
 		m_resampleContext.reset(swr_alloc());
 		if (!m_resampleContext) throw std::runtime_error("Cannot create resampling context");
@@ -292,6 +280,17 @@ void FFmpeg::open() {
 	default:  // Should never be reached but avoids compile warnings
 		abort();
 	}
+} 
+
+double FFmpeg::duration() const { return m_formatContext->duration / double(AV_TIME_BASE); }
+
+void FFmpeg::avformat_close_input(AVFormatContext *fctx) {
+	if (fctx) ::avformat_close_input(&fctx);
+}
+void FFmpeg::avcodec_free_context(AVCodecContext *avctx) {
+         if (avctx == nullptr) return;
+         avcodec_close(avctx);
+         ::avcodec_free_context(&avctx);
 }
 
 class FfmpegError: public std::runtime_error {
@@ -373,7 +372,7 @@ void FFmpeg::decodePacket(Packet &pkt) {
 				new_position -= double(m_formatContext->streams[m_streamId]->start_time) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
                         m_position = new_position;
 		}
-		if (m_mediaType == AVMEDIA_TYPE_VIDEO) processVideo(std::move(frame)); else processAudio(std::move(frame));
+		(this->*m_processingFn)(std::move(frame));
 	}
 }
 
