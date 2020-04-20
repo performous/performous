@@ -12,7 +12,6 @@
 class Song;
 class Analyzer;
 
-/// TODO: rename to Vocalist or something like that
 struct Player {
 	/// currently played vocal track
 	VocalTrack& m_vocal;
