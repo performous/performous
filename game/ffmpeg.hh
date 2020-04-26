@@ -35,47 +35,68 @@ class AudioBuffer;
 /// ffmpeg class
 class FFmpeg {
   public:
-        using AudioCb = std::function<void(const std::int16_t *data, size_t count, int64_t sample_position)>;
-        using VideoCb = std::function<void(Bitmap)>;
+	class eof_error: public std::exception {};
 
-	/// Decode file; if rate is 0, decode video, otherwise decode audio.
-	FFmpeg(fs::path const& file, unsigned int rate, AudioCb audiocb, VideoCb videocb);
+	/// Decode file, depending on media type audio.
+        FFmpeg(fs::path const& filename, int mediaType);
+        
         void handleOneFrame();
 
-        /** Seek to the chosen time. Will block until the seek is done, if wait is true. **/
-	void seek(double time);
+        /** Seek to the chosen time. **/
+	virtual void seek(double time);
+
 	/// duration
 	double duration() const;
 
-	class eof_error: public std::exception {};
-  private:
-        struct Packet;
-	void decodePacket(Packet &);
+        virtual ~FFmpeg() = default;
+        
+  protected:
 	static void frameDeleter(AVFrame *f) { if (f) av_frame_free(&f); }
 	using uFrame = std::unique_ptr<AVFrame, std::integral_constant<decltype(&frameDeleter), &frameDeleter>>;
-	void processVideo(uFrame frame);
-	void processAudio(uFrame frame);
-        
-        void(FFmpeg::*m_processingFn)(uFrame frame);
 
+        virtual void processFrame(uFrame frame) = 0;
+
+        struct Packet;
+	void decodePacket(Packet &);
+        
 	static void avformat_close_input(AVFormatContext *fctx);
 	static void avcodec_free_context(AVCodecContext *avctx);
 
 	fs::path m_filename;
-	unsigned int m_rate = 0;
-        AudioCb handleAudioData;
-        VideoCb handleVideoData;
-	std::atomic<double> m_seekTarget{ getNaN() };
 	double m_position = 0.0;
 	double m_duration = 0.0;
-        int64_t m_position_in_48k_frames = -1;
 	// libav-specific variables
 	int m_streamId = -1;
 	std::unique_ptr<AVFormatContext, decltype(&avformat_close_input)> m_formatContext{nullptr, avformat_close_input};
 	std::unique_ptr<AVCodecContext, decltype(&avcodec_free_context)> m_codecContext{nullptr, avcodec_free_context};
+};
 
+class AudioFFmpeg : public FFmpeg {
+public:
+        using AudioCb = std::function<void(const std::int16_t *data, size_t count, int64_t sample_position)>;
+        AudioFFmpeg(fs::path const& file, unsigned int rate, AudioCb audioCb);
+
+	void seek(double time) override;
+protected:
+        void processFrame(uFrame frame) override;
+    private:
+        int64_t m_position_in_48k_frames = -1;
+	unsigned int m_rate = 0;
+        AudioCb handleAudioData;
 	std::unique_ptr<SwrContext, void(*)(SwrContext*)> m_resampleContext{nullptr, [] (auto p) { swr_close(p); swr_free(&p); }};
+};
+
+class VideoFFmpeg : public FFmpeg {
+public:
+        using VideoCb = std::function<void(Bitmap)>;
+        VideoFFmpeg(fs::path const& file, VideoCb videoCb);
+
+protected:
+        void processFrame(uFrame frame) override;
+private:
 	std::unique_ptr<SwsContext, void(*)(SwsContext*)> m_swsContext{nullptr, sws_freeContext};
+        VideoCb handleVideoData;
+
 };
 
 class AudioBuffer {
@@ -116,7 +137,7 @@ class AudioBuffer {
 
 	const unsigned m_sps;
 
-        FFmpeg ffmpeg;
+        AudioFFmpeg ffmpeg;
         const double m_duration;
 
         bool m_seek_asked { false };
