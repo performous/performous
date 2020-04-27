@@ -57,7 +57,7 @@ class FBO {
   private:
   	float m_w;
   	float m_h;
-	GLuint m_fbo;
+	GLuint m_fbo {0};
 	OpenGLTexture<GL_TEXTURE_2D> m_texture;
 	OpenGLTexture<GL_TEXTURE_2D> m_depth;
 };
