@@ -5,7 +5,7 @@
 #include "screen_songs.hh"
 #include "util.hh"
 
-#include "aubio/aubio.h"
+#include "aubio.h"
 #include <memory>
 #include <iostream>
 #include <sstream>
