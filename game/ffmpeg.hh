@@ -109,7 +109,7 @@ class AudioBuffer {
 	bool prepare(std::int64_t pos);
 	bool read(float* begin, size_t count, std::int64_t pos, float volume = 1.0f);
         bool terminating();
-        auto duration() { return ffmpeg.duration(); }
+        double duration();
 
   private:
 	// must be called holding the mutex
@@ -123,17 +123,16 @@ class AudioBuffer {
 	bool condition();
 
 	mutable std::mutex m_mutex;
-	std::condition_variable_any m_cond;
+	std::condition_variable m_cond;
 	
 	std::vector<std::int16_t> m_data;
-	size_t m_write_pos = 0;
+	std::int64_t m_write_pos = 0;
 	std::int64_t m_read_pos = 0;
 	std::int64_t m_eof_pos = -1; // -1 until we get the read end from ffmpeg
 
 	const unsigned m_sps;
 
-        AudioFFmpeg ffmpeg;
-        const double m_duration;
+        const double m_duration{ 0 };
 
         bool m_seek_asked { false };
 
