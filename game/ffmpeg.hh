@@ -33,7 +33,10 @@ extern "C" {
 /// ffmpeg class
 class FFmpeg {
   public:
-	class eof_error: public std::exception {};
+        // Exceptions thrown by class
+	class Eof: public std::exception {};
+        class Error;
+        friend Error;
 
 	/// Decode file, depending on media type audio.
         FFmpeg(fs::path const& filename, int mediaType);
