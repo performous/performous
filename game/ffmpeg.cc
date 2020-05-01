@@ -166,7 +166,7 @@ AudioBuffer::AudioBuffer(fs::path const& file, unsigned int rate, size_t size):
 					ffmpeg->handleOneFrame();
 					errors = 0;
 					l.lock();
-				} catch (FFmpeg::eof_error&) {
+				} catch (const FFmpeg::Eof&) {
 					l.lock();
 					// now we know exact eof_pos
 					m_eof_pos = m_write_pos;
@@ -175,11 +175,10 @@ AudioBuffer::AudioBuffer(fs::path const& file, unsigned int rate, size_t size):
 					m_cond.wait(l, [this]{ return m_quit || m_seek_asked; });
 				} catch (const std::exception& e) {
 					std::clog << "ffmpeg/error: " << e.what() << std::endl;
+                                        if (++errors > 2) std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl;
 					l.lock();
-					m_quit = ++errors > 2;
 				}
 			}
-			if (errors > 0) std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl;
     });
 }
 
@@ -222,6 +221,19 @@ static void printFFmpegInfo() {
 #endif
 };
 
+class FFmpeg::Error: public std::runtime_error {
+public:
+	Error(const FFmpeg &self, int errorValue): std::runtime_error(msgFmt(self, errorValue)) {}
+private:
+	static std::string msgFmt(const FFmpeg &self, int errorValue) {
+		char message[AV_ERROR_MAX_STRING_SIZE];
+		av_strerror(errorValue, message, AV_ERROR_MAX_STRING_SIZE);
+		std::ostringstream oss;
+		oss << "FFmpeg Error: Pocessing file " << self.m_filename << " code=" << errorValue << ", error=" << message;
+		return oss.str();
+	}
+};
+
 FFmpeg::FFmpeg(fs::path const& _filename, int mediaType) : m_filename(_filename) {
 	static std::once_flag static_infos;
 	std::call_once(static_infos, &printFFmpegInfo);
@@ -229,15 +241,17 @@ FFmpeg::FFmpeg(fs::path const& _filename, int mediaType) : m_filename(_filename)
 	av_log_set_level(AV_LOG_ERROR);
 	{
 		AVFormatContext *avfctx = nullptr;
-		if (avformat_open_input(&avfctx, m_filename.string().c_str(), nullptr, nullptr)) throw std::runtime_error("Cannot open input file");
+                auto err = avformat_open_input(&avfctx, m_filename.string().c_str(), nullptr, nullptr);
+		if (err) throw Error(*this, err);
 		m_formatContext.reset(avfctx);
 	}
-	if (avformat_find_stream_info(m_formatContext.get(), nullptr) < 0) throw std::runtime_error("Cannot find stream information");
+        auto err = avformat_find_stream_info(m_formatContext.get(), nullptr);
+	if (err < 0) throw Error(*this, err);
 	m_formatContext->flags |= AVFMT_FLAG_GENPTS;
 	// Find a track and open the codec
 	AVCodec* codec = nullptr;
 	m_streamId = av_find_best_stream(m_formatContext.get(), static_cast<AVMediaType>(mediaType), -1, -1, &codec, 0);
-	if (m_streamId < 0) throw std::runtime_error("No suitable track found");
+	if (m_streamId < 0) throw Error(*this, m_streamId);
 
 	decltype(m_codecContext) pCodecCtx{avcodec_alloc_context3(codec), avcodec_free_context};
 	avcodec_parameters_to_context(pCodecCtx.get(), m_formatContext->streams[m_streamId]->codecpar);
@@ -245,7 +259,8 @@ FFmpeg::FFmpeg(fs::path const& _filename, int mediaType) : m_filename(_filename)
 		static std::mutex s_avcodec_mutex;
 		// ffmpeg documentation is clear on the fact that avcodec_open2 is not thread safe.
 		std::lock_guard<std::mutex> l(s_avcodec_mutex);
-		if (avcodec_open2(pCodecCtx.get(), codec, nullptr) < 0) throw std::runtime_error("Cannot open codec");
+                err = avcodec_open2(pCodecCtx.get(), codec, nullptr);
+		if (err < 0) throw Error(*this, err);
 	}
 	pCodecCtx->workaround_bugs = FF_BUG_AUTODETECT;
 	m_codecContext = std::move(pCodecCtx);
@@ -284,19 +299,6 @@ void FFmpeg::avcodec_free_context(AVCodecContext *avctx) {
 	::avcodec_free_context(&avctx);
 }
 
-class FfmpegError: public std::runtime_error {
-public:
-	FfmpegError(int errorValue): runtime_error(msgFmt(errorValue)) {}
-private:
-	static std::string msgFmt(int errorValue) {
-		char message[AV_ERROR_MAX_STRING_SIZE];
-		av_strerror(errorValue, message, AV_ERROR_MAX_STRING_SIZE);
-		std::ostringstream oss;
-		oss << "FfmpegError: code=" << errorValue << ", error=" << message;
-		return oss.str();
-	}
-};
-
 struct FFmpeg::Packet: public AVPacket {
 	Packet() {
 		av_init_packet(this);
@@ -314,9 +316,9 @@ void FFmpeg::handleOneFrame() {
 		auto ret = av_read_frame(m_formatContext.get(), &pkt);
 		if(ret == AVERROR_EOF) {
 			// End of file: no more data to read.
-			throw FFmpeg::eof_error();
+			throw Eof();
 		} else if(ret < 0) {
-			throw FfmpegError(ret);
+			throw Error(*this, ret);
 		}
 
 		if (pkt.stream_index != m_streamId) continue;
@@ -343,24 +345,24 @@ void FFmpeg::decodePacket(Packet &pkt) {
 	auto ret = avcodec_send_packet(m_codecContext.get(), &pkt);
 	if(ret == AVERROR_EOF) {
 		// End of file: no more data to read.
-		throw FFmpeg::eof_error();
+		throw Eof();
 	} else if(ret == AVERROR(EAGAIN)) {
 		// no room for new data, need to get more frames out of the decoder by
 		// calling avcodec_receive_frame()
 	} else if(ret < 0) {
-		throw FfmpegError(ret);
+		throw Error(*this, ret);
 	}
 	while (ret >= 0) {
 		uFrame frame{av_frame_alloc()};
 		ret = avcodec_receive_frame(m_codecContext.get(), frame.get());
 		if(ret == AVERROR_EOF) {
 			// End of file: no more data.
-			throw FFmpeg::eof_error();
+			throw Eof();
 		} else if(ret == AVERROR(EAGAIN)) {
 			// not enough data to decode a frame, go read more and feed more to the decoder
 			break;
 		} else if(ret < 0) {
-			throw FfmpegError(ret);
+			throw Error(*this, ret);
 		}
 		// frame is available here
 		if (frame->pts != int64_t(AV_NOPTS_VALUE)) {
