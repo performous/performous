@@ -32,7 +32,7 @@ class ScreenAudioDevices: public Screen {
 
 	Audio& m_audio;
 	std::unique_ptr<ThemeAudioDevices> m_theme;
-	unsigned int m_selected_column;
+	unsigned int m_selected_column { 0 };
 	portaudio::DeviceInfos m_devs;
 	std::vector<Channel> m_channels;
 	std::unique_ptr<Texture> m_selector;
