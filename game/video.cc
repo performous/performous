@@ -66,14 +66,17 @@ Video::Video(fs::path const& _videoFile, double videoGap): m_videoGap(videoGap),
 				try {
 					ffmpeg->handleOneFrame();
                                         errors = 0;
+					l.lock();
 				} catch (FFmpeg::Eof&) {
 					push(Bitmap());
 					std::clog << "ffmpeg/debug: done loading " << file << std::endl;
+					l.lock();
+                                        m_cond.wait(l, [this]{ return m_quit || m_seek_asked; });
 				} catch (std::exception& e) {
 					std::clog << "ffmpeg/error: " << file << ": " << e.what() << std::endl;
 					if (++errors > 2) { std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl; break; }
+					l.lock();
 				}
-				l.lock();
 			}
 	});
 }
