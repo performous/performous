@@ -4,6 +4,6 @@
 [submodule "aubio"]
 	path = 3rdparty/aubio
 	url = ../aubio
-[submodule "3rdparty/json"]
+[submodule "nlohmann-json"]
 	path = 3rdparty/json
 	url = ../json
