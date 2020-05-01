@@ -175,11 +175,11 @@ AudioBuffer::AudioBuffer(fs::path const& file, unsigned int rate, size_t size):
 					m_cond.wait(l, [this]{ return m_quit || m_seek_asked; });
 				} catch (const std::exception& e) {
 					std::clog << "ffmpeg/error: " << e.what() << std::endl;
-                                        if (++errors > 2) std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl;
+					if (++errors > 2) std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl;
 					l.lock();
 				}
 			}
-    });
+		});
 }
 
 AudioBuffer::~AudioBuffer() {
@@ -222,9 +222,9 @@ static void printFFmpegInfo() {
 };
 
 class FFmpeg::Error: public std::runtime_error {
-public:
+  public:
 	Error(const FFmpeg &self, int errorValue): std::runtime_error(msgFmt(self, errorValue)) {}
-private:
+  private:
 	static std::string msgFmt(const FFmpeg &self, int errorValue) {
 		char message[AV_ERROR_MAX_STRING_SIZE];
 		av_strerror(errorValue, message, AV_ERROR_MAX_STRING_SIZE);
