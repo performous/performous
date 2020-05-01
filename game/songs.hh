@@ -22,6 +22,17 @@ class Songs {
 	/// constructor
 	Songs(Database& database, std::string const& songlist = std::string());
 	~Songs();
+	/// iterators
+	struct iterator_traits {        
+		typedef ptrdiff_t difference_type; //almost always ptrdiff_t
+		typedef std::shared_ptr<Song> value_type; //almost always T
+		typedef std::shared_ptr<Song>& reference; //almost always T& or const T&
+		typedef std::shared_ptr<Song>* pointer; //almost always T* or const T*
+		typedef std::forward_iterator_tag iterator_category;  //usually std::forward_iterator_tag or similar
+	};
+	using iterator = typename std::vector<iterator_traits::value_type>::iterator;
+	iterator begin() { return m_filtered.begin(); }
+	iterator end() { return m_filtered.end(); }
 	/// updates filtered songlist
 	void update();
 	/// reloads songlist
@@ -101,4 +112,3 @@ class Songs {
 	std::unique_ptr<std::thread> m_thread;
 	mutable std::mutex m_mutex;
 };
-
