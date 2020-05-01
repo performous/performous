@@ -21,6 +21,10 @@ class Game;
 class Song;
 class Database;
 
+using SongPtr = std::shared_ptr<Song>;
+using SongCollection = std::vector<SongPtr>;
+
+
 /// songs class for songs screen
 class Songs {
   public:
@@ -29,6 +33,17 @@ class Songs {
 	/// constructor
 	Songs(Database& database, std::string const& songlist = std::string());
 	~Songs();
+	/// iterators
+	struct iterator_traits {
+		using iterator_category = std::random_access_iterator_tag;
+		using difference_type = std::ptrdiff_t; //almost always ptrdiff_t
+		using value_type = SongPtr;
+		using reference = SongPtr&;
+		using pointer = SongPtr*;
+	};
+	using iterator = typename std::vector<iterator_traits::value_type>::iterator;
+	iterator begin() { return m_filtered.begin(); }
+	iterator end() { return m_filtered.end(); }
 	/// updates filtered songlist
 	void update();
 	/// reloads songlist
