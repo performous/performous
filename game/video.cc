@@ -59,20 +59,20 @@ Video::Video(fs::path const& _videoFile, double videoGap): m_videoGap(videoGap),
 					// discard all outdated frame. To avoid races between clean and push, clean and push are done in this thread.
 					m_queue.clear();
 					l.unlock();
-					ffmpeg->seek(seek_pos);  // -5 to workaround ffmpeg inaccurate seeking
+					ffmpeg->seek(seek_pos);
 				}
 				else l.unlock();
 
 				try {
 					ffmpeg->handleOneFrame();
-				} catch (FFmpeg::eof_error&) {
-					push(Bitmap()); // EOF marker
+                                        errors = 0;
+				} catch (FFmpeg::Eof&) {
+					push(Bitmap());
 					std::clog << "ffmpeg/debug: done loading " << file << std::endl;
 				} catch (std::exception& e) {
 					std::clog << "ffmpeg/error: " << file << ": " << e.what() << std::endl;
 					if (++errors > 2) { std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl; break; }
 				}
-				errors = 0;
 				l.lock();
 			}
 	});
