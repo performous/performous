@@ -79,7 +79,7 @@ void AudioBuffer::operator()(const std::int16_t *data, size_t count, int64_t sam
 	}
 
 	m_write_pos = sample_position;
-	auto write_pos_in_ring = m_write_pos % m_data.size();
+	size_t write_pos_in_ring = m_write_pos % m_data.size();
 	auto first_hunk_size = std::min(count, m_data.size() - write_pos_in_ring);
 	std::copy(data, data + first_hunk_size, m_data.begin() + write_pos_in_ring);
 	// second part is when data wrapped in the ring buffer
