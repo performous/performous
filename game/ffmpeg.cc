@@ -151,32 +151,34 @@ AudioBuffer::AudioBuffer(fs::path const& file, unsigned int rate, size_t size):
 		auto ffmpeg = std::make_unique<AudioFFmpeg>(file, rate, std::ref(*this));
 		const_cast<double&>(m_duration) = ffmpeg->duration();
 		reader_thread = std::async(std::launch::async, [this, ffmpeg = std::move(ffmpeg)] {
-			std::unique_lock<std::mutex> l(m_mutex);
 			auto errors = 0u;
+			std::unique_lock<std::mutex> l(m_mutex);
 			while (!m_quit) {
 				if (m_seek_asked) {
-					auto seek_pos = m_read_pos / double(AV_TIME_BASE);
 					m_seek_asked = false;
 					m_write_pos = m_read_pos;
-					l.unlock();
+					auto seek_pos = m_read_pos / double(AV_TIME_BASE);
+
+					UnlockGuard<decltype(l)> unlocked(l); // release lock during seek
 					ffmpeg->seek(seek_pos);
-				} else
-					l.unlock();
+					continue;
+				}
+
 				try {
+					UnlockGuard<decltype(l)> unlocked(l); // release lock during possibly blocking ffmpeg stuff
+
 					ffmpeg->handleOneFrame();
 					errors = 0;
-					l.lock();
 				} catch (const FFmpeg::Eof&) {
-					l.lock();
 					// now we know exact eof_pos
 					m_eof_pos = m_write_pos;
 					// Wait here on eof: either quit is asked, either a new seek
 					// was asked and return back reading frames
 					m_cond.wait(l, [this]{ return m_quit || m_seek_asked; });
 				} catch (const std::exception& e) {
+					UnlockGuard<decltype(l)> unlocked(l); // unlock while doing IOs
 					std::clog << "ffmpeg/error: " << e.what() << std::endl;
 					if (++errors > 2) std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl;
-					l.lock();
 				}
 			}
 		});
