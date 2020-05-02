@@ -58,24 +58,27 @@ Video::Video(fs::path const& _videoFile, double videoGap): m_videoGap(videoGap),
 					auto seek_pos = m_readPosition;
 					// discard all outdated frame. To avoid races between clean and push, clean and push are done in this thread.
 					m_queue.clear();
-					l.unlock();
+
+					UnlockGuard<decltype(l)> unlocked(l); // release lock during seek
 					ffmpeg->seek(seek_pos);
+					continue;
 				}
-				else l.unlock();
 
 				try {
+					UnlockGuard<decltype(l)> unlocked(l); // release lock during possibly blocking ffmpeg stuff
 					ffmpeg->handleOneFrame();
-                                        errors = 0;
-					l.lock();
+					errors = 0;
 				} catch (FFmpeg::Eof&) {
-					push(Bitmap());
-					std::clog << "ffmpeg/debug: done loading " << file << std::endl;
-					l.lock();
-                                        m_cond.wait(l, [this]{ return m_quit || m_seek_asked; });
+					{
+						UnlockGuard<decltype(l)> unlocked(l); // release lock for possibly blocking calls
+						push(Bitmap()); // EOF marker
+						std::clog << "ffmpeg/debug: done loading " << file << std::endl;
+					}
+					m_cond.wait(l, [this]{ return m_quit || m_seek_asked; });
 				} catch (std::exception& e) {
+					UnlockGuard<decltype(l)> unlocked(l); // release lock for possibly blocking calls
 					std::clog << "ffmpeg/error: " << file << ": " << e.what() << std::endl;
 					if (++errors > 2) { std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl; break; }
-					l.lock();
 				}
 			}
 	});
