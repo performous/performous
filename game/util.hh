@@ -35,3 +35,17 @@ template <typename T> T smoothstep(T edge0, T edge1, T x) {
 
 /** Convenience smoothstep wrapper with edges at 0 and 1 **/
 template <typename T> T smoothstep(T x) { return smoothstep<T>(0, 1, x); }
+
+/** Symetric of lock_guard: release a lock in constructor and take it back in destructor */
+template <class Lockable>
+struct UnlockGuard {
+	UnlockGuard(Lockable& m) : m_mutex(m) { m_mutex.unlock(); }
+	~UnlockGuard() { m_mutex.lock(); }
+
+	UnlockGuard(const UnlockGuard&) = delete;
+	UnlockGuard& operator=(const UnlockGuard&) = delete;
+
+	private:
+	Lockable& m_mutex;
+};
+
