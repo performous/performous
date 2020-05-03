@@ -209,15 +209,15 @@ AudioBuffer::AudioBuffer(fs::path const& file, unsigned int rate, size_t size):
 }
 
 AudioBuffer::~AudioBuffer() {
-    {
-	std::unique_lock<mutex> l(m_mutex);
-        m_read_pos = 0;
-        m_write_pos = 0;
-        m_data.clear();
-        m_quit = true;
-    }
-    m_cond.notify_all();
-    reader_thread.get();
+	{
+		std::unique_lock<std::mutex> l(m_mutex);
+		m_read_pos = 0;
+		m_write_pos = 0;
+		std::fill(m_data.begin(), m_data.end(), 0);
+		m_quit = true;
+	}
+	m_cond.notify_all();
+	reader_thread.get();
 }
 
 FFmpeg::FFmpeg(fs::path const& _filename, AudioBuffer *audioBuffer):
