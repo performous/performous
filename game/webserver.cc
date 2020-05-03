@@ -18,20 +18,20 @@ void WebServer::StartServer(int tried, bool fallbackPortInUse) {
 		}
 	}
 
-	std::string portToUse = fallbackPortInUse ? std::to_string(config["game/webserver_fallback_port"].i()) : std::to_string(config["game/webserver_port"].i());
-	std::string addr("");
+	unsigned short portToUse = fallbackPortInUse ? config["game/webserver_fallback_port"].i() : config["game/webserver_port"].i();
+	std::string addr = std::string();
 	if(config["game/webserver_access"].i() == 1) {
-		addr = "http://127.0.0.1:" + portToUse;
+		addr = "http://127.0.0.1:" + std::to_string(portToUse);
 		std::clog << "webserver/notice: Starting local server on: " << addr <<std::endl;
 	} else {
-		addr = "http://0.0.0.0:" + portToUse;
+		addr = "http://0.0.0.0:" + std::to_string(portToUse);
 		std::clog << "webserver/notice: Starting public server on: " << addr << std::endl;
 	}
 
 	try {
-		m_server = std::shared_ptr<RequestHandler>(new RequestHandler(addr, m_songs));
+		m_server = std::shared_ptr<RequestHandler>(new RequestHandler(getIPaddr(), portToUse, m_songs));
 		m_server->open().wait();
-		std::string message = getIPaddr() + ":" +  portToUse;
+		std::string message = getIPaddr() + ":" +  std::to_string(portToUse);
 		Game::getSingletonPtr()->notificationFromWebserver(message);
 	} catch (std::exception& e) {
 		tried = tried + 1;
