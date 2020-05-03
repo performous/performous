@@ -7,3 +7,6 @@
 [submodule "nlohmann-json"]
 	path = 3rdparty/json
 	url = ../json
+[submodule "restinio"]
+	path = 3rdparty/restinio
+	url = ../restinio
