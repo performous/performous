@@ -89,12 +89,10 @@ void AudioBuffer::operator()(const std::int16_t *data, size_t count, int64_t sam
 }
 
 bool AudioBuffer::prepare(std::int64_t pos) {
-	if (pos < 0) pos = 0;
-	std::unique_lock<std::mutex> l(m_mutex, std::try_to_lock);
-	if (!l.owns_lock()) return false;  // Didn't get lock, give up for now
-	if (eof(pos)) return true;
-	m_read_pos = pos;
-	m_cond.notify_all();
+	// perform fake read to trigger any potential seek
+	if (!read(nullptr, 0, pos, 1)) return true;
+
+	std::unique_lock<std::mutex> l(m_mutex);
 	// Has enough been prebuffered already and is the requested position still within buffer
 	auto ring_size = static_cast<std::int64_t>(m_data.size());
 	return m_write_pos > m_read_pos + ring_size / 16 && m_write_pos <= m_read_pos + ring_size;
@@ -120,10 +118,12 @@ bool AudioBuffer::read(float* begin, size_t samples, std::int64_t pos, float vol
 	}
 
 	std::unique_lock<std::mutex> l(m_mutex);
-	if (eof(pos) || m_quit)
+	if (eof(pos + samples) || m_quit)
 		return false;
 
-	if (pos >= m_read_pos + static_cast<std::int64_t>(m_data.size()) || pos < m_read_pos) {
+	// one cannot read more data than the size of buffer
+	samples = std::min(samples, m_data.size());
+	if (pos >= m_read_pos + static_cast<std::int64_t>(m_data.size() - samples) || pos < m_read_pos) {
 		// in case request position is not in the current possible range, we trigger a seek
 		// Note: m_write_pos is not checked on purpose: if pos is after
 		// m_write_pos, zeros present in buffer will be returned
