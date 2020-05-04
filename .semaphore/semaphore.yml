@@ -62,7 +62,7 @@ blocks:
         - name: Generate app bundle
           commands:
             - checkout
-            - git submodule init && git submodule update
+            - git submodule update --init --recursive
             - patch --verbose -ui /Users/semaphore/patch-cmake-ignore-CI-homebrew.patch
             - cd osx-utils
             - chmod +x ./performous-app-build.sh
