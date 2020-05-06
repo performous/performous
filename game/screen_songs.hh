@@ -9,7 +9,7 @@
 #include "video.hh"
 #include "playlist.hh"
 #include "menu.hh"
-#include <aubio/fvec.h>
+#include "aubio/aubio.h"
 
 class Audio;
 class Database;
@@ -38,7 +38,6 @@ public:
 	void drawCovers(); ///< draw the cover browser
 	Texture& getCover(Song const& song); ///< get appropriate cover image for the song (incl. no cover)
 	void drawJukebox(); ///< draw the songbrowser in jukebox mode (fullscreen, full previews, ...)
-	static std::unique_ptr<fvec_t, void(*)(fvec_t*)> previewSamplesBuffer;
 	static std::unique_ptr<fvec_t, void(*)(fvec_t*)> previewBeatsBuffer;
 private:
 	void manageSharedKey(input::NavEvent const& event); ///< same behaviour for jukebox and normal mode
