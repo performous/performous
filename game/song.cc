@@ -14,23 +14,23 @@ extern "C" {
 }
 #ifdef USE_WEBSERVER
 Song::Song(web::json::value const& song): dummyVocal(TrackName::LEAD_VOCAL), randomIdx(rand()) {
-	path = song.has_field("TxtFileFolder") ? fs::path(song.at("TxtFileFolder").as_string().substr(0, song.at("TxtFileFolder").as_string().find_last_of("/\\"))) : "";
-	filename = song.has_field("TxtFile") ? fs::path(song.at("TxtFile").as_string()) : "";
-	artist = song.has_field("Artist") ? song.at("Artist").as_string() : "";
-	title = song.has_field("Title") ? song.at("Title").as_string() : "";
-	language = song.has_field("Language") ? song.at("Language").as_string() : "";
-	edition = song.has_field("Edition") ? song.at("Edition").as_string() : "";
-	creator = song.has_field("Creator") ? song.at("Creator").as_string() : "";
-	genre = song.has_field("Genre") ? song.at("Genre").as_string() : "";
-	cover = song.has_field("Cover") ? song.at("Cover").as_string() : "";
-	background = song.has_field("Background") ? song.at("Background").as_string() : "";
-	video = song.has_field("VideoFile") ? fs::path(song.at("VideoFile").as_string()) : "";
+	path = song.has_field("TxtFileFolder") ? fs::path(UnicodeUtil::convertToUTF8(song.at("TxtFileFolder").as_string().substr(0, song.at("TxtFileFolder").as_string().find_last_of("/\\")))) : std::string();
+	filename = song.has_field("TxtFile") ? fs::path(UnicodeUtil::convertToUTF8(song.at("TxtFile").as_string())) : std::string();
+	artist = song.has_field("Artist") ? UnicodeUtil::convertToUTF8(song.at("Artist").as_string()) : std::string();
+	title = song.has_field("Title") ? UnicodeUtil::convertToUTF8(song.at("Title").as_string()) : std::string();
+	language = song.has_field("Language") ? UnicodeUtil::convertToUTF8(song.at("Language").as_string()) : std::string();
+	edition = song.has_field("Edition") ? UnicodeUtil::convertToUTF8(song.at("Edition").as_string()) : std::string();
+	creator = song.has_field("Creator") ? UnicodeUtil::convertToUTF8(song.at("Creator").as_string()) : std::string();
+	genre = song.has_field("Genre") ? UnicodeUtil::convertToUTF8(song.at("Genre").as_string()) : std::string();
+	cover = song.has_field("Cover") ? UnicodeUtil::convertToUTF8(song.at("Cover").as_string()) : std::string();
+	background = song.has_field("Background") ? UnicodeUtil::convertToUTF8(song.at("Background").as_string()) : std::string();
+	video = song.has_field("VideoFile") ? fs::path(UnicodeUtil::convertToUTF8(UnicodeUtil::convertToUTF8(song.at("VideoFile").as_string()))) : std::string();
 	videoGap = song.has_field("VideoGap") ? song.at("VideoGap").as_number().to_double() : 0.0;
 	start = song.has_field("Start") ? song.at("Start").as_number().to_double() : 0.0;
 	preview_start = song.has_field("PreviewStart") ? song.at("PreviewStart").as_number().to_double() : 0.0;
 	m_duration = song.has_field("Duration") ? song.at("Duration").as_number().to_double() : 0.0;
-	music["background"] = song.has_field("SongFile") ? fs::path(song.at("SongFile").as_string()) : "";
-	music["vocals"] = song.has_field("Vocals") ? fs::path(song.at("Vocals").as_string()) : "";
+	music["background"] = song.has_field("SongFile") ? fs::path(UnicodeUtil::convertToUTF8(song.at("SongFile").as_string())) : std::string();
+	music["vocals"] = song.has_field("Vocals") ? fs::path(UnicodeUtil::convertToUTF8(song.at("Vocals").as_string())) : std::string();
 	loadStatus = Song::LoadStatus::HEADER;
 	
 	if (song.has_field("VocalTracks")) {
