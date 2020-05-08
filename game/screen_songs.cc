@@ -545,7 +545,6 @@ void ScreenSongs::drawMenu() {
 	m_menu.dimensions.stretch(w, h);
 }
 
-std::unique_ptr<fvec_t, void(*)(fvec_t*)> ScreenSongs::previewSamplesBuffer = std::unique_ptr<fvec_t, void(*)(fvec_t*)>(new_fvec(1), [](fvec_t* p){del_fvec(p);});
 std::unique_ptr<fvec_t, void(*)(fvec_t*)> ScreenSongs::previewBeatsBuffer = std::unique_ptr<fvec_t, void(*)(fvec_t*)>(new_fvec(1), [](fvec_t* p){del_fvec(p);});
 
 void ScreenSongs::createPlaylistMenu() {
