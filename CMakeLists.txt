@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.6)
 project(Performous CXX C)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(GetGitRevisionDescription)
 git_describe(PROJECT_VERSION --tags)
@@ -26,7 +27,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
 	add_definitions("-DNDEBUG")
 endif()
 
-if (USE_BOOST_REGEX)
+option(PERFORMOUS_USE_BOOST_REGEX "Use Boost.regex instead of std::regex; enable this on platforms where std::regex might not behave, such as Fedora." OFF)
+
+if (PERFORMOUS_USE_BOOST_REGEX)
         add_definitions(-DUSE_BOOST_REGEX)
 endif()
 
@@ -123,6 +126,22 @@ add_subdirectory(data)
 add_subdirectory(game)
 add_subdirectory(3rdparty/ced)
 add_subdirectory(docs)
+
+find_package(nlohmann_json 3.7.3 QUIET)
+
+if(nlohmann_json_FOUND)
+	message(STATUS "Nlohmann JSON Found.")
+else()
+	message(STATUS "Nlohmann JSON not found; will use included version.")
+	set(JSON_BuildTests OFF CACHE INTERNAL "")
+	set(JSON_Install OFF CACHE INTERNAL "")
+	set(BUILD_TESTING OFF CACHE INTERNAL "")
+	add_subdirectory(3rdparty/json)
+endif()
+
+target_compile_features(nlohmann_json INTERFACE cxx_std_14)
+
+add_subdirectory(3rdparty/restinio/dev)
 
 if(WIN32)
 	install(FILES win32/ConfigureSongDirectory.bat DESTINATION .)
