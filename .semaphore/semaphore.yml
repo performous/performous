@@ -13,6 +13,8 @@ blocks:
           - echo "Installing Performous dependencies..."
           - sudo apt -y update
           - sudo apt -y install cmake gettext help2man clang gcc-7 g++-7 libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libopencv-dev libportmidi-dev libqrencode-dev libicu-dev libcpprest-dev libglm-dev libopenblas-dev libfftw3-dev
+          - git submodule update --init --recursive
+          - checkout
       jobs:
         - name: GCC-7 Build
           env_vars:
@@ -21,8 +23,6 @@ blocks:
             - name: CXX
               value: g++-7
           commands:
-            - checkout
-            - git submodule init && git submodule update
             - mkdir build.gcc && cd build.gcc && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
             - make VERBOSE=1
         - name: Clang-6.0 Build
@@ -32,8 +32,6 @@ blocks:
             - name: CXX
               value: clang++
           commands:
-            - checkout
-            - git submodule init && git submodule update
             - mkdir build.clang && cd build.clang && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
             - make VERBOSE=1
   - name: MacOS 10.14.6 Build    
@@ -62,7 +60,7 @@ blocks:
         - name: Generate app bundle
           commands:
             - checkout
-            - git submodule init && git submodule update
+            - git submodule update --init --recursive
             - patch --verbose -ui /Users/semaphore/patch-cmake-ignore-CI-homebrew.patch
             - cd osx-utils
             - chmod +x ./performous-app-build.sh
