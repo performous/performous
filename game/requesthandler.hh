@@ -61,7 +61,7 @@ class RequestHandler
         std::vector<std::string> GetTranslationKeys();
         std::shared_ptr<Song> GetSongFromJSON_New(nlohmann::json);
         std::shared_ptr<Song> GetSongFromJSON(web::json::value);
-
+		static Performous_Server_Settings make_server_settings(const std::string &url, unsigned short port);
         web::http::experimental::listener::http_listener m_listener;
         Songs& m_songs;
         restinio::http_server_t<Performous_Server_Traits> m_restinio_server;

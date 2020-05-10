@@ -14,11 +14,14 @@
 //                 .request_handler(std::make_unique<Performous_Router_t>());
 //                 } {}
 
-RequestHandler::RequestHandler(std::string url, unsigned short port, Songs& songs):m_listener(url), m_songs(songs), m_restinio_server(restinio::own_io_context(), []( auto & settings ){}) {
+RequestHandler::RequestHandler(std::string url, unsigned short port, Songs& songs):m_listener("http://" + url), m_songs(songs), m_restinio_server(restinio::own_io_context(), make_server_settings(url, port)) {
     m_listener.support(web::http::methods::GET, std::bind(&RequestHandler::Get, this, std::placeholders::_1));
     m_listener.support(web::http::methods::PUT, std::bind(&RequestHandler::Put, this, std::placeholders::_1));
     m_listener.support(web::http::methods::POST, std::bind(&RequestHandler::Post, this, std::placeholders::_1));
     m_listener.support(web::http::methods::DEL, std::bind(&RequestHandler::Delete, this, std::placeholders::_1));
+}
+
+Performous_Server_Settings RequestHandler::make_server_settings(const std::string &url, unsigned short port) {
     auto settings = Performous_Server_Settings(10);
     settings
     .port( port )
@@ -28,10 +31,7 @@ RequestHandler::RequestHandler(std::string url, unsigned short port, Songs& song
     .read_next_http_message_timelimit(std::chrono::seconds(60))
     .write_http_response_timelimit(std::chrono::seconds(60))
     .handle_request_timeout(std::chrono::seconds(60));
-    m_restinio_server = restinio::http_server_t<Performous_Server_Traits>(
-        restinio::own_io_context(),
-        std::forward<Performous_Server_Settings>(settings)
-    );
+    return settings;
 }
 
 RequestHandler::~RequestHandler() {}
@@ -47,7 +47,7 @@ void RequestHandler::Error(pplx::task<void>& t)
     }
 }
 
-std::unique_ptr<Performous_Router_t> init_webserver_router() {
+std::unique_ptr<Performous_Router_t> RequestHandler::init_webserver_router() {
 	auto router = std::make_unique<Performous_Router_t>();
 	return router;
 }
