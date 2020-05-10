@@ -34,3 +34,15 @@ static int defaultBackEnd();
 private:
 static const std::array<const char*,6> platformNames;
 };
+
+#if (BOOST_OS_WINDOWS)
+extern "C" {
+// For DWORD (see end of file)
+#include "windef.h"
+// Force high-performance graphics on dual-GPU systems
+	// http://developer.download.nvidia.com/devzone/devcenter/gamegraphics/files/OptimusRenderingPolicies.pdf
+	__declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+	// https://community.amd.com/thread/169965
+	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
+#endif
