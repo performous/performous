@@ -46,28 +46,28 @@ class performous_logger_t
 		void
 		trace( Message_Builder && msg_builder )
 		{
-			log_message( "webserver/debug: ", msg_builder() );
+			log_message( "webserver/debug", msg_builder() );
 		}
 
 		template< typename Message_Builder >
 		void
 		info( Message_Builder && msg_builder )
 		{
-			log_message( "webserver/info: ", msg_builder() );
+			log_message( "webserver/info", msg_builder() );
 		}
 
 		template< typename Message_Builder >
 		void
 		warn( Message_Builder && msg_builder )
 		{
-			log_message( "webserver/warning: ", msg_builder() );
+			log_message( "webserver/warning", msg_builder() );
 		}
 
 		template< typename Message_Builder >
 		void
 		error( Message_Builder && msg_builder )
 		{
-			log_message( "webserver/error: ", msg_builder() );
+			log_message( "webserver/error", msg_builder() );
 		}
 
 	private:
@@ -76,18 +76,16 @@ class performous_logger_t
 		{
 			std::unique_lock< Lock > lock{ m_lock };
 
-			namespace stdchrono = std::chrono;
-
-			auto now = stdchrono::system_clock::now();
-			auto ms = stdchrono::duration_cast<
-					stdchrono::milliseconds >( now.time_since_epoch() );
-			std::time_t unix_time = stdchrono::duration_cast<
-					stdchrono::seconds >( ms ).count();
-
+			auto now = std::chrono::system_clock::now();
+			auto ms = std::chrono::duration_cast<
+					std::chrono::milliseconds >( now.time_since_epoch() );
+			std::time_t unix_time = std::chrono::duration_cast<
+					std::chrono::seconds >( ms ).count();
+// 			std::clog << "logger/debug: msg is " << msg << std::endl;
 			( *m_out )
 				<<		fmt::format(
+						"{}: [{:%Y-%m-%d %H:%M:%S}.{:03d}] : {}",
 						tag,
-						"[{:%Y-%m-%d %H:%M:%S}.{:03d}] {}: {}",
 						make_localtime( unix_time ),
 						static_cast< int >( ms.count() % 1000u ),
 						msg )
