@@ -28,7 +28,7 @@ void ScreenIntro::enter() {
 		m_first = false;
 	}
 	reloadGL();
-	webserversetting = config["game/webserver_access"].i();
+	webserversetting = config["webserver/access"].i();
 	m_audio.playSample("notice.ogg");
 }
 
