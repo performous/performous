@@ -29,12 +29,34 @@ using Performous_Server_Settings = restinio::run_on_thread_pool_settings_t<Perfo
 class RequestHandler
 {
     public:
+    	friend class WebServer;
         RequestHandler(Songs& songs);
         RequestHandler(std::string url, unsigned short port, Songs& songs);
         virtual ~RequestHandler();
 
         pplx::task<void>open() { return m_listener.open(); }
         pplx::task<void>close() { return m_listener.close(); }
+
+		template < typename RESP >
+static	RESP
+		init_resp( RESP resp )
+		{
+			resp.append_header( "Server", "Performous sample server using RESTinio/v.0.6.7" );
+			resp.append_header_date_field()
+			.append_header( "Content-Type", "text/plain; charset=utf-8" );
+
+			return resp;
+		}
+		
+//         restinio::ip_blocker::inspection_result_t inspect(const restinio::ip_blocker::incoming_info_t & info) noexcept {
+//             if(some_condition(info)) {
+//                 return restinio::ip_blocker::deny();
+//                 }
+//             else {
+//                 return restinio::ip_blocker::allow();
+//                 }
+//         }
+
 
     protected:
 
@@ -46,7 +68,7 @@ class RequestHandler
         void Delete(web::http::http_request request);
         void Error(pplx::task<void>& t);
         
-        std::unique_ptr<Performous_Router_t> init_webserver_router();
+        static std::unique_ptr<Performous_Router_t> init_webserver_router();
 
         web::json::value ExtractJsonFromRequest(web::http::http_request request);
         nlohmann::json ExtractJsonFromRequest_New(web::http::http_request request);

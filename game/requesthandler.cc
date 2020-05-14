@@ -22,15 +22,18 @@ RequestHandler::RequestHandler(std::string url, unsigned short port, Songs& song
 }
 
 Performous_Server_Settings RequestHandler::make_server_settings(const std::string &url, unsigned short port) {
-    auto settings = Performous_Server_Settings(10);
+    auto settings = Performous_Server_Settings(config["webserver/threads"].i());
     settings
     .port( port )
     .address( url )
     .separate_accept_and_create_connect(true)
-    .request_handler(std::make_unique<Performous_Router_t>())
-    .read_next_http_message_timelimit(std::chrono::seconds(60))
-    .write_http_response_timelimit(std::chrono::seconds(60))
-    .handle_request_timeout(std::chrono::seconds(60));
+    .request_handler(init_webserver_router())
+    .read_next_http_message_timelimit(std::chrono::seconds(config["webserver/http_timelimit"].i()))
+    .write_http_response_timelimit(std::chrono::seconds(config["webserver/write_http_timelimit"].i()))
+    .handle_request_timeout(std::chrono::seconds(config["webserver/timeout"].i()))
+    .buffer_size(std::size_t(config["webserver/buffer_size"].i()))
+    .concurrent_accepts_count(config["webserver/threads"].i())
+    .max_pipelined_requests(config["webserver/request_pipeline"].i());
     return settings;
 }
 
@@ -49,6 +52,26 @@ void RequestHandler::Error(pplx::task<void>& t)
 
 std::unique_ptr<Performous_Router_t> RequestHandler::init_webserver_router() {
 	auto router = std::make_unique<Performous_Router_t>();
+	router->http_get( "/single/:param", []( auto req, auto params ){
+		return
+			init_resp( req->create_response() )
+				.set_body(
+					fmt::format(
+						"GET request with single parameter: '{}'",
+						params[ "param" ] ) )
+				.done();
+	} );
+	// GET request to homepage.
+	router->http_get( "/", []( auto req, auto ){
+		return
+			init_resp( req->create_response() )
+				.set_body( "GET request to the homepage.")
+				.done();
+	} );
+    router->non_matched_request_handler(
+            [](auto req){
+                return req->create_response(restinio::status_not_found()).connection_close().done();
+            });
 	return router;
 }
 
