@@ -131,14 +131,11 @@ std::string const ConfigItem::getValue() const {
 	}
 	else if (this->getShortDesc() == config["webserver/netmask"].getShortDesc()) {
 		int slashNotation = std::stoi(getEnumName());
-// 		int slashNotation = boost::get<int>(m_value);
 		std::uint64_t subNetValue = 1;
 		subNetValue <<= 32;
 		subNetValue -= (1 << (32 - slashNotation));
-		std::clog << "webserver/debug: slashNotation: " << std::to_string(slashNotation) << ", subNetValue: " << std::to_string(subNetValue) << std::endl;
-		std::string slashString = std::to_string(slashNotation);
 		std::string displayValue(boost::asio::ip::make_address_v4(subNetValue).to_string());
-		displayValue += (" (/"+slashString+")");
+		displayValue += (" (/"+std::to_string(slashNotation)+")");
 		return displayValue;
 	}
 	if (m_type == "int") {
