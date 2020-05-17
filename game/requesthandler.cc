@@ -3,23 +3,15 @@
 
 #ifdef USE_WEBSERVER
 
-// RequestHandler::RequestHandler(Songs& songs):m_songs(songs),
-// m_restinio_server {
-//         	restinio::own_io_context(),
-//         	[&](auto& settings) {
-//         		settings
-//                 .port( port )
-//                 .address( url )
-//                 .separate_accept_and_create_connect(true)
-//                 .request_handler(std::make_unique<Performous_Router_t>());
-//                 } {}
-
 RequestHandler::RequestHandler(std::string url, unsigned short port, Songs& songs):m_listener("http://" + url), m_songs(songs), m_restinio_server(restinio::own_io_context(), make_server_settings(url, port)) {
+	m_local_ip = RequestHandler::getLocalIP(std::string("1.1.1.1"));
     m_listener.support(web::http::methods::GET, std::bind(&RequestHandler::Get, this, std::placeholders::_1));
     m_listener.support(web::http::methods::PUT, std::bind(&RequestHandler::Put, this, std::placeholders::_1));
     m_listener.support(web::http::methods::POST, std::bind(&RequestHandler::Post, this, std::placeholders::_1));
     m_listener.support(web::http::methods::DEL, std::bind(&RequestHandler::Delete, this, std::placeholders::_1));
 }
+
+boost::asio::ip::network_v4 Performous_IP_Blocker::m_allowed_subnet;
 
 Performous_Server_Settings RequestHandler::make_server_settings(const std::string &url, unsigned short port) {
     auto settings = Performous_Server_Settings(config["webserver/threads"].i());
@@ -34,6 +26,7 @@ Performous_Server_Settings RequestHandler::make_server_settings(const std::strin
     .buffer_size(std::size_t(config["webserver/buffer_size"].i()))
     .concurrent_accepts_count(config["webserver/threads"].i())
     .max_pipelined_requests(config["webserver/request_pipeline"].i());
+    if (config["webserver/access"].i() == 3 ) settings.ip_blocker(std::make_shared<Performous_IP_Blocker>());
     return settings;
 }
 
@@ -48,6 +41,25 @@ void RequestHandler::Error(pplx::task<void>& t)
     catch(...)
     {
     }
+}
+
+boost::asio::ip::address_v4 RequestHandler::getLocalIP(const std::string& service) {
+		boost::asio::io_service netService;
+		boost::asio::ip::udp::resolver resolver(netService);
+		boost::asio::ip::resolver_base::flags flags = boost::asio::ip::resolver_base::flags::passive | boost::asio::ip::resolver_base::flags::numeric_service;
+		boost::asio::ip::address_v4 address;
+		boost::asio::ip::udp::resolver::iterator endpoints;
+		try {
+			address = boost::asio::ip::make_address_v4(service);
+			flags |= boost::asio::ip::resolver_base::flags::numeric_host;
+			endpoints = resolver.resolve(boost::asio::ip::udp::resolver::query(boost::asio::ip::udp::v4(), service, "80", flags));
+		} catch (const std::exception& e) {
+			endpoints = resolver.resolve(boost::asio::ip::udp::resolver::query(boost::asio::ip::udp::v4(), boost::asio::ip::host_name(), "80", flags));
+		}
+		boost::asio::ip::udp::endpoint ep = *endpoints;
+		boost::asio::ip::udp::socket socket(netService);
+		socket.connect(ep);
+		return socket.local_endpoint().address().to_v4();
 }
 
 std::unique_ptr<Performous_Router_t> RequestHandler::init_webserver_router() {
