@@ -2,20 +2,35 @@
 #include "unicode.hh"
 
 #ifdef USE_WEBSERVER
-RequestHandler::RequestHandler(Songs& songs):m_songs(songs)
-{
-}
-RequestHandler::RequestHandler(std::string url, Songs& songs):m_listener(url),m_songs(songs)
-{
+
+RequestHandler::RequestHandler(std::string url, unsigned short port, Songs& songs):m_listener("http://" + url), m_songs(songs), m_restinio_server(restinio::own_io_context(), make_server_settings(url, port)) {
+	m_local_ip = RequestHandler::getLocalIP(std::string("1.1.1.1"));
     m_listener.support(web::http::methods::GET, std::bind(&RequestHandler::Get, this, std::placeholders::_1));
     m_listener.support(web::http::methods::PUT, std::bind(&RequestHandler::Put, this, std::placeholders::_1));
     m_listener.support(web::http::methods::POST, std::bind(&RequestHandler::Post, this, std::placeholders::_1));
     m_listener.support(web::http::methods::DEL, std::bind(&RequestHandler::Delete, this, std::placeholders::_1));
+}
 
+boost::asio::ip::network_v4 Performous_IP_Blocker::m_allowed_subnet;
+
+Performous_Server_Settings RequestHandler::make_server_settings(const std::string &url, unsigned short port) {
+    auto settings = Performous_Server_Settings(config["webserver/threads"].i());
+    settings
+    .port( port )
+    .address( url )
+    .separate_accept_and_create_connect(true)
+    .request_handler(init_webserver_router())
+    .read_next_http_message_timelimit(std::chrono::seconds(config["webserver/http_timelimit"].i()))
+    .write_http_response_timelimit(std::chrono::seconds(config["webserver/write_http_timelimit"].i()))
+    .handle_request_timeout(std::chrono::seconds(config["webserver/timeout"].i()))
+    .buffer_size(std::size_t(config["webserver/buffer_size"].i()))
+    .concurrent_accepts_count(config["webserver/threads"].i())
+    .max_pipelined_requests(config["webserver/request_pipeline"].i());
+    if (config["webserver/access"].i() == 3 ) settings.ip_blocker(std::make_shared<Performous_IP_Blocker>());
+    return settings;
 }
-RequestHandler::~RequestHandler()
-{
-}
+
+RequestHandler::~RequestHandler() {}
 
 void RequestHandler::Error(pplx::task<void>& t)
 {
@@ -28,6 +43,141 @@ void RequestHandler::Error(pplx::task<void>& t)
     }
 }
 
+boost::asio::ip::address_v4 RequestHandler::getLocalIP(const std::string& service) {
+		boost::asio::io_service netService;
+		boost::asio::ip::udp::resolver resolver(netService);
+		boost::asio::ip::resolver_base::flags flags = boost::asio::ip::resolver_base::flags::passive | boost::asio::ip::resolver_base::flags::numeric_service;
+		boost::asio::ip::address_v4 address;
+		boost::asio::ip::udp::resolver::iterator endpoints;
+		try {
+			address = boost::asio::ip::make_address_v4(service);
+			flags |= boost::asio::ip::resolver_base::flags::numeric_host;
+			endpoints = resolver.resolve(boost::asio::ip::udp::resolver::query(boost::asio::ip::udp::v4(), service, "80", flags));
+		} catch (const std::exception& e) {
+			endpoints = resolver.resolve(boost::asio::ip::udp::resolver::query(boost::asio::ip::udp::v4(), boost::asio::ip::host_name(), "80", flags));
+		}
+		boost::asio::ip::udp::endpoint ep = *endpoints;
+		boost::asio::ip::udp::socket socket(netService);
+		socket.connect(ep);
+		return socket.local_endpoint().address().to_v4();
+}
+
+std::unique_ptr<Performous_Router_t> RequestHandler::init_webserver_router() {
+	auto router = std::make_unique<Performous_Router_t>();
+	router->http_get("/", [this](auto req, auto){
+		return HandleFile(req, findFile("index.html").string());
+	});	
+	router->http_get(R"(/api/getDataBase.json)", [this](auto request, auto){ // Get database
+        m_songs.setFilter("");
+        restinio::query_string_params_t query = restinio::parse_query<restinio::parse_query_traits::javascript_compatible>(request->header().query());
+        std::clog << "webserver/debug: query is: " << request->header().query() << std::endl;
+        size_t sort = 1;
+        bool descending = (query.has("order") && query["order"] == "descending");
+        if (query.has("order")) {
+        	std::string order(query["order"]);
+        	if (UnicodeUtil::toLower(order) == "title") sort = 1;
+        	else if (UnicodeUtil::toLower(order) == "artist") sort = 2;
+        	else if (UnicodeUtil::toLower(order) == "edition") sort = 3;
+        	else if (UnicodeUtil::toLower(order) == "language") sort = 6;
+        	m_songs.sortSpecificChange(sort, descending);
+        }
+        nlohmann::json jsonRoot = SongsToJsonObject_New();
+		return init_resp(request->create_response(),std::string("application/json"))
+			.set_body(jsonRoot.dump())
+			.done(); 
+	});
+	
+	router->http_get(R"(/api/language)", [this](auto request, auto) {
+        auto localeMap = GenerateLocaleDict();
+        nlohmann::json jsonRoot = nlohmann::json();
+            for (auto const &kv : localeMap) {
+                std::string key = kv.first;
+                //Hack to get an easy key value pair within the json object.
+                if(key == "Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding Performous see /docs/Authors.txt"){
+                    key = "Credits";
+                }
+                std::replace(key.begin(), key.end(), ' ','_');
+                key = UnicodeUtil::toLower(key);;
+                jsonRoot[key] = kv.second;
+            }
+    	    return init_resp(request->create_response(),std::string("application/json"))
+        		.set_body(jsonRoot.dump())
+        		.done();
+        });
+	router->http_get(R"(/api/getCurrentPlaylist.json)", [](auto request, auto) {
+        Game* gm = Game::getSingletonPtr();
+        nlohmann::json jsonRoot = nlohmann::json::array();
+        for (auto const& song : gm->getCurrentPlayList().getList()) {
+            nlohmann::json songObject;
+            songObject["Title"] = song->title;
+            songObject["Artist"] = song->artist;
+            songObject["Edition"] = song->edition;
+            songObject["Language"] = song->language;
+            songObject["Creator"] = song->creator;
+            songObject["Duration"] = song->getDurationSeconds();
+            jsonRoot.push_back(songObject);
+        }
+        return init_resp(request->create_response(),std::string("application/json"))
+			.set_body(jsonRoot.dump())
+			.done();
+    });
+    router->http_get(R"(/api/getplaylistTimeout)", [](auto request, auto) {
+    	return init_resp(request->create_response())
+        .set_body(std::to_string(config["game/playlist_screen_timeout"].i()))
+        .done();
+    });
+	router->http_get(R"(/:path(.*))", [this](auto req, auto params){
+		std::clog << "webserver/debug: findFile returns: " << findFile(std::string(params["path"])).string() << std::endl;
+		return HandleFile(req, findFile(std::string(params["path"])).string());
+	});
+	
+    router->non_matched_request_handler(
+            [](auto req){
+                return req->create_response(restinio::status_not_found()).connection_close().done();
+            });
+	return router;
+}
+
+restinio::request_handling_status_t RequestHandler::HandleFile(std::shared_ptr<restinio::request_t> request, std::string filePath) {
+    auto path = (!filePath.empty()) ? filePath : request->header().request_target();
+    auto fileName = path.substr(path.find_last_of("/\\") + 1);
+
+        std::string content_type = std::string();
+        if(path.find(".js") != std::string::npos) {
+            content_type = "text/javascript; charset=utf-8";
+        } else if (path.find(".css") != std::string::npos) {
+            content_type = "text/css";
+        } else if (path.find(".png") != std::string::npos) {
+            content_type = "image/png";
+        } else if (path.find(".gif") != std::string::npos) {
+            content_type = "image/gif";
+        } else if (path.find(".ico") != std::string::npos) {
+            content_type = "image/x-icon";
+        } else if (path.find(".svg") != std::string::npos) {
+            content_type = "image/svg+xml";
+        } else if(path.find(".htm") != std::string::npos) {
+            content_type = "text/html; charset=utf-8";
+        } else {
+            content_type = "text/plain; charset=utf-8";
+        }
+
+    std::string fileToSend = findFile(fileName).string();
+	try {
+		auto file = restinio::sendfile(fileToSend);
+		auto modified_at = restinio::make_date_field_value(file.meta().last_modified_at());
+		return init_resp(request->create_response(),content_type)
+						.append_header_date_field()
+						.append_header(restinio::http_field::last_modified, std::move(modified_at))
+						.set_body(std::move(file))
+						.done();
+		} catch(const std::exception &e) {
+			return init_resp(request->create_response(restinio::status_not_found()))
+					.append_header_date_field()
+					.connection_close()
+					.done();
+		}
+}
+
 void RequestHandler::HandleFile(web::http::http_request request, std::string filePath) {
     auto path = filePath != "" ? filePath : request.relative_uri().path();
     auto fileName = path.substr(path.find_last_of("/\\") + 1);
@@ -35,10 +185,8 @@ void RequestHandler::HandleFile(web::http::http_request request, std::string fil
     std::string fileToSend = findFile(fileName).string();
 
     concurrency::streams::fstream::open_istream(U(fileToSend), std::ios::in).then([=](concurrency::streams::istream is) {
-        std::string content_type = "";
-        if(path.find(".html") != std::string::npos) {
-            content_type = "text/html";
-        } else if(path.find(".js") != std::string::npos) {
+        std::string content_type = std::string();
+        if(path.find(".js") != std::string::npos) {
             content_type = "text/javascript";
         } else if (path.find(".css") != std::string::npos) {
             content_type = "text/css";
@@ -48,6 +196,12 @@ void RequestHandler::HandleFile(web::http::http_request request, std::string fil
             content_type = "image/gif";
         } else if (path.find(".ico") != std::string::npos) {
             content_type = "image/x-icon";
+        } else if (path.find(".svg") != std::string::npos) {
+            content_type = "image/svg+xml";
+        } else if(path.find(".htm") != std::string::npos) {
+            content_type = "text/html";
+        } else {
+            content_type = "text/plain";
         }
 
         request.reply(web::http::status_codes::OK, is, U(content_type)).then([](pplx::task<void> t) {
@@ -97,12 +251,14 @@ void RequestHandler::Get(web::http::http_request request)
         } else if(request.relative_uri().query() == "sort=edition&order=descending") {
             m_songs.sortSpecificChange(3, true);
         }
-        web::json::value jsonRoot = SongsToJsonObject();
-        request.reply(web::http::status_codes::OK, jsonRoot);
+//         web::json::value jsonRoot = SongsToJsonObject();
+        nlohmann::json jsonRoot_new = SongsToJsonObject_New();
+        request.reply(web::http::status_codes::OK, convertToCppRest(jsonRoot_new));
         return;
     }  else if(path == "/api/language") {
         auto localeMap = GenerateLocaleDict();
-        web::json::value jsonRoot = web::json::value::object();
+        nlohmann::json jsonRoot = nlohmann::json();
+//         web::json::value jsonRoot = web::json::value::object();
             for (auto const &kv : localeMap) {
                 std::string key = kv.first;
                 //Hack to get an easy key value pair within the json object.
@@ -111,27 +267,26 @@ void RequestHandler::Get(web::http::http_request request)
                 }
                 std::replace(key.begin(), key.end(), ' ','_');
                 key = UnicodeUtil::toLower(key);;
-                jsonRoot[key] = web::json::value(kv.second);
+                jsonRoot[key] = kv.second;
             }
-        request.reply(web::http::status_codes::OK, jsonRoot);
+        request.reply(web::http::status_codes::OK, convertToCppRest(jsonRoot));
         return;
     } else if(path == "/api/getCurrentPlaylist.json") {
         Game* gm = Game::getSingletonPtr();
-        web::json::value jsonRoot = web::json::value::array();
-        auto i = 0;
+        nlohmann::json jsonRoot = nlohmann::json::array();
+//         web::json::value jsonRoot = web::json::value::array();
         for (auto const& song : gm->getCurrentPlayList().getList()) {
-            web::json::value songObject = web::json::value::object();
-            songObject["Title"] = web::json::value::string(song->title);
-            songObject["Artist"] = web::json::value::string(song->artist);
-            songObject["Edition"] = web::json::value::string(song->edition);
-            songObject["Language"] = web::json::value::string(song->language);
-            songObject["Creator"] = web::json::value::string(song->creator);
-            songObject["Duration"] = web::json::value(song->getDurationSeconds());
-            jsonRoot[i] = songObject;
-            i++;
+            nlohmann::json songObject;
+            songObject["Title"] = song->title;
+            songObject["Artist"] = song->artist;
+            songObject["Edition"] = song->edition;
+            songObject["Language"] = song->language;
+            songObject["Creator"] = song->creator;
+            songObject["Duration"] = song->getDurationSeconds();
+            jsonRoot.push_back(songObject);
         }
 
-        request.reply(web::http::status_codes::OK, jsonRoot);
+        request.reply(web::http::status_codes::OK, convertToCppRest(jsonRoot));
         return;
     } else if(path == "/api/getplaylistTimeout") {
         request.reply(web::http::status_codes::OK, U(config["game/playlist_screen_timeout"].i()));
@@ -153,18 +308,21 @@ void RequestHandler::Post(web::http::http_request request)
 
     auto path = request.relative_uri().path();
 
-    web::json::value jsonPostBody = ExtractJsonFromRequest(request);
+    nlohmann::json jsonPostBody = ExtractJsonFromRequest_New(request);
+//     web::json::value jsonPostBody = ExtractJsonFromRequest(request);
 
-    if(jsonPostBody == web::json::value::null()) {
+    if(jsonPostBody.is_null()) {
         request.reply(web::http::status_codes::BadRequest, "Post body is malformed. Please make a valid request.");
         return;
     }
 
     if (path == "/api/add") {
         m_songs.setFilter("");
-        std::shared_ptr<Song> songPointer = GetSongFromJSON(jsonPostBody);
+        std::shared_ptr<Song> songPointer = GetSongFromJSON_New(jsonPostBody);
         if(!songPointer) {
-            request.reply(web::http::status_codes::NotFound, "Song \"" + jsonPostBody["Artist"].as_string() + " - " + jsonPostBody["Title"].as_string() + "\" was not found.");
+            std::string temp("Song \"" + jsonPostBody["Artist"].get<std::string>() + " - " + jsonPostBody["Title"].get<std::string>() + "\" was not found.");
+            web::json::value reply =  web::json::value::string(U(temp));
+            request.reply(web::http::status_codes::NotFound, reply);
             return;
         } else {
             std::clog << "requesthandler/debug: Adding " << songPointer->artist << " - " << songPointer->title << " to the playlist " << std::endl;
@@ -181,7 +339,7 @@ void RequestHandler::Post(web::http::http_request request)
             return;
         }
         try {
-            auto songIdToDelete = jsonPostBody["songId"].as_integer();
+            auto songIdToDelete = jsonPostBody["songId"].get<int>();
             if(songIdToDelete >= 0) {
                 gm->getCurrentPlayList().removeSong(songIdToDelete);
                 ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
@@ -190,7 +348,11 @@ void RequestHandler::Post(web::http::http_request request)
                 request.reply(web::http::status_codes::OK, "success");
                 return;
             } else {
-                request.reply(web::http::status_codes::BadRequest, "Can't remove songs from the playlist with a negative id \"" + std::to_string(songIdToDelete) +"\". Please make a valid request.");
+            std::string temp("Can't remove songs from the playlist with a negative id \"" + std::to_string(songIdToDelete) +"\". Please make a valid request.");
+            web::json::value reply =  web::json::value::string(U(temp));
+            request.reply(web::http::status_codes::BadRequest, reply);
+
+            request.reply(web::http::status_codes::NotFound, reply);
                 return;
             }
         } catch(web::json::json_exception const & e) {
@@ -204,19 +366,25 @@ void RequestHandler::Post(web::http::http_request request)
             return;
         }
         try {
-            auto songIdToMove = jsonPostBody["songId"].as_integer();
-            auto positionToMoveTo = jsonPostBody["position"].as_integer();        
+            auto songIdToMove = jsonPostBody["songId"].get<int>();
+            auto positionToMoveTo = jsonPostBody["position"].get<int>();
             int sizeOfPlaylist = gm->getCurrentPlayList().getList().size();
             if(songIdToMove < 0) {
-                request.reply(web::http::status_codes::BadRequest, "Can't move songs with a negative id \"" + std::to_string(songIdToMove) + "\". Please make a valid request.");
+            std::string temp("Can't move songs with a negative id \"" + std::to_string(songIdToMove) + "\". Please make a valid request.");
+            web::json::value reply =  web::json::value::string(U(temp));
+                request.reply(web::http::status_codes::BadRequest, reply);
                 return;
             }
             if(positionToMoveTo < 0) {
-                request.reply(web::http::status_codes::BadRequest, "Can't move songs to a negative position \"" + std::to_string(positionToMoveTo) + "\". Please make a valid request.");
+                std::string temp("Can't move songs to a negative position \"" + std::to_string(positionToMoveTo) + "\". Please make a valid request.");
+                web::json::value reply =  web::json::value::string(U(temp));
+                request.reply(web::http::status_codes::BadRequest, reply);
                 return;
             }
             if(songIdToMove > sizeOfPlaylist - 1) {
-                request.reply(web::http::status_codes::BadRequest, "Not gonna move the unknown song you've provided \"" + std::to_string(songIdToMove + 1) + "\". Please make a valid request.");
+                std::string temp("Not gonna move the unknown song you've provided \"" + std::to_string(songIdToMove + 1) + "\". Please make a valid request.");
+                web::json::value reply =  web::json::value::string(U(temp));
+                request.reply(web::http::status_codes::BadRequest, reply);
                 return;
             }
             if(positionToMoveTo <= sizeOfPlaylist - 1) {
@@ -226,7 +394,9 @@ void RequestHandler::Post(web::http::http_request request)
                 request.reply(web::http::status_codes::OK, "success");
                 return;
             } else  {
-                request.reply(web::http::status_codes::BadRequest, "Not gonna move the song to \""+ std::to_string(positionToMoveTo + 1) + "\" since the list ain't that long. Please make a valid request.");
+                std::string temp("Not gonna move the song to \""+ std::to_string(positionToMoveTo + 1) + "\" since the list ain't that long. Please make a valid request.");
+                web::json::value reply =  web::json::value::string(U(temp));
+                request.reply(web::http::status_codes::BadRequest, reply);
                 return;
             }
         } catch(web::json::json_exception const & e) {
@@ -235,19 +405,20 @@ void RequestHandler::Post(web::http::http_request request)
             return;
         }     
     } else if(path == "/api/search") {
-        auto query = jsonPostBody["query"].as_string();
+        auto query = jsonPostBody["query"].get<std::string>();
         m_songs.setFilter(query);
-        web::json::value jsonRoot = web::json::value::array();
-        for(int i = 0; i < m_songs.size(); i++) {
-            web::json::value songObject = web::json::value::object();
-            songObject["Title"] = web::json::value::string(m_songs[i]->title);
-            songObject["Artist"] = web::json::value::string(m_songs[i]->artist);
-            songObject["Edition"] = web::json::value::string(m_songs[i]->edition);
-            songObject["Language"] = web::json::value::string(m_songs[i]->language);
-            songObject["Creator"] = web::json::value::string(m_songs[i]->creator);
-            jsonRoot[i] = songObject;
+        nlohmann::json jsonRoot = nlohmann::json::array();
+//         web::json::value jsonRoot = web::json::value::array();
+        for(auto const& song: m_songs) {
+            nlohmann::json songObject;
+            songObject["Title"] = song->title;
+            songObject["Artist"] = song->artist;
+            songObject["Edition"] = song->edition;
+            songObject["Language"] = song->language;
+            songObject["Creator"] = song->creator;
+            jsonRoot.push_back(songObject);
         }
-        request.reply(web::http::status_codes::OK, jsonRoot);
+        request.reply(web::http::status_codes::OK, convertToCppRest(jsonRoot));
         return;
     } else {
         request.reply(web::http::status_codes::NotFound, "The path \""+ path +"\" was not found.");
@@ -282,6 +453,36 @@ web::json::value RequestHandler::ExtractJsonFromRequest(web::http::http_request 
     return jsonBody;
 }
 
+nlohmann::json RequestHandler::convertFromCppRest(web::json::value const& jsonDoc) {
+    utility::stringstream_t stream;
+    jsonDoc.serialize(stream);
+    return nlohmann::json::parse(stream);
+}
+
+web::json::value RequestHandler::convertToCppRest(nlohmann::json const& jsonDoc) {
+    utility::stringstream_t stream;
+    stream << U(jsonDoc.dump());
+    return web::json::value::parse(stream);
+}
+
+
+nlohmann::json RequestHandler::ExtractJsonFromRequest_New(web::http::http_request request) {
+    web::json::value jsonBody = web::json::value::null();
+    request.extract_json().then([&jsonBody](pplx::task<web::json::value> task)
+    {
+         try
+         {
+            jsonBody = task.get();
+         }
+         catch (web::json::json_exception const & e)
+         {
+            std::clog << "webserver/error: JSON exception was thrown \"" << e.what() << "\"." << std::endl;
+         }
+    }).wait();
+
+    return convertFromCppRest(jsonBody);
+}
+
 
 web::json::value RequestHandler::SongsToJsonObject() {
     web::json::value jsonRoot = web::json::value::array();
@@ -299,6 +500,21 @@ web::json::value RequestHandler::SongsToJsonObject() {
     return jsonRoot;
 }
 
+nlohmann::json RequestHandler::SongsToJsonObject_New() {
+    nlohmann::json jsonRoot = nlohmann::json::array();
+    for (auto const& song: m_songs) {
+        nlohmann::json songObject;
+        songObject["Title"] = song->title;
+        songObject["Artist"] = song->artist;
+        songObject["Edition"] = song->edition;
+        songObject["Language"] = song->language;
+        songObject["Creator"] = song->creator;
+        songObject["name"] = song->artist + " " + song->title;
+        jsonRoot.push_back(songObject);
+    }
+    return jsonRoot;
+}
+
 std::shared_ptr<Song> RequestHandler::GetSongFromJSON(web::json::value jsonDoc) {
     m_songs.setFilter("");
 
@@ -313,6 +529,23 @@ std::shared_ptr<Song> RequestHandler::GetSongFromJSON(web::json::value jsonDoc) 
         }
     }
 
+    std::clog << "webserver/info: Couldn't find requested song." << std::endl;
+    return std::shared_ptr<Song>();
+}
+
+std::shared_ptr<Song> RequestHandler::GetSongFromJSON_New(nlohmann::json jsonDoc) {
+    m_songs.setFilter("");
+
+    for (auto const& song: m_songs) {
+        if(song->title == jsonDoc["Title"] &&
+           song->artist == jsonDoc["Artist"] &&
+           song->edition == jsonDoc["Edition"] &&
+           song->language == jsonDoc["Language"] &&
+           song->creator == jsonDoc["Creator"]) {
+            std::clog << "webserver/info: Found requested song." << std::endl;
+            return song;
+        }
+    }
     std::clog << "webserver/info: Couldn't find requested song." << std::endl;
     return std::shared_ptr<Song>();
 }
