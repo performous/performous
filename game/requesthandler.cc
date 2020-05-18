@@ -68,27 +68,118 @@ boost::asio::ip::address_v4 RequestHandler::getLocalIP(const std::string& servic
 
 std::unique_ptr<Performous_Router_t> RequestHandler::init_webserver_router() {
 	auto router = std::make_unique<Performous_Router_t>();
-	router->http_get( "/single/:param", []( auto req, auto params ){
-		return
-			init_resp( req->create_response() )
-				.set_body(
-					fmt::format(
-						"GET request with single parameter: '{}'",
-						params[ "param" ] ) )
-				.done();
-	} );
-	// GET request to homepage.
-	router->http_get( "/", []( auto req, auto ){
-		return
-			init_resp( req->create_response() )
-				.set_body( "GET request to the homepage.")
-				.done();
-	} );
+	router->http_get("/", [this](auto req, auto){
+		return HandleFile(req, findFile("index.html").string());
+	});	
+	router->http_get(R"(/api/getDataBase.json)", [this](auto request, auto){ // Get database
+        m_songs.setFilter("");
+        restinio::query_string_params_t query = restinio::parse_query<restinio::parse_query_traits::javascript_compatible>(request->header().query());
+        std::clog << "webserver/debug: query is: " << request->header().query() << std::endl;
+        size_t sort = 1;
+        bool descending = (query.has("order") && query["order"] == "descending");
+        if (query.has("order")) {
+        	std::string order(query["order"]);
+        	if (UnicodeUtil::toLower(order) == "title") sort = 1;
+        	else if (UnicodeUtil::toLower(order) == "artist") sort = 2;
+        	else if (UnicodeUtil::toLower(order) == "edition") sort = 3;
+        	else if (UnicodeUtil::toLower(order) == "language") sort = 6;
+        	m_songs.sortSpecificChange(sort, descending);
+        }
+        nlohmann::json jsonRoot = SongsToJsonObject_New();
+		return init_resp(request->create_response(),std::string("application/json"))
+			.set_body(jsonRoot.dump())
+			.done(); 
+	});
+	
+	router->http_get(R"(/api/language)", [this](auto request, auto) {
+        auto localeMap = GenerateLocaleDict();
+        nlohmann::json jsonRoot = nlohmann::json();
+            for (auto const &kv : localeMap) {
+                std::string key = kv.first;
+                //Hack to get an easy key value pair within the json object.
+                if(key == "Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding Performous see /docs/Authors.txt"){
+                    key = "Credits";
+                }
+                std::replace(key.begin(), key.end(), ' ','_');
+                key = UnicodeUtil::toLower(key);;
+                jsonRoot[key] = kv.second;
+            }
+    	    return init_resp(request->create_response(),std::string("application/json"))
+        		.set_body(jsonRoot.dump())
+        		.done();
+        });
+	router->http_get(R"(/api/getCurrentPlaylist.json)", [](auto request, auto) {
+        Game* gm = Game::getSingletonPtr();
+        nlohmann::json jsonRoot = nlohmann::json::array();
+        for (auto const& song : gm->getCurrentPlayList().getList()) {
+            nlohmann::json songObject;
+            songObject["Title"] = song->title;
+            songObject["Artist"] = song->artist;
+            songObject["Edition"] = song->edition;
+            songObject["Language"] = song->language;
+            songObject["Creator"] = song->creator;
+            songObject["Duration"] = song->getDurationSeconds();
+            jsonRoot.push_back(songObject);
+        }
+        return init_resp(request->create_response(),std::string("application/json"))
+			.set_body(jsonRoot.dump())
+			.done();
+    });
+    router->http_get(R"(/api/getplaylistTimeout)", [](auto request, auto) {
+    	return init_resp(request->create_response())
+        .set_body(std::to_string(config["game/playlist_screen_timeout"].i()))
+        .done();
+    });
+	router->http_get(R"(/:path(.*))", [this](auto req, auto params){
+		std::clog << "webserver/debug: findFile returns: " << findFile(std::string(params["path"])).string() << std::endl;
+		return HandleFile(req, findFile(std::string(params["path"])).string());
+	});
+	
     router->non_matched_request_handler(
             [](auto req){
                 return req->create_response(restinio::status_not_found()).connection_close().done();
             });
 	return router;
+}
+
+restinio::request_handling_status_t RequestHandler::HandleFile(std::shared_ptr<restinio::request_t> request, std::string filePath) {
+    auto path = (!filePath.empty()) ? filePath : request->header().request_target();
+    auto fileName = path.substr(path.find_last_of("/\\") + 1);
+
+        std::string content_type = std::string();
+        if(path.find(".js") != std::string::npos) {
+            content_type = "text/javascript; charset=utf-8";
+        } else if (path.find(".css") != std::string::npos) {
+            content_type = "text/css";
+        } else if (path.find(".png") != std::string::npos) {
+            content_type = "image/png";
+        } else if (path.find(".gif") != std::string::npos) {
+            content_type = "image/gif";
+        } else if (path.find(".ico") != std::string::npos) {
+            content_type = "image/x-icon";
+        } else if (path.find(".svg") != std::string::npos) {
+            content_type = "image/svg+xml";
+        } else if(path.find(".htm") != std::string::npos) {
+            content_type = "text/html; charset=utf-8";
+        } else {
+            content_type = "text/plain; charset=utf-8";
+        }
+
+    std::string fileToSend = findFile(fileName).string();
+	try {
+		auto file = restinio::sendfile(fileToSend);
+		auto modified_at = restinio::make_date_field_value(file.meta().last_modified_at());
+		return init_resp(request->create_response(),content_type)
+						.append_header_date_field()
+						.append_header(restinio::http_field::last_modified, std::move(modified_at))
+						.set_body(std::move(file))
+						.done();
+		} catch(const std::exception &e) {
+			return init_resp(request->create_response(restinio::status_not_found()))
+					.append_header_date_field()
+					.connection_close()
+					.done();
+		}
 }
 
 void RequestHandler::HandleFile(web::http::http_request request, std::string filePath) {
@@ -98,10 +189,8 @@ void RequestHandler::HandleFile(web::http::http_request request, std::string fil
     std::string fileToSend = findFile(fileName).string();
 
     concurrency::streams::fstream::open_istream(U(fileToSend), std::ios::in).then([=](concurrency::streams::istream is) {
-        std::string content_type = "";
-        if(path.find(".html") != std::string::npos) {
-            content_type = "text/html";
-        } else if(path.find(".js") != std::string::npos) {
+        std::string content_type = std::string();
+        if(path.find(".js") != std::string::npos) {
             content_type = "text/javascript";
         } else if (path.find(".css") != std::string::npos) {
             content_type = "text/css";
@@ -111,6 +200,12 @@ void RequestHandler::HandleFile(web::http::http_request request, std::string fil
             content_type = "image/gif";
         } else if (path.find(".ico") != std::string::npos) {
             content_type = "image/x-icon";
+        } else if (path.find(".svg") != std::string::npos) {
+            content_type = "image/svg+xml";
+        } else if(path.find(".htm") != std::string::npos) {
+            content_type = "text/html";
+        } else {
+            content_type = "text/plain";
         }
 
         request.reply(web::http::status_codes::OK, is, U(content_type)).then([](pplx::task<void> t) {

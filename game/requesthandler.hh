@@ -1,6 +1,7 @@
 #pragma once
 #ifdef USE_WEBSERVER
 
+#include <chrono>
 #include <cpprest/http_listener.h>
 #include <cpprest/filestream.h>
 #include <nlohmann/json.hpp>
@@ -68,13 +69,13 @@ class RequestHandler
         pplx::task<void>close() { return m_listener.close(); }
 
 		template < typename RESP >
-static	RESP
-		init_resp( RESP resp )
+		static	RESP
+		init_resp(RESP resp, const std::string& mime = "text/plain; charset=utf-8")
 		{
-			resp.append_header( "Server", "Performous sample server using RESTinio/v.0.6.7" );
+			resp.append_header("Server", "Performous Webserver using RESTinio/v"+std::to_string(RESTINIO_VERSION));
 			resp.append_header_date_field()
-			.append_header( "Content-Type", "text/plain; charset=utf-8" );
-
+			.append_header(restinio::http_field::expires, restinio::make_date_field_value(std::chrono::system_clock::now() + std::chrono::hours(24 * 2)))
+			.append_header("Content-Type", mime);
 			return resp;
 		}
 
@@ -88,7 +89,7 @@ static	RESP
         void Delete(web::http::http_request request);
         void Error(pplx::task<void>& t);
         
-        static std::unique_ptr<Performous_Router_t> init_webserver_router();
+        std::unique_ptr<Performous_Router_t> init_webserver_router();
         static std::string m_ip_address;
         static boost::asio::ip::address_v4 getLocalIP(const std::string& service);
 
@@ -99,17 +100,18 @@ static	RESP
         web::json::value convertToCppRest(nlohmann::json const& jsonDoc);
 
         void HandleFile(web::http::http_request request, std::string filePath = "");
+        restinio::request_handling_status_t HandleFile(std::shared_ptr<restinio::request_t> request, std::string filePath = std::string());
         nlohmann::json SongsToJsonObject_New();
         web::json::value SongsToJsonObject();
         std::map<std::string, std::string> GenerateLocaleDict();
         std::vector<std::string> GetTranslationKeys();
         std::shared_ptr<Song> GetSongFromJSON_New(nlohmann::json);
         std::shared_ptr<Song> GetSongFromJSON(web::json::value);
-		static Performous_Server_Settings make_server_settings(const std::string &url, unsigned short port);
+		Performous_Server_Settings make_server_settings(const std::string &url, unsigned short port);
         web::http::experimental::listener::http_listener m_listener;
         Songs& m_songs;
         restinio::http_server_t<Performous_Server_Traits> m_restinio_server;
-        boost::asio::ip::address_v4 m_local_ip; 
+        boost::asio::ip::address_v4 m_local_ip;
 };
 #else
 class Songs;
