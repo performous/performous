@@ -21,7 +21,7 @@ class Video {
 	const double m_videoGap;
 	Texture m_texture;
 	double m_textureTime;
-	double m_readPosition = 0;
+	double m_readPosition = 0.0;
 	AnimValue m_alpha;
 	bool m_quit{false};
 	std::future<void> m_grabber;
