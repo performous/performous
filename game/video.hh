@@ -19,7 +19,6 @@ class Video {
 
   private:
 	const double m_videoGap;
-	Bitmap m_videoFrame;
 	Texture m_texture;
 	double m_textureTime;
 	double m_readPosition = 0;

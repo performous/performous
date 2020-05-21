@@ -91,9 +91,10 @@ void Video::prepare(double time) {
 	// shift video timestamp if gap is declared in song config
 	time += m_videoGap;
 
-	if (tryPop(m_videoFrame, time) && !m_videoFrame.buf.empty()) {
-		m_texture.load(m_videoFrame);
-		m_textureTime = m_videoFrame.timestamp;
+	Bitmap videoFrame;
+	if (tryPop(videoFrame, time) && !videoFrame.buf.empty()) {
+		m_texture.load(videoFrame);
+		m_textureTime = videoFrame.timestamp;
 	}
 }
 
