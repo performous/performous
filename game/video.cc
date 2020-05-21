@@ -50,38 +50,38 @@ Video::Video(fs::path const& _videoFile, double videoGap): m_videoGap(videoGap),
 	// make ffmpeg here to get any exception in the current thread
 	auto ffmpeg = std::make_unique<VideoFFmpeg>(_videoFile, [this] (auto f) { push(std::move(f)); });
 	m_grabber = std::async(std::launch::async, [this, file = _videoFile, ffmpeg = std::move(ffmpeg)] {
-			int errors = 0;
-			std::unique_lock<std::mutex> l(m_mutex);
-			while (!m_quit) {
-				if (m_seek_asked) {
-					m_seek_asked = false;
+		int errors = 0;
+		std::unique_lock<std::mutex> l(m_mutex);
+		while (!m_quit) {
+			if (m_seek_asked) {
+				m_seek_asked = false;
 
-					auto seek_pos = m_readPosition;
-					// discard all outdated frame. To avoid races between clean and push, clean and push are done in this thread.
-					m_queue.clear();
+				auto seek_pos = m_readPosition;
+				// discard all outdated frame. To avoid races between clean and push, clean and push are done in this thread.
+				m_queue.clear();
 
-					UnlockGuard<decltype(l)> unlocked(l); // release lock during seek
-					ffmpeg->seek(seek_pos);
-					continue;
-				}
-
-				try {
-					UnlockGuard<decltype(l)> unlocked(l); // release lock during possibly blocking ffmpeg stuff
-					ffmpeg->handleOneFrame();
-					errors = 0;
-				} catch (FFmpeg::Eof&) {
-					{
-						UnlockGuard<decltype(l)> unlocked(l); // release lock for possibly blocking calls
-						push(Bitmap()); // EOF marker
-						std::clog << "ffmpeg/debug: done loading " << file << std::endl;
-					}
-					m_cond.wait(l, [this]{ return m_quit || m_seek_asked; });
-				} catch (std::exception& e) {
-					UnlockGuard<decltype(l)> unlocked(l); // release lock for possibly blocking calls
-					std::clog << "ffmpeg/error: " << file << ": " << e.what() << std::endl;
-					if (++errors > 2) { std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl; break; }
-				}
+				UnlockGuard<decltype(l)> unlocked(l); // release lock during seek
+				ffmpeg->seek(seek_pos);
+				continue;
 			}
+
+			try {
+				UnlockGuard<decltype(l)> unlocked(l); // release lock during possibly blocking ffmpeg stuff
+				ffmpeg->handleOneFrame();
+				errors = 0;
+			} catch (FFmpeg::Eof&) {
+				{
+					UnlockGuard<decltype(l)> unlocked(l); // release lock for possibly blocking calls
+					push(Bitmap()); // EOF marker
+					std::clog << "ffmpeg/debug: done loading " << file << std::endl;
+				}
+				m_cond.wait(l, [this]{ return m_quit || m_seek_asked; });
+			} catch (std::exception& e) {
+				UnlockGuard<decltype(l)> unlocked(l); // release lock for possibly blocking calls
+				std::clog << "ffmpeg/error: " << file << ": " << e.what() << std::endl;
+				if (++errors > 2) { std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl; break; }
+			}
+		}
 	});
 }
 
