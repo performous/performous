@@ -10,12 +10,13 @@ bool Video::tryPop(Bitmap& f, double timestamp) {
 	// if timestamp is out of the queue's range, ask a seek
 	// FIXME 4 should be linked to queue depth: we know the frame rate, thus how
 	// many frames needed for an arbitrary duration
-	m_seek_asked = timestamp > m_readPosition + 4 || timestamp < m_readPosition;
+	m_seek_asked |= timestamp > m_readPosition + 4 || timestamp < m_readPosition;
 
 	m_readPosition = timestamp;
 
-	// if queue is not empty, we are sure will remove at least one element from it or as fr seek.
-	if (!m_queue.empty()) m_cond.notify_all();
+	// if queue is not empty, we are sure will remove at least one element from it.
+	// When seeking needed to wake up thread if waiting for rooms.
+	if (!m_queue.empty() || m_seek_asked) m_cond.notify_all();
 
 	if (m_seek_asked) return false;
 
