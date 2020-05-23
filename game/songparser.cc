@@ -3,7 +3,7 @@
 #include "regex.hh"
 
 #include <boost/algorithm/string.hpp>
-#include <boost/filesystem/fstream.hpp>
+#include <fstream>
 
 
 namespace SongParserUtil {
@@ -46,7 +46,7 @@ SongParser::SongParser(Song& s): m_song(s) {
 	try {
 		enum { NONE, TXT, XML, INI, SM } type = NONE;
 		// Read the file, determine the type and do some initial validation checks
-		fs::ifstream f (s.filename, std::ios::binary);
+		std::ifstream f (s.filename, std::ios::binary);
 		if (!f.is_open()) {
 			throw SongParserException (s, "Could not open song file", 0);
 		}

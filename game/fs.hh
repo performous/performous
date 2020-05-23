@@ -1,9 +1,38 @@
 #pragma once
 
-#include <boost/filesystem/path.hpp>
 #include <list>
 
+#ifdef USE_BOOST_FS
+#include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
+
+// in boost, copy_directory means create_directory
+// https://www.boost.org/doc/libs/1_66_0/libs/filesystem/doc/reference.html#copy_directory
+static inline void create_directory(const fs::path &a, const fs::path &b) {
+    copy_directory(a, b);
+}
+
+#else
+#include <filesystem>
+namespace fs = std::filesystem;
+
+// Reimplment boost's absolute function with 2 parameters, according to its documentation:
+// https://www.boost.org/doc/libs/1_51_0/libs/filesystem/doc/reference.html#absolute
+static inline fs::path absolute(const fs::path& p, const fs::path& base) {
+    if (p.has_root_directory()) {
+        if (p.has_root_name())
+            return p;
+        else
+            return fs::absolute(base).root_name() / p;
+    } else {
+        if (p.has_root_name())
+            return p.root_name() / fs::absolute(base).root_directory() / fs::absolute(base).relative_path() / p.relative_path();
+        else
+            return fs::absolute(base) / p;
+    }
+}
+
+#endif
 
 typedef std::vector<std::uint8_t> BinaryBuffer;
 
