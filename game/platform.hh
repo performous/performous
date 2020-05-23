@@ -1,6 +1,5 @@
 #pragma once
 
-#include "fs.hh"
 #include "log.hh"
 
 #include <array>
@@ -12,7 +11,6 @@
 #include "../boost_predef/os.h"
 #endif
 
-#include <boost/filesystem.hpp>
 #include <SDL2/SDL_events.h>
 
 #if (BOOST_OS_WINDOWS) 
