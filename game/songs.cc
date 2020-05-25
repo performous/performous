@@ -20,8 +20,6 @@
 #include <boost/format.hpp>
 #include <unicode/stsearch.h>
 
-#ifdef USE_WEBSERVER
-#endif
 #include <nlohmann/json.hpp>
 
 Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), m_database(database), m_order(config["songs/sort-order"].i()) {
@@ -82,7 +80,6 @@ void Songs::reload_internal() {
 	doneLoading = true;
 }
 
-#ifdef USE_WEBSERVER
 void Songs::LoadCache() {
 	fs::path songsMetaFile = getCacheDir() / "Songs-Metadata.json";
 	nlohmann::json jsonRoot = nlohmann::json::array();
@@ -214,10 +211,6 @@ void Songs::CacheSonglist() {
 		return;
 	}
 }
-#else 
-void Songs::LoadCache() { }
-void Songs::CacheSonglist() { }
-#endif
 
 void Songs::reload_internal(fs::path const& parent) {
 	if (std::distance(parent.begin(), parent.end()) > 20) { std::clog << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)\n"; return; }
