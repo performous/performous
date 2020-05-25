@@ -12,7 +12,6 @@ extern "C" {
 #include AVFORMAT_INCLUDE
 #include AVCODEC_INCLUDE
 }
-#ifdef USE_WEBSERVER
 
 Song::Song(nlohmann::json const& song): dummyVocal(TrackName::LEAD_VOCAL), randomIdx(rand()) {
 	std::string temp;
@@ -92,7 +91,6 @@ Song::Song(nlohmann::json const& song): dummyVocal(TrackName::LEAD_VOCAL), rando
 	}
 	collateUpdate();
 }
-#endif
 
 Song::Song(fs::path const& path, fs::path const& filename):
   dummyVocal(TrackName::LEAD_VOCAL), path(path), filename(filename), randomIdx(rand())
