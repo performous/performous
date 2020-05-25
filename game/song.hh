@@ -5,8 +5,6 @@
 #include "notes.hh"
 #include "util.hh"
 
-#ifdef USE_WEBSERVER
-#endif
 #include <nlohmann/json.hpp>
 
 #include <stdexcept>
@@ -90,8 +88,6 @@ public:
 	int randomIdx = 0; ///< sorting index used for random order
 
 	// Functions only below this line
-#ifdef USE_WEBSERVER
-#endif
 	Song(nlohmann::json const& song);  ///< Load song from cache.
 	Song(fs::path const& path, fs::path const& filename);  ///< Load song from specified path and filename
 	void reload(bool errorIgnore = true);  ///< Reset and reload the entire song from file
