@@ -1,5 +1,7 @@
 #include "requesthandler.hh"
 #include "unicode.hh"
+#include "fs.hh"
+#include <boost/filesystem.hpp>
 
 #ifdef USE_WEBSERVER
 
@@ -9,6 +11,27 @@ RequestHandler::RequestHandler(std::string url, unsigned short port, Songs& song
     m_listener.support(web::http::methods::PUT, std::bind(&RequestHandler::Put, this, std::placeholders::_1));
     m_listener.support(web::http::methods::POST, std::bind(&RequestHandler::Post, this, std::placeholders::_1));
     m_listener.support(web::http::methods::DEL, std::bind(&RequestHandler::Delete, this, std::placeholders::_1));
+	fs::path extensionsConfig = getConfigDir() / std::string("file-extensions.json");
+	if (!fs::exists(extensionsConfig)) {
+		std::string message("webserver/notice: file-extensions.json not found \"" + getConfigDir().string() + "\", so we'll create it now.");
+		std::clog << message << std::endl;
+		try {
+		fs::path originPath(getShareDir() / "config" / std::string("file-extensions.json"));
+		fs::copy_file(originPath, extensionsConfig);
+		} catch (std::exception const& e) {
+			std::clog << "webserver/error: file-extensions.json couldn't be copied due to... " << e.what() << std::endl;
+		}
+	}
+	m_contentTypes = readJSON(extensionsConfig);
+}
+
+std::string RequestHandler::getContentType(const std::string& extension) {
+	if (m_contentTypes.contains(extension)) {
+		return m_contentTypes[extension].get<std::string>();
+	}
+	return std::string("text/plain;charset=UTF-8");
+}
+
 }
 
 boost::asio::ip::network_v4 Performous_IP_Blocker::m_allowed_subnet;
@@ -138,29 +161,25 @@ std::unique_ptr<Performous_Router_t> RequestHandler::init_webserver_router() {
 	return router;
 }
 
-restinio::request_handling_status_t RequestHandler::HandleFile(std::shared_ptr<restinio::request_t> request, std::string filePath) {
-    auto path = (!filePath.empty()) ? filePath : request->header().request_target();
-    auto fileName = path.substr(path.find_last_of("/\\") + 1);
-
-        std::string content_type = std::string();
-        if(path.find(".js") != std::string::npos) {
-            content_type = "text/javascript; charset=utf-8";
-        } else if (path.find(".css") != std::string::npos) {
-            content_type = "text/css";
-        } else if (path.find(".png") != std::string::npos) {
-            content_type = "image/png";
-        } else if (path.find(".gif") != std::string::npos) {
-            content_type = "image/gif";
-        } else if (path.find(".ico") != std::string::npos) {
-            content_type = "image/x-icon";
-        } else if (path.find(".svg") != std::string::npos) {
-            content_type = "image/svg+xml";
-        } else if(path.find(".htm") != std::string::npos) {
-            content_type = "text/html; charset=utf-8";
-        } else {
-            content_type = "text/plain; charset=utf-8";
-        }
-
+restinio::request_handling_status_t RequestHandler::HandleFile(std::shared_ptr<restinio::request_t> request, const fs::path& filePath) {
+	if (!filePath.has_filename()) {
+		init_resp(request->create_response(restinio::status_forbidden()))
+				.append_header_date_field()
+				.set_body("Directory listings are forbidden.")
+				.done();
+		return restinio::request_rejected();
+	}
+	std::clog << "webserver/debug: Looking for file: " << filePath.string() << std::endl;
+	std::string content_type;
+    fs::path fileName = filePath.filename();
+    if (!fileName.has_extension()) {
+    	content_type = "text/plain;charset=UTF-8";
+    }
+    else {
+    	std::clog << "webserver/debug: File extension is: " << fileName.extension().string() << std::endl;
+    	content_type = getContentType(fileName.extension().string());
+    }
+	std::clog << "webserver/debug: Content-type for extension is: " << content_type << std::endl;
     std::string fileToSend = findFile(fileName).string();
 	try {
 		auto file = restinio::sendfile(fileToSend);
