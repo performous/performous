@@ -77,6 +77,7 @@ class RequestHandler
 		}
 
     protected:
+		std::string getContentType(const std::string& extension);
 
     private:
         
@@ -97,14 +98,15 @@ class RequestHandler
         web::json::value convertToCppRest(nlohmann::json const& jsonDoc);
 
         void HandleFile(web::http::http_request request, std::string filePath = "");
-        restinio::request_handling_status_t HandleFile(std::shared_ptr<restinio::request_t> request, std::string filePath = std::string());
         web::json::value SongsToJsonObject();
+        restinio::request_handling_status_t HandleFile(std::shared_ptr<restinio::request_t> request, const fs::path& filePath);
         nlohmann::json SongsToJsonObject();
         std::map<std::string, std::string> GenerateLocaleDict();
         std::vector<std::string> GetTranslationKeys();
         std::shared_ptr<Song> GetSongFromJSON(nlohmann::json);
 		Performous_Server_Settings make_server_settings(const std::string &url, unsigned short port);
         web::http::experimental::listener::http_listener m_listener;
+		nlohmann::json m_contentTypes = nlohmann::json::object();
         Songs& m_songs;
         restinio::http_server_t<Performous_Server_Traits> m_restinio_server;
         boost::asio::ip::address_v4 m_local_ip;
