@@ -13,6 +13,7 @@
 
 class Song;
 class Database;
+using SongVector = std::vector<std::shared_ptr<Song>>;
 
 /// songs class for songs screen
 class Songs {
@@ -42,7 +43,7 @@ class Songs {
 	/// number of songs
 	int size() const { return m_filtered.size(); }
 	/// true if empty
-	int empty() const { return m_filtered.empty(); }
+	bool empty(bool webServer = false) const { return (webServer ? m_webServerFiltered : m_filtered).empty(); }
 	/// advances to next song
 	void advance(int diff) {
 		int size = m_filtered.size();
@@ -92,11 +93,8 @@ class Songs {
 	void CacheSonglist();
 
 	class RestoreSel;
-	typedef std::vector<std::shared_ptr<Song> > SongVector;
 	std::string m_songlist;
-	SongVector m_songs, m_filtered;
 	AnimValue m_updateTimer;
-	AnimAcceleration math_cover;
 	std::string m_filter;
 	Database & m_database;
 	int m_type = 0;
@@ -111,4 +109,7 @@ class Songs {
 	std::atomic<bool> m_loading{ false };
 	std::unique_ptr<std::thread> m_thread;
 	mutable std::mutex m_mutex;
+  protected:
+    AnimAcceleration math_cover;
+	SongVector m_songs, m_filtered, m_webServerFiltered;
 };
