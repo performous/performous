@@ -99,12 +99,19 @@ boost::asio::ip::address_v4 RequestHandler::getLocalIP(const std::string& servic
 std::unique_ptr<Performous_Router_t> RequestHandler::init_webserver_router() {
 	auto router = std::make_unique<Performous_Router_t>();
 	router->http_get("/", [this](auto req, auto){
-		return HandleFile(req, findFile("index.html").string());
+		return HandleFile(req, findFile("index.html"));
 	});	
-	router->http_get(R"(/api/getDataBase.json)", [this](auto request, auto){ // Get database
-        m_songs.setFilter("");
+	router->http_get(R"--(/:path(.*))--", [this](auto request, auto params){
+		if (!params.has("path")) {
+			init_resp(request->create_response(restinio::status_bad_request()))
+			.set_body("Please make a query to the API.")
+			.done();
+			return restinio::request_rejected();
+		}
+		std::string path(restinio::cast_to<std::string>(params["path"]));
         restinio::query_string_params_t query = restinio::parse_query<restinio::parse_query_traits::javascript_compatible>(request->header().query());
-        std::clog << "webserver/debug: query is: " << request->header().query() << std::endl;
+		if (path == "api/getDataBase.json") { // Get database
+        m_songs.setFilter(std::string(), true);
         size_t sort = 1;
         bool descending = (query.has("order") && query["order"] == "descending");
         if (query.has("order")) {
@@ -115,13 +122,13 @@ std::unique_ptr<Performous_Router_t> RequestHandler::init_webserver_router() {
         	else if (UnicodeUtil::toLower(order) == "language") sort = 6;
         	m_songs.sortSpecificChange(sort, descending);
         }
-		return init_resp(request->create_response(),std::string("application/json"))
         nlohmann::json jsonRoot = SongsToJsonObject();
+		init_resp(request->create_response(restinio::status_ok()),std::string("application/json"))
 			.set_body(jsonRoot.dump())
-			.done(); 
-	});
-	
-	router->http_get(R"(/api/language)", [this](auto request, auto) {
+			.done();
+		return restinio::request_accepted();
+	}
+	else if (path == "api/language") {
         auto localeMap = GenerateLocaleDict();
         nlohmann::json jsonRoot = nlohmann::json();
             for (auto const &kv : localeMap) {
@@ -134,11 +141,12 @@ std::unique_ptr<Performous_Router_t> RequestHandler::init_webserver_router() {
                 key = UnicodeUtil::toLower(key);;
                 jsonRoot[key] = kv.second;
             }
-    	    return init_resp(request->create_response(),std::string("application/json"))
+    	    init_resp(request->create_response(restinio::status_ok()),std::string("application/json"))
         		.set_body(jsonRoot.dump())
         		.done();
-        });
-	router->http_get(R"(/api/getCurrentPlaylist.json)", [](auto request, auto) {
+			return restinio::request_accepted();
+        }
+        else if (path == "api/getCurrentPlaylist.json") {
         Game* gm = Game::getSingletonPtr();
         nlohmann::json jsonRoot = nlohmann::json::array();
         for (auto const& song : gm->getCurrentPlayList().getList()) {
@@ -151,18 +159,20 @@ std::unique_ptr<Performous_Router_t> RequestHandler::init_webserver_router() {
             songObject["Duration"] = song->getDurationSeconds();
             jsonRoot.push_back(songObject);
         }
-        return init_resp(request->create_response(),std::string("application/json"))
+        init_resp(request->create_response(restinio::status_ok()),std::string("application/json"))
 			.set_body(jsonRoot.dump())
 			.done();
-    });
-    router->http_get(R"(/api/getplaylistTimeout)", [](auto request, auto) {
-    	return init_resp(request->create_response())
+		return restinio::request_accepted();
+    }
+    else if (path == "api/getplaylistTimeout") {
+    	init_resp(request->create_response(restinio::status_ok()))
         .set_body(std::to_string(config["game/playlist_screen_timeout"].i()))
         .done();
-    });
-	router->http_get(R"(/:path(.*))", [this](auto req, auto params){
-		std::clog << "webserver/debug: findFile returns: " << findFile(std::string(params["path"])).string() << std::endl;
-		return HandleFile(req, findFile(std::string(params["path"])).string());
+		return restinio::request_accepted();
+    }
+	else {
+		return HandleFile(request, findFile(std::string(params["path"])));
+		}
 	});
 	
     router->non_matched_request_handler(
@@ -180,31 +190,29 @@ restinio::request_handling_status_t RequestHandler::HandleFile(std::shared_ptr<r
 				.done();
 		return restinio::request_rejected();
 	}
-	std::clog << "webserver/debug: Looking for file: " << filePath.string() << std::endl;
 	std::string content_type;
     fs::path fileName = filePath.filename();
     if (!fileName.has_extension()) {
     	content_type = "text/plain;charset=UTF-8";
     }
     else {
-    	std::clog << "webserver/debug: File extension is: " << fileName.extension().string() << std::endl;
     	content_type = getContentType(fileName.extension().string());
     }
-	std::clog << "webserver/debug: Content-type for extension is: " << content_type << std::endl;
     std::string fileToSend = findFile(fileName).string();
 	try {
 		auto file = restinio::sendfile(fileToSend);
 		auto modified_at = restinio::make_date_field_value(file.meta().last_modified_at());
-		return init_resp(request->create_response(),content_type)
+		init_resp(request->create_response(restinio::status_ok()),content_type)
 						.append_header_date_field()
 						.append_header(restinio::http_field::last_modified, std::move(modified_at))
 						.set_body(std::move(file))
 						.done();
+		return restinio::request_accepted();
 		} catch(const std::exception &e) {
-			return init_resp(request->create_response(restinio::status_not_found()))
+			init_resp(request->create_response(restinio::status_not_found()))
 					.append_header_date_field()
-					.connection_close()
 					.done();
+		return restinio::request_rejected();
 		}
 }
 
