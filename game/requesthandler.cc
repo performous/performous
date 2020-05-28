@@ -32,6 +32,13 @@ std::string RequestHandler::getContentType(const std::string& extension) {
 	return std::string("text/plain;charset=UTF-8");
 }
 
+RequestHandler::~RequestHandler() {
+	try {
+		m_restinio_server.close_sync();
+		m_restinio_server.io_context().stop();
+		} catch (const std::exception &e) {
+		std::clog << "webserver/error: Failed to close RESTinio server due to: " << e.what() << "." << std::endl;
+	}
 }
 
 boost::asio::ip::network_v4 Performous_IP_Blocker::m_allowed_subnet;
