@@ -223,14 +223,13 @@ void Songs::CacheSonglist() {
 	}
 
 	fs::path cacheDir = getCacheDir() / "Songs-Metadata.json";
-
+	std::ofstream outFile(cacheDir.string());
 	try {
-		std::ofstream outFile(cacheDir.string());
     	outFile << jsonRoot.dump();
-    	outFile.close();
+    	outFile.close(); // std::ofstream should clean-up after itself but being careful never hurt anybody.
 	} catch (std::exception const& e) {
 		if (outFile.is_open()) {
-			outFile.close();
+			outFile.close(); // See above.
 		}
 		std::clog << "songs/error: Could not save " + cacheDir.string() + ": " + e.what() << std::endl;
 		return;
