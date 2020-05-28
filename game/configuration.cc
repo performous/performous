@@ -8,6 +8,7 @@
 #include "screen_intro.hh"
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
+#include <boost/asio/ip/address_v4.hpp>
 #include <algorithm>
 #include <future>
 #include <iomanip>
@@ -127,6 +128,15 @@ std::string const ConfigItem::getValue() const {
 		}
 		else std::clog << "audio/warning: Currently selected audio backend is unavailable on this system, will default to Auto." << std::endl;
 		return "Auto";
+	}
+	else if (this->getShortDesc() == config["webserver/netmask"].getShortDesc()) {
+		int slashNotation = std::stoi(getEnumName());
+		std::uint64_t subNetValue = 1;
+		subNetValue <<= 32;
+		subNetValue -= (1 << (32 - slashNotation));
+		std::string displayValue(boost::asio::ip::make_address_v4(subNetValue).to_string());
+		displayValue += (" (/"+std::to_string(slashNotation)+")");
+		return displayValue;
 	}
 	if (m_type == "int") {
 		int val = boost::get<int>(m_value);
