@@ -1,16 +1,12 @@
 #pragma once
 #ifdef USE_WEBSERVER
 
-#include <chrono>
-#include <cpprest/http_listener.h>
-#include <cpprest/filestream.h>
-#include <nlohmann/json.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ip/network_v4.hpp>
+#include <chrono>
+#include <nlohmann/json.hpp>
 #include <restinio/all.hpp>
-
-#include "screen_playlist.hh"
-#include "restinio_performous_logger_adapter.hh"
+#include <restinio/helpers/http_field_parsers/cache-control.hpp>
 
 #ifdef USE_BOOST_REGEX
 #include <restinio/router/boost_regex_engine.hpp>
@@ -20,6 +16,8 @@ using Performous_Router_t = restinio::router::express_router_t<restinio::router:
 using Performous_Router_t = restinio::router::express_router_t<restinio::router::std_regex_engine_t>;
 #endif
 
+#include "screen_playlist.hh"
+#include "restinio_performous_logger_adapter.hh"
 class Performous_IP_Blocker {
 	public:
 		restinio::ip_blocker::inspection_result_t inspect(const restinio::ip_blocker::incoming_info_t& info) noexcept {
@@ -61,18 +59,17 @@ class RequestHandler
     	friend class WebServer;
         RequestHandler(Songs& songs);
         RequestHandler(std::string url, unsigned short port, Songs& songs);
-        virtual ~RequestHandler();
+        ~RequestHandler();
         const boost::asio::ip::address_v4& getLocalIP() const { return m_local_ip; };
         pplx::task<void>open() { return m_listener.open(); }
         pplx::task<void>close() { return m_listener.close(); }
 
 		template < typename RESP >
 		static	RESP
-		init_resp(RESP resp, const std::string& mime = "text/plain; charset=utf-8")
-		{
+		init_resp(RESP resp, const std::string& mime = "text/plain; charset=utf-8") {
 			resp.append_header("Server", "Performous Webserver using RESTinio/v"+std::to_string(RESTINIO_VERSION));
 			resp.append_header_date_field()
-			.append_header(restinio::http_field::expires, restinio::make_date_field_value(std::chrono::system_clock::now() + std::chrono::hours(24 * 2)))
+			.append_header(restinio::http_field::cache_control, "no-cache, max-age=20, stale-while-revalidate=60")
 			.append_header("Content-Type", mime);
 			return resp;
 		}
@@ -99,12 +96,11 @@ class RequestHandler
 
         void HandleFile(web::http::http_request request, std::string filePath = "");
         restinio::request_handling_status_t HandleFile(std::shared_ptr<restinio::request_t> request, std::string filePath = std::string());
-        nlohmann::json SongsToJsonObject_New();
         web::json::value SongsToJsonObject();
+        nlohmann::json SongsToJsonObject();
         std::map<std::string, std::string> GenerateLocaleDict();
         std::vector<std::string> GetTranslationKeys();
-        std::shared_ptr<Song> GetSongFromJSON_New(nlohmann::json);
-        std::shared_ptr<Song> GetSongFromJSON(web::json::value);
+        std::shared_ptr<Song> GetSongFromJSON(nlohmann::json);
 		Performous_Server_Settings make_server_settings(const std::string &url, unsigned short port);
         web::http::experimental::listener::http_listener m_listener;
         Songs& m_songs;
