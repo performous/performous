@@ -81,8 +81,8 @@ std::unique_ptr<Performous_Router_t> RequestHandler::init_webserver_router() {
         	else if (UnicodeUtil::toLower(order) == "language") sort = 6;
         	m_songs.sortSpecificChange(sort, descending);
         }
-        nlohmann::json jsonRoot = SongsToJsonObject_New();
 		return init_resp(request->create_response(),std::string("application/json"))
+        nlohmann::json jsonRoot = SongsToJsonObject();
 			.set_body(jsonRoot.dump())
 			.done(); 
 	});
@@ -500,7 +500,7 @@ web::json::value RequestHandler::SongsToJsonObject() {
     return jsonRoot;
 }
 
-nlohmann::json RequestHandler::SongsToJsonObject_New() {
+nlohmann::json RequestHandler::SongsToJsonObject() {
     nlohmann::json jsonRoot = nlohmann::json::array();
     for (auto const& song: m_songs) {
         nlohmann::json songObject;
@@ -533,8 +533,8 @@ std::shared_ptr<Song> RequestHandler::GetSongFromJSON(web::json::value jsonDoc) 
     return std::shared_ptr<Song>();
 }
 
-std::shared_ptr<Song> RequestHandler::GetSongFromJSON_New(nlohmann::json jsonDoc) {
-    m_songs.setFilter("");
+std::shared_ptr<Song> RequestHandler::GetSongFromJSON(nlohmann::json jsonDoc) {
+    m_songs.setFilter(std::string(), true);
 
     for (auto const& song: m_songs) {
         if(song->title == jsonDoc["Title"] &&
