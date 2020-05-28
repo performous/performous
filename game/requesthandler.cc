@@ -171,9 +171,169 @@ std::unique_ptr<Performous_Router_t> RequestHandler::init_webserver_router() {
 		}
 	});
 	
+	/// POST Handlers
+	
+    router->http_post(R"--(/:path(.*))--", [this](auto request, auto params) {
+    	if (!params.has("path")) {
+			init_resp(request->create_response(restinio::status_bad_request()))
+			.set_body("Please make a query to the API.")
+			.done();
+			return restinio::request_rejected();
+		}
+		
+		std::string path(restinio::cast_to<std::string>(params["path"]));
+        Game* gm = Game::getSingletonPtr();
+        nlohmann::json jsonPostBody;
+		try {
+    		jsonPostBody = nlohmann::json::parse(request->body());
+	    } catch (nlohmann::json::exception const& e) {
+			std::clog << "webserver/error: JSON exception was thrown \"" << e.what() << "\"." << std::endl;
+    	}
+    	if (jsonPostBody.empty()) {
+			init_resp(request->create_response(restinio::status_bad_request()))
+			.set_body("POST Body malformed, please make a valid request.")
+			.done();
+			return restinio::request_rejected();
+    	}
+        if (path == "api/add") {
+			m_songs.setFilter(std::string(), true);
+			std::shared_ptr<Song> songPointer = GetSongFromJSON(jsonPostBody);
+			if(!songPointer) {
+				std::string temp("Song \"" + jsonPostBody["Artist"].get<std::string>() + " - " + jsonPostBody["Title"].get<std::string>() + "\" was not found.");
+				init_resp(request->create_response(restinio::status_not_found()))
+					.set_body(temp)
+					.done();
+				return restinio::request_accepted();
+			} else {
+				gm->getCurrentPlayList().addSong(songPointer);
+				ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
+				m_pp->triggerSongListUpdate();
+				init_resp(request->create_response(restinio::status_ok()))
+					.set_body("success")
+					.done();
+				return restinio::request_accepted();
+			}
+		}
+		else if(path == "api/remove") {
+			if(gm->getCurrentPlayList().isEmpty()) {
+				init_resp(request->create_response(restinio::status_conflict()))
+					.set_body("Playlist is empty.")
+					.done();
+				return restinio::request_accepted();
+			}
+				auto songIdToDelete = jsonPostBody["songId"].get<int>();
+				if(songIdToDelete >= 0) {
+					gm->getCurrentPlayList().removeSong(songIdToDelete);
+					ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
+					m_pp->triggerSongListUpdate();
+					init_resp(request->create_response(restinio::status_ok()))
+					.set_body("success")
+					.done();
+				return restinio::request_accepted();
+				}
+				else {
+					std::string temp("Can't remove songs from the playlist with a negative id \"" + std::to_string(songIdToDelete) +"\". Please make a valid request.");
+					init_resp(request->create_response(restinio::status_bad_request()))
+						.set_body(temp)
+						.done();
+					return restinio::request_accepted();
+				}
+    	}
+    	else if (path == "api/setposition") {
+			if(gm->getCurrentPlayList().isEmpty()) {
+				init_resp(request->create_response(restinio::status_conflict()))
+					.set_body("Playlist is empty.")
+					.done();
+				return restinio::request_accepted();
+			}
+			try {
+				auto songIdToMove = jsonPostBody["songId"].get<int>();
+				auto positionToMoveTo = jsonPostBody["position"].get<int>();
+				int sizeOfPlaylist = gm->getCurrentPlayList().getList().size();
+				if(songIdToMove < 0) {
+					std::string temp("Can't move songs with a negative id \"" + std::to_string(songIdToMove) + "\". Please make a valid request.");
+					init_resp(request->create_response(restinio::status_bad_request()))
+						.set_body(temp)
+						.done();
+					return restinio::request_accepted();
+				}
+				if(positionToMoveTo < 0) {
+					std::string temp("Can't move songs to a negative position \"" + std::to_string(positionToMoveTo) + "\". Please make a valid request.");
+					init_resp(request->create_response(restinio::status_bad_request()))
+					.set_body(temp)
+					.done();
+					return restinio::request_accepted();
+				}
+				if(songIdToMove > sizeOfPlaylist - 1) {
+					std::string temp("Song ID \"" + std::to_string(songIdToMove + 1) + "\" is beyond the playlist bounds. Please make a valid request.");
+					init_resp(request->create_response(restinio::status_bad_request()))
+						.set_body(temp)
+						.done();
+					return restinio::request_accepted();
+				}
+				if(positionToMoveTo <= sizeOfPlaylist - 1) {
+					gm->getCurrentPlayList().setPosition(songIdToMove,positionToMoveTo);
+					ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
+					m_pp->triggerSongListUpdate();
+					init_resp(request->create_response(restinio::status_ok()))
+						.set_body("success")
+						.done();
+						return restinio::request_accepted();
+				} else  {
+					std::string temp("Not gonna move the song to \""+ std::to_string(positionToMoveTo + 1) + "\" since the list ain't that long. Please make a valid request.");
+					init_resp(request->create_response(restinio::status_conflict()))
+						.set_body(temp)
+						.done();
+					return restinio::request_accepted();
+				}
+			} catch(nlohmann::json::exception const & e) {
+				std::string str = std::string("JSON Exception: ") + e.what();
+				init_resp(request->create_response(restinio::status_bad_request()))
+					.set_body(str)
+					.done();
+				return restinio::request_accepted();
+			}
+    	}
+    	else if (path == "api/search") {
+			auto query = jsonPostBody.find("query");
+			m_songs.setFilter(*query, true);
+			nlohmann::json jsonRoot = nlohmann::json::array();
+			for(auto song = m_songs.begin(true); song != m_songs.end(true); song++) {
+				nlohmann::json songObject;
+				songObject["Title"] = song->get()->title;
+				songObject["Artist"] = song->get()->artist;
+				songObject["Edition"] = song->get()->edition;
+				songObject["Language"] = song->get()->language;
+				songObject["Creator"] = song->get()->creator;
+				jsonRoot.push_back(songObject);
+			}
+			init_resp(request->create_response(restinio::status_ok()),std::string("application/json"))	
+				.set_body(jsonRoot.dump())
+				.done();
+			return restinio::request_accepted();
+    	}
+    	else {
+			init_resp(request->create_response(restinio::status_not_found()))
+			.set_body("API Path not found.")
+			.done();
+			return restinio::request_rejected();
+    	}
+    });
+	router->http_put(R"-(.*)-", [](auto request, auto){
+        init_resp(request->create_response(restinio::status_ok()))
+            .done();
+		return restinio::request_accepted();
+	});
+	router->http_delete(R"-(.*)-", [](auto request, auto){
+        init_resp(request->create_response(restinio::status_ok()))
+            .done();
+		return restinio::request_accepted();
+	});
     router->non_matched_request_handler(
-            [](auto req){
-                return req->create_response(restinio::status_not_found()).connection_close().done();
+            [](auto request){
+            	std::clog << "webserver/notice: Non-matched request." << std::endl;
+                request->create_response(restinio::status_not_found()).done();
+                return restinio::request_rejected();
             });
 	return router;
 }
