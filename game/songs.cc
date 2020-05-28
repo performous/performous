@@ -82,21 +82,8 @@ void Songs::reload_internal() {
 
 void Songs::LoadCache() {
 	fs::path songsMetaFile = getCacheDir() / "Songs-Metadata.json";
-	std::ifstream file(songsMetaFile.string());
 	nlohmann::json jsonRoot = nlohmann::json::array();
-    if (file.is_open()) {
-    	try {
-	        jsonRoot = nlohmann::json::parse(file);
-	        file.close();
-    	} catch(std::exception const& e) {
-    		if (file.is_open()) { file.close(); }
-			std::clog << "songs/error: " << e.what() << std::endl;
-			return;
-    	}
-    } else {
-    	std::clog << "songs/info: Could not open songs meta cache file " << songsMetaFile.string() << std::endl;
-    	return;
-    }
+	jsonRoot = readJSON(songsMetaFile);
 
 	Paths systemSongs = getPathsConfig("paths/system-songs");
 	Paths localPaths = getPathsConfig("paths/songs");
