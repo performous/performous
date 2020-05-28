@@ -32,21 +32,22 @@ class Songs {
 		typedef std::forward_iterator_tag iterator_category;  //usually std::forward_iterator_tag or similar
 	};
 	using iterator = typename std::vector<iterator_traits::value_type>::iterator;
-	iterator begin() { return m_filtered.begin(); }
-	iterator end() { return m_filtered.end(); }
+	iterator begin(bool webServer = false) { return (webServer ? m_webServerFiltered : m_filtered).begin(); }
+	iterator end(bool webServer = false) { return (webServer ? m_webServerFiltered : m_filtered).end(); }
 	/// updates filtered songlist
 	void update();
 	/// reloads songlist
 	void reload();
 	/// array access
 	std::shared_ptr<Song> operator[](std::size_t pos) { return m_filtered[pos]; }
+	std::shared_ptr<Song> at(std::size_t pos, bool webServer = false) { return (webServer ? m_webServerFiltered[pos] : m_filtered[pos]); }
 	/// number of songs
-	int size() const { return m_filtered.size(); }
+	int size(bool webServer = false) const { return (webServer ? m_webServerFiltered : m_filtered).size(); }
 	/// true if empty
 	bool empty(bool webServer = false) const { return (webServer ? m_webServerFiltered : m_filtered).empty(); }
 	/// advances to next song
-	void advance(int diff) {
-		int size = m_filtered.size();
+	void advance(int diff, bool webServer = false) {
+		int size = (webServer ? m_webServerFiltered : m_filtered).size();
 		if (size == 0) return;  // Do nothing if no songs are available
 		int _current = (int(math_cover.getTarget()) + diff) % size;
 		if (_current < 0) _current += size;
@@ -61,27 +62,27 @@ class Songs {
 	/// sets margins for animation
 	void setAnimMargins(double left, double right) { math_cover.setMargins(left, right); }
 	/// @return current song
-	std::shared_ptr<Song> currentPtr() { return m_filtered.empty() ? std::shared_ptr<Song>() : m_filtered[math_cover.getTarget()]; }
+	std::shared_ptr<Song> currentPtr(bool webServer = false) { return (webServer ? m_webServerFiltered : m_filtered).empty() ? std::shared_ptr<Song>() : (webServer ? m_webServerFiltered : m_filtered)[math_cover.getTarget()]; }
 	/// @return current song
-	Song& current() { return *m_filtered[math_cover.getTarget()]; }
+	Song& current(bool webServer = false) { return *(webServer ? m_webServerFiltered : m_filtered)[math_cover.getTarget()]; }
 	/// @return current Song
-	Song const& current() const { return *m_filtered[math_cover.getTarget()]; }
+	Song const& current(bool webServer = false) const { return *(webServer ? m_webServerFiltered : m_filtered)[math_cover.getTarget()]; }
 	/// filters songlist by regular expression
-	void setFilter(std::string const& regex);
+	void setFilter(std::string const& regex, bool webServer = false);
 	/// Get the current song type filter number
 	int typeNum() const { return m_type; }
 	/// Description of the current song type filter
 	std::string typeDesc() const;
 	/// Change song type filter (diff is normally -1 or 1; 0 has special meaning of reset)
-	void typeChange(int diff);
+	void typeChange(int diff, bool webServer = false);
 	/// Cycle song type filters by filter category (0 = none, 1..4 = different categories)
-	void typeCycle(int cat);
+	void typeCycle(int cat, bool webServer = false);
 	int sortNum() const { return m_order; }
 	/// Description of the current sort mode
 	std::string sortDesc() const;
 	/// Change sorting mode (diff is normally -1 or 1)
-	void sortChange(int diff);
-	void sortSpecificChange(int sortOrder, bool descending = false);
+	void sortChange(int diff, bool webServer = false);
+	void sortSpecificChange(int sortOrder, bool descending = false, bool webServer = false);
 	/// parses file into Song &tmp
 	void parseFile(Song& tmp);
 	std::atomic<bool> doneLoading{ false };
@@ -91,7 +92,6 @@ class Songs {
   private:
   	void LoadCache();
 	void CacheSonglist();
-
 	class RestoreSel;
 	std::string m_songlist;
 	AnimValue m_updateTimer;
@@ -103,8 +103,8 @@ class Songs {
 	void reload_internal();
 	void reload_internal(fs::path const& p);
 	void randomize_internal();
-	void filter_internal();
-	void sort_internal(bool descending = false);
+	void filter_internal(bool webServer = false);
+	void sort_internal(bool descending = false, bool webServer = false);
 	std::atomic<bool> m_dirty{ false };
 	std::atomic<bool> m_loading{ false };
 	std::unique_ptr<std::thread> m_thread;
