@@ -73,8 +73,6 @@ else()
 	message(STATUS "Localization disabled: Gettext tools (msgfmt) missing")
 endif()
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/ced)
-
 if (APPLE)
 	set_property(GLOBAL PROPERTY BLA_VENDOR APPLE)
 	set(ACCELERATE_COMMAND "--enable-accelerate")
