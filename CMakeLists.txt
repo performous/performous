@@ -55,16 +55,6 @@ endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/ced)
 
-if (APPLE)
-	set_property(GLOBAL PROPERTY BLA_VENDOR APPLE)
-	set(ACCELERATE_COMMAND "--enable-accelerate")
-	set(AUBIO_CFLAGS "${CMAKE_C_FLAGS} -iframeworkwithsysroot /System/Library/Frameworks/ -mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET} -isysroot '${CMAKE_OSX_SYSROOT}/'")
-else()
-	set(ACCELERATE_COMMAND "--enable-atlas")
-        set_property(GLOBAL PROPERTY BLA_VENDOR OpenBLAS)
-	set(AUBIO_CFLAGS "${CMAKE_C_FLAGS}")
-endif()
-
 #include(ExternalProject)
 #ExternalProject_Add(build-aubio-from-sources
 #	SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/aubio/
