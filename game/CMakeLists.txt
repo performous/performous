@@ -60,16 +60,51 @@ endif()
 
 set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES})
 
+# Define main executable
+add_executable(performous ${SOURCES})
+
+  string(ASCII 27 Esc)
+# Enable C++14 support and other compiler flags...
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	target_compile_options(performous -fcx-limited-range)
+	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+	message("Detected ${Esc}[36mGCC ${Esc}[mversion ${Esc}[36m${GCC_VERSION}${Esc}[m")
+	if (GCC_VERSION VERSION_GREATER_EQUAL 8.0)
+		message(STATUS "Setting C++ standard to: ${Esc}[36mC++17${Esc}[m")
+		set_property(TARGET performous PROPERTY CXX_STANDARD 17)
+	elseif (GCC_VERSION VERSION_GREATER_EQUAL 7.0)
+		message(STATUS "Setting C++ standard to: ${Esc}[36mC++14${Esc}[m")
+		set_property(TARGET performous PROPERTY CXX_STANDARD 14)
+	elseif (GCC_VERSION VERSION_GREATER_EQUAL 4.8)
+		set_property(TARGET performous PROPERTY CXX_STANDARD 11)
+		target_compile_options(performous -Wno-attributes -Wno-deprecated-declarations)
+		message(WARNING "Your GCC is rather old, disabling some useful compiler warnings (GCC 5+ or Clang 3.4+ recommended for proper C++14 support).")
+	else()
+		message(FATAL_ERROR "Your C++ compiler is too old, please upgrade.")
+	endif()
+endif()
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+	message("Detected ${Esc}[36mClang/AppleClang ${Esc}[mversion ${Esc}[36m${CMAKE_CXX_COMPILER_VERSION}${Esc}[m")
+	if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 5.0)
+		message(STATUS "Setting C++ standard to: ${Esc}[36mC++17${Esc}[m")
+		set_property(TARGET performous PROPERTY CXX_STANDARD 17)
+	elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 3.4 )
+		message(STATUS "Setting C++ standard to: C${Esc}[36m++14${Esc}[m")
+		set_property(TARGET performous PROPERTY CXX_STANDARD 14)
+	else ()
+	# FIXME: This case is probably not correct but seriously, I don't think it will come up very frequently anyway.
+		set_property(TARGET performous PROPERTY CXX_STANDARD 11)
+		target_compile_options(performous -Wno-attributes -Wno-deprecated-declarations)
+		message(WARNING "Your GCC is rather old, disabling some useful compiler warnings (GCC 5+ or Clang 3.4+ recommended for proper C++14 support).")
+	endif()
+endif()
+
 # Libraries
 
-find_package(Boost 1.36 REQUIRED COMPONENTS program_options filesystem iostreams system locale)
+find_package(Boost 1.55 REQUIRED COMPONENTS program_options filesystem iostreams system locale)
 include_directories(${Boost_INCLUDE_DIRS})
 list(APPEND LIBS ${Boost_LIBRARIES})
-
-if (Boost_VERSION VERSION_LESS 105500)
-	message("-- Using Boost < 1.55: defining BOOST_NO_CXX11_SCOPED_ENUMS")
-	set(CMAKE_CXX_FLAGS "-DBOOST_NO_CXX11_SCOPED_ENUMS ${CMAKE_CXX_FLAGS}")
-endif()
 
 find_package(ICU 60 REQUIRED uc data i18n io)
 include_directories(${ICU_INCLUDE_DIRS})
@@ -92,6 +127,8 @@ foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWS
 	list(APPEND LIBS ${${lib}_LIBRARIES})
 	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
+
+target_sources(performous PRIVATE ${SDL2_SOURCES})
 
 option(ENABLE_MIDI "Enable support for MIDI hardware (e-drums with USB/MIDI connection)." ON)
 if(ENABLE_MIDI)
@@ -162,16 +199,16 @@ if(WIN32)
 		add_definitions(-DBOOST_THREAD_USE_LIB)
 	endif()
 	set(BIN_INSTALL .)  # Straight to Program Files/Performous with no bin subfolder.
-	set(SUBSYSTEM_WIN32 WIN32)
+	set_property(TARGET performous PROPERTY WIN32_EXECUTABLE TRUE)
 else()
 	set(BIN_INSTALL bin)
 endif()
 
-# Build main executable
-add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
 if(WIN32)
   target_link_libraries(performous wsock32 ws2_32)
 endif()
+
+target_compile_options(performous PRIVATE -Wall -Wextra)
 
 target_link_libraries(performous ced aubio)
 
