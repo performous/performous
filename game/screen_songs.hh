@@ -9,7 +9,7 @@
 #include "video.hh"
 #include "playlist.hh"
 #include "menu.hh"
-#include <aubio/fvec.h>
+#include "fvec.h"
 
 class Audio;
 class Database;
