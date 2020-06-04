@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # NSIS script generator for Performous.
 # Copyright (C) 2010 John Stumpo
 #
