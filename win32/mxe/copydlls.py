@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # DLL dependency resolution and copying script.
 # Copyright (C) 2010 John Stumpo
 #
