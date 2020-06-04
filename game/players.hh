@@ -82,11 +82,21 @@ class Players {
 	/// advances to next player
 	void advance(int diff) {
 		int size = m_filtered.size();
-		if (size == 0) return;  // Do nothing if no songs are available
+		if (size == 0) return;  // Do nothing if no players are available
 		int _current = size ? (int(math_cover.getTarget()) + diff) % size : 0;
 		if (_current < 0) _current += m_filtered.size();
 		math_cover.setTarget(_current,this->size());
 	}
+	/// Advances to player with known ID. Do nothing, if playerId is not present in filtered list.
+	void advanceToId(int playerId) {
+		for (int i = 0; i < m_filtered.size(); ++i) {
+			if (m_filtered[i].id == playerId) {
+				math_cover.setTarget(i, this->size());
+				return;
+			}
+		}
+	}
+
 	/// get current id
 	int currentId() const { return math_cover.getTarget(); }
 	/// gets current position

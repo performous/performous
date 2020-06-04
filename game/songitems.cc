@@ -50,7 +50,7 @@ int SongItems::addSongItem(std::string const& artist, std::string const& title, 
 }
 
 void SongItems::addSong(std::shared_ptr<Song> song) {
-	int id = lookup(song);
+	int id = lookup(*song);
 	if (id == -1)
 	{
 		id = addSongItem(song->artist, song->title);
@@ -71,14 +71,7 @@ void SongItems::addSong(std::shared_ptr<Song> song) {
 	m_songs.insert(si);
 }
 
-int SongItems::lookup(std::shared_ptr<Song> song) const {
-	for (auto const& s: m_songs) {
-		if (song->collateByArtistOnly == s.artist && song->collateByTitleOnly == s.title) return s.id;
-	}
-	return -1;
-}
-
-int SongItems::lookup(Song& song) const {
+int SongItems::lookup(const Song& song) const {
 	for (auto const& s: m_songs) {
 		if (song.collateByArtistOnly == s.artist && song.collateByTitleOnly == s.title) return s.id;
 	}
