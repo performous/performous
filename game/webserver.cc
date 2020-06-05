@@ -76,16 +76,14 @@ WebServer::WebServer(Songs& songs)
 }
 
 WebServer::~WebServer() {
-	if (m_server) {
-		try {
+	try {
+		if (m_server) {
 			m_server->m_restinio_server.close_sync();
 			m_server->m_restinio_server.io_context().stop();
-		} catch (const std::exception &e) {
-			std::clog << "webserver/error: Failed to close RESTinio server due to: " << e.what() << "." << std::endl;
+		} 
+		if (m_serverThread) { m_serverThread->detach(); } // Using join results in a potential crash and/or locks-up forever waiting for the thread.
+	} catch (const std::exception &e) {
+		std::clog << "webserver/error: Failed to close RESTinio server due to: " << e.what() << "." << std::endl;
 		}
-		if (m_serverThread->joinable()) {
-			m_serverThread->join();
-		}
-	}
 }
 #endif
