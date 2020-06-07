@@ -48,7 +48,7 @@ class Screen {
 class Game: public Singleton <Game> {
   public:
 	/// constructor
-	Game(Window& window, Audio& audio);
+	Game(Window& window, Audio& audio, Songs& songs);
 	~Game();
 	/// Adds a screen to the manager
 	void addScreen(std::unique_ptr<Screen> s) { 
@@ -111,6 +111,7 @@ class Game: public Singleton <Game> {
 private:
 	Audio& m_audio;
 	Window& m_window;
+	std::unique_ptr<WebServer> m_webserver;
 
 public:
 	input::Controllers controllers;
