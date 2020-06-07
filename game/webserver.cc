@@ -1,6 +1,7 @@
 #include "webserver.hh"
 #ifdef USE_WEBSERVER
 #include "requesthandler.hh"
+#include "screen.hh"
 #include <boost/asio.hpp>
 #include <boost/asio/ip/network_v4.hpp>
 #include <boost/asio/ip/address_v4_range.hpp>

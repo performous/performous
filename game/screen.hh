@@ -1,17 +1,21 @@
 #pragma once
 
-#include "controllers.hh"
-#include "singleton.hh"
 #include "animvalue.hh"
-#include "opengl_text.hh"
-#include "video_driver.hh"
+#include "controllers.hh"
 #include "dialog.hh"
-#include "playlist.hh"
 #include "fbo.hh"
+#include "opengl_text.hh"
+#include "playlist.hh"
+#include "singleton.hh"
+#include "video_driver.hh"
+#include "webserver.hh"
 
 #include <SDL2/SDL_events.h>
-#include <string>
+
+#include <map>
 #include <memory>
+#include <string>
+
 
 class Audio;
 
