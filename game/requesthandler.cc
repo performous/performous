@@ -53,8 +53,12 @@ Performous_Server_Settings RequestHandler::make_server_settings(const std::strin
     .handle_request_timeout(std::chrono::seconds(config["webserver/timeout"].i()))
     .buffer_size(std::size_t(config["webserver/buffer_size"].i()))
     .concurrent_accepts_count(config["webserver/threads"].i())
-    .max_pipelined_requests(config["webserver/request_pipeline"].i());
-    settings.ip_blocker(std::make_shared<Performous_IP_Blocker>());
+    .max_pipelined_requests(config["webserver/request_pipeline"].i())
+    .acceptor_options_setter(
+        []( auto & options ){
+          options.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
+        })
+    .ip_blocker(std::make_shared<Performous_IP_Blocker>());
     return settings;
 }
 
