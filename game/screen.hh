@@ -111,6 +111,8 @@ class Game: public Singleton <Game> {
 	void notificationFromWebserver(std::string message) { m_webserverMessage = message; }
 	std::string subscribeWebserverMessages() { return m_webserverMessage; }
 #endif
+	/// Destroys and restarts the webserver
+	void restartWebServer();
 
 private:
 	Audio& m_audio;
