@@ -53,14 +53,14 @@ void WebServer::startServer(int tried, bool fallbackPortInUse) {
 		startServer(tried, fallbackPortInUse);
 	}
 	try {
-		boost::asio::post(m_server->m_restinio_server.io_context(), [&] {
-        		m_server->m_restinio_server.open_sync();
+		boost::asio::post(m_server->m_io_context, [&] {
+        		m_server->m_restinio_server->open_sync();
 				std::string message(m_server->getLocalIP().to_string()+":");
 				message += std::to_string(portToUse);
 		m_game.notificationFromWebserver(message);
 				});
     	Performous_IP_Blocker::setAllowedSubnet(m_server->getLocalIP());
-		m_server->m_restinio_server.io_context().run();
+		m_server->m_io_context.run();
 	} catch (std::exception& e) {
 		std::string message("webserver/error: " + std::string(e.what()) + ". Trying again... (tried " + std::to_string(tried) + " times.)");
 		std::clog << message << std::endl;
@@ -82,8 +82,8 @@ WebServer::WebServer(Game &game, Songs& songs) : m_game(game), m_songs(songs {
 WebServer::~WebServer() {
 	try {
 		if (m_server) {
-			m_server->m_restinio_server.close_sync();
-			m_server->m_restinio_server.io_context().stop();
+			m_server->m_restinio_server->close_sync();
+			m_server->m_io_context.stop();
 		} 
 		if (m_serverThread) { m_serverThread->detach(); } // Using join results in a potential crash and/or locks-up forever waiting for the thread.
 	} catch (const std::exception &e) {

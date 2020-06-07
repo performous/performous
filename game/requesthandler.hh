@@ -96,7 +96,8 @@ class RequestHandler
 	Performous_Server_Settings make_server_settings(const std::string &url, unsigned short port);
         Game& m_game;
         Songs& m_songs;
-        restinio::http_server_t<Performous_Server_Traits> m_restinio_server;
+        boost::asio::io_context m_io_context;
+        std::unique_ptr<restinio::http_server_t<Performous_Server_Traits> > m_restinio_server = nullptr;
         boost::asio::ip::address_v4 m_local_ip;
 };
 #else
