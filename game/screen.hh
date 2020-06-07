@@ -101,7 +101,7 @@ class Game: public Singleton <Game> {
 	void showLogo(bool show = true) { m_logoAnim.setTarget(show ? 1.0 : 0.0); }
 	/// Draw the logo
 	void drawLogo();
-	///global playlist access
+	/// global playlist access
 	PlayList& getCurrentPlayList() { return currentPlaylist; }
 #ifdef USE_WEBSERVER
 	void notificationFromWebserver(std::string message) { m_webserverMessage = message; }
