@@ -36,18 +36,21 @@ class ConfigItem {
 	void select(int i); ///< Set optionlist selected item index
 	void reset(bool factory = false) { m_value = factory ? m_factoryDefaultValue : m_defaultValue; } ///< Reset to default
 	void makeSystem() { m_defaultValue = m_value; } ///< Make current value the system default (used when saving system config)
+	std::string const& getName() const { return m_keyName; } ///< get the name for this ConfigItem in the schema.
 	std::string const getValue() const; ///< Get a human-readable representation of the current value
+	std::string const getOldValue() const { return m_oldValue; } ///< Get a human-readable representation of a previous value.
+	void setOldValue(std::string const& value) { m_oldValue = value; } ///< Store the current value before changing it, for later comparison.
 	std::string const& getShortDesc() const { return m_shortDesc; } ///< get the short description for this ConfigItem
 	std::string const& getLongDesc() const { return m_longDesc; } ///< get the long description for this ConfigItem
 	void addEnum(std::string name); ///< Dynamically adds an enum to all values
 	void selectEnum(std::string const& name); ///< Set integer value by enum name
 	std::string const getEnumName() const; ///< Returns the selected enum option's text
-	std::string oldValue;
 	
   private:
 	template <typename T> void updateNumeric(xmlpp::Element& elem, int mode); ///< Used internally for loading XML
 	void verifyType(std::string const& t) const; ///< throws std::logic_error if t != type
 	ConfigItem& incdec(int dir); ///< Increment/decrement by dir steps (must be -1 or 1)
+	std::string m_keyName; ///< The config key in the schema file.
 	std::string m_type;
 	std::string m_shortDesc;
 	std::string m_longDesc;
@@ -57,6 +60,7 @@ class ConfigItem {
 	Value m_value; ///< The current value
 	Value m_factoryDefaultValue; ///< The value from config schema
 	Value m_defaultValue; ///< The value from config schema or system config
+	std::string m_oldValue; ///< A previous value, as output by getValue().
 	std::vector<std::string> m_enums; ///< Enum value titles
 	boost::variant<int, double> m_step, m_min, m_max;
 	boost::variant<int, double> m_multiplier;
