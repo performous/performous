@@ -53,6 +53,12 @@ void Game::drawScreen() {
 	drawNotifications();
 }
 
+void Game::restartWebServer() {
+#ifdef USE_WEBSERVER
+	m_webserver->restartServer();
+#endif
+}
+
 void Game::loading(std::string const& message, float progress) {
 	// TODO: Create a better one, this is quite ugly
 	flashMessage(message + " " + std::to_string(int(round(progress*100))) + "%", 0.0f, 0.5f, 0.2f);
