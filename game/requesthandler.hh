@@ -1,9 +1,14 @@
 #pragma once
+
+class Songs;
+
 #ifdef USE_WEBSERVER
+class Song;
+#include "configuration.hh"
+#include "fs.hh"
 
 #include <boost/asio.hpp>
 #include <boost/asio/ip/network_v4.hpp>
-#include <chrono>
 #include <nlohmann/json.hpp>
 #include <restinio/all.hpp>
 #include <restinio/helpers/http_field_parsers/cache-control.hpp>
@@ -16,8 +21,13 @@ using Performous_Router_t = restinio::router::express_router_t<restinio::router:
 using Performous_Router_t = restinio::router::express_router_t<restinio::router::std_regex_engine_t>;
 #endif
 
-#include "screen_playlist.hh"
 #include "restinio_performous_logger_adapter.hh"
+
+#include <chrono>
+#include <map>
+#include <memory>
+#include <vector>
+
 class Performous_IP_Blocker {
 	public:
 		restinio::ip_blocker::inspection_result_t inspect(const restinio::ip_blocker::incoming_info_t& info) noexcept {
@@ -93,8 +103,6 @@ class RequestHandler
         boost::asio::ip::address_v4 m_local_ip;
 };
 #else
-class Songs;
-
 class RequestHandler
 {
 public:
