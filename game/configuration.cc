@@ -213,6 +213,7 @@ template <typename T> void ConfigItem::updateNumeric(xmlpp::Element& elem, int m
 
 void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 	if (mode == 0) {
+		m_keyName = getAttribute(elem, "name");
 		m_type = getAttribute(elem, "type");
 		if (m_type.empty()) throw std::runtime_error("Entry type attribute is missing");
 		// Menu text
@@ -287,14 +288,14 @@ void writeConfig(bool system) {
 		std::string type = item.get_type();
 		entryNode->set_attribute("type", type);
 		if (name == "graphic/stereo3d") {
-			std::string prev3DState = item.oldValue;
+			std::string prev3DState = item.getOldValue();
 			if (prev3DState != std::to_string(item.b()) && !prev3DState.empty()) {
 				std::clog << "video/info: Stereo 3D configuration changed, will reset shaders." << std::endl;
 				Game::getSingletonPtr()->window().resetShaders();
 			}
 		}
 		if (name == "audio/backend") {
-			std::string currentBackEnd = Audio::backendConfig().oldValue;
+			std::string currentBackEnd = Audio::backendConfig().getOldValue();
 			int oldValue = PaHostApiNameToHostApiTypeId(currentBackEnd);
 			int newValue = PaHostApiNameToHostApiTypeId(item.getEnumName());
 			if (currentBackEnd != item.getEnumName() && !currentBackEnd.empty()) {
@@ -434,5 +435,5 @@ void populateBackends (const std::list<std::string>& backendList) {
 	static std::string selectedBackend = std::string();
 	selectedBackend = backendConfig.getValue();
 	backendConfig.selectEnum(selectedBackend);
-	backendConfig.oldValue = backendConfig.getEnumName();
+	backendConfig.setOldValue(backendConfig.getEnumName());
 }
