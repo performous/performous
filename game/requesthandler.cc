@@ -7,7 +7,7 @@
 
 #ifdef USE_WEBSERVER
 
-RequestHandler::RequestHandler(std::string url, unsigned short port, Songs& songs): m_songs(songs), m_restinio_server(restinio::own_io_context(), make_server_settings(url, port)) {
+RequestHandler::RequestHandler(std::string url, unsigned short port, Songs& songs): m_songs(songs), m_restinio_server(std::make_unique<restinio::http_server_t<Performous_Server_Traits> >(restinio::external_io_context(m_io_context), make_server_settings(url, port))) {
 	m_local_ip = RequestHandler::getLocalIP(std::string("1.1.1.1"));
 	fs::path extensionsConfig = getConfigDir() / std::string("file-extensions.json");
 	if (!fs::exists(extensionsConfig)) {
@@ -32,8 +32,8 @@ std::string RequestHandler::getContentType(const std::string& extension) {
 
 RequestHandler::~RequestHandler() {
 	try {
-		m_restinio_server.close_sync();
-		m_restinio_server.io_context().stop();
+		m_restinio_server->close_sync();
+		m_io_context.stop();
 		} catch (const std::exception &e) {
 		std::clog << "webserver/error: Failed to close RESTinio server due to: " << e.what() << "." << std::endl;
 	}
