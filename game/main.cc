@@ -141,8 +141,7 @@ void mainLoop(std::string const& songlist) {
 		} catch (RUNTIME_ERROR& e) {
 			std::cerr << "ERROR: " << e.what() << std::endl;
 		}
-	Game gm(*window, audio);
-	WebServer server(songs);
+	Game gm(*window, audio, songs);
 	try {
 		// Load audio samples
 		gm.loading(_("Loading audio samples..."), 0.5);
