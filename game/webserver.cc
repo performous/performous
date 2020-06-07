@@ -5,14 +5,14 @@
 #include <boost/asio/ip/network_v4.hpp>
 #include <boost/asio/ip/address_v4_range.hpp>
 
-void WebServer::StartServer(int tried, bool fallbackPortInUse) {
+void WebServer::startServer(int tried, bool fallbackPortInUse) {
 	if(tried > 2) {
 			std::string message("webserver/error: Couldn't start webserver after 3 tries");
 		if(fallbackPortInUse == false) {
 		 	message += std::string("; trying fallback port...");
 			std::clog << message << std::endl;
 			Game::getSingletonPtr()->notificationFromWebserver(message);					
-			StartServer(0, true);
+			startServer(0, true);
 			return;
 		}
 		message += std::string("using the main and fallback ports; won't try again.");
@@ -45,7 +45,7 @@ void WebServer::StartServer(int tried, bool fallbackPortInUse) {
 		std::clog << message << std::endl;
 		Game::getSingletonPtr()->notificationFromWebserver(message);		
 		std::this_thread::sleep_for(20s);
-		StartServer(tried, fallbackPortInUse);
+		startServer(tried, fallbackPortInUse);
 	}
 	try {
 		boost::asio::post(m_server->m_restinio_server.io_context(), [&] {
@@ -61,7 +61,7 @@ void WebServer::StartServer(int tried, bool fallbackPortInUse) {
 		std::clog << message << std::endl;
 		Game::getSingletonPtr()->notificationFromWebserver(message);		
 		std::this_thread::sleep_for(20s);
-		StartServer(tried, fallbackPortInUse);
+		startServer(tried, fallbackPortInUse);
 	}
 }
 
@@ -71,8 +71,8 @@ WebServer::WebServer(Songs& songs)
 	if(config["webserver/access"].i() == 0) {
 		std::clog << "webserver/notice: Not starting webserver." << std::endl;
 	} else {
-		m_serverThread = std::make_unique<std::thread>([this] { StartServer(0, false); });
 	}
+		m_serverThread = std::make_unique<std::thread>([this] { startServer(0, false); });
 }
 
 WebServer::~WebServer() {
