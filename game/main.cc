@@ -14,7 +14,6 @@
 #include "songs.hh"
 #include "video_driver.hh"
 #include "webcam.hh"
-#include "webserver.hh"
 
 // Screens
 #include "screen_intro.hh"

@@ -9,7 +9,6 @@
 #include <sstream>
 #include <thread>
 #include <vector>
-#include "screen.hh"
 
 class Song;
 class Database;
