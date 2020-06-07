@@ -1,6 +1,8 @@
 #include "requesthandler.hh"
+#include "screen_playlist.hh"
+#include "songs.hh"
 #include "unicode.hh"
-#include "fs.hh"
+
 #include <boost/filesystem.hpp>
 
 #ifdef USE_WEBSERVER
