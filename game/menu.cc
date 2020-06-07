@@ -64,6 +64,9 @@ void Menu::action(int dir) {
 					std::string oldValue((current().value->getValue() == _("Disabled")) ? "0" : "1");
 					current().value->setOldValue(oldValue);
 				}
+				else if (current().value->getName().substr(0,10) == "webserver/") {
+					current().value->setOldValue(current().value->getValue());
+				}
 				if (dir > 0) ++(*(current().value));
 				else if (dir < 0) --(*(current().value));
 			}

@@ -129,7 +129,7 @@ std::string const ConfigItem::getValue() const {
 		else std::clog << "audio/warning: Currently selected audio backend is unavailable on this system, will default to Auto." << std::endl;
 		return "Auto";
 	}
-	else if (this->getShortDesc() == config["webserver/netmask"].getShortDesc()) {
+	else if (this->getName() == "webserver/netmask") {
 		int slashNotation = std::stoi(getEnumName());
 		std::uint64_t subNetValue = 1;
 		subNetValue <<= 32;
@@ -288,6 +288,7 @@ void writeConfig(bool system) {
 	xmlpp::Document doc;
 	auto nodeRoot = doc.create_root_node("performous");
 	bool dirty = false;
+	bool webServerNeedsRestart = false;
 	for (auto& elem: config) {
 		ConfigItem& item = elem.second;
 		std::string name = elem.first;
@@ -302,6 +303,12 @@ void writeConfig(bool system) {
 			if (prev3DState != std::to_string(item.b()) && !prev3DState.empty()) {
 				std::clog << "video/info: Stereo 3D configuration changed, will reset shaders." << std::endl;
 				Game::getSingletonPtr()->window().resetShaders();
+			}
+		}
+		if (name.substr(0,10) == "webserver/") {
+			if (!item.getOldValue().empty() && (item.getOldValue() != item.getValue())) {
+				webServerNeedsRestart  = true;
+				std::clog << "webserver/notice: WebServer configuration changed; we'll need to restart it." << std::endl;
 			}
 		}
 		if (name == "audio/backend") {
@@ -337,6 +344,9 @@ void writeConfig(bool system) {
 		if (dirty) {
 			rename(tmp, conf);
 			std::cerr << "Saved configuration to " << conf << std::endl;
+			if (webServerNeedsRestart) {
+				Game::getSingletonPtr()->restartWebServer();
+			}
 		} else {
 			std::cerr << "Using default settings, no configuration file needed." << std::endl;
 		}
