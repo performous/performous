@@ -61,15 +61,9 @@ endif()
 set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES})
 
 # Libraries
-
-find_package(Boost 1.36 REQUIRED COMPONENTS program_options filesystem iostreams system locale)
+find_package(Boost ${NEEDED_BOOST_VERSION} REQUIRED COMPONENTS program_options filesystem iostreams system locale)
 include_directories(${Boost_INCLUDE_DIRS})
 list(APPEND LIBS ${Boost_LIBRARIES})
-
-if (Boost_VERSION VERSION_LESS 105500)
-	message("-- Using Boost < 1.55: defining BOOST_NO_CXX11_SCOPED_ENUMS")
-	set(CMAKE_CXX_FLAGS "-DBOOST_NO_CXX11_SCOPED_ENUMS ${CMAKE_CXX_FLAGS}")
-endif()
 
 find_package(ICU 60 REQUIRED uc data i18n io)
 include_directories(${ICU_INCLUDE_DIRS})
@@ -123,27 +117,6 @@ else()
 	message(STATUS "Webcam support: Disabled (explicitly disabled)")
 endif()
 
-option(ENABLE_WEBSERVER "Enable webserver support (cpprestsdk)." ON)
-if(ENABLE_WEBSERVER)
-	foreach(lib CppRest)
-		find_package(${lib})
-	endforeach(lib)
-	if(CppRest_FOUND)
-		find_package(Boost 1.36 REQUIRED COMPONENTS chrono thread)
-		include_directories(${Boost_INCLUDE_DIRS})
-		list(APPEND LIBS ${Boost_LIBRARIES})
-
-		include_directories(${CppRest_INCLUDE_DIRS})
-		list(APPEND LIBS ${CppRest_LIBRARIES})
-		message(STATUS "Webserver support: Enabled")
-		add_definitions("-DUSE_WEBSERVER")
-	else()
-		message(STATUS "Webserver support: Disabled (cpprestsdk not found)")
-	endif()
-else()
-	message(STATUS "Webserver support: Disabled (explicitly disabled)")
-endif()
-
 if(UNIX AND NOT APPLE)
 	# Note: cannot use list APPEND here because it inserts semicolons instead of spaces
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
@@ -173,7 +146,7 @@ if(WIN32)
   target_link_libraries(performous wsock32 ws2_32)
 endif()
 
-target_link_libraries(performous ced aubio)
+target_link_libraries(performous PRIVATE ced aubio nlohmann_json::nlohmann_json restinio::restinio)
 
 if(APPLE)
 	list(APPEND LIBS "-framework Accelerate")
@@ -181,8 +154,8 @@ endif()
 list(APPEND LIBS ${FFTW3_LIBRARIES})
 list(APPEND LIBS ${BLAS_LIBRARIES})
 
-target_link_libraries(performous PkgConfig::deps)
-target_link_libraries(performous ${LIBS})
+target_link_libraries(performous PRIVATE PkgConfig::deps)
+target_link_libraries(performous PRIVATE ${LIBS})
 
 target_include_directories(performous PRIVATE "${AUBIO_INSTALL_DIR}/include/")
 
