@@ -13,3 +13,4 @@ CMakeCache.txt
 CMakeFiles
 *.xcodeproj
 /.semaphore/keys-secret.yml
+/.vs

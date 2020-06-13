@@ -1,0 +1,764 @@
+﻿{
+  "configurations": [
+    // Windows X64 Debug using 'msvc_x64'
+    {
+      "name": "win-x64-Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "inheritEnvironments": [ "msvc_x64" ],
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "cmakeToolchain": "${env.VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "variables": [
+        {
+          "name": "BUILD_SHARED_LIBS",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "ENABLE_WEBSERVER",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "LibRSVG_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/debug/lib/rsvg-2.40d.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML2_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/debug/lib/libxml2.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "SDL2_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/debug/lib/SDL2d.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Cairo_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/debug/lib/cairod.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Glibmm_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/debug/lib/glibmm.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML++_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/debug/lib/xml++.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Crypto_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/debug/lib/libcrypto.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Ssl_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/debug/lib/libssl.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "CppRest_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/debug/lib/cpprest_2_10d.lib",
+          "type": "FILEPATH"
+        }
+      ]
+    },
+    // Windows X64 RelWithDebInfo using 'msvc_x64'
+    {
+      "name": "win-x64-RelWithDebInfo",
+      "generator": "Ninja",
+      "configurationType": "RelWithDebInfo",
+      "inheritEnvironments": [ "msvc_x64" ],
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "cmakeToolchain": "${env.VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "variables": [
+        {
+          "name": "BUILD_SHARED_LIBS",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "ENABLE_WEBSERVER",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "LibRSVG_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/lib/rsvg-2.40.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML2_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/lib/libxml2.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Glibmm_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/lib/glibmm.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML++_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/lib/xml++.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Crypto_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/lib/libcrypto.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Ssl_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/lib/libssl.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "CppRest_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/lib/cpprest_2_10.lib",
+          "type": "FILEPATH"
+        }
+      ]
+    },
+    // Windows X64 Release using 'msvc_x64'
+    {
+      "name": "win-x64-Release",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "inheritEnvironments": [ "msvc_x64" ],
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "cmakeToolchain": "${env.VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "variables": [
+        {
+          "name": "BUILD_SHARED_LIBS",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "ENABLE_WEBSERVER",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "LibRSVG_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/lib/rsvg-2.40.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML2_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/lib/libxml2.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Glibmm_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/lib/glibmm.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML++_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/lib/xml++.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Crypto_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/lib/libcrypto.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Ssl_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/lib/libssl.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "CppRest_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-windows/lib/cpprest_2_10.lib",
+          "type": "FILEPATH"
+        }
+      ]
+    },
+    // Windows X86 Debug using 'msvc_x86'
+    {
+      "name": "win-x86-Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "inheritEnvironments": [ "msvc_x86" ],
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "cmakeToolchain": "${env.VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "variables": [
+        {
+          "name": "BUILD_SHARED_LIBS",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "ENABLE_WEBSERVER",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "LibRSVG_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/debug/lib/rsvg-2.40d.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML2_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/debug/lib/libxml2.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "SDL2_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/debug/lib/SDL2d.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Cairo_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/debug/lib/cairod.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Glibmm_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/debug/lib/glibmm.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML++_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/debug/lib/xml++.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Crypto_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/debug/lib/libcrypto.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Ssl_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/debug/lib/libssl.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "CppRest_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/debug/lib/cpprest_2_10d.lib",
+          "type": "FILEPATH"
+        }
+      ]
+    },
+    // Windows X86 RelWithDebInfo using 'msvc_x86'
+    {
+      "name": "win-x86-RelWithDebInfo",
+      "generator": "Ninja",
+      "configurationType": "RelWithDebInfo",
+      "inheritEnvironments": [ "msvc_x86" ],
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "cmakeToolchain": "${env.VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "variables": [
+        {
+          "name": "BUILD_SHARED_LIBS",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "ENABLE_WEBSERVER",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "LibRSVG_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/lib/rsvg-2.40.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML2_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/lib/libxml2.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Glibmm_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/lib/glibmm.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML++_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/lib/xml++.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Crypto_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/lib/libcrypto.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Ssl_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/lib/libssl.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "CppRest_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/lib/cpprest_2_10.lib",
+          "type": "FILEPATH"
+        }
+      ]
+    },
+    // Windows X86 Release using 'msvc_x86'
+    {
+      "name": "win-x86-Release",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "inheritEnvironments": [ "msvc_x86" ],
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "cmakeToolchain": "${env.VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "variables": [
+        {
+          "name": "BUILD_SHARED_LIBS",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "ENABLE_WEBSERVER",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "LibRSVG_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/lib/rsvg-2.40.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML2_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/lib/libxml2.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Glibmm_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/lib/glibmm.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML++_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/lib/xml++.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Crypto_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/lib/libcrypto.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Ssl_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/lib/libssl.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "CppRest_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-windows/lib/cpprest_2_10.lib",
+          "type": "FILEPATH"
+        }
+      ]
+    },
+    // Linux X64 Debug using 'linux_x64'
+    {
+      "name": "linux-x64-Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "inheritEnvironments": [ "linux_x64" ],
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "cmakeToolchain": "${env.VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "variables": [
+        {
+          "name": "BUILD_SHARED_LIBS",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "ENABLE_WEBSERVER",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "LibRSVG_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/debug/lib/rsvg-2.40d.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML2_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/debug/lib/libxml2.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "SDL2_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/debug/lib/SDL2d.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Cairo_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/debug/lib/cairod.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Glibmm_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/debug/lib/glibmm.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML++_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/debug/lib/xml++.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Crypto_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/debug/lib/libcrypto.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Ssl_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/debug/lib/libssl.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "CppRest_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/debug/lib/cpprest_2_10d.lib",
+          "type": "FILEPATH"
+        }
+      ]
+    },
+    // Linux X64 RelWithDebInfo using 'linux_x64'
+    {
+      "name": "linux-x64-RelWithDebInfo",
+      "generator": "Ninja",
+      "configurationType": "RelWithDebInfo",
+      "inheritEnvironments": [ "linux_x64" ],
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "cmakeToolchain": "${env.VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "variables": [
+        {
+          "name": "BUILD_SHARED_LIBS",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "ENABLE_WEBSERVER",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "LibRSVG_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/lib/rsvg-2.40.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML2_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/lib/libxml2.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Glibmm_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/lib/glibmm.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML++_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/lib/xml++.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Crypto_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/lib/libcrypto.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Ssl_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/lib/libssl.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "CppRest_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/lib/cpprest_2_10.lib",
+          "type": "FILEPATH"
+        }
+      ]
+    },
+    // Linux X64 Release using 'linux_x64'
+    {
+      "name": "linux-x64-Release",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "inheritEnvironments": [ "linux_x64" ],
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "cmakeToolchain": "${env.VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "variables": [
+        {
+          "name": "BUILD_SHARED_LIBS",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "ENABLE_WEBSERVER",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "LibRSVG_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/lib/rsvg-2.40.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML2_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/lib/libxml2.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Glibmm_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/lib/glibmm.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML++_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/lib/xml++.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Crypto_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/lib/libcrypto.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Ssl_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/lib/libssl.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "CppRest_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x64-linux/lib/cpprest_2_10.lib",
+          "type": "FILEPATH"
+        }
+      ]
+    },
+    // Linux X86 Debug using 'linux_x86'
+    {
+      "name": "linux-x86-Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "inheritEnvironments": [ "linux_x86" ],
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "cmakeToolchain": "${env.VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "variables": [
+        {
+          "name": "BUILD_SHARED_LIBS",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "ENABLE_WEBSERVER",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "LibRSVG_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/debug/lib/rsvg-2.40d.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML2_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/debug/lib/libxml2.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "SDL2_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/debug/lib/SDL2d.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Cairo_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/debug/lib/cairod.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Glibmm_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/debug/lib/glibmm.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML++_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/debug/lib/xml++.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Crypto_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/debug/lib/libcrypto.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Ssl_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/debug/lib/libssl.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "CppRest_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/debug/lib/cpprest_2_10d.lib",
+          "type": "FILEPATH"
+        }
+      ]
+    },
+    // Linux X86 RelWithDebInfo using 'linux_x86'
+    {
+      "name": "linux-x86-RelWithDebInfo",
+      "generator": "Ninja",
+      "configurationType": "RelWithDebInfo",
+      "inheritEnvironments": [ "linux_x86" ],
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "cmakeToolchain": "${env.VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "variables": [
+        {
+          "name": "BUILD_SHARED_LIBS",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "ENABLE_WEBSERVER",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "LibRSVG_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/lib/rsvg-2.40.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML2_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/lib/libxml2.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Glibmm_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/lib/glibmm.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML++_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/lib/xml++.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Crypto_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/lib/libcrypto.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Ssl_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/lib/libssl.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "CppRest_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/lib/cpprest_2_10.lib",
+          "type": "FILEPATH"
+        }
+      ]
+    },
+    // Linux X86 Release using 'linux_x86'
+    {
+      "name": "linux-x86-Release",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "inheritEnvironments": [ "linux_x86" ],
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "cmakeToolchain": "${env.VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "variables": [
+        {
+          "name": "BUILD_SHARED_LIBS",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "ENABLE_WEBSERVER",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "LibRSVG_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/lib/rsvg-2.40.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML2_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/lib/libxml2.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Glibmm_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/lib/glibmm.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "LibXML++_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/lib/xml++.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Crypto_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/lib/libcrypto.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "Ssl_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/lib/libssl.lib",
+          "type": "FILEPATH"
+        },
+        {
+          "name": "CppRest_LIBRARY",
+          "value": "${env.VCPKG_ROOT}/installed/x86-linux/lib/cpprest_2_10.lib",
+          "type": "FILEPATH"
+        }
+      ]
+    }
+  ]
+}
