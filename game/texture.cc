@@ -144,11 +144,11 @@ Texture::~Texture() { ldr->remove(this); }
 // Stuff for converting pix::Format into OpenGL enum values & other flags
 namespace {
 	struct PixFmt {
-		PixFmt(): swap() {} // Required by std::map
+		PixFmt() = default;
 		PixFmt(GLenum f, GLenum t, bool s): format(f), type(t), swap(s) {}
-		GLenum format;
-		GLenum type;
-		bool swap;  // Reverse byte order
+		GLenum format = GL_RGB;
+		GLenum type = GL_UNSIGNED_BYTE;
+		bool swap = false;  // Reverse byte order
 	};
 	struct PixFormats {
 		typedef std::map<pix::Format, PixFmt> Map;
