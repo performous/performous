@@ -74,16 +74,40 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	std::shared_ptr<PangoLayout> layout(
 	  pango_layout_new(ctx.get()),
 	  g_object_unref);
+	pango_layout_set_wrap(layout.get(), PANGO_WRAP_WORD);
+	pango_layout_set_ellipsize(layout.get(), PANGO_ELLIPSIZE_NONE);
+	pango_layout_set_single_paragraph_mode(layout.get(), false);
 	pango_layout_set_alignment(layout.get(), alignment);
 	pango_layout_set_font_description(layout.get(), desc.get());
+// 	pango_layout_set_width(layout.get(), targetWidth * m * PANGO_SCALE * 0.96);	
 	pango_layout_set_text(layout.get(), _text.text.c_str(), -1);
+// 	pango_layout_set_width(layout.get(), std::min(pango_layout_get_width(layout.get()),(targetWidth * m * PANGO_SCALE * 0.96));	
 	// Compute text extents
 	{
 		PangoRectangle rec;
 		pango_layout_get_pixel_extents(layout.get(), nullptr, &rec);
+		std::clog << "text/debug: raw text width for : \"" << _text.text << "\", before wrapping: " << ((rec.width + border) / m) << std::endl;
+		if ((rec.width + border) > (targetWidth * m * 0.96)) {
+			std:: clog << "text/debug: text too long; will try again with wrapping." << std::endl;
+			pango_layout_set_width(layout.get(), targetWidth * m * PANGO_SCALE * 0.96);	
+			pango_layout_set_text(layout.get(), _text.text.c_str(), -1);
+			pango_layout_get_pixel_extents(layout.get(), nullptr, &rec);
+			std::clog << "text/debug: raw text width for : \"" << _text.text << "\", after wrapping: " << ((rec.width + border) / m) << std::endl;
+		}
 		m_x = rec.width + border;  // Add twice half a border for margins
 		m_y = rec.height + border;
 	}
+// 	int layout_width = pango_layout_get_pixel_width(layout.get());
+// 	int layout_width = pango_layout_get_pixel_width(layout.get());
+	unsigned lines = pango_layout_get_line_count (layout.get());
+	for (unsigned i = 0; i < lines; i++) {
+	PangoLayoutLine* line = pango_layout_get_line_readonly(layout.get(), i);
+	int start = line->start_index;
+	int length = line->length;
+	std::string lineText(pango_layout_get_text(layout.get()),start,length);
+	std::clog << "text/debug: (layout) Line " << std::to_string(i + 1) << ": \"" << lineText << "\", width is: " << (m_x / m / targetWidth * 100) << "%, m_y: " << (m_y / m) << ", did we wrap?: " << std::string(pango_layout_is_wrapped(layout.get()) ? "Yes" : "No") << std::endl;
+	}
+	
 	// Create Cairo surface and drawing context
 	std::shared_ptr<cairo_surface_t> surface(
 	  cairo_image_surface_create(CAIRO_FORMAT_ARGB32, m_x, m_y),
@@ -281,6 +305,7 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool lyrics) {
 		dim.middle(position_x + 0.5 * dim.w());
 		TexCoords tex;
 		double factor = _text[i].factor;
+		std::clog << "text/debug: Text (inside draw()): \"" << m_text.text << "\", position_x: " << position_x << ",texture_height: " << m_texture_height << std::endl;
 		if (factor > 1.0) {
 			LyricColorTrans lc(m_text.fill_col, m_text.stroke_col, m_text_highlight.fill_col, m_text_highlight.stroke_col);
 			dim.fixedWidth(dim.w() * factor);
