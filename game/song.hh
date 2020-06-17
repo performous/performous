@@ -5,7 +5,10 @@
 #include "notes.hh"
 #include "util.hh"
 
+#ifdef USE_WEBSERVER
 #include <cpprest/json.h>
+#endif
+
 #include <stdexcept>
 #include <string>
 
@@ -43,6 +46,14 @@ public:
 	fs::path path; ///< path of songfile
 	fs::path filename; ///< name of songfile
 	fs::path midifilename; ///< name of midi file in FoF format
+	struct BPM {
+		BPM (double _begin, double _ts, double bpm) :
+		begin (_begin), step (0.25 * 60.0 / bpm), ts (_ts) {}
+		double begin;  // Time in seconds
+		double step;  // Seconds per quarter note
+		double ts;
+	};
+	std::vector<BPM> m_bpms;
 	std::vector<std::string> category; ///< category of song
 	std::string genre; ///< genre
 	std::string edition; ///< license
@@ -51,8 +62,8 @@ public:
 	std::string text; ///< songtext
 	std::string creator; ///< creator
 	std::string language; ///< language
-	using Music = std::map<std::string, fs::path>;
-	Music music; ///< music files (background, guitar, rhythm/bass, drums, vocals)
+	using MusicFiles = std::map<std::string, fs::path>;
+	MusicFiles music; ///< music files (background, guitar, rhythm/bass, drums, vocals)
 	fs::path cover; ///< cd cover
 	fs::path background; ///< background image
 	fs::path video; ///< video
@@ -63,7 +74,7 @@ public:
 	double videoGap = 0.0; ///< gap with video
 	double start = 0.0; ///< start of song
 	double preview_start = getNaN(); ///< starting time for the preview
-	int64_t m_duration = 0;
+	double m_duration = 0.0;
 	using Stops = std::vector<std::pair<double,double> >;
 	Stops stops; ///< related to dance
 	using Beats = std::vector<double>;
@@ -79,7 +90,9 @@ public:
 	int randomIdx = 0; ///< sorting index used for random order
 
 	// Functions only below this line
+#ifdef USE_WEBSERVER
 	Song(web::json::value const& song);  ///< Load song from cache.
+#endif
 	Song(fs::path const& path, fs::path const& filename);  ///< Load song from specified path and filename
 	void reload(bool errorIgnore = true);  ///< Reset and reload the entire song from file
 	void loadNotes(bool errorIgnore = true);  ///< Load note data (called when entering singing screen, headers preloaded).

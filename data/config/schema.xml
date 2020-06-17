@@ -219,13 +219,13 @@ to save the current settings to XML.
 	</entry>
 	<entry name="graphic/window_pos_x" type="int" value="0" hidden="true">
 		<ui unit=" pixels" />
-		<limits min="0" max="65000" step="256" />
+		<limits min="0" max="16384" step="8" />
 		<short>X-Position of the window</short>
 		<long>The X-Position of the window.</long>
 	</entry>
 	<entry name="graphic/window_pos_y" type="int" value="0" hidden="true">
 		<ui unit=" pixels" />
-		<limits min="0" max="65000" step="256" />
+		<limits min="0" max="16384" step="8" />
 		<short>Y-Position of the window</short>
 		<long>The Y-Position of the window.</long>
 	</entry>
@@ -305,19 +305,19 @@ to save the current settings to XML.
 		<ui unit=" ms" multiplier="1000" />
 		<limits min="-0.5" max="0.5" step="0.01" />
 		<short>Audio/video latency</short>
-		<long>Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing.</long>
+		<long>Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use 'Ctrl + ,' or 'Ctrl + .' to adjust this while performing.</long>
 	</entry>
 	<entry name="audio/round-trip" type="float" value="0.09">
 		<ui unit=" ms" multiplier="1000" />
 		<limits min="0.0" max="0.5" step="0.01" />
 		<short>Audio round-trip latency</short>
-		<long>Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4.</long>
+		<long>Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with 'Ctrl + -' or 'Ctrl + ='.</long>
 	</entry>
 	<entry name="audio/controller_delay" type="float" value="0.08">
 		<ui unit=" ms" multiplier="1000" />
 		<limits min="0.0" max="0.5" step="0.01" />
 		<short>Audio/controller latency</short>
-		<long>Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing.</long>
+		<long>Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use 'Ctrl + [' or 'Ctrl + ]' to adjust while performing.</long>
 	</entry>
 	<entry name="audio/devices" type="string_list" hidden="true">
 		<stringvalue>dev="USBMIC" mics="blue,red"</stringvalue><!-- SingStar mics -->
@@ -361,19 +361,31 @@ to save the current settings to XML.
 	</entry>
 
 	<!-- Paths -->
-	<entry name="paths/songs" type="string_list">
-		<stringvalue>DATADIR/songs/</stringvalue>
-		<stringvalue>/usr/local/share/games/ultrastar/songs/</stringvalue>
-		<stringvalue>/usr/local/share/games/fretsonfire/data/songs/</stringvalue>
-		<stringvalue>/usr/share/games/ultrastar/songs/</stringvalue>
-		<stringvalue>/usr/share/games/fretsonfire/data/songs/</stringvalue>
-		<stringvalue>~/.ultrastar/songs/</stringvalue>
+	<entry name="paths/songs" type="string_list" hidden="false">
 		<short>Song folders</short>
 		<long>Where to recursively look for songs. DATADIR at the beginning means all Performous data folders.</long>
 	</entry>
-	<entry name="paths/showhiddenfolders" type="bool" value = "false">
+	<entry name="paths/showhiddenfolders" type="bool" value="false">
 		<short>Show hidden folders</short>
 		<long>When true the screen_paths will also show hidden folders</long>
+	</entry>
+	<entry name="paths/system-songs" type="string_list">
+		<stringvalue>DATADIR/songs</stringvalue>
+		<stringvalue>/usr/local/share/games/ultrastar/songs</stringvalue>
+		<stringvalue>/usr/local/share/games/fretsonfire/data/songs</stringvalue>
+		<stringvalue>/usr/share/games/ultrastar/songs</stringvalue>
+		<stringvalue>/usr/share/games/fretsonfire/data/songs</stringvalue>
+		<stringvalue>~/.ultrastar/songs</stringvalue>
+		<stringvalue>/usr/local/share/performous/songs</stringvalue>
+		<stringvalue>/usr/share/performous/songs</stringvalue>
+		<stringvalue>~/.local/share/games/performous</stringvalue>
+		<stringvalue>~/.local/share/performous</stringvalue>
+		<stringvalue>%USERPROFILE%\AppData\Roaming\performous</stringvalue>
+		<stringvalue>~\AppData\Roaming\performous</stringvalue>
+		<stringvalue>%HOMEDRIVE%%HOMEPATH%\Application Data\performous</stringvalue>
+		<stringvalue>~\Application Data\performous</stringvalue>
+		<short>Default Song folders</short>
+		<long>Where to recursively look for songs. DATADIR at the beginning means all Performous data folders.</long>
 	</entry>
 	<entry name="paths/system" type="string_list">
 		<short>Base folders for data</short>

@@ -9,7 +9,7 @@
 #include "playlist.hh"
 #include "fbo.hh"
 
-#include <SDL2/SDL.h>
+#include <SDL2/SDL_events.h>
 #include <string>
 #include <memory>
 
@@ -103,6 +103,10 @@ class Game: public Singleton <Game> {
 	void drawLogo();
 	///global playlist access
 	PlayList& getCurrentPlayList() { return currentPlaylist; }
+#ifdef USE_WEBSERVER
+	void notificationFromWebserver(std::string message) { m_webserverMessage = message; }
+	std::string subscribeWebserverMessages() { return m_webserverMessage; }
+#endif
 
 private:
 	Audio& m_audio;
@@ -131,6 +135,9 @@ private:
 	AnimValue m_dialogTimeOut;
 	// Dialog members
 	std::unique_ptr<Dialog> m_dialog;
+#ifdef USE_WEBSERVER
+	std::string m_webserverMessage = "Trying to connect to webserver";
+#endif
 };
 
 // Declaration for the singleton pointer defined in game.cc

@@ -12,7 +12,7 @@ extern "C" {
 #include AVFORMAT_INCLUDE
 #include AVCODEC_INCLUDE
 }
-
+#ifdef USE_WEBSERVER
 Song::Song(web::json::value const& song): dummyVocal(TrackName::LEAD_VOCAL), randomIdx(rand()) {
 	path = song.has_field("TxtFileFolder") ? fs::path(song.at("TxtFileFolder").as_string().substr(0, song.at("TxtFileFolder").as_string().find_last_of("/\\"))) : "";
 	filename = song.has_field("TxtFile") ? fs::path(song.at("TxtFile").as_string()) : "";
@@ -53,9 +53,13 @@ Song::Song(web::json::value const& song): dummyVocal(TrackName::LEAD_VOCAL), ran
 	}		
 	if (song.has_field("GuitarTracks")) {
 			instrumentTracks.insert(std::make_pair(TrackName::GUITAR, InstrumentTrack(TrackName::GUITAR)));
-	}		
+	}
+	if (song.has_field("BPM")) {
+			m_bpms.push_back(BPM(0, 0, song.at("BPM").as_number().to_double()));
+	}
 	collateUpdate();
 }
+#endif
 
 Song::Song(fs::path const& path, fs::path const& filename):
   dummyVocal(TrackName::LEAD_VOCAL), path(path), filename(filename), randomIdx(rand())
@@ -173,7 +177,7 @@ VocalTrack& Song::getVocalTrack(size_t idx) {
 }
 
 double Song::getDurationSeconds() {
-	if(m_duration == 0) {
+	if(m_duration == 0.0 || m_duration < 1.0) {
 		AVFormatContext *pFormatCtx = avformat_alloc_context();
 		if (avformat_open_input(&pFormatCtx, music["background"].string().c_str(), nullptr, nullptr) == 0) {
 			avformat_find_stream_info(pFormatCtx, nullptr);
@@ -183,11 +187,10 @@ double Song::getDurationSeconds() {
 			return m_duration;
 		}
 		std::clog << "song/info: >>> Couldn't open file for calculating duration." << std::endl;
-		return 0;
+		return 0.0;
 	} else { //duration is still in memmory that means we already loaded it
 		return m_duration;
 	}
-	return 0;
 }
 
 std::string Song::str() const { return title + "  by  " + artist; }

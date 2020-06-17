@@ -69,11 +69,11 @@ void LayoutSinger::drawScore(PositionMode position) {
 		if (p->m_prevLineScore > 0.5 && fact > 0) {
 			std::string prevLineRank;
 			double fzoom = 3.0 / (2.0 + fact);
-			if (p->m_prevLineScore > 0.95) prevLineRank = "Perfect";
-			else if (p->m_prevLineScore > 0.9) prevLineRank = "Excellent";
-			else if (p->m_prevLineScore > 0.8) prevLineRank = "Great";
-			else if (p->m_prevLineScore > 0.6) prevLineRank = "Good";
-			else if (p->m_prevLineScore > 0.4) prevLineRank = "OK";
+			if (p->m_prevLineScore > 0.95) prevLineRank = _("Perfect");
+			else if (p->m_prevLineScore > 0.9) prevLineRank = _("Excellent");
+			else if (p->m_prevLineScore > 0.8) prevLineRank = _("Great");
+			else if (p->m_prevLineScore > 0.6) prevLineRank = _("Good");
+			else if (p->m_prevLineScore > 0.4) prevLineRank = _("OK");
 			m_line_rank_text[i%4]->render(prevLineRank);
 			switch(position) {
 				case LayoutSinger::FULL:

@@ -12,6 +12,7 @@ public:
 
 private:
 	void StartServer(int tried, bool fallbackPortInUse);
+	std::string getIPaddr();	
 	std::shared_ptr<std::thread> m_serverThread;
 	std::shared_ptr<RequestHandler> m_server;
 	Songs& m_songs;

@@ -39,14 +39,6 @@ private:
 	unsigned m_tsPerBeat = 0;  ///< The ts increment per beat
 	unsigned m_tsEnd = 0;  ///< The ending ts of the song
 	enum class CurrentSinger { P1, P2, BOTH } m_curSinger = CurrentSinger::P1;
-	struct BPM {
-		BPM (double _begin, double _ts, double bpm) :
-		begin (_begin), step (0.25 * 60.0 / bpm), ts (_ts) {}
-		double begin;  // Time in seconds
-		double step;  // Seconds per quarter note
-		double ts;
-	};
-	std::vector<BPM> m_bpms;
 	Song::Stops m_stops;  ///< Stops stored in <ts, duration> format
 	/// The following struct is cleared between tracks
 	struct TXTState {
@@ -59,7 +51,7 @@ private:
 	void vocalsTogether();
 	void guessFiles();
 	bool getline (std::string& line) { ++m_linenum; return (bool) std::getline (m_ss, line); }
-	BPM getBPM(double ts) const;
+	Song::BPM getBPM(Song const& s, double ts) const;
 	void addBPM(double ts, double bpm);
 	double tsTime(double ts) const;  ///< Convert a timestamp (beats) into time (seconds)
 	bool txtCheck(std::string const& data) const;

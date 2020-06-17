@@ -13,13 +13,16 @@
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
-#include <regex>
+#include "regex.hh"
 #include <stdexcept>
 
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
-#include <cpprest/json.h>
 #include <unicode/stsearch.h>
+
+#ifdef USE_WEBSERVER
+#include <cpprest/json.h>
+#endif
 
 Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), m_database(database), m_order(config["songs/sort-order"].i()) {
 	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
@@ -53,7 +56,10 @@ void Songs::reload_internal() {
 	std::clog << "songs/notice: Done loading the cache. You now have " << m_songs.size() << " songs in your list." << std::endl;
 	std::clog << "songs/notice: Starting to load all songs from disk, to update the cache." << std::endl;
 	Profiler prof("songloader");
+	Paths systemSongs = getPathsConfig("paths/system-songs");
 	Paths paths = getPathsConfig("paths/songs");
+	paths.insert(paths.begin(), systemSongs.begin(), systemSongs.end());
+
 	for (auto it = paths.begin(); m_loading && it != paths.end(); ++it) { //loop through stored directories from config
 		try {
 			if (!fs::is_directory(*it)) { std::clog << "songs/info: >>> Not scanning: " << *it << " (no such directory)\n"; continue; }
@@ -76,6 +82,7 @@ void Songs::reload_internal() {
 	doneLoading = true;
 }
 
+#ifdef USE_WEBSERVER
 void Songs::LoadCache() {
 	fs::path songsMetaFile = getCacheDir() / "Songs-Metadata.json";
 	std::ifstream file(songsMetaFile.string());
@@ -96,17 +103,24 @@ void Songs::LoadCache() {
     	return;
     }
 
-    auto stringList = config["paths/songs"].sl();
+	Paths systemSongs = getPathsConfig("paths/system-songs");
+	Paths localPaths = getPathsConfig("paths/songs");
+	localPaths.insert(localPaths.begin(), systemSongs.begin(), systemSongs.end());
+
+	std::vector<std::string> userSongs;
+	for(const fs::path& userSong : localPaths) {
+		userSongs.push_back(userSong.string());
+	}
 
     for(auto const& song : jsonRoot.as_array()) {
     	struct stat buffer;
     	auto songPath = song.at("TxtFile").as_string();
     	auto isSongPathInConfiguredPaths = std::find_if(
-                                                        stringList.begin(), 
-                                                        stringList.end(), 
-														[songPath](const std::string& stringListItem) { 
-															return songPath.find(stringListItem) != std::string::npos;
-														 }) != stringList.end();
+                                                        userSongs.begin(), 
+                                                        userSongs.end(), 
+														[songPath](const std::string& userSongItem) { 
+															return songPath.find(userSongItem) != std::string::npos;
+														 }) != userSongs.end();
     	if(_STAT(songPath.c_str(), &buffer) == 0 && isSongPathInConfiguredPaths) {
     		std::shared_ptr<Song> realSong(new Song(song));
     		m_songs.push_back(realSong);
@@ -168,11 +182,14 @@ void Songs::CacheSonglist() {
     	if(!song->music["vocals"].string().empty()) {
 	        songObject["Vocals"] = web::json::value::string(song->music["vocals"].string());
 	    }
-    	auto duration = song->getDurationSeconds();
+    	double duration = song->getDurationSeconds();
     	if(!std::isnan(duration)) {
-	    	songObject["Duration"] = web::json::value(duration);
+	    	songObject["Duration"] = web::json::value::number(duration);
 	    }
-
+	    if (!song->m_bpms.empty()) {
+			songObject["BPM"] = web::json::value::number(15 / song->m_bpms.front().step);
+		}
+			
 		// Cache songtype also.
 		if(song->hasVocals()) {
 			uint32_t vocals = song->vocalTracks.size();
@@ -211,11 +228,15 @@ void Songs::CacheSonglist() {
 		return;
 	}
 }
+#else 
+void Songs::LoadCache() { }
+void Songs::CacheSonglist() { }
+#endif
 
 void Songs::reload_internal(fs::path const& parent) {
 	if (std::distance(parent.begin(), parent.end()) > 20) { std::clog << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)\n"; return; }
 	try {
-		std::regex expression(R"((\.txt|^song\.ini|^notes\.xml|\.sm)$)", std::regex_constants::icase);
+		regex expression(R"((\.txt|^song\.ini|^notes\.xml|\.sm)$)", regex_constants::icase);
 		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) { //loop through files
 			fs::path p = dirIt->path();
 			if (fs::is_directory(p)) { reload_internal(p); continue; } //if the file is a folder redo this function with this folder as path

@@ -48,21 +48,21 @@ namespace {
 	std::string getRank(double error) {
 		double ac = accuracy(error);
 		if (error < 0.0) {
-			if (ac > .90) return "Perfect!";
-			if (ac > .80) return "Excellent!-";
-			if (ac > .70) return "Great!-";
-			if (ac > .60) return " Good!- ";
-			if (ac > .40) return "  OK!-  ";
-			if (ac > .20) return "Late!-";
-			return "Way off!";
+			if (ac > .90) return _("Perfect!");
+			if (ac > .80) return _("Excellent!-");
+			if (ac > .70) return _("Great!-");
+			if (ac > .60) return _(" Good!- ");
+			if (ac > .40) return _("  OK!-  ");
+			if (ac > .20) return _("Late!-");
+			return _("Way off!");
 		} else {
-			if (ac > .90) return "Perfect!";
-			if (ac > .80) return "-Excellent!";
-			if (ac > .70) return "-Great!";
-			if (ac > .60) return " -Good! ";
-			if (ac > .40) return "  -OK!  ";
-			if (ac > .20) return "-Early!";
-			return "Way off!";
+			if (ac > .90) return _("Perfect!");
+			if (ac > .80) return _("-Excellent!");
+			if (ac > .70) return _("-Great!");
+			if (ac > .60) return _(" -Good! ");
+			if (ac > .40) return _("  -OK!  ");
+			if (ac > .20) return _("-Early!");
+			return _("Way off!");
 		}
 	}
 
@@ -525,7 +525,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			double sc = getScale() * 0.6 * arrowSize * (3.0 + glow);
 			Transform trans(glmath::translate(glmath::vec3(0.0, 0.0, 0.5 * glow))); // Slightly elevated
 			ColorTrans c(Color::alpha(std::sqrt(alpha)));
-			m_popupText->render(text);
+			m_popupText->render(_(text));
 			m_popupText->dimensions().middle(x).center(time2y(0.0)).stretch(sc, sc/2.0);
 			m_popupText->draw();
 		}

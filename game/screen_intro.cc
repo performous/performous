@@ -9,6 +9,8 @@
 #include "theme.hh"
 #include "menu.hh"
 
+#include <SDL_timer.h>
+
 ScreenIntro::ScreenIntro(std::string const& name, Audio& audio): Screen(name), m_audio(audio), m_first(true) {
 }
 
@@ -190,44 +192,20 @@ void ScreenIntro::populateMenu() {
 }
 
 #ifdef USE_WEBSERVER
-// FIXME: Move most of this code to webserver.cc. In particular, print the IP address you actually bind to, not something else.
 
 void ScreenIntro::draw_webserverNotice() {
 	if(m_webserverNoticeTimeout.get() == 0) {
 		m_drawNotice = !m_drawNotice;
-		m_webserverNoticeTimeout.setValue(2);
+		m_webserverNoticeTimeout.setValue(5);
 	}
 	std::stringstream m_webserverStatusString;
-	if(webserversetting == 1 && m_drawNotice) {
-		m_webserverStatusString << _("Webserver active!\n use a webbrowser\nand navigate to localhost:") << config["game/webserver_port"].i();
-		theme->WebserverNotice.draw(m_webserverStatusString.str());
-	}
-	else if(webserversetting == 2 && m_drawNotice) {
-		if(m_ipaddr.empty()) {
-			m_ipaddr = getIPaddr();
-		}
-		m_webserverStatusString << _("Webserver active!\n connect to this computer\nusing ") << m_ipaddr << ":" << config["game/webserver_port"].i();
+	if((webserversetting == 1 || webserversetting == 2) && m_drawNotice) {
+		std::string message = Game::getSingletonPtr()->subscribeWebserverMessages();		
+		m_webserverStatusString << _("Webserver active!\n connect to this computer\nusing: ") << message;
 		theme->WebserverNotice.draw(m_webserverStatusString.str());
 	}
 }
 
-
-std::string ScreenIntro::getIPaddr() {
-	try {
-		boost::asio::io_service netService;
-		boost::asio::ip::udp::resolver resolver(netService);
-		boost::asio::ip::udp::resolver::query query(boost::asio::ip::udp::v4(), "8.8.8.8", "80");
-		boost::asio::ip::udp::resolver::iterator endpoints = resolver.resolve(query);
-		boost::asio::ip::udp::endpoint ep = *endpoints;
-		boost::asio::ip::udp::socket socket(netService);
-		socket.connect(ep);
-		boost::asio::ip::address addr = socket.local_endpoint().address();
-		return addr.to_string();
-	} catch(std::exception& e) {
-		std::string ip = boost::asio::ip::host_name();
-		return ip.empty() ? "localhost" : ip;
-	}
-}
 #else
 void ScreenIntro::draw_webserverNotice() {}
 #endif

@@ -101,7 +101,7 @@
 					}
 					}
 				}
-				if (didMigrateConfig) { std::clog << "fs/info: Succesfully moved configuration files to their new location: " << conf.string() << std::endl; }
+				if (didMigrateConfig) { std::clog << "fs/info: Successfully moved configuration files to their new location: " << conf.string() << std::endl; }
 				}
 			// Data dirs
 			std::string logmsg = "fs/info: Determining data dirs (search path):\n";

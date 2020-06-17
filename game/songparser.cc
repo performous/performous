@@ -1,11 +1,13 @@
 #include "songparser.hh"
+#include "unicode.hh"
+#include "regex.hh"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem/fstream.hpp>
-#include <regex>
 
 
 namespace SongParserUtil {
+
 	void assign (int& var, std::string const& str) {
 		try {
 			var = std::stoi (str);
@@ -29,10 +31,11 @@ namespace SongParserUtil {
 		}
 	}
 	void assign (bool& var, std::string const& str) {
-		if ((str == "YES") || (str == "yes") || (str == "1")) {var = true; } else if ((str == "NO") || (str == "no") || (str == "0")) {
-			var = false;
-		}
-		else { throw std::runtime_error ("Invalid boolean value: " + str); }
+		auto lowerStr = UnicodeUtil::toLower(str);
+		auto is_yes = lowerStr == "yes" || str == "1";
+		auto is_no = lowerStr == "no" || str == "0";
+		if (!is_yes && !is_no) { throw std::runtime_error ("Invalid boolean value: " + str); }
+		var = is_yes;
 	}
 	void eraseLast (std::string& s, char ch) {
 		if (!s.empty() && (*s.rbegin() == ch)) {s.erase (s.size() - 1); }
@@ -70,6 +73,11 @@ SongParser::SongParser(Song& s): m_song(s) {
 		}
 		// Header already parsed?
 		if (s.loadStatus == Song::LoadStatus::HEADER) {
+			if (!s.m_bpms.empty()) {
+				double bpm = (15 / s.m_bpms.front().step);
+				s.m_bpms.clear();
+				addBPM(0, bpm);
+			}
 			if (type == TXT) txtParse();
 			else if (type == INI) midParse();  // INI doesn't contain notes, parse those from MIDI
 			else if (type == XML) xmlParse();
@@ -128,7 +136,7 @@ void SongParser::guessFiles () {
 	std::string logMissing, logFound;
 
 	// Run checks, remove bogus values and construct regexps
-	std::vector<std::regex> regexps;
+	std::vector<regex> regexps;
 	bool missing = false;
 	for (auto const& p : fields) {
 		fs::path& file = *p.first;
@@ -137,7 +145,7 @@ void SongParser::guessFiles () {
 			file.clear();
 		}
 		if (file.empty()) { missing = true; }
-		regexps.emplace_back (p.second, std::regex_constants::icase);
+		regexps.emplace_back (p.second, regex_constants::icase);
 	}
 	
 	if (!missing) {
@@ -229,7 +237,7 @@ void SongParser::finalize () {
 				
 				// Try to fix overlapping syllables.
 				if (next != vocal.notes.end() && Note::overlapping(*itn, *next)) {
-					double beatDur = getBPM(itn->begin).step;
+					double beatDur = getBPM(m_song, itn->begin).step;
 					double newEnd = (next->begin - beatDur);
 					std::clog << "songparser/info: Trying to correct duration of overlapping notes (" << itn->syllable << " & " << next->syllable << ")..." << std::endl;
 					std::clog << "songparser/info: Changing ending to: " << newEnd << ", will give a length of: " << (newEnd - (itn->begin)) << std::endl;
@@ -277,28 +285,30 @@ void SongParser::finalize () {
 	}
 }
 
-SongParser::BPM SongParser::getBPM(double ts) const {
-	for (auto& itb: boost::adaptors::reverse(m_bpms)) {
+Song::BPM SongParser::getBPM(Song const& s, double ts) const {
+	for (auto& itb: boost::adaptors::reverse(s.m_bpms)) {
 		if (itb.begin <= ts) return itb;
 	}
 	throw std::runtime_error("No BPM definition prior to this note...");
 }
 
 void SongParser::addBPM(double ts, double bpm) {
+	Song& s = m_song;
 	if (!(( bpm >= 1.0) && ( bpm < 1e12) )) { throw std::runtime_error("Invalid BPM value"); }
-	if (!m_bpms.empty() && ( m_bpms.back().ts >= ts) ) {
-		if (m_bpms.back().ts < ts) { throw std::runtime_error("Invalid BPM timestamp"); }
-		m_bpms.pop_back();	// Some ITG songs contain repeated BPM definitions...
+	if (!s.m_bpms.empty() && ( s.m_bpms.back().ts >= ts) ) {
+		if (s.m_bpms.back().ts < ts) { throw std::runtime_error("Invalid BPM timestamp"); }
+		s.m_bpms.pop_back();	// Some ITG songs contain repeated BPM definitions...
 	}
-	m_bpms.push_back (BPM (tsTime (ts), ts, bpm));
+	s.m_bpms.push_back (Song::BPM (tsTime (ts), ts, bpm));
 }
 
 double SongParser::tsTime(double ts) const {
-	if (m_bpms.empty()) {
+	Song& s = m_song;
+	if (s.m_bpms.empty()) {
 		if (ts != 0) { throw std::runtime_error("BPM data missing"); }
 		return m_gap;
 	}
-	for (std::vector<BPM>::const_reverse_iterator it = m_bpms.rbegin(); it != m_bpms.rend(); ++it) {
+	for (std::vector<Song::BPM>::const_reverse_iterator it = s.m_bpms.rbegin(); it != s.m_bpms.rend(); ++it) {
 		if (it->ts <= ts) { return it->begin + (ts - it->ts) * it->step; }
 	}
 	throw std::logic_error("INTERNAL ERROR: BPM data invalid");

@@ -1,29 +1,30 @@
 version: v1.0
-name: Performous Build on Ubuntu 18.04 
+name: Performous build
 agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
-blocks:    
+blocks:
   - name: Ubuntu 18.04 Build
+    dependencies: []
     task:
       prologue:
         commands:
-          - echo "Installing Performous Dependencies..."
+          - echo "Installing Performous dependencies..."
           - sudo apt -y update
-          - sudo apt -y install cmake gettext help2man clang gcc-7 g++-7 libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libopencv-dev libportmidi-dev libqrencode-dev libicu-dev libcpprest-dev libglm-dev
+          - sudo apt -y install cmake gettext help2man clang gcc-7 g++-7 libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libopencv-dev libportmidi-dev libqrencode-dev libicu-dev libcpprest-dev libglm-dev libopenblas-dev libfftw3-dev
       jobs:
         - name: GCC-7 Build
           env_vars:
-             - name: CC
-               value: gcc-7
-             - name: CXX
-               value: g++-7
+            - name: CC
+              value: gcc-7
+            - name: CXX
+              value: g++-7
           commands:
-             - checkout
-             - git submodule init && git submodule update
-             - mkdir build.gcc && cd build.gcc && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
-             - make VERBOSE=1
+            - checkout
+            - git submodule init && git submodule update
+            - mkdir build.gcc && cd build.gcc && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
+            - make VERBOSE=1
         - name: Clang-6.0 Build
           env_vars:
             - name: CC
@@ -31,7 +32,41 @@ blocks:
             - name: CXX
               value: clang++
           commands:
-             - checkout
-             - git submodule init && git submodule update
-             - mkdir build.clang && cd build.clang && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
-             - make VERBOSE=1
+            - checkout
+            - git submodule init && git submodule update
+            - mkdir build.clang && cd build.clang && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
+            - make VERBOSE=1
+  - name: MacOS 10.14.6 Build    
+    dependencies: []
+    task:
+      agent:
+        machine:
+          type: a1-standard-4
+          os_image: macos-mojave-xcode11
+      secrets:
+        - name: macos-ci-pubkey
+        - name: check-deps-script
+        - name: ignore-ci-homebrew
+      prologue:
+        commands:
+          - echo Trying to restore cache...
+          - ssh-keyscan -p 29920 66.185.20.68 >> ~/.ssh/known_hosts
+          - chmod 400 ~/.ssh/semaphore_cache_key
+          - cache restore new-macports-prefix
+          - sudo chmod +x /Users/semaphore/check-install-macports.sh
+          - export PATH="/Users/semaphore/local/bin:/Users/semaphore/local/sbin:$PATH"
+          - mkdir -p ./local
+          - sudo ln -sf /Users/semaphore/local/ /opt/local
+          - test -e /Users/semaphore/local/.deps_installed || /Users/semaphore/check-install-macports.sh | cat 2>&1
+      jobs:
+        - name: Generate app bundle
+          commands:
+            - checkout
+            - git submodule init && git submodule update
+            - patch --verbose -ui /Users/semaphore/patch-cmake-ignore-CI-homebrew.patch
+            - cd osx-utils
+            - chmod +x ./performous-app-build.sh
+            - ./performous-app-build.sh -D
+            - cd /Users/semaphore
+            - rm -rf /Users/semaphore/local/var/macports/distfiles/* /Users/semaphore/local/var/macports/software/* /Users/semaphore/local/var/macports/sources/*
+            - cache store new-macports-prefix ./local
