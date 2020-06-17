@@ -74,6 +74,28 @@ namespace {
 		if (!f) throw std::runtime_error("File cannot be read: " + path.string());
 		return ret;
 	}
+	
+	nlohmann::json readJSON(fs::path const& filename) {
+		nlohmann::json json;
+		std::clog << "json/debug: Will try to parse JSON in: " << filename.string() << std::endl;
+		std::ifstream file(filename.string());
+		if (!file.is_open()) throw std::runtime_error("Can't open file.");
+			try {
+	        	json = nlohmann::json::parse(file);
+	        	file.close();
+    			return json;
+	    	} catch(nlohmann::json::exception const& e) {
+    			if (file.is_open()) { 
+    				file.close();
+    			}
+				std::clog << "json/error: " << e.what() << std::endl;
+    		} catch(std::exception const& e) {
+    			if (file.is_open()) { file.close(); }
+				std::clog << "fs/error: " << e.what() << std::endl;
+    	}
+		return nlohmann::json();
+	}
+	
 
 void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destinationDir)
 {

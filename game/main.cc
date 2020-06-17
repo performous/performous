@@ -14,7 +14,6 @@
 #include "songs.hh"
 #include "video_driver.hh"
 #include "webcam.hh"
-#include "webserver.hh"
 
 // Screens
 #include "screen_intro.hh"
@@ -141,8 +140,7 @@ void mainLoop(std::string const& songlist) {
 		} catch (RUNTIME_ERROR& e) {
 			std::cerr << "ERROR: " << e.what() << std::endl;
 		}
-	Game gm(*window, audio);
-	WebServer server(songs);
+	Game gm(*window, audio, songs);
 	try {
 		// Load audio samples
 		gm.loading(_("Loading audio samples..."), 0.5);
