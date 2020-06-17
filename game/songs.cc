@@ -577,3 +577,13 @@ Song const& Songs::current(bool webServer) const {
 	return *getSongs(webServer).front();
 }
 
+std::shared_ptr<Song> Songs::currentPtr(bool webServer) {
+	std::shared_ptr<Song> temp = nullptr;
+	try {
+		temp = getSongs(webServer).at(math_cover.getTarget());
+	} catch (std::out_of_range const& e) {
+		std::clog << "songs/error: invalid pointer to a song with id: " << math_cover.getTarget() << std::endl;
+	}
+	return temp;
+}
+
