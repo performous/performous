@@ -30,7 +30,7 @@ class Songs {
 	SongVector& getSongs(bool webServer = false) { return (webServer ? m_webServerFiltered : m_filtered); }
 	SongVector const& getSongs(bool webServer = false) const { return (webServer ? m_webServerFiltered : m_filtered); }
 	/// number of songs
-	int size(bool webServer = false) const { return getSongs(webServer).size(); }
+	size_t size(bool webServer = false) const { return getSongs(webServer).size(); }
 	/// true if empty
 	bool empty(bool webServer = false) const { return getSongs(webServer).empty(); }
 	/// advances to next song
@@ -41,7 +41,7 @@ class Songs {
 		math_cover.setTarget(_current, size(webServer));
 	}
 	/// get current id
-	int currentId() const { return math_cover.getTarget(); }
+	size_t currentId() const { return math_cover.getTarget(); }
 	/// gets current position
 	double currentPosition() { return math_cover.getValue(); }
 	/// gets current velocity
@@ -49,8 +49,7 @@ class Songs {
 	/// sets margins for animation
 	void setAnimMargins(double left, double right) { math_cover.setMargins(left, right); }
 	/// @return current song
-	std::shared_ptr<Song> currentPtr(bool webServer = false) {
-		return getSongs(webServer).empty() ? std::shared_ptr<Song>() : getSongs(webServer)[math_cover.getTarget()]; }
+	std::shared_ptr<Song> currentPtr(bool webServer = false);
 	/// @return current Song
 	Song const& current(bool webServer = false) const;
 	/// filters songlist by regular expression
