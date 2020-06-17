@@ -9,10 +9,10 @@
 #include <sstream>
 #include <thread>
 #include <vector>
-#include "screen.hh"
 
 class Song;
 class Database;
+using SongVector = std::vector<std::shared_ptr<Song>>;
 
 /// songs class for songs screen
 class Songs {
@@ -27,18 +27,18 @@ class Songs {
 	/// reloads songlist
 	void reload();
 	/// array access
-	std::shared_ptr<Song> operator[](std::size_t pos) { return m_filtered[pos]; }
+	SongVector& getSongs(bool webServer = false) { return (webServer ? m_webServerFiltered : m_filtered); }
+	SongVector const& getSongs(bool webServer = false) const { return (webServer ? m_webServerFiltered : m_filtered); }
 	/// number of songs
-	int size() const { return m_filtered.size(); }
+	int size(bool webServer = false) const { return getSongs(webServer).size(); }
 	/// true if empty
-	int empty() const { return m_filtered.empty(); }
+	bool empty(bool webServer = false) const { return getSongs(webServer).empty(); }
 	/// advances to next song
-	void advance(int diff) {
-		int size = m_filtered.size();
-		if (size == 0) return;  // Do nothing if no songs are available
-		int _current = (int(math_cover.getTarget()) + diff) % size;
-		if (_current < 0) _current += size;
-		math_cover.setTarget(_current, size);
+	void advance(int diff, bool webServer = false) {
+		if (empty(webServer)) return;  // Do nothing if no songs are available
+		int _current = (int(math_cover.getTarget()) + diff) % size(webServer);
+		if (_current < 0) _current += size(webServer);
+		math_cover.setTarget(_current, size(webServer));
 	}
 	/// get current id
 	int currentId() const { return math_cover.getTarget(); }
@@ -49,27 +49,26 @@ class Songs {
 	/// sets margins for animation
 	void setAnimMargins(double left, double right) { math_cover.setMargins(left, right); }
 	/// @return current song
-	std::shared_ptr<Song> currentPtr() { return m_filtered.empty() ? std::shared_ptr<Song>() : m_filtered[math_cover.getTarget()]; }
-	/// @return current song
-	Song& current() { return *m_filtered[math_cover.getTarget()]; }
+	std::shared_ptr<Song> currentPtr(bool webServer = false) {
+		return getSongs(webServer).empty() ? std::shared_ptr<Song>() : getSongs(webServer)[math_cover.getTarget()]; }
 	/// @return current Song
-	Song const& current() const { return *m_filtered[math_cover.getTarget()]; }
+	Song const& current(bool webServer = false) const;
 	/// filters songlist by regular expression
-	void setFilter(std::string const& regex);
+	void setFilter(std::string const& regex, bool webServer = false);
 	/// Get the current song type filter number
 	int typeNum() const { return m_type; }
 	/// Description of the current song type filter
 	std::string typeDesc() const;
 	/// Change song type filter (diff is normally -1 or 1; 0 has special meaning of reset)
-	void typeChange(int diff);
+	void typeChange(int diff, bool webServer = false);
 	/// Cycle song type filters by filter category (0 = none, 1..4 = different categories)
-	void typeCycle(int cat);
-	int sortNum() const { return m_order; }
+	void typeCycle(int cat, bool webServer = false);
+	int& sortNum(bool webServer = false) { return (webServer ? m_webServerOrder : m_order); }
 	/// Description of the current sort mode
 	std::string sortDesc() const;
 	/// Change sorting mode (diff is normally -1 or 1)
-	void sortChange(int diff);
-	void sortSpecificChange(int sortOrder, bool descending = false);
+	void sortChange(int diff, bool webServer = false);
+	void sortSpecificChange(int sortOrder, bool descending = false, bool webServer = false);
 	/// parses file into Song &tmp
 	void parseFile(Song& tmp);
 	std::atomic<bool> doneLoading{ false };
@@ -79,26 +78,26 @@ class Songs {
   private:
   	void LoadCache();
 	void CacheSonglist();
-
 	class RestoreSel;
-	typedef std::vector<std::shared_ptr<Song> > SongVector;
 	std::string m_songlist;
-	SongVector m_songs, m_filtered;
 	AnimValue m_updateTimer;
-	AnimAcceleration math_cover;
 	std::string m_filter;
 	Database & m_database;
 	int m_type = 0;
 	int m_order;  // Set by constructor
+	int m_webServerType = 0; // Not used now, but it might be in the future.
+	int m_webServerOrder = 2;
 	void dumpSongs_internal() const;
 	void reload_internal();
 	void reload_internal(fs::path const& p);
 	void randomize_internal();
-	void filter_internal();
-	void sort_internal(bool descending = false);
+	void filter_internal(bool webServer = false);
+	void sort_internal(bool descending = false, bool webServer = false);
 	std::atomic<bool> m_dirty{ false };
 	std::atomic<bool> m_loading{ false };
 	std::unique_ptr<std::thread> m_thread;
 	mutable std::mutex m_mutex;
+  protected:
+    AnimAcceleration math_cover;
+	SongVector m_songs, m_filtered, m_webServerFiltered;
 };
-
