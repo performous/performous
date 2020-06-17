@@ -1,4 +1,5 @@
 #include "songparser.hh"
+#include "unicode.hh"
 #include "regex.hh"
 
 #include <boost/algorithm/string.hpp>
@@ -6,6 +7,7 @@
 
 
 namespace SongParserUtil {
+
 	void assign (int& var, std::string const& str) {
 		try {
 			var = std::stoi (str);
@@ -29,10 +31,11 @@ namespace SongParserUtil {
 		}
 	}
 	void assign (bool& var, std::string const& str) {
-		if ((str == "YES") || (str == "yes") || (str == "1")) {var = true; } else if ((str == "NO") || (str == "no") || (str == "0")) {
-			var = false;
-		}
-		else { throw std::runtime_error ("Invalid boolean value: " + str); }
+		auto lowerStr = UnicodeUtil::toLower(str);
+		auto is_yes = lowerStr == "yes" || str == "1";
+		auto is_no = lowerStr == "no" || str == "0";
+		if (!is_yes && !is_no) { throw std::runtime_error ("Invalid boolean value: " + str); }
+		var = is_yes;
 	}
 	void eraseLast (std::string& s, char ch) {
 		if (!s.empty() && (*s.rbegin() == ch)) {s.erase (s.size() - 1); }
