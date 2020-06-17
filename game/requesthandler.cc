@@ -98,13 +98,12 @@ std::unique_ptr<Performous_Router_t> RequestHandler::init_webserver_router() {
 		if (path == "api/getDataBase.json") { // Get database
         m_songs.setFilter(std::string(), true);
         size_t sort = 1;
-        bool descending = (query.has("order") && query["order"] == "descending");
-        if (query.has("order")) {
-        	std::string order(query["order"]);
-        	if (UnicodeUtil::toLower(order) == "title") sort = 1;
-        	else if (UnicodeUtil::toLower(order) == "artist") sort = 2;
-        	else if (UnicodeUtil::toLower(order) == "edition") sort = 3;
-        	else if (UnicodeUtil::toLower(order) == "language") sort = 6;
+        bool descending = (query.has("order") && query.get_param("order").value() == "descending");
+        if (query.has("sort")) {
+        	if (query["sort"] == "title") sort = 1;
+        	else if (query["sort"] == "artist") sort = 2;
+        	else if (query["sort"] == "edition") sort = 3;
+        	else if (query["sort"] == "language") sort = 6;
         	m_songs.sortSpecificChange(sort, descending, true);
         }
         nlohmann::json jsonRoot = SongsToJsonObject();
@@ -134,7 +133,7 @@ std::unique_ptr<Performous_Router_t> RequestHandler::init_webserver_router() {
         else if (path == "api/getCurrentPlaylist.json") {
         Game* gm = Game::getSingletonPtr();
         nlohmann::json jsonRoot = nlohmann::json::array();
-        for (auto const& song : gm->getCurrentPlayList().getList()) {
+        for (std::shared_ptr<Song> const& song : gm->getCurrentPlayList().getList()) {
             nlohmann::json songObject;
             songObject["Title"] = song->title;
             songObject["Artist"] = song->artist;
@@ -287,13 +286,13 @@ std::unique_ptr<Performous_Router_t> RequestHandler::init_webserver_router() {
 			auto query = jsonPostBody.find("query");
 			m_songs.setFilter(*query, true);
 			nlohmann::json jsonRoot = nlohmann::json::array();
-			for(auto song = m_songs.begin(true); song != m_songs.end(true); song++) {
+			for(std::shared_ptr<Song> const& song: m_songs.getSongs(true)) {
 				nlohmann::json songObject;
-				songObject["Title"] = song->get()->title;
-				songObject["Artist"] = song->get()->artist;
-				songObject["Edition"] = song->get()->edition;
-				songObject["Language"] = song->get()->language;
-				songObject["Creator"] = song->get()->creator;
+				songObject["Title"] = song->title;
+				songObject["Artist"] = song->artist;
+				songObject["Edition"] = song->edition;
+				songObject["Language"] = song->language;
+				songObject["Creator"] = song->creator;
 				jsonRoot.push_back(songObject);
 			}
 			init_resp(request->create_response(restinio::status_ok()),std::string("application/json"))	
@@ -363,7 +362,7 @@ restinio::request_handling_status_t RequestHandler::HandleFile(std::shared_ptr<r
 
 nlohmann::json RequestHandler::SongsToJsonObject() {
     nlohmann::json jsonRoot = nlohmann::json::array();
-    for (auto const& song: m_songs) {
+    for (std::shared_ptr<Song> const& song: (m_songs.getSongs(true))) {
         nlohmann::json songObject;
         songObject["Title"] = song->title;
         songObject["Artist"] = song->artist;
@@ -378,8 +377,7 @@ nlohmann::json RequestHandler::SongsToJsonObject() {
 
 std::shared_ptr<Song> RequestHandler::GetSongFromJSON(nlohmann::json jsonDoc) {
     m_songs.setFilter(std::string(), true);
-
-    for (auto const& song: m_songs) {
+    for (std::shared_ptr<Song> const& song: m_songs.getSongs(true)) {
         if(song->title == jsonDoc["Title"] &&
            song->artist == jsonDoc["Artist"] &&
            song->edition == jsonDoc["Edition"] &&

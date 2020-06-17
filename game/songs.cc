@@ -116,8 +116,7 @@ void Songs::LoadCache() {
 
 void Songs::CacheSonglist() {
     nlohmann::json jsonRoot = nlohmann::json::array();
-	for (auto const& song : m_songs)
-    {  
+	for (std::shared_ptr<Song> const& song : getSongs()) {  
         nlohmann::json songObject;
         if (!song->path.string().empty()) {
         	songObject["TxtFileFolder"] = song->path.string();
@@ -234,11 +233,11 @@ void Songs::reload_internal(fs::path const& parent) {
 				std::shared_ptr<Song>s(new Song(p.parent_path(), p));
 				std::lock_guard<std::mutex> l(m_mutex);
 				int AdditionalFileIndex = -1;
-				for(unsigned int i = 0; i< m_songs.size(); i++) {
-					if (s->filename.extension() != m_songs[i]->filename.extension() && s->filename.stem() == m_songs[i]->filename.stem() &&
-							s->title == m_songs[i]->title && s->artist == m_songs[i]->artist) {
-						std::clog << "songs/info: >>> Found additional song file: " << s->filename << " for: " << m_songs[i]->filename << std::endl;
-						AdditionalFileIndex = i;
+				for (std::shared_ptr<Song>& song: getSongs()) {
+					if (s->filename.extension() != song->filename.extension() && s->filename.stem() == song->filename.stem() &&
+							s->title == song->title && s->artist == song->artist) {
+						std::clog << "songs/info: >>> Found additional song file: " << s->filename << " for: " << song->filename << std::endl;
+						AdditionalFileIndex = (std::addressof(song)-std::addressof(m_songs.front())); // This works because we're working with a std::vector.
 					}
 				}				
 
@@ -295,7 +294,7 @@ void Songs::update() {
 }
 
 void Songs::setFilter(std::string const& val, bool webServer) {
-	if (m_filter == val) return;
+	if ((m_filter == val) && !val.empty()) { return; } // No need to update, unless filter is empty, then go ahead to populate the container.
 	m_filter = val;
 	filter_internal(webServer);
 }
@@ -304,7 +303,7 @@ void Songs::filter_internal(bool webServer) {
 	m_updateTimer.setValue(0.0);
 	std::lock_guard<std::mutex> l(m_mutex);
 	m_dirty = false;
-	RestoreSel restore(*this, webServer ? m_webServerFiltered : m_filtered);
+	RestoreSel restore(*this, getSongs());
 	try {
 		SongVector filtered;
 		// if filter text is blank and no type filter is set, just display all songs.
@@ -333,9 +332,9 @@ void Songs::filter_internal(bool webServer) {
 				return true;
 			});
 		}
-		(webServer ? m_webServerFiltered : m_filtered).swap(filtered);
+		getSongs(webServer).swap(filtered);
 	} catch (...) {
-		SongVector(m_songs.begin(), m_songs.end()).swap(webServer ? m_webServerFiltered : m_filtered);  // Invalid regex => copy everything
+		getSongs(webServer) = m_songs; // Invalid regex => copy everything
 	}
 	sort_internal(false, webServer);
 }
@@ -437,11 +436,11 @@ std::string Songs::sortDesc() const {
 }
 
 void Songs::sortChange(int diff, bool webServer) {
-	m_order = (m_order + diff) % orders;
-	if (m_order < 0) m_order += orders;
-	RestoreSel restore(*this, webServer ? m_webServerFiltered : m_filtered);
-	config["songs/sort-order"].i() = m_order;
-	switch (m_order) {
+	sortNum(webServer) = (sortNum(webServer) + diff) % orders;
+	if (sortNum(webServer) < 0) sortNum(webServer) += orders;
+	RestoreSel restore(*this, getSongs());
+	if (!webServer) { config["songs/sort-order"].i() = sortNum(); }
+	switch (sortNum(webServer)) {
 		case 1:
 		 [[fallthrough]];
 		case 2:
@@ -464,21 +463,21 @@ void Songs::sortChange(int diff, bool webServer) {
 
 void Songs::sortSpecificChange(int sortOrder, bool descending, bool webServer) {
 	if (sortOrder < 0) {
-		m_order = 0;
+		sortNum(webServer) = 0;
 	} else if (sortOrder <= 6) {
-		m_order = sortOrder;
+		sortNum(webServer) = sortOrder;
 	} else {
-		m_order = 0;
+		sortNum(webServer) = 0;
 	}
-	RestoreSel restore(*this, webServer ? m_webServerFiltered : m_filtered);
-	config["songs/sort-order"].i() = m_order;
+	RestoreSel restore(*this, getSongs());
+	if (!webServer) { config["songs/sort-order"].i() = sortNum(); }
 	sort_internal(descending, webServer);
 }
 
 void Songs::sort_internal(bool descending, bool webServer) {
-SongVector& vector = (webServer ? m_webServerFiltered : m_filtered);
+SongVector& vector = getSongs(webServer);
 	if (descending) {
-		switch (m_order) {
+		switch (sortNum(webServer)) {
 		  case 0: std::stable_sort(vector.begin(), vector.end(), customComparator(&Song::randomIdx)); break;
 		  case 1: std::sort(vector.rbegin(), vector.rend(), customComparator(&Song::collateByTitle)); break;
 		  case 2: std::sort(vector.rbegin(), vector.rend(), customComparator(&Song::collateByArtist)); break;
@@ -489,7 +488,7 @@ SongVector& vector = (webServer ? m_webServerFiltered : m_filtered);
 		  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
 		}
 	} else {
-		switch (m_order) {
+		switch (sortNum(webServer)) {
 		  case 0: std::stable_sort(vector.begin(), vector.end(), customComparator(&Song::randomIdx)); break;
 		  case 1: std::sort(vector.begin(), vector.end(), customComparator(&Song::collateByTitle)); break;
 		  case 2: std::sort(vector.begin(), vector.end(), customComparator(&Song::collateByArtist)); break;
@@ -542,5 +541,14 @@ void Songs::dumpSongs_internal() const {
 	fs::path coverpath = fs::path(m_songlist) / "covers";
 	fs::create_directories(coverpath);
 	dumpXML(svec, m_songlist + "/songlist.xml");
+}
+
+Song const& Songs::current(bool webServer) const {
+	try {
+			return *(getSongs(webServer))[math_cover.getTarget()];
+	} catch (std::exception const& e) {
+			std::clog << "songs/error: Error attempting to access song, " << e.what() << std::endl;
+	}
+	return *getSongs(webServer).front();
 }
 
