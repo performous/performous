@@ -76,11 +76,36 @@ OpenGLText::OpenGLText(TextStyle& _text, double m, WrappingStyle const& wrapping
 	std::shared_ptr<PangoLayout> layout(
 	  pango_layout_new(ctx.get()),
 	  g_object_unref);
-	pango_layout_set_wrap(layout.get(), PANGO_WRAP_WORD);
-	pango_layout_set_ellipsize(layout.get(), PANGO_ELLIPSIZE_NONE);
+	pango_layout_set_wrap(layout.get(), PANGO_WRAP_WORD_CHAR);
+	PangoEllipsizeMode ellipsize;
+	int maxWidth = -1;
+	switch (wrapping.m_ellipsize) {
+		case WrappingStyle::EllipsizeMode::NONE:
+			ellipsize = (wrapping.m_maxLines == -1) ? PANGO_ELLIPSIZE_NONE : PANGO_ELLIPSIZE_MIDDLE;
+			break;
+		case WrappingStyle::EllipsizeMode::START:
+			ellipsize = PANGO_ELLIPSIZE_START;
+			break;
+		case WrappingStyle::EllipsizeMode::MIDDLE:
+			ellipsize = PANGO_ELLIPSIZE_MIDDLE;
+			break;
+		case WrappingStyle::EllipsizeMode::END:
+			ellipsize = PANGO_ELLIPSIZE_END;
+			break;
+	}
+	if (wrapping.m_maxWidth != 0) { //FIXME: Got to adjust the maximum width according to the x_position.
 		std::clog << "txt/debug: float targetWidth (" << std::to_string(static_cast<float>(targetWidth)) << ")" << ", float m (" << std::to_string(static_cast<float>(m)) << "), float PANGO_SCALE (" << std::to_string(static_cast<float>(PANGO_SCALE)) << ")" << std::endl;
+		float width = static_cast<float>(targetWidth) * static_cast<float>(m) * static_cast<float>(PANGO_SCALE);
 		std::clog << "txt/debug: float width before dividing and rounding (" << std::to_string(width) << ")" << std::endl;
+		width = std::round(width * (static_cast<float>(wrapping.m_maxWidth) / 100.0));
 		std::clog << "txt/debug: float width (" << std::to_string(width) << ")" << std::endl;
+		maxWidth = width;
+	}
+	pango_layout_set_ellipsize(layout.get(), ellipsize);
+	pango_layout_set_width(layout.get(), maxWidth);
+	if (wrapping.m_maxLines < 0) {
+		pango_layout_set_height(layout.get(), wrapping.m_maxLines);
+	}
 	std::clog << "txt/debug: Text " << _text.text << ", wrapping: maxLines(" << wrapping.m_maxLines << "), maxWidth(" << std::to_string(maxWidth) << "), ellipsize(" << std::to_string(ellipsize) << ")" << std::endl;
 	pango_layout_set_single_paragraph_mode(layout.get(), false);
 	pango_layout_set_alignment(layout.get(), alignment);
