@@ -50,6 +50,41 @@ struct TextStyle {
 	std::string text; ///< text
 	TextStyle(): stroke_width(), stroke_miterlimit(1.0), fontsize() {}
 };
+	
+/// Convenience container for deciding how a given OpenGLText instance will be wrapped, ellipsized or fitted to the display area.
+struct WrappingStyle {
+	enum class EllipsizeMode { NONE, START, MIDDLE, END };
+
+	/// constructor
+	WrappingStyle(unsigned short int _maxWidth = 0, EllipsizeMode _ellipsize = EllipsizeMode::NONE, unsigned short int _maxLines = 1);
+	
+	/// setters
+	WrappingStyle& ellipsizeNone(unsigned short int lines = 1) { m_maxLines = (lines * -1); m_ellipsize = EllipsizeMode::NONE; return *this; }
+	WrappingStyle& ellipsizeStart(unsigned short int lines = 1) { m_maxLines = (lines * -1); m_ellipsize = EllipsizeMode::START; return *this; }
+	WrappingStyle& ellipsizeMiddle(unsigned short int lines = 1) { m_maxLines = (lines * -1); m_ellipsize = EllipsizeMode::MIDDLE; return *this; }
+	WrappingStyle& ellipsizeEnd(unsigned short int lines = 1) { m_maxLines = (lines * -1); m_ellipsize = EllipsizeMode::END; return *this; }
+	WrappingStyle& setWidth(unsigned short int width = 0) { m_maxWidth = (width > 96 ? 0 : width); return *this; }
+	
+	/// presets
+	WrappingStyle& menuScreenText(unsigned short int lines = 0) { setWidth(96); ellipsizeMiddle(lines); return *this;  } ///< No line limit, wrap at screen edge and/or ellipsize middle.
+	WrappingStyle& lyrics() { ellipsizeNone(1); setWidth(96); return *this;  } ///< Default one line, wrap at screen edge, don't ellipsize or wrap.
+	
+	/** maximum lines.
+	  * This is an int because Pango is a mess.
+	  * Values (for Pango):
+	  *   <=-1: Maximum amount of lines per paragraph.
+	  *      0: Maximum one line in the entire layout.
+	  *    >=1: Maximum height in PANGO_UNITS.
+	  * We'll always be using negative values, and we'll use the "0" to signal we should not set a line limit at all.
+	*/
+	short int m_maxLines;
+	/// ellipsis style
+	EllipsizeMode m_ellipsize;
+	/// maximum width, valid values are 0 to 100 (percent of screen).
+	/// 0 means no limit, and in practice it will turn off wrapping of text.
+	/// 96 (being used as the default), in practice means wrap or ellipsize at the edge of the screen minus at least a 2% margin on each side.
+	unsigned short int m_maxWidth;
+};
 
 /// this class will enable to create a texture from a themed text structure
 /** it will not cache any data (class using this class should)
@@ -59,7 +94,7 @@ struct TextStyle {
 class OpenGLText {
 public:
 	/// constructor
-	OpenGLText(TextStyle &_text, double m);
+	OpenGLText(TextStyle &_text, double m, WrappingStyle const& wrapping);
 	/// draws area
 	void draw(Dimensions &_dim, TexCoords &_tex);
 	/// draws full texture
@@ -70,8 +105,11 @@ public:
 	double y() const { return m_y; }
 	/// @returns dimension of texture
 	Dimensions& dimensions() { return m_texture.dimensions; }
+	/// @return number of lines rendered.
+	size_t lines() { return m_lines; }
 
 private:
+	size_t m_lines = 1;
 	double m_x;
 	double m_y;
 	Texture m_texture;
@@ -81,19 +119,22 @@ private:
 class SvgTxtThemeSimple {
 public:
 	/// constructor
-	SvgTxtThemeSimple(fs::path const& themeFile, double factor = 1.0);
+	SvgTxtThemeSimple(fs::path const& themeFile, double factor = 1.0, WrappingStyle _wrapping = WrappingStyle().menuScreenText());
 	/// renders text
 	void render(std::string _text);
 	/// draws texture
 	void draw();
 	/// gets dimensions
 	Dimensions& dimensions() { return m_opengl_text->dimensions(); }
+	/// Returns the number of lines in a contained OpenGLText.
+	size_t totalLines() { return m_opengl_text->lines(); }
 
 private:
 	std::unique_ptr<OpenGLText> m_opengl_text;
 	std::string m_cache_text;
 	TextStyle m_text;
 	double m_factor;
+	WrappingStyle m_wrapping;
 };
 
 /// themed svg texts
@@ -146,9 +187,9 @@ public:
 	/// dimensions, what else
 	Dimensions dimensions;
 	/// constructor
-	SvgTxtTheme(fs::path const& themeFile, double factor = 1.0);
+	SvgTxtTheme(fs::path const& themeFile, double factor = 1.0, WrappingStyle _wrapping = WrappingStyle().menuScreenText());
 	/// draws text with alpha
-	void draw(std::vector<TZoomText>& _text, bool lyrics = false);
+	void draw(std::vector<TZoomText>& _text, bool padSyllables = false);
 	/// draw text with alpha
 	void draw(std::string _text);
 	/// sets highlight
@@ -159,7 +200,9 @@ public:
 	double h() const { return m_texture_height; }
 	/// set align
 	void setAlign(Align align) { m_align = align; }
-
+	/// Returns the maximum number of lines in a contained OpenGLText.
+	size_t totalLines();
+	
 private:
 	std::vector<std::unique_ptr<OpenGLText>> m_opengl_text;
 	Align m_align;
@@ -173,5 +216,6 @@ private:
 	std::string m_cache_text;
 	TextStyle m_text;
 	TextStyle m_text_highlight;
+	WrappingStyle m_wrapping;
 };
 

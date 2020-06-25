@@ -46,7 +46,7 @@ void ScreenPlaylist::prepare() {
 }
 
 void ScreenPlaylist::reloadGL() {
-	theme = std::make_unique<ThemePlaylistScreen>();
+	theme = std::make_unique<ThemePlaylistScreen>(showOpts);
 	m_menuTheme = std::make_unique<ThemeInstrumentMenu>();
 	m_singCover = std::make_unique<Texture>(findFile("no_cover.svg"));
 	m_instrumentCover = std::make_unique<Texture>(findFile("instrument_cover.svg"));
@@ -247,22 +247,20 @@ void ScreenPlaylist::drawMenu() {
 void ScreenPlaylist::draw_menu_options() {
 	// Variables used for positioning and other stuff
 	double wcounter = 0;
-	const size_t showopts = 7; // Show at most 8 options simultaneously
 	const float x = -0.35; // x xcoordinate from screen center, the menu should be aligned left of the center therefore it´s negative.n
 	const float start_y = -0.15;
 	const float sel_margin = 0.04;
 	const MenuOptions opts = songlist_menu.getOptions();
 	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get()-songlist_menu.getSubmenuLevel()));
 	// Determine from which item to start
-	int start_i = std::min((int)songlist_menu.curIndex() - 1, (int)opts.size() - (int)showopts
+	int start_i = std::min((int)songlist_menu.curIndex() - 1, (int)opts.size() - (int)showOpts
 		+ (songlist_menu.getSubmenuLevel() == 2 ? 1 : 0)); // Hack to counter side-effects from displaying the value inside the menu
-	if (start_i < 0 || opts.size() == showopts) start_i = 0;
+	if (start_i < 0 || opts.size() == showOpts) start_i = 0;
 
 	// Loop the currently visible options
-	for (size_t i = start_i, ii = 0; ii < showopts && i < opts.size(); ++i, ++ii) {
+	for (size_t i = start_i, ii = 0, lines = 0; ii < showOpts && i < opts.size(); ++i, ii+=lines) {
 		MenuOption const& opt = opts[i];
 		ColorTrans c(Color::alpha(submenuanim));
-
 		// Selection
 		if (i == songlist_menu.curIndex()) {
 			// Animate selection higlight moving
@@ -271,7 +269,9 @@ void ScreenPlaylist::draw_menu_options() {
 			// Draw the text, dim if option not available
 			{
 				ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
-				theme->option_selected.dimensions.left(x).center(start_y + ii*0.049);
+				lines = theme->option_selected.totalLines();
+				std::clog << "playlist/debug: i is: " << i << ", ii is: " << ii << ", entry for " << opt.getName() << " has: " << lines << " lines." << std::endl;
+				theme->option_selected.dimensions.left(x).center(start_y + ii*lines*0.049);
 				theme->option_selected.draw(opt.getName());
 			}
 			wcounter = std::max(wcounter, theme->option_selected.w() + 2 * sel_margin); // Calculate the widest entry
@@ -287,7 +287,9 @@ void ScreenPlaylist::draw_menu_options() {
 			std::string title = opt.getName();
 			SvgTxtTheme& txt = getTextObject(title);
 			ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
-			txt.dimensions.left(x).center(start_y + ii*0.05);
+			lines = txt.totalLines();
+			std::clog << "playlist/debug: i is: " << i << ", ii is: " << ii << ", entry for " << title << " has: " << lines << " lines." << std::endl;
+			txt.dimensions.left(x).center(start_y + ii*lines*0.05);
 			txt.draw(title);
 			wcounter = std::max(wcounter, txt.w() + 2 * sel_margin); // Calculate the widest entry
 		}
@@ -297,7 +299,7 @@ void ScreenPlaylist::draw_menu_options() {
 
 SvgTxtTheme& ScreenPlaylist::getTextObject(std::string const& txt) {
 	if (theme->options.find(txt) != theme->options.end()) return (*theme->options.at(txt).get());
-	std::pair<std::string, std::unique_ptr<SvgTxtTheme>> kv = std::make_pair(txt, std::make_unique<SvgTxtTheme>(findFile("mainmenu_option.svg"), config["graphic/text_lod"].f()));
+	std::pair<std::string, std::unique_ptr<SvgTxtTheme>> kv = std::make_pair(txt, std::make_unique<SvgTxtTheme>(findFile("mainmenu_option.svg"), config["graphic/text_lod"].f(), WrappingStyle().menuScreenText(showOpts)));
 	theme->options.insert(std::move(kv));
 	return (*theme->options.at(txt).get());
 }
