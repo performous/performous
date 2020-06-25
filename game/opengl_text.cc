@@ -101,6 +101,7 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 // 	int layout_width = pango_layout_get_pixel_width(layout.get());
 	unsigned lines = pango_layout_get_line_count (layout.get());
 	for (unsigned i = 0; i < lines; i++) {
+	m_lines = pango_layout_get_line_count (layout.get());
 	PangoLayoutLine* line = pango_layout_get_line_readonly(layout.get(), i);
 	int start = line->start_index;
 	int length = line->length;
@@ -261,6 +262,15 @@ void SvgTxtTheme::draw(std::string _text) {
 	t.factor = 1.0;
 	tmp.push_back(t);
 	draw(tmp);
+}
+
+size_t SvgTxtTheme::totalLines() {
+	size_t lines = 1;
+	for (std::unique_ptr<OpenGLText> const& text: m_opengl_text) {
+		size_t current_lines = text->lines();
+		lines = (current_lines > lines ? current_lines : lines);
+	}
+	return lines;
 }
 
 void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool padSyllables) {

@@ -70,6 +70,8 @@ public:
 	double y() const { return m_y; }
 	/// @returns dimension of texture
 	Dimensions& dimensions() { return m_texture.dimensions; }
+	/// @return number of lines rendered.
+	size_t lines() { return m_lines; }
 
 private:
 	double m_x;
@@ -88,6 +90,8 @@ public:
 	void draw();
 	/// gets dimensions
 	Dimensions& dimensions() { return m_opengl_text->dimensions(); }
+	/// Returns the number of lines in a contained OpenGLText.
+	size_t totalLines() { return m_opengl_text->lines(); }
 
 private:
 	std::unique_ptr<OpenGLText> m_opengl_text;
@@ -159,7 +163,9 @@ public:
 	double h() const { return m_texture_height; }
 	/// set align
 	void setAlign(Align align) { m_align = align; }
-
+	/// Returns the maximum number of lines in a contained OpenGLText.
+	size_t totalLines();
+	
 private:
 	std::vector<std::unique_ptr<OpenGLText>> m_opengl_text;
 	Align m_align;
