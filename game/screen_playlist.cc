@@ -258,9 +258,9 @@ void ScreenPlaylist::draw_menu_options() {
 	if (start_i < 0 || opts.size() == showOpts) start_i = 0;
 
 	// Loop the currently visible options
+	for (size_t i = start_i, ii = 0, lines = 0; ii < showOpts && i < opts.size(); ++i, ii+=lines) {
 		MenuOption const& opt = opts[i];
 		ColorTrans c(Color::alpha(submenuanim));
-
 		// Selection
 		if (i == songlist_menu.curIndex()) {
 			// Animate selection higlight moving
@@ -269,7 +269,9 @@ void ScreenPlaylist::draw_menu_options() {
 			// Draw the text, dim if option not available
 			{
 				ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
-				theme->option_selected.dimensions.left(x).center(start_y + ii*0.049);
+				lines = theme->option_selected.totalLines();
+				std::clog << "playlist/debug: i is: " << i << ", ii is: " << ii << ", entry for " << opt.getName() << " has: " << lines << " lines." << std::endl;
+				theme->option_selected.dimensions.left(x).center(start_y + ii*lines*0.049);
 				theme->option_selected.draw(opt.getName());
 			}
 			wcounter = std::max(wcounter, theme->option_selected.w() + 2 * sel_margin); // Calculate the widest entry
@@ -285,7 +287,9 @@ void ScreenPlaylist::draw_menu_options() {
 			std::string title = opt.getName();
 			SvgTxtTheme& txt = getTextObject(title);
 			ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
-			txt.dimensions.left(x).center(start_y + ii*0.05);
+			lines = txt.totalLines();
+			std::clog << "playlist/debug: i is: " << i << ", ii is: " << ii << ", entry for " << title << " has: " << lines << " lines." << std::endl;
+			txt.dimensions.left(x).center(start_y + ii*lines*0.05);
 			txt.draw(title);
 			wcounter = std::max(wcounter, txt.w() + 2 * sel_margin); // Calculate the widest entry
 		}
@@ -295,7 +299,7 @@ void ScreenPlaylist::draw_menu_options() {
 
 SvgTxtTheme& ScreenPlaylist::getTextObject(std::string const& txt) {
 	if (theme->options.find(txt) != theme->options.end()) return (*theme->options.at(txt).get());
-	std::pair<std::string, std::unique_ptr<SvgTxtTheme>> kv = std::make_pair(txt, std::make_unique<SvgTxtTheme>(findFile("mainmenu_option.svg"), config["graphic/text_lod"].f()));
+	std::pair<std::string, std::unique_ptr<SvgTxtTheme>> kv = std::make_pair(txt, std::make_unique<SvgTxtTheme>(findFile("mainmenu_option.svg"), config["graphic/text_lod"].f(), WrappingStyle().menuScreenText(showOpts)));
 	theme->options.insert(std::move(kv));
 	return (*theme->options.at(txt).get());
 }
