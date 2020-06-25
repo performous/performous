@@ -148,7 +148,7 @@ public:
 	/// constructor
 	SvgTxtTheme(fs::path const& themeFile, double factor = 1.0);
 	/// draws text with alpha
-	void draw(std::vector<TZoomText>& _text, bool lyrics = false);
+	void draw(std::vector<TZoomText>& _text, bool padSyllables = false);
 	/// draw text with alpha
 	void draw(std::string _text);
 	/// sets highlight

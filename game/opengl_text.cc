@@ -263,7 +263,7 @@ void SvgTxtTheme::draw(std::string _text) {
 	draw(tmp);
 }
 
-void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool lyrics) {
+void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool padSyllables) {
 
 	std::string tmp;
 	for (auto& zt: _text) { tmp += zt.string; }
@@ -285,14 +285,14 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool lyrics) {
 	}
 
 	double texture_ar = text_x / text_y;
-	m_texture_width = std::min(lyrics ? 0.864 : 0.96, text_x / targetWidth); // targetWidth is defined in video_driver.cc, it's the base rendering width, used to project the svg onto a gltexture. currently we're targeting 1366x768 as base resolution.
+	m_texture_width = std::min(padSyllables ? 0.864 : 0.96, text_x / targetWidth); // targetWidth is defined in video_driver.cc, it's the base rendering width, used to project the svg onto a gltexture. currently we're targeting 1366x768 as base resolution.
 	
 	double position_x = dimensions.x1();
-	if (m_align == CENTER) position_x -= 0.5 * (m_texture_width * (lyrics ? 1.1 : 1.0));
+	if (m_align == CENTER) position_x -= 0.5 * (m_texture_width * (padSyllables ? 1.1 : 1.0));
 	if (m_align == RIGHT) position_x -= m_texture_width;
 
-	if ((position_x + m_texture_width * (lyrics ? 1.1 : 1.0)) > (lyrics ? 0.432 : 0.48)) { 
-		m_texture_width = ((lyrics ? 0.432 : 0.48) - position_x / (lyrics ? 1.1 : 1.0)) ;
+	if ((position_x + m_texture_width * (padSyllables ? 1.1 : 1.0)) > (padSyllables ? 0.432 : 0.48)) { 
+		m_texture_width = ((padSyllables ? 0.432 : 0.48) - position_x / (padSyllables ? 1.1 : 1.0)) ;
 	}
 	m_texture_height = m_texture_width / texture_ar; // Keep aspect ratio.
 	for (size_t i = 0; i < _text.size(); i++) {
@@ -312,7 +312,7 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool lyrics) {
 			m_opengl_text[i]->draw(dim, tex);
 		} 
 		else { m_opengl_text[i]->draw(dim, tex); }
-		position_x += (syllable_width / factor) * (lyrics ? 1.1 : 1.0);
+		position_x += (syllable_width / factor) * (padSyllables ? 1.1 : 1.0);
 	}
 }
 
