@@ -57,7 +57,9 @@ namespace {
 	}
 }
 
-OpenGLText::OpenGLText(TextStyle& _text, double m) {
+WrappingStyle::WrappingStyle (unsigned short int _maxWidth, EllipsizeMode _ellipsize, unsigned short int _maxLines) : m_maxLines(_maxLines * -1), m_ellipsize(_ellipsize), m_maxWidth(_maxWidth > 96 ? 0 : _maxWidth) {};
+
+OpenGLText::OpenGLText(TextStyle& _text, double m, WrappingStyle const& wrapping) {
 	m *= 2.0;  // HACK to improve text quality without affecting compatibility with old versions
 	// Setup font settings
 	PangoAlignment alignment = parseAlignment(_text.fontalign);
@@ -76,6 +78,38 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	std::shared_ptr<PangoLayout> layout(
 	  pango_layout_new(ctx.get()),
 	  g_object_unref);
+	pango_layout_set_wrap(layout.get(), PANGO_WRAP_WORD_CHAR);
+	PangoEllipsizeMode ellipsize;
+	int maxWidth = -1;
+	switch (wrapping.m_ellipsize) {
+		case WrappingStyle::EllipsizeMode::NONE:
+			ellipsize = (wrapping.m_maxLines == -1) ? PANGO_ELLIPSIZE_NONE : PANGO_ELLIPSIZE_MIDDLE;
+			break;
+		case WrappingStyle::EllipsizeMode::START:
+			ellipsize = PANGO_ELLIPSIZE_START;
+			break;
+		case WrappingStyle::EllipsizeMode::MIDDLE:
+			ellipsize = PANGO_ELLIPSIZE_MIDDLE;
+			break;
+		case WrappingStyle::EllipsizeMode::END:
+			ellipsize = PANGO_ELLIPSIZE_END;
+			break;
+	}
+	if (wrapping.m_maxWidth != 0) { //FIXME: Got to adjust the maximum width according to the x_position.
+		std::clog << "txt/debug: float targetWidth (" << std::to_string(static_cast<float>(targetWidth)) << ")" << ", float m (" << std::to_string(static_cast<float>(m)) << "), float PANGO_SCALE (" << std::to_string(static_cast<float>(PANGO_SCALE)) << ")" << std::endl;
+		float width = static_cast<float>(targetWidth) * static_cast<float>(m) * static_cast<float>(PANGO_SCALE);
+		std::clog << "txt/debug: float width before dividing and rounding (" << std::to_string(width) << ")" << std::endl;
+		width = std::round(width * (static_cast<float>(wrapping.m_maxWidth) / 100.0));
+		std::clog << "txt/debug: float width (" << std::to_string(width) << ")" << std::endl;
+		maxWidth = width;
+	}
+	pango_layout_set_ellipsize(layout.get(), ellipsize);
+	pango_layout_set_width(layout.get(), maxWidth);
+	if (wrapping.m_maxLines < 0) {
+		pango_layout_set_height(layout.get(), wrapping.m_maxLines);
+	}
+	std::clog << "txt/debug: Text " << _text.text << ", wrapping: maxLines(" << wrapping.m_maxLines << "), maxWidth(" << std::to_string(maxWidth) << "), ellipsize(" << std::to_string(ellipsize) << ")" << std::endl;
+	pango_layout_set_single_paragraph_mode(layout.get(), false);
 	pango_layout_set_alignment(layout.get(), alignment);
 	pango_layout_set_font_description(layout.get(), desc.get());
 	pango_layout_set_text(layout.get(), _text.text.c_str(), -1);
@@ -83,9 +117,26 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	{
 		PangoRectangle rec;
 		pango_layout_get_pixel_extents(layout.get(), nullptr, &rec);
+// 		std::clog << "text/debug: raw text width for : \"" << _text.text << "\", before wrapping: " << ((rec.width + border) / m) << std::endl;
+// 		if ((rec.width + border) > (targetWidth * m * 0.96)) {
+// 			std:: clog << "text/debug: text too long; will try again with wrapping." << std::endl;
+// 			pango_layout_set_width(layout.get(), targetWidth * m * PANGO_SCALE * 0.96);	
+// 			pango_layout_set_text(layout.get(), _text.text.c_str(), -1);
+// 			pango_layout_get_pixel_extents(layout.get(), nullptr, &rec);
+			std::clog << "text/debug: raw text width for : \"" << _text.text << "\", after wrapping: " << ((rec.width + border) / m) << std::endl;
+// 		}
 		m_x = rec.width + border;  // Add twice half a border for margins
 		m_y = rec.height + border;
 	}
+	m_lines = pango_layout_get_line_count (layout.get());
+	for (unsigned i = 0; i < m_lines; i++) {
+	PangoLayoutLine* line = pango_layout_get_line_readonly(layout.get(), i);
+	int start = line->start_index;
+	int length = line->length;
+	std::string lineText(pango_layout_get_text(layout.get()),start,length);
+	std::clog << "text/debug: (layout) Line " << std::to_string(i + 1) << ": \"" << lineText << "\", width is: " << (m_x / m / targetWidth * 100) << "%, m_y: " << (m_y / m) << ", did we wrap?: " << std::string(pango_layout_is_wrapped(layout.get()) ? "Yes" : "No") << std::endl;
+	}
+	
 	// Create Cairo surface and drawing context
 	std::shared_ptr<cairo_surface_t> surface(
 	  cairo_image_surface_create(CAIRO_FORMAT_ARGB32, m_x, m_y),
@@ -203,7 +254,7 @@ namespace {
 	}
 }
 
-SvgTxtThemeSimple::SvgTxtThemeSimple(fs::path const& themeFile, double factor) : m_factor(factor) {
+SvgTxtThemeSimple::SvgTxtThemeSimple(fs::path const& themeFile, double factor, WrappingStyle wrapping) : m_factor(factor), m_wrapping(wrapping) {
 	SvgTxtTheme::Align a;
 	double tmp;
 	parseTheme(themeFile, m_text, tmp, tmp, tmp, tmp, a);
@@ -213,7 +264,7 @@ void SvgTxtThemeSimple::render(std::string _text) {
 	if (!m_opengl_text.get() || m_cache_text != _text) {
 		m_cache_text = _text;
 		m_text.text = _text;
-		m_opengl_text = std::make_unique<OpenGLText>(m_text, m_factor);
+		m_opengl_text = std::make_unique<OpenGLText>(m_text, m_factor, m_wrapping);
 	}
 }
 
@@ -221,7 +272,7 @@ void SvgTxtThemeSimple::draw() {
 	m_opengl_text->draw();
 }
 
-SvgTxtTheme::SvgTxtTheme(fs::path const& themeFile, double factor): m_align(),m_factor(factor) {
+SvgTxtTheme::SvgTxtTheme(fs::path const& themeFile, double factor, WrappingStyle wrapping): m_align(), m_factor(factor), m_wrapping(wrapping) {
 	parseTheme(themeFile, m_text, m_width, m_height, m_x, m_y, m_align);
 	dimensions.stretch(0.0, 0.0).middle(-0.5 + m_x / m_width).center((m_y - 0.5 * m_height) / m_width);
 }
@@ -241,7 +292,16 @@ void SvgTxtTheme::draw(std::string _text) {
 	draw(tmp);
 }
 
-void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool lyrics) {
+size_t SvgTxtTheme::totalLines() {
+	size_t lines = 1;
+	for (std::unique_ptr<OpenGLText> const& text: m_opengl_text) {
+		size_t current_lines = text->lines();
+		lines = (current_lines > lines ? current_lines : lines);
+	}
+	return lines;
+}
+
+void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool padSyllables) {
 
 	std::string tmp;
 	for (auto& zt: _text) { tmp += zt.string; }
@@ -250,7 +310,7 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool lyrics) {
 		m_opengl_text.clear();
 		for (auto& zt: _text) {
 			m_text.text = zt.string;
-			auto openGlPtr = std::unique_ptr<OpenGLText>(std::make_unique<OpenGLText>(m_text, m_factor));
+			auto openGlPtr = std::unique_ptr<OpenGLText>(std::make_unique<OpenGLText>(m_text, m_factor, m_wrapping));
 			m_opengl_text.push_back(std::move(openGlPtr));
 		}
 	}
@@ -263,14 +323,14 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool lyrics) {
 	}
 
 	double texture_ar = text_x / text_y;
-	m_texture_width = std::min(0.96, text_x / targetWidth); // targetWidth is defined in video_driver.cc, it's the base rendering width, used to project the svg onto a gltexture. currently we're targeting 1366x768 as base resolution.
+	m_texture_width = std::min(padSyllables ? 0.864 : 0.96, text_x / targetWidth); // targetWidth is defined in video_driver.cc, it's the base rendering width, used to project the svg onto a gltexture. currently we're targeting 1366x768 as base resolution.
 	
 	double position_x = dimensions.x1();
-	if (m_align == CENTER) position_x -= 0.5 * m_texture_width;
+	if (m_align == CENTER) position_x -= 0.5 * (m_texture_width * (padSyllables ? 1.1 : 1.0));
 	if (m_align == RIGHT) position_x -= m_texture_width;
 
-	if ((position_x + m_texture_width) > 0.48) { 
-		m_texture_width = (0.48 - position_x);
+	if ((position_x + m_texture_width * (padSyllables ? 1.1 : 1.0)) > (padSyllables ? 0.432 : 0.48)) { 
+		m_texture_width = ((padSyllables ? 0.432 : 0.48) - position_x / (padSyllables ? 1.1 : 1.0)) ;
 	}
 	m_texture_height = m_texture_width / texture_ar; // Keep aspect ratio.
 	for (size_t i = 0; i < _text.size(); i++) {
@@ -283,13 +343,14 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool lyrics) {
 		dim.middle(position_x + 0.5 * dim.w());
 		TexCoords tex;
 		double factor = _text[i].factor;
+		std::clog << "text/debug: Text (inside draw()): \"" << m_text.text << "\", position_x: " << position_x << ",texture_height: " << m_texture_height << std::endl;
 		if (factor > 1.0) {
 			LyricColorTrans lc(m_text.fill_col, m_text.stroke_col, m_text_highlight.fill_col, m_text_highlight.stroke_col);
 			dim.fixedWidth(dim.w() * factor);
 			m_opengl_text[i]->draw(dim, tex);
 		} 
 		else { m_opengl_text[i]->draw(dim, tex); }
-		position_x += (syllable_width / factor) * (lyrics ? 1.1 : 1.0);
+		position_x += (syllable_width / factor) * (padSyllables ? 1.1 : 1.0);
 	}
 }
 

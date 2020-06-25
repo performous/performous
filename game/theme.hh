@@ -79,7 +79,7 @@ public:
 /// theme for intro screen
 class ThemeIntro: public Theme {
 public:
-	ThemeIntro();
+	ThemeIntro(unsigned short int showOpts);
 	/// back highlight for selected option
 	Texture back_h;
 	/// menu option texts
@@ -119,7 +119,7 @@ public:
 //at the moment just a copy of ThemeSongs
 class ThemePlaylistScreen: public Theme {
 public:
-	ThemePlaylistScreen();
+	ThemePlaylistScreen(unsigned short int showOpts);
 	/// menu option texts
 	std::map<std::string, std::unique_ptr<SvgTxtTheme>> options;
 	/// selected menu option text

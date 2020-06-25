@@ -37,4 +37,5 @@ class ScreenIntro : public Screen {
 	AnimValue m_submenuAnim;
 	AnimValue m_webserverNoticeTimeout;
 	int webserversetting = 0;
+	const unsigned short showOpts = 5; // Show at most 5 options simultaneously
 };

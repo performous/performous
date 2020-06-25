@@ -127,8 +127,8 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, input::DevicePtr dev, i
 	m_fretObj.load(findFile("fret.obj"));
 	m_tappableObj.load(findFile("fret_tap.obj"));
 	// Score calculator (TODO a better one)
-	m_scoreText = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f());
-	m_streakText = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f());
+	m_scoreText = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f(), WrappingStyle().lyrics());
+	m_streakText = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f(), WrappingStyle().lyrics());
 	for (size_t i = 0; i < max_panels; ++i) {
 		m_pressed_anim[i].setRate(5.0);
 		m_holds[i] = 0;
