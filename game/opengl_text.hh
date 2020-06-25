@@ -94,7 +94,7 @@ struct WrappingStyle {
 class OpenGLText {
 public:
 	/// constructor
-	OpenGLText(TextStyle &_text, double m);
+	OpenGLText(TextStyle &_text, double m, WrappingStyle const& wrapping);
 	/// draws area
 	void draw(Dimensions &_dim, TexCoords &_tex);
 	/// draws full texture
@@ -119,7 +119,7 @@ private:
 class SvgTxtThemeSimple {
 public:
 	/// constructor
-	SvgTxtThemeSimple(fs::path const& themeFile, double factor = 1.0);
+	SvgTxtThemeSimple(fs::path const& themeFile, double factor = 1.0, WrappingStyle _wrapping = WrappingStyle().menuScreenText());
 	/// renders text
 	void render(std::string _text);
 	/// draws texture
@@ -134,6 +134,7 @@ private:
 	std::string m_cache_text;
 	TextStyle m_text;
 	double m_factor;
+	WrappingStyle m_wrapping;
 };
 
 /// themed svg texts
@@ -186,7 +187,7 @@ public:
 	/// dimensions, what else
 	Dimensions dimensions;
 	/// constructor
-	SvgTxtTheme(fs::path const& themeFile, double factor = 1.0);
+	SvgTxtTheme(fs::path const& themeFile, double factor = 1.0, WrappingStyle _wrapping = WrappingStyle().menuScreenText());
 	/// draws text with alpha
 	void draw(std::vector<TZoomText>& _text, bool padSyllables = false);
 	/// draw text with alpha
@@ -215,5 +216,6 @@ private:
 	std::string m_cache_text;
 	TextStyle m_text;
 	TextStyle m_text_highlight;
+	WrappingStyle m_wrapping;
 };
 

@@ -228,7 +228,7 @@ namespace {
 	}
 }
 
-SvgTxtThemeSimple::SvgTxtThemeSimple(fs::path const& themeFile, double factor) : m_factor(factor) {
+SvgTxtThemeSimple::SvgTxtThemeSimple(fs::path const& themeFile, double factor, WrappingStyle wrapping) : m_factor(factor), m_wrapping(wrapping) {
 	SvgTxtTheme::Align a;
 	double tmp;
 	parseTheme(themeFile, m_text, tmp, tmp, tmp, tmp, a);
@@ -238,7 +238,7 @@ void SvgTxtThemeSimple::render(std::string _text) {
 	if (!m_opengl_text.get() || m_cache_text != _text) {
 		m_cache_text = _text;
 		m_text.text = _text;
-		m_opengl_text = std::make_unique<OpenGLText>(m_text, m_factor);
+		m_opengl_text = std::make_unique<OpenGLText>(m_text, m_factor, m_wrapping);
 	}
 }
 
@@ -246,7 +246,7 @@ void SvgTxtThemeSimple::draw() {
 	m_opengl_text->draw();
 }
 
-SvgTxtTheme::SvgTxtTheme(fs::path const& themeFile, double factor): m_align(),m_factor(factor) {
+SvgTxtTheme::SvgTxtTheme(fs::path const& themeFile, double factor, WrappingStyle wrapping): m_align(), m_factor(factor), m_wrapping(wrapping) {
 	parseTheme(themeFile, m_text, m_width, m_height, m_x, m_y, m_align);
 	dimensions.stretch(0.0, 0.0).middle(-0.5 + m_x / m_width).center((m_y - 0.5 * m_height) / m_width);
 }
@@ -284,7 +284,7 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool padSyllables) {
 		m_opengl_text.clear();
 		for (auto& zt: _text) {
 			m_text.text = zt.string;
-			auto openGlPtr = std::unique_ptr<OpenGLText>(std::make_unique<OpenGLText>(m_text, m_factor));
+			auto openGlPtr = std::unique_ptr<OpenGLText>(std::make_unique<OpenGLText>(m_text, m_factor, m_wrapping));
 			m_opengl_text.push_back(std::move(openGlPtr));
 		}
 	}
