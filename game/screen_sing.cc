@@ -671,8 +671,8 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
   m_pos(0.8, 2.0),
   m_bg(findFile("score_window.svg")),
   m_scoreBar(findFile("score_bar_bg.svg"), findFile("score_bar_fg.svg"), ProgressBar::VERTICAL, 0.0, 0.0, false),
-  m_score_text(findFile("score_txt.svg")),
-  m_score_rank(findFile("score_rank.svg"))
+  m_score_text(findFile("score_txt.svg"), config["graphic/text_lod"].f(), WrappingStyle().lyrics()),
+  m_score_rank(findFile("score_rank.svg"), config["graphic/text_lod"].f(), WrappingStyle().lyrics())
 {
 	Game::getSingletonPtr()->showLogo();
 	m_pos.setTarget(0.0);

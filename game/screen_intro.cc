@@ -158,7 +158,7 @@ void ScreenIntro::draw() {
 
 SvgTxtTheme& ScreenIntro::getTextObject(std::string const& txt) {
 	if (theme->options.find(txt) != theme->options.end()) return (*theme->options.at(txt).get());
-	std::pair<std::string, std::unique_ptr<SvgTxtTheme>> kv = std::make_pair(txt, std::make_unique<SvgTxtTheme>(findFile("mainmenu_option.svg"), config["graphic/text_lod"].f()));
+	std::pair<std::string, std::unique_ptr<SvgTxtTheme>> kv = std::make_pair(txt, std::make_unique<SvgTxtTheme>(findFile("mainmenu_option.svg"), config["graphic/text_lod"].f(), WrappingStyle().menuScreenText(showOpts)));
 	theme->options.insert(std::move(kv));
 	return (*theme->options.at(txt).get());
 }
