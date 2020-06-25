@@ -78,32 +78,31 @@ OpenGLText::OpenGLText(TextStyle& _text, double m, WrappingStyle const& wrapping
 	  g_object_unref);
 	pango_layout_set_wrap(layout.get(), PANGO_WRAP_WORD);
 	pango_layout_set_ellipsize(layout.get(), PANGO_ELLIPSIZE_NONE);
+		std::clog << "txt/debug: float targetWidth (" << std::to_string(static_cast<float>(targetWidth)) << ")" << ", float m (" << std::to_string(static_cast<float>(m)) << "), float PANGO_SCALE (" << std::to_string(static_cast<float>(PANGO_SCALE)) << ")" << std::endl;
+		std::clog << "txt/debug: float width before dividing and rounding (" << std::to_string(width) << ")" << std::endl;
+		std::clog << "txt/debug: float width (" << std::to_string(width) << ")" << std::endl;
+	std::clog << "txt/debug: Text " << _text.text << ", wrapping: maxLines(" << wrapping.m_maxLines << "), maxWidth(" << std::to_string(maxWidth) << "), ellipsize(" << std::to_string(ellipsize) << ")" << std::endl;
 	pango_layout_set_single_paragraph_mode(layout.get(), false);
 	pango_layout_set_alignment(layout.get(), alignment);
 	pango_layout_set_font_description(layout.get(), desc.get());
-// 	pango_layout_set_width(layout.get(), targetWidth * m * PANGO_SCALE * 0.96);	
 	pango_layout_set_text(layout.get(), _text.text.c_str(), -1);
-// 	pango_layout_set_width(layout.get(), std::min(pango_layout_get_width(layout.get()),(targetWidth * m * PANGO_SCALE * 0.96));	
 	// Compute text extents
 	{
 		PangoRectangle rec;
 		pango_layout_get_pixel_extents(layout.get(), nullptr, &rec);
-		std::clog << "text/debug: raw text width for : \"" << _text.text << "\", before wrapping: " << ((rec.width + border) / m) << std::endl;
-		if ((rec.width + border) > (targetWidth * m * 0.96)) {
-			std:: clog << "text/debug: text too long; will try again with wrapping." << std::endl;
-			pango_layout_set_width(layout.get(), targetWidth * m * PANGO_SCALE * 0.96);	
-			pango_layout_set_text(layout.get(), _text.text.c_str(), -1);
-			pango_layout_get_pixel_extents(layout.get(), nullptr, &rec);
+// 		std::clog << "text/debug: raw text width for : \"" << _text.text << "\", before wrapping: " << ((rec.width + border) / m) << std::endl;
+// 		if ((rec.width + border) > (targetWidth * m * 0.96)) {
+// 			std:: clog << "text/debug: text too long; will try again with wrapping." << std::endl;
+// 			pango_layout_set_width(layout.get(), targetWidth * m * PANGO_SCALE * 0.96);	
+// 			pango_layout_set_text(layout.get(), _text.text.c_str(), -1);
+// 			pango_layout_get_pixel_extents(layout.get(), nullptr, &rec);
 			std::clog << "text/debug: raw text width for : \"" << _text.text << "\", after wrapping: " << ((rec.width + border) / m) << std::endl;
-		}
+// 		}
 		m_x = rec.width + border;  // Add twice half a border for margins
 		m_y = rec.height + border;
 	}
-// 	int layout_width = pango_layout_get_pixel_width(layout.get());
-// 	int layout_width = pango_layout_get_pixel_width(layout.get());
-	unsigned lines = pango_layout_get_line_count (layout.get());
-	for (unsigned i = 0; i < lines; i++) {
 	m_lines = pango_layout_get_line_count (layout.get());
+	for (unsigned i = 0; i < m_lines; i++) {
 	PangoLayoutLine* line = pango_layout_get_line_readonly(layout.get(), i);
 	int start = line->start_index;
 	int length = line->length;
