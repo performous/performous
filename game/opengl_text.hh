@@ -109,6 +109,7 @@ public:
 	size_t lines() { return m_lines; }
 
 private:
+	size_t m_lines = 1;
 	double m_x;
 	double m_y;
 	Texture m_texture;
