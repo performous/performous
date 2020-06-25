@@ -55,7 +55,9 @@ namespace {
 	}
 }
 
-OpenGLText::OpenGLText(TextStyle& _text, double m) {
+WrappingStyle::WrappingStyle (unsigned short int _maxWidth, EllipsizeMode _ellipsize, unsigned short int _maxLines) : m_maxLines(_maxLines * -1), m_ellipsize(_ellipsize), m_maxWidth(_maxWidth > 96 ? 0 : _maxWidth) {};
+
+OpenGLText::OpenGLText(TextStyle& _text, double m, WrappingStyle const& wrapping) {
 	m *= 2.0;  // HACK to improve text quality without affecting compatibility with old versions
 	// Setup font settings
 	PangoAlignment alignment = parseAlignment(_text.fontalign);
