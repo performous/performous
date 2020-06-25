@@ -50,6 +50,41 @@ struct TextStyle {
 	std::string text; ///< text
 	TextStyle(): stroke_width(), stroke_miterlimit(1.0), fontsize() {}
 };
+	
+/// Convenience container for deciding how a given OpenGLText instance will be wrapped, ellipsized or fitted to the display area.
+struct WrappingStyle {
+	enum class EllipsizeMode { NONE, START, MIDDLE, END };
+
+	/// constructor
+	WrappingStyle(unsigned short int _maxWidth = 0, EllipsizeMode _ellipsize = EllipsizeMode::NONE, unsigned short int _maxLines = 1);
+	
+	/// setters
+	WrappingStyle& ellipsizeNone(unsigned short int lines = 1) { m_maxLines = (lines * -1); m_ellipsize = EllipsizeMode::NONE; return *this; }
+	WrappingStyle& ellipsizeStart(unsigned short int lines = 1) { m_maxLines = (lines * -1); m_ellipsize = EllipsizeMode::START; return *this; }
+	WrappingStyle& ellipsizeMiddle(unsigned short int lines = 1) { m_maxLines = (lines * -1); m_ellipsize = EllipsizeMode::MIDDLE; return *this; }
+	WrappingStyle& ellipsizeEnd(unsigned short int lines = 1) { m_maxLines = (lines * -1); m_ellipsize = EllipsizeMode::END; return *this; }
+	WrappingStyle& setWidth(unsigned short int width = 0) { m_maxWidth = (width > 96 ? 0 : width); return *this; }
+	
+	/// presets
+	WrappingStyle& menuScreenText(unsigned short int lines = 0) { setWidth(96); ellipsizeMiddle(lines); return *this;  } ///< No line limit, wrap at screen edge and/or ellipsize middle.
+	WrappingStyle& lyrics() { ellipsizeNone(1); setWidth(96); return *this;  } ///< Default one line, wrap at screen edge, don't ellipsize or wrap.
+	
+	/** maximum lines.
+	  * This is an int because Pango is a mess.
+	  * Values (for Pango):
+	  *   <=-1: Maximum amount of lines per paragraph.
+	  *      0: Maximum one line in the entire layout.
+	  *    >=1: Maximum height in PANGO_UNITS.
+	  * We'll always be using negative values, and we'll use the "0" to signal we should not set a line limit at all.
+	*/
+	short int m_maxLines;
+	/// ellipsis style
+	EllipsizeMode m_ellipsize;
+	/// maximum width, valid values are 0 to 100 (percent of screen).
+	/// 0 means no limit, and in practice it will turn off wrapping of text.
+	/// 96 (being used as the default), in practice means wrap or ellipsize at the edge of the screen minus at least a 2% margin on each side.
+	unsigned short int m_maxWidth;
+};
 
 /// this class will enable to create a texture from a themed text structure
 /** it will not cache any data (class using this class should)
