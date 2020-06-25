@@ -33,7 +33,7 @@ void ScreenIntro::enter() {
 }
 
 void ScreenIntro::reloadGL() {
-	theme = std::make_unique<ThemeIntro>();
+	theme = std::make_unique<ThemeIntro>(showOpts);
 }
 
 void ScreenIntro::exit() {
@@ -79,7 +79,6 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 void ScreenIntro::draw_menu_options() {
 	// Variables used for positioning and other stuff
 	double wcounter = 0;
-	const size_t showopts = 5; // Show at most 5 options simultaneously
 	const float x = -0.35;
 	const float start_y = -0.1;
 	const float sel_margin = 0.03;
@@ -88,12 +87,12 @@ void ScreenIntro::draw_menu_options() {
 	theme->back_h.dimensions.fixedHeight(0.038f);
 	theme->back_h.dimensions.stretch(m_menu.dimensions.w(), theme->back_h.dimensions.h());
 	// Determine from which item to start
-	int start_i = std::min((int)m_menu.curIndex() - 1, (int)opts.size() - (int)showopts
+	int start_i = std::min((int)m_menu.curIndex() - 1, (int)opts.size() - (int)showOpts
 		+ (m_menu.getSubmenuLevel() == 2 ? 1 : 0)); // Hack to counter side-effects from displaying the value inside the menu
-	if (start_i < 0 || opts.size() == showopts) start_i = 0;
+	if (start_i < 0 || opts.size() == showOpts) start_i = 0;
 
 	// Loop the currently visible options
-	for (size_t i = start_i, ii = 0; ii < showopts && i < opts.size(); ++i, ++ii) {
+	for (size_t i = start_i, ii = 0; ii < showOpts && i < opts.size(); ++i, ++ii) {
 		MenuOption const& opt = opts[i];
 		ColorTrans c(Color::alpha(submenuanim));
 
