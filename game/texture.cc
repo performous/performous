@@ -22,9 +22,9 @@ Shader& getShader(std::string const& name) {
 
 float Dimensions::screenY() const {
 	switch (m_screenAnchor) {
-	  case CENTER: return 0.0;
-	  case TOP: return -0.5 * virtH();
-	  case BOTTOM: return 0.5 * virtH();
+	  case CENTER: return 0.0f;
+	  case TOP: return -0.5f * virtH();
+	  case BOTTOM: return 0.5f * virtH();
 	}
 	throw std::logic_error("Dimensions::screenY(): unknown m_screenAnchor value");
 }

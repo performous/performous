@@ -138,7 +138,7 @@ void ScreenPlaylist::draw() {
 			  translate(vec3(-0.4f + 0.9f * pos, 0.045f, 0.0f)) //vec3(horizontal-offset-from-center, vertical offset from screen_bottom)
 			  * rotate(-0.0f, vec3(0.0f, 1.0f, 0.0f))
 			);
-			s.dimensions.middle().screenBottom(-0.06).fitInside(0.08, 0.08);
+			s.dimensions.middle().screenBottom(-0.06f).fitInside(0.08f, 0.08f);
 			s.draw();
 		}
 	}
@@ -215,7 +215,7 @@ void ScreenPlaylist::drawMenu() {
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
 	const auto cur = &overlay_menu.current();
-	double w = overlay_menu.dimensions.w();
+	float w = overlay_menu.dimensions.w();
 	const float txth = th.option_selected.h();
 	const float step = txth * 0.85f;
 	const float h = overlay_menu.getOptions().size() * step + step;
@@ -238,7 +238,7 @@ void ScreenPlaylist::drawMenu() {
 		y += step;
 	}
 	if (cur->getComment() != "") {
-		th.comment.dimensions.middle(0).screenBottom(-0.12);
+		th.comment.dimensions.middle(0).screenBottom(-0.12f);
 		th.comment.draw(cur->getComment());
 	}
 	overlay_menu.dimensions.stretch(w, h);
@@ -246,10 +246,10 @@ void ScreenPlaylist::drawMenu() {
 
 void ScreenPlaylist::draw_menu_options() {
 	// Variables used for positioning and other stuff
-	double wcounter = 0;
-	const float x = -0.35; // x xcoordinate from screen center, the menu should be aligned left of the center therefore it´s negative.n
-	const float start_y = -0.15;
-	const float sel_margin = 0.04;
+	float wcounter = 0;
+	const float x = -0.35f; // x xcoordinate from screen center, the menu should be aligned left of the center therefore it´s negative.n
+	const float start_y = -0.15f;
+	const float sel_margin = 0.04f;
 	const MenuOptions opts = songlist_menu.getOptions();
 	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get()-songlist_menu.getSubmenuLevel()));
 	// Determine from which item to start
@@ -268,17 +268,17 @@ void ScreenPlaylist::draw_menu_options() {
 			if (selanim < 0) selanim = 0;
 			// Draw the text, dim if option not available
 			{
-				ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
+				ColorTrans c(Color::alpha(opt.isActive() ? 1.0f : 0.5f));
 				lines = theme->option_selected.totalLines();
 				std::clog << "playlist/debug: i is: " << i << ", ii is: " << ii << ", entry for " << opt.getName() << " has: " << lines << " lines." << std::endl;
-				theme->option_selected.dimensions.left(x).center(start_y + ii*lines*0.049);
+				theme->option_selected.dimensions.left(x).center(start_y + ii*lines*0.049f);
 				theme->option_selected.draw(opt.getName());
 			}
 			wcounter = std::max(wcounter, theme->option_selected.w() + 2 * sel_margin); // Calculate the widest entry
 			// If this is a config item, show the value below
 			if (opt.type == MenuOption::CHANGE_VALUE) {
 				++ii; // Use a slot for the value
-				theme->option_selected.dimensions.left(x + sel_margin).center(-0.1 + (selanim+1)*0.08);
+				theme->option_selected.dimensions.left(x + sel_margin).center(-0.1f + (selanim+1)*0.08f);
 				theme->option_selected.draw("<  " + opt.value->getValue() + "  >");
 			}
 
@@ -286,10 +286,10 @@ void ScreenPlaylist::draw_menu_options() {
 		} else {
 			std::string title = opt.getName();
 			SvgTxtTheme& txt = getTextObject(title);
-			ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
+			ColorTrans c(Color::alpha(opt.isActive() ? 1.0f : 0.5f));
 			lines = txt.totalLines();
 			std::clog << "playlist/debug: i is: " << i << ", ii is: " << ii << ", entry for " << title << " has: " << lines << " lines." << std::endl;
-			txt.dimensions.left(x).center(start_y + ii*lines*0.05);
+			txt.dimensions.left(x).center(start_y + ii*lines*0.05f);
 			txt.draw(title);
 			wcounter = std::max(wcounter, txt.w() + 2 * sel_margin); // Calculate the widest entry
 		}

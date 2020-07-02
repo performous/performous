@@ -34,9 +34,9 @@ ConfigItem& ConfigItem::incdec(int dir) {
 		int step = boost::get<int>(m_step);
 		val = clamp(((val + dir * step)/ step) * step, boost::get<int>(m_min), boost::get<int>(m_max));
 	} else if (m_type == "float") {
-		double& val = boost::get<double>(m_value);
-		double step = boost::get<double>(m_step);
-		val = clamp(round((val + dir * step) / step) * step, boost::get<double>(m_min), boost::get<double>(m_max));
+		float& val = boost::get<float>(m_value);
+		float step = boost::get<float>(m_step);
+		val = clamp(round((val + dir * step) / step) * step, boost::get<float>(m_min), boost::get<float>(m_max));
 	} else if (m_type == "bool") {
 		bool& val = boost::get<bool>(m_value);
 		val = !val;
@@ -50,7 +50,7 @@ ConfigItem& ConfigItem::incdec(int dir) {
 bool ConfigItem::isDefaultImpl(ConfigItem::Value const& defaultValue) const {
 	if (m_type == "bool") return boost::get<bool>(m_value) == boost::get<bool>(defaultValue);
 	if (m_type == "int") return boost::get<int>(m_value) == boost::get<int>(defaultValue);
-	if (m_type == "float") return boost::get<double>(m_value) == boost::get<double>(defaultValue);
+	if (m_type == "float") return boost::get<float>(m_value) == boost::get<float>(defaultValue);
 	if (m_type == "string") return boost::get<std::string>(m_value) == boost::get<std::string>(defaultValue);
 	if (m_type == "string_list") return boost::get<StringList>(m_value) == boost::get<StringList>(defaultValue);
 	if (m_type == "option_list") return boost::get<OptionList>(m_value) == boost::get<OptionList>(defaultValue);
@@ -71,7 +71,7 @@ void ConfigItem::verifyType(std::string const& type) const {
 int& ConfigItem::i() { verifyType("int"); return boost::get<int>(m_value); }
 int const& ConfigItem::i() const { verifyType("int"); return boost::get<int>(m_value); }
 bool& ConfigItem::b() { verifyType("bool"); return boost::get<bool>(m_value); }
-double& ConfigItem::f() { verifyType("float"); return boost::get<double>(m_value); }
+float& ConfigItem::f() { verifyType("float"); return boost::get<float>(m_value); }
 std::string& ConfigItem::s() { verifyType("string"); return boost::get<std::string>(m_value); }
 ConfigItem::StringList& ConfigItem::sl() { verifyType("string_list"); return boost::get<StringList>(m_value); }
 ConfigItem::OptionList& ConfigItem::ol() { verifyType("option_list"); return boost::get<OptionList>(m_value); }
@@ -88,7 +88,7 @@ namespace {
 		while (s > 0.0 && (s *= 10) < 10) ++precision;
 		// Format the output
 		boost::format fmter("%f");
-		fmter % boost::io::group(std::setprecision(precision), double(m) * boost::get<T>(value));
+		fmter % boost::io::group(std::setprecision(precision), float(m) * boost::get<T>(value));
 		return fmter.str();
 	}
 
@@ -133,7 +133,7 @@ std::string const ConfigItem::getValue() const {
 		if (val >= 0 && val < int(m_enums.size())) return m_enums[val];
 		return numericFormat<int>(m_value, m_multiplier, m_step) + m_unit;
 	}
-	if (m_type == "float") return numericFormat<double>(m_value, m_multiplier, m_step) + m_unit;
+	if (m_type == "float") return numericFormat<float>(m_value, m_multiplier, m_step) + m_unit;
 	if (m_type == "bool") return boost::get<bool>(m_value) ? _("Enabled") : _("Disabled");
 	if (m_type == "string") return boost::get<std::string>(m_value);
 	if (m_type == "string_list") {
@@ -248,8 +248,8 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 		updateNumeric<int>(elem, mode);
 	} else if (m_type == "float") {
 		std::string value_string = getAttribute(elem, "value");
-		if (!value_string.empty()) m_value = std::stod(value_string);
-			updateNumeric<double>(elem, mode);
+		if (!value_string.empty()) m_value = std::stof(value_string);
+			updateNumeric<float>(elem, mode);
 			} else if (m_type == "string") {
 				m_value = getText(elem, "stringvalue");
 			} else if (m_type == "string_list" || m_type == "option_list") {

@@ -14,10 +14,10 @@ template<> Game* Singleton<Game>::ms_Singleton = nullptr;
 Game::Game(Window& _window, Audio& _audio):
   m_audio(_audio), m_window(_window), m_finished(false), newScreen(), currentScreen(), currentPlaylist(),
   m_timeToFadeIn(), m_timeToFadeOut(), m_timeToShow(), m_message(),
-  m_messagePopup(0.0, 1.0), m_textMessage(findFile("message_text.svg"), config["graphic/text_lod"].f(), WrappingStyle().menuScreenText()),
+  m_messagePopup(0.0f, 1.0), m_textMessage(findFile("message_text.svg"), config["graphic/text_lod"].f(), WrappingStyle().menuScreenText(5)),
   m_loadingProgress(0.0f), m_logo(findFile("logo.svg")), m_logoAnim(0.0, 0.5)
 {
-	m_textMessage.dimensions.middle().center(-0.05);
+	m_textMessage.dimensions.middle().center(-0.05f);
 }
 
 void Game::activateScreen(std::string const& name) {
@@ -65,11 +65,11 @@ void Game::drawLoading() {
 	drawLogo();
 	drawNotifications();
 	const int maxi = 20;
-	const double x = 0.3;
-	const double spacing = 0.01;
-	const double sq_size = (2*x - (maxi-1)*spacing) / maxi;
+	const float x = 0.3f;
+	const float spacing = 0.01f;
+	const float sq_size = (2*x - (maxi-1)*spacing) / maxi;
 	for (int i = 0; i <= m_loadingProgress * maxi; ++i) {
-		ColorTrans c(Color(0.2, 0.7, 0.7, (m_loadingProgress + 1.0)*0.5));
+		ColorTrans c(Color(0.2f, 0.7f, 0.7f, (m_loadingProgress + 1.0f)*0.5f));
 		UseShader shader(getShader("color"));
 		float cx = -x + i * (sq_size + spacing);
 		float cy = 0;
@@ -112,7 +112,7 @@ bool Game::closeDialog() {
 }
 
 void Game::drawLogo() {
-	m_logo.dimensions.fixedHeight(0.1).left(-0.45).screenTop(-0.1 + 0.11 * smoothstep(m_logoAnim.get()));
+	m_logo.dimensions.fixedHeight(0.1f).left(-0.45f).screenTop(-0.1f + 0.11f * static_cast<float>(smoothstep(m_logoAnim.get())));
 	m_logo.draw();
 }
 

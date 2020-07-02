@@ -22,7 +22,7 @@ void SongParser::txtParseHeader() {
 	s.insertVocalTrack(TrackName::LEAD_VOCAL, VocalTrack(TrackName::LEAD_VOCAL)); // Dummy note to indicate there is a track
 	while (getline(line) && txtParseField(line)) {}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
-	if (m_bpm != 0.0) addBPM(0, m_bpm);
+	if (m_bpm != 0.0f) addBPM(0, m_bpm);
 }
 
 /// Parse notes
@@ -139,7 +139,7 @@ bool SongParser::txtParseNote(std::string line) {
 	std::istringstream iss(line);
 	if (line[0] == 'B') {
 		unsigned int ts;
-		double bpm;
+		float bpm;
 		iss.ignore();
 		if (!(iss >> ts >> bpm)) throw std::runtime_error("Invalid BPM line format");
 		addBPM(ts, bpm);
@@ -235,6 +235,6 @@ bool SongParser::txtParseNote(std::string line) {
 void SongParser::txtResetState() {
 	m_txt = TXTState();
 	m_song.m_bpms.clear();
-	if (m_bpm != 0.0) { addBPM (0, m_bpm); }
+	if (m_bpm != 0.0f) { addBPM (0, m_bpm); }
 }
 

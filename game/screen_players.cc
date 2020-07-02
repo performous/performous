@@ -151,22 +151,22 @@ void ScreenPlayers::draw() {
 
 		// Draw the covers
 		std::size_t ss = m_players.size();
-		int baseidx = spos + 1.5; --baseidx; // Round correctly
-		double shift = spos - baseidx;
+		int baseidx = spos + 1.5f; --baseidx; // Round correctly
+		float shift = spos - baseidx;
 		// FIXME: 3D browser
 		for (int i = -2; i < 5; ++i) {
 			PlayerItem player_display = m_players[baseidx + i];
 			if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
 			
 			Texture& s = !player_display.path.empty() ? *loadTextureFromMap(player_display.path) : *m_emptyCover;
-			double diff = (i == 0 ? (0.5 - fabs(shift)) * 0.07 : 0.0);
-			double y = 0.27 + 0.5 * diff;
+			float diff = (i == 0 ? (0.5 - fabs(shift)) * 0.07 : 0.0);
+			float y = 0.27f + 0.5f * diff;
 			// Draw the cover
-			s.dimensions.middle(-0.2 + 0.17 * (i - shift)).bottom(y - 0.2 * diff).fitInside(0.14 + diff, 0.14 + diff); s.draw();
+			s.dimensions.middle(-0.2f + 0.17f * (i - shift)).bottom(y - 0.2f * diff).fitInside(0.14f + diff, 0.14f + diff); s.draw();
 			// Draw the reflection
-			s.dimensions.top(y + 0.2 * diff); s.tex = TexCoords(0, 1, 1, 0);
+			s.dimensions.top(y + 0.2f * diff); s.tex = TexCoords(0, 1, 1, 0);
 			{
-				ColorTrans c(Color::alpha(0.4));
+				ColorTrans c(Color::alpha(0.4f));
 				s.draw();
 			}
 			s.tex = TexCoords();

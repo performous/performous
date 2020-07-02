@@ -119,7 +119,7 @@ void Webcam::render() {
 		m_frameAvailable = false;
 	}
 	using namespace glmath;
-	Transform trans(scale(vec3(-1.0, 1.0, 1.0)));
+	Transform trans(scale(vec3(-1.0f, 1.0f, 1.0f)));
 	m_texture.draw(); // Draw
 	#endif
 }

@@ -28,7 +28,7 @@ class ConfigItem {
 	int& i(); ///< Access integer item
 	int const& i() const; ///< Access integer item
 	bool& b(); ///< Access boolean item
-	double& f(); ///< Access floating-point item
+	float& f(); ///< Access floating-point item
 	std::string& s(); ///< Access string item
 	StringList& sl(); ///< Access stringlist item
 	OptionList& ol(); ///< Access optionlist item
@@ -52,14 +52,14 @@ class ConfigItem {
 	std::string m_shortDesc;
 	std::string m_longDesc;
 
-	typedef boost::variant<bool, int, double, std::string, StringList> Value;
+	typedef boost::variant<bool, int, float, std::string, StringList> Value;
 	bool isDefaultImpl(Value const& defaultValue) const;
 	Value m_value; ///< The current value
 	Value m_factoryDefaultValue; ///< The value from config schema
 	Value m_defaultValue; ///< The value from config schema or system config
 	std::vector<std::string> m_enums; ///< Enum value titles
-	boost::variant<int, double> m_step, m_min, m_max;
-	boost::variant<int, double> m_multiplier;
+	boost::variant<int, float> m_step, m_min, m_max;
+	boost::variant<int, float> m_multiplier;
 	std::string m_unit;
 	int m_sel;
 };

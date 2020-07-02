@@ -211,7 +211,7 @@ void ScreenSing::instrumentLayout(double time) {
 		if (shouldPause != m_audio.isPaused()) m_audio.togglePause();
 	} else if (time < -0.5) {
 		// Display help if no-one has joined yet
-		ColorTrans c(Color::alpha(clamp(-1.0 - 2.0 * time)));
+		ColorTrans c(Color::alpha(static_cast<float>(clamp(-1.0 - 2.0 * time))));
 		m_help->draw();
 	}
 	double iw = std::min(0.5, 1.0 / count_alive);
@@ -220,7 +220,7 @@ void ScreenSing::instrumentLayout(double time) {
 	std::map<std::string, CountSum> pitchbend; // Stream id to (count, sum)
 	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it, ++i) {
 		(*it)->engine();
-		(*it)->position((0.5 + i - 0.5 * count_alive) * iw, iw); // Do layout stuff
+		(*it)->position((0.5f + i - 0.5f * count_alive) * iw, iw); // Do layout stuff
 		(*it)->draw(time);
 		{
 			CountSum& cs = volume[(*it)->getTrack()];
@@ -315,7 +315,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 					else msg = dev->source.isKeyboard() ? _("Press SPACE to join drums!") : _("KICK to join!");
 				}
 			}
-			if (!msg.empty()) gm->flashMessage(msg, 0.0, 0.1, 0.1);
+			if (!msg.empty()) gm->flashMessage(msg, 0.0f, 0.1f, 0.1f);
 			else if (type == input::DEVTYPE_DANCEPAD) m_instruments.push_back(std::make_unique<DanceGraph>(m_audio, *m_song, dev));
 			else if (type != input::DEVTYPE_GENERIC) m_instruments.push_back(std::make_unique<GuitarGraph>(m_audio, *m_song, dev, m_instruments.size()));
 		}
@@ -449,12 +449,12 @@ void ScreenSing::manageEvent(SDL_Event event) {
 }
 
 namespace {
-	const double arMin = 1.33;
-	const double arMax = 2.35;
+	const float arMin = 1.33f;
+	const float arMax = 2.35f;
 
 	void fillBG() {
 		Dimensions dim(arMin);
-		dim.fixedWidth(1.0);
+		dim.fixedWidth(1.0f);
 		glutil::VertexArray va;
 		va.texCoord(0,0).vertex(dim.x1(), dim.y1());
 		va.texCoord(0,0).vertex(dim.x2(), dim.y1());
@@ -501,7 +501,7 @@ void ScreenSing::draw() {
 	// Rendering starts
 	{
 		Transform ft(farTransform());
-		double ar = arMax;
+		float ar = arMax;
 		// Background image
 		if (!m_background || m_background->empty()) m_background = std::make_unique<Texture>(m_backgrounds.getRandom());
 		ar = m_background->dimensions.ar();
@@ -511,14 +511,14 @@ void ScreenSing::draw() {
 		if (m_cam && config["graphic/webcam"].b()) m_cam->render();
 		// Video
 		if (m_video) {
-			m_video->render(time); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp;
+			m_video->render(time); float tmp = m_video->dimensions().ar(); if (tmp > 0.0f) ar = tmp;
 		}
 		// Top/bottom borders
 		ar = clamp(ar, arMin, arMax);
-		double offset = 0.5 / ar + 0.2;
-		theme->bg_bottom.dimensions.fixedWidth(1.0).bottom(offset);
+		float offset = 0.5f / ar + 0.2f;
+		theme->bg_bottom.dimensions.fixedWidth(1.0f).bottom(offset);
 		theme->bg_bottom.draw();
-		theme->bg_top.dimensions.fixedWidth(1.0).top(-offset);
+		theme->bg_top.dimensions.fixedWidth(1.0f).top(-offset);
 		theme->bg_top.draw();
 	}
 
@@ -536,9 +536,9 @@ void ScreenSing::draw() {
 	// Compute and draw the timer and the progressbar
 	{
 		unsigned t = clamp(time, 0.0, length);
-		m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
-		theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
-		theme->songinfo.dimensions.screenBottom(-0.01);
+		m_progress->dimensions.fixedWidth(0.4f).left(-0.5f).screenTop();
+		theme->timer.dimensions.screenTop(0.5f * m_progress->dimensions.h());
+		theme->songinfo.dimensions.screenBottom(-0.01f);
 		m_progress->draw(songPercent);
 
 		Song::SongSection section("error", 0);
@@ -624,7 +624,7 @@ void ScreenSing::drawMenu() {
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
 	const auto cur = &m_menu.current();
-	double w = m_menu.dimensions.w();
+	float w = m_menu.dimensions.w();
 	const float txth = th.option_selected.h();
 	const float step = txth * 0.85f;
 	const float h = m_menu.getOptions().size() * step + step;
@@ -649,7 +649,7 @@ void ScreenSing::drawMenu() {
 			if (player < analyzers.size()) {
 				Color color = MicrophoneColor::get(analyzers[player].getId());
 				ColorTrans c(color);
-				m_player_icon->dimensions.right(x).fixedHeight(0.040).center(y);
+				m_player_icon->dimensions.right(x).fixedHeight(0.040f).center(y);
 				m_player_icon->draw();
 			}
 			player++;
@@ -659,7 +659,7 @@ void ScreenSing::drawMenu() {
 		y += step;
 	}
 	if (cur->getComment() != "") {
-		th.comment.dimensions.middle(0).screenBottom(-0.08);
+		th.comment.dimensions.middle(0).screenBottom(-0.08f);
 		th.comment.draw(cur->getComment());
 	}
 	m_menu.dimensions.stretch(w, h);
@@ -668,9 +668,9 @@ void ScreenSing::drawMenu() {
 
 ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
   m_database(database),
-  m_pos(0.8, 2.0),
+  m_pos(0.8f, 2.0f),
   m_bg(findFile("score_window.svg")),
-  m_scoreBar(findFile("score_bar_bg.svg"), findFile("score_bar_fg.svg"), ProgressBar::VERTICAL, 0.0, 0.0, false),
+  m_scoreBar(findFile("score_bar_bg.svg"), findFile("score_bar_fg.svg"), ProgressBar::VERTICAL, 0.0f, 0.0f, false),
   m_score_text(findFile("score_txt.svg"), config["graphic/text_lod"].f(), WrappingStyle().lyrics()),
   m_score_rank(findFile("score_rank.svg"), config["graphic/text_lod"].f(), WrappingStyle().lyrics())
 {
@@ -698,9 +698,9 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		item.track_simple = (*it)->getTrack();
 		item.track = (*it)->getModeId();
 		item.track = UnicodeUtil::toUpper(item.track, 1); // Capitalize
-		if (item.track_simple == TrackName::DRUMS) item.color = Color(0.1, 0.1, 0.1);
-		else if (item.track_simple == TrackName::BASS) item.color = Color(0.5, 0.3, 0.1);
-		else item.color = Color(1.0, 0.0, 0.0);
+		if (item.track_simple == TrackName::DRUMS) item.color = Color(0.1f, 0.1f, 0.1f);
+		else if (item.track_simple == TrackName::BASS) item.color = Color(0.5f, 0.3f, 0.1f);
+		else item.color = Color(1.0f, 0.0f, 0.0f);
 
 		m_database.scores.push_back(item);
 		++it;
@@ -739,22 +739,22 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 
 void ScoreWindow::draw() {
 	using namespace glmath;
-	Transform trans(translate(vec3(0.0, m_pos.get(), 0.0)));
+	Transform trans(translate(vec3(0.0f, m_pos.get(), 0.0f)));
 	m_bg.draw();
-	const double spacing = 0.1 + 0.1 / m_database.scores.size();
+	const float spacing = 0.1f + 0.1f / m_database.scores.size();
 	unsigned i = 0;
 
 	for (Database::cur_scores_t::const_iterator p = m_database.scores.begin(); p != m_database.scores.end(); ++p, ++i) {
 		int score = p->score;
 		ColorTrans c(p->color);
-		double x = spacing * (0.5 + i - 0.5 * m_database.scores.size());
-		m_scoreBar.dimensions.fixedWidth(0.09).middle(x).bottom(0.20);
+		float x = spacing * (0.5f + i - 0.5f * m_database.scores.size());
+		m_scoreBar.dimensions.fixedWidth(0.09f).middle(x).bottom(0.20f);
 		m_scoreBar.draw(score / 10000.0);
 		m_score_text.render(std::to_string(score));
-		m_score_text.dimensions().middle(x).top(0.24).fixedHeight(0.042);
+		m_score_text.dimensions().middle(x).top(0.24f).fixedHeight(0.042f);
 		m_score_text.draw();
 		m_score_text.render(p->track_simple);
-		m_score_text.dimensions().middle(x).top(0.20).fixedHeight(0.042);
+		m_score_text.dimensions().middle(x).top(0.20f).fixedHeight(0.042f);
 		m_score_text.draw();
 	}
 	m_score_rank.draw(m_rank);

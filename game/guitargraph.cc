@@ -390,7 +390,7 @@ void GuitarGraph::engine() {
 		// Solo just ended?
 		} else if (m_soloTotal > 0) {
 			m_popups.push_back(Popup(std::to_string(unsigned(m_soloScore / m_soloTotal * 100)) + " %",
-			  Color(0.0, 0.8, 0.0), 1.0, m_popupText.get()));
+			  Color(0.0f, 0.8f, 0.0f), 1.0f, m_popupText.get()));
 			m_soloScore = 0;
 			m_soloTotal = 0;
 		}
@@ -447,7 +447,7 @@ void GuitarGraph::engine() {
 		m_bigStreak = getNextBigStreak(m_bigStreak);
 		m_starmeter += streakStarBonus;
 		m_popups.push_back(Popup(std::to_string(unsigned(m_bigStreak)) + "\n" + _("Streak!"),
-		  Color(1.0, 0.0, 0.0), 1.0, m_popupText.get()));
+		  Color(1.0f, 0.0f, 0.0f), 1.0f, m_popupText.get()));
 	}
 	// During GodMode, correctness is full, no matter what
 	if (m_starpower.get() > 0.01) m_correctness.setTarget(1.0, true);
@@ -459,7 +459,7 @@ void GuitarGraph::activateStarpower() {
 		m_starmeter = 0;
 		m_starpower.setValue(1.0);
 		m_popups.push_back(Popup(_("God Mode\nActivated!"),
-		  Color(0.3, 0.0, 1.0), 0.666, m_popupText.get(), _("Mistakes ignored!"), &m_text));
+		  Color(0.3f, 0.0f, 1.0f), 0.666f, m_popupText.get(), _("Mistakes ignored!"), &m_text));
 	}
 }
 
@@ -746,12 +746,12 @@ namespace {
 	const float fretWid = 0.5f; // The actual width is two times this
 
 	/// Create a symmetric vertex pair of given data
-	void vertexPair(glutil::VertexArray& va, float x, float y, Color color, float ty, float fretW = fretWid, float zn = 0.0) {
+	void vertexPair(glutil::VertexArray& va, float x, float y, Color color, float ty, float fretW = fretWid, float zn = 0.0f) {
 		color.a = y2a(y);
 		{
 			glmath::vec4 c(color.r, color.g, color.b, color.a);
-			va.color(c).texCoord(0.0f, ty).vertex(x - fretW, y, 0.1 + zn);
-			va.color(c).texCoord(1.0f, ty).vertex(x + fretW, y, 0.1 - zn);
+			va.color(c).texCoord(0.0f, ty).vertex(x - fretW, y, 0.1f + zn);
+			va.color(c).texCoord(1.0f, ty).vertex(x + fretW, y, 0.1f - zn);
 		}
 	}
 
@@ -773,7 +773,7 @@ void GuitarGraph::drawNotes(double time) {
 	}
 	if (time != time) return;  // Check that time is not NaN
 
-	glmath::dvec4 neckglow;  // Used for calculating the average neck color
+	glmath::vec4 neckglow;  // Used for calculating the average neck color
 
 	// Iterate chords
 	for (auto& chord: m_chords) {
@@ -811,7 +811,7 @@ void GuitarGraph::drawNotes(double time) {
 			if (!joining(time)) {
 				// Get a color for the fret and adjust it if GodMode is on
 				c = colorize(color(fret), chord.begin);
-				if (glow > 0.1f) { neckglow = neckglow + glmath::dvec4(c.r, c.g, c.b, 1.0); } // neck glow tracking
+				if (glow > 0.1f) { neckglow = neckglow + glmath::vec4(c.r, c.g, c.b, 1.0f); } // neck glow tracking
 				// Further adjust the color if the note is hit
 				c.r += glow * 0.2f;
 				c.g += glow * 0.2f;
@@ -826,21 +826,21 @@ void GuitarGraph::drawNotes(double time) {
 	}
 	// Mangle neck glow color as needed
 	// Convert sum into average and apply correctness as premultiplied alpha
-	if (neckglow.w > 0.0) neckglow = (correctness() / neckglow.w) * neckglow;
+	if (neckglow.w > 0.0f) neckglow = static_cast<float>((correctness() / neckglow.w)) * neckglow;
 	// Blend into use slowly
-	m_neckglowColor = glmath::mix(m_neckglowColor, neckglow, 0.05);
+	m_neckglowColor = glmath::mix(m_neckglowColor, neckglow, 0.05f);
 }
 
 double GuitarGraph::neckWidth() const { return std::min(0.5, m_width.get()); }
 
 void GuitarGraph::drawNeckStuff(double time) {
 	using namespace glmath;
-	mat4 m = translate(vec3(0.0f, 0.5 * virtH(), 0.0f)) * rotate(g_angle, vec3(1.0f, 0.0f, 0.0f)) * scale(neckWidth() / 5.0f);
+	mat4 m = translate(vec3(0.0f, 0.5f * virtH(), 0.0f)) * rotate(g_angle, vec3(1.0f, 0.0f, 0.0f)) * scale(neckWidth() / 5.0f);
 	// Do some jumping for drums
 	if (m_drums) {
 		float jumpanim = m_drumJump.get();
 		if (jumpanim == 1.0) m_drumJump.setTarget(0.0);
-		if (jumpanim > 0) m = translate(vec3(0.0f, -m_drumJump.get() * 0.01, 0.0f)) * m;
+		if (jumpanim > 0) m = translate(vec3(0.0f, -m_drumJump.get() * 0.01f, 0.0f)) * m;
 	}
 	//Transform trans(m);
 	ViewTrans trans(m);
@@ -872,7 +872,7 @@ void GuitarGraph::drawNeckStuff(double time) {
 		{
 			float level = m_pressed_anim[0].get();
 			ColorTrans c(Color(level, level, level));
-			drawBar(0.0, 0.01f);
+			drawBar(0.0f, 0.01f);
 		}
 		// Fret buttons on cursor
 		for (unsigned fret = m_drums; fret < m_pads; ++fret) {
@@ -912,7 +912,7 @@ void GuitarGraph::drawNeckStuff(double time) {
 			float h = flameAnim * 4.0f * fretWid;
 			UseTexture tblock(*ftex);
 			glutil::VertexArray va;
-			glmath::vec4 c(1.0, 1.0, 1.0, 1.0 - flameAnim);
+			glmath::vec4 c(1.0f, 1.0f, 1.0f, 1.0f - flameAnim);
 			va.texCoord(0.0f, 1.0f).color(c).vertex(x - fretWid, time2y(0.0f), 0.0f);
 			va.texCoord(1.0f, 1.0f).color(c).vertex(x + fretWid, time2y(0.0f), 0.0f);
 			va.texCoord(0.0f, 0.0f).color(c).vertex(x - fretWid, time2y(0.0f), h);
@@ -959,15 +959,15 @@ void GuitarGraph::drawNeckStuff(double time) {
 /// Main drawing function (projection, neck, cursor...)
 void GuitarGraph::draw(double time) {
 	glutil::GLErrorChecker ec("GuitarGraph::draw");
-	ViewTrans view(m_cx.get(), 0.0, 0.75);  // Apply a per-player local perspective
+	ViewTrans view(m_cx.get(), 0.0f, 0.75f);  // Apply a per-player local perspective
 
 	drawNeckStuff(time);
 
-	if (m_neckglowColor.w > 0.0) {
+	if (m_neckglowColor.w > 0.0f) {
 		// Neck glow drawing
 		using namespace glmath;
 		ColorTrans c(glmath::diagonal(m_neckglowColor));
-		m_neckglow.dimensions.screenBottom(0.0).middle().fixedWidth(neckWidth());
+		m_neckglow.dimensions.screenBottom(0.0f).middle().fixedWidth(neckWidth());
 		m_neckglow.draw();
 	}
 
@@ -1085,33 +1085,33 @@ void GuitarGraph::drawInfo(double time) {
 		using namespace glmath;
 		Transform trans(translate(vec3(0.0f, 0.0f, -0.5f)));  // Add some depth
 		double w = neckWidth();
-		double xcor = 0.53 * w;
-		double h = 0.15 * w;
+		float xcor = 0.53f * w;
+		float h = 0.15f * w;
 		// Draw scores
 		{
-			ColorTrans c(Color(0.1, 0.3, 1.0, 0.9));
+			ColorTrans c(Color(0.1f, 0.3f, 1.0f, 0.9f));
 			m_scoreText->render((boost::format("%04d") % getScore()).str());
-			m_scoreText->dimensions().middle(-xcor).fixedHeight(h).screenBottom(-0.22);
+			m_scoreText->dimensions().middle(-xcor).fixedHeight(h).screenBottom(-0.22f);
 			m_scoreText->draw();
 		}
 		// Draw streak counter
 		{
-			ColorTrans c(Color(0.6, 0.6, 0.7, 0.95));
+			ColorTrans c(Color(0.6f, 0.6f, 0.7f, 0.95f));
 			m_streakText->render(std::to_string(unsigned(m_streak)) + "/"
 			  + std::to_string(unsigned(m_longestStreak)));
-			m_streakText->dimensions().middle(-xcor).fixedHeight(h*0.75).screenBottom(-0.18);
+			m_streakText->dimensions().middle(-xcor).fixedHeight(h*0.75f).screenBottom(-0.18f);
 			m_streakText->draw();
 		}
 	}
 	// Status text at the bottom
 	{
-		ColorTrans c(Color::alpha(std::abs(std::fmod(time, 1.0) - 0.5f) * 2.0f));
+		ColorTrans c(Color::alpha(static_cast<float>(std::abs(std::fmod(time, 1.0) - 0.5) * 2.0)));
 		if (canActivateStarpower()) {
-			m_text.dimensions.screenBottom(-0.02).middle(-0.12);
+			m_text.dimensions.screenBottom(-0.02f).middle(-0.12f);
 			if (!m_drums) m_text.draw(_("God Mode Ready!"));
 			else if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin && time <= m_dfIt->end) m_text.draw(_("Drum Fill!"));
 		} else if (m_solo) {
-			m_text.dimensions.screenBottom(-0.02).middle(-0.03);
+			m_text.dimensions.screenBottom(-0.02f).middle(-0.03f);
 			m_text.draw(_("Solo!"));
 		}
 	}

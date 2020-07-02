@@ -133,10 +133,10 @@ void ScreenPaths::draw() {
 		m_theme->back_h.dimensions.fixedHeight(0.065f);
 		m_theme->back_h.dimensions.stretch(m_menu.dimensions.w(), m_theme->back_h.dimensions.h());
 		const size_t showopts = 13; // Show at most 8 options simultaneously
-		const float sel_margin = 0.04;
-		const float x = -0.45;
-		const float start_y = -0.15;
-		double wcounter = 0;
+		const float sel_margin = 0.04f;
+		const float x = -0.45f;
+		const float start_y = -0.15f;
+		float wcounter = 0;
 		const MenuOptions opts = m_menu.getOptions();
 		int start_i = std::min((int)m_menu.curIndex() - 1, (int)opts.size() - (int)showopts
 			+ (m_menu.getSubmenuLevel() == 2 ? 1 : 0)); // Hack to counter side-effects from displaying the value inside the menu
@@ -146,26 +146,26 @@ void ScreenPaths::draw() {
 			if (i == m_menu.curIndex()) {
 				double selanim = m_selAnim.get() - start_i;
 				if (selanim < 0) { selanim = 0; }
-				m_theme->back_h.dimensions.left(x - sel_margin).center(start_y + selanim*0.08);
+				m_theme->back_h.dimensions.left(x - sel_margin).center(start_y + selanim*0.08f);
 				m_theme->back_h.draw();
 				// Draw the text, dim if option not available
 				{
-					ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
-					m_theme->device.dimensions.left(x).center(start_y + ii*0.03);
+					ColorTrans c(Color::alpha(opt.isActive() ? 1.0f : 0.5f));
+					m_theme->device.dimensions.left(x).center(start_y + ii*0.03f);
 					m_theme->device.draw(opt.getName());
 				} // to make the colortrans object go out of scope
 				wcounter = std::max(wcounter, m_theme->device.w() + 2 * sel_margin); // Calculate the widest entry
 				// If this is a config item, show the value below
 			} else {
-				ColorTrans c(Color::alpha(opt.isActive() ? 0.8 : 0.5));
-				m_theme->device.dimensions.left(x).center(start_y + ii*0.03);
+				ColorTrans c(Color::alpha(opt.isActive() ? 0.8f : 0.5f));
+				m_theme->device.dimensions.left(x).center(start_y + ii*0.03f);
 				m_theme->device.draw(opt.getName());
 			}
 		}
 	} //draw menu
-	m_theme->comment_bg.dimensions.center().screenBottom(-0.01);
+	m_theme->comment_bg.dimensions.center().screenBottom(-0.01f);
 	m_theme->comment_bg.draw();
-	m_theme->comment.dimensions.left(-0.48).screenBottom(-0.028);
+	m_theme->comment.dimensions.left(-0.48f).screenBottom(-0.028f);
 	m_theme->comment.draw(m_menu.current().getComment());
 
 }

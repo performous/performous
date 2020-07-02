@@ -57,7 +57,7 @@ class Dimensions {
 	float x1() const {
 		switch (m_xAnchor) {
 		  case LEFT: return m_x;
-		  case MIDDLE: return m_x - 0.5 * m_w;
+		  case MIDDLE: return m_x - 0.5f * m_w;
 		  case RIGHT: return m_x - m_w;
 		}
 		throw std::logic_error("Unknown value in Dimensions::m_xAnchor");
@@ -66,7 +66,7 @@ class Dimensions {
 	float y1() const {
 		switch (m_yAnchor) {
 		  case TOP: return screenY() + m_y;
-		  case CENTER: return screenY() + m_y - 0.5 * m_h;
+		  case CENTER: return screenY() + m_y - 0.5f * m_h;
 		  case BOTTOM: return screenY() + m_y - m_h;
 		}
 		throw std::logic_error("Unknown value in Dimensions::m_yAnchor");
@@ -76,9 +76,9 @@ class Dimensions {
 	/// returns bottom
 	float y2() const { return y1() + h(); }
 	/// returns x center
-	float xc() const { return x1() + 0.5 * w(); }
+	float xc() const { return x1() + 0.5f * w(); }
 	/// returns y center
-	float yc() const { return y1() + 0.5 * h(); }
+	float yc() const { return y1() + 0.5f * h(); }
 	/// returns width
 	float w() const { return m_w; }
 	/// returns height
@@ -99,13 +99,13 @@ struct TexCoords {
 	float x2; ///< right
 	float y2; ///< bottom
 	/// constructor
-	TexCoords(float x1_ = 0.0, float y1_ = 0.0, float x2_ = 1.0, float y2_ = 1.0):
+	TexCoords(float x1_ = 0.0f, float y1_ = 0.0f, float x2_ = 1.0f, float y2_ = 1.0f):
 	  x1(x1_), y1(y1_), x2(x2_), y2(y2_) {}
 	bool outOfBounds() const {
 		return test(x1) || test(y1) || test(x2) || test(y2);
 	}
 private:
-	static bool test(float x) { return x < 0.0 || x > 1.0; }
+	static bool test(float x) { return x < 0.0f || x > 1.0f; }
 };
 
 /// This function hides the ugly global vari-- I mean singleton access to ScreenManager...

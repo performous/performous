@@ -36,7 +36,7 @@ namespace {
 	};
 
 	float getSeparation() {
-		return config["graphic/stereo3d"].b() ? 0.001f * config["graphic/stereo3dseparation"].f() : 0.0;
+		return config["graphic/stereo3d"].b() ? 0.001f * config["graphic/stereo3dseparation"].f() : 0.0f;
 	}
 
 	// stump: under MSVC, near and far are #defined to nothing for compatibility with ancient code, hence the underscores.
@@ -292,7 +292,7 @@ void Window::render(std::function<void (void)> drawFunc) {
 	if (stereo && type == 2 && !m_fullscreen) stereo = false;
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	updateStereo(stereo ? getSeparation() : 0.0);
+	updateStereo(stereo ? getSeparation() : 0.0f);
 	glerror.check("setup");
 	// Can we do direct to framebuffer rendering (no FBO)?
 	if (!stereo || type == 2) { view(stereo); drawFunc(); return; }
@@ -313,13 +313,13 @@ void Window::render(std::function<void (void)> drawFunc) {
 	view(0);  // Viewport for drawable area
 	glDisable(GL_BLEND);
 	glmath::mat4 colorMatrix = glmath::mat4(1.0f);
-	updateStereo(0.0);  // Disable stereo mode while we composite
+	updateStereo(0.0f);  // Disable stereo mode while we composite
 	glerror.check("FBO->FB setup");
 	for (int num = 0; num < 2; ++num) {
 		{
-			float saturation = 0.5;  // (0..1)
-			float col = (1.0 + 2.0 * saturation) / 3.0;
-			float gry = 0.5 * (1.0 - col);
+			float saturation = 0.5f;  // (0..1)
+			float col = (1.0f + 2.0f * saturation) / 3.0f;
+			float gry = 0.5f * (1.0f - col);
 			bool out[3] = {};  // Which colors to output
 			if (type == 0 && num == 0) { out[0] = true; }  // Red
 			if (type == 0 && num == 1) { out[1] = out[2] = true; }  // Cyan
@@ -327,7 +327,7 @@ void Window::render(std::function<void (void)> drawFunc) {
 			if (type == 1 && num == 1) { out[0] = out[2] = true; }  // Magenta
 			for (unsigned i = 0; i < 3; ++i) {
 				for (unsigned j = 0; j < 3; ++j) {
-					float val = 0.0;
+					float val = 0.0f;
 					if (out[i]) val = (i == j ? col : gry);
 					colorMatrix[j][i] = val;
 				}
@@ -335,14 +335,14 @@ void Window::render(std::function<void (void)> drawFunc) {
 		}
 		// Render FBO with 1:1 pixels, properly filtered/positioned for 3d
 		ColorTrans c(colorMatrix);
-		Dimensions dim = Dimensions(getFBO().width() / getFBO().height()).fixedWidth(1.0);
-		dim.center((num == 0 ? 0.25 : -0.25) * dim.h());
+		Dimensions dim = Dimensions(getFBO().width() / getFBO().height()).fixedWidth(1.0f);
+		dim.center((num == 0 ? 0.25f : -0.25f) * dim.h());
 		if (num == 1) {
 			// Right eye blends over the left eye
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_ONE, GL_ONE);
 		}
-		getFBO().getTexture().draw(dim, TexCoords(0.0, 1.0, 1.0, 0));
+		getFBO().getTexture().draw(dim, TexCoords(0.0f, 1.0f, 1.0f, 0));
 	}
 }
 
@@ -542,8 +542,8 @@ ViewTrans::ViewTrans(float offsetX, float offsetY, float frac): m_old(g_projecti
 	float h = virtH();
 	const float f = near_ / z0;  // z0 to nearplane conversion factor
 	// Corners of the screen at z0
-	float x1 = -0.5, x2 = 0.5;
-	float y1 = 0.5 * h, y2 = -0.5 * h;
+	float x1 = -0.5f, x2 = 0.5f;
+	float y1 = 0.5f * h, y2 = -0.5f * h;
 	// Move the perspective point by frac of offset (i.e. move the image)
 	float persX = frac * offsetX, persY = frac * offsetY;
 	x1 -= persX; x2 -= persX;
@@ -577,7 +577,7 @@ Transform::~Transform() {
 glmath::mat4 farTransform() {
 	float z = far_ - 0.1f;  // Very near the far plane but just a bit closer to avoid accidental clipping
 	float s = z / z0;  // Scale the image so that it looks the same size
-	s *= 1.0 + 2.0 * getSeparation(); // A bit more for stereo3d (avoid black borders)
+	s *= 1.0f + 2.0f * getSeparation(); // A bit more for stereo3d (avoid black borders)
 	using namespace glmath;
 	return translate(vec3(0.0f, 0.0f, -z + z0)) * scale(s); // Very near the farplane
 }

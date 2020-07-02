@@ -3,7 +3,7 @@
 #include "util.hh"
 #include <cmath>
 
-Video::Video(fs::path const& _videoFile, double videoGap): m_mpeg(_videoFile), m_videoGap(videoGap), m_textureTime(), m_lastTime(), m_alpha(-0.5, 1.5) {}
+Video::Video(fs::path const& _videoFile, double videoGap): m_mpeg(_videoFile), m_videoGap(videoGap), m_textureTime(), m_lastTime(), m_alpha(-0.5f, 1.5f) {}
 
 void Video::prepare(double time) {
 	time += m_videoGap;
@@ -28,8 +28,8 @@ void Video::render(double time) {
 	time += m_videoGap;
 	double tdist = std::abs(m_textureTime - time);
 	m_alpha.setTarget(tdist < 0.4 ? 1.2f : -0.5f);
-	double alpha = clamp(m_alpha.get());
-	if (alpha == 0.0) return;
+	float alpha = clamp(m_alpha.get());
+	if (alpha == 0.0f) return;
 	ColorTrans c(Color::alpha(alpha));
 	m_texture.draw();
 }

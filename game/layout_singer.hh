@@ -17,7 +17,7 @@ class LyricRow {
 	/// iterator
 	typedef Notes::const_iterator Iterator;
 	/// constructor
-	LyricRow(Iterator& it, Iterator const& eof): extraspacing(0.0, 2.0), fade(0.0, 0.6) {
+	LyricRow(Iterator& it, Iterator const& eof): extraspacing(0.0f, 2.0f), fade(0.0, 0.6) {
 		fade.setTarget(1.0);
 		m_begin = it;
 		while (it != eof && it->type != Note::SLEEP) ++it;
