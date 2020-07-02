@@ -97,7 +97,7 @@ struct WrappingStyle {
 class OpenGLText {
 public:
 	/// constructor
-	OpenGLText(TextStyle &_text, double m, WrappingStyle const& wrapping, Align textureAlign);
+	OpenGLText(TextStyle &_text, float m, WrappingStyle const& wrapping, Align textureAlign);
 	/// draws area
 	void draw(Dimensions &_dim, TexCoords &_tex);
 	/// draws full texture

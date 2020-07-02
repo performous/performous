@@ -57,7 +57,7 @@ namespace {
 
 WrappingStyle::WrappingStyle (unsigned short int _maxWidth, EllipsizeMode _ellipsize, unsigned short int _maxLines) : m_maxLines(_maxLines * -1), m_ellipsize(_ellipsize), m_maxWidth(_maxWidth > 96 ? 0 : _maxWidth) {};
 
-OpenGLText::OpenGLText(TextStyle& _text, double m, WrappingStyle const& wrapping, Align textureAlign) {
+OpenGLText::OpenGLText(TextStyle& _text, float m, WrappingStyle const& wrapping, Align textureAlign) {
 	m *= 2.0f;  // HACK to improve text quality without affecting compatibility with old versions
 	// Setup font settings
 	PangoAlignment alignment = parseAlignment(_text.fontalign);
@@ -191,7 +191,7 @@ void OpenGLText::draw(Dimensions &_dim, TexCoords &_tex) {
 }
 
 namespace {
-	void parseTheme(fs::path const& themeFile, TextStyle &_theme, double &_width, double &_height, double &_x, double &_y, Align& _align) {
+	void parseTheme(fs::path const& themeFile, TextStyle &_theme, float &_width, float &_height, float &_x, float &_y, Align& _align) {
 		xmlpp::Node::PrefixNsMap nsmap;
 		nsmap["svg"] = "http://www.w3.org/2000/svg";
 		xmlpp::DomParser dom(themeFile.string());
@@ -324,7 +324,8 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool padSyllables) {
 	m_texture_width = std::min(padSyllables ? 0.864f : 0.96f, text_x / targetWidth); // targetWidth is defined in video_driver.cc, it's the base rendering width, used to project the svg onto a gltexture. currently we're targeting 1366x768 as base resolution.
 	
 	float position_x = dimensions.x1();
-	if (m_align == Align::CENTER) position_x -= 0.5 * (m_texture_width * (padSyllables ? 1.1 : 1.0));
+	std::clog << "text/debug: Initial position_x inside SvgTxtTheme::draw is: " << std::to_string(position_x) << std::endl;
+	if (m_align == Align::CENTER) position_x -= 0.5f * (m_texture_width * (padSyllables ? 1.1f : 1.0f));
 	if (m_align == Align::RIGHT) position_x -= m_texture_width;
 
 	if ((position_x + m_texture_width * (padSyllables ? 1.1f : 1.0f)) > (padSyllables ? 0.432f : 0.48f)) { 
