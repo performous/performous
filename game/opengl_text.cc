@@ -57,7 +57,7 @@ namespace {
 
 WrappingStyle::WrappingStyle (unsigned short int _maxWidth, EllipsizeMode _ellipsize, unsigned short int _maxLines) : m_maxLines(_maxLines * -1), m_ellipsize(_ellipsize), m_maxWidth(_maxWidth > 96 ? 0 : _maxWidth) {};
 
-OpenGLText::OpenGLText(TextStyle& _text, double m, WrappingStyle const& wrapping) {
+OpenGLText::OpenGLText(TextStyle& _text, double m, WrappingStyle const& wrapping, Align textureAlign) {
 	m *= 2.0f;  // HACK to improve text quality without affecting compatibility with old versions
 	// Setup font settings
 	PangoAlignment alignment = parseAlignment(_text.fontalign);
@@ -191,7 +191,7 @@ void OpenGLText::draw(Dimensions &_dim, TexCoords &_tex) {
 }
 
 namespace {
-	void parseTheme(fs::path const& themeFile, TextStyle &_theme, double &_width, double &_height, double &_x, double &_y, SvgTxtTheme::Align& _align) {
+	void parseTheme(fs::path const& themeFile, TextStyle &_theme, double &_width, double &_height, double &_x, double &_y, Align& _align) {
 		xmlpp::Node::PrefixNsMap nsmap;
 		nsmap["svg"] = "http://www.w3.org/2000/svg";
 		xmlpp::DomParser dom(themeFile.string());
@@ -235,9 +235,9 @@ namespace {
 				std::string value;
 				std::getline(iss2, value);
 				_theme.fontalign = value;
-				if (value == "start") _align = SvgTxtTheme::LEFT;
-				else if (value == "middle") _align = SvgTxtTheme::CENTER;
-				else if (value == "end") _align = SvgTxtTheme::RIGHT;
+				if (value == "start") _align = Align::LEFT;
+				else if (value == "middle") _align = Align::CENTER;
+				else if (value == "end") _align = Align::RIGHT;
 			}
 		}
 		// Parse x and y attributes
@@ -252,8 +252,8 @@ namespace {
 	}
 }
 
-	SvgTxtTheme::Align a;
 SvgTxtThemeSimple::SvgTxtThemeSimple(fs::path const& themeFile, float factor, WrappingStyle wrapping) : m_factor(factor), m_wrapping(wrapping) {
+	Align a;
 	float tmp;
 	parseTheme(themeFile, m_text, tmp, tmp, tmp, tmp, a);
 }
@@ -262,7 +262,7 @@ void SvgTxtThemeSimple::render(std::string _text) {
 	if (!m_opengl_text.get() || m_cache_text != _text) {
 		m_cache_text = _text;
 		m_text.text = _text;
-		m_opengl_text = std::make_unique<OpenGLText>(m_text, m_factor, m_wrapping);
+		m_opengl_text = std::make_unique<OpenGLText>(m_text, m_factor, m_wrapping, Align());
 	}
 }
 
@@ -308,7 +308,7 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool padSyllables) {
 		m_opengl_text.clear();
 		for (auto& zt: _text) {
 			m_text.text = zt.string;
-			auto openGlPtr = std::unique_ptr<OpenGLText>(std::make_unique<OpenGLText>(m_text, m_factor, m_wrapping));
+			auto openGlPtr = std::unique_ptr<OpenGLText>(std::make_unique<OpenGLText>(m_text, m_factor, m_wrapping, m_align));
 			m_opengl_text.push_back(std::move(openGlPtr));
 		}
 	}
@@ -323,9 +323,9 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool padSyllables) {
 	float texture_ar = text_x / text_y;
 	m_texture_width = std::min(padSyllables ? 0.864f : 0.96f, text_x / targetWidth); // targetWidth is defined in video_driver.cc, it's the base rendering width, used to project the svg onto a gltexture. currently we're targeting 1366x768 as base resolution.
 	
-	if (m_align == CENTER) position_x -= 0.5 * (m_texture_width * (padSyllables ? 1.1 : 1.0));
-	if (m_align == RIGHT) position_x -= m_texture_width;
 	float position_x = dimensions.x1();
+	if (m_align == Align::CENTER) position_x -= 0.5 * (m_texture_width * (padSyllables ? 1.1 : 1.0));
+	if (m_align == Align::RIGHT) position_x -= m_texture_width;
 
 	if ((position_x + m_texture_width * (padSyllables ? 1.1f : 1.0f)) > (padSyllables ? 0.432f : 0.48f)) { 
 		m_texture_width = ((padSyllables ? 0.432f : 0.48f) - position_x / (padSyllables ? 1.1f : 1.0f)) ;

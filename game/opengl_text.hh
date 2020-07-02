@@ -6,6 +6,9 @@
 #include <pango/pangocairo.h>
 #include <vector>
 
+/// horizontal align
+enum class Align {A_ASIS, LEFT, CENTER, RIGHT};
+
 /// Load custom fonts from current theme and data folders
 void loadFonts();
 
@@ -94,7 +97,7 @@ struct WrappingStyle {
 class OpenGLText {
 public:
 	/// constructor
-	OpenGLText(TextStyle &_text, double m, WrappingStyle const& wrapping);
+	OpenGLText(TextStyle &_text, double m, WrappingStyle const& wrapping, Align textureAlign);
 	/// draws area
 	void draw(Dimensions &_dim, TexCoords &_tex);
 	/// draws full texture
@@ -182,8 +185,6 @@ public:
 	enum Fitting {F_ASIS, INSIDE, OUTSIDE, FORCE_INSIDE, FORCE_OUTSIDE};
 	/// vertical align
 	enum VAlign {V_ASIS, TOP, MIDDLE, BOTTOM};
-	/// horizontal align
-	enum Align {A_ASIS, LEFT, CENTER, RIGHT};
 	/// dimensions, what else
 	Dimensions dimensions;
 	/// constructor
