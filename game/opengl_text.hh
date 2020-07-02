@@ -102,10 +102,10 @@ public:
 	void draw(Dimensions &_dim, TexCoords &_tex);
 	/// draws full texture
 	void draw();
-	/// @return x
-	float x() const { return m_x; }
-	/// @return y
-	float y() const { return m_y; }
+	/// @return width
+	float w() const { return m_width; }
+	/// @return height
+	float h() const { return m_height; }
 	/// @returns dimension of texture
 	Dimensions& dimensions() { return m_texture.dimensions; }
 	/// @return number of lines rendered.
@@ -113,8 +113,8 @@ public:
 
 private:
 	size_t m_lines = 1;
-	float m_x;
-	float m_y;
+	float m_width;
+	float m_height;
 	Texture m_texture;
 };
 

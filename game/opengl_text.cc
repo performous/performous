@@ -123,8 +123,8 @@ OpenGLText::OpenGLText(TextStyle& _text, double m, WrappingStyle const& wrapping
 // 			pango_layout_get_pixel_extents(layout.get(), nullptr, &rec);
 			std::clog << "text/debug: raw text width for : \"" << _text.text << "\", after wrapping: " << ((rec.width + border) / m) << std::endl;
 // 		}
-		m_x = rec.width + border;  // Add twice half a border for margins
-		m_y = rec.height + border;
+		m_width = rec.width + border;  // Add twice half a border for margins
+		m_height = rec.height + border;
 	}
 	m_lines = pango_layout_get_line_count (layout.get());
 	for (unsigned i = 0; i < m_lines; i++) {
@@ -137,7 +137,7 @@ OpenGLText::OpenGLText(TextStyle& _text, double m, WrappingStyle const& wrapping
 	
 	// Create Cairo surface and drawing context
 	std::shared_ptr<cairo_surface_t> surface(
-	  cairo_image_surface_create(CAIRO_FORMAT_ARGB32, m_x, m_y),
+	  cairo_image_surface_create(CAIRO_FORMAT_ARGB32, m_width, m_height),
 	  cairo_surface_destroy);
 	std::shared_ptr<cairo_t> dc(
 	  cairo_create(surface.get()),
@@ -176,8 +176,8 @@ OpenGLText::OpenGLText(TextStyle& _text, double m, WrappingStyle const& wrapping
 	bitmap.resize(cairo_image_surface_get_width(surface.get()), cairo_image_surface_get_height(surface.get()));
 	m_texture.load(bitmap, true);
 	// We don't want text quality multiplier m to affect rendering size...
-	m_x /= m;
-	m_y /= m;
+	m_width /= m;
+	m_height /= m;
 }
 
 void OpenGLText::draw() {
@@ -316,8 +316,8 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool padSyllables) {
 	float text_y = 0.0f;
 	// First compute maximum height and whole length
 	for (size_t i = 0; i < _text.size(); i++ ) {
-		text_x += m_opengl_text[i]->x();
-		text_y = std::max(text_y, m_opengl_text[i]->y());
+		text_x += m_opengl_text[i]->w();
+		text_y = std::max(text_y, m_opengl_text[i]->h());
 	}
 
 	float texture_ar = text_x / text_y;
