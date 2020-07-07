@@ -132,7 +132,7 @@ OpenGLText::OpenGLText(TextStyle& _text, float m, WrappingStyle const& wrapping,
 	int start = line->start_index;
 	int length = line->length;
 	std::string lineText(pango_layout_get_text(layout.get()),start,length);
-	std::clog << "text/debug: (layout) Line " << std::to_string(i + 1) << ": \"" << lineText << "\", width is: " << (m_x / m / targetWidth * 100) << "%, m_y: " << (m_y / m) << ", did we wrap?: " << std::string(pango_layout_is_wrapped(layout.get()) ? "Yes" : "No") << std::endl;
+	std::clog << "text/debug: (layout) Line " << std::to_string(i + 1) << ": \"" << lineText << "\", width is: " << (m_width / m / targetWidth * 100) << "%, m_y: " << (m_height / m) << ", did we wrap?: " << std::string(pango_layout_is_wrapped(layout.get()) ? "Yes" : "No") << std::endl;
 	}
 	
 	// Create Cairo surface and drawing context
