@@ -107,7 +107,7 @@ void ScreenIntro::draw_menu_options() {
 			{
 				theme->option_selected.draw(opt.getName());
 				ColorTrans c(Color::alpha(opt.isActive() ? 1.0f : 0.5f));
-				theme->option_selected.dimensions.left(test_pos).center(start_y + ii*0.065f);
+				theme->option_selected.dimensions.left(x).center(start_y + ii*0.065f);
 			}
 			wcounter = std::max(wcounter, theme->option_selected.w() + 2 * sel_margin); // Calculate the widest entry
 			// If this is a config item, show the value below
