@@ -1,4 +1,4 @@
-#include "player.hh"
+﻿#include "player.hh"
 #include "song.hh"
 #include "engine.hh" // just for Engine::TIMESTEP
 
@@ -51,7 +51,7 @@ void Player::update() {
 		}
 		if (endTime < m_scoreIt->end) break;  // The note continues past this timestep
 		// Check if we got a star
-		if ((m_scoreIt->type == Note::NORMAL || m_scoreIt->type == Note::SLIDE || m_scoreIt->type == Note::GOLDEN)
+		if ((m_scoreIt->type == Note::NORMAL || m_scoreIt->type == Note::SLIDE || m_scoreIt->type == Note::GOLDEN || m_scoreIt->type == Note::GOLDEN2)
 		  && (m_noteScore / m_vocal.m_scoreFactor / m_scoreIt->maxScore() > 0.8)) {
 			m_scoreIt->stars.push_back(m_color);
 		}
