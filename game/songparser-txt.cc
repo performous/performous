@@ -1,4 +1,4 @@
-#include "songparser.hh"
+﻿#include "songparser.hh"
 #include "unicode.hh"
 
 #include <boost/algorithm/string.hpp>
@@ -165,8 +165,10 @@ bool SongParser::txtParseNote(std::string line) {
 	unsigned int ts = m_txt.prevts;
 	switch (n.type) {
 		case Note::NORMAL:
+		case Note::RAP:
 		case Note::FREESTYLE:
 		case Note::GOLDEN:
+		case Note::GOLDEN2:
 		{
 			unsigned int length = 0;
 			if (!(iss >> ts >> length >> n.note)) throw std::runtime_error("Invalid note line format");
