@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # NSIS script generator for Performous.
 # Copyright (C) 2010 John Stumpo
 #
@@ -21,9 +21,10 @@ import sys
 import shutil
 
 try:
-    makensis = subprocess.Popen([os.environ['MAKENSIS'], '-'], stdin=subprocess.PIPE)
+    makensis_var = os.environ['MAKENSIS']
 except KeyError:
-    makensis = subprocess.Popen(['makensis', '-'], stdin=subprocess.PIPE)
+    makensis_var = os.environ['makensis']
+makensis = subprocess.Popen([makensis_var, '-INPUTCHARSET', 'UTF8', '-'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
 
 if not os.path.isdir('dist'):
     os.mkdir('dist')
@@ -36,12 +37,12 @@ if 'WINDRES' in os.environ:
 else:
     custom_windres = 'windres'
 
-for windres in [custom_windres, 'i686-pc-mingw32-windres', 'i686-w64-mingw32.shared-windres']:
+for windres in [custom_windres, 'i686-w64-mingw32.shared-windres']:
     try:
-        resources = subprocess.Popen([windres, exepath], stdout=subprocess.PIPE)
+        resources = subprocess.run([windres, exepath], stdout=subprocess.PIPE, encoding='utf-8')
     except:
         continue
-    for line in resources.stdout.readlines():
+    for line in resources.stdout.splitlines():
         if not line.strip().startswith('VALUE'):
             continue
         if 'ProductVersion' in line:
@@ -63,7 +64,7 @@ elif os.path.isdir('/etc/fonts'):
 
 dest = os.getcwd()
 for path in fcconfpath:
-	print 'Copying fontconfig configuration files from:', path
+	print ('Copying fontconfig configuration files from:', path)
 	if not os.path.exists(os.path.join(dest,'etc')):
 		os.mkdir(os.path.join(dest,'etc'))
 	if os.path.isfile(path):
@@ -74,14 +75,15 @@ for path in fcconfpath:
 def instpath(*elements):
     return os.path.join(*elements).replace('/', '\\').replace('.\\', '')
 
-makensis.stdin.write(r'''!include "MUI2.nsh"
+makensis_script = fr'''!include "MUI2.nsh"
 !include FileFunc.nsh
 
-!define VERSION "%s"
+!define VERSION "{version!s}"
 !define REGKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Performous"
 
-Name "Performous ${VERSION}"
-OutFile "dist\Performous-${VERSION}.exe"
+Name "Performous ${{VERSION}}"
+OutFile "dist\Performous-${{VERSION}}.exe"
+Unicode true
 
 SetCompressor /SOLID lzma
 
@@ -89,7 +91,7 @@ ShowInstDetails show
 ShowUninstDetails show
 
 InstallDir "$PROGRAMFILES\Performous"
-InstallDirRegKey HKLM ${REGKEY} "InstallLocation"
+InstallDirRegKey HKLM ${{REGKEY}} "InstallLocation"
 
 RequestExecutionLevel admin
 
@@ -106,14 +108,14 @@ RequestExecutionLevel admin
 !insertmacro MUI_LANGUAGE "English"
 
 Section
-''' % version)
+'''
 
 for root, dirs, files in os.walk('.'):
-    makensis.stdin.write('  SetOutPath "$INSTDIR\\%s"\n' % instpath(root))
+    makensis_script += '  SetOutPath "$INSTDIR\\{}"\n'.format(instpath(root))
     for file in files:
-        makensis.stdin.write('  File "%s"\n' % instpath('stage', root, file))
+        makensis_script += '  File "{}"\n'.format(instpath('stage', root, file))
 
-makensis.stdin.write(r'''  WriteUninstaller "$INSTDIR\uninst.exe"
+makensis_script += r'''  WriteUninstaller "$INSTDIR\uninst.exe"
   SetShellVarContext all
   CreateDirectory "$INSTDIR\songs"
   CreateDirectory "$SMPROGRAMS\Performous"
@@ -137,16 +139,16 @@ SectionEnd
 
 Section Uninstall
   RmDir "$INSTDIR\songs"
-''')
+'''
 
 for root, dirs, files in os.walk('.', topdown=False):
     for dir in dirs:
-        makensis.stdin.write('  RmDir "$INSTDIR\\%s"\n' % instpath(root, dir))
+        makensis_script += '  RmDir "$INSTDIR\\{}"\n'.format(instpath(root, dir))
     for file in files:
-        makensis.stdin.write('  Delete "$INSTDIR\\%s"\n' % instpath(root, file))
-    makensis.stdin.write('  RmDir "$INSTDIR\\%s"\n' % instpath(root))
+        makensis_script += '  Delete "$INSTDIR\\{}"\n'.format(instpath(root, file))
+    makensis_script += '  RmDir "$INSTDIR\\{}"\n'.format(instpath(root))
 
-makensis.stdin.write(r'''  Delete "$INSTDIR\uninst.exe"
+makensis_script += r'''  Delete "$INSTDIR\uninst.exe"
   RmDir "$INSTDIR"
   SetShellVarContext all
   Delete "$SMPROGRAMS\Performous\Performous.lnk"
@@ -156,11 +158,11 @@ makensis.stdin.write(r'''  Delete "$INSTDIR\uninst.exe"
   RmDir "$SMPROGRAMS\Performous"
   DeleteRegKey HKLM ${REGKEY}
 SectionEnd
-''')
+'''
 
-makensis.stdin.close()
-if makensis.wait() != 0:
-    print >>sys.stderr, 'Installer compilation failed.'
+print(makensis.communicate(input=makensis_script)[0], file=sys.stdout)
+if makensis.returncode != 0:
+    print ('Installer compilation failed.', file=sys.stderr)
     sys.exit(1)
 else:
-    print '\ndist/Performous-%s.exe is ready.' % version
+    print ('\ndist/Performous-{}.exe is ready.'.format(version))

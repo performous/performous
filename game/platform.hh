@@ -19,9 +19,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #define _STAT(x, y) _stat(x, y)
+using STAT = struct _stat;
 #else
 #include <sys/stat.h>
 #define _STAT(x, y) stat(x, y)
+using STAT = struct stat;
 #endif
 
 struct Platform {
