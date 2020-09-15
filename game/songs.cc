@@ -113,7 +113,7 @@ void Songs::LoadCache() {
 	}
 
     for(auto const& song : jsonRoot.as_array()) {
-    	struct stat buffer;
+    	STAT buffer;
     	auto songPath = song.at("TxtFile").as_string();
     	auto isSongPathInConfiguredPaths = std::find_if(
                                                         userSongs.begin(), 
