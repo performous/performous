@@ -4,7 +4,7 @@
 #include "texture.hh"
 #include "util.hh"
 #include "libda/sample.hpp"
-#include "aubio/aubio.h"
+#include "aubio.h"
 #include <atomic>
 #include <condition_variable>
 #include <cstdint>
