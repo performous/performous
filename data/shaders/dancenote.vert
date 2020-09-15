@@ -1,4 +1,9 @@
+#ifdef GL_IS_ES
+#version 310 es
+#else
 #version 330 core
+#endif
+precision highp float;
 
 layout(location = 0) in vec3 vertPos;
 layout(location = 1) in vec2 vertTexCoord;
