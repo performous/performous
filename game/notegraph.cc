@@ -1,4 +1,4 @@
-#include "notegraph.hh"
+﻿#include "notegraph.hh"
 
 #include "configuration.hh"
 #include "database.hh"
@@ -158,9 +158,13 @@ void NoteGraph::drawNotes() {
 		Texture* t1;
 		Texture* t2;
 		switch (it->type) {
-		  case Note::NORMAL: case Note::SLIDE: t1 = &m_notebar; t2 = &m_notebar_hl; break;
-		  case Note::GOLDEN: t1 = &m_notebargold; t2 = &m_notebargold_hl; break;
-		  case Note::FREESTYLE:  // Freestyle notes use custom handling
+			case Note::NORMAL: case Note::SLIDE: t1 = &m_notebar; t2 = &m_notebar_hl; break;
+			case Note::GOLDEN:
+			case Note::GOLDEN2: //fallthrough
+				t1 = &m_notebargold; t2 = &m_notebargold_hl;
+			break;
+			case Note::FREESTYLE:  // Freestyle notes use custom handling
+			case Note::RAP: //handle RAP notes like freestyle for now
 			{
 				Dimensions dim;
 				dim.middle(m_baseX + 0.5 * (it->begin + it->end) * pixUnit).center(m_baseY + it->note * m_noteUnit).stretch((it->end - it->begin) * pixUnit, -m_noteUnit * 12.0);

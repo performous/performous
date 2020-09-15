@@ -9,14 +9,16 @@
 #include "fs.hh"
 
 void loadFonts() {
-	FcConfig *config = FcInitLoadConfig();
+	auto config = std::unique_ptr<FcConfig, decltype(&FcConfigDestroy)>(FcInitLoadConfig(), &FcConfigDestroy);
 	for (fs::path const& font: listFiles("fonts")) {
-		FcBool err = FcConfigAppFontAddFile(config, reinterpret_cast<const FcChar8*>(font.string().c_str()));
+		FcBool err = FcConfigAppFontAddFile(config.get(), reinterpret_cast<const FcChar8*>(font.string().c_str()));
 		std::clog << "font/info: Loading font " << font << ": " << ((err == FcTrue)?"ok":"error") << std::endl;
 	}
-	if (!FcConfigBuildFonts(config))
+	if (!FcConfigBuildFonts(config.get()))
 		throw std::logic_error("Could not build font database.");
-	FcConfigSetCurrent(config);
+
+        // FcConfigSetCurrent increments the refcount of config, thus the local handle on config can be deleted safely.
+	FcConfigSetCurrent(config.get());
 
 	// This would all be very useless if pango+cairo didn't use the fontconfig+freetype backend:
 
