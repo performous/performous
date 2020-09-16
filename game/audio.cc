@@ -7,7 +7,7 @@
 #include "songs.hh"
 #include "util.hh"
 
-#include "aubio/aubio.h"
+#include "aubio.h"
 #include <boost/range/iterator_range.hpp>
 
 #include <cmath>

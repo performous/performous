@@ -9,8 +9,8 @@
 #include <limits>
 
 extern "C" {
-#include AVFORMAT_INCLUDE
-#include AVCODEC_INCLUDE
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
 }
 #ifdef USE_WEBSERVER
 Song::Song(web::json::value const& song): dummyVocal(TrackName::LEAD_VOCAL), randomIdx(rand()) {

@@ -5,7 +5,7 @@
 #include "notes.hh"
 #include "pitch.hh"
 #include "libda/portaudio.hpp"
-#include "aubio/aubio.h"
+#include "aubio.h"
 #include <deque>
 #include <map>
 #include <memory>
