@@ -1,9 +1,4 @@
-#ifdef GL_IS_ES
-#version 310 es
-#else
 #version 330 core
-#endif
-precision highp float;
 
 //DEFINES
 

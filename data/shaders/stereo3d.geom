@@ -1,12 +1,5 @@
-#ifdef GL_IS_ES
-#version 310 es
-#extension GL_OES_viewport_array : require
-#extension GL_OES_geometry_shader : require
-#else
 #version 330 core
 #extension GL_ARB_viewport_array : require
-#endif
-precision highp float;
 
 layout (std140) uniform stereoParams {
 	float sepFactor;

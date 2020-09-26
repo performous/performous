@@ -72,9 +72,8 @@ Window::Window() {
 		GLattrSetter attr_d(SDL_GL_DEPTH_SIZE, 24);
 		GLattrSetter attr_db(SDL_GL_DOUBLEBUFFER, 1);
 		GLattrSetter attr_glmaj(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-		GLattrSetter attr_glmin(SDL_GL_CONTEXT_MINOR_VERSION, (epoxy_is_desktop_gl() == true ? 3 : 1));
-		GLattrSetter attr_glprof(SDL_GL_CONTEXT_PROFILE_MASK, (epoxy_is_desktop_gl() == true ? SDL_GL_CONTEXT_PROFILE_CORE : SDL_GL_CONTEXT_PROFILE_ES));
-		int checkProfileError = SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &glProfile); 
+		GLattrSetter attr_glmin(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+		GLattrSetter attr_glprof(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 		auto flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL;
 		if (config["graphic/highdpi"].b()) { flags |= SDL_WINDOW_ALLOW_HIGHDPI; }
 		else { SDL_SetHintWithPriority("SDL_HINT_VIDEO_HIGHDPI_DISABLED", "1", SDL_HINT_OVERRIDE); }
@@ -137,12 +136,7 @@ Window::Window() {
 		if (!screen) throw std::runtime_error(std::string("SDL_CreateWindow failed: ") + SDL_GetError());
 		SDL_GLContext glContext = SDL_GL_CreateContext(screen);
 		if (glContext == nullptr) throw std::runtime_error(std::string("SDL_GL_CreateContext failed with error: ") + SDL_GetError());
-		if (glProfile == SDL_GL_CONTEXT_PROFILE_ES) {
-			if (epoxy_gl_version() < 31) throw std::runtime_error("OpenGL ES detected, but Performous needs at least ES 3.1 to run.") ;
-		}
-		else {
-			if (epoxy_gl_version() < 33) throw std::runtime_error("Performous needs OpenGL 3.3+ Core Profile to run.");
-		}
+		if (epoxy_gl_version() < 33) throw std::runtime_error("Performous needs at least OpenGL 3.3+ Core profile to run.");
 		glutil::GLErrorChecker error("Initializing buffers");
 		{
 			initBuffers();
@@ -165,32 +159,15 @@ void Window::createShaders() {
 	// The Stereo3D shader needs OpenGL 3.3 and GL_ARB_viewport_array, some Intel drivers support GL 3.3,
 	// but not GL_ARB_viewport_array, so we just check for the extension here.
 	if (config["graphic/stereo3d"].b()) {
-		if ((epoxy_has_gl_extension("GL_ARB_viewport_array")) 
-		  || (epoxy_has_gl_extension("GL_OES_viewport_array") && epoxy_has_gl_extension("GL_OES_geometry_shader"))) {
-			// Compile geometry shaders when stereo is requested
-			if (glProfile == SDL_GL_CONTEXT_PROFILE_ES) {
-				shader("color")
-				  .addDefines("#define GL_IS_ES\n")
-				  .compileFile(findFile("shaders/stereo3d.geom"));
-				shader("texture")
-				  .addDefines("#define GL_IS_ES\n")
-				  .compileFile(findFile("shaders/stereo3d.geom"));
-				shader("3dobject")
-				  .addDefines("#define GL_IS_ES\n")
-				  .compileFile(findFile("shaders/stereo3d.geom"));
-				shader("dancenote")
-				  .addDefines("#define GL_IS_ES\n")
-				  .compileFile(findFile("shaders/stereo3d.geom"));		
-			}
-			else {
-				shader("color").compileFile(findFile("shaders/stereo3d.geom"));
-				shader("texture").compileFile(findFile("shaders/stereo3d.geom"));
-				shader("3dobject").compileFile(findFile("shaders/stereo3d.geom"));
-				shader("dancenote").compileFile(findFile("shaders/stereo3d.geom"));
-			}
+		if (epoxy_has_gl_extension("GL_ARB_viewport_array")) {
+		// Compile geometry shaders when stereo is requested
+		shader("color").compileFile(findFile("shaders/stereo3d.geom"));
+		shader("texture").compileFile(findFile("shaders/stereo3d.geom"));
+		shader("3dobject").compileFile(findFile("shaders/stereo3d.geom"));
+		shader("dancenote").compileFile(findFile("shaders/stereo3d.geom"));
 		}
 		else { 
-		std::clog << "video/warning: Disabling Stereo3D due to missing a required extension; either 'GL_ARB_viewport_array', 'GL_OES_viewport_array' or 'GL_OES_geometry_shader' are unsupported." << std::endl;
+		std::clog << "video/warning: Stereo3D was enabled but the 'GL_ARB_viewport_array' extension is unsupported; will now disable Stereo3D." << std::endl;
 		config["graphic/stereo3d"].b() = false;
 		}
 	}

@@ -101,7 +101,6 @@ private:
 	const GLuint vertTexCoord = 1;
 	const GLuint vertNormal = 2;
 	const GLuint vertColor = 3;
-	int glProfile;
 	void setWindowPosition(const Sint32& x, const Sint32& y);
 	void setFullscreen();
 	/// Setup everything for drawing a view.
