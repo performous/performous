@@ -36,6 +36,11 @@ endif()
 
 option(USE_BOOST_FS "Whether to use boost filsystem instead of c++17" FALSE)
 
+if (APPLE)
+# Macos seems not to support c++17 fs
+set(USE_BOOST_FS TRUE)
+endif()
+
 if (USE_BOOST_FS)
         add_definitions(-DUSE_BOOST_FS)
 endif()
