@@ -7,14 +7,12 @@
 
 namespace cache {
 	fs::path constructSVGCacheFileName(fs::path const& svgfilename, double factor){
-		fs::path cache_filename;
 		std::string const lod = (boost::format("%.2f") % factor).str();
 		std::string const cache_basename = svgfilename.filename().string() + ".cache_" + lod + ".premul.png";
 		std::string fullpath = svgfilename.parent_path().string();
 		// Windows drive name handling
 		std::replace_if(fullpath.begin(), fullpath.end(), boost::is_any_of(":"), '_');
-		cache_filename = getCacheDir() / "misc" / fullpath / cache_basename;
-		return cache_filename;
+		return getCacheDir() / "misc" / fs::path(fullpath).relative_path() / cache_basename;
 	}
 
 }

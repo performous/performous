@@ -4,6 +4,7 @@
 #include "glshader.hh"
 #include "glutil.hh"
 #include <map>
+#include <functional>
 #include <SDL2/SDL_events.h>
 
 float screenW();
