@@ -46,7 +46,7 @@ SongParser::SongParser(Song& s): m_song(s) {
 	try {
 		enum { NONE, TXT, XML, INI, SM } type = NONE;
 		// Read the file, determine the type and do some initial validation checks
-		std::ifstream f (s.filename, std::ios::binary);
+		std::ifstream f (s.filename.string(), std::ios::binary);
 		if (!f.is_open()) {
 			throw SongParserException (s, "Could not open song file", 0);
 		}

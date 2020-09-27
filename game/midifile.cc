@@ -25,7 +25,7 @@ class MidiStream {
 	 * @param file MidiFile to be read
 	 */
 	MidiStream(fs::path const& file) {
-		std::ifstream ifs(file, std::ios::binary);
+		std::ifstream ifs(file.string(), std::ios::binary);
 #if MIDI_DEBUG_LEVEL > 1
 		std::cout << "Opening file: " << file << std::endl;
 #endif

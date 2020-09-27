@@ -10,14 +10,15 @@ using namespace glutil;
 
 namespace {
 	/// Loads a file into memory
-	std::string loadFile(fs::path const& filepath) {
+	std::string loadFile(fs::path const& _filepath) {
+                auto filepath = _filepath.string();
 		std::ifstream f(filepath, std::ios::binary);
-		if (!f) throw std::runtime_error(std::string("Couldn't open ") + filepath.string());
+		if (!f) throw std::runtime_error(std::string("Couldn't open ") + filepath);
 		f.seekg(0, std::ios::end);
 		size_t size = f.tellg();
 		f.seekg(0);
 		std::vector<char> data(size+1); // +1 for terminating null
-		if (!f.read(&data[0], size)) throw std::runtime_error(std::string("Unexpected I/O error in ") + filepath.string());
+		if (!f.read(&data[0], size)) throw std::runtime_error(std::string("Unexpected I/O error in ") + filepath);
 		data.back() = '\0';
 		return std::string(&data[0]);
 	}

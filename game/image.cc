@@ -91,9 +91,9 @@ namespace {
 }
 
 void writePNG(fs::path const& filename, Bitmap const& img, unsigned stride) {
-	fs::path name = filename;
+	auto name = filename.string();
 	// We use PNG in a non-standard way, with premultiplied alpha, signified by .premul.png extension.
-	std::clog << "image/debug: Saving PNG: " + name.string() << std::endl;
+	std::clog << "image/debug: Saving PNG: " + name << std::endl;
 	std::vector<png_bytep> rows(img.height);
 	// Determine color type and bytes per pixel
 	unsigned char bpp;
@@ -135,7 +135,7 @@ void loadPNG(Bitmap& bitmap, fs::path const& filename) {
 	std::clog << "image/debug: Loading PNG: " + filename.string() << std::endl;
 	// A hack to assume linear premultiplied data if file extension is .premul.png (used for cached SVGs)
 	if (filename.stem().extension() == "premul") bitmap.linearPremul = true;
-	std::ifstream file(filename, std::ios::binary);
+	std::ifstream file(filename.string(), std::ios::binary);
 	png_structp pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
 	if (!pngPtr) throw std::runtime_error("png_create_read_struct failed");
 	png_infop infoPtr = nullptr;
