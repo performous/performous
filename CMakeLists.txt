@@ -41,10 +41,6 @@ if (APPLE)
 set(USE_BOOST_FS TRUE)
 endif()
 
-if (USE_BOOST_FS)
-        add_definitions(-DUSE_BOOST_FS)
-endif()
-
 # Note: AUTO_PTR is for Boost which won't compile with C++17 otherwise (fixed in Boost git but not in 1.66)
 add_compile_options(-Wall -Wextra -D_LIBCPP_ENABLE_CXX17_REMOVED_AUTO_PTR $<$<CXX_COMPILER_ID:gcc>:-fcx-limited-range>)
 
