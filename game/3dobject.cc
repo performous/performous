@@ -31,7 +31,7 @@ struct Face {
 void Object3d::loadWavefrontObj(fs::path const& filepath, float scale) {
 	int linenumber = 0;
 	std::string row;
-	std::ifstream file(filepath, std::ios::binary);
+	std::ifstream file(filepath.c_str(), std::ios::binary);
 	if (!file) throw std::runtime_error("Couldn't open object file "+filepath.string());
 	std::vector<glmath::vec3> vertices;
 	std::vector<glmath::vec3> normals;
