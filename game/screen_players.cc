@@ -1,6 +1,7 @@
 #include "screen_players.hh"
 #include "screen_songs.hh"
 
+#include "game.hh"
 #include "configuration.hh"
 #include "audio.hh"
 #include "database.hh"
