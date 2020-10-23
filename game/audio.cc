@@ -4,6 +4,7 @@
 #include "configuration.hh"
 #include "libda/portaudio.hpp"
 #include "screen_songs.hh"
+#include "game.hh"
 #include "songs.hh"
 #include "util.hh"
 

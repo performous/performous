@@ -62,13 +62,20 @@ struct Player {
 	}
 };
 
+using PlayerId = size_t;
+
 /** Static Information of a player, not
   dependent from current song.
 
   Used for Players Management.
   */
 struct PlayerItem {
-	int id; ///< unique identifier for this PlayerItem, Link to hiscore
+    static PlayerId UndefinedPlayerId;
+
+    PlayerItem() = default;
+    PlayerItem(PlayerId);
+    
+	PlayerId id; ///< unique identifier for this PlayerItem, Link to hiscore
 
 	std::string name; ///< name displayed and used for searching the player
 	fs::path picture; ///< the filename which was passed from xml (and is written back)

@@ -8,6 +8,7 @@
 #include "image.hh"
 #include "platform.hh"
 #include "screen.hh"
+#include "game.hh"
 #include "util.hh"
 #include <boost/filesystem.hpp>
 #include <SDL2/SDL.h>
