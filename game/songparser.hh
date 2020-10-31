@@ -3,7 +3,7 @@
 #include "libxml++.hh"
 #include "song.hh"
 #include "unicode.hh"
-#include <boost/filesystem.hpp>
+#include "fs.hh"
 #include <boost/range/adaptor/reversed.hpp>
 #include <sstream>
 
