@@ -47,10 +47,6 @@ void Database::save() {
 	}
 }
 
-void Database::addPlayer(std::string const& name, std::string const& picture, int id) {
-	m_players.addPlayer(name, picture, id);
-}
-
 void Database::addSong(std::shared_ptr<Song> s) {
 	m_songs.addSong(s);
 }

@@ -70,8 +70,6 @@ using PlayerId = size_t;
   Used for Players Management.
   */
 struct PlayerItem {
-    static PlayerId UndefinedPlayerId;
-
     PlayerItem() = default;
     PlayerItem(PlayerId);
     

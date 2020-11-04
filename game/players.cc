@@ -27,7 +27,7 @@ void Players::load(xmlpp::NodeSet const& n) {
 			auto tn = xmlpp::get_first_child_text(dynamic_cast<xmlpp::Element&>(**n2.begin()));
 			picture = tn->get_content();
 		}
-		addPlayer(a_name->get_value(), picture, id);
+		addPlayer(a_name->get_value(), id, picture);
 	}
 	filter_internal();
 }
@@ -66,21 +66,24 @@ std::string Players::lookup(PlayerId id) const {
     return it->name;
 }
 
-void Players::addPlayer (std::string const& name, std::string const& picture, PlayerId id) {
+void Players::addPlayer (std::string const& name, std::string const& picture) {
+    const auto id = assign_id_internal();
+
+	addPlayer(name, id, picture);
+}
+
+void Players::addPlayer (std::string const& name, PlayerId id, std::string const& picture) {
 	PlayerItem pi;
 	pi.id = id;
 	pi.name = name;
 	pi.picture = picture;
 
-	if (pi.id == PlayerItem::UndefinedPlayerId) 
-        pi.id = assign_id_internal();
-
-	if (pi.picture != "") // no picture, so don't search path
+	if (!pi.picture.empty()) // no picture, so don't search path
 	{
 		try {
 			pi.path =  findFile(fs::path("pictures") / pi.picture);
-		} catch (std::runtime_error const& e)
-		{
+		} 
+		catch (std::runtime_error const& e) {
 			std::cerr << e.what() << std::endl;
 		}
 	}

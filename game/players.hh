@@ -57,8 +57,10 @@ class Players {
 	  */
 	std::string lookup(PlayerId id) const;
 
-	/// add a player with a displayed name and an optional picture; if no id is given one will be assigned
-	void addPlayer (std::string const& name, std::string const& picture = "", PlayerId id = PlayerItem::UndefinedPlayerId);
+	/// add a player with a displayed name and an optional picture; new id will be assigned
+	void addPlayer (std::string const& name, std::string const& picture = {});
+	/// add a player with a displayed name, existing id and an optional picture
+	void addPlayer (std::string const& name, PlayerId id, std::string const& picture = {});
 
 	/// const array access
 	PlayerItem operator[](std::size_t pos) const;

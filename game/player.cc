@@ -2,8 +2,6 @@
 #include "song.hh"
 #include "engine.hh" // just for Engine::TIMESTEP
 
-PlayerId PlayerItem::UndefinedPlayerId{size_t(-1)};
-
 Player::Player(VocalTrack& vocal, Analyzer& analyzer, size_t frames):
 	  m_vocal(vocal), m_analyzer(analyzer), m_pitch(frames, std::make_pair(getNaN(),
 	  -getInf())), m_pos(), m_score(), m_noteScore(), m_lineScore(), m_maxLineScore(),
