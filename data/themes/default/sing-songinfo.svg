@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -10,11 +8,11 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.0"
-   width="1000"
-   height="800"
+   width="48.180519"
+   height="8.7984457"
    id="svg3465"
    sodipodi:version="0.32"
-   inkscape:version="0.92.2 (5c3e80d, 2017-08-06)"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
    sodipodi:docname="sing-songinfo.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
@@ -30,7 +28,7 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="1025"
+     inkscape:window-height="943"
      inkscape:window-width="1920"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -42,34 +40,35 @@
      pagecolor="#ffffff"
      id="base"
      showgrid="false"
-     inkscape:zoom="10.82"
-     inkscape:cx="10.356132"
-     inkscape:cy="58.017773"
+     inkscape:zoom="3.8254477"
+     inkscape:cx="7.0728519"
+     inkscape:cy="-39.787238"
      inkscape:window-x="0"
-     inkscape:window-y="27"
+     inkscape:window-y="23"
      inkscape:current-layer="svg3465"
-     inkscape:window-maximized="1" />
+     inkscape:window-maximized="1"
+     inkscape:document-rotation="0" />
   <defs
      id="defs3467">
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 300 : 1"
+       inkscape:vp_x="0 : 299.99998 : 1"
        inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="800 : 300 : 1"
-       inkscape:persp3d-origin="400 : 200 : 1"
+       inkscape:vp_z="800 : 299.99998 : 1"
+       inkscape:persp3d-origin="400 : 199.99998 : 1"
        id="perspective9" />
   </defs>
   <text
      xml:space="preserve"
      id="timer_text"
-     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.45777512px;line-height:0%;font-family:'Droid Sans Mono';text-align:start;text-anchor:start;display:inline;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.34604928;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     y="911.35938"
-     x="5.0858607"
-     transform="scale(1.2106374,0.82601117)"><tspan
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.4578px;line-height:0%;font-family:'Droid Sans Mono';text-align:start;text-anchor:start;display:inline;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.346049;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     y="7.8348145"
+     x="-0.85061979"
+     transform="scale(1.2106374,0.82601116)"><tspan
        id="tspan4717"
-       y="913.77081"
-       x="5.0858607"
-       style="font-size:13.8419733px;text-align:start;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.34604928;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">00:00</tspan></text>
+       y="10.246253"
+       x="-0.85061979"
+       style="font-size:13.842px;text-align:start;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.346049;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">00:00</tspan></text>
   <!--       style="font-size:25px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;opacity:1;fill:black;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.56078384;display:inline;font-family:Droid Sans Mono"
 -->
 </svg>

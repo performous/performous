@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Sodipodi ("http://www.sodipodi.com/") -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,13 +11,14 @@
    version="1.0"
    x="0"
    y="0"
-   width="1000"
-   height="800"
+   width="1366"
+   height="768"
    id="svg559"
    sodipodi:version="0.32"
-   inkscape:version="0.48.1 r9760"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
    sodipodi:docname="audiodevices_bg.svg"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   viewBox="-366 32 1366 768">
   <metadata
      id="metadata35">
     <rdf:RDF>
@@ -28,12 +27,13 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="856"
-     inkscape:window-width="1242"
+     inkscape:window-height="943"
+     inkscape:window-width="1920"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -43,30 +43,23 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="1.2304507"
-     inkscape:cx="468.69692"
+     inkscape:zoom="0.61522535"
+     inkscape:cx="942.50704"
      inkscape:cy="408.0027"
-     inkscape:window-x="541"
-     inkscape:window-y="122"
-     inkscape:current-layer="svg559"
+     inkscape:window-x="0"
+     inkscape:window-y="23"
+     inkscape:current-layer="g3955"
      showgrid="false"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:window-maximized="0" />
+     inkscape:window-maximized="1"
+     inkscape:document-rotation="0"
+     viewbox-x="-366"
+     viewbox-width="1366"
+     viewbox-y="32"
+     viewbox-height="768" />
   <defs
      id="defs561">
-    <filter
-       inkscape:collect="always"
-       id="filter3869"
-       x="-0.019231318"
-       width="1.0384626"
-       y="-0.12226724"
-       height="1.2445345">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="3.4581674"
-         id="feGaussianBlur3871" />
-    </filter>
     <filter
        inkscape:collect="always"
        id="filter5083">
@@ -112,39 +105,29 @@
        fx="727.25122"
        cy="757.60583"
        cx="727.25122"
-       gradientTransform="matrix(0.43355171,-0.84504566,1.805509,0.92631863,-980.88023,538.04792)"
+       gradientTransform="matrix(0.59223164,-0.81124383,2.4663253,0.88926588,-1705.8824,548.526)"
        gradientUnits="userSpaceOnUse"
        id="radialGradient3721"
        xlink:href="#linearGradient3629-3"
        inkscape:collect="always" />
   </defs>
   <rect
-     style="fill:#ffffff;fill-opacity:1"
+     style="fill:#ffffff;fill-opacity:1;stroke-width:1.14515"
      id="rect2851"
-     width="1000"
-     height="800"
-     x="0"
-     y="0" />
+     width="1366"
+     height="768"
+     x="-366"
+     y="32" />
   <rect
-     style="fill:url(#radialGradient3721);fill-opacity:1;stroke:none"
+     style="fill:url(#radialGradient3721);fill-opacity:1;stroke:none;stroke-width:1.14515"
      id="rect2855"
-     width="1000"
-     height="800"
-     x="0"
-     y="0" />
-  <text
-     xml:space="preserve"
-     style="font-size:24.89476013px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Goblin"
-     x="266.96185"
-     y="759.88806"
-     id="text2508"><tspan
-       sodipodi:role="line"
-       id="tspan2510"
-       x="266.96185"
-       y="759.88806" /></text>
+     width="1366"
+     height="768"
+     x="-366"
+     y="32" />
   <g
      id="g3955"
-     transform="translate(18.488319,-59.198001)"
+     transform="translate(18.488386,4.8022814)"
      style="opacity:0.6;filter:url(#filter5083)">
     <g
        id="g2900"
@@ -158,7 +141,7 @@
            style="fill:#000000;fill-opacity:1">
           <g
              id="g2911-6"
-             transform="matrix(-1,0,0,-1,-410.27669,1157.9797)"
+             transform="rotate(180,-205.13834,578.98985)"
              style="fill:#000000;fill-opacity:1">
             <path
                style="fill:#000000;fill-opacity:1"

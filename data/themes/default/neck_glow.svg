@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -15,7 +13,7 @@
    height="128"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.47 r22583"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
    sodipodi:docname="neck_glow.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    sodipodi:modified="true">
@@ -31,8 +29,8 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="854"
-     inkscape:window-width="1440"
+     inkscape:window-height="943"
+     inkscape:window-width="1920"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -40,24 +38,27 @@
      pagecolor="#ffffff"
      id="base"
      inkscape:zoom="1.7759539"
-     inkscape:cx="9.4369493"
-     inkscape:cy="44.237484"
+     inkscape:cx="9.4369492"
+     inkscape:cy="-19.762515"
      inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-y="23"
      inkscape:current-layer="svg2"
      showgrid="true"
      showguides="false"
      inkscape:snap-global="true"
      inkscape:snap-bbox="true"
      inkscape:snap-grids="true"
-     inkscape:window-maximized="1">
+     inkscape:window-maximized="1"
+     inkscape:document-rotation="0">
     <inkscape:grid
        type="xygrid"
        id="grid3223"
        visible="true"
        enabled="true"
        empspacing="5"
-       snapvisiblegridlinesonly="true" />
+       snapvisiblegridlinesonly="true"
+       originx="-4.9999983e-08"
+       originy="-63.999999" />
   </sodipodi:namedview>
   <defs
      id="defs4">
@@ -175,7 +176,7 @@
        xlink:href="#linearGradient4109"
        id="linearGradient4303"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(-12,0)"
+       gradientTransform="translate(-12)"
        x1="64.430161"
        y1="268.30783"
        x2="146.39825"
@@ -277,17 +278,14 @@
        fx="162.5"
        fy="256"
        r="157.5"
-       gradientTransform="matrix(1,0,0,0.22222222,0,199.11111)"
+       gradientTransform="matrix(0.81269841,0,0,0.4063492,-4.063492,-40.025399)"
        gradientUnits="userSpaceOnUse" />
   </defs>
-  <path
-     sodipodi:type="arc"
-     style="fill:url(#radialGradient3661);fill-opacity:1.0;fill-rule:nonzero;stroke:none"
+  <ellipse
+     style="fill:url(#radialGradient3661);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.21905"
      id="path2879"
-     sodipodi:cx="162.5"
-     sodipodi:cy="256"
-     sodipodi:rx="157.5"
-     sodipodi:ry="35"
-     d="m 320,256 a 157.5,35 0 1 1 -315,0 157.5,35 0 1 1 315,0 z"
-     transform="matrix(0.81269841,0,0,1.8285714,-4.063492,-340.11428)" />
+     cx="128"
+     cy="64"
+     rx="128"
+     ry="64" />
 </svg>

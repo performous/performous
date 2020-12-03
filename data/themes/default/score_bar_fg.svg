@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,9 +12,9 @@
    height="256"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
    version="1.0"
-   sodipodi:docname="bar_fill.svg"
+   sodipodi:docname="score_bar_fg.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs4">
@@ -195,15 +194,17 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.4892738"
-     inkscape:cx="32.000002"
-     inkscape:cy="127.99999"
+     inkscape:cx="30.632451"
+     inkscape:cy="126.54291"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="877"
      inkscape:window-height="846"
      inkscape:window-x="767"
-     inkscape:window-y="23" />
+     inkscape:window-y="23"
+     inkscape:document-rotation="0"
+     inkscape:window-maximized="0" />
   <metadata
      id="metadata7">
     <rdf:RDF>

@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Sodipodi ("http://www.sodipodi.com/") -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,11 +10,11 @@
    version="1.0"
    x="0"
    y="0"
-   width="800.000000"
-   height="600.000000"
+   width="612.34216"
+   height="77.840225"
    id="svg559"
    sodipodi:version="0.32"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
    sodipodi:docname="score_rank.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    sodipodi:modified="true">
@@ -44,32 +42,32 @@
      pagecolor="#ffffff"
      id="base"
      inkscape:zoom="1.26"
-     inkscape:cx="285.76321"
-     inkscape:cy="363.49206"
+     inkscape:cx="191.57541"
+     inkscape:cy="304.59129"
      inkscape:window-x="168"
-     inkscape:window-y="122"
+     inkscape:window-y="87"
      inkscape:current-layer="svg559"
      showgrid="false"
-     inkscape:window-maximized="0" />
+     inkscape:window-maximized="0"
+     inkscape:document-rotation="0" />
   <defs
      id="defs561">
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 300 : 1"
+       inkscape:vp_x="0 : -222.15977 : 1"
        inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="800 : 300 : 1"
-       inkscape:persp3d-origin="400 : 200 : 1"
+       inkscape:vp_z="800 : -222.15977 : 1"
+       inkscape:persp3d-origin="400 : -322.15977 : 1"
        id="perspective8" />
   </defs>
   <text
-     x="400"
-     y="119.71297"
-     style="font-size:70px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#ffd100;fill-opacity:1;stroke:#000000;stroke-width:1.58534133;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;display:inline;font-family:Goblin"
+     x="305.81219"
+     y="60.812202"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:70px;line-height:0%;font-family:Goblin;text-align:center;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#ffd100;fill-opacity:1;stroke:#000000;stroke-width:1.58534;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
      id="text10203"
-     xml:space="preserve"
-     sodipodi:linespacing="125%"><tspan
-       x="400"
-       y="119.71297"
+     xml:space="preserve"><tspan
+       x="305.81219"
+       y="60.812202"
        id="tspan10205"
-       style="font-size:70px;text-align:center;text-anchor:middle;fill:#ffd100;fill-opacity:1;stroke-width:1.58534133">Lead Singer</tspan></text>
+       style="font-size:70px;text-align:center;text-anchor:middle;fill:#ffd100;fill-opacity:1;stroke-width:1.58534">Lead Singer</tspan></text>
 </svg>

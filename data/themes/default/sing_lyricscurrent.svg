@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -10,11 +8,11 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.0"
-   width="800"
-   height="600"
+   width="127.20703"
+   height="32.680664"
    id="svg3465"
    sodipodi:version="0.32"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
    sodipodi:docname="sing_lyricscurrent.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
@@ -41,32 +39,32 @@
      pagecolor="#ffffff"
      id="base"
      inkscape:zoom="0.43596296"
-     inkscape:cx="458.84961"
-     inkscape:cy="340.50263"
+     inkscape:cx="122.89258"
+     inkscape:cy="-161.42895"
      inkscape:window-x="101"
-     inkscape:window-y="100"
+     inkscape:window-y="78"
      inkscape:current-layer="svg3465"
      showgrid="false"
-     inkscape:window-maximized="0" />
+     inkscape:window-maximized="0"
+     inkscape:document-rotation="0" />
   <defs
      id="defs3467">
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 300 : 1"
+       inkscape:vp_x="0 : -267.31934 : 1"
        inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="800 : 300 : 1"
-       inkscape:persp3d-origin="400 : 200 : 1"
+       inkscape:vp_z="800 : -267.31934 : 1"
+       inkscape:persp3d-origin="400 : -367.31934 : 1"
        id="perspective9" />
   </defs>
   <text
-     sodipodi:linespacing="125%"
      xml:space="preserve"
      id="text3481"
-     style="font-size:30px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:center;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#eeeeeeff;stroke:#111111ff;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:1.5;stroke-dasharray:none;stroke-dashoffset:0;display:inline;font-family:Goblin"
-     y="527.65424"
-     x="400"><tspan
-       style="font-size:30px;text-align:center;text-anchor:middle;"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:30px;line-height:0%;font-family:Goblin;text-align:center;writing-mode:lr-tb;text-anchor:middle;display:inline;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:1.5;stroke-dasharray:none;stroke-dashoffset:0"
+     y="25.722656"
+     x="64.042969"><tspan
+       style="font-size:30px;text-align:center;text-anchor:middle"
        id="tspan2921"
-       y="527.65424"
-       x="400">lyrics</tspan></text>
+       y="25.722656"
+       x="64.042969">lyrics</tspan></text>
 </svg>

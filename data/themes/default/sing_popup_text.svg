@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -10,11 +8,11 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.0"
-   width="256"
-   height="128"
+   width="268.65607"
+   height="54.523693"
    id="svg3465"
    sodipodi:version="0.32"
-   inkscape:version="0.47 r22583"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
    sodipodi:docname="sing_popup_text.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
@@ -42,37 +40,37 @@
      id="base"
      showgrid="false"
      inkscape:zoom="1.3525"
-     inkscape:cx="199.2681"
-     inkscape:cy="91.992898"
+     inkscape:cx="181.62637"
+     inkscape:cy="55.726513"
      inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-y="23"
      inkscape:current-layer="svg3465"
-     inkscape:window-maximized="0" />
+     inkscape:window-maximized="0"
+     inkscape:document-rotation="0" />
   <defs
      id="defs3467">
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 300 : 1"
+       inkscape:vp_x="0 : 226.52369 : 1"
        inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="800 : 300 : 1"
-       inkscape:persp3d-origin="400 : 200 : 1"
+       inkscape:vp_z="800 : 226.52369 : 1"
+       inkscape:persp3d-origin="400 : 126.52369 : 1"
        id="perspective9" />
   </defs>
   <g
-     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      id="layer15"
-     transform="translate(-32.532348,10.07024)">
+     transform="translate(-50.174075,-26.196145)">
     <text
        x="47.081493"
        y="77.530563"
-       style="font-size:70.43302155px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.99999988;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline;font-family:Goblin"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:70.433px;line-height:0%;font-family:Goblin;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="text10199"
        xml:space="preserve"
-       sodipodi:linespacing="125%"
        transform="scale(0.98936247,1.0107519)"><tspan
          x="47.081493"
          y="77.530563"
-         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.99999988;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          id="tspan10201">3..2..1</tspan></text>
   </g>
 </svg>

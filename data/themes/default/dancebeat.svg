@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -15,7 +13,7 @@
    height="520"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.47pre4 r22446"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
    sodipodi:docname="dancebeat.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    sodipodi:modified="true">
@@ -31,7 +29,7 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="1124"
+     inkscape:window-height="943"
      inkscape:window-width="1914"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -39,24 +37,27 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="1.6493699"
-     inkscape:cx="17.383146"
-     inkscape:cy="260.2425"
+     inkscape:zoom="0.58314032"
+     inkscape:cx="-17.478652"
+     inkscape:cy="397.43075"
      inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-y="23"
      inkscape:current-layer="svg2"
      showgrid="true"
      showguides="false"
      inkscape:snap-global="true"
      inkscape:snap-bbox="true"
-     inkscape:window-maximized="0">
+     inkscape:window-maximized="0"
+     inkscape:document-rotation="0">
     <inkscape:grid
        type="xygrid"
        id="grid3223"
        visible="true"
        enabled="true"
        empspacing="5"
-       snapvisiblegridlinesonly="true" />
+       snapvisiblegridlinesonly="true"
+       originx="0"
+       originy="0" />
   </sodipodi:namedview>
   <defs
      id="defs4">
@@ -223,7 +224,7 @@
      height="130"
      width="250"
      id="rect3723"
-     style="fill:url(#linearGradient3731);fill-opacity:1.0" />
+     style="fill:url(#linearGradient3731);fill-opacity:1" />
   <rect
      style="fill:url(#linearGradient3737);fill-opacity:1"
      id="rect3735"

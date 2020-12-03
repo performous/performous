@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Sodipodi ("http://www.sodipodi.com/") -->
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -11,13 +10,12 @@
    version="1.0"
    x="0"
    y="0"
-   width="800.000000"
-   height="600.000000"
+   width="122.25723"
+   height="300.035"
    id="svg559"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
    sodipodi:docname="score_level.svg"
-   sodipodi:docbase="/home/yoda/UltraStar/sf/UltraStar-ng/themes/lima"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
      id="metadata35">
@@ -42,20 +40,22 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="1.2233333"
-     inkscape:cx="400"
-     inkscape:cy="300"
+     inkscape:zoom="0.30583333"
+     inkscape:cx="184.95564"
+     inkscape:cy="-256.31421"
      inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-y="23"
      inkscape:current-layer="svg559"
-     showgrid="false" />
+     showgrid="false"
+     inkscape:document-rotation="0"
+     inkscape:window-maximized="0" />
   <defs
      id="defs561" />
   <rect
-     style="opacity:1;fill:#000000;fill-opacity:0.69350648;stroke:#323232;stroke-width:2;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     style="opacity:1;fill:#000000;fill-opacity:0.693506;stroke:#323232;stroke-width:2;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
      id="rect2174"
      width="120.25723"
      height="298.035"
-     x="108.52218"
-     y="279.1571" />
+     x="1"
+     y="1" />
 </svg>

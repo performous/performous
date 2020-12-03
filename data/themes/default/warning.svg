@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,7 +11,7 @@
    height="400"
    id="svg1901"
    sodipodi:version="0.32"
-   inkscape:version="0.91 r13725"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
    sodipodi:docname="warning.svg"
    version="1.0"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
@@ -74,17 +72,18 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.92658226"
-     inkscape:cx="-194.1015"
-     inkscape:cy="321.93945"
+     inkscape:cx="336.7619"
+     inkscape:cy="337.93945"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      gridtolerance="10000"
      inkscape:window-width="1920"
-     inkscape:window-height="1056"
+     inkscape:window-height="943"
      inkscape:window-x="0"
-     inkscape:window-y="24"
+     inkscape:window-y="23"
      showgrid="true"
-     inkscape:window-maximized="1">
+     inkscape:window-maximized="1"
+     inkscape:document-rotation="0">
     <inkscape:grid
        type="xygrid"
        id="grid4789"

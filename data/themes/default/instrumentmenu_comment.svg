@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Sodipodi ("http://www.sodipodi.com/") -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,21 +10,21 @@
    version="1.0"
    x="0"
    y="0"
-   width="140"
-   height="40"
+   width="158.7227"
+   height="21.863369"
    id="svg559"
    sodipodi:version="0.32"
-   inkscape:version="0.47 r22583"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
    sodipodi:docname="instrumentmenu_comment.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs2522">
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 300 : 1"
+       inkscape:vp_x="0 : 281.86337 : 1"
        inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="800 : 300 : 1"
-       inkscape:persp3d-origin="400 : 200 : 1"
+       inkscape:vp_z="800 : 281.86337 : 1"
+       inkscape:persp3d-origin="400 : 181.86337 : 1"
        id="perspective8" />
   </defs>
   <metadata
@@ -42,8 +40,8 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="852"
-     inkscape:window-width="1440"
+     inkscape:window-height="943"
+     inkscape:window-width="1920"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -54,23 +52,23 @@
      pagecolor="#ffffff"
      id="base"
      inkscape:zoom="3.5638182"
-     inkscape:cx="63.312761"
-     inkscape:cy="28.101518"
+     inkscape:cx="49.337106"
+     inkscape:cy="19.438793"
      inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-y="23"
      inkscape:current-layer="svg559"
      showgrid="false"
-     inkscape:window-maximized="1" />
+     inkscape:window-maximized="1"
+     inkscape:document-rotation="0" />
   <text
-     x="12.682061"
-     y="30.636002"
-     style="font-size:28.45248412999999843px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#808080;fill-opacity:1;stroke:#000000;stroke-width:0.96595233999999996;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;display:inline;font-family:Goblin"
+     x="-0.78495568"
+     y="21.646093"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:28.4525px;line-height:0%;font-family:Goblin;text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#808080;fill-opacity:1;stroke:#000000;stroke-width:0.965952;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
      id="text10203"
      xml:space="preserve"
-     sodipodi:linespacing="125%"
      transform="scale(1.0377692,0.9636054)"><tspan
-       x="12.682061"
-       y="30.636002"
+       x="-0.78495568"
+       y="21.646093"
        id="tspan10205"
-       style="font-size:28.45248412999999843px;text-align:start;text-anchor:start;fill:#808080;fill-opacity:1;stroke-width:0.96595233999999996">Cmmnt</tspan></text>
+       style="font-size:28.4525px;text-align:start;text-anchor:start;fill:#808080;fill-opacity:1;stroke-width:0.965952">Cmmnt</tspan></text>
 </svg>

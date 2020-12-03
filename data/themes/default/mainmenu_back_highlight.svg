@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Sodipodi ("http://www.sodipodi.com/") -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,11 +11,11 @@
    version="1.0"
    x="0"
    y="0"
-   width="400"
-   height="80"
+   width="397.5513"
+   height="77.551308"
    id="svg559"
    sodipodi:version="0.32"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
    sodipodi:docname="mainmenu_back_highlight.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
@@ -45,15 +43,16 @@
      pagecolor="#ffffff"
      id="base"
      inkscape:zoom="2.4609014"
-     inkscape:cx="264.61648"
-     inkscape:cy="41.573564"
+     inkscape:cx="165.86689"
+     inkscape:cy="40.349215"
      inkscape:window-x="330"
-     inkscape:window-y="55"
+     inkscape:window-y="33"
      inkscape:current-layer="svg559"
      showgrid="false"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:window-maximized="0" />
+     inkscape:window-maximized="0"
+     inkscape:document-rotation="0" />
   <defs
      id="defs561">
     <linearGradient
@@ -80,10 +79,10 @@
     </linearGradient>
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 400 : 1"
+       inkscape:vp_x="0 : 397.55131 : 1"
        inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="1000 : 400 : 1"
-       inkscape:persp3d-origin="500 : 266.66667 : 1"
+       inkscape:vp_z="1000 : 397.55131 : 1"
+       inkscape:persp3d-origin="500 : 264.21798 : 1"
        id="perspective62" />
     <linearGradient
        id="linearGradient6053">
@@ -160,10 +159,10 @@
        y2="260.4765" />
     <inkscape:perspective
        id="perspective2871"
-       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
-       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:persp3d-origin="0.5 : -2.115359 : 1"
+       inkscape:vp_z="1 : -1.9486923 : 1"
        inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_x="0 : 0.5 : 1"
+       inkscape:vp_x="0 : -1.9486923 : 1"
        sodipodi:type="inkscape:persp3d" />
     <linearGradient
        id="linearGradient3751">
@@ -178,10 +177,10 @@
     </linearGradient>
     <inkscape:perspective
        id="perspective2871-4"
-       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
-       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:persp3d-origin="0.5 : -2.115359 : 1"
+       inkscape:vp_z="1 : -1.9486923 : 1"
        inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_x="0 : 0.5 : 1"
+       inkscape:vp_x="0 : -1.9486923 : 1"
        sodipodi:type="inkscape:persp3d" />
     <linearGradient
        inkscape:collect="always"
@@ -206,17 +205,17 @@
     </linearGradient>
     <inkscape:perspective
        id="perspective2849"
-       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
-       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:persp3d-origin="0.5 : -2.115359 : 1"
+       inkscape:vp_z="1 : -1.9486923 : 1"
        inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_x="0 : 0.5 : 1"
+       inkscape:vp_x="0 : -1.9486923 : 1"
        sodipodi:type="inkscape:persp3d" />
     <inkscape:perspective
        id="perspective2854"
-       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
-       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:persp3d-origin="0.5 : -2.115359 : 1"
+       inkscape:vp_z="1 : -1.9486923 : 1"
        inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_x="0 : 0.5 : 1"
+       inkscape:vp_x="0 : -1.9486923 : 1"
        sodipodi:type="inkscape:persp3d" />
     <linearGradient
        y2="260.4765"
@@ -247,25 +246,27 @@
        y1="154.99852"
        x2="403.24554"
        y2="-42.490097"
-       gradientUnits="userSpaceOnUse" />
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-1.2243469,-1.2243493)" />
   </defs>
   <text
      xml:space="preserve"
-     style="font-size:24.89476013px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Goblin"
-     x="266.96185"
-     y="39.888062"
+     style="font-style:normal;font-weight:normal;line-height:0%;font-family:Goblin;fill:#000000;fill-opacity:1;stroke:none"
+     x="265.73752"
+     y="38.663712"
      id="text2508"><tspan
        sodipodi:role="line"
        id="tspan2510"
-       x="266.96185"
-       y="39.888062" /></text>
+       x="265.73752"
+       y="38.663712"
+       style="font-size:24.8948px;line-height:1.25"> </tspan></text>
   <rect
-     y="1.2243493"
-     x="1.2243469"
+     y="0"
+     x="0"
      height="77.551308"
      width="397.5513"
      id="rect6405"
-     style="fill:url(#linearGradient3786);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.44899988000000013;marker:none;visibility:visible;display:inline;overflow:visible"
+     style="display:inline;overflow:visible;visibility:visible;fill:url(#linearGradient3786);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.449;marker:none"
      rx="2.6344144"
      ry="3.6571968" />
 </svg>

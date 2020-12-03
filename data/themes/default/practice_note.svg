@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,9 +11,8 @@
    height="50"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
    version="1.0"
-   sodipodi:docbase="/root/USNG/branches/hacking/themes/lima"
    sodipodi:docname="practice_note.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
@@ -27,17 +25,19 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="9.04"
-     inkscape:cx="44.454683"
-     inkscape:cy="21.792349"
+     inkscape:cx="26.75556"
+     inkscape:cy="30.641911"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      inkscape:window-width="822"
      inkscape:window-height="722"
      inkscape:window-x="608"
-     inkscape:window-y="100"
+     inkscape:window-y="78"
      showgrid="false"
      width="80px"
-     height="50px" />
+     height="50px"
+     inkscape:document-rotation="0"
+     inkscape:window-maximized="0" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -62,7 +62,7 @@
      transform="translate(-247.7219,-621.15445)">
     <path
        style="fill:#000000"
-       d="M 267.56476,668.82743 C 253.30212,663.34553 247.81274,656.94529 247.72256,645.69277 C 247.60494,631.01587 263.31926,621.12949 286.72594,621.15449 C 301.83554,621.17061 311.88394,624.42323 320.26658,632.01135 C 332.61008,643.18489 329.36062,657.70735 312.4874,666.77825 C 303.64922,671.52953 277.67742,672.71429 267.56476,668.82743 z M 299.89352,664.50729 C 305.17218,660.52725 304.77702,643.80935 299.22126,636.06521 C 290.68224,624.16267 275.94586,622.52677 272.065,633.05053 C 265.23,651.58501 285.95748,675.01491 299.89352,664.50729 z "
+       d="m 267.56476,668.82743 c -14.26264,-5.4819 -19.75202,-11.88214 -19.8422,-23.13466 -0.11762,-14.6769 15.5967,-24.56328 39.00338,-24.53828 15.1096,0.0161 25.158,3.26874 33.54064,10.85686 12.3435,11.17354 9.09404,25.696 -7.77918,34.7669 -8.83818,4.75128 -34.80998,5.93604 -44.92264,2.04918 z m 32.32876,-4.32014 c 5.27866,-3.98004 4.8835,-20.69794 -0.67226,-28.44208 -8.53902,-11.90254 -23.2754,-13.53844 -27.15626,-3.01468 -6.835,18.53448 13.89248,41.96438 27.82852,31.45676 z"
        id="path2266" />
   </g>
 </svg>

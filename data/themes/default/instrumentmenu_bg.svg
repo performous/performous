@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -14,7 +12,7 @@
    height="378.5"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.48.3.1 r9886"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
    version="1.0"
    sodipodi:docname="instrumentmenu_bg.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
@@ -91,20 +89,21 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.49497475"
-     inkscape:cx="-77.406281"
+     inkscape:cx="-77.406279"
      inkscape:cy="220.56135"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="1053"
+     inkscape:window-height="943"
      inkscape:window-x="0"
-     inkscape:window-y="-1"
+     inkscape:window-y="23"
      inkscape:window-maximized="1"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
-     fit-margin-bottom="0" />
+     fit-margin-bottom="0"
+     inkscape:document-rotation="0" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -122,7 +121,7 @@
      id="layer1"
      transform="translate(369.06735,69.25)">
     <rect
-       style="opacity:0.79237288;fill:#000000;fill-opacity:1;stroke:none"
+       style="opacity:0.792373;fill:#000000;fill-opacity:1;stroke:none"
        id="rect2383"
        width="658.31732"
        height="378.5"

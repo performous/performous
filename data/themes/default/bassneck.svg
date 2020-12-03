@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,10 +10,10 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.0"
    width="250"
-   height="520"
+   height="529.21411"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.47 r22583"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
    sodipodi:docname="bassneck.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    sodipodi:modified="true">
@@ -41,27 +39,30 @@
      id="base"
      inkscape:zoom="1.244236"
      inkscape:cx="-20.470797"
-     inkscape:cy="292.14824"
+     inkscape:cy="296.33653"
      inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-y="23"
      inkscape:current-layer="g4297"
      showgrid="true"
      showguides="false"
-     inkscape:window-maximized="0">
+     inkscape:window-maximized="0"
+     inkscape:document-rotation="0">
     <inkscape:grid
        type="xygrid"
        id="grid3223"
        visible="true"
-       enabled="true" />
+       enabled="true"
+       originx="3.0940247e-08"
+       originy="4.1882861" />
   </sodipodi:namedview>
   <defs
      id="defs4">
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 260 : 1"
+       inkscape:vp_x="0 : 269.21411 : 1"
        inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="250 : 260 : 1"
-       inkscape:persp3d-origin="125 : 173.33333 : 1"
+       inkscape:vp_z="250 : 269.21411 : 1"
+       inkscape:persp3d-origin="125 : 182.54744 : 1"
        id="perspective41" />
     <linearGradient
        inkscape:collect="always"
@@ -152,7 +153,7 @@
        x2="249.85738"
        y2="259.35468"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.9893675,0,0,0.9937313,0,2.2711467)" />
+       gradientTransform="matrix(0.9893675,0,0,0.9937313,3.0940247e-8,6.4594328)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient3207"
@@ -177,24 +178,25 @@
        y2="4.6783328" />
   </defs>
   <rect
-     y="0"
-     x="0"
+     y="4.1882863"
+     x="3.0940246e-08"
      height="520"
      width="250"
      id="rect2405"
      style="opacity:1;fill:url(#linearGradient4393);fill-opacity:1;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
   <g
-     id="g4297">
+     id="g4297"
+     transform="translate(3.0940247e-8,4.1882861)">
     <path
        sodipodi:nodetypes="cscssc"
        id="path3261"
-       d="M 81.432615,523.32667 C -18.442228,249.08013 45.037557,325.48219 83.125406,205.12676 C 121.21329,84.771376 59.426308,16.350148 59.426308,16.350148 C 59.426308,16.350148 127.98446,33.661541 127.98446,167.2066 C 127.98446,300.75162 79.739823,297.4542 95.821367,384.01118 C 111.9029,470.56812 153.37636,523.32667 153.37636,523.32667"
+       d="M 81.432615,523.32667 C -18.442228,249.08013 45.037557,325.48219 83.125406,205.12676 121.21329,84.771376 59.426308,16.350148 59.426308,16.350148 c 0,0 68.558152,17.311393 68.558152,150.856452 0,133.54502 -48.244637,130.2476 -32.163093,216.80458 16.081533,86.55694 57.554993,139.31549 57.554993,139.31549"
        style="fill:url(#linearGradient4303);fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        inkscape:transform-center-x="25.312288"
        inkscape:transform-center-y="-253.48831" />
     <path
        style="fill:url(#linearGradient4301);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 156.94058,-2.7426601 C 197.09035,63.403575 223.53139,132.71627 211.6837,209.35672 C 190.42957,346.84571 243.03378,478.1378 243.03378,478.1378 C 209.22758,435.88668 204.37385,417.26638 192.48364,377.57343 C 145.93498,222.18048 183.42574,222.06796 157.13587,128.90521 C 138.95232,64.468613 110.71652,46.267978 92.17322,3.3547926e-14"
+       d="M 156.94058,-2.7426601 C 197.09035,63.403575 223.53139,132.71627 211.6837,209.35672 190.42957,346.84571 243.03378,478.1378 243.03378,478.1378 209.22758,435.88668 204.37385,417.26638 192.48364,377.57343 145.93498,222.18048 183.42574,222.06796 157.13587,128.90521 138.95232,64.468613 110.71652,46.267978 92.17322,0"
        id="use3265"
        sodipodi:nodetypes="cscssc"
        inkscape:transform-center-x="-46.636479"
@@ -202,14 +204,14 @@
   </g>
   <g
      id="g3393"
-     transform="translate(1.3558093,0.6218326)">
+     transform="translate(1.3558093,4.8101187)">
     <rect
        y="-0.62183261"
        x="-1.3558093"
        height="9.8890123"
        width="250"
        id="rect2415"
-       style="fill:url(#linearGradient10369);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:6;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+       style="display:inline;overflow:visible;visibility:visible;fill:url(#linearGradient10369);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none;enable-background:accumulate" />
     <use
        height="520"
        width="250"
@@ -264,6 +266,6 @@
        height="528.36328"
        width="12"
        id="rect3205"
-       style="fill:url(#linearGradient10308);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:6;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+       style="display:inline;overflow:visible;visibility:visible;fill:url(#linearGradient10308);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none;enable-background:accumulate" />
   </g>
 </svg>

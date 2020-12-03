@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Sodipodi ("http://www.sodipodi.com/") -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,13 +11,14 @@
    version="1.0"
    x="0"
    y="0"
-   width="1000"
-   height="800"
+   width="1366"
+   height="768"
    id="svg559"
    sodipodi:version="0.32"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
    sodipodi:docname="songs_bg_ground.svg"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   viewBox="0 32 1366 768">
   <metadata
      id="metadata35">
     <rdf:RDF>
@@ -28,13 +27,13 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="859"
-     inkscape:window-width="1537"
+     inkscape:window-height="943"
+     inkscape:window-width="1920"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -44,16 +43,17 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="0.87006002"
-     inkscape:cx="232.66006"
+     inkscape:zoom="0.25"
+     inkscape:cx="188.65115"
      inkscape:cy="328.41019"
-     inkscape:window-x="225"
-     inkscape:window-y="127"
+     inkscape:window-x="0"
+     inkscape:window-y="23"
      inkscape:current-layer="svg559"
      showgrid="false"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:window-maximized="0" />
+     inkscape:window-maximized="1"
+     inkscape:document-rotation="0" />
   <defs
      id="defs561">
     <linearGradient
@@ -101,10 +101,10 @@
     </linearGradient>
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 400 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="1000 : 400 : 1"
-       inkscape:persp3d-origin="500 : 266.66667 : 1"
+       inkscape:vp_x="0 : 398.22222 : 1"
+       inkscape:vp_y="0 : 1066.6666 : 0"
+       inkscape:vp_z="1066.6666 : 398.22222 : 1"
+       inkscape:persp3d-origin="533.33333 : 256 : 1"
        id="perspective62" />
     <linearGradient
        id="linearGradient6053">
@@ -192,10 +192,10 @@
        gradientUnits="userSpaceOnUse" />
     <inkscape:perspective
        id="perspective3691"
-       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
-       inkscape:vp_z="1 : 0.5 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_x="0 : 0.5 : 1"
+       inkscape:persp3d-origin="0.53333333 : -28.088891 : 1"
+       inkscape:vp_z="1.0666666 : -27.911113 : 1"
+       inkscape:vp_y="0 : 1066.6666 : 0"
+       inkscape:vp_x="0 : -27.911113 : 1"
        sodipodi:type="inkscape:persp3d" />
     <linearGradient
        inkscape:collect="always"
@@ -237,28 +237,18 @@
        x2="410.25833"
        y1="-446.23236"
        x1="410.25833"
-       gradientTransform="matrix(3.0616996,0,0,4.7562535,-718.21316,1562.6214)"
+       gradientTransform="matrix(4.1822817,0,0,6.2202478,-981.07918,2287.676)"
        gradientUnits="userSpaceOnUse"
        id="linearGradient4031"
        xlink:href="#linearGradient6053-8"
        inkscape:collect="always" />
   </defs>
-  <text
-     xml:space="preserve"
-     style="font-size:24.89476013px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Goblin"
-     x="266.96185"
-     y="759.88806"
-     id="text2508"><tspan
-       sodipodi:role="line"
-       id="tspan2510"
-       x="266.96185"
-       y="759.88806" /></text>
   <rect
-     y="-800"
+     y="-802.17004"
      x="0"
-     height="240.22711"
-     width="1000"
+     height="314.17001"
+     width="1366"
      id="rect6051"
-     style="fill:url(#linearGradient4031);fill-opacity:1"
+     style="fill:url(#linearGradient4031);fill-opacity:1;stroke-width:1.33659"
      transform="scale(1,-1)" />
 </svg>

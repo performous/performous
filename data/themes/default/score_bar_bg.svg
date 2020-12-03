@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -9,13 +8,13 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="64"
-   height="256"
+   width="64.085831"
+   height="256.08582"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
    version="1.0"
-   sodipodi:docname="bar_stroke.svg"
+   sodipodi:docname="score_bar_bg.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs4">
@@ -32,10 +31,10 @@
     </linearGradient>
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_x="0 : 526.26691 : 1"
        inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="744.09448 : 526.18109 : 1"
-       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       inkscape:vp_z="744.09448 : 526.26691 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.87321 : 1"
        id="perspective10" />
     <linearGradient
        inkscape:collect="always"
@@ -46,12 +45,12 @@
        x2="33.554657"
        y2="-0.98177975"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.9544661,0,0,0.9886165,-2.6779771e-2,0.9447589)" />
+       gradientTransform="matrix(0.9544661,0,0,0.9886165,-0.02677977,0.9447589)" />
     <clipPath
        clipPathUnits="userSpaceOnUse"
        id="clipPath3476">
       <rect
-         style="opacity:1;fill:url(#linearGradient3480);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.9141736;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+         style="display:inline;overflow:visible;visibility:visible;opacity:1;fill:url(#linearGradient3480);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.91417;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none;enable-background:accumulate"
          id="rect3478"
          width="176.6787"
          height="732.00079"
@@ -73,7 +72,7 @@
        clipPathUnits="userSpaceOnUse"
        id="clipPath3482">
       <rect
-         style="opacity:1;fill:url(#linearGradient3486);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.9141736;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+         style="display:inline;overflow:visible;visibility:visible;opacity:1;fill:url(#linearGradient3486);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.91417;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none;enable-background:accumulate"
          id="rect3484"
          width="108.34083"
          height="448.86887"
@@ -95,14 +94,14 @@
        clipPathUnits="userSpaceOnUse"
        id="clipPath3488">
       <rect
-         style="opacity:1;fill:url(#linearGradient3492);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.9141736;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+         style="display:inline;overflow:visible;visibility:visible;opacity:1;fill:url(#linearGradient3492);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.91417;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none;enable-background:accumulate"
          id="rect3490"
          width="84.279854"
          height="349.1814"
          x="-164.00085"
          y="7.1028223"
          ry="6.8199492"
-         transform="matrix(0.9492114,-0.314639,0.314639,0.9492114,0,0)" />
+         transform="rotate(-18.339022)" />
     </clipPath>
     <linearGradient
        inkscape:collect="always"
@@ -118,14 +117,14 @@
        clipPathUnits="userSpaceOnUse"
        id="clipPath3494">
       <rect
-         style="opacity:1;fill:url(#linearGradient3498);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.9141736;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+         style="display:inline;overflow:visible;visibility:visible;opacity:1;fill:url(#linearGradient3498);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.91417;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none;enable-background:accumulate"
          id="rect3496"
          width="79.174919"
          height="328.03107"
          x="-45.36124"
          y="-25.200241"
          ry="6.4068561"
-         transform="matrix(0.997851,-6.5523259e-2,6.5523259e-2,0.997851,0,0)" />
+         transform="rotate(-3.7568979)" />
     </clipPath>
     <linearGradient
        inkscape:collect="always"
@@ -141,14 +140,14 @@
        clipPathUnits="userSpaceOnUse"
        id="clipPath3500">
       <rect
-         style="opacity:1;fill:url(#linearGradient3504);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.9141736;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+         style="display:inline;overflow:visible;visibility:visible;opacity:1;fill:url(#linearGradient3504);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.91417;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none;enable-background:accumulate"
          id="rect3502"
          width="73.717499"
          height="305.42035"
          x="-141.34662"
          y="-77.569504"
          ry="5.9652405"
-         transform="matrix(0.9657312,-0.2595445,0.2595445,0.9657312,0,0)" />
+         transform="rotate(-15.043035)" />
     </clipPath>
     <linearGradient
        inkscape:collect="always"
@@ -164,14 +163,14 @@
        clipPathUnits="userSpaceOnUse"
        id="clipPath3506">
       <rect
-         style="opacity:1;fill:url(#linearGradient3510);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.9141736;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+         style="display:inline;overflow:visible;visibility:visible;opacity:1;fill:url(#linearGradient3510);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.91417;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none;enable-background:accumulate"
          id="rect3508"
          width="61.085831"
          height="253.08583"
          x="-150.72115"
          y="-181.22908"
          ry="4.9430823"
-         transform="matrix(0.5933644,-0.804934,0.804934,0.5933644,0,0)" />
+         transform="rotate(-53.60388)" />
     </clipPath>
     <linearGradient
        inkscape:collect="always"
@@ -195,15 +194,17 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.4324324"
-     inkscape:cx="33.554656"
-     inkscape:cy="127.48178"
+     inkscape:cx="33.597569"
+     inkscape:cy="127.5247"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="877"
      inkscape:window-height="846"
      inkscape:window-x="767"
-     inkscape:window-y="23" />
+     inkscape:window-y="23"
+     inkscape:document-rotation="0"
+     inkscape:window-maximized="0" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -218,9 +219,10 @@
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
-     id="layer1">
+     id="layer1"
+     transform="translate(0.0429132,0.04292035)">
     <rect
-       style="opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:3;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       style="display:inline;overflow:visible;visibility:visible;opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:3;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none;enable-background:accumulate"
        id="rect2383"
        width="61.085831"
        height="253.08583"

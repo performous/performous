@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Sodipodi ("http://www.sodipodi.com/") -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,21 +10,21 @@
    version="1.0"
    x="0"
    y="0"
-   width="110"
-   height="20"
+   width="91.639053"
+   height="18.119822"
    id="svg559"
    sodipodi:version="0.32"
-   inkscape:version="0.47 r22583"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
    sodipodi:docname="message_text.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs2522">
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 300 : 1"
+       inkscape:vp_x="0 : 298.11982 : 1"
        inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="800 : 300 : 1"
-       inkscape:persp3d-origin="400 : 200 : 1"
+       inkscape:vp_z="800 : 298.11982 : 1"
+       inkscape:persp3d-origin="400 : 198.11982 : 1"
        id="perspective8" />
   </defs>
   <metadata
@@ -42,8 +40,8 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="854"
-     inkscape:window-width="1440"
+     inkscape:window-height="943"
+     inkscape:window-width="1920"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -54,23 +52,23 @@
      pagecolor="#ffffff"
      id="base"
      inkscape:zoom="3.5638182"
-     inkscape:cx="60.101374"
-     inkscape:cy="22.158164"
+     inkscape:cx="59.369611"
+     inkscape:cy="21.078056"
      inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-y="23"
      inkscape:current-layer="svg559"
      showgrid="false"
-     inkscape:window-maximized="1" />
+     inkscape:window-maximized="1"
+     inkscape:document-rotation="0" />
   <text
-     x="0.21655023"
-     y="13.585703"
-     style="font-size:22px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.9659524;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;display:inline;font-family:Droid Sans Mono"
+     x="-0.50924426"
+     y="12.496713"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:22px;line-height:0%;font-family:'Droid Sans Mono';text-align:start;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.965952;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
      id="text10203"
      xml:space="preserve"
-     sodipodi:linespacing="125%"
      transform="scale(1.0082228,0.99184427)"><tspan
-       x="0.21655023"
-       y="13.585703"
+       x="-0.50924426"
+       y="12.496713"
        id="tspan10205"
-       style="font-size:22px;text-align:start;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke-width:0.9659524">message</tspan></text>
+       style="font-size:22px;text-align:start;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke-width:0.965952">message</tspan></text>
 </svg>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -8,23 +7,22 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="64"
-   height="256"
+   width="62"
+   height="254"
    id="svg1901"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
    sodipodi:docname="vumeter_bg.svg"
-   sodipodi:docbase="/home/tsoots/ohj/translations/po"
    version="1.0"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs1903">
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_x="0 : 524.18109 : 1"
        inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="744.09448 : 526.18109 : 1"
-       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       inkscape:vp_z="744.09448 : 524.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 348.78739 : 1"
        id="perspective7" />
   </defs>
   <sodipodi:namedview
@@ -34,23 +32,27 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="4.9720185"
-     inkscape:cx="-36.525743"
-     inkscape:cy="96.674529"
+     inkscape:zoom="2.4860093"
+     inkscape:cx="-24.955396"
+     inkscape:cy="143.94466"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      gridtolerance="10000"
      inkscape:window-width="1920"
-     inkscape:window-height="1125"
+     inkscape:window-height="943"
      inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-y="23"
      showgrid="true"
-     inkscape:showpageshadow="false">
+     inkscape:showpageshadow="false"
+     inkscape:document-rotation="0"
+     inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
        id="grid3164"
        visible="true"
-       enabled="true" />
+       enabled="true"
+       originx="-1"
+       originy="-1" />
   </sodipodi:namedview>
   <metadata
      id="metadata1906">
@@ -67,9 +69,10 @@
      inkscape:label="Taso 1"
      inkscape:groupmode="layer"
      id="layer1"
-     style="opacity:1">
+     style="opacity:1"
+     transform="translate(-1,-1)">
     <rect
-       style="fill:#000000;fill-opacity:0.75294119;stroke:none;stroke-width:0.05000000000000000;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#000000;fill-opacity:0.752941;stroke:none;stroke-width:0.05;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect2380"
        width="62"
        height="254"
@@ -79,7 +82,7 @@
        ry="5" />
     <text
        xml:space="preserve"
-       style="font-size:29.48888778999999971px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#d9d9d9;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Droid Sans Mono"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0%;font-family:'Droid Sans Mono';fill:#d9d9d9;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="18.861689"
        y="199.61098"
        id="text3152"
@@ -87,10 +90,11 @@
          sodipodi:role="line"
          id="tspan3154"
          x="18.861689"
-         y="199.61098">dB</tspan></text>
+         y="199.61098"
+         style="font-size:29.4889px;line-height:1.25">dB</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:20.84702301px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Droid Sans Mono"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0%;font-family:'Droid Sans Mono';fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="4.7968478"
        y="21.889374"
        id="text3156"
@@ -98,46 +102,51 @@
          sodipodi:role="line"
          id="tspan3158"
          x="4.7968478"
-         y="21.889374">CLIP</tspan></text>
+         y="21.889374"
+         style="font-size:20.847px;line-height:1.25">CLIP</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Droid Sans Mono"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0%;font-family:'Droid Sans Mono';fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="15"
        y="111"
        id="text3160"><tspan
          sodipodi:role="line"
          id="tspan3162"
          x="15"
-         y="111">-20</tspan></text>
+         y="111"
+         style="font-size:20px;line-height:1.25">-20</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;opacity:1;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Droid Sans Mono"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0%;font-family:'Droid Sans Mono';opacity:1;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="15"
        y="61"
        id="text3166"><tspan
          sodipodi:role="line"
          id="tspan3168"
          x="15"
-         y="61">-10</tspan></text>
+         y="61"
+         style="font-size:20px;line-height:1.25">-10</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;opacity:1;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Droid Sans Mono"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0%;font-family:'Droid Sans Mono';opacity:1;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="15"
        y="211"
        id="text3170"><tspan
          sodipodi:role="line"
          id="tspan3172"
          x="15"
-         y="211">-40</tspan></text>
+         y="211"
+         style="font-size:20px;line-height:1.25">-40</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:20px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;opacity:1;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Droid Sans Mono"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0%;font-family:'Droid Sans Mono';opacity:1;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="15"
        y="161"
        id="text3174"><tspan
          sodipodi:role="line"
          id="tspan3176"
          x="15"
-         y="161">-30</tspan></text>
+         y="161"
+         style="font-size:20px;line-height:1.25">-30</tspan></text>
   </g>
 </svg>

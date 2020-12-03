@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,10 +10,10 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.0"
    width="250"
-   height="520"
+   height="529.29303"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.47 r22583"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
    sodipodi:docname="guitarneck.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    sodipodi:modified="true">
@@ -31,8 +29,8 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:window-height="854"
-     inkscape:window-width="1440"
+     inkscape:window-height="943"
+     inkscape:window-width="1920"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -41,29 +39,32 @@
      id="base"
      inkscape:zoom="1.2557891"
      inkscape:cx="-64.662274"
-     inkscape:cy="332.00336"
+     inkscape:cy="336.89237"
      inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-y="23"
      inkscape:current-layer="g4297"
      showgrid="true"
      showguides="false"
      inkscape:snap-global="true"
      inkscape:snap-bbox="true"
-     inkscape:window-maximized="1">
+     inkscape:window-maximized="1"
+     inkscape:document-rotation="0">
     <inkscape:grid
        type="xygrid"
        id="grid3223"
        visible="true"
-       enabled="true" />
+       enabled="true"
+       originx="0"
+       originy="4.8890123" />
   </sodipodi:namedview>
   <defs
      id="defs4">
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 260 : 1"
+       inkscape:vp_x="0 : 269.29303 : 1"
        inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="250 : 260 : 1"
-       inkscape:persp3d-origin="125 : 173.33333 : 1"
+       inkscape:vp_z="250 : 269.29303 : 1"
+       inkscape:persp3d-origin="125 : 182.62636 : 1"
        id="perspective42" />
     <linearGradient
        id="linearGradient4387">
@@ -97,7 +98,7 @@
        x2="249.84105"
        y2="259.35468"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.9893674,0,0,0.9937313,0,3.2659465)" />
+       gradientTransform="matrix(0.9893674,0,0,0.9937313,0,8.1549588)" />
     <linearGradient
        id="linearGradient4109">
       <stop
@@ -190,14 +191,15 @@
        y2="4.6783328" />
   </defs>
   <rect
-     y="0.99479985"
+     y="5.883812"
      x="0"
      height="520"
      width="250"
      id="rect2405"
      style="opacity:1;fill:url(#linearGradient4393);fill-opacity:1;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
   <g
-     id="g4297">
+     id="g4297"
+     transform="translate(0,4.8890123)">
     <path
        style="fill:url(#linearGradient4301);fill-opacity:1;fill-rule:evenodd;stroke:none"
        d="M 151.32893,-2.7426601 C 188,54.03106 212.1501,113.52257 201.32893,179.30355 181.91633,297.3112 229.96274,410 229.96274,410 199.08562,373.7356 194.65243,357.75369 183.79243,323.68497 141.27689,190.31026 175.51933,190.21369 151.5073,110.25152 134.89923,54.94519 109.10987,39.323472 92.17322,-0.38861802"
@@ -214,14 +216,15 @@
        inkscape:transform-center-y="-241.66338" />
   </g>
   <g
-     id="g3393">
+     id="g3393"
+     transform="translate(0,4.8890123)">
     <rect
        y="-4.8890123"
        x="0"
        height="9.8890123"
        width="250"
        id="rect2415"
-       style="fill:url(#linearGradient10373);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:6;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+       style="display:inline;overflow:visible;visibility:visible;fill:url(#linearGradient10373);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none;enable-background:accumulate" />
     <use
        height="520"
        width="250"
@@ -276,6 +279,6 @@
        height="528.36328"
        width="9"
        id="rect3205"
-       style="fill:url(#linearGradient2516);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:6;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+       style="display:inline;overflow:visible;visibility:visible;fill:url(#linearGradient2516);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none;enable-background:accumulate" />
   </g>
 </svg>

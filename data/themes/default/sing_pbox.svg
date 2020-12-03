@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,9 +12,8 @@
    height="63.933247"
    id="svg3465"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
    sodipodi:docname="sing_pbox.svg"
-   sodipodi:docbase="/home/jesusda/docs/curro/yo/ultrastar-ng/base/theme-pod/themes/default"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
      id="metadata13361">
@@ -30,9 +28,9 @@
   </metadata>
   <sodipodi:namedview
      inkscape:cy="38.708266"
-     inkscape:cx="37.588867"
-     inkscape:zoom="17.799815"
-     inkscape:window-height="1125"
+     inkscape:cx="27.616853"
+     inkscape:zoom="6.293185"
+     inkscape:window-height="943"
      inkscape:window-width="1920"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -46,9 +44,11 @@
      showguides="true"
      inkscape:guide-bbox="true"
      inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-y="23"
      inkscape:current-layer="svg3465"
-     showgrid="false">
+     showgrid="false"
+     inkscape:document-rotation="0"
+     inkscape:window-maximized="0">
     <sodipodi:guide
        orientation="vertical"
        position="-118.28318"
@@ -83,13 +83,12 @@
   <text
      xml:space="preserve"
      id="text18005"
-     style="font-size:34.76020813000000231px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.99999996;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline;font-family:Droid Sans Mono"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:34.7602px;line-height:0%;font-family:'Droid Sans Mono';text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      y="49.370342"
      x="17.111099"
-     sodipodi:linespacing="100%"
      transform="scale(0.9961138,1.0039014)"><tspan
        id="tspan18007"
-       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.99999996;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        y="49.370342"
        x="17.111099">P</tspan></text>
 </svg>

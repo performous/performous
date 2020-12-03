@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -11,11 +9,11 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.0"
-   width="500"
-   height="40"
+   width="491.97003"
+   height="31.584583"
    id="svg3465"
    sodipodi:version="0.32"
-   inkscape:version="0.47pre0 r21549"
+   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
    sodipodi:docname="sing_progressbg.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
@@ -30,8 +28,8 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:cy="20"
-     inkscape:cx="384.05366"
+     inkscape:cy="15.331906"
+     inkscape:cx="165.63824"
      inkscape:zoom="1.868"
      inkscape:window-height="722"
      inkscape:window-width="1022"
@@ -45,26 +43,29 @@
      pagecolor="#8e8e8e"
      id="base"
      inkscape:window-x="250"
-     inkscape:window-y="25"
+     inkscape:window-y="23"
      inkscape:current-layer="svg3465"
      showgrid="false"
-     inkscape:window-maximized="0">
+     inkscape:window-maximized="0"
+     inkscape:document-rotation="0">
     <inkscape:grid
        type="xygrid"
        id="grid2385"
        visible="true"
        enabled="true"
        empspacing="5"
-       snapvisiblegridlinesonly="true" />
+       snapvisiblegridlinesonly="true"
+       originx="-4.2826552"
+       originy="-4.6680942" />
   </sodipodi:namedview>
   <defs
      id="defs3467">
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 20 : 1"
+       inkscape:vp_x="0 : 11.584583 : 1"
        inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="500 : 20 : 1"
-       inkscape:persp3d-origin="250 : 13.333333 : 1"
+       inkscape:vp_z="500 : 11.584583 : 1"
+       inkscape:persp3d-origin="250 : 4.9179163 : 1"
        id="perspective13" />
     <linearGradient
        id="linearGradient2382">
@@ -89,11 +90,12 @@
        y1="3.1680942"
        x2="250.26767"
        y2="37.752678"
-       gradientUnits="userSpaceOnUse" />
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-4.2826552,-4.6680942)" />
   </defs>
   <path
-     style="fill:url(#linearGradient2388);fill-opacity:1;fill-rule:nonzero;marker:none;marker-start:none;marker-mid:none;marker-end:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;stroke:none;stroke-opacity:1;stroke-width:3;opacity:0.69999999999999996"
-     d="M 484.25269,4.6680942 C 490.90069,4.6680942 496.25269,10.020094 496.25269,16.668094 L 496.25269,24.252677 C 496.25269,30.900677 490.90069,36.252677 484.25269,36.252677 L 4.2826552,36.252677 L 4.2826552,4.6680942 L 484.25269,4.6680942 z"
+     style="display:inline;overflow:visible;visibility:visible;opacity:0.7;fill:url(#linearGradient2388);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3;stroke-opacity:1;marker:none;marker-start:none;marker-mid:none;marker-end:none;enable-background:accumulate"
+     d="m 479.97003,0 c 6.648,0 12,5.3519998 12,12 v 7.584583 c 0,6.648 -5.352,12 -12,12 H 0 V 0 Z"
      id="rect2380"
      sodipodi:nodetypes="ccccccc" />
 </svg>
