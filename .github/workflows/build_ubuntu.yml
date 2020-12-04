@@ -24,10 +24,10 @@ jobs:
       run: echo GITHUB_WORKSPACE=$GITHUB_WORKSPACE
       
     - name: Apt update
-      run: apt-get update
+      run: sudo apt-get update
 
     - name: Install tools
-      run: apt-get -y install git cmake build-essential gettext help2man openssl wget clang-3.8
+      run: sudo apt-get -y install git cmake build-essential gettext help2man openssl wget clang-3.8
  
     - name: Prepare sources for act (run actions local)
       run: echo #rm -r 3rdparty/aubio 3rdparty/ced
@@ -42,23 +42,23 @@ jobs:
 
     - name: Install libraries
       run: |
-        #apt-get -y install software-properties-common
-        apt-get -y install libblas-dev #liblapack-dev
-        apt-get -y install fftw3-dev fftw3
-        apt-get -y install libicu-dev 
-        apt-get -y install libepoxy-dev 
-        apt-get -y install libsdl2-dev 
-        apt-get -y install libfreetype6-dev
-        apt-get -y install libpango1.0-dev
-        apt-get -y install librsvg2-dev
-        apt-get -y install libxml++2.6-dev 
-        apt-get -y install libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libjpeg-dev
-        apt-get -y install portaudio19-dev 
-        apt-get -y install libboost-all-dev
-        apt-get -y install libglm-dev 
-        #apt-get -y install libopencv-dev 
-        #apt-get -y install libportmidi-dev 
-        #apt-get -y install libssl-dev 
+        #sudo apt-get -y install software-properties-common
+        sudo apt-get -y install libblas-dev #liblapack-dev
+        sudo apt-get -y install fftw3-dev fftw3
+        sudo apt-get -y install libicu-dev 
+        sudo apt-get -y install libepoxy-dev 
+        sudo apt-get -y install libsdl2-dev 
+        sudo apt-get -y install libfreetype6-dev
+        sudo apt-get -y install libpango1.0-dev
+        sudo apt-get -y install librsvg2-dev
+        sudo apt-get -y install libxml++2.6-dev 
+        sudo apt-get -y install libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libjpeg-dev
+        sudo apt-get -y install portaudio19-dev 
+        sudo apt-get -y install libboost-all-dev
+        sudo apt-get -y install libglm-dev 
+        #sudo apt-get -y install libopencv-dev 
+        #sudo apt-get -y install libportmidi-dev 
+        #sudo apt-get -y install libssl-dev 
 
     - name: Create Build Environment
       # Some projects don't allow in-source building, so create a separate build directory
