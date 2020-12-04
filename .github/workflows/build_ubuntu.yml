@@ -27,7 +27,7 @@ jobs:
       run: sudo apt-get update
 
     - name: Install tools
-      run: sudo apt-get -y install git cmake build-essential gettext help2man openssl wget clang-3.8
+      run: sudo apt-get -y install git cmake build-essential gettext help2man openssl wget #clang-3.8
  
     - name: Prepare sources for act (run actions local)
       run: echo #rm -r 3rdparty/aubio 3rdparty/ced
