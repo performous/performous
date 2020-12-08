@@ -77,62 +77,75 @@ Window::Window() {
 		auto flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL;
 		if (config["graphic/highdpi"].b()) { flags |= SDL_WINDOW_ALLOW_HIGHDPI; }
 		else { SDL_SetHintWithPriority("SDL_HINT_VIDEO_HIGHDPI_DISABLED", "1", SDL_HINT_OVERRIDE); }
-		int width = config["graphic/window_width"].i();
-		int height = config["graphic/window_height"].i();
-		int windowPosX = config["graphic/window_pos_x"].i();
-		int windowPosY = config["graphic/window_pos_y"].i();
+		int windowPosX = std::max(0, config["graphic/window_pos_x"].i());
+		int windowPosY = std::max(0, config["graphic/window_pos_y"].i());
+		const int minWidth = 640;
+		const int minHeight = 360;
+		int winWidth = std::max(minWidth, config["graphic/window_width"].i());
+		int winHeight = std::max(minHeight, config["graphic/window_height"].i());
+		std::clog << "video/info: Saved window dimensions: " << winWidth << "x" << winHeight << ", positioned at: " << windowPosX << "," << windowPosY << std::endl;
 		int displayCount = SDL_GetNumVideoDisplays();
 		if (displayCount <= 0) {
 			throw std::runtime_error(std::string("video/error: SDL_GetNumVideoDisplays failed: ") + SDL_GetError());
 		}
-		SDL_Rect totalSize;
+		SDL_Rect totalDisplaySize{0,0,0,0};
 		if (displayCount > 1) {
-			totalSize.x = 0;
-			totalSize.y = 0;
-			totalSize.w = 0;
-			totalSize.h = 0;
+			SDL_Rect displaySize{0,0,0,0};
 			int displayNum = 0;
-			SDL_Rect displaySize;
-			SDL_Rect prevTotal;
 			while (displayNum < displayCount) {
-				if (SDL_GetDisplayBounds(displayNum, &displaySize) != 0) {
+				if (SDL_GetDisplayUsableBounds(displayNum, &displaySize) != 0) {
 					throw std::runtime_error(std::string("video/error: SDL_GetDisplayBounds failed: ") + SDL_GetError());
 				}
-				prevTotal.x = totalSize.x;
-				prevTotal.y = totalSize.y;
-				prevTotal.w = totalSize.w;
-				prevTotal.h = totalSize.h;
-				SDL_UnionRect(&prevTotal, &displaySize, &totalSize);
+				SDL_UnionRect(&totalDisplaySize, &displaySize, &totalDisplaySize);
 				++displayNum;
 			}
 		}
 		else {
-			if (SDL_GetDisplayBounds(0, &totalSize) != 0) {
+			if (SDL_GetDisplayUsableBounds(0, &totalDisplaySize) != 0) {
 				throw std::runtime_error(std::string("video/error: SDL_GetDisplayBounds failed: ") + SDL_GetError());
 			}
 		}
+		float winAR = static_cast<float>(winWidth) / static_cast<float>(winHeight);
+		// First, check if window top-left corner is outside the screen, adjust as necessary.
 		SDL_Point winOrigin {windowPosX, windowPosY};
-		if (SDL_PointInRect(&winOrigin, &totalSize) == SDL_FALSE) {
-			if (winOrigin.x < totalSize.x) { winOrigin.x = totalSize.x; }
-			else if (winOrigin.x > totalSize.w) { winOrigin.x = (totalSize.w - width); }
-			if (winOrigin.y < totalSize.y) { winOrigin.y = totalSize.y; }
-			else if (winOrigin.y > totalSize.h) { winOrigin.y = (totalSize.h - height); }
-			std::clog << "video/info: Saved window position outside of current display set-up; resetting to " << winOrigin.x << "," << winOrigin.y << std::endl;
+		if (SDL_PointInRect(&winOrigin, &totalDisplaySize) == SDL_FALSE) {
+			if (winOrigin.x < totalDisplaySize.x) { windowPosX = winOrigin.x = totalDisplaySize.x; }
+			if (winOrigin.y < totalDisplaySize.y) { windowPosY = winOrigin.y = totalDisplaySize.y; }
+			std::clog << "video/info: Window top-left corner outside display area; reseting to top-left corner of display array." << std::endl;
 		}
-		SDL_Point winEnd {(winOrigin.x + width), (winOrigin.y + height)};
-		if (SDL_PointInRect(&winEnd, &totalSize) == SDL_FALSE) {
-			if (winEnd.x > totalSize.w) {
-			width = totalSize.w;
-			winOrigin.x = (totalSize.w - width);
+		SDL_Point winEnd {(winOrigin.x + winWidth), (winOrigin.y + winHeight)};
+		// Then, check if the bottom-right would stretch past the display boundaries, and try to make it fit by moving it.
+		if (SDL_PointInRect(&winEnd, &totalDisplaySize) == SDL_FALSE) {
+			if (winEnd.x < totalDisplaySize.x || winEnd.x > (totalDisplaySize.x + totalDisplaySize.w)) { 
+			winOrigin.x = windowPosX = totalDisplaySize.w - winWidth;
+			if (winOrigin.x < totalDisplaySize.x) winOrigin.x = windowPosX = totalDisplaySize.x;
 			}
-			if (winEnd.y > totalSize.h) {
-			height = totalSize.h;
-			winOrigin.y = (totalSize.y - height);
+			if (winEnd.y < totalDisplaySize.y || winEnd.y > (totalDisplaySize.y + totalDisplaySize.h)) { 
+			winOrigin.y = windowPosY = totalDisplaySize.h - winHeight;
+			if (winOrigin.y < totalDisplaySize.y) winOrigin.y = windowPosX = totalDisplaySize.y;
 			}
-			std::clog << "video/info: Saved window size outside of current display set-up; resetting to " << width << "x" << height << std::endl;
-		}		
-		std::clog << "video/info: Create window dimensions: " << width << "x" << height << " on screen position: " << winOrigin.x << "x" << winOrigin.y << std::endl;
-		screen = SDL_CreateWindow(PACKAGE " " VERSION, winOrigin.x, winOrigin.y, width, height, flags);
+			winEnd.x = (winOrigin.x + winWidth);
+			winEnd.y = (winOrigin.y + winHeight);
+			std::clog << "video/debug: Window with saved size would not fit the screen at saved position, will try to move it to (" << winOrigin.x << "," << winOrigin.y << ") to make it fit." << std::endl;
+		}
+		// Then, check if window still won't fit the display area; in that case, try to fit width while keeping aspect ratio.
+		if (SDL_PointInRect(&winEnd, &totalDisplaySize) == SDL_FALSE) {
+			winWidth = std::max(totalDisplaySize.w - winOrigin.x, minWidth);
+			winHeight = winWidth / winAR;
+			winEnd.x = winOrigin.x + winWidth;
+			winEnd.y = winOrigin.y + winHeight;
+			// Finally, if new window size is still too large, just fill useable screen area.
+			if (SDL_PointInRect(&winEnd, &totalDisplaySize) == SDL_FALSE) {
+				winWidth = (totalDisplaySize.w - winOrigin.x);
+				winHeight = (totalDisplaySize.h - winOrigin.y);
+			}
+			std::clog << "video/info: Saved window size is larger than current display set-up; resetting to " << winWidth << "x" << winHeight << std::endl;
+		}
+		
+		std::clog << "video/info: Create window dimensions: " << winWidth << "x" << winHeight << " on screen position: (" << winOrigin.x << "," << winOrigin.y << ")" << std::endl;
+		screen = SDL_CreateWindow(PACKAGE " " VERSION, winOrigin.x, winOrigin.y, winWidth, winHeight, flags);
+		s_width = winWidth;
+		s_height = winHeight;
 		if (!screen) throw std::runtime_error(std::string("SDL_CreateWindow failed: ") + SDL_GetError());
 		SDL_GLContext glContext = SDL_GL_CreateContext(screen);
 		if (glContext == nullptr) throw std::runtime_error(std::string("SDL_GL_CreateContext failed with error: ") + SDL_GetError());
@@ -141,8 +154,8 @@ Window::Window() {
 		{
 			initBuffers();
 		}
+		SDL_SetWindowMinimumSize(screen, minWidth, minHeight);
 	}
-	SDL_SetWindowMinimumSize(screen, 640, 360);
 	SDL_GetWindowPosition(screen, &m_windowX, &m_windowY);
 	// Dump some OpenGL info
 	std::clog << "video/info: GL_VENDOR:     " << glGetString(GL_VENDOR) << std::endl;
