@@ -231,7 +231,7 @@ class FFmpeg::Error: public std::runtime_error {
 		char message[AV_ERROR_MAX_STRING_SIZE];
 		av_strerror(errorValue, message, AV_ERROR_MAX_STRING_SIZE);
 		std::ostringstream oss;
-		oss << "FFmpeg Error: Pocessing file " << self.m_filename << " code=" << errorValue << ", error=" << message;
+		oss << "FFmpeg Error: Processing file " << self.m_filename << " code=" << errorValue << ", error=" << message;
 		return oss.str();
 	}
 };
