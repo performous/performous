@@ -39,7 +39,6 @@ public:
 private:
 	Menu overlay_menu;
 	Menu songlist_menu;
-	bool m_first;
 	AnimValue m_selAnim;
 	AnimValue m_submenuAnim;
 	Audio& m_audio;

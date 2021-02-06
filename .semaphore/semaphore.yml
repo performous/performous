@@ -12,28 +12,27 @@ blocks:
         commands:
           - echo "Installing Performous dependencies..."
           - sudo apt -y update
-          - sudo apt -y install cmake gettext help2man clang gcc-7 g++-7 libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libopencv-dev libportmidi-dev libqrencode-dev libicu-dev libcpprest-dev libglm-dev libopenblas-dev libfftw3-dev
+          - sudo add-apt-repository -y ppa:litenstein/performous-bionic
+          - sudo apt -y install cmake gettext help2man clang-9 gcc-8 g++-8 libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++3.0-dev portaudio19-dev libopencv-dev libportmidi-dev libqrencode-dev libicu-dev libglm-dev libopenblas-dev libfftw3-dev
+          - checkout
+          - git submodule update --init --recursive
       jobs:
-        - name: GCC-7 Build
+        - name: GCC-8.4.0 Build
           env_vars:
             - name: CC
-              value: gcc-7
+              value: gcc-8
             - name: CXX
-              value: g++-7
+              value: g++-8
           commands:
-            - checkout
-            - git submodule init && git submodule update
             - mkdir build.gcc && cd build.gcc && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
             - make VERBOSE=1
-        - name: Clang-6.0 Build
+        - name: Clang-9 Build
           env_vars:
             - name: CC
-              value: clang
+              value: clang-9
             - name: CXX
-              value: clang++
+              value: clang++-9
           commands:
-            - checkout
-            - git submodule init && git submodule update
             - mkdir build.clang && cd build.clang && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
             - make VERBOSE=1
   - name: MacOS 10.14.6 Build    
@@ -42,31 +41,32 @@ blocks:
       agent:
         machine:
           type: a1-standard-4
-          os_image: macos-mojave-xcode11
+          os_image: macos-xcode11
       secrets:
         - name: macos-ci-pubkey
-        - name: check-deps-script
         - name: ignore-ci-homebrew
       prologue:
         commands:
           - echo Trying to restore cache...
           - ssh-keyscan -p 29920 66.185.20.68 >> ~/.ssh/known_hosts
           - chmod 400 ~/.ssh/semaphore_cache_key
-          - cache restore new-macports-prefix
-          - sudo chmod +x /Users/semaphore/check-install-macports.sh
-          - export PATH="/Users/semaphore/local/bin:/Users/semaphore/local/sbin:$PATH"
-          - mkdir -p ./local
+          - export PATH=/opt/local/bin:/opt/local/sbin:$PATH
+          - export MANPATH=/opt/local/share/man:$MANPATH
+          - export DISPLAY=:0.0
+          - cache restore macports-10_15
+          - mkdir -p /Users/semaphore/local
+          - mkdir -p /Users/semaphore/Applications
+          - sudo ln -sf /Users/semaphore/local/Applications /Users/semaphore/Applications/MacPorts
           - sudo ln -sf /Users/semaphore/local/ /opt/local
-          - test -e /Users/semaphore/local/.deps_installed || /Users/semaphore/check-install-macports.sh | cat 2>&1
+          - test -e /Users/semaphore/local/bin/port || ( curl -LJ https://www.dropbox.com/s/4c5oav6za5l4gvv/macports-10_15-install.tar.gz?dl=1 | tar x ) 
       jobs:
         - name: Generate app bundle
           commands:
             - checkout
-            - git submodule init && git submodule update
+            - git submodule update --init --recursive
             - patch --verbose -ui /Users/semaphore/patch-cmake-ignore-CI-homebrew.patch
             - cd osx-utils
             - chmod +x ./performous-app-build.sh
             - ./performous-app-build.sh -D
             - cd /Users/semaphore
-            - rm -rf /Users/semaphore/local/var/macports/distfiles/* /Users/semaphore/local/var/macports/software/* /Users/semaphore/local/var/macports/sources/*
-            - cache store new-macports-prefix ./local
+            - cache store macports-10_15 ./local

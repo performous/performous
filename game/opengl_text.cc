@@ -26,10 +26,10 @@ void loadFonts() {
 	std::clog << "font/info: PangoCairo is using font map " << G_OBJECT_TYPE_NAME(map) << std::endl;
 	if (pango_cairo_font_map_get_font_type(map) != CAIRO_FONT_TYPE_FT) {
 		PangoCairoFontMap *ftMap = PANGO_CAIRO_FONT_MAP(pango_cairo_font_map_new_for_font_type(CAIRO_FONT_TYPE_FT));
-		std::clog << "font/info: Switching to font map " << G_OBJECT_TYPE_NAME(ftMap) << std::endl;
-		if (ftMap)
+		if (ftMap) {
+			std::clog << "font/info: Switching to font map " << G_OBJECT_TYPE_NAME(ftMap) << std::endl;
 			pango_cairo_font_map_set_default(ftMap);
-		else
+		} else
 			std::clog << "font/error: Can't switch to FreeType, fonts will be unavailable!" << std::endl;
 	}
 }
