@@ -28,13 +28,13 @@ void NoteGraph::reset() {
 }
 
 namespace {
-	void drawNotebar(Texture const& texture, double x, double ybeg, double yend, double w, double h) {
+	void drawNotebar(Texture const& texture, double x, double ybeg, double yend, double w, double h, double h_new) {
 		glutil::VertexArray va;
 		UseTexture tblock(texture);
 
 		// The front cap begins
 		va.texCoord(0.0f, 0.0f).vertex(x, ybeg);
-		va.texCoord(0.0f, 1.0f).vertex(x, ybeg + h);
+		va.texCoord(0.0f, 1.0f).vertex(x, ybeg + h_new);
 		if (w >= 2.0 * h) {
 			// Calculate the y coordinates of the middle part
 			double tmp = h / w;  // h = cap size (because it is a h by h square)
@@ -42,21 +42,21 @@ namespace {
 			double y2 = tmp * ybeg + (1.0 - tmp) * yend;
 			// The middle part between caps
 			va.texCoord(0.5f, 0.0f).vertex(x + h, y1);
-			va.texCoord(0.5f, 1.0f).vertex(x + h, y1 + h);
+			va.texCoord(0.5f, 1.0f).vertex(x + h, y1 + h_new);
 			va.texCoord(0.5f, 0.0f).vertex(x + w - h, y2);
-			va.texCoord(0.5f, 1.0f).vertex(x + w - h, y2 + h);
+			va.texCoord(0.5f, 1.0f).vertex(x + w - h, y2 + h_new);
 		} else {
 			// Note is too short to even fit caps, crop to fit.
 			double ymid = 0.5 * (ybeg + yend);
 			float crop = 0.25f * w / h;
 			va.texCoord(crop, 0.0f).vertex(x + 0.5 * w, ymid);
-			va.texCoord(crop, 1.0f).vertex(x + 0.5 * w, ymid + h);
+			va.texCoord(crop, 1.0f).vertex(x + 0.5 * w, ymid + h_new);
 			va.texCoord(1.0f - crop, 0.0f).vertex(x + 0.5 * w, ymid);
-			va.texCoord(1.0f - crop, 1.0f).vertex(x + 0.5 * w, ymid + h);
+			va.texCoord(1.0f - crop, 1.0f).vertex(x + 0.5 * w, ymid + h_new);
 		}
 		// The rear cap ends
 		va.texCoord(1.0f, 0.0f).vertex(x + w, yend);
-		va.texCoord(1.0f, 1.0f).vertex(x + w, yend + h);
+		va.texCoord(1.0f, 1.0f).vertex(x + w, yend + h_new);
 
 		va.draw();
 	}
@@ -179,16 +179,30 @@ void NoteGraph::drawNotes() {
 		  default: throw std::logic_error("Unknown note type: don't know how to render");
 		}
 		double x = m_baseX + it->begin * pixUnit + m_noteUnit; // left x coordinate: begin minus border (side borders -noteUnit wide)
-		double ybeg = m_baseY + (it->notePrev + 1) * m_noteUnit; // top y coordinate (on the one higher note line)
-		double yend = m_baseY + (it->note + 1) * m_noteUnit; // top y coordinate (on the one higher note line)
+		double bar_height = barHeight();
+		double ybeg = m_baseY + (it->notePrev +bar_height/*+ 1*/) * m_noteUnit; // top y coordinate (on the one higher note line)
+		double yend = m_baseY + (it->note +bar_height/*+ 1*/) * m_noteUnit; // top y coordinate (on the one higher note line)
 		double w = (it->end - it->begin) * pixUnit - m_noteUnit * 2.0; // width: including borders on both sides
 		double h = -m_noteUnit * 2.0; // height: 0.5 border + 1.0 bar + 0.5 border = 2.0
-		drawNotebar(*t1, x, ybeg, yend, w, h);
+		double h_new = h * bar_height; //
+		drawNotebar(*t1, x, ybeg, yend, w, h, h_new);
 		if (alpha > 0.0) {
 			ColorTrans c(Color::alpha(alpha));
-			drawNotebar(*t2, x, ybeg, yend, w, h);
+			drawNotebar(*t2, x, ybeg, yend, w, h, h_new);
 		}
 	}
+}
+
+double NoteGraph::barHeight() {
+	switch(config["game/difficulty"].i()){
+		case 0:
+			return 1;
+		case 1:
+			return 0.5;
+		case 2:
+			return 0.21;
+	}
+	return 1;
 }
 
 namespace {
