@@ -25,6 +25,7 @@ class NoteGraph {
 	void drawNotes();
 	/// draw waves (what players are singing)
 	void drawWaves(Database const& database);
+ 	double barHeight();
 	VocalTrack const& m_vocal;
 	Texture m_notelines;
 	Texture m_wave;
