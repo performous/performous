@@ -254,7 +254,7 @@ void NoteGraph::drawWaves(Database const& database) {
 			// Graphics positioning & animation:
 			double y = m_baseY + val * m_noteUnit;
 			double thickness = clamp(1.0 + pitch[idx].second / 60.0) + 0.5;
-			thickness *= 1.0 + 0.2 * std::sin(tex - 2.0 * texOffset); // Further animation :)
+			thickness *= barHeight() * (1.0 + 0.2 * std::sin(tex - 2.0 * texOffset)); // Further animation :)
 			thickness *= -m_noteUnit;
 			// If there has been a break or if the pitch change is too fast, terminate and begin a new one
 			if (oldval != oldval || std::abs(oldval - val) > 1) strip(va);
