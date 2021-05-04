@@ -43,7 +43,7 @@ Hiscore::HiscoreVector Hiscore::queryHiscore(unsigned max, unsigned playerid, un
 }
 
 bool Hiscore::hasHiscore(unsigned songid) const {
-	for (auto const& h: m_hiscore) if (songid == h.songid && currentLevel()==h.level) return true;
+	for (auto const& h: m_hiscore) if (songid == h.songid && currentLevel() == h.level) return true;
 	return false;
 }
 
