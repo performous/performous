@@ -47,9 +47,9 @@ double Note::powerFactor(double note) const {
 	double error = std::abs(diff(note));
 	switch(GameDifficulty(config["game/difficulty"].i())){
 		case GameDifficulty::HARD:
-			return clamp((0.5 - error) / (0.5 - 0.2151), 0.0, 1.0); // No points if error > 50 cents, perfect score if error < 21.51 cents (syntonic comma)
+			return clamp((1 - error) / (1 - 0.5), 0.0, 1.0); // No points if error > 100 cents, perfect score if error < 50 cents
 		case GameDifficulty::PERFECT:
-			return clamp((0.2151 - error) / (0.2151 - 0.06), 0.0, 1.0); // No points if error > 21.51 cents, perfect score if error < 6 cents
+			return clamp((0.5 - error) / (0.5 - 0.2151), 0.0, 1.0); // No points if error > 50 cents, perfect score if error < 21.51 cents (syntonic comma)
 		case GameDifficulty::NORMAL:
 		default: 
 			return clamp(1.5 - error, 0.0, 1.0); // No points if error > 150 cents, perfect score if error < 50 cents
