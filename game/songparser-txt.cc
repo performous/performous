@@ -1,5 +1,6 @@
 ﻿#include "songparser.hh"
 #include "unicode.hh"
+#include "fs.hh"
 
 #include <boost/algorithm/string.hpp>
 #include <algorithm>
@@ -119,11 +120,11 @@ bool SongParser::txtParseField(std::string const& line) {
 	else if (key == "EDITION") m_song.edition = value.substr(value.find_first_not_of(" "));
 	else if (key == "GENRE") m_song.genre = value.substr(value.find_first_not_of(" "));
 	else if (key == "CREATOR") m_song.creator = value.substr(value.find_first_not_of(" "));
-	else if (key == "COVER") m_song.cover = fs::absolute(value, m_song.path);
-	else if (key == "MP3") m_song.music["background"] = fs::absolute(value, m_song.path);
-	else if (key == "VOCALS") m_song.music["vocals"] = fs::absolute(value, m_song.path);
-	else if (key == "VIDEO") m_song.video = fs::absolute(value, m_song.path);
-	else if (key == "BACKGROUND") m_song.background = fs::absolute(value, m_song.path);
+	else if (key == "COVER") m_song.cover = absolute(value, m_song.path);
+	else if (key == "MP3") m_song.music["background"] = absolute(value, m_song.path);
+	else if (key == "VOCALS") m_song.music["vocals"] = absolute(value, m_song.path);
+	else if (key == "VIDEO") m_song.video = absolute(value, m_song.path);
+	else if (key == "BACKGROUND") m_song.background = absolute(value, m_song.path);
 	else if (key == "START") assign(m_song.start, value);
 	else if (key == "VIDEOGAP") assign(m_song.videoGap, value);
 	else if (key == "PREVIEWSTART") assign(m_song.preview_start, value);
