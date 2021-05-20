@@ -1,5 +1,6 @@
 ﻿#include "notes.hh"
 
+#include "configuration.hh"
 #include "util.hh"
 #include <cmath>
 #include <sstream>
@@ -44,7 +45,16 @@ double Note::scoreMultiplier() const {
 double Note::powerFactor(double note) const {
 	if (type == FREESTYLE) return 1.0;
 	double error = std::abs(diff(note));
-	return clamp(1.5 - error, 0.0, 1.0);
+	switch(GameDifficulty(config["game/difficulty"].i())){
+		case GameDifficulty::HARD:
+			return clamp((1 - error) / (1 - 0.5), 0.0, 1.0); // No points if error > 100 cents, perfect score if error < 50 cents
+		case GameDifficulty::PERFECT:
+			return clamp((0.5 - error) / (0.5 - 0.2151), 0.0, 1.0); // No points if error > 50 cents, perfect score if error < 21.51 cents (syntonic comma)
+		case GameDifficulty::NORMAL:
+		default: 
+			return clamp(1.5 - error, 0.0, 1.0); // No points if error > 150 cents, perfect score if error < 50 cents
+
+	}
 }
 
 Duration::Duration(): begin(getNaN()), end(getNaN()) {}

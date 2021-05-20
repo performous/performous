@@ -123,6 +123,12 @@ struct DanceTrack {
 	Notes notes;
 };
 
+enum class GameDifficulty{
+	NORMAL,
+	HARD,
+	PERFECT
+};
+
 enum DanceDifficulty {
 	BEGINNER,
 	EASY,
