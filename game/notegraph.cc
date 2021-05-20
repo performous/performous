@@ -196,9 +196,9 @@ void NoteGraph::drawNotes() {
 double NoteGraph::barHeight() {
 	switch(GameDifficulty(config["game/difficulty"].i())){
 		case GameDifficulty::HARD:
-			return 0.5;
+			return 1;
 		case GameDifficulty::PERFECT:
-			return 0.21;
+			return 0.5;
 		case GameDifficulty::NORMAL:
 		default:
 			return 1;
