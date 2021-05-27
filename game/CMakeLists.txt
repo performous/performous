@@ -3,6 +3,10 @@ cmake_minimum_required(VERSION 2.6)
 file(GLOB SOURCE_FILES "*.cc")
 file(GLOB HEADER_FILES "*.hh" "libda/*.hpp")
 
+# Fs is compiled/linked separately to ease switch boost/c++17
+list(REMOVE_ITEM SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/fs.cc)
+list(REMOVE_ITEM HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/fs.hh)
+
 if(WIN32)
 	# We want to support all these version numbers:
 	# 1.0 1.0.1 1.0+ 1.0.1+ 1.0-2-g123abcd 1.0.1-5-g123abcd
@@ -62,9 +66,21 @@ set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES})
 
 # Libraries
 
-find_package(Boost 1.36 REQUIRED COMPONENTS program_options filesystem iostreams system locale)
+find_package(Boost 1.36 REQUIRED COMPONENTS program_options iostreams system locale)
 include_directories(${Boost_INCLUDE_DIRS})
 list(APPEND LIBS ${Boost_LIBRARIES})
+
+add_library(fs STATIC fs.cc)
+target_include_directories(fs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+if (USE_BOOST_FS)
+    find_package(Boost 1.36 REQUIRED COMPONENTS filesystem)
+
+    target_link_libraries(fs PUBLIC Boost::filesystem)
+    target_compile_definitions(fs PUBLIC -DUSE_BOOST_FS)
+else()
+    find_package(Filesystem REQUIRED)
+    target_link_libraries(fs PRIVATE std::filesystem)
+endif()
 
 if (Boost_VERSION VERSION_LESS 105500)
 	message("-- Using Boost < 1.55: defining BOOST_NO_CXX11_SCOPED_ENUMS")
@@ -170,10 +186,8 @@ endif()
 # Build main executable
 add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
 if(WIN32)
-  target_link_libraries(performous wsock32 ws2_32)
+  target_link_libraries(performous PRIVATE wsock32 ws2_32)
 endif()
-
-target_link_libraries(performous ced aubio)
 
 if(APPLE)
 	list(APPEND LIBS "-framework Accelerate")
@@ -181,8 +195,7 @@ endif()
 list(APPEND LIBS ${FFTW3_LIBRARIES})
 list(APPEND LIBS ${BLAS_LIBRARIES})
 
-target_link_libraries(performous PkgConfig::deps)
-target_link_libraries(performous ${LIBS})
+target_link_libraries(performous PRIVATE fs ced aubio ${LIBS} PkgConfig::deps)
 
 target_include_directories(performous PRIVATE "${AUBIO_INSTALL_DIR}/include/")
 
