@@ -77,10 +77,12 @@ target_include_directories(fs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 if (USE_BOOST_FS)
     find_package(Boost 1.55 REQUIRED COMPONENTS filesystem)
 
+    message (STATUS "Using boost::filesystem")
     target_link_libraries(fs PUBLIC Boost::filesystem)
     target_compile_definitions(fs PUBLIC -DUSE_BOOST_FS)
 else()
     find_package(Filesystem REQUIRED)
+    message (STATUS "Using std::filesystem")
     target_link_libraries(fs PRIVATE std::filesystem)
 endif()
 
