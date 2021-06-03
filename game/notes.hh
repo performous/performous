@@ -99,6 +99,11 @@ struct Note {
 	double scoreMultiplier() const;
 };
 
+
+double thresholdForFullScore(); /// Threshold to award perfect score for a note
+double thresholdForNonzeroScore(); /// Threshold to award nonzero score for a note
+
+
 typedef std::vector<Note> Notes;
 
 class VocalTrack {

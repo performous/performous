@@ -42,19 +42,36 @@ double Note::scoreMultiplier() const {
 	return 0.0;
 }
 
+double thresholdForFullScore() {
+	switch(GameDifficulty(config["game/difficulty"].i())){
+		case GameDifficulty::PERFECT:
+			return 0.2151;
+		case GameDifficulty::HARD:
+			return 0.5;
+		case GameDifficulty::NORMAL:
+		default: 
+			return 0.5;
+	}
+}
+
+double thresholdForNonzeroScore() {
+	switch(GameDifficulty(config["game/difficulty"].i())){
+		case GameDifficulty::PERFECT:
+			return 0.5;
+		case GameDifficulty::HARD:
+			return 1.0;
+		case GameDifficulty::NORMAL:
+		default: 
+			return 1.5;
+	}
+}
+
 double Note::powerFactor(double note) const {
 	if (type == FREESTYLE) return 1.0;
 	double error = std::abs(diff(note));
-	switch(GameDifficulty(config["game/difficulty"].i())){
-		case GameDifficulty::HARD:
-			return clamp((1 - error) / (1 - 0.5), 0.0, 1.0); // No points if error > 100 cents, perfect score if error < 50 cents
-		case GameDifficulty::PERFECT:
-			return clamp((0.5 - error) / (0.5 - 0.2151), 0.0, 1.0); // No points if error > 50 cents, perfect score if error < 21.51 cents (syntonic comma)
-		case GameDifficulty::NORMAL:
-		default: 
-			return clamp(1.5 - error, 0.0, 1.0); // No points if error > 150 cents, perfect score if error < 50 cents
-
-	}
+	double thresholdFull = thresholdForFullScore();
+	double thresholdNonzero = thresholdForNonzeroScore();
+	return clamp((thresholdNonzero - error)/(thresholdNonzero - thresholdFull), 0.0, 1.0);
 }
 
 Duration::Duration(): begin(getNaN()), end(getNaN()) {}

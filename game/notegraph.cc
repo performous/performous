@@ -194,15 +194,11 @@ void NoteGraph::drawNotes() {
 }
 
 double NoteGraph::barHeight() {
-	switch(GameDifficulty(config["game/difficulty"].i())){
-		case GameDifficulty::HARD:
-			return 1;
-		case GameDifficulty::PERFECT:
-			return 0.5;
-		case GameDifficulty::NORMAL:
-		default:
-			return 1;
-	}
+	return 2.0 * thresholdForFullScore();
+}
+
+double NoteGraph::waveThickness(){
+	return thresholdForNonzeroScore() - thresholdForFullScore();
 }
 
 namespace {
@@ -254,7 +250,7 @@ void NoteGraph::drawWaves(Database const& database) {
 			// Graphics positioning & animation:
 			double y = m_baseY + val * m_noteUnit;
 			double thickness = clamp(1.0 + pitch[idx].second / 60.0) + 0.5;
-			thickness *= barHeight() * (1.0 + 0.2 * std::sin(tex - 2.0 * texOffset)); // Further animation :)
+			thickness *= NoteGraph::waveThickness() * (1.0 + 0.2 * std::sin(tex - 2.0 * texOffset)); // Further animation :)
 			thickness *= -m_noteUnit;
 			// If there has been a break or if the pitch change is too fast, terminate and begin a new one
 			if (oldval != oldval || std::abs(oldval - val) > 1) strip(va);
