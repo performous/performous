@@ -162,11 +162,8 @@ else()
 	message(STATUS "Webserver support: Disabled (explicitly disabled)")
 endif()
 
-if(UNIX AND NOT APPLE)
-	# Note: cannot use list APPEND here because it inserts semicolons instead of spaces
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
-endif()
+find_package(Threads)
+target_link_libraries(performous PRIVATE Threads::Threads)
 
 if(WIN32)
 	add_definitions("-DEPOXY_SHARED")
