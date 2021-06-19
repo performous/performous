@@ -37,25 +37,19 @@ endif()
 option(USE_BOOST_FS "Whether to use boost filsystem instead of c++17" FALSE)
 
 if (APPLE)
-	set (MACOS_SUPPORT_FILESYSTEM FALSE)
 	if (${CMAKE_OSX_DEPLOYMENT_TARGET})
 		message (STATUS "Checking macOS deployment target... ${CMAKE_OSX_DEPLOYMENT_TARGET}")
 		if (${CMAKE_OSX_DEPLOYMENT_TARGET} VERSION_GREATER_EQUAL 10.15)
 			message (STATUS "Targetting macOS 10.15 or newer, enabling std::filesystem")
-			set(MACOS_SUPPORT_FILESYSTEM TRUE)
+                else ()
+			set(USE_BOOST_FS TRUE)
 		endif()
 	else()
 		execute_process(COMMAND "/usr/bin/sw_vers | grep ProductVersion | sed 's|ProductVersion: ||'" OUTPUT_VARIABLE HOST_MACOS_VERSION)
 		message (STATUS "macOS deployment target not set; checking host... ${HOST_MACOS_VERSION}")
-		if (${HOST_MACOS_VERSION} VERSION_GREATER_EQUAL 10.15)
-			set(MACOS_SUPPORT_FILESYSTEM TRUE)
+		if (${HOST_MACOS_VERSION} VERSION_LESS 10.15)
+			set(USE_BOOST_FS TRUE)
 		endif()
-	endif()
-	if (${MACOS_SUPPORT_FILESYSTEM})
-		message (STATUS "Enabling std::filesystem")
-	else()
-		message (STATUS "Not enabling std::filesystem")
-		set(USE_BOOST_FS ON)
 	endif()
 endif()
 
@@ -87,48 +81,7 @@ endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/ced)
 
-if (APPLE)
-	set_property(GLOBAL PROPERTY BLA_VENDOR APPLE)
-	set(ACCELERATE_COMMAND "--enable-accelerate")
-	set(AUBIO_CFLAGS "${CMAKE_C_FLAGS} -iframeworkwithsysroot /System/Library/Frameworks/ -mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET} -isysroot '${CMAKE_OSX_SYSROOT}/'")
-else()
-	set(ACCELERATE_COMMAND "--enable-atlas")
-        set_property(GLOBAL PROPERTY BLA_VENDOR OpenBLAS)
-	set(AUBIO_CFLAGS "${CMAKE_C_FLAGS}")
-endif()
-
-find_package(BLAS REQUIRED MODULE)
-find_package(FFTW3 COMPONENTS single REQUIRED MODULE)
-
-if(NOT FFTW3_FOUND OR NOT BLAS_FOUND)
-	message(ERROR "fftw3 or BLAS required to build aubio, but they cannot be found.")
-endif()
-
-include(ExternalProject)
-ExternalProject_Add(build-aubio-from-sources
-	SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/aubio/
-        BINARY_DIR ${CMAKE_BINARY_DIR}/3rdparty/aubio-build/
-        INSTALL_DIR ${CMAKE_BINARY_DIR}/3rdparty/aubio-install/
-        UPDATE_COMMAND ""
-	TMP_DIR ${CMAKE_BINARY_DIR}/3rdparty/aubio-build/tmp/
-	CONFIGURE_COMMAND ""
-	BUILD_COMMAND ${CMAKE_COMMAND} -E env CFLAGS=${AUBIO_CFLAGS} ${CMAKE_SOURCE_DIR}/3rdparty/aubio/waf
-                  ${ACCELERATE_COMMAND} --disable-tests --notests --verbose
-                  --enable-fftw3f --disable-sndfile --disable-avcodec --disable-double
-                  --disable-samplerate --disable-docs --disable-wavread --disable-wavwrite
-                  --disable-tests --notests --disable-examples --disable-apple-audio
-                  --disable-fat --disable-jack --libdir=lib
-                  --prefix=${CMAKE_BINARY_DIR}/3rdparty/aubio-install/
-                  --top=${CMAKE_SOURCE_DIR}/3rdparty/aubio/
-                  --out=${CMAKE_BINARY_DIR}/3rdparty/aubio-build/ configure build install
-	INSTALL_COMMAND ""
-)
-
-ExternalProject_Get_Property(build-aubio-from-sources INSTALL_DIR)
-set (AUBIO_INSTALL_DIR ${INSTALL_DIR})
-add_library(aubio STATIC IMPORTED)
-set_target_properties(aubio PROPERTIES IMPORTED_LOCATION ${AUBIO_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}aubio${CMAKE_STATIC_LIBRARY_SUFFIX})
-add_dependencies(aubio build-aubio-from-sources)
+find_package(Aubio REQUIRED)
 
 add_subdirectory(data)
 
