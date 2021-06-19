@@ -64,21 +64,25 @@ endif()
 
 set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES})
 
+# Build main executable
+add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
 # Libraries
 
 find_package(Boost 1.36 REQUIRED COMPONENTS program_options iostreams system locale)
-include_directories(${Boost_INCLUDE_DIRS})
-list(APPEND LIBS ${Boost_LIBRARIES})
+target_include_directories(performous PRIVATE ${Boost_INCLUDE_DIRS})
+target_link_libraries(performous PRIVATE ${Boost_LIBRARIES})
 
 add_library(fs STATIC fs.cc)
 target_include_directories(fs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 if (USE_BOOST_FS)
     find_package(Boost 1.36 REQUIRED COMPONENTS filesystem)
 
+    message (STATUS "Using boost::filesystem")
     target_link_libraries(fs PUBLIC Boost::filesystem)
     target_compile_definitions(fs PUBLIC -DUSE_BOOST_FS)
 else()
     find_package(Filesystem REQUIRED)
+    message (STATUS "Using std::filesystem")
     target_link_libraries(fs PRIVATE std::filesystem)
 endif()
 
@@ -88,14 +92,14 @@ if (Boost_VERSION VERSION_LESS 105500)
 endif()
 
 find_package(ICU 60 REQUIRED uc data i18n io)
-include_directories(${ICU_INCLUDE_DIRS})
-list(APPEND LIBS ${ICU_LIBRARIES})
+target_include_directories(performous SYSTEM PRIVATE ${ICU_INCLUDE_DIRS})
+target_link_libraries(performous PRIVATE ${ICU_LIBRARIES})
 
 # LibEpoxy < 1.2 crashes with binary drivers (nvidia & fglrx) when creating shaders
 # (see https://github.com/anholt/libepoxy/issues/23 for the exact problem)
 find_package(LibEpoxy 1.2 REQUIRED)
-include_directories(${LibEpoxy_INCLUDE_DIRS})
-list(APPEND LIBS ${LibEpoxy_LIBRARIES})
+target_include_directories(performous SYSTEM PRIVATE ${LibEpoxy_INCLUDE_DIRS})
+target_link_libraries(performous PRIVATE ${LibEpoxy_LIBRARIES})
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(deps REQUIRED IMPORTED_TARGET glib-2.0 gio-2.0 gobject-2.0)
@@ -104,8 +108,8 @@ pkg_check_modules(deps REQUIRED IMPORTED_TARGET glib-2.0 gio-2.0 gobject-2.0)
 foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM)
 	find_package(${lib} REQUIRED)
 	message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
-	include_directories(${${lib}_INCLUDE_DIRS})
-	list(APPEND LIBS ${${lib}_LIBRARIES})
+	target_include_directories(performous SYSTEM PRIVATE ${${lib}_INCLUDE_DIRS})
+	target_link_libraries(performous PRIVATE ${${lib}_LIBRARIES})
 	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
 
@@ -141,9 +145,7 @@ endif()
 
 option(ENABLE_WEBSERVER "Enable webserver support (cpprestsdk)." ON)
 if(ENABLE_WEBSERVER)
-	foreach(lib CppRest)
-		find_package(${lib})
-	endforeach(lib)
+	find_package(CppRest)
 	if(CppRest_FOUND)
 		find_package(Boost 1.36 REQUIRED COMPONENTS chrono thread)
 		include_directories(${Boost_INCLUDE_DIRS})
@@ -160,11 +162,8 @@ else()
 	message(STATUS "Webserver support: Disabled (explicitly disabled)")
 endif()
 
-if(UNIX AND NOT APPLE)
-	# Note: cannot use list APPEND here because it inserts semicolons instead of spaces
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
-endif()
+find_package(Threads)
+target_link_libraries(performous PRIVATE Threads::Threads)
 
 if(WIN32)
 	add_definitions("-DEPOXY_SHARED")
@@ -183,8 +182,6 @@ else()
 	set(BIN_INSTALL bin)
 endif()
 
-# Build main executable
-add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
 if(WIN32)
   target_link_libraries(performous PRIVATE wsock32 ws2_32)
 endif()
@@ -196,8 +193,6 @@ list(APPEND LIBS ${FFTW3_LIBRARIES})
 list(APPEND LIBS ${BLAS_LIBRARIES})
 
 target_link_libraries(performous PRIVATE fs ced aubio ${LIBS} PkgConfig::deps)
-
-target_include_directories(performous PRIVATE "${AUBIO_INSTALL_DIR}/include/")
 
 install(TARGETS performous DESTINATION ${BIN_INSTALL})
 

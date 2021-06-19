@@ -57,8 +57,7 @@ class FFmpeg {
 
 	virtual void processFrame(uFrame frame) = 0;
 
-	struct Packet;
-	void decodePacket(Packet &);
+	void handleSomeFrames();
 
 	static void avformat_close_input(AVFormatContext *fctx);
 	static void avcodec_free_context(AVCodecContext *avctx);

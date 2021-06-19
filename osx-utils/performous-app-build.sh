@@ -4,7 +4,7 @@ set -o errexit
 # without it the bundle would be broken
 
 test -z ${PREFIXDIR} && PREFIXDIR="/opt/local" # By default, the default prefix for macports, change this if you're using a different path or package manager.
-test -z ${DEPLOYMENT_TARGET} && DEPLOYMENT_TARGET="10.12" # Change this if you want to target a different version of macOS.
+test -z ${DEPLOYMENT_TARGET} && DEPLOYMENT_TARGET="10.14" # Change this if you want to target a different version of macOS.
 MAKE_JOBS=$(sysctl -n hw.ncpu)
 test -z ${CC} && CCPATH="/usr/bin/clang" # Path to system Clang, change if you want another compiler.
 test -z ${CXX} && CXXPATH="/usr/bin/clang++" # Path to system Clang, change if you want another compiler.
