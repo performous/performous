@@ -1,4 +1,4 @@
-#include "notes.hh"
+﻿#include "notes.hh"
 
 #include "util.hh"
 #include <cmath>
@@ -22,10 +22,12 @@ double Note::score(double n, double b, double e) const {
 double Note::scoreMultiplier() const {
 	switch(type) {
 		case GOLDEN:
+		case GOLDEN2:
 			return 2.0;
 		case SLEEP:
 			return 0.0;
 		case FREESTYLE:
+		case RAP:
 		case NORMAL:
 		case SLIDE:
 		case TAP:

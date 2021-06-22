@@ -1,9 +1,9 @@
 #include "log.hh"
 
 #include "fs.hh"
-#include <boost/filesystem.hpp>
 #include <boost/iostreams/device/file_descriptor.hpp>
 #include <boost/iostreams/stream.hpp>
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -96,7 +96,7 @@ static VerboseMessageSink vsm; //!< \internal
 //! \internal used to store the default/original clog buffer.
 static std::streambuf* default_ClogBuf = nullptr;
 
-fs::ofstream file;
+std::ofstream file;
 
 std::string target;
 int minLevel;
@@ -166,7 +166,7 @@ Logger::Logger(std::string const& level) {
 		if (minLevel < 100) {
 			fs::path name = getLogFilename();
 			fs::create_directories(name.parent_path());
-			file.open(name);
+			file.open(name.c_str());
 			msg += " Log file: " + name.string();
 		}
 		sb.open(vsm);
