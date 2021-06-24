@@ -22,7 +22,7 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevicePt
   m_arrow_down(findFile("arrow_button_down.svg")),
   m_arrow_left(findFile("arrow_button_left.svg")),
   m_arrow_right(findFile("arrow_button_right.svg")),
-  m_text(findFile("sing_timetxt.svg"), config["graphic/text_lod"].f()),
+  m_text(findFile("sing_timetxt.svg"), config["graphic/text_lod"].f(), WrappingStyle().lyrics()),
   m_selectedTrack(""),
   m_selectedDifficulty(0),
   m_rejoin(false),
@@ -42,7 +42,7 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevicePt
 	double time = m_audio.getPosition();
 	m_jointime = time < 0.0 ? -1.0 : time + join_delay;
 
-	m_popupText = std::make_unique<SvgTxtThemeSimple>(findFile("sing_popup_text.svg"), config["graphic/text_lod"].f());
+	m_popupText = std::make_unique<SvgTxtThemeSimple>(findFile("sing_popup_text.svg"), config["graphic/text_lod"].f(), WrappingStyle().lyrics());
 	m_menuTheme = std::make_unique<ThemeInstrumentMenu>();
 	for (auto& elem: m_pressed) elem = false;
 }

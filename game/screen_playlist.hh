@@ -66,6 +66,7 @@ private:
 	std::unique_ptr<Texture> m_bandCover;
 	std::unique_ptr<Texture> m_danceCover;
 	std::unique_ptr<Webcam> m_cam;
+	const unsigned short showOpts = 7; // Show at most 8 options simultaneously
 };
 
 
