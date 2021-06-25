@@ -25,6 +25,7 @@ Song::Song(web::json::value const& song): dummyVocal(TrackName::LEAD_VOCAL), ran
 	cover = song.has_field("Cover") ? song.at("Cover").as_string() : "";
 	background = song.has_field("Background") ? song.at("Background").as_string() : "";
 	video = song.has_field("VideoFile") ? fs::path(song.at("VideoFile").as_string()) : "";
+	midifilename = song.has_field("MidFile") ? fs::path(song.at("MidFile").as_string()) : "";
 	videoGap = song.has_field("VideoGap") ? song.at("VideoGap").as_number().to_double() : 0.0;
 	start = song.has_field("Start") ? song.at("Start").as_number().to_double() : 0.0;
 	preview_start = song.has_field("PreviewStart") ? song.at("PreviewStart").as_number().to_double() : 0.0;

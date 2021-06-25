@@ -167,6 +167,9 @@ void Songs::CacheSonglist() {
     	if(!song->music["background"].string().empty()) {
 	        songObject["SongFile"] = web::json::value::string(song->music["background"].string());
 	    }
+    	if(!song->midifilename.string().empty()) {
+	        songObject["MidFile"] = web::json::value::string(song->midifilename.string());
+	    }
     	if(!song->video.string().empty()) {
 	        songObject["VideoFile"] = web::json::value::string(song->video.string());
 	    }
