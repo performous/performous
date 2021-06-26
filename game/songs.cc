@@ -164,8 +164,8 @@ void Songs::CacheSonglist() {
     	if(!song->background.string().empty()) {
 	        songObject["Background"] = web::json::value::string(song->background.string());
 	    }
-    	if(!song->music["background"].string().empty()) {
-	        songObject["SongFile"] = web::json::value::string(song->music["background"].string());
+    	if(!song->music[TrackName::BGMUSIC].string().empty()) {
+	        songObject["SongFile"] = web::json::value::string(song->music[TrackName::BGMUSIC].string());
 	    }
     	if(!song->midifilename.string().empty()) {
 	        songObject["MidFile"] = web::json::value::string(song->midifilename.string());
@@ -182,9 +182,31 @@ void Songs::CacheSonglist() {
     	if(!std::isnan(song->preview_start)) {
 	        songObject["PreviewStart"] = web::json::value::number(song->preview_start);
 	    }
-    	if(!song->music["vocals"].string().empty()) {
-	        songObject["Vocals"] = web::json::value::string(song->music["vocals"].string());
+    	if(!song->music[TrackName::LEAD_VOCAL].string().empty()) {
+	        songObject["Vocals"] = web::json::value::string(song->music[TrackName::LEAD_VOCAL].string());
 	    }
+        if(!song->music[TrackName::PREVIEW].string().empty()) {
+	        songObject["Preview"] = web::json::value::string(song->music[TrackName::PREVIEW].string());
+        }
+        if(!song->music[TrackName::GUITAR].string().empty()) {
+	        songObject["Guitar"] = web::json::value::string(song->music[TrackName::GUITAR].string());
+        }
+        if(!song->music[TrackName::BASS].string().empty()) {
+	        songObject["Bass"] = web::json::value::string(song->music[TrackName::BASS].string());
+        }
+        if(!song->music[TrackName::DRUMS].string().empty()) {
+	        songObject["Drums"] = web::json::value::string(song->music[TrackName::DRUMS].string());
+        }
+        if(!song->music[TrackName::KEYBOARD].string().empty()) {
+	        songObject["Keyboard"] = web::json::value::string(song->music[TrackName::KEYBOARD].string());
+        }
+        if(!song->music[TrackName::GUITAR_COOP].string().empty()) {
+	        songObject["Guitar_coop"] = web::json::value::string(song->music[TrackName::GUITAR_COOP].string());
+        }
+        if(!song->music[TrackName::GUITAR_RHYTHM].string().empty()) {
+	        songObject["Guitar_Rhythm"] = web::json::value::string(song->music[TrackName::GUITAR_RHYTHM].string());
+        }
+
     	double duration = song->getDurationSeconds();
     	if(!std::isnan(duration)) {
 	    	songObject["Duration"] = web::json::value::number(duration);
