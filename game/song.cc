@@ -30,8 +30,8 @@ Song::Song(web::json::value const& song): dummyVocal(TrackName::LEAD_VOCAL), ran
 	start = song.has_field("Start") ? song.at("Start").as_number().to_double() : 0.0;
 	preview_start = song.has_field("PreviewStart") ? song.at("PreviewStart").as_number().to_double() : 0.0;
 	m_duration = song.has_field("Duration") ? song.at("Duration").as_number().to_double() : 0.0;
-	music["background"] = song.has_field("SongFile") ? fs::path(song.at("SongFile").as_string()) : "";
-	music["vocals"] = song.has_field("Vocals") ? fs::path(song.at("Vocals").as_string()) : "";
+	music[TrackName::BGMUSIC] = song.has_field("SongFile") ? fs::path(song.at("SongFile").as_string()) : "";
+	music[TrackName::LEAD_VOCAL] = song.has_field("Vocals") ? fs::path(song.at("Vocals").as_string()) : "";
 	loadStatus = Song::LoadStatus::HEADER;
 	
 	if (song.has_field("VocalTracks")) {
