@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.6)
 
 file(GLOB SOURCE_FILES "*.cc")
 file(GLOB HEADER_FILES "*.hh" "libda/*.hpp")
@@ -192,8 +192,12 @@ endif()
 if(APPLE)
 	list(APPEND LIBS "-framework Accelerate")
 endif()
-list(APPEND LIBS ${FFTW3_LIBRARIES})
-list(APPEND LIBS ${BLAS_LIBRARIES})
+if(FFTW3_FOUND)
+	list(APPEND LIBS ${FFTW3_LIBRARIES})
+endif()
+if(BLAS_FOUND)
+	list(APPEND LIBS ${BLAS_LIBRARIES})
+endif()
 
 target_link_libraries(performous PRIVATE fs ced aubio ${LIBS} PkgConfig::deps)
 
