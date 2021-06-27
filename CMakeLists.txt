@@ -97,11 +97,11 @@ else()
 	set(AUBIO_CFLAGS "${CMAKE_C_FLAGS}")
 endif()
 
-find_package(BLAS REQUIRED MODULE)
-find_package(FFTW3 COMPONENTS single REQUIRED MODULE)
+find_package(BLAS MODULE)
+find_package(FFTW3 COMPONENTS single MODULE)
 
-if(NOT FFTW3_FOUND OR NOT BLAS_FOUND)
-	message(ERROR "fftw3 or BLAS required to build aubio, but they cannot be found.")
+if(NOT FFTW3_FOUND AND NOT BLAS_FOUND)
+	message(FATAL_ERROR "fftw3 or BLAS required to build aubio, but they cannot be found.")
 endif()
 
 include(ExternalProject)
