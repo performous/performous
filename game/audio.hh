@@ -58,7 +58,7 @@ struct Device {
 	/// Stop
 	void stop();
 	/// Callback
-	int operator()(void const* input, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags);
+	int operator()(float const* input, float* output, unsigned long frames);
 	/// Returns true if this device is opened for output
 	bool isOutput() const { return outptr != nullptr; }
 	/// Returns true if this device is assigned to the named channel (mic color or "OUT")
@@ -142,10 +142,10 @@ public:
 
 class Music {
 struct Track {
-	FFmpeg mpeg;
+	AudioBuffer audioBuffer;
 	float fadeLevel = 1.0f;
 	float pitchFactor = 0.0f;
-	template <typename... Args> Track(Args&&... args): mpeg(args...) {}
+	template <typename... Args> Track(Args&&... args): audioBuffer(std::forward<Args>(args)...) {}
 };	
 	friend class ScreenSongs;
 	public:

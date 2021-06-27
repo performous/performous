@@ -161,7 +161,7 @@ bool Music::operator()(float* begin, float* end) {
 // 			// Otherwise just get the audio and mix it straight away
 // 			} else
 // #endif
-		if (t.mpeg.audioQueue(mixbuf.data(), mixbuf.data() + mixbuf.size(), m_pos, t.fadeLevel)) eof = false;
+		if (t.audioBuffer.read(mixbuf.data(), mixbuf.size(), m_pos, t.fadeLevel)) eof = false;
 		
 	}
 	m_pos += samples;
@@ -188,18 +188,17 @@ bool Music::operator()(float* begin, float* end) {
 
 double Music::duration() const {
 	double dur = 0.0;
-	for (auto& kv: tracks) dur = std::max(dur, kv.second->mpeg.audioQueue.duration());
+	for (auto& kv: tracks) dur = std::max(dur, kv.second->audioBuffer.duration());
 	return dur;
 }
 
 bool Music::prepare() {
 	bool ready = true;
 	for (auto& kv: tracks) {
-		FFmpeg& mpeg = kv.second->mpeg;
-		if (mpeg.terminating()) continue;  // Song loading failed or other error, won't ever get ready
-		if (mpeg.audioQueue.prepare(m_pos)) {
+		auto& audioBuffer = kv.second->audioBuffer;
+		if (audioBuffer.prepare(m_pos)) {
 			if (kv.first == "background" && m_preview && m_pos > 0) {
-				fvec_t* previewSamples = mpeg.audioQueue.makePreviewBuffer();
+				auto previewSamples = audioBuffer.makePreviewBuffer();
 				fvec_t* previewBeats = ScreenSongs::previewBeatsBuffer.get();
 				intptr_t readptr = 0;
 				fvec_t* tempoSamplePtr = new_fvec(Audio::aubio_hop_size);
@@ -208,7 +207,7 @@ bool Music::prepare() {
 				ScreenSongs* sSongs = static_cast<ScreenSongs *>(gm->getScreen("Songs"));
 				double pstart = sSongs->getSongs().currentPtr()->preview_start;
 				pstart = (std::isnan(pstart) ? 0.0 : pstart);
-				double first_period, first_beat;
+				double first_period = 0.0, first_beat = 0.0;
 				std::vector<double> extra_beats;
 				Song::Beats& beats = sSongs->getSongs().currentPtr()->beats;
 				if (!sSongs->getSongs().currentPtr()->hasControllers()) {
@@ -258,17 +257,17 @@ void Music::trackPitchBend(std::string const& name, double pitchFactor) {
 struct Sample {
   private:
 	double m_pos;
-	FFmpeg mpeg;
+	AudioBuffer audioBuffer;
 	bool eof;
   public:
-	Sample(fs::path const& filename, unsigned sr) : m_pos(), mpeg(filename, sr), eof(true) { }
+	Sample(fs::path const& filename, unsigned sr) : m_pos(), audioBuffer(filename, sr), eof(true) { }
 	void operator()(float* begin, float* end) {
 		if(eof) {
 			// No more data to play in this sample
 			return;
 		}
 		std::vector<float> mixbuf(end - begin);
-		if(!mpeg.audioQueue(mixbuf.data(), mixbuf.data() + mixbuf.size(), m_pos, 1.0)) {
+		if(!audioBuffer.read(mixbuf.data(), mixbuf.size(), m_pos, 1.0)) {
 			eof = true;
 		}
 		for (size_t i = 0, iend = end - begin; i != iend; ++i) {
@@ -425,9 +424,7 @@ void Device::stop() {
 	if (err != paNoError) throw std::runtime_error(std::string("Pa_StopStream: ") + Pa_GetErrorText(err));
 }
 
-int Device::operator()(void const* input, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags) try {
-	float const* inbuf = static_cast<float const*>(input);
-	float* outbuf = static_cast<float*>(output);
+int Device::operator()(float const* inbuf, float* outbuf, unsigned long frames) try {
 	for (std::size_t i = 0; i < mics.size(); ++i) {
 		if (!mics[i]) continue;  // No analyzer? -> Channel not used
 		da::sample_const_iterator it = da::sample_const_iterator(inbuf + i, in);
@@ -544,7 +541,7 @@ struct Audio::Impl {
 		// stop all audio streams befor destoying the object.
 		// else portaudio will keep sending data to those destroyed
 		// objects.
-		for (auto& device: devices) device.stop();
+		for (auto& device: devices) try { device.stop(); } catch (const std::exception &e) { std::clog << "audio/error: " << e.what(); }
 	}
 };
 
