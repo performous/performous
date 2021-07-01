@@ -231,7 +231,7 @@ class FFmpeg::Error: public std::runtime_error {
 		char message[AV_ERROR_MAX_STRING_SIZE];
 		av_strerror(errorValue, message, AV_ERROR_MAX_STRING_SIZE);
 		std::ostringstream oss;
-		oss << "FFmpeg Error: Pocessing file " << self.m_filename << " code=" << errorValue << ", error=" << message;
+		oss << "FFmpeg Error: Processing file " << self.m_filename << " code=" << errorValue << ", error=" << message;
 		return oss.str();
 	}
 };
@@ -301,21 +301,11 @@ void FFmpeg::avcodec_free_context(AVCodecContext *avctx) {
 	::avcodec_free_context(&avctx);
 }
 
-struct FFmpeg::Packet: public AVPacket {
-	Packet() {
-		av_init_packet(this);
-		this->data = nullptr;
-		this->size = 0;
-	}
-
-	~Packet() { av_packet_unref(this); }
-};
-
 void FFmpeg::handleOneFrame() {
 	bool read_one = false;
 	do {
-		Packet pkt;
-		auto ret = av_read_frame(m_formatContext.get(), &pkt);
+                std::unique_ptr<AVPacket, std::function<void(AVPacket*)>> pkt(av_packet_alloc(), [] (auto *pkt) { av_packet_free(&pkt); });
+		auto ret = av_read_frame(m_formatContext.get(), pkt.get());
 		if(ret == AVERROR_EOF) {
 			// End of file: no more data to read.
 			throw Eof();
@@ -323,9 +313,19 @@ void FFmpeg::handleOneFrame() {
 			throw Error(*this, ret);
 		}
 
-		if (pkt.stream_index != m_streamId) continue;
+		if (pkt->stream_index != m_streamId) continue;
 
-		decodePacket(pkt);
+                ret = avcodec_send_packet(m_codecContext.get(), pkt.get());
+                if(ret == AVERROR_EOF) {
+                        // End of file: no more data to read.
+                        throw Eof();
+                } else if(ret == AVERROR(EAGAIN)) {
+                        // no room for new data, need to get more frames out of the decoder by
+                        // calling avcodec_receive_frame()
+                } else if(ret < 0) {
+                        throw Error(*this, ret);
+                }
+		handleSomeFrames();
 		read_one = true;
 	} while (!read_one);
 }
@@ -343,27 +343,18 @@ void AudioFFmpeg::seek(double time) {
 	m_position_in_48k_frames = -1; //kill previous position
 }
 
-void FFmpeg::decodePacket(Packet &pkt) {
-	auto ret = avcodec_send_packet(m_codecContext.get(), &pkt);
-	if(ret == AVERROR_EOF) {
-		// End of file: no more data to read.
-		throw Eof();
-	} else if(ret == AVERROR(EAGAIN)) {
-		// no room for new data, need to get more frames out of the decoder by
-		// calling avcodec_receive_frame()
-	} else if(ret < 0) {
-		throw Error(*this, ret);
-	}
-	while (ret >= 0) {
+void FFmpeg::handleSomeFrames() {
+        int ret;
+        do {
 		uFrame frame{av_frame_alloc()};
 		ret = avcodec_receive_frame(m_codecContext.get(), frame.get());
-		if(ret == AVERROR_EOF) {
+		if (ret == AVERROR_EOF) {
 			// End of file: no more data.
 			throw Eof();
-		} else if(ret == AVERROR(EAGAIN)) {
+		} else if (ret == AVERROR(EAGAIN)) {
 			// not enough data to decode a frame, go read more and feed more to the decoder
 			break;
-		} else if(ret < 0) {
+		} else if (ret < 0) {
 			throw Error(*this, ret);
 		}
 		// frame is available here
@@ -374,7 +365,7 @@ void FFmpeg::decodePacket(Packet &pkt) {
 			m_position = new_position;
 		}
 		processFrame(std::move(frame));
-	}
+	} while (ret >= 0);
 }
 
 void VideoFFmpeg::processFrame(uFrame frame) {

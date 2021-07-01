@@ -83,7 +83,7 @@ class Players {
 	void advance(int diff) {
 		int size = m_filtered.size();
 		if (size == 0) return;  // Do nothing if no songs are available
-		int _current = size ? (int(math_cover.getTarget()) + diff) % size : 0;
+		int _current = (int(math_cover.getTarget()) + diff) % size;
 		if (_current < 0) _current += m_filtered.size();
 		math_cover.setTarget(_current,this->size());
 	}
