@@ -2,7 +2,7 @@
 
 #include "libxml++.hh"
 
-#include <boost/variant.hpp>
+#include <variant>
 #include <map>
 #include <string>
 #include <vector>
@@ -52,14 +52,14 @@ class ConfigItem {
 	std::string m_shortDesc;
 	std::string m_longDesc;
 
-	typedef boost::variant<bool, int, double, std::string, StringList> Value;
+	typedef std::variant<bool, int, double, std::string, StringList> Value;
 	bool isDefaultImpl(Value const& defaultValue) const;
 	Value m_value; ///< The current value
 	Value m_factoryDefaultValue; ///< The value from config schema
 	Value m_defaultValue; ///< The value from config schema or system config
 	std::vector<std::string> m_enums; ///< Enum value titles
-	boost::variant<int, double> m_step, m_min, m_max;
-	boost::variant<int, double> m_multiplier;
+	std::variant<int, double> m_step, m_min, m_max;
+	std::variant<int, double> m_multiplier;
 	std::string m_unit;
 	int m_sel;
 };
