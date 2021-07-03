@@ -1,3 +1,0 @@
-[submodule "compact_enc_det"]
-	path = 3rdparty/ced
-	url = https://github.com/performous/compact_enc_det.git
