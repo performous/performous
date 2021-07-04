@@ -89,7 +89,6 @@ struct ButtonMap {
 	Button map;  // Generic action
 	Button negative, positive;  // Half-axis movement
 	Button up, down, left, right;  // Hat direction
-	ButtonMap() { std::memset(this, 0, sizeof(*this)); }
 };
 
 typedef std::map<HWButton, ButtonMap> ButtonMapping;
