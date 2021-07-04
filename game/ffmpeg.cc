@@ -48,7 +48,7 @@ AudioBuffer::uFvec AudioBuffer::makePreviewBuffer() {
 		}
 	}
 	return fvec;
-};
+}
 
 bool AudioBuffer::wantMore() {
 	return m_write_pos < m_read_pos + static_cast<std::int64_t>(m_data.size() / 2);
@@ -221,7 +221,7 @@ static void printFFmpegInfo() {
 #if (LIBAVFORMAT_VERSION_INT) < (AV_VERSION_INT(58,0,0))
 	av_register_all();
 #endif
-};
+}
 
 class FFmpeg::Error: public std::runtime_error {
   public:
