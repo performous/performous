@@ -13,6 +13,8 @@
 #include <string>
 #include <memory>
 
+#include "i18n.hh"
+
 class Audio;
 
 /// Abstract Class for screens
@@ -48,7 +50,7 @@ class Screen {
 class Game: public Singleton <Game> {
   public:
 	/// constructor
-	Game(Window& window, Audio& audio);
+	Game(Window& window, Audio& audio, TranslationEngine& translationEngine);
 	~Game();
 	/// Adds a screen to the manager
 	void addScreen(std::unique_ptr<Screen> s) { 
@@ -103,6 +105,9 @@ class Game: public Singleton <Game> {
 	void drawLogo();
 	///global playlist access
 	PlayList& getCurrentPlayList() { return currentPlaylist; }
+	void setLanguage(const std::string language) { m_translationEngine.setLanguage(language); };
+    const std::string getCurrentLanguage() { return m_translationEngine.getCurrentLanguage(); };
+
 #ifdef USE_WEBSERVER
 	void notificationFromWebserver(std::string message) { m_webserverMessage = message; }
 	std::string subscribeWebserverMessages() { return m_webserverMessage; }
@@ -111,6 +116,7 @@ class Game: public Singleton <Game> {
 private:
 	Audio& m_audio;
 	Window& m_window;
+	TranslationEngine& m_translationEngine;
 
 public:
 	input::Controllers controllers;

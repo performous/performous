@@ -129,7 +129,7 @@ void mainLoop(std::string const& songlist) {
 	std::clog << "core/notice: Starting the audio subsystem (errors printed on console may be ignored)." << std::endl;
 	Audio audio;
 	std::clog << "core/info: Loading assets." << std::endl;
-	TranslationEngine localization(PACKAGE);
+	TranslationEngine localization(std::string(PACKAGE));
 	std::unique_ptr<Window> window;
 	TextureLoader m_loader;
 	Backgrounds backgrounds;
@@ -141,7 +141,7 @@ void mainLoop(std::string const& songlist) {
 		} catch (RUNTIME_ERROR& e) {
 			std::cerr << "ERROR: " << e.what() << std::endl;
 		}
-	Game gm(*window, audio);
+	Game gm(*window, audio, localization);
 	WebServer server(songs);
 	try {
 		// Load audio samples
