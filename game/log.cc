@@ -167,7 +167,7 @@ Logger::Logger(std::string const& level) {
 		if (minLevel < 100) {
 			fs::path name = getLogFilename();
 			fs::create_directories(name.parent_path());
-			file.open(name.string());
+			file.open(name.c_str());
 			msg += " Log file: " + name.string();
 		}
 		sb.open(vsm);
