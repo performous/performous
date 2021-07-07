@@ -26,7 +26,7 @@ namespace {
 
 /// Dumps Shader/Program InfoLog
 void Shader::dumpInfoLog(GLuint id) {
-	GLint maxLength=0;
+	GLint maxLength = 0;
 
 	if (glIsShader(id)) glGetShaderiv(id, GL_INFO_LOG_LENGTH, &maxLength);
 	else glGetProgramiv(id, GL_INFO_LOG_LENGTH, &maxLength);
