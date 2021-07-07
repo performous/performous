@@ -141,7 +141,7 @@ Shader& Shader::compileCode(std::string const& srccode, GLenum type) {
 	if (gl_response != GL_TRUE) {
 		throw std::runtime_error("Shader compile error.");
 	}
-	
+
 	shader_ids.push_back(new_shader);
 	return *this;
 }
