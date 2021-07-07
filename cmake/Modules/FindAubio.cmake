@@ -45,8 +45,10 @@ ExternalProject_Add(build-aubio-from-sources
         UPDATE_COMMAND ""
 	TMP_DIR ${CMAKE_BINARY_DIR}/3rdparty/aubio-build/tmp/
 	CONFIGURE_COMMAND ""
-	BUILD_COMMAND ${CMAKE_COMMAND} -E env CFLAGS=${AUBIO_CFLAGS} ${WAF}
-                  ${ACCELERATE_COMMAND} --disable-tests --notests --verbose
+	BUILD_COMMAND ${CMAKE_COMMAND} -E env CFLAGS=${AUBIO_CFLAGS}
+                  CXX=${CMAKE_CXX_COMPILER}
+                  CC=${CMAKE_C_COMPILER}
+                  ${WAF} ${ACCELERATE_COMMAND} --disable-tests --notests --verbose
                   --enable-fftw3f --disable-sndfile --disable-avcodec --disable-double
                   --disable-samplerate --disable-docs --disable-wavread --disable-wavwrite
                   --disable-tests --notests --disable-examples --disable-apple-audio
@@ -63,6 +65,7 @@ file(MAKE_DIRECTORY ${INSTALL_DIR}/include)
 
 add_library(aubio STATIC IMPORTED)
 set_target_properties(aubio PROPERTIES IMPORTED_LOCATION ${AUBIO_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}aubio${CMAKE_STATIC_LIBRARY_SUFFIX})
+
 set_target_properties(aubio PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${AUBIO_INSTALL_DIR}/include/)
 
 add_dependencies(aubio build-aubio-from-sources)
