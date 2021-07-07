@@ -67,7 +67,7 @@ namespace {
 
 	BinaryBuffer readFile(fs::path const& path) {
 		BinaryBuffer ret;
-		std::ifstream f(path.c_str(), std::ios::binary);
+		fs::ifstream f(path, std::ios::binary);
 		f.seekg(0, std::ios::end);
 		ret.resize(f.tellg());
 		f.seekg(0);
