@@ -25,7 +25,7 @@ namespace {
 }
 
 /// Dumps Shader/Program InfoLog
-void Shader::dumpInfoLog(GLuint id) { 
+void Shader::dumpInfoLog(GLuint id) {
 	GLint maxLength=0;
 
 	if (glIsShader(id)) glGetShaderiv(id, GL_INFO_LOG_LENGTH, &maxLength);
@@ -37,7 +37,7 @@ void Shader::dumpInfoLog(GLuint id) {
 	if (glIsShader(id)) glGetShaderInfoLog(id, maxLength, &infoLogLength, infoLog.data());
 	else glGetProgramInfoLog(id, maxLength, &infoLogLength, infoLog.data());
 
-	if (maxLength == 0) return;	
+	if (maxLength == 0) return;
 	// Ignore success messages that the Radeon driver always seems to give
 	if (std::equal(infoLog.data(), infoLog.data() + infoLogLength, "Vertex shader(s) linked, fragment shader(s) linked, geometry shader(s) linked.")) return;
 	// Format a (possibly multi-line) log message
