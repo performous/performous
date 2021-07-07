@@ -48,7 +48,7 @@ Video::~Video() {
 
 Video::Video(fs::path const& _videoFile, double videoGap): m_videoGap(videoGap), m_textureTime(), m_alpha(-0.5, 1.5) {
 	// make ffmpeg here to get any exception in the current thread
-	auto ffmpeg = std::make_unique<VideoFFmpeg>(_videoFile, [this] (auto f) { push(std::move(f)); });
+	auto ffmpeg = std::make_unique<VideoFFmpeg>(_videoFile, [this] (auto f) { this->push(std::move(f)); });
 	m_grabber = std::async(std::launch::async, [this, file = _videoFile, ffmpeg = std::move(ffmpeg)] {
 		int errors = 0;
 		std::unique_lock<std::mutex> l(m_mutex);
