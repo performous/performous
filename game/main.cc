@@ -170,9 +170,9 @@ void mainLoop(std::string const& songlist) {
 		gm.addScreen(std::make_unique<ScreenPlayers>("Players", audio, database));
 		gm.addScreen(std::make_unique<ScreenPlaylist>("Playlist", audio, songs, backgrounds));
 		gm.activateScreen("Intro");
-		gm.loading(_("Entering main menu"), 0.8);
+		gm.loading(_("Entering main menu..."), 0.8);
 		gm.updateScreen();  // exit/enter, any exception is fatal error
-		gm.loading(_("Loading complete"), 1.0);
+		gm.loading(_("Loading complete!"), 1.0);
 		// Main loop
 		auto time = Clock::now();
 		unsigned frames = 0;
