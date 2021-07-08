@@ -45,6 +45,8 @@ ExternalProject_Add(build-aubio-from-sources
         UPDATE_COMMAND ""
 	TMP_DIR ${CMAKE_BINARY_DIR}/3rdparty/aubio-build/tmp/
 	CONFIGURE_COMMAND ""
+	BUILD_BYPRODUCTS ${CMAKE_BINARY_DIR}/3rdparty/aubio-install/lib/${CMAKE_STATIC_LIBRARY_PREFIX}aubio${CMAKE_STATIC_LIBRARY_SUFFIX}
+	                 ${CMAKE_BINARY_DIR}/3rdparty/aubio-install/include/aubio/aubio.h
 	BUILD_COMMAND ${CMAKE_COMMAND} -E env CFLAGS=${AUBIO_CFLAGS}
                   CXX=${CMAKE_CXX_COMPILER}
                   CC=${CMAKE_C_COMPILER}
@@ -67,7 +69,5 @@ add_library(aubio STATIC IMPORTED)
 set_target_properties(aubio PROPERTIES IMPORTED_LOCATION ${AUBIO_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}aubio${CMAKE_STATIC_LIBRARY_SUFFIX})
 
 set_target_properties(aubio PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${AUBIO_INSTALL_DIR}/include/)
-
-add_dependencies(aubio build-aubio-from-sources)
 
 endif()
