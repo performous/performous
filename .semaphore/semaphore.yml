@@ -71,6 +71,7 @@ blocks:
             - cd /Users/semaphore
             - cache store macports-10_15 ./local
   - name: Ubuntu 18.04 Build (Meson)
+    dependencies: []
     task:
       prologue:
         commands:
