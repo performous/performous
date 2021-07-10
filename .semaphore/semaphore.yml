@@ -35,7 +35,7 @@ blocks:
           commands:
             - mkdir build.clang && cd build.clang && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
             - make VERBOSE=1
-  - name: MacOS 10.14.6 Build    
+  - name: MacOS 10.14.6 Build
     dependencies: []
     task:
       agent:
@@ -58,7 +58,7 @@ blocks:
           - mkdir -p /Users/semaphore/Applications
           - sudo ln -sf /Users/semaphore/local/Applications /Users/semaphore/Applications/MacPorts
           - sudo ln -sf /Users/semaphore/local/ /opt/local
-          - test -e /Users/semaphore/local/bin/port || ( curl -LJ https://www.dropbox.com/s/4c5oav6za5l4gvv/macports-10_15-install.tar.gz?dl=1 | tar x ) 
+          - test -e /Users/semaphore/local/bin/port || ( curl -LJ https://www.dropbox.com/s/4c5oav6za5l4gvv/macports-10_15-install.tar.gz?dl=1 | tar x )
       jobs:
         - name: Generate app bundle
           commands:
@@ -70,3 +70,41 @@ blocks:
             - ./performous-app-build.sh -D
             - cd /Users/semaphore
             - cache store macports-10_15 ./local
+  - name: Ubuntu 18.04 Build (Meson)
+    task:
+      prologue:
+        commands:
+          - echo "Installing Performous dependencies..."
+          - sudo apt-get update -y
+          - sudo apt-get install -y gettext clang-9 gcc-8 g++-8
+          - sudo apt-get install -y python3-dev python3-pip
+          - sem-version python 3.8
+          - sudo pip3 install meson
+          - sudo apt-get install -y ninja-build
+          - sudo apt-get install -y libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libicu-dev libopencv-dev libportmidi-dev libglm-dev libaubio-dev libcpprest-dev
+          - echo "Checking out..."
+          - checkout
+          - git submodule update --init --recursive
+      jobs:
+        - name: GCC-8.4.0 Build
+          env_vars:
+            - name: CC
+              value: gcc-8
+            - name: CXX
+              value: g++-8
+          commands:
+            - echo "Setting up build..."
+            - meson setup build.gcc -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true
+            - echo "Building..."
+            - meson compile -C build.gcc
+        - name: Clang-9 Build
+          env_vars:
+            - name: CC
+              value: clang-9
+            - name: CXX
+              value: clang++-9
+          commands:
+            - echo "Setting up build..."
+            - meson setup build.clang -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true
+            - echo "Building..."
+            - meson compile -C build.clang

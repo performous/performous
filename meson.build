@@ -1,13 +1,54 @@
-project('performous', 
+#Project definition
+project('performous',
         'cpp',
-        default_options : ['cpp_std=c++17'])
+        version: '1.x',
+        default_options : ['cpp_std=c++17','buildtype=debugoptimized'],
+        meson_version: '>=0.53.0',
+        license : 'GPL-2.0-or-later')
 
+#Print project summary.  Limited to strict minimum for now
+summary({'Use Open CV': get_option('usewebcam'),
+         'Use Port Midi': get_option('usemididrum'),
+         'Use Web Server': get_option('usewebserver')
+        }, section: 'Build Options')
+
+#Configuration
 conf = configuration_data()
 conf.set('CMAKE_PROJECT_NAME', 'Performous')
-conf.set('PROJECT_VERSION', 'git-meson')
+conf.set('PROJECT_VERSION', meson.project_version())
 conf.set('LOCALE_DIR', 'share/locale')
 conf.set('SHARE_INSTALL', 'share/games/performous')
 
+#Compilers flags.  Some warnings really should be enabled (eg narrowing, overflow etc) but some legacy code
+#has too many of those for the output to be useful.
+#LTO is used if it is available on GCC (10+), but not on clang as it does not seem to be linking fine
+compiler=meson.get_compiler('cpp')
+if compiler.get_id() == 'gcc'
+  compiler_args=compiler.get_supported_arguments(
+    ['-Wall','-Wextra','-pedantic','-Wc++20-compat',
+    '-Wno-deprecated-declarations',
+    '-Wno-mismatched-tags',
+    '-Wno-narrowing',
+    '-Wno-overflow',
+    '-flto'])
+else
+  compiler_args=compiler.get_supported_arguments(
+    ['-Wall','-Wextra','-pedantic','-Wc++20-compat',
+    '-Wno-c++11-narrowing',
+    '-Wno-implicit-int-float-conversion',
+    '-Wno-inconsistent-missing-override',
+    '-Wno-deprecated-declarations',
+    '-Wno-mismatched-tags'])
+endif
+
+#Link with stdc++fs if it is supplied by the compiler (gcc v8 or older, clang v10 or older)
+#This is currently necessary on semaphore CI, which is running gcc8 max.
+#Has_Link_Argument is only supported in meson 0.46+
+if compiler.has_link_argument('-lstdc++fs')
+  add_project_link_arguments(['-lstdc++fs'], language: 'cpp')
+endif
+
+#Dependencies
 libxmlpp = dependency('libxml++-3.0', required : false)
 if libxmlpp.found()
   conf.set('LIBXMLPP_VERSION_3_0', 1)
@@ -18,39 +59,69 @@ else
   conf.set('LIBXMLPP_VERSION_3_0', 0)
 endif
 
-opencv = dependency('opencv4', required : false)
-if opencv.found()
-  add_project_arguments('-DUSE_OPENCV', language : 'cpp')
+#OpenCV may be referred to as opencv or opencv4
+if get_option('usewebcam')
+  message('OpenCV build requested')
+  opencv = dependency('opencv', required: false)
+  if opencv.found()
+      add_project_arguments('-DUSE_OPENCV', language : 'cpp')
+  else
+    opencv = dependency('opencv4', method : 'pkg-config', required: false)
+    if opencv.found()
+      add_project_arguments('-DUSE_OPENCV', language : 'cpp')
+    else
+      error('OpenCV not found but webcam build requested')
+    endif
+  endif
 else
-  warning('OpenCV not found:    Webcam support DISABLED')
+  opencv=dependency('',required: false)
 endif
 
-portmidi = dependency('PortMidi', required : false, cmake_module_path : 'cmake/Modules/')
-if portmidi.found()
-  add_project_arguments('-DUSE_PORTMIDI', language: 'cpp')
+#Portmidi is maybe not found in pkg-config, use find library as an alternative
+if get_option('usemididrum')
+  message('Portmidi build requested')
+  portmidi = dependency('portmidi', required: false)
+  if portmidi.found()
+    add_project_arguments('-DUSE_PORTMIDI', language: 'cpp')
+  else
+    portmidi = compiler.find_library('libportmidi', required: false)
+    if portmidi.found()
+      add_project_arguments('-DUSE_PORTMIDI', language: 'cpp')
+    else
+      error('PORTMIDI not found but MIDI drum support build requested')
+    endif
+  endif
 else
-  warning('PORTMIDI not found:  MIDI drum support DISABLED')
+  portmidi=dependency('',required: false)
 endif
 
-# This could in principle work, but doesn't in practice, at least not on my system
-# - cpprestsdk doesn't support pkg-config
-# - FindCppRest.cmake shipped with Performous doesn't find it for some reason
-# - The library's installed cpprestsdk-config.cmake is not in path
-# - This build script doesn't add the required extra Boost components to build
-cpprest = dependency('CppRest', required : false, cmake_module_path : 'cmake/Modules/')
-if cpprest.found()
-  add_project_arguments('-DUSE_WEBSERVER', language: 'cpp')
+#Cpprest may not be in pkg-config
+#Also, libssl and libcrypto are only needed when webserver support is requested
+if get_option('usewebserver')
+  message('Webserver build requested')
+  cpprest=dependency('cpprest', required : false)
+  if cpprest.found()
+    add_project_arguments('-DUSE_WEBSERVER', language: 'cpp')
+  else
+    cpprest=compiler.find_library('libcpprest', required:false)
+    if cpprest.found()
+      add_project_arguments('-DUSE_WEBSERVER', language: 'cpp')
+    else
+      error('CppRestSdk not found but webserver build requested')
+    endif
+  endif
 else
-  warning('CppRestSdk not found:  WEBSERVER support DISABLED')
+  cpprest=dependency('',required: false)
 endif
 
+#Write configuration file
 configure_file(input : 'game/config.hh.in', output : 'config.hh', configuration : conf)
 
 dependencies = [
   dependency('pangocairo'),
   dependency('sdl2'),
   dependency('aubio'),
-  dependency('boost', modules : [
+  dependency('boost', modules : [ # Meson treats boost specially: no pkg-config supported
     'filesystem',
     'iostreams',
     'locale',
@@ -71,29 +142,14 @@ dependencies = [
   dependency('libswresample'),
   dependency('portaudio-2.0'),
   dependency('fontconfig'),
+  dependency('glm'),
+  dependency('libssl', required:get_option('usewebserver')), #Only needed with webserver
+  dependency('libcrypto', required:get_option('usewebserver')), #Idem
   libxmlpp,
   opencv,
   portmidi,
   cpprest
 ]
-
-compiler=meson.get_compiler('cpp')
-if compiler.get_id() == 'gcc'
-  compiler_args=compiler.get_supported_arguments(
-    ['-Wall','-Wextra','-pedantic','-Wc++20-compat',
-    '-Wno-deprecated-declarations',
-    '-Wno-mismatched-tags',
-    '-Wno-narrowing',
-    '-Wno-overflow'])
-else
-  compiler_args=compiler.get_supported_arguments(
-    ['-Wall','-Wextra','-pedantic','-Wc++20-compat',
-    '-Wno-c++11-narrowing',
-    '-Wno-implicit-int-float-conversion',
-    '-Wno-inconsistent-missing-override',
-    '-Wno-deprecated-declarations',
-    '-Wno-mismatched-tags'])
-endif
 
 executable('performous', [
   '3rdparty/ced/compact_enc_det/compact_enc_det.cc',
@@ -173,6 +229,7 @@ executable('performous', [
   install: true
 )
 
+#Installation of data files
 datapaths = [
   'data/backgrounds',
   'data/config',
@@ -186,3 +243,11 @@ datapaths = [
 foreach dp: datapaths
   install_subdir(dp, install_dir: 'share/games/performous')
 endforeach
+
+#TBD: desktop file, pixmap files, man etc. see cmake of data and docs dir
+# help2man = find_program('help2man', required: false)
+# if help2man.found()
+#   help2man_opts = [
+#     '--no-info',
+#     '--section=1',
+#...
