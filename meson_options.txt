@@ -1,0 +1,3 @@
+option('usewebcam', type: 'boolean', value: false, description: 'Build with webcam support')
+option('usemididrum', type: 'boolean', value: false, description: 'Build with midi drum support')
+option('usewebserver', type: 'boolean', value: false, description: 'Build with web server support')
