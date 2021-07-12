@@ -1,6 +1,4 @@
-build
-build32
-build64
+build*
 CMakeLists.txt.user*
 *~
 *.mo
