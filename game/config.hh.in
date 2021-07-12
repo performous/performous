@@ -1,6 +1,6 @@
 #pragma once
 
-// The build system uses this file to generate config.hh within the build folder.
+// The build system uses this file to generate the config.hh header file within the build folder.
 
 #define PACKAGE "@CMAKE_PROJECT_NAME@"
 #define VERSION "@PROJECT_VERSION@"
