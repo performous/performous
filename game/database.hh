@@ -74,9 +74,6 @@ private: // will be bypassed by above friend declaration
 	cur_scores_t scores;
 
 public: // methods for database management
-
-	/**A facade for Players::addPlayer.*/
-	void addPlayer(std::string const& name, std::string const& picture = "", int id = -1);
 	/**A facade for SongItems::addSong.*/
 	void addSong(std::shared_ptr<Song> s);
 	/**A facade for Hiscore::addHiscore.
