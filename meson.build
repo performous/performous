@@ -244,10 +244,10 @@ foreach dp: datapaths
   install_subdir(dp, install_dir: 'share/games/performous')
 endforeach
 
-#TBD: desktop file, pixmap files, man etc. see cmake of data and docs dir
+# TBD: desktop file, pixmap files, man etc. see cmake of data and docs dir
 # help2man = find_program('help2man', required: false)
 # if help2man.found()
 #   help2man_opts = [
 #     '--no-info',
 #     '--section=1',
-#...
+# Maybe also add a target to build a debian pkg ...
