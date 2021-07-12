@@ -7,11 +7,17 @@
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
-// in boost, copy_directory means create_directory
-// https://www.boost.org/doc/libs/1_66_0/libs/filesystem/doc/reference.html#copy_directory
-static inline void create_directory(const fs::path &a, const fs::path &b) {
-    copy_directory(a, b);
-}
+	#if BOOST_VERSION < 107400
+	// create_directory was added in boost 1.74
+	// see https://www.boost.org/users/history/version_1_74_0.html
+
+	// in boost, copy_directory means create_directory
+	// https://www.boost.org/doc/libs/1_66_0/libs/filesystem/doc/reference.html#copy_directory
+	static inline void create_directory(const fs::path &a, const fs::path &b) {
+	    copy_directory(a, b);
+	}
+
+	#endif
 
 #else
 #include <filesystem>
