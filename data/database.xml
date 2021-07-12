@@ -10,7 +10,7 @@
 		</player>
 	</players>
 	<hiscores> <!-- a list of highscores -->
-		<hiscore songid="123" playerid="123" track="vocals">600</hiscore>
+		<hiscore songid="123" playerid="123" track="vocals" level="0">600</hiscore>
 	</hiscores>
 </performous>
 <!--
