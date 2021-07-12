@@ -14,7 +14,7 @@ namespace fs = boost::filesystem;
 	// in boost, copy_directory means create_directory
 	// https://www.boost.org/doc/libs/1_66_0/libs/filesystem/doc/reference.html#copy_directory
 	static inline void create_directory(const fs::path &a, const fs::path &b) {
-	    copy_directory(a, b);
+	    copy_directory(b, a);
 	}
 
 	#endif
