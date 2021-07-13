@@ -12,10 +12,22 @@ summary({'Use Open CV': get_option('usewebcam'),
          'Use Web Server': get_option('usewebserver')
         }, section: 'Build Options')
 
+#Add git describe output to version number.
+#This does not appear work on semaphore, maybe because of stdout.
+#If it fails, falls back to the project version defined above, without git reference.
+version = meson.project_version()
+git = find_program('git', required: true)
+if git.found()
+  gitcmd = run_command(git, 'describe')
+  if gitcmd.returncode() == 0
+    version = meson.project_version()+' (git: '+gitcmd.stdout().strip() +')'
+  endif
+endif
+
 #Configuration
 conf = configuration_data()
 conf.set('CMAKE_PROJECT_NAME', 'Performous')
-conf.set('PROJECT_VERSION', meson.project_version())
+conf.set('PROJECT_VERSION', version)
 conf.set('LOCALE_DIR', 'share/locale')
 conf.set('SHARE_INSTALL', 'share/games/performous')
 
