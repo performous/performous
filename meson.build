@@ -1,7 +1,7 @@
 #Project definition
 project('performous',
         'cpp',
-        version: '2.x',
+        version: '1.x',
         default_options : ['cpp_std=c++17','buildtype=debugoptimized'],
         meson_version: '>=0.53.0',
         license : 'GPL-2.0-or-later')
