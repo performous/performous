@@ -5,11 +5,7 @@
 #include <array>
 #include <iostream>
 
-#if ((BOOST_VERSION / 100 % 1000) >= 55)
 #include <boost/predef/os.h>
-#else
-#include "../boost_predef/os.h"
-#endif
 
 #include <SDL2/SDL_events.h>
 
