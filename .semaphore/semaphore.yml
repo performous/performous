@@ -101,7 +101,7 @@ blocks:
               value: g++-8
           commands:
             - echo "Setting up build..."
-            - meson setup build.gcc -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true
+            - meson setup build.gcc -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true -Dstoponwarning=true
             - echo "Building..."
             - meson compile -C build.gcc
         - name: Clang-9 Build
