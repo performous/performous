@@ -1,4 +1,5 @@
 /[bB]uild*/
+/osx-utils/[bB]uild*/
 CMakeLists.txt.user*
 *~
 *.mo
