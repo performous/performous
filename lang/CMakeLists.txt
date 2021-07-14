@@ -7,6 +7,7 @@ cmake_minimum_required(VERSION 2.8)
 
 file(GLOB _languages *.po)
 set(_mofiles)
+
 foreach(_pofile ${_languages})
 	get_filename_component(_language ${_pofile} NAME_WE)
 	set(_mofile ${CMAKE_CURRENT_BINARY_DIR}/${_language}.mo)
