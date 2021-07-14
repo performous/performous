@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nlohmann/json.hpp>
 #include <list>
 #include <vector>
 
@@ -76,6 +77,8 @@ struct pathCache {
 fs::path findFile(fs::path const& filename);  ///< Look for the specified file in theme and data folders.
 
 BinaryBuffer readFile(fs::path const& path); ///< Reads a file into a buffer. 
+
+nlohmann::json readJSON(fs::path const& filename); ///< Reads a JSON file into memory.
 
 Paths listFiles(fs::path const& dir);  ///< List contents of specified folder in theme and data folders (omit duplicates).
 
