@@ -22,35 +22,23 @@ class Songs {
 	/// constructor
 	Songs(Database& database, std::string const& songlist = std::string());
 	~Songs();
-	/// iterators
-	struct iterator_traits {        
-		typedef ptrdiff_t difference_type; //almost always ptrdiff_t
-		typedef std::shared_ptr<Song> value_type; //almost always T
-		typedef std::shared_ptr<Song>& reference; //almost always T& or const T&
-		typedef std::shared_ptr<Song>* pointer; //almost always T* or const T*
-		typedef std::forward_iterator_tag iterator_category;  //usually std::forward_iterator_tag or similar
-	};
-	using iterator = typename std::vector<iterator_traits::value_type>::iterator;
-	iterator begin(bool webServer = false) { return (webServer ? m_webServerFiltered : m_filtered).begin(); }
-	iterator end(bool webServer = false) { return (webServer ? m_webServerFiltered : m_filtered).end(); }
 	/// updates filtered songlist
 	void update();
 	/// reloads songlist
 	void reload();
 	/// array access
-	std::shared_ptr<Song> operator[](std::size_t pos) { return m_filtered[pos]; }
-	std::shared_ptr<Song> at(std::size_t pos, bool webServer = false) { return (webServer ? m_webServerFiltered[pos] : m_filtered[pos]); }
+	SongVector& getSongs(bool webServer = false) { return (webServer ? m_webServerFiltered : m_filtered); }
+	SongVector const& getSongs(bool webServer = false) const { return (webServer ? m_webServerFiltered : m_filtered); }
 	/// number of songs
-	int size(bool webServer = false) const { return (webServer ? m_webServerFiltered : m_filtered).size(); }
+	int size(bool webServer = false) const { return getSongs(webServer).size(); }
 	/// true if empty
-	bool empty(bool webServer = false) const { return (webServer ? m_webServerFiltered : m_filtered).empty(); }
+	bool empty(bool webServer = false) const { return getSongs(webServer).empty(); }
 	/// advances to next song
 	void advance(int diff, bool webServer = false) {
-		int size = (webServer ? m_webServerFiltered : m_filtered).size();
-		if (size == 0) return;  // Do nothing if no songs are available
-		int _current = (int(math_cover.getTarget()) + diff) % size;
-		if (_current < 0) _current += size;
-		math_cover.setTarget(_current, size);
+		if (empty(webServer)) return;  // Do nothing if no songs are available
+		int _current = (int(math_cover.getTarget()) + diff) % size(webServer);
+		if (_current < 0) _current += size(webServer);
+		math_cover.setTarget(_current, size(webServer));
 	}
 	/// get current id
 	int currentId() const { return math_cover.getTarget(); }
@@ -61,11 +49,10 @@ class Songs {
 	/// sets margins for animation
 	void setAnimMargins(double left, double right) { math_cover.setMargins(left, right); }
 	/// @return current song
-	std::shared_ptr<Song> currentPtr(bool webServer = false) { return (webServer ? m_webServerFiltered : m_filtered).empty() ? std::shared_ptr<Song>() : (webServer ? m_webServerFiltered : m_filtered)[math_cover.getTarget()]; }
-	/// @return current song
-	Song& current(bool webServer = false) { return *(webServer ? m_webServerFiltered : m_filtered)[math_cover.getTarget()]; }
+	std::shared_ptr<Song> currentPtr(bool webServer = false) {
+		return getSongs(webServer).empty() ? std::shared_ptr<Song>() : getSongs(webServer)[math_cover.getTarget()]; }
 	/// @return current Song
-	Song const& current(bool webServer = false) const { return *(webServer ? m_webServerFiltered : m_filtered)[math_cover.getTarget()]; }
+	Song const& current(bool webServer = false) const;
 	/// filters songlist by regular expression
 	void setFilter(std::string const& regex, bool webServer = false);
 	/// Get the current song type filter number
@@ -76,7 +63,7 @@ class Songs {
 	void typeChange(int diff, bool webServer = false);
 	/// Cycle song type filters by filter category (0 = none, 1..4 = different categories)
 	void typeCycle(int cat, bool webServer = false);
-	int sortNum() const { return m_order; }
+	int& sortNum(bool webServer = false) { return (webServer ? m_webServerOrder : m_order); }
 	/// Description of the current sort mode
 	std::string sortDesc() const;
 	/// Change sorting mode (diff is normally -1 or 1)
@@ -98,6 +85,8 @@ class Songs {
 	Database & m_database;
 	int m_type = 0;
 	int m_order;  // Set by constructor
+	int m_webServerType = 0; // Not used now, but it might be in the future.
+	int m_webServerOrder = 2;
 	void dumpSongs_internal() const;
 	void reload_internal();
 	void reload_internal(fs::path const& p);
