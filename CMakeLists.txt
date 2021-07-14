@@ -23,7 +23,7 @@ endif(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 # Add a sensible build type default and warning because empty means no optimization and no debug info.
 if(NOT CMAKE_BUILD_TYPE)
 	message("WARNING: CMAKE_BUILD_TYPE is not defined!\n         Defaulting to CMAKE_BUILD_TYPE=RelWithDebInfo. Use ccmake to set a proper value.")
-	SET(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
+	set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif(NOT CMAKE_BUILD_TYPE)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -65,10 +65,10 @@ add_compile_options(-Wall -Wextra -D_LIBCPP_ENABLE_CXX17_REMOVED_AUTO_PTR $<$<CX
 if(WIN32)
 	set(CMAKE_CXX_FLAGS "-DWIN32_LEAN_AND_MEAN ${CMAKE_CXX_FLAGS}")
 	set(SHARE_INSTALL_DEFAULT ".")
-	SET(LOCALE_DIR_DEFAULT "locale")
+	set(LOCALE_DIR_DEFAULT "locale")
 else()
 	set(SHARE_INSTALL_DEFAULT "share/games/performous")
-	SET(LOCALE_DIR_DEFAULT "share/locale")
+	set(LOCALE_DIR_DEFAULT "share/locale")
 endif()
 
 set(SHARE_INSTALL "${SHARE_INSTALL_DEFAULT}" CACHE STRING "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
@@ -154,11 +154,54 @@ if(NOT APPLE)
 endif()
 
 #CPACK variables
+include(InstallRequiredSystemLibraries)
+
+# Project definition
+set(CPACK_PACKAGE_VENDOR "Performous")
+set(CPACK_PACKAGE_DESCRIPTION "Karaoke, band games and dancing in the same package. Performous lets you perform great songs, improve your musical skills and simply have fun! No special hardware required, you may play guitar on your PC keyboard, sing on your laptop microphone and so on. If you do have SingStar microphones, Guitar Hero or Rock Band instruments, or dance pads, just plug them into your USB ports and start rocking!")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "An open-source music and rhythm game.")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/licence.txt")
+if(WIN32)
+	set(CPACK_PACKAGE_EXECUTABLES "Performous")
+else()
+	set(CPACK_PACKAGE_EXECUTABLES "performous")
+endif()
+set(CPACK_PACKAGE_CONTACT "Arjan Speiard | Asgard Sings! <info@asgardsings.nl>")
+
+if(NOT CPACK_PACKAGE_VERSION)
+	set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+endif()
+set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CMAKE_BINARY_DIR};${PROJECT_NAME};ALL;/")
+set(CPACK_GENERATOR "TGZ;ZIP;DEB;RPM;NSIS")
+
+# Debian specific settings
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_PACKAGE_SECTION "Games")
+
+# RPM specific settings
+set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
+
+set(CPACK_RPM_PACKAGE_REQUIRES "cairo-devel, librsvg2-devel, glibmm24-devel, libxml++-devel, boost-devel, SDL2-devel, libepoxy-devel, ffmpeg-devel, portaudio-devel, opencv-devel, portmidi-devel, libjpeg-turbo-devel, pango-devel, libpng-devel, glm-devel, openblas-devel, fftw-devel, cpprest-devel")
+set(CPACK_RPM_PACKAGE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/licence.txt")
+
+set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "${LC_MESSAGES_DIRS}")
+set(CPACK_RPM_PACKAGE_DESCRIPTION "${CPACK_PACKAGE_DESCRIPTION}")
+set(CPACK_RPM_PACKAGE_URL "https://github.com/performous/performous")
+
+# NSIS specific settings
+set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/win32/performous.ico")
+set(CPACK_NSIS_MUI_UNIICON "${CMAKE_SOURCE_DIR}/win32/performous.ico")
+#set(CPACK_NSIS_MUI_WELCOMEFINISHPAGE_BITMAP "")
+#set(CPACK_NSIS_MUI_UNWELCOMEFINISHPAGE_BITMAP "")
+set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+set(CPACK_NSIS_MODIFY_PATH OFF)
+set(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_EXECUTABLES}")
+set(CPACK_NSIS_PACKAGE_NAME "${CPACK_PACKAGE_EXECUTABLES}")
+set(CPACK_NSIS_HELP_LINK "https://github.com/performous/performous/wiki")
+set(CPACK_NSIS_URL_INFO_ABOUT "https://performous.org")
+set(CPACK_NSIS_CONTACT "${CPACK_PACKAGE_CONTACT}")
+set(CPACK_NSIS_MUI_FINISHPAGE_RUN "Performous.exe")
+set(CPACK_NSIS_WELCOME_TITLE "Welcome to the Performous installer")
+
 include(CPack)
-SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Niek Nooijens")
-SET(CPACK_PACKAGE_CONTACT "nieknooijens@gmail.com")
-SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libavcodec54, libavformat54, libswresample2, libsdl2-2.0-0, libportaudiocpp0, libboost-all-dev, libswscale2, libxml++2.6-2, libopencv-dev, librsvg2-2, libpango-1.0-0, libcairo2, libjpeg8, libpng12-0, libportmidi0, libicu-dev, libglm-dev libopenblas-dev libfftw3-dev")
-SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION_SUMMARY "A free music rhythm game similar to SingStar, Guitar Hero and DDR")
-SET(CPACK_DEBIAN_PACKAGE_VERSION ${PROJECT_VERSION})
-SET(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
-SET(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CMAKE_BINARY_DIR};${PROJECT_NAME};ALL;/")
