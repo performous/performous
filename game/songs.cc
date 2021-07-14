@@ -19,10 +19,7 @@
 #include "fs.hh"
 #include <boost/format.hpp>
 #include <unicode/stsearch.h>
-
-#ifdef USE_WEBSERVER
-#include <cpprest/json.h>
-#endif
+#include <nlohmann/json.hpp>
 
 Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), m_database(database), m_order(config["songs/sort-order"].i()) {
 	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
@@ -86,15 +83,17 @@ void Songs::reload_internal() {
 void Songs::LoadCache() {
 	fs::path songsMetaFile = getCacheDir() / "Songs-Metadata.json";
 	std::ifstream file(songsMetaFile.string());
-	web::json::value jsonRoot;
-    if (file)
-    {
+	nlohmann::json jsonRoot = nlohmann::json::array();
+	if (!fs::exists(songsMetaFile)) {
+		std::clog << "songs/notice: song cache not found..." << std::endl;
+		return;
+	}
+    if (file.is_open()) {
     	try {
-	        std::stringstream buffer;
-	        buffer << file.rdbuf();
+	        jsonRoot = nlohmann::json::parse(file);
 	        file.close();
-	        jsonRoot = web::json::value::parse(buffer);
     	} catch(std::exception const& e) {
+    		if (file.is_open()) { file.close(); }
 			std::clog << "songs/error: " << e.what() << std::endl;
 			return;
     	}
@@ -108,13 +107,13 @@ void Songs::LoadCache() {
 	localPaths.insert(localPaths.begin(), systemSongs.begin(), systemSongs.end());
 
 	std::vector<std::string> userSongs;
-	for(const fs::path& userSong : localPaths) {
+	for (const fs::path& userSong : localPaths) {
 		userSongs.push_back(userSong.string());
 	}
 
-    for(auto const& song : jsonRoot.as_array()) {
+    for(auto const& song : jsonRoot) {
     	STAT buffer;
-    	auto songPath = song.at("TxtFile").as_string();
+    	auto songPath = song["TxtFile"].get<std::string>();
     	auto isSongPathInConfiguredPaths = std::find_if(
                                                         userSongs.begin(), 
                                                         userSongs.end(), 
@@ -129,126 +128,124 @@ void Songs::LoadCache() {
 }
 
 void Songs::CacheSonglist() {
-    web::json::value jsonRoot = web::json::value::array();
-    auto i = 0;
+    nlohmann::json jsonRoot = nlohmann::json::array();
 	for (auto const& song : m_songs)
     {  
-        web::json::value songObject = web::json::value::object();
-        if(!song->path.string().empty()) {
-        	songObject["TxtFileFolder"] = web::json::value::string(song->path.string());
+        nlohmann::json songObject;
+        if (!song->path.string().empty()) {
+        	songObject["TxtFileFolder"] = song->path.string();
         }
-        if(!song->filename.string().empty()) {
-        	songObject["TxtFile"] = web::json::value::string(song->filename.string());
+        if (!song->filename.string().empty()) {
+        	songObject["TxtFile"] = song->filename.string();
         }
-        if(!song->title.empty()) {
-        	songObject["Title"] = web::json::value::string(song->title);
+        if (!song->title.empty()) {
+        	songObject["Title"] = song->title;
     	}
-		if(!song->artist.empty()) {
-        	songObject["Artist"] = web::json::value::string(song->artist);
+		if (!song->artist.empty()) {
+        	songObject["Artist"] = song->artist;
     	}
-        if(!song->edition.empty()) {
-        	songObject["Edition"] = web::json::value::string(song->edition);
+        if (!song->edition.empty()) {
+        	songObject["Edition"] = song->edition;
     	}
-    	if(!song->language.empty()) {
-        	songObject["Language"] = web::json::value::string(song->language);
+    	if (!song->language.empty()) {
+        	songObject["Language"] = song->language;
         }
-        if(!song->creator.empty()) {
-        	songObject["Creator"] = web::json::value::string(song->creator);
+        if (!song->creator.empty()) {
+        	songObject["Creator"] = song->creator;
     	}
-    	if(!song->genre.empty()) {
-        	songObject["Genre"] = web::json::value::string(song->genre);
+    	if (!song->genre.empty()) {
+        	songObject["Genre"] = song->genre;
     	}
-    	if(!song->cover.string().empty()) {
-        	songObject["Cover"] = web::json::value::string(song->cover.string());
+    	if (!song->cover.string().empty()) {
+        	songObject["Cover"] = song->cover.string();
     	}
-    	if(!song->background.string().empty()) {
-	        songObject["Background"] = web::json::value::string(song->background.string());
+    	if (!song->background.string().empty()) {
+	        songObject["Background"] = song->background.string();
+	    }
+
+    	if (!song->video.string().empty()) {
+	        songObject["VideoFile"] = song->video.string();
+	    }
+    	if (!std::isnan(song->start)) {
+	        songObject["Start"] = static_cast<double>(song->start);
+	    }
+    	if (!std::isnan(song->videoGap)) {
+	        songObject["VideoGap"] = static_cast<double>(song->videoGap);
+	    }
+    	if (!std::isnan(song->preview_start)) {
+	        songObject["PreviewStart"] = static_cast<double>(song->preview_start);
 	    }
     	if(!song->music[TrackName::BGMUSIC].string().empty()) {
-	        songObject["SongFile"] = web::json::value::string(song->music[TrackName::BGMUSIC].string());
+	        songObject["SongFile"] = song->music["TrackName::BGMUSIC"].string();
 	    }
     	if(!song->midifilename.string().empty()) {
-	        songObject["MidFile"] = web::json::value::string(song->midifilename.string());
-	    }
-    	if(!song->video.string().empty()) {
-	        songObject["VideoFile"] = web::json::value::string(song->video.string());
-	    }
-    	if(!std::isnan(song->start)) {
-	        songObject["Start"] = web::json::value(song->start);
-	    }
-    	if(!std::isnan(song->videoGap)) {
-	        songObject["VideoGap"] = web::json::value(song->videoGap);
-	    }
-    	if(!std::isnan(song->preview_start)) {
-	        songObject["PreviewStart"] = web::json::value::number(song->preview_start);
+	        songObject["MidFile"] = song->midifilename.string();
 	    }
     	if(!song->music[TrackName::LEAD_VOCAL].string().empty()) {
-	        songObject["Vocals"] = web::json::value::string(song->music[TrackName::LEAD_VOCAL].string());
+	        songObject["Vocals"] = song->music[TrackName::LEAD_VOCAL].string();
 	    }
         if(!song->music[TrackName::PREVIEW].string().empty()) {
-	        songObject["Preview"] = web::json::value::string(song->music[TrackName::PREVIEW].string());
+	        songObject["Preview"] = song->music[TrackName::PREVIEW].string();
         }
         if(!song->music[TrackName::GUITAR].string().empty()) {
-	        songObject["Guitar"] = web::json::value::string(song->music[TrackName::GUITAR].string());
+	        songObject["Guitar"] = song->music[TrackName::GUITAR].string();
         }
         if(!song->music[TrackName::BASS].string().empty()) {
-	        songObject["Bass"] = web::json::value::string(song->music[TrackName::BASS].string());
+	        songObject["Bass"] = song->music[TrackName::BASS].string();
         }
         if(!song->music[TrackName::DRUMS].string().empty()) {
-	        songObject["Drums"] = web::json::value::string(song->music[TrackName::DRUMS].string());
+	        songObject["Drums"] = song->music[TrackName::DRUMS].string();
         }
         if(!song->music[TrackName::KEYBOARD].string().empty()) {
-	        songObject["Keyboard"] = web::json::value::string(song->music[TrackName::KEYBOARD].string());
+	        songObject["Keyboard"] = song->music[TrackName::KEYBOARD].string();
         }
         if(!song->music[TrackName::GUITAR_COOP].string().empty()) {
-	        songObject["Guitar_coop"] = web::json::value::string(song->music[TrackName::GUITAR_COOP].string());
+	        songObject["Guitar_coop"] = song->music[TrackName::GUITAR_COOP].string();
         }
         if(!song->music[TrackName::GUITAR_RHYTHM].string().empty()) {
-	        songObject["Guitar_Rhythm"] = web::json::value::string(song->music[TrackName::GUITAR_RHYTHM].string());
+	        songObject["Guitar_Rhythm"] = song->music[TrackName::GUITAR_RHYTHM].string();
         }
 
     	double duration = song->getDurationSeconds();
-    	if(!std::isnan(duration)) {
-	    	songObject["Duration"] = web::json::value::number(duration);
+    	if (!std::isnan(duration)) {
+	    	songObject["Duration"] = static_cast<double>(duration);
 	    }
 	    if (!song->m_bpms.empty()) {
-			songObject["BPM"] = web::json::value::number(15 / song->m_bpms.front().step);
+			songObject["BPM"] = static_cast<double>(15.0 / song->m_bpms.front().step);
 		}
 			
 		// Cache songtype also.
-		if(song->hasVocals()) {
+		if (song->hasVocals()) {
 			uint32_t vocals = song->vocalTracks.size();
-        	songObject["VocalTracks"] = web::json::value::number(vocals);
+        	songObject["VocalTracks"] = vocals;
     	}
-		if(song->hasKeyboard()) {
-        	songObject["KeyboardTracks"] = web::json::value::number(1);
+		if (song->hasKeyboard()) {
+        	songObject["KeyboardTracks"] = 1;
     	}
-		if(song->hasDrums()) {
-        	songObject["DrumTracks"] = web::json::value::number(1);
+		if (song->hasDrums()) {
+        	songObject["DrumTracks"] = 1;
     	}
-		if(song->hasDance()) {
+		if (song->hasDance()) {
 			uint32_t dance = song->danceTracks.size();
-        	songObject["DanceTracks"] = web::json::value::number(dance);
+        	songObject["DanceTracks"] = dance;
     	}
-		if(song->hasGuitars()) {
+		if (song->hasGuitars()) {
 			uint32_t guitars = song->instrumentTracks.size() - song->hasDrums() - song->hasKeyboard();
-        	songObject["GuitarTracks"] = web::json::value::number(guitars);
+        	songObject["GuitarTracks"] = guitars;
     	}
-	    if(songObject != web::json::value::object()) {
-        	jsonRoot[i] = songObject;
-        	i++;
-    	}
+	    if (!songObject.empty()) { jsonRoot.push_back(songObject); }
 	}
 
 	fs::path cacheDir = getCacheDir() / "Songs-Metadata.json";
 
 	try {
-		std::stringstream stream;
-		jsonRoot.serialize(stream);
 		std::ofstream outFile(cacheDir.string());
-    	outFile << stream.rdbuf();
+    	outFile << jsonRoot.dump();
     	outFile.close();
 	} catch (std::exception const& e) {
+		if (outFile.is_open()) {
+			outFile.close();
+		}
 		std::clog << "songs/error: Could not save " + cacheDir.string() + ": " + e.what() << std::endl;
 		return;
 	}
