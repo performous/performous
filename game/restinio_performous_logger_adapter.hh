@@ -96,7 +96,7 @@ class performous_logger_t
 		std::ostream * m_out;
 };
 
-using single_threaded_performous_logger_t = performous_logger_t< null_lock_t >;
+using single_threaded_performous_logger_t = performous_logger_t< null_mutex_t >;
 using shared_performous_logger_t = performous_logger_t< std::mutex >;
 
 } /* namespace restinio */
