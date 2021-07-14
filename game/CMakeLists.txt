@@ -68,25 +68,20 @@ set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES})
 add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
 # Libraries
 
-find_package(Boost 1.36 REQUIRED COMPONENTS program_options iostreams system locale)
+find_package(Boost 1.55 REQUIRED COMPONENTS program_options iostreams system locale)
 target_include_directories(performous PRIVATE ${Boost_INCLUDE_DIRS})
 target_link_libraries(performous PRIVATE ${Boost_LIBRARIES})
 
 add_library(fs STATIC fs.cc)
 target_include_directories(fs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 if (USE_BOOST_FS)
-    find_package(Boost 1.36 REQUIRED COMPONENTS filesystem)
+    find_package(Boost 1.55 REQUIRED COMPONENTS filesystem)
 
     target_link_libraries(fs PUBLIC Boost::filesystem)
     target_compile_definitions(fs PUBLIC -DUSE_BOOST_FS)
 else()
     find_package(Filesystem REQUIRED)
     target_link_libraries(fs PRIVATE std::filesystem)
-endif()
-
-if (Boost_VERSION VERSION_LESS 105500)
-	message("-- Using Boost < 1.55: defining BOOST_NO_CXX11_SCOPED_ENUMS")
-	set(CMAKE_CXX_FLAGS "-DBOOST_NO_CXX11_SCOPED_ENUMS ${CMAKE_CXX_FLAGS}")
 endif()
 
 find_package(ICU 60 REQUIRED uc data i18n io)
@@ -147,7 +142,7 @@ if(ENABLE_WEBSERVER)
 		find_package(${lib})
 	endforeach(lib)
 	if(CppRest_FOUND)
-		find_package(Boost 1.36 REQUIRED COMPONENTS chrono thread)
+		find_package(Boost 1.55 REQUIRED COMPONENTS chrono thread)
 		include_directories(${Boost_INCLUDE_DIRS})
 		list(APPEND LIBS ${Boost_LIBRARIES})
 
