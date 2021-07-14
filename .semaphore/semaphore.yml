@@ -39,6 +39,14 @@ blocks:
           commands:
             - mkdir build.clang && cd build.clang && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
             - make VERBOSE=1
+      epilogue:
+        commands:
+          - echo "Making linux releases"
+          - cd performous/build.gcc && tar -czf performous-gcc8.tar.gz * && cd $HOME
+          - cd performous/build.clang && tar -czf performous-clang9.tar.gz * && cd $HOME
+          - artifact push project --expire-in 1d performous/build.gcc/performous-gcc8.tar.gz --force -d performous-1.1.${SEMAPHORE_GIT_SHA}-gcc.tar.gz
+          - artifact push project --expire-in 1d performous/build.gcc/performous-clang9.tar.gz --force -d performous-1.1.${SEMAPHORE_GIT_SHA}-clang.tar.gz
+
   - name: MacOS 10.14.6 Build
     execution_time_limit:
       minutes: 15
@@ -78,6 +86,13 @@ blocks:
             - ./performous-app-build.sh -D
             - cd /Users/semaphore
             - cache store macports-10_15 ./local
+      epilogue:
+        commands:
+          - echo "Making osx release"
+          - cd performous/osx-utils/out/Performous.app 
+          - tar -czf performous-clang.tar.gz * && cd $HOME
+          - artifact push project --expire-in 1d performous/osx-utils/out/Performous.app/performous-clang.tar.gz --force -d performous-1.1.${SEMAPHORE_GIT_SHA}-gcc.tar.gz
+
   - name: Ubuntu 18.04 Build (Meson)
     execution_time_limit:
       minutes: 10
