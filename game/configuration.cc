@@ -8,7 +8,7 @@
 #include "screen_intro.hh"
 #include "util.hh"
 #include <boost/format.hpp>
-
+#include <boost/asio/ip/address_v4.hpp>
 #include <algorithm>
 #include <future>
 #include <iomanip>
@@ -106,7 +106,7 @@ namespace {
 }
 
 std::string const ConfigItem::getValue() const {
-	if (this->getShortDesc() == config["audio/backend"].getShortDesc()) {
+	if (this->getName() == "audio/backend") {
 		int AutoBackendType = 1337;
 		static int val = std::get<int>(m_value);
 		if (val != std::get<int>(m_value)) val = PaHostApiNameToHostApiTypeId(this->getEnumName()); // In the case of the audio backend, val is the real value while m_value is the enum case for its cosmetic name.
@@ -128,6 +128,15 @@ std::string const ConfigItem::getValue() const {
 		}
 		else std::clog << "audio/warning: Currently selected audio backend is unavailable on this system, will default to Auto." << std::endl;
 		return "Auto";
+	}
+	else if (this->getName() == "webserver/netmask") {
+		int slashNotation = std::stoi(getEnumName());
+		std::uint64_t subNetValue = 1;
+		subNetValue <<= 32;
+		subNetValue -= (1 << (32 - slashNotation));
+		std::string displayValue(boost::asio::ip::make_address_v4(subNetValue).to_string());
+		displayValue += (" (/"+std::to_string(slashNotation)+")");
+		return displayValue;
 	}
 	if (m_type == "int") {
 		int val = std::get<int>(m_value);
@@ -214,6 +223,7 @@ template <typename T> void ConfigItem::updateNumeric(xmlpp::Element& elem, int m
 
 void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 	if (mode == 0) {
+		m_keyName = getAttribute(elem, "name");
 		m_type = getAttribute(elem, "type");
 		if (m_type.empty()) throw std::runtime_error("Entry type attribute is missing");
 		// Menu text
@@ -278,6 +288,7 @@ void writeConfig(bool system) {
 	xmlpp::Document doc;
 	auto nodeRoot = doc.create_root_node("performous");
 	bool dirty = false;
+	bool webServerNeedsRestart = false;
 	for (auto& elem: config) {
 		ConfigItem& item = elem.second;
 		std::string name = elem.first;
@@ -288,14 +299,20 @@ void writeConfig(bool system) {
 		std::string type = item.get_type();
 		entryNode->set_attribute("type", type);
 		if (name == "graphic/stereo3d") {
-			std::string prev3DState = item.oldValue;
+			std::string prev3DState = item.getOldValue();
 			if (prev3DState != std::to_string(item.b()) && !prev3DState.empty()) {
 				std::clog << "video/info: Stereo 3D configuration changed, will reset shaders." << std::endl;
 				Game::getSingletonPtr()->window().resetShaders();
 			}
 		}
+		if (name.substr(0,10) == "webserver/") {
+			if (!item.getOldValue().empty() && (item.getOldValue() != item.getValue())) {
+				webServerNeedsRestart  = true;
+				std::clog << "webserver/notice: WebServer configuration changed; we'll need to restart it." << std::endl;
+			}
+		}
 		if (name == "audio/backend") {
-			std::string currentBackEnd = Audio::backendConfig().oldValue;
+			std::string currentBackEnd = Audio::backendConfig().getOldValue();
 			int oldValue = PaHostApiNameToHostApiTypeId(currentBackEnd);
 			int newValue = PaHostApiNameToHostApiTypeId(item.getEnumName());
 			if (currentBackEnd != item.getEnumName() && !currentBackEnd.empty()) {
@@ -327,6 +344,9 @@ void writeConfig(bool system) {
 		if (dirty) {
 			rename(tmp, conf);
 			std::cerr << "Saved configuration to " << conf << std::endl;
+			if (webServerNeedsRestart) {
+				Game::getSingletonPtr()->restartWebServer();
+			}
 		} else {
 			std::cerr << "Using default settings, no configuration file needed." << std::endl;
 		}
@@ -435,5 +455,5 @@ void populateBackends (const std::list<std::string>& backendList) {
 	static std::string selectedBackend = std::string();
 	selectedBackend = backendConfig.getValue();
 	backendConfig.selectEnum(selectedBackend);
-	backendConfig.oldValue = backendConfig.getEnumName();
+	backendConfig.setOldValue(backendConfig.getEnumName());
 }
