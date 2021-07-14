@@ -6,6 +6,8 @@ agent:
     os_image: ubuntu1804
 blocks:
   - name: Ubuntu 18.04 Build
+    execution_time_limit:
+      minutes: 15
     dependencies: []
     task:
       prologue:
@@ -36,6 +38,8 @@ blocks:
             - mkdir build.clang && cd build.clang && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
             - make VERBOSE=1
   - name: MacOS 10.14.6 Build
+    execution_time_limit:
+      minutes: 15
     dependencies: []
     task:
       agent:
@@ -71,6 +75,8 @@ blocks:
             - cd /Users/semaphore
             - cache store macports-10_15 ./local
   - name: Ubuntu 18.04 Build (Meson)
+    execution_time_limit:
+      minutes: 10
     dependencies: []
     task:
       prologue:
