@@ -2,6 +2,7 @@
 #include "game.hh"
 
 #ifdef USE_WEBSERVER
+#include "requesthandler.hh"
 #include <boost/asio.hpp>
 #include <boost/asio/ip/network_v4.hpp>
 #include <boost/asio/ip/address_v4_range.hpp>
@@ -24,29 +25,29 @@ void WebServer::StartServer(int tried, bool fallbackPortInUse) {
 
 	unsigned short portToUse = fallbackPortInUse ? config["webserver/fallback_port"].ui() : config["webserver/port"].ui();
 	std::string addr;
-	std::string message("webserver/notice: Starting webserver on http://");
+	std::string message("webserver/notice: Starting webserver, binding to ");
 	if (config["webserver/access"].ui() == 1) {
 		addr = "127.0.0.1";
+		message += addr;
 		message = ", listening to connections from localhost";
 	} else if (config["webserver/access"].ui() >= 2) {
 		addr = "0.0.0.0";
+		message += addr;
 		message += "; listening to any connections";
 		
 		if (config["webserver/access"].ui() == 3) {
-			message += " originating from subnet " + config["webserver/subnet"].getValue();
+			message += " originating from subnet " + config["webserver/netmask"].getValue();
 		}
 	}
 	std::clog << message << "." << std::endl;
 	try {
-		m_server = std::shared_ptr<RequestHandler>(new RequestHandler(addr, m_songs));
-// 		m_server->open().wait();
-// 		std::string message = getIPaddr() + ":" +  std::to_string(portToUse);
+		m_server = std::shared_ptr<RequestHandler>(new RequestHandler(addr, portToUse, m_songs));
 		m_game.notificationFromWebserver(message);
 	} catch (std::exception& e) {
 		tried = tried + 1;
-		std::clog << "webserver/error: " << e.what() << " Trying again... (tried " << tried << " times)." << std::endl;
+		std::clog << "webserver/error: " << e.what() << ". Trying again... (tried " << tried << " times)." << std::endl;
 		std::string message(e.what());
-		message += " Trying again... (tried " + std::to_string(tried) +" times).";
+		message += ". Trying again... (tried " + std::to_string(tried) +" times).";
 		m_game.notificationFromWebserver(message);
 		std::this_thread::sleep_for(20s);
 		StartServer(tried, fallbackPortInUse);
@@ -56,9 +57,10 @@ void WebServer::StartServer(int tried, bool fallbackPortInUse) {
     [&] {
         // Starting the server in a sync way.
         m_server->m_restinio_server.open_sync();
-		std::string message = getIPaddr() + ":" +  std::to_string(portToUse);
+		std::string message = m_server->getLocalIP().to_string() + ":" +  std::to_string(portToUse);
 		m_game.notificationFromWebserver(message);
     });
+    	Performous_IP_Blocker::setAllowedSubnet(m_server->getLocalIP());
 		m_server->m_restinio_server.io_context().run();
 	} catch (std::exception& e) {
 		std::clog << "webserver/error: Failed to open RESTinio server due to: " << e.what() << ". Trying again... (tried " << tried << " times.)" << std::endl;
@@ -90,31 +92,6 @@ WebServer::~WebServer() {
 			std::clog << "webserver/error: Failed to close RESTinio server due to: " << e.what() << "." << std::endl;
 		}
 		m_serverThread->join();
-	}
-}
-
-std::string WebServer::getIPaddr() {
-	try {
-		boost::asio::io_service netService;
-		boost::asio::ip::udp::resolver resolver(netService);
-		boost::asio::ip::udp::resolver::query query(boost::asio::ip::udp::v4(), "1.1.1.1", "80");
-		boost::asio::ip::udp::resolver::iterator endpoints = resolver.resolve(query);
-		boost::asio::ip::udp::endpoint ep = *endpoints;
-		boost::asio::ip::udp::socket socket(netService);
-		socket.connect(ep);
-		boost::asio::ip::address addr = socket.local_endpoint().address();
-		std::clog << "webserver/debug: IP Address is: " << addr.to_string() << std::endl;
-		auto testNetwork = boost::asio::ip::make_network_v4(addr.to_v4(), boost::asio::ip::make_address_v4("255.255.255.0"));
-		std::string addresses;
-		for (const auto& testAddress: testNetwork.hosts()) {
-			if (!addresses.empty()) addresses += ", ";
-			addresses += testAddress.to_string();
-		}
-		std::clog << "webserver/debug: Range of addresses is: " << addresses << std::endl;
-		return addr.to_string();
-	} catch(std::exception& e) {
-		std::string ip = boost::asio::ip::host_name();
-		return ip.empty() ? "localhost" : ip;
 	}
 }
 #endif

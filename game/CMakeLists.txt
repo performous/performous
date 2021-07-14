@@ -90,8 +90,7 @@ add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
 # Libraries
 
 find_package(Boost 1.55 REQUIRED COMPONENTS program_options iostreams system locale)
-target_include_directories(performous SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
-target_link_libraries(performous PRIVATE ${Boost_LIBRARIES})
+target_link_libraries(performous PRIVATE Boost::program_options Boost::iostreams Boost::locale Boost::system Boost::boost)
 
 add_library(fs STATIC fs.cc)
 target_include_directories(fs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

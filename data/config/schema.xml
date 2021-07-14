@@ -38,7 +38,7 @@ to save the current settings to XML.
 		</entry>
 		<entry name="webserver">
 			<short>Webserver</short>
-			<long>Setup Webserver</long>
+			<long>Setup Webserver.</long>
 		</entry>
 	</menu>
 
@@ -436,24 +436,7 @@ to save the current settings to XML.
 	</entry>
 	<entry name="webserver/netmask" type="uint" value="8">
 		<limits>
-		<!-- You can uncomment the following cases to enable them; note though that already /16 is a ridiculusly big subnet for the purposes of this game. -->
-<!-- 
-		<enum>1</enum>
-		<enum>2</enum>
-		<enum>3</enum>
-		<enum>4</enum>
-		<enum>5</enum>
-		<enum>6</enum>
-		<enum>7</enum>
-		<enum>8</enum>
-		<enum>9</enum>
-		<enum>10</enum>
-		<enum>11</enum>
-		<enum>12</enum>
-		<enum>13</enum>
-		<enum>14</enum>
-		<enum>15</enum>
- -->
+		<!-- You can add extra cases but note that /16 is already a ridiculously big subnet. -->
 		<enum>16</enum>
 		<enum>17</enum>
 		<enum>18</enum>
@@ -477,19 +460,19 @@ to save the current settings to XML.
 		</entry>
 	<entry name="webserver/port" type="uint" value="8000">
 		<!-- allow all port values that would make any sense. -->
-		<limits min="1" max="65535" step="1" />
+		<limits min="1025" max="65535" step="1" />
 		<short>Webserver port</short>
 		<long>Port to use for the web server. Choose one that is not used by other applications.</long>
 	</entry>
 	<entry name="webserver/fallback_port" type="uint" value="8001">
 		<!-- allow all port values that would make any sense. -->
-		<limits min="1" max="65535" step="1" />
+		<limits min="1025" max="65535" step="1" />
 		<short>Webserver fallback port</short>
 		<long>Port to use in case original webserver port is in use. Choose one that you know for sure is not used by other applications.</long>
 	</entry>
-	<entry name="webserver/threads" type="uint" value="8">
-		<!-- 32 is a lot of threads. -->
-		<limits min="1" max="32" step="1" />
+	<entry name="webserver/threads" hidden="true" type="uint" value="4">
+		<!-- 4 threads is already a lot of threads. -->
+		<limits min="1" max="8" step="1" />
 		<short>Webserver Threads</short>
 		<long>Size of threadpool alloted for handling webserver connections.</long>
 	</entry>
@@ -498,23 +481,23 @@ to save the current settings to XML.
 		<short>Handler Timeout</short>
 		<long>Seconds the request handler can take to generate a response.</long>
 	</entry>
-	<entry name="webserver/http_timelimit" type="uint" value="300">
+	<entry name="webserver/http_timelimit" hidden="true" type="uint" value="300">
 		<limits min="5" max="180" step="1" />
 		<short>Connection Timelimit</short>
 		<long>Seconds to hold a connection before responding to a new HTTP request.</long>
 	</entry>
-	<entry name="webserver/write_http_timelimit" type="uint" value="15">
+	<entry name="webserver/write_http_timelimit" hidden="true" type="uint" value="15">
 		<limits min="5" max="180" step="1" />
 		<short>Write Timeout</short>
 		<long>Seconds to wait for HTTP response to be written to a socket.</long>
 	</entry>
-	<entry name="webserver/buffer_size" type="uint" value="4096">
+	<entry name="webserver/buffer_size" hidden="true" type="uint" value="4096">
 		<limits min="1024" max="524288" step="512" />
 		<short>Buffer Size</short>
 		<long>Size of buffer for reading when receiving HTTP request.</long>
 	</entry>
-	<entry name="webserver/request_pipeline" type="uint" value="15">
-		<limits min="1" max="100" step="1" />
+	<entry name="webserver/request_pipeline" hidden="true" type="uint" value="4">
+		<limits min="2" max="10" step="1" />
 		<short>Request Pipeline</short>
 		<long>Maximum number of pipelined requests per connection.</long>
 	</entry>
