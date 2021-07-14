@@ -111,7 +111,7 @@ void ScreenPlaylist::draw() {
 		if(gm->getCurrentPlayList().isEmpty()) {
 			m_songs.setFilter("");
 			auto randomsong = std::rand() % m_songs.size();
-			ss->setSong(m_songs[randomsong]);
+			ss->setSong(m_songs.getSongs()[randomsong]);
 		} else {
 			ss->setSong(gm->getCurrentPlayList().getNext());
 		}
@@ -188,7 +188,7 @@ void ScreenPlaylist::createEscMenu() {
 		} else {
 			m_songs.setFilter("");
 			auto randomsong = std::rand() % m_songs.size();
-			ss->setSong(m_songs[randomsong]);
+			ss->setSong(m_songs.getSongs()[randomsong]);
 		}
 		gm->activateScreen("Sing");
 	}));
