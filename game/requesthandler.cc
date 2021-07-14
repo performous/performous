@@ -2,20 +2,39 @@
 #include "unicode.hh"
 
 #ifdef USE_WEBSERVER
-RequestHandler::RequestHandler(Songs& songs):m_songs(songs)
-{
-}
-RequestHandler::RequestHandler(std::string url, Songs& songs):m_listener(url),m_songs(songs)
-{
+
+// RequestHandler::RequestHandler(Songs& songs):m_songs(songs),
+// m_restinio_server {
+//         	restinio::own_io_context(),
+//         	[&](auto& settings) {
+//         		settings
+//                 .port( port )
+//                 .address( url )
+//                 .separate_accept_and_create_connect(true)
+//                 .request_handler(std::make_unique<Performous_Router_t>());
+//                 } {}
+
+RequestHandler::RequestHandler(std::string url, unsigned short port, Songs& songs):m_listener(url), m_songs(songs), m_restinio_server(restinio::own_io_context(), []( auto & settings ){}) {
     m_listener.support(web::http::methods::GET, std::bind(&RequestHandler::Get, this, std::placeholders::_1));
     m_listener.support(web::http::methods::PUT, std::bind(&RequestHandler::Put, this, std::placeholders::_1));
     m_listener.support(web::http::methods::POST, std::bind(&RequestHandler::Post, this, std::placeholders::_1));
     m_listener.support(web::http::methods::DEL, std::bind(&RequestHandler::Delete, this, std::placeholders::_1));
+    auto settings = Performous_Server_Settings(10);
+    settings
+    .port( port )
+    .address( url )
+    .separate_accept_and_create_connect(true)
+    .request_handler(std::make_unique<Performous_Router_t>())
+    .read_next_http_message_timelimit(std::chrono::seconds(60))
+    .write_http_response_timelimit(std::chrono::seconds(60))
+    .handle_request_timeout(std::chrono::seconds(60));
+    m_restinio_server = restinio::http_server_t<Performous_Server_Traits>(
+        restinio::own_io_context(),
+        std::forward<Performous_Server_Settings>(settings)
+    );
+}
 
-}
-RequestHandler::~RequestHandler()
-{
-}
+RequestHandler::~RequestHandler() {}
 
 void RequestHandler::Error(pplx::task<void>& t)
 {
@@ -26,6 +45,11 @@ void RequestHandler::Error(pplx::task<void>& t)
     catch(...)
     {
     }
+}
+
+std::unique_ptr<Performous_Router_t> init_webserver_router() {
+	auto router = std::make_unique<Performous_Router_t>();
+	return router;
 }
 
 void RequestHandler::HandleFile(web::http::http_request request, std::string filePath) {
