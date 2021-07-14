@@ -14,7 +14,7 @@ void WebServer::startServer(int tried, bool fallbackPortInUse) {
 	if(tried > 2) {
 			std::string message("webserver/error: Couldn't start webserver after 3 tries");
 		if(fallbackPortInUse == false) {
-		 	message += std::string("; trying fallback port...");
+			message += std::string("; trying fallback port...");
 			std::clog << message << std::endl;
 			Game::getSingletonPtr()->notificationFromWebserver(message);					
 			startServer(0, true);
@@ -54,13 +54,13 @@ void WebServer::startServer(int tried, bool fallbackPortInUse) {
 	}
 	try {
 		boost::asio::post(m_server->m_io_context, [&] {
-        		m_server->m_restinio_server->open_sync();
-        		std::string ip((config["webserver/access"].i() == 1) ? "localhost" : m_server->getLocalIP().to_string());
+				m_server->m_restinio_server->open_sync();
+				std::string ip((config["webserver/access"].i() == 1) ? "localhost" : m_server->getLocalIP().to_string());
 				std::string message("http://"+ip+":");
 				message += std::to_string(portToUse);
 				Game::getSingletonPtr()->notificationFromWebserver(message);
 				});
-    	Performous_IP_Blocker::setAllowedSubnet(m_server->getLocalIP());
+		Performous_IP_Blocker::setAllowedSubnet(m_server->getLocalIP());
 		m_server->m_io_context.run();
 	} catch (std::exception& e) {
 		std::string message("webserver/error: " + std::string(e.what()) + ". Trying again... (tried " + std::to_string(tried) + " times.)");
