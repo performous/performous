@@ -4,6 +4,8 @@ agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
+execution_time_limit:
+  minutes: 30
 blocks:
   - name: Ubuntu 18.04 Build
     execution_time_limit:
