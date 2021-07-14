@@ -99,7 +99,7 @@ std::unique_ptr<Performous_Router_t> RequestHandler::init_webserver_router() {
         	else if (UnicodeUtil::toLower(order) == "artist") sort = 2;
         	else if (UnicodeUtil::toLower(order) == "edition") sort = 3;
         	else if (UnicodeUtil::toLower(order) == "language") sort = 6;
-        	m_songs.sortSpecificChange(sort, descending);
+        	m_songs.sortSpecificChange(sort, descending, true);
         }
         nlohmann::json jsonRoot = SongsToJsonObject();
 		init_resp(request->create_response(restinio::status_ok()),std::string("application/json"))
