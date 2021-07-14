@@ -242,7 +242,7 @@ void ScreenSongs::drawJukebox() {
 	if (pos < diff) diff = pos;  // Diff from beginning instead of from end
 	if (!m_songbg.get() && !m_video.get()) diff = 0.0;  // Always display song name if there is no background
 	if (diff < 3.0) {
-		Song& song = m_songs.current();
+		Song const& song = m_songs.current();
 		// Draw the cover
 		Texture* cover = nullptr;
 		if (!song.cover.empty()) cover = loadTextureFromMap(song.cover);
@@ -303,7 +303,7 @@ void ScreenSongs::draw() {
 			oss_order << _("Visit performous.org for free songs");
 		}
 	} else {
-		Song& song = m_songs.current();
+		Song const& song = m_songs.current();
 		// Format the song information text
 		oss_song << song.artist << ": " << song.title;
 		// Get hiscores from database
@@ -376,7 +376,7 @@ void ScreenSongs::drawCovers() {
 	// Draw covers and reflections
 	for (int i = -2; i < 6; ++i) {
 		if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
-		Song& song = *m_songs[baseidx + i];
+		Song& song = *m_songs.getSongs()[baseidx + i];
 		Texture& s = getCover(song);
 		// Calculate dimensions for cover and instrument markers
 		double pos = i - shift;
