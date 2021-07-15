@@ -45,7 +45,7 @@ if compiler.get_id() == 'gcc'
     '-flto'])
   #Treat all warnings as errors if requested
   if get_option('stoponwarning')
-    compiler_args+=['-Werror','-Wfatal-errors']
+    compiler_args+=['-Werror']
   endif
 else
   compiler_args=compiler.get_supported_arguments(
