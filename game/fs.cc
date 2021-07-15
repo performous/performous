@@ -95,7 +95,7 @@ void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destina
 		boost::algorithm::replace_first(relativePathStr, sourceDir.string(), "");
 		try { 
 			if (!fs::is_directory(path)) { fs::copy_file(path, destinationDir / relativePathStr); }
-			else { create_directory(path, destinationDir / relativePathStr); }
+			else { create_directory(destinationDir / relativePathStr, path); }
 		} catch (...) {
 			throw std::runtime_error("Cannot copy file " + path.string() + ", because it already exists in the destination folder.");
 		}
