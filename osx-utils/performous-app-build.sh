@@ -3,15 +3,28 @@ set -o errexit
 # the very first step is to check that dylibbundler exists,
 # without it the bundle would be broken
 
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "${SOURCE}" ]
+	do # resolve $SOURCE until the file is no longer a symlink
+		DIR="$( cd -P "$( dirname "${SOURCE}" )" && pwd )"
+		SOURCE="$(readlink "${SOURCE}")"
+		[[ "${SOURCE}" != /* ]] && SOURCE="${DIR}/${SOURCE}" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+	done
+CURRDIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
 test -z ${PREFIXDIR} && PREFIXDIR="/opt/local" # By default, the default prefix for macports, change this if you're using a different path or package manager.
 test -z ${DEPLOYMENT_TARGET} && DEPLOYMENT_TARGET="10.14" # Change this if you want to target a different version of macOS.
+test -z ${PERFORMOUS_SOURCE} && PERFORMOUS_SOURCE="${CURRDIR}/.." # Change this if using another copy of the source or if this file is not under path/to/performous/osx-utils/
 MAKE_JOBS=$(sysctl -n hw.ncpu)
 test -z ${CC} && CCPATH="/usr/bin/clang" # Path to system Clang, change if you want another compiler.
 test -z ${CXX} && CXXPATH="/usr/bin/clang++" # Path to system Clang, change if you want another compiler.
 
+args="$@"
+debug="^(--debug|-d)$"
+cleanbuild="^(--no-clean|-k)$"
 
-args=("$@")
-debug="^(--debug|--DEBUG|-d|-D)$"
+DEBUG=0
+PERFORMOUS_CLEAN_BUILD=1
 
 function asksure {
 	echo -n "$1"
@@ -39,13 +52,21 @@ function exists {
 	fi
 }
 
-function arewedebug {
-	if [[ ${args[0]} =~ ${debug} ]]
+function check_arguments {
+	shopt -s nocasematch
+	for arg in ${args}
+	do
+		if [[ ${arg} =~ ${debug} ]]
 		then
-			DEBUG=1
-	else
-		DEBUG=0
-	fi
+				DEBUG=1
+		else
+			if [[ ${arg} =~ ${cleanbuild} ]]
+			then
+				PERFORMOUS_CLEAN_BUILD=0
+			fi
+		fi
+	done
+	shopt -u nocasematch
 }
 
 function bundlelibs {
@@ -64,20 +85,21 @@ function bundlelibs {
 function createdmg {
 	if [ "${FANCY_DMG}" == 0 ]
 		then
-			ln -sf /Applications "${CURRDIR}/out/Applications"
-			rm "${CURRDIR}/out/.DS_Store"
+			ln -sf /Applications "${PERFORMOUS_SOURCE}/out/Applications"
+			rm "${PERFORMOUS_SOURCE}/osx-utils/out/.DS_Store"
 			/usr/bin/hdiutil create -ov -srcfolder out -volname Performous -fs HFS+ -fsargs "-c c=64,a=16,e=16" -format UDRW RWPerformous.dmg
 			/usr/bin/hdiutil convert -ov RWPerformous.dmg -format UDZO -imagekey zlib-level=9 -o Performous.dmg
 			rm -f RWPerformous.dmg
 			cd ..
 	elif [ "${FANCY_DMG}" == 1 ]
 		then
-			rm -f "${CURRDIR}/Performous.dmg"
-			appdmg "${CURRDIR}/resources/dmg_spec.json" "${CURRDIR}/Performous.dmg"
+			rm -f "${PERFORMOUS_SOURCE}/osx-utils/Performous.dmg"
+			appdmg "${PERFORMOUS_SOURCE}/osx-utils/resources/dmg_spec.json" "${PERFORMOUS_SOURCE}/osx-utils/Performous.dmg"
 	fi
 }
 
 function main {
+	printf "\n"
 	if [[ "${DEBUG}" = 1 ]]
 		then
 			echo "Will create bundle for debugging..."
@@ -101,7 +123,7 @@ function main {
 			else
 				if exists npm
 					then
-						if asksure "appdmg is not installed, would you like to install it? (y/n)"
+						if asksure "* appdmg is not installed, would you like to install it? (y/n)"
 							then
 								sudo npm install -g https://github.com/LinusU/node-appdmg.git && FANCY_DMG=1
 							else
@@ -116,19 +138,10 @@ function main {
 		fi
 	fi
 
-	SOURCE="${BASH_SOURCE[0]}"
-	while [ -h "${SOURCE}" ]
-		do # resolve $SOURCE until the file is no longer a symlink
-			DIR="$( cd -P "$( dirname "${SOURCE}" )" && pwd )"
-			SOURCE="$(readlink "${SOURCE}")"
-			[[ "${SOURCE}" != /* ]] && SOURCE="${DIR}/${SOURCE}" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-		done
-	CURRDIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
-
 # first compile performous, build dir shouldn't exist at this stage
 
 # define Bundle structure
-	TEMPDIR="${CURRDIR}/out/Performous.app/Contents"
+	TEMPDIR="${PERFORMOUS_SOURCE}/osx-utils/out/Performous.app/Contents"
 	RESDIR="${TEMPDIR}/Resources"
 	LIBDIR="${RESDIR}/lib"
 	LOCALEDIR="${RESDIR}/Locales"
@@ -136,28 +149,55 @@ function main {
 	BINDIR="${TEMPDIR}/MacOS"
 	ETCDIR="${RESDIR}/etc"
 
-	rm -rf "${TEMPDIR}"
-	mkdir -p "${TEMPDIR}"
-
-	rm -rf ./build
-	mkdir build
-	cd build
-
-	cmake -DCMAKE_INSTALL_PREFIX=$TEMPDIR -DCMAKE_BUILD_TYPE=${RELTYPE} -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DFreetype_INCLUDE_DIR="${PREFIXDIR}"/include/freetype2 -DCMAKE_OSX_DEPLOYMENT_TARGET=${DEPLOYMENT_TARGET} -DFontconfig_INCLUDE_DIR="${PREFIXDIR}"/include/fontconfig -DAVCodec_INCLUDE_DIR="${PREFIXDIR}"/include/libavcodec -DAVFormat_INCLUDE_DIR="${PREFIXDIR}"/include/libavformat -DSWScale_INCLUDE_DIR="${PREFIXDIR}"/include/libswscale -DFreetype_INCLUDE_DIR="${PREFIXDIR}"/include/freetype2/ -DLibXML2_LIBRARY="${PREFIXDIR}"/lib/libxml2.dylib -DLibXML2_INCLUDE_DIR="${PREFIXDIR}"/include/libxml2 -DGlibmmConfig_INCLUDE_DIR="${PREFIXDIR}"/lib/glibmm-2.4/include -DGlibConfig_INCLUDE_DIR="${PREFIXDIR}"/lib/glib-2.0/include -DCMAKE_C_COMPILER="${CCPATH}" -DCMAKE_CXX_COMPILER="${CXXPATH}" -DCMAKE_C_FLAGS="-arch x86_64" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DSHARE_INSTALL=Resources -DLOCALE_DIR=Resources/Locales -DCMAKE_CXX_FLAGS="-std=c++1y -Wall -Wextra -stdlib=libc++ -arch x86_64" -DCMAKE_EXE_LINKER_FLAGS="-stdlib=libc++ -lc++ -lc++abi -arch x86_64" -DCMAKE_OSX_ARCHITECTURES="x86_64" ../..
+	printf "\n"
+	echo "--- Performous source: ${PERFORMOUS_SOURCE}"
+	echo "--- Build folder: ${PERFORMOUS_SOURCE}/build"
+	echo "--- Output folder: ${PERFORMOUS_SOURCE}/osx-utils/out"
+	printf "\n"
+	if [[ "${PERFORMOUS_CLEAN_BUILD}" == 1 ]]
+		then
+			echo "Wiping build and output bundle folders..."
+			printf "\n"
+			rm -rf "${PERFORMOUS_SOURCE}/build"
+			rm -rf "${TEMPDIR}"
+			mkdir -p "${TEMPDIR}"
+		else
+			echo "No-clean mode enabled; preserving previous build directory."
+			printf "\n"
+			rm -rf "${TEMPDIR}"
+			mkdir -p "${TEMPDIR}"
+	fi
 	
-	make -j${MAKE_JOBS} install # You can change the -j value in order to spawn more build threads.
+	cmake \
+	  -DCMAKE_INSTALL_PREFIX="$TEMPDIR" \
+	  -DCMAKE_PREFIX_PATH="${PREFIXDIR}" \
+	  -DCMAKE_BUILD_TYPE="${RELTYPE}" \
+	  -DENABLE_WEBSERVER="ON" \
+	  -DCMAKE_VERBOSE_MAKEFILE="ON" \
+	  -DCMAKE_OSX_DEPLOYMENT_TARGET="${DEPLOYMENT_TARGET}" \
+	  -DCMAKE_C_COMPILER="${CCPATH}" \
+	  -DCMAKE_CXX_COMPILER="${CXXPATH}" \
+	  -DCMAKE_EXPORT_COMPILE_COMMANDS="ON" \
+	  -DSHARE_INSTALL="Resources" \
+	  -DLOCALE_DIR="Resources/Locales" \
+	  -DCMAKE_CXX_FLAGS="-Wall -Wextra" \
+	  -DCMAKE_OSX_ARCHITECTURES="x86_64" \
+	  -B "${PERFORMOUS_SOURCE}/build" \
+	  -S "${PERFORMOUS_SOURCE}"
+	
+	make -C "${PERFORMOUS_SOURCE}/build" -j${MAKE_JOBS} install # You can change the -j value in order to spawn more build threads.
 
 # then create the rest of the app bundle
 
 	mv "${TEMPDIR}/bin" "${BINDIR}"
 
-	cp ../resources/performous-launcher "${BINDIR}"
+	cp "${PERFORMOUS_SOURCE}/osx-utils/resources/performous-launcher" "${BINDIR}"
 	if [[ "${DEBUG}" = 1 ]]
 		then
 			sed -i '' -e 's|"\${CURRDIR}\/performous"|"\${CURRDIR}\/performous" --log debug|g' "$BINDIR/performous-launcher" # enable debug logging.
 	fi
-	cp ../resources/performous.icns "${RESDIR}"
-	cp ../resources/Info.plist "${TEMPDIR}"
+	cp "${PERFORMOUS_SOURCE}/osx-utils/resources/performous.icns" "${RESDIR}"
+	cp "${PERFORMOUS_SOURCE}/osx-utils/resources/Info.plist" "${TEMPDIR}"
 
 	mkdir -p "${FRAMEWORKDIR}"
 	mkdir -p "${LIBDIR}"
@@ -190,6 +230,6 @@ function main {
 	fi
 }
 
-arewedebug
+check_arguments
 
 main
