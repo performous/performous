@@ -86,7 +86,7 @@ blocks:
           # Clean up the 3rdparty folder (aubio is installed from system pkgs) and pull ced from its repository
           - rm -rf 3rdparty
           - git clone https://github.com/google/compact_enc_det.git 3rdparty/ced
-          - cd 3rdparty/ced & git checkout -q 37529e6 & cd ../..
+          - cd 3rdparty/ced && git checkout -q 37529e6 && cd ../..
       jobs:
         - name: GCC-8.4.0 Build
           env_vars:
