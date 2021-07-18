@@ -43,6 +43,10 @@ if compiler.get_id() == 'gcc'
     '-Wno-narrowing',
     '-Wno-overflow',
     '-flto'])
+  #Treat all warnings as errors if requested
+  if get_option('stoponwarning')
+    compiler_args+=['-Werror']
+  endif
 else
   compiler_args=compiler.get_supported_arguments(
     ['-Wall','-Wextra','-pedantic','-Wc++20-compat',
