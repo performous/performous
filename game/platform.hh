@@ -21,9 +21,9 @@ using STAT = struct stat;
 #endif
 
 struct Platform {
-enum platforms { windows, linux, macos, bsd, solaris, unix };
+enum HostOS { PERFORMOUS_WIN, PERFORMOUS_LINUX, PERFORMOUS_MAC, PERFORMOUS_BSD, PERFORMOUS_SOLARIS, PERFORMOUS_UNIX };
 Platform();
-static platforms currentOS();
+static HostOS currentOS();
 static uint16_t shortcutModifier(bool eitherSide = true);
 static int defaultBackEnd();
 
