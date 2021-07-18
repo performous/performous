@@ -87,13 +87,17 @@ blocks:
         commands:
           - echo "Installing Performous dependencies..."
           - sudo apt-get update -y
-          - sudo apt-get install -y ninja-build
-          - sudo apt-get install -y gettext clang-9 gcc-8 g++-8 python3-dev python3-pip libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libicu-dev libopencv-dev libportmidi-dev libglm-dev libaubio-dev libcpprest-dev
-          - sem-version python 3.8
+          - sudo apt-get install -y ninja-build gettext clang-9 gcc-8 g++-8 python3-dev python3-pip
+          - sudo apt-get install -y libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-iostreams-dev libboost-locale-dev libboost-system-dev libboost-program-options-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libicu-dev libopencv-dev libportmidi-dev libglm-dev libaubio-dev libcpprest-dev
+          - sem-version python 3.9
           - sudo pip3 install meson
           - echo "Checking out..."
           - checkout
-          - git submodule update --init --recursive
+          # Clean up the 3rdparty folder (aubio is installed with brew) and pull ced from its repository
+          - rm -rf 3rdparty
+          - git clone --depth 1 https://github.com/google/compact_enc_det.git 3rdparty/ced
+          # Checkout should fail if (ever) google ced is updated, providing an opportunity to review the changes
+          - git -C 3rdparty/ced checkout 37529e6
       jobs:
         - name: GCC-8.4.0 Build
           env_vars:
@@ -103,9 +107,14 @@ blocks:
               value: g++-8
           commands:
             - echo "Setting up build..."
-            - meson setup build.gcc -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true -Dstoponwarning=true
+            - meson setup build.gcc -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true -Dwarningaserror=true
+            - artifact push job --expire-in 1w build.gcc/meson-info
+            - artifact push job --expire-in 1w build.gcc/meson-logs
+            - artifact push job --expire-in 1w build.gcc/build.ninja
+            - artifact push job --expire-in 1w build.gcc/compile_commands.json
             - echo "Building..."
             - meson compile -C build.gcc
+            - artifact push job --expire-in 1w build.gcc/.ninja_log
         - name: Clang-9 Build
           env_vars:
             - name: CC
@@ -115,5 +124,10 @@ blocks:
           commands:
             - echo "Setting up build..."
             - meson setup build.clang -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true
+            - artifact push job --expire-in 1w build.clang/meson-info
+            - artifact push job --expire-in 1w build.clang/meson-logs
+            - artifact push job --expire-in 1w build.clang/build.ninja
+            - artifact push job --expire-in 1w build.clang/compile_commands.json
             - echo "Building..."
             - meson compile -C build.clang
+            - artifact push job --expire-in 1w build.clang/.ninja_log
