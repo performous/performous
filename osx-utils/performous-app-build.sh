@@ -10,28 +10,24 @@ while [ -h "${SOURCE}" ]
 		SOURCE="$(readlink "${SOURCE}")"
 		[[ "${SOURCE}" != /* ]] && SOURCE="${DIR}/${SOURCE}" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
 	done
+
 CURRDIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
-
-test -z ${PREFIXDIR} && PREFIXDIR="/opt/local" # By default, the default prefix for macports, change this if you're using a different path or package manager.
-test -z ${DEPLOYMENT_TARGET} && DEPLOYMENT_TARGET="10.14" # Change this if you want to target a different version of macOS.
-test -z ${PERFORMOUS_SOURCE} && PERFORMOUS_SOURCE="${CURRDIR}/.." # Change this if using another copy of the source or if this file is not under path/to/performous/osx-utils/
-MAKE_JOBS=$(sysctl -n hw.ncpu)
-test -z ${CC} && CCPATH="/usr/bin/clang" # Path to system Clang, change if you want another compiler.
-test -z ${CXX} && CXXPATH="/usr/bin/clang++" # Path to system Clang, change if you want another compiler.
-
 args="$@"
 debug="^(--debug|-d)$"
 cleanbuild="^(--no-clean|-k)$"
 
 DEBUG=0
 PERFORMOUS_CLEAN_BUILD=1
+brew_retcode=-1
+port_retcode=-1
 
-function asksure {
-	echo -n "$1"
+function askPrompt {
+	echo -n "$1 "
 		while read -r -n 1 -s answer
 			do
 				if [[ $answer = [YyNn] ]]
 					then
+						echo -n $answer
 						[[ $answer = [Yy] ]] && retval=0
 						[[ $answer = [Nn] ]] && retval=1
 						break
@@ -42,6 +38,39 @@ function asksure {
 
 	return $retval
 }
+
+function detectPkgManager {
+	brew_retcode=$(brew -v 1>/dev/null 2>&1; echo $?)
+	port_retcode=$(port version 1>/dev/null 2>&1; echo $?)
+	if [[ ${brew_retcode} = 0 ]]
+		then
+			brew_prefix="$(dirname $(dirname $(which brew)))"
+			echo "Homebrew install found at: ${brew_prefix}"
+			PREFIXDIR="${brew_prefix}"
+	fi
+	if [[ ${port_retcode} = 0 ]]
+		then
+			port_prefix="$(dirname $(dirname $(which port)))"
+			echo "MacPorts install found at: ${port_prefix}"
+			PREFIXDIR="${port_prefix}"
+	fi
+	if [[ ${port_retcode} = 0 && ${brew_retcode} = 0 ]]
+		then
+			if askPrompt "Would you like to use Homebrew (y), or MacPorts (n)?"
+				then
+					PREFIXDIR="${brew_prefix}"
+				else
+					PREFIXDIR="${port_prefix}"
+			fi
+	fi
+}
+
+test -z ${PREFIXDIR} && detectPkgManager # Look for both Homebrew and Macports and use whichever is found. If for some reason, both are available, let the user choose. Alternatively, define this while invoking the script to bypass this behavior.
+test -z ${DEPLOYMENT_TARGET} && DEPLOYMENT_TARGET="10.14" # Change this if you want to target a different version of macOS.
+test -z ${PERFORMOUS_SOURCE} && PERFORMOUS_SOURCE="${CURRDIR}/.." # Change this if using another copy of the source or if this file is not under path/to/performous/osx-utils/
+MAKE_JOBS=$(sysctl -n hw.ncpu)
+test -z ${CC} && CCPATH="/usr/bin/clang" # Path to system Clang, change if you want another compiler.
+test -z ${CXX} && CXXPATH="/usr/bin/clang++" # Path to system Clang, change if you want another compiler.
 
 function exists {
 	if hash "$1" 2>/dev/null
@@ -123,7 +152,7 @@ function main {
 			else
 				if exists npm
 					then
-						if asksure "* appdmg is not installed, would you like to install it? (y/n)"
+						if askPrompt "* appdmg is not installed, would you like to install it? (y/n)"
 							then
 								sudo npm install -g https://github.com/LinusU/node-appdmg.git && FANCY_DMG=1
 							else
