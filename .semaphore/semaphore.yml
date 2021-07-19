@@ -15,9 +15,28 @@ blocks:
       prologue:
         commands:
           - echo "Installing Performous dependencies..."
-          - sudo apt -y update
+          - cache restore ubuntu1804-cache
           - sudo add-apt-repository -y ppa:litenstein/performous-bionic
-          - sudo apt -y install cmake gettext help2man clang-9 gcc-8 g++-8 libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++3.0-dev portaudio19-dev libopencv-dev libportmidi-dev libqrencode-dev libicu-dev libglm-dev libopenblas-dev libfftw3-dev
+          - sudo apt -y update
+          - |
+            if ! [[ -d $HOME/vendor/apt ]]; then
+              mkdir -p $HOME/vendor/apt
+            fi
+          - |
+            # First check for archives cache
+            if ! [[ -d $HOME/vendor/apt/archives ]]; then
+              # It doesn't so download the packages
+              sudo apt -y install --download-only cmake gettext help2man clang-9 gcc-8 g++-8 libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++3.0-dev portaudio19-dev libopencv-dev libportmidi-dev libqrencode-dev libicu-dev libglm-dev libopenblas-dev libfftw3-dev
+              # Then move them to our cache directory
+              sudo cp -R /var/cache/apt $HOME/vendor/
+              # Making sure our user has ownership, in order to cache
+              sudo chown -R semaphore:semaphore $HOME/vendor/apt
+            fi
+
+            # Install all packages in the cache
+            sudo dpkg -i $HOME/vendor/apt/archives/*.deb
+          - cache store ubuntu1804-cache $HOME/vendor
+          #- sudo apt -y install cmake gettext help2man clang-9 gcc-8 g++-8 libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++3.0-dev portaudio19-dev libopencv-dev libportmidi-dev libqrencode-dev libicu-dev libglm-dev libopenblas-dev libfftw3-dev
           - checkout
           - git submodule update --init --recursive
       jobs:
