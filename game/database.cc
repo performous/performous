@@ -2,8 +2,9 @@
 
 #include "configuration.hh"
 #include "libxml++-impl.hh"
+#include "fs.hh"
 #include "i18n.hh"
-#include <boost/filesystem.hpp>
+
 #include <iostream>
 
 Database::Database(fs::path const& filename): m_filename(filename) {
