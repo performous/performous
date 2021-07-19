@@ -7,6 +7,38 @@ agent:
 execution_time_limit:
   minutes: 30
 blocks:
+  - name: Test
+    execution_time_limit:
+      minutes: 15
+    dependencies: []
+    task:
+      prologue:
+        commands:
+          - echo "Current Directory $PWD"
+          - checkout
+          - echo "Current Directory $PWD"
+          - mkdir bla
+          - cd bla
+          - echo "Current Directory $PWD"
+      jobs:
+        - name: Test Build
+          commands:
+            - echo "Current Directory $PWD"
+            - echo "something"
+            - echo "Current Directory $PWD"
+            - mkdir pizza
+            - cd pizza
+            - echo "Current Directory $PWD"
+      epilogue:
+        commands:
+          - echo "Current Directory $PWD"
+          - echo "epilogue"
+          - echo "Current Directory $PWD"
+          - mkdir pokemon
+          - cd pokemon
+          - echo "Current Directory $PWD"
+
+blocks:
   - name: Ubuntu 18.04 Build
     execution_time_limit:
       minutes: 15
@@ -42,10 +74,20 @@ blocks:
       epilogue:
         commands:
           - echo "Making linux releases"
-          - cd performous/build.gcc && tar -czf performous-gcc8.tar.gz * && cd $HOME
-          - cd performous/build.clang && tar -czf performous-clang9.tar.gz * && cd $HOME
-          - artifact push project --expire-in 1d performous/build.gcc/performous-gcc8.tar.gz --force -d performous-1.1.${SEMAPHORE_GIT_SHA}-gcc.tar.gz
-          - artifact push project --expire-in 1d performous/build.gcc/performous-clang9.tar.gz --force -d performous-1.1.${SEMAPHORE_GIT_SHA}-clang.tar.gz
+          - cd performous/build.gcc
+          - cpack -G TGZ
+          - cpack -G DEB
+          - cpack -G RPM
+          - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.tar.gz --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-gcc.tar.gz
+          - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.tar.gz --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-gcc.deb
+          - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.tar.gz --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-gcc.rpm
+          - cd ../build.clang
+          - cpack -G TGZ
+          - cpack -G DEB
+          - cpack -G RPM
+          - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.tar.gz --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-clang.tar.gz
+          - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.tar.gz --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-gcc.deb
+          - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.tar.gz --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-gcc.rpm
 
   - name: MacOS 10.14.6 Build
     execution_time_limit:
