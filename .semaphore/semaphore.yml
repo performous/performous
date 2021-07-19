@@ -16,8 +16,8 @@ blocks:
         commands:
           - echo "Installing Performous dependencies..."
           - sudo apt -y update
-          - sudo add-apt-repository -y ppa:litenstein/performous-bionic
-          - sudo apt -y install cmake gettext help2man clang-9 gcc-8 g++-8 libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++3.0-dev portaudio19-dev libopencv-dev libportmidi-dev libqrencode-dev libicu-dev libglm-dev libopenblas-dev libfftw3-dev
+          #- sudo add-apt-repository -y ppa:litenstein/performous-bionic
+          - sudo apt -y install --no-install-recommends git cmake gettext help2man clang-9 gcc-8 g++-8 rpm libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libopencv-dev libportmidi-dev libqrencode-dev libicu-dev libglm-dev libopenblas-dev libfftw3-dev libssl-dev libcpprest-dev
           - checkout
           - git submodule update --init --recursive
       jobs:
@@ -30,6 +30,13 @@ blocks:
           commands:
             - mkdir build.gcc && cd build.gcc && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
             - make VERBOSE=1
+            - cpack -G TGZ
+            - cpack -G DEB
+            - cpack -G RPM
+            - GIT_VERSION=$(git rev-parse HEAD)
+            - artifact push project --expire-in 1d Performous-${GIT_VERSION}-Linux.tar.gz --force --destination Performous-${GIT_VERSION}-Linux-gcc.tar.gz
+            - artifact push project --expire-in 1d Performous-${GIT_VERSION}-Linux.deb --force --destination Performous-${GIT_VERSION}-Linux-gcc.deb
+            - artifact push project --expire-in 1d Performous-${GIT_VERSION}-Linux.rpm --force --destination Performous-${GIT_VERSION}-Linux-gcc.rpm
         - name: Clang-9 Build
           env_vars:
             - name: CC
@@ -39,13 +46,13 @@ blocks:
           commands:
             - mkdir build.clang && cd build.clang && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
             - make VERBOSE=1
-      epilogue:
-        commands:
-          - echo "Making linux releases"
-          - cd performous/build.gcc && tar -czf performous-gcc8.tar.gz * && cd $HOME
-          - cd performous/build.clang && tar -czf performous-clang9.tar.gz * && cd $HOME
-          - artifact push project --expire-in 1d performous/build.gcc/performous-gcc8.tar.gz --force -d performous-1.1.${SEMAPHORE_GIT_SHA}-gcc.tar.gz
-          - artifact push project --expire-in 1d performous/build.gcc/performous-clang9.tar.gz --force -d performous-1.1.${SEMAPHORE_GIT_SHA}-clang.tar.gz
+            - cpack -G TGZ
+            - cpack -G DEB
+            - cpack -G RPM
+            - GIT_VERSION=$(git rev-parse HEAD)
+            - artifact push project --expire-in 1d Performous-${GIT_VERSION}-Linux.tar.gz --force --destination Performous-${GIT_VERSION}-Linux-clang.tar.gz
+            - artifact push project --expire-in 1d Performous-${GIT_VERSION}-Linux.deb --force --destination Performous-${GIT_VERSION}-Linux-clang.deb
+            - artifact push project --expire-in 1d Performous-${GIT_VERSION}-Linux.rpm --force --destination Performous-${GIT_VERSION}-Linux-clang.rpm
 
   - name: MacOS 10.14.6 Build
     execution_time_limit:
@@ -89,7 +96,7 @@ blocks:
       epilogue:
         commands:
           - echo "Making osx release"
-          - cd performous/osx-utils/out/Performous.app 
+          - cd performous/osx-utils/out/Performous.app
           - tar -czf performous-clang.tar.gz * && cd $HOME
           - artifact push project --expire-in 1d performous/osx-utils/out/Performous.app/performous-clang.tar.gz --force -d performous-1.1.${SEMAPHORE_GIT_SHA}-gcc.tar.gz
 
@@ -102,8 +109,8 @@ blocks:
         commands:
           - echo "Installing Performous dependencies..."
           - sudo apt-get update -y
-          - sudo apt-get install -y ninja-build
-          - sudo apt-get install -y gettext clang-9 gcc-8 g++-8 python3-dev python3-pip libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libicu-dev libopencv-dev libportmidi-dev libglm-dev libaubio-dev libcpprest-dev
+          - sudo apt-get install -y --no-install-recommends ninja-build
+          - sudo apt-get install -y --no-install-recommends gettext clang-9 gcc-8 g++-8 python3-dev python3-pip libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libicu-dev libopencv-dev libportmidi-dev libglm-dev libaubio-dev libcpprest-dev
           - sem-version python 3.8
           - sudo pip3 install meson
           - echo "Checking out..."
