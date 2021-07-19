@@ -16,8 +16,8 @@ blocks:
         commands:
           - echo "Installing Performous dependencies..."
           - sudo apt -y update
-          - sudo add-apt-repository -y ppa:litenstein/performous-bionic
-          - sudo apt -y install cmake gettext help2man clang-9 gcc-8 g++-8 libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++3.0-dev portaudio19-dev libopencv-dev libportmidi-dev libqrencode-dev libicu-dev libglm-dev libopenblas-dev libfftw3-dev
+          #- sudo add-apt-repository -y ppa:litenstein/performous-bionic
+          - sudo apt -y install git cmake gettext help2man clang-9 gcc-8 g++-8 rpm libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libopencv-dev libportmidi-dev libqrencode-dev libicu-dev libglm-dev libopenblas-dev libfftw3-dev libssl-dev libcpprest-dev
           - checkout
           - git submodule update --init --recursive
       jobs:
@@ -30,6 +30,12 @@ blocks:
           commands:
             - mkdir build.gcc && cd build.gcc && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
             - make VERBOSE=1
+            - cpack -G TGZ
+            - cpack -G DEB
+            - cpack -G RPM
+            - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.tar.gz --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-gcc.tar.gz
+            - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.deb --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-gcc.deb
+            - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.rpm --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-gcc.rpm
         - name: Clang-9 Build
           env_vars:
             - name: CC
@@ -39,6 +45,13 @@ blocks:
           commands:
             - mkdir build.clang && cd build.clang && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
             - make VERBOSE=1
+            - cpack -G TGZ
+            - cpack -G DEB
+            - cpack -G RPM
+            - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.tar.gz --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-clang.tar.gz
+            - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.deb --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-clang.deb
+            - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.rpm --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-clang.rpm
+
   - name: MacOS 10.14.6 Build
     execution_time_limit:
       minutes: 15
@@ -78,6 +91,13 @@ blocks:
             - ./performous-app-build.sh -D
             - cd /Users/semaphore
             - cache store macports-10_15 ./local
+      epilogue:
+        commands:
+          - echo "Making osx release"
+          - cd performous/osx-utils/out/Performous.app
+          - tar -czf performous-clang.tar.gz * && cd $HOME
+          - artifact push project --expire-in 1d performous/osx-utils/out/Performous.app/performous-clang.tar.gz --force -d performous-1.1.${SEMAPHORE_GIT_SHA}-gcc.tar.gz
+
   - name: Ubuntu 18.04 Build (Meson)
     execution_time_limit:
       minutes: 10
