@@ -42,10 +42,20 @@ blocks:
       epilogue:
         commands:
           - echo "Making linux releases"
-          - cd performous/build.gcc && tar -czf performous-gcc8.tar.gz * && cd $HOME
-          - cd performous/build.clang && tar -czf performous-clang9.tar.gz * && cd $HOME
-          - artifact push project --expire-in 1d performous/build.gcc/performous-gcc8.tar.gz --force -d performous-1.1.${SEMAPHORE_GIT_SHA}-gcc.tar.gz
-          - artifact push project --expire-in 1d performous/build.gcc/performous-clang9.tar.gz --force -d performous-1.1.${SEMAPHORE_GIT_SHA}-clang.tar.gz
+          - cd $HOME/performous/build.gcc
+          - cpack -G TGZ
+          - cpack -G DEB
+          - cpack -G RPM
+          - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.tar.gz --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-gcc.tar.gz
+          - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.deb --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-gcc.deb
+          - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.rpm --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-gcc.rpm
+          - cd ../build.clang
+          - cpack -G TGZ
+          - cpack -G DEB
+          - cpack -G RPM
+          - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.tar.gz --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-clang.tar.gz
+          - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.deb --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-clang.deb
+          - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.rpm --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-clang.rpm
 
   - name: MacOS 10.14.6 Build
     execution_time_limit:
