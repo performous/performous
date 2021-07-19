@@ -48,6 +48,16 @@ to save the current settings to XML.
 		<short>Karaoke mode</short>
 		<long>Hide pitch wave, notes and scoring.</long>
 	</entry>
+	<entry name="game/difficulty" type="int" value="0">
+		<limits>
+			<enum>Normal</enum>
+			<enum>Hard</enum>
+			<enum>Perfect</enum>
+		</limits>
+		<short>Difficulty</short>
+		<long>Game difficulty.</long>
+	</entry>
+
 	<entry name="game/Textstyle" type="int" value="0">
 		<limits>
 			<enum>Western mode</enum>
