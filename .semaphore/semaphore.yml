@@ -39,6 +39,24 @@ blocks:
           commands:
             - mkdir build.clang && cd build.clang && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
             - make VERBOSE=1
+      epilogue:
+        commands:
+          - echo "Making linux releases"
+          - cd $HOME/performous/build.gcc
+          - cpack -G TGZ
+          - cpack -G DEB
+          - cpack -G RPM
+          - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.tar.gz --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-gcc.tar.gz
+          - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.deb --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-gcc.deb
+          - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.rpm --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-gcc.rpm
+          - cd ../build.clang
+          - cpack -G TGZ
+          - cpack -G DEB
+          - cpack -G RPM
+          - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.tar.gz --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-clang.tar.gz
+          - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.deb --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-clang.deb
+          - artifact push project --expire-in 1d Performous-${CPACK_PACKAGE_VERSION}-Linux.rpm --force --destination Performous-${CPACK_PACKAGE_VERSION}-Linux-clang.rpm
+
   - name: MacOS 10.14.6 Build
     execution_time_limit:
       minutes: 15
@@ -78,6 +96,13 @@ blocks:
             - ./performous-app-build.sh -D
             - cd /Users/semaphore
             - cache store macports-10_15 ./local
+      epilogue:
+        commands:
+          - echo "Making osx release"
+          - cd performous/osx-utils/out/Performous.app 
+          - tar -czf performous-clang.tar.gz * && cd $HOME
+          - artifact push project --expire-in 1d performous/osx-utils/out/Performous.app/performous-clang.tar.gz --force -d performous-1.1.${SEMAPHORE_GIT_SHA}-gcc.tar.gz
+
   - name: Ubuntu 18.04 Build (Meson)
     execution_time_limit:
       minutes: 10
