@@ -8,7 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 include(GetGitRevisionDescription)
-git_describe(PROJECT_VERSION --tags)
+git_describe(PROJECT_VERSION)
 if(NOT PROJECT_VERSION)
 	set(PROJECT_VERSION "1.1+")
 endif()
