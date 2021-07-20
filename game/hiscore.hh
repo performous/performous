@@ -56,5 +56,5 @@ public:
 private:
 	typedef std::multiset<HiscoreItem> hiscore_t;
 	hiscore_t m_hiscore;
-	int currentLevel() const;
+	unsigned currentLevel() const;
 };
