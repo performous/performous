@@ -84,6 +84,6 @@ void Hiscore::save(xmlpp::Element *hiscores) {
 	}
 }
 
-int Hiscore::currentLevel() const {
+unsigned Hiscore::currentLevel() const {
 	return config["game/difficulty"].i();
 }
