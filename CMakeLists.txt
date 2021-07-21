@@ -89,6 +89,8 @@ FetchContent_Declare(ced-sources
 
 FetchContent_MakeAvailable(ced-sources)
 
+option(USE_SELF_BUILT_AUBIO "Use custom aubio local build instead of using system lib (if available)" FALSE)
+
 find_package(Aubio REQUIRED)
 
 add_subdirectory(data)
