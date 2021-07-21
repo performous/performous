@@ -188,8 +188,6 @@ find_package(Threads)
 
 target_link_libraries(performous PRIVATE fs ced aubio ${LIBS} PkgConfig::deps Threads::Threads)
 
-target_include_directories(performous PRIVATE "${AUBIO_INSTALL_DIR}/include/")
-
 install(TARGETS performous DESTINATION ${BIN_INSTALL})
 
 set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)  # Store library paths in executable

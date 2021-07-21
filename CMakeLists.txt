@@ -87,49 +87,7 @@ endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/ced)
 
-if (APPLE)
-	set_property(GLOBAL PROPERTY BLA_VENDOR APPLE)
-	set(ACCELERATE_COMMAND "--enable-accelerate")
-	set(AUBIO_CFLAGS "${CMAKE_C_FLAGS} -iframeworkwithsysroot /System/Library/Frameworks/ -mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET} -isysroot '${CMAKE_OSX_SYSROOT}/'")
-else()
-	set(ACCELERATE_COMMAND "--enable-atlas")
-        set_property(GLOBAL PROPERTY BLA_VENDOR OpenBLAS)
-	set(AUBIO_CFLAGS "${CMAKE_C_FLAGS}")
-endif()
-
-#include(ExternalProject)
-#ExternalProject_Add(build-aubio-from-sources
-#	SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/aubio/
-#        BINARY_DIR ${CMAKE_BINARY_DIR}/3rdparty/aubio-build/
-#        INSTALL_DIR ${CMAKE_BINARY_DIR}/3rdparty/aubio-install/
-#        UPDATE_COMMAND ""
-#	TMP_DIR ${CMAKE_BINARY_DIR}/3rdparty/aubio-build/tmp/
-#	CONFIGURE_COMMAND ""
-#	BUILD_COMMAND ${CMAKE_COMMAND} -E env CFLAGS=${AUBIO_CFLAGS} ${CMAKE_SOURCE_DIR}/3rdparty/aubio/waf
-#                  ${ACCELERATE_COMMAND} --disable-tests --notests --verbose
-#                  --enable-fftw3f --disable-sndfile --disable-avcodec --disable-double
-#                  --disable-samplerate --disable-docs --disable-wavread --disable-wavwrite
-#                  --disable-tests --notests --disable-examples --disable-apple-audio
-#                  --disable-fat --disable-jack --libdir=lib
-#                  --prefix=${CMAKE_BINARY_DIR}/3rdparty/aubio-install/
-#                  --top=${CMAKE_SOURCE_DIR}/3rdparty/aubio/
-#                  --out=${CMAKE_BINARY_DIR}/3rdparty/aubio-build/ configure build install
-#	INSTALL_COMMAND ""
-#)
-#
-#ExternalProject_Get_Property(build-aubio-from-sources INSTALL_DIR)
-#set (AUBIO_INSTALL_DIR ${INSTALL_DIR})
-#add_library(aubio STATIC IMPORTED)
-
 add_subdirectory("3rdparty/aubio")
-target_include_directories(aubio INTERFACE
-	3rdparty/aubio/src
-)
-
-#get_target_property(AUBIO_INSTALL_DIR aubio LIBRARY_OUTPUT_DIRECTORY)
-#message (WARNING "AUBIO OUTPUT DIRECTORY: ${AUBIO_INSTALL_DIR}")
-#set_target_properties(aubio PROPERTIES IMPORTED_LOCATION ${AUBIO_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}aubio${CMAKE_STATIC_LIBRARY_SUFFIX})
-#add_dependencies(aubio build-aubio-from-sources)
 
 add_subdirectory(data)
 
