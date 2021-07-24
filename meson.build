@@ -96,10 +96,7 @@ opencv = nulldependency
 if get_option('usewebcam')
   opencv = dependency('opencv', required: false)
   if not opencv.found()
-    opencv = dependency('opencv4', required: false)
-    if not opencv.found()
-      error('OpenCV not found but webcam build requested')
-    endif
+    opencv = dependency('opencv4', required: true)
   endif
 endif
 
@@ -111,42 +108,25 @@ if get_option('usemididrum')
   if not portmidi.found()
     portmidi = compiler.find_library('libportmidi', required: false)
     if not portmidi.found()
-      portmidi = compiler.find_library('portmidi', required: false)
-      if not portmidi.found()
-        error('PORTMIDI not found but MIDI drum support build requested')
-      endif
+      portmidi = compiler.find_library('portmidi', required: true)
     endif
   endif
 endif
 
 # Note: cpprest may not be in pkg-config
-cpprestneededandfound = false
 cpprest = nulldependency
-if get_option('usewebserver')
-  cpprest = dependency('cpprest', required: false)
-  if cpprest.found()
-    cpprestneededandfound = true
-  else
-    cpprest = compiler.find_library('libcpprest', required: false)
-    if cpprest.found()
-      cpprestneededandfound = true
-    else
-      cpprest = compiler.find_library('cpprest', required: false)
-      if cpprest.found()
-        cpprestneededandfound = true
-      else
-        error('CppRestSdk not found but webserver build requested')
-      endif
-    endif
-  endif
-endif
-
 libssl = nulldependency
 libcrypto = nulldependency
-
-if cpprestneededandfound
+if get_option('usewebserver')
   libssl = dependency('libssl', required: true)
   libcrypto = dependency('libcrypto', required: true)
+  cpprest = dependency('cpprest', required: false)
+  if not cpprest.found()
+    cpprest = compiler.find_library('libcpprest', required: false)
+    if not cpprest.found()
+      cpprest = compiler.find_library('cpprest', required: true)
+    endif
+  endif
 endif
 
 # Write configuration file
@@ -182,8 +162,7 @@ dependencies = [
   libxmlpp,
   opencv,
   portmidi,
-  cpprest
-]
+  cpprest]
 
 executable('performous', [
   '3rdparty/ced/compact_enc_det/compact_enc_det.cc',
@@ -270,8 +249,7 @@ datapaths = [
   'data/shaders',
   'data/sounds',
   'data/themes',
-  'data/xsl'
-]
+  'data/xsl']
 
 foreach dp: datapaths
   install_subdir( dp, install_dir: 'share/games/performous')
