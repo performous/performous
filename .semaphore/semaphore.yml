@@ -107,7 +107,7 @@ blocks:
               value: g++-8
           commands:
             - echo "Setting up build..."
-            - meson setup build.gcc -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true -Dwarningaserror=true
+            - meson setup --buildtype release build.gcc -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true -Dwarningaserror=true
             - artifact push job --expire-in 1w build.gcc/meson-info
             - artifact push job --expire-in 1w build.gcc/meson-logs
             - artifact push job --expire-in 1w build.gcc/build.ninja
@@ -123,7 +123,7 @@ blocks:
               value: clang++-9
           commands:
             - echo "Setting up build..."
-            - meson setup build.clang -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true
+            - meson setup --buildtype release build.clang -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true
             - artifact push job --expire-in 1w build.clang/meson-info
             - artifact push job --expire-in 1w build.clang/meson-logs
             - artifact push job --expire-in 1w build.clang/build.ninja
