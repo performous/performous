@@ -1,6 +1,6 @@
 #include "songparser.hh"
 #include "unicode.hh"
-#include "regex.hh"
+#include <regex>
 
 #include <boost/algorithm/string.hpp>
 #include <fstream>
@@ -136,7 +136,7 @@ void SongParser::guessFiles () {
 	std::string logMissing, logFound;
 
 	// Run checks, remove bogus values and construct regexps
-	std::vector<regex> regexps;
+	std::vector<std::regex> regexps;
 	bool missing = false;
 	for (auto const& p : fields) {
 		fs::path& file = *p.first;
@@ -145,7 +145,7 @@ void SongParser::guessFiles () {
 			file.clear();
 		}
 		if (file.empty()) { missing = true; }
-		regexps.emplace_back (p.second, regex_constants::icase);
+		regexps.emplace_back (p.second, std::regex_constants::icase);
 	}
 	
 	if (!missing) {
