@@ -6,7 +6,7 @@
 #include "libxml++-impl.hh"
 
 #include <algorithm>
-#include "regex.hh"
+#include <regex>
 #include <unicode/stsearch.h>
 
 UErrorCode Players::m_icuError = U_ZERO_ERROR;
@@ -131,7 +131,7 @@ void Players::filter_internal() {
 			});
 		}
 // 		for (auto const& p: m_players) {
-// 			if (regex_search(p.name, regex(m_filter, regex_constants::icase))) filtered.push_back(p);
+// 			if (regex_search(p.name, regex(m_filter, std::regex_constants::icase))) filtered.push_back(p);
 // 		}
 		m_filtered.swap(filtered);
 	} catch (...) {
