@@ -148,7 +148,7 @@ add_subdirectory(game)
 add_subdirectory(3rdparty/ced)
 add_subdirectory(docs)
 
-find_package(nlohmann_json 3.7.3 QUIET)
+find_package(nlohmann_json 3.9.1 QUIET)
 
 if(nlohmann_json_FOUND)
 	message(STATUS "Nlohmann JSON Found.")
