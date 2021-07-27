@@ -75,7 +75,7 @@ blocks:
             - patch --verbose -ui /Users/semaphore/patch-cmake-ignore-CI-homebrew.patch
             - cd osx-utils
             - chmod +x ./performous-app-build.sh
-            - ./performous-app-build.sh -D
+            - PREFIXDIR=/opt/local ./performous-app-build.sh -D
             - cd /Users/semaphore
             - cache store macports-10_15 ./local
   - name: Ubuntu 18.04 Build (Meson)
