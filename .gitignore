@@ -1,6 +1,4 @@
-build
-build32
-build64
+/[bB]uild*/
 CMakeLists.txt.user*
 *~
 *.mo

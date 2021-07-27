@@ -69,7 +69,5 @@ private:
 	std::map<fs::path, std::unique_ptr<Texture>> m_covers;
 	int m_menuPos, m_infoPos;
 	bool m_jukebox;
-	bool show_hiscores;
-	int hiscore_start_pos;
 	Menu m_menu;
 };

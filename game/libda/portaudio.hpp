@@ -215,32 +215,18 @@ namespace portaudio {
 		operator PaStreamParameters const*() const { return params.channelCount > 0 ? &params : nullptr; }
 	};
 
-	template <typename Functor> int functorCallback(void const* input, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void* userData) {
-		Functor* ptr = *reinterpret_cast<Functor**>(&userData);
-		return (*ptr)(input, output, frameCount, timeInfo, statusFlags);
+	template <typename Functor> static int functorCallback(void const* input, void* output, unsigned long frameCount,
+                                                               const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags, void* userData) {
+		auto &callback = *reinterpret_cast<Functor*>(userData);
+		return callback(reinterpret_cast<float const*>(input), reinterpret_cast<float*>(output), frameCount);
 	}
 
 	class Stream {
 		PaStream* m_handle;
-	public:
 		// We are non-copyable
 		Stream(Stream const&) = delete;
 		Stream& operator=(Stream const&) = delete;
-		/// Construct a stream as with Pa_OpenStream
-		Stream(
-		  PaStreamParameters const* input,
-		  PaStreamParameters const* output,
-		  double sampleRate,
-		  unsigned long framesPerBuffer = paFramesPerBufferUnspecified,
-		  PaStreamFlags flags = paNoFlag,
-		  PaStreamCallback* callback = nullptr,
-		  void* userData = nullptr)
-		{
-			if (output != nullptr) {
-				if (output->channelCount > 0) { flags = paPrimeOutputBuffersUsingStreamCallback; }
-			}
-			PORTAUDIO_CHECKED(Pa_OpenStream, (&m_handle, input, output, sampleRate, framesPerBuffer, flags, callback, userData));
-		}
+	public:
 		/// Construct stream using a C++ functor as callback
 		template <typename Functor> Stream(
 		  Functor& functor,
@@ -249,7 +235,12 @@ namespace portaudio {
 		  double sampleRate,
 		  unsigned long framesPerBuffer = paFramesPerBufferUnspecified,
 		  PaStreamFlags flags = paNoFlag
-		): Stream(input, output, sampleRate, framesPerBuffer, flags, functorCallback<Functor>, (void*)(intptr_t)&functor) {}
+		) {
+			if (output != nullptr) {
+				if (output->channelCount > 0) { flags = paPrimeOutputBuffersUsingStreamCallback; }
+			}
+			PORTAUDIO_CHECKED(Pa_OpenStream, (&m_handle, input, output, sampleRate, framesPerBuffer, flags, functorCallback<Functor>, (void*)(intptr_t)&functor));
+		}
 		~Stream() {
 			if (!m_handle) return;
 			// Give audio a little time to shutdown but then just quit

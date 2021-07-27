@@ -1,13 +1,14 @@
 #include "log.hh"
 
 #include "fs.hh"
-#include <boost/filesystem.hpp>
 #include <boost/iostreams/device/file_descriptor.hpp>
 #include <boost/iostreams/stream.hpp>
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <mutex>
 #include <stdexcept>
+#include <errno.h>
 
 /** \file
  * \brief The std::clog logger.
@@ -55,7 +56,7 @@ struct StderrGrabber {
 	StderrGrabber(): stream(dup(STDERR_FILENO), boost::iostreams::close_handle), backup(std::cerr.rdbuf()) {
 		std::cerr.rdbuf(stream.rdbuf());  // Make std::cerr write to our stream (which connects to normal stderr)
 		int fd[2];
-		pipe(fd);  // Create pipe fd[1]->fd[0]
+		if (pipe(fd) == -1) std::clog << "stderr/notice: `pipe` returned an error: " << strerror(errno) << std::endl;
 		dup2(fd[1], STDERR_FILENO);  // Close stderr and replace it with a copy of pipe begin
 		close(fd[1]);  // Close the original pipe begin
 		std::clog << "stderr/info: Standard error output redirected here\n" << std::flush;
@@ -96,7 +97,7 @@ static VerboseMessageSink vsm; //!< \internal
 //! \internal used to store the default/original clog buffer.
 static std::streambuf* default_ClogBuf = nullptr;
 
-fs::ofstream file;
+std::ofstream file;
 
 std::string target;
 int minLevel;
@@ -166,7 +167,7 @@ Logger::Logger(std::string const& level) {
 		if (minLevel < 100) {
 			fs::path name = getLogFilename();
 			fs::create_directories(name.parent_path());
-			file.open(name);
+			file.open(name.c_str());
 			msg += " Log file: " + name.string();
 		}
 		sb.open(vsm);
@@ -190,4 +191,3 @@ void Logger::teardown() {
 	file.close();
 	default_ClogBuf = nullptr;
 }
-
