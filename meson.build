@@ -132,6 +132,12 @@ if get_option('usewebserver')
   endif
 endif
 
+boostmodules = ['iostreams','locale','program_options','system']
+if not compiler.has_header('filesystem')
+  boostmodules += ['filesystem'] # Boost::filesystem is used on systems where the standard filesystem is not available
+  conf.set('USE_BOOST_FS', '1')
+endif
+
 # Write configuration file
 configure_file(input: 'game/config.hh.in', output: 'config.hh', configuration: conf)
 
@@ -139,12 +145,7 @@ dependencies = [
   dependency('pangocairo'),
   dependency('sdl2'),
   dependency('aubio'),
-  dependency('boost', modules: [ # Meson treats boost specially: no pkg-config supported
-    'iostreams',
-    'locale',
-    'program_options',
-    'system'
-  ]),
+  dependency('boost', modules: boostmodules),
   dependency('epoxy'),
   dependency('icu-uc'),
   dependency('icu-i18n'),
