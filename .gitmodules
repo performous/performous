@@ -4,3 +4,6 @@
 [submodule "aubio"]
 	path = 3rdparty/aubio
 	url = https://github.com/performous/aubio.git
+[submodule "3rdparty/json"]
+	path = 3rdparty/json
+	url = ../json
