@@ -97,12 +97,14 @@ void RequestHandler::Get(web::http::http_request request)
         } else if(request.relative_uri().query() == "sort=edition&order=descending") {
             m_songs.sortSpecificChange(3, true);
         }
-        web::json::value jsonRoot = SongsToJsonObject();
-        request.reply(web::http::status_codes::OK, jsonRoot);
+//         web::json::value jsonRoot = SongsToJsonObject();
+        nlohmann::json jsonRoot_new = SongsToJsonObject_New();
+        request.reply(web::http::status_codes::OK, convertToCppRest(jsonRoot_new));
         return;
     }  else if(path == "/api/language") {
         auto localeMap = GenerateLocaleDict();
-        web::json::value jsonRoot = web::json::value::object();
+        nlohmann::json jsonRoot = nlohmann::json();
+//         web::json::value jsonRoot = web::json::value::object();
             for (auto const &kv : localeMap) {
                 std::string key = kv.first;
                 //Hack to get an easy key value pair within the json object.
@@ -111,27 +113,26 @@ void RequestHandler::Get(web::http::http_request request)
                 }
                 std::replace(key.begin(), key.end(), ' ','_');
                 key = UnicodeUtil::toLower(key);;
-                jsonRoot[key] = web::json::value(kv.second);
+                jsonRoot[key] = kv.second;
             }
-        request.reply(web::http::status_codes::OK, jsonRoot);
+        request.reply(web::http::status_codes::OK, convertToCppRest(jsonRoot));
         return;
     } else if(path == "/api/getCurrentPlaylist.json") {
         Game* gm = Game::getSingletonPtr();
-        web::json::value jsonRoot = web::json::value::array();
-        auto i = 0;
+        nlohmann::json jsonRoot = nlohmann::json::array();
+//         web::json::value jsonRoot = web::json::value::array();
         for (auto const& song : gm->getCurrentPlayList().getList()) {
-            web::json::value songObject = web::json::value::object();
-            songObject["Title"] = web::json::value::string(song->title);
-            songObject["Artist"] = web::json::value::string(song->artist);
-            songObject["Edition"] = web::json::value::string(song->edition);
-            songObject["Language"] = web::json::value::string(song->language);
-            songObject["Creator"] = web::json::value::string(song->creator);
-            songObject["Duration"] = web::json::value(song->getDurationSeconds());
-            jsonRoot[i] = songObject;
-            i++;
+            nlohmann::json songObject;
+            songObject["Title"] = song->title;
+            songObject["Artist"] = song->artist;
+            songObject["Edition"] = song->edition;
+            songObject["Language"] = song->language;
+            songObject["Creator"] = song->creator;
+            songObject["Duration"] = song->getDurationSeconds();
+            jsonRoot.push_back(songObject);
         }
 
-        request.reply(web::http::status_codes::OK, jsonRoot);
+        request.reply(web::http::status_codes::OK, convertToCppRest(jsonRoot));
         return;
     } else if(path == "/api/getplaylistTimeout") {
         request.reply(web::http::status_codes::OK, U(config["game/playlist_screen_timeout"].i()));
@@ -153,18 +154,21 @@ void RequestHandler::Post(web::http::http_request request)
 
     auto path = request.relative_uri().path();
 
-    web::json::value jsonPostBody = ExtractJsonFromRequest(request);
+    nlohmann::json jsonPostBody = ExtractJsonFromRequest_New(request);
+//     web::json::value jsonPostBody = ExtractJsonFromRequest(request);
 
-    if(jsonPostBody == web::json::value::null()) {
+    if(jsonPostBody.is_null()) {
         request.reply(web::http::status_codes::BadRequest, "Post body is malformed. Please make a valid request.");
         return;
     }
 
     if (path == "/api/add") {
         m_songs.setFilter("");
-        std::shared_ptr<Song> songPointer = GetSongFromJSON(jsonPostBody);
+        std::shared_ptr<Song> songPointer = GetSongFromJSON_New(jsonPostBody);
         if(!songPointer) {
-            request.reply(web::http::status_codes::NotFound, "Song \"" + jsonPostBody["Artist"].as_string() + " - " + jsonPostBody["Title"].as_string() + "\" was not found.");
+            std::string temp("Song \"" + jsonPostBody["Artist"].get<std::string>() + " - " + jsonPostBody["Title"].get<std::string>() + "\" was not found.");
+            web::json::value reply =  web::json::value::string(U(temp));
+            request.reply(web::http::status_codes::NotFound, reply);
             return;
         } else {
             std::clog << "requesthandler/debug: Adding " << songPointer->artist << " - " << songPointer->title << " to the playlist " << std::endl;
@@ -181,7 +185,7 @@ void RequestHandler::Post(web::http::http_request request)
             return;
         }
         try {
-            auto songIdToDelete = jsonPostBody["songId"].as_integer();
+            auto songIdToDelete = jsonPostBody["songId"].get<int>();
             if(songIdToDelete >= 0) {
                 gm->getCurrentPlayList().removeSong(songIdToDelete);
                 ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
@@ -190,7 +194,11 @@ void RequestHandler::Post(web::http::http_request request)
                 request.reply(web::http::status_codes::OK, "success");
                 return;
             } else {
-                request.reply(web::http::status_codes::BadRequest, "Can't remove songs from the playlist with a negative id \"" + std::to_string(songIdToDelete) +"\". Please make a valid request.");
+            std::string temp("Can't remove songs from the playlist with a negative id \"" + std::to_string(songIdToDelete) +"\". Please make a valid request.");
+            web::json::value reply =  web::json::value::string(U(temp));
+            request.reply(web::http::status_codes::BadRequest, reply);
+
+            request.reply(web::http::status_codes::NotFound, reply);
                 return;
             }
         } catch(web::json::json_exception const & e) {
@@ -204,19 +212,25 @@ void RequestHandler::Post(web::http::http_request request)
             return;
         }
         try {
-            auto songIdToMove = jsonPostBody["songId"].as_integer();
-            auto positionToMoveTo = jsonPostBody["position"].as_integer();
+            auto songIdToMove = jsonPostBody["songId"].get<int>();
+            auto positionToMoveTo = jsonPostBody["position"].get<int>();
             int sizeOfPlaylist = gm->getCurrentPlayList().getList().size();
             if(songIdToMove < 0) {
-                request.reply(web::http::status_codes::BadRequest, "Can't move songs with a negative id \"" + std::to_string(songIdToMove) + "\". Please make a valid request.");
+            std::string temp("Can't move songs with a negative id \"" + std::to_string(songIdToMove) + "\". Please make a valid request.");
+            web::json::value reply =  web::json::value::string(U(temp));
+                request.reply(web::http::status_codes::BadRequest, reply);
                 return;
             }
             if(positionToMoveTo < 0) {
-                request.reply(web::http::status_codes::BadRequest, "Can't move songs to a negative position \"" + std::to_string(positionToMoveTo) + "\". Please make a valid request.");
+                std::string temp("Can't move songs to a negative position \"" + std::to_string(positionToMoveTo) + "\". Please make a valid request.");
+                web::json::value reply =  web::json::value::string(U(temp));
+                request.reply(web::http::status_codes::BadRequest, reply);
                 return;
             }
             if(songIdToMove > sizeOfPlaylist - 1) {
-                request.reply(web::http::status_codes::BadRequest, "Not gonna move the unknown song you've provided \"" + std::to_string(songIdToMove + 1) + "\". Please make a valid request.");
+                std::string temp("Not gonna move the unknown song you've provided \"" + std::to_string(songIdToMove + 1) + "\". Please make a valid request.");
+                web::json::value reply =  web::json::value::string(U(temp));
+                request.reply(web::http::status_codes::BadRequest, reply);
                 return;
             }
             if(positionToMoveTo <= sizeOfPlaylist - 1) {
@@ -226,7 +240,9 @@ void RequestHandler::Post(web::http::http_request request)
                 request.reply(web::http::status_codes::OK, "success");
                 return;
             } else  {
-                request.reply(web::http::status_codes::BadRequest, "Not gonna move the song to \""+ std::to_string(positionToMoveTo + 1) + "\" since the list ain't that long. Please make a valid request.");
+                std::string temp("Not gonna move the song to \""+ std::to_string(positionToMoveTo + 1) + "\" since the list ain't that long. Please make a valid request.");
+                web::json::value reply =  web::json::value::string(U(temp));
+                request.reply(web::http::status_codes::BadRequest, reply);
                 return;
             }
         } catch(web::json::json_exception const & e) {
@@ -235,19 +251,20 @@ void RequestHandler::Post(web::http::http_request request)
             return;
         }
     } else if(path == "/api/search") {
-        auto query = jsonPostBody["query"].as_string();
+        auto query = jsonPostBody["query"].get<std::string>();
         m_songs.setFilter(query);
-        web::json::value jsonRoot = web::json::value::array();
-        for(int i = 0; i < m_songs.size(); i++) {
-            web::json::value songObject = web::json::value::object();
-            songObject["Title"] = web::json::value::string(m_songs[i]->title);
-            songObject["Artist"] = web::json::value::string(m_songs[i]->artist);
-            songObject["Edition"] = web::json::value::string(m_songs[i]->edition);
-            songObject["Language"] = web::json::value::string(m_songs[i]->language);
-            songObject["Creator"] = web::json::value::string(m_songs[i]->creator);
-            jsonRoot[i] = songObject;
+        nlohmann::json jsonRoot = nlohmann::json::array();
+//         web::json::value jsonRoot = web::json::value::array();
+        for(auto const& song: m_songs) {
+            nlohmann::json songObject;
+            songObject["Title"] = song->title;
+            songObject["Artist"] = song->artist;
+            songObject["Edition"] = song->edition;
+            songObject["Language"] = song->language;
+            songObject["Creator"] = song->creator;
+            jsonRoot.push_back(songObject);
         }
-        request.reply(web::http::status_codes::OK, jsonRoot);
+        request.reply(web::http::status_codes::OK, convertToCppRest(jsonRoot));
         return;
     } else {
         request.reply(web::http::status_codes::NotFound, "The path \""+ path +"\" was not found.");
@@ -282,6 +299,36 @@ web::json::value RequestHandler::ExtractJsonFromRequest(web::http::http_request 
     return jsonBody;
 }
 
+nlohmann::json RequestHandler::convertFromCppRest(web::json::value const& jsonDoc) {
+    utility::stringstream_t stream;
+    jsonDoc.serialize(stream);
+    return nlohmann::json::parse(stream);
+}
+
+web::json::value RequestHandler::convertToCppRest(nlohmann::json const& jsonDoc) {
+    utility::stringstream_t stream;
+    stream << U(jsonDoc.dump());
+    return web::json::value::parse(stream);
+}
+
+
+nlohmann::json RequestHandler::ExtractJsonFromRequest_New(web::http::http_request request) {
+    web::json::value jsonBody = web::json::value::null();
+    request.extract_json().then([&jsonBody](pplx::task<web::json::value> task)
+    {
+         try
+         {
+            jsonBody = task.get();
+         }
+         catch (web::json::json_exception const & e)
+         {
+            std::clog << "webserver/error: JSON exception was thrown \"" << e.what() << "\"." << std::endl;
+         }
+    }).wait();
+
+    return convertFromCppRest(jsonBody);
+}
+
 
 web::json::value RequestHandler::SongsToJsonObject() {
     web::json::value jsonRoot = web::json::value::array();
@@ -299,6 +346,21 @@ web::json::value RequestHandler::SongsToJsonObject() {
     return jsonRoot;
 }
 
+nlohmann::json RequestHandler::SongsToJsonObject_New() {
+    nlohmann::json jsonRoot = nlohmann::json::array();
+    for (auto const& song: m_songs) {
+        nlohmann::json songObject;
+        songObject["Title"] = song->title;
+        songObject["Artist"] = song->artist;
+        songObject["Edition"] = song->edition;
+        songObject["Language"] = song->language;
+        songObject["Creator"] = song->creator;
+        songObject["name"] = song->artist + " " + song->title;
+        jsonRoot.push_back(songObject);
+    }
+    return jsonRoot;
+}
+
 std::shared_ptr<Song> RequestHandler::GetSongFromJSON(web::json::value jsonDoc) {
     m_songs.setFilter("");
 
@@ -313,6 +375,23 @@ std::shared_ptr<Song> RequestHandler::GetSongFromJSON(web::json::value jsonDoc) 
         }
     }
 
+    std::clog << "webserver/info: Couldn't find requested song." << std::endl;
+    return std::shared_ptr<Song>();
+}
+
+std::shared_ptr<Song> RequestHandler::GetSongFromJSON_New(nlohmann::json jsonDoc) {
+    m_songs.setFilter("");
+
+    for (auto const& song: m_songs) {
+        if(song->title == jsonDoc["Title"] &&
+           song->artist == jsonDoc["Artist"] &&
+           song->edition == jsonDoc["Edition"] &&
+           song->language == jsonDoc["Language"] &&
+           song->creator == jsonDoc["Creator"]) {
+            std::clog << "webserver/info: Found requested song." << std::endl;
+            return song;
+        }
+    }
     std::clog << "webserver/info: Couldn't find requested song." << std::endl;
     return std::shared_ptr<Song>();
 }
