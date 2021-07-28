@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(GetGitRevisionDescription)
 git_describe(PROJECT_VERSION --tags)
@@ -30,7 +31,10 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
 	add_definitions("-DNDEBUG")
 endif()
 
-if (USE_BOOST_REGEX)
+option(PERFORMOUS_USE_BOOST_REGEX "Use Boost.regex instead of std::regex; enable this on platforms where std::regex might not behave, such as Fedora." OFF)
+option(ENABLE_WEBSERVER "Enable webserver support (RESTinio)." ON)
+
+if (PERFORMOUS_USE_BOOST_REGEX)
         add_definitions(-DUSE_BOOST_REGEX)
 endif()
 
@@ -128,11 +132,35 @@ add_library(aubio STATIC IMPORTED)
 set_target_properties(aubio PROPERTIES IMPORTED_LOCATION ${AUBIO_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}aubio${CMAKE_STATIC_LIBRARY_SUFFIX})
 add_dependencies(aubio build-aubio-from-sources)
 
-add_subdirectory(data)
+if(ENABLE_WEBSERVER)
+		add_subdirectory(3rdparty/restinio/dev)
+		message(STATUS "Webserver support: Enabled")
+		add_definitions("-DUSE_WEBSERVER")
+		set(NEEDED_BOOST_VERSION 1.66)
+else()
+	set(NEEDED_BOOST_VERSION 1.58)
+	message(STATUS "Webserver support: Disabled (explicitly disabled)")
+endif()
 
+
+add_subdirectory(data)
 add_subdirectory(game)
 add_subdirectory(3rdparty/ced)
 add_subdirectory(docs)
+
+find_package(nlohmann_json 3.9.1 QUIET)
+
+if(nlohmann_json_FOUND)
+	message(STATUS "Nlohmann JSON Found.")
+else()
+	message(STATUS "Nlohmann JSON not found; will use included version.")
+	set(JSON_BuildTests OFF CACHE INTERNAL "")
+	set(JSON_Install OFF CACHE INTERNAL "")
+	set(BUILD_TESTING OFF CACHE INTERNAL "")
+	add_subdirectory(3rdparty/json)
+endif()
+
+target_compile_features(nlohmann_json INTERFACE cxx_std_14)
 
 if(WIN32)
 	install(FILES win32/ConfigureSongDirectory.bat DESTINATION .)
