@@ -31,7 +31,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
 	add_definitions("-DNDEBUG")
 endif()
 
-if (USE_BOOST_REGEX)
+option(PERFORMOUS_USE_BOOST_REGEX "Use Boost.regex instead of std::regex; enable this on platforms where std::regex might not behave, such as Fedora." OFF)
+
+if (PERFORMOUS_USE_BOOST_REGEX)
         add_definitions(-DUSE_BOOST_REGEX)
 endif()
 
@@ -143,10 +145,13 @@ else()
 	message(STATUS "Nlohmann JSON not found; will use included version.")
 	set(JSON_BuildTests OFF CACHE INTERNAL "")
 	set(JSON_Install OFF CACHE INTERNAL "")
+	set(BUILD_TESTING OFF CACHE INTERNAL "")
 	add_subdirectory(3rdparty/json)
 endif()
 
 target_compile_features(nlohmann_json INTERFACE cxx_std_14)
+
+add_subdirectory(3rdparty/restinio/dev)
 
 if(WIN32)
 	install(FILES win32/ConfigureSongDirectory.bat DESTINATION .)
