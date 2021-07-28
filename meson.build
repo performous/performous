@@ -124,7 +124,10 @@ if get_option('usewebserver')
   if not cpprest.found()
     cpprest = compiler.find_library('libcpprest', required: false)
     if not cpprest.found()
-      cpprest = compiler.find_library('cpprest', required: true)
+      cpprest = compiler.find_library('cpprest', required: false)
+      if not cpprest.found()
+        cpprest = dependency('cpprestsdk', required: true, method: 'cmake', modules: 'cpprestsdk::cpprest') # Macports
+      endif
     endif
   endif
 endif
