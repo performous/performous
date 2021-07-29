@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.6)
 
 # It should be possible to switch to CMake's GETTEXT_CREATE_TRANSLATIONS
 # if we either drop the LOCALE_DIR or that function gets a customised
