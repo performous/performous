@@ -207,7 +207,7 @@ bool Music::prepare() {
 				ScreenSongs* sSongs = static_cast<ScreenSongs *>(gm->getScreen("Songs"));
 				double pstart = sSongs->getSongs().currentPtr()->preview_start;
 				pstart = (std::isnan(pstart) ? 0.0 : pstart);
-				double first_period, first_beat;
+				double first_period = 0.0, first_beat = 0.0;
 				std::vector<double> extra_beats;
 				Song::Beats& beats = sSongs->getSongs().currentPtr()->beats;
 				if (!sSongs->getSongs().currentPtr()->hasControllers()) {
@@ -424,9 +424,7 @@ void Device::stop() {
 	if (err != paNoError) throw std::runtime_error(std::string("Pa_StopStream: ") + Pa_GetErrorText(err));
 }
 
-int Device::operator()(void const* input, void* output, unsigned long frames, const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags) try {
-	float const* inbuf = static_cast<float const*>(input);
-	float* outbuf = static_cast<float*>(output);
+int Device::operator()(float const* inbuf, float* outbuf, unsigned long frames) try {
 	for (std::size_t i = 0; i < mics.size(); ++i) {
 		if (!mics[i]) continue;  // No analyzer? -> Channel not used
 		da::sample_const_iterator it = da::sample_const_iterator(inbuf + i, in);
@@ -543,7 +541,7 @@ struct Audio::Impl {
 		// stop all audio streams befor destoying the object.
 		// else portaudio will keep sending data to those destroyed
 		// objects.
-		for (auto& device: devices) device.stop();
+		for (auto& device: devices) try { device.stop(); } catch (const std::exception &e) { std::clog << "audio/error: " << e.what(); }
 	}
 };
 

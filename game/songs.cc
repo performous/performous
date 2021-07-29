@@ -16,7 +16,7 @@
 #include "regex.hh"
 #include <stdexcept>
 
-#include <boost/filesystem.hpp>
+#include "fs.hh"
 #include <boost/format.hpp>
 #include <unicode/stsearch.h>
 
@@ -113,7 +113,7 @@ void Songs::LoadCache() {
 	}
 
     for(auto const& song : jsonRoot.as_array()) {
-    	struct stat buffer;
+    	STAT buffer;
     	auto songPath = song.at("TxtFile").as_string();
     	auto isSongPathInConfiguredPaths = std::find_if(
                                                         userSongs.begin(), 
@@ -164,8 +164,11 @@ void Songs::CacheSonglist() {
     	if(!song->background.string().empty()) {
 	        songObject["Background"] = web::json::value::string(song->background.string());
 	    }
-    	if(!song->music["background"].string().empty()) {
-	        songObject["SongFile"] = web::json::value::string(song->music["background"].string());
+    	if(!song->music[TrackName::BGMUSIC].string().empty()) {
+	        songObject["SongFile"] = web::json::value::string(song->music[TrackName::BGMUSIC].string());
+	    }
+    	if(!song->midifilename.string().empty()) {
+	        songObject["MidFile"] = web::json::value::string(song->midifilename.string());
 	    }
     	if(!song->video.string().empty()) {
 	        songObject["VideoFile"] = web::json::value::string(song->video.string());
@@ -179,9 +182,31 @@ void Songs::CacheSonglist() {
     	if(!std::isnan(song->preview_start)) {
 	        songObject["PreviewStart"] = web::json::value::number(song->preview_start);
 	    }
-    	if(!song->music["vocals"].string().empty()) {
-	        songObject["Vocals"] = web::json::value::string(song->music["vocals"].string());
+    	if(!song->music[TrackName::LEAD_VOCAL].string().empty()) {
+	        songObject["Vocals"] = web::json::value::string(song->music[TrackName::LEAD_VOCAL].string());
 	    }
+        if(!song->music[TrackName::PREVIEW].string().empty()) {
+	        songObject["Preview"] = web::json::value::string(song->music[TrackName::PREVIEW].string());
+        }
+        if(!song->music[TrackName::GUITAR].string().empty()) {
+	        songObject["Guitar"] = web::json::value::string(song->music[TrackName::GUITAR].string());
+        }
+        if(!song->music[TrackName::BASS].string().empty()) {
+	        songObject["Bass"] = web::json::value::string(song->music[TrackName::BASS].string());
+        }
+        if(!song->music[TrackName::DRUMS].string().empty()) {
+	        songObject["Drums"] = web::json::value::string(song->music[TrackName::DRUMS].string());
+        }
+        if(!song->music[TrackName::KEYBOARD].string().empty()) {
+	        songObject["Keyboard"] = web::json::value::string(song->music[TrackName::KEYBOARD].string());
+        }
+        if(!song->music[TrackName::GUITAR_COOP].string().empty()) {
+	        songObject["Guitar_coop"] = web::json::value::string(song->music[TrackName::GUITAR_COOP].string());
+        }
+        if(!song->music[TrackName::GUITAR_RHYTHM].string().empty()) {
+	        songObject["Guitar_Rhythm"] = web::json::value::string(song->music[TrackName::GUITAR_RHYTHM].string());
+        }
+
     	double duration = song->getDurationSeconds();
     	if(!std::isnan(duration)) {
 	    	songObject["Duration"] = web::json::value::number(duration);
@@ -237,8 +262,8 @@ void Songs::reload_internal(fs::path const& parent) {
 	if (std::distance(parent.begin(), parent.end()) > 20) { std::clog << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)\n"; return; }
 	try {
 		regex expression(R"((\.txt|^song\.ini|^notes\.xml|\.sm)$)", regex_constants::icase);
-		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) { //loop through files
-			fs::path p = dirIt->path();
+		for (const auto &dir : fs::directory_iterator(parent)) { //loop through files
+			fs::path p = dir.path();
 			if (fs::is_directory(p)) { reload_internal(p); continue; } //if the file is a folder redo this function with this folder as path
 			if (!regex_search(p.filename().string(), expression)) continue; //if the folder does not contain any of the requested files, ignore it
 			try { //found song file, make a new song with it.

@@ -9,8 +9,8 @@
 #include <limits>
 
 extern "C" {
-#include AVFORMAT_INCLUDE
-#include AVCODEC_INCLUDE
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
 }
 #ifdef USE_WEBSERVER
 Song::Song(web::json::value const& song): dummyVocal(TrackName::LEAD_VOCAL), randomIdx(rand()) {
@@ -25,12 +25,20 @@ Song::Song(web::json::value const& song): dummyVocal(TrackName::LEAD_VOCAL), ran
 	cover = song.has_field("Cover") ? song.at("Cover").as_string() : "";
 	background = song.has_field("Background") ? song.at("Background").as_string() : "";
 	video = song.has_field("VideoFile") ? fs::path(song.at("VideoFile").as_string()) : "";
+	midifilename = song.has_field("MidFile") ? fs::path(song.at("MidFile").as_string()) : "";
 	videoGap = song.has_field("VideoGap") ? song.at("VideoGap").as_number().to_double() : 0.0;
 	start = song.has_field("Start") ? song.at("Start").as_number().to_double() : 0.0;
 	preview_start = song.has_field("PreviewStart") ? song.at("PreviewStart").as_number().to_double() : 0.0;
 	m_duration = song.has_field("Duration") ? song.at("Duration").as_number().to_double() : 0.0;
-	music["background"] = song.has_field("SongFile") ? fs::path(song.at("SongFile").as_string()) : "";
-	music["vocals"] = song.has_field("Vocals") ? fs::path(song.at("Vocals").as_string()) : "";
+	music[TrackName::BGMUSIC] = song.has_field("SongFile") ? fs::path(song.at("SongFile").as_string()) : "";
+	music[TrackName::LEAD_VOCAL] = song.has_field("Vocals") ? fs::path(song.at("Vocals").as_string()) : "";
+	music[TrackName::PREVIEW] = song.has_field("Preview") ? fs::path(song.at("Preview").as_string()) : "";
+	music[TrackName::GUITAR] = song.has_field("Guitar") ? fs::path(song.at("Guitar").as_string()) : "";
+	music[TrackName::BASS] = song.has_field("Bass") ? fs::path(song.at("Bass").as_string()) : "";
+	music[TrackName::DRUMS] = song.has_field("Drums") ? fs::path(song.at("Drums").as_string()) : "";
+	music[TrackName::KEYBOARD] = song.has_field("Keyboard") ? fs::path(song.at("Keyboard").as_string()) : "";
+	music[TrackName::GUITAR_COOP] = song.has_field("Guitar_coop") ? fs::path(song.at("Guitar_coop").as_string()) : "";
+	music[TrackName::GUITAR_RHYTHM] = song.has_field("Guitar_rhythm") ? fs::path(song.at("Guitar_rhythm").as_string()) : "";
 	loadStatus = Song::LoadStatus::HEADER;
 	
 	if (song.has_field("VocalTracks")) {
