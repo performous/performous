@@ -6,8 +6,9 @@
 #include "util.hh"
 #include "i18n.hh"
 #include "screen_intro.hh"
-#include <boost/filesystem.hpp>
+#include "util.hh"
 #include <boost/format.hpp>
+
 #include <algorithm>
 #include <future>
 #include <iomanip>
@@ -30,30 +31,30 @@ ConfigItem::ConfigItem(OptionList opts): m_type("option_list"), m_value(opts), m
 
 ConfigItem& ConfigItem::incdec(int dir) {
 	if (m_type == "int") {
-		int& val = boost::get<int>(m_value);
-		int step = boost::get<int>(m_step);
-		val = clamp(((val + dir * step)/ step) * step, boost::get<int>(m_min), boost::get<int>(m_max));
+		int& val = std::get<int>(m_value);
+		int step = std::get<int>(m_step);
+		val = clamp(((val + dir * step)/ step) * step, std::get<int>(m_min), std::get<int>(m_max));
 	} else if (m_type == "float") {
-		double& val = boost::get<double>(m_value);
-		double step = boost::get<double>(m_step);
-		val = clamp(round((val + dir * step) / step) * step, boost::get<double>(m_min), boost::get<double>(m_max));
+		double& val = std::get<double>(m_value);
+		double step = std::get<double>(m_step);
+		val = clamp(round((val + dir * step) / step) * step, std::get<double>(m_min), std::get<double>(m_max));
 	} else if (m_type == "bool") {
-		bool& val = boost::get<bool>(m_value);
+		bool& val = std::get<bool>(m_value);
 		val = !val;
 	} else if (m_type == "option_list") {
-		size_t s = boost::get<OptionList>(m_value).size();
+		size_t s = std::get<OptionList>(m_value).size();
 		m_sel = (m_sel + dir + s) % s;
 	}
 	return *this;
 }
 
 bool ConfigItem::isDefaultImpl(ConfigItem::Value const& defaultValue) const {
-	if (m_type == "bool") return boost::get<bool>(m_value) == boost::get<bool>(defaultValue);
-	if (m_type == "int") return boost::get<int>(m_value) == boost::get<int>(defaultValue);
-	if (m_type == "float") return boost::get<double>(m_value) == boost::get<double>(defaultValue);
-	if (m_type == "string") return boost::get<std::string>(m_value) == boost::get<std::string>(defaultValue);
-	if (m_type == "string_list") return boost::get<StringList>(m_value) == boost::get<StringList>(defaultValue);
-	if (m_type == "option_list") return boost::get<OptionList>(m_value) == boost::get<OptionList>(defaultValue);
+	if (m_type == "bool") return std::get<bool>(m_value) == std::get<bool>(defaultValue);
+	if (m_type == "int") return std::get<int>(m_value) == std::get<int>(defaultValue);
+	if (m_type == "float") return std::get<double>(m_value) == std::get<double>(defaultValue);
+	if (m_type == "string") return std::get<std::string>(m_value) == std::get<std::string>(defaultValue);
+	if (m_type == "string_list") return std::get<StringList>(m_value) == std::get<StringList>(defaultValue);
+	if (m_type == "option_list") return std::get<OptionList>(m_value) == std::get<OptionList>(defaultValue);
 	throw std::logic_error("ConfigItem::is_default doesn't know type '" + m_type + "'");
 }
 
@@ -68,27 +69,27 @@ void ConfigItem::verifyType(std::string const& type) const {
 	throw std::logic_error("Config item type mismatch: item=" + name + ", type=" + m_type + ", requested=" + type);
 }
 
-int& ConfigItem::i() { verifyType("int"); return boost::get<int>(m_value); }
-int const& ConfigItem::i() const { verifyType("int"); return boost::get<int>(m_value); }
-bool& ConfigItem::b() { verifyType("bool"); return boost::get<bool>(m_value); }
-double& ConfigItem::f() { verifyType("float"); return boost::get<double>(m_value); }
-std::string& ConfigItem::s() { verifyType("string"); return boost::get<std::string>(m_value); }
-ConfigItem::StringList& ConfigItem::sl() { verifyType("string_list"); return boost::get<StringList>(m_value); }
-ConfigItem::OptionList& ConfigItem::ol() { verifyType("option_list"); return boost::get<OptionList>(m_value); }
-std::string& ConfigItem::so() { verifyType("option_list"); return boost::get<OptionList>(m_value).at(m_sel); }
+int& ConfigItem::i() { verifyType("int"); return std::get<int>(m_value); }
+int const& ConfigItem::i() const { verifyType("int"); return std::get<int>(m_value); }
+bool& ConfigItem::b() { verifyType("bool"); return std::get<bool>(m_value); }
+double& ConfigItem::f() { verifyType("float"); return std::get<double>(m_value); }
+std::string& ConfigItem::s() { verifyType("string"); return std::get<std::string>(m_value); }
+ConfigItem::StringList& ConfigItem::sl() { verifyType("string_list"); return std::get<StringList>(m_value); }
+ConfigItem::OptionList& ConfigItem::ol() { verifyType("option_list"); return std::get<OptionList>(m_value); }
+std::string& ConfigItem::so() { verifyType("option_list"); return std::get<OptionList>(m_value).at(m_sel); }
 
-void ConfigItem::select(int i) { verifyType("option_list"); m_sel = clamp<int>(i, 0, boost::get<OptionList>(m_value).size()-1); }
+void ConfigItem::select(int i) { verifyType("option_list"); m_sel = clamp<int>(i, 0, std::get<OptionList>(m_value).size()-1); }
 
 namespace {
 	template <typename T, typename VariantAll, typename VariantNum> std::string numericFormat(VariantAll const& value, VariantNum const& multiplier, VariantNum const& step) {
-		T m = boost::get<T>(multiplier);
+		T m = std::get<T>(multiplier);
 		// Find suitable precision (not very useful for integers, but this code is generic...)
-		T s = std::abs(m * boost::get<T>(step));
+		T s = std::abs(m * std::get<T>(step));
 		unsigned precision = 0;
 		while (s > 0.0 && (s *= 10) < 10) ++precision;
 		// Format the output
 		boost::format fmter("%f");
-		fmter % boost::io::group(std::setprecision(precision), double(m) * boost::get<T>(value));
+		fmter % boost::io::group(std::setprecision(precision), double(m) * std::get<T>(value));
 		return fmter.str();
 	}
 
@@ -107,8 +108,8 @@ namespace {
 std::string const ConfigItem::getValue() const {
 	if (this->getShortDesc() == config["audio/backend"].getShortDesc()) {
 		int AutoBackendType = 1337;
-		static int val = boost::get<int>(m_value);
-		if (val != boost::get<int>(m_value)) val = PaHostApiNameToHostApiTypeId(this->getEnumName()); // In the case of the audio backend, val is the real value while m_value is the enum case for its cosmetic name.
+		static int val = std::get<int>(m_value);
+		if (val != std::get<int>(m_value)) val = PaHostApiNameToHostApiTypeId(this->getEnumName()); // In the case of the audio backend, val is the real value while m_value is the enum case for its cosmetic name.
 		int hostApi = Pa_HostApiTypeIdToHostApiIndex(PaHostApiTypeId(val));
 		std::ostringstream oss;
 		oss << "audio/info: Trying the selected Portaudio backend...";
@@ -129,18 +130,18 @@ std::string const ConfigItem::getValue() const {
 		return "Auto";
 	}
 	if (m_type == "int") {
-		int val = boost::get<int>(m_value);
+		int val = std::get<int>(m_value);
 		if (val >= 0 && val < int(m_enums.size())) return m_enums[val];
 		return numericFormat<int>(m_value, m_multiplier, m_step) + m_unit;
 	}
 	if (m_type == "float") return numericFormat<double>(m_value, m_multiplier, m_step) + m_unit;
-	if (m_type == "bool") return boost::get<bool>(m_value) ? _("Enabled") : _("Disabled");
-	if (m_type == "string") return boost::get<std::string>(m_value);
+	if (m_type == "bool") return std::get<bool>(m_value) ? _("Enabled") : _("Disabled");
+	if (m_type == "string") return std::get<std::string>(m_value);
 	if (m_type == "string_list") {
-		StringList const& sl = boost::get<StringList>(m_value);
+		StringList const& sl = std::get<StringList>(m_value);
 		return sl.size() == 1 ? "{" + sl[0] + "}" : (boost::format(_("%d items")) % sl.size()).str();
 	}
-	if (m_type == "option_list") return boost::get<OptionList>(m_value).at(m_sel);
+	if (m_type == "option_list") return std::get<OptionList>(m_value).at(m_sel);
 	throw std::logic_error("ConfigItem::getValue doesn't know type '" + m_type + "'");
 }
 

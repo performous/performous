@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <map>
 #include <string>
@@ -60,7 +60,7 @@ struct Note {
 	/// which players sung well
 	mutable std::vector<Color> stars;
 	/// note type
-	enum Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', SLIDE = '+', SLEEP = '-',
+	enum Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', GOLDEN2 = 'G', SLIDE = '+', SLEEP = '-', RAP = 'R',
 	  TAP = '1', HOLDBEGIN = '2', HOLDEND = '3', ROLL = '4', MINE = 'M', LIFT = 'L'} type;
 	int note; ///< MIDI pitch of the note (at the end for slide notes)
 	int notePrev; ///< MIDI pitch of the previous note (should be same as note for everything but SLIDE)

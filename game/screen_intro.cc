@@ -1,4 +1,4 @@
-#include "screen_intro.hh"
+﻿#include "screen_intro.hh"
 
 #include "fs.hh"
 #include "glmath.hh"
@@ -9,7 +9,7 @@
 #include "theme.hh"
 #include "menu.hh"
 
-#include <SDL_timer.h>
+#include <SDL2/SDL_timer.h>
 
 ScreenIntro::ScreenIntro(std::string const& name, Audio& audio): Screen(name), m_audio(audio), m_first(true) {
 }

@@ -31,7 +31,7 @@ void RequestHandler::Error(pplx::task<void>& t)
 void RequestHandler::HandleFile(web::http::http_request request, std::string filePath) {
     auto path = filePath != "" ? filePath : request.relative_uri().path();
     auto fileName = path.substr(path.find_last_of("/\\") + 1);
-        
+
     std::string fileToSend = findFile(fileName).string();
 
     concurrency::streams::fstream::open_istream(U(fileToSend), std::ios::in).then([=](concurrency::streams::istream is) {
@@ -81,19 +81,19 @@ void RequestHandler::Get(web::http::http_request request)
     } else if (path == "/api/getDataBase.json") { //get database
         m_songs.setFilter("");
         if(request.relative_uri().query() == "sort=artist&order=ascending") {
-            m_songs.sortSpecificChange(2);    
+            m_songs.sortSpecificChange(2);
         } else if(request.relative_uri().query() == "sort=artist&order=descending") {
             m_songs.sortSpecificChange(2, true);
         } else if(request.relative_uri().query() == "sort=title&order=ascending") {
-            m_songs.sortSpecificChange(1);    
+            m_songs.sortSpecificChange(1);
         } else if(request.relative_uri().query() == "sort=title&order=descending") {
             m_songs.sortSpecificChange(1, true);
         } else if(request.relative_uri().query() == "sort=language&order=ascending") {
-            m_songs.sortSpecificChange(6);    
+            m_songs.sortSpecificChange(6);
         } else if(request.relative_uri().query() == "sort=language&order=descending") {
             m_songs.sortSpecificChange(6, true);
         } else if(request.relative_uri().query() == "sort=edition&order=ascending") {
-            m_songs.sortSpecificChange(3);    
+            m_songs.sortSpecificChange(3);
         } else if(request.relative_uri().query() == "sort=edition&order=descending") {
             m_songs.sortSpecificChange(3, true);
         }
@@ -139,7 +139,7 @@ void RequestHandler::Get(web::http::http_request request)
     } else {
         HandleFile(request);
     }
-};
+}
 
 void RequestHandler::Post(web::http::http_request request)
 {
@@ -205,7 +205,7 @@ void RequestHandler::Post(web::http::http_request request)
         }
         try {
             auto songIdToMove = jsonPostBody["songId"].as_integer();
-            auto positionToMoveTo = jsonPostBody["position"].as_integer();        
+            auto positionToMoveTo = jsonPostBody["position"].as_integer();
             int sizeOfPlaylist = gm->getCurrentPlayList().getList().size();
             if(songIdToMove < 0) {
                 request.reply(web::http::status_codes::BadRequest, "Can't move songs with a negative id \"" + std::to_string(songIdToMove) + "\". Please make a valid request.");
@@ -233,7 +233,7 @@ void RequestHandler::Post(web::http::http_request request)
             std::string str = std::string("JSON Exception: ") + e.what();
             request.reply(web::http::status_codes::BadRequest, str);
             return;
-        }     
+        }
     } else if(path == "/api/search") {
         auto query = jsonPostBody["query"].as_string();
         m_songs.setFilter(query);
@@ -253,17 +253,17 @@ void RequestHandler::Post(web::http::http_request request)
         request.reply(web::http::status_codes::NotFound, "The path \""+ path +"\" was not found.");
         return;
     }
-};
+}
 
 void RequestHandler::Delete(web::http::http_request request)
 {
     request.reply(web::http::status_codes::OK);
-};
+}
 
 void RequestHandler::Put(web::http::http_request request)
 {
     request.reply(web::http::status_codes::OK);
-};
+}
 
 web::json::value RequestHandler::ExtractJsonFromRequest(web::http::http_request request) {
     web::json::value jsonBody = web::json::value::null();
@@ -327,7 +327,7 @@ std::map<std::string, std::string> RequestHandler::GenerateLocaleDict() {
 }
 
 std::vector<std::string> RequestHandler::GetTranslationKeys() {
-    std::vector<std::string> tranlationKeys = { 
+    std::vector<std::string> tranlationKeys = {
         translate_noop("Performous web frontend"),
         translate_noop("View database"),
         translate_noop("View playlist"),
