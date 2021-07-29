@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-31 21:55+0200\n"
-"PO-Revision-Date: 2020-03-31 22:15+0200\n"
+"POT-Creation-Date: 2020-05-21 18:28+0200\n"
+"PO-Revision-Date: 2020-05-21 18:39+0200\n"
 "Last-Translator: Sébastien Gonzalve <sebastien.gonzalve@aliceadsl.fr>\n"
 "Language-Team: \n"
 "Language: fr_FR\n"
@@ -17,74 +17,74 @@ msgstr ""
 "X-Poedit-SearchPath-1: ../data\n"
 
 #. Game
-#. Gameplay related options
+#. Gameplay related options.
 #. name: game
 #: ../data/config/schema.xml:19
 msgid "Game"
 msgstr "Jeu"
 
 #. Game
-#. Gameplay related options
+#. Gameplay related options.
 #. name: game
 #: ../data/config/schema.xml:20
-msgid "Gameplay related options"
-msgstr "Configurer les options de jeu"
+msgid "Gameplay related options."
+msgstr "Configurer les options de jeu."
 
 #. Graphic
-#. Configure rendering and video settings
+#. Configure rendering and video settings.
 #. name: graphic
 #: ../data/config/schema.xml:23
 msgid "Graphic"
 msgstr "Graphique"
 
 #. Graphic
-#. Configure rendering and video settings
+#. Configure rendering and video settings.
 #. name: graphic
 #: ../data/config/schema.xml:24
-msgid "Configure rendering and video settings"
-msgstr "Configurer les options vidéos et graphiques"
+msgid "Configure rendering and video settings."
+msgstr "Configurer les options vidéos et graphiques."
 
 #. Audio Devices
-#. Setup microphones and playback
+#. Setup microphones and playback.
 #. name: AudioDevices
 #: ../data/config/schema.xml:28
 msgid "Audio Devices"
 msgstr "Périphériques audio"
 
 #. Audio Devices
-#. Setup microphones and playback
+#. Setup microphones and playback.
 #. name: AudioDevices
 #: ../data/config/schema.xml:29
-msgid "Setup microphones and playback"
-msgstr "Configurer les microphones et la sortie son"
+msgid "Setup microphones and playback."
+msgstr "Configurer les microphones et la sortie son."
 
 #. Audio
-#. Configure general audio settings
+#. Configure general audio settings.
 #. name: audio
 #: ../data/config/schema.xml:32
 msgid "Audio"
 msgstr "Audio"
 
 #. Audio
-#. Configure general audio settings
+#. Configure general audio settings.
 #. name: audio
 #: ../data/config/schema.xml:33
-msgid "Configure general audio settings"
-msgstr "Configurer les options audio"
+msgid "Configure general audio settings."
+msgstr "Configurer les options audio."
 
 #. Paths
-#. Setup song and data paths
+#. Setup song and data paths.
 #. name: Paths
 #: ../data/config/schema.xml:36
 msgid "Paths"
 msgstr "Chemins"
 
 #. Paths
-#. Setup song and data paths
+#. Setup song and data paths.
 #. name: Paths
 #: ../data/config/schema.xml:37
-msgid "Setup song and data paths"
-msgstr "Configurer les chemins des morceaux et des données"
+msgid "Setup song and data paths."
+msgstr "Configurer les chemins des morceaux et des données."
 
 #. Karaoke mode
 #. Hide pitch wave, notes and scoring.
@@ -174,7 +174,7 @@ msgstr "Nom du thème à utiliser."
 #. value: 15
 #: ../data/config/schema.xml:75
 msgid "Playlist screen timeout"
-msgstr ""
+msgstr "Durée d'affichage de la liste de lecture"
 
 #. Playlist screen timeout
 #. How long it will take before the next song in the playlist starts automatically.
@@ -195,7 +195,7 @@ msgstr ""
 #. value: 5
 #: ../data/config/schema.xml:80
 msgid "Song results timeout"
-msgstr ""
+msgstr "Durée d'affichage des meilleurs scores"
 
 #. Song results timeout
 #. How long the scores will be displayed for after finishing a song.
@@ -270,7 +270,7 @@ msgstr ""
 "Fait la distinction entre les majuscules et les minuscules lors du tri."
 
 #. Webserver port
-#. Port to use for the web server. Choose one that is not used by other applications.
+#. Port to use for the webserver. Choose one that is not used by other applications.
 #. name: game/webserver_port
 #. type: int
 #. value: 8000
@@ -279,13 +279,17 @@ msgid "Webserver port"
 msgstr "Port du serveur web"
 
 #. Webserver port
-#. Port to use for the web server. Choose one that is not used by other applications.
+#. Port to use for the webserver. Choose one that is not used by other applications.
 #. name: game/webserver_port
 #. type: int
 #. value: 8000
 #: ../data/config/schema.xml:105
+#, fuzzy
+#| msgid ""
+#| "Port to use for the web server. Choose one that is not used by other "
+#| "applications."
 msgid ""
-"Port to use for the web server. Choose one that is not used by other "
+"Port to use for the webserver. Choose one that is not used by other "
 "applications."
 msgstr ""
 "Port à utiliser pour le serveur web. Prenez soin d'en choisir un qui n'est "
@@ -350,7 +354,7 @@ msgid "Enable keyboard as drumkit."
 msgstr "Activer la batterie au clavier."
 
 #. Drums use Pro mode
-#. Drums use Pro mode (toms are not cymbals)
+#. Drums use Pro mode (toms are not cymbals).
 #. name: game/drum_promode
 #. type: bool
 #. value: true
@@ -359,13 +363,13 @@ msgid "Drums use Pro mode"
 msgstr "Le batterie est en mode Pro"
 
 #. Drums use Pro mode
-#. Drums use Pro mode (toms are not cymbals)
+#. Drums use Pro mode (toms are not cymbals).
 #. name: game/drum_promode
 #. type: bool
 #. value: true
 #: ../data/config/schema.xml:123
-msgid "Drums use Pro mode (toms are not cymbals)"
-msgstr ""
+msgid "Drums use Pro mode (toms are not cymbals)."
+msgstr "Le batterie est en mode Pro (les toms ne sont pas de cymbales)."
 
 #. Keyboard as dance pad
 #. Enable keyboard as dance pad.
@@ -529,7 +533,7 @@ msgstr ""
 #. type: string_list
 #: ../data/config/schema.xml:203
 msgid "Word Collation"
-msgstr ""
+msgstr "Mots à ignorer lors du tri"
 
 #. Word Collation
 #. Words that should be ignored when sorting.
@@ -880,10 +884,8 @@ msgstr ""
 #. type: int
 #. value: 1337
 #: ../data/config/schema.xml:301
-#, fuzzy
-#| msgid "Audio Devices"
 msgid "Audio Backend"
-msgstr "Périphériques audio"
+msgstr "Système audio"
 
 #. Audio Backend
 #. Configure which audio backend to use; not all backends will be supported on all platforms.
@@ -899,7 +901,7 @@ msgstr ""
 "pas disponibles sur toutes les plateformes."
 
 #. Audio/video latency
-#. Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing.
+#. Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use 'Ctrl + ,' or 'Ctrl + .' to adjust this while performing.
 #. name: audio/video_delay
 #. type: float
 #. value: 0.06
@@ -907,8 +909,9 @@ msgstr ""
 msgid "Audio/video latency"
 msgstr "Latence audio/vidéo"
 
+# Attention, il s'agit bien de la position de la touche sur le clavier, pas du caractère associé.
 #. Audio/video latency
-#. Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing.
+#. Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use 'Ctrl + ,' or 'Ctrl + .' to adjust this while performing.
 #. name: audio/video_delay
 #. type: float
 #. value: 0.06
@@ -917,18 +920,18 @@ msgid ""
 "Affects all modes. Use negative value if your display input lag is greater "
 "than the sound card output latency, positive values in the opposite case and "
 "zero if they are equal. This should be set so that the notes pass the cursor "
-"at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while "
-"performing."
+"at the same time the audio is heard. Use 'Ctrl + ,' or 'Ctrl + .' to adjust "
+"this while performing."
 msgstr ""
 "Affecte tous les modes. Choisissez une valeur négative si le retard entre "
 "l'entrée et l'affichage est plus important que la latence audio. Choisissez "
-"une valeur positive dans le cas opposé, et une valeur nulle s'ils sont "
+"une valeur positive dans le cas contraire, ou une valeur nulle s'ils sont "
 "égaux. Ajustez pour faire en sorte que les notes passent le curseur en "
-"rythme avec la musique. Utilisez Ctrl+F1/F2 pour l'ajuster pendant une "
-"chanson."
+"rythme avec la musique. Utilisez 'Ctrl + ;' ou 'Ctrl + :' pour l'ajuster "
+"pendant une chanson."
 
 #. Audio round-trip latency
-#. Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4.
+#. Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with 'Ctrl + -' or 'Ctrl + ='.
 #. name: audio/round-trip
 #. type: float
 #. value: 0.09
@@ -937,7 +940,7 @@ msgid "Audio round-trip latency"
 msgstr "Latence audio/audio"
 
 #. Audio round-trip latency
-#. Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4.
+#. Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with 'Ctrl + -' or 'Ctrl + ='.
 #. name: audio/round-trip
 #. type: float
 #. value: 0.09
@@ -946,13 +949,15 @@ msgid ""
 "Affects singing only. The time it takes for Performous playback to reach "
 "your speakers, fly to the microphone and all the way back until Performous "
 "captures and analyzes it. While performing, press Ctrl+S for synth mode and "
-"adjust with Ctrl+F3/F4."
+"adjust with 'Ctrl + -' or 'Ctrl + ='."
 msgstr ""
-"Affecte uniquement la voix. Latence entre la capture du micro et le son des "
-"enceintes. Utilisez Ctrl+F3/F4 pour l'ajuster pendant une chanson."
+"Affecte uniquement le chant. Temps nécessaire pour que la musique arrive "
+"jusqu'aux enceintes, revienne par le microphone et que Performous ait le "
+"temps de l'analyser. Pendant le chant, utilisez Ctrl+S pour le mode synth et "
+"ajustez avec 'Ctrl + )' or 'Ctrl + ='."
 
 #. Audio/controller latency
-#. Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing.
+#. Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use 'Ctrl + [' or 'Ctrl + ]' to adjust while performing.
 #. name: audio/controller_delay
 #. type: float
 #. value: 0.08
@@ -961,7 +966,7 @@ msgid "Audio/controller latency"
 msgstr "Latence audio/controlleur"
 
 #. Audio/controller latency
-#. Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing.
+#. Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use 'Ctrl + [' or 'Ctrl + ]' to adjust while performing.
 #. name: audio/controller_delay
 #. type: float
 #. value: 0.08
@@ -969,12 +974,12 @@ msgstr "Latence audio/controlleur"
 msgid ""
 "Affects instruments and dancing only. The total of USB (guitar or dance pad) "
 "latency combined with audio output latency. Adjust so that you can hit the "
-"notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to "
-"adjust while performing."
+"notes best when playing by ear (not looking on screen). Use 'Ctrl + [' or "
+"'Ctrl + ]' to adjust while performing."
 msgstr ""
 "Affecte uniquement les instruments et les tapis de danse. Latence entre le "
-"périphérique USB et la sortie sonore. Utilisez Ctrl+F5/F6 pour l'ajuster "
-"pendant une chanson."
+"périphérique USB et la sortie sonore. Utilisez 'Ctrl + ^' ou 'Ctrl + $' pour "
+"l'ajuster pendant une chanson."
 
 #. Audio devices
 #. List of audio devices to try.
@@ -1054,8 +1059,8 @@ msgid ""
 "The ingame fail sound volume. Values above 90 are not recommended as "
 "distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
 msgstr ""
-"Le volume des morceaux en cas d'erreur. Les valeurs supérieures à 90 ne sont "
-"pas recommandées (distorsion)."
+"Le volume des notifications d'erreur pendant le jeu. Les valeurs supérieures "
+"à 90 ne sont pas recommandées (distorsion)."
 
 #. Microphone pass-through
 #. Send captured singing voice to speakers.
@@ -1134,7 +1139,7 @@ msgstr ""
 "les répertoires de données."
 
 #. Show hidden folders
-#. When true the screen_paths will also show hidden folders
+#. When true the screen 'Paths' will also show hidden folders.
 #. name: paths/showhiddenfolders
 #. type: bool
 #. value: false
@@ -1143,21 +1148,19 @@ msgid "Show hidden folders"
 msgstr "Montrer les dossiers cachés"
 
 #. Show hidden folders
-#. When true the screen_paths will also show hidden folders
+#. When true the screen 'Paths' will also show hidden folders.
 #. name: paths/showhiddenfolders
 #. type: bool
 #. value: false
 #: ../data/config/schema.xml:370
-msgid "When true the screen_paths will also show hidden folders"
-msgstr "Si activé, le menu affichera aussi les répertoires cachés"
+msgid "When true the screen 'Paths' will also show hidden folders."
+msgstr "Si activé, le menu affichera aussi les répertoires cachés."
 
 #. Default Song folders
 #. Where to recursively look for songs. DATADIR at the beginning means all Performous data folders.
 #. name: paths/system-songs
 #. type: string_list
 #: ../data/config/schema.xml:387
-#, fuzzy
-#| msgid "Song folders"
 msgid "Default Song folders"
 msgstr "Répertoires des chansons"
 
@@ -1182,7 +1185,7 @@ msgstr ""
 "chemins peuvent être ajoutés ici."
 
 #. Sort order
-#. Currently active sort order
+#. Currently active sort order.
 #. name: songs/sort-order
 #. type: int
 #. value: 0
@@ -1192,14 +1195,14 @@ msgid "Sort order"
 msgstr "Ordre de tri"
 
 #. Sort order
-#. Currently active sort order
+#. Currently active sort order.
 #. name: songs/sort-order
 #. type: int
 #. value: 0
 #. hidden: true
 #: ../data/config/schema.xml:399
-msgid "Currently active sort order"
-msgstr "Ordre de tri courant"
+msgid "Currently active sort order."
+msgstr "Ordre de tri courant."
 
 #: ../data/performous.desktop:3
 msgid "Performous"
@@ -1215,13 +1218,13 @@ msgstr ""
 
 #: ../data/performous.desktop:17
 msgid "song;music;dance;karaoke;microphone;sound;singing;"
-msgstr ""
+msgstr "chanson;musique;danse;karaoke;microphone;son;chant;"
 
 #: ../game/configuration.cc:137
 msgid "Enabled"
 msgstr "Activé"
 
-#: ../game/configuration.cc:137 ../game/menu.cc:77
+#: ../game/configuration.cc:137 ../game/menu.cc:64
 msgid "Disabled"
 msgstr "Désactivé"
 
@@ -1256,7 +1259,7 @@ msgstr "Parfait !"
 
 #: ../game/dancegraph.cc:52
 msgid "Excellent!-"
-msgstr ""
+msgstr "Excellent !-"
 
 #: ../game/dancegraph.cc:53
 msgid "Great!-"
@@ -1268,7 +1271,7 @@ msgstr " Bien !- "
 
 #: ../game/dancegraph.cc:55
 msgid "  OK!-  "
-msgstr ""
+msgstr "  OK !-  "
 
 #: ../game/dancegraph.cc:56
 msgid "Late!-"
@@ -1280,7 +1283,7 @@ msgstr "A coté de la plaque !"
 
 #: ../game/dancegraph.cc:60
 msgid "-Excellent!"
-msgstr ""
+msgstr "-Excellent !"
 
 #: ../game/dancegraph.cc:61
 msgid "-Great!"
@@ -1292,7 +1295,7 @@ msgstr " -Bien ! "
 
 #: ../game/dancegraph.cc:63
 msgid "  -OK!  "
-msgstr ""
+msgstr "  -OK !  "
 
 #: ../game/dancegraph.cc:64
 msgid "-Early!"
@@ -1433,25 +1436,25 @@ msgstr ""
 
 #: ../game/main.cc:148
 msgid "Loading audio samples..."
-msgstr "Chargement des samples..."
+msgstr "Chargement des echantillons..."
 
 #: ../game/main.cc:163
 msgid "Creating screens..."
 msgstr "Création des écrans..."
 
 #: ../game/main.cc:173
-msgid "Entering main menu"
-msgstr "Entrée dans le menu principal"
+msgid "Entering main menu..."
+msgstr "Entrée dans le menu principal..."
 
-#: ../game/main.cc:175 ../game/screen_sing.cc:80
-msgid "Loading complete"
-msgstr "Chargement terminé"
+#: ../game/main.cc:175
+msgid "Loading complete!"
+msgstr "Chargement terminé."
 
 #: ../game/main.cc:184
 msgid ""
 "Done Loading!\n"
 " Loaded "
-msgstr "Chargement effectué ! Chargé"
+msgstr "Chargement effectué ! Chargé "
 
 #: ../game/main.cc:190
 msgid "Screenshot taken!"
@@ -1459,7 +1462,7 @@ msgstr "Capture d'écran effectuée."
 
 #: ../game/main.cc:193
 msgid "Screenshot failed!"
-msgstr "Echec de la capture d'écran."
+msgstr "Échec de la capture d'écran."
 
 #: ../game/requesthandler.cc:331
 msgid "Performous web frontend"
@@ -1474,7 +1477,7 @@ msgid "View playlist"
 msgstr "Voir la liste de lecture"
 
 #: ../game/requesthandler.cc:334
-msgid "Search and Add"
+msgid "Search and add"
 msgstr "Chercher et ajouter"
 
 #: ../game/requesthandler.cc:335
@@ -1495,7 +1498,7 @@ msgstr "Langue"
 
 #: ../game/requesthandler.cc:339
 msgid "Edition"
-msgstr ""
+msgstr "Édition"
 
 #: ../game/requesthandler.cc:340
 msgid "Creator"
@@ -1557,7 +1560,7 @@ msgstr "Non"
 msgid "Move up"
 msgstr "Monter"
 
-#: ../game/requesthandler.cc:355
+#: ../game/requesthandler.cc:355 ../game/screen_playlist.cc:386
 msgid "Move down"
 msgstr "Descendre"
 
@@ -1578,48 +1581,48 @@ msgid "Cancel"
 msgstr "Annuler"
 
 #: ../game/requesthandler.cc:360
-msgid "Successfully removed song from playlist"
-msgstr "Chanson retirée"
+msgid "Successfully removed song from playlist."
+msgstr "Chanson retirée de la liste de lecture."
 
 #: ../game/requesthandler.cc:361
-msgid "Failed removing song from playlist"
-msgstr "Échec du retrait de la chanson"
+msgid "Failed removing song from playlist!"
+msgstr "Échec du retrait de la chanson de la liste de lecture."
 
 #: ../game/requesthandler.cc:362
-msgid "Successfully changed position of song"
-msgstr "Chanson deplacée"
+msgid "Successfully changed position of song."
+msgstr "Chanson déplacée."
 
 #: ../game/requesthandler.cc:363
-msgid "Failed changing position of song"
-msgstr "Échec du déplacement de la chanson"
+msgid "Failed changing position of song!"
+msgstr "Échec du déplacement de la chanson."
 
 #: ../game/requesthandler.cc:364
-msgid "Successfully moved song up"
-msgstr "Chanson remontée"
+msgid "Successfully moved song up."
+msgstr "Chanson remontée."
 
 #: ../game/requesthandler.cc:365
-msgid "Failed moving song up"
-msgstr "Échec de la remontée de la chanson"
+msgid "Failed moving song up!"
+msgstr "Échec de la remontée de la chanson."
 
 #: ../game/requesthandler.cc:366
-msgid "Successfully moved song down"
-msgstr "Chanson descendue"
+msgid "Successfully moved song down."
+msgstr "Chanson descendue."
 
 #: ../game/requesthandler.cc:367
-msgid "Failed moving song down"
-msgstr "Échec de la descente de la chanson"
+msgid "Failed moving song down!"
+msgstr "Échec de la descente de la chanson."
 
 #: ../game/requesthandler.cc:368
-msgid "Successfully added song to the playlist"
-msgstr "Chanson ajoutée à la liste de lecture"
+msgid "Successfully added song to the playlist."
+msgstr "Chanson ajoutée à la liste de lecture."
 
 #: ../game/requesthandler.cc:369
-msgid "Failed adding song to the playlist"
-msgstr "Échec de l'ajout à la liste de lecture"
+msgid "Failed adding song to the playlist!"
+msgstr "Échec de l'ajout à la liste de lecture."
 
 #: ../game/requesthandler.cc:370
-msgid "No songs found with current filter"
-msgstr "Aucune chanson ne correspond à ce critère"
+msgid "No songs found with current filter."
+msgstr "Aucune chanson ne correspond à ce critère."
 
 #: ../game/screen_audiodevices.cc:65
 msgid ""
@@ -1630,8 +1633,8 @@ msgid ""
 "Your other options changes will be saved too."
 msgstr ""
 "Il semble que vous ayez certaines configurations\n"
-"incompatibles avec cette interface d'utilisation.\n"
-"Sauvegarder cette configuration va écraser\n"
+"manuelles incompatibles avec cette interface.\n"
+"Sauvegarder cette configuration remplacera\n"
 "toutes les configurations audio préexistantes.\n"
 "Vos autres changements seront également sauvegardés."
 
@@ -1692,20 +1695,20 @@ msgid "Practice"
 msgstr "S'exercer"
 
 #: ../game/screen_intro.cc:174
-msgid "Check your skills or test the microphones"
-msgstr "Chauffer votre voix et tester les micros"
+msgid "Check your skills or test the microphones."
+msgstr "Chauffer votre voix ou tester les micros."
 
 #: ../game/screen_intro.cc:190
 msgid "Configure"
 msgstr "Options"
 
 #: ../game/screen_intro.cc:190
-msgid "Configure audio and game options"
-msgstr "Configurer les options de jeu"
+msgid "Configure audio and game options."
+msgstr "Configurer les options de jeu et de son."
 
 #: ../game/screen_intro.cc:191
-msgid "Leave the game"
-msgstr "Sortir du jeu"
+msgid "Leave the game."
+msgstr "Sortir du jeu."
 
 #: ../game/screen_intro.cc:204
 msgid ""
@@ -1715,7 +1718,7 @@ msgid ""
 msgstr ""
 "Serveur Web actif !\n"
 "Connectez vous à cet ordinateur\n"
-"depuis :"
+"depuis : "
 
 #: ../game/screen_paths.cc:69
 msgid "Hide hidden folders"
@@ -1742,10 +1745,12 @@ msgid ".."
 msgstr ""
 
 #: ../game/screen_paths.cc:95
-msgid "Go up one folder"
+#, fuzzy
+#| msgid "Go up one folder"
+msgid "Go to parent folder"
 msgstr "Remonter au dossier parent"
 
-#: ../game/screen_paths.cc:102
+#: ../game/screen_paths.cc:122
 msgid "Open folder"
 msgstr "Ouvrir le dossier"
 
@@ -1871,10 +1876,6 @@ msgid "Move this song up the list"
 msgstr "Monter ce morceau dans la liste"
 
 #: ../game/screen_playlist.cc:386
-msgid "Move Down"
-msgstr "Descendre"
-
-#: ../game/screen_playlist.cc:386
 msgid "Move this song down the list"
 msgstr "Descendre ce morceau dans la liste"
 
@@ -1893,6 +1894,10 @@ msgstr "Chanson contenant des pistes défectueuses !"
 #: ../game/screen_sing.cc:70
 msgid "Loading menu..."
 msgstr "Chargement du menu..."
+
+#: ../game/screen_sing.cc:80
+msgid "Loading complete"
+msgstr "Chargement terminé"
 
 #: ../game/screen_sing.cc:86
 msgid "Start"
@@ -1964,11 +1969,11 @@ msgstr "   Restez pour votre classement !"
 
 #: ../game/screen_sing.cc:564
 msgid "   Prepare for the next song!"
-msgstr "Préparez vous pour la prochaine chanson !"
+msgstr "   Préparez vous pour la prochaine chanson !"
 
 #: ../game/screen_sing.cc:576
 msgid "   Choose your next song!"
-msgstr "Choisir la prochaine chanson !"
+msgstr "   Choisir la prochaine chanson !"
 
 #: ../game/screen_sing.cc:710
 msgid "No player!"
@@ -1985,7 +1990,7 @@ msgstr "Soliste"
 #: ../game/screen_sing.cc:720 ../game/screen_sing.cc:726
 #: ../game/screen_sing.cc:732
 msgid "Rising star"
-msgstr "Etoile montante"
+msgstr "Étoile montante"
 
 #: ../game/screen_sing.cc:721 ../game/screen_sing.cc:727
 #: ../game/screen_sing.cc:733
@@ -2046,11 +2051,11 @@ msgstr "options"
 
 #: ../game/screen_songs.cc:323
 msgid "sort order: "
-msgstr "ordre :"
+msgstr "ordre : "
 
 #: ../game/screen_songs.cc:324
 msgid "type filter: "
-msgstr "filtre :"
+msgstr "filtre : "
 
 #: ../game/screen_songs.cc:325
 msgid "hiscores"
@@ -2172,108 +2177,5 @@ msgstr "classement par chemin"
 msgid "sorted by language"
 msgstr "classement par langue"
 
-#~ msgid "Fallback song encoding"
-#~ msgstr "Encodage des morceaux de secours"
-
-#~ msgid "Pick the text codec used for song files that are not UTF-8."
-#~ msgstr ""
-#~ "Choisir l'encodage utilisé pour les morceaux qui ne sont pas en UTF-8."
-
-#~ msgid ""
-#~ "Webserver active!\n"
-#~ " use a webbrowser\n"
-#~ "and navigate to localhost:"
-#~ msgstr ""
-#~ "Serveur Web actif !\n"
-#~ "Utilisez un navigateur Web\n"
-#~ "et rendez vous sur localhost:"
-
-#~ msgid ""
-#~ "This tool is not yet available.\n"
-#~ "Configure paths by adding them\n"
-#~ "as command line parameters and\n"
-#~ "then save them in configuration menu."
-#~ msgstr ""
-#~ "Cet outil n'est pas encore disponible.\n"
-#~ "Configurez les chemins en les ajoutant\n"
-#~ "à la ligne de commande et\n"
-#~ "sauvegardez-les dans le menu de configuration."
-
-#~ msgid "Press any key to exit."
-#~ msgstr "Appuyer sur n'importe quelle touche pour quitter."
-
-#~ msgid "Windows users can also use ConfigureSongDirectory.bat script."
-#~ msgstr ""
-#~ "Les utilisateurs de Windows peuvent aussi utiliser le script "
-#~ "ConfigureSongDirectory.bat."
-
-#, fuzzy
-#~ msgid "Back to song browser"
-#~ msgstr "Quitter vers la liste des morceaux"
-
-#~ msgid "No Items up to now."
-#~ msgstr "Aucun élément jusqu'à présent"
-
-#~ msgid "Be the first to be listed here!"
-#~ msgstr "Soyez le premier à être listé ici!"
-
-#~ msgid "Song is broken!"
-#~ msgstr "Chanson cassée"
-
-#~ msgid "Loading instruments..."
-#~ msgstr "Chargement des instruments..."
-
-#~ msgid "Finalizing..."
-#~ msgstr "Finalisation"
-
-#, fuzzy
-#~ msgid "Loading graphics..."
-#~ msgstr "Chargement de la chanson..."
-
-#~ msgid "Random background..."
-#~ msgstr "Papier peint aléatoires..."
-
-#~ msgid "(press END to view hiscores)"
-#~ msgstr "(presser Fin pour voir le classement)"
-
-#~ msgid "Gameplay settings."
-#~ msgstr "Options de jeu"
-
-#~ msgid "Video and rendering settings."
-#~ msgstr "Options vidéo et de rendu"
-
-#~ msgid "Audio-related settings."
-#~ msgstr "Options audio"
-
-#~ msgid "System paths."
-#~ msgstr "Chemins système"
-
-#~ msgid ""
-#~ "Part of sound card name or its number or empty to use the first available "
-#~ "device. Used currently for MIDI drum controllers."
-#~ msgstr ""
-#~ "Partie du nom de la carte son ou son numéro ou vide pour utiliser la "
-#~ "première disponible. Utilisé pour les batteries MIDI pour le moment."
-
-#~ msgid "3D notes"
-#~ msgstr "Notes 3D"
-
-#~ msgid ""
-#~ "Draw instrument notes as 3-dimensional objects. May hurt performance on "
-#~ "older hardware."
-#~ msgstr "Dessinne les notes des instruments en 3D"
-
-#~ msgid "Loading theme..."
-#~ msgstr "Chargement du thème..."
-
-#~ msgid "Loading background..."
-#~ msgstr "Chargement du fond d'écran..."
-
-#~ msgid "Loading user interface..."
-#~ msgstr "Chargement de l'interface utilisateur..."
-
-#~ msgid "Audio..."
-#~ msgstr "Audio..."
-
-#~ msgid "Launching background loaders..."
-#~ msgstr "Lancement des chargements en arrière plan..."
+#~ msgid "Move Down"
+#~ msgstr "Descendre"
