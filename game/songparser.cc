@@ -145,7 +145,7 @@ void SongParser::guessFiles () {
 			file.clear();
 		}
 		if (file.empty()) { missing = true; }
-		regexps.emplace_back (p.second, std::regex_constants::icase);
+		regexps.emplace_back(p.second, std::regex_constants::icase);
 	}
 	
 	if (!missing) {
