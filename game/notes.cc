@@ -1,5 +1,6 @@
 ﻿#include "notes.hh"
 
+#include "configuration.hh"
 #include "util.hh"
 #include <cmath>
 #include <sstream>
@@ -41,10 +42,36 @@ double Note::scoreMultiplier() const {
 	return 0.0;
 }
 
+double thresholdForFullScore() {
+	switch(GameDifficulty(config["game/difficulty"].i())){
+		case GameDifficulty::PERFECT:
+			return 0.2151;
+		case GameDifficulty::HARD:
+			return 0.5;
+		case GameDifficulty::NORMAL:
+		default: 
+			return 0.5;
+	}
+}
+
+double thresholdForNonzeroScore() {
+	switch(GameDifficulty(config["game/difficulty"].i())){
+		case GameDifficulty::PERFECT:
+			return 0.5;
+		case GameDifficulty::HARD:
+			return 1.0;
+		case GameDifficulty::NORMAL:
+		default: 
+			return 1.5;
+	}
+}
+
 double Note::powerFactor(double note) const {
 	if (type == FREESTYLE) return 1.0;
 	double error = std::abs(diff(note));
-	return clamp(1.5 - error, 0.0, 1.0);
+	double thresholdFull = thresholdForFullScore();
+	double thresholdNonzero = thresholdForNonzeroScore();
+	return clamp((thresholdNonzero - error)/(thresholdNonzero - thresholdFull), 0.0, 1.0);
 }
 
 Duration::Duration(): begin(getNaN()), end(getNaN()) {}
