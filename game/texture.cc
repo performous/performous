@@ -4,6 +4,7 @@
 #include "video_driver.hh"
 #include "screen.hh"
 #include "svg.hh"
+#include "game.hh"
 #include <boost/algorithm/string/case_conv.hpp>
 
 #include <atomic>

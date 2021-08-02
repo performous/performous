@@ -7,6 +7,7 @@
 #include "i18n.hh"
 #include "screen_intro.hh"
 #include "util.hh"
+#include "game.hh"
 #include <boost/format.hpp>
 
 #include <algorithm>

@@ -1,5 +1,6 @@
-#include "audio.hh"
+#include "game.hh"
 #include "screen.hh"
+#include "audio.hh"
 #include "fs.hh"
 #include "configuration.hh"
 #include "glutil.hh"
