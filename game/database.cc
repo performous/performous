@@ -1,5 +1,6 @@
 #include "database.hh"
 
+#include "configuration.hh"
 #include "libxml++-impl.hh"
 #include "fs.hh"
 #include "i18n.hh"
@@ -61,17 +62,17 @@ void Database::addHiscore(std::shared_ptr<Song> s) {
 	int score = scores.front().score;
 	std::string track = scores.front().track;
 	int songid = m_songs.lookup(s);
-
-	m_hiscores.addHiscore(score, playerid, songid, track);
-	std::clog << "database/info: Added new hiscore " << score << " points on track " << track << " of songid " << songid << std::endl;
+	unsigned level = config["game/difficulty"].i();
+	m_hiscores.addHiscore(score, playerid, songid, level, track);
+	std::clog << "database/info: Added new hiscore " << score << " points on track " << track << " of songid " << songid << " level "<< level<< std::endl;
 }
 
 bool Database::reachedHiscore(std::shared_ptr<Song> s) const {
 	int score = scores.front().score;
 	std::string track = scores.front().track;
 	int songid = m_songs.lookup(s);
-
-	return m_hiscores.reachedHiscore(score, songid, track);
+	unsigned level = config["game/difficulty"].i();
+	return m_hiscores.reachedHiscore(score, songid, level, track);
 }
 
 void Database::queryOverallHiscore(std::ostream & os, std::string const& track) const {
