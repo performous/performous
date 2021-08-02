@@ -1,4 +1,6 @@
 #include "webserver.hh"
+#include "game.hh"
+
 #ifdef USE_WEBSERVER
 #include <boost/asio.hpp>
 

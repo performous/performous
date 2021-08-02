@@ -39,20 +39,10 @@ class Players {
 	typedef std::set<PlayerItem> players_t;
 	typedef std::vector<PlayerItem> fplayers_t;
 
-  private:
-	players_t m_players;
-	fplayers_t m_filtered;
-
-	std::string m_filter;
-	AnimAcceleration math_cover;
-
-	bool m_dirty;
-
   public:
 	Players(const Players&) = delete;
   	const Players& operator=(const Players&) = delete;
-	Players();
-	~Players();
+	Players() = default;
 
 	void load(xmlpp::NodeSet const& n);
 	void save(xmlpp::Element *players);
@@ -65,30 +55,19 @@ class Players {
 	/** lookup a players name using the playerid.
 	  @return the players name or "Unknown Player"
 	  */
-	std::string lookup(int id) const;
+	std::string lookup(PlayerId id) const;
 
 	/// add a player with a displayed name and an optional picture; if no id is given one will be assigned
-	void addPlayer (std::string const& name, std::string const& picture = "", int id = -1);
+	void addPlayer (std::string const& name, std::string const& picture = "", PlayerId id = PlayerItem::UndefinedPlayerId);
 
 	/// const array access
-	PlayerItem operator[](std::size_t pos) const {
-		if (pos < m_filtered.size()) return m_filtered[pos];
-		else return PlayerItem();
-	}
-	/// number of songs
-	size_t size() const { return m_filtered.size(); };
-	/// true if empty
-	int empty() const { return m_filtered.empty(); };
+	PlayerItem operator[](std::size_t pos) const;
+	size_t count() const { return m_filtered.size(); }
+	bool isEmpty() const { return m_filtered.empty(); }
 	/// advances to next player
-	void advance(int diff) {
-		int size = m_filtered.size();
-		if (size == 0) return;  // Do nothing if no songs are available
-		int _current = (int(math_cover.getTarget()) + diff) % size;
-		if (_current < 0) _current += m_filtered.size();
-		math_cover.setTarget(_current,this->size());
-	}
+	void advance(int diff);
 	/// get current id
-	int currentId() const { return math_cover.getTarget(); }
+	PlayerId currentId() const { return math_cover.getTarget(); }
 	/// gets current position
 	double currentPosition() { return math_cover.getValue(); }
 	/// gets current velocity
@@ -96,15 +75,22 @@ class Players {
 	/// sets margins for animation
 	void setAnimMargins(double left, double right) { math_cover.setMargins(left, right); }
 	/// @return current PlayerItem (the copy is very cheap at the moment)
-	PlayerItem current() const {
-		if (math_cover.getTarget() < m_filtered.size()) return m_filtered[math_cover.getTarget()];
-		else return PlayerItem();
-	}
+	PlayerItem current() const;
 	/// filters playerlist by regular expression
 	void setFilter(std::string const& regex);
-  private:
-	int assign_id_internal(); /// returns the next available id
+  
+private:
+	PlayerId assign_id_internal(); /// returns the next available id
 	void filter_internal();
 	static UErrorCode m_icuError;
 	static icu::RuleBasedCollator icuCollator;
+
+private:
+	players_t m_players;
+	fplayers_t m_filtered;
+
+	std::string m_filter;
+	AnimAcceleration math_cover;
+
+	bool m_dirty = false;
 };
