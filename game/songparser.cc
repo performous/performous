@@ -1,9 +1,9 @@
 #include "songparser.hh"
 #include "unicode.hh"
-#include "regex.hh"
+#include <regex>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/filesystem/fstream.hpp>
+#include <fstream>
 
 
 namespace SongParserUtil {
@@ -46,7 +46,7 @@ SongParser::SongParser(Song& s): m_song(s) {
 	try {
 		enum { NONE, TXT, XML, INI, SM } type = NONE;
 		// Read the file, determine the type and do some initial validation checks
-		fs::ifstream f (s.filename, std::ios::binary);
+		std::ifstream f (s.filename.string(), std::ios::binary);
 		if (!f.is_open()) {
 			throw SongParserException (s, "Could not open song file", 0);
 		}
@@ -136,7 +136,7 @@ void SongParser::guessFiles () {
 	std::string logMissing, logFound;
 
 	// Run checks, remove bogus values and construct regexps
-	std::vector<regex> regexps;
+	std::vector<std::regex> regexps;
 	bool missing = false;
 	for (auto const& p : fields) {
 		fs::path& file = *p.first;
@@ -145,7 +145,7 @@ void SongParser::guessFiles () {
 			file.clear();
 		}
 		if (file.empty()) { missing = true; }
-		regexps.emplace_back (p.second, regex_constants::icase);
+		regexps.emplace_back(p.second, std::regex_constants::icase);
 	}
 	
 	if (!missing) {

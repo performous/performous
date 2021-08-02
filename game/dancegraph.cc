@@ -31,7 +31,7 @@ namespace {
 	int getNextBigStreak(int prev) { return prev + 10; }
 
 	/// Get an accuracy value [0, 1] for the error offset (in seconds)
-	double accuracy(double error) { return 1.0 - (std::abs(error) / maxTolerance); };
+	double accuracy(double error) { return 1.0 - (std::abs(error) / maxTolerance); }
 
 	/// Gives points based on error from a perfect hit
 	double points(double error) {

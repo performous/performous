@@ -4,8 +4,12 @@ agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
+execution_time_limit:
+  minutes: 30
 blocks:
   - name: Ubuntu 18.04 Build
+    execution_time_limit:
+      minutes: 15
     dependencies: []
     task:
       prologue:
@@ -35,7 +39,9 @@ blocks:
           commands:
             - mkdir build.clang && cd build.clang && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
             - make VERBOSE=1
-  - name: MacOS 10.14.6 Build    
+  - name: MacOS 10.14.6 Build
+    execution_time_limit:
+      minutes: 15
     dependencies: []
     task:
       agent:
@@ -44,29 +50,70 @@ blocks:
           os_image: macos-xcode11
       secrets:
         - name: macos-ci-pubkey
+        - name: macos-cache
         - name: ignore-ci-homebrew
       prologue:
         commands:
+          - chmod 400 /Users/semaphore/macos-cache-key
+          - mv /Users/semaphore/macos-cache-key /Users/semaphore/.ssh/semaphore_cache_key
           - echo Trying to restore cache...
-          - ssh-keyscan -p 29920 66.185.20.68 >> ~/.ssh/known_hosts
-          - chmod 400 ~/.ssh/semaphore_cache_key
+          - ssh-keyscan -p 29920 66.185.20.68 >> /Users/semaphore/.ssh/known_hosts && ssh-add /Users/semaphore/.ssh/semaphore_cache_key
           - export PATH=/opt/local/bin:/opt/local/sbin:$PATH
           - export MANPATH=/opt/local/share/man:$MANPATH
           - export DISPLAY=:0.0
-          - cache restore macports-10_15
-          - mkdir -p /Users/semaphore/local
-          - mkdir -p /Users/semaphore/Applications
-          - sudo ln -sf /Users/semaphore/local/Applications /Users/semaphore/Applications/MacPorts
-          - sudo ln -sf /Users/semaphore/local/ /opt/local
-          - test -e /Users/semaphore/local/bin/port || ( curl -LJ https://www.dropbox.com/s/4c5oav6za5l4gvv/macports-10_15-install.tar.gz?dl=1 | tar x ) 
       jobs:
         - name: Generate app bundle
           commands:
+            - cache restore macports-10_15
+            - mkdir -p /Users/semaphore/local
+            - mkdir -p /Users/semaphore/Applications
+            - sudo ln -sf /Users/semaphore/local/Applications /Users/semaphore/Applications/MacPorts
+            - sudo ln -sf /Users/semaphore/local/ /opt/local
+            - test -e /Users/semaphore/local/bin/port || ( curl -LJ https://www.dropbox.com/s/4c5oav6za5l4gvv/macports-10_15-install.tar.gz?dl=1 | tar x )
             - checkout
             - git submodule update --init --recursive
             - patch --verbose -ui /Users/semaphore/patch-cmake-ignore-CI-homebrew.patch
             - cd osx-utils
             - chmod +x ./performous-app-build.sh
-            - ./performous-app-build.sh -D
+            - PREFIXDIR=/opt/local ./performous-app-build.sh -D
             - cd /Users/semaphore
             - cache store macports-10_15 ./local
+  - name: Ubuntu 18.04 Build (Meson)
+    execution_time_limit:
+      minutes: 10
+    dependencies: []
+    task:
+      prologue:
+        commands:
+          - echo "Installing Performous dependencies..."
+          - sudo apt-get update -y
+          - sudo apt-get install -y ninja-build
+          - sudo apt-get install -y gettext clang-9 gcc-8 g++-8 python3-dev python3-pip libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libicu-dev libopencv-dev libportmidi-dev libglm-dev libaubio-dev libcpprest-dev
+          - sem-version python 3.8
+          - sudo pip3 install meson
+          - echo "Checking out..."
+          - checkout
+          - git submodule update --init --recursive
+      jobs:
+        - name: GCC-8.4.0 Build
+          env_vars:
+            - name: CC
+              value: gcc-8
+            - name: CXX
+              value: g++-8
+          commands:
+            - echo "Setting up build..."
+            - meson setup build.gcc -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true -Dstoponwarning=true
+            - echo "Building..."
+            - meson compile -C build.gcc
+        - name: Clang-9 Build
+          env_vars:
+            - name: CC
+              value: clang-9
+            - name: CXX
+              value: clang++-9
+          commands:
+            - echo "Setting up build..."
+            - meson setup build.clang -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true
+            - echo "Building..."
+            - meson compile -C build.clang

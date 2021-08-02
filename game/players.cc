@@ -6,7 +6,6 @@
 #include "libxml++-impl.hh"
 
 #include <algorithm>
-#include "regex.hh"
 #include <unicode/stsearch.h>
 
 UErrorCode Players::m_icuError = U_ZERO_ERROR;
@@ -130,9 +129,6 @@ void Players::filter_internal() {
 			return (search.first(m_icuError) != USEARCH_DONE);
 			});
 		}
-// 		for (auto const& p: m_players) {
-// 			if (regex_search(p.name, regex(m_filter, regex_constants::icase))) filtered.push_back(p);
-// 		}
 		m_filtered.swap(filtered);
 	} catch (...) {
 		fplayers_t(m_players.begin(), m_players.end()).swap(m_filtered);  // Invalid regex => copy everything

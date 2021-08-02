@@ -1,6 +1,6 @@
-[submodule "compact_enc_dec"]
+[submodule "compact_enc_det"]
 	path = 3rdparty/ced
-	url = ../compact_enc_det
+	url = https://github.com/performous/compact_enc_det.git
 [submodule "aubio"]
 	path = 3rdparty/aubio
-	url = ../aubio
+	url = https://github.com/performous/aubio.git
