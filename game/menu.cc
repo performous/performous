@@ -2,7 +2,7 @@
 #include "screen.hh"
 #include "texture.hh"
 #include "fs.hh"
-
+#include "game.hh"
 
 MenuOption::MenuOption(std::string const& nm, std::string const& comm, MenuImage img):
   type(), value(), newValue(), callback(), image(img), name(nm), comment(comm), namePtr(), commentPtr()
