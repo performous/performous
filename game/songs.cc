@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
-#include <regex.hh>
+#include <regex>
 #include <stdexcept>
 
 #include <boost/format.hpp>
