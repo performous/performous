@@ -6,6 +6,7 @@
 #include "theme.hh"
 #include "audio.hh"
 #include "i18n.hh"
+#include "game.hh"
 
 ScreenPaths::ScreenPaths(std::string const& name, Audio& audio, Songs& songs): Screen(name), m_audio(audio), m_songs(songs) {}
 
