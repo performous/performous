@@ -23,6 +23,8 @@ blocks:
       jobs:
         - name: GCC-8.4.0 Build
           env_vars:
+            - name: COMPILER
+              value: gcc
             - name: CC
               value: gcc-8
             - name: CXX
@@ -30,15 +32,10 @@ blocks:
           commands:
             - mkdir build.gcc && cd build.gcc && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
             - make VERBOSE=1
-            - cpack -G TGZ
-            - cpack -G DEB
-            - cpack -G RPM
-            - GIT_VERSION=$(git rev-parse --short HEAD)
-            - artifact push project --expire-in 1d Performous-${GIT_VERSION}-Linux.tar.gz --force --destination Performous-${GIT_VERSION}-Linux-gcc.tar.gz
-            - artifact push project --expire-in 1d Performous-${GIT_VERSION}-Linux.deb --force --destination Performous-${GIT_VERSION}-Linux-gcc.deb
-            - artifact push project --expire-in 1d Performous-${GIT_VERSION}-Linux.rpm --force --destination Performous-${GIT_VERSION}-Linux-gcc.rpm
         - name: Clang-9 Build
           env_vars:
+            - name: COMPILER
+              value: clang
             - name: CC
               value: clang-9
             - name: CXX
@@ -46,13 +43,16 @@ blocks:
           commands:
             - mkdir build.clang && cd build.clang && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
             - make VERBOSE=1
-            - cpack -G TGZ
-            - cpack -G DEB
-            - cpack -G RPM
-            - GIT_VERSION=$(git rev-parse --short HEAD)
-            - artifact push project --expire-in 1d Performous-${GIT_VERSION}-Linux.tar.gz --force --destination Performous-${GIT_VERSION}-Linux-clang.tar.gz
-            - artifact push project --expire-in 1d Performous-${GIT_VERSION}-Linux.deb --force --destination Performous-${GIT_VERSION}-Linux-clang.deb
-            - artifact push project --expire-in 1d Performous-${GIT_VERSION}-Linux.rpm --force --destination Performous-${GIT_VERSION}-Linux-clang.rpm
+      epilogue:
+        commands:
+          - echo making artifacts for $COMPILER
+          - cpack -G TGZ
+          - cpack -G DEB
+          - cpack -G RPM
+          - GIT_VERSION=$(git rev-parse --short HEAD)
+          - artifact push project --expire-in 1d Performous-${GIT_VERSION}-Linux.tar.gz --force --destination Performous-${GIT_VERSION}-Linux-${COMPILER}.tar.gz
+          - artifact push project --expire-in 1d Performous-${GIT_VERSION}-Linux.deb --force --destination Performous-${GIT_VERSION}-Linux-${COMPILER}.deb
+          - artifact push project --expire-in 1d Performous-${GIT_VERSION}-Linux.rpm --force --destination Performous-${GIT_VERSION}-Linux-${COMPILER}.rpm
 
   - name: MacOS 10.14.6 Build
     execution_time_limit:
