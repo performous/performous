@@ -1,17 +1,21 @@
 #pragma once
 
-#include "controllers.hh"
-#include "singleton.hh"
 #include "animvalue.hh"
-#include "opengl_text.hh"
-#include "video_driver.hh"
+#include "controllers.hh"
 #include "dialog.hh"
-#include "playlist.hh"
 #include "fbo.hh"
+#include "opengl_text.hh"
+#include "playlist.hh"
+#include "singleton.hh"
+#include "video_driver.hh"
+#include "webserver.hh"
 
 #include <SDL2/SDL_events.h>
-#include <string>
+
+#include <map>
 #include <memory>
+#include <string>
+
 
 class Audio;
 
@@ -48,7 +52,7 @@ class Screen {
 class Game: public Singleton <Game> {
   public:
 	/// constructor
-	Game(Window& window, Audio& audio);
+	Game(Window& window, Audio& audio, Songs& songs);
 	~Game();
 	/// Adds a screen to the manager
 	void addScreen(std::unique_ptr<Screen> s) { 
@@ -101,16 +105,19 @@ class Game: public Singleton <Game> {
 	void showLogo(bool show = true) { m_logoAnim.setTarget(show ? 1.0 : 0.0); }
 	/// Draw the logo
 	void drawLogo();
-	///global playlist access
+	/// global playlist access
 	PlayList& getCurrentPlayList() { return currentPlaylist; }
 #ifdef USE_WEBSERVER
 	void notificationFromWebserver(std::string message) { m_webserverMessage = message; }
 	std::string subscribeWebserverMessages() { return m_webserverMessage; }
 #endif
+	/// Destroys and restarts the webserver
+	void restartWebServer();
 
 private:
 	Audio& m_audio;
 	Window& m_window;
+	std::unique_ptr<WebServer> m_webserver;
 
 public:
 	input::Controllers controllers;
