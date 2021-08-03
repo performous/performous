@@ -31,6 +31,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
 	add_definitions("-DNDEBUG")
 endif()
 
+option(ENABLE_WEBSERVER "Enable webserver support (RESTinio)." ON)
 option(USE_BOOST_FS "Whether to use boost filsystem instead of c++17" FALSE)
 
 if (APPLE)
@@ -125,8 +126,18 @@ add_library(aubio STATIC IMPORTED)
 set_target_properties(aubio PROPERTIES IMPORTED_LOCATION ${AUBIO_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}aubio${CMAKE_STATIC_LIBRARY_SUFFIX})
 add_dependencies(aubio build-aubio-from-sources)
 
-add_subdirectory(data)
+if(ENABLE_WEBSERVER)
+		add_subdirectory(3rdparty/restinio/dev)
+		message(STATUS "Webserver support: Enabled")
+		add_definitions("-DUSE_WEBSERVER")
+		set(NEEDED_BOOST_VERSION 1.66)
+else()
+	set(NEEDED_BOOST_VERSION 1.58)
+	message(STATUS "Webserver support: Disabled (explicitly disabled)")
+endif()
 
+
+add_subdirectory(data)
 add_subdirectory(game)
 add_subdirectory(3rdparty/ced)
 add_subdirectory(docs)
@@ -144,8 +155,6 @@ else()
 endif()
 
 target_compile_features(nlohmann_json INTERFACE cxx_std_14)
-
-add_subdirectory(3rdparty/restinio/dev)
 
 if(WIN32)
 	install(FILES win32/ConfigureSongDirectory.bat DESTINATION .)
