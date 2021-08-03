@@ -15,17 +15,13 @@ class Song;
 #include <nlohmann/json.hpp>
 #include <restinio/all.hpp>
 #include <restinio/helpers/http_field_parsers/cache-control.hpp>
-#ifdef USE_BOOST_REGEX
-#include <restinio/router/boost_regex_engine.hpp>
-using Performous_Router_t = restinio::router::express_router_t<restinio::router::boost_regex_engine_t>;
-#else
 #include <restinio/router/std_regex_engine.hpp>
-using Performous_Router_t = restinio::router::express_router_t<restinio::router::std_regex_engine_t>;
-#endif
 
 #include <map>
 #include <memory>
 #include <vector>
+
+using Performous_Router_t = restinio::router::express_router_t<restinio::router::std_regex_engine_t>;
 
 /**
 * Class in charge of accepting remote connections. In practice, it's only used if a custom Subnet mask is set for the server.
