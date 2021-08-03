@@ -57,7 +57,7 @@ class LayoutSinger {
   public:
 	enum PositionMode {FULL, TOP, BOTTOM, LEFT, RIGHT};
 	/// ThemeSing is optional if you want to use drawScore only
-	LayoutSinger(VocalTrack& vocal, Database& database, std::shared_ptr<ThemeSing> theme = std::make_shared<ThemeSing>());
+	LayoutSinger(VocalTrack& vocal, Database& database, NoteGraphScalerPtr const&, std::shared_ptr<ThemeSing> theme = std::make_shared<ThemeSing>());
 	~LayoutSinger();
 	void reset();
 	void draw(double time, PositionMode position = LayoutSinger::FULL);
