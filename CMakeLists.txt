@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(GetGitRevisionDescription)
 git_describe(PROJECT_VERSION --tags)
@@ -140,6 +141,8 @@ else()
 	set(JSON_Install OFF CACHE INTERNAL "")
 	add_subdirectory(3rdparty/json)
 endif()
+
+target_compile_features(nlohmann_json INTERFACE cxx_std_14)
 
 if(WIN32)
 	install(FILES win32/ConfigureSongDirectory.bat DESTINATION .)
