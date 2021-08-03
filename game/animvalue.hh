@@ -91,9 +91,9 @@ class AnimAcceleration {
 		return m_position;
 	}
 	/// get target
-	unsigned int getTarget() const { return m_target; };
+	std::size_t getTarget() const { return m_target; };
 	/// set target
-	void setTarget(unsigned int target, unsigned int songs) {
+	void setTarget(std::size_t target, std::size_t songs) {
 		m_target = target;
 		if (m_songs == songs) return;
 		// Number of songs has changed => reset animation
@@ -107,8 +107,8 @@ class AnimAcceleration {
 	double getVelocity() const { return m_velocity; }
 
   private:
-	unsigned int m_target;
-	unsigned int m_songs;
+	std::size_t m_target;
+	std::size_t m_songs;
 	double m_position;
 	double m_velocity;
 	double m_marginLeft;
