@@ -178,6 +178,8 @@ if(WIN32)
   target_link_libraries(performous PRIVATE wsock32 ws2_32)
 endif()
 
+target_link_libraries(performous PRIVATE ced aubio nlohmann_json::nlohmann_json)
+
 if(APPLE)
 	list(APPEND LIBS "-framework Accelerate")
 endif()
