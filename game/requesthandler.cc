@@ -2,20 +2,42 @@
 #include "unicode.hh"
 
 #ifdef USE_WEBSERVER
-RequestHandler::RequestHandler(Songs& songs):m_songs(songs)
-{
-}
-RequestHandler::RequestHandler(std::string url, Songs& songs):m_listener(url),m_songs(songs)
-{
+
+// RequestHandler::RequestHandler(Songs& songs):m_songs(songs),
+// m_restinio_server {
+//         	restinio::own_io_context(),
+//         	[&](auto& settings) {
+//         		settings
+//                 .port( port )
+//                 .address( url )
+//                 .separate_accept_and_create_connect(true)
+//                 .request_handler(std::make_unique<Performous_Router_t>());
+//                 } {}
+
+RequestHandler::RequestHandler(std::string url, unsigned short port, Songs& songs):m_listener("http://" + url), m_songs(songs), m_restinio_server(restinio::own_io_context(), make_server_settings(url, port)) {
     m_listener.support(web::http::methods::GET, std::bind(&RequestHandler::Get, this, std::placeholders::_1));
     m_listener.support(web::http::methods::PUT, std::bind(&RequestHandler::Put, this, std::placeholders::_1));
     m_listener.support(web::http::methods::POST, std::bind(&RequestHandler::Post, this, std::placeholders::_1));
     m_listener.support(web::http::methods::DEL, std::bind(&RequestHandler::Delete, this, std::placeholders::_1));
+}
 
+Performous_Server_Settings RequestHandler::make_server_settings(const std::string &url, unsigned short port) {
+    auto settings = Performous_Server_Settings(config["webserver/threads"].i());
+    settings
+    .port( port )
+    .address( url )
+    .separate_accept_and_create_connect(true)
+    .request_handler(init_webserver_router())
+    .read_next_http_message_timelimit(std::chrono::seconds(config["webserver/http_timelimit"].i()))
+    .write_http_response_timelimit(std::chrono::seconds(config["webserver/write_http_timelimit"].i()))
+    .handle_request_timeout(std::chrono::seconds(config["webserver/timeout"].i()))
+    .buffer_size(std::size_t(config["webserver/buffer_size"].i()))
+    .concurrent_accepts_count(config["webserver/threads"].i())
+    .max_pipelined_requests(config["webserver/request_pipeline"].i());
+    return settings;
 }
-RequestHandler::~RequestHandler()
-{
-}
+
+RequestHandler::~RequestHandler() {}
 
 void RequestHandler::Error(pplx::task<void>& t)
 {
@@ -26,6 +48,31 @@ void RequestHandler::Error(pplx::task<void>& t)
     catch(...)
     {
     }
+}
+
+std::unique_ptr<Performous_Router_t> RequestHandler::init_webserver_router() {
+	auto router = std::make_unique<Performous_Router_t>();
+	router->http_get( "/single/:param", []( auto req, auto params ){
+		return
+			init_resp( req->create_response() )
+				.set_body(
+					fmt::format(
+						"GET request with single parameter: '{}'",
+						params[ "param" ] ) )
+				.done();
+	} );
+	// GET request to homepage.
+	router->http_get( "/", []( auto req, auto ){
+		return
+			init_resp( req->create_response() )
+				.set_body( "GET request to the homepage.")
+				.done();
+	} );
+    router->non_matched_request_handler(
+            [](auto req){
+                return req->create_response(restinio::status_not_found()).connection_close().done();
+            });
+	return router;
 }
 
 void RequestHandler::HandleFile(web::http::http_request request, std::string filePath) {

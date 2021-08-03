@@ -139,10 +139,13 @@ else()
 	message(STATUS "Nlohmann JSON not found; will use included version.")
 	set(JSON_BuildTests OFF CACHE INTERNAL "")
 	set(JSON_Install OFF CACHE INTERNAL "")
+	set(BUILD_TESTING OFF CACHE INTERNAL "")
 	add_subdirectory(3rdparty/json)
 endif()
 
 target_compile_features(nlohmann_json INTERFACE cxx_std_14)
+
+add_subdirectory(3rdparty/restinio/dev)
 
 if(WIN32)
 	install(FILES win32/ConfigureSongDirectory.bat DESTINATION .)
