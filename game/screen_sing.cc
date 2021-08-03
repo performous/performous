@@ -17,6 +17,7 @@
 #include "video.hh"
 #include "webcam.hh"
 #include "screen_songs.hh"
+#include "notegraphscalerfactory.hh"
 
 #include <boost/format.hpp>
 #include <iostream>
@@ -122,9 +123,11 @@ void ScreenSing::setupVocals() {
 			selectedTracks.push_back(vocal);
 			shownTracks.insert(vocal);
 		}
+
 		//if (shownTracks.size() > 2) throw std::runtime_error("Too many tracks chosen. Only two vocal tracks can be used simultaneously.")
 		for (auto const& trk: shownTracks) {
-			auto layoutSingerPtr = std::unique_ptr<LayoutSinger>(std::make_unique<LayoutSinger>(*trk, m_database, theme));
+			const auto scaler = NoteGraphScalerFactory().create();
+			auto layoutSingerPtr = std::unique_ptr<LayoutSinger>(std::make_unique<LayoutSinger>(*trk, m_database, scaler, theme));
 			m_layout_singer.push_back(std::move(layoutSingerPtr));
 		}
 		// Note: Engine maps tracks with analyzers 1:1. If user doesn't have mics, we still want to have singer layout enabled but without engine...
