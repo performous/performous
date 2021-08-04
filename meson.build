@@ -6,6 +6,9 @@ project('performous',
         meson_version: '>=0.53.0',
         license : 'GPL-2.0-or-later')
 
+compact_enc_det = subproject('ced')
+compact_enc_det_dep = compact_enc_det.get_variable('compact_enc_det_dep') 
+
 #Print project summary.  Limited to strict minimum for now
 summary({'Use Open CV': get_option('usewebcam'),
          'Use Port Midi': get_option('usemididrum'),
@@ -168,10 +171,6 @@ dependencies = [
 ]
 
 executable('performous', [
-  '3rdparty/ced/compact_enc_det/compact_enc_det.cc',
-  '3rdparty/ced/compact_enc_det/compact_enc_det_hint_code.cc',
-  '3rdparty/ced/util/encodings/encodings.cc',
-  '3rdparty/ced/util/languages/languages.cc',
   'game/3dobject.cc',
   'game/audio.cc',
   'game/backgrounds.cc',
@@ -240,7 +239,6 @@ executable('performous', [
   'game/webserver.cc'
 ],
   dependencies : dependencies,
-  include_directories : include_directories('3rdparty/ced'),
   cpp_args : compiler_args,
   install: true
 )
