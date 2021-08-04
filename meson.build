@@ -189,7 +189,7 @@ executable('performous', [
   'game/engine.cc',
   'game/execname.cc',
   'game/ffmpeg.cc',
-  'game/fixnotegraphscaler.cc',
+  'game/fixednotegraphscaler.cc',
   'game/fs.cc',
   'game/game.cc',
   'game/glshader.cc',

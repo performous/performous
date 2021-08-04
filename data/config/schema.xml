@@ -217,7 +217,7 @@ to save the current settings to XML.
 	<entry name="game/notegraphscalingmode" type="int" value="0">
 		<limits>
 			<enum>Dynamic</enum>
-			<enum>Fix</enum>
+			<enum>Fixed</enum>
 		</limits>
 		<short>Note Graph Scaling</short>
 		<long>Type of scaling the note graph.</long>
