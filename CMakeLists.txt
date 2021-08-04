@@ -83,6 +83,7 @@ else()
 	message(STATUS "Localization disabled: Gettext tools (msgfmt) missing")
 endif()
 
+#FIXME: Purposefully not changing aubio here either, to make sure this doesn't break any open PRs.
 if (APPLE)
 	set_property(GLOBAL PROPERTY BLA_VENDOR APPLE)
 	set(ACCELERATE_COMMAND "--enable-accelerate")
@@ -120,6 +121,7 @@ ExternalProject_Add(build-aubio-from-sources
 	INSTALL_COMMAND ""
 )
 
+
 ExternalProject_Get_Property(build-aubio-from-sources INSTALL_DIR)
 set (AUBIO_INSTALL_DIR ${INSTALL_DIR})
 add_library(aubio STATIC IMPORTED)
@@ -127,7 +129,7 @@ set_target_properties(aubio PROPERTIES IMPORTED_LOCATION ${AUBIO_INSTALL_DIR}/li
 add_dependencies(aubio build-aubio-from-sources)
 
 if(ENABLE_WEBSERVER)
-		add_subdirectory(3rdparty/restinio/dev)
+		add_subdirectory(subprojects/restinio/dev)
 		message(STATUS "Webserver support: Enabled")
 		add_definitions("-DUSE_WEBSERVER")
 		set(NEEDED_BOOST_VERSION 1.66)
@@ -139,7 +141,7 @@ endif()
 
 add_subdirectory(data)
 add_subdirectory(game)
-add_subdirectory(3rdparty/ced)
+add_subdirectory(3rdparty/ced) # FIXME: Purposefully not changing ced here, to make sure this doesn't break any open PRs.
 add_subdirectory(docs)
 
 find_package(nlohmann_json 3.9.1 QUIET)
@@ -151,7 +153,7 @@ else()
 	set(JSON_BuildTests OFF CACHE INTERNAL "")
 	set(JSON_Install OFF CACHE INTERNAL "")
 	set(BUILD_TESTING OFF CACHE INTERNAL "")
-	add_subdirectory(3rdparty/json)
+	add_subdirectory(subprojects/nlohmann_json)
 endif()
 
 target_compile_features(nlohmann_json INTERFACE cxx_std_14)
