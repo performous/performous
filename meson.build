@@ -7,7 +7,10 @@ project('performous',
         license : 'GPL-2.0-or-later')
 
 compact_enc_det = subproject('ced')
+nlohmann_json = subproject('nlohmann_json')
+
 compact_enc_det_dep = compact_enc_det.get_variable('compact_enc_det_dep') 
+nlohmann_json_dep = dependency('nlohmann_json', fallback : [nlohmann_json, nlohmann_json_dep])
 
 #Print project summary.  Limited to strict minimum for now
 summary({'Use Open CV': get_option('usewebcam'),
