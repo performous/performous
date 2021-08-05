@@ -124,7 +124,6 @@ blocks:
     dependencies: []
     task:
       prologue:
-        parallelism: 6
         commands:
           - docker pull ooshlablu/performous-build:ubuntu18.04
           - docker pull ooshlablu/performous-build:ubuntu20.04
