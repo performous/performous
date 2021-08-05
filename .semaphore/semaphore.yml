@@ -140,7 +140,7 @@ blocks:
           commands:
             - echo "Testing Fedora 32 pull and build"
             - docker run ooshlablu/performous-build:fedora32 ./build_performous.sh
-        - name: Fedora 32 Conntainer
+        - name: Fedora 33 Conntainer
           commands:
             - echo "Testing Fedora 33 pull and build"
             - docker run ooshlablu/performous-build:fedora33 ./build_performous.sh
