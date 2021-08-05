@@ -117,3 +117,35 @@ blocks:
             - meson setup build.clang -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true
             - echo "Building..."
             - meson compile -C build.clang
+
+  - name: Docker test
+    execution_time_limit:
+      minutes: 10
+    dependencies: []
+    task:
+      prologue:
+        commands:
+          - echo "Checking out..."
+          - checkout
+      jobs:
+        - name: Ubuntu 18.04 Container
+          commands:
+            - echo "Testing 18.04 pull and build"
+            - docker run ooshlablu/performous-build:ubuntu18.04 ./build_performous.sh
+        - name: Ubuntu 20.04 Container
+          commands:
+            - echo "Testing 20.04 pull and build"
+            - docker run ooshlablu/performous-build:ubuntu20.04 ./build_performous.sh
+        - name: Fedora 32 Conntainer
+          commands:
+            - echo "Testing Fedora 32 pull and build"
+            - docker run ooshlablu/performous-build:fedora32 ./build_performous.sh
+        - name: Fedora 32 Conntainer
+          commands:
+            - echo "Testing Fedora 33 pull and build"
+            - docker run ooshlablu/performous-build:fedora33 ./build_performous.sh
+        - name: Fedora 34 Conntainer
+          commands:
+            - echo "Testing Fedora 34 pull and build"
+            - docker run ooshlablu/performous-build:fedora34 ./build_performous.sh
+
