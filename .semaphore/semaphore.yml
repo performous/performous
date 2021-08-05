@@ -148,27 +148,27 @@ blocks:
           commands:
             - echo "Running the build script in the Ubuntu 20.04 container"
             - docker run ooshlablu/performous-build:ubuntu20.04 ./build_performous.sh -m -b ${SEMAPHORE_GIT_SHA}
-        - name: Fedora 32
+        - name: Fedora 32 Cmake
           commands:
             - echo "Running the build script in the Fedora 32 container"
             - docker run ooshlablu/performous-build:fedora32 ./build_performous.sh -c -b ${SEMAPHORE_GIT_SHA}
-        - name: Fedora 32
+        - name: Fedora 32 Meson
           commands:
             - echo "Running the build script in the Fedora 32 container"
             - docker run ooshlablu/performous-build:fedora32 ./build_performous.sh -m -b ${SEMAPHORE_GIT_SHA}
-        - name: Fedora 33
+        - name: Fedora 33 Cmake
           commands:
             - echo "Running the build script in the Fedora 33 container"
             - docker run ooshlablu/performous-build:fedora33 ./build_performous.sh -c -b ${SEMAPHORE_GIT_SHA}
-        - name: Fedora 33
+        - name: Fedora 33 Meson
           commands:
             - echo "Running the build script in the Fedora 33 container"
             - docker run ooshlablu/performous-build:fedora33 ./build_performous.sh -m -b ${SEMAPHORE_GIT_SHA}
-        - name: Fedora 34
+        - name: Fedora 34 Cmake
           commands:
             - echo "Running the build script in the Fedora 34 container"
             - docker run ooshlablu/performous-build:fedora34 ./build_performous.sh -c -b ${SEMAPHORE_GIT_SHA}
-        - name: Fedora 34
+        - name: Fedora 34 Meson
           commands:
             - echo "Running the build script in the Fedora 34 container"
             - docker run ooshlablu/performous-build:fedora34 ./build_performous.sh -m -b ${SEMAPHORE_GIT_SHA}
