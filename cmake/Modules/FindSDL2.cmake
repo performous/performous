@@ -274,7 +274,7 @@ if(SDL2_LIBRARY)
   # So I use a temporary variable until the end so I can set the
   # "real" variable in one-shot.
   if(APPLE)
-    set(SDL2_LIBRARIES ${SDL2_LIBRARIES} -framework Cocoa)
+    set(SDL2_LIBRARIES ${SDL2_LIBRARIES} "-framework Cocoa")
   endif()
 
   # For threads, as mentioned Apple doesn't need this.
@@ -343,7 +343,7 @@ if(SDL2_FOUND)
       # For OS X, SDL2 uses Cocoa as a backend so it must link to Cocoa.
       # For more details, please see above.
       set_property(TARGET SDL2::Core APPEND PROPERTY
-                   INTERFACE_LINK_OPTIONS -framework Cocoa)
+                   INTERFACE_LINK_OPTIONS "-framework Cocoa")
     else()
       # For threads, as mentioned Apple doesn't need this.
       # For more details, please see above.
