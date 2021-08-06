@@ -86,6 +86,9 @@ else()
     target_link_libraries(fs PRIVATE std::filesystem)
 endif()
 
+find_package(SDL2 REQUIRED)
+target_link_libraries(performous PRIVATE SDL2::Main)
+
 find_package(ICU 60 REQUIRED uc data i18n io)
 target_include_directories(performous SYSTEM PRIVATE ${ICU_INCLUDE_DIRS})
 target_link_libraries(performous PRIVATE ${ICU_LIBRARIES})
@@ -100,7 +103,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(deps REQUIRED IMPORTED_TARGET glib-2.0 gio-2.0 gobject-2.0)
 
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM)
+foreach(lib ${OUR_LIBS} PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM)
 	find_package(${lib} REQUIRED)
 	message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
 	target_include_directories(performous SYSTEM PRIVATE ${${lib}_INCLUDE_DIRS})
