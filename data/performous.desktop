@@ -1,4 +1,5 @@
 [Desktop Entry]
+Type=Application
 Name=Performous
 Comment=A karaoke game
 Comment[de]=Ein Karaoke-Spiel
@@ -8,9 +9,8 @@ Comment[fr]=Un jeu de Karaoké
 Comment[it]=Un gioco di karaoke
 Comment[ro]=Un joc de tip karaoke
 Comment[se]=Ett karaoke-spel
-Exec=performous
 Icon=performous
+Exec=performous
 Terminal=false
-Type=Application
 Categories=Game;ArcadeGame;
-Keywords=song;music;dance;karaoke;microphone;sound;singing;
+Keywords=game;song;music;dance;karaoke;microphone;sound;singing;
