@@ -30,10 +30,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
 	add_definitions("-DNDEBUG")
 endif()
 
-if (USE_BOOST_REGEX)
-        add_definitions(-DUSE_BOOST_REGEX)
-endif()
-
 option(USE_BOOST_FS "Whether to use boost filsystem instead of c++17" FALSE)
 
 if (APPLE)
@@ -84,8 +80,6 @@ if(Gettext_FOUND)
 else()
 	message(STATUS "Localization disabled: Gettext tools (msgfmt) missing")
 endif()
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/ced)
 
 if (APPLE)
 	set_property(GLOBAL PROPERTY BLA_VENDOR APPLE)
