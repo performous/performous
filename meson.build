@@ -87,12 +87,12 @@ endif
 # Dependencies
 nulldependency = dependency('', required: false)
 
-libxmlpp = dependency('libxml++-3.0', required: false)
+libxmlpp = dependency('libxml++-3.0', cmake_module_path: './cmake/Modules', required: false)
 if libxmlpp.found()
   conf.set('LIBXMLPP_VERSION_3_0', 1)
   conf.set('LIBXMLPP_VERSION_2_6', 0)
 else
-  libxmlpp = dependency('libxml++-2.6', required: true)
+  libxmlpp = dependency('libxml++-2.6', cmake_module_path: './cmake/Modules', required: true)
   conf.set('LIBXMLPP_VERSION_2_6', 1)
   conf.set('LIBXMLPP_VERSION_3_0', 0)
   warning('libxml++-2.6 is deprecated.  Use a more recent version if possible.')
@@ -101,9 +101,12 @@ endif
 # OpenCV may be referred to as opencv or opencv4
 opencv = nulldependency
 if get_option('usewebcam')
-  opencv = dependency('opencv', required: false)
+  opencv = dependency('opencv', modules : ['opencv_core', 'opencv_videoio'], required: false)
   if not opencv.found()
-    opencv = dependency('opencv4', required: true)
+    opencv = dependency('opencv3', modules : ['opencv_core', 'opencv_videoio'], required: false)
+      if not opencv.found()
+        opencv = dependency('opencv4', modules : ['opencv_core', 'opencv_videoio'], required: true)
+      endif
   endif
 endif
 
@@ -111,11 +114,19 @@ endif
 # with both names libportmidi (on ubuntu) and portmidi (on OSX)
 portmidi = nulldependency
 if get_option('usemididrum')
-  portmidi = dependency('portmidi', required: false)
+  portmidi = dependency('portmidi', cmake_module_path: './cmake/Modules', required: false)
   if not portmidi.found()
-    portmidi = compiler.find_library('libportmidi', required: false)
+    if (host_machine.system() == 'darwin')
+      portmidi = compiler.find_library('libportmidi', dirs: ['/usr/lib','/usr/local/lib','/opt/local/lib'], required: false)
+    else
+      portmidi = compiler.find_library('libportmidi', required: false)
+    endif
     if not portmidi.found()
-      portmidi = compiler.find_library('portmidi', required: true)
+      if (host_machine.system() == 'darwin')
+        portmidi = compiler.find_library('portmidi', dirs: ['/usr/lib','/usr/local/lib','/opt/local/lib'], required: true)
+      else
+        portmidi = compiler.find_library('portmidi', required: true)
+      endif
     endif
   endif
 endif
@@ -125,8 +136,8 @@ cpprest = nulldependency
 libssl = nulldependency
 libcrypto = nulldependency
 if get_option('usewebserver')
-  libssl = dependency('libssl', required: true)
-  libcrypto = dependency('libcrypto', required: true)
+  libssl = dependency('libssl', cmake_module_path: './cmake/Modules', required: true)
+  libcrypto = dependency('libcrypto', cmake_module_path: './cmake/Modules', required: true)
   cpprest = dependency('cpprest', required: false)
   if not cpprest.found()
     cpprest = compiler.find_library('libcpprest', required: false)
@@ -167,25 +178,25 @@ endif
 configure_file(input: 'game/config.hh.in', output: 'config.hh', configuration: conf)
 
 dependencies = [
-  dependency('pangocairo'),
-  dependency('sdl2'),
+  dependency('pangocairo', cmake_module_path: './cmake/Modules'),
+  dependency('sdl2', cmake_module_path: './cmake/Modules'),
   dependency('aubio'),
   dependency('boost', modules: boostmodules),
-  dependency('epoxy'),
-  dependency('icu-uc'),
-  dependency('icu-i18n'),
-  dependency('icu-io'),
-  dependency('libpng'),
-  dependency('libjpeg'),
-  dependency('librsvg-2.0'),
-  dependency('libavcodec'),
-  dependency('libavformat'),
-  dependency('libavutil'),
-  dependency('libswscale'),
-  dependency('libswresample'),
-  dependency('portaudio-2.0'),
-  dependency('fontconfig'),
-  dependency('glm'),
+  dependency('epoxy', cmake_module_path: './cmake/Modules'),
+  dependency('icu-uc', cmake_module_path: './cmake/Modules'),
+  dependency('icu-i18n', cmake_module_path: './cmake/Modules'),
+  dependency('icu-io', cmake_module_path: './cmake/Modules'),
+  dependency('libpng', cmake_module_path: './cmake/Modules'),
+  dependency('libjpeg', cmake_module_path: './cmake/Modules'),
+  dependency('librsvg-2.0', cmake_module_path: './cmake/Modules'),
+  dependency('libavcodec', cmake_module_path: './cmake/Modules'),
+  dependency('libavformat', cmake_module_path: './cmake/Modules'),
+  dependency('libavutil', cmake_module_path: './cmake/Modules'),
+  dependency('libswscale', cmake_module_path: './cmake/Modules'),
+  dependency('libswresample', cmake_module_path: './cmake/Modules'),
+  dependency('portaudio-2.0', cmake_module_path: './cmake/Modules'),
+  dependency('fontconfig', cmake_module_path: './cmake/Modules'),
+  dependency('glm', cmake_module_path: './cmake/Modules'),
   libssl,
   libcrypto,
   libxmlpp,
