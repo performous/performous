@@ -5,11 +5,7 @@
 #include <array>
 #include <iostream>
 
-#if ((BOOST_VERSION / 100 % 1000) >= 55)
 #include <boost/predef/os.h>
-#else
-#include "../boost_predef/os.h"
-#endif
 
 #include <SDL2/SDL_events.h>
 
@@ -25,9 +21,9 @@ using STAT = struct stat;
 #endif
 
 struct Platform {
-enum platforms { windows, linux, macos, bsd, solaris, unix };
+enum HostOS { OS_WIN, OS_LINUX, OS_MAC, OS_BSD, OS_SOLARIS, OS_UNIX };
 Platform();
-static platforms currentOS();
+static HostOS currentOS();
 static uint16_t shortcutModifier(bool eitherSide = true);
 static int defaultBackEnd();
 

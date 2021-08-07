@@ -55,8 +55,8 @@ void Analyzer::output(float* begin, float* end, double rate) {
 	const unsigned out = (end - begin) / 2 /* stereo */;
 	if (out == 0) return;
 	const unsigned in = m_resampleFactor * (m_rate / rate) * out + 2 * a /* lanczos kernel */ + 5 /* safety margin for rounding errors */;
-	float pcm[m_passthrough.capacity];
-	m_passthrough.read(pcm, pcm + in + 4);
+	std::vector<float> pcm(m_passthrough.capacity);
+	m_passthrough.read(pcm.data(), pcm.data() + in + 4);
 	for (unsigned i = 0; i < out; ++i) {
 		double s = 0.0;
 		unsigned k = m_resamplePos;
