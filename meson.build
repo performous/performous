@@ -1,54 +1,74 @@
-#Project definition
+# Project definition
 project('performous',
         'cpp',
         version: '1.x',
-        default_options : ['cpp_std=c++17','buildtype=debugoptimized'],
+        default_options: ['cpp_std=c++17','buildtype=debugoptimized'],
         meson_version: '>=0.53.0',
-        license : 'GPL-2.0-or-later')
+        license: 'GPL-2.0-or-later')
 
-#Print project summary.  Limited to strict minimum for now
-summary({'Use Open CV': get_option('usewebcam'),
-         'Use Port Midi': get_option('usemididrum'),
-         'Use Web Server': get_option('usewebserver')
+# Print project summary. Limited to strict minimum for now
+summary({'Use Webcam': get_option('usewebcam'),
+         'Use Midi Drum': get_option('usemididrum'),
+         'Use Web Server': get_option('usewebserver'),
+         'Compilation warnings as errors': get_option('warningaserror')
         }, section: 'Build Options')
 
-#Add git describe output to version number.
-#This does not appear work on semaphore, maybe because of stdout.
-#If it fails, falls back to the project version defined above, without git reference.
+pymodule = import('python')
+python3 = pymodule.find_installation()
+
+if host_machine.system() == 'darwin'
+  warning('Targetting a version of macOS different than the one running is not supported on Meson.')
+endif
+
+# Add git describe output to version number.
+# This does not appear work on semaphore, maybe because of stdout.
+# If it fails, falls back to the project version defined above, without git reference.
 version = meson.project_version()
 git = find_program('git', required: true)
 if git.found()
   gitcmd = run_command(git, 'describe')
   if gitcmd.returncode() == 0
-    version = meson.project_version()+' (git: '+gitcmd.stdout().strip() +')'
+    version = meson.project_version() + ' (git: ' + gitcmd.stdout().strip() + ')'
   endif
 endif
 
-#Configuration
+# Configuration
 conf = configuration_data()
 conf.set('CMAKE_PROJECT_NAME', 'Performous')
 conf.set('PROJECT_VERSION', version)
 conf.set('LOCALE_DIR', 'share/locale')
 conf.set('SHARE_INSTALL', 'share/games/performous')
 
-#Compilers flags.  Some warnings really should be enabled (eg narrowing, overflow etc) but some legacy code
-#has too many of those for the output to be useful.
-#LTO is used if it is available on GCC (10+), but not on clang as it does not seem to be linking fine
-compiler=meson.get_compiler('cpp')
+# Convert options to project arguments
+if get_option('usemididrum')
+  add_project_arguments('-DUSE_PORTMIDI', language: 'cpp')
+endif
+if get_option('usewebcam')
+  add_project_arguments('-DUSE_OPENCV', language: 'cpp')
+endif
+if get_option('usewebserver')
+  add_project_arguments('-DUSE_WEBSERVER', language: 'cpp')
+endif
+
+# Compilers flags.  Some warnings really should be enabled (eg narrowing, overflow etc) but some legacy code
+# has too many of those for the output to be useful.
+# LTO is used if it is available on GCC (10+), but not on clang as it does not seem to be linking fine
+compiler = meson.get_compiler('cpp')
 if compiler.get_id() == 'gcc'
-  compiler_args=compiler.get_supported_arguments(
+  compiler_args = compiler.get_supported_arguments(
     ['-Wall','-Wextra','-pedantic','-Wc++20-compat',
     '-Wno-deprecated-declarations',
     '-Wno-mismatched-tags',
     '-Wno-narrowing',
     '-Wno-overflow',
     '-flto'])
-  #Treat all warnings as errors if requested
-  if get_option('stoponwarning')
-    compiler_args+=['-Werror']
-  endif
+    # Treat all warnings as errors if requested
+    # Currently only for the gcc build, as clang returns more warnings that still need fixing
+    if get_option('warningaserror')
+      compiler_args += ['-Werror']
+    endif
 else
-  compiler_args=compiler.get_supported_arguments(
+  compiler_args = compiler.get_supported_arguments(
     ['-Wall','-Wextra','-pedantic','-Wc++20-compat',
     '-Wno-c++11-narrowing',
     '-Wno-implicit-int-float-conversion',
@@ -57,115 +77,132 @@ else
     '-Wno-mismatched-tags'])
 endif
 
-#Link with stdc++fs if it is supplied by the compiler (gcc v8 or older, clang v10 or older)
-#This is currently necessary on semaphore CI, which is running gcc8 max.
-#Has_Link_Argument is only supported in meson 0.46+
+# Link with stdc++fs if it is supplied by the compiler (gcc v8 or older, clang v10 or older)
+# This is currently necessary on semaphore CI, which is running gcc8 max.
+# Has_Link_Argument is only supported in meson 0.46+
 if compiler.has_link_argument('-lstdc++fs')
   add_project_link_arguments(['-lstdc++fs'], language: 'cpp')
 endif
 
-#Dependencies
-libxmlpp = dependency('libxml++-3.0', required : false)
+# Dependencies
+nulldependency = dependency('', required: false)
+
+libxmlpp = dependency('libxml++-3.0', cmake_module_path: './cmake/Modules', required: false)
 if libxmlpp.found()
   conf.set('LIBXMLPP_VERSION_3_0', 1)
   conf.set('LIBXMLPP_VERSION_2_6', 0)
 else
-  libxmlpp = dependency('libxml++-2.6')
+  libxmlpp = dependency('libxml++-2.6', cmake_module_path: './cmake/Modules', required: true)
   conf.set('LIBXMLPP_VERSION_2_6', 1)
   conf.set('LIBXMLPP_VERSION_3_0', 0)
+  warning('libxml++-2.6 is deprecated.  Use a more recent version if possible.')
 endif
 
-#OpenCV may be referred to as opencv or opencv4
+# OpenCV may be referred to as opencv or opencv4
+opencv = nulldependency
 if get_option('usewebcam')
-  message('OpenCV build requested')
-  opencv = dependency('opencv', required: false)
-  if opencv.found()
-      add_project_arguments('-DUSE_OPENCV', language : 'cpp')
-  else
-    opencv = dependency('opencv4', method : 'pkg-config', required: false)
-    if opencv.found()
-      add_project_arguments('-DUSE_OPENCV', language : 'cpp')
-    else
-      error('OpenCV not found but webcam build requested')
-    endif
+  opencv = dependency('opencv', modules : ['opencv_core', 'opencv_videoio'], required: false)
+  if not opencv.found()
+    opencv = dependency('opencv3', modules : ['opencv_core', 'opencv_videoio'], required: false)
+      if not opencv.found()
+        opencv = dependency('opencv4', modules : ['opencv_core', 'opencv_videoio'], required: true)
+      endif
   endif
-else
-  opencv=dependency('',required: false)
 endif
 
-#Portmidi is maybe not found in pkg-config, use find library as an alternative
+# Portmidi is maybe not found in pkg-config, use find library as an alternative,
+# with both names libportmidi (on ubuntu) and portmidi (on OSX)
+portmidi = nulldependency
 if get_option('usemididrum')
-  message('Portmidi build requested')
-  portmidi = dependency('portmidi', required: false)
-  if portmidi.found()
-    add_project_arguments('-DUSE_PORTMIDI', language: 'cpp')
-  else
-    portmidi = compiler.find_library('libportmidi', required: false)
-    if portmidi.found()
-      add_project_arguments('-DUSE_PORTMIDI', language: 'cpp')
+  portmidi = dependency('portmidi', cmake_module_path: './cmake/Modules', required: false)
+  if not portmidi.found()
+    if (host_machine.system() == 'darwin')
+      portmidi = compiler.find_library('libportmidi', dirs: ['/usr/lib','/usr/local/lib','/opt/local/lib'], required: false)
     else
-      error('PORTMIDI not found but MIDI drum support build requested')
+      portmidi = compiler.find_library('libportmidi', required: false)
+    endif
+    if not portmidi.found()
+      if (host_machine.system() == 'darwin')
+        portmidi = compiler.find_library('portmidi', dirs: ['/usr/lib','/usr/local/lib','/opt/local/lib'], required: true)
+      else
+        portmidi = compiler.find_library('portmidi', required: true)
+      endif
     endif
   endif
-else
-  portmidi=dependency('',required: false)
 endif
 
-#Cpprest may not be in pkg-config
-#Also, libssl and libcrypto are only needed when webserver support is requested
+# Note: cpprest may not be in pkg-config
+cpprest = nulldependency
+libssl = nulldependency
+libcrypto = nulldependency
 if get_option('usewebserver')
-  message('Webserver build requested')
-  cpprest=dependency('cpprest', required : false)
-  if cpprest.found()
-    add_project_arguments('-DUSE_WEBSERVER', language: 'cpp')
-  else
-    cpprest=compiler.find_library('libcpprest', required:false)
-    if cpprest.found()
-      add_project_arguments('-DUSE_WEBSERVER', language: 'cpp')
-    else
-      error('CppRestSdk not found but webserver build requested')
+  libssl = dependency('libssl', cmake_module_path: './cmake/Modules', required: true)
+  libcrypto = dependency('libcrypto', cmake_module_path: './cmake/Modules', required: true)
+  cpprest = dependency('cpprest', required: false)
+  if not cpprest.found()
+    cpprest = compiler.find_library('libcpprest', required: false)
+    if not cpprest.found()
+      cpprest = compiler.find_library('cpprest', required: false)
+      if not cpprest.found()
+        cpprest = dependency('cpprestsdk', required: true, method: 'cmake', modules: 'cpprestsdk::cpprest') # Macports
+      endif
     endif
   endif
-else
-  cpprest=dependency('',required: false)
 endif
 
-#Write configuration file
-configure_file(input : 'game/config.hh.in', output : 'config.hh', configuration : conf)
+boostmodules = ['iostreams','locale','program_options','system']
+if host_machine.system() == 'darwin'
+  getMacVersion = run_command(python3,'-c','import platform;print(platform.mac_ver()[0])')
+  if getMacVersion.returncode() == 0
+    macVersion = getMacVersion.stdout()
+    if macVersion.version_compare('<10.15.0') == true
+      message('Detected macOS older than 10.15; will use the Boost implementation of filesystem')
+      boostmodules += ['filesystem'] # Boost::filesystem is used on systems where the standard filesystem is not available
+      conf.set('USE_BOOST_FS', 1)
+    else
+      conf.set('USE_BOOST_FS', 0)
+    endif
+  else
+    error('Can\'t determine macOS version.')
+  endif
+else
+  if not compiler.has_header('filesystem')
+    boostmodules += ['filesystem'] # Boost::filesystem is used on systems where the standard filesystem is not available
+    conf.set('USE_BOOST_FS', 1)
+  else
+    conf.set('USE_BOOST_FS', 0)
+  endif
+endif
+
+# Write configuration file
+configure_file(input: 'game/config.hh.in', output: 'config.hh', configuration: conf)
 
 dependencies = [
-  dependency('pangocairo'),
-  dependency('sdl2'),
+  dependency('pangocairo', cmake_module_path: './cmake/Modules'),
+  dependency('sdl2', cmake_module_path: './cmake/Modules'),
   dependency('aubio'),
-  dependency('boost', modules : [ # Meson treats boost specially: no pkg-config supported
-    'filesystem',
-    'iostreams',
-    'locale',
-    'program_options',
-    'system'
-  ]),
-  dependency('epoxy'),
-  dependency('icu-uc'),
-  dependency('icu-i18n'),
-  dependency('icu-io'),
-  dependency('libpng'),
-  dependency('libjpeg'),
-  dependency('librsvg-2.0'),
-  dependency('libavcodec'),
-  dependency('libavformat'),
-  dependency('libavutil'),
-  dependency('libswscale'),
-  dependency('libswresample'),
-  dependency('portaudio-2.0'),
-  dependency('fontconfig'),
-  dependency('glm'),
-  dependency('libssl', required:get_option('usewebserver')), #Only needed with webserver
-  dependency('libcrypto', required:get_option('usewebserver')), #Idem
+  dependency('boost', modules: boostmodules),
+  dependency('epoxy', cmake_module_path: './cmake/Modules'),
+  dependency('icu-uc', cmake_module_path: './cmake/Modules'),
+  dependency('icu-i18n', cmake_module_path: './cmake/Modules'),
+  dependency('icu-io', cmake_module_path: './cmake/Modules'),
+  dependency('libpng', cmake_module_path: './cmake/Modules'),
+  dependency('libjpeg', cmake_module_path: './cmake/Modules'),
+  dependency('librsvg-2.0', cmake_module_path: './cmake/Modules'),
+  dependency('libavcodec', cmake_module_path: './cmake/Modules'),
+  dependency('libavformat', cmake_module_path: './cmake/Modules'),
+  dependency('libavutil', cmake_module_path: './cmake/Modules'),
+  dependency('libswscale', cmake_module_path: './cmake/Modules'),
+  dependency('libswresample', cmake_module_path: './cmake/Modules'),
+  dependency('portaudio-2.0', cmake_module_path: './cmake/Modules'),
+  dependency('fontconfig', cmake_module_path: './cmake/Modules'),
+  dependency('glm', cmake_module_path: './cmake/Modules'),
+  libssl,
+  libcrypto,
   libxmlpp,
   opencv,
   portmidi,
-  cpprest
-]
+  cpprest]
 
 executable('performous', [
   '3rdparty/ced/compact_enc_det/compact_enc_det.cc',
@@ -237,15 +274,14 @@ executable('performous', [
   'game/video.cc',
   'game/video_driver.cc',
   'game/webcam.cc',
-  'game/webserver.cc'
-],
-  dependencies : dependencies,
-  include_directories : include_directories('3rdparty/ced'),
-  cpp_args : compiler_args,
+  'game/webserver.cc'],
+  dependencies: dependencies,
+  include_directories: include_directories('3rdparty/ced'),
+  cpp_args: compiler_args,
   install: true
 )
 
-#Installation of data files
+# Installation of data files
 datapaths = [
   'data/backgrounds',
   'data/config',
@@ -253,17 +289,18 @@ datapaths = [
   'data/shaders',
   'data/sounds',
   'data/themes',
-  'data/xsl'
-]
+  'data/xsl']
 
 foreach dp: datapaths
-  install_subdir(dp, install_dir: 'share/games/performous')
+  install_subdir( dp, install_dir: 'share/games/performous')
 endforeach
 
-# TBD: desktop file, pixmap files, man etc. see cmake of data and docs dir
-# help2man = find_program('help2man', required: false)
-# if help2man.found()
-#   help2man_opts = [
-#     '--no-info',
-#     '--section=1',
-# Maybe also add a target to build a debian pkg ...
+if host_machine.system() == 'linux'
+  install_data('data/performous.desktop', install_dir: 'share/applications')
+  install_data('data/themes/default/icon.svg', rename: 'performous.svg', install_dir: 'share/pixmaps')
+endif
+
+if host_machine.system() == 'darwin'
+  install_data('data/performous.desktop', install_dir: 'Resources/applications')
+  install_data('data/themes/default/icon.svg', rename: 'performous.svg', install_dir: 'Resources/pixmaps')
+endif
