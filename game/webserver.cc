@@ -45,7 +45,7 @@ void WebServer::startServer(int tried, bool fallbackPortInUse) {
 	try {
 		m_server = std::make_unique<RequestHandler>(addr, portToUse, m_songs);
 	} catch (std::exception& e) {
-		tried = tried + 1;
+		++tried;
 		std::string message("webserver/error: " + std::string(e.what()) + ". Trying again... (tried " + std::to_string(tried) + " times).");
 		std::clog << message << std::endl;
 		Game::getSingletonPtr()->notificationFromWebserver(message);
@@ -63,6 +63,7 @@ void WebServer::startServer(int tried, bool fallbackPortInUse) {
 		Performous_IP_Blocker::setAllowedSubnet(m_server->getLocalIP());
 		m_server->m_io_context.run();
 	} catch (std::exception& e) {
+		++tried;
 		std::string message("webserver/error: " + std::string(e.what()) + ". Trying again... (tried " + std::to_string(tried) + " times.)");
 		std::clog << message << std::endl;
 		Game::getSingletonPtr()->notificationFromWebserver(message);
