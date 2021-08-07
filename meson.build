@@ -13,6 +13,13 @@ summary({'Use Webcam': get_option('usewebcam'),
          'Compilation warnings as errors': get_option('warningaserror')
         }, section: 'Build Options')
 
+pymodule = import('python')
+python3 = pymodule.find_installation()
+
+if host_machine.system() == 'darwin'
+  warning('Targetting a version of macOS different than the one running is not supported on Meson.')
+endif
+
 # Add git describe output to version number.
 # This does not appear work on semaphore, maybe because of stdout.
 # If it fails, falls back to the project version defined above, without git reference.
@@ -133,9 +140,27 @@ if get_option('usewebserver')
 endif
 
 boostmodules = ['iostreams','locale','program_options','system']
-if not compiler.has_header('filesystem')
-  boostmodules += ['filesystem'] # Boost::filesystem is used on systems where the standard filesystem is not available
-  conf.set('USE_BOOST_FS', '1')
+if host_machine.system() == 'darwin'
+  getMacVersion = run_command(python3,'-c','import platform;print(platform.mac_ver()[0])')
+  if getMacVersion.returncode() == 0
+    macVersion = getMacVersion.stdout()
+    if macVersion.version_compare('<10.15.0') == true
+      message('Detected macOS older than 10.15; will use the Boost implementation of filesystem')
+      boostmodules += ['filesystem'] # Boost::filesystem is used on systems where the standard filesystem is not available
+      conf.set('USE_BOOST_FS', 1)
+    else
+      conf.set('USE_BOOST_FS', 0)
+    endif
+  else
+    error('Can\'t determine macOS version.')
+  endif
+else
+  if not compiler.has_header('filesystem')
+    boostmodules += ['filesystem'] # Boost::filesystem is used on systems where the standard filesystem is not available
+    conf.set('USE_BOOST_FS', 1)
+  else
+    conf.set('USE_BOOST_FS', 0)
+  endif
 endif
 
 # Write configuration file
