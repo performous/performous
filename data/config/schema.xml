@@ -32,13 +32,13 @@ to save the current settings to XML.
 			<short>Audio</short>
 			<long>Configure general audio settings</long>
 		</entry>
-		<entry name="Paths">
-			<short>Paths</short>
-			<long>Setup song and data paths</long>
-		</entry>
 		<entry name="webserver">
 			<short>Webserver</short>
 			<long>Setup Webserver</long>
+		</entry>
+		<entry name="Paths">
+			<short>Paths</short>
+			<long>Setup song and data paths</long>
 		</entry>
 	</menu>
 
