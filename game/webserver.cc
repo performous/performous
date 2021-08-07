@@ -16,13 +16,13 @@ void WebServer::startServer(int tried, bool fallbackPortInUse) {
 		if(fallbackPortInUse == false) {
 			message += std::string("; trying fallback port...");
 			std::clog << message << std::endl;
-			Game::getSingletonPtr()->notificationFromWebserver(message);					
+			Game::getSingletonPtr()->notificationFromWebserver(message);
 			startServer(0, true);
 			return;
 		}
 		message += std::string("using the main and fallback ports; won't try again.");
 		std::clog << message << std::endl;
-		Game::getSingletonPtr()->notificationFromWebserver(message);							
+		Game::getSingletonPtr()->notificationFromWebserver(message);
 	}
 
 	unsigned short portToUse = fallbackPortInUse ? config["webserver/fallback_port"].i() : config["webserver/port"].i();
@@ -46,9 +46,9 @@ void WebServer::startServer(int tried, bool fallbackPortInUse) {
 		m_server = std::make_unique<RequestHandler>(addr, portToUse, m_songs);
 	} catch (std::exception& e) {
 		tried = tried + 1;
-		std::string message("webserver/error: " + std::string(e.what()) + ". Trying again... (tried " + std::to_string(tried) + " times)."); 
+		std::string message("webserver/error: " + std::string(e.what()) + ". Trying again... (tried " + std::to_string(tried) + " times).");
 		std::clog << message << std::endl;
-		Game::getSingletonPtr()->notificationFromWebserver(message);		
+		Game::getSingletonPtr()->notificationFromWebserver(message);
 		std::this_thread::sleep_for(20s);
 		startServer(tried, fallbackPortInUse);
 	}
@@ -65,7 +65,7 @@ void WebServer::startServer(int tried, bool fallbackPortInUse) {
 	} catch (std::exception& e) {
 		std::string message("webserver/error: " + std::string(e.what()) + ". Trying again... (tried " + std::to_string(tried) + " times.)");
 		std::clog << message << std::endl;
-		Game::getSingletonPtr()->notificationFromWebserver(message);		
+		Game::getSingletonPtr()->notificationFromWebserver(message);
 		std::this_thread::sleep_for(20s);
 		startServer(tried, fallbackPortInUse);
 	}

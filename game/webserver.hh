@@ -13,7 +13,7 @@ public:
 	WebServer(Songs& songs);
 	~WebServer();
 	void restartServer(); ///< Public interface to restart WebServer if configuration changes.
-	
+
 private:
 	void startServer(int tried, bool fallbackPortInUse); ///< Start the WebServer.
 	void stopServer(); ///< Stop the WebServer; called before restarting and in the destructor.

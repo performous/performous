@@ -85,7 +85,7 @@ std::unique_ptr<Performous_Router_t> RequestHandler::init_webserver_router() {
 	auto router = std::make_unique<Performous_Router_t>();
 	router->http_get("/", [this](auto req, auto){
 		return HandleFile(req, findFile("index.html"));
-	}); 
+	});
 	router->http_get(R"--(/:path(.*))--", [this](auto request, auto params){
 		if (!params.has("path")) {
 			init_resp(request->create_response(restinio::status_bad_request()))
