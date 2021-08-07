@@ -1,0 +1,12 @@
+{
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.renderWhitespace": "all",
+    "files.trimTrailingWhitespace": true,
+    "files.eol": "\n",
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    // This reduces the more conventional 4 spaces
+    // It improves the number of chars visible per line and allows to vizualize leading spaces/tabs mistakes.
+    // See FFmpeg::handleOneFrame() for example.
+    "editor.tabSize": 2
+}
