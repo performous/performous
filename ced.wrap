@@ -1,0 +1,6 @@
+[wrap-git]
+url = https://github.com/performous/compact_enc_det.git
+revision = head
+
+[provide]
+dependency_names = ced
