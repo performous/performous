@@ -18,7 +18,7 @@ blocks:
           - sudo apt -y update
           - sudo apt-get install apt-transport-https ca-certificates gnupg software-properties-common wget
           - wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
-          - sudo apt-add-repository 'deb https://apt.kitware.com/ubuntu/ focal main'
+          - sudo apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
           - sudo add-apt-repository -y ppa:litenstein/performous-bionic
           - sudo apt -y install cmake gettext help2man clang-9 gcc-8 g++-8 libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++3.0-dev portaudio19-dev libopencv-dev libportmidi-dev libqrencode-dev libicu-dev libglm-dev libopenblas-dev libfftw3-dev
           - checkout
