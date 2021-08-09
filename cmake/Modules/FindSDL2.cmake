@@ -12,7 +12,12 @@
 # http://www.cmake.org/Wiki/CMake:How_To_Find_Libraries
 
 include(LibFindMacros)
-libfind_pkg_detect(SDL2 sdl2 FIND_PATH SDL.h PATH_SUFFIXES SDL2 FIND_LIBRARY SDL2)
+
+if("${CMAKE_BUILD_TYPE}" MATCHES "[Dd]ebug")
+  libfind_pkg_detect(SDL2 sdl2 FIND_PATH SDL.h PATH_SUFFIXES SDL2 FIND_LIBRARY SDL2d)
+else()
+  libfind_pkg_detect(SDL2 sdl2 FIND_PATH SDL.h PATH_SUFFIXES SDL2 FIND_LIBRARY SDL2)
+endif()
 
 # Process others than OSX with native SDL normally
 if(NOT "${SDL2_SDL_LIBRARY}" MATCHES "framework")
@@ -42,4 +47,3 @@ endif()
 if(APPLE)
   set(SDL2_LIBRARIES ${SDL2_LIBRARIES} "-framework Cocoa")
 endif(APPLE)
-
