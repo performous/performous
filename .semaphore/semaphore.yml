@@ -96,7 +96,9 @@ blocks:
           - sudo pip3 install meson
           - echo "Checking out..."
           - checkout
-          - git submodule update --init --recursive
+          - git clone --depth 1 https://github.com/google/compact_enc_det.git 3rdparty/ced
+          # Checkout should fail if (ever) google ced is updated, providing an opportunity to review the changes
+          - git -C 3rdparty/ced checkout 37529e6
       jobs:
         - name: GCC-8.4.0 Build
           env_vars:
