@@ -133,7 +133,10 @@ endif
 #Write configuration file
 configure_file(input : 'game/config.hh.in', output : 'config.hh', configuration : conf)
 
+ced = subproject('ced')
+
 dependencies = [
+  dependency('ced'),
   dependency('pangocairo'),
   dependency('sdl2'),
   dependency('aubio'),
@@ -168,10 +171,6 @@ dependencies = [
 ]
 
 executable('performous', [
-  '3rdparty/ced/compact_enc_det/compact_enc_det.cc',
-  '3rdparty/ced/compact_enc_det/compact_enc_det_hint_code.cc',
-  '3rdparty/ced/util/encodings/encodings.cc',
-  '3rdparty/ced/util/languages/languages.cc',
   'game/3dobject.cc',
   'game/audio.cc',
   'game/backgrounds.cc',
@@ -240,7 +239,6 @@ executable('performous', [
   'game/webserver.cc'
 ],
   dependencies : dependencies,
-  include_directories : include_directories('3rdparty/ced'),
   cpp_args : compiler_args,
   install: true
 )
