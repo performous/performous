@@ -86,7 +86,7 @@ blocks:
       minutes: 10
     dependencies: []
     skip:
-      when: "branch != 'meson'"
+      when: "pull_request == '646'"
     task:
       prologue:
         commands:
