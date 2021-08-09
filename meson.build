@@ -6,6 +6,26 @@ project('performous',
         meson_version: '>=0.53.0',
         license : 'GPL-2.0-or-later')
 
+compact_enc_det = subproject('ced')
+nlohmann_json = subproject('nlohmann_json')
+
+compact_enc_det_dep = compact_enc_det.get_variable('compact_enc_det_dep') 
+nlohmann_json_dep = dependency('nlohmann_json', fallback : ['nlohmann_json', 'nlohmann_json_dep'])
+
+aubio_dep = dependency('aubio', required: false)
+
+if not aubio_dep.found()
+cmake = import('cmake')
+cmake_opts = cmake.subproject_options()
+# cmake_opts.set_override_option('CMAKE_MODULE_PATH', meson.source_root()/'cmake/Modules')
+cmake_opts.add_cmake_defines({
+        'CMAKE_INSTALL_PREFIX': meson.build_root(),
+        'CMAKE_MODULE_PATH': meson.source_root()/'cmake/Modules'
+})
+  aubio = cmake.subproject('aubio', options: cmake_opts)
+  aubio_dep = aubio.dependency('aubio')
+endif
+
 #Print project summary.  Limited to strict minimum for now
 summary({'Use Open CV': get_option('usewebcam'),
          'Use Port Midi': get_option('usemididrum'),
@@ -134,6 +154,9 @@ endif
 configure_file(input : 'game/config.hh.in', output : 'config.hh', configuration : conf)
 
 dependencies = [
+  aubio_dep,
+  compact_enc_det_dep,
+  nlohmann_json_dep,
   dependency('pangocairo'),
   dependency('sdl2'),
   dependency('aubio'),
@@ -168,10 +191,6 @@ dependencies = [
 ]
 
 executable('performous', [
-  '3rdparty/ced/compact_enc_det/compact_enc_det.cc',
-  '3rdparty/ced/compact_enc_det/compact_enc_det_hint_code.cc',
-  '3rdparty/ced/util/encodings/encodings.cc',
-  '3rdparty/ced/util/languages/languages.cc',
   'game/3dobject.cc',
   'game/audio.cc',
   'game/backgrounds.cc',
@@ -240,7 +259,6 @@ executable('performous', [
   'game/webserver.cc'
 ],
   dependencies : dependencies,
-  include_directories : include_directories('3rdparty/ced'),
   cpp_args : compiler_args,
   install: true
 )

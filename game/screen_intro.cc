@@ -1,4 +1,4 @@
-﻿#include "screen_intro.hh"
+#include "screen_intro.hh"
 
 #include "fs.hh"
 #include "glmath.hh"
@@ -28,7 +28,7 @@ void ScreenIntro::enter() {
 		m_first = false;
 	}
 	reloadGL();
-	webserversetting = config["game/webserver_access"].i();
+	webserversetting = config["webserver/access"].i();
 	m_audio.playSample("notice.ogg");
 }
 
@@ -198,11 +198,8 @@ void ScreenIntro::draw_webserverNotice() {
 		m_drawNotice = !m_drawNotice;
 		m_webserverNoticeTimeout.setValue(5);
 	}
-	std::stringstream m_webserverStatusString;
-	if((webserversetting == 1 || webserversetting == 2) && m_drawNotice) {
-		std::string message = Game::getSingletonPtr()->subscribeWebserverMessages();		
-		m_webserverStatusString << _("Webserver active!\n connect to this computer\nusing: ") << message;
-		theme->WebserverNotice.draw(m_webserverStatusString.str());
+	if((webserversetting >= 1) && m_drawNotice) {
+		theme->WebserverNotice.draw(Game::getSingletonPtr()->subscribeWebserverMessages());
 	}
 }
 

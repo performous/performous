@@ -1,6 +1,13 @@
 [submodule "compact_enc_det"]
-	path = 3rdparty/ced
+	path = subprojects/ced
 	url = https://github.com/performous/compact_enc_det.git
 [submodule "aubio"]
-	path = 3rdparty/aubio
+	path = subprojects/aubio
 	url = https://github.com/performous/aubio.git
+[submodule "nlohmann-json"]
+	path = subprojects/nlohmann_json
+	url = https://github.com/performous/json.git
+	shallow = true
+[submodule "restinio"]
+	path = subprojects/restinio
+	url = https://github.com/performous/restinio.git
