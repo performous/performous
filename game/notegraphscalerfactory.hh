@@ -5,5 +5,5 @@
 class NoteGraphScalerFactory
 {
 public:
-	NoteGraphScalerPtr create() const;
+    NoteGraphScalerPtr create(VocalTrack const&) const;
 };
