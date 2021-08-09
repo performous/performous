@@ -9,7 +9,7 @@
 
 include(LibFindMacros)
 
-libfind_pkg_check_modules(Png_PKGCONF PThread)
+libfind_pkg_check_modules(PThread_PKGCONF PThread)
 
 find_library(PThread_LIBRARY
   NAMES pthreadGC2
