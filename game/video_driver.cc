@@ -399,13 +399,13 @@ void Window::event(Uint8 const& eventID, Sint32 const& data1, Sint32 const& data
 			setWindowPosition(data1, data2);
 			break;
 		case SDL_WINDOWEVENT_MAXIMIZED:
-			if (Platform::currentOS() == Platform::macos) {
+			if (Platform::currentOS() == Platform::OS_MAC) {
 				config["graphic/fullscreen"].b() = true;
 				}
 			else { m_needResize = true; }
 			break;	
 		case SDL_WINDOWEVENT_RESTORED:
-			if (Platform::currentOS() == Platform::macos) {
+			if (Platform::currentOS() == Platform::OS_MAC) {
 				config["graphic/fullscreen"].b() = false;
 				}
 			else { m_needResize = true; }
