@@ -77,10 +77,12 @@ target_include_directories(fs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 if (USE_BOOST_FS)
     find_package(Boost 1.55 REQUIRED COMPONENTS filesystem)
 
+    message (STATUS "Using boost::filesystem")
     target_link_libraries(fs PUBLIC Boost::filesystem)
     target_compile_definitions(fs PUBLIC -DUSE_BOOST_FS)
 else()
     find_package(Filesystem REQUIRED)
+    message (STATUS "Using std::filesystem")
     target_link_libraries(fs PRIVATE std::filesystem)
 endif()
 
@@ -138,9 +140,7 @@ endif()
 
 option(ENABLE_WEBSERVER "Enable webserver support (cpprestsdk)." ON)
 if(ENABLE_WEBSERVER)
-	foreach(lib CppRest)
-		find_package(${lib})
-	endforeach(lib)
+	find_package(CppRest)
 	if(CppRest_FOUND)
 		find_package(Boost 1.55 REQUIRED COMPONENTS chrono thread)
 		include_directories(${Boost_INCLUDE_DIRS})
@@ -187,8 +187,6 @@ list(APPEND LIBS ${BLAS_LIBRARIES})
 find_package(Threads)
 
 target_link_libraries(performous PRIVATE fs ced aubio ${LIBS} PkgConfig::deps Threads::Threads)
-
-target_include_directories(performous PRIVATE "${AUBIO_INSTALL_DIR}/include/")
 
 install(TARGETS performous DESTINATION ${BIN_INSTALL})
 
