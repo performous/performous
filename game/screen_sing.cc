@@ -126,7 +126,7 @@ void ScreenSing::setupVocals() {
 
 		//if (shownTracks.size() > 2) throw std::runtime_error("Too many tracks chosen. Only two vocal tracks can be used simultaneously.")
 		for (auto const& trk: shownTracks) {
-			const auto scaler = NoteGraphScalerFactory().create();
+			const auto scaler = NoteGraphScalerFactory().create(*trk);
 			auto layoutSingerPtr = std::unique_ptr<LayoutSinger>(std::make_unique<LayoutSinger>(*trk, m_database, scaler, theme));
 			m_layout_singer.push_back(std::move(layoutSingerPtr));
 		}
