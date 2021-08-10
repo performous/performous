@@ -9,23 +9,22 @@
 #include <iostream>
 #include <sstream>
 
-ScreenPlaylist::ScreenPlaylist(std::string const& name,Audio& audio, Songs& songs, Backgrounds& bgs):
-	Screen(name), m_audio(audio), m_songs(songs), m_backgrounds(bgs), keyPressed()
+ScreenPlaylist::ScreenPlaylist(Game &game, std::string const& name,Audio& audio, Songs& songs, Backgrounds& bgs):
+	Screen(game, name), m_audio(audio), m_songs(songs), m_backgrounds(bgs), keyPressed()
 {}
 
 void ScreenPlaylist::enter() {
-	Game* gm = Game::getSingletonPtr();
 	// Initialize webcam
-	gm->loading(_("Initializing webcam..."), 0.1);
+	getGame().loading(_("Initializing webcam..."), 0.1);
 	if (config["graphic/webcam"].b() && Webcam::enabled()) {
 		try {
 			m_cam = std::make_unique<Webcam>(config["graphic/webcamid"].i());
 		} catch (std::exception& e) { std::cout << e.what() << std::endl; };
 	}
 	m_audio.togglePause();
-	if (gm->getCurrentPlayList().isEmpty()) {
+	if (getGame().getCurrentPlayList().isEmpty()) {
 		if(!config["game/autoplay"].b()) {
-			gm->activateScreen("Songs");
+			getGame().activateScreen("Songs");
 		}
 	}
 	keyPressed = false;
@@ -35,7 +34,7 @@ void ScreenPlaylist::enter() {
 	}
 	m_nextTimer.setValue(timervalue);
 	overlay_menu.close();
-	gm->loading(_("Loading song timestamps..."), 0.2);
+	getGame().loading(_("Loading song timestamps..."), 0.2);
 	createSongListMenu();
 	songlist_menu.open();
 	reloadGL();
@@ -83,7 +82,7 @@ void ScreenPlaylist::manageEvent(input::NavEvent const& event) {
 		if (nav == input::NAV_PAUSE) {
 			m_audio.togglePause();
 		} else if (nav == input::NAV_START) {
-			menu.action();
+			menu.action(getGame());
 		} else if (event.menu == input::NAVMENU_A_PREV) {
 			menu.move(-1);
 		} else if (event.menu == input::NAVMENU_A_NEXT) {
@@ -101,21 +100,20 @@ void ScreenPlaylist::manageEvent(SDL_Event) {
 }
 
 void ScreenPlaylist::draw() {
-	Game* gm = Game::getSingletonPtr();
 	if (!m_background || m_background->empty()) m_background = std::make_unique<Texture>(m_backgrounds.getRandom());
 	m_background->draw();
 	if (m_nextTimer.get() == 0.0 && keyPressed == false) {
-		Screen* s = gm->getScreen("Sing");
+		Screen* s = getGame().getScreen("Sing");
 		ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
 		assert(ss);
-		if(gm->getCurrentPlayList().isEmpty()) {
+		if(getGame().getCurrentPlayList().isEmpty()) {
 			m_songs.setFilter("");
 			auto randomsong = std::rand() % m_songs.size();
 			ss->setSong(m_songs[randomsong]);
 		} else {
-			ss->setSong(gm->getCurrentPlayList().getNext());
+			ss->setSong(getGame().getCurrentPlayList().getNext());
 		}
-		gm->activateScreen("Sing");
+		getGame().activateScreen("Sing");
 	}
 	if (m_cam && config["graphic/webcam"].b()) m_cam->render();
 	draw_menu_options();
@@ -128,7 +126,7 @@ void ScreenPlaylist::draw() {
 		createSongListMenu();
 		needsUpdate = false;
 	}
-	auto const& playlist = gm->getCurrentPlayList().getList();
+	auto const& playlist = getGame().getCurrentPlayList().getList();
 	for (unsigned i = playlist.size() - 1; i < playlist.size(); --i) {
 		if(i < 9) { //only draw the first 9 covers
 			Texture& s = getCover(*playlist[i]);
@@ -179,31 +177,28 @@ Texture& ScreenPlaylist::getCover(Song const& song) {
 void ScreenPlaylist::createEscMenu() {
 	overlay_menu.clear();
 	overlay_menu.add(MenuOption(_("Continue"), _("Continue playing")).call([this]() {
-		Game* gm = Game::getSingletonPtr();
-		Screen* s = gm->getScreen("Sing");
+		Screen* s = getGame().getScreen("Sing");
 		ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
 		assert(ss);
-		if(!gm->getCurrentPlayList().isEmpty()) {
-			ss->setSong(gm->getCurrentPlayList().getNext());
+		if(!getGame().getCurrentPlayList().isEmpty()) {
+			ss->setSong(getGame().getCurrentPlayList().getNext());
 		} else {
 			m_songs.setFilter("");
 			auto randomsong = std::rand() % m_songs.size();
 			ss->setSong(m_songs[randomsong]);
 		}
-		gm->activateScreen("Sing");
+		getGame().activateScreen("Sing");
 	}));
 	overlay_menu.add(MenuOption(_("Add songs"), _("Open the song browser to add more songs")).screen("Songs"));
 	overlay_menu.add(MenuOption(_("Shuffle"), _("Randomize the order of the playlist")).call([this]() {
-		Game* tm = Game::getSingletonPtr();
-		tm->getCurrentPlayList().shuffle();
+		getGame().getCurrentPlayList().shuffle();
 		overlay_menu.close();
 		createSongListMenu();
 	}));
 	overlay_menu.add(MenuOption(_("Clear and exit"), _("Remove all the songs from the list")).call([this]() {
-		Game* tm = Game::getSingletonPtr();
-		tm->getCurrentPlayList().clear();
+		getGame().getCurrentPlayList().clear();
 		overlay_menu.close();
-		tm->activateScreen("Songs");
+		getGame().activateScreen("Songs");
 	}));
 	overlay_menu.add(MenuOption(_("Back"), _("Back to playlist viewer")).call([this]() {
 		overlay_menu.close();
@@ -303,11 +298,10 @@ SvgTxtTheme& ScreenPlaylist::getTextObject(std::string const& txt) {
 }
 
 void ScreenPlaylist::createSongListMenu() {
-	Game* gm = Game::getSingletonPtr();
 	std::ostringstream oss_playlist;
 	int count = 1;
 	songlist_menu.clear();
-	SongList& currentList = gm->getCurrentPlayList().getList();
+	SongList& currentList = getGame().getCurrentPlayList().getList();
 	int totaldurationSeconds = 0;
 	for (auto const& song: currentList) {
 		//timestamp handles
@@ -353,44 +347,39 @@ void ScreenPlaylist::createSongMenu(int songNumber) {
 	std::string firstDesc = songNumber >= 2 ?
 		_("Ignore the playlist's order and play this song first") :
 		_("Start the song already!");
-	overlay_menu.add(MenuOption(firstOption, firstDesc).call([songNumber]() {
-		Game* gm = Game::getSingletonPtr();
-		Screen* s = gm->getScreen("Sing");
+	overlay_menu.add(MenuOption(firstOption, firstDesc).call([&, songNumber]() {
+		Screen* s = getGame().getScreen("Sing");
 		ScreenSing* ss = dynamic_cast<ScreenSing*>(s);
 		assert(ss);
-		ss->setSong(gm->getCurrentPlayList().getSong(songNumber - 1));
-		gm->activateScreen("Sing");
+		ss->setSong(getGame().getCurrentPlayList().getSong(songNumber - 1));
+		getGame().activateScreen("Sing");
 	}));
-	overlay_menu.add(MenuOption(_("Remove"), _("Remove this song from the list")).call([this, songNumber]() {
-		Game* gm = Game::getSingletonPtr();
+	overlay_menu.add(MenuOption(_("Remove"), _("Remove this song from the list")).call([&, songNumber]() {
 		// Minus 1 so it doesn´t remove #2 when you´ve selected #1
-		gm->getCurrentPlayList().removeSong(songNumber - 1);
+		getGame().getCurrentPlayList().removeSong(songNumber - 1);
 		overlay_menu.close();
-		if (gm->getCurrentPlayList().isEmpty()) {
-			gm->activateScreen("Songs");
+		if (getGame().getCurrentPlayList().isEmpty()) {
+			getGame().activateScreen("Songs");
 		} else {
 			createSongListMenu();
 		}
 	}));
 	if (songNumber >= 2) { //can't move up first song
-		overlay_menu.add(MenuOption(_("Move up"), _("Move this song up the list")).call([this, songNumber]() {
-			Game* gm = Game::getSingletonPtr();
-			gm->getCurrentPlayList().swap(songNumber -1, songNumber -2);
+		overlay_menu.add(MenuOption(_("Move up"), _("Move this song up the list")).call([&, songNumber]() {
+			getGame().getCurrentPlayList().swap(songNumber -1, songNumber -2);
 			createSongListMenu();
 			overlay_menu.close();
 		}));
 	}
-	Game* gm = Game::getSingletonPtr();
-	int size = gm->getCurrentPlayList().getList().size();
+	int size = getGame().getCurrentPlayList().getList().size();
 	if (songNumber < size) { //can't move down the last song
-		overlay_menu.add(MenuOption(_("Move Down"), _("Move this song down the list")).call([this, songNumber]() {
-			Game* gm = Game::getSingletonPtr();
-			gm->getCurrentPlayList().swap(songNumber -1, songNumber);
+		overlay_menu.add(MenuOption(_("Move Down"), _("Move this song down the list")).call([&, songNumber]() {
+			getGame().getCurrentPlayList().swap(songNumber -1, songNumber);
 			createSongListMenu();
 			overlay_menu.close();
 		}));
 	}
-	overlay_menu.add(MenuOption(_("Back"), _("Back to playlist viewer")).call([this]() {
+	overlay_menu.add(MenuOption(_("Back"), _("Back to playlist viewer")).call([&]() {
 		overlay_menu.close();
 	}));
 }

@@ -75,8 +75,8 @@ namespace {
 
 
 /// Constructor
-DanceGraph::DanceGraph(Audio& audio, Song const& song, input::DevicePtr dev):
-  InstrumentGraph(audio, song, dev),
+DanceGraph::DanceGraph(Game &game, Audio& audio, Song const& song, input::DevicePtr dev):
+  InstrumentGraph(game, audio, song, dev),
   m_level(BEGINNER),
   m_beat(findFile("dancebeat.svg")),
   m_arrows(findFile("arrows.svg")),
@@ -260,8 +260,8 @@ void DanceGraph::engine() {
 		// Menu keys
 		if (menuOpen() && ev.value != 0.0) {
 			if (ev.nav == input::NAV_START || ev.nav == input::NAV_CANCEL) m_menu.close();
-			else if (ev.nav == input::NAV_RIGHT) m_menu.action(1);
-			else if (ev.nav == input::NAV_LEFT) m_menu.action(-1);
+			else if (ev.nav == input::NAV_RIGHT) m_menu.action(m_game, 1);
+			else if (ev.nav == input::NAV_LEFT) m_menu.action(m_game, -1);
 			else if (ev.nav == input::NAV_UP) m_menu.move(-1);
 			else if (ev.nav == input::NAV_DOWN) m_menu.move(1);
 			difficulty_changed = true;
