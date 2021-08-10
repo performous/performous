@@ -113,13 +113,8 @@ blocks:
           commands:
             - echo "Setting up build..."
             - meson setup --buildtype release build.gcc -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true -Dwarningaserror=true
-            - artifact push job --expire-in 1w build.gcc/meson-info
-            - artifact push job --expire-in 1w build.gcc/meson-logs
-            - artifact push job --expire-in 1w build.gcc/build.ninja
-            - artifact push job --expire-in 1w build.gcc/compile_commands.json
             - echo "Building..."
             - meson compile -C build.gcc
-            - artifact push job --expire-in 1w build.gcc/.ninja_log
         - name: Clang-9 Build
           env_vars:
             - name: CC
@@ -129,10 +124,5 @@ blocks:
           commands:
             - echo "Setting up build..."
             - meson setup --buildtype release build.clang -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true
-            - artifact push job --expire-in 1w build.clang/meson-info
-            - artifact push job --expire-in 1w build.clang/meson-logs
-            - artifact push job --expire-in 1w build.clang/build.ninja
-            - artifact push job --expire-in 1w build.clang/compile_commands.json
             - echo "Building..."
             - meson compile -C build.clang
-            - artifact push job --expire-in 1w build.clang/.ninja_log
