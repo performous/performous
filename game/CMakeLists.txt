@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.14.5)
 
 file(GLOB SOURCE_FILES "*.cc")
 file(GLOB HEADER_FILES "*.hh" "libda/*.hpp")
