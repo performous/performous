@@ -1,7 +1,6 @@
 #include "fs.hh"
 #include "image.hh"
 
-#include <boost/filesystem/path.hpp>
 #include <jpeglib.h>
 #include <png.h>
 
