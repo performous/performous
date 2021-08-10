@@ -2,17 +2,17 @@
 #ifdef USE_WEBSERVER
 #include <boost/asio.hpp>
 
-void WebServer::StartServer(int tried, bool fallbackPortInUse) {
+void WebServer::StartServer(Game &game, int tried, bool fallbackPortInUse) {
 	if(tried > 2) {
 		if(fallbackPortInUse == false) {
 			std::clog << "webserver/error: Couldn't start webserver tried 3 times. Trying fallback port.." << std::endl;
-			Game::getSingletonPtr()->notificationFromWebserver("Couldn't start webserver tried 3 times. Trying fallback port...");					
+			game.notificationFromWebserver("Couldn't start webserver tried 3 times. Trying fallback port...");
 			StartServer(0, true);
 			return;
 		}
 
 		std::clog << "webserver/error: Couldn't start webserver tried 3 times using normal port and 3 times using fallback port. Stopping webserver." << std::endl;
-		Game::getSingletonPtr()->notificationFromWebserver("Couldn't start webserver.");							
+		game.notificationFromWebserver("Couldn't start webserver.");
 		if(m_server) {
 			m_server->close().wait();
 		}
@@ -29,28 +29,28 @@ void WebServer::StartServer(int tried, bool fallbackPortInUse) {
 	}
 
 	try {
-		m_server = std::shared_ptr<RequestHandler>(new RequestHandler(addr, m_songs));
+		m_server = std::shared_ptr<RequestHandler>(new RequestHandler(game, addr, m_songs));
 		m_server->open().wait();
 		std::string message = getIPaddr() + ":" +  portToUse;
-		Game::getSingletonPtr()->notificationFromWebserver(message);
+		game.notificationFromWebserver(message);
 	} catch (std::exception& e) {
 		tried = tried + 1;
 		std::clog << "webserver/error: " << e.what() << " Trying again... (tried " << tried << " times)." << std::endl;
 		std::string message(e.what());
 		message += " Trying again... (tried " + std::to_string(tried) +" times).";
-		Game::getSingletonPtr()->notificationFromWebserver(message);		
+		game.notificationFromWebserver(message);
 		std::this_thread::sleep_for(20s);
 		StartServer(tried, fallbackPortInUse);
 	}
 }
 
-WebServer::WebServer(Songs& songs)
+WebServer::WebServer(Game &game, Songs& songs)
 : m_songs(songs)
 {
 	if(config["game/webserver_access"].i() == 0) {
 		std::clog << "webserver/notice: Not starting webserver." << std::endl;
 	} else {
-		m_serverThread = std::make_unique<std::thread>([this] { StartServer(0, false); });
+		m_serverThread = std::make_unique<std::thread>([this] { StartServer(game, 0, false); });
 	}
 }
 
