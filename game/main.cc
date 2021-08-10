@@ -138,10 +138,10 @@ void mainLoop(std::string const& songlist) {
 	loadFonts();
 	try {
 		window = std::make_unique<Window>();
-		} catch (RUNTIME_ERROR& e) {
-			std::cerr << "ERROR: " << e.what() << std::endl;
-		}
-	Game gm(*window, audio);
+	} catch (RUNTIME_ERROR& e) {
+		std::cerr << "ERROR: " << e.what() << std::endl;
+	}
+	Game gm(*window);
 	WebServer server(gm, songs);
 	try {
 		// Load audio samples
@@ -227,19 +227,19 @@ void mainLoop(std::string const& songlist) {
 				gm.controllers.process(eventTime);
 				checkEvents(gm, eventTime);
 				if (benchmarking) prof("events");
-		} catch (RUNTIME_ERROR& e) {
-			std::cerr << "ERROR: " << e.what() << std::endl;
-			gm.flashMessage(std::string("ERROR: ") + e.what());
+			} catch (RUNTIME_ERROR& e) {
+				std::cerr << "ERROR: " << e.what() << std::endl;
+				gm.flashMessage(std::string("ERROR: ") + e.what());
 			}
 		}
-		writeConfig(gm);
+		writeConfig(gm, audio);
 	} catch (EXCEPTION& e) {
 		std::clog << "core/error: Exiting due to fatal error: " << e.what() << std::endl;
 		gm.fatalError(e.what());  // Notify the user
 		throw;
-		} catch (QuitNow&) {
+	} catch (QuitNow&) {
 		std::cerr << "Terminated." << std::endl;
-		}
+	}
 }
 
 /// Simple test utility to make mapping of joystick buttons/axes easier
@@ -299,8 +299,7 @@ void fatalError(std::string msg, bool hasLog = false, std::string title = "FATAL
 	}
 	errMsg << std::endl << "If you think this is a bug in Performous, please report it at "
 	  << std::endl << "  https://github.com/performous/performous/issues";
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title.c_str(),
-	  errMsg.str().c_str(), nullptr);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title.c_str(), errMsg.str().c_str(), nullptr);
 	std::cerr << title << ": " << msg << std::endl;
 	if (hasLog) {
 		std::clog << "core/error: " << errMsg.str() << std::endl;
