@@ -2,7 +2,7 @@
 #include "unicode.hh"
 
 #ifdef USE_WEBSERVER
-RequestHandler::RequestHandler(Songs& songs):m_songs(songs)
+RequestHandler::RequestHandler(Game &game, Songs& songs): m_game(game), m_songs(songs)
 {
 }
 RequestHandler::RequestHandler(std::string url, Songs& songs):m_listener(url),m_songs(songs)
@@ -116,10 +116,9 @@ void RequestHandler::Get(web::http::http_request request)
         request.reply(web::http::status_codes::OK, jsonRoot);
         return;
     } else if(path == "/api/getCurrentPlaylist.json") {
-        Game* gm = Game::getSingletonPtr();
         web::json::value jsonRoot = web::json::value::array();
         auto i = 0;
-        for (auto const& song : gm->getCurrentPlayList().getList()) {
+        for (auto const& song : m_game.getCurrentPlayList().getList()) {
             web::json::value songObject = web::json::value::object();
             songObject["Title"] = web::json::value::string(song->title);
             songObject["Artist"] = web::json::value::string(song->artist);
@@ -143,8 +142,6 @@ void RequestHandler::Get(web::http::http_request request)
 
 void RequestHandler::Post(web::http::http_request request)
 {
-    Game* gm = Game::getSingletonPtr();
-
     auto uri = request.relative_uri().path();
     if(request.relative_uri().query() != "") {
         uri += "?" + request.relative_uri().query();
@@ -168,23 +165,23 @@ void RequestHandler::Post(web::http::http_request request)
             return;
         } else {
             std::clog << "requesthandler/debug: Adding " << songPointer->artist << " - " << songPointer->title << " to the playlist " << std::endl;
-            gm->getCurrentPlayList().addSong(songPointer);
-            ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
+            m_game.getCurrentPlayList().addSong(songPointer);
+            ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(m_game.getScreen("Playlist"));
             m_pp->triggerSongListUpdate();
 
             request.reply(web::http::status_codes::OK, "success");
             return;
         }
     } else if(path == "/api/remove") {
-        if(gm->getCurrentPlayList().isEmpty()) {
+        if(m_game.getCurrentPlayList().isEmpty()) {
             request.reply(web::http::status_codes::BadRequest, "Playlist is empty.");
             return;
         }
         try {
             auto songIdToDelete = jsonPostBody["songId"].as_integer();
             if(songIdToDelete >= 0) {
-                gm->getCurrentPlayList().removeSong(songIdToDelete);
-                ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
+                m_game.getCurrentPlayList().removeSong(songIdToDelete);
+                ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(m_game.getScreen("Playlist"));
                 m_pp->triggerSongListUpdate();
 
                 request.reply(web::http::status_codes::OK, "success");
@@ -199,14 +196,14 @@ void RequestHandler::Post(web::http::http_request request)
             return;
         }
     } else if(path == "/api/setposition") {
-        if(gm->getCurrentPlayList().isEmpty()) {
+        if(m_game.getCurrentPlayList().isEmpty()) {
             request.reply(web::http::status_codes::BadRequest, "Playlist is empty.");
             return;
         }
         try {
             auto songIdToMove = jsonPostBody["songId"].as_integer();
             auto positionToMoveTo = jsonPostBody["position"].as_integer();
-            int sizeOfPlaylist = gm->getCurrentPlayList().getList().size();
+            int sizeOfPlaylist = m_game.getCurrentPlayList().getList().size();
             if(songIdToMove < 0) {
                 request.reply(web::http::status_codes::BadRequest, "Can't move songs with a negative id \"" + std::to_string(songIdToMove) + "\". Please make a valid request.");
                 return;
@@ -220,8 +217,8 @@ void RequestHandler::Post(web::http::http_request request)
                 return;
             }
             if(positionToMoveTo <= sizeOfPlaylist - 1) {
-                gm->getCurrentPlayList().setPosition(songIdToMove,positionToMoveTo);
-                ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
+                m_game.getCurrentPlayList().setPosition(songIdToMove,positionToMoveTo);
+                ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(m_game.getScreen("Playlist"));
                 m_pp->triggerSongListUpdate();
                 request.reply(web::http::status_codes::OK, "success");
                 return;

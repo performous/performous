@@ -13,7 +13,7 @@ class ThemeAudioDevices;
 class ScreenAudioDevices: public Screen {
   public:
 	/// constructor
-	ScreenAudioDevices(std::string const& name, Audio& m_audio);
+	ScreenAudioDevices(Game &game, std::string const& name, Audio& m_audio);
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);

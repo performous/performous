@@ -32,11 +32,12 @@ typedef std::vector<std::unique_ptr<InstrumentGraph>> Instruments;
 class ScoreWindow {
   public:
 	/// constructor
-	ScoreWindow(Instruments& instruments, Database& database);
+	ScoreWindow(Game &game, Instruments& instruments, Database& database);
 	/// draws ScoreWindow
 	void draw();
 	bool empty();
   private:
+	Game &m_game;
 	Database& m_database;
 	AnimValue m_pos;
 	Texture m_bg;
@@ -50,7 +51,7 @@ class ScoreWindow {
 class ScreenSing: public Screen {
   public:
 	/// constructor
-	ScreenSing(std::string const& name, Audio& audio, Database& database, Backgrounds& bgs);
+	ScreenSing(Game &game, std::string const& name, Audio& audio, Database& database, Backgrounds& bgs);
 	void enter();
 	void exit();
 	void reloadGL();

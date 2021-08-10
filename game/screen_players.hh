@@ -22,7 +22,7 @@ class LayoutSinger;
 class ScreenPlayers : public Screen {
   public:
 	/// constructor
-	ScreenPlayers(std::string const& name, Audio& audio, Database& database);
+	ScreenPlayers(Game &game, std::string const& name, Audio& audio, Database& database);
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);

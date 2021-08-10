@@ -18,7 +18,7 @@ class ThemeAudioDevices;
 class ScreenPaths: public Screen {
   public:
 	/// constructor
-	ScreenPaths(std::string const& name, Audio& audio, Songs& songs);
+	ScreenPaths(Game &game, std::string const& name, Audio& audio, Songs& songs);
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);
