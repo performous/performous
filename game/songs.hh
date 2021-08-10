@@ -11,14 +11,15 @@
 #include <vector>
 #include "screen.hh"
 
+class Game;
 class Song;
 class Database;
 
 /// songs class for songs screen
 class Songs {
   public:
-  	Songs(const Songs&) = delete;
-  	const Songs& operator=(const Songs&) = delete;
+	Songs(const Songs&) = delete;
+	const Songs& operator=(const Songs&) = delete;
 	/// constructor
 	Songs(Database& database, std::string const& songlist = std::string());
 	~Songs();
@@ -68,7 +69,7 @@ class Songs {
 	/// Description of the current sort mode
 	std::string sortDesc() const;
 	/// Change sorting mode (diff is normally -1 or 1)
-	void sortChange(int diff);
+	void sortChange(Game &game, int diff);
 	void sortSpecificChange(int sortOrder, bool descending = false);
 	/// parses file into Song &tmp
 	void parseFile(Song& tmp);
@@ -77,7 +78,7 @@ class Songs {
 	size_t loadedSongs() const { return m_songs.size(); }
 
   private:
-  	void LoadCache();
+	void LoadCache();
 	void CacheSonglist();
 
 	class RestoreSel;
