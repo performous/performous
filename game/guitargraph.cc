@@ -89,8 +89,8 @@ void GuitarGraph::initDrums() {
 	//m_samples.push_back("drum tom2");
 }
 
-GuitarGraph::GuitarGraph(Audio& audio, Song const& song, input::DevicePtr dev, int number):
-  InstrumentGraph(audio, song, dev),
+GuitarGraph::GuitarGraph(Game &game, Audio& audio, Song const& song, input::DevicePtr dev, int number):
+  InstrumentGraph(game, audio, song, dev),
   m_tail(findFile("tail.svg")),
   m_tail_glow(findFile("tail_glow.svg")),
   m_tail_drumfill(findFile("tail_drumfill.svg")),
@@ -328,15 +328,15 @@ void GuitarGraph::engine() {
 		if (menuOpen()) {
 			// Check first regular keys
 			if (ev.pressed()) {
-				if (ev.nav == input::NAV_START) m_menu.action();
-				else if (ev.nav == input::NAV_LEFT) m_menu.action(-1);
+				if (ev.nav == input::NAV_START) m_menu.action(m_game);
+				else if (ev.nav == input::NAV_LEFT) m_menu.action(m_game, -1);
 				else if (ev.nav == input::NAV_UP) m_menu.move(-1);
 				else if (ev.nav == input::NAV_DOWN) m_menu.move(1);
-				else if (ev.nav == input::NAV_RIGHT) m_menu.action(1);
+				else if (ev.nav == input::NAV_RIGHT) m_menu.action(m_game, 1);
 				else if (ev.nav == input::NAV_CANCEL) m_menu.close();
 				if (!m_drums) {
-					if (ev.button == input::GUITAR_GREEN) m_menu.action(-1);
-					else if (ev.button == input::GUITAR_RED) m_menu.action(1);
+					if (ev.button == input::GUITAR_GREEN) m_menu.action(m_game, -1);
+					else if (ev.button == input::GUITAR_RED) m_menu.action(m_game, 1);
 				}
 			}
 			// See if anything changed

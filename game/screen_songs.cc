@@ -20,8 +20,8 @@
 
 static const double IDLE_TIMEOUT = 35.0; // seconds
 
-ScreenSongs::ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Database& database):
-  Screen(name), m_audio(audio), m_songs(songs), m_database(database)
+ScreenSongs::ScreenSongs(Game &game, std::string const& name, Audio& audio, Songs& songs, Database& database):
+  Screen(game, name), m_audio(audio), m_songs(songs), m_database(database)
 {
 	m_songs.setAnimMargins(5.0, 5.0);
 	// Using AnimValues as a simple timers counting seconds
@@ -73,14 +73,13 @@ void ScreenSongs::menuBrowse(int dir) {
 	switch (m_menuPos) {
 		case 4: m_infoPos = (m_infoPos + dir + 5) % 5; break;
 		case 3: m_songs.typeChange(dir); break;
-		case 2: m_songs.sortChange(dir); break;
+		case 2: m_songs.sortChange(getGame(), dir); break;
 		case 1: m_songs.advance(dir); break;
 		case 0: /* no function on playlist yet */ break;
 	}
 }
 
 void ScreenSongs::manageEvent(input::NavEvent const& event) {
-	Game* gm = Game::getSingletonPtr();
 	input::NavButton nav = event.button;
 	// Handle basic navigational input that is possible also with instruments
 	m_idleTimer.setValue(0.0);  // Reset idle timer
@@ -106,13 +105,13 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 		if (m_menuPos != 1) m_menuPos = 1;  // Exit menu (back to song selection)
 		else if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }  // Clear search
 		else if (m_songs.typeNum()) m_songs.typeChange(0);  // Clear type filter
-		else gm->activateScreen("Intro");
+		else getGame().activateScreen("Intro");
 	}
 	// The rest are only available when there are songs available
 	else if (m_songs.empty()) return;
 	else if (nav == input::NAV_START) {
 		if (m_menu.isOpen()) {
-			m_menu.action();
+			m_menu.action(getGame());
 		}
 		else if (m_menuPos == 1 /* Cover browser */) {
 			if (addSong()) sing();  // Add song and sing if it was the first to be added
@@ -122,7 +121,7 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 			m_jukebox = true;
 		}
 		else if (m_menuPos == 0 /* Playlist */) {
-			if (gm->getCurrentPlayList().isEmpty()) {
+			if (getGame().getCurrentPlayList().isEmpty()) {
 				m_menuPos = 1;
 				addSong();
 			} else {
@@ -162,7 +161,7 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 				m_songs.setFilter(m_search.text);
 				}
 			// Shortcut keys for accessing different type filter modes
-			if (key == SDL_SCANCODE_TAB) m_songs.sortChange(1);
+			if (key == SDL_SCANCODE_TAB) m_songs.sortChange(getGame(), 1);
 			if (key == SDL_SCANCODE_F5) m_songs.typeCycle(2);
 			if (key == SDL_SCANCODE_F6) m_songs.typeCycle(3);
 			if (key == SDL_SCANCODE_F7) m_songs.typeCycle(4);
@@ -173,8 +172,7 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 }
 
 void ScreenSongs::update() {
-	Game* sm = Game::getSingletonPtr();
-	sm->showLogo(!m_jukebox);
+	getGame().showLogo(!m_jukebox);
 	if (m_idleTimer.get() < 0.3) return;  // Only update when the user gives us a break
 	m_songs.update(); // Poll for new songs
 	bool songChange = false;  // Do we need to switch songs?
@@ -199,7 +197,7 @@ void ScreenSongs::update() {
 	if (!songChange) return;
 	ScreenSongs::previewBeatsBuffer.reset(new_fvec(1));
 	{
-	std::lock_guard<std::recursive_mutex> l(Audio::aubio_mutex);	
+	std::lock_guard<std::recursive_mutex> l(Audio::aubio_mutex);
 	Audio::aubioTempo.reset(new_aubio_tempo("default", Audio::aubio_win_size, Audio::aubio_hop_size, Audio::getSR()));
 	}
 	if (song && song->hasControllers()) { song->loadNotes(); } // Needed for BPM info.
@@ -216,18 +214,16 @@ void ScreenSongs::update() {
 }
 
 bool ScreenSongs::addSong() {
-	Game* gm = Game::getSingletonPtr();
-	auto& pl = gm->getCurrentPlayList();
+	auto& pl = getGame().getCurrentPlayList();
 	bool empty = pl.getList().empty();
 	pl.addSong(m_songs.currentPtr());
 	return empty;
 }
 
 void ScreenSongs::sing() {
-	Game* gm = Game::getSingletonPtr();
-	ScreenSing& ss = dynamic_cast<ScreenSing&>(*gm->getScreen("Sing"));
-	ss.setSong(gm->getCurrentPlayList().getNext());
-	gm->activateScreen("Sing");
+	ScreenSing& ss = dynamic_cast<ScreenSing&>(*getGame().getScreen("Sing"));
+	ss.setSong(getGame().getCurrentPlayList().getNext());
+	getGame().activateScreen("Sing");
 }
 
 void ScreenSongs::prepare() {
@@ -324,7 +320,7 @@ void ScreenSongs::draw() {
 		case 3: oss_order << HORIZ_ARROW << _("type filter: ") << m_songs.typeDesc(); break;
 		case 4: oss_order << HORIZ_ARROW << _("hiscores") << PAD << ENTER << _("jukebox mode"); break;
 		case 0:
-			bool empty = Game::getSingletonPtr()->getCurrentPlayList().isEmpty();
+			bool empty = getGame().getCurrentPlayList().isEmpty();
 			oss_order << ENTER << (empty ? _("start a playlist with this song!") : _("open the playlist menu"));
 			break;
 		}
@@ -404,8 +400,7 @@ void ScreenSongs::drawCovers() {
 		s.draw();
 	}
 	// Draw the playlist
-	Game* gm = Game::getSingletonPtr();
-	auto const& playlist = gm->getCurrentPlayList().getList();
+	auto const& playlist = getGame().getCurrentPlayList().getList();
 	double c = (m_menuPos == 0 /* Playlist */ ? beat : 1.0);
 	ColorTrans c1(Color(c, c, c));
 	for (unsigned i = playlist.size() - 1; i < playlist.size(); --i) {
@@ -550,22 +545,19 @@ std::unique_ptr<fvec_t, void(*)(fvec_t*)> ScreenSongs::previewBeatsBuffer = std:
 void ScreenSongs::createPlaylistMenu() {
 	m_menu.clear();
 	m_menu.add(MenuOption(_("Play"), "").call([this]() {
-		Game* tm = Game::getSingletonPtr();
-		tm->getCurrentPlayList().addSong(m_songs.currentPtr());
+		getGame().getCurrentPlayList().addSong(m_songs.currentPtr());
 		m_menuPos = 1;
 		m_menu.close();
 		sing();
 	}));
 	m_menu.add(MenuOption(_("Shuffle"), "").call([this]() {
-		Game* tm = Game::getSingletonPtr();
-		tm->getCurrentPlayList().shuffle();
+		getGame().getCurrentPlayList().shuffle();
 		m_menuPos = 1;
 		m_menu.close();
 	}));
 	m_menu.add(MenuOption(_("View playlist"), "").screen("Playlist"));
 	m_menu.add(MenuOption(_("Clear playlist"), "").call([this]() {
-		Game* tm = Game::getSingletonPtr();
-		tm->getCurrentPlayList().clear();
+		getGame().getCurrentPlayList().clear();
 		m_menuPos = 1;
 		m_menu.close();
 	}));

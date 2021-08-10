@@ -45,7 +45,7 @@ class ConfigItem {
 	void addEnum(std::string name); ///< Dynamically adds an enum to all values
 	void selectEnum(std::string const& name); ///< Set integer value by enum name
 	std::string const getEnumName() const; ///< Returns the selected enum option's text
-	
+
   private:
 	template <typename T> void updateNumeric(xmlpp::Element& elem, int mode); ///< Used internally for loading XML
 	void verifyType(std::string const& t) const; ///< throws std::logic_error if t != type
@@ -75,8 +75,10 @@ extern Config config; ///< A global variable that contains all config items
 void readConfig();
 void populateBackends(const std::list<std::string>& backendList);
 
+class Game;
+
 /** Write modified config options to user's or system-wide config XML **/
-void writeConfig(bool system = false);
+void writeConfig(Game &game, bool system = false);
 
 /// struct for entries in menu
 struct MenuEntry {
