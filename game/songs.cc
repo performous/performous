@@ -482,7 +482,7 @@ std::string Songs::sortDesc() const {
 	return str;
 }
 
-void Songs::sortChange(Game &game, int diff) {
+void Songs::sortChange(Game &game, Audio &audio, int diff) {
 	m_order = (m_order + diff) % orders;
 	if (m_order < 0) m_order += orders;
 	RestoreSel restore(*this);
@@ -505,7 +505,7 @@ void Songs::sortChange(Game &game, int diff) {
 			break;
 		}
 	sort_internal();
-	writeConfig(game, false);
+	writeConfig(game, audio, false);
 }
 
 void Songs::sortSpecificChange(int sortOrder, bool descending) {

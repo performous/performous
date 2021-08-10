@@ -73,7 +73,7 @@ void ScreenSongs::menuBrowse(int dir) {
 	switch (m_menuPos) {
 		case 4: m_infoPos = (m_infoPos + dir + 5) % 5; break;
 		case 3: m_songs.typeChange(dir); break;
-		case 2: m_songs.sortChange(getGame(), dir); break;
+		case 2: m_songs.sortChange(getGame(), m_audio, dir); break;
 		case 1: m_songs.advance(dir); break;
 		case 0: /* no function on playlist yet */ break;
 	}
@@ -161,7 +161,7 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 				m_songs.setFilter(m_search.text);
 				}
 			// Shortcut keys for accessing different type filter modes
-			if (key == SDL_SCANCODE_TAB) m_songs.sortChange(getGame(), 1);
+			if (key == SDL_SCANCODE_TAB) m_songs.sortChange(getGame(), m_audio, 1);
 			if (key == SDL_SCANCODE_F5) m_songs.typeCycle(2);
 			if (key == SDL_SCANCODE_F6) m_songs.typeCycle(3);
 			if (key == SDL_SCANCODE_F7) m_songs.typeCycle(4);

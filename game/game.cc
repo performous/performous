@@ -11,8 +11,8 @@
 
 template<> Game* Singleton<Game>::ms_Singleton = nullptr;
 
-Game::Game(Window& _window, Audio& _audio):
-  m_audio(_audio), m_window(_window), m_finished(false), newScreen(), currentScreen(), currentPlaylist(),
+Game::Game(Window& _window):
+  m_window(_window), m_finished(false), newScreen(), currentScreen(), currentPlaylist(),
   m_timeToFadeIn(), m_timeToFadeOut(), m_timeToShow(), m_message(),
   m_messagePopup(0.0, 1.0), m_textMessage(findFile("message_text.svg"), config["graphic/text_lod"].f()),
   m_loadingProgress(0.0f), m_logo(findFile("logo.svg")), m_logoAnim(0.0, 0.5)
@@ -150,9 +150,4 @@ Game::~Game() {
 
 bool Game::isFinished() {
 	return m_finished;
-}
-
-void Game::restartAudio() {
-	m_audio.restart();
-	m_audio.playMusic(findFile("menu.ogg"), true); // Start music again
 }

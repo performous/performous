@@ -69,7 +69,7 @@ class Songs {
 	/// Description of the current sort mode
 	std::string sortDesc() const;
 	/// Change sorting mode (diff is normally -1 or 1)
-	void sortChange(Game &game, int diff);
+	void sortChange(Game &game, Audio &audio, int diff);
 	void sortSpecificChange(int sortOrder, bool descending = false);
 	/// parses file into Song &tmp
 	void parseFile(Song& tmp);

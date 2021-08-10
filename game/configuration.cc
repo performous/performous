@@ -275,7 +275,7 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 fs::path systemConfFile;
 fs::path userConfFile;
 
-void writeConfig(Game &game, bool system) {
+void writeConfig(Game &game, Audio &audio, bool system) {
 	xmlpp::Document doc;
 	auto nodeRoot = doc.create_root_node("performous");
 	bool dirty = false;
@@ -303,7 +303,8 @@ void writeConfig(Game &game, bool system) {
 				entryNode->set_attribute("value", std::to_string(newValue));
 				std::clog << "audio/info: Audio backend changed; will now restart audio subsystem." << std::endl;
 				Audio::backendConfig().selectEnum(item.getEnumName());
-				game.restartAudio();
+				audio.restart();
+				audio.playMusic(findFile("menu.ogg"), true); // Start music again
 			}
 			else {	entryNode->set_attribute("value", std::to_string(oldValue)); }
 		}
