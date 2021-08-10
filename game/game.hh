@@ -23,8 +23,8 @@ class Game: public Singleton <Game> {
 	Game(Window& window, Audio& audio);
 	~Game();
 	/// Adds a screen to the manager
-	void addScreen(std::unique_ptr<Screen> s) { 
-		std::string screenName = s.get()->getName(); 
+	void addScreen(std::unique_ptr<Screen> s) {
+		std::string screenName = s.get()->getName();
 		std::pair<std::string, std::unique_ptr<Screen>> kv = std::make_pair(screenName, std::move(s));
 		screens.insert(std::move(kv));
 	}
@@ -114,4 +114,3 @@ private:
 
 // Declaration for the singleton pointer defined in game.cc
 template<> Game* Singleton<Game>::ms_Singleton;
-

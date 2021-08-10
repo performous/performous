@@ -8,8 +8,8 @@
 #include "progressbar.hh"
 #include "game.hh"
 
-ScreenPractice::ScreenPractice(std::string const& name, Audio& audio):
-  Screen(name), m_audio(audio)
+ScreenPractice::ScreenPractice(Game &game, std::string const& name, Audio& audio):
+  Screen(game, name), m_audio(audio)
 {}
 
 void ScreenPractice::enter() {
@@ -26,7 +26,7 @@ void ScreenPractice::enter() {
 	m_samples.push_back("drum cymbal");
 	//m_samples.push_back("drum tom2");
 	reloadGL();
-	Game::getSingletonPtr()->controllers.enableEvents(true);
+	getGame().controllers.enableEvents(true);
 }
 
 void ScreenPractice::reloadGL() {
@@ -34,19 +34,18 @@ void ScreenPractice::reloadGL() {
 }
 
 void ScreenPractice::exit() {
-	Game::getSingletonPtr()->controllers.enableEvents(false);
+	getGame().controllers.enableEvents(false);
 	m_vumeters.clear();
 	m_samples.clear();
 	theme.reset();
 }
 
 void ScreenPractice::manageEvent(input::NavEvent const& event) {
-	Game* gm = Game::getSingletonPtr();
 	input::NavButton nav = event.button;
-	if (nav == input::NAV_CANCEL || nav == input::NAV_START) gm->activateScreen("Intro");
+	if (nav == input::NAV_CANCEL || nav == input::NAV_START) getGame().activateScreen("Intro");
 	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
 	// Process all instrument events that are available, then throw away the instruments...
-	input::DevicePtr dev = gm->controllers.registerDevice(event.source);
+	input::DevicePtr dev = getGame().controllers.registerDevice(event.source);
 	if (dev) {
 		for (input::Event ev; dev->getEvent(ev);) {
 			if (ev.value == 0.0) continue;

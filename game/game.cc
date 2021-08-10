@@ -58,7 +58,7 @@ void Game::loading(std::string const& message, float progress) {
 	flashMessage(message + " " + std::to_string(int(round(progress*100))) + "%", 0.0f, 0.5f, 0.2f);
 	m_loadingProgress = progress;
 	m_window.blank();
-	m_window.render([this] { drawLoading(); });
+	m_window.render(*this, [this] { drawLoading(); });
 	m_window.swap();
 }
 
@@ -87,7 +87,7 @@ void Game::drawLoading() {
 void Game::fatalError(std::string const& message) {
 	dialog("FATAL ERROR\n\n" + message);
 	m_window.blank();
-	m_window.render([this] { drawNotifications(); });
+	m_window.render(*this, [this] { drawNotifications(); });
 	m_window.swap();
 	std::this_thread::sleep_for(4s);
 }
@@ -144,16 +144,16 @@ void Game::drawNotifications() {
 void Game::finished() {
 	m_finished = true;
 }
- 
+
 Game::~Game() {
 	if (currentScreen) currentScreen->exit();
 }
- 
+
 bool Game::isFinished() {
 	return m_finished;
 }
 
-void Game::restartAudio() { 
-		m_audio.restart();
-		m_audio.playMusic(findFile("menu.ogg"), true); // Start music again
-	}
+void Game::restartAudio() {
+	m_audio.restart();
+	m_audio.playMusic(findFile("menu.ogg"), true); // Start music again
+}
