@@ -123,6 +123,7 @@ else()
 	message(STATUS "MIDI I/O: Disabled (explicitly disabled)")
 endif()
 
+# Activating webcam
 option(ENABLE_WEBCAM "Enable webcam support (OpenCV)." ON)
 if(ENABLE_WEBCAM)
 	find_package(OpenCV)
@@ -138,23 +139,36 @@ else()
 	message(STATUS "Webcam support: Disabled (explicitly disabled)")
 endif()
 
-option(ENABLE_WEBSERVER "Enable webserver support (cpprestsdk)." ON)
-if(ENABLE_WEBSERVER)
-	find_package(CppRest)
+# Activating webserver
+if(DEFINED ENABLE_WEBSERVER AND ENABLE_WEBSERVER)
+	# webserver explicitly requested, make it mandatory
+	find_package(CppRest REQUIRED)
+	message(STATUS "Webserver support: Enabled (explicitly enabled)")
+elseif(DEFINED ENABLE_WEBSERVER AND NOT ENABLE_WEBSERVER)
+	# webserver explicitly disabled
+	message(STATUS "Webserver support: Disabled (explicitly disabled)")
+else()
+	# webserver not requested explicitly, best effort try to find it
+	find_package(CppRest QUIET)
 	if(CppRest_FOUND)
-		find_package(Boost 1.55 REQUIRED COMPONENTS chrono thread)
-		include_directories(${Boost_INCLUDE_DIRS})
-		list(APPEND LIBS ${Boost_LIBRARIES})
-
-		include_directories(${CppRest_INCLUDE_DIRS})
-		list(APPEND LIBS ${CppRest_LIBRARIES})
-		message(STATUS "Webserver support: Enabled")
-		add_definitions("-DUSE_WEBSERVER")
+		message(STATUS "Webserver support: Enabled (automatically found)")
 	else()
 		message(STATUS "Webserver support: Disabled (cpprestsdk not found)")
 	endif()
-else()
-	message(STATUS "Webserver support: Disabled (explicitly disabled)")
+endif()
+# make sure the command line option found is not cached
+unset(ENABLE_WEBSERVER CACHE)
+
+# if cpprest is found, add it to the dependencies
+if(CppRest_FOUND)
+	include_directories(${CppRest_INCLUDE_DIRS})
+	list(APPEND LIBS ${CppRest_LIBRARIES})
+	add_definitions("-DUSE_WEBSERVER")
+
+	# add other required dependencies then
+	find_package(Boost 1.55 REQUIRED COMPONENTS chrono thread)
+	include_directories(${Boost_INCLUDE_DIRS})
+	list(APPEND LIBS ${Boost_LIBRARIES})
 endif()
 
 if(WIN32)
