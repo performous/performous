@@ -6,32 +6,37 @@
 
 namespace xmlpp {
 #if LIBXMLPP_VERSION_2_6
-	typedef NodeSet const_NodeSet; // implementation to satisfy libxml++ 2.6 API
-
-	static inline Element* add_child_element(Element* element, const Glib::ustring& name) {
-		return element->add_child(name);
-	}
-
-	static inline const TextNode* get_first_child_text(const Element& element) {
-		return element.get_child_text();
-	}
-
-	static inline void set_first_child_text(Element* element, const Glib::ustring& content) {
-		return element->set_child_text(content);
-	}
+	using strType = Glib::ustring;
+	using const_NodeSet = NodeSet;
 #elif LIBXMLPP_VERSION_3_0
-	typedef Node::const_NodeSet const_NodeSet; // correct libxml++ 3.0 implementation
+	using strType = Glib::ustring;
+	using const_NodeSet = Node::const_NodeSet;
+#elif LIBXMLPP_VERSION_5_0
+	using strType = std::string;
+	using const_NodeSet = Node::const_NodeSet;
+#endif
 
-	static inline Element* add_child_element(Element* element, const Glib::ustring& name) {
-		return element->add_child_element(name);
+	static inline Element* add_child_element(Element* element, const strType& name) {
+		#if LIBXMLPP_VERSION_2_6
+			return element->add_child(name);
+		#else
+			return element->add_child_element(name);
+		#endif
 	}
 
 	static inline const TextNode* get_first_child_text(const Element& element) {
-		return element.get_first_child_text();
+		#if LIBXMLPP_VERSION_2_6
+			return element.get_child_text();
+		#else
+			return element.get_first_child_text();
+		#endif
 	}
 
-	static inline void set_first_child_text(Element* element, const Glib::ustring& content) {
-		return element->set_first_child_text(content);
+	static inline void set_first_child_text(Element* element, const strType& content) {
+		#if LIBXMLPP_VERSION_2_6
+			return element->set_child_text(content);
+		#else
+			return element->set_first_child_text(content);
+		#endif
 	}
-#endif
 }
