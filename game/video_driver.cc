@@ -267,11 +267,11 @@ void Window::updateTransforms() {
 	mat4 normal(g_modelview);
 	m_matrixUniforms.projMatrix = g_projection;
 	m_matrixUniforms.mvMatrix = g_modelview;
-	m_matrixUniforms.normalMatrix = normal;	
+	m_matrixUniforms.normalMatrix = normal;
 	glBufferSubData(GL_UNIFORM_BUFFER, m_matrixUniforms.offset(), m_matrixUniforms.size(), &m_matrixUniforms);
 }
 
-void Window::render(std::function<void (void)> drawFunc) {
+void Window::render(Game &game, std::function<void (void)> drawFunc) {
 	glutil::GLErrorChecker glerror("Window::render");
 	ViewTrans trans;  // Default frustum
 	bool stereo = config["graphic/stereo3d"].b();
@@ -284,7 +284,7 @@ void Window::render(std::function<void (void)> drawFunc) {
 		if (!warn3d) {
 			warn3d = true;
 			std::clog << "video/warning: Your GPU does not support Stereo3D mode (OpenGL extension ARB_viewport_array is required)" << std::endl;
-			Game::getSingletonPtr()->flashMessage("Your GPU does not support Stereo3D mode");
+			game.flashMessage("Your GPU does not support Stereo3D mode");
 		}
 	}
 

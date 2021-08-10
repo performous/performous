@@ -14,12 +14,13 @@
 #include <memory>
 
 class Audio;
+class Game;
 
 /// Abstract Class for screens
 class Screen {
   public:
 	/// counstructor
-	Screen(std::string const& name): m_name(name) {}
+	Screen(Game &game, std::string const& name): m_game(game), m_name(name) {}
 	virtual ~Screen() {}
 	/// Event handler for navigation events
 	virtual void manageEvent(input::NavEvent const& event) = 0;
@@ -37,7 +38,10 @@ class Screen {
 	virtual void reloadGL() { exit(); enter(); }
 	/// returns screen name
 	std::string getName() const { return m_name; }
+	/// returns game
+	Game& getGame() const { return m_game; }
   private:
+	Game &m_game;
 	std::string m_name;
 };
 
@@ -48,11 +52,11 @@ class Screen {
 class Game: public Singleton <Game> {
   public:
 	/// constructor
-	Game(Window& window, Audio& audio);
+	Game(Window& window);
 	~Game();
 	/// Adds a screen to the manager
-	void addScreen(std::unique_ptr<Screen> s) { 
-		std::string screenName = s.get()->getName(); 
+	void addScreen(std::unique_ptr<Screen> s) {
+		std::string screenName = s.get()->getName();
 		std::pair<std::string, std::unique_ptr<Screen>> kv = std::make_pair(screenName, std::move(s));
 		screens.insert(std::move(kv));
 	}
@@ -72,9 +76,6 @@ class Game: public Singleton <Game> {
 	Screen* getScreen(std::string const& name);
 	/// Returns a reference to the window
 	Window& window() { return m_window; }
-
-	/// Restarts Audio subsystem and begins playing menu music.
-	void restartAudio();
 
 	/// Draw a loading progress indication
 	void loading(std::string const& message, float progress);
@@ -109,7 +110,6 @@ class Game: public Singleton <Game> {
 #endif
 
 private:
-	Audio& m_audio;
 	Window& m_window;
 
 public:
