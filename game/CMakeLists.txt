@@ -124,19 +124,29 @@ else()
 endif()
 
 # Activating webcam
-option(ENABLE_WEBCAM "Enable webcam support (OpenCV)." ON)
-if(ENABLE_WEBCAM)
-	find_package(OpenCV)
-	if(OpenCV_FOUND)
-		include_directories(${OpenCV_INCLUDE_DIRS})
-		list(APPEND LIBS ${OpenCV_LIBS})
-		add_definitions("-DUSE_OPENCV")
-		message(STATUS "Webcam support: Enabled")
-	else()
-		message(STATUS "Webcam support: Disabled (libcv/libhighgui not found)")
-	endif()
-else()
+if(DEFINED ENABLE_WEBCAM AND ENABLE_WEBCAM)
+	# webcam support explicitly requested, make it mandatory
+	find_package(OpenCV REQUIRED)
+	message(STATUS "Webcam support: Enabled (explicitly enabled)")
+elseif(DEFINED ENABLE_WEBCAM AND NOT ENABLE_WEBCAM)
+	# webcam support explicitly disabled
 	message(STATUS "Webcam support: Disabled (explicitly disabled)")
+else()
+	# webcam support not requested explicitly, best effort try to find it
+	find_package(OpenCV QUIET)
+	if(OpenCV_FOUND)
+		message(STATUS "Webcam support: Enabled (automatically found)")
+	else()
+		message(STATUS "Webcam support: Disabled (OpenCV (libcv/libhighgui) not found)")
+	endif()
+endif()
+# make sure the command line option found is not cached
+unset(ENABLE_WEBCAM CACHE)
+
+if(OpenCV_FOUND)
+	include_directories(${OpenCV_INCLUDE_DIRS})
+	list(APPEND LIBS ${OpenCV_LIBS})
+	add_definitions("-DUSE_OPENCV")
 endif()
 
 # Activating webserver
