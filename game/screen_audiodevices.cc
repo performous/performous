@@ -186,7 +186,7 @@ bool ScreenAudioDevices::save(bool skip_ui_config) {
 		}
 		config["audio/devices"].sl() = devconf;
 	}
-	writeConfig(getGame(), false); // Save the new config
+	writeConfig(getGame(), m_audio, false); // Save the new config
 	m_audio.restart(); // Reload audio to take the new settings into use
 	m_audio.playMusic(findFile("menu.ogg"), true); // Start music again
 	// Check that all went well

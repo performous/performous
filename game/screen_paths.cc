@@ -32,7 +32,7 @@ void ScreenPaths::manageEvent(SDL_Event event) {
 			// TODO: Save
 		}
 		else if (key == SDL_SCANCODE_S && modifier & Platform::shortcutModifier()) {
-			writeConfig(getGame(), modifier & KMOD_ALT);
+			writeConfig(getGame(), m_audio, modifier & KMOD_ALT);
 			getGame().flashMessage((modifier & KMOD_ALT)
 				? _("Settings saved as system defaults.") : _("Settings saved."));
 		}
