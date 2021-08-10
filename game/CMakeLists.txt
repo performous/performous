@@ -108,19 +108,30 @@ foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWS
 	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
 
-option(ENABLE_MIDI "Enable support for MIDI hardware (e-drums with USB/MIDI connection)." ON)
-if(ENABLE_MIDI)
+# Activating MIDI hardware (e-drums with USB/MIDI connection)
+if(DEFINED ENABLE_MIDI AND ENABLE_MIDI)
+	# Midi support explicitly requested, make it mandatory
+	find_package(PortMidi REQUIRED)
+	message(STATUS "MIDI I/O support: Enabled (explicitly enabled)")
+elseif(DEFINED ENABLE_MIDI AND NOT ENABLE_MIDI)
+	# Midi support explicitly disabled
+	message(STATUS "MIDI I/O support: Disabled (explicitly disabled)")
+else()
+	# Midi support not requested explicitly, best effort try to find it
 	find_package(PortMidi)
 	if(PortMidi_FOUND)
-		include_directories(${PortMidi_INCLUDE_DIRS})
-		list(APPEND LIBS ${PortMidi_LIBRARIES})
-		add_definitions("-DUSE_PORTMIDI")
-		message(STATUS "MIDI I/O: Enabled")
+		message(STATUS "MIDI I/O support: Enabled (automatically found)")
 	else()
-		message(STATUS "MIDI I/O: Disabled (libportmidi not found)")
+		message(STATUS "MIDI I/O support: Disabled (libportmidi not found)")
 	endif()
-else()
-	message(STATUS "MIDI I/O: Disabled (explicitly disabled)")
+endif()
+# make sure the command line option found is not cached
+unset(ENABLE_MIDI CACHE)
+
+if(PortMidi_FOUND)
+	include_directories(${PortMidi_INCLUDE_DIRS})
+	list(APPEND LIBS ${PortMidi_LIBRARIES})
+	add_definitions("-DUSE_PORTMIDI")
 endif()
 
 # Activating webcam
