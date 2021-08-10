@@ -22,7 +22,7 @@ typedef std::vector<DanceNote> DanceNotes;
 class DanceGraph: public InstrumentGraph {
   public:
 	/// constructor
-	DanceGraph(Audio& audio, Song const& song, input::DevicePtr dev);
+	DanceGraph(Game &game, Audio& audio, Song const& song, input::DevicePtr dev);
 	/** draws DanceGraph
 	 * @param time at which time to draw
 	 */

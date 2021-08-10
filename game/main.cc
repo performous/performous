@@ -142,7 +142,7 @@ void mainLoop(std::string const& songlist) {
 			std::cerr << "ERROR: " << e.what() << std::endl;
 		}
 	Game gm(*window, audio);
-	WebServer server(songs);
+	WebServer server(gm, songs);
 	try {
 		// Load audio samples
 		gm.loading(_("Loading audio samples..."), 0.5);
@@ -161,14 +161,14 @@ void mainLoop(std::string const& songlist) {
 		audio.loadSample("notice.ogg",findFile("notice.ogg"));
 		// Load screens
 		gm.loading(_("Creating screens..."), 0.7);
-		gm.addScreen(std::make_unique<ScreenIntro>("Intro", audio));
-		gm.addScreen(std::make_unique<ScreenSongs>("Songs", audio, songs, database));
-		gm.addScreen(std::make_unique<ScreenSing>("Sing", audio, database, backgrounds));
-		gm.addScreen(std::make_unique<ScreenPractice>("Practice", audio));
-		gm.addScreen(std::make_unique<ScreenAudioDevices>("AudioDevices", audio));
-		gm.addScreen(std::make_unique<ScreenPaths>("Paths", audio, songs));
-		gm.addScreen(std::make_unique<ScreenPlayers>("Players", audio, database));
-		gm.addScreen(std::make_unique<ScreenPlaylist>("Playlist", audio, songs, backgrounds));
+		gm.addScreen(std::make_unique<ScreenIntro>(gm, "Intro", audio));
+		gm.addScreen(std::make_unique<ScreenSongs>(gm, "Songs", audio, songs, database));
+		gm.addScreen(std::make_unique<ScreenSing>(gm, "Sing", audio, database, backgrounds));
+		gm.addScreen(std::make_unique<ScreenPractice>(gm, "Practice", audio));
+		gm.addScreen(std::make_unique<ScreenAudioDevices>(gm, "AudioDevices", audio));
+		gm.addScreen(std::make_unique<ScreenPaths>(gm, "Paths", audio, songs));
+		gm.addScreen(std::make_unique<ScreenPlayers>(gm, "Players", audio, database));
+		gm.addScreen(std::make_unique<ScreenPlaylist>(gm, "Playlist", audio, songs, backgrounds));
 		gm.activateScreen("Intro");
 		gm.loading(_("Entering main menu"), 0.8);
 		gm.updateScreen();  // exit/enter, any exception is fatal error
@@ -199,7 +199,7 @@ void mainLoop(std::string const& songlist) {
 			try {
 				window->blank();
 				// Draw
-				window->render([&gm]{ gm.drawScreen(); });
+				window->render(gm, [&gm]{ gm.drawScreen(); });
 				if (benchmarking) { glFinish(); prof("draw"); }
 				// Display (and wait until next frame)
 				window->swap();
@@ -232,7 +232,7 @@ void mainLoop(std::string const& songlist) {
 			gm.flashMessage(std::string("ERROR: ") + e.what());
 			}
 		}
-		writeConfig();
+		writeConfig(gm);
 	} catch (EXCEPTION& e) {
 		std::clog << "core/error: Exiting due to fatal error: " << e.what() << std::endl;
 		gm.fatalError(e.what());  // Notify the user
