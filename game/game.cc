@@ -11,8 +11,8 @@
 
 template<> Game* Singleton<Game>::ms_Singleton = nullptr;
 
-Game::Game(Window& _window, Audio& _audio):
-  m_audio(_audio), m_window(_window), m_finished(false), newScreen(), currentScreen(), currentPlaylist(),
+Game::Game(Window& _window):
+  m_window(_window), m_finished(false), newScreen(), currentScreen(), currentPlaylist(),
   m_timeToFadeIn(), m_timeToFadeOut(), m_timeToShow(), m_message(),
   m_messagePopup(0.0, 1.0), m_textMessage(findFile("message_text.svg"), config["graphic/text_lod"].f()),
   m_loadingProgress(0.0f), m_logo(findFile("logo.svg")), m_logoAnim(0.0, 0.5)
@@ -57,7 +57,7 @@ void Game::loading(std::string const& message, float progress) {
 	flashMessage(message + " " + std::to_string(int(round(progress*100))) + "%", 0.0f, 0.5f, 0.2f);
 	m_loadingProgress = progress;
 	m_window.blank();
-	m_window.render([this] { drawLoading(); });
+	m_window.render(*this, [this] { drawLoading(); });
 	m_window.swap();
 }
 
@@ -86,7 +86,7 @@ void Game::drawLoading() {
 void Game::fatalError(std::string const& message) {
 	dialog("FATAL ERROR\n\n" + message);
 	m_window.blank();
-	m_window.render([this] { drawNotifications(); });
+	m_window.render(*this, [this] { drawNotifications(); });
 	m_window.swap();
 	std::this_thread::sleep_for(4s);
 }
@@ -143,16 +143,11 @@ void Game::drawNotifications() {
 void Game::finished() {
 	m_finished = true;
 }
- 
+
 Game::~Game() {
 	if (currentScreen) currentScreen->exit();
 }
- 
+
 bool Game::isFinished() {
 	return m_finished;
 }
-
-void Game::restartAudio() { 
-		m_audio.restart();
-		m_audio.playMusic(findFile("menu.ogg"), true); // Start music again
-	}

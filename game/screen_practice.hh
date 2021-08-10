@@ -13,7 +13,7 @@ class ThemePractice;
 class ScreenPractice : public Screen {
   public:
 	/// constructor
-	ScreenPractice(std::string const& name, Audio& audio);
+	ScreenPractice(Game &game, std::string const& name, Audio& audio);
 	void enter();
 	void exit();
 	void reloadGL();

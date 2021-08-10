@@ -7,7 +7,7 @@
 #include "audio.hh"
 #include "i18n.hh"
 
-ScreenPaths::ScreenPaths(std::string const& name, Audio& audio, Songs& songs): Screen(name), m_audio(audio), m_songs(songs) {}
+ScreenPaths::ScreenPaths(Game &game, std::string const& name, Audio& audio, Songs& songs): Screen(game, name), m_audio(audio), m_songs(songs) {}
 
 void ScreenPaths::enter() {
 	m_theme = std::make_unique<ThemeAudioDevices>();
@@ -31,24 +31,23 @@ void ScreenPaths::manageEvent(SDL_Event event) {
 			// TODO: Save
 		}
 		else if (key == SDL_SCANCODE_S && modifier & Platform::shortcutModifier()) {
-			writeConfig(modifier & KMOD_ALT);
-			Game::getSingletonPtr()->flashMessage((modifier & KMOD_ALT)
+			writeConfig(getGame(), m_audio, modifier & KMOD_ALT);
+			getGame().flashMessage((modifier & KMOD_ALT)
 				? _("Settings saved as system defaults.") : _("Settings saved."));
 		}
 	}
 }
 
 void ScreenPaths::manageEvent(input::NavEvent const& ev) {
-	Game* gm = Game::getSingletonPtr();
 	if (ev.button == input::NAV_CANCEL) {
-		gm->activateScreen("Intro");
+		getGame().activateScreen("Intro");
 	}
 	else if (ev.button == input::NAV_PAUSE) m_audio.togglePause();
 	else if (ev.button == input::NAV_DOWN) m_menu.move(1); //one down
 	else if (ev.button == input::NAV_MOREDOWN) m_menu.move(5); //five down (page-dwon-key)
 	else if (ev.button == input::NAV_UP) m_menu.move(-1); //one up
 	else if (ev.button == input::NAV_MOREUP) m_menu.move(-5); //five up (page up key)
-	else if (ev.button == input::NAV_START) m_menu.action(); //enter: execute currently selected option.
+	else if (ev.button == input::NAV_START) m_menu.action(getGame()); //enter: execute currently selected option.
 }
 
 void ScreenPaths::generateMenuFromPath(fs::path path) {
@@ -95,7 +94,7 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 		m_menu.add(MenuOption(_(".."),_("Go up one folder")).call([this, sl, path]() {
 					generateMenuFromPath(path.parent_path());
 	}));
-	
+
 	// Extract list of all directories
 	std::list<fs::path> directories;
 	for (const auto &di : fs::directory_iterator(path)) {
