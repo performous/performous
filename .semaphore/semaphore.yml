@@ -93,9 +93,10 @@ blocks:
           - echo "Installing Performous dependencies..."
           - sudo apt-get update -y
           - sudo apt-get install -y ninja-build
-          - sudo apt-get install -y gettext clang-9 gcc-8 g++-8 python3-dev python3-pip libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-program-options-dev libboost-iostreams-dev libboost-system-dev libboost-locale-dev  libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libicu-dev libopencv-videoio-dev libportmidi-dev libglm-dev libaubio-dev libcpprest-dev
-          - sem-version python 3.8
-          - sudo pip3 install meson
+          - sudo apt-get install -y gettext clang-9 gcc-8 g++-8
+          - sudo apt-get install -y libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-iostreams-dev libboost-locale-dev libboost-system-dev libboost-program-options-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev libicu-dev libopencv-videoio-dev libportmidi-dev libglm-dev libaubio-dev libcpprest-dev
+          - sem-version python 3.9
+          - pip3 install meson
           - echo "Checking out..."
           - checkout
           - git clone --depth 1 https://github.com/google/compact_enc_det.git 3rdparty/ced
@@ -110,7 +111,7 @@ blocks:
               value: g++-8
           commands:
             - echo "Setting up build..."
-            - meson setup build.gcc -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true -Dstoponwarning=true
+            - meson setup --buildtype=plain build.gcc -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true -Dstoponwarning=true
             - echo "Building..."
             - meson compile -C build.gcc
         - name: Clang-9 Build
@@ -121,6 +122,6 @@ blocks:
               value: clang++-9
           commands:
             - echo "Setting up build..."
-            - meson setup build.clang -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true
+            - meson setup --buildtype=plain build.clang -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true
             - echo "Building..."
             - meson compile -C build.clang
