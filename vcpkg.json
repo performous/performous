@@ -1,0 +1,39 @@
+{
+  "name": "performous",
+  "version": "1.0.0",
+  "dependencies": [
+    "openblas",
+    "fftw3",
+    "boost-program-options",
+    "boost-iostreams",
+    "boost-system",
+    "boost-format",
+    "boost-locale",
+    {
+      "name": "boost-locale",
+      "features": [
+        "icu"
+      ]
+    },
+    "libepoxy",
+    "sdl2",
+    "pango",
+    "freetype",
+    "cairo",
+    "gdk-pixbuf",
+    "librsvg",
+    "libxml2",
+    "libsigcpp",
+    "glibmm",
+    "libxmlpp",
+    "ffmpeg",
+    "portaudio",
+    "glm",
+    "portmidi",
+    "opencv",
+    "openssl",
+    "cpprestsdk",
+    "pthread"
+  ],
+  "builtin-baseline": "69478c5caafcde4c490bb1fccb960296801dbb5f"
+}
