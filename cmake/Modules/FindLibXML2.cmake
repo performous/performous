@@ -20,7 +20,7 @@ find_path(LibXML2_INCLUDE_DIR
 )
 
 find_library(LibXML2_LIBRARY
-  NAMES xml2
+  NAMES xml2 libxml2
   HINTS ${LibXML2_PKGCONF_LIBRARY_DIRS}
 )
 

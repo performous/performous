@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "game.hh"
 #include "audio.hh"
 #include "animvalue.hh"
 #include "notes.hh"
