@@ -1,6 +1,7 @@
 #include "screen_players.hh"
 #include "screen_songs.hh"
 
+#include "game.hh"
 #include "configuration.hh"
 #include "audio.hh"
 #include "database.hh"
@@ -61,7 +62,7 @@ void ScreenPlayers::manageEvent(input::NavEvent const& event) {
 		if (m_search.text.empty()) { gm->activateScreen("Songs"); return; }
 		else { m_search.text.clear(); m_players.setFilter(m_search.text); }
 	} else if (nav == input::NAV_START) {
-		if (m_players.empty()) {
+		if (m_players.isEmpty()) {
 			m_players.addPlayer(m_search.text);
 			m_players.setFilter(m_search.text);
 			m_players.update();
@@ -80,7 +81,7 @@ void ScreenPlayers::manageEvent(input::NavEvent const& event) {
 			// frustrating for second one that he cannot enter, so better go for next one...
 		}
 	}
-	else if (m_players.empty()) return;
+	else if (m_players.isEmpty()) return;
 	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
 	else if (nav == input::NAV_LEFT) m_players.advance(-1);
 	else if (nav == input::NAV_RIGHT) m_players.advance(1);
@@ -127,7 +128,7 @@ void ScreenPlayers::draw() {
 	double videoGap = 0.0;
 	std::ostringstream oss_song, oss_order;
 	// Test if there are no players currently selected
-	if (m_players.empty()) {
+	if (m_players.isEmpty()) {
 		// Format the song information text
 		if (m_search.text.empty()) {
 			oss_song << _("No players found!");
@@ -152,7 +153,7 @@ void ScreenPlayers::draw() {
 		double spos = m_players.currentPosition(); // This needs to be polled to run the animation
 
 		// Draw the covers
-		std::size_t ss = m_players.size();
+		const auto ss = m_players.count();
 		int baseidx = spos + 1.5; --baseidx; // Round correctly
 		double shift = spos - baseidx;
 		// FIXME: 3D browser
