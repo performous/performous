@@ -6,6 +6,7 @@
 #include "controllers.hh"
 #include "theme.hh"
 #include "progressbar.hh"
+#include "game.hh"
 
 ScreenPractice::ScreenPractice(std::string const& name, Audio& audio):
   Screen(name), m_audio(audio)
