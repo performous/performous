@@ -135,8 +135,8 @@ blocks:
         - name: Ubuntu 20.04 Cmake
           commands:
             - echo "Running the build script in the Ubuntu 20.04 container"
-        - name: Ubuntu 20.04 Meson
             - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run ooshlablu/performous-build:ubuntu20.04 ./build_performous.sh -c -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run ooshlablu/performous-build:ubuntu20.04 ./build_performous.sh -c -b ${SEMAPHORE_GIT_SHA}; fi
+        - name: Ubuntu 20.04 Meson
           commands:
             - echo "Running the build script in the Ubuntu 20.04 container"
             - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run ooshlablu/performous-build:ubuntu20.04 ./build_performous.sh -m -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run ooshlablu/performous-build:ubuntu20.04 ./build_performous.sh -m -b ${SEMAPHORE_GIT_SHA}; fi
