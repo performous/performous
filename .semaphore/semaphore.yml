@@ -127,7 +127,7 @@ blocks:
         - name: Ubuntu 18.04 Cmake
           commands:
             - echo "Running the build script in the Ubuntu 18.04 container"
-            - docker run ooshlablu/performous-build:ubuntu18.04 ./build_performous.sh -c -b ${SEMAPHORE_GIT_SHA} -r ${SEMAPHORE_GIT_URL}
+            - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run ooshlablu/performous-build:ubuntu18.04 ./build_performous.sh -c -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run ooshlablu/performous-build:ubuntu18.04 ./build_performous.sh -c -b ${SEMAPHORE_GIT_SHA}; fi
         - name: Ubuntu 18.04 Meson
           commands:
             - echo "Running the build script in the Ubuntu 18.04 container"
