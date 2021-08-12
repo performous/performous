@@ -7,20 +7,22 @@
 
 Dimensions dimensions; // Make a public member variable
 
-NoteGraph::NoteGraph(VocalTrack const& vocal):
+NoteGraph::NoteGraph(VocalTrack const& vocal, NoteGraphScalerPtr const& scaler):
   m_vocal(vocal),
   m_notelines(findFile("notelines.svg")), m_wave(findFile("wave.svg")),
   m_star(findFile("star.svg")), m_star_hl(findFile("star_glow.svg")),
   m_notebar(findFile("notebar.svg")), m_notebar_hl(findFile("notebar_hi.svg")),
   m_notebarfs(findFile("notebarfs.svg")), m_notebarfs_hl(findFile("notebarfs_hi.svg")),
   m_notebargold(findFile("notebargold.svg")), m_notebargold_hl(findFile("notebargold_hi.svg")),
-  m_notealpha(0.0f), m_nlTop(0.0, 4.0), m_nlBottom(0.0, 4.0), m_time()
+  m_notealpha(0.0f), m_nlTop(0.0, 4.0), m_nlBottom(0.0, 4.0), m_time(), m_scaler(scaler)
 {
 	dimensions.stretch(1.0, 0.5); // Initial dimensions, probably overridden from somewhere
 	m_nlTop.setTarget(m_vocal.noteMax, true);
 	m_nlBottom.setTarget(m_vocal.noteMin, true);
 	for (auto const& n: m_vocal.notes) n.stars.clear(); // Reset stars
 	reset();
+    
+	m_scaler->initialize(vocal);
 }
 
 void NoteGraph::reset() {
@@ -73,21 +75,11 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 
 	// Automatically zooming notelines
 	{
-		int low = m_vocal.noteMax;
-		int high = m_vocal.noteMin;
-		int low2 = m_vocal.noteMax;
-		int high2 = m_vocal.noteMin;
-		for (auto it = m_songit; it != m_vocal.notes.end() && it->begin < time + 15.0; ++it) {
-			if (it->type == Note::SLEEP) continue;
-			if (it->note < low) low = it->note;
-			if (it->note > high) high = it->note;
-			if (it->begin > time + 8.0) continue;
-			if (it->note < low2) low2 = it->note;
-			if (it->note > high2) high2 = it->note;
-		}
-		if (low2 <= high2) {
-			m_nlTop.setRange(high2, high);
-			m_nlBottom.setRange(low, low2);
+		const auto dimensions = m_scaler->calculate(m_vocal, m_songit, time);
+
+		if (dimensions.min2 <= dimensions.max2) {
+			m_nlTop.setRange(dimensions.max2, dimensions.max1);
+			m_nlBottom.setRange(dimensions.min1, dimensions.min2);
 		}
 	}
 	switch(position) {
@@ -265,4 +257,3 @@ void NoteGraph::drawWaves(Database const& database) {
 		strip(va);
 	}
 }
-
