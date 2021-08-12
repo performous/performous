@@ -2,7 +2,6 @@
 
 #include "dynamicnotegraphscaler.hh"
 #include "fixednotegraphscaler.hh"
-#include "notescaleanalyser.hh"
 
 #include "configuration.hh"
 
