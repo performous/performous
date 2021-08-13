@@ -10,8 +10,6 @@
 #include <stdexcept>
 #include <cstdlib>
 
-template<> Game* Singleton<Game>::ms_Singleton = nullptr;
-
 Game::Game(Window& _window, Audio& _audio):
   m_audio(_audio), m_window(_window), m_finished(false), newScreen(), currentScreen(), currentPlaylist(),
   m_timeToFadeIn(), m_timeToFadeOut(), m_timeToShow(), m_message(),
