@@ -21,7 +21,7 @@ BEGIN
       VALUE "FileDescription",  "@CMAKE_PROJECT_NAME@ Game"
       VALUE "FileVersion", "@PROJECT_VERSION@"
       VALUE "InternalName", "Performous.exe"
-      VALUE "LegalCopyright", "Copyright © 2009-2014 @CMAKE_PROJECT_NAME@ Team - GNU GPL v2 or later"
+      VALUE "LegalCopyright", "Copyright © 2009-2021 @CMAKE_PROJECT_NAME@ Team - GNU GPL v2 or later"
       VALUE "OriginalFilename", "Performous.exe"
       VALUE "ProductName", "@CMAKE_PROJECT_NAME@"
       VALUE "ProductVersion", "@PROJECT_VERSION@"
