@@ -203,7 +203,9 @@ namespace {
 void NoteGraph::drawWaves(Database const& database) {
 	if (m_vocal.notes.empty()) return; // Cannot draw without notes
 	UseTexture tblock(m_wave);
-	for (auto const& player: database.cur) {
+	std::list<Player> players = database.cur;
+	players.sort([](const Player& f, const Player& s) {return f.m_score < s.m_score; });
+	for (auto const& player: players) {
 		if (player.m_vocal.name != m_vocal.name)
 			continue;
 		float const texOffset = 2.0 * m_time; // Offset for animating the wave texture
