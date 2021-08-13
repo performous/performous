@@ -20,8 +20,8 @@ struct CamFrame {
 
 class Webcam {
   public:
-	/// cam_id -1 means pick any device
-	Webcam(int cam_id = -1);
+	/// cam_id 0 means autodetect webcam.
+	Webcam(int cam_id = 0);
 	~Webcam();
 
 	/// Thread runs here, don't call directly
