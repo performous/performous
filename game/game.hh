@@ -113,5 +113,4 @@ private:
 };
 
 // Declaration for the singleton pointer defined in game.cc
-template<> Game* Singleton<Game>::ms_Singleton;
-
+template<> Game* Singleton<Game>::ms_Singleton = nullptr;
