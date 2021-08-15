@@ -12,6 +12,7 @@
 #include "video.hh"
 #include "i18n.hh"
 #include "controllers.hh"
+#include "notegraphscalerfactory.hh"
 
 #include <iostream>
 #include <sstream>
@@ -26,7 +27,8 @@ ScreenPlayers::ScreenPlayers(std::string const& name, Audio& audio, Database& da
 
 void ScreenPlayers::enter() {
 	keyPressed = false;
-	m_layout_singer = std::make_unique<LayoutSinger>(m_song->getVocalTrack(0), m_database);
+	const auto scaler = NoteGraphScalerFactory().create(m_song->getVocalTrack(0));
+	m_layout_singer = std::make_unique<LayoutSinger>(m_song->getVocalTrack(0), m_database, scaler);
 	theme = std::make_unique<ThemeSongs>();
 	m_emptyCover = std::make_unique<Texture>(findFile("no_player_image.svg"));
 	m_search.text.clear();

@@ -202,3 +202,21 @@ endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
+if(WIN32)
+	install(CODE [[
+        file(GET_RUNTIME_DEPENDENCIES
+            RESOLVED_DEPENDENCIES_VAR deps_resolved
+            UNRESOLVED_DEPENDENCIES_VAR deps_unresolved
+            EXECUTABLES $<TARGET_FILE:performous>
+            PRE_EXCLUDE_REGEXES "api-ms-*" "ext-ms-*"
+            POST_EXCLUDE_REGEXES ".*system32/.*\\.dll"
+            )
+        message(STATUS "Resolving runtime dependencies for $<TARGET_FILE:performous>")
+        foreach(dep ${deps_resolved})
+            file(INSTALL ${dep} DESTINATION ${CMAKE_INSTALL_PREFIX})
+        endforeach()
+        foreach(dep ${deps_unresolved})
+            message(WARNING "Runtime dependency ${dep} could not be resolved.")
+        endforeach()
+        ]])
+endif()
