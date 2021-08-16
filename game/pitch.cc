@@ -124,7 +124,8 @@ bool Analyzer::calcFFT() {
 void Analyzer::calcTones() {
 	// Precalculated constants
 	const double freqPerBin = m_rate / FFT_N;
-	const double phaseStep = TAU * m_step / FFT_N;
+	const double stepRate = m_rate / m_step;  // Steps per second
+	const double phaseStep = double(m_step) / FFT_N;
 	const double normCoeff = 1.0 / FFT_N;
 	const double minMagnitude = pow(10, -100.0 / 20.0) / normCoeff; // -100 dB
 	// Limit frequency range of processing
@@ -133,14 +134,11 @@ void Analyzer::calcTones() {
 	std::vector<Peak> peaks(kMax + 1); // One extra to simplify loops
 	for (size_t k = 1; k <= kMax; ++k) {
 		double magnitude = std::abs(m_fft[k]);
-		double phase = std::arg(m_fft[k]);
-		// process phase difference
+		double phase = std::arg(m_fft[k]) / TAU;
 		double delta = phase - m_fftLastPhase[k];
 		m_fftLastPhase[k] = phase;
-		delta -= k * phaseStep;  // subtract expected phase difference
-		delta = std::remainder(delta, TAU);  // map delta phase into +/- pi interval
-		delta /= phaseStep;  // calculate diff from bin center frequency
-		double freq = (k + delta) * freqPerBin;  // calculate the true frequency
+		// Use phase difference over a step to calculate what the frequency must be
+		double freq = stepRate * (std::round(k * phaseStep - delta) + delta);
 		if (freq > 1.0 && magnitude > minMagnitude) {
 			peaks[k].freq = freq;
 			peaks[k].db = 20.0 * log10(normCoeff * magnitude);
