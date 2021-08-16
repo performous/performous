@@ -1,12 +1,12 @@
 #include "unicode.hh"
 
 #include "configuration.hh"
-#include "regex.hh"
+#include <regex>
 #include <sstream>
 #include <stdexcept>
 #include <unicode/unistr.h>
 #include <unicode/ustream.h>
-#include "../3rdparty/ced/compact_enc_det/compact_enc_det.h"
+#include "compact_enc_det/compact_enc_det.h"
 
 UErrorCode UnicodeUtil::m_staticIcuError = U_ZERO_ERROR;
 icu::RuleBasedCollator UnicodeUtil::m_dummyCollator (icu::UnicodeString (""), icu::Collator::PRIMARY, m_staticIcuError);
@@ -103,7 +103,7 @@ void UnicodeUtil::collate (songMetadata& stringmap) {
 			}
 		}
 		std::string collatedString = regex_replace(convertToUTF8(kv.second),
-		regex(pattern, regex_constants::icase), "$3,$2");
+		std::regex(pattern, std::regex_constants::icase), "$3,$2");
 		stringmap[kv.first] = collatedString;
 	}
 }
