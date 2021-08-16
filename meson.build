@@ -87,15 +87,24 @@ endif
 # Dependencies
 nulldependency = dependency('', required: false)
 
-libxmlpp = dependency('libxml++-3.0', cmake_module_path: './cmake/Modules', required: false)
+libxmlpp = dependency('libxml++-5.0', cmake_module_path: './cmake/Modules', required: false)
 if libxmlpp.found()
-  conf.set('LIBXMLPP_VERSION_3_0', 1)
+  conf.set('LIBXMLPP_VERSION_5_0', 1)
+  conf.set('LIBXMLPP_VERSION_3_0', 0)
   conf.set('LIBXMLPP_VERSION_2_6', 0)
 else
-  libxmlpp = dependency('libxml++-2.6', cmake_module_path: './cmake/Modules', required: true)
-  conf.set('LIBXMLPP_VERSION_2_6', 1)
-  conf.set('LIBXMLPP_VERSION_3_0', 0)
-  warning('libxml++-2.6 is deprecated.  Use a more recent version if possible.')
+  libxmlpp = dependency('libxml++-3.0', cmake_module_path: './cmake/Modules', required: false)
+  if libxmlpp.found()
+    conf.set('LIBXMLPP_VERSION_5_0', 0)
+    conf.set('LIBXMLPP_VERSION_3_0', 1)
+    conf.set('LIBXMLPP_VERSION_2_6', 0)
+  else
+    libxmlpp = dependency('libxml++-2.6', cmake_module_path: './cmake/Modules', required: true)
+    conf.set('LIBXMLPP_VERSION_5_0', 0)
+    conf.set('LIBXMLPP_VERSION_3_0', 0)
+    conf.set('LIBXMLPP_VERSION_2_6', 1)
+    warning('libxml++-2.6 is deprecated.  Use a more recent version if possible.')
+  endif
 endif
 
 # OpenCV may be referred to as opencv or opencv4
