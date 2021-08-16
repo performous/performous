@@ -6,6 +6,9 @@ project('performous',
         meson_version: '>=0.53.0',
         license: 'GPL-2.0-or-later')
 
+compact_enc_det = subproject('ced')
+compact_enc_det_dep = compact_enc_det.get_variable('compact_enc_det_dep') 
+
 # Print project summary. Limited to strict minimum for now
 summary({'Use Webcam': get_option('usewebcam'),
          'Use Midi Drum': get_option('usemididrum'),
@@ -194,6 +197,7 @@ endif
 configure_file(input: 'game/config.hh.in', output: 'config.hh', configuration: conf)
 
 dependencies = [
+  compact_enc_det_dep,
   dependency('pangocairo', cmake_module_path: './cmake/Modules'),
   dependency('sdl2', cmake_module_path: './cmake/Modules'),
   dependency('aubio'),
@@ -221,10 +225,6 @@ dependencies = [
   cpprest]
 
 executable('performous', [
-  '3rdparty/ced/compact_enc_det/compact_enc_det.cc',
-  '3rdparty/ced/compact_enc_det/compact_enc_det_hint_code.cc',
-  '3rdparty/ced/util/encodings/encodings.cc',
-  '3rdparty/ced/util/languages/languages.cc',
   'game/3dobject.cc',
   'game/audio.cc',
   'game/backgrounds.cc',
@@ -295,7 +295,6 @@ executable('performous', [
   'game/webcam.cc',
   'game/webserver.cc'],
   dependencies: dependencies,
-  include_directories: include_directories('3rdparty/ced'),
   cpp_args: compiler_args,
   install: true
 )
