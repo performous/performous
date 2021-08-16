@@ -159,6 +159,13 @@ if get_option('usewebserver')
   endif
 endif
 
+# Note: GLM can provide a CMake config script, but we also have a FindGLM module. Apparently when both are available, Meson crashes and burns.
+
+glm_dep = dependency('glm', required: false)
+if not glm_dep.found()
+  glm_dep = dependency('glm', cmake_module_path: './cmake/Modules', required: true)
+endif
+
 boostmodules = ['iostreams','locale','program_options','system']
 if host_machine.system() == 'darwin'
   getMacVersion = run_command(python3,'-c','import platform;print(platform.mac_ver()[0])')
@@ -205,7 +212,7 @@ dependencies = [
   dependency('libswresample', cmake_module_path: './cmake/Modules'),
   dependency('portaudio-2.0', cmake_module_path: './cmake/Modules'),
   dependency('fontconfig', cmake_module_path: './cmake/Modules'),
-  dependency('glm', cmake_module_path: './cmake/Modules'),
+  glm_dep,
   libssl,
   libcrypto,
   libxmlpp,
