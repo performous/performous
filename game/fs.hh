@@ -5,7 +5,7 @@
 #include <list>
 #include <vector>
 
-#if USE_BOOST_FS == 1
+#ifdef USE_BOOST_FS
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
