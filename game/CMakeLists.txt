@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.14.5)
 
 file(GLOB SOURCE_FILES "*.cc")
 file(GLOB HEADER_FILES "*.hh" "libda/*.hpp")
@@ -77,10 +77,12 @@ target_include_directories(fs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 if (USE_BOOST_FS)
     find_package(Boost 1.55 REQUIRED COMPONENTS filesystem)
 
+    message (STATUS "Using boost::filesystem")
     target_link_libraries(fs PUBLIC Boost::filesystem)
     target_compile_definitions(fs PUBLIC -DUSE_BOOST_FS)
 else()
     find_package(Filesystem REQUIRED)
+    message (STATUS "Using std::filesystem")
     target_link_libraries(fs PRIVATE std::filesystem)
 endif()
 
@@ -138,9 +140,7 @@ endif()
 
 option(ENABLE_WEBSERVER "Enable webserver support (cpprestsdk)." ON)
 if(ENABLE_WEBSERVER)
-	foreach(lib CppRest)
-		find_package(${lib})
-	endforeach(lib)
+	find_package(CppRest)
 	if(CppRest_FOUND)
 		find_package(Boost 1.55 REQUIRED COMPONENTS chrono thread)
 		include_directories(${Boost_INCLUDE_DIRS})
@@ -188,8 +188,6 @@ find_package(Threads)
 
 target_link_libraries(performous PRIVATE fs ced aubio ${LIBS} PkgConfig::deps Threads::Threads)
 
-target_include_directories(performous PRIVATE "${AUBIO_INSTALL_DIR}/include/")
-
 install(TARGETS performous DESTINATION ${BIN_INSTALL})
 
 set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)  # Store library paths in executable
@@ -204,3 +202,21 @@ endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
+if(WIN32)
+	install(CODE [[
+        file(GET_RUNTIME_DEPENDENCIES
+            RESOLVED_DEPENDENCIES_VAR deps_resolved
+            UNRESOLVED_DEPENDENCIES_VAR deps_unresolved
+            EXECUTABLES $<TARGET_FILE:performous>
+            PRE_EXCLUDE_REGEXES "api-ms-*" "ext-ms-*"
+            POST_EXCLUDE_REGEXES ".*system32/.*\\.dll"
+            )
+        message(STATUS "Resolving runtime dependencies for $<TARGET_FILE:performous>")
+        foreach(dep ${deps_resolved})
+            file(INSTALL ${dep} DESTINATION ${CMAKE_INSTALL_PREFIX})
+        endforeach()
+        foreach(dep ${deps_unresolved})
+            message(WARNING "Runtime dependency ${dep} could not be resolved.")
+        endforeach()
+        ]])
+endif()
