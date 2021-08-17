@@ -5,18 +5,11 @@
 #include "fs.hh"
 #include "hiscore.hh"
 #include "players.hh"
+#include "scoreitem.hh"
 #include "songitems.hh"
+
 #include <string>
 #include <ostream>
-
-struct ScoreItem {
-	int score;
-	input::DevType type;
-	std::string track;  ///< includes difficulty
-	std::string track_simple; ///< no difficulty
-	Color color;
-	bool operator<(ScoreItem const& other) const { return score < other.score; }
-};
 
 /**Access to a database for performous which holds
   Player-, Hiscore-, Song-, Track- and (in future)
