@@ -81,6 +81,7 @@ void SongItems::addSong(SongPtr song) {
 std::optional<SongId> SongItems::lookup(Song const& song) const {
     auto const si = std::find_if(m_songs.begin(), m_songs.end(), [&song](SongItem const& si) {
 
+
         // This is not always really correct but in most cases these inputs should have been normalized into unicode at one point during their life time.
         if (song.collateByArtistOnly.length() != si.artist.length() ||
             song.collateByTitleOnly.length() != si.title.length()) return false;
