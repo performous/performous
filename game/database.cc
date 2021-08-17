@@ -112,8 +112,13 @@ void Database::queryPerPlayerHiscore(std::ostream & os, std::string const& track
 	}
 }
 
-bool Database::hasHiscore(Song& s) const {
-	int songid = m_songs.lookup(s);
+bool Database::hasHiscore(const Song& s) const {
+	const auto songid = m_songs.lookup(s);
 	return m_hiscores.hasHiscore(songid);
+}
+
+unsigned Database::getHiscore(const Song& s) const {
+	const auto songid = m_songs.lookup(s);
+	return m_hiscores.getHiscore(songid);
 }
 

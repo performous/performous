@@ -80,8 +80,8 @@ public:
 
 	/**Lookup a songid for a specific song.
 	  @return -1 if no song found.*/
-	int lookup(std::shared_ptr<Song> song) const;
-	int lookup(Song& song) const;
+	int lookup(std::shared_ptr<Song> const& song) const;
+	int lookup(const Song& song) const;
 
 	/**Lookup the artist + title for a specific song.
 	  @return "Unknown Song" if nothing is found.

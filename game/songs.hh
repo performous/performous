@@ -66,7 +66,7 @@ class Songs {
 	void typeCycle(int cat);
 	int sortNum() const { return m_order; }
 	/// Description of the current sort mode
-	std::string sortDesc() const;
+	std::string getSortDescription() const;
 	/// Change sorting mode (diff is normally -1 or 1)
 	void sortChange(int diff);
 	void sortSpecificChange(int sortOrder, bool descending = false);
@@ -77,11 +77,12 @@ class Songs {
 	size_t loadedSongs() const { return m_songs.size(); }
 
   private:
-  	void LoadCache();
+	void LoadCache();
 	void CacheSonglist();
 
 	class RestoreSel;
-	typedef std::vector<std::shared_ptr<Song> > SongVector;
+	using SongPtr = std::shared_ptr<Song>;
+	using SongVector = std::vector<SongPtr>;
 	std::string m_songlist;
 	SongVector m_songs, m_filtered;
 	AnimValue m_updateTimer;
