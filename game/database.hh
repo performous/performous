@@ -10,6 +10,7 @@
 #include <optional>
 #include <string>
 #include <ostream>
+
 /**Access to a database for performous which holds
   Player-, Hiscore-, Song-, Track- and (in future)
   Partydata.

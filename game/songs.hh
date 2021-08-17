@@ -91,6 +91,8 @@ class Songs {
 	Cache loadCache();
 	void CacheSonglist();
 
+	using SongPtr = std::shared_ptr<Song>;
+	using SongVector = std::vector<SongPtr>;
 	void dumpSongs_internal() const;
 	void reload_internal();
 	void reload_internal(fs::path const& p, Cache cache);

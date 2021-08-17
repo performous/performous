@@ -44,8 +44,8 @@ ScoreWindow::ScoreWindow(Game& game, Instruments& instruments, Database& databas
 	else {
 		// Determine winner
 		m_database.scores.sort([](ScoreItem i, ScoreItem j) -> bool { return (i.score>j.score); });
-		const auto winner = *std::max_element(m_database.scores.begin(), m_database.scores.end());
-		const auto topScore = winner.score;
+		ScoreItem const& winner = *std::max_element(m_database.scores.begin(), m_database.scores.end());
+		const unsigned topScore = winner.score;
 		// Determine rank
 		if (winner.type == input::DevType::VOCALS) {
 			if (topScore > 8000) m_rank = _("Hit singer");

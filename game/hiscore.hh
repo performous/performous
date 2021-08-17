@@ -1,6 +1,7 @@
 #pragma once
 
 #include "hiscoreitem.hh"
+
 #include "libxml++.hh"
 #include "player.hh"
 #include "songitems.hh"
