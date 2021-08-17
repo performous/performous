@@ -67,7 +67,7 @@ class Songs {
 	void typeCycle(int cat);
 	int sortNum() const { return m_order; }
 	/// Description of the current sort mode
-	std::string sortDesc() const;
+	std::string getSortDescription() const;
 	/// Change sorting mode (diff is normally -1 or 1)
 	void sortChange(int diff);
 	void sortSpecificChange(int sortOrder, bool descending = false);
@@ -82,7 +82,8 @@ class Songs {
 	void CacheSonglist();
 
 	class RestoreSel;
-	typedef std::vector<std::shared_ptr<Song> > SongVector;
+	using SongPtr = std::shared_ptr<Song>;
+	using SongVector = std::vector<SongPtr>;
 	std::string m_songlist;
 	// Careful the m_songs needs to be correctly locked when accessed, and
 	// especially, the reload_internal thread expects to be the only thread

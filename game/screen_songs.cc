@@ -317,10 +317,10 @@ void ScreenSongs::draw() {
 		case 1:
 			if (!m_search.text.empty()) oss_order << m_search.text;
 			else if (m_songs.typeNum()) oss_order << m_songs.typeDesc();
-			else if (m_songs.sortNum()) oss_order << m_songs.sortDesc();
+			else if (m_songs.sortNum()) oss_order << m_songs.getSortDescription();
 			else oss_order << _("<type in to search>") << PAD << HORIZ_ARROW << _("songs") << PAD << VERT_ARROW << _("options");
 			break;
-		case 2: oss_order << HORIZ_ARROW << _("sort order: ") << m_songs.sortDesc(); break;
+		case 2: oss_order << HORIZ_ARROW << _("sort order: ") << m_songs.getSortDescription(); break;
 		case 3: oss_order << HORIZ_ARROW << _("type filter: ") << m_songs.typeDesc(); break;
 		case 4: oss_order << HORIZ_ARROW << _("hiscores") << PAD << ENTER << _("jukebox mode"); break;
 		case 0:
