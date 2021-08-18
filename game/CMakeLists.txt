@@ -109,21 +109,23 @@ foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWS
 endforeach(lib)
 
 # Activating MIDI hardware (e-drums with USB/MIDI connection)
-if(DEFINED ENABLE_MIDI AND ENABLE_MIDI)
-	# Midi support explicitly requested, make it mandatory
-	find_package(PortMidi REQUIRED)
-	message(STATUS "MIDI I/O support: Enabled (explicitly enabled)")
-elseif(DEFINED ENABLE_MIDI AND NOT ENABLE_MIDI)
-	# Midi support explicitly disabled
-	message(STATUS "MIDI I/O support: Disabled (explicitly disabled)")
-else()
+set(ENABLE_MIDI AUTO CACHE STRING "Use midi hardware (e-drums with USB/MIDI connection)")
+set_property(CACHE ENABLE_MIDI PROPERTY STRINGS AUTO ON OFF)
+if(NOT DEFINED ENABLE_MIDI OR "AUTO" STREQUAL ${ENABLE_MIDI})
 	# Midi support not requested explicitly, best effort try to find it
-	find_package(PortMidi)
+	find_package(PortMidi QUIET)
 	if(PortMidi_FOUND)
 		message(STATUS "MIDI I/O support: Enabled (automatically found)")
 	else()
 		message(STATUS "MIDI I/O support: Disabled (libportmidi not found)")
 	endif()
+elseif(ENABLE_MIDI)
+	# Midi support explicitly requested, make it mandatory
+	find_package(PortMidi REQUIRED)
+	message(STATUS "MIDI I/O support: Enabled (explicitly enabled)")
+else()
+	# Midi support explicitly disabled
+	message(STATUS "MIDI I/O support: Disabled (explicitly disabled)")
 endif()
 # make sure the command line option found is not cached
 unset(ENABLE_MIDI CACHE)
@@ -135,14 +137,9 @@ if(PortMidi_FOUND)
 endif()
 
 # Activating webcam
-if(DEFINED ENABLE_WEBCAM AND ENABLE_WEBCAM)
-	# webcam support explicitly requested, make it mandatory
-	find_package(OpenCV REQUIRED)
-	message(STATUS "Webcam support: Enabled (explicitly enabled)")
-elseif(DEFINED ENABLE_WEBCAM AND NOT ENABLE_WEBCAM)
-	# webcam support explicitly disabled
-	message(STATUS "Webcam support: Disabled (explicitly disabled)")
-else()
+set(ENABLE_WEBCAM AUTO CACHE STRING "Use webcam")
+set_property(CACHE ENABLE_WEBCAM PROPERTY STRINGS AUTO ON OFF)
+if(NOT DEFINED ENABLE_WEBCAM OR "AUTO" STREQUAL ${ENABLE_WEBCAM})
 	# webcam support not requested explicitly, best effort try to find it
 	find_package(OpenCV QUIET)
 	if(OpenCV_FOUND)
@@ -150,6 +147,13 @@ else()
 	else()
 		message(STATUS "Webcam support: Disabled (OpenCV (libcv/libhighgui) not found)")
 	endif()
+elseif(ENABLE_WEBCAM)
+	# webcam support explicitly requested, make it mandatory
+	find_package(OpenCV REQUIRED)
+	message(STATUS "Webcam support: Enabled (explicitly enabled)")
+else()
+	# webcam support explicitly disabled
+	message(STATUS "Webcam support: Disabled (explicitly disabled)")
 endif()
 # make sure the command line option found is not cached
 unset(ENABLE_WEBCAM CACHE)
@@ -161,14 +165,9 @@ if(OpenCV_FOUND)
 endif()
 
 # Activating webserver
-if(DEFINED ENABLE_WEBSERVER AND ENABLE_WEBSERVER)
-	# webserver explicitly requested, make it mandatory
-	find_package(CppRest REQUIRED)
-	message(STATUS "Webserver support: Enabled (explicitly enabled)")
-elseif(DEFINED ENABLE_WEBSERVER AND NOT ENABLE_WEBSERVER)
-	# webserver explicitly disabled
-	message(STATUS "Webserver support: Disabled (explicitly disabled)")
-else()
+set(ENABLE_WEBSERVER AUTO CACHE STRING "Use webserver")
+set_property(CACHE ENABLE_WEBSERVER PROPERTY STRINGS AUTO ON OFF)
+if(NOT DEFINED ENABLE_WEBSERVER OR "AUTO" STREQUAL ${ENABLE_WEBSERVER})
 	# webserver not requested explicitly, best effort try to find it
 	find_package(CppRest QUIET)
 	if(CppRest_FOUND)
@@ -176,6 +175,13 @@ else()
 	else()
 		message(STATUS "Webserver support: Disabled (cpprestsdk not found)")
 	endif()
+elseif(ENABLE_WEBSERVER)
+	# webserver explicitly requested, make it mandatory
+	find_package(CppRest REQUIRED)
+	message(STATUS "Webserver support: Enabled (explicitly enabled)")
+else()
+	# webserver explicitly disabled
+	message(STATUS "Webserver support: Disabled (explicitly disabled)")
 endif()
 # make sure the command line option found is not cached
 unset(ENABLE_WEBSERVER CACHE)
