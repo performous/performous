@@ -25,7 +25,7 @@ class ThemeInstrumentMenu;
 class ScreenSongs : public Screen {
 public:
 	/// constructor
-	ScreenSongs(std::string const& name, Audio& audio, Songs& songs, Database& database);
+	ScreenSongs(Game &game, std::string const& name, Audio& audio, Songs& songs, Database& database);
 	void enter();
 	void exit();
 	void reloadGL();

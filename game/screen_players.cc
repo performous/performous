@@ -18,8 +18,8 @@
 #include <sstream>
 #include <boost/format.hpp>
 
-ScreenPlayers::ScreenPlayers(std::string const& name, Audio& audio, Database& database):
-  Screen(name), m_audio(audio), m_database(database), m_players(database.m_players)
+ScreenPlayers::ScreenPlayers(Game &game, std::string const& name, Audio& audio, Database& database):
+  Screen(game, name), m_audio(audio), m_database(database), m_players(database.m_players)
 {
 	m_players.setAnimMargins(5.0, 5.0);
 	m_playTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
@@ -36,7 +36,7 @@ void ScreenPlayers::enter() {
 	m_audio.fadeout();
 	m_quitTimer.setValue(config["game/highscore_timeout"].i());
 	if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
-		Game::getSingletonPtr()->activateScreen("Playlist");
+		getGame().activateScreen("Playlist");
 	}
 }
 
@@ -56,10 +56,9 @@ void ScreenPlayers::exit() {
 
 void ScreenPlayers::manageEvent(input::NavEvent const& event) {
 	keyPressed = true;
-	Game* gm = Game::getSingletonPtr();
 	input::NavButton nav = event.button;
 	if (nav == input::NAV_CANCEL) {
-		if (m_search.text.empty()) { gm->activateScreen("Songs"); return; }
+		if (m_search.text.empty()) { getGame().activateScreen("Songs"); return; }
 		else { m_search.text.clear(); m_players.setFilter(m_search.text); }
 	} else if (nav == input::NAV_START) {
 		if (m_players.isEmpty()) {
@@ -73,7 +72,7 @@ void ScreenPlayers::manageEvent(input::NavEvent const& event) {
 
 		if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
 			// no more highscore, we are now finished
-			gm->activateScreen("Playlist");
+			getGame().activateScreen("Playlist");
 		} else {
 			m_search.text.clear();
 			m_players.setFilter("");
@@ -187,7 +186,7 @@ void ScreenPlayers::draw() {
 
 	// Schedule playback change if the chosen song has changed
 	if (music != m_playReq) { m_playReq = music; m_playTimer.setValue(0.0); }
-	if (m_quitTimer.get() == 0.0 && !keyPressed) { Game::getSingletonPtr()->activateScreen("Playlist"); return; }
+	if (m_quitTimer.get() == 0.0 && !keyPressed) { getGame().activateScreen("Playlist"); return; }
 	// Play/stop preview playback (if it is the time)
 	if (music != m_playing && m_playTimer.get() > 0.4) {
 		m_songbg.reset(); m_video.reset();

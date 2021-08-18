@@ -482,7 +482,7 @@ std::string Songs::sortDesc() const {
 	return str;
 }
 
-void Songs::sortChange(int diff) {
+void Songs::sortChange(Game &game, Audio &audio, int diff) {
 	m_order = (m_order + diff) % orders;
 	if (m_order < 0) m_order += orders;
 	RestoreSel restore(*this);
@@ -502,10 +502,10 @@ void Songs::sortChange(int diff) {
 			if (U_FAILURE(collatorError)) {
 				std::clog << "sorting/error: Unable to change collator strength." << std::endl;
 			}
-			break;		
+			break;
 		}
 	sort_internal();
-	writeConfig(false);
+	writeConfig(game, audio, false);
 }
 
 void Songs::sortSpecificChange(int sortOrder, bool descending) {
