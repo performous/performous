@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.14.5)
 project(Performous CXX C)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -12,6 +12,7 @@ git_describe(PROJECT_VERSION --tags)
 if(NOT PROJECT_VERSION)
 	set(PROJECT_VERSION "1.1+")
 endif()
+string(TIMESTAMP YEAR "%Y")
 
 message("Building ${PROJECT_NAME} ${PROJECT_VERSION}")
 
@@ -30,32 +31,22 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
 	add_definitions("-DNDEBUG")
 endif()
 
-if (USE_BOOST_REGEX)
-        add_definitions(-DUSE_BOOST_REGEX)
-endif()
-
 option(USE_BOOST_FS "Whether to use boost filsystem instead of c++17" FALSE)
 
 if (APPLE)
-	set (MACOS_SUPPORT_FILESYSTEM FALSE)
 	if (${CMAKE_OSX_DEPLOYMENT_TARGET})
 		message (STATUS "Checking macOS deployment target... ${CMAKE_OSX_DEPLOYMENT_TARGET}")
 		if (${CMAKE_OSX_DEPLOYMENT_TARGET} VERSION_GREATER_EQUAL 10.15)
 			message (STATUS "Targetting macOS 10.15 or newer, enabling std::filesystem")
-			set(MACOS_SUPPORT_FILESYSTEM TRUE)
+                else ()
+			set(USE_BOOST_FS TRUE)
 		endif()
 	else()
 		execute_process(COMMAND /usr/bin/sw_vers "-productVersion" OUTPUT_VARIABLE HOST_MACOS_VERSION)
 		message (STATUS "macOS deployment target not set; checking host... ${HOST_MACOS_VERSION}")
-		if (${HOST_MACOS_VERSION} VERSION_GREATER_EQUAL 10.15)
-			set(MACOS_SUPPORT_FILESYSTEM TRUE)
+		if (${HOST_MACOS_VERSION} VERSION_LESS 10.15)
+			set(USE_BOOST_FS TRUE)
 		endif()
-	endif()
-	if (${MACOS_SUPPORT_FILESYSTEM})
-		message (STATUS "Enabling std::filesystem")
-	else()
-		message (STATUS "Not enabling std::filesystem")
-		set(USE_BOOST_FS ON)
 	endif()
 endif()
 
@@ -85,53 +76,23 @@ else()
 	message(STATUS "Localization disabled: Gettext tools (msgfmt) missing")
 endif()
 
-if (APPLE)
-	set_property(GLOBAL PROPERTY BLA_VENDOR APPLE)
-	set(ACCELERATE_COMMAND "--enable-accelerate")
-	set(AUBIO_CFLAGS "${CMAKE_C_FLAGS} -iframeworkwithsysroot /System/Library/Frameworks/ -mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET} -isysroot '${CMAKE_OSX_SYSROOT}/'")
-else()
-	set(ACCELERATE_COMMAND "--enable-atlas")
-        set_property(GLOBAL PROPERTY BLA_VENDOR OpenBLAS)
-	set(AUBIO_CFLAGS "${CMAKE_C_FLAGS}")
-endif()
-
-find_package(BLAS REQUIRED MODULE)
-find_package(FFTW3 COMPONENTS single REQUIRED MODULE)
-
-if(NOT FFTW3_FOUND OR NOT BLAS_FOUND)
-	message(ERROR "fftw3 or BLAS required to build aubio, but they cannot be found.")
-endif()
-
-include(ExternalProject)
-ExternalProject_Add(build-aubio-from-sources
-	SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/aubio/
-        BINARY_DIR ${CMAKE_BINARY_DIR}/3rdparty/aubio-build/
-        INSTALL_DIR ${CMAKE_BINARY_DIR}/3rdparty/aubio-install/
-        UPDATE_COMMAND ""
-	TMP_DIR ${CMAKE_BINARY_DIR}/3rdparty/aubio-build/tmp/
-	CONFIGURE_COMMAND ""
-	BUILD_COMMAND ${CMAKE_COMMAND} -E env CFLAGS=${AUBIO_CFLAGS} ${CMAKE_SOURCE_DIR}/3rdparty/aubio/waf
-                  ${ACCELERATE_COMMAND} --disable-tests --notests --verbose
-                  --enable-fftw3f --disable-sndfile --disable-avcodec --disable-double
-                  --disable-samplerate --disable-docs --disable-wavread --disable-wavwrite
-                  --disable-tests --notests --disable-examples --disable-apple-audio
-                  --disable-fat --disable-jack --libdir=lib
-                  --prefix=${CMAKE_BINARY_DIR}/3rdparty/aubio-install/
-                  --top=${CMAKE_SOURCE_DIR}/3rdparty/aubio/
-                  --out=${CMAKE_BINARY_DIR}/3rdparty/aubio-build/ configure build install
-	INSTALL_COMMAND ""
+include(FetchContent)
+FetchContent_Declare(ced-sources
+  GIT_REPOSITORY https://github.com/performous/compact_enc_det.git
+  #https://github.com/google/compact_enc_det.git
+  GIT_TAG        master
+  SOURCE_DIR ced-src
 )
 
-ExternalProject_Get_Property(build-aubio-from-sources INSTALL_DIR)
-set (AUBIO_INSTALL_DIR ${INSTALL_DIR})
-add_library(aubio STATIC IMPORTED)
-set_target_properties(aubio PROPERTIES IMPORTED_LOCATION ${AUBIO_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}aubio${CMAKE_STATIC_LIBRARY_SUFFIX})
-add_dependencies(aubio build-aubio-from-sources)
+FetchContent_MakeAvailable(ced-sources)
+
+option(USE_SELF_BUILT_AUBIO "Use custom aubio local build instead of using system lib (if available)" FALSE)
+
+find_package(Aubio REQUIRED)
 
 add_subdirectory(data)
 
 add_subdirectory(game)
-add_subdirectory(3rdparty/ced)
 add_subdirectory(docs)
 
 if(WIN32)
@@ -152,11 +113,66 @@ if(NOT APPLE)
 endif()
 
 #CPACK variables
-include(CPack)
-set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Niek Nooijens")
-set(CPACK_PACKAGE_CONTACT "nieknooijens@gmail.com")
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libavcodec54, libavformat54, libswresample2, libsdl2-2.0-0, libportaudiocpp0, libboost-all-dev, libswscale2, libxml++2.6-2, libopencv-dev, librsvg2-2, libpango-1.0-0, libcairo2, libjpeg8, libpng12-0, libportmidi0, libicu-dev, libglm-dev libopenblas-dev libfftw3-dev")
-set(CPACK_DEBIAN_PACKAGE_DESCRIPTION_SUMMARY "A free music rhythm game similar to SingStar, Guitar Hero and DDR")
-set(CPACK_DEBIAN_PACKAGE_VERSION ${PROJECT_VERSION})
-set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
+include(InstallRequiredSystemLibraries)
+
+# Project definition
+set(CPACK_PACKAGE_VENDOR "Performous")
+set(CPACK_PACKAGE_DESCRIPTION "Karaoke, band games and dancing in the same package. Performous lets you perform great songs, improve your musical skills and simply have fun! No special hardware required, you may play guitar on your PC keyboard, sing on your laptop microphone and so on. If you do have SingStar microphones, Guitar Hero or Rock Band instruments, or dance pads, just plug them into your USB ports and start rocking!")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "An open-source music and rhythm game.")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.md")
+if(WIN32)
+	set(CPACK_PACKAGE_EXECUTABLES "Performous" "${CMAKE_CURRENT_SOURCE_DIR}/win32\\\\performous.ico")
+	set(CPACK_PACKAGE_INSTALL_DIRECTORY "Performous\\\\Performous")
+else()
+	set(CPACK_PACKAGE_EXECUTABLES "performous")
+endif()
+set(CPACK_PACKAGE_CONTACT "Arjan Speiard | Asgard Sings! <info@asgardsings.nl>")
+
+if(NOT CPACK_PACKAGE_VERSION)
+	set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+endif()
 set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CMAKE_BINARY_DIR};${PROJECT_NAME};ALL;/")
+set(CPACK_GENERATOR "TGZ;ZIP;DEB;RPM;NSIS")
+
+# Debian specific settings
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_PACKAGE_SECTION "Games")
+
+# RPM specific settings
+set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
+
+set(CPACK_RPM_PACKAGE_REQUIRES "cairo-devel, librsvg2-devel, glibmm24-devel, libxml++-devel, boost-devel, SDL2-devel, libepoxy-devel, ffmpeg-devel, portaudio-devel, opencv-devel, portmidi-devel, libjpeg-turbo-devel, pango-devel, libpng-devel, glm-devel, openblas-devel, fftw-devel, cpprest-devel")
+set(CPACK_RPM_PACKAGE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.md")
+
+set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "${LC_MESSAGES_DIRS}")
+set(CPACK_RPM_PACKAGE_DESCRIPTION "${CPACK_PACKAGE_DESCRIPTION}")
+set(CPACK_RPM_PACKAGE_URL "https://github.com/performous/performous")
+
+# NSIS specific settings
+set(CPACK_NSIS_MUI_ICON "${CMAKE_CURRENT_SOURCE_DIR}/win32\\\\performous.ico")
+set(CPACK_NSIS_MUI_UNIICON "${CMAKE_CURRENT_SOURCE_DIR}/win32\\\\performous.ico")
+set(CPACK_NSIS_MUI_WELCOMEFINISHPAGE_BITMAP "${CMAKE_CURRENT_SOURCE_DIR}/win32/nsis\\\\welcomefinishpage.bmp")
+set(CPACK_NSIS_COMPRESSOR "/SOLID lzma")
+set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+set(CPACK_NSIS_MODIFY_PATH OFF)
+set(CPACK_NSIS_DISPLAY_NAME "${PROJECT_NAME}")
+set(CPACK_NSIS_PACKAGE_NAME "${CPACK_NSIS_DISPLAY_NAME}")
+set(CPACK_NSIS_INSTALLED_ICON_NAME "${PROJECT_NAME}.exe")
+set(CPACK_NSIS_HELP_LINK "https://github.com/performous/performous")
+set(CPACK_NSIS_URL_INFO_ABOUT "https://performous.org")
+set(CPACK_NSIS_CONTACT "${CPACK_PACKAGE_CONTACT}")
+set(CPACK_NSIS_CREATE_ICONS_EXTRA "CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\${PROJECT_NAME}.lnk' '$INSTDIR\\\\${PROJECT_NAME}.exe'"
+								  "CreateShortcut '$SMPROGRAMS\\\\Performous\\\\Uninstall.lnk' '$INSTDIR\\\\Uninstall.exe''")
+set(CPACK_NSIS_DELETE_ICONS_EXTRA "Delete '$SMPROGRAMS\\\\$START_MENU\\\\${PROJECT_NAME}.lnk'"
+								  "Delete '$SMPROGRAMS\\\\$START_MENU\\\\Uninstall.lnk'")
+set(CPACK_NSIS_EXECUTABLES_DIRECTORY ".")
+set(CPACK_NSIS_MUI_FINISHPAGE_RUN "${PROJECT_NAME}.exe")
+set(CPACK_NSIS_MENU_LINKS "https://discord.gg/NS3m3ad" "Performous Discord")
+set(CPACK_NSIS_WELCOME_TITLE "Welcome to the Performous installer.")
+set(CPACK_NSIS_FINISH_TITLE "Congratulations Performous is now installed.")
+set(CPACK_NSIS_MUI_HEADERIMAGE "${CMAKE_CURRENT_SOURCE_DIR}/win32/nsis\\\\headerimage.bmp")
+set(CPACK_NSIS_MANIFEST_DPI_AWARE ON)
+set(CPACK_NSIS_BRANDING_TEXT "Performous installer ${PROJECT_VERSION} 2009-${YEAR}")
+
+include(CPack)

@@ -8,6 +8,7 @@
 #include "platform.hh"
 #include "theme.hh"
 #include "menu.hh"
+#include "game.hh"
 
 #include <SDL2/SDL_timer.h>
 

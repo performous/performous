@@ -8,7 +8,7 @@
 #include <thread>
 
 #ifdef USE_OPENCV
-#include <opencv2/opencv.hpp>
+#include <opencv2/videoio.hpp>
 
 #else
 // Dummy classes

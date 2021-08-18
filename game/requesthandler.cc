@@ -1,5 +1,6 @@
 #include "requesthandler.hh"
 #include "unicode.hh"
+#include "game.hh"
 
 #ifdef USE_WEBSERVER
 RequestHandler::RequestHandler(Songs& songs):m_songs(songs)

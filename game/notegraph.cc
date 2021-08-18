@@ -7,20 +7,22 @@
 
 Dimensions dimensions; // Make a public member variable
 
-NoteGraph::NoteGraph(VocalTrack const& vocal):
+NoteGraph::NoteGraph(VocalTrack const& vocal, NoteGraphScalerPtr const& scaler):
   m_vocal(vocal),
   m_notelines(findFile("notelines.svg")), m_wave(findFile("wave.svg")),
   m_star(findFile("star.svg")), m_star_hl(findFile("star_glow.svg")),
   m_notebar(findFile("notebar.svg")), m_notebar_hl(findFile("notebar_hi.svg")),
   m_notebarfs(findFile("notebarfs.svg")), m_notebarfs_hl(findFile("notebarfs_hi.svg")),
   m_notebargold(findFile("notebargold.svg")), m_notebargold_hl(findFile("notebargold_hi.svg")),
-  m_notealpha(0.0f), m_nlTop(0.0, 4.0), m_nlBottom(0.0, 4.0), m_time()
+  m_notealpha(0.0f), m_nlTop(0.0, 4.0), m_nlBottom(0.0, 4.0), m_time(), m_scaler(scaler)
 {
 	dimensions.stretch(1.0, 0.5); // Initial dimensions, probably overridden from somewhere
 	m_nlTop.setTarget(m_vocal.noteMax, true);
 	m_nlBottom.setTarget(m_vocal.noteMin, true);
 	for (auto const& n: m_vocal.notes) n.stars.clear(); // Reset stars
 	reset();
+    
+	m_scaler->initialize(vocal);
 }
 
 void NoteGraph::reset() {
@@ -28,35 +30,35 @@ void NoteGraph::reset() {
 }
 
 namespace {
-	void drawNotebar(Texture const& texture, double x, double ybeg, double yend, double w, double h) {
+	void drawNotebar(Texture const& texture, double x, double ybeg, double yend, double w, double h_x, double h_y) {
 		glutil::VertexArray va;
 		UseTexture tblock(texture);
 
 		// The front cap begins
 		va.texCoord(0.0f, 0.0f).vertex(x, ybeg);
-		va.texCoord(0.0f, 1.0f).vertex(x, ybeg + h);
-		if (w >= 2.0 * h) {
+		va.texCoord(0.0f, 1.0f).vertex(x, ybeg + h_y);
+		if (w >= 2.0 * h_x) {
 			// Calculate the y coordinates of the middle part
-			double tmp = h / w;  // h = cap size (because it is a h by h square)
+			double tmp = h_x / w;  // h_x = cap size (because it is a h_x by h_x square)
 			double y1 = (1.0 - tmp) * ybeg + tmp * yend;
 			double y2 = tmp * ybeg + (1.0 - tmp) * yend;
 			// The middle part between caps
-			va.texCoord(0.5f, 0.0f).vertex(x + h, y1);
-			va.texCoord(0.5f, 1.0f).vertex(x + h, y1 + h);
-			va.texCoord(0.5f, 0.0f).vertex(x + w - h, y2);
-			va.texCoord(0.5f, 1.0f).vertex(x + w - h, y2 + h);
+			va.texCoord(0.5f, 0.0f).vertex(x + h_x, y1);
+			va.texCoord(0.5f, 1.0f).vertex(x + h_x, y1 + h_y);
+			va.texCoord(0.5f, 0.0f).vertex(x + w - h_x, y2);
+			va.texCoord(0.5f, 1.0f).vertex(x + w - h_x, y2 + h_y);
 		} else {
 			// Note is too short to even fit caps, crop to fit.
 			double ymid = 0.5 * (ybeg + yend);
-			float crop = 0.25f * w / h;
+			float crop = 0.25f * w / h_x;
 			va.texCoord(crop, 0.0f).vertex(x + 0.5 * w, ymid);
-			va.texCoord(crop, 1.0f).vertex(x + 0.5 * w, ymid + h);
+			va.texCoord(crop, 1.0f).vertex(x + 0.5 * w, ymid + h_y);
 			va.texCoord(1.0f - crop, 0.0f).vertex(x + 0.5 * w, ymid);
-			va.texCoord(1.0f - crop, 1.0f).vertex(x + 0.5 * w, ymid + h);
+			va.texCoord(1.0f - crop, 1.0f).vertex(x + 0.5 * w, ymid + h_y);
 		}
 		// The rear cap ends
 		va.texCoord(1.0f, 0.0f).vertex(x + w, yend);
-		va.texCoord(1.0f, 1.0f).vertex(x + w, yend + h);
+		va.texCoord(1.0f, 1.0f).vertex(x + w, yend + h_y);
 
 		va.draw();
 	}
@@ -73,21 +75,11 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 
 	// Automatically zooming notelines
 	{
-		int low = m_vocal.noteMax;
-		int high = m_vocal.noteMin;
-		int low2 = m_vocal.noteMax;
-		int high2 = m_vocal.noteMin;
-		for (auto it = m_songit; it != m_vocal.notes.end() && it->begin < time + 15.0; ++it) {
-			if (it->type == Note::SLEEP) continue;
-			if (it->note < low) low = it->note;
-			if (it->note > high) high = it->note;
-			if (it->begin > time + 8.0) continue;
-			if (it->note < low2) low2 = it->note;
-			if (it->note > high2) high2 = it->note;
-		}
-		if (low2 <= high2) {
-			m_nlTop.setRange(high2, high);
-			m_nlBottom.setRange(low, low2);
+		const auto dimensions = m_scaler->calculate(m_vocal, m_songit, time);
+
+		if (dimensions.min2 <= dimensions.max2) {
+			m_nlTop.setRange(dimensions.max2, dimensions.max1);
+			m_nlBottom.setRange(dimensions.min1, dimensions.min2);
 		}
 	}
 	switch(position) {
@@ -179,16 +171,26 @@ void NoteGraph::drawNotes() {
 		  default: throw std::logic_error("Unknown note type: don't know how to render");
 		}
 		double x = m_baseX + it->begin * pixUnit + m_noteUnit; // left x coordinate: begin minus border (side borders -noteUnit wide)
-		double ybeg = m_baseY + (it->notePrev + 1) * m_noteUnit; // top y coordinate (on the one higher note line)
-		double yend = m_baseY + (it->note + 1) * m_noteUnit; // top y coordinate (on the one higher note line)
+		double bar_height = barHeight();
+		double ybeg = m_baseY + (it->notePrev +bar_height) * m_noteUnit; // top y coordinate (on the one higher note line)
+		double yend = m_baseY + (it->note +bar_height) * m_noteUnit; // top y coordinate (on the one higher note line)
 		double w = (it->end - it->begin) * pixUnit - m_noteUnit * 2.0; // width: including borders on both sides
-		double h = -m_noteUnit * 2.0; // height: 0.5 border + 1.0 bar + 0.5 border = 2.0
-		drawNotebar(*t1, x, ybeg, yend, w, h);
+		double h_x = -m_noteUnit * 2.0; // height: 0.5 border + 1.0 bar + 0.5 border = 2.0
+		double h_y = h_x * bar_height; //
+		drawNotebar(*t1, x, ybeg, yend, w, h_x, h_y);
 		if (alpha > 0.0) {
 			ColorTrans c(Color::alpha(alpha));
-			drawNotebar(*t2, x, ybeg, yend, w, h);
+			drawNotebar(*t2, x, ybeg, yend, w, h_x, h_y);
 		}
 	}
+}
+
+double NoteGraph::barHeight() {
+	return 2.0 * thresholdForFullScore();
+}
+
+double NoteGraph::waveThickness(){
+	return thresholdForNonzeroScore() - thresholdForFullScore();
 }
 
 namespace {
@@ -240,7 +242,7 @@ void NoteGraph::drawWaves(Database const& database) {
 			// Graphics positioning & animation:
 			double y = m_baseY + val * m_noteUnit;
 			double thickness = clamp(1.0 + pitch[idx].second / 60.0) + 0.5;
-			thickness *= 1.0 + 0.2 * std::sin(tex - 2.0 * texOffset); // Further animation :)
+			thickness *= NoteGraph::waveThickness() * (1.0 + 0.2 * std::sin(tex - 2.0 * texOffset)); // Further animation :)
 			thickness *= -m_noteUnit;
 			// If there has been a break or if the pitch change is too fast, terminate and begin a new one
 			if (oldval != oldval || std::abs(oldval - val) > 1) strip(va);
@@ -255,4 +257,3 @@ void NoteGraph::drawWaves(Database const& database) {
 		strip(va);
 	}
 }
-

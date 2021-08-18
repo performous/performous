@@ -3,6 +3,7 @@
 #include "animvalue.hh"
 #include "texture.hh"
 #include "notes.hh"
+#include "dynamicnotegraphscaler.hh"
 
 class Song;
 class Database;
@@ -12,7 +13,7 @@ class NoteGraph {
   public:
 	enum Position {FULLSCREEN, TOP, BOTTOM, LEFT, RIGHT};
 	/// constructor
-	NoteGraph(VocalTrack const& vocal);
+	NoteGraph(VocalTrack const& vocal, NoteGraphScalerPtr const&);
 	/// resets NoteGraph and Notes
 	void reset();
 	/** draws NoteGraph (notelines, notes, waves)
@@ -25,6 +26,8 @@ class NoteGraph {
 	void drawNotes();
 	/// draw waves (what players are singing)
 	void drawWaves(Database const& database);
+ 	double barHeight();
+ 	double waveThickness();
 	VocalTrack const& m_vocal;
 	Texture m_notelines;
 	Texture m_wave;
@@ -41,6 +44,6 @@ class NoteGraph {
 	Notes::const_iterator m_songit;
 	double m_time;
 	double m_max, m_min, m_noteUnit, m_baseY, m_baseX;
-
+	const NoteGraphScalerPtr m_scaler;
 };
 

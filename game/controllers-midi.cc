@@ -3,7 +3,7 @@
 #include "controllers.hh"
 #include "fs.hh"
 #include "portmidi.hh"
-#include "regex.hh"
+#include <regex>
 #include <unordered_map>
 #include <sstream>
 
@@ -12,7 +12,7 @@ namespace input {
 	class Midi: public Hardware {
 	public:
 		Midi() {
-			regex re(config["game/midi_input"].s());
+			std::regex re(config["game/midi_input"].s());
 			for (int dev = 0; dev < Pm_CountDevices(); ++dev) {
 				try {
 					PmDeviceInfo const* info = Pm_GetDeviceInfo(dev);

@@ -2,7 +2,7 @@
 #include "screen.hh"
 #include "texture.hh"
 #include "fs.hh"
-
+#include "game.hh"
 
 MenuOption::MenuOption(std::string const& nm, std::string const& comm, MenuImage img):
   type(), value(), newValue(), callback(), image(img), name(nm), comment(comm), namePtr(), commentPtr()
@@ -57,11 +57,12 @@ void Menu::action(int dir) {
 		}
 		case MenuOption::CHANGE_VALUE: {
 			if (current().value) {
-				if (current().value->getShortDesc() == config["audio/backend"].getShortDesc()) {
-					current().value->oldValue = current().value->getValue();
+				if (current().value->getName() == "audio/backend") {
+					current().value->setOldValue(current().value->getValue());
 				}
-				else if (current().value->getShortDesc() == config["graphic/stereo3d"].getShortDesc()) {
-					current().value->oldValue = (current().value->getValue() == _("Disabled")) ? "0" : "1";
+				else if (current().value->getName() == "graphic/stereo3d") {
+					std::string oldValue((current().value->getValue() == _("Disabled")) ? "0" : "1");
+					current().value->setOldValue(oldValue);
 				}
 				if (dir > 0) ++(*(current().value));
 				else if (dir < 0) --(*(current().value));
