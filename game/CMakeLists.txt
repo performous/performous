@@ -127,8 +127,6 @@ else()
 	# Midi support explicitly disabled
 	message(STATUS "MIDI I/O support: Disabled (explicitly disabled)")
 endif()
-# make sure the command line option found is not cached
-unset(ENABLE_MIDI CACHE)
 
 if(PortMidi_FOUND)
 	include_directories(${PortMidi_INCLUDE_DIRS})
@@ -155,8 +153,6 @@ else()
 	# webcam support explicitly disabled
 	message(STATUS "Webcam support: Disabled (explicitly disabled)")
 endif()
-# make sure the command line option found is not cached
-unset(ENABLE_WEBCAM CACHE)
 
 if(OpenCV_FOUND)
 	include_directories(${OpenCV_INCLUDE_DIRS})
@@ -183,8 +179,6 @@ else()
 	# webserver explicitly disabled
 	message(STATUS "Webserver support: Disabled (explicitly disabled)")
 endif()
-# make sure the command line option found is not cached
-unset(ENABLE_WEBSERVER CACHE)
 
 # if cpprest is found, add it to the dependencies
 if(CppRest_FOUND)
