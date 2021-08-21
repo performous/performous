@@ -172,7 +172,7 @@ void ScreenIntro::populateMenu() {
 	MenuImage imgQuit(new Texture(findFile("intro_quit.svg")));
 	m_menu.clear();
 	m_menu.add(MenuOption(_("Perform"), _("Start performing!"), imgSing).screen("Songs"));
-	m_menu.add(MenuOption(_("Practice"), _("Check your skills or test the microphones"), imgPractice).screen("Practice"));
+	m_menu.add(MenuOption(_("Practice"), _("Check your skills or test the microphones."), imgPractice).screen("Practice"));
 	// Configure menu + submenu options
 	MenuOptions configmain;
 	for (MenuEntry const& submenu: configMenu) {
@@ -188,8 +188,8 @@ void ScreenIntro::populateMenu() {
 			configmain.push_back(MenuOption(_(submenu.shortDesc.c_str()), _(submenu.longDesc.c_str()), imgConfig).screen(submenu.name));
 		}
 	}
-	m_menu.add(MenuOption(_("Configure"), _("Configure audio and game options"), imgConfig).submenu(configmain));
-	m_menu.add(MenuOption(_("Quit"), _("Leave the game"), imgQuit).screen(""));
+	m_menu.add(MenuOption(_("Configure"), _("Configure audio and game options."), imgConfig).submenu(configmain));
+	m_menu.add(MenuOption(_("Quit"), _("Leave the game."), imgQuit).screen(""));
 }
 
 #ifdef USE_WEBSERVER
