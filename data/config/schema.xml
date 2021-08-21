@@ -150,7 +150,7 @@ to save the current settings to XML.
 	</entry>
 	<entry name="game/drum_promode" type="bool" value="true">
 		<short>Drums use Pro mode</short>
-		<long>Drums use Pro mode (toms are not cymbals).</long>
+		<long>Drums use Pro mode. (Toms are not cymbals.)</long>
 	</entry>
 	<entry name="game/keyboard_dancepad" type="bool" value="true">
 		<short>Keyboard as dance pad</short>
