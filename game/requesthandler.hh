@@ -9,8 +9,8 @@
 class RequestHandler
 {
     public:
-        RequestHandler(Songs& songs);
-        RequestHandler(std::string url, Songs& songs);
+        RequestHandler(Game &game, Songs& songs);
+        RequestHandler(Game &game, std::string url, Songs& songs);
         virtual ~RequestHandler();
 
         pplx::task<void>open() { return m_listener.open(); }
@@ -35,14 +35,16 @@ class RequestHandler
 
         web::http::experimental::listener::http_listener m_listener;
 
+        Game& m_game;
         Songs& m_songs;
 };
 #else
 class Songs;
+class Game;
 
 class RequestHandler
 {
 public:
-    RequestHandler(Songs&) {}
+    RequestHandler(Game&, Songs&) {}
 };
 #endif
