@@ -29,12 +29,12 @@ public:
 		return true;
 	};
 
-	static ConfigItem& TranslationEngine::translationConfig() {
+	static ConfigItem& translationConfig() {
 		static ConfigItem& backend = config["game/language"];
 		return backend;
 	}
 
-	void TranslationEngine::initializeAllLanguages() {
+	void initializeAllLanguages() {
 		auto path = getLocaleDir().string();
 		m_gen.add_messages_path(path);
 		m_gen.add_messages_domain(m_package);
