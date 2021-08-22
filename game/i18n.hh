@@ -68,7 +68,7 @@ public:
 	}
 
 	std::string getLanguageByHumanReadableName(const std::string& language) {
-		if (language == "Auto") {
+		if (language == _("Auto")) {
 			return boost::locale::util::get_system_locale(true);
 		}
 
