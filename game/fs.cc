@@ -12,6 +12,7 @@
 #include <mutex>
 #include <set>
 #include <sstream>
+#include <regex>
 
 #if (BOOST_OS_WINDOWS)
 #include <windows.h>
