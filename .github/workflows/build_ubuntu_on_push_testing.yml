@@ -1,0 +1,118 @@
+name: Build Ubuntu on push with testing
+
+on: 
+  push:
+  
+  workflow_dispatch:
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    # The CMake configure and build commands are platform agnostic and should work equally
+    # well on Windows or Mac.  You can convert this to a matrix build if you need
+    # cross-platform coverage.
+    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Info
+      run: echo GITHUB_WORKSPACE=$GITHUB_WORKSPACE
+      
+    - name: Apt update
+      run: sudo apt-get update
+
+    - name: Install tools
+      run: sudo apt-get -y install git cmake build-essential gettext help2man openssl wget #clang-3.8
+
+    - name: Install gtest
+      run: sudo apt-get -y install libgtest-dev
+ 
+    - name: Install gmock
+      run: sudo apt-get install -y libgmock-dev
+ 
+    - name: Prepare sources for act (run actions local)
+      run: echo #rm -r 3rdparty/aubio 3rdparty/ced
+
+    - name: Checkout 
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Prepare Submodules
+      run : git submodule update --init --recursive
+
+    - name: Install libraries
+      run: |
+        #sudo apt-get -y install software-properties-common
+        #sudo apt-get -y install libblas-dev #liblapack-dev
+        sudo apt-get -y install libopenblas-dev
+        sudo apt-get -y install fftw3-dev fftw3
+        sudo apt-get -y install libicu-dev 
+        sudo apt-get -y install libepoxy-dev 
+        sudo apt-get -y install libsdl2-dev 
+        sudo apt-get -y install libfreetype6-dev
+        sudo apt-get -y install libpango1.0-dev
+        sudo apt-get -y install librsvg2-dev
+        sudo apt-get -y install libxml++2.6-dev 
+        sudo apt-get -y install libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libjpeg-dev
+        sudo apt-get -y install portaudio19-dev 
+        sudo apt-get -y install libglm-dev 
+        sudo apt-get -y install libboost-all-dev
+        sudo apt-get -y install nlohmann-json3-dev
+        sudo apt-get -y install libaubio-dev
+        sudo apt-get -y install libfmt-dev
+        #sudo apt-get -y install libopencv-dev 
+        #sudo apt-get -y install libportmidi-dev 
+        #sudo apt-get -y install libssl-dev 
+
+    - name: Create Build Environment
+      # Some projects don't allow in-source building, so create a separate build directory
+      # We'll use this as our working directory for all subsequent commands
+      #run: cmake -E make_directory ${{runner.workspace}}/build
+      run: |
+        mkdir -p build
+        #cd build
+
+    - name: Configure CMake
+      # Use a bash shell so we can use the same syntax for environment variable
+      # access regardless of the host operating system
+      shell: bash
+      working-directory: build
+      # Note the current convention is to use the -S and -B options here to specify source 
+      # and build directories, but this is only available with CMake 3.13 and higher.  
+      # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
+      run: cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE || cat CMakeFiles/CMakeError.log 
+
+    - name: Build
+      working-directory: build
+      shell: bash
+      # Execute the build.  You can specify a specific target with "--target <NAME>"
+      run: cmake --build . --config $BUILD_TYPE
+
+    - name: Test
+      working-directory: build
+      shell: bash
+      # Execute tests defined by the CMake configuration.  
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      run: ctest -C $BUILD_TYPE
+
+    - name: GTest enviroment
+      working-directory: build/testing
+      shell: bash
+      run: |
+        pwd
+        ls -l
+ 
+    - name: GTest Unittests
+      working-directory: build/testing
+      shell: bash
+      run: ./performous_test --gtest_filter=UnitTest*
+ 
+    - name: GTest all tests
+      working-directory: build/testing
+      shell: bash
+      run: ./performous_test
+ 
