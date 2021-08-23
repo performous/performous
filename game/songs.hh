@@ -83,12 +83,12 @@ class Songs {
 
 	class RestoreSel;
 	using SongPtr = std::shared_ptr<Song>;
-	using SongVector = std::vector<SongPtr>;
+	using SongCollection = std::vector<SongPtr>;
 	std::string m_songlist;
 	// Careful the m_songs needs to be correctly locked when accessed, and
 	// especially, the reload_internal thread expects to be the only thread
 	// to modify this member (any other thread may read it).
-	SongVector m_songs, m_filtered;
+	SongCollection m_songs, m_filtered;
 	AnimValue m_updateTimer;
 	AnimAcceleration math_cover;
 	std::string m_filter;
