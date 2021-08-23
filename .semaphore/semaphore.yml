@@ -24,25 +24,25 @@ blocks:
           - checkout
           - git submodule update --init --recursive
       jobs:
-        - name: GCC-8.4.0 Build
+        - name: GCC-11.1.0 Build
           env_vars:
             - name: COMPILER
               value: gcc
             - name: CC
-              value: gcc-8
+              value: gcc-11
             - name: CXX
-              value: g++-8
+              value: g++-11
           commands:
             - mkdir build.gcc && cd build.gcc && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
             - make VERBOSE=1
-        - name: Clang-9 Build
+        - name: Clang-12.0.1 Build
           env_vars:
             - name: COMPILER
               value: clang
             - name: CC
-              value: clang-9
+              value: clang-12
             - name: CXX
-              value: clang++-9
+              value: clang++-12
           commands:
             - mkdir build.clang && cd build.clang && cmake -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DENABLE_WEBCAM=ON ..
             - make VERBOSE=1
