@@ -333,7 +333,7 @@ class Songs::RestoreSel {
 	~RestoreSel() {
 		std::ptrdiff_t pos = 0;
 		if (auto song = m_sel.lock()) {
-			SongCollection& f = m_s.m_filtered;
+			auto& f = m_s.m_filtered;
 			auto it = std::find(f.begin(), f.end(), song);
 			if (it != f.end()) pos = it - f.begin();
 		}
