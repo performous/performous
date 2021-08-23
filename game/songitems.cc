@@ -50,14 +50,12 @@ int SongItems::addSongItem(std::string const& artist, std::string const& title, 
 }
 
 void SongItems::addSong(std::shared_ptr<Song> song) {
-	int id = lookup(song);
-	if (id == -1)
-	{
+	auto id = lookup(song);
+	if (!id.has_value())
 		id = addSongItem(song->artist, song->title);
-	}
 
 	SongItem si;
-	si.id = id;
+	si.id = id.value();
 	auto it = m_songs.find(si);
 	if (it == m_songs.end()) throw SongItemsException("Cant find song which was added just before");
 	// it->song.reset(song); // does not work, it is a read only structure...
@@ -71,20 +69,19 @@ void SongItems::addSong(std::shared_ptr<Song> song) {
 	m_songs.insert(si);
 }
 
-int SongItems::lookup(std::shared_ptr<Song> const& song) const {
-	for (auto const& s: m_songs)
-		if (song->collateByArtistOnly == s.artist && song->collateByTitleOnly == s.title) 
-			return s.id;
+std::optional<unsigned> SongItems::lookup(std::shared_ptr<Song> const& song) const {
+	if(!song)
+		return {};
 
-	return -1;
+	return lookup(*song);
 }
 
-int SongItems::lookup(const Song& song) const {
+std::optional<unsigned> SongItems::lookup(const Song& song) const {
 	for (auto const& s: m_songs)
 		if (song.collateByArtistOnly == s.artist && song.collateByTitleOnly == s.title) 
 			return s.id;
 
-	return -1;
+	return {};
 }
 
 std::string SongItems::lookup(int id) const {

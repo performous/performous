@@ -78,10 +78,9 @@ public:
 	  */
 	void addSong(std::shared_ptr<Song> song);
 
-	/**Lookup a songid for a specific song.
-	  @return -1 if no song found.*/
-	int lookup(std::shared_ptr<Song> const& song) const;
-	int lookup(const Song& song) const;
+	/**Lookup a songid for a specific song.*/
+	std::optional<unsigned> lookup(std::shared_ptr<Song> const& song) const;
+	std::optional<unsigned> lookup(const Song& song) const;
 
 	/**Lookup the artist + title for a specific song.
 	  @return "Unknown Song" if nothing is found.
