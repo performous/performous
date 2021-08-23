@@ -75,15 +75,15 @@ target_link_libraries(performous PRIVATE ${Boost_LIBRARIES})
 add_library(fs STATIC fs.cc)
 target_include_directories(fs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 if (USE_BOOST_FS)
-    find_package(Boost 1.55 REQUIRED COMPONENTS filesystem)
+	find_package(Boost 1.55 REQUIRED COMPONENTS filesystem)
 
-    message (STATUS "Using boost::filesystem")
-    target_link_libraries(fs PUBLIC Boost::filesystem)
-    target_compile_definitions(fs PUBLIC -DUSE_BOOST_FS)
+	message (STATUS "Using boost::filesystem")
+	target_link_libraries(fs PUBLIC Boost::filesystem)
+	target_compile_definitions(fs PUBLIC -DUSE_BOOST_FS)
 else()
-    find_package(Filesystem REQUIRED)
-    message (STATUS "Using std::filesystem")
-    target_link_libraries(fs PRIVATE std::filesystem)
+	find_package(Filesystem REQUIRED)
+	message (STATUS "Using std::filesystem")
+	target_link_libraries(fs PRIVATE std::filesystem)
 endif()
 
 find_package(ICU 60 REQUIRED uc data i18n io)
@@ -151,7 +151,7 @@ set(ENABLE_WEBCAM AUTO CACHE STRING "Use webcam")
 set_property(CACHE ENABLE_WEBCAM PROPERTY STRINGS AUTO ON OFF)
 if("AUTO" STREQUAL "${ENABLE_WEBCAM}")
 	# webcam support not requested explicitly, best effort try to find it
-	find_package(OpenCV REQUIRED core videoio)
+	find_package(OpenCV COMPONENTS core videoio)
 	if(OPENCV_VIDEOIO_FOUND)
 		message(STATUS "Webcam support: Enabled (automatically found)")
 	else()
@@ -288,19 +288,19 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
 if(WIN32)
 	install(CODE [[
-        file(GET_RUNTIME_DEPENDENCIES
-            RESOLVED_DEPENDENCIES_VAR deps_resolved
-            UNRESOLVED_DEPENDENCIES_VAR deps_unresolved
-            EXECUTABLES $<TARGET_FILE:performous>
-            PRE_EXCLUDE_REGEXES "api-ms-*" "ext-ms-*"
-            POST_EXCLUDE_REGEXES ".*system32/.*\\.dll"
-            )
-        message(STATUS "Resolving runtime dependencies for $<TARGET_FILE:performous>")
-        foreach(dep ${deps_resolved})
-            file(INSTALL ${dep} DESTINATION ${CMAKE_INSTALL_PREFIX})
-        endforeach()
-        foreach(dep ${deps_unresolved})
-            message(WARNING "Runtime dependency ${dep} could not be resolved.")
-        endforeach()
-        ]])
+		file(GET_RUNTIME_DEPENDENCIES
+			RESOLVED_DEPENDENCIES_VAR deps_resolved
+			UNRESOLVED_DEPENDENCIES_VAR deps_unresolved
+			EXECUTABLES $<TARGET_FILE:performous>
+			PRE_EXCLUDE_REGEXES "api-ms-*" "ext-ms-*"
+			POST_EXCLUDE_REGEXES ".*system32/.*\\.dll"
+			)
+		message(STATUS "Resolving runtime dependencies for $<TARGET_FILE:performous>")
+		foreach(dep ${deps_resolved})
+			file(INSTALL ${dep} DESTINATION ${CMAKE_INSTALL_PREFIX})
+		endforeach()
+		foreach(dep ${deps_unresolved})
+			message(WARNING "Runtime dependency ${dep} could not be resolved.")
+		endforeach()
+		]])
 endif()
