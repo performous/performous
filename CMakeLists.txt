@@ -130,6 +130,15 @@ if(NOT CPACK_PACKAGE_VERSION)
 endif()
 set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CMAKE_BINARY_DIR};${PROJECT_NAME};ALL;/")
 
+enable_testing()
+find_package(GTest)
+if(GTest_FOUND)
+	message(STATUS "Testing enabled: Building test host")
+	add_subdirectory(testing)
+else()
+	message(STATUS "Testing disabled: Package gtest missing")
+endif()
+
 # Debian specific settings
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 set(CPACK_DEBIAN_PACKAGE_SECTION "Games")
