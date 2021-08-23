@@ -24,7 +24,10 @@
 #include <cpprest/json.h>
 #endif
 
-Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), m_database(database), m_order(config["songs/sort-order"].i()) {
+Songs::Songs(Database & database, std::string const& songlist): 
+  m_songlist(songlist), 
+  m_database(database), 
+  m_order(config["songs/sort-order"].i()) {
 	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
 	reload();
 }
@@ -324,7 +327,7 @@ class Songs::RestoreSel {
 	~RestoreSel() {
 		int pos = 0;
 		if (m_sel) {
-			SongVector& f = m_s.m_filtered;
+			auto& f = m_s.m_filtered;
 			auto it = std::find(f.begin(), f.end(), m_sel);
 			m_s.math_cover.reset();
 			if (it != f.end()) pos = it - f.begin();
@@ -352,7 +355,7 @@ void Songs::filter_internal() {
 	m_dirty = false;
 	RestoreSel restore(*this);
 	try {
-		SongVector filtered;
+		auto filtered = SongCollection();
 		// if filter text is blank and no type filter is set, just display all songs.
 		if (m_filter == std::string() && m_type == 0) filtered = m_songs;
 		else {
@@ -381,7 +384,7 @@ void Songs::filter_internal() {
 		}
 		m_filtered.swap(filtered);
 	} catch (...) {
-		SongVector(m_songs.begin(), m_songs.end()).swap(m_filtered);  // Invalid regex => copy everything
+		SongCollection(m_songs.begin(), m_songs.end()).swap(m_filtered);  // Invalid regex => copy everything
 	}
 	sort_internal();
 }
@@ -391,9 +394,10 @@ namespace {
 	/// A functor that compares songs based on a selected member field of them.
 	template<typename Field> class CmpByField {
 		Field Song::* m_field;
+		bool m_ascending;
 	  public:
 		/** @param field a pointer to the field to use (pointer to member) **/
-		CmpByField(Field Song::* field): m_field(field) {}
+		CmpByField(Field Song::* field, bool ascending): m_field(field), m_ascending(ascending) {}
 		/// Compare left < right
 		bool operator()(Song const& left , Song const& right) {
 			return left.*m_field < right.*m_field;
@@ -406,9 +410,10 @@ namespace {
 	
 	template<> class CmpByField<std::string> {
 		std::string Song::* m_field;
+		bool m_ascending;
 	  public:
 		/** @param field a pointer to the field to use (pointer to member) **/
-		CmpByField(std::string Song::* field): m_field(field) {}
+		CmpByField(std::string Song::* field, bool ascending): m_field(field), m_ascending(ascending) {}
 		/// Compare left < right
 		bool operator()(Song const& left , Song const& right) {
 			icu::UnicodeString leftVal = icu::UnicodeString::fromUTF8(left.*m_field);
@@ -416,10 +421,10 @@ namespace {
 			UErrorCode sortError = U_ZERO_ERROR;
 			UCollationResult result = UnicodeUtil::m_sortCollator.compare(leftVal, rightVal, sortError);
 			if (U_SUCCESS(sortError)) {
-			return (result == UCOL_LESS);
+				return result == UCOL_LESS ? m_ascending : !m_ascending;
 			}
 			else {
-			throw std::runtime_error("unicode/error: Sorting comparison error in CmpByField<std::string> ");
+				throw std::runtime_error("unicode/error: Sorting comparison error in CmpByField<std::string> ");
 			}
 		}
 		/// Compare *left < *right
@@ -429,9 +434,9 @@ namespace {
 	};
 
 	/// A helper for easily constructing CmpByField objects
-	template <typename T> CmpByField<T> customComparator(T Song::*field) { return CmpByField<T>(field); }
-	static const int types = 7, orders = 7;
+	template <typename T> CmpByField<T> customComparator(T Song::*field, bool ascending) { return CmpByField<T>(field, ascending); }
 
+	static const int types = 7, orders = 8;
 }
 
 std::string Songs::typeDesc() const {
@@ -467,7 +472,7 @@ void Songs::typeCycle(int cat) {
 	filter_internal();
 }
 
-std::string Songs::sortDesc() const {
+std::string Songs::getSortDescription() const {
 	std::string str;
 	switch (m_order) {
 	  case 0: str = _("random order"); break;
@@ -477,14 +482,16 @@ std::string Songs::sortDesc() const {
 	  case 4: str = _("sorted by genre"); break;
 	  case 5: str = _("sorted by path"); break;
 	  case 6: str = _("sorted by language"); break;
-	  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortDesc");
+	  case 7: str = _("sorted by score"); break;
+	  default: throw std::logic_error("Internal error: unknown sort order in Songs::getSortDescription");
 	}
 	return str;
 }
 
 void Songs::sortChange(int diff) {
 	m_order = (m_order + diff) % orders;
-	if (m_order < 0) m_order += orders;
+	if (m_order < 0) 
+		m_order += orders;
 	RestoreSel restore(*this);
 	config["songs/sort-order"].i() = m_order;
 	switch (m_order) {
@@ -509,39 +516,37 @@ void Songs::sortChange(int diff) {
 }
 
 void Songs::sortSpecificChange(int sortOrder, bool descending) {
-	if(sortOrder < 0) {
+	if(sortOrder < 0) 
 		m_order = 0;
-	} else if(sortOrder <= 6) {
+	else if(sortOrder < orders)
 		m_order = sortOrder;
-	} else {
+	else
 		m_order = 0;
-	}
+	
 	RestoreSel restore(*this);
 	config["songs/sort-order"].i() = m_order;
 	sort_internal(descending);
 }
 
 void Songs::sort_internal(bool descending) {
-	if(descending) {
+	if(m_order == 0)
+		std::stable_sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::randomIdx, true));
+	else {        
+		auto begin = m_filtered.begin();
+		auto end = m_filtered.end();
+
 		switch (m_order) {
-		  case 0: std::stable_sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::randomIdx)); break;
-		  case 1: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::collateByTitle)); break;
-		  case 2: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::collateByArtist)); break;
-		  case 3: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::edition)); break;
-		  case 4: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::genre)); break;
-		  case 5: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::path)); break;
-		  case 6: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::language)); break;
-		  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
-		}
-	} else {
-		switch (m_order) {
-		  case 0: std::stable_sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::randomIdx)); break;
-		  case 1: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::collateByTitle)); break;
-		  case 2: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::collateByArtist)); break;
-		  case 3: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::edition)); break;
-		  case 4: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::genre)); break;
-		  case 5: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::path)); break;
-		  case 6: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::language)); break;
+		  case 1: std::sort(begin, end, customComparator(&Song::collateByTitle, !descending)); break;
+		  case 2: std::sort(begin, end, customComparator(&Song::collateByArtist, !descending)); break;
+		  case 3: std::sort(begin, end, customComparator(&Song::edition, !descending)); break;
+		  case 4: std::sort(begin, end, customComparator(&Song::genre, !descending)); break;
+		  case 5: std::sort(begin, end, customComparator(&Song::path, !descending)); break;
+		  case 6: std::sort(begin, end, customComparator(&Song::language, !descending)); break;
+		  case 7: std::sort(begin, end, [this, &descending](SongPtr const& a, SongPtr const& b){
+				const auto scoreA = m_database.getHiscore(*a);              
+				const auto scoreB = m_database.getHiscore(*b);              
+				return scoreA > scoreB ? !descending : descending;              
+			}); break;
 		  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
 		}
 	}
@@ -561,7 +566,9 @@ namespace {
 			std::cerr << "Songlist error handling cover image: " << e.what() << std::endl;
 		}
 	}
-	template <typename SongVector> void dumpXML(SongVector const& svec, std::string const& filename) {
+	
+	template<typename SongCollection>
+	void dumpXML(SongCollection const& svec, std::string const& filename) {
 		xmlpp::Document doc;
 		xmlpp::Element* songlist = doc.create_root_node("songlist");
 		songlist->set_attribute("size", std::to_string(svec.size()));
@@ -582,8 +589,9 @@ namespace {
 
 void Songs::dumpSongs_internal() const {
 	if (m_songlist.empty()) return;
-	SongVector svec = m_songs;
-	std::sort(svec.begin(), svec.end(), customComparator(&Song::collateByArtist));
+    
+	auto svec = m_songs;
+	std::sort(svec.begin(), svec.end(), customComparator(&Song::collateByArtist, true));
 	fs::path coverpath = fs::path(m_songlist) / "covers";
 	fs::create_directories(coverpath);
 	dumpXML(svec, m_songlist + "/songlist.xml");

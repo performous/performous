@@ -1,20 +1,12 @@
 #pragma once
 
+#include "hiscoreitem.hh"
+
 #include "libxml++.hh"
 
 #include <set>
 #include <string>
 #include <vector>
-
-/// This struct holds together information for a single item of a highscore.
-struct HiscoreItem {
-	unsigned score, playerid, songid, level;
-	std::string track;
-	HiscoreItem(unsigned score, unsigned playerid, unsigned songid, unsigned level, std::string const& track):
-	  score(score), playerid(playerid), songid(songid), level(level), track(track) {}
-	/// Operator for sorting by score. Reverse order, so that highest is first!
-	bool operator<(HiscoreItem const& other) const { return other.score < score; }
-};
 
 class Hiscore {
 public:
@@ -46,15 +38,16 @@ public:
 	  */
 	void addHiscore(unsigned score, unsigned playerid, unsigned songid, unsigned level, std::string const& track);
 
-	typedef std::vector<HiscoreItem> HiscoreVector;
+	using HiscoreVector = std::vector<HiscoreItem>;
 
 	/// This queries the database for a sorted vector of highscores. The defaults mean to query everything.
 	/// @param max limits the number of elements returned.
 	HiscoreVector queryHiscore(unsigned max, unsigned playerid, unsigned songid, std::string const& track) const;
 	bool hasHiscore(unsigned songid) const;
+	unsigned getHiscore(unsigned songid) const;
 	std::size_t size() const { return m_hiscore.size(); }
 private:
-	typedef std::multiset<HiscoreItem> hiscore_t;
+	using hiscore_t = std::multiset<HiscoreItem>;
 	hiscore_t m_hiscore;
 	unsigned currentLevel() const;
 };

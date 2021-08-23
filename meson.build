@@ -215,6 +215,7 @@ executable('performous', [
   'game/playlist.cc',
   'game/progressbar.cc',
   'game/requesthandler.cc',
+  'game/scorewindow.cc',
   'game/screen_audiodevices.cc',
   'game/screen_intro.cc',
   'game/screen_paths.cc',
