@@ -82,9 +82,9 @@ class Songs {
 
 	class RestoreSel;
 	using SongPtr = std::shared_ptr<Song>;
-	using SongVector = std::vector<SongPtr>;
+	using SongCollection = std::vector<SongPtr>;
 	std::string m_songlist;
-	SongVector m_songs, m_filtered;
+	SongCollection m_songs, m_filtered;
 	AnimValue m_updateTimer;
 	AnimAcceleration math_cover;
 	std::string m_filter;

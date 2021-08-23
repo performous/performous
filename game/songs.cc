@@ -327,7 +327,7 @@ class Songs::RestoreSel {
 	~RestoreSel() {
 		int pos = 0;
 		if (m_sel) {
-			SongVector& f = m_s.m_filtered;
+			auto& f = m_s.m_filtered;
 			auto it = std::find(f.begin(), f.end(), m_sel);
 			m_s.math_cover.reset();
 			if (it != f.end()) pos = it - f.begin();
@@ -355,7 +355,7 @@ void Songs::filter_internal() {
 	m_dirty = false;
 	RestoreSel restore(*this);
 	try {
-		SongVector filtered;
+		auto filtered = SongCollection();
 		// if filter text is blank and no type filter is set, just display all songs.
 		if (m_filter == std::string() && m_type == 0) filtered = m_songs;
 		else {
@@ -384,7 +384,7 @@ void Songs::filter_internal() {
 		}
 		m_filtered.swap(filtered);
 	} catch (...) {
-		SongVector(m_songs.begin(), m_songs.end()).swap(m_filtered);  // Invalid regex => copy everything
+		SongCollection(m_songs.begin(), m_songs.end()).swap(m_filtered);  // Invalid regex => copy everything
 	}
 	sort_internal();
 }
@@ -542,7 +542,7 @@ void Songs::sort_internal(bool descending) {
 		  case 4: std::sort(begin, end, customComparator(&Song::genre, !descending)); break;
 		  case 5: std::sort(begin, end, customComparator(&Song::path, !descending)); break;
 		  case 6: std::sort(begin, end, customComparator(&Song::language, !descending)); break;
-		  case 7: std::sort(begin, end, [this, descending](SongPtr const& a, SongPtr const& b){
+		  case 7: std::sort(begin, end, [this, &descending](SongPtr const& a, SongPtr const& b){
 				const auto scoreA = m_database.getHiscore(*a);              
 				const auto scoreB = m_database.getHiscore(*b);              
 				return scoreA > scoreB ? !descending : descending;              
@@ -566,7 +566,9 @@ namespace {
 			std::cerr << "Songlist error handling cover image: " << e.what() << std::endl;
 		}
 	}
-	template <typename SongVector> void dumpXML(SongVector const& svec, std::string const& filename) {
+	
+	template<typename SongCollection>
+	void dumpXML(SongCollection const& svec, std::string const& filename) {
 		xmlpp::Document doc;
 		xmlpp::Element* songlist = doc.create_root_node("songlist");
 		songlist->set_attribute("size", std::to_string(svec.size()));
@@ -587,7 +589,8 @@ namespace {
 
 void Songs::dumpSongs_internal() const {
 	if (m_songlist.empty()) return;
-	SongVector svec = m_songs;
+    
+	auto svec = m_songs;
 	std::sort(svec.begin(), svec.end(), customComparator(&Song::collateByArtist, true));
 	fs::path coverpath = fs::path(m_songlist) / "covers";
 	fs::create_directories(coverpath);
