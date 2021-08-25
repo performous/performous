@@ -17,6 +17,20 @@
 #include <map>
 #include <unordered_map>
 
+int PaHostApiNameToHostApiTypeId (const std::string& name) {
+	if (name == "Auto") return 1337;
+	if (name == "Windows DirectSound") return 1;
+	if (name == "MME") return 2;
+	if (name == "ASIO") return 3;
+	if (name == "Core Audio" || name == "CoreAudio") return 5;
+	if (name == "OSS") return 7; // Not an error, stupid PortAudio.
+	if (name == "ALSA") return 8;
+	if (name == "Windows WDM-KS") return 11;
+	if (name == "JACK Audio Connection Kit") return 12;
+	if (name == "Windows WASAPI") return 13;
+	throw std::runtime_error("Invalid PortAudio HostApiTypeId Specified.");
+}
+
 namespace {
 	/**
 	 * A function to parse key=value pairs with quoting capabilites.

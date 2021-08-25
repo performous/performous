@@ -27,7 +27,7 @@ ScreenPlayers::ScreenPlayers(std::string const& name, Audio& audio, Database& da
 
 void ScreenPlayers::enter() {
 	keyPressed = false;
-	const auto scaler = NoteGraphScalerFactory().create(m_song->getVocalTrack(0u));
+	const auto scaler = NoteGraphScalerFactory(config).create(m_song->getVocalTrack(0u));
 	m_layout_singer = std::make_unique<LayoutSinger>(m_song->getVocalTrack(0u), m_database, scaler);
 	theme = std::make_unique<ThemeSongs>();
 	m_emptyCover = std::make_unique<Texture>(findFile("no_player_image.svg"));
