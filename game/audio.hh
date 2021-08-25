@@ -18,6 +18,8 @@
 
 const unsigned AUDIO_MAX_ANALYZERS = 11;
 
+int PaHostApiNameToHostApiTypeId (const std::string& name);
+
 struct Output;
 
 /**
