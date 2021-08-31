@@ -11,6 +11,7 @@ namespace input {
 	class Keyboard: public Hardware {
 		std::set<unsigned> m_pressed;
 		bool m_guitar, m_keytar, m_drumkit, m_dancepad;
+		unsigned m_mod;
 		/// Set the value of an instrument bool from a config variable and return a log message snippet if value was changed.
 		static std::string setMode(bool& var, std::string const& name) {
 			bool value = config["game/keyboard_" + name].b();
@@ -19,11 +20,15 @@ namespace input {
 			return " " + name + (value ? " enabled." : " disabled.");
 		}
 	public:
-		Keyboard(): m_guitar(), m_keytar(), m_drumkit(), m_dancepad() {}
+		Keyboard(): m_guitar(), m_keytar(), m_drumkit(), m_dancepad(), m_mod() {}
 		bool process(Event& event, SDL_Event const& sdlEv) override {
 			if (sdlEv.type != SDL_KEYDOWN && sdlEv.type != SDL_KEYUP) return false;
-			// Switch modes only when no keys are pressed (avoids buttons getting stuck on mode change)
+			// Switch modes and update m_mod only when no buttons are pressed
+			// (avoids buttons getting stuck on mode change)
 			if (m_pressed.empty()) {
+				// The mods that we consider modifiers here: only left Ctrl/Cmd and Alt
+				m_mod = sdlEv.key.keysym.mod & (Platform::shortcutModifier(false) | KMOD_LALT);
+				// Enable/disable keyboard instruments based on current config
 				std::string msg;
 				if (g_enableInstruments) {
 					msg += setMode(m_guitar, "guitar");
@@ -36,25 +41,22 @@ namespace input {
 				}
 				if (!msg.empty()) std::clog << "controller-keyboard/info: Mode change:" + msg << std::endl;
 			}
-			// Keep track of pressed keys
-			{
-				unsigned pressedId = sdlEv.key.keysym.sym << 16 | sdlEv.key.keysym.sym;
-				if (sdlEv.type == SDL_KEYDOWN) m_pressed.insert(pressedId);
-				else m_pressed.erase(pressedId);
-			}
 			// Convert SDL event into controller Event
-			event.source = SourceId(SOURCETYPE_KEYBOARD, 0);  // FIXME! cmake the device ID zero because in SDL2 it ain't zero!!
+			event.source = SourceId(SOURCETYPE_KEYBOARD, 0);
 			event.hw = sdlEv.key.keysym.scancode;
 			event.value = (sdlEv.type == SDL_KEYDOWN ? 1.0 : 0.0);
-			// Get the modifier keys that we actually use as modifiers
-			unsigned mod = sdlEv.key.keysym.mod & (Platform::shortcutModifier(false) | KMOD_LALT);
 			// Map to keyboard instruments (sets event.button if matching)
-			if (!mod) mapping(event);
+			mapping(event);
 			// Map to menu navigation
-			if (event.button == GENERIC_UNASSIGNED) event.button = navigation(sdlEv.key.keysym.scancode, mod);
-			return event.button != GENERIC_UNASSIGNED;
+			if (event.button == GENERIC_UNASSIGNED) event.button = navigation(event.hw);
+			if (event.button == GENERIC_UNASSIGNED) return false;
+			// Keep track of pressed buttons
+			if (event.value) m_pressed.insert(event.button);
+			else m_pressed.erase(event.button);
+			return true;
 		}
 		void mapping(Event& event) {
+			if (m_mod) return;
 			unsigned button = 0;
 			switch (event.hw) {
 				// Guitar on keyboard
@@ -115,8 +117,8 @@ namespace input {
 			event.button = ButtonId(button);
 			event.source.channel = event.devType;  // Each type gets its own unique SourceId channel
 		}
-		Button navigation(unsigned k, unsigned mod) {
-			if (!mod) {
+		Button navigation(unsigned k) {
+			if (!m_mod) {
 				if (k == SDL_SCANCODE_UP) return GENERIC_UP;
 				if (k == SDL_SCANCODE_DOWN) return GENERIC_DOWN;
 				if (k == SDL_SCANCODE_LEFT) return GENERIC_LEFT;
@@ -127,7 +129,7 @@ namespace input {
 				if (k == SDL_SCANCODE_PAGEDOWN) return GENERIC_MOREDOWN;
 				if (k == SDL_SCANCODE_PAUSE) return GENERIC_PAUSE;
 			}
-			else if (mod == Platform::shortcutModifier(false)) {
+			else if (m_mod == Platform::shortcutModifier(false)) {
 				if (k == SDL_SCANCODE_UP) return GENERIC_VOLUME_UP;
 				if (k == SDL_SCANCODE_DOWN) return GENERIC_VOLUME_DOWN;
 				if (k == SDL_SCANCODE_P) return GENERIC_PAUSE;
@@ -138,6 +140,5 @@ namespace input {
 
 	void Hardware::enableKeyboardInstruments(bool state) { g_enableInstruments = state; }
 	Hardware::ptr constructKeyboard() { return Hardware::ptr(new Keyboard()); }
-	
-}
 
+}
