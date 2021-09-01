@@ -9,13 +9,11 @@
 
 /// struct to represent tones
 struct Tone {
-	static const std::size_t MINAGE = 1; ///< The minimum age required for a tone to be output
 	double freq; ///< Frequency (Hz)
 	double db; ///< Level (dB)
 	double stabledb; ///< Stable level, useful for graphics rendering
 	std::size_t age; ///< How many times the tone has been detected in row
 	Tone();
-	void print() const; ///< Prints Tone to std::cout
 	bool operator==(double f) const; ///< Compare for rough frequency match
 	/// Less-than compare by levels (instead of frequencies like operator< does)
 	static bool dbCompare(Tone const& l, Tone const& r) { return l.db < r.db; }
@@ -77,7 +75,7 @@ public:
 	/// list of tones
 	typedef std::list<Tone> tones_t;
 	/// constructor
-	Analyzer(double rate, std::string id, std::size_t step = 200);
+	Analyzer(double rate, std::string id, std::size_t step = 128);
 	/** Add input data to buffer. This is thread-safe (against other functions). **/
 	template <typename InIt> void input(InIt begin, InIt end) {
 		m_buf.insert(begin, end);
