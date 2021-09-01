@@ -50,10 +50,7 @@ if (APPLE)
 	endif()
 endif()
 
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-  # Note: AUTO_PTR is for Boost which won't compile with C++17 otherwise (fixed in Boost git but not in 1.66)
-  add_compile_options(-Wall -Wextra -D_LIBCPP_ENABLE_CXX17_REMOVED_AUTO_PTR $<$<CXX_COMPILER_ID:gcc>:-fcx-limited-range>)
-endif()
+add_compile_options(-Wall $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wextra> $<$<CXX_COMPILER_ID:gcc>:-fcx-limited-range>)
 
 if(WIN32)
 	set(CMAKE_CXX_FLAGS "-DWIN32_LEAN_AND_MEAN ${CMAKE_CXX_FLAGS}")
