@@ -220,13 +220,8 @@ endif()
 list(APPEND LIBS ${FFTW3_LIBRARIES})
 list(APPEND LIBS ${BLAS_LIBRARIES})
 
-if(WIN32)
-  find_package(pthreads REQUIRED)
-  target_link_libraries(performous PRIVATE fs ced aubio ${LIBS} PkgConfig::deps PThreads4W::PThreads4W)
-else()
-  find_package(Threads)
-  target_link_libraries(performous PRIVATE fs ced aubio ${LIBS} PkgConfig::deps Threads::Threads)
-endif()
+find_package(Threads)
+target_link_libraries(performous PRIVATE fs ced aubio ${LIBS} PkgConfig::deps Threads::Threads)
 
 install(TARGETS performous DESTINATION ${BIN_INSTALL})
 
