@@ -13,7 +13,7 @@ if (NOT AUBIO_FOUND)
     include(FetchContent)
     FetchContent_Declare(aubio-sources
       GIT_REPOSITORY https://github.com/performous/aubio.git
-      GIT_TAG        2bf3653dc6d9a10ba86714101ca1c916a963e93d
+      GIT_TAG        fcf3b14c6ee5e5a658a5683ac303e56c8ade2432
       SOURCE_DIR aubio-src
     )
     FetchContent_MakeAvailable(aubio-sources)
