@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-18 22:12+0200\n"
-"PO-Revision-Date: 2021-08-18 22:12+0200\n"
+"POT-Creation-Date: 2021-09-01 11:30+0200\n"
+"PO-Revision-Date: 2021-09-01 11:33+0200\n"
 "Last-Translator: Arjan Speiard | Asgard Sings! <arjan.spieard@gmail.com>\n"
 "Language-Team: \n"
 "Language: fr_FR\n"
@@ -110,10 +110,8 @@ msgstr "Cacher la hauteur chantée, les notes et le score."
 #. type: int
 #. value: 0
 #: ../data/config/schema.xml:57
-#, fuzzy
-#| msgid "Select difficulty"
 msgid "Difficulty"
-msgstr "Sélectionner la difficulté"
+msgstr "Difficulté"
 
 #. Difficulty
 #. Game difficulty.
@@ -121,10 +119,8 @@ msgstr "Sélectionner la difficulté"
 #. type: int
 #. value: 0
 #: ../data/config/schema.xml:58
-#, fuzzy
-#| msgid "Select difficulty"
 msgid "Game difficulty."
-msgstr "Sélectionner la difficulté"
+msgstr "Choisir la difficulté."
 
 #. Lyric highlight style
 #. Hide pitch wave, notes and scoring.
@@ -306,10 +302,6 @@ msgstr "Port du serveur web"
 #. type: int
 #. value: 8000
 #: ../data/config/schema.xml:115
-#, fuzzy
-#| msgid ""
-#| "Port to use for the web server. Choose one that is not used by other "
-#| "applications."
 msgid ""
 "Port to use for the webserver. Choose one that is not used by other "
 "applications."
@@ -346,7 +338,7 @@ msgstr ""
 #. value: 0
 #: ../data/config/schema.xml:132
 msgid "Note Graph Scaling"
-msgstr ""
+msgstr "Mise à l'échelle de notes"
 
 #. Note Graph Scaling
 #. Type of scaling the note graph.
@@ -355,7 +347,7 @@ msgstr ""
 #. value: 0
 #: ../data/config/schema.xml:133
 msgid "Type of scaling the note graph."
-msgstr ""
+msgstr "Type de mise à l'échelle des notes."
 
 #. Keyboard as guitar
 #. Enable keyboard as guitar (Frets on Fire mode).
@@ -394,7 +386,7 @@ msgid "Enable keyboard as drumkit."
 msgstr "Activer la batterie au clavier."
 
 #. Drums use Pro mode
-#. Drums use Pro mode (toms are not cymbals).
+#. Drums use Pro mode. (Toms are not cymbals.)
 #. name: game/drum_promode
 #. type: bool
 #. value: true
@@ -403,13 +395,13 @@ msgid "Drums use Pro mode"
 msgstr "Le batterie est en mode Pro"
 
 #. Drums use Pro mode
-#. Drums use Pro mode (toms are not cymbals).
+#. Drums use Pro mode. (Toms are not cymbals.)
 #. name: game/drum_promode
 #. type: bool
 #. value: true
 #: ../data/config/schema.xml:145
-msgid "Drums use Pro mode (toms are not cymbals)."
-msgstr "Le batterie est en mode Pro (les toms ne sont pas de cymbales)."
+msgid "Drums use Pro mode. (Toms are not cymbals.)"
+msgstr "Le batterie est en mode Pro (les toms ne sont pas des cymbales)."
 
 #. Keyboard as dance pad
 #. Enable keyboard as dance pad.
@@ -1684,7 +1676,7 @@ msgid ""
 "to cancel. Ctrl + R to reset defaults"
 msgstr ""
 "Utilisez les flèches pour configurer. Tapez Entrer/Démarrer pour sauvegarder "
-"ou Ech/Select pour annuler. Ctrl+R pour remettre à zéro."
+"ou Ech/Select pour annuler. Ctrl+R pour remettre à zéro"
 
 #: ../game/screen_audiodevices.cc:151
 msgid ""
@@ -1781,8 +1773,6 @@ msgid ".."
 msgstr ""
 
 #: ../game/screen_paths.cc:96
-#, fuzzy
-#| msgid "Go up one folder"
 msgid "Go to parent folder"
 msgstr "Remonter au dossier parent"
 
