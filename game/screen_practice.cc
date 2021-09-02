@@ -91,7 +91,7 @@ void ScreenPractice::draw_analyzers() {
 			Analyzer::tones_t tones = analyzer.getTones();
 
 			for (Analyzer::tones_t::const_iterator t = tones.begin(); t != tones.end(); ++t) {
-				if (t->age < Tone::MINAGE) continue;
+				if (t->age < 3) continue;
 				if (!scale.setFreq(t->freq).isValid()) continue;
 				double line = scale.getNoteLine() + 0.4 * scale.getNoteOffset();
 				float posXnote = -0.25 + 0.2 * i + 0.002 * t->stabledb;  // Wiggle horizontally based on volume
