@@ -76,8 +76,8 @@ class Game: public Singleton <Game> {
 	void drawLogo();
 	///global playlist access
 	PlayList& getCurrentPlayList() { return currentPlaylist; }
-	void setLanguage(const std::string language) { m_translationEngine.setLanguage(language, true); };
-	const std::string getCurrentLanguage() { return m_translationEngine.getCurrentLanguage().second; };
+	void setLanguage(const std::string& language) { m_translationEngine.setLanguage(language, true); };
+	std::string getCurrentLanguage() { return m_translationEngine.getCurrentLanguage().second; };
 #ifdef USE_WEBSERVER
 	void notificationFromWebserver(std::string message) { m_webserverMessage = message; }
 	std::string subscribeWebserverMessages() { return m_webserverMessage; }
