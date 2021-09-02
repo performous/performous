@@ -330,10 +330,10 @@ void writeConfig(bool system) {
 			auto newLanguagestr = item.getEnumName();
 			auto currentLanguageId = LanguageToLanguageId(currentLanguageStr);
 			auto newLanguageId = LanguageToLanguageId(newLanguagestr);
-			if ((newLanguagestr == "Auto" || currentLanguageId != newLanguageId) && !TranslationEngine::translationConfig().getOldValue().empty()) {
+			if ((newLanguagestr == "Auto" || currentLanguageId != newLanguageId) && !config["game/language"].getOldValue().empty()) {
 				std::cout << "Wanting to change something, old value: '" << currentLanguageStr << "' new value: '" << newLanguagestr << "'" << std::endl;
 				entryNode->set_attribute("value", std::to_string(newLanguageId));
-				TranslationEngine::translationConfig().selectEnum(newLanguagestr);
+				config["game/language"].selectEnum(newLanguagestr);
 				Game::getSingletonPtr()->setLanguage(newLanguagestr);
 				Game::getSingletonPtr()->getCurrentScreen()->exit();
 				Game::getSingletonPtr()->activateScreen("Intro");
@@ -503,8 +503,6 @@ void populateLanguages(const std::map<std::string, std::string>& languages, bool
 	for (auto const& language : languages) {
 		languageConfig.addEnum(language.second);
 	}
-	static std::string selectedLanguage = std::string();
-	selectedLanguage = languageConfig.getValue();
-	languageConfig.selectEnum(selectedLanguage);
+	languageConfig.selectEnum(languageConfig.getValue());
 	languageConfig.setOldValue(languageConfig.getEnumName());
 }
