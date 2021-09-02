@@ -69,7 +69,7 @@ add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
 # Libraries
 
 find_package(Boost 1.55 REQUIRED COMPONENTS program_options iostreams system locale)
-target_include_directories(performous PRIVATE ${Boost_INCLUDE_DIRS})
+target_include_directories(performous SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
 target_link_libraries(performous PRIVATE ${Boost_LIBRARIES})
 
 add_library(fs STATIC fs.cc)
@@ -130,8 +130,9 @@ endif()
 
 if(PortMidi_FOUND)
 	include_directories(${PortMidi_INCLUDE_DIRS})
-	list(APPEND LIBS ${PortMidi_LIBRARIES})
+	list(APPEND OPTIONAL_MIDI_LIBS ${PortMidi_LIBRARIES})
 	add_definitions("-DUSE_PORTMIDI")
+	install(TARGETS performous DESTINATION ${BIN_INSTALL} COMPONENT portmidi)
 endif()
 
 # Activating webcam
@@ -156,8 +157,9 @@ endif()
 
 if(OpenCV_FOUND)
 	include_directories(${OpenCV_INCLUDE_DIRS})
-	list(APPEND LIBS ${OpenCV_LIBS})
+	list(APPEND OPTIONAL_WEBCAM_LIBS ${OpenCV_LIBS})
 	add_definitions("-DUSE_OPENCV")
+	install(TARGETS performous DESTINATION ${BIN_INSTALL} COMPONENT webcam)
 endif()
 
 # Activating webserver
@@ -183,14 +185,16 @@ endif()
 # if cpprest is found, add it to the dependencies
 if(CppRest_FOUND)
 	include_directories(${CppRest_INCLUDE_DIRS})
-	list(APPEND LIBS ${CppRest_LIBRARIES})
+	list(APPEND OPTIONAL_WEBSERVER_LIBS ${CppRest_LIBRARIES})
 	add_definitions("-DUSE_WEBSERVER")
 
 	# add other required dependencies then
 	# FIXME: move this to the CppRest package includes if possible
 	find_package(Boost 1.55 REQUIRED COMPONENTS chrono thread)
 	include_directories(${Boost_INCLUDE_DIRS})
-	list(APPEND LIBS ${Boost_LIBRARIES})
+	list(APPEND OPTIONAL_WEBSERVER_LIBS ${Boost_LIBRARIES})
+
+	install(TARGETS performous DESTINATION ${BIN_INSTALL} COMPONENT webserver)
 endif()
 
 if(WIN32)
@@ -221,10 +225,9 @@ list(APPEND LIBS ${FFTW3_LIBRARIES})
 list(APPEND LIBS ${BLAS_LIBRARIES})
 
 find_package(Threads)
+target_link_libraries(performous PRIVATE fs ced aubio ${LIBS} ${OPTIONAL_MIDI_LIBS} ${OPTIONAL_WEBCAM_LIBS} ${OPTIONAL_WEBSERVER_LIBS} PkgConfig::deps Threads::Threads)
 
-target_link_libraries(performous PRIVATE fs ced aubio ${LIBS} PkgConfig::deps Threads::Threads)
-
-install(TARGETS performous DESTINATION ${BIN_INSTALL})
+install(TARGETS performous DESTINATION ${BIN_INSTALL} COMPONENT Application)
 
 set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)  # Store library paths in executable
 set_target_properties(performous PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})  # Produce executable in build/, not build/game/
@@ -233,6 +236,7 @@ set_target_properties(performous PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BIN
 if(WIN32)
 	set_target_properties(performous PROPERTIES OUTPUT_NAME "Performous")
 endif()
+		message("Optional Libs: ${OPTIONAL_LIBS}")
 
 # Generate config.hh
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
@@ -254,5 +258,5 @@ if(WIN32)
         foreach(dep ${deps_unresolved})
             message(WARNING "Runtime dependency ${dep} could not be resolved.")
         endforeach()
-        ]])
+        ]] COMPONENT Application)
 endif()
