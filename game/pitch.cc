@@ -124,23 +124,21 @@ bool Analyzer::calcFFT() {
 void Analyzer::calcTones() {
 	// Precalculated constants
 	const double freqPerBin = m_rate / FFT_N;
-	const double phaseStep = TAU * m_step / FFT_N;
+	const double stepRate = m_rate / m_step;  // Steps per second
+	const double phaseStep = double(m_step) / FFT_N;
 	const double normCoeff = 1.0 / FFT_N;
-	const double minMagnitude = pow(10, -100.0 / 20.0) / normCoeff; // -100 dB
+	const double minMagnitude = pow(10, -80.0 / 20.0) / normCoeff; // -80 dB
 	// Limit frequency range of processing
 	const size_t kMin = std::max(size_t(1), size_t(FFT_MINFREQ / freqPerBin));
 	const size_t kMax = std::min(FFT_N / 2, size_t(FFT_MAXFREQ / freqPerBin));
 	std::vector<Peak> peaks(kMax + 1); // One extra to simplify loops
 	for (size_t k = 1; k <= kMax; ++k) {
 		double magnitude = std::abs(m_fft[k]);
-		double phase = std::arg(m_fft[k]);
-		// process phase difference
+		double phase = std::arg(m_fft[k]) / TAU;
 		double delta = phase - m_fftLastPhase[k];
 		m_fftLastPhase[k] = phase;
-		delta -= k * phaseStep;  // subtract expected phase difference
-		delta = std::remainder(delta, TAU);  // map delta phase into +/- pi interval
-		delta /= phaseStep;  // calculate diff from bin center frequency
-		double freq = (k + delta) * freqPerBin;  // calculate the true frequency
+		// Use phase difference over a step to calculate what the frequency must be
+		double freq = stepRate * (std::round(k * phaseStep - delta) + delta);
 		if (freq > 1.0 && magnitude > minMagnitude) {
 			peaks[k].freq = freq;
 			peaks[k].db = 20.0 * log10(normCoeff * magnitude);
@@ -157,7 +155,7 @@ void Analyzer::calcTones() {
 	// Find the tones (collections of harmonics) from the array of peaks
 	tones_t tones;
 	for (size_t k = kMax - 1; k >= kMin; --k) {
-		if (peaks[k].db < -70.0) continue;
+		if (peaks[k].db < -60.0) continue;
 		// Find the best divider for getting the fundamental from peaks[k]
 		std::size_t bestDiv = 1;
 		int bestScore = 0;
@@ -167,7 +165,7 @@ void Analyzer::calcTones() {
 			for (std::size_t n = 1; n < div && n < 8; ++n) {
 				Peak& p = match(peaks, k * n / div);
 				--score;
-				if (p.db < -90.0 || std::abs(p.freq / n / freq - 1.0) > .03) continue;
+				if (p.db < -80.0 || std::abs(p.freq / n / freq - 1.0) > .03) continue;
 				if (n == 1) score += 4; // Extra for fundamental
 				score += 2;
 			}
@@ -195,7 +193,7 @@ void Analyzer::calcTones() {
 		}
 		t.freq /= count;
 		// If the tone seems strong enough, add it (-3 dB compensation for each harmonic)
-		if (t.db > -50.0 - 3.0 * count) {
+		if (t.db > -40.0 - 3.0 * count) {
 			t.stabledb = t.db;
 			tones.push_back(t);
 		}
@@ -217,7 +215,7 @@ void Analyzer::mergeWithOld(tones_t& tones) const {
 			it->age = old.age + 1;
 			it->stabledb = 0.8 * old.stabledb + 0.2 * it->db;
 			it->freq = 0.5 * old.freq + 0.5 * it->freq;
-		} else if (old.db > -80.0) {
+		} else if (old.db > -70.0) {
 			// Insert a decayed version of the old tone into new tones
 			Tone& t = *tones.insert(it, old);
 			t.db -= 5.0;
