@@ -3,7 +3,7 @@
 #include "chrono.hh"
 #include "configuration.hh"
 #include "util.hh"
-#include <SDL2/SDL_events.h>
+#include <SDL_events.h>
 #include <climits>
 #include <deque>
 #include <iostream>
