@@ -19,7 +19,7 @@ namespace cv {
 #endif
 
 Webcam::Webcam(int cam_id):
-  m_thread(), m_capture(), m_writer(), m_frameAvailable(false), m_autoDetect(0)
+  m_thread(), m_capture(), m_writer(), m_frameAvailable(false)
 {
 	#ifdef USE_OPENCV
 	// Initialize the capture device
