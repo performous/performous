@@ -20,7 +20,6 @@ struct CamFrame {
 
 class Webcam {
   public:
-	/// cam_id 0 means autodetect webcam.
 	Webcam(int cam_id = 0);
 	~Webcam();
 
@@ -47,6 +46,7 @@ class Webcam {
 	bool m_frameAvailable;
 	std::atomic<bool> m_running{ false };
 	std::atomic<bool> m_quit{ false };
+	const int m_autoDetect;
 
   public:
 	static bool enabled() {
