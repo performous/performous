@@ -19,15 +19,15 @@ namespace cv {
 #endif
 
 Webcam::Webcam(int cam_id):
-  m_thread(), m_capture(), m_writer(), m_frameAvailable(false)
+  m_thread(), m_capture(), m_writer(), m_frameAvailable(false), m_autoDetect(0)
 {
 	#ifdef USE_OPENCV
 	// Initialize the capture device
 	m_capture.reset(new cv::VideoCapture(cam_id));
 	if (!m_capture->isOpened()) {
-		if (cam_id != -1) {
+		if (cam_id != m_autoDetect) {
 			std::clog << "Webcam/warning: Webcam id " << cam_id << " failed, trying autodetecting...";
-			m_capture.reset(new cv::VideoCapture(-1));
+			m_capture.reset(new cv::VideoCapture(m_autoDetect));
 		}
 		if (!m_capture->isOpened())
 			throw std::runtime_error("Could not initialize webcam capturing!");
