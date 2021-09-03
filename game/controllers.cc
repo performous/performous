@@ -5,7 +5,7 @@
 #include "libxml++-impl.hh"
 #include "unicode.hh"
 #include <regex>
-#include <SDL2/SDL_joystick.h>
+#include <SDL_joystick.h>
 
 #include <deque>
 #include <stdexcept>
