@@ -46,7 +46,7 @@ class Webcam {
 	bool m_frameAvailable;
 	std::atomic<bool> m_running{ false };
 	std::atomic<bool> m_quit{ false };
-	const int m_autoDetect;
+	const int m_autoDetect = 0;
 
   public:
 	static bool enabled() {
