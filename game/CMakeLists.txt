@@ -108,6 +108,9 @@ foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWS
 	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
 
+target_include_directories(fs PRIVATE ${SDL2_INCLUDE_DIRS})
+target_link_libraries(fs PRIVATE ${SDL2_LIBRARIES})
+
 # Activating MIDI hardware (e-drums with USB/MIDI connection)
 set(ENABLE_MIDI AUTO CACHE STRING "Use midi hardware (e-drums with USB/MIDI connection)")
 set_property(CACHE ENABLE_MIDI PROPERTY STRINGS AUTO ON OFF)
