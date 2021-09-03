@@ -33,7 +33,13 @@
     "opencv",
     "openssl",
     "cpprestsdk",
-    "pthread"
+    "gettext",
+    {
+      "name": "gettext",
+      "features": [
+        "tools"
+      ]
+    }
   ],
-  "builtin-baseline": "9fb1585e7a375cfa873697557ced116dfacbd1d7"
+  "builtin-baseline": "8c092e5cb6c275906758f0b5b54dde4ce6afaaa0"
 }
