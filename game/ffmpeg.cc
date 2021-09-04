@@ -374,7 +374,7 @@ void VideoFFmpeg::processFrame(uFrame frame) {
 	auto h = m_codecContext->height;
 	Bitmap f;
 	f.timestamp = m_position;
-	f.fmt = pix::RGB;
+	f.fmt = pix::Format::RGB;
 	f.resize(w, h);
 	{
 		uint8_t* data = f.data();
