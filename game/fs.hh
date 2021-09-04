@@ -97,3 +97,12 @@ Paths const& getPaths();  ///< Get the data file search path
 Paths getThemePaths();  ///< Get the data/theme file search path (includes current and default themes in addition to data folders)
 Paths getPathsConfig(std::string const& confOption);  ///< Return expanded list of paths specified by a path config option
 
+template <>
+class std::hash<fs::path>
+{
+public:
+    size_t operator()(const fs::path& path) const
+    {
+        return fs::hash_value(path);
+    }
+};
