@@ -121,7 +121,7 @@ void DanceGraph::setupJoinMenu() {
 		ConfigItem::OptionList ol;
 		int i = 0, cur = 0;
 		// Add difficulties to the option list
-		for (int level = 0; level < to_underlying(DanceDifficulty::DIFFICULTYCOUNT); ++level) {
+		for (int level = 0; level < to_underlying(DanceDifficulty::COUNT); ++level) {
 			if (difficulty(DanceDifficulty(level), true)) {
 				ol.push_back(std::to_string(level));
 				if (DanceDifficulty(level) == m_level) cur = i;
@@ -206,7 +206,7 @@ std::string DanceGraph::getModeId() const {
 /// Attempt to change the difficulty by a step
 void DanceGraph::changeDifficulty(int delta) {
 	int newLevel = to_underlying(m_level) + delta;
-	if(newLevel >= to_underlying(DanceDifficulty::DIFFICULTYCOUNT) || newLevel < 0) return; // Out of bounds
+	if(newLevel >= to_underlying(DanceDifficulty::COUNT) || newLevel < 0) return; // Out of bounds
 	auto it = m_song.danceTracks.find(m_gamingMode);
 	if(it->second.find((DanceDifficulty)newLevel) != it->second.end())
 		difficulty((DanceDifficulty)newLevel);

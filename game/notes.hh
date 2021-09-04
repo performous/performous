@@ -141,7 +141,7 @@ enum class DanceDifficulty : unsigned {
 	MEDIUM,
 	HARD,
 	CHALLENGE,
-	DIFFICULTYCOUNT
+	COUNT
 };
 
 typedef std::map<DanceDifficulty, DanceTrack> DanceDifficultyMap;

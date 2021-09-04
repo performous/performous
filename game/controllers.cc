@@ -47,11 +47,11 @@ namespace {
 
 	std::ostream& operator<<(std::ostream& os, SourceId const& source) {
 		switch (source.type) {
-			case SourceType::SOURCETYPE_NONE: return os << "(none)";
-			case SourceType::SOURCETYPE_KEYBOARD: return os << "(keyboard " << source.device << " instrument " << source.channel << ")";
-			case SourceType::SOURCETYPE_JOYSTICK: return os << "(joystick " << source.device << ")";
-			case SourceType::SOURCETYPE_MIDI: return os << "(midi " << source.device << " channel " << source.channel << ")";
-			case SourceType::SOURCETYPE_N: break;
+			case SourceType::NONE: return os << "(none)";
+			case SourceType::KEYBOARD: return os << "(keyboard " << source.device << " instrument " << source.channel << ")";
+			case SourceType::JOYSTICK: return os << "(joystick " << source.device << ")";
+			case SourceType::MIDI: return os << "(midi " << source.device << " channel " << source.channel << ")";
+			case SourceType::N: break;
 		}
 		throw std::logic_error("Unknown SOURCETYPE in controllers.cc SourceId operator<<");
 	}
@@ -144,9 +144,9 @@ struct Controllers::Impl {
 		#include "controllers-buttons.ii"
 		readControllers(getShareDir() / "config/controllers.xml");
 		readControllers(getConfigDir() / "controllers.xml");
-		m_hw[SourceType::SOURCETYPE_KEYBOARD] = constructKeyboard();
-		m_hw[SourceType::SOURCETYPE_JOYSTICK] = constructJoysticks();
-		if (Hardware::midiEnabled()) m_hw[SourceType::SOURCETYPE_MIDI] = constructMidi();
+		m_hw[SourceType::KEYBOARD] = constructKeyboard();
+		m_hw[SourceType::JOYSTICK] = constructJoysticks();
+		if (Hardware::midiEnabled()) m_hw[SourceType::MIDI] = constructMidi();
 	}
 	
 	void readControllers(fs::path const& file) {
@@ -157,8 +157,8 @@ struct Controllers::Impl {
 		std::clog << "controllers/info: Parsing " << file << std::endl;
 		xmlpp::DomParser domParser(file.string());
 		try {
-			parseControllers(domParser, "/controllers/joystick/controller", SourceType::SOURCETYPE_JOYSTICK);
-			parseControllers(domParser, "/controllers/midi/controller", SourceType::SOURCETYPE_MIDI);
+			parseControllers(domParser, "/controllers/joystick/controller", SourceType::JOYSTICK);
+			parseControllers(domParser, "/controllers/midi/controller", SourceType::MIDI);
 		} catch (XMLError& e) {
 			int line = e.elem.get_line();
 			std::string name = e.elem.get_name();

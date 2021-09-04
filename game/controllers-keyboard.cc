@@ -42,7 +42,7 @@ namespace input {
 				if (!msg.empty()) std::clog << "controller-keyboard/info: Mode change:" + msg << std::endl;
 			}
 			// Convert SDL event into controller Event
-			event.source = SourceId(SourceType::SOURCETYPE_KEYBOARD, 0);
+			event.source = SourceId(SourceType::KEYBOARD, 0);
 			event.hw = sdlEv.key.keysym.scancode;
 			event.value = (sdlEv.type == SDL_KEYDOWN ? 1.0 : 0.0);
 			// Map to keyboard instruments (sets event.button if matching)

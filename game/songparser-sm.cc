@@ -83,7 +83,7 @@ bool SongParser::smParseField(std::string line) {
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
 			std::string difficultyclass = boost::trim_copy(line.substr(0, line.find_first_of(':')));
 			difficultyclass = UnicodeUtil::toUpper(difficultyclass);
-			DanceDifficulty danceDifficulty = DanceDifficulty::DIFFICULTYCOUNT;
+			DanceDifficulty danceDifficulty = DanceDifficulty::COUNT;
 			if(difficultyclass == "BEGINNER") danceDifficulty = DanceDifficulty::BEGINNER;
 			if(difficultyclass == "EASY") danceDifficulty = DanceDifficulty::EASY;
 			if(difficultyclass == "MEDIUM") danceDifficulty = DanceDifficulty::MEDIUM;

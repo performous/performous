@@ -12,7 +12,7 @@
 #include <vector>
 
 namespace input {
-	enum class SourceType { SOURCETYPE_NONE, SOURCETYPE_JOYSTICK, SOURCETYPE_MIDI, SOURCETYPE_KEYBOARD, SOURCETYPE_N };
+	enum class SourceType { NONE, JOYSTICK, MIDI, KEYBOARD, N };
 	enum class DevType : unsigned { DEVTYPE_GENERIC, DEVTYPE_VOCALS, DEVTYPE_GUITAR, DEVTYPE_DRUMS, DEVTYPE_KEYTAR, DEVTYPE_PIANO, DEVTYPE_DANCEPAD, DEVTYPE_N };
 	/// Generalized mapping of navigation actions
 	enum NavButton {
@@ -46,13 +46,13 @@ namespace input {
 	
 	/// Each controller has unique SourceId that can be used for telling players apart etc.
 	struct SourceId {
-		SourceId(SourceType type = SourceType::SOURCETYPE_NONE, unsigned device = 0, unsigned channel = 0): type(type), device(device), channel(channel) {
+		SourceId(SourceType type = SourceType::NONE, unsigned device = 0, unsigned channel = 0): type(type), device(device), channel(channel) {
 		}
 		SourceType type;
 		unsigned device, channel;  ///< Device number and channel (0..1023)
 		/// Provide numeric conversion for comparison and ordered containers
 		operator unsigned() const { return unsigned(type)<<20 | device<<10 | channel; }
-		bool isKeyboard() const { return type == SourceType::SOURCETYPE_KEYBOARD; }  ///< This is so common test that a helper is provided
+		bool isKeyboard() const { return type == SourceType::KEYBOARD; }  ///< This is so common test that a helper is provided
 	};
 	
 	struct Event {
