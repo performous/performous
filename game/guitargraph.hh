@@ -99,12 +99,12 @@ class GuitarGraph: public InstrumentGraph {
 
 	// Track stuff
 	enum class Difficulty : unsigned {
-		DIFFICULTY_KIDS,     // Kids
-		DIFFICULTY_SUPAEASY, // Easy
-		DIFFICULTY_EASY,     // Medium
-		DIFFICULTY_MEDIUM,   // Hard
-		DIFFICULTY_AMAZING,  // Expert
-		DIFFICULTYCOUNT
+		KIDS,     // Kids
+		SUPAEASY, // Easy
+		EASY,     // Medium
+		MEDIUM,   // Hard
+		AMAZING,  // Expert
+		COUNT
 	} m_level;
 	void setupJoinMenu();
 	void updateJoinMenu();
