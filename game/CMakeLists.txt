@@ -224,7 +224,6 @@ list(APPEND LIBS ${FFTW3_LIBRARIES})
 list(APPEND LIBS ${BLAS_LIBRARIES})
 
 find_package(Threads)
-
 target_link_libraries(performous PRIVATE fs ced aubio ${LIBS} PkgConfig::deps Threads::Threads)
 
 install(TARGETS performous DESTINATION ${BIN_INSTALL})
