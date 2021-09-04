@@ -111,7 +111,3 @@ private:
 	std::string m_webserverMessage = "Trying to connect to webserver";
 #endif
 };
-
-// Declaration for the singleton pointer defined in game.cc
-template<> Game* Singleton<Game>::ms_Singleton;
-

@@ -7,7 +7,7 @@
 
 #include <boost/predef/os.h>
 
-#include <SDL2/SDL_events.h>
+#include <SDL_events.h>
 
 #if (BOOST_OS_WINDOWS) 
 #include <sys/types.h>
