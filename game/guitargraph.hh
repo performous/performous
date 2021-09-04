@@ -98,7 +98,7 @@ class GuitarGraph: public InstrumentGraph {
 	bool m_drums; /// are we using drums?
 
 	// Track stuff
-	enum Difficulty {
+	enum class Difficulty : unsigned {
 		DIFFICULTY_KIDS,     // Kids
 		DIFFICULTY_SUPAEASY, // Easy
 		DIFFICULTY_EASY,     // Medium

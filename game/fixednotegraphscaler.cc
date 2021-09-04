@@ -9,7 +9,7 @@ void FixedNoteGraphScaler::initialize(VocalTrack const& vocal) {
     result.max2 = vocal.noteMin;
 
     for (auto it = vocal.notes.begin(); it != vocal.notes.end(); ++it) {
-        if (it->type == Note::SLEEP) continue;
+        if (it->type == Note::Type::SLEEP) continue;
         if (it->note < result.min1) result.min1 = it->note;
         if (it->note > result.max1) result.max1 = it->note;
         if (it->note < result.min2) result.min2 = it->note;

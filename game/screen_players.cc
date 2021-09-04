@@ -58,10 +58,10 @@ void ScreenPlayers::manageEvent(input::NavEvent const& event) {
 	keyPressed = true;
 	Game* gm = Game::getSingletonPtr();
 	input::NavButton nav = event.button;
-	if (nav == input::NAV_CANCEL) {
+	if (nav == input::NavButton::NAV_CANCEL) {
 		if (m_search.text.empty()) { gm->activateScreen("Songs"); return; }
 		else { m_search.text.clear(); m_players.setFilter(m_search.text); }
-	} else if (nav == input::NAV_START) {
+	} else if (nav == input::NavButton::NAV_START) {
 		if (m_players.isEmpty()) {
 			m_players.addPlayer(m_search.text);
 			m_players.setFilter(m_search.text);
@@ -82,13 +82,13 @@ void ScreenPlayers::manageEvent(input::NavEvent const& event) {
 		}
 	}
 	else if (m_players.isEmpty()) return;
-	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
-	else if (nav == input::NAV_LEFT) m_players.advance(-1);
-	else if (nav == input::NAV_RIGHT) m_players.advance(1);
-	else if (nav == input::NAV_UP) m_players.advance(-1);
-	else if (nav == input::NAV_DOWN) m_players.advance(1);
-	else if (nav == input::NAV_MOREUP) m_players.advance(-10);
-	else if (nav == input::NAV_MOREDOWN) m_players.advance(10);
+	else if (nav == input::NavButton::NAV_PAUSE) m_audio.togglePause();
+	else if (nav == input::NavButton::NAV_LEFT) m_players.advance(-1);
+	else if (nav == input::NavButton::NAV_RIGHT) m_players.advance(1);
+	else if (nav == input::NavButton::NAV_UP) m_players.advance(-1);
+	else if (nav == input::NavButton::NAV_DOWN) m_players.advance(1);
+	else if (nav == input::NavButton::NAV_MOREUP) m_players.advance(-10);
+	else if (nav == input::NavButton::NAV_MOREDOWN) m_players.advance(10);
 }
 
 void ScreenPlayers::manageEvent(SDL_Event event) {
@@ -196,6 +196,6 @@ void ScreenPlayers::draw() {
 		if (!video.empty() && config["graphic/video"].b()) m_video = std::make_unique<Video>(video, videoGap);
 		m_playing = music;
 	}
-	m_layout_singer->drawScore(LayoutSinger::TOP);
+	m_layout_singer->drawScore(LayoutSinger::PositionMode::TOP);
 }
 
