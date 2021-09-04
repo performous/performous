@@ -1,13 +1,13 @@
 #include "fs.hh"
 #include "image.hh"
 
-#include <boost/filesystem/path.hpp>
 #include <jpeglib.h>
 #include <png.h>
 
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <cstring>
 
 namespace {
 	void writePngHelper(png_structp pngPtr, png_bytep data, png_size_t length) {
