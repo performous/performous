@@ -84,25 +84,25 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 	input::NavButton nav = event.button;
 	// Handle basic navigational input that is possible also with instruments
 	m_idleTimer.setValue(0.0);  // Reset idle timer
-	if (nav == input::NAV_PAUSE) m_audio.togglePause();
-	else if (event.menu == input::NAVMENU_A_PREV) {
+	if (nav == input::NavButton::NAV_PAUSE) m_audio.togglePause();
+	else if (event.menu == input::NavMenu::NAVMENU_A_PREV) {
 		if (m_menu.isOpen()) m_menu.move(-1);
 		else menuBrowse(-1);
 	}
-	else if (event.menu == input::NAVMENU_A_NEXT) {
+	else if (event.menu == input::NavMenu::NAVMENU_A_NEXT) {
 		if (m_menu.isOpen()) m_menu.move(1);
 		else menuBrowse(1);
 	}
-	else if (nav == input::NAV_MOREUP) m_songs.advance(-10);
-	else if (nav == input::NAV_MOREDOWN) m_songs.advance(10);
+	else if (nav == input::NavButton::NAV_MOREUP) m_songs.advance(-10);
+	else if (nav == input::NavButton::NAV_MOREDOWN) m_songs.advance(10);
 	else if (m_jukebox) {
-		if (nav == input::NAV_CANCEL) m_jukebox = false;
-		else if (nav == input::NAV_START) { addSong(); sing(); }
-		else if (event.menu == input::NAVMENU_B_NEXT)  m_audio.seek(-5);
-		else if (event.menu == input::NAVMENU_B_PREV) m_audio.seek(5);
-		else if (nav == input::NAV_MOREUP) m_audio.seek(-30);
-		else if (nav == input::NAV_MOREDOWN) m_audio.seek(30);
-	} else if (nav == input::NAV_CANCEL) {
+		if (nav == input::NavButton::NAV_CANCEL) m_jukebox = false;
+		else if (nav == input::NavButton::NAV_START) { addSong(); sing(); }
+		else if (event.menu == input::NavMenu::NAVMENU_B_NEXT)  m_audio.seek(-5);
+		else if (event.menu == input::NavMenu::NAVMENU_B_PREV) m_audio.seek(5);
+		else if (nav == input::NavButton::NAV_MOREUP) m_audio.seek(-30);
+		else if (nav == input::NavButton::NAV_MOREDOWN) m_audio.seek(30);
+	} else if (nav == input::NavButton::NAV_CANCEL) {
 		if (m_menuPos != 1) m_menuPos = 1;  // Exit menu (back to song selection)
 		else if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }  // Clear search
 		else if (m_songs.typeNum()) m_songs.typeChange(0);  // Clear type filter
@@ -110,7 +110,7 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 	}
 	// The rest are only available when there are songs available
 	else if (m_songs.empty()) return;
-	else if (nav == input::NAV_START) {
+	else if (nav == input::NavButton::NAV_START) {
 		if (m_menu.isOpen()) {
 			m_menu.action();
 		}
@@ -131,11 +131,11 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 			}
 		}
 	}
-	else if (event.menu == input::NAVMENU_B_PREV) {
+	else if (event.menu == input::NavMenu::NAVMENU_B_PREV) {
 		if (m_menu.isOpen()) m_menu.move(-1);
 		else if (m_menuPos < 4) ++m_menuPos;
 	}
-	else if (event.menu == input::NAVMENU_B_NEXT) {
+	else if (event.menu == input::NavMenu::NAVMENU_B_NEXT) {
 		if (m_menu.isOpen()) m_menu.move(1);
 		else if (m_menuPos > 0) --m_menuPos;
 	}
