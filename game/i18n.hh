@@ -88,7 +88,7 @@ public:
 		return allLanguages.at(languageKey);
 	}
 
-	const std::pair<std::string, std::string>& getCurrentLanguage() { return m_currentLanguage; }
+	const std::pair<std::string, std::string>& getCurrentLanguage() const { return m_currentLanguage; }
 
 	std::map<std::string, std::string> GetAllLanguages(bool refresh = false) {
 		if (refresh) {
