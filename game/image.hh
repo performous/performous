@@ -8,12 +8,14 @@
 #include <stdexcept>
 #include <vector>
 
-namespace pix { enum Format {
-	INT_ARGB,  // Cairo's pixel format (SVG, text): premultiplied linear RGB (BGRA byte order)
-	CHAR_RGBA,  // libpng w/ alpha: non-premul sRGB (RGBA byte order)
-	RGB,  // libpng w/o alpha, libjpeg, ffmpeg: sRGB (RGB byte order, no padding)
-	BGR  // OpenCV/webcam: sRGB (BGR byte order, no padding)
-}; }
+namespace pix { 
+	enum class Format {
+		INT_ARGB,  // Cairo's pixel format (SVG, text): premultiplied linear RGB (BGRA byte order)
+		CHAR_RGBA,  // libpng w/ alpha: non-premul sRGB (RGBA byte order)
+		RGB,  // libpng w/o alpha, libjpeg, ffmpeg: sRGB (RGB byte order, no padding)
+		BGR  // OpenCV/webcam: sRGB (BGR byte order, no padding)
+	}; 
+}
 
 struct Bitmap {
 	std::vector<unsigned char> buf;  // Pixel data if owned by Bitmap
@@ -24,7 +26,7 @@ struct Bitmap {
 	pix::Format fmt;
 	bool linearPremul;  // Is the data linear RGB and premultiplied (as opposed to sRGB and non-premultiplied)
 	bool bottomFirst;  // Upside-down (only used for taking screenshots)
-	Bitmap(unsigned char* ptr = nullptr): ptr(ptr), width(), height(), ar(), timestamp(), fmt(pix::CHAR_RGBA), linearPremul(), bottomFirst() {}
+	Bitmap(unsigned char* ptr = nullptr): ptr(ptr), width(), height(), ar(), timestamp(), fmt(pix::Format::CHAR_RGBA), linearPremul(), bottomFirst() {}
 	void resize(unsigned w, unsigned h) {
 		if (!ptr) buf.resize(w * h * 4); else buf.clear();
 		width = w;
