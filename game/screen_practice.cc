@@ -50,9 +50,9 @@ void ScreenPractice::manageEvent(input::NavEvent const& event) {
 	if (dev) {
 		for (input::Event ev; dev->getEvent(ev);) {
 			if (ev.value == 0.0) continue;
-			if (dev->type == input::DevType::DEVTYPE_DANCEPAD) {}
-			else if (dev->type == input::DevType::DEVTYPE_GUITAR) {}
-			else if (dev->type == input::DevType::DEVTYPE_DRUMS) m_audio.playSample(m_samples[ev.button.num() % m_samples.size()]);
+			if (dev->type == input::DevType::DANCEPAD) {}
+			else if (dev->type == input::DevType::GUITAR) {}
+			else if (dev->type == input::DevType::DRUMS) m_audio.playSample(m_samples[ev.button.num() % m_samples.size()]);
 		}
 	}
 	// TODO: We could store the DevicePtrs and display the instruments on screen in a meaningful way

@@ -99,7 +99,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, input::DevicePtr dev, i
   m_tap(findFile("tap.svg")),
   m_neckglow(findFile("neck_glow.svg")),
   m_neckglowColor(),
-  m_drums(dev->type == input::DevType::DEVTYPE_DRUMS),
+  m_drums(dev->type == input::DevType::DRUMS),
   m_level(),
   m_track_index(m_instrumentTracks.end()),
   m_dfIt(m_drumfills.end()),

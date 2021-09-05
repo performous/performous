@@ -299,28 +299,28 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 		input::DevicePtr dev = gm->controllers.registerDevice(event.source);
 		if (dev) {
 			// Eat all events and see if any are valid for joining
-			input::DevType type = input::DevType::DEVTYPE_GENERIC;
+			input::DevType type = input::DevType::GENERIC;
 			std::string msg;
 			for (input::Event ev; dev->getEvent(ev);) {
 				if (ev.value == 0.0) continue;
-				if (dev->type == input::DevType::DEVTYPE_DANCEPAD && m_song->hasDance()) {
+				if (dev->type == input::DevType::DANCEPAD && m_song->hasDance()) {
 					if (ev.button == input::ButtonId::DANCEPAD_UP) type = dev->type;
 					else msg = dev->source.isKeyboard() ? _("Press UP to join dance!") : _("Step UP to join!");
 				}
-				else if (dev->type == input::DevType::DEVTYPE_GUITAR && m_song->hasGuitars()) {
+				else if (dev->type == input::DevType::GUITAR && m_song->hasGuitars()) {
 					if (ev.button == input::ButtonId::GUITAR_GREEN) type = dev->type;
 					else if (ev.button != input::ButtonId::GUITAR_WHAMMY && ev.button != input::ButtonId::GUITAR_GODMODE) {
 						msg = dev->source.isKeyboard() ? _("Press 1 to join guitar!") : _("Press GREEN to join!");
 					}
 				}
-				else if (dev->type == input::DevType::DEVTYPE_DRUMS && m_song->hasDrums()) {
+				else if (dev->type == input::DevType::DRUMS && m_song->hasDrums()) {
 					if (ev.button == input::ButtonId::DRUMS_KICK) type = dev->type;
 					else msg = dev->source.isKeyboard() ? _("Press SPACE to join drums!") : _("KICK to join!");
 				}
 			}
 			if (!msg.empty()) gm->flashMessage(msg, 0.0, 0.1, 0.1);
-			else if (type == input::DevType::DEVTYPE_DANCEPAD) m_instruments.push_back(std::make_unique<DanceGraph>(m_audio, *m_song, dev));
-			else if (type != input::DevType::DEVTYPE_GENERIC) m_instruments.push_back(std::make_unique<GuitarGraph>(m_audio, *m_song, dev, m_instruments.size()));
+			else if (type == input::DevType::DANCEPAD) m_instruments.push_back(std::make_unique<DanceGraph>(m_audio, *m_song, dev));
+			else if (type != input::DevType::GENERIC) m_instruments.push_back(std::make_unique<GuitarGraph>(m_audio, *m_song, dev, m_instruments.size()));
 		}
 	}
 
@@ -487,9 +487,9 @@ void ScreenSing::prepare() {
 /// Test if a given device type can join the current song.
 // TODO: Somehow avoid duplicating these same checks in ScreenSing::prepare.
 bool ScreenSing::devCanParticipate(input::DevType const& devType) const {
-	if (devType == input::DevType::DEVTYPE_DANCEPAD && m_song->hasDance()) return true;
-	if (devType == input::DevType::DEVTYPE_GUITAR && m_song->hasGuitars()) return true;
-	if (devType == input::DevType::DEVTYPE_DRUMS && m_song->hasDrums()) return true;
+	if (devType == input::DevType::DANCEPAD && m_song->hasDance()) return true;
+	if (devType == input::DevType::GUITAR && m_song->hasGuitars()) return true;
+	if (devType == input::DevType::DRUMS && m_song->hasDrums()) return true;
 	return false;	
 }
 
@@ -682,7 +682,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 	m_database.scores.clear();
 	// Singers
 	for (auto p = m_database.cur.begin(); p != m_database.cur.end();) {
-		ScoreItem item; item.type = input::DevType::DEVTYPE_VOCALS;
+		ScoreItem item; item.type = input::DevType::VOCALS;
 		item.score = p->getScore();
 		if (item.score < 500) { p = m_database.cur.erase(p); continue; } // Dead
 		item.track = "Vocals"; // For database
@@ -717,13 +717,13 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		ScoreItem winner = *std::max_element(m_database.scores.begin(), m_database.scores.end());
 		int topScore = winner.score;
 		// Determine rank
-		if (winner.type == input::DevType::DEVTYPE_VOCALS) {
+		if (winner.type == input::DevType::VOCALS) {
 			if (topScore > 8000) m_rank = _("Hit singer");
 			else if (topScore > 6000) m_rank = _("Lead singer");
 			else if (topScore > 4000) m_rank = _("Rising star");
 			else if (topScore > 2000) m_rank = _("Amateur");
 			else m_rank = _("Tone deaf");
-		} else if (winner.type == input::DevType::DEVTYPE_DANCEPAD) {
+		} else if (winner.type == input::DevType::DANCEPAD) {
 			if (topScore > 8000) m_rank = _("Maniac");
 			else if (topScore > 6000) m_rank = _("Hoofer");
 			else if (topScore > 4000) m_rank = _("Rising star");

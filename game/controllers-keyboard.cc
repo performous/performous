@@ -71,7 +71,7 @@ namespace input {
 				case SDL_SCANCODE_F1: case SDL_SCANCODE_1: case SDL_SCANCODE_Z:
 				guitar_process:
 					if (!m_guitar) return;
-					event.devType = DevType::DEVTYPE_GUITAR;
+					event.devType = DevType::GUITAR;
 					break;
 
 				// Keytar on keyboard
@@ -82,7 +82,7 @@ namespace input {
 				case SDL_SCANCODE_F8: button++; [[fallthrough]];
 				case SDL_SCANCODE_F7:
 					if (!m_keytar) return;
-					event.devType = DevType::DEVTYPE_KEYTAR;
+					event.devType = DevType::KEYTAR;
 					break;
 
 				// Drums on keyboard
@@ -96,7 +96,7 @@ namespace input {
 				case SDL_SCANCODE_SPACE:
 					drum_process:
 					if (!m_drumkit) return;
-					event.devType = DevType::DEVTYPE_DRUMS;
+					event.devType = DevType::DRUMS;
 					break;
 
 				// Dance on keypad
@@ -109,7 +109,7 @@ namespace input {
 				case SDL_SCANCODE_KP_2: case SDL_SCANCODE_DOWN: case SDL_SCANCODE_KP_5: button++; [[fallthrough]];
 				case SDL_SCANCODE_KP_4: case SDL_SCANCODE_LEFT:
 					if (!m_dancepad) return;
-					event.devType = DevType::DEVTYPE_DANCEPAD;
+					event.devType = DevType::DANCEPAD;
 					break;
 
 				default: return;
