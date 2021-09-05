@@ -13,7 +13,7 @@
 
 namespace input {
 	enum class SourceType { NONE, JOYSTICK, MIDI, KEYBOARD, N };
-	enum class DevType : unsigned { DEVTYPE_GENERIC, DEVTYPE_VOCALS, DEVTYPE_GUITAR, DEVTYPE_DRUMS, DEVTYPE_KEYTAR, DEVTYPE_PIANO, DEVTYPE_DANCEPAD, DEVTYPE_N };
+	enum class DevType : unsigned { GENERIC, VOCALS, GUITAR, DRUMS, KEYTAR, PIANO, DANCEPAD, N };
 	/// Generalized mapping of navigation actions
 	enum NavButton {
 		NAV_NONE /* No NavEvent emitted */, NAV_SOME /* Major gameplay button with no direct nav function, used for joining instruments */,

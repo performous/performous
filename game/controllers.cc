@@ -40,7 +40,7 @@ namespace {
 	}
 	// Return a NavButton corresponding to an Event
 	NavButton navigation(Event const& ev) {
-		#define DEFINE_BUTTON(dt, btn, num, nav) if ((DevType::DEVTYPE_##dt == DevType::DEVTYPE_GENERIC || ev.devType == DevType::DEVTYPE_##dt) && ev.button == dt##_##btn) return nav;
+		#define DEFINE_BUTTON(dt, btn, num, nav) if ((DevType::dt == DevType::GENERIC || ev.devType == DevType::dt) && ev.button == dt##_##btn) return nav;
 		#include "controllers-buttons.ii"
 		return NavButton::NAV_NONE;
 	}
@@ -56,7 +56,7 @@ namespace {
 		throw std::logic_error("Unknown SOURCETYPE in controllers.cc SourceId operator<<");
 	}
 	std::string buttonDebug(DevType type, Button b) {
-		#define DEFINE_BUTTON(dt, btn, num, nav) if ((DevType::DEVTYPE_##dt == DevType::DEVTYPE_GENERIC || type == DevType::DEVTYPE_##dt) && b == dt##_##btn) \
+		#define DEFINE_BUTTON(dt, btn, num, nav) if ((DevType::dt == DevType::GENERIC || type == DevType::dt) && b == dt##_##btn) \
 		  return #dt " " #btn " (" #nav ")";
 		#include "controllers-buttons.ii"
 		throw std::logic_error("Invalid Button value in controllers.cc buttonDebug");
@@ -119,7 +119,7 @@ struct Controllers::Impl {
 	ControllerDefs m_controllerDefs;
 
 	typedef std::map<std::string, Button> NameToButton;
-	NameToButton m_buttons[to_underlying(DevType::DEVTYPE_N)];
+	NameToButton m_buttons[to_underlying(DevType::N)];
 
 	typedef std::map<SourceId, ControllerDef const*> Assignments;
 	Assignments m_assignments;
@@ -140,7 +140,7 @@ struct Controllers::Impl {
 	Time m_prevProcess{};
 
 	Impl(): m_eventsEnabled() {
-		#define DEFINE_BUTTON(devtype, button, num, nav) m_buttons[to_underlying(DevType::DEVTYPE_##devtype)][#button] = devtype##_##button;
+		#define DEFINE_BUTTON(devtype, button, num, nav) m_buttons[to_underlying(DevType::devtype)][#button] = devtype##_##button;
 		#include "controllers-buttons.ii"
 		readControllers(getShareDir() / "config/controllers.xml");
 		readControllers(getConfigDir() / "controllers.xml");
@@ -176,11 +176,11 @@ struct Controllers::Impl {
 			// Device type
 			{
 				std::string type = getAttribute(elem, "type");
-				if (type == "guitar") def.devType = DevType::DEVTYPE_GUITAR;
-				else if (type == "drumkit") def.devType = DevType::DEVTYPE_DRUMS;
-				else if (type == "keytar") def.devType = DevType::DEVTYPE_KEYTAR;
-				else if (type == "piano") def.devType = DevType::DEVTYPE_PIANO;
-				else if (type == "dancepad") def.devType = DevType::DEVTYPE_DANCEPAD;
+				if (type == "guitar") def.devType = DevType::GUITAR;
+				else if (type == "drumkit") def.devType = DevType::DRUMS;
+				else if (type == "keytar") def.devType = DevType::KEYTAR;
+				else if (type == "piano") def.devType = DevType::PIANO;
+				else if (type == "dancepad") def.devType = DevType::DANCEPAD;
 				else {
 					std::clog << "controllers/warning: " << type << ": Unknown controller type in controllers.xml (skipped)" << std::endl;
 					continue;
@@ -239,7 +239,7 @@ struct Controllers::Impl {
 		name = UnicodeUtil::toUpper(name);
 		std::replace( name.begin(), name.end(), '-', '_');
 		// Try getting button first from devtype-specific, then generic names
-		buttonByName(type, name, button) || buttonByName(DevType::DEVTYPE_GENERIC, name, button) ||
+		buttonByName(type, name, button) || buttonByName(DevType::GENERIC, name, button) ||
 		  std::clog << "controllers/warning: " << name << ": Unknown button name in controllers.xml." << std::endl;
 		return button;
 	}
@@ -364,7 +364,7 @@ struct Controllers::Impl {
 			NavEvent ne(ev);
 			// Menu navigation mapping
 			{
-				bool vertical = (ev.devType == DevType::DEVTYPE_GUITAR);
+				bool vertical = (ev.devType == DevType::GUITAR);
 				if (ne.button == NavButton::NAV_UP) ne.menu = (vertical ? NavMenu::NAVMENU_A_PREV : NavMenu::NAVMENU_B_PREV);
 				else if (ne.button == NavButton::NAV_DOWN) ne.menu = (vertical ? NavMenu::NAVMENU_A_NEXT : NavMenu::NAVMENU_B_NEXT);
 				else if (ne.button == NavButton::NAV_LEFT) ne.menu = (vertical ? NavMenu::NAVMENU_B_PREV : NavMenu::NAVMENU_A_PREV);
