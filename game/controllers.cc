@@ -40,23 +40,23 @@ namespace {
 	}
 	// Return a NavButton corresponding to an Event
 	NavButton navigation(Event const& ev) {
-		#define DEFINE_BUTTON(dt, btn, num, nav) if ((DEVTYPE_##dt == DEVTYPE_GENERIC || ev.devType == DEVTYPE_##dt) && ev.button == dt##_##btn) return nav;
+		#define DEFINE_BUTTON(dt, btn, num, nav) if ((DevType::dt == DevType::GENERIC || ev.devType == DevType::dt) && ev.button == ButtonId::dt##_##btn) return nav;
 		#include "controllers-buttons.ii"
-		return NAV_NONE;
+		return NavButton::NAV_NONE;
 	}
 
 	std::ostream& operator<<(std::ostream& os, SourceId const& source) {
 		switch (source.type) {
-			case SOURCETYPE_NONE: return os << "(none)";
-			case SOURCETYPE_KEYBOARD: return os << "(keyboard " << source.device << " instrument " << source.channel << ")";
-			case SOURCETYPE_JOYSTICK: return os << "(joystick " << source.device << ")";
-			case SOURCETYPE_MIDI: return os << "(midi " << source.device << " channel " << source.channel << ")";
-			case SOURCETYPE_N: break;
+			case SourceType::NONE: return os << "(none)";
+			case SourceType::KEYBOARD: return os << "(keyboard " << source.device << " instrument " << source.channel << ")";
+			case SourceType::JOYSTICK: return os << "(joystick " << source.device << ")";
+			case SourceType::MIDI: return os << "(midi " << source.device << " channel " << source.channel << ")";
+			case SourceType::N: break;
 		}
 		throw std::logic_error("Unknown SOURCETYPE in controllers.cc SourceId operator<<");
 	}
 	std::string buttonDebug(DevType type, Button b) {
-		#define DEFINE_BUTTON(dt, btn, num, nav) if ((DEVTYPE_##dt == DEVTYPE_GENERIC || type == DEVTYPE_##dt) && b == dt##_##btn) \
+		#define DEFINE_BUTTON(dt, btn, num, nav) if ((DevType::dt == DevType::GENERIC || type == DevType::dt) && b == ButtonId::dt##_##btn) \
 		  return #dt " " #btn " (" #nav ")";
 		#include "controllers-buttons.ii"
 		throw std::logic_error("Invalid Button value in controllers.cc buttonDebug");
@@ -64,7 +64,7 @@ namespace {
 	std::ostream& operator<<(std::ostream& os, Event const& ev) {
 		os << ev.source << ' ';
 		// Print hw button info if the event is not assigned to a function, otherwise print assignments
-		if (ev.button == GENERIC_UNASSIGNED) {
+		if (ev.button == ButtonId::GENERIC_UNASSIGNED) {
 			if (hwIsAxis.matches(ev.hw)) {
 				os << "axis hw=" << ev.hw - hwIsAxis.min << " value=" << ev.value;
 			} else if (hwIsHat.matches(ev.hw)) {
@@ -119,7 +119,7 @@ struct Controllers::Impl {
 	ControllerDefs m_controllerDefs;
 
 	typedef std::map<std::string, Button> NameToButton;
-	NameToButton m_buttons[DEVTYPE_N];
+	NameToButton m_buttons[to_underlying(DevType::N)];
 
 	typedef std::map<SourceId, ControllerDef const*> Assignments;
 	Assignments m_assignments;
@@ -140,13 +140,13 @@ struct Controllers::Impl {
 	Time m_prevProcess{};
 
 	Impl(): m_eventsEnabled() {
-		#define DEFINE_BUTTON(devtype, button, num, nav) m_buttons[DEVTYPE_##devtype][#button] = devtype##_##button;
+		#define DEFINE_BUTTON(devtype, button, num, nav) m_buttons[to_underlying(DevType::devtype)][#button] = ButtonId::devtype##_##button;
 		#include "controllers-buttons.ii"
 		readControllers(getShareDir() / "config/controllers.xml");
 		readControllers(getConfigDir() / "controllers.xml");
-		m_hw[SOURCETYPE_KEYBOARD] = constructKeyboard();
-		m_hw[SOURCETYPE_JOYSTICK] = constructJoysticks();
-		if (Hardware::midiEnabled()) m_hw[SOURCETYPE_MIDI] = constructMidi();
+		m_hw[SourceType::KEYBOARD] = constructKeyboard();
+		m_hw[SourceType::JOYSTICK] = constructJoysticks();
+		if (Hardware::midiEnabled()) m_hw[SourceType::MIDI] = constructMidi();
 	}
 	
 	void readControllers(fs::path const& file) {
@@ -157,8 +157,8 @@ struct Controllers::Impl {
 		std::clog << "controllers/info: Parsing " << file << std::endl;
 		xmlpp::DomParser domParser(file.string());
 		try {
-			parseControllers(domParser, "/controllers/joystick/controller", SOURCETYPE_JOYSTICK);
-			parseControllers(domParser, "/controllers/midi/controller", SOURCETYPE_MIDI);
+			parseControllers(domParser, "/controllers/joystick/controller", SourceType::JOYSTICK);
+			parseControllers(domParser, "/controllers/midi/controller", SourceType::MIDI);
 		} catch (XMLError& e) {
 			int line = e.elem.get_line();
 			std::string name = e.elem.get_name();
@@ -176,11 +176,11 @@ struct Controllers::Impl {
 			// Device type
 			{
 				std::string type = getAttribute(elem, "type");
-				if (type == "guitar") def.devType = DEVTYPE_GUITAR;
-				else if (type == "drumkit") def.devType = DEVTYPE_DRUMS;
-				else if (type == "keytar") def.devType = DEVTYPE_KEYTAR;
-				else if (type == "piano") def.devType = DEVTYPE_PIANO;
-				else if (type == "dancepad") def.devType = DEVTYPE_DANCEPAD;
+				if (type == "guitar") def.devType = DevType::GUITAR;
+				else if (type == "drumkit") def.devType = DevType::DRUMS;
+				else if (type == "keytar") def.devType = DevType::KEYTAR;
+				else if (type == "piano") def.devType = DevType::PIANO;
+				else if (type == "dancepad") def.devType = DevType::DANCEPAD;
 				else {
 					std::clog << "controllers/warning: " << type << ": Unknown controller type in controllers.xml (skipped)" << std::endl;
 					continue;
@@ -234,18 +234,18 @@ struct Controllers::Impl {
 	}
 	/// Find button by name, either of given type or of generic type
 	Button findButton(DevType type, std::string name) {
-		Button button = GENERIC_UNASSIGNED;
+		Button button = ButtonId::GENERIC_UNASSIGNED;
 		if (name.empty()) return button;
 		name = UnicodeUtil::toUpper(name);
 		std::replace( name.begin(), name.end(), '-', '_');
 		// Try getting button first from devtype-specific, then generic names
-		buttonByName(type, name, button) || buttonByName(DEVTYPE_GENERIC, name, button) ||
+		buttonByName(type, name, button) || buttonByName(DevType::GENERIC, name, button) ||
 		  std::clog << "controllers/warning: " << name << ": Unknown button name in controllers.xml." << std::endl;
 		return button;
 	}
 	/// Try to find button of specific type
 	bool buttonByName(DevType type, std::string const& name, Button& button) {
-		NameToButton const& n2b = m_buttons[type];
+		NameToButton const& n2b = m_buttons[to_underlying(type)];
 		auto it = n2b.find(name);
 		if (it == n2b.end()) return false;
 		button = it->second;
@@ -355,26 +355,26 @@ struct Controllers::Impl {
 		}
 	}
 	bool pushMappedEvent(Event& ev) {
-		if (ev.button == GENERIC_UNASSIGNED) return false;
+		if (ev.button == ButtonId::GENERIC_UNASSIGNED) return false;
 		if (!valueChanged(ev)) return false;  // Avoid repeated or other useless events
 		std::clog << "controllers/debug: processing " << ev << std::endl;
 		ev.nav = navigation(ev);
 		// Emit nav event (except if device is currently registered for events)
-		if (ev.nav != NAV_NONE) {
+		if (ev.nav != NavButton::NAV_NONE) {
 			NavEvent ne(ev);
 			// Menu navigation mapping
 			{
-				bool vertical = (ev.devType == DEVTYPE_GUITAR);
-				if (ne.button == NAV_UP) ne.menu = (vertical ? NAVMENU_A_PREV : NAVMENU_B_PREV);
-				else if (ne.button == NAV_DOWN) ne.menu = (vertical ? NAVMENU_A_NEXT : NAVMENU_B_NEXT);
-				else if (ne.button == NAV_LEFT) ne.menu = (vertical ? NAVMENU_B_PREV : NAVMENU_A_PREV);
-				else if (ne.button == NAV_RIGHT) ne.menu = (vertical ? NAVMENU_B_NEXT : NAVMENU_A_NEXT);
+				bool vertical = (ev.devType == DevType::GUITAR);
+				if (ne.button == NavButton::NAV_UP) ne.menu = (vertical ? NavMenu::NAVMENU_A_PREV : NavMenu::NAVMENU_B_PREV);
+				else if (ne.button == NavButton::NAV_DOWN) ne.menu = (vertical ? NavMenu::NAVMENU_A_NEXT : NavMenu::NAVMENU_B_NEXT);
+				else if (ne.button == NavButton::NAV_LEFT) ne.menu = (vertical ? NavMenu::NAVMENU_B_PREV : NavMenu::NAVMENU_A_PREV);
+				else if (ne.button == NavButton::NAV_RIGHT) ne.menu = (vertical ? NavMenu::NAVMENU_B_NEXT : NavMenu::NAVMENU_A_NEXT);
 			}
 			if (ev.value != 0.0) {
 				m_navEvents.push_back(ne);
-				if (ne.button >= NAV_REPEAT) m_navRepeat.insert(std::make_pair(ne.button, ne));
+				if (ne.button >= NavButton::NAV_REPEAT) m_navRepeat.insert(std::make_pair(ne.button, ne));
 			} else {
-				if (ne.button >= NAV_REPEAT) m_navRepeat.erase(ne.button);
+				if (ne.button >= NavButton::NAV_REPEAT) m_navRepeat.erase(ne.button);
 			}
 		}
 		if (m_eventsEnabled) {

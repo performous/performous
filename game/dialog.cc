@@ -7,27 +7,27 @@ Dialog::Dialog(std::string const& text) :
 	{
 		m_dialog.dimensions.screenTop(-0.1f);
 		m_animationVal.setValue(1);
-		m_state = SLIDEIN;
+		m_state = State::SLIDEIN;
 	}
 
 void Dialog::draw() {
 	double verticaloffset = 1.0;
 	switch(m_state) {
-	case IDLE:
+	case State::IDLE:
 		verticaloffset = 0.0;
 		if(m_animationVal.get() == 0) {
-			m_state = SLIDEOUT;
+			m_state = State::SLIDEOUT;
 			m_animationVal.setValue(1);
 		}
 		break;
-		case SLIDEIN :
+		case State::SLIDEIN :
 		verticaloffset = 1.0 - 1.0 * (1.0-m_animationVal.get()); //TODO animate dialog
 		if(m_animationVal.get() == 0) {
-			m_state = IDLE;
+			m_state = State::IDLE;
 			m_animationVal.setValue(6);
 		}
 		break;
-		case SLIDEOUT:
+		case State::SLIDEOUT:
 			verticaloffset = 1.0 - 1.0 * m_animationVal.get();
 		break;
 	}

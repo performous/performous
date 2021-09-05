@@ -136,13 +136,8 @@ public:
 	 *   SE: (x1,y1)</pre>
 	 */
 	/// TODO anchors
-	enum Gravity {NW,N,NE,W,C,E,SW,S,SE};
-	/// where to position when space is too small
-	enum Fitting {F_ASIS, INSIDE, OUTSIDE, FORCE_INSIDE, FORCE_OUTSIDE};
-	/// vertical align
-	enum VAlign {V_ASIS, TOP, MIDDLE, BOTTOM};
 	/// horizontal align
-	enum Align {A_ASIS, LEFT, CENTER, RIGHT};
+	enum class Align { A_ASIS, LEFT, CENTER, RIGHT };
 	/// dimensions, what else
 	Dimensions dimensions;
 	/// constructor
