@@ -40,7 +40,7 @@ namespace {
 	}
 	// Return a NavButton corresponding to an Event
 	NavButton navigation(Event const& ev) {
-		#define DEFINE_BUTTON(dt, btn, num, nav) if ((DevType::dt == DevType::GENERIC || ev.devType == DevType::dt) && ev.button == dt##_##btn) return nav;
+		#define DEFINE_BUTTON(dt, btn, num, nav) if ((DevType::dt == DevType::GENERIC || ev.devType == DevType::dt) && ev.button == ButtonId::dt##_##btn) return nav;
 		#include "controllers-buttons.ii"
 		return NavButton::NAV_NONE;
 	}
@@ -56,7 +56,7 @@ namespace {
 		throw std::logic_error("Unknown SOURCETYPE in controllers.cc SourceId operator<<");
 	}
 	std::string buttonDebug(DevType type, Button b) {
-		#define DEFINE_BUTTON(dt, btn, num, nav) if ((DevType::dt == DevType::GENERIC || type == DevType::dt) && b == dt##_##btn) \
+		#define DEFINE_BUTTON(dt, btn, num, nav) if ((DevType::dt == DevType::GENERIC || type == DevType::dt) && b == ButtonId::dt##_##btn) \
 		  return #dt " " #btn " (" #nav ")";
 		#include "controllers-buttons.ii"
 		throw std::logic_error("Invalid Button value in controllers.cc buttonDebug");
@@ -140,7 +140,7 @@ struct Controllers::Impl {
 	Time m_prevProcess{};
 
 	Impl(): m_eventsEnabled() {
-		#define DEFINE_BUTTON(devtype, button, num, nav) m_buttons[to_underlying(DevType::devtype)][#button] = devtype##_##button;
+		#define DEFINE_BUTTON(devtype, button, num, nav) m_buttons[to_underlying(DevType::devtype)][#button] = ButtonId::devtype##_##button;
 		#include "controllers-buttons.ii"
 		readControllers(getShareDir() / "config/controllers.xml");
 		readControllers(getConfigDir() / "controllers.xml");
@@ -234,7 +234,7 @@ struct Controllers::Impl {
 	}
 	/// Find button by name, either of given type or of generic type
 	Button findButton(DevType type, std::string name) {
-		Button button = GENERIC_UNASSIGNED;
+		Button button = ButtonId::GENERIC_UNASSIGNED;
 		if (name.empty()) return button;
 		name = UnicodeUtil::toUpper(name);
 		std::replace( name.begin(), name.end(), '-', '_');
@@ -355,7 +355,7 @@ struct Controllers::Impl {
 		}
 	}
 	bool pushMappedEvent(Event& ev) {
-		if (ev.button == GENERIC_UNASSIGNED) return false;
+		if (ev.button == ButtonId::GENERIC_UNASSIGNED) return false;
 		if (!valueChanged(ev)) return false;  // Avoid repeated or other useless events
 		std::clog << "controllers/debug: processing " << ev << std::endl;
 		ev.nav = navigation(ev);
