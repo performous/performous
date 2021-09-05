@@ -24,7 +24,7 @@ namespace input {
 	/// Alternative orientation-agnostic mapping where A axis is the one that is easiest to access (e.g. guitar pick) and B might not be available on all devices
 	enum class NavMenu { NAVMENU_NONE, NAVMENU_A_PREV, NAVMENU_A_NEXT, NAVMENU_B_PREV, NAVMENU_B_NEXT };
 
-	enum ButtonId: unsigned {
+	enum class ButtonId: unsigned {
 		// Button constants for each DevType
 		#define DEFINE_BUTTON(devtype, button, num, nav) devtype##_##button = num,
 		#include "controllers-buttons.ii"
