@@ -284,11 +284,11 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	Song::Status status = m_song->status(time, this);
 	// When score window is displayed
 	if (m_score_window.get()) {
-		if (nav == input::NavButton::NAV_START || nav == input::NavButton::NAV_CANCEL) activateNextScreen();
+		if (nav == input::NavButton::START || nav == input::NavButton::CANCEL) activateNextScreen();
 		return;  // The rest are only available when score window is not displayed
 	}
 	// Instant quit with CANCEL at the very beginning
-	if (nav == input::NavButton::NAV_CANCEL && time < 1.0) {
+	if (nav == input::NavButton::CANCEL && time < 1.0) {
 		if (m_menu.isOpen()) { m_menu.moveToLast(); }
 		else { Game::getSingletonPtr()->activateScreen(config["game/autoplay"].b() ? "Songs" : "Playlist"); }
 		return;
@@ -326,24 +326,24 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 
 	// Only pause or esc opens the global menu (instruments have their own menus)
 	// TODO: This should probably check if the source is participating as an instrument or not rather than check for its type
-	if (!devCanParticipate(event.devType) && (nav == input::NavButton::NAV_PAUSE || nav == input::NavButton::NAV_CANCEL) && !m_audio.isPaused() && !m_menu.isOpen()) {
+	if (!devCanParticipate(event.devType) && (nav == input::NavButton::PAUSE || nav == input::NavButton::CANCEL) && !m_audio.isPaused() && !m_menu.isOpen()) {
 		m_menu.open();
 		m_audio.togglePause();
 	}
 	// Global/singer pause menu navigation
 	if (m_menu.isOpen()) {
 		int do_action = 0;
-		if (nav == input::NavButton::NAV_START) { do_action = 1; }
-		else if (nav == input::NavButton::NAV_LEFT) {
+		if (nav == input::NavButton::START) { do_action = 1; }
+		else if (nav == input::NavButton::LEFT) {
 			if (m_menu.current().type == MenuOption::Type::CHANGE_VALUE) { do_action = -1; }
 			else { m_menu.move(-1); return; }
 		}
-		else if (nav == input::NavButton::NAV_RIGHT) {
+		else if (nav == input::NavButton::RIGHT) {
 			if (m_menu.current().type == MenuOption::Type::CHANGE_VALUE) { do_action = 1; }
 			else { m_menu.move(1); return; }
 			}
-		else if (nav == input::NavButton::NAV_DOWN) { m_menu.move(1); return; }
-		else if (nav == input::NavButton::NAV_UP) { m_menu.move(-1); return; }
+		else if (nav == input::NavButton::DOWN) { m_menu.move(1); return; }
+		else if (nav == input::NavButton::UP) { m_menu.move(-1); return; }
 
 		if (do_action != 0) {
 			std::string currentOption = m_menu.current().getVirtName();
@@ -357,7 +357,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 		}
 	}
 	// Start button has special functions for skipping things (only in singing for now)
-	if (nav == input::NavButton::NAV_START && m_instruments.empty() && !m_layout_singer.empty() && !m_audio.isPaused()) {
+	if (nav == input::NavButton::START && m_instruments.empty() && !m_layout_singer.empty() && !m_audio.isPaused()) {
 		// Open score dialog early
 		if (status == Song::Status::FINISHED) {
 			if (m_engine) m_engine->kill(); // Kill the engine thread

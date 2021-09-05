@@ -40,9 +40,9 @@ namespace {
 	}
 	// Return a NavButton corresponding to an Event
 	NavButton navigation(Event const& ev) {
-		#define DEFINE_BUTTON(dt, btn, num, nav) if ((DevType::dt == DevType::GENERIC || ev.devType == DevType::dt) && ev.button == ButtonId::dt##_##btn) return nav;
+		#define DEFINE_BUTTON(dt, btn, num, nav) if ((DevType::dt == DevType::GENERIC || ev.devType == DevType::dt) && ev.button == ButtonId::dt##_##btn) return NavButton::nav;
 		#include "controllers-buttons.ii"
-		return NavButton::NAV_NONE;
+		return NavButton::NONE;
 	}
 
 	std::ostream& operator<<(std::ostream& os, SourceId const& source) {
@@ -57,7 +57,7 @@ namespace {
 	}
 	std::string buttonDebug(DevType type, Button b) {
 		#define DEFINE_BUTTON(dt, btn, num, nav) if ((DevType::dt == DevType::GENERIC || type == DevType::dt) && b == ButtonId::dt##_##btn) \
-		  return #dt " " #btn " (" #nav ")";
+		  return #dt " " #btn " (NavButton::" #nav ")";
 		#include "controllers-buttons.ii"
 		throw std::logic_error("Invalid Button value in controllers.cc buttonDebug");
 	}
@@ -360,21 +360,21 @@ struct Controllers::Impl {
 		std::clog << "controllers/debug: processing " << ev << std::endl;
 		ev.nav = navigation(ev);
 		// Emit nav event (except if device is currently registered for events)
-		if (ev.nav != NavButton::NAV_NONE) {
+		if (ev.nav != NavButton::NONE) {
 			NavEvent ne(ev);
 			// Menu navigation mapping
 			{
 				bool vertical = (ev.devType == DevType::GUITAR);
-				if (ne.button == NavButton::NAV_UP) ne.menu = (vertical ? NavMenu::NAVMENU_A_PREV : NavMenu::NAVMENU_B_PREV);
-				else if (ne.button == NavButton::NAV_DOWN) ne.menu = (vertical ? NavMenu::NAVMENU_A_NEXT : NavMenu::NAVMENU_B_NEXT);
-				else if (ne.button == NavButton::NAV_LEFT) ne.menu = (vertical ? NavMenu::NAVMENU_B_PREV : NavMenu::NAVMENU_A_PREV);
-				else if (ne.button == NavButton::NAV_RIGHT) ne.menu = (vertical ? NavMenu::NAVMENU_B_NEXT : NavMenu::NAVMENU_A_NEXT);
+				if (ne.button == NavButton::UP) ne.menu = (vertical ? NavMenu::NAVMENU_A_PREV : NavMenu::NAVMENU_B_PREV);
+				else if (ne.button == NavButton::DOWN) ne.menu = (vertical ? NavMenu::NAVMENU_A_NEXT : NavMenu::NAVMENU_B_NEXT);
+				else if (ne.button == NavButton::LEFT) ne.menu = (vertical ? NavMenu::NAVMENU_B_PREV : NavMenu::NAVMENU_A_PREV);
+				else if (ne.button == NavButton::RIGHT) ne.menu = (vertical ? NavMenu::NAVMENU_B_NEXT : NavMenu::NAVMENU_A_NEXT);
 			}
 			if (ev.value != 0.0) {
 				m_navEvents.push_back(ne);
-				if (ne.button >= NavButton::NAV_REPEAT) m_navRepeat.insert(std::make_pair(ne.button, ne));
+				if (ne.button >= NavButton::REPEAT) m_navRepeat.insert(std::make_pair(ne.button, ne));
 			} else {
-				if (ne.button >= NavButton::NAV_REPEAT) m_navRepeat.erase(ne.button);
+				if (ne.button >= NavButton::REPEAT) m_navRepeat.erase(ne.button);
 			}
 		}
 		if (m_eventsEnabled) {

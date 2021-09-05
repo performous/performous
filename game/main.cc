@@ -103,13 +103,13 @@ static void checkEvents(Game& gm, Time eventTime) {
 	for (input::NavEvent event; gm.controllers.getNav(event); ) {
 		input::NavButton nav = event.button;
 		// Volume control
-		if (nav == input::NavButton::NAV_VOLUME_UP || nav == input::NavButton::NAV_VOLUME_DOWN) {
+		if (nav == input::NavButton::VOLUME_UP || nav == input::NavButton::VOLUME_DOWN) {
 			std::string curS = gm.getCurrentScreen()->getName();
 			// Pick proper setting
 			std::string which_vol = (curS == "Sing" || curS == "Practice")
 			  ? "audio/music_volume" : "audio/preview_volume";
 			// Adjust value
-			if (nav == input::NavButton::NAV_VOLUME_UP) ++config[which_vol]; else --config[which_vol];
+			if (nav == input::NavButton::VOLUME_UP) ++config[which_vol]; else --config[which_vol];
 			// Show message
 			gm.flashMessage(config[which_vol].getShortDesc() + ": " + config[which_vol].getValue());
 			continue; // Already handled here...

@@ -259,11 +259,11 @@ void DanceGraph::engine() {
 		m_dead = 0; // Keep alive
 		// Menu keys
 		if (menuOpen() && ev.value != 0.0) {
-			if (ev.nav == input::NavButton::NAV_START || ev.nav == input::NavButton::NAV_CANCEL) m_menu.close();
-			else if (ev.nav == input::NavButton::NAV_RIGHT) m_menu.action(1);
-			else if (ev.nav == input::NavButton::NAV_LEFT) m_menu.action(-1);
-			else if (ev.nav == input::NavButton::NAV_UP) m_menu.move(-1);
-			else if (ev.nav == input::NavButton::NAV_DOWN) m_menu.move(1);
+			if (ev.nav == input::NavButton::START || ev.nav == input::NavButton::CANCEL) m_menu.close();
+			else if (ev.nav == input::NavButton::RIGHT) m_menu.action(1);
+			else if (ev.nav == input::NavButton::LEFT) m_menu.action(-1);
+			else if (ev.nav == input::NavButton::UP) m_menu.move(-1);
+			else if (ev.nav == input::NavButton::DOWN) m_menu.move(1);
 			difficulty_changed = true;
 			// See if anything changed
 			if (m_selectedTrack.so() != m_gamingMode) setTrack(m_selectedTrack.so());
@@ -274,7 +274,7 @@ void DanceGraph::engine() {
 			updateJoinMenu();
 		// Open Menu
 		} else if (!menuOpen() && ev.value != 0.0) {
-			if (ev.nav == input::NavButton::NAV_CANCEL || ev.nav == input::NavButton::NAV_START) m_menu.open();
+			if (ev.nav == input::NavButton::CANCEL || ev.nav == input::NavButton::START) m_menu.open();
 		}
 		auto buttonId = to_underlying(ev.button.id);
 		if (buttonId < max_panels) {

@@ -44,18 +44,18 @@ void ScreenIntro::exit() {
 
 void ScreenIntro::manageEvent(input::NavEvent const& event) {
 	input::NavButton nav = event.button;
-	if (nav == input::NavButton::NAV_CANCEL) {
+	if (nav == input::NavButton::CANCEL) {
 		if (m_menu.getSubmenuLevel() == 0) m_menu.moveToLast();  // Move cursor to quit in main menu
 		else m_menu.closeSubmenu(); // One menu level up
 	}
-	else if (nav == input::NavButton::NAV_DOWN || nav == input::NavButton::NAV_MOREDOWN) m_menu.move(1);
-	else if (nav == input::NavButton::NAV_UP || nav == input::NavButton::NAV_MOREUP) m_menu.move(-1);
-	else if (nav == input::NavButton::NAV_RIGHT && m_menu.getSubmenuLevel() >= 2) m_menu.action(1); // Config menu
-	else if (nav == input::NavButton::NAV_LEFT && m_menu.getSubmenuLevel() >= 2) m_menu.action(-1); // Config menu
-	else if (nav == input::NavButton::NAV_RIGHT && m_menu.getSubmenuLevel() < 2) m_menu.move(1); // Instrument nav hack
-	else if (nav == input::NavButton::NAV_LEFT && m_menu.getSubmenuLevel() < 2) m_menu.move(-1); // Instrument nav hack
-	else if (nav == input::NavButton::NAV_START) m_menu.action();
-	else if (nav == input::NavButton::NAV_PAUSE) m_audio.togglePause();
+	else if (nav == input::NavButton::DOWN || nav == input::NavButton::MOREDOWN) m_menu.move(1);
+	else if (nav == input::NavButton::UP || nav == input::NavButton::MOREUP) m_menu.move(-1);
+	else if (nav == input::NavButton::RIGHT && m_menu.getSubmenuLevel() >= 2) m_menu.action(1); // Config menu
+	else if (nav == input::NavButton::LEFT && m_menu.getSubmenuLevel() >= 2) m_menu.action(-1); // Config menu
+	else if (nav == input::NavButton::RIGHT && m_menu.getSubmenuLevel() < 2) m_menu.move(1); // Instrument nav hack
+	else if (nav == input::NavButton::LEFT && m_menu.getSubmenuLevel() < 2) m_menu.move(-1); // Instrument nav hack
+	else if (nav == input::NavButton::START) m_menu.action();
+	else if (nav == input::NavButton::PAUSE) m_audio.togglePause();
 	// Animation targets
 	m_selAnim.setTarget(m_menu.curIndex());
 	m_submenuAnim.setTarget(m_menu.getSubmenuLevel());
