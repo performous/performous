@@ -277,7 +277,7 @@ void DanceGraph::engine() {
 			if (ev.nav == input::NavButton::CANCEL || ev.nav == input::NavButton::START) m_menu.open();
 		}
 		auto buttonId = to_underlying(ev.button.id);
-		if (buttonId < max_panels) {
+		if (buttonId < static_cast<decltype(buttonId)>(max_panels)) {
 			// Gaming controls
 			if (ev.value == 0.0) {
 				m_pressed[buttonId] = false;
@@ -341,7 +341,7 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 	auto buttonId = to_underlying(ev.button.id);
 	// So it was a PRESS event
 	for (auto it = m_notesIt; it != m_notes.end() && time <= it->note.end + maxTolerance; ++it) {
-		if(!it->isHit && std::abs(time - it->note.begin) <= maxTolerance && buttonId == unsigned(it->note.note)) {
+		if(!it->isHit && std::abs(time - it->note.begin) <= maxTolerance && buttonId == static_cast<decltype(buttonId)>(it->note.note)) {
 			it->isHit = true;
 			if (it->note.type != Note::Type::MINE) {
 				it->score = points(it->note.begin - time);

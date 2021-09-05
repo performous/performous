@@ -135,7 +135,7 @@ enum class GameDifficulty {
 	PERFECT
 };
 
-enum class DanceDifficulty : unsigned {
+enum class DanceDifficulty : int {
 	BEGINNER,
 	EASY,
 	MEDIUM,
