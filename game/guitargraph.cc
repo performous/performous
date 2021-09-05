@@ -983,7 +983,7 @@ void GuitarGraph::draw(double time) {
 
 /// Draws a single note
 /// The times passed are normalized to [past, future]
-void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float whammy, bool tappable, bool hit, double hitAnim, double releaseTime) {
+void GuitarGraph::drawNote(unsigned fret, Color color, float tBeg, float tEnd, float whammy, bool tappable, bool hit, double hitAnim, double releaseTime) {
 	float x = getFretX(fret);
 	auto drumsKickButtonId = to_underlying(input::ButtonId::DRUMS_KICK);
 	if (m_drums && fret == drumsKickButtonId) { // Bass drum? That's easy
