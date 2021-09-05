@@ -43,8 +43,8 @@ void ScreenPractice::exit() {
 void ScreenPractice::manageEvent(input::NavEvent const& event) {
 	Game* gm = Game::getSingletonPtr();
 	input::NavButton nav = event.button;
-	if (nav == input::NavButton::NAV_CANCEL || nav == input::NavButton::NAV_START) gm->activateScreen("Intro");
-	else if (nav == input::NavButton::NAV_PAUSE) m_audio.togglePause();
+	if (nav == input::NavButton::CANCEL || nav == input::NavButton::START) gm->activateScreen("Intro");
+	else if (nav == input::NavButton::PAUSE) m_audio.togglePause();
 	// Process all instrument events that are available, then throw away the instruments...
 	input::DevicePtr dev = gm->controllers.registerDevice(event.source);
 	if (dev) {

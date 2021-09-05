@@ -15,11 +15,11 @@ namespace input {
 	enum class SourceType { NONE, JOYSTICK, MIDI, KEYBOARD, N };
 	enum class DevType : unsigned { GENERIC, VOCALS, GUITAR, DRUMS, KEYTAR, PIANO, DANCEPAD, N };
 	/// Generalized mapping of navigation actions
-	enum NavButton {
-		NAV_NONE /* No NavEvent emitted */, NAV_SOME /* Major gameplay button with no direct nav function, used for joining instruments */,
-		NAV_START, NAV_CANCEL, NAV_PAUSE,
-		NAV_REPEAT = 0x80 /* Anything after this is auto-repeating */,
-		NAV_UP, NAV_DOWN, NAV_LEFT, NAV_RIGHT, NAV_MOREUP, NAV_MOREDOWN, NAV_VOLUME_UP, NAV_VOLUME_DOWN
+	enum class NavButton {
+		NONE /* No NavEvent emitted */, SOME /* Major gameplay button with no direct nav function, used for joining instruments */,
+		START, CANCEL, PAUSE,
+		REPEAT = 0x80 /* Anything after this is auto-repeating */,
+		UP, DOWN, LEFT, RIGHT, MOREUP, MOREDOWN, VOLUME_UP, VOLUME_DOWN
 	};
 	/// Alternative orientation-agnostic mapping where A axis is the one that is easiest to access (e.g. guitar pick) and B might not be available on all devices
 	enum class NavMenu { NAVMENU_NONE, NAVMENU_A_PREV, NAVMENU_A_NEXT, NAVMENU_B_PREV, NAVMENU_B_NEXT };
@@ -63,7 +63,7 @@ namespace input {
 		double value; ///< Zero for button release, up to 1.0 for press (e.g. velocity value), or axis value (-1.0 .. 1.0)
 		Time time; ///< When did the event occur
 		DevType devType; ///< Device type
-		Event(): source(), hw(), nav(NavButton::NAV_NONE), value(), time(), devType() {}
+		Event(): source(), hw(), nav(NavButton::NONE), value(), time(), devType() {}
 		bool pressed() const { return value != 0.0; }
 	};
 

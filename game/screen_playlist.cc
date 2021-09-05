@@ -72,7 +72,7 @@ void ScreenPlaylist::manageEvent(input::NavEvent const& event) {
 	if (keyPressed == false)
 		keyPressed = true;
 
-	if (nav == input::NavButton::NAV_CANCEL) {
+	if (nav == input::NavButton::CANCEL) {
 		if(overlay_menu.isOpen()) {
 			overlay_menu.close();
 		} else {
@@ -80,9 +80,9 @@ void ScreenPlaylist::manageEvent(input::NavEvent const& event) {
 			overlay_menu.open();
 		}
 	} else {
-		if (nav == input::NavButton::NAV_PAUSE) {
+		if (nav == input::NavButton::PAUSE) {
 			m_audio.togglePause();
-		} else if (nav == input::NavButton::NAV_START) {
+		} else if (nav == input::NavButton::START) {
 			menu.action();
 		} else if (event.menu == input::NavMenu::NAVMENU_A_PREV) {
 			menu.move(-1);

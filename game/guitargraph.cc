@@ -333,12 +333,12 @@ void GuitarGraph::engine() {
 		if (menuOpen()) {
 			// Check first regular keys
 			if (ev.pressed()) {
-				if (ev.nav == input::NavButton::NAV_START) m_menu.action();
-				else if (ev.nav == input::NavButton::NAV_LEFT) m_menu.action(-1);
-				else if (ev.nav == input::NavButton::NAV_UP) m_menu.move(-1);
-				else if (ev.nav == input::NavButton::NAV_DOWN) m_menu.move(1);
-				else if (ev.nav == input::NavButton::NAV_RIGHT) m_menu.action(1);
-				else if (ev.nav == input::NavButton::NAV_CANCEL) m_menu.close();
+				if (ev.nav == input::NavButton::START) m_menu.action();
+				else if (ev.nav == input::NavButton::LEFT) m_menu.action(-1);
+				else if (ev.nav == input::NavButton::UP) m_menu.move(-1);
+				else if (ev.nav == input::NavButton::DOWN) m_menu.move(1);
+				else if (ev.nav == input::NavButton::RIGHT) m_menu.action(1);
+				else if (ev.nav == input::NavButton::CANCEL) m_menu.close();
 				if (!m_drums) {
 					if (ev.button == input::ButtonId::GUITAR_GREEN) m_menu.action(-1);
 					else if (ev.button == input::ButtonId::GUITAR_RED) m_menu.action(1);
