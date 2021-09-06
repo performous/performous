@@ -2,6 +2,7 @@
 #include "song.hh"
 #include "engine.hh" // just for Engine::TIMESTEP
 
+PlayerId PlayerItem::UndefinedPlayerId{size_t(-1)};
 
 Player::Player(VocalTrack& vocal, Analyzer& analyzer, size_t frames):
 	  m_vocal(vocal), m_analyzer(analyzer), m_pitch(frames, std::make_pair(getNaN(),
@@ -82,4 +83,9 @@ void Player::calcRowRank() {
 		}
 		m_lineScore = 0;
 	}
+}
+
+PlayerItem::PlayerItem(PlayerId id) 
+: id(id)
+{
 }

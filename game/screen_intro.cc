@@ -8,8 +8,9 @@
 #include "platform.hh"
 #include "theme.hh"
 #include "menu.hh"
+#include "game.hh"
 
-#include <SDL2/SDL_timer.h>
+#include <SDL_timer.h>
 
 ScreenIntro::ScreenIntro(std::string const& name, Audio& audio): Screen(name), m_audio(audio), m_first(true) {
 }

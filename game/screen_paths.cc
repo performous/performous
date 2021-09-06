@@ -6,13 +6,13 @@
 #include "theme.hh"
 #include "audio.hh"
 #include "i18n.hh"
+#include "game.hh"
 
 ScreenPaths::ScreenPaths(std::string const& name, Audio& audio, Songs& songs): Screen(name), m_audio(audio), m_songs(songs) {}
 
 void ScreenPaths::enter() {
 	m_theme = std::make_unique<ThemeAudioDevices>();
-	fs::path homedir(getenv("HOME"));
-	generateMenuFromPath(homedir);
+	generateMenuFromPath(getHomeDir());
 }
 
 void ScreenPaths::exit() {

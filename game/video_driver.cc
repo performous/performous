@@ -8,12 +8,13 @@
 #include "image.hh"
 #include "platform.hh"
 #include "screen.hh"
+#include "game.hh"
 #include "util.hh"
 #include "fs.hh"
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_hints.h>
-#include <SDL2/SDL_rect.h>
-#include <SDL2/SDL_video.h>
+#include <SDL.h>
+#include <SDL_hints.h>
+#include <SDL_rect.h>
+#include <SDL_video.h>
 
 namespace {
 	float s_width;

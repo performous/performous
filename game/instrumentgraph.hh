@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "game.hh"
 #include "audio.hh"
 #include "animvalue.hh"
 #include "notes.hh"
@@ -12,6 +13,7 @@
 #include "menu.hh"
 #include "screen.hh"
 #include "fs.hh"
+#include "util.hh"
 
 /// Represents popup messages
 class Popup {
@@ -94,7 +96,7 @@ public:
 	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
 	unsigned stream() const { return m_stream; }
 	double correctness() const { return m_correctness.get(); }
-	int getScore() const { return (m_score > 0 ? m_score : 0) * m_scoreFactor; }
+	int getScore() const { return clamp(m_score * m_scoreFactor, 0.0, 10000.0); }
 	input::DevType getGraphType() const { return m_dev->type; }
 	virtual double getWhammy() const { return 0; }
 	bool isKeyboard() const { return m_dev->source.isKeyboard(); }
