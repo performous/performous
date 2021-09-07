@@ -365,10 +365,10 @@ struct Controllers::Impl {
 			// Menu navigation mapping
 			{
 				bool vertical = (ev.devType == DevType::GUITAR);
-				if (ne.button == NavButton::UP) ne.menu = (vertical ? NavMenu::NAVMENU_A_PREV : NavMenu::NAVMENU_B_PREV);
-				else if (ne.button == NavButton::DOWN) ne.menu = (vertical ? NavMenu::NAVMENU_A_NEXT : NavMenu::NAVMENU_B_NEXT);
-				else if (ne.button == NavButton::LEFT) ne.menu = (vertical ? NavMenu::NAVMENU_B_PREV : NavMenu::NAVMENU_A_PREV);
-				else if (ne.button == NavButton::RIGHT) ne.menu = (vertical ? NavMenu::NAVMENU_B_NEXT : NavMenu::NAVMENU_A_NEXT);
+				if (ne.button == NavButton::UP) ne.menu = (vertical ? NavMenu::A_PREV : NavMenu::B_PREV);
+				else if (ne.button == NavButton::DOWN) ne.menu = (vertical ? NavMenu::A_NEXT : NavMenu::B_NEXT);
+				else if (ne.button == NavButton::LEFT) ne.menu = (vertical ? NavMenu::B_PREV : NavMenu::A_PREV);
+				else if (ne.button == NavButton::RIGHT) ne.menu = (vertical ? NavMenu::B_NEXT : NavMenu::A_NEXT);
 			}
 			if (ev.value != 0.0) {
 				m_navEvents.push_back(ne);

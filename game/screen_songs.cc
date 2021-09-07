@@ -85,11 +85,11 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 	// Handle basic navigational input that is possible also with instruments
 	m_idleTimer.setValue(0.0);  // Reset idle timer
 	if (nav == input::NavButton::PAUSE) m_audio.togglePause();
-	else if (event.menu == input::NavMenu::NAVMENU_A_PREV) {
+	else if (event.menu == input::NavMenu::A_PREV) {
 		if (m_menu.isOpen()) m_menu.move(-1);
 		else menuBrowse(-1);
 	}
-	else if (event.menu == input::NavMenu::NAVMENU_A_NEXT) {
+	else if (event.menu == input::NavMenu::A_NEXT) {
 		if (m_menu.isOpen()) m_menu.move(1);
 		else menuBrowse(1);
 	}
@@ -98,8 +98,8 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 	else if (m_jukebox) {
 		if (nav == input::NavButton::CANCEL) m_jukebox = false;
 		else if (nav == input::NavButton::START) { addSong(); sing(); }
-		else if (event.menu == input::NavMenu::NAVMENU_B_NEXT)  m_audio.seek(-5);
-		else if (event.menu == input::NavMenu::NAVMENU_B_PREV) m_audio.seek(5);
+		else if (event.menu == input::NavMenu::B_NEXT)  m_audio.seek(-5);
+		else if (event.menu == input::NavMenu::B_PREV) m_audio.seek(5);
 		else if (nav == input::NavButton::MOREUP) m_audio.seek(-30);
 		else if (nav == input::NavButton::MOREDOWN) m_audio.seek(30);
 	} else if (nav == input::NavButton::CANCEL) {
@@ -131,11 +131,11 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 			}
 		}
 	}
-	else if (event.menu == input::NavMenu::NAVMENU_B_PREV) {
+	else if (event.menu == input::NavMenu::B_PREV) {
 		if (m_menu.isOpen()) m_menu.move(-1);
 		else if (m_menuPos < 4) ++m_menuPos;
 	}
-	else if (event.menu == input::NavMenu::NAVMENU_B_NEXT) {
+	else if (event.menu == input::NavMenu::B_NEXT) {
 		if (m_menu.isOpen()) m_menu.move(1);
 		else if (m_menuPos > 0) --m_menuPos;
 	}
