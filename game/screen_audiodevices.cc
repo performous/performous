@@ -80,14 +80,14 @@ void ScreenAudioDevices::manageEvent(input::NavEvent const& event) {
 	input::NavButton nav = event.button;
 	auto& chpos = m_channels[m_selected_column].pos;
 	const unsigned posN = m_devs.size() + 1;
-	if (nav == input::NAV_CANCEL) gm->activateScreen("Intro");
-	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
+	if (nav == input::NavButton::CANCEL) gm->activateScreen("Intro");
+	else if (nav == input::NavButton::PAUSE) m_audio.togglePause();
 	else if (m_devs.empty()) return; // The rest work if there are any devices
-	else if (nav == input::NAV_START) { if (save()) gm->activateScreen("Intro"); }
-	else if (nav == input::NAV_LEFT && m_selected_column > 0) --m_selected_column;
-	else if (nav == input::NAV_RIGHT && m_selected_column < m_channels.size()-1) ++m_selected_column;
-	else if (nav == input::NAV_UP) chpos = (chpos + posN) % posN - 1;
-	else if (nav == input::NAV_DOWN) chpos = (chpos + posN + 2) % posN - 1;
+	else if (nav == input::NavButton::START) { if (save()) gm->activateScreen("Intro"); }
+	else if (nav == input::NavButton::LEFT && m_selected_column > 0) --m_selected_column;
+	else if (nav == input::NavButton::RIGHT && m_selected_column < m_channels.size()-1) ++m_selected_column;
+	else if (nav == input::NavButton::UP) chpos = (chpos + posN) % posN - 1;
+	else if (nav == input::NavButton::DOWN) chpos = (chpos + posN + 2) % posN - 1;
 }
 
 void ScreenAudioDevices::manageEvent(SDL_Event event) {

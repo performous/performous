@@ -22,8 +22,8 @@ std::string MenuOption::getVirtName() const {
 const std::string& MenuOption::getComment() const { return commentPtr ? *commentPtr : comment; }
 
 bool MenuOption::isActive() const {
-	if (type == OPEN_SUBMENU && options.empty()) return false;
-	if (type == CHANGE_VALUE) {
+	if (type == Type::OPEN_SUBMENU && options.empty()) return false;
+	if (type == Type::CHANGE_VALUE) {
 		if (!value) return false;
 		if (value->get_type() == "option_list" && value->ol().size() <= 1) return false;
 	}
@@ -49,13 +49,13 @@ void Menu::select(size_t sel) {
 
 void Menu::action(int dir) {
 	switch (current().type) {
-		case MenuOption::OPEN_SUBMENU: {
+		case MenuOption::Type::OPEN_SUBMENU: {
 			if (current().options.empty()) break;
 			menu_stack.push_back(&current().options);
 			selection_stack.push_back(0);
 			break;
 		}
-		case MenuOption::CHANGE_VALUE: {
+		case MenuOption::Type::CHANGE_VALUE: {
 			if (current().value) {
 				if (current().value->getName() == "audio/backend") {
 					current().value->setOldValue(current().value->getValue());
@@ -69,14 +69,14 @@ void Menu::action(int dir) {
 			}
 			break;
 		}
-		case MenuOption::SET_AND_CLOSE:
+		case MenuOption::Type::SET_AND_CLOSE:
 			if (current().value) *(current().value) = current().newValue;
 			[[fallthrough]];  // Continuing to CLOSE_SUBMENU is intentional
-		case MenuOption::CLOSE_SUBMENU: {
+		case MenuOption::Type::CLOSE_SUBMENU: {
 			closeSubmenu();
 			break;
 		}
-		case MenuOption::ACTIVATE_SCREEN: {
+		case MenuOption::Type::ACTIVATE_SCREEN: {
 			Game* gm = Game::getSingletonPtr();
 			std::string screen = current().newValue.s();
 			clear();
@@ -84,7 +84,7 @@ void Menu::action(int dir) {
 			else gm->activateScreen(screen);
 			break;
 		}
-		case MenuOption::CALLBACK_FUNCTION: {
+		case MenuOption::Type::CALLBACK_FUNCTION: {
 			if (current().callback) current().callback();
 			break;
 		}

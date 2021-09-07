@@ -36,7 +36,6 @@ class DanceGraph: public InstrumentGraph {
 
   private:
 	// Difficulty & mode selection
-	enum DanceStep { STEP_LEFT, STEP_DOWN, STEP_UP, STEP_RIGHT };
 	void setupJoinMenu();
 	void updateJoinMenu();
 	void setTrack(const std::string& track);

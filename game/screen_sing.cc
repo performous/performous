@@ -166,7 +166,7 @@ void ScreenSing::reloadGL() {
 	m_pause_icon = std::make_unique<Texture>(findFile("sing_pause.svg"));
 	m_player_icon = std::make_unique<Texture>(findFile("sing_pbox.svg")); // For duet menu
 	m_help = std::make_unique<Texture>(findFile("instrumenthelp.svg"));
-	m_progress = std::make_unique<ProgressBar>(findFile("sing_progressbg.svg"), findFile("sing_progressfg.svg"), ProgressBar::HORIZONTAL, 0.01f, 0.01f, true);
+	m_progress = std::make_unique<ProgressBar>(findFile("sing_progressbg.svg"), findFile("sing_progressfg.svg"), ProgressBar::Mode::HORIZONTAL, 0.01f, 0.01f, true);
 	// Load background
 	if (!m_song->background.empty()) m_background = std::make_unique<Texture>(m_song->background);
 }
@@ -284,11 +284,11 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	Song::Status status = m_song->status(time, this);
 	// When score window is displayed
 	if (m_score_window.get()) {
-		if (nav == input::NAV_START || nav == input::NAV_CANCEL) activateNextScreen();
+		if (nav == input::NavButton::START || nav == input::NavButton::CANCEL) activateNextScreen();
 		return;  // The rest are only available when score window is not displayed
 	}
 	// Instant quit with CANCEL at the very beginning
-	if (nav == input::NAV_CANCEL && time < 1.0) {
+	if (nav == input::NavButton::CANCEL && time < 1.0) {
 		if (m_menu.isOpen()) { m_menu.moveToLast(); }
 		else { Game::getSingletonPtr()->activateScreen(config["game/autoplay"].b() ? "Songs" : "Playlist"); }
 		return;
@@ -299,51 +299,51 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 		input::DevicePtr dev = gm->controllers.registerDevice(event.source);
 		if (dev) {
 			// Eat all events and see if any are valid for joining
-			input::DevType type = input::DEVTYPE_GENERIC;
+			input::DevType type = input::DevType::GENERIC;
 			std::string msg;
 			for (input::Event ev; dev->getEvent(ev);) {
 				if (ev.value == 0.0) continue;
-				if (dev->type == input::DEVTYPE_DANCEPAD && m_song->hasDance()) {
-					if (ev.button == input::DANCEPAD_UP) type = dev->type;
+				if (dev->type == input::DevType::DANCEPAD && m_song->hasDance()) {
+					if (ev.button == input::ButtonId::DANCEPAD_UP) type = dev->type;
 					else msg = dev->source.isKeyboard() ? _("Press UP to join dance!") : _("Step UP to join!");
 				}
-				else if (dev->type == input::DEVTYPE_GUITAR && m_song->hasGuitars()) {
-					if (ev.button == input::GUITAR_GREEN) type = dev->type;
-					else if (ev.button != input::GUITAR_WHAMMY && ev.button != input::GUITAR_GODMODE) {
+				else if (dev->type == input::DevType::GUITAR && m_song->hasGuitars()) {
+					if (ev.button == input::ButtonId::GUITAR_GREEN) type = dev->type;
+					else if (ev.button != input::ButtonId::GUITAR_WHAMMY && ev.button != input::ButtonId::GUITAR_GODMODE) {
 						msg = dev->source.isKeyboard() ? _("Press 1 to join guitar!") : _("Press GREEN to join!");
 					}
 				}
-				else if (dev->type == input::DEVTYPE_DRUMS && m_song->hasDrums()) {
-					if (ev.button == input::DRUMS_KICK) type = dev->type;
+				else if (dev->type == input::DevType::DRUMS && m_song->hasDrums()) {
+					if (ev.button == input::ButtonId::DRUMS_KICK) type = dev->type;
 					else msg = dev->source.isKeyboard() ? _("Press SPACE to join drums!") : _("KICK to join!");
 				}
 			}
 			if (!msg.empty()) gm->flashMessage(msg, 0.0, 0.1, 0.1);
-			else if (type == input::DEVTYPE_DANCEPAD) m_instruments.push_back(std::make_unique<DanceGraph>(m_audio, *m_song, dev));
-			else if (type != input::DEVTYPE_GENERIC) m_instruments.push_back(std::make_unique<GuitarGraph>(m_audio, *m_song, dev, m_instruments.size()));
+			else if (type == input::DevType::DANCEPAD) m_instruments.push_back(std::make_unique<DanceGraph>(m_audio, *m_song, dev));
+			else if (type != input::DevType::GENERIC) m_instruments.push_back(std::make_unique<GuitarGraph>(m_audio, *m_song, dev, m_instruments.size()));
 		}
 	}
 
 	// Only pause or esc opens the global menu (instruments have their own menus)
 	// TODO: This should probably check if the source is participating as an instrument or not rather than check for its type
-	if (!devCanParticipate(event.devType) && (nav == input::NAV_PAUSE || nav == input::NAV_CANCEL) && !m_audio.isPaused() && !m_menu.isOpen()) {
+	if (!devCanParticipate(event.devType) && (nav == input::NavButton::PAUSE || nav == input::NavButton::CANCEL) && !m_audio.isPaused() && !m_menu.isOpen()) {
 		m_menu.open();
 		m_audio.togglePause();
 	}
 	// Global/singer pause menu navigation
 	if (m_menu.isOpen()) {
 		int do_action = 0;
-		if (nav == input::NAV_START) { do_action = 1; }
-		else if (nav == input::NAV_LEFT) {
-			if (m_menu.current().type == MenuOption::CHANGE_VALUE) { do_action = -1; }
+		if (nav == input::NavButton::START) { do_action = 1; }
+		else if (nav == input::NavButton::LEFT) {
+			if (m_menu.current().type == MenuOption::Type::CHANGE_VALUE) { do_action = -1; }
 			else { m_menu.move(-1); return; }
 		}
-		else if (nav == input::NAV_RIGHT) {
-			if (m_menu.current().type == MenuOption::CHANGE_VALUE) { do_action = 1; }
+		else if (nav == input::NavButton::RIGHT) {
+			if (m_menu.current().type == MenuOption::Type::CHANGE_VALUE) { do_action = 1; }
 			else { m_menu.move(1); return; }
 			}
-		else if (nav == input::NAV_DOWN) { m_menu.move(1); return; }
-		else if (nav == input::NAV_UP) { m_menu.move(-1); return; }
+		else if (nav == input::NavButton::DOWN) { m_menu.move(1); return; }
+		else if (nav == input::NavButton::UP) { m_menu.move(-1); return; }
 
 		if (do_action != 0) {
 			std::string currentOption = m_menu.current().getVirtName();
@@ -357,7 +357,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 		}
 	}
 	// Start button has special functions for skipping things (only in singing for now)
-	if (nav == input::NAV_START && m_instruments.empty() && !m_layout_singer.empty() && !m_audio.isPaused()) {
+	if (nav == input::NavButton::START && m_instruments.empty() && !m_layout_singer.empty() && !m_audio.isPaused()) {
 		// Open score dialog early
 		if (status == Song::Status::FINISHED) {
 			if (m_engine) m_engine->kill(); // Kill the engine thread
@@ -487,9 +487,9 @@ void ScreenSing::prepare() {
 /// Test if a given device type can join the current song.
 // TODO: Somehow avoid duplicating these same checks in ScreenSing::prepare.
 bool ScreenSing::devCanParticipate(input::DevType const& devType) const {
-	if (devType == input::DEVTYPE_DANCEPAD && m_song->hasDance()) return true;
-	if (devType == input::DEVTYPE_GUITAR && m_song->hasGuitars()) return true;
-	if (devType == input::DEVTYPE_DRUMS && m_song->hasDrums()) return true;
+	if (devType == input::DevType::DANCEPAD && m_song->hasDance()) return true;
+	if (devType == input::DevType::GUITAR && m_song->hasGuitars()) return true;
+	if (devType == input::DevType::DRUMS && m_song->hasDrums()) return true;
 	return false;	
 }
 
@@ -531,7 +531,7 @@ void ScreenSing::draw() {
 
 	bool fullSinger = m_instruments.empty() && m_layout_singer.size() <= 1;
 	for (unsigned i = 0; i < m_layout_singer.size(); ++i) {
-		m_layout_singer[i]->draw(time, fullSinger ? LayoutSinger::FULL : (i == 0 ? LayoutSinger::TOP : LayoutSinger::BOTTOM));
+		m_layout_singer[i]->draw(time, fullSinger ? LayoutSinger::PositionMode::FULL : (i == 0 ? LayoutSinger::PositionMode::TOP : LayoutSinger::PositionMode::BOTTOM));
 	}
 
 	Song::Status status = m_song->status(time, this);
@@ -673,7 +673,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
   m_database(database),
   m_pos(0.8, 2.0),
   m_bg(findFile("score_window.svg")),
-  m_scoreBar(findFile("score_bar_bg.svg"), findFile("score_bar_fg.svg"), ProgressBar::VERTICAL, 0.0, 0.0, false),
+  m_scoreBar(findFile("score_bar_bg.svg"), findFile("score_bar_fg.svg"), ProgressBar::Mode::VERTICAL, 0.0, 0.0, false),
   m_score_text(findFile("score_txt.svg")),
   m_score_rank(findFile("score_rank.svg"))
 {
@@ -682,7 +682,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 	m_database.scores.clear();
 	// Singers
 	for (auto p = m_database.cur.begin(); p != m_database.cur.end();) {
-		ScoreItem item; item.type = input::DEVTYPE_VOCALS;
+		ScoreItem item; item.type = input::DevType::VOCALS;
 		item.score = p->getScore();
 		if (item.score < 500) { p = m_database.cur.erase(p); continue; } // Dead
 		item.track = "Vocals"; // For database
@@ -717,13 +717,13 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		ScoreItem winner = *std::max_element(m_database.scores.begin(), m_database.scores.end());
 		int topScore = winner.score;
 		// Determine rank
-		if (winner.type == input::DEVTYPE_VOCALS) {
+		if (winner.type == input::DevType::VOCALS) {
 			if (topScore > 8000) m_rank = _("Hit singer");
 			else if (topScore > 6000) m_rank = _("Lead singer");
 			else if (topScore > 4000) m_rank = _("Rising star");
 			else if (topScore > 2000) m_rank = _("Amateur");
 			else m_rank = _("Tone deaf");
-		} else if (winner.type == input::DEVTYPE_DANCEPAD) {
+		} else if (winner.type == input::DevType::DANCEPAD) {
 			if (topScore > 8000) m_rank = _("Maniac");
 			else if (topScore > 6000) m_rank = _("Hoofer");
 			else if (topScore > 4000) m_rank = _("Rising star");
