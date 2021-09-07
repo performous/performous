@@ -84,13 +84,13 @@ void ScreenPlaylist::manageEvent(input::NavEvent const& event) {
 			m_audio.togglePause();
 		} else if (nav == input::NavButton::START) {
 			menu.action();
-		} else if (event.menu == input::NavMenu::NAVMENU_A_PREV) {
+		} else if (event.menu == input::NavMenu::A_PREV) {
 			menu.move(-1);
-		} else if (event.menu == input::NavMenu::NAVMENU_A_NEXT) {
+		} else if (event.menu == input::NavMenu::A_NEXT) {
 			menu.move(1);
-		} else if (event.menu == input::NavMenu::NAVMENU_B_PREV) {
+		} else if (event.menu == input::NavMenu::B_PREV) {
 			menu.move(-1);
-		} else if (event.menu == input::NavMenu::NAVMENU_B_NEXT) {
+		} else if (event.menu == input::NavMenu::B_NEXT) {
 			menu.move(1);
 		}
 	}
