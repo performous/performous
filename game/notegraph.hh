@@ -11,7 +11,7 @@ class Database;
 /// handles drawing of notes and waves
 class NoteGraph {
   public:
-	enum Position {FULLSCREEN, TOP, BOTTOM, LEFT, RIGHT};
+	enum class Position { FULLSCREEN, TOP, BOTTOM, LEFT, RIGHT };
 	/// constructor
 	NoteGraph(VocalTrack const& vocal, NoteGraphScalerPtr const&);
 	/// resets NoteGraph and Notes
@@ -20,7 +20,7 @@ class NoteGraph {
 	 * @param time at which time to draw
 	 * @param players reference to the list of singing Players
 	 */
-	void draw(double time, Database const& database, Position position = NoteGraph::FULLSCREEN);
+	void draw(double time, Database const& database, Position position = NoteGraph::Position::FULLSCREEN);
   private:
 	/// draw notebars
 	void drawNotes();
