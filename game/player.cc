@@ -45,14 +45,14 @@ void Player::update() {
 			m_scoreIt->power = std::max(m_scoreIt->power, m_scoreIt->powerFactor(note));
 		}
 		// If a row of lyrics ends, calculate how well it went
-		if (m_scoreIt->type == Note::SLEEP) {
+		if (m_scoreIt->type == Note::Type::SLEEP) {
 			calcRowRank();
 		} else {
 			m_maxLineScore = 0; // Not in SLEEP note anymore, so reset maximum
 		}
 		if (endTime < m_scoreIt->end) break;  // The note continues past this timestep
 		// Check if we got a star
-		if ((m_scoreIt->type == Note::NORMAL || m_scoreIt->type == Note::SLIDE || m_scoreIt->type == Note::GOLDEN || m_scoreIt->type == Note::GOLDEN2)
+		if ((m_scoreIt->type == Note::Type::NORMAL || m_scoreIt->type == Note::Type::SLIDE || m_scoreIt->type == Note::Type::GOLDEN || m_scoreIt->type == Note::Type::GOLDEN2)
 		  && (m_noteScore / m_vocal.m_scoreFactor / m_scoreIt->maxScore() > 0.8)) {
 			m_scoreIt->stars.push_back(m_color);
 		}
@@ -71,7 +71,7 @@ void Player::calcRowRank() {
 		Notes::const_reverse_iterator maxScoreIt(m_scoreIt);
 		// NOTE: MacOSX needs the following cast to compile correctly
 		// it is related to the fact that OSX default compiler is 4.0.1 that is buggy when not casting
-		while ((maxScoreIt != static_cast<Notes::const_reverse_iterator>(m_vocal.notes.rend())) && (maxScoreIt->type != Note::SLEEP)) {
+		while ((maxScoreIt != static_cast<Notes::const_reverse_iterator>(m_vocal.notes.rend())) && (maxScoreIt->type != Note::Type::SLEEP)) {
 			m_maxLineScore += m_vocal.m_scoreFactor * maxScoreIt->maxScore();
 			maxScoreIt++;
 		}

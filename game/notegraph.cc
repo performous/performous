@@ -71,7 +71,7 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 	if (time < m_time) reset();
 	m_time = time;
 	// Update m_songit (which note to start the rendering from)
-	while (m_songit != m_vocal.notes.end() && (m_songit->type == Note::SLEEP || m_songit->end < time - (baseLine + 0.5) / pixUnit)) ++m_songit;
+	while (m_songit != m_vocal.notes.end() && (m_songit->type == Note::Type::SLEEP || m_songit->end < time - (baseLine + 0.5) / pixUnit)) ++m_songit;
 
 	// Automatically zooming notelines
 	{
@@ -83,19 +83,19 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 		}
 	}
 	switch(position) {
-		case NoteGraph::FULLSCREEN:
+		case NoteGraph::Position::FULLSCREEN:
 			dimensions.stretch(1.0, 0.50).center();
 			break;
-		case NoteGraph::TOP:
+		case NoteGraph::Position::TOP:
 			dimensions.stretch(1.0, 0.32).bottom(0.0);
 			break;
-		case NoteGraph::BOTTOM:
+		case NoteGraph::Position::BOTTOM:
 			dimensions.stretch(1.0, 0.32).top(0.0);
 			break;
-		case NoteGraph::LEFT:
+		case NoteGraph::Position::LEFT:
 			dimensions.stretch(0.50, 0.50).center().left(-0.5);
 			break;
-		case NoteGraph::RIGHT:
+		case NoteGraph::Position::RIGHT:
 			dimensions.stretch(0.50, 0.50).center().right();
 			break;
 	}
@@ -125,7 +125,7 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 			float centery = m_baseY + (it->note + 0.4) * m_noteUnit; // Star is 0.4 notes higher than current note
 			float centerx = x + w - (player_star_offset + 1.2) * hh; // Star is 1.2 units from end
 			float rot = std::remainder(time * 5.0, TAU); // They rotate!
-			bool smallerNoteGraph = ((position == NoteGraph::TOP) || (position == NoteGraph::BOTTOM));
+			bool smallerNoteGraph = ((position == NoteGraph::Position::TOP) || (position == NoteGraph::Position::BOTTOM));
 			float zoom = (std::abs((rot-180) / 360.0f) * 0.8f + 0.6f) * (smallerNoteGraph ? 2.3 : 2.0) * hh;
 			using namespace glmath;
 			Transform trans(translate(vec3(centerx, centery, 0.0f)) * rotate(rot, vec3(0.0f, 0.0f, 1.0f)));
@@ -145,18 +145,18 @@ void NoteGraph::drawNotes() {
 
 	// Draw notes
 	for (auto it = m_songit; it != m_vocal.notes.end() && it->begin < m_time - (baseLine - 0.5) / pixUnit; ++it) {
-		if (it->type == Note::SLEEP) continue;
+		if (it->type == Note::Type::SLEEP) continue;
 		double alpha = it->power;
 		Texture* t1;
 		Texture* t2;
 		switch (it->type) {
-			case Note::NORMAL: case Note::SLIDE: t1 = &m_notebar; t2 = &m_notebar_hl; break;
-			case Note::GOLDEN:
-			case Note::GOLDEN2: //fallthrough
+			case Note::Type::NORMAL: case Note::Type::SLIDE: t1 = &m_notebar; t2 = &m_notebar_hl; break;
+			case Note::Type::GOLDEN:
+			case Note::Type::GOLDEN2: //fallthrough
 				t1 = &m_notebargold; t2 = &m_notebargold_hl;
 			break;
-			case Note::FREESTYLE:  // Freestyle notes use custom handling
-			case Note::RAP: //handle RAP notes like freestyle for now
+			case Note::Type::FREESTYLE:  // Freestyle notes use custom handling
+			case Note::Type::RAP: //handle RAP notes like freestyle for now
 			{
 				Dimensions dim;
 				dim.middle(m_baseX + 0.5 * (it->begin + it->end) * pixUnit).center(m_baseY + it->note * m_noteUnit).stretch((it->end - it->begin) * pixUnit, -m_noteUnit * 12.0);
@@ -203,7 +203,9 @@ namespace {
 void NoteGraph::drawWaves(Database const& database) {
 	if (m_vocal.notes.empty()) return; // Cannot draw without notes
 	UseTexture tblock(m_wave);
-	for (auto const& player: database.cur) {
+	auto sortedPlayers = std::list<std::reference_wrapper<const Player>>(database.cur.begin(), database.cur.end());
+	sortedPlayers.sort([](const Player& playerOne, const Player& playerTwo) {return playerOne.m_score < playerTwo.m_score; });
+	for (const Player& player: sortedPlayers) {
 		if (player.m_vocal.name != m_vocal.name)
 			continue;
 		float const texOffset = 2.0 * m_time; // Offset for animating the wave texture
@@ -228,11 +230,11 @@ void NoteGraph::drawWaves(Database const& database) {
 			if (idx < beginIdx) continue; // Skip graphics rendering if out of screen
 			double x = -0.2 + (t - m_time) * pixUnit;
 			// Find the currently active note(s)
-			while (noteIt != m_vocal.notes.end() && (noteIt->type == Note::SLEEP || t > noteIt->end)) ++noteIt;
+			while (noteIt != m_vocal.notes.end() && (noteIt->type == Note::Type::SLEEP || t > noteIt->end)) ++noteIt;
 			auto notePrev = noteIt;
-			while (notePrev != m_vocal.notes.begin() && (notePrev->type == Note::SLEEP || t < notePrev->begin)) --notePrev;
+			while (notePrev != m_vocal.notes.begin() && (notePrev->type == Note::Type::SLEEP || t < notePrev->begin)) --notePrev;
 			bool hasNote = (noteIt != m_vocal.notes.end());
-			bool hasPrev = notePrev->type != Note::SLEEP && t >= notePrev->begin;
+			bool hasPrev = notePrev->type != Note::Type::SLEEP && t >= notePrev->begin;
 			double val;
 			if (hasNote && hasPrev) val = 0.5 * (noteIt->note + notePrev->note);
 			else if (hasNote) val = noteIt->note;
