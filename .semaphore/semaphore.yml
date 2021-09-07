@@ -114,6 +114,7 @@ blocks:
       prologue:
         commands:
           - echo "Installing Performous dependencies..."
+          - sudo add-apt-repository -y ppa:litenstein/focal-backports
           - sudo apt-get update -y
           - sudo apt-get install -y --no-install-recommends ninja-build
           - sudo apt-get install -y --no-install-recommends gettext clang-12 gcc-11 g++-11 python3-dev python3-pip meson libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-program-options-dev libboost-iostreams-dev libboost-system-dev libboost-locale-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++3.2-dev portaudio19-dev libicu-dev libopencv-dev libportmidi-dev libglm-dev libaubio-dev libcpprest-dev
