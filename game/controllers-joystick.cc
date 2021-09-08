@@ -38,7 +38,7 @@ namespace input {
 				event.value = sdlEv.jhat.value;
 			}
 			else return false;
-			event.source = SourceId(SOURCETYPE_JOYSTICK, sdlEv.jbutton.which);  // All j* structures have .which at the same position as jbutton
+			event.source = SourceId(SourceType::JOYSTICK, sdlEv.jbutton.which);  // All j* structures have .which at the same position as jbutton
 			return true;
 		}
 		typedef std::shared_ptr<SDL_Joystick> JoyPtr;

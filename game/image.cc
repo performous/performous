@@ -99,8 +99,8 @@ void writePNG(fs::path const& filename, Bitmap const& img, unsigned stride) {
 	unsigned char bpp;
 	int colorType;
 	switch (img.fmt) {
-		case pix::RGB: bpp = 3; colorType = PNG_COLOR_TYPE_RGB; break;
-		case pix::CHAR_RGBA: bpp = 4; colorType = PNG_COLOR_TYPE_RGBA; break;
+		case pix::Format::RGB: bpp = 3; colorType = PNG_COLOR_TYPE_RGB; break;
+		case pix::Format::CHAR_RGBA: bpp = 4; colorType = PNG_COLOR_TYPE_RGBA; break;
 		default:
 			// Byte order would need to be changed for other formats and we don't currently need them...
 			throw std::logic_error("Unsupported pixel format in writePNG_internal");
@@ -153,7 +153,7 @@ void loadPNG(Bitmap& bitmap, fs::path const& filename) {
 
 void loadJPEG(Bitmap& bitmap, fs::path const& filename) {
 	std::clog << "image/debug: Loading JPEG: " + filename.string() << std::endl;
-	bitmap.fmt = pix::RGB;
+	bitmap.fmt = pix::Format::RGB;
 	struct my_jpeg_error_mgr jerr;
 	BinaryBuffer data = readFile(filename);
 	jpeg_decompress_struct cinfo;
@@ -184,10 +184,10 @@ void Bitmap::crop(const unsigned width, const unsigned height, const unsigned x,
 
 	unsigned char bpp;
 	switch (fmt) {
-	case pix::INT_ARGB: bpp = 4; break; // Correct?
-	case pix::BGR: bpp = 3; break;
-	case pix::RGB: bpp = 3; break;
-	case pix::CHAR_RGBA: bpp = 4; break;
+	case pix::Format::INT_ARGB: bpp = 4; break; // Correct?
+	case pix::Format::BGR: bpp = 3; break;
+	case pix::Format::RGB: bpp = 3; break;
+	case pix::Format::CHAR_RGBA: bpp = 4; break;
 	default: throw std::logic_error("Unsupported picture format.");
 	}
 

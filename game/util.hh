@@ -49,3 +49,9 @@ struct UnlockGuard {
 	Lockable& m_mutex;
 };
 
+
+/** Templated conversion from strongly typed enums to the underlying type. **/
+template <typename E>
+constexpr auto to_underlying(E e) noexcept -> std::enable_if_t<std::is_enum<E>::value, std::underlying_type_t<E>> {
+	return static_cast<std::underlying_type_t<E>>(e);
+}
