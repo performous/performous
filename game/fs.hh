@@ -1,9 +1,11 @@
 #pragma once
 
+#include "config.hh"
+
 #include <list>
 #include <vector>
 
-#ifdef USE_BOOST_FS
+#if USE_BOOST_FS == 1
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
