@@ -111,7 +111,7 @@ void Webcam::render() {
 		std::lock_guard<std::mutex> l(m_mutex);
 		// Load the image
 		Bitmap bitmap;
-		bitmap.fmt = pix::BGR;
+		bitmap.fmt = pix::Format::BGR;
 		bitmap.buf.swap(m_frame.data);
 		bitmap.resize(m_frame.width, m_frame.height);
 		m_texture.load(bitmap);

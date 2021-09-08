@@ -98,13 +98,13 @@ class GuitarGraph: public InstrumentGraph {
 	bool m_drums; /// are we using drums?
 
 	// Track stuff
-	enum Difficulty {
-		DIFFICULTY_KIDS,     // Kids
-		DIFFICULTY_SUPAEASY, // Easy
-		DIFFICULTY_EASY,     // Medium
-		DIFFICULTY_MEDIUM,   // Hard
-		DIFFICULTY_AMAZING,  // Expert
-		DIFFICULTYCOUNT
+	enum class Difficulty : int {
+		KIDS,     // Kids
+		SUPAEASY, // Easy
+		EASY,     // Medium
+		MEDIUM,   // Hard
+		AMAZING,  // Expert
+		COUNT
 	} m_level;
 	void setupJoinMenu();
 	void updateJoinMenu();
@@ -121,10 +121,10 @@ class GuitarGraph: public InstrumentGraph {
 	void drawNeckStuff(double time);  ///< Anything in neck coordinates
 	void drawNotes(double time);  ///< Frets etc.
 	void drawBar(double time, float h);
-	void drawNote(int fret, Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
+	void drawNote(unsigned fret, Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
 	void drawDrumfill(float tBeg, float tEnd);
 	void drawInfo(double time);
-	float getFretX(int fret) { return (-2.0f + fret- (m_drums ? 0.5 : 0)) * (m_leftymode.b() ? -1 : 1); }
+	float getFretX(unsigned fret) { return (-2.0f + fret- (m_drums ? 0.5 : 0)) * (m_leftymode.b() ? -1 : 1); }
 	double neckWidth() const; ///< Get the currently effective neck width (0.5 or less)
 	// Chords & notes
 	void updateChords();

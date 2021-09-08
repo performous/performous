@@ -99,7 +99,7 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, input::DevicePtr dev, i
   m_tap(findFile("tap.svg")),
   m_neckglow(findFile("neck_glow.svg")),
   m_neckglowColor(),
-  m_drums(dev->type == input::DEVTYPE_DRUMS),
+  m_drums(dev->type == input::DevType::DRUMS),
   m_level(),
   m_track_index(m_instrumentTracks.end()),
   m_dfIt(m_drumfills.end()),
@@ -138,10 +138,10 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, input::DevicePtr dev, i
 	while (number--)
 		if (++m_track_index == m_instrumentTracks.end()) m_track_index = m_instrumentTracks.begin();
 	// Pick a nice default difficulty (note: the execution of || stops when true is returned)
-	difficulty(DIFFICULTY_EASY) ||
-	difficulty(DIFFICULTY_SUPAEASY) ||
-	difficulty(DIFFICULTY_MEDIUM) ||
-	difficulty(DIFFICULTY_AMAZING) ||
+	difficulty(Difficulty::EASY) ||
+	difficulty(Difficulty::SUPAEASY) ||
+	difficulty(Difficulty::MEDIUM) ||
+	difficulty(Difficulty::AMAZING) ||
 	(difficultyAuto(), true);
 	updateNeck();
 	setupJoinMenu();
@@ -151,7 +151,8 @@ void GuitarGraph::setupJoinMenuDifficulty() {
 	ConfigItem::OptionList ol;
 	int cur = 0;
 	// Add difficulties to the option list
-	for (int level = 0; level < DIFFICULTYCOUNT; ++level) {
+	auto maxLevel = to_underlying(Difficulty::COUNT);
+	for (int level = 0; level < maxLevel; ++level) {
 		if (difficulty(Difficulty(level), true)) {
 			ol.push_back(std::to_string(level));
 			if (Difficulty(level) == m_level) cur = ol.size()-1;
@@ -245,25 +246,28 @@ std::string GuitarGraph::getTrack() const {
 
 /// Get the difficulty as displayable string
 std::string GuitarGraph::getDifficultyString() const {
-	return _(diffv[m_level].name.c_str());
+	return _(diffv[to_underlying(m_level)].name.c_str());
 }
 
 /// Get a string id for track and difficulty
 std::string GuitarGraph::getModeId() const {
-	return m_track_index->first + " - " + diffv[m_level].name;
+	return m_track_index->first + " - " + diffv[to_underlying(m_level)].name;
 }
 
 /// Cycle through difficulties
 void GuitarGraph::changeDifficulty(int dir) {
-	for (int level = ((int)m_level + dir) % DIFFICULTYCOUNT; level != m_level;
-	  level = (level+dir) % DIFFICULTYCOUNT)
+	auto maxLevel = to_underlying(Difficulty::COUNT);
+	auto currentLevel = to_underlying(m_level);
+	for (int level = ((int)m_level + dir) % maxLevel; level != currentLevel;
+	  level = (level+dir) % maxLevel)
 		if (difficulty(Difficulty(level))) return;
 }
 
 /// Find an initial difficulty level to use
 void GuitarGraph::difficultyAuto(bool tryKeep) {
 	if (tryKeep && difficulty(Difficulty(m_level))) return;
-	for (int level = 0; level < DIFFICULTYCOUNT; ++level) if (difficulty(Difficulty(level))) return;
+	auto maxLevel = to_underlying(Difficulty::COUNT);
+	for (int level = 0; level < maxLevel; ++level) if (difficulty(Difficulty(level))) return;
 	throw std::runtime_error("No difficulty levels found for track " + m_track_index->first);
 }
 
@@ -275,7 +279,7 @@ bool GuitarGraph::difficulty(Difficulty level, bool check_only) {
 		if (&track == &elem.second) break;
 	}
 	// Check if the difficulty level is available
-	uint8_t basepitch = diffv[level].basepitch;
+	uint8_t basepitch = diffv[to_underlying(level)].basepitch;
 	NoteMap const& nm = track.nm;
 	unsigned fail = 0;
 	for (unsigned fret = 0; fret < m_pads; ++fret) if (nm.find(basepitch + fret) == nm.end()) ++fail;
@@ -303,8 +307,9 @@ void GuitarGraph::engine() {
 	handleCountdown(time, time < getNotesBeginTime() ? getNotesBeginTime() : m_jointime+1);
 	// Handle all events
 	for (input::Event ev; m_dev->getEvent(ev); ) {
+		auto buttonId = to_underlying(ev.button.id);
 		// Lefty mode flip of buttons
-		if (m_leftymode.b() && m_drums && ev.source.type != input::SOURCETYPE_MIDI) {
+		if (m_leftymode.b() && m_drums && ev.source.type != input::SourceType::MIDI) {
 			unsigned layer = ev.button.layer(), num = ev.button.num();
 			// Layers 0-1: reverse all but kick; layer 2: swap yellow and blue cymbals
 			if ((layer < 2 && num >= 1 && num <= 4) || (layer == 2 && num >= 2 && num <= 3)) ev.button = input::Button(layer, 5 - num);
@@ -314,7 +319,7 @@ void GuitarGraph::engine() {
 			unsigned layer = ev.button.layer(), num = ev.button.num();
 			// Guitar numbering hack
 			if (!m_drums) {
-				if (ev.button == input::GUITAR_PICK_DOWN || ev.button == input::GUITAR_PICK_UP) { layer = 0; num = 0; }
+				if (ev.button == input::ButtonId::GUITAR_PICK_DOWN || ev.button == input::ButtonId::GUITAR_PICK_UP) { layer = 0; num = 0; }
 				else ++num;
 			}
 			// Update key pressed status
@@ -328,20 +333,20 @@ void GuitarGraph::engine() {
 		if (menuOpen()) {
 			// Check first regular keys
 			if (ev.pressed()) {
-				if (ev.nav == input::NAV_START) m_menu.action();
-				else if (ev.nav == input::NAV_LEFT) m_menu.action(-1);
-				else if (ev.nav == input::NAV_UP) m_menu.move(-1);
-				else if (ev.nav == input::NAV_DOWN) m_menu.move(1);
-				else if (ev.nav == input::NAV_RIGHT) m_menu.action(1);
-				else if (ev.nav == input::NAV_CANCEL) m_menu.close();
+				if (ev.nav == input::NavButton::START) m_menu.action();
+				else if (ev.nav == input::NavButton::LEFT) m_menu.action(-1);
+				else if (ev.nav == input::NavButton::UP) m_menu.move(-1);
+				else if (ev.nav == input::NavButton::DOWN) m_menu.move(1);
+				else if (ev.nav == input::NavButton::RIGHT) m_menu.action(1);
+				else if (ev.nav == input::NavButton::CANCEL) m_menu.close();
 				if (!m_drums) {
-					if (ev.button == input::GUITAR_GREEN) m_menu.action(-1);
-					else if (ev.button == input::GUITAR_RED) m_menu.action(1);
+					if (ev.button == input::ButtonId::GUITAR_GREEN) m_menu.action(-1);
+					else if (ev.button == input::ButtonId::GUITAR_RED) m_menu.action(1);
 				}
 			}
 			// See if anything changed
 			if (!m_drums && m_selectedTrack.so() != m_track_index->first) setTrack(m_selectedTrack.so());
-			else if (std::stoi(m_selectedDifficulty.so()) != m_level)
+			else if (std::stoi(m_selectedDifficulty.so()) != to_underlying(m_level))
 				difficulty(Difficulty(std::stoi(m_selectedDifficulty.so())));
 			else if (m_rejoin.b()) { unjoin(); setupJoinMenu(); m_dev->pushEvent(input::Event()); /* FIXME: HACK! */ }
 			// Sync menu items & captions
@@ -349,14 +354,14 @@ void GuitarGraph::engine() {
 			break;
 
 		// If the songs hasn't yet started, we want key presses to bring join menu back (not pause menu)
-		} else if (time < -2 && ev.pressed() && ev.button != input::GUITAR_WHAMMY && ev.button != input::GUITAR_GODMODE) {
+		} else if (time < -2 && ev.pressed() && ev.button != input::ButtonId::GUITAR_WHAMMY && ev.button != input::ButtonId::GUITAR_GODMODE) {
 			setupJoinMenu();
 			m_menu.open();
 			break;
 		// Handle Start/Select keypresses
 		} else if (!isKeyboard()) {
-			if (ev.button == input::GENERIC_CANCEL) ev.button = input::GUITAR_GODMODE; // Select = GodMode
-			if (ev.button == input::GENERIC_START) { m_menu.open(); continue; }
+			if (ev.button == input::ButtonId::GENERIC_CANCEL) ev.button = input::ButtonId::GUITAR_GODMODE; // Select = GodMode
+			if (ev.button == input::ButtonId::GENERIC_START) { m_menu.open(); continue; }
 		}
 
 		// Disable gameplay when game is paused
@@ -364,9 +369,9 @@ void GuitarGraph::engine() {
 
 		// Guitar specific actions
 		if (!m_drums) {
-			if (ev.button == input::GUITAR_GODMODE && ev.pressed()) activateStarpower();
-			if (ev.button == input::GUITAR_WHAMMY) m_whammy = (1.0 + ev.value + 2.0*(rand()/double(RAND_MAX))) / 4.0;
-			if (ev.button <= m_pads && !ev.pressed()) endHold(ev.button, time);
+			if (ev.button == input::ButtonId::GUITAR_GODMODE && ev.pressed()) activateStarpower();
+			if (ev.button == input::ButtonId::GUITAR_WHAMMY) m_whammy = (1.0 + ev.value + 2.0*(rand()/double(RAND_MAX))) / 4.0;
+			if (buttonId <= m_pads && !ev.pressed()) endHold(buttonId, time);
 		}
 
 		// Playing
@@ -504,7 +509,7 @@ void GuitarGraph::fail(double time, int fret) {
 		// remove equivalent of 1 perfect hit for every note
 		// kids tend to play a lot of extra notes just for the fun of it.
 		// need to make sure they don't end up with a score of zero
-		m_score -= (m_level == DIFFICULTY_KIDS) ? points(0)/2.0 : points(0);
+		m_score -= (m_level == Difficulty::KIDS) ? points(0)/2.0 : points(0);
 		m_correctness.setTarget(0.0, true);  // Instantly fail correctness
 	}
 	endStreak();
@@ -578,7 +583,7 @@ void GuitarGraph::drumHit(double time, unsigned layer, unsigned fret) {
 	for (auto it = m_chordIt; it != m_chords.end() && it->begin <= time + tolerance; ++it) {
 		// it->dur[fret]          == NULL for a chord that doesn't include the fret played (pad hit)
 		// m_notes[it->dur[fret]] != 0    when the fret played (pad hit) was already played
-		if (m_level == DIFFICULTY_KIDS) {
+		if (m_level == Difficulty::KIDS) {
 			// in kiddy mode we don't care about the correct pad
 			// all that matters is that there is still a missing note in that chord
 			if (m_chordIt->status == m_chordIt->polyphony) continue;
@@ -613,14 +618,14 @@ void GuitarGraph::drumHit(double time, unsigned layer, unsigned fret) {
 		m_events.push_back(Event(time, 1, fret, dur));
 		m_notes[dur] = m_events.size();
 		// Scoring - be a little more generous for kids
-		double score = (m_level == DIFFICULTY_KIDS) ? points(tolerance/2.0) : points(tolerance);
+		double score = (m_level == Difficulty::KIDS) ? points(tolerance/2.0) : points(tolerance);
 		m_chordIt->score += score;
 		m_score += score;
 		if (!m_drumfills.empty()) m_starmeter += score; // Only add starmeter if it's possible to activate GodMode
 		// Graphical effects
 		m_flames[fret].push_back(AnimValue(0.0, flameSpd));
 		m_flames[fret].back().setTarget(1.0);
-		if (fret == input::DRUMS_KICK) m_drumJump.setTarget(1.0); // Do a jump for bass drum
+		if (fret == to_underlying(input::ButtonId::DRUMS_KICK)) m_drumJump.setTarget(1.0); // Do a jump for bass drum
 		// All drums of the chord hit already?
 		if (m_chordIt->status == m_chordIt->polyphony) {
 			//m_score -= m_chordIt->score;
@@ -638,14 +643,15 @@ void GuitarGraph::drumHit(double time, unsigned layer, unsigned fret) {
 
 /// Handle guitar events and scoring
 void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
-	bool picked = (ev.button == input::GUITAR_PICK_UP || ev.button == input::GUITAR_PICK_DOWN) && ev.pressed();
+	bool picked = (ev.button == input::ButtonId::GUITAR_PICK_UP || ev.button == input::ButtonId::GUITAR_PICK_DOWN) && ev.pressed();
+	auto buttonId = to_underlying(ev.button.id);
 	// Handle Big Rock Ending
 	if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin - maxTolerance
 	  && time <= m_dfIt->end + maxTolerance) {
-		if (!ev.pressed() || ev.button >= m_pads) return;  // No processing for release events or non-fret buttons
+		if (!ev.pressed() || buttonId >= m_pads) return;  // No processing for release events or non-fret buttons
 		m_drumfillHits += 1;
-		m_flames[ev.button].push_back(AnimValue(0.0, flameSpd));
-		m_flames[ev.button].back().setTarget(1.0);
+		m_flames[buttonId].push_back(AnimValue(0.0, flameSpd));
+		m_flames[buttonId].back().setTarget(1.0);
 		return;
 	}
 	bool frets[max_panels];  // The combination about to be played
@@ -654,18 +660,18 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 			frets[fret] = m_pressed[fret + 1];
 		}
 	} else { // Attempt to tap
-		if (ev.button >= m_pads) return;
+		if (buttonId >= m_pads) return;
 		if (m_correctness.get() < 0.5 && m_starpower.get() < 0.001) return; // Hammering not possible at the moment
 		for (unsigned fret = 0; fret < m_pads; ++fret) frets[fret] = false;
-		for (unsigned fret = ev.button + 1; fret < m_pads; ++fret) {
+		for (unsigned fret = buttonId + 1; fret < m_pads; ++fret) {
 			if (frets[fret]) return; // Extra buttons on right side
 		}
 		if (ev.pressed()) {
 			// Hammer-on, the fret pressed is played
-			frets[ev.button] = true;
+			frets[buttonId] = true;
 		} else {
 			// Pull off, find the note to played that way
-			int fret = ev.button;
+			int fret = buttonId;
 			do {
 				if (--fret < 0) return; // No frets pressed -> not a pull off
 			} while (!frets[fret]);
@@ -895,9 +901,10 @@ void GuitarGraph::drawNeckStuff(double time) {
 
 	drawNotes(time);
 
+	auto drumsKickButtonId = to_underlying(input::ButtonId::DRUMS_KICK);
 	// Draw flames
 	for (unsigned fret = 0; fret < m_pads; ++fret) { // Loop through the frets
-		if (m_drums && fret == input::DRUMS_KICK) { // Skip bass drum
+		if (m_drums && fret == drumsKickButtonId) { // Skip bass drum
 			m_flames[fret].clear(); continue;
 		}
 		Texture* ftex = &m_flame;
@@ -976,9 +983,10 @@ void GuitarGraph::draw(double time) {
 
 /// Draws a single note
 /// The times passed are normalized to [past, future]
-void GuitarGraph::drawNote(int fret, Color color, float tBeg, float tEnd, float whammy, bool tappable, bool hit, double hitAnim, double releaseTime) {
+void GuitarGraph::drawNote(unsigned fret, Color color, float tBeg, float tEnd, float whammy, bool tappable, bool hit, double hitAnim, double releaseTime) {
 	float x = getFretX(fret);
-	if (m_drums && fret == input::DRUMS_KICK) { // Bass drum? That's easy
+	auto drumsKickButtonId = to_underlying(input::ButtonId::DRUMS_KICK);
+	if (m_drums && fret == drumsKickButtonId) { // Bass drum? That's easy
 		if (hit || hitAnim > 0) return;	// Hide it if it's hit
 		color.a = time2a(tBeg);
 		{
@@ -1153,8 +1161,9 @@ void GuitarGraph::updateChords() {
 
 	Durations::size_type pos[5] = {}, size[5] = {};
 	Durations const* durations[5] = {};
+	auto currentLevel = to_underlying(m_level);
 	for (unsigned fret = 0; fret < m_pads; ++fret) {
-		int basepitch = diffv[m_level].basepitch;
+		int basepitch = diffv[currentLevel].basepitch;
 		auto it = nm.find(basepitch + fret);
 		if (it == nm.end()) continue;
 		durations[fret] = &it->second;
@@ -1204,11 +1213,11 @@ void GuitarGraph::updateChords() {
 	m_hasTomTrack = false;
 	if(m_drums) {
 		// HiHat/Rack Tom 1 detection
-		m_hasTomTrack = updateTom(110, input::DRUMS_YELLOW) || m_hasTomTrack;
+		m_hasTomTrack = updateTom(110, to_underlying(input::ButtonId::DRUMS_YELLOW)) || m_hasTomTrack;
 		// Ride Cymbal/Rack Tom 2 detection
-		m_hasTomTrack = updateTom(111, input::DRUMS_BLUE) || m_hasTomTrack;
+		m_hasTomTrack = updateTom(111, to_underlying(input::ButtonId::DRUMS_BLUE)) || m_hasTomTrack;
 		// Crash Cymbal/Floor Tom detection
-		m_hasTomTrack = updateTom(112, input::DRUMS_GREEN) || m_hasTomTrack;
+		m_hasTomTrack = updateTom(112, to_underlying(input::ButtonId::DRUMS_GREEN)) || m_hasTomTrack;
 	}
 
 	// Solos
