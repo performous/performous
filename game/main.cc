@@ -141,7 +141,7 @@ void mainLoop(std::string const& songlist) {
 		} catch (RUNTIME_ERROR& e) {
 			std::cerr << "ERROR: " << e.what() << std::endl;
 		}
-	Game gm(*window, audio);
+	Game gm(*window, audio, localization);
 	WebServer server(songs);
 	try {
 		// Load audio samples
@@ -404,7 +404,7 @@ int main(int argc, char** argv) try {
 
 void outputOptionalFeatureStatus() {
 	std::clog << "core/notice: " PACKAGE " " VERSION " starting..."
-	  << "\n  Internationalization: " << (TranslationEngine::enabled() ? "Enabled" : "Disabled")
+	  << "\n  Internationalization: " << ("Enabled")
 	  << "\n  MIDI Hardware I/O:    " << (input::Hardware::midiEnabled() ? "Enabled" : "Disabled")
 	  << "\n  Webcam support:       " << (Webcam::enabled() ? "Enabled" : "Disabled")
 	  << std::endl;
