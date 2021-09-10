@@ -107,10 +107,14 @@ if(NOT APPLE)
   endif()
 endif()
 
+if(WIN32)
+	set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION ".")
+endif()
+
 #CPACK variables
 include(InstallRequiredSystemLibraries)
 
-# Project definition
+# Project definition						
 set(CPACK_PACKAGE_VENDOR "Performous")
 set(CPACK_PACKAGE_DESCRIPTION "Karaoke, band games and dancing in the same package. Performous lets you perform great songs, improve your musical skills and simply have fun! No special hardware required, you may play guitar on your PC keyboard, sing on your laptop microphone and so on. If you do have SingStar microphones, Guitar Hero or Rock Band instruments, or dance pads, just plug them into your USB ports and start rocking!")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
