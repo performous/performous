@@ -22,73 +22,73 @@ msgstr ""
 "X-Poedit-SearchPath-1: ../data\n"
 
 #. Game
-#. Gameplay related options
+#. Gameplay related options.
 #. name: game
 #: ../data/config/schema.xml:19
 msgid "Game"
 msgstr ""
 
 #. Game
-#. Gameplay related options
+#. Gameplay related options.
 #. name: game
 #: ../data/config/schema.xml:20
-msgid "Gameplay related options"
+msgid "Gameplay related options."
 msgstr ""
 
 #. Graphic
-#. Configure rendering and video settings
+#. Configure rendering and video settings.
 #. name: graphic
 #: ../data/config/schema.xml:23
 msgid "Graphic"
 msgstr ""
 
 #. Graphic
-#. Configure rendering and video settings
+#. Configure rendering and video settings.
 #. name: graphic
 #: ../data/config/schema.xml:24
-msgid "Configure rendering and video settings"
+msgid "Configure rendering and video settings."
 msgstr ""
 
 #. Audio Devices
-#. Setup microphones and playback
+#. Setup microphones and playback.
 #. name: AudioDevices
 #: ../data/config/schema.xml:28
 msgid "Audio Devices"
 msgstr ""
 
 #. Audio Devices
-#. Setup microphones and playback
+#. Setup microphones and playback.
 #. name: AudioDevices
 #: ../data/config/schema.xml:29
-msgid "Setup microphones and playback"
+msgid "Setup microphones and playback."
 msgstr ""
 
 #. Audio
-#. Configure general audio settings
+#. Configure general audio settings.
 #. name: audio
 #: ../data/config/schema.xml:32
 msgid "Audio"
 msgstr ""
 
 #. Audio
-#. Configure general audio settings
+#. Configure general audio settings.
 #. name: audio
 #: ../data/config/schema.xml:33
-msgid "Configure general audio settings"
+msgid "Configure general audio settings."
 msgstr ""
 
 #. Paths
-#. Setup song and data paths
+#. Setup song and data paths.
 #. name: Paths
 #: ../data/config/schema.xml:36
 msgid "Paths"
 msgstr ""
 
 #. Paths
-#. Setup song and data paths
+#. Setup song and data paths.
 #. name: Paths
 #: ../data/config/schema.xml:37
-msgid "Setup song and data paths"
+msgid "Setup song and data paths."
 msgstr ""
 
 #. Karaoke mode
@@ -305,7 +305,7 @@ msgid "Make a difference between uppercase and lowercase letters when sorting."
 msgstr ""
 
 #. Webserver port
-#. Port to use for the web server. Choose one that is not used by other applications.
+#. Port to use for the webserver. Choose one that is not used by other applications.
 #. name: game/webserver_port
 #. type: int
 #. value: 8000
@@ -314,13 +314,13 @@ msgid "Webserver port"
 msgstr ""
 
 #. Webserver port
-#. Port to use for the web server. Choose one that is not used by other applications.
+#. Port to use for the webserver. Choose one that is not used by other applications.
 #. name: game/webserver_port
 #. type: int
 #. value: 8000
 #: ../data/config/schema.xml:123
 msgid ""
-"Port to use for the web server. Choose one that is not used by other "
+"Port to use for the webserver. Choose one that is not used by other "
 "applications."
 msgstr ""
 
@@ -399,7 +399,7 @@ msgid "Enable keyboard as drumkit."
 msgstr ""
 
 #. Drums use Pro mode
-#. Drums use Pro mode (toms are not cymbals)
+#. Drums use Pro mode (toms are not cymbals).
 #. name: game/drum_promode
 #. type: bool
 #. value: true
@@ -408,12 +408,12 @@ msgid "Drums use Pro mode"
 msgstr ""
 
 #. Drums use Pro mode
-#. Drums use Pro mode (toms are not cymbals)
+#. Drums use Pro mode (toms are not cymbals).
 #. name: game/drum_promode
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:153
-msgid "Drums use Pro mode (toms are not cymbals)"
+#: ../data/config/schema.xml:123
+msgid "Drums use Pro mode (toms are not cymbals)."
 msgstr ""
 
 #. Keyboard as dance pad
@@ -1128,7 +1128,7 @@ msgid ""
 msgstr ""
 
 #. Show hidden folders
-#. When true the screen_paths will also show hidden folders
+#. When true the screen 'Paths' will also show hidden folders.
 #. name: paths/showhiddenfolders
 #. type: bool
 #. value: false
@@ -1137,12 +1137,12 @@ msgid "Show hidden folders"
 msgstr ""
 
 #. Show hidden folders
-#. When true the screen_paths will also show hidden folders
+#. When true the screen 'Paths' will also show hidden folders.
 #. name: paths/showhiddenfolders
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:400
-msgid "When true the screen_paths will also show hidden folders"
+#: ../data/config/schema.xml:370
+msgid "When true the screen 'Paths' will also show hidden folders."
 msgstr ""
 
 #. Default Song folders
@@ -1172,7 +1172,7 @@ msgid ""
 msgstr ""
 
 #. Sort order
-#. Currently active sort order
+#. Currently active sort order.
 #. name: songs/sort-order
 #. type: int
 #. value: 0
@@ -1182,13 +1182,13 @@ msgid "Sort order"
 msgstr ""
 
 #. Sort order
-#. Currently active sort order
+#. Currently active sort order.
 #. name: songs/sort-order
 #. type: int
 #. value: 0
 #. hidden: true
-#: ../data/config/schema.xml:429
-msgid "Currently active sort order"
+#: ../data/config/schema.xml:399
+msgid "Currently active sort order."
 msgstr ""
 
 #: ../data/performous.desktop:3
@@ -1207,7 +1207,7 @@ msgstr ""
 msgid "Enabled"
 msgstr ""
 
-#: ../game/configuration.cc:148 ../game/menu.cc:64
+#: ../game/configuration.cc:137 ../game/menu.cc:64
 msgid "Disabled"
 msgstr ""
 
@@ -1490,11 +1490,11 @@ msgid "Creating screens..."
 msgstr ""
 
 #: ../game/main.cc:173
-msgid "Entering main menu"
+msgid "Entering main menu..."
 msgstr ""
 
-#: ../game/main.cc:175 ../game/screen_sing.cc:81
-msgid "Loading complete"
+#: ../game/main.cc:175
+msgid "Loading complete!"
 msgstr ""
 
 #: ../game/main.cc:184
@@ -1621,48 +1621,48 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+#: ../game/requesthandler.cc:360
+msgid "Successfully removed song from playlist."
+msgstr ""
+
 #: ../game/requesthandler.cc:361
-msgid "Successfully removed song from playlist"
+msgid "Failed removing song from playlist!"
 msgstr ""
 
 #: ../game/requesthandler.cc:362
-msgid "Failed removing song from playlist"
+msgid "Successfully changed position of song."
 msgstr ""
 
 #: ../game/requesthandler.cc:363
-msgid "Successfully changed position of song"
+msgid "Failed changing position of song!"
 msgstr ""
 
 #: ../game/requesthandler.cc:364
-msgid "Failed changing position of song"
+msgid "Successfully moved song up."
 msgstr ""
 
 #: ../game/requesthandler.cc:365
-msgid "Successfully moved song up"
+msgid "Failed moving song up!"
 msgstr ""
 
 #: ../game/requesthandler.cc:366
-msgid "Failed moving song up"
+msgid "Successfully moved song down."
 msgstr ""
 
 #: ../game/requesthandler.cc:367
-msgid "Successfully moved song down"
+msgid "Failed moving song down!"
 msgstr ""
 
 #: ../game/requesthandler.cc:368
-msgid "Failed moving song down"
+msgid "Successfully added song to the playlist."
 msgstr ""
 
 #: ../game/requesthandler.cc:369
-msgid "Successfully added song to the playlist"
+msgid "Failed adding song to the playlist!"
 msgstr ""
 
 #: ../game/requesthandler.cc:370
-msgid "Failed adding song to the playlist"
-msgstr ""
-
-#: ../game/requesthandler.cc:371
-msgid "No songs found with current filter"
+msgid "No songs found with current filter."
 msgstr ""
 
 #: ../game/screen_audiodevices.cc:66
@@ -1724,20 +1724,20 @@ msgstr ""
 msgid "Practice"
 msgstr ""
 
-#: ../game/screen_intro.cc:175
-msgid "Check your skills or test the microphones"
+#: ../game/screen_intro.cc:174
+msgid "Check your skills or test the microphones."
 msgstr ""
 
 #: ../game/screen_intro.cc:191
 msgid "Configure"
 msgstr ""
 
-#: ../game/screen_intro.cc:191
-msgid "Configure audio and game options"
+#: ../game/screen_intro.cc:190
+msgid "Configure audio and game options."
 msgstr ""
 
-#: ../game/screen_intro.cc:192
-msgid "Leave the game"
+#: ../game/screen_intro.cc:191
+msgid "Leave the game."
 msgstr ""
 
 #: ../game/screen_intro.cc:205
@@ -1772,7 +1772,7 @@ msgid ".."
 msgstr ""
 
 #: ../game/screen_paths.cc:95
-msgid "Go up one folder"
+msgid "Go to parent folder"
 msgstr ""
 
 #: ../game/screen_paths.cc:122
@@ -1901,10 +1901,6 @@ msgid "Move this song up the list"
 msgstr ""
 
 #: ../game/screen_playlist.cc:386
-msgid "Move Down"
-msgstr ""
-
-#: ../game/screen_playlist.cc:386
 msgid "Move this song down the list"
 msgstr ""
 
@@ -1924,7 +1920,11 @@ msgstr ""
 msgid "Loading menu..."
 msgstr ""
 
-#: ../game/screen_sing.cc:87
+#: ../game/screen_sing.cc:80
+msgid "Loading complete"
+msgstr ""
+
+#: ../game/screen_sing.cc:86
 msgid "Start"
 msgstr ""
 
