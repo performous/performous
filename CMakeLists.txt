@@ -107,6 +107,10 @@ if(NOT APPLE)
   endif()
 endif()
 
+if(WIN32)
+	set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION ".")
+endif()
+
 #CPACK variables
 include(InstallRequiredSystemLibraries)
 
