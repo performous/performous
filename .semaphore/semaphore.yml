@@ -16,7 +16,7 @@ blocks:
         commands:
           - echo "Installing Performous dependencies..."
           - sudo apt -y update
-          - sudo apt-get install apt-transport-https ca-certificates gnupg software-properties-common wget
+          - sudo apt-get install --no-install-recommends apt-transport-https ca-certificates gnupg software-properties-common wget
           - wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
           - sudo apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
           - sudo add-apt-repository -y ppa:litenstein/focal-backports
@@ -99,10 +99,10 @@ blocks:
       epilogue:
         commands:
           - echo "Making osx release"
-          - cd performous/osx-utils/out/Performous.app
+          - cd performous/osx-utils/out/
           - GIT_VERSION=$(git rev-parse --short HEAD)
-          - tar -czf performous-clang.tar.gz * && cd $HOME
-          - artifact push project --expire-in 1d performous/osx-utils/out/Performous.app/performous-clang.tar.gz --force -d performous-${GIT_VERSION}-macOS-gcc.tar.gz
+          - tar -czf performous-clang.tar.gz Performous.app && cd $HOME
+          - artifact push project --expire-in 1d performous/osx-utils/out/performous-clang.tar.gz --force -d performous-${GIT_VERSION}-macOS-gcc.tar.gz
 
   - name: Ubuntu 20.04 Build (Meson)
     execution_time_limit:
@@ -116,10 +116,7 @@ blocks:
           - echo "Installing Performous dependencies..."
           - sudo add-apt-repository -y ppa:litenstein/focal-backports
           - sudo apt-get update -y
-          - sudo apt-get install -y --no-install-recommends ninja-build
-          - sudo apt-get install -y --no-install-recommends gettext clang-12 gcc-11 g++-11 python3-dev python3-pip meson libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-program-options-dev libboost-iostreams-dev libboost-system-dev libboost-locale-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++3.2-dev portaudio19-dev libicu-dev libopencv-dev libportmidi-dev libglm-dev libaubio-dev libcpprest-dev
-          - sem-version python 3.8
-#          - sudo pip3 install meson
+          - sudo apt-get install -y --no-install-recommends ninja-build gettext clang-12 gcc-11 g++-11 libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev libboost-iostreams-dev libboost-locale-dev libboost-system-dev libboost-program-options-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev libpng-dev libjpeg-dev libxml++3.2-dev portaudio19-dev libicu-dev libopencv-dev libportmidi-dev libglm-dev libaubio-dev libcpprest-dev meson
           - echo "Checking out..."
           - checkout
           - git clone --depth 1 https://github.com/google/compact_enc_det.git 3rdparty/ced
@@ -134,7 +131,7 @@ blocks:
               value: g++-11
           commands:
             - echo "Setting up build..."
-            - meson setup build.gcc -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true -Dstoponwarning=true
+            - meson setup --buildtype=plain build.gcc -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true -Dwarningaserror=true
             - echo "Building..."
             - meson compile -C build.gcc
         - name: Clang-12.0.1 Build
@@ -145,6 +142,6 @@ blocks:
               value: clang++-12
           commands:
             - echo "Setting up build..."
-            - meson setup build.clang -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true
+            - meson setup --buildtype=plain build.clang -Dusewebcam=true -Dusemididrum=true -Dusewebserver=true
             - echo "Building..."
             - meson compile -C build.clang

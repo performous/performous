@@ -40,15 +40,15 @@ void ScreenPaths::manageEvent(SDL_Event event) {
 
 void ScreenPaths::manageEvent(input::NavEvent const& ev) {
 	Game* gm = Game::getSingletonPtr();
-	if (ev.button == input::NAV_CANCEL) {
+	if (ev.button == input::NavButton::CANCEL) {
 		gm->activateScreen("Intro");
 	}
-	else if (ev.button == input::NAV_PAUSE) m_audio.togglePause();
-	else if (ev.button == input::NAV_DOWN) m_menu.move(1); //one down
-	else if (ev.button == input::NAV_MOREDOWN) m_menu.move(5); //five down (page-dwon-key)
-	else if (ev.button == input::NAV_UP) m_menu.move(-1); //one up
-	else if (ev.button == input::NAV_MOREUP) m_menu.move(-5); //five up (page up key)
-	else if (ev.button == input::NAV_START) m_menu.action(); //enter: execute currently selected option.
+	else if (ev.button == input::NavButton::PAUSE) m_audio.togglePause();
+	else if (ev.button == input::NavButton::DOWN) m_menu.move(1); //one down
+	else if (ev.button == input::NavButton::MOREDOWN) m_menu.move(5); //five down (page-dwon-key)
+	else if (ev.button == input::NavButton::UP) m_menu.move(-1); //one up
+	else if (ev.button == input::NavButton::MOREUP) m_menu.move(-5); //five up (page up key)
+	else if (ev.button == input::NavButton::START) m_menu.action(); //enter: execute currently selected option.
 }
 
 void ScreenPaths::generateMenuFromPath(fs::path path) {
