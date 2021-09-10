@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-18 22:12+0200\n"
-"PO-Revision-Date: 2021-08-18 22:12+0200\n"
+"POT-Creation-Date: 2021-09-10 23:57+0200\n"
+"PO-Revision-Date: 2021-09-10 23:57+0200\n"
 "Last-Translator: Arjan Speiard | Asgard Sings! <arjan.spieard@gmail.com>\n"
 "Language-Team: Sajjad Gerami <sajjad.gerami@gmail.com>\n"
 "Language: fa_IR\n"
@@ -259,12 +259,30 @@ msgid ""
 "song."
 msgstr ""
 
+#. Language
+#. Language to show Performous in
+#. name: game/language
+#. type: int
+#. value: 1337
+#: ../data/config/schema.xml:103 ../game/requesthandler.cc:339
+msgid "Language"
+msgstr ""
+
+#. Language
+#. Language to show Performous in
+#. name: game/language
+#. type: int
+#. value: 1337
+#: ../data/config/schema.xml:104
+msgid "Language to show Performous in"
+msgstr ""
+
 #. Webserver access
 #. Define if you want to control performous remotely with web interface (requires restart).
 #. name: game/webserver_access
 #. type: int
 #. value: 0
-#: ../data/config/schema.xml:104
+#: ../data/config/schema.xml:112
 msgid "Webserver access"
 msgstr ""
 
@@ -273,7 +291,7 @@ msgstr ""
 #. name: game/webserver_access
 #. type: int
 #. value: 0
-#: ../data/config/schema.xml:105
+#: ../data/config/schema.xml:113
 msgid ""
 "Define if you want to control performous remotely with web interface "
 "(requires restart)."
@@ -284,7 +302,7 @@ msgstr ""
 #. name: game/case-sorting
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:108
+#: ../data/config/schema.xml:116
 msgid "Case-sensitive sorting."
 msgstr ""
 
@@ -293,7 +311,7 @@ msgstr ""
 #. name: game/case-sorting
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:109
+#: ../data/config/schema.xml:117
 msgid "Make a difference between uppercase and lowercase letters when sorting."
 msgstr ""
 
@@ -302,7 +320,7 @@ msgstr ""
 #. name: game/webserver_port
 #. type: int
 #. value: 8000
-#: ../data/config/schema.xml:114
+#: ../data/config/schema.xml:122
 msgid "Webserver port"
 msgstr ""
 
@@ -311,7 +329,7 @@ msgstr ""
 #. name: game/webserver_port
 #. type: int
 #. value: 8000
-#: ../data/config/schema.xml:115
+#: ../data/config/schema.xml:123
 msgid ""
 "Port to use for the webserver. Choose one that is not used by other "
 "applications."
@@ -322,7 +340,7 @@ msgstr ""
 #. name: game/webserver_fallback_port
 #. type: int
 #. value: 8001
-#: ../data/config/schema.xml:120
+#: ../data/config/schema.xml:128
 msgid "Webserver fallback port"
 msgstr ""
 
@@ -331,7 +349,7 @@ msgstr ""
 #. name: game/webserver_fallback_port
 #. type: int
 #. value: 8001
-#: ../data/config/schema.xml:121
+#: ../data/config/schema.xml:129
 msgid ""
 "Port to use in case original webserver port is in use. Choose one that you "
 "know for sure is not used by other applications."
@@ -342,7 +360,7 @@ msgstr ""
 #. name: game/notegraphscalingmode
 #. type: int
 #. value: 0
-#: ../data/config/schema.xml:132
+#: ../data/config/schema.xml:140
 msgid "Note Graph Scaling"
 msgstr ""
 
@@ -351,7 +369,7 @@ msgstr ""
 #. name: game/notegraphscalingmode
 #. type: int
 #. value: 0
-#: ../data/config/schema.xml:133
+#: ../data/config/schema.xml:141
 msgid "Type of scaling the note graph."
 msgstr ""
 
@@ -360,7 +378,7 @@ msgstr ""
 #. name: game/keyboard_guitar
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:136
+#: ../data/config/schema.xml:144
 msgid "Keyboard as guitar"
 msgstr "صفحه کلید به جای گیتار"
 
@@ -369,7 +387,7 @@ msgstr "صفحه کلید به جای گیتار"
 #. name: game/keyboard_guitar
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:137
+#: ../data/config/schema.xml:145
 msgid "Enable keyboard as guitar (Frets on Fire mode)."
 msgstr "فعال کردن صفحه کلید بجای گیتار(حالت Frets on Fire)"
 
@@ -378,7 +396,7 @@ msgstr "فعال کردن صفحه کلید بجای گیتار(حالت Frets o
 #. name: game/keyboard_drumkit
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:140
+#: ../data/config/schema.xml:148
 msgid "Keyboard as drumkit"
 msgstr "صفحه کلید بجای درام"
 
@@ -387,26 +405,26 @@ msgstr "صفحه کلید بجای درام"
 #. name: game/keyboard_drumkit
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:141
+#: ../data/config/schema.xml:149
 msgid "Enable keyboard as drumkit."
 msgstr "فعال کردن صفحه کلید بجای درام"
 
 #. Drums use Pro mode
-#. Drums use Pro mode (toms are not cymbals).
+#. Drums use Pro mode. (Toms are not cymbals.)
 #. name: game/drum_promode
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:144
+#: ../data/config/schema.xml:152
 msgid "Drums use Pro mode"
 msgstr ""
 
 #. Drums use Pro mode
-#. Drums use Pro mode (toms are not cymbals).
+#. Drums use Pro mode. (Toms are not cymbals.)
 #. name: game/drum_promode
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:145
-msgid "Drums use Pro mode (toms are not cymbals)."
+#: ../data/config/schema.xml:153
+msgid "Drums use Pro mode. (Toms are not cymbals.)"
 msgstr ""
 
 #. Keyboard as dance pad
@@ -414,7 +432,7 @@ msgstr ""
 #. name: game/keyboard_dancepad
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:148
+#: ../data/config/schema.xml:156
 msgid "Keyboard as dance pad"
 msgstr "صفحه کلید بجای تخته رقص"
 
@@ -423,7 +441,7 @@ msgstr "صفحه کلید بجای تخته رقص"
 #. name: game/keyboard_dancepad
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:149
+#: ../data/config/schema.xml:157
 msgid "Enable keyboard as dance pad."
 msgstr "فعال کردن صفحه کلید بجای تخته رقص."
 
@@ -432,7 +450,7 @@ msgstr "فعال کردن صفحه کلید بجای تخته رقص."
 #. name: game/keyboard_keytar
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:152
+#: ../data/config/schema.xml:160
 msgid "Keyboard as keytar"
 msgstr "صفحه کلید بجای کیتار."
 
@@ -441,7 +459,7 @@ msgstr "صفحه کلید بجای کیتار."
 #. name: game/keyboard_keytar
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:153
+#: ../data/config/schema.xml:161
 msgid "Enable keyboard as keytar."
 msgstr "فعال کردن صفحه کلید بجای کیتار."
 
@@ -450,7 +468,7 @@ msgstr "فعال کردن صفحه کلید بجای کیتار."
 #. name: game/instrument0
 #. type: int
 #. value: 0
-#: ../data/config/schema.xml:160
+#: ../data/config/schema.xml:168
 msgid "Force controller A's type"
 msgstr "مدل A دسته را اعمال کن"
 
@@ -459,7 +477,7 @@ msgstr "مدل A دسته را اعمال کن"
 #. name: game/instrument0
 #. type: int
 #. value: 0
-#: ../data/config/schema.xml:161
+#: ../data/config/schema.xml:169
 msgid ""
 "Override autodetection and force the first controller to the given type."
 msgstr "شناسایی خودکار را با اولین نوع دسته داده شده جایگزین کن"
@@ -469,7 +487,7 @@ msgstr "شناسایی خودکار را با اولین نوع دسته داد�
 #. name: game/instrument1
 #. type: int
 #. value: 0
-#: ../data/config/schema.xml:168
+#: ../data/config/schema.xml:176
 msgid "Force controller B's type"
 msgstr "مدل B دسته را اعمال کن"
 
@@ -478,7 +496,7 @@ msgstr "مدل B دسته را اعمال کن"
 #. name: game/instrument1
 #. type: int
 #. value: 0
-#: ../data/config/schema.xml:169
+#: ../data/config/schema.xml:177
 msgid ""
 "Override autodetection and force the second controller to the given type."
 msgstr "شناسایی خودکار را با دومین نوع دسته داده شده جایگزین کن"
@@ -488,7 +506,7 @@ msgstr "شناسایی خودکار را با دومین نوع دسته داد�
 #. name: game/instrument2
 #. type: int
 #. value: 0
-#: ../data/config/schema.xml:176
+#: ../data/config/schema.xml:184
 msgid "Force controller C's type"
 msgstr "مدل C دسته را اعمال کن"
 
@@ -497,7 +515,7 @@ msgstr "مدل C دسته را اعمال کن"
 #. name: game/instrument2
 #. type: int
 #. value: 0
-#: ../data/config/schema.xml:177
+#: ../data/config/schema.xml:185
 msgid ""
 "Override autodetection and force the third controller to the given type."
 msgstr "شناسایی خودکار را با سومین نوع دسته داده شده جایگزین کن"
@@ -507,7 +525,7 @@ msgstr "شناسایی خودکار را با سومین نوع دسته داد�
 #. name: game/instrument3
 #. type: int
 #. value: 0
-#: ../data/config/schema.xml:184
+#: ../data/config/schema.xml:192
 msgid "Force controller D's type"
 msgstr "مدل D دسته را اعمال کن"
 
@@ -516,7 +534,7 @@ msgstr "مدل D دسته را اعمال کن"
 #. name: game/instrument3
 #. type: int
 #. value: 0
-#: ../data/config/schema.xml:185
+#: ../data/config/schema.xml:193
 msgid ""
 "Override autodetection and force the fourth controller to the given type."
 msgstr "شناسایی خودکار را با چهارمین نوع دسته داده شده جایگزین کن"
@@ -525,7 +543,7 @@ msgstr "شناسایی خودکار را با چهارمین نوع دسته د�
 #. Force joystick to some kind of instrument.
 #. name: game/instruments
 #. type: string_list
-#: ../data/config/schema.xml:192
+#: ../data/config/schema.xml:200
 msgid "Joystick configuration"
 msgstr "پیکربندی دسته فرمان"
 
@@ -533,7 +551,7 @@ msgstr "پیکربندی دسته فرمان"
 #. Force joystick to some kind of instrument.
 #. name: game/instruments
 #. type: string_list
-#: ../data/config/schema.xml:193
+#: ../data/config/schema.xml:201
 msgid "Force joystick to some kind of instrument."
 msgstr "اجبار کردن دسته فرمان برای ساز"
 
@@ -541,7 +559,7 @@ msgstr "اجبار کردن دسته فرمان برای ساز"
 #. Regex for matching the MIDI devices to use. The default is to use all available devices.
 #. name: game/midi_input
 #. type: string
-#: ../data/config/schema.xml:196
+#: ../data/config/schema.xml:204
 msgid "Hardware MIDI input device"
 msgstr "دستگاه سخت افزار ورودی MIDI"
 
@@ -549,7 +567,7 @@ msgstr "دستگاه سخت افزار ورودی MIDI"
 #. Regex for matching the MIDI devices to use. The default is to use all available devices.
 #. name: game/midi_input
 #. type: string
-#: ../data/config/schema.xml:197
+#: ../data/config/schema.xml:205
 msgid ""
 "Regex for matching the MIDI devices to use. The default is to use all "
 "available devices."
@@ -559,7 +577,7 @@ msgstr "الگوی تطابق دستگاه های MIDI. پیش فرض استفا
 #. Words that should be ignored when sorting.
 #. name: game/sorting_ignore
 #. type: string_list
-#: ../data/config/schema.xml:225
+#: ../data/config/schema.xml:233
 msgid "Word Collation"
 msgstr ""
 
@@ -567,7 +585,7 @@ msgstr ""
 #. Words that should be ignored when sorting.
 #. name: game/sorting_ignore
 #. type: string_list
-#: ../data/config/schema.xml:226
+#: ../data/config/schema.xml:234
 msgid "Words that should be ignored when sorting."
 msgstr ""
 
@@ -577,7 +595,7 @@ msgstr ""
 #. type: int
 #. value: 1366
 #. hidden: true
-#: ../data/config/schema.xml:233
+#: ../data/config/schema.xml:241
 msgid "Windowed width"
 msgstr "عرض صفحه"
 
@@ -587,7 +605,7 @@ msgstr "عرض صفحه"
 #. type: int
 #. value: 1366
 #. hidden: true
-#: ../data/config/schema.xml:234
+#: ../data/config/schema.xml:242
 msgid "The width of the window."
 msgstr "عرض صفحه"
 
@@ -597,7 +615,7 @@ msgstr "عرض صفحه"
 #. type: int
 #. value: 768
 #. hidden: true
-#: ../data/config/schema.xml:239
+#: ../data/config/schema.xml:247
 msgid "Windowed height"
 msgstr "ارتفاع صفحه"
 
@@ -607,7 +625,7 @@ msgstr "ارتفاع صفحه"
 #. type: int
 #. value: 768
 #. hidden: true
-#: ../data/config/schema.xml:240
+#: ../data/config/schema.xml:248
 msgid "The height of the window."
 msgstr "ارتفاع صفحه"
 
@@ -617,7 +635,7 @@ msgstr "ارتفاع صفحه"
 #. type: int
 #. value: 0
 #. hidden: true
-#: ../data/config/schema.xml:245
+#: ../data/config/schema.xml:253
 #, fuzzy
 #| msgid "The width of the window."
 msgid "X-Position of the window"
@@ -629,7 +647,7 @@ msgstr "عرض صفحه"
 #. type: int
 #. value: 0
 #. hidden: true
-#: ../data/config/schema.xml:246
+#: ../data/config/schema.xml:254
 #, fuzzy
 #| msgid "The width of the window."
 msgid "The X-Position of the window."
@@ -641,7 +659,7 @@ msgstr "عرض صفحه"
 #. type: int
 #. value: 0
 #. hidden: true
-#: ../data/config/schema.xml:251
+#: ../data/config/schema.xml:259
 #, fuzzy
 #| msgid "The width of the window."
 msgid "Y-Position of the window"
@@ -653,7 +671,7 @@ msgstr "عرض صفحه"
 #. type: int
 #. value: 0
 #. hidden: true
-#: ../data/config/schema.xml:252
+#: ../data/config/schema.xml:260
 #, fuzzy
 #| msgid "The width of the window."
 msgid "The Y-Position of the window."
@@ -664,7 +682,7 @@ msgstr "عرض صفحه"
 #. name: graphic/highdpi
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:255
+#: ../data/config/schema.xml:263
 msgid "High DPI Graphics"
 msgstr ""
 
@@ -673,7 +691,7 @@ msgstr ""
 #. name: graphic/highdpi
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:256
+#: ../data/config/schema.xml:264
 msgid "Enable High-DPI (Retina) graphics when supported; requires restart."
 msgstr ""
 
@@ -682,7 +700,7 @@ msgstr ""
 #. name: graphic/fullscreen
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:259
+#: ../data/config/schema.xml:267
 msgid "Fullscreen mode"
 msgstr "حالت تمام صفحه"
 
@@ -691,7 +709,7 @@ msgstr "حالت تمام صفحه"
 #. name: graphic/fullscreen
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:260
+#: ../data/config/schema.xml:268
 msgid "Enable fullscreen mode on startup."
 msgstr "فعال کردن حالت تمام صفحه هنگام شروع"
 
@@ -700,7 +718,7 @@ msgstr "فعال کردن حالت تمام صفحه هنگام شروع"
 #. name: graphic/stereo3d
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:263
+#: ../data/config/schema.xml:271
 msgid "Stereoscopic 3D"
 msgstr "برجسته بین سه بعدی"
 
@@ -709,7 +727,7 @@ msgstr "برجسته بین سه بعدی"
 #. name: graphic/stereo3d
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:264
+#: ../data/config/schema.xml:272
 msgid "Enable 3D rendering of Performous."
 msgstr "فعال کردن حالت سه یعدی پرفورمیوس"
 
@@ -718,7 +736,7 @@ msgstr "فعال کردن حالت سه یعدی پرفورمیوس"
 #. name: graphic/stereo3dtype
 #. type: int
 #. value: 0
-#: ../data/config/schema.xml:272
+#: ../data/config/schema.xml:280
 msgid "Stereo3D type"
 msgstr "حالت سه بعدی"
 
@@ -727,7 +745,7 @@ msgstr "حالت سه بعدی"
 #. name: graphic/stereo3dtype
 #. type: int
 #. value: 0
-#: ../data/config/schema.xml:273
+#: ../data/config/schema.xml:281
 msgid "Some modes may only get activated in fullscreen mode."
 msgstr "بعضی از حالات فقط در حالت تمام صفحه فعال می شوند"
 
@@ -736,7 +754,7 @@ msgstr "بعضی از حالات فقط در حالت تمام صفحه فعال
 #. name: graphic/stereo3dseparation
 #. type: float
 #. value: 50
-#: ../data/config/schema.xml:278
+#: ../data/config/schema.xml:286
 msgid "Stereo3D separation"
 msgstr "تفکیک سه بعدی"
 
@@ -745,7 +763,7 @@ msgstr "تفکیک سه بعدی"
 #. name: graphic/stereo3dseparation
 #. type: float
 #. value: 50
-#: ../data/config/schema.xml:279
+#: ../data/config/schema.xml:287
 msgid ""
 "The strength of the effect. Experiment with different settings for best "
 "results."
@@ -756,7 +774,7 @@ msgstr "قدرت اثر. برای نتیجه بهتر با یک تنظیم دی�
 #. name: graphic/video
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:282
+#: ../data/config/schema.xml:290
 msgid "Video playback"
 msgstr "پخش تصویر"
 
@@ -765,7 +783,7 @@ msgstr "پخش تصویر"
 #. name: graphic/video
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:283
+#: ../data/config/schema.xml:291
 msgid ""
 "Allows completely disabling background videos. It is recommended to leave "
 "this enabled as Performous will still smoothly fade out the video if your "
@@ -780,7 +798,7 @@ msgstr ""
 #. name: graphic/webcam
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:286
+#: ../data/config/schema.xml:294
 msgid "Webcam background"
 msgstr "تصویر زمینه دوربین..."
 
@@ -789,7 +807,7 @@ msgstr "تصویر زمینه دوربین..."
 #. name: graphic/webcam
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:287
+#: ../data/config/schema.xml:295
 msgid ""
 "Performous can use webcam as a background video. Disable it if Performous "
 "crashes while entering a song."
@@ -798,22 +816,26 @@ msgstr ""
 "پرفورمیوس موقع ورود به یک آهنگ متوقف شد این گزینه را غیر فعال کنید."
 
 #. Webcam id
-#. Use -1 to autodetect or a number starting from 0 to choose specific device.
+#. Use 0 to autodetect or a number starting from 1 to choose specific device.
 #. name: graphic/webcamid
 #. type: int
-#. value: -1
-#: ../data/config/schema.xml:291
+#. value: 0
+#: ../data/config/schema.xml:299
 msgid "Webcam id"
 msgstr "شماره دوربین"
 
 #. Webcam id
-#. Use -1 to autodetect or a number starting from 0 to choose specific device.
+#. Use 0 to autodetect or a number starting from 1 to choose specific device.
 #. name: graphic/webcamid
 #. type: int
-#. value: -1
-#: ../data/config/schema.xml:292
+#. value: 0
+#: ../data/config/schema.xml:300
+#, fuzzy
+#| msgid ""
+#| "Use -1 to autodetect or a number starting from 0 to choose specific "
+#| "device."
 msgid ""
-"Use -1 to autodetect or a number starting from 0 to choose specific device."
+"Use 0 to autodetect or a number starting from 1 to choose specific device."
 msgstr ""
 "برای شناسایی خودکار -۱ و یا یک عدد که با ۰ شروع می شود را برای انتخاب دستگاه "
 "خاص وارد کنید."
@@ -823,7 +845,7 @@ msgstr ""
 #. name: graphic/svg_lod
 #. type: float
 #. value: 1.5
-#: ../data/config/schema.xml:297
+#: ../data/config/schema.xml:305
 msgid "SVG quality"
 msgstr "کیفیت SVG"
 
@@ -832,7 +854,7 @@ msgstr "کیفیت SVG"
 #. name: graphic/svg_lod
 #. type: float
 #. value: 1.5
-#: ../data/config/schema.xml:298
+#: ../data/config/schema.xml:306
 msgid ""
 "Larger numbers cause vector graphics to be rendered in higher resolution. "
 "Decrease this to make navigating in menus faster."
@@ -845,7 +867,7 @@ msgstr ""
 #. name: graphic/text_lod
 #. type: float
 #. value: 1.5
-#: ../data/config/schema.xml:303
+#: ../data/config/schema.xml:311
 msgid "Text quality"
 msgstr "کیفیت متن"
 
@@ -854,7 +876,7 @@ msgstr "کیفیت متن"
 #. name: graphic/text_lod
 #. type: float
 #. value: 1.5
-#: ../data/config/schema.xml:304
+#: ../data/config/schema.xml:312
 msgid ""
 "Larger numbers cause text to be rendered in higher resolution. Decrease this "
 "to make everything a little faster."
@@ -867,7 +889,7 @@ msgstr ""
 #. name: graphic/fps
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:307
+#: ../data/config/schema.xml:315
 msgid "Benchmark mode"
 msgstr "حالت محک"
 
@@ -876,7 +898,7 @@ msgstr "حالت محک"
 #. name: graphic/fps
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:308
+#: ../data/config/schema.xml:316
 msgid ""
 "Framerate limit of 100 FPS is removed and the game instead renders at full "
 "speed. FPS values are printed to console. Please note that the display "
@@ -891,7 +913,7 @@ msgstr ""
 #. name: audio/latency
 #. type: float
 #. value: 0.075
-#: ../data/config/schema.xml:315
+#: ../data/config/schema.xml:323
 msgid "Suggested latency"
 msgstr "زمان تاخیر پیشنهادی"
 
@@ -900,7 +922,7 @@ msgstr "زمان تاخیر پیشنهادی"
 #. name: audio/latency
 #. type: float
 #. value: 0.075
-#: ../data/config/schema.xml:316
+#: ../data/config/schema.xml:324
 msgid ""
 "This is a hint for the audio engine about the desired latency. Set this as "
 "low as possible while retaining clear audio playback. Requires restart."
@@ -913,7 +935,7 @@ msgstr ""
 #. name: audio/backend
 #. type: int
 #. value: 1337
-#: ../data/config/schema.xml:323
+#: ../data/config/schema.xml:331
 #, fuzzy
 #| msgid "Audio Devices"
 msgid "Audio Backend"
@@ -924,7 +946,7 @@ msgstr "دستگاه های صوتی"
 #. name: audio/backend
 #. type: int
 #. value: 1337
-#: ../data/config/schema.xml:324
+#: ../data/config/schema.xml:332
 msgid ""
 "Configure which audio backend to use; not all backends will be supported on "
 "all platforms."
@@ -935,7 +957,7 @@ msgstr ""
 #. name: audio/video_delay
 #. type: float
 #. value: 0.06
-#: ../data/config/schema.xml:329
+#: ../data/config/schema.xml:337
 msgid "Audio/video latency"
 msgstr "تاخیر صدا و تصویر"
 
@@ -944,7 +966,7 @@ msgstr "تاخیر صدا و تصویر"
 #. name: audio/video_delay
 #. type: float
 #. value: 0.06
-#: ../data/config/schema.xml:330
+#: ../data/config/schema.xml:338
 #, fuzzy
 #| msgid ""
 #| "Affects all modes. Use negative value if your display input lag is "
@@ -969,7 +991,7 @@ msgstr ""
 #. name: audio/round-trip
 #. type: float
 #. value: 0.09
-#: ../data/config/schema.xml:335
+#: ../data/config/schema.xml:343
 msgid "Audio round-trip latency"
 msgstr "تاخیر در رفت و آمد صدا"
 
@@ -978,7 +1000,7 @@ msgstr "تاخیر در رفت و آمد صدا"
 #. name: audio/round-trip
 #. type: float
 #. value: 0.09
-#: ../data/config/schema.xml:336
+#: ../data/config/schema.xml:344
 #, fuzzy
 #| msgid ""
 #| "Affects singing only. The time it takes for Performous playback to reach "
@@ -1001,7 +1023,7 @@ msgstr ""
 #. name: audio/controller_delay
 #. type: float
 #. value: 0.08
-#: ../data/config/schema.xml:341
+#: ../data/config/schema.xml:349
 msgid "Audio/controller latency"
 msgstr "تاخیر در صدا و کنترلر"
 
@@ -1010,7 +1032,7 @@ msgstr "تاخیر در صدا و کنترلر"
 #. name: audio/controller_delay
 #. type: float
 #. value: 0.08
-#: ../data/config/schema.xml:342
+#: ../data/config/schema.xml:350
 #, fuzzy
 #| msgid ""
 #| "Affects instruments and dancing only. The total of USB (guitar or dance "
@@ -1033,7 +1055,7 @@ msgstr ""
 #. name: audio/devices
 #. type: string_list
 #. hidden: true
-#: ../data/config/schema.xml:349
+#: ../data/config/schema.xml:357
 msgid "Audio devices"
 msgstr "دستگاه های صوتی"
 
@@ -1042,7 +1064,7 @@ msgstr "دستگاه های صوتی"
 #. name: audio/devices
 #. type: string_list
 #. hidden: true
-#: ../data/config/schema.xml:350
+#: ../data/config/schema.xml:358
 msgid "List of audio devices to try."
 msgstr "فهرستی از دستگاه های صدا برای آزمایش کردن."
 
@@ -1051,7 +1073,7 @@ msgstr "فهرستی از دستگاه های صدا برای آزمایش کر�
 #. name: audio/preview_volume
 #. type: int
 #. value: 70
-#: ../data/config/schema.xml:355
+#: ../data/config/schema.xml:363
 msgid "Menu volume"
 msgstr "میزان صدای منو"
 
@@ -1060,7 +1082,7 @@ msgstr "میزان صدای منو"
 #. name: audio/preview_volume
 #. type: int
 #. value: 70
-#: ../data/config/schema.xml:356
+#: ../data/config/schema.xml:364
 msgid "The volume level of menus, song previews and jukebox mode."
 msgstr "میزان صدای منوها پیش نمایش آهنگ ها و حالت جعبه موزیک"
 
@@ -1069,7 +1091,7 @@ msgstr "میزان صدای منوها پیش نمایش آهنگ ها و حال
 #. name: audio/music_volume
 #. type: int
 #. value: 90
-#: ../data/config/schema.xml:361
+#: ../data/config/schema.xml:369
 msgid "Music volume"
 msgstr "میزان صدای آهنگ"
 
@@ -1078,7 +1100,7 @@ msgstr "میزان صدای آهنگ"
 #. name: audio/music_volume
 #. type: int
 #. value: 90
-#: ../data/config/schema.xml:362
+#: ../data/config/schema.xml:370
 msgid ""
 "The ingame music volume. Values above 90 are not recommended as distortion "
 "may occur."
@@ -1091,7 +1113,7 @@ msgstr ""
 #. name: audio/fail_volume
 #. type: int
 #. value: 90
-#: ../data/config/schema.xml:367
+#: ../data/config/schema.xml:375
 msgid "Failure volume"
 msgstr "میزان صدای خراب کردن آهنگ"
 
@@ -1100,7 +1122,7 @@ msgstr "میزان صدای خراب کردن آهنگ"
 #. name: audio/fail_volume
 #. type: int
 #. value: 90
-#: ../data/config/schema.xml:368
+#: ../data/config/schema.xml:376
 msgid ""
 "The ingame fail sound volume. Values above 90 are not recommended as "
 "distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
@@ -1114,7 +1136,7 @@ msgstr ""
 #. name: audio/pass-through
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:371
+#: ../data/config/schema.xml:379
 msgid "Microphone pass-through"
 msgstr "صدای میانی میکروفن"
 
@@ -1123,7 +1145,7 @@ msgstr "صدای میانی میکروفن"
 #. name: audio/pass-through
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:372
+#: ../data/config/schema.xml:380
 msgid "Send captured singing voice to speakers."
 msgstr "ارسال صدای خواننده به بلندگو"
 
@@ -1132,7 +1154,7 @@ msgstr "ارسال صدای خواننده به بلندگو"
 #. name: audio/pass-through_ratio
 #. type: float
 #. value: 2.0
-#: ../data/config/schema.xml:377
+#: ../data/config/schema.xml:385
 msgid "Pass-through volume ratio"
 msgstr "میزان حجم صدای میانی"
 
@@ -1141,7 +1163,7 @@ msgstr "میزان حجم صدای میانی"
 #. name: audio/pass-through_ratio
 #. type: float
 #. value: 2.0
-#: ../data/config/schema.xml:378
+#: ../data/config/schema.xml:386
 msgid "How much voice is amplified compared to the music."
 msgstr "چقدر صدا در مقایسه با موسیقی بلند شده."
 
@@ -1150,7 +1172,7 @@ msgstr "چقدر صدا در مقایسه با موسیقی بلند شده."
 #. name: audio/suppress_center_channel
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:381
+#: ../data/config/schema.xml:389
 msgid "Suppress center channel"
 msgstr ""
 
@@ -1159,7 +1181,7 @@ msgstr ""
 #. name: audio/suppress_center_channel
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:382
+#: ../data/config/schema.xml:390
 msgid "Suppress audio of center channel (e.g. vocals)."
 msgstr ""
 
@@ -1168,7 +1190,7 @@ msgstr ""
 #. name: paths/songs
 #. type: string_list
 #. hidden: false
-#: ../data/config/schema.xml:387
+#: ../data/config/schema.xml:395
 msgid "Song folders"
 msgstr "پوشه آهنگ ها"
 
@@ -1176,7 +1198,7 @@ msgstr "پوشه آهنگ ها"
 #. Where to recursively look for songs. DATADIR at the beginning means all Performous data folders.
 #. name: paths/system-songs
 #. type: string_list
-#: ../data/config/schema.xml:410
+#: ../data/config/schema.xml:418
 msgid ""
 "Where to recursively look for songs. DATADIR at the beginning means all "
 "Performous data folders."
@@ -1189,7 +1211,7 @@ msgstr ""
 #. name: paths/showhiddenfolders
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:391 ../game/screen_paths.cc:75
+#: ../data/config/schema.xml:399 ../game/screen_paths.cc:74
 msgid "Show hidden folders"
 msgstr ""
 
@@ -1198,7 +1220,7 @@ msgstr ""
 #. name: paths/showhiddenfolders
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:392
+#: ../data/config/schema.xml:400
 msgid "When true the screen 'Paths' will also show hidden folders."
 msgstr ""
 
@@ -1206,7 +1228,7 @@ msgstr ""
 #. Where to recursively look for songs. DATADIR at the beginning means all Performous data folders.
 #. name: paths/system-songs
 #. type: string_list
-#: ../data/config/schema.xml:409
+#: ../data/config/schema.xml:417
 #, fuzzy
 #| msgid "Song folders"
 msgid "Default Song folders"
@@ -1216,7 +1238,7 @@ msgstr "پوشه آهنگ ها"
 #. System defaults are included automatically. Additional paths can be added here.
 #. name: paths/system
 #. type: string_list
-#: ../data/config/schema.xml:413
+#: ../data/config/schema.xml:421
 msgid "Base folders for data"
 msgstr "پوشه اصلی اطلاعات"
 
@@ -1224,7 +1246,7 @@ msgstr "پوشه اصلی اطلاعات"
 #. System defaults are included automatically. Additional paths can be added here.
 #. name: paths/system
 #. type: string_list
-#: ../data/config/schema.xml:414
+#: ../data/config/schema.xml:422
 msgid ""
 "System defaults are included automatically. Additional paths can be added "
 "here."
@@ -1238,7 +1260,7 @@ msgstr ""
 #. type: int
 #. value: 0
 #. hidden: true
-#: ../data/config/schema.xml:420 ../game/requesthandler.cc:342
+#: ../data/config/schema.xml:428 ../game/requesthandler.cc:342
 msgid "Sort order"
 msgstr ""
 
@@ -1248,7 +1270,7 @@ msgstr ""
 #. type: int
 #. value: 0
 #. hidden: true
-#: ../data/config/schema.xml:421
+#: ../data/config/schema.xml:429
 msgid "Currently active sort order."
 msgstr ""
 
@@ -1264,18 +1286,82 @@ msgstr ""
 msgid "song;music;dance;karaoke;microphone;sound;singing;"
 msgstr ""
 
-#: ../game/configuration.cc:139
+#: ../game/configuration.cc:147
 msgid "Enabled"
 msgstr "فعال شد"
 
-#: ../game/configuration.cc:139 ../game/menu.cc:64
+#: ../game/configuration.cc:147 ../game/menu.cc:64
 msgid "Disabled"
 msgstr "غیر فعال شد"
 
-#: ../game/configuration.cc:143
+#: ../game/configuration.cc:151
 #, c-format
 msgid "%d items"
 msgstr "مورد %d"
+
+#: ../game/configuration.cc:452 ../game/i18n.hh:101
+msgid "Asturian"
+msgstr ""
+
+#: ../game/configuration.cc:453 ../game/i18n.hh:102
+msgid "Danish"
+msgstr ""
+
+#: ../game/configuration.cc:454 ../game/i18n.hh:103
+msgid "German"
+msgstr ""
+
+#: ../game/configuration.cc:455 ../game/i18n.hh:104
+msgid "English"
+msgstr ""
+
+#: ../game/configuration.cc:456 ../game/i18n.hh:105
+msgid "Spanish"
+msgstr ""
+
+#: ../game/configuration.cc:457 ../game/i18n.hh:106
+msgid "Persian"
+msgstr ""
+
+#: ../game/configuration.cc:458 ../game/i18n.hh:107
+msgid "Finnish"
+msgstr ""
+
+#: ../game/configuration.cc:459 ../game/i18n.hh:108
+msgid "French"
+msgstr ""
+
+#: ../game/configuration.cc:460 ../game/i18n.hh:109
+msgid "Hungarian"
+msgstr ""
+
+#: ../game/configuration.cc:461 ../game/i18n.hh:110
+msgid "Italian"
+msgstr ""
+
+#: ../game/configuration.cc:462 ../game/i18n.hh:111
+msgid "Japanese"
+msgstr ""
+
+#: ../game/configuration.cc:463 ../game/i18n.hh:112
+msgid "Dutch"
+msgstr ""
+
+#: ../game/configuration.cc:464 ../game/i18n.hh:113
+msgid "Polish"
+msgstr ""
+
+#: ../game/configuration.cc:465 ../game/i18n.hh:114
+msgid "Portuguese"
+msgstr ""
+
+#: ../game/configuration.cc:466 ../game/i18n.hh:115
+msgid "Swedish"
+msgstr ""
+
+#: ../game/configuration.cc:467 ../game/i18n.hh:116
+msgid "Chinese"
+msgstr ""
 
 #: ../game/dancegraph.cc:17
 msgid "Beginner"
@@ -1346,30 +1432,30 @@ msgstr ""
 msgid "-Early!"
 msgstr ""
 
-#: ../game/dancegraph.cc:106 ../game/guitargraph.cc:193
+#: ../game/dancegraph.cc:106 ../game/guitargraph.cc:194
 msgid "Ready!"
 msgstr "آماده!"
 
-#: ../game/dancegraph.cc:106 ../game/guitargraph.cc:193
+#: ../game/dancegraph.cc:106 ../game/guitargraph.cc:194
 #: ../game/screen_intro.cc:174
 msgid "Start performing!"
 msgstr "اجرا رو شروع کن!"
 
-#: ../game/dancegraph.cc:117 ../game/guitargraph.cc:182
+#: ../game/dancegraph.cc:117 ../game/guitargraph.cc:183
 msgid "Select track"
 msgstr "انتخاب قطعه"
 
-#: ../game/dancegraph.cc:133 ../game/guitargraph.cc:162
+#: ../game/dancegraph.cc:133 ../game/guitargraph.cc:163
 msgid "Select difficulty"
 msgstr "انتخاب میزان سختی"
 
-#: ../game/dancegraph.cc:136 ../game/guitargraph.cc:199
+#: ../game/dancegraph.cc:136 ../game/guitargraph.cc:200
 #: ../game/instrumentgraph.cc:59 ../game/screen_intro.cc:192
 #: ../game/screen_sing.cc:108 ../game/screen_sing.cc:155
 msgid "Quit"
 msgstr "خروج"
 
-#: ../game/dancegraph.cc:136 ../game/guitargraph.cc:199
+#: ../game/dancegraph.cc:136 ../game/guitargraph.cc:200
 #: ../game/instrumentgraph.cc:59 ../game/screen_sing.cc:108
 #: ../game/screen_sing.cc:155
 msgid "Exit to song browser"
@@ -1381,7 +1467,7 @@ msgstr "توقف!"
 
 # نوار باریک
 # خط
-#: ../game/dancegraph.cc:320 ../game/guitargraph.cc:449
+#: ../game/dancegraph.cc:321 ../game/guitargraph.cc:454
 msgid "Streak!"
 msgstr "ماشاالله!"
 
@@ -1393,23 +1479,23 @@ msgstr "بچه ها"
 msgid "Expert"
 msgstr "حرفه ای"
 
-#: ../game/guitargraph.cc:168 ../game/guitargraph.cc:185
+#: ../game/guitargraph.cc:169 ../game/guitargraph.cc:186
 msgid "Lefty-mode"
 msgstr "چپ دست"
 
-#: ../game/guitargraph.cc:206
+#: ../game/guitargraph.cc:207
 msgid "ON"
 msgstr "روشن"
 
-#: ../game/guitargraph.cc:206
+#: ../game/guitargraph.cc:207
 msgid "OFF"
 msgstr "خاموش"
 
-#: ../game/guitargraph.cc:207
+#: ../game/guitargraph.cc:208
 msgid "Toggle lefty-mode"
 msgstr "تعویض به چپ دست"
 
-#: ../game/guitargraph.cc:461
+#: ../game/guitargraph.cc:466
 msgid ""
 "God Mode\n"
 "Activated!"
@@ -1417,21 +1503,25 @@ msgstr ""
 "حالت فوق العده\n"
 "فعال شد!"
 
-#: ../game/guitargraph.cc:462
+#: ../game/guitargraph.cc:467
 msgid "Mistakes ignored!"
 msgstr "از اشتباهات صرف نظر شد!"
 
-#: ../game/guitargraph.cc:1111
+#: ../game/guitargraph.cc:1119
 msgid "God Mode Ready!"
 msgstr "حالت فوق العاده آماده است!"
 
-#: ../game/guitargraph.cc:1112
+#: ../game/guitargraph.cc:1120
 msgid "Drum Fill!"
 msgstr "درام پر است!"
 
-#: ../game/guitargraph.cc:1115
+#: ../game/guitargraph.cc:1123
 msgid "Solo!"
 msgstr "تک نوازی!"
+
+#: ../game/i18n.hh:63 ../game/i18n.hh:100
+msgid "Auto"
+msgstr ""
 
 #: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:149
 msgid "Resume"
@@ -1541,10 +1631,6 @@ msgstr ""
 
 #: ../game/requesthandler.cc:338
 msgid "Title"
-msgstr ""
-
-#: ../game/requesthandler.cc:339
-msgid "Language"
 msgstr ""
 
 #: ../game/requesthandler.cc:340
@@ -1690,11 +1776,11 @@ msgstr ""
 "تنظیمات مربوط به دستگاه ها می شود\n"
 "تغییرات دیگر شما در تنظیمات نیز ذخیره می شود."
 
-#: ../game/screen_audiodevices.cc:125
+#: ../game/screen_audiodevices.cc:129
 msgid "- Unassigned -"
 msgstr "-تخصیص نیافته-"
 
-#: ../game/screen_audiodevices.cc:146
+#: ../game/screen_audiodevices.cc:150
 msgid ""
 "Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select "
 "to cancel. Ctrl + R to reset defaults"
@@ -1702,7 +1788,7 @@ msgstr ""
 "از کلیدهای جهت نما جهت پیکربندی استفاده کنید. برای ذخیره Enter/Start و برای "
 "لغو test یا Esc/Select بزنید. Ctrl + R برای بازگشت به حالت اولیه"
 
-#: ../game/screen_audiodevices.cc:151
+#: ../game/screen_audiodevices.cc:155
 msgid ""
 "For advanced device configuration, use command line parameter --audio (use --"
 "audiohelp for details)."
@@ -1710,7 +1796,7 @@ msgstr ""
 "برای پیکربندی پیشرفته دستگاه از پارامتر audio-- خط فرمان استفاده کنید (برای "
 "اطلاعات بیشتر از audiohelp-- استفاده کنید)."
 
-#: ../game/screen_audiodevices.cc:195
+#: ../game/screen_audiodevices.cc:199
 msgid "Some devices failed to open!"
 msgstr "باز کردن بعضی از دستگاه ها با مشکل مواجه شد!"
 
@@ -1726,11 +1812,11 @@ msgstr ""
 "\n"
 "لطفا قبل از بازی پیکربندی کنید."
 
-#: ../game/screen_intro.cc:75 ../game/screen_paths.cc:37
+#: ../game/screen_intro.cc:75 ../game/screen_paths.cc:36
 msgid "Settings saved as system defaults."
 msgstr "تنظیمان به عنوان پیش فرض سیستم ذخیره شد."
 
-#: ../game/screen_intro.cc:75 ../game/screen_paths.cc:37
+#: ../game/screen_intro.cc:75 ../game/screen_paths.cc:36
 msgid "Settings saved."
 msgstr "تنظیمات ذخیره شد."
 
@@ -1775,35 +1861,35 @@ msgid ""
 "using: "
 msgstr ""
 
-#: ../game/screen_paths.cc:70
+#: ../game/screen_paths.cc:69
 msgid "Hide hidden folders"
 msgstr ""
 
-#: ../game/screen_paths.cc:82
+#: ../game/screen_paths.cc:81
 msgid "Remove this folder"
 msgstr ""
 
-#: ../game/screen_paths.cc:82
+#: ../game/screen_paths.cc:81
 msgid "Remove current folder from song folders"
 msgstr ""
 
-#: ../game/screen_paths.cc:88
+#: ../game/screen_paths.cc:87
 msgid "Add this folder"
 msgstr ""
 
-#: ../game/screen_paths.cc:88
+#: ../game/screen_paths.cc:87
 msgid "Add current folder to song folders"
 msgstr ""
 
-#: ../game/screen_paths.cc:96
+#: ../game/screen_paths.cc:95
 msgid ".."
 msgstr ""
 
-#: ../game/screen_paths.cc:96
+#: ../game/screen_paths.cc:95
 msgid "Go to parent folder"
 msgstr ""
 
-#: ../game/screen_paths.cc:123
+#: ../game/screen_paths.cc:122
 msgid "Open folder"
 msgstr ""
 
