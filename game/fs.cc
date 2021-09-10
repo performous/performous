@@ -9,6 +9,7 @@
 #include <mutex>
 #include <set>
 #include <sstream>
+#include <regex>
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/range.hpp>

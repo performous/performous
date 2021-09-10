@@ -13,13 +13,15 @@
 						goto found;
 					}
 					// Use locale .mo files from build folder?
-					if (base.filename() == "build" && fs::exists(base / "lang")) {
+					auto folder = base.filename();
+					auto reg = "x\\d{2}-([Dd]ebug|[Rr]elease)(-install)?"; // matches all build folders.
+					if ((folder == "build" || std::regex_search(folder.string(), std::regex(reg))) && fs::exists(base / "lang")) {
 						locale = base / "lang";
 					}
 					base = base.parent_path();
 				} while (true);
 			found:;
-				if (locale.empty() && fs::exists(base / LOCALEDIR)) locale = base / LOCALEDIR;
+				if (locale.empty() && fs::exists(base / LOCALE_DIR)) locale = base / LOCALE_DIR;
 			}
 			// System-wide config files
 			{
