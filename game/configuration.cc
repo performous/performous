@@ -134,8 +134,7 @@ std::string const ConfigItem::getValue() const {
 	}
 	if (this->getName() == "game/language") {
 		int autoLanguageType = 1337;
-		static int val = std::get<int>(m_value);
-		if (val != std::get<int>(m_value)) val = LanguageToLanguageId(this->getEnumName()); // In the case of the language, val is the real value while m_value is the enum case for its cosmetic name.
+		int val = LanguageToLanguageId(this->getEnumName()); // In the case of the language, val is the real value while m_value is the enum case for its cosmetic name.
 		std::string languageName = (val != autoLanguageType) ? this->getEnumName() : "Auto";
 		return languageName;
 	}
