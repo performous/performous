@@ -1,5 +1,5 @@
 [wrap-file]
 directory=compact_enc_det-meson
-source_url=https://github.com/performous/compact_enc_det/archive/refs/heads/meson.zip
+source_url=https://github.com/performous/compact_enc_det/archive/refs/heads/master.zip
 source_filename=meson.zip
-source_hash=dcc2cb98b8aeb63370bea6d5f20b7aadc776f223083dccf701b71815321442e2
+source_hash=519e0d2e946b15f78b4b3564e5d7021aa4c64c73014148cc221698536a10c177
