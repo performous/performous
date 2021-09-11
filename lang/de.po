@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-22 01:35+0200\n"
-"PO-Revision-Date: 2021-08-22 01:40+0200\n"
+"POT-Creation-Date: 2017-08-30 22:31+0200\n"
+"PO-Revision-Date: 2021-09-11 03:21+0200\n"
 "Last-Translator: Arjan Speiard | Asgard Sings! <arjan.spieard@gmail.com>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _;translate_noop\n"
 "X-Poedit-Basepath: .\n"
-"X-Generator: Poedit 3.0\n"
+"X-Generator: Poedit 2.3\n"
 "X-Poedit-SearchPath-0: ../game\n"
 "X-Poedit-SearchPath-1: ../data\n"
 
@@ -121,10 +121,8 @@ msgstr "Schwierigkeit auswählen"
 #. type: int
 #. value: 0
 #: ../data/config/schema.xml:58
-#, fuzzy
-#| msgid "Select difficulty"
 msgid "Game difficulty."
-msgstr "Schwierigkeit auswählen"
+msgstr "Schwierigkeit auswählen."
 
 #. Lyric highlight style
 #. Hide pitch wave, notes and scoring.
@@ -196,7 +194,7 @@ msgstr "Name des zu benutzenden Themas."
 #. value: 15
 #: ../data/config/schema.xml:85
 msgid "Playlist screen timeout"
-msgstr ""
+msgstr "Auszeit der Abspiellistenanzeige"
 
 #. Playlist screen timeout
 #. How long it will take before the next song in the playlist starts automatically.
@@ -204,10 +202,8 @@ msgstr ""
 #. type: int
 #. value: 15
 #: ../data/config/schema.xml:86
-msgid ""
-"How long it will take before the next song in the playlist starts "
-"automatically."
-msgstr ""
+msgid "How long it will take before the next song in the playlist starts automatically."
+msgstr "Dauer bevor der nächste Song der Abspielliste gestartet wird."
 
 #. Song results timeout
 #. How long the scores will be displayed for after finishing a song.
@@ -216,7 +212,7 @@ msgstr ""
 #. value: 5
 #: ../data/config/schema.xml:90
 msgid "Song results timeout"
-msgstr ""
+msgstr "Dauer der Ergebnisanzeige"
 
 #. Song results timeout
 #. How long the scores will be displayed for after finishing a song.
@@ -225,7 +221,7 @@ msgstr ""
 #. value: 5
 #: ../data/config/schema.xml:91
 msgid "How long the scores will be displayed for after finishing a song."
-msgstr ""
+msgstr "Dauer der Anzeige des Ergebnisses nach dem Beenden eines Songs."
 
 #. High-score timeout
 #. How long the high-scores screen will wait for input before going to the next song.
@@ -234,7 +230,7 @@ msgstr ""
 #. value: 5
 #: ../data/config/schema.xml:95
 msgid "High-score timeout"
-msgstr ""
+msgstr "Anzeigedauer Punktestand"
 
 #. High-score timeout
 #. How long the high-scores screen will wait for input before going to the next song.
@@ -242,10 +238,8 @@ msgstr ""
 #. type: int
 #. value: 5
 #: ../data/config/schema.xml:96
-msgid ""
-"How long the high-scores screen will wait for input before going to the next "
-"song."
-msgstr ""
+msgid "How long the high-scores screen will wait for input before going to the next song."
+msgstr "Dauer bevor die Anzeige des Punktestandes zur nächsten Anzeige wechselt."
 
 #. Language
 #. Language to show Performous in
@@ -280,9 +274,7 @@ msgstr ""
 #. type: int
 #. value: 0
 #: ../data/config/schema.xml:113
-msgid ""
-"Define if you want to control performous remotely with web interface "
-"(requires restart)."
+msgid "Define if you want to control performous remotely with web interface (requires restart)."
 msgstr ""
 
 #. Case-sensitive sorting.
@@ -292,7 +284,7 @@ msgstr ""
 #. value: false
 #: ../data/config/schema.xml:116
 msgid "Case-sensitive sorting."
-msgstr ""
+msgstr "Sortierung beachtet Groß-Kleinschreibung."
 
 #. Case-sensitive sorting.
 #. Make a difference between uppercase and lowercase letters when sorting.
@@ -301,7 +293,7 @@ msgstr ""
 #. value: false
 #: ../data/config/schema.xml:117
 msgid "Make a difference between uppercase and lowercase letters when sorting."
-msgstr ""
+msgstr "Unterscheidet Groß- und Kleinschreibung bei der Sortierung."
 
 #. Webserver port
 #. Port to use for the web server. Choose one that is not used by other applications.
@@ -318,9 +310,7 @@ msgstr ""
 #. type: int
 #. value: 8000
 #: ../data/config/schema.xml:123
-msgid ""
-"Port to use for the web server. Choose one that is not used by other "
-"applications."
+msgid "Port to use for the web server. Choose one that is not used by other applications."
 msgstr ""
 
 #. Webserver fallback port
@@ -338,9 +328,7 @@ msgstr ""
 #. type: int
 #. value: 8001
 #: ../data/config/schema.xml:129
-msgid ""
-"Port to use in case original webserver port is in use. Choose one that you "
-"know for sure is not used by other applications."
+msgid "Port to use in case original webserver port is in use. Choose one that you know for sure is not used by other applications."
 msgstr ""
 
 #. Note Graph Scaling
@@ -350,7 +338,7 @@ msgstr ""
 #. value: 0
 #: ../data/config/schema.xml:140
 msgid "Note Graph Scaling"
-msgstr ""
+msgstr "Skalierung der Notenanzeige"
 
 #. Note Graph Scaling
 #. Type of scaling the note graph.
@@ -359,7 +347,7 @@ msgstr ""
 #. value: 0
 #: ../data/config/schema.xml:141
 msgid "Type of scaling the note graph."
-msgstr ""
+msgstr "Wählt die Art der Skalierung der Notenanzeige."
 
 #. Keyboard as guitar
 #. Enable keyboard as guitar (Frets on Fire mode).
@@ -395,7 +383,7 @@ msgstr "Tastatur als Schlagzeug nutzen"
 #. value: true
 #: ../data/config/schema.xml:149
 msgid "Enable keyboard as drumkit."
-msgstr "Aktiviere Tastatur als Schlagzeug"
+msgstr "Aktiviere Tastatur als Schlagzeug."
 
 #. Drums use Pro mode
 #. Drums use Pro mode (toms are not cymbals)
@@ -431,7 +419,7 @@ msgstr "Tastatur als Dancepad nutzen"
 #. value: true
 #: ../data/config/schema.xml:157
 msgid "Enable keyboard as dance pad."
-msgstr "Aktiviere Keyboard als Dancepad"
+msgstr "Aktiviere Keyboard als Dancepad."
 
 #. Keyboard as keytar
 #. Enable keyboard as keytar.
@@ -449,7 +437,7 @@ msgstr "Tastatur als Keytar"
 #. value: true
 #: ../data/config/schema.xml:161
 msgid "Enable keyboard as keytar."
-msgstr "Benutze Tastatur als Keytar"
+msgstr "Benutze Tastatur als Keytar."
 
 #. Force controller A's type
 #. Override autodetection and force the first controller to the given type.
@@ -466,11 +454,8 @@ msgstr "Erzwinge Typ von Eingabegrät A"
 #. type: int
 #. value: 0
 #: ../data/config/schema.xml:169
-msgid ""
-"Override autodetection and force the first controller to the given type."
-msgstr ""
-"Automatische Erkennung übergehen und immer diesen Typ für das erste "
-"Eingabegerät wählen."
+msgid "Override autodetection and force the first controller to the given type."
+msgstr "Automatische Erkennung übergehen und immer diesen Typ für das erste Eingabegerät wählen."
 
 #. Force controller B's type
 #. Override autodetection and force the second controller to the given type.
@@ -487,11 +472,8 @@ msgstr "Erzwinge Typ von Eingabegrät B"
 #. type: int
 #. value: 0
 #: ../data/config/schema.xml:177
-msgid ""
-"Override autodetection and force the second controller to the given type."
-msgstr ""
-"Automatische Erkennung übergehen und immer diesen Typ für das zweite "
-"Eingabegerät wählen."
+msgid "Override autodetection and force the second controller to the given type."
+msgstr "Automatische Erkennung übergehen und immer diesen Typ für das zweite Eingabegerät wählen."
 
 #. Force controller C's type
 #. Override autodetection and force the third controller to the given type.
@@ -508,11 +490,8 @@ msgstr "Erzwinge Typ von Eingabegrät C"
 #. type: int
 #. value: 0
 #: ../data/config/schema.xml:185
-msgid ""
-"Override autodetection and force the third controller to the given type."
-msgstr ""
-"Automatische Erkennung übergehen und immer diesen Typ für das dritte "
-"Eingabegerät wählen."
+msgid "Override autodetection and force the third controller to the given type."
+msgstr "Automatische Erkennung übergehen und immer diesen Typ für das dritte Eingabegerät wählen."
 
 #. Force controller D's type
 #. Override autodetection and force the fourth controller to the given type.
@@ -529,11 +508,8 @@ msgstr "Erzwinge Typ von Eingabegrät D"
 #. type: int
 #. value: 0
 #: ../data/config/schema.xml:193
-msgid ""
-"Override autodetection and force the fourth controller to the given type."
-msgstr ""
-"Automatische Erkennung übergehen und immer diesen Typ für das vierte "
-"Eingabegerät wählen."
+msgid "Override autodetection and force the fourth controller to the given type."
+msgstr "Automatische Erkennung übergehen und immer diesen Typ für das vierte Eingabegerät wählen."
 
 #. Joystick configuration
 #. Force joystick to some kind of instrument.
@@ -549,7 +525,7 @@ msgstr "Eingabegeräte konfigurieren"
 #. type: string_list
 #: ../data/config/schema.xml:201
 msgid "Force joystick to some kind of instrument."
-msgstr "Erzwinge Eingabegerät als spezielles Instrument"
+msgstr "Erzwinge Eingabegerät als spezielles Instrument."
 
 #. Hardware MIDI input device
 #. Regex for matching the MIDI devices to use. The default is to use all available devices.
@@ -564,12 +540,8 @@ msgstr "MIDI Eingabegerät"
 #. name: game/midi_input
 #. type: string
 #: ../data/config/schema.xml:205
-msgid ""
-"Regex for matching the MIDI devices to use. The default is to use all "
-"available devices."
-msgstr ""
-"Regex, um die zu benutzenden MIDI-Geräte zu wählen. Standardmässig werden "
-"alle verfügbaren Geräte benutzt."
+msgid "Regex for matching the MIDI devices to use. The default is to use all available devices."
+msgstr "Regex, um die zu benutzenden MIDI-Geräte zu wählen. Standardmässig werden alle verfügbaren Geräte benutzt."
 
 #. Word Collation
 #. Words that should be ignored when sorting.
@@ -577,7 +549,7 @@ msgstr ""
 #. type: string_list
 #: ../data/config/schema.xml:233
 msgid "Word Collation"
-msgstr ""
+msgstr "Wortvergleich"
 
 #. Word Collation
 #. Words that should be ignored when sorting.
@@ -585,7 +557,7 @@ msgstr ""
 #. type: string_list
 #: ../data/config/schema.xml:234
 msgid "Words that should be ignored when sorting."
-msgstr ""
+msgstr "Zu ignorierende Wörter beim Sortieren."
 
 #. Windowed width
 #. The width of the window.
@@ -605,7 +577,7 @@ msgstr "Fensterbreite"
 #. hidden: true
 #: ../data/config/schema.xml:242
 msgid "The width of the window."
-msgstr "Breite des Fensters"
+msgstr "Breite des Fensters."
 
 #. Windowed height
 #. The height of the window.
@@ -625,7 +597,7 @@ msgstr "Fensterhöhe"
 #. hidden: true
 #: ../data/config/schema.xml:248
 msgid "The height of the window."
-msgstr "Höhe des Fensters"
+msgstr "Höhe des Fensters."
 
 #. X-Position of the window
 #. The X-Position of the window.
@@ -710,7 +682,7 @@ msgstr "Vollbildmodus"
 #. value: false
 #: ../data/config/schema.xml:268
 msgid "Enable fullscreen mode on startup."
-msgstr "Aktivere Vollbild beim Start"
+msgstr "Aktivere Vollbild beim Start."
 
 #. Stereoscopic 3D
 #. Enable 3D rendering of Performous.
@@ -763,12 +735,8 @@ msgstr "Stereo3D-Trennung"
 #. type: float
 #. value: 50
 #: ../data/config/schema.xml:287
-msgid ""
-"The strength of the effect. Experiment with different settings for best "
-"results."
-msgstr ""
-"Die Stärke des 3D-Effektes. Experimentiere mit verschiedenen Werten, um die "
-"beste Einstellung zu finden."
+msgid "The strength of the effect. Experiment with different settings for best results."
+msgstr "Die Stärke des 3D-Effektes. Experimentiere mit verschiedenen Werten, um die beste Einstellung zu finden."
 
 #. Video playback
 #. Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough.
@@ -785,14 +753,8 @@ msgstr "Video-Wiedergabe …"
 #. type: bool
 #. value: true
 #: ../data/config/schema.xml:291
-msgid ""
-"Allows completely disabling background videos. It is recommended to leave "
-"this enabled as Performous will still smoothly fade out the video if your "
-"computer is not fast enough."
-msgstr ""
-"Erlaubt es Hintergrundvideos komplett zu deaktivieren. Es ist empfehlenswert "
-"dies Option aktiviert zu lassen - Performous wird das Video trotzdem flüssig "
-"ausblenden, wenn dein Computer nicht schnell genug ist."
+msgid "Allows completely disabling background videos. It is recommended to leave this enabled as Performous will still smoothly fade out the video if your computer is not fast enough."
+msgstr "Erlaubt es Hintergrundvideos komplett zu deaktivieren. Es ist empfehlenswert dies Option aktiviert zu lassen - Performous wird das Video trotzdem flüssig ausblenden, wenn dein Computer nicht schnell genug ist."
 
 #. Webcam background
 #. Performous can use webcam as a background video. Disable it if Performous crashes while entering a song.
@@ -809,12 +771,8 @@ msgstr "Webcam als Hintergrund"
 #. type: bool
 #. value: false
 #: ../data/config/schema.xml:295
-msgid ""
-"Performous can use webcam as a background video. Disable it if Performous "
-"crashes while entering a song."
-msgstr ""
-"Performous kann eine Webcam für Hintergrundvideos nutzen. Du kannst diese "
-"Option deaktivieren, falls Performous abstürzt, wenn du ein Lied startest."
+msgid "Performous can use webcam as a background video. Disable it if Performous crashes while entering a song."
+msgstr "Performous kann eine Webcam für Hintergrundvideos nutzen. Du kannst diese Option deaktivieren, falls Performous abstürzt, wenn du ein Lied startest."
 
 #. Webcam id
 #. Use -1 to autodetect or a number starting from 0 to choose specific device.
@@ -831,10 +789,8 @@ msgstr "Webcam ID"
 #. type: int
 #. value: -1
 #: ../data/config/schema.xml:300
-msgid ""
-"Use -1 to autodetect or a number starting from 0 to choose specific device."
-msgstr ""
-"Benutze -1 für Autoerkennung oder wähle eine Zahl für ein spezielles Geräte"
+msgid "Use -1 to autodetect or a number starting from 0 to choose specific device."
+msgstr "Benutze -1 für Autoerkennung oder wähle eine Zahl für ein spezielles Geräte."
 
 #. SVG quality
 #. Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster.
@@ -851,12 +807,8 @@ msgstr "SVG Grafikqualität"
 #. type: float
 #. value: 1.5
 #: ../data/config/schema.xml:306
-msgid ""
-"Larger numbers cause vector graphics to be rendered in higher resolution. "
-"Decrease this to make navigating in menus faster."
-msgstr ""
-"Bei Hohen Werten rendert Performous Vektorgraphiken in höherer Auflösung. "
-"Niedrigere Werte ermöglichen eine schnellere Navigation in den Menüs."
+msgid "Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster."
+msgstr "Bei Hohen Werten rendert Performous Vektorgraphiken in höherer Auflösung. Niedrigere Werte ermöglichen eine schnellere Navigation in den Menüs."
 
 #. Text quality
 #. Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster.
@@ -873,12 +825,8 @@ msgstr "Textqualität"
 #. type: float
 #. value: 1.5
 #: ../data/config/schema.xml:312
-msgid ""
-"Larger numbers cause text to be rendered in higher resolution. Decrease this "
-"to make everything a little faster."
-msgstr ""
-"Bei hohen Werten rendert Performous Texte in höherer Auflösung. Niedrigere "
-"Werte erhöhen die allgemeine Performance ein wenig."
+msgid "Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster."
+msgstr "Bei hohen Werten rendert Performous Texte in höherer Auflösung. Niedrigere Werte erhöhen die allgemeine Performance ein wenig."
 
 #. Benchmark mode
 #. Framerate limit of 100 FPS is removed and the game instead renders at full speed. FPS values are printed to console. Please note that the display drivers may still limit the rendering speed to the screen refresh rate.
@@ -895,15 +843,8 @@ msgstr "Benchmarkmodus"
 #. type: bool
 #. value: false
 #: ../data/config/schema.xml:316
-msgid ""
-"Framerate limit of 100 FPS is removed and the game instead renders at full "
-"speed. FPS values are printed to console. Please note that the display "
-"drivers may still limit the rendering speed to the screen refresh rate."
-msgstr ""
-"Das Limit für die Bildwiederholrate wird aufgehoben und die maximal "
-"möglichen Werte in der Konsole ausgegeben. Bemerkung: Es ist möglich, dass "
-"der Grafiktreiber die Geschwindigkeit immer noch auf die Bildwiederholrate "
-"des Bildschirms beschränkt."
+msgid "Framerate limit of 100 FPS is removed and the game instead renders at full speed. FPS values are printed to console. Please note that the display drivers may still limit the rendering speed to the screen refresh rate."
+msgstr "Das Limit für die Bildwiederholrate wird aufgehoben und die maximal möglichen Werte in der Konsole ausgegeben. Bemerkung: Es ist möglich, dass der Grafiktreiber die Geschwindigkeit immer noch auf die Bildwiederholrate des Bildschirms beschränkt."
 
 #. Suggested latency
 #. This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart.
@@ -920,13 +861,8 @@ msgstr "Empfohlene Latenz"
 #. type: float
 #. value: 0.075
 #: ../data/config/schema.xml:324
-msgid ""
-"This is a hint for the audio engine about the desired latency. Set this as "
-"low as possible while retaining clear audio playback. Requires restart."
-msgstr ""
-"Die Audioengine nutzt diesen Wert für die gewünschte Latenz im Spiel. Diese "
-"Wert beeinflusst die Audiowiedergabequalität im Spiel. Bemerkung: So "
-"niedrig, wie möglich, so hoch wie nötig - Erfordert einen Neustart."
+msgid "This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart."
+msgstr "Die Audioengine nutzt diesen Wert für die gewünschte Latenz im Spiel. Diese Wert beeinflusst die Audiowiedergabequalität im Spiel. Bemerkung: So niedrig, wie möglich, so hoch wie nötig - Erfordert einen Neustart."
 
 #. Audio Backend
 #. Configure which audio backend to use; not all backends will be supported on all platforms.
@@ -945,9 +881,7 @@ msgstr "Audiogeräte"
 #. type: int
 #. value: 1337
 #: ../data/config/schema.xml:332
-msgid ""
-"Configure which audio backend to use; not all backends will be supported on "
-"all platforms."
+msgid "Configure which audio backend to use; not all backends will be supported on all platforms."
 msgstr ""
 
 #. Audio/video latency
@@ -966,24 +900,9 @@ msgstr "Audio-/Videolatenz"
 #. value: 0.06
 #: ../data/config/schema.xml:338
 #, fuzzy
-#| msgid ""
-#| "Affects all modes. Use negative value if your display input lag is "
-#| "greater than the sound card output latency, positive values in the "
-#| "opposite case and zero if they are equal. This should be set so that the "
-#| "notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 "
-#| "to adjust this while performing."
-msgid ""
-"Affects all modes. Use negative value if your display input lag is greater "
-"than the sound card output latency, positive values in the opposite case and "
-"zero if they are equal. This should be set so that the notes pass the cursor "
-"at the same time the audio is heard. Use 'Ctrl + ,' or 'Ctrl + .' to adjust "
-"this while performing."
-msgstr ""
-"Betrifft alle Modi. Verwende negative Werte, wenn dein Bildschirm-Eingabe-"
-"Lag größer ist als die Soundkarten-Ausgabe-Latenz, positive Werte im "
-"umgekehrten Fall und Null, falls sie gleich sind. Dies sollte so eingestellt "
-"sein, dass die Noten den Cursor in dem Moment passieren, wenn der Ton zu "
-"hören ist. Verwende Strg+F1/F2, um dies während deines Auftritts anzupassen."
+#| msgid "Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use Ctrl+F1/F2 to adjust this while performing."
+msgid "Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use 'Ctrl + ,' or 'Ctrl + .' to adjust this while performing."
+msgstr "Betrifft alle Modi. Verwende negative Werte, wenn dein Bildschirm-Eingabe-Lag größer ist als die Soundkarten-Ausgabe-Latenz, positive Werte im umgekehrten Fall und Null, falls sie gleich sind. Dies sollte so eingestellt sein, dass die Noten den Cursor in dem Moment passieren, wenn der Ton zu hören ist. Verwende Strg+F1/F2, um dies während deines Auftritts anzupassen."
 
 #. Audio round-trip latency
 #. Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with 'Ctrl + -' or 'Ctrl + ='.
@@ -1001,22 +920,9 @@ msgstr "Gesangslatenz"
 #. value: 0.09
 #: ../data/config/schema.xml:344
 #, fuzzy
-#| msgid ""
-#| "Affects singing only. The time it takes for Performous playback to reach "
-#| "your speakers, fly to the microphone and all the way back until "
-#| "Performous captures and analyzes it. While performing, press Ctrl+S for "
-#| "synth mode and adjust with Ctrl+F3/F4."
-msgid ""
-"Affects singing only. The time it takes for Performous playback to reach "
-"your speakers, fly to the microphone and all the way back until Performous "
-"captures and analyzes it. While performing, press Ctrl+S for synth mode and "
-"adjust with 'Ctrl + -' or 'Ctrl + ='."
-msgstr ""
-"Betrifft nur den Gesang. Er markiert die Zeit von der Wiedergabe an den "
-"Lautsprechern, zum Mikrofon und den gesamten Weg bis zur Aufnahme und "
-"Analyse durch Performous. Kann durch während des Spiels direkt durch das "
-"betätigen von Strg+S für den Synth-Modus und durch die Tasten Strg+F3/F4 "
-"reguliert werden."
+#| msgid "Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with Ctrl+F3/F4."
+msgid "Affects singing only. The time it takes for Performous playback to reach your speakers, fly to the microphone and all the way back until Performous captures and analyzes it. While performing, press Ctrl+S for synth mode and adjust with 'Ctrl + -' or 'Ctrl + ='."
+msgstr "Betrifft nur den Gesang. Er markiert die Zeit von der Wiedergabe an den Lautsprechern, zum Mikrofon und den gesamten Weg bis zur Aufnahme und Analyse durch Performous. Kann durch während des Spiels direkt durch das betätigen von Strg+S für den Synth-Modus und durch die Tasten Strg+F3/F4 reguliert werden."
 
 #. Audio/controller latency
 #. Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use 'Ctrl + [' or 'Ctrl + ]' to adjust while performing.
@@ -1034,20 +940,9 @@ msgstr "Audio/Controller Latenz"
 #. value: 0.08
 #: ../data/config/schema.xml:350
 #, fuzzy
-#| msgid ""
-#| "Affects instruments and dancing only. The total of USB (guitar or dance "
-#| "pad) latency combined with audio output latency. Adjust so that you can "
-#| "hit the notes best when playing by ear (not looking on screen). Use Ctrl"
-#| "+F5/F6 to adjust while performing."
-msgid ""
-"Affects instruments and dancing only. The total of USB (guitar or dance pad) "
-"latency combined with audio output latency. Adjust so that you can hit the "
-"notes best when playing by ear (not looking on screen). Use 'Ctrl + [' or "
-"'Ctrl + ]' to adjust while performing."
-msgstr ""
-"Betrifft nur Instrumente und Tanzpads. So einstellen, dass du die Noten gut "
-"nach Gehör spielen kannst. Es ist möglich, diesen Wert während des Spiels "
-"mit den Tasten Strg+F5/F6 zu regulieren."
+#| msgid "Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use Ctrl+F5/F6 to adjust while performing."
+msgid "Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use 'Ctrl + [' or 'Ctrl + ]' to adjust while performing."
+msgstr "Betrifft nur Instrumente und Tanzpads. So einstellen, dass du die Noten gut nach Gehör spielen kannst. Es ist möglich, diesen Wert während des Spiels mit den Tasten Strg+F5/F6 zu regulieren."
 
 #. Audio devices
 #. List of audio devices to try.
@@ -1083,7 +978,7 @@ msgstr "Menü Lautstärke"
 #. value: 70
 #: ../data/config/schema.xml:364
 msgid "The volume level of menus, song previews and jukebox mode."
-msgstr "Lautstärke in den Menüs, Lied-Previews und im Jukebox-Modus"
+msgstr "Lautstärke in den Menüs, Lied-Previews und im Jukebox-Modus."
 
 #. Music volume
 #. The ingame music volume. Values above 90 are not recommended as distortion may occur.
@@ -1100,12 +995,8 @@ msgstr "Musik Lautstärke"
 #. type: int
 #. value: 90
 #: ../data/config/schema.xml:370
-msgid ""
-"The ingame music volume. Values above 90 are not recommended as distortion "
-"may occur."
-msgstr ""
-"Lautstärke im Spiel. Werte über 90 sind nicht zu empfehlen aufgrund von "
-"Verzerrungen und anderen Störungen."
+msgid "The ingame music volume. Values above 90 are not recommended as distortion may occur."
+msgstr "Lautstärke im Spiel. Werte über 90 sind nicht zu empfehlen aufgrund von Verzerrungen und anderen Störungen."
 
 #. Failure volume
 #. The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!
@@ -1122,12 +1013,8 @@ msgstr "Versager Lautstärke"
 #. type: int
 #. value: 90
 #: ../data/config/schema.xml:376
-msgid ""
-"The ingame fail sound volume. Values above 90 are not recommended as "
-"distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
-msgstr ""
-"Die Lautstärke der Musik im Falle des Verspielens. Werte über 90 werden "
-"nicht empfohlen aufgrund von Verzerrungen und anderen Störungen."
+msgid "The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
+msgstr "Die Lautstärke der Musik im Falle des Verspielens. Werte über 90 werden nicht empfohlen aufgrund von Verzerrungen und anderen Störungen!"
 
 #. Microphone pass-through
 #. Send captured singing voice to speakers.
@@ -1197,13 +1084,8 @@ msgstr "Liederordner"
 #. name: paths/system-songs
 #. type: string_list
 #: ../data/config/schema.xml:418
-msgid ""
-"Where to recursively look for songs. DATADIR at the beginning means all "
-"Performous data folders."
-msgstr ""
-"Dieser Ordner wird (rekursiv, d.h. mit allen Unterordnern) nach Liedern "
-"durchsucht. Die Verwendung von DATADIR bezeichnet hierbei den Datenordner "
-"von Performous."
+msgid "Where to recursively look for songs. DATADIR at the beginning means all Performous data folders."
+msgstr "Dieser Ordner wird (rekursiv, d.h. mit allen Unterordnern) nach Liedern durchsucht. Die Verwendung von DATADIR bezeichnet hierbei den Datenordner von Performous."
 
 #. Show hidden folders
 #. When true the screen_paths will also show hidden folders
@@ -1212,7 +1094,7 @@ msgstr ""
 #. value: false
 #: ../data/config/schema.xml:399 ../game/screen_paths.cc:74
 msgid "Show hidden folders"
-msgstr ""
+msgstr "Zeige versteckte Verzeichnisse an"
 
 #. Show hidden folders
 #. When true the screen_paths will also show hidden folders
@@ -1246,12 +1128,8 @@ msgstr "Ordner für Daten"
 #. name: paths/system
 #. type: string_list
 #: ../data/config/schema.xml:422
-msgid ""
-"System defaults are included automatically. Additional paths can be added "
-"here."
-msgstr ""
-"Standardpfade werden automatisch eingefügt. Hier können Neue hinzugefügt "
-"werden."
+msgid "System defaults are included automatically. Additional paths can be added here."
+msgstr "Standardpfade werden automatisch eingefügt. Hier können Neue hinzugefügt werden."
 
 #. Sort order
 #. Currently active sort order
@@ -1271,15 +1149,15 @@ msgstr "Sortierreihenfolge"
 #. hidden: true
 #: ../data/config/schema.xml:429
 msgid "Currently active sort order"
-msgstr ""
+msgstr "Gerade aktive Sortierung"
 
 #: ../data/performous.desktop:3
 msgid "Performous"
-msgstr ""
+msgstr "Performous"
 
 #: ../data/performous.desktop:4
 msgid "A karaoke game"
-msgstr ""
+msgstr "Ein Karaoke-Spiel"
 
 #: ../data/performous.desktop:17
 msgid "song;music;dance;karaoke;microphone;sound;singing;"
@@ -1384,27 +1262,27 @@ msgstr "Herausforderung"
 
 #: ../game/dancegraph.cc:51 ../game/dancegraph.cc:59
 msgid "Perfect!"
-msgstr ""
+msgstr "Perfekt!"
 
 #: ../game/dancegraph.cc:52
 msgid "Excellent!-"
-msgstr ""
+msgstr "Exzellent!-"
 
 #: ../game/dancegraph.cc:53
 msgid "Great!-"
-msgstr ""
+msgstr "Super!-"
 
 #: ../game/dancegraph.cc:54
 msgid " Good!- "
-msgstr ""
+msgstr " Gut!- "
 
 #: ../game/dancegraph.cc:55
 msgid "  OK!-  "
-msgstr ""
+msgstr "  OK!-  "
 
 #: ../game/dancegraph.cc:56
 msgid "Late!-"
-msgstr ""
+msgstr "Zu spät!-"
 
 #: ../game/dancegraph.cc:57 ../game/dancegraph.cc:65
 msgid "Way off!"
@@ -1412,23 +1290,23 @@ msgstr ""
 
 #: ../game/dancegraph.cc:60
 msgid "-Excellent!"
-msgstr ""
+msgstr "-Großartig!"
 
 #: ../game/dancegraph.cc:61
 msgid "-Great!"
-msgstr ""
+msgstr "-Prima!"
 
 #: ../game/dancegraph.cc:62
 msgid " -Good! "
-msgstr ""
+msgstr " -Gut! "
 
 #: ../game/dancegraph.cc:63
 msgid "  -OK!  "
-msgstr ""
+msgstr "  -OK!  "
 
 #: ../game/dancegraph.cc:64
 msgid "-Early!"
-msgstr ""
+msgstr "-Zu früh!"
 
 #: ../game/dancegraph.cc:106 ../game/guitargraph.cc:193
 msgid "Ready!"
@@ -1457,7 +1335,7 @@ msgstr "Beenden"
 #: ../game/instrumentgraph.cc:59 ../game/screen_sing.cc:108
 #: ../game/screen_sing.cc:155
 msgid "Exit to song browser"
-msgstr "Zurück zum Liedbrowser."
+msgstr "Zurück zum Liedbrowser"
 
 #: ../game/dancegraph.cc:247
 msgid "STOP!"
@@ -1495,7 +1373,7 @@ msgstr "Modus Linkshänder auswählen"
 msgid ""
 "God Mode\n"
 "Activated!"
-msgstr "God Mode aktiviert"
+msgstr "God Mode aktiviert!"
 
 #: ../game/guitargraph.cc:462
 msgid "Mistakes ignored!"
@@ -1549,25 +1427,23 @@ msgstr ""
 
 #: ../game/layout_singer.cc:72
 msgid "Perfect"
-msgstr ""
+msgstr "Perfekt"
 
 #: ../game/layout_singer.cc:73
 msgid "Excellent"
-msgstr ""
+msgstr "Exzellent"
 
 #: ../game/layout_singer.cc:74
-#, fuzzy
-#| msgid "Creator"
 msgid "Great"
-msgstr "Schöpfer"
+msgstr "Super"
 
 #: ../game/layout_singer.cc:75
 msgid "Good"
-msgstr ""
+msgstr "Gut"
 
 #: ../game/layout_singer.cc:76
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: ../game/main.cc:148
 msgid "Loading audio samples..."
@@ -1590,6 +1466,8 @@ msgid ""
 "Done Loading!\n"
 " Loaded "
 msgstr ""
+"Laden beendet!\n"
+"Geladen "
 
 #: ../game/main.cc:190
 msgid "Screenshot taken!"
@@ -1660,12 +1538,8 @@ msgid "Refresh playlist"
 msgstr "Abspielliste aktualisieren"
 
 #: ../game/requesthandler.cc:349
-msgid ""
-"Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding "
-"Performous see /docs/Authors.txt"
-msgstr ""
-"Web-Interface von Niek Nooijens und Arjan Speiard, für volle Credits in "
-"Bezug auf Performous see /docs/Authors.txt"
+msgid "Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding Performous see /docs/Authors.txt"
+msgstr "Web-Interface von Niek Nooijens und Arjan Speiard, für volle Credits in Bezug auf Performous see /docs/Authors.txt"
 
 #: ../game/requesthandler.cc:350
 msgid "Search"
@@ -1693,67 +1567,67 @@ msgstr "Hochschieben"
 
 #: ../game/requesthandler.cc:356
 msgid "Move down"
-msgstr ""
+msgstr "Runterschieben"
 
 #: ../game/requesthandler.cc:357
 msgid "Set position"
-msgstr ""
+msgstr "Positionieren"
 
 #: ../game/requesthandler.cc:358
 msgid "Remove song"
-msgstr ""
+msgstr "Entferne Song"
 
 #: ../game/requesthandler.cc:359
 msgid "Desired position of song"
-msgstr ""
+msgstr "Gewünschte Songposition"
 
 #: ../game/requesthandler.cc:360
 msgid "Cancel"
-msgstr ""
+msgstr "Abbrechen"
 
 #: ../game/requesthandler.cc:361
 msgid "Successfully removed song from playlist"
-msgstr ""
+msgstr "Song erfolgreich aus Abspielliste entfernt"
 
 #: ../game/requesthandler.cc:362
 msgid "Failed removing song from playlist"
-msgstr ""
+msgstr "Entfernen des Songs aus der Abspielliste fehlgeschlagen"
 
 #: ../game/requesthandler.cc:363
 msgid "Successfully changed position of song"
-msgstr ""
+msgstr "Song-Position erfolgreich geändert"
 
 #: ../game/requesthandler.cc:364
 msgid "Failed changing position of song"
-msgstr ""
+msgstr "Song-Position konnte nicht geändert werden"
 
 #: ../game/requesthandler.cc:365
 msgid "Successfully moved song up"
-msgstr ""
+msgstr "Song erfolgreich nach oben bewegt"
 
 #: ../game/requesthandler.cc:366
 msgid "Failed moving song up"
-msgstr ""
+msgstr "Song konnte nicht nach oben bewegt werden"
 
 #: ../game/requesthandler.cc:367
 msgid "Successfully moved song down"
-msgstr ""
+msgstr "Song erfolgreich nach unter bewegt"
 
 #: ../game/requesthandler.cc:368
 msgid "Failed moving song down"
-msgstr ""
+msgstr "Song konnte nicht nach unter bewegt werden"
 
 #: ../game/requesthandler.cc:369
 msgid "Successfully added song to the playlist"
-msgstr ""
+msgstr "Song in Abspielliste aufgnommen"
 
 #: ../game/requesthandler.cc:370
 msgid "Failed adding song to the playlist"
-msgstr ""
+msgstr "Song konnte nicht in Abspielliste aufgenommen werden"
 
 #: ../game/requesthandler.cc:371
 msgid "No songs found with current filter"
-msgstr ""
+msgstr "Der aktuelle Filter liefert keine Songs"
 
 #: ../game/screen_audiodevices.cc:66
 msgid ""
@@ -1774,21 +1648,12 @@ msgid "- Unassigned -"
 msgstr "- Nicht zugeordnet -"
 
 #: ../game/screen_audiodevices.cc:146
-msgid ""
-"Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select "
-"to cancel. Ctrl + R to reset defaults"
-msgstr ""
-"Benutze Pfeiltasten zum Einstellen. Drücke Enter/Start zum speichern und "
-"testen oder Esc/Select zum Abbrechen. Ctrl + R, um auf Standard "
-"zurückzusetzen"
+msgid "Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select to cancel. Ctrl + R to reset defaults"
+msgstr "Benutze Pfeiltasten zum Einstellen. Drücke Enter/Start zum speichern und testen oder Esc/Select zum Abbrechen. Ctrl + R, um auf Standard zurückzusetzen"
 
 #: ../game/screen_audiodevices.cc:151
-msgid ""
-"For advanced device configuration, use command line parameter --audio (use --"
-"audiohelp for details)."
-msgstr ""
-"Für erweiterte Gerätekonfiguration, benutze den Kommandozeilenparameter --"
-"audio (benutze --audiohelp für Details)."
+msgid "For advanced device configuration, use command line parameter --audio (use --audiohelp for details)."
+msgstr "Für erweiterte Gerätekonfiguration, benutze den Kommandozeilenparameter --audio (benutze --audiohelp für Details)."
 
 #: ../game/screen_audiodevices.cc:195
 msgid "Some devices failed to open!"
@@ -1816,9 +1681,7 @@ msgstr "Einstellungen gespeichert."
 
 #: ../game/screen_intro.cc:154
 msgid "Ctrl + S to save, Ctrl + R to reset defaults"
-msgstr ""
-"Drücke die Kombinationen Strg + S zum Speichern oder Strg + R um die "
-"Standardeinstellung wiederherzustellen"
+msgstr "Drücke die Kombinationen Strg + S zum Speichern oder Strg + R um die Standardeinstellung wiederherzustellen"
 
 #: ../game/screen_intro.cc:174
 msgid "Perform"
@@ -1830,7 +1693,7 @@ msgstr "Üben"
 
 #: ../game/screen_intro.cc:175
 msgid "Check your skills or test the microphones"
-msgstr "Teste deine Fähigkeiten - oder das Mikro!"
+msgstr "Teste deine Fähigkeiten - oder das Mikro"
 
 #: ../game/screen_intro.cc:191
 msgid "Configure"
@@ -1853,35 +1716,35 @@ msgstr ""
 
 #: ../game/screen_paths.cc:69
 msgid "Hide hidden folders"
-msgstr ""
+msgstr "Versteckte Verzeichnisse nicht anzeigen"
 
 #: ../game/screen_paths.cc:81
 msgid "Remove this folder"
-msgstr ""
+msgstr "Dieses Verzeichnis entfernen"
 
 #: ../game/screen_paths.cc:81
 msgid "Remove current folder from song folders"
-msgstr ""
+msgstr "Aktuelles Verzeichnis aus Song-Verzeichnissen entfernen"
 
 #: ../game/screen_paths.cc:87
 msgid "Add this folder"
-msgstr ""
+msgstr "Füge dieses Verzeichnis hinzu"
 
 #: ../game/screen_paths.cc:87
 msgid "Add current folder to song folders"
-msgstr ""
+msgstr "Akuelles Verzeichnis zu Song-Verzeichnissen hinzufügen"
 
 #: ../game/screen_paths.cc:95
 msgid ".."
-msgstr ""
+msgstr ".."
 
 #: ../game/screen_paths.cc:95
 msgid "Go up one folder"
-msgstr ""
+msgstr "Wechsel zum übergeordneten Verzeichnis"
 
 #: ../game/screen_paths.cc:122
 msgid "Open folder"
-msgstr ""
+msgstr "Öffne Verzeichnis"
 
 #: ../game/screen_players.cc:134
 msgid "No players found!"
@@ -1905,7 +1768,7 @@ msgstr "Du hast %1% punkte erreicht!"
 
 #: ../game/screen_players.cc:147
 msgid "Change player with arrow keys."
-msgstr "Du kannst die Spieler mit den Pfeiltasten wechseln"
+msgstr "Du kannst die Spieler mit den Pfeiltasten wechseln."
 
 #: ../game/screen_players.cc:148
 msgid "Name:"
@@ -1925,7 +1788,7 @@ msgstr "Initialisiere Webcam..."
 
 #: ../game/screen_playlist.cc:38
 msgid "Loading song timestamps..."
-msgstr ""
+msgstr "Lade Song-Zeitstempel..."
 
 #: ../game/screen_playlist.cc:181 ../game/screen_playlist.cc:352
 msgid "Continue"
@@ -1986,8 +1849,7 @@ msgstr "Zuerst abspielen"
 
 #: ../game/screen_playlist.cc:354
 msgid "Ignore the playlist's order and play this song first"
-msgstr ""
-"Ignoriere die Reihenfolge der Abspielliste und spiele dieses Lied als erstes"
+msgstr "Ignoriere die Reihenfolge der Abspielliste und spiele dieses Lied als erstes"
 
 #: ../game/screen_playlist.cc:355
 msgid "Start the song already!"
@@ -2087,7 +1949,7 @@ msgstr "KICK um teilzunehmen!"
 
 #: ../game/screen_sing.cc:557
 msgid "   ENTER to skip instrumental break"
-msgstr "ENTER um Vorbereitung abzubrechen"
+msgstr " ENTER um Vorbereitung abzubrechen"
 
 #: ../game/screen_sing.cc:562 ../game/screen_sing.cc:583
 msgid "   Autoplay enabled"
@@ -2095,15 +1957,15 @@ msgstr "   Automatische Wiedergabe aktiviert"
 
 #: ../game/screen_sing.cc:565 ../game/screen_sing.cc:577
 msgid "   Remember to wait for grading!"
-msgstr "Bitte Warte auf die Bewertung!"
+msgstr " Bitte Warte auf die Bewertung!"
 
 #: ../game/screen_sing.cc:567
 msgid "   Prepare for the next song!"
-msgstr ""
+msgstr "   Warte auf den nächsten Song!"
 
 #: ../game/screen_sing.cc:579
 msgid "   Choose your next song!"
-msgstr ""
+msgstr "   Wähle deinen nächsten Song!"
 
 #: ../game/screen_sing.cc:713
 msgid "No player!"
@@ -2181,11 +2043,11 @@ msgstr "Optionen"
 
 #: ../game/screen_songs.cc:323
 msgid "sort order: "
-msgstr "Sortierreihenfolge:"
+msgstr "Sortierreihenfolge: "
 
 #: ../game/screen_songs.cc:324
 msgid "type filter: "
-msgstr "Typfilter:"
+msgstr "Typfilter: "
 
 #: ../game/screen_songs.cc:325
 msgid "hiscores"
@@ -2328,9 +2190,7 @@ msgstr "nach Sprache sortiert"
 #~ msgstr "Drücke eine beliebige Taste zum Beenden."
 
 #~ msgid "Windows users can also use ConfigureSongDirectory.bat script."
-#~ msgstr ""
-#~ "Windows-Benutzer können auch das ConfigureSongDirectory.bat Script "
-#~ "benutzen."
+#~ msgstr "Windows-Benutzer können auch das ConfigureSongDirectory.bat Script benutzen."
 
 #, fuzzy
 #~ msgid "Back to song browser"
@@ -2372,22 +2232,14 @@ msgstr "nach Sprache sortiert"
 #~ msgid "System paths."
 #~ msgstr "Systempfad"
 
-#~ msgid ""
-#~ "Part of sound card name or its number or empty to use the first available "
-#~ "device. Used currently for MIDI drum controllers."
-#~ msgstr ""
-#~ "Teil der Bezeichnung der Soundkarte oder die Nummer oder Freilassen für "
-#~ "das erste verfügbare Gerät. Momentan für MIDI Schlagzeug genutzt."
+#~ msgid "Part of sound card name or its number or empty to use the first available device. Used currently for MIDI drum controllers."
+#~ msgstr "Teil der Bezeichnung der Soundkarte oder die Nummer oder Freilassen für das erste verfügbare Gerät. Momentan für MIDI Schlagzeug genutzt."
 
 #~ msgid "3D notes"
 #~ msgstr "3D Noten"
 
-#~ msgid ""
-#~ "Draw instrument notes as 3-dimensional objects. May hurt performance on "
-#~ "older hardware."
-#~ msgstr ""
-#~ "Zeichnet die Noten der Instrumente als dreidimensionale Objekte. "
-#~ "Deaktivieren kann auf älterer Hardware die Performance verbessern."
+#~ msgid "Draw instrument notes as 3-dimensional objects. May hurt performance on older hardware."
+#~ msgstr "Zeichnet die Noten der Instrumente als dreidimensionale Objekte. Deaktivieren kann auf älterer Hardware die Performance verbessern."
 
 #, fuzzy
 #~ msgid "Loading theme..."
