@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-08-30 22:31+0200\n"
-"PO-Revision-Date: 2017-08-30 22:33+0200\n"
+"PO-Revision-Date: 2021-09-11 02:23+0200\n"
 "Last-Translator: Arjan Speiard | Asgard Sings! <arjan.spieard@gmail.com>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _;translate_noop\n"
 "X-Poedit-Basepath: .\n"
-"X-Generator: Poedit 2.0.1\n"
+"X-Generator: Poedit 2.3\n"
 "X-Poedit-SearchPath-0: ../game\n"
 "X-Poedit-SearchPath-1: ../data\n"
 
@@ -94,13 +94,13 @@ msgstr "Name des zu benutzenden Themas."
 
 #: ../data/config/schema.xml:75
 msgid "Playlist screen timeout"
-msgstr ""
+msgstr "Auszeit der Abspiellistenanzeige "
 
 #: ../data/config/schema.xml:76
 msgid ""
 "How long it will take before the next song in the playlist starts "
 "automatically."
-msgstr ""
+msgstr "Dauer bevor der nächste Song der Abspielliste gestartet wird."
 
 #: ../data/config/schema.xml:84
 msgid "Webserver access"
@@ -136,7 +136,7 @@ msgstr "Tastatur als Schlagzeug nutzen"
 
 #: ../data/config/schema.xml:99
 msgid "Enable keyboard as drumkit."
-msgstr "Aktiviere Tastatur als Schlagzeug"
+msgstr "Aktiviere Tastatur als Schlagzeug."
 
 #: ../data/config/schema.xml:102
 msgid "Keyboard as dance pad"
@@ -144,7 +144,7 @@ msgstr "Tastatur als Dancepad nutzen"
 
 #: ../data/config/schema.xml:103
 msgid "Enable keyboard as dance pad."
-msgstr "Aktiviere Keyboard als Dancepad"
+msgstr "Aktiviere Keyboard als Dancepad."
 
 #: ../data/config/schema.xml:106
 msgid "Keyboard as keytar"
@@ -152,7 +152,7 @@ msgstr "Tastatur als Keytar"
 
 #: ../data/config/schema.xml:107
 msgid "Enable keyboard as keytar."
-msgstr "Benutze Tastatur als Keytar"
+msgstr "Benutze Tastatur als Keytar."
 
 #: ../data/config/schema.xml:114
 msgid "Force controller A's type"
@@ -204,7 +204,7 @@ msgstr "Eingabegeräte konfigurieren"
 
 #: ../data/config/schema.xml:147
 msgid "Force joystick to some kind of instrument."
-msgstr "Erzwinge Eingabegerät als spezielles Instrument"
+msgstr "Erzwinge Eingabegerät als spezielles Instrument."
 
 #: ../data/config/schema.xml:150
 msgid "Hardware MIDI input device"
@@ -232,7 +232,7 @@ msgstr "Fensterbreite"
 
 #: ../data/config/schema.xml:175
 msgid "The width of the window."
-msgstr "Breite des Fensters"
+msgstr "Breite des Fensters."
 
 #: ../data/config/schema.xml:180
 msgid "Windowed height"
@@ -240,7 +240,7 @@ msgstr "Fensterhöhe"
 
 #: ../data/config/schema.xml:181
 msgid "The height of the window."
-msgstr "Höhe des Fensters"
+msgstr "Höhe des Fensters."
 
 #: ../data/config/schema.xml:184
 msgid "Fullscreen mode"
@@ -248,7 +248,7 @@ msgstr "Vollbildmodus"
 
 #: ../data/config/schema.xml:185
 msgid "Enable fullscreen mode on startup."
-msgstr "Aktivere Vollbild beim Start"
+msgstr "Aktivere Vollbild beim Start."
 
 #: ../data/config/schema.xml:188
 msgid "Stereoscopic 3D"
@@ -312,7 +312,7 @@ msgstr "Webcam ID"
 msgid ""
 "Use -1 to autodetect or a number starting from 0 to choose specific device."
 msgstr ""
-"Benutze -1 für Autoerkennung oder wähle eine Zahl für ein spezielles Geräte"
+"Benutze -1 für Autoerkennung oder wähle eine Zahl für ein spezielles Geräte."
 
 #: ../data/config/schema.xml:222
 msgid "SVG quality"
@@ -430,7 +430,7 @@ msgstr "Menü Lautstärke"
 
 #: ../data/config/schema.xml:273
 msgid "The volume level of menus, song previews and jukebox mode."
-msgstr "Lautstärke in den Menüs, Lied-Previews und im Jukebox-Modus"
+msgstr "Lautstärke in den Menüs, Lied-Previews und im Jukebox-Modus."
 
 #: ../data/config/schema.xml:278
 msgid "Music volume"
@@ -454,7 +454,7 @@ msgid ""
 "distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
 msgstr ""
 "Die Lautstärke der Musik im Falle des Verspielens. Werte über 90 werden "
-"nicht empfohlen aufgrund von Verzerrungen und anderen Störungen."
+"nicht empfohlen aufgrund von Verzerrungen und anderen Störungen!"
 
 #: ../data/config/schema.xml:288
 msgid "Microphone pass-through"
@@ -495,7 +495,7 @@ msgstr ""
 
 #: ../data/config/schema.xml:314 ../game/screen_paths.cc:74
 msgid "Show hidden folders"
-msgstr ""
+msgstr "Zeige versteckte Verzeichnisse an"
 
 #: ../data/config/schema.xml:315
 msgid "When true the screen_paths will also show hidden folders"
@@ -519,19 +519,19 @@ msgstr "Sortierreihenfolge"
 
 #: ../data/config/schema.xml:326
 msgid "Currently active sort order"
-msgstr ""
+msgstr "Gerade aktive Sortierung"
 
 #: ../data/performous.desktop:3
 msgid "Performous"
-msgstr ""
+msgstr "Performous"
 
 #: ../data/performous.desktop:4
 msgid "A karaoke game"
-msgstr ""
+msgstr "Ein Karaoke-Spiel"
 
 #: ../data/performous.desktop:13
 msgid "performous"
-msgstr ""
+msgstr "Performous"
 
 #: ../data/performous.desktop:17
 msgid "song;music;dance;karaoke;microphone;sound;singing;"
@@ -597,7 +597,7 @@ msgstr "Beenden"
 #: ../game/instrumentgraph.cc:59 ../game/screen_sing.cc:94
 #: ../game/screen_sing.cc:131
 msgid "Exit to song browser"
-msgstr "Zurück zum Liedbrowser."
+msgstr "Zurück zum Liedbrowser"
 
 #: ../game/dancegraph.cc:248
 msgid "STOP!"
@@ -635,7 +635,7 @@ msgstr "Modus Linkshänder auswählen"
 msgid ""
 "God Mode\n"
 "Activated!"
-msgstr "God Mode aktiviert"
+msgstr "God Mode aktiviert!"
 
 #: ../game/guitargraph.cc:462
 msgid "Mistakes ignored!"
@@ -780,7 +780,7 @@ msgstr "Üben"
 
 #: ../game/screen_intro.cc:173
 msgid "Check your skills or test the microphones"
-msgstr "Teste deine Fähigkeiten - oder das Mikro!"
+msgstr "Teste deine Fähigkeiten - oder das Mikro"
 
 #: ../game/screen_intro.cc:189
 msgid "Configure"
@@ -810,35 +810,35 @@ msgstr ""
 
 #: ../game/screen_paths.cc:69
 msgid "Hide hidden folders"
-msgstr ""
+msgstr "Versteckte Verzeichnisse nicht anzeigen"
 
 #: ../game/screen_paths.cc:81
 msgid "Remove this folder"
-msgstr ""
+msgstr "Dieses Verzeichnis entfernen"
 
 #: ../game/screen_paths.cc:81
 msgid "Remove current folder from song folders"
-msgstr ""
+msgstr "Aktuelles Verzeichnis aus Song-Verzeichnissen entfernen"
 
 #: ../game/screen_paths.cc:87
 msgid "Add this folder"
-msgstr ""
+msgstr "Füge dieses Verzeichnis hinzu"
 
 #: ../game/screen_paths.cc:87
 msgid "Add current folder to song folders"
-msgstr ""
+msgstr "Akuelles Verzeichnis zu Song-Verzeichnissen hinzufügen"
 
 #: ../game/screen_paths.cc:93
 msgid ".."
-msgstr ""
+msgstr ".."
 
 #: ../game/screen_paths.cc:93
 msgid "Go up one folder"
-msgstr ""
+msgstr "Wechsel zum übergeordneten Verzeichnis"
 
 #: ../game/screen_paths.cc:104
 msgid "Open folder"
-msgstr ""
+msgstr "Öffne Verzeichnis"
 
 #: ../game/screen_players.cc:117
 msgid "No players found!"
@@ -862,7 +862,7 @@ msgstr "Du hast %1% punkte erreicht!"
 
 #: ../game/screen_players.cc:130
 msgid "Change player with arrow keys."
-msgstr "Du kannst die Spieler mit den Pfeiltasten wechseln"
+msgstr "Du kannst die Spieler mit den Pfeiltasten wechseln."
 
 #: ../game/screen_players.cc:131
 msgid "Name:"
@@ -882,7 +882,7 @@ msgstr "Initialisiere Webcam..."
 
 #: ../game/screen_playlist.cc:46
 msgid "Loading song timestamps..."
-msgstr ""
+msgstr "Lade Song-Zeitstempel"
 
 #: ../game/screen_playlist.cc:171 ../game/screen_playlist.cc:334
 msgid "Continue"
@@ -1048,7 +1048,7 @@ msgstr "KICK um teilzunehmen!"
 
 #: ../game/screen_sing.cc:521
 msgid "   ENTER to skip instrumental break"
-msgstr "ENTER um Vorbereitung abzubrechen"
+msgstr " ENTER um Vorbereitung abzubrechen"
 
 #: ../game/screen_sing.cc:525 ../game/screen_sing.cc:539
 msgid "   Autoplay enabled"
@@ -1056,7 +1056,7 @@ msgstr "   Automatische Wiedergabe aktiviert"
 
 #: ../game/screen_sing.cc:528 ../game/screen_sing.cc:536
 msgid "   Remember to wait for grading!"
-msgstr "Bitte Warte auf die Bewertung!"
+msgstr " Bitte Warte auf die Bewertung!"
 
 #: ../game/screen_sing.cc:669
 msgid "No player!"
@@ -1134,11 +1134,11 @@ msgstr "Optionen"
 
 #: ../game/screen_songs.cc:317
 msgid "sort order: "
-msgstr "Sortierreihenfolge:"
+msgstr "Sortierreihenfolge: "
 
 #: ../game/screen_songs.cc:318
 msgid "type filter: "
-msgstr "Typfilter:"
+msgstr "Typfilter: "
 
 #: ../game/screen_songs.cc:319
 msgid "hiscores"
@@ -1354,67 +1354,67 @@ msgstr "Nein"
 
 #: ../game/webserver.cc:308
 msgid "Move down"
-msgstr ""
+msgstr "Runter"
 
 #: ../game/webserver.cc:309
 msgid "Set position"
-msgstr ""
+msgstr "Positionieren"
 
 #: ../game/webserver.cc:310
 msgid "Remove song"
-msgstr ""
+msgstr "Entferne Song"
 
 #: ../game/webserver.cc:311
 msgid "Desired position of song"
-msgstr ""
+msgstr "Gewünsche Song-Position"
 
 #: ../game/webserver.cc:312
 msgid "Cancel"
-msgstr ""
+msgstr "Abbrechen"
 
 #: ../game/webserver.cc:313
 msgid "Successfully removed song from playlist"
-msgstr ""
+msgstr "Song erfolgreich aus Abspielliste entfernt"
 
 #: ../game/webserver.cc:314
 msgid "Failed removing song from playlist"
-msgstr ""
+msgstr "Entfernen des Songs aus der Abspielliste fehlgeschlagen"
 
 #: ../game/webserver.cc:315
 msgid "Successfully changed position of song"
-msgstr ""
+msgstr "Song-Position erfolgreich geändert"
 
 #: ../game/webserver.cc:316
 msgid "Failed changing position of song"
-msgstr ""
+msgstr "Song-Position konnte nicht geändert werden"
 
 #: ../game/webserver.cc:317
 msgid "Successfully moved song up"
-msgstr ""
+msgstr "Song erfolgreich nach oben bewegt"
 
 #: ../game/webserver.cc:318
 msgid "Failed moving song up"
-msgstr ""
+msgstr "Song konnte nicht nach oben bewegt werden"
 
 #: ../game/webserver.cc:319
 msgid "Successfully moved song down"
-msgstr ""
+msgstr "Song erfolgreich nach unter bewegt"
 
 #: ../game/webserver.cc:320
 msgid "Failed moving song down"
-msgstr ""
+msgstr "Song konnte nicht nach unter bewegt werden"
 
 #: ../game/webserver.cc:321
 msgid "Successfully added song to the playlist"
-msgstr ""
+msgstr "Song in Abspielliste aufgnommen"
 
 #: ../game/webserver.cc:322
 msgid "Failed adding song to the playlist"
-msgstr ""
+msgstr "Song konnte nicht in Wiedergabelist aufgenommen werden"
 
 #: ../game/webserver.cc:323
 msgid "No songs found with current filter"
-msgstr ""
+msgstr "Der aktuelle Filter liefert keine Songs"
 
 #~ msgid ""
 #~ "This tool is not yet available.\n"
