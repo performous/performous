@@ -94,7 +94,15 @@ to save the current settings to XML.
 		<limits min="0" max="30" step="5" />
 		<short>High-score timeout</short>
 		<long>How long the high-scores screen will wait for input before going to the next song.</long>
-	</entry>	
+	</entry>
+	<entry name="game/language" type="int" value="1337">
+		<limits>
+			<enum>Auto</enum>
+			<!-- enum options will be added dynamically according to detected interfaces. -->
+		</limits>
+		<short>Language</short>
+		<long>Language to show Performous in</long>
+	</entry>
 	<entry name="game/webserver_access" type="int" value="0">
 		<limits>
 			<enum>Disabled</enum>
@@ -286,10 +294,10 @@ to save the current settings to XML.
 		<short>Webcam background</short>
 		<long>Performous can use webcam as a background video. Disable it if Performous crashes while entering a song.</long>
 	</entry>
-	<entry name="graphic/webcamid" type="int" value="-1">
-		<limits min="-1" max="9" step="1" />
+	<entry name="graphic/webcamid" type="int" value="0">
+		<limits min="0" max="9" step="1" />
 		<short>Webcam id</short>
-		<long>Use -1 to autodetect or a number starting from 0 to choose specific device.</long>
+		<long>Use 0 to autodetect or a number starting from 1 to choose specific device.</long>
 	</entry>
 	<entry name="graphic/svg_lod" type="float" value="1.5">
 		<ui unit="x" />

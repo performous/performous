@@ -7,7 +7,7 @@
 
 #include <boost/predef/os.h>
 
-#include <SDL2/SDL_events.h>
+#include <SDL_events.h>
 
 #if (BOOST_OS_WINDOWS) 
 #include <sys/types.h>
@@ -21,7 +21,7 @@ using STAT = struct stat;
 #endif
 
 struct Platform {
-enum HostOS { OS_WIN, OS_LINUX, OS_MAC, OS_BSD, OS_SOLARIS, OS_UNIX };
+enum class HostOS { OS_WIN, OS_LINUX, OS_MAC, OS_BSD, OS_SOLARIS, OS_UNIX };
 Platform();
 static HostOS currentOS();
 static uint16_t shortcutModifier(bool eitherSide = true);

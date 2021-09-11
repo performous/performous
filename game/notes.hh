@@ -60,7 +60,7 @@ struct Note {
 	/// which players sung well
 	mutable std::vector<Color> stars;
 	/// note type
-	enum Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', GOLDEN2 = 'G', SLIDE = '+', SLEEP = '-', RAP = 'R',
+	enum class Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', GOLDEN2 = 'G', SLIDE = '+', SLEEP = '-', RAP = 'R',
 	  TAP = '1', HOLDBEGIN = '2', HOLDEND = '3', ROLL = '4', MINE = 'M', LIFT = 'L'} type;
 	int note; ///< MIDI pitch of the note (at the end for slide notes)
 	int notePrev; ///< MIDI pitch of the previous note (should be same as note for everything but SLIDE)
@@ -81,8 +81,9 @@ struct Note {
 	/// Compares begin of two notes
 	static bool ltBegin(Note const& a, Note const& b) {
 		if (a.begin == b.begin) {
-			if (a.type == Note::SLEEP) return true;
-			if (b.type == Note::SLEEP) return false;			
+			if (a.type == b.type) return false;
+			if (a.type == Note::Type::SLEEP) return true;
+			if (b.type == Note::Type::SLEEP) return false;
 		}
 		return a.begin < b.begin; 
 	}
@@ -90,11 +91,11 @@ struct Note {
 	static bool ltEnd(Note const& a, Note const& b) { return a.end < b.end; }
 	/// Compare equality of two notes, used for deleting duplicates when programatically creating the duet track.
 	static bool equal(Note const& a, Note const& b) { 
-		if (a.type == Note::SLEEP) return (a.type == b.type);
+		if (a.type == Note::Type::SLEEP) return (a.type == b.type);
 		return (a.begin == b.begin && a.end == b.end && a.note == b.note && a.type == b.type);
 	}
 	/// Check if two notes overlap
-	static bool overlapping(Note const& a, Note const& b) { return (a.end > b.begin && a.type != Note::SLEEP && b.type != Note::SLEEP); }
+	static bool overlapping(Note const& a, Note const& b) { return (a.end > b.begin && a.type != Note::Type::SLEEP && b.type != Note::Type::SLEEP); }
   private:
 	double scoreMultiplier() const;
 };
@@ -128,19 +129,19 @@ struct DanceTrack {
 	Notes notes;
 };
 
-enum class GameDifficulty{
+enum class GameDifficulty {
 	NORMAL,
 	HARD,
 	PERFECT
 };
 
-enum DanceDifficulty {
+enum class DanceDifficulty : int {
 	BEGINNER,
 	EASY,
 	MEDIUM,
 	HARD,
 	CHALLENGE,
-	DIFFICULTYCOUNT
+	COUNT
 };
 
 typedef std::map<DanceDifficulty, DanceTrack> DanceDifficultyMap;
