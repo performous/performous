@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-10 23:47+0200\n"
-"PO-Revision-Date: 2021-09-10 23:57+0200\n"
+"POT-Creation-Date: 2017-08-30 22:31+0200\n"
+"PO-Revision-Date: 2021-09-13 17:47+0200\n"
 "Last-Translator: Arjan Speiard | Asgard Sings! <arjan.spieard@gmail.com>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -110,8 +110,6 @@ msgstr "Verstecke Tonhöhen-Welle, Noten und Punkte."
 #. type: int
 #. value: 0
 #: ../data/config/schema.xml:57
-#, fuzzy
-#| msgid "Select difficulty"
 msgid "Difficulty"
 msgstr "Schwierigkeit auswählen"
 
@@ -194,7 +192,7 @@ msgstr "Name des zu benutzenden Themas."
 #. value: 15
 #: ../data/config/schema.xml:85
 msgid "Playlist screen timeout"
-msgstr ""
+msgstr "Auszeit der Abspiellistenanzeige"
 
 #. Playlist screen timeout
 #. How long it will take before the next song in the playlist starts automatically.
@@ -205,7 +203,7 @@ msgstr ""
 msgid ""
 "How long it will take before the next song in the playlist starts "
 "automatically."
-msgstr ""
+msgstr "Dauer bevor der nächste Song der Abspielliste gestartet wird."
 
 #. Song results timeout
 #. How long the scores will be displayed for after finishing a song.
@@ -214,7 +212,7 @@ msgstr ""
 #. value: 5
 #: ../data/config/schema.xml:90
 msgid "Song results timeout"
-msgstr ""
+msgstr "Dauer der Ergebnisanzeige"
 
 #. Song results timeout
 #. How long the scores will be displayed for after finishing a song.
@@ -223,7 +221,7 @@ msgstr ""
 #. value: 5
 #: ../data/config/schema.xml:91
 msgid "How long the scores will be displayed for after finishing a song."
-msgstr ""
+msgstr "Dauer der Anzeige des Ergebnisses nach dem Beenden eines Songs."
 
 #. High-score timeout
 #. How long the high-scores screen will wait for input before going to the next song.
@@ -232,7 +230,7 @@ msgstr ""
 #. value: 5
 #: ../data/config/schema.xml:95
 msgid "High-score timeout"
-msgstr ""
+msgstr "Anzeigedauer Punktestand"
 
 #. High-score timeout
 #. How long the high-scores screen will wait for input before going to the next song.
@@ -244,6 +242,7 @@ msgid ""
 "How long the high-scores screen will wait for input before going to the next "
 "song."
 msgstr ""
+"Dauer bevor die Anzeige des Punktestandes zur nächsten Anzeige wechselt."
 
 #. Language
 #. Language to show Performous in
@@ -270,7 +269,7 @@ msgstr "Sprache zum Anzeigen Performous in"
 #. value: 0
 #: ../data/config/schema.xml:112
 msgid "Webserver access"
-msgstr ""
+msgstr "Zugriff auf Webserver"
 
 #. Webserver access
 #. Define if you want to control performous remotely with web interface (requires restart).
@@ -281,7 +280,7 @@ msgstr ""
 msgid ""
 "Define if you want to control performous remotely with web interface "
 "(requires restart)."
-msgstr ""
+msgstr "Fernzugriff auf Performous (erfordert einen Neustart)."
 
 #. Case-sensitive sorting.
 #. Make a difference between uppercase and lowercase letters when sorting.
@@ -290,7 +289,7 @@ msgstr ""
 #. value: false
 #: ../data/config/schema.xml:116
 msgid "Case-sensitive sorting."
-msgstr ""
+msgstr "Sortierung beachtet Groß-Kleinschreibung."
 
 #. Case-sensitive sorting.
 #. Make a difference between uppercase and lowercase letters when sorting.
@@ -299,7 +298,7 @@ msgstr ""
 #. value: false
 #: ../data/config/schema.xml:117
 msgid "Make a difference between uppercase and lowercase letters when sorting."
-msgstr ""
+msgstr "Unterscheidet Groß- und Kleinschreibung bei der Sortierung."
 
 #. Webserver port
 #. Port to use for the webserver. Choose one that is not used by other applications.
@@ -308,7 +307,7 @@ msgstr ""
 #. value: 8000
 #: ../data/config/schema.xml:122
 msgid "Webserver port"
-msgstr ""
+msgstr "Port des Webserver"
 
 #. Webserver port
 #. Port to use for the webserver. Choose one that is not used by other applications.
@@ -320,6 +319,8 @@ msgid ""
 "Port to use for the webserver. Choose one that is not used by other "
 "applications."
 msgstr ""
+"Port zur Verwendung für Webserver. Wählen Sie eine aus die nicht von anderen "
+"Programs verwendet wird."
 
 #. Webserver fallback port
 #. Port to use in case original webserver port is in use. Choose one that you know for sure is not used by other applications.
@@ -328,7 +329,7 @@ msgstr ""
 #. value: 8001
 #: ../data/config/schema.xml:128
 msgid "Webserver fallback port"
-msgstr ""
+msgstr "Fallback-Port des Webserver"
 
 #. Webserver fallback port
 #. Port to use in case original webserver port is in use. Choose one that you know for sure is not used by other applications.
@@ -340,6 +341,8 @@ msgid ""
 "Port to use in case original webserver port is in use. Choose one that you "
 "know for sure is not used by other applications."
 msgstr ""
+"Fallback-Port des Webserver welches verwendet kann werden wenn die normales "
+"Webserver port schon verwendet ist."
 
 #. Note Graph Scaling
 #. Type of scaling the note graph.
@@ -348,7 +351,7 @@ msgstr ""
 #. value: 0
 #: ../data/config/schema.xml:140
 msgid "Note Graph Scaling"
-msgstr ""
+msgstr "Skalierung der Notenanzeige"
 
 #. Note Graph Scaling
 #. Type of scaling the note graph.
@@ -357,7 +360,7 @@ msgstr ""
 #. value: 0
 #: ../data/config/schema.xml:141
 msgid "Type of scaling the note graph."
-msgstr ""
+msgstr "Wählt die Art der Skalierung der Notenanzeige."
 
 #. Keyboard as guitar
 #. Enable keyboard as guitar (Frets on Fire mode).
@@ -402,7 +405,7 @@ msgstr "Aktiviere Tastatur als Schlagzeug."
 #. value: true
 #: ../data/config/schema.xml:152
 msgid "Drums use Pro mode"
-msgstr ""
+msgstr "Drums verwenden den Pro-Modus"
 
 #. Drums use Pro mode
 #. Drums use Pro mode. (Toms are not cymbals.)
@@ -411,7 +414,7 @@ msgstr ""
 #. value: true
 #: ../data/config/schema.xml:153
 msgid "Drums use Pro mode. (Toms are not cymbals.)"
-msgstr ""
+msgstr "Drums verwenden den Pro-Modus. (Toms sind keine Becken.)"
 
 #. Keyboard as dance pad
 #. Enable keyboard as dance pad.
@@ -575,7 +578,7 @@ msgstr ""
 #. type: string_list
 #: ../data/config/schema.xml:233
 msgid "Word Collation"
-msgstr ""
+msgstr "Wortvergleich"
 
 #. Word Collation
 #. Words that should be ignored when sorting.
@@ -583,7 +586,7 @@ msgstr ""
 #. type: string_list
 #: ../data/config/schema.xml:234
 msgid "Words that should be ignored when sorting."
-msgstr ""
+msgstr "Zu ignorierende Wörter beim Sortieren."
 
 #. Windowed width
 #. The width of the window.
@@ -632,8 +635,6 @@ msgstr "Höhe des Fensters."
 #. value: 0
 #. hidden: true
 #: ../data/config/schema.xml:253
-#, fuzzy
-#| msgid "The width of the window."
 msgid "X-Position of the window"
 msgstr "Breite des Fensters"
 
@@ -684,6 +685,8 @@ msgstr "Grafik mit hoher DPI"
 #: ../data/config/schema.xml:264
 msgid "Enable High-DPI (Retina) graphics when supported; requires restart."
 msgstr ""
+"Aktivieren Sie Grafik mit hoher DPI (Retina) wenn diese unterstützt werden; "
+"Erfordert einen Neustart."
 
 #. Fullscreen mode
 #. Enable fullscreen mode on startup.
@@ -825,7 +828,7 @@ msgstr "Webcam ID"
 msgid ""
 "Use 0 to autodetect or a number starting from 1 to choose specific device."
 msgstr ""
-"Benutze -1 für Autoerkennung oder wähle eine Zahl für ein spezielles Geräte."
+"Benutze 0 für Autoerkennung oder wähle eine Zahl für ein spezielles Geräte."
 
 #. SVG quality
 #. Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster.
@@ -925,8 +928,6 @@ msgstr ""
 #. type: int
 #. value: 1337
 #: ../data/config/schema.xml:331
-#, fuzzy
-#| msgid "Audio Devices"
 msgid "Audio Backend"
 msgstr "Audiogeräte"
 
@@ -940,6 +941,8 @@ msgid ""
 "Configure which audio backend to use; not all backends will be supported on "
 "all platforms."
 msgstr ""
+"Konfigurieren welches Audio-Back-End verwendet werden soll; Nicht alle "
+"Backends werden auf allen Plattformen unterstützt."
 
 #. Audio/video latency
 #. Affects all modes. Use negative value if your display input lag is greater than the sound card output latency, positive values in the opposite case and zero if they are equal. This should be set so that the notes pass the cursor at the same time the audio is heard. Use 'Ctrl + ,' or 'Ctrl + .' to adjust this while performing.
@@ -967,7 +970,7 @@ msgstr ""
 "Lag größer ist als die Soundkarten-Ausgabe-Latenz, positive Werte im "
 "umgekehrten Fall und Null, falls sie gleich sind. Dies sollte so eingestellt "
 "sein, dass die Noten den Cursor in dem Moment passieren, wenn der Ton zu "
-"hören ist. Verwende 'Strg +,' oder 'Strg + .' , um dies während deines "
+"hören ist. Verwende 'Strg + ,' oder 'Strg + .', um dies während deines "
 "Auftritts anzupassen."
 
 #. Audio round-trip latency
@@ -1185,7 +1188,7 @@ msgstr ""
 #. value: false
 #: ../data/config/schema.xml:399 ../game/screen_paths.cc:74
 msgid "Show hidden folders"
-msgstr ""
+msgstr "Zeige versteckte Verzeichnisse an"
 
 #. Show hidden folders
 #. When true the screen 'Paths' will also show hidden folders.
@@ -1194,15 +1197,13 @@ msgstr ""
 #. value: false
 #: ../data/config/schema.xml:400
 msgid "When true the screen 'Paths' will also show hidden folders."
-msgstr ""
+msgstr "Wenn wahr auch versteckte Ordner anzeigen."
 
 #. Default Song folders
 #. Where to recursively look for songs. DATADIR at the beginning means all Performous data folders.
 #. name: paths/system-songs
 #. type: string_list
 #: ../data/config/schema.xml:417
-#, fuzzy
-#| msgid "Song folders"
 msgid "Default Song folders"
 msgstr "Liederordner"
 
@@ -1244,19 +1245,19 @@ msgstr "Sortierreihenfolge"
 #. hidden: true
 #: ../data/config/schema.xml:429
 msgid "Currently active sort order."
-msgstr ""
+msgstr "Gerade aktive Sortierung."
 
 #: ../data/performous.desktop:3
 msgid "Performous"
-msgstr ""
+msgstr "Performous"
 
 #: ../data/performous.desktop:4
 msgid "A karaoke game"
-msgstr ""
+msgstr "Ein Karaoke-Spiel"
 
 #: ../data/performous.desktop:17
 msgid "song;music;dance;karaoke;microphone;sound;singing;"
-msgstr ""
+msgstr "song;musik;tanz;karaoke;mikrofon;klang;singen;"
 
 #: ../game/configuration.cc:147
 msgid "Enabled"
@@ -1357,51 +1358,51 @@ msgstr "Herausforderung"
 
 #: ../game/dancegraph.cc:51 ../game/dancegraph.cc:59
 msgid "Perfect!"
-msgstr ""
+msgstr "Perfekt!"
 
 #: ../game/dancegraph.cc:52
 msgid "Excellent!-"
-msgstr ""
+msgstr "Exzellent!-"
 
 #: ../game/dancegraph.cc:53
 msgid "Great!-"
-msgstr ""
+msgstr "Super!-"
 
 #: ../game/dancegraph.cc:54
 msgid " Good!- "
-msgstr ""
+msgstr " Gut!- "
 
 #: ../game/dancegraph.cc:55
 msgid "  OK!-  "
-msgstr ""
+msgstr "  OK!-  "
 
 #: ../game/dancegraph.cc:56
 msgid "Late!-"
-msgstr ""
+msgstr "Zu spät!-"
 
 #: ../game/dancegraph.cc:57 ../game/dancegraph.cc:65
 msgid "Way off!"
-msgstr ""
+msgstr "Viel zu spät!"
 
 #: ../game/dancegraph.cc:60
 msgid "-Excellent!"
-msgstr ""
+msgstr "-Großartig!"
 
 #: ../game/dancegraph.cc:61
 msgid "-Great!"
-msgstr ""
+msgstr "-Prima!"
 
 #: ../game/dancegraph.cc:62
 msgid " -Good! "
-msgstr ""
+msgstr " -Gut! "
 
 #: ../game/dancegraph.cc:63
 msgid "  -OK!  "
-msgstr ""
+msgstr "  -OK!  "
 
 #: ../game/dancegraph.cc:64
 msgid "-Early!"
-msgstr ""
+msgstr "-Zu früh!"
 
 #: ../game/dancegraph.cc:106 ../game/guitargraph.cc:194
 msgid "Ready!"
@@ -1488,7 +1489,7 @@ msgstr "Solo!"
 
 #: ../game/i18n.hh:63 ../game/i18n.hh:100
 msgid "Auto"
-msgstr "Automatische"
+msgstr "Automatisch"
 
 #: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:149
 msgid "Resume"
@@ -1520,23 +1521,23 @@ msgstr ""
 
 #: ../game/layout_singer.cc:72
 msgid "Perfect"
-msgstr ""
+msgstr "Perfekt"
 
 #: ../game/layout_singer.cc:73
 msgid "Excellent"
-msgstr ""
+msgstr "Exzellent"
 
 #: ../game/layout_singer.cc:74
 msgid "Great"
-msgstr ""
+msgstr "Super"
 
 #: ../game/layout_singer.cc:75
 msgid "Good"
-msgstr ""
+msgstr "Gut"
 
 #: ../game/layout_singer.cc:76
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: ../game/main.cc:148
 msgid "Loading audio samples..."
@@ -1559,6 +1560,8 @@ msgid ""
 "Done Loading!\n"
 " Loaded "
 msgstr ""
+"Laden beendet!\n"
+"Geladen "
 
 #: ../game/main.cc:190
 msgid "Screenshot taken!"
@@ -1582,7 +1585,7 @@ msgstr "Abspielliste anzeigen"
 
 #: ../game/requesthandler.cc:335
 msgid "Search and add"
-msgstr "Suchen & Hinzufügen"
+msgstr "Suchen & hinzufügen"
 
 #: ../game/requesthandler.cc:336
 msgid "Sort by"
@@ -1662,67 +1665,67 @@ msgstr "Hochschieben"
 
 #: ../game/requesthandler.cc:356 ../game/screen_playlist.cc:386
 msgid "Move down"
-msgstr ""
+msgstr "Runterschieben"
 
 #: ../game/requesthandler.cc:357
 msgid "Set position"
-msgstr ""
+msgstr "Positionieren"
 
 #: ../game/requesthandler.cc:358
 msgid "Remove song"
-msgstr ""
+msgstr "Entferne Song"
 
 #: ../game/requesthandler.cc:359
 msgid "Desired position of song"
-msgstr ""
+msgstr "Gewünschte Songposition"
 
 #: ../game/requesthandler.cc:360
 msgid "Cancel"
-msgstr ""
+msgstr "Abbrechen"
 
 #: ../game/requesthandler.cc:361
 msgid "Successfully removed song from playlist."
-msgstr ""
+msgstr "Song erfolgreich aus Abspielliste entfernt."
 
 #: ../game/requesthandler.cc:362
 msgid "Failed removing song from playlist!"
-msgstr "Entferne das Lied von der Abspielliste!"
+msgstr "Entfernen des Songs aus der Abspielliste fehlgeschlagen!"
 
 #: ../game/requesthandler.cc:363
 msgid "Successfully changed position of song."
-msgstr ""
+msgstr "Song-Position erfolgreich geändert."
 
 #: ../game/requesthandler.cc:364
 msgid "Failed changing position of song!"
-msgstr ""
+msgstr "Song-Position konnte nicht geändert werden!"
 
 #: ../game/requesthandler.cc:365
 msgid "Successfully moved song up."
-msgstr ""
+msgstr "Song erfolgreich nach oben bewegt."
 
 #: ../game/requesthandler.cc:366
 msgid "Failed moving song up!"
-msgstr ""
+msgstr "Song konnte nicht nach oben bewegt werden!"
 
 #: ../game/requesthandler.cc:367
 msgid "Successfully moved song down."
-msgstr ""
+msgstr "Song erfolgreich nach unter bewegt."
 
 #: ../game/requesthandler.cc:368
 msgid "Failed moving song down!"
-msgstr ""
+msgstr "Song konnte nicht nach unter bewegt werden!"
 
 #: ../game/requesthandler.cc:369
 msgid "Successfully added song to the playlist."
-msgstr ""
+msgstr "Song in Abspielliste aufgnommen."
 
 #: ../game/requesthandler.cc:370
 msgid "Failed adding song to the playlist!"
-msgstr "Schiebe dieses Lied auf der Liste nach unten!"
+msgstr "Song konnte nicht in Abspielliste aufgenommen werden!"
 
 #: ../game/requesthandler.cc:371
 msgid "No songs found with current filter."
-msgstr ""
+msgstr "Der aktuelle Filter liefert keine Songs."
 
 #: ../game/screen_audiodevices.cc:66
 msgid ""
@@ -1819,38 +1822,40 @@ msgid ""
 " connect to this computer\n"
 "using: "
 msgstr ""
+"Webserver aktive!\n"
+" Gehe zu: "
 
 #: ../game/screen_paths.cc:69
 msgid "Hide hidden folders"
-msgstr ""
+msgstr "Versteckte Verzeichnisse nicht anzeigen"
 
 #: ../game/screen_paths.cc:81
 msgid "Remove this folder"
-msgstr ""
+msgstr "Dieses Verzeichnis entfernen"
 
 #: ../game/screen_paths.cc:81
 msgid "Remove current folder from song folders"
-msgstr ""
+msgstr "Aktuelles Verzeichnis aus Song-Verzeichnissen entfernen"
 
 #: ../game/screen_paths.cc:87
 msgid "Add this folder"
-msgstr ""
+msgstr "Füge dieses Verzeichnis hinzu"
 
 #: ../game/screen_paths.cc:87
 msgid "Add current folder to song folders"
-msgstr ""
+msgstr "Akuelles Verzeichnis zu Song-Verzeichnissen hinzufügen"
 
 #: ../game/screen_paths.cc:95
 msgid ".."
-msgstr ""
+msgstr ".."
 
 #: ../game/screen_paths.cc:95
 msgid "Go to parent folder"
-msgstr ""
+msgstr "Wechsel zum übergeordneten Verzeichnis"
 
 #: ../game/screen_paths.cc:122
 msgid "Open folder"
-msgstr ""
+msgstr "Öffne Verzeichnis"
 
 #: ../game/screen_players.cc:134
 msgid "No players found!"
@@ -1894,7 +1899,7 @@ msgstr "Initialisiere Webcam..."
 
 #: ../game/screen_playlist.cc:38
 msgid "Loading song timestamps..."
-msgstr ""
+msgstr "Lade Song-Zeitstempel..."
 
 #: ../game/screen_playlist.cc:181 ../game/screen_playlist.cc:352
 msgid "Continue"
@@ -2056,7 +2061,7 @@ msgstr "KICK um teilzunehmen!"
 
 #: ../game/screen_sing.cc:557
 msgid "   ENTER to skip instrumental break"
-msgstr "   ENTER um Vorbereitung abzubrechen"
+msgstr " ENTER um Vorbereitung abzubrechen"
 
 #: ../game/screen_sing.cc:562 ../game/screen_sing.cc:583
 msgid "   Autoplay enabled"
@@ -2068,11 +2073,11 @@ msgstr " Bitte Warte auf die Bewertung!"
 
 #: ../game/screen_sing.cc:567
 msgid "   Prepare for the next song!"
-msgstr ""
+msgstr "   Warte auf den nächsten Song!"
 
 #: ../game/screen_sing.cc:579
 msgid "   Choose your next song!"
-msgstr ""
+msgstr "   Wähle deinen nächsten Song!"
 
 #: ../game/screen_sing.cc:713
 msgid "No player!"
