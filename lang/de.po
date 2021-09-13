@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-10 23:47+0200\n"
-"PO-Revision-Date: 2021-09-10 23:57+0200\n"
+"POT-Creation-Date: 2017-08-30 22:31+0200\n"
+"PO-Revision-Date: 2021-09-11 02:23+0200\n"
 "Last-Translator: Arjan Speiard | Asgard Sings! <arjan.spieard@gmail.com>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _;translate_noop\n"
 "X-Poedit-Basepath: .\n"
-"X-Generator: Poedit 3.0\n"
+"X-Generator: Poedit 2.3\n"
 "X-Poedit-SearchPath-0: ../game\n"
 "X-Poedit-SearchPath-1: ../data\n"
 
@@ -194,7 +194,7 @@ msgstr "Name des zu benutzenden Themas."
 #. value: 15
 #: ../data/config/schema.xml:85
 msgid "Playlist screen timeout"
-msgstr ""
+msgstr "Auszeit der Abspiellistenanzeige "
 
 #. Playlist screen timeout
 #. How long it will take before the next song in the playlist starts automatically.
@@ -205,7 +205,7 @@ msgstr ""
 msgid ""
 "How long it will take before the next song in the playlist starts "
 "automatically."
-msgstr ""
+msgstr "Dauer bevor der nächste Song der Abspielliste gestartet wird."
 
 #. Song results timeout
 #. How long the scores will be displayed for after finishing a song.
@@ -624,38 +624,6 @@ msgstr "Fensterhöhe"
 #: ../data/config/schema.xml:248
 msgid "The height of the window."
 msgstr "Höhe des Fensters."
-
-#. X-Position of the window
-#. The X-Position of the window.
-#. name: graphic/window_pos_x
-#. type: int
-#. value: 0
-#. hidden: true
-#: ../data/config/schema.xml:253
-#, fuzzy
-#| msgid "The width of the window."
-msgid "X-Position of the window"
-msgstr "Breite des Fensters"
-
-#. X-Position of the window
-#. The X-Position of the window.
-#. name: graphic/window_pos_x
-#. type: int
-#. value: 0
-#. hidden: true
-#: ../data/config/schema.xml:254
-msgid "The X-Position of the window."
-msgstr "Breite des Fensters."
-
-#. Y-Position of the window
-#. The Y-Position of the window.
-#. name: graphic/window_pos_y
-#. type: int
-#. value: 0
-#. hidden: true
-#: ../data/config/schema.xml:259
-msgid "Y-Position of the window"
-msgstr "Höhe des Fensters"
 
 #. Y-Position of the window
 #. The Y-Position of the window.
@@ -1185,7 +1153,7 @@ msgstr ""
 #. value: false
 #: ../data/config/schema.xml:399 ../game/screen_paths.cc:74
 msgid "Show hidden folders"
-msgstr ""
+msgstr "Zeige versteckte Verzeichnisse an"
 
 #. Show hidden folders
 #. When true the screen 'Paths' will also show hidden folders.
@@ -1236,23 +1204,21 @@ msgstr ""
 msgid "Sort order"
 msgstr "Sortierreihenfolge"
 
-#. Sort order
-#. Currently active sort order.
-#. name: songs/sort-order
-#. type: int
-#. value: 0
-#. hidden: true
-#: ../data/config/schema.xml:429
-msgid "Currently active sort order."
-msgstr ""
+#: ../data/config/schema.xml:326
+msgid "Currently active sort order"
+msgstr "Gerade aktive Sortierung"
 
 #: ../data/performous.desktop:3
 msgid "Performous"
-msgstr ""
+msgstr "Performous"
 
 #: ../data/performous.desktop:4
 msgid "A karaoke game"
-msgstr ""
+msgstr "Ein Karaoke-Spiel"
+
+#: ../data/performous.desktop:13
+msgid "performous"
+msgstr "Performous"
 
 #: ../data/performous.desktop:17
 msgid "song;music;dance;karaoke;microphone;sound;singing;"
@@ -1797,9 +1763,9 @@ msgstr "Spielen"
 msgid "Practice"
 msgstr "Üben"
 
-#: ../game/screen_intro.cc:175
-msgid "Check your skills or test the microphones."
-msgstr "Teste deine Fähigkeiten - oder das Mikro."
+#: ../game/screen_intro.cc:173
+msgid "Check your skills or test the microphones"
+msgstr "Teste deine Fähigkeiten - oder das Mikro"
 
 #: ../game/screen_intro.cc:191
 msgid "Configure"
@@ -1822,35 +1788,35 @@ msgstr ""
 
 #: ../game/screen_paths.cc:69
 msgid "Hide hidden folders"
-msgstr ""
+msgstr "Versteckte Verzeichnisse nicht anzeigen"
 
 #: ../game/screen_paths.cc:81
 msgid "Remove this folder"
-msgstr ""
+msgstr "Dieses Verzeichnis entfernen"
 
 #: ../game/screen_paths.cc:81
 msgid "Remove current folder from song folders"
-msgstr ""
+msgstr "Aktuelles Verzeichnis aus Song-Verzeichnissen entfernen"
 
 #: ../game/screen_paths.cc:87
 msgid "Add this folder"
-msgstr ""
+msgstr "Füge dieses Verzeichnis hinzu"
 
 #: ../game/screen_paths.cc:87
 msgid "Add current folder to song folders"
-msgstr ""
+msgstr "Akuelles Verzeichnis zu Song-Verzeichnissen hinzufügen"
 
 #: ../game/screen_paths.cc:95
 msgid ".."
-msgstr ""
+msgstr ".."
 
-#: ../game/screen_paths.cc:95
-msgid "Go to parent folder"
-msgstr ""
+#: ../game/screen_paths.cc:93
+msgid "Go up one folder"
+msgstr "Wechsel zum übergeordneten Verzeichnis"
 
 #: ../game/screen_paths.cc:122
 msgid "Open folder"
-msgstr ""
+msgstr "Öffne Verzeichnis"
 
 #: ../game/screen_players.cc:134
 msgid "No players found!"
@@ -1894,7 +1860,7 @@ msgstr "Initialisiere Webcam..."
 
 #: ../game/screen_playlist.cc:38
 msgid "Loading song timestamps..."
-msgstr ""
+msgstr "Lade Song-Zeitstempel"
 
 #: ../game/screen_playlist.cc:181 ../game/screen_playlist.cc:352
 msgid "Continue"
@@ -2056,7 +2022,7 @@ msgstr "KICK um teilzunehmen!"
 
 #: ../game/screen_sing.cc:557
 msgid "   ENTER to skip instrumental break"
-msgstr "   ENTER um Vorbereitung abzubrechen"
+msgstr " ENTER um Vorbereitung abzubrechen"
 
 #: ../game/screen_sing.cc:562 ../game/screen_sing.cc:583
 msgid "   Autoplay enabled"
@@ -2065,14 +2031,6 @@ msgstr "   Automatische Wiedergabe aktiviert"
 #: ../game/screen_sing.cc:565 ../game/screen_sing.cc:577
 msgid "   Remember to wait for grading!"
 msgstr " Bitte Warte auf die Bewertung!"
-
-#: ../game/screen_sing.cc:567
-msgid "   Prepare for the next song!"
-msgstr ""
-
-#: ../game/screen_sing.cc:579
-msgid "   Choose your next song!"
-msgstr ""
 
 #: ../game/screen_sing.cc:713
 msgid "No player!"
@@ -2276,14 +2234,157 @@ msgstr "nach Dateipfad sortiert"
 msgid "sorted by language"
 msgstr "nach Sprache sortiert"
 
-#~ msgid "Move Down"
-#~ msgstr "Runterschieben"
+#: ../game/webserver.cc:284
+msgid "Performous web frontend"
+msgstr "Performous website"
 
-#~ msgid "Fallback song encoding"
-#~ msgstr "Fallback-Lied-Codierung"
+#: ../game/webserver.cc:285
+msgid "View database"
+msgstr "Datenbank anzeigen"
 
-#~ msgid "Pick the text codec used for song files that are not UTF-8."
-#~ msgstr "Wähle die Textkodierung für Lieder, die nicht in UTF-8 vorliegen."
+#: ../game/webserver.cc:287
+msgid "Search and Add"
+msgstr "Suchen & Hinzufügen"
+
+#: ../game/webserver.cc:288
+msgid "Sort by"
+msgstr "Sortieren nach"
+
+#: ../game/webserver.cc:289
+msgid "Artist"
+msgstr "Performer"
+
+#: ../game/webserver.cc:290
+msgid "Title"
+msgstr "Titel"
+
+#: ../game/webserver.cc:291
+msgid "Language"
+msgstr "Sprache"
+
+#: ../game/webserver.cc:292
+msgid "Edition"
+msgstr "Version"
+
+#: ../game/webserver.cc:293
+msgid "Creator"
+msgstr "Schöpfer"
+
+#: ../game/webserver.cc:295
+msgid "Normal"
+msgstr "Normal"
+
+#: ../game/webserver.cc:296
+msgid "Inverted"
+msgstr "Umgekehrt"
+
+#: ../game/webserver.cc:297
+msgid "Update every 10 sec"
+msgstr "Alle 10 Sekunden aktualisieren"
+
+#: ../game/webserver.cc:298
+msgid "Refresh database"
+msgstr "Datenbank aktualisieren"
+
+#: ../game/webserver.cc:299
+msgid "Upcoming songs"
+msgstr "Die nächste Songs"
+
+#: ../game/webserver.cc:300
+msgid "Refresh playlist"
+msgstr "Abspielliste aktualisieren"
+
+#: ../game/webserver.cc:301
+msgid ""
+"Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding "
+"Performous see /docs/Authors.txt"
+msgstr ""
+"Web-Interface von Niek Nooijens und Arjan Speiard, für volle Credits in "
+"Bezug auf Performous see /docs/Authors.txt"
+
+#: ../game/webserver.cc:302
+msgid "Search"
+msgstr "Suchen"
+
+#: ../game/webserver.cc:303
+msgid "Available songs"
+msgstr "Verfügbare Songs"
+
+#: ../game/webserver.cc:304
+msgid "Search for songs"
+msgstr "Suche nach Liedern"
+
+#: ../game/webserver.cc:305
+msgid "Yes"
+msgstr "Ja"
+
+#: ../game/webserver.cc:306
+msgid "No"
+msgstr "Nein"
+
+#: ../game/webserver.cc:308
+msgid "Move down"
+msgstr "Runter"
+
+#: ../game/webserver.cc:309
+msgid "Set position"
+msgstr "Positionieren"
+
+#: ../game/webserver.cc:310
+msgid "Remove song"
+msgstr "Entferne Song"
+
+#: ../game/webserver.cc:311
+msgid "Desired position of song"
+msgstr "Gewünsche Song-Position"
+
+#: ../game/webserver.cc:312
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: ../game/webserver.cc:313
+msgid "Successfully removed song from playlist"
+msgstr "Song erfolgreich aus Abspielliste entfernt"
+
+#: ../game/webserver.cc:314
+msgid "Failed removing song from playlist"
+msgstr "Entfernen des Songs aus der Abspielliste fehlgeschlagen"
+
+#: ../game/webserver.cc:315
+msgid "Successfully changed position of song"
+msgstr "Song-Position erfolgreich geändert"
+
+#: ../game/webserver.cc:316
+msgid "Failed changing position of song"
+msgstr "Song-Position konnte nicht geändert werden"
+
+#: ../game/webserver.cc:317
+msgid "Successfully moved song up"
+msgstr "Song erfolgreich nach oben bewegt"
+
+#: ../game/webserver.cc:318
+msgid "Failed moving song up"
+msgstr "Song konnte nicht nach oben bewegt werden"
+
+#: ../game/webserver.cc:319
+msgid "Successfully moved song down"
+msgstr "Song erfolgreich nach unter bewegt"
+
+#: ../game/webserver.cc:320
+msgid "Failed moving song down"
+msgstr "Song konnte nicht nach unter bewegt werden"
+
+#: ../game/webserver.cc:321
+msgid "Successfully added song to the playlist"
+msgstr "Song in Abspielliste aufgnommen"
+
+#: ../game/webserver.cc:322
+msgid "Failed adding song to the playlist"
+msgstr "Song konnte nicht in Wiedergabelist aufgenommen werden"
+
+#: ../game/webserver.cc:323
+msgid "No songs found with current filter"
+msgstr "Der aktuelle Filter liefert keine Songs"
 
 #~ msgid ""
 #~ "This tool is not yet available.\n"
