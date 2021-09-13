@@ -172,6 +172,8 @@ blocks:
             - echo "Running the build script in the Ubuntu 18.04 container"
             - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run ooshlablu/performous-build:ubuntu18.04 ./build_performous.sh -c -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run ooshlablu/performous-build:ubuntu18.04 ./build_performous.sh -c -b ${SEMAPHORE_GIT_SHA}; fi
         - name: Ubuntu 18.04 Meson
+          skip:
+            when: "branch != 'meson'"
           priority:
           - value: 70
             when: true
@@ -185,7 +187,9 @@ blocks:
           commands:
             - echo "Running the build script in the Ubuntu 20.04 container"
             - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run ooshlablu/performous-build:ubuntu20.04 ./build_performous.sh -c -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run ooshlablu/performous-build:ubuntu20.04 ./build_performous.sh -c -b ${SEMAPHORE_GIT_SHA}; fi
-        - name: Ubuntu 20.04 Meson
+        - naime: Ubuntu 20.04 Meson
+          skip:
+            when: "branch != 'meson'"
           priority:
           - value: 70
             when: true
@@ -214,6 +218,8 @@ blocks:
             - echo "Running the build script in the Fedora 33 container"
             - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run ooshlablu/performous-build:fedora33 ./build_performous.sh -c -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run ooshlablu/performous-build:fedora33 ./build_performous.sh -c -b ${SEMAPHORE_GIT_SHA}; fi
         - name: Fedora 33 Meson
+          skip:
+            when: "branch != 'meson'"
           priority:
           - value: 70
             when: true
@@ -228,6 +234,8 @@ blocks:
             - echo "Running the build script in the Fedora 34 container"
             - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run ooshlablu/performous-build:fedora34 ./build_performous.sh -c -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run ooshlablu/performous-build:fedora34 ./build_performous.sh -c -b ${SEMAPHORE_GIT_SHA}; fi
         - name: Fedora 34 Meson
+          skip:
+            when: "branch != 'meson'"
           priority:
           - value: 70
             when: true
