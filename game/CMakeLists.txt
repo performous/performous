@@ -69,7 +69,7 @@ add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
 # Libraries
 
 find_package(Boost 1.55 REQUIRED COMPONENTS program_options iostreams system locale)
-target_include_directories(performous PRIVATE ${Boost_INCLUDE_DIRS})
+target_include_directories(performous SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
 target_link_libraries(performous PRIVATE ${Boost_LIBRARIES})
 
 add_library(fs STATIC fs.cc)
@@ -107,6 +107,9 @@ foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWS
 	target_link_libraries(performous PRIVATE ${${lib}_LIBRARIES})
 	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
+
+target_include_directories(fs PRIVATE ${SDL2_INCLUDE_DIRS})
+target_link_libraries(fs PRIVATE ${SDL2_LIBRARIES})
 
 # Activating MIDI hardware (e-drums with USB/MIDI connection)
 set(ENABLE_MIDI AUTO CACHE STRING "Use midi hardware (e-drums with USB/MIDI connection)")
@@ -155,8 +158,8 @@ else()
 endif()
 
 if(OpenCV_FOUND)
-	include_directories(${OpenCV_INCLUDE_DIRS})
-	list(APPEND LIBS ${OpenCV_LIBS})
+	target_include_directories(performous SYSTEM PRIVATE ${OpenCV_INCLUDE_DIRS})
+	target_link_libraries(performous PRIVATE ${OpenCV_LIBS})
 	add_definitions("-DUSE_OPENCV")
 endif()
 
@@ -182,15 +185,13 @@ endif()
 
 # if cpprest is found, add it to the dependencies
 if(CppRest_FOUND)
-	include_directories(${CppRest_INCLUDE_DIRS})
-	list(APPEND LIBS ${CppRest_LIBRARIES})
-	add_definitions("-DUSE_WEBSERVER")
-
 	# add other required dependencies then
 	# FIXME: move this to the CppRest package includes if possible
 	find_package(Boost 1.55 REQUIRED COMPONENTS chrono thread)
-	include_directories(${Boost_INCLUDE_DIRS})
-	list(APPEND LIBS ${Boost_LIBRARIES})
+	target_include_directories(performous SYSTEM PRIVATE ${CppRest_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+	target_link_libraries(performous PRIVATE ${CppRest_LIBRARIES} ${Boost_LIBRARIES})
+
+	add_definitions("-DUSE_WEBSERVER")
 endif()
 
 if(WIN32)
@@ -221,7 +222,6 @@ list(APPEND LIBS ${FFTW3_LIBRARIES})
 list(APPEND LIBS ${BLAS_LIBRARIES})
 
 find_package(Threads)
-
 target_link_libraries(performous PRIVATE fs ced aubio ${LIBS} PkgConfig::deps Threads::Threads)
 
 install(TARGETS performous DESTINATION ${BIN_INSTALL})

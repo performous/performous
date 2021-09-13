@@ -25,9 +25,9 @@ Webcam::Webcam(int cam_id):
 	// Initialize the capture device
 	m_capture.reset(new cv::VideoCapture(cam_id));
 	if (!m_capture->isOpened()) {
-		if (cam_id != -1) {
+		if (cam_id != m_autoDetect) {
 			std::clog << "Webcam/warning: Webcam id " << cam_id << " failed, trying autodetecting...";
-			m_capture.reset(new cv::VideoCapture(-1));
+			m_capture.reset(new cv::VideoCapture(m_autoDetect));
 		}
 		if (!m_capture->isOpened())
 			throw std::runtime_error("Could not initialize webcam capturing!");
@@ -48,9 +48,9 @@ Webcam::Webcam(int cam_id):
 	float fps = m_capture->get(cv::CAP_PROP_FPS);
 	int framew = m_capture->get(cv::CAP_PROP_FRAME_WIDTH);
 	int frameh = m_capture->get(cv::CAP_PROP_FRAME_HEIGHT);
-	int codec = CV_FOURCC('P','I','M','1'); // MPEG-1
+	int codec = cv::VideoWriter::fourcc('P','I','M','1'); // MPEG-1
 	std::string out_file = (getHomeDir() / "performous-webcam_out.mpg").string();
-	m_writer.reset(new cv::VideoWriter(out_file.c_str(), codec, fps > 0 ? fps : 30.0f, cvSize(framew,frameh)));
+	m_writer.reset(new cv::VideoWriter(out_file.c_str(), codec, fps > 0 ? fps : 30.0f, cv::cvSize(framew,frameh)));
 	if (!m_writer->isOpened()) {
 		std::cout << "Could not initialize webcam video saving!" << std::endl;
 		m_writer.reset();
@@ -111,7 +111,7 @@ void Webcam::render() {
 		std::lock_guard<std::mutex> l(m_mutex);
 		// Load the image
 		Bitmap bitmap;
-		bitmap.fmt = pix::BGR;
+		bitmap.fmt = pix::Format::BGR;
 		bitmap.buf.swap(m_frame.data);
 		bitmap.resize(m_frame.width, m_frame.height);
 		m_texture.load(bitmap);

@@ -80,14 +80,14 @@ void ScreenAudioDevices::manageEvent(input::NavEvent const& event) {
 	input::NavButton nav = event.button;
 	auto& chpos = m_channels[m_selected_column].pos;
 	const unsigned posN = m_devs.size() + 1;
-	if (nav == input::NAV_CANCEL) gm->activateScreen("Intro");
-	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
+	if (nav == input::NavButton::CANCEL) gm->activateScreen("Intro");
+	else if (nav == input::NavButton::PAUSE) m_audio.togglePause();
 	else if (m_devs.empty()) return; // The rest work if there are any devices
-	else if (nav == input::NAV_START) { if (save()) gm->activateScreen("Intro"); }
-	else if (nav == input::NAV_LEFT && m_selected_column > 0) --m_selected_column;
-	else if (nav == input::NAV_RIGHT && m_selected_column < m_channels.size()-1) ++m_selected_column;
-	else if (nav == input::NAV_UP) chpos = (chpos + posN) % posN - 1;
-	else if (nav == input::NAV_DOWN) chpos = (chpos + posN + 2) % posN - 1;
+	else if (nav == input::NavButton::START) { if (save()) gm->activateScreen("Intro"); }
+	else if (nav == input::NavButton::LEFT && m_selected_column > 0) --m_selected_column;
+	else if (nav == input::NavButton::RIGHT && m_selected_column < m_channels.size()-1) ++m_selected_column;
+	else if (nav == input::NavButton::UP) chpos = (chpos + posN) % posN - 1;
+	else if (nav == input::NavButton::DOWN) chpos = (chpos + posN + 2) % posN - 1;
 }
 
 void ScreenAudioDevices::manageEvent(SDL_Event event) {
@@ -115,14 +115,18 @@ void ScreenAudioDevices::draw() {
 	for (size_t i = 0; i < m_devs.size(); ++i) {
 		const float y = -yoff + i*ystep;
 		float alpha = 1.0f;
-		// "Grey out" devices that doesn't fit the selection
-		if (m_channels[m_selected_column].name == "OUT" && !m_devs[i].out) alpha = 0.5f;
-		else if (m_channels[m_selected_column].name != "OUT" && !m_devs[i].in) alpha = 0.5f;
+
+		const bool isDevice = (i < m_devs.size());
+		if (isDevice) {
+			// "Grey out" devices that doesn't fit the selection
+			if (m_channels[m_selected_column].name == "OUT" && !m_devs[i].out) alpha = 0.5f;
+			else if (m_channels[m_selected_column].name != "OUT" && !m_devs[i].in) alpha = 0.5f;
+		}
 		m_theme->device_bg.dimensions.center(y);
 		m_theme->device_bg.draw();
 		ColorTrans c(Color::alpha(alpha));
 		m_theme->device.dimensions.middle(-xstep*0.5).center(y);
-		m_theme->device.draw(i < m_devs.size() ? m_devs[i].desc() : _("- Unassigned -"));
+		m_theme->device.draw(isDevice ? m_devs[i].desc() : _("- Unassigned -"));
 	}
 	// Icons
 	for (size_t i = 0; i < m_channels.size(); ++i) {
@@ -159,7 +163,7 @@ void ScreenAudioDevices::load() {
 		for (auto& c: m_channels) {
 			if (!d.isChannel(c.name)) continue;
 			for (size_t i = 0; i < m_devs.size(); ++i) {
-				if (unsigned(m_devs[i].idx) == d.dev) c.pos = i;
+				if (unsigned(m_devs[i].index) == d.dev) c.pos = i;
 			}
 		}
 	}

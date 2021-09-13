@@ -46,7 +46,7 @@ namespace input {
 				if (evnt == 0x80 /* NOTE OFF */) { evnt = 0x90; vel = 0; }  // Translate NOTE OFF into NOTE ON with zero-velocity
 				if (evnt != 0x90 /* NOTE ON */) continue;  // Ignore anything that isn't NOTE ON/OFF
 				std::clog << "controller-midi/info: MIDI NOTE ON/OFF event: ch=" << unsigned(chan) << " note=" << unsigned(note) << " vel=" << unsigned(vel) << std::endl;
-				event.source = SourceId(SOURCETYPE_MIDI, it->first, chan);
+				event.source = SourceId(SourceType::MIDI, it->first, chan);
 				event.hw = note;
 				event.value = vel / 127.0;
 				return true;
