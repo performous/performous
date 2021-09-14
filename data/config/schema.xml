@@ -413,7 +413,6 @@ to save the current settings to XML.
 		<stringvalue>%USERPROFILE%\AppData\Roaming\performous</stringvalue>
 		<stringvalue>~\AppData\Roaming\performous</stringvalue>
 		<stringvalue>%HOMEDRIVE%%HOMEPATH%\Application Data\performous</stringvalue>
-		<stringvalue>~\Application Data\performous</stringvalue>
 		<short>Default Song folders</short>
 		<long>Where to recursively look for songs. DATADIR at the beginning means all Performous data folders.</long>
 	</entry>
