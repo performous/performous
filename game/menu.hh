@@ -28,12 +28,12 @@ public:
 	MenuOption(const std::string& nm, const std::string& comm, MenuImage img = MenuImage());
 
 	/// Make the option change values of a ConfigItem.
-	MenuOption& changer(ConfigItem& val, std::string virtOptName = std::string()) {
+	MenuOption& changer(ConfigItem& val, std::string virtOptName = {}) {
 		type = Type::CHANGE_VALUE;
 		value = &val;
 		if (!virtOptName.empty()) { virtualName = virtOptName; }
 		return *this;
-		}
+	}
 	/// Make the option set a given value for ConfigItem and close the menu.
 	MenuOption& setter(ConfigItem& val, ConfigItem newval) { type = Type::SET_AND_CLOSE; value = &val; newValue = newval; return *this; }
 	/// Make the option open a submenu
