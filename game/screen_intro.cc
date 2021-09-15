@@ -116,7 +116,7 @@ void ScreenIntro::draw_menu_options() {
 			if (opt.type == MenuOption::Type::CHANGE_VALUE) {
 				++ii; // Use a slot for the value
 				theme->option_selected.dimensions.left(x + sel_margin).center(-0.1 + (selanim+1)*0.065);
-				theme->option_selected.draw("<  " + opt.value->getValue() + "  >");
+				theme->option_selected.draw("<  " + _(opt.value->getValue()) + "  >");
 			}
 
 		// Regular option (not selected)
@@ -175,17 +175,17 @@ void ScreenIntro::populateMenu() {
 	m_menu.add(MenuOption(_("Practice"), _("Check your skills or test the microphones."), imgPractice).screen("Practice"));
 	// Configure menu + submenu options
 	MenuOptions configmain;
-	for (MenuEntry const& submenu: configMenu) {
+	for (auto const& submenu: configMenu) {
 		if (!submenu.items.empty()) {
 			MenuOptions opts;
 			// Process items that belong to that submenu
-			for (std::string const& item: submenu.items) {
+			for (auto const& item: submenu.items) {
 				ConfigItem& c = config[item];
-				opts.push_back(MenuOption(_(c.getShortDesc().c_str()), _(c.getLongDesc().c_str())).changer(c));
+				opts.push_back(MenuOption(_(c.getShortDesc()), _(c.getLongDesc())).changer(c));
 			}
-			configmain.push_back(MenuOption(_(submenu.shortDesc.c_str()), _(submenu.longDesc.c_str()), imgConfig).submenu(opts));
+			configmain.push_back(MenuOption(_(submenu.shortDesc), _(submenu.longDesc), imgConfig).submenu(opts));
 		} else {
-			configmain.push_back(MenuOption(_(submenu.shortDesc.c_str()), _(submenu.longDesc.c_str()), imgConfig).screen(submenu.name));
+			configmain.push_back(MenuOption(_(submenu.shortDesc), _(submenu.longDesc), imgConfig).screen(submenu.name));
 		}
 	}
 	m_menu.add(MenuOption(_("Configure"), _("Configure audio and game options."), imgConfig).submenu(configmain));
