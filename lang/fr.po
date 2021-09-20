@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-10 23:58+0200\n"
-"PO-Revision-Date: 2021-09-11 00:12+0200\n"
-"Last-Translator: Arjan Speiard | Asgard Sings! <arjan.spieard@gmail.com>\n"
+"POT-Creation-Date: 2021-09-20 16:02-0300\n"
+"PO-Revision-Date: 2021-09-20 16:12-0300\n"
+"Last-Translator: Gregorio Litenstein <g.litenstein@gmail.com>\n"
 "Language-Team: \n"
 "Language: fr_FR\n"
 "MIME-Version: 1.0\n"
@@ -15,6 +15,1013 @@ msgstr ""
 "X-Generator: Poedit 3.0\n"
 "X-Poedit-SearchPath-0: ../game\n"
 "X-Poedit-SearchPath-1: ../data\n"
+
+#: ../game/configuration.cc:147
+msgid "Enabled"
+msgstr "Activé"
+
+#: ../game/configuration.cc:147 ../game/menu.cc:64
+msgid "Disabled"
+msgstr "Désactivé"
+
+#: ../game/configuration.cc:151
+#, c-format
+msgid "%d items"
+msgstr "%d entrées"
+
+#: ../game/configuration.cc:452 ../game/i18n.hh:101
+msgid "Asturian"
+msgstr "Le asturien"
+
+#: ../game/configuration.cc:453 ../game/i18n.hh:102
+msgid "Danish"
+msgstr "Le danois"
+
+#: ../game/configuration.cc:454 ../game/i18n.hh:103
+msgid "German"
+msgstr "L’allemand"
+
+#: ../game/configuration.cc:455 ../game/i18n.hh:104
+msgid "English"
+msgstr "L’anglais"
+
+#: ../game/configuration.cc:456 ../game/i18n.hh:105
+msgid "Spanish"
+msgstr "L’espagnol"
+
+#: ../game/configuration.cc:457 ../game/i18n.hh:106
+msgid "Persian"
+msgstr "Le persan"
+
+#: ../game/configuration.cc:458 ../game/i18n.hh:107
+msgid "Finnish"
+msgstr "Le finlandais"
+
+#: ../game/configuration.cc:459 ../game/i18n.hh:108
+msgid "French"
+msgstr "Le français"
+
+#: ../game/configuration.cc:460 ../game/i18n.hh:109
+msgid "Hungarian"
+msgstr "Le hongrois"
+
+#: ../game/configuration.cc:461 ../game/i18n.hh:110
+msgid "Italian"
+msgstr "L’italien"
+
+#: ../game/configuration.cc:462 ../game/i18n.hh:111
+msgid "Japanese"
+msgstr "Le japonais"
+
+#: ../game/configuration.cc:463 ../game/i18n.hh:112
+msgid "Dutch"
+msgstr "Le néerlandais"
+
+#: ../game/configuration.cc:464 ../game/i18n.hh:113
+msgid "Polish"
+msgstr "Le polonais"
+
+#: ../game/configuration.cc:465 ../game/i18n.hh:114
+msgid "Portuguese"
+msgstr "Le portugais"
+
+#: ../game/configuration.cc:466 ../game/i18n.hh:115
+msgid "Swedish"
+msgstr "Le suédois"
+
+#: ../game/configuration.cc:467 ../game/i18n.hh:116
+msgid "Chinese"
+msgstr "Le chinois"
+
+#: ../game/dancegraph.cc:17
+msgid "Beginner"
+msgstr "Débutant"
+
+#: ../game/dancegraph.cc:17 ../game/guitargraph.cc:13
+msgid "Easy"
+msgstr "Facile"
+
+#: ../game/dancegraph.cc:17 ../game/guitargraph.cc:13
+msgid "Medium"
+msgstr "Moyen"
+
+#: ../game/dancegraph.cc:17 ../game/guitargraph.cc:13
+msgid "Hard"
+msgstr "Difficile"
+
+#: ../game/dancegraph.cc:17
+msgid "Challenge"
+msgstr "Défi"
+
+#: ../game/dancegraph.cc:51 ../game/dancegraph.cc:59
+msgid "Perfect!"
+msgstr "Parfait !"
+
+#: ../game/dancegraph.cc:52
+msgid "Excellent!-"
+msgstr "Excellent !-"
+
+#: ../game/dancegraph.cc:53
+msgid "Great!-"
+msgstr "Super !-"
+
+#: ../game/dancegraph.cc:54
+msgid " Good!- "
+msgstr " Bien !- "
+
+#: ../game/dancegraph.cc:55
+msgid "  OK!-  "
+msgstr "  OK !-  "
+
+#: ../game/dancegraph.cc:56
+msgid "Late!-"
+msgstr "Plus vite !-"
+
+#: ../game/dancegraph.cc:57 ../game/dancegraph.cc:65
+msgid "Way off!"
+msgstr "A coté de la plaque !"
+
+#: ../game/dancegraph.cc:60
+msgid "-Excellent!"
+msgstr "-Excellent !"
+
+#: ../game/dancegraph.cc:61
+msgid "-Great!"
+msgstr "-Super !"
+
+#: ../game/dancegraph.cc:62
+msgid " -Good! "
+msgstr " -Bien ! "
+
+#: ../game/dancegraph.cc:63
+msgid "  -OK!  "
+msgstr "  -OK !  "
+
+#: ../game/dancegraph.cc:64
+msgid "-Early!"
+msgstr "-Trop tôt!"
+
+#: ../game/dancegraph.cc:106 ../game/guitargraph.cc:194
+msgid "Ready!"
+msgstr "Prêt !"
+
+#: ../game/dancegraph.cc:106 ../game/guitargraph.cc:194
+#: ../game/screen_intro.cc:174
+msgid "Start performing!"
+msgstr "Commencer une partie !"
+
+#: ../game/dancegraph.cc:117 ../game/guitargraph.cc:183
+msgid "Select track"
+msgstr "Sélectionner la piste"
+
+#: ../game/dancegraph.cc:133 ../game/guitargraph.cc:163
+msgid "Select difficulty"
+msgstr "Sélectionner la difficulté"
+
+#: ../game/dancegraph.cc:136 ../game/guitargraph.cc:200
+#: ../game/instrumentgraph.cc:59 ../game/screen_intro.cc:192
+#: ../game/screen_sing.cc:108 ../game/screen_sing.cc:155
+msgid "Quit"
+msgstr "Quitter"
+
+#: ../game/dancegraph.cc:136 ../game/guitargraph.cc:200
+#: ../game/instrumentgraph.cc:59 ../game/screen_sing.cc:108
+#: ../game/screen_sing.cc:155
+msgid "Exit to song browser"
+msgstr "Revenir vers la liste des morceaux"
+
+#: ../game/dancegraph.cc:247
+msgid "STOP!"
+msgstr "STOP !"
+
+#: ../game/dancegraph.cc:321 ../game/guitargraph.cc:454
+msgid "Streak!"
+msgstr "A la chaine !"
+
+#: ../game/guitargraph.cc:13
+msgid "Kids"
+msgstr "Enfants"
+
+#: ../game/guitargraph.cc:13
+msgid "Expert"
+msgstr "Expert"
+
+#: ../game/guitargraph.cc:169 ../game/guitargraph.cc:186
+msgid "Lefty-mode"
+msgstr "Mode gaucher"
+
+#: ../game/guitargraph.cc:207
+msgid "ON"
+msgstr "Activé"
+
+#: ../game/guitargraph.cc:207
+msgid "OFF"
+msgstr "Désactivé"
+
+#: ../game/guitargraph.cc:208
+msgid "Toggle lefty-mode"
+msgstr "Basculer en mode gaucher"
+
+#: ../game/guitargraph.cc:466
+msgid ""
+"God Mode\n"
+"Activated!"
+msgstr ""
+"God Mode\n"
+"Activé !"
+
+#: ../game/guitargraph.cc:467
+msgid "Mistakes ignored!"
+msgstr "Erreurs ignorées !"
+
+#: ../game/guitargraph.cc:1119
+msgid "God Mode Ready!"
+msgstr "God Mode Prêt !"
+
+#: ../game/guitargraph.cc:1120
+msgid "Drum Fill!"
+msgstr "Solo Batterie !"
+
+#: ../game/guitargraph.cc:1123
+msgid "Solo!"
+msgstr "Solo !"
+
+#: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:149
+msgid "Resume"
+msgstr "Reprendre"
+
+#: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:149
+msgid "Back to performing!"
+msgstr "Retourner à la partie !"
+
+#: ../game/instrumentgraph.cc:57
+msgid "Rejoin"
+msgstr "Rejoindre le jeu"
+
+#: ../game/instrumentgraph.cc:57
+msgid "Change selections"
+msgstr "Changer les paramètres"
+
+#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:150
+msgid "Restart"
+msgstr "Redémarrer"
+
+#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:150
+msgid ""
+"Start the song\n"
+"from the beginning"
+msgstr ""
+"Démarrer le morceau\n"
+"depuis le début"
+
+#: ../game/layout_singer.cc:72
+msgid "Perfect"
+msgstr "Parfait"
+
+#: ../game/layout_singer.cc:73
+msgid "Excellent"
+msgstr "Excellent"
+
+#: ../game/layout_singer.cc:74
+msgid "Great"
+msgstr "Super"
+
+#: ../game/layout_singer.cc:75
+msgid "Good"
+msgstr "Bien"
+
+#: ../game/layout_singer.cc:76
+msgid "OK"
+msgstr "OK"
+
+#: ../game/main.cc:148
+msgid "Loading audio samples..."
+msgstr "Chargement des echantillons..."
+
+#: ../game/main.cc:163
+msgid "Creating screens..."
+msgstr "Création des écrans..."
+
+#: ../game/main.cc:173
+msgid "Entering main menu..."
+msgstr "Entrée dans le menu principal..."
+
+#: ../game/main.cc:175
+msgid "Loading complete!"
+msgstr "Chargement terminé!"
+
+#: ../game/main.cc:184
+msgid ""
+"Done Loading!\n"
+" Loaded "
+msgstr "Chargement effectué ! Chargé "
+
+#: ../game/main.cc:190
+msgid "Screenshot taken!"
+msgstr "Capture d'écran effectuée!"
+
+#: ../game/main.cc:193
+msgid "Screenshot failed!"
+msgstr "Échec de la capture d'écran!"
+
+#: ../game/requesthandler.cc:332
+msgid "Performous web frontend"
+msgstr "Portail web de Performous"
+
+#: ../game/requesthandler.cc:333
+msgid "View database"
+msgstr "Voir la base de données"
+
+#: ../game/requesthandler.cc:334 ../game/screen_songs.cc:565
+msgid "View playlist"
+msgstr "Voir la liste de lecture"
+
+#: ../game/requesthandler.cc:335
+msgid "Search and add"
+msgstr "Chercher et ajouter"
+
+#: ../game/requesthandler.cc:336
+msgid "Sort by"
+msgstr "Trier par"
+
+#: ../game/requesthandler.cc:337
+msgid "Artist"
+msgstr "Artiste"
+
+#: ../game/requesthandler.cc:338
+msgid "Title"
+msgstr "Titre"
+
+#. Language
+#. Language to show Performous in
+#. name: game/language
+#. type: int
+#. value: 1337
+#: ../game/requesthandler.cc:339 ../data/config/schema.xml:103
+msgid "Language"
+msgstr "Langue"
+
+#: ../game/requesthandler.cc:340
+msgid "Edition"
+msgstr "Édition"
+
+#: ../game/requesthandler.cc:341
+msgid "Creator"
+msgstr "Créateur"
+
+#. Sort order
+#. Currently active sort order.
+#. name: songs/sort-order
+#. type: int
+#. value: 0
+#. hidden: true
+#: ../game/requesthandler.cc:342 ../data/config/schema.xml:428
+msgid "Sort order"
+msgstr "Ordre de tri"
+
+#: ../game/requesthandler.cc:343
+msgid "Normal"
+msgstr "Normal"
+
+#: ../game/requesthandler.cc:344
+msgid "Inverted"
+msgstr "Inversé"
+
+#: ../game/requesthandler.cc:345
+msgid "Update every 10 sec"
+msgstr "Mis à jour toutes les 10 sec"
+
+#: ../game/requesthandler.cc:346
+msgid "Refresh database"
+msgstr "Mettre à jour la base de données"
+
+#: ../game/requesthandler.cc:347
+msgid "Upcoming songs"
+msgstr "Chansons à suivre"
+
+#: ../game/requesthandler.cc:348
+msgid "Refresh playlist"
+msgstr "Rafraichir la liste de lecture"
+
+#: ../game/requesthandler.cc:349
+msgid ""
+"Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding "
+"Performous see /docs/Authors.txt"
+msgstr ""
+"Interface Web de Niek Nooijens et Arjan Speiard; la liste complète des "
+"contributeurs est dans /docs/Authors.txt"
+
+#: ../game/requesthandler.cc:350
+msgid "Search"
+msgstr "Rechercher"
+
+#: ../game/requesthandler.cc:351
+msgid "Available songs"
+msgstr "Chansons disponibles"
+
+#: ../game/requesthandler.cc:352
+msgid "Search for songs"
+msgstr "Rechercher des chansons"
+
+#: ../game/requesthandler.cc:353
+msgid "Yes"
+msgstr "Oui"
+
+#: ../game/requesthandler.cc:354
+msgid "No"
+msgstr "Non"
+
+#: ../game/requesthandler.cc:355 ../game/screen_playlist.cc:376
+msgid "Move up"
+msgstr "Monter"
+
+#: ../game/requesthandler.cc:356 ../game/screen_playlist.cc:386
+msgid "Move down"
+msgstr "Descendre"
+
+#: ../game/requesthandler.cc:357
+msgid "Set position"
+msgstr "Définir la position"
+
+#: ../game/requesthandler.cc:358
+msgid "Remove song"
+msgstr "Retirer la chanson"
+
+#: ../game/requesthandler.cc:359
+msgid "Desired position of song"
+msgstr "Position de la chanson"
+
+#: ../game/requesthandler.cc:360
+msgid "Cancel"
+msgstr "Annuler"
+
+#: ../game/requesthandler.cc:361
+msgid "Successfully removed song from playlist."
+msgstr "Chanson retirée de la liste de lecture."
+
+#: ../game/requesthandler.cc:362
+msgid "Failed removing song from playlist!"
+msgstr "Échec du retrait de la chanson de la liste de lecture!"
+
+#: ../game/requesthandler.cc:363
+msgid "Successfully changed position of song."
+msgstr "Chanson déplacée."
+
+#: ../game/requesthandler.cc:364
+msgid "Failed changing position of song!"
+msgstr "Échec du déplacement de la chanson!"
+
+#: ../game/requesthandler.cc:365
+msgid "Successfully moved song up."
+msgstr "Chanson remontée."
+
+#: ../game/requesthandler.cc:366
+msgid "Failed moving song up!"
+msgstr "Échec de la remontée de la chanson!"
+
+#: ../game/requesthandler.cc:367
+msgid "Successfully moved song down."
+msgstr "Chanson descendue."
+
+#: ../game/requesthandler.cc:368
+msgid "Failed moving song down!"
+msgstr "Échec de la descente de la chanson!"
+
+#: ../game/requesthandler.cc:369
+msgid "Successfully added song to the playlist."
+msgstr "Chanson ajoutée à la liste de lecture."
+
+#: ../game/requesthandler.cc:370
+msgid "Failed adding song to the playlist!"
+msgstr "Échec de l'ajout à la liste de lecture!"
+
+#: ../game/requesthandler.cc:371
+msgid "No songs found with current filter."
+msgstr "Aucune chanson ne correspond à ce critère."
+
+#: ../game/screen_audiodevices.cc:66
+msgid ""
+"It seems you have some manual configurations\n"
+"incompatible with this user interface.\n"
+"Saving these settings will override\n"
+"all existing audio device configuration.\n"
+"Your other options changes will be saved too."
+msgstr ""
+"Il semble que vous ayez certaines configurations\n"
+"manuelles incompatibles avec cette interface.\n"
+"Sauvegarder cette configuration remplacera\n"
+"toutes les configurations audio préexistantes.\n"
+"Vos autres changements seront également sauvegardés."
+
+#: ../game/screen_audiodevices.cc:129
+msgid "- Unassigned -"
+msgstr "- Non assigné -"
+
+#: ../game/screen_audiodevices.cc:150
+msgid ""
+"Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select "
+"to cancel. Ctrl + R to reset defaults"
+msgstr ""
+"Utilisez les flèches pour configurer. Tapez Entrer/Démarrer pour sauvegarder "
+"ou Ech/Select pour annuler. Ctrl+R pour remettre à zéro"
+
+#: ../game/screen_audiodevices.cc:155
+msgid ""
+"For advanced device configuration, use command line parameter --audio (use --"
+"audiohelp for details)."
+msgstr ""
+"Pour une configuration avancée veuillez utiliser la ligne de commande --"
+"audio (--audiohelp pour l'aide)."
+
+#: ../game/screen_audiodevices.cc:199
+msgid "Some devices failed to open!"
+msgstr "Certains périphériques n'ont pas pu être ouverts !"
+
+#: ../game/screen_intro.cc:27
+msgid "No playback devices could be used.\n"
+msgstr "Aucun périphérique audio de sortie n'est utilisable.\n"
+
+#: ../game/screen_intro.cc:28
+msgid ""
+"\n"
+"Please configure some before playing."
+msgstr ""
+"\n"
+"Veuillez les configurer avant de jouer."
+
+#: ../game/screen_intro.cc:75 ../game/screen_paths.cc:36
+msgid "Settings saved as system defaults."
+msgstr "Configuration enregistrée comme configuration par défaut."
+
+#: ../game/screen_intro.cc:75 ../game/screen_paths.cc:36
+msgid "Settings saved."
+msgstr "Configuration enregistrée."
+
+#: ../game/screen_intro.cc:154
+msgid "Ctrl + S to save, Ctrl + R to reset defaults"
+msgstr "Ctrl + S pour sauvegarder, Ctrl + R pour réinitialiser"
+
+#: ../game/screen_intro.cc:174
+msgid "Perform"
+msgstr "Jouer"
+
+#: ../game/screen_intro.cc:175
+msgid "Practice"
+msgstr "S'exercer"
+
+#: ../game/screen_intro.cc:175
+msgid "Check your skills or test the microphones."
+msgstr "Chauffer votre voix ou tester les micros."
+
+#: ../game/screen_intro.cc:191
+msgid "Configure"
+msgstr "Options"
+
+#: ../game/screen_intro.cc:191
+msgid "Configure audio and game options."
+msgstr "Configurer les options de jeu et de son."
+
+#: ../game/screen_intro.cc:192
+msgid "Leave the game."
+msgstr "Sortir du jeu."
+
+#: ../game/screen_intro.cc:205
+msgid ""
+"Webserver active!\n"
+" connect to this computer\n"
+"using: "
+msgstr ""
+"Serveur Web actif !\n"
+"Connectez vous à cet ordinateur\n"
+"depuis : "
+
+#: ../game/screen_paths.cc:69
+msgid "Hide hidden folders"
+msgstr "Ignorer les dossiers cachés"
+
+#. Show hidden folders
+#. When true the screen 'Paths' will also show hidden folders.
+#. name: paths/showhiddenfolders
+#. type: bool
+#. value: false
+#: ../game/screen_paths.cc:74 ../data/config/schema.xml:399
+msgid "Show hidden folders"
+msgstr "Montrer les dossiers cachés"
+
+#: ../game/screen_paths.cc:81
+msgid "Remove this folder"
+msgstr "Oter ce dossier"
+
+#: ../game/screen_paths.cc:81
+msgid "Remove current folder from song folders"
+msgstr "Oter le dossier courant de la liste des dossiers de chansons"
+
+#: ../game/screen_paths.cc:87
+msgid "Add this folder"
+msgstr "Ajouter le dossier courant"
+
+#: ../game/screen_paths.cc:87
+msgid "Add current folder to song folders"
+msgstr "Ajouter ce dossier à la liste des dossiers de chansons"
+
+#: ../game/screen_paths.cc:95
+msgid ".."
+msgstr ".."
+
+#: ../game/screen_paths.cc:95
+msgid "Go to parent folder"
+msgstr "Remonter au dossier parent"
+
+#: ../game/screen_paths.cc:122
+msgid "Open folder"
+msgstr "Ouvrir le dossier"
+
+#: ../game/screen_players.cc:134
+msgid "No players found!"
+msgstr "Aucun joueur n'a été trouvé !"
+
+#: ../game/screen_players.cc:135
+msgid "Enter a name to create a new player."
+msgstr "Entrez un nom pour créer un nouveau joueur."
+
+#: ../game/screen_players.cc:137
+msgid "Press enter to create player!"
+msgstr "Pressez Entrer pour créer un nouveau joueur !"
+
+#: ../game/screen_players.cc:141
+msgid "No players worth mentioning!"
+msgstr "Pas de joueur digne de ce nom !"
+
+#: ../game/screen_players.cc:146
+msgid "You reached %1% points!"
+msgstr "%1% points marqués !"
+
+#: ../game/screen_players.cc:147
+msgid "Change player with arrow keys."
+msgstr "Changez de joueur avec les flèches."
+
+#: ../game/screen_players.cc:148
+msgid "Name:"
+msgstr "Nom :"
+
+#: ../game/screen_players.cc:151
+msgid "Type text to filter or create a new player."
+msgstr "Entrez un nom pour créer ou filtrer un joueur."
+
+#: ../game/screen_players.cc:151
+msgid "Search Text:"
+msgstr "Recherche :"
+
+#: ../game/screen_playlist.cc:19 ../game/screen_sing.cc:46
+msgid "Initializing webcam..."
+msgstr "Initialisation de la webcam..."
+
+#: ../game/screen_playlist.cc:38
+msgid "Loading song timestamps..."
+msgstr "Chargement des marqueurs de chanson..."
+
+#: ../game/screen_playlist.cc:181 ../game/screen_playlist.cc:352
+msgid "Continue"
+msgstr "Continuer"
+
+#: ../game/screen_playlist.cc:181
+msgid "Continue playing"
+msgstr "Continuer à jouer"
+
+#: ../game/screen_playlist.cc:195
+msgid "Add songs"
+msgstr "Ajouter des morceaux"
+
+#: ../game/screen_playlist.cc:195
+msgid "Open the song browser to add more songs"
+msgstr "Ouvrir le navigateur de morceaux pour ajouter plus de morceaux"
+
+#: ../game/screen_playlist.cc:196 ../game/screen_songs.cc:559
+msgid "Shuffle"
+msgstr "Aléatoire"
+
+#: ../game/screen_playlist.cc:196
+msgid "Randomize the order of the playlist"
+msgstr "Mélanger l'ordre de la liste de lecture"
+
+#: ../game/screen_playlist.cc:202
+msgid "Clear and exit"
+msgstr "Vider et quitter"
+
+#: ../game/screen_playlist.cc:202
+msgid "Remove all the songs from the list"
+msgstr "Enlever l'ensemble des morceaux de la liste"
+
+#: ../game/screen_playlist.cc:208 ../game/screen_playlist.cc:393
+#: ../game/screen_songs.cc:572
+msgid "Back"
+msgstr "Précédent"
+
+#: ../game/screen_playlist.cc:208 ../game/screen_playlist.cc:393
+msgid "Back to playlist viewer"
+msgstr "Retourner à la liste de lecture"
+
+#: ../game/screen_playlist.cc:335
+msgid "Press enter to view song options"
+msgstr "Appuyer sur ENTREE pour voir les options du morceau"
+
+#: ../game/screen_playlist.cc:344
+msgid "View more options"
+msgstr "Voir plus d'options"
+
+#: ../game/screen_playlist.cc:344
+msgid "View general playlist settings"
+msgstr "Configurer les options de la liste de lecture"
+
+#: ../game/screen_playlist.cc:352
+msgid "Play first"
+msgstr "Jouer en premier"
+
+#: ../game/screen_playlist.cc:354
+msgid "Ignore the playlist's order and play this song first"
+msgstr "Ignorer l'ordre de la liste de lecture et jouer ce morceau en premier"
+
+#: ../game/screen_playlist.cc:355
+msgid "Start the song already!"
+msgstr "Démarre-le ce morceau !"
+
+#: ../game/screen_playlist.cc:364
+msgid "Remove"
+msgstr "Enlever"
+
+#: ../game/screen_playlist.cc:364
+msgid "Remove this song from the list"
+msgstr "Enlever ce morceau de la liste"
+
+#: ../game/screen_playlist.cc:376
+msgid "Move this song up the list"
+msgstr "Monter ce morceau dans la liste"
+
+#: ../game/screen_playlist.cc:386
+msgid "Move this song down the list"
+msgstr "Descendre ce morceau dans la liste"
+
+#: ../game/screen_sing.cc:53
+msgid "Loading video..."
+msgstr "Chargement de la vidéo..."
+
+#: ../game/screen_sing.cc:59
+msgid "Loading song..."
+msgstr "Chargement de la chanson..."
+
+#: ../game/screen_sing.cc:66
+msgid "Song contains broken tracks!"
+msgstr "Chanson contenant des pistes défectueuses !"
+
+#: ../game/screen_sing.cc:71
+msgid "Loading menu..."
+msgstr "Chargement du menu..."
+
+#: ../game/screen_sing.cc:81
+msgid "Loading complete"
+msgstr "Chargement terminé"
+
+#: ../game/screen_sing.cc:87
+msgid "Start"
+msgstr "Démarrer"
+
+#: ../game/screen_sing.cc:87
+msgid "Start performing"
+msgstr "Commencer une partie"
+
+#: ../game/screen_sing.cc:90
+msgid "Duet mode"
+msgstr "Mode duo"
+
+#: ../game/screen_sing.cc:91
+msgid "Normal mode"
+msgstr "Mode normal"
+
+#: ../game/screen_sing.cc:92
+msgid "Switch between duet and regular singing mode"
+msgstr "Basculer entre le mode standard et le mode duo"
+
+#: ../game/screen_sing.cc:102
+msgid "Change vocal track"
+msgstr "Change la piste de chant"
+
+#: ../game/screen_sing.cc:153
+msgid "Skip"
+msgstr "Passer"
+
+#: ../game/screen_sing.cc:153
+msgid "Skip current song"
+msgstr "Passer le morceau actuel"
+
+#: ../game/screen_sing.cc:308
+msgid "Press UP to join dance!"
+msgstr "Appuyer sur HAUT pour entrer dans la danse !"
+
+#: ../game/screen_sing.cc:308
+msgid "Step UP to join!"
+msgstr "Appuyer sur HAUT pour jouer !"
+
+#: ../game/screen_sing.cc:313
+msgid "Press 1 to join guitar!"
+msgstr "Appuyer sur 1 pour jouer avec une guitare !"
+
+#: ../game/screen_sing.cc:313
+msgid "Press GREEN to join!"
+msgstr "Appuyer sur VERT pour jouer !"
+
+#: ../game/screen_sing.cc:318
+msgid "Press SPACE to join drums!"
+msgstr "Appuyer sur ESPACE pour jouer avec une batterie !"
+
+#: ../game/screen_sing.cc:318
+msgid "KICK to join!"
+msgstr "Appuyer sur la PEDALE pour jouer !"
+
+#: ../game/screen_sing.cc:557
+msgid "   ENTER to skip instrumental break"
+msgstr "   \"Entrée\" pour passer l'instrumental"
+
+#: ../game/screen_sing.cc:562 ../game/screen_sing.cc:583
+msgid "   Autoplay enabled"
+msgstr "   Autoplay activé"
+
+#: ../game/screen_sing.cc:565 ../game/screen_sing.cc:577
+msgid "   Remember to wait for grading!"
+msgstr "   Restez pour votre classement !"
+
+#: ../game/screen_sing.cc:567
+msgid "   Prepare for the next song!"
+msgstr "   Préparez vous pour la prochaine chanson !"
+
+#: ../game/screen_sing.cc:579
+msgid "   Choose your next song!"
+msgstr "   Choisir la prochaine chanson !"
+
+#: ../game/screen_sing.cc:713
+msgid "No player!"
+msgstr "Aucun joueur n'a été trouvé !"
+
+#: ../game/screen_sing.cc:721
+msgid "Hit singer"
+msgstr "Superstar"
+
+#: ../game/screen_sing.cc:722
+msgid "Lead singer"
+msgstr "Soliste"
+
+#: ../game/screen_sing.cc:723 ../game/screen_sing.cc:729
+#: ../game/screen_sing.cc:735
+msgid "Rising star"
+msgstr "Étoile montante"
+
+#: ../game/screen_sing.cc:724 ../game/screen_sing.cc:730
+#: ../game/screen_sing.cc:736
+msgid "Amateur"
+msgstr "Amateur"
+
+#: ../game/screen_sing.cc:725 ../game/screen_sing.cc:737
+msgid "Tone deaf"
+msgstr "Casserole"
+
+#: ../game/screen_sing.cc:727
+msgid "Maniac"
+msgstr "Maniac"
+
+#: ../game/screen_sing.cc:728
+msgid "Hoofer"
+msgstr "Claquettiste"
+
+#: ../game/screen_sing.cc:731
+msgid "Loser"
+msgstr "Perdant"
+
+#: ../game/screen_sing.cc:733
+msgid "Virtuoso"
+msgstr "Virtuose"
+
+#: ../game/screen_sing.cc:734
+msgid "Rocker"
+msgstr "Rockeur"
+
+#: ../game/screen_songs.cc:296
+msgid "Sorry, no songs match the search!"
+msgstr "Désolé, aucun morceau ne correspond à cette recherche !"
+
+#: ../game/screen_songs.cc:299
+msgid "Sorry, no songs match the filter!"
+msgstr "Désolé, aucun morceau ne correspond à ce filtre !"
+
+#: ../game/screen_songs.cc:302
+msgid "No songs found!"
+msgstr "Aucun morceau trouvé !"
+
+#: ../game/screen_songs.cc:303
+msgid "Visit performous.org for free songs"
+msgstr "Visitez performous.org pour des morceaux gratuits"
+
+#: ../game/screen_songs.cc:321
+msgid "<type in to search>"
+msgstr "<Entrez votre recherche>"
+
+#: ../game/screen_songs.cc:321
+msgid "songs"
+msgstr "morceaux"
+
+#: ../game/screen_songs.cc:321
+msgid "options"
+msgstr "options"
+
+#: ../game/screen_songs.cc:323
+msgid "sort order: "
+msgstr "ordre : "
+
+#: ../game/screen_songs.cc:324
+msgid "type filter: "
+msgstr "filtre : "
+
+#: ../game/screen_songs.cc:325
+msgid "hiscores"
+msgstr "meilleurs scores"
+
+#: ../game/screen_songs.cc:325
+msgid "jukebox mode"
+msgstr "mode jukebox"
+
+#: ../game/screen_songs.cc:328
+msgid "start a playlist with this song!"
+msgstr "commencer une liste de lecture avec ce morceau !"
+
+#: ../game/screen_songs.cc:328
+msgid "open the playlist menu"
+msgstr "ouvrir le menu de listes de lecture"
+
+#: ../game/screen_songs.cc:552
+msgid "Play"
+msgstr "Jouer"
+
+#: ../game/screen_songs.cc:566
+msgid "Clear playlist"
+msgstr "Vider la liste de lecture"
+
+#: ../game/songparser-xml.cc:117
+msgid "Together"
+msgstr "Ensemble"
+
+#: ../game/songs.cc:439
+msgid "show all songs"
+msgstr "montrer tous les morceaux"
+
+#: ../game/songs.cc:440
+msgid "has dance"
+msgstr "contient de la danse"
+
+#: ../game/songs.cc:441
+msgid "has vocals"
+msgstr "contient du chant"
+
+#: ../game/songs.cc:442
+msgid "has duet"
+msgstr "contient un mode duo"
+
+#: ../game/songs.cc:443
+msgid "has guitar"
+msgstr "contient une guitare"
+
+#: ../game/songs.cc:444
+msgid "drums or keytar"
+msgstr "batterie ou keytar"
+
+#: ../game/songs.cc:445
+msgid "full band"
+msgstr "groupe complet"
+
+#: ../game/songs.cc:473
+msgid "random order"
+msgstr "ordre aléatoire"
+
+#: ../game/songs.cc:474
+msgid "sorted by song"
+msgstr "classement par chanson"
+
+#: ../game/songs.cc:475
+msgid "sorted by artist"
+msgstr "classement par artiste"
+
+#: ../game/songs.cc:476
+msgid "sorted by edition"
+msgstr "classement par édition"
+
+#: ../game/songs.cc:477
+msgid "sorted by genre"
+msgstr "classement par genre"
+
+#: ../game/songs.cc:478
+msgid "sorted by path"
+msgstr "classement par chemin"
+
+#: ../game/songs.cc:479
+msgid "sorted by language"
+msgstr "classement par langue"
 
 #. Game
 #. Gameplay related options.
@@ -251,15 +1258,6 @@ msgstr ""
 #. name: game/language
 #. type: int
 #. value: 1337
-#: ../data/config/schema.xml:103 ../game/requesthandler.cc:339
-msgid "Language"
-msgstr "Langue"
-
-#. Language
-#. Language to show Performous in
-#. name: game/language
-#. type: int
-#. value: 1337
 #: ../data/config/schema.xml:104
 msgid "Language to show Performous in"
 msgstr "Langue dans laquelle afficher Performous"
@@ -349,23 +1347,27 @@ msgstr ""
 "Port à utiliser au cas ou le port original du serveur web n'est pas "
 "disponible. Prenez un un qui soit certainement libre."
 
-#. Note Graph Scaling
-#. Type of scaling the note graph.
+#. Notegraph Scaling
+#. Choose whether the notegraph keeps a fixed scale or is adjusted according to the current song.
 #. name: game/notegraphscalingmode
 #. type: int
 #. value: 0
 #: ../data/config/schema.xml:140
-msgid "Note Graph Scaling"
+#, fuzzy
+#| msgid "Note Graph Scaling"
+msgid "Notegraph Scaling"
 msgstr "Mise à l'échelle de notes"
 
-#. Note Graph Scaling
-#. Type of scaling the note graph.
+#. Notegraph Scaling
+#. Choose whether the notegraph keeps a fixed scale or is adjusted according to the current song.
 #. name: game/notegraphscalingmode
 #. type: int
 #. value: 0
 #: ../data/config/schema.xml:141
-msgid "Type of scaling the note graph."
-msgstr "Type de mise à l'échelle des notes."
+msgid ""
+"Choose whether the notegraph keeps a fixed scale or is adjusted according to "
+"the current song."
+msgstr "Type de mise à l’échelle des notes."
 
 #. Keyboard as guitar
 #. Enable keyboard as guitar (Frets on Fire mode).
@@ -1193,15 +2195,6 @@ msgstr ""
 #. name: paths/showhiddenfolders
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:399 ../game/screen_paths.cc:74
-msgid "Show hidden folders"
-msgstr "Montrer les dossiers cachés"
-
-#. Show hidden folders
-#. When true the screen 'Paths' will also show hidden folders.
-#. name: paths/showhiddenfolders
-#. type: bool
-#. value: false
 #: ../data/config/schema.xml:400
 msgid "When true the screen 'Paths' will also show hidden folders."
 msgstr "Si activé, le menu affichera aussi les répertoires cachés."
@@ -1240,16 +2233,6 @@ msgstr ""
 #. type: int
 #. value: 0
 #. hidden: true
-#: ../data/config/schema.xml:428 ../game/requesthandler.cc:342
-msgid "Sort order"
-msgstr "Ordre de tri"
-
-#. Sort order
-#. Currently active sort order.
-#. name: songs/sort-order
-#. type: int
-#. value: 0
-#. hidden: true
 #: ../data/config/schema.xml:429
 msgid "Currently active sort order."
 msgstr "Ordre de tri courant."
@@ -1266,928 +2249,9 @@ msgstr "Un jeu de karaoke"
 msgid "song;music;dance;karaoke;microphone;sound;singing;"
 msgstr "chanson;musique;danse;karaoke;microphone;son;chant;"
 
-#: ../game/configuration.cc:147
-msgid "Enabled"
-msgstr "Activé"
-
-#: ../game/configuration.cc:147 ../game/menu.cc:64
-msgid "Disabled"
-msgstr "Désactivé"
-
-#: ../game/configuration.cc:151
-#, c-format
-msgid "%d items"
-msgstr "%d entrées"
-
-#: ../game/configuration.cc:452 ../game/i18n.hh:101
-msgid "Asturian"
-msgstr "Le asturien"
-
-#: ../game/configuration.cc:453 ../game/i18n.hh:102
-msgid "Danish"
-msgstr "Le danois"
-
-#: ../game/configuration.cc:454 ../game/i18n.hh:103
-msgid "German"
-msgstr "L’allemand"
-
-#: ../game/configuration.cc:455 ../game/i18n.hh:104
-msgid "English"
-msgstr "L’anglais"
-
-#: ../game/configuration.cc:456 ../game/i18n.hh:105
-msgid "Spanish"
-msgstr "L’espagnol"
-
-#: ../game/configuration.cc:457 ../game/i18n.hh:106
-msgid "Persian"
-msgstr "Le persan"
-
-#: ../game/configuration.cc:458 ../game/i18n.hh:107
-msgid "Finnish"
-msgstr "Le finlandais"
-
-#: ../game/configuration.cc:459 ../game/i18n.hh:108
-msgid "French"
-msgstr "Le français"
-
-#: ../game/configuration.cc:460 ../game/i18n.hh:109
-msgid "Hungarian"
-msgstr "Le hongrois"
-
-#: ../game/configuration.cc:461 ../game/i18n.hh:110
-msgid "Italian"
-msgstr "L’italien"
-
-#: ../game/configuration.cc:462 ../game/i18n.hh:111
-msgid "Japanese"
-msgstr "Le japonais"
-
-#: ../game/configuration.cc:463 ../game/i18n.hh:112
-msgid "Dutch"
-msgstr "Le néerlandais"
-
-#: ../game/configuration.cc:464 ../game/i18n.hh:113
-msgid "Polish"
-msgstr "Le polonais"
-
-#: ../game/configuration.cc:465 ../game/i18n.hh:114
-msgid "Portuguese"
-msgstr "Le portugais"
-
-#: ../game/configuration.cc:466 ../game/i18n.hh:115
-msgid "Swedish"
-msgstr "Le suédois"
-
-#: ../game/configuration.cc:467 ../game/i18n.hh:116
-msgid "Chinese"
-msgstr "Le chinois"
-
-#: ../game/dancegraph.cc:17
-msgid "Beginner"
-msgstr "Débutant"
-
-#: ../game/dancegraph.cc:17 ../game/guitargraph.cc:13
-msgid "Easy"
-msgstr "Facile"
-
-#: ../game/dancegraph.cc:17 ../game/guitargraph.cc:13
-msgid "Medium"
-msgstr "Moyen"
-
-#: ../game/dancegraph.cc:17 ../game/guitargraph.cc:13
-msgid "Hard"
-msgstr "Difficile"
-
-#: ../game/dancegraph.cc:17
-msgid "Challenge"
-msgstr "Défi"
-
-#: ../game/dancegraph.cc:51 ../game/dancegraph.cc:59
-msgid "Perfect!"
-msgstr "Parfait !"
-
-#: ../game/dancegraph.cc:52
-msgid "Excellent!-"
-msgstr "Excellent !-"
-
-#: ../game/dancegraph.cc:53
-msgid "Great!-"
-msgstr "Super !-"
-
-#: ../game/dancegraph.cc:54
-msgid " Good!- "
-msgstr " Bien !- "
-
-#: ../game/dancegraph.cc:55
-msgid "  OK!-  "
-msgstr "  OK !-  "
-
-#: ../game/dancegraph.cc:56
-msgid "Late!-"
-msgstr "Plus vite !-"
-
-#: ../game/dancegraph.cc:57 ../game/dancegraph.cc:65
-msgid "Way off!"
-msgstr "A coté de la plaque !"
-
-#: ../game/dancegraph.cc:60
-msgid "-Excellent!"
-msgstr "-Excellent !"
-
-#: ../game/dancegraph.cc:61
-msgid "-Great!"
-msgstr "-Super !"
-
-#: ../game/dancegraph.cc:62
-msgid " -Good! "
-msgstr " -Bien ! "
-
-#: ../game/dancegraph.cc:63
-msgid "  -OK!  "
-msgstr "  -OK !  "
-
-#: ../game/dancegraph.cc:64
-msgid "-Early!"
-msgstr "-Trop tôt!"
-
-#: ../game/dancegraph.cc:106 ../game/guitargraph.cc:194
-msgid "Ready!"
-msgstr "Prêt !"
-
-#: ../game/dancegraph.cc:106 ../game/guitargraph.cc:194
-#: ../game/screen_intro.cc:174
-msgid "Start performing!"
-msgstr "Commencer une partie !"
-
-#: ../game/dancegraph.cc:117 ../game/guitargraph.cc:183
-msgid "Select track"
-msgstr "Sélectionner la piste"
-
-#: ../game/dancegraph.cc:133 ../game/guitargraph.cc:163
-msgid "Select difficulty"
-msgstr "Sélectionner la difficulté"
-
-#: ../game/dancegraph.cc:136 ../game/guitargraph.cc:200
-#: ../game/instrumentgraph.cc:59 ../game/screen_intro.cc:192
-#: ../game/screen_sing.cc:108 ../game/screen_sing.cc:155
-msgid "Quit"
-msgstr "Quitter"
-
-#: ../game/dancegraph.cc:136 ../game/guitargraph.cc:200
-#: ../game/instrumentgraph.cc:59 ../game/screen_sing.cc:108
-#: ../game/screen_sing.cc:155
-msgid "Exit to song browser"
-msgstr "Revenir vers la liste des morceaux"
-
-#: ../game/dancegraph.cc:247
-msgid "STOP!"
-msgstr "STOP !"
-
-#: ../game/dancegraph.cc:321 ../game/guitargraph.cc:454
-msgid "Streak!"
-msgstr "A la chaine !"
-
-#: ../game/guitargraph.cc:13
-msgid "Kids"
-msgstr "Enfants"
-
-#: ../game/guitargraph.cc:13
-msgid "Expert"
-msgstr "Expert"
-
-#: ../game/guitargraph.cc:169 ../game/guitargraph.cc:186
-msgid "Lefty-mode"
-msgstr "Mode gaucher"
-
-#: ../game/guitargraph.cc:207
-msgid "ON"
-msgstr "Activé"
-
-#: ../game/guitargraph.cc:207
-msgid "OFF"
-msgstr "Désactivé"
-
-#: ../game/guitargraph.cc:208
-msgid "Toggle lefty-mode"
-msgstr "Basculer en mode gaucher"
-
-#: ../game/guitargraph.cc:466
-msgid ""
-"God Mode\n"
-"Activated!"
-msgstr ""
-"God Mode\n"
-"Activé !"
-
-#: ../game/guitargraph.cc:467
-msgid "Mistakes ignored!"
-msgstr "Erreurs ignorées !"
-
-#: ../game/guitargraph.cc:1119
-msgid "God Mode Ready!"
-msgstr "God Mode Prêt !"
-
-#: ../game/guitargraph.cc:1120
-msgid "Drum Fill!"
-msgstr "Solo Batterie !"
-
-#: ../game/guitargraph.cc:1123
-msgid "Solo!"
-msgstr "Solo !"
-
 #: ../game/i18n.hh:63 ../game/i18n.hh:100
 msgid "Auto"
 msgstr "Automatique"
-
-#: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:149
-msgid "Resume"
-msgstr "Reprendre"
-
-#: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:149
-msgid "Back to performing!"
-msgstr "Retourner à la partie !"
-
-#: ../game/instrumentgraph.cc:57
-msgid "Rejoin"
-msgstr "Rejoindre le jeu"
-
-#: ../game/instrumentgraph.cc:57
-msgid "Change selections"
-msgstr "Changer les paramètres"
-
-#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:150
-msgid "Restart"
-msgstr "Redémarrer"
-
-#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:150
-msgid ""
-"Start the song\n"
-"from the beginning"
-msgstr ""
-"Démarrer le morceau\n"
-"depuis le début"
-
-#: ../game/layout_singer.cc:72
-msgid "Perfect"
-msgstr "Parfait"
-
-#: ../game/layout_singer.cc:73
-msgid "Excellent"
-msgstr "Excellent"
-
-#: ../game/layout_singer.cc:74
-msgid "Great"
-msgstr "Super"
-
-#: ../game/layout_singer.cc:75
-msgid "Good"
-msgstr "Bien"
-
-#: ../game/layout_singer.cc:76
-msgid "OK"
-msgstr "OK"
-
-#: ../game/main.cc:148
-msgid "Loading audio samples..."
-msgstr "Chargement des echantillons..."
-
-#: ../game/main.cc:163
-msgid "Creating screens..."
-msgstr "Création des écrans..."
-
-#: ../game/main.cc:173
-msgid "Entering main menu..."
-msgstr "Entrée dans le menu principal..."
-
-#: ../game/main.cc:175
-msgid "Loading complete!"
-msgstr "Chargement terminé!"
-
-#: ../game/main.cc:184
-msgid ""
-"Done Loading!\n"
-" Loaded "
-msgstr "Chargement effectué ! Chargé "
-
-#: ../game/main.cc:190
-msgid "Screenshot taken!"
-msgstr "Capture d'écran effectuée!"
-
-#: ../game/main.cc:193
-msgid "Screenshot failed!"
-msgstr "Échec de la capture d'écran!"
-
-#: ../game/requesthandler.cc:332
-msgid "Performous web frontend"
-msgstr "Portail web de Performous"
-
-#: ../game/requesthandler.cc:333
-msgid "View database"
-msgstr "Voir la base de données"
-
-#: ../game/requesthandler.cc:334 ../game/screen_songs.cc:565
-msgid "View playlist"
-msgstr "Voir la liste de lecture"
-
-#: ../game/requesthandler.cc:335
-msgid "Search and add"
-msgstr "Chercher et ajouter"
-
-#: ../game/requesthandler.cc:336
-msgid "Sort by"
-msgstr "Trier par"
-
-#: ../game/requesthandler.cc:337
-msgid "Artist"
-msgstr "Artiste"
-
-#: ../game/requesthandler.cc:338
-msgid "Title"
-msgstr "Titre"
-
-#: ../game/requesthandler.cc:340
-msgid "Edition"
-msgstr "Édition"
-
-#: ../game/requesthandler.cc:341
-msgid "Creator"
-msgstr "Créateur"
-
-#: ../game/requesthandler.cc:343
-msgid "Normal"
-msgstr "Normal"
-
-#: ../game/requesthandler.cc:344
-msgid "Inverted"
-msgstr "Inversé"
-
-#: ../game/requesthandler.cc:345
-msgid "Update every 10 sec"
-msgstr "Mis à jour toutes les 10 sec"
-
-#: ../game/requesthandler.cc:346
-msgid "Refresh database"
-msgstr "Mettre à jour la base de données"
-
-#: ../game/requesthandler.cc:347
-msgid "Upcoming songs"
-msgstr "Chansons à suivre"
-
-#: ../game/requesthandler.cc:348
-msgid "Refresh playlist"
-msgstr "Rafraichir la liste de lecture"
-
-#: ../game/requesthandler.cc:349
-msgid ""
-"Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding "
-"Performous see /docs/Authors.txt"
-msgstr ""
-"Interface Web de Niek Nooijens et Arjan Speiard; la liste complète des "
-"contributeurs est dans /docs/Authors.txt"
-
-#: ../game/requesthandler.cc:350
-msgid "Search"
-msgstr "Rechercher"
-
-#: ../game/requesthandler.cc:351
-msgid "Available songs"
-msgstr "Chansons disponibles"
-
-#: ../game/requesthandler.cc:352
-msgid "Search for songs"
-msgstr "Rechercher des chansons"
-
-#: ../game/requesthandler.cc:353
-msgid "Yes"
-msgstr "Oui"
-
-#: ../game/requesthandler.cc:354
-msgid "No"
-msgstr "Non"
-
-#: ../game/requesthandler.cc:355 ../game/screen_playlist.cc:376
-msgid "Move up"
-msgstr "Monter"
-
-#: ../game/requesthandler.cc:356 ../game/screen_playlist.cc:386
-msgid "Move down"
-msgstr "Descendre"
-
-#: ../game/requesthandler.cc:357
-msgid "Set position"
-msgstr "Définir la position"
-
-#: ../game/requesthandler.cc:358
-msgid "Remove song"
-msgstr "Retirer la chanson"
-
-#: ../game/requesthandler.cc:359
-msgid "Desired position of song"
-msgstr "Position de la chanson"
-
-#: ../game/requesthandler.cc:360
-msgid "Cancel"
-msgstr "Annuler"
-
-#: ../game/requesthandler.cc:361
-msgid "Successfully removed song from playlist."
-msgstr "Chanson retirée de la liste de lecture."
-
-#: ../game/requesthandler.cc:362
-msgid "Failed removing song from playlist!"
-msgstr "Échec du retrait de la chanson de la liste de lecture!"
-
-#: ../game/requesthandler.cc:363
-msgid "Successfully changed position of song."
-msgstr "Chanson déplacée."
-
-#: ../game/requesthandler.cc:364
-msgid "Failed changing position of song!"
-msgstr "Échec du déplacement de la chanson!"
-
-#: ../game/requesthandler.cc:365
-msgid "Successfully moved song up."
-msgstr "Chanson remontée."
-
-#: ../game/requesthandler.cc:366
-msgid "Failed moving song up!"
-msgstr "Échec de la remontée de la chanson!"
-
-#: ../game/requesthandler.cc:367
-msgid "Successfully moved song down."
-msgstr "Chanson descendue."
-
-#: ../game/requesthandler.cc:368
-msgid "Failed moving song down!"
-msgstr "Échec de la descente de la chanson!"
-
-#: ../game/requesthandler.cc:369
-msgid "Successfully added song to the playlist."
-msgstr "Chanson ajoutée à la liste de lecture."
-
-#: ../game/requesthandler.cc:370
-msgid "Failed adding song to the playlist!"
-msgstr "Échec de l'ajout à la liste de lecture!"
-
-#: ../game/requesthandler.cc:371
-msgid "No songs found with current filter."
-msgstr "Aucune chanson ne correspond à ce critère."
-
-#: ../game/screen_audiodevices.cc:66
-msgid ""
-"It seems you have some manual configurations\n"
-"incompatible with this user interface.\n"
-"Saving these settings will override\n"
-"all existing audio device configuration.\n"
-"Your other options changes will be saved too."
-msgstr ""
-"Il semble que vous ayez certaines configurations\n"
-"manuelles incompatibles avec cette interface.\n"
-"Sauvegarder cette configuration remplacera\n"
-"toutes les configurations audio préexistantes.\n"
-"Vos autres changements seront également sauvegardés."
-
-#: ../game/screen_audiodevices.cc:129
-msgid "- Unassigned -"
-msgstr "- Non assigné -"
-
-#: ../game/screen_audiodevices.cc:150
-msgid ""
-"Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select "
-"to cancel. Ctrl + R to reset defaults"
-msgstr ""
-"Utilisez les flèches pour configurer. Tapez Entrer/Démarrer pour sauvegarder "
-"ou Ech/Select pour annuler. Ctrl+R pour remettre à zéro"
-
-#: ../game/screen_audiodevices.cc:155
-msgid ""
-"For advanced device configuration, use command line parameter --audio (use --"
-"audiohelp for details)."
-msgstr ""
-"Pour une configuration avancée veuillez utiliser la ligne de commande --"
-"audio (--audiohelp pour l'aide)."
-
-#: ../game/screen_audiodevices.cc:199
-msgid "Some devices failed to open!"
-msgstr "Certains périphériques n'ont pas pu être ouverts !"
-
-#: ../game/screen_intro.cc:27
-msgid "No playback devices could be used.\n"
-msgstr "Aucun périphérique audio de sortie n'est utilisable.\n"
-
-#: ../game/screen_intro.cc:28
-msgid ""
-"\n"
-"Please configure some before playing."
-msgstr ""
-"\n"
-"Veuillez les configurer avant de jouer."
-
-#: ../game/screen_intro.cc:75 ../game/screen_paths.cc:36
-msgid "Settings saved as system defaults."
-msgstr "Configuration enregistrée comme configuration par défaut."
-
-#: ../game/screen_intro.cc:75 ../game/screen_paths.cc:36
-msgid "Settings saved."
-msgstr "Configuration enregistrée."
-
-#: ../game/screen_intro.cc:154
-msgid "Ctrl + S to save, Ctrl + R to reset defaults"
-msgstr "Ctrl + S pour sauvegarder, Ctrl + R pour réinitialiser"
-
-#: ../game/screen_intro.cc:174
-msgid "Perform"
-msgstr "Jouer"
-
-#: ../game/screen_intro.cc:175
-msgid "Practice"
-msgstr "S'exercer"
-
-#: ../game/screen_intro.cc:175
-msgid "Check your skills or test the microphones."
-msgstr "Chauffer votre voix ou tester les micros."
-
-#: ../game/screen_intro.cc:191
-msgid "Configure"
-msgstr "Options"
-
-#: ../game/screen_intro.cc:191
-msgid "Configure audio and game options."
-msgstr "Configurer les options de jeu et de son."
-
-#: ../game/screen_intro.cc:192
-msgid "Leave the game."
-msgstr "Sortir du jeu."
-
-#: ../game/screen_intro.cc:205
-msgid ""
-"Webserver active!\n"
-" connect to this computer\n"
-"using: "
-msgstr ""
-"Serveur Web actif !\n"
-"Connectez vous à cet ordinateur\n"
-"depuis : "
-
-#: ../game/screen_paths.cc:69
-msgid "Hide hidden folders"
-msgstr "Ignorer les dossiers cachés"
-
-#: ../game/screen_paths.cc:81
-msgid "Remove this folder"
-msgstr "Oter ce dossier"
-
-#: ../game/screen_paths.cc:81
-msgid "Remove current folder from song folders"
-msgstr "Oter le dossier courant de la liste des dossiers de chansons"
-
-#: ../game/screen_paths.cc:87
-msgid "Add this folder"
-msgstr "Ajouter le dossier courant"
-
-#: ../game/screen_paths.cc:87
-msgid "Add current folder to song folders"
-msgstr "Ajouter ce dossier à la liste des dossiers de chansons"
-
-#: ../game/screen_paths.cc:95
-msgid ".."
-msgstr ".."
-
-#: ../game/screen_paths.cc:95
-msgid "Go to parent folder"
-msgstr "Remonter au dossier parent"
-
-#: ../game/screen_paths.cc:122
-msgid "Open folder"
-msgstr "Ouvrir le dossier"
-
-#: ../game/screen_players.cc:134
-msgid "No players found!"
-msgstr "Aucun joueur n'a été trouvé !"
-
-#: ../game/screen_players.cc:135
-msgid "Enter a name to create a new player."
-msgstr "Entrez un nom pour créer un nouveau joueur."
-
-#: ../game/screen_players.cc:137
-msgid "Press enter to create player!"
-msgstr "Pressez Entrer pour créer un nouveau joueur !"
-
-#: ../game/screen_players.cc:141
-msgid "No players worth mentioning!"
-msgstr "Pas de joueur digne de ce nom !"
-
-#: ../game/screen_players.cc:146
-msgid "You reached %1% points!"
-msgstr "%1% points marqués !"
-
-#: ../game/screen_players.cc:147
-msgid "Change player with arrow keys."
-msgstr "Changez de joueur avec les flèches."
-
-#: ../game/screen_players.cc:148
-msgid "Name:"
-msgstr "Nom :"
-
-#: ../game/screen_players.cc:151
-msgid "Type text to filter or create a new player."
-msgstr "Entrez un nom pour créer ou filtrer un joueur."
-
-#: ../game/screen_players.cc:151
-msgid "Search Text:"
-msgstr "Recherche :"
-
-#: ../game/screen_playlist.cc:19 ../game/screen_sing.cc:46
-msgid "Initializing webcam..."
-msgstr "Initialisation de la webcam..."
-
-#: ../game/screen_playlist.cc:38
-msgid "Loading song timestamps..."
-msgstr "Chargement des marqueurs de chanson..."
-
-#: ../game/screen_playlist.cc:181 ../game/screen_playlist.cc:352
-msgid "Continue"
-msgstr "Continuer"
-
-#: ../game/screen_playlist.cc:181
-msgid "Continue playing"
-msgstr "Continuer à jouer"
-
-#: ../game/screen_playlist.cc:195
-msgid "Add songs"
-msgstr "Ajouter des morceaux"
-
-#: ../game/screen_playlist.cc:195
-msgid "Open the song browser to add more songs"
-msgstr "Ouvrir le navigateur de morceaux pour ajouter plus de morceaux"
-
-#: ../game/screen_playlist.cc:196 ../game/screen_songs.cc:559
-msgid "Shuffle"
-msgstr "Aléatoire"
-
-#: ../game/screen_playlist.cc:196
-msgid "Randomize the order of the playlist"
-msgstr "Mélanger l'ordre de la liste de lecture"
-
-#: ../game/screen_playlist.cc:202
-msgid "Clear and exit"
-msgstr "Vider et quitter"
-
-#: ../game/screen_playlist.cc:202
-msgid "Remove all the songs from the list"
-msgstr "Enlever l'ensemble des morceaux de la liste"
-
-#: ../game/screen_playlist.cc:208 ../game/screen_playlist.cc:393
-#: ../game/screen_songs.cc:572
-msgid "Back"
-msgstr "Précédent"
-
-#: ../game/screen_playlist.cc:208 ../game/screen_playlist.cc:393
-msgid "Back to playlist viewer"
-msgstr "Retourner à la liste de lecture"
-
-#: ../game/screen_playlist.cc:335
-msgid "Press enter to view song options"
-msgstr "Appuyer sur ENTREE pour voir les options du morceau"
-
-#: ../game/screen_playlist.cc:344
-msgid "View more options"
-msgstr "Voir plus d'options"
-
-#: ../game/screen_playlist.cc:344
-msgid "View general playlist settings"
-msgstr "Configurer les options de la liste de lecture"
-
-#: ../game/screen_playlist.cc:352
-msgid "Play first"
-msgstr "Jouer en premier"
-
-#: ../game/screen_playlist.cc:354
-msgid "Ignore the playlist's order and play this song first"
-msgstr "Ignorer l'ordre de la liste de lecture et jouer ce morceau en premier"
-
-#: ../game/screen_playlist.cc:355
-msgid "Start the song already!"
-msgstr "Démarre-le ce morceau !"
-
-#: ../game/screen_playlist.cc:364
-msgid "Remove"
-msgstr "Enlever"
-
-#: ../game/screen_playlist.cc:364
-msgid "Remove this song from the list"
-msgstr "Enlever ce morceau de la liste"
-
-#: ../game/screen_playlist.cc:376
-msgid "Move this song up the list"
-msgstr "Monter ce morceau dans la liste"
-
-#: ../game/screen_playlist.cc:386
-msgid "Move this song down the list"
-msgstr "Descendre ce morceau dans la liste"
-
-#: ../game/screen_sing.cc:53
-msgid "Loading video..."
-msgstr "Chargement de la vidéo..."
-
-#: ../game/screen_sing.cc:59
-msgid "Loading song..."
-msgstr "Chargement de la chanson..."
-
-#: ../game/screen_sing.cc:66
-msgid "Song contains broken tracks!"
-msgstr "Chanson contenant des pistes défectueuses !"
-
-#: ../game/screen_sing.cc:71
-msgid "Loading menu..."
-msgstr "Chargement du menu..."
-
-#: ../game/screen_sing.cc:81
-msgid "Loading complete"
-msgstr "Chargement terminé"
-
-#: ../game/screen_sing.cc:87
-msgid "Start"
-msgstr "Démarrer"
-
-#: ../game/screen_sing.cc:87
-msgid "Start performing"
-msgstr "Commencer une partie"
-
-#: ../game/screen_sing.cc:90
-msgid "Duet mode"
-msgstr "Mode duo"
-
-#: ../game/screen_sing.cc:91
-msgid "Normal mode"
-msgstr "Mode normal"
-
-#: ../game/screen_sing.cc:92
-msgid "Switch between duet and regular singing mode"
-msgstr "Basculer entre le mode standard et le mode duo"
-
-#: ../game/screen_sing.cc:102
-msgid "Change vocal track"
-msgstr "Change la piste de chant"
-
-#: ../game/screen_sing.cc:153
-msgid "Skip"
-msgstr "Passer"
-
-#: ../game/screen_sing.cc:153
-msgid "Skip current song"
-msgstr "Passer le morceau actuel"
-
-#: ../game/screen_sing.cc:308
-msgid "Press UP to join dance!"
-msgstr "Appuyer sur HAUT pour entrer dans la danse !"
-
-#: ../game/screen_sing.cc:308
-msgid "Step UP to join!"
-msgstr "Appuyer sur HAUT pour jouer !"
-
-#: ../game/screen_sing.cc:313
-msgid "Press 1 to join guitar!"
-msgstr "Appuyer sur 1 pour jouer avec une guitare !"
-
-#: ../game/screen_sing.cc:313
-msgid "Press GREEN to join!"
-msgstr "Appuyer sur VERT pour jouer !"
-
-#: ../game/screen_sing.cc:318
-msgid "Press SPACE to join drums!"
-msgstr "Appuyer sur ESPACE pour jouer avec une batterie !"
-
-#: ../game/screen_sing.cc:318
-msgid "KICK to join!"
-msgstr "Appuyer sur la PEDALE pour jouer !"
-
-#: ../game/screen_sing.cc:557
-msgid "   ENTER to skip instrumental break"
-msgstr "   \"Entrée\" pour passer l'instrumental"
-
-#: ../game/screen_sing.cc:562 ../game/screen_sing.cc:583
-msgid "   Autoplay enabled"
-msgstr "   Autoplay activé"
-
-#: ../game/screen_sing.cc:565 ../game/screen_sing.cc:577
-msgid "   Remember to wait for grading!"
-msgstr "   Restez pour votre classement !"
-
-#: ../game/screen_sing.cc:567
-msgid "   Prepare for the next song!"
-msgstr "   Préparez vous pour la prochaine chanson !"
-
-#: ../game/screen_sing.cc:579
-msgid "   Choose your next song!"
-msgstr "   Choisir la prochaine chanson !"
-
-#: ../game/screen_sing.cc:713
-msgid "No player!"
-msgstr "Aucun joueur n'a été trouvé !"
-
-#: ../game/screen_sing.cc:721
-msgid "Hit singer"
-msgstr "Superstar"
-
-#: ../game/screen_sing.cc:722
-msgid "Lead singer"
-msgstr "Soliste"
-
-#: ../game/screen_sing.cc:723 ../game/screen_sing.cc:729
-#: ../game/screen_sing.cc:735
-msgid "Rising star"
-msgstr "Étoile montante"
-
-#: ../game/screen_sing.cc:724 ../game/screen_sing.cc:730
-#: ../game/screen_sing.cc:736
-msgid "Amateur"
-msgstr "Amateur"
-
-#: ../game/screen_sing.cc:725 ../game/screen_sing.cc:737
-msgid "Tone deaf"
-msgstr "Casserole"
-
-#: ../game/screen_sing.cc:727
-msgid "Maniac"
-msgstr "Maniac"
-
-#: ../game/screen_sing.cc:728
-msgid "Hoofer"
-msgstr "Claquettiste"
-
-#: ../game/screen_sing.cc:731
-msgid "Loser"
-msgstr "Perdant"
-
-#: ../game/screen_sing.cc:733
-msgid "Virtuoso"
-msgstr "Virtuose"
-
-#: ../game/screen_sing.cc:734
-msgid "Rocker"
-msgstr "Rockeur"
-
-#: ../game/screen_songs.cc:296
-msgid "Sorry, no songs match the search!"
-msgstr "Désolé, aucun morceau ne correspond à cette recherche !"
-
-#: ../game/screen_songs.cc:299
-msgid "Sorry, no songs match the filter!"
-msgstr "Désolé, aucun morceau ne correspond à ce filtre !"
-
-#: ../game/screen_songs.cc:302
-msgid "No songs found!"
-msgstr "Aucun morceau trouvé !"
-
-#: ../game/screen_songs.cc:303
-msgid "Visit performous.org for free songs"
-msgstr "Visitez performous.org pour des morceaux gratuits"
-
-#: ../game/screen_songs.cc:321
-msgid "<type in to search>"
-msgstr "<Entrez votre recherche>"
-
-#: ../game/screen_songs.cc:321
-msgid "songs"
-msgstr "morceaux"
-
-#: ../game/screen_songs.cc:321
-msgid "options"
-msgstr "options"
-
-#: ../game/screen_songs.cc:323
-msgid "sort order: "
-msgstr "ordre : "
-
-#: ../game/screen_songs.cc:324
-msgid "type filter: "
-msgstr "filtre : "
-
-#: ../game/screen_songs.cc:325
-msgid "hiscores"
-msgstr "meilleurs scores"
-
-#: ../game/screen_songs.cc:325
-msgid "jukebox mode"
-msgstr "mode jukebox"
-
-#: ../game/screen_songs.cc:328
-msgid "start a playlist with this song!"
-msgstr "commencer une liste de lecture avec ce morceau !"
-
-#: ../game/screen_songs.cc:328
-msgid "open the playlist menu"
-msgstr "ouvrir le menu de listes de lecture"
-
-#: ../game/screen_songs.cc:552
-msgid "Play"
-msgstr "Jouer"
-
-#: ../game/screen_songs.cc:566
-msgid "Clear playlist"
-msgstr "Vider la liste de lecture"
 
 #: ../game/song.hh:28
 msgid "Guitar"
@@ -2225,65 +2289,8 @@ msgstr "Harmonique 2"
 msgid "Harmonic 3"
 msgstr "Harmonique 3"
 
-#: ../game/songparser-xml.cc:117
-msgid "Together"
-msgstr "Ensemble"
-
-#: ../game/songs.cc:439
-msgid "show all songs"
-msgstr "montrer tous les morceaux"
-
-#: ../game/songs.cc:440
-msgid "has dance"
-msgstr "contient de la danse"
-
-#: ../game/songs.cc:441
-msgid "has vocals"
-msgstr "contient du chant"
-
-#: ../game/songs.cc:442
-msgid "has duet"
-msgstr "contient un mode duo"
-
-#: ../game/songs.cc:443
-msgid "has guitar"
-msgstr "contient une guitare"
-
-#: ../game/songs.cc:444
-msgid "drums or keytar"
-msgstr "batterie ou keytar"
-
-#: ../game/songs.cc:445
-msgid "full band"
-msgstr "groupe complet"
-
-#: ../game/songs.cc:473
-msgid "random order"
-msgstr "ordre aléatoire"
-
-#: ../game/songs.cc:474
-msgid "sorted by song"
-msgstr "classement par chanson"
-
-#: ../game/songs.cc:475
-msgid "sorted by artist"
-msgstr "classement par artiste"
-
-#: ../game/songs.cc:476
-msgid "sorted by edition"
-msgstr "classement par édition"
-
-#: ../game/songs.cc:477
-msgid "sorted by genre"
-msgstr "classement par genre"
-
-#: ../game/songs.cc:478
-msgid "sorted by path"
-msgstr "classement par chemin"
-
-#: ../game/songs.cc:479
-msgid "sorted by language"
-msgstr "classement par langue"
+#~ msgid "Type of scaling the note graph."
+#~ msgstr "Type de mise à l'échelle des notes."
 
 #~ msgid "Move Down"
 #~ msgstr "Descendre"
