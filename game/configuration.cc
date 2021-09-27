@@ -463,8 +463,9 @@ unsigned int LanguageToLanguageId(const std::string& name) {
 	if (name == _("Dutch")) return 12;
 	if (name == _("Polish")) return 13;
 	if (name == _("Portuguese")) return 14;
-	if (name == _("Swedish")) return 15;
-	if (name == _("Chinese")) return 16;
+	if (name == _("Slovak")) return 15;
+	if (name == _("Swedish")) return 16;
+	if (name == _("Chinese")) return 17;
 	
 	return 1337; // if no name matched return "Auto" which translates to computer language OR English.
 }
