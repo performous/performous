@@ -2,7 +2,7 @@ if (NOT USE_SELF_BUILT_AUBIO)
     find_package(PkgConfig REQUIRED)
     if(PKG_CONFIG_FOUND)
         # The version we look for is legacy, may need some fine tunning
-        pkg_check_modules(AUBIO IMPORTED_TARGET aubio>=0.4.9)
+        pkg_check_modules(AUBIO IMPORTED_TARGET GLOBAL aubio>=0.4.9)
             if(AUBIO_FOUND)
                 add_library(aubio ALIAS PkgConfig::AUBIO)
             endif()
