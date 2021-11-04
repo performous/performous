@@ -97,7 +97,6 @@ to save the current settings to XML.
 	</entry>
 	<entry name="game/language" type="int" value="1337">
 		<limits>
-			<enum>Auto</enum>
 			<!-- enum options will be added dynamically according to detected interfaces. -->
 		</limits>
 		<short>Language</short>
