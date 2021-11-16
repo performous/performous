@@ -69,7 +69,7 @@ add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
 # Libraries
 
 find_package(Boost 1.55 REQUIRED COMPONENTS program_options iostreams system locale)
-target_include_directories(performous PRIVATE ${Boost_INCLUDE_DIRS})
+target_include_directories(performous SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
 target_link_libraries(performous PRIVATE ${Boost_LIBRARIES})
 
 add_library(fs STATIC fs.cc)
@@ -108,53 +108,90 @@ foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWS
 	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
 
-option(ENABLE_MIDI "Enable support for MIDI hardware (e-drums with USB/MIDI connection)." ON)
-if(ENABLE_MIDI)
-	find_package(PortMidi)
+target_include_directories(fs PRIVATE ${SDL2_INCLUDE_DIRS})
+target_link_libraries(fs PRIVATE ${SDL2_LIBRARIES})
+
+# Activating MIDI hardware (e-drums with USB/MIDI connection)
+set(ENABLE_MIDI AUTO CACHE STRING "Use midi hardware (e-drums with USB/MIDI connection)")
+set_property(CACHE ENABLE_MIDI PROPERTY STRINGS AUTO ON OFF)
+if("AUTO" STREQUAL "${ENABLE_MIDI}")
+	# Midi support not requested explicitly, best effort try to find it
+	find_package(PortMidi QUIET)
 	if(PortMidi_FOUND)
-		include_directories(${PortMidi_INCLUDE_DIRS})
-		list(APPEND LIBS ${PortMidi_LIBRARIES})
-		add_definitions("-DUSE_PORTMIDI")
-		message(STATUS "MIDI I/O: Enabled")
+		message(STATUS "MIDI I/O support: Enabled (automatically found)")
 	else()
-		message(STATUS "MIDI I/O: Disabled (libportmidi not found)")
+		message(STATUS "MIDI I/O support: Disabled (libportmidi not found)")
 	endif()
+elseif(ENABLE_MIDI)
+	# Midi support explicitly requested, make it mandatory
+	find_package(PortMidi REQUIRED)
+	message(STATUS "MIDI I/O support: Enabled (explicitly enabled)")
 else()
-	message(STATUS "MIDI I/O: Disabled (explicitly disabled)")
+	# Midi support explicitly disabled
+	message(STATUS "MIDI I/O support: Disabled (explicitly disabled)")
 endif()
 
-option(ENABLE_WEBCAM "Enable webcam support (OpenCV)." ON)
-if(ENABLE_WEBCAM)
-	find_package(OpenCV)
+if(PortMidi_FOUND)
+	include_directories(${PortMidi_INCLUDE_DIRS})
+	list(APPEND LIBS ${PortMidi_LIBRARIES})
+	add_definitions("-DUSE_PORTMIDI")
+endif()
+
+# Activating webcam
+set(ENABLE_WEBCAM AUTO CACHE STRING "Use webcam")
+set_property(CACHE ENABLE_WEBCAM PROPERTY STRINGS AUTO ON OFF)
+if("AUTO" STREQUAL "${ENABLE_WEBCAM}")
+	# webcam support not requested explicitly, best effort try to find it
+	find_package(OpenCV QUIET)
 	if(OpenCV_FOUND)
-		include_directories(${OpenCV_INCLUDE_DIRS})
-		list(APPEND LIBS ${OpenCV_LIBS})
-		add_definitions("-DUSE_OPENCV")
-		message(STATUS "Webcam support: Enabled")
+		message(STATUS "Webcam support: Enabled (automatically found)")
 	else()
-		message(STATUS "Webcam support: Disabled (libcv/libhighgui not found)")
+		message(STATUS "Webcam support: Disabled (OpenCV (libcv/libhighgui) not found)")
 	endif()
+elseif(ENABLE_WEBCAM)
+	# webcam support explicitly requested, make it mandatory
+	find_package(OpenCV REQUIRED)
+	message(STATUS "Webcam support: Enabled (explicitly enabled)")
 else()
+	# webcam support explicitly disabled
 	message(STATUS "Webcam support: Disabled (explicitly disabled)")
 endif()
 
-option(ENABLE_WEBSERVER "Enable webserver support (cpprestsdk)." ON)
-if(ENABLE_WEBSERVER)
-	find_package(CppRest)
-	if(CppRest_FOUND)
-		find_package(Boost 1.55 REQUIRED COMPONENTS chrono thread)
-		include_directories(${Boost_INCLUDE_DIRS})
-		list(APPEND LIBS ${Boost_LIBRARIES})
+if(OpenCV_FOUND)
+	target_include_directories(performous SYSTEM PRIVATE ${OpenCV_INCLUDE_DIRS})
+	target_link_libraries(performous PRIVATE ${OpenCV_LIBS})
+	add_definitions("-DUSE_OPENCV")
+endif()
 
-		include_directories(${CppRest_INCLUDE_DIRS})
-		list(APPEND LIBS ${CppRest_LIBRARIES})
-		message(STATUS "Webserver support: Enabled")
-		add_definitions("-DUSE_WEBSERVER")
+# Activating webserver
+set(ENABLE_WEBSERVER AUTO CACHE STRING "Use webserver")
+set_property(CACHE ENABLE_WEBSERVER PROPERTY STRINGS AUTO ON OFF)
+if("AUTO" STREQUAL "${ENABLE_WEBSERVER}")
+	# webserver not requested explicitly, best effort try to find it
+	find_package(CppRest QUIET)
+	if(CppRest_FOUND)
+		message(STATUS "Webserver support: Enabled (automatically found)")
 	else()
 		message(STATUS "Webserver support: Disabled (cpprestsdk not found)")
 	endif()
+elseif(ENABLE_WEBSERVER)
+	# webserver explicitly requested, make it mandatory
+	find_package(CppRest REQUIRED)
+	message(STATUS "Webserver support: Enabled (explicitly enabled)")
 else()
+	# webserver explicitly disabled
 	message(STATUS "Webserver support: Disabled (explicitly disabled)")
+endif()
+
+# if cpprest is found, add it to the dependencies
+if(CppRest_FOUND)
+	# add other required dependencies then
+	# FIXME: move this to the CppRest package includes if possible
+	find_package(Boost 1.55 REQUIRED COMPONENTS chrono thread)
+	target_include_directories(performous SYSTEM PRIVATE ${CppRest_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+	target_link_libraries(performous PRIVATE ${CppRest_LIBRARIES} ${Boost_LIBRARIES})
+
+	add_definitions("-DUSE_WEBSERVER")
 endif()
 
 if(WIN32)
@@ -185,7 +222,6 @@ list(APPEND LIBS ${FFTW3_LIBRARIES})
 list(APPEND LIBS ${BLAS_LIBRARIES})
 
 find_package(Threads)
-
 target_link_libraries(performous PRIVATE fs ced aubio ${LIBS} PkgConfig::deps Threads::Threads)
 
 install(TARGETS performous DESTINATION ${BIN_INSTALL})

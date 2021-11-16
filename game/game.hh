@@ -12,6 +12,7 @@
 #include "fbo.hh"
 #include "audio.hh"
 #include "screen.hh"
+#include "i18n.hh"
 
 /// Manager for screens and Playlist
 /** manages screens
@@ -20,7 +21,7 @@
 class Game: public Singleton <Game> {
   public:
 	/// constructor
-	Game(Window& window, Audio& audio);
+	Game(Window& window, Audio& audio, TranslationEngine& translationEngine);
 	~Game();
 	/// Adds a screen to the manager
 	void addScreen(std::unique_ptr<Screen> s) { 
@@ -75,6 +76,8 @@ class Game: public Singleton <Game> {
 	void drawLogo();
 	///global playlist access
 	PlayList& getCurrentPlayList() { return currentPlaylist; }
+	void setLanguage(const std::string& language) { m_translationEngine.setLanguage(language, true); };
+	std::string getCurrentLanguage() const { return m_translationEngine.getCurrentLanguage().second; };
 #ifdef USE_WEBSERVER
 	void notificationFromWebserver(std::string message) { m_webserverMessage = message; }
 	std::string subscribeWebserverMessages() { return m_webserverMessage; }
@@ -107,11 +110,8 @@ private:
 	AnimValue m_dialogTimeOut;
 	// Dialog members
 	std::unique_ptr<Dialog> m_dialog;
+	TranslationEngine& m_translationEngine;
 #ifdef USE_WEBSERVER
 	std::string m_webserverMessage = "Trying to connect to webserver";
 #endif
 };
-
-// Declaration for the singleton pointer defined in game.cc
-template<> Game* Singleton<Game>::ms_Singleton;
-

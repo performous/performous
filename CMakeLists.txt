@@ -50,8 +50,7 @@ if (APPLE)
 	endif()
 endif()
 
-# Note: AUTO_PTR is for Boost which won't compile with C++17 otherwise (fixed in Boost git but not in 1.66)
-add_compile_options(-Wall -Wextra -D_LIBCPP_ENABLE_CXX17_REMOVED_AUTO_PTR $<$<CXX_COMPILER_ID:gcc>:-fcx-limited-range>)
+add_compile_options(-Wall $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wextra> $<$<CXX_COMPILER_ID:gcc>:-fcx-limited-range>)
 
 if(WIN32)
 	set(CMAKE_CXX_FLAGS "-DWIN32_LEAN_AND_MEAN ${CMAKE_CXX_FLAGS}")
@@ -95,10 +94,6 @@ add_subdirectory(data)
 add_subdirectory(game)
 add_subdirectory(docs)
 
-if(WIN32)
-	install(FILES win32/ConfigureSongDirectory.bat DESTINATION .)
-endif()
-
 if(NOT APPLE)
   # uninstall target
   if(NOT TARGET uninstall)
@@ -110,6 +105,10 @@ if(NOT APPLE)
     add_custom_target(uninstall
       COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake/uninstall.cmake)
   endif()
+endif()
+
+if(WIN32)
+	set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION ".")
 endif()
 
 #CPACK variables

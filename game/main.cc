@@ -103,13 +103,13 @@ static void checkEvents(Game& gm, Time eventTime) {
 	for (input::NavEvent event; gm.controllers.getNav(event); ) {
 		input::NavButton nav = event.button;
 		// Volume control
-		if (nav == input::NAV_VOLUME_UP || nav == input::NAV_VOLUME_DOWN) {
+		if (nav == input::NavButton::VOLUME_UP || nav == input::NavButton::VOLUME_DOWN) {
 			std::string curS = gm.getCurrentScreen()->getName();
 			// Pick proper setting
 			std::string which_vol = (curS == "Sing" || curS == "Practice")
 			  ? "audio/music_volume" : "audio/preview_volume";
 			// Adjust value
-			if (nav == input::NAV_VOLUME_UP) ++config[which_vol]; else --config[which_vol];
+			if (nav == input::NavButton::VOLUME_UP) ++config[which_vol]; else --config[which_vol];
 			// Show message
 			gm.flashMessage(config[which_vol].getShortDesc() + ": " + config[which_vol].getValue());
 			continue; // Already handled here...
@@ -141,7 +141,7 @@ void mainLoop(std::string const& songlist) {
 		} catch (RUNTIME_ERROR& e) {
 			std::cerr << "ERROR: " << e.what() << std::endl;
 		}
-	Game gm(*window, audio);
+	Game gm(*window, audio, localization);
 	WebServer server(songs);
 	try {
 		// Load audio samples
@@ -170,9 +170,9 @@ void mainLoop(std::string const& songlist) {
 		gm.addScreen(std::make_unique<ScreenPlayers>("Players", audio, database));
 		gm.addScreen(std::make_unique<ScreenPlaylist>("Playlist", audio, songs, backgrounds));
 		gm.activateScreen("Intro");
-		gm.loading(_("Entering main menu"), 0.8);
+		gm.loading(_("Entering main menu..."), 0.8);
 		gm.updateScreen();  // exit/enter, any exception is fatal error
-		gm.loading(_("Loading complete"), 1.0);
+		gm.loading(_("Loading complete!"), 1.0);
 		// Main loop
 		auto time = Clock::now();
 		unsigned frames = 0;
@@ -404,7 +404,7 @@ int main(int argc, char** argv) try {
 
 void outputOptionalFeatureStatus() {
 	std::clog << "core/notice: " PACKAGE " " VERSION " starting..."
-	  << "\n  Internationalization: " << (TranslationEngine::enabled() ? "Enabled" : "Disabled")
+	  << "\n  Internationalization: " << ("Enabled")
 	  << "\n  MIDI Hardware I/O:    " << (input::Hardware::midiEnabled() ? "Enabled" : "Disabled")
 	  << "\n  Webcam support:       " << (Webcam::enabled() ? "Enabled" : "Disabled")
 	  << std::endl;

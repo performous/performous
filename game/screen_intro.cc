@@ -10,7 +10,7 @@
 #include "menu.hh"
 #include "game.hh"
 
-#include <SDL2/SDL_timer.h>
+#include <SDL_timer.h>
 
 ScreenIntro::ScreenIntro(std::string const& name, Audio& audio): Screen(name), m_audio(audio), m_first(true) {
 }
@@ -44,18 +44,18 @@ void ScreenIntro::exit() {
 
 void ScreenIntro::manageEvent(input::NavEvent const& event) {
 	input::NavButton nav = event.button;
-	if (nav == input::NAV_CANCEL) {
+	if (nav == input::NavButton::CANCEL) {
 		if (m_menu.getSubmenuLevel() == 0) m_menu.moveToLast();  // Move cursor to quit in main menu
 		else m_menu.closeSubmenu(); // One menu level up
 	}
-	else if (nav == input::NAV_DOWN || nav == input::NAV_MOREDOWN) m_menu.move(1);
-	else if (nav == input::NAV_UP || nav == input::NAV_MOREUP) m_menu.move(-1);
-	else if (nav == input::NAV_RIGHT && m_menu.getSubmenuLevel() >= 2) m_menu.action(1); // Config menu
-	else if (nav == input::NAV_LEFT && m_menu.getSubmenuLevel() >= 2) m_menu.action(-1); // Config menu
-	else if (nav == input::NAV_RIGHT && m_menu.getSubmenuLevel() < 2) m_menu.move(1); // Instrument nav hack
-	else if (nav == input::NAV_LEFT && m_menu.getSubmenuLevel() < 2) m_menu.move(-1); // Instrument nav hack
-	else if (nav == input::NAV_START) m_menu.action();
-	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
+	else if (nav == input::NavButton::DOWN || nav == input::NavButton::MOREDOWN) m_menu.move(1);
+	else if (nav == input::NavButton::UP || nav == input::NavButton::MOREUP) m_menu.move(-1);
+	else if (nav == input::NavButton::RIGHT && m_menu.getSubmenuLevel() >= 2) m_menu.action(1); // Config menu
+	else if (nav == input::NavButton::LEFT && m_menu.getSubmenuLevel() >= 2) m_menu.action(-1); // Config menu
+	else if (nav == input::NavButton::RIGHT && m_menu.getSubmenuLevel() < 2) m_menu.move(1); // Instrument nav hack
+	else if (nav == input::NavButton::LEFT && m_menu.getSubmenuLevel() < 2) m_menu.move(-1); // Instrument nav hack
+	else if (nav == input::NavButton::START) m_menu.action();
+	else if (nav == input::NavButton::PAUSE) m_audio.togglePause();
 	// Animation targets
 	m_selAnim.setTarget(m_menu.curIndex());
 	m_submenuAnim.setTarget(m_menu.getSubmenuLevel());
@@ -113,7 +113,7 @@ void ScreenIntro::draw_menu_options() {
 			}
 			wcounter = std::max(wcounter, theme->option_selected.w() + 2 * sel_margin); // Calculate the widest entry
 			// If this is a config item, show the value below
-			if (opt.type == MenuOption::CHANGE_VALUE) {
+			if (opt.type == MenuOption::Type::CHANGE_VALUE) {
 				++ii; // Use a slot for the value
 				theme->option_selected.dimensions.left(x + sel_margin).center(-0.1 + (selanim+1)*0.065);
 				theme->option_selected.draw("<  " + opt.value->getValue() + "  >");
@@ -172,7 +172,7 @@ void ScreenIntro::populateMenu() {
 	MenuImage imgQuit(new Texture(findFile("intro_quit.svg")));
 	m_menu.clear();
 	m_menu.add(MenuOption(_("Perform"), _("Start performing!"), imgSing).screen("Songs"));
-	m_menu.add(MenuOption(_("Practice"), _("Check your skills or test the microphones"), imgPractice).screen("Practice"));
+	m_menu.add(MenuOption(_("Practice"), _("Check your skills or test the microphones."), imgPractice).screen("Practice"));
 	// Configure menu + submenu options
 	MenuOptions configmain;
 	for (MenuEntry const& submenu: configMenu) {
@@ -188,8 +188,8 @@ void ScreenIntro::populateMenu() {
 			configmain.push_back(MenuOption(_(submenu.shortDesc.c_str()), _(submenu.longDesc.c_str()), imgConfig).screen(submenu.name));
 		}
 	}
-	m_menu.add(MenuOption(_("Configure"), _("Configure audio and game options"), imgConfig).submenu(configmain));
-	m_menu.add(MenuOption(_("Quit"), _("Leave the game"), imgQuit).screen(""));
+	m_menu.add(MenuOption(_("Configure"), _("Configure audio and game options."), imgConfig).submenu(configmain));
+	m_menu.add(MenuOption(_("Quit"), _("Leave the game."), imgQuit).screen(""));
 }
 
 #ifdef USE_WEBSERVER

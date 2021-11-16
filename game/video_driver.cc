@@ -11,10 +11,10 @@
 #include "game.hh"
 #include "util.hh"
 #include "fs.hh"
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_hints.h>
-#include <SDL2/SDL_rect.h>
-#include <SDL2/SDL_video.h>
+#include <SDL.h>
+#include <SDL_hints.h>
+#include <SDL_rect.h>
+#include <SDL_video.h>
 
 namespace {
 	float s_width;
@@ -399,13 +399,13 @@ void Window::event(Uint8 const& eventID, Sint32 const& data1, Sint32 const& data
 			setWindowPosition(data1, data2);
 			break;
 		case SDL_WINDOWEVENT_MAXIMIZED:
-			if (Platform::currentOS() == Platform::OS_MAC) {
+			if (Platform::currentOS() == Platform::HostOS::OS_MAC) {
 				config["graphic/fullscreen"].b() = true;
 				}
 			else { m_needResize = true; }
 			break;	
 		case SDL_WINDOWEVENT_RESTORED:
-			if (Platform::currentOS() == Platform::OS_MAC) {
+			if (Platform::currentOS() == Platform::HostOS::OS_MAC) {
 				config["graphic/fullscreen"].b() = false;
 				}
 			else { m_needResize = true; }
@@ -495,7 +495,7 @@ void Window::screenshot() {
 	img.height = nativeH;
 	unsigned stride = (img.width * 3 + 3) & ~3;  // Rows are aligned to 4 byte boundaries
 	img.buf.resize(stride * img.height);
-	img.fmt = pix::RGB;
+	img.fmt = pix::Format::RGB;
 	img.linearPremul = true; // Not really, but this will use correct gamma.
 	img.bottomFirst = true;
 	// Get pixel data from OpenGL

@@ -19,11 +19,11 @@
 					base = base.parent_path();
 				} while (true);
 			found:;
-				if (locale.empty() && fs::exists(base / LOCALEDIR)) locale = base / LOCALEDIR;
+				if (locale.empty() && fs::exists(base / LOCALE_DIR)) locale = base / LOCALE_DIR;
 			}
 			// System-wide config files
 			{
-				sysConf = (Platform::currentOS() == Platform::OS_MAC) ? "/Library/Preferences/Performous" : "/etc/xdg/performous";
+				sysConf = (Platform::currentOS() == Platform::HostOS::OS_MAC) ? "/Library/Preferences/Performous" : "/etc/xdg/performous";
 			}
 			
 			// Home
@@ -34,7 +34,7 @@
 			
 			// Config
 			{
-				if (Platform::currentOS() == Platform::OS_MAC) {
+				if (Platform::currentOS() == Platform::HostOS::OS_MAC) {
 					conf = (home / "Library/Preferences/Performous");
 				}
 				else {
@@ -46,7 +46,7 @@
 			
 			// Data
 			{
-				if (Platform::currentOS() == Platform::OS_MAC) {
+				if (Platform::currentOS() == Platform::HostOS::OS_MAC) {
 					data = share;
 				}
 				else {
@@ -56,7 +56,7 @@
 			}
 			// Cache
 			{
-				if (Platform::currentOS() == Platform::OS_MAC) {
+				if (Platform::currentOS() == Platform::HostOS::OS_MAC) {
 					cache = (home / "Library/Caches/Performous"); 
 				}
 				else {
@@ -82,7 +82,7 @@
 				logmsg += "  cache:    " + cache.string() + '\n';
 				std::clog << logmsg << std::flush;
 			}
-				if (Platform::currentOS() == Platform::OS_MAC) {
+				if (Platform::currentOS() == Platform::HostOS::OS_MAC) {
 				char const* p = getenv("XDG_CONFIG_HOME");
 				fs::path oldConf = (p ? p : home / ".config/performous");
 				if (fs::is_directory(oldConf)) {
