@@ -87,7 +87,7 @@ blocks:
             - mkdir -p /Users/semaphore/Applications
             - sudo ln -sf /Users/semaphore/local/Applications /Users/semaphore/Applications/MacPorts
             - sudo ln -sf /Users/semaphore/local/ /opt/local
-            - test -e /Users/semaphore/local/bin/port || ( curl -LJ https://www.dropbox.com/s/4c5oav6za5l4gvv/macports-10_15-install.tar.gz?dl=1 | tar x )
+            - test -e /Users/semaphore/local/bin/port || ( curl -LJ https://www.dropbox.com/s/bes5ig6dzsjsxce/macports-10_15-install.tar.gz?dl=1 | tar x )
             - checkout
             - git submodule update --init --recursive
             - patch --verbose -ui /Users/semaphore/patch-cmake-ignore-CI-homebrew.patch
