@@ -135,7 +135,7 @@ std::string const ConfigItem::getValue() const {
 	if (this->getName() == "game/language") {
 		int autoLanguageType = 1337;
 		int val = LanguageToLanguageId(this->getEnumName()); // In the case of the language, val is the real value while m_value is the enum case for its cosmetic name.
-		std::string languageName = (val != autoLanguageType) ? this->getEnumName() : "Auto";
+		std::string languageName = (val != autoLanguageType) ? this->getEnumName() : _("Auto");
 		return languageName;
 	}
 	if (m_type == "int") {
@@ -329,7 +329,7 @@ void writeConfig(bool system) {
 			auto newLanguagestr = item.getEnumName();
 			auto currentLanguageId = LanguageToLanguageId(currentLanguageStr);
 			auto newLanguageId = LanguageToLanguageId(newLanguagestr);
-			if ((newLanguagestr == "Auto" || currentLanguageId != newLanguageId) && !config["game/language"].getOldValue().empty()) {
+			if ((newLanguagestr == _("Auto") || currentLanguageId != newLanguageId) && !config["game/language"].getOldValue().empty()) {
 				std::cout << "Wanting to change something, old value: '" << currentLanguageStr << "' new value: '" << newLanguagestr << "'" << std::endl;
 				entryNode->set_attribute("value", std::to_string(newLanguageId));
 				config["game/language"].selectEnum(newLanguagestr);
@@ -463,8 +463,9 @@ unsigned int LanguageToLanguageId(const std::string& name) {
 	if (name == _("Dutch")) return 12;
 	if (name == _("Polish")) return 13;
 	if (name == _("Portuguese")) return 14;
-	if (name == _("Swedish")) return 15;
-	if (name == _("Chinese")) return 16;
+	if (name == _("Slovak")) return 15;
+	if (name == _("Swedish")) return 16;
+	if (name == _("Chinese")) return 17;
 	
 	return 1337; // if no name matched return "Auto" which translates to computer language OR English.
 }
