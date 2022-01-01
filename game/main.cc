@@ -34,14 +34,8 @@
 #include <vector>
 
 // Disable main level exception handling for debug builds (because gdb cannot properly catch throwing otherwise)
-#ifdef NDEBUG
 #define RUNTIME_ERROR std::runtime_error
 #define EXCEPTION std::exception
-#else
-namespace { struct Nothing { char const* what() const { return nullptr; } }; }
-#define RUNTIME_ERROR Nothing
-#define EXCEPTION Nothing
-#endif
 
 std::atomic<bool> g_quit{ false };
 
