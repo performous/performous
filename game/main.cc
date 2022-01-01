@@ -345,45 +345,40 @@ int main(int argc, char** argv) try {
 	}
 
 	Logger logger(loglevel);
-	try {
-		outputOptionalFeatureStatus();
+	
+	outputOptionalFeatureStatus();
 
-		// Read config files
-		readConfig();
+	// Read config files
+	readConfig();
 
-		if (vm.count("audiohelp")) {
-			std::clog << "core/notice: Starting audio subsystem for audiohelp (errors printed on console may be ignored)." << std::endl;
-			Audio audio;
-			// Print the devices
-			std::cout << portaudio::AudioBackends().dump();
-			// Some examples
-			std::cout << "Example --audio parameters" << std::endl;
-			std::cout << "  --audio \"out=2\"         # Pick first working two-channel playback device" << std::endl;
-			std::cout << "  --audio \"dev=1 out=2\"   # Pick device id 1 and assign stereo playback" << std::endl;
-			std::cout << "  --audio 'dev=\"HDA Intel\" mics=blue,red'   # HDA Intel with two mics" << std::endl;
-			std::cout << "  --audio 'dev=pulse out=2 mics=blue'       # PulseAudio with input and output" << std::endl;
-			return EXIT_SUCCESS;
-		}
-		// Override XML config for options that were specified from commandline or performous.conf
-		confOverride(songdirs, "paths/songs");
-		confOverride(devices, "audio/devices");
-		getPaths(); // Initialize paths before other threads start
-		if (vm.count("jstest")) { // Joystick test program
-			std::clog << "core/notice: Starting jstest input test utility." << std::endl;
-			std::cout << std::endl << "Joystick utility - Touch your joystick to see buttons here" << std::endl
-			<< "Hit ESC (window focused) to quit" << std::endl << std::endl;
-			jstestLoop();
-			return EXIT_SUCCESS;
-		}
-		// Run the game init and main loop
-		mainLoop(songlist);
-
-		return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
-	} catch (EXCEPTION& e) {
-		// After logging is initialized, we can also inform the user about the log file.
-		fatalError(e.what());
-		return EXIT_FAILURE;
+	if (vm.count("audiohelp")) {
+		std::clog << "core/notice: Starting audio subsystem for audiohelp (errors printed on console may be ignored)." << std::endl;
+		Audio audio;
+		// Print the devices
+		std::cout << portaudio::AudioBackends().dump();
+		// Some examples
+		std::cout << "Example --audio parameters" << std::endl;
+		std::cout << "  --audio \"out=2\"         # Pick first working two-channel playback device" << std::endl;
+		std::cout << "  --audio \"dev=1 out=2\"   # Pick device id 1 and assign stereo playback" << std::endl;
+		std::cout << "  --audio 'dev=\"HDA Intel\" mics=blue,red'   # HDA Intel with two mics" << std::endl;
+		std::cout << "  --audio 'dev=pulse out=2 mics=blue'       # PulseAudio with input and output" << std::endl;
+		return EXIT_SUCCESS;
 	}
+	// Override XML config for options that were specified from commandline or performous.conf
+	confOverride(songdirs, "paths/songs");
+	confOverride(devices, "audio/devices");
+	getPaths(); // Initialize paths before other threads start
+	if (vm.count("jstest")) { // Joystick test program
+		std::clog << "core/notice: Starting jstest input test utility." << std::endl;
+		std::cout << std::endl << "Joystick utility - Touch your joystick to see buttons here" << std::endl
+		<< "Hit ESC (window focused) to quit" << std::endl << std::endl;
+		jstestLoop();
+		return EXIT_SUCCESS;
+	}
+	// Run the game init and main loop
+	mainLoop(songlist);
+
+	return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
 } catch (EXCEPTION& e) {
 	fatalError(e.what());
 	return EXIT_FAILURE;
