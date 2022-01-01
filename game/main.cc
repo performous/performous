@@ -124,18 +124,15 @@ void mainLoop(std::string const& songlist) {
 	Audio audio;
 	std::clog << "core/info: Loading assets." << std::endl;
 	TranslationEngine localization(PACKAGE);
-	std::unique_ptr<Window> window;
 	TextureLoader m_loader;
 	Backgrounds backgrounds;
 	Database database(getConfigDir() / "database.xml");
 	Songs songs(database, songlist);
 	loadFonts();
-	try {
-		window = std::make_unique<Window>();
-		} catch (RUNTIME_ERROR& e) {
-			std::cerr << "ERROR: " << e.what() << std::endl;
-		}
-	Game gm(*window, audio, localization);
+
+        Window window{};
+
+	Game gm(window, audio, localization);
 	WebServer server(songs);
 	try {
 		// Load audio samples
@@ -180,7 +177,7 @@ void mainLoop(std::string const& songlist) {
 			}
 			if (g_take_screenshot) {
 				try {
-					window->screenshot();
+					window.screenshot();
 					gm.flashMessage(_("Screenshot taken!"));
 				} catch (EXCEPTION& e) {
 					std::cerr << "ERROR: " << e.what() << std::endl;
@@ -191,12 +188,12 @@ void mainLoop(std::string const& songlist) {
 			gm.updateScreen();  // exit/enter, any exception is fatal error
 			if (benchmarking) prof("misc");
 			try {
-				window->blank();
+				window.blank();
 				// Draw
-				window->render([&gm]{ gm.drawScreen(); });
+				window.render([&gm]{ gm.drawScreen(); });
 				if (benchmarking) { glFinish(); prof("draw"); }
 				// Display (and wait until next frame)
-				window->swap();
+				window.swap();
 				if (benchmarking) { glFinish(); prof("swap"); }
 				updateTextures();
 				gm.prepareScreen();
@@ -231,9 +228,9 @@ void mainLoop(std::string const& songlist) {
 		std::clog << "core/error: Exiting due to fatal error: " << e.what() << std::endl;
 		gm.fatalError(e.what());  // Notify the user
 		throw;
-		} catch (QuitNow&) {
+	} catch (QuitNow&) {
 		std::cerr << "Terminated." << std::endl;
-		}
+	}
 }
 
 /// Simple test utility to make mapping of joystick buttons/axes easier
