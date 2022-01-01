@@ -285,20 +285,16 @@ template <typename Container> void confOverride(Container const& c, std::string 
 
 void outputOptionalFeatureStatus();
 
-void fatalError(std::string msg, bool hasLog = false, std::string title = "FATAL ERROR") {
+static void fatalError(const std::string &msg) {
 	std::ostringstream errMsg;
 	errMsg << msg;
-	if (hasLog) {
-		errMsg << std::endl << "More details might be available in " << getLogFilename() << ".";
-	}
 	errMsg << std::endl << "If you think this is a bug in Performous, please report it at "
 	  << std::endl << "  https://github.com/performous/performous/issues";
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title.c_str(),
+        auto title = "FATAL ERROR";
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title,
 	  errMsg.str().c_str(), nullptr);
 	std::cerr << title << ": " << msg << std::endl;
-	if (hasLog) {
-		std::clog << "core/error: " << errMsg.str() << std::endl;
-	}
+        std::clog << "core/error: " << errMsg.str() << std::endl;
 }
 
 int main(int argc, char** argv) try {
@@ -388,7 +384,7 @@ int main(int argc, char** argv) try {
 		return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
 	} catch (EXCEPTION& e) {
 		// After logging is initialized, we can also inform the user about the log file.
-		fatalError(e.what(), true);
+		fatalError(e.what());
 		return EXIT_FAILURE;
 	}
 } catch (EXCEPTION& e) {
