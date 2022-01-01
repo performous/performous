@@ -286,15 +286,12 @@ template <typename Container> void confOverride(Container const& c, std::string 
 void outputOptionalFeatureStatus();
 
 static void fatalError(const std::string &msg) {
-	std::ostringstream errMsg;
-	errMsg << msg;
-	errMsg << std::endl << "If you think this is a bug in Performous, please report it at "
-	  << std::endl << "  https://github.com/performous/performous/issues";
+	auto errMsg = msg + "\nIf you think this is a bug in Performous, please report it at \n"
+	                    "  https://github.com/performous/performous/issues";
         auto title = "FATAL ERROR";
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title,
-	  errMsg.str().c_str(), nullptr);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, errMsg.c_str(), nullptr);
 	std::cerr << title << ": " << msg << std::endl;
-        std::clog << "core/error: " << errMsg.str() << std::endl;
+        std::clog << "core/error: " << errMsg << std::endl;
 }
 
 int main(int argc, char** argv) try {
