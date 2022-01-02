@@ -37,34 +37,9 @@
 #define RUNTIME_ERROR std::runtime_error
 #define EXCEPTION std::exception
 
-std::atomic<bool> g_quit{ false };
-
 bool g_take_screenshot = false;
 
-// Signal handling for Ctrl-C
-
-static void signalSetup();
-
-extern "C" void quit(int) {
-	using namespace std; // Apparently some implementations put quick_exit in std:: and others in ::
-	if (g_quit) abort();  // Instant exit if Ctrl+C is pressed again
-	g_quit = true;
-	signalSetup();
-}
-
-static void signalSetup() {
-	std::signal(SIGINT, quit);
-	std::signal(SIGTERM, quit);
-}
-
-/// can be thrown as an exception to quit the game
-struct QuitNow {};
-
 static void checkEvents(Game& gm, Time eventTime) {
-	if (g_quit) {
-		std::cerr << "Terminating, please wait... (or kill the process)" << std::endl;
-		throw QuitNow();
-	}
 	Window& window = gm.window();
 	SDL_Event event;
 	while (SDL_PollEvent(&event) == 1) {
@@ -218,9 +193,9 @@ void mainLoop(std::string const& songlist) {
 				gm.controllers.process(eventTime);
 				checkEvents(gm, eventTime);
 				if (benchmarking) prof("events");
-		} catch (RUNTIME_ERROR& e) {
-			std::cerr << "ERROR: " << e.what() << std::endl;
-			gm.flashMessage(std::string("ERROR: ") + e.what());
+			} catch (RUNTIME_ERROR& e) {
+				std::cerr << "ERROR: " << e.what() << std::endl;
+				gm.flashMessage(std::string("ERROR: ") + e.what());
 			}
 		}
 		writeConfig();
@@ -228,8 +203,6 @@ void mainLoop(std::string const& songlist) {
 		std::clog << "core/error: Exiting due to fatal error: " << e.what() << std::endl;
 		gm.fatalError(e.what());  // Notify the user
 		throw;
-	} catch (QuitNow&) {
-		std::cerr << "Terminated." << std::endl;
 	}
 }
 
@@ -267,8 +240,6 @@ void jstestLoop() {
 		}
 	} catch (EXCEPTION& e) {
 		std::cerr << "ERROR: " << e.what() << std::endl;
-	} catch (QuitNow&) {
-		std::cerr << "Terminated." << std::endl;
 	}
 	return;
 }
@@ -292,7 +263,6 @@ static void fatalError(const std::string &msg) {
 }
 
 int main(int argc, char** argv) try {
-	signalSetup();
 	std::srand(std::time(nullptr));
 	// Parse commandline options
 	std::vector<std::string> devices;
