@@ -109,101 +109,96 @@ void mainLoop(std::string const& songlist) {
 
 	Game gm(window, audio, localization);
 	WebServer server(songs);
-	try {
-		// Load audio samples
-		gm.loading(_("Loading audio samples..."), 0.5);
-		audio.loadSample("drum bass", findFile("sounds/drum_bass.ogg"));
-		audio.loadSample("drum snare", findFile("sounds/drum_snare.ogg"));
-		audio.loadSample("drum hi-hat", findFile("sounds/drum_hi-hat.ogg"));
-		audio.loadSample("drum tom1", findFile("sounds/drum_tom1.ogg"));
-		audio.loadSample("drum cymbal", findFile("sounds/drum_cymbal.ogg"));
-		//audio.loadSample("drum tom2", findFile("sounds/drum_tom2.ogg"));
-		audio.loadSample("guitar fail1", findFile("sounds/guitar_fail1.ogg"));
-		audio.loadSample("guitar fail2", findFile("sounds/guitar_fail2.ogg"));
-		audio.loadSample("guitar fail3", findFile("sounds/guitar_fail3.ogg"));
-		audio.loadSample("guitar fail4", findFile("sounds/guitar_fail4.ogg"));
-		audio.loadSample("guitar fail5", findFile("sounds/guitar_fail5.ogg"));
-		audio.loadSample("guitar fail6", findFile("sounds/guitar_fail6.ogg"));
-		audio.loadSample("notice.ogg",findFile("notice.ogg"));
-		// Load screens
-		gm.loading(_("Creating screens..."), 0.7);
-		gm.addScreen(std::make_unique<ScreenIntro>("Intro", audio));
-		gm.addScreen(std::make_unique<ScreenSongs>("Songs", audio, songs, database));
-		gm.addScreen(std::make_unique<ScreenSing>("Sing", audio, database, backgrounds));
-		gm.addScreen(std::make_unique<ScreenPractice>("Practice", audio));
-		gm.addScreen(std::make_unique<ScreenAudioDevices>("AudioDevices", audio));
-		gm.addScreen(std::make_unique<ScreenPaths>("Paths", audio, songs));
-		gm.addScreen(std::make_unique<ScreenPlayers>("Players", audio, database));
-		gm.addScreen(std::make_unique<ScreenPlaylist>("Playlist", audio, songs, backgrounds));
-		gm.activateScreen("Intro");
-		gm.loading(_("Entering main menu..."), 0.8);
-		gm.updateScreen();  // exit/enter, any exception is fatal error
-		gm.loading(_("Loading complete!"), 1.0);
-		// Main loop
-		auto time = Clock::now();
-		unsigned frames = 0;
-		std::clog << "core/info: Assets loaded, entering main loop." << std::endl;
-		while (!gm.isFinished()) {
-			Profiler prof("mainloop");
-			bool benchmarking = config["graphic/fps"].b();
-			if (songs.doneLoading == true && songs.displayedAlert == false) {
-				gm.dialog(_("Done Loading!\n Loaded ") + std::to_string(songs.loadedSongs()) + " Songs.");
-				songs.displayedAlert = true;
-			}
-			if (g_take_screenshot) {
-				try {
-					window.screenshot();
-					gm.flashMessage(_("Screenshot taken!"));
-				} catch (EXCEPTION& e) {
-					std::cerr << "ERROR: " << e.what() << std::endl;
-					gm.flashMessage(_("Screenshot failed!"));
-				}
-				g_take_screenshot = false;
-			}
-			gm.updateScreen();  // exit/enter, any exception is fatal error
-			if (benchmarking) prof("misc");
+
+	// Load audio samples
+	gm.loading(_("Loading audio samples..."), 0.5);
+	audio.loadSample("drum bass", findFile("sounds/drum_bass.ogg"));
+	audio.loadSample("drum snare", findFile("sounds/drum_snare.ogg"));
+	audio.loadSample("drum hi-hat", findFile("sounds/drum_hi-hat.ogg"));
+	audio.loadSample("drum tom1", findFile("sounds/drum_tom1.ogg"));
+	audio.loadSample("drum cymbal", findFile("sounds/drum_cymbal.ogg"));
+	//audio.loadSample("drum tom2", findFile("sounds/drum_tom2.ogg"));
+	audio.loadSample("guitar fail1", findFile("sounds/guitar_fail1.ogg"));
+	audio.loadSample("guitar fail2", findFile("sounds/guitar_fail2.ogg"));
+	audio.loadSample("guitar fail3", findFile("sounds/guitar_fail3.ogg"));
+	audio.loadSample("guitar fail4", findFile("sounds/guitar_fail4.ogg"));
+	audio.loadSample("guitar fail5", findFile("sounds/guitar_fail5.ogg"));
+	audio.loadSample("guitar fail6", findFile("sounds/guitar_fail6.ogg"));
+	audio.loadSample("notice.ogg",findFile("notice.ogg"));
+	// Load screens
+	gm.loading(_("Creating screens..."), 0.7);
+	gm.addScreen(std::make_unique<ScreenIntro>("Intro", audio));
+	gm.addScreen(std::make_unique<ScreenSongs>("Songs", audio, songs, database));
+	gm.addScreen(std::make_unique<ScreenSing>("Sing", audio, database, backgrounds));
+	gm.addScreen(std::make_unique<ScreenPractice>("Practice", audio));
+	gm.addScreen(std::make_unique<ScreenAudioDevices>("AudioDevices", audio));
+	gm.addScreen(std::make_unique<ScreenPaths>("Paths", audio, songs));
+	gm.addScreen(std::make_unique<ScreenPlayers>("Players", audio, database));
+	gm.addScreen(std::make_unique<ScreenPlaylist>("Playlist", audio, songs, backgrounds));
+	gm.activateScreen("Intro");
+	gm.loading(_("Entering main menu..."), 0.8);
+	gm.updateScreen();  // exit/enter, any exception is fatal error
+	gm.loading(_("Loading complete!"), 1.0);
+	// Main loop
+	auto time = Clock::now();
+	unsigned frames = 0;
+	std::clog << "core/info: Assets loaded, entering main loop." << std::endl;
+	while (!gm.isFinished()) {
+		Profiler prof("mainloop");
+		bool benchmarking = config["graphic/fps"].b();
+		if (songs.doneLoading == true && songs.displayedAlert == false) {
+			gm.dialog(_("Done Loading!\n Loaded ") + std::to_string(songs.loadedSongs()) + " Songs.");
+			songs.displayedAlert = true;
+		}
+		if (g_take_screenshot) {
 			try {
-				window.blank();
-				// Draw
-				window.render([&gm]{ gm.drawScreen(); });
-				if (benchmarking) { glFinish(); prof("draw"); }
-				// Display (and wait until next frame)
-				window.swap();
-				if (benchmarking) { glFinish(); prof("swap"); }
-				updateTextures();
-				gm.prepareScreen();
-				if (benchmarking) { glFinish(); prof("textures"); }
-				if (benchmarking) {
-					++frames;
-					if (Clock::now() - time > 1s) {
-						std::ostringstream oss;
-						oss << frames << " FPS";
-						gm.flashMessage(oss.str());
-						time += 1s;
-						frames = 0;
-					}
-				} else {
-					std::this_thread::sleep_until(time + 10ms); // Max 100 FPS
-					time = Clock::now();
+				window.screenshot();
+				gm.flashMessage(_("Screenshot taken!"));
+			} catch (EXCEPTION& e) {
+				std::cerr << "ERROR: " << e.what() << std::endl;
+				gm.flashMessage(_("Screenshot failed!"));
+			}
+			g_take_screenshot = false;
+		}
+		gm.updateScreen();  // exit/enter, any exception is fatal error
+		if (benchmarking) prof("misc");
+		try {
+			window.blank();
+			// Draw
+			window.render([&gm]{ gm.drawScreen(); });
+			if (benchmarking) { glFinish(); prof("draw"); }
+			// Display (and wait until next frame)
+			window.swap();
+			if (benchmarking) { glFinish(); prof("swap"); }
+			updateTextures();
+			gm.prepareScreen();
+			if (benchmarking) { glFinish(); prof("textures"); }
+			if (benchmarking) {
+				++frames;
+				if (Clock::now() - time > 1s) {
+					std::ostringstream oss;
+					oss << frames << " FPS";
+					gm.flashMessage(oss.str());
+					time += 1s;
 					frames = 0;
 				}
-				if (benchmarking) prof("fpsctrl");
-				// Process events for the next frame
-				auto eventTime = Clock::now();
-				gm.controllers.process(eventTime);
-				checkEvents(gm, eventTime);
-				if (benchmarking) prof("events");
-			} catch (RUNTIME_ERROR& e) {
-				std::cerr << "ERROR: " << e.what() << std::endl;
-				gm.flashMessage(std::string("ERROR: ") + e.what());
+			} else {
+				std::this_thread::sleep_until(time + 10ms); // Max 100 FPS
+				time = Clock::now();
+				frames = 0;
 			}
+			if (benchmarking) prof("fpsctrl");
+			// Process events for the next frame
+			auto eventTime = Clock::now();
+			gm.controllers.process(eventTime);
+			checkEvents(gm, eventTime);
+			if (benchmarking) prof("events");
+		} catch (RUNTIME_ERROR& e) {
+			std::cerr << "ERROR: " << e.what() << std::endl;
+			gm.flashMessage(std::string("ERROR: ") + e.what());
 		}
-		writeConfig();
-	} catch (EXCEPTION& e) {
-		std::clog << "core/error: Exiting due to fatal error: " << e.what() << std::endl;
-		gm.fatalError(e.what());  // Notify the user
-		throw;
 	}
+	writeConfig();
 }
 
 /// Simple test utility to make mapping of joystick buttons/axes easier
