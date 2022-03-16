@@ -131,7 +131,17 @@ Window::Window() : screen(nullptr, &SDL_DestroyWindow), glContext(nullptr, &SDL_
 			winOrigin.y = (totalSize.y - height);
 			}
 			std::clog << "video/info: Saved window size outside of current display set-up; resetting to " << width << "x" << height << std::endl;
-		}		
+		}
+
+		if (winOrigin.x == 0)
+		{
+			winOrigin.x = SDL_WINDOWPOS_UNDEFINED;
+		}
+		if (winOrigin.y == 0)
+		{
+			winOrigin.y = SDL_WINDOWPOS_UNDEFINED;
+		}
+
 		std::clog << "video/info: Create window dimensions: " << width << "x" << height << " on screen position: " << winOrigin.x << "x" << winOrigin.y << std::endl;
 		screen.reset(SDL_CreateWindow(PACKAGE " " VERSION, winOrigin.x, winOrigin.y, width, height, flags));
 		if (!screen) throw std::runtime_error(std::string("SDL_CreateWindow failed: ") + SDL_GetError());
