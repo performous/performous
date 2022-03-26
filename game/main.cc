@@ -105,7 +105,7 @@ void mainLoop(std::string const& songlist) {
 	Songs songs(database, songlist);
 	loadFonts();
 
-        Window window{};
+	Window window{};
 
 	Game gm(window, audio, localization);
 	WebServer server(songs);
@@ -251,10 +251,10 @@ void outputOptionalFeatureStatus();
 static void fatalError(const std::string &msg) {
 	auto errMsg = msg + "\nIf you think this is a bug in Performous, please report it at \n"
 	                    "  https://github.com/performous/performous/issues";
-        auto title = "FATAL ERROR";
+	auto title = "FATAL ERROR";
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, errMsg.c_str(), nullptr);
 	std::cerr << title << ": " << msg << std::endl;
-        std::clog << "core/error: " << errMsg << std::endl;
+	std::clog << "core/error: " << errMsg << std::endl;
 }
 
 int main(int argc, char** argv) try {
