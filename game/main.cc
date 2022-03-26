@@ -34,43 +34,12 @@
 #include <vector>
 
 // Disable main level exception handling for debug builds (because gdb cannot properly catch throwing otherwise)
-#ifdef NDEBUG
 #define RUNTIME_ERROR std::runtime_error
 #define EXCEPTION std::exception
-#else
-namespace { struct Nothing { char const* what() const { return nullptr; } }; }
-#define RUNTIME_ERROR Nothing
-#define EXCEPTION Nothing
-#endif
-
-std::atomic<bool> g_quit{ false };
 
 bool g_take_screenshot = false;
 
-// Signal handling for Ctrl-C
-
-static void signalSetup();
-
-extern "C" void quit(int) {
-	using namespace std; // Apparently some implementations put quick_exit in std:: and others in ::
-	if (g_quit) abort();  // Instant exit if Ctrl+C is pressed again
-	g_quit = true;
-	signalSetup();
-}
-
-static void signalSetup() {
-	std::signal(SIGINT, quit);
-	std::signal(SIGTERM, quit);
-}
-
-/// can be thrown as an exception to quit the game
-struct QuitNow {};
-
 static void checkEvents(Game& gm, Time eventTime) {
-	if (g_quit) {
-		std::cerr << "Terminating, please wait... (or kill the process)" << std::endl;
-		throw QuitNow();
-	}
 	Window& window = gm.window();
 	SDL_Event event;
 	while (SDL_PollEvent(&event) == 1) {
@@ -130,116 +99,106 @@ void mainLoop(std::string const& songlist) {
 	Audio audio;
 	std::clog << "core/info: Loading assets." << std::endl;
 	TranslationEngine localization(PACKAGE);
-	std::unique_ptr<Window> window;
 	TextureLoader m_loader;
 	Backgrounds backgrounds;
 	Database database(getConfigDir() / "database.xml");
 	Songs songs(database, songlist);
 	loadFonts();
-	try {
-		window = std::make_unique<Window>();
-		} catch (RUNTIME_ERROR& e) {
-			std::cerr << "ERROR: " << e.what() << std::endl;
-		}
-	Game gm(*window, audio, localization);
+
+	Window window{};
+
+	Game gm(window, audio, localization);
 	WebServer server(songs);
-	try {
-		// Load audio samples
-		gm.loading(_("Loading audio samples..."), 0.5);
-		audio.loadSample("drum bass", findFile("sounds/drum_bass.ogg"));
-		audio.loadSample("drum snare", findFile("sounds/drum_snare.ogg"));
-		audio.loadSample("drum hi-hat", findFile("sounds/drum_hi-hat.ogg"));
-		audio.loadSample("drum tom1", findFile("sounds/drum_tom1.ogg"));
-		audio.loadSample("drum cymbal", findFile("sounds/drum_cymbal.ogg"));
-		//audio.loadSample("drum tom2", findFile("sounds/drum_tom2.ogg"));
-		audio.loadSample("guitar fail1", findFile("sounds/guitar_fail1.ogg"));
-		audio.loadSample("guitar fail2", findFile("sounds/guitar_fail2.ogg"));
-		audio.loadSample("guitar fail3", findFile("sounds/guitar_fail3.ogg"));
-		audio.loadSample("guitar fail4", findFile("sounds/guitar_fail4.ogg"));
-		audio.loadSample("guitar fail5", findFile("sounds/guitar_fail5.ogg"));
-		audio.loadSample("guitar fail6", findFile("sounds/guitar_fail6.ogg"));
-		audio.loadSample("notice.ogg",findFile("notice.ogg"));
-		// Load screens
-		gm.loading(_("Creating screens..."), 0.7);
-		gm.addScreen(std::make_unique<ScreenIntro>("Intro", audio));
-		gm.addScreen(std::make_unique<ScreenSongs>("Songs", audio, songs, database));
-		gm.addScreen(std::make_unique<ScreenSing>("Sing", audio, database, backgrounds));
-		gm.addScreen(std::make_unique<ScreenPractice>("Practice", audio));
-		gm.addScreen(std::make_unique<ScreenAudioDevices>("AudioDevices", audio));
-		gm.addScreen(std::make_unique<ScreenPaths>("Paths", audio, songs));
-		gm.addScreen(std::make_unique<ScreenPlayers>("Players", audio, database));
-		gm.addScreen(std::make_unique<ScreenPlaylist>("Playlist", audio, songs, backgrounds));
-		gm.activateScreen("Intro");
-		gm.loading(_("Entering main menu..."), 0.8);
-		gm.updateScreen();  // exit/enter, any exception is fatal error
-		gm.loading(_("Loading complete!"), 1.0);
-		// Main loop
-		auto time = Clock::now();
-		unsigned frames = 0;
-		std::clog << "core/info: Assets loaded, entering main loop." << std::endl;
-		while (!gm.isFinished()) {
-			Profiler prof("mainloop");
-			bool benchmarking = config["graphic/fps"].b();
-			if (songs.doneLoading == true && songs.displayedAlert == false) {
-				gm.dialog(_("Done Loading!\n Loaded ") + std::to_string(songs.loadedSongs()) + " Songs.");
-				songs.displayedAlert = true;
-			}
-			if (g_take_screenshot) {
-				try {
-					window->screenshot();
-					gm.flashMessage(_("Screenshot taken!"));
-				} catch (EXCEPTION& e) {
-					std::cerr << "ERROR: " << e.what() << std::endl;
-					gm.flashMessage(_("Screenshot failed!"));
-				}
-				g_take_screenshot = false;
-			}
-			gm.updateScreen();  // exit/enter, any exception is fatal error
-			if (benchmarking) prof("misc");
+
+	// Load audio samples
+	gm.loading(_("Loading audio samples..."), 0.5);
+	audio.loadSample("drum bass", findFile("sounds/drum_bass.ogg"));
+	audio.loadSample("drum snare", findFile("sounds/drum_snare.ogg"));
+	audio.loadSample("drum hi-hat", findFile("sounds/drum_hi-hat.ogg"));
+	audio.loadSample("drum tom1", findFile("sounds/drum_tom1.ogg"));
+	audio.loadSample("drum cymbal", findFile("sounds/drum_cymbal.ogg"));
+	//audio.loadSample("drum tom2", findFile("sounds/drum_tom2.ogg"));
+	audio.loadSample("guitar fail1", findFile("sounds/guitar_fail1.ogg"));
+	audio.loadSample("guitar fail2", findFile("sounds/guitar_fail2.ogg"));
+	audio.loadSample("guitar fail3", findFile("sounds/guitar_fail3.ogg"));
+	audio.loadSample("guitar fail4", findFile("sounds/guitar_fail4.ogg"));
+	audio.loadSample("guitar fail5", findFile("sounds/guitar_fail5.ogg"));
+	audio.loadSample("guitar fail6", findFile("sounds/guitar_fail6.ogg"));
+	audio.loadSample("notice.ogg",findFile("notice.ogg"));
+	// Load screens
+	gm.loading(_("Creating screens..."), 0.7);
+	gm.addScreen(std::make_unique<ScreenIntro>("Intro", audio));
+	gm.addScreen(std::make_unique<ScreenSongs>("Songs", audio, songs, database));
+	gm.addScreen(std::make_unique<ScreenSing>("Sing", audio, database, backgrounds));
+	gm.addScreen(std::make_unique<ScreenPractice>("Practice", audio));
+	gm.addScreen(std::make_unique<ScreenAudioDevices>("AudioDevices", audio));
+	gm.addScreen(std::make_unique<ScreenPaths>("Paths", audio, songs));
+	gm.addScreen(std::make_unique<ScreenPlayers>("Players", audio, database));
+	gm.addScreen(std::make_unique<ScreenPlaylist>("Playlist", audio, songs, backgrounds));
+	gm.activateScreen("Intro");
+	gm.loading(_("Entering main menu..."), 0.8);
+	gm.updateScreen();  // exit/enter, any exception is fatal error
+	gm.loading(_("Loading complete!"), 1.0);
+	// Main loop
+	auto time = Clock::now();
+	unsigned frames = 0;
+	std::clog << "core/info: Assets loaded, entering main loop." << std::endl;
+	while (!gm.isFinished()) {
+		Profiler prof("mainloop");
+		bool benchmarking = config["graphic/fps"].b();
+		if (songs.doneLoading == true && songs.displayedAlert == false) {
+			gm.dialog(_("Done Loading!\n Loaded ") + std::to_string(songs.loadedSongs()) + " Songs.");
+			songs.displayedAlert = true;
+		}
+		if (g_take_screenshot) {
 			try {
-				window->blank();
-				// Draw
-				window->render([&gm]{ gm.drawScreen(); });
-				if (benchmarking) { glFinish(); prof("draw"); }
-				// Display (and wait until next frame)
-				window->swap();
-				if (benchmarking) { glFinish(); prof("swap"); }
-				updateTextures();
-				gm.prepareScreen();
-				if (benchmarking) { glFinish(); prof("textures"); }
-				if (benchmarking) {
-					++frames;
-					if (Clock::now() - time > 1s) {
-						std::ostringstream oss;
-						oss << frames << " FPS";
-						gm.flashMessage(oss.str());
-						time += 1s;
-						frames = 0;
-					}
-				} else {
-					std::this_thread::sleep_until(time + 10ms); // Max 100 FPS
-					time = Clock::now();
+				window.screenshot();
+				gm.flashMessage(_("Screenshot taken!"));
+			} catch (EXCEPTION& e) {
+				std::cerr << "ERROR: " << e.what() << std::endl;
+				gm.flashMessage(_("Screenshot failed!"));
+			}
+			g_take_screenshot = false;
+		}
+		gm.updateScreen();  // exit/enter, any exception is fatal error
+		if (benchmarking) prof("misc");
+		try {
+			window.blank();
+			// Draw
+			window.render([&gm]{ gm.drawScreen(); });
+			if (benchmarking) { glFinish(); prof("draw"); }
+			// Display (and wait until next frame)
+			window.swap();
+			if (benchmarking) { glFinish(); prof("swap"); }
+			updateTextures();
+			gm.prepareScreen();
+			if (benchmarking) { glFinish(); prof("textures"); }
+			if (benchmarking) {
+				++frames;
+				if (Clock::now() - time > 1s) {
+					std::ostringstream oss;
+					oss << frames << " FPS";
+					gm.flashMessage(oss.str());
+					time += 1s;
 					frames = 0;
 				}
-				if (benchmarking) prof("fpsctrl");
-				// Process events for the next frame
-				auto eventTime = Clock::now();
-				gm.controllers.process(eventTime);
-				checkEvents(gm, eventTime);
-				if (benchmarking) prof("events");
+			} else {
+				std::this_thread::sleep_until(time + 10ms); // Max 100 FPS
+				time = Clock::now();
+				frames = 0;
+			}
+			if (benchmarking) prof("fpsctrl");
+			// Process events for the next frame
+			auto eventTime = Clock::now();
+			gm.controllers.process(eventTime);
+			checkEvents(gm, eventTime);
+			if (benchmarking) prof("events");
 		} catch (RUNTIME_ERROR& e) {
 			std::cerr << "ERROR: " << e.what() << std::endl;
 			gm.flashMessage(std::string("ERROR: ") + e.what());
-			}
 		}
-		writeConfig();
-	} catch (EXCEPTION& e) {
-		std::clog << "core/error: Exiting due to fatal error: " << e.what() << std::endl;
-		gm.fatalError(e.what());  // Notify the user
-		throw;
-		} catch (QuitNow&) {
-		std::cerr << "Terminated." << std::endl;
-		}
+	}
+	writeConfig();
 }
 
 /// Simple test utility to make mapping of joystick buttons/axes easier
@@ -276,8 +235,6 @@ void jstestLoop() {
 		}
 	} catch (EXCEPTION& e) {
 		std::cerr << "ERROR: " << e.what() << std::endl;
-	} catch (QuitNow&) {
-		std::cerr << "Terminated." << std::endl;
 	}
 	return;
 }
@@ -291,24 +248,16 @@ template <typename Container> void confOverride(Container const& c, std::string 
 
 void outputOptionalFeatureStatus();
 
-void fatalError(std::string msg, bool hasLog = false, std::string title = "FATAL ERROR") {
-	std::ostringstream errMsg;
-	errMsg << msg;
-	if (hasLog) {
-		errMsg << std::endl << "More details might be available in " << getLogFilename() << ".";
-	}
-	errMsg << std::endl << "If you think this is a bug in Performous, please report it at "
-	  << std::endl << "  https://github.com/performous/performous/issues";
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title.c_str(),
-	  errMsg.str().c_str(), nullptr);
+static void fatalError(const std::string &msg) {
+	auto errMsg = msg + "\nIf you think this is a bug in Performous, please report it at \n"
+	                    "  https://github.com/performous/performous/issues";
+	auto title = "FATAL ERROR";
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, errMsg.c_str(), nullptr);
 	std::cerr << title << ": " << msg << std::endl;
-	if (hasLog) {
-		std::clog << "core/error: " << errMsg.str() << std::endl;
-	}
+	std::clog << "core/error: " << errMsg << std::endl;
 }
 
 int main(int argc, char** argv) try {
-	signalSetup();
 	std::srand(std::time(nullptr));
 	// Parse commandline options
 	std::vector<std::string> devices;
@@ -358,45 +307,40 @@ int main(int argc, char** argv) try {
 	}
 
 	Logger logger(loglevel);
-	try {
-		outputOptionalFeatureStatus();
+	
+	outputOptionalFeatureStatus();
 
-		// Read config files
-		readConfig();
+	// Read config files
+	readConfig();
 
-		if (vm.count("audiohelp")) {
-			std::clog << "core/notice: Starting audio subsystem for audiohelp (errors printed on console may be ignored)." << std::endl;
-			Audio audio;
-			// Print the devices
-			std::cout << portaudio::AudioBackends().dump();
-			// Some examples
-			std::cout << "Example --audio parameters" << std::endl;
-			std::cout << "  --audio \"out=2\"         # Pick first working two-channel playback device" << std::endl;
-			std::cout << "  --audio \"dev=1 out=2\"   # Pick device id 1 and assign stereo playback" << std::endl;
-			std::cout << "  --audio 'dev=\"HDA Intel\" mics=blue,red'   # HDA Intel with two mics" << std::endl;
-			std::cout << "  --audio 'dev=pulse out=2 mics=blue'       # PulseAudio with input and output" << std::endl;
-			return EXIT_SUCCESS;
-		}
-		// Override XML config for options that were specified from commandline or performous.conf
-		confOverride(songdirs, "paths/songs");
-		confOverride(devices, "audio/devices");
-		getPaths(); // Initialize paths before other threads start
-		if (vm.count("jstest")) { // Joystick test program
-			std::clog << "core/notice: Starting jstest input test utility." << std::endl;
-			std::cout << std::endl << "Joystick utility - Touch your joystick to see buttons here" << std::endl
-			<< "Hit ESC (window focused) to quit" << std::endl << std::endl;
-			jstestLoop();
-			return EXIT_SUCCESS;
-		}
-		// Run the game init and main loop
-		mainLoop(songlist);
-
-		return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
-	} catch (EXCEPTION& e) {
-		// After logging is initialized, we can also inform the user about the log file.
-		fatalError(e.what(), true);
-		return EXIT_FAILURE;
+	if (vm.count("audiohelp")) {
+		std::clog << "core/notice: Starting audio subsystem for audiohelp (errors printed on console may be ignored)." << std::endl;
+		Audio audio;
+		// Print the devices
+		std::cout << portaudio::AudioBackends().dump();
+		// Some examples
+		std::cout << "Example --audio parameters" << std::endl;
+		std::cout << "  --audio \"out=2\"         # Pick first working two-channel playback device" << std::endl;
+		std::cout << "  --audio \"dev=1 out=2\"   # Pick device id 1 and assign stereo playback" << std::endl;
+		std::cout << "  --audio 'dev=\"HDA Intel\" mics=blue,red'   # HDA Intel with two mics" << std::endl;
+		std::cout << "  --audio 'dev=pulse out=2 mics=blue'       # PulseAudio with input and output" << std::endl;
+		return EXIT_SUCCESS;
 	}
+	// Override XML config for options that were specified from commandline or performous.conf
+	confOverride(songdirs, "paths/songs");
+	confOverride(devices, "audio/devices");
+	getPaths(); // Initialize paths before other threads start
+	if (vm.count("jstest")) { // Joystick test program
+		std::clog << "core/notice: Starting jstest input test utility." << std::endl;
+		std::cout << std::endl << "Joystick utility - Touch your joystick to see buttons here" << std::endl
+		<< "Hit ESC (window focused) to quit" << std::endl << std::endl;
+		jstestLoop();
+		return EXIT_SUCCESS;
+	}
+	// Run the game init and main loop
+	mainLoop(songlist);
+
+	return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
 } catch (EXCEPTION& e) {
 	fatalError(e.what());
 	return EXIT_FAILURE;
