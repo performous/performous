@@ -105,6 +105,7 @@ std::map<std::string, std::string> TranslationEngine::GetAllLanguages(bool refre
 		{ "nl_NL.UTF-8", _("Dutch") },
 		{ "pl_PL.UTF-8", _("Polish") },
 		{ "pt_PT.UTF-8", _("Portuguese") },
+		{ "sk_SK.UTF-8", _("Slovak") },
 		{ "sv_SE.UTF-8", _("Swedish") },
 		{ "zh_CN.UTF-8", _("Chinese") }
 	};

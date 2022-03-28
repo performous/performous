@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-11 00:12+0200\n"
-"PO-Revision-Date: 2021-09-11 00:12+0200\n"
-"Last-Translator: Arjan Speiard | Asgard Sings! <arjan.spieard@gmail.com>\n"
+"POT-Creation-Date: 2021-09-20 16:02-0300\n"
+"PO-Revision-Date: 2021-09-20 16:13-0300\n"
+"Last-Translator: Gregorio Litenstein <g.litenstein@gmail.com>\n"
 "Language-Team: \n"
 "Language: ja_JP\n"
 "MIME-Version: 1.0\n"
@@ -16,6 +16,1072 @@ msgstr ""
 "X-Generator: Poedit 3.0\n"
 "X-Poedit-SearchPath-0: ../data\n"
 "X-Poedit-SearchPath-1: ../game\n"
+
+#: ../game/configuration.cc:147
+msgid "Enabled"
+msgstr "使用可能"
+
+#: ../game/configuration.cc:147 ../game/menu.cc:64
+msgid "Disabled"
+msgstr "使用禁止"
+
+#: ../game/configuration.cc:151
+#, c-format
+msgid "%d items"
+msgstr "%d 細目"
+
+#: ../game/configuration.cc:452 ../game/i18n.hh:101
+msgid "Asturian"
+msgstr ""
+
+#: ../game/configuration.cc:453 ../game/i18n.hh:102
+msgid "Danish"
+msgstr ""
+
+#: ../game/configuration.cc:454 ../game/i18n.hh:103
+msgid "German"
+msgstr ""
+
+#: ../game/configuration.cc:455 ../game/i18n.hh:104
+msgid "English"
+msgstr ""
+
+#: ../game/configuration.cc:456 ../game/i18n.hh:105
+msgid "Spanish"
+msgstr ""
+
+#: ../game/configuration.cc:457 ../game/i18n.hh:106
+msgid "Persian"
+msgstr ""
+
+#: ../game/configuration.cc:458 ../game/i18n.hh:107
+msgid "Finnish"
+msgstr ""
+
+#: ../game/configuration.cc:459 ../game/i18n.hh:108
+msgid "French"
+msgstr ""
+
+#: ../game/configuration.cc:460 ../game/i18n.hh:109
+msgid "Hungarian"
+msgstr ""
+
+#: ../game/configuration.cc:461 ../game/i18n.hh:110
+msgid "Italian"
+msgstr ""
+
+#: ../game/configuration.cc:462 ../game/i18n.hh:111
+msgid "Japanese"
+msgstr ""
+
+#: ../game/configuration.cc:463 ../game/i18n.hh:112
+msgid "Dutch"
+msgstr ""
+
+#: ../game/configuration.cc:464 ../game/i18n.hh:113
+msgid "Polish"
+msgstr ""
+
+#: ../game/configuration.cc:465 ../game/i18n.hh:114
+msgid "Portuguese"
+msgstr ""
+
+#: ../game/configuration.cc:466 ../game/i18n.hh:115
+msgid "Swedish"
+msgstr ""
+
+#: ../game/configuration.cc:467 ../game/i18n.hh:116
+msgid "Chinese"
+msgstr ""
+
+#: ../game/dancegraph.cc:17
+msgid "Beginner"
+msgstr "初心者"
+
+#: ../game/dancegraph.cc:17 ../game/guitargraph.cc:13
+msgid "Easy"
+msgstr "易しい"
+
+#: ../game/dancegraph.cc:17 ../game/guitargraph.cc:13
+#, fuzzy
+msgid "Medium"
+msgstr "中間"
+
+#: ../game/dancegraph.cc:17 ../game/guitargraph.cc:13
+msgid "Hard"
+msgstr "難しい"
+
+#: ../game/dancegraph.cc:17
+msgid "Challenge"
+msgstr "挑戦"
+
+#: ../game/dancegraph.cc:51 ../game/dancegraph.cc:59
+msgid "Perfect!"
+msgstr ""
+
+#: ../game/dancegraph.cc:52
+msgid "Excellent!-"
+msgstr ""
+
+#: ../game/dancegraph.cc:53
+msgid "Great!-"
+msgstr ""
+
+#: ../game/dancegraph.cc:54
+msgid " Good!- "
+msgstr ""
+
+#: ../game/dancegraph.cc:55
+msgid "  OK!-  "
+msgstr ""
+
+#: ../game/dancegraph.cc:56
+msgid "Late!-"
+msgstr ""
+
+#: ../game/dancegraph.cc:57 ../game/dancegraph.cc:65
+msgid "Way off!"
+msgstr ""
+
+#: ../game/dancegraph.cc:60
+msgid "-Excellent!"
+msgstr ""
+
+#: ../game/dancegraph.cc:61
+msgid "-Great!"
+msgstr ""
+
+#: ../game/dancegraph.cc:62
+msgid " -Good! "
+msgstr ""
+
+#: ../game/dancegraph.cc:63
+msgid "  -OK!  "
+msgstr ""
+
+#: ../game/dancegraph.cc:64
+msgid "-Early!"
+msgstr ""
+
+# There's probably a better word
+#: ../game/dancegraph.cc:106 ../game/guitargraph.cc:194
+msgid "Ready!"
+msgstr "レディー！"
+
+# See comment about Perform
+#: ../game/dancegraph.cc:106 ../game/guitargraph.cc:194
+#: ../game/screen_intro.cc:174
+msgid "Start performing!"
+msgstr "演奏しはじめて"
+
+# or would トラックにして下さい work?
+#: ../game/dancegraph.cc:117 ../game/guitargraph.cc:183
+msgid "Select track"
+msgstr "トラックを決めて下さい"
+
+# or would 難しさにして下さい work?
+#: ../game/dancegraph.cc:133 ../game/guitargraph.cc:163
+msgid "Select difficulty"
+msgstr "難しさを決めて下さい"
+
+#: ../game/dancegraph.cc:136 ../game/guitargraph.cc:200
+#: ../game/instrumentgraph.cc:59 ../game/screen_intro.cc:192
+#: ../game/screen_sing.cc:108 ../game/screen_sing.cc:155
+msgid "Quit"
+msgstr "終了"
+
+#: ../game/dancegraph.cc:136 ../game/guitargraph.cc:200
+#: ../game/instrumentgraph.cc:59 ../game/screen_sing.cc:108
+#: ../game/screen_sing.cc:155
+msgid "Exit to song browser"
+msgstr "音楽ブラウザに終了する"
+
+# 止まって or 止めて, not sure which english stop that's indented.
+#: ../game/dancegraph.cc:247
+msgid "STOP!"
+msgstr "止まって！"
+
+#: ../game/dancegraph.cc:321 ../game/guitargraph.cc:454
+msgid "Streak!"
+msgstr "ストリーク!"
+
+#: ../game/guitargraph.cc:13
+msgid "Kids"
+msgstr "子供"
+
+#: ../game/guitargraph.cc:13
+msgid "Expert"
+msgstr "専門家"
+
+#: ../game/guitargraph.cc:169 ../game/guitargraph.cc:186
+msgid "Lefty-mode"
+msgstr "左手モード"
+
+#: ../game/guitargraph.cc:207
+msgid "ON"
+msgstr "オン"
+
+#: ../game/guitargraph.cc:207
+msgid "OFF"
+msgstr "オフ"
+
+#: ../game/guitargraph.cc:208
+msgid "Toggle lefty-mode"
+msgstr "左手モードをトグル"
+
+#: ../game/guitargraph.cc:466
+msgid ""
+"God Mode\n"
+"Activated!"
+msgstr ""
+"神モード\n"
+"活性化！"
+
+#: ../game/guitargraph.cc:467
+msgid "Mistakes ignored!"
+msgstr "間違い無視"
+
+#: ../game/guitargraph.cc:1119
+msgid "God Mode Ready!"
+msgstr "神モードできた"
+
+#: ../game/guitargraph.cc:1120
+msgid "Drum Fill!"
+msgstr "ドラム・フィル"
+
+#: ../game/guitargraph.cc:1123
+msgid "Solo!"
+msgstr "ソロー"
+
+#: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:149
+msgid "Resume"
+msgstr "再会"
+
+#: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:149
+msgid "Back to performing!"
+msgstr "演奏に再会する"
+
+#: ../game/instrumentgraph.cc:57
+msgid "Rejoin"
+msgstr "再加入"
+
+#: ../game/instrumentgraph.cc:57
+msgid "Change selections"
+msgstr "曲目を変更"
+
+#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:150
+msgid "Restart"
+msgstr "再起動"
+
+#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:150
+msgid ""
+"Start the song\n"
+"from the beginning"
+msgstr "初めから曲を開始する"
+
+#: ../game/layout_singer.cc:72
+msgid "Perfect"
+msgstr ""
+
+#: ../game/layout_singer.cc:73
+msgid "Excellent"
+msgstr ""
+
+#: ../game/layout_singer.cc:74
+#, fuzzy
+#| msgid "Creator"
+msgid "Great"
+msgstr "創作者"
+
+#: ../game/layout_singer.cc:75
+msgid "Good"
+msgstr ""
+
+#: ../game/layout_singer.cc:76
+msgid "OK"
+msgstr ""
+
+# note: says "music" instead of "audio samples"
+#: ../game/main.cc:148
+msgid "Loading audio samples..."
+msgstr "音楽を読み替えていまうす…"
+
+#: ../game/main.cc:163
+msgid "Creating screens..."
+msgstr "画面を作り中"
+
+#: ../game/main.cc:173
+#, fuzzy
+#| msgid "Entering main menu"
+msgid "Entering main menu..."
+msgstr "メインメニューに入り中"
+
+#: ../game/main.cc:175
+#, fuzzy
+#| msgid "Loading complete"
+msgid "Loading complete!"
+msgstr "良い込みできた"
+
+#: ../game/main.cc:184
+msgid ""
+"Done Loading!\n"
+" Loaded "
+msgstr ""
+
+#: ../game/main.cc:190
+msgid "Screenshot taken!"
+msgstr "スクリーンショットを取りました"
+
+#: ../game/main.cc:193
+msgid "Screenshot failed!"
+msgstr "スクリーンショットを失敗しました"
+
+#: ../game/requesthandler.cc:332
+msgid "Performous web frontend"
+msgstr "ペルフォームース・ウエブ・フロントエンド"
+
+#: ../game/requesthandler.cc:333
+msgid "View database"
+msgstr "ダタベースを見る"
+
+#: ../game/requesthandler.cc:334 ../game/screen_songs.cc:565
+msgid "View playlist"
+msgstr ""
+
+#: ../game/requesthandler.cc:335
+#, fuzzy
+#| msgid "Search and Add"
+msgid "Search and add"
+msgstr "探索と加える"
+
+#: ../game/requesthandler.cc:336
+msgid "Sort by"
+msgstr "並べ替える"
+
+#: ../game/requesthandler.cc:337
+msgid "Artist"
+msgstr "歌手"
+
+#: ../game/requesthandler.cc:338
+msgid "Title"
+msgstr "曲名"
+
+#. Language
+#. Language to show Performous in
+#. name: game/language
+#. type: int
+#. value: 1337
+#: ../game/requesthandler.cc:339 ../data/config/schema.xml:103
+msgid "Language"
+msgstr "言語"
+
+#: ../game/requesthandler.cc:340
+msgid "Edition"
+msgstr "版"
+
+#: ../game/requesthandler.cc:341
+msgid "Creator"
+msgstr "創作者"
+
+#. Sort order
+#. Currently active sort order.
+#. name: songs/sort-order
+#. type: int
+#. value: 0
+#. hidden: true
+#: ../game/requesthandler.cc:342 ../data/config/schema.xml:428
+msgid "Sort order"
+msgstr "ソート順"
+
+#: ../game/requesthandler.cc:343
+msgid "Normal"
+msgstr "普通"
+
+#: ../game/requesthandler.cc:344
+msgid "Inverted"
+msgstr "反転"
+
+#: ../game/requesthandler.cc:345
+msgid "Update every 10 sec"
+msgstr "毎十秒更新"
+
+#: ../game/requesthandler.cc:346
+msgid "Refresh database"
+msgstr "ダタベース更新"
+
+#: ../game/requesthandler.cc:347
+msgid "Upcoming songs"
+msgstr "今後の曲"
+
+#: ../game/requesthandler.cc:348
+msgid "Refresh playlist"
+msgstr "プレイリスト更新"
+
+#: ../game/requesthandler.cc:349
+msgid ""
+"Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding "
+"Performous see /docs/Authors.txt"
+msgstr ""
+"ウェブ・インターフェースはニク・ノーイエンスとアルジャン・スペイアルドによっ "
+"て作られました。創作者は/docs/Authors.txt に書かれています。"
+
+#: ../game/requesthandler.cc:350
+msgid "Search"
+msgstr "探索"
+
+#: ../game/requesthandler.cc:351
+msgid "Available songs"
+msgstr "利用可能曲"
+
+#: ../game/requesthandler.cc:352
+msgid "Search for songs"
+msgstr "曲に探索する"
+
+#: ../game/requesthandler.cc:353
+msgid "Yes"
+msgstr "はい"
+
+#: ../game/requesthandler.cc:354
+msgid "No"
+msgstr "いいえ"
+
+#: ../game/requesthandler.cc:355 ../game/screen_playlist.cc:376
+msgid "Move up"
+msgstr ""
+
+#: ../game/requesthandler.cc:356 ../game/screen_playlist.cc:386
+msgid "Move down"
+msgstr ""
+
+#: ../game/requesthandler.cc:357
+msgid "Set position"
+msgstr ""
+
+#: ../game/requesthandler.cc:358
+msgid "Remove song"
+msgstr ""
+
+#: ../game/requesthandler.cc:359
+msgid "Desired position of song"
+msgstr ""
+
+#: ../game/requesthandler.cc:360
+msgid "Cancel"
+msgstr ""
+
+#: ../game/requesthandler.cc:361
+msgid "Successfully removed song from playlist."
+msgstr ""
+
+#: ../game/requesthandler.cc:362
+#, fuzzy
+#| msgid "Remove this song from the list"
+msgid "Failed removing song from playlist!"
+msgstr "この曲はリストから消す。"
+
+#: ../game/requesthandler.cc:363
+msgid "Successfully changed position of song."
+msgstr ""
+
+#: ../game/requesthandler.cc:364
+msgid "Failed changing position of song!"
+msgstr ""
+
+#: ../game/requesthandler.cc:365
+msgid "Successfully moved song up."
+msgstr ""
+
+#: ../game/requesthandler.cc:366
+msgid "Failed moving song up!"
+msgstr ""
+
+#: ../game/requesthandler.cc:367
+msgid "Successfully moved song down."
+msgstr ""
+
+#: ../game/requesthandler.cc:368
+msgid "Failed moving song down!"
+msgstr ""
+
+#: ../game/requesthandler.cc:369
+msgid "Successfully added song to the playlist."
+msgstr ""
+
+#: ../game/requesthandler.cc:370
+#, fuzzy
+msgid "Failed adding song to the playlist!"
+msgstr "この曲はリストから消す。"
+
+#: ../game/requesthandler.cc:371
+msgid "No songs found with current filter."
+msgstr ""
+
+#: ../game/screen_audiodevices.cc:66
+msgid ""
+"It seems you have some manual configurations\n"
+"incompatible with this user interface.\n"
+"Saving these settings will override\n"
+"all existing audio device configuration.\n"
+"Your other options changes will be saved too."
+msgstr ""
+"自分の相対立する設定が有るのようです。 \n"
+"この設定をセーブするのは他の機会コンフィグレーションを上書きます。\n"
+"別の設定変更もセーブしますよ。"
+
+#: ../game/screen_audiodevices.cc:129
+msgid "- Unassigned -"
+msgstr "ー　当たらない　ー"
+
+#: ../game/screen_audiodevices.cc:150
+msgid ""
+"Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select "
+"to cancel. Ctrl + R to reset defaults"
+msgstr ""
+"矢印キーはコンフィギアーのに使います。エンターとスタートはセーブとテストのに"
+"使ってエスケープとセレクトはキャンセルのにつかいます。ctrl+R は設定を戻るのに"
+"使います"
+
+#: ../game/screen_audiodevices.cc:155
+msgid ""
+"For advanced device configuration, use command line parameter --audio (use --"
+"audiohelp for details)."
+msgstr ""
+
+#: ../game/screen_audiodevices.cc:199
+msgid "Some devices failed to open!"
+msgstr "機械をあけません。"
+
+#: ../game/screen_intro.cc:27
+msgid "No playback devices could be used.\n"
+msgstr "再生装置が見つかりませんでした\n"
+
+#: ../game/screen_intro.cc:28
+msgid ""
+"\n"
+"Please configure some before playing."
+msgstr ""
+"\n"
+" 遊ぶ前に再生装置を設定して下さい。"
+
+#: ../game/screen_intro.cc:75 ../game/screen_paths.cc:36
+msgid "Settings saved as system defaults."
+msgstr "設定はシステム・デファウルトにセーブされました。"
+
+#: ../game/screen_intro.cc:75 ../game/screen_paths.cc:36
+msgid "Settings saved."
+msgstr "設定をセーブしました。"
+
+#: ../game/screen_intro.cc:154
+msgid "Ctrl + S to save, Ctrl + R to reset defaults"
+msgstr "セーブするはCtrl + S で、設定元に戻るはCtrl + Rです。"
+
+# 塩素する = musical performance
+# I think 本番 could work, unless sence 3 of Jim's WWWJDIC is the most common meaning...
+# I get the feeling that 演じろ is more theatrical.
+# パフォーマンスする feels to english imo
+# Perhaps suru should be dropped?
+#: ../game/screen_intro.cc:174
+msgid "Perform"
+msgstr "演奏する"
+
+# not sure this is the best word
+#: ../game/screen_intro.cc:175
+msgid "Practice"
+msgstr "トレーニング"
+
+#: ../game/screen_intro.cc:175
+#, fuzzy
+#| msgid "Check your skills or test the microphones"
+msgid "Check your skills or test the microphones."
+msgstr "自分の能力とマイクをテストできます。"
+
+#: ../game/screen_intro.cc:191
+msgid "Configure"
+msgstr "設定"
+
+#: ../game/screen_intro.cc:191
+#, fuzzy
+#| msgid "Configure audio and game options"
+msgid "Configure audio and game options."
+msgstr "オーディオとゲームのオプションを設定する"
+
+#: ../game/screen_intro.cc:192
+#, fuzzy
+#| msgid "Leave the game"
+msgid "Leave the game."
+msgstr "ゲームを終了する"
+
+#: ../game/screen_intro.cc:205
+msgid ""
+"Webserver active!\n"
+" connect to this computer\n"
+"using: "
+msgstr ""
+
+#: ../game/screen_paths.cc:69
+msgid "Hide hidden folders"
+msgstr ""
+
+#. Show hidden folders
+#. When true the screen 'Paths' will also show hidden folders.
+#. name: paths/showhiddenfolders
+#. type: bool
+#. value: false
+#: ../game/screen_paths.cc:74 ../data/config/schema.xml:399
+msgid "Show hidden folders"
+msgstr ""
+
+#: ../game/screen_paths.cc:81
+msgid "Remove this folder"
+msgstr ""
+
+#: ../game/screen_paths.cc:81
+msgid "Remove current folder from song folders"
+msgstr ""
+
+#: ../game/screen_paths.cc:87
+msgid "Add this folder"
+msgstr ""
+
+#: ../game/screen_paths.cc:87
+msgid "Add current folder to song folders"
+msgstr ""
+
+#: ../game/screen_paths.cc:95
+msgid ".."
+msgstr ""
+
+#: ../game/screen_paths.cc:95
+msgid "Go to parent folder"
+msgstr ""
+
+#: ../game/screen_paths.cc:122
+msgid "Open folder"
+msgstr ""
+
+# or perhaps a less polite for would do?
+# 見つからなかった, but that's only 2 kana less.
+#: ../game/screen_players.cc:134
+msgid "No players found!"
+msgstr "千住が見つかりませんでした"
+
+# Unless I'm wrong:
+# [S1]なら[S2] = if S1 then S2 will happen
+# or is 名前に入れば... better?
+# なら is same as 入れば only なら should be put after a noun or な-adjective,
+# so 入れば would be better.
+# however, to "insert" text like a name is 入力する and a goal can be described either as ように
+# or as ために, ように is used with verbs that don't contain volition but ために is used with verbs that do.
+# finally, from the dictionary I got: 選手 せんしゅ (n) player (in game); team member; 千住 isn't anything according to my
+#: ../game/screen_players.cc:135
+msgid "Enter a name to create a new player."
+msgstr "選手を作るように名前を入力して下さい"
+
+#: ../game/screen_players.cc:137
+msgid "Press enter to create player!"
+msgstr "エンターキーを押せば選手を作って"
+
+# or perhaps a less polite for would do?
+# 見つからなかった, but that's only 2 kana less.
+#: ../game/screen_players.cc:141
+#, fuzzy
+msgid "No players worth mentioning!"
+msgstr "千住が見つかりませんでした"
+
+#: ../game/screen_players.cc:146
+msgid "You reached %1% points!"
+msgstr "%1%点をとりました"
+
+#: ../game/screen_players.cc:147
+msgid "Change player with arrow keys."
+msgstr "矢印キーで千住を変えます。"
+
+#: ../game/screen_players.cc:148
+msgid "Name:"
+msgstr "名前："
+
+#: ../game/screen_players.cc:151
+msgid "Type text to filter or create a new player."
+msgstr "新しい選手を作るように字を入力して下さい"
+
+# will search criteria do? 検索テクスト feels wrong to me (僕がでもが外人だ… ;)
+#: ../game/screen_players.cc:151
+msgid "Search Text:"
+msgstr "検索条件："
+
+#: ../game/screen_playlist.cc:19 ../game/screen_sing.cc:46
+msgid "Initializing webcam..."
+msgstr "カメラを組み立ています"
+
+#: ../game/screen_playlist.cc:38
+msgid "Loading song timestamps..."
+msgstr ""
+
+#: ../game/screen_playlist.cc:181 ../game/screen_playlist.cc:352
+msgid "Continue"
+msgstr "続く"
+
+#: ../game/screen_playlist.cc:181
+msgid "Continue playing"
+msgstr "遊び続く"
+
+#: ../game/screen_playlist.cc:195
+msgid "Add songs"
+msgstr "曲を加え"
+
+#: ../game/screen_playlist.cc:195
+msgid "Open the song browser to add more songs"
+msgstr "もっと曲を加えるのに曲選択画面へ戻る"
+
+#: ../game/screen_playlist.cc:196 ../game/screen_songs.cc:559
+msgid "Shuffle"
+msgstr "シャッフル"
+
+#: ../game/screen_playlist.cc:196
+msgid "Randomize the order of the playlist"
+msgstr "リストの曲を更迭する。"
+
+#: ../game/screen_playlist.cc:202
+msgid "Clear and exit"
+msgstr "消すと止める。"
+
+#: ../game/screen_playlist.cc:202
+msgid "Remove all the songs from the list"
+msgstr "全曲をリストから消すと止める。"
+
+#: ../game/screen_playlist.cc:208 ../game/screen_playlist.cc:393
+#: ../game/screen_songs.cc:572
+msgid "Back"
+msgstr "戻る"
+
+#: ../game/screen_playlist.cc:208 ../game/screen_playlist.cc:393
+msgid "Back to playlist viewer"
+msgstr "リスト画面へ戻る"
+
+#: ../game/screen_playlist.cc:335
+msgid "Press enter to view song options"
+msgstr "曲設定を見る為にエンターを押して下さい"
+
+#: ../game/screen_playlist.cc:344
+msgid "View more options"
+msgstr "もっとの設定をみる"
+
+#: ../game/screen_playlist.cc:344
+#, fuzzy
+msgid "View general playlist settings"
+msgstr "全般オーディオのオプションを設定する"
+
+#: ../game/screen_playlist.cc:352
+msgid "Play first"
+msgstr "今すぐプレイする"
+
+#: ../game/screen_playlist.cc:354
+msgid "Ignore the playlist's order and play this song first"
+msgstr "この曲を今すぐプレイされます"
+
+#: ../game/screen_playlist.cc:355
+msgid "Start the song already!"
+msgstr "曲を始めよう"
+
+#: ../game/screen_playlist.cc:364
+msgid "Remove"
+msgstr "消す"
+
+#: ../game/screen_playlist.cc:364
+msgid "Remove this song from the list"
+msgstr "この曲はリストから消す。"
+
+#: ../game/screen_playlist.cc:376
+#, fuzzy
+msgid "Move this song up the list"
+msgstr "この曲はリストから消す。"
+
+#: ../game/screen_playlist.cc:386
+#, fuzzy
+msgid "Move this song down the list"
+msgstr "この曲はリストから消す。"
+
+# ます-form (suspended form) + 中 means that something is in progress and is more often used in signs,
+# て+います is more conversational
+#: ../game/screen_sing.cc:53
+msgid "Loading video..."
+msgstr "ビデオを読み込み中…"
+
+#: ../game/screen_sing.cc:59
+msgid "Loading song..."
+msgstr "音楽を読み替えていまうす…"
+
+#: ../game/screen_sing.cc:66
+msgid "Song contains broken tracks!"
+msgstr "音楽には壊れてトラックが含まれます"
+
+#: ../game/screen_sing.cc:71
+msgid "Loading menu..."
+msgstr "メニューを読み込み中…"
+
+#: ../game/screen_sing.cc:81
+msgid "Loading complete"
+msgstr "良い込みできた"
+
+#: ../game/screen_sing.cc:87
+#, fuzzy
+msgid "Start"
+msgstr "再起動"
+
+# See comment about Perform
+#: ../game/screen_sing.cc:87
+#, fuzzy
+msgid "Start performing"
+msgstr "演奏しはじめて"
+
+#: ../game/screen_sing.cc:90
+msgid "Duet mode"
+msgstr "二部合唱モード"
+
+# could 開式 be used for this?
+#: ../game/screen_sing.cc:91
+msgid "Normal mode"
+msgstr "普通モード"
+
+#: ../game/screen_sing.cc:92
+msgid "Switch between duet and regular singing mode"
+msgstr ""
+
+#: ../game/screen_sing.cc:102
+msgid "Change vocal track"
+msgstr "歌手トラックを変更する"
+
+#: ../game/screen_sing.cc:153
+msgid "Skip"
+msgstr ""
+
+#: ../game/screen_sing.cc:153
+msgid "Skip current song"
+msgstr ""
+
+#: ../game/screen_sing.cc:308
+msgid "Press UP to join dance!"
+msgstr ""
+
+#: ../game/screen_sing.cc:308
+msgid "Step UP to join!"
+msgstr ""
+
+#: ../game/screen_sing.cc:313
+msgid "Press 1 to join guitar!"
+msgstr ""
+
+#: ../game/screen_sing.cc:313
+msgid "Press GREEN to join!"
+msgstr ""
+
+#: ../game/screen_sing.cc:318
+msgid "Press SPACE to join drums!"
+msgstr ""
+
+#: ../game/screen_sing.cc:318
+msgid "KICK to join!"
+msgstr ""
+
+# maybe 無視 instead of skip?
+# is 場合は superflous?
+# インストゥルメンタル could work instead of 楽器の休憩
+# or should a のに construction be used?
+# 場合 if a hepothetical situation, とき could be better because it has a wider range of usage
+# 押して下さい is however more polite than 押す
+#: ../game/screen_sing.cc:557
+msgid "   ENTER to skip instrumental break"
+msgstr "   楽器の休憩をスキップ欲しい場合は、エンターキーを押して下さい"
+
+#: ../game/screen_sing.cc:562 ../game/screen_sing.cc:583
+msgid "   Autoplay enabled"
+msgstr ""
+
+#: ../game/screen_sing.cc:565 ../game/screen_sing.cc:577
+msgid "   Remember to wait for grading!"
+msgstr "   採点を待って忘れないで下さい"
+
+#: ../game/screen_sing.cc:567
+msgid "   Prepare for the next song!"
+msgstr ""
+
+#: ../game/screen_sing.cc:579
+msgid "   Choose your next song!"
+msgstr ""
+
+#: ../game/screen_sing.cc:713
+msgid "No player!"
+msgstr "選手がいません！"
+
+#: ../game/screen_sing.cc:721
+msgid "Hit singer"
+msgstr "ヒット歌手"
+
+#: ../game/screen_sing.cc:722
+msgid "Lead singer"
+msgstr "歌手一番"
+
+#: ../game/screen_sing.cc:723 ../game/screen_sing.cc:729
+#: ../game/screen_sing.cc:735
+msgid "Rising star"
+msgstr "上がる星"
+
+#: ../game/screen_sing.cc:724 ../game/screen_sing.cc:730
+#: ../game/screen_sing.cc:736
+msgid "Amateur"
+msgstr "素人"
+
+# from dictionary: 音痴 おんち (n,adj-no) (1) tone-deafness; amusia; having no ear for music; (adj-na) (2) tone-deaf; off-key; (suf) (3) having no sense (of something); being hopeless (when it comes to something)
+#: ../game/screen_sing.cc:725 ../game/screen_sing.cc:737
+msgid "Tone deaf"
+msgstr "音痴"
+
+#: ../game/screen_sing.cc:727
+msgid "Maniac"
+msgstr "マニアック"
+
+#: ../game/screen_sing.cc:728
+msgid "Hoofer"
+msgstr "ホーファー"
+
+# 敗者 はいしゃ (n) the defeated; vanquished; loser; could be here as well
+#: ../game/screen_sing.cc:731
+msgid "Loser"
+msgstr "負け犬"
+
+#: ../game/screen_sing.cc:733
+msgid "Virtuoso"
+msgstr "妙手"
+
+#: ../game/screen_sing.cc:734
+msgid "Rocker"
+msgstr "ロッカー"
+
+#: ../game/screen_songs.cc:296
+msgid "Sorry, no songs match the search!"
+msgstr ""
+
+#: ../game/screen_songs.cc:299
+msgid "Sorry, no songs match the filter!"
+msgstr ""
+
+#: ../game/screen_songs.cc:302
+msgid "No songs found!"
+msgstr "曲が全然見つけませんでした。"
+
+#: ../game/screen_songs.cc:303
+msgid "Visit performous.org for free songs"
+msgstr "無料曲をダウンロードに「performous.org」行って下さい"
+
+#: ../game/screen_songs.cc:321
+msgid "<type in to search>"
+msgstr ""
+
+#: ../game/screen_songs.cc:321
+msgid "songs"
+msgstr ""
+
+#: ../game/screen_songs.cc:321
+msgid "options"
+msgstr ""
+
+#: ../game/screen_songs.cc:323
+msgid "sort order: "
+msgstr ""
+
+#: ../game/screen_songs.cc:324
+msgid "type filter: "
+msgstr ""
+
+# ハイスコア or 高得点?
+#: ../game/screen_songs.cc:325
+#, fuzzy
+msgid "hiscores"
+msgstr "%1%の高得点\n"
+
+#: ../game/screen_songs.cc:325
+#, fuzzy
+msgid "jukebox mode"
+msgstr "左手モード"
+
+#: ../game/screen_songs.cc:328
+msgid "start a playlist with this song!"
+msgstr ""
+
+#: ../game/screen_songs.cc:328
+msgid "open the playlist menu"
+msgstr ""
+
+#: ../game/screen_songs.cc:552
+msgid "Play"
+msgstr ""
+
+#: ../game/screen_songs.cc:566
+msgid "Clear playlist"
+msgstr ""
+
+#: ../game/songparser-xml.cc:117
+msgid "Together"
+msgstr ""
+
+#: ../game/songs.cc:439
+msgid "show all songs"
+msgstr "全部の曲を見せて"
+
+#: ../game/songs.cc:440
+msgid "has dance"
+msgstr "「踊」がある。"
+
+#: ../game/songs.cc:441
+#, fuzzy
+msgid "has vocals"
+msgstr "ボーカル"
+
+#: ../game/songs.cc:442
+msgid "has duet"
+msgstr "二部合唱がある"
+
+#: ../game/songs.cc:443
+#, fuzzy
+msgid "has guitar"
+msgstr "リズムギター"
+
+#: ../game/songs.cc:444
+#, fuzzy
+msgid "drums or keytar"
+msgstr "どラムズかキーターか。"
+
+#: ../game/songs.cc:445
+msgid "full band"
+msgstr "全楽団"
+
+#: ../game/songs.cc:473
+msgid "random order"
+msgstr "無作為並べ替え"
+
+#: ../game/songs.cc:474
+msgid "sorted by song"
+msgstr "歌順に並べ替えた"
+
+#: ../game/songs.cc:475
+msgid "sorted by artist"
+msgstr "アーティスト順に並べ替えた"
+
+#: ../game/songs.cc:476
+msgid "sorted by edition"
+msgstr "版順に並べ替えた"
+
+#: ../game/songs.cc:477
+msgid "sorted by genre"
+msgstr "ジャンル順に並べ替えた"
+
+#: ../game/songs.cc:478
+msgid "sorted by path"
+msgstr "パス順に並べ替えた"
+
+#: ../game/songs.cc:479
+msgid "sorted by language"
+msgstr "言語に並べ替え"
 
 #. Game
 #. Gameplay related options.
@@ -261,15 +1327,6 @@ msgstr ""
 #. name: game/language
 #. type: int
 #. value: 1337
-#: ../data/config/schema.xml:103 ../game/requesthandler.cc:339
-msgid "Language"
-msgstr "言語"
-
-#. Language
-#. Language to show Performous in
-#. name: game/language
-#. type: int
-#. value: 1337
 #: ../data/config/schema.xml:104
 msgid "Language to show Performous in"
 msgstr ""
@@ -352,22 +1409,24 @@ msgid ""
 "know for sure is not used by other applications."
 msgstr ""
 
-#. Note Graph Scaling
-#. Type of scaling the note graph.
+#. Notegraph Scaling
+#. Choose whether the notegraph keeps a fixed scale or is adjusted according to the current song.
 #. name: game/notegraphscalingmode
 #. type: int
 #. value: 0
 #: ../data/config/schema.xml:140
-msgid "Note Graph Scaling"
+msgid "Notegraph Scaling"
 msgstr ""
 
-#. Note Graph Scaling
-#. Type of scaling the note graph.
+#. Notegraph Scaling
+#. Choose whether the notegraph keeps a fixed scale or is adjusted according to the current song.
 #. name: game/notegraphscalingmode
 #. type: int
 #. value: 0
 #: ../data/config/schema.xml:141
-msgid "Type of scaling the note graph."
+msgid ""
+"Choose whether the notegraph keeps a fixed scale or is adjusted according to "
+"the current song."
 msgstr ""
 
 #. Keyboard as guitar
@@ -1140,15 +2199,6 @@ msgstr ""
 #. name: paths/showhiddenfolders
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:399 ../game/screen_paths.cc:74
-msgid "Show hidden folders"
-msgstr ""
-
-#. Show hidden folders
-#. When true the screen 'Paths' will also show hidden folders.
-#. name: paths/showhiddenfolders
-#. type: bool
-#. value: false
 #: ../data/config/schema.xml:400
 msgid "When true the screen 'Paths' will also show hidden folders."
 msgstr ""
@@ -1185,16 +2235,6 @@ msgstr ""
 #. type: int
 #. value: 0
 #. hidden: true
-#: ../data/config/schema.xml:428 ../game/requesthandler.cc:342
-msgid "Sort order"
-msgstr "ソート順"
-
-#. Sort order
-#. Currently active sort order.
-#. name: songs/sort-order
-#. type: int
-#. value: 0
-#. hidden: true
 #: ../data/config/schema.xml:429
 msgid "Currently active sort order."
 msgstr ""
@@ -1211,983 +2251,8 @@ msgstr ""
 msgid "song;music;dance;karaoke;microphone;sound;singing;"
 msgstr ""
 
-#: ../game/configuration.cc:147
-msgid "Enabled"
-msgstr "使用可能"
-
-#: ../game/configuration.cc:147 ../game/menu.cc:64
-msgid "Disabled"
-msgstr "使用禁止"
-
-#: ../game/configuration.cc:151
-#, c-format
-msgid "%d items"
-msgstr "%d 細目"
-
-#: ../game/configuration.cc:452 ../game/i18n.hh:101
-msgid "Asturian"
-msgstr ""
-
-#: ../game/configuration.cc:453 ../game/i18n.hh:102
-msgid "Danish"
-msgstr ""
-
-#: ../game/configuration.cc:454 ../game/i18n.hh:103
-msgid "German"
-msgstr ""
-
-#: ../game/configuration.cc:455 ../game/i18n.hh:104
-msgid "English"
-msgstr ""
-
-#: ../game/configuration.cc:456 ../game/i18n.hh:105
-msgid "Spanish"
-msgstr ""
-
-#: ../game/configuration.cc:457 ../game/i18n.hh:106
-msgid "Persian"
-msgstr ""
-
-#: ../game/configuration.cc:458 ../game/i18n.hh:107
-msgid "Finnish"
-msgstr ""
-
-#: ../game/configuration.cc:459 ../game/i18n.hh:108
-msgid "French"
-msgstr ""
-
-#: ../game/configuration.cc:460 ../game/i18n.hh:109
-msgid "Hungarian"
-msgstr ""
-
-#: ../game/configuration.cc:461 ../game/i18n.hh:110
-msgid "Italian"
-msgstr ""
-
-#: ../game/configuration.cc:462 ../game/i18n.hh:111
-msgid "Japanese"
-msgstr ""
-
-#: ../game/configuration.cc:463 ../game/i18n.hh:112
-msgid "Dutch"
-msgstr ""
-
-#: ../game/configuration.cc:464 ../game/i18n.hh:113
-msgid "Polish"
-msgstr ""
-
-#: ../game/configuration.cc:465 ../game/i18n.hh:114
-msgid "Portuguese"
-msgstr ""
-
-#: ../game/configuration.cc:466 ../game/i18n.hh:115
-msgid "Swedish"
-msgstr ""
-
-#: ../game/configuration.cc:467 ../game/i18n.hh:116
-msgid "Chinese"
-msgstr ""
-
-#: ../game/dancegraph.cc:17
-msgid "Beginner"
-msgstr "初心者"
-
-#: ../game/dancegraph.cc:17 ../game/guitargraph.cc:13
-msgid "Easy"
-msgstr "易しい"
-
-#: ../game/dancegraph.cc:17 ../game/guitargraph.cc:13
-#, fuzzy
-msgid "Medium"
-msgstr "中間"
-
-#: ../game/dancegraph.cc:17 ../game/guitargraph.cc:13
-msgid "Hard"
-msgstr "難しい"
-
-#: ../game/dancegraph.cc:17
-msgid "Challenge"
-msgstr "挑戦"
-
-#: ../game/dancegraph.cc:51 ../game/dancegraph.cc:59
-msgid "Perfect!"
-msgstr ""
-
-#: ../game/dancegraph.cc:52
-msgid "Excellent!-"
-msgstr ""
-
-#: ../game/dancegraph.cc:53
-msgid "Great!-"
-msgstr ""
-
-#: ../game/dancegraph.cc:54
-msgid " Good!- "
-msgstr ""
-
-#: ../game/dancegraph.cc:55
-msgid "  OK!-  "
-msgstr ""
-
-#: ../game/dancegraph.cc:56
-msgid "Late!-"
-msgstr ""
-
-#: ../game/dancegraph.cc:57 ../game/dancegraph.cc:65
-msgid "Way off!"
-msgstr ""
-
-#: ../game/dancegraph.cc:60
-msgid "-Excellent!"
-msgstr ""
-
-#: ../game/dancegraph.cc:61
-msgid "-Great!"
-msgstr ""
-
-#: ../game/dancegraph.cc:62
-msgid " -Good! "
-msgstr ""
-
-#: ../game/dancegraph.cc:63
-msgid "  -OK!  "
-msgstr ""
-
-#: ../game/dancegraph.cc:64
-msgid "-Early!"
-msgstr ""
-
-# There's probably a better word
-#: ../game/dancegraph.cc:106 ../game/guitargraph.cc:194
-msgid "Ready!"
-msgstr "レディー！"
-
-# See comment about Perform
-#: ../game/dancegraph.cc:106 ../game/guitargraph.cc:194
-#: ../game/screen_intro.cc:174
-msgid "Start performing!"
-msgstr "演奏しはじめて"
-
-# or would トラックにして下さい work?
-#: ../game/dancegraph.cc:117 ../game/guitargraph.cc:183
-msgid "Select track"
-msgstr "トラックを決めて下さい"
-
-# or would 難しさにして下さい work?
-#: ../game/dancegraph.cc:133 ../game/guitargraph.cc:163
-msgid "Select difficulty"
-msgstr "難しさを決めて下さい"
-
-#: ../game/dancegraph.cc:136 ../game/guitargraph.cc:200
-#: ../game/instrumentgraph.cc:59 ../game/screen_intro.cc:192
-#: ../game/screen_sing.cc:108 ../game/screen_sing.cc:155
-msgid "Quit"
-msgstr "終了"
-
-#: ../game/dancegraph.cc:136 ../game/guitargraph.cc:200
-#: ../game/instrumentgraph.cc:59 ../game/screen_sing.cc:108
-#: ../game/screen_sing.cc:155
-msgid "Exit to song browser"
-msgstr "音楽ブラウザに終了する"
-
-# 止まって or 止めて, not sure which english stop that's indented.
-#: ../game/dancegraph.cc:247
-msgid "STOP!"
-msgstr "止まって！"
-
-#: ../game/dancegraph.cc:321 ../game/guitargraph.cc:454
-msgid "Streak!"
-msgstr "ストリーク!"
-
-#: ../game/guitargraph.cc:13
-msgid "Kids"
-msgstr "子供"
-
-#: ../game/guitargraph.cc:13
-msgid "Expert"
-msgstr "専門家"
-
-#: ../game/guitargraph.cc:169 ../game/guitargraph.cc:186
-msgid "Lefty-mode"
-msgstr "左手モード"
-
-#: ../game/guitargraph.cc:207
-msgid "ON"
-msgstr "オン"
-
-#: ../game/guitargraph.cc:207
-msgid "OFF"
-msgstr "オフ"
-
-#: ../game/guitargraph.cc:208
-msgid "Toggle lefty-mode"
-msgstr "左手モードをトグル"
-
-#: ../game/guitargraph.cc:466
-msgid ""
-"God Mode\n"
-"Activated!"
-msgstr ""
-"神モード\n"
-"活性化！"
-
-#: ../game/guitargraph.cc:467
-msgid "Mistakes ignored!"
-msgstr "間違い無視"
-
-#: ../game/guitargraph.cc:1119
-msgid "God Mode Ready!"
-msgstr "神モードできた"
-
-#: ../game/guitargraph.cc:1120
-msgid "Drum Fill!"
-msgstr "ドラム・フィル"
-
-#: ../game/guitargraph.cc:1123
-msgid "Solo!"
-msgstr "ソロー"
-
 #: ../game/i18n.hh:63 ../game/i18n.hh:100
 msgid "Auto"
-msgstr ""
-
-#: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:149
-msgid "Resume"
-msgstr "再会"
-
-#: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:149
-msgid "Back to performing!"
-msgstr "演奏に再会する"
-
-#: ../game/instrumentgraph.cc:57
-msgid "Rejoin"
-msgstr "再加入"
-
-#: ../game/instrumentgraph.cc:57
-msgid "Change selections"
-msgstr "曲目を変更"
-
-#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:150
-msgid "Restart"
-msgstr "再起動"
-
-#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:150
-msgid ""
-"Start the song\n"
-"from the beginning"
-msgstr "初めから曲を開始する"
-
-#: ../game/layout_singer.cc:72
-msgid "Perfect"
-msgstr ""
-
-#: ../game/layout_singer.cc:73
-msgid "Excellent"
-msgstr ""
-
-#: ../game/layout_singer.cc:74
-#, fuzzy
-#| msgid "Creator"
-msgid "Great"
-msgstr "創作者"
-
-#: ../game/layout_singer.cc:75
-msgid "Good"
-msgstr ""
-
-#: ../game/layout_singer.cc:76
-msgid "OK"
-msgstr ""
-
-# note: says "music" instead of "audio samples"
-#: ../game/main.cc:148
-msgid "Loading audio samples..."
-msgstr "音楽を読み替えていまうす…"
-
-#: ../game/main.cc:163
-msgid "Creating screens..."
-msgstr "画面を作り中"
-
-#: ../game/main.cc:173
-#, fuzzy
-#| msgid "Entering main menu"
-msgid "Entering main menu..."
-msgstr "メインメニューに入り中"
-
-#: ../game/main.cc:175
-#, fuzzy
-#| msgid "Loading complete"
-msgid "Loading complete!"
-msgstr "良い込みできた"
-
-#: ../game/main.cc:184
-msgid ""
-"Done Loading!\n"
-" Loaded "
-msgstr ""
-
-#: ../game/main.cc:190
-msgid "Screenshot taken!"
-msgstr "スクリーンショットを取りました"
-
-#: ../game/main.cc:193
-msgid "Screenshot failed!"
-msgstr "スクリーンショットを失敗しました"
-
-#: ../game/requesthandler.cc:332
-msgid "Performous web frontend"
-msgstr "ペルフォームース・ウエブ・フロントエンド"
-
-#: ../game/requesthandler.cc:333
-msgid "View database"
-msgstr "ダタベースを見る"
-
-#: ../game/requesthandler.cc:334 ../game/screen_songs.cc:565
-msgid "View playlist"
-msgstr ""
-
-#: ../game/requesthandler.cc:335
-#, fuzzy
-#| msgid "Search and Add"
-msgid "Search and add"
-msgstr "探索と加える"
-
-#: ../game/requesthandler.cc:336
-msgid "Sort by"
-msgstr "並べ替える"
-
-#: ../game/requesthandler.cc:337
-msgid "Artist"
-msgstr "歌手"
-
-#: ../game/requesthandler.cc:338
-msgid "Title"
-msgstr "曲名"
-
-#: ../game/requesthandler.cc:340
-msgid "Edition"
-msgstr "版"
-
-#: ../game/requesthandler.cc:341
-msgid "Creator"
-msgstr "創作者"
-
-#: ../game/requesthandler.cc:343
-msgid "Normal"
-msgstr "普通"
-
-#: ../game/requesthandler.cc:344
-msgid "Inverted"
-msgstr "反転"
-
-#: ../game/requesthandler.cc:345
-msgid "Update every 10 sec"
-msgstr "毎十秒更新"
-
-#: ../game/requesthandler.cc:346
-msgid "Refresh database"
-msgstr "ダタベース更新"
-
-#: ../game/requesthandler.cc:347
-msgid "Upcoming songs"
-msgstr "今後の曲"
-
-#: ../game/requesthandler.cc:348
-msgid "Refresh playlist"
-msgstr "プレイリスト更新"
-
-#: ../game/requesthandler.cc:349
-msgid ""
-"Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding "
-"Performous see /docs/Authors.txt"
-msgstr ""
-"ウェブ・インターフェースはニク・ノーイエンスとアルジャン・スペイアルドによっ "
-"て作られました。創作者は/docs/Authors.txt に書かれています。"
-
-#: ../game/requesthandler.cc:350
-msgid "Search"
-msgstr "探索"
-
-#: ../game/requesthandler.cc:351
-msgid "Available songs"
-msgstr "利用可能曲"
-
-#: ../game/requesthandler.cc:352
-msgid "Search for songs"
-msgstr "曲に探索する"
-
-#: ../game/requesthandler.cc:353
-msgid "Yes"
-msgstr "はい"
-
-#: ../game/requesthandler.cc:354
-msgid "No"
-msgstr "いいえ"
-
-#: ../game/requesthandler.cc:355 ../game/screen_playlist.cc:376
-msgid "Move up"
-msgstr ""
-
-#: ../game/requesthandler.cc:356 ../game/screen_playlist.cc:386
-msgid "Move down"
-msgstr ""
-
-#: ../game/requesthandler.cc:357
-msgid "Set position"
-msgstr ""
-
-#: ../game/requesthandler.cc:358
-msgid "Remove song"
-msgstr ""
-
-#: ../game/requesthandler.cc:359
-msgid "Desired position of song"
-msgstr ""
-
-#: ../game/requesthandler.cc:360
-msgid "Cancel"
-msgstr ""
-
-#: ../game/requesthandler.cc:361
-msgid "Successfully removed song from playlist."
-msgstr ""
-
-#: ../game/requesthandler.cc:362
-#, fuzzy
-#| msgid "Remove this song from the list"
-msgid "Failed removing song from playlist!"
-msgstr "この曲はリストから消す。"
-
-#: ../game/requesthandler.cc:363
-msgid "Successfully changed position of song."
-msgstr ""
-
-#: ../game/requesthandler.cc:364
-msgid "Failed changing position of song!"
-msgstr ""
-
-#: ../game/requesthandler.cc:365
-msgid "Successfully moved song up."
-msgstr ""
-
-#: ../game/requesthandler.cc:366
-msgid "Failed moving song up!"
-msgstr ""
-
-#: ../game/requesthandler.cc:367
-msgid "Successfully moved song down."
-msgstr ""
-
-#: ../game/requesthandler.cc:368
-msgid "Failed moving song down!"
-msgstr ""
-
-#: ../game/requesthandler.cc:369
-msgid "Successfully added song to the playlist."
-msgstr ""
-
-#: ../game/requesthandler.cc:370
-#, fuzzy
-msgid "Failed adding song to the playlist!"
-msgstr "この曲はリストから消す。"
-
-#: ../game/requesthandler.cc:371
-msgid "No songs found with current filter."
-msgstr ""
-
-#: ../game/screen_audiodevices.cc:66
-msgid ""
-"It seems you have some manual configurations\n"
-"incompatible with this user interface.\n"
-"Saving these settings will override\n"
-"all existing audio device configuration.\n"
-"Your other options changes will be saved too."
-msgstr ""
-"自分の相対立する設定が有るのようです。 \n"
-"この設定をセーブするのは他の機会コンフィグレーションを上書きます。\n"
-"別の設定変更もセーブしますよ。"
-
-#: ../game/screen_audiodevices.cc:129
-msgid "- Unassigned -"
-msgstr "ー　当たらない　ー"
-
-#: ../game/screen_audiodevices.cc:150
-msgid ""
-"Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select "
-"to cancel. Ctrl + R to reset defaults"
-msgstr ""
-"矢印キーはコンフィギアーのに使います。エンターとスタートはセーブとテストのに"
-"使ってエスケープとセレクトはキャンセルのにつかいます。ctrl+R は設定を戻るのに"
-"使います"
-
-#: ../game/screen_audiodevices.cc:155
-msgid ""
-"For advanced device configuration, use command line parameter --audio (use --"
-"audiohelp for details)."
-msgstr ""
-
-#: ../game/screen_audiodevices.cc:199
-msgid "Some devices failed to open!"
-msgstr "機械をあけません。"
-
-#: ../game/screen_intro.cc:27
-msgid "No playback devices could be used.\n"
-msgstr "再生装置が見つかりませんでした\n"
-
-#: ../game/screen_intro.cc:28
-msgid ""
-"\n"
-"Please configure some before playing."
-msgstr ""
-"\n"
-" 遊ぶ前に再生装置を設定して下さい。"
-
-#: ../game/screen_intro.cc:75 ../game/screen_paths.cc:36
-msgid "Settings saved as system defaults."
-msgstr "設定はシステム・デファウルトにセーブされました。"
-
-#: ../game/screen_intro.cc:75 ../game/screen_paths.cc:36
-msgid "Settings saved."
-msgstr "設定をセーブしました。"
-
-#: ../game/screen_intro.cc:154
-msgid "Ctrl + S to save, Ctrl + R to reset defaults"
-msgstr "セーブするはCtrl + S で、設定元に戻るはCtrl + Rです。"
-
-# 塩素する = musical performance
-# I think 本番 could work, unless sence 3 of Jim's WWWJDIC is the most common meaning...
-# I get the feeling that 演じろ is more theatrical.
-# パフォーマンスする feels to english imo
-# Perhaps suru should be dropped?
-#: ../game/screen_intro.cc:174
-msgid "Perform"
-msgstr "演奏する"
-
-# not sure this is the best word
-#: ../game/screen_intro.cc:175
-msgid "Practice"
-msgstr "トレーニング"
-
-#: ../game/screen_intro.cc:175
-#, fuzzy
-#| msgid "Check your skills or test the microphones"
-msgid "Check your skills or test the microphones."
-msgstr "自分の能力とマイクをテストできます。"
-
-#: ../game/screen_intro.cc:191
-msgid "Configure"
-msgstr "設定"
-
-#: ../game/screen_intro.cc:191
-#, fuzzy
-#| msgid "Configure audio and game options"
-msgid "Configure audio and game options."
-msgstr "オーディオとゲームのオプションを設定する"
-
-#: ../game/screen_intro.cc:192
-#, fuzzy
-#| msgid "Leave the game"
-msgid "Leave the game."
-msgstr "ゲームを終了する"
-
-#: ../game/screen_intro.cc:205
-msgid ""
-"Webserver active!\n"
-" connect to this computer\n"
-"using: "
-msgstr ""
-
-#: ../game/screen_paths.cc:69
-msgid "Hide hidden folders"
-msgstr ""
-
-#: ../game/screen_paths.cc:81
-msgid "Remove this folder"
-msgstr ""
-
-#: ../game/screen_paths.cc:81
-msgid "Remove current folder from song folders"
-msgstr ""
-
-#: ../game/screen_paths.cc:87
-msgid "Add this folder"
-msgstr ""
-
-#: ../game/screen_paths.cc:87
-msgid "Add current folder to song folders"
-msgstr ""
-
-#: ../game/screen_paths.cc:95
-msgid ".."
-msgstr ""
-
-#: ../game/screen_paths.cc:95
-msgid "Go to parent folder"
-msgstr ""
-
-#: ../game/screen_paths.cc:122
-msgid "Open folder"
-msgstr ""
-
-# or perhaps a less polite for would do?
-# 見つからなかった, but that's only 2 kana less.
-#: ../game/screen_players.cc:134
-msgid "No players found!"
-msgstr "千住が見つかりませんでした"
-
-# Unless I'm wrong:
-# [S1]なら[S2] = if S1 then S2 will happen
-# or is 名前に入れば... better?
-# なら is same as 入れば only なら should be put after a noun or な-adjective,
-# so 入れば would be better.
-# however, to "insert" text like a name is 入力する and a goal can be described either as ように
-# or as ために, ように is used with verbs that don't contain volition but ために is used with verbs that do.
-# finally, from the dictionary I got: 選手 せんしゅ (n) player (in game); team member; 千住 isn't anything according to my
-#: ../game/screen_players.cc:135
-msgid "Enter a name to create a new player."
-msgstr "選手を作るように名前を入力して下さい"
-
-#: ../game/screen_players.cc:137
-msgid "Press enter to create player!"
-msgstr "エンターキーを押せば選手を作って"
-
-# or perhaps a less polite for would do?
-# 見つからなかった, but that's only 2 kana less.
-#: ../game/screen_players.cc:141
-#, fuzzy
-msgid "No players worth mentioning!"
-msgstr "千住が見つかりませんでした"
-
-#: ../game/screen_players.cc:146
-msgid "You reached %1% points!"
-msgstr "%1%点をとりました"
-
-#: ../game/screen_players.cc:147
-msgid "Change player with arrow keys."
-msgstr "矢印キーで千住を変えます。"
-
-#: ../game/screen_players.cc:148
-msgid "Name:"
-msgstr "名前："
-
-#: ../game/screen_players.cc:151
-msgid "Type text to filter or create a new player."
-msgstr "新しい選手を作るように字を入力して下さい"
-
-# will search criteria do? 検索テクスト feels wrong to me (僕がでもが外人だ… ;)
-#: ../game/screen_players.cc:151
-msgid "Search Text:"
-msgstr "検索条件："
-
-#: ../game/screen_playlist.cc:19 ../game/screen_sing.cc:46
-msgid "Initializing webcam..."
-msgstr "カメラを組み立ています"
-
-#: ../game/screen_playlist.cc:38
-msgid "Loading song timestamps..."
-msgstr ""
-
-#: ../game/screen_playlist.cc:181 ../game/screen_playlist.cc:352
-msgid "Continue"
-msgstr "続く"
-
-#: ../game/screen_playlist.cc:181
-msgid "Continue playing"
-msgstr "遊び続く"
-
-#: ../game/screen_playlist.cc:195
-msgid "Add songs"
-msgstr "曲を加え"
-
-#: ../game/screen_playlist.cc:195
-msgid "Open the song browser to add more songs"
-msgstr "もっと曲を加えるのに曲選択画面へ戻る"
-
-#: ../game/screen_playlist.cc:196 ../game/screen_songs.cc:559
-msgid "Shuffle"
-msgstr "シャッフル"
-
-#: ../game/screen_playlist.cc:196
-msgid "Randomize the order of the playlist"
-msgstr "リストの曲を更迭する。"
-
-#: ../game/screen_playlist.cc:202
-msgid "Clear and exit"
-msgstr "消すと止める。"
-
-#: ../game/screen_playlist.cc:202
-msgid "Remove all the songs from the list"
-msgstr "全曲をリストから消すと止める。"
-
-#: ../game/screen_playlist.cc:208 ../game/screen_playlist.cc:393
-#: ../game/screen_songs.cc:572
-msgid "Back"
-msgstr "戻る"
-
-#: ../game/screen_playlist.cc:208 ../game/screen_playlist.cc:393
-msgid "Back to playlist viewer"
-msgstr "リスト画面へ戻る"
-
-#: ../game/screen_playlist.cc:335
-msgid "Press enter to view song options"
-msgstr "曲設定を見る為にエンターを押して下さい"
-
-#: ../game/screen_playlist.cc:344
-msgid "View more options"
-msgstr "もっとの設定をみる"
-
-#: ../game/screen_playlist.cc:344
-#, fuzzy
-msgid "View general playlist settings"
-msgstr "全般オーディオのオプションを設定する"
-
-#: ../game/screen_playlist.cc:352
-msgid "Play first"
-msgstr "今すぐプレイする"
-
-#: ../game/screen_playlist.cc:354
-msgid "Ignore the playlist's order and play this song first"
-msgstr "この曲を今すぐプレイされます"
-
-#: ../game/screen_playlist.cc:355
-msgid "Start the song already!"
-msgstr "曲を始めよう"
-
-#: ../game/screen_playlist.cc:364
-msgid "Remove"
-msgstr "消す"
-
-#: ../game/screen_playlist.cc:364
-msgid "Remove this song from the list"
-msgstr "この曲はリストから消す。"
-
-#: ../game/screen_playlist.cc:376
-#, fuzzy
-msgid "Move this song up the list"
-msgstr "この曲はリストから消す。"
-
-#: ../game/screen_playlist.cc:386
-#, fuzzy
-msgid "Move this song down the list"
-msgstr "この曲はリストから消す。"
-
-# ます-form (suspended form) + 中 means that something is in progress and is more often used in signs,
-# て+います is more conversational
-#: ../game/screen_sing.cc:53
-msgid "Loading video..."
-msgstr "ビデオを読み込み中…"
-
-#: ../game/screen_sing.cc:59
-msgid "Loading song..."
-msgstr "音楽を読み替えていまうす…"
-
-#: ../game/screen_sing.cc:66
-msgid "Song contains broken tracks!"
-msgstr "音楽には壊れてトラックが含まれます"
-
-#: ../game/screen_sing.cc:71
-msgid "Loading menu..."
-msgstr "メニューを読み込み中…"
-
-#: ../game/screen_sing.cc:81
-msgid "Loading complete"
-msgstr "良い込みできた"
-
-#: ../game/screen_sing.cc:87
-#, fuzzy
-msgid "Start"
-msgstr "再起動"
-
-# See comment about Perform
-#: ../game/screen_sing.cc:87
-#, fuzzy
-msgid "Start performing"
-msgstr "演奏しはじめて"
-
-#: ../game/screen_sing.cc:90
-msgid "Duet mode"
-msgstr "二部合唱モード"
-
-# could 開式 be used for this?
-#: ../game/screen_sing.cc:91
-msgid "Normal mode"
-msgstr "普通モード"
-
-#: ../game/screen_sing.cc:92
-msgid "Switch between duet and regular singing mode"
-msgstr ""
-
-#: ../game/screen_sing.cc:102
-msgid "Change vocal track"
-msgstr "歌手トラックを変更する"
-
-#: ../game/screen_sing.cc:153
-msgid "Skip"
-msgstr ""
-
-#: ../game/screen_sing.cc:153
-msgid "Skip current song"
-msgstr ""
-
-#: ../game/screen_sing.cc:308
-msgid "Press UP to join dance!"
-msgstr ""
-
-#: ../game/screen_sing.cc:308
-msgid "Step UP to join!"
-msgstr ""
-
-#: ../game/screen_sing.cc:313
-msgid "Press 1 to join guitar!"
-msgstr ""
-
-#: ../game/screen_sing.cc:313
-msgid "Press GREEN to join!"
-msgstr ""
-
-#: ../game/screen_sing.cc:318
-msgid "Press SPACE to join drums!"
-msgstr ""
-
-#: ../game/screen_sing.cc:318
-msgid "KICK to join!"
-msgstr ""
-
-# maybe 無視 instead of skip?
-# is 場合は superflous?
-# インストゥルメンタル could work instead of 楽器の休憩
-# or should a のに construction be used?
-# 場合 if a hepothetical situation, とき could be better because it has a wider range of usage
-# 押して下さい is however more polite than 押す
-#: ../game/screen_sing.cc:557
-msgid "   ENTER to skip instrumental break"
-msgstr "   楽器の休憩をスキップ欲しい場合は、エンターキーを押して下さい"
-
-#: ../game/screen_sing.cc:562 ../game/screen_sing.cc:583
-msgid "   Autoplay enabled"
-msgstr ""
-
-#: ../game/screen_sing.cc:565 ../game/screen_sing.cc:577
-msgid "   Remember to wait for grading!"
-msgstr "   採点を待って忘れないで下さい"
-
-#: ../game/screen_sing.cc:567
-msgid "   Prepare for the next song!"
-msgstr ""
-
-#: ../game/screen_sing.cc:579
-msgid "   Choose your next song!"
-msgstr ""
-
-#: ../game/screen_sing.cc:713
-msgid "No player!"
-msgstr "選手がいません！"
-
-#: ../game/screen_sing.cc:721
-msgid "Hit singer"
-msgstr "ヒット歌手"
-
-#: ../game/screen_sing.cc:722
-msgid "Lead singer"
-msgstr "歌手一番"
-
-#: ../game/screen_sing.cc:723 ../game/screen_sing.cc:729
-#: ../game/screen_sing.cc:735
-msgid "Rising star"
-msgstr "上がる星"
-
-#: ../game/screen_sing.cc:724 ../game/screen_sing.cc:730
-#: ../game/screen_sing.cc:736
-msgid "Amateur"
-msgstr "素人"
-
-# from dictionary: 音痴 おんち (n,adj-no) (1) tone-deafness; amusia; having no ear for music; (adj-na) (2) tone-deaf; off-key; (suf) (3) having no sense (of something); being hopeless (when it comes to something)
-#: ../game/screen_sing.cc:725 ../game/screen_sing.cc:737
-msgid "Tone deaf"
-msgstr "音痴"
-
-#: ../game/screen_sing.cc:727
-msgid "Maniac"
-msgstr "マニアック"
-
-#: ../game/screen_sing.cc:728
-msgid "Hoofer"
-msgstr "ホーファー"
-
-# 敗者 はいしゃ (n) the defeated; vanquished; loser; could be here as well
-#: ../game/screen_sing.cc:731
-msgid "Loser"
-msgstr "負け犬"
-
-#: ../game/screen_sing.cc:733
-msgid "Virtuoso"
-msgstr "妙手"
-
-#: ../game/screen_sing.cc:734
-msgid "Rocker"
-msgstr "ロッカー"
-
-#: ../game/screen_songs.cc:296
-msgid "Sorry, no songs match the search!"
-msgstr ""
-
-#: ../game/screen_songs.cc:299
-msgid "Sorry, no songs match the filter!"
-msgstr ""
-
-#: ../game/screen_songs.cc:302
-msgid "No songs found!"
-msgstr "曲が全然見つけませんでした。"
-
-#: ../game/screen_songs.cc:303
-msgid "Visit performous.org for free songs"
-msgstr "無料曲をダウンロードに「performous.org」行って下さい"
-
-#: ../game/screen_songs.cc:321
-msgid "<type in to search>"
-msgstr ""
-
-#: ../game/screen_songs.cc:321
-msgid "songs"
-msgstr ""
-
-#: ../game/screen_songs.cc:321
-msgid "options"
-msgstr ""
-
-#: ../game/screen_songs.cc:323
-msgid "sort order: "
-msgstr ""
-
-#: ../game/screen_songs.cc:324
-msgid "type filter: "
-msgstr ""
-
-# ハイスコア or 高得点?
-#: ../game/screen_songs.cc:325
-#, fuzzy
-msgid "hiscores"
-msgstr "%1%の高得点\n"
-
-#: ../game/screen_songs.cc:325
-#, fuzzy
-msgid "jukebox mode"
-msgstr "左手モード"
-
-#: ../game/screen_songs.cc:328
-msgid "start a playlist with this song!"
-msgstr ""
-
-#: ../game/screen_songs.cc:328
-msgid "open the playlist menu"
-msgstr ""
-
-#: ../game/screen_songs.cc:552
-msgid "Play"
-msgstr ""
-
-#: ../game/screen_songs.cc:566
-msgid "Clear playlist"
 msgstr ""
 
 #: ../game/song.hh:28
@@ -2225,69 +2290,6 @@ msgstr "ハルモニク 2"
 #: ../game/song.hh:28
 msgid "Harmonic 3"
 msgstr "ハルモニク 3"
-
-#: ../game/songparser-xml.cc:117
-msgid "Together"
-msgstr ""
-
-#: ../game/songs.cc:439
-msgid "show all songs"
-msgstr "全部の曲を見せて"
-
-#: ../game/songs.cc:440
-msgid "has dance"
-msgstr "「踊」がある。"
-
-#: ../game/songs.cc:441
-#, fuzzy
-msgid "has vocals"
-msgstr "ボーカル"
-
-#: ../game/songs.cc:442
-msgid "has duet"
-msgstr "二部合唱がある"
-
-#: ../game/songs.cc:443
-#, fuzzy
-msgid "has guitar"
-msgstr "リズムギター"
-
-#: ../game/songs.cc:444
-#, fuzzy
-msgid "drums or keytar"
-msgstr "どラムズかキーターか。"
-
-#: ../game/songs.cc:445
-msgid "full band"
-msgstr "全楽団"
-
-#: ../game/songs.cc:473
-msgid "random order"
-msgstr "無作為並べ替え"
-
-#: ../game/songs.cc:474
-msgid "sorted by song"
-msgstr "歌順に並べ替えた"
-
-#: ../game/songs.cc:475
-msgid "sorted by artist"
-msgstr "アーティスト順に並べ替えた"
-
-#: ../game/songs.cc:476
-msgid "sorted by edition"
-msgstr "版順に並べ替えた"
-
-#: ../game/songs.cc:477
-msgid "sorted by genre"
-msgstr "ジャンル順に並べ替えた"
-
-#: ../game/songs.cc:478
-msgid "sorted by path"
-msgstr "パス順に並べ替えた"
-
-#: ../game/songs.cc:479
-msgid "sorted by language"
-msgstr "言語に並べ替え"
 
 #~ msgid ""
 #~ "This tool is not yet available.\n"
