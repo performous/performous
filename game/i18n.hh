@@ -10,7 +10,7 @@
 
 class TranslationEngine {
 public:
-	TranslationEngine(const char *package);;
+	TranslationEngine(const char *package);
 
 	void initializeAllLanguages();
 	void setLanguage(const std::string& language, bool fromSettings = false);
