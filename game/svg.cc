@@ -47,7 +47,7 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	std::shared_ptr<cairo_t> dc(cairo_create(surface.get()), cairo_destroy);
 	cairo_scale(dc.get(), factor, factor);
 #if LIBRSVG_MAJOR_VERSION >= 2 && LIBRSVG_MINOR_VERSION >= 52
-	RsvgRectangle viewport = {0,0, svg_width, svg_height}; //viewport start is defenetely 0,0 but width and height?... from rsvg_handle_get_intrinsic_size_in_pixels I guess...
+	RsvgRectangle viewport = {0,0, svg_width, svg_height}; 
 	rsvg_handle_render_document(svgHandle.get(),dc.get(), &viewport, NULL);
 #else
 	rsvg_handle_render_cairo(svgHandle.get(), dc.get());
