@@ -27,7 +27,7 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 		g_error_free(pError);
 		throw std::runtime_error("Unable to load " + filename.string());
 	}
-#if LIBRSVG_MAJOR_VERSION >= 2 && LIBRSVG_MINOR_VERSION >= 46
+#if LIBRSVG_MAJOR_VERSION >= 2 && LIBRSVG_MINOR_VERSION >= 52
 	gdouble svg_width = 0, svg_height = 0;
 	rsvg_handle_get_intrinsic_size_in_pixels(svgHandle.get(),&svg_width, &svg_height);
 	bitmap.resize(static_cast<int>(svg_width + 0.5)*factor, static_cast<int>(svg_height + 0.5)*factor);
