@@ -2424,33 +2424,6 @@ msgstr "Ein - normaler Text"
 msgid "On - centered text"
 msgstr "Ein - zentrierter Text"
 
-#. Difficulty
-#. Game difficulty.
-#. name: game/difficulty
-#. type: int
-#. value: 0
-#: ../data/config/schema.xml:53
-msgid "Normal"
-msgstr "Normal"
-
-#. Difficulty
-#. Game difficulty.
-#. name: game/difficulty
-#. type: int
-#. value: 0
-#: ../data/config/schema.xml:54
-msgid "Hard"
-msgstr "Schwierig"
-
-#. Difficulty
-#. Game difficulty.
-#. name: game/difficulty
-#. type: int
-#. value: 0
-#: ../data/config/schema.xml:55
-msgid "Perfect"
-msgstr "Perfekt"
-
 #. Lyric highlight style
 #. Hide pitch wave, notes and scoring.
 #. name: game/Textstyle
@@ -2468,24 +2441,6 @@ msgstr "Western-Modus"
 #: ../data/config/schema.xml:64
 msgid "Asian mode"
 msgstr "Asien-Modus"
-
-#. Audio Backend
-#. Configure which audio backend to use; not all backends will be supported on all platforms.
-#. name: audio/backend
-#. type: int
-#. value: 1337
-#: ../data/config/schema.xml:328
-msgid "Auto"
-msgstr "Auto"
-
-#. Webserver access
-#. Define if you want to control performous remotely with web interface (requires restart).
-#. name: game/webserver_access
-#. type: int
-#. value: 0
-#: ../data/config/schema.xml:108
-msgid "Disabled"
-msgstr "Deaktiviert"
 
 #. Webserver access
 #. Define if you want to control performous remotely with web interface (requires restart).
