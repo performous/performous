@@ -2396,3 +2396,147 @@ msgstr "Harmonic 3"
 
 #~ msgid "System"
 #~ msgstr "System"
+
+#. Karaoke mode
+#. Hide pitch wave, notes and scoring.
+#. name: game/karaoke_mode
+#. type: int
+#. value: 0
+#: ../data/config/schema.xml:44
+msgid "Off"
+msgstr "Aus"
+
+#. Karaoke mode
+#. Hide pitch wave, notes and scoring.
+#. name: game/karaoke_mode
+#. type: int
+#. value: 0
+#: ../data/config/schema.xml:45
+msgid "On - normal text"
+msgstr "Ein - normaler Text"
+
+#. Karaoke mode
+#. Hide pitch wave, notes and scoring.
+#. name: game/karaoke_mode
+#. type: int
+#. value: 0
+#: ../data/config/schema.xml:46
+msgid "On - centered text"
+msgstr "Ein - zentrierter Text"
+
+#. Lyric highlight style
+#. Hide pitch wave, notes and scoring.
+#. name: game/Textstyle
+#. type: int
+#. value: 0
+#: ../data/config/schema.xml:63
+msgid "Western mode"
+msgstr "Western-Modus"
+
+#. Lyric highlight style
+#. Hide pitch wave, notes and scoring.
+#. name: game/Textstyle
+#. type: int
+#. value: 0
+#: ../data/config/schema.xml:64
+msgid "Asian mode"
+msgstr "Asien-Modus"
+
+#. Webserver access
+#. Define if you want to control performous remotely with web interface (requires restart).
+#. name: game/webserver_access
+#. type: int
+#. value: 0
+#: ../data/config/schema.xml:109
+msgid "Localhost "
+msgstr "Localhost"
+
+#. Webserver access
+#. Define if you want to control performous remotely with web interface (requires restart).
+#. name: game/webserver_access
+#. type: int
+#. value: 0
+#: ../data/config/schema.xml:110
+msgid "All connections"
+msgstr "Alle Verbindungen"
+
+#. Note Graph Scaling
+#. Type of scaling the note graph.
+#. name: game/notegraphscalingmode
+#. type: int
+#. value: 0
+#: ../data/config/schema.xml:133
+msgid "Dynamic"
+msgstr "Dynamisch"
+
+#. Note Graph Scaling
+#. Type of scaling the note graph.
+#. name: game/notegraphscalingmode
+#. type: int
+#. value: 0
+#: ../data/config/schema.xml:134
+msgid "Fixed"
+msgstr "Fix"
+
+#. Note Graph Scaling
+#. Type of scaling the note graph.
+#. name: game/notegraphscalingmode
+#. type: int
+#. value: 0
+#: ../data/config/schema.xml:135
+msgid "Auto (1 octave)"
+msgstr "Auto (1 Oktave)"
+
+#. Note Graph Scaling
+#. Type of scaling the note graph.
+#. name: game/notegraphscalingmode
+#. type: int
+#. value: 0
+#: ../data/config/schema.xml:136
+msgid "Auto (1.5 octaves)"
+msgstr "Auto (1.5 Oktaven)"
+
+#. Note Graph Scaling
+#. Type of scaling the note graph.
+#. name: game/notegraphscalingmode
+#. type: int
+#. value: 0
+#: ../data/config/schema.xml:137
+msgid "Auto (2 octaves)"
+msgstr "Auto (2 Oktaven)"
+
+#. Note Graph Scaling
+#. Type of scaling the note graph.
+#. name: game/notegraphscalingmode
+#. type: int
+#. value: 0
+#: ../data/config/schema.xml:138
+msgid "Auto (2.5 octaves)"
+msgstr "Auto (2.5 Oktaven)"
+
+#. Stereo3D type
+#. Some modes may only get activated in fullscreen mode.
+#. name: graphic/stereo3dtype
+#. type: int
+#. value: 0
+#: ../data/config/schema.xml:276
+msgid "Red/Cyan"
+msgstr "Rot/Türkis"
+
+#. Stereo3D type
+#. Some modes may only get activated in fullscreen mode.
+#. name: graphic/stereo3dtype
+#. type: int
+#. value: 0
+#: ../data/config/schema.xml:277
+msgid "Green/Magenta"
+msgstr "Grün/Magenta"
+
+#. Stereo3D type
+#. Some modes may only get activated in fullscreen mode.
+#. name: graphic/stereo3dtype
+#. type: int
+#. value: 0
+#: ../data/config/schema.xml:278
+msgid "Over/Under"
+msgstr "Über/Unter"
