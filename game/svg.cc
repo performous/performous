@@ -1,4 +1,4 @@
-#include "svg.hh"
+﻿#include "svg.hh"
 
 #include "cache.hh"
 #include "configuration.hh"
@@ -27,11 +27,17 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 		g_error_free(pError);
 		throw std::runtime_error("Unable to load " + filename.string());
 	}
+#if LIBRSVG_MAJOR_VERSION >= 2 && LIBRSVG_MINOR_VERSION >= 46
+	gdouble svg_width = 0, svg_height = 0;
+	rsvg_handle_get_intrinsic_size_in_pixels(svgHandle.get(),&svg_width, &svg_height);
+	bitmap.resize(static_cast<int>(svg_width + 0.5)*factor, static_cast<int>(svg_height + 0.5)*factor);
+#else //functions are deprecated since 2.46
 	// Get SVG dimensions
 	RsvgDimensionData svgDimension;
 	rsvg_handle_get_dimensions(svgHandle.get(), &svgDimension);
 	// Prepare the pixel buffer
 	bitmap.resize(svgDimension.width*factor, svgDimension.height*factor);
+#endif
 	bitmap.fmt = pix::Format::INT_ARGB;
 	bitmap.linearPremul = true;
 	// Raster with Cairo
@@ -40,7 +46,12 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	  cairo_surface_destroy);
 	std::shared_ptr<cairo_t> dc(cairo_create(surface.get()), cairo_destroy);
 	cairo_scale(dc.get(), factor, factor);
+#if LIBRSVG_MAJOR_VERSION >= 2 && LIBRSVG_MINOR_VERSION >= 52
+	RsvgRectangle viewport = {0,0, svg_width, svg_height}; //viewport start is defenetely 0,0 but width and height?... from rsvg_handle_get_intrinsic_size_in_pixels I guess...
+	rsvg_handle_render_document(svgHandle.get(),dc.get(), &viewport, NULL);
+#else
 	rsvg_handle_render_cairo(svgHandle.get(), dc.get());
+#endif
 	// Change byte order from BGRA to RGBA
 	for (uint32_t *ptr = reinterpret_cast<uint32_t*>(bitmap.buf.data()), *end = ptr + bitmap.buf.size() / 4; ptr < end; ++ptr) {
 		uint8_t* pixel = reinterpret_cast<uint8_t*>(ptr);
@@ -52,4 +63,5 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	fs::path cache_filename = cache::constructSVGCacheFileName(filename, factor);
 	fs::create_directories(cache_filename.parent_path());
 	writePNG(cache_filename, bitmap);
+
 }
