@@ -16,6 +16,7 @@ namespace {
 		if (!f) throw std::runtime_error(std::string("Couldn't open ") + filepath);
 		f.seekg(0, std::ios::end);
 		size_t size = f.tellg();
+                if (size == static_cast<decltype(size)>(-1)) throw std::runtime_error(std::string("Cannot get size of file ") + filepath);
 		f.seekg(0);
 		std::vector<char> data(size+1); // +1 for terminating null
 		if (!f.read(&data[0], size)) throw std::runtime_error(std::string("Unexpected I/O error in ") + filepath);
