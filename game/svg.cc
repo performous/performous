@@ -29,7 +29,7 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	}
 #if LIBRSVG_MAJOR_VERSION >= 2 && LIBRSVG_MINOR_VERSION >= 52
 	gdouble svg_width = 0, svg_height = 0;
-	rsvg_handle_get_intrinsic_size_in_pixels(svgHandle.get(),&svg_width, &svg_height);
+	rsvg_handle_get_intrinsic_size_in_pixels(svgHandle.get(), &svg_width, &svg_height);
 	bitmap.resize(static_cast<int>(svg_width * factor + 0.5), static_cast<int>(svg_height * factor + 0.5));
 #else //functions are deprecated since 2.46
 	// Get SVG dimensions
