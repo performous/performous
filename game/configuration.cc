@@ -195,7 +195,8 @@ void ConfigItem::removeAllEnums() {
 
 void ConfigItem::selectEnum(std::string const& name) {
 	auto it = std::find(m_enums.begin(), m_enums.end(), name);
-	if (it == m_enums.end()) throw std::runtime_error("Enum value " + name + " not found in " + m_shortDesc);
+	if (it == m_enums.end())
+        throw std::runtime_error("Enum value " + name + " not found in " + m_shortDesc);
 	i() = it - m_enums.begin();
 }
 
