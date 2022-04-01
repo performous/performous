@@ -179,7 +179,10 @@ Logger::Logger(std::string const& level) {
 	grabber = std::make_unique<StderrGrabber>();
 }
 
-Logger::~Logger() { teardown(); }
+Logger::~Logger() {
+	std::clog << "core/notice: More details might be available in " << getLogFilename() << ".\n";
+	teardown();
+}
 
 void Logger::teardown() {
 	grabber.reset();
