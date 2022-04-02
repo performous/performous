@@ -1,5 +1,5 @@
 Performous is
-   Copyright (C) 2006-2016 The Performous Team
+   Copyright (C) 2006-2022 The Performous Team
 
 Performous is GNU GPLv2 or later. Some parts of the project may have more
 liberal licenses, see docs/license for details.  See docs/Authors.txt for
