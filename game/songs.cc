@@ -54,6 +54,9 @@ void Songs::reload_internal() {
 #ifdef USE_WEBSERVER
 	std::clog << "songs/notice: Starting to load all songs from cache." << std::endl;
 	LoadCache();
+	// the following code is used to check that load <=> save are idempotent
+	//CacheSonglist();
+	//return;
 	std::clog << "songs/notice: Done loading the cache. You now have " << m_songs.size() << " songs in your list." << std::endl;
 #endif
 	std::clog << "songs/notice: Starting to load all songs from disk, to update the cache." << std::endl;
@@ -84,8 +87,10 @@ void Songs::reload_internal() {
 	doneLoading = true;
 }
 
+const std::string SONGS_CACHE_JSON_FILE = "songs.json";
+
 void Songs::LoadCache() {
-	const fs::path songsMetaFile = getCacheDir() / "Songs-Metadata.json";
+	const fs::path songsMetaFile = getCacheDir() / SONGS_CACHE_JSON_FILE;
 	std::ifstream file(songsMetaFile.string());
 	auto jsonRoot = nlohmann::json::array();
 	if (file) {
@@ -112,7 +117,7 @@ void Songs::LoadCache() {
 	}
 
 	for(auto const& song : jsonRoot) {
-		const auto songPath = song.at("TxtFile").get<std::string>();
+		const auto songPath = song.at("txtFile").get<std::string>();
 		const bool isSongPathInConfiguredPaths = std::find_if(
 			allPaths.begin(),
 			allPaths.end(),
@@ -132,104 +137,100 @@ void Songs::CacheSonglist() {
 	for (auto const& song : m_songs) {
 		auto songObject = nlohmann::json::object();
 		if(!song->path.string().empty()) {
-			songObject["TxtFileFolder"] = song->path.string();
+			songObject["txtFileFolder"] = song->path.string();
 		}
 		if(!song->filename.string().empty()) {
-			songObject["TxtFile"] = song->filename.string();
+			songObject["txtFile"] = song->filename.string();
 		}
 		if(!song->title.empty()) {
-			songObject["Title"] = song->title;
+			songObject["title"] = song->title;
 		}
 		if(!song->artist.empty()) {
-			songObject["Artist"] = song->artist;
+			songObject["artist"] = song->artist;
 		}
 		if(!song->edition.empty()) {
-			songObject["Edition"] = song->edition;
+			songObject["edition"] = song->edition;
 		}
 		if(!song->language.empty()) {
-			songObject["Language"] = song->language;
+			songObject["language"] = song->language;
 		}
 		if(!song->creator.empty()) {
-			songObject["Creator"] = song->creator;
+			songObject["creator"] = song->creator;
 		}
 		if(!song->genre.empty()) {
-			songObject["Genre"] = song->genre;
+			songObject["genre"] = song->genre;
 		}
 		if(!song->cover.string().empty()) {
-			songObject["Cover"] = song->cover.string();
+			songObject["cover"] = song->cover.string();
 		}
 		if(!song->background.string().empty()) {
-			songObject["Background"] = song->background.string();
+			songObject["background"] = song->background.string();
 		}
 		if(!song->music[TrackName::BGMUSIC].string().empty()) {
-			songObject["SongFile"] = song->music[TrackName::BGMUSIC].string();
+			songObject["songFile"] = song->music[TrackName::BGMUSIC].string();
 		}
 		if(!song->midifilename.string().empty()) {
-			songObject["MidFile"] = song->midifilename.string();
+			songObject["midFile"] = song->midifilename.string();
 		}
 		if(!song->video.string().empty()) {
-			songObject["VideoFile"] = song->video.string();
+			songObject["videoFile"] = song->video.string();
 		}
 		if(!std::isnan(song->start)) {
-			songObject["Start"] = song->start;
+			songObject["start"] = song->start;
 		}
 		if(!std::isnan(song->videoGap)) {
-			songObject["VideoGap"] = song->videoGap;
+			songObject["videoGap"] = song->videoGap;
 		}
 		if(!std::isnan(song->preview_start)) {
-			songObject["PreviewStart"] = song->preview_start;
+			songObject["previewStart"] = song->preview_start;
 		}
 		if(!song->music[TrackName::LEAD_VOCAL].string().empty()) {
-			songObject["Vocals"] = song->music[TrackName::LEAD_VOCAL].string();
+			songObject["vocals"] = song->music[TrackName::LEAD_VOCAL].string();
 		}
 		if(!song->music[TrackName::PREVIEW].string().empty()) {
-			songObject["Preview"] = song->music[TrackName::PREVIEW].string();
+			songObject["preview"] = song->music[TrackName::PREVIEW].string();
 		}
 		if(!song->music[TrackName::GUITAR].string().empty()) {
-			songObject["Guitar"] = song->music[TrackName::GUITAR].string();
+			songObject["guitar"] = song->music[TrackName::GUITAR].string();
 		}
 		if(!song->music[TrackName::BASS].string().empty()) {
-			songObject["Bass"] = song->music[TrackName::BASS].string();
+			songObject["bass"] = song->music[TrackName::BASS].string();
 		}
 		if(!song->music[TrackName::DRUMS].string().empty()) {
-			songObject["Drums"] = song->music[TrackName::DRUMS].string();
+			songObject["drums"] = song->music[TrackName::DRUMS].string();
 		}
 		if(!song->music[TrackName::KEYBOARD].string().empty()) {
-			songObject["Keyboard"] = song->music[TrackName::KEYBOARD].string();
+			songObject["keyboard"] = song->music[TrackName::KEYBOARD].string();
 		}
 		if(!song->music[TrackName::GUITAR_COOP].string().empty()) {
-			songObject["Guitar_coop"] = song->music[TrackName::GUITAR_COOP].string();
+			songObject["guitarCoop"] = song->music[TrackName::GUITAR_COOP].string();
 		}
 		if(!song->music[TrackName::GUITAR_RHYTHM].string().empty()) {
-			songObject["Guitar_Rhythm"] = song->music[TrackName::GUITAR_RHYTHM].string();
+			songObject["guitarRhythm"] = song->music[TrackName::GUITAR_RHYTHM].string();
 		}
 
 		double duration = song->getDurationSeconds();
 		if(!std::isnan(duration)) {
-			songObject["Duration"] = duration;
+			songObject["duration"] = duration;
 		}
 		if (!song->m_bpms.empty()) {
-			songObject["BPM"] = 15 / song->m_bpms.front().step;
+			songObject["bpm"] = 15 / song->m_bpms.front().step;
 		}
 
 		// Cache songtype also.
 		if(song->hasVocals()) {
-			songObject["VocalTracks"] = song->vocalTracks.size();
+			songObject["vocalTracks"] = song->vocalTracks.size();
 		}
-		songObject["KeyboardTracks"] = song->hasKeyboard() ? 1 : 0;
-		songObject["DrumTracks"] = song->hasDrums() ? 1 : 0;
-		if(song->hasDance()) {
-			songObject["DanceTracks"] = song->danceTracks.size();
-		}
-		if(song->hasGuitars()) {
-			songObject["GuitarTracks"] = song->instrumentTracks.size() - song->hasDrums() - song->hasKeyboard();
-		}
+		songObject["keyboardTracks"] = song->hasKeyboard();
+		songObject["drumTracks"] = song->hasDrums();
+		songObject["danceTracks"] = song->hasDance();
+		songObject["guitarTracks"] = song->hasGuitars();
 		if(songObject != nlohmann::json::object()) {
 			jsonRoot.push_back(songObject);
 		}
 	}
 
-	fs::path cacheDir = getCacheDir() / "Songs-Metadata.json";
+	fs::path cacheDir = getCacheDir() / SONGS_CACHE_JSON_FILE;
 
 	try {
 		std::ofstream outFile(cacheDir.string());
@@ -255,7 +256,7 @@ void Songs::reload_internal(fs::path const& parent) {
 				});
 				auto alreadyInCache = it != m_songs.end();
 
-				if(alreadyInCache) { 
+				if(alreadyInCache) {
 					continue;
 				}
 
@@ -270,7 +271,7 @@ void Songs::reload_internal(fs::path const& parent) {
 						std::clog << "songs/info: >>> Found additional song file: " << s->filename << " for: " << m_songs[i]->filename << std::endl;
 						AdditionalFileIndex = i;
 					}
-				}				
+				}
 
 				if(AdditionalFileIndex > 0) { //TODO: add it to existing song
 					std::clog << "songs/info: >>> not yet implemented " << std::endl;
