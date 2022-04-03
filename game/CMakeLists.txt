@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.14.5)
 
 file(GLOB SOURCE_FILES "*.cc")
 file(GLOB HEADER_FILES "*.hh" "libda/*.hpp")
@@ -69,7 +69,7 @@ add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
 # Libraries
 
 find_package(Boost 1.55 REQUIRED COMPONENTS program_options iostreams system locale)
-target_include_directories(performous PRIVATE ${Boost_INCLUDE_DIRS})
+target_include_directories(performous SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
 target_link_libraries(performous PRIVATE ${Boost_LIBRARIES})
 
 add_library(fs STATIC fs.cc)
@@ -77,10 +77,12 @@ target_include_directories(fs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 if (USE_BOOST_FS)
     find_package(Boost 1.55 REQUIRED COMPONENTS filesystem)
 
+    message (STATUS "Using boost::filesystem")
     target_link_libraries(fs PUBLIC Boost::filesystem)
     target_compile_definitions(fs PUBLIC -DUSE_BOOST_FS)
 else()
     find_package(Filesystem REQUIRED)
+    message (STATUS "Using std::filesystem")
     target_link_libraries(fs PRIVATE std::filesystem)
 endif()
 
@@ -106,55 +108,90 @@ foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWS
 	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
 
-option(ENABLE_MIDI "Enable support for MIDI hardware (e-drums with USB/MIDI connection)." ON)
-if(ENABLE_MIDI)
-	find_package(PortMidi)
+target_include_directories(fs PRIVATE ${SDL2_INCLUDE_DIRS})
+target_link_libraries(fs PRIVATE ${SDL2_LIBRARIES})
+
+# Activating MIDI hardware (e-drums with USB/MIDI connection)
+set(ENABLE_MIDI AUTO CACHE STRING "Use midi hardware (e-drums with USB/MIDI connection)")
+set_property(CACHE ENABLE_MIDI PROPERTY STRINGS AUTO ON OFF)
+if("AUTO" STREQUAL "${ENABLE_MIDI}")
+	# Midi support not requested explicitly, best effort try to find it
+	find_package(PortMidi QUIET)
 	if(PortMidi_FOUND)
-		include_directories(${PortMidi_INCLUDE_DIRS})
-		list(APPEND LIBS ${PortMidi_LIBRARIES})
-		add_definitions("-DUSE_PORTMIDI")
-		message(STATUS "MIDI I/O: Enabled")
+		message(STATUS "MIDI I/O support: Enabled (automatically found)")
 	else()
-		message(STATUS "MIDI I/O: Disabled (libportmidi not found)")
+		message(STATUS "MIDI I/O support: Disabled (libportmidi not found)")
 	endif()
+elseif(ENABLE_MIDI)
+	# Midi support explicitly requested, make it mandatory
+	find_package(PortMidi REQUIRED)
+	message(STATUS "MIDI I/O support: Enabled (explicitly enabled)")
 else()
-	message(STATUS "MIDI I/O: Disabled (explicitly disabled)")
+	# Midi support explicitly disabled
+	message(STATUS "MIDI I/O support: Disabled (explicitly disabled)")
 endif()
 
-option(ENABLE_WEBCAM "Enable webcam support (OpenCV)." ON)
-if(ENABLE_WEBCAM)
-	find_package(OpenCV)
+if(PortMidi_FOUND)
+	include_directories(${PortMidi_INCLUDE_DIRS})
+	list(APPEND LIBS ${PortMidi_LIBRARIES})
+	add_definitions("-DUSE_PORTMIDI")
+endif()
+
+# Activating webcam
+set(ENABLE_WEBCAM AUTO CACHE STRING "Use webcam")
+set_property(CACHE ENABLE_WEBCAM PROPERTY STRINGS AUTO ON OFF)
+if("AUTO" STREQUAL "${ENABLE_WEBCAM}")
+	# webcam support not requested explicitly, best effort try to find it
+	find_package(OpenCV QUIET)
 	if(OpenCV_FOUND)
-		include_directories(${OpenCV_INCLUDE_DIRS})
-		list(APPEND LIBS ${OpenCV_LIBS})
-		add_definitions("-DUSE_OPENCV")
-		message(STATUS "Webcam support: Enabled")
+		message(STATUS "Webcam support: Enabled (automatically found)")
 	else()
-		message(STATUS "Webcam support: Disabled (libcv/libhighgui not found)")
+		message(STATUS "Webcam support: Disabled (OpenCV (libcv/libhighgui) not found)")
 	endif()
+elseif(ENABLE_WEBCAM)
+	# webcam support explicitly requested, make it mandatory
+	find_package(OpenCV REQUIRED)
+	message(STATUS "Webcam support: Enabled (explicitly enabled)")
 else()
+	# webcam support explicitly disabled
 	message(STATUS "Webcam support: Disabled (explicitly disabled)")
 endif()
 
-option(ENABLE_WEBSERVER "Enable webserver support (cpprestsdk)." ON)
-if(ENABLE_WEBSERVER)
-	foreach(lib CppRest)
-		find_package(${lib})
-	endforeach(lib)
-	if(CppRest_FOUND)
-		find_package(Boost 1.55 REQUIRED COMPONENTS chrono thread)
-		include_directories(${Boost_INCLUDE_DIRS})
-		list(APPEND LIBS ${Boost_LIBRARIES})
+if(OpenCV_FOUND)
+	target_include_directories(performous SYSTEM PRIVATE ${OpenCV_INCLUDE_DIRS})
+	target_link_libraries(performous PRIVATE ${OpenCV_LIBS})
+	add_definitions("-DUSE_OPENCV")
+endif()
 
-		include_directories(${CppRest_INCLUDE_DIRS})
-		list(APPEND LIBS ${CppRest_LIBRARIES})
-		message(STATUS "Webserver support: Enabled")
-		add_definitions("-DUSE_WEBSERVER")
+# Activating webserver
+set(ENABLE_WEBSERVER AUTO CACHE STRING "Use webserver")
+set_property(CACHE ENABLE_WEBSERVER PROPERTY STRINGS AUTO ON OFF)
+if("AUTO" STREQUAL "${ENABLE_WEBSERVER}")
+	# webserver not requested explicitly, best effort try to find it
+	find_package(CppRest QUIET)
+	if(CppRest_FOUND)
+		message(STATUS "Webserver support: Enabled (automatically found)")
 	else()
 		message(STATUS "Webserver support: Disabled (cpprestsdk not found)")
 	endif()
+elseif(ENABLE_WEBSERVER)
+	# webserver explicitly requested, make it mandatory
+	find_package(CppRest REQUIRED)
+	message(STATUS "Webserver support: Enabled (explicitly enabled)")
 else()
+	# webserver explicitly disabled
 	message(STATUS "Webserver support: Disabled (explicitly disabled)")
+endif()
+
+# if cpprest is found, add it to the dependencies
+if(CppRest_FOUND)
+	# add other required dependencies then
+	# FIXME: move this to the CppRest package includes if possible
+	find_package(Boost 1.55 REQUIRED COMPONENTS chrono thread)
+	target_include_directories(performous SYSTEM PRIVATE ${CppRest_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+	target_link_libraries(performous PRIVATE ${CppRest_LIBRARIES} ${Boost_LIBRARIES})
+
+	add_definitions("-DUSE_WEBSERVER")
 endif()
 
 if(WIN32)
@@ -185,10 +222,7 @@ list(APPEND LIBS ${FFTW3_LIBRARIES})
 list(APPEND LIBS ${BLAS_LIBRARIES})
 
 find_package(Threads)
-
 target_link_libraries(performous PRIVATE fs ced aubio ${LIBS} PkgConfig::deps Threads::Threads)
-
-target_include_directories(performous PRIVATE "${AUBIO_INSTALL_DIR}/include/")
 
 install(TARGETS performous DESTINATION ${BIN_INSTALL})
 
@@ -204,3 +238,21 @@ endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
+if(WIN32)
+	install(CODE [[
+        file(GET_RUNTIME_DEPENDENCIES
+            RESOLVED_DEPENDENCIES_VAR deps_resolved
+            UNRESOLVED_DEPENDENCIES_VAR deps_unresolved
+            EXECUTABLES $<TARGET_FILE:performous>
+            PRE_EXCLUDE_REGEXES "api-ms-*" "ext-ms-*"
+            POST_EXCLUDE_REGEXES ".*system32/.*\\.dll"
+            )
+        message(STATUS "Resolving runtime dependencies for $<TARGET_FILE:performous>")
+        foreach(dep ${deps_resolved})
+            file(INSTALL ${dep} DESTINATION ${CMAKE_INSTALL_PREFIX})
+        endforeach()
+        foreach(dep ${deps_unresolved})
+            message(WARNING "Runtime dependency ${dep} could not be resolved.")
+        endforeach()
+        ]])
+endif()

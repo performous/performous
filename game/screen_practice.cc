@@ -6,6 +6,7 @@
 #include "controllers.hh"
 #include "theme.hh"
 #include "progressbar.hh"
+#include "game.hh"
 
 ScreenPractice::ScreenPractice(std::string const& name, Audio& audio):
   Screen(name), m_audio(audio)
@@ -15,7 +16,7 @@ void ScreenPractice::enter() {
 	m_audio.playMusic(findFile("practice.ogg"));
 	// draw vu meters
 	for (unsigned int i = 0, mics = m_audio.analyzers().size(); i < mics; ++i) {
-		auto progressBarPtr = std::unique_ptr<ProgressBar>(std::make_unique<ProgressBar>(findFile("vumeter_bg.svg"), findFile("vumeter_fg.svg"), ProgressBar::VERTICAL, 0.136, 0.023));
+		auto progressBarPtr = std::unique_ptr<ProgressBar>(std::make_unique<ProgressBar>(findFile("vumeter_bg.svg"), findFile("vumeter_fg.svg"), ProgressBar::Mode::VERTICAL, 0.136, 0.023));
 		m_vumeters.push_back(std::move(progressBarPtr));
 	}
 	m_samples.push_back("drum bass");
@@ -42,16 +43,16 @@ void ScreenPractice::exit() {
 void ScreenPractice::manageEvent(input::NavEvent const& event) {
 	Game* gm = Game::getSingletonPtr();
 	input::NavButton nav = event.button;
-	if (nav == input::NAV_CANCEL || nav == input::NAV_START) gm->activateScreen("Intro");
-	else if (nav == input::NAV_PAUSE) m_audio.togglePause();
+	if (nav == input::NavButton::CANCEL || nav == input::NavButton::START) gm->activateScreen("Intro");
+	else if (nav == input::NavButton::PAUSE) m_audio.togglePause();
 	// Process all instrument events that are available, then throw away the instruments...
 	input::DevicePtr dev = gm->controllers.registerDevice(event.source);
 	if (dev) {
 		for (input::Event ev; dev->getEvent(ev);) {
 			if (ev.value == 0.0) continue;
-			if (dev->type == input::DEVTYPE_DANCEPAD) {}
-			else if (dev->type == input::DEVTYPE_GUITAR) {}
-			else if (dev->type == input::DEVTYPE_DRUMS) m_audio.playSample(m_samples[ev.button.num() % m_samples.size()]);
+			if (dev->type == input::DevType::DANCEPAD) {}
+			else if (dev->type == input::DevType::GUITAR) {}
+			else if (dev->type == input::DevType::DRUMS) m_audio.playSample(m_samples[ev.button.num() % m_samples.size()]);
 		}
 	}
 	// TODO: We could store the DevicePtrs and display the instruments on screen in a meaningful way

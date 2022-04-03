@@ -20,7 +20,7 @@ class LyricRow {
 	LyricRow(Iterator& it, Iterator const& eof): extraspacing(0.0, 2.0), fade(0.0, 0.6) {
 		fade.setTarget(1.0);
 		m_begin = it;
-		while (it != eof && it->type != Note::SLEEP) ++it;
+		while (it != eof && it->type != Note::Type::SLEEP) ++it;
 		m_end = it;
 		if (it != eof) ++it;
 		if (m_begin == m_end) throw std::logic_error("Empty sentence");
@@ -55,12 +55,12 @@ class LyricRow {
 
 class LayoutSinger {
   public:
-	enum PositionMode {FULL, TOP, BOTTOM, LEFT, RIGHT};
+	enum class PositionMode { FULL, TOP, BOTTOM, LEFT, RIGHT };
 	/// ThemeSing is optional if you want to use drawScore only
-	LayoutSinger(VocalTrack& vocal, Database& database, std::shared_ptr<ThemeSing> theme = std::make_shared<ThemeSing>());
+	LayoutSinger(VocalTrack& vocal, Database& database, NoteGraphScalerPtr const&, std::shared_ptr<ThemeSing> theme = std::make_shared<ThemeSing>());
 	~LayoutSinger();
 	void reset();
-	void draw(double time, PositionMode position = LayoutSinger::FULL);
+	void draw(double time, PositionMode position = LayoutSinger::PositionMode::FULL);
 	void drawScore(PositionMode position);
 	double lyrics_begin() const;
 	void hideLyrics(bool hide = true) { m_hideLyrics = hide; }

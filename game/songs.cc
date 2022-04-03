@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
-#include "regex.hh"
+#include <regex>
 #include <stdexcept>
 
 #include "fs.hh"
@@ -261,7 +261,7 @@ void Songs::CacheSonglist() { }
 void Songs::reload_internal(fs::path const& parent) {
 	if (std::distance(parent.begin(), parent.end()) > 20) { std::clog << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)\n"; return; }
 	try {
-		regex expression(R"((\.txt|^song\.ini|^notes\.xml|\.sm)$)", regex_constants::icase);
+		std::regex expression(R"((\.txt|^song\.ini|^notes\.xml|\.sm)$)", std::regex_constants::icase);
 		for (const auto &dir : fs::directory_iterator(parent)) { //loop through files
 			fs::path p = dir.path();
 			if (fs::is_directory(p)) { reload_internal(p); continue; } //if the file is a folder redo this function with this folder as path

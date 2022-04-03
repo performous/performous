@@ -19,6 +19,6 @@ class Dialog {
 	Texture m_dialog;
 	SvgTxtTheme m_svgText;
 	AnimValue m_animationVal;
-	enum state {SLIDEIN, IDLE, SLIDEOUT};
-	state m_state;
+	enum class State { SLIDEIN, IDLE, SLIDEOUT};
+	State m_state;
 };

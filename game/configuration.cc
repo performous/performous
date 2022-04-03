@@ -7,6 +7,7 @@
 #include "i18n.hh"
 #include "screen_intro.hh"
 #include "util.hh"
+#include "game.hh"
 #include <boost/format.hpp>
 
 #include <algorithm>
@@ -15,6 +16,8 @@
 #include <stdexcept>
 #include <iostream>
 #include <cmath>
+#include <map>
+#include <string>
 
 Config config;
 
@@ -106,7 +109,7 @@ namespace {
 }
 
 std::string const ConfigItem::getValue() const {
-	if (this->getShortDesc() == config["audio/backend"].getShortDesc()) {
+	if (this->getName() == "audio/backend") {
 		int AutoBackendType = 1337;
 		static int val = std::get<int>(m_value);
 		if (val != std::get<int>(m_value)) val = PaHostApiNameToHostApiTypeId(this->getEnumName()); // In the case of the audio backend, val is the real value while m_value is the enum case for its cosmetic name.
@@ -128,6 +131,12 @@ std::string const ConfigItem::getValue() const {
 		}
 		else std::clog << "audio/warning: Currently selected audio backend is unavailable on this system, will default to Auto." << std::endl;
 		return "Auto";
+	}
+	if (this->getName() == "game/language") {
+		int autoLanguageType = 1337;
+		int val = LanguageToLanguageId(this->getEnumName()); // In the case of the language, val is the real value while m_value is the enum case for its cosmetic name.
+		std::string languageName = (val != autoLanguageType) ? this->getEnumName() : _("Auto");
+		return languageName;
 	}
 	if (m_type == "int") {
 		int val = std::get<int>(m_value);
@@ -176,6 +185,14 @@ void ConfigItem::addEnum(std::string name) {
 	m_step = 1;
 }
 
+void ConfigItem::removeAllEnums() {
+	verifyType("int");
+	m_enums.clear();
+	m_min = 0;
+	m_max = int(m_enums.size() - 1);
+	m_step = 1;
+}
+
 void ConfigItem::selectEnum(std::string const& name) {
 	auto it = std::find(m_enums.begin(), m_enums.end(), name);
 	if (it == m_enums.end()) throw std::runtime_error("Enum value " + name + " not found in " + m_shortDesc);
@@ -214,6 +231,7 @@ template <typename T> void ConfigItem::updateNumeric(xmlpp::Element& elem, int m
 
 void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 	if (mode == 0) {
+		m_keyName = getAttribute(elem, "name");
 		m_type = getAttribute(elem, "type");
 		if (m_type.empty()) throw std::runtime_error("Entry type attribute is missing");
 		// Menu text
@@ -288,14 +306,14 @@ void writeConfig(bool system) {
 		std::string type = item.get_type();
 		entryNode->set_attribute("type", type);
 		if (name == "graphic/stereo3d") {
-			std::string prev3DState = item.oldValue;
+			std::string prev3DState = item.getOldValue();
 			if (prev3DState != std::to_string(item.b()) && !prev3DState.empty()) {
 				std::clog << "video/info: Stereo 3D configuration changed, will reset shaders." << std::endl;
 				Game::getSingletonPtr()->window().resetShaders();
 			}
 		}
 		if (name == "audio/backend") {
-			std::string currentBackEnd = Audio::backendConfig().oldValue;
+			std::string currentBackEnd = Audio::backendConfig().getOldValue();
 			int oldValue = PaHostApiNameToHostApiTypeId(currentBackEnd);
 			int newValue = PaHostApiNameToHostApiTypeId(item.getEnumName());
 			if (currentBackEnd != item.getEnumName() && !currentBackEnd.empty()) {
@@ -305,6 +323,23 @@ void writeConfig(bool system) {
 				Game::getSingletonPtr()->restartAudio();
 			}
 			else { 	entryNode->set_attribute("value", std::to_string(oldValue)); }
+		}
+		else if (name == "game/language") {
+			auto currentLanguageStr = Game::getSingletonPtr()->getCurrentLanguage();
+			auto newLanguagestr = item.getEnumName();
+			auto currentLanguageId = LanguageToLanguageId(currentLanguageStr);
+			auto newLanguageId = LanguageToLanguageId(newLanguagestr);
+			if ((newLanguagestr == _("Auto") || currentLanguageId != newLanguageId) && !config["game/language"].getOldValue().empty()) {
+				std::cout << "Wanting to change something, old value: '" << currentLanguageStr << "' new value: '" << newLanguagestr << "'" << std::endl;
+				entryNode->set_attribute("value", std::to_string(newLanguageId));
+				config["game/language"].selectEnum(newLanguagestr);
+				Game::getSingletonPtr()->setLanguage(newLanguagestr);
+				Game::getSingletonPtr()->getCurrentScreen()->exit();
+				Game::getSingletonPtr()->activateScreen("Intro");
+			}
+			else {
+				entryNode->set_attribute("value", std::to_string(currentLanguageId));
+			}
 		}
 		else if (type == "int") entryNode->set_attribute("value",std::to_string(item.i()));
 		else if (type == "bool") entryNode->set_attribute("value", item.b() ? "true" : "false");
@@ -413,6 +448,28 @@ int PaHostApiNameToHostApiTypeId (const std::string& name) {
 	throw std::runtime_error("Invalid PortAudio HostApiTypeId Specified.");
 }
 
+unsigned int LanguageToLanguageId(const std::string& name) {
+	if (name == _("Asturian")) return 1;
+	if (name == _("Danish")) return 2;
+	if (name == _("German")) return 3;
+	if (name == _("English")) return 4;
+	if (name == _("Spanish")) return 5;
+	if (name == _("Persian")) return 6;
+	if (name == _("Finnish")) return 7;
+	if (name == _("French")) return 8;
+	if (name == _("Hungarian")) return 9;
+	if (name == _("Italian")) return 10;
+	if (name == _("Japanese")) return 11;
+	if (name == _("Dutch")) return 12;
+	if (name == _("Polish")) return 13;
+	if (name == _("Portuguese")) return 14;
+	if (name == _("Slovak")) return 15;
+	if (name == _("Swedish")) return 16;
+	if (name == _("Chinese")) return 17;
+	
+	return 1337; // if no name matched return "Auto" which translates to computer language OR English.
+}
+
 
 void readConfig() {
 	// Find config schema
@@ -435,5 +492,17 @@ void populateBackends (const std::list<std::string>& backendList) {
 	static std::string selectedBackend = std::string();
 	selectedBackend = backendConfig.getValue();
 	backendConfig.selectEnum(selectedBackend);
-	backendConfig.oldValue = backendConfig.getEnumName();
+	backendConfig.setOldValue(backendConfig.getEnumName());
+}
+
+void populateLanguages(const std::map<std::string, std::string>& languages, bool refreshOutDated) {
+	ConfigItem& languageConfig = config["game/language"];
+	if (refreshOutDated) {
+		languageConfig.removeAllEnums();
+	}
+	for (auto const& language : languages) {
+		languageConfig.addEnum(language.second);
+	}
+	languageConfig.selectEnum(languageConfig.getValue());
+	languageConfig.setOldValue(languageConfig.getEnumName());
 }

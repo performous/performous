@@ -1,17 +1,18 @@
 #include "fs.hh"
 
-#include "config.hh"
 #include "configuration.hh"
 #include "platform.hh"
-#include <boost/algorithm/string/replace.hpp>
-#include "fs.hh"
-#include <boost/range.hpp>
+
 #include <algorithm>
 #include <cstdlib>
 #include <fstream>
 #include <mutex>
 #include <set>
 #include <sstream>
+#include <regex>
+
+#include <boost/algorithm/string/replace.hpp>
+#include <boost/range.hpp>
 
 #if (BOOST_OS_WINDOWS)
 #include <windows.h>
@@ -67,7 +68,7 @@ namespace {
 
 	BinaryBuffer readFile(fs::path const& path) {
 		BinaryBuffer ret;
-		std::ifstream f(path.c_str(), std::ios::binary);
+		fs::ifstream f(path, std::ios::binary);
 		f.seekg(0, std::ios::end);
 		ret.resize(f.tellg());
 		f.seekg(0);

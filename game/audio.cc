@@ -4,6 +4,7 @@
 #include "configuration.hh"
 #include "libda/portaudio.hpp"
 #include "screen_songs.hh"
+#include "game.hh"
 #include "songs.hh"
 #include "util.hh"
 
@@ -150,9 +151,9 @@ bool Music::operator()(float* begin, float* end) {
 // 			if (t.pitchFactor != 0) { // Pitch shift
 // 				Buffer tempbuf(end - begin);
 // 				// Get audio to temp buffer
-// 				if (t.mpeg.audioQueue(&*tempbuf.begin(), &*tempbuf.end(), m_pos, t.fadeLevel)) eof = false;
+// 				if (t.mpeg.audioQueue(tempbuf.data(), tempbuf.data() + tempbuf.size(), m_pos, t.fadeLevel)) eof = false;
 // 				// Do the magic
-// 				PitchShift(&*tempbuf.begin(), &*tempbuf.end(), t.pitchFactor);
+// 				PitchShift(tempbuf.begin(), tempbuf.end(), t.pitchFactor);
 // 				// Mix with other tracks
 // 				Buffer::iterator m = mixbuf.begin();
 // 				Buffer::iterator b = tempbuf.begin();
@@ -165,14 +166,14 @@ bool Music::operator()(float* begin, float* end) {
 		
 	}
 	m_pos += samples;
-	
+	const float volume = static_cast<float>(m_preview ? config["audio/preview_volume"].i() : config["audio/music_volume"].i()) / 100.0;
 	for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
 		if (i % 2 == 0) {
 			fadeLevel += fadeRate;
 			if (fadeLevel <= 0.0) return false;
 			if (fadeLevel > 1.0) { fadeLevel = 1.0; fadeRate = 0.0; }
 		}
-		begin[i] += mixbuf[i] * fadeLevel * static_cast<float>(m_preview ? config["audio/preview_volume"].i() : config["audio/music_volume"].i())/100.0;
+		begin[i] += mixbuf[i] * fadeLevel * volume;
 	}
 	// suppress center channel vocals
 	if(suppressCenterChannel && !m_preview) {
@@ -270,8 +271,9 @@ struct Sample {
 		if(!audioBuffer.read(mixbuf.data(), mixbuf.size(), m_pos, 1.0)) {
 			eof = true;
 		}
+		const auto failVolume = static_cast<float>(config["audio/fail_volume"].i()) / 100.0;
 		for (size_t i = 0, iend = end - begin; i != iend; ++i) {
-			begin[i] += mixbuf[i] * static_cast<float>(config["audio/fail_volume"].i())/100.0;
+			begin[i] += mixbuf[i] * failVolume;
 		}
 		m_pos += end - begin;
 	}
@@ -295,7 +297,7 @@ struct Synth {
 		Notes::const_iterator it = m_notes.begin();
 
 		while (it != m_notes.end() && it->end < position) ++it;
-		if (it == m_notes.end() || it->type == Note::SLEEP || it->begin > position) { phase = 0.0; return; }
+		if (it == m_notes.end() || it->type == Note::Type::SLEEP || it->begin > position) { phase = 0.0; return; }
 		int note = it->note % 12;
 		double d = (note + 1) / 13.0;
 		double freq = MusicalScale().setNote(note + 4 * 12).getFreq();
@@ -312,7 +314,7 @@ struct Synth {
 };
 
 struct Command {
-	enum { TRACK_FADE, TRACK_PITCHBEND, SAMPLE_RESET } type;
+	enum class Type { TRACK_FADE, TRACK_PITCHBEND, SAMPLE_RESET } type;
 	std::string track;
 	double factor;
 };
@@ -343,13 +345,13 @@ struct Output {
 		// Process commands
 		for (auto const& cmd: commands) {
 			switch (cmd.type) {
-			case Command::TRACK_FADE:
+			case Command::Type::TRACK_FADE:
 				if (!playing.empty()) playing[0]->trackFade(cmd.track, cmd.factor);
 				break;
-			case Command::TRACK_PITCHBEND:
+			case Command::Type::TRACK_PITCHBEND:
 				if (!playing.empty()) playing[0]->trackPitchBend(cmd.track, cmd.factor);
 				break;
-			case Command::SAMPLE_RESET:
+			case Command::Type::SAMPLE_RESET:
 				auto it = samples.find(cmd.track);
 				if (it != samples.end())
 					it->second->reset();
@@ -583,7 +585,7 @@ void Audio::loadSample(std::string const& streamId, fs::path const& filename) {
 void Audio::playSample(std::string const& streamId) {
 	Output& o = self->output;
 	std::lock_guard<std::mutex> l(o.mutex);
-	Command cmd = { Command::SAMPLE_RESET, streamId, 0.0 };
+	Command cmd = { Command::Type::SAMPLE_RESET, streamId, 0.0 };
 	o.commands.push_back(cmd);
 }
 
@@ -674,14 +676,14 @@ bool Audio::isPaused() const { return self->output.paused; }
 void Audio::streamFade(std::string track, double fadeLevel) {
 	Output& o = self->output;
 	std::lock_guard<std::mutex> l(o.mutex);
-	Command cmd = { Command::TRACK_FADE, track, fadeLevel };
+	Command cmd = { Command::Type::TRACK_FADE, track, fadeLevel };
 	o.commands.push_back(cmd);
 }
 
 void Audio::streamBend(std::string track, double pitchFactor) {
 	Output& o = self->output;
 	std::lock_guard<std::mutex> l(o.mutex);
-	Command cmd = { Command::TRACK_PITCHBEND, track, pitchFactor };
+	Command cmd = { Command::Type::TRACK_PITCHBEND, track, pitchFactor };
 	o.commands.push_back(cmd);
 }
 

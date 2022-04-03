@@ -1,5 +1,7 @@
 #pragma once
 
+#include "config.hh"
+
 #include <list>
 #include <vector>
 
@@ -21,7 +23,15 @@ namespace fs = boost::filesystem;
 
 #else
 #include <filesystem>
-namespace fs = std::filesystem;
+namespace fs {
+
+using namespace std::filesystem;
+
+using std::ifstream;
+using std::fstream;
+using std::ofstream;
+
+}
 
 // Reimplment boost's absolute function with 2 parameters, according to its documentation:
 // https://www.boost.org/doc/libs/1_51_0/libs/filesystem/doc/reference.html#absolute

@@ -1,11 +1,12 @@
 ﻿#include "notes.hh"
 
+#include "configuration.hh"
 #include "util.hh"
 #include <cmath>
 #include <sstream>
 #include <stdexcept>
 
-Note::Note(): begin(getNaN()), end(getNaN()), phase(getNaN()), power(getNaN()), type(NORMAL), note(), notePrev() {}
+Note::Note(): begin(getNaN()), end(getNaN()), phase(getNaN()), power(getNaN()), type(Note::Type::NORMAL), note(), notePrev() {}
 
 double Note::diff(double note, double n) { return remainder(n - note, 12.0); }
 double Note::maxScore() const { return scoreMultiplier() * (end - begin); }
@@ -21,30 +22,56 @@ double Note::score(double n, double b, double e) const {
 
 double Note::scoreMultiplier() const {
 	switch(type) {
-		case GOLDEN:
-		case GOLDEN2:
+		case Note::Type::GOLDEN:
+		case Note::Type::GOLDEN2:
 			return 2.0;
-		case SLEEP:
+		case Note::Type::SLEEP:
 			return 0.0;
-		case FREESTYLE:
-		case RAP:
-		case NORMAL:
-		case SLIDE:
-		case TAP:
-		case HOLDBEGIN:
-		case HOLDEND:
-		case ROLL:
-		case MINE:
-		case LIFT:
+		case Note::Type::FREESTYLE:
+		case Note::Type::RAP:
+		case Note::Type::NORMAL:
+		case Note::Type::SLIDE:
+		case Note::Type::TAP:
+		case Note::Type::HOLDBEGIN:
+		case Note::Type::HOLDEND:
+		case Note::Type::ROLL:
+		case Note::Type::MINE:
+		case Note::Type::LIFT:
 			return 1.0;
 	}
 	return 0.0;
 }
 
+double thresholdForFullScore() {
+	switch(GameDifficulty(config["game/difficulty"].i())){
+		case GameDifficulty::PERFECT:
+			return 0.2151;
+		case GameDifficulty::HARD:
+			return 0.5;
+		case GameDifficulty::NORMAL:
+		default: 
+			return 0.5;
+	}
+}
+
+double thresholdForNonzeroScore() {
+	switch(GameDifficulty(config["game/difficulty"].i())){
+		case GameDifficulty::PERFECT:
+			return 0.5;
+		case GameDifficulty::HARD:
+			return 1.0;
+		case GameDifficulty::NORMAL:
+		default: 
+			return 1.5;
+	}
+}
+
 double Note::powerFactor(double note) const {
-	if (type == FREESTYLE) return 1.0;
+	if (type == Note::Type::FREESTYLE) return 1.0;
 	double error = std::abs(diff(note));
-	return clamp(1.5 - error, 0.0, 1.0);
+	double thresholdFull = thresholdForFullScore();
+	double thresholdNonzero = thresholdForNonzeroScore();
+	return clamp((thresholdNonzero - error)/(thresholdNonzero - thresholdFull), 0.0, 1.0);
 }
 
 Duration::Duration(): begin(getNaN()), end(getNaN()) {}

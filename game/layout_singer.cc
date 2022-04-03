@@ -8,8 +8,8 @@
 #include <list>
 #include <boost/format.hpp>
 
-LayoutSinger::LayoutSinger(VocalTrack& vocal, Database& database, std::shared_ptr<ThemeSing> theme):
-  m_vocal(vocal), m_noteGraph(vocal),m_lyricit(vocal.notes.begin()), m_lyrics(), m_database(database), m_theme(theme), m_hideLyrics() {
+LayoutSinger::LayoutSinger(VocalTrack& vocal, Database& database, NoteGraphScalerPtr const& scaler, std::shared_ptr<ThemeSing> theme):
+  m_vocal(vocal), m_noteGraph(vocal, scaler), m_lyricit(vocal.notes.begin()), m_lyrics(), m_database(database), m_theme(theme), m_hideLyrics() {
 	m_score_text[0] = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f());
 	m_score_text[1] = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f());
 	m_score_text[2] = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f());
@@ -36,7 +36,7 @@ void LayoutSinger::drawScore(PositionMode position) {
 		if (color.a == 0.0) continue;
 		m_score_text[i%4]->render((boost::format("%04d") % p->getScore()).str());
 		switch(position) {
-			case LayoutSinger::FULL:
+			case LayoutSinger::PositionMode::FULL:
 				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.125 * j).fixedWidth(0.035).screenTop(0.055);
 				if (m_database.cur.size() < 9){
 					m_player_icon->dimensions.left(-0.5 + 0.01 + 0.125 * j).fixedWidth(0.035).screenTop(0.05);
@@ -45,16 +45,16 @@ void LayoutSinger::drawScore(PositionMode position) {
 					m_player_icon->dimensions.left(-0.506 + 0.01 + 0.0905 * j).fixedWidth(0.028).screenTop(0.050);				
 					m_score_text[i%4]->dimensions().middle(-0.519 + 0.08 + 0.0905 * j).fixedHeight(0.029).screenTop(0.053);}
 				break;
-			case LayoutSinger::TOP:
+			case LayoutSinger::PositionMode::TOP:
 				m_player_icon->dimensions.right(0.35).fixedHeight(0.050).screenTop(0.025 + 0.050 * j);
 				m_score_text[i%4]->dimensions().right(0.45).fixedHeight(0.050).screenTop(0.025 + 0.050 * j);
 				break;
-			case LayoutSinger::BOTTOM:
+			case LayoutSinger::PositionMode::BOTTOM:
 				m_player_icon->dimensions.right(0.35).fixedHeight(0.050).center(0.025 + 0.050 * j);
 				m_score_text[i%4]->dimensions().right(0.45).fixedHeight(0.050).center(0.025 + 0.050 * j);
 				break;
-			case LayoutSinger::LEFT:
-			case LayoutSinger::RIGHT:
+			case LayoutSinger::PositionMode::LEFT:
+			case LayoutSinger::PositionMode::RIGHT:
 				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * j).fixedWidth(0.075).screenTop(0.055);
 				m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * j).fixedHeight(0.075).screenTop(0.055);
 				break;
@@ -76,17 +76,17 @@ void LayoutSinger::drawScore(PositionMode position) {
 			else if (p->m_prevLineScore > 0.4) prevLineRank = _("OK");
 			m_line_rank_text[i%4]->render(prevLineRank);
 			switch(position) {
-				case LayoutSinger::FULL:
+				case LayoutSinger::PositionMode::FULL:
 					m_line_rank_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * j).fixedHeight(0.055*fzoom).screenTop(0.11);
 					break;
-				case LayoutSinger::TOP:
+				case LayoutSinger::PositionMode::TOP:
 					m_line_rank_text[i%4]->dimensions().right(0.30).fixedHeight(0.05*fzoom).screenTop(0.025 + 0.050 * j);
 					break;
-				case LayoutSinger::BOTTOM:
+				case LayoutSinger::PositionMode::BOTTOM:
 					m_line_rank_text[i%4]->dimensions().right(0.30).fixedHeight(0.05*fzoom).center(0.025 + 0.050 * j);
 					break;
-				case LayoutSinger::LEFT:
-				case LayoutSinger::RIGHT:
+				case LayoutSinger::PositionMode::LEFT:
+				case LayoutSinger::PositionMode::RIGHT:
 					m_line_rank_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * j).fixedHeight(0.055*fzoom).screenTop(0.11);
 					break;
 			}
@@ -104,18 +104,18 @@ void LayoutSinger::draw(double time, PositionMode position) {
 	// Draw notes and pitch waves (only when not in karaoke mode)
 	if (!config["game/karaoke_mode"].i()) {
 		switch(position) {
-			case LayoutSinger::FULL:
-				m_noteGraph.draw(time, m_database, NoteGraph::FULLSCREEN);
+			case LayoutSinger::PositionMode::FULL:
+				m_noteGraph.draw(time, m_database, NoteGraph::Position::FULLSCREEN);
 				break;
-			case LayoutSinger::TOP:
-				m_noteGraph.draw(time, m_database, NoteGraph::TOP);
+			case LayoutSinger::PositionMode::TOP:
+				m_noteGraph.draw(time, m_database, NoteGraph::Position::TOP);
 				break;
-			case LayoutSinger::BOTTOM:
-				m_noteGraph.draw(time, m_database, NoteGraph::BOTTOM);
+			case LayoutSinger::PositionMode::BOTTOM:
+				m_noteGraph.draw(time, m_database, NoteGraph::Position::BOTTOM);
 				break;
-			case LayoutSinger::LEFT:
-			case LayoutSinger::RIGHT:
-				m_noteGraph.draw(time, m_database, NoteGraph::LEFT);
+			case LayoutSinger::PositionMode::LEFT:
+			case LayoutSinger::PositionMode::RIGHT:
+				m_noteGraph.draw(time, m_database, NoteGraph::Position::LEFT);
 				break;
 		}
 	}
@@ -125,7 +125,7 @@ void LayoutSinger::draw(double time, PositionMode position) {
 		double linespacing = 0.0;
 		Dimensions pos;
 		switch(position) {
-			case LayoutSinger::FULL:
+			case LayoutSinger::PositionMode::FULL:
 				if(config["game/karaoke_mode"].i() >= 2) {
 					pos.center(0);
 				} else {
@@ -133,16 +133,16 @@ void LayoutSinger::draw(double time, PositionMode position) {
 				}
 				linespacing = 0.04;
 				break;
-			case LayoutSinger::TOP:
+			case LayoutSinger::PositionMode::TOP:
 				pos.center(-0.06);
 				linespacing = 0.04;
 				break;
-			case LayoutSinger::BOTTOM:
+			case LayoutSinger::PositionMode::BOTTOM:
 				pos.screenBottom(-0.07);
 				linespacing = 0.04;
 				break;
-			case LayoutSinger::LEFT:
-			case LayoutSinger::RIGHT:
+			case LayoutSinger::PositionMode::LEFT:
+			case LayoutSinger::PositionMode::RIGHT:
 				pos.screenBottom(-0.1);
 				linespacing = 0.06;
 				break;

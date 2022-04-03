@@ -4,6 +4,7 @@
 #include "video_driver.hh"
 #include "screen.hh"
 #include "svg.hh"
+#include "game.hh"
 #include <boost/algorithm/string/case_conv.hpp>
 
 #include <atomic>
@@ -22,9 +23,9 @@ Shader& getShader(std::string const& name) {
 
 float Dimensions::screenY() const {
 	switch (m_screenAnchor) {
-	  case CENTER: return 0.0;
-	  case TOP: return -0.5 * virtH();
-	  case BOTTOM: return 0.5 * virtH();
+	  case YAnchor::CENTER: return 0.0;
+	  case YAnchor::TOP: return -0.5 * virtH();
+	  case YAnchor::BOTTOM: return 0.5 * virtH();
 	}
 	throw std::logic_error("Dimensions::screenY(): unknown m_screenAnchor value");
 }
@@ -131,7 +132,7 @@ void updateTextures() { ldr->apply(); }
 template <typename T> void loader(T* target, fs::path const& name) {
 	// Temporarily add 1x1 pixel black texture
 	Bitmap bitmap;
-	bitmap.fmt = pix::RGB;
+	bitmap.fmt = pix::Format::RGB;
 	bitmap.resize(1, 1);
 	target->load(bitmap);
 	// Ask the loader to retrieve the image
@@ -155,10 +156,10 @@ namespace {
 		Map m;
 		PixFormats() {
 			using namespace pix;
-			m[RGB] = PixFmt(GL_RGB, GL_UNSIGNED_BYTE, false);
-			m[BGR] = PixFmt(GL_BGR, GL_UNSIGNED_BYTE, true);
-			m[CHAR_RGBA] = PixFmt(GL_RGBA, GL_UNSIGNED_BYTE, false);
-			m[INT_ARGB] = PixFmt(GL_BGRA, GL_UNSIGNED_INT_8_8_8_8, true);
+			m[Format::RGB] = PixFmt(GL_RGB, GL_UNSIGNED_BYTE, false);
+			m[Format::BGR] = PixFmt(GL_BGR, GL_UNSIGNED_BYTE, true);
+			m[Format::CHAR_RGBA] = PixFmt(GL_RGBA, GL_UNSIGNED_BYTE, false);
+			m[Format::INT_ARGB] = PixFmt(GL_BGRA, GL_UNSIGNED_INT_8_8_8_8, true);
 		}
 	} pixFormats;
 	PixFmt const& getPixFmt(pix::Format format) {

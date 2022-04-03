@@ -97,7 +97,7 @@ static VerboseMessageSink vsm; //!< \internal
 //! \internal used to store the default/original clog buffer.
 static std::streambuf* default_ClogBuf = nullptr;
 
-std::ofstream file;
+fs::ofstream file;
 
 std::string target;
 int minLevel;
@@ -167,7 +167,7 @@ Logger::Logger(std::string const& level) {
 		if (minLevel < 100) {
 			fs::path name = getLogFilename();
 			fs::create_directories(name.parent_path());
-			file.open(name.c_str());
+			file.open(name);
 			msg += " Log file: " + name.string();
 		}
 		sb.open(vsm);
@@ -179,7 +179,10 @@ Logger::Logger(std::string const& level) {
 	grabber = std::make_unique<StderrGrabber>();
 }
 
-Logger::~Logger() { teardown(); }
+Logger::~Logger() {
+	std::clog << "core/notice: More details might be available in " << getLogFilename() << ".\n";
+	teardown();
+}
 
 void Logger::teardown() {
 	grabber.reset();
