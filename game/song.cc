@@ -52,10 +52,10 @@ Song::Song(web::json::value const& song): dummyVocal(TrackName::LEAD_VOCAL), ran
 			instrumentTracks.insert(make_pair(TrackName::KEYBOARD, InstrumentTrack(TrackName::KEYBOARD)));
 	}
 	
-	if (song.has_field("DrumTracks")) {
+	if (song.has_field("DrumTracks") && song..at("DrumTracks").as_number() > 0) {
 			instrumentTracks.insert(make_pair(TrackName::DRUMS, InstrumentTrack(TrackName::DRUMS)));
 	}		
-	if (song.has_field("DanceTracks")) {
+	if (song.has_field("DanceTracks") && song..at("DanceTracks").as_number() > 0) {
 		DanceDifficultyMap danceDifficultyMap;
 			danceTracks.insert(std::make_pair("dance-single", danceDifficultyMap));
 	}		
