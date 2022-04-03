@@ -79,8 +79,10 @@ class Game: public Singleton <Game> {
 	void setLanguage(const std::string& language) { m_translationEngine.setLanguage(language, true); };
 	std::string getCurrentLanguage() const { return m_translationEngine.getCurrentLanguage().second; };
 #ifdef USE_WEBSERVER
+#define _TURN_OFF_PLATFORM_STRING
 	void notificationFromWebserver(std::string message) { m_webserverMessage = message; }
 	std::string subscribeWebserverMessages() { return m_webserverMessage; }
+#undef _TURN_OFF_PLATFORM_STRING
 #endif
 
 private:

@@ -6,7 +6,9 @@
 #include "util.hh"
 
 #ifdef USE_WEBSERVER
+#define _TURN_OFF_PLATFORM_STRING
 #include <cpprest/json.h>
+#undef _TURN_OFF_PLATFORM_STRING
 #endif
 
 #include <stdexcept>
@@ -91,7 +93,9 @@ public:
 
 	// Functions only below this line
 #ifdef USE_WEBSERVER
+#define _TURN_OFF_PLATFORM_STRING
 	Song(web::json::value const& song);  ///< Load song from cache.
+#undef _TURN_OFF_PLATFORM_STRING
 #endif
 	Song(fs::path const& path, fs::path const& filename);  ///< Load song from specified path and filename
 	void reload(bool errorIgnore = true);  ///< Reset and reload the entire song from file
