@@ -19,7 +19,7 @@
 					base = base.parent_path();
 				} while (true);
 			found:;
-				if (locale.empty() && fs::exists(base / LOCALEDIR)) locale = base / LOCALEDIR;
+				if (locale.empty() && fs::exists(base / LOCALE_DIR)) locale = base / LOCALE_DIR;
 			}
 			// System-wide config files
 			{
