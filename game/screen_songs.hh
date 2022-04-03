@@ -10,6 +10,7 @@
 #include "playlist.hh"
 #include "menu.hh"
 #include "aubio/aubio.h"
+#include <unordered_map>
 
 class Audio;
 class Database;

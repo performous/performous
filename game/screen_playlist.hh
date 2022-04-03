@@ -14,6 +14,7 @@
 #include "configuration.hh"
 #include <mutex>
 #include <vector>
+#include <unordered_map>
 
 class Audio;
 class Database;
