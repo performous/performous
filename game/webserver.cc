@@ -2,6 +2,7 @@
 #include "game.hh"
 
 #ifdef USE_WEBSERVER
+#define _TURN_OFF_PLATFORM_STRING
 #include <boost/asio.hpp>
 
 void WebServer::StartServer(int tried, bool fallbackPortInUse) {
@@ -83,4 +84,5 @@ std::string WebServer::getIPaddr() {
 		return ip.empty() ? "localhost" : ip;
 	}
 }
+#undef _TURN_OFF_PLATFORM_STRING
 #endif

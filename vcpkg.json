@@ -4,6 +4,7 @@
   "dependencies": [
     "openblas",
     "fftw3",
+    "boost-asio",
     "boost-program-options",
     "boost-iostreams",
     "boost-system",
