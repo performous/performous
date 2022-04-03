@@ -14,6 +14,7 @@
 #include "configuration.hh"
 #include <mutex>
 #include <vector>
+#include <unordered_map>
 
 class Audio;
 class Database;
@@ -50,7 +51,7 @@ private:
 	void createMenuFromPlaylist();
 	Texture* loadTextureFromMap(fs::path path);
 	Backgrounds& m_backgrounds;
-	std::map<fs::path, std::unique_ptr<Texture>> m_covers;
+	std::unordered_map<fs::path, std::unique_ptr<Texture>> m_covers;
 	std::unique_ptr<ThemeInstrumentMenu> m_menuTheme;
 	std::unique_ptr<ThemePlaylistScreen> theme;
 	std::unique_ptr<Texture> m_background;
