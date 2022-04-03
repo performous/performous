@@ -100,10 +100,9 @@ Paths getThemePaths();  ///< Get the data/theme file search path (includes curre
 Paths getPathsConfig(std::string const& confOption);  ///< Return expanded list of paths specified by a path config option
 
 template <>
-class std::hash<fs::path>
+struct std::hash<fs::path>
 {
-public:
-    size_t operator()(const fs::path& path) const
+    size_t operator()(const fs::path& path) const noexcept
     {
         return fs::hash_value(path);
     }
