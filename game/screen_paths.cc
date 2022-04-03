@@ -98,7 +98,7 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 	
 	// Extract list of all directories
 	std::list<fs::path> directories;
-	for (const auto &di : fs::directory_iterator(path)) {
+	for (const auto &di : fs::directory_iterator(path, fs::directory_options::skip_permission_denied)) {
 		auto &p = di.path();
 		if (fs::is_directory(p) && (showHiddenfolders || p.filename().c_str()[0] != '.')) {
 			directories.emplace_back(p);
