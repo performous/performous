@@ -1,7 +1,6 @@
 #pragma once
 
 #ifdef USE_WEBSERVER
-
 #include "requesthandler.hh"
 
 class Game;
@@ -20,6 +19,7 @@ private:
 	Game& m_game;
 	Songs& m_songs;
 };
+
 #else
 class Songs;
 class Game;
