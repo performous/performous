@@ -193,6 +193,7 @@ void ScreenIntro::populateMenu() {
 }
 
 #ifdef USE_WEBSERVER
+#define _TURN_OFF_PLATFORM_STRING
 
 void ScreenIntro::draw_webserverNotice() {
 	if(m_webserverNoticeTimeout.get() == 0) {
@@ -207,6 +208,7 @@ void ScreenIntro::draw_webserverNotice() {
 	}
 }
 
+#undef _TURN_OFF_PLATFORM_STRING
 #else
 void ScreenIntro::draw_webserverNotice() {}
 #endif
