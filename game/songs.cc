@@ -20,9 +20,6 @@
 #include <boost/format.hpp>
 #include <unicode/stsearch.h>
 
-#ifdef USE_WEBSERVER
-#include <cpprest/json.h>
-#endif
 #include <fstream>
 #include "nlohmann/json.hpp"
 
@@ -54,8 +51,11 @@ void Songs::reload_internal() {
 		m_songs.clear();
 		m_dirty = true;
 	}
+#ifdef USE_WEBSERVER
+	std::clog << "songs/notice: Starting to load all songs from cache." << std::endl;
 	LoadCache();
 	std::clog << "songs/notice: Done loading the cache. You now have " << m_songs.size() << " songs in your list." << std::endl;
+#endif
 	std::clog << "songs/notice: Starting to load all songs from disk, to update the cache." << std::endl;
 	Profiler prof("songloader");
 	Paths systemSongs = getPathsConfig("paths/system-songs");
@@ -84,55 +84,48 @@ void Songs::reload_internal() {
 	doneLoading = true;
 }
 
-#ifdef USE_WEBSERVER
 void Songs::LoadCache() {
-	fs::path songsMetaFile = getCacheDir() / "Songs-Metadata.json";
+	const fs::path songsMetaFile = getCacheDir() / "Songs-Metadata.json";
 	std::ifstream file(songsMetaFile.string());
-	web::json::value jsonRoot;
-    if (file)
-    {
-    	try {
-	        std::stringstream buffer;
-	        buffer << file.rdbuf();
-	        file.close();
-	        jsonRoot = web::json::value::parse(buffer);
-    	} catch(std::exception const& e) {
+	auto jsonRoot = nlohmann::json::array();
+	if (file) {
+		try {
+			std::stringstream buffer;
+			buffer << file.rdbuf();
+			file.close();
+			jsonRoot = nlohmann::json::parse(buffer);
+		} catch(std::exception const& e) {
 			std::clog << "songs/error: " << e.what() << std::endl;
+			file.close();
 			return;
-    	}
-    } else {
-    	std::clog << "songs/info: Could not open songs meta cache file " << songsMetaFile.string() << std::endl;
-    	return;
-    }
-
-	Paths systemSongs = getPathsConfig("paths/system-songs");
-	Paths localPaths = getPathsConfig("paths/songs");
-	localPaths.insert(localPaths.begin(), systemSongs.begin(), systemSongs.end());
-
-	std::vector<std::string> userSongs;
-	for(const fs::path& userSong : localPaths) {
-		userSongs.push_back(userSong.string());
+		}
+	} else {
+		std::clog << "songs/info: Could not open songs meta cache file " << songsMetaFile.string() << std::endl;
+		return;
 	}
 
-    for(auto const& song : jsonRoot.as_array()) {
-    	STAT buffer;
-    	auto songPath = song.at("TxtFile").as_string();
-    	auto isSongPathInConfiguredPaths = std::find_if(
-                                                        userSongs.begin(), 
-                                                        userSongs.end(), 
-														[songPath](const std::string& userSongItem) { 
-															return songPath.find(userSongItem) != std::string::npos;
-														 }) != userSongs.end();
-    	if(_STAT(songPath.c_str(), &buffer) == 0 && isSongPathInConfiguredPaths) {
-    		std::shared_ptr<Song> realSong(new Song(song));
-    		m_songs.push_back(realSong);
-    	}  	
-    }
-}
+	std::vector<std::string> allPaths;
+	for(const auto& songPaths : {getPathsConfig("paths/system-songs"), getPathsConfig("paths/songs")}) {
+		for(const auto& songPath: songPaths) {
+			allPaths.push_back(songPath.string());
+		}
+	}
 
-#else
-void Songs::LoadCache() { }
-#endif
+	for(auto const& song : jsonRoot) {
+		const auto songPath = song.at("TxtFile").get<std::string>();
+		const bool isSongPathInConfiguredPaths = std::find_if(
+			allPaths.begin(),
+			allPaths.end(),
+			[songPath](const std::string& userSongItem) {
+				return songPath.find(userSongItem) != std::string::npos;
+			}) != allPaths.end();
+		STAT buffer;
+		if(_STAT(songPath.c_str(), &buffer) == 0 && isSongPathInConfiguredPaths) {
+			std::shared_ptr<Song> realSong(new Song(song));
+			m_songs.push_back(realSong);
+		}
+	}
+}
 
 void Songs::CacheSonglist() {
 	auto jsonRoot = nlohmann::json::array();
