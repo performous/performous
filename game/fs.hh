@@ -1,5 +1,7 @@
 #pragma once
 
+#include "config.hh"
+
 #include <list>
 #include <vector>
 

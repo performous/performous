@@ -332,7 +332,7 @@ std::vector<std::string> RequestHandler::GetTranslationKeys() {
         translate_noop("Performous web frontend"),
         translate_noop("View database"),
         translate_noop("View playlist"),
-        translate_noop("Search and Add"),
+        translate_noop("Search and add"),
         translate_noop("Sort by"),
         translate_noop("Artist"),
         translate_noop("Title"),
@@ -358,17 +358,17 @@ std::vector<std::string> RequestHandler::GetTranslationKeys() {
         translate_noop("Remove song"),
         translate_noop("Desired position of song"),
         translate_noop("Cancel"),
-        translate_noop("Successfully removed song from playlist"),
-        translate_noop("Failed removing song from playlist"),
-        translate_noop("Successfully changed position of song"),
-        translate_noop("Failed changing position of song"),
-        translate_noop("Successfully moved song up"),
-        translate_noop("Failed moving song up"),
-        translate_noop("Successfully moved song down"),
-        translate_noop("Failed moving song down"),
-        translate_noop("Successfully added song to the playlist"),
-        translate_noop("Failed adding song to the playlist"),
-        translate_noop("No songs found with current filter")
+        translate_noop("Successfully removed song from playlist."),
+        translate_noop("Failed removing song from playlist!"),
+        translate_noop("Successfully changed position of song."),
+        translate_noop("Failed changing position of song!"),
+        translate_noop("Successfully moved song up."),
+        translate_noop("Failed moving song up!"),
+        translate_noop("Successfully moved song down."),
+        translate_noop("Failed moving song down!"),
+        translate_noop("Successfully added song to the playlist."),
+        translate_noop("Failed adding song to the playlist!"),
+        translate_noop("No songs found with current filter.")
     };
 
     return tranlationKeys;
