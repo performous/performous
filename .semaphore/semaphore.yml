@@ -170,7 +170,7 @@ blocks:
             when: true
           commands:
             - echo "Running the build script in the Ubuntu 18.04 container"
-            - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run ooshlablu/performous-build:ubuntu18.04 ./build_performous.sh -c -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run ooshlablu/performous-build:ubuntu18.04 ./build_performous.sh -c -b ${SEMAPHORE_GIT_SHA}; fi
+            - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run performous/deps:ubuntu18.04 ./build_performous.sh -c -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run performous/deps:ubuntu18.04 ./build_performous.sh -c -b ${SEMAPHORE_GIT_SHA}; fi
 
         - name: Ubuntu 20.04 Cmake
           priority:
@@ -178,7 +178,7 @@ blocks:
             when: true
           commands:
             - echo "Running the build script in the Ubuntu 20.04 container"
-            - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run ooshlablu/performous-build:ubuntu20.04 ./build_performous.sh -c -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run ooshlablu/performous-build:ubuntu20.04 ./build_performous.sh -c -b ${SEMAPHORE_GIT_SHA}; fi
+            - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run performous/deps:ubuntu20.04 ./build_performous.sh -c -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run performous/deps:ubuntu20.04 ./build_performous.sh -c -b ${SEMAPHORE_GIT_SHA}; fi
 
         - name: Fedora 32 Cmake
           priority:
@@ -186,7 +186,7 @@ blocks:
             when: true
           commands:
             - echo "Running the build script in the Fedora 32 container"
-            - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run ooshlablu/performous-build:fedora32 ./build_performous.sh -c -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run ooshlablu/performous-build:fedora32 ./build_performous.sh -c -b ${SEMAPHORE_GIT_SHA}; fi
+            - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run performous/deps:fedora32 ./build_performous.sh -c -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run performous/deps:fedora32 ./build_performous.sh -c -b ${SEMAPHORE_GIT_SHA}; fi
 
         - name: Fedora 33 Cmake
           priority:
@@ -194,7 +194,7 @@ blocks:
             when: true
           commands:
             - echo "Running the build script in the Fedora 33 container"
-            - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run ooshlablu/performous-build:fedora33 ./build_performous.sh -c -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run ooshlablu/performous-build:fedora33 ./build_performous.sh -c -b ${SEMAPHORE_GIT_SHA}; fi
+            - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run performous/deps:fedora33 ./build_performous.sh -c -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run performous/deps:fedora33 ./build_performous.sh -c -b ${SEMAPHORE_GIT_SHA}; fi
 
         - name: Fedora 34 Cmake
           priority:
@@ -202,7 +202,7 @@ blocks:
             when: true
           commands:
             - echo "Running the build script in the Fedora 34 container"
-            - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run ooshlablu/performous-build:fedora34 ./build_performous.sh -c -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run ooshlablu/performous-build:fedora34 ./build_performous.sh -c -b ${SEMAPHORE_GIT_SHA}; fi
+            - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run performous/deps:fedora34 ./build_performous.sh -c -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run performous/deps:fedora34 ./build_performous.sh -c -b ${SEMAPHORE_GIT_SHA}; fi
 
 
   - name: Linux Meson Builds
@@ -220,7 +220,7 @@ blocks:
             when: true
           commands:
             - echo "Running the build script in the Ubuntu 18.04 container"
-            - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run ooshlablu/performous-build:ubuntu18.04 ./build_performous.sh -m -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run ooshlablu/performous-build:ubuntu18.04 ./build_performous.sh -m -b ${SEMAPHORE_GIT_SHA}; fi
+            - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run performous/deps:ubuntu18.04 ./build_performous.sh -m -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run performous/deps:ubuntu18.04 ./build_performous.sh -m -b ${SEMAPHORE_GIT_SHA}; fi
 
         - name: Ubuntu 20.04 Meson
           priority:
@@ -228,7 +228,7 @@ blocks:
             when: true
           commands:
             - echo "Running the build script in the Ubuntu 20.04 container"
-            - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run ooshlablu/performous-build:ubuntu20.04 ./build_performous.sh -m -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run ooshlablu/performous-build:ubuntu20.04 ./build_performous.sh -m -b ${SEMAPHORE_GIT_SHA}; fi
+            - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run performous/deps:ubuntu20.04 ./build_performous.sh -m -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run performous/deps:ubuntu20.04 ./build_performous.sh -m -b ${SEMAPHORE_GIT_SHA}; fi
 
         - name: Fedora 32 Meson
           priority:
@@ -236,7 +236,7 @@ blocks:
             when: true
           commands:
             - echo "Running the build script in the Fedora 32 container"
-            - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run ooshlablu/performous-build:fedora32 ./build_performous.sh -m -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run ooshlablu/performous-build:fedora32 ./build_performous.sh -m -b ${SEMAPHORE_GIT_SHA}; fi
+            - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run performous/deps:fedora32 ./build_performous.sh -m -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run performous/deps:fedora32 ./build_performous.sh -m -b ${SEMAPHORE_GIT_SHA}; fi
 
         - name: Fedora 33 Meson
           priority:
@@ -244,7 +244,7 @@ blocks:
             when: true
           commands:
             - echo "Running the build script in the Fedora 33 container"
-            - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run ooshlablu/performous-build:fedora33 ./build_performous.sh -m -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run ooshlablu/performous-build:fedora33 ./build_performous.sh -m -b ${SEMAPHORE_GIT_SHA}; fi
+            - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run performous/deps:fedora33 ./build_performous.sh -m -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run performous/deps:fedora33 ./build_performous.sh -m -b ${SEMAPHORE_GIT_SHA}; fi
 
         - name: Fedora 34 Meson
           priority:
@@ -252,6 +252,6 @@ blocks:
             when: true
           commands:
             - echo "Running the build script in the Fedora 34 container"
-            - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run ooshlablu/performous-build:fedora34 ./build_performous.sh -m -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run ooshlablu/performous-build:fedora34 ./build_performous.sh -m -b ${SEMAPHORE_GIT_SHA}; fi
+            - if [ ${SEMAPHORE_GIT_PR_NUMBER} ]; then docker run performous/deps:fedora34 ./build_performous.sh -m -p ${SEMAPHORE_GIT_PR_NUMBER}; else docker run performous/deps:fedora34 ./build_performous.sh -m -b ${SEMAPHORE_GIT_SHA}; fi
 
 
