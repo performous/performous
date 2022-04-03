@@ -1,6 +1,7 @@
 #pragma once
 
 #ifdef USE_WEBSERVER
+#define _TURN_OFF_PLATFORM_STRING
 
 #include "requesthandler.hh"
 
@@ -17,6 +18,8 @@ private:
 	std::shared_ptr<RequestHandler> m_server;
 	Songs& m_songs;
 };
+
+#undef _TURN_OFF_PLATFORM_STRING
 #else
 class Songs;
 
