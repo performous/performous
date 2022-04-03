@@ -243,11 +243,7 @@ namespace portaudio {
 		}
 		~Stream() {
 			if (!m_handle) return;
-			// Give audio a little time to shutdown but then just quit
-			auto audiokiller = std::async(std::launch::async, Pa_CloseStream, m_handle);
-			if (audiokiller.wait_for(std::chrono::seconds(5)) == std::future_status::ready) return;
-			std::cerr << "PortAudio BUG: Pa_CloseStream hung for more than five seconds. Aborting." << std::endl;
-			abort();  // Crash. Calling exit() is prone to hang.
+			PORTAUDIO_CHECKED(Pa_CloseStream, (m_handle));
 		}
 		operator PaStream*() { return m_handle; }
 	};
