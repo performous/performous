@@ -37,6 +37,8 @@ class ScreenIntro : public Screen {
 	AnimValue m_webserverNoticeTimeout;
 	int webserversetting = 0;
 	#ifdef USE_WEBSERVER
+	#define _TURN_OFF_PLATFORM_STRING
 	bool m_drawNotice = false;
+	#undef _TURN_OFF_PLATFORM_STRING
 	#endif
 };
