@@ -92,7 +92,7 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 	}
 	auto parent = path.parent_path();
 	if (!parent.empty() && parent != path)
-		m_menu.add(MenuOption(_(".."),_("Go up one folder")).call([this, sl, path]() {
+		m_menu.add(MenuOption(_(".."),_("Go to parent folder")).call([this, sl, path]() {
 					generateMenuFromPath(path.parent_path());
 	}));
 	

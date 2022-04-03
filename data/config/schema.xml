@@ -17,24 +17,24 @@ to save the current settings to XML.
 	<menu>
 		<entry name="game">
 			<short>Game</short>
-			<long>Gameplay related options</long>
+			<long>Gameplay related options.</long>
 		</entry>
 		<entry name="graphic">
 			<short>Graphic</short>
-			<long>Configure rendering and video settings</long>
+			<long>Configure rendering and video settings.</long>
 		</entry>
 		<entry name="AudioDevices">
 			<!-- Handled internally by Performous -->
 			<short>Audio Devices</short>
-			<long>Setup microphones and playback</long>
+			<long>Setup microphones and playback.</long>
 		</entry>
 		<entry name="audio">
 			<short>Audio</short>
-			<long>Configure general audio settings</long>
+			<long>Configure general audio settings.</long>
 		</entry>
 		<entry name="Paths">
 			<short>Paths</short>
-			<long>Setup song and data paths</long>
+			<long>Setup song and data paths.</long>
 		</entry>
 	</menu>
 
@@ -94,7 +94,14 @@ to save the current settings to XML.
 		<limits min="0" max="30" step="5" />
 		<short>High-score timeout</short>
 		<long>How long the high-scores screen will wait for input before going to the next song.</long>
-	</entry>	
+	</entry>
+	<entry name="game/language" type="int" value="1337">
+		<limits>
+			<!-- enum options will be added dynamically according to detected interfaces. -->
+		</limits>
+		<short>Language</short>
+		<long>Language to show Performous in</long>
+	</entry>
 	<entry name="game/webserver_access" type="int" value="0">
 		<limits>
 			<enum>Disabled</enum>
@@ -112,7 +119,7 @@ to save the current settings to XML.
 		<!-- maximum of 16 bit is 65536, so 60000 should be a nice upper-limit -->
 		<limits min="0" max="60000" step="1" />
 		<short>Webserver port</short>
-		<long>Port to use for the web server. Choose one that is not used by other applications.</long>
+		<long>Port to use for the webserver. Choose one that is not used by other applications.</long>
 	</entry>
 	<entry name="game/webserver_fallback_port" type="int" value="8001">
 		<!-- maximum of 16 bit is 65536, so 60000 should be a nice upper-limit -->
@@ -129,8 +136,8 @@ to save the current settings to XML.
 			<enum>Auto (2 octaves)</enum>
 			<enum>Auto (2.5 octaves)</enum>
 		</limits>
-		<short>Note Graph Scaling</short>
-		<long>Type of scaling the note graph.</long>
+		<short>Notegraph Scaling</short>
+		<long>Choose whether the notegraph keeps a fixed scale or is adjusted according to the current song.</long>
 	</entry>
 	<entry name="game/keyboard_guitar" type="bool" value="true">
 		<short>Keyboard as guitar</short>
@@ -142,7 +149,7 @@ to save the current settings to XML.
 	</entry>
 	<entry name="game/drum_promode" type="bool" value="true">
 		<short>Drums use Pro mode</short>
-		<long>Drums use Pro mode (toms are not cymbals)</long>
+		<long>Drums use Pro mode. (Toms are not cymbals.)</long>
 	</entry>
 	<entry name="game/keyboard_dancepad" type="bool" value="true">
 		<short>Keyboard as dance pad</short>
@@ -389,7 +396,7 @@ to save the current settings to XML.
 	</entry>
 	<entry name="paths/showhiddenfolders" type="bool" value="false">
 		<short>Show hidden folders</short>
-		<long>When true the screen_paths will also show hidden folders</long>
+		<long>When true the screen 'Paths' will also show hidden folders.</long>
 	</entry>
 	<entry name="paths/system-songs" type="string_list">
 		<stringvalue>DATADIR/songs</stringvalue>
@@ -405,7 +412,6 @@ to save the current settings to XML.
 		<stringvalue>%USERPROFILE%\AppData\Roaming\performous</stringvalue>
 		<stringvalue>~\AppData\Roaming\performous</stringvalue>
 		<stringvalue>%HOMEDRIVE%%HOMEPATH%\Application Data\performous</stringvalue>
-		<stringvalue>~\Application Data\performous</stringvalue>
 		<short>Default Song folders</short>
 		<long>Where to recursively look for songs. DATADIR at the beginning means all Performous data folders.</long>
 	</entry>
@@ -418,6 +424,6 @@ to save the current settings to XML.
 		<ui unit=" pixels" />
 		<limits min="0" max="6" step="1" />
 		<short>Sort order</short>
-		<long>Currently active sort order</long>
+		<long>Currently active sort order.</long>
 	</entry>
 </performous>
