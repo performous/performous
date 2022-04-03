@@ -48,12 +48,12 @@ void Songs::reload() {
 
 void Songs::reload_internal() {
 	{
-		std::lock_guard<std::mutex> l(m_mutex);
+		std::unique_lock<std::shared_mutex> l(m_mutex);
 		m_songs.clear();
 		m_dirty = true;
 	}
 	LoadCache();
-	std::clog << "songs/notice: Done loading the cache. You now have " << m_songs.size() << " songs in your list." << std::endl;
+	std::clog << "songs/notice: Done loading the cache. You now have " << loadedSongs() << " songs in your list." << std::endl;
 	std::clog << "songs/notice: Starting to load all songs from disk, to update the cache." << std::endl;
 	Profiler prof("songloader");
 	Paths systemSongs = getPathsConfig("paths/system-songs");
@@ -64,9 +64,9 @@ void Songs::reload_internal() {
 		try {
 			if (!fs::is_directory(*it)) { std::clog << "songs/info: >>> Not scanning: " << *it << " (no such directory)\n"; continue; }
 			std::clog << "songs/info: >>> Scanning " << *it << std::endl;
-			size_t count = m_songs.size();
+			size_t count = loadedSongs();
 			reload_internal(*it);
-			size_t diff = m_songs.size() - count;
+			size_t diff = loadedSongs() - count;
 			if (diff > 0 && m_loading) std::clog << "songs/info: " << diff << " songs loaded\n";
 		} catch (std::exception& e) {
 			std::clog << "songs/error: >>> Error scanning " << *it << ": " << e.what() << '\n';
@@ -76,7 +76,7 @@ void Songs::reload_internal() {
 	if (m_loading) dumpSongs_internal(); // Dump the songlist to file (if requested)
 	std::clog << std::flush;
 	m_loading = false;
-	std::clog << "songs/notice: Done Loading. Loaded " << m_songs.size() << " Songs." << std::endl;
+	std::clog << "songs/notice: Done Loading. Loaded " << loadedSongs() << " Songs." << std::endl;
 	CacheSonglist();
 	std::clog << "songs/notice: Done Caching." << std::endl;
 	doneLoading = true;
@@ -122,14 +122,17 @@ void Songs::LoadCache() {
 															return songPath.find(userSongItem) != std::string::npos;
 														 }) != userSongs.end();
     	if(_STAT(songPath.c_str(), &buffer) == 0 && isSongPathInConfiguredPaths) {
-    		std::shared_ptr<Song> realSong(new Song(song));
-    		m_songs.push_back(realSong);
+		auto realSong = std::make_shared<Song>(song);
+		std::unique_lock<std::shared_mutex> l(m_mutex);
+		m_songs.push_back(std::move(realSong));
     	}  	
     }
 }
 
 void Songs::CacheSonglist() {
     web::json::value jsonRoot = web::json::value::array();
+
+	std::shared_lock<std::shared_mutex> l(m_mutex);
     auto i = 0;
 	for (auto const& song : m_songs)
     {  
@@ -267,10 +270,13 @@ void Songs::reload_internal(fs::path const& parent) {
 			if (fs::is_directory(p)) { reload_internal(p); continue; } //if the file is a folder redo this function with this folder as path
 			if (!regex_search(p.filename().string(), expression)) continue; //if the folder does not contain any of the requested files, ignore it
 			try { //found song file, make a new song with it.
-				auto it = std::find_if(m_songs.begin(), m_songs.end(), [p](std::shared_ptr<Song> n) {
-					return n->filename == p;
-				});
-				auto alreadyInCache = it != m_songs.end();
+				auto alreadyInCache = [&] {
+					std::shared_lock<std::shared_mutex> l(m_mutex);
+					auto it = std::find_if(m_songs.begin(), m_songs.end(), [p](std::shared_ptr<Song> n) {
+						return n->filename == p;
+						});
+					return it != m_songs.end();
+				}();
 
 				if(alreadyInCache) { 
 					continue;
@@ -279,24 +285,25 @@ void Songs::reload_internal(fs::path const& parent) {
 				std::clog << "songs/notice: Found song which was not in the cache: " << p.string() << std::endl;
 
 				std::shared_ptr<Song>s(new Song(p.parent_path(), p));
-				std::lock_guard<std::mutex> l(m_mutex);
 				int AdditionalFileIndex = -1;
-				for(unsigned int i = 0; i< m_songs.size(); i++) {
-					if(s->filename.extension() != m_songs[i]->filename.extension() && s->filename.stem() == m_songs[i]->filename.stem() &&
-							s->title == m_songs[i]->title && s->artist == m_songs[i]->artist) {
-						std::clog << "songs/info: >>> Found additional song file: " << s->filename << " for: " << m_songs[i]->filename << std::endl;
-						AdditionalFileIndex = i;
+				{
+					std::shared_lock<std::shared_mutex> l(m_mutex);
+					for(unsigned int i = 0; i< m_songs.size(); i++) {
+						if(s->filename.extension() != m_songs[i]->filename.extension() && s->filename.stem() == m_songs[i]->filename.stem() &&
+							    s->title == m_songs[i]->title && s->artist == m_songs[i]->artist) {
+							std::clog << "songs/info: >>> Found additional song file: " << s->filename << " for: " << m_songs[i]->filename << std::endl;
+							AdditionalFileIndex = i;
+						}
 					}
-				}				
-
+				}
 				if(AdditionalFileIndex > 0) { //TODO: add it to existing song
 					std::clog << "songs/info: >>> not yet implemented " << std::endl;
-					s->getDurationSeconds();
-					m_songs.push_back(s); // will make it appear double!!
-				} else {
-					s->getDurationSeconds();
-					m_songs.push_back(s); //put it in the database
 				}
+				s->getDurationSeconds();
+
+				// there is not race while the lock being released as this thread is the only one to modify the song list.
+				std::unique_lock<std::shared_mutex> l(m_mutex);
+				m_songs.push_back(s); //put it in the database, if found twice will appear in double
 				m_dirty = true;
 			} catch (SongParserException& e) {
 				std::clog << e;
@@ -348,18 +355,20 @@ void Songs::setFilter(std::string const& val) {
 
 void Songs::filter_internal() {
 	m_updateTimer.setValue(0.0);
-	std::lock_guard<std::mutex> l(m_mutex);
 	m_dirty = false;
 	RestoreSel restore(*this);
 	try {
 		SongVector filtered;
 		// if filter text is blank and no type filter is set, just display all songs.
-		if (m_filter == std::string() && m_type == 0) filtered = m_songs;
-		else {
+		if (m_filter == std::string() && m_type == 0) {
+			std::shared_lock<std::shared_mutex> l(m_mutex);
+			filtered = m_songs;
+		} else {
 			std::string charset = UnicodeUtil::getCharset(m_filter);
 			icu::UnicodeString filter = ((charset == "UTF-8") ? icu::UnicodeString::fromUTF8(m_filter) : icu::UnicodeString(m_filter.c_str(), charset.c_str()));
 			UErrorCode icuError = U_ZERO_ERROR;
 			
+			std::shared_lock<std::shared_mutex> l(m_mutex);
 			std::copy_if (m_songs.begin(), m_songs.end(), std::back_inserter(filtered), [&](std::shared_ptr<Song> it){
 			// Filter by type first.	
 				if (m_type == 1 && !(*it).hasDance()) return false;
@@ -381,7 +390,8 @@ void Songs::filter_internal() {
 		}
 		m_filtered.swap(filtered);
 	} catch (...) {
-		SongVector(m_songs.begin(), m_songs.end()).swap(m_filtered);  // Invalid regex => copy everything
+		std::shared_lock<std::shared_mutex> l(m_mutex);
+		m_filtered = m_songs; // Invalid regex => copy everything
 	}
 	sort_internal();
 }
@@ -582,7 +592,7 @@ namespace {
 
 void Songs::dumpSongs_internal() const {
 	if (m_songlist.empty()) return;
-	SongVector svec = m_songs;
+	SongVector svec = [&] { std::shared_lock<std::shared_mutex> l(m_mutex); return m_songs; }();
 	std::sort(svec.begin(), svec.end(), customComparator(&Song::collateByArtist));
 	fs::path coverpath = fs::path(m_songlist) / "covers";
 	fs::create_directories(coverpath);
