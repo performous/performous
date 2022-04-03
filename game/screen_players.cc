@@ -108,8 +108,7 @@ void ScreenPlayers::manageEvent(SDL_Event event) {
 
 Texture* ScreenPlayers::loadTextureFromMap(fs::path path) {
 	if(m_covers.find(path) == m_covers.end()) {
-		std::pair<fs::path, std::unique_ptr<Texture>> kv = std::make_pair(path, std::make_unique<Texture>(path));
-		m_covers.insert(std::move(kv));
+		m_covers.insert({ path, std::make_unique<Texture>(path) });
 	}
 	try {
 		return m_covers.at(path).get();
