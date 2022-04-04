@@ -172,7 +172,7 @@ void Songs::CacheSonglist() {
 			songObject["songFile"] = song->music[TrackName::BGMUSIC].string();
 		}
 		if(!song->midifilename.string().empty()) {
-			songObject["midFile"] = song->midifilename.string();
+			songObject["midiFile"] = song->midifilename.string();
 		}
 		if(!song->video.string().empty()) {
 			songObject["videoFile"] = song->video.string();
@@ -236,7 +236,8 @@ void Songs::CacheSonglist() {
 
 	try {
 		std::ofstream outFile(cacheDir.string());
-		outFile << jsonRoot.dump(4);
+		const int spacesCount = 4;
+		outFile << jsonRoot.dump(spacesCount);
 		outFile.close();
 	} catch (std::exception const& e) {
 		std::clog << "songs/error: Could not save " + cacheDir.string() + ": " + e.what() << std::endl;

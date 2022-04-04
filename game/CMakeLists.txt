@@ -100,7 +100,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(deps REQUIRED IMPORTED_TARGET glib-2.0 gio-2.0 gobject-2.0)
 
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM)
+foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM Json)
 	find_package(${lib} REQUIRED)
 	message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
 	target_include_directories(performous SYSTEM PRIVATE ${${lib}_INCLUDE_DIRS})
@@ -110,10 +110,6 @@ endforeach(lib)
 
 target_include_directories(fs PRIVATE ${SDL2_INCLUDE_DIRS})
 target_link_libraries(fs PRIVATE ${SDL2_LIBRARIES})
-
-# looking for nlohmann json library
-find_package(nlohmann_json 3.2.0 REQUIRED)
-target_link_libraries(performous PRIVATE nlohmann_json::nlohmann_json)
 
 # Activating MIDI hardware (e-drums with USB/MIDI connection)
 set(ENABLE_MIDI AUTO CACHE STRING "Use midi hardware (e-drums with USB/MIDI connection)")
