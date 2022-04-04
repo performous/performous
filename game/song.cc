@@ -12,62 +12,61 @@ extern "C" {
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
 }
-#ifdef USE_WEBSERVER
-Song::Song(web::json::value const& song): dummyVocal(TrackName::LEAD_VOCAL), randomIdx(rand()) {
-	path = song.has_field("TxtFileFolder") ? fs::path(song.at("TxtFileFolder").as_string().substr(0, song.at("TxtFileFolder").as_string().find_last_of("/\\"))) : "";
-	filename = song.has_field("TxtFile") ? fs::path(song.at("TxtFile").as_string()) : "";
-	artist = song.has_field("Artist") ? song.at("Artist").as_string() : "";
-	title = song.has_field("Title") ? song.at("Title").as_string() : "";
-	language = song.has_field("Language") ? song.at("Language").as_string() : "";
-	edition = song.has_field("Edition") ? song.at("Edition").as_string() : "";
-	creator = song.has_field("Creator") ? song.at("Creator").as_string() : "";
-	genre = song.has_field("Genre") ? song.at("Genre").as_string() : "";
-	cover = song.has_field("Cover") ? song.at("Cover").as_string() : "";
-	background = song.has_field("Background") ? song.at("Background").as_string() : "";
-	video = song.has_field("VideoFile") ? fs::path(song.at("VideoFile").as_string()) : "";
-	midifilename = song.has_field("MidFile") ? fs::path(song.at("MidFile").as_string()) : "";
-	videoGap = song.has_field("VideoGap") ? song.at("VideoGap").as_number().to_double() : 0.0;
-	start = song.has_field("Start") ? song.at("Start").as_number().to_double() : 0.0;
-	preview_start = song.has_field("PreviewStart") ? song.at("PreviewStart").as_number().to_double() : 0.0;
-	m_duration = song.has_field("Duration") ? song.at("Duration").as_number().to_double() : 0.0;
-	music[TrackName::BGMUSIC] = song.has_field("SongFile") ? fs::path(song.at("SongFile").as_string()) : "";
-	music[TrackName::LEAD_VOCAL] = song.has_field("Vocals") ? fs::path(song.at("Vocals").as_string()) : "";
-	music[TrackName::PREVIEW] = song.has_field("Preview") ? fs::path(song.at("Preview").as_string()) : "";
-	music[TrackName::GUITAR] = song.has_field("Guitar") ? fs::path(song.at("Guitar").as_string()) : "";
-	music[TrackName::BASS] = song.has_field("Bass") ? fs::path(song.at("Bass").as_string()) : "";
-	music[TrackName::DRUMS] = song.has_field("Drums") ? fs::path(song.at("Drums").as_string()) : "";
-	music[TrackName::KEYBOARD] = song.has_field("Keyboard") ? fs::path(song.at("Keyboard").as_string()) : "";
-	music[TrackName::GUITAR_COOP] = song.has_field("Guitar_coop") ? fs::path(song.at("Guitar_coop").as_string()) : "";
-	music[TrackName::GUITAR_RHYTHM] = song.has_field("Guitar_rhythm") ? fs::path(song.at("Guitar_rhythm").as_string()) : "";
+
+Song::Song(nlohmann::json const& song): dummyVocal(TrackName::LEAD_VOCAL), randomIdx(rand()) {
+	path = song.contains("txtFileFolder") ? fs::path(song.at("txtFileFolder").get<std::string>()) : "";
+	filename = song.contains("txtFile") ? fs::path(song.at("txtFile").get<std::string>()) : "";
+	artist = song.contains("artist") ? song.at("artist").get<std::string>() : "";
+	title = song.contains("title") ? song.at("title").get<std::string>() : "";
+	language = song.contains("language") ? song.at("language").get<std::string>() : "";
+	edition = song.contains("edition") ? song.at("edition").get<std::string>() : "";
+	creator = song.contains("creator") ? song.at("creator").get<std::string>() : "";
+	genre = song.contains("genre") ? song.at("genre").get<std::string>() : "";
+	cover = song.contains("cover") ? song.at("cover").get<std::string>() : "";
+	background = song.contains("background") ? song.at("background").get<std::string>() : "";
+	video = song.contains("videoFile") ? fs::path(song.at("videoFile").get<std::string>()) : "";
+	midifilename = song.contains("midiFile") ? fs::path(song.at("midiFile").get<std::string>()) : "";
+	videoGap = song.contains("videoGap") ? song.at("videoGap").get<double>() : 0.0;
+	start = song.contains("start") ? song.at("start").get<double>() : 0.0;
+	preview_start = song.contains("previewStart") ? song.at("previewStart").get<double>() : 0.0;
+	m_duration = song.contains("duration") ? song.at("duration").get<double>() : 0.0;
+	music[TrackName::BGMUSIC] = song.contains("songFile") ? fs::path(song.at("songFile").get<std::string>()) : "";
+	music[TrackName::LEAD_VOCAL] = song.contains("vocals") ? fs::path(song.at("vocals").get<std::string>()) : "";
+	music[TrackName::PREVIEW] = song.contains("preview") ? fs::path(song.at("preview").get<std::string>()) : "";
+	music[TrackName::GUITAR] = song.contains("guitar") ? fs::path(song.at("guitar").get<std::string>()) : "";
+	music[TrackName::BASS] = song.contains("bass") ? fs::path(song.at("bass").get<std::string>()) : "";
+	music[TrackName::DRUMS] = song.contains("drums") ? fs::path(song.at("drums").get<std::string>()) : "";
+	music[TrackName::KEYBOARD] = song.contains("keyboard") ? fs::path(song.at("keyboard").get<std::string>()) : "";
+	music[TrackName::GUITAR_COOP] = song.contains("guitarCoop") ? fs::path(song.at("guitarCoop").get<std::string>()) : "";
+	music[TrackName::GUITAR_RHYTHM] = song.contains("guitarRhythm") ? fs::path(song.at("guitarRhythm").get<std::string>()) : "";
 	loadStatus = Song::LoadStatus::HEADER;
-	
-	if (song.has_field("VocalTracks")) {
-		for (unsigned i = 0; i < song.at("VocalTracks").as_number().to_uint32(); i++) {
+
+	if (song.contains("vocalTracks")) {
+		for (size_t i = 0; i < song.at("vocalTracks").get<size_t>(); i++) {
 			std::string track = "DummyTrack" + std::to_string(i);
 			insertVocalTrack(track, VocalTrack(track));
 		}
 	}
-	
-	if (song.has_field("KeyboardTracks")) {
-			instrumentTracks.insert(make_pair(TrackName::KEYBOARD, InstrumentTrack(TrackName::KEYBOARD)));
+
+	if (song.contains("keyboardTracks") && song.at("keyboardTracks").get<bool>()) {
+		instrumentTracks.insert(make_pair(TrackName::KEYBOARD, InstrumentTrack(TrackName::KEYBOARD)));
 	}
-	
-	if (song.has_field("DrumTracks")) {
-			instrumentTracks.insert(make_pair(TrackName::DRUMS, InstrumentTrack(TrackName::DRUMS)));
-	}		
-	if (song.has_field("DanceTracks")) {
+
+	if (song.contains("drumTracks") && song.at("drumTracks").get<bool>()) {
+		instrumentTracks.insert(make_pair(TrackName::DRUMS, InstrumentTrack(TrackName::DRUMS)));
+	}
+	if (song.contains("danceTracks") && song.at("danceTracks").get<bool>()) {
 		DanceDifficultyMap danceDifficultyMap;
-			danceTracks.insert(std::make_pair("dance-single", danceDifficultyMap));
-	}		
-	if (song.has_field("GuitarTracks")) {
-			instrumentTracks.insert(std::make_pair(TrackName::GUITAR, InstrumentTrack(TrackName::GUITAR)));
+		danceTracks.insert(std::make_pair("dance-single", danceDifficultyMap));
 	}
-	if (song.has_field("BPM")) {
-			m_bpms.push_back(BPM(0, 0, song.at("BPM").as_number().to_double()));
+	if (song.contains("guitarTracks") && song.at("guitarTracks").get<bool>()) {
+		instrumentTracks.insert(std::make_pair(TrackName::GUITAR, InstrumentTrack(TrackName::GUITAR)));
+	}
+	if (song.contains("bpm")) {
+		m_bpms.push_back(BPM(0, 0, song.at("bpm").get<double>()));
 	}
 	collateUpdate();
 }
-#endif
 
 Song::Song(fs::path const& path, fs::path const& filename):
   dummyVocal(TrackName::LEAD_VOCAL), path(path), filename(filename), randomIdx(rand())
@@ -95,11 +94,11 @@ void Song::dropNotes() {
 
 void Song::collateUpdate() {
 	songMetadata collateInfo {{"artist", artist}, {"title", title}};
-	UnicodeUtil::collate(collateInfo);	
-	
+	UnicodeUtil::collate(collateInfo);
+
 	collateByTitle = collateInfo["title"] + "__" + collateInfo["artist"] + "__" + filename.string();
 	collateByTitleOnly = collateInfo["title"];
-	
+
 	collateByArtist = collateInfo["artist"] + "__" + collateInfo["title"] + "__" + filename.string();
 	collateByArtistOnly = collateInfo["artist"];
 }
@@ -211,4 +210,3 @@ std::vector<std::string> Song::getVocalTrackNames() const {
 	for (auto const& kv: vocalTracks) result.push_back(kv.first);
 	return result;
 }
-

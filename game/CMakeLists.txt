@@ -111,6 +111,10 @@ endforeach(lib)
 target_include_directories(fs PRIVATE ${SDL2_INCLUDE_DIRS})
 target_link_libraries(fs PRIVATE ${SDL2_LIBRARIES})
 
+# looking for nlohmann json library
+find_package(nlohmann_json 3.2.0 REQUIRED)
+target_link_libraries(performous PRIVATE nlohmann_json::nlohmann_json)
+
 # Activating MIDI hardware (e-drums with USB/MIDI connection)
 set(ENABLE_MIDI AUTO CACHE STRING "Use midi hardware (e-drums with USB/MIDI connection)")
 set_property(CACHE ENABLE_MIDI PROPERTY STRINGS AUTO ON OFF)
