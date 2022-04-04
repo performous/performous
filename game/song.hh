@@ -5,7 +5,7 @@
 #include "notes.hh"
 #include "util.hh"
 
-#include "nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 
 #include <stdexcept>
 #include <string>
