@@ -25,7 +25,7 @@ Song::Song(nlohmann::json const& song): dummyVocal(TrackName::LEAD_VOCAL), rando
 	cover = song.contains("cover") ? song.at("cover").get<std::string>() : "";
 	background = song.contains("background") ? song.at("background").get<std::string>() : "";
 	video = song.contains("videoFile") ? fs::path(song.at("videoFile").get<std::string>()) : "";
-	midifilename = song.contains("midFile") ? fs::path(song.at("midFile").get<std::string>()) : "";
+	midifilename = song.contains("midiFile") ? fs::path(song.at("midiFile").get<std::string>()) : "";
 	videoGap = song.contains("videoGap") ? song.at("videoGap").get<double>() : 0.0;
 	start = song.contains("start") ? song.at("start").get<double>() : 0.0;
 	preview_start = song.contains("previewStart") ? song.at("previewStart").get<double>() : 0.0;
