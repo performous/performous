@@ -7,7 +7,6 @@
     "boost-program-options",
     "boost-iostreams",
     "boost-system",
-    "boost-format",
     "boost-locale",
     {
       "name": "boost-locale",
@@ -39,7 +38,8 @@
       "features": [
         "tools"
       ]
-    }
+    },
+    "fmt"
   ],
   "builtin-baseline": "af2287382b1991dbdcb7e5112d236f3323b9dd7a"
 }
