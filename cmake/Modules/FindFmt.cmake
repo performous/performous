@@ -10,6 +10,10 @@
 
 include(LibFindMacros)
 
-libfind_pkg_detect(Fmt fmt FIND_PATH fmt/core.h)
+if(APPLE)
+	add_definitions("-DFMT_SHARED")
+endif()
+
+libfind_pkg_detect(Fmt fmt FIND_PATH fmt/core.h fmt/format.h FIND_LIBRARY fmt)
 set(Fmt_VERSION ${Fmt_PKGCONF_VERSION})
 libfind_process(Fmt)
