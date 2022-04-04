@@ -8,7 +8,7 @@
 #include "screen_intro.hh"
 #include "util.hh"
 #include "game.hh"
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <algorithm>
 #include <future>
