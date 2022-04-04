@@ -17,7 +17,7 @@
 #include <stdexcept>
 
 #include "fs.hh"
-#include <boost/format.hpp>
+#include <fmt/core.h>
 #include <unicode/stsearch.h>
 
 #include <fstream>
@@ -541,7 +541,7 @@ namespace {
 		try {
 			std::string ext = s.cover.extension().string();
 			if (exists(s.cover)) {
-				std::string coverlink = "covers/" + (boost::format("%|04|") % num).str() + ext;
+				std::string coverlink = fmt::format("covers/{:04d}{:1}", num, ".jpg");
 				if (fs::is_symlink(coverlink)) fs::remove(coverlink);
 				create_symlink(s.cover, coverlink);
 				xmlpp::set_first_child_text(xmlpp::add_child_element(song, "cover"), coverlink);

@@ -1,13 +1,13 @@
 #include "cache.hh"
 #include "fs.hh"
 
-#include <boost/format.hpp>
+#include <fmt/core.h>
 #include <algorithm>
 #include <boost/algorithm/string/classification.hpp>
 
 namespace cache {
 	fs::path constructSVGCacheFileName(fs::path const& svgfilename, double factor){
-		std::string const lod = (boost::format("%.2f") % factor).str();
+		std::string const lod = fmt::format("{:.2f}", factor);
 		std::string const cache_basename = svgfilename.filename().string() + ".cache_" + lod + ".premul.png";
 		std::string fullpath = svgfilename.parent_path().string();
 		// Windows drive name handling
