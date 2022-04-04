@@ -8,7 +8,7 @@
 #include "screen_intro.hh"
 #include "util.hh"
 #include "game.hh"
-#include <boost/format.hpp>
+#include <fmt/core.h>
 
 #include <algorithm>
 #include <future>
@@ -90,10 +90,8 @@ namespace {
 		T s = std::abs(m * std::get<T>(step));
 		unsigned precision = 0;
 		while (s > 0.0 && (s *= 10) < 10) ++precision;
-		// Format the output
-		boost::format fmter("%f");
-		fmter % boost::io::group(std::setprecision(precision), double(m) * std::get<T>(value));
-		return fmter.str();
+		// Not quite sure how to format this with FMT
+		return fmt::format("{:d}", std::get<T>(value));
 	}
 
 	std::string getText(xmlpp::Element const& elem) {
@@ -148,7 +146,7 @@ std::string const ConfigItem::getValue() const {
 	if (m_type == "string") return std::get<std::string>(m_value);
 	if (m_type == "string_list") {
 		StringList const& sl = std::get<StringList>(m_value);
-		return sl.size() == 1 ? "{" + sl[0] + "}" : (boost::format(_("%d items")) % sl.size()).str();
+		return sl.size() == 1 ? "{" + sl[0] + "}" : fmt::format(_("{:d} items"), sl.size());
 	}
 	if (m_type == "option_list") return std::get<OptionList>(m_value).at(m_sel);
 	throw std::logic_error("ConfigItem::getValue doesn't know type '" + m_type + "'");
