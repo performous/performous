@@ -6,7 +6,7 @@
 #include "database.hh"
 
 #include <list>
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 LayoutSinger::LayoutSinger(VocalTrack& vocal, Database& database, NoteGraphScalerPtr const& scaler, std::shared_ptr<ThemeSing> theme):
   m_vocal(vocal), m_noteGraph(vocal, scaler), m_lyricit(vocal.notes.begin()), m_lyrics(), m_database(database), m_theme(theme), m_hideLyrics() {
@@ -34,7 +34,7 @@ void LayoutSinger::drawScore(PositionMode position) {
 		if (p->m_vocal.name != m_vocal.name) continue;
 		Color color(p->m_color.r, p->m_color.g, p->m_color.b, p->activity());
 		if (color.a == 0.0) continue;
-		m_score_text[i%4]->render((boost::format("%04d") % p->getScore()).str());
+		m_score_text[i % 4]->render(fmt::format("{:04d}", p->getScore()));
 		switch(position) {
 			case LayoutSinger::PositionMode::FULL:
 				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.125 * j).fixedWidth(0.035).screenTop(0.055);
