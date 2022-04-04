@@ -1,7 +1,7 @@
 #include "cache.hh"
 #include "fs.hh"
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <algorithm>
 #include <boost/algorithm/string/classification.hpp>
 
