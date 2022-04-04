@@ -19,7 +19,7 @@
 #include "screen_songs.hh"
 #include "notegraphscalerfactory.hh"
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <iostream>
 #include <stdexcept>
 #include <cmath>

@@ -16,7 +16,7 @@
 
 #include <iostream>
 #include <sstream>
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 ScreenPlayers::ScreenPlayers(std::string const& name, Audio& audio, Database& database):
   Screen(name), m_audio(audio), m_database(database), m_players(database.m_players)
