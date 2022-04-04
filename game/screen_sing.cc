@@ -19,7 +19,7 @@
 #include "screen_songs.hh"
 #include "notegraphscalerfactory.hh"
 
-#include <boost/format.hpp>
+#include <fmt/format.h>
 #include <iostream>
 #include <stdexcept>
 #include <cmath>
@@ -547,9 +547,9 @@ void ScreenSing::draw() {
 		Song::SongSection section("error", 0);
 		std::string statustxt;
 		if (m_song->getPrevSection(t - 1.0, section)) {
-			statustxt = (boost::format("%02u:%02u - %s") % (t / 60) % (t % 60) % section.name).str();
+			statustxt = fmt::format("{:02d}:{:02d} - {2}", (t / 60), (t % 60), (section.name));
 		} else {
-			statustxt = (boost::format("%02u:%02u") % (t / 60) % (t % 60)).str();
+			statustxt = fmt::format("{:02d}:{:02d}", (t / 60), (t % 60));
 		}
 
 		if (!m_score_window.get() && m_instruments.empty() && !m_layout_singer.empty()) {
