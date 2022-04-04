@@ -26,7 +26,7 @@
 #include "screen_players.hh"
 #include "screen_playlist.hh"
 
-#include <boost/format.hpp>
+#include <fmt/core.h>
 #include <boost/program_options.hpp>
 #include <cstdlib>
 #include <csignal>
@@ -148,7 +148,7 @@ void mainLoop(std::string const& songlist) {
 		Profiler prof("mainloop");
 		bool benchmarking = config["graphic/fps"].b();
 		if (songs.doneLoading == true && songs.displayedAlert == false) {
-			gm.dialog((boost::format(_("Done Loading!\n Loaded %d songs.")) % songs.loadedSongs()).str());
+			gm.dialog(fmt::format(_("Done Loading!\n Loaded {0} songs."), songs.loadedSongs()));
 			songs.displayedAlert = true;
 		}
 		if (g_take_screenshot) {

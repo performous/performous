@@ -7,7 +7,6 @@
     "boost-program-options",
     "boost-iostreams",
     "boost-system",
-    "boost-format",
     "boost-locale",
     {
       "name": "boost-locale",
@@ -41,7 +40,8 @@
       ]
     },
     "nlohmann-json",
-    "aubio"
+    "aubio",
+    "fmt"
   ],
   "builtin-baseline": "14e7bb4ae24616ec54ff6b2f6ef4e8659434ea44"
 }
