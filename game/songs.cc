@@ -21,7 +21,7 @@
 #include <unicode/stsearch.h>
 
 #include <fstream>
-#include "nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 
 Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), m_database(database), m_order(config["songs/sort-order"].i()) {
 	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
