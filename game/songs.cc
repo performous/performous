@@ -17,7 +17,7 @@
 #include <stdexcept>
 
 #include "fs.hh"
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <unicode/stsearch.h>
 
 #include <fstream>

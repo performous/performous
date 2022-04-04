@@ -114,7 +114,7 @@ foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWS
 	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
 
-find_package(fmt REQUIRED)
+find_package(fmt REQUIRED CONFIG)
 target_link_libraries(performous PRIVATE fmt::fmt)
 
 target_include_directories(fs PRIVATE ${SDL2_INCLUDE_DIRS})
