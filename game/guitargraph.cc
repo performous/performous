@@ -6,7 +6,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <stdexcept>
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 namespace {
 	#if 0 // Here is some dummy gettext calls to populate the dictionary
@@ -779,7 +779,7 @@ void GuitarGraph::drawNotes(double time) {
 	}
 	if (time != time) return;  // Check that time is not NaN
 
-	glmath::dvec4 neckglow;  // Used for calculating the average neck color
+	glmath::dvec4 neckglow{};  // Used for calculating the average neck color
 
 	// Iterate chords
 	for (auto& chord: m_chords) {
@@ -1098,7 +1098,7 @@ void GuitarGraph::drawInfo(double time) {
 		// Draw scores
 		{
 			ColorTrans c(Color(0.1, 0.3, 1.0, 0.9));
-			m_scoreText->render((boost::format("%04d") % getScore()).str());
+			m_scoreText->render(fmt::format("{:04d}", getScore()));
 			m_scoreText->dimensions().middle(-xcor).fixedHeight(h).screenBottom(-0.22);
 			m_scoreText->draw();
 		}
