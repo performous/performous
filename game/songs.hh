@@ -17,8 +17,8 @@ class Database;
 /// songs class for songs screen
 class Songs {
   public:
-  	Songs(const Songs&) = delete;
-  	const Songs& operator=(const Songs&) = delete;
+	Songs(const Songs&) = delete;
+	const Songs& operator=(const Songs&) = delete;
 	/// constructor
 	Songs(Database& database, std::string const& songlist = std::string());
 	~Songs();
@@ -77,7 +77,7 @@ class Songs {
 	size_t loadedSongs() const { return m_songs.size(); }
 
   private:
-  	void LoadCache();
+	void LoadCache();
 	void CacheSonglist();
 
 	class RestoreSel;
@@ -101,4 +101,3 @@ class Songs {
 	std::unique_ptr<std::thread> m_thread;
 	mutable std::mutex m_mutex;
 };
-
