@@ -17,6 +17,8 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  WINDOWS_VCPKG_CACHE: "vcpkg_installed"
 jobs:
   # Set up a release that packages will be published to.
   create_release:
@@ -174,13 +176,42 @@ jobs:
           submodules: recursive
 
       - uses: seanmiddleditch/gha-setup-ninja@master
+      
+      #- name: Extract a zip and populate cache
+      #  run: |
+      #     mkdir build
+      #     cd build
+      #     mkdir x64-debug
+      #     cd x64-debug
+      #     Invoke-WebRequest -OutFile vcpkg_installed.zip -Uri https://asgardsings.nl/vcpkg_installed.zip
+      #     7z x vcpkg_installed.zip
+      #
+      - name: Cache vcpkg compiled binaries
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-vcpkg
+        with:
+          path: ./build/x64-debug/vcpkg_installed
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/vcpkg.json') }}
 
-      - name: RunAll
-        id: depbuildandprogrambuild
+      - name: Restore dependencies
+        id: restore_dependencies-x64
         run: |
-           mkdir build
            cd build
-           cmake -G Ninja .. --preset x64-debug
+           cmake .. -G Ninja --preset x64-debug
+      
+      - name: Build Performous
+        id: build_performous_x64
+        run: |
+           cmake --build x64-debug
+           
+      - name: Create Installer
+        id: package_performous_x64
+        run: |
+           cd x64-release
+           cpack -G NSIS x64-release
+           set ARTIFACT_PATH="${CPACK_BUILD_SOURCE_DIRS}/${CPACK_PACKAGE_FILE_NAME}.exe" >> ${GITHUB_ENV}
+           set ARTIFACT_FILENAME="${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}.exe" >> ${GITHUB_ENV}
 
       - name: Upload release assets
         id: upload_assets
@@ -190,5 +221,5 @@ jobs:
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
           asset_path: ${{ env.ARTIFACT_PATH }}
-          asset_name: Performous.exe
+          asset_name: ${{ env.ARTIFACT_FILENAME }}
           asset_content_type: application/octet-stream
