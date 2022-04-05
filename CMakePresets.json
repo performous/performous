@@ -13,7 +13,7 @@
         "BUILD_SHARED_LIBS": "ON",
         "ENABLE_WEBSERVER": "OFF",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/${presetName}-install",
-        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
       }
     },
     {
