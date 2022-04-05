@@ -45,6 +45,7 @@ jobs:
   # https://github.com/performous/performous-docker since
   # github actions provides only Ubuntu
   Linux_Packages:
+    if: ${{ false }}  # disable for now
     # The upload step needs the release to be created first so it
     # can access the upload_url output
     needs: create_release
@@ -125,6 +126,7 @@ jobs:
 
   # Create the MacOS dmg
   MacOS_Packages:
+    if: ${{ false }}  # disable for now
     # The upload step needs the release to be created first so it
     # can access the upload_url output
     needs: create_release
@@ -162,4 +164,3 @@ jobs:
           asset_name: Performous.dmg
           asset_content_type: application/octet-stream
 
-## TO DO: Windows parallel jobs
