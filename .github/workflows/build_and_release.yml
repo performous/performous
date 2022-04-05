@@ -173,19 +173,13 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup VCPKG
-        uses: lukka/run-vcpkg@v10
-        id: runvcpkg
-        with:
-          vcpkgJsonGlob: 'vcpkg.json'
+      - name: RunAll
+        id: depbuildandprogrambuild
+        run: |
+           mkdir build
+           cd build
+           cmake -G Ninja .. --preset x64-debug
 
-      - name: Run CMake+vcpkg+Ninja+CTest to generate/build/test.
-        uses: lukka/run-cmake@v10
-        id: runcmake
-        with:
-          configurePreset: 'ninja-multi-vcpkg'
-          buildPreset: 'x64-Debug'
-      
       - name: Upload release assets
         id: upload_assets
         uses: actions/upload-release-asset@v1
