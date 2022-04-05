@@ -4,33 +4,95 @@ name: Build and Release Performous
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
+  # Triggers the workflow on merges to master, all PRs, and release tags 
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    branches:
+      - master
+      - '**'
+    pull_request:
+      branches: 
+        - '**'
+    tags:
+      - '[0-9]+\.[0-9]+\.[0-9]+'
+      - '[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  # Set up a release that packages will be published to.
+  # Make sure it only ones _once_
+  create_release:
+    name: Create the release all builds will post to
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    # Make sure the output variable for this step is set so it
+    # can be consumed by later build steps
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - name: Create the release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          # This token is automatically generated with each virtual session
+          # DO NOT create this in the sevrets manager
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.sha }}
+          release_name: Release ${{ github.sha }}
+          draft: true
+          prerelease: true
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - name: set URL (fixme output should be able to be passed between jobs)
+        run: echo "RELEASE_URL=${{ steps.create_release.outputs.upload_url }}"
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+  # Separate build jobs for everything
+  Linux_Packages:
+    # The upload step needs the release to be created first so it
+    # can access the upload_url output
+    needs: create_release
+    # Ubuntu required for Linux containers
+    runs-on: ubuntu-latest
+    container: performous/deps:${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu18.04
+          - ubuntu20.04
+          - ubuntu22.04
+          - fedora33
+          - fedora34
+          - fedora35
+    steps:
+      - name: Build package
+        id: build_package
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          # Do the build using the script in the container
+          cd /root/performous
+          ./build_performous.sh -r https://github.com/${{ github.repository }} -c -g -R -b ${{ github.sha }}
+          #mkdir build.cmake
+          #touch build.cmake/Performous-09bd9432-Linux.deb
+          # Do some mangling to make a unique name based on the OS
+          # This is needed so we don't overwite in the release each time
+          ls performous/build.cmake/Performous*-Linux.*
+          mv $(ls performous/build.cmake/Performous*-Linux.*) .
+          ls -lha
+          pwd
+          PACKAGE_NAME=$(ls /root/performous/Performous*-Linux.*)
+          PACKAGE_PREFIX=$(echo ${PACKAGE_NAME} | cut -d '.' -f1)
+          PACKAGE_SUFFIX=$(echo ${PACKAGE_NAME} | cut -d '.' -f2)
+          . /etc/os-release
+          mv ${PACKAGE_NAME} ${PACKAGE_PREFIX}-${ID}_${VERSION_ID}.${PACKAGE_SUFFIX}
+          echo "ARTIFACT_PATH=$(ls /root/performous/Performous*-Linux-*.*)" >> ${GITHUB_ENV}
+          echo "ARTIFACT_NAME=$(ls /root/performous/Performous*-Linux-*.* | cut -d '/' -f4)" >> ${GITHUB_ENV} 
+
+      - name: Upload release assets
+        id: upload_assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: ${{ env.ARTIFACT_PATH }}
+          asset_name: ${{ env.ARTIFACT_NAME }}
+          asset_content_type: application/octet-stream
