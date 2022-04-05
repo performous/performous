@@ -123,4 +123,43 @@ jobs:
           asset_name: ${{ env.ARTIFACT_NAME }}
           asset_content_type: application/octet-stream
 
-## TO DO: Add MacOS and Windows parallel jobs
+  # Create the MacOS dmg
+  MacOS_Packages:
+    # The upload step needs the release to be created first so it
+    # can access the upload_url output
+    needs: create_release
+    # Ubuntu required for Linux containers
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Git
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install Dependencies
+        id: install_deps
+        run: |
+           brew install boost cmake ffmpeg@4 help2man icu4c portaudio portmidi\
+             opencv libepoxy librsvg libxml++3 sdl2 dylibbundler asio fftw glm
+           brew link ffmpeg@4
+
+      - name: Build package
+        id: build_package
+        run: |
+          cd osx-utils
+          chmod +x ./performous-app-build.sh
+          ./performous-app-build.sh
+          echo "ARTIFACT_PATH=$(pwd)/Performous.dmg" >> ${GITHUB_ENV}
+
+      - name: Upload release assets
+        id: upload_assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: ${{ env.ARTIFACT_PATH }}
+          asset_name: Performous.dmg
+          asset_content_type: application/octet-stream
+
+## TO DO: Windows parallel jobs

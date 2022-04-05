@@ -114,8 +114,8 @@ function bundlelibs {
 function createdmg {
 	if [ "${FANCY_DMG}" == 0 ]
 		then
-			ln -sf /Applications "${PERFORMOUS_SOURCE}/out/Applications"
-			rm "${PERFORMOUS_SOURCE}/osx-utils/out/.DS_Store"
+			ln -sf /Applications "${PERFORMOUS_SOURCE}/osx-utils/out/Applications"
+			rm -f "${PERFORMOUS_SOURCE}/osx-utils/out/.DS_Store"
 			/usr/bin/hdiutil create -ov -srcfolder out -volname Performous -fs HFS+ -fsargs "-c c=64,a=16,e=16" -format UDRW RWPerformous.dmg
 			/usr/bin/hdiutil convert -ov RWPerformous.dmg -format UDZO -imagekey zlib-level=9 -o Performous.dmg
 			rm -f RWPerformous.dmg
