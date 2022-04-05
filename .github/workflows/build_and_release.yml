@@ -164,3 +164,35 @@ jobs:
           asset_name: Performous.dmg
           asset_content_type: application/octet-stream
 
+  Windows_Packages:
+    needs: create_release
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Git
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Setup VCPKG
+        uses: lukka/run-vcpkg@v10
+        id: runvcpkg
+        with:
+          vcpkgJsonGlob: 'vcpkg.json'
+
+      - name: Run CMake+vcpkg+Ninja+CTest to generate/build/test.
+        uses: lukka/run-cmake@v10
+        id: runcmake
+        with:
+          configurePreset: 'ninja-multi-vcpkg'
+          buildPreset: 'x64-Debug'
+      
+      - name: Upload release assets
+        id: upload_assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: ${{ env.ARTIFACT_PATH }}
+          asset_name: Performous.exe
+          asset_content_type: application/octet-stream
