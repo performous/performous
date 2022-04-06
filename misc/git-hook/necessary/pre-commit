@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# Usage: add this file to your project's .git/hooks directory.
+# Now, when you change some files in repository and try to commit these
+# changes, git will run this script right before commit. 
+
+GITDIR=`git rev-parse --git-common-dir`
+if [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
+    GITDIR=`cygpath --unix $GITDIR`
+fi
+
+export GITDIR
+
+if [ -f "./functions.bash" ]
+then
+    . ./functions.bash
+else
+    . $GITDIR/hooks/functions.bash
+fi
+
+echo ">>>>>>>> modifying begin <<<<<<<<"
+
+files=`find $GITDIR/hooks/precommit/modify/* -type f -maxdepth 0 -mindepth 0`
+
+for file in $files
+do
+    echo "######## begin $file ########"
+    
+    if [ -z `echo "$file" | sed 's/.*\.ps1$//g'` ]
+    then
+        runPSScript -File $file
+    else
+        $file
+    fi
+    result="$?"
+
+    if [ "$result" -ne 0 ]
+    then    
+        echo "######## end $file: abort ########"
+        exit 1
+    fi
+    
+    echo "######## end $file: continue ########"
+done
+
+echo ">>>>>>>> modifying complete <<<<<<<<"
+
+echo ">>>>>>>> checks begin <<<<<<<<"
+
+files=`find $GITDIR/hooks/precommit/check/* -type f -maxdepth 0 -mindepth 0`
+
+for file in $files
+do
+    echo "######## begin $file ########"
+    
+    if [ -z `echo "$file" | sed 's/.*\.ps1$//g'` ]
+    then
+        runPSScript -File $file
+    else
+        $file
+    fi
+    result="$?"
+
+    if [ "$result" -ne 0 ]
+    then    
+        echo "######## end $file: abort ########"
+        exit 1
+    fi
+    
+    echo "######## end $file: continue ########"
+done
+
+echo ">>>>>>>> checks complete <<<<<<<<"
+
+exit 0
