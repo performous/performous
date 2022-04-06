@@ -72,8 +72,8 @@ jobs:
   # Make this depend on all of the other jobs so it comes last
   # and won't update the PR with a link without artifacts
   Update_PR_With_Artifacts:
-    needs:
-      - test
+#    needs:
+#      - test
     #if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
@@ -102,7 +102,7 @@ jobs:
               }
             }
             const {owner, repo} = context.repo;
-#            const run_id = '${{github.event.workflow_run.id}}';
+            const run_id = '${{github.event.workflow_run.id}}';
 #            const pull_requests = ${{ toJSON(github.event.workflow_run.pull_requests) }};
 #            if (!pull_requests.length) {
 #              return core.error("This workflow doesn't match any pull requests!");
