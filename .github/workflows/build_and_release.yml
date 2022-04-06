@@ -141,6 +141,12 @@ jobs:
           artifacts: |
             ${{ env.ARTIFACT_PATH }}
 
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.ARTIFACT_PATH }}
+
   # Create the MacOS dmg
   MacOS_Packages:
     if: ${{ false }}  # disable for now
