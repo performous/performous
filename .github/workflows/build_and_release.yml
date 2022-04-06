@@ -178,7 +178,7 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            "Artifacts: https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts"
+            "Artifacts produced during this build can be found at the bottom of this page: https://github.com/ooshlablu/performous/actions/runs/${{ github.run_id }}#Artifacts"
 
   # Create the MacOS dmg
   MacOS_Packages:
