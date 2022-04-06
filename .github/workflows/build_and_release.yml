@@ -6,13 +6,14 @@ on:
   push:
     branches:
       - master
-      - '**'
-    pull_request:
-      branches: 
-        - '**'
+      - fake-master
+      - github-actions
     tags:
       - '[0-9]+\.[0-9]+\.[0-9]+'
       - '[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+'
+
+  # On anything pull request related
+  pull_request:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -31,6 +32,7 @@ jobs:
     steps:
       - name: Create the release
         id: create_release
+        if: ${{ github.event_name != 'pull_request' }}
         uses: actions/create-release@v1
         env:
           # This token is automatically generated with each virtual session
@@ -47,7 +49,7 @@ jobs:
   # https://github.com/performous/performous-docker since
   # github actions provides only Ubuntu
   Linux_Packages:
-    if: ${{ false }}  # disable for now
+    #if: ${{ false }}  # disable for now
     # The upload step needs the release to be created first so it
     # can access the upload_url output
     needs: create_release
@@ -117,6 +119,7 @@ jobs:
 
       - name: Upload release assets
         id: upload_assets
+        if: ${{ github.event_name != 'pull_request' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -125,6 +128,16 @@ jobs:
           asset_path: ${{ env.ARTIFACT_PATH }}
           asset_name: ${{ env.ARTIFACT_NAME }}
           asset_content_type: application/octet-stream
+
+      - name: Upload PR assets
+        id: upload_pr
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: gavv/pull-request-artifacts@v1.0.0
+        with:
+          commit: ${{ github.event.pull_request.head.sha }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: |
+            - ${{ env.ARTIFACT_PATH }}
 
   # Create the MacOS dmg
   MacOS_Packages:
@@ -167,6 +180,7 @@ jobs:
           asset_content_type: application/octet-stream
 
   Windows_Packages:
+    if: ${{ false }}
     needs: create_release
     runs-on: windows-latest
     steps:
