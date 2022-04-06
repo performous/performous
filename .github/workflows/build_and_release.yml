@@ -147,6 +147,35 @@ jobs:
           name: ${{ env.ARTIFACT_NAME }}
           path: ${{ env.ARTIFACT_PATH }}
 
+
+      - name: echo value
+        run: |
+          echo ${{ github.event.client_payload.prnumber }}
+          echo ${{ github.event.client_payload.checkrunid }}
+      - name: get check_suite_id
+        id: getsuiteid
+        run: |
+          URL="https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.event.client_payload.checkrunid }}"
+          check_suite_id=$(curl -s -u admin:${{ secrets.GITHUB_TOKEN }} $URL | jq -r '.check_suite_url' | awk -F "/" '{print $NF}')
+          echo $check_suite_id
+          echo "::set-output name=suiteid::$check_suite_id"
+      - name: get artifacts_id
+        id: getartid
+        run: |
+          URL="https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.event.client_payload.checkrunid }}/artifacts"
+          artifacts_id=$(curl -s -u admin:${{ secrets.GITHUB_TOKEN }} $URL | jq '.artifacts[].id')
+          echo $artifacts_id
+          echo "::set-output name=artid::$artifacts_id"
+      - name: check url
+        run: |
+          echo https://github.com/${{ github.repository }}/suites/${{ steps.getsuiteid.outputs.suiteid }}/artifacts/${{ steps.getartid.outputs.artid }}
+      - name: comment pr
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.client_payload.prnumber }}
+          body: |
+            The artifacts url is https://github.com/${{ github.repository }}/suites/${{ steps.getsuiteid.outputs.suiteid }}/artifacts/${{ steps.getartid.outputs.artid }}
+
   # Create the MacOS dmg
   MacOS_Packages:
     if: ${{ false }}  # disable for now
