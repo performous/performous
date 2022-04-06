@@ -97,7 +97,7 @@ jobs:
                   comment_id: last.id,
                 });
               } else {
-                core.info(`Creating a comment in issue / PR #${issue_number}`);
+                core.info(`Creating a comment in issue / PR ${issue_number}`);
                 await github.rest.issues.createComment({issue_number, body, owner, repo});
               }
             }
