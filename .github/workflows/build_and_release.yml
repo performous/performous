@@ -172,9 +172,9 @@ jobs:
       - name: comment pr
         uses: peter-evans/create-or-update-comment@v1
         with:
-          issue-number: ${{ github.event.client_payload.prnumber }}
+          issue-number: ${{github.event.issue.number}}
           body: |
-            https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.event.client_payload.checkrunid }}/artifacts
+            "Artifacts: https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.event.client_payload.checkrunid }}/artifacts"
 #            The artifacts url is https://github.com/${{ github.repository }}/suites/${{ steps.getsuiteid.outputs.suiteid }}/artifacts/${{ steps.getartid.outputs.artid }}
 
   # Create the MacOS dmg
