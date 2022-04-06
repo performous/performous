@@ -31,7 +31,7 @@ jobs:
     steps:
       - name: Create the PR release
         id: create_pr_release
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ false && github.event_name == 'pull_request' }}
         uses: actions/create-release@v1
         env:
           # This token is automatically generated with each virtual session
@@ -72,20 +72,85 @@ jobs:
   # Make this depend on all of the other jobs so it comes last
   # and won't update the PR with a link without artifacts
   Update_PR_With_Artifacts:
-    needs:
-      - create_release
-      - Linux_Packages
-      - MacOS_Packages
-      #- Windows_Packages
+    #needs:
+    #  - test
+    if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' }}
     steps:
-      - name: Update PR with Artifact URL
-        uses: peter-evans/create-or-update-comment@v1
+      - uses: actions/github-script@v5
         with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            Artifacts produced during this build can be found at the bottom of this page https://github.com/ooshlablu/performous/actions/runs/${{ steps.create_release.outputs.html_url }}
+          # This snippet is public-domain, taken from
+          # https://github.com/oprypin/nightly.link/blob/master/.github/workflows/pr-comment.yml
+          script: |
+            async function upsertComment(owner, repo, issue_number, purpose, body) {
+              const {data: comments} = await github.rest.issues.listComments(
+                {owner, repo, issue_number});
+              const marker = `<!-- bot: ${purpose} -->`;
+              body = marker + "\n" + body;
+              const existing = comments.filter((c) => c.body.includes(marker));
+              if (existing.length > 0) {
+                const last = existing[existing.length - 1];
+                core.info(`Updating comment ${last.id}`);
+                await github.rest.issues.updateComment({
+                  owner, repo,
+                  body,
+                  comment_id: last.id,
+                });
+              } else {
+                core.info(`Creating a comment in issue / PR #${issue_number}`);
+                await github.rest.issues.createComment({issue_number, body, owner, repo});
+              }
+            }
+            const {owner, repo} = context.repo;
+            const run_id = ${{github.event.workflow_run.id}};
+            const pull_requests = ${{ toJSON(github.event.workflow_run.pull_requests) }};
+            if (!pull_requests.length) {
+              return core.error("This workflow doesn't match any pull requests!");
+            }
+            const artifacts = await github.paginate(
+              github.rest.actions.listWorkflowRunArtifacts, {owner, repo, run_id});
+            if (!artifacts.length) {
+              return core.error(`No artifacts found`);
+            }
+            let body = `Artifacts produced by this Pull Request:\n`;
+            for (const art of artifacts) {
+              body += `\n* [${art.name}](https://nightly.link/${owner}/${repo}/actions/artifacts/${art.id})`;
+            }
+            body += `(These artifacts will only be available for 90 days.)
+            core.info("Review thread message body:", body);
+            for (const pr of pull_requests) {
+              await upsertComment(owner, repo, pr.number,
+                "nightly-link", body);
+            }
+
+#    needs:
+#      - create_release
+#      - Linux_Packages
+#      - MacOS_Packages
+#      #- Windows_Packages
+#    runs-on: ubuntu-latest
+#    if: ${{ github.event_name == 'pull_request' }}
+#    steps:
+#      - name: Update PR with Artifact URL
+#        uses: peter-evans/create-or-update-comment@v1
+#        with:
+#          issue-number: ${{ github.event.pull_request.number }}
+#          body: |
+#            Artifacts produced during this build can be found at the bottom of this page https://github.com/ooshlablu/performous/actions/runs/${{ steps.create_release.outputs.html_url }}
+  #Dumb test function
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          dd if=/dev/zero of=file.gz bs=1024 count=50
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: file.gz
+          path: file.gz
+
+
 
   # Create the Linux Packages
   # This is done in containers provided by
@@ -234,6 +299,7 @@ jobs:
   Windows_Packages:
     needs: create_release
     runs-on: windows-latest
+    if: ${{ false }}
     steps:
       - name: Checkout Git
         uses: actions/checkout@v3
@@ -253,24 +319,37 @@ jobs:
       #     Invoke-WebRequest -OutFile vcpkg_installed.zip -Uri https://asgardsings.nl/vcpkg_installed.zip
       #     7z x vcpkg_installed.zip
       
-      - name: Cache vcpkg compiled binaries
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-vcpkg
-        with:
-          path: ./build/x64-debug/vcpkg_installed
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/vcpkg.json') }}
+      #- name: Cache vcpkg compiled binaries
+      #  uses: actions/cache@v3
+      #  env:
+      #    cache-name: cache-vcpkg
+      #  with:
+      #    path: ./build/x64-debug/vcpkg_installed
+      #    key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/vcpkg.json') }}
 
-      - name: Restore dependencies
-        id: restore_dependencies-x64
+      - uses: lukka/run-vcpkg@v10.2
+        with:
+          vcpkgGitCommitId: '71d274d7ce32d7f2508062a70e0a5ebe981319eb'
+
+      - uses: lukka/run-cmake@v10
         continue-on-error: true
-        env:
-          VCPKG_FEATURE_FLAGS: binarycaching,versions
-          VCPKG_BINARY_SOURCES: 'files,D:/a/performous/performous/build/x64-debug/vcpkg_installed,readwrite'
-        run: |
-           cd build
-           dir x64-debug\vcpkg_installed
-           cmake .. -G Ninja --preset x64-debug
+        with:
+          configurePreset: 'x64-debug'
+          buildPreset: 'x64-debug'
+
+
+
+      #- name: Restore dependencies
+      #  id: restore_dependencies-x64
+      #  continue-on-error: true
+      #  #env:
+      #    #VCPKG_FEATURE_FLAGS: binarycaching,versions
+      #    #VCPKG_BINARY_SOURCES: 'files,D:/a/performous/performous/build/x64-debug/vcpkg_installed,readwrite'
+      #  run: |
+      #     mkdir build
+      #     cd build
+      #     mkdir x64-debug
+      #     cmake .. -G Ninja --preset x64-debug 
       #
       #- name: Build Performous
       #  id: build_performous_x64
