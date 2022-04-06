@@ -25,7 +25,6 @@ jobs:
   create_release:
     name: Create the release all builds will post to
     runs-on: ubuntu-latest
-    if: ${{ github.event_name != 'pull_request' }}
     # Make sure the output variable for this step is set so it
     # can be consumed by later build steps
     outputs:
