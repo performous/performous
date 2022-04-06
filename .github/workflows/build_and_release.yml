@@ -6,7 +6,6 @@ on:
   push:
     branches:
       - master
-      - fake-master
       - github-actions
     tags:
       - '[0-9]+\.[0-9]+\.[0-9]+'
@@ -23,6 +22,7 @@ env:
 jobs:
   # Set up a release that packages will be published to.
   create_release:
+    if: ${{ false }}
     name: Create the release all builds will post to
     runs-on: ubuntu-latest
     # Make sure the output variable for this step is set so it
@@ -44,12 +44,26 @@ jobs:
           draft: true
           prerelease: true
 
+  Update_PR_With_Artifacts:
+    needs:
+      - Linux_Packages
+      #- MacOS_Packages
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
+    steps:
+      - name: Update PR with Artifact URL
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            "Artifacts produced during this build can be found at the bottom of this page: https://github.com/ooshlablu/performous/actions/runs/${{ github.run_id }}"
+
   # Create the Linux Packages
   # This is done in containers provided by
   # https://github.com/performous/performous-docker since
   # github actions provides only Ubuntu
   Linux_Packages:
-    if: ${{ false }}  # disable for now
+    #if: ${{ false }}  # disable for now
     # The upload step needs the release to be created first so it
     # can access the upload_url output
     needs: create_release
@@ -117,6 +131,14 @@ jobs:
           echo "ARTIFACT_PATH=${ARTIFACT_PATH}" >> ${GITHUB_ENV}
           echo "ARTIFACT_NAME=${ARTIFACT_NAME}" >> ${GITHUB_ENV} 
 
+      # Upload artifacts during each run"
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.ARTIFACT_PATH }}
+ 
+      # Upload artifacts to releases only during PR events
       - name: Upload release assets
         id: upload_assets
         if: ${{ github.event_name != 'pull_request' }}
@@ -129,56 +151,6 @@ jobs:
           asset_name: ${{ env.ARTIFACT_NAME }}
           asset_content_type: application/octet-stream
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ env.ARTIFACT_NAME }}
-          path: ${{ env.ARTIFACT_PATH }}
-
-
-#      - name: echo value
-#        run: |
-#          echo ${{ github.event.issue.number }}
-#          echo ${{ github.event.pull_request.number }}
-#          echo ${{ github.event.client_payload.checkrunid }}
-#          echo ${{ github.repository }}
-#      - name: comment pr
-#        uses: peter-evans/create-or-update-comment@v1
-#        with:
-#          issue-number: ${{ github.event.pull_request.number }}
-#          body: |
-#            "Artifacts: https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts"
-#            The artifacts url is https://github.com/${{ github.repository }}/suites/${{ steps.getsuiteid.outputs.suiteid }}/artifacts/${{ steps.getartid.outputs.artid }}
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          dd if=/dev/zero of=file.gz bs=1024 count=50
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: file.gz
-          path: file.gz
-
-
-  Update_PR_With_Artifacts:
-    needs: test 
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' }}
-    steps:
-      - name: echo value
-        run: |
-          echo ${{ github.event.issue.number }}
-          echo ${{ github.event.pull_request.number }}
-          echo ${{ github.event.client_payload.checkrunid }}
-          echo ${{ github.repository }}
-      - name: comment pr
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            "Artifacts produced during this build can be found at the bottom of this page: https://github.com/ooshlablu/performous/actions/runs/${{ github.run_id }}#Artifacts"
 
   # Create the MacOS dmg
   MacOS_Packages:
@@ -209,6 +181,12 @@ jobs:
           ./performous-app-build.sh
           echo "ARTIFACT_PATH=$(pwd)/Performous.dmg" >> ${GITHUB_ENV}
 
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Performous.dmg
+          path: ${{ env.ARTIFACT_PATH }}
+
       - name: Upload release assets
         id: upload_assets
         if: ${{ github.event_name != 'pull_request' }}
@@ -221,16 +199,6 @@ jobs:
           asset_name: Performous.dmg
           asset_content_type: application/octet-stream
 
-      - name: Upload PR assets
-        id: upload_pr
-        if: ${{ github.event_name == 'pull_request' }}
-        uses: gavv/pull-request-artifacts@v1.0.0
-        with:
-          commit: ${{ github.event.pull_request.head.sha }}
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts-repo: ooshlablu/performous-artifacts
-          artifacts: |
-            ${{ env.ARTIFACT_PATH }}
 
   Windows_Packages:
     if: ${{ false }}
