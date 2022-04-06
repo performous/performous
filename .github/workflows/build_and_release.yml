@@ -103,10 +103,10 @@ jobs:
             }
             const {owner, repo} = context.repo;
             const run_id = '${{github.run_id}}';
-            #const pull_requests = '${{ toJSON(github.event.pull_request) }}';
-            #if (!pull_requests.length) {
-            #  return core.error("This workflow doesn't match any pull requests!");
-            #}
+            const pull_requests = '${{ toJSON(github.event.workflow_run.pull_requests) }}';
+            if (!pull_requests.length) {
+              return core.error("This workflow doesn't match any pull requests!");
+            }
             const artifacts = await github.paginate(
               github.rest.actions.listWorkflowRunArtifacts, {owner, repo, run_id});
             if (!artifacts.length) {
