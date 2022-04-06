@@ -121,9 +121,9 @@ jobs:
 #              await upsertComment(owner, repo, pr.number,
 #                "nightly-link", body);
 #            }
-  PR_UPDATER:
-    needs:
-      - test
+#  PR_UPDATER:
+#    needs:
+#      - test
 #      - create_release
 #      - Linux_Packages
 #      - MacOS_Packages
