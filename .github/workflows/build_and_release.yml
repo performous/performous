@@ -22,7 +22,7 @@ env:
 jobs:
   # Set up a release that packages will be published to.
   create_release:
-    if: ${{ false }}
+    #if: ${{ false }}
     name: Create the release all builds will post to
     runs-on: ubuntu-latest
     # Make sure the output variable for this step is set so it
