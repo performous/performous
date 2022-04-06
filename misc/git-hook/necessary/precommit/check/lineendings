@@ -1,0 +1,37 @@
+#!/bin/bash
+
+. $GITDIR/hooks/functions.bash
+
+if git rev-parse --verify HEAD >/dev/null 2>&1
+then
+    against=HEAD
+else
+    # Initial commit: diff against an empty tree object
+    against=4b825dc642cb6eb9a060e54bf8d69288fbee4904
+fi
+
+# We should check only added or modified files of these given types for line endings.
+changed_files=$(git diff-index --cached $against | grep -E '([MA]	.*\.(c|cpp|cc|cxx|h|hh)$)' | cut -f 2)
+issue_found=0
+
+IFS=$'\n' # bash specific
+for file in $changed_files
+do
+    result=`cat "$file" | grep -E -n '[[:space:]]$'`
+    
+    if [ -n "$result" ]
+    then
+        echo "file with line ending issue: $file"
+        echo "$result"
+        issue_found=1        
+    else
+        echo "file without issue: $file"
+    fi
+done
+
+if [ $issue_found = 1 ]
+then
+    exit 1
+fi
+
+exit 0
