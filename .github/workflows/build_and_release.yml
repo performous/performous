@@ -103,24 +103,25 @@ jobs:
             }
             const {owner, repo} = context.repo;
             const run_id = '${{github.event.workflow_run.id}}';
-#            const pull_requests = ${{ toJSON(github.event.workflow_run.pull_requests) }};
-#            if (!pull_requests.length) {
-#              return core.error("This workflow doesn't match any pull requests!");
-#            }
-#            const artifacts = await github.paginate(
-#              github.rest.actions.listWorkflowRunArtifacts, {owner, repo, run_id});
-#            if (!artifacts.length) {
-#              return core.error(`No artifacts found`);
-#            }
-#            let body = `Download the artifacts for this pull request:\n`;
-#            for (const art of artifacts) {
-#              body += `\n* [${art.namei}](https://nightly.link/${owner}/${repo}/actions/artifacts/${art.id})`;
-#            }
-#            core.info("Review thread message body:", body);
-#            for (const pr of pull_requests) {
-#              await upsertComment(owner, repo, pr.number,
-#                "nightly-link", body);
-#            }
+            const pull_requests = '${{ toJSON(github.event.workflow_run.pull_requests) }}';
+            if (!pull_requests.length) {
+              return core.error("This workflow doesn't match any pull requests!");
+            }
+            const artifacts = await github.paginate(
+              github.rest.actions.listWorkflowRunArtifacts, {owner, repo, run_id});
+            if (!artifacts.length) {
+              return core.error(`No artifacts found`);
+            }
+            let body = `Download the artifacts for this pull request:\n`;
+            for (const art of artifacts) {
+              body += `\n* [${art.namei}](https://nightly.link/${owner}/${repo}/actions/artifacts/${art.id})`;
+            }
+            core.info("Review thread message body:", body);
+            for (const pr of pull_requests) {
+              await upsertComment(owner, repo, pr.number,
+                "nightly-link", body);
+            }
+
 #  PR_UPDATER:
 #    needs:
 #      - test
