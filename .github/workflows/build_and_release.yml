@@ -72,8 +72,8 @@ jobs:
   # Make this depend on all of the other jobs so it comes last
   # and won't update the PR with a link without artifacts
   Update_PR_With_Artifacts:
-    #needs:
-    #  - test
+    needs:
+      - test
     if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
