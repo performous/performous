@@ -142,7 +142,7 @@ jobs:
 
   # Create the MacOS dmg
   MacOS_Packages:
-    #if: ${{ false }}  # disable for now
+    if: ${{ false }}  # disable for now
     # The upload step needs the release to be created first so it
     # can access the upload_url output
     needs: create_release
