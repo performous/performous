@@ -17,38 +17,63 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-env:
-  WINDOWS_VCPKG_CACHE: "vcpkg_installed"
 jobs:
   # Set up a release that packages will be published to.
   create_release:
     #if: ${{ false }}
-    name: Create the release all builds will post to
+    name: Create the Beta release
     runs-on: ubuntu-latest
     # Make sure the output variable for this step is set so it
     # can be consumed by later build steps
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
+      html_url: ${{ steps.create_release.outputs.html_url }}
     steps:
-      - name: Create the release
-        id: create_release
-        if: ${{ github.event_name != 'pull_request' }}
+      - name: Create the PR release
+        id: create_pr_release
+        if: ${{ github.event_name == 'pull_request' }}
         uses: actions/create-release@v1
         env:
           # This token is automatically generated with each virtual session
           # DO NOT create this in the secrets manager
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.tag }}-beta-${{ github.sha }}
-          release_name: Beta Release ${{ github.tag }}-beta-${{ github.sha }}
-          draft: true
+          tag_name: PR-${{ github.event.pull_request.number }}-${{ github.run_number }}
+          release_name: PR-${{ github.event.pull_request.number }} Artifacts
+          draft: false
           prerelease: true
-    # TO DO Add non-beta release step for tags
+      - name: Create the Beta release
+        id: create_beta_release
+        if: ${{ false && github.event_name != 'pull_request' }}
+        uses: actions/create-release@v1
+        env:
+          # This token is automatically generated with each virtual session
+          # DO NOT create this in the secrets manager
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.tag }}-beta-${{ github.sha }}-${{ github.run_number }}
+          release_name: Beta Release ${{ github.tag }}-beta-${{ github.sha }}-${{ github.run_number }}
+          draft: false
+          prerelease: true
+      - name: Create the Main release
+        id: create_release
+        if: ${{ github.event_name == 'tag' }}
+        uses: actions/create-release@v1
+        env:
+          # This token is automatically generated with each virtual session
+          # DO NOT create this in the secrets manager
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.tag }}
+          release_name: Release ${{ github.tag }}
+          draft: true
+          prerelease: false
 
   # Make this depend on all of the other jobs so it comes last
   # and won't update the PR with a link without artifacts
   Update_PR_With_Artifacts:
     needs:
+      - create_release
       - Linux_Packages
       - MacOS_Packages
       #- Windows_Packages
@@ -60,13 +85,14 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            Artifacts produced during this build can be found at the bottom of this page https://github.com/ooshlablu/performous/actions/runs/${{ github.run_id }}
+            Artifacts produced during this build can be found at the bottom of this page https://github.com/ooshlablu/performous/actions/runs/${{ steps.create_release.outputs.html_url }}
 
   # Create the Linux Packages
   # This is done in containers provided by
   # https://github.com/performous/performous-docker since
   # github actions provides only Ubuntu
   Linux_Packages:
+    if: ${{ false }}
     #if: ${{ false }}  # disable for now
     # The upload step needs the release to be created first so it
     # can access the upload_url output
@@ -145,7 +171,7 @@ jobs:
       # Upload artifacts to releases only during PR events
       - name: Upload release assets
         id: upload_assets
-        if: ${{ github.event_name != 'pull_request' }}
+#        if: ${{ githubi.event_name != 'pull_request' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -158,6 +184,7 @@ jobs:
 
   # Create the MacOS dmg
   MacOS_Packages:
+    if: ${{ false }}
     #if: ${{ false }}  # disable for now
     # The upload step needs the release to be created first so it
     # can access the upload_url output
@@ -193,7 +220,7 @@ jobs:
 
       - name: Upload release assets
         id: upload_assets
-        if: ${{ github.event_name != 'pull_request' }}
+#        if: ${{ github.event_name != 'pull_request' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -205,7 +232,6 @@ jobs:
 
 
   Windows_Packages:
-    if: ${{ false }}
     needs: create_release
     runs-on: windows-latest
     steps:
@@ -213,9 +239,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: recursive
-
-      - uses: seanmiddleditch/gha-setup-ninja@master
       
+      - uses: ilammy/msvc-dev-cmd@v1.4.1
+
+      - uses: seanmiddleditch/gha-setup-ninja@master      
+    
       #- name: Extract a zip and populate cache
       #  run: |
       #     mkdir build
@@ -224,7 +252,7 @@ jobs:
       #     cd x64-debug
       #     Invoke-WebRequest -OutFile vcpkg_installed.zip -Uri https://asgardsings.nl/vcpkg_installed.zip
       #     7z x vcpkg_installed.zip
-      #
+      
       - name: Cache vcpkg compiled binaries
         uses: actions/cache@v3
         env:
@@ -235,30 +263,35 @@ jobs:
 
       - name: Restore dependencies
         id: restore_dependencies-x64
+        continue-on-error: true
+        env:
+          VCPKG_FEATURE_FLAGS: binarycaching,versions
+          VCPKG_BINARY_SOURCES: 'files,D:/a/performous/performous/build/x64-debug/vcpkg_installed,readwrite'
         run: |
            cd build
+           dir x64-debug\vcpkg_installed
            cmake .. -G Ninja --preset x64-debug
-      
-      - name: Build Performous
-        id: build_performous_x64
-        run: |
-           cmake --build x64-debug
-           
-      - name: Create Installer
-        id: package_performous_x64
-        run: |
-           cd x64-release
-           cpack -G NSIS x64-release
-           set ARTIFACT_PATH="${CPACK_BUILD_SOURCE_DIRS}/${CPACK_PACKAGE_FILE_NAME}.exe" >> ${GITHUB_ENV}
-           set ARTIFACT_FILENAME="${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}.exe" >> ${GITHUB_ENV}
-
-      - name: Upload release assets
-        id: upload_assets
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: ${{ env.ARTIFACT_PATH }}
-          asset_name: ${{ env.ARTIFACT_FILENAME }}
-          asset_content_type: application/octet-stream
+      #
+      #- name: Build Performous
+      #  id: build_performous_x64
+      #  run: |
+      #     cmake --build x64-debug
+      #     
+      #- name: Create Installer
+      #  id: package_performous_x64
+      #  run: |
+      #     cd x64-debug
+      #     cpack -G NSIS x64-release
+      #     set ARTIFACT_PATH="${CPACK_BUILD_SOURCE_DIRS}/${CPACK_PACKAGE_FILE_NAME}.exe" >> ${GITHUB_ENV}
+      #     set ARTIFACT_FILENAME="${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}.exe" >> ${GITHUB_ENV}
+      #
+      #- name: Upload release assets
+      #  id: upload_assets
+      #  uses: actions/upload-release-asset@v1
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #  with:
+      #    upload_url: ${{ needs.create_release.outputs.upload_url }}
+      #    asset_path: ${{ env.ARTIFACT_PATH }}
+      #    asset_name: ${{ env.ARTIFACT_FILENAME }}
+      #    asset_content_type: application/octet-stream
