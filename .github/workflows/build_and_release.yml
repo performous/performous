@@ -9,7 +9,6 @@ on:
       - fake-master
       - github-actions
     pull_request:
-      branches: 
         - '**'
     tags:
       - '[0-9]+\.[0-9]+\.[0-9]+'
