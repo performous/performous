@@ -59,7 +59,7 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             Artifacts produced during this build can be found at the bottom of this page
-  https://github.com/ooshlablu/performous/actions/runs/${{ github.run_id }}
+  [](https://github.com/ooshlablu/performous/actions/runs/${{ github.run_id }})
 
   # Create the Linux Packages
   # This is done in containers provided by
