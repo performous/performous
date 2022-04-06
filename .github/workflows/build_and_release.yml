@@ -96,13 +96,13 @@ jobs:
                   body,
                   comment_id: last.id,
                 });
-#              } else {
-#                core.info(`Creating a comment in issue / PR ${issue_number}`);
-#                await github.rest.issues.createComment({issue_number, body, owner, repo});
-#              }
-#            }
-#            const {owner, repo} = context.repo;
-#            const run_id = ${{github.event.workflow_run.id}};
+              } else {
+                core.info(`Creating a comment in issue / PR ${issue_number}`);
+                await github.rest.issues.createComment({issue_number, body, owner, repo});
+              }
+            }
+            const {owner, repo} = context.repo;
+            const run_id = ${{github.event.workflow_run.id}};
 #            const pull_requests = ${{ toJSON(github.event.workflow_run.pull_requests) }};
 #            if (!pull_requests.length) {
 #              return core.error("This workflow doesn't match any pull requests!");
