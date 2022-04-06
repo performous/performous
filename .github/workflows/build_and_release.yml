@@ -153,6 +153,7 @@ jobs:
     needs: Linux_Packages
     runs-on: ubuntu-latest
     if: ${{ github.event.pull_request.number }}
+    steps:
       - name: echo value
         run: |
           echo ${{ github.event.issue.number }}
