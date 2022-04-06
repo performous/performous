@@ -97,7 +97,7 @@ jobs:
                   comment_id: last.id,
                 });
               } else {
-                core.info(`Creating a comment in issue / PR ${issue_number}`);
+                core.info(`Creating a comment in issue / PR #${issue_number}`);
                 await github.rest.issues.createComment({issue_number, body, owner, repo});
               }
             }
@@ -112,17 +112,15 @@ jobs:
             if (!artifacts.length) {
               return core.error(`No artifacts found`);
             }
-            let body = `Artifacts produced by this Pull Request:\n`;
+            let body = `Download the artifacts for this pull request:\n`;
             for (const art of artifacts) {
-              body += `\n* [${art.name}](https://nightly.link/${owner}/${repo}/actions/artifacts/${art.id})`;
+              body += `\n* [${art.namei}](https://nightly.link/${owner}/${repo}/actions/artifacts/${art.id})`;
             }
-            body += `(These artifacts will only be available for 90 days.);
             core.info("Review thread message body:", body);
             for (const pr of pull_requests) {
               await upsertComment(owner, repo, pr.number,
                 "nightly-link", body);
             }
-
 #    needs:
 #      - create_release
 #      - Linux_Packages
