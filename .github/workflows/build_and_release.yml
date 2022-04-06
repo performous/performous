@@ -44,10 +44,12 @@ jobs:
           draft: true
           prerelease: true
 
+  # Make this depend on all of the other jobs so it comes last
+  # and won't update the PR with a link without artifacts
   Update_PR_With_Artifacts:
     needs:
       - Linux_Packages
-      #- MacOS_Packages
+      - MacOS_Packages
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' }}
     steps:
@@ -55,8 +57,7 @@ jobs:
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            "Artifacts produced during this build can be found at the bottom of this page: https://github.com/ooshlablu/performous/actions/runs/${{ github.run_id }}"
+          body: Artifacts produced during this build can be found at the bottom of this page: https://github.com/ooshlablu/performous/actions/runs/${{ github.run_id }}
 
   # Create the Linux Packages
   # This is done in containers provided by
@@ -154,7 +155,7 @@ jobs:
 
   # Create the MacOS dmg
   MacOS_Packages:
-    if: ${{ false }}  # disable for now
+    #if: ${{ false }}  # disable for now
     # The upload step needs the release to be created first so it
     # can access the upload_url output
     needs: create_release
