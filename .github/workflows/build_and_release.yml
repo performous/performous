@@ -129,18 +129,6 @@ jobs:
           asset_name: ${{ env.ARTIFACT_NAME }}
           asset_content_type: application/octet-stream
 
-#      - name: Upload PR assets
-#        id: upload_pr
-#        if: ${{ github.event_name == 'pull_request' }}
-#        uses: gavv/pull-request-artifacts@v1.0.0
-#        with:
-#          commit: ${{ github.event.pull_request.head.sha }}
-#          repo-token: ${{ secrets.GITHUB_TOKEN }}
-#          artifacts-token: ${{ secrets.GITHUB_TOKEN }}
-#          artifacts-repo: ooshlablu/performous-artifacts
-#          artifacts: |
-#            ${{ env.ARTIFACT_PATH }}
-
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
@@ -148,17 +136,35 @@ jobs:
           path: ${{ env.ARTIFACT_PATH }}
 
 
+#      - name: echo value
+#        run: |
+#          echo ${{ github.event.issue.number }}
+#          echo ${{ github.event.pull_request.number }}
+#          echo ${{ github.event.client_payload.checkrunid }}
+#          echo ${{ github.repository }}
+#      - name: comment pr
+#        uses: peter-evans/create-or-update-comment@v1
+#        with:
+#          issue-number: ${{ github.event.pull_request.number }}
+#          body: |
+#            "Artifacts: https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts"
+#            The artifacts url is https://github.com/${{ github.repository }}/suites/${{ steps.getsuiteid.outputs.suiteid }}/artifacts/${{ steps.getartid.outputs.artid }}
+  Update_PR_With_Artifacts:
+    needs: Linux_Packages
+    runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.number }}
       - name: echo value
         run: |
           echo ${{ github.event.issue.number }}
           echo ${{ github.event.pull_request.number }}
+          echo ${{ github.event.client_payload.checkrunid }}
+          echo ${{ github.repository }}
       - name: comment pr
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            "Artifacts: https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.event.client_payload.checkrunid }}/artifacts"
-#            The artifacts url is https://github.com/${{ github.repository }}/suites/${{ steps.getsuiteid.outputs.suiteid }}/artifacts/${{ steps.getartid.outputs.artid }}
+            "Artifacts: https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts"
 
   # Create the MacOS dmg
   MacOS_Packages:
