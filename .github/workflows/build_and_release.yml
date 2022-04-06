@@ -39,10 +39,11 @@ jobs:
           # DO NOT create this in the secrets manager
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.sha }}
-          release_name: Release ${{ github.sha }}
+          tag_name: ${{ github.tag }}-beta-${{ github.sha }}
+          release_name: Beta Release ${{ github.tag }}-beta-${{ github.sha }}
           draft: true
           prerelease: true
+    # TO DO Add non-beta release step for tags
 
   # Make this depend on all of the other jobs so it comes last
   # and won't update the PR with a link without artifacts
@@ -50,6 +51,7 @@ jobs:
     needs:
       - Linux_Packages
       - MacOS_Packages
+      #- Windows_Packages
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' }}
     steps:
@@ -133,7 +135,7 @@ jobs:
           echo "ARTIFACT_PATH=${ARTIFACT_PATH}" >> ${GITHUB_ENV}
           echo "ARTIFACT_NAME=${ARTIFACT_NAME}" >> ${GITHUB_ENV} 
 
-      # Upload artifacts during each run"
+      # Upload artifacts during each run
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
@@ -183,7 +185,7 @@ jobs:
           ./performous-app-build.sh
           echo "ARTIFACT_PATH=$(pwd)/Performous.dmg" >> ${GITHUB_ENV}
 
-      - name: Upload artifact
+      - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: Performous.dmg
