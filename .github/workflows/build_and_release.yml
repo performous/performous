@@ -116,7 +116,7 @@ jobs:
             for (const art of artifacts) {
               body += `\n* [${art.name}](https://nightly.link/${owner}/${repo}/actions/artifacts/${art.id})`;
             }
-            body += `(These artifacts will only be available for 90 days.)
+            body += `(These artifacts will only be available for 90 days.);
             core.info("Review thread message body:", body);
             for (const pr of pull_requests) {
               await upsertComment(owner, repo, pr.number,
