@@ -7,7 +7,7 @@ jobs:
   see_some_things:
     runs-on: ubuntu-latest
     steps:
-      run: |
+      - run: |
         echo ${{github.event.workflow_run.id}}
         echo ${{ toJSON(github.event.workflow_run.pull_requests) }}
   pr_comment:
