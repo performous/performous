@@ -137,7 +137,7 @@ jobs:
           commit: ${{ github.event.pull_request.head.sha }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           artifacts: |
-            - ${{ env.ARTIFACT_PATH }}
+            ${{ env.ARTIFACT_PATH }}
 
   # Create the MacOS dmg
   MacOS_Packages:
