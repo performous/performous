@@ -136,7 +136,7 @@ jobs:
         with:
           commit: ${{ github.event.pull_request.head.sha }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          repo: ooshlablu/performous-artifacts
+          artifacts-repo: ooshlablu/performous-artifacts
           artifacts: |
             ${{ env.ARTIFACT_PATH }}
 
@@ -188,7 +188,7 @@ jobs:
         with:
           commit: ${{ github.event.pull_request.head.sha }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          repo: ooshlablu/performous-artifacts
+          artifacts-repo: ooshlablu/performous-artifacts
           artifacts: |
             ${{ env.ARTIFACT_PATH }}
 
