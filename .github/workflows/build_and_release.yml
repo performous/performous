@@ -49,7 +49,7 @@ jobs:
   # https://github.com/performous/performous-docker since
   # github actions provides only Ubuntu
   Linux_Packages:
-    #if: ${{ false }}  # disable for now
+    if: ${{ false }}  # disable for now
     # The upload step needs the release to be created first so it
     # can access the upload_url output
     needs: create_release
@@ -149,10 +149,23 @@ jobs:
 #          body: |
 #            "Artifacts: https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts"
 #            The artifacts url is https://github.com/${{ github.repository }}/suites/${{ steps.getsuiteid.outputs.suiteid }}/artifacts/${{ steps.getartid.outputs.artid }}
-  Update_PR_With_Artifacts:
-    needs: Linux_Packages
+  test:
     runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.number }}
+    steps:
+      run: |
+        dd if=/dev/zero of=file.gz bs=1024 count=50
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: file.gz
+          path: file.gz
+
+
+  Update_PR_With_Artifacts:
+    needs: test 
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
     steps:
       - name: echo value
         run: |
