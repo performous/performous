@@ -129,17 +129,17 @@ jobs:
           asset_name: ${{ env.ARTIFACT_NAME }}
           asset_content_type: application/octet-stream
 
-      - name: Upload PR assets
-        id: upload_pr
-        if: ${{ github.event_name == 'pull_request' }}
-        uses: gavv/pull-request-artifacts@v1.0.0
-        with:
-          commit: ${{ github.event.pull_request.head.sha }}
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts-token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts-repo: ooshlablu/performous-artifacts
-          artifacts: |
-            ${{ env.ARTIFACT_PATH }}
+#      - name: Upload PR assets
+#        id: upload_pr
+#        if: ${{ github.event_name == 'pull_request' }}
+#        uses: gavv/pull-request-artifacts@v1.0.0
+#        with:
+#          commit: ${{ github.event.pull_request.head.sha }}
+#          repo-token: ${{ secrets.GITHUB_TOKEN }}
+#          artifacts-token: ${{ secrets.GITHUB_TOKEN }}
+#          artifacts-repo: ooshlablu/performous-artifacts
+#          artifacts: |
+#            ${{ env.ARTIFACT_PATH }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
