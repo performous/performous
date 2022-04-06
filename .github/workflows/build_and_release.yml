@@ -153,7 +153,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-        dd if=/dev/zero of=file.gz bs=1024 count=50
+          dd if=/dev/zero of=file.gz bs=1024 count=50
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
