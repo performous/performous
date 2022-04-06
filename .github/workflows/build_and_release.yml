@@ -102,7 +102,7 @@ jobs:
               }
             }
             const {owner, repo} = context.repo;
-            const run_id = ${{github.run_id}};
+            const run_id = '${{needs.test.outputs.run_id}}';
             const pull_requests = "${{ toJSON(github.event.workflow_run.pull_requests) }}";
             if (!pull_requests.length) {
               return core.error("This workflow doesn't match any pull requests!");
@@ -141,6 +141,8 @@ jobs:
   #Dumb test function
   test:
     runs-on: ubuntu-latest
+    outputs:
+      run_id: ${{ github.run_id }}
     steps:
       - run: |
           dd if=/dev/zero of=file.gz bs=1024 count=50
