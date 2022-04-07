@@ -1,6 +1,6 @@
 param([switch]$all, [switch]$clear)
 
-$gitDir = git rev-parse --git-commom-dir
+$gitDir = git rev-parse --git-common-dir
 
 if (!(test-path $gitDir)) 
 {
