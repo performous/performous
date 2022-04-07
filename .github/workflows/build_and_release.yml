@@ -30,7 +30,7 @@ jobs:
     steps:
       - name: Create the Beta release
         id: create_beta_release
-        if: ${{ false && github.event_name != 'pull_request' }}
+        if: ${{ github.event_name != 'pull_request' }}
         uses: actions/create-release@v1
         env:
           # This token is automatically generated with each virtual session
