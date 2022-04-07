@@ -47,7 +47,7 @@ jobs:
             for (const art of artifacts) {
               body += `\n* [${art.name}.zip](https://nightly.link/${owner}/${repo}/actions/artifacts/${art.id}.zip)`;
             }
-            body += `This service is provided by [nightly.link](https://github.com/oprypin/nightly.link)`;
+            body += `\nThis service is provided by [nightly.link](https://github.com/oprypin/nightly.link)`;
             core.info("Review thread message body:", body);
             for (const pr of pull_requests) {
               await upsertComment(owner, repo, pr.number,
