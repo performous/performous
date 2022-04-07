@@ -69,7 +69,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: file.gz
-          path: ${{ ARTIFACT_PATH }}/file.gz
+          path: ${{ env.ARTIFACT_PATH }}/file.gz
 
 
   # Create the Linux Packages
@@ -156,7 +156,7 @@ jobs:
       # Upload artifacts to releases only during PR events
       - name: Upload release assets
         id: upload_assets
-        if: ${{ githubi.event_name != 'pull_request' }}
+        if: ${{ github.event_name != 'pull_request' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
