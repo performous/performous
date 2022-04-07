@@ -20,8 +20,7 @@ on:
 jobs:
   # Set up a release that packages will be published to.
   create_release:
-    #if: ${{ false }}
-    name: Create the Beta release
+    name: Create a release
     runs-on: ubuntu-latest
     # Make sure the output variable for this step is set so it
     # can be consumed by later build steps
@@ -29,19 +28,6 @@ jobs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
       html_url: ${{ steps.create_release.outputs.html_url }}
     steps:
-      - name: Create the PR release
-        id: create_pr_release
-        if: ${{ false && github.event_name == 'pull_request' }}
-        uses: actions/create-release@v1
-        env:
-          # This token is automatically generated with each virtual session
-          # DO NOT create this in the secrets manager
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: PR-${{ github.event.pull_request.number }}-${{ github.run_number }}
-          release_name: PR-${{ github.event.pull_request.number }} Artifacts
-          draft: false
-          prerelease: true
       - name: Create the Beta release
         id: create_beta_release
         if: ${{ false && github.event_name != 'pull_request' }}
@@ -51,8 +37,8 @@ jobs:
           # DO NOT create this in the secrets manager
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.tag }}-beta-${{ github.sha }}-${{ github.run_number }}
-          release_name: Beta Release ${{ github.tag }}-beta-${{ github.sha }}-${{ github.run_number }}
+          tag_name: 1.2.0-beta-${{ github.sha }}-${{ github.run_number }}
+          release_name: Beta Release 1.2.0-beta-${{ github.sha }}-${{ github.run_number }}
           draft: false
           prerelease: true
       - name: Create the Main release
@@ -69,93 +55,21 @@ jobs:
           draft: true
           prerelease: false
 
-  # Make this depend on all of the other jobs so it comes last
-  # and won't update the PR with a link without artifacts
-#  Update_PR_With_Artifacts:
-#    needs:
-#      - test
-#    #if: github.event_name == 'pull_request'
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/github-script@v5
-#        with:
-#          # This snippet is public-domain, taken from
-#          # https://github.com/oprypin/nightly.link/blob/master/.github/workflows/pr-comment.yml
-#          script: |
-#            async function upsertComment(owner, repo, issue_number, purpose, body) {
-#              const {data: comments} = await github.rest.issues.listComments(
-#                {owner, repo, issue_number});
-#              const marker = `<!-- bot: ${purpose} -->`;
-#              body = marker + "\n" + body;
-#              const existing = comments.filter((c) => c.body.includes(marker));
-#              if (existing.length > 0) {
-#                const last = existing[existing.length - 1];
-#                core.info(`Updating comment ${last.id}`);
-#                await github.rest.issues.updateComment({
-#                  owner, repo,
-#                  body,
-#                  comment_id: last.id,
-#                });
-#              } else {
-#                core.info(`Creating a comment in issue / PR ${issue_number}`);
-#                await github.rest.issues.createComment({issue_number, body, owner, repo});
-#              }
-#            }
-#            const {owner, repo} = context.repo;
-#            const run_id = '${{github.run_id}}';
-#            const pull_requests = "${{ toJSON(github.event.workflow_run.pull_requests) }}";
-#            if (!pull_requests.length) {
-#              return core.error("This workflow doesn't match any pull requests!");
-#            }
-#            const artifacts = await github.paginate(
-#              github.rest.actions.listWorkflowRunArtifacts, {owner, repo, run_id});
-#            if (!artifacts.length) {
-#              return core.error(`No artifacts found`);
-#            }
-#            let body = `Download the artifacts for this pull request:\n`;
-#            for (const art of artifacts) {
-#              body += `\n* [${art.name}](https://nightly.link/${owner}/${repo}/actions/artifacts/${art.id})`;
-#
-#            }
-#            core.info("Review thread message body:", body);
-#            for (const pr of pull_requests) {
-#              await upsertComment(owner, repo, pr.number,
-#                "nightly-link", body);
-#            }
 
-#  PR_UPDATER:
-#    needs:
-#      - test
-#      - create_release
-#      - Linux_Packages
-#      - MacOS_Packages
-#      #- Windows_Packages
-#    runs-on: ubuntu-latesti
-#    if: ${{ github.event_name == 'pull_request' }}
-#    steps:
-#      - name: Update PR with Artifact URL
-#        uses: peter-evans/create-or-update-comment@v1
-#        with:
-#          issue-number: ${{ github.event.pull_request.number }}
-#          body: |
-#            Artifacts produced during this build can be found at the bottom of this page https://github.com/ooshlablu/performous/actions/runs/${{ steps.create_release.outputs.html_url }}
   #Dumb test function
   test:
+    if: ${{ false }} 
     runs-on: ubuntu-latest
-    outputs:
-      run_id: ${{ github.run_id }}
     steps:
       - run: |
           dd if=/dev/zero of=file.gz bs=1024 count=50
-          echo "CURRENT_DIR=$(pwd)" >> ${GITHUB_ENV}
-          echo ${{ github.run_id }}
+          echo "ARTIFACT_PATH=$(pwd)" >> ${GITHUB_ENV}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: file.gz
-          path: ${{ env.CURRENT_DIR }}/file.gz
-
+          path: ${{ ARTIFACT_PATH }}/file.gz
 
 
   # Create the Linux Packages
@@ -163,7 +77,7 @@ jobs:
   # https://github.com/performous/performous-docker since
   # github actions provides only Ubuntu
   Linux_Packages:
-    if: ${{ false }}
+    #if: ${{ false }}
     #if: ${{ false }}  # disable for now
     # The upload step needs the release to be created first so it
     # can access the upload_url output
@@ -242,7 +156,7 @@ jobs:
       # Upload artifacts to releases only during PR events
       - name: Upload release assets
         id: upload_assets
-#        if: ${{ githubi.event_name != 'pull_request' }}
+        if: ${{ githubi.event_name != 'pull_request' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -255,7 +169,7 @@ jobs:
 
   # Create the MacOS dmg
   MacOS_Packages:
-    if: ${{ false }}
+    #if: ${{ false }}
     #if: ${{ false }}  # disable for now
     # The upload step needs the release to be created first so it
     # can access the upload_url output
@@ -291,7 +205,7 @@ jobs:
 
       - name: Upload release assets
         id: upload_assets
-#        if: ${{ github.event_name != 'pull_request' }}
+        if: ${{ github.event_name != 'pull_request' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -380,4 +294,3 @@ jobs:
       #    asset_path: ${{ env.ARTIFACT_PATH }}
       #    asset_name: ${{ env.ARTIFACT_FILENAME }}
       #    asset_content_type: application/octet-stream
-
