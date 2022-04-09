@@ -7,59 +7,63 @@
 
 #include <algorithm>
 #include <limits>
+#include <optional>
 
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
 }
 
+template <typename T> std::optional<T> getJsonEntry(nlohmann::json const& json, const char *name) {
+        if (json.count(name) > 0) return json.at(name).get<T>();
+        return {};
+}
+
 Song::Song(nlohmann::json const& song): dummyVocal(TrackName::LEAD_VOCAL), randomIdx(rand()) {
-	path = song.count("txtFileFolder") > 0 ? fs::path(song.at("txtFileFolder").get<std::string>()) : "";
-	filename = song.count("txtFile") > 0 ? fs::path(song.at("txtFile").get<std::string>()) : "";
-	artist = song.count("artist") > 0 ? song.at("artist").get<std::string>() : "";
-	title = song.count("title") > 0 ? song.at("title").get<std::string>() : "";
-	language = song.count("language") > 0 ? song.at("language").get<std::string>() : "";
-	edition = song.count("edition") > 0 ? song.at("edition").get<std::string>() : "";
-	creator = song.count("creator") > 0 ? song.at("creator").get<std::string>() : "";
-	genre = song.count("genre") > 0 ? song.at("genre").get<std::string>() : "";
-	cover = song.count("cover") > 0 ? song.at("cover").get<std::string>() : "";
-	background = song.count("background") > 0 ? song.at("background").get<std::string>() : "";
-	video = song.count("videoFile") > 0 ? fs::path(song.at("videoFile").get<std::string>()) : "";
-	midifilename = song.count("midiFile") > 0 ? fs::path(song.at("midiFile").get<std::string>()) : "";
-	videoGap = song.count("videoGap") > 0 ? song.at("videoGap").get<double>() : 0.0;
-	start = song.count("start") > 0 ? song.at("start").get<double>() : 0.0;
-	preview_start = song.count("previewStart") > 0 ? song.at("previewStart").get<double>() : 0.0;
-	m_duration = song.count("duration") > 0 ? song.at("duration").get<double>() : 0.0;
-	music[TrackName::BGMUSIC] = song.count("songFile") > 0 ? fs::path(song.at("songFile").get<std::string>()) : "";
-	music[TrackName::LEAD_VOCAL] = song.count("vocals") > 0 ? fs::path(song.at("vocals").get<std::string>()) : "";
-	music[TrackName::PREVIEW] = song.count("preview") > 0 ? fs::path(song.at("preview").get<std::string>()) : "";
-	music[TrackName::GUITAR] = song.count("guitar") > 0 ? fs::path(song.at("guitar").get<std::string>()) : "";
-	music[TrackName::BASS] = song.count("bass") > 0 ? fs::path(song.at("bass").get<std::string>()) : "";
-	music[TrackName::DRUMS] = song.count("drums") > 0 ? fs::path(song.at("drums").get<std::string>()) : "";
-	music[TrackName::KEYBOARD] = song.count("keyboard") > 0 ? fs::path(song.at("keyboard").get<std::string>()) : "";
-	music[TrackName::GUITAR_COOP] = song.count("guitarCoop") > 0 ? fs::path(song.at("guitarCoop").get<std::string>()) : "";
-	music[TrackName::GUITAR_RHYTHM] = song.count("guitarRhythm") > 0 ? fs::path(song.at("guitarRhythm").get<std::string>()) : "";
+	path = getJsonEntry<std::string>(song, "txtFileFolder").value_or("");
+	filename = getJsonEntry<std::string>(song, "txtFile").value_or("");
+	artist = getJsonEntry<std::string>(song, "artist").value_or("");
+	title = getJsonEntry<std::string>(song, "title").value_or("");
+	language = getJsonEntry<std::string>(song, "language").value_or("");
+	edition = getJsonEntry<std::string>(song, "edition").value_or("");
+	creator = getJsonEntry<std::string>(song, "creator").value_or("");
+	genre = getJsonEntry<std::string>(song, "genre").value_or("");
+	cover = getJsonEntry<std::string>(song, "cover").value_or("");
+	background = getJsonEntry<std::string>(song, "background").value_or("");
+	video = getJsonEntry<std::string>(song, "videoFile").value_or("");
+	midifilename = getJsonEntry<std::string>(song, "midiFile").value_or("");
+	videoGap = getJsonEntry<double>(song, "videoGap").value_or(0.0);
+	start = getJsonEntry<double>(song, "start").value_or(0.0);
+	preview_start = getJsonEntry<double>(song, "previewStart").value_or(0.0);
+	m_duration = getJsonEntry<double>(song, "duration").value_or(0.0);
+	music[TrackName::BGMUSIC] = getJsonEntry<std::string>(song, "songFile").value_or("");
+	music[TrackName::LEAD_VOCAL] = getJsonEntry<std::string>(song, "vocals").value_or("");
+	music[TrackName::PREVIEW] = getJsonEntry<std::string>(song, "preview").value_or("");
+	music[TrackName::GUITAR] = getJsonEntry<std::string>(song, "guitar").value_or("");
+	music[TrackName::BASS] = getJsonEntry<std::string>(song, "bass").value_or("");
+	music[TrackName::DRUMS] = getJsonEntry<std::string>(song, "drums").value_or("");
+	music[TrackName::KEYBOARD] = getJsonEntry<std::string>(song, "keyboard").value_or("");
+	music[TrackName::GUITAR_COOP] = getJsonEntry<std::string>(song, "guitarCoop").value_or("");
+	music[TrackName::GUITAR_RHYTHM] = getJsonEntry<std::string>(song, "guitarRhythm").value_or("");
 	loadStatus = Song::LoadStatus::HEADER;
 
-	if (song.count("vocalTracks") > 0) {
-		for (size_t i = 0; i < song.at("vocalTracks").get<size_t>(); i++) {
-			std::string track = "DummyTrack" + std::to_string(i);
-			insertVocalTrack(track, VocalTrack(track));
-		}
+	for (size_t i = 0; i < getJsonEntry<size_t>(song, "vocalTracks").value_or(0); i++) {
+		std::string track = "DummyTrack" + std::to_string(i);
+		insertVocalTrack(track, VocalTrack(track));
 	}
 
-	if (song.count("keyboardTracks") > 0 && song.at("keyboardTracks").get<bool>()) {
+	if (getJsonEntry<bool>(song, "keyboardTracks").value_or(false)) {
 		instrumentTracks.insert(make_pair(TrackName::KEYBOARD, InstrumentTrack(TrackName::KEYBOARD)));
 	}
 
-	if (song.count("drumTracks") > 0 && song.at("drumTracks").get<bool>()) {
+	if (getJsonEntry<bool>(song, "drumTracks").value_or(false)) {
 		instrumentTracks.insert(make_pair(TrackName::DRUMS, InstrumentTrack(TrackName::DRUMS)));
 	}
-	if (song.count("danceTracks") > 0 && song.at("danceTracks").get<bool>()) {
+	if (getJsonEntry<bool>(song, "danceTracks").value_or(false)) {
 		DanceDifficultyMap danceDifficultyMap;
 		danceTracks.insert(std::make_pair("dance-single", danceDifficultyMap));
 	}
-	if (song.count("guitarTracks") > 0 && song.at("guitarTracks").get<bool>()) {
+	if (getJsonEntry<bool>(song, "guitarTracks").value_or(false)) {
 		instrumentTracks.insert(std::make_pair(TrackName::GUITAR, InstrumentTrack(TrackName::GUITAR)));
 	}
 	if (song.count("bpm") > 0) {
