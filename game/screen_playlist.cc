@@ -278,7 +278,7 @@ void ScreenPlaylist::draw_menu_options() {
 			if (opt.type == MenuOption::Type::CHANGE_VALUE) {
 				++ii; // Use a slot for the value
 				theme->option_selected.dimensions.left(x + sel_margin).center(-0.1 + (selanim+1)*0.08);
-				theme->option_selected.draw("<  " + opt.value->getValue() + "  >");
+				theme->option_selected.draw("<  " + opt.value->toString() + "  >");
 			}
 
 		// Regular option (not selected)

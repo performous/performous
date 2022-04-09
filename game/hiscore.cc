@@ -8,7 +8,7 @@
 #include <sstream>
 #include <stdexcept>
 
-bool Hiscore::reachedHiscore(unsigned score, unsigned songid, unsigned level, std::string const& track) const {
+bool Hiscore::reachedHiscore(unsigned score, unsigned songid, const std::string &level, std::string const& track) const {
 	if (score > 10000) throw std::logic_error("Invalid score value");
 	if (score < 2000) return false; // come on, did you even try to sing?
 
@@ -23,7 +23,7 @@ bool Hiscore::reachedHiscore(unsigned score, unsigned songid, unsigned level, st
 	return true; // nothing found for that song -> true
 }
 
-void Hiscore::addHiscore(unsigned score, unsigned playerid, unsigned songid, unsigned level, std::string const& track) {
+void Hiscore::addHiscore(unsigned score, unsigned playerid, unsigned songid, const std::string &level, std::string const& track) {
 	if (track.empty()) throw std::runtime_error("No track given");
 	if (!reachedHiscore(score, songid, level, track)) return;
 	m_hiscore.insert(HiscoreItem(score, playerid, songid, level, track));
@@ -61,9 +61,9 @@ void Hiscore::load(xmlpp::NodeSet const& nodes) {
 
 		int playerid = std::stoi(a_playerid->get_value());
 		int songid = std::stoi(a_songid->get_value());
-		unsigned level = 0;
+		std::string level;
 		if (a_level)
-			level = std::stoi(a_level->get_value());
+			level = a_level->get_value();
 
 		auto tn = xmlpp::get_first_child_text(element);
 		if (!tn) throw std::runtime_error("Score not found");
@@ -79,11 +79,11 @@ void Hiscore::save(xmlpp::Element *hiscores) {
 		hiscore->set_attribute("playerid", std::to_string(h.playerid));
 		hiscore->set_attribute("songid", std::to_string(h.songid));
 		hiscore->set_attribute("track", h.track);
-		hiscore->set_attribute("level", std::to_string(h.level));
+		hiscore->set_attribute("level", h.level);
 		hiscore->add_child_text(std::to_string(h.score));
 	}
 }
 
-unsigned Hiscore::currentLevel() const {
-	return config["game/difficulty"].i();
+std::string Hiscore::currentLevel() const {
+	return config["game/difficulty"].getEnumName();
 }

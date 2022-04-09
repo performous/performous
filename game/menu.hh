@@ -44,7 +44,7 @@ public:
 	/// Make the option open a submenu
 	void submenu(MenuOptions opts) { type = Type::OPEN_SUBMENU; options = std::move(opts); }
 	/// Make the option activate a screeen
-	void screen(std::string const& scrn) { type = Type::ACTIVATE_SCREEN; newValue = scrn; }
+	void screen(std::string const& scrn) { type = Type::ACTIVATE_SCREEN; newValue = ConfigItem(scrn); }
 	/// Make the option call a callback
 	void call(MenuOptionCallback f) { type = Type::CALLBACK_FUNCTION; callback = f; }
 	/// Sets name to follow a reference

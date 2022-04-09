@@ -81,7 +81,7 @@ static void checkEvents(Game& gm, Time eventTime) {
 			// Adjust value
 			if (nav == input::NavButton::VOLUME_UP) ++config[which_vol]; else --config[which_vol];
 			// Show message
-			gm.flashMessage(config[which_vol].getShortDesc() + ": " + config[which_vol].getValue());
+			gm.flashMessage(config[which_vol].getShortDesc() + ": " + config[which_vol].toString());
 			continue; // Already handled here...
 		}
 		// If a dialog is open, any nav event will close it

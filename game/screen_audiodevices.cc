@@ -21,7 +21,7 @@ namespace {
 }
 
 int getBackend() {
-	static std::string selectedBackend = Audio::backendConfig().getValue();
+	static std::string selectedBackend = Audio::backendConfig().getEnumName();
 	return PaHostApiNameToHostApiTypeId(selectedBackend);
 }
 
@@ -191,8 +191,6 @@ bool ScreenAudioDevices::save(bool skip_ui_config) {
 		config["audio/devices"].sl() = devconf;
 	}
 	writeConfig(false); // Save the new config
-	m_audio.restart(); // Reload audio to take the new settings into use
-	m_audio.playMusic(findFile("menu.ogg"), true); // Start music again
 	// Check that all went well
 	bool ret = verify();
 	if (!ret) Game::getSingletonPtr()->dialog(_("Some devices failed to open!"));

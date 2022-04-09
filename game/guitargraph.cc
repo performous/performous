@@ -154,8 +154,8 @@ void GuitarGraph::setupJoinMenuDifficulty() {
 	auto maxLevel = to_underlying(Difficulty::COUNT);
 	for (int level = 0; level < maxLevel; ++level) {
 		if (difficulty(Difficulty(level), true)) {
-			ol.push_back(std::to_string(level));
-			if (Difficulty(level) == m_level) cur = ol.size()-1;
+			ol.options.push_back(std::to_string(level));
+			if (Difficulty(level) == m_level) cur = ol.options.size()-1;
 		}
 	}
 	m_selectedDifficulty = ConfigItem(ol); // Create a ConfigItem from the option list
@@ -175,8 +175,8 @@ void GuitarGraph::setupJoinMenuGuitar() {
 	int cur = 0;
 	// Add tracks to option list
 	for (InstrumentTracksConstPtr::const_iterator it = m_instrumentTracks.begin(); it != m_instrumentTracks.end(); ++it) {
-		ol.push_back(it->first);
-		if (m_track_index->first == it->first) cur = ol.size()-1; // Find the index of current track
+		ol.options.push_back(it->first);
+		if (m_track_index->first == it->first) cur = ol.options.size()-1; // Find the index of current track
 	}
 	m_selectedTrack = ConfigItem(ol); // Create a ConfigItem from the option list
 	m_selectedTrack.select(cur); // Set the selection to current track

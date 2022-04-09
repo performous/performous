@@ -8,9 +8,10 @@
 
 /// This struct holds together information for a single item of a highscore.
 struct HiscoreItem {
-	unsigned score, playerid, songid, level;
+	unsigned score, playerid, songid;
+        std::string level;
 	std::string track;
-	HiscoreItem(unsigned score, unsigned playerid, unsigned songid, unsigned level, std::string const& track):
+	HiscoreItem(unsigned score, unsigned playerid, unsigned songid, const std::string &level, std::string const& track):
 	  score(score), playerid(playerid), songid(songid), level(level), track(track) {}
 	/// Operator for sorting by score. Reverse order, so that highest is first!
 	bool operator<(HiscoreItem const& other) const { return other.score < score; }
@@ -31,7 +32,7 @@ public:
 	  @return true if the score make it into the list
 	  @return false if addNewHiscore does not make sense for that score.
 	  */
-	bool reachedHiscore(unsigned score, unsigned songid, unsigned level, std::string const& track) const;
+	bool reachedHiscore(unsigned score, unsigned songid, const std::string &level, std::string const& track) const;
 
 	/**Add a specific highscore into the list.
 
@@ -44,7 +45,7 @@ public:
 	  in its valid interval. If one of this conditions is not net a
 	  HiscoreException will be raised.
 	  */
-	void addHiscore(unsigned score, unsigned playerid, unsigned songid, unsigned level, std::string const& track);
+	void addHiscore(unsigned score, unsigned playerid, unsigned songid, const std::string &level, std::string const& track);
 
 	typedef std::vector<HiscoreItem> HiscoreVector;
 
@@ -56,5 +57,5 @@ public:
 private:
 	typedef std::multiset<HiscoreItem> hiscore_t;
 	hiscore_t m_hiscore;
-	unsigned currentLevel() const;
+	std::string currentLevel() const;
 };

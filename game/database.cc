@@ -62,7 +62,7 @@ void Database::addHiscore(std::shared_ptr<Song> s) {
 	int score = scores.front().score;
 	std::string track = scores.front().track;
 	int songid = m_songs.lookup(s);
-	unsigned level = config["game/difficulty"].i();
+	auto level = config["game/difficulty"].getEnumName();
 	m_hiscores.addHiscore(score, playerid, songid, level, track);
 	std::clog << "database/info: Added new hiscore " << score << " points on track " << track << " of songid " << songid << " level "<< level<< std::endl;
 }
@@ -71,7 +71,7 @@ bool Database::reachedHiscore(std::shared_ptr<Song> s) const {
 	int score = scores.front().score;
 	std::string track = scores.front().track;
 	int songid = m_songs.lookup(s);
-	unsigned level = config["game/difficulty"].i();
+	auto level = config["game/difficulty"].getEnumName();
 	return m_hiscores.reachedHiscore(score, songid, level, track);
 }
 

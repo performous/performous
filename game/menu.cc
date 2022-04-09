@@ -11,7 +11,7 @@ MenuOption::MenuOption(std::string const& nm, std::string const& comm, MenuImage
 std::string MenuOption::getName() const {
 	if (namePtr) return *namePtr;
 	if (!name.empty()) return name;
-	if (value) return value->getValue();
+	if (value) return value->toString();
 	return "";
 }
 
@@ -25,7 +25,7 @@ bool MenuOption::isActive() const {
 	if (type == Type::OPEN_SUBMENU && options.empty()) return false;
 	if (type == Type::CHANGE_VALUE) {
 		if (!value) return false;
-		if (value->get_type() == "option_list" && value->ol().size() <= 1) return false;
+		if (value->get_type_name() == "option_list" && value->ol().options.size() <= 1) return false;
 	}
 	return true;
 }
@@ -58,12 +58,6 @@ void Menu::action(int dir) {
 		}
 		case MenuOption::Type::CHANGE_VALUE: {
 			if (current().value) {
-				if (current().value->getName() == "audio/backend") {
-					current().value->setOldValue(current().value->getValue());
-				}
-				else if (current().value->getName() == "graphic/stereo3d") {
-					current().value->setOldValue(current().value->getValue());
-				}
 				if (dir > 0) ++(*(current().value));
 				else if (dir < 0) --(*(current().value));
 
@@ -72,7 +66,7 @@ void Menu::action(int dir) {
 					Game::getSingletonPtr()->restartAudio();
 				} else if (current().value->getName() == "game/language") {
 					auto &value = config["game/language"];
-					Game::getSingletonPtr()->setLanguage(value.getValue());
+					Game::getSingletonPtr()->setLanguage(value.getEnumName());
 				} else if (current().value->getName() == "graphic/stereo3d") {
 					try {
 						std::clog << "video/info: Stereo 3D configuration changed, will reset shaders.\n";
