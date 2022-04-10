@@ -22,7 +22,8 @@ else ()
     include(FetchContent)
     set(Json_VERSION "3.10.5")
     FetchContent_Declare(nlohmann_json
-      GIT_REPOSITORY https://github.com/nlohmann/json.git
+      GIT_REPOSITORY https://github.com/performous/json.git
+      GIT_SHALLOW    TRUE
       GIT_TAG        v${Json_VERSION}
       SOURCE_DIR     nlohmann_json
     )
