@@ -99,6 +99,8 @@ target_link_libraries(performous PRIVATE ${LibEpoxy_LIBRARIES})
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(deps REQUIRED IMPORTED_TARGET glib-2.0 gio-2.0 gobject-2.0)
 
+option(ALLOW_SELF_BUILT_AUBIO "allow downloading and building aubio from sources if not available on system" FALSE)
+option(FORCE_SELF_BUILT_AUBIO "force downloading and building aubio from sources" FALSE)
 find_package(Aubio 0.4.9 REQUIRED)
 message(STATUS "Aubio includes: ${Aubio_INCLUDE_DIRS}")
 target_include_directories(performous SYSTEM PRIVATE ${Aubio_INCLUDE_DIRS})
