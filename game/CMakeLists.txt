@@ -107,6 +107,9 @@ target_include_directories(performous SYSTEM PRIVATE ${Aubio_INCLUDE_DIRS})
 target_link_libraries(performous PRIVATE ${Aubio_LIBRARIES})
 add_definitions(${Aubio_DEFINITIONS})
 
+option(ALLOW_SELF_BUILT_JSON "allow downloading and building nlohmann_json from sources if not available on system" FALSE)
+option(FORCE_SELF_BUILT_JSON "force downloading and building nlohmann_json from sources" FALSE)
+
 # Find all the libs that don't require extra parameters
 foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM Json)
 	find_package(${lib} REQUIRED)
