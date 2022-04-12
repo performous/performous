@@ -1,4 +1,4 @@
-﻿#include "screen_intro.hh"
+#include "screen_intro.hh"
 
 #include "fs.hh"
 #include "graphic/glmath.hh"
@@ -175,6 +175,7 @@ void ScreenIntro::populateMenu() {
 	m_menu.clear();
 	m_menu.add(MenuOption(translate_noop("Perform"), translate_noop("Start performing!"), imgSing)).screen("Songs");
 	m_menu.add(MenuOption(translate_noop("Practice"), translate_noop("Check your skills or test the microphones."), imgPractice)).screen("Practice");
+	m_menu.add(MenuOption(_("Players"), _("Configure players"), imgConfig).screen("PlayerSetup"));
 	// Configure menu + submenu options
 	MenuOptions configmain;
 	for (auto const& submenu: configMenu) {

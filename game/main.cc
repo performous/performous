@@ -26,6 +26,7 @@
 #include "screen_audiodevices.hh"
 #include "screen_paths.hh"
 #include "screen_players.hh"
+#include "screen_playersetup.hh"
 #include "screen_playlist.hh"
 
 #include <fmt/format.h>
@@ -138,7 +139,8 @@ void mainLoop(std::string const& songlist) {
 	gm.addScreen(std::make_unique<ScreenAudioDevices>(gm, "AudioDevices", audio));
 	gm.addScreen(std::make_unique<ScreenPaths>(gm, "Paths", audio, songs));
 	gm.addScreen(std::make_unique<ScreenPlayers>(gm, "Players", audio, database));
-	gm.addScreen(std::make_unique<ScreenPlaylist>(gm, "Playlist", audio, songs, backgrounds));
+	gm.addScreen(std::make_unique<ScreenPlayerSetup>(gm, database.getPlayers()));
+	gm.addScreen(std::make_unique<ScreenPlaylist>("Playlist", audio, songs, backgrounds));
 	gm.activateScreen("Intro");
 	gm.loading(_("Entering main menu..."), 0.8f);
 	gm.updateScreen();  // exit/enter, any exception is fatal error

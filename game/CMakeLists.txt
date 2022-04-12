@@ -4,12 +4,14 @@ file(GLOB SOURCE_FILES
 	"*.cc"
 	"graphic/*.cc"
 	"songorder/*.cc"
+	"ui/*.cc"
 	"utils/*.cc"
 )
 file(GLOB HEADER_FILES
 	"*.hh"
 	"graphic/*.hh"
 	"songorder/*.hh"
+	"ui/*.hh"
 	"utils/*.hh"
 	"libda/*.hpp"
 )

@@ -23,7 +23,7 @@
   The current lists (Players and scores) are used
   to pass the information which players have won
   to the ScoreScreen and then to the players window.
- */
+  */
 class Database {
 public:
 	/**Will try to load the database.
@@ -92,6 +92,7 @@ public: // methods for database queries
 	unsigned getHiscore(SongPtr const& s) const;
 	std::vector<HiscoreItem> getHiscores(SongPtr const& s) const;
 	bool noPlayers() const;
+	Players& getPlayers() { return m_players; }
 
 private:
 	fs::path m_filename;
