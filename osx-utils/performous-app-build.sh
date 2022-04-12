@@ -230,7 +230,9 @@ function main {
 	  -DCMAKE_OSX_ARCHITECTURES="x86_64" \
 	  -DPERFORMOUS_VERSION="${PACKAGE_VERSION}" \
 	  -B "${PERFORMOUS_SOURCE}/build" \
-	  -S "${PERFORMOUS_SOURCE}"
+	  -S "${PERFORMOUS_SOURCE}" \
+	  -DALLOW_SELF_BUILT_AUBIO="TRUE" \
+	  -DALLOW_SELF_BUILT_JSON="TRUE"
 	
 	make -C "${PERFORMOUS_SOURCE}/build" -j${MAKE_JOBS} install # You can change the -j value in order to spawn more build threads.
 
