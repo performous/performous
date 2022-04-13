@@ -100,7 +100,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(deps REQUIRED IMPORTED_TARGET glib-2.0 gio-2.0 gobject-2.0)
 
 
-option(SELF_BUILT_GIT_BASE "base path of the git trees used for self built dependencies" "https://github.com/performous")
+set(SELF_BUILT_GIT_BASE "https://github.com/performous" CACHE STRING "base path of the git trees used for self built dependencies")
 
 set(SELF_BUILT_AUBIO "NEVER" CACHE STRING "rule to allow self build of Aubio dependency library [NEVER*|AUTO|ALWAYS]")
 find_package(Aubio 0.4.10 REQUIRED)
