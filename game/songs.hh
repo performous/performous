@@ -33,35 +33,19 @@ class Songs {
 	/// constructor
 	Songs(Database& database, std::string const& songlist = std::string());
 	~Songs();
-	/// iterators
-	struct iterator_traits {
-		using iterator_category = std::random_access_iterator_tag;
-		using difference_type = std::ptrdiff_t; //almost always ptrdiff_t
-		using value_type = SongPtr;
-		using reference = SongPtr&;
-		using pointer = SongPtr*;
-	};
-	using iterator = typename std::vector<iterator_traits::value_type>::iterator;
-	iterator begin() { return m_filtered.begin(); }
-	iterator end() { return m_filtered.end(); }
 	/// updates filtered songlist
 	void update();
 	/// reloads songlist
 	void reload();
 	/// array access
-	std::shared_ptr<Song> operator[](std::size_t pos) { return m_filtered[pos]; }
+	SongCollection& getSongs(bool webServer = false) { std::shared_lock<std::shared_mutex> l(m_mutex); return (webServer ? m_webServerFiltered : m_filtered); }
+	SongCollection const& getSongs(bool webServer = false) const { std::shared_lock<std::shared_mutex> l(m_mutex); return (webServer ? m_webServerFiltered : m_filtered); }
 	/// number of songs
-	std::size_t size() const { return m_filtered.size(); }
+	std::size_t size(bool webServer = false) const { return getSongs(webServer).size(); }
 	/// true if empty
-	bool empty(bool webServer = false) const { return (webServer ? m_webServerFiltered : m_filtered).empty(); }
-	/// advances to next song
-	void advance(int diff) {
-		std::ptrdiff_t size = static_cast<int>(m_filtered.size());
-		if (size == 0) return;  // Do nothing if no songs are available
-		std::ptrdiff_t _current = (math_cover.getTarget() + diff) % size;
-		if (_current < 0) _current += size;
-		math_cover.setTarget(_current, size);
-	}
+	bool empty(bool webServer = false) const { return getSongs(webServer).empty(); }
+	/// advances to previous/next song
+	void advance(int diff, bool webServer = false);
 	/// get current id
 	std::ptrdiff_t currentId() const { return math_cover.getTarget(); }
 	/// gets current position
@@ -71,28 +55,29 @@ class Songs {
 	/// sets margins for animation
 	void setAnimMargins(double left, double right) { math_cover.setMargins(left, right); }
 	/// @return current song
-	std::shared_ptr<Song> currentPtr() const;
+	std::shared_ptr<Song> currentPtr(bool webServer = false) const;
 	/// @return current song
-	Song& current();
+	Song& current(bool webServer = false);
 	/// @return current Song
-	Song const& current() const;
+	Song const& current(bool webServer = false) const;
 	/// filters songlist by regular expression
-	void setFilter(std::string const& regex);
+	void setFilter(std::string const& regex, bool webServer = false);
 	/// Get the current song type filter number
 	unsigned short typeNum() const { return m_type; }
 	/// Description of the current song type filter
 	std::string typeDesc() const;
 	enum class SortChange : int { BACK = -1, RESET = 0, FORWARD = 1};
 	/// Change song type filter (diff is normally -1 or 1; 0 has special meaning of reset)
-	void typeChange(SortChange diff);
+	void typeChange(SortChange diff, bool webServer = false);
 	/// Cycle song type filters by filter category (0 = none, 1..4 = different categories)
-	void typeCycle(unsigned short cat);
-	unsigned short sortNum() const { return m_order; }
+	void typeCycle(unsigned short cat, bool webServer = false);
+	Cycle<unsigned short>& getSortOrder(bool webServer = false) { return (webServer ? m_webServerOrder : m_order); }
+	Cycle<unsigned short> getSortOrder(bool webServer = false) const { return (webServer ? m_webServerOrder : m_order); }
 	/// Description of the current sort mode
 	std::string getSortDescription() const;
 	/// Change sorting mode (diff is normally -1 or 1)
-	void sortChange(Game&, SortChange diff);
-	void sortSpecificChange(unsigned short sortOrder, bool descending = false);
+	void sortChange(Game& game, SortChange diff, bool webServer = false);
+	void sortSpecificChange(unsigned short sortOrder, bool descending = false, bool webServer = false);
 	/// parses file into Song &tmp
 	void parseFile(Song& tmp);
 	std::atomic<bool> doneLoading{ false };
@@ -108,9 +93,8 @@ class Songs {
 	void reload_internal();
 	void reload_internal(fs::path const& p);
 	void randomize_internal();
-	void filter_internal();
-	void sort_internal(bool descending = false);
-
+	void filter_internal(bool webServer = false);
+	void sort_internal(bool descending = false, bool webServer = false);
 	class RestoreSel;
 	std::string m_songlist;
 	// Careful the m_songs needs to be correctly locked when accessed, and
@@ -123,6 +107,9 @@ class Songs {
 	Database & m_database;
 	unsigned short m_type = 0;
 	Cycle<unsigned short> m_order;  // Set by constructor
+	unsigned short m_webServerType = 0; // Not used now, but it might be in the future.
+	// FIXME (yes I know we don't like these but this PR is already humongous): Maybe store webServer sort and type somewhere in memory, on a per-ip basis?
+	Cycle<unsigned short> m_webServerOrder; 
 	std::atomic<bool> m_dirty{ false };
 	std::atomic<bool> m_loading{ false };
 	std::unique_ptr<std::thread> m_thread;

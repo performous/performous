@@ -60,7 +60,8 @@ Songs::Songs(Database & database, std::string const& songlist)
 
 Songs::~Songs() {
 	m_loading = false; // Terminate song loading if currently in progress
-	m_thread->join();
+	if ((m_thread) && m_thread->joinable())
+		m_thread->join();
 }
 
 void Songs::reload() {
@@ -73,6 +74,15 @@ void Songs::reload() {
 	m_loading = true;
 	if (m_thread) m_thread->join();
 	m_thread = std::make_unique<std::thread>([this]{ reload_internal(); });
+}
+
+void Songs::advance(int diff, bool webServer) {
+	SongCollection& vector = getSongs(webServer);
+	auto size = static_cast<std::ptrdiff_t>(vector.size());
+	if (empty(webServer)) return;  // Do nothing if no songs are available
+	auto _current = (static_cast<std::ptrdiff_t>(math_cover.getTarget()) + diff) % size;
+	if (_current < 0) _current += size;
+	math_cover.setTarget(_current, size);
 }
 
 void Songs::reload_internal() {
@@ -265,39 +275,41 @@ void Songs::reload_internal(fs::path const& parent) {
 	try {
 		std::regex expression(R"((\.txt|^song\.ini|^notes\.xml|\.sm)$)", std::regex_constants::icase);
 		for (const auto &dir : fs::directory_iterator(parent)) { //loop through files
-			if (!m_loading) return; // early return in case scanning is long and user wants to exit quickly
+			if (!m_loading) {
+// 				m_mutex.unlock();
+				return; // early return in case scanning is long and user wants to exit quickly
+			}
 			fs::path p = dir.path();
 			if (fs::is_directory(p)) { reload_internal(p); continue; } //if the file is a folder redo this function with this folder as path
 			if (!regex_search(p.filename().string(), expression)) continue; //if the folder does not contain any of the requested files, ignore it
 			try { //found song file, make a new song with it.
-				{
-					std::shared_lock<std::shared_mutex> l(m_mutex);
-					auto it = std::find_if(m_songs.begin(), m_songs.end(), [p](std::shared_ptr<Song> n) {
-						return n->filename == p;
-					});
-					auto const alreadyInCache =  it != m_songs.end();
+					{
+						std::shared_lock<std::shared_mutex> l(m_mutex);
+						auto it = std::find_if(m_songs.begin(), m_songs.end(), [p](SongPtr n) {
+							return n->filename == p;
+						});
+						auto const alreadyInCache =  it != m_songs.end();
 
 					if(alreadyInCache) {
 						m_database.addSong(*it);
 						continue;
 					}
 				}
+			std::clog << "songs/notice: Found song which was not in the cache: " << p.string() << std::endl;
 
-				std::clog << "songs/notice: Found song which was not in the cache: " << p.string() << std::endl;
-
-				std::shared_ptr<Song>s(new Song(p.parent_path(), p));
-				std::ptrdiff_t AdditionalFileIndex = -1;
+			SongPtr s(new Song(p.parent_path(), p));
+			std::ptrdiff_t AdditionalFileIndex = -1;
 				{
 					std::shared_lock<std::shared_mutex> l(m_mutex);
-					for(auto const& song: m_songs) {
-						if(s->filename.extension() != song->filename.extension() && s->filename.stem() == song->filename.stem() &&
-								s->title == song->title && s->artist == song->artist) {
+					for (SongPtr const& song: getSongs()) {
+						if (s->filename.extension() != song->filename.extension() &&
+						  s->filename.stem() == song->filename.stem() &&
+						  s->title == song->title && s->artist == song->artist) {
 							std::clog << "songs/info: >>> Found additional song file: " << s->filename << " for: " << song->filename << std::endl;
-							AdditionalFileIndex = &song - &m_songs[0];
+							AdditionalFileIndex = (std::addressof(song)-std::addressof(m_songs.front())); // This works because we're working with a std::vector.
 						}
 					}
 				}
-
 				if(AdditionalFileIndex > 0) { //TODO: add it to existing song
 					std::clog << "songs/info: >>> not yet implemented " << std::endl;
 				}
@@ -345,16 +357,16 @@ void Songs::update() {
 	if (first) { first = false; math_cover.reset(); math_cover.setTarget(0, static_cast<std::ptrdiff_t>(size())); }
 }
 
-void Songs::setFilter(std::string const& val) {
-	if (m_filter == val) return;
+void Songs::setFilter(std::string const& val, bool webServer) {
+	if ((m_filter == val) && !val.empty()) { return; } // No need to update, unless filter is empty, then go ahead to populate the container.
 	m_filter = val;
-	filter_internal();
+	filter_internal(webServer);
 }
 
-void Songs::filter_internal() {
+void Songs::filter_internal(bool webServer) {
 	m_updateTimer.setValue(0.0);
 	m_dirty = false;
-	RestoreSel restore(*this);
+	if (!webServer) RestoreSel restore(*this);
 	try {
 		auto filtered = SongCollection();
 		// if filter text is blank and no type filter is set, just display all songs.
@@ -387,12 +399,12 @@ void Songs::filter_internal() {
 				return true;
 			});
 		}
-		m_filtered.swap(filtered);
+		getSongs(webServer).swap(filtered);
 	} catch (...) {
 		std::shared_lock<std::shared_mutex> l(m_mutex);
 		SongCollection(m_songs.begin(), m_songs.end()).swap(m_filtered);  // Invalid regex => copy everything
 	}
-	sort_internal();
+	sort_internal(false, webServer);
 }
 
 namespace {
@@ -458,17 +470,17 @@ std::string Songs::typeDesc() const {
 	throw std::logic_error("Internal error: unknown type filter in Songs::typeDesc");
 }
 
-void Songs::typeChange(SortChange diff) {
+void Songs::typeChange(SortChange diff, bool webServer) {
 	if (diff == SortChange::RESET) m_type = 0;
 	else {
 		int dir = to_underlying(diff);
 		m_type = static_cast<unsigned short>((m_type + dir) % types);
 		if (m_type >= types) m_type += types;
 	}
-	filter_internal();
+	filter_internal(webServer);
 }
 
-void Songs::typeCycle(unsigned short cat) {
+void Songs::typeCycle(unsigned short cat, bool webServer) {
 	static const unsigned short categories[types] = { 0, 1, 2, 2, 3, 3, 4 };
 	// Find the next matching category
 	unsigned short type = 0;
@@ -476,70 +488,71 @@ void Songs::typeCycle(unsigned short cat) {
 		if (categories[t] == cat) { type = t; break; }
 	}
 	m_type = type;
-	filter_internal();
+	filter_internal(webServer);
 }
 
 std::string Songs::getSortDescription() const {
-	if(m_order < m_songOrders.size())
+	if(getSortOrder(false) < m_songOrders.size())
 		return m_songOrders[m_order]->getDescription();
 
 	throw std::logic_error("Internal error: unknown sort order in Songs::getSortDescription");
 }
 
-void Songs::sortChange(Game& game, SortChange diff) {
+void Songs::sortChange(Game& game, SortChange diff, bool webServer) {
 	switch(diff) {
 		case SortChange::BACK:
-			m_order.backward();
+			getSortOrder(webServer).backward();
 		break;
 		case SortChange::FORWARD:
-			m_order.forward();
+			getSortOrder(webServer).forward();
 		break;
 		case SortChange::RESET:
-			m_order.set(0u);
+			getSortOrder(webServer).set(0u);
 		break;
 	}
-
-	RestoreSel restore(*this);
-	config["songs/sort-order"].ui() = m_order;
-
+	if (!webServer) {
+		RestoreSel restore(*this);
+		config["songs/sort-order"].ui() = getSortOrder(webServer);
+	}
 	sort_internal();
 	writeConfig(game, false);
 }
 
-void Songs::sortSpecificChange(unsigned short sortOrder, bool descending) {
+void Songs::sortSpecificChange(unsigned short sortOrder, bool descending, bool webServer) {
 	if(sortOrder < m_songOrders.size())
-		m_order = sortOrder;
+		getSortOrder(webServer).set(sortOrder);
 	else
-		m_order = 0;
-
-	RestoreSel restore(*this);
-	config["songs/sort-order"].ui() = m_order;
+		getSortOrder(webServer).set(0);
+	if (!webServer) {
+		RestoreSel restore(*this);
+		config["songs/sort-order"].ui() = sortOrder;
+	}
 	sort_internal(descending);
 }
 
-void Songs::sort_internal(bool descending) {
+void Songs::sort_internal(bool descending, bool webServer) {
 	if(m_order >= m_songOrders.size()) {
 		throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
 	}
 
 	auto& order = *m_songOrders[m_order];
 
-	order.prepare(m_filtered, m_database);
+	order.prepare(getSongs(webServer), m_database);
 
-	std::stable_sort(m_filtered.begin(), m_filtered.end(),
+	std::stable_sort(getSongs(webServer).begin(), getSongs(webServer).end(),
 		[&](SongPtr const& a, SongPtr const& b) { return order(*a, *b) ? !descending : descending; });
 }
 
-std::shared_ptr<Song> Songs::currentPtr() const try {
-	return m_filtered.at(static_cast<size_t>(math_cover.getTarget()));
+SongPtr Songs::currentPtr(bool webServer) const try {
+	return getSongs(webServer).at(static_cast<size_t>(math_cover.getTarget())); 
 } catch (std::out_of_range const& e) { return nullptr; }
 
-Song& Songs::current() try {
-	return *m_filtered.at(static_cast<size_t>(math_cover.getTarget()));
+Song& Songs::current(bool webServer) try { 
+	return *getSongs(webServer).at(static_cast<size_t>(math_cover.getTarget()));
 } catch (std::out_of_range const& e) { throw std::runtime_error(std::string("songs/error: out-of-bounds access attempt for Songs: ") + e.what()); }
 
-Song const& Songs::current() const try {
-	return *m_filtered.at(static_cast<size_t>(math_cover.getTarget()));
+Song const& Songs::current(bool webServer) const try { 
+	return *getSongs(webServer).at(static_cast<size_t>(math_cover.getTarget()));
 } catch (std::out_of_range const& e) { throw std::runtime_error(std::string("songs/error: out-of-bounds access attempt for Songs: ") + e.what()); }
 
 namespace {

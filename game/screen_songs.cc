@@ -242,7 +242,7 @@ void ScreenSongs::drawJukebox() {
 	if (pos < diff) diff = pos;  // Diff from beginning instead of from end
 	if (!m_songbg.get() && !m_video.get()) diff = 0.0;  // Always display song name if there is no background
 	if (diff < 3.0) {
-		Song& song = m_songs.current();
+		Song const& song = m_songs.current();
 		// Draw the cover
 		Texture* cover = nullptr;
 		if (!song.cover.empty()) cover = loadTextureFromMap(song.cover);
@@ -307,7 +307,7 @@ void ScreenSongs::draw() {
 			oss_order << _("Visit performous.org for free songs");
 		}
 	} else {
-		Song& song = m_songs.current();
+		Song const& song = m_songs.current();
 		// Format the song information text
 		oss_song << song.artist << ": " << song.title;
 		hiscore = getHighScoreText();
@@ -320,7 +320,7 @@ void ScreenSongs::draw() {
 		case 1:
 			if (!m_search.text.empty()) oss_order << m_search.text;
 			else if (m_songs.typeNum()) oss_order << m_songs.typeDesc();
-			else if (m_songs.sortNum()) oss_order << m_songs.getSortDescription();
+			else if (m_songs.getSortOrder()) oss_order << m_songs.getSortDescription();
 			else oss_order << _("<type in to search>") << PAD << HORIZ_ARROW << _("songs") << PAD << VERT_ARROW << _("options");
 			break;
 		case 2: oss_order << HORIZ_ARROW << _("sort order: ") << m_songs.getSortDescription(); break;
@@ -424,7 +424,7 @@ void ScreenSongs::drawCovers() {
 	int idx = static_cast<int>(baseidx);
 	for (int i = -2; i < 6; ++i) {
 		if (idx + i < 0 || idx + i >= ss) continue;
-		Song& song = *m_songs[static_cast<unsigned>(idx + i)];
+		Song& song = *m_songs.getSongs()[static_cast<unsigned>(idx + i)];
 		Texture& s = getCover(song);
 		// Calculate dimensions for cover and instrument markers
 		float pos = static_cast<float>(static_cast<double>(i) - shift);
