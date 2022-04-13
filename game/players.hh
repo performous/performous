@@ -40,7 +40,7 @@ class Players {
 
   public:
 	Players(const Players&) = delete;
-  	const Players& operator=(const Players&) = delete;
+	const Players& operator=(const Players&) = delete;
 	Players() = default;
 
 	void load(xmlpp::NodeSet const& n);
@@ -60,8 +60,10 @@ class Players {
 	void addPlayer (std::string const& name, std::string const& picture = "", std::optional<PlayerId> id = std::nullopt);
 
 	/// const array access
-	PlayerItem operator[](unsigned pos) const;
+	PlayerItem const& operator[](unsigned pos) const;
+	PlayerItem& operator[](unsigned pos);
 	unsigned count() const { return static_cast<unsigned>(m_filtered.size()); }
+
 	bool isEmpty() const { return m_filtered.empty(); }
 	/// advances to next player
 	void advance(std::ptrdiff_t diff);
@@ -77,7 +79,7 @@ class Players {
 	PlayerItem current() const;
 	/// filters playerlist by regular expression
 	void setFilter(std::string const& regex);
-  
+
 private:
 	PlayerId assign_id_internal(); /// returns the next available id
 	void filter_internal();

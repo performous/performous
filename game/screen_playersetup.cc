@@ -3,9 +3,11 @@
 #include "game.hh"
 #include "i18n.hh"
 #include "controllers.hh"
+#include "database.hh"
 
-ScreenPlayerSetup::ScreenPlayerSetup(Game& game, Players& players)
-: Screen("PlayerSetup"), m_game(game), m_players(players), m_background(findFile("intro_bg.svg")) {
+ScreenPlayerSetup::ScreenPlayerSetup(Game& game, Players& players, Database const& database)
+: Screen("PlayerSetup"), m_game(game), m_players(players), m_database(database),
+  m_background(findFile("intro_bg.svg")) {
 	initializeControls();
 }
 
@@ -174,11 +176,13 @@ void ScreenPlayerSetup::draw() {
 
 	auto items = std::vector<Item>();
 
-	for(auto i = 0U; i < m_players.count(); ++i)
+	for(auto i = 0U; i < m_players.count(); ++i) {
 		items.emplace_back(m_players[i].name);
+		items.back().setUserData(&m_players[i]);
+	}
 
-	for(auto i = 0U; i < 15; ++i)
-		items.emplace_back("Player " + std::to_string(i));
+	//for(auto i = 0U; i < 15; ++i)
+	//	items.emplace_back("Player " + std::to_string(i));
 
 	m_playerList.setItems(items);
 
@@ -198,9 +202,78 @@ void ScreenPlayerSetup::initializeControls() {
 	const auto horizontalOffset = -0.45;
 	const auto lineHeight = 0.025;
 	const auto listHeight = 1 + verticalOffset - 0.45;
+	auto y = verticalOffset;
 
 	m_control.addControl(m_playerList);
-	m_playerList.setGeometry(horizontalOffset, verticalOffset, horizontalSpace, listHeight);
+	m_playerList.setGeometry(horizontalOffset, y, horizontalSpace, listHeight);
+	m_playerList.onSelectionChanged([&](List& list, size_t index, size_t){ m_name.setText(list.getItems()[index].toString());});
+		auto const player = *list.getItems()[index].getUserData<PlayerItem*>();
+		auto const path = player.getAvatarPath();
+
+		if(path.empty())
+			m_avatar.setTexture(findFile("no_player_image.svg"));
+		else
+			m_avatar.setTexture(path);
+
+		auto const& scores = m_database.getHighScores();
+		auto const result = scores.queryHiscore(-1, player.id, -1, {});
+		auto const best = std::max_element(result.begin(), result.end(), [](auto const& a, auto const& b){ return a.score < b.score;});
+
+		if(best == result.end()) {
+			m_bestScore.setText(_("na"));
+			m_bestSong.setText(_("na"));
+		}
+		else {
+			auto const& songs = m_database.getSongs();
+			auto const song = songs.lookup(best->songid);
+
+			m_bestScore.setText(std::to_string(best->score));
+			m_bestSong.setText(song);
+		}
+
+	m_control.addControl(m_nameLabel);
+	m_nameLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01, y, horizontalSpace, lineHeight);
+	m_nameLabel.setText(_("Name:"));
+
+	m_control.addControl(m_name);
+	m_name.setGeometry(horizontalOffset + (horizontalSpace + 0.01) * 2, y, horizontalSpace, lineHeight);
+	m_name.onTextChanged(
+		[&](TextBox&, std::string const& text, std::string const&){
+			std::cout << "changed to " << text << std::endl;
+			if(m_playerList.getSelectedIndex() != List::None) {
+				m_playerList.getSelected().getUserData<PlayerItem*>()->name = text;
+				m_playerList.getSelected().setText(text);
+			}
+		});
+
+	y += lineHeight + lineHeight * 0.5;
+
+	m_control.addControl(m_avatarLabel);
+	m_avatarLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01, y, horizontalSpace, lineHeight);
+	m_avatarLabel.setText(_("Avatar:"));
+
+	m_control.addControl(m_avatar);
+	m_avatar.setGeometry(horizontalOffset + (horizontalSpace + 0.01) * 2, y, horizontalSpace, horizontalSpace);
+
+	y += horizontalSpace + lineHeight * 0.5;
+
+	m_control.addControl(m_bestScoreLabel);
+	m_bestScoreLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01, y, horizontalSpace, lineHeight);
+	m_bestScoreLabel.setText(_("Best score:"));
+
+	m_control.addControl(m_bestScore);
+	m_bestScore.setGeometry(horizontalOffset + (horizontalSpace + 0.01) * 2, y, horizontalSpace, lineHeight);
+	m_bestScore.setText(_("na"));
+
+	y += lineHeight + lineHeight * 0.5;
+
+	m_control.addControl(m_bestSongLabel);
+	m_bestSongLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01, y, horizontalSpace, lineHeight);
+	m_bestSongLabel.setText(_("Best song:"));
+
+	m_control.addControl(m_bestSong);
+	m_bestSong.setGeometry(horizontalOffset + (horizontalSpace + 0.01) * 2, y, horizontalSpace, lineHeight);
+	m_bestSong.setText(_("na"));
 
 	m_control.focusNext();
 }

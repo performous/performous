@@ -55,7 +55,7 @@ std::optional<PlayerId> Players::lookup(std::string const& name) const {
 
 std::optional<std::string> Players::lookup(const PlayerId& id) const {
 	const auto it = m_players.find(PlayerItem(id));
-	if (it == m_players.end()) 
+	if (it == m_players.end())
 		return std::nullopt;
 
 	return it->name;
@@ -95,10 +95,10 @@ void Players::setFilter(std::string const& val) {
 
 PlayerId Players::assign_id_internal() {
 	const auto it = std::max_element(m_players.begin(),m_players.end());
-	
+
 	if (it != m_players.end() && it->id) 
-		return it->id + 1;
-	
+		return it->id+1;
+
 	return 0;
 }
 
@@ -137,25 +137,33 @@ void Players::filter_internal() {
 	math_cover.setTarget(pos, count());
 }
 
-PlayerItem Players::operator[](unsigned pos) const {
-    if (pos < count()) 
-        return m_filtered[pos];
-    
-    return PlayerItem();
+PlayerItem const& Players::operator[](unsigned pos) const {
+	if (pos < count())
+		return m_filtered[pos];
+
+	throw std::runtime_error("No player with at pos " + std::to_string(pos) + " found!");
+}
+
+PlayerItem& Players::operator[](unsigned pos) {
+	if (pos < count())
+		return m_filtered[pos];
+
+	throw std::runtime_error("No player with at pos " + std::to_string(pos) + " found!");
 }
 
 void Players::advance(std::ptrdiff_t diff) {
     const unsigned size = count();
-    if (size == 0) return; // Do nothing if no players are available
-    std::ptrdiff_t current = 0;
-        current = (static_cast<std::ptrdiff_t>(math_cover.getTarget()) + diff) % size;
-    if (current < 0)
-        current += count();
-    math_cover.setTarget(current, count());
+    if (size == 0) 
+    	return; // Do nothing if no players are available
+    std::ptrdiff_t current = (static_cast<std::ptrdiff_t>(math_cover.getTarget()) + diff) % size;
+	if (current < 0)
+		current += count();
+	math_cover.setTarget(current, count());
 }
 
 PlayerItem Players::current() const {
-    if (math_cover.getTarget() < static_cast<ptrdiff_t>(m_filtered.size())) return m_filtered[static_cast<unsigned>(math_cover.getTarget())];
-    
-    return PlayerItem();
+    if (math_cover.getTarget() < static_cast<ptrdiff_t>(m_filtered.size())) 
+    	return m_filtered[static_cast<unsigned>(math_cover.getTarget())];
+
+	return PlayerItem();
 }

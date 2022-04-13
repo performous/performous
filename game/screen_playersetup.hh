@@ -5,13 +5,17 @@
 #include "ui/form.hh"
 #include "ui/graphiccontext.hh"
 #include "ui/list.hh"
+#include "ui/textbox.hh"
+#include "ui/image.hh"
+#include "ui/label.hh"
 
 class Players;
 class Game;
+class Database;
 
 class ScreenPlayerSetup: public Screen {
   public:
-	ScreenPlayerSetup(Game& game, Players& players);
+	ScreenPlayerSetup(Game& game, Players& players, Database const&);
 	~ScreenPlayerSetup() override = default;
 
 	void manageEvent(input::NavEvent const& event) override;
@@ -26,8 +30,17 @@ class ScreenPlayerSetup: public Screen {
   private:
 	Game& m_game;
 	Players& m_players;
+	Database const& m_database;
 	Texture m_background;
 	GraphicContext m_gc;
 	Form m_control;
 	List m_playerList;
+	Label m_nameLabel;
+	TextBox m_name;
+	Label m_avatarLabel;
+	Image m_avatar;
+	Label m_bestScoreLabel;
+	Label m_bestScore;
+	Label m_bestSongLabel;
+	Label m_bestSong;
 };

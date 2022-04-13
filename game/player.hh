@@ -97,4 +97,14 @@ struct PlayerItem {
 	{
 		return name == pi.name;
 	}
+
+	std::string getName() const {
+		return name;
+	}
+	void setName(std::string const& newName) {
+		name = newName;
+	}
+	fs::path getAvatarPath() const {
+		return picture;
+	}
 };

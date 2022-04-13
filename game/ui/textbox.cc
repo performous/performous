@@ -9,8 +9,20 @@ TextBox::TextBox(Control* parent, std::string const& text)
 : Control(parent), m_text(text),  m_background(findFile("mainmenu_comment_bg.svg")) {
 }
 
+void TextBox::sendTextChanged(std::string const& newText, std::string const& oldText) {
+	if(oldText != newText) {
+		if(m_onTextChanged)
+			m_onTextChanged(*this, newText, oldText);
+	}
+}
+
 TextBox& TextBox::setText(std::string const& text) {
-	m_text.setText(text);
+	if(m_text.getText() != text) {
+		if(m_onTextChanged)
+			m_onTextChanged(*this, text, m_text.getText());
+
+		m_text.setText(text);
+	}
 
 	m_cursorPosition = text.size();
 
@@ -24,6 +36,10 @@ std::string TextBox::getText() const {
 		text.erase(m_cursorPosition, 1);
 
 	return text;
+}
+
+void TextBox::onTextChanged(std::function<void(TextBox&, std::string const&, std::string const&)> const& callback) {
+	m_onTextChanged = callback;
 }
 
 TextBox& TextBox::setMaxLength(size_t length) {
@@ -63,6 +79,8 @@ void TextBox::onKey(Key key) {
 			break;
 		default:
 			if(text.length() < m_maxLength) {
+				const auto oldText = getText();
+
 				if(key >= Key::Number0 && key <= Key::Number9)
 					text.insert(m_cursorPosition++, 1, '0' + static_cast<char>(key) - static_cast<char>(Key::Number0));
 				else if(key >= Key::a && key <= Key::z)
@@ -71,6 +89,8 @@ void TextBox::onKey(Key key) {
 					text.insert(m_cursorPosition++, 1, 'A' + static_cast<char>(key) - static_cast<char>(Key::A));
 				else if(key == Key::Space)
 					text.insert(m_cursorPosition++, 1, ' ');
+
+				sendTextChanged(getText(), oldText);
 			}
 	}
 

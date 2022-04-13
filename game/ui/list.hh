@@ -4,6 +4,8 @@
 #include "text.hh"
 #include "../texture.hh"
 
+#include <any>
+#include <functional>
 #include <tuple>
 #include <vector>
 
@@ -14,10 +16,18 @@ class Item {
 
 	std::string getId() const;
 	std::string toString() const;
+	void setText(std::string const&);
+
+	template<class Type>
+	Type const& getUserData() const { return std::any_cast<Type const&>(m_userData);}
+	template<class Type>
+	Type& getUserData() { return std::any_cast<Type&>(m_userData);}
+	void setUserData(std::any const&);
 
   private:
 	std::string m_id;
 	std::string m_text;
+	std::any m_userData;
 };
 
 class List : public Control {
@@ -33,7 +43,9 @@ class List : public Control {
 	size_t countItems() const;
 
 	Item const& getSelected() const;
+	Item& getSelected();
 	size_t getSelectedIndex() const;
+	void onSelectionChanged(std::function<void(List&, size_t, size_t)> const&);
 
 	void select(size_t);
 	void select(std::string const& id);
@@ -51,6 +63,7 @@ class List : public Control {
 	std::vector<Item> m_items;
 	std::vector<Text> m_texts;
 	size_t m_selected = -1;
+	std::function<void(List&, size_t, size_t)> m_onSelectionChanged;
 };
 
 

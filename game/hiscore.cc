@@ -44,6 +44,7 @@ void Hiscore::addHiscore(HiscoreItem&& item) {
 }
 
 Hiscore::HiscoreVector Hiscore::queryHiscore(std::optional<PlayerId> playerid, std::optional<SongId> songid, std::string const& track, std::optional<unsigned> max) const {
+	++max;
 	HiscoreVector hv;
 	for (auto const& h: m_hiscore) {
 		if (playerid && playerid.value() != h.playerid) continue;

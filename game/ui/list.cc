@@ -17,6 +17,19 @@ std::string Item::toString() const {
 	return m_text;
 }
 
+void Item::setText(const std::string& text) {
+	m_text = text;
+}
+/*
+std::any const& Item::getUserData() const {
+	return m_userData;
+}
+*/
+void Item::setUserData(std::any const& data) {
+	m_userData = data;
+}
+
+
 const size_t List::None = -1;
 
 List::List(std::vector<Item> const& items, Control* parent)
@@ -48,12 +61,21 @@ Item const& List::getSelected() const {
 	return m_items.at(m_selected);
 }
 
+Item& List::getSelected() {
+	return m_items.at(m_selected);
+}
+
 size_t List::getSelectedIndex() const {
 	return m_selected;
 }
 
 void List::select(size_t index) {
-	m_selected = index;
+	if(m_selected != index) {
+		if(m_onSelectionChanged)
+			m_onSelectionChanged(*this, index, m_selected);
+
+		m_selected = index;
+	}
 }
 
 void List::select(const std::string& id) {
@@ -65,6 +87,10 @@ void List::select(const std::string& id) {
 	}
 
 	throw std::runtime_error("No item with id '" + id + "' found!");
+}
+
+void List::onSelectionChanged(const std::function<void(List&, size_t, size_t)>& callback) {
+	m_onSelectionChanged = callback;
 }
 
 void List::onKey(Key key) {
@@ -96,8 +122,11 @@ void List::draw(GraphicContext& gc) {
 	if(m_items.size() != m_texts.size())
 		updateTexts();
 
+	if(m_items.empty())
+		return;
+
 	const auto lineHeight = 0.025;
-	const auto itemsToDisplay = size_t((getHeight() - lineHeight) / lineHeight);
+	const auto itemsToDisplay = std::min(countItems(), size_t((getHeight() - lineHeight) / lineHeight));
 	const auto itemsToDisplayHalf = itemsToDisplay / 2;
 	const auto itemToStart = getSelectedIndex() == None ? 0 :
 		std::min(int(countItems()) - int(itemsToDisplay), std::max(0, int(getSelectedIndex()) - int(itemsToDisplayHalf)));
