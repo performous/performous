@@ -5,7 +5,7 @@ function(_buildAubioFromSource)
 	include(FetchContent)
 	set(Aubio_VERSION "0.4.9-performous" PARENT_SCOPE)
 	FetchContent_Declare(aubio_from_source
-		GIT_REPOSITORY https://github.com/performous/aubio.git
+		GIT_REPOSITORY ${SELF_BUILT_GIT_BASE}/aubio.git
 		GIT_SHALLOW    TRUE
 		GIT_TAG        14fec3da6749fbcc47b56648d7a38296eccd9499
 		SOURCE_DIR aubio-src
