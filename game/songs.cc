@@ -1,27 +1,25 @@
 #include "songs.hh"
 
 #include "configuration.hh"
-#include "fs.hh"
-#include "song.hh"
 #include "database.hh"
+#include "fs.hh"
 #include "i18n.hh"
-#include "profiler.hh"
 #include "libxml++-impl.hh"
-#include "unicode.hh"
+#include "log.hh"
 #include "platform.hh"
+#include "profiler.hh"
+#include "song.hh"
+#include "unicode.hh"
 
 #include <algorithm>
 #include <cstdlib>
-#include <iostream>
+#include <fstream>
 #include <regex>
 #include <stdexcept>
 
-#include "fs.hh"
 #include <boost/format.hpp>
-#include <unicode/stsearch.h>
-
-#include <fstream>
 #include <nlohmann/json.hpp>
+#include <unicode/stsearch.h>
 
 Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), m_database(database), m_order(config["songs/sort-order"].i()) {
 	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
