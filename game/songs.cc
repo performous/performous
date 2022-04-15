@@ -39,16 +39,12 @@ void Songs::reload() {
 	}
 	// Run loading thread
 	m_loading = true;
-	if (m_thread) m_thread->join();
-	m_thread = std::make_unique<std::thread>([this]{ reload_internal(); });
-}
-
-void Songs::reload_internal() {
 	{
 		std::unique_lock<std::shared_mutex> l(m_mutex);
 		m_songs.clear();
 		m_dirty = true;
 	}
+	if (m_thread) m_thread->join();
 	std::clog << "songs/notice: Starting to load all songs from cache." << std::endl;
 	LoadCache();
 	// the following code is used to check that load <=> save are idempotent
@@ -56,6 +52,10 @@ void Songs::reload_internal() {
 	//return;
 	std::clog << "songs/notice: Done loading the cache. You now have " << loadedSongs() << " songs in your list." << std::endl;
 	std::clog << "songs/notice: Starting to load all songs from disk, to update the cache." << std::endl;
+	m_thread = std::make_unique<std::thread>([this]{ reload_internal(); });
+}
+
+void Songs::reload_internal() {
 	Profiler prof("songloader");
 	Paths systemSongs = getPathsConfig("paths/system-songs");
 	Paths paths = getPathsConfig("paths/songs");
