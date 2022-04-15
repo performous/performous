@@ -5,6 +5,7 @@
 #include "fs.hh"
 #include "i18n.hh"
 #include "libxml++-impl.hh"
+#include "log.hh"
 #include "platform.hh"
 #include "profiler.hh"
 #include "song.hh"
@@ -54,14 +55,12 @@ void Songs::reload_internal() {
 		m_songs.clear();
 		m_dirty = true;
 	}
-#ifdef USE_WEBSERVER
 	std::clog << "songs/notice: Starting to load all songs from cache." << std::endl;
 	LoadCache();
 	// the following code is used to check that load <=> save are idempotent
 	//CacheSonglist();
 	//return;
 	std::clog << "songs/notice: Done loading the cache. You now have " << loadedSongs() << " songs in your list." << std::endl;
-#endif
 	std::clog << "songs/notice: Starting to load all songs from disk, to update the cache." << std::endl;
 	Profiler prof("songloader");
 	Paths systemSongs = getPathsConfig("paths/system-songs");
