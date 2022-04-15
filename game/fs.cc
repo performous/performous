@@ -66,33 +66,33 @@ namespace {
 	using Lock = std::lock_guard<std::mutex>;
 }
 
-	BinaryBuffer readFile(fs::path const& path) {
-		BinaryBuffer ret;
-		fs::ifstream f(path, std::ios::binary);
-		f.seekg(0, std::ios::end);
-		ret.resize(f.tellg());
-		f.seekg(0);
-		f.read(reinterpret_cast<char*>(ret.data()), ret.size());
-		if (!f) throw std::runtime_error("File cannot be read: " + path.string());
-		return ret;
-	}
+BinaryBuffer readFile(fs::path const& path) {
+	BinaryBuffer ret;
+	fs::ifstream f(path, std::ios::binary);
+	f.seekg(0, std::ios::end);
+	ret.resize(f.tellg());
+	f.seekg(0);
+	f.read(reinterpret_cast<char*>(ret.data()), ret.size());
+	if (!f) throw std::runtime_error("File cannot be read: " + path.string());
+	return ret;
+}
 
-	nlohmann::json readJSON(fs::path const& filename) {
+nlohmann::json readJSON(fs::path const& filename) {
 	nlohmann::json json = nlohmann::json::array();
-		std::clog << "json/debug: Will try to parse JSON in: " << filename.string() << std::endl;
-		std::ifstream file;
-			try {
-			file.open(filename.string());
-			if (!file.is_open()) throw std::runtime_error("Can't open file.");
-				json = nlohmann::json::parse(file);
-			} catch(nlohmann::json::exception const& e) {
-				std::clog << "json/error: " << e.what() << std::endl;
-			} catch(std::exception const& e) {
-				std::clog << "fs/error: " << e.what() << std::endl;
-			}
-			file.close();
-		return json;
+	std::clog << "json/debug: Will try to parse JSON in: " << filename.string() << std::endl;
+	std::ifstream file;
+	try {
+	file.open(filename.string());
+		if (!file.is_open()) throw std::runtime_error("Can't open file.");
+			json = nlohmann::json::parse(file);
+		} catch(nlohmann::json::exception const& e) {
+			std::clog << "json/error: " << e.what() << std::endl;
+		} catch(std::exception const& e) {
+			std::clog << "fs/error: " << e.what() << std::endl;
 	}
+	file.close();
+	return json;
+}
 
 void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destinationDir)
 {
