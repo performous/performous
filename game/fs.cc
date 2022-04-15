@@ -77,6 +77,23 @@ namespace {
 		return ret;
 	}
 
+	nlohmann::json readJSON(fs::path const& filename) {
+	nlohmann::json json = nlohmann::json::array();
+		std::clog << "json/debug: Will try to parse JSON in: " << filename.string() << std::endl;
+		std::ifstream file;
+			try {
+			file.open(filename.string());
+			if (!file.is_open()) throw std::runtime_error("Can't open file.");
+				json = nlohmann::json::parse(file);
+			} catch(nlohmann::json::exception const& e) {
+				std::clog << "json/error: " << e.what() << std::endl;
+			} catch(std::exception const& e) {
+				std::clog << "fs/error: " << e.what() << std::endl;
+			}
+			file.close();
+		return json;
+	}
+
 void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destinationDir)
 {
 	if (!fs::exists(sourceDir) || !fs::is_directory(sourceDir)) {
@@ -128,20 +145,20 @@ Paths getThemePaths() {
 	std::string theme = config["game/theme"].getEnumName();
 	Paths paths = getPaths();
 	Paths infixes = { 
-					  themes / theme,
-					  themes / theme / www,
-					  themes / theme / www / js,
-					  themes / theme / www / css,
-					  themes / theme / www / images,
-					  themes / theme / www / fonts,
+						themes / theme,
+						themes / theme / www,
+						themes / theme / www / js,
+						themes / theme / www / css,
+						themes / theme / www / images,
+						themes / theme / www / fonts,
 
-					  themes / def,
-					  themes / def / www,					  
-					  themes / def / www / js,
-					  themes / def / www / css,				  
-					  themes / def / www / images,			  
-					  themes / def / www / fonts,
-					  fs::path() };
+						themes / def,
+						themes / def / www,						
+						themes / def / www / js,
+						themes / def / www / css,					
+						themes / def / www / images,				
+						themes / def / www / fonts,
+						fs::path() };
 	if (!theme.empty() && theme != def) infixes.push_front(themes / theme);
 	// Build combinations of paths and infixes
 	Paths themePaths;
@@ -164,21 +181,21 @@ fs::path findFile(fs::path const& filename) {
 		if (fs::exists(p)) return p.string();
 	}
 	std::string logmsg = "fs/error: Unable to locate data file, tried:\n";
-	for (auto const& p: list) logmsg += "  " + p.string() + '\n';
+	for (auto const& p: list) logmsg += "	 " + p.string() + '\n';
 	std::clog << logmsg << std::flush;
 	throw std::runtime_error("Cannot find file \"" + filename.string() + "\" in Performous theme or data folders");
 }
 
 Paths listFiles(fs::path const& dir) {
 	if (dir.is_absolute()) throw std::logic_error("listFiles expects a folder name without path.");
-	std::set<fs::path> found;  // Filenames already found
-	Paths files;  // Full paths of files found
+	std::set<fs::path> found;	 // Filenames already found
+	Paths files;	// Full paths of files found
 	for (fs::path path: getThemePaths()) {
 		fs::path subdir = path / dir;
 		if (!fs::is_directory(subdir))
 			continue;
 		for (const auto &d : fs::recursive_directory_iterator(subdir)) {
-			fs::path name = d.path().filename();  // FIXME: Extract full path from current folder, not just the filename
+			fs::path name = d.path().filename();	// FIXME: Extract full path from current folder, not just the filename
 			// If successfully inserted to "found", it wasn't found before, so add to paths.
 			if (found.insert(name).second) files.push_back(d);
 		}
@@ -205,7 +222,7 @@ Paths getPathsConfig(std::string const& confOption) {
 	Lock l(mutex);
 	Paths ret;
 	for (auto const& str: config[confOption].sl()) {
-		ret.splice(ret.end(), cache.pathExpand(str));  // Add expanded paths to ret.
+		ret.splice(ret.end(), cache.pathExpand(str));	 // Add expanded paths to ret.
 	}
 	return ret;
 }
