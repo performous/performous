@@ -1,27 +1,25 @@
 #include "songs.hh"
 
 #include "configuration.hh"
-#include "fs.hh"
-#include "song.hh"
 #include "database.hh"
+#include "fs.hh"
 #include "i18n.hh"
-#include "profiler.hh"
 #include "libxml++-impl.hh"
-#include "unicode.hh"
+#include "log.hh"
 #include "platform.hh"
+#include "profiler.hh"
+#include "song.hh"
+#include "unicode.hh"
 
 #include <algorithm>
 #include <cstdlib>
-#include <iostream>
+#include <fstream>
 #include <regex>
 #include <stdexcept>
 
-#include "fs.hh"
 #include <boost/format.hpp>
-#include <unicode/stsearch.h>
-
-#include <fstream>
 #include <nlohmann/json.hpp>
+#include <unicode/stsearch.h>
 
 Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), m_database(database), m_order(config["songs/sort-order"].i()) {
 	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
@@ -41,25 +39,23 @@ void Songs::reload() {
 	}
 	// Run loading thread
 	m_loading = true;
-	if (m_thread) m_thread->join();
-	m_thread = std::make_unique<std::thread>([this]{ reload_internal(); });
-}
-
-void Songs::reload_internal() {
 	{
 		std::unique_lock<std::shared_mutex> l(m_mutex);
 		m_songs.clear();
 		m_dirty = true;
 	}
-#ifdef USE_WEBSERVER
+	if (m_thread) m_thread->join();
 	std::clog << "songs/notice: Starting to load all songs from cache." << std::endl;
 	LoadCache();
 	// the following code is used to check that load <=> save are idempotent
 	//CacheSonglist();
 	//return;
 	std::clog << "songs/notice: Done loading the cache. You now have " << loadedSongs() << " songs in your list." << std::endl;
-#endif
 	std::clog << "songs/notice: Starting to load all songs from disk, to update the cache." << std::endl;
+	m_thread = std::make_unique<std::thread>([this]{ reload_internal(); });
+}
+
+void Songs::reload_internal() {
 	Profiler prof("songloader");
 	Paths systemSongs = getPathsConfig("paths/system-songs");
 	Paths paths = getPathsConfig("paths/songs");
@@ -91,24 +87,8 @@ const std::string SONGS_CACHE_JSON_FILE = "songs.json";
 
 void Songs::LoadCache() {
 	const fs::path songsMetaFile = getCacheDir() / SONGS_CACHE_JSON_FILE;
-	std::ifstream file(songsMetaFile.string());
-	auto jsonRoot = nlohmann::json::array();
-	if (file) {
-		try {
-			std::stringstream buffer;
-			buffer << file.rdbuf();
-			file.close();
-			jsonRoot = nlohmann::json::parse(buffer);
-		} catch(std::exception const& e) {
-			std::clog << "songs/error: " << e.what() << std::endl;
-			file.close();
-			return;
-		}
-	} else {
-		std::clog << "songs/info: Could not open songs meta cache file " << songsMetaFile.string() << std::endl;
-		return;
-	}
-
+	auto jsonRoot = readJSON(songsMetaFile);
+	if (jsonRoot.empty()) return;
 	std::vector<std::string> allPaths;
 	for(const auto& songPaths : {getPathsConfig("paths/system-songs"), getPathsConfig("paths/songs")}) {
 		for(const auto& songPath: songPaths) {
@@ -233,16 +213,17 @@ void Songs::CacheSonglist() {
 	}
 
 	fs::path cacheDir = getCacheDir() / SONGS_CACHE_JSON_FILE;
-
+	std::ofstream outFile;
 	try {
-		std::ofstream outFile(cacheDir.string());
+		outFile.open(cacheDir.string(),std::ios::out);
+		if (!outFile.is_open()) throw std::runtime_error("Can't open file.");
 		const int spacesCount = 4;
 		outFile << jsonRoot.dump(spacesCount);
-		outFile.close();
+		std::clog << "songs/info: saved " + std::to_string(jsonRoot.size()) + " songs to the cache at " + cacheDir.string() << std::endl;
 	} catch (std::exception const& e) {
 		std::clog << "songs/error: Could not save " + cacheDir.string() + ": " + e.what() << std::endl;
-		return;
 	}
+	outFile.close();
 }
 
 void Songs::reload_internal(fs::path const& parent) {
