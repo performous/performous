@@ -2,10 +2,9 @@
 
 #include "fs.hh"
 #include "i18n.hh"
+#include "json.hh"
 #include "notes.hh"
 #include "util.hh"
-
-#include <nlohmann/json.hpp>
 
 #include <cstdint>
 #include <memory>

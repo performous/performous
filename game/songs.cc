@@ -4,6 +4,7 @@
 #include "database.hh"
 #include "fs.hh"
 #include "i18n.hh"
+#include "json.hh"
 #include "libxml++-impl.hh"
 #include "log.hh"
 #include "platform.hh"
@@ -93,24 +94,8 @@ const std::string SONGS_CACHE_JSON_FILE = "songs.json";
 
 void Songs::LoadCache() {
 	const fs::path songsMetaFile = getCacheDir() / SONGS_CACHE_JSON_FILE;
-	std::ifstream file(songsMetaFile.string());
-	auto jsonRoot = nlohmann::json::array();
-	if (file) {
-		try {
-			std::stringstream buffer;
-			buffer << file.rdbuf();
-			file.close();
-			jsonRoot = nlohmann::json::parse(buffer);
-		} catch(std::exception const& e) {
-			std::clog << "songs/error: " << e.what() << std::endl;
-			file.close();
-			return;
-		}
-	} else {
-		std::clog << "songs/info: Could not open songs meta cache file " << songsMetaFile.string() << std::endl;
-		return;
-	}
-
+	auto jsonRoot = readJSON(songsMetaFile);
+	if (jsonRoot.empty()) return;
 	std::vector<std::string> allPaths;
 	for(const auto& songPaths : {getPathsConfig("paths/system-songs"), getPathsConfig("paths/songs")}) {
 		for(const auto& songPath: songPaths) {
@@ -235,17 +220,8 @@ void Songs::CacheSonglist() {
 	}
 
 	fs::path cacheDir = getCacheDir() / SONGS_CACHE_JSON_FILE;
-
-	try {
-		std::ofstream outFile(cacheDir.string());
-		const int spacesCount = 4;
-		outFile << jsonRoot.dump(spacesCount);
-		outFile.close();
-	} catch (std::exception const& e) {
-		std::clog << "songs/error: Could not save " + cacheDir.string() + ": " + e.what() << std::endl;
-		return;
+	writeJSON(jsonRoot, cacheDir);
 	}
-}
 
 void Songs::reload_internal(fs::path const& parent) {
 	if (std::distance(parent.begin(), parent.end()) > 20) { std::clog << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)\n"; return; }
