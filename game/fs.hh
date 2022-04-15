@@ -1,6 +1,7 @@
 #pragma once
 
 #include "config.hh"
+#include <nlohmann/json.hpp>
 
 #include <list>
 #include <vector>
@@ -53,6 +54,7 @@ static inline fs::path absolute(const fs::path& p, const fs::path& base) {
 
 typedef std::vector<std::uint8_t> BinaryBuffer;
 
+nlohmann::json readJSON(fs::path const& filename); ///< Reads a JSON file into memory.
 std::list<std::string> getThemes();  ///< Find all theme folders and return theme names.
 
 /// Recursively copies a folder, throws on error.
