@@ -12,7 +12,7 @@ include(LibFindMacros)
 
 set(Json_FIND_REQUIRED FALSE)
 set(Json_FIND_QUIETLY TRUE)
-libfind_pkg_detect(Json nlohmann_json FIND_PATH nlohmann/json.hpp)
+libfind_pkg_detect(Json nlohmann_json >= 3.6.0 FIND_PATH nlohmann/json.hpp)
 libfind_process(Json)
 
 if (Json_FOUND)
