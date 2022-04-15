@@ -51,9 +51,9 @@ class Songs {
 	/// array access
 	std::shared_ptr<Song> operator[](std::size_t pos) { return m_filtered[pos]; }
 	/// number of songs
-	size_t size() const { return m_filtered.size(); }
+	std::size_t size() const { return m_filtered.size(); }
 	/// true if empty
-	bool empty() const { return m_filtered.empty(); }
+	bool empty(bool webServer = false) const { return (webServer ? m_webServerFiltered : m_filtered).empty(); }
 	/// advances to next song
 	void advance(int diff) {
 		std::ptrdiff_t size = static_cast<int>(m_filtered.size());
@@ -97,7 +97,7 @@ class Songs {
 	void parseFile(Song& tmp);
 	std::atomic<bool> doneLoading{ false };
 	std::atomic<bool> displayedAlert{ false };
-	size_t loadedSongs() const { std::shared_lock<std::shared_mutex> l(m_mutex); return m_songs.size(); }
+	std::size_t loadedSongs() const { std::shared_lock<std::shared_mutex> l(m_mutex); return m_songs.size(); }
 	void addSongOrder(SongOrderPtr);
 
   private:
@@ -116,9 +116,9 @@ class Songs {
 	// Careful the m_songs needs to be correctly locked when accessed, and
 	// especially, the reload_internal thread expects to be the only thread
 	// to modify this member (any other thread may read it).
-	SongCollection m_songs, m_filtered;
-	AnimValue m_updateTimer;
 	AnimAcceleration math_cover;
+	AnimValue m_updateTimer;
+	SongCollection m_songs, m_filtered, m_webServerFiltered;
 	std::string m_filter;
 	Database & m_database;
 	unsigned short m_type = 0;

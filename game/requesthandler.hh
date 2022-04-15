@@ -3,6 +3,7 @@
 
 #include <cpprest/http_listener.h>
 #include <cpprest/filestream.h>
+#include <nlohmann/json.hpp>
 
 #include "screen_playlist.hh"
 
@@ -26,11 +27,17 @@ class RequestHandler
         void Error(pplx::task<void>& t);
 
         web::json::value ExtractJsonFromRequest(web::http::http_request request);
+        nlohmann::json ExtractJsonFromRequest_New(web::http::http_request request);
+        
+        nlohmann::json convertFromCppRest(web::json::value const& jsonDoc);
+        web::json::value convertToCppRest(nlohmann::json const& jsonDoc);
 
         void HandleFile(web::http::http_request request, std::string filePath = "");
+        nlohmann::json SongsToJsonObject_New();
         web::json::value SongsToJsonObject();
         std::map<std::string, std::string> GenerateLocaleDict();
         std::vector<std::string> GetTranslationKeys();
+        std::shared_ptr<Song> GetSongFromJSON_New(nlohmann::json);
         std::shared_ptr<Song> GetSongFromJSON(web::json::value);
 
         web::http::experimental::listener::http_listener m_listener;
