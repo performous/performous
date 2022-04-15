@@ -1,22 +1,22 @@
 #include "songs.hh"
 
 #include "configuration.hh"
-#include "fs.hh"
-#include "song.hh"
 #include "database.hh"
+#include "fs.hh"
 #include "i18n.hh"
-#include "profiler.hh"
 #include "libxml++-impl.hh"
-#include "unicode.hh"
+#include "log.hh"
+#include "profiler.hh"
 #include "platform.hh"
+#include "song.hh"
+#include "unicode.hh"
 
 #include <algorithm>
 #include <cstdlib>
-#include <iostream>
+#include <fstream>
 #include <regex>
 #include <stdexcept>
 
-#include "fs.hh"
 #include <boost/format.hpp>
 #include <unicode/stsearch.h>
 
