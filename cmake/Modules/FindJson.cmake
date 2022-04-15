@@ -15,7 +15,7 @@ set(Json_FIND_QUIETLY TRUE)
 libfind_pkg_detect(Json nlohmann_json FIND_PATH nlohmann/json.hpp)
 libfind_process(Json)
 
-if (Json_FOUND)
+if (Json_FOUND AND ${Json_PKGCONF_VERSION} VERSION_GREATER_EQUAL 3.6.0)
     set(Json_VERSION ${Json_PKGCONF_VERSION})
 else ()
     message("-- Fetching nlohmann_json from github...")
