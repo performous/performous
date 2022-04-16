@@ -440,13 +440,11 @@ int Device::operator()(float const* inbuf, float* outbuf, unsigned long frames) 
 
 struct Audio::Impl {
 	Output output;
-	portaudio::Init init;
 	std::deque<Analyzer> analyzers;
 	std::deque<Device> devices;
 	bool playback = false;
 	std::string selectedBackend = Audio::backendConfig().getValue();
 	Impl() {
-		populateBackends(portaudio::AudioBackends().getBackends());
 		std::clog << portaudio::AudioBackends().dump() << std::flush; // Dump PortAudio backends and devices to log.
 		// Parse audio devices from config
 		ConfigItem::StringList devs = config["audio/devices"].sl();
@@ -546,9 +544,13 @@ struct Audio::Impl {
 	}
 };
 
-Audio::Audio(): self(std::make_unique<Impl>()) {
+portaudio::Init Audio::init;
+
+Audio::Audio() {
 	aubio_tempo_set_silence(Audio::aubioTempo.get(), -50.0);
 	aubio_tempo_set_threshold(Audio::aubioTempo.get(), 0.4);
+        populateBackends(portaudio::AudioBackends().getBackends());
+        self = std::make_unique<Impl>();
 }
 Audio::~Audio() { close(); }
 

@@ -75,6 +75,8 @@ class ConfigItem;
 /** @short High level audio playback API **/
 class Audio {
 	friend int getBackend();
+        // static because Port audio once for the whole software lifetime
+	static portaudio::Init init;
 	struct Impl;
 	std::unique_ptr<Impl> self;
 	friend class ScreenSongs;
