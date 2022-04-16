@@ -207,3 +207,87 @@ jobs:
           asset_path: ${{ env.ARTIFACT_PATH }}
           asset_name: ${{ env.ARTIFACT_NAME }}
           asset_content_type: application/octet-stream
+
+  # Create the MacOS dmg
+  MacOS_Packages:
+    name: Create MacOS dmg
+    needs:
+      - determine_version
+      - create_release
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Git
+        id: checkout_git
+        run: |
+          git clone --recursive ${{ github.server_url }}/${{ github.repository }}
+          cd performous
+          if [ "${{ github.head_ref }}" ]; then
+            git checkout ${{ github.head_ref }}
+          else
+            git checkout ${{ github.sha }}
+          fi
+
+      # brew fetch runs downloads in parallel, which is faster
+      # than letting install do it
+      - name: Fetch Dependencies
+        id: fetch_deps
+        run: |
+          brew fetch --deps boost cmake ffmpeg@4 help2man icu4c portaudio\
+            portmidi opencv libepoxy librsvg libxml++3 sdl2 dylibbundler\
+            asio fftw glm
+
+      - name: Install Dependencies
+        id: install_deps
+        run: |
+           brew install boost cmake ffmpeg@4 help2man icu4c portaudio portmidi\
+             opencv libepoxy librsvg libxml++3 sdl2 dylibbundler asio fftw glm
+           brew link ffmpeg@4
+
+      - name: Build package
+        id: build_package
+        run: |
+          cd performous/osx-utils
+          export PACKAGE_VERSION=${{ needs.determine_version.outputs.complete_version }}
+          echo $PACKAGE_VERSION
+          chmod +x ./performous-app-build.sh
+          ./performous-app-build.sh
+          WORK_DIR=$(pwd)
+          PACKAGE_PATH=$(ls ${WORK_DIR}/Performous.*)
+          PACKAGE_NAME=$(echo ${PACKAGE_PATH} | sed 's/\(Performous\).*$/\1/')
+          PACKAGE_SUFFIX=$(echo ${PACKAGE_PATH} | sed 's/^.*\(.\{4\}\)/\1/')
+          NEW_PACKAGE_NAME="${PACKAGE_NAME}-${PACKAGE_VERSION}${PACKAGE_SUFFIX}"
+          MASTER_NEW_PACKAGE_NAME="${PACKAGE_NAME}-latest${PACKAGE_SUFFIX}"
+          cp ${PACKAGE_PATH} ${MASTER_NEW_PACKAGE_NAME}
+          mv ${PACKAGE_PATH} ${NEW_PACKAGE_NAME}
+          ARTIFACT_NAME=$( echo ${NEW_PACKAGE_NAME} | rev | cut -d '/' -f1 | rev)
+          MASTER_ARTIFACT_NAME=$( echo ${MASTER_NEW_PACKAGE_NAME} | rev | cut -d '/' -f1 | rev)
+          echo "ARTIFACT_PATH=${NEW_PACKAGE_NAME}" >> ${GITHUB_ENV}
+          echo "ARTIFACT_NAME=${ARTIFACT_NAME}" >> ${GITHUB_ENV}
+          echo "MASTER_ARTIFACT_PATH=${MASTER_NEW_PACKAGE_NAME}" >> ${GITHUB_ENV}
+          echo "MASTER_ARTIFACT_NAME=${MASTER_ARTIFACT_NAME}" >> ${GITHUB_ENV}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.ARTIFACT_PATH }}
+
+      - name: Upload artifact with unified name
+        if: ${{ github.ref == 'refs/heads/master' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.MASTER_ARTIFACT_NAME }}
+          path: ${{ env.MASTER_ARTIFACT_PATH }}
+
+      - name: Upload artifacts to tagged release
+        id: upload_assets
+        if: ${{ github.event_name != 'pull_request' && github.ref_type == 'tag' }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: ${{ env.ARTIFACT_PATH }}
+          asset_name: ${{ env.ARTIFACT_NAME }}
+          asset_content_type: application/octet-stream
