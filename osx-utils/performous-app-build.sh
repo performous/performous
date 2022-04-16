@@ -72,6 +72,24 @@ MAKE_JOBS=$(sysctl -n hw.ncpu)
 test -z ${CC} && CCPATH="/usr/bin/clang" # Path to system Clang, change if you want another compiler.
 test -z ${CXX} && CXXPATH="/usr/bin/clang++" # Path to system Clang, change if you want another compiler.
 
+## Set the versions that will be changed in the copied Info.plist file.
+## On the MacOS builder, 'PACKAGE_VERSION' is exported and will be picked up.
+## If it isn't there, fall back to what git provides for a version locally.
+if [ -z ${PACKAGE_VERSION} ]; then
+	PACKAGE_VERSION=$(git describe --tags || echo 1.0.0)
+fi
+PACKAGE_SEM_VER=$(echo ${PACKAGE_VERSION} | grep -oE "[0-9]+\.[0-9]+\.[0-9]+")
+if [ $(echo ${PACKAGE_VERSION} | grep -c alpha) -gt 0 ]; then
+	PR_NUM=$(echo ${PACKAGE_VERSION} | cut -d'-' -f2)
+	PACKAGE_SEM_VER="${PACKAGE_SEM_VER}a${PR_NUM}"
+elif [ $(echo ${PACKAGE_VERSION} | grep -c beta) -gt 0 ]; then
+	BETA_NUM=$(echo ${PACKAGE_VERSION} | cut -d'-' -f2)
+	PACKAGE_SEM_VER="${PACKAGE_SEM_VER}b${BETA_NUM}"
+fi
+PACKAGE_MAJOR=$(echo ${PACKAGE_SEM_VER} | cut -d'.' -f1)
+PACKAGE_MINOR=$(echo ${PACKAGE_SEM_VER} | cut -d'.' -f2)
+
+
 function exists {
 	if hash "$1" 2>/dev/null
 		then
@@ -114,8 +132,8 @@ function bundlelibs {
 function createdmg {
 	if [ "${FANCY_DMG}" == 0 ]
 		then
-			ln -sf /Applications "${PERFORMOUS_SOURCE}/out/Applications"
-			rm "${PERFORMOUS_SOURCE}/osx-utils/out/.DS_Store"
+			ln -sf /Applications "${PERFORMOUS_SOURCE}/osx-utils/out/Applications"
+			rm -f "${PERFORMOUS_SOURCE}/osx-utils/out/.DS_Store"
 			/usr/bin/hdiutil create -ov -srcfolder out -volname Performous -fs HFS+ -fsargs "-c c=64,a=16,e=16" -format UDRW RWPerformous.dmg
 			/usr/bin/hdiutil convert -ov RWPerformous.dmg -format UDZO -imagekey zlib-level=9 -o Performous.dmg
 			rm -f RWPerformous.dmg
@@ -210,6 +228,7 @@ function main {
 	  -DLOCALE_DIR="Resources/Locales" \
 	  -DCMAKE_CXX_FLAGS="-Wall -Wextra" \
 	  -DCMAKE_OSX_ARCHITECTURES="x86_64" \
+	  -DPERFORMOUS_VERSION="${PACKAGE_VERSION}" \
 	  -B "${PERFORMOUS_SOURCE}/build" \
 	  -S "${PERFORMOUS_SOURCE}"
 	
@@ -225,7 +244,13 @@ function main {
 			sed -i '' -e 's|"\${CURRDIR}\/performous"|"\${CURRDIR}\/performous" --log debug|g' "$BINDIR/performous-launcher" # enable debug logging.
 	fi
 	cp "${PERFORMOUS_SOURCE}/osx-utils/resources/performous.icns" "${RESDIR}"
+
+	## Copy Info.plist and change the token values
 	cp "${PERFORMOUS_SOURCE}/osx-utils/resources/Info.plist" "${TEMPDIR}"
+	sed -i '' s/@@CFBundleShortVersionString@@/${PACKAGE_MAJOR}\.${PACKAGE_MINOR}/ "${TEMPDIR}/Info.plist"
+	sed -i '' s/@@CFBundleLongVersionString@@/${PACKAGE_VERSION}/ "${TEMPDIR}/Info.plist"
+	sed -i '' s/@@CFBundleVersion@@/${PACKAGE_SEM_VER}/ "${TEMPDIR}/Info.plist"
+
 
 	mkdir -p "${FRAMEWORKDIR}"
 	mkdir -p "${LIBDIR}"
