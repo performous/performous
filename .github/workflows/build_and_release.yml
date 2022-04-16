@@ -1,0 +1,209 @@
+name: Build and Release Performous
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on merges to master, release branches,
+  # all PRs, and release tags 
+  push:
+    branches:
+      - master
+      - '[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+'
+    tags:
+      - '[0-9]+\.[0-9]+\.[0-9]+'
+      - '[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+'
+
+  # On anything pull request related
+  pull_request:
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Note: entire jobs or sections can be disabled by adding
+# if: ${{ false }} to the definition column
+jobs:
+  # Determine version
+  determine_version:
+    name: Determine the version to be used
+    runs-on: ubuntu-latest
+    outputs:
+      latest_tag_version: ${{ steps.versioning.outputs.latest_tag_version }}
+      latest_full_tag_version: ${{ steps.versioning.outputs.latest_full_tag_version }}
+      version_major: ${{ steps.versioning.outputs.version_major }}
+      version_minor: ${{ steps.versioning.outputs.version_minor }}
+      version_patch: ${{ steps.versioning.outputs.version_patch }}
+      version_tweak: ${{ steps.versioning.outputs.version_tweak }}
+      complete_version: ${{ steps.versioning.outputs.complete_version }}
+    steps:
+      - name: Determine the complete version
+        id: versioning
+        run: |
+          git clone --recursive ${{ github.server_url }}/${{ github.repository }}
+          cd performous
+          if [ "${{ github.head_ref }}" ]; then
+            git checkout ${{ github.head_ref }}
+          else
+            git checkout ${{ github.sha }}
+          fi
+          LATEST_TAG_VERSION=$(git describe --tags --abbrev=0 || echo 1.0.0)
+          LATEST_FULL_TAG_VERSION=$(git describe --tags || echo 1.0.0)
+          echo "::set-output name=latest_tag_version::$(git describe --tags --abbrev=0 || echo 1.0.0)"
+          echo "::set-output name=latest_full_tag_version::$(git describe --tags || echo 1.0.0)"
+          echo "::set-output name=version_major::$(cut -d '.' -f 1 <<< $(git describe --tags --abbrev=0 || echo 1.0.0))"
+          echo "::set-output name=version_minor::$(cut -d '.' -f 2 <<< $(git describe --tags --abbrev=0 || echo 1.0.0))"
+          echo "::set-output name=version_patch::$(cut -d '.' -f 3 <<< $(git describe --tags --abbrev=0 || echo 1.0.0))"
+          echo "::set-output name=version_tweak::0"
+          echo "::set-output name=complete_version::$(if [ $GITHUB_REF_TYPE == 'tag' ]; then echo $GITHUB_REF_NAME; elif [ $GITHUB_REF_TYPE == 'branch' ] && [ $GITHUB_REF_NAME == 'master' ]; then echo $LATEST_FULL_TAG_VERSION-beta; elif [ $GITHUB_REF_TYPE == 'branch' ] && [ $GITHUB_REF_NAME != 'master' ]; then echo $LATEST_TAG_VERSION-${{github.event.pull_request.number}}-${GITHUB_SHA::7}-alpha; fi)"
+          rm -rf performous
+
+  # Set up a release that packages will be published to.
+  create_release:
+    name: Create a release
+    runs-on: ubuntu-latest
+    # Make sure the output variable for this step is set so it
+    # can be consumed by later build steps
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Create the Main release
+        id: create_release
+        if: ${{ github.event_name != 'pull_request' && github.ref_type == 'tag' }}
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Performous ${{ github.ref_name }}
+          draft: true
+          prerelease: false
+
+  # Create the Linux Packages
+  # This is done in containers provided by
+  # ${{ github.server_url }}/${{ github.repository }}-docker since
+  # github actions provides only Ubuntu
+  Linux_Packages:
+    # The upload step needs the release to be created first so it
+    # can access the upload_url output. This step also needs the output from
+    # the version dteremination job to name things correctly.
+    name: Create Linux packages
+    needs:
+      - determine_version
+      - create_release
+    # Ubuntu required for Linux containers
+    runs-on: ubuntu-latest
+    # The docker registry here is hard-coded because it it publicly visible
+    # and therefore will work if forked. If you are setting up a registry,
+    # make sure the visibility of the registry is set to "public".
+    # This is necessary because the container registry is set up under a
+    # different github repository than this one, and GITHUB_TOKEN is only
+    # valid for one session in the repo the job was started under.
+    # Because the the performous-docker gh repo created the registry, it has
+    # ownership over the registry in ghcr.io and cannot be accessed from here.
+    container: ghcr.io/performous/deps:${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          # Images must be added to 
+          # ${{ github.server_url }}/${{ github.repository }}-docker with a successful
+          # run on master before they can be used here
+          - ubuntu18.04
+          - ubuntu20.04
+          - ubuntu22.04
+          - fedora33
+          - fedora34
+          - fedora35
+    steps:
+      - name: Checkout Git
+        id: checkout_git
+        run: |
+          git clone --recursive ${{ github.server_url }}/${{ github.repository }}
+          cd performous
+          if [ "${{ github.head_ref }}" ]; then
+            git checkout ${{ github.head_ref }}
+          else
+            git checkout ${{ github.sha }}
+          fi
+
+      - name: Build package
+        id: build_package
+        run: |
+          cd performous
+          # Pull in OS variables to figure out options later
+          . /etc/os-release
+
+          ## Set up some special cmake flags for fedora
+          if [ "${ID}" == "fedora" ]; then
+            EXTRA_CMAKE_ARGS="-DUSE_BOOST_REGEX=1"
+          fi
+
+          ## Figure out what type of packages we need to generate
+          case ${ID} in
+            'fedora')
+          PACKAGE_TYPE='RPM';;
+            'ubuntu')
+          PACKAGE_TYPE='DEB';;
+            *)
+          PACKAGE_TYPE='TAR';;
+          esac
+
+          PACKAGE_VERSION=${{ needs.determine_version.outputs.complete_version }}
+          echo $PACKAGE_VERSION
+
+          # Build the Packages
+          mkdir build_cmake
+          cd build_cmake
+          cmake ${EXTRA_CMAKE_ARGS} -DCMAKE_BUILD_TYPE=Release \
+            -DPERFORMOUS_VERSION=$PACKAGE_VERSION \
+            -DENABLE_WEBSERVER=ON \
+            -DCMAKE_VERBOSE_MAKEFILE=1 \
+            -DENABLE_WEBCAM=ON ..
+          CPU_CORES=$(nproc --all)
+          make -j${CPU_CORES}
+          cpack -G ${PACKAGE_TYPE}
+          
+          # Do some mangling to make a unique name based on the OS
+          # This is needed so we don't overwite in the release each time.
+          # We should probably investigate what cmake can do for package output
+          # to make this cleaner in the future
+          WORK_DIR=$(pwd)
+          PACKAGE_PATH=$(ls ${WORK_DIR}/Performous*-Linux.*)
+          PACKAGE_NAME=$(echo ${PACKAGE_PATH} | sed 's/\(Performous\).*$/\1/')
+          PACKAGE_SUFFIX=$(echo ${PACKAGE_PATH} | sed 's/^.*\(.\{4\}\)/\1/')
+          NEW_PACKAGE_NAME="${PACKAGE_NAME}-${PACKAGE_VERSION}-${ID}_${VERSION_ID}${PACKAGE_SUFFIX}"
+          MASTER_NEW_PACKAGE_NAME="${PACKAGE_NAME}-latest-${ID}_${VERSION_ID}${PACKAGE_SUFFIX}"
+          cp ${PACKAGE_PATH} ${MASTER_NEW_PACKAGE_NAME}
+          mv ${PACKAGE_PATH} ${NEW_PACKAGE_NAME}
+          ARTIFACT_NAME=$( echo ${NEW_PACKAGE_NAME} | rev | cut -d '/' -f1 | rev)
+          MASTER_ARTIFACT_NAME=$( echo ${MASTER_NEW_PACKAGE_NAME} | rev | cut -d '/' -f1 | rev)
+          echo "ARTIFACT_PATH=${NEW_PACKAGE_NAME}" >> ${GITHUB_ENV}
+          echo "ARTIFACT_NAME=${ARTIFACT_NAME}" >> ${GITHUB_ENV}
+          echo "MASTER_ARTIFACT_PATH=${MASTER_NEW_PACKAGE_NAME}" >> ${GITHUB_ENV}
+          echo "MASTER_ARTIFACT_NAME=${MASTER_ARTIFACT_NAME}" >> ${GITHUB_ENV}
+
+      # Upload artifacts during pull-requests
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.ARTIFACT_PATH }}
+
+      # Upload artifacts on master
+      - name: Upload artifact with unified name
+        if: ${{ github.ref == 'refs/heads/master' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.MASTER_ARTIFACT_NAME }}
+          path: ${{ env.MASTER_ARTIFACT_PATH }}
+ 
+      # Upload artifacts to releases only during Release events
+      - name: Upload artifacts to tagged release
+        id: upload_assets
+        if: ${{ github.event_name != 'pull_request' && github.ref_type == 'tag' }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: ${{ env.ARTIFACT_PATH }}
+          asset_name: ${{ env.ARTIFACT_NAME }}
+          asset_content_type: application/octet-stream
