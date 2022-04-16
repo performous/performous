@@ -13,7 +13,7 @@
 
 include(LibFindMacros)
 
-libfind_pkg_detect(SDL2 sdl2 FIND_PATH SDL.h PATH_SUFFIXES SDL2 FIND_LIBRARY SDL2d SDL2)
+libfind_pkg_detect(SDL2 sdl2 FIND_PATH SDL.h PATH_SUFFIXES SDL2 FIND_LIBRARY SDL2)
 
 # Process others than OSX with native SDL normally
 if(NOT "${SDL2_SDL_LIBRARY}" MATCHES "framework")
