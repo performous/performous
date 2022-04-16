@@ -422,8 +422,7 @@ void Device::start() {
 }
 
 void Device::stop() {
-	PaError err = Pa_StopStream(stream);
-	if (err != paNoError) throw std::runtime_error(std::string("Pa_StopStream: ") + Pa_GetErrorText(err));
+	PORTAUDIO_CHECKED(Pa_AbortStream, (stream));
 }
 
 int Device::operator()(float const* inbuf, float* outbuf, unsigned long frames) try {
@@ -561,10 +560,7 @@ ConfigItem& Audio::backendConfig() {
 void Audio::restart() { close(); self = std::make_unique<Impl>(); }
 
 void Audio::close() {
-	// Only wait a limited time for closing of audio devices because it often hangs (on Linux)
-	auto audiokiller = std::async(std::launch::async, [this]{ self.reset(); });
-	if (audiokiller.wait_for(2.5s) == std::future_status::ready) return;
-	throw std::runtime_error("Audio hung for some reason.\nPlease restart Performous.");
+	self.reset();
 }
 
 bool Audio::isOpen() const {
