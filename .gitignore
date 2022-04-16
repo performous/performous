@@ -1,4 +1,4 @@
-[bB]uild*
+[bB]uild/*
 CMakeLists.txt.user*
 *~
 *.mo
