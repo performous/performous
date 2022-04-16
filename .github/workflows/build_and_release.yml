@@ -292,3 +292,83 @@ jobs:
           asset_path: ${{ env.ARTIFACT_PATH }}
           asset_name: ${{ env.ARTIFACT_NAME }}
           asset_content_type: application/octet-stream
+
+  # Create the Windows installer
+  Windows_Packages:
+    name: Create Windows installer
+    needs:
+      - determine_version
+      - create_release
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Git
+        id: checkout_git
+        run: |
+          git clone --recursive ${{ github.server_url }}/${{ github.repository }}
+          cd performous
+          if ( "${{ github.head_ref }}" ) {
+            git checkout ${{ github.head_ref }}
+          }
+          else {
+            git checkout ${{ github.sha }}
+          }
+
+      - name: Setup our dev environment
+        uses: ilammy/msvc-dev-cmd@v1.4.1
+
+      - name: Setup ninja cmake generator
+        uses: seanmiddleditch/gha-setup-ninja@master
+
+      - name: Download and build our dependencies using vcpkg
+        uses: lukka/run-vcpkg@v10.2
+        with:
+          vcpkgGitCommitId: '71d274d7ce32d7f2508062a70e0a5ebe981319eb'
+          runVcpkgInstall: true
+
+      - name: Run cmake to configure the project and build it
+        env:
+          PERFORMOUS_VERSION: ${{ needs.determine_version.outputs.complete_version }}
+        run: |
+          cd ${{ github.workspace }}/performous
+          echo $PERFORMOUS_VERSION
+          cmake --preset "x64-release"
+          cmake --build --preset "x64-release"
+
+      - name: Create Installer
+        id: package_performous_x64
+        run: |
+           cd performous/build/x64-release
+           cpack -G NSIS x64-release
+           Copy-Item $(Get-ChildItem -Filter '*win64.exe').Name "Performous-latest.exe"
+           Rename-Item $(Get-ChildItem -Filter '*win64.exe').Name -NewName "Performous-${{ needs.determine_version.outputs.complete_version }}.exe"
+           chcp 65001 #set code page to utf-8
+           echo ("ARTIFACT_PATH=${{ github.workspace }}/performous/build/x64-release/Performous-${{ needs.determine_version.outputs.complete_version }}.exe") >> $env:GITHUB_ENV
+           echo ("ARTIFACT_FILENAME=Performous-${{ needs.determine_version.outputs.complete_version }}.exe") >> $env:GITHUB_ENV
+           echo ("MASTER_ARTIFACT_PATH=${{ github.workspace }}/performous/build/x64-release/Performous-latest.exe") >> $env:GITHUB_ENV
+           echo ("MASTER_ARTIFACT_FILENAME=Performous-latest.exe") >> $env:GITHUB_ENV
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          name: ${{ env.ARTIFACT_FILENAME }}
+          path: ${{ env.ARTIFACT_PATH }}
+
+      - name: Upload artifact with unified name
+        if: ${{ github.ref == 'refs/heads/master' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.MASTER_ARTIFACT_FILENAME }}
+          path: ${{ env.MASTER_ARTIFACT_PATH }}
+
+      - name: Upload artifacts to tagged release
+        id: upload_assets
+        uses: actions/upload-release-asset@v1
+        if: ${{ github.event_name != 'pull_request' && github.ref_type == 'tag' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: ${{ env.ARTIFACT_PATH }}
+          asset_name: ${{ env.ARTIFACT_FILENAME }}
+          asset_content_type: application/octet-stream
