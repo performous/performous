@@ -102,6 +102,14 @@ pkg_check_modules(deps REQUIRED IMPORTED_TARGET glib-2.0 gio-2.0 gobject-2.0)
 
 set(SELF_BUILT_GIT_BASE "https://github.com/performous" CACHE STRING "base path of the git trees used for self built dependencies")
 
+include(LibFetchMacros)
+libfetch_git_pkg(Ced
+	NAME       ced
+	REPOSITORY ${SELF_BUILT_GIT_BASE}/compact_enc_det.git
+	#https://github.com/google/compact_enc_det.git
+	REFERENCE  "master"
+)
+
 set(SELF_BUILT_AUBIO "NEVER" CACHE STRING "rule to allow self build of Aubio dependency library [NEVER*|AUTO|ALWAYS]")
 find_package(Aubio 0.4.10 REQUIRED)
 message(STATUS "Aubio includes: ${Aubio_INCLUDE_DIRS}")
