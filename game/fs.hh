@@ -55,6 +55,8 @@ static inline fs::path absolute(const fs::path& p, const fs::path& base) {
 typedef std::vector<std::uint8_t> BinaryBuffer;
 
 nlohmann::json readJSON(fs::path const& filename); ///< Reads a JSON file into memory.
+void writeJSON(nlohmann::json const& json, fs::path const& filename); ///< Write a JSON file.
+
 std::list<std::string> getThemes();  ///< Find all theme folders and return theme names.
 
 /// Recursively copies a folder, throws on error.
