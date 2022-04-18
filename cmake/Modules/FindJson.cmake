@@ -16,9 +16,9 @@ set(Json_GIT_VERSION "v3.10.5")
 if(SELF_BUILT_JSON STREQUAL "ALWAYS")
 	message(STATUS "Json forced to build from source")
 	libfetch_git_pkg(Json
-		NAME       nlohman_json
 		REPOSITORY ${SELF_BUILT_GIT_BASE}/json.git
 		REFERENCE  ${Json_GIT_VERSION}
+		FIND_PATH  nlohmann/json.hpp
 	)
 	message(STATUS "Found Json ${Json_VERSION}")
 elseif(SELF_BUILT_JSON STREQUAL "NEVER")
@@ -33,9 +33,9 @@ elseif(SELF_BUILT_JSON STREQUAL "AUTO")
 	if(NOT Json_FOUND)
 		message(STATUS "Json build from source because not found on system")
 		libfetch_git_pkg(Json
-			NAME       nlohman_json
 			REPOSITORY ${SELF_BUILT_GIT_BASE}/json.git
 			REFERENCE  ${Json_GIT_VERSION}
+			FIND_PATH  nlohmann/json.hpp
 		)
 	else()
 		set(Json_VERSION ${Json_PKGCONF_VERSION})

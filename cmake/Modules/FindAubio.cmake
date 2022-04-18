@@ -6,9 +6,9 @@ set(Aubio_GIT_VERSION "14fec3da6749fbcc47b56648d7a38296eccd9499")
 if(SELF_BUILT_AUBIO STREQUAL "ALWAYS")
 	message(STATUS "aubio forced to build from source")
 	libfetch_git_pkg(Aubio
-		NAME aubio
 		REPOSITORY ${SELF_BUILT_GIT_BASE}/aubio.git
 		REFERENCE  ${Aubio_GIT_VERSION}
+		FIND_PATH  aubio/aubio.h
 	)
 	message(STATUS "Found Aubio ${Aubio_VERSION}")
 elseif(SELF_BUILT_AUBIO STREQUAL "NEVER")
@@ -23,9 +23,9 @@ elseif(SELF_BUILT_AUBIO STREQUAL "AUTO")
 	if(NOT Aubio_FOUND)
 		message(STATUS "aubio build from source because not found on system")
 		libfetch_git_pkg(Aubio
-			NAME aubio
 			REPOSITORY ${SELF_BUILT_GIT_BASE}/aubio.git
 			REFERENCE  ${Aubio_GIT_VERSION}
+			FIND_PATH  aubio/aubio.h
 		)
 	else()
 		set(Aubio_VERSION ${Aubio_PKGCONF_VERSION})
