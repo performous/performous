@@ -8,7 +8,7 @@ if(SELF_BUILT_AUBIO STREQUAL "ALWAYS")
 	libfetch_git_pkg(Aubio
 		REPOSITORY ${SELF_BUILT_GIT_BASE}/aubio.git
 		REFERENCE  ${Aubio_GIT_VERSION}
-		FIND_PATH  aubio/aubio.h
+		#FIND_PATH  aubio/aubio.h
 	)
 	message(STATUS "Found Aubio ${Aubio_VERSION}")
 elseif(SELF_BUILT_AUBIO STREQUAL "NEVER")
@@ -25,7 +25,7 @@ elseif(SELF_BUILT_AUBIO STREQUAL "AUTO")
 		libfetch_git_pkg(Aubio
 			REPOSITORY ${SELF_BUILT_GIT_BASE}/aubio.git
 			REFERENCE  ${Aubio_GIT_VERSION}
-			FIND_PATH  aubio/aubio.h
+			#FIND_PATH  aubio/aubio.h
 		)
 	else()
 		set(Aubio_VERSION ${Aubio_PKGCONF_VERSION})
