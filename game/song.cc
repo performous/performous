@@ -15,7 +15,7 @@ extern "C" {
 }
 
 template <typename T> std::optional<T> getJsonEntry(nlohmann::json const& json, const char *name) {
-        if (json.count(name) > 0) return json.at(name).get<T>();
+        if (json.contains(name)) return json.at(name).get<T>();
         return {};
 }
 
@@ -66,7 +66,7 @@ Song::Song(nlohmann::json const& song): dummyVocal(TrackName::LEAD_VOCAL), rando
 	if (getJsonEntry<bool>(song, "guitarTracks").value_or(false)) {
 		instrumentTracks.insert(std::make_pair(TrackName::GUITAR, InstrumentTrack(TrackName::GUITAR)));
 	}
-	if (song.count("bpm") > 0) {
+	if (song.contains("bpm")) {
 		m_bpms.push_back(BPM(0, 0, song.at("bpm").get<double>()));
 	}
 	collateUpdate();
