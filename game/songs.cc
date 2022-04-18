@@ -3,6 +3,7 @@
 #include "configuration.hh"
 #include "database.hh"
 #include "fs.hh"
+#include "json.hh"
 #include "i18n.hh"
 #include "libxml++-impl.hh"
 #include "log.hh"
