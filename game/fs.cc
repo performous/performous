@@ -80,9 +80,8 @@ BinaryBuffer readFile(fs::path const& path) {
 nlohmann::json readJSON(fs::path const& filename) {
 	nlohmann::json json = nlohmann::json::array();
 	std::clog << "json/debug: Will try to parse JSON in: " << filename.string() << std::endl;
-	std::ifstream file;
 	try {
-	file.open(filename.string());
+		std::ifstream file(filename.string());
 		if (!file.is_open()) throw std::runtime_error("Can't open file.");
 			json = nlohmann::json::parse(file);
 		} catch(nlohmann::json::exception const& e) {
@@ -90,14 +89,12 @@ nlohmann::json readJSON(fs::path const& filename) {
 		} catch(std::exception const& e) {
 			std::clog << "fs/error: " << e.what() << std::endl;
 	}
-	file.close();
 	return json;
 }
 
 void writeJSON(nlohmann::json const& json, fs::path const& filename) {
-		std::ofstream outFile;
 	try {
-		outFile.open(filename.string(),std::ios::out);
+		std::ofstream outFile(filename.string());
 		if (!outFile.is_open()) throw std::runtime_error("Can't open file.");
 		const int spacesCount = 4;
 		outFile << json.dump(spacesCount);
@@ -108,7 +105,6 @@ void writeJSON(nlohmann::json const& json, fs::path const& filename) {
 	} catch (std::exception const& e) {
 		std::clog << "fs/error: Could not save " + filename.string() + ": " + e.what() << std::endl;
 	}
-	outFile.close();
 }
 
 void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destinationDir)
