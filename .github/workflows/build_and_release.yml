@@ -234,13 +234,14 @@ jobs:
         run: |
           brew fetch --deps boost cmake ffmpeg@4 help2man icu4c portaudio\
             portmidi opencv libepoxy librsvg libxml++3 sdl2 dylibbundler\
-            asio fftw glm
+            aubio fftw glm
 
       - name: Install Dependencies
         id: install_deps
         run: |
-           brew install boost cmake ffmpeg@4 help2man icu4c portaudio portmidi\
-             opencv libepoxy librsvg libxml++3 sdl2 dylibbundler asio fftw glm
+           brew install boost cmake ffmpeg@4 help2man icu4c portaudio\
+            portmidi opencv libepoxy librsvg libxml++3 sdl2 dylibbundler\
+            aubio fftw glm
            brew link ffmpeg@4
 
       - name: Build package
