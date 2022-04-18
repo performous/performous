@@ -1,17 +1,17 @@
 include(FetchContent)
 
-# Simple function to abstract fetching dependency from Git.
-# it produces similare output as what libfind_pkg_detect would return:
+# Simple function to abstract fetching a dependency from Git.
+# It produces similar output as what libfind_pkg_detect would return:
 # - ${PREFIX}_VERSION
 # - ${PREFIX}_INCLUDE_DIRS
 # - ${PREFIX}_FOUND
 # The following attribute are required:
-# - the PREFIX
+# - PREFIX
 # - REPOSITORY <address>: the git repository address
-# - REFERENCE <reference>: a git reference for this repository (tag or hash or branch or ...
-# The following attribute are optional:
+# - REFERENCE <reference>: a git reference for this repository (tag, branch, or hash)
+# The following attributes are optional:
 # - FIND_PATH <header path>: the path of a file that should be located.
-# Eg: libfetch_git_pkg(Json NAME json REPOSITORY http://performous.org/json.git REFERENCE master FIND_PATH json/json.hpp)
+# Eg: libfetch_git_pkg(Json NAME json REPOSITORY https://github.com/performous/json.git REFERENCE master FIND_PATH json/json.hpp)
 function (libfetch_git_pkg PREFIX)
 	# parse arguments
 	set(argname pkgargs)
