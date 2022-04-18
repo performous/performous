@@ -37,13 +37,10 @@ jobs:
       - name: Determine the complete version
         id: versioning
         run: |
+          # Always check the tags on master since it will have the latest.
+          # Tags will trigger their own workflow and version names
           git clone --recursive ${{ github.server_url }}/${{ github.repository }}
           cd performous
-          if [ "${{ github.head_ref }}" ]; then
-            git checkout ${{ github.head_ref }}
-          else
-            git checkout ${{ github.sha }}
-          fi
           LATEST_TAG_VERSION=$(git describe --tags --abbrev=0 || echo 1.0.0)
           LATEST_FULL_TAG_VERSION=$(git describe --tags || echo 1.0.0)
           echo "::set-output name=latest_tag_version::$(git describe --tags --abbrev=0 || echo 1.0.0)"
@@ -114,14 +111,9 @@ jobs:
     steps:
       - name: Checkout Git
         id: checkout_git
-        run: |
-          git clone --recursive ${{ github.server_url }}/${{ github.repository }}
-          cd performous
-          if [ "${{ github.head_ref }}" ]; then
-            git checkout ${{ github.head_ref }}
-          else
-            git checkout ${{ github.sha }}
-          fi
+        uses: actions/checkout@v3
+        with:
+          path: performous
 
       - name: Build package
         id: build_package
@@ -218,14 +210,10 @@ jobs:
     steps:
       - name: Checkout Git
         id: checkout_git
-        run: |
-          git clone --recursive ${{ github.server_url }}/${{ github.repository }}
-          cd performous
-          if [ "${{ github.head_ref }}" ]; then
-            git checkout ${{ github.head_ref }}
-          else
-            git checkout ${{ github.sha }}
-          fi
+        uses: actions/checkout@v3
+        with:
+          path: performous
+
 
       # brew fetch runs downloads in parallel, which is faster
       # than letting install do it
@@ -248,6 +236,8 @@ jobs:
         id: build_package
         run: |
           cd performous/osx-utils
+          # This export is required because the variable is consumed by the 
+          # MacOS build script to set the version correctly
           export PACKAGE_VERSION=${{ needs.determine_version.outputs.complete_version }}
           echo $PACKAGE_VERSION
           chmod +x ./performous-app-build.sh
@@ -303,15 +293,10 @@ jobs:
     steps:
       - name: Checkout Git
         id: checkout_git
-        run: |
-          git clone --recursive ${{ github.server_url }}/${{ github.repository }}
-          cd performous
-          if ( "${{ github.head_ref }}" ) {
-            git checkout ${{ github.head_ref }}
-          }
-          else {
-            git checkout ${{ github.sha }}
-          }
+        uses: actions/checkout@v3
+        with:
+          path: performous
+
 
       - name: Setup our dev environment
         uses: ilammy/msvc-dev-cmd@v1.4.1

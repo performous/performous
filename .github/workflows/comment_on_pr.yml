@@ -1,7 +1,7 @@
 name: Comment on pull request
 on:
   workflow_run:
-    workflows: [ '**' ]
+    workflows: [ 'Build and Release Performous' ]
     types: [completed]
 jobs:
   pr_comment:
