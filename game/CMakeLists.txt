@@ -99,6 +99,26 @@ target_link_libraries(performous PRIVATE ${LibEpoxy_LIBRARIES})
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(deps REQUIRED IMPORTED_TARGET glib-2.0 gio-2.0 gobject-2.0)
 
+
+set(SELF_BUILT_GIT_BASE "https://github.com/performous" CACHE STRING "base path of the git trees used for self built dependencies")
+
+include(LibFetchMacros)
+libfetch_git_pkg(Ced
+	NAME       ced
+	REPOSITORY ${SELF_BUILT_GIT_BASE}/compact_enc_det.git
+	#https://github.com/google/compact_enc_det.git
+	REFERENCE  "master"
+)
+
+set(SELF_BUILT_AUBIO "NEVER" CACHE STRING "rule to allow self build of Aubio dependency library [NEVER*|AUTO|ALWAYS]")
+find_package(Aubio 0.4.10 REQUIRED)
+message(STATUS "Aubio includes: ${Aubio_INCLUDE_DIRS}")
+target_include_directories(performous SYSTEM PRIVATE ${Aubio_INCLUDE_DIRS})
+target_link_libraries(performous PRIVATE ${Aubio_LIBRARIES})
+add_definitions(${Aubio_DEFINITIONS})
+
+set(SELF_BUILT_JSON "NEVER" CACHE STRING "rule to allow self build of Json dependency library [NEVER*|AUTO|ALWAYS]")
+
 # Find all the libs that don't require extra parameters
 foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM Json)
 	find_package(${lib} REQUIRED)
