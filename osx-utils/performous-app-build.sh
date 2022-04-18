@@ -211,7 +211,9 @@ function main {
 	  -DCMAKE_CXX_FLAGS="-Wall -Wextra" \
 	  -DCMAKE_OSX_ARCHITECTURES="x86_64" \
 	  -B "${PERFORMOUS_SOURCE}/build" \
-	  -S "${PERFORMOUS_SOURCE}"
+	  -S "${PERFORMOUS_SOURCE}" \
+	  -DSELF_BUILT_AUBIO="AUTO" \
+	  -DSELF_BUILT_JSON="AUTO"
 	
 	make -C "${PERFORMOUS_SOURCE}/build" -j${MAKE_JOBS} install # You can change the -j value in order to spawn more build threads.
 
