@@ -251,7 +251,7 @@ FFmpeg::FFmpeg(fs::path const& _filename, int mediaType) : m_filename(_filename)
 	if (err < 0) throw Error(*this, err);
 	m_formatContext->flags |= AVFMT_FLAG_GENPTS;
 	// Find a track and open the codec
-	AVCodec* codec = nullptr;
+	const AVCodec* codec = nullptr;
 	m_streamId = av_find_best_stream(m_formatContext.get(), static_cast<AVMediaType>(mediaType), -1, -1, &codec, 0);
 	if (m_streamId < 0) throw Error(*this, m_streamId);
 
