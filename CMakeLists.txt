@@ -83,13 +83,14 @@ endif()
 
 include(FetchContent)
 FetchContent_Declare(ced-sources
-  GIT_REPOSITORY https://github.com/performous/compact_enc_det.git
-  #https://github.com/google/compact_enc_det.git
+  GIT_REPOSITORY https://github.com/google/compact_enc_det.git
   GIT_TAG        master
-  SOURCE_DIR ced-src
+  SOURCE_DIR     ced-src
 )
 
 FetchContent_MakeAvailable(ced-sources)
+
+set_target_properties(ced_unittest PROPERTIES EXCLUDE_FROM_ALL TRUE EXCLUDE_FROM_DEFAULT_BUILD TRUE)
 
 option(USE_SELF_BUILT_AUBIO "Use custom aubio local build instead of using system lib (if available)" FALSE)
 
