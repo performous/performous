@@ -108,6 +108,8 @@ jobs:
           - fedora34
           - fedora35
           - fedora36
+          - debian10
+          - debian11
     steps:
       - name: Checkout Git
         id: checkout_git
@@ -141,7 +143,7 @@ jobs:
           case ${ID} in
             'fedora')
           PACKAGE_TYPE='RPM';;
-            'ubuntu')
+            'ubuntu|debian')
           PACKAGE_TYPE='DEB';;
             *)
           PACKAGE_TYPE='TGZ';;
