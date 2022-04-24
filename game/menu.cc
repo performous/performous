@@ -66,6 +66,11 @@ void Menu::action(int dir) {
 				}
 				if (dir > 0) ++(*(current().value));
 				else if (dir < 0) --(*(current().value));
+
+				if (current().value->getName() == "game/language") {
+					auto &value = config["game/language"];
+					Game::getSingletonPtr()->setLanguage(value.getValue());
+				}
 			}
 			break;
 		}

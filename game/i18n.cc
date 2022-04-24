@@ -5,6 +5,10 @@
 
 TranslationEngine::TranslationEngine(const char *package) : m_package(package) {
 	initializeAllLanguages();
+	/* set all languages in configuration.
+	 * They are kept untranslated internally which prevents having issues
+	 * when changing languages (and need to update internal stuff with
+	 * translations) */
 	populateLanguages(GetAllLanguages());
 
 	std::clog << "locale/debug: Checking if language is set in config." << std::endl;
@@ -43,7 +47,6 @@ void TranslationEngine::setLanguage(const std::string& language, bool fromSettin
 	try {
 		std::locale::global(m_gen(m_currentLanguage.first));
 		std::cout << "locale/notice: Current language is: '" << m_currentLanguage.second << "'" << std::endl;
-		populateLanguages(GetAllLanguages(true), true);
 	}
 	catch (std::runtime_error& e) {
 		std::clog << "locale/warning: Unable to detect locale, will try to fallback to en_US.UTF-8. Exception: " << e.what() << std::endl;
@@ -52,7 +55,7 @@ void TranslationEngine::setLanguage(const std::string& language, bool fromSettin
 }
 
 std::string TranslationEngine::getLanguageByHumanReadableName(const std::string& language) {
-	if (language == _("Auto")) {
+	if (language == "Auto") {
 		return boost::locale::util::get_system_locale(true);
 	}
 
@@ -89,25 +92,27 @@ std::map<std::string, std::string> TranslationEngine::GetAllLanguages(bool refre
 	}
 	if (m_languages.size() != 0) return m_languages;
 
+	// Internally, all strings are kept in English, but they are eventually
+	// displayed as menu entries thus they need translation
 	m_languages = {
-		{ "None", _("Auto") },
-		{ "ast_ES.UTF-8", _("Asturian") },
-		{ "da_DK.UTF-8", _("Danish") },
-		{ "de_DE.UTF-8", _("German") },
-		{ "en_US.UTF-8", _("English") },
-		{ "es_ES.UTF-8", _("Spanish") },
-		{ "fa_IR.UTF-8", _("Persian") },
-		{ "fi_FI.UTF-8", _("Finnish") },
-		{ "fr_FR.UTF-8", _("French") },
-		{ "hu_HU.UTF-8", _("Hungarian") },
-		{ "it_IT.UTF-8", _("Italian") },
-		{ "ja_JP.UTF-8", _("Japanese") },
-		{ "nl_NL.UTF-8", _("Dutch") },
-		{ "pl_PL.UTF-8", _("Polish") },
-		{ "pt_PT.UTF-8", _("Portuguese") },
-		{ "sk_SK.UTF-8", _("Slovak") },
-		{ "sv_SE.UTF-8", _("Swedish") },
-		{ "zh_CN.UTF-8", _("Chinese") }
+		{ "None", translate_noop("Auto") },
+		{ "ast_ES.UTF-8", translate_noop("Asturian") },
+		{ "da_DK.UTF-8", translate_noop("Danish") },
+		{ "de_DE.UTF-8", translate_noop("German") },
+		{ "en_US.UTF-8", translate_noop("English") },
+		{ "es_ES.UTF-8", translate_noop("Spanish") },
+		{ "fa_IR.UTF-8", translate_noop("Persian") },
+		{ "fi_FI.UTF-8", translate_noop("Finnish") },
+		{ "fr_FR.UTF-8", translate_noop("French") },
+		{ "hu_HU.UTF-8", translate_noop("Hungarian") },
+		{ "it_IT.UTF-8", translate_noop("Italian") },
+		{ "ja_JP.UTF-8", translate_noop("Japanese") },
+		{ "nl_NL.UTF-8", translate_noop("Dutch") },
+		{ "pl_PL.UTF-8", translate_noop("Polish") },
+		{ "pt_PT.UTF-8", translate_noop("Portuguese") },
+		{ "sk_SK.UTF-8", translate_noop("Slovak") },
+		{ "sv_SE.UTF-8", translate_noop("Swedish") },
+		{ "zh_CN.UTF-8", translate_noop("Chinese") }
 	};
 
 	return m_languages;
