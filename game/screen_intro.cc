@@ -109,7 +109,7 @@ void ScreenIntro::draw_menu_options() {
 			{
 				ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
 				theme->option_selected.dimensions.left(x).center(start_y + ii*0.065);
-				theme->option_selected.draw(opt.getName());
+				theme->option_selected.draw(_(opt.getName()));
 			}
 			wcounter = std::max(wcounter, theme->option_selected.w() + 2 * sel_margin); // Calculate the widest entry
 			// If this is a config item, show the value below
@@ -121,7 +121,7 @@ void ScreenIntro::draw_menu_options() {
 
 		// Regular option (not selected)
 		} else {
-			std::string title = opt.getName();
+			std::string title = _(opt.getName());
 			SvgTxtTheme& txt = getTextObject(title);
 			ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
 			txt.dimensions.left(x).center(start_y + ii*0.065);
@@ -144,7 +144,7 @@ void ScreenIntro::draw() {
 	theme->comment_bg.dimensions.center().screenBottom(-0.01);
 	theme->comment_bg.draw();
 	theme->comment.dimensions.left(-0.48).screenBottom(-0.028);
-	theme->comment.draw(m_menu.current().getComment());
+	theme->comment.draw(_(m_menu.current().getComment()));
 	// Key help for config
 	if (m_menu.getSubmenuLevel() > 0) {
 		theme->short_comment_bg.dimensions.stretch(theme->short_comment.w() + 0.065, 0.025);
@@ -171,8 +171,8 @@ void ScreenIntro::populateMenu() {
 	MenuImage imgConfig(new Texture(findFile("intro_configure.svg")));
 	MenuImage imgQuit(new Texture(findFile("intro_quit.svg")));
 	m_menu.clear();
-	m_menu.add(MenuOption(_("Perform"), _("Start performing!"), imgSing).screen("Songs"));
-	m_menu.add(MenuOption(_("Practice"), _("Check your skills or test the microphones."), imgPractice).screen("Practice"));
+	m_menu.add(MenuOption(translate_noop("Perform"), translate_noop("Start performing!"), imgSing).screen("Songs"));
+	m_menu.add(MenuOption(translate_noop("Practice"), translate_noop("Check your skills or test the microphones."), imgPractice).screen("Practice"));
 	// Configure menu + submenu options
 	MenuOptions configmain;
 	for (auto const& submenu: configMenu) {
@@ -181,15 +181,15 @@ void ScreenIntro::populateMenu() {
 			// Process items that belong to that submenu
 			for (auto const& item: submenu.items) {
 				ConfigItem& c = config[item];
-				opts.push_back(MenuOption(_(c.getShortDesc()), _(c.getLongDesc())).changer(c));
+				opts.push_back(MenuOption(c.getShortDesc(), c.getLongDesc()).changer(c));
 			}
-			configmain.push_back(MenuOption(_(submenu.shortDesc), _(submenu.longDesc), imgConfig).submenu(opts));
+			configmain.push_back(MenuOption(submenu.shortDesc, submenu.longDesc, imgConfig).submenu(opts));
 		} else {
-			configmain.push_back(MenuOption(_(submenu.shortDesc), _(submenu.longDesc), imgConfig).screen(submenu.name));
+			configmain.push_back(MenuOption(submenu.shortDesc, submenu.longDesc, imgConfig).screen(submenu.name));
 		}
 	}
-	m_menu.add(MenuOption(_("Configure"), _("Configure audio and game options."), imgConfig).submenu(configmain));
-	m_menu.add(MenuOption(_("Quit"), _("Leave the game."), imgQuit).screen(""));
+	m_menu.add(MenuOption(translate_noop("Configure"), translate_noop("Configure audio and game options."), imgConfig).submenu(configmain));
+	m_menu.add(MenuOption(translate_noop("Quit"), translate_noop("Leave the game."), imgQuit).screen(""));
 }
 
 #ifdef USE_WEBSERVER

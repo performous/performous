@@ -135,7 +135,7 @@ std::string const ConfigItem::getValue() const {
 	if (this->getName() == "game/language") {
 		int autoLanguageType = 1337;
 		int val = LanguageToLanguageId(this->getEnumName()); // In the case of the language, val is the real value while m_value is the enum case for its cosmetic name.
-		std::string languageName = (val != autoLanguageType) ? this->getEnumName() : _("Auto");
+		std::string languageName = (val != autoLanguageType) ? this->getEnumName() : "Auto";
 		return languageName;
 	}
 	if (m_type == "int") {
@@ -331,7 +331,7 @@ void writeConfig(bool system) {
 			auto newLanguagestr = item.getEnumName();
 			auto currentLanguageId = LanguageToLanguageId(currentLanguageStr);
 			auto newLanguageId = LanguageToLanguageId(newLanguagestr);
-			if ((newLanguagestr == _("Auto") || currentLanguageId != newLanguageId) && !config["game/language"].getOldValue().empty()) {
+			if ((newLanguagestr == "Auto" || currentLanguageId != newLanguageId) && !config["game/language"].getOldValue().empty()) {
 				std::cout << "Wanting to change something, old value: '" << currentLanguageStr << "' new value: '" << newLanguagestr << "'" << std::endl;
 				entryNode->set_attribute("value", std::to_string(newLanguageId));
 				config["game/language"].selectEnum(newLanguagestr);
@@ -451,23 +451,23 @@ int PaHostApiNameToHostApiTypeId (const std::string& name) {
 }
 
 unsigned int LanguageToLanguageId(const std::string& name) {
-	if (name == _("Asturian")) return 1;
-	if (name == _("Danish")) return 2;
-	if (name == _("German")) return 3;
-	if (name == _("English")) return 4;
-	if (name == _("Spanish")) return 5;
-	if (name == _("Persian")) return 6;
-	if (name == _("Finnish")) return 7;
-	if (name == _("French")) return 8;
-	if (name == _("Hungarian")) return 9;
-	if (name == _("Italian")) return 10;
-	if (name == _("Japanese")) return 11;
-	if (name == _("Dutch")) return 12;
-	if (name == _("Polish")) return 13;
-	if (name == _("Portuguese")) return 14;
-	if (name == _("Slovak")) return 15;
-	if (name == _("Swedish")) return 16;
-	if (name == _("Chinese")) return 17;
+	if (name == "Asturian") return 1;
+	if (name == "Danish") return 2;
+	if (name == "German") return 3;
+	if (name == "English") return 4;
+	if (name == "Spanish") return 5;
+	if (name == "Persian") return 6;
+	if (name == "Finnish") return 7;
+	if (name == "French") return 8;
+	if (name == "Hungarian") return 9;
+	if (name == "Italian") return 10;
+	if (name == "Japanese") return 11;
+	if (name == "Dutch") return 12;
+	if (name == "Polish") return 13;
+	if (name == "Portuguese") return 14;
+	if (name == "Slovak") return 15;
+	if (name == "Swedish") return 16;
+	if (name == "Chinese") return 17;
 
 	return 1337; // if no name matched return "Auto" which translates to computer language OR English.
 }
