@@ -200,6 +200,84 @@ jobs:
           asset_name: ${{ env.ARTIFACT_NAME }}
           asset_content_type: application/octet-stream
 
+  # Create the AppImage
+  AppImage:
+    name: Create the AppImage
+    needs:
+      - determine_version
+      - create_release
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Install the AppImage bundler
+        id: fetch_deps
+        run: |
+          wget -O appimage-builder-x86_64.AppImage https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.0.0-beta.1/appimage-builder-1.0.0-677acbd-x86_64.AppImage
+          chmod +x appimage-builder-x86_64.AppImage
+          sudo mv appimage-builder-x86_64.AppImage /usr/local/bin/appimage-builder
+
+      - name: Checkout Git
+        id: checkout_git
+        uses: actions/checkout@v3
+        with:
+          path: performous
+
+      - name: Build the AppImage
+        id: build_appimage
+        run: |
+          cd performous
+          mkdir build
+          cd build
+          PACKAGE_VERSION=${{ needs.determine_version.outputs.complete_version }}
+          cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DENABLE_WEBSERVER=ON -DENABLE_WEBCAM=ON -DPERFORMOUS_VERSION=$PACKAGE_VERSION ..
+          make -j$(nproc) install DESTDIR=../AppDir
+          cd ..
+          appimage-builder --recipe AppImageBuilder.yml --skip-test
+
+          WORK_DIR=$(pwd)
+          PACKAGE_PATH=$(ls ${WORK_DIR}/*.AppImage)
+          PACKAGE_NAME=$(echo ${PACKAGE_PATH} | sed 's/\(performous\).*$/\1/')
+          PACKAGE_SUFFIX=".AppImage"
+          NEW_PACKAGE_NAME="${PACKAGE_NAME}-${PACKAGE_VERSION}-${ID}_${VERSION_ID}${PACKAGE_SUFFIX}"
+          MASTER_NEW_PACKAGE_NAME="${PACKAGE_NAME}-latest-${ID}_${VERSION_ID}${PACKAGE_SUFFIX}"
+          cp ${PACKAGE_PATH} ${MASTER_NEW_PACKAGE_NAME}
+          mv ${PACKAGE_PATH} ${NEW_PACKAGE_NAME}
+          ARTIFACT_NAME=$( echo ${NEW_PACKAGE_NAME} | rev | cut -d '/' -f1 | rev)
+          MASTER_ARTIFACT_NAME=$( echo ${MASTER_NEW_PACKAGE_NAME} | rev | cut -d '/' -f1 | rev)
+          echo "ARTIFACT_PATH=${NEW_PACKAGE_NAME}" >> ${GITHUB_ENV}
+          echo "ARTIFACT_NAME=${ARTIFACT_NAME}" >> ${GITHUB_ENV}
+          echo "MASTER_ARTIFACT_PATH=${MASTER_NEW_PACKAGE_NAME}" >> ${GITHUB_ENV}
+          echo "MASTER_ARTIFACT_NAME=${MASTER_ARTIFACT_NAME}" >> ${GITHUB_ENV}
+
+      # Upload artifacts during pull-requests
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.ARTIFACT_PATH }}
+
+      # Upload artifacts on master
+      - name: Upload artifact with unified name
+        if: ${{ github.ref == 'refs/heads/master' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.MASTER_ARTIFACT_NAME }}
+          path: ${{ env.MASTER_ARTIFACT_PATH }}
+
+      # Upload artifacts to releases only during Release events
+      - name: Upload artifacts to tagged release
+        id: upload_assets
+        if: ${{ github.event_name != 'pull_request' && github.ref_type == 'tag' }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: ${{ env.ARTIFACT_PATH }}
+          asset_name: ${{ env.ARTIFACT_NAME }}
+          asset_content_type: application/octet-stream
+
+
   # Create the MacOS dmg
   MacOS_Packages:
     name: Create MacOS dmg
