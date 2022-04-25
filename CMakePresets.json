@@ -1,0 +1,83 @@
+{
+  "version": 2,
+  "configurePresets": [
+    {
+      "name": "windows-base",
+      "description": "Target Windows with the Visual Studio development environment.",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "cl.exe",
+        "CMAKE_CXX_COMPILER": "cl.exe",
+        "BUILD_SHARED_LIBS": "ON",
+        "ENABLE_WEBSERVER": "OFF",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/${presetName}-install",
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "PERFORMOUS_VERSION": "$env{PERFORMOUS_VERSION}"
+      }
+    },
+    {
+      "name": "x64-debug",
+      "displayName": "x64 Debug",
+      "description": "Target Windows Debug (64-bit).",
+      "inherits": "windows-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "x64-release",
+      "displayName": "x64 Release",
+      "description": "Target Windows Release (64-bit).",
+      "inherits": "x64-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "x86-debug",
+      "displayName": "x86 Debug",
+      "description": "Target Windows Debug (32-bit).",
+      "inherits": "windows-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "x86-release",
+      "displayName": "x86 Release",
+      "description": "Target Windows Release (32-bit).",
+      "inherits": "x86-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "x64-debug",
+      "configurePreset": "x64-debug",
+      "displayName": "Build x64-debug with Ninja",
+      "description": "Build x64-debug with Ninja"
+    },
+    {
+      "name": "x64-release",
+      "configurePreset": "x64-release",
+      "displayName": "Build x64-release with Ninja",
+      "description": "Build x64-release with Ninja"
+    },
+    {
+      "name": "x86-debug",
+      "configurePreset": "x86-debug",
+      "displayName": "Build x86-debug with Ninja",
+      "description": "Build x86-debug with Ninja"
+    },
+    {
+      "name": "x86-release",
+      "configurePreset": "x86-release",
+      "displayName": "Build x86-release with Ninja",
+      "description": "Build x86-release with Ninja"
+    }
+  ]
+}

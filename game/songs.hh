@@ -10,6 +10,7 @@
 #include <thread>
 #include <vector>
 #include "screen.hh"
+#include <shared_mutex>
 
 class Song;
 class Database;
@@ -17,8 +18,8 @@ class Database;
 /// songs class for songs screen
 class Songs {
   public:
-  	Songs(const Songs&) = delete;
-  	const Songs& operator=(const Songs&) = delete;
+	Songs(const Songs&) = delete;
+	const Songs& operator=(const Songs&) = delete;
 	/// constructor
 	Songs(Database& database, std::string const& songlist = std::string());
 	~Songs();
@@ -74,15 +75,18 @@ class Songs {
 	void parseFile(Song& tmp);
 	std::atomic<bool> doneLoading{ false };
 	std::atomic<bool> displayedAlert{ false };
-	size_t loadedSongs() const { return m_songs.size(); }
+	size_t loadedSongs() const { std::shared_lock<std::shared_mutex> l(m_mutex); return m_songs.size(); }
 
   private:
-  	void LoadCache();
+	void LoadCache();
 	void CacheSonglist();
 
 	class RestoreSel;
 	typedef std::vector<std::shared_ptr<Song> > SongVector;
 	std::string m_songlist;
+	// Careful the m_songs needs to be correctly locked when accessed, and
+	// especially, the reload_internal thread expects to be the only thread
+	// to modify this member (any other thread may read it).
 	SongVector m_songs, m_filtered;
 	AnimValue m_updateTimer;
 	AnimAcceleration math_cover;
@@ -99,6 +103,5 @@ class Songs {
 	std::atomic<bool> m_dirty{ false };
 	std::atomic<bool> m_loading{ false };
 	std::unique_ptr<std::thread> m_thread;
-	mutable std::mutex m_mutex;
+	mutable std::shared_mutex m_mutex;
 };
-
