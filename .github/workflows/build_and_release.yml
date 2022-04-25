@@ -127,6 +127,12 @@ jobs:
             EXTRA_CMAKE_ARGS="-DUSE_BOOST_REGEX=1"
           fi
 
+          if [ "${ID}" = "ubuntu" -a "${VERSION_ID}" = "18.04" ]; then
+            # Ubuntu 18.04 has system Aubio 0.4.5, this is not enough
+            # because performous requires a minimum version of 0.4.9.
+            EXTRA_CMAKE_ARGS="${EXTRA_CMAKE_ARGS} -DSELF_BUILT_AUBIO=ALWAYS"
+          fi
+
           ## Figure out what type of packages we need to generate
           case ${ID} in
             'fedora')
@@ -302,14 +308,14 @@ jobs:
         run: |
           brew fetch --deps boost cmake ffmpeg@4 help2man icu4c portaudio\
             portmidi opencv libepoxy librsvg libxml++3 sdl2 dylibbundler\
-            aubio fftw glm
+            aubio fftw glm nlohmann-json
 
       - name: Install Dependencies
         id: install_deps
         run: |
            brew install boost cmake ffmpeg@4 help2man icu4c portaudio\
             portmidi opencv libepoxy librsvg libxml++3 sdl2 dylibbundler\
-            aubio fftw glm
+            aubio fftw glm nlohmann-json
            brew link ffmpeg@4
 
       - name: Build package
