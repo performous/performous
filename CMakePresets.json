@@ -12,6 +12,7 @@
         "CMAKE_CXX_COMPILER": "cl.exe",
         "BUILD_SHARED_LIBS": "ON",
         "ENABLE_WEBSERVER": "OFF",
+        "SELF_BUILT_AUBIO": "ALWAYS",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/${presetName}-install",
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
         "PERFORMOUS_VERSION": "$env{PERFORMOUS_VERSION}"

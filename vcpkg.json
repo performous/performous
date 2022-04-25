@@ -40,7 +40,8 @@
         "tools"
       ]
     },
-    "nlohmann-json"
+    "nlohmann-json",
+    "aubio"
   ],
   "builtin-baseline": "71d274d7ce32d7f2508062a70e0a5ebe981319eb"
 }
