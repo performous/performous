@@ -208,12 +208,13 @@ jobs:
       - create_release
     runs-on: ubuntu-20.04
     steps:
-      - name: Install the AppImage bundler
+      - name: Install the AppImage bundler and Performous deps
         id: fetch_deps
         run: |
           wget -O appimage-builder-x86_64.AppImage https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.0.0-beta.1/appimage-builder-1.0.0-677acbd-x86_64.AppImage
           chmod +x appimage-builder-x86_64.AppImage
           sudo mv appimage-builder-x86_64.AppImage /usr/local/bin/appimage-builder
+          sudo apt-get install -y --no-install-recommends git cmake build-essential gettext help2man libopenblas-dev libfftw3-dev libicu-dev libepoxy-dev libsdl2-dev libfreetype6-dev libpango1.0-dev librsvg2-dev libxml++2.6-dev libavcodec-dev libavformat-dev libswscale-dev libjpeg-dev portaudio19-dev libglm-dev libboost-filesystem-dev libboost-iostreams-dev libboost-locale-dev libboost-system-dev libboost-program-options-dev libssl-dev libcpprest-dev libportmidi-dev libopencv-dev libaubio-dev nlohmann-json3-dev
 
       - name: Checkout Git
         id: checkout_git
@@ -225,9 +226,10 @@ jobs:
         id: build_appimage
         run: |
           cd performous
+          PACKAGE_VERSION=${{ needs.determine_version.outputs.complete_version }}
+          sed -i s/@@VERSION@@/${PACKAGE_VERSION}/ AppImageBuilder.yml
           mkdir build
           cd build
-          PACKAGE_VERSION=${{ needs.determine_version.outputs.complete_version }}
           cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DENABLE_WEBSERVER=ON -DENABLE_WEBCAM=ON -DPERFORMOUS_VERSION=$PACKAGE_VERSION ..
           make -j$(nproc) install DESTDIR=../AppDir
           cd ..
@@ -237,8 +239,8 @@ jobs:
           PACKAGE_PATH=$(ls ${WORK_DIR}/*.AppImage)
           PACKAGE_NAME=$(echo ${PACKAGE_PATH} | sed 's/\(performous\).*$/\1/')
           PACKAGE_SUFFIX=".AppImage"
-          NEW_PACKAGE_NAME="${PACKAGE_NAME}-${PACKAGE_VERSION}-${ID}_${VERSION_ID}${PACKAGE_SUFFIX}"
-          MASTER_NEW_PACKAGE_NAME="${PACKAGE_NAME}-latest-${ID}_${VERSION_ID}${PACKAGE_SUFFIX}"
+          NEW_PACKAGE_NAME="${PACKAGE_NAME}-${PACKAGE_VERSION}${PACKAGE_SUFFIX}"
+          MASTER_NEW_PACKAGE_NAME="${PACKAGE_NAME}-latest${PACKAGE_SUFFIX}"
           cp ${PACKAGE_PATH} ${MASTER_NEW_PACKAGE_NAME}
           mv ${PACKAGE_PATH} ${NEW_PACKAGE_NAME}
           ARTIFACT_NAME=$( echo ${NEW_PACKAGE_NAME} | rev | cut -d '/' -f1 | rev)
