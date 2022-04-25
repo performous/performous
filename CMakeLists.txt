@@ -81,20 +81,6 @@ else()
 	message(STATUS "Localization disabled: Gettext tools (msgfmt) missing")
 endif()
 
-include(FetchContent)
-FetchContent_Declare(ced-sources
-  GIT_REPOSITORY https://github.com/performous/compact_enc_det.git
-  #https://github.com/google/compact_enc_det.git
-  GIT_TAG        master
-  SOURCE_DIR ced-src
-)
-
-FetchContent_MakeAvailable(ced-sources)
-
-option(USE_SELF_BUILT_AUBIO "Use custom aubio local build instead of using system lib (if available)" FALSE)
-
-find_package(Aubio REQUIRED)
-
 add_subdirectory(data)
 
 add_subdirectory(game)
