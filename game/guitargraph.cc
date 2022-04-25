@@ -779,7 +779,7 @@ void GuitarGraph::drawNotes(double time) {
 	}
 	if (time != time) return;  // Check that time is not NaN
 
-	glmath::dvec4 neckglow;  // Used for calculating the average neck color
+	glmath::dvec4 neckglow{};  // Used for calculating the average neck color
 
 	// Iterate chords
 	for (auto& chord: m_chords) {
