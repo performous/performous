@@ -1,4 +1,0 @@
-option('usewebcam', type: 'boolean', value: false, description: 'Build with webcam support (opencv)')
-option('usemididrum', type: 'boolean', value: false, description: 'Build with midi drum support (portmidi)')
-option('usewebserver', type: 'boolean', value: false, description: 'Build with web server support (cpprest)')
-option('warningaserror', type: 'boolean', value: false, description: 'Consider compilation warnings as errors')
