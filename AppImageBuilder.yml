@@ -6,42 +6,49 @@ AppDir:
     id: performous
     name: performous
     icon: performous
-    version: 1.x
+    version: @@VERSION@@
     exec: usr/bin/performous
     exec_args: $@
   apt:
     arch: amd64
     allow_unauthenticated: true
     sources:
-      - sourceline: deb http://archive.ubuntu.com/ubuntu/ bionic main restricted universe multiverse
-      - sourceline: deb http://archive.ubuntu.com/ubuntu/ bionic-updates main restricted universe multiverse
+      - sourceline: deb http://archive.ubuntu.com/ubuntu/ focal main restricted universe multiverse
+      - sourceline: deb http://archive.ubuntu.com/ubuntu/ focal-updates main restricted universe multiverse
     include:
-      - libpangocairo-1.0-0
-      - libsdl2-2.0-0
+      ## All of these dependencies can be found by downloading the Performous
+      ## package for Ubuntu 20.04 and doing a dpkg -I on it
       - libaubio5
-      - libboost-iostreams1.65.1
-      - libboost-filesystem1.65.1
-      - libboost-program-options1.65.1
-      - libboost-system1.65.1
-      - libboost-locale1.65.1
-      - libepoxy0
-      - libicu60
-      - libpng16-16
-      - libjpeg8
-      - librsvg2-2
-      - libavcodec57
-      - libavformat57
-      - libavutil55
-      - libswscale4
-      - libswresample2
-      - libportaudio2
-      - libfontconfig1
-      - libxml++2.6-2v5
-      - libglibmm-2.4-1v5
-      - libportmidi0
-      - libopencv-video3.2
-      - libopencv-videoio3.2
+      - libavcodec58
+      - libavformat58
+      - libavutil56
+      - libboost-iostreams1.71.0
+      - libboost-locale1.71.0
+      - libboost-program-options1.71.0
+      - libc6
+      - libcairo2
       - libcpprest2.10
+      - libepoxy0
+      - libfontconfig1
+      - libgcc-s1
+      - libglib2.0-0
+      - libglibmm-2.4-1v5
+      - libicu66
+      - libjpeg8
+      - libopencv-core4.2
+      - libopencv-videoio4.2
+      - libpango-1.0-0
+      - libpangocairo-1.0-0
+      - libpng16-16
+      - libportaudio2
+      - libportmidi0
+      - librsvg2-2
+      - libsdl2-2.0-0
+      - libssl1.1
+      - libstdc++6
+      - libswresample3
+      - libswscale5
+      - libxml++2.6-2v5
     exclude:
       - usr/share/man
       - usr/share/doc/*/README.*
