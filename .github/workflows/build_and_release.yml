@@ -237,7 +237,7 @@ jobs:
 
           WORK_DIR=$(pwd)
           PACKAGE_PATH=$(ls ${WORK_DIR}/*.AppImage)
-          PACKAGE_NAME=$(echo ${PACKAGE_PATH} | sed 's/\(performous\).*$/\1/')
+          PACKAGE_NAME=$(echo ${PACKAGE_PATH} | sed 's/\(Performous\).*$/\1/')
           PACKAGE_SUFFIX=".AppImage"
           NEW_PACKAGE_NAME="${PACKAGE_NAME}-${PACKAGE_VERSION}${PACKAGE_SUFFIX}"
           MASTER_NEW_PACKAGE_NAME="${PACKAGE_NAME}-latest${PACKAGE_SUFFIX}"

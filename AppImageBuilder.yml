@@ -3,8 +3,8 @@ version: 1
 AppDir:
   path: ./AppDir
   app_info:
-    id: performous
-    name: performous
+    id: Performous
+    name: Performous
     icon: performous
     version: @@VERSION@@
     exec: usr/bin/performous
@@ -49,33 +49,21 @@ AppDir:
       - libswresample3
       - libswscale5
       - libxml++2.6-2v5
+    exclude: []
+  files:
     exclude:
       - usr/share/man
       - usr/share/doc/*/README.*
       - usr/share/doc/*/changelog.*
       - usr/share/doc/*/NEWS.*
       - usr/share/doc/*/TODO.*
-  test:
-    fedora-30:
-      image: appimagecrafters/tests-env:fedora-30
-      command: ./AppRun -v
-      use_host_x: true
-    debian-stable:
-      image: appimagecrafters/tests-env:debian-stable
-      command: ./AppRun -v
-      use_host_x: true
-    archlinux-latest:
-      image: appimagecrafters/tests-env:archlinux-latest
-      command: ./AppRun -v
-      use_host_x: true
-    centos-7:
-      image: appimagecrafters/tests-env:centos-7
-      command: ./AppRun -v
-      use_host_x: true
-    ubuntu-xenial:
-      image: appimagecrafters/tests-env:ubuntu-xenial
-      command: ./AppRun -v
-      use_host_x: true
+  after_bundle:
+    ## In Fedora and Gentoo (probably others too), libnsl has been deprecated
+    ## from glibc and is available in another package. It still exists as part
+    ## of the Debian lineage, and must be copied into the project root so it
+    ## can run on Distros where it is not available by default.
+    ## Hopefully this can be removed some day.
+    cp $TARGET_APPDIR/runtime/compat/lib/x86_64-linux-gnu/libnsl.so.1 $TARGET_APPDIR/
 AppImage:
   arch: x86_64
   update-information: None
