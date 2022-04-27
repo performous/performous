@@ -310,7 +310,6 @@ int main(int argc, char** argv) try {
 	
 	outputOptionalFeatureStatus();
 
-	// Read config files
 	readConfig();
 
 	if (vm.count("audiohelp")) {
