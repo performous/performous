@@ -9,7 +9,7 @@
 #include "regex.hh"
 #include <unicode/stsearch.h>
 
-UErrorCode Players::m_icuError = U_ZERO_ERROR;
+icu::ErrorCode Players::m_icuError;
 
 Players::Players():
 	m_players(),

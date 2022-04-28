@@ -105,6 +105,6 @@ class Players {
   private:
 	int assign_id_internal(); /// returns the next available id
 	void filter_internal();
-	static UErrorCode m_icuError;
+	static icu::ErrorCode m_icuError;
 	static icu::RuleBasedCollator icuCollator;
 };
