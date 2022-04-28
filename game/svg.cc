@@ -34,6 +34,8 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	bitmap.resize(svgDimension.width*factor, svgDimension.height*factor);
 	bitmap.fmt = pix::INT_ARGB;
 	bitmap.linearPremul = true;
+	std::clog << "loadSVG/debug: filename: " << filename.filename().string() << ", width: " << std::to_string(svgDimension.width) << ", height: " << std::to_string(svgDimension.height) << ", ar: " << std::to_string((float)svgDimension.width / (float)svgDimension.height) << std::endl;
+// 	std::clog << "loadSVG(Bitmap)/debug: filename: " << filename.filename().string() << ", width: " << std::to_string(bitmap.width) << ", height: " << std::to_string(bitmap.height) << ", ar: " << std::to_string(bitmap.ar) << std::endl;	
 	// Raster with Cairo
 	std::shared_ptr<cairo_surface_t> surface(
 	  cairo_image_surface_create_for_data(&bitmap.buf[0], CAIRO_FORMAT_ARGB32, bitmap.width, bitmap.height, bitmap.width * 4),
