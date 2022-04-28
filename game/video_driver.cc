@@ -18,6 +18,7 @@
 namespace {
 	float s_width;
 	float s_height;
+	unsigned windowView = 0;
 	/// Attempt to set attribute and report errors.
 	/// Tests for success when destoryed.
 	struct GLattrSetter {
@@ -385,9 +386,11 @@ void Window::view(unsigned num) {
 		SDL_GetWindowSize(screen, &nativeW, &nativeH);
 	}
 	else { SDL_GL_GetDrawableSize(screen, &nativeW, &nativeH); }
+	std::clog << "video/debug: s_width: " << std::to_string(s_width) << ", s_height: " << std::to_string(s_height) << std::endl;
 	float vx = 0.5f * (nativeW - s_width);
 	float vy = 0.5f * (nativeH - s_height);
 	float vw = s_width, vh = s_height;
+	std::clog << "window/debug: vx: " << std::to_string(vx) << ", vy: " << std::to_string(vy) << ", nativeW: " << nativeW << ", s_width: " << std::to_string(s_width) << ", s_height: " << std::to_string(s_height) << ", nativeH: " << nativeH << ", vw: " << std::to_string(vw) << ", vh: " << std::to_string(vh) << std::endl;
 	if (num == 0) {
 		glViewport(vx, vy, vw, vh);  // Drawable area of the window (excluding black bars)
 	} else {
@@ -443,6 +446,7 @@ void Window::event(Uint8 const& eventID, Sint32 const& data1, Sint32 const& data
 
 void Window::setWindowPosition(const Sint32& x, const Sint32& y)
 {
+	std::clog << "video/debug: Window::setWindowPosition... x is: " << x << ", y: " << y << std::endl;
 	config["graphic/window_pos_x"].i() = x;
 	config["graphic/window_pos_y"].i() = y;
 }
