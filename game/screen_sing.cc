@@ -84,12 +84,16 @@ void ScreenSing::enter() {
 void ScreenSing::prepareVoicesMenu(size_t moveSelectionTo) {
 		VocalTracks const& tracks = m_song->vocalTracks;
 		m_menu.clear();
-		m_menu.add(MenuOption(_("Start"), _("Start performing")).call([this]{ setupVocals(); }));
+		auto start = std::make_unique<MenuOption>(_("Start"), _("Start performing"));
+		start->call([this]{ setupVocals(); });
+		m_menu.add(std::move(start));
 
 		if (players() > 1) { // Duet toggle
 			m_duet.addEnum(_("Duet mode"));
 			m_duet.addEnum(_("Normal mode"));
-			m_menu.add(MenuOption("", _("Switch between duet and regular singing mode")).changer(m_duet,"song/duet"));
+			auto duetToggle = std::make_unique<MenuOption>("", _("Switch between duet and regular singing mode"));
+			duetToggle->changer(m_duet,"song/duet");
+			m_menu.add(std::move(duetToggle));
 		}
 		// Add vocal track selector for each player
 		for (size_t player = 0; player < players(); ++player) {
@@ -99,13 +103,17 @@ void ScreenSing::prepareVoicesMenu(size_t moveSelectionTo) {
 				if (player % 2) vocalTrack.selectEnum(m_song->getVocalTrack(SongParserUtil::DUET_P2).name);  // Every other player gets the second track
 				else vocalTrack.selectEnum(m_song->getVocalTrack(TrackName::LEAD_VOCAL).name);
 			}
-			m_menu.add(MenuOption("", _("Change vocal track")).changer(vocalTrack));
+			auto vocalSelect = std::make_unique<MenuOption>("", _("Change vocal track"));
+			vocalSelect->changer(vocalTrack);
+			m_menu.add(std::move(vocalSelect));
 			if (m_duet.i() == 1) {
 				vocalTrack.selectEnum(m_song->getVocalTrack(SongParserUtil::DUET_BOTH).name);
 				break; // If duet mode is disabled, the vocal track selection for players beyond the first is ignored anyway.
 			}
 		}
-		m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
+		auto quit = std::make_unique<MenuOption>(_("Quit"), _("Exit to song browser"));
+		quit->screen("Songs");
+		m_menu.add(std::move(quit));
 		m_menu.select(moveSelectionTo);
 		m_menu.open();
 		if (tracks.size() <= 1) setupVocals();  // No duet menu
@@ -146,16 +154,23 @@ void ScreenSing::setupVocals() {
 
 void ScreenSing::createPauseMenu() {
 	m_menu.clear();
-	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
-	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning")).screen("Sing"));
+	auto resume = std::make_unique<MenuOption>(_("Resume"), _("Back to performing!"));
+	m_menu.add(std::move(resume));
+	auto restart = std::make_unique<MenuOption>(_("Restart"), _("Start the song\nfrom the beginning"));
+	restart->screen("Sing");
+	m_menu.add(std::move(restart));
 	Game* gm = Game::getSingletonPtr();
-	if(!gm->getCurrentPlayList().isEmpty() || config["game/autoplay"].b()){
-		m_menu.add(MenuOption(_("Skip"), _("Skip current song")).screen("Playlist"));
+	if(!gm->getCurrentPlayList().isEmpty() || config["game/autoplay"].b()) {
+		auto skip = std::make_unique<MenuOption>(_("Skip"), _("Skip current song"));
+		skip->screen("Playlist");
+		m_menu.add(std::move(skip));
 	}
-	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).call([]() {
+	auto quit = std::make_unique<MenuOption>(_("Quit"), _("Exit to song browser"));
+	quit->call([]() {
 		Game* gm = Game::getSingletonPtr();
 		gm->activateScreen("Songs");
-	}));
+	});
+	m_menu.add(std::move(quit));
 	m_menu.close();
 }
 
@@ -626,7 +641,7 @@ void ScreenSing::drawMenu() {
 	if (m_menu.empty()) return;
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
-	const auto cur = &m_menu.current();
+	MenuOption& cur = m_menu.current();
 	double w = m_menu.dimensions.w();
 	const float txth = th.option_selected.h();
 	const float step = txth * 0.85f;
@@ -640,15 +655,14 @@ void ScreenSing::drawMenu() {
 	w = 0;
 	std::size_t player = 0;
 	auto& analyzers = m_audio.analyzers();
-	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it) {
+	for (auto const& option: m_menu) {
 		// Pick the font object
 		SvgTxtTheme* txt = &th.option_selected;
-		if (cur != &*it)
-			txt = &(th.getCachedOption(it->getName()));
+		if (&cur != option.get()) txt = &(th.getCachedOption(option->getName()));
 		// Set dimensions and draw
 		txt->dimensions.middle(x).center(y);
-		txt->draw(it->getName());
-		if (it->value == &m_vocalTracks[player]) {
+		txt->draw(option->getName());
+		if (option->value == &m_vocalTracks[player]) {
 			if (player < analyzers.size()) {
 				Color color = MicrophoneColor::get(analyzers[player].getId());
 				ColorTrans c(color);
@@ -661,9 +675,9 @@ void ScreenSing::drawMenu() {
 		w = std::max(w, txt->w() + 2 * step); // Calculate the widest entry
 		y += step;
 	}
-	if (cur->getComment() != "") {
+	if (cur.getComment() != "") {
 		th.comment.dimensions.middle(0).screenBottom(-0.08);
-		th.comment.draw(cur->getComment());
+		th.comment.draw(cur.getComment());
 	}
 	m_menu.dimensions.stretch(w, h);
 }

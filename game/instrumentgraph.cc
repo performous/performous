@@ -53,10 +53,17 @@ bool InstrumentGraph::dead() const { return m_jointime != m_jointime || m_dead >
 
 void InstrumentGraph::setupPauseMenu() {
 	m_menu.clear();
-	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
-	m_menu.add(MenuOption(_("Rejoin"), _("Change selections")).changer(m_rejoin));
-	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning")).screen("Sing"));
-	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
+	auto resume = std::make_unique<MenuOption>(_("Resume"), _("Back to performing!"));
+	m_menu.add(std::move(resume));
+	auto rejoin = std::make_unique<MenuOption>(_("Rejoin"), _("Change selections"));
+	rejoin->changer(m_rejoin);
+	m_menu.add(std::move(rejoin));
+	auto restart = std::make_unique<MenuOption>(_("Restart"), _("Start the song\nfrom the beginning"));
+	restart->screen("Sing");
+	m_menu.add(std::move(restart));
+	auto quit = std::make_unique<MenuOption>(_("Quit"), _("Exit to song browser"));
+	quit->screen("Songs");
+	m_menu.add(std::move(quit));
 }
 
 
@@ -90,7 +97,7 @@ void InstrumentGraph::drawMenu() {
 	m_arrow_down.dimensions.stretch(0.05, 0.05);
 	m_arrow_left.dimensions.stretch(0.05, 0.05);
 	m_arrow_right.dimensions.stretch(0.05, 0.05);
-	const auto cur = &m_menu.current();
+	MenuOption const& cur = m_menu.current();
 	double w = m_menu.dimensions.w();
 	const float s = std::min(m_width.get(), 0.5) / w;
 	Transform trans(glmath::scale(s));  // Fit better menu on screen
@@ -110,13 +117,11 @@ void InstrumentGraph::drawMenu() {
 	// Loop through menu items
 	w = 0;
 	unsigned i = 0;
-	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it, ++i) {
-		std::string menutext = it->getName();
+	for (auto const& option: m_menu) {
+		std::string menutext = option->getName();
 		SvgTxtTheme* txt = &th.option_selected; // Default: font for selected menu item
-
-		if (cur != &*it) { // Unselected menuoption
+		if (&cur != option.get()) { // Unselected menuoption
 			txt = &(th.getCachedOption(menutext));
-
 		// Selected item
 		} else {
 			// Left/right Icons
@@ -174,18 +179,18 @@ void InstrumentGraph::drawMenu() {
 			}
 		}
 		// Finally we are at the actual menu item text drawing
-		ColorTrans c(Color::alpha(it->isActive() ? 1.0 : 0.5));
+		ColorTrans c(Color::alpha(option->isActive() ? 1.0 : 0.5));
 		txt->dimensions.middle(x).center(y);
 		txt->draw(menutext);
 		w = std::max(w, txt->w() + 2 * step + button_margin * 2); // Calculate the widest entry
 		y += step; // Move draw position down for the next option
 	}
 	// Draw comment text
-	if (cur->getComment() != "") {
+	if (cur.getComment() != "") {
 		//th.comment_bg.dimensions.middle().screenBottom(-0.2);
 		//th.comment_bg.draw();
 		th.comment.dimensions.middle().screenBottom(-0.12);
-		th.comment.draw(cur->getComment());
+		th.comment.draw(cur.getComment());
 	}
 	// Save the calculated menu dimensions
 	m_menu.dimensions.stretch(w, h);

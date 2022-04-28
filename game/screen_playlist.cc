@@ -177,7 +177,8 @@ Texture& ScreenPlaylist::getCover(Song const& song) {
 
 void ScreenPlaylist::createEscMenu() {
 	overlay_menu.clear();
-	overlay_menu.add(MenuOption(_("Continue"), _("Continue playing")).call([this]() {
+	auto continueOpt = std::make_unique<MenuOption>(_("Continue"), _("Continue playing"));
+	continueOpt->call([this]() {
 		Game* gm = Game::getSingletonPtr();
 		Screen* s = gm->getScreen("Sing");
 		ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
@@ -190,30 +191,39 @@ void ScreenPlaylist::createEscMenu() {
 			ss->setSong(m_songs[randomsong]);
 		}
 		gm->activateScreen("Sing");
-	}));
-	overlay_menu.add(MenuOption(_("Add songs"), _("Open the song browser to add more songs")).screen("Songs"));
-	overlay_menu.add(MenuOption(_("Shuffle"), _("Randomize the order of the playlist")).call([this]() {
+	});
+	overlay_menu.add(std::move(continueOpt));
+	auto addSongs = std::make_unique<MenuOption>(_("Add songs"), _("Open the song browser to add more songs"));
+	addSongs->screen("Songs");
+	auto shuffle = std::make_unique<MenuOption>(_("Shuffle"), _("Randomize the order of the playlist"));
+	overlay_menu.add(std::move(addSongs));
+	shuffle->call([this]() {
 		Game* tm = Game::getSingletonPtr();
 		tm->getCurrentPlayList().shuffle();
 		overlay_menu.close();
 		createSongListMenu();
-	}));
-	overlay_menu.add(MenuOption(_("Clear and exit"), _("Remove all the songs from the list")).call([this]() {
+	});
+	overlay_menu.add(std::move(shuffle));
+	auto clearExit = std::make_unique<MenuOption>(_("Clear and exit"), _("Remove all the songs from the list"));
+	clearExit->call([this]() {
 		Game* tm = Game::getSingletonPtr();
 		tm->getCurrentPlayList().clear();
 		overlay_menu.close();
 		tm->activateScreen("Songs");
-	}));
-	overlay_menu.add(MenuOption(_("Back"), _("Back to playlist viewer")).call([this]() {
+	});
+	overlay_menu.add(std::move(clearExit));
+	auto back = std::make_unique<MenuOption>(_("Back"), _("Back to playlist viewer"));
+	back->call([this]() {
 		overlay_menu.close();
-	}));
+	});
+	overlay_menu.add(std::move(back));
 }
 
 void ScreenPlaylist::drawMenu() {
 	if (overlay_menu.empty()) return;
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
-	const auto cur = &overlay_menu.current();
+	MenuOption& cur = overlay_menu.current();
 	double w = overlay_menu.dimensions.w();
 	const float txth = th.option_selected.h();
 	const float step = txth * 0.85f;
@@ -225,20 +235,19 @@ void ScreenPlaylist::drawMenu() {
 	th.bg.draw();
 	// Loop through menu items
 	w = 0;
-	for (MenuOptions::const_iterator it = overlay_menu.begin(); it != overlay_menu.end(); ++it) {
+	for (auto const& option: overlay_menu) {
 		// Pick the font object
 		SvgTxtTheme* txt = &th.option_selected;
-		if (cur != &*it)
-			txt = &(th.getCachedOption(it->getName()));
+		if (&cur != option.get()) txt = &(th.getCachedOption(option->getName()));
 		// Set dimensions and draw
 		txt->dimensions.middle(x).center(y);
-		txt->draw(it->getName());
+		txt->draw(option->getName());
 		w = std::max(w, txt->w() + 2 * step); // Calculate the widest entry
 		y += step;
 	}
-	if (cur->getComment() != "") {
+	if (cur.getComment() != "") {
 		th.comment.dimensions.middle(0).screenBottom(-0.12);
-		th.comment.draw(cur->getComment());
+		th.comment.draw(cur.getComment());
 	}
 	overlay_menu.dimensions.stretch(w, h);
 }
@@ -250,7 +259,7 @@ void ScreenPlaylist::draw_menu_options() {
 	const float x = -0.35; // x xcoordinate from screen center, the menu should be aligned left of the center therefore it´s negative.n
 	const float start_y = -0.15;
 	const float sel_margin = 0.04;
-	const MenuOptions opts = songlist_menu.getOptions();
+	MenuOptions const& opts = songlist_menu.getOptions();
 	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get()-songlist_menu.getSubmenuLevel()));
 	// Determine from which item to start
 	int start_i = std::min((int)songlist_menu.curIndex() - 1, (int)opts.size() - (int)showopts
@@ -259,7 +268,7 @@ void ScreenPlaylist::draw_menu_options() {
 
 	// Loop the currently visible options
 	for (size_t i = start_i, ii = 0; ii < showopts && i < opts.size(); ++i, ++ii) {
-		MenuOption const& opt = opts[i];
+		MenuOption const& opt = *opts[i];
 		ColorTrans c(Color::alpha(submenuanim));
 
 		// Selection
@@ -331,19 +340,23 @@ void ScreenPlaylist::createSongListMenu() {
 			songinfo = songinfo + "                           >"; //FIXME: ugly hack to make the text scale so it fits on screen!
 		}
 		//then add it to the menu:
-		songlist_menu.add(MenuOption(_(songinfo.c_str()),_("Press enter to view song options")).call([this, count]() {
+		auto songInfo = std::make_unique<MenuOption>(_(songinfo.c_str()),_("Press enter to view song options"));
+		songInfo->call([this, count]() {
 			createSongMenu(count);
 			overlay_menu.open();
-		}));
+		});
+		songlist_menu.add(std::move(songInfo));
 		oss_playlist.str("");
 		count++;
 		totaldurationSeconds += song->getDurationSeconds();
 		totaldurationSeconds += config["game/playlist_screen_timeout"].i();
 	}
-	songlist_menu.add(MenuOption(_("View more options"),_("View general playlist settings")).call([this]() {
+	auto viewOptions = std::make_unique<MenuOption>(_("View more options"),_("View general playlist settings"));
+	viewOptions->call([this]() {
 		createEscMenu();
 		overlay_menu.open();
-	}));
+	});
+	songlist_menu.add(std::move(viewOptions));
 }
 
 void ScreenPlaylist::createSongMenu(int songNumber) {
@@ -352,15 +365,18 @@ void ScreenPlaylist::createSongMenu(int songNumber) {
 	std::string firstDesc = songNumber >= 2 ?
 		_("Ignore the playlist's order and play this song first") :
 		_("Start the song already!");
-	overlay_menu.add(MenuOption(firstOption, firstDesc).call([songNumber]() {
+	auto fo = std::make_unique<MenuOption>(firstOption, firstDesc);
+	fo->call([songNumber]() {
 		Game* gm = Game::getSingletonPtr();
 		Screen* s = gm->getScreen("Sing");
 		ScreenSing* ss = dynamic_cast<ScreenSing*>(s);
 		assert(ss);
 		ss->setSong(gm->getCurrentPlayList().getSong(songNumber - 1));
 		gm->activateScreen("Sing");
-	}));
-	overlay_menu.add(MenuOption(_("Remove"), _("Remove this song from the list")).call([this, songNumber]() {
+	});
+	overlay_menu.add(std::move(fo));
+	auto removeSong = std::make_unique<MenuOption>(_("Remove"), _("Remove this song from the list"));
+	removeSong->call([this, songNumber]() {
 		Game* gm = Game::getSingletonPtr();
 		// Minus 1 so it doesn´t remove #2 when you´ve selected #1
 		gm->getCurrentPlayList().removeSong(songNumber - 1);
@@ -370,28 +386,35 @@ void ScreenPlaylist::createSongMenu(int songNumber) {
 		} else {
 			createSongListMenu();
 		}
-	}));
+	});
+	overlay_menu.add(std::move(removeSong));
 	if (songNumber >= 2) { //can't move up first song
-		overlay_menu.add(MenuOption(_("Move up"), _("Move this song up the list")).call([this, songNumber]() {
+		auto moveUp = std::make_unique<MenuOption>(_("Move up"), _("Move this song up the list"));
+		moveUp->call([this, songNumber]() {
 			Game* gm = Game::getSingletonPtr();
 			gm->getCurrentPlayList().swap(songNumber -1, songNumber -2);
 			createSongListMenu();
 			overlay_menu.close();
-		}));
+		});
+		overlay_menu.add(std::move(moveUp));
 	}
 	Game* gm = Game::getSingletonPtr();
 	int size = gm->getCurrentPlayList().getList().size();
 	if (songNumber < size) { //can't move down the last song
-		overlay_menu.add(MenuOption(_("Move down"), _("Move this song down the list")).call([this, songNumber]() {
+		auto moveDown = std::make_unique<MenuOption>(_("Move Down"), _("Move this song down the list"));
+		moveDown->call([this, songNumber]() {
 			Game* gm = Game::getSingletonPtr();
 			gm->getCurrentPlayList().swap(songNumber -1, songNumber);
 			createSongListMenu();
 			overlay_menu.close();
-		}));
+		});
+		overlay_menu.add(std::move(moveDown));
 	}
-	overlay_menu.add(MenuOption(_("Back"), _("Back to playlist viewer")).call([this]() {
+	auto back = std::make_unique<MenuOption>(_("Back"), _("Back to playlist viewer"));
+	back->call([this]() {
 		overlay_menu.close();
-	}));
+	});
+	overlay_menu.add(std::move(back));
 }
 
 void ScreenPlaylist::triggerSongListUpdate() {

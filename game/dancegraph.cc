@@ -103,7 +103,8 @@ void DanceGraph::setupJoinMenu() {
 	m_menu.clear();
 	updateJoinMenu();
 	// Populate root menu
-	m_menu.add(MenuOption(_("Ready!"), _("Start performing!")));
+	auto ready = std::make_unique<MenuOption>(_("Ready!"), _("Start performing!"));
+	m_menu.add(std::move(ready));
 	{ // Create track selector
 		ConfigItem::OptionList ol;
 		int i = 0, cur = 0;
@@ -114,7 +115,9 @@ void DanceGraph::setupJoinMenu() {
 		}
 		m_selectedTrack = ConfigItem(ol); // Create a ConfigItem from the option list
 		m_selectedTrack.select(cur); // Set the selection to current level
-		m_menu.add(MenuOption("", _("Select track")).changer(m_selectedTrack)); // MenuOption that cycles the options
+		auto selectTrack = std::make_unique<MenuOption>("", _("Select track"));
+		selectTrack->changer(m_selectedTrack);
+		m_menu.add(std::move(selectTrack)); // MenuOption that cycles the options
 		m_menu.back().setDynamicName(m_trackOpt); // Set the title to be dynamic
 	}
 	{ // Create difficulty opt
@@ -130,10 +133,14 @@ void DanceGraph::setupJoinMenu() {
 		}
 		m_selectedDifficulty = ConfigItem(ol); // Create a ConfigItem from the option list
 		m_selectedDifficulty.select(cur); // Set the selection to current level
-		m_menu.add(MenuOption("", _("Select difficulty")).changer(m_selectedDifficulty)); // MenuOption that cycles the options
+		auto selectDifficulty = std::make_unique<MenuOption>("", _("Select difficulty"));
+		selectDifficulty->changer(m_selectedDifficulty);
+		m_menu.add(std::move(selectDifficulty)); // MenuOption that cycles the options
 		m_menu.back().setDynamicName(m_difficultyOpt); // Set the title to be dynamic
 	}
-	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
+	auto quit = std::make_unique<MenuOption>(_("Quit"), _("Exit to song browser"));
+	quit->screen("Songs");
+	m_menu.add(std::move(quit));
 }
 
 void DanceGraph::updateJoinMenu() {
