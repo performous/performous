@@ -396,18 +396,18 @@ void Window::view(unsigned num) {
 	} else {
 		// Splitscreen stereo3d
 		if (nativeW == 1280 && nativeH == 1470) {  // HDMI 720p 3D mode
-			glViewportIndexedf(1, 0, 750, 1280, 720);
-			glViewportIndexedf(2, 0, 0, 1280, 720);
-			s_width = 1280;
-			s_height = 720;
+			glViewportIndexedf(1, 0.0f, 750.0f, 1280.0f, 720.0f);
+			glViewportIndexedf(2, 0.0f, 0.0f, 1280.0f, 720.0f);
+			s_width = 1280.0f;
+			s_height = 720.0f;
 		} else if (nativeW == 1920 && nativeH == 2205) {  // HDMI 1080p 3D mode
-			glViewportIndexedf(1, 0, 1125, 1920, 1080);
-			glViewportIndexedf(2, 0, 0, 1920, 1080);
-			s_width = 1920;
-			s_height = 1080;
+			glViewportIndexedf(1, 0.0f, 1125.0f, 1920.0f, 1080.0f);
+			glViewportIndexedf(2, 0.0f, 0.0f, 1920.0f, 1080.0f);
+			s_width = 1920.0f;
+			s_height = 1080.0f;
 		} else {  // Regular top/bottom 3d
-			glViewportIndexedf(1, 0, vh / 2, vw, vh / 2);  // Top half of the drawable area
-			glViewportIndexedf(2, 0, 0, vw, vh / 2);  // Bottom half of the drawable area
+			glViewportIndexedf(1, 0.0f, vh / 2.0f, vw, vh / 2.0f);  // Top half of the drawable area
+			glViewportIndexedf(2, 0.0f, 0.0f, vw, vh / 2.0f);  // Bottom half of the drawable area
 		}
 	}
 }
@@ -452,7 +452,7 @@ void Window::setWindowPosition(const Sint32& x, const Sint32& y)
 }
 
 FBO& Window::getFBO() {
-	if (!m_fbo) m_fbo = std::make_unique<FBO>(s_width, (2 * s_height));
+	if (!m_fbo) m_fbo = std::make_unique<FBO>(s_width, (2.0f * s_height));
 	return *m_fbo;
 }
 
