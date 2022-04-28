@@ -11,8 +11,8 @@ class Texture;
 class MenuOption;
 class Menu;
 
-typedef std::vector<MenuOption> MenuOptions;
-typedef std::vector<MenuOptions*> SubmenuStack;
+typedef std::vector<std::unique_ptr<MenuOption>> MenuOptions;
+typedef std::vector<std::shared_ptr<MenuOptions>> SubmenuStack;
 typedef std::function<void ()> MenuOptionCallback;
 typedef std::shared_ptr<Texture> MenuImage;
 
@@ -37,7 +37,7 @@ public:
 	/// Make the option set a given value for ConfigItem and close the menu.
 	MenuOption& setter(ConfigItem& val, ConfigItem newval) { type = Type::SET_AND_CLOSE; value = &val; newValue = newval; return *this; }
 	/// Make the option open a submenu
-	MenuOption& submenu(MenuOptions opts) { type = Type::OPEN_SUBMENU; options = opts; return *this; }
+	MenuOption& submenu(MenuOptions opts) { type = Type::OPEN_SUBMENU; options = std::make_shared<MenuOptions>(std::move(opts)); return *this; }
 	/// Make the option activate a screeen
 	MenuOption& screen(std::string const& scrn) { type = Type::ACTIVATE_SCREEN; newValue = scrn; return *this; }
 	/// Make the option call a callback
@@ -56,7 +56,7 @@ public:
 	bool isActive() const;
 	ConfigItem* value;  ///< Setting to be adjusted
 	ConfigItem newValue;  ///< Value to be set or screen name
-	MenuOptions options;  ///< Submenu
+	std::shared_ptr<MenuOptions> options;  ///< Submenu
 	MenuOptionCallback callback;  ///< Callback function
 	MenuImage image;  ///< Image to use with option
 private:
@@ -74,7 +74,7 @@ public:
 	/// constructor
 	Menu();
 	/// add a menu option
-	void add(MenuOption opt);
+	void add(std::unique_ptr<MenuOption> opt);
 	/// move the selection
 	void move(int dir = 1);
 	/// set selection
@@ -95,18 +95,17 @@ public:
 	void moveToLast() { selection_stack.back() = menu_stack.back()->size() - 1; }
 
 	size_t curIndex() { return selection_stack.back(); }
-	MenuOption& current() { return menu_stack.back()->at(selection_stack.back()); }
-	MenuOption& back() { return root_options.back(); }
+	MenuOption& current() { return *(menu_stack.back())->at(selection_stack.back()); }
+	MenuOption& back() { return *(root_options->back()); }
 	const MenuOptions::const_iterator begin() const { return menu_stack.back()->begin(); }
 	const MenuOptions::const_iterator end() const { return menu_stack.back()->end(); }
-	const MenuOptions getOptions() const { return *menu_stack.back(); }
+	const MenuOptions& getOptions() const { return *menu_stack.back(); }
 
 	Dimensions dimensions;
 
 private:
-	MenuOptions root_options;
+	std::shared_ptr<MenuOptions> root_options;
 	SubmenuStack menu_stack;
 	std::vector<size_t> selection_stack;
-
 	bool m_open;
 };

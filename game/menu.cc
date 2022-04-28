@@ -4,9 +4,7 @@
 #include "fs.hh"
 #include "game.hh"
 
-MenuOption::MenuOption(std::string const& nm, std::string const& comm, MenuImage img):
-  type(), value(), newValue(), callback(), image(img), name(nm), comment(comm), namePtr(), commentPtr()
-{}
+MenuOption::MenuOption(std::string const& nm, std::string const& comm, MenuImage img): type(), value(), newValue(), options(std::make_shared<MenuOptions>()), callback(), image(img), name(nm), comment(comm), namePtr(), commentPtr() {}
 
 std::string MenuOption::getName() const {
 	if (namePtr) return *namePtr;
@@ -22,7 +20,7 @@ std::string MenuOption::getVirtName() const {
 const std::string& MenuOption::getComment() const { return commentPtr ? *commentPtr : comment; }
 
 bool MenuOption::isActive() const {
-	if (type == Type::OPEN_SUBMENU && options.empty()) return false;
+	if (type == Type::OPEN_SUBMENU && options->empty()) return false;
 	if (type == Type::CHANGE_VALUE) {
 		if (!value) return false;
 		if (value->get_type() == "option_list" && value->ol().size() <= 1) return false;
@@ -31,10 +29,10 @@ bool MenuOption::isActive() const {
 }
 
 
-Menu::Menu(): dimensions(), m_open(true) { clear(); }
+Menu::Menu(): dimensions(), m_open(true), root_options(std::make_shared<MenuOptions>()) { clear(); }
 
-void Menu::add(MenuOption opt) {
-	root_options.push_back(opt);
+void Menu::add(std::unique_ptr<MenuOption> opt) {
+	root_options->push_back(std::move(opt));
 	clear(true); // Adding resets menu stack
 }
 
@@ -50,8 +48,8 @@ void Menu::select(size_t sel) {
 void Menu::action(int dir) {
 	switch (current().type) {
 		case MenuOption::Type::OPEN_SUBMENU: {
-			if (current().options.empty()) break;
-			menu_stack.push_back(&current().options);
+			if (current().options->empty()) break;
+			menu_stack.push_back(current().options);
 			selection_stack.push_back(0);
 			break;
 		}
@@ -92,10 +90,10 @@ void Menu::action(int dir) {
 }
 
 void Menu::clear(bool save_root) {
-	if (!save_root) root_options.clear();
+	if (!save_root) root_options->clear();
 	menu_stack.clear();
 	selection_stack.clear();
-	menu_stack.push_back(&root_options);
+	menu_stack.push_back(root_options);
 	selection_stack.push_back(0);
 }
 
