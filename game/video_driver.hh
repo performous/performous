@@ -63,6 +63,7 @@ glmath::mat4 farTransform();
 /// handles the window
 class Window {
 public:
+	SDL_Window* getWin() { return screen; }
 	Window();
 	~Window();
 	void render(std::function<void (void)> drawFunc);
