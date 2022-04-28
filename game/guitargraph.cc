@@ -159,13 +159,17 @@ void GuitarGraph::setupJoinMenuDifficulty() {
 	}
 	m_selectedDifficulty = ConfigItem(ol); // Create a ConfigItem from the option list
 	m_selectedDifficulty.select(cur); // Set the selection to current level
-	m_menu.add(MenuOption("", _("Select difficulty")).changer(m_selectedDifficulty)); // MenuOption that cycles the options
+	auto _selectDifficulty = std::make_unique<MenuOption>("", _("Select difficulty"));
+	_selectDifficulty->changer(m_selectedDifficulty);
+	m_menu.add(std::move(_selectDifficulty)); // MenuOption that cycles the options
 	m_menu.back().setDynamicName(m_difficultyOpt); // Set the title to be dynamic
 }
 
 void GuitarGraph::setupJoinMenuDrums() {
 	setupJoinMenuDifficulty();
-	m_menu.add(MenuOption(_("Lefty-mode"), "").changer(m_leftymode));
+	auto _leftyMode = std::make_unique<MenuOption>(_("Lefty-mode"), "");
+	_leftyMode->changer(m_leftymode);
+	m_menu.add(std::move(_leftyMode));
 	m_menu.back().setDynamicComment(m_leftyOpt);
 }
 
@@ -179,10 +183,14 @@ void GuitarGraph::setupJoinMenuGuitar() {
 	}
 	m_selectedTrack = ConfigItem(ol); // Create a ConfigItem from the option list
 	m_selectedTrack.select(cur); // Set the selection to current track
-	m_menu.add(MenuOption("", _("Select track")).changer(m_selectedTrack)); // MenuOption that cycles the options
+	auto _selectTrack = std::make_unique<MenuOption>("", _("Select track"));
+	_selectTrack->changer(m_selectedTrack);
+	m_menu.add(std::move(_selectTrack)); // MenuOption that cycles the options
 	m_menu.back().setDynamicName(m_trackOpt); // Set the title to be dynamic
 	setupJoinMenuDifficulty();
-	m_menu.add(MenuOption(_("Lefty-mode"), "").changer(m_leftymode));
+	auto _leftyMode = std::make_unique<MenuOption>(_("Lefty-mode"), "");
+	_leftyMode->changer(m_leftymode);
+	m_menu.add(std::move(_leftyMode));
 	m_menu.back().setDynamicComment(m_leftyOpt);
 }
 
@@ -190,13 +198,16 @@ void GuitarGraph::setupJoinMenu() {
 	m_menu.clear();
 	updateJoinMenu();
 	// Populate root menu
-	m_menu.add(MenuOption(_("Ready!"), _("Start performing!")));
+	auto _ready = std::make_unique<MenuOption>(_("Ready!"), _("Start performing!"));
+	m_menu.add(std::move(_ready));
 	if(m_drums) {
 		setupJoinMenuDrums();
 	} else {
 		setupJoinMenuGuitar();
 	}
-	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
+	auto _quit = std::make_unique<MenuOption>(_("Quit"), _("Exit to song browser"));
+	_quit->screen("Songs");
+	m_menu.add(std::move(_quit));
 }
 
 void GuitarGraph::updateJoinMenu() {

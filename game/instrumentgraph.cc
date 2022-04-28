@@ -53,10 +53,17 @@ bool InstrumentGraph::dead() const { return m_jointime != m_jointime || m_dead >
 
 void InstrumentGraph::setupPauseMenu() {
 	m_menu.clear();
-	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
-	m_menu.add(MenuOption(_("Rejoin"), _("Change selections")).changer(m_rejoin));
-	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning")).screen("Sing"));
-	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
+	auto _resume = std::make_unique<MenuOption>(_("Resume"), _("Back to performing!"));
+	m_menu.add(std::move(_resume));
+	auto _rejoin = std::make_unique<MenuOption>(_("Rejoin"), _("Change selections"));
+	_rejoin->changer(m_rejoin);
+	m_menu.add(std::move(_rejoin));
+	auto _restart = std::make_unique<MenuOption>(_("Restart"), _("Start the song\nfrom the beginning"));
+	_restart->screen("Sing");
+	m_menu.add(std::move(_restart));
+	auto _quit = std::make_unique<MenuOption>(_("Quit"), _("Exit to song browser"));
+	_quit->screen("Songs");
+	m_menu.add(std::move(_quit));
 }
 
 
@@ -90,7 +97,7 @@ void InstrumentGraph::drawMenu() {
 	m_arrow_down.dimensions.stretch(0.05f, 0.05f);
 	m_arrow_left.dimensions.stretch(0.05f, 0.05f);
 	m_arrow_right.dimensions.stretch(0.05f, 0.05f);
-	const auto cur = &m_menu.current();
+	MenuOption& cur = m_menu.current();
 	float w = m_menu.dimensions.w();
 	const float s = std::min(m_width.get(), 0.5) / w;
 	Transform trans(glmath::scale(s));  // Fit better menu on screen
@@ -111,12 +118,10 @@ void InstrumentGraph::drawMenu() {
 	w = 0;
 	unsigned i = 0;
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it, ++i) {
-		std::string menutext = it->getName();
 		SvgTxtTheme* txt = &th.option_selected; // Default: font for selected menu item
-
-		if (cur != &*it) { // Unselected menuoption
 			txt = &(th.getCachedOption(menutext));
-
+		std::string menutext = (*it)->getName();
+		if (&cur != &*it->get()) { // Unselected menuoption
 		// Selected item
 		} else {
 			// Left/right Icons
@@ -181,7 +186,7 @@ void InstrumentGraph::drawMenu() {
 		y += step; // Move draw position down for the next option
 	}
 	// Draw comment text
-	if (cur->getComment() != "") {
+	if (cur.getComment() != "") {
 		//th.comment_bg.dimensions.middle().screenBottom(-0.2);
 		//th.comment_bg.draw();
 		th.comment.dimensions.middle().screenBottom(-0.12f);
