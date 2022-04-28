@@ -105,15 +105,14 @@ void ScreenPlaylist::draw() {
 	if (!m_background || m_background->empty()) m_background = std::make_unique<Texture>(m_backgrounds.getRandom());
 	m_background->draw();
 	if (m_nextTimer.get() == 0.0 && keyPressed == false) {
-		Screen* s = gm->getScreen("Sing");
-		ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
-		assert(ss);
+		Screen& s = gm->getScreen("Sing");
+		ScreenSing& ss = dynamic_cast<ScreenSing&> (s);
 		if(gm->getCurrentPlayList().isEmpty()) {
 			m_songs.setFilter("");
 			auto randomsong = std::rand() % m_songs.size();
-			ss->setSong(m_songs[randomsong]);
+			ss.setSong(m_songs[randomsong]);
 		} else {
-			ss->setSong(gm->getCurrentPlayList().getNext());
+			ss.setSong(gm->getCurrentPlayList().getNext());
 		}
 		gm->activateScreen("Sing");
 	}
@@ -181,15 +180,14 @@ void ScreenPlaylist::createEscMenu() {
 	auto _continue = std::make_unique<MenuOption>(_("Continue"), _("Continue playing"));
 	_continue->call([this]() {
 		Game* gm = Game::getSingletonPtr();
-		Screen* s = gm->getScreen("Sing");
-		ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
-		assert(ss);
+		Screen& s = gm->getScreen("Sing");
+		ScreenSing& ss = dynamic_cast<ScreenSing&> (s);
 		if(!gm->getCurrentPlayList().isEmpty()) {
-			ss->setSong(gm->getCurrentPlayList().getNext());
+			ss.setSong(gm->getCurrentPlayList().getNext());
 		} else {
 			m_songs.setFilter("");
 			auto randomsong = std::rand() % m_songs.size();
-			ss->setSong(m_songs[randomsong]);
+			ss.setSong(m_songs[randomsong]);
 		}
 		gm->activateScreen("Sing");
 	});
@@ -372,10 +370,9 @@ void ScreenPlaylist::createSongMenu(int songNumber) {
 	auto fo = std::make_unique<MenuOption>(firstOption, firstDesc);
 	fo->call([songNumber]() {
 		Game* gm = Game::getSingletonPtr();
-		Screen* s = gm->getScreen("Sing");
-		ScreenSing* ss = dynamic_cast<ScreenSing*>(s);
-		assert(ss);
-		ss->setSong(gm->getCurrentPlayList().getSong(songNumber - 1));
+		Screen& s = gm->getScreen("Sing");
+		ScreenSing& ss = dynamic_cast<ScreenSing&>(s);
+		ss.setSong(gm->getCurrentPlayList().getSong(songNumber - 1));
 		gm->activateScreen("Sing");
 	});
 	overlay_menu.add(std::move(fo));
