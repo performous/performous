@@ -54,7 +54,9 @@ ThemeIntro::ThemeIntro(unsigned short int showOpts):
 	WebserverNotice(findFile("intro_webserver_notice.svg"), config["graphic/text_lod"].f(), WrappingStyle().menuScreenText().ellipsizeNone()),
 	comment_bg(findFile("mainmenu_comment_bg.svg")),
 	short_comment_bg(findFile("mainmenu_scomment_bg.svg"))
-{}
+{
+std::clog << "themeIntro/debug: Constructed new theme." << std::endl;
+}
 
 ThemeInstrumentMenu::ThemeInstrumentMenu():
 	Theme(findFile("instrumentmenu_bg.svg")),
