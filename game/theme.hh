@@ -2,6 +2,7 @@
 
 #include "opengl_text.hh"
 #include "texture.hh"
+#include <memory>
 #include <string>
 
 /// abstract theme class
@@ -21,13 +22,13 @@ class ThemeSongs: public Theme {
 public:
 	ThemeSongs();
 	/// song display
-	SvgTxtTheme song;
+	std::shared_ptr<SvgTxtTheme> song;
 	/// ordering display
-	SvgTxtTheme order;
+	std::shared_ptr<SvgTxtTheme> order;
 	/// has hiscore display
-	SvgTxtTheme has_hiscore;
+	std::shared_ptr<SvgTxtTheme> has_hiscore;
 	/// hiscores display
-	SvgTxtTheme hiscores;
+	std::shared_ptr<SvgTxtTheme> hiscores;
 };
 
 /// theme for practice screen
@@ -39,7 +40,7 @@ public:
 	/// sharp sign
 	Texture sharp;
 	/// note name text
-	SvgTxtTheme note_txt;
+	std::shared_ptr<SvgTxtTheme> note_txt;
 };
 
 /// theme for singing screen
@@ -51,13 +52,13 @@ public:
 	/// bottom background
 	Texture bg_bottom;
 	/// current lyrics line
-	SvgTxtTheme lyrics_now;
+	std::shared_ptr<SvgTxtTheme> lyrics_now;
 	/// next lyrics line
-	SvgTxtTheme lyrics_next;
+	std::shared_ptr<SvgTxtTheme> lyrics_next;
 	/// time display
-	SvgTxtTheme timer;
+	std::shared_ptr<SvgTxtTheme> timer;
 	/// show the current song info
-	SvgTxtTheme songinfo;
+	std::shared_ptr<SvgTxtTheme> songinfo;
 };
 
 /// theme for audio device screen
@@ -65,11 +66,11 @@ class ThemeAudioDevices: public Theme {
 public:
 	ThemeAudioDevices();
 	/// device item
-	SvgTxtTheme device;
+	std::shared_ptr<SvgTxtTheme> device;
 	/// device item background
 	Texture device_bg;
 	/// comment text
-	SvgTxtTheme comment;
+	std::shared_ptr<SvgTxtTheme> comment;
 	/// comment background
 	Texture comment_bg;
 	/// back highlight for selected option
@@ -83,15 +84,15 @@ public:
 	/// back highlight for selected option
 	Texture back_h;
 	/// menu option texts
-	std::map<std::string, std::unique_ptr<SvgTxtTheme>> options;
+	std::map<std::string, std::shared_ptr<SvgTxtTheme>> options;
 	/// selected menu option text
-	SvgTxtTheme option_selected;
+	std::shared_ptr<SvgTxtTheme> option_selected;
 	/// menu comment text
-	SvgTxtTheme comment;
+	std::shared_ptr<SvgTxtTheme> comment;
 	/// configuration comment text (short tip)
-	SvgTxtTheme short_comment;
+	std::shared_ptr<SvgTxtTheme> short_comment;
 	/// notice to remind people the webserver is active
-	SvgTxtTheme WebserverNotice;
+	std::shared_ptr<SvgTxtTheme> WebserverNotice;
 	/// configuration comment background
 	Texture comment_bg;
 	/// configuration comment background (short tip)
@@ -105,15 +106,15 @@ public:
 	/// back highlight for selected option
 	Texture back_h;
 	/// menu option texts
-	std::map<std::string, std::unique_ptr<SvgTxtTheme>> options;
+	std::map<std::string, std::shared_ptr<SvgTxtTheme>> options;
 	/// menu selected option text
-	SvgTxtTheme option_selected;
+	std::shared_ptr<SvgTxtTheme> option_selected;
 	/// menu comment text
-	SvgTxtTheme comment;
+	std::shared_ptr<SvgTxtTheme> comment;
 	/// menu comment background
 	//Texture comment_bg;
 	/// get a cached option test
-	SvgTxtTheme& getCachedOption(const std::string& text);
+	std::shared_ptr<SvgTxtTheme> getCachedOption(const std::string& text);
 };
 
 //at the moment just a copy of ThemeSongs
@@ -121,13 +122,13 @@ class ThemePlaylistScreen: public Theme {
 public:
 	ThemePlaylistScreen(unsigned short int showOpts);
 	/// menu option texts
-	std::map<std::string, std::unique_ptr<SvgTxtTheme>> options;
+	std::map<std::string, std::shared_ptr<SvgTxtTheme>> options;
 	/// selected menu option text
-	SvgTxtTheme option_selected;
+	std::shared_ptr<SvgTxtTheme> option_selected;
 	/// menu comment text
-	SvgTxtTheme comment;
+	std::shared_ptr<SvgTxtTheme> comment;
 	/// configuration comment text (short tip)
-	SvgTxtTheme short_comment;
+	std::shared_ptr<SvgTxtTheme> short_comment;
 	/// configuration comment background
 	Texture comment_bg;
 	/// configuration comment background (short tip)
