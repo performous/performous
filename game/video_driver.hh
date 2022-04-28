@@ -8,8 +8,14 @@
 
 float screenW();
 float screenH();
-const float targetWidth = 1366.0f; // One of the most common desktop resolutions in use today.
-static inline float virtH() { return float(screenH()) / screenW(); }
+float targetAR();
+float targetWidth();
+float targetHeight();
+// const float targetWidth = screenW() / 2.0f; // One of the most common desktop resolutions in use today.
+// const float targetHeight = 768.0f; // One of the most common desktop resolutions in use today.
+// const float targetAR = targetWidth / targetHeight; // One of the most common desktop resolutions in use today.
+// static inline float virtH() { return screenH() / screenW(); }
+
 
 struct SDL_Surface;
 struct SDL_Window;
@@ -72,6 +78,8 @@ public:
 	void resize();
 	/// take a screenshot
 	void screenshot();
+	/// Return equivalence between Y and X coordinates, adjusted by aspect ratio.
+	static float virtH() { return screenH() / screenW(); }
 	
 	/// Return reference to Uniform Buffer Object.
 	static GLuint const& UBO() { return Window::m_ubo; }	

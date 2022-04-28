@@ -18,7 +18,8 @@ class YCoordinate {
 	/// Conversion functions
 	explicit operator const float() const { return raw(); }
 	explicit operator float() { return raw(); }
-	float operator ()() const { return raw() * Window::virtH(); }
+	float value() const { return raw() * Window::virtH(); }
+	float operator ()() const { return value(); }
 	explicit operator double() { return static_cast<double>(raw()); }
 	explicit operator long double() { return static_cast<long double>(raw()); }
 	explicit operator std::string() { 

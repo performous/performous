@@ -52,6 +52,13 @@ namespace {
 float screenW() { return s_width; }
 float screenH() { return s_height; }
 
+float targetWidth() { 
+	return screenW() / 2.0f;
+// 	return 1366.0f;
+}
+float targetHeight() { return screenH() / 2.0f; }
+float targetAR() { return 1.0f; }
+
 GLuint Window::m_ubo = 0;
 GLuint Window::m_vao = 0;
 GLuint Window::m_vbo = 0;
@@ -349,17 +356,18 @@ void Window::render(std::function<void (void)> drawFunc) {
 		// Render FBO with 1:1 pixels, properly filtered/positioned for 3d
 		ColorTrans c(colorMatrix);
 		Dimensions dim = Dimensions(getFBO().width() / getFBO().height()).fixedWidth(1.0f);
-		dim.center((num == 0 ? 0.25f : -0.25f) * dim.h());
+		dim.center((num == 0 ? 0.25f : -0.25f) * dim.h().raw());
 		if (num == 1) {
 			// Right eye blends over the left eye
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_ONE, GL_ONE);
 		}
-		getFBO().getTexture().draw(dim, TexCoords(0.0f, 1.0f, 1.0f, 0));
+		getFBO().getTexture().draw(dim, TexCoords(0.0f, 1.0f, 1.0f, 0.0f));
 	}
 }
 
 void Window::view(unsigned num) {
+	std::clog << "window/debug: Window::view() has been called: " << ++windowView << " times." << std::endl;
 	glutil::GLErrorChecker glerror("Window::view");
 	// Set flags
 	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
@@ -473,6 +481,9 @@ void Window::resize() {
 	} else {
 		SDL_ShowCursor(SDL_TRUE);
 		SDL_EnableScreenSaver();
+		if (static_cast<float>(h) < (0.429f * static_cast<float>(w))) w = std::round(static_cast<float>(h) / 0.429f);
+		if (static_cast<float>(w) > (0.8f * static_cast<float>(h))) h = std::round(static_cast<float>(w) * 0.8f);
+		std::clog << "video/debug: Resized to " << std::to_string(w) << "x" << std::to_string(h) << std::endl;
 		config["graphic/window_width"].i() = w;
 		config["graphic/window_height"].i() = h;
 		SDL_GetWindowPosition(screen, &m_windowX, &m_windowY);
@@ -484,11 +495,11 @@ void Window::resize() {
 		SDL_GetWindowSize(screen, &nativeW, &nativeH);
 	}
 	else { SDL_GL_GetDrawableSize(screen, &nativeW, &nativeH); }
-	s_width = nativeW;
-	s_height = nativeH;
+	s_width = static_cast<float>(nativeW);
+	s_height = static_cast<float>(nativeH);
 	// Enforce aspect ratio limits
-	if (s_height < 0.56f * s_width) s_width = round(s_height / 0.56f);
-	if (s_height > 0.8f * s_width) s_height = round(0.8f * s_width);
+	if (s_height < (0.429f * s_width)) s_width = std::round(s_height / 0.429f);
+	if (s_height > (0.8f * s_width)) s_height = std::round(0.8f * s_width);
 	std::clog << "video/info: Window size " << w << "x" << h;
 	if (w != nativeW) std::clog << " (HiDPI " << nativeW << "x" << nativeH << ")";
 	std::clog << ", rendering in " << s_width << "x" << s_height << std::endl;
@@ -552,7 +563,7 @@ ColorTrans::~ColorTrans() {
 ViewTrans::ViewTrans(float offsetX, float offsetY, float frac): m_old(g_projection) {
 	// Setup the projection matrix for 2D translates
 	using namespace glmath;
-	float h = virtH();
+	float h = Window::virtH();
 	const float f = near_ / z0;  // z0 to nearplane conversion factor
 	// Corners of the screen at z0
 	float x1 = -0.5f, x2 = 0.5f;
@@ -562,6 +573,7 @@ ViewTrans::ViewTrans(float offsetX, float offsetY, float frac): m_old(g_projecti
 	x1 -= persX; x2 -= persX;
 	y1 -= persY; y2 -= persY;
 	// Perspective projection + the rest of the offset in eye (world) space
+	std::clog << "frustum/debug: frac: " << std::to_string(frac) << ", offsetX: " << std::to_string(offsetX) << ", offsetY: " << std::to_string(offsetY) << ", left: " << std::to_string(f * x1) << ", right: " << std::to_string(f * x2) << ", bottom: " << std::to_string(f * y1) << ", top: " << std::to_string(f * y2) << ", near: " << std::to_string(near_) << ", far: " << far_ << std::endl;
 	g_projection = glm::frustum(f * x1, f * x2, f * y1, f * y2, near_, far_)
 	  * translate(vec3(offsetX - persX, offsetY - persY, -z0));
 	Game::getSingletonPtr()->window().updateTransforms();

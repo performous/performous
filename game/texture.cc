@@ -20,11 +20,11 @@ Shader& getShader(std::string const& name) {
 	return Game::getSingletonPtr()->window().shader(name);  // FIXME
 }
 
-float Dimensions::screenY() const {
+YCoordinate Dimensions::screenY() const {
 	switch (m_screenAnchor) {
-	  case CENTER: return 0.0f;
-	  case TOP: return -0.5f * virtH();
-	  case BOTTOM: return 0.5f * virtH();
+	  case CENTER: return YCoordinate(0.0f);
+	  case TOP: return YCoordinate(-0.5f);
+	  case BOTTOM: return YCoordinate(0.5f);
 	}
 	throw std::logic_error("Dimensions::screenY(): unknown m_screenAnchor value");
 }
@@ -48,6 +48,8 @@ class TextureLoader::Impl {
 			else if (ext == ".jpg" || ext == ".jpeg") loadJPEG(bitmap, name);
 			else if (ext == ".png") loadPNG(bitmap, name);
 			else throw std::runtime_error("Unknown image file format: " + name.string());
+	std::clog << "bitmap/debug: filename: " << name.filename().string() << ", width: " << std::to_string(bitmap.width) << ", height: " << std::to_string(bitmap.height) << ", ar: " << std::to_string(bitmap.ar) << std::endl;	
+
 		} catch (std::exception& e) {
 			std::clog << "image/error: " << e.what() << std::endl;
 		}
@@ -138,7 +140,7 @@ template <typename T> void loader(T* target, fs::path const& name) {
 	ldr->push(target, Job(name, [target](Bitmap& bitmap){ target->load(bitmap); }));
 }
 
-Texture::Texture(fs::path const& filename) { loader(this, filename); }
+Texture::Texture(fs::path const& filename): m_filename(filename.filename().string()) { loader(this, filename); }
 Texture::~Texture() { ldr->remove(this); }
 
 // Stuff for converting pix::Format into OpenGL enum values & other flags
@@ -175,7 +177,12 @@ void Texture::load(Bitmap const& bitmap, bool isText) {
 	glutil::GLErrorChecker glerror("Texture::load");
 	// Initialize dimensions
 	m_width = bitmap.width; m_height = bitmap.height;
-	dimensions = Dimensions(bitmap.ar).fixedWidth(1.0f);
+	if (bitmap.width != 1 && bitmap.height != 1) { std::clog << "texture/debug: filename: " << m_filename << ", bitmap.ar: " << std::to_string(bitmap.ar) << std::endl;
+	}
+	dimensions = Dimensions(bitmap.ar);
+// 	.fixedHeight(YCoordinate(1.0f));
+	std::clog << "Texture::load()/debug: filename: " << m_filename << ", dimensions.x1: " << std::to_string(dimensions.x1()) << ", dimensions.y1(): " << dimensions.y1() << ", dimensions.x2: " << std::to_string(dimensions.x2()) << ", dimensions.y2(): " << dimensions.y2() << ", dimensions.w(): " << std::to_string(dimensions.w()) << ", m_width: " << std::to_string(m_width) << ", m_height: " << std::to_string(m_height) << std::endl;
+	draw(dimensions, TexCoords(tex.x1, tex.y1, tex.x2, tex.y2));
 	m_premultiplied = bitmap.linearPremul;
 	UseTexture texture(*this);
 	// When texture area is small, bilinear filter the closest mipmap
@@ -184,7 +191,7 @@ void Texture::load(Bitmap const& bitmap, bool isText) {
 	glTexParameterf(type(), GL_TEXTURE_MAG_FILTER, isText ? GL_NEAREST : GL_LINEAR);
 	if (!isText) glTexParameterf(type(), GL_TEXTURE_MAX_LEVEL, 4);
 	glerror.check("glTexParameterf");
-
+	std::clog << "Texture::load()/debug: After loading, filename: " << m_filename << ", dimensions.x1: " << std::to_string(dimensions.x1()) << ", dimensions.y1(): " << dimensions.y1() << ", dimensions.x2: " << std::to_string(dimensions.x2()) << ", dimensions.y2(): " << dimensions.y2() << ", dimensions.w(): " << std::to_string(dimensions.w()) << ", m_width: " << std::to_string(m_width) << ", m_height: " << std::to_string(m_height) << std::endl;
 	// Anisotropy is potential trouble maker
 	if (epoxy_has_gl_extension("GL_EXT_texture_filter_anisotropic")) {
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);
@@ -203,6 +210,8 @@ void Texture::draw() const {
 	// FIXME: This gets image alpha handling right but our ColorMatrix system always assumes premultiplied alpha
 	// (will produce incorrect results for fade effects)
 	glBlendFunc(m_premultiplied ? GL_ONE : GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+// 	std::clog << "Texture::draw()/debug: tex.x1: " << std::to_string(tex.x1) << ", tex.y1: " << std::to_string(tex.y1) << ", tex.x2: " << std::to_string(tex.x2) << ", tex.y2: " << std::to_string(tex.y2) << std::endl;
+// 	std::clog << "Texture::draw()/debug: dimensions.x1: " << std::to_string(dimensions.x1()) << ", dimensions.y1(): " << dimensions.y1() << ", dimensions.x2: " << std::to_string(dimensions.x2()) << ", dimensions.y2(): " << dimensions.y2() << std::endl;
 	draw(dimensions, TexCoords(tex.x1, tex.y1, tex.x2, tex.y2));
 }
 
