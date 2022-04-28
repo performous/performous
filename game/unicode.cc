@@ -21,14 +21,14 @@ std::string UnicodeUtil::getCharset (std::string const& str) {
 	
 	Encoding encoding = CompactEncDet::DetectEncoding(
         str.c_str(), static_cast<int>(str.size()),
-        nullptr, nullptr, nullptr,
-        UNKNOWN_ENCODING,
-        UNKNOWN_LANGUAGE,
-        CompactEncDet::WEB_CORPUS,
-        true,
-        &bytes_consumed,
-        &is_reliable);
-        
+		nullptr, nullptr, nullptr,
+		UNKNOWN_ENCODING,
+		UNKNOWN_LANGUAGE,
+		CompactEncDet::WEB_CORPUS,
+		true,
+		&bytes_consumed,
+		&is_reliable);
+		
 	if (!is_reliable) {
 			std::clog << "unicode/warning: detected encoding (" <<
 			MimeEncodingName(encoding) << ") for text: " <<
