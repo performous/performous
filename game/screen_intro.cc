@@ -11,7 +11,7 @@
 
 #include <SDL_timer.h>
 
-ScreenIntro::ScreenIntro(std::string const& name, Audio& audio): Screen(name), m_audio(audio), m_first(true) {
+ScreenIntro::ScreenIntro(std::string const& name, Audio& audio): Screen(name), m_audio(audio), m_menu(Menu()), m_first(true) {
 }
 
 void ScreenIntro::enter() {
@@ -82,7 +82,7 @@ void ScreenIntro::draw_menu_options() {
 	const float x = -0.35f;
 	const float start_y = -0.1f;
 	const float sel_margin = 0.03f;
-	const MenuOptions opts = m_menu.getOptions();
+	MenuOptions const& opts = m_menu.getOptions();
 	float submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get()-m_menu.getSubmenuLevel()));
 	theme->back_h.dimensions.fixedHeight(0.038f);
 	theme->back_h.dimensions.stretch(m_menu.dimensions.w(), theme->back_h.dimensions.h());
@@ -93,7 +93,7 @@ void ScreenIntro::draw_menu_options() {
 
 	// Loop the currently visible options
 	for (size_t i = start_i, ii = 0; ii < showOpts && i < opts.size(); ++i, ++ii) {
-		MenuOption const& opt = opts[i];
+		MenuOption const& opt = *opts[i].get();
 		ColorTrans c(Color::alpha(submenuanim));
 
 		// Selection
@@ -169,8 +169,12 @@ void ScreenIntro::populateMenu() {
 	MenuImage imgConfig(new Texture(findFile("intro_configure.svg")));
 	MenuImage imgQuit(new Texture(findFile("intro_quit.svg")));
 	m_menu.clear();
-	m_menu.add(MenuOption(_("Perform"), _("Start performing!"), imgSing).screen("Songs"));
-	m_menu.add(MenuOption(_("Practice"), _("Check your skills or test the microphones"), imgPractice).screen("Practice"));
+	auto _perform = std::make_unique<MenuOption>(_("Perform"), _("Start performing!"), imgSing);
+	_perform->screen("Songs");
+	m_menu.add(std::move(_perform));
+	auto _practice = std::make_unique<MenuOption>(_("Practice"), _("Check your skills or test the microphones"), imgPractice);
+	_practice->screen("Practice");
+	m_menu.add(std::move(_practice));
 	// Configure menu + submenu options
 	MenuOptions configmain;
 	for (MenuEntry const& submenu: configMenu) {
@@ -179,15 +183,25 @@ void ScreenIntro::populateMenu() {
 			// Process items that belong to that submenu
 			for (std::string const& item: submenu.items) {
 				ConfigItem& c = config[item];
-				opts.push_back(MenuOption(_(c.getShortDesc().c_str()), _(c.getLongDesc().c_str())).changer(c));
+				  std::unique_ptr<MenuOption> sm = std::make_unique<MenuOption>(_(c.getShortDesc().c_str()), _(c.getLongDesc().c_str()));
+				  sm->changer(c);
+				  opts.push_back(std::move(sm));
 			}
-			configmain.push_back(MenuOption(_(submenu.shortDesc.c_str()), _(submenu.longDesc.c_str()), imgConfig).submenu(opts));
+			std::unique_ptr<MenuOption> mo = std::make_unique<MenuOption>(_(submenu.shortDesc.c_str()), _(submenu.longDesc.c_str()), imgConfig);
+			mo->submenu(std::move(opts));
+			configmain.push_back(std::move(mo));
 		} else {
-			configmain.push_back(MenuOption(_(submenu.shortDesc.c_str()), _(submenu.longDesc.c_str()), imgConfig).screen(submenu.name));
+			std::unique_ptr<MenuOption> mo = std::make_unique<MenuOption>(_(submenu.shortDesc.c_str()), _(submenu.longDesc.c_str()), imgConfig);
+			mo->screen(submenu.name);
+			configmain.push_back(std::move(mo));
 		}
 	}
-	m_menu.add(MenuOption(_("Configure"), _("Configure audio and game options"), imgConfig).submenu(configmain));
-	m_menu.add(MenuOption(_("Quit"), _("Leave the game"), imgQuit).screen(""));
+	auto _configure = std::make_unique<MenuOption>(_("Configure"), _("Configure audio and game options"), imgConfig);
+	_configure->submenu(std::move(configmain));
+	m_menu.add(std::move(_configure));
+	auto _quit = std::make_unique<MenuOption>(_("Quit"), _("Leave the game"), imgQuit);
+	_quit->screen("");
+	m_menu.add(std::move(_quit));
 }
 
 #ifdef USE_WEBSERVER

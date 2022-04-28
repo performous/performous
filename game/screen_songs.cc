@@ -515,7 +515,7 @@ void ScreenSongs::drawMenu() {
 	if (m_menu.empty()) return;
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
-	const auto cur = &m_menu.current();
+	MenuOption& cur = m_menu.current();
 	float w = m_menu.dimensions.w();
 	const float txth = th.option_selected.h();
 	const float step = txth * 0.85f;
@@ -530,17 +530,18 @@ void ScreenSongs::drawMenu() {
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it) {
 		// Pick the font object
 		SvgTxtTheme* txt = &th.option_selected;
-		if (cur != &*it)
 			txt = &(th.getCachedOption(it->getName()));
+		if (&cur != &*it->get()) {
+		}
 		// Set dimensions and draw
 		txt->dimensions.middle(x).center(y);
-		txt->draw(it->getName());
+		txt->draw((*it)->getName());
 		w = std::max(w, txt->w() + 2 * step); // Calculate the widest entry
 		y += step;
 	}
-	if (cur->getComment() != "") {
 		th.comment.dimensions.middle(0).screenBottom(-0.12f);
-		th.comment.draw(cur->getComment());
+	if (cur.getComment() != "") {
+		th.comment->draw(cur.getComment());
 	}
 	m_menu.dimensions.stretch(w, h);
 }
@@ -550,28 +551,38 @@ std::unique_ptr<fvec_t, void(*)(fvec_t*)> ScreenSongs::previewBeatsBuffer = std:
 
 void ScreenSongs::createPlaylistMenu() {
 	m_menu.clear();
-	m_menu.add(MenuOption(_("Play"), "").call([this]() {
+	auto _play = std::make_unique<MenuOption>(_("Play"), "");
+	_play->call([this]() {
 		Game* tm = Game::getSingletonPtr();
 		tm->getCurrentPlayList().addSong(m_songs.currentPtr());
 		m_menuPos = 1;
 		m_menu.close();
 		sing();
-	}));
-	m_menu.add(MenuOption(_("Shuffle"), "").call([this]() {
+	});
+	m_menu.add(std::move(_play));
+	auto _shuffle = std::make_unique<MenuOption>(_("Shuffle"), "");
+	_shuffle->call([this]() {
 		Game* tm = Game::getSingletonPtr();
 		tm->getCurrentPlayList().shuffle();
 		m_menuPos = 1;
 		m_menu.close();
-	}));
-	m_menu.add(MenuOption(_("View playlist"), "").screen("Playlist"));
-	m_menu.add(MenuOption(_("Clear playlist"), "").call([this]() {
+	});
+	m_menu.add(std::move(_shuffle));
+	auto _viewPlaylist = std::make_unique<MenuOption>(_("View playlist"), "");
+	_viewPlaylist->screen("Playlist");
+	m_menu.add(std::move(_viewPlaylist));
+	auto _clearPlaylist = std::make_unique<MenuOption>(_("Clear playlist"), "");
+	_clearPlaylist->call([this]() {
 		Game* tm = Game::getSingletonPtr();
 		tm->getCurrentPlayList().clear();
 		m_menuPos = 1;
 		m_menu.close();
-	}));
-	m_menu.add(MenuOption(_("Back"), "").call([this]() {
+	});
+	m_menu.add(std::move(_clearPlaylist));
+	auto _back = std::make_unique<MenuOption>(_("Back"), "");
+	_back->call([this]() {
 		m_menuPos = 1;
 		m_menu.close();
-	}));
+	});
+	m_menu.add(std::move(_back));
 }

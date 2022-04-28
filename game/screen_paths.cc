@@ -66,35 +66,46 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 	}
 	bool showHiddenfolders = config["paths/showhiddenfolders"].b();
 	if(showHiddenfolders) {
-		m_menu.add(MenuOption(_("Hide hidden folders"),_("Hide hidden folders")).call([this, sl, path]() {
+		auto _hiddenToggle = std::make_unique<MenuOption>(_("Hide hidden folders"),_("Hide hidden folders"));
+		_hiddenToggle->call([this, sl, path]() {
 			config["paths/showhiddenfolders"].b() = false;
 			generateMenuFromPath(path);
-		}));
+		});
+		m_menu.add(std::move(_hiddenToggle));
 	} else {
-		m_menu.add(MenuOption(_("Show hidden folders"),_("Show hidden folders")).call([this, sl, path]() {
+		auto _hiddenToggle = std::make_unique<MenuOption>(_("Show hidden folders"),_("Show hidden folders"));
+		_hiddenToggle->call([this, sl, path]() {
 			config["paths/showhiddenfolders"].b() = true;
 			generateMenuFromPath(path);
-		}));
+		});
+		m_menu.add(std::move(_hiddenToggle));
 	}
 
 	if(folderInConfig) {
-		m_menu.add(MenuOption(_("Remove this folder"),_("Remove current folder from song folders")).call([this, sl, path, position]() {
+		auto _removeFolder = std::make_unique<MenuOption>(_("Remove this folder"),_("Remove current folder from song folders"));
+		_removeFolder->call([this, sl, path, position]() {
 			config["paths/songs"].sl().erase(position); //WHY the fuck is this const??
 			generateMenuFromPath(path);
 			//Reload internal, but that crashes!! rely on the user to press ctrl+r in song selection screen
-		}));
+		});
+		m_menu.add(std::move(_removeFolder));
 	} else {
-		m_menu.add(MenuOption(_("Add this folder"),_("Add current folder to song folders")).call([this, sl, path]() {
+		auto _addFolder = std::make_unique<MenuOption>(_("Add this folder"),_("Add current folder to song folders"));
+		_addFolder->call([this, sl, path]() {
 			config["paths/songs"].sl().push_back(path.string()); //WHY the fuck is this const??
 			generateMenuFromPath(path);
 			//Reload internal, but that crashes!! rely on the user to press ctrl+r in song selection screen
-		}));
+		});
+		m_menu.add(std::move(_addFolder));
 	}
 	auto parent = path.parent_path();
-	if (!parent.empty() && parent != path)
-		m_menu.add(MenuOption(_(".."),_("Go up one folder")).call([this, sl, path]() {
+	if (!parent.empty() && parent != path) {
+		auto _upFolder = std::make_unique<MenuOption>(_(".."),_("Go up one folder"));
+		_upFolder->call([this, sl, path]() {
 					generateMenuFromPath(path.parent_path());
-	}));
+		});
+		m_menu.add(std::move(_upFolder));
+	}
 	
 	// Extract list of all directories
 	std::list<fs::path> directories;
@@ -119,7 +130,9 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 
 	// Add entries to menu
 	for (const auto &p : directories) {
-		m_menu.add(MenuOption(p.string(), _("Open folder")).call([this, p] { generateMenuFromPath(p); }));
+		auto _open = std::make_unique<MenuOption>(p.string(), _("Open folder"));
+		_open->call([this, p] { generateMenuFromPath(p); });
+		m_menu.add(std::move(_open));
 	}
 }
 
@@ -137,12 +150,12 @@ void ScreenPaths::draw() {
 		const float x = -0.45f;
 		const float start_y = -0.15f;
 		float wcounter = 0;
-		const MenuOptions opts = m_menu.getOptions();
+		MenuOptions const& opts = m_menu.getOptions();
 		int start_i = std::min((int)m_menu.curIndex() - 1, (int)opts.size() - (int)showopts
 			+ (m_menu.getSubmenuLevel() == 2 ? 1 : 0)); // Hack to counter side-effects from displaying the value inside the menu
 		if (start_i < 0 || opts.size() == showopts) { start_i = 0; }
 		for (size_t i = start_i, ii = 0; ii < showopts && i < opts.size(); ++i, ++ii) {
-			MenuOption const& opt = opts[i];
+			MenuOption const& opt = *opts[i];
 			if (i == m_menu.curIndex()) {
 				double selanim = m_selAnim.get() - start_i;
 				if (selanim < 0) { selanim = 0; }
