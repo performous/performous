@@ -57,13 +57,15 @@ AppDir:
       - usr/share/doc/*/changelog.*
       - usr/share/doc/*/NEWS.*
       - usr/share/doc/*/TODO.*
-  after_bundle:
+  after_bundle: |
     ## In Fedora and Gentoo (probably others too), libnsl has been deprecated
     ## from glibc and is available in another package. It still exists as part
     ## of the Debian lineage, and must be copied into the project root so it
     ## can run on Distros where it is not available by default.
     ## Hopefully this can be removed some day.
     cp $TARGET_APPDIR/runtime/compat/lib/x86_64-linux-gnu/libnsl.so.1 $TARGET_APPDIR/
+    ## This needs to be copied to make Arch work
+    cp $TARGET_APPDIR/runtime/compat/lib/x86_64-linux-gnu/libcrypt.so.1 $TARGET_APPDIR/
 AppImage:
   arch: x86_64
   update-information: None
