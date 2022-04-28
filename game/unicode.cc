@@ -6,9 +6,10 @@
 #include <stdexcept>
 #include <unicode/unistr.h>
 #include <unicode/ustream.h>
+#include <unicode/ubidi.h>
 #include "../3rdparty/ced/compact_enc_det/compact_enc_det.h"
 
-UErrorCode UnicodeUtil::m_staticIcuError = U_ZERO_ERROR;
+icu::ErrorCode UnicodeUtil::m_staticIcuError = icu::ErrorCode();
 icu::RuleBasedCollator UnicodeUtil::m_dummyCollator (icu::UnicodeString (""), icu::Collator::PRIMARY, m_staticIcuError);
 icu::RuleBasedCollator UnicodeUtil::m_sortCollator  (nullptr, icu::Collator::SECONDARY, m_staticIcuError);
 
@@ -65,6 +66,33 @@ std::string UnicodeUtil::convertToUTF8 (std::string const& str) {
 	std::stringstream ss (str);
 	convertToUTF8 (ss, std::string());
 	return ss.str();
+}
+
+bool UnicodeUtil::isRTL(std::string const& str) {
+	bool _return = false;
+	icu::ErrorCode _unicodeError;
+	std::string charset = UnicodeUtil::getCharset(str);
+	icu::UnicodeString ustring = icu::UnicodeString(str.c_str(), charset.c_str());
+	 std::unique_ptr<UBiDi,void(*)(UBiDi*)> _uBiDiObj(
+		ubidi_open(),
+		[](UBiDi* p) {
+			if (p != nullptr) {
+			ubidi_close(p);
+			}
+		});
+	ubidi_setPara(
+		_uBiDiObj.get(),
+		ustring.getBuffer(),
+		-1,
+		UBIDI_DEFAULT_LTR,
+		nullptr,
+		_unicodeError
+	);
+	if (_unicodeError.isSuccess()) _return = (ubidi_getDirection(_uBiDiObj.get()) != UBIDI_LTR);
+	else {
+		std::clog << "unicode/warning: Error (" << std::to_string(_unicodeError.get()) << ": " << _unicodeError.errorName() << "), determining text direction for: " << str << ", will assume LTR." << std::endl;
+		}
+	return _return;
 }
 
 std::string UnicodeUtil::toLower (std::string const& str, size_t length) {
