@@ -263,10 +263,9 @@ void ScreenSing::activateNextScreen()
 
 	// Score window visible -> Enter quits to Players Screen
 	if(!config["game/karaoke_mode"].i() && !m_song->hasDance() &&!m_song->hasDrums() &&!m_song->hasGuitars()) {
-		Screen* s = gm->getScreen("Players");
-		ScreenPlayers* ss = dynamic_cast<ScreenPlayers*> (s);
-		assert(ss);
-		ss->setSong(m_song);
+		Screen& s = gm->getScreen("Players");
+		ScreenPlayers& ss = dynamic_cast<ScreenPlayers&> (s);
+		ss.setSong(m_song);
 		gm->activateScreen("Players");
 	} else {
 		gm->activateScreen("Playlist");

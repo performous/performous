@@ -21,23 +21,25 @@ Game::Game(Window& _window, Audio& _audio):
 }
 
 void Game::activateScreen(std::string const& name) {
-	newScreen = getScreen(name);
+	newScreen = &getScreen(name);
 }
 
 void Game::updateScreen() {
 	if (!newScreen) return;
-	Screen* s = newScreen;  // A local copy in case exit() or enter() want to change screens again
+	Screen& s = *newScreen;  // A local copy in case exit() or enter() want to change screens again
 	newScreen = nullptr;
 	if (currentScreen) currentScreen->exit();
+	if (currentScreen) {
+	}
 	currentScreen = nullptr;  // Exception safety, do not remove
-	s->enter();
-	currentScreen = s;
+	s.enter();
+	currentScreen = &s;
 }
 
-Screen* Game::getScreen(std::string const& name) {
+Screen& Game::getScreen(std::string const& name) {
 	auto it = screens.find(name);
 	if (it != screens.end()){
-		return it->second.get();
+		return *it->second;
 	}
 	throw std::invalid_argument("Screen " + name + " does not exist");
 }

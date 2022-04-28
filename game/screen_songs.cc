@@ -225,7 +225,7 @@ bool ScreenSongs::addSong() {
 
 void ScreenSongs::sing() {
 	Game* gm = Game::getSingletonPtr();
-	ScreenSing& ss = dynamic_cast<ScreenSing&>(*gm->getScreen("Sing"));
+	ScreenSing& ss = dynamic_cast<ScreenSing&>(gm->getScreen("Sing"));
 	ss.setSong(gm->getCurrentPlayList().getNext());
 	gm->activateScreen("Sing");
 }

@@ -205,13 +205,13 @@ bool Music::prepare() {
 				fvec_t* tempoSamplePtr = new_fvec(Audio::aubio_hop_size);
 				std::lock_guard<std::recursive_mutex> l(Audio::aubio_mutex);
 				Game* gm = Game::getSingletonPtr();
-				ScreenSongs* sSongs = static_cast<ScreenSongs *>(gm->getScreen("Songs"));
-				double pstart = sSongs->getSongs().currentPtr()->preview_start;
+				ScreenSongs& sSongs = static_cast<ScreenSongs&>(gm->getScreen("Songs"));
+				double pstart = sSongs.getSongs().currentPtr()->preview_start;
 				pstart = (std::isnan(pstart) ? 0.0 : pstart);
 				double first_period, first_beat;
 				std::vector<double> extra_beats;
-				Song::Beats& beats = sSongs->getSongs().currentPtr()->beats;
-				if (!sSongs->getSongs().currentPtr()->hasControllers()) {
+				Song::Beats& beats = sSongs.getSongs().currentPtr()->beats;
+				if (!sSongs.getSongs().currentPtr()->hasControllers()) {
 				while ((readptr + Audio::aubio_hop_size) <= previewSamples->length) {
 					tempoSamplePtr->data = &previewSamples->data[readptr];
 					aubio_tempo_do(Audio::aubioTempo.get(),tempoSamplePtr,previewBeats);

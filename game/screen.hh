@@ -10,8 +10,9 @@
 #include "fbo.hh"
 
 #include <SDL2/SDL_events.h>
-#include <string>
 #include <memory>
+#include <string>
+
 
 class Audio;
 
@@ -52,7 +53,7 @@ class Game: public Singleton <Game> {
 	~Game();
 	/// Adds a screen to the manager
 	void addScreen(std::unique_ptr<Screen> s) { 
-		std::string screenName = s.get()->getName(); 
+		std::string screenName = (*s).getName(); 
 		std::pair<std::string, std::unique_ptr<Screen>> kv = std::make_pair(screenName, std::move(s));
 		screens.insert(std::move(kv));
 	}
@@ -69,7 +70,7 @@ class Game: public Singleton <Game> {
 	/// Returns pointer to current Screen
 	Screen* getCurrentScreen() { return currentScreen; }
 	/// Returns pointer to Screen for given name
-	Screen* getScreen(std::string const& name);
+	Screen& getScreen(std::string const& name);
 	/// Returns a reference to the window
 	Window& window() { return m_window; }
 
@@ -116,6 +117,8 @@ public:
 	input::Controllers controllers;
 
 private:
+	// Dialog members
+	std::unique_ptr<Dialog> m_dialog;
 	bool m_finished;
 	typedef std::map<std::string, std::unique_ptr<Screen>> screenmap_t;
 	screenmap_t screens;
@@ -128,13 +131,12 @@ private:
 	float m_timeToShow;
 	std::string m_message;
 	AnimValue m_messagePopup;
-	SvgTxtTheme m_textMessage;
+	std::shared_ptr<SvgTxtTheme> m_textMessage;
 	float m_loadingProgress;
 	Texture m_logo;
+	Texture m_logo_2;
 	AnimValue m_logoAnim;
 	AnimValue m_dialogTimeOut;
-	// Dialog members
-	std::unique_ptr<Dialog> m_dialog;
 #ifdef USE_WEBSERVER
 	std::string m_webserverMessage = "Trying to connect to webserver";
 #endif

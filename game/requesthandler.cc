@@ -169,8 +169,8 @@ void RequestHandler::Post(web::http::http_request request)
         } else {
             std::clog << "requesthandler/debug: Adding " << songPointer->artist << " - " << songPointer->title << " to the playlist " << std::endl;
             gm->getCurrentPlayList().addSong(songPointer);
-            ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
-            m_pp->triggerSongListUpdate();
+            ScreenPlaylist& m_pp = dynamic_cast<ScreenPlaylist&>(gm->getScreen("Playlist"));
+            m_pp.triggerSongListUpdate();
 
             request.reply(web::http::status_codes::OK, "success");
             return;
@@ -184,8 +184,8 @@ void RequestHandler::Post(web::http::http_request request)
             auto songIdToDelete = jsonPostBody["songId"].as_integer();
             if(songIdToDelete >= 0) {
                 gm->getCurrentPlayList().removeSong(songIdToDelete);
-                ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
-                m_pp->triggerSongListUpdate();
+                ScreenPlaylist& m_pp = dynamic_cast<ScreenPlaylist&>(gm->getScreen("Playlist"));
+                m_pp.triggerSongListUpdate();
 
                 request.reply(web::http::status_codes::OK, "success");
                 return;
@@ -221,8 +221,8 @@ void RequestHandler::Post(web::http::http_request request)
             }
             if(positionToMoveTo <= sizeOfPlaylist - 1) {
                 gm->getCurrentPlayList().setPosition(songIdToMove,positionToMoveTo);
-                ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
-                m_pp->triggerSongListUpdate();
+                ScreenPlaylist& m_pp = dynamic_cast<ScreenPlaylist&>(gm->getScreen("Playlist"));
+                m_pp.triggerSongListUpdate();
                 request.reply(web::http::status_codes::OK, "success");
                 return;
             } else  {
