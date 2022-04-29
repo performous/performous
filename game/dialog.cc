@@ -11,30 +11,30 @@ Dialog::Dialog(std::string const& text) :
 	}
 
 void Dialog::draw() {
-	double verticaloffset = 1.0;
+	float verticaloffset = 1.0f;
 	switch(m_state) {
 	case State::IDLE:
-		verticaloffset = 0.0;
+		verticaloffset = 0.0f;
 		if(m_animationVal.get() == 0) {
 			m_state = State::SLIDEOUT;
-			m_animationVal.setValue(1);
+			m_animationVal.setValue(1.0f);
 		}
 		break;
 		case State::SLIDEIN :
-		verticaloffset = 1.0 - 1.0 * (1.0-m_animationVal.get()); //TODO animate dialog
+		verticaloffset = 1.0f - 1.0f * (1.0f-m_animationVal.get()); //TODO animate dialog
 		if(m_animationVal.get() == 0) {
 			m_state = State::IDLE;
-			m_animationVal.setValue(6);
+			m_animationVal.setValue(6.0f);
 		}
 		break;
 		case State::SLIDEOUT:
-			verticaloffset = 1.0 - 1.0 * m_animationVal.get();
+			verticaloffset = 1.0f - 1.0f * m_animationVal.get();
 		break;
 	}
 
 
-	m_dialog.dimensions.fixedHeight(0.15).right(0.5).screenTop(-0.10 + 0.11 - verticaloffset);
+	m_dialog.dimensions.fixedHeight(0.15f).right(0.5f).screenTop(-0.10f + 0.11f - verticaloffset);
 	m_dialog.draw();
-	m_svgText.dimensions.right(0.35).screenTop(0.08 - 0.10 + 0.11 - verticaloffset);
+	m_svgText.dimensions.right(0.35f).screenTop(0.08f - 0.10f + 0.11f - verticaloffset);
 	m_svgText.draw(m_text);
 }

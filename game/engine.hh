@@ -12,14 +12,14 @@ class VocalTrack;
 /// performous engine
 class Engine {
 	Audio& m_audio;
-	double m_time;
+	float m_time;
 	std::atomic<bool> m_quit{ false };
 	Database& m_database;
 	std::unique_ptr<std::thread> m_thread;
 
   public:
 	typedef std::vector<VocalTrack*> VocalTrackPtrs;
-	static const double TIMESTEP;  ///< The duration of one engine time step in seconds
+	static const float TIMESTEP;  ///< The duration of one engine time step in seconds
 	/// Construct an engine thread with vocal tracks and players specified by parameters
 	Engine(Audio& audio, VocalTrackPtrs vocals, Database& database);
 	~Engine() { kill(); }

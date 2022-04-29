@@ -9,11 +9,11 @@
 
 /// stores duration of a note
 struct Duration {
-	double begin; ///< beginning timestamp in seconds
-	double end;   ///< ending timestamp in seconds
+	float begin; ///< beginning timestamp in seconds
+	float end;   ///< ending timestamp in seconds
 	Duration();
 	/// create a new Duration object and initialize begin and end
-	Duration(double b, double e): begin(b), end(e) {}
+	Duration(float b, float e): begin(b), end(e) {}
 	/// compares begin timestamps of two Duration structs
 	static bool ltBegin(Duration const& a, Duration const& b) { return a.begin < b.begin; }
 	/// compares end timestamps of two Duration structs
@@ -51,12 +51,12 @@ static inline bool isTrackInside(InstrumentTracks const& track_map, std::string 
 /// note read from songfile
 struct Note {
 	Note();
-	double begin; ///< begin time
-	double end; ///< end time
-	double phase; /// Position within a measure, [0, 1)
+	float begin; ///< begin time
+	float end; ///< end time
+	float phase; /// Position within a measure, [0, 1)
 	// FIXME: Remove gameplay variables from here (Note should be immutable).
 	/// power of note (how well it is being hit right now)
-	mutable double power;
+	mutable float power;
 	/// which players sung well
 	mutable std::vector<Color> stars;
 	/// note type
@@ -67,17 +67,17 @@ struct Note {
 	/// lyrics syllable for that note
 	std::string syllable;
 	/// Difference of n from note
-	double diff(double n) const { return diff(note, n); }
+	float diff(float n) const { return diff(note, n); }
 	/// Difference of n from note, so that note + diff(note, n) is n (mod 12)
-	static double diff(double note, double n);
+	static float diff(float note, float n);
 	/// Maximum score
-	double maxScore() const;
+	float maxScore() const;
 	/// The length of the time period [a,b] that falls within the note in seconds
-	double clampDuration(double b, double e) const;
+	float clampDuration(float b, float e) const;
 	/// Score when singing over time period (a, b), which needs not to be entirely within the note
-	double score(double freq, double b, double e) const;
+	float score(float freq, float b, float e) const;
 	/// How precisely the note is hit (always 1.0 for freestyle, 0..1 for others)
-	double powerFactor(double note) const;
+	float powerFactor(float note) const;
 	/// Compares begin of two notes
 	static bool ltBegin(Note const& a, Note const& b) {
 		if (a.begin == b.begin) {
@@ -97,12 +97,12 @@ struct Note {
 	/// Check if two notes overlap
 	static bool overlapping(Note const& a, Note const& b) { return (a.end > b.begin && a.type != Note::Type::SLEEP && b.type != Note::Type::SLEEP); }
   private:
-	double scoreMultiplier() const;
+	  float scoreMultiplier() const;
 };
 
 
-double thresholdForFullScore(); /// Threshold to award perfect score for a note
-double thresholdForNonzeroScore(); /// Threshold to award nonzero score for a note
+float thresholdForFullScore(); /// Threshold to award perfect score for a note
+float thresholdForNonzeroScore(); /// Threshold to award nonzero score for a note
 
 
 typedef std::vector<Note> Notes;
@@ -114,8 +114,8 @@ public:
 	std::string name;
 	Notes notes;
 	int noteMin, noteMax; ///< lowest and highest note
-	double beginTime, endTime; ///< the period where there are notes
-	double m_scoreFactor; ///< normalization factor for the scoring system
+	float beginTime, endTime; ///< the period where there are notes
+	float m_scoreFactor; ///< normalization factor for the scoring system
 	MusicalScale scale; ///< scale in which song is sung
 };
 

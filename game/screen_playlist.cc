@@ -29,13 +29,13 @@ void ScreenPlaylist::enter() {
 		}
 	}
 	keyPressed = false;
-	auto timervalue = config["game/playlist_screen_timeout"].i();
-	if(timervalue < 0.0) {
-		timervalue = 0.0;
+	auto timervalue = config["game/playlist_screen_timeout"].f();
+	if(timervalue < 0.0f) {
+		timervalue = 0.0f;
 	}
 	m_nextTimer.setValue(timervalue);
 	overlay_menu.close();
-	gm->loading(_("Loading song timestamps..."), 0.2);
+	gm->loading(_("Loading song timestamps..."), 0.2f);
 	createSongListMenu();
 	songlist_menu.open();
 	reloadGL();
@@ -138,7 +138,7 @@ void ScreenPlaylist::draw() {
 			  translate(vec3(-0.4f + 0.9f * pos, 0.045f, 0.0f)) //vec3(horizontal-offset-from-center, vertical offset from screen_bottom)
 			  * rotate(-0.0f, vec3(0.0f, 1.0f, 0.0f))
 			);
-			s.dimensions.middle().screenBottom(-0.06).fitInside(0.08, 0.08);
+			s.dimensions.middle().screenBottom(-0.06f).fitInside(0.08f, 0.08f);
 			s.draw();
 		}
 	}
@@ -214,7 +214,7 @@ void ScreenPlaylist::drawMenu() {
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
 	const auto cur = &overlay_menu.current();
-	double w = overlay_menu.dimensions.w();
+	float w = overlay_menu.dimensions.w();
 	const float txth = th.option_selected.h();
 	const float step = txth * 0.85f;
 	const float h = overlay_menu.getOptions().size() * step + step;
@@ -245,13 +245,13 @@ void ScreenPlaylist::drawMenu() {
 
 void ScreenPlaylist::draw_menu_options() {
 	// Variables used for positioning and other stuff
-	double wcounter = 0;
+	float wcounter = 0;
 	const size_t showopts = 7; // Show at most 8 options simultaneously
 	const float x = -0.35; // x xcoordinate from screen center, the menu should be aligned left of the center therefore it´s negative.n
 	const float start_y = -0.15;
 	const float sel_margin = 0.04;
 	const MenuOptions opts = songlist_menu.getOptions();
-	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get()-songlist_menu.getSubmenuLevel()));
+	float submenuanim = 1.0f - std::min(1.0f, std::abs(m_submenuAnim.get()-songlist_menu.getSubmenuLevel()));
 	// Determine from which item to start
 	int start_i = std::min((int)songlist_menu.curIndex() - 1, (int)opts.size() - (int)showopts
 		+ (songlist_menu.getSubmenuLevel() == 2 ? 1 : 0)); // Hack to counter side-effects from displaying the value inside the menu
@@ -265,19 +265,19 @@ void ScreenPlaylist::draw_menu_options() {
 		// Selection
 		if (i == songlist_menu.curIndex()) {
 			// Animate selection higlight moving
-			double selanim = m_selAnim.get() - start_i;
-			if (selanim < 0) selanim = 0;
+			float selanim = m_selAnim.get() - start_i;
+			if (selanim < 0) selanim = 0.0f;
 			// Draw the text, dim if option not available
 			{
-				ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
-				theme->option_selected.dimensions.left(x).center(start_y + ii*0.049);
+				c = ColorTrans(Color::alpha(opt.isActive() ? 1.0f : 0.5f));
+				theme->option_selected.dimensions.left(x).center(start_y + ii * 0.049f);
 				theme->option_selected.draw(opt.getName());
 			}
 			wcounter = std::max(wcounter, theme->option_selected.w() + 2 * sel_margin); // Calculate the widest entry
 			// If this is a config item, show the value below
 			if (opt.type == MenuOption::Type::CHANGE_VALUE) {
 				++ii; // Use a slot for the value
-				theme->option_selected.dimensions.left(x + sel_margin).center(-0.1 + (selanim+1)*0.08);
+				theme->option_selected.dimensions.left(x + sel_margin).center(-0.1f + (selanim + 1.0f) * 0.08f);
 				theme->option_selected.draw("<  " + opt.value->getValue() + "  >");
 			}
 
@@ -285,8 +285,8 @@ void ScreenPlaylist::draw_menu_options() {
 		} else {
 			std::string title = opt.getName();
 			SvgTxtTheme& txt = getTextObject(title);
-			ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
-			txt.dimensions.left(x).center(start_y + ii*0.05);
+			c = ColorTrans(Color::alpha(opt.isActive() ? 1.0f : 0.5f));
+			txt.dimensions.left(x).center(start_y + ii * 0.05f);
 			txt.draw(title);
 			wcounter = std::max(wcounter, txt.w() + 2 * sel_margin); // Calculate the widest entry
 		}

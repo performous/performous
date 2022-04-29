@@ -14,8 +14,8 @@ namespace SongParserUtil {
 	void assign(int& var, std::string const& str);
 	/// Parse an unsigned int from string and assign it to a variable
 	void assign(unsigned& var, std::string const& str);
-	/// Parse a double from string and assign it to a variable
-	void assign(double& var, std::string str);
+	/// Parse a float from string and assign it to a variable
+	void assign(float& var, std::string str);
 	/// Parse a boolean from string and assign it to a variable
 	void assign(bool& var, std::string const& str);
 	/// Erase last character if it matches
@@ -34,15 +34,15 @@ private:
 	std::stringstream m_ss;
 	unsigned m_linenum = 0;
 	bool m_relative = false;
-	double m_gap = 0.0;
-	double m_bpm = 0.0;
+	float m_gap = 0.0f;
+	float m_bpm = 0.0f;
 	unsigned m_tsPerBeat = 0;  ///< The ts increment per beat
 	unsigned m_tsEnd = 0;  ///< The ending ts of the song
 	enum class CurrentSinger { P1, P2, BOTH } m_curSinger = CurrentSinger::P1;
 	Song::Stops m_stops;  ///< Stops stored in <ts, duration> format
 	/// The following struct is cleared between tracks
 	struct TXTState {
-		double prevtime = 0.0;
+		float prevtime = 0.0f;
 		unsigned prevts = 0;
 		unsigned relativeShift = 0;
 	} m_txt;
@@ -51,9 +51,9 @@ private:
 	void vocalsTogether();
 	void guessFiles();
 	bool getline (std::string& line) { ++m_linenum; return (bool) std::getline (m_ss, line); }
-	Song::BPM getBPM(Song const& s, double ts) const;
-	void addBPM(double ts, double bpm);
-	double tsTime(double ts) const;  ///< Convert a timestamp (beats) into time (seconds)
+	Song::BPM getBPM(Song const& s, float ts) const;
+	void addBPM(float ts, float bpm);
+	float tsTime(float ts) const;  ///< Convert a timestamp (beats) into time (seconds)
 	bool txtCheck(std::string const& data) const;
 	void txtParseHeader();
 	void txtParse();
@@ -74,5 +74,5 @@ private:
 	void smParse();
 	bool smParseField(std::string line);
 	Notes smParseNotes(std::string line);
-	std::pair<double, double> smStopConvert(std::pair<double, double> s);
+	std::pair<float, float> smStopConvert(std::pair<float, float> s);
 };

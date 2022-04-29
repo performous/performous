@@ -57,7 +57,7 @@ class Dimensions {
 	float x1() const {
 		switch (m_xAnchor) {
 		  case XAnchor::LEFT: return m_x;
-		  case XAnchor::MIDDLE: return m_x - 0.5 * m_w;
+		  case XAnchor::MIDDLE: return m_x - 0.5f * m_w;
 		  case XAnchor::RIGHT: return m_x - m_w;
 		}
 		throw std::logic_error("Unknown value in Dimensions::m_xAnchor");
@@ -66,7 +66,7 @@ class Dimensions {
 	float y1() const {
 		switch (m_yAnchor) {
 		  case YAnchor::TOP: return screenY() + m_y;
-		  case YAnchor::CENTER: return screenY() + m_y - 0.5 * m_h;
+		  case YAnchor::CENTER: return screenY() + m_y - 0.5f * m_h;
 		  case YAnchor::BOTTOM: return screenY() + m_y - m_h;
 		}
 		throw std::logic_error("Unknown value in Dimensions::m_yAnchor");
@@ -76,9 +76,9 @@ class Dimensions {
 	/// returns bottom
 	float y2() const { return y1() + h(); }
 	/// returns x center
-	float xc() const { return x1() + 0.5 * w(); }
+	float xc() const { return x1() + 0.5f * w(); }
 	/// returns y center
-	float yc() const { return y1() + 0.5 * h(); }
+	float yc() const { return y1() + 0.5f * h(); }
 	/// returns width
 	float w() const { return m_w; }
 	/// returns height
@@ -153,8 +153,8 @@ template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, Tex
 
 	// The texture wraps over at the edges (repeat)
 	const bool repeating = tex.outOfBounds();
-	glTexParameterf(type(), GL_TEXTURE_WRAP_S, repeating ? GL_REPEAT : GL_CLAMP_TO_EDGE);
-	glTexParameterf(type(), GL_TEXTURE_WRAP_T, repeating ? GL_REPEAT : GL_CLAMP_TO_EDGE);
+	glTexParameteri(type(), GL_TEXTURE_WRAP_S, repeating ? GL_REPEAT : GL_CLAMP_TO_EDGE);
+	glTexParameteri(type(), GL_TEXTURE_WRAP_T, repeating ? GL_REPEAT : GL_CLAMP_TO_EDGE);
 	glerror.check("repeat mode");
 
 	va.texCoord(tex.x1, tex.y1).vertex(dim.x1(), dim.y1());

@@ -84,8 +84,8 @@ void ScreenPractice::draw_analyzers() {
 		}
 		// getPeak returns 0.0 when clipping, negative values when not that loud.
 		// Normalizing to [0,1], where 0 is -43 dB or less (to match the vumeter graphic)
-		m_vumeters[i]->dimensions.screenBottom().left(-0.4 + i * 0.08).fixedWidth(0.04); //0.08 was originally 0.2. Now 11 in a row fits
-		m_vumeters[i]->draw(analyzer.getPeak() / 43.0 + 1.0);
+		m_vumeters[i]->dimensions.screenBottom().left(-0.4f + i * 0.08f).fixedWidth(0.04f); //0.08 was originally 0.2. Now 11 in a row fits
+		m_vumeters[i]->draw(analyzer.getPeak() / 43.0f + 1.0f);
 
 		if (freq != 0.0) {
 			Analyzer::tones_t tones = analyzer.getTones();

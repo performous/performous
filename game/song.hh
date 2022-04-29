@@ -45,11 +45,11 @@ public:
 	fs::path filename; ///< name of songfile
 	fs::path midifilename; ///< name of midi file in FoF format
 	struct BPM {
-		BPM (double _begin, double _ts, double bpm) :
-		begin (_begin), step (0.25 * 60.0 / bpm), ts (_ts) {}
-		double begin;  // Time in seconds
-		double step;  // Seconds per quarter note
-		double ts;
+		BPM (float _begin, float _ts, float bpm) :
+		begin (_begin), step (0.25f * 60.0f / bpm), ts (_ts) {}
+		float begin;  // Time in seconds
+		float step;  // Seconds per quarter note
+		float ts;
 	};
 	std::vector<BPM> m_bpms;
 	std::vector<std::string> category; ///< category of song
@@ -69,20 +69,20 @@ public:
 	std::string collateByTitleOnly;  ///< String for sorting by title only
 	std::string collateByArtist;  ///< String for sorting by artist, title
 	std::string collateByArtistOnly;  ///< String for sorting by artist only
-	double videoGap = 0.0; ///< gap with video
-	double start = 0.0; ///< start of song
-	double preview_start = getNaN(); ///< starting time for the preview
-	double m_duration = 0.0;
-	using Stops = std::vector<std::pair<double,double> >;
+	float videoGap = 0.0; ///< gap with video
+	float start = 0.0; ///< start of song
+	float preview_start = getNaN(); ///< starting time for the preview
+	float m_duration = 0.0;
+	using Stops = std::vector<std::pair<float, float> >;
 	Stops stops; ///< related to dance
-	using Beats = std::vector<double>;
+	using Beats = std::vector<float>;
 	Beats beats; ///< related to instrument and dance
 	bool hasBRE = false; ///< is there a Big Rock Ending? (used for drums only)
 	std::string b0rked; ///< Is something broken? (so that user can be notified)
 	struct SongSection {
 		std::string name;
-		double begin;
-		SongSection(std::string const& name, const double begin): name(name), begin(begin) {}
+		float begin;
+		SongSection(std::string const& name, const float begin): name(name), begin(begin) {}
 	};
 	std::vector<SongSection> songsections; ///< vector of song sections
 	int randomIdx = 0; ///< sorting index used for random order
@@ -98,12 +98,12 @@ public:
 	std::string str() const;  ///< Return "title by artist" string for UI
 	std::string strFull() const;  ///< Return multi-line full song info (used for searching)
 	/** Get the song status at a given timestamp **/
-	Status status(double time, ScreenSing* song);
+	Status status(float time, ScreenSing* song);
 	// Get a selected track, or LEAD_VOCAL if not found or the first one if not found
 	VocalTrack& getVocalTrack(std::string vocalTrack = TrackName::LEAD_VOCAL);
 	VocalTrack& getVocalTrack(size_t idx = 0);
 	std::vector<std::string> getVocalTrackNames() const;
-	double getDurationSeconds();
+	float getDurationSeconds();
 	bool hasDance() const { return !danceTracks.empty(); }
 	bool hasDrums() const { return instrumentTracks.find(TrackName::DRUMS) != instrumentTracks.end(); }
 	bool hasKeyboard() const { return instrumentTracks.find(TrackName::KEYBOARD) != instrumentTracks.end(); }
@@ -111,8 +111,8 @@ public:
 	bool hasVocals() const { return !vocalTracks.empty(); }
 	bool hasDuet() const { return vocalTracks.size() > 1; }
 	bool hasControllers() const { return !danceTracks.empty() || !instrumentTracks.empty(); }
-	bool getNextSection(double pos, SongSection &section);
-	bool getPrevSection(double pos, SongSection &section);
+	bool getNextSection(float pos, SongSection &section);
+	bool getPrevSection(float pos, SongSection &section);
 private:
 	void collateUpdate();   ///< Rebuild collate variables (used for sorting) from other strings
 };

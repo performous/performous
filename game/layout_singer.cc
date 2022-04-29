@@ -37,26 +37,26 @@ void LayoutSinger::drawScore(PositionMode position) {
 		m_score_text[i%4]->render((boost::format("%04d") % p->getScore()).str());
 		switch(position) {
 			case LayoutSinger::PositionMode::FULL:
-				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.125 * j).fixedWidth(0.035).screenTop(0.055);
+				m_player_icon->dimensions.left(-0.5f + 0.01f + 0.125f * j).fixedWidth(0.035f).screenTop(0.055f);
 				if (m_database.cur.size() < 9){
-					m_player_icon->dimensions.left(-0.5 + 0.01 + 0.125 * j).fixedWidth(0.035).screenTop(0.05);
-					m_score_text[i%4]->dimensions().middle(-0.425 + 0.01 + 0.125 * j).fixedHeight(0.035).screenTop(0.055);}			
+					m_player_icon->dimensions.left(-0.5f + 0.01f + 0.125f * j).fixedWidth(0.035f).screenTop(0.05f);
+					m_score_text[i%4]->dimensions().middle(-0.425f + 0.01f + 0.125f * j).fixedHeight(0.035f).screenTop(0.055f);}			
 				else{
-					m_player_icon->dimensions.left(-0.506 + 0.01 + 0.0905 * j).fixedWidth(0.028).screenTop(0.050);				
-					m_score_text[i%4]->dimensions().middle(-0.519 + 0.08 + 0.0905 * j).fixedHeight(0.029).screenTop(0.053);}
+					m_player_icon->dimensions.left(-0.506f + 0.01f + 0.0905f * j).fixedWidth(0.028f).screenTop(0.050f);				
+					m_score_text[i%4]->dimensions().middle(-0.519f + 0.08f + 0.0905f * j).fixedHeight(0.029f).screenTop(0.053f);}
 				break;
 			case LayoutSinger::PositionMode::TOP:
-				m_player_icon->dimensions.right(0.35).fixedHeight(0.050).screenTop(0.025 + 0.050 * j);
-				m_score_text[i%4]->dimensions().right(0.45).fixedHeight(0.050).screenTop(0.025 + 0.050 * j);
+				m_player_icon->dimensions.right(0.35f).fixedHeight(0.050f).screenTop(0.025f + 0.050f * j);
+				m_score_text[i%4]->dimensions().right(0.45f).fixedHeight(0.050f).screenTop(0.025f + 0.050f * j);
 				break;
 			case LayoutSinger::PositionMode::BOTTOM:
-				m_player_icon->dimensions.right(0.35).fixedHeight(0.050).center(0.025 + 0.050 * j);
-				m_score_text[i%4]->dimensions().right(0.45).fixedHeight(0.050).center(0.025 + 0.050 * j);
+				m_player_icon->dimensions.right(0.35f).fixedHeight(0.050f).center(0.025f + 0.050f * j);
+				m_score_text[i%4]->dimensions().right(0.45f).fixedHeight(0.050f).center(0.025f + 0.050f * j);
 				break;
 			case LayoutSinger::PositionMode::LEFT:
 			case LayoutSinger::PositionMode::RIGHT:
-				m_player_icon->dimensions.left(-0.5 + 0.01 + 0.25 * j).fixedWidth(0.075).screenTop(0.055);
-				m_score_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * j).fixedHeight(0.075).screenTop(0.055);
+				m_player_icon->dimensions.left(-0.5f + 0.01f + 0.25f * j).fixedWidth(0.075f).screenTop(0.055f);
+				m_score_text[i%4]->dimensions().middle(-0.350f + 0.01f + 0.25f * j).fixedHeight(0.075f).screenTop(0.055f);
 				break;
 		}
 		{
@@ -68,7 +68,7 @@ void LayoutSinger::drawScore(PositionMode position) {
 		double fact = p->m_feedbackFader.get();
 		if (p->m_prevLineScore > 0.5 && fact > 0) {
 			std::string prevLineRank;
-			double fzoom = 3.0 / (2.0 + fact);
+			float fzoom = 3.0f / (2.0f + fact);
 			if (p->m_prevLineScore > 0.95) prevLineRank = _("Perfect");
 			else if (p->m_prevLineScore > 0.9) prevLineRank = _("Excellent");
 			else if (p->m_prevLineScore > 0.8) prevLineRank = _("Great");
@@ -77,21 +77,21 @@ void LayoutSinger::drawScore(PositionMode position) {
 			m_line_rank_text[i%4]->render(prevLineRank);
 			switch(position) {
 				case LayoutSinger::PositionMode::FULL:
-					m_line_rank_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * j).fixedHeight(0.055*fzoom).screenTop(0.11);
+					m_line_rank_text[i%4]->dimensions().middle(-0.350f + 0.01f + 0.25f * j).fixedHeight(0.055f * fzoom).screenTop(0.11f);
 					break;
 				case LayoutSinger::PositionMode::TOP:
-					m_line_rank_text[i%4]->dimensions().right(0.30).fixedHeight(0.05*fzoom).screenTop(0.025 + 0.050 * j);
+					m_line_rank_text[i%4]->dimensions().right(0.30f).fixedHeight(0.05f * fzoom).screenTop(0.025f + 0.050f * j);
 					break;
 				case LayoutSinger::PositionMode::BOTTOM:
-					m_line_rank_text[i%4]->dimensions().right(0.30).fixedHeight(0.05*fzoom).center(0.025 + 0.050 * j);
+					m_line_rank_text[i%4]->dimensions().right(0.30f).fixedHeight(0.05f * fzoom).center(0.025f + 0.050f * j);
 					break;
 				case LayoutSinger::PositionMode::LEFT:
 				case LayoutSinger::PositionMode::RIGHT:
-					m_line_rank_text[i%4]->dimensions().middle(-0.350 + 0.01 + 0.25 * j).fixedHeight(0.055*fzoom).screenTop(0.11);
+					m_line_rank_text[i%4]->dimensions().middle(-0.350f + 0.01f + 0.25f * j).fixedHeight(0.055f * fzoom).screenTop(0.11f);
 					break;
 			}
 			{
-				color.a = clamp(fact*2.0);
+				color.a = clamp(fact * 2.0);
 				ColorTrans c(color);
 				m_line_rank_text[i%4]->draw();
 			}
@@ -100,7 +100,7 @@ void LayoutSinger::drawScore(PositionMode position) {
 	}
 }
 
-void LayoutSinger::draw(double time, PositionMode position) {
+void LayoutSinger::draw(float time, PositionMode position) {
 	// Draw notes and pitch waves (only when not in karaoke mode)
 	if (!config["game/karaoke_mode"].i()) {
 		switch(position) {
@@ -122,29 +122,29 @@ void LayoutSinger::draw(double time, PositionMode position) {
 
 	// Draw the lyrics
 	if (!m_hideLyrics) {
-		double linespacing = 0.0;
+		float linespacing = 0.0f;
 		Dimensions pos;
 		switch(position) {
 			case LayoutSinger::PositionMode::FULL:
 				if(config["game/karaoke_mode"].i() >= 2) {
 					pos.center(0);
 				} else {
-					pos.screenBottom(-0.07);
+					pos.screenBottom(-0.07f);
 				}
-				linespacing = 0.04;
+				linespacing = 0.04f;
 				break;
 			case LayoutSinger::PositionMode::TOP:
-				pos.center(-0.06);
-				linespacing = 0.04;
+				pos.center(-0.06f);
+				linespacing = 0.04f;
 				break;
 			case LayoutSinger::PositionMode::BOTTOM:
-				pos.screenBottom(-0.07);
-				linespacing = 0.04;
+				pos.screenBottom(-0.07f);
+				linespacing = 0.04f;
 				break;
 			case LayoutSinger::PositionMode::LEFT:
 			case LayoutSinger::PositionMode::RIGHT:
-				pos.screenBottom(-0.1);
-				linespacing = 0.06;
+				pos.screenBottom(-0.1f);
+				linespacing = 0.06f;
 				break;
 		}
 		bool dirty;
@@ -152,7 +152,7 @@ void LayoutSinger::draw(double time, PositionMode position) {
 			dirty = false;
 			if (!m_lyrics.empty() && m_lyrics[0].expired(time)) {
 				// Add extra spacing to replace the removed row
-				if (m_lyrics.size() > 1) m_lyrics[1].extraspacing.move(m_lyrics[0].extraspacing.get() + 1.0);
+				if (m_lyrics.size() > 1) m_lyrics[1].extraspacing.move(m_lyrics[0].extraspacing.get() + 1.0f);
 				m_lyrics.pop_front();
 				dirty = true;
 			}
@@ -163,8 +163,8 @@ void LayoutSinger::draw(double time, PositionMode position) {
 		} while (dirty);
 		if (m_theme.get()) // if there is a theme, draw the lyrics with it
 		{
-			for (size_t i = 0; i < m_lyrics.size(); ++i, pos.move(0.0, linespacing)) {
-				pos.move(0.0, m_lyrics[i].extraspacing.get() * linespacing);
+			for (size_t i = 0; i < m_lyrics.size(); ++i, pos.move(0.0f, linespacing)) {
+				pos.move(0.0f, m_lyrics[i].extraspacing.get() * linespacing);
 				if (i == 0) m_lyrics[0].draw(m_theme->lyrics_now, time, pos);
 				else if (i == 1) m_lyrics[1].draw(m_theme->lyrics_next, time, pos);
 			}

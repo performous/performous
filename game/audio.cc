@@ -62,7 +62,7 @@ namespace {
 	 * @param end end of the buffer
 	 * @param factor shift factor from 0 (no shift) to 1 (maximum)
 	 */
-	template <typename It> void PitchShift(It begin, It end, double factor) {
+	template <typename It> void PitchShift(It begin, It end, float factor) {
 		//FIXME: Dummy volume bender
 		for (It i = begin; i != end; ++i)
 			*i *= factor * factor; // Decrease music volume
@@ -85,15 +85,15 @@ void AudioClock::timeSync(Seconds audioPos, Seconds length) {
 	const Seconds diff = audio - sys;
 	// Skew-based correction only if going forward and relatively well synced
 	if (max > m_max.load() && std::abs(diff.count()) < maxError.count()) {
-		constexpr double fudgeFactor = 0.001;  // Adjustment ratio
+		constexpr float fudgeFactor = 0.001f;  // Adjustment ratio
 		// Update base position (this should not affect the clock)
 		m_baseTime = now;
 		m_basePos = sys;
 		// Apply a VERY ARTIFICIAL correction for clock!
-		const Seconds valadj = length * 0.1 * rand() / RAND_MAX;  // Dither
-		m_skew += (diff < valadj ? -1.0 : 1.0) * fudgeFactor;
+		const Seconds valadj = length * 0.1f * rand() / RAND_MAX;  // Dither
+		m_skew += (diff < valadj ? -1.0f : 1.0f) * fudgeFactor;
 		// Limits to keep things sane in abnormal situations
-		m_skew = clamp(m_skew, -0.01, 0.01);
+		m_skew = clamp(m_skew, -0.01f, 0.01f);
 	} else {
 		// Off too much, step to correct time
 		m_baseTime = now;
@@ -187,8 +187,8 @@ bool Music::operator()(float* begin, float* end) {
 	return !eof;
 }
 
-double Music::duration() const {
-	double dur = 0.0;
+float Music::duration() const {
+	float dur = 0.0f;
 	for (auto& kv: tracks) dur = std::max(dur, kv.second->audioBuffer.duration());
 	return dur;
 }
@@ -206,17 +206,17 @@ bool Music::prepare() {
 				std::lock_guard<std::recursive_mutex> l(Audio::aubio_mutex);
 				Game* gm = Game::getSingletonPtr();
 				ScreenSongs* sSongs = static_cast<ScreenSongs *>(gm->getScreen("Songs"));
-				double pstart = sSongs->getSongs().currentPtr()->preview_start;
+				float pstart = sSongs->getSongs().currentPtr()->preview_start;
 				pstart = (std::isnan(pstart) ? 0.0 : pstart);
-				double first_period = 0.0, first_beat = 0.0;
-				std::vector<double> extra_beats;
+				float first_period = 0.0, first_beat = 0.0;
+				std::vector<float> extra_beats;
 				Song::Beats& beats = sSongs->getSongs().currentPtr()->beats;
 				if (!sSongs->getSongs().currentPtr()->hasControllers()) {
 				while ((readptr + Audio::aubio_hop_size) <= previewSamples->length) {
 					tempoSamplePtr->data = &previewSamples->data[readptr];
 					aubio_tempo_do(Audio::aubioTempo.get(),tempoSamplePtr,previewBeats);
 					if (previewBeats->data[0] != 0) {
-						double beatSecs = aubio_tempo_get_last_s(Audio::aubioTempo.get());
+						float beatSecs = aubio_tempo_get_last_s(Audio::aubioTempo.get());
 							if (beats.empty()) { // Store time and period of first detected beat.
 								first_beat = beatSecs;
 								first_period = aubio_tempo_get_period_s(Audio::aubioTempo.get());
@@ -226,7 +226,7 @@ bool Music::prepare() {
 					readptr += Audio::aubio_hop_size;
 				}
 					if (!beats.empty()) {
-						double newBeat = first_beat - first_period;
+						float newBeat = first_beat - first_period;
 						while (newBeat > 0.02) {
 							extra_beats.push_back(newBeat + pstart);
 							newBeat -= first_period;
@@ -243,13 +243,13 @@ bool Music::prepare() {
 	return ready;
 }
 
-void Music::trackFade(std::string const& name, double fadeLevel) {
+void Music::trackFade(std::string const& name, float fadeLevel) {
 	auto it = tracks.find(name);
 	if (it == tracks.end()) return;
 	it->second->fadeLevel = fadeLevel;
 }
 
-void Music::trackPitchBend(std::string const& name, double pitchFactor) {
+void Music::trackPitchBend(std::string const& name, float pitchFactor) {
 	auto it = tracks.find(name);
 	if (it == tracks.end()) return;
 	it->second->pitchFactor = pitchFactor;
@@ -257,7 +257,7 @@ void Music::trackPitchBend(std::string const& name, double pitchFactor) {
 
 struct Sample {
   private:
-	double m_pos;
+	float m_pos;
 	AudioBuffer audioBuffer;
 	bool eof;
   public:
@@ -271,7 +271,7 @@ struct Sample {
 		if(!audioBuffer.read(mixbuf.data(), mixbuf.size(), m_pos, 1.0)) {
 			eof = true;
 		}
-		const auto failVolume = static_cast<float>(config["audio/fail_volume"].i()) / 100.0;
+		const auto failVolume = static_cast<float>(config["audio/fail_volume"].i()) / 100.0f;
 		for (size_t i = 0, iend = end - begin; i != iend; ++i) {
 			begin[i] += mixbuf[i] * failVolume;
 		}
@@ -286,26 +286,26 @@ struct Sample {
 struct Synth {
   private:
 	Notes m_notes;
-	double srate; ///< Sample rate
+	float srate; ///< Sample rate
   public:
 	Synth(Notes const& notes, unsigned int sr) : m_notes(notes), srate(sr) {}
-	void operator()(float* begin, float* end, double position) {
-		static double phase = 0.0;
-		for (float *i = begin; i < end; ++i) *i *= 0.3; // Decrease music volume
+	void operator()(float* begin, float* end, float position) {
+		static float phase = 0.0f;
+		for (float *i = begin; i < end; ++i) *i *= 0.3f; // Decrease music volume
 
 		std::vector<float> mixbuf(end - begin);
 		Notes::const_iterator it = m_notes.begin();
 
 		while (it != m_notes.end() && it->end < position) ++it;
-		if (it == m_notes.end() || it->type == Note::Type::SLEEP || it->begin > position) { phase = 0.0; return; }
+		if (it == m_notes.end() || it->type == Note::Type::SLEEP || it->begin > position) { phase = 0.0f; return; }
 		int note = it->note % 12;
-		double d = (note + 1) / 13.0;
-		double freq = MusicalScale().setNote(note + 4 * 12).getFreq();
-		double value = 0.0;
+		float d = (note + 1.0f) / 13.0f;
+		float freq = MusicalScale().setNote(note + 4.0f * 12.0f).getFreq();
+		float value = 0.0;
 		// Synthesize tones
 		for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
 			if (i % 2 == 0) {
-				value = d * 0.2 * std::sin(phase) + 0.2 * std::sin(2 * phase) + (1.0 - d) * 0.2 * std::sin(4 * phase);
+				value = d * 0.2f * std::sin(phase) + 0.2f * std::sin(2.0f * phase) + (1.0f - d) * 0.2f * std::sin(4.0f * phase);
 				phase += TAU * freq / srate;
 			}
 			begin[i] += value;
@@ -316,7 +316,7 @@ struct Synth {
 struct Command {
 	enum class Type { TRACK_FADE, TRACK_PITCHBEND, SAMPLE_RESET } type;
 	std::string track;
-	double factor;
+	float factor;
 };
 
 /// Audio output callback wrapper. The playback Device calls this when it needs samples.
@@ -361,7 +361,7 @@ struct Output {
 		commands.clear();
 	}
 
-	void callback(float* begin, float* end, double rate) {
+	void callback(float* begin, float* end, float rate) {
 		callbackUpdate();
 		std::fill(begin, end, 0.0f);
 		if (paused) return;
@@ -407,7 +407,7 @@ struct Output {
 };
 
 
-Device::Device(unsigned int in, unsigned int out, double rate, unsigned int dev):
+Device::Device(unsigned int in, unsigned int out, float rate, unsigned int dev):
   in(in), out(out), rate(rate), dev(dev),
   stream(*this,
   portaudio::Params().channelCount(in).device(dev).suggestedLatency(config["audio/latency"].f()),
@@ -590,11 +590,11 @@ void Audio::unloadSample(std::string const& streamId) {
 	self->output.samples.erase(streamId);
 }
 
-void Audio::playMusic(Audio::Files const& filenames, bool preview, double fadeTime, double startPos) {
+void Audio::playMusic(Audio::Files const& filenames, bool preview, float fadeTime, float startPos) {
 	Output& o = self->output;
 	auto m = std::make_unique<Music>(filenames, getSR(), preview);
 	m->seek(startPos);
-	m->fadeRate = 1.0 / getSR() / fadeTime;
+	m->fadeRate = 1.0f / getSR() / fadeTime;
 	// Format debug message
 	std::string logmsg = "audio/debug: playMusic(";
 	for (auto& kv: filenames) logmsg += kv.first + "=" + kv.second.filename().string() + ", ";
@@ -608,7 +608,7 @@ void Audio::playMusic(Audio::Files const& filenames, bool preview, double fadeTi
 	o.commands.clear();  // Remove old unprocessed commands (they should not apply to the new music)
 }
 
-void Audio::playMusic(fs::path const& filename, bool preview, double fadeTime, double startPos) {
+void Audio::playMusic(fs::path const& filename, bool preview, float fadeTime, float startPos) {
 	Audio::Files m;
 	m["MAIN"] = filename;
 	playMusic(m, preview, fadeTime, startPos);
@@ -624,7 +624,7 @@ void Audio::stopMusic() {
 	}
 }
 
-void Audio::fadeout(double fadeTime) {
+void Audio::fadeout(float fadeTime) {
 	playMusic(Audio::Files(), false, fadeTime);
 	{
 		Output& o = self->output;
@@ -634,13 +634,13 @@ void Audio::fadeout(double fadeTime) {
 	}
 }
 
-double Audio::getPosition() const {
+float Audio::getPosition() const {
 	Output& o = self->output;
 	std::lock_guard<std::mutex> l(o.mutex);
 	return (o.playing.empty() || o.preloading.get()) ? getNaN() : o.playing[0]->pos();
 }
 
-double Audio::getLength() const {
+float Audio::getLength() const {
 	Output& o = self->output;
 	std::lock_guard<std::mutex> l(o.mutex);
 	return (o.playing.empty() || o.preloading.get()) ? getNaN() : o.playing[0]->duration();
@@ -652,14 +652,14 @@ bool Audio::isPlaying() const {
 	return o.preloading || !o.playing.empty();
 }
 
-void Audio::seek(double offset) {
+void Audio::seek(float offset) {
 	Output& o = self->output;
 	std::lock_guard<std::mutex> l(o.mutex);
-	for (auto& trk: o.playing) trk->seek(clamp(trk->pos() + offset, 0.0, trk->duration()));
+	for (auto& trk: o.playing) trk->seek(clamp(trk->pos() + offset, 0.0f, trk->duration()));
 	pause(false);
 }
 
-void Audio::seekPos(double pos) {
+void Audio::seekPos(float pos) {
 	Output& o = self->output;
 	std::lock_guard<std::mutex> l(o.mutex);
 	for (auto& trk: o.playing) trk->seek(pos);
@@ -669,14 +669,14 @@ void Audio::seekPos(double pos) {
 void Audio::pause(bool state) { self->output.paused = state; }
 bool Audio::isPaused() const { return self->output.paused; }
 
-void Audio::streamFade(std::string track, double fadeLevel) {
+void Audio::streamFade(std::string track, float fadeLevel) {
 	Output& o = self->output;
 	std::lock_guard<std::mutex> l(o.mutex);
 	Command cmd = { Command::Type::TRACK_FADE, track, fadeLevel };
 	o.commands.push_back(cmd);
 }
 
-void Audio::streamBend(std::string track, double pitchFactor) {
+void Audio::streamBend(std::string track, float pitchFactor) {
 	Output& o = self->output;
 	std::lock_guard<std::mutex> l(o.mutex);
 	Command cmd = { Command::Type::TRACK_PITCHBEND, track, pitchFactor };

@@ -22,10 +22,10 @@ namespace SongParserUtil {
 			throw std::runtime_error ("\"" + str + "\" is not valid unsigned integer value");
 		}
 	}
-	void assign (double& var, std::string str) {
+	void assign (float& var, std::string str) {
 		std::replace (str.begin(), str.end(), ',', '.');  // Fix decimal separators
 		try {
-			var = std::stod (str);
+			var = std::stof (str);
 		} catch (...) {
 			throw std::runtime_error ("\"" + str + "\" is not valid floating point value");
 		}
@@ -74,9 +74,9 @@ SongParser::SongParser(Song& s): m_song(s) {
 		// Header already parsed?
 		if (s.loadStatus == Song::LoadStatus::HEADER) {
 			if (!s.m_bpms.empty()) {
-				double bpm = (15 / s.m_bpms.front().step);
+				float bpm = (15.0f / s.m_bpms.front().step);
 				s.m_bpms.clear();
-				addBPM(0, bpm);
+				addBPM(0.f, bpm);
 			}
 			if (type == Type::TXT) txtParse();
 			else if (type == Type::INI) midParse();  // INI doesn't contain notes, parse those from MIDI
@@ -96,7 +96,7 @@ SongParser::SongParser(Song& s): m_song(s) {
 
 		// Default for preview position if none was specified in header
 		if (std::isnan(s.preview_start)) {
-			s.preview_start = ((type == Type::INI || s.getDurationSeconds() < 50.0) ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
+			s.preview_start = ((type == Type::INI || s.getDurationSeconds() < 50.0f) ? 5.0f : 30.0f);  // 5 s for band mode, 30 s for others
 		}
 		guessFiles();
 		if (!m_song.midifilename.empty()) {midParseHeader(); }
@@ -237,8 +237,8 @@ void SongParser::finalize () {
 				
 				// Try to fix overlapping syllables.
 				if (next != vocal.notes.end() && Note::overlapping(*itn, *next)) {
-					double beatDur = getBPM(m_song, itn->begin).step;
-					double newEnd = (next->begin - beatDur);
+					float beatDur = getBPM(m_song, itn->begin).step;
+					float newEnd = (next->begin - beatDur);
 					std::clog << "songparser/info: Trying to correct duration of overlapping notes (" << itn->syllable << " & " << next->syllable << ")..." << std::endl;
 					std::clog << "songparser/info: Changing ending to: " << newEnd << ", will give a length of: " << (newEnd - (itn->begin)) << std::endl;
 					if ((newEnd - itn->begin) >= beatDur) {
@@ -275,9 +275,9 @@ void SongParser::finalize () {
 		// Set begin/end times
 		if (!vocal.notes.empty()) { vocal.beginTime = vocal.notes.front().begin, vocal.endTime = vocal.notes.back().end; } else { vocal.beginTime = vocal.endTime = 0.0; }
 		// Compute maximum score
-		double max_score = 0.0;
+		float max_score = 0.0f;
 		for (auto& note : vocal.notes) { max_score += note.maxScore(); }
-		vocal.m_scoreFactor = 1.0 / max_score;
+		vocal.m_scoreFactor = 1.0f / max_score;
 	}
 	if (m_tsPerBeat) {
 		// Add song beat markers
@@ -285,14 +285,14 @@ void SongParser::finalize () {
 	}
 }
 
-Song::BPM SongParser::getBPM(Song const& s, double ts) const {
+Song::BPM SongParser::getBPM(Song const& s, float ts) const {
 	for (auto& itb: boost::adaptors::reverse(s.m_bpms)) {
 		if (itb.begin <= ts) return itb;
 	}
 	throw std::runtime_error("No BPM definition prior to this note...");
 }
 
-void SongParser::addBPM(double ts, double bpm) {
+void SongParser::addBPM(float ts, float bpm) {
 	Song& s = m_song;
 	if (!(( bpm >= 1.0) && ( bpm < 1e12) )) { throw std::runtime_error("Invalid BPM value"); }
 	if (!s.m_bpms.empty() && ( s.m_bpms.back().ts >= ts) ) {
@@ -302,7 +302,7 @@ void SongParser::addBPM(double ts, double bpm) {
 	s.m_bpms.push_back (Song::BPM (tsTime (ts), ts, bpm));
 }
 
-double SongParser::tsTime(double ts) const {
+float SongParser::tsTime(float ts) const {
 	Song& s = m_song;
 	if (s.m_bpms.empty()) {
 		if (ts != 0) { throw std::runtime_error("BPM data missing"); }

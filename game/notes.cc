@@ -8,25 +8,25 @@
 
 Note::Note(): begin(getNaN()), end(getNaN()), phase(getNaN()), power(getNaN()), type(Note::Type::NORMAL), note(), notePrev() {}
 
-double Note::diff(double note, double n) { return remainder(n - note, 12.0); }
-double Note::maxScore() const { return scoreMultiplier() * (end - begin); }
+float Note::diff(float aNote, float n) { return remainder(n - aNote, 12.0f); }
+float Note::maxScore() const { return scoreMultiplier() * (end - begin); }
 
-double Note::clampDuration(double b, double e) const {
-	double len = std::min(e, end) - std::max(b, begin);
+float Note::clampDuration(float b, float e) const {
+	float len = std::min(e, end) - std::max(b, begin);
 	return len > 0.0 ? len : 0.0;
 }
 
-double Note::score(double n, double b, double e) const {
+float Note::score(float n, float b, float e) const {
 	return scoreMultiplier() * powerFactor(n) * clampDuration(b, e);
 }
 
-double Note::scoreMultiplier() const {
+float Note::scoreMultiplier() const {
 	switch(type) {
 		case Note::Type::GOLDEN:
 		case Note::Type::GOLDEN2:
-			return 2.0;
+			return 2.0f;
 		case Note::Type::SLEEP:
-			return 0.0;
+			return 0.0f;
 		case Note::Type::FREESTYLE:
 		case Note::Type::RAP:
 		case Note::Type::NORMAL:
@@ -37,41 +37,41 @@ double Note::scoreMultiplier() const {
 		case Note::Type::ROLL:
 		case Note::Type::MINE:
 		case Note::Type::LIFT:
-			return 1.0;
+			return 1.0f;
 	}
-	return 0.0;
+	return 0.0f;
 }
 
-double thresholdForFullScore() {
+float thresholdForFullScore() {
 	switch(GameDifficulty(config["game/difficulty"].i())){
 		case GameDifficulty::PERFECT:
-			return 0.2151;
+			return 0.2151f;
 		case GameDifficulty::HARD:
-			return 0.5;
+			return 0.5f;
 		case GameDifficulty::NORMAL:
 		default: 
-			return 0.5;
+			return 0.5f;
 	}
 }
 
-double thresholdForNonzeroScore() {
+float thresholdForNonzeroScore() {
 	switch(GameDifficulty(config["game/difficulty"].i())){
 		case GameDifficulty::PERFECT:
-			return 0.5;
+			return 0.5f;
 		case GameDifficulty::HARD:
-			return 1.0;
+			return 1.0f;
 		case GameDifficulty::NORMAL:
 		default: 
-			return 1.5;
+			return 1.5f;
 	}
 }
 
-double Note::powerFactor(double note) const {
-	if (type == Note::Type::FREESTYLE) return 1.0;
-	double error = std::abs(diff(note));
-	double thresholdFull = thresholdForFullScore();
-	double thresholdNonzero = thresholdForNonzeroScore();
-	return clamp((thresholdNonzero - error)/(thresholdNonzero - thresholdFull), 0.0, 1.0);
+float Note::powerFactor(float note) const {
+	if (type == Note::Type::FREESTYLE) return 1.0f;
+	float error = std::abs(diff(note));
+	float thresholdFull = thresholdForFullScore();
+	float thresholdNonzero = thresholdForNonzeroScore();
+	return clamp((thresholdNonzero - error)/(thresholdNonzero - thresholdFull), 0.0f, 1.0f);
 }
 
 Duration::Duration(): begin(getNaN()), end(getNaN()) {}
@@ -82,7 +82,7 @@ VocalTrack::VocalTrack(std::string name) : name(name) {reload();}
 
 void VocalTrack::reload() {
 	notes.clear();
-	m_scoreFactor = 0.0;
+	m_scoreFactor = 0.0f;
 	noteMin = std::numeric_limits<int>::max();
 	noteMax = std::numeric_limits<int>::min();
 	beginTime = endTime = getNaN();

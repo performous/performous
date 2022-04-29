@@ -4,7 +4,7 @@
 #include "util.hh"
 #include <cmath>
 
-bool Video::tryPop(Bitmap& f, double timestamp) {
+bool Video::tryPop(Bitmap& f, float timestamp) {
 	std::unique_lock<std::mutex> l(m_mutex);
 
 	// if timestamp is out of the queue's range, ask a seek
@@ -46,7 +46,7 @@ Video::~Video() {
 	m_grabber.get();
 }
 
-Video::Video(fs::path const& _videoFile, double videoGap): m_videoGap(videoGap), m_textureTime(), m_alpha(-0.5, 1.5) {
+Video::Video(fs::path const& _videoFile, float videoGap): m_videoGap(videoGap), m_textureTime(), m_alpha(-0.5, 1.5) {
 	m_grabber = std::async(std::launch::async, [this, file = _videoFile] {
 		try {
 			auto ffmpeg = std::make_unique<VideoFFmpeg>(file, [this](auto f) { this->push(std::move(f)); });
@@ -91,7 +91,7 @@ Video::Video(fs::path const& _videoFile, double videoGap): m_videoGap(videoGap),
 	});
 }
 
-void Video::prepare(double time) {
+void Video::prepare(float time) {
 	if (std::isnan(time)) return;
 
 	// shift video timestamp if gap is declared in song config
@@ -104,12 +104,12 @@ void Video::prepare(double time) {
 	}
 }
 
-void Video::render(double time) {
+void Video::render(float time) {
 	time += m_videoGap;
-	double tdist = std::abs(m_textureTime - time);
-	m_alpha.setTarget(tdist < 0.4 ? 1.2f : -0.5f);
-	double alpha = clamp(m_alpha.get());
-	if (alpha == 0.0) return;
+	float tdist = std::abs(m_textureTime - time);
+	m_alpha.setTarget(tdist < 0.4f ? 1.2f : -0.5f);
+	float alpha = clamp(m_alpha.get());
+	if (alpha == 0.0f) return;
 	ColorTrans c(Color::alpha(alpha));
 	m_texture.draw();
 }

@@ -18,7 +18,7 @@ Player::Player(VocalTrack& vocal, Analyzer& analyzer, size_t frames):
 
 void Player::update() {
 	if (m_pos == m_pitch.size()) return; // End of song already
-	double beginTime = Engine::TIMESTEP * m_pos;
+	float beginTime = Engine::TIMESTEP * m_pos;
 	// Get the currently sung tone and store it in player's pitch data (also control inactivity timer)
 	Tone const* t = m_analyzer.findTone();
 	if (t) {
@@ -28,16 +28,16 @@ void Player::update() {
 		if (m_activitytimer > 0) --m_activitytimer;
 		m_pitch[m_pos++] = std::make_pair(getNaN(), -getInf());
 	}
-	double endTime = Engine::TIMESTEP * m_pos;
+	float endTime = Engine::TIMESTEP * m_pos;
 	// Iterate over all the notes that are considered for this timestep
 	while (m_scoreIt != m_vocal.notes.end()) {
 		if (endTime < m_scoreIt->begin) break;  // The note begins later than on this timestep
 		// If tone was detected, calculate score
-		m_scoreIt->power *= std::pow(0.05, m_scoreIt->clampDuration(beginTime, endTime));  // Fade glow
+		m_scoreIt->power *= std::pow(0.05f, m_scoreIt->clampDuration(beginTime, endTime));  // Fade glow
 		if (t) {
-			double note = MusicalScale(m_vocal.scale).setFreq(t->freq).getNote();
+			float note = MusicalScale(m_vocal.scale).setFreq(t->freq).getNote();
 			// Add score
-			double score_addition = m_vocal.m_scoreFactor * m_scoreIt->score(note, beginTime, endTime);
+			float score_addition = m_vocal.m_scoreFactor * m_scoreIt->score(note, beginTime, endTime);
 			m_score += score_addition;
 			m_noteScore += score_addition;
 			m_lineScore += score_addition;

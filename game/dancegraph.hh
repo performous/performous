@@ -6,11 +6,11 @@ class Song;
 
 struct DanceNote {
 	DanceNote(Note note) :
-		note(note), hitAnim(0.0, 5.0), releaseTime(0), error(getNaN()), score(0), isHit(false) {}
+		note(note), hitAnim(0.0f, 5.0f), releaseTime(0.0f), error(getNaN()), score(0.0f), isHit(false) {}
 	Note note;
 	AnimValue hitAnim; /// for animating hits
-	double releaseTime; /// tells when a hold was ended
-	double error; /// time difference between hit and correct time (negative = late)
+	float releaseTime; /// tells when a hold was ended
+	float error; /// time difference between hit and correct time (negative = late)
 	int score;
 	bool isHit;
 };
@@ -26,7 +26,7 @@ class DanceGraph: public InstrumentGraph {
 	/** draws DanceGraph
 	 * @param time at which time to draw
 	 */
-	void draw(double time);
+	void draw(float time);
 	void engine();
 	std::string getTrack() const;
 	std::string getDifficultyString() const;
@@ -46,16 +46,16 @@ class DanceGraph: public InstrumentGraph {
 	DanceTracks::const_iterator m_curTrackIt; /// iterator to the currently selected game mode
 
 	// Scoring & drawing
-	void dance(double time, input::Event const& ev);
-	void drawBeats(double time);
-	void drawNote(DanceNote& note, double time);
-	void drawInfo(double time, Dimensions dimensions);
+	void dance(float time, input::Event const& ev);
+	void drawBeats(float time);
+	void drawNote(DanceNote& note, float time);
+	void drawInfo(float time, Dimensions dimensions);
 	void drawArrow(int arrow_i, Texture& tex, float ty1 = 0.0, float ty2 = 1.0);
 
 	// Helpers
 	float panel2x(int i) const { return getScale() * (-(m_pads * 0.5f) + m_arrow_map[i] + 0.5f); } /// Get x for an arrow line
 	float getScale() const { return 1.0f / m_pads * 8.0f; }
-	double getNotesBeginTime() const { return m_notes.front().note.begin; }
+	float getNotesBeginTime() const { return m_notes.front().note.begin; }
 	glutil::danceNoteUniforms m_uniforms;
 
 	// Note stuff

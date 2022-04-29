@@ -32,10 +32,10 @@ Song::Song(nlohmann::json const& song): dummyVocal(TrackName::LEAD_VOCAL), rando
 	background = getJsonEntry<std::string>(song, "background").value_or("");
 	video = getJsonEntry<std::string>(song, "videoFile").value_or("");
 	midifilename = getJsonEntry<std::string>(song, "midiFile").value_or("");
-	videoGap = getJsonEntry<double>(song, "videoGap").value_or(0.0);
-	start = getJsonEntry<double>(song, "start").value_or(0.0);
-	preview_start = getJsonEntry<double>(song, "previewStart").value_or(0.0);
-	m_duration = getJsonEntry<double>(song, "duration").value_or(0.0);
+	videoGap = getJsonEntry<float>(song, "videoGap").value_or(0.0f);
+	start = getJsonEntry<float>(song, "start").value_or(0.0f);
+	preview_start = getJsonEntry<float>(song, "previewStart").value_or(0.0f);
+	m_duration = getJsonEntry<float>(song, "duration").value_or(0.0f);
 	music[TrackName::BGMUSIC] = getJsonEntry<std::string>(song, "songFile").value_or("");
 	music[TrackName::LEAD_VOCAL] = getJsonEntry<std::string>(song, "vocals").value_or("");
 	music[TrackName::PREVIEW] = getJsonEntry<std::string>(song, "preview").value_or("");
@@ -67,7 +67,7 @@ Song::Song(nlohmann::json const& song): dummyVocal(TrackName::LEAD_VOCAL), rando
 		instrumentTracks.insert(std::make_pair(TrackName::GUITAR, InstrumentTrack(TrackName::GUITAR)));
 	}
 	if (song.count("bpm") > 0) {
-		m_bpms.push_back(BPM(0, 0, song.at("bpm").get<double>()));
+		m_bpms.push_back(BPM(0, 0, song.at("bpm").get<float>()));
 	}
 	collateUpdate();
 }
@@ -107,7 +107,7 @@ void Song::collateUpdate() {
 	collateByArtistOnly = collateInfo["artist"];
 }
 
-Song::Status Song::status(double time, ScreenSing* song) {
+Song::Status Song::status(float time, ScreenSing* song) {
 	if (song->getMenu().isOpen()) return Status::NORMAL; // This should prevent querying getVocalTrack with an out-of-bounds/uninitialized index.
 	if (vocalTracks.empty()) return Status::NORMAL;  // To avoid crash with non-vocal songs (dance, guitar) -- FIXME: what should we actually do?
 	Note target; target.end = time;
@@ -126,7 +126,7 @@ Song::Status Song::status(double time, ScreenSing* song) {
 	return Status::NORMAL;
 }
 
-bool Song::getNextSection(double pos, SongSection &section) {
+bool Song::getNextSection(float pos, SongSection &section) {
 	for (auto& sect: songsections) {
 		if (sect.begin > pos) {
 			section = sect;
@@ -137,7 +137,7 @@ bool Song::getNextSection(double pos, SongSection &section) {
 	return false;
 }
 
-bool Song::getPrevSection(double pos, SongSection &section) {
+bool Song::getPrevSection(float pos, SongSection &section) {
 	for (auto it = songsections.rbegin(); it != songsections.rend(); ++it) {
 		// subtract 1 second so we can jump across a section
 		if (it->begin < pos - 1.0) {
@@ -186,7 +186,7 @@ VocalTrack& Song::getVocalTrack(size_t idx) {
 	return it->second;
 }
 
-double Song::getDurationSeconds() {
+float Song::getDurationSeconds() {
 	if(m_duration == 0.0 || m_duration < 1.0) {
 		AVFormatContext *pFormatCtx = avformat_alloc_context();
 		if (avformat_open_input(&pFormatCtx, music["background"].string().c_str(), nullptr, nullptr) == 0) {

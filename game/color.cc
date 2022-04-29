@@ -38,38 +38,38 @@ namespace {
 
 	// Convert sRGB color component into linear as per OpenGL specs
 	float lin(float sRGB) {
-		if (sRGB <= 0.04045) return sRGB / 12.92;
-		return std::pow((sRGB + 0.055)/1.055, 2.4);
+		if (sRGB <= 0.04045f) return sRGB / 12.92f;
+		return std::pow((sRGB + 0.055f)/1.055f, 2.4f);
 	}
 }
 
 Color::Color(std::string const& str) {
-	unsigned int r = 0, g = 0, b = 0, a = 255;
-	if (str.size() > 0 && str[0] == '#' && sscanf(str.c_str() + 1, "%02x %02x %02x %02x", &r, &g, &b, &a) >= 3) {
-		*this = Color(lin(r / 255.0), lin(g / 255.0), lin(b / 255.0), a / 255.0);
+	unsigned int red = 0, green = 0, blue = 0, alpha = 255;
+	if (str.size() > 0 && str[0] == '#' && sscanf(str.c_str() + 1, "%02x %02x %02x %02x", &red, &green, &blue, &alpha) >= 3) {
+		*this = Color(lin(red / 255.0f), lin(green / 255.0f), lin(blue / 255.0f), alpha / 255.0f);
 		return;
 	}
 	ColorNames::Map::const_iterator it = colors.m.find(str);
 	if (it != colors.m.end()) { *this = it->second; return; }
 	std::clog << "color/warning: Unknown color: " << str << " (using magenta to highlight)" << std::endl;
-	*this = Color(1.0, 0.0, 1.0, 1.0);
+	*this = Color(1.0f, 0.0f, 1.0f, 1.0f);
 }
 
 glmath::vec4 Color::linear() const {
-	return a * glmath::vec4(r, g, b, 1.0);
+	return a * glmath::vec4(r, g, b, 1.0f);
 }
 
 Color MicrophoneColor::get(std::string name) {
-	if (name == "black") return Color(3.0/255.0, 3.0/255.0, 3.0/255.0, 1.0);
-	else if (name == "gray") return Color(24.0/255.0, 24.0/255.0, 24.0/255.0, 1.0);
-	else if (name == "white") return Color(1.0, 1.0, 1.0, 1.0);
-	else if (name == "aqua") return Color(0.0, 1.0, 1.0, 1.0);
-	else if (name == "purple") return Color(63.0/255.0, 0.0, 1.0, 1.0);
-	else if (name == "orange") return Color(1.0, 52.0/255.0, 0.0, 1.0);
-	else if (name == "fuchsia") return Color(1.0, 0.06, 127/255.0, 1.0);
-	else if (name == "yellow") return Color(1.0, 1.0, 0.0, 1.0);
-	else if (name == "green") return Color(0.0, 1.0, 0.0, 1.0);	
-	else if (name == "red") return Color(1, 0.0, 0.0, 1.0);
-	else if (name == "blue") return Color(0.0, 43.75/255.0, 1.0, 1.0);
-	else return Color(0.5, 0.5, 0.5, 1.0);
+	if (name == "black") return Color(3.0f/255.0f, 3.0f/255.0f, 3.0f/255.0f, 1.0f);
+	else if (name == "gray") return Color(24.0f/255.0f, 24.0f/255.0f, 24.0f/255.0f, 1.0f);
+	else if (name == "white") return Color(1.0f, 1.0f, 1.0f, 1.0f);
+	else if (name == "aqua") return Color(0.0f, 1.0f, 1.0f, 1.0f);
+	else if (name == "purple") return Color(63.0f/255.0f, 0.0f, 1.0f, 1.0f);
+	else if (name == "orange") return Color(1.0f, 52.0f/255.0f, 0.0f, 1.0f);
+	else if (name == "fuchsia") return Color(1.0f, 0.06f, 127/255.0f, 1.0f);
+	else if (name == "yellow") return Color(1.0f, 1.0f, 0.0f, 1.0f);
+	else if (name == "green") return Color(0.0f, 1.0f, 0.0f, 1.0f);	
+	else if (name == "red") return Color(1.0f, 0.0f, 0.0f, 1.0f);
+	else if (name == "blue") return Color(0.0f, 43.75f/255.0f, 1.0f, 1.0f);
+	else return Color(0.5f, 0.5f, 0.5f, 1.0f);
 }

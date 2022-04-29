@@ -48,7 +48,7 @@ class Songs {
 	/// gets current velocity
 	double currentVelocity() const { return math_cover.getVelocity(); }
 	/// sets margins for animation
-	void setAnimMargins(double left, double right) { math_cover.setMargins(left, right); }
+	void setAnimMargins(float left, float right) { math_cover.setMargins(left, right); }
 	/// @return current song
 	std::shared_ptr<Song> currentPtr() { return m_filtered.empty() ? std::shared_ptr<Song>() : m_filtered[math_cover.getTarget()]; }
 	/// @return current song

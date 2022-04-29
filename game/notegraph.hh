@@ -20,14 +20,14 @@ class NoteGraph {
 	 * @param time at which time to draw
 	 * @param players reference to the list of singing Players
 	 */
-	void draw(double time, Database const& database, Position position = NoteGraph::Position::FULLSCREEN);
+	void draw(float time, Database const& database, Position position = NoteGraph::Position::FULLSCREEN);
   private:
 	/// draw notebars
 	void drawNotes();
 	/// draw waves (what players are singing)
 	void drawWaves(Database const& database);
- 	double barHeight();
- 	double waveThickness();
+	float barHeight();
+	float waveThickness();
 	VocalTrack const& m_vocal;
 	Texture m_notelines;
 	Texture m_wave;
@@ -42,8 +42,8 @@ class NoteGraph {
 	float m_notealpha;
 	AnimValue m_nlTop, m_nlBottom;
 	Notes::const_iterator m_songit;
-	double m_time;
-	double m_max, m_min, m_noteUnit, m_baseY, m_baseX;
+	float m_time;
+	float m_max, m_min, m_noteUnit, m_baseY, m_baseX;
 	const NoteGraphScalerPtr m_scaler;
 };
 

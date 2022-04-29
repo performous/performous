@@ -17,8 +17,8 @@ class LyricRow {
 	/// iterator
 	typedef Notes::const_iterator Iterator;
 	/// constructor
-	LyricRow(Iterator& it, Iterator const& eof): extraspacing(0.0, 2.0), fade(0.0, 0.6) {
-		fade.setTarget(1.0);
+	LyricRow(Iterator& it, Iterator const& eof): extraspacing(0.0f, 2.0f), fade(0.0f, 0.6f) {
+		fade.setTarget(1.0f);
 		m_begin = it;
 		while (it != eof && it->type != Note::Type::SLEEP) ++it;
 		m_end = it;
@@ -26,22 +26,22 @@ class LyricRow {
 		if (m_begin == m_end) throw std::logic_error("Empty sentence");
 	}
 	/// lyric expired?
-	bool expired(double time) const {
-		double lastTime = 0.0;
+	bool expired(float time) const {
+		float lastTime = 0.0;
 		for (Iterator it = m_begin; it != m_end; ++it) lastTime = it->end;
 		return time > lastTime;
 	}
 	/// draw/print lyrics
-	void draw(SvgTxtTheme& txt, double time, Dimensions &dim) const {
+	void draw(SvgTxtTheme& txt, float time, Dimensions &dim) const {
 		std::vector<TZoomText> sentence;
 		for (Iterator it = m_begin; it != m_end; ++it) {
 			sentence.push_back(TZoomText(it->syllable));
 			if(!config["game/Textstyle"].i()) {
 			bool current = (time >= it->begin && time < it->end);
-			sentence.back().factor = current ? 1.1 - 0.1 * (time - it->begin) / (it->end - it->begin) : 1.0; // Zoom-in and out while it's the current syllable.
+			sentence.back().factor = current ? 1.1f - 0.1f * (time - it->begin) / (it->end - it->begin) : 1.0f; // Zoom-in and out while it's the current syllable.
 			} else {
 			bool current = time >=it->begin;
-			sentence.back().factor = current ? std::min(1.0 + (0.15 * (time - it->begin) / (it->end - it->begin)), 1.1) : 1.0; // Zoom-in and out syllable proportionally to their length.
+			sentence.back().factor = current ? std::min(1.0f + (0.15f * (time - it->begin) / (it->end - it->begin)), 1.1f) : 1.0f; // Zoom-in and out syllable proportionally to their length.
 			}
 		}
 		ColorTrans c(Color::alpha(fade.get()));
@@ -60,7 +60,7 @@ class LayoutSinger {
 	LayoutSinger(VocalTrack& vocal, Database& database, NoteGraphScalerPtr const&, std::shared_ptr<ThemeSing> theme = std::make_shared<ThemeSing>());
 	~LayoutSinger();
 	void reset();
-	void draw(double time, PositionMode position = LayoutSinger::PositionMode::FULL);
+	void draw(float time, PositionMode position = LayoutSinger::PositionMode::FULL);
 	void drawScore(PositionMode position);
 	double lyrics_begin() const;
 	void hideLyrics(bool hide = true) { m_hideLyrics = hide; }

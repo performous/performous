@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-constexpr double TAU = 2.0 * 3.141592653589793238462643383279502884;  // https://tauday.com/tau-manifesto
+constexpr float TAU = 2.0 * 3.141592653589793238462643383279502884f;  // https://tauday.com/tau-manifesto
 
 /** Templated conversion functions for string to T, specializations defined in util.cc **/
 template <typename T> T sconv(std::string const& s);
@@ -22,10 +22,10 @@ template <typename Numeric> struct MinMax {
 };
 
 /** A convenient way for getting NaNs **/
-static inline constexpr double getNaN() { return std::numeric_limits<double>::quiet_NaN(); }
+static inline constexpr float getNaN() { return std::numeric_limits<float>::quiet_NaN(); }
 
 /** A convenient way for getting infs **/
-static inline constexpr double getInf() { return std::numeric_limits<double>::infinity(); }
+static inline constexpr float getInf() { return std::numeric_limits<float>::infinity(); }
 
 /** OpenGL smoothstep function **/
 template <typename T> T smoothstep(T edge0, T edge1, T x) {

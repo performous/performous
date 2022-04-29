@@ -7,7 +7,7 @@
 #include <iostream>
 #include <list>
 
-const double Engine::TIMESTEP = 0.01;
+const float Engine::TIMESTEP = 0.01f;
 
 Engine::Engine(Audio& audio, VocalTrackPtrs vocals, Database& database):
   m_audio(audio), m_time(), m_quit(), m_database(database)
@@ -30,8 +30,8 @@ Engine::Engine(Audio& audio, VocalTrackPtrs vocals, Database& database):
 void Engine::operator()() {
 	while (!m_quit) {
 		for (Player& player: m_database.cur) player.prepare();
-		double t = m_audio.getPosition() - config["audio/round-trip"].f();
-		double timeLeft = m_time - t;
+		float t = m_audio.getPosition() - config["audio/round-trip"].f();
+		float timeLeft = m_time - t;
 		if (timeLeft != timeLeft || timeLeft > 1.0) timeLeft = 1.0;  // FIXME: Workaround for NaN values and other weirdness (should fix the weirdness instead)
 		if (timeLeft > 0.0) { std::this_thread::sleep_for(std::min(TIMESTEP, timeLeft) * 1s); continue; }
 		for (Player& player: m_database.cur) player.update();

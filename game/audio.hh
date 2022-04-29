@@ -28,7 +28,7 @@ class AudioClock {
 	mutable std::mutex m_mutex;
 	Time m_baseTime; ///< A reference time (corresponds to m_basePos)
 	Seconds m_basePos = 0.0s; ///< A reference position in song
-	double m_skew = 0.0; ///< The skew ratio applied to system time (since baseTime)
+	float m_skew = 0.0; ///< The skew ratio applied to system time (since baseTime)
 	std::atomic<Seconds> m_max{ 0.0s }; ///< Maximum output value for the clock (end of the current audio block)
 	/// Get the current position (current time via parameter, no locking)
 	Seconds pos_internal(Time now) const;
@@ -46,13 +46,13 @@ public:
 struct Device {
 	// Init
 	const unsigned int in, out;
-	const double rate;
+	const float rate;
 	const unsigned int dev;
 	portaudio::Stream stream;
 	std::vector<Analyzer*> mics;
 	Output* outptr;
 
-	Device(unsigned int in, unsigned int out, double rate, unsigned int dev);
+	Device(unsigned int in, unsigned int out, float rate, unsigned int dev);
 	/// Start
 	void start();
 	/// Stop
@@ -97,9 +97,9 @@ public:
 	 * @param fadeTime time to fade
 	 * @param startPos starting position
 	 */
-	void playMusic(fs::path const& filename, bool preview = false, double fadeTime = 0.5, double startPos = 0.0);
+	void playMusic(fs::path const& filename, bool preview = false, float fadeTime = 0.5f, float startPos = 0.0f);
 	/** Plays a list of songs **/
-	void playMusic(Files const& filenames, bool preview = false, double fadeTime = 0.5, double startPos = 0.0);
+	void playMusic(Files const& filenames, bool preview = false, float fadeTime = 0.5f, float startPos = 0.0f);
 	/** Loads/plays/unloads a sample **/
 	void loadSample(std::string const& streamId, fs::path const& filename);
 	void playSample(std::string const& streamId);
@@ -107,21 +107,21 @@ public:
 	/** Stops music **/
 	void stopMusic();
 	/** Fades music out **/
-	void fadeout(double time = 1.0);
+	void fadeout(float time = 1.0f);
 	/** Get the length of the currently playing song, in seconds. **/
-	double getLength() const;
+	float getLength() const;
 	/**
 	 * This methods seek forward in the stream (backwards if
 	 * argument is negative), and continues playing.
 	 * @param seek_dist number of seconds to seek from current position
 	 */
-	void seek(double seek_dist);
+	void seek(float seek_dist);
 	/** Seek to specific time **/
-	void seekPos(double pos);
+	void seekPos(float pos);
 	/** Is the music playing (loaded and not at EOF yet, pause doesn't matter) **/
 	bool isPlaying() const;
 	/** Get the current position. If not known or nothing is playing, NaN is returned. **/
-	double getPosition() const;
+	float getPosition() const;
 	void togglePause() { pause(!isPaused()); }
 	void pause(bool state = true);
 	bool isPaused() const;
@@ -130,11 +130,11 @@ public:
 	/** Toggle center channel suppressor **/
 	void toggleCenterChannelSuppressor();
 	/** Adjust volume level of a single track (used for muting incorrectly played instruments). Range 0.0 to 1.0. **/
-	void streamFade(std::string track, double volume);
+	void streamFade(std::string track, float volume);
 	/** Do a pitch shift - used for guitar whammy bar */
-	void streamBend(std::string track, double pitchFactor);
+	void streamBend(std::string track, float pitchFactor);
 	/** Get sample rate */
-	static double getSR() { return 48000.0; }
+	static float getSR() { return 48000.0f; }
 	static unsigned aubio_hop_size;
 	static unsigned aubio_win_size;
 	static std::unique_ptr<aubio_tempo_t, void(*)(aubio_tempo_t*)> aubioTempo;
@@ -150,27 +150,27 @@ struct Track {
 	friend class ScreenSongs;
 	public:
 	std::unordered_map<std::string, std::unique_ptr<Track>> tracks; ///< Audio decoders
-	double srate; ///< Sample rate
+	float srate; ///< Sample rate
 	int64_t m_pos = 0; ///< Current sample position
 	bool m_preview;
 	class AudioClock m_clock;
-	Seconds durationOf(int64_t samples) const { return 1.0s * samples / srate / 2.0; }
+	Seconds durationOf(int64_t samples) const { return 1.0s * samples / srate / 2.0f; }
 	float* sampleStartPtr = nullptr;
 	float* sampleEndPtr = nullptr;
 public:
 	bool suppressCenterChannel = false;
-	double fadeLevel = 0.0;
-	double fadeRate = 0.0;
+	float fadeLevel = 0.0f;
+	float fadeRate = 0.0f;
 	using Buffer = std::vector<float>;
 	Music(Audio::Files const& files, unsigned int sr, bool preview);
 	/// Sums the stream to output sample range, returns true if the stream still has audio left afterwards.
 	bool operator()(float* begin, float* end);
-	void seek(double time) { m_pos = time * srate * 2.0; }
+	void seek(float time) { m_pos = time * srate * 2.0f; }
 	/// Get the current position in seconds
-	double pos() const { return m_clock.pos().count(); }
-	double duration() const;
+	float pos() const { return m_clock.pos().count(); }
+	float duration() const;
 	/// Prepare (seek) all tracks to current position, return true when done (nonblocking)
 	bool prepare();
-	void trackFade(std::string const& name, double fadeLevel);
-	void trackPitchBend(std::string const& name, double pitchFactor);	
+	void trackFade(std::string const& name, float fadeLevel);
+	void trackPitchBend(std::string const& name, float pitchFactor);
 };

@@ -318,7 +318,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 					else msg = dev->source.isKeyboard() ? _("Press SPACE to join drums!") : _("KICK to join!");
 				}
 			}
-			if (!msg.empty()) gm->flashMessage(msg, 0.0, 0.1, 0.1);
+			if (!msg.empty()) gm->flashMessage(msg, 0.0f, 0.1f, 0.1f);
 			else if (type == input::DevType::DANCEPAD) m_instruments.push_back(std::make_unique<DanceGraph>(m_audio, *m_song, dev));
 			else if (type != input::DevType::GENERIC) m_instruments.push_back(std::make_unique<GuitarGraph>(m_audio, *m_song, dev, m_instruments.size()));
 		}
@@ -539,9 +539,9 @@ void ScreenSing::draw() {
 	// Compute and draw the timer and the progressbar
 	{
 		unsigned t = clamp(time, 0.0, length);
-		m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
+		m_progress->dimensions.fixedWidth(0.4f).left(-0.5f).screenTop();
 		theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
-		theme->songinfo.dimensions.screenBottom(-0.01);
+		theme->songinfo.dimensions.screenBottom(-0.01f);
 		m_progress->draw(songPercent);
 
 		Song::SongSection section("error", 0);
@@ -627,7 +627,7 @@ void ScreenSing::drawMenu() {
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
 	const auto cur = &m_menu.current();
-	double w = m_menu.dimensions.w();
+	float w = m_menu.dimensions.w();
 	const float txth = th.option_selected.h();
 	const float step = txth * 0.85f;
 	const float h = m_menu.getOptions().size() * step + step;
@@ -662,7 +662,7 @@ void ScreenSing::drawMenu() {
 		y += step;
 	}
 	if (cur->getComment() != "") {
-		th.comment.dimensions.middle(0).screenBottom(-0.08);
+		th.comment.dimensions.middle(0).screenBottom(-0.08f);
 		th.comment.draw(cur->getComment());
 	}
 	m_menu.dimensions.stretch(w, h);

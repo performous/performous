@@ -20,7 +20,7 @@ struct Player {
 	/// player color for bars, waves, scores
 	Color m_color;
 	/// typedef for pitch
-	typedef std::vector<std::pair<double, double> > pitch_t;
+	typedef std::vector<std::pair<float, float> > pitch_t;
 	/// player's pitch
 	pitch_t m_pitch;
 	/// current position in pitch vector (first unused spot)

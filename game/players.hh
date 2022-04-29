@@ -69,11 +69,11 @@ class Players {
 	/// get current id
 	PlayerId currentId() const { return math_cover.getTarget(); }
 	/// gets current position
-	double currentPosition() { return math_cover.getValue(); }
+	float currentPosition() { return math_cover.getValue(); }
 	/// gets current velocity
-	double currentVelocity() const { return math_cover.getVelocity(); }
+	float currentVelocity() const { return math_cover.getVelocity(); }
 	/// sets margins for animation
-	void setAnimMargins(double left, double right) { math_cover.setMargins(left, right); }
+	void setAnimMargins(float left, float right) { math_cover.setMargins(left, right); }
 	/// @return current PlayerItem (the copy is very cheap at the moment)
 	PlayerItem current() const;
 	/// filters playerlist by regular expression

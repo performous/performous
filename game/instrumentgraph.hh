@@ -19,15 +19,15 @@
 class Popup {
   public:
 	/// Constructor
-	Popup(std::string msg, Color c, double speed, SvgTxtThemeSimple* popupText, std::string info = "", SvgTxtTheme* infoText = nullptr):
-	  m_msg(msg), m_color(c), m_anim(AnimValue(0.0, speed)), m_popupText(popupText), m_info(info), m_infoText(infoText)
+	Popup(std::string msg, Color c, float speed, SvgTxtThemeSimple* popupText, std::string info = "", SvgTxtTheme* infoText = nullptr):
+	  m_msg(msg), m_color(c), m_anim(AnimValue(0.0f, speed)), m_popupText(popupText), m_info(info), m_infoText(infoText)
 	{
-		m_anim.setTarget(1.0, false);
+		m_anim.setTarget(1.0f, false);
 	}
 	/// Draw the popup
 	/// Returns false if it is expired
 	bool draw() {
-		double anim = m_anim.get();
+		float anim = m_anim.get();
 		if (anim <= 0.0 || !m_popupText) return false;
 		float a = 1.0 - anim;
 		m_color.a = a;
@@ -36,11 +36,11 @@ class Popup {
 		{
 			using namespace glmath;
 			Transform trans(translate(vec3(0.0f, 0.0f, 0.5f * anim)));
-			m_popupText->dimensions().center(0.1 - 0.03 * anim).middle().stretch(0.2f, 0.2f);
+			m_popupText->dimensions().center(0.1f - 0.03f * anim).middle().stretch(0.2f, 0.2f);
 			m_popupText->draw();
 		}
 		if (m_info != "" && m_infoText) {
-			m_infoText->dimensions.screenBottom(-0.02).middle(-0.12);
+			m_infoText->dimensions.screenBottom(-0.02f).middle(-0.12f);
 			m_infoText->draw(m_info);
 		}
 		if (anim > 0.999) m_anim.setTarget(0.0, true);
@@ -70,7 +70,7 @@ public:
 	virtual ~InstrumentGraph();
 
 	// Interface functions
-	virtual void draw(double time) = 0;
+	virtual void draw(float time) = 0;
 	virtual void engine() = 0;
 	virtual void process(input::Event const&) {}
 	virtual std::string getTrack() const = 0;
@@ -90,15 +90,15 @@ public:
 	void unjoin();
 
 	// General getters
-	bool joining(double time) const { return time < m_jointime; }
+	bool joining(float time) const { return time < m_jointime; }
 	bool ready() const { return m_ready; };
 	bool menuOpen() const { return m_menu.isOpen(); }
-	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
+	void position(float cx, float width) { m_cx.setTarget(cx); m_width.setTarget(width); }
 	unsigned stream() const { return m_stream; }
-	double correctness() const { return m_correctness.get(); }
-	int getScore() const { return clamp(m_score * m_scoreFactor, 0.0, 10000.0); }
+	float correctness() const { return m_correctness.get(); }
+	int getScore() const { return clamp(m_score * m_scoreFactor, 0.0f, 10000.0f); }
 	input::DevType getGraphType() const { return m_dev->type; }
-	virtual double getWhammy() const { return 0; }
+	virtual float getWhammy() const { return 0; }
 	bool isKeyboard() const { return m_dev->source.isKeyboard(); }
 
   protected:
@@ -155,9 +155,9 @@ public:
 	bool m_pressed[max_panels]; /// is certain panel pressed currently
 	AnimValue m_pressed_anim[max_panels]; /// animation for panel pressing
 	AnimValue m_correctness;
-	double m_score; /// unnormalized scores
-	double m_scoreFactor; /// normalization factor
-	double m_starmeter; /// when this is high enough, GodMode becomes available
+	float m_score; /// unnormalized scores
+	float m_scoreFactor; /// normalization factor
+	float m_starmeter; /// when this is high enough, GodMode becomes available
 	int m_streak; /// player's current streak/combo
 	int m_longestStreak; /// player's longest streak/combo
 	int m_bigStreak; /// next limit when a popup appears

@@ -79,13 +79,13 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 
 void ScreenIntro::draw_menu_options() {
 	// Variables used for positioning and other stuff
-	double wcounter = 0;
+	float wcounter = 0.0f;
 	const size_t showopts = 5; // Show at most 5 options simultaneously
-	const float x = -0.35;
-	const float start_y = -0.1;
-	const float sel_margin = 0.03;
+	const float x = -0.35f;
+	const float start_y = -0.1f;
+	const float sel_margin = 0.03f;
 	const MenuOptions opts = m_menu.getOptions();
-	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get()-m_menu.getSubmenuLevel()));
+	float submenuanim = 1.0f - std::min(1.0f, std::abs(m_submenuAnim.get()-m_menu.getSubmenuLevel()));
 	theme->back_h.dimensions.fixedHeight(0.038f);
 	theme->back_h.dimensions.stretch(m_menu.dimensions.w(), theme->back_h.dimensions.h());
 	// Determine from which item to start
@@ -101,21 +101,21 @@ void ScreenIntro::draw_menu_options() {
 		// Selection
 		if (i == m_menu.curIndex()) {
 			// Animate selection higlight moving
-			double selanim = m_selAnim.get() - start_i;
+			float selanim = m_selAnim.get() - start_i;
 			if (selanim < 0) selanim = 0;
-			theme->back_h.dimensions.left(x - sel_margin).center(start_y + selanim*0.065);
+			theme->back_h.dimensions.left(x - sel_margin).center(start_y + selanim * 0.065f);
 			theme->back_h.draw();
 			// Draw the text, dim if option not available
 			{
-				ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
-				theme->option_selected.dimensions.left(x).center(start_y + ii*0.065);
+				ColorTrans c(Color::alpha(opt.isActive() ? 1.0f : 0.5f));
+				theme->option_selected.dimensions.left(x).center(start_y + ii * 0.065f);
 				theme->option_selected.draw(opt.getName());
 			}
-			wcounter = std::max(wcounter, theme->option_selected.w() + 2 * sel_margin); // Calculate the widest entry
+			wcounter = std::max(wcounter, theme->option_selected.w() + 2.0f * sel_margin); // Calculate the widest entry
 			// If this is a config item, show the value below
 			if (opt.type == MenuOption::Type::CHANGE_VALUE) {
 				++ii; // Use a slot for the value
-				theme->option_selected.dimensions.left(x + sel_margin).center(-0.1 + (selanim+1)*0.065);
+				theme->option_selected.dimensions.left(x + sel_margin).center(-0.1f + (selanim + 1.0f) * 0.065f);
 				theme->option_selected.draw("<  " + _(opt.value->getValue()) + "  >");
 			}
 
@@ -123,8 +123,8 @@ void ScreenIntro::draw_menu_options() {
 		} else {
 			std::string title = opt.getName();
 			SvgTxtTheme& txt = getTextObject(title);
-			ColorTrans c(Color::alpha(opt.isActive() ? 1.0 : 0.5));
-			txt.dimensions.left(x).center(start_y + ii*0.065);
+			ColorTrans c(Color::alpha(opt.isActive() ? 1.0f : 0.5f));
+			txt.dimensions.left(x).center(start_y + ii * 0.065f);
 			txt.draw(title);
 			wcounter = std::max(wcounter, txt.w() + 2 * sel_margin); // Calculate the widest entry
 		}
@@ -141,16 +141,16 @@ void ScreenIntro::draw() {
 	}
 	if (m_menu.current().image) m_menu.current().image->draw();
 	// Comment
-	theme->comment_bg.dimensions.center().screenBottom(-0.01);
+	theme->comment_bg.dimensions.center().screenBottom(-0.01f);
 	theme->comment_bg.draw();
-	theme->comment.dimensions.left(-0.48).screenBottom(-0.028);
+	theme->comment.dimensions.left(-0.48f).screenBottom(-0.028f);
 	theme->comment.draw(m_menu.current().getComment());
 	// Key help for config
 	if (m_menu.getSubmenuLevel() > 0) {
-		theme->short_comment_bg.dimensions.stretch(theme->short_comment.w() + 0.065, 0.025);
-		theme->short_comment_bg.dimensions.left(-0.54).screenBottom(-0.054);
+		theme->short_comment_bg.dimensions.stretch(theme->short_comment.w() + 0.065f, 0.025f);
+		theme->short_comment_bg.dimensions.left(-0.54f).screenBottom(-0.054f);
 		theme->short_comment_bg.draw();
-		theme->short_comment.dimensions.left(-0.48).screenBottom(-0.067);
+		theme->short_comment.dimensions.left(-0.48f).screenBottom(-0.067f);
 		theme->short_comment.draw(_("Ctrl + S to save, Ctrl + R to reset defaults"));
 	}
 	// Menu

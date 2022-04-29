@@ -71,7 +71,7 @@ class Game: public Singleton <Game> {
 	/// Returns finished state
 	bool isFinished();
 	/// Show performous logo
-	void showLogo(bool show = true) { m_logoAnim.setTarget(show ? 1.0 : 0.0); }
+	void showLogo(bool show = true) { m_logoAnim.setTarget(show ? 1.0f : 0.0f); }
 	/// Draw the logo
 	void drawLogo();
 	///global playlist access

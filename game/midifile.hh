@@ -77,7 +77,7 @@ public:
 	Tracks tracks;
 	struct MidiSection {
 		std::string name;
-		double begin;
+		float begin;
 		MidiSection(std::string const& name, const double begin): name(name), begin(begin) {}
 	};
 	typedef std::vector<MidiSection> MidiSections;
@@ -87,7 +87,7 @@ public:
 	void cout_midi_event(uint8_t type, uint8_t arg1, uint8_t arg2, uint32_t miditime);
 	void process_midi_event(Track& track, uint8_t type, uint8_t arg1, uint8_t arg2, uint32_t miditime);
 	uint64_t get_us(uint32_t miditime);
-	double get_seconds(uint32_t miditime) { return 1e-6 * get_us(miditime); }
+	float get_seconds(uint32_t miditime) { return 1e-6 * get_us(miditime); }
 	void add_tempo_change(uint32_t miditime, uint32_t tempo);
 	uint16_t format;
 	typedef std::vector<std::string> CommandEvents;

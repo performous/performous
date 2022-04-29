@@ -8,8 +8,8 @@
 #include <stdexcept>
 
 // Limit the range to avoid noise and useless computation
-static const double FFT_MINFREQ = 45.0;
-static const double FFT_MAXFREQ = 5000.0;
+static const float FFT_MINFREQ = 45.0;
+static const float FFT_MAXFREQ = 5000.0;
 
 Tone::Tone():
   freq(0.0),
@@ -27,20 +27,20 @@ void Tone::print() const {
 	std::cout << std::endl;
 }
 
-bool Tone::operator==(double f) const {
+bool Tone::operator==(float f) const {
 	return std::abs(freq / f - 1.0) < 0.05;
 }
 
-Analyzer::Analyzer(double rate, std::string id, std::size_t step):
+Analyzer::Analyzer(float rate, std::string id, std::size_t step):
   m_step(step),
-  m_resampleFactor(1.0),
+  m_resampleFactor(1.0f),
   m_resamplePos(),
   m_rate(rate),
   m_id(id),
   m_window(FFT_N),
   m_fftLastPhase(FFT_N / 2),
-  m_peak(0.0),
-  m_oldfreq(0.0)
+  m_peak(0.0f),
+  m_oldfreq(0.0f)
 {
 	if (m_step > FFT_N) throw std::logic_error("Analyzer step is larger that FFT_N (ideally it should be less than a fourth of FFT_N).");
 	// Hamming window
@@ -49,7 +49,7 @@ Analyzer::Analyzer(double rate, std::string id, std::size_t step):
 	}
 }
 
-void Analyzer::output(float* begin, float* end, double rate) {
+void Analyzer::output(float* begin, float* end, float rate) {
 	constexpr unsigned a = 2;
 	const unsigned size = m_passthrough.size();
 	const unsigned out = (end - begin) / 2 /* stereo */;
@@ -58,9 +58,9 @@ void Analyzer::output(float* begin, float* end, double rate) {
 	std::vector<float> pcm(m_passthrough.capacity);
 	m_passthrough.read(pcm.data(), pcm.data() + in + 4);
 	for (unsigned i = 0; i < out; ++i) {
-		double s = 0.0;
+		float s = 0.0;
 		unsigned k = m_resamplePos;
-		double x = m_resamplePos - k;
+		float x = m_resamplePos - k;
 		// Lanczos sampling of input at m_resamplePos
 		for (unsigned j = 0; j <= 2 * a; ++j) s += pcm[k + j] * da::lanc<a>(x - j + a);
 		s *= 5.0;
@@ -76,23 +76,23 @@ void Analyzer::output(float* begin, float* end, double rate) {
 		m_resampleFactor = 1.0;
 	} else {
 		m_passthrough.pop(num);
-		m_resampleFactor = 0.99 * m_resampleFactor + 0.01 * (size > 700 ? 1.02 : 0.98);
+		m_resampleFactor = 0.99f * m_resampleFactor + 0.01f * (size > 700 ? 1.02f : 0.98f);
 	}
 }
 
 
 namespace {
 	struct Peak {
-		double freq;
-		double db;
+		float freq;
+		float db;
 		bool harm[Tone::MAXHARM];
-		Peak(double _freq = 0.0, double _db = -getInf()):
+		Peak(float _freq = 0.0f, float _db = -getInf()):
 		  freq(_freq), db(_db)
 		{
 			for (auto& h: harm) h = false;
 		}
 		void clear() {
-			freq = 0.0;
+			freq = 0.0f;
 			db = -getInf();
 		}
 	};
@@ -114,7 +114,7 @@ bool Analyzer::calcFFT() {
 	for (float const* ptr = pcm + FFT_N - m_step; ptr != pcm + FFT_N; ++ptr) {
 		float s = *ptr;
 		float p = s * s;
-		if (p > m_peak) m_peak = p; else m_peak *= 0.999;
+		if (p > m_peak) m_peak = p; else m_peak *= 0.999f;
 	}
 	// Calculate FFT
 	m_fft = da::fft<FFT_P>(pcm, m_window);
@@ -123,31 +123,31 @@ bool Analyzer::calcFFT() {
 
 void Analyzer::calcTones() {
 	// Precalculated constants
-	const double freqPerBin = m_rate / FFT_N;
-	const double stepRate = m_rate / m_step;  // Steps per second
-	const double phaseStep = double(m_step) / FFT_N;
-	const double normCoeff = 1.0 / FFT_N;
-	const double minMagnitude = pow(10, -80.0 / 20.0) / normCoeff; // -80 dB
+	const float freqPerBin = m_rate / FFT_N;
+	const float stepRate = m_rate / m_step;  // Steps per second
+	const float phaseStep = float(m_step) / FFT_N;
+	const float normCoeff = 1.0f / FFT_N;
+	const float minMagnitude = pow(10, -80.0f / 20.0f) / normCoeff; // -80 dB
 	// Limit frequency range of processing
 	const size_t kMin = std::max(size_t(1), size_t(FFT_MINFREQ / freqPerBin));
 	const size_t kMax = std::min(FFT_N / 2, size_t(FFT_MAXFREQ / freqPerBin));
 	std::vector<Peak> peaks(kMax + 1); // One extra to simplify loops
 	for (size_t k = 1; k <= kMax; ++k) {
-		double magnitude = std::abs(m_fft[k]);
-		double phase = std::arg(m_fft[k]) / TAU;
-		double delta = phase - m_fftLastPhase[k];
+		float magnitude = std::abs(m_fft[k]);
+		float phase = std::arg(m_fft[k]) / TAU;
+		float delta = phase - m_fftLastPhase[k];
 		m_fftLastPhase[k] = phase;
 		// Use phase difference over a step to calculate what the frequency must be
-		double freq = stepRate * (std::round(k * phaseStep - delta) + delta);
-		if (freq > 1.0 && magnitude > minMagnitude) {
+		float freq = stepRate * (std::round(k * phaseStep - delta) + delta);
+		if (freq > 1.0f && magnitude > minMagnitude) {
 			peaks[k].freq = freq;
-			peaks[k].db = 20.0 * log10(normCoeff * magnitude);
+			peaks[k].db = 20.0f * log10(normCoeff * magnitude);
 		}
 	}
 	// Prefilter peaks
-	double prevdb = peaks[0].db;
+	float prevdb = peaks[0].db;
 	for (size_t k = 1; k < kMax; ++k) {
-		double db = peaks[k].db;
+		float db = peaks[k].db;
 		if (db > prevdb) peaks[k - 1].clear();
 		if (db < prevdb) peaks[k].clear();
 		prevdb = db;
@@ -160,7 +160,7 @@ void Analyzer::calcTones() {
 		std::size_t bestDiv = 1;
 		int bestScore = 0;
 		for (std::size_t div = 2; div <= Tone::MAXHARM && k / div > 1; ++div) {
-			double freq = peaks[k].freq / div; // Fundamental
+			float freq = peaks[k].freq / div; // Fundamental
 			int score = 0;
 			for (std::size_t n = 1; n < div && n < 8; ++n) {
 				Peak& p = match(peaks, k * n / div);
@@ -177,7 +177,7 @@ void Analyzer::calcTones() {
 		// Construct a Tone by combining the fundamental frequency (freq) and all harmonics
 		Tone t;
 		std::size_t count = 0;
-		double freq = peaks[k].freq / bestDiv;
+		float freq = peaks[k].freq / bestDiv;
 		t.db = peaks[k].db;
 		for (std::size_t n = 1; n <= bestDiv; ++n) {
 			// Find the peak for n'th harmonic
@@ -212,14 +212,14 @@ void Analyzer::mergeWithOld(tones_t& tones) const {
 		// If match found
 		if (it != tones.end() && *it == old) {
 			// Merge the old tone into the new tone
-			it->age = old.age + 1;
-			it->stabledb = 0.8 * old.stabledb + 0.2 * it->db;
-			it->freq = 0.5 * old.freq + 0.5 * it->freq;
-		} else if (old.db > -70.0) {
+			it->age = old.age + 1.0f;
+			it->stabledb = 0.8f * old.stabledb + 0.2f * it->db;
+			it->freq = 0.5f * old.freq + 0.5f * it->freq;
+		} else if (old.db > -70.0f) {
 			// Insert a decayed version of the old tone into new tones
 			Tone& t = *tones.insert(it, old);
-			t.db -= 5.0;
-			t.stabledb -= 0.1;
+			t.db -= 5.0f;
+			t.stabledb -= 0.1f;
 		}
 	}
 }

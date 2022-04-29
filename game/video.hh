@@ -10,32 +10,32 @@
 class Video {
   public:
 	/// opens given video file
-	Video(fs::path const& videoFile, double videoGap = 0.0);
+	Video(fs::path const& videoFile, float videoGap = 0.0f);
 	~Video();
-	void prepare(double time);  ///< Load the current video frame into a texture
-	void render(double time);  ///< Render the prepared video frame
+	void prepare(float time);  ///< Load the current video frame into a texture
+	void render(float time);  ///< Render the prepared video frame
 	/// returns Dimensions of video clip
 	Dimensions const& dimensions() const { return m_texture.dimensions; }
 
   private:
-	const double m_videoGap;
+	const float m_videoGap;
 	Texture m_texture;
-	double m_textureTime;
-	double m_readPosition = 0.0;
+	float m_textureTime;
+	float m_readPosition = 0.0f;
 	AnimValue m_alpha;
 	bool m_quit{false};
 	std::future<void> m_grabber;
 
 	/// trys to pop a video frame from queue
-	bool tryPop(Bitmap& f, double timestamp);
+	bool tryPop(Bitmap& f, float timestamp);
 	/// Add frame to queue
 	void push(Bitmap&& f);
 	/// Clear and unlock the queue
 	void reset();
 	/// return timestamp of next frame to read
-	double headPosition() const { return m_queue.front().timestamp; }
+	float headPosition() const { return m_queue.front().timestamp; }
 	/// return timestamp of next frame to read
-	double backPosition() const { return m_queue.back().timestamp; }
+	float backPosition() const { return m_queue.back().timestamp; }
 
 	std::deque<Bitmap> m_queue;
 	mutable std::mutex m_mutex;

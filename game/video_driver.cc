@@ -303,7 +303,7 @@ void Window::render(std::function<void (void)> drawFunc) {
 	if (stereo && type == 2 && !m_fullscreen) stereo = false;
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	updateStereo(stereo ? getSeparation() : 0.0);
+	updateStereo(stereo ? getSeparation() : 0.0f);
 	glerror.check("setup");
 	// Can we do direct to framebuffer rendering (no FBO)?
 	if (!stereo || type == 2) { view(stereo); drawFunc(); return; }
@@ -347,13 +347,13 @@ void Window::render(std::function<void (void)> drawFunc) {
 		// Render FBO with 1:1 pixels, properly filtered/positioned for 3d
 		ColorTrans c(colorMatrix);
 		Dimensions dim = Dimensions(getFBO().width() / getFBO().height()).fixedWidth(1.0);
-		dim.center((num == 0 ? 0.25 : -0.25) * dim.h());
+		dim.center((num == 0 ? 0.25f : -0.25f) * dim.h());
 		if (num == 1) {
 			// Right eye blends over the left eye
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_ONE, GL_ONE);
 		}
-		getFBO().getTexture().draw(dim, TexCoords(0.0, 1.0, 1.0, 0));
+		getFBO().getTexture().draw(dim, TexCoords(0.0f, 1.0f, 1.0f, 0.0f));
 	}
 }
 
@@ -588,7 +588,7 @@ Transform::~Transform() {
 glmath::mat4 farTransform() {
 	float z = far_ - 0.1f;  // Very near the far plane but just a bit closer to avoid accidental clipping
 	float s = z / z0;  // Scale the image so that it looks the same size
-	s *= 1.0 + 2.0 * getSeparation(); // A bit more for stereo3d (avoid black borders)
+	s *= 1.0f + 2.0f * getSeparation(); // A bit more for stereo3d (avoid black borders)
 	using namespace glmath;
 	return translate(vec3(0.0f, 0.0f, -z + z0)) * scale(s); // Very near the farplane
 }

@@ -74,8 +74,8 @@ void SongParser::midParseHeader() {
 			}
 		}
 	}
-	addBPM(0, (6e7 / midi.tempochanges.front().value));
-	std::clog << "songparser-mid/debug: Got a bpm: " << (6e7 / midi.tempochanges.front().value) << std::endl;
+	addBPM(0.0f, (6e7f / midi.tempochanges.front().value));
+	std::clog << "songparser-mid/debug: Got a bpm: " << (6e7f / midi.tempochanges.front().value) << std::endl;
 }
 
 /// Parse notes
@@ -101,8 +101,8 @@ void SongParser::midParse() {
 				Durations& dur = nm2[elem.first];
 				MidiFileParser::Notes const& notes = elem.second;
 				for (auto const& note: notes) {
-					double beg = midi.get_seconds(note.begin)+s.start;
-					double end = midi.get_seconds(note.end)+s.start;
+					float beg = midi.get_seconds(note.begin)+s.start;
+					float end = midi.get_seconds(note.end)+s.start;
 					if (end == 0) continue; // Note with no ending
 					if (beg > end) { // Reversed note
 						if (beg - end > 0.001) { reversedNoteCount++; continue; }

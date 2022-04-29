@@ -44,10 +44,10 @@ class FFmpeg {
 	void handleOneFrame();
 
 	/** Seek to the chosen time. **/
-	virtual void seek(double time);
+	virtual void seek(float time);
 
 	/// duration
-	double duration() const;
+	float duration() const;
 
 	virtual ~FFmpeg() = default;
 
@@ -63,8 +63,8 @@ class FFmpeg {
 	static void avcodec_free_context(AVCodecContext *avctx);
 
 	fs::path m_filename;
-	double m_position = 0.0;
-	double m_duration = 0.0;
+	float m_position = 0.0f;
+	float m_duration = 0.0f;
 	// libav-specific variables
 	int m_streamId = -1;
 	std::unique_ptr<AVFormatContext, decltype(&avformat_close_input)> m_formatContext{nullptr, avformat_close_input};
@@ -76,7 +76,7 @@ class AudioFFmpeg : public FFmpeg {
 	using AudioCb = std::function<void(const std::int16_t *data, size_t count, int64_t sample_position)>;
 	AudioFFmpeg(fs::path const& file, unsigned int rate, AudioCb audioCb);
 
-	void seek(double time) override;
+	void seek(float time) override;
   protected:
 	void processFrame(uFrame frame) override;
   private:
@@ -111,12 +111,12 @@ class AudioBuffer {
 	bool prepare(std::int64_t pos);
 	bool read(float* begin, size_t count, std::int64_t pos, float volume = 1.0f);
 	bool terminating();
-	double duration();
+	float duration();
 
   private:
 	// must be called holding the mutex
 	bool eof(std::int64_t pos) const {
-		return (m_eof_pos != -1 && pos >= m_eof_pos) || (double(pos) / m_sps >= m_duration);
+		return (m_eof_pos != -1 && pos >= m_eof_pos) || (float(pos) / m_sps >= m_duration);
 	}
 
 	bool wantSeek();
@@ -133,7 +133,7 @@ class AudioBuffer {
 	std::int64_t m_eof_pos = -1; // -1 until we get the read end from ffmpeg
 
 	const unsigned m_sps;
-	const double m_duration{ 0 };
+	const float m_duration{ 0 };
 	bool m_seek_asked { false };
 	bool m_quit{ false };
 	std::future<void> reader_thread;

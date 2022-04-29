@@ -74,8 +74,8 @@ void SongParser::txtParse() {
 						std::clog << "songparser/info: Will try to fix overlap (most likely between both singers) with a linebreak." << std::endl;
 						Note lineBreak = Note();
 						lineBreak.type = Note::Type::SLEEP;
-						double beatDur = getBPM(m_song, finalDuet.back().begin).step;
-						double newEnd = (currentNote.begin - 2*beatDur);
+						float beatDur = getBPM(m_song, finalDuet.back().begin).step;
+						float newEnd = (currentNote.begin - 2*beatDur);
 						lineBreak.begin = lineBreak.end = newEnd;
 						if (finalDuet.back().type != Note::Type::SLEEP) {
 							finalDuet.back().end = newEnd;
@@ -107,7 +107,7 @@ bool SongParser::txtParseField(std::string const& line) {
 	// Parse header data that is stored in SongParser rather than in song (and thus needs to be read every time)
 	if (key == "BPM") assign(m_bpm, value);
 	else if (key == "RELATIVE") assign(m_relative, value);
-	else if (key == "GAP") { assign(m_gap, value); m_gap *= 1e-3; }
+	else if (key == "GAP") { assign(m_gap, value); m_gap *= 1e-3f; }
 	else if (key == "DUETSINGERP1" || key == "P1") m_song.insertVocalTrack(TrackName::LEAD_VOCAL, VocalTrack(value.substr(value.find_first_not_of(" "))));
 	// Strong hint that this is a duet, so it will be readily displayed with two singers in browser and properly filtered
 	else if (key == "DUETSINGERP2" || key == "P2") m_song.insertVocalTrack(DUET_P2, VocalTrack(value.substr(value.find_first_not_of(" "))));
@@ -140,7 +140,7 @@ bool SongParser::txtParseNote(std::string line) {
 	std::istringstream iss(line);
 	if (line[0] == 'B') {
 		unsigned int ts;
-		double bpm;
+		float bpm;
 		iss.ignore();
 		if (!(iss >> ts >> bpm)) throw std::runtime_error("Invalid BPM line format");
 		addBPM(ts, bpm);
@@ -215,7 +215,7 @@ bool SongParser::txtParseNote(std::string line) {
 			}
 		} else throw std::runtime_error("The first note has negative timestamp");
 	}
-	double prevtime = m_txt.prevtime;
+	float prevtime = m_txt.prevtime;
 	m_txt.prevtime = n.end;
 	if (n.type != Note::Type::SLEEP && n.end > n.begin) {
 		vocal.noteMin = std::min(vocal.noteMin, n.note);

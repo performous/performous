@@ -7,16 +7,16 @@
 
 MusicalScale& MusicalScale::clear() { m_freq = m_note = getNaN(); return *this; }
 
-MusicalScale& MusicalScale::setFreq(double freq) {
+MusicalScale& MusicalScale::setFreq(float freq) {
 	m_freq = freq;
-	m_note = m_baseId + 12.0 * std::log(freq / m_baseFreq) / std::log(2.0);
+	m_note = m_baseId + 12.0f * std::log(freq / m_baseFreq) / std::log(2.0f);
 	if (!isValid()) m_note = getNaN();
 	return *this;
 }
 
-MusicalScale& MusicalScale::setNote(double note) {
+MusicalScale& MusicalScale::setNote(float note) {
 	m_note = note;
-	m_freq = m_baseFreq * std::pow(2.0, (m_note - m_baseId) / 12.0);
+	m_freq = m_baseFreq * std::pow(2.0f, (m_note - m_baseId) / 12.0f);
 	return *this;
 }
 

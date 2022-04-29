@@ -127,17 +127,17 @@ bool SongParser::smParseField(std::string line) {
 	if (key == "OFFSET") { assign(m_gap, value); m_gap *= -1; }
 	else if (key == "BPMS"){
 			std::istringstream iss(value);
-			double ts, bpm;
+			float ts, bpm;
 			char chr;
 			while (iss >> ts >> chr >> bpm) {
 				if (ts == 0.0) m_bpm = bpm;
-				addBPM(ts * 4.0, bpm);
+				addBPM(ts * 4.0f, bpm);
 				if (!(iss >> chr)) break;
 			}
 	}
 	else if (key == "STOPS"){
 			std::istringstream iss(value);
-			double beat, sec;
+			float beat, sec;
 			char chr;
 			while (iss >> beat >> chr >> sec) {
 				m_stops.push_back(std::make_pair(beat * 4.0, sec));
@@ -181,7 +181,7 @@ Notes SongParser::smParseNotes(std::string line) {
 	DanceChords chords;	//temporary container for notes
 	Notes notes;
 	unsigned measure = 1;
-	double begin = 0.0;
+	float begin = 0.0f;
 	bool forceMeasure = false;
 
 	std::map<int, int> holdMarks; // Keeps track of hold notes not yet terminated
@@ -193,12 +193,12 @@ Notes SongParser::smParseNotes(std::string line) {
 		if (line.substr(0, 2) == "//") continue;  // Skip comments
 		if (line[0] == '#') break;  // HACK: This should read away the next #NOTES: line
 		if (line[0] == ',' || line[0] == ';') {
-			double end = tsTime(measure * 16.0);
+			float end = tsTime(measure * 16.0f);
 			unsigned div = chords.size();
-			double step = (end - begin) / div;
+			float step = (end - begin) / div;
 			for (unsigned note = 0; note < div; ++note) {
-				double t = begin + note * step;
-				double phase = double(note) / div;
+				float t = begin + note * step;
+				float phase = float(note) / div;
 				for (auto& elem: chords[note]) {
 					int& holdIdx = holdMarks[elem.first];  // holdIdx for current arrow
 					Note& n = elem.second;
@@ -257,7 +257,7 @@ Notes SongParser::smParseNotes(std::string line) {
 }
 
 /// Convert a stop into <time, duration> (as stored in the song)
-std::pair<double, double> SongParser::smStopConvert(std::pair<double, double> s) {
+std::pair<float, float> SongParser::smStopConvert(std::pair<float, float> s) {
 	s.first = tsTime(s.first);
 	return s;
 }

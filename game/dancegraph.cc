@@ -24,44 +24,44 @@ namespace {
 	// Note: t is difference from playback time so it must be in range [past, future]
 	float time2y(float t) { return timescale * (t - past) / (future - past); }
 	float time2a(float t) {
-		float a = clamp(1.0 - t / future); // Note: we want 1.0 alpha already at zero t.
+		float a = clamp(1.0f - t / future); // Note: we want 1.0 alpha already at zero t.
 		return std::pow(a, 0.8f); // Nicer curve
 	}
-	const double maxTolerance = 0.15; // Maximum error in seconds
+	const float maxTolerance = 0.15f; // Maximum error in seconds
 	int getNextBigStreak(int prev) { return prev + 10; }
 
 	/// Get an accuracy value [0, 1] for the error offset (in seconds)
-	double accuracy(double error) { return 1.0 - (std::abs(error) / maxTolerance); }
+	float accuracy(float error) { return 1.0 - (std::abs(error) / maxTolerance); }
 
 	/// Gives points based on error from a perfect hit
-	double points(double error) {
-		double ac = accuracy(error);
-		if (ac > .90) return 50.0;  // Perfect
-		if (ac > .80) return 40.0;  // Excellent
-		if (ac > .70) return 30.0;  // Great
-		if (ac > .60) return 20.0;  // Good
-		if (ac > .40) return 15.0;  // OK
-		if (ac > .20) return 10.0;  // Late/Early
-		return 5.0;  // Way off
+	float points(float error) {
+		float ac = accuracy(error);
+		if (ac > .90f) return 50.0f;  // Perfect
+		if (ac > .80f) return 40.0f;  // Excellent
+		if (ac > .70f) return 30.0f;  // Great
+		if (ac > .60f) return 20.0f;  // Good
+		if (ac > .40f) return 15.0f;  // OK
+		if (ac > .20f) return 10.0f;  // Late/Early
+		return 5.0f;  // Way off
 	}
 
-	std::string getRank(double error) {
-		double ac = accuracy(error);
-		if (error < 0.0) {
-			if (ac > .90) return _("Perfect!");
-			if (ac > .80) return _("Excellent!-");
-			if (ac > .70) return _("Great!-");
-			if (ac > .60) return _(" Good!- ");
-			if (ac > .40) return _("  OK!-  ");
-			if (ac > .20) return _("Late!-");
+	std::string getRank(float error) {
+		float ac = accuracy(error);
+		if (error < 0.0f) {
+			if (ac > .90f) return _("Perfect!");
+			if (ac > .80f) return _("Excellent!-");
+			if (ac > .70f) return _("Great!-");
+			if (ac > .60f) return _(" Good!- ");
+			if (ac > .40f) return _("  OK!-  ");
+			if (ac > .20f) return _("Late!-");
 			return _("Way off!");
 		} else {
-			if (ac > .90) return _("Perfect!");
-			if (ac > .80) return _("-Excellent!");
-			if (ac > .70) return _("-Great!");
-			if (ac > .60) return _(" -Good! ");
-			if (ac > .40) return _("  -OK!  ");
-			if (ac > .20) return _("-Early!");
+			if (ac > .90f) return _("Perfect!");
+			if (ac > .80f) return _("-Excellent!");
+			if (ac > .70f) return _("-Great!");
+			if (ac > .60f) return _(" -Good! ");
+			if (ac > .40f) return _("  -OK!  ");
+			if (ac > .20f) return _("-Early!");
 			return _("Way off!");
 		}
 	}
@@ -227,14 +227,14 @@ bool DanceGraph::difficulty(DanceDifficulty level, bool check_only) {
 	m_level = level;
 	for (auto& noteIt: m_activeNotes) noteIt = m_notes.end();
 	m_scoreFactor = 1;
-	if (!m_notes.empty()) m_scoreFactor = 10000.0 / (50 * m_notes.size()); // maxpoints / (notepoint * notes)
+	if (!m_notes.empty()) m_scoreFactor = 10000.0f / (50.0f * m_notes.size()); // maxpoints / (notepoint * notes)
 	updateJoinMenu();
 	return true;
 }
 
 /// Handles input and some logic
 void DanceGraph::engine() {
-	double time = m_audio.getPosition();
+	float time = m_audio.getPosition();
 	time -= config["audio/controller_delay"].f();
 	doUpdates();
 	// Handle stops
@@ -324,9 +324,9 @@ void DanceGraph::engine() {
 }
 
 /// Handles scoring and such
-void DanceGraph::dance(double time, input::Event const& ev) {
+void DanceGraph::dance(float time, input::Event const& ev) {
 	// Handle release events
-	if (ev.value == 0.0) {
+	if (ev.value == 0.0f) {
 		auto it = m_activeNotes[to_underlying(ev.button.id)];
 		if(it != m_notes.end()) {
 			if(!it->releaseTime && it->note.end > time + maxTolerance) {
@@ -388,7 +388,7 @@ void DanceGraph::drawArrow(int arrow_i, Texture& tex, float ty1, float ty2) {
 }
 
 /// Draws the dance graph
-void DanceGraph::draw(double time) {
+void DanceGraph::draw(float time) {
 	for (auto const& stop: m_song.stops) {
 		if (stop.first >= time) break;
 		if (time < stop.first + stop.second) { time = stop.first; break; } // Inside stop
@@ -396,8 +396,8 @@ void DanceGraph::draw(double time) {
 	}
 
 	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
-	dimensions.screenTop().middle(m_cx.get()).stretch(m_width.get(), 1.0);
-	ViewTrans view(0.5 * (dimensions.x1() + dimensions.x2()), 0.0, 0.75);  // Apply a per-player local perspective
+	dimensions.screenTop().middle(m_cx.get()).stretch(m_width.get(), 1.0f);
+	ViewTrans view(0.5f * (dimensions.x1() + dimensions.x2()), 0.0f, 0.75f);  // Apply a per-player local perspective
 	{
 		using namespace glmath;
 		// Some matrix magic to get the viewport right
@@ -434,12 +434,12 @@ void DanceGraph::draw(double time) {
 	drawInfo(time, dimensions); // Go draw some texts and other interface stuff
 }
 
-void DanceGraph::drawBeats(double time) {
+void DanceGraph::drawBeats(float time) {
 	UseTexture tex(m_beat);
 	glutil::VertexArray va;
 	float texCoord = 0.0f;
 	float tBeg = 0.0f, tEnd;
-	float w = 0.5 * m_pads * getScale();
+	float w = 0.5f * m_pads * getScale();
 	for (auto it = m_song.beats.begin(); it != m_song.beats.end() && tBeg < future; ++it, texCoord += texCoordStep, tBeg = tEnd) {
 		tEnd = *it - time;
 		//if (tEnd < past) continue;
@@ -456,7 +456,7 @@ void DanceGraph::drawBeats(double time) {
 }
 
 /// Draws a single note (or hold)
-void DanceGraph::drawNote(DanceNote& note, double time) {
+void DanceGraph::drawNote(DanceNote& note, float time) {
 	float tBeg = note.note.begin - time;
 	float tEnd = note.note.end - time;
 	int arrow_i = note.note.note;
@@ -470,7 +470,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 		if (mine) note.hitAnim.setRate(1.0);
 		note.hitAnim.setTarget(1.0, false);
 	}
-	double glow = note.hitAnim.get();
+	float glow = note.hitAnim.get();
 
 	{
 		UseShader us(getShader("dancenote"));
@@ -514,7 +514,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	}
 
 	// Draw a text telling how well we hit
-	double alpha = 1.0 - glow;
+	float alpha = 1.0 - glow;
 	if (!mine && note.isHit) {
 		std::string text;
 		if (note.releaseTime <= 0.0 && tBeg < tEnd) { // Is being held down and is a hold note
@@ -524,23 +524,23 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			text = note.score ? getRank(note.error) : "FAIL!";
 		}
 		if (!text.empty()) {
-			double sc = getScale() * 0.6 * arrowSize * (3.0 + glow);
+			float sc = getScale() * 0.6 * arrowSize * (3.0 + glow);
 			Transform trans(glmath::translate(glmath::vec3(0.0, 0.0, 0.5 * glow))); // Slightly elevated
 			ColorTrans c(Color::alpha(std::sqrt(alpha)));
 			m_popupText->render(_(text));
-			m_popupText->dimensions().middle(x).center(time2y(0.0)).stretch(sc, sc/2.0);
+			m_popupText->dimensions().middle(x).center(time2y(0.0f)).stretch(sc, sc/2.0f);
 			m_popupText->draw();
 		}
 	}
 }
 
 /// Draw popups and other info texts
-void DanceGraph::drawInfo(double /*time*/, Dimensions dimensions) {
+void DanceGraph::drawInfo(float /*time*/, Dimensions dimensions) {
 	if (!menuOpen()) {
 		// Draw scores
-		m_text.dimensions.screenBottom(-0.35).middle(0.32 * dimensions.w());
+		m_text.dimensions.screenBottom(-0.35f).middle(0.32f * dimensions.w());
 		m_text.draw(std::to_string(unsigned(getScore())));
-		m_text.dimensions.screenBottom(-0.32).middle(0.32 * dimensions.w());
+		m_text.dimensions.screenBottom(-0.32f).middle(0.32f * dimensions.w());
 		m_text.draw(std::to_string(unsigned(m_streak)) + "/"
 		  + std::to_string(unsigned(m_longestStreak)));
 	}

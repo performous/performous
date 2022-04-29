@@ -40,7 +40,7 @@ namespace {
 
 AudioBuffer::uFvec AudioBuffer::makePreviewBuffer() {
 	uFvec fvec(new_fvec(m_data.size() / 2));
-	float previewVol = float(config["audio/preview_volume"].i()) / 100.0;
+	float previewVol = float(config["audio/preview_volume"].i()) / 100.0f;
 	{
 		std::lock_guard<std::mutex> l(m_mutex);
 		for (size_t rpos = 0, bpos = 0; rpos < m_data.size(); rpos += 2, bpos ++) {
@@ -144,12 +144,12 @@ bool AudioBuffer::read(float* begin, size_t samples, std::int64_t pos, float vol
 	return true;
 }
 
-double AudioBuffer::duration() { return m_duration; }
+float AudioBuffer::duration() { return m_duration; }
 
 AudioBuffer::AudioBuffer(fs::path const& file, unsigned int rate, size_t size):
 	m_data(size), m_sps(rate * AUDIO_CHANNELS) {
 		auto ffmpeg = std::make_unique<AudioFFmpeg>(file, rate, std::ref(*this));
-		const_cast<double&>(m_duration) = ffmpeg->duration();
+		const_cast<float&>(m_duration) = ffmpeg->duration();
 		reader_thread = std::async(std::launch::async, [this, ffmpeg = std::move(ffmpeg)] {
 			auto errors = 0u;
 			std::unique_lock<std::mutex> l(m_mutex);
@@ -157,7 +157,7 @@ AudioBuffer::AudioBuffer(fs::path const& file, unsigned int rate, size_t size):
 				if (m_seek_asked) {
 					m_seek_asked = false;
 					m_write_pos = m_read_pos;
-					auto seek_pos = m_read_pos / double(AV_TIME_BASE);
+					auto seek_pos = m_read_pos / float(AV_TIME_BASE);
 
 					UnlockGuard<decltype(l)> unlocked(l); // release lock during seek
 					ffmpeg->seek(seek_pos);
@@ -290,7 +290,7 @@ AudioFFmpeg::AudioFFmpeg(fs::path const& filename, unsigned int rate, AudioCb au
 		swr_init(m_resampleContext.get());
 	}
 
-double FFmpeg::duration() const { return m_formatContext->duration / double(AV_TIME_BASE); }
+float FFmpeg::duration() const { return m_formatContext->duration / float(AV_TIME_BASE); }
 
 void FFmpeg::avformat_close_input(AVFormatContext *fctx) {
 	if (fctx) ::avformat_close_input(&fctx);
@@ -330,7 +330,7 @@ void FFmpeg::handleOneFrame() {
 	} while (!read_one);
 }
 
-void FFmpeg::seek(double time) {
+void FFmpeg::seek(float time) {
 	// AVSEEK_FLAG_BACKWARD makes sure we always get a keyframe BEFORE the
 	// request time, thus it allows us to drop some frames to reach the
 	// exact point where asked to seek
@@ -338,7 +338,7 @@ void FFmpeg::seek(double time) {
 	av_seek_frame(m_formatContext.get(), -1, time * AV_TIME_BASE, flags);
 }
 
-void AudioFFmpeg::seek(double time) {
+void AudioFFmpeg::seek(float time) {
 	FFmpeg::seek(time);
 	m_position_in_48k_frames = -1; //kill previous position
 }
@@ -359,9 +359,9 @@ void FFmpeg::handleSomeFrames() {
 		}
 		// frame is available here
 		if (frame->pts != int64_t(AV_NOPTS_VALUE)) {
-			auto new_position = double(frame->pts) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
+			auto new_position = float(frame->pts * av_q2d(m_formatContext->streams[m_streamId]->time_base));
 			if (m_formatContext->streams[m_streamId]->start_time != int64_t(AV_NOPTS_VALUE))
-				new_position -= double(m_formatContext->streams[m_streamId]->start_time) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
+				new_position -= float(m_formatContext->streams[m_streamId]->start_time) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
 			m_position = new_position;
 		}
 		processFrame(std::move(frame));
