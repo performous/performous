@@ -141,9 +141,9 @@ std::string const ConfigItem::getValue() const {
 	if (m_type == "int") {
 		int val = std::get<int>(m_value);
 		if (val >= 0 && val < int(m_enums.size())) return m_enums[val];
-		return numericFormat<int>(m_value, m_multiplier, m_step) + m_unit;
+		return numericFormat<int>(m_value, m_multiplier, m_step) + _(m_unit);
 	}
-	if (m_type == "float") return numericFormat<double>(m_value, m_multiplier, m_step) + m_unit;
+	if (m_type == "float") return numericFormat<double>(m_value, m_multiplier, m_step) + _(m_unit);
 	if (m_type == "bool") return std::get<bool>(m_value) ? _("Enabled") : _("Disabled");
 	if (m_type == "string") return std::get<std::string>(m_value);
 	if (m_type == "string_list") {
@@ -218,7 +218,9 @@ template <typename T> void ConfigItem::updateNumeric(xmlpp::Element& elem, int m
 	}
 	if (!ns.empty()) {
 		xmlpp::Element& e = dynamic_cast<xmlpp::Element&>(*ns[0]);
-		try { m_unit = getAttribute(e, "unit"); } catch (...) {}
+		try {
+			m_unit = getAttribute(e, "unit");
+		} catch (...) {}
 		std::string m;
 		try {
 			m = getAttribute(e, "multiplier");
@@ -466,7 +468,7 @@ unsigned int LanguageToLanguageId(const std::string& name) {
 	if (name == _("Slovak")) return 15;
 	if (name == _("Swedish")) return 16;
 	if (name == _("Chinese")) return 17;
-	
+
 	return 1337; // if no name matched return "Auto" which translates to computer language OR English.
 }
 
