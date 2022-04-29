@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-09-20 16:02-0300\n"
-"PO-Revision-Date: 2021-09-20 16:10-0300\n"
+"PO-Revision-Date: 2022-04-29 11:11+0200\n"
 "Last-Translator: Gregorio Litenstein <g.litenstein@gmail.com>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _;translate_noop\n"
 "X-Poedit-Basepath: .\n"
-"X-Generator: Poedit 3.0\n"
+"X-Generator: Poedit 2.3\n"
 "X-Poedit-SearchPath-0: ../game\n"
 "X-Poedit-SearchPath-1: ../data\n"
 
@@ -2283,120 +2283,6 @@ msgstr "Harmonic 2"
 msgid "Harmonic 3"
 msgstr "Harmonic 3"
 
-#~ msgid "Type of scaling the note graph."
-#~ msgstr "Wählt die Art der Skalierung der Notenanzeige."
-
-#~ msgid "Move Down"
-#~ msgstr "Runterschieben"
-
-#~ msgid "Fallback song encoding"
-#~ msgstr "Fallback-Lied-Codierung"
-
-#~ msgid "Pick the text codec used for song files that are not UTF-8."
-#~ msgstr "Wähle die Textkodierung für Lieder, die nicht in UTF-8 vorliegen."
-
-#~ msgid ""
-#~ "This tool is not yet available.\n"
-#~ "Configure paths by adding them\n"
-#~ "as command line parameters and\n"
-#~ "then save them in configuration menu."
-#~ msgstr ""
-#~ "Dieses Werkzeug ist leider noch nicht verfügbar.\n"
-#~ "Du kannst Pfade konfigurieren, indem du sie als\n"
-#~ "Befehlszeilenparameter angibst und dann im\n"
-#~ "Konfigurationsmenü speicherst."
-
-#~ msgid "Press any key to exit."
-#~ msgstr "Drücke eine beliebige Taste zum Beenden."
-
-#~ msgid "Windows users can also use ConfigureSongDirectory.bat script."
-#~ msgstr ""
-#~ "Windows-Benutzer können auch das ConfigureSongDirectory.bat Script "
-#~ "benutzen."
-
-#, fuzzy
-#~ msgid "Back to song browser"
-#~ msgstr "Zurück zum Songbrowser."
-
-#~ msgid "No Items up to now."
-#~ msgstr "Hier steht noch nichts."
-
-#~ msgid "Be the first to be listed here!"
-#~ msgstr "Trag dich als Erster in diese Liste ein!"
-
-#~ msgid "Song is broken!"
-#~ msgstr "Der Song ist fehlerhaft!"
-
-#, fuzzy
-#~ msgid "Loading instruments..."
-#~ msgstr "Lade Song ..."
-
-#, fuzzy
-#~ msgid "Loading graphics..."
-#~ msgstr "Lade Song ..."
-
-#, fuzzy
-#~ msgid "Random background..."
-#~ msgstr "Webcam als Hintergrund"
-
-#~ msgid "(press END to view hiscores)"
-#~ msgstr "(ENDE drücken um Highscores anzuzeigen)"
-
-#~ msgid "Gameplay settings."
-#~ msgstr "Spieleinstellungen"
-
-#~ msgid "Video and rendering settings."
-#~ msgstr "Video- und Rendereinstellungen"
-
-#~ msgid "Audio-related settings."
-#~ msgstr "Audioeinstellungen"
-
-#~ msgid "System paths."
-#~ msgstr "Systempfad"
-
-#~ msgid ""
-#~ "Part of sound card name or its number or empty to use the first available "
-#~ "device. Used currently for MIDI drum controllers."
-#~ msgstr ""
-#~ "Teil der Bezeichnung der Soundkarte oder die Nummer oder Freilassen für "
-#~ "das erste verfügbare Gerät. Momentan für MIDI Schlagzeug genutzt."
-
-#~ msgid "3D notes"
-#~ msgstr "3D Noten"
-
-#~ msgid ""
-#~ "Draw instrument notes as 3-dimensional objects. May hurt performance on "
-#~ "older hardware."
-#~ msgstr ""
-#~ "Zeichnet die Noten der Instrumente als dreidimensionale Objekte. "
-#~ "Deaktivieren kann auf älterer Hardware die Performance verbessern."
-
-#, fuzzy
-#~ msgid "Loading theme..."
-#~ msgstr "Lade Song ..."
-
-#, fuzzy
-#~ msgid "Loading background..."
-#~ msgstr "Lade Song ..."
-
-#, fuzzy
-#~ msgid "Loading user interface..."
-#~ msgstr "Lade Song ..."
-
-#, fuzzy
-#~ msgid "Audio..."
-#~ msgstr "Audio"
-
-#, fuzzy
-#~ msgid "Press Enter to configure (TODO: implement)"
-#~ msgstr "Bestätige Enter, um dies zu Konfigurieren"
-
-#~ msgid "Miscellaneous..."
-#~ msgstr "Sonstiges …"
-
-#~ msgid "System"
-#~ msgstr "System"
-
 #. Karaoke mode
 #. Hide pitch wave, notes and scoring.
 #. name: game/karaoke_mode
@@ -2540,3 +2426,117 @@ msgstr "Grün/Magenta"
 #: ../data/config/schema.xml:278
 msgid "Over/Under"
 msgstr "Über/Unter"
+
+#~ msgid "Type of scaling the note graph."
+#~ msgstr "Wählt die Art der Skalierung der Notenanzeige."
+
+#~ msgid "Move Down"
+#~ msgstr "Runterschieben"
+
+#~ msgid "Fallback song encoding"
+#~ msgstr "Fallback-Lied-Codierung"
+
+#~ msgid "Pick the text codec used for song files that are not UTF-8."
+#~ msgstr "Wähle die Textkodierung für Lieder, die nicht in UTF-8 vorliegen."
+
+#~ msgid ""
+#~ "This tool is not yet available.\n"
+#~ "Configure paths by adding them\n"
+#~ "as command line parameters and\n"
+#~ "then save them in configuration menu."
+#~ msgstr ""
+#~ "Dieses Werkzeug ist leider noch nicht verfügbar.\n"
+#~ "Du kannst Pfade konfigurieren, indem du sie als\n"
+#~ "Befehlszeilenparameter angibst und dann im\n"
+#~ "Konfigurationsmenü speicherst."
+
+#~ msgid "Press any key to exit."
+#~ msgstr "Drücke eine beliebige Taste zum Beenden."
+
+#~ msgid "Windows users can also use ConfigureSongDirectory.bat script."
+#~ msgstr ""
+#~ "Windows-Benutzer können auch das ConfigureSongDirectory.bat Script "
+#~ "benutzen."
+
+#, fuzzy
+#~ msgid "Back to song browser"
+#~ msgstr "Zurück zum Songbrowser."
+
+#~ msgid "No Items up to now."
+#~ msgstr "Hier steht noch nichts."
+
+#~ msgid "Be the first to be listed here!"
+#~ msgstr "Trag dich als Erster in diese Liste ein!"
+
+#~ msgid "Song is broken!"
+#~ msgstr "Der Song ist fehlerhaft!"
+
+#, fuzzy
+#~ msgid "Loading instruments..."
+#~ msgstr "Lade Song ..."
+
+#, fuzzy
+#~ msgid "Loading graphics..."
+#~ msgstr "Lade Song ..."
+
+#, fuzzy
+#~ msgid "Random background..."
+#~ msgstr "Webcam als Hintergrund"
+
+#~ msgid "(press END to view hiscores)"
+#~ msgstr "(ENDE drücken um Highscores anzuzeigen)"
+
+#~ msgid "Gameplay settings."
+#~ msgstr "Spieleinstellungen"
+
+#~ msgid "Video and rendering settings."
+#~ msgstr "Video- und Rendereinstellungen"
+
+#~ msgid "Audio-related settings."
+#~ msgstr "Audioeinstellungen"
+
+#~ msgid "System paths."
+#~ msgstr "Systempfad"
+
+#~ msgid ""
+#~ "Part of sound card name or its number or empty to use the first available "
+#~ "device. Used currently for MIDI drum controllers."
+#~ msgstr ""
+#~ "Teil der Bezeichnung der Soundkarte oder die Nummer oder Freilassen für "
+#~ "das erste verfügbare Gerät. Momentan für MIDI Schlagzeug genutzt."
+
+#~ msgid "3D notes"
+#~ msgstr "3D Noten"
+
+#~ msgid ""
+#~ "Draw instrument notes as 3-dimensional objects. May hurt performance on "
+#~ "older hardware."
+#~ msgstr ""
+#~ "Zeichnet die Noten der Instrumente als dreidimensionale Objekte. "
+#~ "Deaktivieren kann auf älterer Hardware die Performance verbessern."
+
+#, fuzzy
+#~ msgid "Loading theme..."
+#~ msgstr "Lade Song ..."
+
+#, fuzzy
+#~ msgid "Loading background..."
+#~ msgstr "Lade Song ..."
+
+#, fuzzy
+#~ msgid "Loading user interface..."
+#~ msgstr "Lade Song ..."
+
+#, fuzzy
+#~ msgid "Audio..."
+#~ msgstr "Audio"
+
+#, fuzzy
+#~ msgid "Press Enter to configure (TODO: implement)"
+#~ msgstr "Bestätige Enter, um dies zu Konfigurieren"
+
+#~ msgid "Miscellaneous..."
+#~ msgstr "Sonstiges …"
+
+#~ msgid "System"
+#~ msgstr "System"
