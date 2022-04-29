@@ -299,26 +299,20 @@ void Songs::reload_internal(fs::path const& parent) {
 	}
 }
 
-// Make std::find work with shared_ptrs and regular pointers
-static bool operator==(std::shared_ptr<Song> const& a, Song const* b) { return a.get() == b; }
-
 /// Store currently selected song on construction and restore the selection on destruction
 /// Assumes that m_filtered has been modified and finds the old selection by pointer value.
 /// Sets up math_cover so that the old selection is restored if possible, otherwise the first song is selected.
 class Songs::RestoreSel {
 	Songs& m_s;
-	Song const* m_sel;
+	std::weak_ptr<Song> m_sel;
   public:
 	/// constructor
-	RestoreSel(Songs& s): m_s(s), m_sel(s.empty() ? nullptr : &s.current()) {}
-	/// resets song to given song
-	void reset(Song const* song = nullptr) { m_sel = song; }
+	RestoreSel(Songs& s): m_s(s), m_sel(s.currentPtr()) {}
 	~RestoreSel() {
 		int pos = 0;
-		if (m_sel) {
+		if (auto song = m_sel.lock()) {
 			SongVector& f = m_s.m_filtered;
-			auto it = std::find(f.begin(), f.end(), m_sel);
-			m_s.math_cover.reset();
+			auto it = std::find(f.begin(), f.end(), song);
 			if (it != f.end()) pos = it - f.begin();
 		}
 		m_s.math_cover.setTarget(pos, m_s.size());
