@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14.5)
+cmake_minimum_required(VERSION 3.15.0)
 project(Performous CXX C)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -56,7 +56,7 @@ if (APPLE)
 	endif()
 endif()
 
-add_compile_options(-Wall $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wextra> $<$<CXX_COMPILER_ID:gcc>:-fcx-limited-range>)
+add_compile_options($<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall> $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wextra> $<$<CXX_COMPILER_ID:gcc>:-fcx-limited-range> $<$<CXX_COMPILER_ID:MSVC>:/W4> $<$<CXX_COMPILER_ID:MSVC>:/external:W0> $<$<CXX_COMPILER_ID:MSVC>:/external:anglebrackets>)
 
 if(WIN32)
 	set(CMAKE_CXX_FLAGS "-DWIN32_LEAN_AND_MEAN ${CMAKE_CXX_FLAGS}")
