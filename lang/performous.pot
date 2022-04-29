@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-29 11:05+0200\n"
+"POT-Creation-Date: 2022-04-29 11:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -745,6 +745,12 @@ msgstr ""
 msgid "Words that should be ignored when sorting."
 msgstr ""
 
+#. Sort order
+#. Currently active sort order.
+#: ../data/config/schema.xml:424
+msgid " pixels"
+msgstr ""
+
 #. Windowed width
 #. The width of the window.
 #. name: graphic/window_width
@@ -924,6 +930,12 @@ msgstr ""
 msgid "Some modes may only get activated in fullscreen mode."
 msgstr ""
 
+#. Failure volume
+#. The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!
+#: ../data/config/schema.xml:372
+msgid " %"
+msgstr ""
+
 #. Stereo3D separation
 #. The strength of the effect. Experiment with different settings for best results.
 #. name: graphic/stereo3dseparation
@@ -1004,6 +1016,12 @@ msgid ""
 "Use 0 to autodetect or a number starting from 1 to choose specific device."
 msgstr ""
 
+#. Text quality
+#. Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster.
+#: ../data/config/schema.xml:308
+msgid "x"
+msgstr ""
+
 #. SVG quality
 #. Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster.
 #. name: graphic/svg_lod
@@ -1063,6 +1081,12 @@ msgid ""
 "Framerate limit of 100 FPS is removed and the game instead renders at full "
 "speed. FPS values are printed to console. Please note that the display "
 "drivers may still limit the rendering speed to the screen refresh rate."
+msgstr ""
+
+#. Audio/controller latency
+#. Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use 'Ctrl + [' or 'Ctrl + ]' to adjust while performing.
+#: ../data/config/schema.xml:346
+msgid " ms"
 msgstr ""
 
 #. Suggested latency
@@ -1264,6 +1288,12 @@ msgstr ""
 #. value: false
 #: ../data/config/schema.xml:379
 msgid "Send captured singing voice to speakers."
+msgstr ""
+
+#. Pass-through volume ratio
+#. How much voice is amplified compared to the music.
+#: ../data/config/schema.xml:382
+msgid " x"
 msgstr ""
 
 #. Pass-through volume ratio

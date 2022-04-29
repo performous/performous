@@ -82,6 +82,25 @@ for filename in xmlfiles:
                 f'msgid "{text}"\n'
                 'msgstr ""\n'
             )
+        if elem.tag in ("ui"):
+            text = (
+                elem.attrib["unit"]
+                .replace('\\', '\\\\')
+                .replace('"', '\\"')
+                .replace('\n', '\\n')
+            )
+            s = parent[elem].find("short").text
+            l = parent[elem].find("long").text
+            info = f'#. {s}\n'
+            info += f'#. {l}\n'
+            for k, v in parent[parent[elem]].attrib.items():
+                info += f"#. {k}: {v}\n"
+            po[text] = (
+                f'\n{info}'
+                f'#: {filename}:{elem.lineno}\n'
+                f'msgid "{text}"\n'
+                'msgstr ""\n'
+            )
 
 with open(pofile, "w") as f:
     f.write(HEADER)
