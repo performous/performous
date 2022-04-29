@@ -46,7 +46,7 @@ class ConfigItem {
 	void removeAllEnums(); /// Removes all the enum values from this entry.
 	void selectEnum(std::string const& name); ///< Set integer value by enum name
 	std::string const getEnumName() const; ///< Returns the selected enum option's text
-	
+
   private:
 	template <typename T> void updateNumeric(xmlpp::Element& elem, int mode); ///< Used internally for loading XML
 	void verifyType(std::string const& t) const; ///< throws std::logic_error if t != type
@@ -69,7 +69,7 @@ class ConfigItem {
 	int m_sel;
 };
 
-typedef std::map<std::string, ConfigItem> Config;
+using Config = std::map<std::string, ConfigItem>;
 extern Config config; ///< A global variable that contains all config items
 
 /** Read config schema and configuration from XML files **/
@@ -91,5 +91,5 @@ struct MenuEntry {
 int PaHostApiNameToHostApiTypeId(const std::string& name);
 unsigned int LanguageToLanguageId(const std::string& name);
 
-typedef std::vector<MenuEntry> ConfigMenu;
+using ConfigMenu = std::vector<MenuEntry>;
 extern ConfigMenu configMenu;
