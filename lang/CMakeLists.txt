@@ -9,7 +9,13 @@ file(GLOB _languages *.po)
 set(_mofiles)
 foreach(_pofile ${_languages})
 	get_filename_component(_language ${_pofile} NAME_WE)
-	set(_mofile ${CMAKE_CURRENT_BINARY_DIR}/${_language}.mo)
+	if(WIN32)
+		# For some reason we need this structure on Windows to make localization work for a local build folder without install.
+		set(_mofile ${CMAKE_CURRENT_BINARY_DIR}/${_language}/LC_MESSAGES/${CMAKE_PROJECT_NAME}.mo)
+	else()
+		set(_mofile ${CMAKE_CURRENT_BINARY_DIR}/${_language}.mo)
+	endif()
+
 	add_custom_command(
 		OUTPUT ${_mofile}
 		COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} -v ${_pofile} -o ${_mofile}
