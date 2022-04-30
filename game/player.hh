@@ -73,6 +73,10 @@ using PlayerId = unsigned;
 struct PlayerItem {
 	PlayerItem() = default;
 	PlayerItem(const PlayerId& _id) : id{_id} {}
+	PlayerItem(PlayerItem const&) = default;
+	PlayerItem& operator=(PlayerItem const&) = default;
+	PlayerItem(PlayerItem&&) = default;
+	PlayerItem& operator=(PlayerItem&&) = default;
 
 	PlayerId id; ///< unique identifier for this PlayerItem, Link to hiscore
 

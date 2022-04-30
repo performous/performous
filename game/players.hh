@@ -35,8 +35,8 @@ struct PlayersException: public std::runtime_error {
  */
 class Players {
   private:
-	typedef std::set<PlayerItem> players_t;
-	typedef std::vector<PlayerItem> fplayers_t;
+	using players_t = std::set<std::shared_ptr<PlayerItem>>;
+	using fplayers_t = std::vector<std::shared_ptr<PlayerItem>>;
 
   public:
 	Players(const Players&) = delete;
@@ -58,6 +58,7 @@ class Players {
 
 	/// add a player with a displayed name and an optional picture; if no id is given one will be assigned
 	void addPlayer (std::string const& name, std::string const& picture = "", std::optional<PlayerId> id = std::nullopt);
+	void addPlayer(PlayerItem const&);
 
 	/// const array access
 	PlayerItem const& operator[](unsigned pos) const;
@@ -76,7 +77,7 @@ class Players {
 	/// sets margins for animation
 	void setAnimMargins(double left, double right) { math_cover.setMargins(left, right); }
 	/// @return current PlayerItem (the copy is very cheap at the moment)
-	PlayerItem current() const;
+	PlayerItem const& current() const;
 	/// filters playerlist by regular expression
 	void setFilter(std::string const& regex);
 
