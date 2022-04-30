@@ -1,0 +1,13 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Wiki
+    url: "https://github.com/performous/performous/wiki/"
+    about: "Consult the wiki first, it might already contain the information you are looking for"
+
+  - name: Question
+    url: "https://github.com/performous/performous/discussions"
+    about: "Please ask questions related to usage/setup/support/non-issue development discussion in the Discussions section"
+
+  - name: Question
+    url: "https://discord.gg/NS3m3ad"
+    about: "Alternatively, ask on Discord in the channel user_support"
