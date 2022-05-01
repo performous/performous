@@ -299,13 +299,6 @@ void writeConfig(bool system) {
 		entryNode->set_attribute("name", name);
 		std::string type = item.get_type();
 		entryNode->set_attribute("type", type);
-		if (name == "graphic/stereo3d") {
-			std::string prev3DState = item.getOldValue();
-			if (prev3DState != std::to_string(item.b()) && !prev3DState.empty()) {
-				std::clog << "video/info: Stereo 3D configuration changed, will reset shaders." << std::endl;
-				Game::getSingletonPtr()->window().resetShaders();
-			}
-		}
 		if (name == "audio/backend") {
 			std::string currentBackEnd = Audio::backendConfig().getOldValue();
 			int oldValue = PaHostApiNameToHostApiTypeId(currentBackEnd);
