@@ -84,12 +84,12 @@ void ScreenSing::enter() {
 void ScreenSing::prepareVoicesMenu(size_t moveSelectionTo) {
 		VocalTracks const& tracks = m_song->vocalTracks;
 		m_menu.clear();
-		m_menu.add(MenuOption(_("Start"), _("Start performing")).call([this]{ setupVocals(); }));
+		m_menu.add(MenuOption(_("Start"), _("Start performing"))).call([this]{ setupVocals(); });
 
 		if (players() > 1) { // Duet toggle
 			m_duet.addEnum(_("Duet mode"));
 			m_duet.addEnum(_("Normal mode"));
-			m_menu.add(MenuOption("", _("Switch between duet and regular singing mode")).changer(m_duet,"song/duet"));
+			m_menu.add(MenuOption("", _("Switch between duet and regular singing mode"))).changer(m_duet,"song/duet");
 		}
 		// Add vocal track selector for each player
 		for (size_t player = 0; player < players(); ++player) {
@@ -99,13 +99,13 @@ void ScreenSing::prepareVoicesMenu(size_t moveSelectionTo) {
 				if (player % 2) vocalTrack.selectEnum(m_song->getVocalTrack(SongParserUtil::DUET_P2).name);  // Every other player gets the second track
 				else vocalTrack.selectEnum(m_song->getVocalTrack(TrackName::LEAD_VOCAL).name);
 			}
-			m_menu.add(MenuOption("", _("Change vocal track")).changer(vocalTrack));
+			m_menu.add(MenuOption("", _("Change vocal track"))).changer(vocalTrack);
 			if (m_duet.i() == 1) {
 				vocalTrack.selectEnum(m_song->getVocalTrack(SongParserUtil::DUET_BOTH).name);
 				break; // If duet mode is disabled, the vocal track selection for players beyond the first is ignored anyway.
 			}
 		}
-		m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
+		m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"))).screen("Songs");
 		m_menu.select(moveSelectionTo);
 		m_menu.open();
 		if (tracks.size() <= 1) setupVocals();  // No duet menu
@@ -147,15 +147,15 @@ void ScreenSing::setupVocals() {
 void ScreenSing::createPauseMenu() {
 	m_menu.clear();
 	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
-	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning")).screen("Sing"));
+	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning"))).screen("Sing");
 	Game* gm = Game::getSingletonPtr();
 	if(!gm->getCurrentPlayList().isEmpty() || config["game/autoplay"].b()){
-		m_menu.add(MenuOption(_("Skip"), _("Skip current song")).screen("Playlist"));
+		m_menu.add(MenuOption(_("Skip"), _("Skip current song"))).screen("Playlist");
 	}
-	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).call([]() {
+	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"))).call([]() {
 		Game* gm = Game::getSingletonPtr();
 		gm->activateScreen("Songs");
-	}));
+	});
 	m_menu.close();
 }
 

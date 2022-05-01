@@ -548,28 +548,28 @@ std::unique_ptr<fvec_t, void(*)(fvec_t*)> ScreenSongs::previewBeatsBuffer = std:
 
 void ScreenSongs::createPlaylistMenu() {
 	m_menu.clear();
-	m_menu.add(MenuOption(_("Play"), "").call([this]() {
+	m_menu.add(MenuOption(_("Play"), "")).call([this]() {
 		Game* tm = Game::getSingletonPtr();
 		tm->getCurrentPlayList().addSong(m_songs.currentPtr());
 		m_menuPos = 1;
 		m_menu.close();
 		sing();
-	}));
-	m_menu.add(MenuOption(_("Shuffle"), "").call([this]() {
+	});
+	m_menu.add(MenuOption(_("Shuffle"), "")).call([this]() {
 		Game* tm = Game::getSingletonPtr();
 		tm->getCurrentPlayList().shuffle();
 		m_menuPos = 1;
 		m_menu.close();
-	}));
-	m_menu.add(MenuOption(_("View playlist"), "").screen("Playlist"));
-	m_menu.add(MenuOption(_("Clear playlist"), "").call([this]() {
+	});
+	m_menu.add(MenuOption(_("View playlist"), "")).screen("Playlist");
+	m_menu.add(MenuOption(_("Clear playlist"), "")).call([this]() {
 		Game* tm = Game::getSingletonPtr();
 		tm->getCurrentPlayList().clear();
 		m_menuPos = 1;
 		m_menu.close();
-	}));
-	m_menu.add(MenuOption(_("Back"), "").call([this]() {
+	});
+	m_menu.add(MenuOption(_("Back"), "")).call([this]() {
 		m_menuPos = 1;
 		m_menu.close();
-	}));
+	});
 }

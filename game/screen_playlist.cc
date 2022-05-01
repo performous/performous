@@ -177,7 +177,7 @@ Texture& ScreenPlaylist::getCover(Song const& song) {
 
 void ScreenPlaylist::createEscMenu() {
 	overlay_menu.clear();
-	overlay_menu.add(MenuOption(_("Continue"), _("Continue playing")).call([this]() {
+	overlay_menu.add(MenuOption(_("Continue"), _("Continue playing"))).call([this]() {
 		Game* gm = Game::getSingletonPtr();
 		Screen* s = gm->getScreen("Sing");
 		ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
@@ -190,23 +190,23 @@ void ScreenPlaylist::createEscMenu() {
 			ss->setSong(m_songs[randomsong]);
 		}
 		gm->activateScreen("Sing");
-	}));
-	overlay_menu.add(MenuOption(_("Add songs"), _("Open the song browser to add more songs")).screen("Songs"));
-	overlay_menu.add(MenuOption(_("Shuffle"), _("Randomize the order of the playlist")).call([this]() {
+	});
+	overlay_menu.add(MenuOption(_("Add songs"), _("Open the song browser to add more songs"))).screen("Songs");
+	overlay_menu.add(MenuOption(_("Shuffle"), _("Randomize the order of the playlist"))).call([this]() {
 		Game* tm = Game::getSingletonPtr();
 		tm->getCurrentPlayList().shuffle();
 		overlay_menu.close();
 		createSongListMenu();
-	}));
-	overlay_menu.add(MenuOption(_("Clear and exit"), _("Remove all the songs from the list")).call([this]() {
+	});
+	overlay_menu.add(MenuOption(_("Clear and exit"), _("Remove all the songs from the list"))).call([this]() {
 		Game* tm = Game::getSingletonPtr();
 		tm->getCurrentPlayList().clear();
 		overlay_menu.close();
 		tm->activateScreen("Songs");
-	}));
-	overlay_menu.add(MenuOption(_("Back"), _("Back to playlist viewer")).call([this]() {
+	});
+	overlay_menu.add(MenuOption(_("Back"), _("Back to playlist viewer"))).call([this]() {
 		overlay_menu.close();
-	}));
+	});
 }
 
 void ScreenPlaylist::drawMenu() {
@@ -250,7 +250,7 @@ void ScreenPlaylist::draw_menu_options() {
 	const float x = -0.35; // x xcoordinate from screen center, the menu should be aligned left of the center therefore it´s negative.n
 	const float start_y = -0.15;
 	const float sel_margin = 0.04;
-	const MenuOptions opts = songlist_menu.getOptions();
+	const MenuOptions &opts = songlist_menu.getOptions();
 	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get()-songlist_menu.getSubmenuLevel()));
 	// Determine from which item to start
 	int start_i = std::min((int)songlist_menu.curIndex() - 1, (int)opts.size() - (int)showopts
@@ -331,19 +331,19 @@ void ScreenPlaylist::createSongListMenu() {
 			songinfo = songinfo + "                           >"; //FIXME: ugly hack to make the text scale so it fits on screen!
 		}
 		//then add it to the menu:
-		songlist_menu.add(MenuOption(_(songinfo.c_str()),_("Press enter to view song options")).call([this, count]() {
+		songlist_menu.add(MenuOption(_(songinfo.c_str()),_("Press enter to view song options"))).call([this, count]() {
 			createSongMenu(count);
 			overlay_menu.open();
-		}));
+		});
 		oss_playlist.str("");
 		count++;
 		totaldurationSeconds += song->getDurationSeconds();
 		totaldurationSeconds += config["game/playlist_screen_timeout"].i();
 	}
-	songlist_menu.add(MenuOption(_("View more options"),_("View general playlist settings")).call([this]() {
+	songlist_menu.add(MenuOption(_("View more options"),_("View general playlist settings"))).call([this]() {
 		createEscMenu();
 		overlay_menu.open();
-	}));
+	});
 }
 
 void ScreenPlaylist::createSongMenu(int songNumber) {
@@ -352,15 +352,15 @@ void ScreenPlaylist::createSongMenu(int songNumber) {
 	std::string firstDesc = songNumber >= 2 ?
 		_("Ignore the playlist's order and play this song first") :
 		_("Start the song already!");
-	overlay_menu.add(MenuOption(firstOption, firstDesc).call([songNumber]() {
+	overlay_menu.add(MenuOption(firstOption, firstDesc)).call([songNumber]() {
 		Game* gm = Game::getSingletonPtr();
 		Screen* s = gm->getScreen("Sing");
 		ScreenSing* ss = dynamic_cast<ScreenSing*>(s);
 		assert(ss);
 		ss->setSong(gm->getCurrentPlayList().getSong(songNumber - 1));
 		gm->activateScreen("Sing");
-	}));
-	overlay_menu.add(MenuOption(_("Remove"), _("Remove this song from the list")).call([this, songNumber]() {
+	});
+	overlay_menu.add(MenuOption(_("Remove"), _("Remove this song from the list"))).call([this, songNumber]() {
 		Game* gm = Game::getSingletonPtr();
 		// Minus 1 so it doesn´t remove #2 when you´ve selected #1
 		gm->getCurrentPlayList().removeSong(songNumber - 1);
@@ -370,28 +370,28 @@ void ScreenPlaylist::createSongMenu(int songNumber) {
 		} else {
 			createSongListMenu();
 		}
-	}));
+	});
 	if (songNumber >= 2) { //can't move up first song
-		overlay_menu.add(MenuOption(_("Move up"), _("Move this song up the list")).call([this, songNumber]() {
+		overlay_menu.add(MenuOption(_("Move up"), _("Move this song up the list"))).call([this, songNumber]() {
 			Game* gm = Game::getSingletonPtr();
 			gm->getCurrentPlayList().swap(songNumber -1, songNumber -2);
 			createSongListMenu();
 			overlay_menu.close();
-		}));
+		});
 	}
 	Game* gm = Game::getSingletonPtr();
 	int size = gm->getCurrentPlayList().getList().size();
 	if (songNumber < size) { //can't move down the last song
-		overlay_menu.add(MenuOption(_("Move down"), _("Move this song down the list")).call([this, songNumber]() {
+		overlay_menu.add(MenuOption(_("Move down"), _("Move this song down the list"))).call([this, songNumber]() {
 			Game* gm = Game::getSingletonPtr();
 			gm->getCurrentPlayList().swap(songNumber -1, songNumber);
 			createSongListMenu();
 			overlay_menu.close();
-		}));
+		});
 	}
-	overlay_menu.add(MenuOption(_("Back"), _("Back to playlist viewer")).call([this]() {
+	overlay_menu.add(MenuOption(_("Back"), _("Back to playlist viewer"))).call([this]() {
 		overlay_menu.close();
-	}));
+	});
 }
 
 void ScreenPlaylist::triggerSongListUpdate() {

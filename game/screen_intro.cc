@@ -84,7 +84,7 @@ void ScreenIntro::draw_menu_options() {
 	const float x = -0.35;
 	const float start_y = -0.1;
 	const float sel_margin = 0.03;
-	const MenuOptions opts = m_menu.getOptions();
+	const MenuOptions &opts = m_menu.getOptions();
 	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get()-m_menu.getSubmenuLevel()));
 	theme->back_h.dimensions.fixedHeight(0.038f);
 	theme->back_h.dimensions.stretch(m_menu.dimensions.w(), theme->back_h.dimensions.h());
@@ -171,8 +171,8 @@ void ScreenIntro::populateMenu() {
 	MenuImage imgConfig(new Texture(findFile("intro_configure.svg")));
 	MenuImage imgQuit(new Texture(findFile("intro_quit.svg")));
 	m_menu.clear();
-	m_menu.add(MenuOption(translate_noop("Perform"), translate_noop("Start performing!"), imgSing).screen("Songs"));
-	m_menu.add(MenuOption(translate_noop("Practice"), translate_noop("Check your skills or test the microphones."), imgPractice).screen("Practice"));
+	m_menu.add(MenuOption(translate_noop("Perform"), translate_noop("Start performing!"), imgSing)).screen("Songs");
+	m_menu.add(MenuOption(translate_noop("Practice"), translate_noop("Check your skills or test the microphones."), imgPractice)).screen("Practice");
 	// Configure menu + submenu options
 	MenuOptions configmain;
 	for (auto const& submenu: configMenu) {
@@ -181,15 +181,18 @@ void ScreenIntro::populateMenu() {
 			// Process items that belong to that submenu
 			for (auto const& item: submenu.items) {
 				ConfigItem& c = config[item];
-				opts.push_back(MenuOption(c.getShortDesc(), c.getLongDesc()).changer(c));
+				opts.emplace_back(MenuOption(c.getShortDesc(), c.getLongDesc()));
+                                opts.back().changer(c);
 			}
-			configmain.push_back(MenuOption(submenu.shortDesc, submenu.longDesc, imgConfig).submenu(opts));
+			configmain.emplace_back(MenuOption(submenu.shortDesc, submenu.longDesc, imgConfig));
+                        configmain.back().submenu(std::move(opts));
 		} else {
-			configmain.push_back(MenuOption(submenu.shortDesc, submenu.longDesc, imgConfig).screen(submenu.name));
+			configmain.emplace_back(MenuOption(submenu.shortDesc, submenu.longDesc, imgConfig));
+                        configmain.back().screen(submenu.name);
 		}
 	}
-	m_menu.add(MenuOption(translate_noop("Configure"), translate_noop("Configure audio and game options."), imgConfig).submenu(configmain));
-	m_menu.add(MenuOption(translate_noop("Quit"), translate_noop("Leave the game."), imgQuit).screen(""));
+	m_menu.add(MenuOption(translate_noop("Configure"), translate_noop("Configure audio and game options."), imgConfig)).submenu(std::move(configmain));
+	m_menu.add(MenuOption(translate_noop("Quit"), translate_noop("Leave the game."), imgQuit)).screen("");
 }
 
 #ifdef USE_WEBSERVER

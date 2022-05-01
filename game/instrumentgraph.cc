@@ -54,9 +54,9 @@ bool InstrumentGraph::dead() const { return m_jointime != m_jointime || m_dead >
 void InstrumentGraph::setupPauseMenu() {
 	m_menu.clear();
 	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
-	m_menu.add(MenuOption(_("Rejoin"), _("Change selections")).changer(m_rejoin));
-	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning")).screen("Sing"));
-	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
+	m_menu.add(MenuOption(_("Rejoin"), _("Change selections"))).changer(m_rejoin);
+	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning"))).screen("Sing");
+	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"))).screen("Songs");
 }
 
 
