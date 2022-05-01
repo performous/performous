@@ -18,7 +18,7 @@ layout (std140) uniform danceNote {
 	float clock;
 	float scale;
 	vec2 position;
-	float padding[2];
+	float dnPadding[2];
 };
 
 out vData {
