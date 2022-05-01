@@ -185,14 +185,6 @@ void ConfigItem::addEnum(std::string name) {
 	m_step = 1;
 }
 
-void ConfigItem::removeAllEnums() {
-	verifyType("int");
-	m_enums.clear();
-	m_min = 0;
-	m_max = int(m_enums.size() - 1);
-	m_step = 1;
-}
-
 void ConfigItem::selectEnum(std::string const& name) {
 	auto it = std::find(m_enums.begin(), m_enums.end(), name);
 	if (it == m_enums.end()) throw std::runtime_error("Enum value " + name + " not found in " + m_shortDesc);
@@ -497,11 +489,8 @@ void populateBackends (const std::list<std::string>& backendList) {
 	backendConfig.setOldValue(backendConfig.getEnumName());
 }
 
-void populateLanguages(const std::map<std::string, std::string>& languages, bool refreshOutDated) {
+void populateLanguages(const std::map<std::string, std::string>& languages) {
 	ConfigItem& languageConfig = config["game/language"];
-	if (refreshOutDated) {
-		languageConfig.removeAllEnums();
-	}
 	for (auto const& language : languages) {
 		languageConfig.addEnum(language.second);
 	}
