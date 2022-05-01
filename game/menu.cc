@@ -33,9 +33,10 @@ bool MenuOption::isActive() const {
 
 Menu::Menu(): dimensions(), m_open(true) { clear(); }
 
-void Menu::add(MenuOption opt) {
-	root_options.push_back(opt);
+MenuOption &Menu::add(MenuOption opt) {
+	root_options.emplace_back(std::move(opt));
 	clear(true); // Adding resets menu stack
+	return root_options.back();
 }
 
 void Menu::move(int dir) {

@@ -27,6 +27,12 @@ public:
 	/// @param img Image filename
 	MenuOption(const std::string& nm, const std::string& comm, MenuImage img = MenuImage());
 
+	MenuOption(const MenuOption&) = delete;
+	MenuOption &operator=(const MenuOption&) = delete;
+
+	MenuOption(MenuOption&&) = default;
+	MenuOption &operator=(MenuOption&&) = default;
+
 	/// Make the option change values of a ConfigItem.
 	MenuOption& changer(ConfigItem& val, std::string virtOptName = {}) {
 		type = Type::CHANGE_VALUE;
@@ -37,7 +43,7 @@ public:
 	/// Make the option set a given value for ConfigItem and close the menu.
 	MenuOption& setter(ConfigItem& val, ConfigItem newval) { type = Type::SET_AND_CLOSE; value = &val; newValue = newval; return *this; }
 	/// Make the option open a submenu
-	MenuOption& submenu(MenuOptions opts) { type = Type::OPEN_SUBMENU; options = opts; return *this; }
+	MenuOption& submenu(MenuOptions opts) { type = Type::OPEN_SUBMENU; options = std::move(opts); return *this; }
 	/// Make the option activate a screeen
 	MenuOption& screen(std::string const& scrn) { type = Type::ACTIVATE_SCREEN; newValue = scrn; return *this; }
 	/// Make the option call a callback
@@ -73,8 +79,8 @@ class Menu {
 public:
 	/// constructor
 	Menu();
-	/// add a menu option
-	void add(MenuOption opt);
+	/// add a menu option, returns the one added
+	MenuOption &add(MenuOption opt);
 	/// move the selection
 	void move(int dir = 1);
 	/// set selection
@@ -99,7 +105,7 @@ public:
 	MenuOption& back() { return root_options.back(); }
 	const MenuOptions::const_iterator begin() const { return menu_stack.back()->begin(); }
 	const MenuOptions::const_iterator end() const { return menu_stack.back()->end(); }
-	const MenuOptions getOptions() const { return *menu_stack.back(); }
+	const MenuOptions &getOptions() const { return *menu_stack.back(); }
 
 	Dimensions dimensions;
 

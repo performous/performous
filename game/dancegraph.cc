@@ -114,7 +114,7 @@ void DanceGraph::setupJoinMenu() {
 		}
 		m_selectedTrack = ConfigItem(ol); // Create a ConfigItem from the option list
 		m_selectedTrack.select(cur); // Set the selection to current level
-		m_menu.add(MenuOption("", _("Select track")).changer(m_selectedTrack)); // MenuOption that cycles the options
+		m_menu.add(MenuOption("", _("Select track"))).changer(m_selectedTrack); // MenuOption that cycles the options
 		m_menu.back().setDynamicName(m_trackOpt); // Set the title to be dynamic
 	}
 	{ // Create difficulty opt
@@ -130,10 +130,10 @@ void DanceGraph::setupJoinMenu() {
 		}
 		m_selectedDifficulty = ConfigItem(ol); // Create a ConfigItem from the option list
 		m_selectedDifficulty.select(cur); // Set the selection to current level
-		m_menu.add(MenuOption("", _("Select difficulty")).changer(m_selectedDifficulty)); // MenuOption that cycles the options
+		m_menu.add(MenuOption("", _("Select difficulty"))).changer(m_selectedDifficulty); // MenuOption that cycles the options
 		m_menu.back().setDynamicName(m_difficultyOpt); // Set the title to be dynamic
 	}
-	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
+	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"))).screen("Songs");
 }
 
 void DanceGraph::updateJoinMenu() {
