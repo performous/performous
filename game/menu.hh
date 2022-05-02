@@ -34,24 +34,23 @@ public:
 	MenuOption &operator=(MenuOption&&) = default;
 
 	/// Make the option change values of a ConfigItem.
-	MenuOption& changer(ConfigItem& val, std::string virtOptName = {}) {
+	void changer(ConfigItem& val, std::string virtOptName = {}) {
 		type = Type::CHANGE_VALUE;
 		value = &val;
 		if (!virtOptName.empty()) { virtualName = virtOptName; }
-		return *this;
 	}
 	/// Make the option set a given value for ConfigItem and close the menu.
-	MenuOption& setter(ConfigItem& val, ConfigItem newval) { type = Type::SET_AND_CLOSE; value = &val; newValue = newval; return *this; }
+	void setter(ConfigItem& val, ConfigItem newval) { type = Type::SET_AND_CLOSE; value = &val; newValue = newval; }
 	/// Make the option open a submenu
-	MenuOption& submenu(MenuOptions opts) { type = Type::OPEN_SUBMENU; options = std::move(opts); return *this; }
+	void submenu(MenuOptions opts) { type = Type::OPEN_SUBMENU; options = std::move(opts); }
 	/// Make the option activate a screeen
-	MenuOption& screen(std::string const& scrn) { type = Type::ACTIVATE_SCREEN; newValue = scrn; return *this; }
+	void screen(std::string const& scrn) { type = Type::ACTIVATE_SCREEN; newValue = scrn; }
 	/// Make the option call a callback
-	MenuOption& call(MenuOptionCallback f) { type = Type::CALLBACK_FUNCTION; callback = f; return *this; }
+	void call(MenuOptionCallback f) { type = Type::CALLBACK_FUNCTION; callback = f; }
 	/// Sets name to follow a reference
-	MenuOption& setDynamicName(std::string& nm) { namePtr = &nm; return *this; }
+	void setDynamicName(std::string& nm) { namePtr = &nm; }
 	/// Sets comment to follow a reference
-	MenuOption& setDynamicComment(std::string& comm) { commentPtr = &comm; return *this; }
+	void setDynamicComment(std::string& comm) { commentPtr = &comm; }
 	/// Return name
 	std::string getName() const;
 	/// Return virtual name (for options living only inside the screen)
