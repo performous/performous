@@ -102,11 +102,12 @@ pkg_check_modules(deps REQUIRED IMPORTED_TARGET glib-2.0 gio-2.0 gobject-2.0)
 set(SELF_BUILT_GIT_BASE "https://github.com/performous" CACHE STRING "base path of the git trees used for self built dependencies")
 set(SELF_BUILT_AUBIO "NEVER" CACHE STRING "rule to allow self build of Aubio dependency library [NEVER*|AUTO|ALWAYS]")
 set(SELF_BUILT_JSON "NEVER" CACHE STRING "rule to allow self build of Json dependency library [NEVER*|AUTO|ALWAYS]")
+set(SELF_BUILT_WEBSERVER "NEVER" CACHE STRING "rule to allow self build of Webserver dependency library [NEVER*|AUTO|ALWAYS]")
 
 set(Aubio_REQUIRED_VERSION "0.4.9")
 
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM Json Ced Aubio)
+foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM Json Ced Aubio Webserver)
 	find_package(${lib} ${${lib}_REQUIRED_VERSION} REQUIRED)
 	message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
 	target_include_directories(performous SYSTEM PRIVATE ${${lib}_INCLUDE_DIRS})
