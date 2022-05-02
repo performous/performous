@@ -36,7 +36,5 @@ class ScreenIntro : public Screen {
 	AnimValue m_submenuAnim;
 	AnimValue m_webserverNoticeTimeout;
 	int webserversetting = 0;
-	#ifdef USE_WEBSERVER
 	bool m_drawNotice = false;
-	#endif
 };

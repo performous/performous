@@ -38,11 +38,16 @@ class RequestHandler
         Songs& m_songs;
 };
 #else
+#include <string>
+
 class Songs;
 
-class RequestHandler
-{
+class RequestHandler {
 public:
     RequestHandler(Songs&) {}
+    RequestHandler(std::string, Songs&) {}
+
+    void open() { return ; }
+    void close() { return ; }
 };
 #endif
