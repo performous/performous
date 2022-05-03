@@ -16,7 +16,8 @@ set(Webserver_GIT_VERSION "v0.10.7")
 if(SELF_BUILT_WEBSERVER STREQUAL "ALWAYS")
 	message(STATUS "Webserver forced to build from source")
 	libfetch_git_pkg(Webserver
-		REPOSITORY https://github.com/yhirose/cpp-httplib.git
+		#REPOSITORY https://github.com/yhirose/cpp-httplib.git
+		REPOSITORY ${SELF_BUILT_GIT_BASE}/cpp-httplib.git
 		REFERENCE  ${Webserver_GIT_VERSION}
 		FIND_PATH  httplib.h
 	)

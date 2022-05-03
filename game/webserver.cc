@@ -38,7 +38,11 @@ void WebServer::StartServer(int tried, bool fallbackPortInUse) {
 #ifdef USE_WEBSERVER
 		m_server->open().wait();
 #else
-		m_server->open();
+		if(config["game/webserver_access"].i() == 1) {
+			m_server->open("127.0.0.1", std::stoi(portToUse));
+		} else {
+			m_server->open("0.0.0.0", std::stoi(portToUse));
+		}
 #endif
 		std::string message = getIPaddr() + ":" +  portToUse;
 		Game::getSingletonPtr()->setNotificationFromWebserver(message);

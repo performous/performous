@@ -16,7 +16,7 @@ $.loadScript = function (url, callback) {
     The website is now fully useable.
 */
 function loadSearchJs() {
-    $("#custom-scripts-search").load("search.js", function () {
+    $("#custom-scripts-search").load("js/search.js", function () {
         console.log("All scripts are loaded. The website is now fully useable.");
     });
 }
@@ -26,7 +26,7 @@ function loadSearchJs() {
     Continues to loadSearchJs().
 */
 function loadPlaylistJs() {
-    $("#custom-scripts-playlist").load("playlist.js", loadSearchJs);
+    $("#custom-scripts-playlist").load("js/playlist.js", loadSearchJs);
 }
 
 /*
@@ -34,7 +34,7 @@ function loadPlaylistJs() {
     Continues to loadPlaylistJs().
 */
 function loadDatabaseJs() {
-    $("#custom-scripts-database").load("database.js", loadPlaylistJs);
+    $("#custom-scripts-database").load("js/database.js", loadPlaylistJs);
 }
 
 /*
@@ -42,7 +42,7 @@ function loadDatabaseJs() {
     Continues to loadDatabaseJs().
 */
 function loadSongsJs() {
-    $("#custom-scripts-songs").load("songs.js", loadDatabaseJs);
+    $("#custom-scripts-songs").load("js/songs.js", loadDatabaseJs);
 }
 
 /*
@@ -50,7 +50,7 @@ function loadSongsJs() {
     Continues to loadSongsJs().
 */
 function loadAlertJs() {
-    $("#custom-scripts-alert").load("alert.js", loadSongsJs);
+    $("#custom-scripts-alert").load("js/alert.js", loadSongsJs);
 }
 
 /*
@@ -58,7 +58,7 @@ function loadAlertJs() {
     Continues to loadAlertJs().
 */
 function loadDateUtilityJs() {
-    $("#custom-scripts-date-utility").load("date-utility.js", loadAlertJs);
+    $("#custom-scripts-date-utility").load("js/date-utility.js", loadAlertJs);
 }
 
 /*
@@ -66,7 +66,7 @@ function loadDateUtilityJs() {
     Continues to loadDateUtilityJs().
 */
 function loadListItemsJs() {
-    $("#custom-script-list-items").load("list-items.js", loadDateUtilityJs);
+    $("#custom-script-list-items").load("js/list-items.js", loadDateUtilityJs);
 }
 
 /*
@@ -74,7 +74,7 @@ function loadListItemsJs() {
     Continues to loadListItemsJs().
 */
 function loadTableJs() {
-    $.loadScript("table.js", loadListItemsJs);
+    $.loadScript("js/table.js", loadListItemsJs);
 }
 
 /*
@@ -84,7 +84,7 @@ function loadTableJs() {
     Continues to loadTableJs().
 */
 function loadLocalizeJs() {
-    $("#custom-script-localize").load("localize.js", loadTableJs);
+    $("#custom-script-localize").load("js/localize.js", loadTableJs);
 }
 
 /*

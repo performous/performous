@@ -30,7 +30,7 @@ class RequestHandler
         void HandleFile(web::http::http_request request, std::string filePath = "");
         web::json::value SongsToJsonObject();
         std::map<std::string, std::string> GenerateLocaleDict();
-        std::vector<std::string> GetTranslationKeys();
+        const std::vector<std::string> &GetTranslationKeys() const;
         std::shared_ptr<Song> GetSongFromJSON(web::json::value);
 
         web::http::experimental::listener::http_listener m_listener;
@@ -40,14 +40,22 @@ class RequestHandler
 #else
 #include <string>
 
-class Songs;
+#include <httplib.h>
+
+#include "songs.hh"
 
 class RequestHandler {
 public:
-    RequestHandler(Songs&) {}
-    RequestHandler(std::string, Songs&) {}
+    RequestHandler(std::string, Songs &songs);
 
-    void open() { return ; }
-    void close() { return ; }
+    void open(const std::string &addr, int port) { m_server.listen(addr.c_str(), port); }
+    void close() { m_server.stop(); }
+
+private:
+    const std::vector<std::string>& GetTranslationKeys() const;
+
+private:
+    httplib::Server m_server;
+    Songs& m_songs;
 };
 #endif
