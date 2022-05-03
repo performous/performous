@@ -25,13 +25,13 @@ void Players::load(xmlpp::NodeSet const& n) {
 		player.setName(a_name->get_value());
 
 		auto n2 = element.find("picture");
-		std::string picture;
 		if (!n2.empty()) // optional picture element
 		{
 			auto tn = xmlpp::get_first_child_text(dynamic_cast<xmlpp::Element&>(**n2.begin()));
-			picture = tn->get_content();
+			auto const picture = fs::path(tn->get_content());
 
-			player.path = picture;
+			player.picture = picture;
+			player.path = findFile(picture);
 		}
 
 		auto active = element.get_attribute("active");
@@ -55,6 +55,7 @@ void Players::save(xmlpp::Element *players) {
 		playerNode->set_attribute("active", player->isActive() ? "true" : "false");
 		if (player->picture != "")
 		{
+			std::cout << "save image" << std::endl;
 			auto pictureNode = xmlpp::add_child_element(playerNode, "picture");
 			pictureNode->add_child_text(player->picture.string());
 		}
@@ -90,10 +91,14 @@ void Players::addPlayer(PlayerItem const& p) {
 	if (player.picture != "") // no picture, so don't search path
 	{
 		try {
-			player.path =  findFile(fs::path("pictures") / player.picture);
-		} catch (std::runtime_error const& e)
-		{
+			player.path = findFile("pictures" / player.picture);
+		} catch (std::runtime_error const& e) {
 			std::cerr << e.what() << std::endl;
+			try {
+				player.path = findFile("avatar" / player.picture);
+			} catch (std::runtime_error const& e) {
+				std::cerr << e.what() << std::endl;
+			}
 		}
 	}
 

@@ -1,5 +1,7 @@
 #include "control.hh"
 
+#include <iostream>
+
 Control::Control(Control* parent)
 : m_parent(parent) {
 }
@@ -45,4 +47,23 @@ void Control::setName(std::string const& name) {
 
 std::string Control::getName() const {
 	return m_name;
+}
+
+void Control::onKeyDown(std::function<void(Control&, Key)> const& callback) {
+	m_onKeyDown = callback;
+}
+
+void Control::onKeyUp(std::function<void(Control&, Key)> const& callback) {
+	m_onKeyUp = callback;
+}
+
+void Control::sendOnKeyDown(Key key) {
+	std::cout << "sendOnKeyDown" << std::endl;
+	if(m_onKeyDown)
+		m_onKeyDown(*this, key);
+}
+
+void Control::sendOnKeyUp(Key key) {
+	if(m_onKeyUp)
+		m_onKeyUp(*this, key);
 }

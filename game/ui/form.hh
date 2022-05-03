@@ -4,10 +4,12 @@
 
 class Form : public UserControl {
   public:
-	  void focusNext();
-	  void focusPrevious();
+	void focusNext();
+	void focusPrevious();
 
-	  void onKey(Key) override;
+	void onKey(Key) override;
+	void onKeyDown(Key key) override;
+	void onKeyUp(Key key) override;
 
   private:
 	  Control* m_focus = nullptr;

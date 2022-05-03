@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <functional>
 
 class GraphicContext;
 
@@ -34,8 +35,18 @@ class Control {
 	};
 
 	virtual void onKey(Key) {}
+	virtual void onKeyDown(Key) {}
+	virtual void onKeyUp(Key) {}
+
+	void onKeyDown(std::function<void(Control&, Key)> const&);
+	void onKeyUp(std::function<void(Control&, Key)> const&);
 
 	virtual void draw(GraphicContext&) = 0;
+
+  protected:
+	friend class Form;
+	void sendOnKeyDown(Key);
+	void sendOnKeyUp(Key);
 
   protected:
 	Control* m_parent = nullptr;
@@ -47,4 +58,6 @@ class Control {
 	float m_width;
 	float m_height;
 	bool m_focused = false;
+	std::function<void(Control&, Key)> m_onKeyDown;
+	std::function<void(Control&, Key)> m_onKeyUp;
 };

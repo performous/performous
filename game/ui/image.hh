@@ -11,10 +11,12 @@ class Image : public Control {
 
 	void setTexture(std::string const& texture);
 
-	bool canFocused() const override { return false; }
+	bool canFocused() const override { return m_canBeFocused; }
+	void canBeFocused(bool value) { m_canBeFocused = value; }
 	void draw(GraphicContext&) override;
 
   private:
 	std::unique_ptr<Texture> m_texture;
 	Texture m_background;
+	bool m_canBeFocused = false;
 };

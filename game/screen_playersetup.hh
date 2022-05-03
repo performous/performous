@@ -26,6 +26,8 @@ class ScreenPlayerSetup: public Screen {
 
   private:
 	void initializeControls();
+	void shiftAvatarLeft();
+	void shiftAvatarRight();
 
   private:
 	Game& m_game;
@@ -39,8 +41,11 @@ class ScreenPlayerSetup: public Screen {
 	TextBox m_name;
 	Label m_avatarLabel;
 	Image m_avatar;
+	Image m_avatarPrevious;
+	Image m_avatarNext;
 	Label m_bestScoreLabel;
 	Label m_bestScore;
 	Label m_bestSongLabel;
 	Label m_bestSong;
+	std::vector<std::string> m_avatars;
 };

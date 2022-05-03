@@ -108,7 +108,25 @@ struct PlayerItem {
 	void setName(std::string const& newName) {
 		name = newName;
 	}
-	fs::path getAvatarPath() const {
+	std::string getAvatar() const {
 		return picture;
 	}
+	void setAvatar(std::string const& newPicture) {
+		picture = newPicture;
+	}
+	fs::path getAvatarPath() const {
+		return path;
+	}
+	void setAvatarPath(fs::path const& newPath) {
+		path = newPath;
+	}
+	bool isActive() const {
+		return m_active;
+	}
+	void setActive(bool active) {
+		m_active = active;
+	}
+
+  private:
+	bool m_active = true;
 };

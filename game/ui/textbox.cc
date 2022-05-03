@@ -2,11 +2,11 @@
 #include "graphiccontext.hh"
 
 TextBox::TextBox(std::string const& text, Control* parent)
-: Control(parent), m_text(text),  m_background(findFile("mainmenu_comment_bg.svg")) {
+: Control(parent), m_text(text),  m_background(findFile("mainmenu_back_highlight.svg")) {
 }
 
 TextBox::TextBox(Control* parent, std::string const& text)
-: Control(parent), m_text(text),  m_background(findFile("mainmenu_comment_bg.svg")) {
+: Control(parent), m_text(text),  m_background(findFile("mainmenu_back_highlight.svg")) {
 }
 
 void TextBox::sendTextChanged(std::string const& newText, std::string const& oldText) {

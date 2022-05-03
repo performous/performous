@@ -4,7 +4,8 @@
 #include <configuration.hh>
 
 GraphicContext::GraphicContext() {
-	addFont("default", "mainmenu_option.svg");
+	//addFont("default", "mainmenu_option.svg");
+	addFont("ui", "mainmenu_comment.svg");
 }
 
 void GraphicContext::addFont(std::string const& font, fs::path const& file) {

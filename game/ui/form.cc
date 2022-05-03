@@ -65,3 +65,27 @@ void Form::onKey(Key key) {
 	}
 }
 
+void Form::onKeyDown(Key key) {
+	switch(key) {
+		case Key::BackTab:
+			break;
+		case Key::Tab:
+			break;
+		default:
+			if(m_focus)
+				m_focus->sendOnKeyDown(key);
+	}
+}
+
+void Form::onKeyUp(Key key) {
+	switch(key) {
+		case Key::BackTab:
+			break;
+		case Key::Tab:
+			break;
+		default:
+			if(m_focus)
+				m_focus->sendOnKeyUp(key);
+	}
+}
+
