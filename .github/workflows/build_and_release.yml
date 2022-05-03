@@ -105,9 +105,9 @@ jobs:
           - ubuntu18.04
           - ubuntu20.04
           - ubuntu22.04
-          - fedora33
           - fedora34
           - fedora35
+          - fedora36
     steps:
       - name: Checkout Git
         id: checkout_git
