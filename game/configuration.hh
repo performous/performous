@@ -83,7 +83,6 @@ extern Config config; ///< A global variable that contains all config items
 /** Read config schema and configuration from XML files **/
 void readConfig();
 void populateBackends(const std::vector<std::string>& backendList);
-void populateLanguages(const std::map<std::string, std::string>& languages);
 
 /** Write modified config options to user's or system-wide config XML **/
 void writeConfig(bool system = false);

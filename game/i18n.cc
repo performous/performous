@@ -3,6 +3,52 @@
 #include "configuration.hh"
 #include "fs.hh"
 
+// Helper function to convert deprecated lang format of the config.xml.
+// Should be eventually removed as we drop the backward compat with this old
+// game versions
+static std::string LanguageIdToLanguage(const unsigned int& id) {
+	switch (id) {
+		case 1: return "Asturian";
+		case 2: return "Danish";
+		case 3: return "German";
+		case 4: return "English";
+		case 5: return "Spanish";
+		case 6: return "Persian";
+		case 7: return "Finnish";
+		case 8: return "French";
+		case 9: return "Hungarian";
+		case 10: return "Italian";
+		case 11: return "Japanese";
+		case 12: return "Dutch";
+		case 13: return "Polish";
+		case 14: return "Portuguese";
+		case 15: return "Slovak";
+		case 16: return "Swedish";
+		case 17: return "Chinese";
+	}
+	return "Auto"; // if no name matched (may be the magic 1337 value return "Auto" which translates to computer language OR English.
+}
+
+static void populateLanguages(const std::map<std::string, std::string>& languages) {
+	ConfigItem& languageConfig = config["game/language"];
+	for (auto const& language : languages) {
+		languageConfig.addEnum(language.second);
+	}
+
+	// workaround former configuation that was storing lang as a number
+	const auto &selected = [&] {
+		const auto &l = languageConfig.toString();
+		try { // try to check if value stored is a number
+			auto id = std::stoi(languageConfig.toString());
+			return LanguageIdToLanguage(id);
+		} catch (const std::exception &) {
+			return l; //return non numeric value; should be the lang itself
+		}
+	}();
+
+	languageConfig.selectEnum(selected);
+}
+
 TranslationEngine::TranslationEngine(const char *package) : m_package(package) {
 	initializeAllLanguages();
 	/* set all languages in configuration.
