@@ -93,6 +93,4 @@ private:
 
 	std::string m_filter;
 	AnimAcceleration math_cover;
-
-	bool m_dirty = false;
 };

@@ -98,7 +98,7 @@ void ScreenPlayerSetup::exit() {
 void ScreenPlayerSetup::initializeControls() {
 	const auto verticalOffset = -0.15;
 	const auto horizontalSpace = 0.225;
-	const auto horizontalLabelSpace = horizontalSpace * 0.5;
+	const auto horizontalLabelSpace = horizontalSpace * 0.75;
 	const auto horizontalOffset = -0.45;
 	const auto lineHeight = 0.025;
 	const auto listHeight = 1 + verticalOffset - 0.5;
@@ -128,6 +128,7 @@ void ScreenPlayerSetup::initializeControls() {
 		if(best == result.end()) {
 			m_bestScore.setText(_("na"));
 			m_bestSong.setText(_("na"));
+			m_averageScore.setText(_("na"));
 		}
 		else {
 			auto const& songs = m_database.getSongs();
@@ -135,6 +136,11 @@ void ScreenPlayerSetup::initializeControls() {
 
 			m_bestScore.setText(std::to_string(best->score));
 			m_bestSong.setText(song);
+
+			auto const averageScore = std::accumulate(result.begin(), result.end(), 0U,
+				[](size_t sum, HiscoreItem const& score) { return sum + score.score;}) / result.size();
+
+			m_averageScore.setText(std::to_string(averageScore));
 		}
 
 	getForm().addControl(m_nameLabel);
@@ -198,6 +204,16 @@ void ScreenPlayerSetup::initializeControls() {
 	getForm().addControl(m_bestSong);
 	m_bestSong.setGeometry(horizontalOffset + horizontalSpace + 0.01 + horizontalLabelSpace + 0.01, y, horizontalSpace, lineHeight);
 	m_bestSong.setText(_("na"));
+
+	y += lineHeight + verticalSpace;
+
+	getForm().addControl(m_averageScoreLabel);
+	m_averageScoreLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01, y, horizontalLabelSpace, lineHeight);
+	m_averageScoreLabel.setText(_("Average score:"));
+
+	getForm().addControl(m_averageScore);
+	m_averageScore.setGeometry(horizontalOffset + horizontalSpace + 0.01 + horizontalLabelSpace + 0.01, y, horizontalSpace, lineHeight);
+	m_averageScore.setText(_("na"));
 
 	getForm().focusNext();
 }

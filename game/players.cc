@@ -63,7 +63,7 @@ void Players::save(xmlpp::Element *players) {
 }
 
 void Players::update() {
-	if (m_dirty) filter_internal();
+	filter_internal();
 }
 
 std::optional<PlayerId> Players::lookup(std::string const& name) const {
@@ -102,7 +102,6 @@ void Players::addPlayer(PlayerItem const& p) {
 		}
 	}
 
-	m_dirty = true;
 	const auto ret = m_players.emplace(std::make_shared<PlayerItem>(player));
 	if (!ret.second)
 	{
@@ -137,7 +136,6 @@ PlayerId Players::assign_id_internal() {
 }
 
 void Players::filter_internal() {
-	m_dirty = false;
 	auto const selection = current();
 
 	try {

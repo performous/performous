@@ -47,5 +47,7 @@ class ScreenPlayerSetup: public Screen {
 	Label m_bestScore;
 	Label m_bestSongLabel;
 	Label m_bestSong;
+	Label m_averageScoreLabel;
+	Label m_averageScore;
 	std::vector<std::string> m_avatars;
 };
