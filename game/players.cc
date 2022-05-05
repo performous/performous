@@ -141,20 +141,29 @@ void Players::filter_internal() {
 	auto const selection = current();
 
 	try {
-		fplayers_t filtered;
-		if (m_filter.empty()) filtered = fplayers_t(m_players.begin(), m_players.end());
-		else {
-			auto filter = icu::UnicodeString::fromUTF8(
-				UnicodeUtil::convertToUTF8(m_filter)
-				);
-			icu::ErrorCode icuError;
+		auto filtered = fplayers_t();
 
-			std::copy_if (m_players.begin(), m_players.end(), std::back_inserter(filtered), 
-				[&](PlayerItem it){
-					icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8(it->getName()), UnicodeUtil::m_searchCollator.get(), nullptr, icuError);
-					return (search.first(icuError) != USEARCH_DONE);
-				});
-		}
+		auto filter = icu::UnicodeString::fromUTF8(
+			UnicodeUtil::convertToUTF8(m_filter)
+			);
+		icu::ErrorCode icuError;
+
+		std::copy_if(m_players.begin(), m_players.end(), std::back_inserter(filtered),
+			[&](auto const& it){
+				std::cout << "filter player " << it->getName() << " active: " << it->isActive() << std::endl;
+
+				if(!it->isActive())
+					return false;
+
+				if(m_filter.empty())
+					return true;
+
+				auto search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8(it->getName()), UnicodeUtil::m_searchCollator.get(), nullptr, m_icuError);
+
+				return (search.first(m_icuError) != USEARCH_DONE);
+			});
+
+		std::cout << "filtered players: " << filtered.size() << std::endl;
 		m_filtered.swap(filtered);
 	} catch (...) {
 		fplayers_t(m_players.begin(), m_players.end()).swap(m_filtered);  // Invalid regex => copy everything

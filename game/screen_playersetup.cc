@@ -62,8 +62,9 @@ void ScreenPlayerSetup::enter() {
 
 	auto items = std::vector<Item>();
 
-	for(auto i = 0U; i < m_players.count(); ++i) {
-		auto& player = m_players[i];
+	for(auto& p : m_players.getPlayers()) {
+		auto& player = *p;
+		std::cout << "add player " << player.getName() << std::endl;
 
 		items.emplace_back(player.getName());
 		items.back().setChecked(player.isActive());
@@ -95,13 +96,13 @@ void ScreenPlayerSetup::exit() {
 }
 
 void ScreenPlayerSetup::initializeControls() {
-	const auto verticalSpace = 0.05;
 	const auto verticalOffset = -0.15;
 	const auto horizontalSpace = 0.225;
 	const auto horizontalLabelSpace = horizontalSpace * 0.5;
 	const auto horizontalOffset = -0.45;
 	const auto lineHeight = 0.025;
 	const auto listHeight = 1 + verticalOffset - 0.5;
+	const auto verticalSpace = lineHeight * 0.125;;
 	auto y = verticalOffset;
 
 	getForm().addControl(m_playerList);
@@ -152,7 +153,7 @@ void ScreenPlayerSetup::initializeControls() {
 			}
 		});
 
-	y += lineHeight + lineHeight * 0.5;
+	y += lineHeight + verticalSpace;
 
 	getForm().addControl(m_avatarLabel);
 	m_avatarLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01, y, horizontalLabelSpace, lineHeight);
@@ -178,7 +179,7 @@ void ScreenPlayerSetup::initializeControls() {
 	getForm().addControl(m_avatarNext);
 	m_avatarNext.setGeometry(x, y2, horizontalSpace * 0.15, horizontalSpace * 0.15);
 
-	y += horizontalSpace * 0.6 + lineHeight * 0.5;
+	y += horizontalSpace * 0.6 + verticalSpace;
 
 	getForm().addControl(m_bestScoreLabel);
 	m_bestScoreLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01, y, horizontalLabelSpace, lineHeight);
@@ -188,7 +189,7 @@ void ScreenPlayerSetup::initializeControls() {
 	m_bestScore.setGeometry(horizontalOffset + horizontalSpace + 0.01 + horizontalLabelSpace + 0.01, y, horizontalSpace, lineHeight);
 	m_bestScore.setText(_("na"));
 
-	y += lineHeight + lineHeight * 0.5;
+	y += lineHeight + verticalSpace;
 
 	getForm().addControl(m_bestSongLabel);
 	m_bestSongLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01, y, horizontalLabelSpace, lineHeight);

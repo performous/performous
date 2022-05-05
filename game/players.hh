@@ -60,6 +60,8 @@ class Players {
 	void addPlayer (std::string const& name, std::string const& picture = "", std::optional<PlayerId> id = std::nullopt);
 	void addPlayer(PlayerItem const&);
 
+	players_t const& getPlayers() const { return  m_players; }
+
 	/// const array access
 	PlayerItem const& operator[](unsigned pos) const;
 	PlayerItem& operator[](unsigned pos);
