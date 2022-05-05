@@ -101,7 +101,7 @@ void ScreenPlayerSetup::initializeControls() {
 	const auto horizontalLabelSpace = horizontalSpace * 0.5;
 	const auto horizontalOffset = -0.45;
 	const auto lineHeight = 0.025;
-	const auto listHeight = 1 + verticalOffset - 0.45;
+	const auto listHeight = 1 + verticalOffset - 0.5;
 	auto y = verticalOffset;
 
 	getForm().addControl(m_playerList);

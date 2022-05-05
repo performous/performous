@@ -3,6 +3,8 @@
 #include <string>
 #include <functional>
 
+#include "border.hh"
+
 class GraphicContext;
 
 class Control {
@@ -48,6 +50,8 @@ class Control {
 	void sendOnKeyDown(Key);
 	void sendOnKeyUp(Key);
 
+	void drawFocus();
+
   protected:
 	Control* m_parent = nullptr;
 
@@ -58,6 +62,7 @@ class Control {
 	float m_width;
 	float m_height;
 	bool m_focused = false;
+	Border m_focus{std::make_shared<BorderDefinition>(findFile("ui_focused.svg"))};
 	std::function<void(Control&, Key)> m_onKeyDown;
 	std::function<void(Control&, Key)> m_onKeyUp;
 };

@@ -103,6 +103,8 @@ void TextBox::onKey(Key key) {
 }
 
 void TextBox::draw(GraphicContext& gc) {
+	drawFocus();
+
 	const auto color = ColorTrans(hasFocus() ? Color(1.f, 1.f, 1.f) : Color(0.6f, 0.6f, 0.6f));
 
 	m_background.dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());

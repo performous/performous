@@ -29,6 +29,8 @@ void Image::draw(GraphicContext& gc) {
 	auto const width = getWidth() * 0.9;
 	auto const height = getHeight() * 0.9;
 
+	drawFocus();
+
 	m_background.dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());
 	m_background.draw();
 

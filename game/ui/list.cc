@@ -116,6 +116,8 @@ void List::updateTexts() {
 }
 
 void List::draw(GraphicContext& gc) {
+	drawFocus();
+
 	m_background.dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());
 	m_background.draw();
 

@@ -67,3 +67,10 @@ void Control::sendOnKeyUp(Key key) {
 	if(m_onKeyUp)
 		m_onKeyUp(*this, key);
 }
+
+void Control::drawFocus() {
+	if(hasFocus()) {
+		m_focus.setGeometry(getX(), getY(), getWidth(), getHeight());
+		m_focus.draw();
+	}
+}
