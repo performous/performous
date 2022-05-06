@@ -129,8 +129,8 @@ jobs:
             EXTRA_CMAKE_ARGS="-DUSE_BOOST_REGEX=1"
           fi
 
-          if [ "${ID}" = "ubuntu" -a "${VERSION_ID}" = "18.04" ]; then
-            # Ubuntu 18.04 has system Aubio 0.4.5, this is not enough
+          if ([ "${ID}" = "ubuntu" ] && [ "${VERSION_ID}" = "18.04" ]) || ([ "${ID}" = "debian" ] && [ "${VERSION_ID}" = "10" ]); then
+            # Ubuntu 18.04 and Debian Buster has system Aubio 0.4.5, this is not enough
             # because performous requires a minimum version of 0.4.9.
             EXTRA_CMAKE_ARGS="${EXTRA_CMAKE_ARGS} -DSELF_BUILT_AUBIO=ALWAYS"
             if ([ "${ID}" = "ubuntu" ]); then
@@ -142,11 +142,11 @@ jobs:
           ## Figure out what type of packages we need to generate
           case ${ID} in
             'fedora')
-          PACKAGE_TYPE='RPM';;
-            'ubuntu|debian')
-          PACKAGE_TYPE='DEB';;
+              PACKAGE_TYPE='RPM';;
+            'ubuntu'|'debian')
+              PACKAGE_TYPE='DEB';;
             *)
-          PACKAGE_TYPE='TGZ';;
+              PACKAGE_TYPE='TGZ';;
           esac
 
           PACKAGE_VERSION=${{ needs.determine_version.outputs.complete_version }}
