@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-29 11:32+0200\n"
+"POT-Creation-Date: 2022-05-06 22:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _;translate_noop\n"
 "X-Poedit-Basepath: .\n"
-"X-Generator: Poedit 2.3\n"
+"X-Generator: Poedit 3.0\n"
 "X-Poedit-SearchPath-0: ../game\n"
 "X-Poedit-SearchPath-1: ../data\n"
 
@@ -614,8 +614,7 @@ msgstr ""
 #. name: audio/backend
 #. type: int
 #. value: 1337
-#: ../data/config/schema.xml:327 ../game/configuration.cc:138
-#: ../game/configuration.cc:332 ../game/i18n.cc:55 ../game/i18n.cc:93
+#: ../data/config/schema.xml:327 ../game/i18n.cc:98
 msgid "Auto"
 msgstr ""
 
@@ -1423,10 +1422,6 @@ msgstr ""
 msgid "A karaoke game"
 msgstr ""
 
-#: ../data/performous.desktop:13
-msgid "performous"
-msgstr ""
-
 #: ../data/performous.desktop:17
 msgid "game;song;music;dance;karaoke;microphone;sound;singing;"
 msgstr ""
@@ -1438,74 +1433,6 @@ msgstr ""
 #: ../game/configuration.cc:151
 #, c-format
 msgid "%d items"
-msgstr ""
-
-#: ../game/configuration.cc:452 ../game/i18n.cc:94
-msgid "Asturian"
-msgstr ""
-
-#: ../game/configuration.cc:453 ../game/i18n.cc:95
-msgid "Danish"
-msgstr ""
-
-#: ../game/configuration.cc:454 ../game/i18n.cc:96
-msgid "German"
-msgstr ""
-
-#: ../game/configuration.cc:455 ../game/i18n.cc:97
-msgid "English"
-msgstr ""
-
-#: ../game/configuration.cc:456 ../game/i18n.cc:98
-msgid "Spanish"
-msgstr ""
-
-#: ../game/configuration.cc:457 ../game/i18n.cc:99
-msgid "Persian"
-msgstr ""
-
-#: ../game/configuration.cc:458 ../game/i18n.cc:100
-msgid "Finnish"
-msgstr ""
-
-#: ../game/configuration.cc:459 ../game/i18n.cc:101
-msgid "French"
-msgstr ""
-
-#: ../game/configuration.cc:460 ../game/i18n.cc:102
-msgid "Hungarian"
-msgstr ""
-
-#: ../game/configuration.cc:461 ../game/i18n.cc:103
-msgid "Italian"
-msgstr ""
-
-#: ../game/configuration.cc:462 ../game/i18n.cc:104
-msgid "Japanese"
-msgstr ""
-
-#: ../game/configuration.cc:463 ../game/i18n.cc:105
-msgid "Dutch"
-msgstr ""
-
-#: ../game/configuration.cc:464 ../game/i18n.cc:106
-msgid "Polish"
-msgstr ""
-
-#: ../game/configuration.cc:465 ../game/i18n.cc:107
-msgid "Portuguese"
-msgstr ""
-
-#: ../game/configuration.cc:466 ../game/i18n.cc:108
-msgid "Slovak"
-msgstr ""
-
-#: ../game/configuration.cc:467 ../game/i18n.cc:109
-msgid "Swedish"
-msgstr ""
-
-#: ../game/configuration.cc:468 ../game/i18n.cc:110
-msgid "Chinese"
 msgstr ""
 
 #: ../game/dancegraph.cc:17
@@ -1655,6 +1582,74 @@ msgstr ""
 msgid "Solo!"
 msgstr ""
 
+#: ../game/i18n.cc:99
+msgid "Asturian"
+msgstr ""
+
+#: ../game/i18n.cc:100
+msgid "Danish"
+msgstr ""
+
+#: ../game/i18n.cc:101
+msgid "German"
+msgstr ""
+
+#: ../game/i18n.cc:102
+msgid "English"
+msgstr ""
+
+#: ../game/i18n.cc:103
+msgid "Spanish"
+msgstr ""
+
+#: ../game/i18n.cc:104
+msgid "Persian"
+msgstr ""
+
+#: ../game/i18n.cc:105
+msgid "Finnish"
+msgstr ""
+
+#: ../game/i18n.cc:106
+msgid "French"
+msgstr ""
+
+#: ../game/i18n.cc:107
+msgid "Hungarian"
+msgstr ""
+
+#: ../game/i18n.cc:108
+msgid "Italian"
+msgstr ""
+
+#: ../game/i18n.cc:109
+msgid "Japanese"
+msgstr ""
+
+#: ../game/i18n.cc:110
+msgid "Dutch"
+msgstr ""
+
+#: ../game/i18n.cc:111
+msgid "Polish"
+msgstr ""
+
+#: ../game/i18n.cc:112
+msgid "Portuguese"
+msgstr ""
+
+#: ../game/i18n.cc:113
+msgid "Slovak"
+msgstr ""
+
+#: ../game/i18n.cc:114
+msgid "Swedish"
+msgstr ""
+
+#: ../game/i18n.cc:115
+msgid "Chinese"
+msgstr ""
+
 #: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:149
 msgid "Resume"
 msgstr ""
@@ -1697,33 +1692,34 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
-#: ../game/main.cc:114
+#: ../game/main.cc:115
 msgid "Loading audio samples..."
 msgstr ""
 
-#: ../game/main.cc:129
+#: ../game/main.cc:130
 msgid "Creating screens..."
 msgstr ""
 
-#: ../game/main.cc:139
+#: ../game/main.cc:140
 msgid "Entering main menu..."
 msgstr ""
 
-#: ../game/main.cc:141
+#: ../game/main.cc:142
 msgid "Loading complete!"
 msgstr ""
 
-#: ../game/main.cc:150
+#: ../game/main.cc:151
+#, c-format
 msgid ""
 "Done Loading!\n"
-" Loaded "
+" Loaded %d songs."
 msgstr ""
 
-#: ../game/main.cc:156
+#: ../game/main.cc:157
 msgid "Screenshot taken!"
 msgstr ""
 
-#: ../game/main.cc:159
+#: ../game/main.cc:160
 msgid "Screenshot failed!"
 msgstr ""
 
@@ -2358,58 +2354,58 @@ msgstr ""
 msgid "Together"
 msgstr ""
 
-#: ../game/songs.cc:434
+#: ../game/songs.cc:428
 msgid "show all songs"
 msgstr ""
 
-#: ../game/songs.cc:435
+#: ../game/songs.cc:429
 msgid "has dance"
 msgstr ""
 
-#: ../game/songs.cc:436
+#: ../game/songs.cc:430
 msgid "has vocals"
 msgstr ""
 
-#: ../game/songs.cc:437
+#: ../game/songs.cc:431
 msgid "has duet"
 msgstr ""
 
-#: ../game/songs.cc:438
+#: ../game/songs.cc:432
 msgid "has guitar"
 msgstr ""
 
-#: ../game/songs.cc:439
+#: ../game/songs.cc:433
 msgid "drums or keytar"
 msgstr ""
 
-#: ../game/songs.cc:440
+#: ../game/songs.cc:434
 msgid "full band"
 msgstr ""
 
-#: ../game/songs.cc:468
+#: ../game/songs.cc:462
 msgid "random order"
 msgstr ""
 
-#: ../game/songs.cc:469
+#: ../game/songs.cc:463
 msgid "sorted by song"
 msgstr ""
 
-#: ../game/songs.cc:470
+#: ../game/songs.cc:464
 msgid "sorted by artist"
 msgstr ""
 
-#: ../game/songs.cc:471
+#: ../game/songs.cc:465
 msgid "sorted by edition"
 msgstr ""
 
-#: ../game/songs.cc:472
+#: ../game/songs.cc:466
 msgid "sorted by genre"
 msgstr ""
 
-#: ../game/songs.cc:473
+#: ../game/songs.cc:467
 msgid "sorted by path"
 msgstr ""
 
-#: ../game/songs.cc:474
+#: ../game/songs.cc:468
 msgid "sorted by language"
 msgstr ""
