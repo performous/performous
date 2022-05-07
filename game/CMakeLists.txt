@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14.5)
 
-file(GLOB SOURCE_FILES "*.cc")
+file(GLOB SOURCE_FILES "*.cc" "libda/*.cc")
 file(GLOB HEADER_FILES "*.hh" "libda/*.hpp")
 
 # Fs is compiled/linked separately to ease switch boost/c++17
