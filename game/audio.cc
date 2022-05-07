@@ -443,7 +443,8 @@ struct Audio::Impl {
 	std::deque<Analyzer> analyzers;
 	std::deque<Device> devices;
 	bool playback = false;
-	Impl(std::string selectedBackend) {
+	portaudio::AudioBackend backend;
+	Impl(portaudio::AudioBackend selectedBackend) : backend(std::move(selectedBackend)) {
 		// Parse audio devices from config
 		ConfigItem::StringList devs = config["audio/devices"].sl();
 		for (ConfigItem::StringList::const_iterator it = devs.begin(), end = devs.end(); it != end; ++it) {
@@ -476,7 +477,6 @@ struct Audio::Impl {
 					if (!iss.eof()) throw std::runtime_error("Syntax error parsing device parameter " + key);
 				}
 				if (params.mics.size() < params.in) { params.mics.resize(params.in); }
-				portaudio::AudioDevices ad(PaHostApiTypeId(PaHostApiNameToHostApiTypeId(selectedBackend)));
 					bool wantOutput = (params.in == 0) ? true : false;
 					unsigned num;
 					std::string msg = "audio/info: Device string empty; will look for a device with at least ";
@@ -492,7 +492,7 @@ struct Audio::Impl {
 					std::clog << "audio/debug: Will try to find device matching dev: " << params.dev << std::endl;
 					}
 					else { std::clog << msg << std::endl; }
-					portaudio::DeviceInfo const& info = ad.find(params.dev, wantOutput, num);
+					portaudio::DeviceInfo const& info = backend.find(params.dev, wantOutput, num);
 					std::clog << "audio/info: Found: " << info.name << ", in: " << info.in << ", out: " << info.out << std::endl;
 				if (info.in < params.mics.size()) throw std::runtime_error("Device doesn't have enough input channels");
 				if (info.out < params.out) throw std::runtime_error("Device doesn't have enough output channels");
@@ -542,11 +542,15 @@ struct Audio::Impl {
 	}
 };
 
+portaudio::AudioBackend &Audio::getBackend() {
+	return self->backend;
+}
+
 Audio::Audio() {
 	aubio_tempo_set_silence(Audio::aubioTempo.get(), -50.0);
 	aubio_tempo_set_threshold(Audio::aubioTempo.get(), 0.4);
         populateBackends(portaudio::AudioBackendFactory().getBackendsNames());
-        self = std::make_unique<Impl>(Audio::backendConfig().getValue());
+        self = std::make_unique<Impl>(portaudio::AudioBackendFactory().makeBackend(Audio::backendConfig().getValue()));
 }
 
 // Necessary because of p-impl
@@ -557,7 +561,7 @@ ConfigItem& Audio::backendConfig() {
 	return backend;
 }
 
-void Audio::restart() { self = std::make_unique<Impl>(Audio::backendConfig().getValue()); }
+void Audio::restart() { self = std::make_unique<Impl>(portaudio::AudioBackendFactory().makeBackend(Audio::backendConfig().getValue())); }
 
 bool Audio::isOpen() const {
 	return !self->devices.empty();

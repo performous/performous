@@ -36,9 +36,8 @@ void ScreenAudioDevices::enter() {
 	int bend = getBackend();
 	std::clog << "audio-devices/debug: Entering audio Devices... backend has been detected as: " << bend << std::endl;
 	m_theme = std::make_unique<ThemeAudioDevices>();
-	PaHostApiTypeId backend = PaHostApiTypeId(bend);
-	portaudio::AudioDevices ads(backend);
-	m_devs = ads.devices;
+	auto &backend = m_audio.getBackend();
+	m_devs = backend.getDevices();
 	// FIXME: Something more elegant, like a warning box
 	if (m_devs.empty()) throw std::runtime_error("No audio devices found!");
 	m_selected_column = 0;
