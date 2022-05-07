@@ -18,5 +18,6 @@ class Image : public Control {
   private:
 	std::unique_ptr<Texture> m_texture;
 	Texture m_background;
+	std::string m_path;
 	bool m_canBeFocused = false;
 };

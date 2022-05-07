@@ -109,7 +109,7 @@ struct PlayerItem {
 		name = newName;
 	}
 	std::string getAvatar() const {
-		return picture;
+		return picture.string();
 	}
 	void setAvatar(std::string const& newPicture) {
 		picture = newPicture;

@@ -27,7 +27,7 @@ void GraphicContext::drawCentered(Text& text, float x, float y, float width, flo
 	text.drawCentered(x, y, width, height);
 }
 
-std::shared_ptr<SvgTxtTheme> GraphicContext::makeSvgText(std::string const& text) {
+std::shared_ptr<SvgTxtTheme> GraphicContext::makeSvgText(std::string const&) {
 	const auto font = m_fonts.begin()->second;
 
 	return std::make_shared<SvgTxtTheme>(font.first, font.second);

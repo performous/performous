@@ -52,6 +52,12 @@ size_t TextBox::getMaxLength() const {
 	return m_maxLength;
 }
 
+namespace {
+	char convertToChar(Control::Key key, Control::Key base, char offset) {
+		return static_cast<char>(static_cast<int>(key) - static_cast<int>(base) + offset);
+	}
+}
+
 void TextBox::onKey(Key key) {
 	auto text = m_text.getText();
 
@@ -82,11 +88,11 @@ void TextBox::onKey(Key key) {
 				const auto oldText = getText();
 
 				if(key >= Key::Number0 && key <= Key::Number9)
-					text.insert(m_cursorPosition++, 1, '0' + static_cast<char>(key) - static_cast<char>(Key::Number0));
+					text.insert(m_cursorPosition++, 1, convertToChar(key, Key::Number0, '0'));
 				else if(key >= Key::a && key <= Key::z)
-					text.insert(m_cursorPosition++, 1, 'a' + static_cast<char>(key) - static_cast<char>(Key::a));
+					text.insert(m_cursorPosition++, 1, convertToChar(key, Key::a, 'a'));
 				else if(key >= Key::A && key <= Key::Z)
-					text.insert(m_cursorPosition++, 1, 'A' + static_cast<char>(key) - static_cast<char>(Key::A));
+					text.insert(m_cursorPosition++, 1, convertToChar(key, Key::A, 'A'));
 				else if(key == Key::Space)
 					text.insert(m_cursorPosition++, 1, ' ');
 

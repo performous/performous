@@ -38,7 +38,9 @@ void FormScreen::manageEvent(SDL_Event event) {
 	if (!keyDown && !keyUp)
 		return;
 
-	auto sendKey = keyDown ? [](Control& control, Control::Key key){ control.onKeyDown(key);} : [](Control& control, Control::Key key){ control.onKeyUp(key); control.onKey(key);};
+	auto sendKey = keyDown
+	  ? std::function<void(Control&, Control::Key)>{[](Control& control, Control::Key key){ control.onKeyDown(key);}}
+	  : std::function<void(Control&, Control::Key)>{[](Control& control, Control::Key key){ control.onKeyUp(key); control.onKey(key);}};
 
 	switch(event.key.keysym.scancode) {
 		case SDL_SCANCODE_ESCAPE:

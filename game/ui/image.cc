@@ -21,13 +21,14 @@ void Image::setTexture(std::string const& texture) {
 			m_texture = std::make_unique<Texture>(texture);
 		else
 			m_texture = std::make_unique<Texture>(findFile(texture));
+	}
 }
 
-void Image::draw(GraphicContext& gc) {
-	auto const xOffset = getWidth() * 0.05;
-	auto const yOffset = getHeight() * 0.05;
-	auto const width = getWidth() * 0.9;
-	auto const height = getHeight() * 0.9;
+void Image::draw(GraphicContext&) {
+	auto const xOffset = getWidth() * 0.05f;
+	auto const yOffset = getHeight() * 0.05f;
+	auto const width = getWidth() * 0.9f;
+	auto const height = getHeight() * 0.9f;
 
 	drawFocus();
 

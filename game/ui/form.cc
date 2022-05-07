@@ -1,6 +1,5 @@
 #include "form.hh"
 
-
 void Form::focusNext() {
 	if(getChildren().empty())
 		return;

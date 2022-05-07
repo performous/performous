@@ -9,7 +9,7 @@ namespace {
 	void loadAvatars(std::vector<std::string>& avatars) {
 		for(auto const& path : listFiles("avatar")) {
 			std::cout << path << " : " << ("avatar" / path.filename()) << std::endl;
-			avatars.emplace_back("avatar" / path.filename());
+			avatars.emplace_back(("avatar" / path.filename()).string());
 		}
 	}
 	int getId(std::vector<std::string> const& avatars, std::string const& current) {
@@ -26,7 +26,7 @@ namespace {
 	}
 	void setAvatar(Image& avatar, int id, std::vector<std::string> const& avatars) {
 		if(id == -1)
-			avatar.setTexture(findFile("no_player_image.svg"));
+			avatar.setTexture("no_player_image.svg");
 		else if(id == -2)
 			setAvatar(avatar, int(avatars.size()) - 1, avatars);
 		else if(id == int(avatars.size()))
@@ -42,8 +42,7 @@ namespace {
 }
 
 ScreenPlayerSetup::ScreenPlayerSetup(Game& game, Players& players, Database const& database)
-: FormScreen("PlayerSetup"), m_game(game), m_players(players), m_database(database),
-  m_background(findFile("intro_bg.svg")) {
+: FormScreen("PlayerSetup"), m_game(game), m_players(players), m_database(database),  m_background(findFile("intro_bg.svg")) {
 	loadAvatars(m_avatars);
 	initializeControls();
 }
@@ -58,7 +57,7 @@ void ScreenPlayerSetup::draw() {
 }
 
 void ScreenPlayerSetup::enter() {
-	m_players.update(); // Poll for new players
+	m_players.update();
 
 	auto items = std::vector<Item>();
 
@@ -71,9 +70,9 @@ void ScreenPlayerSetup::enter() {
 		items.back().setUserData(&player);
 		auto const avatar = player.getAvatar();
 		if(avatar.empty())
-			items.back().setIcon(findFile("no_player_image.svg"));
+			items.back().setIcon("no_player_image.svg");
 		else
-			items.back().setIcon(player.getAvatarPath());
+			items.back().setIcon(player.getAvatarPath().string());
 
 		std::cout << player.getAvatar() << " : " << player.getAvatarPath() << std::endl;
 	}
@@ -106,6 +105,7 @@ void ScreenPlayerSetup::initializeControls() {
 	auto y = verticalOffset;
 
 	getForm().addControl(m_playerList);
+	m_playerList.displayIcon(true);
 	m_playerList.displayCheckBox(true);
 	m_playerList.setGeometry(horizontalOffset, y, horizontalSpace, listHeight);
 	m_playerList.onSelectionChanged([&](List& list, size_t index, size_t){ m_name.setText(list.getItems()[index].toString());});
@@ -113,7 +113,7 @@ void ScreenPlayerSetup::initializeControls() {
 		auto const avatar = player.getAvatar();
 
 		if(avatar.empty())
-			m_avatar.setTexture(findFile("no_player_image.svg"));
+			m_avatar.setTexture("no_player_image.svg");
 		else
 			m_avatar.setTexture(avatar);
 
@@ -242,7 +242,7 @@ void ScreenPlayerSetup::shiftAvatarLeft() {
 	}
 
 	setAvatar(m_avatar, m_avatarPrevious, m_avatarNext, id, m_avatars);
-	m_playerList.getSelected().setIcon(player.getAvatarPath());
+	m_playerList.getSelected().setIcon(player.getAvatarPath().string());
 }
 
 void ScreenPlayerSetup::shiftAvatarRight() {
@@ -269,7 +269,7 @@ void ScreenPlayerSetup::shiftAvatarRight() {
 	}
 
 	setAvatar(m_avatar, m_avatarPrevious, m_avatarNext, id, m_avatars);
-	m_playerList.getSelected().setIcon(player.getAvatarPath());
+	m_playerList.getSelected().setIcon(player.getAvatarPath().string());
 }
 
 

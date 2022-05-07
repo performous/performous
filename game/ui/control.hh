@@ -62,7 +62,7 @@ class Control {
 	float m_width;
 	float m_height;
 	bool m_focused = false;
-	Border m_focus{std::make_shared<BorderDefinition>(findFile("ui_focused.svg"))};
+	Border m_focus{std::make_shared<BorderDefinition>(findFile("ui_focused.svg").string())};
 	std::function<void(Control&, Key)> m_onKeyDown;
 	std::function<void(Control&, Key)> m_onKeyUp;
 };
