@@ -79,6 +79,27 @@ rename:
 		DeviceInfos devices;
 	};
 
+	struct AudioBackendFactory::Init {
+		Init() { PORTAUDIO_CHECKED(Pa_Initialize, ());
+			for (int i = 0; i < Pa_GetHostApiCount(); ++i) {
+				backends.emplace_back(Pa_GetHostApiInfo(i));
+			}
+			if (backends.empty()) throw std::runtime_error("No suitable audio backends found.");
+
+			dump();
+		}
+		~Init() { Pa_Terminate(); }
+		void dump() const {
+			std::cout << "audio/info: PortAudio backends:\n";
+			size_t i = 0;
+			for (auto const& b: backends) { std::cout << "  #" << i++ << ": " << UnicodeUtil::convertToUTF8(b->name) << " (" << b->deviceCount << " devices):\n"; }
+		}
+
+		std::vector<const PaHostApiInfo *> backends;
+	};
+
+	AudioBackendFactory::Init AudioBackendFactory::init;
+
 	AudioBackend::AudioBackend(const PaHostApiInfo &pa_info) : pa_info(pa_info), audio_devices(std::make_unique<AudioDevices>(pa_info.type)) {}
 
 	// All default here because of p-impl
@@ -88,12 +109,6 @@ rename:
 
 		/// Get a printable dump of the devices
 	AudioBackendFactory::AudioBackendFactory() {
-		for (int i = 0; i < Pa_GetHostApiCount(); ++i) {
-			backends.emplace_back(Pa_GetHostApiInfo(i));
-		}
-		if (backends.empty()) throw std::runtime_error("No suitable audio backends found."); // Check specifically for 0 because it returns a negative error code if Pa is not initialized.
-
-		dump();
 	};
 
         DeviceInfos &AudioBackend::getDevices() { return audio_devices->devices;}
@@ -105,29 +120,17 @@ rename:
 	AudioBackend AudioBackendFactory::makeBackend(std::string backendName) {
                 if (backendName == "Auto")
                     backendName = Platform::defaultBackEnd();
-		for (auto const& b: backends)
+		for (auto const& b: init.backends)
 			if (UnicodeUtil::convertToUTF8(b->name) == backendName)
 				return { *b };
                 throw std::runtime_error("Invalid backend name '" + backendName + "' provided.");
 	}
 
-	void AudioBackendFactory::dump() const {
-		std::cout << "audio/info: PortAudio backends:\n";
-		size_t i = 0;
-		for (auto const& b: backends) { std::cout << "  #" << i++ << ": " << UnicodeUtil::convertToUTF8(b->name) << " (" << b->deviceCount << " devices):\n"; }
-	}
-
 	std::vector<std::string> AudioBackendFactory::getBackendsNames() const {
 		std::vector<std::string> names;
-		for (auto const& temp: backends) {
+		for (auto const& temp: init.backends) {
 			names.emplace_back(UnicodeUtil::convertToUTF8(temp->name));
 		}
 		return names;
 	}
-
-	struct AudioBackendFactory::Init {
-		Init() { PORTAUDIO_CHECKED(Pa_Initialize, ()); }
-		~Init() { Pa_Terminate(); }
-	};
-	AudioBackendFactory::Init AudioBackendFactory::init;
 } // portaudio

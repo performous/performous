@@ -79,8 +79,6 @@ namespace portaudio {
 	private:
 		void dump() const;
 
-		std::vector<const PaHostApiInfo *> backends;
-
 		struct Init;
 		static Init init;
 	};
