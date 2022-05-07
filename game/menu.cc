@@ -67,7 +67,10 @@ void Menu::action(int dir) {
 				if (dir > 0) ++(*(current().value));
 				else if (dir < 0) --(*(current().value));
 
-				if (current().value->getName() == "game/language") {
+				if (current().value->getName() == "audio/backend") {
+					std::clog << "audio/info: Audio backend changed; will now restart audio subsystem.\n";
+					Game::getSingletonPtr()->restartAudio();
+				} else if (current().value->getName() == "game/language") {
 					auto &value = config["game/language"];
 					Game::getSingletonPtr()->setLanguage(value.getValue());
 				} else if (current().value->getName() == "graphic/stereo3d") {
