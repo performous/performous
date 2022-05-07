@@ -87,7 +87,6 @@ public:
 	Audio();
 	~Audio();
 	void restart();
-	void close();
 	std::deque<Analyzer>& analyzers();
 	std::deque<Device>& devices();
 	bool isOpen() const;
