@@ -82,6 +82,7 @@ class Audio {
 	friend class Music;
 	static std::recursive_mutex aubio_mutex;
 public:
+	portaudio::AudioBackend &getBackend();
 	typedef std::map<std::string, fs::path> Files;
 	static ConfigItem& backendConfig();
 	Audio();

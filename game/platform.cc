@@ -23,14 +23,14 @@ Platform::Platform() {
 
 const std::array<const char*,6> Platform::platformNames = {{ "Windows", "Linux", "MacOS", "BSD", "Solaris", "Unix" }}; // Relevant for debug only.
 
-int Platform::defaultBackEnd() {
+std::string Platform::defaultBackEnd() {
 		switch (Platform::currentOS()) {
-			case HostOS::OS_WIN: return 13; // WASAPI
-			case HostOS::OS_MAC: return 5; // CoreAudio
-			case HostOS::OS_SOLARIS: return 7; // OSS
-			case HostOS::OS_BSD: return 7; // OSS
-			case HostOS::OS_LINUX: return 8; // ALSA
-			case HostOS::OS_UNIX: return 8; // ALSA
+			case HostOS::OS_WIN: return "WASAPI";
+			case HostOS::OS_MAC: return "CoreAudio";
+			case HostOS::OS_SOLARIS: return "OSS";
+			case HostOS::OS_BSD: return "OSS";
+			case HostOS::OS_LINUX: return "ALSA";
+			case HostOS::OS_UNIX: return "ALSA";
 			default: break;
 		}
 	throw std::runtime_error("Unable to determine a default Audio backend.");
