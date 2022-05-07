@@ -14,6 +14,7 @@
 #include <regex>
 #include <set>
 #include <stdexcept>
+#include <vector>
 
 #define PORTAUDIO_CHECKED(func, args) portaudio::internal::check(func args, #func)
 
@@ -134,38 +135,19 @@ namespace portaudio {
 		DeviceInfos devices;
 	};
 
-	struct AudioBackends {
-		AudioBackends () {
-			for (int i = 0; i < Pa_GetHostApiCount(); ++i) {
-				backends.emplace_back(Pa_GetHostApiInfo(i));
-			}
-			if (backends.empty()) throw std::runtime_error("No suitable audio backends found."); // Check specifically for 0 because it returns a negative error code if Pa is not initialized.
-		};
+	struct AudioBackendFactory {
+		AudioBackendFactory();
+
+		std::vector<std::string> getBackendsNames() const;
+	private:
+		void dump() const;
 
 		std::vector<const PaHostApiInfo *> backends;
 
-		std::string dump() const {
-			std::ostringstream oss;
-			oss << "audio/info: PortAudio backends:\n";
-			size_t i = 0;
-			for (auto const& b: backends) { oss << "  #" << i++ << ": " << UnicodeUtil::convertToUTF8(b->name) << " (" << b->deviceCount << " devices):\n"; }
-			return oss.str();
-		}
-
-                //FIXME No need for a list here....
-		std::list<std::string> getBackendsNames() {
-			std::list<std::string> names;
-			for (auto const& temp: backends) {
-				names.emplace_back(UnicodeUtil::convertToUTF8(temp->name));
-			}
-			return names;
-		}
+		struct Init;
+		static Init init;
 	};
 
-	struct Init {
-		Init() { PORTAUDIO_CHECKED(Pa_Initialize, ()); }
-		~Init() { Pa_Terminate(); }
-	};
 
 	struct Params {
 		PaStreamParameters params;

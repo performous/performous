@@ -445,7 +445,6 @@ struct Audio::Impl {
 	bool playback = false;
 	std::string selectedBackend = Audio::backendConfig().getValue();
 	Impl() {
-		std::clog << portaudio::AudioBackends().dump() << std::flush; // Dump PortAudio backends and devices to log.
 		// Parse audio devices from config
 		ConfigItem::StringList devs = config["audio/devices"].sl();
 		for (ConfigItem::StringList::const_iterator it = devs.begin(), end = devs.end(); it != end; ++it) {
@@ -544,12 +543,10 @@ struct Audio::Impl {
 	}
 };
 
-portaudio::Init Audio::init;
-
 Audio::Audio() {
 	aubio_tempo_set_silence(Audio::aubioTempo.get(), -50.0);
 	aubio_tempo_set_threshold(Audio::aubioTempo.get(), 0.4);
-        populateBackends(portaudio::AudioBackends().getBackendsNames());
+        populateBackends(portaudio::AudioBackendFactory().getBackendsNames());
         self = std::make_unique<Impl>();
 }
 Audio::~Audio() { close(); }

@@ -473,7 +473,7 @@ void readConfig() {
 	if (ci.i() == -1) ci.selectEnum("default");  // Select the default theme if nothing is selected
 }
 
-void populateBackends (const std::list<std::string>& backendList) {
+void populateBackends (const std::vector<std::string>& backendList) {
 	ConfigItem& backendConfig = config["audio/backend"];
 	for (std::string const& backend: backendList) backendConfig.addEnum(backend);
 	static std::string selectedBackend = std::string();
