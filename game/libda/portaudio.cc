@@ -17,17 +17,6 @@ namespace portaudio {
 					if (name.find(dev) != std::string::npos) name.clear();
 				}
 				if (name.empty()) continue;  // No acceptable device found
-				// Verify that the name is unique (haven't seen duplicate names occur though)
-				std::string n = name;
-				while (true) {
-					int num = 1;
-					for (auto& dev: devices)
-						if (dev.name == n) {
-							std::ostringstream oss;
-							oss << name << " #" << ++num;
-							n = oss.str();
-						}
-				};
 				devices.emplace_back(DeviceInfo(i, name, info->maxInputChannels, info->maxOutputChannels, Pa_HostApiDeviceIndexToDeviceIndex(backendIndex, i)));
 			}
 			for (auto& dev: devices) {
