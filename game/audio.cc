@@ -549,7 +549,7 @@ portaudio::Init Audio::init;
 Audio::Audio() {
 	aubio_tempo_set_silence(Audio::aubioTempo.get(), -50.0);
 	aubio_tempo_set_threshold(Audio::aubioTempo.get(), 0.4);
-        populateBackends(portaudio::AudioBackends().getBackends());
+        populateBackends(portaudio::AudioBackends().getBackendsNames());
         self = std::make_unique<Impl>();
 }
 Audio::~Audio() { close(); }
