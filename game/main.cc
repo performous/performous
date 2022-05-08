@@ -317,7 +317,6 @@ int main(int argc, char** argv) try {
 
 	if (vm.count("audiohelp")) {
 		std::clog << "core/notice: Starting audio subsystem for audiohelp (errors printed on console may be ignored)." << std::endl;
-		Audio audio;
 		// Some examples
 		std::cout << "Example --audio parameters" << std::endl;
 		std::cout << "  --audio \"out=2\"         # Pick first working two-channel playback device" << std::endl;
