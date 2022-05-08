@@ -439,11 +439,12 @@ int Device::operator()(float const* inbuf, float* outbuf, unsigned long frames) 
 }
 
 struct Audio::Impl {
+        // Keep backend initialized first/deleted last so that nothing is playing while destroying it.
+	portaudio::AudioBackend backend;
 	Output output;
 	std::deque<Analyzer> analyzers;
 	std::deque<Device> devices;
 	bool playback = false;
-	portaudio::AudioBackend backend;
 	Impl(portaudio::AudioBackend selectedBackend) : backend(std::move(selectedBackend)) {
 		// Parse audio devices from config
 		ConfigItem::StringList devs = config["audio/devices"].sl();
