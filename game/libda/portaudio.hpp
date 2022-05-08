@@ -64,6 +64,8 @@ namespace portaudio {
 		DeviceInfo const& find(std::string const& name, bool output, unsigned num);
 
 		DeviceInfos &getDevices();
+
+                void dump() const;
 	private:
 		struct AudioDevices;
 		std::reference_wrapper<const PaHostApiInfo> pa_info;
@@ -77,8 +79,6 @@ namespace portaudio {
 
                 AudioBackend makeBackend(std::string bakendName);
 	private:
-		void dump() const;
-
 		struct Init;
 		static Init init;
 	};

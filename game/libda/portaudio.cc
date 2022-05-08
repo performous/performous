@@ -74,16 +74,8 @@ namespace portaudio {
 				backends.emplace_back(Pa_GetHostApiInfo(i));
 			}
 			if (backends.empty()) throw std::runtime_error("No suitable audio backends found.");
-
-			dump();
 		}
 		~Init() { Pa_Terminate(); }
-		void dump() const {
-			std::cout << "audio/info: PortAudio backends:\n";
-			size_t i = 0;
-			for (auto const& b: backends) { std::cout << "  #" << i++ << ": " << UnicodeUtil::convertToUTF8(b->name) << " (" << b->deviceCount << " devices):\n"; }
-		}
-
 		std::vector<const PaHostApiInfo *> backends;
 	};
 
@@ -92,27 +84,30 @@ namespace portaudio {
 	AudioBackend::AudioBackend(const PaHostApiInfo &pa_info) : pa_info(pa_info), audio_devices(std::make_unique<AudioDevices>(pa_info.type)) {}
 
 	// All default here because of p-impl
+	AudioBackendFactory::AudioBackendFactory() { //FIXME delme
+	}
 	AudioBackend::~AudioBackend() = default;
 	AudioBackend::AudioBackend(AudioBackend &&) = default;
 	AudioBackend &AudioBackend::operator=(AudioBackend &&) = default;
 
-		/// Get a printable dump of the devices
-	AudioBackendFactory::AudioBackendFactory() {
-	};
-
-        DeviceInfos &AudioBackend::getDevices() { return audio_devices->devices;}
+	DeviceInfos &AudioBackend::getDevices() { return audio_devices->devices;}
 
 	DeviceInfo const& AudioBackend::find(std::string const& name, bool output, unsigned num) {
 		return audio_devices->find(name, output, num);
 	}
 
+	void AudioBackend::dump() const {
+		std::cout << UnicodeUtil::convertToUTF8(pa_info.get().name) << " (" << pa_info.get().deviceCount << " devices):\n";
+		std::cout << AudioDevices(pa_info.get().type).dump();
+	}
+
 	AudioBackend AudioBackendFactory::makeBackend(std::string backendName) {
-                if (backendName == "Auto")
-                    backendName = Platform::defaultBackEnd();
+		if (backendName == "Auto")
+			backendName = Platform::defaultBackEnd();
 		for (auto const& b: init.backends)
 			if (UnicodeUtil::convertToUTF8(b->name) == backendName)
 				return { *b };
-                throw std::runtime_error("Invalid backend name '" + backendName + "' provided.");
+		throw std::runtime_error("Invalid backend name '" + backendName + "' provided.");
 	}
 
 	std::vector<std::string> AudioBackendFactory::getBackendsNames() const {
