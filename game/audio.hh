@@ -53,6 +53,7 @@ struct Device {
 	Output* outptr;
 
 	Device(unsigned int in, unsigned int out, double rate, unsigned int dev);
+        ~Device();
 	/// Start
 	void start();
 	/// Stop

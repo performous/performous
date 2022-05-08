@@ -416,6 +416,10 @@ Device::Device(unsigned int in, unsigned int out, double rate, unsigned int dev)
   outptr()
 {}
 
+Device::~Device() {
+	try { stop(); } catch (const std::exception &e) { std::clog << "audio/error: " << e.what(); }
+}
+
 void Device::start() {
 	PaError err = Pa_StartStream(stream);
 	if (err != paNoError) throw std::runtime_error(std::string("Pa_StartStream: ") + Pa_GetErrorText(err));
@@ -441,9 +445,9 @@ int Device::operator()(float const* inbuf, float* outbuf, unsigned long frames) 
 struct Audio::Impl {
         // Keep backend initialized first/deleted last so that nothing is playing while destroying it.
 	portaudio::AudioBackend backend;
-	Output output;
-	std::deque<Analyzer> analyzers;
 	std::deque<Device> devices;
+	std::deque<Analyzer> analyzers;
+	Output output;
 	bool playback = false;
 	Impl(portaudio::AudioBackend selectedBackend) : backend(std::move(selectedBackend)) {
 		// Parse audio devices from config
@@ -536,10 +540,6 @@ struct Audio::Impl {
 			output.mics.push_back(&analyzers[i]);
 	}
 	~Impl() {
-		// stop all audio streams befor destoying the object.
-		// else portaudio will keep sending data to those destroyed
-		// objects.
-		for (auto& device: devices) try { device.stop(); } catch (const std::exception &e) { std::clog << "audio/error: " << e.what(); }
 	}
 };
 
@@ -551,7 +551,7 @@ Audio::Audio() {
 	aubio_tempo_set_silence(Audio::aubioTempo.get(), -50.0);
 	aubio_tempo_set_threshold(Audio::aubioTempo.get(), 0.4);
         populateBackends(portaudio::AudioBackendFactory().getBackendsNames());
-        self = std::make_unique<Impl>(portaudio::AudioBackendFactory().makeBackend(Audio::backendConfig().getValue()));
+        self = std::make_unique<Impl>(portaudio::AudioBackendFactory().makeBackend(Audio::backendConfig().getEnumName()));
 }
 
 // Necessary because of p-impl
@@ -562,7 +562,7 @@ ConfigItem& Audio::backendConfig() {
 	return backend;
 }
 
-void Audio::restart() { self = std::make_unique<Impl>(portaudio::AudioBackendFactory().makeBackend(Audio::backendConfig().getValue())); }
+void Audio::restart() { self = nullptr; self = std::make_unique<Impl>(portaudio::AudioBackendFactory().makeBackend(Audio::backendConfig().getEnumName())); }
 
 bool Audio::isOpen() const {
 	return !self->devices.empty();
