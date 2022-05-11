@@ -10,7 +10,7 @@ on:
 jobs:
   pr_comment:
     name: Add packages to PRs
-    if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success'
+    if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'completed'
     runs-on: ubuntu-latest
     steps:
       - name: Get the PR number
