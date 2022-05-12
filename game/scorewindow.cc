@@ -6,7 +6,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
   m_database(database),
   m_pos(0.8, 2.0),
   m_bg(findFile("score_window.svg")),
-  m_scoreBar(findFile("score_bar_bg.svg"), findFile("score_bar_fg.svg"), ProgressBar::VERTICAL, 0.0, 0.0, false),
+  m_scoreBar(findFile("score_bar_bg.svg"), findFile("score_bar_fg.svg"), ProgressBar::Mode::VERTICAL, 0.0, 0.0, false),
   m_score_text(findFile("score_txt.svg")),
   m_score_rank(findFile("score_rank.svg"))
 {
@@ -16,32 +16,32 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 	// Singers
 	for (auto p = m_database.cur.begin(); p != m_database.cur.end();) {
 		const auto score = p->getScore();
-        
+
 		if (score < 500) { // Dead
-			p = m_database.cur.erase(p); 
+			p = m_database.cur.erase(p);
 			continue;
 		}
 
-		m_database.scores.emplace_back(score, input::DEVTYPE_VOCALS, "Vocals", "vocals", Color(p->m_color.r, p->m_color.g, p->m_color.b));
+		m_database.scores.emplace_back(score, input::DevType::VOCALS, "Vocals", "vocals", Color(p->m_color.r, p->m_color.g, p->m_color.b));
 		++p;
 	}
 	// Instruments
 	for (auto it = instruments.begin(); it != instruments.end();) {
 		const auto score = (*it)->getScore();
-        
+
 		if (score < 100) { // Dead
-			it = instruments.erase(it); 
-			continue;            
+			it = instruments.erase(it);
+			continue;
 		}
 
 		const auto type = (*it)->getGraphType();
 		const auto track_simple = (*it)->getTrack();
 		const auto track = UnicodeUtil::toUpper((*it)->getModeId(), 1); // Capitalize
 		auto color = Color(1.0, 0.0, 0.0);
-        
-		if (track_simple == TrackName::DRUMS) 
+
+		if (track_simple == TrackName::DRUMS)
 			color = Color(0.1, 0.1, 0.1);
-		else if (track_simple == TrackName::BASS) 
+		else if (track_simple == TrackName::BASS)
 			color = Color(0.5, 0.3, 0.1);
 
 		m_database.scores.emplace_back(score, type, track, track_simple, color);
@@ -56,13 +56,13 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		const auto winner = *std::max_element(m_database.scores.begin(), m_database.scores.end());
 		const auto topScore = winner.score;
 		// Determine rank
-		if (winner.type == input::DEVTYPE_VOCALS) {
+		if (winner.type == input::DevType::VOCALS) {
 			if (topScore > 8000) m_rank = _("Hit singer");
 			else if (topScore > 6000) m_rank = _("Lead singer");
 			else if (topScore > 4000) m_rank = _("Rising star");
 			else if (topScore > 2000) m_rank = _("Amateur");
 			else m_rank = _("Tone deaf");
-		} else if (winner.type == input::DEVTYPE_DANCEPAD) {
+		} else if (winner.type == input::DevType::DANCEPAD) {
 			if (topScore > 8000) m_rank = _("Maniac");
 			else if (topScore > 6000) m_rank = _("Hoofer");
 			else if (topScore > 4000) m_rank = _("Rising star");
