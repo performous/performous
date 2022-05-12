@@ -5,6 +5,7 @@
 #include "libxml++.hh"
 
 #include <memory>
+#include <optional>
 #include <set>
 #include <vector>
 #include <string>
