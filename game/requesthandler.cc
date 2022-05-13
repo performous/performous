@@ -2,6 +2,8 @@
 #include "unicode.hh"
 #include "game.hh"
 
+#include <cstdint>
+
 #ifdef USE_WEBSERVER
 RequestHandler::RequestHandler(Songs& songs):m_songs(songs)
 {
@@ -119,7 +121,7 @@ void RequestHandler::Get(web::http::http_request request)
     } else if(path == "/api/getCurrentPlaylist.json") {
         Game* gm = Game::getSingletonPtr();
         web::json::value jsonRoot = web::json::value::array();
-        auto i = 0;
+        unsigned i = 0;
         for (auto const& song : gm->getCurrentPlayList().getList()) {
             web::json::value songObject = web::json::value::object();
             songObject["Title"] = web::json::value::string(song->title);
@@ -182,18 +184,13 @@ void RequestHandler::Post(web::http::http_request request)
             return;
         }
         try {
-            auto songIdToDelete = jsonPostBody["songId"].as_integer();
-            if(songIdToDelete >= 0) {
+            unsigned songIdToDelete = jsonPostBody["songId"].as_number().to_uint32();
                 gm->getCurrentPlayList().removeSong(songIdToDelete);
                 ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(gm->getScreen("Playlist"));
                 m_pp->triggerSongListUpdate();
 
                 request.reply(web::http::status_codes::OK, "success");
                 return;
-            } else {
-                request.reply(web::http::status_codes::BadRequest, "Can't remove songs from the playlist with a negative id \"" + std::to_string(songIdToDelete) +"\". Please make a valid request.");
-                return;
-            }
         } catch(web::json::json_exception const & e) {
             std::string str = std::string("JSON Exception: ") + e.what();
             request.reply(web::http::status_codes::BadRequest, str);
@@ -205,17 +202,9 @@ void RequestHandler::Post(web::http::http_request request)
             return;
         }
         try {
-            auto songIdToMove = jsonPostBody["songId"].as_integer();
-            auto positionToMoveTo = jsonPostBody["position"].as_integer();
-            int sizeOfPlaylist = gm->getCurrentPlayList().getList().size();
-            if(songIdToMove < 0) {
-                request.reply(web::http::status_codes::BadRequest, "Can't move songs with a negative id \"" + std::to_string(songIdToMove) + "\". Please make a valid request.");
-                return;
-            }
-            if(positionToMoveTo < 0) {
-                request.reply(web::http::status_codes::BadRequest, "Can't move songs to a negative position \"" + std::to_string(positionToMoveTo) + "\". Please make a valid request.");
-                return;
-            }
+            unsigned songIdToMove = jsonPostBody["songId"].as_number().to_uint32();
+            unsigned positionToMoveTo = jsonPostBody["position"].as_number().to_uint32();
+            unsigned sizeOfPlaylist = static_cast<unsigned>(gm->getCurrentPlayList().getList().size());
             if(songIdToMove > sizeOfPlaylist - 1) {
                 request.reply(web::http::status_codes::BadRequest, "Not gonna move the unknown song you've provided \"" + std::to_string(songIdToMove + 1) + "\". Please make a valid request.");
                 return;
@@ -239,7 +228,7 @@ void RequestHandler::Post(web::http::http_request request)
         auto query = jsonPostBody["query"].as_string();
         m_songs.setFilter(query);
         web::json::value jsonRoot = web::json::value::array();
-        for(int i = 0; i < m_songs.size(); i++) {
+        for(size_t i = 0; i < m_songs.size(); i++) {
             web::json::value songObject = web::json::value::object();
             songObject["Title"] = web::json::value::string(m_songs[i]->title);
             songObject["Artist"] = web::json::value::string(m_songs[i]->artist);
@@ -286,7 +275,7 @@ web::json::value RequestHandler::ExtractJsonFromRequest(web::http::http_request 
 
 web::json::value RequestHandler::SongsToJsonObject() {
     web::json::value jsonRoot = web::json::value::array();
-    for (int i=0; i< m_songs.size(); i++) {
+    for (size_t i=0; i< m_songs.size(); i++) {
         web::json::value songObject = web::json::value::object();
         songObject["Title"] = web::json::value::string(m_songs[i]->title);
         songObject["Artist"] = web::json::value::string(m_songs[i]->artist);
@@ -303,7 +292,7 @@ web::json::value RequestHandler::SongsToJsonObject() {
 std::shared_ptr<Song> RequestHandler::GetSongFromJSON(web::json::value jsonDoc) {
     m_songs.setFilter("");
 
-    for(int i = 0; i< m_songs.size(); i++) {
+    for(size_t i = 0; i< m_songs.size(); i++) {
         if(m_songs[i]->title == jsonDoc["Title"].as_string() &&
            m_songs[i]->artist == jsonDoc["Artist"].as_string() &&
            m_songs[i]->edition == jsonDoc["Edition"].as_string() &&
