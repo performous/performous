@@ -15,7 +15,7 @@ ScreenPractice::ScreenPractice(std::string const& name, Audio& audio):
 void ScreenPractice::enter() {
 	m_audio.playMusic(findFile("practice.ogg"));
 	// draw vu meters
-	for (unsigned int i = 0, mics = m_audio.analyzers().size(); i < mics; ++i) {
+	for (size_t i = 0, mics = m_audio.analyzers().size(); i < mics; ++i) {
 		auto progressBarPtr = std::unique_ptr<ProgressBar>(std::make_unique<ProgressBar>(findFile("vumeter_bg.svg"), findFile("vumeter_fg.svg"), ProgressBar::Mode::VERTICAL, 0.136, 0.023));
 		m_vumeters.push_back(std::move(progressBarPtr));
 	}
@@ -85,7 +85,7 @@ void ScreenPractice::draw_analyzers() {
 		// getPeak returns 0.0 when clipping, negative values when not that loud.
 		// Normalizing to [0,1], where 0 is -43 dB or less (to match the vumeter graphic)
 		m_vumeters[i]->dimensions.screenBottom().left(-0.4f + i * 0.08f).fixedWidth(0.04f); //0.08 was originally 0.2. Now 11 in a row fits
-		m_vumeters[i]->draw(analyzer.getPeak() / 43.0 + 1.0);
+		m_vumeters[i]->draw(static_cast<float>(analyzer.getPeak() / 43.0 + 1.0));
 
 		if (freq != 0.0) {
 			Analyzer::tones_t tones = analyzer.getTones();
@@ -94,8 +94,8 @@ void ScreenPractice::draw_analyzers() {
 				if (t->age < Tone::MINAGE) continue;
 				if (!scale.setFreq(t->freq).isValid()) continue;
 				double line = scale.getNoteLine() + 0.4 * scale.getNoteOffset();
-				float posXnote = -0.25 + 0.2 * i + 0.002 * t->stabledb;  // Wiggle horizontally based on volume
-				float posYnote = -0.03 - line * 0.015;  // On treble key (C4), plus offset (lines)
+				float posXnote = static_cast<float>(-0.25 + 0.2 * i + 0.002 * t->stabledb);  // Wiggle horizontally based on volume
+				float posYnote = static_cast<float>(-0.03 - line * 0.015);  // On treble key (C4), plus offset (lines)
 
 				theme->note.dimensions.left(posXnote).center(posYnote);
 				theme->note.draw();
