@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <cstdint>
 #include <complex>
 #include <vector>
 #include <list>
@@ -79,7 +80,7 @@ public:
 	/// list of tones
 	typedef std::list<Tone> tones_t;
 	/// constructor
-	Analyzer(double rate, std::string id, std::size_t step = 200);
+	Analyzer(double rate, std::string id, unsigned step = 200);
 	/** Add input data to buffer. This is thread-safe (against other functions). **/
 	template <typename InIt> void input(InIt begin, InIt end) {
 		m_buf.insert(begin, end);
@@ -117,7 +118,7 @@ public:
 	std::string const& getId() const { return m_id; }
 
 private:
-	const std::size_t m_step;
+	const unsigned m_step;
 	RingBuffer<2 * FFT_N> m_buf;  // Twice the FFT size should give enough room for sliding window and for engine delays
 	RingBuffer<4096> m_passthrough;
 	double m_resampleFactor;
