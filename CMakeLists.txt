@@ -56,8 +56,6 @@ if (APPLE)
 	endif()
 endif()
 
-add_compile_options(-Wall $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wextra> $<$<CXX_COMPILER_ID:gcc>:-fcx-limited-range> $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wconversion>)
-
 if(WIN32)
 	set(CMAKE_CXX_FLAGS "-DWIN32_LEAN_AND_MEAN ${CMAKE_CXX_FLAGS}")
 	set(SHARE_INSTALL_DEFAULT ".")
@@ -84,6 +82,10 @@ endif()
 add_subdirectory(data)
 
 add_subdirectory(game)
+
+target_compile_options(performous PRIVATE -Wall $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wextra> $<$<CXX_COMPILER_ID:gcc>:-fcx-limited-range> $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wconversion>)
+
+
 add_subdirectory(docs)
 
 if(NOT APPLE)
