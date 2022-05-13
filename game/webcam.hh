@@ -1,6 +1,7 @@
 #pragma once
 
 #include "texture.hh"
+#include <cstdint>
 #include <atomic>
 #include <mutex>
 #include <thread>
@@ -46,8 +47,9 @@ class Webcam {
 	bool m_frameAvailable;
 	std::atomic<bool> m_running{ false };
 	std::atomic<bool> m_quit{ false };
+	#ifdef USE_OPENCV
 	const int m_autoDetect = 0;
-
+	#endif
   public:
 	static bool enabled() {
 		#ifdef USE_OPENCV
