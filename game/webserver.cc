@@ -15,11 +15,7 @@ void WebServer::StartServer(int tried, bool fallbackPortInUse) {
 		std::clog << "webserver/error: Couldn't start webserver tried 3 times using normal port and 3 times using fallback port. Stopping webserver." << std::endl;
 		Game::getSingletonPtr()->setNotificationFromWebserver("Couldn't start webserver.");
 		if(m_server) {
-#ifdef USE_WEBSERVER
-			m_server->close().wait();
-#else
 			m_server->close();
-#endif
 		}
 	}
 
@@ -35,15 +31,11 @@ void WebServer::StartServer(int tried, bool fallbackPortInUse) {
 
 	try {
 		m_server = std::shared_ptr<RequestHandler>(new RequestHandler(addr, m_songs));
-#ifdef USE_WEBSERVER
-		m_server->open().wait();
-#else
 		if(config["game/webserver_access"].i() == 1) {
 			m_server->open("127.0.0.1", std::stoi(portToUse));
 		} else {
 			m_server->open("0.0.0.0", std::stoi(portToUse));
 		}
-#endif
 		std::string message = getIPaddr() + ":" +  portToUse;
 		Game::getSingletonPtr()->setNotificationFromWebserver(message);
 	} catch (std::exception& e) {
@@ -69,17 +61,8 @@ WebServer::WebServer(Songs& songs)
 
 WebServer::~WebServer() {
 	if( m_server ) {
-#ifdef USE_WEBSERVER
-            try {
-		m_server->close().wait();
-		m_serverThread->join();
-            } catch (const pplx::invalid_operation &e) {
-                std::clog << "webserver/error: stoping webserver failed: " << e.what() << std::endl;
-            }
-#else
 	    m_server->close();
 	    m_serverThread->join();
-#endif
 	}
 }
 

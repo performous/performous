@@ -170,37 +170,6 @@ if(OpenCV_FOUND)
 	add_definitions("-DUSE_OPENCV")
 endif()
 
-# Activating webserver
-set(ENABLE_WEBSERVER AUTO CACHE STRING "Use webserver")
-set_property(CACHE ENABLE_WEBSERVER PROPERTY STRINGS AUTO ON OFF)
-if("AUTO" STREQUAL "${ENABLE_WEBSERVER}")
-	# webserver not requested explicitly, best effort try to find it
-	find_package(CppRest QUIET)
-	if(CppRest_FOUND)
-		message(STATUS "Webserver support: Enabled (automatically found)")
-	else()
-		message(STATUS "Webserver support: Disabled (cpprestsdk not found)")
-	endif()
-elseif(ENABLE_WEBSERVER)
-	# webserver explicitly requested, make it mandatory
-	find_package(CppRest REQUIRED)
-	message(STATUS "Webserver support: Enabled (explicitly enabled)")
-else()
-	# webserver explicitly disabled
-	message(STATUS "Webserver support: Disabled (explicitly disabled)")
-endif()
-
-# if cpprest is found, add it to the dependencies
-if(CppRest_FOUND)
-	# add other required dependencies then
-	# FIXME: move this to the CppRest package includes if possible
-	find_package(Boost 1.55 REQUIRED COMPONENTS chrono thread)
-	target_include_directories(performous SYSTEM PRIVATE ${CppRest_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
-	target_link_libraries(performous PRIVATE ${CppRest_LIBRARIES} ${Boost_LIBRARIES})
-
-	add_definitions("-DUSE_WEBSERVER")
-endif()
-
 if(WIN32)
 	add_definitions("-DEPOXY_SHARED")
 	option(MXE_HACK "Features horrible hacks, but is able to compile a static performous.exe (that may not work)." OFF)
