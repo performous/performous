@@ -49,7 +49,7 @@ class ScreenPlayers : public Screen {
 	AnimValue m_quitTimer;
 	TextInput m_search;
 	std::unique_ptr<Texture> m_emptyCover;
-	std::unordered_map<fs::path, std::unique_ptr<Texture>> m_covers;
+	std::unordered_map<fs::path, std::unique_ptr<Texture>, FsPathHash> m_covers;
 	std::unique_ptr<LayoutSinger> m_layout_singer;
 	bool keyPressed = false;
 };
