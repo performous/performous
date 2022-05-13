@@ -27,8 +27,8 @@ ScreenPlayers::ScreenPlayers(std::string const& name, Audio& audio, Database& da
 
 void ScreenPlayers::enter() {
 	keyPressed = false;
-	const auto scaler = NoteGraphScalerFactory().create(m_song->getVocalTrack(0));
-	m_layout_singer = std::make_unique<LayoutSinger>(m_song->getVocalTrack(0), m_database, scaler);
+	const auto scaler = NoteGraphScalerFactory().create(m_song->getVocalTrack(0u));
+	m_layout_singer = std::make_unique<LayoutSinger>(m_song->getVocalTrack(0u), m_database, scaler);
 	theme = std::make_unique<ThemeSongs>();
 	m_emptyCover = std::make_unique<Texture>(findFile("no_player_image.svg"));
 	m_search.text.clear();
@@ -151,19 +151,19 @@ void ScreenPlayers::draw() {
 		double spos = m_players.currentPosition(); // This needs to be polled to run the animation
 
 		// Draw the covers
-		const auto ss = m_players.count();
-		int baseidx = spos + 1.5f; --baseidx; // Round correctly
-		float shift = spos - baseidx;
+		const unsigned ss = m_players.count();
+		double baseidx = spos + 1.5f; --baseidx; // Round correctly
+		double shift = spos - baseidx;
 		// FIXME: 3D browser
 		for (int i = -2; i < 5; ++i) {
-			PlayerItem player_display = m_players[baseidx + i];
-			if (baseidx + i < 0 || baseidx + i >= int(ss)) continue;
-			
+			PlayerItem player_display = m_players[static_cast<unsigned>(baseidx + i)];
+			if (static_cast<unsigned>(baseidx + i) >= ss) continue;
+
 			Texture& s = !player_display.path.empty() ? *loadTextureFromMap(player_display.path) : *m_emptyCover;
 			float diff = (i == 0 ? static_cast<float>((0.5 - fabs(shift)) * 0.07) : 0.0f);
 			float y = 0.27f + 0.5f * diff;
 			// Draw the cover
-			s.dimensions.middle(-0.2f + 0.17f * (i - shift)).bottom(y - 0.2f * diff).fitInside(0.14f + diff, 0.14f + diff); s.draw();
+			s.dimensions.middle(static_cast<float>(-0.2f + 0.17f * (i - shift))).bottom(y - 0.2f * diff).fitInside(0.14f + diff, 0.14f + diff); s.draw();
 			// Draw the reflection
 			s.dimensions.top(y + 0.2f * diff); s.tex = TexCoords(0, 1, 1, 0);
 			{
@@ -196,4 +196,3 @@ void ScreenPlayers::draw() {
 	}
 	m_layout_singer->drawScore(LayoutSinger::PositionMode::TOP);
 }
-
