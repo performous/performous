@@ -39,7 +39,7 @@ namespace {
 }
 
 AudioBuffer::uFvec AudioBuffer::makePreviewBuffer() {
-	uFvec fvec(new_fvec(m_data.size() / 2));
+	uFvec fvec(new_fvec(static_cast<uint_t>(m_data.size() / 2)));
 	float previewVol = float(config["audio/preview_volume"].i()) / 100.0f;
 	{
 		std::lock_guard<std::mutex> l(m_mutex);
@@ -59,7 +59,7 @@ bool AudioBuffer::condition() {
 	return m_quit || m_seek_asked || wantMore();
 }
 
-void AudioBuffer::operator()(const std::int16_t *data, size_t count, int64_t sample_position) {
+void AudioBuffer::operator()(const std::int16_t *data, std::int64_t count, std::int64_t sample_position) {
 	if (sample_position < 0) {
 		std::clog << "ffmpeg/warning: Negative audio sample_position " << sample_position << " seconds, frame ignored." << std::endl;
 		return;
@@ -79,8 +79,8 @@ void AudioBuffer::operator()(const std::int16_t *data, size_t count, int64_t sam
 	}
 
 	m_write_pos = sample_position;
-	size_t write_pos_in_ring = m_write_pos % m_data.size();
-	auto first_hunk_size = std::min(count, m_data.size() - write_pos_in_ring);
+	std::int64_t write_pos_in_ring = m_write_pos % static_cast<std::int64_t>(m_data.size());
+	auto first_hunk_size = std::min(count, static_cast<std::int64_t>(m_data.size()) - write_pos_in_ring);
 	std::copy(data, data + first_hunk_size, m_data.begin() + write_pos_in_ring);
 	// second part is when data wrapped in the ring buffer
 	std::copy(data + first_hunk_size, data + count, m_data.begin());
@@ -101,9 +101,9 @@ bool AudioBuffer::prepare(std::int64_t pos) {
 // pos may be negative because upper layer may request 'extra time' before
 // starting the play back. In this case, the buffer is filled of zero.
 //
-bool AudioBuffer::read(float* begin, size_t samples, std::int64_t pos, float volume) {
+bool AudioBuffer::read(float* begin, std::int64_t samples, std::int64_t pos, float volume) {
 	if (pos < 0) {
-		size_t negative_samples;
+		std::int64_t negative_samples;
 		if (static_cast<std::int64_t>(samples) + pos > 0) negative_samples = samples - (samples + pos);
 		else negative_samples = samples;
 
@@ -122,8 +122,9 @@ bool AudioBuffer::read(float* begin, size_t samples, std::int64_t pos, float vol
 		return false;
 
 	// one cannot read more data than the size of buffer
-	samples = std::min(samples, m_data.size());
-	if (pos >= m_read_pos + static_cast<std::int64_t>(m_data.size() - samples) || pos < m_read_pos) {
+	std::int64_t size = static_cast<std::int64_t>(m_data.size());
+	samples = std::min(samples, size);
+	if (pos >= m_read_pos + size - samples || pos < m_read_pos) {
 		// in case request position is not in the current possible range, we trigger a seek
 		// Note: m_write_pos is not checked on purpose: if pos is after
 		// m_write_pos, zeros present in buffer will be returned
@@ -135,8 +136,8 @@ bool AudioBuffer::read(float* begin, size_t samples, std::int64_t pos, float vol
 		return true;
 	}
 
-	for (size_t s = 0; s < samples; ++s) {
-		begin[s] += volume * da::conv_from_s16(m_data[(m_read_pos + s) % m_data.size()]);
+	for (std::int64_t s = 0; s < samples; ++s) {
+		begin[s] += volume * da::conv_from_s16(m_data[static_cast<size_t>((m_read_pos + s)) % m_data.size()]);
 	}
 
 	m_read_pos = pos + samples;
@@ -146,7 +147,7 @@ bool AudioBuffer::read(float* begin, size_t samples, std::int64_t pos, float vol
 
 double AudioBuffer::duration() { return m_duration; }
 
-AudioBuffer::AudioBuffer(fs::path const& file, unsigned int rate, size_t size):
+AudioBuffer::AudioBuffer(fs::path const& file, unsigned rate, size_t size):
 	m_data(size), m_sps(rate * AUDIO_CHANNELS) {
 		auto ffmpeg = std::make_unique<AudioFFmpeg>(file, rate, std::ref(*this));
 		const_cast<double&>(m_duration) = ffmpeg->duration();
@@ -157,7 +158,7 @@ AudioBuffer::AudioBuffer(fs::path const& file, unsigned int rate, size_t size):
 				if (m_seek_asked) {
 					m_seek_asked = false;
 					m_write_pos = m_read_pos;
-					auto seek_pos = m_read_pos / double(AV_TIME_BASE);
+					auto seek_pos = static_cast<double>(m_read_pos) / double(AV_TIME_BASE);
 
 					UnlockGuard<decltype(l)> unlocked(l); // release lock during seek
 					ffmpeg->seek(seek_pos);
@@ -279,21 +280,21 @@ VideoFFmpeg::VideoFFmpeg(fs::path const& filename, VideoCb videoCb) : FFmpeg(fil
 				SWS_POINT, nullptr, nullptr, nullptr));
 }
 
-AudioFFmpeg::AudioFFmpeg(fs::path const& filename, unsigned int rate, AudioCb audioCb) :
+AudioFFmpeg::AudioFFmpeg(fs::path const& filename, int rate, AudioCb audioCb) :
 	FFmpeg(filename, AVMEDIA_TYPE_AUDIO), m_rate(rate), handleAudioData(audioCb) {
 		// setup resampler
 		m_resampleContext.reset(swr_alloc());
 		if (!m_resampleContext) throw std::runtime_error("Cannot create resampling context");
-		av_opt_set_int(m_resampleContext.get(), "in_channel_layout", m_codecContext->channel_layout ? m_codecContext->channel_layout : av_get_default_channel_layout(m_codecContext->channels), 0);
+		av_opt_set_int(m_resampleContext.get(), "in_channel_layout", m_codecContext->channel_layout ? static_cast<std::int64_t>(m_codecContext->channel_layout) : av_get_default_channel_layout(m_codecContext->channels), 0);
 		av_opt_set_int(m_resampleContext.get(), "out_channel_layout", av_get_default_channel_layout(AUDIO_CHANNELS), 0);
 		av_opt_set_int(m_resampleContext.get(), "in_sample_rate", m_codecContext->sample_rate, 0);
-		av_opt_set_int(m_resampleContext.get(), "out_sample_rate", m_rate, 0);
+		av_opt_set_int(m_resampleContext.get(), "out_sample_rate", static_cast<int>(m_rate), 0);
 		av_opt_set_int(m_resampleContext.get(), "in_sample_fmt", m_codecContext->sample_fmt, 0);
 		av_opt_set_int(m_resampleContext.get(), "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
 		swr_init(m_resampleContext.get());
 	}
 
-double FFmpeg::duration() const { return m_formatContext->duration / double(AV_TIME_BASE); }
+double FFmpeg::duration() const { return double(m_formatContext->duration) / double(AV_TIME_BASE); }
 
 void FFmpeg::avformat_close_input(AVFormatContext *fctx) {
 	if (fctx) ::avformat_close_input(&fctx);
@@ -338,7 +339,7 @@ void FFmpeg::seek(double time) {
 	// request time, thus it allows us to drop some frames to reach the
 	// exact point where asked to seek
 	int flags = AVSEEK_FLAG_BACKWARD;
-	av_seek_frame(m_formatContext.get(), -1, time * AV_TIME_BASE, flags);
+	av_seek_frame(m_formatContext.get(), -1, static_cast<std::int64_t>(time * AV_TIME_BASE), flags);
 }
 
 void AudioFFmpeg::seek(double time) {
@@ -361,9 +362,9 @@ void FFmpeg::handleSomeFrames() {
 			throw Error(*this, ret);
 		}
 		// frame is available here
-		if (frame->pts != int64_t(AV_NOPTS_VALUE)) {
+		if (frame->pts != std::int64_t(AV_NOPTS_VALUE)) {
 			auto new_position = double(frame->pts) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
-			if (m_formatContext->streams[m_streamId]->start_time != int64_t(AV_NOPTS_VALUE))
+			if (m_formatContext->streams[m_streamId]->start_time != std::int64_t(AV_NOPTS_VALUE))
 				new_position -= double(m_formatContext->streams[m_streamId]->start_time) * av_q2d(m_formatContext->streams[m_streamId]->time_base);
 			m_position = new_position;
 		}
@@ -373,35 +374,34 @@ void FFmpeg::handleSomeFrames() {
 
 void VideoFFmpeg::processFrame(uFrame frame) {
 	// Convert into RGB and scale the data
-	int w = (m_codecContext->width + 15) & ~15;
-	auto h = m_codecContext->height;
+	std::uint32_t w = static_cast<std::uint32_t>((m_codecContext->width + 15) & ~15);
+	std::uint32_t h = static_cast<std::uint32_t>(m_codecContext->height);
 	Bitmap f;
 	f.timestamp = m_position;
 	f.fmt = pix::Format::RGB;
 	f.resize(w, h);
 	{
-		uint8_t* data = f.data();
-		int linesize = w * 3;
-		sws_scale(m_swsContext.get(), frame->data, frame->linesize, 0, h, &data, &linesize);
+		std::uint8_t* data = f.data();
+		int linesize = static_cast<int>(w * 3);
+		sws_scale(m_swsContext.get(), frame->data, frame->linesize, 0, static_cast<int>(h), &data, &linesize);
 	}
 	handleVideoData(std::move(f));  // Takes ownership and may block until there is space
 }
 
 void AudioFFmpeg::processFrame(uFrame frame) {
 	// resample to output
-	int16_t *output;
+	std::int16_t *output;
 	int out_samples = swr_get_out_samples(m_resampleContext.get(), frame->nb_samples);
-	av_samples_alloc((uint8_t**)&output, nullptr, AUDIO_CHANNELS, out_samples,
+	av_samples_alloc((std::uint8_t**)&output, nullptr, AUDIO_CHANNELS, out_samples,
 			AV_SAMPLE_FMT_S16, 0);
-	out_samples = swr_convert(m_resampleContext.get(), (uint8_t**)&output, out_samples,
-			(const uint8_t**)&frame->data[0], frame->nb_samples);
+	out_samples = swr_convert(m_resampleContext.get(), (std::uint8_t**)&output, out_samples,
+			(const std::uint8_t**)&frame->data[0], frame->nb_samples);
 	// The output is now an interleaved array of 16-bit samples
 	if (m_position_in_48k_frames == -1) {
-		m_position_in_48k_frames = static_cast<int64_t>(m_position * m_rate + 0.5f);
+		m_position_in_48k_frames = static_cast<std::int64_t>(m_position * m_rate + 0.5f);
 	}
 	handleAudioData(output, out_samples * AUDIO_CHANNELS, m_position_in_48k_frames * AUDIO_CHANNELS /* pass in samples */);
 	av_freep(&output);
 	m_position_in_48k_frames += out_samples;
 	m_position += frame->nb_samples * av_q2d(m_formatContext->streams[m_streamId]->time_base);
 }
-

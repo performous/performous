@@ -73,15 +73,15 @@ class FFmpeg {
 
 class AudioFFmpeg : public FFmpeg {
   public:
-	using AudioCb = std::function<void(const std::int16_t *data, size_t count, int64_t sample_position)>;
-	AudioFFmpeg(fs::path const& file, unsigned int rate, AudioCb audioCb);
+	using AudioCb = std::function<void(const std::int16_t *data, std::int64_t count, std::int64_t sample_position)>;
+	AudioFFmpeg(fs::path const& file, int rate, AudioCb audioCb);
 
 	void seek(double time) override;
   protected:
 	void processFrame(uFrame frame) override;
   private:
-	int64_t m_position_in_48k_frames = -1;
-	unsigned int m_rate = 0;
+	std::int64_t m_position_in_48k_frames = -1;
+	int m_rate = 0;
 	AudioCb handleAudioData;
 	std::unique_ptr<SwrContext, void(*)(SwrContext*)> m_resampleContext{nullptr, [] (auto p) { swr_close(p); swr_free(&p); }};
 };
@@ -103,13 +103,13 @@ class AudioBuffer {
   public:
 	using uFvec = std::unique_ptr<fvec_t, std::integral_constant<decltype(&del_fvec), &del_fvec>>;
 
-	AudioBuffer(fs::path const& file, unsigned int rate, size_t size = 4320256);
+	AudioBuffer(fs::path const& file, unsigned rate, size_t size = 4320256);
 	~AudioBuffer();
 
 	uFvec makePreviewBuffer();
-	void operator()(const std::int16_t *data, size_t count, int64_t sample_position);
+	void operator()(const std::int16_t *data, std::int64_t count, std::int64_t sample_position);
 	bool prepare(std::int64_t pos);
-	bool read(float* begin, size_t count, std::int64_t pos, float volume = 1.0f);
+	bool read(float* begin, std::int64_t samples, std::int64_t pos, float volume = 1.0f);
 	bool terminating();
 	double duration();
 
