@@ -18,7 +18,7 @@ std::string UnicodeUtil::getCharset (std::string const& str) {
 	bool is_reliable;
 	
 	Encoding encoding = CompactEncDet::DetectEncoding(
-        text, strlen(text),
+        text, static_cast<int>(strlen(text)),
         nullptr, nullptr, nullptr,
         UNKNOWN_ENCODING,
         UNKNOWN_LANGUAGE,
@@ -67,22 +67,24 @@ std::string UnicodeUtil::convertToUTF8 (std::string const& str) {
 	return ss.str();
 }
 
-std::string UnicodeUtil::toLower (std::string const& str, size_t length) {
+std::string UnicodeUtil::toLower (std::string const& str, int length) {
 	std::stringstream ss (str);
 	convertToUTF8 (ss, std::string());
 	std::string ret;
-	if (length == 0 || length >= str.size()) length = str.size();
+	int sizeI = static_cast<int>(str.size());
+	if (length == 0 || length >= sizeI) length = sizeI;
 		icu::UnicodeString tmp = icu::UnicodeString::fromUTF8(ss.str());
 		tmp = tmp.tempSubString(0, length).toLower() + tmp.tempSubString(length, tmp.length() - 1);
 		tmp.toUTF8String(ret);
 	return ret;
 }
 
-std::string UnicodeUtil::toUpper (std::string const& str, size_t length) {
+std::string UnicodeUtil::toUpper (std::string const& str, int length) {
 	std::stringstream ss (str);
 	convertToUTF8 (ss, std::string());
 	std::string ret;
-	if (length == 0 || length >= str.size()) length = str.size();
+	int sizeI = static_cast<int>(str.size());
+	if (length == 0 || length >= sizeI) length = sizeI;
 		icu::UnicodeString tmp = icu::UnicodeString::fromUTF8(ss.str());
 		tmp = tmp.tempSubString(0, length).toUpper() + tmp.tempSubString(length, tmp.length() - 1);
 		tmp.toUTF8String(ret);
