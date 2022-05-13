@@ -400,7 +400,7 @@ jobs:
       - name: Download and build our dependencies using vcpkg
         uses: lukka/run-vcpkg@v10.2
         with:
-          vcpkgGitCommitId: '71d274d7ce32d7f2508062a70e0a5ebe981319eb'
+          vcpkgGitCommitId: '14e7bb4ae24616ec54ff6b2f6ef4e8659434ea44'
           runVcpkgInstall: true
 
       - name: Run cmake to configure the project and build it
