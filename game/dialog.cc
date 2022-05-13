@@ -21,14 +21,14 @@ void Dialog::draw() {
 		}
 		break;
 		case State::SLIDEIN :
-		verticaloffset = 1.0 - 1.0 * (1.0-m_animationVal.get()); //TODO animate dialog
+		verticaloffset = static_cast<float>(1.0 - 1.0 * (1.0-m_animationVal.get())); //TODO animate dialog
 		if(m_animationVal.get() == 0) {
 			m_state = State::IDLE;
 			m_animationVal.setValue(6);
 		}
 		break;
 		case State::SLIDEOUT:
-			verticaloffset = 1.0 - 1.0 * m_animationVal.get();
+			verticaloffset = static_cast<float>(1.0 - 1.0 * m_animationVal.get());
 		break;
 	}
 
