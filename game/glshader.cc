@@ -3,6 +3,7 @@
 #include "glutil.hh"
 #include "video_driver.hh"
 #include <algorithm>
+#include <ios>
 #include <fstream>
 #include <stdexcept>
 
@@ -15,12 +16,12 @@ namespace {
 		std::ifstream f(filepath, std::ios::binary);
 		if (!f) throw std::runtime_error(std::string("Couldn't open ") + filepath);
 		f.seekg(0, std::ios::end);
-		size_t size = f.tellg();
+		std::streamoff size = f.tellg();
 		if (size == static_cast<decltype(size)>(-1)) throw std::runtime_error(std::string("Cannot get size of file ") + filepath);
 		f.seekg(0);
-		std::vector<char> data(size+1); // +1 for terminating null
+		std::vector<char> data(static_cast<size_t>(size+1)); // +1 for terminating null
 		if (!f.read(&data[0], size)) throw std::runtime_error(std::string("Unexpected I/O error in ") + filepath);
-		data.back() = '\0';
+		data.emplace_back() = '\0';
 		return std::string(&data[0]);
 	}
 }
@@ -32,7 +33,7 @@ void Shader::dumpInfoLog(GLuint id) {
 	if (glIsShader(id)) glGetShaderiv(id, GL_INFO_LOG_LENGTH, &maxLength);
 	else glGetProgramiv(id, GL_INFO_LOG_LENGTH, &maxLength);
 
-	std::vector<GLchar> infoLog(maxLength);
+	std::vector<GLchar> infoLog(static_cast<size_t>(maxLength));
 	int infoLogLength = 0;
 
 	if (glIsShader(id)) glGetShaderInfoLog(id, maxLength, &infoLogLength, infoLog.data());
@@ -55,7 +56,7 @@ void Shader::dumpInfoLog(GLuint id) {
 void Shader::bindUniformBlocks() {
 	glUseProgram(program);
 	glBindBuffer(GL_UNIFORM_BUFFER,Window::UBO());
-	GLsizei bufferSize = glutil::danceNoteUniforms::offset() + glutil::danceNoteUniforms::size();
+	GLint64 bufferSize = glutil::danceNoteUniforms::offset() + glutil::danceNoteUniforms::size();
 	glBufferData(GL_UNIFORM_BUFFER, bufferSize, NULL, GL_DYNAMIC_DRAW);
 	for (std::pair<std::string, unsigned int> const& uniformBlock: Shader::m_uniformblocks) {
 			GLuint blockIndex = glGetUniformBlockIndex(program, uniformBlock.first.c_str());
