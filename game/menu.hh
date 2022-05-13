@@ -2,6 +2,7 @@
 
 #include "opengl_text.hh"
 #include "configuration.hh"
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <string>
@@ -83,7 +84,7 @@ public:
 	/// move the selection
 	void move(int dir = 1);
 	/// set selection
-	void select(size_t sel);
+	void select(unsigned sel);
 	/// adjust the selected value
 	void action(int dir = 1);
 	/// clear items
@@ -93,14 +94,14 @@ public:
 
 	bool empty() const { return (menu_stack.empty() || (menu_stack.size() == 1 && menu_stack.back()->empty())); }
 	bool isOpen() const { return m_open; }
-	size_t getSubmenuLevel() const { return menu_stack.size() - 1; }
+	unsigned getSubmenuLevel() const { return static_cast<unsigned>(menu_stack.size() - 1); }
 	void open() { m_open = true; }
 	void close() { m_open = false; }
 	void toggle() { m_open = !m_open; }
-	void moveToLast() { selection_stack.back() = menu_stack.back()->size() - 1; }
+	void moveToLast() { selection_stack.back() = static_cast<unsigned>(menu_stack.back()->size() - 1); }
 
-	size_t curIndex() { return selection_stack.back(); }
-	MenuOption& current() { return menu_stack.back()->at(selection_stack.back()); }
+	unsigned curIndex() { return selection_stack.back(); }
+	MenuOption& current() { return menu_stack.back()->at(static_cast<size_t>(selection_stack.back())); }
 	MenuOption& back() { return root_options.back(); }
 	const MenuOptions::const_iterator begin() const { return menu_stack.back()->begin(); }
 	const MenuOptions::const_iterator end() const { return menu_stack.back()->end(); }
@@ -111,7 +112,7 @@ public:
 private:
 	MenuOptions root_options;
 	SubmenuStack menu_stack;
-	std::vector<size_t> selection_stack;
+	std::vector<unsigned> selection_stack;
 
 	bool m_open;
 };

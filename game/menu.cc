@@ -40,11 +40,11 @@ MenuOption &Menu::add(MenuOption opt) {
 }
 
 void Menu::move(int dir) {
-	if (dir > 0 && selection_stack.back() < menu_stack.back()->size() - 1) ++selection_stack.back();
+	if (dir > 0 && selection_stack.back() < menu_stack.back()->size() - 1u) ++selection_stack.back();
 	else if (dir < 0 && selection_stack.back() > 0) --selection_stack.back();
 }
 
-void Menu::select(size_t sel) {
+void Menu::select(unsigned sel) {
 	if (sel < menu_stack.back()->size()) selection_stack.back() = sel;
 }
 
