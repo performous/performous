@@ -3,6 +3,8 @@
 #include "chrono.hh"
 #include "util.hh"
 #include <cmath>
+#include <cstddef>
+#include <cstdint>
 #include <stdexcept>
 
 /// class for simple/linear animation/transition of values
@@ -69,8 +71,8 @@ class AnimAcceleration {
 			m_velocity = 0.0;
 			return m_position = m_target;
 		}
-		std::size_t rounds = 1.0 + 1000.0 * duration; // 1 ms or shorter timesteps
-		double t = duration / rounds;
+		std::size_t rounds = static_cast<size_t>(1.0 + 1000.0 * duration); // 1 ms or shorter timesteps
+		double t = duration / static_cast<double>(rounds);
 		for (std::size_t i = 0; i < rounds; ++i) {
 			double d = remainder(m_target - m_position, num); // Distance (via shortest way)
 			// Allow it to stop nicely, without jitter
@@ -91,14 +93,13 @@ class AnimAcceleration {
 		return m_position;
 	}
 	/// get target
-	unsigned int getTarget() const { return m_target; };
+	std::ptrdiff_t getTarget() const { return static_cast<std::ptrdiff_t>(m_target); };
 	/// set target
-	void setTarget(unsigned int target, unsigned int songs) {
-		m_target = target;
+	void setTarget(std::ptrdiff_t target, std::ptrdiff_t songs) {
+		m_target = static_cast<double>(target);
 		if (m_songs == songs) return;
 		// Number of songs has changed => reset animation
-		m_songs = songs;
-		m_position = target;
+		m_position = static_cast<double>(target);
 		m_velocity = 0.0;
 	};
 	/// resets animation target to 0
@@ -107,8 +108,8 @@ class AnimAcceleration {
 	double getVelocity() const { return m_velocity; }
 
   private:
-	unsigned int m_target;
-	unsigned int m_songs;
+	double m_target;
+	unsigned m_songs;
 	double m_position;
 	double m_velocity;
 	double m_marginLeft;
