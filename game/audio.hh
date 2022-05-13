@@ -6,6 +6,8 @@
 #include "pitch.hh"
 #include "libda/portaudio.hpp"
 #include "aubio/aubio.h"
+#include <cstddef>
+#include <cstdint>
 #include <deque>
 #include <map>
 #include <memory>
@@ -45,20 +47,20 @@ public:
 
 struct Device {
 	// Init
-	const unsigned int in, out;
+	const int in, out;
 	const double rate;
-	const unsigned int dev;
+	const PaDeviceIndex dev;
 	portaudio::Stream stream;
 	std::vector<Analyzer*> mics;
 	Output* outptr;
 
-	Device(unsigned int in, unsigned int out, double rate, unsigned int dev);
+	Device(int in, int out, double rate, PaDeviceIndex dev);
 	/// Start
 	void start();
 	/// Stop
 	void stop();
 	/// Callback
-	int operator()(float const* input, float* output, unsigned long frames);
+	int operator()(float const* input, float* output, std::ptrdiff_t frames);
 	/// Returns true if this device is opened for output
 	bool isOutput() const { return outptr != nullptr; }
 	/// Returns true if this device is assigned to the named channel (mic color or "OUT")
@@ -146,17 +148,17 @@ class Music {
 struct Track {
 	AudioBuffer audioBuffer;
 	double fadeLevel = 1.0;
-	double pitchFactor = 0.0f;
+	double pitchFactor = 0.0;
 	template <typename... Args> Track(Args&&... args): audioBuffer(std::forward<Args>(args)...) {}
 };	
 	friend class ScreenSongs;
 	public:
 	std::unordered_map<std::string, std::unique_ptr<Track>> tracks; ///< Audio decoders
 	double srate; ///< Sample rate
-	int64_t m_pos = 0; ///< Current sample position
+	std::int64_t m_pos = 0; ///< Current sample position
 	bool m_preview;
 	class AudioClock m_clock;
-	Seconds durationOf(int64_t samples) const { return 1.0s * samples / srate / 2.0; }
+	Seconds durationOf(std::int64_t samples) const { return 1.0s * samples / srate / 2.0; }
 	float* sampleStartPtr = nullptr;
 	float* sampleEndPtr = nullptr;
 public:
@@ -167,7 +169,7 @@ public:
 	Music(Audio::Files const& files, unsigned int sr, bool preview);
 	/// Sums the stream to output sample range, returns true if the stream still has audio left afterwards.
 	bool operator()(float* begin, float* end);
-	void seek(double time) { m_pos = time * srate * 2.0; }
+	void seek(double time) { m_pos = static_cast<std::int64_t>(time * srate * 2.0); }
 	/// Get the current position in seconds
 	double pos() const { return m_clock.pos().count(); }
 	double duration() const;
