@@ -31,7 +31,7 @@ namespace da {
 				const std::complex<T> temp = data[i + M] * w;
 				data[M + i] = data[i] - temp;
 				data[i] += temp;
-				w *= std::polar<T>(1.0, - TAU / N);
+				w *= std::polar<T>(1.0, - static_cast<float>(TAU / N));
 			}
 		}
 	};

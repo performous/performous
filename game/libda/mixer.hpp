@@ -117,27 +117,27 @@ namespace da {
 		}
 	  private:
 		std::shared_ptr<buffer> m_buffer;
-		int64_t m_pos;
+		std::int64_t m_pos;
 	};
 
 	class fadeinOp {
 	  public:
 	  	fadeinOp(const fadeinOp&) = delete;
   		const fadeinOp& operator=(const fadeinOp&) = delete;
-		fadeinOp(double time = 1.0, int64_t pos = 0): m_pos(pos), m_time(time) {}
+		fadeinOp(double time = 1.0, std::int64_t pos = 0): m_pos(pos), m_time(time) {}
 		bool operator()(pcm_data& data) {
 			size_t end = m_time * data.rate;
 			size_t size = data.frames * data.channels;
-			if (m_pos > int64_t(end)) return 1.0f;
+			if (m_pos > std::int64_t(end)) return 1.0f;
 			for (size_t i = 0; i < size; ++i, ++m_pos) {
 				if (m_pos < 0) data.rawbuf[i] = 0.0f;
 				sample_t level = size_t(m_pos) < end ? sample_t(m_pos) / end : 1.0f;
 				data.rawbuf[i] *= level;
 			}
-			return m_pos < int64_t(end);
+			return m_pos < std::int64_t(end);
 		}
 	  private:
-		int64_t m_pos;
+		std::int64_t m_pos;
 		double m_time;
 	};
 
@@ -145,7 +145,7 @@ namespace da {
 	  public:
 	  	fadeoutOp(const fadeoutOp&) = delete;
   		const fadeoutOp& operator=(const fadeoutOp&) = delete;
-		fadeoutOp(callback_t cb, double time = 1.0, int64_t pos = 0): m_stream(cb), m_pos(pos), m_time(time) {}
+		fadeoutOp(callback_t cb, double time = 1.0, std::int64_t pos = 0): m_stream(cb), m_pos(pos), m_time(time) {}
 		bool operator()(pcm_data& data) {
 			bool ret = m_stream(data);
 			size_t end = m_time * data.rate;
@@ -155,11 +155,11 @@ namespace da {
 				sample_t level = size_t(m_pos) < end ? 1.0f - sample_t(m_pos) / end : 0.0f;
 				data.rawbuf[i] *= level;
 			}
-			return ret && m_pos < int64_t(end);
+			return ret && m_pos < std::int64_t(end);
 		}
 	  private:
 		callback_t m_stream;
-		int64_t m_pos;
+		std::int64_t m_pos;
 		double m_time;
 	};
 
