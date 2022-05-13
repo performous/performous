@@ -29,6 +29,7 @@
 #include <fmt/format.h>
 #include <boost/program_options.hpp>
 #include <cstdlib>
+#include <cstdint>
 #include <csignal>
 #include <string>
 #include <thread>
@@ -50,8 +51,8 @@ static void checkEvents(Game& gm, Time eventTime) {
 		if (type == SDL_WINDOWEVENT) window.event(event.window.event, event.window.data1, event.window.data2);
 		if (type == SDL_QUIT) gm.finished();
 		if (type == SDL_KEYDOWN) {
-			auto key  = event.key.keysym.scancode;
-			auto mod = event.key.keysym.mod;
+			SDL_Scancode key  = event.key.keysym.scancode;
+			std::uint16_t mod = event.key.keysym.mod;
 			bool altEnter = (key == SDL_SCANCODE_RETURN || key == SDL_SCANCODE_KP_ENTER) && mod & KMOD_ALT;  // Alt+Enter
 			bool modF = key == SDL_SCANCODE_F && mod & KMOD_CTRL && mod & KMOD_GUI;  // MacOS Ctrl+Cmd+F
 			if (altEnter || modF || key == SDL_SCANCODE_F11) {
@@ -261,7 +262,7 @@ static void fatalError(const std::string &msg) {
 }
 
 int main(int argc, char** argv) try {
-	std::srand(std::time(nullptr));
+	std::srand(static_cast<unsigned>(std::time(nullptr)));
 	// Parse commandline options
 	std::vector<std::string> devices;
 	std::vector<std::string> songdirs;
