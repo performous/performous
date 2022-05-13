@@ -7,6 +7,7 @@
 #include "../unicode.hh"
 #include "../platform.hh"
 #include <portaudio.h>
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <future>
@@ -37,7 +38,7 @@ namespace portaudio {
 	}
 
 	struct DeviceInfo {
-		DeviceInfo(int id, std::string n = std::string(), int i = 0, int o = 0, unsigned index = 0): name(n), flex(n), idx(id), in(i), out(o), index(index) {}
+		DeviceInfo(int id, std::string n = std::string(), int i = 0, int o = 0, int index = 0): name(n), flex(n), idx(id), in(i), out(o), index(index) {}
 		std::string desc() const {
 			std::ostringstream oss;
 			oss << name << " (";
@@ -49,9 +50,9 @@ namespace portaudio {
 		}
 		std::string name;  ///< Full device name in UTF-8
 		std::string flex;  ///< Modified name that is less specific but still unique (allow device numbers to change)
-		unsigned idx;
-		unsigned in, out;
-		unsigned index;
+		int idx;
+		int in, out;
+		int index;
 	};
 	typedef std::vector<DeviceInfo> DeviceInfos;
 	struct AudioDevices {
@@ -64,7 +65,7 @@ namespace portaudio {
 		AudioDevices(PaHostApiTypeId backend = AutoBackendType) {
 			PaHostApiIndex backendIndex = Pa_HostApiTypeIdToHostApiIndex((backend == AutoBackendType ? defaultBackEnd() : backend));
 			if (backendIndex == paHostApiNotFound) backendIndex = Pa_HostApiTypeIdToHostApiIndex(defaultBackEnd());
-			for (unsigned i = 0, end = Pa_GetHostApiInfo(backendIndex)->deviceCount; i != end; ++i) {
+			for (int i = 0, end = Pa_GetHostApiInfo(backendIndex)->deviceCount; i != end; ++i) {
 				PaDeviceInfo const* info = Pa_GetDeviceInfo(Pa_HostApiDeviceIndexToDeviceIndex(backendIndex, i));
 				if (!info) continue;
 				std::string name = UnicodeUtil::convertToUTF8(info->name);
@@ -110,7 +111,7 @@ namespace portaudio {
 			for (auto const& d: devices) { oss << "    #" << d.idx << " " << d.desc() << std::endl; }
 			return oss.str();
 		}
-		DeviceInfo const& find(std::string const& name, bool output, unsigned num) {
+		DeviceInfo const& find(std::string const& name, bool output, int num) {
 			if (name.empty()) { return findByChannels(output, num); }
 			// Try name search with full match
 			for (auto const& dev: devices) {
@@ -125,9 +126,9 @@ namespace portaudio {
 			}
 			throw std::runtime_error("No such device.");
 		}
-		DeviceInfo const& findByChannels(bool output, unsigned num) {
+		DeviceInfo const& findByChannels(bool output, int num) {
 			for (auto const& dev: devices) {
-				unsigned reqChannels = output ? dev.out : dev.in;
+				int reqChannels = output ? dev.out : dev.in;
 				if (reqChannels >= num) { return dev;  }
 			}
 			throw std::runtime_error("No such device.");
@@ -155,7 +156,7 @@ namespace portaudio {
 		static int count() { return Pa_GetHostApiCount(); }
 		AudioBackends () {
 			if (count() == 0) throw std::runtime_error("No suitable audio backends found."); // Check specifically for 0 because it returns a negative error code if Pa is not initialized.
-			for (unsigned i = 0, end = Pa_GetHostApiCount(); i != end; ++i) {
+			for (int i = 0, end = Pa_GetHostApiCount(); i != end; ++i) {
 				PaHostApiInfo const* info = Pa_GetHostApiInfo(i);
 				if (!info || info->deviceCount < 1) continue;
 				/*
@@ -219,7 +220,7 @@ namespace portaudio {
 	template <typename Functor> static int functorCallback(void const* input, void* output, unsigned long frameCount,
                                                                const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags, void* userData) {
 		auto &callback = *reinterpret_cast<Functor*>(userData);
-		return callback(reinterpret_cast<float const*>(input), reinterpret_cast<float*>(output), frameCount);
+		return callback(reinterpret_cast<float const*>(input), reinterpret_cast<float*>(output), static_cast<std::int64_t>(frameCount));
 	}
 
 	class Stream {

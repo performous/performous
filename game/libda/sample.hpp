@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cstdint>
 #include <cmath>
+#include <limits>
 
 /**
  * @file sample.hpp Sample format definition and format conversions.
@@ -9,7 +11,7 @@
 namespace da {
 
 	using namespace std;  // For std::round which apparently is not in std namespace on mingw and thus cannot be directly used
-	
+
 	// Should be a floating-point type
 	typedef float sample_t;
 
@@ -20,19 +22,25 @@ namespace da {
 		return val;
 	}
 
-	constexpr sample_t max_s16(32767), min_s16 = -max_s16 - sample_t(1);
-	constexpr sample_t max_s24(8388607), min_s24 = -max_s24 - sample_t(1);
-	constexpr sample_t max_s32(2147483647), min_s32= -max_s32 - sample_t(1);
+	constexpr sample_t max_s16(static_cast<sample_t>(std::numeric_limits<std::int16_t>::max()));
+	constexpr sample_t min_s16 = -max_s16 - sample_t(1);
+
+	constexpr sample_t max_s24(8388607);
+	constexpr sample_t min_s24 = -max_s24 - sample_t(1);
+
+	constexpr sample_t max_s32(static_cast<sample_t>(std::numeric_limits<int>::max()));
+	constexpr sample_t min_s32 = -max_s32 - sample_t(1);
+
 	constexpr double tau(6.2831853071795864769252867665590057683943387987502116);  ///< One full circle
 	constexpr double pi = tau / sample_t(2);  ///< Half circle
 	constexpr double eps(1e-10);  ///< Tiny positive value
-	
+
 	/// Mathematical sinc function
 	template<typename Float> static inline Float msinc(Float x) { return std::abs(x) < Float(eps) ? Float(1) : std::sin(x) / x; }
-	
+
 	/// Normalized (signal processing) sinc function
 	template<typename Float> static inline Float sinc(Float x) { return msinc(Float(pi) * x); }
-	
+
 	/// Lanczos kernel of size A
 	template<unsigned A, typename Float> static inline Float lanc(Float x) {
 		return std::abs(x) < A ? sinc(x) * sinc(x / A) : Float();
@@ -48,9 +56,9 @@ namespace da {
 	// clipping in the float-to-int conversions. Now amplitude 1.0 in floating
 	// point produces -32767 .. 32767 symmetrical non-clipping range in s16.
 
-	static inline sample_t conv_from_s16(int s) { return s / max_s16; }
-	static inline sample_t conv_from_s24(int s) { return s / max_s24; }
-	static inline sample_t conv_from_s32(int s) { return s / max_s32; }
+	static inline sample_t conv_from_s16(std::int64_t s) { return static_cast<float>(s) / max_s16; }
+	static inline sample_t conv_from_s24(std::int64_t s) { return static_cast<float>(s) / max_s24; }
+	static inline sample_t conv_from_s32(std::int64_t s) { return static_cast<float>(s) / max_s32; }
 	// The rounding is strictly not necessary, but it greatly improves
 	// the error tolerance if any floating point calculations are done.
 	// The ugly static_casts are required to avoid warnings in MSVC.
