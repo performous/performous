@@ -30,5 +30,5 @@ class Object3d {
 	/// draws the object (with texture if given)
 	void draw();
 	/// draws the object with a transform
-	void draw(float x, float y, float z = 0, float s = 1.0f);
+	void draw(float x, float y, float z = 0.0f, float s = 1.0f);
 };
