@@ -108,7 +108,7 @@ void Video::render(double time) {
 	time += m_videoGap;
 	double tdist = std::abs(m_textureTime - time);
 	m_alpha.setTarget(tdist < 0.4 ? 1.2f : -0.5f);
-	float alpha = clamp(m_alpha.get());
+	float alpha = static_cast<float>(clamp(m_alpha.get()));
 	if (alpha == 0.0f) return;
 	ColorTrans c(Color::alpha(alpha));
 	m_texture.draw();
