@@ -74,7 +74,7 @@ void SongParser::midParseHeader() {
 			}
 		}
 	}
-	addBPM(0, (6e7 / midi.tempochanges.front().value));
+	addBPM(0, static_cast<float>(6e7 / midi.tempochanges.front().value));
 	std::clog << "songparser-mid/debug: Got a bpm: " << (6e7 / midi.tempochanges.front().value) << std::endl;
 }
 
@@ -85,7 +85,7 @@ void SongParser::midParse() {
 
 	MidiFileParser midi(s.midifilename);
 	int reversedNoteCount = 0;
-	for (uint32_t ts = 0, end = midi.ts_last + midi.division; ts < end; ts += midi.division) s.beats.push_back(midi.get_seconds(ts)+s.start);
+	for (std::uint32_t ts = 0, end = midi.ts_last + midi.division; ts < end; ts += midi.division) s.beats.push_back(midi.get_seconds(ts)+s.start);
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
 		std::string name = it->name;

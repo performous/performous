@@ -1,5 +1,7 @@
 #include "songparser.hh"
 #include "unicode.hh"
+#include "util.hh"
+#include <cmath>
 #include <regex>
 
 #include <boost/algorithm/string.hpp>
@@ -17,7 +19,7 @@ namespace SongParserUtil {
 	}
 	void assign (unsigned& var, std::string const& str) {
 		try {
-			var = std::stoi (str);
+			var = stou(str);
 		} catch (...) {
 			throw std::runtime_error ("\"" + str + "\" is not valid unsigned integer value");
 		}
@@ -59,7 +61,7 @@ SongParser::SongParser(Song& s): m_song(s) {
 			throw SongParserException (s, "Could not open song file", 0);
 		}
 		m_ss << f.rdbuf();
-		int size = m_ss.str().length();
+		size_t size = m_ss.str().length();
 		if ((size < 10) || (size > 100000)) {
 			throw SongParserException (s, "Does not look like a song file (wrong size)", 1, true);
 		}
@@ -75,14 +77,14 @@ SongParser::SongParser(Song& s): m_song(s) {
 			else if (iniCheck (m_ss.str())) {
 				type = Type::INI;
 			}
-			else { 
+			else {
 				throw SongParserException (s, "Does not look like a song file (wrong header)", 1, true);
 			}
 		}
 		// Header already parsed?
 		if (s.loadStatus == Song::LoadStatus::HEADER) {
 			if (!s.m_bpms.empty()) {
-				float bpm = (15 / s.m_bpms.front().step);
+				float bpm = static_cast<float>(15.0 / s.m_bpms.front().step);
 				s.m_bpms.clear();
 				addBPM(0, bpm);
 			}
@@ -108,7 +110,7 @@ SongParser::SongParser(Song& s): m_song(s) {
 		}
 		guessFiles();
 		if (!m_song.midifilename.empty()) {midParseHeader(); }
-		
+
 		s.loadStatus = Song::LoadStatus::HEADER;
 	} catch (SongParserException&) {
 		throw;
@@ -140,7 +142,7 @@ void SongParser::guessFiles () {
 		{ &m_song.music[TrackName::BGMUSIC], R"(^song\.(mp3|ogg|aac)$)" },
 		{ &m_song.music[TrackName::BGMUSIC], R"(\.(mp3|ogg|aac)$)" },
 	};
-	
+
 	std::string logMissing, logFound;
 
 	// Run checks, remove bogus values and construct regexps
@@ -155,7 +157,7 @@ void SongParser::guessFiles () {
 		if (file.empty()) { missing = true; }
 		regexps.emplace_back(p.second, std::regex_constants::icase);
 	}
-	
+
 	if (!missing) {
 		return;	// All OK!
 	}
@@ -173,9 +175,9 @@ void SongParser::guessFiles () {
 		}
 		files.erase (field);  // Remove from available options
 	}
-	
+
 	m_song.music[TrackName::PREVIEW].clear();  // We don't currently support preview tracks (TODO: proper handling in audio.cc).
-	
+
 	if (logFound.empty() && logMissing.empty()) {
 		return;
 	}
@@ -206,7 +208,7 @@ void SongParser::vocalsTogether () {
 	for (auto& nt : m_song.vocalTracks) {
 		togetherIt->second.noteMin = std::min (togetherIt->second.noteMin, nt.second.noteMin);
 		togetherIt->second.noteMax = std::max (togetherIt->second.noteMax, nt.second.noteMax);
-		
+
 		Notes& n = nt.second.notes;
 		if (!n.empty()) {tracks.push_back (TrackInfo (n.begin(), n.end())); }
 	}
@@ -242,7 +244,7 @@ void SongParser::finalize () {
 			for (auto itn = vocal.notes.begin(); itn != vocal.notes.end();) {
 				if (itn->type == Note::Type::SLEEP) { itn->end = itn->begin; ++itn; continue; }
 				auto next = (itn +1);
-				
+
 				// Try to fix overlapping syllables.
 				if (next != vocal.notes.end() && Note::overlapping(*itn, *next)) {
 					double beatDur = getBPM(m_song, itn->begin).step;
@@ -272,7 +274,7 @@ void SongParser::finalize () {
 		}
 		// Adjust negative notes
 		if (vocal.noteMin <= 0) {
-			unsigned int shift = (1 - vocal.noteMin / 12) * 12;
+		 	float shift = (1 - std::floor(vocal.noteMin / 12)) * 12;
 			vocal.noteMin += shift;
 			vocal.noteMax += shift;
 			for (auto& elem : vocal.notes) {
@@ -289,7 +291,7 @@ void SongParser::finalize () {
 	}
 	if (m_tsPerBeat) {
 		// Add song beat markers
-		for (unsigned ts = 0; ts < m_tsEnd; ts += m_tsPerBeat) { m_song.beats.push_back (tsTime (ts)); }
+		for (unsigned ts = 0; ts < m_tsEnd; ts += m_tsPerBeat) { m_song.beats.push_back (tsTime (static_cast<double>(ts))); }
 	}
 }
 

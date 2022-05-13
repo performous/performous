@@ -130,8 +130,8 @@ bool SongParser::smParseField(std::string line) {
 			double ts, bpm;
 			char chr;
 			while (iss >> ts >> chr >> bpm) {
-				if (ts == 0.0) m_bpm = bpm;
-				addBPM(ts * 4.0, bpm);
+				if (ts == 0.0) m_bpm = static_cast<float>(bpm);
+				addBPM(ts * 4.0, m_bpm);
 				if (!(iss >> chr)) break;
 			}
 	}
@@ -175,7 +175,7 @@ bool SongParser::smParseField(std::string line) {
 
 Notes SongParser::smParseNotes(std::string line) {
 	//container for dance songs
-	typedef std::map<int, Note> DanceChord;	//int indicates "arrow" position (cmp. fret in guitar)
+	typedef std::map<unsigned, Note> DanceChord;	//int indicates "arrow" position (cmp. fret in guitar)
 	typedef std::vector<DanceChord> DanceChords;
 
 	DanceChords chords;	//temporary container for notes
@@ -184,7 +184,7 @@ Notes SongParser::smParseNotes(std::string line) {
 	double begin = 0.0;
 	bool forceMeasure = false;
 
-	std::map<int, int> holdMarks; // Keeps track of hold notes not yet terminated
+	std::map<unsigned, unsigned> holdMarks; // Keeps track of hold notes not yet terminated
 
 	while (forceMeasure || getline(line)) {
 		if (forceMeasure) { line = ";"; forceMeasure = false; }
@@ -194,13 +194,13 @@ Notes SongParser::smParseNotes(std::string line) {
 		if (line[0] == '#') break;  // HACK: This should read away the next #NOTES: line
 		if (line[0] == ',' || line[0] == ';') {
 			double end = tsTime(measure * 16.0);
-			unsigned div = chords.size();
+			unsigned div = static_cast<unsigned>(chords.size());
 			double step = (end - begin) / div;
-			for (unsigned note = 0; note < div; ++note) {
+			for (unsigned note = 0u; note < div; ++note) {
 				double t = begin + note * step;
 				double phase = double(note) / div;
 				for (auto& elem: chords[note]) {
-					int& holdIdx = holdMarks[elem.first];  // holdIdx for current arrow
+					unsigned& holdIdx = holdMarks[elem.first];  // holdIdx for current arrow
 					Note& n = elem.second;
 					n.begin = n.end = t;
 					n.phase = phase;
@@ -209,12 +209,12 @@ Notes SongParser::smParseNotes(std::string line) {
 					// TODO: Proper ROLL handling
 					if (n.type == Note::Type::HOLDBEGIN || n.type == Note::Type::ROLL) {
 						notes.push_back(n);  // Note added now, end time will be fixed later
-						holdIdx = notes.size(); // Store index in notes plus one
+						holdIdx = static_cast<unsigned>(notes.size()); // Store index in notes plus one
 						continue;
 					}
 					if (n.type == Note::Type::HOLDEND) {
 						if (holdIdx == 0) throw std::runtime_error("Hold end without beginning");
-						notes[holdIdx - 1].end = t;
+						notes[static_cast<unsigned>(holdIdx - 1)].end = t;
 					}
 					holdIdx = 0;
 				}
@@ -234,8 +234,8 @@ Notes SongParser::smParseNotes(std::string line) {
 			forceMeasure = true;
 			line = line.substr(0, line.size()-1);
 		}
-		for(std::size_t i = 0; i < line.size(); i++) {
-			char notetype = line[i];
+		for(unsigned i = 0; i < static_cast<unsigned>(line.size()); i++) {
+			char notetype = line[static_cast<unsigned>(i)];
 			if (notetype == '0') continue;
 			Note note;
 			if(notetype == '1') note.type = Note::Type::TAP;
@@ -247,12 +247,12 @@ Notes SongParser::smParseNotes(std::string line) {
 			else if(notetype >= 'a' && notetype <= 'z') note.type = Note::Type::TAP;
 			else if(notetype >= 'A' && notetype <= 'Z') note.type = Note::Type::TAP;
 			else throw std::runtime_error(std::string("Invalid note command: ") + notetype);
-			note.note = i;
+			note.note = static_cast<float>(i);
 			chord[i] = note;
 		}
 		chords.push_back(chord);
 	}
-	m_tsEnd = std::max(m_tsEnd, measure * 16);
+	m_tsEnd = std::max(m_tsEnd, static_cast<unsigned>(std::round(measure * 16.0)));
 	return notes;
 }
 
