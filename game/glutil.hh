@@ -122,7 +122,7 @@ namespace glutil {
 		}
 
 		GLsizei size() const {
-			return m_vertices.size();
+			return static_cast<int>(m_vertices.size());
 		}
 		
 		static GLsizei stride() { return sizeof(VertexInfo); }
