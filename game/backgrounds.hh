@@ -25,16 +25,16 @@ class Backgrounds {
 	/// array access
 	std::string& operator[](std::size_t pos) { return m_bgs.at(pos); }
 	/// number of backgrounds
-	int size() const { return m_bgs.size(); };
+	size_t size() const { return m_bgs.size(); };
 	/// true if empty
-	int empty() const { return m_bgs.empty(); };
+	bool empty() const { return m_bgs.empty(); };
 	/// returns random background
 	std::string getRandom();
 
   private:
 	typedef std::vector<std::string> BGVector;
 	BGVector m_bgs;
-	int m_bgiter = 0;
+	unsigned m_bgiter = 0;
 	void reload_internal();
 	void reload_internal(fs::path const& p);
 	std::atomic<bool> m_dirty{ false };
