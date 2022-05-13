@@ -77,17 +77,17 @@ void LayoutSinger::drawScore(PositionMode position) {
 			m_line_rank_text[i%4]->render(prevLineRank);
 			switch(position) {
 				case LayoutSinger::PositionMode::FULL:
-					m_line_rank_text[i%4]->dimensions().middle(-0.350f + 0.01f + 0.25f * j).fixedHeight(0.055f*fzoom).screenTop(0.11f);
+					m_line_rank_text[i%4]->dimensions().middle(-0.350f + 0.01f + 0.25f * j).fixedHeight(static_cast<float>(0.055*fzoom)).screenTop(0.11f);
 					break;
 				case LayoutSinger::PositionMode::TOP:
-					m_line_rank_text[i%4]->dimensions().right(0.30f).fixedHeight(0.05f*fzoom).screenTop(0.025f + 0.050f * j);
+					m_line_rank_text[i%4]->dimensions().right(0.30f).fixedHeight(static_cast<float>(0.05*fzoom)).screenTop(0.025f + 0.050f * j);
 					break;
 				case LayoutSinger::PositionMode::BOTTOM:
-					m_line_rank_text[i%4]->dimensions().right(0.30f).fixedHeight(0.05f*fzoom).center(0.025f + 0.050f * j);
+					m_line_rank_text[i%4]->dimensions().right(0.30f).fixedHeight(static_cast<float>(0.05*fzoom)).center(0.025f + 0.050f * j);
 					break;
 				case LayoutSinger::PositionMode::LEFT:
 				case LayoutSinger::PositionMode::RIGHT:
-					m_line_rank_text[i%4]->dimensions().middle(-0.350f + 0.01f + 0.25f * j).fixedHeight(0.055f*fzoom).screenTop(0.11f);
+					m_line_rank_text[i%4]->dimensions().middle(-0.350f + 0.01f + 0.25f * j).fixedHeight(static_cast<float>(0.055*fzoom)).screenTop(0.11f);
 					break;
 			}
 			{
@@ -163,8 +163,8 @@ void LayoutSinger::draw(double time, PositionMode position) {
 		} while (dirty);
 		if (m_theme.get()) // if there is a theme, draw the lyrics with it
 		{
-			for (size_t i = 0; i < m_lyrics.size(); ++i, pos.move(0.0, linespacing)) {
-				pos.move(0.0, m_lyrics[i].extraspacing.get() * linespacing);
+			for (size_t i = 0; i < m_lyrics.size(); ++i, pos.move(0.0f, linespacing)) {
+				pos.move(0.0f, static_cast<float>(m_lyrics[i].extraspacing.get() * linespacing));
 				if (i == 0) m_lyrics[0].draw(m_theme->lyrics_now, time, pos);
 				else if (i == 1) m_lyrics[1].draw(m_theme->lyrics_next, time, pos);
 			}
