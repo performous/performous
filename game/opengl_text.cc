@@ -3,6 +3,7 @@
 #include "libxml++-impl.hh"
 
 #include "fontconfig/fontconfig.h"
+#include <cstdint>
 #include <cmath>
 #include <iostream>
 #include <sstream>
@@ -83,12 +84,12 @@ OpenGLText::OpenGLText(TextStyle& _text, float m) {
 	{
 		PangoRectangle rec;
 		pango_layout_get_pixel_extents(layout.get(), nullptr, &rec);
-		m_x = rec.width + border;  // Add twice half a border for margins
-		m_y = rec.height + border;
+		m_x = static_cast<float>(rec.width) + border;  // Add twice half a border for margins
+		m_y = static_cast<float>(rec.height) + border;
 	}
 	// Create Cairo surface and drawing context
 	std::shared_ptr<cairo_surface_t> surface(
-	  cairo_image_surface_create(CAIRO_FORMAT_ARGB32, m_x, m_y),
+	  cairo_image_surface_create(CAIRO_FORMAT_ARGB32, static_cast<int>(m_x), static_cast<int>(m_y)),
 	  cairo_surface_destroy);
 	std::shared_ptr<cairo_t> dc(
 	  cairo_create(surface.get()),
@@ -124,7 +125,9 @@ OpenGLText::OpenGLText(TextStyle& _text, float m) {
 	Bitmap bitmap(cairo_image_surface_get_data(surface.get()));
 	bitmap.fmt = pix::Format::INT_ARGB;
 	bitmap.linearPremul = true;
-	bitmap.resize(cairo_image_surface_get_width(surface.get()), cairo_image_surface_get_height(surface.get()));
+	unsigned width = static_cast<unsigned>(cairo_image_surface_get_width(surface.get()));
+	unsigned height = static_cast<unsigned>(cairo_image_surface_get_height(surface.get()));
+	bitmap.resize(width, height);
 	m_texture.load(bitmap, true);
 	// We don't want text quality multiplier m to affect rendering size...
 	m_x /= m;
@@ -169,7 +172,7 @@ namespace {
 				// Parse as int because https://llvm.org/bugs/show_bug.cgi?id=17782
 				int value;
 				iss2 >> value;
-				_theme.fontsize = value;
+				_theme.fontsize = static_cast<float>(value);
 			}
 			else if (token == "font-family") std::getline(iss2, _theme.fontfamily);
 			else if (token == "font-style") std::getline(iss2, _theme.fontstyle);
@@ -264,17 +267,17 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool lyrics) {
 
 	float texture_ar = text_x / text_y;
 	m_texture_width = std::min(0.96f, text_x / targetWidth); // targetWidth is defined in video_driver.cc, it's the base rendering width, used to project the svg onto a gltexture. currently we're targeting 1366x768 as base resolution.
-	
-	if (m_align == Align::CENTER) position_x -= 0.5f * m_texture_width;
-	if (m_align == Align::RIGHT) position_x -= m_texture_width;
 	float position_x = dimensions.x1();
 
-	if ((position_x + m_texture_width > 0.48f)) { 
+	if (m_align == Align::CENTER) position_x -= 0.5f * m_texture_width;
+	if (m_align == Align::RIGHT) position_x -= m_texture_width;
+
+	if ((position_x + m_texture_width > 0.48f)) {
 		m_texture_width = (0.48f - position_x) ;
 	}
 	m_texture_height = m_texture_width / texture_ar; // Keep aspect ratio.
 	for (size_t i = 0; i < _text.size(); i++) {
-		float syllable_x = m_opengl_text[i]->w();
+		float syllable_x = m_opengl_text[i]->x();
 		float syllable_width = syllable_x *  m_texture_width / text_x * _text[i].factor;
 		float syllable_height = m_texture_height * _text[i].factor;
 		float syllable_ar = syllable_width / syllable_height;
@@ -287,9 +290,8 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool lyrics) {
 			LyricColorTrans lc(m_text.fill_col, m_text.stroke_col, m_text_highlight.fill_col, m_text_highlight.stroke_col);
 			dim.fixedWidth(dim.w() * factor);
 			m_opengl_text[i]->draw(dim, tex);
-		} 
+		}
 		else { m_opengl_text[i]->draw(dim, tex); }
 		position_x += (syllable_width / factor) * (lyrics ? 1.1f : 1.0f);
 	}
 }
-
