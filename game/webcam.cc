@@ -113,7 +113,7 @@ void Webcam::render() {
 		Bitmap bitmap;
 		bitmap.fmt = pix::Format::BGR;
 		bitmap.buf.swap(m_frame.data);
-		bitmap.resize(m_frame.width, m_frame.height);
+		bitmap.resize(static_cast<unsigned>(m_frame.width), static_cast<unsigned>(m_frame.height));
 		m_texture.load(bitmap);
 		bitmap.buf.swap(m_frame.data);  // Get back our buffer (FIXME: do we need to?)
 		m_frameAvailable = false;
