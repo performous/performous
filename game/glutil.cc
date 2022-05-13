@@ -9,10 +9,10 @@ namespace glutil {
 		}
 		float result;
 		result = std::ceil(static_cast<float>(offset) / static_cast<float>(Window::bufferOffsetAlignment));
-		result *= Window::bufferOffsetAlignment;
-		return result;
+		result *= static_cast<float>(Window::bufferOffsetAlignment);
+		return static_cast<GLintptr>(result);
 	}
-		
+
 	void VertexArray::clear() {
 		m_vertices.clear();
 	}
@@ -20,7 +20,7 @@ namespace glutil {
 	void VertexArray::draw(GLint mode) {
 		GLErrorChecker glerror("VertexArray::draw");
 		if (empty()) return;
-	
+
 		glBufferData(GL_ARRAY_BUFFER, stride() * size(), &m_vertices.front(), GL_DYNAMIC_DRAW);
 
 		glerror.check("draw arrays");
