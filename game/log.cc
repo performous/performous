@@ -3,6 +3,7 @@
 #include "fs.hh"
 #include <boost/iostreams/device/file_descriptor.hpp>
 #include <boost/iostreams/stream.hpp>
+#include <cstddef>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -118,13 +119,13 @@ int numeric(std::string const& level) {
 }
 
 std::streamsize VerboseMessageSink::write(const char* s, std::streamsize n) {
-	std::string line(s, n);  // Note: s is *not* a c-string, thus we must stop after n chars.
+	std::string line(s, static_cast<size_t>(n));  // Note: s is *not* a c-string, thus we must stop after n chars.
 	// Parse prefix as subsystem/level:...
 	size_t slash = line.find('/');
 	size_t colon = line.find(": ", slash);
 	if (slash == std::string::npos || colon == std::string::npos) {
 		std::string msg = "logger/error: Invalid log prefix on line [[[\n" + line + "]]]\n";
-		write(msg.data(), msg.size());
+		write(msg.data(), static_cast<std::streamsize>(msg.size()));
 		return n;
 	}
 	std::string subsystem(line, 0, slash);
@@ -132,7 +133,7 @@ std::streamsize VerboseMessageSink::write(const char* s, std::streamsize n) {
 	int lev = numeric(level);
 	if (lev == -1) {
 		std::string msg = "logger/error: Invalid level '" + level + "' line [[[\n" + line + "]]]\n";
-		write(msg.data(), msg.size());
+		write(msg.data(), static_cast<std::streamsize>(msg.size()));
 		return n;
 	}
 	if (lev >= minLevel || (!target.empty() && subsystem.find(target) != std::string::npos)) {
