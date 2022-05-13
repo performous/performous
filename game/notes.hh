@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <cstdint>
 #include <map>
 #include <string>
 #include <vector>
@@ -21,7 +22,7 @@ struct Duration {
 };
 
 typedef std::vector<Duration> Durations;
-typedef std::map<int, Durations> NoteMap;
+typedef std::map<unsigned, Durations> NoteMap;
 
 /// Sort by instrument track name
 struct CompInstrumentTrack {
@@ -56,14 +57,14 @@ struct Note {
 	double phase; /// Position within a measure, [0, 1)
 	// FIXME: Remove gameplay variables from here (Note should be immutable).
 	/// power of note (how well it is being hit right now)
-	mutable double power;
+	mutable float power;
 	/// which players sung well
 	mutable std::vector<Color> stars;
 	/// note type
 	enum class Type { FREESTYLE = 'F', NORMAL = ':', GOLDEN = '*', GOLDEN2 = 'G', SLIDE = '+', SLEEP = '-', RAP = 'R',
 	  TAP = '1', HOLDBEGIN = '2', HOLDEND = '3', ROLL = '4', MINE = 'M', LIFT = 'L'} type;
-	int note; ///< MIDI pitch of the note (at the end for slide notes)
-	int notePrev; ///< MIDI pitch of the previous note (should be same as note for everything but SLIDE)
+	float note; ///< MIDI pitch of the note (at the end for slide notes)
+	float notePrev; ///< MIDI pitch of the previous note (should be same as note for everything but SLIDE)
 	/// lyrics syllable for that note
 	std::string syllable;
 	/// Difference of n from note
@@ -77,7 +78,7 @@ struct Note {
 	/// Score when singing over time period (a, b), which needs not to be entirely within the note
 	double score(double freq, double b, double e) const;
 	/// How precisely the note is hit (always 1.0 for freestyle, 0..1 for others)
-	double powerFactor(double note) const;
+	float powerFactor(double note) const;
 	/// Compares begin of two notes
 	static bool ltBegin(Note const& a, Note const& b) {
 		if (a.begin == b.begin) {
@@ -85,12 +86,12 @@ struct Note {
 			if (a.type == Note::Type::SLEEP) return true;
 			if (b.type == Note::Type::SLEEP) return false;
 		}
-		return a.begin < b.begin; 
+		return a.begin < b.begin;
 	}
 	/// Compares end of two notes
 	static bool ltEnd(Note const& a, Note const& b) { return a.end < b.end; }
 	/// Compare equality of two notes, used for deleting duplicates when programatically creating the duet track.
-	static bool equal(Note const& a, Note const& b) { 
+	static bool equal(Note const& a, Note const& b) {
 		if (a.type == Note::Type::SLEEP) return (a.type == b.type);
 		return (a.begin == b.begin && a.end == b.end && a.note == b.note && a.type == b.type);
 	}
@@ -113,7 +114,7 @@ public:
 	void reload();
 	std::string name;
 	Notes notes;
-	int noteMin, noteMax; ///< lowest and highest note
+	float noteMin, noteMax; ///< lowest and highest note
 	double beginTime, endTime; ///< the period where there are notes
 	double m_scoreFactor; ///< normalization factor for the scoring system
 	MusicalScale scale; ///< scale in which song is sung

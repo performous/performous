@@ -28,7 +28,7 @@ namespace input {
 				}
 			}
 		}
-		std::string getName(unsigned dev) const override {
+		std::string getName(int dev) const override {
 			PmDeviceInfo const* info = Pm_GetDeviceInfo(dev);
 			if (!info) throw std::logic_error("Invalid MIDI device requested in Midi::getName");
 			std::ostringstream name;
@@ -37,18 +37,18 @@ namespace input {
 		}
 		bool process(Event& event) override {
 			PmEvent ev;
-			for (auto it = m_streams.begin(); it != m_streams.end(); ++it) {
+			for (auto it = m_streams.begin(); it != m_streams.end();++it) {
 				if (Pm_Read(*it->second, &ev, 1) != 1) continue;
-				unsigned char evnt = ev.message & 0xF0;
-				unsigned char note = ev.message >> 8;
-				unsigned char vel  = ev.message >> 16;
+				unsigned char evnt = static_cast<unsigned char>(ev.message & 0xF0);
+				unsigned char note = static_cast<unsigned char>(ev.message >> 8);
+				unsigned char vel  = static_cast<unsigned char>(ev.message >> 16);
 				unsigned chan = (ev.message & 0x0F) + 1;  // It is conventional to use one-based indexing
-				if (evnt == 0x80 /* NOTE OFF */) { evnt = 0x90; vel = 0; }  // Translate NOTE OFF into NOTE ON with zero-velocity
+				if (evnt == 0x80 /* NOTE OFF */) { evnt = static_cast<unsigned char>(0x90); vel = 0; }  // Translate NOTE OFF into NOTE ON with zero-velocity
 				if (evnt != 0x90 /* NOTE ON */) continue;  // Ignore anything that isn't NOTE ON/OFF
 				std::clog << "controller-midi/info: MIDI NOTE ON/OFF event: ch=" << unsigned(chan) << " note=" << unsigned(note) << " vel=" << unsigned(vel) << std::endl;
-				event.source = SourceId(SourceType::MIDI, it->first, chan);
-				event.hw = note;
 				event.value = vel / 127.0;
+				event.source = SourceId(SourceType::MIDI, it->first, chan);
+				event.hw = static_cast<unsigned>(note);
 				return true;
 			}
 			return false;

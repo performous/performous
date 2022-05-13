@@ -4,6 +4,7 @@
 #include "song.hh"
 #include "unicode.hh"
 #include "fs.hh"
+#include <cstdint>
 #include <boost/range/adaptor/reversed.hpp>
 #include <sstream>
 

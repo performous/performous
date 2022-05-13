@@ -1,7 +1,6 @@
 #include "musicalscale.hh"
 
 #include "util.hh"
-#include <cmath>
 #include <sstream>
 #include <stdexcept>
 
@@ -20,15 +19,15 @@ MusicalScale& MusicalScale::setNote(double note) {
 	return *this;
 }
 
-unsigned MusicalScale::getNoteId() const {
+float MusicalScale::getNoteId() const {
 	if (!isValid()) throw std::logic_error("MusicalScale::getNoteId must only be called on valid notes.");
-	return round(m_note);
+	return static_cast<float>(std::round(m_note));
 }
 
 // NOTE: Only C major scale is currently implemented.
 
 static const char* const noteNames[12] = {"C ","C#","D ","D#","E ","F ","F#","G ","G#","A ","A#","B "};
-static const int noteLines[12] = { 0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6 };
+static const unsigned noteLines[12] = { 0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6 };
 
 std::string MusicalScale::getStr() const {
 	if (!isValid()) return std::string();
@@ -37,11 +36,10 @@ std::string MusicalScale::getStr() const {
 	return oss.str();
 }
 
-int MusicalScale::getNoteLine() const {
-	return (getOctave() - 4) * 7 + noteLines[getNum()];
+unsigned MusicalScale::getNoteLine() const {
+	return static_cast<unsigned>((getOctave() - 4) * 7 + static_cast<int>(noteLines[getNum()]));
 }
 
 bool MusicalScale::isSharp() const {
 	return noteNames[getNum()][1] == '#';  // Uses the second character of noteNames!
 }
-

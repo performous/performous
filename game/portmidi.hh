@@ -1,6 +1,7 @@
 #pragma once
 
 #include <portmidi.h>
+#include <cstdint>
 #include <stdexcept>
 #include <iostream>
 
@@ -33,4 +34,3 @@ namespace pm {
 		}
 	};
 }
-

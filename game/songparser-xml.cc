@@ -85,7 +85,7 @@ void SongParser::xmlParseHeader() {
 		}
 		if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 	}
-	
+
 	// Extract tempo
 	{
 		xmlpp::const_NodeSet n;
@@ -98,7 +98,7 @@ void SongParser::xmlParseHeader() {
 		else throw std::runtime_error("Unknown tempo resolution: " + res);
 	}
 	addBPM(0, m_bpm);
-	
+
 	// Read TRACK elements (singer names), if available
 	std::string singers;  // Only used for "Together" track
 	xmlpp::const_NodeSet tracks;
@@ -140,7 +140,7 @@ void SongParser::xmlParse() {
 	dom.find("/ss:MELODY[ss:SENTENCE]", tracks) || dom.find("/ss:MELODY/ss:TRACK[ss:SENTENCE]", tracks);
 	if (tracks.empty()) throw std::runtime_error("No valid tracks or sentences found");
 	// Process each vocalTrack separately; use the same XML (version 1) track twice if needed
-	unsigned players = clamp<unsigned>(s.vocalTracks.size(), 1, 2);  // Don't count "Together" track
+	unsigned players = clamp<unsigned>(static_cast<unsigned>(s.vocalTracks.size()), 1, 2);  // Don't count "Together" track
 	auto vocalIt = s.vocalTracks.begin();
 	for (unsigned player = 0; player < players; ++player, ++vocalIt) {
 		if (vocalIt == s.vocalTracks.end()) throw std::logic_error("SongParser-xml vocalIt past the end");
@@ -172,7 +172,7 @@ void SongParser::xmlParse() {
 			for (auto const& elem: notes) {
 				auto const& noteNode = dynamic_cast<xmlpp::Element const&>(*elem);
 				Note n = xmlParseNote(noteNode, ts);
-				if (n.note == 0) continue;
+				if (n.note == 0.0f) continue;
 				// Skip sentences that do not belong to current player
 				if (player != 0 && sentenceSinger == "Solo 1") continue;
 				if (players > 1 && player != 1 && sentenceSinger == "Solo 2") continue;
@@ -193,7 +193,8 @@ Note SongParser::xmlParseNote(xmlpp::Element const& noteNode, unsigned& ts) {
 	} else {
 		lyric += ' ';
 	}
-	unsigned note, duration;
+	int note;
+	double duration;
 	SongParserUtil::assign(note, noteNode.get_attribute("MidiNote")->get_value().c_str());
 	SongParserUtil::assign(duration, noteNode.get_attribute("Duration")->get_value().c_str());
 	if (noteNode.get_attribute("FreeStyle")) n.type = Note::Type::FREESTYLE;
@@ -201,13 +202,11 @@ Note SongParser::xmlParseNote(xmlpp::Element const& noteNode, unsigned& ts) {
 	else n.type = Note::Type::NORMAL;
 
 	n.begin = tsTime(ts);
-	ts += duration;
+	ts += static_cast<unsigned>(duration);
 	n.end = tsTime(ts);
 	n.syllable = lyric;
-	n.note = note;
-	n.notePrev = note;
+	n.note = static_cast<float>(note);
+	n.notePrev = static_cast<float>(note);
 
 	return n;
 }
-
-

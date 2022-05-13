@@ -49,7 +49,7 @@ double thresholdForFullScore() {
 		case GameDifficulty::HARD:
 			return 0.5;
 		case GameDifficulty::NORMAL:
-		default: 
+		default:
 			return 0.5;
 	}
 }
@@ -61,17 +61,17 @@ double thresholdForNonzeroScore() {
 		case GameDifficulty::HARD:
 			return 1.0;
 		case GameDifficulty::NORMAL:
-		default: 
+		default:
 			return 1.5;
 	}
 }
 
-double Note::powerFactor(double note) const {
+float Note::powerFactor(double note) const {
 	if (type == Note::Type::FREESTYLE) return 1.0;
 	double error = std::abs(diff(note));
 	double thresholdFull = thresholdForFullScore();
 	double thresholdNonzero = thresholdForNonzeroScore();
-	return clamp((thresholdNonzero - error)/(thresholdNonzero - thresholdFull), 0.0, 1.0);
+	return static_cast<float>(clamp((thresholdNonzero - error)/(thresholdNonzero - thresholdFull), 0.0, 1.0));
 }
 
 Duration::Duration(): begin(getNaN()), end(getNaN()) {}
@@ -83,7 +83,7 @@ VocalTrack::VocalTrack(std::string name) : name(name) {reload();}
 void VocalTrack::reload() {
 	notes.clear();
 	m_scoreFactor = 0.0;
-	noteMin = std::numeric_limits<int>::max();
-	noteMax = std::numeric_limits<int>::min();
+	noteMin = std::numeric_limits<float>::max();
+	noteMax = std::numeric_limits<float>::min();
 	beginTime = endTime = getNaN();
 }
