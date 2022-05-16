@@ -214,24 +214,34 @@ function main {
 			rm -rf "${TEMPDIR}"
 			mkdir -p "${TEMPDIR}"
 	fi
+
+	## If we're using Homebrew as the package mananager for MacOS, then we
+	## need to tell cmake where the openssl libraries are
+	if [ $(which brew) ]; then
+		CMAKE_EXTRA_ARGS='-DOPENSSL_ROOT_DIR=/usr/local/opt/openssl -DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib'
+		export LDFLAGS=-L/usr/local/opt/openssl/lib 
+		export CPPFLAGS=-I/usr/local/opt/openssl/include
+		export PKG_CONFIG_PATH=/usr/local/opt/openssl/lib/pkgconfig
+	fi
 	
-	cmake \
-	  -DCMAKE_INSTALL_PREFIX="$TEMPDIR" \
-	  -DCMAKE_PREFIX_PATH="${PREFIXDIR}" \
-	  -DCMAKE_BUILD_TYPE="${RELTYPE}" \
-	  -DCMAKE_VERBOSE_MAKEFILE="ON" \
-	  -DCMAKE_OSX_DEPLOYMENT_TARGET="${DEPLOYMENT_TARGET}" \
-	  -DCMAKE_C_COMPILER="${CCPATH}" \
-	  -DCMAKE_CXX_COMPILER="${CXXPATH}" \
-	  -DCMAKE_EXPORT_COMPILE_COMMANDS="ON" \
-	  -DSHARE_INSTALL="Resources" \
-	  -DLOCALE_DIR="Resources/Locales" \
-	  -DCMAKE_CXX_FLAGS="-Wall -Wextra" \
-	  -DCMAKE_OSX_ARCHITECTURES="x86_64" \
-	  -DPERFORMOUS_VERSION="${PACKAGE_VERSION}" \
-	  -DSELF_BUILT_AUBIO="ALWAYS" \
-	  -B "${PERFORMOUS_SOURCE}/build" \
-	  -S "${PERFORMOUS_SOURCE}"
+	cmake ${CMAKE_EXTRA_ARGS} \
+		-DCMAKE_INSTALL_PREFIX="$TEMPDIR" \
+		-DCMAKE_PREFIX_PATH="${PREFIXDIR}" \
+		-DCMAKE_BUILD_TYPE="${RELTYPE}" \
+		-DCMAKE_VERBOSE_MAKEFILE="ON" \
+		-DCMAKE_OSX_DEPLOYMENT_TARGET="${DEPLOYMENT_TARGET}" \
+		-DCMAKE_C_COMPILER="${CCPATH}" \
+		-DCMAKE_CXX_COMPILER="${CXXPATH}" \
+		-DCMAKE_EXPORT_COMPILE_COMMANDS="ON" \
+		-DSHARE_INSTALL="Resources" \
+		-DLOCALE_DIR="Resources/Locales" \
+		-DCMAKE_CXX_FLAGS="-Wall -Wextra" \
+		-DCMAKE_OSX_ARCHITECTURES="x86_64" \
+		-DPERFORMOUS_VERSION="${PACKAGE_VERSION}" \
+		-DSELF_BUILT_AUBIO="ALWAYS" \
+		-DENABLE_WEBSERVER=ON \
+		-B "${PERFORMOUS_SOURCE}/build" \
+		-S "${PERFORMOUS_SOURCE}"
 	
 	make -C "${PERFORMOUS_SOURCE}/build" -j${MAKE_JOBS} install # You can change the -j value in order to spawn more build threads.
 
