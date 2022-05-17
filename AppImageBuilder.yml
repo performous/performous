@@ -49,7 +49,8 @@ AppDir:
       - libswresample3
       - libswscale5
       - libxml++2.6-2v5
-    exclude: []
+    exclude:
+      - libasound2
   files:
     exclude:
       - usr/share/man
