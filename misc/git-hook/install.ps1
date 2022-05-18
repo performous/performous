@@ -2,12 +2,11 @@ param([switch]$all, [switch]$clear)
 
 $gitDir = git rev-parse --git-common-dir
 
-if (!(test-path $gitDir)) 
-{
-   $gitDir = git rev-parse --git-dir
+if (!(test-path $gitDir)) {
+    $gitDir = git rev-parse --git-dir
 }
 
-$gitDir = (resolve-path ($gitDir)).Path
+$gitDir = (Resolve-Path ($gitDir)).Path
 
 if (!$gitDir) {
     throw ".git - Directory not found"
@@ -21,7 +20,9 @@ if (!(test-path $gitHooksDir)) {
 
 if($clear) {
     write-host "cleaning old hooks dir: $githooksdir"
-    Remove-Item (join-path $githooksdir "*") -force -recurse
+    Remove-Item (join-path $githooksdir "*") -force -recurse -exclude "*.sample"
+
+    exit
 }
 
 write-host "providing files:"
