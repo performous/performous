@@ -20,28 +20,31 @@ fi
 
 echo ">>>>>>>> modifying begin <<<<<<<<"
 
-files=`find $GITDIR/hooks/precommit/modify/* -type f -maxdepth 0 -mindepth 0`
+if [ -d "$GITDIR/hooks/precommit/modify" ]
+then
+    files=`find $GITDIR/hooks/precommit/modify/* -type f -maxdepth 0 -mindepth 0`
 
-for file in $files
-do
-    echo "######## begin $file ########"
-    
-    if [ -z `echo "$file" | sed 's/.*\.ps1$//g'` ]
-    then
-        runPSScript -File $file
-    else
-        $file
-    fi
-    result="$?"
+    for file in $files
+    do
+        echo "######## begin $file ########"
+        
+        if [ -z `echo "$file" | sed 's/.*\.ps1$//g'` ]
+        then
+            runPSScript -File $file
+        else
+            $file
+        fi
+        result="$?"
 
-    if [ "$result" -ne 0 ]
-    then    
-        echo "######## end $file: abort ########"
-        exit 1
-    fi
-    
-    echo "######## end $file: continue ########"
-done
+        if [ "$result" -ne 0 ]
+        then    
+            echo "######## end $file: abort ########"
+            exit 1
+        fi
+        
+        echo "######## end $file: continue ########"
+    done
+fi
 
 echo ">>>>>>>> modifying complete <<<<<<<<"
 
