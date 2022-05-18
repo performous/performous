@@ -67,7 +67,7 @@ void Database::addHiscore(std::shared_ptr<Song> s) {
 	//just remember, who was selected this playerid
 	playersByDevices[hiscore.player_id] = playerId;
 	m_hiscores.addHiscore(hiscore.score, playerId, songId, level, hiscore.track);
-	std::clog << "database/info: Added new hiscore " << hiscore.score << " points on track " << hiscore.track << " of songid " << songId << std::endl;
+	std::clog << "database/info: Added new hiscore " << hiscore.score << " points on track " << hiscore.track << " of songid " << songId << "." << std::endl;
 }
 
 bool Database::reachedHiscore(std::shared_ptr<Song> s) const {
