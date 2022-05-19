@@ -23,7 +23,7 @@ void ScreenPaths::exit() {
 void ScreenPaths::manageEvent(SDL_Event event) {
 	if (event.type == SDL_KEYDOWN) {
 		SDL_Keycode key = event.key.keysym.scancode;
-		uint16_t modifier = event.key.keysym.mod;
+		std::uint16_t modifier = event.key.keysym.mod;
 		// Reset to defaults
 		if (key == SDL_SCANCODE_R && modifier & Platform::shortcutModifier()) {
 			config["paths/songs"].reset(modifier & KMOD_ALT);
@@ -95,7 +95,7 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 		m_menu.add(MenuOption(_(".."),_("Go to parent folder"))).call([this, sl, path]() {
 					generateMenuFromPath(path.parent_path());
 	});
-	
+
 	// Extract list of all directories
 	std::list<fs::path> directories;
 	for (const auto &di : fs::directory_iterator(path)) {
@@ -132,33 +132,32 @@ void ScreenPaths::draw() {
 	{
 		m_theme->back_h.dimensions.fixedHeight(0.065f);
 		m_theme->back_h.dimensions.stretch(m_menu.dimensions.w(), m_theme->back_h.dimensions.h());
-		const size_t showopts = 13; // Show at most 8 options simultaneously
+		const unsigned showopts = 13; // Show at most 8 options simultaneously
 		const float sel_margin = 0.04f;
 		const float x = -0.45f;
 		const float start_y = -0.15f;
 		float wcounter = 0.0f;
 		const MenuOptions &opts = m_menu.getOptions();
-		int start_i = std::min((int)m_menu.curIndex() - 1, (int)opts.size() - (int)showopts
-			+ (m_menu.getSubmenuLevel() == 2 ? 1 : 0)); // Hack to counter side-effects from displaying the value inside the menu
+		int start_i = std::min(static_cast<int>(m_menu.curIndex() - 1), static_cast<int>(opts.size() - showopts + (m_menu.getSubmenuLevel() == 2 ? 1 : 0))); // Hack to counter side-effects from displaying the value inside the menu
 		if (start_i < 0 || opts.size() == showopts) { start_i = 0; }
-		for (size_t i = start_i, ii = 0; ii < showopts && i < opts.size(); ++i, ++ii) {
+		for (unsigned i = static_cast<unsigned>(start_i), ii = 0; ii < showopts && i < static_cast<unsigned>(opts.size()); ++i, ++ii) {
 			MenuOption const& opt = opts[i];
 			if (i == m_menu.curIndex()) {
 				double selanim = m_selAnim.get() - start_i;
 				if (selanim < 0.0) { selanim = 0.0; }
-				m_theme->back_h.dimensions.left(x - sel_margin).center(start_y + selanim*0.08f);
+				m_theme->back_h.dimensions.left(x - sel_margin).center(static_cast<float>(start_y + selanim*0.08f));
 				m_theme->back_h.draw();
 				// Draw the text, dim if option not available
 				{
 					ColorTrans c(Color::alpha(opt.isActive() ? 1.0f : 0.5f));
-					m_theme->device.dimensions.left(x).center(start_y + ii*0.03f);
+					m_theme->device.dimensions.left(x).center(start_y + static_cast<float>(ii)*0.03f);
 					m_theme->device.draw(opt.getName());
 				} // to make the colortrans object go out of scope
 				wcounter = std::max(wcounter, m_theme->device.w() + 2.0f * sel_margin); // Calculate the widest entry
 				// If this is a config item, show the value below
 			} else {
 				ColorTrans c(Color::alpha(opt.isActive() ? 0.8f : 0.5f));
-				m_theme->device.dimensions.left(x).center(start_y + ii*0.03f);
+				m_theme->device.dimensions.left(x).center(start_y + static_cast<float>(ii)*0.03f);
 				m_theme->device.draw(opt.getName());
 			}
 		}
