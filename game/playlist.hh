@@ -2,6 +2,7 @@
 #pragma once
 
 #include "song.hh"
+#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <sstream>
@@ -21,7 +22,7 @@ public:
 	/// Returns all currently queued songs
 	SongList& getList();
 	///array-access should replace getList!!
-	std::shared_ptr<Song> operator[](std::size_t index) { return m_list[index]; }
+	std::shared_ptr<Song> operator[](unsigned index) { return m_list[index]; }
 	/// Returns true if the queue is empty
 	bool isEmpty();
 	/// Randomizes the order of the playlist
@@ -29,12 +30,12 @@ public:
 	///clears list
 	void clear();
 	///removes a song
-	void removeSong(int index);
+	void removeSong(unsigned index);
 	/// swaps two songs
-	void swap (int index1, int index2);
-	void setPosition (unsigned int index1, unsigned int index2);
+	void swap (unsigned index1, unsigned index2);
+	void setPosition (unsigned index1, unsigned index2);
 	/// gets a specific song and removes it from the queue
-	std::shared_ptr<Song> getSong(int index);
+	std::shared_ptr<Song> getSong(unsigned index);
 	/// this is for the webserver, to avoid crashing when adding the current playing song
 	std::shared_ptr<Song> currentlyActive;
 private:
