@@ -46,7 +46,7 @@ private:
 	Songs& m_songs;
 	void createSongListMenu();
 	void createEscMenu();
-	void createSongMenu(int songNumber);
+	void createSongMenu(unsigned songNumber);
 	void drawMenu();
 	void createMenuFromPlaylist();
 	Texture* loadTextureFromMap(fs::path path);
