@@ -2,6 +2,7 @@
 
 #include "libxml++.hh"
 
+#include <cstdint>
 #include <variant>
 #include <map>
 #include <string>
@@ -13,13 +14,13 @@ class ConfigItem {
   public:
 	typedef std::vector<std::string> StringList; ///< a list of strings
 	typedef std::vector<std::string> OptionList; ///< a list of string options
-	ConfigItem() : m_sel() {}
-	ConfigItem(bool bval);
-	ConfigItem(int ival);
-	ConfigItem(float fval);
+	ConfigItem() : m_sel() {};
+	explicit ConfigItem(bool bval);
+	explicit ConfigItem(int ival);
+	explicit ConfigItem(float fval);
 	ConfigItem(std::string sval);
 	ConfigItem(OptionList opts);
-	void update(xmlpp::Element& elem, int mode); ///< Load XML config file, elem = Entry, mode = 0 for schema, 1 for system config and 2 for user config
+	void update(xmlpp::Element& elem, unsigned mode); ///< Load XML config file, elem = Entry, mode = 0 for schema, 1 for system config and 2 for user config
 	ConfigItem& operator++() { return incdec(1); } ///< increments config value
 	ConfigItem& operator--() { return incdec(-1); } ///< decrements config value
 	/// Is the current value the same as the default value (factory setting or system setting)
@@ -33,7 +34,7 @@ class ConfigItem {
 	StringList& sl(); ///< Access stringlist item
 	OptionList& ol(); ///< Access optionlist item
 	std::string& so(); ///< Access currently selected string option
-	void select(int i); ///< Set optionlist selected item index
+	void select(unsigned short i); ///< Set optionlist selected item index
 	void reset(bool factory = false) { m_value = factory ? m_factoryDefaultValue : m_defaultValue; } ///< Reset to default
 	void makeSystem() { m_defaultValue = m_value; } ///< Make current value the system default (used when saving system config)
 	std::string const& getName() const { return m_keyName; } ///< get the name for this ConfigItem in the schema.
@@ -47,7 +48,7 @@ class ConfigItem {
 	std::string const getEnumName() const; ///< Returns the selected enum option's text
 
   private:
-	template <typename T> void updateNumeric(xmlpp::Element& elem, int mode); ///< Used internally for loading XML
+	template <typename T> void updateNumeric(xmlpp::Element& elem, unsigned mode); ///< Used internally for loading XML
 	void verifyType(std::string const& t) const; ///< throws std::logic_error if t != type
 	ConfigItem& incdec(int dir); ///< Increment/decrement by dir steps (must be -1 or 1)
 	std::string m_keyName; ///< The config key in the schema file.
@@ -62,10 +63,9 @@ class ConfigItem {
 	Value m_defaultValue; ///< The value from config schema or system config
 	std::string m_oldValue; ///< A previous value, as output by getValue().
 	std::vector<std::string> m_enums; ///< Enum value titles
-	std::variant<int, float> m_step, m_min, m_max;
-	std::variant<int, float> m_multiplier;
+	std::variant<int, float> m_step, m_min, m_max, m_multiplier;
 	std::string m_unit;
-	int m_sel;
+	unsigned short m_sel;
 };
 
 using Config = std::map<std::string, ConfigItem>;

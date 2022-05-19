@@ -25,6 +25,8 @@ ConfigItem::ConfigItem(bool bval): m_type("bool"), m_value(bval), m_sel() { }
 
 ConfigItem::ConfigItem(int ival): m_type("int"), m_value(ival), m_sel() { }
 
+ConfigItem::ConfigItem(unsigned short uival): m_type("uint"), m_value(uival), m_sel() { }
+
 ConfigItem::ConfigItem(float fval): m_type("float"), m_value(fval), m_sel() { }
 
 ConfigItem::ConfigItem(std::string sval): m_type("string"), m_value(sval), m_sel() { }
@@ -37,23 +39,30 @@ ConfigItem& ConfigItem::incdec(int dir) {
 		int& val = std::get<int>(m_value);
 		int step = std::get<int>(m_step);
 		val = clamp(((val + dir * step)/ step) * step, std::get<int>(m_min), std::get<int>(m_max));
+		unsigned short& val = std::get<unsigned short>(m_value); 
+		int value = static_cast<int>(val);
+		int step = std::get<unsigned short>(m_step);
+		int min = static_cast<int>(std::get<unsigned short>(m_min));
+		int max = static_cast<int>(std::get<unsigned short>(m_max));
+		val = static_cast<unsigned short>(clamp(((value + dir * step) / step) * step, min, max));
 	} else if (m_type == "float") {
 		float& val = std::get<float>(m_value);
 		float step = std::get<float>(m_step);
-		val = clamp(round((val + dir * step) / step) * step, std::get<float>(m_min), std::get<float>(m_max));
+		val = clamp(round((val + static_cast<float>(dir) * step) / step) * step, std::get<float>(m_min), std::get<float>(m_max));
 	} else if (m_type == "bool") {
 		bool& val = std::get<bool>(m_value);
 		val = !val;
 	} else if (m_type == "option_list") {
-		size_t s = std::get<OptionList>(m_value).size();
-		m_sel = (m_sel + dir + s) % s;
+		unsigned short s = static_cast<unsigned short>(std::get<OptionList>(m_value).size());
+		m_sel = static_cast<unsigned short>(m_sel + dir + s) % s;
 	}
 	return *this;
 }
 
 bool ConfigItem::isDefaultImpl(ConfigItem::Value const& defaultValue) const {
 	if (m_type == "bool") return std::get<bool>(m_value) == std::get<bool>(defaultValue);
-	if (m_type == "int") return std::get<int>(m_value) == std::get<int>(defaultValue);
+	if (m_type == "int") return i() == std::get<int>(defaultValue);
+	if (m_type == "uint") return ui() == std::get<unsigned short>(defaultValue);
 	if (m_type == "float") return std::get<float>(m_value) == std::get<float>(defaultValue);
 	if (m_type == "string") return std::get<std::string>(m_value) == std::get<std::string>(defaultValue);
 	if (m_type == "string_list") return std::get<StringList>(m_value) == std::get<StringList>(defaultValue);
@@ -63,8 +72,8 @@ bool ConfigItem::isDefaultImpl(ConfigItem::Value const& defaultValue) const {
 
 void ConfigItem::verifyType(std::string const& type) const {
 	if (type == m_type) return;
-	std::string name = "unknown";
 	// Try to find this item in the config map
+	std::string name = "unknown";
 	for (Config::const_iterator it = config.begin(); it != config.end(); ++it) {
 		if (&it->second == this) { name = it->first; break; }
 	}
@@ -74,6 +83,8 @@ void ConfigItem::verifyType(std::string const& type) const {
 
 int& ConfigItem::i() { verifyType("int"); return std::get<int>(m_value); }
 int const& ConfigItem::i() const { verifyType("int"); return std::get<int>(m_value); }
+unsigned short& ConfigItem::ui() { verifyType("uint"); return std::get<unsigned short>(m_value); }
+unsigned short const& ConfigItem::ui() const { verifyType("uint"); return std::get<unsigned short>(m_value); }
 bool& ConfigItem::b() { verifyType("bool"); return std::get<bool>(m_value); }
 float& ConfigItem::f() { verifyType("float"); return std::get<float>(m_value); }
 std::string& ConfigItem::s() { verifyType("string"); return std::get<std::string>(m_value); }
@@ -81,15 +92,14 @@ ConfigItem::StringList& ConfigItem::sl() { verifyType("string_list"); return std
 ConfigItem::OptionList& ConfigItem::ol() { verifyType("option_list"); return std::get<OptionList>(m_value); }
 std::string& ConfigItem::so() { verifyType("option_list"); return std::get<OptionList>(m_value).at(m_sel); }
 
-void ConfigItem::select(int i) { verifyType("option_list"); m_sel = clamp<int>(i, 0, std::get<OptionList>(m_value).size()-1); }
+void ConfigItem::select(unsigned short i) { verifyType("option_list"); m_sel = clamp<unsigned short>(i, 0, static_cast<unsigned short>(std::get<OptionList>(m_value).size()-1)); }
 
 namespace {
 	template <typename T, typename VariantAll, typename VariantNum> std::string numericFormat(VariantAll const& value, VariantNum const& multiplier, VariantNum const& step) {
-		T m = std::get<T>(multiplier);
 		// Find suitable precision (not very useful for integers, but this code is generic...)
-		T s = std::abs(m * std::get<T>(step));
-		unsigned precision = 0;
-		while (s > 0.0 && (s *= 10) < 10) ++precision;
+		T s = std::abs<T>(std::get<T>(multiplier) * std::get<T>(step));
+		int precision = 0;
+		while (s > static_cast<T>(0) && (s *= static_cast<T>(10)) < static_cast<T>(10)) ++precision;
 		// Not quite sure how to format this with FMT
 		return fmt::format("{:.{}f}", double(m) * std::get<T>(value), precision);
 	}
@@ -108,9 +118,9 @@ namespace {
 
 std::string const ConfigItem::getValue() const {
 	if (this->getName() == "audio/backend") {
-		int AutoBackendType = 1337;
-		static int val = std::get<int>(m_value);
-		if (val != std::get<int>(m_value)) val = PaHostApiNameToHostApiTypeId(this->getEnumName()); // In the case of the audio backend, val is the real value while m_value is the enum case for its cosmetic name.
+		unsigned short AutoBackendType = 1337;
+		static int val = std::get<unsigned short>(m_value);
+		if (val != std::get<unsigned short>(m_value)) val = PaHostApiNameToHostApiTypeId(this->getEnumName()); // In the case of the audio backend, val is the real value while m_value is the enum case for its cosmetic name.
 		int hostApi = Pa_HostApiTypeIdToHostApiIndex(PaHostApiTypeId(val));
 		std::ostringstream oss;
 		oss << "audio/info: Trying the selected Portaudio backend...";
@@ -131,24 +141,27 @@ std::string const ConfigItem::getValue() const {
 		return "Auto";
 	}
 	if (this->getName() == "game/language") {
-		int autoLanguageType = 1337;
-		int val = LanguageToLanguageId(this->getEnumName()); // In the case of the language, val is the real value while m_value is the enum case for its cosmetic name.
+		unsigned autoLanguageType = 1337;
+		unsigned val = LanguageToLanguageId(this->getEnumName()); // In the case of the language, val is the real value while m_value is the enum case for its cosmetic name.
 		std::string languageName = (val != autoLanguageType) ? this->getEnumName() : "Auto";
 		return languageName;
 	}
 	if (m_type == "int") {
 		int val = std::get<int>(m_value);
-		if (val >= 0 && val < int(m_enums.size())) return m_enums[val];
 		return numericFormat<int>(m_value, m_multiplier, m_step) + _(m_unit);
+		return numericFormat<unsigned short>(m_value, m_multiplier, m_step) + _(m_unit);
 	}
-	if (m_type == "float") return numericFormat<float>(m_value, m_multiplier, m_step) + m_unit;
+	if (m_type == "float") return numericFormat<float>(m_value, m_multiplier, m_step) + _(m_unit);
 	if (m_type == "bool") return std::get<bool>(m_value) ? _("Enabled") : _("Disabled");
 	if (m_type == "string") return std::get<std::string>(m_value);
 	if (m_type == "string_list") {
 		StringList const& sl = std::get<StringList>(m_value);
 		return sl.size() == 1 ? "{" + sl[0] + "}" : fmt::format(_("{:d} items"), sl.size());
 	}
-	if (m_type == "option_list") return std::get<OptionList>(m_value).at(m_sel);
+	if (m_type == "option_list") {
+		if (m_sel <= -1) throw std::logic_error("Invalid option selected at index: " + std::to_string(m_sel));
+		return std::get<OptionList>(m_value).at(static_cast<size_t>(m_sel));
+	}
 	throw std::logic_error("ConfigItem::getValue doesn't know type '" + m_type + "'");
 }
 
@@ -178,25 +191,26 @@ void ConfigItem::addEnum(std::string name) {
 	if (find(m_enums.begin(),m_enums.end(),name) == m_enums.end()) {
 		m_enums.push_back(name);
 	}
-	m_min = 0;
-	m_max = int(m_enums.size() - 1);
-	m_step = 1;
+
+	m_min = static_cast<unsigned short>(0);
+	m_max = static_cast<unsigned short>(m_enums.size() - 1);
+	m_min = static_cast<unsigned short>(1);
 }
 
 void ConfigItem::selectEnum(std::string const& name) {
 	auto it = std::find(m_enums.begin(), m_enums.end(), name);
 	if (it == m_enums.end()) throw std::runtime_error("Enum value " + name + " not found in " + m_shortDesc);
-	i() = it - m_enums.begin();
+	ui() = static_cast<unsigned short>(it - m_enums.begin());
 }
 
 
 std::string const ConfigItem::getEnumName() const {
-	int const& val = i();
-	if (val >= 0 && val < int(m_enums.size())) { return m_enums[val]; }
+	int val = i();
+	if (val < m_enums.size()) { return m_enums[val]; }
 	else { return std::string(); }
 }
 
-template <typename T> void ConfigItem::updateNumeric(xmlpp::Element& elem, int mode) {
+template <typename T> void ConfigItem::updateNumeric(xmlpp::Element& elem, unsigned mode) {
 	auto ns = elem.find("limits");
 	if (!ns.empty()) setLimits<T>(dynamic_cast<xmlpp::Element&>(*ns[0]), m_min, m_max, m_step);
 	else if (mode == 0) throw XMLError(elem, "child element limits missing");
@@ -221,7 +235,7 @@ template <typename T> void ConfigItem::updateNumeric(xmlpp::Element& elem, int m
 }
 
 
-void ConfigItem::update(xmlpp::Element& elem, int mode) try {
+void ConfigItem::update(xmlpp::Element& elem, unsigned mode) try {
 	if (mode == 0) {
 		m_keyName = getAttribute(elem, "name");
 		m_type = getAttribute(elem, "type");
@@ -243,6 +257,8 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 	} else if (m_type == "int") {
 		std::string value_string = getAttribute(elem, "value");
 		if (!value_string.empty()) m_value = std::stoi(value_string);
+		updateNumeric<int>(elem, mode);
+		if (!value_string.empty()) m_value = static_cast<unsigned short>(std::stoi(value_string));
 			// Enum handling
 			if (mode == 0) {
 				auto n2 = elem.find("limits/enum");
@@ -251,12 +267,12 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 						xmlpp::Element& elem2 = dynamic_cast<xmlpp::Element&>(**it2);
 						m_enums.push_back(getText(elem2));
 					}
-					m_min = 0;
-					m_max = int(m_enums.size() - 1);
-					m_step = 1;
+					m_min = static_cast<unsigned short>(0);
+					m_max = static_cast<unsigned short>(m_enums.size() - 1);
+					m_step = static_cast<unsigned short>(1);
 				}
 			}
-		updateNumeric<int>(elem, mode);
+		updateNumeric<unsigned short>(elem, mode);
 	} else if (m_type == "float") {
 		std::string value_string = getAttribute(elem, "value");
 		if (!value_string.empty()) m_value = std::stof(value_string);
@@ -369,7 +385,7 @@ void readMenuXML(xmlpp::Node* node) {
 	configMenu.push_back(me);
 }
 
-void readConfigXML(fs::path const& file, int mode) {
+void readConfigXML(fs::path const& file, unsigned mode) {
 	if (!fs::exists(file)) {
 		std::clog << "config/info: Skipping " << file << " (not found)" << std::endl;
 		return;
