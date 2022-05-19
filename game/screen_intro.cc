@@ -65,7 +65,7 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 	if (event.type == SDL_KEYDOWN && m_menu.getSubmenuLevel() > 0) {
 		// These are only available in config menu
 		int key = event.key.keysym.scancode;
-		uint16_t modifier = event.key.keysym.mod;
+		std::uint16_t modifier = event.key.keysym.mod;
 		if (key == SDL_SCANCODE_R && modifier & Platform::shortcutModifier() && m_menu.current().value) {
 			m_menu.current().value->reset(modifier & KMOD_ALT);
 		}
@@ -80,7 +80,7 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 void ScreenIntro::draw_menu_options() {
 	// Variables used for positioning and other stuff
 	float wcounter = 0.0f;
-	const size_t showopts = 5; // Show at most 5 options simultaneously
+	const unsigned showopts = 5; // Show at most 5 options simultaneously
 	const float x = -0.35f;
 	const float start_y = -0.1f;
 	const float sel_margin = 0.03f;
@@ -89,33 +89,31 @@ void ScreenIntro::draw_menu_options() {
 	theme->back_h.dimensions.fixedHeight(0.038f);
 	theme->back_h.dimensions.stretch(m_menu.dimensions.w(), theme->back_h.dimensions.h());
 	// Determine from which item to start
-	int start_i = std::min((int)m_menu.curIndex() - 1, (int)opts.size() - (int)showopts
-		+ (m_menu.getSubmenuLevel() == 2 ? 1 : 0)); // Hack to counter side-effects from displaying the value inside the menu
+	int start_i = std::min(static_cast<int>(m_menu.curIndex() - 1), static_cast<int>(opts.size() - showopts + (m_menu.getSubmenuLevel() == 2 ? 1 : 0))); // Hack to counter side-effects from displaying the value inside the menu
 	if (start_i < 0 || opts.size() == showopts) start_i = 0;
-
 	// Loop the currently visible options
-	for (size_t i = start_i, ii = 0; ii < showopts && i < opts.size(); ++i, ++ii) {
+	for (unsigned i = static_cast<unsigned>(start_i), ii = 0; ii < showopts && i < static_cast<unsigned>(opts.size()); ++i, ++ii) {
 		MenuOption const& opt = opts[i];
-		ColorTrans c(Color::alpha(submenuanim));
+		ColorTrans c(Color::alpha(static_cast<float>(submenuanim)));
 
 		// Selection
 		if (i == m_menu.curIndex()) {
 			// Animate selection higlight moving
-			float selanim = m_selAnim.get() - start_i;
+			double selanim = m_selAnim.get() - start_i;
 			if (selanim < 0.0) selanim = 0.0;
-			theme->back_h.dimensions.left(x - sel_margin).center(start_y + selanim*0.065);
+			theme->back_h.dimensions.left(x - sel_margin).center(static_cast<float>(start_y + selanim*0.065));
 			theme->back_h.draw();
 			// Draw the text, dim if option not available
 			{
 				ColorTrans c(Color::alpha(opt.isActive() ? 1.0f : 0.5f));
-				theme->option_selected.dimensions.left(x).center(start_y + ii*0.065f);
+				theme->option_selected.dimensions.left(x).center(start_y + static_cast<float>(ii)*0.065f);
 				theme->option_selected.draw(_(opt.getName()));
 			}
 			wcounter = std::max(wcounter, theme->option_selected.w() + 2.0f * sel_margin); // Calculate the widest entry
 			// If this is a config item, show the value below
 			if (opt.type == MenuOption::Type::CHANGE_VALUE) {
 				++ii; // Use a slot for the value
-				theme->option_selected.dimensions.left(x + sel_margin).center(-0.1f + (selanim+1.0f)*0.065f);
+				theme->option_selected.dimensions.left(x + sel_margin).center(static_cast<float>(-0.1 + (selanim+1.0)*0.065));
 				theme->option_selected.draw("<  " + _(opt.value->getValue()) + "  >");
 			}
 
@@ -124,7 +122,7 @@ void ScreenIntro::draw_menu_options() {
 			std::string title = _(opt.getName());
 			SvgTxtTheme& txt = getTextObject(title);
 			ColorTrans c(Color::alpha(opt.isActive() ? 1.0f : 0.5f));
-			txt.dimensions.left(x).center(start_y + ii*0.065f);
+			txt.dimensions.left(x).center(start_y + static_cast<float>(ii)*0.065f);
 			txt.draw(title);
 			wcounter = std::max(wcounter, txt.w() + 2.0f * sel_margin); // Calculate the widest entry
 		}
@@ -135,8 +133,8 @@ void ScreenIntro::draw_menu_options() {
 void ScreenIntro::draw() {
 	glutil::GLErrorChecker glerror("ScreenIntro::draw()");
 	{
-		float anim = SDL_GetTicks() % 20000 / 20000.0;
-		ColorTrans c(glmath::rotate(TAU * anim, glmath::vec3(1.0f, 1.0f, 1.0f)));
+		float anim = static_cast<float>(SDL_GetTicks() % 20000 / 20000.0);
+		ColorTrans c(glmath::rotate(static_cast<float>(TAU * anim), glmath::vec3(1.0f, 1.0f, 1.0f)));
 		theme->bg.draw();
 	}
 	if (m_menu.current().image) m_menu.current().image->draw();
@@ -204,7 +202,7 @@ void ScreenIntro::draw_webserverNotice() {
 	}
 	std::stringstream m_webserverStatusString;
 	if((webserversetting == 1 || webserversetting == 2) && m_drawNotice) {
-		std::string message = Game::getSingletonPtr()->subscribeWebserverMessages();		
+		std::string message = Game::getSingletonPtr()->subscribeWebserverMessages();
 		m_webserverStatusString << _("Webserver active!\n connect to this computer\nusing: ") << message;
 		theme->WebserverNotice.draw(m_webserverStatusString.str());
 	}
