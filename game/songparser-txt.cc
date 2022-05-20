@@ -179,7 +179,7 @@ bool SongParser::txtParseNote(std::string line) {
 			if (iss.get() == ' ') std::getline(iss, n.syllable);
 			n.end = tsTime(ts + length);
 		}
-			break;
+		break;
 		case Note::Type::SLEEP:
 		{
 			unsigned int end;
@@ -191,8 +191,16 @@ bool SongParser::txtParseNote(std::string line) {
 			}
 			n.end = tsTime(end);
 		}
-			break;
-		default: throw std::runtime_error("Unknown note type");
+		break;
+		case Note::Type::SLIDE:
+		case Note::Type::TAP:
+		case Note::Type::HOLDBEGIN:
+		case Note::Type::HOLDEND:
+		case Note::Type::ROLL:
+		case Note::Type::MINE:
+		case Note::Type::LIFT:
+		default: 
+			throw std::runtime_error("Unknown note type");
 	}
 	n.begin = tsTime(ts);
 	VocalTrack& vocal = m_song.getVocalTrack(

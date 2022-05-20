@@ -150,7 +150,10 @@ void NoteGraph::drawNotes() {
 		Texture* t1;
 		Texture* t2;
 		switch (it->type) {
-			case Note::Type::NORMAL: case Note::Type::SLIDE: t1 = &m_notebar; t2 = &m_notebar_hl; break;
+			case Note::Type::NORMAL: 
+			case Note::Type::SLIDE: 
+				t1 = &m_notebar; t2 = &m_notebar_hl; 
+			break;
 			case Note::Type::GOLDEN:
 			case Note::Type::GOLDEN2: //fallthrough
 				t1 = &m_notebargold; t2 = &m_notebargold_hl;
@@ -168,7 +171,15 @@ void NoteGraph::drawNotes() {
 				}
 			}
 			continue;
-		  default: throw std::logic_error("Unknown note type: don't know how to render");
+			case Note::Type::SLEEP:
+			case Note::Type::TAP:
+			case Note::Type::HOLDBEGIN:
+			case Note::Type::HOLDEND:
+			case Note::Type::ROLL:
+			case Note::Type::MINE:
+			case Note::Type::LIFT:
+			default: 
+				throw std::logic_error("Unknown note type: don't know how to render");
 		}
 		float x = static_cast<float>(m_baseX + it->begin * pixUnit + m_noteUnit); // left x coordinate: begin minus border (side borders -noteUnit wide)
 		float bar_height = barHeight();
