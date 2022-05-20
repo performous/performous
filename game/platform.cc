@@ -2,12 +2,12 @@
 #include "fs.hh"
 
 Platform::HostOS Platform::currentOS() {
-if (BOOST_OS_WINDOWS != 0) { return HostOS::OS_WIN; }
-else if (BOOST_OS_LINUX != 0) { return HostOS::OS_LINUX; }
-else if (BOOST_OS_MACOS != 0) { return HostOS::OS_MAC; }
-else if (BOOST_OS_BSD != 0) { return HostOS::OS_BSD; }
-else if (BOOST_OS_SOLARIS != 0) { return HostOS::OS_SOLARIS; }
-else if (BOOST_OS_UNIX != 0) { return HostOS::OS_UNIX; }
+if constexpr(BOOST_OS_WINDOWS != 0) { return HostOS::OS_WIN; }
+else if constexpr(BOOST_OS_LINUX != 0) { return HostOS::OS_LINUX; }
+else if constexpr(BOOST_OS_MACOS != 0) { return HostOS::OS_MAC; }
+else if constexpr(BOOST_OS_BSD != 0) { return HostOS::OS_BSD; }
+else if constexpr(BOOST_OS_SOLARIS != 0) { return HostOS::OS_SOLARIS; }
+else if constexpr(BOOST_OS_UNIX != 0) { return HostOS::OS_UNIX; }
 }
 
 uint16_t Platform::shortcutModifier(bool eitherSide) {
