@@ -101,6 +101,8 @@ void writePNG(fs::path const& filename, Bitmap const& img, unsigned stride) {
 	switch (img.fmt) {
 		case pix::Format::RGB: bpp = 3; colorType = PNG_COLOR_TYPE_RGB; break;
 		case pix::Format::CHAR_RGBA: bpp = 4; colorType = PNG_COLOR_TYPE_RGBA; break;
+		case pix::Format::BGR:
+		case pix::Format::INT_ARGB:
 		default:
 			// Byte order would need to be changed for other formats and we don't currently need them...
 			throw std::logic_error("Unsupported pixel format in writePNG_internal");
