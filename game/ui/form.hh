@@ -4,6 +4,7 @@
 
 class Form : public UserControl {
   public:
+	void focus(Control const&);
 	void focusNext();
 	void focusPrevious();
 

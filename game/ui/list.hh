@@ -58,6 +58,7 @@ class List : public Control {
 
 	void select(size_t);
 	void select(std::string const& id);
+	void select(std::function<bool(Item const&)> const&);
 
 	void displayIcon(bool);
 	bool isDisplayingIcon() const;
@@ -69,7 +70,7 @@ class List : public Control {
 
   private:
 	void updateTexts();
-    void updateIcons();
+	void updateIcons();
 	void updateCheckBoxs();
 
   private:

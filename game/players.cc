@@ -81,7 +81,7 @@ std::optional<std::string> Players::lookup(const PlayerId& id) const {
 	return (*it)->name;
 }
 
-void Players::addPlayer(PlayerItem const& p) {
+PlayerId Players::addPlayer(PlayerItem const& p) {
 	auto player = p;
 
 	//pi.id = id.value_or(assign_id_internal());
@@ -108,6 +108,8 @@ void Players::addPlayer(PlayerItem const& p) {
 		player.id = assign_id_internal();
 		m_players.emplace(std::make_shared<PlayerItem>(player)); // now do the insert with the fresh id
 	}
+
+	return player.id;
 }
 
 void Players::addPlayer(std::string const& name, std::string const& picture, std::optional<PlayerId> id) {
@@ -117,7 +119,18 @@ void Players::addPlayer(std::string const& name, std::string const& picture, std
 	pi.name = name;
 	pi.picture = picture;
 
-	addPlayer(pi);
+	return addPlayer(pi);
+}
+
+void Players::removePlayer(PlayerItem const& player) {
+	removePlayer(player.id);
+}
+
+void Players::removePlayer(PlayerId playerId) {
+	auto const it = std::find_if(m_players.begin(), m_players.end(), [playerId](auto const& itemPtr){ return itemPtr->id == playerId;});
+
+	if(it != m_players.end())
+		m_players.erase(it);
 }
 
 void Players::setFilter(std::string const& val) {
@@ -132,7 +145,7 @@ PlayerId Players::assign_id_internal() {
 	if (it != m_players.end() && it->id) 
 		return (*it)->id + 1;
 
-	return 0;
+	return id;
 }
 
 void Players::filter_internal() {

@@ -58,7 +58,9 @@ class Players {
 
 	/// add a player with a displayed name and an optional picture; if no id is given one will be assigned
 	void addPlayer (std::string const& name, std::string const& picture = "", std::optional<PlayerId> id = std::nullopt);
-	void addPlayer(PlayerItem const&);
+	PlayerId addPlayer(PlayerItem const&);
+	void removePlayer(PlayerId);
+	void removePlayer(PlayerItem const&);
 
 	players_t const& getPlayers() const { return  m_players; }
 

@@ -1,5 +1,24 @@
 #include "form.hh"
 
+void Form::focus(Control const& control) {
+	if(getChildren().empty())
+		return;
+
+	if(m_focus == &control)
+		return;
+
+	if(m_focus)
+		m_focus->setFocus(false);
+
+	auto children = getChildren();
+	auto it = std::find(children.begin(), children.end(), &control);
+
+	if(it != children.end()) {
+		m_focus = *it;
+		m_focus->setFocus(true);
+	}
+}
+
 void Form::focusNext() {
 	if(getChildren().empty())
 		return;

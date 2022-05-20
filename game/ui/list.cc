@@ -106,6 +106,17 @@ void List::select(const std::string& id) {
 	throw std::runtime_error("No item with id '" + id + "' found!");
 }
 
+void List::select(std::function<bool(Item const&)> const& selector) {
+	for(auto i = 0U; i < m_items.size(); ++i) {
+		if(selector(m_items[i])) {
+			select(i);
+			return;
+		}
+	}
+
+	throw std::runtime_error("No matching item found!");
+}
+
 void List::onSelectionChanged(const std::function<void(List&, size_t, size_t)>& callback) {
 	m_onSelectionChanged = callback;
 }

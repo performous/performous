@@ -59,6 +59,12 @@ void ScreenPlayerSetup::draw() {
 void ScreenPlayerSetup::enter() {
 	m_players.update();
 
+	initialize();
+
+	getForm().focus(m_playerList);
+}
+
+void ScreenPlayerSetup::initialize() {
 	auto items = std::vector<Item>();
 
 	for(auto& p : m_players.getPlayers()) {
@@ -95,13 +101,13 @@ void ScreenPlayerSetup::exit() {
 }
 
 void ScreenPlayerSetup::initializeControls() {
-	const auto verticalOffset = -0.15;
-	const auto horizontalSpace = 0.225;
-	const auto horizontalLabelSpace = horizontalSpace * 0.75;
-	const auto horizontalOffset = -0.45;
-	const auto lineHeight = 0.025;
-	const auto listHeight = 1 + verticalOffset - 0.5;
-	const auto verticalSpace = lineHeight * 0.125;;
+	const auto verticalOffset = -0.15f;
+	const auto horizontalSpace = 0.225f;
+	const auto horizontalLabelSpace = horizontalSpace * 0.75f;
+	const auto horizontalOffset = -0.45f;
+	const auto lineHeight = 0.025f;
+	const auto listHeight = 1.f + verticalOffset - 0.5f;
+	const auto verticalSpace = lineHeight * 0.125f;
 	auto y = verticalOffset;
 
 	getForm().addControl(m_playerList);
@@ -144,12 +150,12 @@ void ScreenPlayerSetup::initializeControls() {
 		}
 
 	getForm().addControl(m_nameLabel);
-	m_nameLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01, y, horizontalLabelSpace, lineHeight);
+	m_nameLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01f, y, horizontalLabelSpace, lineHeight);
 	m_nameLabel.setText(_("Name:"));
 
 	getForm().addControl(m_name);
 	m_name.setMaxLength(16);
-	m_name.setGeometry(horizontalOffset + horizontalSpace + 0.01 + horizontalLabelSpace + 0.01, y, horizontalSpace, lineHeight);
+	m_name.setGeometry(horizontalOffset + horizontalSpace + 0.01f + horizontalLabelSpace + 0.01f, y, horizontalSpace, lineHeight);
 	m_name.onTextChanged(
 		[&](TextBox&, std::string const& text, std::string const&){
 			std::cout << "changed to " << text << std::endl;
@@ -162,16 +168,16 @@ void ScreenPlayerSetup::initializeControls() {
 	y += lineHeight + verticalSpace;
 
 	getForm().addControl(m_avatarLabel);
-	m_avatarLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01, y, horizontalLabelSpace, lineHeight);
+	m_avatarLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01f, y, horizontalLabelSpace, lineHeight);
 	m_avatarLabel.setText(_("Avatar:"));
 
-	auto x = horizontalOffset + horizontalSpace + 0.01 + horizontalLabelSpace + 0.01;
-	auto y2 = y + (horizontalSpace * (0.6 - 0.15)) * 0.5;
+	auto x = horizontalOffset + horizontalSpace + 0.01f + horizontalLabelSpace + 0.01f;
+	auto y2 = y + (horizontalSpace * (0.6f - 0.15f)) * 0.5f;
 	getForm().addControl(m_avatarPrevious);
-	m_avatarPrevious.setGeometry(x, y2, horizontalSpace * 0.15, horizontalSpace * 0.15);
-	x += horizontalSpace * 0.2;
+	m_avatarPrevious.setGeometry(x, y2, horizontalSpace * 0.15f, horizontalSpace * 0.15f);
+	x += horizontalSpace * 0.2f;
 	getForm().addControl(m_avatar);
-	m_avatar.setGeometry(x, y, horizontalSpace * 0.6, horizontalSpace * 0.6);
+	m_avatar.setGeometry(x, y, horizontalSpace * 0.6f, horizontalSpace * 0.6f);
 	m_avatar.canBeFocused(true);
 	m_avatar.onKeyUp(
 		[&](Control&, Control::Key key){
@@ -181,41 +187,53 @@ void ScreenPlayerSetup::initializeControls() {
 				shiftAvatarRight();
 		}
 	);
-	x += horizontalSpace * 0.65;
+	x += horizontalSpace * 0.65f;
 	getForm().addControl(m_avatarNext);
-	m_avatarNext.setGeometry(x, y2, horizontalSpace * 0.15, horizontalSpace * 0.15);
+	m_avatarNext.setGeometry(x, y2, horizontalSpace * 0.15f, horizontalSpace * 0.15f);
 
-	y += horizontalSpace * 0.6 + verticalSpace;
+	y += horizontalSpace * 0.6f + verticalSpace;
 
 	getForm().addControl(m_bestScoreLabel);
-	m_bestScoreLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01, y, horizontalLabelSpace, lineHeight);
+	m_bestScoreLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01f, y, horizontalLabelSpace, lineHeight);
 	m_bestScoreLabel.setText(_("Best score:"));
 
 	getForm().addControl(m_bestScore);
-	m_bestScore.setGeometry(horizontalOffset + horizontalSpace + 0.01 + horizontalLabelSpace + 0.01, y, horizontalSpace, lineHeight);
+	m_bestScore.setGeometry(horizontalOffset + horizontalSpace + 0.01f + horizontalLabelSpace + 0.01f, y, horizontalSpace, lineHeight);
 	m_bestScore.setText(_("na"));
 
 	y += lineHeight + verticalSpace;
 
 	getForm().addControl(m_bestSongLabel);
-	m_bestSongLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01, y, horizontalLabelSpace, lineHeight);
+	m_bestSongLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01f, y, horizontalLabelSpace, lineHeight);
 	m_bestSongLabel.setText(_("Best song:"));
 
 	getForm().addControl(m_bestSong);
-	m_bestSong.setGeometry(horizontalOffset + horizontalSpace + 0.01 + horizontalLabelSpace + 0.01, y, horizontalSpace, lineHeight);
+	m_bestSong.setGeometry(horizontalOffset + horizontalSpace + 0.01f + horizontalLabelSpace + 0.01f, y, horizontalSpace, lineHeight);
 	m_bestSong.setText(_("na"));
 
 	y += lineHeight + verticalSpace;
 
 	getForm().addControl(m_averageScoreLabel);
-	m_averageScoreLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01, y, horizontalLabelSpace, lineHeight);
+	m_averageScoreLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01f, y, horizontalLabelSpace, lineHeight);
 	m_averageScoreLabel.setText(_("Average score:"));
 
 	getForm().addControl(m_averageScore);
-	m_averageScore.setGeometry(horizontalOffset + horizontalSpace + 0.01 + horizontalLabelSpace + 0.01, y, horizontalSpace, lineHeight);
+	m_averageScore.setGeometry(horizontalOffset + horizontalSpace + 0.01f + horizontalLabelSpace + 0.01f, y, horizontalSpace, lineHeight);
 	m_averageScore.setText(_("na"));
 
-	getForm().focusNext();
+	y += (lineHeight + verticalSpace) * 4;
+
+	getForm().addControl(m_addPlayerButton);
+	m_addPlayerButton.setGeometry(horizontalOffset + horizontalSpace + 0.01f, y, horizontalLabelSpace, lineHeight);
+	m_addPlayerButton.setText(_("Add player"));
+	m_addPlayerButton.onClicked([&](Button&){addPlayer();});
+
+	getForm().addControl(m_deletePlayerButton);
+	m_deletePlayerButton.setGeometry(horizontalOffset + horizontalSpace + 0.01f + horizontalLabelSpace + 0.01f, y, horizontalLabelSpace, lineHeight);
+	m_deletePlayerButton.setText(_("Delete player"));
+	m_deletePlayerButton.onClicked([&](Button&){deletePlayer();});
+
+	getForm().focus(m_playerList);
 }
 
 void ScreenPlayerSetup::shiftAvatarLeft() {
@@ -270,6 +288,35 @@ void ScreenPlayerSetup::shiftAvatarRight() {
 
 	setAvatar(m_avatar, m_avatarPrevious, m_avatarNext, id, m_avatars);
 	m_playerList.getSelected().setIcon(player.getAvatarPath().string());
+}
+
+void ScreenPlayerSetup::addPlayer() {
+	auto const id = m_players.addPlayer(_("New player"));
+
+	std::cout << "added player with id " << id << std::endl;
+
+	initialize();
+
+	auto const selector = [id](Item const& item) {
+		return item.getUserData<PlayerItem*>()->id == id;
+	};
+
+	m_playerList.select(selector);
+
+	getForm().focus(m_name);
+}
+
+void ScreenPlayerSetup::deletePlayer() {
+	std::cout << "delete player" << std::endl;
+	try {
+		auto const& listitemToRemove = m_playerList.getSelected();
+		auto const& playerToRemove = *listitemToRemove.getUserData<PlayerItem*>();
+
+		m_players.removePlayer(playerToRemove);
+
+		initialize();
+	}
+	catch(...) {}
 }
 
 
