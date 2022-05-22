@@ -91,7 +91,7 @@ namespace {
 		unsigned precision = 0;
 		while (s > 0.0 && (s *= 10) < 10) ++precision;
 		// Not quite sure how to format this with FMT
-		return fmt::format("{:d}", std::get<T>(value));
+		return fmt::format("{:.{}f}", double(m) * std::get<T>(value), precision);
 	}
 
 	std::string getText(xmlpp::Element const& elem) {
