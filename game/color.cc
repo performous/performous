@@ -44,9 +44,9 @@ namespace {
 }
 
 Color::Color(std::string const& str) {
-	unsigned int r = 0, g = 0, b = 0, a = 255;
+	int r = 0, g = 0, b = 0, a = 255;
 	if (str.size() > 0 && str[0] == '#' && sscanf(str.c_str() + 1, "%02x %02x %02x %02x", &r, &g, &b, &a) >= 3) {
-		*this = Color(lin(r / 255.0f), lin(g / 255.0f), lin(b / 255.0f), a / 255.0f);
+		*this = Color(lin(static_cast<float>(r) / 255.0f), lin(static_cast<float>(g) / 255.0f), lin(static_cast<float>(b) / 255.0f), static_cast<float>(a) / 255.0f);
 		return;
 	}
 	ColorNames::Map::const_iterator it = colors.m.find(str);
@@ -68,7 +68,7 @@ Color MicrophoneColor::get(std::string name) {
 	else if (name == "orange") return Color(1.0f, 52.0f/255.0f, 0.0f, 1.0f);
 	else if (name == "fuchsia") return Color(1.0f, 0.06f, 127/255.0f, 1.0f);
 	else if (name == "yellow") return Color(1.0f, 1.0f, 0.0f, 1.0f);
-	else if (name == "green") return Color(0.0f, 1.0f, 0.0f, 1.0f);	
+	else if (name == "green") return Color(0.0f, 1.0f, 0.0f, 1.0f);
 	else if (name == "red") return Color(1, 0.0f, 0.0f, 1.0f);
 	else if (name == "blue") return Color(0.0f, 43.75f/255.0f, 1.0f, 1.0f);
 	else return Color(0.5f, 0.5f, 0.5f, 1.0f);
