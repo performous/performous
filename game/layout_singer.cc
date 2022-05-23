@@ -29,7 +29,8 @@ void LayoutSinger::reset() {
 }
 
 void LayoutSinger::drawScore(PositionMode position) {
-	unsigned int i = 0, j = 0;
+	unsigned int i = 0;
+    float j = 0.0f;
 	for (std::list<Player>::const_iterator p = m_database.cur.begin(); p != m_database.cur.end(); ++p, ++i) {
 		if (p->m_vocal.name != m_vocal.name) continue;
 		Color color(p->m_color.r, p->m_color.g, p->m_color.b, p->activity());
@@ -40,9 +41,9 @@ void LayoutSinger::drawScore(PositionMode position) {
 				m_player_icon->dimensions.left(-0.5f + 0.01f + 0.125f * j).fixedWidth(0.035f).screenTop(0.055f);
 				if (m_database.cur.size() < 9){
 					m_player_icon->dimensions.left(-0.5f + 0.01f + 0.125f * j).fixedWidth(0.035f).screenTop(0.05f);
-					m_score_text[i%4]->dimensions().middle(-0.425f + 0.01f + 0.125f * j).fixedHeight(0.035f).screenTop(0.055f);}			
+					m_score_text[i%4]->dimensions().middle(-0.425f + 0.01f + 0.125f * j).fixedHeight(0.035f).screenTop(0.055f);}
 				else{
-					m_player_icon->dimensions.left(-0.506f + 0.01f + 0.0905f * j).fixedWidth(0.028f).screenTop(0.050f);				
+					m_player_icon->dimensions.left(-0.506f + 0.01f + 0.0905f * j).fixedWidth(0.028f).screenTop(0.050f);
 					m_score_text[i%4]->dimensions().middle(-0.519f + 0.08f + 0.0905f * j).fixedHeight(0.029f).screenTop(0.053f);}
 				break;
 			case LayoutSinger::PositionMode::TOP:
