@@ -17,7 +17,7 @@ struct ProfCP {
 	void add(double t) {
 		++samples;
 		total += t;
-		avg = total / samples;
+		avg = total / static_cast<double>(samples);
 		if (peak < t) peak = t;
 	}
 };
@@ -66,5 +66,3 @@ class Profiler {
 		std::clog << oss.str() << std::endl;
 	}
 };
-
-
