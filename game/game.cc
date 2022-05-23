@@ -68,10 +68,10 @@ void Game::drawLoading() {
 	const float x = 0.3f;
 	const float spacing = 0.01f;
 	const float sq_size = (2*x - (maxi-1)*spacing) / maxi;
-	for (int i = 0; i <= m_loadingProgress * maxi; ++i) {
+	for (float f = 0.0f; f <= m_loadingProgress * maxi; ++f) {
 		ColorTrans c(Color(0.2f, 0.7f, 0.7f, (m_loadingProgress + 1.0f)*0.5f));
 		UseShader shader(getShader("color"));
-		float cx = -x + i * (sq_size + spacing);
+		float cx = -x + f * (sq_size + spacing);
 		float cy = 0;
 		float r = sq_size/2;
 		glutil::VertexArray va;
@@ -143,16 +143,16 @@ void Game::drawNotifications() {
 void Game::finished() {
 	m_finished = true;
 }
- 
+
 Game::~Game() {
 	if (currentScreen) currentScreen->exit();
 }
- 
+
 bool Game::isFinished() {
 	return m_finished;
 }
 
-void Game::restartAudio() { 
+void Game::restartAudio() {
 		m_audio.restart();
 		m_audio.playMusic(findFile("menu.ogg"), true); // Start music again
 	}
