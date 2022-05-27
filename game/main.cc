@@ -209,6 +209,8 @@ void jstestLoop() {
 		config["graphic/window_width"].i() = 640;
 		config["graphic/window_height"].i() = 360;
 		Window window;
+		input::Controllers controllers;
+		controllers.enableEvents(true);
 		// Main loop
 		int oldjoy = -1, oldaxis = -1, oldvalue = -1;
 		while (true) {
