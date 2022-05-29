@@ -46,12 +46,35 @@ function detectPkgManager {
 		then
 			brew_prefix="$(dirname $(dirname $(which brew)))"
 			echo "Homebrew install found at: ${brew_prefix}"
+			opencv_installed=$(brew list opencv 2>/dev/null | grep "No available formula or cask" 1>/dev/null 2>/dev/null; echo $?)
+			opencv3_installed=$(brew list opencv@3 2>/dev/null | grep "No available formula or cask" 1>/dev/null 2>/dev/null; echo $?)			
+			if [[ ${opencv_installed} ]]
+				then
+					opencv_prefix="$(dirname $(dirname '$(brew ls opencv | grep OpenCVConfig.cmake)'))"
+			elif [[ ${opencv3_installed} ]]
+				then
+					opencv_prefix="$(dirname $(dirname '$(brew ls opencv@3 | grep OpenCVConfig.cmake)'))"
+			else
+				opencv_prefix=
+			fi
+
 			PREFIXDIR="${brew_prefix}"
 	fi
 	if [[ ${port_retcode} = 0 ]]
 		then
 			port_prefix="$(dirname $(dirname $(which port)))"
 			echo "MacPorts install found at: ${port_prefix}"
+			opencv4_installed=$(port -q installed opencv4 | grep -v "None of the specified" >/dev/null; echo $?)
+			opencv3_installed=$(port -q installed opencv3 | grep -v "None of the specified" >/dev/null; echo $?)
+			if [[ ${opencv4_installed} ]]
+				then
+					opencv_prefix="$(dirname $(dirname $(port -q contents opencv4 | grep OpenCVConfig.cmake)))/"
+			elif [[ ${opencv3_installed} ]]
+				then
+					opencv_prefix="$(dirname $(dirname $(port -q contents opencv3 | grep OpenCVConfig.cmake)))/"
+			else
+				opencv_prefix=
+			fi
 			PREFIXDIR="${port_prefix}"
 	fi
 	if [[ ${port_retcode} = 0 && ${brew_retcode} = 0 ]]
@@ -217,7 +240,7 @@ function main {
 	
 	cmake \
 	  -DCMAKE_INSTALL_PREFIX="$TEMPDIR" \
-	  -DCMAKE_PREFIX_PATH="${PREFIXDIR}" \
+	  -DCMAKE_PREFIX_PATH="${PREFIXDIR};${opencv_prefix}" \
 	  -DCMAKE_BUILD_TYPE="${RELTYPE}" \
 	  -DCMAKE_VERBOSE_MAKEFILE="ON" \
 	  -DCMAKE_OSX_DEPLOYMENT_TARGET="${DEPLOYMENT_TARGET}" \
