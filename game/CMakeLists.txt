@@ -102,11 +102,12 @@ pkg_check_modules(deps REQUIRED IMPORTED_TARGET glib-2.0 gio-2.0 gobject-2.0)
 set(SELF_BUILT_GIT_BASE "https://github.com/performous" CACHE STRING "base path of the git trees used for self built dependencies")
 set(SELF_BUILT_AUBIO "NEVER" CACHE STRING "rule to allow self build of Aubio dependency library [NEVER*|AUTO|ALWAYS]")
 set(SELF_BUILT_JSON "NEVER" CACHE STRING "rule to allow self build of Json dependency library [NEVER*|AUTO|ALWAYS]")
+set(SELF_BUILT_WEBSERVER "NEVER" CACHE STRING "rule to allow self build of Webserver dependency library [NEVER*|AUTO|ALWAYS]")
 
 set(Aubio_REQUIRED_VERSION "0.4.9")
 
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM Json Ced Aubio)
+foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM Json Ced Aubio Webserver)
 	find_package(${lib} ${${lib}_REQUIRED_VERSION} REQUIRED)
 	message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
 	target_include_directories(performous SYSTEM PRIVATE ${${lib}_INCLUDE_DIRS})
@@ -170,37 +171,6 @@ if(OPENCV_VIDEOIO_FOUND)
 	target_include_directories(performous SYSTEM PRIVATE ${OpenCV_INCLUDE_DIRS})
 	target_link_libraries(performous PRIVATE ${OpenCV_LIBS})
 	add_definitions("-DUSE_OPENCV")
-endif()
-
-# Activating webserver
-set(ENABLE_WEBSERVER AUTO CACHE STRING "Use webserver")
-set_property(CACHE ENABLE_WEBSERVER PROPERTY STRINGS AUTO ON OFF)
-if("AUTO" STREQUAL "${ENABLE_WEBSERVER}")
-	# webserver not requested explicitly, best effort try to find it
-	find_package(CppRest QUIET)
-	if(CppRest_FOUND)
-		message(STATUS "Webserver support: Enabled (automatically found)")
-	else()
-		message(STATUS "Webserver support: Disabled (cpprestsdk not found)")
-	endif()
-elseif(ENABLE_WEBSERVER)
-	# webserver explicitly requested, make it mandatory
-	find_package(CppRest REQUIRED)
-	message(STATUS "Webserver support: Enabled (explicitly enabled)")
-else()
-	# webserver explicitly disabled
-	message(STATUS "Webserver support: Disabled (explicitly disabled)")
-endif()
-
-# if cpprest is found, add it to the dependencies
-if(CppRest_FOUND)
-	# add other required dependencies then
-	# FIXME: move this to the CppRest package includes if possible
-	find_package(Boost 1.55 REQUIRED COMPONENTS chrono thread)
-	target_include_directories(performous SYSTEM PRIVATE ${CppRest_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
-	target_link_libraries(performous PRIVATE ${CppRest_LIBRARIES} ${Boost_LIBRARIES})
-
-	add_definitions("-DUSE_WEBSERVER")
 endif()
 
 if(WIN32)

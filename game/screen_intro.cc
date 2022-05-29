@@ -195,8 +195,6 @@ void ScreenIntro::populateMenu() {
 	m_menu.add(MenuOption(translate_noop("Quit"), translate_noop("Leave the game."), imgQuit)).screen("");
 }
 
-#ifdef USE_WEBSERVER
-
 void ScreenIntro::draw_webserverNotice() {
 	if(m_webserverNoticeTimeout.get() == 0) {
 		m_drawNotice = !m_drawNotice;
@@ -204,12 +202,8 @@ void ScreenIntro::draw_webserverNotice() {
 	}
 	std::stringstream m_webserverStatusString;
 	if((webserversetting == 1 || webserversetting == 2) && m_drawNotice) {
-		std::string message = Game::getSingletonPtr()->subscribeWebserverMessages();		
+		const std::string &message = Game::getSingletonPtr()->getNotificationFromWebserver();
 		m_webserverStatusString << _("Webserver active!\n connect to this computer\nusing: ") << message;
 		theme->WebserverNotice.draw(m_webserverStatusString.str());
 	}
 }
-
-#else
-void ScreenIntro::draw_webserverNotice() {}
-#endif

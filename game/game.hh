@@ -78,10 +78,9 @@ class Game: public Singleton <Game> {
 	PlayList& getCurrentPlayList() { return currentPlaylist; }
 	void setLanguage(const std::string& language) { m_translationEngine.setLanguage(language, true); };
 	std::string getCurrentLanguage() const { return m_translationEngine.getCurrentLanguage().second; };
-#ifdef USE_WEBSERVER
-	void notificationFromWebserver(std::string message) { m_webserverMessage = message; }
-	std::string subscribeWebserverMessages() { return m_webserverMessage; }
-#endif
+
+	void setNotificationFromWebserver(const std::string &message) { m_webserverMessage = message; }
+	const std::string& getNotificationFromWebserver() const { return m_webserverMessage; }
 
 private:
 	Audio& m_audio;
@@ -111,7 +110,5 @@ private:
 	// Dialog members
 	std::unique_ptr<Dialog> m_dialog;
 	TranslationEngine& m_translationEngine;
-#ifdef USE_WEBSERVER
 	std::string m_webserverMessage = "Trying to connect to webserver";
-#endif
 };

@@ -1,22 +1,21 @@
 #include "webserver.hh"
 #include "game.hh"
 
-#ifdef USE_WEBSERVER
 #include <boost/asio.hpp>
 
 void WebServer::StartServer(int tried, bool fallbackPortInUse) {
 	if(tried > 2) {
 		if(fallbackPortInUse == false) {
 			std::clog << "webserver/error: Couldn't start webserver tried 3 times. Trying fallback port.." << std::endl;
-			Game::getSingletonPtr()->notificationFromWebserver("Couldn't start webserver tried 3 times. Trying fallback port...");					
+			Game::getSingletonPtr()->setNotificationFromWebserver("Couldn't start webserver tried 3 times. Trying fallback port...");
 			StartServer(0, true);
 			return;
 		}
 
 		std::clog << "webserver/error: Couldn't start webserver tried 3 times using normal port and 3 times using fallback port. Stopping webserver." << std::endl;
-		Game::getSingletonPtr()->notificationFromWebserver("Couldn't start webserver.");							
+		Game::getSingletonPtr()->setNotificationFromWebserver("Couldn't start webserver.");
 		if(m_server) {
-			m_server->close().wait();
+			m_server->close();
 		}
 	}
 
@@ -32,15 +31,19 @@ void WebServer::StartServer(int tried, bool fallbackPortInUse) {
 
 	try {
 		m_server = std::shared_ptr<RequestHandler>(new RequestHandler(addr, m_songs));
-		m_server->open().wait();
+		if(config["game/webserver_access"].i() == 1) {
+			m_server->open("127.0.0.1", std::stoi(portToUse));
+		} else {
+			m_server->open("0.0.0.0", std::stoi(portToUse));
+		}
 		std::string message = getIPaddr() + ":" +  portToUse;
-		Game::getSingletonPtr()->notificationFromWebserver(message);
+		Game::getSingletonPtr()->setNotificationFromWebserver(message);
 	} catch (std::exception& e) {
 		tried = tried + 1;
 		std::clog << "webserver/error: " << e.what() << " Trying again... (tried " << tried << " times)." << std::endl;
 		std::string message(e.what());
 		message += " Trying again... (tried " + std::to_string(tried) +" times).";
-		Game::getSingletonPtr()->notificationFromWebserver(message);		
+		Game::getSingletonPtr()->setNotificationFromWebserver(message);
 		std::this_thread::sleep_for(20s);
 		StartServer(tried, fallbackPortInUse);
 	}
@@ -58,12 +61,8 @@ WebServer::WebServer(Songs& songs)
 
 WebServer::~WebServer() {
 	if( m_server ) {
-            try {
-		m_server->close().wait();
-		m_serverThread->join();
-            } catch (const pplx::invalid_operation &e) {
-                std::clog << "webserver/error: stoping webserver failed: " << e.what() << std::endl;
-            }
+	    m_server->close();
+	    m_serverThread->join();
 	}
 }
 
@@ -83,4 +82,3 @@ std::string WebServer::getIPaddr() {
 		return ip.empty() ? "localhost" : ip;
 	}
 }
-#endif

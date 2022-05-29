@@ -157,7 +157,7 @@ jobs:
           cd build_cmake
           cmake ${EXTRA_CMAKE_ARGS} -DCMAKE_BUILD_TYPE=Release \
             -DPERFORMOUS_VERSION=$PACKAGE_VERSION \
-            -DENABLE_WEBSERVER=ON \
+            -DSELF_BUILT_WEBSERVER=ALWAYS \
             -DCMAKE_VERBOSE_MAKEFILE=1 \
             -DENABLE_WEBCAM=ON ..
           CPU_CORES=$(nproc --all)
@@ -243,7 +243,7 @@ jobs:
           sed -i s/@@VERSION@@/${PACKAGE_VERSION}/ AppImageBuilder.yml
           mkdir build
           cd build
-          cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DENABLE_WEBSERVER=ON -DENABLE_WEBCAM=ON -DPERFORMOUS_VERSION=$PACKAGE_VERSION ..
+          cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DSELF_BUILT_WEBSERVER=ALWAYS -DENABLE_WEBCAM=ON -DPERFORMOUS_VERSION=$PACKAGE_VERSION ..
           make -j$(nproc) install DESTDIR=../AppDir
           cd ..
           appimage-builder --recipe AppImageBuilder.yml --skip-test

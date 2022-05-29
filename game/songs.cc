@@ -51,7 +51,8 @@ void Songs::reload_internal() {
 		m_songs.clear();
 		m_dirty = true;
 	}
-#ifdef USE_WEBSERVER
+#if 0
+	// FIXME: this has been disactivated while refactoring
 	std::clog << "songs/notice: Starting to load all songs from cache." << std::endl;
 	LoadCache();
 	// the following code is used to check that load <=> save are idempotent
