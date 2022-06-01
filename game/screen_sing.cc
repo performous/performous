@@ -688,6 +688,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		item.track = "Vocals"; // For database
 		item.track_simple = "vocals"; // For ScoreWindow
 		item.color = Color(p->m_color.r, p->m_color.g, p->m_color.b);
+		item.player_id = p->getId();
 
 		m_database.scores.push_back(item);
 		++p;
@@ -704,6 +705,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		if (item.track_simple == TrackName::DRUMS) item.color = Color(0.1, 0.1, 0.1);
 		else if (item.track_simple == TrackName::BASS) item.color = Color(0.5, 0.3, 0.1);
 		else item.color = Color(1.0, 0.0, 0.0);
+		item.player_id = item.track_simple; //probably not totally unique, but at least lets to discern some players with their favorite instrument
 
 		m_database.scores.push_back(item);
 		++it;

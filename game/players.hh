@@ -66,6 +66,16 @@ class Players {
 	bool isEmpty() const { return m_filtered.empty(); }
 	/// advances to next player
 	void advance(int diff);
+	/// Advances to player with known ID. Do nothing, if playerId is not present in filtered list.
+	void advanceToId(int playerId) {
+		for (int i = 0; i < m_filtered.size(); ++i) {
+			if (m_filtered[i].id == playerId) {
+				math_cover.setTarget(i, m_filtered.size());
+				return;
+			}
+		}
+	}
+
 	/// get current id
 	PlayerId currentId() const { return math_cover.getTarget(); }
 	/// gets current position
