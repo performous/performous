@@ -319,8 +319,6 @@ void writeConfig(bool system) {
 				entryNode->set_attribute("value", std::to_string(newLanguageId));
 				config["game/language"].selectEnum(newLanguagestr);
 				Game::getSingletonPtr()->setLanguage(newLanguagestr);
-				Game::getSingletonPtr()->getCurrentScreen()->exit();
-				Game::getSingletonPtr()->activateScreen("Intro");
 			}
 			else {
 				entryNode->set_attribute("value", std::to_string(currentLanguageId));
