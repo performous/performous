@@ -10,7 +10,7 @@ else if constexpr(BOOST_OS_SOLARIS != 0) { return HostOS::OS_SOLARIS; }
 else if constexpr(BOOST_OS_UNIX != 0) { return HostOS::OS_UNIX; }
 }
 
-uint16_t Platform::shortcutModifier(bool eitherSide) {
+std::uint16_t Platform::shortcutModifier(bool eitherSide) {
 	if (currentOS() == HostOS::OS_MAC) { return eitherSide ? KMOD_GUI : KMOD_LGUI; }
 	else { return eitherSide ? KMOD_CTRL : KMOD_LCTRL; }
 }

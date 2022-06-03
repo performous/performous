@@ -2,6 +2,7 @@
 
 #include "controllers.hh"
 #include <SDL_events.h>
+#include <cstdint>
 #include <string>
 #include <memory>
 
