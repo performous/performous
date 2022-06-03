@@ -3,6 +3,7 @@
 #include "log.hh"
 
 #include <array>
+#include <cstdint>
 #include <iostream>
 
 #include <boost/predef/os.h>
@@ -24,7 +25,7 @@ struct Platform {
 enum class HostOS { OS_WIN, OS_LINUX, OS_MAC, OS_BSD, OS_SOLARIS, OS_UNIX };
 Platform();
 static HostOS currentOS();
-static uint16_t shortcutModifier(bool eitherSide = true);
+static std::uint16_t shortcutModifier(bool eitherSide = true);
 static int defaultBackEnd();
 
 private:

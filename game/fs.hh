@@ -2,6 +2,7 @@
 
 #include "config.hh"
 
+#include <cstdint>
 #include <list>
 #include <vector>
 
