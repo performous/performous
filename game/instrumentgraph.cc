@@ -23,7 +23,7 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevicePt
   m_arrow_left(findFile("arrow_button_left.svg")),
   m_arrow_right(findFile("arrow_button_right.svg")),
   m_text(findFile("sing_timetxt.svg"), config["graphic/text_lod"].f()),
-  m_selectedTrack(""),
+  m_selectedTrack(std::string()),
   m_selectedDifficulty(0),
   m_rejoin(false),
   m_leftymode(false),
@@ -79,11 +79,11 @@ void InstrumentGraph::toggleMenu(int forcestate) {
 
 
 void InstrumentGraph::drawMenu() {
-	ViewTrans view(m_cx.get(), 0.0f, 0.75f);  // Apply a per-player local perspective
+	ViewTrans view(static_cast<float>(m_cx.get()), 0.0f, 0.75f);  // Apply a per-player local perspective
 	if (m_menu.empty()) return;
 	Dimensions dimensions(1.0f); // FIXME: bogus aspect ratio (is this fixable?)
-	if (getGraphType() == input::DevType::DANCEPAD) dimensions.screenTop().middle().stretch(m_width.get(), 1.0f);
-	else dimensions.screenBottom().middle().fixedWidth(std::min(m_width.get(), 0.5));
+	if (getGraphType() == input::DevType::DANCEPAD) dimensions.screenTop().middle().stretch(static_cast<float>(m_width.get()), 1.0);
+	else dimensions.screenBottom().middle().fixedWidth(static_cast<float>(std::min(m_width.get(), 0.5)));
 	ThemeInstrumentMenu& th = *m_menuTheme;
 	th.back_h.dimensions.fixedHeight(0.08f);
 	m_arrow_up.dimensions.stretch(0.05f, 0.05f);
@@ -100,7 +100,7 @@ void InstrumentGraph::drawMenu() {
 	const float button_margin = m_arrow_up.dimensions.w()
 		* (isKeyboard() && getGraphType() != input::DevType::DANCEPAD ? 2.0f : 1.0f);
 	const float step = txth * 0.7f;
-	const float h = m_menu.getOptions().size() * step + step;
+	const float h = static_cast<float>(m_menu.getOptions().size()) * step + step;
 	float y = -h * .5f + step;
 	float x = -w*.5f + step + button_margin;
 	float xx = w*.5f - step - button_margin;
@@ -223,13 +223,13 @@ Color const& InstrumentGraph::color(unsigned fret) const {
 		if (fret == 0) fret = 4;
 		else if (fret == 4) fret = 0;
 	}
-	return fretColors[fret];
+	return fretColors[static_cast<size_t>(fret)];
 }
 
 
 void InstrumentGraph::unjoin() {
 	m_jointime = getNaN();
-	m_rejoin = false;
+	m_rejoin.b() = false;
 	m_score = 0;
 	m_starmeter = 0;
 	m_streak = 0;

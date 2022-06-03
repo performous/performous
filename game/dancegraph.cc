@@ -23,8 +23,9 @@ namespace {
 	const float texCoordStep = -0.25f; // Four beat lines per beat texture
 	// Note: t is difference from playback time so it must be in range [past, future]
 	float time2y(float t) { return timescale * (t - past) / (future - past); }
-	float time2a(float t) {
-		float a = clamp(1.0 - t / future); // Note: we want 1.0 alpha already at zero t.
+	float time2y(double t) { return timescale * (static_cast<float>(t) - past) / (future - past); }
+	float time2a(double t) {
+		float a = static_cast<float>(clamp(1.0 - t / future)); // Note: we want 1.0 alpha already at zero t.
 		return std::pow(a, 0.8f); // Nicer curve
 	}
 	const double maxTolerance = 0.15; // Maximum error in seconds
@@ -106,7 +107,7 @@ void DanceGraph::setupJoinMenu() {
 	m_menu.add(MenuOption(_("Ready!"), _("Start performing!")));
 	{ // Create track selector
 		ConfigItem::OptionList ol;
-		int i = 0, cur = 0;
+		unsigned short i = 0, cur = 0;
 		// Add tracks to option list
 		for (auto it = m_song.danceTracks.begin(); it != m_song.danceTracks.end(); ++it, ++i) {
 			ol.push_back(it->first);
@@ -119,9 +120,9 @@ void DanceGraph::setupJoinMenu() {
 	}
 	{ // Create difficulty opt
 		ConfigItem::OptionList ol;
-		int i = 0, cur = 0;
+		unsigned short i = 0, cur = 0;
 		// Add difficulties to the option list
-		for (int level = 0; level < to_underlying(DanceDifficulty::COUNT); ++level) {
+		for (auto level = 0; level < to_underlying(DanceDifficulty::COUNT); ++level) {
 			if (difficulty(DanceDifficulty(level), true)) {
 				ol.push_back(std::to_string(level));
 				if (DanceDifficulty(level) == m_level) cur = i;
@@ -170,17 +171,17 @@ void DanceGraph::finalizeTrackChange() {
 	// Determine how many arrow lines are needed
 	m_gamingMode = m_curTrackIt->first;
 	std::string gm = m_gamingMode;
-	if (gm == "dance-single") { m_pads = 4; std::copy(mapping4, mapping4+max_panels, m_arrow_map); }
-	else if (gm == "dance-double") { m_pads = 8; std::copy(mapping8, mapping8+max_panels, m_arrow_map); }
-	else if (gm == "dance-couple") { m_pads = 8; std::copy(mapping8, mapping8+max_panels, m_arrow_map); }
-	else if (gm == "dance-solo") { m_pads = 6; std::copy(mapping6, mapping6+max_panels, m_arrow_map); }
-	else if (gm == "pump-single") { m_pads = 5 ; std::copy(mapping5, mapping5+max_panels, m_arrow_map); }
-	else if (gm == "pump-double") { m_pads = 10; std::copy(mapping10, mapping10+max_panels, m_arrow_map); }
-	else if (gm == "pump-couple") { m_pads = 10; std::copy(mapping10, mapping10+max_panels, m_arrow_map); }
-	else if (gm == "ez2-single") { m_pads = 5; std::copy(mapping5, mapping5+max_panels, m_arrow_map); }
-	else if (gm == "ez2-double") { m_pads = 10; std::copy(mapping10, mapping10+max_panels, m_arrow_map); }
-	else if (gm == "ez2-real") { m_pads = 7; std::copy(mapping7, mapping7+max_panels, m_arrow_map); }
-	else if (gm == "para-single") { m_pads = 5; std::copy(mapping5, mapping5+max_panels, m_arrow_map); }
+	if (gm == "dance-single") { m_pads = 4u; std::copy(mapping4, mapping4+max_panels, m_arrow_map); }
+	else if (gm == "dance-double") { m_pads = 8u; std::copy(mapping8, mapping8+max_panels, m_arrow_map); }
+	else if (gm == "dance-couple") { m_pads = 8u; std::copy(mapping8, mapping8+max_panels, m_arrow_map); }
+	else if (gm == "dance-solo") { m_pads = 6u; std::copy(mapping6, mapping6+max_panels, m_arrow_map); }
+	else if (gm == "pump-single") { m_pads = 5u; std::copy(mapping5, mapping5+max_panels, m_arrow_map); }
+	else if (gm == "pump-double") { m_pads = 10u; std::copy(mapping10, mapping10+max_panels, m_arrow_map); }
+	else if (gm == "pump-couple") { m_pads = 10u; std::copy(mapping10, mapping10+max_panels, m_arrow_map); }
+	else if (gm == "ez2-single") { m_pads = 5u; std::copy(mapping5, mapping5+max_panels, m_arrow_map); }
+	else if (gm == "ez2-double") { m_pads = 10u; std::copy(mapping10, mapping10+max_panels, m_arrow_map); }
+	else if (gm == "ez2-real") { m_pads = 7u; std::copy(mapping7, mapping7+max_panels, m_arrow_map); }
+	else if (gm == "para-single") { m_pads = 5u; std::copy(mapping5, mapping5+max_panels, m_arrow_map); }
 	else throw std::runtime_error("Unknown track " + gm);
 
 	changeDifficulty(0); // Construct new notes
@@ -227,7 +228,7 @@ bool DanceGraph::difficulty(DanceDifficulty level, bool check_only) {
 	m_level = level;
 	for (auto& noteIt: m_activeNotes) noteIt = m_notes.end();
 	m_scoreFactor = 1;
-	if (!m_notes.empty()) m_scoreFactor = 10000.0 / (50 * m_notes.size()); // maxpoints / (notepoint * notes)
+	if (!m_notes.empty()) m_scoreFactor = 10000.0 / (50 * static_cast<double>(m_notes.size())); // maxpoints / (notepoint * notes)
 	updateJoinMenu();
 	return true;
 }
@@ -308,7 +309,7 @@ void DanceGraph::engine() {
 
 	// Holding button when mine comes?
 	for (auto it = m_notesIt; it != m_notes.end() && time <= it->note.begin + maxTolerance; ++it) {
-		if(!it->isHit && it->note.type == Note::Type::MINE && m_pressed[it->note.note] &&
+		if(!it->isHit && it->note.type == Note::Type::MINE && m_pressed[static_cast<unsigned>(it->note.note)] &&
 		  it->note.begin >= time - maxTolerance && it->note.end <= time + maxTolerance) {
 			it->isHit = true;
 			m_score -= points(0);
@@ -344,7 +345,7 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 		if(!it->isHit && std::abs(time - it->note.begin) <= maxTolerance && buttonId == static_cast<decltype(buttonId)>(it->note.note)) {
 			it->isHit = true;
 			if (it->note.type != Note::Type::MINE) {
-				it->score = points(it->note.begin - time);
+				it->score = static_cast<int>(points(it->note.begin - time));
 				it->error = it->note.begin - time;
 				m_streak++;
 				if (m_streak > m_longestStreak) m_longestStreak = m_streak;
@@ -364,21 +365,21 @@ namespace {
 	const float one_arrow_tex_w = 1.0f / 8.0f; // Width of a single arrow in texture coordinates
 
 	/// Create a symmetric vertex pair for arrow drawing
-	void vertexPair(glutil::VertexArray& va, int arrow_i, float y, float ty) {
-		if (arrow_i < 0) {
+	void vertexPair(glutil::VertexArray& va, float arrow_i, float y, float ty) {
+		if (arrow_i < 0.0f) {
 			// Single thing in a texture (e.g. mine)
 			va.texCoord(0.0f, ty).vertex(-arrowSize, y);
 			va.texCoord(1.0f, ty).vertex(arrowSize, y);
 		} else {
 			// Arrow from a texture atlas
 			va.texCoord(arrow_i * one_arrow_tex_w, ty).vertex(-arrowSize, y);
-			va.texCoord((arrow_i+1) * one_arrow_tex_w, ty).vertex(arrowSize, y);
+			va.texCoord((arrow_i+1.0f) * one_arrow_tex_w, ty).vertex(arrowSize, y);
 		}
 	}
 }
 
 /// Draw a dance pad icon using the given texture
-void DanceGraph::drawArrow(int arrow_i, Texture& tex, float ty1, float ty2) {
+void DanceGraph::drawArrow(float arrow_i, Texture& tex, float ty1, float ty2) {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(tex.type(), tex.id());
 	glutil::VertexArray va;
@@ -396,7 +397,7 @@ void DanceGraph::draw(double time) {
 	}
 
 	Dimensions dimensions(1.0f); // FIXME: bogus aspect ratio (is this fixable?)
-	dimensions.screenTop().middle(m_cx.get()).stretch(m_width.get(), 1.0f);
+	dimensions.screenTop().middle(static_cast<float>(m_cx.get())).stretch(static_cast<float>(m_width.get()), 1.0f);
 	ViewTrans view(0.5f * (dimensions.x1() + dimensions.x2()), 0.0f, 0.75f);  // Apply a per-player local perspective
 	{
 		using namespace glmath;
@@ -414,11 +415,11 @@ void DanceGraph::draw(double time) {
 			m_uniforms.noteType = 0;
 			m_uniforms.scale = getScale();
 			for (unsigned arrow_i = 0; arrow_i < m_pads; ++arrow_i) {
-				float l = m_pressed_anim[arrow_i].get();
+				float l = static_cast<float>(m_pressed_anim[arrow_i].get());
 				m_uniforms.hitAnim = l;
-				m_uniforms.position = glmath::vec2(panel2x(arrow_i), time2y(0.0));
+				m_uniforms.position = glmath::vec2(panel2x(static_cast<float>(arrow_i)), time2y(0.0));
 				glBufferSubData(GL_UNIFORM_BUFFER, m_uniforms.offset(), m_uniforms.size(), &m_uniforms);
-				drawArrow(arrow_i, m_arrows_cursor);
+				drawArrow(static_cast<float>(arrow_i), m_arrows_cursor);
 			}
 		}
 
@@ -438,8 +439,8 @@ void DanceGraph::drawBeats(double time) {
 	UseTexture tex(m_beat);
 	glutil::VertexArray va;
 	float texCoord = 0.0f;
-	float tBeg = 0.0f, tEnd;
-	float w = 0.5 * m_pads * getScale();
+	double tBeg = 0.0f, tEnd;
+	float w = static_cast<float>(0.5f * static_cast<float>(m_pads) * getScale());
 	for (auto it = m_song.beats.begin(); it != m_song.beats.end() && tBeg < future; ++it, texCoord += texCoordStep, tBeg = tEnd) {
 		tEnd = *it - time;
 		//if (tEnd < past) continue;
@@ -448,7 +449,7 @@ void DanceGraph::drawBeats(double time) {
 			texCoord -= texCoordStep * (tEnd - future) / (tEnd - tBeg);
 			tEnd = future;
 		}*/
-		glmath::vec4 c(1.0f, 1.0f, 1.0f, time2a(tEnd));
+		glmath::vec4 c(1.0f, 1.0f, 1.0f, static_cast<float>(time2a(tEnd)));
 		va.color(c).normal(0.0f, 1.0f, 0.0f).texCoord(0.0f, texCoord).vertex(-w, time2y(tEnd));
 		va.color(c).normal(0.0f, 1.0f, 0.0f).texCoord(1.0f, texCoord).vertex(w, time2y(tEnd));
 	}
@@ -457,16 +458,16 @@ void DanceGraph::drawBeats(double time) {
 
 /// Draws a single note (or hold)
 void DanceGraph::drawNote(DanceNote& note, double time) {
-	float tBeg = note.note.begin - time;
-	float tEnd = note.note.end - time;
-	int arrow_i = note.note.note;
+	double tBeg = note.note.begin - time;
+	double tEnd = note.note.end - time;
+	float arrow_i = note.note.note;
 	bool mine = note.note.type == Note::Type::MINE;
 	float x = panel2x(arrow_i);
 	float yBeg = time2y(tBeg);
 	float yEnd = time2y(tEnd);
 
 	// Did we hit it?
-	if (note.isHit && (note.releaseTime > 0.0 || std::abs(tEnd) < maxTolerance) && note.hitAnim.getTarget() == 0.0) {
+	if (note.isHit && (note.releaseTime || std::abs(tEnd) < maxTolerance) && note.hitAnim.getTarget() == 0.0) {
 		if (mine) note.hitAnim.setRate(1.0);
 		note.hitAnim.setTarget(1.0, false);
 	}
@@ -480,11 +481,11 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 
 		if (yEnd - yBeg > arrowSize) {
 			// Draw holds
-			if (note.isHit && note.releaseTime <= 0) { // The note is being held down
-				yBeg = std::max(time2y(0.0), yBeg);
-				yEnd = std::max(time2y(0.0), yEnd);
+			if (note.isHit && !note.releaseTime) { // The note is being held down
+				yBeg = std::max(time2y(0.0f), yBeg);
+				yEnd = std::max(time2y(0.0f), yEnd);
 			}
-			if (note.releaseTime > 0) yBeg = time2y(note.releaseTime - time); // Oh noes, it got released!
+			if (note.releaseTime) yBeg = time2y(note.releaseTime.value() - time); // Oh noes, it got released!
 			m_uniforms.noteType = 2;
 			m_uniforms.position = glmath::vec2(x, yBeg);
 			glBufferSubData(GL_UNIFORM_BUFFER, m_uniforms.offset(), m_uniforms.size(), &m_uniforms);
@@ -517,7 +518,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	double alpha = 1.0 - glow;
 	if (!mine && note.isHit) {
 		std::string text;
-		if (note.releaseTime <= 0.0 && tBeg < tEnd) { // Is being held down and is a hold note
+		if (!note.releaseTime && tBeg < tEnd) { // Is being held down and is a hold note
 			text = "HOLD";
 			alpha = glow = 1.0;
 		} else if (glow > 0.0) { // Released already, display rank
@@ -526,7 +527,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 		if (!text.empty()) {
 			double sc = getScale() * 0.6 * arrowSize * (3.0 + glow);
 			Transform trans(glmath::translate(glmath::vec3(0.0f, 0.0f, 0.5f * static_cast<float>(glow)))); // Slightly elevated
-			ColorTrans c(Color::alpha(std::sqrt(alpha)));
+			ColorTrans c(Color::alpha(static_cast<float>(std::sqrt(alpha))));
 			m_popupText->render(_(text));
 			m_popupText->dimensions().middle(x).center(time2y(0.0f)).stretch(static_cast<float>(sc), static_cast<float>(sc/2.0));
 			m_popupText->draw();
