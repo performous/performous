@@ -3,6 +3,8 @@
 #include "instrumentgraph.hh"
 #include "3dobject.hh"
 
+#include <cstdint>
+
 class Song;
 
 struct GuitarChord {
@@ -10,11 +12,11 @@ struct GuitarChord {
 	bool fret[5];
 	bool fret_cymbal[5];
 	Duration const* dur[5];
-	int polyphony;
+	unsigned polyphony;
 	bool tappable;
 	bool passed; // Set to true for notes that should not re-appear when rewinding
-	int status; // Guitar: 0 = not played, 1 = tapped, 2 = picked, drums: number of pads hit
-	int score;
+	unsigned status; // Guitar: 0 = not played, 1 = tapped, 2 = picked, drums: number of pads hit
+	float score;
 	AnimValue hitAnim[5];
 	double releaseTimes[5];
 	GuitarChord(): begin(), end(), polyphony(), tappable(), passed(), status(), score() {
@@ -69,13 +71,13 @@ class GuitarGraph: public InstrumentGraph {
 	void updateNeck();
 	bool canActivateStarpower() { return (m_starmeter > 6000); }
 	void activateStarpower();
-	void errorMeter(float error);
+	void errorMeter(double error);
 	void fail(double time, int fret);
 	void endHold(unsigned fret, double time = 0.0);
 	void endBRE();
 	void endStreak() { m_streak = 0; m_bigStreak = 0; }
 	void updateDrumFill(double time);
-	void drumHit(double time, unsigned layer, unsigned pad);
+	void drumHit(double time, unsigned layer, unsigned fret);
 	void guitarPlay(double time, input::Event const& ev);
 
 	// Media
@@ -121,14 +123,14 @@ class GuitarGraph: public InstrumentGraph {
 	void drawNeckStuff(double time);  ///< Anything in neck coordinates
 	void drawNotes(double time);  ///< Frets etc.
 	void drawBar(double time, float h);
-	void drawNote(unsigned fret, Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
-	void drawDrumfill(float tBeg, float tEnd);
+	void drawNote(unsigned fret, Color, double tBeg, double tEnd, float whammy = 0.0f, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
+	void drawDrumfill(double tBeg, double tEnd);
 	void drawInfo(double time);
-	float getFretX(int64_t fret) { return (-2.0f + fret- (m_drums ? 0.5f : 0.0f)) * (m_leftymode.b() ? -1 : 1); }
+	float getFretX(unsigned fret) { return (-2.0f + static_cast<float>(fret) - (m_drums ? 0.5f : 0.0f)) * (m_leftymode.b() ? -1 : 1); }
 	float neckWidth() const; ///< Get the currently effective neck width (0.5 or less)
 	// Chords & notes
 	void updateChords();
-	bool updateTom(unsigned int tomTrack, unsigned int fretId); // returns true if this tom track exists
+	bool updateTom(unsigned int tomTrack, int fretId); // returns true if this tom track exists
 	double getNotesBeginTime() const { return m_chords.front().begin; }
 	typedef std::vector<GuitarChord> Chords;
 	Chords m_chords;

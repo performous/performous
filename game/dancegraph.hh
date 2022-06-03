@@ -2,14 +2,16 @@
 
 #include "instrumentgraph.hh"
 
+#include <optional>
+
 class Song;
 
 struct DanceNote {
 	DanceNote(Note note) :
-		note(note), hitAnim(0.0, 5.0), releaseTime(0), error(getNaN()), score(0), isHit(false) {}
+		note(note), hitAnim(0.0, 5.0), releaseTime(), error(getNaN()), score(0), isHit(false) {}
 	Note note;
 	AnimValue hitAnim; /// for animating hits
-	double releaseTime; /// tells when a hold was ended
+	std::optional<double> releaseTime; /// tells when a hold was ended
 	double error; /// time difference between hit and correct time (negative = late)
 	int score;
 	bool isHit;
@@ -50,11 +52,11 @@ class DanceGraph: public InstrumentGraph {
 	void drawBeats(double time);
 	void drawNote(DanceNote& note, double time);
 	void drawInfo(double time, Dimensions dimensions);
-	void drawArrow(int arrow_i, Texture& tex, float ty1 = 0.0f, float ty2 = 1.0f);
+	void drawArrow(float arrow_i, Texture& tex, float ty1 = 0.0f, float ty2 = 1.0f);
 
 	// Helpers
-	float panel2x(int i) const { return getScale() * (-(m_pads * 0.5f) + m_arrow_map[i] + 0.5f); } /// Get x for an arrow line
-	float getScale() const { return 1.0f / m_pads * 8.0f; }
+	float panel2x(float f) const { return getScale() * (-(static_cast<float>(m_pads) * 0.5f) + m_arrow_map[static_cast<unsigned>(f)] + 0.5f); } /// Get x for an arrow line
+	float getScale() const { return 1.0f / static_cast<float>(m_pads) * 8.0f; }
 	double getNotesBeginTime() const { return m_notes.front().note.begin; }
 	glutil::danceNoteUniforms m_uniforms;
 
@@ -71,7 +73,6 @@ class DanceGraph: public InstrumentGraph {
 	Texture m_mine;
 
 	// Misc
-	int m_arrow_map[max_panels]; /// game mode dependant mapping of arrows' ordering at cursor
+	float m_arrow_map[max_panels]; /// game mode dependant mapping of arrows' ordering at cursor
 	bool m_insideStop;
 };
-

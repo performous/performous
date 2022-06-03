@@ -15,6 +15,8 @@
 #include "fs.hh"
 #include "util.hh"
 
+#include <cstdint>
+
 /// Represents popup messages
 class Popup {
   public:
@@ -29,14 +31,14 @@ class Popup {
 	bool draw() {
 		double anim = m_anim.get();
 		if (anim <= 0.0 || !m_popupText) return false;
-		float a = 1.0 - anim;
+		float a = static_cast<float>(1.0 - anim);
 		m_color.a = a;
 		ColorTrans color(m_color);
 		m_popupText->render(m_msg);
 		{
 			using namespace glmath;
 			Transform trans(translate(vec3(0.0f, 0.0f, 0.5f * anim)));
-			m_popupText->dimensions().center(0.1f - 0.03f * anim).middle().stretch(0.2f, 0.2f);
+			m_popupText->dimensions().center(static_cast<float>(0.1f - 0.03f * anim)).middle().stretch(0.2f, 0.2f);
 			m_popupText->draw();
 		}
 		if (m_info != "" && m_infoText) {
@@ -94,9 +96,9 @@ public:
 	bool ready() const { return m_ready; };
 	bool menuOpen() const { return m_menu.isOpen(); }
 	void position(float cx, float width) { m_cx.setTarget(cx); m_width.setTarget(width); }
-	unsigned stream() const { return m_stream; }
+	size_t stream() const { return m_stream; }
 	double correctness() const { return m_correctness.get(); }
-	int getScore() const { return clamp(m_score * m_scoreFactor, 0.0, 10000.0); }
+	unsigned getScore() const { return static_cast<unsigned>(clamp(m_score * m_scoreFactor, 0.0, 10000.0)); }
 	input::DevType getGraphType() const { return m_dev->type; }
 	virtual double getWhammy() const { return 0; }
 	bool isKeyboard() const { return m_dev->source.isKeyboard(); }
@@ -105,18 +107,18 @@ public:
 	// Core stuff
 	Audio& m_audio;
 	Song const& m_song;
-	std::size_t m_stream; /// audio stream number
+	size_t m_stream; /// audio stream number
 	input::DevicePtr m_dev;
 	AnimValue m_cx, m_width; /// controls horizontal position and width smoothly
 	struct Event {
 		double time;
 		AnimValue glow;
 		AnimValue whammy;
-		int type; // 0 = miss (pick), 1 = tap, 2 = pick
-		int fret;
+		unsigned type; // 0 = miss (pick), 1 = tap, 2 = pick
+        int fret;
 		Duration const* dur;
 		double holdTime;
-		Event(double t, int ty, int f = -1, Duration const* d = nullptr): time(t), glow(0.0, 5.0), whammy(0.0, 0.5), type(ty), fret(f), dur(d), holdTime(d ? d->begin : getNaN()) { if (type > 0) glow.setValue(1.0); }
+		Event(double t, unsigned ty, int f = -1, Duration const* d = nullptr): time(t), glow(0.0, 5.0), whammy(0.0, 0.5), type(ty), fret(f), dur(d), holdTime(d ? d->begin : getNaN()) { if (type > 0) glow.setValue(1.0); }
 	};
 	typedef std::vector<Event> Events;
 	Events m_events;
@@ -166,4 +168,3 @@ public:
 	unsigned m_dead; /// how many notes has been passed without hitting buttons
 	bool m_ready;
 };
-
