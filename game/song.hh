@@ -7,6 +7,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include <cstdint>
 #include <stdexcept>
 #include <string>
 
@@ -101,7 +102,7 @@ public:
 	Status status(double time, ScreenSing* song);
 	// Get a selected track, or LEAD_VOCAL if not found or the first one if not found
 	VocalTrack& getVocalTrack(std::string vocalTrack = TrackName::LEAD_VOCAL);
-	VocalTrack& getVocalTrack(size_t idx = 0);
+	VocalTrack& getVocalTrack(unsigned idx = 0);
 	std::vector<std::string> getVocalTrackNames() const;
 	double getDurationSeconds();
 	bool hasDance() const { return !danceTracks.empty(); }
