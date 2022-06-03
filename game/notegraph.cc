@@ -21,7 +21,7 @@ NoteGraph::NoteGraph(VocalTrack const& vocal, NoteGraphScalerPtr const& scaler):
 	m_nlBottom.setTarget(m_vocal.noteMin, true);
 	for (auto const& n: m_vocal.notes) n.stars.clear(); // Reset stars
 	reset();
-    
+
 	m_scaler->initialize(vocal);
 }
 
@@ -99,11 +99,11 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 			dimensions.stretch(0.50f, 0.50f).center().right();
 			break;
 	}
-	m_max = m_nlTop.get() + 7.0f;
-	m_min = m_nlBottom.get() - 7.0f;
+	m_max = static_cast<float>(m_nlTop.get() + 7.0f);
+	m_min = static_cast<float>(m_nlBottom.get() - 7.0f);
 	m_noteUnit = -dimensions.h() / std::max(48.0f * dimensions.h(), m_max - m_min);
 	m_baseY = -0.5f * (m_min + m_max) * m_noteUnit + dimensions.yc();
-	m_baseX = baseLine - m_time * pixUnit + dimensions.xc();  // FIXME: Moving in X direction requires additional love (is b0rked now, keep it centered at zero)
+	m_baseX = static_cast<float>(baseLine - m_time * pixUnit + dimensions.xc());  // FIXME: Moving in X direction requires additional love (is b0rked now, keep it centered at zero)
 
 	// Fading notelines handing
 	if (m_songit == m_vocal.notes.end() || m_songit->begin > m_time + 3.0) m_notealpha -= 0.02f;
@@ -119,12 +119,12 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 	for (auto it = m_songit; it != m_vocal.notes.end() && it->begin < m_time - (baseLine - 0.5f) / pixUnit; ++it) {
 		float player_star_offset = 0;
 		for (std::vector<Color>::const_iterator it_col = it->stars.begin(); it_col != it->stars.end(); ++it_col) {
-			float x = m_baseX + it->begin * pixUnit + m_noteUnit; // left x coordinate: begin minus border (side borders -noteUnit wide)
-			float w = (it->end - it->begin) * pixUnit - m_noteUnit * 2.0f; // width: including borders on both sides
+			float x = static_cast<float>(m_baseX + it->begin * pixUnit + m_noteUnit); // left x coordinate: begin minus border (side borders -noteUnit wide)
+			float w = static_cast<float>((it->end - it->begin) * pixUnit - m_noteUnit * 2.0f); // width: including borders on both sides
 			float hh = -m_noteUnit;
 			float centery = m_baseY + (it->note + 0.4f) * m_noteUnit; // Star is 0.4 notes higher than current note
 			float centerx = x + w - (player_star_offset + 1.2f) * hh; // Star is 1.2 units from end
-			float rot = std::remainder(time * 5.0, TAU); // They rotate!
+			float rot = static_cast<float>(std::remainder(time * 5.0, TAU)); // They rotate!
 			bool smallerNoteGraph = ((position == NoteGraph::Position::TOP) || (position == NoteGraph::Position::BOTTOM));
 			float zoom = (std::abs((rot-180) / 360.0f) * 0.8f + 0.6f) * (smallerNoteGraph ? 2.3f : 2.0f) * hh;
 			using namespace glmath;
@@ -146,7 +146,7 @@ void NoteGraph::drawNotes() {
 	// Draw notes
 	for (auto it = m_songit; it != m_vocal.notes.end() && it->begin < m_time - (baseLine - 0.5f) / pixUnit; ++it) {
 		if (it->type == Note::Type::SLEEP) continue;
-		double alpha = it->power;
+		float alpha = it->power;
 		Texture* t1;
 		Texture* t2;
 		switch (it->type) {
@@ -159,22 +159,22 @@ void NoteGraph::drawNotes() {
 			case Note::Type::RAP: //handle RAP notes like freestyle for now
 			{
 				Dimensions dim;
-				dim.middle(m_baseX + 0.5f * (it->begin + it->end) * pixUnit).center(m_baseY + it->note * m_noteUnit).stretch((it->end - it->begin) * pixUnit, -m_noteUnit * 12.0f);
-				float xoffset = 0.1 * m_time / m_notebarfs.dimensions.ar();
+				dim.middle(static_cast<float>(m_baseX + 0.5f * (it->begin + it->end) * pixUnit)).center(static_cast<float>(m_baseY + it->note * m_noteUnit)).stretch(static_cast<float>(it->end - it->begin) * pixUnit, -m_noteUnit * 12.0f);
+				float xoffset = static_cast<float>(0.1 * m_time / m_notebarfs.dimensions.ar());
 				m_notebarfs.draw(dim, TexCoords(xoffset, 0.0f, xoffset + dim.ar() / m_notebarfs.dimensions.ar(), 1.0f));
 				if (alpha > 0.0f) {
-					float xoffset = rand() / double(RAND_MAX);
+					float xoffset = static_cast<float>(rand() / double(RAND_MAX));
 					m_notebarfs_hl.draw(dim, TexCoords(xoffset, 0.0f, xoffset + dim.ar() / m_notebarfs_hl.dimensions.ar(), 1.0f));
 				}
 			}
 			continue;
 		  default: throw std::logic_error("Unknown note type: don't know how to render");
 		}
-		float x = m_baseX + it->begin * pixUnit + m_noteUnit; // left x coordinate: begin minus border (side borders -noteUnit wide)
-		double bar_height = barHeight();
-		double ybeg = m_baseY + (it->notePrev +bar_height) * m_noteUnit; // top y coordinate (on the one higher note line)
-		double yend = m_baseY + (it->note +bar_height) * m_noteUnit; // top y coordinate (on the one higher note line)
-		float w = (it->end - it->begin) * pixUnit - m_noteUnit * 2.0f; // width: including borders on both sides
+		float x = static_cast<float>(m_baseX + it->begin * pixUnit + m_noteUnit); // left x coordinate: begin minus border (side borders -noteUnit wide)
+		float bar_height = barHeight();
+		float ybeg = m_baseY + (it->notePrev +bar_height) * m_noteUnit; // top y coordinate (on the one higher note line)
+		float yend = m_baseY + (it->note +bar_height) * m_noteUnit; // top y coordinate (on the one higher note line)
+		float w = static_cast<float>(it->end - it->begin) * pixUnit - m_noteUnit * 2.0f; // width: including borders on both sides
 		float h_x = -m_noteUnit * 2.0f; // height: 0.5 border + 1.0 bar + 0.5 border = 2.0
 		float h_y = h_x * bar_height; //
 		drawNotebar(*t1, x, ybeg, yend, w, h_x, h_y);
@@ -185,12 +185,12 @@ void NoteGraph::drawNotes() {
 	}
 }
 
-double NoteGraph::barHeight() {
-	return 2.0 * thresholdForFullScore();
+float NoteGraph::barHeight() {
+	return static_cast<float>(2.0 * thresholdForFullScore());
 }
 
-double NoteGraph::waveThickness(){
-	return thresholdForNonzeroScore() - thresholdForFullScore();
+float NoteGraph::waveThickness(){
+	return static_cast<float>(thresholdForNonzeroScore() - thresholdForFullScore());
 }
 
 namespace {
@@ -208,16 +208,16 @@ void NoteGraph::drawWaves(Database const& database) {
 	for (const Player& player: sortedPlayers) {
 		if (player.m_vocal.name != m_vocal.name)
 			continue;
-		float const texOffset = 2.0 * m_time; // Offset for animating the wave texture
+		float const texOffset = static_cast<float>(2.0 * m_time); // Offset for animating the wave texture
 		Player::pitch_t const& pitch = player.m_pitch;
-		size_t const beginIdx = std::max(0.0, m_time - 0.5 / pixUnit) / Engine::TIMESTEP; // At which pitch idx to start displaying the wave
+		size_t const beginIdx = static_cast<size_t>(std::max(0.0, m_time - 0.5 / pixUnit) / Engine::TIMESTEP); // At which pitch idx to start displaying the wave
 		size_t const endIdx = player.m_pos;
 		size_t idx = beginIdx;
 		// Go back until silence (NaN freq) to allow proper wave phase to be calculated
 		if (beginIdx < endIdx) while (idx > 0 && pitch[idx].first == pitch[idx].first) --idx;
 		// Start processing
 		float tex = texOffset;
-		double t = idx * Engine::TIMESTEP;
+		double t = static_cast<double>(idx) * Engine::TIMESTEP;
 		double oldval = getNaN();
 		glutil::VertexArray va;
 		auto noteIt = m_vocal.notes.begin();
@@ -226,9 +226,9 @@ void NoteGraph::drawWaves(Database const& database) {
 			double const freq = pitch[idx].first;
 			// If freq is NaN, we have nothing to process
 			if (freq != freq) { oldval = getNaN(); tex = texOffset; continue; }
-			tex += freq * 0.001; // Wave phase (texture coordinate)
+			tex += static_cast<float>(freq * 0.001); // Wave phase (texture coordinate)
 			if (idx < beginIdx) continue; // Skip graphics rendering if out of screen
-			float x = -0.2f + (t - m_time) * pixUnit;
+			float x = static_cast<float>(-0.2f + (t - m_time) * pixUnit);
 			// Find the currently active note(s)
 			while (noteIt != m_vocal.notes.end() && (noteIt->type == Note::Type::SLEEP || t > noteIt->end)) ++noteIt;
 			auto notePrev = noteIt;
@@ -242,7 +242,7 @@ void NoteGraph::drawWaves(Database const& database) {
 			// Now val contains the active note value. The following calculates note value for current freq:
 			val += Note::diff(val, MusicalScale(m_vocal.scale).setFreq(freq).getNote());
 			// Graphics positioning & animation:
-			float y = m_baseY + val * m_noteUnit;
+			float y = static_cast<float>(m_baseY + val * m_noteUnit);
 			double thickness = clamp(1.0 + pitch[idx].second / 60.0) + 0.5;
 			thickness *= NoteGraph::waveThickness() * (1.0 + 0.2 * std::sin(tex - 2.0 * texOffset)); // Further animation :)
 			thickness *= -m_noteUnit;
