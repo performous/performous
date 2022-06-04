@@ -5,15 +5,15 @@
  */
 
 #include "../unicode.hh"
-#include "../platform.hh"
 #include <portaudio.h>
 #include <cstdint>
 #include <cstdlib>
-#include <future>
+#include <functional>
 #include <iostream>
 #include <regex>
 #include <set>
 #include <stdexcept>
+#include <vector>
 
 #define PORTAUDIO_CHECKED(func, args) portaudio::internal::check(func args, #func)
 
@@ -54,153 +54,35 @@ namespace portaudio {
 		unsigned index;
 	};
 	typedef std::vector<DeviceInfo> DeviceInfos;
-	struct AudioDevices {
-		static int count() { return Pa_GetDeviceCount(); }
-		static const PaHostApiTypeId AutoBackendType = PaHostApiTypeId(1337);
-		static PaHostApiTypeId defaultBackEnd() {
-			return PaHostApiTypeId(Platform::defaultBackEnd());
-		}
-		/// Constructor gets the PA devices into a vector
-		AudioDevices(PaHostApiTypeId backend = AutoBackendType) {
-			PaHostApiIndex backendIndex = Pa_HostApiTypeIdToHostApiIndex((backend == AutoBackendType ? defaultBackEnd() : backend));
-			if (backendIndex == paHostApiNotFound) backendIndex = Pa_HostApiTypeIdToHostApiIndex(defaultBackEnd());
-			for (unsigned i = 0, end = Pa_GetHostApiInfo(backendIndex)->deviceCount; i != end; ++i) {
-				PaDeviceInfo const* info = Pa_GetDeviceInfo(Pa_HostApiDeviceIndexToDeviceIndex(backendIndex, i));
-				if (!info) continue;
-				std::string name = UnicodeUtil::convertToUTF8(info->name);
-				/// Omit some useless legacy devices of PortAudio/ALSA from our list
-				for (auto const& dev: { "front", "surround40", "surround41", "surround50", "surround51", "surround71", "iec958", "spdif", "dmix" }) {
-					if (name.find(dev) != std::string::npos) name.clear();
-				}
-				if (name.empty()) continue;  // No acceptable device found
-				// Verify that the name is unique (haven't seen duplicate names occur though)
-				std::string n = name;
-				while (true) {
-					int num = 1;
-					for (auto& dev: devices) if (dev.name == n) goto rename;
-					break;
-				rename:
-					std::ostringstream oss;
-					oss << name << " #" << ++num;
-					n = oss.str();
-				};
-				devices.push_back(DeviceInfo(i, name, info->maxInputChannels, info->maxOutputChannels, Pa_HostApiDeviceIndexToDeviceIndex(backendIndex, i)));
-			}
-			for (auto& dev: devices) {
-				// Array of regex - replacement pairs
-				static char const* const replacements[][2] = {
-					{ "\\(hw:\\d+,", "(hw:," },  // Remove ALSA device numbers
-					{ " \\(.*\\)", "" },  // Remove the parenthesis part entirely
-				};
-				for (auto const& rep: replacements) {
-					std::string flex = std::regex_replace(dev.flex, std::regex(rep[0]), rep[1]);
-					if (flex == dev.flex) continue;  // Nothing changed
-					// Verify that flex doesn't find any wrong devices
-					bool fail = false;
-					try {
-						if (find(flex, false, 0).idx != dev.idx) fail = true;
-					} catch (...) {}  // Failure to find anything is success
-					if (!fail) dev.flex = flex;
-				}
-			}
-		}
-		/// Get a printable dump of the devices
-		std::string dump() const {
-			std::ostringstream oss;
-			for (auto const& d: devices) { oss << "    #" << d.idx << " " << d.desc() << std::endl; }
-			return oss.str();
-		}
-		DeviceInfo const& find(std::string const& name, bool output, unsigned num) {
-			if (name.empty()) { return findByChannels(output, num); }
-			// Try name search with full match
-			for (auto const& dev: devices) {
-				if ((output ? dev.out : dev.in) < num) continue;
-				if (dev.name == name) return dev;
-			}
-			// Try name search with partial/flexible match
-			for (auto const& dev: devices) {
-				if ((output ? dev.out : dev.in) < num) continue;
-				if (dev.name.find(name) != std::string::npos) { return dev; }
-				if (dev.flex.find(name) != std::string::npos) { return dev; }
-			}
-			throw std::runtime_error("No such device.");
-		}
-		DeviceInfo const& findByChannels(bool output, unsigned num) {
-			for (auto const& dev: devices) {
-				unsigned reqChannels = output ? dev.out : dev.in;
-				if (reqChannels >= num) { return dev;  }
-			}
-			throw std::runtime_error("No such device.");
-		}
-		DeviceInfos devices;
+
+	struct AudioBackend {
+		AudioBackend(const PaHostApiInfo &pa_info);
+		~AudioBackend();
+		AudioBackend(AudioBackend &&);
+		AudioBackend &operator=(AudioBackend &&);
+
+		DeviceInfo const& find(std::string const& name, bool output, unsigned num);
+
+		DeviceInfos &getDevices();
+
+                void dump() const;
+	private:
+		struct AudioDevices;
+		std::reference_wrapper<const PaHostApiInfo> pa_info;
+		std::unique_ptr<AudioDevices> audio_devices;
 	};
 
-	struct BackendInfo {
-		BackendInfo(int id, PaHostApiTypeId type, std::string n = std::string(), int n_dev = 0): idx(id), name(n), type(type), devices(n_dev) {}
-		int idx;
-		std::string name;
-		PaHostApiTypeId type;
-		int devices;
-		std::string desc () const {
-		std::ostringstream oss;
-		oss << "  #" << idx << ": " << name << " (" << devices << " devices):" << std::endl;
-		oss << portaudio::AudioDevices(type).dump();
-		return oss.str();
-		}
+	struct AudioBackendFactory {
+		AudioBackendFactory();
+
+		std::vector<std::string> getBackendsNames() const;
+
+                AudioBackend makeBackend(std::string bakendName);
+	private:
+		struct Init;
+		static Init init;
 	};
 
-	typedef std::vector<BackendInfo> BackendInfos;
-
-	struct AudioBackends {
-		static int count() { return Pa_GetHostApiCount(); }
-		AudioBackends () {
-			if (count() == 0) throw std::runtime_error("No suitable audio backends found."); // Check specifically for 0 because it returns a negative error code if Pa is not initialized.
-			for (unsigned i = 0, end = Pa_GetHostApiCount(); i != end; ++i) {
-				PaHostApiInfo const* info = Pa_GetHostApiInfo(i);
-				if (!info || info->deviceCount < 1) continue;
-				/*
-				Constant, unique identifier for each audio backend past alpha status.
-					1 = DirectSound
-					2 = MME
-					3 = ASIO
-					4 = SoundManager
-					5 = CoreAudio
-					7 = OSS
-					8 = ALSA
-					9 = AL
-					10 = BeOS
-					11 = WDMKS
-					12 = JACK
-					13 = WASAPI
-					14 = AudioScienceHPI
-					0 = Backend currently being developed.
-				*/
-				PaHostApiTypeId apiID = info->type;
-				std::string name = UnicodeUtil::convertToUTF8(info->name);
-				backends.push_back(BackendInfo(i, apiID, name, info->deviceCount));
-			}
-		};
-		BackendInfos backends;
-
-		std::string dump() const {
-		std::ostringstream oss;
-		oss << "audio/info: PortAudio backends:" << std::endl;
-		for (auto const& b: backends) { oss << b.desc() << std::endl; }
-			return oss.str();
-		}
-		std::list<std::string> getBackends() {
-			std::set<std::string> bends;
-			for (auto const& temp: backends) {
-				bends.insert(temp.name);
-			}
-			return std::list<std::string>(bends.begin(),bends.end());
-		}
-	};
-
-	struct Init {
-		Init() { PORTAUDIO_CHECKED(Pa_Initialize, ()); }
-		~Init() { Pa_Terminate(); }
-	};
 
 	struct Params {
 		PaStreamParameters params;

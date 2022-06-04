@@ -81,7 +81,7 @@ static void checkEvents(Game& gm, Time eventTime) {
 			// Adjust value
 			if (nav == input::NavButton::VOLUME_UP) ++config[which_vol]; else --config[which_vol];
 			// Show message
-			gm.flashMessage(config[which_vol].getShortDesc() + ": " + config[which_vol].getValue());
+			gm.flashMessage(config[which_vol].getShortDesc() + ": " + config[which_vol].toString());
 			continue; // Already handled here...
 		}
 		// If a dialog is open, any nav event will close it
@@ -317,9 +317,13 @@ int main(int argc, char** argv) try {
 
 	if (vm.count("audiohelp")) {
 		std::clog << "core/notice: Starting audio subsystem for audiohelp (errors printed on console may be ignored)." << std::endl;
-		Audio audio;
-		// Print the devices
-		std::cout << portaudio::AudioBackends().dump();
+		std::cout << "audio/info: PortAudio backends:\n";
+		auto bef = portaudio::AudioBackendFactory();
+		size_t idx = 0;
+		for (const auto &ben : bef.getBackendsNames()) {
+			std::cout << " #" << idx << ' ';
+			bef.makeBackend(ben).dump();
+		}
 		// Some examples
 		std::cout << "Example --audio parameters" << std::endl;
 		std::cout << "  --audio \"out=2\"         # Pick first working two-channel playback device" << std::endl;

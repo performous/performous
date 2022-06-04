@@ -286,7 +286,7 @@ void Window::render(std::function<void (void)> drawFunc) {
 	glutil::GLErrorChecker glerror("Window::render");
 	ViewTrans trans;  // Default frustum
 	bool stereo = config["graphic/stereo3d"].b();
-	int type = config["graphic/stereo3dtype"].i();
+	const auto &type = config["graphic/stereo3dtype"].getEnumName();
 
 	static bool warn3d = false;
 	if (!stereo) warn3d = false;
@@ -300,13 +300,13 @@ void Window::render(std::function<void (void)> drawFunc) {
 	}
 
 	// Over/under only available in fullscreen
-	if (stereo && type == 2 && !m_fullscreen) stereo = false;
+	if (stereo && type == "Over/Under" && !m_fullscreen) stereo = false;
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	updateStereo(stereo ? getSeparation() : 0.0);
 	glerror.check("setup");
 	// Can we do direct to framebuffer rendering (no FBO)?
-	if (!stereo || type == 2) { view(stereo); drawFunc(); return; }
+	if (!stereo || type == "Over/Under") { view(stereo); drawFunc(); return; }
 	// Render both eyes to FBO (full resolution top/bottom for anaglyph)
 	
 	glerror.check("FBO");
@@ -332,10 +332,10 @@ void Window::render(std::function<void (void)> drawFunc) {
 			float col = (1.0 + 2.0 * saturation) / 3.0;
 			float gry = 0.5 * (1.0 - col);
 			bool out[3] = {};  // Which colors to output
-			if (type == 0 && num == 0) { out[0] = true; }  // Red
-			if (type == 0 && num == 1) { out[1] = out[2] = true; }  // Cyan
-			if (type == 1 && num == 0) { out[1] = true; }  // Green
-			if (type == 1 && num == 1) { out[0] = out[2] = true; }  // Magenta
+			if (type == "Red/Cyan" && num == 0) { out[0] = true; }  // Red
+			if (type == "Red/Cyan" && num == 1) { out[1] = out[2] = true; }  // Cyan
+			if (type == "Green/Magenta" && num == 0) { out[1] = true; }  // Green
+			if (type == "Green/Magenta" && num == 1) { out[0] = out[2] = true; }  // Magenta
 			for (unsigned i = 0; i < 3; ++i) {
 				for (unsigned j = 0; j < 3; ++j) {
 					float val = 0.0;

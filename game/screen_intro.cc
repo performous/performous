@@ -29,7 +29,7 @@ void ScreenIntro::enter() {
 		m_first = false;
 	}
 	reloadGL();
-	webserversetting = config["game/webserver_access"].i();
+	webserversetting = config["game/webserver_access"].getEnumName();
 	m_audio.playSample("notice.ogg");
 }
 
@@ -116,7 +116,7 @@ void ScreenIntro::draw_menu_options() {
 			if (opt.type == MenuOption::Type::CHANGE_VALUE) {
 				++ii; // Use a slot for the value
 				theme->option_selected.dimensions.left(x + sel_margin).center(-0.1 + (selanim+1)*0.065);
-				theme->option_selected.draw("<  " + _(opt.value->getValue()) + "  >");
+				theme->option_selected.draw("<  " + _(opt.value->toString()) + "  >");
 			}
 
 		// Regular option (not selected)
@@ -203,7 +203,7 @@ void ScreenIntro::draw_webserverNotice() {
 		m_webserverNoticeTimeout.setValue(5);
 	}
 	std::stringstream m_webserverStatusString;
-	if((webserversetting == 1 || webserversetting == 2) && m_drawNotice) {
+	if((webserversetting == "Disabled" || webserversetting == "Localhost") && m_drawNotice) {
 		std::string message = Game::getSingletonPtr()->subscribeWebserverMessages();		
 		m_webserverStatusString << _("Webserver active!\n connect to this computer\nusing: ") << message;
 		theme->WebserverNotice.draw(m_webserverStatusString.str());

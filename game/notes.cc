@@ -43,7 +43,7 @@ double Note::scoreMultiplier() const {
 }
 
 double thresholdForFullScore() {
-	switch(GameDifficulty(config["game/difficulty"].i())){
+	switch(gameDifficultyFromString(config["game/difficulty"].getEnumName())){
 		case GameDifficulty::PERFECT:
 			return 0.2151;
 		case GameDifficulty::HARD:
@@ -55,7 +55,7 @@ double thresholdForFullScore() {
 }
 
 double thresholdForNonzeroScore() {
-	switch(GameDifficulty(config["game/difficulty"].i())){
+	switch(gameDifficultyFromString(config["game/difficulty"].getEnumName())){
 		case GameDifficulty::PERFECT:
 			return 0.5;
 		case GameDifficulty::HARD:

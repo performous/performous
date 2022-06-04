@@ -21,7 +21,7 @@ namespace {
 }
 
 int getBackend() {
-	static std::string selectedBackend = Audio::backendConfig().getValue();
+	static std::string selectedBackend = Audio::backendConfig().getEnumName();
 	return PaHostApiNameToHostApiTypeId(selectedBackend);
 }
 
@@ -36,9 +36,8 @@ void ScreenAudioDevices::enter() {
 	int bend = getBackend();
 	std::clog << "audio-devices/debug: Entering audio Devices... backend has been detected as: " << bend << std::endl;
 	m_theme = std::make_unique<ThemeAudioDevices>();
-	PaHostApiTypeId backend = PaHostApiTypeId(bend);
-	portaudio::AudioDevices ads(backend);
-	m_devs = ads.devices;
+	auto &backend = m_audio.getBackend();
+	m_devs = backend.getDevices();
 	// FIXME: Something more elegant, like a warning box
 	if (m_devs.empty()) throw std::runtime_error("No audio devices found!");
 	m_selected_column = 0;
@@ -192,8 +191,6 @@ bool ScreenAudioDevices::save(bool skip_ui_config) {
 		config["audio/devices"].sl() = devconf;
 	}
 	writeConfig(false); // Save the new config
-	m_audio.restart(); // Reload audio to take the new settings into use
-	m_audio.playMusic(findFile("menu.ogg"), true); // Start music again
 	// Check that all went well
 	bool ret = verify();
 	if (!ret) Game::getSingletonPtr()->dialog(_("Some devices failed to open!"));

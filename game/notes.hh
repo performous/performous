@@ -135,6 +135,13 @@ enum class GameDifficulty {
 	PERFECT
 };
 
+static inline GameDifficulty gameDifficultyFromString(const std::string &s) {
+    if (s == "Perfect") return GameDifficulty::PERFECT;
+    else if (s == "Normal") return GameDifficulty::NORMAL;
+    // Hard is the default
+    else return GameDifficulty::HARD; 
+}
+
 enum class DanceDifficulty : int {
 	BEGINNER,
 	EASY,

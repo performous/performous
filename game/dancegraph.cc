@@ -109,7 +109,7 @@ void DanceGraph::setupJoinMenu() {
 		int i = 0, cur = 0;
 		// Add tracks to option list
 		for (auto it = m_song.danceTracks.begin(); it != m_song.danceTracks.end(); ++it, ++i) {
-			ol.push_back(it->first);
+			ol.options.push_back(it->first);
 			if (m_gamingMode == it->first) cur = i; // Find the index of current track
 		}
 		m_selectedTrack = ConfigItem(ol); // Create a ConfigItem from the option list
@@ -123,7 +123,7 @@ void DanceGraph::setupJoinMenu() {
 		// Add difficulties to the option list
 		for (int level = 0; level < to_underlying(DanceDifficulty::COUNT); ++level) {
 			if (difficulty(DanceDifficulty(level), true)) {
-				ol.push_back(std::to_string(level));
+				ol.options.push_back(std::to_string(level));
 				if (DanceDifficulty(level) == m_level) cur = i;
 				++i;
 			}

@@ -24,7 +24,7 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevicePt
   m_arrow_right(findFile("arrow_button_right.svg")),
   m_text(findFile("sing_timetxt.svg"), config["graphic/text_lod"].f()),
   m_selectedTrack(""),
-  m_selectedDifficulty(0),
+  m_selectedDifficulty(config["game/difficulty"]),
   m_rejoin(false),
   m_leftymode(false),
   m_pads(),
@@ -229,7 +229,7 @@ Color const& InstrumentGraph::color(unsigned fret) const {
 
 void InstrumentGraph::unjoin() {
 	m_jointime = getNaN();
-	m_rejoin = false;
+	m_rejoin = ConfigItem(false);
 	m_score = 0;
 	m_starmeter = 0;
 	m_streak = 0;

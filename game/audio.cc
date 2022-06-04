@@ -416,6 +416,10 @@ Device::Device(unsigned int in, unsigned int out, double rate, unsigned int dev)
   outptr()
 {}
 
+Device::~Device() {
+	try { stop(); } catch (const std::exception &e) { std::clog << "audio/error: " << e.what(); }
+}
+
 void Device::start() {
 	PaError err = Pa_StartStream(stream);
 	if (err != paNoError) throw std::runtime_error(std::string("Pa_StartStream: ") + Pa_GetErrorText(err));
@@ -439,13 +443,13 @@ int Device::operator()(float const* inbuf, float* outbuf, unsigned long frames) 
 }
 
 struct Audio::Impl {
-	Output output;
-	std::deque<Analyzer> analyzers;
+        // Keep backend initialized first/deleted last so that nothing is playing while destroying it.
+	portaudio::AudioBackend backend;
 	std::deque<Device> devices;
+	std::deque<Analyzer> analyzers;
+	Output output;
 	bool playback = false;
-	std::string selectedBackend = Audio::backendConfig().getValue();
-	Impl() {
-		std::clog << portaudio::AudioBackends().dump() << std::flush; // Dump PortAudio backends and devices to log.
+	Impl(portaudio::AudioBackend selectedBackend) : backend(std::move(selectedBackend)) {
 		// Parse audio devices from config
 		ConfigItem::StringList devs = config["audio/devices"].sl();
 		for (ConfigItem::StringList::const_iterator it = devs.begin(), end = devs.end(); it != end; ++it) {
@@ -478,7 +482,6 @@ struct Audio::Impl {
 					if (!iss.eof()) throw std::runtime_error("Syntax error parsing device parameter " + key);
 				}
 				if (params.mics.size() < params.in) { params.mics.resize(params.in); }
-				portaudio::AudioDevices ad(PaHostApiTypeId(PaHostApiNameToHostApiTypeId(selectedBackend)));
 					bool wantOutput = (params.in == 0) ? true : false;
 					unsigned num;
 					std::string msg = "audio/info: Device string empty; will look for a device with at least ";
@@ -494,7 +497,7 @@ struct Audio::Impl {
 					std::clog << "audio/debug: Will try to find device matching dev: " << params.dev << std::endl;
 					}
 					else { std::clog << msg << std::endl; }
-					portaudio::DeviceInfo const& info = ad.find(params.dev, wantOutput, num);
+					portaudio::DeviceInfo const& info = backend.find(params.dev, wantOutput, num);
 					std::clog << "audio/info: Found: " << info.name << ", in: " << info.in << ", out: " << info.out << std::endl;
 				if (info.in < params.mics.size()) throw std::runtime_error("Device doesn't have enough input channels");
 				if (info.out < params.out) throw std::runtime_error("Device doesn't have enough output channels");
@@ -537,33 +540,29 @@ struct Audio::Impl {
 			output.mics.push_back(&analyzers[i]);
 	}
 	~Impl() {
-		// stop all audio streams befor destoying the object.
-		// else portaudio will keep sending data to those destroyed
-		// objects.
-		for (auto& device: devices) try { device.stop(); } catch (const std::exception &e) { std::clog << "audio/error: " << e.what(); }
 	}
 };
 
-portaudio::Init Audio::init;
+portaudio::AudioBackend &Audio::getBackend() {
+	return self->backend;
+}
 
 Audio::Audio() {
 	aubio_tempo_set_silence(Audio::aubioTempo.get(), -50.0);
 	aubio_tempo_set_threshold(Audio::aubioTempo.get(), 0.4);
-        populateBackends(portaudio::AudioBackends().getBackends());
-        self = std::make_unique<Impl>();
+        populateBackends(portaudio::AudioBackendFactory().getBackendsNames());
+        self = std::make_unique<Impl>(portaudio::AudioBackendFactory().makeBackend(Audio::backendConfig().getEnumName()));
 }
-Audio::~Audio() { close(); }
+
+// Necessary because of p-impl
+Audio::~Audio() = default;
 
 ConfigItem& Audio::backendConfig() {
 	static ConfigItem& backend = config["audio/backend"];
 	return backend;
 }
 
-void Audio::restart() { close(); self = std::make_unique<Impl>(); }
-
-void Audio::close() {
-	self.reset();
-}
+void Audio::restart() { self = nullptr; self = std::make_unique<Impl>(portaudio::AudioBackendFactory().makeBackend(Audio::backendConfig().getEnumName())); }
 
 bool Audio::isOpen() const {
 	return !self->devices.empty();

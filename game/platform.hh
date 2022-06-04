@@ -4,6 +4,7 @@
 
 #include <array>
 #include <iostream>
+#include <string>
 
 #include <boost/predef/os.h>
 
@@ -25,7 +26,7 @@ enum class HostOS { OS_WIN, OS_LINUX, OS_MAC, OS_BSD, OS_SOLARIS, OS_UNIX };
 Platform();
 static HostOS currentOS();
 static uint16_t shortcutModifier(bool eitherSide = true);
-static int defaultBackEnd();
+static std::string defaultBackEnd();
 
 private:
 static const std::array<const char*,6> platformNames;

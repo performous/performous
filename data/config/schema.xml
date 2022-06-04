@@ -39,7 +39,7 @@ to save the current settings to XML.
 	</menu>
 
 	<!-- Gameplay preferences -->
-	<entry name="game/karaoke_mode" type="int" value="0">
+	<entry name="game/karaoke_mode" type="enum" value="Off">
 		<limits>
 			<enum>Off</enum>
 			<enum>On - normal text</enum>
@@ -48,7 +48,7 @@ to save the current settings to XML.
 		<short>Karaoke mode</short>
 		<long>Hide pitch wave, notes and scoring.</long>
 	</entry>
-	<entry name="game/difficulty" type="int" value="0">
+	<entry name="game/difficulty" type="enum" value="Normal">
 		<limits>
 			<enum>Normal</enum>
 			<enum>Hard</enum>
@@ -58,7 +58,7 @@ to save the current settings to XML.
 		<long>Game difficulty.</long>
 	</entry>
 
-	<entry name="game/Textstyle" type="int" value="0">
+	<entry name="game/Textstyle" type="enum" value="Western mode">
 		<limits>
 			<enum>Western mode</enum>
 			<enum>Asian mode</enum>
@@ -74,9 +74,11 @@ to save the current settings to XML.
 		<short>Pitch waves</short>
 		<long>Enable singing pitch display (when not in karaoke mode).</long>
 	</entry>
-	<entry name="game/theme" type="int" value="-1">
-		<limits min="-1" max="-1" step="0" />
+	<entry name="game/theme" type="enum" value="default">
+		<limits>
+                <enum>default</enum>
 		<!-- Enum options added dynamically by scanning theme folders -->
+                </limits>
 		<short>Theme</short>
 		<long>Name of the theme to use.</long>
 	</entry>
@@ -95,14 +97,15 @@ to save the current settings to XML.
 		<short>High-score timeout</short>
 		<long>How long the high-scores screen will wait for input before going to the next song.</long>
 	</entry>
-	<entry name="game/language" type="int" value="1337">
+	<entry name="game/language" type="enum" value="Auto">
 		<limits>
+			<enum>Auto</enum>
 			<!-- enum options will be added dynamically according to detected interfaces. -->
 		</limits>
 		<short>Language</short>
 		<long>Language to show Performous in</long>
 	</entry>
-	<entry name="game/webserver_access" type="int" value="0">
+	<entry name="game/webserver_access" type="enum" value="Disabled">
 		<limits>
 			<enum>Disabled</enum>
 			<enum>Localhost </enum>
@@ -127,7 +130,7 @@ to save the current settings to XML.
 		<short>Webserver fallback port</short>
 		<long>Port to use in case original webserver port is in use. Choose one that you know for sure is not used by other applications.</long>
 	</entry>
-	<entry name="game/notegraphscalingmode" type="int" value="0">
+	<entry name="game/notegraphscalingmode" type="enum" value="Dynamic">
 		<limits>
 			<enum>Dynamic</enum>
 			<enum>Fixed</enum>
@@ -159,7 +162,7 @@ to save the current settings to XML.
 		<short>Keyboard as keytar</short>
 		<long>Enable keyboard as keytar.</long>
 	</entry>
-	<entry name="game/instrument0" type="int" value="0">
+	<entry name="game/instrument0" type="enum" value="Auto">
 		<limits>
 			<enum>Auto</enum>
 			<!-- Options added dynamically from controllers.xml -->
@@ -167,7 +170,7 @@ to save the current settings to XML.
 		<short>Force controller A's type</short>
 		<long>Override autodetection and force the first controller to the given type.</long>
 	</entry>
-	<entry name="game/instrument1" type="int" value="0">
+	<entry name="game/instrument1" type="enum" value="Auto">
 		<limits>
 			<enum>Auto</enum>
 			<!-- Options added dynamically from controllers.xml -->
@@ -175,7 +178,7 @@ to save the current settings to XML.
 		<short>Force controller B's type</short>
 		<long>Override autodetection and force the second controller to the given type.</long>
 	</entry>
-	<entry name="game/instrument2" type="int" value="0">
+	<entry name="game/instrument2" type="enum" value="Auto">
 		<limits>
 			<enum>Auto</enum>
 			<!-- Options added dynamically from controllers.xml -->
@@ -183,7 +186,7 @@ to save the current settings to XML.
 		<short>Force controller C's type</short>
 		<long>Override autodetection and force the third controller to the given type.</long>
 	</entry>
-	<entry name="game/instrument3" type="int" value="0">
+	<entry name="game/instrument3" type="enum" value="Auto">
 		<limits>
 			<enum>Auto</enum>
 			<!-- Options added dynamically from controllers.xml -->
@@ -205,7 +208,7 @@ to save the current settings to XML.
 		<stringvalue></stringvalue>
 	</entry>
 <!-- 
-	<entry name="game/fallback_encoding" type="int" value="2">
+	<entry name="game/fallback_encoding" type="enum" value="CP1252">
 		<limits>
 			<enum>CP1250</enum>
 			<enum>CP1251</enum>
@@ -270,7 +273,7 @@ to save the current settings to XML.
 		<short>Stereoscopic 3D</short>
 		<long>Enable 3D rendering of Performous.</long>
 	</entry>
-	<entry name="graphic/stereo3dtype" type="int" value="0">
+	<entry name="graphic/stereo3dtype" type="enum" value="Red/Cyan">
 		<limits>
 			<enum>Red/Cyan</enum>
 			<enum>Green/Magenta</enum>
@@ -322,7 +325,7 @@ to save the current settings to XML.
 		<short>Suggested latency</short>
 		<long>This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart.</long>
 	</entry>
-	<entry name="audio/backend" type="int" value="1337">
+	<entry name="audio/backend" type="enum" value="Auto">
 		<limits>
 		<enum>Auto</enum>
 		<!-- enum options will be added dynamically according to detected interfaces. -->

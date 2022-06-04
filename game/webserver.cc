@@ -22,7 +22,7 @@ void WebServer::StartServer(int tried, bool fallbackPortInUse) {
 
 	std::string portToUse = fallbackPortInUse ? std::to_string(config["game/webserver_fallback_port"].i()) : std::to_string(config["game/webserver_port"].i());
 	std::string addr("");
-	if(config["game/webserver_access"].i() == 1) {
+	if(config["game/webserver_access"].getEnumName() == "Localhost") {
 		addr = "http://127.0.0.1:" + portToUse;
 		std::clog << "webserver/notice: Starting local server on: " << addr <<std::endl;
 	} else {
@@ -49,7 +49,7 @@ void WebServer::StartServer(int tried, bool fallbackPortInUse) {
 WebServer::WebServer(Songs& songs)
 : m_songs(songs)
 {
-	if(config["game/webserver_access"].i() == 0) {
+	if(config["game/webserver_access"].getEnumName() == "Disabled") {
 		std::clog << "webserver/notice: Not starting webserver." << std::endl;
 	} else {
 		m_serverThread = std::make_unique<std::thread>([this] { StartServer(0, false); });
