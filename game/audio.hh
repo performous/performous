@@ -76,19 +76,18 @@ class ConfigItem;
 class Audio {
 	friend int getBackend();
         // static because Port audio once for the whole software lifetime
-	static portaudio::Init init;
 	struct Impl;
 	std::unique_ptr<Impl> self;
 	friend class ScreenSongs;
 	friend class Music;
 	static std::recursive_mutex aubio_mutex;
 public:
+	portaudio::AudioBackend &getBackend();
 	typedef std::map<std::string, fs::path> Files;
 	static ConfigItem& backendConfig();
 	Audio();
 	~Audio();
 	void restart();
-	void close();
 	std::deque<Analyzer>& analyzers();
 	std::deque<Device>& devices();
 	bool isOpen() const;
