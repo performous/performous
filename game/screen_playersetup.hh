@@ -4,6 +4,8 @@
 #include "texture.hh"
 #include "ui/button.hh"
 #include "ui/formscreen.hh"
+#include "ui/layout/grid.hh"
+#include "ui/layout/panel.hh"
 #include "ui/image.hh"
 #include "ui/label.hh"
 #include "ui/list.hh"
@@ -53,5 +55,7 @@ class ScreenPlayerSetup: public FormScreen {
 	Label m_averageScore;
 	Button m_addPlayerButton;
 	Button m_deletePlayerButton;
+	Grid m_grid;
+	Panel m_panel;
 	std::vector<std::string> m_avatars;
 };

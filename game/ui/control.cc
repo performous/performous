@@ -49,6 +49,30 @@ std::string Control::getName() const {
 	return m_name;
 }
 
+void Control::enable() {
+	m_enabled = true;
+}
+
+void Control::disable() {
+	m_enabled = false;
+}
+
+void Control::setEnabled(bool enabled) {
+	m_enabled = enabled;
+}
+
+bool Control::isEnabled() const {
+	return m_enabled;
+}
+
+void Control::setTabIndex(unsigned index) {
+	m_tabIndex = index;
+}
+
+unsigned Control::getTabIndex() const {
+	return m_tabIndex;
+}
+
 void Control::onKeyDown(std::function<void(Control&, Key)> const& callback) {
 	m_onKeyDown = callback;
 }

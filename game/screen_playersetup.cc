@@ -42,7 +42,7 @@ namespace {
 }
 
 ScreenPlayerSetup::ScreenPlayerSetup(Game& game, Players& players, Database const& database)
-: FormScreen("PlayerSetup"), m_game(game), m_players(players), m_database(database),  m_background(findFile("intro_bg.svg")) {
+: FormScreen("PlayerSetup"), m_game(game), m_players(players), m_database(database),  m_background(findFile("intro_bg.svg")), m_grid(2, 1) {
 	loadAvatars(m_avatars);
 	initializeControls();
 }
@@ -110,10 +110,17 @@ void ScreenPlayerSetup::initializeControls() {
 	const auto verticalSpace = lineHeight * 0.125f;
 	auto y = verticalOffset;
 
-	getForm().addControl(m_playerList);
+	getForm().addControl(m_grid);
+
+	m_grid.resizeColumns({0.33f, 0.67f});
+	m_grid.setGeometry(horizontalOffset, verticalOffset, -horizontalOffset * 2.0f, -verticalOffset * 2.0f);
+
+	m_grid(0, 0) = &m_playerList;
+	m_grid(1, 0) = &m_panel;
+
 	m_playerList.displayIcon(true);
 	m_playerList.displayCheckBox(true);
-	m_playerList.setGeometry(horizontalOffset, y, horizontalSpace, listHeight);
+	m_playerList.setTabIndex(0);
 	m_playerList.onSelectionChanged([&](List& list, size_t index, size_t){ m_name.setText(list.getItems()[index].toString());});
 		auto const& player = *list.getItems()[index].getUserData<PlayerItem*>();
 		auto const avatar = player.getAvatar();
@@ -149,13 +156,16 @@ void ScreenPlayerSetup::initializeControls() {
 			m_averageScore.setText(std::to_string(averageScore));
 		}
 
-	getForm().addControl(m_nameLabel);
-	m_nameLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01f, y, horizontalLabelSpace, lineHeight);
+	y = 0.f;
+
+	m_panel.addControl(m_nameLabel);
+	m_nameLabel.setGeometry(0.01f, y, horizontalLabelSpace, lineHeight);
 	m_nameLabel.setText(_("Name:"));
 
-	getForm().addControl(m_name);
+	m_panel.addControl(m_name);
 	m_name.setMaxLength(16);
-	m_name.setGeometry(horizontalOffset + horizontalSpace + 0.01f + horizontalLabelSpace + 0.01f, y, horizontalSpace, lineHeight);
+	m_name.setTabIndex(1);
+	m_name.setGeometry(0.01f + horizontalLabelSpace + 0.01f, y, horizontalSpace, lineHeight);
 	m_name.onTextChanged(
 		[&](TextBox&, std::string const& text, std::string const&){
 			std::cout << "changed to " << text << std::endl;
@@ -167,18 +177,19 @@ void ScreenPlayerSetup::initializeControls() {
 
 	y += lineHeight + verticalSpace;
 
-	getForm().addControl(m_avatarLabel);
-	m_avatarLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01f, y, horizontalLabelSpace, lineHeight);
+	m_panel.addControl(m_avatarLabel);
+	m_avatarLabel.setGeometry(0.01f, y, horizontalLabelSpace, lineHeight);
 	m_avatarLabel.setText(_("Avatar:"));
 
-	auto x = horizontalOffset + horizontalSpace + 0.01f + horizontalLabelSpace + 0.01f;
+	auto x = 0.01f + horizontalLabelSpace + 0.01f;
 	auto y2 = y + (horizontalSpace * (0.6f - 0.15f)) * 0.5f;
-	getForm().addControl(m_avatarPrevious);
+	m_panel.addControl(m_avatarPrevious);
 	m_avatarPrevious.setGeometry(x, y2, horizontalSpace * 0.15f, horizontalSpace * 0.15f);
 	x += horizontalSpace * 0.2f;
-	getForm().addControl(m_avatar);
+	m_panel.addControl(m_avatar);
 	m_avatar.setGeometry(x, y, horizontalSpace * 0.6f, horizontalSpace * 0.6f);
 	m_avatar.canBeFocused(true);
+	m_avatar.setTabIndex(2);
 	m_avatar.onKeyUp(
 		[&](Control&, Control::Key key){
 			if(key == Control::Key::Left)
@@ -188,51 +199,55 @@ void ScreenPlayerSetup::initializeControls() {
 		}
 	);
 	x += horizontalSpace * 0.65f;
-	getForm().addControl(m_avatarNext);
+	m_panel.addControl(m_avatarNext);
 	m_avatarNext.setGeometry(x, y2, horizontalSpace * 0.15f, horizontalSpace * 0.15f);
 
 	y += horizontalSpace * 0.6f + verticalSpace;
 
-	getForm().addControl(m_bestScoreLabel);
-	m_bestScoreLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01f, y, horizontalLabelSpace, lineHeight);
+	m_panel.addControl(m_bestScoreLabel);
+	m_bestScoreLabel.setGeometry(0.01f, y, horizontalLabelSpace, lineHeight);
 	m_bestScoreLabel.setText(_("Best score:"));
 
-	getForm().addControl(m_bestScore);
-	m_bestScore.setGeometry(horizontalOffset + horizontalSpace + 0.01f + horizontalLabelSpace + 0.01f, y, horizontalSpace, lineHeight);
+	m_panel.addControl(m_bestScore);
+	m_bestScore.setGeometry(0.01f + horizontalLabelSpace + 0.01f, y, horizontalSpace, lineHeight);
 	m_bestScore.setText(_("na"));
 
 	y += lineHeight + verticalSpace;
 
-	getForm().addControl(m_bestSongLabel);
-	m_bestSongLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01f, y, horizontalLabelSpace, lineHeight);
+	m_panel.addControl(m_bestSongLabel);
+	m_bestSongLabel.setGeometry(0.01f, y, horizontalLabelSpace, lineHeight);
 	m_bestSongLabel.setText(_("Best song:"));
 
-	getForm().addControl(m_bestSong);
-	m_bestSong.setGeometry(horizontalOffset + horizontalSpace + 0.01f + horizontalLabelSpace + 0.01f, y, horizontalSpace, lineHeight);
+	m_panel.addControl(m_bestSong);
+	m_bestSong.setGeometry(0.01f + horizontalLabelSpace + 0.01f, y, horizontalSpace, lineHeight);
 	m_bestSong.setText(_("na"));
 
 	y += lineHeight + verticalSpace;
 
-	getForm().addControl(m_averageScoreLabel);
-	m_averageScoreLabel.setGeometry(horizontalOffset + horizontalSpace + 0.01f, y, horizontalLabelSpace, lineHeight);
+	m_panel.addControl(m_averageScoreLabel);
+	m_averageScoreLabel.setGeometry(0.01f, y, horizontalLabelSpace, lineHeight);
 	m_averageScoreLabel.setText(_("Average score:"));
 
-	getForm().addControl(m_averageScore);
-	m_averageScore.setGeometry(horizontalOffset + horizontalSpace + 0.01f + horizontalLabelSpace + 0.01f, y, horizontalSpace, lineHeight);
+	//getForm().addControl(m_averageScore);
+	m_panel.addControl(m_averageScore);
+	m_averageScore.setGeometry(0.01f + horizontalLabelSpace + 0.01f, y, horizontalSpace, lineHeight);
 	m_averageScore.setText(_("na"));
 
 	y += (lineHeight + verticalSpace) * 4;
 
-	getForm().addControl(m_addPlayerButton);
-	m_addPlayerButton.setGeometry(horizontalOffset + horizontalSpace + 0.01f, y, horizontalLabelSpace, lineHeight);
+	m_panel.addControl(m_addPlayerButton);
+	m_addPlayerButton.setGeometry(0.01f, y, horizontalLabelSpace, lineHeight);
 	m_addPlayerButton.setText(_("Add player"));
+	m_addPlayerButton.setTabIndex(3);
 	m_addPlayerButton.onClicked([&](Button&){addPlayer();});
 
-	getForm().addControl(m_deletePlayerButton);
-	m_deletePlayerButton.setGeometry(horizontalOffset + horizontalSpace + 0.01f + horizontalLabelSpace + 0.01f, y, horizontalLabelSpace, lineHeight);
+	m_panel.addControl(m_deletePlayerButton);
+	m_deletePlayerButton.setGeometry(0.01f + horizontalLabelSpace + 0.01f, y, horizontalLabelSpace, lineHeight);
 	m_deletePlayerButton.setText(_("Delete player"));
+	m_deletePlayerButton.setTabIndex(4);
 	m_deletePlayerButton.onClicked([&](Button&){deletePlayer();});
 
+	m_grid.layout();
 	getForm().focus(m_playerList);
 }
 

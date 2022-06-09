@@ -1,7 +1,9 @@
 #include "form.hh"
 
 void Form::focus(Control const& control) {
-	if(getChildren().empty())
+	auto children = collectChildren([](Control const& control){return control.canFocused();});
+
+	if(children.empty())
 		return;
 
 	if(m_focus == &control)
@@ -10,7 +12,6 @@ void Form::focus(Control const& control) {
 	if(m_focus)
 		m_focus->setFocus(false);
 
-	auto children = getChildren();
 	auto it = std::find(children.begin(), children.end(), &control);
 
 	if(it != children.end()) {
@@ -20,19 +21,24 @@ void Form::focus(Control const& control) {
 }
 
 void Form::focusNext() {
-	if(getChildren().empty())
+	auto childSet = collectChildren([](Control const& control){return control.canFocused();});
+
+	if(childSet.empty())
 		return;
 
+	auto children = std::vector<Control*>(childSet.begin(), childSet.end());
+
+	std::sort(children.begin(), children.end(), [](Control const* a, Control const* b){ return a->getTabIndex() < b->getTabIndex();});
+
 	if(!m_focus)
-		m_focus = *getChildren().begin();
+		m_focus = children.front();
 	else {
-		auto children = getChildren();
-		auto it = children.find(m_focus);
+		auto it = std::find(children.begin(), children.end(), m_focus);
 
 		m_focus->setFocus(false);
 
 		if(it == children.end() || ++it == children.end())
-			m_focus = *getChildren().begin();
+			m_focus = *children.begin();
 		else
 			m_focus = *it;
 	}
@@ -44,21 +50,26 @@ void Form::focusNext() {
 }
 
 void Form::focusPrevious() {
-	if(getChildren().empty())
+	auto childSet = collectChildren([](Control const& control){return control.canFocused();});
+
+	if(childSet.empty())
 		return;
 
+	auto children = std::vector<Control*>(childSet.begin(), childSet.end());
+
+	std::sort(children.begin(), children.end(), [](Control const* a, Control const* b){ return a->getTabIndex() < b->getTabIndex();});
+
 	if(!m_focus)
-		m_focus = *getChildren().rbegin();
+		m_focus = *children.rbegin();
 	else {
-		auto children = getChildren();
-		auto it = children.find(m_focus);
+		auto it = std::find(children.begin(), children.end(), m_focus);
 
 		m_focus->setFocus(false);
 
-		if(it == children.begin() || --it == children.begin())
-			m_focus = *getChildren().rbegin();
+		if(it == children.begin())
+			m_focus = *children.rbegin();
 		else
-			m_focus = *it;
+			m_focus = *--it;
 	}
 
 	m_focus->setFocus(true);

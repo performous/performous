@@ -26,9 +26,17 @@ class Control {
 	void setName(std::string const& name);
 	std::string getName() const;
 
+	void enable();
+	void disable();
+	void setEnabled(bool enabled);
+	bool isEnabled() const;
+
 	virtual bool canFocused() const { return true; }
 	virtual void setFocus(bool focused) { m_focused = focused; }
 	bool hasFocus() const { return m_focused; }
+
+	void setTabIndex(unsigned);
+	unsigned getTabIndex() const;
 
 	enum class Key { Up, Down, Left, Right, PageUp, PageDown, Space, Tab, BackTab, Escape, Return, Delete, BackSpace,
 		Number0, Number1, Number2, Number3, Number4, Number5, Number6, Number7, Number8, Number9,
@@ -62,6 +70,8 @@ class Control {
 	float m_width;
 	float m_height;
 	bool m_focused = false;
+	bool m_enabled = true;
+	unsigned m_tabIndex = 0;
 	Border m_focus{std::make_shared<BorderDefinition>(findFile("ui_focused.svg").string())};
 	std::function<void(Control&, Key)> m_onKeyDown;
 	std::function<void(Control&, Key)> m_onKeyUp;
