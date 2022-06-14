@@ -50,7 +50,7 @@ struct Player {
 	/// calculate how well last lyrics row went
 	void calcRowRank();
 	/// player activity singing
-	float activity() const { return m_activitytimer / 300.0; }
+	float activity() const { return static_cast<float>(m_activitytimer / 300.0); }
 	/// get player's score
 	int getScore() const {
 		return 10000.0 * m_score;
@@ -70,7 +70,7 @@ using PlayerId = size_t;
   Used for Players Management.
   */
 struct PlayerItem {
-    static PlayerId UndefinedPlayerId;
+    constexpr static PlayerId UndefinedPlayerId = -1;
 
     PlayerItem() = default;
     PlayerItem(PlayerId);
