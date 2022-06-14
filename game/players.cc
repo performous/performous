@@ -158,7 +158,7 @@ void Players::advance(int diff) {
 }
 
 PlayerItem Players::current() const {
-    if (math_cover.getTarget() < m_filtered.size()) return m_filtered[math_cover.getTarget()];
+    if (math_cover.getTarget() < static_cast<std::ptrdiff_t>(m_filtered.size())) return m_filtered[static_cast<size_t>(math_cover.getTarget())];
     
     return PlayerItem();
 }
