@@ -40,7 +40,7 @@ namespace input {
 			else return false;
 			try {
 			event.source = SourceId(SourceType::JOYSTICK, static_cast<unsigned>(sdlEv.jbutton.which));  // All j* structures have .which at the same position as jbutton
-			} catch (std::exception const& e) {
+			} catch (std::exception const&) {
 				std::clog << "joystick/error: " + std::to_string(sdlEv.jbutton.which) + " is an invalid SDL_JoystickID." << std::endl;
 			}
 			return true;
