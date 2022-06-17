@@ -30,10 +30,10 @@ ConfigItem::ConfigItem(unsigned short uival): m_type("uint"), m_value(uival), m_
 		val = static_cast<unsigned short>(clamp(((value + dir * step) / step) * step, min, max));
 
 class ConfigItemXMLLoader {
-  public:
+public:
 	void update(ConfigItem&, xmlpp::Element& elem, int mode); ///< Load XML config file, elem = Entry, mode = 0 for schema, 1 for system config and 2 for user config
-	
-  private:
+
+private:
 	template <typename T> void updateNumeric(ConfigItem&, xmlpp::Element& elem, int mode); ///< Used internally for loading XML
 	void verifyType(std::string const& t) const; ///< throws std::logic_error if t != type
 };
@@ -61,14 +61,8 @@ namespace {
 		return getText(dynamic_cast<xmlpp::Element const&>(*ns[0]));
 	}
 
-	if (this->getName() == "game/language") {
-		unsigned autoLanguageType = 1337;
-		unsigned val = LanguageToLanguageId(this->getEnumName()); // In the case of the language, val is the real value while m_value is the enum case for its cosmetic name.
-		std::string languageName = (val != autoLanguageType) ? this->getEnumName() : "Auto";
-		return languageName;
-	}
 	struct XMLError {
-		XMLError(xmlpp::Element& e, std::string msg): elem(e), message(msg) {}
+		XMLError(xmlpp::Element& e, std::string msg) : elem(e), message(msg) {}
 		xmlpp::Element& elem;
 		std::string message;
 	};
@@ -100,87 +94,95 @@ template <typename T> void ConfigItemXMLLoader::updateNumeric(ConfigItem& item, 
 	if (!ns.empty()) {
 		xmlpp::Element& e = dynamic_cast<xmlpp::Element&>(*ns[0]);
 		try {
-			item.getUnit() = getAttribute(e, "unit"); 
-		} catch (...) {
+			item.getUnit() = getAttribute(e, "unit");
+		}
+		catch (...) {
 		}
 		std::string m;
 		try {
 			m = getAttribute(e, "multiplier");
 			item.getMultiplier() = sconv<T>(m);
-		} 
+		}
 		catch (XMLError&) {
 		}
-		catch (std::exception&) { 
-			throw XMLError(e, "attribute multiplier='" + m + "' value invalid"); 
+		catch (std::exception&) {
+			throw XMLError(e, "attribute multiplier='" + m + "' value invalid");
 		}
 	}
 }
 
 void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, int mode) {
-try {
-	if (mode == 0) {
-		item.setName(getAttribute(elem, "name"));
-		item.setType(getAttribute(elem, "type"));
-		if (item.getType().empty()) 
-			throw std::runtime_error("Entry type attribute is missing");
-		// Menu text
-		item.setDescription(getText(elem, "short"));
-		item.setLongDescription(getText(elem, "long"));
-	} else {
-		const auto type = getAttribute(elem, "type");
-		if (!type.empty() && type != item.getType()) 
-			throw std::runtime_error("Entry type mismatch: " + getAttribute(elem, "name") + ": schema type = " + item.getType() + ", config type = " + type);
-	}
-	if (item.getType() == "bool") {
-		const auto value_string = getAttribute(elem, "value");
-		if (value_string == "true") 
-			item.setValue(true);
-		else if (value_string == "false") 
-			item.setValue(false);
-		else 
-			throw std::runtime_error("Invalid boolean value '" + value_string + "'");
-	} else if (item.getType() == "int") {
-		const auto value_string = getAttribute(elem, "value");
-		if (!value_string.empty()) 
-			item.setValue(std::stoi(value_string));
+	try {
+		if (mode == 0) {
+			item.setName(getAttribute(elem, "name"));
+			item.setType(getAttribute(elem, "type"));
+			if (item.getType().empty())
+				throw std::runtime_error("Entry type attribute is missing");
+			// Menu text
+			item.setDescription(getText(elem, "short"));
+			item.setLongDescription(getText(elem, "long"));
+		}
+		else {
+			const auto type = getAttribute(elem, "type");
+			if (!type.empty() && type != item.getType())
+				throw std::runtime_error("Entry type mismatch: " + getAttribute(elem, "name") + ": schema type = " + item.getType() + ", config type = " + type);
+		}
+		if (item.getType() == "bool") {
+			const auto value_string = getAttribute(elem, "value");
+			if (value_string == "true")
+				item.setValue(true);
+			else if (value_string == "false")
+				item.setValue(false);
+			else
+				throw std::runtime_error("Invalid boolean value '" + value_string + "'");
+		}
+		else if (item.getType() == "int") {
+			const auto value_string = getAttribute(elem, "value");
+			if (!value_string.empty())
+				item.setValue(std::stoi(value_string));
 		updateNumeric<int>(elem, mode);
 	} else if (m_type == "uint") {
 		std::string value_string = getAttribute(elem, "value");
 		if (!value_string.empty()) m_value = static_cast<unsigned short>(std::stoi(value_string));
-		// Enum handling
-		if (mode == 0) {
-			auto n2 = elem.find("limits/enum");
-			if (!n2.empty()) {
-				for (auto it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
-					xmlpp::Element& elem2 = dynamic_cast<xmlpp::Element&>(**it2);
-					item.getEnum().push_back(getText(elem2));
+			// Enum handling
+			if (mode == 0) {
+				auto n2 = elem.find("limits/enum");
+				if (!n2.empty()) {
+					for (auto it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
+						xmlpp::Element& elem2 = dynamic_cast<xmlpp::Element&>(**it2);
+						item.getEnum().push_back(getText(elem2));
+					}
+					item.getMin() = static_cast<unsigned short>(0);
+					item.getMax() = static_cast<unsigned short>(item.getEnum().size() - 1);
+					item.getStep() = static_cast<unsigned short>(1);
 				}
-					m_min = static_cast<unsigned short>(0);
-					m_max = static_cast<unsigned short>(m_enums.size() - 1);
-					m_step = static_cast<unsigned short>(1);
 			}
+		updateNumeric<unsigned short>(item, elem, mode);
 		}
-		updateNumeric<unsigned short>(elem, mode);
-	} else if (item.getType() == "float") {
-		std::string value_string = getAttribute(elem, "value");
-		if (!value_string.empty()) m_value = std::stof(value_string);
+		else if (item.getType() == "float") {
+			std::string value_string = getAttribute(elem, "value");
+			if (!value_string.empty()) item.setValue(std::stof(value_string));
 			updateNumeric<float>(elem, mode);
-	} else if (item.getType() == "string") {
-		item.setValue(getText(elem, "stringvalue"));
-	} else if (item.getType() == "string_list" || item.getType() == "option_list") {
-		//TODO: Option list should also update selection (from attribute?)
-		std::vector<std::string> value;
-		auto n2 = elem.find("stringvalue");
-		for (auto it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
-			value.push_back(getText(dynamic_cast<xmlpp::Element const&>(**it2)));
 		}
-		item.setValue(value);
-	} else if (!item.getType().empty()) 
-		throw std::runtime_error("Invalid value type in config schema: " + item.getType());
-	// Schema sets all defaults, system config sets the system default
-	if (mode < 1) item.setFactoryDefaultValue(item.value());
-	if (mode < 2) item.setDefaultValue(item.value());
-    } catch (std::exception& e) {
+		else if (item.getType() == "string") {
+			item.setValue(getText(elem, "stringvalue"));
+		}
+		else if (item.getType() == "string_list" || item.getType() == "option_list") {
+			//TODO: Option list should also update selection (from attribute?)
+			std::vector<std::string> value;
+			auto n2 = elem.find("stringvalue");
+			for (auto it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
+				value.push_back(getText(dynamic_cast<xmlpp::Element const&>(**it2)));
+			}
+			item.setValue(value);
+		}
+		else if (!item.getType().empty())
+			throw std::runtime_error("Invalid value type in config schema: " + item.getType());
+		// Schema sets all defaults, system config sets the system default
+		if (mode < 1) item.setFactoryDefaultValue(item.value());
+		if (mode < 2) item.setDefaultValue(item.value());
+	}
+	catch (std::exception& e) {
 		const auto line = elem.get_line();
 		throw std::runtime_error(std::to_string(line) + ": Error while reading entry: " + e.what());
 	}
@@ -190,14 +192,20 @@ try {
 fs::path systemConfFile;
 fs::path userConfFile;
 
-namespace{
-	std::string getValue_audio_backend(ConfigItem const& item) { 
-		if (item.getName() != "audio/backend") 
+namespace {
+	std::string getValue_language(ConfigItem const& item) {
+		int autoLanguageType = 1337;
+		int val = LanguageToLanguageId(item.getEnumName()); // In the case of the language, val is the real value while m_value is the enum case for its cosmetic name.
+		std::string languageName = (val != autoLanguageType) ? item.getEnumName() : "Auto";
+		return languageName;
+	}
+	std::string getValue_audio_backend(ConfigItem const& item) {
+		if (item.getName() != "audio/backend")
 			throw std::logic_error("getValue_audio_backend: item must be 'audio/backend' but is '" + item.getName() + "'");
-        
+
 		int AutoBackendType = 1337;
 		static int val = std::get<int>(item.value());
-		if (val != std::get<int>(item.value())) 
+		if (val != std::get<int>(item.value()))
 			val = PaHostApiNameToHostApiTypeId(item.getEnumName()); // In the case of the audio backend, val is the real value while m_value is the enum case for its cosmetic name.
 		int hostApi = Pa_HostApiTypeIdToHostApiIndex(PaHostApiTypeId(val));
 		std::ostringstream oss;
@@ -224,7 +232,7 @@ void writeConfig(bool system) {
 	xmlpp::Document doc;
 	auto nodeRoot = doc.create_root_node("performous");
 	bool dirty = false;
-	for (auto& elem: config) {
+	for (auto& elem : config) {
 		ConfigItem& item = elem.second;
 		std::string name = elem.first;
 		if (item.isDefault(system) && name != "audio/backend" && name != "graphic/stereo3d") continue; // No need to save settings with default values
@@ -243,7 +251,7 @@ void writeConfig(bool system) {
 				Audio::backendConfig().selectEnum(item.getEnumName());
 				Game::getSingletonPtr()->restartAudio();
 			}
-			else { 	entryNode->set_attribute("value", std::to_string(oldValue)); }
+			else { entryNode->set_attribute("value", std::to_string(oldValue)); }
 		}
 		else if (name == "game/language") {
 			auto currentLanguageStr = Game::getSingletonPtr()->getCurrentLanguage();
@@ -260,17 +268,17 @@ void writeConfig(bool system) {
 				entryNode->set_attribute("value", std::to_string(currentLanguageId));
 			}
 		}
-		else if (type == "int") entryNode->set_attribute("value",std::to_string(item.i()));
+		else if (type == "int") entryNode->set_attribute("value", std::to_string(item.i()));
 		else if (type == "uint") entryNode->set_attribute("value",std::to_string(item.ui()));
 		else if (type == "bool") entryNode->set_attribute("value", item.b() ? "true" : "false");
-		else if (type == "float") entryNode->set_attribute("value",std::to_string(item.f()));
+		else if (type == "float") entryNode->set_attribute("value", std::to_string(item.f()));
 		else if (item.get_type() == "string") xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(item.s());
 		else if (item.get_type() == "string_list") {
-			for (auto const& str: item.sl()) xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(str);
+			for (auto const& str : item.sl()) xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(str);
 		}
 		else if (item.get_type() == "option_list") {
 			//TODO: Write selected also (as attribute?)
-			for (auto const& str: item.ol()) xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(str);
+			for (auto const& str : item.ol()) xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(str);
 		}
 	}
 	fs::path const& conf = system ? systemConfFile : userConfFile;
@@ -282,15 +290,17 @@ void writeConfig(bool system) {
 		if (dirty) {
 			rename(tmp, conf);
 			std::cerr << "Saved configuration to " << conf << std::endl;
-		} else {
+		}
+		else {
 			std::cerr << "Using default settings, no configuration file needed." << std::endl;
 		}
-	} catch (...) {
+	}
+	catch (...) {
 		throw std::runtime_error("Unable to save " + conf.string());
 	}
 	if (!system) return;
 	// Tell the items that we have changed the system default
-	for (auto& elem: config) elem.second.makeSystem();
+	for (auto& elem : config) elem.second.makeSystem();
 	// User config is no longer needed
 	if (exists(userConfFile)) remove(userConfFile);
 }
@@ -332,21 +342,25 @@ void readConfigXML(fs::path const& file, unsigned mode) {
 				ConfigItemXMLLoader().update(item, elem, 0);
 				// Add the item to menu, if not hidden
 				bool hidden = false;
-				try { 
-					if (getAttribute(elem, "hidden") == "true") hidden = true; 
-				} catch (XMLError&) {}
+				try {
+					if (getAttribute(elem, "hidden") == "true") hidden = true;
+				}
+				catch (XMLError&) {}
 				if (!hidden) {
-					for (auto& elem: configMenu) {
+					for (auto& elem : configMenu) {
 						const auto prefix = elem.name + '/';
-						if (name.substr(0, prefix.size()) == prefix) { 
-							elem.items.push_back(name); 
-							break; 
+						if (name.substr(0, prefix.size()) == prefix) {
+							elem.items.push_back(name);
+							break;
 						}
 					}
 				}
-				if(item.getName() == "audio/backend")
+				if (item.getName() == "game/language")
+					item.setGetValueFunction(getValue_language);
+				else if (item.getName() == "audio/backend")
 					item.setGetValueFunction(getValue_audio_backend);
-			} else {
+			}
+			else {
 				if (it == config.end()) {
 					std::clog << "config/warning:   Entry " << name << " ignored (does not exist in config schema)." << std::endl;
 					continue;
@@ -354,11 +368,13 @@ void readConfigXML(fs::path const& file, unsigned mode) {
 				ConfigItemXMLLoader().update(it->second, elem, mode);
 			}
 		}
-	} catch (XMLError& e) {
+	}
+	catch (XMLError& e) {
 		int line = e.elem.get_line();
 		std::string name = e.elem.get_name();
 		throw std::runtime_error(file.string() + ":" + std::to_string(line) + " element " + name + " " + e.message);
-	} catch (std::exception& e) {
+	}
+	catch (std::exception& e) {
 		throw std::runtime_error(file.string() + ":" + e.what());
 	}
 }
@@ -396,13 +412,13 @@ void readConfig() {
 	pathInit();
 	// Populate themes
 	ConfigItem& ci = config["game/theme"];
-	for (std::string const& theme: getThemes()) ci.addEnum(theme);
+	for (std::string const& theme : getThemes()) ci.addEnum(theme);
 	if (ci.ui() == 1337) ci.selectEnum("default");  // Select the default theme if nothing is selected
 }
 
-void populateBackends (const std::list<std::string>& backendList) {
+void populateBackends(const std::list<std::string>& backendList) {
 	ConfigItem& backendConfig = config["audio/backend"];
-	for (std::string const& backend: backendList) backendConfig.addEnum(backend);
+	for (std::string const& backend : backendList) backendConfig.addEnum(backend);
 	static std::string selectedBackend = std::string();
 	selectedBackend = backendConfig.getValue();
 	backendConfig.selectEnum(selectedBackend);
