@@ -7,11 +7,13 @@
 #include "../opengl_text.hh"
 #include "../fs.hh"
 
+#include "ui/effect/effectmanager.hh"
+
 class Text;
 
 class GraphicContext {
 public:
-	GraphicContext();
+	GraphicContext(EffectManager&);
 
 	void addFont(std::string const& font, fs::path const& file);
 
@@ -21,6 +23,10 @@ public:
 
 	std::shared_ptr<SvgTxtTheme> makeSvgText(std::string const& text);
 
+	void add(EffectPtr);
+	void remove(EffectPtr);
+
 private:
+	EffectManager& m_effectManager;
 	std::map<std::string, std::pair<fs::path, double>> m_fonts;
 };

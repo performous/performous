@@ -6,11 +6,11 @@
 #include <video_driver.hh>
 
 BorderDefinition::BorderDefinition(const std::string& texture)
-: Texture(texture) {
+	: Texture(texture) {
 }
 
 BorderDefinition::BorderDefinition(const std::string& texture, float borderWidthInPixel)
-: Texture(texture), m_borderWidth(borderWidthInPixel) {
+	: Texture(texture), m_borderWidth(borderWidthInPixel) {
 }
 
 float BorderDefinition::getBorderWidth() const {
@@ -18,11 +18,11 @@ float BorderDefinition::getBorderWidth() const {
 }
 
 Border::Border(BorderDefinitionPtr definition)
-: m_definition(definition) {
+	: m_definition(definition) {
 }
 
 Border::Border(BorderDefinitionPtr definition, float x, float y, float width, float height)
-: m_definition(definition), m_x(x), m_y(y), m_width(width), m_height(height) {
+	: m_definition(definition), m_x(x), m_y(y), m_width(width), m_height(height) {
 }
 
 void Border::setGeometry(float x, float y, float width, float height) {
@@ -30,6 +30,8 @@ void Border::setGeometry(float x, float y, float width, float height) {
 	m_y = y;
 	m_width = width;
 	m_height = height;
+
+	update();
 }
 
 float Border::getX() const {
@@ -106,4 +108,14 @@ void Border::draw() {
 	va2.texCoord(1, 1).vertex(x2, y2);
 	va2.draw();
 
+}
+
+PathPtr Border::getPath() const {
+	return m_path;
+}
+
+void Border::update() {
+	auto const halfBorder = m_border * 0.5f;
+
+	m_path->setGeometry(m_x - halfBorder, m_y - halfBorder, m_width + m_border, m_height + m_border);
 }

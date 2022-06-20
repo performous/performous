@@ -3,7 +3,8 @@
 
 #include <configuration.hh>
 
-GraphicContext::GraphicContext() {
+GraphicContext::GraphicContext(EffectManager& manager)
+: m_effectManager(manager) {
 	//addFont("default", "mainmenu_option.svg");
 	addFont("ui", "mainmenu_comment.svg");
 }
@@ -31,4 +32,12 @@ std::shared_ptr<SvgTxtTheme> GraphicContext::makeSvgText(std::string const&) {
 	const auto font = m_fonts.begin()->second;
 
 	return std::make_shared<SvgTxtTheme>(font.first, font.second);
+}
+
+void GraphicContext::add(EffectPtr effect) {
+	m_effectManager.add(effect);
+}
+
+void GraphicContext::remove(EffectPtr effect) {
+	m_effectManager.remove(effect);
 }

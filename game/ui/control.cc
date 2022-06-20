@@ -1,9 +1,66 @@
 #include "control.hh"
 
+#include "ui/effect/pathchaser.hh"
+#include "ui/effect/rotation.hh"
+#include "ui/effect/texturedrawer.hh"
+#include "ui/effect/sinus.hh"
+#include "ui/effect/generic.hh"
+#include "ui/effect/combination.hh"
+#include "ui/graphiccontext.hh"
+
+#include "fs.hh"
+
+#include <glm/gtx/matrix_transform_2d.hpp>
+
 #include <iostream>
 
 Control::Control(Control* parent)
-: m_parent(parent) {
+: m_parent(parent), m_focusEffectImage(findFile("star_glow.svg")) {
+	m_focusEffectImage.dimensions.stretch(0.01f, 0.01f);
+	m_focusEffectImage.dimensions.left(-0.005f).top(-0.005f);
+
+	auto drawer =  std::make_shared<TextureDrawer>(m_focusEffectImage);
+	auto pathChaser = std::make_shared<PathChaser>(m_focus);
+
+	pathChaser->setConsumer([&](Point const& point) {
+		//std::cout << "consumer: " << point << std::endl;
+		//m_focusEffectImage.dimensions.left(point.getX() - 0.005f).top(point.getY() - 0.005f);
+		auto v = glmath::vec2();
+
+		v[0] = point.getX();
+		v[1] = point.getY();
+
+		m_matrix = glm::mat3(1.f);
+		m_matrix = glm::scale(m_matrix, glmath::vec2(0.33f));
+		m_matrix = glm::translate(m_matrix, v);
+		//m_matrix = glm::scale(m_matrix, glmath::vec2(0.25f));
+	});
+
+	auto rotation = std::make_shared<Rotation>();
+
+	rotation->setConsumer([&](float angle) {
+		//std::cout << "consumer: " << angle << std::endl;
+		//m_matrix = glm::mat3(1.f);
+		m_matrix = glm::rotate(m_matrix, angle);
+	});
+
+	auto generic = std::make_shared<Generic>([&, drawer](EffectContext const& context){
+		//std::cout << "generic" << std::endl;
+		const auto v = context.getSecondsSinceStart() * 0.5f;
+		const auto a = v - floor(v);
+		drawer->setMatrix(m_matrix);
+		drawer->setColor(Color(1.f, 0.f, 0.f, a));
+	});
+
+	auto border = std::make_shared<Sinus>(1.f, 0.f, 1.f);
+
+	border->setConsumer([&](float value){
+		//std::cout << "border: " << v << std::endl;
+		auto const color = ColorTrans(Color::alpha(value));
+		m_focus.draw();
+	});
+
+	m_focusEffect = combine(border/*, pathChaser, rotation, generic, drawer*/);
 }
 
 Control* Control::getParent() {
@@ -92,9 +149,13 @@ void Control::sendOnKeyUp(Key key) {
 		m_onKeyUp(*this, key);
 }
 
-void Control::drawFocus() {
+void Control::drawFocus(GraphicContext& gc) {
 	if(hasFocus()) {
 		m_focus.setGeometry(getX(), getY(), getWidth(), getHeight());
-		m_focus.draw();
+
+		gc.add(m_focusEffect);
+	}
+	else {
+		gc.remove(m_focusEffect);
 	}
 }

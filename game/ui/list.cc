@@ -197,7 +197,7 @@ void List::updateCheckBoxs() {
 }
 
 void List::draw(GraphicContext& gc) {
-	drawFocus();
+	drawFocus(gc);
 
 	m_background.dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());
 	m_background.draw();

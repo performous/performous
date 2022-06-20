@@ -1,7 +1,7 @@
 #include "formscreen.hh"
 
 FormScreen::FormScreen(const std::string& name)
-: Screen(name) {
+: Screen(name), m_gc(m_effectManager) {
 }
 
 void FormScreen::manageEvent(input::NavEvent const& event) {
@@ -173,7 +173,33 @@ void FormScreen::manageEvent(SDL_Event event) {
 	}
 }
 
+#include <chrono>
+
+namespace {
+	std::chrono::milliseconds getCurrentTimeInMilliseconds() {
+		auto const now = std::chrono::system_clock::now();
+
+		return std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
+	}
+
+	float getSecondsSinceLastFrame() {
+		static std::chrono::milliseconds lastFrame = getCurrentTimeInMilliseconds();
+		auto const now = getCurrentTimeInMilliseconds();
+		auto const difference = now - lastFrame;
+
+//        std::cout << "last: " << lastFrame.count() << std::endl;
+//        std::cout << "now:  " << now.count() << std::endl;
+//        std::cout << "diff: " << difference.count() << std::endl;
+
+		lastFrame = now;
+
+		return float(difference.count()) * 0.001f;
+	}
+}
+
 void FormScreen::draw() {
 	m_control.draw(m_gc);
+
+	m_effectManager.process(getSecondsSinceLastFrame());
 }
 

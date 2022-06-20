@@ -109,7 +109,7 @@ void TextBox::onKey(Key key) {
 }
 
 void TextBox::draw(GraphicContext& gc) {
-	drawFocus();
+	drawFocus(gc);
 
 	const auto color = ColorTrans(hasFocus() ? Color(1.f, 1.f, 1.f) : Color(0.6f, 0.6f, 0.6f));
 

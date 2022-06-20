@@ -24,13 +24,13 @@ void Image::setTexture(std::string const& texture) {
 	}
 }
 
-void Image::draw(GraphicContext&) {
+void Image::draw(GraphicContext& gc) {
 	auto const xOffset = getWidth() * 0.05f;
 	auto const yOffset = getHeight() * 0.05f;
 	auto const width = getWidth() * 0.9f;
 	auto const height = getHeight() * 0.9f;
 
-	drawFocus();
+	drawFocus(gc);
 
 	m_background.dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());
 	m_background.draw();

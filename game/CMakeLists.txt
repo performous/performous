@@ -6,6 +6,8 @@ file(GLOB SOURCE_FILES
 	"songorder/*.cc"
 	"ui/*.cc"
 	"ui/layout/*.cc"
+	"ui/path/*.cc"
+	"ui/effect/*.cc"
 	"utils/*.cc"
 )
 file(GLOB HEADER_FILES
@@ -14,6 +16,8 @@ file(GLOB HEADER_FILES
 	"songorder/*.hh"
 	"ui/*.hh"
 	"ui/layout/*.hh"
+	"ui/path/*.hh"
+	"ui/effect/*.hh"
 	"utils/*.hh"
 	"libda/*.hpp"
 )
