@@ -104,7 +104,7 @@ bool AudioBuffer::prepare(std::int64_t pos) {
 bool AudioBuffer::read(float* begin, std::int64_t samples, std::int64_t pos, float volume) {
 	if (pos < 0) {
 		std::int64_t negative_samples;
-		if (static_cast<std::int64_t>(samples) + pos > 0) negative_samples = samples - (samples + pos);
+		if (samples + pos > 0) negative_samples = samples - (samples + pos);
 		else negative_samples = samples;
 
 		// put zeros to negative positions
@@ -374,8 +374,8 @@ void FFmpeg::handleSomeFrames() {
 
 void VideoFFmpeg::processFrame(uFrame frame) {
 	// Convert into RGB and scale the data
-	std::uint32_t w = static_cast<std::uint32_t>((m_codecContext->width + 15) & ~15);
-	std::uint32_t h = static_cast<std::uint32_t>(m_codecContext->height);
+	auto w = static_cast<unsigned>((m_codecContext->width + 15) & ~15);
+	auto h = static_cast<unsigned>(m_codecContext->height);
 	Bitmap f;
 	f.timestamp = m_position;
 	f.fmt = pix::Format::RGB;
