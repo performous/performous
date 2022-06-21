@@ -23,7 +23,7 @@ InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevicePt
   m_arrow_left(findFile("arrow_button_left.svg")),
   m_arrow_right(findFile("arrow_button_right.svg")),
   m_text(findFile("sing_timetxt.svg"), config["graphic/text_lod"].f()),
-  m_selectedTrack(std::string()),
+  m_selectedTrack(),
   m_selectedDifficulty(0),
   m_rejoin(false),
   m_leftymode(false),
