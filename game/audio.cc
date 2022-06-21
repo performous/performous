@@ -267,7 +267,10 @@ struct Sample {
 			// No more data to play in this sample
 			return;
 		}
-		if (end <= begin) return;
+		if (end <= begin) {
+			eof = true;
+			return;
+		}
 		std::int64_t size = end - begin;
 		std::vector<float> mixbuf(static_cast<size_t>(size));
 		if(!audioBuffer.read(mixbuf.data(), size, m_pos, 1.0)) {
@@ -295,6 +298,7 @@ struct Synth {
 		static double phase = 0.0;
 		for (float *i = begin; i < end; ++i) *i *= 0.3f; // Decrease music volume
 		std::int64_t size = end - begin;
+		if (end <= begin) return;
 		std::vector<float> mixbuf(static_cast<size_t>(size));
 		Notes::const_iterator it = m_notes.begin();
 
