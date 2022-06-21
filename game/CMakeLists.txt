@@ -216,6 +216,8 @@ if(WIN32)
 	endif()
 	set(BIN_INSTALL .)  # Straight to Program Files/Performous with no bin subfolder.
 	set(SUBSYSTEM_WIN32 WIN32)
+elseif(APPLE)
+	set(BIN_INSTALL MacOS)
 else()
 	set(BIN_INSTALL bin)
 endif()
@@ -234,6 +236,36 @@ find_package(Threads)
 target_link_libraries(performous PRIVATE fs ced aubio ${LIBS} PkgConfig::deps Threads::Threads)
 
 install(TARGETS performous DESTINATION ${BIN_INSTALL})
+
+if (APPLE AND ${CMAKE_GENERATOR} STREQUAL "Xcode")
+	set(PATH "$ENV{PATH}")
+	EXECUTE_PROCESS(
+		COMMAND /usr/bin/defaults read -g AppleLanguages
+		OUTPUT_VARIABLE PERFORMOUS_LANG
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+	)
+	string(REGEX REPLACE
+	"[ \"\(\)\t\r\n]"
+	""
+	PERFORMOUS_LANG
+	${PERFORMOUS_LANG}
+	)
+	string(REGEX REPLACE
+	"-([A-Z][A-Z]),"
+	"_\\1; "
+	PERFORMOUS_LANG
+	${PERFORMOUS_LANG}
+	)
+	set(PERFORMOUS_LANG ${PERFORMOUS_LANG})
+	list(GET PERFORMOUS_LANG 0 PERFORMOUS_LANG)
+	set_target_properties(performous PROPERTIES
+	XCODE_SCHEME_EXECUTABLE "${CMAKE_INSTALL_PREFIX}/${BIN_INSTALL}/performous"
+	XCODE_SCHEME_ARGUMENTS "--log debug"
+	XCODE_SCHEME_ENVIRONMENT "FONTCONFIG_PATH=\"${CMAKE_INSTALL_PREFIX}/${SHARE_INSTALL}/etc/fonts\";
+	GDK_PIXBUF_MODULE_FILE=\"\";
+	LANG=\"${PERFORMOUS_LANG}.UTF-8\""
+	)
+endif()
 
 set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)  # Store library paths in executable
 set_target_properties(performous PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})  # Produce executable in build/, not build/game/
