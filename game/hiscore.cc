@@ -45,8 +45,7 @@ Hiscore::HiscoreVector Hiscore::queryHiscore(PlayerId playerid, SongId songid, s
 
 bool Hiscore::hasHiscore(SongId songid) const {
 	if (!songid) return false;
-	auto const& hiscore = std::find_if(m_hiscore.begin(),m_hiscore.end(), [songid, level = currentLevel()](auto const& h) { return (songid.value() == h.songid && level == h.level); });
-	return (hiscore != m_hiscore.end());
+	return std::any_of(m_hiscore.begin(),m_hiscore.end(), [songid, level = currentLevel()](auto const& h) { return (songid.value() == h.songid && level == h.level); });
 }
 
 unsigned Hiscore::getHiscore(unsigned songid) const {
