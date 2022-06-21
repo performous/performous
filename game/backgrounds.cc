@@ -61,8 +61,8 @@ void Backgrounds::reload_internal(fs::path const& parent) {
 				m_dirty = true;
 			}
 		}
-	} catch (std::exception const&) {
-		std::cout << "Error accessing " << parent << std::endl;
+	} catch (std::exception const& e) {
+		std::cout << "Exception thrown: " + std::string(e.what()) + ", error accessing " + parent.string() << std::endl;
 	}
 }
 
