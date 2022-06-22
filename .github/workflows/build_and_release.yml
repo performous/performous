@@ -334,9 +334,11 @@ jobs:
           export PACKAGE_VERSION=${{ needs.determine_version.outputs.complete_version }}
           echo $PACKAGE_VERSION
           chmod +x ./performous-app-build.sh
-          ./performous-app-build.sh
           WORK_DIR=$(pwd)
-          PACKAGE_PATH=$(ls ${WORK_DIR}/Performous.*)
+          mkdir -p out
+          export PERFORMOUS_OUTPUT_DIR="${WORK_DIR}/out"
+          ./performous-app-build.sh
+          PACKAGE_PATH=$(ls ${PERFORMOUS_OUTPUT_DIR}/Performous*.dmg)
           PACKAGE_NAME=$(echo ${PACKAGE_PATH} | sed 's/\(Performous\).*$/\1/')
           PACKAGE_SUFFIX=$(echo ${PACKAGE_PATH} | sed 's/^.*\(.\{4\}\)/\1/')
           NEW_PACKAGE_NAME="${PACKAGE_NAME}-${PACKAGE_VERSION}${PACKAGE_SUFFIX}"
