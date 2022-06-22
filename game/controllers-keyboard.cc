@@ -51,7 +51,7 @@ namespace input {
 			if (event.button == ButtonId::GENERIC_UNASSIGNED) event.button = navigation(event.hw);
 			if (event.button == ButtonId::GENERIC_UNASSIGNED) return false;
 			// Keep track of pressed buttons
-			if (event.value) m_pressed.insert(to_underlying(event.button.id));
+			if (event.value != 0.0) m_pressed.insert(to_underlying(event.button.id));
 			else m_pressed.erase(to_underlying(event.button.id));
 			return true;
 		}

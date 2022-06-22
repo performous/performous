@@ -5,9 +5,11 @@
 #include "util.hh"
 #include <SDL_events.h>
 #include <climits>
+#include <cstdint>
 #include <deque>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <vector>
 
@@ -51,7 +53,7 @@ namespace input {
 		SourceType type;
 		unsigned device, channel;  ///< Device number and channel (0..1023)
 		/// Provide numeric conversion for comparison and ordered containers
-		operator unsigned() const { return unsigned(type)<<20 | device<<10 | channel; }
+		operator unsigned() const { return static_cast<unsigned>(type)<<20 | device<<10 | channel; }
 		bool isKeyboard() const { return type == SourceType::KEYBOARD; }  ///< This is so common test that a helper is provided
 	};
 	
@@ -126,7 +128,7 @@ namespace input {
 		Hardware() {}
 		virtual ~Hardware() {}
 		/// Get the name of a specific device of this type
-		virtual std::string getName(unsigned) const { return std::string(); }
+		virtual std::string getName(int) const { return std::string(); }
 		/// Return an Event and true if any are available. The Event is pre-initialized with current time.
 		virtual bool process(Event&) { return false; }
 		/// Convert an SDL event into Event. The Event is pre-initialized with event's time. Returns false if SDL_Event was not handled.

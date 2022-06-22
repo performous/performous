@@ -70,7 +70,7 @@ namespace {
 			} else if (hwIsHat.matches(ev.hw)) {
 				os << "hat hw=" << ev.hw - hwIsHat.min << ' ';
 				std::string dir;
-				unsigned val = ev.value;
+				unsigned val = static_cast<unsigned>(ev.value);
 				if (val & SDL_HAT_UP) dir += "up";
 				if (val & SDL_HAT_DOWN) dir += "down";
 				if (val & SDL_HAT_LEFT) dir += "left";
@@ -314,7 +314,7 @@ struct Controllers::Impl {
 		std::pair<Assignments::iterator, bool> ret = m_assignments.insert(Assignments::value_type(event.source, nullptr));
 		ControllerDef const*& def = ret.first->second;  // A reference to the value inside the map
 		if (!ret.second) return def;  // Source already assigned, just return it.
-		std::string devName = m_hw[event.source.type]->getName(event.source.device);
+		std::string devName = m_hw[event.source.type]->getName(static_cast<int>(event.source.device));
 		// Find a matching ControllerDef
 		for (ControllerDefs::const_iterator it = m_controllerDefs.begin(); it != m_controllerDefs.end() && !def; ++it) {
 			if (it->second.matches(event, devName)) def = &it->second;
@@ -339,7 +339,7 @@ struct Controllers::Impl {
 			bool handled = false;
 			ButtonMap const& m = it->second;
 			double value = ev.value;
-			unsigned val = value;
+			unsigned val = static_cast<unsigned>(ev.value);
 			ev.button = m.map; if (pushMappedEvent(ev)) handled = true;
 			ev.button = m.positive; ev.value = clamp(value); if (pushMappedEvent(ev)) handled = true;
 			ev.button = m.negative; ev.value = clamp(-value); if (pushMappedEvent(ev)) handled = true;
