@@ -4,7 +4,6 @@
 #include "util.hh"
 
 #include <fmt/format.h>
-
 #include <algorithm>
 #include <future>
 #include <iomanip>
@@ -15,11 +14,11 @@
 ConfigItemMap config;
 
 ConfigItem::ConfigItem(bool bval)
-: m_type("bool"), m_value(bval) { 
+: m_type("bool"), m_value(bval) {
 }
 
 ConfigItem::ConfigItem(int ival)
-: m_type("int"), m_value(ival) { 
+: m_type("int"), m_value(ival) {
 }
 
 ConfigItem::ConfigItem(unsigned short uival)
@@ -27,15 +26,15 @@ ConfigItem::ConfigItem(unsigned short uival)
 }
 
 ConfigItem::ConfigItem(float fval)
-: m_type("float"), m_value(fval) { 
+: m_type("float"), m_value(fval) {
 }
 
 ConfigItem::ConfigItem(std::string sval)
-: m_type("string"), m_value(sval) { 
+: m_type("string"), m_value(sval) {
 }
 
 ConfigItem::ConfigItem(OptionList opts)
-: m_type("option_list"), m_value(opts) { 
+: m_type("option_list"), m_value(opts) {
 }
 
 std::variant<int, double>& ConfigItem::getMin() {
@@ -96,22 +95,22 @@ bool ConfigItem::isDefaultImpl(ConfigItem::Value const& defaultValue) const {
 }
 
 void ConfigItem::verifyType(std::string const& type) const {
-	if (type == m_type) 
+	if (type == m_type)
 		return;
 	const auto name = getName();
-	if (m_type.empty()) 
+	if (m_type.empty())
 		throw std::logic_error("Config item " + name + ", requested_type=" + type + " used in C++ but missing from config schema");
 
 	throw std::logic_error("Config item type mismatch: item=" + name + ", type=" + m_type + ", requested=" + type);
 }
 
-int& ConfigItem::i() { 
-    verifyType("int"); 
-    return std::get<int>(m_value); 
+int& ConfigItem::i() {
+	verifyType("int");
+	return std::get<int>(m_value);
 }
-int const& ConfigItem::i() const { 
-    verifyType("int"); 
-    return std::get<int>(m_value); 
+int const& ConfigItem::i() const {
+	verifyType("int");
+	return std::get<int>(m_value);
 }
 unsigned short& ConfigItem::ui() {
     verifyType("uint"); 
@@ -121,33 +120,33 @@ unsigned short const& ConfigItem::ui() const {
     verifyType("uint"); 
     return std::get<unsigned short>(m_value); 
 }
-bool& ConfigItem::b() { 
-    verifyType("bool"); 
-    return std::get<bool>(m_value); 
+bool& ConfigItem::b() {
+	verifyType("bool");
+	return std::get<bool>(m_value);
 }
-double& ConfigItem::f() { 
-    verifyType("float"); 
-    return std::get<double>(m_value); 
+double& ConfigItem::f() {
+	verifyType("float");
+	return std::get<double>(m_value);
 }
-std::string& ConfigItem::s() { 
-    verifyType("string"); 
-    return std::get<std::string>(m_value); 
+std::string& ConfigItem::s() {
+	verifyType("string");
+	return std::get<std::string>(m_value);
 }
-ConfigItem::StringList& ConfigItem::sl() { 
-    verifyType("string_list"); 
-    return std::get<StringList>(m_value); 
+ConfigItem::StringList& ConfigItem::sl() {
+	verifyType("string_list");
+	return std::get<StringList>(m_value);
 }
-ConfigItem::OptionList& ConfigItem::ol() { 
-    verifyType("option_list"); 
-    return std::get<OptionList>(m_value); 
+ConfigItem::OptionList& ConfigItem::ol() {
+	verifyType("option_list");
+	return std::get<OptionList>(m_value);
 }
-std::string& ConfigItem::so() { 
-    verifyType("option_list"); 
-    return std::get<OptionList>(m_value).at(m_sel); 
+std::string& ConfigItem::so() {
+	verifyType("option_list");
+	return std::get<OptionList>(m_value).at(m_sel);
 }
 
 void ConfigItem::select(unsigned short i) { 
-    verifyType("option_list"); 
+	verifyType("option_list");
     m_sel = clamp<unsigned short>(i, 0, static_cast<unsigned short>(std::get<OptionList>(m_value).size()-1));
 }
 
@@ -168,7 +167,7 @@ namespace {
 std::string const ConfigItem::getValue() const {
 	if(m_getValue)
 		return m_getValue(*this);
-    
+
 	if (m_type == "int") {
 		return numericFormat<int>(m_value, m_multiplier, m_step) + _(m_unit);
 	}
