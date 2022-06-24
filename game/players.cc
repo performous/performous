@@ -69,7 +69,7 @@ void Players::addPlayer (std::string const& name, std::string const& picture, Pl
 	pi.name = name;
 	pi.picture = picture;
 
-	if (!id) pi.id = assign_id_internal();
+	pi.id = id.value_or(assign_id_internal());
 
 	if (pi.picture != "") // no picture, so don't search path
 	{
