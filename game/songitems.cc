@@ -35,7 +35,7 @@ void SongItems::save(xmlpp::Element* songs) {
 unsigned SongItems::addSongItem(std::string const& artist, std::string const& title, SongId _id) {
 	SongItem si;
 	unsigned id;
-	id = _id ? _id.value() : assign_id_internal();
+	id = _id.value_or(assign_id_internal());
 	si.id = id;
 	songMetadata collateInfo {{"artist", artist}, {"title", title}};
 	UnicodeUtil::collate(collateInfo);		
