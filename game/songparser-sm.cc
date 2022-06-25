@@ -234,8 +234,8 @@ Notes SongParser::smParseNotes(std::string line) {
 			forceMeasure = true;
 			line = line.substr(0, line.size()-1);
 		}
-		for(unsigned i = 0; i < static_cast<unsigned>(line.size()); i++) {
-			char notetype = line[static_cast<unsigned>(i)];
+		for(unsigned i = 0; i < line.size(); i++) {
+			char notetype = line[i];
 			if (notetype == '0') continue;
 			Note note;
 			if(notetype == '1') note.type = Note::Type::TAP;
