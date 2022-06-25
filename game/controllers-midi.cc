@@ -39,9 +39,9 @@ namespace input {
 			PmEvent ev;
 			for (auto it = m_streams.begin(); it != m_streams.end();++it) {
 				if (Pm_Read(*it->second, &ev, 1) != 1) continue;
-				unsigned char evnt = static_cast<unsigned char>(ev.message & 0xF0);
-				unsigned char note = static_cast<unsigned char>(Pm_MessageData1(ev.message));
-				unsigned char vel  = static_cast<unsigned char>(Pm_MessageData2(ev.message));
+				auto evnt = static_cast<unsigned char>(Pm_MessageStatus(ev.message) & 0xF0);
+				auto note = static_cast<unsigned char>(Pm_MessageData1(ev.message));
+				auto vel  = static_cast<unsigned char>(Pm_MessageData2(ev.message));
 				unsigned chan = (ev.message & 0x0F) + 1;  // It is conventional to use one-based indexing
 				if (evnt == 0x80 /* NOTE OFF */) { evnt = static_cast<unsigned char>(0x90); vel = 0; }  // Translate NOTE OFF into NOTE ON with zero-velocity
 				if (evnt != 0x90 /* NOTE ON */) continue;  // Ignore anything that isn't NOTE ON/OFF
