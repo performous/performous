@@ -9,19 +9,19 @@ struct TextInput {
 	/// appends unicode symbol
 	TextInput& operator+=(unsigned int ucs) { //don't know if this is still relevant since SDL2 handles unicode
 		if (ucs < 0x80) {
-			text += static_cast<std::basic_string<char>::value_type>(ucs);
+			text += static_cast<char>(ucs);
 		} else if (ucs < 0x800) {
-			text += static_cast<std::basic_string<char>::value_type>(0xC0 | (ucs >> 6));
-			text += static_cast<std::basic_string<char>::value_type>(0x80 | (ucs & 0x3F));
+			text += static_cast<char>(0xC0 | (ucs >> 6));
+			text += static_cast<char>(0x80 | (ucs & 0x3F));
 		} else if (ucs < 0x10000) {
-			text += static_cast<std::basic_string<char>::value_type>(0xE0 | (ucs >> 12));
-			text += static_cast<std::basic_string<char>::value_type>(0x80 | ((ucs >> 6) & 0x3F));
-			text += static_cast<std::basic_string<char>::value_type>(0x80 | (ucs & 0x3F));
+			text += static_cast<char>(0xE0 | (ucs >> 12));
+			text += static_cast<char>(0x80 | ((ucs >> 6) & 0x3F));
+			text += static_cast<char>(0x80 | (ucs & 0x3F));
 		} else {
-			text += static_cast<std::basic_string<char>::value_type>(0xF0 | (ucs >> 18));
-			text += static_cast<std::basic_string<char>::value_type>(0x80 | ((ucs >> 12) & 0x3F));
-			text += static_cast<std::basic_string<char>::value_type>(0x80 | ((ucs >> 6) & 0x3F));
-			text += static_cast<std::basic_string<char>::value_type>(0x80 | (ucs & 0x3F));
+			text += static_cast<char>(0xF0 | (ucs >> 18));
+			text += static_cast<char>(0x80 | ((ucs >> 12) & 0x3F));
+			text += static_cast<char>(0x80 | ((ucs >> 6) & 0x3F));
+			text += static_cast<char>(0x80 | (ucs & 0x3F));
 		}
 		return *this;
 	}
