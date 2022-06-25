@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstdint>
 #include <iostream>
 #include <map>
 #include <string>
@@ -17,8 +16,8 @@ struct UnicodeUtil {
 	static std::string getCharset(std::string const& str);
 	static void convertToUTF8 (std::stringstream &_stream, std::string _filename);
 	static std::string convertToUTF8 (std::string const& str);
-	static std::string toLower (std::string const& str, int length = 0);
-	static std::string toUpper (std::string const& str, int length = 0);
+	static std::string toLower (std::string const& str, size_t length = 0);
+	static std::string toUpper (std::string const& str, size_t length = 0);
 	static icu::RuleBasedCollator m_dummyCollator;
 	static icu::RuleBasedCollator m_sortCollator;
 	static UErrorCode m_staticIcuError;
