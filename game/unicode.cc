@@ -67,27 +67,27 @@ std::string UnicodeUtil::convertToUTF8 (std::string const& str) {
 	return ss.str();
 }
 
-std::string UnicodeUtil::toLower (std::string const& str, int length) {
+std::string UnicodeUtil::toLower (std::string const& str, size_t length) {
 	std::stringstream ss (str);
 	convertToUTF8 (ss, std::string());
 	std::string ret;
-	int sizeI = static_cast<int>(str.size());
-	if (length == 0 || length >= sizeI) length = sizeI;
-		icu::UnicodeString tmp = icu::UnicodeString::fromUTF8(ss.str());
-		tmp = tmp.tempSubString(0, length).toLower() + tmp.tempSubString(length, tmp.length() - 1);
-		tmp.toUTF8String(ret);
+	if (length == 0 || length >= str.size()) length = str.size();
+	auto icu_length = static_cast<int32_t>(length); // ICU expects int32_t for lengths...
+	icu::UnicodeString tmp = icu::UnicodeString::fromUTF8(ss.str());
+	tmp = tmp.tempSubString(0, icu_length).toLower() + tmp.tempSubString(icu_length, tmp.length() - 1);
+	tmp.toUTF8String(ret);
 	return ret;
 }
 
-std::string UnicodeUtil::toUpper (std::string const& str, int length) {
+std::string UnicodeUtil::toUpper (std::string const& str, size_t length) {
 	std::stringstream ss (str);
 	convertToUTF8 (ss, std::string());
 	std::string ret;
-	int sizeI = static_cast<int>(str.size());
-	if (length == 0 || length >= sizeI) length = sizeI;
-		icu::UnicodeString tmp = icu::UnicodeString::fromUTF8(ss.str());
-		tmp = tmp.tempSubString(0, length).toUpper() + tmp.tempSubString(length, tmp.length() - 1);
-		tmp.toUTF8String(ret);
+	if (length == 0 || length >= str.size()) length = str.size();
+	auto icu_length = static_cast<int32_t>(length); // ICU expects int32_t for lengths...
+	icu::UnicodeString tmp = icu::UnicodeString::fromUTF8(ss.str());
+	tmp = tmp.tempSubString(0, icu_length).toUpper() + tmp.tempSubString(icu_length, tmp.length() - 1);
+	tmp.toUTF8String(ret);
 	return ret;
 }
 
