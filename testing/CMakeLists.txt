@@ -1,7 +1,13 @@
 cmake_minimum_required(VERSION 3.15)
 
-file(GLOB SOURCE_FILES "*.cc")
-file(GLOB HEADER_FILES "*.hh")
+set(SOURCE_FILES 
+    "configitemtest.cc"
+    "fixednotegraphscalertest.cc"
+    "notegraphscalerfactorytest.cc"
+    "utiltest.cc"
+)
+set(HEADER_FILES
+)
 set(GAME_SOURCES 
     "../game/configitem.cc"
     "../game/dynamicnotegraphscaler.cc"
