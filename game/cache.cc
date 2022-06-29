@@ -6,7 +6,7 @@
 #include <boost/algorithm/string/classification.hpp>
 
 namespace cache {
-	fs::path constructSVGCacheFileName(fs::path const& svgfilename, double factor){
+	fs::path constructSVGCacheFileName(fs::path const& svgfilename, float factor){
 		std::string const lod = fmt::format("{:.2f}", factor);
 		std::string const cache_basename = svgfilename.filename().string() + ".cache_" + lod + ".premul.png";
 		std::string fullpath = svgfilename.parent_path().string();

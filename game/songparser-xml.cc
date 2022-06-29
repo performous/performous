@@ -94,7 +94,7 @@ void SongParser::xmlParseHeader() {
 		std::string res = e.get_attribute("Resolution")->get_value();
 		SongParserUtil::assign(m_bpm, e.get_attribute("Tempo")->get_value().c_str());
 		if (res == "Semiquaver") {}
-		else if (res == "Demisemiquaver") m_bpm *= 2.0;
+		else if (res == "Demisemiquaver") m_bpm *= 2.0f;
 		else throw std::runtime_error("Unknown tempo resolution: " + res);
 	}
 	addBPM(0, m_bpm);

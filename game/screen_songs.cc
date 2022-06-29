@@ -248,7 +248,7 @@ void ScreenSongs::drawJukebox() {
 		if (!song.cover.empty()) cover = loadTextureFromMap(song.cover);
 		if (cover && !cover->empty()) {
 			Texture& s = *cover;
-			s.dimensions.left(theme->song.dimensions.x1()).top(theme->song.dimensions.y2() + 0.05).fitInside(0.15, 0.15);
+			s.dimensions.left(theme->song.dimensions.x1()).top(theme->song.dimensions.y2() + 0.05f).fitInside(0.15f, 0.15f);
 			s.draw();
 		}
 		// Format && draw the song information text
@@ -265,7 +265,7 @@ void ScreenSongs::drawMultimedia() {
 		double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
 		m_songbg_default->draw();   // Default bg
 		if (m_songbg.get() && !m_video.get()) {
-			if (m_songbg->width() > 512 && m_songbg->dimensions.ar() > 1.1) {
+			if (m_songbg->width() > 512 && m_songbg->dimensions.ar() > 1.1f) {
 				// Full screen mode
 				float s = sin(m_clock.get()) * 0.15 + 1.15;
 				Transform sc(glmath::scale(glmath::vec3(s, s, s)));
@@ -273,7 +273,7 @@ void ScreenSongs::drawMultimedia() {
 			} else {
 				// Low res texture or cover image, render in tiled mode
 				double x = 0.05 * m_clock.get();
-				m_songbg->draw(m_songbg->dimensions, TexCoords(x, 0.0, x + 5.0, 5.0));
+				m_songbg->draw(m_songbg->dimensions, TexCoords(x, 0.0f, x + 5.0f, 5.0f));
 			}
 		}
 		if (m_video.get()) m_video->render(time);
@@ -335,7 +335,7 @@ void ScreenSongs::draw() {
 		// Draw song and order texts
 		theme->song.draw(oss_song.str());
 		theme->order.draw(oss_order.str());
-		drawInstruments(Dimensions(1.0).fixedHeight(0.09).right(0.45).screenTop(0.02));
+		drawInstruments(Dimensions(1.0f).fixedHeight(0.09f).right(0.45f).screenTop(0.02f));
 		theme->hiscores.draw(oss_hiscore.str());
 	}
 	// Menus on top of everything
@@ -349,7 +349,7 @@ void ScreenSongs::drawCovers() {
 	int baseidx = spos + 1.5; --baseidx; // Round correctly
 	double shift = spos - baseidx;
 	// Calculate beat
-	double beat = 0.5 + m_idleTimer.get() / 2.0;  // 30 BPM
+	float beat = 0.5 + m_idleTimer.get() / 2.0;  // 30 BPM
 	if (ss > 0) {
 		// Use actual song BPM. FIXME: Should only do this if currentId is also playing.
 		if (m_songs.currentPtr()->music == m_playing) {
@@ -363,11 +363,11 @@ void ScreenSongs::drawCovers() {
 				}
 			}
 			else if (m_songs.currentPtr() && !m_songs.currentPtr()->m_bpms.empty()) {
-				double tempo = (m_songs.currentPtr()->m_bpms.front().step * 4.0);
-				if (int(tempo) <= 100.0) tempo *= 2.0;
-				else if (int(tempo) > 400.0) tempo /= 4.0;
-				else if (int(tempo) > 300.0) tempo /= 3.0;
-				else if (int(tempo) > 190.0) tempo /= 2.0;
+				float tempo = (m_songs.currentPtr()->m_bpms.front().step * 4.0f);
+				if (static_cast<unsigned>(tempo) <= 100) tempo *= 2.0f;
+				else if (static_cast<unsigned>(tempo) > 400) tempo /= 4.0f;
+				else if (static_cast<unsigned>(tempo) > 300) tempo /= 3.0f;
+				else if (static_cast<unsigned>(tempo) > 190) tempo /= 2.0f;
 				beat = 0.5 + m_idleTimer.get() / tempo;
 			}
 		}
@@ -379,44 +379,44 @@ void ScreenSongs::drawCovers() {
 		Song& song = *m_songs[baseidx + i];
 		Texture& s = getCover(song);
 		// Calculate dimensions for cover and instrument markers
-		double pos = i - shift;
+		float pos = i - shift;
 		// Function for highlight effect (offset = 0 for current cover), returns 0..1 highlight level
-		auto highlightf = [=](double offset) { return smoothstep(3.5, 0.0, std::abs(pos + offset)); };
+		auto highlightf = [=](float offset) { return smoothstep(3.5f, 0.0f, std::abs(pos + offset)); };
 		// Coordinate translations (pos and offset in cover units to z and x in OpenGL space)
-		auto ztrans = [=](double offset) { return -0.5 + 0.3 * highlightf(offset); };
-		auto xtrans = [=](double offset) { return -0.2 + 0.20 * (pos + offset); };
+		auto ztrans = [=](float offset) { return -0.5f + 0.3f * highlightf(offset); };
+		auto xtrans = [=](float offset) { return -0.2f + 0.20f * (pos + offset); };
 		// A cover is angled to a line between the surrounding gaps (offset +- 0.5 covers)
-		double angle = -std::atan2(ztrans(0.5) - ztrans(-0.5), xtrans(0.5) - xtrans(-0.5));
-		double y = 0.5 * virtH();
-		double x = xtrans(0.0);
-		double z = ztrans(0.0);
-		double c = 0.4 + 0.6 * highlightf(0.0);
+		float angle = -std::atan2(ztrans(0.5f) - ztrans(-0.5f), xtrans(0.5f) - xtrans(-0.5f));
+		float y = 0.5f * virtH();
+		float x = xtrans(0.0f);
+		float z = ztrans(0.0f);
+		float c = 0.4f + 0.6f * highlightf(0.0f);
 		if (m_menuPos == 1 /* Cover browser */ && baseidx + i == currentId) c = beat;
 		using namespace glmath;
-		Transform trans(translate(vec3(x, y, z)) * rotate(angle, vec3(0.0, 1.0, 0.0)));
+		Transform trans(translate(vec3(x, y, z)) * rotate(angle, vec3(0.0f, 1.0f, 0.0f)));
 		ColorTrans c1(Color(c, c, c));
-		s.dimensions.middle().screenCenter().bottom().fitInside(0.17, 0.17);
+		s.dimensions.middle().screenCenter().bottom().fitInside(0.17f, 0.17f);
 		// Draw the cover normally
 		s.draw();
 		// Draw the reflection
 		Transform transMirror(scale(vec3(1.0f, -1.0f, 1.0f)));
-		ColorTrans c2(Color::alpha(0.4));
+		ColorTrans c2(Color::alpha(0.4f));
 		s.draw();
 	}
 	// Draw the playlist
 	Game* gm = Game::getSingletonPtr();
 	auto const& playlist = gm->getCurrentPlayList().getList();
-	double c = (m_menuPos == 0 /* Playlist */ ? beat : 1.0);
+	float c = (m_menuPos == 0 /* Playlist */ ? beat : 1.0);
 	ColorTrans c1(Color(c, c, c));
 	for (unsigned i = playlist.size() - 1; i < playlist.size(); --i) {
 		Texture& s = getCover(*playlist[i]);
-		double pos =  i / std::max<double>(5.0, playlist.size());
+		float pos =  i / std::max<float>(5.0f, playlist.size());
 		using namespace glmath;
 		Transform trans(
-		  translate(vec3(-0.35 + 0.06 * pos, 0.0, 0.3 - 0.2 * pos))
-		  * rotate(-0.0, vec3(0.0, 1.0, 0.0))
+		  translate(vec3(-0.35f + 0.06f * pos, 0.0f, 0.3f - 0.2f * pos))
+		  * rotate(-0.0f, vec3(0.0f, 1.0f, 0.0f))
 		);
-		s.dimensions.middle().screenBottom(-0.06).fitInside(0.08, 0.08);
+		s.dimensions.middle().screenBottom(-0.06f).fitInside(0.08f, 0.08f);
 		s.draw();
 	}
 }
@@ -488,7 +488,7 @@ void ScreenSongs::drawInstruments(Dimensions dim) const {
 	}
 
 	UseTexture tex(*m_instrumentList);
-	double x = dim.x1();
+	float x = dim.x1();
 	// dancing
 	if (have_dance) {
 		drawIcon(6, dim.left(x));
@@ -502,11 +502,11 @@ void ScreenSongs::drawInstruments(Dimensions dim) const {
 	// guitars & bass
 	for (int i = guitarCount-1; i >= 0; i--) {
 		drawIcon(i == 0 && have_bass ? 3 : 2, dim.left(x));
-		x -= (i > 0 ? 0.3 : 1.0) * dim.w();
+		x -= (i > 0 ? 0.3f : 1.0f) * dim.w();
 	}
 	for (int i = vocalCount-1; i >= 0; i--) {
 		drawIcon(1, dim.left(x));
-		x -= (i > 0 ? 0.3 : 1.0) * dim.w();
+		x -= (i > 0 ? 0.3f : 1.0f) * dim.w();
 	}
 }
 
@@ -515,7 +515,7 @@ void ScreenSongs::drawMenu() {
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
 	const auto cur = &m_menu.current();
-	double w = m_menu.dimensions.w();
+	float w = m_menu.dimensions.w();
 	const float txth = th.option_selected.h();
 	const float step = txth * 0.85f;
 	const float h = m_menu.getOptions().size() * step + step;
@@ -538,7 +538,7 @@ void ScreenSongs::drawMenu() {
 		y += step;
 	}
 	if (cur->getComment() != "") {
-		th.comment.dimensions.middle(0).screenBottom(-0.12);
+		th.comment.dimensions.middle(0).screenBottom(-0.12f);
 		th.comment.draw(cur->getComment());
 	}
 	m_menu.dimensions.stretch(w, h);

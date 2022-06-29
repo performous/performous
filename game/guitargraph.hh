@@ -86,7 +86,7 @@ class GuitarGraph: public InstrumentGraph {
 	Texture m_flame_godmode;
 	Texture m_tap; /// image for 2d HOPO note cap
 	Texture m_neckglow; /// image for the glow from the bottom of the neck
-	glmath::dvec4 m_neckglowColor;
+	glmath::vec4 m_neckglowColor;
 	Object3d m_fretObj; /// 3d object for regular note
 	Object3d m_tappableObj; /// 3d object for the HOPO note cap
 	std::vector<std::string> m_samples; /// sound effects
@@ -124,8 +124,8 @@ class GuitarGraph: public InstrumentGraph {
 	void drawNote(unsigned fret, Color, float tBeg, float tEnd, float whammy = 0, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
 	void drawDrumfill(float tBeg, float tEnd);
 	void drawInfo(double time);
-	float getFretX(unsigned fret) { return (-2.0f + fret- (m_drums ? 0.5 : 0)) * (m_leftymode.b() ? -1 : 1); }
-	double neckWidth() const; ///< Get the currently effective neck width (0.5 or less)
+	float getFretX(int64_t fret) { return (-2.0f + fret- (m_drums ? 0.5f : 0.0f)) * (m_leftymode.b() ? -1 : 1); }
+	float neckWidth() const; ///< Get the currently effective neck width (0.5 or less)
 	// Chords & notes
 	void updateChords();
 	bool updateTom(unsigned int tomTrack, unsigned int fretId); // returns true if this tom track exists
@@ -146,11 +146,11 @@ class GuitarGraph: public InstrumentGraph {
 	AnimValue m_errorMeterFade;
 	AnimValue m_drumJump;
 	AnimValue m_starpower; /// how long the GodMode lasts (also used in fading the effect)
-	double m_starmeter; /// when this is high enough, GodMode becomes available
-	double m_drumfillHits; /// keeps track that enough hits are scored
-	double m_drumfillScore; /// max score for the notes under drum fill
-	double m_soloTotal; /// maximum solo score
-	double m_soloScore; /// score during solo
+	float m_starmeter; /// when this is high enough, GodMode becomes available
+	float m_drumfillHits; /// keeps track that enough hits are scored
+	float m_drumfillScore; /// max score for the notes under drum fill
+	float m_soloTotal; /// maximum solo score
+	float m_soloScore; /// score during solo
 	bool m_solo; /// are we currently playing a solo
 	bool m_hasTomTrack; /// true if the track has at least one tom track
 	bool m_proMode; /// true if pro drums. (it would be better to split guitar/trum tracks into sep classes)

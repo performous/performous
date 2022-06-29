@@ -43,20 +43,20 @@ void ScreenSing::enter() {
 	m_DuetTimeout.setValue(10);
 	Game* gm = Game::getSingletonPtr();
 	// Initialize webcam
-	gm->loading(_("Initializing webcam..."), 0.1);
+	gm->loading(_("Initializing webcam..."), 0.1f);
 	if (config["graphic/webcam"].b() && Webcam::enabled()) {
 		try {
 			m_cam = std::make_unique<Webcam>(config["graphic/webcamid"].i());
 		} catch (std::exception& e) { std::cout << e.what() << std::endl; };
 	}
 	// Load video
-	gm->loading(_("Loading video..."), 0.2);
+	gm->loading(_("Loading video..."), 0.2f);
 	if (!m_song->video.empty() && config["graphic/video"].b()) {
 		m_video = std::make_unique<Video>(m_song->video, m_song->videoGap);
 	}
 	reloadGL();
 	// Load song notes
-	gm->loading(_("Loading song..."), 0.4);
+	gm->loading(_("Loading song..."), 0.4f);
 	try { m_song->loadNotes(false /* don't ignore errors */); }
 	catch (SongParserException& e) {
 		std::clog << e;
@@ -68,7 +68,7 @@ void ScreenSing::enter() {
 	double setup_delay = (!m_song->hasControllers() ? -1.0 : -5.0);
 	m_audio.pause();
 	m_audio.playMusic(m_song->music, false, 0.0, setup_delay);
-	gm->loading(_("Loading menu..."), 0.7);
+	gm->loading(_("Loading menu..."), 0.7f);
 	{
 		m_duet = ConfigItem(0);
 		for (size_t player = 0; player < players(); ++player) {
@@ -78,7 +78,7 @@ void ScreenSing::enter() {
 		prepareVoicesMenu();
 	}
 	gm->showLogo(false);
-	gm->loading(_("Loading complete"), 1.0);
+	gm->loading(_("Loading complete"), 1.0f);
 }
 
 void ScreenSing::prepareVoicesMenu(size_t moveSelectionTo) {
@@ -214,7 +214,7 @@ void ScreenSing::instrumentLayout(double time) {
 		if (shouldPause != m_audio.isPaused()) m_audio.togglePause();
 	} else if (time < -0.5) {
 		// Display help if no-one has joined yet
-		ColorTrans c(Color::alpha(clamp(-1.0 - 2.0 * time)));
+		ColorTrans c(Color::alpha(static_cast<float>(clamp(-1.0 - 2.0 * time))));
 		m_help->draw();
 	}
 	double iw = std::min(0.5, 1.0 / count_alive);
@@ -223,7 +223,7 @@ void ScreenSing::instrumentLayout(double time) {
 	std::map<std::string, CountSum> pitchbend; // Stream id to (count, sum)
 	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it, ++i) {
 		(*it)->engine();
-		(*it)->position((0.5 + i - 0.5 * count_alive) * iw, iw); // Do layout stuff
+		(*it)->position((0.5f + i - 0.5f * count_alive) * iw, iw); // Do layout stuff
 		(*it)->draw(time);
 		{
 			CountSum& cs = volume[(*it)->getTrack()];
@@ -318,7 +318,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 					else msg = dev->source.isKeyboard() ? _("Press SPACE to join drums!") : _("KICK to join!");
 				}
 			}
-			if (!msg.empty()) gm->flashMessage(msg, 0.0, 0.1, 0.1);
+			if (!msg.empty()) gm->flashMessage(msg, 0.0f, 0.1f, 0.1f);
 			else if (type == input::DevType::DANCEPAD) m_instruments.push_back(std::make_unique<DanceGraph>(m_audio, *m_song, dev));
 			else if (type != input::DevType::GENERIC) m_instruments.push_back(std::make_unique<GuitarGraph>(m_audio, *m_song, dev, m_instruments.size()));
 		}
@@ -452,12 +452,12 @@ void ScreenSing::manageEvent(SDL_Event event) {
 }
 
 namespace {
-	const double arMin = 1.33;
-	const double arMax = 2.35;
+	const float arMin = 1.33f;
+	const float arMax = 2.35f;
 
 	void fillBG() {
 		Dimensions dim(arMin);
-		dim.fixedWidth(1.0);
+		dim.fixedWidth(1.0f);
 		glutil::VertexArray va;
 		va.texCoord(0,0).vertex(dim.x1(), dim.y1());
 		va.texCoord(0,0).vertex(dim.x2(), dim.y1());
@@ -504,7 +504,7 @@ void ScreenSing::draw() {
 	// Rendering starts
 	{
 		Transform ft(farTransform());
-		double ar = arMax;
+		float ar = arMax;
 		// Background image
 		if (!m_background || m_background->empty()) m_background = std::make_unique<Texture>(m_backgrounds.getRandom());
 		ar = m_background->dimensions.ar();
@@ -514,14 +514,14 @@ void ScreenSing::draw() {
 		if (m_cam && config["graphic/webcam"].b()) m_cam->render();
 		// Video
 		if (m_video) {
-			m_video->render(time); double tmp = m_video->dimensions().ar(); if (tmp > 0.0) ar = tmp;
+			m_video->render(time); float tmp = m_video->dimensions().ar(); if (tmp > 0.0f) ar = tmp;
 		}
 		// Top/bottom borders
 		ar = clamp(ar, arMin, arMax);
-		double offset = 0.5 / ar + 0.2;
-		theme->bg_bottom.dimensions.fixedWidth(1.0).bottom(offset);
+		float offset = 0.5f / ar + 0.2f;
+		theme->bg_bottom.dimensions.fixedWidth(1.0f).bottom(offset);
 		theme->bg_bottom.draw();
-		theme->bg_top.dimensions.fixedWidth(1.0).top(-offset);
+		theme->bg_top.dimensions.fixedWidth(1.0f).top(-offset);
 		theme->bg_top.draw();
 	}
 
@@ -539,9 +539,9 @@ void ScreenSing::draw() {
 	// Compute and draw the timer and the progressbar
 	{
 		unsigned t = clamp(time, 0.0, length);
-		m_progress->dimensions.fixedWidth(0.4).left(-0.5).screenTop();
-		theme->timer.dimensions.screenTop(0.5 * m_progress->dimensions.h());
-		theme->songinfo.dimensions.screenBottom(-0.01);
+		m_progress->dimensions.fixedWidth(0.4f).left(-0.5f).screenTop();
+		theme->timer.dimensions.screenTop(0.5f * m_progress->dimensions.h());
+		theme->songinfo.dimensions.screenBottom(-0.01f);
 		m_progress->draw(songPercent);
 
 		Song::SongSection section("error", 0);
@@ -627,7 +627,7 @@ void ScreenSing::drawMenu() {
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
 	const auto cur = &m_menu.current();
-	double w = m_menu.dimensions.w();
+	float w = m_menu.dimensions.w();
 	const float txth = th.option_selected.h();
 	const float step = txth * 0.85f;
 	const float h = m_menu.getOptions().size() * step + step;
@@ -652,7 +652,7 @@ void ScreenSing::drawMenu() {
 			if (player < analyzers.size()) {
 				Color color = MicrophoneColor::get(analyzers[player].getId());
 				ColorTrans c(color);
-				m_player_icon->dimensions.right(x).fixedHeight(0.040).center(y);
+				m_player_icon->dimensions.right(x).fixedHeight(0.040f).center(y);
 				m_player_icon->draw();
 			}
 			player++;
@@ -662,7 +662,7 @@ void ScreenSing::drawMenu() {
 		y += step;
 	}
 	if (cur->getComment() != "") {
-		th.comment.dimensions.middle(0).screenBottom(-0.08);
+		th.comment.dimensions.middle(0.0f).screenBottom(-0.08f);
 		th.comment.draw(cur->getComment());
 	}
 	m_menu.dimensions.stretch(w, h);

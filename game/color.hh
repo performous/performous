@@ -10,11 +10,11 @@ struct Color {
 	float b;
 	float a;
 	/// Default-construct white
-	Color(): r(1.0), g(1.0), b(1.0), a(1.0) {}
+	Color(): r(1.0f), g(1.0f), b(1.0f), a(1.0f) {}
 	/// Construct using RGB(A)
-	Color(float red, float grn, float blu, float alp = 1.0): r(red), g(grn), b(blu), a(alp) {}
+	Color(float red, float grn, float blu, float alp = 1.0f): r(red), g(grn), b(blu), a(alp) {}
 	/// Construct white color with alpha
-	static Color alpha(float alp) { return Color(1.0, 1.0, 1.0, alp); }
+	static Color alpha(float alp) { return Color(1.0f, 1.0f, 1.0f, alp); }
 	/// Parse CSS color string (sRGB)
 	explicit Color(std::string const& str);
 	/// Return premultiplied linear color suitable for use with OpenGL

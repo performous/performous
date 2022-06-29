@@ -112,7 +112,7 @@ void mainLoop(std::string const& songlist) {
 	WebServer server(songs);
 
 	// Load audio samples
-	gm.loading(_("Loading audio samples..."), 0.5);
+	gm.loading(_("Loading audio samples..."), 0.5f);
 	audio.loadSample("drum bass", findFile("sounds/drum_bass.ogg"));
 	audio.loadSample("drum snare", findFile("sounds/drum_snare.ogg"));
 	audio.loadSample("drum hi-hat", findFile("sounds/drum_hi-hat.ogg"));
@@ -127,7 +127,7 @@ void mainLoop(std::string const& songlist) {
 	audio.loadSample("guitar fail6", findFile("sounds/guitar_fail6.ogg"));
 	audio.loadSample("notice.ogg",findFile("notice.ogg"));
 	// Load screens
-	gm.loading(_("Creating screens..."), 0.7);
+	gm.loading(_("Creating screens..."), 0.7f);
 	gm.addScreen(std::make_unique<ScreenIntro>("Intro", audio));
 	gm.addScreen(std::make_unique<ScreenSongs>("Songs", audio, songs, database));
 	gm.addScreen(std::make_unique<ScreenSing>("Sing", audio, database, backgrounds));
@@ -137,9 +137,9 @@ void mainLoop(std::string const& songlist) {
 	gm.addScreen(std::make_unique<ScreenPlayers>("Players", audio, database));
 	gm.addScreen(std::make_unique<ScreenPlaylist>("Playlist", audio, songs, backgrounds));
 	gm.activateScreen("Intro");
-	gm.loading(_("Entering main menu..."), 0.8);
+	gm.loading(_("Entering main menu..."), 0.8f);
 	gm.updateScreen();  // exit/enter, any exception is fatal error
-	gm.loading(_("Loading complete!"), 1.0);
+	gm.loading(_("Loading complete!"), 1.0f);
 	// Main loop
 	auto time = Clock::now();
 	unsigned frames = 0;

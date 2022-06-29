@@ -45,7 +45,7 @@ public:
 	fs::path filename; ///< name of songfile
 	fs::path midifilename; ///< name of midi file in FoF format
 	struct BPM {
-		BPM (double _begin, double _ts, double bpm) :
+		BPM (double _begin, double _ts, float bpm) :
 		begin (_begin), step (0.25 * 60.0 / bpm), ts (_ts) {}
 		double begin;  // Time in seconds
 		double step;  // Seconds per quarter note

@@ -166,12 +166,12 @@ bool Music::operator()(float* begin, float* end) {
 		
 	}
 	m_pos += samples;
-	const float volume = static_cast<float>(m_preview ? config["audio/preview_volume"].i() : config["audio/music_volume"].i()) / 100.0;
+	const float volume = static_cast<float>(m_preview ? config["audio/preview_volume"].i() : config["audio/music_volume"].i()) / 100.0f;
 	for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
 		if (i % 2 == 0) {
 			fadeLevel += fadeRate;
-			if (fadeLevel <= 0.0) return false;
-			if (fadeLevel > 1.0) { fadeLevel = 1.0; fadeRate = 0.0; }
+			if (fadeLevel <= 0.0f) return false;
+			if (fadeLevel > 1.0f) { fadeLevel = 1.0f; fadeRate = 0.0f; }
 		}
 		begin[i] += mixbuf[i] * fadeLevel * volume;
 	}
@@ -271,8 +271,8 @@ struct Sample {
 		if(!audioBuffer.read(mixbuf.data(), mixbuf.size(), m_pos, 1.0)) {
 			eof = true;
 		}
-		const auto failVolume = static_cast<float>(config["audio/fail_volume"].i()) / 100.0;
 		for (size_t i = 0, iend = end - begin; i != iend; ++i) {
+		const auto failVolume = static_cast<float>(config["audio/fail_volume"].i()) / 100.0f;
 			begin[i] += mixbuf[i] * failVolume;
 		}
 		m_pos += end - begin;
@@ -291,9 +291,9 @@ struct Synth {
 	Synth(Notes const& notes, unsigned int sr) : m_notes(notes), srate(sr) {}
 	void operator()(float* begin, float* end, double position) {
 		static double phase = 0.0;
-		for (float *i = begin; i < end; ++i) *i *= 0.3; // Decrease music volume
 
 		std::vector<float> mixbuf(end - begin);
+		for (float *i = begin; i < end; ++i) *i *= 0.3f; // Decrease music volume
 		Notes::const_iterator it = m_notes.begin();
 
 		while (it != m_notes.end() && it->end < position) ++it;
@@ -547,8 +547,8 @@ struct Audio::Impl {
 portaudio::Init Audio::init;
 
 Audio::Audio() {
-	aubio_tempo_set_silence(Audio::aubioTempo.get(), -50.0);
-	aubio_tempo_set_threshold(Audio::aubioTempo.get(), 0.4);
+	aubio_tempo_set_silence(Audio::aubioTempo.get(), -50.0f);
+	aubio_tempo_set_threshold(Audio::aubioTempo.get(), 0.4f);
         populateBackends(portaudio::AudioBackends().getBackends());
         self = std::make_unique<Impl>();
 }

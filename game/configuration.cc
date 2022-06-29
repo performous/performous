@@ -38,9 +38,9 @@ ConfigItem& ConfigItem::incdec(int dir) {
 		int step = std::get<int>(m_step);
 		val = clamp(((val + dir * step)/ step) * step, std::get<int>(m_min), std::get<int>(m_max));
 	} else if (m_type == "float") {
-		double& val = std::get<double>(m_value);
-		double step = std::get<double>(m_step);
-		val = clamp(round((val + dir * step) / step) * step, std::get<double>(m_min), std::get<double>(m_max));
+		float& val = std::get<float>(m_value);
+		float step = std::get<float>(m_step);
+		val = clamp(round((val + dir * step) / step) * step, std::get<float>(m_min), std::get<float>(m_max));
 	} else if (m_type == "bool") {
 		bool& val = std::get<bool>(m_value);
 		val = !val;
@@ -54,7 +54,7 @@ ConfigItem& ConfigItem::incdec(int dir) {
 bool ConfigItem::isDefaultImpl(ConfigItem::Value const& defaultValue) const {
 	if (m_type == "bool") return std::get<bool>(m_value) == std::get<bool>(defaultValue);
 	if (m_type == "int") return std::get<int>(m_value) == std::get<int>(defaultValue);
-	if (m_type == "float") return std::get<double>(m_value) == std::get<double>(defaultValue);
+	if (m_type == "float") return std::get<float>(m_value) == std::get<float>(defaultValue);
 	if (m_type == "string") return std::get<std::string>(m_value) == std::get<std::string>(defaultValue);
 	if (m_type == "string_list") return std::get<StringList>(m_value) == std::get<StringList>(defaultValue);
 	if (m_type == "option_list") return std::get<OptionList>(m_value) == std::get<OptionList>(defaultValue);
@@ -75,7 +75,7 @@ void ConfigItem::verifyType(std::string const& type) const {
 int& ConfigItem::i() { verifyType("int"); return std::get<int>(m_value); }
 int const& ConfigItem::i() const { verifyType("int"); return std::get<int>(m_value); }
 bool& ConfigItem::b() { verifyType("bool"); return std::get<bool>(m_value); }
-double& ConfigItem::f() { verifyType("float"); return std::get<double>(m_value); }
+float& ConfigItem::f() { verifyType("float"); return std::get<float>(m_value); }
 std::string& ConfigItem::s() { verifyType("string"); return std::get<std::string>(m_value); }
 ConfigItem::StringList& ConfigItem::sl() { verifyType("string_list"); return std::get<StringList>(m_value); }
 ConfigItem::OptionList& ConfigItem::ol() { verifyType("option_list"); return std::get<OptionList>(m_value); }
@@ -141,7 +141,7 @@ std::string const ConfigItem::getValue() const {
 		if (val >= 0 && val < int(m_enums.size())) return m_enums[val];
 		return numericFormat<int>(m_value, m_multiplier, m_step) + _(m_unit);
 	}
-	if (m_type == "float") return numericFormat<double>(m_value, m_multiplier, m_step) + _(m_unit);
+	if (m_type == "float") return numericFormat<float>(m_value, m_multiplier, m_step) + m_unit;
 	if (m_type == "bool") return std::get<bool>(m_value) ? _("Enabled") : _("Disabled");
 	if (m_type == "string") return std::get<std::string>(m_value);
 	if (m_type == "string_list") {
@@ -259,8 +259,8 @@ void ConfigItem::update(xmlpp::Element& elem, int mode) try {
 		updateNumeric<int>(elem, mode);
 	} else if (m_type == "float") {
 		std::string value_string = getAttribute(elem, "value");
-		if (!value_string.empty()) m_value = std::stod(value_string);
-			updateNumeric<double>(elem, mode);
+		if (!value_string.empty()) m_value = std::stof(value_string);
+			updateNumeric<float>(elem, mode);
 			} else if (m_type == "string") {
 				m_value = getText(elem, "stringvalue");
 			} else if (m_type == "string_list" || m_type == "option_list") {

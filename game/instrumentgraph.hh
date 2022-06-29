@@ -36,11 +36,11 @@ class Popup {
 		{
 			using namespace glmath;
 			Transform trans(translate(vec3(0.0f, 0.0f, 0.5f * anim)));
-			m_popupText->dimensions().center(0.1 - 0.03 * anim).middle().stretch(0.2f, 0.2f);
+			m_popupText->dimensions().center(0.1f - 0.03f * anim).middle().stretch(0.2f, 0.2f);
 			m_popupText->draw();
 		}
 		if (m_info != "" && m_infoText) {
-			m_infoText->dimensions.screenBottom(-0.02).middle(-0.12);
+			m_infoText->dimensions.screenBottom(-0.02f).middle(-0.12f);
 			m_infoText->draw(m_info);
 		}
 		if (anim > 0.999) m_anim.setTarget(0.0, true);
@@ -93,7 +93,7 @@ public:
 	bool joining(double time) const { return time < m_jointime; }
 	bool ready() const { return m_ready; };
 	bool menuOpen() const { return m_menu.isOpen(); }
-	void position(double cx, double width) { m_cx.setTarget(cx); m_width.setTarget(width); }
+	void position(float cx, float width) { m_cx.setTarget(cx); m_width.setTarget(width); }
 	unsigned stream() const { return m_stream; }
 	double correctness() const { return m_correctness.get(); }
 	int getScore() const { return clamp(m_score * m_scoreFactor, 0.0, 10000.0); }
