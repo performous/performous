@@ -68,18 +68,11 @@ void SongItems::addSong(std::shared_ptr<Song> song) {
 	m_songs.insert(si);
 }
 
-SongId SongItems::lookup(std::shared_ptr<Song> song) const {
-	if(!song)
-	return std::nullopt;
-
-	return lookup(*song);
-}
-
-SongId SongItems::lookup(Song& song) const {
-	for (auto const& s: m_songs)
-		if (song.collateByArtistOnly == s.artist && song.collateByTitleOnly == s.title) 
-			return s.id;
-
+SongId SongItems::lookup(Song const& song) const {
+	auto const& si = std::find_if(m_songs.begin(), m_songs.end(), [song](SongItem const& si) {
+		return UnicodeUtil::toLower(song.collateByArtistOnly) == UnicodeUtil::toLower(si.artist) && UnicodeUtil::toLower(song.collateByTitleOnly) == UnicodeUtil::toLower(si.title);
+	});
+	if (si != m_songs.end()) return si->id;
 	return std::nullopt;
 }
 
