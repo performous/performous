@@ -88,7 +88,7 @@ public: // methods for database queries
 	void queryPerSongHiscore(std::ostream & os, std::shared_ptr<Song> s, std::string const& track = std::string()) const;
 	void queryPerPlayerHiscore(std::ostream & os, std::string const& track = std::string()) const;
 
-	bool hasHiscore(const Song& s) const;
+	bool hasHiscore(Song const& s) const;
 	unsigned getHiscore(const Song& s) const;
 	bool noPlayers() const;
 
