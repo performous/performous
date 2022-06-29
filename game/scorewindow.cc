@@ -2,6 +2,8 @@
 
 #include "database.hh"
 
+#include <algorithm>
+
 ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
   m_database(database),
   m_pos(0.8f, 2.0f),
@@ -13,39 +15,27 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 	Game::getSingletonPtr()->showLogo();
 	m_pos.setTarget(0.0);
 	m_database.scores.clear();
+
 	// Singers
-	for (auto p = m_database.cur.begin(); p != m_database.cur.end();) {
-		const auto score = p->getScore();
-
-		if (score < 500) { // Dead
-			p = m_database.cur.erase(p);
-			continue;
-		}
-
-		m_database.scores.emplace_back(score, input::DevType::VOCALS, "Vocals", "vocals", Color(p->m_color.r, p->m_color.g, p->m_color.b));
-		++p;
+	m_database.cur.remove_if([](Player const& p){ return p.getScore() < 500; }); // Dead.
+	for (Player const& p: m_database.cur) {
+		m_database.scores.emplace_back(p.getScore(), input::DevType::VOCALS, "Vocals", "vocals", Color(p.m_color.r, p.m_color.g, p.m_color.b));
 	}
+
 	// Instruments
-	for (auto it = instruments.begin(); it != instruments.end();) {
-		const auto score = (*it)->getScore();
-
-		if (score < 100) { // Dead
-			it = instruments.erase(it);
-			continue;
-		}
-
-		const auto type = (*it)->getGraphType();
-		const auto track_simple = (*it)->getTrack();
-		const auto track = UnicodeUtil::toUpper((*it)->getModeId(), 1); // Capitalize
-		auto color = Color(1.0f, 0.0f, 0.0f);
+	std::remove_if(instruments.begin(), instruments.end(),[](std::unique_ptr<InstrumentGraph> const& i){ return i->getScore() < 100; }); // Dead.
+	for (std::unique_ptr<InstrumentGraph> const& i: instruments) {
+		input::DevType const& type = i->getGraphType();
+		std::string const& track_simple = i->getTrack();
+		std::string const& track = UnicodeUtil::toUpper(i->getModeId(), 1); // Capitalize
+		Color color = Color(1.0f, 0.0f, 0.0f);
 
 		if (track_simple == TrackName::DRUMS)
 			color = Color(0.1f, 0.1f, 0.1f);
 		else if (track_simple == TrackName::BASS)
 			color = Color(0.5f, 0.3f, 0.1f);
 
-		m_database.scores.emplace_back(score, type, track, track_simple, color);
-		++it;
+		m_database.scores.emplace_back(i->getScore(), type, track, track_simple, color);
 	}
 
 	if (m_database.scores.empty())
@@ -53,8 +43,8 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 	else {
 		// Determine winner
 		m_database.scores.sort([](ScoreItem i, ScoreItem j) -> bool { return (i.score>j.score); });
-		const auto winner = *std::max_element(m_database.scores.begin(), m_database.scores.end());
-		const auto topScore = winner.score;
+		ScoreItem const& winner = *std::max_element(m_database.scores.begin(), m_database.scores.end());
+		const unsigned topScore = winner.score;
 		// Determine rank
 		if (winner.type == input::DevType::VOCALS) {
 			if (topScore > 8000) m_rank = _("Hit singer");
@@ -83,21 +73,21 @@ void ScoreWindow::draw() {
 	using namespace glmath;
 	Transform trans(translate(vec3(0.0f, static_cast<float>(m_pos.get()), 0.0f)));
 	m_bg.draw();
-	const float spacing = 0.1f + 0.1f / m_database.scores.size();
+	const float spacing = 0.1f + 0.1f / static_cast<float>(m_database.scores.size());
 	unsigned i = 0;
-
-	for (auto p = m_database.scores.begin(); p != m_database.scores.end(); ++p, ++i) {
-		unsigned score = p->score;
-		ColorTrans c(p->color);
-		float x = spacing * (0.5f + i - 0.5f * m_database.scores.size());
+	for (ScoreItem const& s: m_database.scores) {
+		unsigned score = s.score;
+		ColorTrans c(s.color);
+		float x = spacing * (0.5f + static_cast<float>(i) - 0.5f * static_cast<float>(m_database.scores.size()));
 		m_scoreBar.dimensions.fixedWidth(0.09f).middle(x).bottom(0.20f);
-		m_scoreBar.draw(score / 10000.0f);
+		m_scoreBar.draw(static_cast<float>(score) / 10000.0f);
 		m_score_text.render(std::to_string(score));
 		m_score_text.dimensions().middle(x).top(0.24f).fixedHeight(0.042f);
 		m_score_text.draw();
-		m_score_text.render(p->track_simple);
+		m_score_text.render(s.track_simple);
 		m_score_text.dimensions().middle(x).top(0.20f).fixedHeight(0.042f);
 		m_score_text.draw();
+		++i;
 	}
 	m_score_rank.draw(m_rank);
 }
