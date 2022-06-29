@@ -49,7 +49,7 @@ void Database::save() {
 	}
 }
 
-void Database::addPlayer(std::string const& name, std::string const& picture, int id) {
+void Database::addPlayer(std::string const& name, std::string const& picture, PlayerId id) {
 	m_players.addPlayer(name, picture, id);
 }
 
@@ -58,33 +58,39 @@ void Database::addSong(std::shared_ptr<Song> s) {
 }
 
 void Database::addHiscore(std::shared_ptr<Song> s) {
-	int playerid = m_players.lookup(m_players.current().name);
-	int score = scores.front().score;
+	PlayerId playerid = m_players.lookup(m_players.current().name);
+	unsigned score = scores.front().score;
 	std::string track = scores.front().track;
-	const auto songid = m_songs.lookup(s);
+	const SongId songid = m_songs.lookup(s);
 	
-	if(!songid.has_value())
+	if(!songid.has_value()) {
+		std::clog << "database/error: Invalid song ID for song: " + s->artist + " - " + s->title << std::endl;
 		return;
-    
-	const auto level = config["game/difficulty"].i();
+	}
+	unsigned short level = config["game/difficulty"].ui();
 	m_hiscores.addHiscore(score, playerid, songid.value(), level, track);
-	std::clog << "database/info: Added new hiscore " << score << " points on track " << track << " of songid " << songid.value() << " level "<< level<< std::endl;
+	std::clog << "database/info: Added new hiscore " << score << " points on track " << track << " of songid " << std::to_string(songid.value()) << " level "<< level<< std::endl;
 }
 
 bool Database::reachedHiscore(std::shared_ptr<Song> s) const {
-	const auto songid = m_songs.lookup(s);
+	const SongId songid = m_songs.lookup(s);
     
 	if(!songid.has_value())
 		return false;
     
-	const auto score = scores.front().score;
+	unsigned score = scores.front().score;
 	const auto track = scores.front().track;
-	const auto level = config["game/difficulty"].i();
+	SongId songid = m_songs.lookup(s);
+	if (!songid) { 
+		std::clog << "database/error: Invalid song ID for song: " + s->artist + " - " + s->title << std::endl;
+		return false;
+	}
+	unsigned short level = config["game/difficulty"].ui();
 	return m_hiscores.reachedHiscore(score, songid.value(), level, track);
 }
 
 void Database::queryOverallHiscore(std::ostream & os, std::string const& track) const {
-	const auto hi = m_hiscores.queryHiscore (10, -1, -1, track);
+	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore (std::nullopt, std::nullopt, track, 10);
 	for (size_t i=0; i < hi.size(); ++i) {
 		os << i+1 << ".\t"
 		   << m_players.lookup(hi[i].playerid) << "\t"
@@ -95,11 +101,11 @@ void Database::queryOverallHiscore(std::ostream & os, std::string const& track) 
 }
 
 void Database::queryPerSongHiscore(std::ostream & os, std::shared_ptr<Song> s, std::string const& track) const {
-	const auto songid = m_songs.lookup(s);
-	if (!songid.has_value()) return;  // Song not included in database (yet)
+	SongId songid = m_songs.lookup(s);
+	if (!songid) return; // song not yet in database.
 	// Reorder hiscores by track / score
 	std::map<std::string, std::multiset<HiscoreItem>> scoresByTrack;
-	for (HiscoreItem const& hi: m_hiscores.queryHiscore(-1, -1, songid.value(), track)) 
+	for (HiscoreItem const& hi: m_hiscores.queryHiscore(std::nullopt, songid.value(), track, std::nullopt)) scoresByTrack[hi.track].insert(hi);
 		scoresByTrack[hi.track].insert(hi);
 	for (auto const& hiv: scoresByTrack) {
 		os << hiv.first << ":\n";
@@ -111,8 +117,8 @@ void Database::queryPerSongHiscore(std::ostream & os, std::shared_ptr<Song> s, s
 }
 
 void Database::queryPerPlayerHiscore(std::ostream & os, std::string const& track) const {
-	const auto playerid = m_players.lookup(m_players.current().name);
-	const auto hi = m_hiscores.queryHiscore(3, playerid, -1, track);
+	PlayerId playerid = m_players.lookup(m_players.current().name);
+	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore(playerid, std::nullopt, track, 3);
 
 	for (size_t i=0; i < hi.size(); ++i) {
 		os << i+1 << ".\t"
@@ -123,16 +129,17 @@ void Database::queryPerPlayerHiscore(std::ostream & os, std::string const& track
 }
 
 bool Database::hasHiscore(const Song& s) const {
-	const auto songid = m_songs.lookup(s);
+	const SongId songid = m_songs.lookup(s);
 
-	if(!songid.has_value())
+	if (!songid) { 
+		std::clog << "database/error: Invalid song ID for song: " + s.artist + " - " + s.title << std::endl;
 		return false;
-    
+	}
 	return m_hiscores.hasHiscore(songid.value());
 }
 
 unsigned Database::getHiscore(const Song& s) const {
-	const auto songid = m_songs.lookup(s);
+	const SongId songid = m_songs.lookup(s);
 
 	if(!songid.has_value())
 		return 0;

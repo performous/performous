@@ -2,6 +2,7 @@
 
 #include <set>
 #include <list>
+#include <optional>
 #include <vector>
 #include <string>
 #include <stdexcept>
@@ -50,7 +51,7 @@ class Players {
 	void update();
 
 	/// lookup a playerid using the players name
-	int lookup(std::string const& name) const;
+	PlayerId lookup(std::string const& name) const;
 
 	/** lookup a players name using the playerid.
 	  @return the players name or "Unknown Player"
@@ -58,16 +59,16 @@ class Players {
 	std::string lookup(PlayerId id) const;
 
 	/// add a player with a displayed name and an optional picture; if no id is given one will be assigned
-	void addPlayer (std::string const& name, std::string const& picture = "", PlayerId id = PlayerItem::UndefinedPlayerId);
+	void addPlayer (std::string const& name, std::string const& picture = "", PlayerId id = std::nullopt);
 
 	/// const array access
-	PlayerItem operator[](std::size_t pos) const;
-	size_t count() const { return m_filtered.size(); }
+	PlayerItem operator[](unsigned pos) const;
+	unsigned count() const { return static_cast<unsigned>(m_filtered.size()); }
 	bool isEmpty() const { return m_filtered.empty(); }
 	/// advances to next player
-	void advance(int diff);
+	void advance(std::ptrdiff_t diff);
 	/// get current id
-	PlayerId currentId() const { return math_cover.getTarget(); }
+	PlayerId currentId() const { return static_cast<unsigned>(math_cover.getTarget()); }
 	/// gets current position
 	double currentPosition() { return math_cover.getValue(); }
 	/// gets current velocity
@@ -80,7 +81,7 @@ class Players {
 	void setFilter(std::string const& regex);
   
 private:
-	PlayerId assign_id_internal(); /// returns the next available id
+	unsigned assign_id_internal(); /// returns the next available id
 	void filter_internal();
 	static UErrorCode m_icuError;
 	static icu::RuleBasedCollator icuCollator;

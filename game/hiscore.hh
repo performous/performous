@@ -23,7 +23,7 @@ public:
 	  @return true if the score make it into the list
 	  @return false if addNewHiscore does not make sense for that score.
 	  */
-	bool reachedHiscore(unsigned score, unsigned songid, unsigned level, std::string const& track) const;
+	bool reachedHiscore(unsigned score, SongId songid, unsigned short level, std::string const& track) const;
 
 	/**Add a specific highscore into the list.
 
@@ -36,18 +36,18 @@ public:
 	  in its valid interval. If one of this conditions is not net a
 	  HiscoreException will be raised.
 	  */
-	void addHiscore(unsigned score, unsigned playerid, unsigned songid, unsigned level, std::string const& track);
+	void addHiscore(unsigned score, PlayerId playerid, SongId songid, unsigned short level, std::string const& track);
 
 	using HiscoreVector = std::vector<HiscoreItem>;
 
 	/// This queries the database for a sorted vector of highscores. The defaults mean to query everything.
 	/// @param max limits the number of elements returned.
-	HiscoreVector queryHiscore(unsigned max, unsigned playerid, unsigned songid, std::string const& track) const;
-	bool hasHiscore(unsigned songid) const;
+	HiscoreVector queryHiscore(PlayerId playerid, SongId songid, std::string const& track, std::optional<unsigned> max = std::nullopt) const;
+	bool hasHiscore(SongId songid) const;
 	unsigned getHiscore(unsigned songid) const;
 	std::size_t size() const { return m_hiscore.size(); }
 private:
 	using hiscore_t = std::multiset<HiscoreItem>;
 	hiscore_t m_hiscore;
-	unsigned currentLevel() const;
+	unsigned short currentLevel() const;
 };

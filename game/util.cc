@@ -1,5 +1,7 @@
 #include "util.hh"
 
+#include <stdexcept>
+
 // Only conversion types used in Performous are provided
 template <> int sconv(std::string const& s) { return std::stoi(s); }
 template <> unsigned short sconv(std::string const& s) { return static_cast<unsigned short>(std::stoi(s)); }
