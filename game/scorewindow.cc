@@ -4,9 +4,9 @@
 
 ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
   m_database(database),
-  m_pos(0.8, 2.0),
+  m_pos(0.8f, 2.0f),
   m_bg(findFile("score_window.svg")),
-  m_scoreBar(findFile("score_bar_bg.svg"), findFile("score_bar_fg.svg"), ProgressBar::Mode::VERTICAL, 0.0, 0.0, false),
+  m_scoreBar(findFile("score_bar_bg.svg"), findFile("score_bar_fg.svg"), ProgressBar::Mode::VERTICAL, 0.0f, 0.0f, false),
   m_score_text(findFile("score_txt.svg")),
   m_score_rank(findFile("score_rank.svg"))
 {
@@ -37,12 +37,12 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 		const auto type = (*it)->getGraphType();
 		const auto track_simple = (*it)->getTrack();
 		const auto track = UnicodeUtil::toUpper((*it)->getModeId(), 1); // Capitalize
-		auto color = Color(1.0, 0.0, 0.0);
+		auto color = Color(1.0f, 0.0f, 0.0f);
 
 		if (track_simple == TrackName::DRUMS)
-			color = Color(0.1, 0.1, 0.1);
+			color = Color(0.1f, 0.1f, 0.1f);
 		else if (track_simple == TrackName::BASS)
-			color = Color(0.5, 0.3, 0.1);
+			color = Color(0.5f, 0.3f, 0.1f);
 
 		m_database.scores.emplace_back(score, type, track, track_simple, color);
 		++it;
@@ -81,22 +81,22 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 
 void ScoreWindow::draw() {
 	using namespace glmath;
-	Transform trans(translate(vec3(0.0, m_pos.get(), 0.0)));
+	Transform trans(translate(vec3(0.0f, static_cast<float>(m_pos.get()), 0.0f)));
 	m_bg.draw();
-	const double spacing = 0.1 + 0.1 / m_database.scores.size();
+	const float spacing = 0.1f + 0.1f / m_database.scores.size();
 	unsigned i = 0;
 
 	for (auto p = m_database.scores.begin(); p != m_database.scores.end(); ++p, ++i) {
-		int score = p->score;
+		unsigned score = p->score;
 		ColorTrans c(p->color);
-		double x = spacing * (0.5 + i - 0.5 * m_database.scores.size());
-		m_scoreBar.dimensions.fixedWidth(0.09).middle(x).bottom(0.20);
-		m_scoreBar.draw(score / 10000.0);
+		float x = spacing * (0.5f + i - 0.5f * m_database.scores.size());
+		m_scoreBar.dimensions.fixedWidth(0.09f).middle(x).bottom(0.20f);
+		m_scoreBar.draw(score / 10000.0f);
 		m_score_text.render(std::to_string(score));
-		m_score_text.dimensions().middle(x).top(0.24).fixedHeight(0.042);
+		m_score_text.dimensions().middle(x).top(0.24f).fixedHeight(0.042f);
 		m_score_text.draw();
 		m_score_text.render(p->track_simple);
-		m_score_text.dimensions().middle(x).top(0.20).fixedHeight(0.042);
+		m_score_text.dimensions().middle(x).top(0.20f).fixedHeight(0.042f);
 		m_score_text.draw();
 	}
 	m_score_rank.draw(m_rank);
