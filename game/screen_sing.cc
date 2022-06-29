@@ -46,7 +46,7 @@ void ScreenSing::enter() {
 	gm->loading(_("Initializing webcam..."), 0.1f);
 	if (config["graphic/webcam"].b() && Webcam::enabled()) {
 		try {
-			m_cam = std::make_unique<Webcam>(config["graphic/webcamid"].i());
+			m_cam = std::make_unique<Webcam>(config["graphic/webcamid"].ui());
 		} catch (std::exception& e) { std::cout << e.what() << std::endl; };
 	}
 	// Load video
@@ -70,10 +70,10 @@ void ScreenSing::enter() {
 	m_audio.playMusic(m_song->music, false, 0.0, setup_delay);
 	gm->loading(_("Loading menu..."), 0.7f);
 	{
-		m_duet = ConfigItem(0);
+		m_duet = ConfigItem(static_cast<unsigned short>(0));
 		for (size_t player = 0; player < players(); ++player) {
 			ConfigItem& vocalTrack = m_vocalTracks[player];
-			vocalTrack = ConfigItem(0);
+			vocalTrack = ConfigItem(static_cast<unsigned short>(0));
 		}
 		prepareVoicesMenu();
 	}
@@ -100,7 +100,7 @@ void ScreenSing::prepareVoicesMenu(unsigned moveSelectionTo) {
 				else vocalTrack.selectEnum(m_song->getVocalTrack(TrackName::LEAD_VOCAL).name);
 			}
 			m_menu.add(MenuOption("", _("Change vocal track"))).changer(vocalTrack);
-			if (m_duet.i() == 1) {
+			if (m_duet.ui() == 1) {
 				vocalTrack.selectEnum(m_song->getVocalTrack(SongParserUtil::DUET_BOTH).name);
 				break; // If duet mode is disabled, the vocal track selection for players beyond the first is ignored anyway.
 			}
@@ -119,7 +119,7 @@ void ScreenSing::setupVocals() {
 		//size_t players = (analyzers.empty() ? 1 : analyzers.size());  // Always at least 1; should be number of mics
 		std::set<VocalTrack*> shownTracks;  // Tracks to be included in layout_singer (stored by name for proper sorting and merging duplicates)
 		for (size_t player = 0; player < players(); ++player) {
-			VocalTrack* vocal = &m_song->getVocalTrack(static_cast<unsigned>(m_vocalTracks[(m_duet.i() == 0 ? player : 0)].i()));
+			VocalTrack* vocal = &m_song->getVocalTrack(m_vocalTracks[(m_duet.ui() == 0u ? player : 0u)].ui());
 			selectedTracks.push_back(vocal);
 			shownTracks.insert(vocal);
 		}
@@ -137,10 +137,10 @@ void ScreenSing::setupVocals() {
 	bool sameVoice = true;
 	for (size_t player = 0; player < players(); ++player) {
 		ConfigItem& vocalTrack = m_vocalTracks[player];
-		if (player == 0) { m_selectedVocal = static_cast<unsigned>(vocalTrack.i()); }
-		if (vocalTrack.i() != m_selectedVocal) { sameVoice = false; break; }
+		if (player == 0) { m_selectedVocal = vocalTrack.ui(); }
+		if (vocalTrack.ui() != m_selectedVocal) { sameVoice = false; break; }
 	}
-	m_singingDuet = (m_song->hasDuet() && m_duet.i() == 0 && players() > 1 && sameVoice != true);
+	m_singingDuet = (m_song->hasDuet() && m_duet.ui() == 0 && players() > 1 && sameVoice != true);
 	m_audio.pause(false);
 }
 
@@ -265,7 +265,7 @@ void ScreenSing::activateNextScreen()
 	}
 
 	// Score window visible -> Enter quits to Players Screen
-	if(!config["game/karaoke_mode"].i() && !m_song->hasDance() &&!m_song->hasDrums() &&!m_song->hasGuitars()) {
+	if(!config["game/karaoke_mode"].ui() && !m_song->hasDance() &&!m_song->hasDrums() &&!m_song->hasGuitars()) {
 		Screen* s = gm->getScreen("Players");
 		ScreenPlayers* ss = dynamic_cast<ScreenPlayers*> (s);
 		assert(ss);
@@ -279,7 +279,7 @@ void ScreenSing::activateNextScreen()
 void ScreenSing::manageEvent(input::NavEvent const& event) {
 	keyPressed = true;
 	input::NavButton nav = event.button;
-	m_quitTimer.setValue(config["game/results_timeout"].i());
+	m_quitTimer.setValue(config["game/results_timeout"].ui());
 	double time = m_audio.getPosition();
 	Song::Status status = m_song->status(time, this);
 	// When score window is displayed
@@ -394,19 +394,19 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		if (key == SDL_SCANCODE_S) m_audio.toggleSynth(m_song->getVocalTrack(m_selectedTrack).notes);
 		if (key == SDL_SCANCODE_V) m_audio.streamFade("vocals", event.key.keysym.mod & KMOD_SHIFT ? 1.0 : 0.0);
 		if (key == SDL_SCANCODE_K)  { // Toggle karaoke mode
-			if(config["game/karaoke_mode"].i() >=2) config["game/karaoke_mode"].i() = 0;
+			if(config["game/karaoke_mode"].ui() >=2) config["game/karaoke_mode"].ui() = 0;
 			else ++config["game/karaoke_mode"];
 			dispInFlash(config["game/karaoke_mode"]);
 		}
 		if (key == SDL_SCANCODE_H) {
-			config["game/Textstyle"].i() ? config["game/Textstyle"].i() = 0 : ++config["game/Textstyle"].i();
+			config["game/Textstyle"].ui() ? config["game/Textstyle"].ui() = 0 : ++config["game/Textstyle"].ui();
 			dispInFlash(config["game/Textstyle"]);
 			}
 		if (key == SDL_SCANCODE_W) dispInFlash(++config["game/pitch"]); // Toggle pitch wave
 		// Toggle webcam
 		if (key == SDL_SCANCODE_A && Webcam::enabled()) {
 			// Initialize if we haven't done that already
-			if (!m_cam) { try { m_cam = std::make_unique<Webcam>(config["graphic/webcamid"].i()); } catch (...) { }; }
+			if (!m_cam) { try { m_cam = std::make_unique<Webcam>(config["graphic/webcamid"].ui()); } catch (...) { }; }
 			if (m_cam) { dispInFlash(++config["graphic/webcam"]); m_cam->pause(!config["graphic/webcam"].b()); }
 		}
 		// Latency settings
@@ -556,7 +556,7 @@ void ScreenSing::draw() {
 			if (status == Song::Status::INSTRUMENTAL_BREAK) {
 				statustxt += _("   ENTER to skip instrumental break");
 			}
-			if (status == Song::Status::FINISHED && !config["game/karaoke_mode"].i()) {
+			if (status == Song::Status::FINISHED && !config["game/karaoke_mode"].ui()) {
 				if(config["game/autoplay"].b()) {
 					if(m_displayAutoPlay) {
 						statustxt += _("   Autoplay enabled");
@@ -587,7 +587,7 @@ void ScreenSing::draw() {
 		theme->timer.draw(statustxt);
 	}
 
-	if (config["game/karaoke_mode"].i() && !m_song->hasControllers()) { //guitar track? display the score window anyway!
+	if (config["game/karaoke_mode"].ui() && !m_song->hasControllers()) { //guitar track? display the score window anyway!
 		if (!m_audio.isPlaying()) {
 			Game* gm = Game::getSingletonPtr();
 			gm->activateScreen("Playlist");
@@ -606,7 +606,7 @@ void ScreenSing::draw() {
 		else if (!m_audio.isPlaying() || (status == Song::Status::FINISHED
 		  && m_audio.getLength() - time <= (m_song->instrumentTracks.empty() && m_song->danceTracks.empty() ? 3.0 : 0.2) )) {
 			// Time to create the score window
-			m_quitTimer.setValue(config["game/results_timeout"].i());
+			m_quitTimer.setValue(config["game/results_timeout"].ui());
 			if (m_engine) m_engine->kill(); // kill the engine thread (to avoid consuming memory)
 			m_score_window = std::make_unique<ScoreWindow>(m_instruments, m_database);
 		}

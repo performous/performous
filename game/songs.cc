@@ -27,7 +27,7 @@
 Songs::Songs(Database & database, std::string const& songlist): 
   m_songlist(songlist), 
   m_database(database), 
-  m_order(config["songs/sort-order"].i()) {
+  m_order(config["songs/sort-order"].ui()) {
 	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
 	reload();
 }
@@ -316,7 +316,7 @@ class Songs::RestoreSel {
 	~RestoreSel() {
 		std::ptrdiff_t pos = 0;
 		if (auto song = m_sel.lock()) {
-			SongVector& f = m_s.m_filtered;
+			SongCollection& f = m_s.m_filtered;
 			auto it = std::find(f.begin(), f.end(), song);
 			if (it != f.end()) pos = it - f.begin();
 		}
@@ -342,7 +342,7 @@ void Songs::filter_internal() {
 	m_dirty = false;
 	RestoreSel restore(*this);
 	try {
-		auto filtered = SongCollection();
+		SongCollection filtered = SongCollection();
 		// if filter text is blank and no type filter is set, just display all songs.
 		if (m_filter == std::string() && m_type == 0) {
 			std::shared_lock<std::shared_mutex> l(m_mutex);
@@ -354,21 +354,21 @@ void Songs::filter_internal() {
 			
 			std::shared_lock<std::shared_mutex> l(m_mutex);
 			std::copy_if (m_songs.begin(), m_songs.end(), std::back_inserter(filtered), [&](std::shared_ptr<Song> it){
-			// Filter by type first.	
+			// Filter by type first.
 				if (m_type == 1 && !(*it).hasDance()) return false;
 				if (m_type == 2 && !(*it).hasVocals()) return false;
 				if (m_type == 3 && !(*it).hasDuet()) return false;
 				if (m_type == 4 && !(*it).hasGuitars()) return false;
 				if (m_type == 5 && !(*it).hasDrums() && !(*it).hasKeyboard()) return false;
 				if (m_type == 6 && (!(*it).hasVocals() || !(*it).hasGuitars() || (!(*it).hasDrums() && !(*it).hasKeyboard()))) return false;
-				
-		  // If search is not empty, filter by search term.	
+
+		  // If search is not empty, filter by search term.
 				if (!m_filter.empty()) {
 					icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8((*it).strFull()), &UnicodeUtil::m_dummyCollator, nullptr, icuError);
 					return (search.first(icuError) != USEARCH_DONE);
 					}
-					
-		// If we still haven't returned, it must be a type match with an empty search string.			
+
+		// If we still haven't returned, it must be a type match with an empty search string.
 				return true;
 			});
 		}
@@ -398,7 +398,7 @@ namespace {
 			return operator()(*left, *right);
 		}
 	};
-	
+
 	template<> class CmpByField<std::string> {
 		std::string Song::* m_field;
 		bool m_ascending;
@@ -448,7 +448,7 @@ void Songs::typeChange(SortChange diff) {
 	else {
 		int dir = to_underlying(diff);
 		m_type = static_cast<unsigned short>((m_type + dir) % types);
-		if (m_type < 0) m_type += types;
+		if (m_type >= types) m_type += types;
 	}
 	filter_internal();
 }
@@ -482,9 +482,9 @@ std::string Songs::getSortDescription() const {
 
 void Songs::sortChange(SortChange diff) {
 	m_order = static_cast<unsigned short>(m_order + to_underlying(diff)) % orders;
-	if (m_order < 0) m_order += orders;
+	if (m_order >= orders) m_order += orders;
 	RestoreSel restore(*this);
-	config["songs/sort-order"].i() = m_order;
+	config["songs/sort-order"].ui() = m_order;
 	switch (m_order) {
 		case 1:
 		 [[fallthrough]];
@@ -500,7 +500,7 @@ void Songs::sortChange(SortChange diff) {
 			if (U_FAILURE(collatorError)) {
 				std::clog << "sorting/error: Unable to change collator strength." << std::endl;
 			}
-			break;		
+			break;
 		}
 	sort_internal();
 	writeConfig(false);
@@ -510,7 +510,7 @@ void Songs::sortSpecificChange(unsigned short sortOrder, bool descending) {
 	if(sortOrder < orders) m_order = sortOrder;
 	else m_order = 0; 
 	RestoreSel restore(*this);
-	config["songs/sort-order"].i() = m_order;
+	config["songs/sort-order"].ui() = m_order;
 	sort_internal(descending);
 }
 
@@ -581,4 +581,3 @@ void Songs::dumpSongs_internal() const {
 	fs::create_directories(coverpath);
 	dumpXML(svec, m_songlist + "/songlist.xml");
 }
-

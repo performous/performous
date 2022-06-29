@@ -39,7 +39,7 @@ to save the current settings to XML.
 	</menu>
 
 	<!-- Gameplay preferences -->
-	<entry name="game/karaoke_mode" type="int" value="0">
+	<entry name="game/karaoke_mode" type="uint" value="0">
 		<limits>
 			<enum>Off</enum>
 			<enum>On - normal text</enum>
@@ -48,7 +48,7 @@ to save the current settings to XML.
 		<short>Karaoke mode</short>
 		<long>Hide pitch wave, notes and scoring.</long>
 	</entry>
-	<entry name="game/difficulty" type="int" value="0">
+	<entry name="game/difficulty" type="uint" value="0">
 		<limits>
 			<enum>Normal</enum>
 			<enum>Hard</enum>
@@ -58,7 +58,7 @@ to save the current settings to XML.
 		<long>Game difficulty.</long>
 	</entry>
 
-	<entry name="game/Textstyle" type="int" value="0">
+	<entry name="game/Textstyle" type="uint" value="0">
 		<limits>
 			<enum>Western mode</enum>
 			<enum>Asian mode</enum>
@@ -74,35 +74,35 @@ to save the current settings to XML.
 		<short>Pitch waves</short>
 		<long>Enable singing pitch display (when not in karaoke mode).</long>
 	</entry>
-	<entry name="game/theme" type="int" value="-1">
-		<limits min="-1" max="-1" step="0" />
+	<entry name="game/theme" type="uint" value="1337">
+		<limits min="1337" max="1337" step="0" />
 		<!-- Enum options added dynamically by scanning theme folders -->
 		<short>Theme</short>
 		<long>Name of the theme to use.</long>
 	</entry>
-	<entry name="game/playlist_screen_timeout" type="int" value="15">
+	<entry name="game/playlist_screen_timeout" type="uint" value="15">
 		<limits min="0" max="60" step="5" />
 		<short>Playlist screen timeout</short>
 		<long>How long it will take before the next song in the playlist starts automatically.</long>
 	</entry>
-	<entry name="game/results_timeout" type="int" value="5">
+	<entry name="game/results_timeout" type="uint" value="5">
 		<limits min="5" max="20" step="1" />
 		<short>Song results timeout</short>
 		<long>How long the scores will be displayed for after finishing a song.</long>
 	</entry>
-	<entry name="game/highscore_timeout" type="int" value="5">
+	<entry name="game/highscore_timeout" type="uint" value="5">
 		<limits min="0" max="30" step="5" />
 		<short>High-score timeout</short>
 		<long>How long the high-scores screen will wait for input before going to the next song.</long>
 	</entry>
-	<entry name="game/language" type="int" value="1337">
+	<entry name="game/language" type="uint" value="1337">
 		<limits>
 			<!-- enum options will be added dynamically according to detected interfaces. -->
 		</limits>
 		<short>Language</short>
 		<long>Language to show Performous in</long>
 	</entry>
-	<entry name="game/webserver_access" type="int" value="0">
+	<entry name="game/webserver_access" type="uint" value="0">
 		<limits>
 			<enum>Disabled</enum>
 			<enum>Localhost </enum>
@@ -115,19 +115,19 @@ to save the current settings to XML.
 		<short>Case-sensitive sorting.</short>
 		<long>Make a difference between uppercase and lowercase letters when sorting.</long>
 	</entry>
-	<entry name="game/webserver_port" type="int" value="8000">
+	<entry name="game/webserver_port" type="uint" value="8000">
 		<!-- maximum of 16 bit is 65536, so 60000 should be a nice upper-limit -->
 		<limits min="0" max="60000" step="1" />
 		<short>Webserver port</short>
 		<long>Port to use for the webserver. Choose one that is not used by other applications.</long>
 	</entry>
-	<entry name="game/webserver_fallback_port" type="int" value="8001">
+	<entry name="game/webserver_fallback_port" type="uint" value="8001">
 		<!-- maximum of 16 bit is 65536, so 60000 should be a nice upper-limit -->
 		<limits min="0" max="60000" step="1" />
 		<short>Webserver fallback port</short>
 		<long>Port to use in case original webserver port is in use. Choose one that you know for sure is not used by other applications.</long>
 	</entry>
-	<entry name="game/notegraphscalingmode" type="int" value="0">
+	<entry name="game/notegraphscalingmode" type="uint" value="0">
 		<limits>
 			<enum>Dynamic</enum>
 			<enum>Fixed</enum>
@@ -159,7 +159,7 @@ to save the current settings to XML.
 		<short>Keyboard as keytar</short>
 		<long>Enable keyboard as keytar.</long>
 	</entry>
-	<entry name="game/instrument0" type="int" value="0">
+	<entry name="game/instrument0" type="uint" value="0">
 		<limits>
 			<enum>Auto</enum>
 			<!-- Options added dynamically from controllers.xml -->
@@ -167,7 +167,7 @@ to save the current settings to XML.
 		<short>Force controller A's type</short>
 		<long>Override autodetection and force the first controller to the given type.</long>
 	</entry>
-	<entry name="game/instrument1" type="int" value="0">
+	<entry name="game/instrument1" type="uint" value="0">
 		<limits>
 			<enum>Auto</enum>
 			<!-- Options added dynamically from controllers.xml -->
@@ -175,7 +175,7 @@ to save the current settings to XML.
 		<short>Force controller B's type</short>
 		<long>Override autodetection and force the second controller to the given type.</long>
 	</entry>
-	<entry name="game/instrument2" type="int" value="0">
+	<entry name="game/instrument2" type="uint" value="0">
 		<limits>
 			<enum>Auto</enum>
 			<!-- Options added dynamically from controllers.xml -->
@@ -183,7 +183,7 @@ to save the current settings to XML.
 		<short>Force controller C's type</short>
 		<long>Override autodetection and force the third controller to the given type.</long>
 	</entry>
-	<entry name="game/instrument3" type="int" value="0">
+	<entry name="game/instrument3" type="uint" value="0">
 		<limits>
 			<enum>Auto</enum>
 			<!-- Options added dynamically from controllers.xml -->
@@ -270,7 +270,7 @@ to save the current settings to XML.
 		<short>Stereoscopic 3D</short>
 		<long>Enable 3D rendering of Performous.</long>
 	</entry>
-	<entry name="graphic/stereo3dtype" type="int" value="0">
+	<entry name="graphic/stereo3dtype" type="uint" value="0">
 		<limits>
 			<enum>Red/Cyan</enum>
 			<enum>Green/Magenta</enum>
@@ -293,7 +293,7 @@ to save the current settings to XML.
 		<short>Webcam background</short>
 		<long>Performous can use webcam as a background video. Disable it if Performous crashes while entering a song.</long>
 	</entry>
-	<entry name="graphic/webcamid" type="int" value="0">
+	<entry name="graphic/webcamid" type="uint" value="0">
 		<limits min="0" max="9" step="1" />
 		<short>Webcam id</short>
 		<long>Use 0 to autodetect or a number starting from 1 to choose specific device.</long>
@@ -322,7 +322,7 @@ to save the current settings to XML.
 		<short>Suggested latency</short>
 		<long>This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart.</long>
 	</entry>
-	<entry name="audio/backend" type="int" value="1337">
+	<entry name="audio/backend" type="uint" value="1337">
 		<limits>
 		<enum>Auto</enum>
 		<!-- enum options will be added dynamically according to detected interfaces. -->
@@ -356,19 +356,19 @@ to save the current settings to XML.
 		<short>Audio devices</short>
 		<long>List of audio devices to try.</long>
 	</entry>
-	<entry name="audio/preview_volume" type="int" value="70">
+	<entry name="audio/preview_volume" type="uint" value="70">
 		<ui unit=" %" />
 		<limits min="0" max="100" step="5" />
 		<short>Menu volume</short>
 		<long>The volume level of menus, song previews and jukebox mode.</long>
 	</entry>
-	<entry name="audio/music_volume" type="int" value="90">
+	<entry name="audio/music_volume" type="uint" value="90">
 		<ui unit=" %" />
 		<limits min="0" max="100" step="5" />
 		<short>Music volume</short>
 		<long>The ingame music volume. Values above 90 are not recommended as distortion may occur.</long>
 	</entry>
-	<entry name="audio/fail_volume" type="int" value="90">
+	<entry name="audio/fail_volume" type="uint" value="90">
 		<ui unit=" %" />
 		<limits min="0" max="100" step="5" />
 		<short>Failure volume</short>
@@ -420,7 +420,7 @@ to save the current settings to XML.
 		<long>System defaults are included automatically. Additional paths can be added here.</long>
 	</entry>
 	<!-- Song ordering -->
-	<entry name="songs/sort-order" type="int" value="0" hidden="true">
+	<entry name="songs/sort-order" type="uint" value="0" hidden="true">
 		<ui unit=" pixels" />
 		<limits min="0" max="6" step="1" />
 		<short>Sort order</short>

@@ -36,7 +36,7 @@ class LyricRow {
 		std::vector<TZoomText> sentence;
 		for (Iterator it = m_begin; it != m_end; ++it) {
 			sentence.push_back(TZoomText(it->syllable));
-			if(!config["game/Textstyle"].i()) {
+			if(!config["game/Textstyle"].ui()) {
 			bool current = (time >= it->begin && time < it->end);
 			sentence.back().factor = static_cast<float>(current ? 1.1 - 0.1 * (time - it->begin) / (it->end - it->begin) : 1.0); // Zoom-in and out while it's the current syllable.
 			} else {

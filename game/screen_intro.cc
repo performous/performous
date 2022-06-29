@@ -29,7 +29,7 @@ void ScreenIntro::enter() {
 		m_first = false;
 	}
 	reloadGL();
-	webserversetting = config["game/webserver_access"].i();
+	webserversetting = config["game/webserver_access"].ui();
 	m_audio.playSample("notice.ogg");
 }
 
@@ -91,6 +91,7 @@ void ScreenIntro::draw_menu_options() {
 	// Determine from which item to start
 	int start_i = std::min(static_cast<int>(m_menu.curIndex() - 1), static_cast<int>(opts.size() - showopts + (m_menu.getSubmenuLevel() == 2 ? 1 : 0))); // Hack to counter side-effects from displaying the value inside the menu
 	if (start_i < 0 || opts.size() == showopts) start_i = 0;
+
 	// Loop the currently visible options
 	for (unsigned i = static_cast<unsigned>(start_i), ii = 0; ii < showopts && i < static_cast<unsigned>(opts.size()); ++i, ++ii) {
 		MenuOption const& opt = opts[i];

@@ -39,6 +39,7 @@ ConfigItem& ConfigItem::incdec(int dir) {
 		int& val = std::get<int>(m_value);
 		int step = std::get<int>(m_step);
 		val = clamp(((val + dir * step)/ step) * step, std::get<int>(m_min), std::get<int>(m_max));
+	} else if (m_type == "uint") {
 		unsigned short& val = std::get<unsigned short>(m_value); 
 		int value = static_cast<int>(val);
 		int step = std::get<unsigned short>(m_step);
@@ -97,7 +98,8 @@ void ConfigItem::select(unsigned short i) { verifyType("option_list"); m_sel = c
 namespace {
 	template <typename T, typename VariantAll, typename VariantNum> std::string numericFormat(VariantAll const& value, VariantNum const& multiplier, VariantNum const& step) {
 		// Find suitable precision (not very useful for integers, but this code is generic...)
-		T s = std::abs<T>(std::get<T>(multiplier) * std::get<T>(step));
+		T m = std::get<T>(multiplier);
+		T s = std::abs<T>(m * std::get<T>(step));
 		int precision = 0;
 		while (s > static_cast<T>(0) && (s *= static_cast<T>(10)) < static_cast<T>(10)) ++precision;
 		// Not quite sure how to format this with FMT
@@ -147,8 +149,11 @@ std::string const ConfigItem::getValue() const {
 		return languageName;
 	}
 	if (m_type == "int") {
-		int val = std::get<int>(m_value);
 		return numericFormat<int>(m_value, m_multiplier, m_step) + _(m_unit);
+	}
+	if (m_type == "uint") {
+		unsigned val = ui();
+		if (val < m_enums.size()) return m_enums[val];
 		return numericFormat<unsigned short>(m_value, m_multiplier, m_step) + _(m_unit);
 	}
 	if (m_type == "float") return numericFormat<float>(m_value, m_multiplier, m_step) + _(m_unit);
@@ -159,8 +164,7 @@ std::string const ConfigItem::getValue() const {
 		return sl.size() == 1 ? "{" + sl[0] + "}" : fmt::format(_("{:d} items"), sl.size());
 	}
 	if (m_type == "option_list") {
-		if (m_sel <= -1) throw std::logic_error("Invalid option selected at index: " + std::to_string(m_sel));
-		return std::get<OptionList>(m_value).at(static_cast<size_t>(m_sel));
+		return std::get<OptionList>(m_value).at(m_sel);
 	}
 	throw std::logic_error("ConfigItem::getValue doesn't know type '" + m_type + "'");
 }
@@ -187,7 +191,7 @@ namespace {
 }
 
 void ConfigItem::addEnum(std::string name) {
-	verifyType("int");
+	verifyType("uint");
 	if (find(m_enums.begin(),m_enums.end(),name) == m_enums.end()) {
 		m_enums.push_back(name);
 	}
@@ -205,7 +209,7 @@ void ConfigItem::selectEnum(std::string const& name) {
 
 
 std::string const ConfigItem::getEnumName() const {
-	int val = i();
+	unsigned val = ui();
 	if (val < m_enums.size()) { return m_enums[val]; }
 	else { return std::string(); }
 }
@@ -245,6 +249,8 @@ void ConfigItem::update(xmlpp::Element& elem, unsigned mode) try {
 		m_longDesc = getText(elem, "long");
 	} else {
 		std::string type = getAttribute(elem, "type");
+		if (type == "int" && m_type == "uint") type = "uint"; // Convert old config values.
+		std::clog << "configuration/info: Converting config value: " + getAttribute(elem, "name") + ", to type uint." << std::endl;
 		if (!type.empty() && type != m_type) throw std::runtime_error("Entry type mismatch: " + getAttribute(elem, "name") + ": schema type = " + m_type + ", config type = " + type);
 	}
 	if (m_type == "bool") {
@@ -258,6 +264,8 @@ void ConfigItem::update(xmlpp::Element& elem, unsigned mode) try {
 		std::string value_string = getAttribute(elem, "value");
 		if (!value_string.empty()) m_value = std::stoi(value_string);
 		updateNumeric<int>(elem, mode);
+	} else if (m_type == "uint") {
+		std::string value_string = getAttribute(elem, "value");
 		if (!value_string.empty()) m_value = static_cast<unsigned short>(std::stoi(value_string));
 			// Enum handling
 			if (mode == 0) {
@@ -341,6 +349,7 @@ void writeConfig(bool system) {
 			}
 		}
 		else if (type == "int") entryNode->set_attribute("value",std::to_string(item.i()));
+		else if (type == "uint") entryNode->set_attribute("value",std::to_string(item.ui()));
 		else if (type == "bool") entryNode->set_attribute("value", item.b() ? "true" : "false");
 		else if (type == "float") entryNode->set_attribute("value",std::to_string(item.f()));
 		else if (item.get_type() == "string") xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(item.s());
@@ -482,7 +491,7 @@ void readConfig() {
 	// Populate themes
 	ConfigItem& ci = config["game/theme"];
 	for (std::string const& theme: getThemes()) ci.addEnum(theme);
-	if (ci.i() == -1) ci.selectEnum("default");  // Select the default theme if nothing is selected
+	if (ci.ui() == 1337) ci.selectEnum("default");  // Select the default theme if nothing is selected
 }
 
 void populateBackends (const std::list<std::string>& backendList) {

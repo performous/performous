@@ -19,7 +19,7 @@ void ScreenPlaylist::enter() {
 	gm->loading(_("Initializing webcam..."), 0.1f);
 	if (config["graphic/webcam"].b() && Webcam::enabled()) {
 		try {
-			m_cam = std::make_unique<Webcam>(config["graphic/webcamid"].i());
+			m_cam = std::make_unique<Webcam>(config["graphic/webcamid"].ui());
 		} catch (std::exception& e) { std::cout << e.what() << std::endl; };
 	}
 	m_audio.togglePause();
@@ -29,7 +29,7 @@ void ScreenPlaylist::enter() {
 		}
 	}
 	keyPressed = false;
-	auto timervalue = config["game/playlist_screen_timeout"].i();
+	auto timervalue = config["game/playlist_screen_timeout"].ui();
 	if(timervalue < 0.0) {
 		timervalue = 0.0;
 	}
@@ -337,7 +337,7 @@ void ScreenPlaylist::createSongListMenu() {
 		oss_playlist.str("");
 		count++;
 		totaldurationSeconds += static_cast<float>(song->getDurationSeconds());
-		totaldurationSeconds += static_cast<float>(config["game/playlist_screen_timeout"].i());
+		totaldurationSeconds += static_cast<float>(config["game/playlist_screen_timeout"].ui());
 	}
 	songlist_menu.add(MenuOption(_("View more options"),_("View general playlist settings"))).call([this]() {
 		createEscMenu();
