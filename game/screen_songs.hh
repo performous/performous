@@ -5,6 +5,7 @@
 #include "screen.hh"
 #include "theme.hh"
 #include "song.hh" // for MusicFiles class
+#include "songs.hh"
 #include "textinput.hh"
 #include "video.hh"
 #include "playlist.hh"
@@ -15,7 +16,6 @@
 class Audio;
 class Database;
 class Song;
-class Songs;
 class Texture;
 class ThemeSongs;
 
@@ -30,7 +30,7 @@ public:
 	void enter();
 	void exit();
 	void reloadGL();
-	void menuBrowse(int dir); ///< Left/Right on menu options
+	void menuBrowse(Songs::SortChange dir); ///< Left/Right on menu options
 	void manageEvent(SDL_Event event);
 	void manageEvent(input::NavEvent const& event);
 	Songs& getSongs() const { return m_songs; }
@@ -68,7 +68,8 @@ private:
 	std::unique_ptr<Texture> m_instrumentList;
 	std::unique_ptr<ThemeInstrumentMenu> m_menuTheme;
 	std::unordered_map<fs::path, std::unique_ptr<Texture>, FsPathHash> m_covers;
-	int m_menuPos, m_infoPos;
+	unsigned m_menuPos;
+	int m_infoPos;
 	bool m_jukebox;
 	Menu m_menu;
 };
