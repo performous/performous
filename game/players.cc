@@ -17,7 +17,7 @@ void Players::load(xmlpp::NodeSet const& n) {
 		if (!a_name) throw PlayersException("Attribute name not found");
 		xmlpp::Attribute* a_id = element.get_attribute("id");
 		if (!a_id) throw PlayersException("Attribute id not found");
-		PlayerId id;
+		std::optional<PlayerId> id;
 		try { id = std::stoi(a_id->get_value()); } catch (std::exception&) { }
 		xmlpp::NodeSet n2 = element.find("picture");
 		std::string picture;
@@ -48,23 +48,22 @@ void Players::update() {
 	if (m_dirty) filter_internal();
 }
 
-PlayerId Players::lookup(std::string const& name) const {
+std::optional<PlayerId> Players::lookup(std::string const& name) const {
 	for (auto const& p: m_players) {
 		if (p.name == name) return p.id;
 	}
 	return std::nullopt;
 }
 
-std::string Players::lookup(PlayerId id) const {
-	if (!id) return "Invalid Player ID";
+std::optional<std::string> Players::lookup(const PlayerId& id) const {
 	const auto it = m_players.find(PlayerItem(id));
 	if (it == m_players.end()) 
-		return "Unknown Player";
+		return std::nullopt;
 
 	return it->name;
 }
 
-void Players::addPlayer (std::string const& name, std::string const& picture, PlayerId id) {
+void Players::addPlayer (std::string const& name, std::string const& picture, std::optional<PlayerId> id) {
 	PlayerItem pi;
 	pi.name = name;
 	pi.picture = picture;
@@ -96,7 +95,7 @@ void Players::setFilter(std::string const& val) {
 	filter_internal();
 }
 
-unsigned Players::assign_id_internal() {
+PlayerId Players::assign_id_internal() {
 	const auto it = m_players.rbegin();
 	
 	if (it != m_players.rend() && it->id) 

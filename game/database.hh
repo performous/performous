@@ -69,7 +69,7 @@ private: // will be bypassed by above friend declaration
 public: // methods for database management
 
 	/**A facade for Players::addPlayer.*/
-	void addPlayer(std::string const& name, std::string const& picture = "", PlayerId id = std::nullopt);
+	void addPlayer(std::string const& name, std::string const& picture = "", std::optional<PlayerId> id = std::nullopt);
 	/**A facade for SongItems::addSong.*/
 	void addSong(std::shared_ptr<Song> s);
 	/**A facade for Hiscore::addHiscore.
