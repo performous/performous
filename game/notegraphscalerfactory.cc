@@ -6,7 +6,7 @@
 #include "configuration.hh"
 
 NoteGraphScalerPtr NoteGraphScalerFactory::create(VocalTrack const& vocal) const {
-    const auto scalingMode = config["game/notegraphscalingmode"].i();
+    const auto scalingMode = config["game/notegraphscalingmode"].ui();
 
     if(scalingMode == 0)
         return std::make_shared<DynamicNoteGraphScaler>();

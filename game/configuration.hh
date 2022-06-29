@@ -17,6 +17,7 @@ class ConfigItem {
 	ConfigItem() : m_sel() {};
 	explicit ConfigItem(bool bval);
 	explicit ConfigItem(int ival);
+	explicit ConfigItem(unsigned short uival);
 	explicit ConfigItem(float fval);
 	ConfigItem(std::string sval);
 	ConfigItem(OptionList opts);
@@ -28,6 +29,8 @@ class ConfigItem {
 	std::string get_type() const { return m_type; } ///< get the field type
 	int& i(); ///< Access integer item
 	int const& i() const; ///< Access integer item
+	unsigned short& ui(); ///< Access unsigned integer item
+	unsigned short const& ui() const; ///< Access unsigned integer item
 	bool& b(); ///< Access boolean item
 	float& f(); ///< Access floating-point item
 	std::string& s(); ///< Access string item
@@ -56,14 +59,15 @@ class ConfigItem {
 	std::string m_shortDesc;
 	std::string m_longDesc;
 
-	typedef std::variant<bool, int, float, std::string, StringList> Value;
+	typedef std::variant<bool, unsigned short, int, float, std::string, StringList> Value;
+// I wanted to allow actual conversion (where possible without changing values erroneously) between i() and ui() but it's not as simple to do as I thought. verifyType() is going bye-bye anyway, so maybe there's a better way to implement it properly with the eventual std::visit implementations.
 	bool isDefaultImpl(Value const& defaultValue) const;
 	Value m_value; ///< The current value
 	Value m_factoryDefaultValue; ///< The value from config schema
 	Value m_defaultValue; ///< The value from config schema or system config
 	std::string m_oldValue; ///< A previous value, as output by getValue().
 	std::vector<std::string> m_enums; ///< Enum value titles
-	std::variant<int, float> m_step, m_min, m_max, m_multiplier;
+	std::variant<int, unsigned short, float> m_step, m_min, m_max, m_multiplier;
 	std::string m_unit;
 	unsigned short m_sel;
 };

@@ -287,7 +287,7 @@ void Window::render(std::function<void (void)> drawFunc) {
 	glutil::GLErrorChecker glerror("Window::render");
 	ViewTrans trans;  // Default frustum
 	bool stereo = config["graphic/stereo3d"].b();
-	int type = config["graphic/stereo3dtype"].i();
+	unsigned type = config["graphic/stereo3dtype"].ui();
 
 	static bool warn3d = false;
 	if (!stereo) warn3d = false;

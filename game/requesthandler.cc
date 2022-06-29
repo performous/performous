@@ -137,7 +137,7 @@ void RequestHandler::Get(web::http::http_request request)
         request.reply(web::http::status_codes::OK, jsonRoot);
         return;
     } else if(path == "/api/getplaylistTimeout") {
-        request.reply(web::http::status_codes::OK, U(config["game/playlist_screen_timeout"].i()));
+        request.reply(web::http::status_codes::OK, U(config["game/playlist_screen_timeout"].ui()));
         return;
     } else {
         HandleFile(request);

@@ -34,7 +34,7 @@ void ScreenPlayers::enter() {
 	m_search.text.clear();
 	m_players.setFilter(m_search.text);
 	m_audio.fadeout();
-	m_quitTimer.setValue(config["game/highscore_timeout"].i());
+	m_quitTimer.setValue(config["game/highscore_timeout"].ui());
 	if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
 		Game::getSingletonPtr()->activateScreen("Playlist");
 	}

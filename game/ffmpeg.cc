@@ -40,7 +40,7 @@ namespace {
 
 AudioBuffer::uFvec AudioBuffer::makePreviewBuffer() {
 	uFvec fvec(new_fvec(static_cast<uint_t>(m_data.size() / 2)));
-	float previewVol = float(config["audio/preview_volume"].i()) / 100.0f;
+	float previewVol = float(config["audio/preview_volume"].ui()) / 100.0f;
 	{
 		std::lock_guard<std::mutex> l(m_mutex);
 		for (size_t rpos = 0, bpos = 0; rpos < m_data.size(); rpos += 2, bpos ++) {

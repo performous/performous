@@ -207,8 +207,8 @@ void mainLoop(std::string const& songlist) {
 void jstestLoop() {
 	try {
 		config["graphic/fullscreen"].b() = false;
-		config["graphic/window_width"].i() = 640;
-		config["graphic/window_height"].i() = 360;
+		config["graphic/window_width"].ui() = 640;
+		config["graphic/window_height"].ui() = 360;
 		Window window;
 		input::Controllers controllers;
 		controllers.enableEvents(true);

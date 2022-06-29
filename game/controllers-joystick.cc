@@ -76,10 +76,10 @@ void init() {
 		ci2.addEnum(title);
 		ci3.addEnum(title);
 		// Check for active items
-		if (i == ci0.i()-1) instruments.push_back("0:" + it->first);
-		if (i == ci1.i()-1) instruments.push_back("1:" + it->first);
-		if (i == ci2.i()-1) instruments.push_back("2:" + it->first);
-		if (i == ci3.i()-1) instruments.push_back("3:" + it->first);
+		if (i == ci0.ui()-1) instruments.push_back("0:" + it->first);
+		if (i == ci1.ui()-1) instruments.push_back("1:" + it->first);
+		if (i == ci2.ui()-1) instruments.push_back("2:" + it->first);
+		if (i == ci3.ui()-1) instruments.push_back("3:" + it->first);
 	}
 
 	// Check all forced instruments

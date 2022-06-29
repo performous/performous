@@ -49,6 +49,7 @@ struct UnlockGuard {
 	Lockable& m_mutex;
 };
 
+std::uint32_t stou(std::string const & str, size_t * idx = nullptr, int base = 10);
 
 /** Templated conversion from strongly typed enums to the underlying type. **/
 template <typename E>
