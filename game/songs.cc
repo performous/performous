@@ -11,6 +11,7 @@
 #include "platform.hh"
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdlib>
 #include <iostream>
 #include <regex>
@@ -273,14 +274,14 @@ void Songs::reload_internal(fs::path const& parent) {
 				std::clog << "songs/notice: Found song which was not in the cache: " << p.string() << std::endl;
 
 				std::shared_ptr<Song>s(new Song(p.parent_path(), p));
-				int AdditionalFileIndex = -1;
+				std::ptrdiff_t AdditionalFileIndex = -1;
 				{
 					std::shared_lock<std::shared_mutex> l(m_mutex);
-					for(unsigned int i = 0; i< m_songs.size(); i++) {
-						if(s->filename.extension() != m_songs[i]->filename.extension() && s->filename.stem() == m_songs[i]->filename.stem() &&
-							    s->title == m_songs[i]->title && s->artist == m_songs[i]->artist) {
-							std::clog << "songs/info: >>> Found additional song file: " << s->filename << " for: " << m_songs[i]->filename << std::endl;
-							AdditionalFileIndex = i;
+					for(auto const& song: m_songs) {
+						if(s->filename.extension() != song->filename.extension() && s->filename.stem() == song->filename.stem() &&
+							    s->title == song->title && s->artist == song->artist) {
+							std::clog << "songs/info: >>> Found additional song file: " << s->filename << " for: " << song->filename << std::endl;
+							AdditionalFileIndex = &song - &m_songs[0];
 						}
 					}
 				}
@@ -313,13 +314,13 @@ class Songs::RestoreSel {
 	/// constructor
 	RestoreSel(Songs& s): m_s(s), m_sel(s.currentPtr()) {}
 	~RestoreSel() {
-		int pos = 0;
+		std::ptrdiff_t pos = 0;
 		if (auto song = m_sel.lock()) {
-			auto& f = m_s.m_filtered;
+			SongVector& f = m_s.m_filtered;
 			auto it = std::find(f.begin(), f.end(), song);
 			if (it != f.end()) pos = it - f.begin();
 		}
-		m_s.math_cover.setTarget(pos, m_s.size());
+		m_s.math_cover.setTarget(pos, static_cast<std::ptrdiff_t>(m_s.size()));
 	}
 };
 
@@ -327,7 +328,7 @@ void Songs::update() {
 	if (m_dirty && m_updateTimer.get() > 0.5) filter_internal(); // Update with newly loaded songs
 	// A hack to move to the first song when the song screen is entered the first time
 	static bool first = true;
-	if (first) { first = false; math_cover.reset(); math_cover.setTarget(0, size()); }
+	if (first) { first = false; math_cover.reset(); math_cover.setTarget(0, static_cast<std::ptrdiff_t>(size())); }
 }
 
 void Songs::setFilter(std::string const& val) {
@@ -426,7 +427,7 @@ namespace {
 	/// A helper for easily constructing CmpByField objects
 	template <typename T> CmpByField<T> customComparator(T Song::*field, bool ascending) { return CmpByField<T>(field, ascending); }
 
-	static const int types = 7, orders = 8;
+	static const unsigned short types = 7, orders = 8;
 }
 
 std::string Songs::typeDesc() const {
@@ -442,20 +443,21 @@ std::string Songs::typeDesc() const {
 	throw std::logic_error("Internal error: unknown type filter in Songs::typeDesc");
 }
 
-void Songs::typeChange(int diff) {
-	if (diff == 0) m_type = 0;
+void Songs::typeChange(SortChange diff) {
+	if (diff == SortChange::RESET) m_type = 0;
 	else {
-		m_type = (m_type + diff) % types;
+		int dir = to_underlying(diff);
+		m_type = static_cast<unsigned short>((m_type + dir) % types);
 		if (m_type < 0) m_type += types;
 	}
 	filter_internal();
 }
 
-void Songs::typeCycle(int cat) {
-	static const int categories[types] = { 0, 1, 2, 2, 3, 3, 4 };
+void Songs::typeCycle(unsigned short cat) {
+	static const unsigned short categories[types] = { 0, 1, 2, 2, 3, 3, 4 };
 	// Find the next matching category
-	int type = 0;
-	for (int t = (categories[m_type] == cat ? m_type + 1 : 0); t < types; ++t) {
+	unsigned short type = 0;
+	for (unsigned short t = (categories[m_type] == cat ? m_type + 1 : 0); t < types; ++t) {
 		if (categories[t] == cat) { type = t; break; }
 	}
 	m_type = type;
@@ -478,10 +480,9 @@ std::string Songs::getSortDescription() const {
 	return str;
 }
 
-void Songs::sortChange(int diff) {
-	m_order = (m_order + diff) % orders;
-	if (m_order < 0) 
-		m_order += orders;
+void Songs::sortChange(SortChange diff) {
+	m_order = static_cast<unsigned short>(m_order + to_underlying(diff)) % orders;
+	if (m_order < 0) m_order += orders;
 	RestoreSel restore(*this);
 	config["songs/sort-order"].i() = m_order;
 	switch (m_order) {
@@ -505,14 +506,9 @@ void Songs::sortChange(int diff) {
 	writeConfig(false);
 }
 
-void Songs::sortSpecificChange(int sortOrder, bool descending) {
-	if(sortOrder < 0) 
-		m_order = 0;
-	else if(sortOrder < orders)
-		m_order = sortOrder;
-	else
-		m_order = 0;
-	
+void Songs::sortSpecificChange(unsigned short sortOrder, bool descending) {
+	if(sortOrder < orders) m_order = sortOrder;
+	else m_order = 0; 
 	RestoreSel restore(*this);
 	config["songs/sort-order"].i() = m_order;
 	sort_internal(descending);

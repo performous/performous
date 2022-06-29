@@ -3,6 +3,8 @@
 #include "animvalue.hh"
 #include "fs.hh"
 #include <atomic>
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <set>
@@ -30,19 +32,19 @@ class Songs {
 	/// array access
 	std::shared_ptr<Song> operator[](std::size_t pos) { return m_filtered[pos]; }
 	/// number of songs
-	int size() const { return m_filtered.size(); }
+	size_t size() const { return m_filtered.size(); }
 	/// true if empty
-	int empty() const { return m_filtered.empty(); }
+	bool empty() const { return m_filtered.empty(); }
 	/// advances to next song
 	void advance(int diff) {
-		int size = m_filtered.size();
+		std::ptrdiff_t size = static_cast<int>(m_filtered.size());
 		if (size == 0) return;  // Do nothing if no songs are available
-		int _current = (int(math_cover.getTarget()) + diff) % size;
+		std::ptrdiff_t _current = (math_cover.getTarget() + diff) % size;
 		if (_current < 0) _current += size;
 		math_cover.setTarget(_current, size);
 	}
 	/// get current id
-	int currentId() const { return math_cover.getTarget(); }
+	std::ptrdiff_t currentId() const { return math_cover.getTarget(); }
 	/// gets current position
 	double currentPosition() { return math_cover.getValue(); }
 	/// gets current velocity
@@ -50,27 +52,28 @@ class Songs {
 	/// sets margins for animation
 	void setAnimMargins(double left, double right) { math_cover.setMargins(left, right); }
 	/// @return current song
-	std::shared_ptr<Song> currentPtr() { return m_filtered.empty() ? std::shared_ptr<Song>() : m_filtered[math_cover.getTarget()]; }
+	std::shared_ptr<Song> currentPtr() { return m_filtered.empty() ? std::shared_ptr<Song>() : m_filtered[static_cast<size_t>(math_cover.getTarget())]; }
 	/// @return current song
-	Song& current() { return *m_filtered[math_cover.getTarget()]; }
+	Song& current() { return *m_filtered[static_cast<size_t>(math_cover.getTarget())]; }
 	/// @return current Song
-	Song const& current() const { return *m_filtered[math_cover.getTarget()]; }
+	Song const& current() const { return *m_filtered[static_cast<size_t>(math_cover.getTarget())]; }
 	/// filters songlist by regular expression
 	void setFilter(std::string const& regex);
 	/// Get the current song type filter number
-	int typeNum() const { return m_type; }
+	unsigned short typeNum() const { return m_type; }
 	/// Description of the current song type filter
 	std::string typeDesc() const;
+	enum class SortChange : int { BACK = -1, RESET = 0, FORWARD = 1};
 	/// Change song type filter (diff is normally -1 or 1; 0 has special meaning of reset)
-	void typeChange(int diff);
+	void typeChange(SortChange diff);
 	/// Cycle song type filters by filter category (0 = none, 1..4 = different categories)
-	void typeCycle(int cat);
-	int sortNum() const { return m_order; }
+	void typeCycle(unsigned short cat);
+	unsigned short sortNum() const { return m_order; }
 	/// Description of the current sort mode
 	std::string getSortDescription() const;
 	/// Change sorting mode (diff is normally -1 or 1)
-	void sortChange(int diff);
-	void sortSpecificChange(int sortOrder, bool descending = false);
+	void sortChange(SortChange diff);
+	void sortSpecificChange(unsigned short sortOrder, bool descending = false);
 	/// parses file into Song &tmp
 	void parseFile(Song& tmp);
 	std::atomic<bool> doneLoading{ false };
@@ -93,8 +96,8 @@ class Songs {
 	AnimAcceleration math_cover;
 	std::string m_filter;
 	Database & m_database;
-	int m_type = 0;
-	int m_order;  // Set by constructor
+	unsigned short m_type = 0;
+	unsigned short m_order;  // Set by constructor
 	void dumpSongs_internal() const;
 	void reload_internal();
 	void reload_internal(fs::path const& p);
