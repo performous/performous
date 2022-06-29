@@ -265,6 +265,13 @@ if (APPLE AND ${CMAKE_GENERATOR} STREQUAL "Xcode")
 	GDK_PIXBUF_MODULE_FILE=\"\";
 	LANG=\"${PERFORMOUS_LANG}.UTF-8\""
 	)
+	install (CODE
+	"SET(ENV{PATH} \"${PATH}\")
+	EXECUTE_PROCESS(
+		COMMAND \"${Performous_SOURCE_DIR}/osx-utils/performous-app-build.sh\" --xcode-bundle --no-clean --no-regenerate
+		COMMAND_ECHO STDOUT
+		)"
+	)
 endif()
 
 set_target_properties(performous PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)  # Store library paths in executable
