@@ -81,7 +81,7 @@ void ScreenSing::enter() {
 	gm->loading(_("Loading complete"), 1.0f);
 }
 
-void ScreenSing::prepareVoicesMenu(size_t moveSelectionTo) {
+void ScreenSing::prepareVoicesMenu(unsigned moveSelectionTo) {
 		VocalTracks const& tracks = m_song->vocalTracks;
 		m_menu.clear();
 		m_menu.add(MenuOption(_("Start"), _("Start performing"))).call([this]{ setupVocals(); });
@@ -119,7 +119,7 @@ void ScreenSing::setupVocals() {
 		//size_t players = (analyzers.empty() ? 1 : analyzers.size());  // Always at least 1; should be number of mics
 		std::set<VocalTrack*> shownTracks;  // Tracks to be included in layout_singer (stored by name for proper sorting and merging duplicates)
 		for (size_t player = 0; player < players(); ++player) {
-			VocalTrack* vocal = &m_song->getVocalTrack(m_vocalTracks[(m_duet.i() == 0 ? player : 0)].i());
+			VocalTrack* vocal = &m_song->getVocalTrack(static_cast<unsigned>(m_vocalTracks[(m_duet.i() == 0 ? player : 0)].i()));
 			selectedTracks.push_back(vocal);
 			shownTracks.insert(vocal);
 		}
@@ -137,8 +137,8 @@ void ScreenSing::setupVocals() {
 	bool sameVoice = true;
 	for (size_t player = 0; player < players(); ++player) {
 		ConfigItem& vocalTrack = m_vocalTracks[player];
-		if (player == 0) { m_selectedVocal = vocalTrack.i(); }
-		if (vocalTrack.i() != static_cast<int>(m_selectedVocal)) { sameVoice = false; break; }
+		if (player == 0) { m_selectedVocal = static_cast<unsigned>(vocalTrack.i()); }
+		if (vocalTrack.i() != m_selectedVocal) { sameVoice = false; break; }
 	}
 	m_singingDuet = (m_song->hasDuet() && m_duet.i() == 0 && players() > 1 && sameVoice != true);
 	m_audio.pause(false);
@@ -223,7 +223,7 @@ void ScreenSing::instrumentLayout(double time) {
 	std::map<std::string, CountSum> pitchbend; // Stream id to (count, sum)
 	for (Instruments::iterator it = m_instruments.begin(); it != m_instruments.end(); ++it, ++i) {
 		(*it)->engine();
-		(*it)->position((0.5f + i - 0.5f * count_alive) * iw, iw); // Do layout stuff
+		(*it)->position(static_cast<float>((0.5f + static_cast<float>(i) - 0.5f * static_cast<float>(count_alive)) * iw), static_cast<float>(iw)); // Do layout stuff
 		(*it)->draw(time);
 		{
 			CountSum& cs = volume[(*it)->getTrack()];
@@ -399,7 +399,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			dispInFlash(config["game/karaoke_mode"]);
 		}
 		if (key == SDL_SCANCODE_H) {
-			config["game/Textstyle"].i() ?  config["game/Textstyle"].i() = 0 : ++config["game/Textstyle"];
+			config["game/Textstyle"].i() ? config["game/Textstyle"].i() = 0 : ++config["game/Textstyle"].i();
 			dispInFlash(config["game/Textstyle"]);
 			}
 		if (key == SDL_SCANCODE_W) dispInFlash(++config["game/pitch"]); // Toggle pitch wave
@@ -490,7 +490,7 @@ bool ScreenSing::devCanParticipate(input::DevType const& devType) const {
 	if (devType == input::DevType::DANCEPAD && m_song->hasDance()) return true;
 	if (devType == input::DevType::GUITAR && m_song->hasGuitars()) return true;
 	if (devType == input::DevType::DRUMS && m_song->hasDrums()) return true;
-	return false;	
+	return false;
 }
 
 
@@ -538,11 +538,11 @@ void ScreenSing::draw() {
 
 	// Compute and draw the timer and the progressbar
 	{
-		unsigned t = clamp(time, 0.0, length);
+		unsigned t = static_cast<unsigned>(clamp(time, 0.0, length));
 		m_progress->dimensions.fixedWidth(0.4f).left(-0.5f).screenTop();
 		theme->timer.dimensions.screenTop(0.5f * m_progress->dimensions.h());
 		theme->songinfo.dimensions.screenBottom(-0.01f);
-		m_progress->draw(songPercent);
+		m_progress->draw(static_cast<float>(songPercent));
 
 		Song::SongSection section("error", 0);
 		std::string statustxt;
@@ -630,7 +630,7 @@ void ScreenSing::drawMenu() {
 	float w = m_menu.dimensions.w();
 	const float txth = th.option_selected.h();
 	const float step = txth * 0.85f;
-	const float h = m_menu.getOptions().size() * step + step;
+	const float h = static_cast<float>(m_menu.getOptions().size()) * step + step;
 	float y = -h * .5f + step;
 	float x = -w * .5f + step;
 	// Background

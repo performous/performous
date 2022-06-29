@@ -42,7 +42,7 @@ class ScreenSing: public Screen {
 	void prepare();
 	void draw();
 
-	size_t selectedVocalTrack() const { return m_selectedVocal; }
+	unsigned selectedVocalTrack() const { return m_selectedVocal; }
 	bool singingDuet() const { return m_singingDuet; }
 	void setupVocals();
 
@@ -62,7 +62,7 @@ class ScreenSing: public Screen {
 	void instrumentLayout(double time);
 	void createPauseMenu();
 	void drawMenu();
-	void prepareVoicesMenu(size_t moveSelectionTo = 0);
+	void prepareVoicesMenu(unsigned moveSelectionTo = 0);
 	bool devCanParticipate(input::DevType const& devType) const;
 	Audio& m_audio;
 	Database& m_database;
@@ -91,7 +91,7 @@ class ScreenSing: public Screen {
 	ConfigItem m_duet;
 	size_t players() const { auto& analyzers = m_audio.analyzers(); return (analyzers.empty() ? 1 : analyzers.size()); } // Always have at least one player to display lyrics and prevent crashes.
 	bool m_singingDuet;
-	size_t m_selectedVocal;
+	unsigned m_selectedVocal;
 	bool m_displayAutoPlay = false;
 	bool keyPressed = false;
 };
