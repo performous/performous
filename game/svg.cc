@@ -13,7 +13,7 @@
 #endif
 
 void loadSVG(Bitmap& bitmap, fs::path const& filename) {
-	double factor = config["graphic/svg_lod"].f();
+	float factor = config["graphic/svg_lod"].f();
 	// Try to load a cached PNG instead
 	if (cache::loadSVG(bitmap, filename, factor)) return;
 	std::clog << "image/debug: Loading SVG: " + filename.string() << std::endl;
@@ -30,7 +30,7 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 #if LIBRSVG_MAJOR_VERSION >= 2 && LIBRSVG_MINOR_VERSION >= 52
 	gdouble svg_width = 0, svg_height = 0;
 	rsvg_handle_get_intrinsic_size_in_pixels(svgHandle.get(), &svg_width, &svg_height);
-	bitmap.resize(static_cast<int>(svg_width * factor + 0.5), static_cast<int>(svg_height * factor + 0.5));
+	bitmap.resize(static_cast<int>(svg_width * factor + 0.5f), static_cast<int>(svg_height * factor + 0.5f));
 #else //functions are deprecated since 2.46
 	// Get SVG dimensions
 	RsvgDimensionData svgDimension;

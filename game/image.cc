@@ -125,7 +125,7 @@ void writePNG(fs::path const& filename, Bitmap const& img, unsigned stride) {
 	} cleanup(pngPtr, infoPtr);
 	infoPtr = png_create_info_struct(pngPtr);
 	if (!infoPtr) throw std::runtime_error("png_create_info_struct failed");
-	png_set_gAMA(pngPtr, infoPtr, img.linearPremul ? 1.0 : 2.2);
+	png_set_gAMA(pngPtr, infoPtr, img.linearPremul ? 1.0f : 2.2f);
 	// Write file
 	std::ofstream file(name, std::ios::binary);
 	writePNG_internal(pngPtr, infoPtr, file, img.width, img.height, colorType, rows);

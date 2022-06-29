@@ -244,7 +244,7 @@ void DanceGraph::engine() {
 		if (time < stop.first + stop.second) {  // Inside stop
 			time = stop.first;
 			if (!m_insideStop) {
-				m_popups.push_back(Popup(_("STOP!"),  Color(1.0, 0.8, 0.0), 2.0, m_popupText.get()));
+				m_popups.push_back(Popup(_("STOP!"),  Color(1.0f, 0.8f, 0.0f), 2.0f, m_popupText.get()));
 				m_insideStop = true;
 			}
 			outsideStop = false;
@@ -319,7 +319,7 @@ void DanceGraph::engine() {
 	if (m_streak >= getNextBigStreak(m_bigStreak)) {
 		m_bigStreak = getNextBigStreak(m_bigStreak);
 		m_popups.push_back(Popup(std::to_string(unsigned(m_bigStreak)) + "\n" + _("Streak!"),
-		  Color(1.0, 0.0, 0.0), 1.0, m_popupText.get()));
+		  Color(1.0f, 0.0f, 0.0f), 1.0f, m_popupText.get()));
 	}
 }
 
@@ -361,7 +361,7 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 
 namespace {
 	const float arrowSize = 0.4f; // Half width of an arrow
-	const float one_arrow_tex_w = 1.0 / 8.0; // Width of a single arrow in texture coordinates
+	const float one_arrow_tex_w = 1.0f / 8.0f; // Width of a single arrow in texture coordinates
 
 	/// Create a symmetric vertex pair for arrow drawing
 	void vertexPair(glutil::VertexArray& va, int arrow_i, float y, float ty) {
@@ -395,14 +395,14 @@ void DanceGraph::draw(double time) {
 		time -= stop.second;
 	}
 
-	Dimensions dimensions(1.0); // FIXME: bogus aspect ratio (is this fixable?)
-	dimensions.screenTop().middle(m_cx.get()).stretch(m_width.get(), 1.0);
-	ViewTrans view(0.5 * (dimensions.x1() + dimensions.x2()), 0.0, 0.75);  // Apply a per-player local perspective
+	Dimensions dimensions(1.0f); // FIXME: bogus aspect ratio (is this fixable?)
+	dimensions.screenTop().middle(m_cx.get()).stretch(m_width.get(), 1.0f);
+	ViewTrans view(0.5f * (dimensions.x1() + dimensions.x2()), 0.0f, 0.75f);  // Apply a per-player local perspective
 	{
 		using namespace glmath;
 		// Some matrix magic to get the viewport right
 		float temp_s = dimensions.w() / 8.0f; // Allow for 8 pads to fit on a track
-		Transform trans(translate(vec3(0.0f, dimensions.y1(), 0.0)) * scale(temp_s));
+		Transform trans(translate(vec3(0.0f, dimensions.y1(), 0.0f)) * scale(temp_s));
 
 		// Draw the "neck" graph (beat lines)
 		drawBeats(time);
@@ -525,10 +525,10 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 		}
 		if (!text.empty()) {
 			double sc = getScale() * 0.6 * arrowSize * (3.0 + glow);
-			Transform trans(glmath::translate(glmath::vec3(0.0, 0.0, 0.5 * glow))); // Slightly elevated
+			Transform trans(glmath::translate(glmath::vec3(0.0f, 0.0f, 0.5f * static_cast<float>(glow)))); // Slightly elevated
 			ColorTrans c(Color::alpha(std::sqrt(alpha)));
 			m_popupText->render(_(text));
-			m_popupText->dimensions().middle(x).center(time2y(0.0)).stretch(sc, sc/2.0);
+			m_popupText->dimensions().middle(x).center(time2y(0.0f)).stretch(static_cast<float>(sc), static_cast<float>(sc/2.0));
 			m_popupText->draw();
 		}
 	}
@@ -538,9 +538,9 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 void DanceGraph::drawInfo(double /*time*/, Dimensions dimensions) {
 	if (!menuOpen()) {
 		// Draw scores
-		m_text.dimensions.screenBottom(-0.35).middle(0.32 * dimensions.w());
+		m_text.dimensions.screenBottom(-0.35f).middle(0.32f * dimensions.w());
 		m_text.draw(std::to_string(unsigned(getScore())));
-		m_text.dimensions.screenBottom(-0.32).middle(0.32 * dimensions.w());
+		m_text.dimensions.screenBottom(-0.32f).middle(0.32f * dimensions.w());
 		m_text.draw(std::to_string(unsigned(m_streak)) + "/"
 		  + std::to_string(unsigned(m_longestStreak)));
 	}

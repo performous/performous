@@ -40,7 +40,7 @@ namespace {
 
 AudioBuffer::uFvec AudioBuffer::makePreviewBuffer() {
 	uFvec fvec(new_fvec(m_data.size() / 2));
-	float previewVol = float(config["audio/preview_volume"].i()) / 100.0;
+	float previewVol = float(config["audio/preview_volume"].i()) / 100.0f;
 	{
 		std::lock_guard<std::mutex> l(m_mutex);
 		for (size_t rpos = 0, bpos = 0; rpos < m_data.size(); rpos += 2, bpos ++) {
@@ -397,7 +397,7 @@ void AudioFFmpeg::processFrame(uFrame frame) {
 			(const uint8_t**)&frame->data[0], frame->nb_samples);
 	// The output is now an interleaved array of 16-bit samples
 	if (m_position_in_48k_frames == -1) {
-		m_position_in_48k_frames = m_position * m_rate + 0.5;
+		m_position_in_48k_frames = static_cast<int64_t>(m_position * m_rate + 0.5f);
 	}
 	handleAudioData(output, out_samples * AUDIO_CHANNELS, m_position_in_48k_frames * AUDIO_CHANNELS /* pass in samples */);
 	av_freep(&output);

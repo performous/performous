@@ -46,7 +46,7 @@ Video::~Video() {
 	m_grabber.get();
 }
 
-Video::Video(fs::path const& _videoFile, double videoGap): m_videoGap(videoGap), m_textureTime(), m_alpha(-0.5, 1.5) {
+Video::Video(fs::path const& _videoFile, double videoGap): m_videoGap(videoGap), m_textureTime(), m_alpha(-0.5f, 1.5f) {
 	m_grabber = std::async(std::launch::async, [this, file = _videoFile] {
 		try {
 			auto ffmpeg = std::make_unique<VideoFFmpeg>(file, [this](auto f) { this->push(std::move(f)); });
@@ -108,8 +108,8 @@ void Video::render(double time) {
 	time += m_videoGap;
 	double tdist = std::abs(m_textureTime - time);
 	m_alpha.setTarget(tdist < 0.4 ? 1.2f : -0.5f);
-	double alpha = clamp(m_alpha.get());
-	if (alpha == 0.0) return;
+	float alpha = clamp(m_alpha.get());
+	if (alpha == 0.0f) return;
 	ColorTrans c(Color::alpha(alpha));
 	m_texture.draw();
 }

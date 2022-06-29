@@ -57,8 +57,8 @@ namespace {
 	}
 }
 
-OpenGLText::OpenGLText(TextStyle& _text, double m) {
-	m *= 2.0;  // HACK to improve text quality without affecting compatibility with old versions
+OpenGLText::OpenGLText(TextStyle& _text, float m) {
+	m *= 2.0f;  // HACK to improve text quality without affecting compatibility with old versions
 	// Setup font settings
 	PangoAlignment alignment = parseAlignment(_text.fontalign);
 	std::shared_ptr<PangoFontDescription> desc(
@@ -68,7 +68,7 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	pango_font_description_set_style(desc.get(), parseStyle(_text.fontstyle));
 	pango_font_description_set_family(desc.get(), _text.fontfamily.c_str());
 	pango_font_description_set_absolute_size(desc.get(), _text.fontsize * PANGO_SCALE * m);
-	double border = _text.stroke_width * m;
+	float border = _text.stroke_width * m;
 	// Setup Pango context and layout
 	std::shared_ptr<PangoContext> ctx(
 	  pango_font_map_create_context(pango_cairo_font_map_get_default()),
@@ -98,16 +98,16 @@ OpenGLText::OpenGLText(TextStyle& _text, double m) {
 	cairo_push_group_with_content (dc.get(), CAIRO_CONTENT_COLOR_ALPHA);
 	cairo_set_operator(dc.get(),CAIRO_OPERATOR_SOURCE);
 	// Add Pango line and path to proper position on the DC
-	cairo_move_to(dc.get(), 0.5 * border, 0.5 * border);  // Margins needed for border stroke to fit in
+	cairo_move_to(dc.get(), 0.5f * border, 0.5f * border);  // Margins needed for border stroke to fit in
 	pango_cairo_update_layout(dc.get(), layout.get());
 	pango_cairo_layout_path(dc.get(), layout.get());
 	// Render text
-	if (_text.fill_col.a > 0.0) {
+	if (_text.fill_col.a > 0.0f) {
 		cairo_set_source_rgba(dc.get(), _text.fill_col.r, _text.fill_col.g, _text.fill_col.b, _text.fill_col.a);
 		cairo_fill_preserve(dc.get());
 	}
 	// Render text border
-	if (_text.stroke_col.a > 0.0) {
+	if (_text.stroke_col.a > 0.0f) {
 		// Use proper line-joins and caps.
 		cairo_set_line_join (dc.get(), _text.LineJoin());
 		cairo_set_line_cap (dc.get(), _text.LineCap());
@@ -142,7 +142,7 @@ void OpenGLText::draw(Dimensions &_dim, TexCoords &_tex) {
 }
 
 namespace {
-	void parseTheme(fs::path const& themeFile, TextStyle &_theme, double &_width, double &_height, double &_x, double &_y, SvgTxtTheme::Align& _align) {
+	void parseTheme(fs::path const& themeFile, TextStyle &_theme, float &_width, float &_height, float &_x, float &_y, SvgTxtTheme::Align& _align) {
 		xmlpp::Node::PrefixNsMap nsmap;
 		nsmap["svg"] = "http://www.w3.org/2000/svg";
 		xmlpp::DomParser dom(themeFile.string());
@@ -150,12 +150,12 @@ namespace {
 		auto n = dom.get_document()->get_root_node()->find("/svg:svg/@width",nsmap);
 		if (n.empty()) throw std::runtime_error("Unable to find text theme info width in "+themeFile.string());
 		xmlpp::Attribute& width = dynamic_cast<xmlpp::Attribute&>(*n[0]);
-		_width = std::stod(width.get_value());
+		_width = std::stof(width.get_value());
 		// Parse height attribute
 		n = dom.get_document()->get_root_node()->find("/svg:svg/@height",nsmap);
 		if (n.empty()) throw std::runtime_error("Unable to find text theme info height in "+themeFile.string());
 		xmlpp::Attribute& height = dynamic_cast<xmlpp::Attribute&>(*n[0]);
-		_height = std::stod(height.get_value());
+		_height = std::stof(height.get_value());
 		// Parse text style attribute (CSS rules)
 		n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@style",nsmap);
 		if (n.empty()) throw std::runtime_error("Unable to find text theme info style in "+themeFile.string());
@@ -195,17 +195,17 @@ namespace {
 		n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@x",nsmap);
 		if (n.empty()) throw std::runtime_error("Unable to find text theme info x in "+themeFile.string());
 		xmlpp::Attribute& x = dynamic_cast<xmlpp::Attribute&>(*n[0]);
-		_x = std::stod(x.get_value());
+		_x = std::stof(x.get_value());
 		n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@y",nsmap);
 		if (n.empty()) throw std::runtime_error("Unable to find text theme info y in "+themeFile.string());
 		xmlpp::Attribute& y = dynamic_cast<xmlpp::Attribute&>(*n[0]);
-		_y = std::stod(y.get_value());
+		_y = std::stof(y.get_value());
 	}
 }
 
-SvgTxtThemeSimple::SvgTxtThemeSimple(fs::path const& themeFile, double factor) : m_factor(factor) {
+SvgTxtThemeSimple::SvgTxtThemeSimple(fs::path const& themeFile, float factor) : m_factor(factor) {
 	SvgTxtTheme::Align a;
-	double tmp;
+	float tmp;
 	parseTheme(themeFile, m_text, tmp, tmp, tmp, tmp, a);
 }
 
@@ -221,13 +221,13 @@ void SvgTxtThemeSimple::draw() {
 	m_opengl_text->draw();
 }
 
-SvgTxtTheme::SvgTxtTheme(fs::path const& themeFile, double factor): m_align(),m_factor(factor) {
+SvgTxtTheme::SvgTxtTheme(fs::path const& themeFile, float factor): m_align(), m_factor(factor) {
 	parseTheme(themeFile, m_text, m_width, m_height, m_x, m_y, m_align);
-	dimensions.stretch(0.0, 0.0).middle(-0.5 + m_x / m_width).center((m_y - 0.5 * m_height) / m_width);
+	dimensions.stretch(0.0f, 0.0f).middle(-0.5f + m_x / m_width).center((m_y - 0.5f * m_height) / m_width);
 }
 
 void SvgTxtTheme::setHighlight(fs::path const& themeFile) {
-	double a,b,c,d;
+	float a,b,c,d;
 	Align e;
 	parseTheme(themeFile, m_text_highlight, a, b, c, d, e);
 }
@@ -236,7 +236,7 @@ void SvgTxtTheme::draw(std::string _text) {
 	std::vector<TZoomText> tmp;
 	TZoomText t;
 	t.string = _text;
-	t.factor = 1.0;
+	t.factor = 1.0f;
 	tmp.push_back(t);
 	draw(tmp);
 }
@@ -254,42 +254,42 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool lyrics) {
 			m_opengl_text.push_back(std::move(openGlPtr));
 		}
 	}
-	double text_x = 0.0;
-	double text_y = 0.0;
+	float text_x = 0.0f;
+	float text_y = 0.0f;
 	// First compute maximum height and whole length
 	for (size_t i = 0; i < _text.size(); i++ ) {
 		text_x += m_opengl_text[i]->x();
 		text_y = std::max(text_y, m_opengl_text[i]->y());
 	}
 
-	double texture_ar = text_x / text_y;
-	m_texture_width = std::min(0.96, text_x / targetWidth); // targetWidth is defined in video_driver.cc, it's the base rendering width, used to project the svg onto a gltexture. currently we're targeting 1366x768 as base resolution.
+	float texture_ar = text_x / text_y;
+	m_texture_width = std::min(0.96f, text_x / targetWidth); // targetWidth is defined in video_driver.cc, it's the base rendering width, used to project the svg onto a gltexture. currently we're targeting 1366x768 as base resolution.
 	
-	double position_x = dimensions.x1();
-	if (m_align == Align::CENTER) position_x -= 0.5 * m_texture_width;
+	if (m_align == Align::CENTER) position_x -= 0.5f * m_texture_width;
 	if (m_align == Align::RIGHT) position_x -= m_texture_width;
+	float position_x = dimensions.x1();
 
-	if ((position_x + m_texture_width) > 0.48) { 
-		m_texture_width = (0.48 - position_x);
+	if ((position_x + m_texture_width > 0.48f)) { 
+		m_texture_width = (0.48f - position_x) ;
 	}
 	m_texture_height = m_texture_width / texture_ar; // Keep aspect ratio.
 	for (size_t i = 0; i < _text.size(); i++) {
-		double syllable_x = m_opengl_text[i]->x();
-		double syllable_width = syllable_x *  m_texture_width / text_x * _text[i].factor;
-		double syllable_height = m_texture_height * _text[i].factor;
-		double syllable_ar = syllable_width / syllable_height;
+		float syllable_x = m_opengl_text[i]->w();
+		float syllable_width = syllable_x *  m_texture_width / text_x * _text[i].factor;
+		float syllable_height = m_texture_height * _text[i].factor;
+		float syllable_ar = syllable_width / syllable_height;
 		Dimensions dim(syllable_ar);
 		dim.fixedHeight(m_texture_height).center(dimensions.y1());
-		dim.middle(position_x + 0.5 * dim.w());
+		dim.middle(position_x + 0.5f * dim.w());
 		TexCoords tex;
-		double factor = _text[i].factor;
-		if (factor > 1.0) {
+		float factor = _text[i].factor;
+		if (factor > 1.0f) {
 			LyricColorTrans lc(m_text.fill_col, m_text.stroke_col, m_text_highlight.fill_col, m_text_highlight.stroke_col);
 			dim.fixedWidth(dim.w() * factor);
 			m_opengl_text[i]->draw(dim, tex);
 		} 
 		else { m_opengl_text[i]->draw(dim, tex); }
-		position_x += (syllable_width / factor) * (lyrics ? 1.1 : 1.0);
+		position_x += (syllable_width / factor) * (lyrics ? 1.1f : 1.0f);
 	}
 }
 

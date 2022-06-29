@@ -22,6 +22,14 @@ namespace SongParserUtil {
 			throw std::runtime_error ("\"" + str + "\" is not valid unsigned integer value");
 		}
 	}
+	void assign (float& var, std::string str) {
+		std::replace (str.begin(), str.end(), ',', '.');  // Fix decimal separators
+		try {
+			var = std::stof (str);
+		} catch (...) {
+			throw std::runtime_error ("\"" + str + "\" is not valid floating point value");
+		}
+	}
 	void assign (double& var, std::string str) {
 		std::replace (str.begin(), str.end(), ',', '.');  // Fix decimal separators
 		try {
@@ -74,7 +82,7 @@ SongParser::SongParser(Song& s): m_song(s) {
 		// Header already parsed?
 		if (s.loadStatus == Song::LoadStatus::HEADER) {
 			if (!s.m_bpms.empty()) {
-				double bpm = (15 / s.m_bpms.front().step);
+				float bpm = (15 / s.m_bpms.front().step);
 				s.m_bpms.clear();
 				addBPM(0, bpm);
 			}
@@ -292,9 +300,9 @@ Song::BPM SongParser::getBPM(Song const& s, double ts) const {
 	throw std::runtime_error("No BPM definition prior to this note...");
 }
 
-void SongParser::addBPM(double ts, double bpm) {
+void SongParser::addBPM(double ts, float bpm) {
 	Song& s = m_song;
-	if (!(( bpm >= 1.0) && ( bpm < 1e12) )) { throw std::runtime_error("Invalid BPM value"); }
+	if (!(( bpm >= 1.0f) && ( bpm < 1e12) )) { throw std::runtime_error("Invalid BPM value"); }
 	if (!s.m_bpms.empty() && ( s.m_bpms.back().ts >= ts) ) {
 		if (s.m_bpms.back().ts < ts) { throw std::runtime_error("Invalid BPM timestamp"); }
 		s.m_bpms.pop_back();	// Some ITG songs contain repeated BPM definitions...

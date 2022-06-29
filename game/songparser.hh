@@ -16,6 +16,8 @@ namespace SongParserUtil {
 	void assign(unsigned& var, std::string const& str);
 	/// Parse a double from string and assign it to a variable
 	void assign(double& var, std::string str);
+	/// Parse a float from string and assign it to a variable
+	void assign(float& var, std::string str);
 	/// Parse a boolean from string and assign it to a variable
 	void assign(bool& var, std::string const& str);
 	/// Erase last character if it matches
@@ -35,7 +37,7 @@ private:
 	unsigned m_linenum = 0;
 	bool m_relative = false;
 	double m_gap = 0.0;
-	double m_bpm = 0.0;
+	float m_bpm = 0.0f;
 	unsigned m_tsPerBeat = 0;  ///< The ts increment per beat
 	unsigned m_tsEnd = 0;  ///< The ending ts of the song
 	enum class CurrentSinger { P1, P2, BOTH } m_curSinger = CurrentSinger::P1;
@@ -52,7 +54,7 @@ private:
 	void guessFiles();
 	bool getline (std::string& line) { ++m_linenum; return (bool) std::getline (m_ss, line); }
 	Song::BPM getBPM(Song const& s, double ts) const;
-	void addBPM(double ts, double bpm);
+	void addBPM(double ts, float bpm);
 	double tsTime(double ts) const;  ///< Convert a timestamp (beats) into time (seconds)
 	bool txtCheck(std::string const& data) const;
 	void txtParseHeader();

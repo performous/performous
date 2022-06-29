@@ -50,7 +50,7 @@ class DanceGraph: public InstrumentGraph {
 	void drawBeats(double time);
 	void drawNote(DanceNote& note, double time);
 	void drawInfo(double time, Dimensions dimensions);
-	void drawArrow(int arrow_i, Texture& tex, float ty1 = 0.0, float ty2 = 1.0);
+	void drawArrow(int arrow_i, Texture& tex, float ty1 = 0.0f, float ty2 = 1.0f);
 
 	// Helpers
 	float panel2x(int i) const { return getScale() * (-(m_pads * 0.5f) + m_arrow_map[i] + 0.5f); } /// Get x for an arrow line
