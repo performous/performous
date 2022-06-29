@@ -9,13 +9,12 @@
 #include <stdexcept>
 
 bool Hiscore::reachedHiscore(unsigned score, SongId songid, unsigned short level, std::string const& track) const {
-	if (!songid) return false;
 	if (score > 10000) throw std::logic_error("Invalid score value");
 	if (score < 2000) return false; // come on, did you even try to sing?
 
 	unsigned position = 0;
 	for (auto const& elem: m_hiscore) {
-		if (elem.songid != songid.value()) continue;
+		if (elem.songid != songid) continue;
 		if (elem.track != track) continue;
 		if (elem.level != level) continue;
 		if (score > elem.score) return true; // seems like you are in top 3!
@@ -27,10 +26,10 @@ bool Hiscore::reachedHiscore(unsigned score, SongId songid, unsigned short level
 void Hiscore::addHiscore(unsigned score, const PlayerId& playerid, SongId songid, unsigned short level, std::string const& track) {
 	if (track.empty()) throw std::runtime_error("No track given");
 	if (!reachedHiscore(score, songid, level, track)) return;
-	m_hiscore.insert(HiscoreItem(score, playerid, songid.value(), level, track));
+	m_hiscore.insert(HiscoreItem(score, playerid, songid, level, track));
 }
 
-Hiscore::HiscoreVector Hiscore::queryHiscore(std::optional<PlayerId> playerid, SongId songid, std::string const& track, std::optional<unsigned> max) const {
+Hiscore::HiscoreVector Hiscore::queryHiscore(std::optional<PlayerId> playerid, std::optional<SongId> songid, std::string const& track, std::optional<unsigned> max) const {
 	HiscoreVector hv;
 	for (auto const& h: m_hiscore) {
 		if (playerid && playerid.value() != h.playerid) continue;
@@ -43,9 +42,8 @@ Hiscore::HiscoreVector Hiscore::queryHiscore(std::optional<PlayerId> playerid, S
 	return hv;
 }
 
-bool Hiscore::hasHiscore(SongId songid) const {
-	if (!songid) return false;
-	return std::any_of(m_hiscore.begin(),m_hiscore.end(), [songid, level = currentLevel()](auto const& h) { return (songid.value() == h.songid && level == h.level); });
+bool Hiscore::hasHiscore(const SongId &songid) const {
+	return std::any_of(m_hiscore.begin(),m_hiscore.end(), [&songid, level = currentLevel()](auto const& h) { return songid == h.songid && level == h.level; });
 }
 
 unsigned Hiscore::getHiscore(unsigned songid) const {

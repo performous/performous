@@ -32,11 +32,9 @@ void SongItems::save(xmlpp::Element* songs) {
 	}
 }
 
-unsigned SongItems::addSongItem(std::string const& artist, std::string const& title, SongId _id) {
+SongId SongItems::addSongItem(std::string const& artist, std::string const& title, std::optional<SongId> _id) {
 	SongItem si;
-	unsigned id;
-	id = _id.value_or(assign_id_internal());
-	si.id = id;
+	si.id = _id.value_or(assign_id_internal());
 	songMetadata collateInfo {{"artist", artist}, {"title", title}};
 	UnicodeUtil::collate(collateInfo);		
 	si.artist = collateInfo["artist"];
@@ -51,10 +49,8 @@ unsigned SongItems::addSongItem(std::string const& artist, std::string const& ti
 }
 
 void SongItems::addSong(std::shared_ptr<Song> song) {
-	SongId id = lookup(song);
-	if (!id) id = addSongItem(song->artist, song->title);
 	SongItem si;
-	si.id = id.value();
+	si.id = lookup(song).value_or(addSongItem(song->artist, song->title));;
 	auto it = m_songs.find(si);
 	if (it == m_songs.end()) throw SongItemsException("Cant find song which was added just before");
 	// it->song.reset(song); // does not work, it is a read only structure...
@@ -68,7 +64,7 @@ void SongItems::addSong(std::shared_ptr<Song> song) {
 	m_songs.insert(si);
 }
 
-SongId SongItems::lookup(Song const& song) const {
+std::optional<SongId> SongItems::lookup(Song const& song) const {
 	auto const& si = std::find_if(m_songs.begin(), m_songs.end(), [song](SongItem const& si) {
 		return UnicodeUtil::toLower(song.collateByArtistOnly) == UnicodeUtil::toLower(si.artist) && UnicodeUtil::toLower(song.collateByTitleOnly) == UnicodeUtil::toLower(si.title);
 	});
@@ -76,17 +72,16 @@ SongId SongItems::lookup(Song const& song) const {
 	return std::nullopt;
 }
 
-std::string SongItems::lookup(SongId id) const {
+std::optional<std::string> SongItems::lookup(const SongId &id) const {
 	SongItem si;
-	if (!id) return "Invalid song ID";
-	si.id = id.value();
+	si.id = id;
 	auto it = m_songs.find(si);
-	if (it == m_songs.end()) return "Unknown Song";
+	if (it == m_songs.end()) return std::nullopt;
 	else if (!it->song) return it->artist + " - " + it->title;
 	else return it->song->artist + " - " + it->song->title;
 }
 
-unsigned SongItems::assign_id_internal() const {
+SongId SongItems::assign_id_internal() const {
 	// use the last one with highest id
 	auto it = m_songs.rbegin();
 	if (it != m_songs.rend()) return it->id+1;
