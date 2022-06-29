@@ -2,12 +2,10 @@
 #include "song.hh"
 #include "engine.hh" // just for Engine::TIMESTEP
 
-PlayerId PlayerItem::UndefinedPlayerId{size_t(-1)};
-
 Player::Player(VocalTrack& vocal, Analyzer& analyzer, size_t frames):
 	  m_vocal(vocal), m_analyzer(analyzer), m_pitch(frames, std::make_pair(getNaN(),
 	  -getInf())), m_pos(), m_score(), m_noteScore(), m_lineScore(), m_maxLineScore(),
-	  m_prevLineScore(-1), m_feedbackFader(0.0, 2.0), m_activitytimer(),
+	  m_prevLineScore(-1.0), m_feedbackFader(0.0, 2.0), m_activitytimer(),
 	  m_scoreIt(m_vocal.notes.begin())
 {
 	// Initialize note powers
@@ -18,7 +16,7 @@ Player::Player(VocalTrack& vocal, Analyzer& analyzer, size_t frames):
 
 void Player::update() {
 	if (m_pos == m_pitch.size()) return; // End of song already
-	double beginTime = Engine::TIMESTEP * m_pos;
+	double beginTime = Engine::TIMESTEP * static_cast<double>(m_pos);
 	// Get the currently sung tone and store it in player's pitch data (also control inactivity timer)
 	Tone const* t = m_analyzer.findTone();
 	if (t) {
@@ -28,12 +26,12 @@ void Player::update() {
 		if (m_activitytimer > 0) --m_activitytimer;
 		m_pitch[m_pos++] = std::make_pair(getNaN(), -getInf());
 	}
-	double endTime = Engine::TIMESTEP * m_pos;
+	double endTime = Engine::TIMESTEP * static_cast<double>(m_pos);
 	// Iterate over all the notes that are considered for this timestep
 	while (m_scoreIt != m_vocal.notes.end()) {
 		if (endTime < m_scoreIt->begin) break;  // The note begins later than on this timestep
 		// If tone was detected, calculate score
-		m_scoreIt->power *= std::pow(0.05, m_scoreIt->clampDuration(beginTime, endTime));  // Fade glow
+		m_scoreIt->power *= static_cast<float>(std::pow(0.05, m_scoreIt->clampDuration(beginTime, endTime)));  // Fade glow
 		if (t) {
 			double note = MusicalScale(m_vocal.scale).setFreq(t->freq).getNote();
 			// Add score
@@ -79,13 +77,10 @@ void Player::calcRowRank() {
 			m_prevLineScore /= m_maxLineScore;
 			m_feedbackFader.setValue(1.0);
 		} else {
-			m_prevLineScore = -1;
+			m_prevLineScore = -1.0;
 		}
 		m_lineScore = 0;
 	}
 }
 
-PlayerItem::PlayerItem(PlayerId id) 
-: id(id)
-{
-}
+PlayerItem::PlayerItem(PlayerId _id) { if (_id) id = _id.value(); }

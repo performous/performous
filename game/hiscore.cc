@@ -8,13 +8,14 @@
 #include <sstream>
 #include <stdexcept>
 
-bool Hiscore::reachedHiscore(unsigned score, unsigned songid, unsigned level, std::string const& track) const {
+bool Hiscore::reachedHiscore(unsigned score, SongId songid, unsigned short level, std::string const& track) const {
+	if (!songid) return false;
 	if (score > 10000) throw std::logic_error("Invalid score value");
 	if (score < 2000) return false; // come on, did you even try to sing?
 
 	unsigned position = 0;
 	for (auto const& elem: m_hiscore) {
-		if (elem.songid != songid) continue;
+		if (elem.songid != songid.value()) continue;
 		if (elem.track != track) continue;
 		if (elem.level != level) continue;
 		if (score > elem.score) return true; // seems like you are in top 3!
@@ -23,28 +24,29 @@ bool Hiscore::reachedHiscore(unsigned score, unsigned songid, unsigned level, st
 	return true; // nothing found for that song -> true
 }
 
-void Hiscore::addHiscore(unsigned score, unsigned playerid, unsigned songid, unsigned level, std::string const& track) {
+void Hiscore::addHiscore(unsigned score, PlayerId playerid, SongId songid, unsigned short level, std::string const& track) {
 	if (track.empty()) throw std::runtime_error("No track given");
 	if (!reachedHiscore(score, songid, level, track)) return;
-	m_hiscore.insert(HiscoreItem(score, playerid, songid, level, track));
+	m_hiscore.insert(HiscoreItem(score, playerid, songid.value(), level, track));
 }
 
-Hiscore::HiscoreVector Hiscore::queryHiscore(unsigned max, unsigned playerid, unsigned songid, std::string const& track) const {
+Hiscore::HiscoreVector Hiscore::queryHiscore(PlayerId playerid, SongId songid, std::string const& track, std::optional<unsigned> max) const {
 	HiscoreVector hv;
 	for (auto const& h: m_hiscore) {
-		if (playerid != unsigned(-1) && playerid != h.playerid) continue;
-		if (songid != unsigned(-1) && songid != h.songid) continue;
+		if (playerid && playerid.value() != h.playerid) continue;
+		if (songid && songid.value() != h.songid) continue;
 		if (currentLevel() != h.level) continue;
 		if (!track.empty() && track != h.track) continue;
-		if (--max == 0) break;
+		if (max && --max.value() == 0) break;
 		hv.push_back(h);
 	}
 	return hv;
 }
 
-bool Hiscore::hasHiscore(unsigned songid) const {
-	for (auto const& h: m_hiscore) if (songid == h.songid && currentLevel() == h.level) return true;
-	return false;
+bool Hiscore::hasHiscore(SongId songid) const {
+	if (!songid) return false;
+	auto const& hiscore = std::find_if(m_hiscore.begin(),m_hiscore.end(), [songid, level = currentLevel()](auto const& h) { return (songid.value() == h.songid && level == h.level); });
+	return (hiscore != m_hiscore.end());
 }
 
 unsigned Hiscore::getHiscore(unsigned songid) const {
@@ -67,15 +69,15 @@ void Hiscore::load(xmlpp::NodeSet const& nodes) {
 
 
 
-		int playerid = std::stoi(a_playerid->get_value());
-		int songid = std::stoi(a_songid->get_value());
-		unsigned level = 0;
+		PlayerId playerid = stou(a_playerid->get_value());
+		SongId songid = stou(a_songid->get_value());
+		unsigned short level = 0;
 		if (a_level)
-			level = std::stoi(a_level->get_value());
+			level = static_cast<unsigned short>(stou(a_level->get_value()));
 
 		auto tn = xmlpp::get_first_child_text(element);
 		if (!tn) throw std::runtime_error("Score not found");
-		int score = std::stoi(tn->get_content());
+		unsigned score = stou(tn->get_content());
 
 		addHiscore(score, playerid, songid, level, a_track ? a_track->get_value() : "vocals");
 	}
@@ -83,8 +85,9 @@ void Hiscore::load(xmlpp::NodeSet const& nodes) {
 
 void Hiscore::save(xmlpp::Element *hiscores) {
 	for (auto const& h: m_hiscore) {
+		if (!h.playerid) continue;
 		xmlpp::Element* hiscore = xmlpp::add_child_element(hiscores, "hiscore");
-		hiscore->set_attribute("playerid", std::to_string(h.playerid));
+		hiscore->set_attribute("playerid", std::to_string(h.playerid.value()));
 		hiscore->set_attribute("songid", std::to_string(h.songid));
 		hiscore->set_attribute("track", h.track);
 		hiscore->set_attribute("level", std::to_string(h.level));
@@ -92,6 +95,6 @@ void Hiscore::save(xmlpp::Element *hiscores) {
 	}
 }
 
-unsigned Hiscore::currentLevel() const {
+unsigned short Hiscore::currentLevel() const {
 	return config["game/difficulty"].ui();
 }

@@ -5,6 +5,7 @@
 #include "notes.hh"
 #include "animvalue.hh"
 
+#include <optional>
 #include <string>
 #include <vector>
 #include <utility>
@@ -52,8 +53,8 @@ struct Player {
 	/// player activity singing
 	float activity() const { return static_cast<float>(m_activitytimer / 300.0); }
 	/// get player's score
-	int getScore() const {
-		return 10000.0 * m_score;
+	unsigned getScore() const {
+		return static_cast<unsigned>(10000.0 * m_score);
 	}
 	/**Operator for sorting by score.*/
 	bool operator < (Player const& other) const
@@ -62,7 +63,7 @@ struct Player {
 	}
 };
 
-using PlayerId = size_t;
+using PlayerId = std::optional<unsigned>;
 
 /** Static Information of a player, not
   dependent from current song.
@@ -70,12 +71,10 @@ using PlayerId = size_t;
   Used for Players Management.
   */
 struct PlayerItem {
-    constexpr static PlayerId UndefinedPlayerId = -1;
-
     PlayerItem() = default;
     PlayerItem(PlayerId);
     
-	PlayerId id; ///< unique identifier for this PlayerItem, Link to hiscore
+	unsigned id; ///< unique identifier for this PlayerItem, Link to hiscore
 
 	std::string name; ///< name displayed and used for searching the player
 	fs::path picture; ///< the filename which was passed from xml (and is written back)
@@ -89,6 +88,7 @@ struct PlayerItem {
 	 Provides ordering and ensures id is unique.*/
 	bool operator< (PlayerItem const& pi) const
 	{
+		if (!pi.id) return false;
 		return id < pi.id;
 	}
 

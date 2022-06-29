@@ -17,7 +17,7 @@ void Players::load(xmlpp::NodeSet const& n) {
 		if (!a_name) throw PlayersException("Attribute name not found");
 		xmlpp::Attribute* a_id = element.get_attribute("id");
 		if (!a_id) throw PlayersException("Attribute id not found");
-		int id = -1;
+		PlayerId id;
 		try { id = std::stoi(a_id->get_value()); } catch (std::exception&) { }
 		xmlpp::NodeSet n2 = element.find("picture");
 		std::string picture;
@@ -48,31 +48,28 @@ void Players::update() {
 	if (m_dirty) filter_internal();
 }
 
-int Players::lookup(std::string const& name) const {
+PlayerId Players::lookup(std::string const& name) const {
 	for (auto const& p: m_players) {
 		if (p.name == name) return p.id;
 	}
-
-	return -1;
+	return std::nullopt;
 }
 
 std::string Players::lookup(PlayerId id) const {
+	if (!id) return "Invalid Player ID";
 	const auto it = m_players.find(PlayerItem(id));
+	if (it == m_players.end()) 
+		return "Unknown Player";
 
-    if (it == m_players.end()) 
-        return "Unknown Player";
-
-    return it->name;
+	return it->name;
 }
 
 void Players::addPlayer (std::string const& name, std::string const& picture, PlayerId id) {
 	PlayerItem pi;
-	pi.id = id;
 	pi.name = name;
 	pi.picture = picture;
 
-	if (pi.id == PlayerItem::UndefinedPlayerId) 
-        pi.id = assign_id_internal();
+	if (!id) pi.id = assign_id_internal();
 
 	if (pi.picture != "") // no picture, so don't search path
 	{
@@ -99,13 +96,13 @@ void Players::setFilter(std::string const& val) {
 	filter_internal();
 }
 
-PlayerId Players::assign_id_internal() {
+unsigned Players::assign_id_internal() {
 	const auto it = m_players.rbegin();
 	
-    if (it != m_players.rend()) 
-        return it->id+1;
+	if (it != m_players.rend() && it->id) 
+		return it->id + 1;
 	
-    return 0;
+	return 0;
 }
 
 void Players::filter_internal() {
@@ -129,7 +126,7 @@ void Players::filter_internal() {
 	math_cover.reset();
 
 	// Restore old selection
-	int pos = 0;
+	std::ptrdiff_t pos = 0;
 	if (selection.name != "") {
 		auto it = std::find(m_filtered.begin(), m_filtered.end(), selection);
 		math_cover.setTarget(0, 0);
@@ -138,27 +135,25 @@ void Players::filter_internal() {
 	math_cover.setTarget(pos, count());
 }
 
-PlayerItem Players::operator[](std::size_t pos) const {
+PlayerItem Players::operator[](unsigned pos) const {
     if (pos < count()) 
         return m_filtered[pos];
     
     return PlayerItem();
 }
 
-void Players::advance(int diff) {
-    const auto size = count();
-    if (size == 0) 
-        return; // Do nothing if no songs are available
-    auto current = 0;
-    if(size > 0)
-        current = (int(math_cover.getTarget()) + diff) % size;
-    if (current < 0) 
+void Players::advance(std::ptrdiff_t diff) {
+    const unsigned size = count();
+    if (size == 0) return; // Do nothing if no players are available
+    std::ptrdiff_t current = 0;
+        current = (static_cast<std::ptrdiff_t>(math_cover.getTarget()) + diff) % size;
+    if (current < 0)
         current += count();
     math_cover.setTarget(current, count());
 }
 
 PlayerItem Players::current() const {
-    if (math_cover.getTarget() < static_cast<std::ptrdiff_t>(m_filtered.size())) return m_filtered[static_cast<size_t>(math_cover.getTarget())];
+    if (math_cover.getTarget() < static_cast<ptrdiff_t>(m_filtered.size())) return m_filtered[static_cast<unsigned>(math_cover.getTarget())];
     
     return PlayerItem();
 }
