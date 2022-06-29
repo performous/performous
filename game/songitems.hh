@@ -19,11 +19,11 @@ struct SongItemsException: public std::runtime_error {
 	{}
 };
 
-using SongId = std::optional<unsigned>;
+using SongId = unsigned;
 
 struct SongItem
 {
-	unsigned id = 0; ///< The unique id for every song
+	SongId id = 0; ///< The unique id for every song
 
 	/** This data is stored separate because it is read in before
 	  the song is added.
@@ -67,7 +67,7 @@ public:
 	  There will be no check if artist and title already exist - if you
 	  need that you want addSong().
 	 */
-	unsigned addSongItem(std::string const& artist, std::string const& title, SongId id = std::nullopt);
+	SongId addSongItem(std::string const& artist, std::string const& title, std::optional<SongId> id = std::nullopt);
 	/**Adds or Links an already existing song with an songitem.
 
 	  The id will be assigned and artist and title will be filled in.
@@ -83,18 +83,18 @@ public:
 
 	/**Lookup a songid for a specific song.
 	  @return a value only if a song was found.*/
-	SongId lookup(std::shared_ptr<Song> song) const { if (song) return lookup(*song); return std::nullopt; };
-	SongId lookup(Song const& song) const;
+	std::optional<SongId> lookup(std::shared_ptr<Song> song) const { if (song) return lookup(*song); return std::nullopt; };
+	std::optional<SongId> lookup(Song const& song) const;
 
 	/**Lookup the artist + title for a specific song.
 	  @return "Unknown Song" if nothing is found.
 	  */
-	std::string lookup (SongId id) const;
+	std::optional<std::string> lookup (const SongId& id) const;
 
 	std::size_t size() const { return m_songs.size(); }
 
 private:
-	unsigned assign_id_internal() const;
+	SongId assign_id_internal() const;
 
 	typedef std::set<SongItem> songs_t;
 	songs_t m_songs;
