@@ -49,7 +49,7 @@ void Database::save() {
 	}
 }
 
-void Database::addPlayer(std::string const& name, std::string const& picture, PlayerId id) {
+void Database::addPlayer(std::string const& name, std::string const& picture, std::optional<PlayerId> id) {
 	m_players.addPlayer(name, picture, id);
 }
 
@@ -58,7 +58,12 @@ void Database::addSong(std::shared_ptr<Song> s) {
 }
 
 void Database::addHiscore(std::shared_ptr<Song> s) {
-	PlayerId playerid = m_players.lookup(m_players.current().name);
+	auto maybe_playerid = m_players.lookup(m_players.current().name);
+	if (!maybe_playerid.has_value()) {
+		std::cerr << "database/error: cannot find player ID for player '" + m_players.current().name << "'\n";
+		return;
+	}
+	auto playerid = maybe_playerid.value();
 	unsigned score = scores.front().score;
 	std::string track = scores.front().track;
 	const SongId songid = m_songs.lookup(s);
@@ -74,10 +79,10 @@ void Database::addHiscore(std::shared_ptr<Song> s) {
 
 bool Database::reachedHiscore(std::shared_ptr<Song> s) const {
 	const SongId songid = m_songs.lookup(s);
-    
+
 	if(!songid.has_value())
 		return false;
-    
+
 	unsigned score = scores.front().score;
 	const auto track = scores.front().track;
 	SongId songid = m_songs.lookup(s);
@@ -93,7 +98,7 @@ void Database::queryOverallHiscore(std::ostream & os, std::string const& track) 
 	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore (std::nullopt, std::nullopt, track, 10);
 	for (size_t i=0; i < hi.size(); ++i) {
 		os << i+1 << ".\t"
-		   << m_players.lookup(hi[i].playerid) << "\t"
+		   << m_players.lookup(hi[i].playerid).value_or("Unknown player Id " + std::to_string(hi[i].playerid)) << "\t"
 		   << m_songs.lookup(hi[i].songid) << "\t"
 		// << hi[i].track << "\t"
 		   << hi[i].score << "\n";
@@ -110,14 +115,14 @@ void Database::queryPerSongHiscore(std::ostream & os, std::shared_ptr<Song> s, s
 	for (auto const& hiv: scoresByTrack) {
 		os << hiv.first << ":\n";
 		for (auto const& hi: hiv.second) {
-			os << "\t" << hi.score << "\t" << m_players.lookup(hi.playerid) << "\n";
+			os << "\t" << hi.score << "\t" << m_players.lookup(hi.playerid).value_or("Unknown player Id " + std::to_string(hi.playerid)) << "\n";
 		}
 		os << "\n";
 	}
 }
 
 void Database::queryPerPlayerHiscore(std::ostream & os, std::string const& track) const {
-	PlayerId playerid = m_players.lookup(m_players.current().name);
+	std::optional<PlayerId> playerid = m_players.lookup(m_players.current().name);
 	std::vector<HiscoreItem> hi = m_hiscores.queryHiscore(playerid, std::nullopt, track, 3);
 
 	for (size_t i=0; i < hi.size(); ++i) {

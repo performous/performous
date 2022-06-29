@@ -51,15 +51,15 @@ class Players {
 	void update();
 
 	/// lookup a playerid using the players name
-	PlayerId lookup(std::string const& name) const;
+	std::optional<PlayerId> lookup(std::string const& name) const;
 
 	/** lookup a players name using the playerid.
-	  @return the players name or "Unknown Player"
+	  @return an optional with the players
 	  */
-	std::string lookup(PlayerId id) const;
+	std::optional<std::string> lookup(const PlayerId &id) const;
 
 	/// add a player with a displayed name and an optional picture; if no id is given one will be assigned
-	void addPlayer (std::string const& name, std::string const& picture = "", PlayerId id = std::nullopt);
+	void addPlayer (std::string const& name, std::string const& picture = "", std::optional<PlayerId> id = std::nullopt);
 
 	/// const array access
 	PlayerItem operator[](unsigned pos) const;
@@ -68,7 +68,7 @@ class Players {
 	/// advances to next player
 	void advance(std::ptrdiff_t diff);
 	/// get current id
-	PlayerId currentId() const { return static_cast<unsigned>(math_cover.getTarget()); }
+	std::optional<PlayerId> currentId() const { return static_cast<unsigned>(math_cover.getTarget()); }
 	/// gets current position
 	double currentPosition() { return math_cover.getValue(); }
 	/// gets current velocity
@@ -81,7 +81,7 @@ class Players {
 	void setFilter(std::string const& regex);
   
 private:
-	unsigned assign_id_internal(); /// returns the next available id
+	PlayerId assign_id_internal(); /// returns the next available id
 	void filter_internal();
 	static UErrorCode m_icuError;
 	static icu::RuleBasedCollator icuCollator;

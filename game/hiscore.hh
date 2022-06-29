@@ -36,13 +36,13 @@ public:
 	  in its valid interval. If one of this conditions is not net a
 	  HiscoreException will be raised.
 	  */
-	void addHiscore(unsigned score, PlayerId playerid, SongId songid, unsigned short level, std::string const& track);
+	void addHiscore(unsigned score, const PlayerId& playerid, SongId songid, unsigned short level, std::string const& track);
 
 	using HiscoreVector = std::vector<HiscoreItem>;
 
 	/// This queries the database for a sorted vector of highscores. The defaults mean to query everything.
 	/// @param max limits the number of elements returned.
-	HiscoreVector queryHiscore(PlayerId playerid, SongId songid, std::string const& track, std::optional<unsigned> max = std::nullopt) const;
+	HiscoreVector queryHiscore(std::optional<PlayerId> playerid, SongId songid, std::string const& track, std::optional<unsigned> max = std::nullopt) const;
 	bool hasHiscore(SongId songid) const;
 	unsigned getHiscore(unsigned songid) const;
 	std::size_t size() const { return m_hiscore.size(); }

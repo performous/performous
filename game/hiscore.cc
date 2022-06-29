@@ -24,13 +24,13 @@ bool Hiscore::reachedHiscore(unsigned score, SongId songid, unsigned short level
 	return true; // nothing found for that song -> true
 }
 
-void Hiscore::addHiscore(unsigned score, PlayerId playerid, SongId songid, unsigned short level, std::string const& track) {
+void Hiscore::addHiscore(unsigned score, const PlayerId& playerid, SongId songid, unsigned short level, std::string const& track) {
 	if (track.empty()) throw std::runtime_error("No track given");
 	if (!reachedHiscore(score, songid, level, track)) return;
 	m_hiscore.insert(HiscoreItem(score, playerid, songid.value(), level, track));
 }
 
-Hiscore::HiscoreVector Hiscore::queryHiscore(PlayerId playerid, SongId songid, std::string const& track, std::optional<unsigned> max) const {
+Hiscore::HiscoreVector Hiscore::queryHiscore(std::optional<PlayerId> playerid, SongId songid, std::string const& track, std::optional<unsigned> max) const {
 	HiscoreVector hv;
 	for (auto const& h: m_hiscore) {
 		if (playerid && playerid.value() != h.playerid) continue;
@@ -86,7 +86,7 @@ void Hiscore::save(xmlpp::Element *hiscores) {
 	for (auto const& h: m_hiscore) {
 		if (!h.playerid) continue;
 		xmlpp::Element* hiscore = xmlpp::add_child_element(hiscores, "hiscore");
-		hiscore->set_attribute("playerid", std::to_string(h.playerid.value()));
+		hiscore->set_attribute("playerid", std::to_string(h.playerid));
 		hiscore->set_attribute("songid", std::to_string(h.songid));
 		hiscore->set_attribute("track", h.track);
 		hiscore->set_attribute("level", std::to_string(h.level));

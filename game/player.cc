@@ -82,5 +82,3 @@ void Player::calcRowRank() {
 		m_lineScore = 0;
 	}
 }
-
-PlayerItem::PlayerItem(PlayerId _id) { if (_id) id = _id.value(); }

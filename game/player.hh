@@ -63,7 +63,7 @@ struct Player {
 	}
 };
 
-using PlayerId = std::optional<unsigned>;
+using PlayerId = unsigned;
 
 /** Static Information of a player, not
   dependent from current song.
@@ -71,10 +71,10 @@ using PlayerId = std::optional<unsigned>;
   Used for Players Management.
   */
 struct PlayerItem {
-    PlayerItem() = default;
-    PlayerItem(PlayerId);
-    
-	unsigned id; ///< unique identifier for this PlayerItem, Link to hiscore
+	PlayerItem() = default;
+	PlayerItem(const PlayerId& _id) : id{_id} {}
+
+	PlayerId id; ///< unique identifier for this PlayerItem, Link to hiscore
 
 	std::string name; ///< name displayed and used for searching the player
 	fs::path picture; ///< the filename which was passed from xml (and is written back)
@@ -88,7 +88,6 @@ struct PlayerItem {
 	 Provides ordering and ensures id is unique.*/
 	bool operator< (PlayerItem const& pi) const
 	{
-		if (!pi.id) return false;
 		return id < pi.id;
 	}
 
