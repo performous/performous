@@ -26,6 +26,14 @@ static inline bool operator>=(Tone const& lhs, Tone const& rhs) { return lhs.fre
 static inline bool operator<(Tone const& lhs, Tone const& rhs) { return lhs.freq < rhs.freq && lhs != rhs; }
 static inline bool operator>(Tone const& lhs, Tone const& rhs) { return lhs.freq > rhs.freq && lhs != rhs; }
 
+struct Peak {
+	double freq, power;
+	Peak(double _freq = 0.0, double _power = 0.0): freq(_freq), power(_power) {}
+};
+
+/// list of peaks
+typedef std::vector<Peak> peaks_t;
+
 static const unsigned FFT_P = 10;
 static const std::size_t FFT_N = 1 << FFT_P;
 
@@ -110,6 +118,7 @@ private:
 	double m_peak;
 	tones_t m_tones;
 	mutable double m_oldfreq;
+	peaks_t calcPeaks();
 	bool calcFFT();
 	void calcTones();
 	void mergeWithOld(tones_t& tones) const;

@@ -74,14 +74,6 @@ void Analyzer::output(float* begin, float* end, double rate) {
 	}
 }
 
-
-namespace {
-	struct Peak {
-		double freq, power;
-		Peak(double _freq = 0.0, double _power = 0.0): freq(_freq), power(_power) {}
-	};
-}
-
 bool Analyzer::calcFFT() {
 	float pcm[FFT_N];
 	// Read FFT_N samples, move forward by m_step samples
@@ -98,7 +90,7 @@ bool Analyzer::calcFFT() {
 	return true;
 }
 
-double a_weight(double freq) {
+static double a_weight(double freq) {
 	// Adapted from https://en.wikipedia.org/wiki/A-weighting
 	double f2 = freq * freq;
 	constexpr double a = 12194.0 * 12194.0;
@@ -108,55 +100,8 @@ double a_weight(double freq) {
 	return 1.25 * a * f2 * f2 / ((f2 + b) * std::sqrt((f2 + c) * (f2 + d)) * (f2 + a));
 }
 
-void Analyzer::calcTones() {
-	// Precalculated constants
-	const double freqPerBin = m_rate / FFT_N;
-	const double stepRate = m_rate / m_step;  // Steps per second
-	const double phaseStep = double(m_step) / FFT_N;
-	const double normCoeff = 1.0 / FFT_N;
-	const double minMagnitude = pow(10, -80.0 / 20.0) / normCoeff; // -80 dB noise cut
-	// Limit frequency range of processing
-	const size_t kMin = std::max(size_t(1), size_t(FFT_MINFREQ / freqPerBin));
-	const size_t kMax = std::min(FFT_N / 2, size_t(FFT_MAXFREQ / freqPerBin));
-	std::vector<Peak> peaks;  // <freq, power>
-	for (size_t k = kMin; k <= kMax; ++k) {
-		double magnitude = std::abs(m_fft[k]);
-		double phase = std::arg(m_fft[k]) / TAU;
-		double delta = phase - m_fftLastPhase[k];
-		m_fftLastPhase[k] = phase;
-		if (magnitude < minMagnitude) continue;
-		// Use phase difference over a step to calculate what the frequency must be
-		double freq = stepRate * (std::round(k * phaseStep - delta) + delta);
-		if (freq > FFT_MINFREQ && std::abs(freq / freqPerBin - k) <= 1.5) {  // +- 1.5 bins allowed
-			magnitude *= a_weight(freq);
-			if (magnitude > minMagnitude) peaks.emplace_back(freq, magnitude * magnitude);
-		}
-	}
-	// Group multiple bins' identical frequencies together by total power
-	{
-		std::sort(peaks.begin(), peaks.end(), [](Peak const& p1, Peak const& p2) {
-			return p1.freq < p2.freq;
-		});
-		std::vector<Peak> p;
-		double freqSum = 0.0, powerSum = 0.0;
-		for (auto [freq, power] : peaks) {
-			if (powerSum > 0.0 && abs(freq / (freqSum / powerSum) - 1.0) > 0.03 /* +- quartertone */) {
-				p.emplace_back(freqSum / powerSum, powerSum);
-				freqSum = powerSum = 0.0;
-			}
-			freqSum += power * freq;
-			powerSum += power;
-		}
-		if (powerSum > 0.0) p.emplace_back(freqSum / powerSum, powerSum);
-		std::sort(p.begin(), p.end(), [](Peak const& p1, Peak const& p2) {
-			return p1.power > p2.power;
-		});
-		if (p.size() > 12) p.resize(12);
-		peaks = std::move(p);
-	}
-	double totalPower = 0.0;
-	for (auto const& p : peaks) totalPower += p.power;
-	/* Debug logging
+// Detailed logging for debugging purposes
+static void logPeaks(peaks_t const& peaks) {
 	if (!peaks.empty()) {
 		std::ostringstream oss;
 		for (auto p : peaks) {
@@ -164,26 +109,98 @@ void Analyzer::calcTones() {
 		}
 		std::clog << "pitch/debug: Peaks" + oss.str() + "\n" << std::flush;
 	}
-	*/
+}
+
+// Logging for debugging purposes
+static void logTones(Analyzer::tones_t const& tones) {
+	if (!tones.empty()) {
+		std::ostringstream oss;
+		for (auto t : tones) {
+			oss << " " << std::round(t.freq) << "Hz/" << std::round(t.db) << "dB";
+		}
+		std::clog << "pitch/debug: Tones"  + oss.str() + "\n" << std::flush;
+	}
+}
+
+peaks_t Analyzer::calcPeaks() {
+	// Precalculated constants
+	const double minMagnitude = pow(10, -80.0 / 20.0);  // early -80 dB noise cut
+	const double freqPerBin = m_rate / FFT_N;
+	const double stepRate = m_rate / m_step;  // Steps per second
+	const double phaseStep = double(m_step) / FFT_N;
+	// Limit frequency range of processing
+	const size_t kMin = std::max(size_t(1), size_t(FFT_MINFREQ / freqPerBin));
+	const size_t kMax = std::min(FFT_N / 2, size_t(FFT_MAXFREQ / freqPerBin));
+	peaks_t peaks;
+	for (size_t k = kMin; k <= kMax; ++k) {
+		double magnitude = std::abs(m_fft[k]);
+		double phase = std::arg(m_fft[k]) / TAU;
+		double delta = phase - m_fftLastPhase[k];
+		m_fftLastPhase[k] = phase;
+		if (magnitude < minMagnitude) continue;
+		// Use phase difference over a step to calculate what the frequency must be
+		double cycles = std::round(k * phaseStep - delta) + delta;  // Cycles per step
+		if (std::abs(cycles - k * phaseStep) >= 0.5) continue;  // Avoid aliasing to far-away bins
+		double freq = cycles * stepRate;
+		if (freq < FFT_MINFREQ) continue;
+		magnitude *= a_weight(freq);
+		double power = magnitude * magnitude;
+		peaks.emplace_back(freq, power);
+	}
+	return peaks;
+}
+
+/// Group multiple bins' identical frequencies together by total power
+static void groupPeaksByFreq(peaks_t& peaks) {
+	std::sort(peaks.begin(), peaks.end(), [](Peak const& p1, Peak const& p2) {
+		return p1.freq < p2.freq;
+	});
+	peaks_t p;
+	double freqSum = 0.0, powerSum = 0.0;
+	for (auto [freq, power] : peaks) {
+		if (powerSum > 0.0 && abs(freq / (freqSum / powerSum) - 1.0) > 0.03 /* +- quartertone */) {
+			p.emplace_back(freqSum / powerSum, powerSum);
+			freqSum = powerSum = 0.0;
+		}
+		freqSum += power * freq;
+		powerSum += power;
+	}
+	if (powerSum > 0.0) p.emplace_back(freqSum / powerSum, powerSum);
+	std::sort(p.begin(), p.end(), [](Peak const& p1, Peak const& p2) {
+		return p1.power > p2.power;
+	});
+	if (p.size() > 12) p.resize(12);
+	peaks = std::move(p);
+}
+
+void Analyzer::calcTones() {
+	peaks_t peaks = calcPeaks();
+	groupPeaksByFreq(peaks);
+	//logPeaks(peaks);
+	double totalPower = 0.0;
+	for (Peak const& p : peaks) totalPower += p.power;
 	// Combine peaks into tones
 	tones_t tones;
 	while (!peaks.empty()) {
-		// Find the best possible match of any peak being any harmonic
+		// Find the best possible match of the strongest peaks against all others as co-harmonics
 		double bestScore = 0.0;
 		double bestFreq = NAN;
 		for (Peak const& p : peaks) {
+			if (bestScore && p.power < 0.03 * totalPower) break;
+			// Try different denumerators of a peak for the base frequency
 			for (size_t den = 1; den <= 3; ++den) {
 				double freq = p.freq / den;
 				if (freq < FFT_MINFREQ) break;
 				double powerSum = 0.0;
 				double freqSum = 0.0;
+				// Collect all peaks that are harmonics of the base frequency
 				for (Peak const& p2: peaks) {
 					double f = p2.freq / std::round(p2.freq / freq);
 					if (abs(f / freq - 1.0) > 0.06) continue;  // Max. offset +-semitone
 					powerSum += p2.power;
 					freqSum += p2.power * f;
 				}
-				double score = powerSum / (5 + den);
+				double score = powerSum / (5 + den);  // Avoid false baseharmonics by disfavoring higher den
 				if (score > bestScore) {
 					bestScore = score;
 					bestFreq = freqSum / powerSum;
@@ -199,23 +216,15 @@ void Analyzer::calcTones() {
 			power += p.power;
 			return true;
 		}), peaks.end());
-		if (power < 0.1 * totalPower) break;
 		Tone t;
 		t.freq = bestFreq;
-		t.db = 10.0 * std::log10(normCoeff * power);
-		if (t.db < -55.0) break;
+		t.db = 10.0 * std::log10(power);
+		if (t.db < -80.0) break;
 		tones.push_back(t);
 	}
-	// Logging for debugging purposes
-	if (!tones.empty()) {
-		std::ostringstream oss;
-		for (auto t : tones) {
-			oss << " " << std::round(t.freq) << "Hz/" << std::round(t.db) << "dB";
-		}
-		std::clog << "pitch/debug: Tones"  + oss.str() + "\n" << std::flush;
-	}
+	logTones(tones);
 	mergeWithOld(tones);
-	m_tones.swap(tones);
+	m_tones = std::move(tones);
 }
 
 void Analyzer::mergeWithOld(tones_t& tones) const {
@@ -229,13 +238,12 @@ void Analyzer::mergeWithOld(tones_t& tones) const {
 		if (it != tones.end() && *it == old) {
 			// Merge the old tone into the new tone
 			it->age = old.age + 1;
-			it->stabledb = 0.8 * old.stabledb + 0.2 * it->db;
+			it->stabledb = 0.8 * old.stabledb + 0.2 * it->db + 3.0;  // Amplify stable tones
 			it->freq = 0.5 * old.freq + 0.5 * it->freq;
-		} else if (old.db > -60.0) {
+		} else if (old.stabledb > -80.0) {
 			// Insert a decayed version of the old tone into new tones
 			Tone& t = *tones.insert(it, old);
-			t.db -= 5.0;
-			t.stabledb -= 0.1;
+			t.stabledb -= 3.0;
 		}
 	}
 }
@@ -253,7 +261,7 @@ Tone const* Analyzer::findTone(double minfreq, double maxfreq) const {
 		if (t.freq > maxfreq) break;
 		double score = t.db;
 		if (m_oldfreq != 0.0 && std::abs(t.freq / m_oldfreq - 1.0) < 0.03) score += 10.0;
-		else if (t.age < 3) continue;
+		else if (t.age < 3 || t.stabledb < -50.0) continue;  // Reduce garbage
 		if (best && bestscore > score) break;
 		best = &t;
 		bestscore = score;
