@@ -16,7 +16,8 @@ class FBO {
 	}
 	/// Handle clean-up
 	~FBO() {
-		if (m_fbo) glDeleteFramebuffers(1, &m_fbo);
+		if (glIsFramebuffer(m_fbo))
+			glDeleteFramebuffers(1, &m_fbo);
 	}
 	/// Returns a reference to the attached texture
 	OpenGLTexture<GL_TEXTURE_2D>& getTexture() {

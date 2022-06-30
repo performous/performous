@@ -16,7 +16,7 @@
 
 #include <iostream>
 #include <sstream>
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 ScreenPlayers::ScreenPlayers(std::string const& name, Audio& audio, Database& database):
   Screen(name), m_audio(audio), m_database(database), m_players(database.m_players)
@@ -108,8 +108,7 @@ void ScreenPlayers::manageEvent(SDL_Event event) {
 
 Texture* ScreenPlayers::loadTextureFromMap(fs::path path) {
 	if(m_covers.find(path) == m_covers.end()) {
-		std::pair<fs::path, std::unique_ptr<Texture>> kv = std::make_pair(path, std::make_unique<Texture>(path));
-		m_covers.insert(std::move(kv));
+		m_covers.insert({ path, std::make_unique<Texture>(path) });
 	}
 	try {
 		return m_covers.at(path).get();
@@ -142,8 +141,7 @@ void ScreenPlayers::draw() {
 	} else {
 		// Format the player information text
 		oss_song << m_database.scores.front().track << '\n';
-		// TODO: use boost::format
-		oss_song << boost::format(_("You reached %1% points!")) % m_database.scores.front().score;
+		oss_song << fmt::format(_("You reached {0} points!"), m_database.scores.front().score);
 		oss_order << _("Change player with arrow keys.") << '\n'
 			<< _("Name:") << ' ' << m_players.current().name << '\n';
 		//m_database.queryPerPlayerHiscore(oss_order);

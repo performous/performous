@@ -17,14 +17,16 @@
 #include <stdexcept>
 
 #include "fs.hh"
-#include <boost/format.hpp>
+#include <fmt/format.h>
 #include <unicode/stsearch.h>
 
-#ifdef USE_WEBSERVER
-#include <cpprest/json.h>
-#endif
+#include <fstream>
+#include <nlohmann/json.hpp>
 
-Songs::Songs(Database & database, std::string const& songlist): m_songlist(songlist), m_database(database), m_order(config["songs/sort-order"].i()) {
+Songs::Songs(Database & database, std::string const& songlist): 
+  m_songlist(songlist), 
+  m_database(database), 
+  m_order(config["songs/sort-order"].i()) {
 	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
 	reload();
 }
@@ -48,12 +50,18 @@ void Songs::reload() {
 
 void Songs::reload_internal() {
 	{
-		std::lock_guard<std::mutex> l(m_mutex);
+		std::unique_lock<std::shared_mutex> l(m_mutex);
 		m_songs.clear();
 		m_dirty = true;
 	}
+#ifdef USE_WEBSERVER
+	std::clog << "songs/notice: Starting to load all songs from cache." << std::endl;
 	LoadCache();
-	std::clog << "songs/notice: Done loading the cache. You now have " << m_songs.size() << " songs in your list." << std::endl;
+	// the following code is used to check that load <=> save are idempotent
+	//CacheSonglist();
+	//return;
+	std::clog << "songs/notice: Done loading the cache. You now have " << loadedSongs() << " songs in your list." << std::endl;
+#endif
 	std::clog << "songs/notice: Starting to load all songs from disk, to update the cache." << std::endl;
 	Profiler prof("songloader");
 	Paths systemSongs = getPathsConfig("paths/system-songs");
@@ -64,9 +72,9 @@ void Songs::reload_internal() {
 		try {
 			if (!fs::is_directory(*it)) { std::clog << "songs/info: >>> Not scanning: " << *it << " (no such directory)\n"; continue; }
 			std::clog << "songs/info: >>> Scanning " << *it << std::endl;
-			size_t count = m_songs.size();
+			size_t count = loadedSongs();
 			reload_internal(*it);
-			size_t diff = m_songs.size() - count;
+			size_t diff = loadedSongs() - count;
 			if (diff > 0 && m_loading) std::clog << "songs/info: " << diff << " songs loaded\n";
 		} catch (std::exception& e) {
 			std::clog << "songs/error: >>> Error scanning " << *it << ": " << e.what() << '\n';
@@ -76,187 +84,169 @@ void Songs::reload_internal() {
 	if (m_loading) dumpSongs_internal(); // Dump the songlist to file (if requested)
 	std::clog << std::flush;
 	m_loading = false;
-	std::clog << "songs/notice: Done Loading. Loaded " << m_songs.size() << " Songs." << std::endl;
+	std::clog << "songs/notice: Done Loading. Loaded " << loadedSongs() << " Songs." << std::endl;
 	CacheSonglist();
 	std::clog << "songs/notice: Done Caching." << std::endl;
 	doneLoading = true;
 }
 
-#ifdef USE_WEBSERVER
+const std::string SONGS_CACHE_JSON_FILE = "songs.json";
+
 void Songs::LoadCache() {
-	fs::path songsMetaFile = getCacheDir() / "Songs-Metadata.json";
+	const fs::path songsMetaFile = getCacheDir() / SONGS_CACHE_JSON_FILE;
 	std::ifstream file(songsMetaFile.string());
-	web::json::value jsonRoot;
-    if (file)
-    {
-    	try {
-	        std::stringstream buffer;
-	        buffer << file.rdbuf();
-	        file.close();
-	        jsonRoot = web::json::value::parse(buffer);
-    	} catch(std::exception const& e) {
+	auto jsonRoot = nlohmann::json::array();
+	if (file) {
+		try {
+			std::stringstream buffer;
+			buffer << file.rdbuf();
+			file.close();
+			jsonRoot = nlohmann::json::parse(buffer);
+		} catch(std::exception const& e) {
 			std::clog << "songs/error: " << e.what() << std::endl;
+			file.close();
 			return;
-    	}
-    } else {
-    	std::clog << "songs/info: Could not open songs meta cache file " << songsMetaFile.string() << std::endl;
-    	return;
-    }
-
-	Paths systemSongs = getPathsConfig("paths/system-songs");
-	Paths localPaths = getPathsConfig("paths/songs");
-	localPaths.insert(localPaths.begin(), systemSongs.begin(), systemSongs.end());
-
-	std::vector<std::string> userSongs;
-	for(const fs::path& userSong : localPaths) {
-		userSongs.push_back(userSong.string());
+		}
+	} else {
+		std::clog << "songs/info: Could not open songs meta cache file " << songsMetaFile.string() << std::endl;
+		return;
 	}
 
-    for(auto const& song : jsonRoot.as_array()) {
-    	STAT buffer;
-    	auto songPath = song.at("TxtFile").as_string();
-    	auto isSongPathInConfiguredPaths = std::find_if(
-                                                        userSongs.begin(), 
-                                                        userSongs.end(), 
-														[songPath](const std::string& userSongItem) { 
-															return songPath.find(userSongItem) != std::string::npos;
-														 }) != userSongs.end();
-    	if(_STAT(songPath.c_str(), &buffer) == 0 && isSongPathInConfiguredPaths) {
-    		std::shared_ptr<Song> realSong(new Song(song));
-    		m_songs.push_back(realSong);
-    	}  	
-    }
+	std::vector<std::string> allPaths;
+	for(const auto& songPaths : {getPathsConfig("paths/system-songs"), getPathsConfig("paths/songs")}) {
+		for(const auto& songPath: songPaths) {
+			allPaths.push_back(songPath.string());
+		}
+	}
+
+	for(auto const& song : jsonRoot) {
+		const auto songPath = song.at("txtFile").get<std::string>();
+		const bool isSongPathInConfiguredPaths = std::find_if(
+			allPaths.begin(),
+			allPaths.end(),
+			[songPath](const std::string& userSongItem) {
+				return songPath.find(userSongItem) != std::string::npos;
+			}) != allPaths.end();
+		STAT buffer;
+		if(_STAT(songPath.c_str(), &buffer) == 0 && isSongPathInConfiguredPaths) {
+			auto realSong = std::make_shared<Song>(song);
+			std::unique_lock<std::shared_mutex> l(m_mutex);
+			m_songs.push_back(std::move(realSong));
+		}
+	}
 }
 
 void Songs::CacheSonglist() {
-    web::json::value jsonRoot = web::json::value::array();
-    auto i = 0;
-	for (auto const& song : m_songs)
-    {  
-        web::json::value songObject = web::json::value::object();
-        if(!song->path.string().empty()) {
-        	songObject["TxtFileFolder"] = web::json::value::string(song->path.string());
-        }
-        if(!song->filename.string().empty()) {
-        	songObject["TxtFile"] = web::json::value::string(song->filename.string());
-        }
-        if(!song->title.empty()) {
-        	songObject["Title"] = web::json::value::string(song->title);
-    	}
-		if(!song->artist.empty()) {
-        	songObject["Artist"] = web::json::value::string(song->artist);
-    	}
-        if(!song->edition.empty()) {
-        	songObject["Edition"] = web::json::value::string(song->edition);
-    	}
-    	if(!song->language.empty()) {
-        	songObject["Language"] = web::json::value::string(song->language);
-        }
-        if(!song->creator.empty()) {
-        	songObject["Creator"] = web::json::value::string(song->creator);
-    	}
-    	if(!song->genre.empty()) {
-        	songObject["Genre"] = web::json::value::string(song->genre);
-    	}
-    	if(!song->cover.string().empty()) {
-        	songObject["Cover"] = web::json::value::string(song->cover.string());
-    	}
-    	if(!song->background.string().empty()) {
-	        songObject["Background"] = web::json::value::string(song->background.string());
-	    }
-    	if(!song->music[TrackName::BGMUSIC].string().empty()) {
-	        songObject["SongFile"] = web::json::value::string(song->music[TrackName::BGMUSIC].string());
-	    }
-    	if(!song->midifilename.string().empty()) {
-	        songObject["MidFile"] = web::json::value::string(song->midifilename.string());
-	    }
-    	if(!song->video.string().empty()) {
-	        songObject["VideoFile"] = web::json::value::string(song->video.string());
-	    }
-    	if(!std::isnan(song->start)) {
-	        songObject["Start"] = web::json::value(song->start);
-	    }
-    	if(!std::isnan(song->videoGap)) {
-	        songObject["VideoGap"] = web::json::value(song->videoGap);
-	    }
-    	if(!std::isnan(song->preview_start)) {
-	        songObject["PreviewStart"] = web::json::value::number(song->preview_start);
-	    }
-    	if(!song->music[TrackName::LEAD_VOCAL].string().empty()) {
-	        songObject["Vocals"] = web::json::value::string(song->music[TrackName::LEAD_VOCAL].string());
-	    }
-        if(!song->music[TrackName::PREVIEW].string().empty()) {
-	        songObject["Preview"] = web::json::value::string(song->music[TrackName::PREVIEW].string());
-        }
-        if(!song->music[TrackName::GUITAR].string().empty()) {
-	        songObject["Guitar"] = web::json::value::string(song->music[TrackName::GUITAR].string());
-        }
-        if(!song->music[TrackName::BASS].string().empty()) {
-	        songObject["Bass"] = web::json::value::string(song->music[TrackName::BASS].string());
-        }
-        if(!song->music[TrackName::DRUMS].string().empty()) {
-	        songObject["Drums"] = web::json::value::string(song->music[TrackName::DRUMS].string());
-        }
-        if(!song->music[TrackName::KEYBOARD].string().empty()) {
-	        songObject["Keyboard"] = web::json::value::string(song->music[TrackName::KEYBOARD].string());
-        }
-        if(!song->music[TrackName::GUITAR_COOP].string().empty()) {
-	        songObject["Guitar_coop"] = web::json::value::string(song->music[TrackName::GUITAR_COOP].string());
-        }
-        if(!song->music[TrackName::GUITAR_RHYTHM].string().empty()) {
-	        songObject["Guitar_Rhythm"] = web::json::value::string(song->music[TrackName::GUITAR_RHYTHM].string());
-        }
-
-    	double duration = song->getDurationSeconds();
-    	if(!std::isnan(duration)) {
-	    	songObject["Duration"] = web::json::value::number(duration);
-	    }
-	    if (!song->m_bpms.empty()) {
-			songObject["BPM"] = web::json::value::number(15 / song->m_bpms.front().step);
+	auto jsonRoot = nlohmann::json::array();
+	std::shared_lock<std::shared_mutex> l(m_mutex);
+	for (auto const& song : m_songs) {
+		auto songObject = nlohmann::json::object();
+		if(!song->path.string().empty()) {
+			songObject["txtFileFolder"] = song->path.string();
 		}
-			
+		if(!song->filename.string().empty()) {
+			songObject["txtFile"] = song->filename.string();
+		}
+		if(!song->title.empty()) {
+			songObject["title"] = song->title;
+		}
+		if(!song->artist.empty()) {
+			songObject["artist"] = song->artist;
+		}
+		if(!song->edition.empty()) {
+			songObject["edition"] = song->edition;
+		}
+		if(!song->language.empty()) {
+			songObject["language"] = song->language;
+		}
+		if(!song->creator.empty()) {
+			songObject["creator"] = song->creator;
+		}
+		if(!song->genre.empty()) {
+			songObject["genre"] = song->genre;
+		}
+		if(!song->cover.string().empty()) {
+			songObject["cover"] = song->cover.string();
+		}
+		if(!song->background.string().empty()) {
+			songObject["background"] = song->background.string();
+		}
+		if(!song->music[TrackName::BGMUSIC].string().empty()) {
+			songObject["songFile"] = song->music[TrackName::BGMUSIC].string();
+		}
+		if(!song->midifilename.string().empty()) {
+			songObject["midiFile"] = song->midifilename.string();
+		}
+		if(!song->video.string().empty()) {
+			songObject["videoFile"] = song->video.string();
+		}
+		if(!std::isnan(song->start)) {
+			songObject["start"] = song->start;
+		}
+		if(!std::isnan(song->videoGap)) {
+			songObject["videoGap"] = song->videoGap;
+		}
+		if(!std::isnan(song->preview_start)) {
+			songObject["previewStart"] = song->preview_start;
+		}
+		if(!song->music[TrackName::LEAD_VOCAL].string().empty()) {
+			songObject["vocals"] = song->music[TrackName::LEAD_VOCAL].string();
+		}
+		if(!song->music[TrackName::PREVIEW].string().empty()) {
+			songObject["preview"] = song->music[TrackName::PREVIEW].string();
+		}
+		if(!song->music[TrackName::GUITAR].string().empty()) {
+			songObject["guitar"] = song->music[TrackName::GUITAR].string();
+		}
+		if(!song->music[TrackName::BASS].string().empty()) {
+			songObject["bass"] = song->music[TrackName::BASS].string();
+		}
+		if(!song->music[TrackName::DRUMS].string().empty()) {
+			songObject["drums"] = song->music[TrackName::DRUMS].string();
+		}
+		if(!song->music[TrackName::KEYBOARD].string().empty()) {
+			songObject["keyboard"] = song->music[TrackName::KEYBOARD].string();
+		}
+		if(!song->music[TrackName::GUITAR_COOP].string().empty()) {
+			songObject["guitarCoop"] = song->music[TrackName::GUITAR_COOP].string();
+		}
+		if(!song->music[TrackName::GUITAR_RHYTHM].string().empty()) {
+			songObject["guitarRhythm"] = song->music[TrackName::GUITAR_RHYTHM].string();
+		}
+
+		double duration = song->getDurationSeconds();
+		if(!std::isnan(duration)) {
+			songObject["duration"] = duration;
+		}
+		if (!song->m_bpms.empty()) {
+			songObject["bpm"] = 15 / song->m_bpms.front().step;
+		}
+
 		// Cache songtype also.
 		if(song->hasVocals()) {
-			uint32_t vocals = song->vocalTracks.size();
-        	songObject["VocalTracks"] = web::json::value::number(vocals);
-    	}
-		if(song->hasKeyboard()) {
-        	songObject["KeyboardTracks"] = web::json::value::number(1);
-    	}
-		if(song->hasDrums()) {
-        	songObject["DrumTracks"] = web::json::value::number(1);
-    	}
-		if(song->hasDance()) {
-			uint32_t dance = song->danceTracks.size();
-        	songObject["DanceTracks"] = web::json::value::number(dance);
-    	}
-		if(song->hasGuitars()) {
-			uint32_t guitars = song->instrumentTracks.size() - song->hasDrums() - song->hasKeyboard();
-        	songObject["GuitarTracks"] = web::json::value::number(guitars);
-    	}
-	    if(songObject != web::json::value::object()) {
-        	jsonRoot[i] = songObject;
-        	i++;
-    	}
+			songObject["vocalTracks"] = song->vocalTracks.size();
+		}
+		songObject["keyboardTracks"] = song->hasKeyboard();
+		songObject["drumTracks"] = song->hasDrums();
+		songObject["danceTracks"] = song->hasDance();
+		songObject["guitarTracks"] = song->hasGuitars();
+		if(songObject != nlohmann::json::object()) {
+			jsonRoot.push_back(songObject);
+		}
 	}
 
-	fs::path cacheDir = getCacheDir() / "Songs-Metadata.json";
+	fs::path cacheDir = getCacheDir() / SONGS_CACHE_JSON_FILE;
 
 	try {
-		std::stringstream stream;
-		jsonRoot.serialize(stream);
 		std::ofstream outFile(cacheDir.string());
-    	outFile << stream.rdbuf();
-    	outFile.close();
+		const int spacesCount = 4;
+		outFile << jsonRoot.dump(spacesCount);
+		outFile.close();
 	} catch (std::exception const& e) {
 		std::clog << "songs/error: Could not save " + cacheDir.string() + ": " + e.what() << std::endl;
 		return;
 	}
 }
-#else 
-void Songs::LoadCache() { }
-void Songs::CacheSonglist() { }
-#endif
 
 void Songs::reload_internal(fs::path const& parent) {
 	if (std::distance(parent.begin(), parent.end()) > 20) { std::clog << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)\n"; return; }
@@ -267,36 +257,41 @@ void Songs::reload_internal(fs::path const& parent) {
 			if (fs::is_directory(p)) { reload_internal(p); continue; } //if the file is a folder redo this function with this folder as path
 			if (!regex_search(p.filename().string(), expression)) continue; //if the folder does not contain any of the requested files, ignore it
 			try { //found song file, make a new song with it.
-				auto it = std::find_if(m_songs.begin(), m_songs.end(), [p](std::shared_ptr<Song> n) {
-					return n->filename == p;
-				});
-				auto alreadyInCache = it != m_songs.end();
+				auto alreadyInCache = [&] {
+					std::shared_lock<std::shared_mutex> l(m_mutex);
+					auto it = std::find_if(m_songs.begin(), m_songs.end(), [p](std::shared_ptr<Song> n) {
+						return n->filename == p;
+						});
+					return it != m_songs.end();
+				}();
 
-				if(alreadyInCache) { 
+				if(alreadyInCache) {
 					continue;
 				}
 
 				std::clog << "songs/notice: Found song which was not in the cache: " << p.string() << std::endl;
 
 				std::shared_ptr<Song>s(new Song(p.parent_path(), p));
-				std::lock_guard<std::mutex> l(m_mutex);
 				int AdditionalFileIndex = -1;
-				for(unsigned int i = 0; i< m_songs.size(); i++) {
-					if(s->filename.extension() != m_songs[i]->filename.extension() && s->filename.stem() == m_songs[i]->filename.stem() &&
-							s->title == m_songs[i]->title && s->artist == m_songs[i]->artist) {
-						std::clog << "songs/info: >>> Found additional song file: " << s->filename << " for: " << m_songs[i]->filename << std::endl;
-						AdditionalFileIndex = i;
+				{
+					std::shared_lock<std::shared_mutex> l(m_mutex);
+					for(unsigned int i = 0; i< m_songs.size(); i++) {
+						if(s->filename.extension() != m_songs[i]->filename.extension() && s->filename.stem() == m_songs[i]->filename.stem() &&
+							    s->title == m_songs[i]->title && s->artist == m_songs[i]->artist) {
+							std::clog << "songs/info: >>> Found additional song file: " << s->filename << " for: " << m_songs[i]->filename << std::endl;
+							AdditionalFileIndex = i;
+						}
 					}
-				}				
+				}
 
 				if(AdditionalFileIndex > 0) { //TODO: add it to existing song
 					std::clog << "songs/info: >>> not yet implemented " << std::endl;
-					s->getDurationSeconds();
-					m_songs.push_back(s); // will make it appear double!!
-				} else {
-					s->getDurationSeconds();
-					m_songs.push_back(s); //put it in the database
 				}
+				s->getDurationSeconds();
+
+				// there is not race while the lock being released as this thread is the only one to modify the song list.
+				std::unique_lock<std::shared_mutex> l(m_mutex);
+				m_songs.push_back(s); //put it in the database, if found twice will appear in double
 				m_dirty = true;
 			} catch (SongParserException& e) {
 				std::clog << e;
@@ -307,26 +302,20 @@ void Songs::reload_internal(fs::path const& parent) {
 	}
 }
 
-// Make std::find work with shared_ptrs and regular pointers
-static bool operator==(std::shared_ptr<Song> const& a, Song const* b) { return a.get() == b; }
-
 /// Store currently selected song on construction and restore the selection on destruction
 /// Assumes that m_filtered has been modified and finds the old selection by pointer value.
 /// Sets up math_cover so that the old selection is restored if possible, otherwise the first song is selected.
 class Songs::RestoreSel {
 	Songs& m_s;
-	Song const* m_sel;
+	std::weak_ptr<Song> m_sel;
   public:
 	/// constructor
-	RestoreSel(Songs& s): m_s(s), m_sel(s.empty() ? nullptr : &s.current()) {}
-	/// resets song to given song
-	void reset(Song const* song = nullptr) { m_sel = song; }
+	RestoreSel(Songs& s): m_s(s), m_sel(s.currentPtr()) {}
 	~RestoreSel() {
 		int pos = 0;
-		if (m_sel) {
-			SongVector& f = m_s.m_filtered;
-			auto it = std::find(f.begin(), f.end(), m_sel);
-			m_s.math_cover.reset();
+		if (auto song = m_sel.lock()) {
+			auto& f = m_s.m_filtered;
+			auto it = std::find(f.begin(), f.end(), song);
 			if (it != f.end()) pos = it - f.begin();
 		}
 		m_s.math_cover.setTarget(pos, m_s.size());
@@ -348,18 +337,20 @@ void Songs::setFilter(std::string const& val) {
 
 void Songs::filter_internal() {
 	m_updateTimer.setValue(0.0);
-	std::lock_guard<std::mutex> l(m_mutex);
 	m_dirty = false;
 	RestoreSel restore(*this);
 	try {
-		SongVector filtered;
+		auto filtered = SongCollection();
 		// if filter text is blank and no type filter is set, just display all songs.
-		if (m_filter == std::string() && m_type == 0) filtered = m_songs;
-		else {
+		if (m_filter == std::string() && m_type == 0) {
+			std::shared_lock<std::shared_mutex> l(m_mutex);
+			filtered = m_songs;
+		} else {
 			std::string charset = UnicodeUtil::getCharset(m_filter);
 			icu::UnicodeString filter = ((charset == "UTF-8") ? icu::UnicodeString::fromUTF8(m_filter) : icu::UnicodeString(m_filter.c_str(), charset.c_str()));
 			UErrorCode icuError = U_ZERO_ERROR;
 			
+			std::shared_lock<std::shared_mutex> l(m_mutex);
 			std::copy_if (m_songs.begin(), m_songs.end(), std::back_inserter(filtered), [&](std::shared_ptr<Song> it){
 			// Filter by type first.	
 				if (m_type == 1 && !(*it).hasDance()) return false;
@@ -381,7 +372,8 @@ void Songs::filter_internal() {
 		}
 		m_filtered.swap(filtered);
 	} catch (...) {
-		SongVector(m_songs.begin(), m_songs.end()).swap(m_filtered);  // Invalid regex => copy everything
+		std::shared_lock<std::shared_mutex> l(m_mutex);
+		SongCollection(m_songs.begin(), m_songs.end()).swap(m_filtered);  // Invalid regex => copy everything
 	}
 	sort_internal();
 }
@@ -391,9 +383,10 @@ namespace {
 	/// A functor that compares songs based on a selected member field of them.
 	template<typename Field> class CmpByField {
 		Field Song::* m_field;
+		bool m_ascending;
 	  public:
 		/** @param field a pointer to the field to use (pointer to member) **/
-		CmpByField(Field Song::* field): m_field(field) {}
+		CmpByField(Field Song::* field, bool ascending): m_field(field), m_ascending(ascending) {}
 		/// Compare left < right
 		bool operator()(Song const& left , Song const& right) {
 			return left.*m_field < right.*m_field;
@@ -406,9 +399,10 @@ namespace {
 	
 	template<> class CmpByField<std::string> {
 		std::string Song::* m_field;
+		bool m_ascending;
 	  public:
 		/** @param field a pointer to the field to use (pointer to member) **/
-		CmpByField(std::string Song::* field): m_field(field) {}
+		CmpByField(std::string Song::* field, bool ascending): m_field(field), m_ascending(ascending) {}
 		/// Compare left < right
 		bool operator()(Song const& left , Song const& right) {
 			icu::UnicodeString leftVal = icu::UnicodeString::fromUTF8(left.*m_field);
@@ -416,10 +410,10 @@ namespace {
 			UErrorCode sortError = U_ZERO_ERROR;
 			UCollationResult result = UnicodeUtil::m_sortCollator.compare(leftVal, rightVal, sortError);
 			if (U_SUCCESS(sortError)) {
-			return (result == UCOL_LESS);
+				return result == UCOL_LESS ? m_ascending : !m_ascending;
 			}
 			else {
-			throw std::runtime_error("unicode/error: Sorting comparison error in CmpByField<std::string> ");
+				throw std::runtime_error("unicode/error: Sorting comparison error in CmpByField<std::string> ");
 			}
 		}
 		/// Compare *left < *right
@@ -429,9 +423,9 @@ namespace {
 	};
 
 	/// A helper for easily constructing CmpByField objects
-	template <typename T> CmpByField<T> customComparator(T Song::*field) { return CmpByField<T>(field); }
-	static const int types = 7, orders = 7;
+	template <typename T> CmpByField<T> customComparator(T Song::*field, bool ascending) { return CmpByField<T>(field, ascending); }
 
+	static const int types = 7, orders = 8;
 }
 
 std::string Songs::typeDesc() const {
@@ -467,7 +461,7 @@ void Songs::typeCycle(int cat) {
 	filter_internal();
 }
 
-std::string Songs::sortDesc() const {
+std::string Songs::getSortDescription() const {
 	std::string str;
 	switch (m_order) {
 	  case 0: str = _("random order"); break;
@@ -477,14 +471,16 @@ std::string Songs::sortDesc() const {
 	  case 4: str = _("sorted by genre"); break;
 	  case 5: str = _("sorted by path"); break;
 	  case 6: str = _("sorted by language"); break;
-	  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortDesc");
+	  case 7: str = _("sorted by score"); break;
+	  default: throw std::logic_error("Internal error: unknown sort order in Songs::getSortDescription");
 	}
 	return str;
 }
 
 void Songs::sortChange(int diff) {
 	m_order = (m_order + diff) % orders;
-	if (m_order < 0) m_order += orders;
+	if (m_order < 0) 
+		m_order += orders;
 	RestoreSel restore(*this);
 	config["songs/sort-order"].i() = m_order;
 	switch (m_order) {
@@ -509,39 +505,37 @@ void Songs::sortChange(int diff) {
 }
 
 void Songs::sortSpecificChange(int sortOrder, bool descending) {
-	if(sortOrder < 0) {
+	if(sortOrder < 0) 
 		m_order = 0;
-	} else if(sortOrder <= 6) {
+	else if(sortOrder < orders)
 		m_order = sortOrder;
-	} else {
+	else
 		m_order = 0;
-	}
+	
 	RestoreSel restore(*this);
 	config["songs/sort-order"].i() = m_order;
 	sort_internal(descending);
 }
 
 void Songs::sort_internal(bool descending) {
-	if(descending) {
+	if(m_order == 0)
+		std::stable_sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::randomIdx, true));
+	else {        
+		auto begin = m_filtered.begin();
+		auto end = m_filtered.end();
+
 		switch (m_order) {
-		  case 0: std::stable_sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::randomIdx)); break;
-		  case 1: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::collateByTitle)); break;
-		  case 2: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::collateByArtist)); break;
-		  case 3: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::edition)); break;
-		  case 4: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::genre)); break;
-		  case 5: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::path)); break;
-		  case 6: std::sort(m_filtered.rbegin(), m_filtered.rend(), customComparator(&Song::language)); break;
-		  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
-		}
-	} else {
-		switch (m_order) {
-		  case 0: std::stable_sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::randomIdx)); break;
-		  case 1: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::collateByTitle)); break;
-		  case 2: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::collateByArtist)); break;
-		  case 3: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::edition)); break;
-		  case 4: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::genre)); break;
-		  case 5: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::path)); break;
-		  case 6: std::sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::language)); break;
+		  case 1: std::sort(begin, end, customComparator(&Song::collateByTitle, !descending)); break;
+		  case 2: std::sort(begin, end, customComparator(&Song::collateByArtist, !descending)); break;
+		  case 3: std::sort(begin, end, customComparator(&Song::edition, !descending)); break;
+		  case 4: std::sort(begin, end, customComparator(&Song::genre, !descending)); break;
+		  case 5: std::sort(begin, end, customComparator(&Song::path, !descending)); break;
+		  case 6: std::sort(begin, end, customComparator(&Song::language, !descending)); break;
+		  case 7: std::sort(begin, end, [this, &descending](SongPtr const& a, SongPtr const& b){
+				const auto scoreA = m_database.getHiscore(*a);              
+				const auto scoreB = m_database.getHiscore(*b);              
+				return scoreA > scoreB ? !descending : descending;              
+			}); break;
 		  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
 		}
 	}
@@ -552,7 +546,7 @@ namespace {
 		try {
 			std::string ext = s.cover.extension().string();
 			if (exists(s.cover)) {
-				std::string coverlink = "covers/" + (boost::format("%|04|") % num).str() + ext;
+				std::string coverlink = fmt::format("covers/{:04d}{:1}", num, ".jpg");
 				if (fs::is_symlink(coverlink)) fs::remove(coverlink);
 				create_symlink(s.cover, coverlink);
 				xmlpp::set_first_child_text(xmlpp::add_child_element(song, "cover"), coverlink);
@@ -561,7 +555,9 @@ namespace {
 			std::cerr << "Songlist error handling cover image: " << e.what() << std::endl;
 		}
 	}
-	template <typename SongVector> void dumpXML(SongVector const& svec, std::string const& filename) {
+	
+	template<typename SongCollection>
+	void dumpXML(SongCollection const& svec, std::string const& filename) {
 		xmlpp::Document doc;
 		xmlpp::Element* songlist = doc.create_root_node("songlist");
 		songlist->set_attribute("size", std::to_string(svec.size()));
@@ -582,8 +578,8 @@ namespace {
 
 void Songs::dumpSongs_internal() const {
 	if (m_songlist.empty()) return;
-	SongVector svec = m_songs;
-	std::sort(svec.begin(), svec.end(), customComparator(&Song::collateByArtist));
+	SongCollection svec = [&] { std::shared_lock<std::shared_mutex> l(m_mutex); return m_songs; }();
+	std::sort(svec.begin(), svec.end(), customComparator(&Song::collateByArtist, true));
 	fs::path coverpath = fs::path(m_songlist) / "covers";
 	fs::create_directories(coverpath);
 	dumpXML(svec, m_songlist + "/songlist.xml");

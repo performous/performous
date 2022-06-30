@@ -10,6 +10,7 @@
 #include "playlist.hh"
 #include "menu.hh"
 #include "aubio/aubio.h"
+#include <unordered_map>
 
 class Audio;
 class Database;
@@ -66,7 +67,7 @@ private:
 	std::unique_ptr<Texture> m_danceCover;
 	std::unique_ptr<Texture> m_instrumentList;
 	std::unique_ptr<ThemeInstrumentMenu> m_menuTheme;
-	std::map<fs::path, std::unique_ptr<Texture>> m_covers;
+	std::unordered_map<fs::path, std::unique_ptr<Texture>, FsPathHash> m_covers;
 	int m_menuPos, m_infoPos;
 	bool m_jukebox;
 	Menu m_menu;

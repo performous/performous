@@ -7,10 +7,16 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
-include(GetGitRevisionDescription)
-git_describe(PROJECT_VERSION --tags)
-if(NOT PROJECT_VERSION)
-	set(PROJECT_VERSION "1.1+")
+if(NOT PERFORMOUS_VERSION)
+    message("No project version specified. Determining latest tag..")
+    include(GetGitRevisionDescription)
+    git_describe(PROJECT_VERSION --tags)
+    if(NOT PROJECT_VERSION)
+        message("No project version found. Falling back onto default versioning strategy.")
+        set(PROJECT_VERSION "1.2+")
+    endif()
+else()
+    set(PROJECT_VERSION "${PERFORMOUS_VERSION}")
 endif()
 string(TIMESTAMP YEAR "%Y")
 
@@ -50,7 +56,7 @@ if (APPLE)
 	endif()
 endif()
 
-add_compile_options(-Wall $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wextra> $<$<CXX_COMPILER_ID:gcc>:-fcx-limited-range>)
+add_compile_options(-Wall $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wextra> $<$<CXX_COMPILER_ID:gcc>:-fcx-limited-range> $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wconversion>)
 
 if(WIN32)
 	set(CMAKE_CXX_FLAGS "-DWIN32_LEAN_AND_MEAN ${CMAKE_CXX_FLAGS}")
@@ -75,20 +81,6 @@ else()
 	message(STATUS "Localization disabled: Gettext tools (msgfmt) missing")
 endif()
 
-include(FetchContent)
-FetchContent_Declare(ced-sources
-  GIT_REPOSITORY https://github.com/performous/compact_enc_det.git
-  #https://github.com/google/compact_enc_det.git
-  GIT_TAG        master
-  SOURCE_DIR ced-src
-)
-
-FetchContent_MakeAvailable(ced-sources)
-
-option(USE_SELF_BUILT_AUBIO "Use custom aubio local build instead of using system lib (if available)" FALSE)
-
-find_package(Aubio REQUIRED)
-
 add_subdirectory(data)
 
 add_subdirectory(game)
@@ -105,6 +97,10 @@ if(NOT APPLE)
     add_custom_target(uninstall
       COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake/uninstall.cmake)
   endif()
+endif()
+
+if(WIN32)
+	set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION ".")
 endif()
 
 #CPACK variables

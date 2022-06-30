@@ -20,8 +20,7 @@ struct CamFrame {
 
 class Webcam {
   public:
-	/// cam_id -1 means pick any device
-	Webcam(int cam_id = -1);
+	Webcam(int cam_id = 0);
 	~Webcam();
 
 	/// Thread runs here, don't call directly
@@ -47,6 +46,7 @@ class Webcam {
 	bool m_frameAvailable;
 	std::atomic<bool> m_running{ false };
 	std::atomic<bool> m_quit{ false };
+	const int m_autoDetect = 0;
 
   public:
 	static bool enabled() {

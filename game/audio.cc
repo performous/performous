@@ -422,8 +422,7 @@ void Device::start() {
 }
 
 void Device::stop() {
-	PaError err = Pa_StopStream(stream);
-	if (err != paNoError) throw std::runtime_error(std::string("Pa_StopStream: ") + Pa_GetErrorText(err));
+	PORTAUDIO_CHECKED(Pa_AbortStream, (stream));
 }
 
 int Device::operator()(float const* inbuf, float* outbuf, unsigned long frames) try {
@@ -441,13 +440,11 @@ int Device::operator()(float const* inbuf, float* outbuf, unsigned long frames) 
 
 struct Audio::Impl {
 	Output output;
-	portaudio::Init init;
 	std::deque<Analyzer> analyzers;
 	std::deque<Device> devices;
 	bool playback = false;
 	std::string selectedBackend = Audio::backendConfig().getValue();
 	Impl() {
-		populateBackends(portaudio::AudioBackends().getBackends());
 		std::clog << portaudio::AudioBackends().dump() << std::flush; // Dump PortAudio backends and devices to log.
 		// Parse audio devices from config
 		ConfigItem::StringList devs = config["audio/devices"].sl();
@@ -547,9 +544,13 @@ struct Audio::Impl {
 	}
 };
 
-Audio::Audio(): self(std::make_unique<Impl>()) {
+portaudio::Init Audio::init;
+
+Audio::Audio() {
 	aubio_tempo_set_silence(Audio::aubioTempo.get(), -50.0);
 	aubio_tempo_set_threshold(Audio::aubioTempo.get(), 0.4);
+        populateBackends(portaudio::AudioBackends().getBackends());
+        self = std::make_unique<Impl>();
 }
 Audio::~Audio() { close(); }
 
@@ -561,10 +562,7 @@ ConfigItem& Audio::backendConfig() {
 void Audio::restart() { close(); self = std::make_unique<Impl>(); }
 
 void Audio::close() {
-	// Only wait a limited time for closing of audio devices because it often hangs (on Linux)
-	auto audiokiller = std::async(std::launch::async, [this]{ self.reset(); });
-	if (audiokiller.wait_for(2.5s) == std::future_status::ready) return;
-	throw std::runtime_error("Audio hung for some reason.\nPlease restart Performous.");
+	self.reset();
 }
 
 bool Audio::isOpen() const {

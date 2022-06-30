@@ -33,9 +33,10 @@ bool MenuOption::isActive() const {
 
 Menu::Menu(): dimensions(), m_open(true) { clear(); }
 
-void Menu::add(MenuOption opt) {
-	root_options.push_back(opt);
+MenuOption &Menu::add(MenuOption opt) {
+	root_options.emplace_back(std::move(opt));
 	clear(true); // Adding resets menu stack
+	return root_options.back();
 }
 
 void Menu::move(int dir) {
@@ -61,11 +62,24 @@ void Menu::action(int dir) {
 					current().value->setOldValue(current().value->getValue());
 				}
 				else if (current().value->getName() == "graphic/stereo3d") {
-					std::string oldValue((current().value->getValue() == _("Disabled")) ? "0" : "1");
-					current().value->setOldValue(oldValue);
+					current().value->setOldValue(current().value->getValue());
 				}
 				if (dir > 0) ++(*(current().value));
 				else if (dir < 0) --(*(current().value));
+
+				if (current().value->getName() == "game/language") {
+					auto &value = config["game/language"];
+					Game::getSingletonPtr()->setLanguage(value.getValue());
+				} else if (current().value->getName() == "graphic/stereo3d") {
+					try {
+						std::clog << "video/info: Stereo 3D configuration changed, will reset shaders.\n";
+						Game::getSingletonPtr()->window().resetShaders();
+					} catch (const std::exception &) {
+						std::cerr << "video/info: Disable Stereo 3D because shader creation failed.\n";
+						current().value->b() = false; // Disable 3D if shader fails
+						throw;
+					}
+                                }
 			}
 			break;
 		}

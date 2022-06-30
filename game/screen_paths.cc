@@ -66,35 +66,35 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 	}
 	bool showHiddenfolders = config["paths/showhiddenfolders"].b();
 	if(showHiddenfolders) {
-		m_menu.add(MenuOption(_("Hide hidden folders"),_("Hide hidden folders")).call([this, sl, path]() {
+		m_menu.add(MenuOption(_("Hide hidden folders"),_("Hide hidden folders"))).call([this, sl, path]() {
 			config["paths/showhiddenfolders"].b() = false;
 			generateMenuFromPath(path);
-		}));
+		});
 	} else {
-		m_menu.add(MenuOption(_("Show hidden folders"),_("Show hidden folders")).call([this, sl, path]() {
+		m_menu.add(MenuOption(_("Show hidden folders"),_("Show hidden folders"))).call([this, sl, path]() {
 			config["paths/showhiddenfolders"].b() = true;
 			generateMenuFromPath(path);
-		}));
+		});
 	}
 
 	if(folderInConfig) {
-		m_menu.add(MenuOption(_("Remove this folder"),_("Remove current folder from song folders")).call([this, sl, path, position]() {
+		m_menu.add(MenuOption(_("Remove this folder"),_("Remove current folder from song folders"))).call([this, sl, path, position]() {
 			config["paths/songs"].sl().erase(position); //WHY the fuck is this const??
 			generateMenuFromPath(path);
 			//Reload internal, but that crashes!! rely on the user to press ctrl+r in song selection screen
-		}));
+		});
 	} else {
-		m_menu.add(MenuOption(_("Add this folder"),_("Add current folder to song folders")).call([this, sl, path]() {
+		m_menu.add(MenuOption(_("Add this folder"),_("Add current folder to song folders"))).call([this, sl, path]() {
 			config["paths/songs"].sl().push_back(path.string()); //WHY the fuck is this const??
 			generateMenuFromPath(path);
 			//Reload internal, but that crashes!! rely on the user to press ctrl+r in song selection screen
-		}));
+		});
 	}
 	auto parent = path.parent_path();
 	if (!parent.empty() && parent != path)
-		m_menu.add(MenuOption(_(".."),_("Go up one folder")).call([this, sl, path]() {
+		m_menu.add(MenuOption(_(".."),_("Go to parent folder"))).call([this, sl, path]() {
 					generateMenuFromPath(path.parent_path());
-	}));
+	});
 	
 	// Extract list of all directories
 	std::list<fs::path> directories;
@@ -119,7 +119,7 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 
 	// Add entries to menu
 	for (const auto &p : directories) {
-		m_menu.add(MenuOption(p.string(), _("Open folder")).call([this, p] { generateMenuFromPath(p); }));
+		m_menu.add(MenuOption(p.string(), _("Open folder"))).call([this, p] { generateMenuFromPath(p); });
 	}
 }
 
@@ -137,7 +137,7 @@ void ScreenPaths::draw() {
 		const float x = -0.45;
 		const float start_y = -0.15;
 		double wcounter = 0;
-		const MenuOptions opts = m_menu.getOptions();
+		const MenuOptions &opts = m_menu.getOptions();
 		int start_i = std::min((int)m_menu.curIndex() - 1, (int)opts.size() - (int)showopts
 			+ (m_menu.getSubmenuLevel() == 2 ? 1 : 0)); // Hack to counter side-effects from displaying the value inside the menu
 		if (start_i < 0 || opts.size() == showopts) { start_i = 0; }

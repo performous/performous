@@ -1,10 +1,10 @@
 #pragma once
-
 #include "animvalue.hh"
 #include "screen.hh"
 #include "theme.hh"
 #include "textinput.hh"
 #include "layout_singer.hh"
+#include <unordered_map>
 
 class Song;
 class Audio;
@@ -49,7 +49,7 @@ class ScreenPlayers : public Screen {
 	AnimValue m_quitTimer;
 	TextInput m_search;
 	std::unique_ptr<Texture> m_emptyCover;
-	std::map<fs::path, std::unique_ptr<Texture>> m_covers;
+	std::unordered_map<fs::path, std::unique_ptr<Texture>, FsPathHash> m_covers;
 	std::unique_ptr<LayoutSinger> m_layout_singer;
 	bool keyPressed = false;
 };

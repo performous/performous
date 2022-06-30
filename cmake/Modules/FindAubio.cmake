@@ -1,21 +1,36 @@
+include(LibFindMacros)
+include(LibFetchMacros)
 
-if (NOT USE_SELF_BUILT_AUBIO)
-    find_package(PkgConfig REQUIRED)
-    if(PKG_CONFIG_FOUND)
-        # The version we look for is legacy, may need some fine tunning
-        pkg_check_modules(AUBIO IMPORTED_TARGET aubio>=0.4.9)
-    endif()
+set(Aubio_GIT_VERSION "master")
+
+if(SELF_BUILT_AUBIO STREQUAL "ALWAYS")
+	message(STATUS "aubio forced to build from source")
+	libfetch_git_pkg(Aubio
+		REPOSITORY ${SELF_BUILT_GIT_BASE}/aubio.git
+		REFERENCE  ${Aubio_GIT_VERSION}
+		#FIND_PATH  aubio/aubio.h
+	)
+elseif(SELF_BUILT_AUBIO STREQUAL "NEVER")
+	find_package(PkgConfig REQUIRED)
+	pkg_check_modules(AUBIO REQUIRED QUIET IMPORTED_TARGET GLOBAL aubio>=${Aubio_FIND_VERSION})
+	add_library(aubio ALIAS PkgConfig::AUBIO)
+	set(Aubio_VERSION ${AUBIO_VERSION})
+elseif(SELF_BUILT_AUBIO STREQUAL "AUTO")
+	find_package(PkgConfig REQUIRED)
+	pkg_check_modules(AUBIO QUIET IMPORTED_TARGET GLOBAL aubio>=${Aubio_FIND_VERSION})
+	if(NOT AUBIO_FOUND)
+		message(STATUS "aubio build from source because not found on system")
+		libfetch_git_pkg(Aubio
+			REPOSITORY ${SELF_BUILT_GIT_BASE}/aubio.git
+			REFERENCE  ${Aubio_GIT_VERSION}
+			#FIND_PATH  aubio/aubio.h
+		)
+	else()
+		add_library(aubio ALIAS PkgConfig::AUBIO)
+		set(Aubio_VERSION ${AUBIO_VERSION})
+	endif()
+else()
+	message(FATAL_ERROR "unknown SELF_BUILD_AUBIO value \"${SELF_BUILT_AUBIO}\". Allowed values are NEVER, AUTO and ALWAYS")
 endif()
 
-if (NOT AUBIO_FOUND)
-
-    message("Building aubio from sources...")
-    include(FetchContent)
-    FetchContent_Declare(aubio-sources
-      GIT_REPOSITORY https://github.com/performous/aubio.git
-      GIT_TAG        14fec3da6749fbcc47b56648d7a38296eccd9499
-      SOURCE_DIR aubio-src
-    )
-    FetchContent_MakeAvailable(aubio-sources)
-
-endif()
+message(STATUS "Found Aubio ${Aubio_VERSION}")

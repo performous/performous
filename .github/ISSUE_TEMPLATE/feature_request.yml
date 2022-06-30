@@ -1,0 +1,38 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for Performous.
+labels: ["Feature request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        #### ADVISORY
+
+        "Please post all details in **English**."
+
+        #### Prerequisites before submitting a feature request!
+        - Read the issue reporting section in the **[contributing guidelines](https://github.com/performous/performous/blob/master/.github/CONTRIBUTING.md#how-to-write-a-good-issue)**, to know how to submit a feature request with the required information.
+        - Verify that the feature being requested is not available in the **[latest official Performous version](https://github.com/performous/performous/releases/latest).**
+        - (Optional, but recommended) Verify that feature being requested is not available in the latest **[CI builds](https://github.com/performous/performous/actions?query=event%3Apush+is%3Acompleted+branch%3Amaster+workflow%3A%22Build+and+Release+Performous%22++)**.
+        - Perform a **[search of the issue tracker (including closed ones)](https://github.com/performous/performous/issues)** to avoid posting a duplicate.
+        - Make sure this is not a support request or question, both of which are better suited for either the **[discussions section](https://github.com/performous/performous/discussions)** or **[Discord - User Support channel](https://discord.gg/NS3m3ad)**.
+        - Verify that the **[wiki](https://github.com/performous/performous/wiki)** did not contain a suitable solution either.
+
+  - type: textarea
+    attributes:
+      label: Suggestion
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Use case
+      description: Provide a valid usecase in which this new feature can be used. This will help us giving some context to the problem we're trying to solve.
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Extra info/examples/attachments
+      description: Add screenshots etc. (Anything that will give us more context about what is being requested!)
+    validations:
+      required: false

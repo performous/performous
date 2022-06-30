@@ -1,13 +1,12 @@
 {
   "name": "performous",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "dependencies": [
     "openblas",
     "fftw3",
     "boost-program-options",
     "boost-iostreams",
     "boost-system",
-    "boost-format",
     "boost-locale",
     {
       "name": "boost-locale",
@@ -39,7 +38,10 @@
       "features": [
         "tools"
       ]
-    }
+    },
+    "nlohmann-json",
+    "aubio",
+    "fmt"
   ],
-  "builtin-baseline": "8c092e5cb6c275906758f0b5b54dde4ce6afaaa0"
+  "builtin-baseline": "14e7bb4ae24616ec54ff6b2f6ef4e8659434ea44"
 }

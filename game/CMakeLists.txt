@@ -99,14 +99,23 @@ target_link_libraries(performous PRIVATE ${LibEpoxy_LIBRARIES})
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(deps REQUIRED IMPORTED_TARGET glib-2.0 gio-2.0 gobject-2.0)
 
+set(SELF_BUILT_GIT_BASE "https://github.com/performous" CACHE STRING "base path of the git trees used for self built dependencies")
+set(SELF_BUILT_AUBIO "NEVER" CACHE STRING "rule to allow self build of Aubio dependency library [NEVER*|AUTO|ALWAYS]")
+set(SELF_BUILT_JSON "NEVER" CACHE STRING "rule to allow self build of Json dependency library [NEVER*|AUTO|ALWAYS]")
+
+set(Aubio_REQUIRED_VERSION "0.4.9")
+
 # Find all the libs that don't require extra parameters
-foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM)
-	find_package(${lib} REQUIRED)
+foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM Json Ced Aubio)
+	find_package(${lib} ${${lib}_REQUIRED_VERSION} REQUIRED)
 	message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
 	target_include_directories(performous SYSTEM PRIVATE ${${lib}_INCLUDE_DIRS})
 	target_link_libraries(performous PRIVATE ${${lib}_LIBRARIES})
 	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
+
+find_package(fmt REQUIRED CONFIG)
+target_link_libraries(performous PRIVATE fmt::fmt)
 
 target_include_directories(fs PRIVATE ${SDL2_INCLUDE_DIRS})
 target_link_libraries(fs PRIVATE ${SDL2_LIBRARIES})
@@ -142,22 +151,22 @@ set(ENABLE_WEBCAM AUTO CACHE STRING "Use webcam")
 set_property(CACHE ENABLE_WEBCAM PROPERTY STRINGS AUTO ON OFF)
 if("AUTO" STREQUAL "${ENABLE_WEBCAM}")
 	# webcam support not requested explicitly, best effort try to find it
-	find_package(OpenCV QUIET)
-	if(OpenCV_FOUND)
+	find_package(OpenCV REQUIRED core videoio)
+	if(OPENCV_VIDEOIO_FOUND)
 		message(STATUS "Webcam support: Enabled (automatically found)")
 	else()
 		message(STATUS "Webcam support: Disabled (OpenCV (libcv/libhighgui) not found)")
 	endif()
 elseif(ENABLE_WEBCAM)
 	# webcam support explicitly requested, make it mandatory
-	find_package(OpenCV REQUIRED)
+	find_package(OpenCV REQUIRED core videoio)
 	message(STATUS "Webcam support: Enabled (explicitly enabled)")
 else()
 	# webcam support explicitly disabled
 	message(STATUS "Webcam support: Disabled (explicitly disabled)")
 endif()
 
-if(OpenCV_FOUND)
+if(OPENCV_VIDEOIO_FOUND)
 	target_include_directories(performous SYSTEM PRIVATE ${OpenCV_INCLUDE_DIRS})
 	target_link_libraries(performous PRIVATE ${OpenCV_LIBS})
 	add_definitions("-DUSE_OPENCV")

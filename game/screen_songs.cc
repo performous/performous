@@ -317,10 +317,10 @@ void ScreenSongs::draw() {
 		case 1:
 			if (!m_search.text.empty()) oss_order << m_search.text;
 			else if (m_songs.typeNum()) oss_order << m_songs.typeDesc();
-			else if (m_songs.sortNum()) oss_order << m_songs.sortDesc();
+			else if (m_songs.sortNum()) oss_order << m_songs.getSortDescription();
 			else oss_order << _("<type in to search>") << PAD << HORIZ_ARROW << _("songs") << PAD << VERT_ARROW << _("options");
 			break;
-		case 2: oss_order << HORIZ_ARROW << _("sort order: ") << m_songs.sortDesc(); break;
+		case 2: oss_order << HORIZ_ARROW << _("sort order: ") << m_songs.getSortDescription(); break;
 		case 3: oss_order << HORIZ_ARROW << _("type filter: ") << m_songs.typeDesc(); break;
 		case 4: oss_order << HORIZ_ARROW << _("hiscores") << PAD << ENTER << _("jukebox mode"); break;
 		case 0:
@@ -423,8 +423,7 @@ void ScreenSongs::drawCovers() {
 
 Texture* ScreenSongs::loadTextureFromMap(fs::path path) {
 	if(m_covers.find(path) == m_covers.end()) {
-		std::pair<fs::path, std::unique_ptr<Texture>> kv = std::make_pair(path, std::make_unique<Texture>(path));
-		m_covers.insert(std::move(kv));
+		m_covers.insert({ path, std::make_unique<Texture>(path) });
 	}
 	try {
 		return m_covers.at(path).get();
@@ -549,28 +548,28 @@ std::unique_ptr<fvec_t, void(*)(fvec_t*)> ScreenSongs::previewBeatsBuffer = std:
 
 void ScreenSongs::createPlaylistMenu() {
 	m_menu.clear();
-	m_menu.add(MenuOption(_("Play"), "").call([this]() {
+	m_menu.add(MenuOption(_("Play"), "")).call([this]() {
 		Game* tm = Game::getSingletonPtr();
 		tm->getCurrentPlayList().addSong(m_songs.currentPtr());
 		m_menuPos = 1;
 		m_menu.close();
 		sing();
-	}));
-	m_menu.add(MenuOption(_("Shuffle"), "").call([this]() {
+	});
+	m_menu.add(MenuOption(_("Shuffle"), "")).call([this]() {
 		Game* tm = Game::getSingletonPtr();
 		tm->getCurrentPlayList().shuffle();
 		m_menuPos = 1;
 		m_menu.close();
-	}));
-	m_menu.add(MenuOption(_("View playlist"), "").screen("Playlist"));
-	m_menu.add(MenuOption(_("Clear playlist"), "").call([this]() {
+	});
+	m_menu.add(MenuOption(_("View playlist"), "")).screen("Playlist");
+	m_menu.add(MenuOption(_("Clear playlist"), "")).call([this]() {
 		Game* tm = Game::getSingletonPtr();
 		tm->getCurrentPlayList().clear();
 		m_menuPos = 1;
 		m_menu.close();
-	}));
-	m_menu.add(MenuOption(_("Back"), "").call([this]() {
+	});
+	m_menu.add(MenuOption(_("Back"), "")).call([this]() {
 		m_menuPos = 1;
 		m_menu.close();
-	}));
+	});
 }

@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <future>
+#include <iostream>
 #include <regex>
 #include <set>
 #include <stdexcept>
@@ -222,10 +223,12 @@ namespace portaudio {
 	}
 
 	class Stream {
-		PaStream* m_handle;
-		// We are non-copyable
-		Stream(Stream const&) = delete;
-		Stream& operator=(Stream const&) = delete;
+		static void shutdownPaStream(PaStream *s) {
+			try { PORTAUDIO_CHECKED(Pa_CloseStream, (s)); }
+			catch(const std::exception &e) { std::cerr << "Failed to close stream " << s << " " << e.what() << '\n'; }
+		}
+
+		std::unique_ptr<PaStream, decltype(&shutdownPaStream)> m_handle{nullptr, &shutdownPaStream};
 	public:
 		/// Construct stream using a C++ functor as callback
 		template <typename Functor> Stream(
@@ -239,17 +242,12 @@ namespace portaudio {
 			if (output != nullptr) {
 				if (output->channelCount > 0) { flags = paPrimeOutputBuffersUsingStreamCallback; }
 			}
-			PORTAUDIO_CHECKED(Pa_OpenStream, (&m_handle, input, output, sampleRate, framesPerBuffer, flags, functorCallback<Functor>, (void*)(intptr_t)&functor));
+			PaStream *new_stream;
+			PORTAUDIO_CHECKED(Pa_OpenStream, (&new_stream, input, output, sampleRate, framesPerBuffer, flags, functorCallback<Functor>, (void*)(intptr_t)&functor));
+			m_handle.reset(new_stream);
+
 		}
-		~Stream() {
-			if (!m_handle) return;
-			// Give audio a little time to shutdown but then just quit
-			auto audiokiller = std::async(std::launch::async, Pa_CloseStream, m_handle);
-			if (audiokiller.wait_for(std::chrono::seconds(5)) == std::future_status::ready) return;
-			std::cerr << "PortAudio BUG: Pa_CloseStream hung for more than five seconds. Aborting." << std::endl;
-			abort();  // Crash. Calling exit() is prone to hang.
-		}
-		operator PaStream*() { return m_handle; }
+		operator PaStream*() { return m_handle.get(); }
 	};
 
 }

@@ -1,5 +1,4 @@
-#include <winuser.h>
-#include <winver.h>
+#include <windows.h>
 
 LANGUAGE 9, 1
 

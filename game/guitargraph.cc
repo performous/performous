@@ -6,7 +6,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <stdexcept>
-#include <boost/format.hpp>
+#include <fmt/format.h>
 
 namespace {
 	#if 0 // Here is some dummy gettext calls to populate the dictionary
@@ -160,13 +160,13 @@ void GuitarGraph::setupJoinMenuDifficulty() {
 	}
 	m_selectedDifficulty = ConfigItem(ol); // Create a ConfigItem from the option list
 	m_selectedDifficulty.select(cur); // Set the selection to current level
-	m_menu.add(MenuOption("", _("Select difficulty")).changer(m_selectedDifficulty)); // MenuOption that cycles the options
+	m_menu.add(MenuOption("", _("Select difficulty"))).changer(m_selectedDifficulty); // MenuOption that cycles the options
 	m_menu.back().setDynamicName(m_difficultyOpt); // Set the title to be dynamic
 }
 
 void GuitarGraph::setupJoinMenuDrums() {
 	setupJoinMenuDifficulty();
-	m_menu.add(MenuOption(_("Lefty-mode"), "").changer(m_leftymode));
+	m_menu.add(MenuOption(_("Lefty-mode"), "")).changer(m_leftymode);
 	m_menu.back().setDynamicComment(m_leftyOpt);
 }
 
@@ -180,10 +180,10 @@ void GuitarGraph::setupJoinMenuGuitar() {
 	}
 	m_selectedTrack = ConfigItem(ol); // Create a ConfigItem from the option list
 	m_selectedTrack.select(cur); // Set the selection to current track
-	m_menu.add(MenuOption("", _("Select track")).changer(m_selectedTrack)); // MenuOption that cycles the options
+	m_menu.add(MenuOption("", _("Select track"))).changer(m_selectedTrack); // MenuOption that cycles the options
 	m_menu.back().setDynamicName(m_trackOpt); // Set the title to be dynamic
 	setupJoinMenuDifficulty();
-	m_menu.add(MenuOption(_("Lefty-mode"), "").changer(m_leftymode));
+	m_menu.add(MenuOption(_("Lefty-mode"), "")).changer(m_leftymode);
 	m_menu.back().setDynamicComment(m_leftyOpt);
 }
 
@@ -197,7 +197,7 @@ void GuitarGraph::setupJoinMenu() {
 	} else {
 		setupJoinMenuGuitar();
 	}
-	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser")).screen("Songs"));
+	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"))).screen("Songs");
 }
 
 void GuitarGraph::updateJoinMenu() {
@@ -779,7 +779,7 @@ void GuitarGraph::drawNotes(double time) {
 	}
 	if (time != time) return;  // Check that time is not NaN
 
-	glmath::dvec4 neckglow;  // Used for calculating the average neck color
+	glmath::dvec4 neckglow{};  // Used for calculating the average neck color
 
 	// Iterate chords
 	for (auto& chord: m_chords) {
@@ -1098,7 +1098,7 @@ void GuitarGraph::drawInfo(double time) {
 		// Draw scores
 		{
 			ColorTrans c(Color(0.1, 0.3, 1.0, 0.9));
-			m_scoreText->render((boost::format("%04d") % getScore()).str());
+			m_scoreText->render(fmt::format("{:04d}", getScore()));
 			m_scoreText->dimensions().middle(-xcor).fixedHeight(h).screenBottom(-0.22);
 			m_scoreText->draw();
 		}

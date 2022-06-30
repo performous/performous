@@ -113,7 +113,8 @@ void Analyzer::calcTones() {
 	const double freqPerBin = m_rate / FFT_N;
 	const double stepRate = m_rate / m_step;  // Steps per second
 	const double phaseStep = double(m_step) / FFT_N;
-	const double minMagnitude = pow(10, -70.0 / 20.0); // -70 dB noise cut
+	const double normCoeff = 1.0 / FFT_N;
+	const double minMagnitude = pow(10, -80.0 / 20.0) / normCoeff; // -80 dB noise cut
 	// Limit frequency range of processing
 	const size_t kMin = std::max(size_t(1), size_t(FFT_MINFREQ / freqPerBin));
 	const size_t kMax = std::min(FFT_N / 2, size_t(FFT_MAXFREQ / freqPerBin));
@@ -201,7 +202,7 @@ void Analyzer::calcTones() {
 		if (power < 0.1 * totalPower) break;
 		Tone t;
 		t.freq = bestFreq;
-		t.db = 10.0 * std::log10(power);
+		t.db = 10.0 * std::log10(normCoeff * power);
 		if (t.db < -55.0) break;
 		tones.push_back(t);
 	}
