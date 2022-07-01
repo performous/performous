@@ -254,6 +254,7 @@ void Songs::reload_internal(fs::path const& parent) {
 	try {
 		std::regex expression(R"((\.txt|^song\.ini|^notes\.xml|\.sm)$)", std::regex_constants::icase);
 		for (const auto &dir : fs::directory_iterator(parent)) { //loop through files
+			if (!m_loading) return; // early return in case scanning is long and user wants to exit quickly
 			fs::path p = dir.path();
 			if (fs::is_directory(p)) { reload_internal(p); continue; } //if the file is a folder redo this function with this folder as path
 			if (!regex_search(p.filename().string(), expression)) continue; //if the folder does not contain any of the requested files, ignore it
