@@ -1,10 +1,11 @@
 #include "graphiccontext.hh"
 #include "text.hh"
 
+#include "effect/effectmanager.hh"
 #include <configuration.hh>
 
-GraphicContext::GraphicContext(EffectManager& manager)
-: m_effectManager(manager) {
+GraphicContext::GraphicContext(Window& window, EffectManager& manager)
+: m_window(window), m_effectManager(manager) {
 	//addFont("default", "mainmenu_option.svg");
 	addFont("ui", "mainmenu_comment.svg");
 }
@@ -40,4 +41,8 @@ void GraphicContext::add(EffectPtr effect) {
 
 void GraphicContext::remove(EffectPtr effect) {
 	m_effectManager.remove(effect);
+}
+
+Window& GraphicContext::getWindow() {
+	return m_window;
 }

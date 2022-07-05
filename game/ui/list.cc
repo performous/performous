@@ -88,10 +88,12 @@ size_t List::getSelectedIndex() const {
 
 void List::select(size_t index) {
 	if(m_selected != index) {
-		if(m_onSelectionChanged)
-			m_onSelectionChanged(*this, index, m_selected);
+		auto const oldIndex = m_selected;
 
 		m_selected = index;
+
+		if(m_onSelectionChanged)
+			m_onSelectionChanged(*this, index, oldIndex);
 	}
 }
 
@@ -200,10 +202,9 @@ void List::draw(GraphicContext& gc) {
 	drawFocus(gc);
 
 	m_background.dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());
-	m_background.draw();
+	m_background.draw(gc.getWindow());
 
-	if(m_items.size() != m_texts.size())
-		updateTexts();
+	updateTexts();
 	updateIcons();
 	updateCheckBoxs();
 
@@ -222,10 +223,10 @@ void List::draw(GraphicContext& gc) {
 
 		if(index == getSelectedIndex()) {
 			m_selectedBackground.dimensions.left(getX()).top(y).stretch(getWidth(), lineHeight);
-			m_selectedBackground.draw();
+			m_selectedBackground.draw(gc.getWindow());
 		}
 
-		const auto color = ColorTrans(Color::alpha(index == getSelectedIndex() ? 1.0 : 0.5));
+		const auto color = ColorTrans(gc.getWindow(), Color::alpha(index == getSelectedIndex() ? 1.0 : 0.5));
 
 		auto x = getX();
 		auto width = getWidth();

@@ -12,7 +12,7 @@ class TextBox : public Control {
 	TextBox(std::string const& text = {}, Control* parent = nullptr);
 	TextBox(Control* parent, std::string const& text = {});
 
-	TextBox& setText(std::string const&);
+	TextBox& setText(std::string const&, bool keepCursorPosition = false);
 	std::string getText() const;
 	TextBox& setMaxLength(size_t);
 	size_t getMaxLength() const;
@@ -21,9 +21,6 @@ class TextBox : public Control {
 	void onKey(Key) override;
 
 	void draw(GraphicContext&) override;
-
-  private:
-	void sendTextChanged(std::string const& newText, std::string const& oldText);
 
   private:
 	Text m_text;

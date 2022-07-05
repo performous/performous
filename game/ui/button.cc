@@ -31,7 +31,7 @@ void Button::draw(GraphicContext& gc) {
 	drawFocus(gc);
 
 	m_background.dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());
-	m_background.draw();
+	m_background.draw(gc.getWindow());
 
 	gc.drawCentered(m_text, getX(), getY(), getWidth(), getHeight());
 }

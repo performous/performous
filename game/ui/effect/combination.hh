@@ -8,7 +8,7 @@ class Combination : public IEffect {
 public:
 	Combination(std::vector<EffectPtr> const&);
 
-	void process(EffectContext const&) override;
+	void process(EffectContext&) override;
 
 private:
 	std::vector<EffectPtr> m_effects;

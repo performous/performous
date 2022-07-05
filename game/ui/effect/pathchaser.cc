@@ -10,7 +10,7 @@ void PathChaser::setConsumer(std::function<void(Point const&)> consumer) {
 	m_consumer = consumer;
 }
 
-void PathChaser::process(EffectContext const& context) {
+void PathChaser::process(EffectContext& context) {
 	if (m_consumer)
 		m_consumer(m_pathProvider.getPath()->getPoint(m_position));
 //std::cout << "position: " << m_position << std::endl;

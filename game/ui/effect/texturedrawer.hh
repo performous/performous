@@ -9,7 +9,7 @@ class TextureDrawer : public IEffect {
 public:
 	TextureDrawer(Texture const&);
 
-	void process(EffectContext const&) override;
+	void process(EffectContext&) override;
 
 	void setColor(Color const&);
 	void resetColor();

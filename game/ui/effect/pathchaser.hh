@@ -11,7 +11,7 @@ public:
 
 	void setConsumer(std::function<void(Point const&)>);
 
-	void process(EffectContext const&) override;
+	void process(EffectContext&) override;
 
 private:
 	IPathProvider const& m_pathProvider;

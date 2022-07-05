@@ -57,8 +57,10 @@ class Players {
 	std::optional<std::string> lookup(const PlayerId &id) const;
 
 	/// add a player with a displayed name and an optional picture; if no id is given one will be assigned
-	void addPlayer (std::string const& name, std::string const& picture = "", std::optional<PlayerId> id = std::nullopt);
-	PlayerId addPlayer(PlayerItem const&);
+	PlayerId addPlayer (std::string const& name, std::string const& picture = "", std::optional<PlayerId> id = std::nullopt);
+	void addPlayer(PlayerItem const&);
+	void assignIds();
+
 	void removePlayer(PlayerId);
 	void removePlayer(PlayerItem const&);
 

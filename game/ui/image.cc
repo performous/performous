@@ -33,11 +33,11 @@ void Image::draw(GraphicContext& gc) {
 	drawFocus(gc);
 
 	m_background.dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());
-	m_background.draw();
+	m_background.draw(gc.getWindow());
 
 	if(m_texture) {
 		m_texture->dimensions.left(getX() + xOffset).top(getY() + yOffset).stretch(width, height);
-		m_texture->draw();
+		m_texture->draw(gc.getWindow());
 	}
 }
 

@@ -1,7 +1,9 @@
 #include "formscreen.hh"
 
-FormScreen::FormScreen(const std::string& name)
-: Screen(name), m_gc(m_effectManager) {
+#include "game.hh"
+
+FormScreen::FormScreen(Game& game, const std::string& name)
+: Screen(game, name), m_effectManager(m_gc), m_gc(game.getWindow(), m_effectManager) {
 }
 
 void FormScreen::manageEvent(input::NavEvent const& event) {
@@ -182,6 +184,14 @@ namespace {
 		return std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
 	}
 
+	float getSecondsSinceStart() {
+		static std::chrono::milliseconds start = getCurrentTimeInMilliseconds();
+		auto const now = getCurrentTimeInMilliseconds();
+		auto const difference = now - start;
+
+		return float(difference.count()) * 0.001f;
+	}
+
 	float getSecondsSinceLastFrame() {
 		static std::chrono::milliseconds lastFrame = getCurrentTimeInMilliseconds();
 		auto const now = getCurrentTimeInMilliseconds();
@@ -200,6 +210,6 @@ namespace {
 void FormScreen::draw() {
 	m_control.draw(m_gc);
 
-	m_effectManager.process(getSecondsSinceLastFrame());
+	m_effectManager.process(getSecondsSinceLastFrame(), getSecondsSinceStart());
 }
 

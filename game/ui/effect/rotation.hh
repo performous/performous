@@ -10,7 +10,7 @@ public:
 
 	void setConsumer(std::function<void(float)>);
 
-	void process(EffectContext const&) override;
+	void process(EffectContext&) override;
 
 private:
 	float m_speed = 0.25f;

@@ -78,7 +78,7 @@ struct PlayerItem {
 	PlayerItem(PlayerItem&&) = default;
 	PlayerItem& operator=(PlayerItem&&) = default;
 
-	PlayerId id; ///< unique identifier for this PlayerItem, Link to hiscore
+	std::optional<PlayerId> id; ///< unique identifier for this PlayerItem, Link to hiscore
 
 	std::string name; ///< name displayed and used for searching the player
 	fs::path picture; ///< the filename which was passed from xml (and is written back)

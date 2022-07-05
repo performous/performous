@@ -8,27 +8,35 @@
 #include <algorithm>
 #include <unicode/stsearch.h>
 
-void Players::load(xmlpp::NodeSet const& n) {
-	for (auto const& elem: n) {
+namespace {
+	std::string getTextFromNode(xmlpp::Node const& n) {
+		auto tn = xmlpp::get_first_child_text(dynamic_cast<xmlpp::Element const&>(n));
+
+		return tn->get_content();
+	}
+}
+
+void Players::load(xmlpp::NodeSet const& nodes) {
+	for (auto const& elem: nodes) {
 		auto player = PlayerItem();
 		auto& element = dynamic_cast<xmlpp::Element&>(*elem);
 		auto a_name = element.get_attribute("name");
 		if (!a_name) throw PlayersException("Attribute name not found");
 		auto a_id = element.get_attribute("id");
 		if (!a_id) throw PlayersException("Attribute id not found");
-		std::optional<PlayerId> id;
-		try {
-			id = std::stoi(a_id->get_value());
-		} catch (std::exception&) { }
 
-		player.id = id;
+		try {
+			player.id = std::stoi(a_id->get_value());
+		} catch (std::exception&) {
+		}
+
 		player.setName(a_name->get_value());
 
-		auto n2 = element.find("picture");
-		if (!n2.empty()) // optional picture element
+		auto resultNodes = element.find("picture");
+		if (!resultNodes.empty()) // optional picture element
 		{
-			auto tn = xmlpp::get_first_child_text(dynamic_cast<xmlpp::Element&>(**n2.begin()));
-			auto const picture = fs::path(tn->get_content());
+			auto const path = getTextFromNode(**resultNodes.begin());
+			auto const picture = fs::path(path);
 
 			player.picture = picture;
 			player.path = findFile(picture);
@@ -42,6 +50,9 @@ void Players::load(xmlpp::NodeSet const& n) {
 
 		addPlayer(player);
 	}
+
+	assignIds();
+
 	filter_internal();
 }
 
@@ -51,7 +62,7 @@ void Players::save(xmlpp::Element *players) {
 		std::cout << "save " << player->getName() << std::endl;
 		auto playerNode = xmlpp::add_child_element(players, "player");
 		playerNode->set_attribute("name", player->getName());
-		playerNode->set_attribute("id", std::to_string(player->id));
+		playerNode->set_attribute("id", std::to_string(player->id.value()));
 		playerNode->set_attribute("active", player->isActive() ? "true" : "false");
 		if (player->picture != "")
 		{
@@ -81,12 +92,15 @@ std::optional<std::string> Players::lookup(const PlayerId& id) const {
 	return (*it)->name;
 }
 
-PlayerId Players::addPlayer(PlayerItem const& p) {
-	auto player = p;
+void Players::assignIds() {
+	for(auto& player : m_players) {
+		if(!player->id.has_value())
+			player->id = assign_id_internal();
+	}
+}
 
-	//pi.id = id.value_or(assign_id_internal());
-	//if (player.id == PlayerItem::UndefinedPlayerId)
-	//	player.id = assign_id_internal();
+void Players::addPlayer(PlayerItem const& p) {
+	auto player = p;
 
 	if (player.picture != "") // no picture, so don't search path
 	{
@@ -102,28 +116,23 @@ PlayerId Players::addPlayer(PlayerItem const& p) {
 		}
 	}
 
-	const auto ret = m_players.emplace(std::make_shared<PlayerItem>(player));
-	if (!ret.second)
-	{
-		player.id = assign_id_internal();
-		m_players.emplace(std::make_shared<PlayerItem>(player)); // now do the insert with the fresh id
-	}
-
-	return player.id;
+	m_players.emplace(std::make_shared<PlayerItem>(player));
 }
 
-void Players::addPlayer(std::string const& name, std::string const& picture, std::optional<PlayerId> id) {
+PlayerId Players::addPlayer(std::string const& name, std::string const& picture, std::optional<PlayerId> id) {
 	PlayerItem pi;
-	
+
 	pi.id = id.value_or(assign_id_internal());
 	pi.name = name;
 	pi.picture = picture;
 
-	return addPlayer(pi);
+	addPlayer(pi);
+
+	return pi.id.value();
 }
 
 void Players::removePlayer(PlayerItem const& player) {
-	removePlayer(player.id);
+	removePlayer(player.id.value());
 }
 
 void Players::removePlayer(PlayerId playerId) {
@@ -140,12 +149,12 @@ void Players::setFilter(std::string const& val) {
 }
 
 PlayerId Players::assign_id_internal() {
-	const auto it = std::max_element(m_players.begin(),m_players.end());
+	const auto it = std::max_element(m_players.begin(), m_players.end());
 
-	if (it != m_players.end() && it->id) 
-		return (*it)->id + 1;
+	if (it != m_players.end() && (*it)->id)
+		return (*it)->id.value() + 1;
 
-	return id;
+	return 0;
 }
 
 void Players::filter_internal() {
@@ -169,9 +178,9 @@ void Players::filter_internal() {
 				if(m_filter.empty())
 					return true;
 
-				auto search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8(it->getName()), UnicodeUtil::m_searchCollator.get(), nullptr, m_icuError);
+				auto search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8(it->getName()), UnicodeUtil::m_searchCollator.get(), nullptr, icuError);
 
-				return (search.first(m_icuError) != USEARCH_DONE);
+				return (search.first(icuError) != USEARCH_DONE);
 			});
 
 		std::cout << "filtered players: " << filtered.size() << std::endl;
@@ -206,18 +215,18 @@ PlayerItem& Players::operator[](unsigned pos) {
 }
 
 void Players::advance(std::ptrdiff_t diff) {
-    const unsigned size = count();
-    if (size == 0) 
-    	return; // Do nothing if no players are available
-    std::ptrdiff_t current = (static_cast<std::ptrdiff_t>(math_cover.getTarget()) + diff) % size;
+	const unsigned size = count();
+	if (size == 0)
+		return; // Do nothing if no players are available
+	std::ptrdiff_t current = (static_cast<std::ptrdiff_t>(math_cover.getTarget()) + diff) % size;
 	if (current < 0)
 		current += count();
 	math_cover.setTarget(current, count());
 }
 
 PlayerItem const& Players::current() const {
-    if (math_cover.getTarget() < static_cast<ptrdiff_t>(m_filtered.size())) 
-    	return m_filtered[static_cast<unsigned>(math_cover.getTarget())];
+	if (math_cover.getTarget() < static_cast<ptrdiff_t>(m_filtered.size()))
+		return *m_filtered[static_cast<unsigned>(math_cover.getTarget())];
 
 	static PlayerItem empty;
 

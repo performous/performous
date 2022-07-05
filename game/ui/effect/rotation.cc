@@ -14,7 +14,7 @@ namespace {
 	float const pi(atanf(1.f) * 4.f);
 }
 
-void Rotation::process(EffectContext const& context) {
+void Rotation::process(EffectContext& context) {
 	if (m_consumer)
 #ifdef GLM_FORCE_RADIANS
 		m_consumer(m_angle * pi * 2.f);

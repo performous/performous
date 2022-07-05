@@ -10,7 +10,6 @@
 #include <functional>
 #include <tuple>
 #include <vector>
-#include "checkbox.hh"
 
 class Item {
   public:

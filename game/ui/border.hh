@@ -31,7 +31,7 @@ class Border : public IPathProvider {
 	float getWidth() const;
 	float getHeight() const;
 
-	void draw();
+	void draw(Window&);
 
 	PathPtr getPath() const override;
 

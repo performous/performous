@@ -53,10 +53,10 @@ void Select::onKey(Key key) {
 }
 
 void Select::draw(GraphicContext& gc) {
-	const auto color = ColorTrans(hasFocus() ? Color(1.f, 1.f, 1.f) : Color(0.6f, 0.6f, 0.6f));
+	const auto color = ColorTrans(gc.getWindow(), hasFocus() ? Color(1.f, 1.f, 1.f) : Color(0.6f, 0.6f, 0.6f));
 
 	m_background.dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());
-	m_background.draw();
+	m_background.draw(gc.getWindow());
 
 	gc.drawCentered(m_text, getX(), getY(), getWidth(), getHeight());
 }

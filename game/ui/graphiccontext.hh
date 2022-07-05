@@ -7,13 +7,14 @@
 #include "../opengl_text.hh"
 #include "../fs.hh"
 
-#include "ui/effect/effectmanager.hh"
+#include "effect/ieffect.hh"
 
 class Text;
+class EffectManager;
 
 class GraphicContext {
 public:
-	GraphicContext(EffectManager&);
+	GraphicContext(Window&, EffectManager&);
 
 	void addFont(std::string const& font, fs::path const& file);
 
@@ -26,7 +27,10 @@ public:
 	void add(EffectPtr);
 	void remove(EffectPtr);
 
+	Window& getWindow();
+
 private:
+	Window& m_window;
 	EffectManager& m_effectManager;
 	std::map<std::string, std::pair<fs::path, double>> m_fonts;
 };

@@ -76,7 +76,7 @@ class Control {
 	Border m_focus{std::make_shared<BorderDefinition>(findFile("ui_focused.svg").string())};
 	Texture m_focusEffectImage;
 	EffectPtr m_focusEffect;
-	glmath::mat3 m_matrix;
+	glmath::mat3 m_matrix{1.f};
 	std::function<void(Control&, Key)> m_onKeyDown;
 	std::function<void(Control&, Key)> m_onKeyUp;
 };

@@ -44,7 +44,7 @@ Control::Control(Control* parent)
 		m_matrix = glm::rotate(m_matrix, angle);
 	});
 
-	auto generic = std::make_shared<Generic>([&, drawer](EffectContext const& context){
+	auto generic = std::make_shared<Generic>([&, drawer](EffectContext& context){
 		//std::cout << "generic" << std::endl;
 		const auto v = context.getSecondsSinceStart() * 0.5f;
 		const auto a = v - floor(v);
@@ -54,10 +54,10 @@ Control::Control(Control* parent)
 
 	auto border = std::make_shared<Sinus>(1.f, 0.f, 1.f);
 
-	border->setConsumer([&](float value){
+	border->setConsumer([&](float value, EffectContext& context){
 		//std::cout << "border: " << v << std::endl;
-		auto const color = ColorTrans(Color::alpha(value));
-		m_focus.draw();
+		auto const color = ColorTrans(context.getGraphicContext().getWindow(), Color::alpha(value));
+		m_focus.draw(context.getGraphicContext().getWindow());
 	});
 
 	m_focusEffect = combine(border/*, pathChaser, rotation, generic, drawer*/);

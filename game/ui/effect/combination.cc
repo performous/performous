@@ -6,7 +6,7 @@ Combination::Combination(const std::vector<EffectPtr>& effects)
 : m_effects(effects) {
 }
 
-void Combination::process(EffectContext const& context) {
+void Combination::process(EffectContext& context) {
 	for(auto const& effect : m_effects)
 		effect->process(context);
 }

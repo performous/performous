@@ -50,10 +50,10 @@ float Border::getHeight() const {
 	return m_height;
 }
 
-void Border::draw() {
+void Border::draw(Window& window) {
 	glutil::GLErrorChecker glerror("Border::draw()");
 
-	auto const texture = UseTexture(*m_definition);
+	auto const texture = UseTexture(window, *m_definition);
 	glerror.check("texture");
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

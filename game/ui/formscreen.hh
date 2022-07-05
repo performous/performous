@@ -7,7 +7,7 @@
 
 class FormScreen: public Screen {
   public:
-	FormScreen(std::string const& name);
+	FormScreen(Game&, std::string const& name);
 	~FormScreen() override = default;
 
 	void manageEvent(input::NavEvent const& event) override;

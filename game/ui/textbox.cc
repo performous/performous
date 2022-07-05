@@ -9,14 +9,7 @@ TextBox::TextBox(Control* parent, std::string const& text)
 : Control(parent), m_text(text),  m_background(findFile("mainmenu_back_highlight.svg")) {
 }
 
-void TextBox::sendTextChanged(std::string const& newText, std::string const& oldText) {
-	if(oldText != newText) {
-		if(m_onTextChanged)
-			m_onTextChanged(*this, newText, oldText);
-	}
-}
-
-TextBox& TextBox::setText(std::string const& text) {
+TextBox& TextBox::setText(std::string const& text, bool keepCursorPosition) {
 	if(m_text.getText() != text) {
 		if(m_onTextChanged)
 			m_onTextChanged(*this, text, m_text.getText());
@@ -24,7 +17,12 @@ TextBox& TextBox::setText(std::string const& text) {
 		m_text.setText(text);
 	}
 
-	m_cursorPosition = text.size();
+	if(keepCursorPosition) {
+		if(m_cursorPosition > text.size())
+			m_cursorPosition = text.size();
+	}
+	else
+		m_cursorPosition = text.size();
 
 	return *this;
 }
@@ -59,10 +57,7 @@ namespace {
 }
 
 void TextBox::onKey(Key key) {
-	auto text = m_text.getText();
-
-	if(m_cursorPosition < text.size() && text[m_cursorPosition] == '|')
-		text.erase(m_cursorPosition, 1);
+	auto text = getText();
 
 	switch(key) {
 		case Key::Up:
@@ -85,8 +80,6 @@ void TextBox::onKey(Key key) {
 			break;
 		default:
 			if(text.length() < m_maxLength) {
-				const auto oldText = getText();
-
 				if(key >= Key::Number0 && key <= Key::Number9)
 					text.insert(m_cursorPosition++, 1, convertToChar(key, Key::Number0, '0'));
 				else if(key >= Key::a && key <= Key::z)
@@ -95,26 +88,19 @@ void TextBox::onKey(Key key) {
 					text.insert(m_cursorPosition++, 1, convertToChar(key, Key::A, 'A'));
 				else if(key == Key::Space)
 					text.insert(m_cursorPosition++, 1, ' ');
-
-				sendTextChanged(getText(), oldText);
 			}
 	}
 
-	if(m_cursorPosition < text.size() && text[m_cursorPosition] != '|')
-		text.insert(m_cursorPosition, 1, '|');
-	else if(m_cursorPosition == text.size())
-		text.append(1, '|');
-
-	m_text.setText(text);
+	setText(text, true);
 }
 
 void TextBox::draw(GraphicContext& gc) {
 	drawFocus(gc);
 
-	const auto color = ColorTrans(hasFocus() ? Color(1.f, 1.f, 1.f) : Color(0.6f, 0.6f, 0.6f));
+	const auto color = ColorTrans(gc.getWindow(), hasFocus() ? Color(1.f, 1.f, 1.f) : Color(0.6f, 0.6f, 0.6f));
 
 	m_background.dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());
-	m_background.draw();
+	m_background.draw(gc.getWindow());
 
 	if(hasFocus()) {
 		auto text = m_text.getText();

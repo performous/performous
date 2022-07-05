@@ -42,7 +42,7 @@ namespace {
 }
 
 ScreenPlayerSetup::ScreenPlayerSetup(Game& game, Players& players, Database const& database)
-: FormScreen("PlayerSetup"), m_game(game), m_players(players), m_database(database),  m_background(findFile("intro_bg.svg")), m_grid(2, 1) {
+: FormScreen(game, "PlayerSetup"), m_game(game), m_players(players), m_database(database),  m_background(findFile("intro_bg.svg")), m_grid(2, 1) {
 	loadAvatars(m_avatars);
 	initializeControls();
 }
@@ -52,7 +52,7 @@ void ScreenPlayerSetup::onCancel() {
 }
 
 void ScreenPlayerSetup::draw() {
-	m_background.draw();
+	m_background.draw(m_game.getWindow());
 	FormScreen::draw();
 }
 
@@ -121,8 +121,11 @@ void ScreenPlayerSetup::initializeControls() {
 	m_playerList.displayIcon(true);
 	m_playerList.displayCheckBox(true);
 	m_playerList.setTabIndex(0);
-	m_playerList.onSelectionChanged([&](List& list, size_t index, size_t){ m_name.setText(list.getItems()[index].toString());});
+	m_playerList.onSelectionChanged([&](List& list, size_t index, size_t){
 		auto const& player = *list.getItems()[index].getUserData<PlayerItem*>();
+
+		m_name.setText(player.getName());
+
 		auto const avatar = player.getAvatar();
 
 		if(avatar.empty())
@@ -135,7 +138,7 @@ void ScreenPlayerSetup::initializeControls() {
 		setAvatar(m_avatar, m_avatarPrevious, m_avatarNext, id, m_avatars);
 
 		auto const& scores = m_database.getHighScores();
-		auto const result = scores.queryHiscore(-1, player.id, -1, {});
+		auto const result = scores.queryHiscore(player.id.value(), {}, {});
 		auto const best = std::max_element(result.begin(), result.end(), [](auto const& a, auto const& b){ return a.score < b.score;});
 
 		if(best == result.end()) {
@@ -148,13 +151,14 @@ void ScreenPlayerSetup::initializeControls() {
 			auto const song = songs.lookup(best->songid);
 
 			m_bestScore.setText(std::to_string(best->score));
-			m_bestSong.setText(song);
+			m_bestSong.setText(song.value());
 
 			auto const averageScore = std::accumulate(result.begin(), result.end(), 0U,
 				[](size_t sum, HiscoreItem const& score) { return sum + score.score;}) / result.size();
 
 			m_averageScore.setText(std::to_string(averageScore));
 		}
+	});
 
 	y = 0.f;
 
