@@ -13,6 +13,7 @@ class ConfigItem {
 	using StringList = std::vector<std::string>; ///< a list of strings
 	using OptionList = std::vector<std::string>; ///< a list of string options
 	using Value = std::variant<bool, unsigned short, int, float, std::string, StringList>;
+	using NumericValue = std::variant<unsigned short, int, float>;
 
 	ConfigItem() = default;
 	explicit ConfigItem(bool bval);
@@ -39,7 +40,7 @@ class ConfigItem {
 	StringList& sl(); ///< Access stringlist item
 	OptionList& ol(); ///< Access optionlist item
 	std::string& so(); ///< Access currently selected string option
-	void select(int i); ///< Set optionlist selected item index
+	void select(unsigned short index); ///< Set optionlist selected item index
 	void reset(bool factory = false) { m_value = factory ? m_factoryDefaultValue : m_defaultValue; } ///< Reset to default
 	void makeSystem() { m_defaultValue = m_value; } ///< Make current value the system default (used when saving system config)
 	std::string const& getName() const { return m_keyName; } ///< get the name for this ConfigItem in the schema.
@@ -61,15 +62,15 @@ class ConfigItem {
 	std::string const getEnumName() const; ///< Returns the selected enum option's text
 	std::vector<std::string>& getEnum() { return m_enums; }
 	int getSelection() const { return m_sel; }
-    
-	std::variant<int, float>& getMin();
-	std::variant<int, float>& getMax();
-	std::variant<int, float>& getStep();
-	std::variant<int, float>& getMultiplier();
+
+	NumericValue& getMin();
+	NumericValue& getMax();
+	NumericValue& getStep();
+	NumericValue& getMultiplier();
 	std::string& getUnit();
-    
-	void setGetValueFunction(std::function<std::string(ConfigItem const&)> f) { m_getValue = f; }    
-    
+
+	void setGetValueFunction(std::function<std::string(ConfigItem const&)> f) { m_getValue = f; }
+
   private:
 	void verifyType(std::string const& t) const; ///< throws std::logic_error if t != type
 	ConfigItem& incdec(int dir); ///< Increment/decrement by dir steps (must be -1 or 1)
@@ -86,11 +87,11 @@ class ConfigItem {
 	Value m_defaultValue; ///< The value from config schema or system config
 	std::string m_oldValue; ///< A previous value, as output by getValue().
 	std::vector<std::string> m_enums; ///< Enum value titles
-	std::variant<int, float> m_step, m_min, m_max;
-	std::variant<int, float> m_multiplier;
+	NumericValue m_step, m_min, m_max;
+	NumericValue m_multiplier;
 	std::string m_unit;
 	int m_sel = 0;
 	std::function<std::string(ConfigItem const&)> m_getValue;
 };
- 
+
 using ConfigItemMap = std::map<std::string, ConfigItem>;

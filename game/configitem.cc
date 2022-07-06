@@ -22,7 +22,7 @@ ConfigItem::ConfigItem(int ival)
 }
 
 ConfigItem::ConfigItem(unsigned short uival)
-: m_type("uint"), m_value(uival), m_sel() { 
+: m_type("uint"), m_value(uival), m_sel() {
 }
 
 ConfigItem::ConfigItem(float fval)
@@ -37,19 +37,19 @@ ConfigItem::ConfigItem(OptionList opts)
 : m_type("option_list"), m_value(opts) {
 }
 
-std::variant<int, double>& ConfigItem::getMin() {
+ConfigItem::NumericValue& ConfigItem::getMin() {
 	return m_min;
 }
 
-std::variant<int, double>& ConfigItem::getMax() {
+ConfigItem::NumericValue& ConfigItem::getMax() {
 	return m_max;
 }
 
-std::variant<int, double>& ConfigItem::getStep() {
+ConfigItem::NumericValue& ConfigItem::getStep() {
 	return m_step;
 }
 
-std::variant<int, double>& ConfigItem::getMultiplier() {
+ConfigItem::NumericValue& ConfigItem::getMultiplier() {
 	return m_multiplier;
 }
 
@@ -63,7 +63,7 @@ ConfigItem& ConfigItem::incdec(int dir) {
 		int step = std::get<int>(m_step);
 		val = clamp(((val + dir * step)/ step) * step, std::get<int>(m_min), std::get<int>(m_max));
 	} else if (m_type == "uint") {
-		unsigned short& val = std::get<unsigned short>(m_value); 
+		unsigned short& val = std::get<unsigned short>(m_value);
 		int value = static_cast<int>(val);
 		int step = std::get<unsigned short>(m_step);
 		int min = static_cast<int>(std::get<unsigned short>(m_min));
@@ -72,7 +72,7 @@ ConfigItem& ConfigItem::incdec(int dir) {
 	} else if (m_type == "float") {
 		auto& val = std::get<float>(m_value);
 		auto step = std::get<float>(m_step);
-		val = clamp(round((val + static_cast<float>(dir) * step) / step) * step, std::get<float>(m_min), std::get<float>(m_max));
+		val = clamp(static_cast<float>(round((val + static_cast<float>(dir) * step) / step) * step), std::get<float>(m_min), std::get<float>(m_max));
 	} else if (m_type == "bool") {
 		bool& val = std::get<bool>(m_value);
 		val = !val;
@@ -87,7 +87,7 @@ bool ConfigItem::isDefaultImpl(ConfigItem::Value const& defaultValue) const {
 	if (m_type == "bool") return std::get<bool>(m_value) == std::get<bool>(defaultValue);
 	if (m_type == "int") return std::get<int>(m_value) == std::get<int>(defaultValue);
 	if (m_type == "uint") return ui() == std::get<unsigned short>(defaultValue);
-	if (m_type == "float") return std::get<double>(m_value) == std::get<double>(defaultValue);
+	if (m_type == "float") return std::get<float>(m_value) == std::get<float>(defaultValue);
 	if (m_type == "string") return std::get<std::string>(m_value) == std::get<std::string>(defaultValue);
 	if (m_type == "string_list") return std::get<StringList>(m_value) == std::get<StringList>(defaultValue);
 	if (m_type == "option_list") return std::get<OptionList>(m_value) == std::get<OptionList>(defaultValue);
@@ -113,20 +113,20 @@ int const& ConfigItem::i() const {
 	return std::get<int>(m_value);
 }
 unsigned short& ConfigItem::ui() {
-    verifyType("uint"); 
-    return std::get<unsigned short>(m_value);
+	verifyType("uint");
+	return std::get<unsigned short>(m_value);
 }
 unsigned short const& ConfigItem::ui() const {
-    verifyType("uint"); 
-    return std::get<unsigned short>(m_value); 
+	verifyType("uint");
+	return std::get<unsigned short>(m_value);
 }
 bool& ConfigItem::b() {
 	verifyType("bool");
 	return std::get<bool>(m_value);
 }
-double& ConfigItem::f() {
+float& ConfigItem::f() {
 	verifyType("float");
-	return std::get<double>(m_value);
+	return std::get<float>(m_value);
 }
 std::string& ConfigItem::s() {
 	verifyType("string");
@@ -145,20 +145,20 @@ std::string& ConfigItem::so() {
 	return std::get<OptionList>(m_value).at(m_sel);
 }
 
-void ConfigItem::select(unsigned short i) { 
+void ConfigItem::select(unsigned short index) {
 	verifyType("option_list");
-    m_sel = clamp<unsigned short>(i, 0, static_cast<unsigned short>(std::get<OptionList>(m_value).size()-1));
+	m_sel = clamp<unsigned short>(index, 0, static_cast<unsigned short>(std::get<OptionList>(m_value).size()-1));
 }
 
 namespace {
 	template <typename T, typename VariantAll, typename VariantNum>
-    std::string numericFormat(VariantAll const& value, VariantNum const& multiplier, VariantNum const& step) {
+	std::string numericFormat(VariantAll const& value, VariantNum const& multiplier, VariantNum const& step) {
 		// Find suitable precision (not very useful for integers, but this code is generic...)
 		T m = std::get<T>(multiplier);
-		T s = std::abs(m * std::get<T>(step));
+		T s = static_cast<T>(std::abs(m * std::get<T>(step)));
 		unsigned precision = 0;
-		while (s > static_cast<T>(0) && (s *= static_cast<T>(10)) < static_cast<T>(10))
-            ++precision;
+		while (s > static_cast<T>(0) && (static_cast<T>(s *= static_cast<T>(10))) < static_cast<T>(10))
+			++precision;
 		// Format the output
 		return fmt::format("{:.{}f}", double(m) * std::get<T>(value), precision);
 	}
@@ -173,22 +173,23 @@ std::string const ConfigItem::getValue() const {
 	}
 	if (m_type == "uint") {
 		unsigned val = ui();
-		if (val < m_enums.size()) return m_enums[val];
+		if (val < m_enums.size())
+			return m_enums[val];
 		return numericFormat<unsigned short>(m_value, m_multiplier, m_step) + _(m_unit);
 	}
-	if (m_type == "float") 
-        return numericFormat<float>(m_value, m_multiplier, m_step) + _(m_unit);
-	if (m_type == "bool") 
-        return std::get<bool>(m_value) ? _("Enabled") : _("Disabled");
-	if (m_type == "string") 
-        return std::get<std::string>(m_value);
+	if (m_type == "float")
+		return numericFormat<float>(m_value, m_multiplier, m_step) + _(m_unit);
+	if (m_type == "bool")
+		return std::get<bool>(m_value) ? _("Enabled") : _("Disabled");
+	if (m_type == "string")
+		return std::get<std::string>(m_value);
 	if (m_type == "string_list") {
 		StringList const& sl = std::get<StringList>(m_value);
 		return sl.size() == 1 ? "{" + sl[0] + "}" : fmt::format(_("{:d} items"), sl.size());
 	}
-	if (m_type == "option_list") 
-        return std::get<OptionList>(m_value).at(m_sel);
-    
+	if (m_type == "option_list")
+		return std::get<OptionList>(m_value).at(m_sel);
+
 	throw std::logic_error("ConfigItem::getValue doesn't know type '" + m_type + "'");
 }
 
@@ -211,8 +212,8 @@ void ConfigItem::selectEnum(std::string const& name) {
 
 std::string const ConfigItem::getEnumName() const {
 	auto const& val = ui();
-	if (val < m_enums.size()) 
-        return m_enums[val];
+	if (val < m_enums.size())
+		return m_enums[val];
 
 	return {};
 }

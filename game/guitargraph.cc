@@ -176,7 +176,7 @@ void GuitarGraph::setupJoinMenuGuitar() {
 	// Add tracks to option list
 	for (InstrumentTracksConstPtr::const_iterator it = m_instrumentTracks.begin(); it != m_instrumentTracks.end(); ++it) {
 		ol.push_back(it->first);
-		if (m_track_index->first == it->first) cur = static_cast<unsigned short>(ol.size())-1; // Find the index of current track
+		if (m_track_index->first == it->first) cur = static_cast<unsigned short>(ol.size() - 1); // Find the index of current track
 	}
 	m_selectedTrack = ConfigItem(ol); // Create a ConfigItem from the option list
 	m_selectedTrack.select(cur); // Set the selection to current track
