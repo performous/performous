@@ -19,15 +19,6 @@
 #include <map>
 #include <string>
 
-ConfigItem::ConfigItem(unsigned short uival): m_type("uint"), m_value(uival), m_sel() { }
-
-	} else if (m_type == "uint") {
-		unsigned short& val = std::get<unsigned short>(m_value); 
-		int value = static_cast<int>(val);
-		int step = std::get<unsigned short>(m_step);
-		int min = static_cast<int>(std::get<unsigned short>(m_min));
-		int max = static_cast<int>(std::get<unsigned short>(m_max));
-		val = static_cast<unsigned short>(clamp(((value + dir * step) / step) * step, min, max));
 
 class ConfigItemXMLLoader {
 public:
@@ -140,10 +131,11 @@ void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, int mod
 			const auto value_string = getAttribute(elem, "value");
 			if (!value_string.empty())
 				item.setValue(std::stoi(value_string));
-		updateNumeric<int>(elem, mode);
-	} else if (m_type == "uint") {
-		std::string value_string = getAttribute(elem, "value");
-		if (!value_string.empty()) m_value = static_cast<unsigned short>(std::stoi(value_string));
+			updateNumeric<int>(item, elem, mode);
+		} else if (item.getType() == "uint") {
+			std::string value_string = getAttribute(elem, "value");
+			if (!value_string.empty())
+				item.setValue(static_cast<unsigned short>(std::stoi(value_string)));
 			// Enum handling
 			if (mode == 0) {
 				auto n2 = elem.find("limits/enum");
@@ -157,12 +149,12 @@ void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, int mod
 					item.getStep() = static_cast<unsigned short>(1);
 				}
 			}
-		updateNumeric<unsigned short>(item, elem, mode);
+			updateNumeric<unsigned short>(item, elem, mode);
 		}
 		else if (item.getType() == "float") {
 			std::string value_string = getAttribute(elem, "value");
 			if (!value_string.empty()) item.setValue(std::stof(value_string));
-			updateNumeric<float>(elem, mode);
+			updateNumeric<float>(item, elem, mode);
 		}
 		else if (item.getType() == "string") {
 			item.setValue(getText(elem, "stringvalue"));
@@ -204,8 +196,8 @@ namespace {
 			throw std::logic_error("getValue_audio_backend: item must be 'audio/backend' but is '" + item.getName() + "'");
 
 		int AutoBackendType = 1337;
-		static int val = std::get<int>(item.value());
-		if (val != std::get<int>(item.value()))
+		static int val = std::get<unsigned short>(item.value());
+		if (val != std::get<unsigned short>(item.value()))
 			val = PaHostApiNameToHostApiTypeId(item.getEnumName()); // In the case of the audio backend, val is the real value while m_value is the enum case for its cosmetic name.
 		int hostApi = Pa_HostApiTypeIdToHostApiIndex(PaHostApiTypeId(val));
 		std::ostringstream oss;
