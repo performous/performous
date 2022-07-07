@@ -50,7 +50,8 @@ SongId SongItems::addSongItem(std::string const& artist, std::string const& titl
 
 void SongItems::addSong(std::shared_ptr<Song> song) {
 	SongItem si;
-	si.id = lookup(song).value_or(addSongItem(song->artist, song->title));;
+	std::optional<unsigned> val = lookup(song);
+	si.id = val ? val.value() : (addSongItem(song->artist, song->title));;
 	auto it = m_songs.find(si);
 	if (it == m_songs.end()) throw SongItemsException("Cant find song which was added just before");
 	// it->song.reset(song); // does not work, it is a read only structure...
@@ -65,8 +66,9 @@ void SongItems::addSong(std::shared_ptr<Song> song) {
 }
 
 std::optional<SongId> SongItems::lookup(Song const& song) const {
-	auto const& si = std::find_if(m_songs.begin(), m_songs.end(), [song](SongItem const& si) {
-		return UnicodeUtil::toLower(song.collateByArtistOnly) == UnicodeUtil::toLower(si.artist) && UnicodeUtil::toLower(song.collateByTitleOnly) == UnicodeUtil::toLower(si.title);
+	auto const& si = std::find_if(m_songs.begin(), m_songs.end(), [&song](SongItem const& si) {
+		if (song.collateByArtistOnly.length() != si.artist.length() || song.collateByTitleOnly.length() != si.title.length()) return false; // This is not always really correct but in most cases these inputs should have been normalized into unicode at one point during their life time.
+		return UnicodeUtil::caseEqual(song.collateByArtistOnly, si.artist, true) && UnicodeUtil::caseEqual(song.collateByTitleOnly, si.title, true);
 	});
 	if (si != m_songs.end()) return si->id;
 	return std::nullopt;
