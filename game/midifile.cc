@@ -1,4 +1,5 @@
 #include "midifile.hh"
+#include "unicode.hh"
 
 #include <algorithm>
 #include <cstddef>
@@ -6,6 +7,7 @@
 #include <iomanip>
 #include <ios>
 #include <iostream>
+#include <regex>
 #include <stdexcept>
 #include <sstream>
 #include <string>
@@ -181,18 +183,14 @@ MidiFileParser::Track MidiFileParser::read_track(MidiStream& stream) {
 				else if (!data.compare(0, sect_pfx.length(), sect_pfx)) {// [section verse_1]
 					std::string sect_name = data.substr(sect_pfx.length(), data.length()-sect_pfx.length()-1);
 					if (sect_name != "big_rock_ending") {
-						bool space = true;
-						for (char& ch: sect_name) { // FIXME: This is iffy, we should have a toTitleCase function in unicode.cc.
-							if (space) ch = static_cast<char>(toupper(ch));  // Capitalize first letter of each word
-							if (ch == '_') { ch = ' '; space = true; }  // underscores to spaces
-							else space = false;
-						}
+						sect_name = std::regex_replace(UnicodeUtil::toTitle(sect_name), std::regex("_"), " ");
 						// replace gtr => guitar
 #if MIDI_DEBUG_LEVEL > 2
 						std::cout << "Section: " << sect_name << " at " << get_seconds(miditime) << std::endl;
 #endif
 						midisections.push_back(MidiSection(sect_name, get_seconds(miditime)));
-					} else cmdevents.push_back(std::string(data)); // see songparser-ini.cc: we need to keep the BRE in cmdevents
+					}
+					else cmdevents.push_back(std::string(data)); // see songparser-ini.cc: we need to keep the BRE in cmdevents
 				}
 				else cmdevents.push_back(std::string(data));
 #if MIDI_DEBUG_LEVEL > 2
