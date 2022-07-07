@@ -86,6 +86,8 @@ public:
 	std::optional<SongId> lookup(std::shared_ptr<Song> song) const { if (song) return lookup(*song); return std::nullopt; };
 	std::optional<SongId> lookup(Song const& song) const;
 
+	SongId getSongId(SongPtr const&) const;
+
 	/**Lookup the artist + title for a specific song.
 	  @return "Unknown Song" if nothing is found.
 	  */
@@ -96,6 +98,6 @@ public:
 private:
 	SongId assign_id_internal() const;
 
-	typedef std::set<SongItem> songs_t;
+	using songs_t = std::set<SongItem>;
 	songs_t m_songs;
 };

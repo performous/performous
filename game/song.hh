@@ -8,6 +8,7 @@
 #include <nlohmann/json.hpp>
 
 #include <cstdint>
+#include <memory>
 #include <stdexcept>
 #include <string>
 
@@ -133,6 +134,8 @@ private:
 	unsigned int m_linenum;
 	bool m_silent;
 };
+
+using SongPtr = std::shared_ptr<Song>;
 
 /// Print a SongParserException in a format suitable for the logging system.
 std::ostream& operator<<(std::ostream& os, SongParserException const& e);

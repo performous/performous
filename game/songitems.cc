@@ -36,7 +36,7 @@ SongId SongItems::addSongItem(std::string const& artist, std::string const& titl
 	SongItem si;
 	si.id = _id.value_or(assign_id_internal());
 	songMetadata collateInfo {{"artist", artist}, {"title", title}};
-	UnicodeUtil::collate(collateInfo);		
+	UnicodeUtil::collate(collateInfo);
 	si.artist = collateInfo["artist"];
 	si.title = collateInfo["title"];
 	std::pair<songs_t::iterator, bool> ret = m_songs.insert(si);
@@ -77,6 +77,15 @@ std::optional<SongId> SongItems::lookup(Song const& song) const {
 	});
 	if (si != m_songs.end()) return si->id;
 	return std::nullopt;
+}
+
+SongId SongItems::getSongId(SongPtr const& song) const {
+	auto const it = std::find_if(m_songs.begin(), m_songs.end(), [song](auto const& item){ return item.song == song;});
+
+	if(it  == m_songs.end())
+		throw std::logic_error("SongItems::getSongId: Did not find an item matching to song!");
+
+	return it->id;
 }
 
 std::optional<std::string> SongItems::lookup(const SongId &id) const {
