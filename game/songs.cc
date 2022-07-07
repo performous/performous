@@ -24,9 +24,9 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
-Songs::Songs(Database & database, std::string const& songlist): 
-  m_songlist(songlist), 
-  m_database(database), 
+Songs::Songs(Database & database, std::string const& songlist):
+  m_songlist(songlist),
+  m_database(database),
   m_order(config["songs/sort-order"].ui()) {
 	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
 	reload();
@@ -279,7 +279,7 @@ void Songs::reload_internal(fs::path const& parent) {
 					std::shared_lock<std::shared_mutex> l(m_mutex);
 					for(auto const& song: m_songs) {
 						if(s->filename.extension() != song->filename.extension() && s->filename.stem() == song->filename.stem() &&
-							    s->title == song->title && s->artist == song->artist) {
+								s->title == song->title && s->artist == song->artist) {
 							std::clog << "songs/info: >>> Found additional song file: " << s->filename << " for: " << song->filename << std::endl;
 							AdditionalFileIndex = &song - &m_songs[0];
 						}
@@ -351,7 +351,7 @@ void Songs::filter_internal() {
 			std::string charset = UnicodeUtil::getCharset(m_filter);
 			icu::UnicodeString filter = ((charset == "UTF-8") ? icu::UnicodeString::fromUTF8(m_filter) : icu::UnicodeString(m_filter.c_str(), charset.c_str()));
 			UErrorCode icuError = U_ZERO_ERROR;
-			
+
 			std::shared_lock<std::shared_mutex> l(m_mutex);
 			std::copy_if (m_songs.begin(), m_songs.end(), std::back_inserter(filtered), [&](std::shared_ptr<Song> it){
 			// Filter by type first.
@@ -508,7 +508,7 @@ void Songs::sortChange(SortChange diff) {
 
 void Songs::sortSpecificChange(unsigned short sortOrder, bool descending) {
 	if(sortOrder < orders) m_order = sortOrder;
-	else m_order = 0; 
+	else m_order = 0;
 	RestoreSel restore(*this);
 	config["songs/sort-order"].ui() = m_order;
 	sort_internal(descending);
@@ -517,7 +517,7 @@ void Songs::sortSpecificChange(unsigned short sortOrder, bool descending) {
 void Songs::sort_internal(bool descending) {
 	if(m_order == 0)
 		std::stable_sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::randomIdx, true));
-	else {        
+	else {
 		auto begin = m_filtered.begin();
 		auto end = m_filtered.end();
 
@@ -529,9 +529,9 @@ void Songs::sort_internal(bool descending) {
 		  case 5: std::sort(begin, end, customComparator(&Song::path, !descending)); break;
 		  case 6: std::sort(begin, end, customComparator(&Song::language, !descending)); break;
 		  case 7: std::sort(begin, end, [this, &descending](SongPtr const& a, SongPtr const& b){
-				const auto scoreA = m_database.getHiscore(*a);              
-				const auto scoreB = m_database.getHiscore(*b);              
-				return scoreA > scoreB ? !descending : descending;              
+				const auto scoreA = m_database.getHiscore(a);
+				const auto scoreB = m_database.getHiscore(b);
+				return scoreA > scoreB ? !descending : descending;
 			}); break;
 		  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
 		}
@@ -552,7 +552,7 @@ namespace {
 			std::cerr << "Songlist error handling cover image: " << e.what() << std::endl;
 		}
 	}
-	
+
 	template<typename SongCollection>
 	void dumpXML(SongCollection const& svec, std::string const& filename) {
 		xmlpp::Document doc;
