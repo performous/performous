@@ -131,9 +131,7 @@ void SongParser::midParse() {
 				else
 					n.type = Note::Type::NORMAL;
 				{
-					std::stringstream ss(lyric.lyric);
-					UnicodeUtil::convertToUTF8(ss, std::string());
-					n.syllable = ss.str();
+					n.syllable = UnicodeUtil::convertToUTF8(lyric.lyric);
 				}
 				std::string& syl = n.syllable;
 				if (n.type != Note::Type::SLEEP) {

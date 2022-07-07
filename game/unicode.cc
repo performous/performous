@@ -1,6 +1,8 @@
 #include "unicode.hh"
 
 #include "configuration.hh"
+#include "game.hh"
+
 #include <regex>
 #include <sstream>
 #include <stdexcept>
@@ -13,12 +15,11 @@ icu::RuleBasedCollator UnicodeUtil::m_dummyCollator (icu::UnicodeString (""), ic
 icu::RuleBasedCollator UnicodeUtil::m_sortCollator  (nullptr, icu::Collator::SECONDARY, m_staticIcuError);
 
 std::string UnicodeUtil::getCharset (std::string const& str) {
-	const char* text = str.c_str();
 	int bytes_consumed;
 	bool is_reliable;
 	
 	Encoding encoding = CompactEncDet::DetectEncoding(
-        text, static_cast<int>(strlen(text)),
+        str.c_str(), static_cast<int>(str.size()),
         nullptr, nullptr, nullptr,
         UNKNOWN_ENCODING,
         UNKNOWN_LANGUAGE,
@@ -37,62 +38,96 @@ std::string UnicodeUtil::getCharset (std::string const& str) {
 	return MimeEncodingName(encoding);
 }
 
-void UnicodeUtil::convertToUTF8 (std::stringstream &_stream, std::string _filename) {
-	std::string data = _stream.str();
-	std::string charset = UnicodeUtil::getCharset(data);	
+std::string UnicodeUtil::convertToUTF8 (std::string const& str, std::string _filename, CaseMapping toCase, bool assumeUTF8) {
+	std::string ret = str;
 	icu::UnicodeString ustring;
-	// Test for UTF-8 BOM (a three-byte sequence at the beginning of a file)
-	if (data.substr(0, 3) == "\xEF\xBB\xBF") {
-		_stream.str(data.substr(3)); // Remove BOM if there is one
+	std::string charset;
+	if (assumeUTF8) {
+		ustring = icu::UnicodeString::fromUTF8(str);
 	}
-	if (charset != "UTF-8") {
-		if (!_filename.empty()) { std::clog << "unicode/info: " << _filename << " does not appear to be UTF-8; (" << charset << ") detected." << std::endl; }
-		std::string _str;
-		const char* tmp = data.c_str();
-		icu::UnicodeString ustring = icu::UnicodeString(tmp, charset.c_str());
-		if (!ustring.isEmpty()) {
-			_stream.str(ustring.toUTF8String(_str));
+	else {
+		if (ret.substr(0, 3) == "\xEF\xBB\xBF") {
+			ret = ret.substr(3); // Remove BOM if there is one
+			charset = "UTF-8";
 		}
-		else {
-			if (!data.empty()) {
-				std::clog << "unicode/error: tried to convert text in an unknown encoding: " << charset << std::endl;
-			}
+		else { charset = UnicodeUtil::getCharset(str); }
+		// Test for UTF-8 BOM (a three-byte sequence at the beginning of a file)
+		if (charset != "UTF-8") {
+			if (!_filename.empty()) { std::clog << "unicode/info: " << _filename << " does not appear to be UTF-8; (" << charset << ") detected." << std::endl; }
+			ustring = icu::UnicodeString(ret.c_str(), charset.c_str());
+		}
+		else { ustring = icu::UnicodeString::fromUTF8(ret); }
+	}
+	switch(toCase) {
+		case CaseMapping::UPPER:
+			ustring.toUpper();
+			break;
+		case CaseMapping::LOWER:
+			ustring.toLower();
+			break;
+		case CaseMapping::TITLE:
+			ustring.toTitle(0, icu::Locale(Game::getSingletonPtr()->getCurrentLanguageCode().c_str()), U_TITLECASE_NO_LOWERCASE);
+			break;
+		case CaseMapping::NONE:
+			break;
+	}
+	if (!ustring.isEmpty()) {
+		ret.clear();
+		ustring.toUTF8String(ret);
+	}
+	else {
+		if (!ret.empty()) {
+			std::clog << "unicode/error: tried to convert text in an unknown encoding: " << charset << std::endl;
 		}
 	}
-}
-
-std::string UnicodeUtil::convertToUTF8 (std::string const& str) {
-	std::stringstream ss (str);
-	convertToUTF8 (ss, std::string());
-	return ss.str();
-}
-
-std::string UnicodeUtil::toLower (std::string const& str, size_t length) {
-	std::stringstream ss (str);
-	convertToUTF8 (ss, std::string());
-	std::string ret;
-	if (length == 0 || length >= str.size()) length = str.size();
-	auto icu_length = static_cast<int32_t>(length); // ICU expects int32_t for lengths...
-	icu::UnicodeString tmp = icu::UnicodeString::fromUTF8(ss.str());
-	tmp = tmp.tempSubString(0, icu_length).toLower() + tmp.tempSubString(icu_length, tmp.length() - 1);
-	tmp.toUTF8String(ret);
 	return ret;
 }
 
-std::string UnicodeUtil::toUpper (std::string const& str, size_t length) {
-	std::stringstream ss (str);
-	convertToUTF8 (ss, std::string());
-	std::string ret;
-	if (length == 0 || length >= str.size()) length = str.size();
-	auto icu_length = static_cast<int32_t>(length); // ICU expects int32_t for lengths...
-	icu::UnicodeString tmp = icu::UnicodeString::fromUTF8(ss.str());
-	tmp = tmp.tempSubString(0, icu_length).toUpper() + tmp.tempSubString(icu_length, tmp.length() - 1);
-	tmp.toUTF8String(ret);
-	return ret;
+bool UnicodeUtil::caseEqual (std::string const& lhs, std::string const& rhs, bool assumeUTF8) {
+	if (lhs == rhs) return true; // Early return
+	
+	std::string a = lhs;
+	std::string b = rhs;
+	std::string aCharset;
+	std::string bCharset;
+	icu::UnicodeString aUniString;
+	icu::UnicodeString bUniString;
+	if (a.substr(0, 3) == "\xEF\xBB\xBF") {
+			a = a.substr(3); // Remove BOM if there is one
+			aCharset = "UTF-8";
+	}
+	if (b.substr(0, 3) == "\xEF\xBB\xBF") {
+			b = b.substr(3); // Remove BOM if there is one
+			bCharset = "UTF-8";
+	}
+	if (aCharset != "UTF-8" && !assumeUTF8) {
+		std::string aCharset = UnicodeUtil::getCharset(a);
+		aUniString = icu::UnicodeString(a.c_str(), aCharset.c_str());
+	}
+	else aUniString = icu::UnicodeString::fromUTF8(a);
+	if (bCharset != "UTF-8" && !assumeUTF8) {
+		std::string bCharset = UnicodeUtil::getCharset(b);
+		bUniString = icu::UnicodeString(b.c_str(), bCharset.c_str());
+	}
+	else bUniString = icu::UnicodeString::fromUTF8(b);
+	int8_t result = aUniString.caseCompare(bUniString, U_FOLD_CASE_DEFAULT);
+	return (result == 0);
+}
+
+std::string UnicodeUtil::toLower (std::string const& str) {
+	return convertToUTF8 (str, "", CaseMapping::LOWER);
+}
+
+std::string UnicodeUtil::toUpper (std::string const& str) {
+	return convertToUTF8 (str, "", CaseMapping::UPPER);
+}
+
+std::string UnicodeUtil::toTitle (std::string const& str) {
+	return convertToUTF8 (str, "", CaseMapping::TITLE);
 }
 
 void UnicodeUtil::collate (songMetadata& stringmap) {
-	for (auto& kv: stringmap) { 
+	for (auto& [key, value]: stringmap) { 
 		ConfigItem::StringList termsToCollate = config["game/sorting_ignore"].sl();
 		std::string pattern = std::string ("^((");
 		for (auto term : termsToCollate) {
@@ -104,8 +139,8 @@ void UnicodeUtil::collate (songMetadata& stringmap) {
 				pattern += std::string(")\\s(.+))$");
 			}
 		}
-		std::string collatedString = regex_replace(convertToUTF8(kv.second),
+		std::string collatedString = regex_replace(convertToUTF8(value),
 		std::regex(pattern, std::regex_constants::icase), "$3,$2");
-		stringmap[kv.first] = collatedString;
+		stringmap[key] = collatedString;
 	}
 }

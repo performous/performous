@@ -27,13 +27,13 @@ struct TZoomText {
  */
 struct TextStyle {
 	cairo_line_join_t LineJoin() {	///< convert svg string to cairo enum.
-		if (UnicodeUtil::toLower(stroke_linejoin) == "round") return CAIRO_LINE_JOIN_ROUND;
-		if (UnicodeUtil::toLower(stroke_linejoin) == "bevel") return CAIRO_LINE_JOIN_BEVEL;	
+		if (UnicodeUtil::caseEqual(stroke_linejoin, "round")) return CAIRO_LINE_JOIN_ROUND;
+		if (UnicodeUtil::caseEqual(stroke_linejoin, "bevel")) return CAIRO_LINE_JOIN_BEVEL;	
 		return CAIRO_LINE_JOIN_MITER;
 	};
 	cairo_line_cap_t LineCap() {	///< convert svg string to cairo enum.
-		if (UnicodeUtil::toLower(stroke_linecap) == "round") return CAIRO_LINE_CAP_ROUND;
-		if (UnicodeUtil::toLower(stroke_linecap) == "square") return CAIRO_LINE_CAP_SQUARE;	
+		if (UnicodeUtil::caseEqual(stroke_linecap, "round")) return CAIRO_LINE_CAP_ROUND;
+		if (UnicodeUtil::caseEqual(stroke_linecap, "square")) return CAIRO_LINE_CAP_SQUARE;	
 		return CAIRO_LINE_CAP_BUTT;
 	};
 	Color fill_col; ///< fill color

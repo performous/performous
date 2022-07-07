@@ -27,7 +27,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 	for (std::unique_ptr<InstrumentGraph> const& i: instruments) {
 		input::DevType const& type = i->getGraphType();
 		std::string const& track_simple = i->getTrack();
-		std::string const& track = UnicodeUtil::toUpper(i->getModeId(), 1); // Capitalize
+		std::string const& track = UnicodeUtil::toTitle(i->getModeId()); // Capitalize
 		Color color = Color(1.0f, 0.0f, 0.0f);
 
 		if (track_simple == TrackName::DRUMS)

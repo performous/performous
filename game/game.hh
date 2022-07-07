@@ -78,6 +78,7 @@ class Game: public Singleton <Game> {
 	PlayList& getCurrentPlayList() { return currentPlaylist; }
 	void setLanguage(const std::string& language) { m_translationEngine.setLanguage(language, true); };
 	std::string getCurrentLanguage() const { return m_translationEngine.getCurrentLanguage().second; };
+	std::string getCurrentLanguageCode();
 #ifdef USE_WEBSERVER
 	void notificationFromWebserver(std::string message) { m_webserverMessage = message; }
 	std::string subscribeWebserverMessages() { return m_webserverMessage; }
