@@ -130,16 +130,16 @@ void Database::queryPerPlayerHiscore(std::ostream & os, std::string const& track
 bool Database::hasHiscore(Song const& s) const 
 try {
 	return m_hiscores.hasHiscore(m_songs.lookup(s).value());
-} catch (const std::exception &e) {
-	std::clog << "database/error: Invalid song ID for song: " + s.artist + " - " + s.title << std::endl;
+} catch (const std::exception &e) { //This is not a real error, and enabling it just results in a ton of garbage in the logs.
+// 	std::clog << "database/info: Song: " + s.artist + " - " + s.title + " not yet in database." << std::endl;
 	return false;
 }
 
 unsigned Database::getHiscore(const Song& s) const try {
 	const auto songid = m_songs.lookup(s);
 	return m_hiscores.getHiscore(songid.value());
-} catch (const std::exception& e) {
-	std::clog << "database/error: Invalid song ID for song: " + s.artist + " - " + s.title << std::endl;
+} catch (const std::exception& e) { //This is not a real error, and enabling it just results in a ton of garbage in the logs.
+// 	std::clog << "database/info: Song: " + s.artist + " - " + s.title + " not yet in database." << std::endl;
 	return 0;
 }
 
