@@ -192,7 +192,7 @@ MidiFileParser::Track MidiFileParser::read_track(MidiStream& stream) {
 					}
 					else cmdevents.push_back(std::string(data)); // see songparser-ini.cc: we need to keep the BRE in cmdevents
 				}
-				else cmdevents.push_back(std::string(data));
+				else cmdevents.emplace_back(std::string(data));
 #if MIDI_DEBUG_LEVEL > 2
 				std::cout << "Text: " << data << std::endl;
 #endif

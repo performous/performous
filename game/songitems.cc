@@ -50,7 +50,8 @@ SongId SongItems::addSongItem(std::string const& artist, std::string const& titl
 
 void SongItems::addSong(std::shared_ptr<Song> song) {
 	SongItem si;
-	std::optional<unsigned> val = lookup(song);
+	// Do NOT use .value_or() here; it gets evaluated and addSongItem() runs regardless of whether we have a value, which results in duplicate entries in the database.
+	auto val = lookup(song);
 	si.id = val ? val.value() : (addSongItem(song->artist, song->title));;
 	auto it = m_songs.find(si);
 	if (it == m_songs.end()) throw SongItemsException("Cant find song which was added just before");
@@ -66,8 +67,12 @@ void SongItems::addSong(std::shared_ptr<Song> song) {
 }
 
 std::optional<SongId> SongItems::lookup(Song const& song) const {
-	auto const& si = std::find_if(m_songs.begin(), m_songs.end(), [&song](SongItem const& si) {
-		if (song.collateByArtistOnly.length() != si.artist.length() || song.collateByTitleOnly.length() != si.title.length()) return false; // This is not always really correct but in most cases these inputs should have been normalized into unicode at one point during their life time.
+	auto const si = std::find_if(m_songs.begin(), m_songs.end(), [&song](SongItem const& si) {
+
+	// This is not always really correct but in most cases these inputs should have been normalized into unicode at one point during their life time.
+		if (song.collateByArtistOnly.length() != si.artist.length() ||
+		song.collateByTitleOnly.length() != si.title.length()) return false; 		
+		
 		return UnicodeUtil::caseEqual(song.collateByArtistOnly, si.artist, true) && UnicodeUtil::caseEqual(song.collateByTitleOnly, si.title, true);
 	});
 	if (si != m_songs.end()) return si->id;

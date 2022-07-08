@@ -146,7 +146,6 @@ void Game::finished() {
 
 std::string Game::getCurrentLanguageCode() {
 	std::string lang = m_translationEngine.getCurrentLanguage().first;
-	std::clog << "getCurrentLanguage/notice: lang code is: " + lang.substr(0, lang.size() - 6) << std::endl;
 	return lang.substr(0, lang.size() - 6);
 }
 
