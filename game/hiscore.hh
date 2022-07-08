@@ -45,7 +45,7 @@ public:
 	/// @param max limits the number of elements returned.
 	unsigned getHiscore(unsigned songid) const;
 	HiscoreVector queryHiscore(std::optional<PlayerId> playerid, std::optional<SongId> songid, std::string const& track, std::optional<unsigned> max = std::nullopt) const;
-	bool hasHiscore(const SongId songid) const;
+	bool hasHiscore(const SongId& songid) const;
 	std::size_t size() const { return m_hiscore.size(); }
 private:
 	using hiscore_t = std::multiset<HiscoreItem>;

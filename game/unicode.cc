@@ -4,7 +4,6 @@
 #include "game.hh"
 
 #include <regex>
-#include <sstream>
 #include <stdexcept>
 #include <unicode/unistr.h>
 #include <unicode/ustream.h>
@@ -43,22 +42,16 @@ std::string UnicodeUtil::convertToUTF8 (std::string const& str, std::string _fil
 	std::string ret = str;
 	icu::UnicodeString ustring;
 	std::string charset;
-	if (assumeUTF8) {
-		ustring = icu::UnicodeString::fromUTF8(str);
-	}
+	if (assumeUTF8) ustring = icu::UnicodeString::fromUTF8(str);
 	else {
-		if (ret.substr(0, 3) == "\xEF\xBB\xBF") {
-			ret = ret.substr(3); // Remove BOM if there is one
-			charset = "UTF-8";
-		}
+		if (removeUTF8BOM(ret)) charset = "UTF-8";
 		else { charset = UnicodeUtil::getCharset(str); }
-		// Test for UTF-8 BOM (a three-byte sequence at the beginning of a file)
+		}
 		if (charset != "UTF-8") {
-			if (!_filename.empty()) { std::clog << "unicode/info: " << _filename << " does not appear to be UTF-8; (" << charset << ") detected." << std::endl; }
+			if (!_filename.empty()) std::clog << "unicode/info: " << _filename << " does not appear to be UTF-8; (" << charset << ") detected." << std::endl; 
 			ustring = icu::UnicodeString(ret.c_str(), charset.c_str());
 		}
-		else { ustring = icu::UnicodeString::fromUTF8(ret); }
-	}
+	else { ustring = icu::UnicodeString::fromUTF8(ret); }
 	switch(toCase) {
 		case CaseMapping::UPPER:
 			ustring.toUpper();
@@ -84,6 +77,15 @@ std::string UnicodeUtil::convertToUTF8 (std::string const& str, std::string _fil
 	return ret;
 }
 
+bool UnicodeUtil::removeUTF8BOM(std::string& str) {
+	// Test for UTF-8 BOM (a three-byte sequence at the beginning of a file)
+	if (str.substr(0, 3) == "\xEF\xBB\xBF") {
+		str = str.substr(3); // Remove BOM if there is one
+		return true;
+	}
+	return false;
+}
+
 bool UnicodeUtil::caseEqual (std::string const& lhs, std::string const& rhs, bool assumeUTF8) {
 	if (lhs == rhs) return true; // Early return
 	
@@ -93,14 +95,8 @@ bool UnicodeUtil::caseEqual (std::string const& lhs, std::string const& rhs, boo
 	std::string bCharset;
 	icu::UnicodeString aUniString;
 	icu::UnicodeString bUniString;
-	if (a.substr(0, 3) == "\xEF\xBB\xBF") {
-			a = a.substr(3); // Remove BOM if there is one
-			aCharset = "UTF-8";
-	}
-	if (b.substr(0, 3) == "\xEF\xBB\xBF") {
-			b = b.substr(3); // Remove BOM if there is one
-			bCharset = "UTF-8";
-	}
+	if (removeUTF8BOM(a)) aCharset = "UTF-8";
+	if (removeUTF8BOM(b)) bCharset = "UTF-8";
 	if (aCharset != "UTF-8" && !assumeUTF8) {
 		std::string aCharset = UnicodeUtil::getCharset(a);
 		aUniString = icu::UnicodeString(a.c_str(), aCharset.c_str());

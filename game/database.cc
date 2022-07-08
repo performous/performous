@@ -24,7 +24,7 @@ void Database::load() {
 		m_songs.load(nodeRoot->find("/performous/songs/song"));
 		m_hiscores.load(nodeRoot->find("/performous/hiscores/hiscore"));
 		std::clog << "database/info: Loaded " << m_players.count() << " players, " << m_songs.size() << " songs and " << m_hiscores.size() << " hiscores from " << m_filename.string() << std::endl;
-	} catch (std::exception& e) {
+	} catch (std::exception const& e) {
 		std::clog << "database/error: Error loading " + m_filename.string() + ": " + e.what() << std::endl;
 	}
 }
@@ -130,16 +130,14 @@ void Database::queryPerPlayerHiscore(std::ostream & os, std::string const& track
 bool Database::hasHiscore(Song const& s) const 
 try {
 	return m_hiscores.hasHiscore(m_songs.lookup(s).value());
-} catch (const std::exception &e) { //This is not a real error, and enabling it just results in a ton of garbage in the logs.
-// 	std::clog << "database/info: Song: " + s.artist + " - " + s.title + " not yet in database." << std::endl;
+} catch (const std::exception&) {
 	return false;
 }
 
 unsigned Database::getHiscore(const Song& s) const try {
 	const auto songid = m_songs.lookup(s);
 	return m_hiscores.getHiscore(songid.value());
-} catch (const std::exception& e) { //This is not a real error, and enabling it just results in a ton of garbage in the logs.
-// 	std::clog << "database/info: Song: " + s.artist + " - " + s.title + " not yet in database." << std::endl;
+} catch (const std::exception&) {
 	return 0;
 }
 
