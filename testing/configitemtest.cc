@@ -93,7 +93,7 @@ namespace {
 
 		EXPECT_EQ("A", item.so());
 
-		item.select(-1);
+		item.select(9);
 
 		EXPECT_EQ("A", item.so());
 	}
@@ -108,9 +108,9 @@ namespace {
 
 		EXPECT_EQ("C", item.so());
 
-		item.select(-1);
+		item.select(9);
 
-		EXPECT_EQ("A", item.so());
+		EXPECT_EQ("C", item.so());
 	}
 
 	TEST(UnitTest_ConfigItem, select) {
