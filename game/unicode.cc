@@ -94,12 +94,12 @@ bool UnicodeUtil::caseEqual (std::string_view lhs, std::string_view rhs, bool as
 	if (removeUTF8BOM(lhs)) lhsCharset = "UTF-8";
 	if (removeUTF8BOM(rhs)) rhsCharset = "UTF-8";
 	if (lhsCharset != "UTF-8" && !assumeUTF8) {
-		std::string lhsCharset(UnicodeUtil::getCharset(lhs));
+		lhsCharset = UnicodeUtil::getCharset(lhs);
 		lhsUniString = icu::UnicodeString(lhs.data(), lhsCharset.c_str());
 	}
 	else lhsUniString = icu::UnicodeString::fromUTF8(lhs.data());
 	if (rhsCharset != "UTF-8" && !assumeUTF8) {
-		std::string rhsCharset(UnicodeUtil::getCharset(rhs));
+		rhsCharset = UnicodeUtil::getCharset(rhs);
 		rhsUniString = icu::UnicodeString(rhs.data(), rhsCharset.c_str());
 	}
 	else rhsUniString = icu::UnicodeString::fromUTF8(rhs.data());
