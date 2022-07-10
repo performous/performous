@@ -117,6 +117,24 @@ jobs:
         with:
           path: performous
 
+      - name: Install gtest
+        id: install_gtest
+        run: |
+          . /etc/os-release
+          if ([ "${ID}" = "ubuntu" ] && [ "${VERSION_ID}" = "20.04" ]); then
+            echo "Install gtest"
+            apt-get -y install libgtest-dev            
+          fi
+          
+      - name: Install gmock
+        id: install_gmock
+        run: |
+          . /etc/os-release
+          if ([ "${ID}" = "ubuntu" ] && [ "${VERSION_ID}" = "20.04" ]); then
+            echo "Install gmock"
+            apt-get -y install libgmock-dev            
+          fi
+
       - name: Build package
         id: build_package
         run: |
@@ -211,7 +229,19 @@ jobs:
           asset_path: ${{ env.ARTIFACT_PATH }}
           asset_name: ${{ env.ARTIFACT_NAME }}
           asset_content_type: application/octet-stream
-
+ 
+      - name: Run unittests
+        #working-directory: build/testing
+        shell: bash
+        run: |
+          . /etc/os-release
+          if ([ "${ID}" = "ubuntu" ] && [ "${VERSION_ID}" = "20.04" ]); then
+            echo "Run unit tests"
+            find . -type d
+            cd performous/build_cmake/testing
+            ./performous_test --gtest_filter=UnitTest*
+          fi
+          
   # Create the AppImage
   AppImage:
     name: Create the AppImage
