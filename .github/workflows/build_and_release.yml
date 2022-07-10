@@ -121,7 +121,7 @@ jobs:
         id: install_gtest
         run: |
           . /etc/os-release
-          if ([ "${ID}" = "ubuntu" ] && [ "${VERSION_ID}" = "20.04" ]); then
+          if ([ "${ID}" = "ubuntu" ] && ([ "${VERSION_ID}" = "20.04" ] || [ "${VERSION_ID}" = "22.04" ]) ); then
             echo "Install gtest"
             apt-get -y install libgtest-dev            
           fi
@@ -130,7 +130,7 @@ jobs:
         id: install_gmock
         run: |
           . /etc/os-release
-          if ([ "${ID}" = "ubuntu" ] && [ "${VERSION_ID}" = "20.04" ]); then
+          if ([ "${ID}" = "ubuntu" ] && ([ "${VERSION_ID}" = "20.04" ] || [ "${VERSION_ID}" = "22.04" ]) ); then
             echo "Install gmock"
             apt-get -y install libgmock-dev            
           fi
@@ -230,16 +230,26 @@ jobs:
           asset_name: ${{ env.ARTIFACT_NAME }}
           asset_content_type: application/octet-stream
  
-      - name: Run unittests
-        #working-directory: build/testing
+      - name: Run unittests directly called
+        #working-directory: performous/build_cmake/testing
         shell: bash
         run: |
           . /etc/os-release
-          if ([ "${ID}" = "ubuntu" ] && [ "${VERSION_ID}" = "20.04" ]); then
+          if ([ "${ID}" = "ubuntu" ] && ([ "${VERSION_ID}" = "20.04" ] || [ "${VERSION_ID}" = "22.04" ]) ); then
             echo "Run unit tests"
-            find . -type d
             cd performous/build_cmake/testing
             ./performous_test --gtest_filter=UnitTest*
+          fi
+
+      - name: Run unittests by ctest
+        #working-directory: performous/build_cmake/testing
+        shell: bash
+        run: |
+          . /etc/os-release
+          if ([ "${ID}" = "ubuntu" ] && ([ "${VERSION_ID}" = "20.04" ] || [ "${VERSION_ID}" = "22.04" ]) ); then
+            echo "Run unit tests"
+            cd performous/build_cmake
+            make test
           fi
           
   # Create the AppImage

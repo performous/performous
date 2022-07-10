@@ -1,10 +1,10 @@
-#include <gtest/gtest.h>
-
 #include "game/fixednotegraphscaler.hh"
 
 #include "game/notes.hh"
 #include "game/dynamicnotegraphscaler.hh"
 #include "game/fixednotegraphscaler.hh"
+
+#include "common.hh"
 
 namespace {
 	Note make(int note, std::string const& text, double begin = 0, double end = 1, Note::Type type = Note::Type::NORMAL) {
