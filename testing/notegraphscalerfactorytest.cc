@@ -1,10 +1,10 @@
-#include <gtest/gtest.h>
-
 #include "game/notegraphscalerfactory.hh"
 
 #include "game/notes.hh"
 #include "game/dynamicnotegraphscaler.hh"
 #include "game/fixednotegraphscaler.hh"
+
+#include "common.hh"
 
 namespace {
 	ConfigItem makeConfigItem(int i) { return ConfigItem{static_cast<unsigned short>(i)};}

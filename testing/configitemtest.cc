@@ -1,10 +1,6 @@
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
-
 #include "game/configitem.hh"
 
-using ::testing::ElementsAre;
-using ::testing::IsEmpty;
+#include "common.hh"
 
 namespace {
 	TEST(UnitTest_ConfigItem, i) {
