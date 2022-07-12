@@ -48,13 +48,14 @@ SongId SongItems::addSongItem(std::string const& artist, std::string const& titl
 	return si.id;
 }
 
-void SongItems::addSong(std::shared_ptr<Song> song) {
+void SongItems::addSong(SongPtr song) {
 	SongItem si;
 	// Do NOT use .value_or() here; it gets evaluated and addSongItem() runs regardless of whether we have a value, which results in duplicate entries in the database.
 	auto val = lookup(song);
 	si.id = val ? val.value() : (addSongItem(song->artist, song->title));;
 	auto it = m_songs.find(si);
-	if (it == m_songs.end()) throw SongItemsException("Cant find song which was added just before");
+	if (it == m_songs.end())
+		throw SongItemsException("Cant find song which was added just before");
 	// it->song.reset(song); // does not work, it is a read only structure...
 
 	// fill up the rest of the information
@@ -82,7 +83,7 @@ std::optional<SongId> SongItems::lookup(Song const& song) const {
 SongId SongItems::getSongId(SongPtr const& song) const {
 	auto const it = std::find_if(m_songs.begin(), m_songs.end(), [song](auto const& item){ return item.song == song;});
 
-	if(it  == m_songs.end())
+	if(it == m_songs.end())
 		throw std::logic_error("SongItems::getSongId: Did not find an item matching to song!");
 
 	return it->id;

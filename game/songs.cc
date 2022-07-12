@@ -259,16 +259,17 @@ void Songs::reload_internal(fs::path const& parent) {
 			if (fs::is_directory(p)) { reload_internal(p); continue; } //if the file is a folder redo this function with this folder as path
 			if (!regex_search(p.filename().string(), expression)) continue; //if the folder does not contain any of the requested files, ignore it
 			try { //found song file, make a new song with it.
-				auto alreadyInCache = [&] {
+				{
 					std::shared_lock<std::shared_mutex> l(m_mutex);
 					auto it = std::find_if(m_songs.begin(), m_songs.end(), [p](std::shared_ptr<Song> n) {
 						return n->filename == p;
-						});
-					return it != m_songs.end();
-				}();
+					});
+					auto const alreadyInCache =  it != m_songs.end();
 
-				if(alreadyInCache) {
-					continue;
+					if(alreadyInCache) {
+						m_database.addSong(*it);
+						continue;
+					}
 				}
 
 				std::clog << "songs/notice: Found song which was not in the cache: " << p.string() << std::endl;
@@ -294,6 +295,8 @@ void Songs::reload_internal(fs::path const& parent) {
 				// there is not race while the lock being released as this thread is the only one to modify the song list.
 				std::unique_lock<std::shared_mutex> l(m_mutex);
 				m_songs.push_back(s); //put it in the database, if found twice will appear in double
+				m_database.addSong(s);
+
 				m_dirty = true;
 			} catch (SongParserException& e) {
 				std::clog << e;
@@ -528,11 +531,23 @@ void Songs::sort_internal(bool descending) {
 		  case 4: std::sort(begin, end, customComparator(&Song::genre, !descending)); break;
 		  case 5: std::sort(begin, end, customComparator(&Song::path, !descending)); break;
 		  case 6: std::sort(begin, end, customComparator(&Song::language, !descending)); break;
-		  case 7: std::sort(begin, end, [this, &descending](SongPtr const& a, SongPtr const& b){
-				const auto scoreA = m_database.getHiscore(a);
-				const auto scoreB = m_database.getHiscore(b);
-				return scoreA > scoreB ? !descending : descending;
-			}); break;
+		  case 7: {
+			auto const songToHiscore = [begin, end, this](){
+				auto result = std::map<SongPtr, int>{};
+
+				std::for_each(begin, end, [&result, this](SongPtr const& song) {
+					result[song] = m_database.getHiscore(song);
+				});
+
+				return result;}();
+
+				std::sort(begin, end, [&songToHiscore, &descending](SongPtr const& a, SongPtr const& b){
+					const auto scoreA = songToHiscore.find(a)->second;
+					const auto scoreB = songToHiscore.find(b)->second;
+					return scoreA > scoreB ? !descending : descending;
+				});
+			}
+		  break;
 		  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
 		}
 	}

@@ -148,6 +148,7 @@ unsigned Database::getHiscore(SongPtr const& s) const {
 		return m_hiscores.getHiscore(songid);
 	} catch (const std::exception& e) {
 		std::clog << "database/error: Invalid song ID for song: " + s->artist + " - " + s->title << std::endl;
+		std::clog << "database/error: message: " << e.what() << std::endl;
 		return 0;
 	}
 }
