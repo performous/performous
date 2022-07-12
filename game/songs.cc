@@ -536,17 +536,23 @@ void Songs::sort_internal(bool descending) {
 				auto result = std::map<SongPtr, int>{};
 
 				std::for_each(begin, end, [&result, this](SongPtr const& song) {
-					result[song] = m_database.getHiscore(song);
+					try {
+						result[song] = m_database.getHiscore(song);
+					}
+					catch(std::exception const&) {
+						result[song] = 0;
+					}
 				});
 
-				return result;}();
+				return result;
+			}();
 
-				std::sort(begin, end, [&songToHiscore, &descending](SongPtr const& a, SongPtr const& b){
-					const auto scoreA = songToHiscore.find(a)->second;
-					const auto scoreB = songToHiscore.find(b)->second;
-					return scoreA > scoreB ? !descending : descending;
-				});
-			}
+			std::sort(begin, end, [&songToHiscore, &descending](SongPtr const& a, SongPtr const& b){
+				auto const scoreA = songToHiscore.find(a)->second;
+				auto const scoreB = songToHiscore.find(b)->second;
+				return scoreA > scoreB ? !descending : descending;
+			});
+		  }
 		  break;
 		  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
 		}
