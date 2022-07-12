@@ -1,12 +1,14 @@
 cmake_minimum_required(VERSION 3.15)
 
 set(SOURCE_FILES 
+    "colortest.cc"
     "configitemtest.cc"
     "fixednotegraphscalertest.cc"
     "notegraphscalerfactorytest.cc"
     "utiltest.cc"
 )
 set(GAME_SOURCES 
+    "../game/color.cc"
     "../game/configitem.cc"
     "../game/dynamicnotegraphscaler.cc"
     "../game/fixednotegraphscaler.cc"
