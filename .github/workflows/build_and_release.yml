@@ -125,6 +125,10 @@ jobs:
             echo "Install gtest"
             apt-get -y install libgtest-dev            
           fi
+          if ([ "${ID}" = "debian" ] && ([ "${VERSION_ID}" = "11" ]) ); then
+            echo "Install gtest"
+            apt-get -y install libgtest-dev            
+          fi
           if ([ "${ID}" = "fedora" ]); then
             echo "Install gtest"
             yum -y install gtest-devel          
@@ -135,6 +139,10 @@ jobs:
         run: |
           . /etc/os-release
           if ([ "${ID}" = "ubuntu" ] && ([ "${VERSION_ID}" = "20.04" ] || [ "${VERSION_ID}" = "22.04" ]) ); then
+            echo "Install gmock"
+            apt-get -y install libgmock-dev            
+          fi
+          if ([ "${ID}" = "debian" ] && ([ "${VERSION_ID}" = "11" ]) ); then
             echo "Install gmock"
             apt-get -y install libgmock-dev            
           fi
@@ -248,6 +256,11 @@ jobs:
             cd performous/build_cmake/testing
             ./performous_test --gtest_filter=UnitTest*
           fi
+          if ([ "${ID}" = "debian" ] && ([ "${VERSION_ID}" = "11" ]) ); then
+            echo "Run unit tests"
+            cd performous/build_cmake/testing
+            ./performous_test --gtest_filter=UnitTest*
+          fi
           if ([ "${ID}" = "fedora" ]); then
             echo "Run unit tests"
             cd performous/build_cmake/testing
@@ -260,6 +273,11 @@ jobs:
         run: |
           . /etc/os-release
           if ([ "${ID}" = "ubuntu" ] && ([ "${VERSION_ID}" = "20.04" ] || [ "${VERSION_ID}" = "22.04" ]) ); then
+            echo "Run unit tests"
+            cd performous/build_cmake
+            make test
+          fi
+          if ([ "${ID}" = "debian" ] && ([ "${VERSION_ID}" = "11" ]) ); then
             echo "Run unit tests"
             cd performous/build_cmake
             make test
