@@ -19,6 +19,9 @@ struct Color {
 	explicit Color(std::string const& str);
 	/// Return premultiplied linear color suitable for use with OpenGL
 	glmath::vec4 linear() const;
+
+	bool operator==(Color const&) const;
+	bool operator!=(Color const&) const;
 };
 
 std::istream& operator>>(std::istream& is, Color& color);
