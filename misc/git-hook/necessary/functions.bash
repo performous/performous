@@ -3,11 +3,6 @@ getTextFileExtensions()
     echo "c|cpp|cc|cxx|h|hh|ps1|psm1|bash|sh|svg|xml|md|html|css|js|json|txt|desktop"
 }
 
-getSourceFileExtensions()
-{
-    echo "c|cpp|cc|cxx|h|hh|ps1|psm1|bash|sh|js|"
-}
-
 getChangedFiles()
 {
     extensions="$1"
