@@ -11,7 +11,7 @@
 #include "compact_enc_det/compact_enc_det.h"
 
 icu::ErrorCode UnicodeUtil::m_staticIcuError = icu::ErrorCode();
-icu::RuleBasedCollator UnicodeUtil::m_dummyCollator (icu::UnicodeString (""), icu::Collator::PRIMARY, m_staticIcuError);
+icu::RuleBasedCollator UnicodeUtil::m_searchCollator (icu::UnicodeString (""), icu::Collator::PRIMARY, m_staticIcuError);
 icu::RuleBasedCollator UnicodeUtil::m_sortCollator  (nullptr, icu::Collator::SECONDARY, m_staticIcuError);
 
 std::string UnicodeUtil::getCharset (std::string_view str) {

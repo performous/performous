@@ -26,6 +26,6 @@ class UnicodeUtil {
 	static std::string toLower (std::string_view str);
 	static std::string toUpper (std::string_view str);
 	static std::string toTitle (std::string_view str);
-	static icu::RuleBasedCollator m_dummyCollator;
+	static icu::RuleBasedCollator m_searchCollator;
 	static icu::RuleBasedCollator m_sortCollator;
 };

@@ -367,7 +367,7 @@ void Songs::filter_internal() {
 
 		  // If search is not empty, filter by search term.
 				if (!m_filter.empty()) {
-					icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8((*it).strFull()), &UnicodeUtil::m_dummyCollator, nullptr, icuError);
+					icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8((*it).strFull()), &UnicodeUtil::m_searchCollator, nullptr, icuError);
 					return (search.first(icuError) != USEARCH_DONE);
 					}
 
