@@ -22,9 +22,9 @@ struct Converter {
 	Converter(Converter& c) = delete;
 	Converter(Converter const& c) = delete;	
 	~Converter() {};
-	
+
 	icu::UnicodeString convertToUTF8(std::string_view sv); ///< Do the actual conversion.
-	
+
 	private:
 	std::string m_codepage;
 	std::unique_ptr<UConverter, decltype(&ucnv_close)> m_converter;
@@ -34,22 +34,25 @@ struct Converter {
 };
 
 class UnicodeUtil {
-	static icu::ErrorCode m_staticIcuError;
-	enum class CaseMapping { LOWER, UPPER, TITLE, NONE };
+	friend class Songs;
 	static std::map<std::string, Converter> m_converters;
+	enum class CaseMapping { LOWER, UPPER, TITLE, NONE };
+
+	static std::string getCharset(std::string_view str);
+	static Converter& getConverter(std::string const& s);
+	static bool removeUTF8BOM(std::string_view str);
+	
 	public:
 	UnicodeUtil() = delete;
 	~UnicodeUtil() = delete;
 	static void collate (songMetadata& stringmap);
-	static std::string getCharset(std::string_view str);
 	static std::string convertToUTF8 (std::string_view str, std::string _filename = std::string(), CaseMapping toCase = CaseMapping::NONE, bool assumeUTF8 = false);
-	static bool removeUTF8BOM(std::string_view str);
 	static bool caseEqual (std::string_view lhs, std::string_view rhs, bool assumeUTF8 = false);
 	static bool isRTL(std::string_view str); ///< FIXME: This won't be used for now, but it might be useful if we eventually implement RTL translations. As-is, at least on my mac, Performous is refusing to render Arabic text, although it might be a font issue.
 	static std::string toLower (std::string_view str);
 	static std::string toUpper (std::string_view str);
 	static std::string toTitle (std::string_view str);
-	static icu::RuleBasedCollator m_searchCollator;
-	static icu::RuleBasedCollator m_sortCollator;
-	static Converter& getConverter(std::string const& s);
+
+	static std::unique_ptr<icu::RuleBasedCollator> m_searchCollator;
+	static std::unique_ptr<icu::RuleBasedCollator> m_sortCollator;
 };

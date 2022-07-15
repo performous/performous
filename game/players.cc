@@ -114,7 +114,7 @@ void Players::filter_internal() {
 		else {
 			icu::UnicodeString filter = icu::UnicodeString::fromUTF8(m_filter);
 			std::copy_if (m_players.begin(), m_players.end(), std::back_inserter(filtered), [&](PlayerItem it){
-			icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8(it.name), &UnicodeUtil::m_searchCollator, nullptr, m_icuError);
+			icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8(it.name), UnicodeUtil::m_searchCollator.get(), nullptr, m_icuError);
 			return (search.first(m_icuError) != USEARCH_DONE);
 			});
 		}

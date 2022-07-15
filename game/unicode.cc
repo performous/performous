@@ -10,9 +10,8 @@
 #include <unicode/ubidi.h>
 #include "compact_enc_det/compact_enc_det.h"
 
-icu::ErrorCode UnicodeUtil::m_staticIcuError = icu::ErrorCode();
-icu::RuleBasedCollator UnicodeUtil::m_searchCollator (icu::UnicodeString (""), icu::Collator::PRIMARY, m_staticIcuError);
-icu::RuleBasedCollator UnicodeUtil::m_sortCollator  (nullptr, icu::Collator::SECONDARY, m_staticIcuError);
+std::unique_ptr<icu::RuleBasedCollator> UnicodeUtil::m_searchCollator = nullptr;
+std::unique_ptr<icu::RuleBasedCollator> UnicodeUtil::m_sortCollator = nullptr;
 
 std::map<std::string, Converter> UnicodeUtil::m_converters{};
 

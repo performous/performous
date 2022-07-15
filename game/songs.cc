@@ -367,7 +367,7 @@ void Songs::filter_internal() {
 
 		  // If search is not empty, filter by search term.
 				if (!m_filter.empty()) {
-					icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8((*it).strFull()), &UnicodeUtil::m_searchCollator, nullptr, icuError);
+					icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8((*it).strFull()), UnicodeUtil::m_searchCollator.get(), nullptr, icuError);
 					return (search.first(icuError) != USEARCH_DONE);
 					}
 
@@ -413,7 +413,7 @@ namespace {
 			icu::UnicodeString leftVal = icu::UnicodeString::fromUTF8(left.*m_field);
 			icu::UnicodeString rightVal = icu::UnicodeString::fromUTF8(right.*m_field);
 			icu::ErrorCode sortError;
-			UCollationResult result = UnicodeUtil::m_sortCollator.compare(leftVal, rightVal, sortError);
+			UCollationResult result = UnicodeUtil::m_sortCollator->compare(leftVal, rightVal, sortError);
 			if (sortError.isSuccess()) {
 				return result == UCOL_LESS ? m_ascending : !m_ascending;
 			}
@@ -498,7 +498,7 @@ void Songs::sortChange(SortChange diff) {
 		case 4:
 		 [[fallthrough]];
 		case 6:
-			UnicodeUtil::m_sortCollator.setStrength(config["game/case-sorting"].b() ? icu::Collator::TERTIARY : icu::Collator::SECONDARY);
+			UnicodeUtil::m_sortCollator->setStrength(config["game/case-sorting"].b() ? icu::Collator::TERTIARY : icu::Collator::SECONDARY);
 			break;
 		}
 	sort_internal();
