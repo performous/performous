@@ -2,6 +2,10 @@
 
 #include "configuration.hh"
 #include "fs.hh"
+#include "unicode.hh"
+
+#include <unicode/locid.h>
+
 
 TranslationEngine::TranslationEngine(const char *package) : m_package(package) {
 	initializeAllLanguages();
@@ -43,8 +47,25 @@ void TranslationEngine::setLanguage(const std::string& language, bool fromSettin
 	else {
 		m_currentLanguage = { language , getLanguageByKey(language) };
 	}
-
+	auto searchLocale = icu::Locale::createCanonical("en_US.UTF-8");
+	auto sortLocale = icu::Locale::createCanonical("en_US.UTF-8");
+	icu::ErrorCode error;
 	try {
+		searchLocale = icu::Locale::createCanonical(m_currentLanguage.first.c_str());
+		sortLocale = icu::Locale::createCanonical(m_currentLanguage.first.c_str());
+#if U_ICU_VERSION_MAJOR_NUM >= 63
+		sortLocale.setUnicodeKeywordValue("co","standard", error);
+#else
+		sortLocale.setKeywordValue("collation","standard", error);
+#endif
+		if (error.isFailure()) throw std::runtime_error("Error " + std::to_string(error.get()) + " creating sorting locale: " + error.errorName());
+		error.reset();
+#if U_ICU_VERSION_MAJOR_NUM >= 63
+		searchLocale.setUnicodeKeywordValue("co","search", error);
+#else
+		sortLocale.setKeywordValue("collation","search", error);
+#endif
+		if (error.isFailure()) throw std::runtime_error("Error " + std::to_string(error.get()) + " creating search locale: " + error.errorName());
 		std::locale::global(m_gen(m_currentLanguage.first));
 		std::cout << "locale/notice: Current language is: '" << m_currentLanguage.second << "'" << std::endl;
 	}
@@ -52,6 +73,23 @@ void TranslationEngine::setLanguage(const std::string& language, bool fromSettin
 		std::clog << "locale/warning: Unable to detect locale, will try to fallback to en_US.UTF-8. Exception: " << e.what() << std::endl;
 		std::locale::global(m_gen("en_US.UTF-8"));
 	}
+
+	icu::RuleBasedCollator* search;
+	icu::RuleBasedCollator* sort;
+
+	error.reset();	
+	search = dynamic_cast<icu::RuleBasedCollator*>(icu::RuleBasedCollator::createInstance(searchLocale, error));
+	if (!search || error.isFailure()) throw std::runtime_error("Unable to create search collator. error: " + std::to_string(error.get()) + ": " + error.errorName());
+
+	error.reset();
+	sort = dynamic_cast<icu::RuleBasedCollator*>(icu::RuleBasedCollator::createInstance(sortLocale, error));
+	if (!sort || error.isFailure()) throw std::runtime_error("Unable to create search collator. error: " + 
+std::to_string(error.get()) + ": " + error.errorName());
+
+	UnicodeUtil::m_searchCollator.reset(search);
+	UnicodeUtil::m_sortCollator.reset(sort);
+	UnicodeUtil::m_searchCollator->setStrength(icu::Collator::PRIMARY);
+	UnicodeUtil::m_sortCollator->setStrength(icu::Collator::SECONDARY);
 }
 
 std::string TranslationEngine::getLanguageByHumanReadableName(const std::string& language) {
