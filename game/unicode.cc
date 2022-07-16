@@ -10,8 +10,8 @@
 #include <unicode/ubidi.h>
 #include "compact_enc_det/compact_enc_det.h"
 
-std::unique_ptr<icu::RuleBasedCollator> UnicodeUtil::m_searchCollator = nullptr;
-std::unique_ptr<icu::RuleBasedCollator> UnicodeUtil::m_sortCollator = nullptr;
+std::unique_ptr<icu::RuleBasedCollator> UnicodeUtil::m_searchCollator;
+std::unique_ptr<icu::RuleBasedCollator> UnicodeUtil::m_sortCollator;
 
 std::map<std::string, Converter> UnicodeUtil::m_converters{};
 
@@ -20,12 +20,10 @@ Converter::Converter(std::string const& codepage): m_codepage(codepage), m_conve
 	if (m_error.isFailure()) throw std::runtime_error("unicode/error: " + std::to_string(m_error.get()) + ": " + std::string(m_error.errorName()));
 }
 
-Converter::Converter(Converter&& c) noexcept: m_codepage(std::move(c.m_codepage)), m_converter(std::move(c.m_converter)), m_error(std::move(c.m_error)) {}
-
-void Converter::reset() {
-	std::scoped_lock l(m_lock);
-	if (m_converter) ucnv_reset(m_converter.get());
-}
+Converter::Converter(Converter&& c) noexcept:
+	m_codepage(std::move(c.m_codepage)),
+	m_converter(std::move(c.m_converter)),
+	m_error(std::move(c.m_error)) {}
 
 icu::UnicodeString Converter::convertToUTF8(std::string_view sv) {
 	std::scoped_lock l(m_lock);

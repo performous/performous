@@ -21,14 +21,12 @@ struct Converter {
 	Converter(Converter&& c) noexcept;
 	Converter(Converter& c) = delete;
 	Converter(Converter const& c) = delete;	
-	~Converter() {};
 
 	icu::UnicodeString convertToUTF8(std::string_view sv); ///< Do the actual conversion.
 
 	private:
 	std::string m_codepage;
 	std::unique_ptr<UConverter, decltype(&ucnv_close)> m_converter;
-	void reset(); ///< UConverters are state machines and need to be reset after each use.
 	icu::ErrorCode m_error;
 	std::mutex m_lock;
 };
