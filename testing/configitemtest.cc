@@ -9,10 +9,24 @@ namespace {
 		EXPECT_EQ(1000, ConfigItem(1000).i());
 
 		EXPECT_THROW(ConfigItem().i(), std::exception);
+		EXPECT_THROW(ConfigItem(static_cast<unsigned short>(0)).i(), std::exception);
 		EXPECT_THROW(ConfigItem(true).i(), std::exception);
 		EXPECT_THROW(ConfigItem(0.1f).i(), std::exception);
 		EXPECT_THROW(ConfigItem(std::string{}).i(), std::exception);
 		EXPECT_THROW(ConfigItem(std::vector<std::string>{}).i(), std::exception);
+	}
+
+	TEST(UnitTest_ConfigItem, ui) {
+		EXPECT_EQ(0, ConfigItem(static_cast<unsigned short>(0)).ui());
+		EXPECT_EQ(1, ConfigItem(static_cast<unsigned short>(1)).ui());
+		EXPECT_EQ(1000, ConfigItem(static_cast<unsigned short>(1000)).ui());
+
+		EXPECT_THROW(ConfigItem().ui(), std::exception);
+		EXPECT_THROW(ConfigItem(3).ui(), std::exception);
+		EXPECT_THROW(ConfigItem(true).ui(), std::exception);
+		EXPECT_THROW(ConfigItem(0.1f).ui(), std::exception);
+		EXPECT_THROW(ConfigItem(std::string{}).ui(), std::exception);
+		EXPECT_THROW(ConfigItem(std::vector<std::string>{}).ui(), std::exception);
 	}
 
 	TEST(UnitTest_ConfigItem, f) {
@@ -21,8 +35,9 @@ namespace {
 		EXPECT_EQ(1000.0f, ConfigItem(1000.0f).f());
 
 		EXPECT_THROW(ConfigItem().f(), std::exception);
-		EXPECT_THROW(ConfigItem(true).f(), std::exception);
 		EXPECT_THROW(ConfigItem(0).f(), std::exception);
+		EXPECT_THROW(ConfigItem(static_cast<unsigned short>(0)).f(), std::exception);
+		EXPECT_THROW(ConfigItem(true).f(), std::exception);
 		EXPECT_THROW(ConfigItem(std::string{}).f(), std::exception);
 		EXPECT_THROW(ConfigItem(std::vector<std::string>{}).f(), std::exception);
 	}
@@ -33,6 +48,7 @@ namespace {
 
 		EXPECT_THROW(ConfigItem().b(), std::exception);
 		EXPECT_THROW(ConfigItem(0).b(), std::exception);
+		EXPECT_THROW(ConfigItem(static_cast<unsigned short>(0)).b(), std::exception);
 		EXPECT_THROW(ConfigItem(0.1f).b(), std::exception);
 		EXPECT_THROW(ConfigItem(std::string{}).b(), std::exception);
 		EXPECT_THROW(ConfigItem(std::vector<std::string>{}).b(), std::exception);
@@ -151,6 +167,7 @@ namespace {
 	TEST(UnitTest_ConfigItem, getType) {
 		EXPECT_EQ("bool", ConfigItem(true).getType());
 		EXPECT_EQ("int", ConfigItem(2).getType());
+		EXPECT_EQ("uint", ConfigItem(static_cast<unsigned short>(4)).getType());
 		EXPECT_EQ("float", ConfigItem(1.2f).getType());
 		EXPECT_EQ("string", ConfigItem(std::string{}).getType());
 		EXPECT_EQ("option_list", ConfigItem(std::vector<std::string>{}).getType());
