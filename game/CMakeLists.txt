@@ -151,7 +151,7 @@ set(ENABLE_WEBCAM AUTO CACHE STRING "Use webcam")
 set_property(CACHE ENABLE_WEBCAM PROPERTY STRINGS AUTO ON OFF)
 if("AUTO" STREQUAL "${ENABLE_WEBCAM}")
 	# webcam support not requested explicitly, best effort try to find it
-	find_package(OpenCV REQUIRED core videoio)
+	find_package(OpenCV COMPONENTS core videoio)
 	if(OPENCV_VIDEOIO_FOUND)
 		message(STATUS "Webcam support: Enabled (automatically found)")
 	else()
