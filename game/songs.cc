@@ -544,11 +544,11 @@ std::shared_ptr<Song> Songs::currentPtr() const try {
 
 Song& Songs::current() try { 
 	return *m_filtered.at(static_cast<size_t>(math_cover.getTarget()));
-} catch (std::out_of_range const& e) { throw std::runtime_error(std::string("songs/error: out-of-bounds access attempt for Songs") + e.what()); }
+} catch (std::out_of_range const& e) { throw std::runtime_error(std::string("songs/error: out-of-bounds access attempt for Songs: ") + e.what()); }
 
 Song const& Songs::current() const try { 
 	return *m_filtered.at(static_cast<size_t>(math_cover.getTarget()));
-} catch (std::out_of_range const& e) { throw std::runtime_error(std::string("songs/error: out-of-bounds access attempt for Songs") + e.what()); }
+} catch (std::out_of_range const& e) { throw std::runtime_error(std::string("songs/error: out-of-bounds access attempt for Songs: ") + e.what()); }
 
 namespace {
 	void dumpCover(xmlpp::Element* song, Song const& s, size_t num) {
