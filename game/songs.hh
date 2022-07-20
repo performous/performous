@@ -52,11 +52,11 @@ class Songs {
 	/// sets margins for animation
 	void setAnimMargins(double left, double right) { math_cover.setMargins(left, right); }
 	/// @return current song
-	std::shared_ptr<Song> currentPtr() { return m_filtered.empty() ? std::shared_ptr<Song>() : m_filtered[static_cast<size_t>(math_cover.getTarget())]; }
+	std::shared_ptr<Song> currentPtr() const;
 	/// @return current song
-	Song& current() { return *m_filtered[static_cast<size_t>(math_cover.getTarget())]; }
+	Song& current();
 	/// @return current Song
-	Song const& current() const { return *m_filtered[static_cast<size_t>(math_cover.getTarget())]; }
+	Song const& current() const;
 	/// filters songlist by regular expression
 	void setFilter(std::string const& regex);
 	/// Get the current song type filter number
