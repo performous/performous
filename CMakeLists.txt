@@ -8,15 +8,15 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 if(NOT PERFORMOUS_VERSION)
-    message("No project version specified. Determining latest tag..")
-    include(GetGitRevisionDescription)
-    git_describe(PROJECT_VERSION --tags)
-    if(NOT PROJECT_VERSION)
-        message("No project version found. Falling back onto default versioning strategy.")
-        set(PROJECT_VERSION "1.2+")
-    endif()
+	message("No project version specified. Determining latest tag..")
+	include(GetGitRevisionDescription)
+	git_describe(PROJECT_VERSION --tags)
+	if(NOT PROJECT_VERSION)
+		message("No project version found. Falling back onto default versioning strategy.")
+		set(PROJECT_VERSION "1.2+")
+	endif()
 else()
-    set(PROJECT_VERSION "${PERFORMOUS_VERSION}")
+	set(PROJECT_VERSION "${PERFORMOUS_VERSION}")
 endif()
 string(TIMESTAMP YEAR "%Y")
 
@@ -44,7 +44,7 @@ if (APPLE)
 		message (STATUS "Checking macOS deployment target... ${CMAKE_OSX_DEPLOYMENT_TARGET}")
 		if (${CMAKE_OSX_DEPLOYMENT_TARGET} VERSION_GREATER_EQUAL 10.15)
 			message (STATUS "Targetting macOS 10.15 or newer, enabling std::filesystem")
-                else ()
+				else ()
 			set(USE_BOOST_FS TRUE)
 		endif()
 	else()
@@ -66,6 +66,7 @@ elseif(APPLE)
 else()
 	set(SHARE_INSTALL_DEFAULT "share/games/performous")
 	set(LOCALE_DIR_DEFAULT "share/locale")
+	add_link_options(-rdynamic)
 endif()
 
 set(SHARE_INSTALL "${SHARE_INSTALL_DEFAULT}" CACHE STRING "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
@@ -94,13 +95,13 @@ add_subdirectory(docs)
 if(NOT APPLE)
   # uninstall target
   if(NOT TARGET uninstall)
-    configure_file(
-      "${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake.in"
-      "${CMAKE_CURRENT_BINARY_DIR}/cmake/uninstall.cmake"
-      IMMEDIATE @ONLY)
+	configure_file(
+	  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake.in"
+	  "${CMAKE_CURRENT_BINARY_DIR}/cmake/uninstall.cmake"
+	  IMMEDIATE @ONLY)
 
-    add_custom_target(uninstall
-      COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake/uninstall.cmake)
+	add_custom_target(uninstall
+	  COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake/uninstall.cmake)
   endif()
 endif()
 
