@@ -353,7 +353,7 @@ void Songs::filter_internal() {
 		} else {
 			std::string charset = UnicodeUtil::getCharset(m_filter);
 			icu::UnicodeString filter = UnicodeUtil::getConverter(UnicodeUtil::getCharset(m_filter)).convertToUTF8(m_filter);
-			UErrorCode icuError = U_ZERO_ERROR;
+			icu::ErrorCode icuError;
 
 			std::shared_lock<std::shared_mutex> l(m_mutex);
 			std::copy_if (m_songs.begin(), m_songs.end(), std::back_inserter(filtered), [&](std::shared_ptr<Song> it){
@@ -412,9 +412,9 @@ namespace {
 		bool operator()(Song const& left , Song const& right) {
 			icu::UnicodeString leftVal = icu::UnicodeString::fromUTF8(left.*m_field);
 			icu::UnicodeString rightVal = icu::UnicodeString::fromUTF8(right.*m_field);
-			UErrorCode sortError = U_ZERO_ERROR;
+			icu::ErrorCode sortError;
 			UCollationResult result = UnicodeUtil::m_sortCollator.compare(leftVal, rightVal, sortError);
-			if (U_SUCCESS(sortError)) {
+			if (sortError.isSuccess()) {
 				return result == UCOL_LESS ? m_ascending : !m_ascending;
 			}
 			else {
@@ -498,11 +498,7 @@ void Songs::sortChange(SortChange diff) {
 		case 4:
 		 [[fallthrough]];
 		case 6:
-			UErrorCode collatorError = U_ZERO_ERROR;
-			UnicodeUtil::m_sortCollator.setAttribute(UCOL_STRENGTH, (config["game/case-sorting"].b()) ? UCOL_TERTIARY : UCOL_SECONDARY, collatorError);
-			if (U_FAILURE(collatorError)) {
-				std::clog << "sorting/error: Unable to change collator strength." << std::endl;
-			}
+			UnicodeUtil::m_sortCollator.setStrength(config["game/case-sorting"].b() ? icu::Collator::TERTIARY : icu::Collator::SECONDARY);
 			break;
 		}
 	sort_internal();

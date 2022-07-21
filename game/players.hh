@@ -7,11 +7,9 @@
 #include <string>
 #include <stdexcept>
 
-#include <unicode/tblcoll.h>
-#include <unicode/unistr.h>
-#include <unicode/utypes.h>
 
 #include "player.hh"
+#include "unicode.hh"
 #include "animvalue.hh"
 #include "libxml++.hh"
 
@@ -83,7 +81,7 @@ class Players {
 private:
 	PlayerId assign_id_internal(); /// returns the next available id
 	void filter_internal();
-	static UErrorCode m_icuError;
+	static icu::ErrorCode m_icuError;
 	static icu::RuleBasedCollator icuCollator;
 
 private:
