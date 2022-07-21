@@ -61,7 +61,7 @@ class ConfigItem {
 	void selectEnum(std::string const& name); ///< Set integer value by enum name
 	std::string const getEnumName() const; ///< Returns the selected enum option's text
 	std::vector<std::string>& getEnum() { return m_enums; }
-	int getSelection() const { return m_sel; }
+	unsigned short getSelection() const { return m_sel; }
 
 	NumericValue& getMin();
 	NumericValue& getMax();
@@ -90,7 +90,7 @@ class ConfigItem {
 	NumericValue m_step, m_min, m_max;
 	NumericValue m_multiplier;
 	std::string m_unit;
-	int m_sel = 0;
+	unsigned short m_sel = 0;
 	std::function<std::string(ConfigItem const&)> m_getValue;
 };
 

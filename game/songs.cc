@@ -529,7 +529,7 @@ void Songs::sort_internal(bool descending) {
 		  case 6: std::sort(begin, end, customComparator(&Song::language, !descending)); break;
 		  case 7: {
 			auto const songToHiscore = [begin, end, this](){
-				auto result = std::map<SongPtr, int>{};
+				auto result = std::map<SongPtr, unsigned>{};
 
 				std::for_each(begin, end, [&result, this](SongPtr const& song) {
 					try {
