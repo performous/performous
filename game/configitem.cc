@@ -211,7 +211,7 @@ void ConfigItem::selectEnum(std::string const& name) {
 
 
 std::string const ConfigItem::getEnumName() const {
-	auto const& val = ui();
+	unsigned short const& val = ui();
 	if (val < m_enums.size())
 		return m_enums[val];
 

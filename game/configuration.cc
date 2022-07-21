@@ -142,7 +142,7 @@ void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, int mod
 				if (!n2.empty()) {
 					for (auto it2 = n2.begin(), end2 = n2.end(); it2 != end2; ++it2) {
 						xmlpp::Element& elem2 = dynamic_cast<xmlpp::Element&>(**it2);
-						item.getEnum().push_back(getText(elem2));
+						if (!getText(elem2).empty()) item.getEnum().push_back(getText(elem2));
 					}
 					item.getMin() = static_cast<unsigned short>(0);
 					item.getMax() = static_cast<unsigned short>(item.getEnum().size() - 1);
