@@ -186,8 +186,8 @@ fs::path userConfFile;
 
 namespace {
 	std::string getValue_language(ConfigItem const& item) {
-		int autoLanguageType = 1337;
-		int val = LanguageToLanguageId(item.getEnumName()); // In the case of the language, val is the real value while m_value is the enum case for its cosmetic name.
+		unsigned short autoLanguageType = 1337;
+		unsigned short val = LanguageToLanguageId(item.getEnumName()); // In the case of the language, val is the real value while m_value is the enum case for its cosmetic name.
 		std::string languageName = (val != autoLanguageType) ? item.getEnumName() : "Auto";
 		return languageName;
 	}
@@ -371,7 +371,7 @@ void readConfigXML(fs::path const& file, unsigned mode) {
 	}
 }
 
-unsigned int LanguageToLanguageId(const std::string& name) {
+unsigned short LanguageToLanguageId(const std::string& name) {
 	if (name == "Asturian") return 1;
 	if (name == "Danish") return 2;
 	if (name == "German") return 3;
