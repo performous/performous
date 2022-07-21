@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <unicode/stsearch.h>
 
-UErrorCode Players::m_icuError = U_ZERO_ERROR;
+icu::ErrorCode Players::m_icuError = icu::ErrorCode();
 
 void Players::load(xmlpp::NodeSet const& n) {
 	for (auto const& elem: n) {
