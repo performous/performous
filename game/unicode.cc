@@ -14,12 +14,37 @@ icu::ErrorCode UnicodeUtil::m_staticIcuError = icu::ErrorCode();
 icu::RuleBasedCollator UnicodeUtil::m_searchCollator (icu::UnicodeString (""), icu::Collator::PRIMARY, m_staticIcuError);
 icu::RuleBasedCollator UnicodeUtil::m_sortCollator  (nullptr, icu::Collator::SECONDARY, m_staticIcuError);
 
+std::map<std::string, Converter> UnicodeUtil::m_converters{};
+
+Converter::Converter(std::string const& codepage): m_codepage(codepage), m_converter(nullptr, &ucnv_close) {
+	m_converter = std::unique_ptr<UConverter, decltype(&ucnv_close)>(ucnv_open(m_codepage.c_str(), m_error), &ucnv_close);
+	if (m_error.isFailure()) throw std::runtime_error("unicode/error: " + std::to_string(m_error.get()) + ": " + std::string(m_error.errorName()));
+}
+
+Converter::Converter(Converter&& c) noexcept: m_codepage(std::move(c.m_codepage)), m_converter(std::move(c.m_converter)), m_error(std::move(c.m_error)) {}
+
+void Converter::reset() {
+	std::scoped_lock l(m_lock);
+	if (m_converter) ucnv_reset(m_converter.get());
+}
+
+icu::UnicodeString Converter::convertToUTF8(std::string_view sv) {
+	std::scoped_lock l(m_lock);
+	icu::UnicodeString ret(sv.data(), static_cast<int>(sv.length()), m_converter.get(), m_error);
+	if (m_error.isFailure()) throw std::runtime_error("Couldn't convert string: " + std::string(sv) + " to UTF-8. Error: " + std::to_string(m_error.get()) + ": " + m_error.errorName());
+	return ret;
+}
+
+Converter& UnicodeUtil::getConverter(std::string const& s) {
+	return m_converters.try_emplace(s, Converter(s)).first->second;
+}
+
 std::string UnicodeUtil::getCharset (std::string_view str) {
 	int bytes_consumed;
 	bool is_reliable;
 	
 	Encoding encoding = CompactEncDet::DetectEncoding(
-        str.data(), static_cast<int>(str.size()),
+		str.data(), static_cast<int>(str.size()),
 		nullptr, nullptr, nullptr,
 		UNKNOWN_ENCODING,
 		UNKNOWN_LANGUAGE,
@@ -48,7 +73,7 @@ std::string UnicodeUtil::convertToUTF8 (std::string_view str, std::string _filen
 		}
 		if (charset != "UTF-8") {
 			if (!_filename.empty()) std::clog << "unicode/info: " << _filename << " does not appear to be UTF-8; (" << charset << ") detected." << std::endl; 
-			ustring = icu::UnicodeString(str.data(), charset.c_str());
+			ustring = UnicodeUtil::getConverter(charset).convertToUTF8(str.data());
 		}
 	else { ustring = icu::UnicodeString::fromUTF8(str.data()); }
 	switch(toCase) {
@@ -95,12 +120,12 @@ bool UnicodeUtil::caseEqual (std::string_view lhs, std::string_view rhs, bool as
 	if (removeUTF8BOM(rhs)) rhsCharset = "UTF-8";
 	if (lhsCharset != "UTF-8" && !assumeUTF8) {
 		lhsCharset = UnicodeUtil::getCharset(lhs);
-		lhsUniString = icu::UnicodeString(lhs.data(), lhsCharset.c_str());
+		lhsUniString = UnicodeUtil::getConverter(lhsCharset).convertToUTF8(lhs.data());
 	}
 	else lhsUniString = icu::UnicodeString::fromUTF8(lhs.data());
 	if (rhsCharset != "UTF-8" && !assumeUTF8) {
 		rhsCharset = UnicodeUtil::getCharset(rhs);
-		rhsUniString = icu::UnicodeString(rhs.data(), rhsCharset.c_str());
+		rhsUniString = UnicodeUtil::getConverter(rhsCharset).convertToUTF8(rhs.data());
 	}
 	else rhsUniString = icu::UnicodeString::fromUTF8(rhs.data());
 	int8_t result = lhsUniString.caseCompare(rhsUniString, U_FOLD_CASE_DEFAULT);
@@ -111,7 +136,7 @@ bool UnicodeUtil::isRTL(std::string_view str) {
 	bool _return = false;
 	icu::ErrorCode _unicodeError;
 	std::string charset(UnicodeUtil::getCharset(str));
-	icu::UnicodeString ustring = icu::UnicodeString(str.data(), charset.c_str());
+	icu::UnicodeString ustring = UnicodeUtil::getConverter(charset).convertToUTF8(str.data());
 	 std::unique_ptr<UBiDi,void(*)(UBiDi*)> _uBiDiObj(
 		ubidi_open(),
 		[](UBiDi* p) {

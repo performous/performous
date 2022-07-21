@@ -2,18 +2,41 @@
 
 #include <iostream>
 #include <map>
+#include <memory>
+#include <mutex>
 #include <string>
 #include <unicode/errorcode.h>
 #include <unicode/tblcoll.h>
 #include <unicode/uclean.h>
+#include <unicode/ucnv.h>
 #include <unicode/ucsdet.h>
 
 typedef std::map<std::string, std::string> songMetadata;
 
+class UnicodeString;
+
+struct Converter {
+	/// Constructor/Destructor
+	Converter(std::string const& codepage);
+	Converter(Converter&& c) noexcept;
+	Converter(Converter& c) = delete;
+	Converter(Converter const& c) = delete;	
+	~Converter() {};
+	
+	icu::UnicodeString convertToUTF8(std::string_view sv); ///< Do the actual conversion.
+	
+	private:
+	std::string m_codepage;
+	std::unique_ptr<UConverter, decltype(&ucnv_close)> m_converter;
+	void reset(); ///< UConverters are state machines and need to be reset after each use.
+	icu::ErrorCode m_error;
+	std::mutex m_lock;
+};
+
 class UnicodeUtil {
 	static icu::ErrorCode m_staticIcuError;
 	enum class CaseMapping { LOWER, UPPER, TITLE, NONE };
-
+	static std::map<std::string, Converter> m_converters;
 	public:
 	UnicodeUtil() = delete;
 	~UnicodeUtil() = delete;
@@ -28,4 +51,5 @@ class UnicodeUtil {
 	static std::string toTitle (std::string_view str);
 	static icu::RuleBasedCollator m_searchCollator;
 	static icu::RuleBasedCollator m_sortCollator;
+	static Converter& getConverter(std::string const& s);
 };
