@@ -22,25 +22,14 @@
 
 class ConfigItemXMLLoader {
 public:
-	void update(ConfigItem&, xmlpp::Element& elem, int mode); ///< Load XML config file, elem = Entry, mode = 0 for schema, 1 for system config and 2 for user config
+	void update(ConfigItem&, xmlpp::Element& elem, unsigned mode); ///< Load XML config file, elem = Entry, mode = 0 for schema, 1 for system config and 2 for user config
 
 private:
-	template <typename T> void updateNumeric(ConfigItem&, xmlpp::Element& elem, int mode); ///< Used internally for loading XML
+	template <typename T> void updateNumeric(ConfigItem& item, xmlpp::Element& elem, unsigned mode); ///< Used internally for loading XML
 	void verifyType(std::string const& t) const; ///< throws std::logic_error if t != type
 };
 
 namespace {
-
-	template <typename T, typename VariantAll, typename VariantNum> std::string numericFormat(ConfigItem& item, VariantAll const& value, VariantNum const& multiplier, VariantNum const& step) {
-		// Find suitable precision (not very useful for integers, but this code is generic...)
-		T m = std::get<T>(multiplier);
-		T s = std::abs<T>(m * std::get<T>(step));
-		int precision = 0;
-		while (s > static_cast<T>(0) && (s *= static_cast<T>(10)) < static_cast<T>(10)) ++precision;
-		// Not quite sure how to format this with FMT
-		return fmt::format("{:.{}f}", double(m) * std::get<T>(value), precision);
-	}
-
 	std::string getText(xmlpp::Element const& elem) {
 		auto n = xmlpp::get_first_child_text(elem);  // Returns NULL if there is no text
 		return n ? std::string(n->get_content()) : std::string();
@@ -72,7 +61,7 @@ namespace {
 	}
 }
 
-template <typename T> void ConfigItemXMLLoader::updateNumeric(ConfigItem& item, xmlpp::Element& elem, int mode) {
+template <typename T> void ConfigItemXMLLoader::updateNumeric(ConfigItem& item, xmlpp::Element& elem, unsigned mode) {
 	auto ns = elem.find("limits");
 	if (!ns.empty()) setLimits<T>(dynamic_cast<xmlpp::Element&>(*ns[0]), item.getMin(), item.getMax(), item.getStep());
 	else if (mode == 0) throw XMLError(elem, "child element limits missing");
@@ -102,7 +91,7 @@ template <typename T> void ConfigItemXMLLoader::updateNumeric(ConfigItem& item, 
 	}
 }
 
-void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, int mode) {
+void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, unsigned mode) {
 	try {
 		if (mode == 0) {
 			item.setName(getAttribute(elem, "name"));
