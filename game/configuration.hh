@@ -32,6 +32,6 @@ struct MenuEntry {
 	std::vector<std::string> items; ///< selectable options
 };
 
-unsigned int LanguageToLanguageId(const std::string& name);
+unsigned short LanguageToLanguageId(const std::string& name);
 using ConfigMenu = std::vector<MenuEntry>;
 extern ConfigMenu configMenu;

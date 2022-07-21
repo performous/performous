@@ -65,7 +65,7 @@ ConfigItem& ConfigItem::incdec(int dir) {
 	} else if (m_type == "uint") {
 		unsigned short& val = std::get<unsigned short>(m_value);
 		int value = static_cast<int>(val);
-		int step = std::get<unsigned short>(m_step);
+		int step = static_cast<int>(std::get<unsigned short>(m_step));
 		int min = static_cast<int>(std::get<unsigned short>(m_min));
 		int max = static_cast<int>(std::get<unsigned short>(m_max));
 		val = static_cast<unsigned short>(clamp(((value + dir * step) / step) * step, min, max));
@@ -172,7 +172,7 @@ std::string const ConfigItem::getValue() const {
 		return numericFormat<int>(m_value, m_multiplier, m_step) + _(m_unit);
 	}
 	if (m_type == "uint") {
-		unsigned val = ui();
+		unsigned short val = ui();
 		if (val < m_enums.size())
 			return m_enums[val];
 		return numericFormat<unsigned short>(m_value, m_multiplier, m_step) + _(m_unit);
