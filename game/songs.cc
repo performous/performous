@@ -1,28 +1,27 @@
 #include "songs.hh"
 
 #include "configuration.hh"
-#include "fs.hh"
-#include "song.hh"
 #include "database.hh"
+#include "fs.hh"
 #include "i18n.hh"
-#include "profiler.hh"
 #include "libxml++-impl.hh"
-#include "unicode.hh"
 #include "platform.hh"
+#include "profiler.hh"
+#include "song.hh"
+#include "unicode.hh"
 
 #include <algorithm>
 #include <cstddef>
 #include <cstdlib>
 #include <iostream>
+#include <fstream>
 #include <regex>
 #include <stdexcept>
 
-#include "fs.hh"
 #include <fmt/format.h>
+#include <nlohmann/json.hpp>
 #include <unicode/stsearch.h>
 
-#include <fstream>
-#include <nlohmann/json.hpp>
 
 Songs::Songs(Database & database, std::string const& songlist):
   m_songlist(songlist),
