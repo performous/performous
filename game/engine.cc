@@ -1,6 +1,7 @@
 #include "engine.hh"
 
 #include "audio.hh"
+#include "pitch.hh"
 #include "song.hh"
 #include "database.hh"
 #include "configuration.hh"
