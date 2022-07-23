@@ -1,4 +1,5 @@
 ﻿#include "player.hh"
+#include "pitch.hh"
 #include "song.hh"
 #include "engine.hh" // just for Engine::TIMESTEP
 
@@ -12,6 +13,10 @@ Player::Player(VocalTrack& vocal, Analyzer& analyzer, size_t frames):
 	for (Notes::const_iterator it = m_vocal.notes.begin(); it != m_vocal.notes.end(); ++it) it->power = 0.0f;
 	// Assign colors
 	m_color = MicrophoneColor::get(m_analyzer.getId());
+}
+
+void Player::prepare() {
+	m_analyzer.process();
 }
 
 void Player::update() {

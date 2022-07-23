@@ -1,20 +1,22 @@
 cmake_minimum_required(VERSION 3.15)
 
-set(SOURCE_FILES 
-    "colortest.cc"
-    "configitemtest.cc"
-    "fixednotegraphscalertest.cc"
-    "notegraphscalerfactorytest.cc"
-    "utiltest.cc"
+set(SOURCE_FILES
+	"colortest.cc"
+	"configitemtest.cc"
+	"fixednotegraphscalertest.cc"
+	"notegraphscalerfactorytest.cc"
+	"ringbuffertest.cc"
+	"utiltest.cc"
 )
-set(GAME_SOURCES 
-    "../game/color.cc"
-    "../game/configitem.cc"
-    "../game/dynamicnotegraphscaler.cc"
-    "../game/fixednotegraphscaler.cc"
-    "../game/musicalscale.cc"
-    "../game/notes.cc"
-    "../game/notegraphscalerfactory.cc"
+set(GAME_SOURCES
+	"../game/color.cc"
+	"../game/configitem.cc"
+	"../game/dynamicnotegraphscaler.cc"
+	"../game/fixednotegraphscaler.cc"
+	"../game/musicalscale.cc"
+	"../game/notes.cc"
+	"../game/notegraphscalerfactory.cc"
+	"../game/pitch.cc"
 )
 
 set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${GAME_SOURCES})
@@ -29,6 +31,6 @@ target_link_libraries(performous_test PRIVATE fmt::fmt)
 
 target_link_libraries(performous_test PRIVATE GTest::GTest GTest::Main)
 
-target_include_directories(performous_test PRIVATE "..")
+target_include_directories(performous_test PRIVATE ".." "../game")
 
 gtest_discover_tests(performous_test)

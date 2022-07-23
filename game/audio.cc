@@ -5,6 +5,7 @@
 #include "libda/portaudio.hpp"
 #include "screen_songs.hh"
 #include "game.hh"
+#include "pitch.hh"
 #include "songs.hh"
 #include "util.hh"
 
@@ -446,6 +447,15 @@ void Device::stop() {
 	PORTAUDIO_CHECKED(Pa_AbortStream, (stream));
 }
 
+bool Device::isChannel(std::string const& name) const {
+	if (name == "OUT")
+		return isOutput();
+	for (auto const& m: mics)
+		if (m && m->getId() == name)
+			return true;
+	return false;
+}
+
 int Device::operator()(float const* inbuf, float* outbuf, std::ptrdiff_t frames) try {
 	for (std::size_t i = 0; i < mics.size(); ++i) {
 		if (!mics[i]) continue;  // No analyzer? -> Channel not used
@@ -570,8 +580,8 @@ portaudio::Init Audio::init;
 Audio::Audio() {
 	aubio_tempo_set_silence(Audio::aubioTempo.get(), -50.0f);
 	aubio_tempo_set_threshold(Audio::aubioTempo.get(), 0.4f);
-        populateBackends(portaudio::AudioBackends().getBackends());
-        self = std::make_unique<Impl>();
+		populateBackends(portaudio::AudioBackends().getBackends());
+		self = std::make_unique<Impl>();
 }
 Audio::~Audio() { close(); }
 
