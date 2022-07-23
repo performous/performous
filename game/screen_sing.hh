@@ -64,6 +64,8 @@ class ScreenSing: public Screen {
 	void drawMenu();
 	void prepareVoicesMenu(unsigned moveSelectionTo = 0);
 	bool devCanParticipate(input::DevType const& devType) const;
+	size_t players() const; // Always have at least one player to display lyrics and prevent crashes.
+
 	Audio& m_audio;
 	Database& m_database;
 	Backgrounds& m_backgrounds;
@@ -89,7 +91,6 @@ class ScreenSing: public Screen {
 	std::string m_selectedTrackLocalized;
 	ConfigItem m_vocalTracks[AUDIO_MAX_ANALYZERS];
 	ConfigItem m_duet;
-	size_t players() const { auto& analyzers = m_audio.analyzers(); return (analyzers.empty() ? 1 : analyzers.size()); } // Always have at least one player to display lyrics and prevent crashes.
 	bool m_singingDuet;
 	unsigned m_selectedVocal;
 	bool m_displayAutoPlay = false;

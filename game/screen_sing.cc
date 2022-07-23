@@ -10,6 +10,7 @@
 #include "i18n.hh"
 #include "layout_singer.hh"
 #include "menu.hh"
+#include "pitch.hh"
 #include "platform.hh"
 #include "screen_players.hh"
 #include "songparser.hh"
@@ -493,6 +494,11 @@ bool ScreenSing::devCanParticipate(input::DevType const& devType) const {
 	return false;
 }
 
+size_t ScreenSing::players() const {
+	auto& analyzers = m_audio.analyzers();
+
+	return (analyzers.empty() ? 1 : analyzers.size());
+}
 
 void ScreenSing::draw() {
 	// Get the time in the song
