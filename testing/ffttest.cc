@@ -2,50 +2,9 @@
 
 #include "game/guitarchords/fft.hh"
 #include "game/guitarchords/chord.hh"
+#include "game/guitarchords/chords.hh"
+#include "game/guitarchords/notes.hh"
 
-const float E = 82.41f;
-const float a = 110.f;
-const float d = 146.83f;
-const float g = 196.0f;
-const float b = 246.94f;
-const float e = 329.63f;
-
-const float E1 = 87.f;
-const float a1 = 117.f;
-const float d1 = 156.f;
-const float g1 = 208.f;
-const float b1 = 262.f;
-const float e1 = 349.f;
-
-const float E2 = 92.5f;
-const float a2 = 123.f;
-const float d2 = 165.f;
-const float g2 = 220.f;
-const float b2 = 277.f;
-const float e2 = 370.f;
-
-const float E3 = 98.f;
-const float a3 = 131.f;
-const float d3 = 175.f;
-const float g3 = 233.f;
-const float b3 = 294.f;
-const float e3 = 392.f;
-
-const float E4 = 104.f;
-const float a4 = 139.f;
-const float d4 = 185.f;
-const float g4 = 247.f;
-const float b4 = 311.f;
-const float e4 = 415.f;
-
-
-const Chord G("G", {E3, a2, d, g, b, e3});
-const Chord D("D", {d, g2, b3, e2});
-const Chord C("C", {a3, d2, g, b1, e});
-const Chord A("A", {a, d2, g2, b2, e});
-const Chord Em("Em", {a1, d1, g, b, e});
-const Chord Dm("Dm", {d, g2, b3, e1});
-const Chord Am("Am", {a, d2, g2, b1, e});
 
 struct UnitTest_FFT : public testing::Test {
 	float const pi2 = static_cast<float>(M_PI * 2.0);
@@ -59,27 +18,6 @@ struct UnitTest_FFT : public testing::Test {
 
 			data[n] = s;
 		}
-	}
-	void fill(std::vector<float>& data) {
-		fill(data, std::set<float>{});
-	}
-	void fill(std::vector<float>& data, float frequency) {
-		fill(data, std::set<float>{frequency});
-	}
-	void fill(std::vector<float>& data, float frequency0, float frequency1) {
-		fill(data, std::set<float>{frequency0, frequency1});
-	}
-	void fill(std::vector<float>& data, float frequency0, float frequency1, float frequency2) {
-		fill(data, std::set<float>{frequency0, frequency1, frequency2});
-	}
-	void fill(std::vector<float>& data, float frequency0, float frequency1, float frequency2, float frequency3) {
-		fill(data, std::set<float>{frequency0, frequency1, frequency2, frequency3});
-	}
-	void fill(std::vector<float>& data, float frequency0, float frequency1, float frequency2, float frequency3, float frequency4) {
-		fill(data, std::set<float>{frequency0, frequency1, frequency2, frequency3, frequency4});
-	}
-	void fill(std::vector<float>& data, float frequency0, float frequency1, float frequency2, float frequency3, float frequency4, float frequency5) {
-		fill(data, std::set<float>{frequency0, frequency1, frequency2, frequency3, frequency4, frequency5});
 	}
 
 	void printBest(std::vector<FFTItem> const& result, unsigned count = 10) {
@@ -96,42 +34,6 @@ struct UnitTest_FFT : public testing::Test {
 			if(++n == count)
 				break;
 		}
-	}
-	void check(std::vector<FFTItem> const& result, float target) {
-		auto sorted = std::map<float, float>();
-
-		for(auto const& item : result)
-			sorted[-item.power] = item.frequency;
-
-		EXPECT_THAT(fabs(target - sorted.begin()->second), Le(48000.f / 8192.f));
-	}
-	void check(std::vector<FFTItem> const& result, float target0, float target1) {
-		auto sorted = std::map<float, float>();
-
-		for(auto const& item : result)
-			sorted[-item.power] = item.frequency;
-
-		auto best = std::vector<float>(2);
-		auto it = sorted.begin();
-
-		for(auto& frequency : best)
-			frequency = it++->second;
-
-		auto const binWidth = 48000.f / 8192.f;
-
-		EXPECT_THAT(best, UnorderedElementsAre(FloatNear(target0, binWidth), FloatNear(target1, binWidth)));
-	}
-	void check(std::vector<FFTItem> const& result, float target0, float target1, float target2) {
-		check(result, {target0, target1, target2});
-	}
-	void check(std::vector<FFTItem> const& result, float target0, float target1, float target2, float target3) {
-		check(result, {target0, target1, target2, target3});
-	}
-	void check(std::vector<FFTItem> const& result, float target0, float target1, float target2, float target3, float target4) {
-		check(result, {target0, target1, target2, target3, target4});
-	}
-	void check(std::vector<FFTItem> const& result, float target0, float target1, float target2, float target3, float target4, float target5) {
-		check(result, {target0, target1, target2, target3, target4, target5});
 	}
 	void check(std::vector<FFTItem> const& result, std::set<float> targets) {
 		auto sorted = std::map<float, float>();
@@ -157,7 +59,7 @@ struct UnitTest_FFT : public testing::Test {
 };
 
 TEST_F(UnitTest_FFT, silence) {
-	fill(input);
+	fill(input, {});
 
 	auto const result = fft.analyse(input);
 	auto n = 0;
@@ -169,7 +71,7 @@ TEST_F(UnitTest_FFT, silence) {
 }
 
 TEST_F(UnitTest_FFT, a) {
-	fill(input, a);
+	fill(input, {a});
 
 	auto const result = fft.analyse(input);
 	auto n = 0;
@@ -183,88 +85,88 @@ TEST_F(UnitTest_FFT, a) {
 	}
 
 	printBest(result);
-	check(result, a);
+	check(result, {a});
 }
 
 TEST_F(UnitTest_FFT, a_2) {
-	fill(input, a * 2);
+	fill(input, {a * 2});
 
 	auto const result = fft.analyse(input);
 
 	printBest(result);
-	check(result, a * 2);
+	check(result, {a * 2});
 }
 
 TEST_F(UnitTest_FFT, a_3) {
-	fill(input, a * 4);
+	fill(input, {a * 4});
 
 	auto const result = fft.analyse(input);
 
 	printBest(result);
-	check(result, a * 4);
+	check(result, {a * 4});
 }
 
 TEST_F(UnitTest_FFT, E) {
-	fill(input, E);
+	fill(input, {E});
 
 	auto const result = fft.analyse(input);
 
 	printBest(result);
-	check(result, E);
+	check(result, {E});
 }
 
 TEST_F(UnitTest_FFT, d) {
-	fill(input, d);
+	fill(input, {d});
 
 	auto const result = fft.analyse(input);
 
 	printBest(result);
-	check(result, d);
+	check(result, {d});
 }
 
 TEST_F(UnitTest_FFT, g) {
-	fill(input, g);
+	fill(input, {g});
 
 	auto const result = fft.analyse(input);
 
 	printBest(result);
-	check(result, g);
+	check(result, {g});
 }
 
 TEST_F(UnitTest_FFT, b) {
-	fill(input, b);
+	fill(input, {b});
 
 	auto const result = fft.analyse(input);
 
 	printBest(result);
-	check(result, b);
+	check(result, {b});
 }
 
 TEST_F(UnitTest_FFT, a_E) {
-	fill(input, a, E);
+	fill(input, {a, E});
 
 	auto const result = fft.analyse(input);
 
 	printBest(result);
-	check(result, a, E);
+	check(result, {a, E});
 }
 
 TEST_F(UnitTest_FFT, a_b) {
-	fill(input, a, b);
+	fill(input, {a, b});
 
 	auto const result = fft.analyse(input);
 
 	printBest(result);
-	check(result, a, b);
+	check(result, {a, b});
 }
 
 TEST_F(UnitTest_FFT, a_E_b) {
-	fill(input, a, E, b);
+	fill(input, {a, E, b});
 
 	auto const result = fft.analyse(input);
 
 	printBest(result);
-	check(result, a, E, b);
+	check(result, {a, E, b});
 }
 
 TEST_F(UnitTest_FFT, chord_Em) {

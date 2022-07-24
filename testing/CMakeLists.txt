@@ -5,6 +5,7 @@ set(SOURCE_FILES
 	"chordtest.cc"
 	"configitemtest.cc"
 	"ffttest.cc"
+	"fftsampletest.cc"
 	"fixednotegraphscalertest.cc"
 	"notegraphscalerfactorytest.cc"
 	"utiltest.cc"
@@ -13,6 +14,7 @@ set(GAME_SOURCES
 	"../game/color.cc"
 	"../game/configitem.cc"
 	"../game/dynamicnotegraphscaler.cc"
+	"../game/ffmpeg.cc"
 	"../game/fixednotegraphscaler.cc"
 	"../game/musicalscale.cc"
 	"../game/notes.cc"
@@ -33,13 +35,19 @@ target_link_libraries(performous_test PRIVATE fmt::fmt)
 
 set(Aubio_REQUIRED_VERSION "0.4.9")
 
-find_package(Aubio ${Aubio_REQUIRED_VERSION} REQUIRED)
-target_include_directories(performous_test SYSTEM PRIVATE ${Aubio_INCLUDE_DIRS})
-target_link_libraries(performous_test PRIVATE ${Aubio_LIBRARIES})
-add_definitions(${Aubio_DEFINITIONS})
+#foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM Json Ced Aubio)
+foreach(lib ${OUR_LIBS} AVFormat SWResample SWScale Aubio)
+	find_package(${lib} ${${lib}_REQUIRED_VERSION} REQUIRED)
+	message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
+	target_include_directories(performous SYSTEM PRIVATE ${${lib}_INCLUDE_DIRS})
+	target_link_libraries(performous PRIVATE ${${lib}_LIBRARIES})
+	add_definitions(${${lib}_DEFINITIONS})
+endforeach(lib)
 
-target_link_libraries(performous_test PRIVATE GTest::GTest gmock GTest::Main aubio)
+target_link_libraries(performous_test PRIVATE GTest::GTest gmock GTest::Main aubio avcodec avutil avformat swresample swscale)
 
-target_include_directories(performous_test PRIVATE ".." "../game")
+target_include_directories(performous_test PRIVATE "." ".." "../game")
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 gtest_discover_tests(performous_test)

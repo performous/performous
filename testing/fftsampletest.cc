@@ -1,0 +1,193 @@
+#include "common.hh"
+
+#include "game/guitarchords/fft.hh"
+#include "game/guitarchords/chord.hh"
+#include "game/guitarchords/chords.hh"
+#include "game/guitarchords/notes.hh"
+#include "game/ffmpeg.hh"
+
+#include <fstream>
+
+struct UnitTest_FFT_sample : public testing::Test {
+	AudioBuffer load(std::string const& filepath) {
+		return AudioBuffer(fs::path(filepath), 48000);
+	}
+	std::vector<float> loadRaw(std::string const& filepath) {
+		auto buffer = std::vector<float>();
+		auto file = std::ifstream(filepath);
+
+		while(file) {
+			auto sample = 0.f;
+
+			file.read(reinterpret_cast<char*>(&sample), 4);
+
+			buffer.emplace_back(sample);
+		}
+
+		return buffer;
+	}
+	void fill(std::string const& filepath, size_t offset = 0) {
+		if(filepath.substr(filepath.size() - 4) == ".f32") {
+			auto const buffer = loadRaw(filepath);
+
+			for(auto i = 0; i < input.size() && i + offset < buffer.size(); ++i)
+				input[i] = buffer[i + offset];
+
+			return;
+		}
+
+		auto buffer = load(filepath);
+
+		std::cout << "Duration of '" + filepath + "': " << buffer.duration() << std::endl;
+
+		buffer.prepare(offset);
+
+		if(!buffer.read(input.data(), input.size(), offset))
+			throw std::runtime_error("Failed to load file '" + filepath + "'!");
+	}
+
+	void check(std::vector<FFTItem> const& result, std::set<float> targets) {
+		auto sorted = std::map<float, float>();
+
+		for(auto const& item : result)
+			sorted[-item.power] = item.frequency;
+
+		auto best = std::vector<float>(targets.size() * 8); // must regard overtones
+		auto it = sorted.begin();
+
+		for(auto& frequency : best)
+			frequency = it++->second;
+
+		auto const binWidth = 48000.f / 8192.f * 1.5f;
+
+		for(auto const& target : targets)
+			EXPECT_THAT(best, Contains(FloatNear(target, binWidth)));
+	}
+	void printBest(std::vector<FFTItem> const& result, unsigned count = 10) {
+		auto sorted = std::map<float, float>();
+
+		for(auto const& item : result) {
+			//std::cout << item.frequency << ": " << item.power << std::endl;
+			sorted[-item.power] = item.frequency;
+		}
+
+		auto n = 0;
+		for(auto const& item : sorted) {
+			std::cout << item.second << ": " << item.first << std::endl;
+			if(++n == count)
+				break;
+		}
+	}
+
+	void printSample(std::vector<float> const& samples) {
+		for(auto const& v : samples)
+			std::cout << v << "/";
+
+		std::cout << std::endl;
+	}
+
+	FFT fft{FFT(48000, 8192)};
+	std::vector<float> input{std::vector<float>(8192)};
+};
+
+
+TEST_F(UnitTest_FFT_sample, E) {
+	fill("data/guitar/takamine/E.f32", 4800);
+
+	//printSample(input);
+
+	auto const result = fft.analyse(input);
+
+	check(result, {E});
+//	printBest(result);
+}
+
+TEST_F(UnitTest_FFT_sample, a) {
+	fill("data/guitar/takamine/a.f32");
+
+	auto const result = fft.analyse(input);
+
+	check(result, {a});
+//	printBest(result);
+}
+
+TEST_F(UnitTest_FFT_sample, d) {
+	fill("data/guitar/takamine/d.f32");
+
+	auto const result = fft.analyse(input);
+
+	check(result, {d});
+//	printBest(result);
+}
+
+TEST_F(UnitTest_FFT_sample, g) {
+	fill("data/guitar/takamine/g.f32");
+
+	auto const result = fft.analyse(input);
+
+	check(result, {g});
+//	printBest(result);
+}
+
+TEST_F(UnitTest_FFT_sample, b) {
+	fill("data/guitar/takamine/b.f32");
+
+	auto const result = fft.analyse(input);
+
+	check(result, {b});
+//	printBest(result);
+}
+
+TEST_F(UnitTest_FFT_sample, e) {
+	fill("data/guitar/takamine/e.f32");
+
+	auto const result = fft.analyse(input);
+
+	check(result, {e});
+//	printBest(result);
+}
+
+TEST_F(UnitTest_FFT_sample, DISABLED_chord_D) {
+	fill("data/guitar/takamine/D.f32", 4800);
+
+	auto const result = fft.analyse(input);
+
+	check(result, D);
+//	printBest(result);
+}
+
+TEST_F(UnitTest_FFT_sample, DISABLED_chord_Dm) {
+	fill("data/guitar/takamine/Dm.f32", 4800);
+
+	auto const result = fft.analyse(input);
+
+	check(result, Dm);
+//	printBest(result);
+}
+
+TEST_F(UnitTest_FFT_sample, chord_G) {
+	fill("data/guitar/takamine/G-2.f32", 4800);
+
+	auto const result = fft.analyse(input);
+
+	check(result, G);
+//	printBest(result);
+}
+
+TEST_F(UnitTest_FFT_sample, chord_A) {
+	fill("data/guitar/takamine/A.f32", 4800);
+
+	auto const result = fft.analyse(input);
+
+	check(result, A);
+//	printBest(result);
+}
+
+TEST_F(UnitTest_FFT_sample, chord_Em) {
+	fill("data/guitar/takamine/Em.f32", 4800);
+
+	auto const result = fft.analyse(input);
+
+	check(result, Em);
+//	printBest(result);
+}

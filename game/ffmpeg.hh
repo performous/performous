@@ -1,10 +1,13 @@
 #pragma once
 
 #include "chrono.hh"
-#include "texture.hh"
+//#include "texture.hh"
 #include "util.hh"
 #include "libda/sample.hpp"
 #include "aubio/aubio.h"
+#include "image.hh"
+#include "fs.hh"
+
 #include <atomic>
 #include <condition_variable>
 #include <cstdint>
@@ -95,7 +98,7 @@ class VideoFFmpeg : public FFmpeg {
 	void processFrame(uFrame frame) override;
   private:
 	std::unique_ptr<SwsContext, void(*)(SwsContext*)> m_swsContext{nullptr, sws_freeContext};
-        VideoCb handleVideoData;
+		VideoCb handleVideoData;
 
 };
 
