@@ -14,7 +14,6 @@ set(GAME_SOURCES
 	"../game/color.cc"
 	"../game/configitem.cc"
 	"../game/dynamicnotegraphscaler.cc"
-	"../game/ffmpeg.cc"
 	"../game/fixednotegraphscaler.cc"
 	"../game/musicalscale.cc"
 	"../game/notes.cc"
@@ -36,7 +35,7 @@ target_link_libraries(performous_test PRIVATE fmt::fmt)
 set(Aubio_REQUIRED_VERSION "0.4.9")
 
 #foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM Json Ced Aubio)
-foreach(lib ${OUR_LIBS} AVFormat SWResample SWScale Aubio)
+foreach(lib ${OUR_LIBS} Aubio)
 	find_package(${lib} ${${lib}_REQUIRED_VERSION} REQUIRED)
 	message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
 	target_include_directories(performous SYSTEM PRIVATE ${${lib}_INCLUDE_DIRS})
@@ -44,7 +43,7 @@ foreach(lib ${OUR_LIBS} AVFormat SWResample SWScale Aubio)
 	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
 
-target_link_libraries(performous_test PRIVATE GTest::GTest gmock GTest::Main aubio avcodec avutil avformat swresample swscale)
+target_link_libraries(performous_test PRIVATE GTest::GTest gmock GTest::Main aubio)
 
 target_include_directories(performous_test PRIVATE "." ".." "../game")
 

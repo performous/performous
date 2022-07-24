@@ -4,14 +4,10 @@
 #include "game/guitarchords/chord.hh"
 #include "game/guitarchords/chords.hh"
 #include "game/guitarchords/notes.hh"
-#include "game/ffmpeg.hh"
 
 #include <fstream>
 
 struct UnitTest_FFT_sample : public testing::Test {
-	AudioBuffer load(std::string const& filepath) {
-		return AudioBuffer(fs::path(filepath), 48000);
-	}
 	std::vector<float> loadRaw(std::string const& filepath) {
 		auto buffer = std::vector<float>();
 		auto file = std::ifstream(filepath);
@@ -36,14 +32,7 @@ struct UnitTest_FFT_sample : public testing::Test {
 			return;
 		}
 
-		auto buffer = load(filepath);
-
-		std::cout << "Duration of '" + filepath + "': " << buffer.duration() << std::endl;
-
-		buffer.prepare(offset);
-
-		if(!buffer.read(input.data(), input.size(), offset))
-			throw std::runtime_error("Failed to load file '" + filepath + "'!");
+		throw std::logic_error("File other than raw are not supported yet!");
 	}
 
 	void check(std::vector<FFTItem> const& result, std::set<float> targets) {
@@ -98,7 +87,7 @@ TEST_F(UnitTest_FFT_sample, E) {
 
 	auto const result = fft.analyse(input);
 
-	check(result, {E});
+	check(result, {E0});
 //	printBest(result);
 }
 
@@ -107,7 +96,7 @@ TEST_F(UnitTest_FFT_sample, a) {
 
 	auto const result = fft.analyse(input);
 
-	check(result, {a});
+	check(result, {a0});
 //	printBest(result);
 }
 
@@ -116,7 +105,7 @@ TEST_F(UnitTest_FFT_sample, d) {
 
 	auto const result = fft.analyse(input);
 
-	check(result, {d});
+	check(result, {d0});
 //	printBest(result);
 }
 
@@ -125,7 +114,7 @@ TEST_F(UnitTest_FFT_sample, g) {
 
 	auto const result = fft.analyse(input);
 
-	check(result, {g});
+	check(result, {g0});
 //	printBest(result);
 }
 
@@ -134,7 +123,7 @@ TEST_F(UnitTest_FFT_sample, b) {
 
 	auto const result = fft.analyse(input);
 
-	check(result, {b});
+	check(result, {b0});
 //	printBest(result);
 }
 
@@ -143,7 +132,7 @@ TEST_F(UnitTest_FFT_sample, e) {
 
 	auto const result = fft.analyse(input);
 
-	check(result, {e});
+	check(result, {e0});
 //	printBest(result);
 }
 

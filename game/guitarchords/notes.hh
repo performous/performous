@@ -1,11 +1,11 @@
 #pragma once
 
-constexpr float E = 82.41f;
-constexpr float a = 110.f;
-constexpr float d = 146.83f;
-constexpr float g = 196.0f;
-constexpr float b = 246.94f;
-constexpr float e = 329.63f;
+constexpr float E0 = 82.41f;
+constexpr float a0 = 110.f;
+constexpr float d0 = 146.83f;
+constexpr float g0 = 196.0f;
+constexpr float b0 = 246.94f;
+constexpr float e0 = 329.63f;
 
 constexpr float E1 = 87.f;
 constexpr float a1 = 117.f;
