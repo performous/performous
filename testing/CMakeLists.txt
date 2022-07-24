@@ -1,21 +1,23 @@
 cmake_minimum_required(VERSION 3.15)
 
-set(SOURCE_FILES 
-    "colortest.cc"
-    "configitemtest.cc"
+set(SOURCE_FILES
+	"colortest.cc"
+	"chordtest.cc"
+	"configitemtest.cc"
 	"ffttest.cc"
-    "fixednotegraphscalertest.cc"
-    "notegraphscalerfactorytest.cc"
-    "utiltest.cc"
+	"fixednotegraphscalertest.cc"
+	"notegraphscalerfactorytest.cc"
+	"utiltest.cc"
 )
-set(GAME_SOURCES 
-    "../game/color.cc"
-    "../game/configitem.cc"
-    "../game/dynamicnotegraphscaler.cc"
-    "../game/fixednotegraphscaler.cc"
-    "../game/musicalscale.cc"
-    "../game/notes.cc"
-    "../game/notegraphscalerfactory.cc"
+set(GAME_SOURCES
+	"../game/color.cc"
+	"../game/configitem.cc"
+	"../game/dynamicnotegraphscaler.cc"
+	"../game/fixednotegraphscaler.cc"
+	"../game/musicalscale.cc"
+	"../game/notes.cc"
+	"../game/notegraphscalerfactory.cc"
+	"../game/guitarchords/chord.cc"
 	"../game/guitarchords/fft.cc"
 )
 

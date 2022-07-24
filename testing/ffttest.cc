@@ -1,41 +1,51 @@
 #include "common.hh"
 
 #include "game/guitarchords/fft.hh"
+#include "game/guitarchords/chord.hh"
 
 const float E = 82.41f;
-const float A = 110.f;
+const float a = 110.f;
 const float d = 146.83f;
 const float g = 196.0f;
 const float b = 246.94f;
 const float e = 329.63f;
 
 const float E1 = 87.f;
-const float A1 = 117.f;
+const float a1 = 117.f;
 const float d1 = 156.f;
 const float g1 = 208.f;
 const float b1 = 262.f;
 const float e1 = 349.f;
 
 const float E2 = 92.5f;
-const float A2 = 123.f;
+const float a2 = 123.f;
 const float d2 = 165.f;
 const float g2 = 220.f;
 const float b2 = 277.f;
 const float e2 = 370.f;
 
 const float E3 = 98.f;
-const float A3 = 131.f;
+const float a3 = 131.f;
 const float d3 = 175.f;
 const float g3 = 233.f;
 const float b3 = 294.f;
 const float e3 = 392.f;
 
 const float E4 = 104.f;
-const float A4 = 139.f;
+const float a4 = 139.f;
 const float d4 = 185.f;
 const float g4 = 247.f;
 const float b4 = 311.f;
 const float e4 = 415.f;
+
+
+const Chord G("G", {E3, a2, d, g, b, e3});
+const Chord D("D", {d, g2, b3, e2});
+const Chord C("C", {a3, d2, g, b1, e});
+const Chord A("A", {a, d2, g2, b2, e});
+const Chord Em("Em", {a1, d1, g, b, e});
+const Chord Dm("Dm", {d, g2, b3, e1});
+const Chord Am("Am", {a, d2, g2, b1, e});
 
 struct UnitTest_FFT : public testing::Test {
 	float const pi2 = static_cast<float>(M_PI * 2.0);
@@ -158,14 +168,14 @@ TEST_F(UnitTest_FFT, silence) {
 	}
 }
 
-TEST_F(UnitTest_FFT, A) {
-	fill(input, A);
+TEST_F(UnitTest_FFT, a) {
+	fill(input, a);
 
 	auto const result = fft.analyse(input);
 	auto n = 0;
 	for(auto const& item : result) {
 		EXPECT_THAT(item.frequency, FloatNear(n * 48000.f / 8192.f, 0.1f));
-		if(fabs(item.frequency - A) < 12)
+		if(fabs(item.frequency - a) < 12)
 			EXPECT_THAT(-item.power, Lt(-10.f));
 		else
 			EXPECT_THAT(item.power, FloatNear(0.f, 9.f));
@@ -173,25 +183,25 @@ TEST_F(UnitTest_FFT, A) {
 	}
 
 	printBest(result);
-	check(result, A);
+	check(result, a);
 }
 
-TEST_F(UnitTest_FFT, A_2) {
-	fill(input, A * 2);
+TEST_F(UnitTest_FFT, a_2) {
+	fill(input, a * 2);
 
 	auto const result = fft.analyse(input);
 
 	printBest(result);
-	check(result, A * 2);
+	check(result, a * 2);
 }
 
-TEST_F(UnitTest_FFT, A_3) {
-	fill(input, A * 4);
+TEST_F(UnitTest_FFT, a_3) {
+	fill(input, a * 4);
 
 	auto const result = fft.analyse(input);
 
 	printBest(result);
-	check(result, A * 4);
+	check(result, a * 4);
 }
 
 TEST_F(UnitTest_FFT, E) {
@@ -230,58 +240,94 @@ TEST_F(UnitTest_FFT, b) {
 	check(result, b);
 }
 
-TEST_F(UnitTest_FFT, A_E) {
-	fill(input, A, E);
+TEST_F(UnitTest_FFT, a_E) {
+	fill(input, a, E);
 
 	auto const result = fft.analyse(input);
 
 	printBest(result);
-	check(result, A, E);
+	check(result, a, E);
 }
 
-TEST_F(UnitTest_FFT, A_b) {
-	fill(input, A, b);
+TEST_F(UnitTest_FFT, a_b) {
+	fill(input, a, b);
 
 	auto const result = fft.analyse(input);
 
 	printBest(result);
-	check(result, A, b);
+	check(result, a, b);
 }
 
-TEST_F(UnitTest_FFT, A_E_b) {
-	fill(input, A, E, b);
+TEST_F(UnitTest_FFT, a_E_b) {
+	fill(input, a, E, b);
 
 	auto const result = fft.analyse(input);
 
 	printBest(result);
-	check(result, A, E, b);
+	check(result, a, E, b);
 }
 
 TEST_F(UnitTest_FFT, chord_Em) {
-	fill(input, A1, d1, g, b, e);
+	fill(input, Em);
 
 	auto const result = fft.analyse(input);
 
 	printBest(result);
-	check(result, A1, d1, g, b, e);
+	check(result, Em);
 }
 
 TEST_F(UnitTest_FFT, chord_D) {
-	fill(input, d, g2, b3, e2);
+	fill(input, D);
 
 	auto const result = fft.analyse(input);
 
 	printBest(result);
-	check(result, d, g2, b3, e2);
+	check(result, D);
 }
 
 TEST_F(UnitTest_FFT, chord_Dm) {
-	fill(input, d, g2, b3, e1);
+	fill(input, Dm);
 
 	auto const result = fft.analyse(input);
 
 	printBest(result);
-	check(result, d, g2, b3, e1);
+	check(result, Dm);
+}
+
+TEST_F(UnitTest_FFT, chord_A) {
+	fill(input, A);
+
+	auto const result = fft.analyse(input);
+
+	printBest(result);
+	check(result, A);
+}
+
+TEST_F(UnitTest_FFT, chord_Am) {
+	fill(input, Am);
+
+	auto const result = fft.analyse(input);
+
+	printBest(result);
+	check(result, Am);
+}
+
+TEST_F(UnitTest_FFT, chord_C) {
+	fill(input, C);
+
+	auto const result = fft.analyse(input);
+
+	printBest(result);
+	check(result, C);
+}
+
+TEST_F(UnitTest_FFT, chord_G) {
+	fill(input, G);
+
+	auto const result = fft.analyse(input);
+
+	printBest(result);
+	check(result, G);
 }
 
 
