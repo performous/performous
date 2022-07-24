@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cmath>
 #include <limits>
 #include <string>
 #include <vector>
@@ -55,4 +56,12 @@ std::uint32_t stou(std::string const & str, size_t * idx = nullptr, int base = 1
 template <typename E>
 constexpr auto to_underlying(E e) noexcept -> std::enable_if_t<std::is_enum<E>::value, std::underlying_type_t<E>> {
 	return static_cast<std::underlying_type_t<E>>(e);
+}
+
+template<typename iterator>
+void createHammingWindow(iterator begin, iterator end) {
+	auto const size = end - begin;
+	for (auto i = 0; i < size; ++i) {
+		*begin++ = static_cast<float>(0.53836 - 0.46164 * std::cos(TAU * static_cast<double>(i) / static_cast<double>(size - 1)));
+	}
 }
