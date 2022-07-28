@@ -23,7 +23,7 @@ private:
 	std::vector<std::string> getLocalePaths() const;
     
 private:
-	std::pair<std::string, std::string> m_currentLanguage;
+	std::pair<std::string, std::string> m_currentLanguage{"en_US.UTF-8", "English" };
 	std::string m_package;
 	boost::locale::generator m_gen;
 	std::map<std::string, std::string> m_languages;

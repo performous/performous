@@ -120,7 +120,7 @@ std::string TranslationEngine::getLanguageByKey(const std::string& languageKey) 
 	return allLanguages.at(languageKey);
 }
 
-const std::pair<std::string, std::string>& TranslationEngine::getCurrentLanguage() const { 
+const std::pair<std::string, std::string>& TranslationEngine::getCurrentLanguage() const {
 	return m_currentLanguage; 
 }
 
