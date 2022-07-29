@@ -96,9 +96,9 @@ void Players::setFilter(std::string const& val) {
 }
 
 PlayerId Players::assign_id_internal() {
-	const auto it = m_players.rbegin();
+	const auto it = std::max_element(m_players.begin(),m_players.end());
 	
-	if (it != m_players.rend() && it->id) 
+	if (it != m_players.end() && it->id) 
 		return it->id + 1;
 	
 	return 0;
