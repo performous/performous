@@ -4,23 +4,29 @@
 #include <string>
 #include <vector>
 
+#include "string.hh"
+
 class Chord {
 public:
-	Chord(std::string const& name, std::set<float> const& frequencies);
+	Chord(std::string const& name, std::vector<Fret> const&);
 
 	std::string const& getName() const;
 
-	Chord& addAlternate(std::set<float> const& frequencies);
+	//Chord& addAlternate(std::set<float> const& frequencies);
 
-	operator std::set<float> const&() const;
+	operator std::vector<Fret> const&() const;
+	bool operator==(Chord const&) const;
+	bool operator!=(Chord const&) const;
+	bool operator<(Chord const&) const;
+	bool operator>(Chord const&) const;
 
-	std::set<float> const& getFrequencies() const;
+	std::vector<Fret> const& getFrets() const;
 
-	size_t countAlternatives() const;
-	std::set<float> const& getAlternative(size_t n = 0) const;
+	//size_t countAlternatives() const;
+	//std::set<float> const& getAlternative(size_t n = 0) const;
 
 private:
 	std::string m_name;
-	std::vector<std::set<float>> m_frequencies;
+	std::vector<Fret> m_frets;
 };
 

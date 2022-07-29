@@ -8,13 +8,34 @@
 
 struct UnitTest_FFT : public testing::Test {
 	float const pi2 = static_cast<float>(M_PI * 2.0);
+	std::vector<String> const strings{E0, a0, d0, g0, b0, e0};
 
-	void fill(std::vector<float>& data, std::set<float> frequencies) {
+	float makeWave(float n, float frequency) {
+		return sin(n * frequency * pi2 / 48000.f);
+	}
+	void fill(std::vector<float>& data, std::set<StringPlay> const& plays) {
 		for(auto n = 0; n < data.size(); ++n) {
 			auto const nf = static_cast<float>(n);
 			auto s = 0.f;
-			for(auto frequency : frequencies)
-				s += 0.25f * sin(nf * frequency * pi2 / 48000.f);
+			auto i = 0;
+			for(auto const& play : plays) {
+				s += 0.25f * makeWave(nf, play.getFrequency());
+				s += 0.05f * makeWave(nf, play.getFrequency(true));
+			}
+
+			data[n] = s;
+		}
+	}
+
+	void fill(std::vector<float>& data, std::vector<Fret> const& frets) {
+		for(auto n = 0; n < data.size(); ++n) {
+			auto const nf = static_cast<float>(n);
+			auto s = 0.f;
+			auto i = 0;
+			for(auto fret : frets) {
+				s += 0.25f * makeWave(nf, strings[i++].getFrequency(fret));
+				s += 0.05f * makeWave(nf, strings[i++].getFrequency(fret, true));
+			}
 
 			data[n] = s;
 		}
@@ -35,22 +56,39 @@ struct UnitTest_FFT : public testing::Test {
 				break;
 		}
 	}
-	void check(std::vector<FFTItem> const& result, std::set<float> targets) {
-		auto sorted = std::map<float, float>();
+	void check(std::vector<FFTItem> const& result, std::set<StringPlay> const& targets) {
+		auto frequencies = std::set<float>();
 
 		for(auto const& item : result)
-			sorted[-item.power] = item.frequency;
-
-		auto best = std::vector<float>(targets.size());
-		auto it = sorted.begin();
-
-		for(auto& frequency : best)
-			frequency = it++->second;
+			if(item.power > 0.1)
+				frequencies.insert(item.frequency);
 
 		auto const binWidth = 48000.f / 8192.f;
 
-		for(auto const& target : targets)
-			EXPECT_THAT(best, Contains(FloatNear(target, binWidth)));
+		for(auto const& target : targets) {
+			EXPECT_THAT(frequencies, Contains(FloatNear(target.getFrequency(), binWidth)));
+			if(target.hasInverseFrequency())
+				EXPECT_THAT(frequencies, Contains(FloatNear(target.getFrequency(true), binWidth)));
+		}
+	}
+
+	void check(std::vector<FFTItem> const& result, Chord const& chord) {
+		auto frequencies = std::set<float>();
+
+		for(auto const& item : result)
+			if(item.power > 0.1)
+				frequencies.insert(item.frequency);
+
+		auto const binWidth = 48000.f / 8192.f;
+
+		for(auto i = 0; i < 6; ++i) {
+			auto const target = strings[i].getFrequency(chord.getFrets()[i]);
+			EXPECT_THAT(frequencies, Contains(FloatNear(target, binWidth)));
+			if(strings[i].hasInverseFrequency(chord.getFrets()[i])) {
+				auto const inverseTarget = strings[i].getFrequency(chord.getFrets()[i], true);
+				EXPECT_THAT(frequencies, Contains(FloatNear(inverseTarget, binWidth)));
+			}
+		}
 	}
 
 
@@ -59,9 +97,9 @@ struct UnitTest_FFT : public testing::Test {
 };
 
 TEST_F(UnitTest_FFT, silence) {
-	fill(input, {});
+	fill(input, std::set<StringPlay>{});
 
-	auto const result = fft.analyse(input);
+	auto const result = fft.analyze(input);
 	auto n = 0;
 	for(auto const& item : result) {
 		EXPECT_THAT(item.frequency, FloatNear(n * 48000.f / 8192.f, 0.1f));
@@ -71,108 +109,99 @@ TEST_F(UnitTest_FFT, silence) {
 }
 
 TEST_F(UnitTest_FFT, a) {
-	fill(input, {a0});
+	fill(input, std::set<StringPlay>{StringPlay{strings[1], 0}});
 
-	auto const result = fft.analyse(input);
-	auto n = 0;
-	for(auto const& item : result) {
-		EXPECT_THAT(item.frequency, FloatNear(n * 48000.f / 8192.f, 0.1f));
-		if(fabs(item.frequency - a0) < 12)
-			EXPECT_THAT(-item.power, Lt(-10.f));
-		else
-			EXPECT_THAT(item.power, FloatNear(0.f, 9.f));
-		++n;
-	}
+	auto const result = fft.analyze(input);
 
 	printBest(result);
-	check(result, {a0});
+	check(result, {StringPlay{strings[1], 0}});
 }
 
 TEST_F(UnitTest_FFT, a_2) {
-	fill(input, {a0 * 2});
+	fill(input, {StringPlay{strings[1], 12}});
 
-	auto const result = fft.analyse(input);
+	auto const result = fft.analyze(input);
 
 	printBest(result);
-	check(result, {a0 * 2});
+	check(result, {StringPlay{strings[1], 12}});
 }
 
 TEST_F(UnitTest_FFT, a_3) {
-	fill(input, {a0 * 4});
+	fill(input, {StringPlay{strings[1], 24}});
 
-	auto const result = fft.analyse(input);
+	auto const result = fft.analyze(input);
 
 	printBest(result);
-	check(result, {a0 * 4});
+	check(result, {StringPlay{strings[1], 24}});
 }
 
 TEST_F(UnitTest_FFT, E) {
-	fill(input, {E0});
+	fill(input, {StringPlay{strings[0], 0}});
 
-	auto const result = fft.analyse(input);
+	auto const result = fft.analyze(input);
 
 	printBest(result);
-	check(result, {E0});
+	check(result, {StringPlay{strings[0], 0}});
 }
 
 TEST_F(UnitTest_FFT, d) {
-	fill(input, {d0});
+	fill(input, {StringPlay{strings[2], 0}});
 
-	auto const result = fft.analyse(input);
+	auto const result = fft.analyze(input);
 
 	printBest(result);
-	check(result, {d0});
+	check(result, {StringPlay{strings[2], 0}});
 }
 
 TEST_F(UnitTest_FFT, g) {
-	fill(input, {g0});
+	fill(input, {StringPlay{strings[3], 0}});
 
-	auto const result = fft.analyse(input);
+	auto const result = fft.analyze(input);
 
 	printBest(result);
-	check(result, {g0});
+	check(result, {StringPlay{strings[3], 0}});
 }
 
 TEST_F(UnitTest_FFT, b) {
-	fill(input, {b0});
+	fill(input, {StringPlay{strings[4], 0}});
 
-	auto const result = fft.analyse(input);
+	auto const result = fft.analyze(input);
 
 	printBest(result);
-	check(result, {b0});
+	check(result, {StringPlay{strings[4], 0}});
 }
 
 TEST_F(UnitTest_FFT, a_E) {
-	fill(input, {a0, E0});
+	fill(input, {StringPlay{strings[0], 0}, StringPlay{strings[1], 0}});
 
-	auto const result = fft.analyse(input);
+	auto const result = fft.analyze(input);
 
 	printBest(result);
-	check(result, {a0, E0});
+	check(result, {StringPlay{strings[0], 0}, StringPlay{strings[1], 0}});
 }
 
 TEST_F(UnitTest_FFT, a_b) {
-	fill(input, {a0, b0});
+	fill(input, {StringPlay{strings[1], 0}, StringPlay{strings[4], 0}});
 
-	auto const result = fft.analyse(input);
+	auto const result = fft.analyze(input);
 
 	printBest(result);
-	check(result, {a0, b0});
+	check(result, {StringPlay{strings[1], 0}, StringPlay{strings[4], 0}});
 }
 
 TEST_F(UnitTest_FFT, a_E_b) {
-	fill(input, {a0, E0, b0});
+	fill(input, {StringPlay{strings[0], 0}, StringPlay{strings[1], 0}, StringPlay{strings[4], 0}});
 
-	auto const result = fft.analyse(input);
+	auto const result = fft.analyze(input);
 
 	printBest(result);
-	check(result, {a0, E0, b0});
+	check(result, {StringPlay{strings[0], 0}, StringPlay{strings[1], 0}, StringPlay{strings[4], 0}});
 }
 
 TEST_F(UnitTest_FFT, chord_Em) {
 	fill(input, Em);
 
-	auto const result = fft.analyse(input);
+	auto const result = fft.analyze(input);
 
 	printBest(result);
 	check(result, Em);
@@ -181,7 +210,7 @@ TEST_F(UnitTest_FFT, chord_Em) {
 TEST_F(UnitTest_FFT, chord_D) {
 	fill(input, D);
 
-	auto const result = fft.analyse(input);
+	auto const result = fft.analyze(input);
 
 	printBest(result);
 	check(result, D);
@@ -190,7 +219,7 @@ TEST_F(UnitTest_FFT, chord_D) {
 TEST_F(UnitTest_FFT, chord_Dm) {
 	fill(input, Dm);
 
-	auto const result = fft.analyse(input);
+	auto const result = fft.analyze(input);
 
 	printBest(result);
 	check(result, Dm);
@@ -199,7 +228,7 @@ TEST_F(UnitTest_FFT, chord_Dm) {
 TEST_F(UnitTest_FFT, chord_A) {
 	fill(input, A);
 
-	auto const result = fft.analyse(input);
+	auto const result = fft.analyze(input);
 
 	printBest(result);
 	check(result, A);
@@ -208,7 +237,7 @@ TEST_F(UnitTest_FFT, chord_A) {
 TEST_F(UnitTest_FFT, chord_Am) {
 	fill(input, Am);
 
-	auto const result = fft.analyse(input);
+	auto const result = fft.analyze(input);
 
 	printBest(result);
 	check(result, Am);
@@ -217,7 +246,7 @@ TEST_F(UnitTest_FFT, chord_Am) {
 TEST_F(UnitTest_FFT, chord_C) {
 	fill(input, C);
 
-	auto const result = fft.analyse(input);
+	auto const result = fft.analyze(input);
 
 	printBest(result);
 	check(result, C);
@@ -226,7 +255,7 @@ TEST_F(UnitTest_FFT, chord_C) {
 TEST_F(UnitTest_FFT, chord_G) {
 	fill(input, G);
 
-	auto const result = fft.analyse(input);
+	auto const result = fft.analyze(input);
 
 	printBest(result);
 	check(result, G);

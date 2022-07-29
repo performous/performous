@@ -21,6 +21,8 @@ m_window(windowSize)
 
 namespace {
 	std::vector<std::complex<float>> doFFT(const std::vector<float>& input, const std::vector<float>& window) {
+		if(window.size() == 16384)
+			return da::fft<14>(input.data(), window);
 		if(window.size() == 8192)
 			return da::fft<13>(input.data(), window);
 		if(window.size() == 4096)
@@ -36,7 +38,7 @@ namespace {
 	}
 }
 
-std::vector<FFTItem> FFT::analyse(const std::vector<float>& input) const {
+std::vector<FFTItem> FFT::analyze(const std::vector<float>& input) const {
 	if(input.size() != m_windowSize)
 		throw std::logic_error("FFT: input must match window size!");
 /*

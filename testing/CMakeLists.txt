@@ -1,14 +1,17 @@
 cmake_minimum_required(VERSION 3.15)
 
 set(SOURCE_FILES
-	"colortest.cc"
 	"chordtest.cc"
+	"chorddetectortest.cc"
+	"colortest.cc"
 	"configitemtest.cc"
 	"ffttest.cc"
 	"fftsampletest.cc"
 	"fixednotegraphscalertest.cc"
 	"notegraphscalerfactorytest.cc"
+	"stringtest.cc"
 	"utiltest.cc"
+	"common.cc"
 )
 set(GAME_SOURCES
 	"../game/color.cc"
@@ -19,7 +22,12 @@ set(GAME_SOURCES
 	"../game/notes.cc"
 	"../game/notegraphscalerfactory.cc"
 	"../game/guitarchords/chord.cc"
+	"../game/guitarchords/chorddetector.cc"
+	"../game/guitarchords/chordmatcher.cc"
 	"../game/guitarchords/fft.cc"
+	"../game/guitarchords/profile.cc"
+	"../game/guitarchords/profilecreator.cc"
+	"../game/guitarchords/string.cc"
 )
 
 set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${GAME_SOURCES})

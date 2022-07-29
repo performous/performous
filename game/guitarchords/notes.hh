@@ -7,7 +7,7 @@ constexpr float g0 = 196.0f;
 constexpr float b0 = 246.94f;
 constexpr float e0 = 329.63f;
 
-constexpr float E1 = 87.f;
+constexpr float E1 = 87.3f;
 constexpr float a1 = 117.f;
 constexpr float d1 = 156.f;
 constexpr float g1 = 208.f;

@@ -14,7 +14,7 @@ class FFT {
   public:
 	FFT(std::size_t sampleRate, std::size_t windowSize);
 
-	std::vector<FFTItem> analyse(std::vector<float> const&) const;
+	std::vector<FFTItem> analyze(std::vector<float> const&) const;
 
   private:
 //    std::unique_ptr<aubio_fft_t, void(*)(aubio_fft_t*)> m_fft;
