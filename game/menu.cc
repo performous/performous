@@ -69,7 +69,7 @@ void Menu::action(int dir) {
 
 				if (current().value->getName() == "game/language") {
 					auto &value = config["game/language"];
-					Game::getSingletonPtr()->setLanguage(value.getValue());
+					TranslationEngine::setLanguage(value.getValue(), true);
 				} else if (current().value->getName() == "graphic/stereo3d") {
 					try {
 						std::clog << "video/info: Stereo 3D configuration changed, will reset shaders.\n";
@@ -79,7 +79,7 @@ void Menu::action(int dir) {
 						current().value->b() = false; // Disable 3D if shader fails
 						throw;
 					}
-                                }
+								}
 			}
 			break;
 		}

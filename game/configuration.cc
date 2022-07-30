@@ -235,7 +235,7 @@ void writeConfig(bool system) {
 			else { entryNode->set_attribute("value", std::to_string(oldValue)); }
 		}
 		else if (name == "game/language") {
-			auto currentLanguageStr = Game::getSingletonPtr()->getCurrentLanguage();
+			auto currentLanguageStr = TranslationEngine::getCurrentLanguage().second;
 			auto newLanguagestr = item.getEnumName();
 			auto currentLanguageId = LanguageToLanguageId(currentLanguageStr);
 			auto newLanguageId = LanguageToLanguageId(newLanguagestr);
@@ -243,7 +243,7 @@ void writeConfig(bool system) {
 				std::cout << "Wanting to change something, old value: '" << currentLanguageStr << "' new value: '" << newLanguagestr << "'" << std::endl;
 				entryNode->set_attribute("value", std::to_string(newLanguageId));
 				config["game/language"].selectEnum(newLanguagestr);
-				Game::getSingletonPtr()->setLanguage(newLanguagestr);
+				TranslationEngine::setLanguage(newLanguagestr, true);
 			}
 			else {
 				entryNode->set_attribute("value", std::to_string(currentLanguageId));
