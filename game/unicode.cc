@@ -81,7 +81,7 @@ std::string UnicodeUtil::convertToUTF8 (std::string_view str, std::string _filen
 			ustring.toLower();
 			break;
 		case CaseMapping::TITLE:
-			ustring.toTitle(0, icu::Locale(Game::getSingletonPtr()->getCurrentLanguageCode().c_str()), U_TITLECASE_NO_LOWERCASE);
+			ustring.toTitle(0, icu::Locale(TranslationEngine::getCurrentLanguageCode().c_str()), U_TITLECASE_NO_LOWERCASE);
 			break;
 		case CaseMapping::NONE:
 			break;

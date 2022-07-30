@@ -10,21 +10,22 @@
 
 class TranslationEngine {
 public:
-	TranslationEngine(const char *package);
+	TranslationEngine();
 
-	void initializeAllLanguages();
-	void setLanguage(const std::string& language, bool fromSettings = false);
-	std::string getLanguageByHumanReadableName(const std::string& language);
-	std::string getLanguageByKey(const std::string& languageKey);
-	const std::pair<std::string, std::string>& getCurrentLanguage() const;
-	std::map<std::string, std::string> GetAllLanguages(bool refresh = false);
+	static void initializeAllLanguages();
+	static void setLanguage(const std::string& language, bool fromSettings = false);
+	static std::string getLanguageByHumanReadableName(const std::string& language);
+	static std::string getLanguageByKey(const std::string& languageKey);
+	static std::string getCurrentLanguageCode();
+	static std::pair<std::string, std::string> const& getCurrentLanguage();
+	static std::map<std::string, std::string> GetAllLanguages(bool refresh = false);
 
 private:
-	std::vector<std::string> getLocalePaths() const;
+	static std::vector<std::string> getLocalePaths();
     
 private:
-	std::pair<std::string, std::string> m_currentLanguage{"en_US.UTF-8", "English" };
-	std::string m_package;
-	boost::locale::generator m_gen;
-	std::map<std::string, std::string> m_languages;
+	static std::pair<std::string, std::string> m_currentLanguage;
+	static std::string m_package;
+	static boost::locale::generator m_gen;
+	static std::map<std::string, std::string> m_languages;
 };

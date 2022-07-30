@@ -1,13 +1,18 @@
 #include "i18n.hh"
 
+#include "config.hh"
 #include "configuration.hh"
 #include "fs.hh"
 #include "unicode.hh"
 
 #include <unicode/locid.h>
 
+std::pair<std::string, std::string> TranslationEngine::m_currentLanguage{"en_US.UTF-8", "English" };
+std::string TranslationEngine::m_package = PACKAGE;
+boost::locale::generator TranslationEngine::m_gen{};
+std::map<std::string, std::string> TranslationEngine::m_languages{};
 
-TranslationEngine::TranslationEngine(const char *package) : m_package(package) {
+TranslationEngine::TranslationEngine() {
 	initializeAllLanguages();
 	/* set all languages in configuration.
 	 * They are kept untranslated internally which prevents having issues
@@ -42,10 +47,10 @@ void TranslationEngine::setLanguage(const std::string& language, bool fromSettin
 	std::clog << "locale/notice: Setting language to: '" << language << "'" << std::endl;
 
 	if (fromSettings) {
-		m_currentLanguage = { getLanguageByHumanReadableName(language) , language };
+		TranslationEngine::m_currentLanguage = { getLanguageByHumanReadableName(language) , language };
 	}
 	else {
-		m_currentLanguage = { language , getLanguageByKey(language) };
+		TranslationEngine::m_currentLanguage = { language , getLanguageByKey(language) };
 	}
 	auto searchLocale = icu::Locale::createCanonical("en_US.UTF-8");
 	auto sortLocale = icu::Locale::createCanonical("en_US.UTF-8");
@@ -120,19 +125,24 @@ std::string TranslationEngine::getLanguageByKey(const std::string& languageKey) 
 	return allLanguages.at(languageKey);
 }
 
-const std::pair<std::string, std::string>& TranslationEngine::getCurrentLanguage() const {
-	return m_currentLanguage; 
+std::pair<std::string, std::string> const& TranslationEngine::getCurrentLanguage() { 
+	return TranslationEngine::m_currentLanguage; 
+}
+
+std::string TranslationEngine::getCurrentLanguageCode() {
+	std::string lang(getCurrentLanguage().first);
+	return lang.substr(0, lang.size() - 6);
 }
 
 std::map<std::string, std::string> TranslationEngine::GetAllLanguages(bool refresh) {
 	if (refresh) {
-		m_languages.clear();
+		TranslationEngine::m_languages.clear();
 	}
-	if (m_languages.size() != 0) return m_languages;
+	if (TranslationEngine::m_languages.size() != 0) return TranslationEngine::m_languages;
 
 	// Internally, all strings are kept in English, but they are eventually
 	// displayed as menu entries thus they need translation
-	m_languages = {
+	TranslationEngine::m_languages = {
 		{ "None", translate_noop("Auto") },
 		{ "ast_ES.UTF-8", translate_noop("Asturian") },
 		{ "da_DK.UTF-8", translate_noop("Danish") },
@@ -156,7 +166,7 @@ std::map<std::string, std::string> TranslationEngine::GetAllLanguages(bool refre
 	return m_languages;
 }
 
-std::vector<std::string> TranslationEngine::getLocalePaths() const {
+std::vector<std::string> TranslationEngine::getLocalePaths() {
 	auto paths = std::vector<std::string>{ ".", "./lang" };
         
 	auto const* root = getenv("PERFORMOUS_ROOT");
