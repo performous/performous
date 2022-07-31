@@ -17,6 +17,8 @@
 #include <SDL_video.h>
 #include <cstdint>
 
+#define stringify( name ) #name
+
 namespace {
 	float s_width;
 	float s_height;
@@ -24,13 +26,13 @@ namespace {
 	/// Tests for success when destoryed.
 	struct GLattrSetter {
 		GLattrSetter(SDL_GLattr attr, int value): m_attr(attr), m_value(value) {
-			if (SDL_GL_SetAttribute(attr, value)) std::clog << "video/warning: Error setting GLattr " << m_attr << std::endl;
+			if (SDL_GL_SetAttribute(attr, value)) std::clog << "video/warning: Error setting GLattr " << stringify(m_attr) << std::endl;
 		}
 		~GLattrSetter() {
 			int value;
 			SDL_GL_GetAttribute(m_attr, &value);
 			if (value != m_value)
-				std::clog << "video/warning: Error setting GLattr " << m_attr
+				std::clog << "video/warning: Error setting GLattr " << stringify (m_attr)
 				<< ": requested " << m_value << ", got " << value << std::endl;
 		}
 		SDL_GLattr m_attr;
@@ -65,6 +67,11 @@ Window::Window() : screen(nullptr, &SDL_DestroyWindow), glContext(nullptr, &SDL_
 	SDL_JoystickEventState(SDL_ENABLE);
 	{ // Setup GL attributes for context creation
 		SDL_SetHintWithPriority("SDL_HINT_VIDEO_HIGHDPI_DISABLED", "0", SDL_HINT_DEFAULT);
+		GLattrSetter attr_hw(SDL_GL_ACCELERATED_VISUAL, 1);
+		GLattrSetter attr_flush(SDL_GL_CONTEXT_RELEASE_BEHAVIOR, SDL_GL_CONTEXT_RELEASE_BEHAVIOR_FLUSH);
+		GLattrSetter attr_glmaj(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+		GLattrSetter attr_glmin(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+		GLattrSetter attr_glprof(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 		GLattrSetter attr_r(SDL_GL_RED_SIZE, 8);
 		GLattrSetter attr_g(SDL_GL_GREEN_SIZE, 8);
 		GLattrSetter attr_b(SDL_GL_BLUE_SIZE, 8);
@@ -72,9 +79,6 @@ Window::Window() : screen(nullptr, &SDL_DestroyWindow), glContext(nullptr, &SDL_
 		GLattrSetter attr_buf(SDL_GL_BUFFER_SIZE, 32);
 		GLattrSetter attr_d(SDL_GL_DEPTH_SIZE, 24);
 		GLattrSetter attr_db(SDL_GL_DOUBLEBUFFER, 1);
-		GLattrSetter attr_glmaj(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-		GLattrSetter attr_glmin(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-		GLattrSetter attr_glprof(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 		Uint32 flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL;
 		if (config["graphic/highdpi"].b()) { flags |= SDL_WINDOW_ALLOW_HIGHDPI; }
 		else { SDL_SetHintWithPriority("SDL_HINT_VIDEO_HIGHDPI_DISABLED", "1", SDL_HINT_OVERRIDE); }
