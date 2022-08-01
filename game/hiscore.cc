@@ -83,7 +83,6 @@ void Hiscore::load(xmlpp::NodeSet const& nodes) {
 
 void Hiscore::save(xmlpp::Element *hiscores) {
 	for (auto const& h: m_hiscore) {
-		if (!h.playerid) continue;
 		xmlpp::Element* hiscore = xmlpp::add_child_element(hiscores, "hiscore");
 		hiscore->set_attribute("playerid", std::to_string(h.playerid));
 		hiscore->set_attribute("songid", std::to_string(h.songid));

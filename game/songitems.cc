@@ -2,6 +2,8 @@
 
 #include "unicode.hh"
 #include "libxml++-impl.hh"
+
+#include <algorithm>
 #include <memory>
 #include <string>
 
@@ -100,7 +102,7 @@ std::optional<std::string> SongItems::lookup(const SongId &id) const {
 
 SongId SongItems::assign_id_internal() const {
 	// use the last one with highest id
-	auto it = m_songs.rbegin();
-	if (it != m_songs.rend()) return it->id+1;
+	auto it = std::max_element(m_songs.begin(),m_songs.end());
+	if (it != m_songs.end()) return it->id+1;
 	return 0; // empty set
 }
