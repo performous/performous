@@ -60,7 +60,6 @@ GLuint Window::m_vbo = 0;
 GLint Window::bufferOffsetAlignment = -1;
 
 Window::Window() : screen(nullptr, &SDL_DestroyWindow), glContext(nullptr, &SDL_GL_DeleteContext) {
-	std::atexit(SDL_Quit);
 	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK))
 		throw std::runtime_error(std::string("SDL_Init failed: ") + SDL_GetError());
 	SDL_JoystickEventState(SDL_ENABLE);
@@ -241,6 +240,7 @@ Window::~Window() {
 	glDeleteBuffers(1, &m_vbo);
 	glDeleteBuffers(1, &m_ubo);
 	glDeleteVertexArrays(1, &m_vao);
+	SDL_Quit();
 }
 
 void Window::blank() {
