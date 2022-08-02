@@ -70,16 +70,17 @@ SongParser::SongParser(Song& s): m_song(s) {
 			type = Type::XML;	// XMLPP should deal with encoding so we don't have to.
 		}
 		else {
-			UnicodeUtil::convertToUTF8(m_ss.str(), s.filename.string());
-			if (smCheck (m_ss.str())) {type = Type::SM; } else if (txtCheck (m_ss.str())) {
+			std::string ss = UnicodeUtil::convertToUTF8(m_ss.str(), s.filename.string());
+			if (smCheck (ss)) {type = Type::SM; } else if (txtCheck (ss)) {
 				type = Type::TXT;
 			}
-			else if (iniCheck (m_ss.str())) {
+			else if (iniCheck (ss)) {
 				type = Type::INI;
 			}
 			else {
 				throw SongParserException (s, "Does not look like a song file (wrong header)", 1, true);
 			}
+			m_ss.str(ss);
 		}
 		// Header already parsed?
 		if (s.loadStatus == Song::LoadStatus::HEADER) {
