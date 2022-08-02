@@ -38,7 +38,7 @@ class UnicodeUtil {
 
 	static std::string getCharset(std::string_view str);
 	static Converter& getConverter(std::string const& s);
-	static bool removeUTF8BOM(std::string_view str);
+	static bool removeUTF8BOM(std::string_view& str);
 	
 	public:
 	UnicodeUtil() = delete;
