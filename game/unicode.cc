@@ -36,10 +36,11 @@ Converter& UnicodeUtil::getConverter(std::string const& s) {
 	return m_converters.try_emplace(s, Converter(s)).first->second;
 }
 
-std::string UnicodeUtil::getCharset (std::string_view str) {
+std::string UnicodeUtil::getCharset (std::string_view& str) {
 	int bytes_consumed;
 	bool is_reliable;
-	
+	if (removeUTF8BOM(str)) return "UTF-8";
+
 	Encoding encoding = CompactEncDet::DetectEncoding(
 		str.data(), static_cast<int>(str.size()),
 		nullptr, nullptr, nullptr,
@@ -49,7 +50,7 @@ std::string UnicodeUtil::getCharset (std::string_view str) {
 		true,
 		&bytes_consumed,
 		&is_reliable);
-		
+
 	if (!is_reliable) {
 			std::clog << "unicode/warning: detected encoding (" <<
 			MimeEncodingName(encoding) << ") for text: " <<
@@ -63,11 +64,8 @@ std::string UnicodeUtil::getCharset (std::string_view str) {
 std::string UnicodeUtil::convertToUTF8 (std::string_view str, std::string _filename, CaseMapping toCase, bool assumeUTF8) {
 	icu::UnicodeString ustring;
 	std::string charset;
-	if (assumeUTF8) ustring = icu::UnicodeString::fromUTF8(str.data());
-	else {
-		if (removeUTF8BOM(str)) charset = "UTF-8";
-		else { charset = UnicodeUtil::getCharset(str); }
-		}
+	if (assumeUTF8) charset = "UTF-8";
+	else charset = UnicodeUtil::getCharset(str);
 		if (charset != "UTF-8") {
 			if (!_filename.empty()) std::clog << "unicode/info: " << _filename << " does not appear to be UTF-8; (" << charset << ") detected." << std::endl; 
 			ustring = UnicodeUtil::getConverter(charset).convertToUTF8(str);
@@ -109,19 +107,15 @@ bool UnicodeUtil::removeUTF8BOM(std::string_view& str) {
 
 bool UnicodeUtil::caseEqual (std::string_view lhs, std::string_view rhs, bool assumeUTF8) {
 	if (lhs == rhs) return true; // Early return
-	std::string lhsCharset;
-	std::string rhsCharset;
+	std::string lhsCharset = UnicodeUtil::getCharset(lhs);
+	std::string rhsCharset = UnicodeUtil::getCharset(rhs);;
 	icu::UnicodeString lhsUniString;
 	icu::UnicodeString rhsUniString;
-	if (removeUTF8BOM(lhs)) lhsCharset = "UTF-8";
-	if (removeUTF8BOM(rhs)) rhsCharset = "UTF-8";
 	if (lhsCharset != "UTF-8" && !assumeUTF8) {
-		lhsCharset = UnicodeUtil::getCharset(lhs);
 		lhsUniString = UnicodeUtil::getConverter(lhsCharset).convertToUTF8(lhs);
 	}
 	else lhsUniString = icu::UnicodeString::fromUTF8(lhs.data());
 	if (rhsCharset != "UTF-8" && !assumeUTF8) {
-		rhsCharset = UnicodeUtil::getCharset(rhs);
 		rhsUniString = UnicodeUtil::getConverter(rhsCharset).convertToUTF8(rhs);
 	}
 	else rhsUniString = icu::UnicodeString::fromUTF8(rhs.data());
