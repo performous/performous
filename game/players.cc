@@ -8,8 +8,6 @@
 #include <algorithm>
 #include <unicode/stsearch.h>
 
-icu::ErrorCode Players::m_icuError = icu::ErrorCode();
-
 void Players::load(xmlpp::NodeSet const& n) {
 	for (auto const& elem: n) {
 		xmlpp::Element& element = dynamic_cast<xmlpp::Element&>(*elem);
@@ -112,10 +110,15 @@ void Players::filter_internal() {
 		fplayers_t filtered;
 		if (m_filter.empty()) filtered = fplayers_t(m_players.begin(), m_players.end());
 		else {
-			icu::UnicodeString filter = icu::UnicodeString::fromUTF8(m_filter);
+
+			auto filter = icu::UnicodeString::fromUTF8(
+				UnicodeUtil::convertToUTF8(m_filter)
+				);
+			icu::ErrorCode icuError;
+
 			std::copy_if (m_players.begin(), m_players.end(), std::back_inserter(filtered), [&](PlayerItem it){
-			icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8(it.name), UnicodeUtil::m_searchCollator.get(), nullptr, m_icuError);
-			return (search.first(m_icuError) != USEARCH_DONE);
+			icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8(it.name), UnicodeUtil::m_searchCollator.get(), nullptr, icuError);
+			return (search.first(icuError) != USEARCH_DONE);
 			});
 		}
 		m_filtered.swap(filtered);
