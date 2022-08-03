@@ -36,7 +36,7 @@ class UnicodeUtil {
 	static std::map<std::string, Converter> m_converters;
 	enum class CaseMapping { LOWER, UPPER, TITLE, NONE };
 
-	static std::string getCharset(std::string_view str);
+	static std::string getCharset(std::string_view& str);
 	static Converter& getConverter(std::string const& s);
 	static bool removeUTF8BOM(std::string_view& str);
 	
