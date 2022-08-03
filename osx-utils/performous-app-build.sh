@@ -219,10 +219,10 @@ function finalize_bundle {
 
 	cd $ETCDIR/fonts
 	PREFIX_REGEX=$(echo ${PREFIXDIR} | sed -e 's|\/|\\\/|g')
-	sed -i '' -e "s|${PREFIX_REGEX}\/share|\.\.\/\.\.\/\.\.\/Resources|g" fonts.conf
+	sed -i '' -e "s|<dir>${PREFIX_REGEX}\/share|<dir prefix='relative'>\.\.\/\.\.\/\.\.\/Resources|g" fonts.conf
 	sed -i '' -e "s|${PREFIX_REGEX}\/var\/cache|\~\/\.cache|g" fonts.conf
 	sed -i '' -e 's|\<\!-- Font directory list --\>|\<\!-- Font directory list --\>\
-	<dir>\.\.\/\.\.\/pixmaps</dir>|g' fonts.conf
+	<dir prefix="relative">\.\.\/\.\.\/pixmaps</dir>|g' fonts.conf
 }
 
 
