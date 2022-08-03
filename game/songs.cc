@@ -351,8 +351,10 @@ void Songs::filter_internal() {
 			std::shared_lock<std::shared_mutex> l(m_mutex);
 			filtered = m_songs;
 		} else {
-			std::string charset = UnicodeUtil::getCharset(m_filter);
-			icu::UnicodeString filter = UnicodeUtil::getConverter(UnicodeUtil::getCharset(m_filter)).convertToUTF8(m_filter);
+		
+			auto filter = icu::UnicodeString::fromUTF8(
+				UnicodeUtil::convertToUTF8(m_filter)
+				);
 			icu::ErrorCode icuError;
 
 			std::shared_lock<std::shared_mutex> l(m_mutex);
