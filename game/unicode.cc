@@ -70,7 +70,7 @@ std::string UnicodeUtil::convertToUTF8 (std::string_view str, std::string _filen
 			if (!_filename.empty()) std::clog << "unicode/info: " << _filename << " does not appear to be UTF-8; (" << charset << ") detected." << std::endl; 
 			ustring = UnicodeUtil::getConverter(charset).convertToUTF8(str);
 		}
-	else { ustring = icu::UnicodeString::fromUTF8(str); }
+	else { ustring = icu::UnicodeString::fromUTF8(str.data()); }
 	switch(toCase) {
 		case CaseMapping::UPPER:
 			ustring.toUpper();
