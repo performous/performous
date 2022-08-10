@@ -37,24 +37,44 @@ ConfigItem::ConfigItem(OptionList opts)
 : m_type("option_list"), m_value(opts) {
 }
 
-ConfigItem::NumericValue& ConfigItem::getMin() {
+ConfigItem::NumericValue ConfigItem::getMin() const {
 	return m_min;
 }
 
-ConfigItem::NumericValue& ConfigItem::getMax() {
+void ConfigItem::setMin(NumericValue min) {
+	m_min = min;
+}
+
+ConfigItem::NumericValue ConfigItem::getMax() const {
 	return m_max;
 }
 
-ConfigItem::NumericValue& ConfigItem::getStep() {
+void ConfigItem::setMax(NumericValue max) {
+	m_max = max;
+}
+
+ConfigItem::NumericValue ConfigItem::getStep() const {
 	return m_step;
 }
 
-ConfigItem::NumericValue& ConfigItem::getMultiplier() {
+void ConfigItem::setStep(NumericValue step) {
+	m_step = step;
+}
+
+ConfigItem::NumericValue ConfigItem::getMultiplier() const {
 	return m_multiplier;
 }
 
-std::string& ConfigItem::getUnit() {
+void ConfigItem::setMultiplier(NumericValue multiplier) {
+	m_multiplier = multiplier;
+}
+
+std::string const& ConfigItem::getUnit() const {
 	return m_unit;
+}
+
+void ConfigItem::setUnit(std::string const& unit) {
+	m_unit = unit;
 }
 
 ConfigItem& ConfigItem::incdec(int dir) {
@@ -193,19 +213,20 @@ std::string const ConfigItem::getValue() const {
 	throw std::logic_error("ConfigItem::getValue doesn't know type '" + m_type + "'");
 }
 
-void ConfigItem::addEnum(std::string name) {
+void ConfigItem::addEnum(std::string const& name) {
 	verifyType("uint");
-	if (find(m_enums.begin(),m_enums.end(),name) == m_enums.end()) {
+	if (find(m_enums.begin(), m_enums.end(), name) == m_enums.end())
 		m_enums.push_back(name);
-	}
+
 	m_min = static_cast<unsigned short>(0);
 	m_max = static_cast<unsigned short>(m_enums.size() - 1);
-	m_min = static_cast<unsigned short>(1);
+	m_step = static_cast<unsigned short>(1);
 }
 
 void ConfigItem::selectEnum(std::string const& name) {
 	auto it = std::find(m_enums.begin(), m_enums.end(), name);
-	if (it == m_enums.end()) throw std::runtime_error("Enum value " + name + " not found in " + m_shortDesc);
+	if (it == m_enums.end())
+		throw std::runtime_error("Enum value " + name + " not found in " + m_shortDesc);
 	ui() = static_cast<unsigned short>(it - m_enums.begin());
 }
 

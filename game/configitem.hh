@@ -57,17 +57,22 @@ class ConfigItem {
 	std::string const getValue() const; ///< Get a human-readable representation of the current value
 	std::string const getOldValue() const { return m_oldValue; } ///< Get a human-readable representation of a previous value.
 	void setOldValue(std::string const& value) { m_oldValue = value; } ///< Store the current value before changing it, for later comparison.
-	void addEnum(std::string name); ///< Dynamically adds an enum to all values
+	void addEnum(std::string const& name); ///< Dynamically adds an enum to all values
 	void selectEnum(std::string const& name); ///< Set integer value by enum name
 	std::string const getEnumName() const; ///< Returns the selected enum option's text
 	std::vector<std::string>& getEnum() { return m_enums; }
 	unsigned short getSelection() const { return m_sel; }
 
-	NumericValue& getMin();
-	NumericValue& getMax();
-	NumericValue& getStep();
-	NumericValue& getMultiplier();
-	std::string& getUnit();
+	NumericValue getMin() const;
+	void setMin(NumericValue);
+	NumericValue getMax() const;
+	void setMax(NumericValue);
+	NumericValue getStep() const;
+	void setStep(NumericValue);
+	NumericValue getMultiplier() const;
+	void setMultiplier(NumericValue);
+	std::string const& getUnit() const;
+	void setUnit(std::string const&);
 
 	void setGetValueFunction(std::function<std::string(ConfigItem const&)> f) { m_getValue = f; }
 
@@ -87,7 +92,8 @@ class ConfigItem {
 	Value m_defaultValue; ///< The value from config schema or system config
 	std::string m_oldValue; ///< A previous value, as output by getValue().
 	std::vector<std::string> m_enums; ///< Enum value titles
-	NumericValue m_step, m_min, m_max;
+	NumericValue m_step{1};
+	NumericValue m_min, m_max;
 	NumericValue m_multiplier;
 	std::string m_unit;
 	unsigned short m_sel = 0;

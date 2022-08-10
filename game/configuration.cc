@@ -59,29 +59,42 @@ namespace {
 		a = e.get_attribute("step");
 		if (a) step = sconv<T>(a->get_value());
 	}
+	template <typename T> void setLimits(xmlpp::Element& e, ConfigItem& item) {
+		decltype(item.getMin()) min;
+		decltype(item.getMax()) max;
+		decltype(item.getStep()) step;
+
+		setLimits<T>(e, min, max, step);
+
+		item.setMin(min);
+		item.setMax(max);
+		item.setStep(step);
+	}
 }
 
 template <typename T> void ConfigItemXMLLoader::updateNumeric(ConfigItem& item, xmlpp::Element& elem, unsigned mode) {
 	auto ns = elem.find("limits");
-	if (!ns.empty()) setLimits<T>(dynamic_cast<xmlpp::Element&>(*ns[0]), item.getMin(), item.getMax(), item.getStep());
-	else if (mode == 0) throw XMLError(elem, "child element limits missing");
+	if (!ns.empty())
+		setLimits<T>(dynamic_cast<xmlpp::Element&>(*ns[0]), item);
+	else if (mode == 0)
+		throw XMLError(elem, "child element limits missing");
 	ns = elem.find("ui");
 	// Default values
 	if (mode == 0) {
-		item.getUnit().clear();
-		item.getMultiplier() = static_cast<T>(1);
+		item.setUnit({});
+		item.setMultiplier(static_cast<T>(1));
 	}
 	if (!ns.empty()) {
 		xmlpp::Element& e = dynamic_cast<xmlpp::Element&>(*ns[0]);
 		try {
-			item.getUnit() = getAttribute(e, "unit");
+			item.setUnit(getAttribute(e, "unit"));
 		}
 		catch (...) {
 		}
 		std::string m;
 		try {
 			m = getAttribute(e, "multiplier");
-			item.getMultiplier() = sconv<T>(m);
+			item.setMultiplier(sconv<T>(m));
 		}
 		catch (XMLError&) {
 		}
@@ -393,8 +406,10 @@ void readConfig() {
 	pathInit();
 	// Populate themes
 	ConfigItem& ci = config["game/theme"];
-	for (std::string const& theme : getThemes()) ci.addEnum(theme);
-	if (ci.ui() == 1337) ci.selectEnum("default");  // Select the default theme if nothing is selected
+	for (auto const& theme : getThemes())
+		ci.addEnum(theme);
+	if (ci.ui() == 1337)
+		ci.selectEnum("default");  // Select the default theme if nothing is selected
 }
 
 void populateBackends(const std::list<std::string>& backendList) {

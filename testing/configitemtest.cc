@@ -294,5 +294,49 @@ namespace {
 
 		EXPECT_EQ(0, item.getSelection());
 	}
+
+	TEST(UnitTest_ConfigItem, increase) {
+		auto item = ConfigItem(static_cast<unsigned short>(0));
+
+		item.addEnum("C");
+		item.addEnum("A");
+		item.addEnum("B");
+
+		EXPECT_EQ(0, item.ui());
+
+		++item;
+
+		EXPECT_EQ(1, item.ui());
+
+		++item;
+
+		EXPECT_EQ(2, item.ui());
+
+		++item;
+
+		EXPECT_EQ(2, item.ui());
+	}
+
+	TEST(UnitTest_ConfigItem, decrease) {
+		auto item = ConfigItem(static_cast<unsigned short>(2));
+
+		item.addEnum("C");
+		item.addEnum("A");
+		item.addEnum("B");
+
+		EXPECT_EQ(2, item.ui());
+
+		--item;
+
+		EXPECT_EQ(1, item.ui());
+
+		--item;
+
+		EXPECT_EQ(0, item.ui());
+
+		--item;
+
+		EXPECT_EQ(0, item.ui());
+	}
 }
 
