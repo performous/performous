@@ -71,7 +71,8 @@ SongParser::SongParser(Song& s): m_song(s) {
 		}
 		else {
 			std::string ss = UnicodeUtil::convertToUTF8(m_ss.str(), s.filename.string());
-			if (smCheck (ss)) {type = Type::SM; } else if (txtCheck (ss)) {
+			if (smCheck (ss)) type = Type::SM;
+			else if (txtCheck (ss)) {
 				type = Type::TXT;
 			}
 			else if (iniCheck (ss)) {
