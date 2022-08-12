@@ -131,7 +131,7 @@ std::pair<std::string, std::string> const& TranslationEngine::getCurrentLanguage
 
 std::string TranslationEngine::getCurrentLanguageCode() {
 	std::string lang(getCurrentLanguage().first);
-	return lang.substr(0, lang.size() - 6);
+	return lang.substr(0, lang.find('.'));
 }
 
 std::map<std::string, std::string> TranslationEngine::GetAllLanguages(bool refresh) {
