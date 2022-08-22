@@ -48,16 +48,16 @@ function askPrompt {
 function detectPkgManager {
 	brew_retcode=$(brew -v 1>/dev/null 2>&1; echo $?)
 	port_retcode=$(port version 1>/dev/null 2>&1; echo $?)
-	if [[ ${brew_retcode} = 0 ]]
+	if [[ ${brew_retcode} -eq 0 ]]
 		then
 			brew_prefix="$(dirname $(dirname $(which brew)))"
 			echo "--- Homebrew install found at: ${brew_prefix}"
 			opencv_installed=$(brew list opencv 2>/dev/null | grep "No available formula or cask" 1>/dev/null 2>/dev/null; echo $?)
 			opencv3_installed=$(brew list opencv@3 2>/dev/null | grep "No available formula or cask" 1>/dev/null 2>/dev/null; echo $?)			
-			if [[ ${opencv_installed} ]]
+			if [[ ${opencv_installed} -eq 0 ]]
 				then
 					opencv_prefix="$(dirname $(dirname '$(brew ls opencv | grep OpenCVConfig.cmake)'))"
-			elif [[ ${opencv3_installed} ]]
+			elif [[ ${opencv3_installed} -eq 0 ]]
 				then
 					opencv_prefix="$(dirname $(dirname '$(brew ls opencv@3 | grep OpenCVConfig.cmake)'))"
 			else
@@ -66,16 +66,16 @@ function detectPkgManager {
 
 			PREFIXDIR="${brew_prefix}"
 	fi
-	if [[ ${port_retcode} = 0 ]]
+	if [[ ${port_retcode} -eq 0 ]]
 		then
 			port_prefix="$(dirname $(dirname $(which port)))"
 			echo "--- MacPorts install found at: ${port_prefix}"
-			opencv4_installed=$(port -q installed opencv4 | grep -v "None of the specified" >/dev/null; echo $?)
-			opencv3_installed=$(port -q installed opencv3 | grep -v "None of the specified" >/dev/null; echo $?)
-			if [[ ${opencv4_installed} ]]
+			opencv4_installed=$(${port_prefix}/bin/port -v installed opencv4 | grep -v "None of the specified" >/dev/null; echo $?)
+			opencv3_installed=$(${port_prefix}/bin/port -v installed opencv3 | grep -v "None of the specified" >/dev/null; echo $?)
+			if [[ ${opencv4_installed} -eq 0 ]]
 				then
 					opencv_prefix="$(dirname $(dirname $(port -q contents opencv4 | grep OpenCVConfig.cmake)))/"
-			elif [[ ${opencv3_installed} ]]
+			elif [[ ${opencv3_installed} -eq 0 ]]
 				then
 					opencv_prefix="$(dirname $(dirname $(port -q contents opencv3 | grep OpenCVConfig.cmake)))/"
 			else
@@ -83,7 +83,7 @@ function detectPkgManager {
 			fi
 			PREFIXDIR="${port_prefix}"
 	fi
-	if [[ ${port_retcode} = 0 && ${brew_retcode} = 0 ]]
+	if [ ${port_retcode} -eq 0 -a ${brew_retcode} -eq 0 ]
 		then
 			if askPrompt "Would you like to use Homebrew (y), or MacPorts (n)?"
 				then
@@ -207,7 +207,7 @@ function finalize_bundle {
 	mkdir -p "${FRAMEWORKDIR}"
 	mkdir -p "${LIBDIR}"
 
-	if [[ "${DEBUG}" = 0 ]]
+	if [ "${DEBUG}" -eq 0 ]
 		then
 			bundlelibs
 		else
@@ -228,7 +228,7 @@ function finalize_bundle {
 
 function main {
 	printf "\n"
-	if [[ "${DEBUG}" = 1 ]]
+	if [ "${DEBUG}" -eq 1 ]
 		then
 			echo "--- Will create bundle for debugging..."
 			RELTYPE=Debug
@@ -277,12 +277,12 @@ function main {
 	BINDIR="${TEMPDIR}/MacOS"
 	ETCDIR="${RESDIR}/etc"
 
-	if [[ "${PERFORMOUS_CLEAN_BUILD}" == 1 ]]
+	if [ "${PERFORMOUS_CLEAN_BUILD}" -eq 1 ]
 		then
 			echo "--- Wiping build folder..."
 			printf "\n"
 			rm -rf "${PERFORMOUS_SOURCE_DIR}/build"
-			if [[ "${PERFORMOUS_GEN_PROJECT}" != 1 && "${PERFORMOUS_XCODE_BUNDLE}" != 1 ]]
+			if [ "${PERFORMOUS_GEN_PROJECT}" -ne 1 -a "${PERFORMOUS_XCODE_BUNDLE}" -ne 1 ]
 				then
 					echo "--- Wiping output folder..."
 					printf "\n"
@@ -292,7 +292,7 @@ function main {
 		else
 			echo "--- No-clean mode enabled; preserving previous build directory."
 			printf "\n"
-			if [[ "${PERFORMOUS_GEN_PROJECT}" != 1 && "${PERFORMOUS_XCODE_BUNDLE}" != 1 ]]
+			if [ "${PERFORMOUS_GEN_PROJECT}" != 1 -a "${PERFORMOUS_XCODE_BUNDLE}" != 1 ]
 				then
 					echo "--- We aren't making an Xcode Project or bundle..."
 					printf "\n"
@@ -302,7 +302,7 @@ function main {
 			fi
 	fi
 	
-	if [[ "${PERFORMOUS_GEN_PROJECT}" == 1 || "${PERFORMOUS_XCODE_BUNDLE}" == 1 ]]
+	if [ "${PERFORMOUS_GEN_PROJECT}" -eq 1 -o "${PERFORMOUS_XCODE_BUNDLE}" -eq 1 ]
 		then
 			CMAKE_GENERATOR="Xcode"
 			PERFORMOUS_BUILD_DIR="${PERFORMOUS_SOURCE_DIR}/build/xcode-proj"
@@ -352,7 +352,7 @@ function main {
 	fi
 	
 	# then create the rest of the app bundle
-	if [[ "${PERFORMOUS_GEN_PROJECT}" == 0 || "${PERFORMOUS_XCODE_BUNDLE}" == 1 ]]
+	if [ "${PERFORMOUS_GEN_PROJECT}" -eq 0 -o "${PERFORMOUS_XCODE_BUNDLE}" -eq 1 ]
 		then
 			if [[ "${PERFORMOUS_XCODE_BUNDLE}" == 1 ]]
 				then
