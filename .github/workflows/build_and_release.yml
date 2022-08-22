@@ -399,7 +399,7 @@ jobs:
            brew install boost cmake ffmpeg@4 help2man icu4c portaudio\
             portmidi opencv libepoxy librsvg libxml++3 sdl2 dylibbundler\
             aubio fftw glm nlohmann-json fmt
-           brew link ffmpeg@4
+           brew link --force --overwrite ffmpeg@4
 
       - name: Build package
         id: build_package
