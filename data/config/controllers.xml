@@ -394,6 +394,23 @@
 				<button hw="14" map="down" />
 			</mapping>
 		</controller>
+		<controller type="dancepad" name="DANCEPAD_DFORCE_DANCE_PUMP">
+			<description>Dforce (Deluxe) Dance + Pump Pad</description>
+			<device regex="USB Joystick" />
+			<mapping>
+				<button hw="0" map="up" />
+				<button hw="1" map="down" />
+				<button hw="2" map="left" />
+				<button hw="3" map="right" />
+				<!-- button 4 is the center button -->
+				<button hw="5" map="down-right" />
+				<button hw="6" map="up-left" />
+				<button hw="7" map="up-right" />
+				<button hw="8" map="down-left" />
+				<button hw="9" map="start" />
+				<axis hw="1" positive="cancel" />
+			</mapping>
+		</controller>
 		<controller type="keytar" name="KEYTAR_GENERIC">
 			<description>Generic keytar</description>
 			<device regex="NO MATCH" />
