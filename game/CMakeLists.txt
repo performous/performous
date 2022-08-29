@@ -12,6 +12,18 @@ if(WIN32)
 	# 1.0 1.0.1 1.0+ 1.0.1+ 1.0-2-g123abcd 1.0.1-5-g123abcd
 	# We use the 2-3 digits of the version as MAJOR.MINOR.PATCH
 	# and the git patch number as TWEAK
+	set(SUBSYSTEM_WIN32 WIN32)
+	if (CMAKE_SOURCE_DIR)
+		if(DEFINED ENV{ORIGINAL_TEMP})
+			set (TMP_LOCATION $ENV{ORIGINAL_TEMP})
+		elseif(DEFINED ENV{TEMP})
+			set (TMP_LOCATION $ENV{TEMP})
+		else()
+			message(WARNING "Temp folder not found. CPack won't be able to create a proper installer.")
+		endif()
+		file(WRITE "${TMP_LOCATION}/source.txt" "${CMAKE_SOURCE_DIR}")
+		file(WRITE "${TMP_LOCATION}/mingwroot.txt" "${CPACK_MINGW_SYSTEM_PREFIX}")
+	endif()
 	string(REGEX REPLACE "\\." ";"  VERSIONING ${PROJECT_VERSION})
 	list(GET VERSIONING -1 LAST_ENTRY)
 	list(REMOVE_AT VERSIONING -1)
@@ -46,10 +58,8 @@ if(WIN32)
 		# According to MinGW tools, we need to compile the rc file, and then link it into projects:
 		# windres foo.rc foores.o
 		# gcc -o foo.exe foo.o foores.o
-		find_library(WSOCK32_LIBRARY wsock32)
-		find_library(WS2_32_LIBRARY ws2_32)
 		if(NOT CMAKE_RC_COMPILER)
-			find_program(CMAKE_RC_COMPILER windres)
+			find_program(CMAKE_RC_COMPILER "${CPACK_MINGW_SYSTEM_PREFIX}/bin/windres")
 		endif()
 		if(NOT CMAKE_RC_COMPILER)
 			message(STATUS "Cannot find windres. Will not create a versioned exe.")
@@ -106,6 +116,11 @@ set(SELF_BUILT_JSON "NEVER" CACHE STRING "rule to allow self build of Json depen
 set(Aubio_REQUIRED_VERSION "0.4.9")
 
 # Find all the libs that don't require extra parameters
+
+if (MINGW)
+target_link_libraries(performous PRIVATE mingw32)
+endif()
+
 foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM Json Ced Aubio)
 	find_package(${lib} ${${lib}_REQUIRED_VERSION} REQUIRED)
 	message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
@@ -182,6 +197,7 @@ if("AUTO" STREQUAL "${ENABLE_WEBSERVER}")
 		message(STATUS "Webserver support: Enabled (automatically found)")
 	else()
 		message(STATUS "Webserver support: Disabled (cpprestsdk not found)")
+		SET (ENABLE_WEBSERVER OFF FORCE)
 	endif()
 elseif(ENABLE_WEBSERVER)
 	# webserver explicitly requested, make it mandatory
@@ -205,25 +221,14 @@ endif()
 
 if(WIN32)
 	add_definitions("-DEPOXY_SHARED")
-	option(MXE_HACK "Features horrible hacks, but is able to compile a static performous.exe (that may not work)." OFF)
-	mark_as_advanced(MXE_HACK)
-	if(MXE_HACK)
-		execute_process(COMMAND "${CMAKE_SOURCE_DIR}/win32/mxe/libs.sh"
-			OUTPUT_VARIABLE MXE_HACK_STRING
-		)
-		set(CMAKE_CXX_LINK_EXECUTABLE ${CMAKE_CXX_LINK_EXECUTABLE}${MXE_HACK_STRING})
-		add_definitions(-DBOOST_THREAD_USE_LIB)
-	endif()
 	set(BIN_INSTALL .)  # Straight to Program Files/Performous with no bin subfolder.
-	set(SUBSYSTEM_WIN32 WIN32)
+	if(ENABLE_WEBSERVER)
+	  target_link_libraries(performous PRIVATE wsock32 ws2_32)
+	endif()
 elseif(APPLE)
 	set(BIN_INSTALL MacOS)
 else()
 	set(BIN_INSTALL bin)
-endif()
-
-if(WIN32)
-  target_link_libraries(performous PRIVATE wsock32 ws2_32)
 endif()
 
 if(APPLE)
@@ -286,7 +291,7 @@ endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
-if(WIN32)
+if(WIN32 AND MSVC)
 	install(CODE [[
         file(GET_RUNTIME_DEPENDENCIES
             RESOLVED_DEPENDENCIES_VAR deps_resolved
@@ -303,4 +308,55 @@ if(WIN32)
             message(WARNING "Runtime dependency ${dep} could not be resolved.")
         endforeach()
         ]])
+elseif(MINGW)
+	install(
+		CODE [[
+		## Hack: CPack doesn't know about the original source folder.
+		if(DEFINED ENV{ORIGINAL_TEMP})
+			set (TMP_LOCATION $ENV{ORIGINAL_TEMP})
+		elseif(DEFINED ENV{TEMP})
+			set (TMP_LOCATION $ENV{TEMP})
+		else()
+			message(WARNING "Temp folder not found. CPack won't be able to create a proper installer.")
+		endif()
+		file (READ "${TMP_LOCATION}/source.txt" CPACK_TOP_SOURCE_DIR)
+		file (READ "${TMP_LOCATION}/mingwroot.txt" CPACK_MINGW_SYSTEM_PREFIX)
+		execute_process(
+			COMMAND "${CPACK_MINGW_SYSTEM_PREFIX}/../usr/bin/bash.exe" -l -c
+			'${CPACK_TOP_SOURCE_DIR}/win32/mingw64/copydlldeps.sh --indir ${CMAKE_INSTALL_PREFIX} --destdir ${CMAKE_INSTALL_PREFIX} --recursivesrcdir ${CPACK_MINGW_SYSTEM_PREFIX} --copy --objdump ${CPACK_MINGW_SYSTEM_PREFIX}/bin/objdump.exe'
+			WORKING_DIRECTORY "${CPACK_MINGW_SYSTEM_PREFIX}"
+			COMMAND_ECHO STDOUT
+			OUTPUT_STRIP_TRAILING_WHITESPACE
+			ECHO_OUTPUT_VARIABLE
+			OUTPUT_VARIABLE COMMAND_OUTPUT
+			ERROR_STRIP_TRAILING_WHITESPACE
+			ECHO_ERROR_VARIABLE
+			ERROR_VARIABLE COMMAND_OUTPUT
+		)
+		if(CMAKE_BUILD_TYPE STREQUAL Release)
+			execute_process(
+				COMMAND "${CPACK_MINGW_SYSTEM_PREFIX}/../usr/bin/bash.exe" -l -c
+				'${CPACK_MINGW_SYSTEM_PREFIX}/bin/strip.exe
+				${CMAKE_INSTALL_PREFIX}/*.exe ${CMAKE_INSTALL_PREFIX}/*.dll'
+				WORKING_DIRECTORY "${CPACK_MINGW_SYSTEM_PREFIX}"
+				COMMAND_ECHO STDOUT
+				OUTPUT_STRIP_TRAILING_WHITESPACE
+				ECHO_OUTPUT_VARIABLE
+				OUTPUT_VARIABLE COMMAND_OUTPUT
+				ERROR_STRIP_TRAILING_WHITESPACE
+				ECHO_ERROR_VARIABLE
+				ERROR_VARIABLE COMMAND_OUTPUT
+				)
+		endif()
+	file(INSTALL
+		"${CPACK_MINGW_SYSTEM_PREFIX}/etc/fonts/fonts.conf"
+		"${CPACK_MINGW_SYSTEM_PREFIX}/etc/fonts/conf.d"
+		DESTINATION "${CMAKE_INSTALL_PREFIX}"
+		)
+		## Hack: add performous' fonts dir to the config.
+		file(READ "${CMAKE_INSTALL_PREFIX}/fonts.conf" FILE_CONTENTS)
+		string(REPLACE "<dir>WINDOWSFONTDIR</dir>" "<dir prefix='relative'>./fonts</dir>\n\t<dir>WINDOWSFONTDIR</dir>" FILE_CONTENTS "${FILE_CONTENTS}")
+		file(WRITE "${CMAKE_INSTALL_PREFIX}/fonts.conf" "${FILE_CONTENTS}")
+		]]
+	)
 endif()

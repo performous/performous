@@ -31,23 +31,14 @@
       "description": "Target Windows Release (64-bit).",
       "inherits": "x64-debug",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+        "CMAKE_BUILD_TYPE": "Release"
       }
     },
     {
-      "name": "x86-debug",
-      "displayName": "x86 Debug",
-      "description": "Target Windows Debug (32-bit).",
-      "inherits": "windows-base",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
-    },
-    {
-      "name": "x86-release",
-      "displayName": "x86 Release",
-      "description": "Target Windows Release (32-bit).",
-      "inherits": "x86-debug",
+      "name": "x64-debinfo",
+      "displayName": "x64 Release with Debug info",
+      "description": "Target Windows Release with Debug info (64-bit).",
+      "inherits": "x64-debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
@@ -57,26 +48,20 @@
     {
       "name": "x64-debug",
       "configurePreset": "x64-debug",
-      "displayName": "Build x64-debug with Ninja",
-      "description": "Build x64-debug with Ninja"
+      "displayName": "Build x64-debug.",
+      "description": "Build x64-debug."
     },
     {
       "name": "x64-release",
       "configurePreset": "x64-release",
-      "displayName": "Build x64-release with Ninja",
-      "description": "Build x64-release with Ninja"
+      "displayName": "Build x64-release.",
+      "description": "Build x64-release."
     },
     {
-      "name": "x86-debug",
-      "configurePreset": "x86-debug",
-      "displayName": "Build x86-debug with Ninja",
-      "description": "Build x86-debug with Ninja"
-    },
-    {
-      "name": "x86-release",
-      "configurePreset": "x86-release",
-      "displayName": "Build x86-release with Ninja",
-      "description": "Build x86-release with Ninja"
+      "name": "x64-debinfo",
+      "configurePreset": "x64-debinfo",
+      "displayName": "Build x64-debinfo.",
+      "description": "Build x64-debinfo."
     }
   ]
 }
