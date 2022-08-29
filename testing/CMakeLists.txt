@@ -29,7 +29,15 @@ target_link_libraries(performous_test PRIVATE ${Boost_LIBRARIES})
 find_package(fmt REQUIRED CONFIG)
 target_link_libraries(performous_test PRIVATE fmt::fmt)
 
-target_link_libraries(performous_test PRIVATE GTest::GTest GTest::Main)
+if (${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.23)
+	target_link_libraries(performous_test PRIVATE GTest::gtest GTest::gtest_main GTest::gmock)
+elseif(${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.20)
+	target_link_libraries(performous_test PRIVATE GTest::gtest
+ GTest::gtest_main)
+else()
+	target_link_libraries(performous_test PRIVATE GTest::GTest
+ GTest::Main)
+endif()
 
 target_include_directories(performous_test PRIVATE ".." "../game")
 

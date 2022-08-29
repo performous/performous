@@ -455,8 +455,8 @@ jobs:
           asset_content_type: application/octet-stream
 
   # Create the Windows installer
-  Windows_Packages:
-    name: Create Windows installer
+  Windows_MSVC_Packages:
+    name: Create Windows installer with MSVC
     needs:
       - determine_version
       - create_release
@@ -478,7 +478,7 @@ jobs:
       - name: Download and build our dependencies using vcpkg
         uses: Lord-Kamina/vcpkg-action@master
         with:
-          pkgs: aubio boost-iostreams boost-locale boost-program-options boost-system cairo cpprestsdk ffmpeg fftw3 fmt fontconfig gdk-pixbuf gettext glibmm glm icu libepoxy librsvg libsigcpp libxml2 libxmlpp nlohmann-json openblas opencv openssl pango portaudio portmidi sdl2
+          pkgs: aubio boost-iostreams boost-locale boost-program-options boost-system cairo cpprestsdk ffmpeg fftw3 fmt fontconfig gdk-pixbuf gettext glibmm glm icu libepoxy librsvg libsigcpp libxml2 libxmlpp nlohmann-json openblas opencv openssl pango portaudio portmidi pthreads sdl2
           triplet: x64-windows-release
           extra-args: --clean-after-build
           cache-key: win64-vcpkg
@@ -490,20 +490,14 @@ jobs:
           set VCPKG_DEFAULT_BINARY_CACHE=${{ github.workspace }}/vcpkg_cache
           cd ${{ github.workspace }}/performous
           echo $PERFORMOUS_VERSION
-          echo "VCPKG_ROOT IS %VCPKG_ROOT%"
-          echo "VCPKG root for the toolchain file is: ${{ github.workspace }}/vcpkg"
           cmake --preset "x64-release" -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-release
           cmake --build --preset "x64-release" -DVCPKG_TARGET_TRIPLET=x64-windows-release -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
-      - name: Check directory tree.
-        if: ${{ always() }}
-        shell: powershell
-        run: |
-          tree ${{ github.workspace }} /F
       - name: Create Installer
         id: package_performous_x64
+        shell: powershell
         run: |
            cd performous/build/x64-release
-           cpack -G NSIS x64-release
+           cpack -G NSIS64 x64-release
            Copy-Item $(Get-ChildItem -Filter '*win64.exe').Name "Performous-latest.exe"
            Rename-Item $(Get-ChildItem -Filter '*win64.exe').Name -NewName "Performous-${{ needs.determine_version.outputs.complete_version }}.exe"
            chcp 65001 #set code page to utf-8
@@ -537,3 +531,120 @@ jobs:
           asset_path: ${{ env.ARTIFACT_PATH }}
           asset_name: ${{ env.ARTIFACT_FILENAME }}
           asset_content_type: application/octet-stream
+
+  Windows_MinGW-w64_Packages:
+    name: Create Windows installer with MinGW-w64
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    needs:
+      - determine_version
+      - create_release
+    steps:
+      - name: Checkout Git
+        id: checkout_git
+        uses: actions/checkout@v3
+        with:
+          path: performous
+      - name: Setup action env and echoing
+        shell: bash
+        run: |
+          echo '::echo::on'
+          echo '::set-output name=action_echo::enabled'
+          echo workpath=$(echo '${{ github.workspace }}' | sed 's|\\|/|g') >> $GITHUB_ENV
+      - name: Install MSYS2.
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: false
+          location: "${{ env.workpath }}"
+          install: >-
+            git
+            mingw-w64-x86_64-boost
+            mingw-w64-x86_64-cairo
+            mingw-w64-x86_64-cc
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-ffmpeg
+            mingw-w64-x86_64-fftw
+            mingw-w64-x86_64-fmt
+            mingw-w64-x86_64-fontconfig
+            mingw-w64-x86_64-gettext
+            mingw-w64-x86_64-glm
+            mingw-w64-x86_64-gtest
+            mingw-w64-x86_64-icu
+            mingw-w64-x86_64-libepoxy
+            mingw-w64-x86_64-libjpeg-turbo
+            mingw-w64-x86_64-libpng
+            mingw-w64-x86_64-librsvg
+            mingw-w64-x86_64-libsigc++
+            mingw-w64-x86_64-libxml++
+            mingw-w64-x86_64-libxml2
+            mingw-w64-x86_64-make
+            mingw-w64-x86_64-nsis
+            mingw-w64-x86_64-nlohmann-json
+            mingw-w64-x86_64-openblas
+            mingw-w64-x86_64-opencv
+            mingw-w64-x86_64-opencv
+            mingw-w64-x86_64-pango
+            mingw-w64-x86_64-portaudio
+            mingw-w64-x86_64-portmidi
+            mingw-w64-x86_64-SDL2
+            mingw-w64-x86_64-winpthreads-git
+
+      - name: Run cmake to configure the project and build it
+        env:
+          PERFORMOUS_VERSION: ${{ needs.determine_version.outputs.complete_version }}
+        shell: msys2 {0}
+        run: |
+          cd "${{ env.workpath }}/performous"
+          mkdir build
+          for f in $(ls -Q ./lang/*.po); do mkdir -pv "./build/lang/$(basename $f | cut -d. -f1)/LC_MESSAGES";done
+          cd build
+          "${{ env.workpath }}/msys64/mingw64/bin/cmake.exe" -G "MinGW Makefiles" .. -DCMAKE_BUILD_TYPE="Release" -DSELF_BUILT_AUBIO=ALWAYS -DENABLE_WEBSERVER=OFF -DPERFORMOUS_VERSION=${{ env.PERFORMOUS_VERSION }} -DCMAKE_VERBOSE_MAKEFILE=ON -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64"
+          "${{ env.workpath }}/msys64/mingw64/bin/cmake.exe" --build ./ --verbose
+      - name: Create Installer
+        id: package_performous_x64
+        shell: msys2 {0}
+        run: |
+           cd "${{ env.workpath }}/performous/build"
+           "${{ env.workpath }}/msys64/mingw64/bin/cpack.exe" -G NSIS64 x64-release -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64" -DCPACK_NSIS_EXECUTABLE="${{ env.workpath }}/msys64/mingw64/bin/makensis.exe" -DCMAKE_BUILD_TYPE="Release" --verbose
+           powershell -command "Copy-Item \$(Get-ChildItem -Filter '*win64.exe').Name 'Performous-latest-mingw-w64.exe'"
+           powershell -command "Rename-Item \$(Get-ChildItem -Filter '*win64.exe').Name -NewName 'Performous-${{ needs.determine_version.outputs.complete_version }}-mingw-w64.exe'"
+           powershell -command "echo ('ARTIFACT_PATH=${{ env.workpath }}/performous/build/Performous-${{ needs.determine_version.outputs.complete_version }}-mingw-w64.exe') >> \$env:GITHUB_ENV"
+           powershell -command "echo ('ARTIFACT_FILENAME=Performous-${{ needs.determine_version.outputs.complete_version }}-mingw-w64.exe') >> \$env:GITHUB_ENV"
+           powershell -command "echo ('MASTER_ARTIFACT_PATH=${{ env.workpath }}/performous/build/Performous-latest-mingw-w64.exe') >> \$env:GITHUB_ENV"
+           powershell -command "echo ('MASTER_ARTIFACT_FILENAME=Performous-latest-mingw-w64.exe') >> \$env:GITHUB_ENV"
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          name: ${{ env.ARTIFACT_FILENAME }}
+          path: ${{ env.ARTIFACT_PATH }}
+
+      - name: Upload artifact with unified name
+        if: ${{ github.ref == 'refs/heads/master' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.MASTER_ARTIFACT_FILENAME }}
+          path: ${{ env.MASTER_ARTIFACT_PATH }}
+
+      - name: Upload artifacts to tagged release
+        id: upload_assets
+        uses: actions/upload-release-asset@v1
+        if: ${{ github.event_name != 'pull_request' && github.ref_type == 'tag' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: ${{ env.ARTIFACT_PATH }}
+          asset_name: ${{ env.ARTIFACT_FILENAME }}
+          asset_content_type: application/octet-stream
+
+      - name: Start SSH session
+        if: ${{ always() }}
+        uses: luchihoratiu/debug-via-ssh@main
+        with:
+          NGROK_AUTH_TOKEN: ${{ secrets.LK_NGROK_TOKEN }}
+          SSH_PASS: ${{ secrets.LK_SSH_PASSWORD }}
+
