@@ -32,15 +32,14 @@ static inline bool operator>=(Tone const& lhs, Tone const& rhs) { return lhs.fre
 static inline bool operator<(Tone const& lhs, Tone const& rhs) { return lhs.freq < rhs.freq && lhs != rhs; }
 static inline bool operator>(Tone const& lhs, Tone const& rhs) { return lhs.freq > rhs.freq && lhs != rhs; }
 
-static const unsigned FFT_P = 12;
+static const unsigned FFT_P = 10;
 static const std::size_t FFT_N = 1 << FFT_P;
-
 
 /// analyzer class
  /** class to analyze input audio and transform it into useable data
  */
 class Analyzer {
-public:
+  public:
 	Analyzer(const Analyzer&) = delete;
 	const Analyzer& operator=(const Analyzer&) = delete;
 	/// fast fourier transform vector
@@ -85,12 +84,11 @@ public:
 	/** Returns the id (color name) of the mic */
 	std::string const& getId() const { return m_id; }
 
-private:
+  private:
 	bool calcFFT();
 	void calcTones();
 	void mergeWithOld(tones_t& tones) const;
 
-private:
 	const unsigned m_step;
 	RingBuffer<2 * FFT_N> m_buf;  // Twice the FFT size should give enough room for sliding window and for engine delays
 	RingBuffer<4096> m_passthrough;

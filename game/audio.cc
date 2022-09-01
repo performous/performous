@@ -162,23 +162,22 @@ bool Music::operator()(float* begin, float* end) {
 	for (auto& kv: tracks) {
 		Track& t = *kv.second;
 // #if 0 // FIXME: Include this code bit once there is a sane pitch shifting algorithm
-// //			if (it->first == "guitar") std::cout << t.pitchFactor << std::endl;
-// 			if (t.pitchFactor != 0) { // Pitch shift
-// 				Buffer tempbuf(end - begin);
-// 				// Get audio to temp buffer
-// 				if (t.mpeg.audioQueue(tempbuf.data(), tempbuf.data() + tempbuf.size(), m_pos, t.fadeLevel)) eof = false;
-// 				// Do the magic
-// 				PitchShift(tempbuf.begin(), tempbuf.end(), t.pitchFactor);
-// 				// Mix with other tracks
-// 				Buffer::iterator m = mixbuf.begin();
-// 				Buffer::iterator b = tempbuf.begin();
-// 				while (b != tempbuf.end())
-// 					*m++ += (*b++);
-// 			// Otherwise just get the audio and mix it straight away
-// 			} else
+// //            if (it->first == "guitar") std::cout << t.pitchFactor << std::endl;
+//             if (t.pitchFactor != 0) { // Pitch shift
+//                 Buffer tempbuf(end - begin);
+//                 // Get audio to temp buffer
+//                 if (t.mpeg.audioQueue(tempbuf.data(), tempbuf.data() + tempbuf.size(), m_pos, t.fadeLevel)) eof = false;
+//                 // Do the magic
+//                 PitchShift(tempbuf.begin(), tempbuf.end(), t.pitchFactor);
+//                 // Mix with other tracks
+//                 Buffer::iterator m = mixbuf.begin();
+//                 Buffer::iterator b = tempbuf.begin();
+//                 while (b != tempbuf.end())
+//                     *m++ += (*b++);
+//             // Otherwise just get the audio and mix it straight away
+//             } else
 // #endif
 		if (t.audioBuffer.read(mixbuf.data(), static_cast<std::int64_t>(mixbuf.size()), m_pos, static_cast<float>(t.fadeLevel))) eof = false;
-
 	}
 	m_pos += samples;
 	const float volume = static_cast<float>(m_preview ? config["audio/preview_volume"].ui() : config["audio/music_volume"].ui()) / 100.0f;
@@ -580,17 +579,23 @@ portaudio::Init Audio::init;
 Audio::Audio() {
 	aubio_tempo_set_silence(Audio::aubioTempo.get(), -50.0f);
 	aubio_tempo_set_threshold(Audio::aubioTempo.get(), 0.4f);
-		populateBackends(portaudio::AudioBackends().getBackends());
-		self = std::make_unique<Impl>();
+	populateBackends(portaudio::AudioBackends().getBackends());
+	self = std::make_unique<Impl>();
 }
-Audio::~Audio() { close(); }
+
+Audio::~Audio() { 
+    close(); 
+}
 
 ConfigItem& Audio::backendConfig() {
 	static ConfigItem& backend = config["audio/backend"];
 	return backend;
 }
 
-void Audio::restart() { close(); self = std::make_unique<Impl>(); }
+void Audio::restart() { 
+    close(); 
+    self = std::make_unique<Impl>(); 
+}
 
 void Audio::close() {
 	self.reset();
@@ -731,5 +736,10 @@ void Audio::toggleCenterChannelSuppressor() {
 	}
 }
 
-std::deque<Analyzer>& Audio::analyzers() { return self->analyzers; }
-std::deque<Device>& Audio::devices() { return self->devices; }
+std::deque<Analyzer>& Audio::analyzers() { 
+    return self->analyzers; 
+}
+
+std::deque<Device>& Audio::devices() { 
+    return self->devices; 
+}

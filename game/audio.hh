@@ -35,7 +35,7 @@ class AudioClock {
 	std::atomic<Seconds> m_max{ 0.0s }; ///< Maximum output value for the clock (end of the current audio block)
 	/// Get the current position (current time via parameter, no locking)
 	Seconds pos_internal(Time now) const;
-public:
+  public:
 	/**
 	* Called from audio callback to keep the clock synced.
 	* @param audioPos the current position in the song
@@ -83,7 +83,7 @@ class Audio {
 	friend class ScreenSongs;
 	friend class Music;
 	static std::recursive_mutex aubio_mutex;
-public:
+  public:
 	typedef std::map<std::string, fs::path> Files;
 	static ConfigItem& backendConfig();
 	Audio();
@@ -144,14 +144,14 @@ public:
 };
 
 class Music {
-struct Track {
-	AudioBuffer audioBuffer;
-	double fadeLevel = 1.0;
-	double pitchFactor = 0.0;
-	template <typename... Args> Track(Args&&... args): audioBuffer(std::forward<Args>(args)...) {}
-};
+	struct Track {
+		AudioBuffer audioBuffer;
+		double fadeLevel = 1.0;
+		double pitchFactor = 0.0;
+		template <typename... Args> Track(Args&&... args): audioBuffer(std::forward<Args>(args)...) {}
+	};
 	friend class ScreenSongs;
-	public:
+  public:
 	std::unordered_map<std::string, std::unique_ptr<Track>> tracks; ///< Audio decoders
 	double srate; ///< Sample rate
 	std::int64_t m_pos = 0; ///< Current sample position
@@ -160,7 +160,7 @@ struct Track {
 	Seconds durationOf(std::int64_t samples) const { return 1.0s * samples / srate / 2.0; }
 	float* sampleStartPtr = nullptr;
 	float* sampleEndPtr = nullptr;
-public:
+  public:
 	bool suppressCenterChannel = false;
 	double fadeLevel = 0.0;
 	double fadeRate = 0.0;
