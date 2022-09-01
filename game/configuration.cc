@@ -60,15 +60,7 @@ namespace {
 		if (a) step = sconv<T>(a->get_value());
 	}
 	template <typename T> void setLimits(xmlpp::Element& e, ConfigItem& item) {
-		decltype(item.getMin()) min;
-		decltype(item.getMax()) max;
-		decltype(item.getStep()) step;
-
-		setLimits<T>(e, min, max, step);
-
-		item.setMin(min);
-		item.setMax(max);
-		item.setStep(step);
+		setLimits<T>(e, item.m_min, item.m_max, item.m_step);
 	}
 }
 
@@ -81,20 +73,20 @@ template <typename T> void ConfigItemXMLLoader::updateNumeric(ConfigItem& item, 
 	ns = elem.find("ui");
 	// Default values
 	if (mode == 0) {
-		item.setUnit({});
-		item.setMultiplier(static_cast<T>(1));
+		item.m_unit = {};
+		item.m_multiplier = static_cast<T>(1);
 	}
 	if (!ns.empty()) {
 		xmlpp::Element& e = dynamic_cast<xmlpp::Element&>(*ns[0]);
 		try {
-			item.setUnit(getAttribute(e, "unit"));
+			item.m_unit = getAttribute(e, "unit");
 		}
 		catch (...) {
 		}
 		std::string m;
 		try {
 			m = getAttribute(e, "multiplier");
-			item.setMultiplier(sconv<T>(m));
+			item.m_multiplier = sconv<T>(m);
 		}
 		catch (XMLError&) {
 		}
@@ -146,9 +138,9 @@ void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, unsigne
 						xmlpp::Element& elem2 = dynamic_cast<xmlpp::Element&>(**it2);
 						if (!getText(elem2).empty()) item.getEnum().push_back(getText(elem2));
 					}
-					item.getMin() = static_cast<unsigned short>(0);
-					item.getMax() = static_cast<unsigned short>(item.getEnum().size() - 1);
-					item.getStep() = static_cast<unsigned short>(1);
+					item.m_min = static_cast<unsigned short>(0);
+					item.m_max = static_cast<unsigned short>(item.getEnum().size() - 1);
+					item.m_step = static_cast<unsigned short>(1);
 				}
 			}
 			updateNumeric<unsigned short>(item, elem, mode);
