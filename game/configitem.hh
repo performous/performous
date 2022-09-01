@@ -63,23 +63,18 @@ class ConfigItem {
 	std::vector<std::string>& getEnum() { return m_enums; }
 	unsigned short getSelection() const { return m_sel; }
 
-	NumericValue getMin() const;
-	void setMin(NumericValue);
-	NumericValue getMax() const;
-	void setMax(NumericValue);
-	NumericValue getStep() const;
-	void setStep(NumericValue);
-	NumericValue getMultiplier() const;
-	void setMultiplier(NumericValue);
-	std::string const& getUnit() const;
-	void setUnit(std::string const&);
-
 	void setGetValueFunction(std::function<std::string(ConfigItem const&)> f) { m_getValue = f; }
 
   private:
 	void verifyType(std::string const& t) const; ///< throws std::logic_error if t != type
 	ConfigItem& incdec(int dir); ///< Increment/decrement by dir steps (must be -1 or 1)
 	bool isDefaultImpl(Value const& defaultValue) const;
+
+  public:
+	NumericValue m_step{1};
+	NumericValue m_min, m_max;
+	NumericValue m_multiplier;
+	std::string m_unit;
 
   private:
 	std::string m_keyName; ///< The config key in the schema file.
@@ -92,10 +87,6 @@ class ConfigItem {
 	Value m_defaultValue; ///< The value from config schema or system config
 	std::string m_oldValue; ///< A previous value, as output by getValue().
 	std::vector<std::string> m_enums; ///< Enum value titles
-	NumericValue m_step{1};
-	NumericValue m_min, m_max;
-	NumericValue m_multiplier;
-	std::string m_unit;
 	unsigned short m_sel = 0;
 	std::function<std::string(ConfigItem const&)> m_getValue;
 };

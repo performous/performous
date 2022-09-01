@@ -37,46 +37,6 @@ ConfigItem::ConfigItem(OptionList opts)
 : m_type("option_list"), m_value(opts) {
 }
 
-ConfigItem::NumericValue ConfigItem::getMin() const {
-	return m_min;
-}
-
-void ConfigItem::setMin(NumericValue min) {
-	m_min = min;
-}
-
-ConfigItem::NumericValue ConfigItem::getMax() const {
-	return m_max;
-}
-
-void ConfigItem::setMax(NumericValue max) {
-	m_max = max;
-}
-
-ConfigItem::NumericValue ConfigItem::getStep() const {
-	return m_step;
-}
-
-void ConfigItem::setStep(NumericValue step) {
-	m_step = step;
-}
-
-ConfigItem::NumericValue ConfigItem::getMultiplier() const {
-	return m_multiplier;
-}
-
-void ConfigItem::setMultiplier(NumericValue multiplier) {
-	m_multiplier = multiplier;
-}
-
-std::string const& ConfigItem::getUnit() const {
-	return m_unit;
-}
-
-void ConfigItem::setUnit(std::string const& unit) {
-	m_unit = unit;
-}
-
 ConfigItem& ConfigItem::incdec(int dir) {
 	if (m_type == "int") {
 		int& val = std::get<int>(m_value);
