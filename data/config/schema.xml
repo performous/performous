@@ -389,6 +389,10 @@ to save the current settings to XML.
 		<short>Suppress center channel</short>
 		<long>Suppress audio of center channel (e.g. vocals).</long>
 	</entry>
+	<entry name="audio/mute_vocals_track" type="bool" value="false">
+		<short>Mute the vocals track</short>
+		<long>Mute the vocals track if a vocals.ogg is found.</long>
+	</entry>
 
 	<!-- Paths -->
 	<entry name="paths/songs" type="string_list" hidden="false">

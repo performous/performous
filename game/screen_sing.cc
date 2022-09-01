@@ -246,7 +246,12 @@ void ScreenSing::instrumentLayout(double time) {
 			if (cs.first > 0) level = cs.second / cs.first;
 			if (m_song->music.size() <= 1) level = std::max(0.333, level);
 		}
-		m_audio.streamFade(name, level);
+		if (name == "Vocals") {
+			m_audio.streamFade(name, config["audio/mute_vocals_track"].b() ? 0.0 : 1.0);
+		}
+		else {
+			m_audio.streamFade(name, level);
+		}
 		if (pitchbend.find(locName) != pitchbend.end()) {
 			CountSum cs = pitchbend[locName];
 			level = cs.second;
@@ -393,7 +398,11 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			dispInFlash(config["audio/suppress_center_channel"]);
 		}
 		if (key == SDL_SCANCODE_S) m_audio.toggleSynth(m_song->getVocalTrack(m_selectedTrack).notes);
-		if (key == SDL_SCANCODE_V) m_audio.streamFade("vocals", event.key.keysym.mod & KMOD_SHIFT ? 1.0 : 0.0);
+		if (key == SDL_SCANCODE_V) {
+			config["audio/mute_vocals_track"].b() = !config["audio/mute_vocals_track"].b();
+			m_audio.streamFade("Vocals", config["audio/mute_vocals_track"].b() ? 0.0 : 1.0);
+			dispInFlash(config["audio/mute_vocals_track"]);
+		}
 		if (key == SDL_SCANCODE_K)  { // Toggle karaoke mode
 			if(config["game/karaoke_mode"].ui() >=2) config["game/karaoke_mode"].ui() = 0;
 			else ++config["game/karaoke_mode"];
