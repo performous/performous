@@ -2,7 +2,6 @@
 
 #include <atomic>
 
-
 /// Lock-free ring buffer. Discards oldest data on overflow (not strictly thread-safe).
 template <std::size_t SIZE> class RingBuffer {
   public:
@@ -17,7 +16,6 @@ template <std::size_t SIZE> class RingBuffer {
   private:
 	static std::size_t modulo(std::size_t idx);  ///< Modulo operation with proper rounding (handles slightly "negative" idx as well)
 
-  private:
 	constexpr static std::size_t buffersize = SIZE + 1;
 	float m_buf[buffersize];
 	// The indices of the next read/write operations. read == write implies that buffer is empty.
