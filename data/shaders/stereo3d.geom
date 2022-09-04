@@ -41,7 +41,7 @@ void main() {
 		EmitVertex();
 	}
 	EndPrimitive();
-	
+
 // Render the right eye
 	for (int i=0; i < gl_in.length(); i++) {
 		passthru(2, i);

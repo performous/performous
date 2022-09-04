@@ -19,33 +19,33 @@ namespace glutil {
 		glmath::vec3 vertNormal = glmath::vec3(0.0f);
 		glmath::vec4 vertColor = glmath::vec4(1.0f);
 	};
-	
+
 	// Uniform block structs
 	struct shaderMatrices {
 		glmath::mat4 projMatrix; // 0 --- Equals vec4[4].
 		glmath::mat4 mvMatrix; // 64 --- Equals vec4[4].
 		glmath::mat4 normalMatrix; // 128 --- Equals vec4[4], but this one should be converted to mat3 in the shader.
 		glmath::mat4 colorMatrix; // 192 --- Equals vec4[4].
-		
+
 		static GLsizeiptr size() { return sizeof(shaderMatrices); };
 		static GLintptr offset() { return 0; };
 		shaderMatrices() {};
 		shaderMatrices(const shaderMatrices&) = delete;
 		shaderMatrices& operator=(const shaderMatrices&) = delete;
 	}; // 256 bytes
-	
+
 	struct stereo3dParams {
 		float sepFactor; // 256
 		float z0; // 260
 		float s3dPadding[2] = {7.0f, 13.0f}; // 264
-		
+
 		static GLsizeiptr size() { return sizeof(stereo3dParams); };
 		static GLintptr offset() { return alignOffset(shaderMatrices::size()); };
 		stereo3dParams() {};
 		stereo3dParams(const stereo3dParams&) = delete;
 		stereo3dParams& operator=(const stereo3dParams&) = delete;
 	}; // 16 bytes
-	
+
 	struct lyricColorUniforms {
 		glmath::vec4 origFill; // 272
 		glmath::vec4 origStroke; // 288
@@ -58,7 +58,7 @@ namespace glutil {
 		lyricColorUniforms(const lyricColorUniforms&) = delete;
 		lyricColorUniforms& operator=(const lyricColorUniforms&) = delete;
 	}; // 64 bytes
-	
+
 	struct danceNoteUniforms {
 		int noteType; // 336
 		float hitAnim; // 340
@@ -124,9 +124,9 @@ namespace glutil {
 		GLsizei size() const {
 			return static_cast<int>(m_vertices.size());
 		}
-		
+
 		static GLsizei stride() { return sizeof(VertexInfo); }
-		
+
 		void clear();
 	};
 

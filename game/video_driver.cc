@@ -188,27 +188,35 @@ void Window::createShaders() {
 	}
 
 	shader("color")
-	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
+	  .addDefines("#define ENABLE_VERTEX_COLOR 1\n")
 	  .compileFile(findFile("shaders/core.vert"))
 	  .compileFile(findFile("shaders/core.frag"))
 	  .link()
 	  .bindUniformBlocks();
 	shader("texture")
 	  .addDefines("#define ENABLE_TEXTURING\n")
-	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
+	  .addDefines("#define ENABLE_VERTEX_COLOR 1\n")
 	  .compileFile(findFile("shaders/core.vert"))
 	  .compileFile(findFile("shaders/core.frag"))
 	  .link()
 	  .bindUniformBlocks();
 	shader("3dobject")
 	  .addDefines("#define ENABLE_LIGHTING\n")
+	  .addDefines("#define ENABLE_VERTEX_COLOR 1\n")
+	  .compileFile(findFile("shaders/core.vert"))
+	  .compileFile(findFile("shaders/core.frag"))
+	  .link()
+	  .bindUniformBlocks();
+	shader("3dobjkey")
+	  .addDefines("#define ENABLE_LIGHTING\n")
+	  .addDefines("#define ENABLE_VERTEX_COLOR 2\n")
 	  .compileFile(findFile("shaders/core.vert"))
 	  .compileFile(findFile("shaders/core.frag"))
 	  .link()
 	  .bindUniformBlocks();
 	shader("dancenote")
 	  .addDefines("#define ENABLE_TEXTURING\n")
-	  .addDefines("#define ENABLE_VERTEX_COLOR\n")
+	  .addDefines("#define ENABLE_VERTEX_COLOR 1\n")
 	  .compileFile(findFile("shaders/dancenote.vert"))
 	  .compileFile(findFile("shaders/core.frag"))
 	  .link()
@@ -367,7 +375,9 @@ void Window::view(unsigned num) {
 	// Set flags
 	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
 	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
+    glFrontFace(GL_CW);
+    glCullFace(GL_BACK);
+    glDisable(GL_CULL_FACE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 	if (GL_EXT_framebuffer_sRGB) glEnable(GL_FRAMEBUFFER_SRGB);

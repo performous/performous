@@ -20,11 +20,19 @@ namespace {
 	}
 }
 
+/// A material containing definitions of colors, etc
+struct Material {
+	std::string name = "";
+	glmath::vec4 color = glmath::vec4(1.f);
+	bool isColorKey = false;
+};
+
 /// A polygon containing links to required point data
 struct Face {
 	std::vector<int> vertices;
 	std::vector<int> texcoords;
 	std::vector<int> normals;
+	std::vector<Material>::const_iterator mtl;
 };
 
 /// Load a Wavefront .obj file and possibly scale it also
@@ -36,7 +44,9 @@ void Object3d::loadWavefrontObj(fs::path const& filepath, float scale) {
 	std::vector<glmath::vec3> vertices;
 	std::vector<glmath::vec3> normals;
 	std::vector<glmath::vec2> texcoords;
+	std::vector<Material> materials;
 	std::vector<Face> m_faces;
+	std::vector<Material>::const_iterator curmtl = materials.end();
 	while (getline(file, row)) {
 		++linenumber;
 		std::istringstream srow(row);
@@ -78,9 +88,54 @@ void Object3d::loadWavefrontObj(fs::path const& filepath, float scale) {
 			if (!f.vertices.empty()
 			  && (f.texcoords.empty() || (f.texcoords.size() == f.vertices.size()))
 			  && (f.normals.empty()   || (f.normals.size() == f.vertices.size()))) {
+				f.mtl = curmtl;
 				m_faces.push_back(f);
 			} else {
 				throw std::runtime_error("Invalid face in "+filepath.string()+":"+std::to_string(linenumber));
+			}
+		} else if (row.substr(0,7) == "mtllib ") { // Materials
+			std::string mtlstr;
+			srow >> tempst >> mtlstr;
+			fs::path mtlpath = findFile(mtlstr);
+			fs::ifstream mtlfile(mtlpath, std::ios::binary);
+			if (!mtlfile) throw std::runtime_error("Couldn't open object material file "+mtlpath.string());
+			int mtlnumber = 0;
+			std::string mtl;
+			while (getline(mtlfile, mtl)) {
+				++mtlnumber;
+				std::istringstream smtl(mtl);
+				if (mtl.substr(0,7) == "newmtl ") {
+					Material m;
+					smtl >> tempst >> m.name;
+					if (m.name.substr(0, 8) == "ColorKey") hasColorKey = m.isColorKey = true;
+					materials.push_back(m);
+				} else if (mtl.substr(0, 3) == "Kd ") {
+					smtl >> tempst >> x >> y >> z;
+					if (materials.empty()) throw std::runtime_error("Unexpected 'Kd' material parameter at "+mtlpath.string()+":"+std::to_string(mtlnumber));
+					// Invert color for keyed objects for handling by the shader
+					if (materials.back().isColorKey) {
+						x = -x;
+						y = -y;
+						z = -z;
+					}
+					materials.back().color = glmath::vec4(x, y, z, 1.0f);
+				} else if (mtl.substr(0, 2) == "d ") {
+					smtl >> tempst >> x;
+					if (materials.empty()) throw std::runtime_error("Unexpected 'd' material parameter at "+mtlpath.string()+":"+std::to_string(mtlnumber));
+					materials.back().color.a = x;
+				} else if (mtl.substr(0, 3) == "Tr ") {
+					smtl >> tempst >> x;
+					if (materials.empty()) throw std::runtime_error("Unexpected 'Tr' material parameter at "+mtlpath.string()+":"+std::to_string(mtlnumber));
+					materials.back().color.a = 1.0f - x;
+				}			}
+			curmtl = materials.end();
+		} else if (row.substr(0, 7) == "usemtl ") {
+			std::string mtlstr;
+			srow >> tempst >> mtlstr;
+			for (std::vector<Material>::const_iterator i = materials.begin(); i != materials.end(); ++i) {
+				if (i->name != mtlstr) continue;
+				curmtl = i;
+				break;
 			}
 		}
 	}
@@ -91,6 +146,7 @@ void Object3d::loadWavefrontObj(fs::path const& filepath, float scale) {
 		for (size_t j = 0; j < i->vertices.size(); ++j) {
 			if (hasNormals) m_va.normal(normals[static_cast<size_t>(i->normals[j])]);
 			if (hasTexCoords) m_va.texCoord(texcoords[static_cast<size_t>(i->texcoords[j])]);
+			if (i->mtl != materials.end()) m_va.color(i->mtl->color);
 			m_va.vertex(vertices[static_cast<size_t>(i->vertices[j])]);
 		}
 	}
@@ -102,7 +158,7 @@ void Object3d::load(fs::path const& filepath, fs::path const& texturepath, float
 }
 
 void Object3d::draw() {
-	UseShader us(getShader("3dobject"));
+	UseShader us(getShader(hasColorKey ? "3dobjkey" : "3dobject"));
 	if (m_texture) {
 		UseTexture tex(*m_texture);
 		m_va.draw(GL_TRIANGLES);

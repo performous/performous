@@ -48,7 +48,7 @@ void main() {
 	vertex.texCoord = vertTexCoord;
 	vertex.normal = mat3(normalMatrix) * vertNormal;
 	vertex.color = vertColor;
-	vertex.lightDir = vec3(1,0,0);	
+	vertex.lightDir = vec3(1,0,0);
 	mat4 trans = scaleMat(scale);
 
 	// Cursor arrows

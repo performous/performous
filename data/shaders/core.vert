@@ -30,4 +30,3 @@ void main() {
 	vertex.normal = normalize(mat3(normalMatrix) * vertNormal);
 	vertex.color = vertColor;
 }
-

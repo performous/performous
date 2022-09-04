@@ -16,6 +16,7 @@ class Object3d {
   private:
 	glutil::VertexArray m_va;
 	std::unique_ptr<Texture> m_texture; /// texture
+	bool hasColorKey = false; // uses color keying
 	/// load a Wavefront .obj 3d object file
 	void loadWavefrontObj(fs::path const& filepath, float scale = 1.0f);
   public:
