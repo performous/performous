@@ -28,10 +28,10 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 endif(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 
 # Add a sensible build type default and warning because empty means no optimization and no debug info.
-if(NOT CMAKE_BUILD_TYPE)
+if(NOT DEFINED CMAKE_BUILD_TYPE)
 	message("WARNING: CMAKE_BUILD_TYPE is not defined!\n         Defaulting to CMAKE_BUILD_TYPE=RelWithDebInfo. Use ccmake to set a proper value.")
 	set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
-endif(NOT CMAKE_BUILD_TYPE)
+endif(NOT DEFINED CMAKE_BUILD_TYPE)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
 	add_definitions("-DNDEBUG")
