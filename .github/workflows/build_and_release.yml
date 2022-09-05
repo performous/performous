@@ -478,7 +478,7 @@ jobs:
       - name: Download and build our dependencies using vcpkg
         uses: Lord-Kamina/vcpkg-action@master
         with:
-          pkgs: aubio boost-iostreams boost-locale boost-program-options boost-system cairo cpprestsdk ffmpeg fftw3 fmt fontconfig gdk-pixbuf gettext glibmm glm icu libepoxy librsvg libsigcpp libxml2 libxmlpp nlohmann-json openblas opencv openssl pango portaudio portmidi pthreads sdl2
+          pkgs: aubio boost-iostreams boost-locale boost-program-options boost-system cairo cpprestsdk ffmpeg fftw3 fmt fontconfig gdk-pixbuf gettext glibmm glm gtest icu libepoxy librsvg libsigcpp libxml2 libxmlpp nlohmann-json openblas opencv openssl pango portaudio portmidi pthreads sdl2
           triplet: x64-windows-release
           extra-args: --clean-after-build
           cache-key: win64-vcpkg
@@ -492,6 +492,16 @@ jobs:
           echo $PERFORMOUS_VERSION
           cmake --preset "x64-release" -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-release
           cmake --build --preset "x64-release" -DVCPKG_TARGET_TRIPLET=x64-windows-release -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+      - name: Run unittests directly called.
+        shell: powershell
+        run: |
+          cd "performous/build/x64-release/testing"
+          ./performous_test.exe --gtest_filter=UnitTest*
+      - name: Run unittests by ctest.
+        shell: powershell
+        run: |
+          cd "performous/build/x64-release"
+          ninja testing/test
       - name: Create Installer
         id: package_performous_x64
         shell: powershell
@@ -603,6 +613,16 @@ jobs:
           cd build
           "${{ env.workpath }}/msys64/mingw64/bin/cmake.exe" -G "MinGW Makefiles" .. -DCMAKE_BUILD_TYPE="Release" -DSELF_BUILT_AUBIO=ALWAYS -DENABLE_WEBSERVER=OFF -DPERFORMOUS_VERSION=${{ env.PERFORMOUS_VERSION }} -DCMAKE_VERBOSE_MAKEFILE=ON -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64"
           "${{ env.workpath }}/msys64/mingw64/bin/cmake.exe" --build ./ --verbose
+      - name: Run unittests directly called.
+        shell: msys2 {0}
+        run: |
+          cd "${{ env.workpath }}/performous/build/testing"
+          ./performous_test.exe --gtest_filter=UnitTest*
+      - name: Run unittests by ctest.
+        shell: msys2 {0}
+        run: |
+          cd "${{ env.workpath }}/performous/build"
+          "${{ env.workpath }}/msys64/mingw64/bin/mingw32-make.exe" test
       - name: Create Installer
         id: package_performous_x64
         shell: msys2 {0}
