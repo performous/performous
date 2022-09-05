@@ -608,7 +608,7 @@ jobs:
         shell: msys2 {0}
         run: |
            cd "${{ env.workpath }}/performous/build"
-           "${{ env.workpath }}/msys64/mingw64/bin/cpack.exe" -G NSIS64 x64-release -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64" -DCPACK_NSIS_EXECUTABLE="${{ env.workpath }}/msys64/mingw64/bin/makensis.exe" -DCMAKE_BUILD_TYPE="Release" --verbose
+           "${{ env.workpath }}/msys64/mingw64/bin/cpack.exe" -G NSIS64 -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64" -DCPACK_NSIS_EXECUTABLE="${{ env.workpath }}/msys64/mingw64/bin/makensis.exe" -DCMAKE_BUILD_TYPE="Release" --verbose
            powershell -command "Copy-Item \$(Get-ChildItem -Filter '*win64.exe').Name 'Performous-latest-mingw-w64.exe'"
            powershell -command "Rename-Item \$(Get-ChildItem -Filter '*win64.exe').Name -NewName 'Performous-${{ needs.determine_version.outputs.complete_version }}-mingw-w64.exe'"
            powershell -command "echo ('ARTIFACT_PATH=${{ env.workpath }}/performous/build/Performous-${{ needs.determine_version.outputs.complete_version }}-mingw-w64.exe') >> \$env:GITHUB_ENV"
@@ -641,10 +641,9 @@ jobs:
           asset_name: ${{ env.ARTIFACT_FILENAME }}
           asset_content_type: application/octet-stream
 
-      - name: Start SSH session
-        if: ${{ always() }}
-        uses: luchihoratiu/debug-via-ssh@main
-        with:
-          NGROK_AUTH_TOKEN: ${{ secrets.LK_NGROK_TOKEN }}
-          SSH_PASS: ${{ secrets.LK_SSH_PASSWORD }}
-
+#      - name: Start SSH session
+#        if: ${{ always() }}
+#        uses: luchihoratiu/debug-via-ssh@main
+#        with:
+#          NGROK_AUTH_TOKEN: ${{ secrets.LK_NGROK_TOKEN }}
+#          SSH_PASS: ${{ secrets.LK_SSH_PASSWORD }}
