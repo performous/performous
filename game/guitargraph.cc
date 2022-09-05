@@ -120,12 +120,13 @@ GuitarGraph::GuitarGraph(Audio& audio, Song const& song, input::DevicePtr dev, i
 {
 	if(m_drums) {
 		initDrums();
+		m_fretObj.load(findFile("drum_tom.obj"));
+		m_tappableObj.load(findFile("drum_cym.obj"));
 	} else {
 		initGuitar();
+		m_fretObj.load(findFile("fret.obj"));
+		m_tappableObj.load(findFile("fret_tap.obj"));
 	}
-	// Load 3D fret objects
-	m_fretObj.load(findFile("fret.obj"));
-	m_tappableObj.load(findFile("fret_tap.obj"));
 	// Score calculator (TODO a better one)
 	m_scoreText = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f());
 	m_streakText = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f());
@@ -775,7 +776,7 @@ void GuitarGraph::drawNotes(double time) {
 			Color c(0.7f, 0.7f, 0.7f);
 			if (m_drumfillHits >= drumfill_min_rate * (m_dfIt->end - m_dfIt->begin))
 				c = colorize(color(4), m_dfIt->end);
-			drawNote(4, c, m_dfIt->end - time, m_dfIt->end - time, 0.0f, false, false, 0.0, 0.0);
+			drawPad(4, c, m_dfIt->end - time, m_dfIt->end - time, false, false, 0.0);
 		}
 	}
 	if (time != time) return;  // Check that time is not NaN
@@ -826,9 +827,8 @@ void GuitarGraph::drawNotes(double time) {
 			}
 			if (glow > 0.5f && tEnd < 0.1f && chord.hitAnim[fret].get() == 0.0) chord.hitAnim[fret].setTarget(1.0);
 			// Call the actual note drawing function
-			bool tap = m_drums ? chord.fret_cymbal[fret] : chord.tappable;
-			drawNote(fret, c, tBeg, tEnd, whammy, tap, glow > 0.5f, chord.hitAnim[fret].get(),
-			  chord.releaseTimes[fret] > 0.0 ? chord.releaseTimes[fret] - time : getNaN());
+			if (m_drums) drawPad(fret, c, tBeg, tEnd, chord.fret_cymbal[fret], glow > 0.5f, chord.hitAnim[fret].get());
+			else drawNote(fret, c, tBeg, tEnd, whammy, chord.tappable, glow > 0.5f, chord.hitAnim[fret].get(), chord.releaseTimes[fret] > 0.0 ? chord.releaseTimes[fret] - time : getNaN());
 		}
 	}
 	// Mangle neck glow color as needed
@@ -986,16 +986,6 @@ void GuitarGraph::draw(double time) {
 /// The times passed are normalized to [past, future]
 void GuitarGraph::drawNote(unsigned fret, Color color, double tBeg, double tEnd, float whammy, bool tappable, bool hit, double hitAnim, double releaseTime) {
 	float x = getFretX(fret);
-	unsigned drumsKickButtonId = to_underlying(input::ButtonId::DRUMS_KICK);
-	if (m_drums && fret == drumsKickButtonId) { // Bass drum? That's easy
-		if (hit || hitAnim > 0) return;	// Hide it if it's hit
-		color.a = time2a(static_cast<float>(tBeg));
-		{
-			ColorTrans c(color);
-			drawBar(tBeg, 0.015f);
-		}
-		return;
-	}
 	// If the note is hit, limit it to cursor position
 	float yBeg = (hit || hitAnim > 0) ? std::min(time2y(0.0f), time2y(static_cast<float>(tBeg))): time2y(static_cast<float>(tBeg));
 	float yEnd = time2y(static_cast<float>(tEnd));
@@ -1061,6 +1051,36 @@ void GuitarGraph::drawNote(unsigned fret, Color color, double tBeg, double tEnd,
 		float s = static_cast<float>(1.0f - hitAnim);
 		ColorTrans c(Color(l, l, l, s));
 		m_tappableObj.draw(x, yBeg, 0.0f, s);
+	}
+}
+
+/// Draws a single drum pad
+void GuitarGraph::drawPad(unsigned fret, Color color, double tBeg, double tEnd, bool cymbal, bool hit, double hitAnim) {
+	float x = getFretX(fret);
+	unsigned drumsKickButtonId = to_underlying(input::ButtonId::DRUMS_KICK);
+	if (fret == drumsKickButtonId) { // Bass drum? That's easy
+		if (hit || hitAnim > 0) return;	// Hide it if it's hit
+		color.a = time2a(static_cast<float>(tBeg));
+		{
+			ColorTrans c(color);
+			drawBar(tBeg, 0.015f);
+		}
+		return;
+	}
+	float yBeg = (hit || hitAnim > 0) ? std::min(time2y(0.0f), time2y(static_cast<float>(tBeg))): time2y(static_cast<float>(tBeg));
+	if (hitAnim > 0.0f && tEnd <= maxTolerance) {
+		float s = static_cast<float>(1.0f - hitAnim);
+		color.a = s;
+		{
+			ColorTrans c(color);
+			(cymbal ? m_tappableObj : m_fretObj).draw(x, yBeg, 0.0f, s);
+		}
+	} else {
+		color.a = clamp(time2a(static_cast<float>(tBeg))*2.0f,0.0f,1.0f);
+		{
+			ColorTrans c(color);
+			(cymbal ? m_tappableObj : m_fretObj).draw(x, yBeg, 0.0f);
+		}
 	}
 }
 

@@ -124,6 +124,7 @@ class GuitarGraph: public InstrumentGraph {
 	void drawNotes(double time);  ///< Frets etc.
 	void drawBar(double time, float h);
 	void drawNote(unsigned fret, Color, double tBeg, double tEnd, float whammy = 0.0f, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
+	void drawPad(unsigned fret, Color, double tBeg, double tEnd, bool cymbal = false, bool hit = false, double hitAnim = 0.0);
 	void drawDrumfill(double tBeg, double tEnd);
 	void drawInfo(double time);
 	float getFretX(unsigned fret) { return (-2.0f + static_cast<float>(fret) - (m_drums ? 0.5f : 0.0f)) * (m_leftymode.b() ? -1 : 1); }
