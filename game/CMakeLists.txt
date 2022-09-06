@@ -24,9 +24,6 @@ if(WIN32)
 		file(WRITE "${TMP_LOCATION}/source.txt" "${CMAKE_SOURCE_DIR}")
 		file(WRITE "${TMP_LOCATION}/mingwroot.txt" "${CPACK_MINGW_SYSTEM_PREFIX}")
 	endif()
-	if (CMAKE_BUILD_TYPE STREQUAL "Release")
-		set (CPACK_STRIP_FILES TRUE)
-	endif()
 	string(REGEX REPLACE "\\." ";"  VERSIONING ${PROJECT_VERSION})
 	list(GET VERSIONING -1 LAST_ENTRY)
 	list(REMOVE_AT VERSIONING -1)
@@ -121,7 +118,7 @@ set(Aubio_REQUIRED_VERSION "0.4.9")
 # Find all the libs that don't require extra parameters
 
 if (MINGW)
-target_link_libraries(performous PRIVATE mingw32)
+	target_link_libraries(performous PRIVATE mingw32)
 endif()
 
 foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM Json Ced Aubio)
