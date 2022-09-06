@@ -388,10 +388,13 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 
 void ScreenSing::manageEvent(SDL_Event event) {
 	keyPressed = true;
+	// Check to see if a menu is open and bail out before changes can be made
+	if (m_score_window.get() || m_menu.isOpen()) return;
+	for (auto& i: m_instruments) if (!i->menuOpen()) return;
 	double time = m_audio.getPosition();
 	SDL_Scancode key = event.key.keysym.scancode;
-	// Ctrl combinations that can be used while performing (not when score dialog is displayed)
-	if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & Platform::shortcutModifier(false)) && !m_score_window.get()) {
+	// Ctrl combinations that can be used while performing
+	if (event.type == SDL_KEYDOWN && (event.key.keysym.mod & Platform::shortcutModifier())) {
 		if (key == SDL_SCANCODE_C) {
 			m_audio.toggleCenterChannelSuppressor();
 			++config["audio/suppress_center_channel"];
