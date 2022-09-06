@@ -26,8 +26,8 @@ namespace input {
 			// Switch modes and update m_mod only when no buttons are pressed
 			// (avoids buttons getting stuck on mode change)
 			if (m_pressed.empty()) {
-				// The mods that we consider modifiers here: only left Ctrl/Cmd and Alt
-				m_mod = sdlEv.key.keysym.mod & (Platform::shortcutModifier(false) | KMOD_LALT);
+				// The mods that we consider modifiers here: only Ctrl/Cmd and Alt
+				m_mod = sdlEv.key.keysym.mod & (Platform::shortcutModifier() | KMOD_LALT);
 				// Enable/disable keyboard instruments based on current config
 				std::string msg;
 				if (g_enableInstruments) {
@@ -129,7 +129,7 @@ namespace input {
 				if (k == SDL_SCANCODE_PAGEDOWN) return ButtonId::GENERIC_MOREDOWN;
 				if (k == SDL_SCANCODE_PAUSE) return ButtonId::GENERIC_PAUSE;
 			}
-			else if (m_mod == Platform::shortcutModifier(false)) {
+			else if (m_mod == Platform::shortcutModifier()) {
 				if (k == SDL_SCANCODE_UP) return ButtonId::GENERIC_VOLUME_UP;
 				if (k == SDL_SCANCODE_DOWN) return ButtonId::GENERIC_VOLUME_DOWN;
 				if (k == SDL_SCANCODE_P) return ButtonId::GENERIC_PAUSE;
