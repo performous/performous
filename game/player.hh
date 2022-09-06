@@ -1,7 +1,6 @@
 #pragma once
 #include "color.hh"
 #include "fs.hh"
-#include "pitch.hh"
 #include "notes.hh"
 #include "animvalue.hh"
 
@@ -11,6 +10,7 @@
 #include <utility>
 
 class Song;
+class Analyzer;
 
 /// player class
 struct Player {
@@ -45,7 +45,7 @@ struct Player {
 	/// constructor
 	Player(VocalTrack& vocal, Analyzer& analyzer, size_t frames);
 	/// prepares analyzer
-	void prepare() { m_analyzer.process(); }
+	void prepare();
 	/// updates player stats
 	void update();
 	/// calculate how well last lyrics row went

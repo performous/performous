@@ -3,7 +3,6 @@
 #include "configuration.hh"
 #include "ffmpeg.hh"
 #include "notes.hh"
-#include "pitch.hh"
 #include "libda/portaudio.hpp"
 #include "aubio/aubio.h"
 #include <cstddef>
@@ -47,6 +46,8 @@ public:
 	Seconds pos() const;
 };
 
+class Analyzer;
+
 struct Device {
 	// Init
 	const int in, out;
@@ -66,11 +67,7 @@ struct Device {
 	/// Returns true if this device is opened for output
 	bool isOutput() const { return outptr != nullptr; }
 	/// Returns true if this device is assigned to the named channel (mic color or "OUT")
-	bool isChannel(std::string const& name) const {
-		if (name == "OUT") return isOutput();
-		for (auto const& m: mics) if (m && m->getId() == name) return true;
-		return false;
-	}
+	bool isChannel(std::string const& name) const;
 };
 
 extern int getBackend();
@@ -79,7 +76,7 @@ class ConfigItem;
 /** @short High level audio playback API **/
 class Audio {
 	friend int getBackend();
-        // static because Port audio once for the whole software lifetime
+		// static because Port audio once for the whole software lifetime
 	static portaudio::Init init;
 	struct Impl;
 	std::unique_ptr<Impl> self;
@@ -152,7 +149,7 @@ struct Track {
 	double fadeLevel = 1.0;
 	double pitchFactor = 0.0;
 	template <typename... Args> Track(Args&&... args): audioBuffer(std::forward<Args>(args)...) {}
-};	
+};
 	friend class ScreenSongs;
 	public:
 	std::unordered_map<std::string, std::unique_ptr<Track>> tracks; ///< Audio decoders
@@ -178,5 +175,5 @@ public:
 	/// Prepare (seek) all tracks to current position, return true when done (nonblocking)
 	bool prepare();
 	void trackFade(std::string const& name, double fadeLevel);
-	void trackPitchBend(std::string const& name, double pitchFactor);	
+	void trackPitchBend(std::string const& name, double pitchFactor);
 };

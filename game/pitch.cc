@@ -43,16 +43,14 @@ Analyzer::Analyzer(double rate, std::string id, unsigned step):
   m_oldfreq(0.0)
 {
 	if (m_step > FFT_N) throw std::logic_error("Analyzer step is larger that FFT_N (ideally it should be less than a fourth of FFT_N).");
-	// Hamming window
-	for (size_t i=0; i < FFT_N; i++) {
-		m_window[i] = static_cast<float>(0.53836 - 0.46164 * std::cos(TAU * static_cast<double>(i) / (FFT_N - 1)));
-	}
+
+	createHammingWindow(m_window.begin(), m_window.end());
 }
 
 void Analyzer::output(float* begin, float* end, double rate) {
 	constexpr unsigned a = 2;
-	const unsigned size = m_passthrough.size();
-	const unsigned out = static_cast<unsigned>((end - begin) / 2) /* stereo */;
+	auto const size = m_passthrough.size();
+	auto const out = static_cast<unsigned>((end - begin) / 2) /* stereo */;
 	if (out == 0) return;
 	const unsigned in = static_cast<unsigned>(m_resampleFactor * (m_rate / rate) * out + 2 * a) /* lanczos kernel */ + 5 /* safety margin for rounding errors */;
 	std::vector<float> pcm(m_passthrough.capacity);
