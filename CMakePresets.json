@@ -13,6 +13,8 @@
         "BUILD_SHARED_LIBS": "ON",
         "ENABLE_WEBSERVER": "OFF",
         "SELF_BUILT_AUBIO": "ALWAYS",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/${presetName}-install",
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
         "PERFORMOUS_VERSION": "$env{PERFORMOUS_VERSION}"
       }
     },
@@ -29,7 +31,7 @@
       "name": "x64-release",
       "displayName": "x64 Release",
       "description": "Target Windows Release (64-bit).",
-      "inherits": "x64-debug",
+      "inherits": "windows-base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
       }
@@ -38,7 +40,7 @@
       "name": "x64-debinfo",
       "displayName": "x64 Release with Debug info",
       "description": "Target Windows Release with Debug info (64-bit).",
-      "inherits": "x64-debug",
+      "inherits": "x64-release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
