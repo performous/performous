@@ -5,7 +5,7 @@
 #include "libda/portaudio.hpp"
 #include "screen_songs.hh"
 #include "game.hh"
-#include "pitch.hh"
+#include "analyzer.hh"
 #include "songs.hh"
 #include "util.hh"
 
@@ -583,8 +583,8 @@ Audio::Audio() {
 	self = std::make_unique<Impl>();
 }
 
-Audio::~Audio() { 
-    close(); 
+Audio::~Audio() {
+	close();
 }
 
 ConfigItem& Audio::backendConfig() {
@@ -592,9 +592,9 @@ ConfigItem& Audio::backendConfig() {
 	return backend;
 }
 
-void Audio::restart() { 
-    close(); 
-    self = std::make_unique<Impl>(); 
+void Audio::restart() {
+	close();
+	self = std::make_unique<Impl>();
 }
 
 void Audio::close() {
@@ -736,10 +736,10 @@ void Audio::toggleCenterChannelSuppressor() {
 	}
 }
 
-std::deque<Analyzer>& Audio::analyzers() { 
-    return self->analyzers; 
+std::deque<Analyzer>& Audio::analyzers() {
+	return self->analyzers;
 }
 
-std::deque<Device>& Audio::devices() { 
-    return self->devices; 
+std::deque<Device>& Audio::devices() {
+	return self->devices;
 }
