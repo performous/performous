@@ -31,6 +31,11 @@ struct UnitTest_Analyzer : public testing::Test {
 	std::vector<float> input{std::vector<float>(8192)};
 };
 
+TEST_F(UnitTest_Analyzer, getId) {
+	EXPECT_THAT(analyzer.getId(), "id");
+	EXPECT_THAT(Analyzer(11025, "test").getId(), "test");
+}
+
 TEST_F(UnitTest_Analyzer, getTones_silence) {
 	fill({});
 
@@ -152,6 +157,16 @@ TEST_F(UnitTest_Analyzer, findTone_silence) {
 	EXPECT_THAT(result, IsNull());
 }
 
+TEST_F(UnitTest_Analyzer, findTone_32_7_C) {
+	fill({32.7});
+
+	analyzer.process();
+
+	auto const result = analyzer.findTone();
+
+	EXPECT_THAT(result, IsNull()); // 32.7 is outside used ranged
+}
+
 TEST_F(UnitTest_Analyzer, findTone_65_4_C) {
 	fill({65.4});
 
@@ -180,4 +195,14 @@ TEST_F(UnitTest_Analyzer, findTone_82_4_E) {
 	auto const& result = analyzer.findTone();
 
 	EXPECT_THAT(result, AllOf(NotNull(), Pointee(82.4)));
+}
+
+TEST_F(UnitTest_Analyzer, findTone_1760_A) {
+	fill({1760});
+
+	analyzer.process();
+
+	auto const& result = analyzer.findTone();
+
+	EXPECT_THAT(result, IsNull()); // 1760 is outside used ranged
 }
