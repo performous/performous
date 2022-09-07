@@ -1,14 +1,17 @@
 cmake_minimum_required(VERSION 3.15)
 
 set(SOURCE_FILES
+	"analyzertest.cc"
 	"colortest.cc"
 	"configitemtest.cc"
 	"fixednotegraphscalertest.cc"
 	"notegraphscalerfactorytest.cc"
+	"printer.cc"
 	"ringbuffertest.cc"
 	"utiltest.cc"
 )
 set(GAME_SOURCES
+	"../game/analyzer.cc"
 	"../game/color.cc"
 	"../game/configitem.cc"
 	"../game/dynamicnotegraphscaler.cc"
@@ -16,7 +19,7 @@ set(GAME_SOURCES
 	"../game/musicalscale.cc"
 	"../game/notes.cc"
 	"../game/notegraphscalerfactory.cc"
-	"../game/pitch.cc"
+	"../game/tone.cc"
 )
 
 set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${GAME_SOURCES})

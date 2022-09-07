@@ -1,4 +1,4 @@
-#include "pitch.hh"
+#include "analyzer.hh"
 
 #include "util.hh"
 #include "libda/fft.hpp"
@@ -10,26 +10,6 @@
 // Limit the range to avoid noise and useless computation
 static const double FFT_MINFREQ = 45.0;
 static const double FFT_MAXFREQ = 5000.0;
-
-Tone::Tone():
-  freq(0.0),
-  db(-getInf()),
-  stabledb(-getInf()),
-  age()
-{
-	for (auto& h: harmonics) h = -getInf();
-}
-
-void Tone::print() const {
-	if (age < Tone::MINAGE) return;
-	std::cout << std::fixed << std::setprecision(1) << freq << " Hz, age " << age << ", " << db << " dB:";
-	for (std::size_t i = 0; i < 8; ++i) std::cout << " " << harmonics[i];
-	std::cout << std::endl;
-}
-
-bool Tone::operator==(double f) const {
-	return std::abs(freq / f - 1.0) < 0.05;
-}
 
 Analyzer::Analyzer(double rate, std::string id, unsigned step):
   m_step(step),
@@ -227,4 +207,29 @@ void Analyzer::mergeWithOld(tones_t& tones) const {
 void Analyzer::process() {
 	// Try calculating FFT and calculate tones until no more data in input buffer
 	while (calcFFT()) calcTones();
+}
+
+Tone const* Analyzer::findTone(double minfreq, double maxfreq) const {
+	if (m_tones.empty()) {
+		m_oldfreq = 0.0;
+		return nullptr;
+	}
+	double db = std::max_element(m_tones.begin(), m_tones.end(), Tone::dbCompare)->db;
+	Tone const* best = nullptr;
+	double bestscore = 0;
+	for (tones_t::const_iterator it = m_tones.begin(); it != m_tones.end(); ++it) {
+		if (it->db < db - 20.0 || it->freq < minfreq || it->age < Tone::MINAGE)
+			continue;
+		if (it->freq > maxfreq)
+			break;
+		double score = it->db - std::max(180.0, std::abs(it->freq - 300.0)) / 10.0;
+		if (m_oldfreq != 0.0 && std::fabs(it->freq/m_oldfreq - 1.0) < 0.05)
+			score += 10.0;
+		if (best && bestscore > score)
+			break;
+		best = &*it;
+		bestscore = score;
+	}
+	m_oldfreq = (best ? best->freq : 0.0);
+	return best;
 }

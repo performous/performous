@@ -10,7 +10,7 @@
 #include "i18n.hh"
 #include "layout_singer.hh"
 #include "menu.hh"
-#include "pitch.hh"
+#include "analyzer.hh"
 #include "platform.hh"
 #include "screen_players.hh"
 #include "songparser.hh"

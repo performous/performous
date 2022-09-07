@@ -1,5 +1,5 @@
 ﻿#include "player.hh"
-#include "pitch.hh"
+#include "analyzer.hh"
 #include "song.hh"
 #include "engine.hh" // just for Engine::TIMESTEP
 
