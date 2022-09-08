@@ -612,7 +612,7 @@ jobs:
           for f in $(ls -Q ./lang/*.po); do mkdir -pv "./build/lang/$(basename $f | cut -d. -f1)/LC_MESSAGES";done
           cd build
           "${{ env.workpath }}/msys64/mingw64/bin/cmake.exe" -G "MinGW Makefiles" .. -DCMAKE_BUILD_TYPE="Release" -DSELF_BUILT_AUBIO=ALWAYS -DENABLE_WEBSERVER=OFF -DPERFORMOUS_VERSION=${{ env.PERFORMOUS_VERSION }} -DCMAKE_VERBOSE_MAKEFILE=ON -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64"
-          "${{ env.workpath }}/msys64/mingw64/bin/cmake.exe" --build ./ --verbose
+          "${{ env.workpath }}/msys64/mingw64/bin/cmake.exe" --build ./ --verbose --parallel 3
       - name: Run unittests directly called.
         shell: msys2 {0}
         run: |
