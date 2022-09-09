@@ -61,7 +61,7 @@ namespace input {
 			switch (event.hw) {
 				// Guitar on keyboard
 				case SDL_SCANCODE_BACKSPACE: button = to_underlying(ButtonId::GUITAR_WHAMMY); goto guitar_process;
-				case SDL_SCANCODE_RCTRL: case SDL_SCANCODE_RALT: button = to_underlying(ButtonId::GUITAR_GODMODE); goto guitar_process;
+				case SDL_SCANCODE_BACKSLASH: case SDL_SCANCODE_SLASH: button = to_underlying(ButtonId::GUITAR_GODMODE); goto guitar_process;
 				case SDL_SCANCODE_RSHIFT: button = to_underlying(ButtonId::GUITAR_PICK_UP); goto guitar_process;
 				case SDL_SCANCODE_RETURN: case SDL_SCANCODE_KP_ENTER: button = to_underlying(ButtonId::GUITAR_PICK_DOWN); goto guitar_process;
 				case SDL_SCANCODE_F5: case SDL_SCANCODE_5: case SDL_SCANCODE_B: button++; [[fallthrough]];
