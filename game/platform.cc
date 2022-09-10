@@ -17,7 +17,7 @@ std::uint16_t Platform::shortcutModifier(bool eitherSide) {
 
 Platform::Platform() {
 	#if (BOOST_OS_WINDOWS)
-	_putenv_s("FONTCONFIG_PATH",".\\etc\\");
+	_putenv_s("FONTCONFIG_PATH",".\\");
 	#endif
 }
 
