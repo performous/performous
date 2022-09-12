@@ -70,10 +70,17 @@ namespace da {
 	static inline int conv_to_s24_fast(sample_t s) { return static_cast<int>(s * max_s24); }
 	static inline int conv_to_s32_fast(sample_t s) { return static_cast<int>(s * max_s32); }
 
-	template <typename ValueType> class step_iterator: public std::iterator<std::random_access_iterator_tag, ValueType> {
+	template <typename ValueType> class step_iterator {
 		ValueType* m_pos;
 		std::ptrdiff_t m_step;
-	  public:
+
+	public:
+		using iterator_category = std::random_access_iterator_tag;
+		using value_type = ValueType;
+		using difference_type = ValueType;
+		using pointer = ValueType*;
+		using reference = ValueType&;
+
 		step_iterator(ValueType* pos, std::ptrdiff_t step): m_pos(pos), m_step(step) {}
 		ValueType& operator*() { return *m_pos; }
 		step_iterator operator+(std::ptrdiff_t rhs) { return step_iterator(m_pos + m_step * rhs, m_step); }
