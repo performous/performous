@@ -1,5 +1,4 @@
 #include "songs.hh"
-
 #include "configuration.hh"
 #include "database.hh"
 #include "fs.hh"
@@ -12,6 +11,9 @@
 #include "song.hh"
 #include "unicode.hh"
 
+#include <fmt/format.h>
+#include <unicode/stsearch.h>
+
 #include <algorithm>
 #include <cstddef>
 #include <cstdlib>
@@ -19,11 +21,6 @@
 #include <fstream>
 #include <regex>
 #include <stdexcept>
-
-#include <fmt/format.h>
-#include <nlohmann/json.hpp>
-#include <unicode/stsearch.h>
-
 
 Songs::Songs(Database & database, std::string const& songlist):
   m_songlist(songlist),
