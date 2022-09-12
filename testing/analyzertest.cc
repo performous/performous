@@ -3,9 +3,12 @@
 
 #include "game/analyzer.hh"
 
-struct UnitTest_Analyzer : public testing::Test {
-	float const pi2 = static_cast<float>(M_PI * 2.0);
+namespace {
+	static constexpr float pi = std::acos(-1.f);
+	static constexpr float pi2 = pi * 2.f; 
+}
 
+struct UnitTest_Analyzer : public testing::Test {
 	float makeWave(float n, float frequency) {
 		return sin(n * frequency * pi2 / 48000.f);
 	}
@@ -16,7 +19,6 @@ struct UnitTest_Analyzer : public testing::Test {
 		for(auto n = 0; n < data.size(); ++n) {
 			auto const nf = static_cast<float>(n);
 			auto s = 0.f;
-			auto i = 0;
 			for(auto const& frequency : frequencies) {
 				s += 0.25f * makeWave(nf, frequency);
 			}
