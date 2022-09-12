@@ -13,9 +13,7 @@
 static const unsigned FFT_P = 10;
 static const std::size_t FFT_N = 1 << FFT_P;
 
-/// analyzer class
- /** class to analyze input audio and transform it into useable data
- */
+ /** class to analyze input audio and transform it to frequency domain to get tone data */
 class Analyzer {
   public:
 	Analyzer(const Analyzer&) = delete;
