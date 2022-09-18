@@ -3,11 +3,6 @@
 
 #include "game/analyzer.hh"
 
-namespace {
-	static constexpr float pi = std::acos(-1.f);
-	static constexpr float pi2 = pi * 2.f; 
-}
-
 struct UnitTest_Analyzer : public testing::Test {
 	float makeWave(float n, float frequency) {
 		return sin(n * frequency * pi2 / 48000.f);
