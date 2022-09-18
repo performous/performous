@@ -353,6 +353,9 @@ void readMenuXML(xmlpp::Node* node) {
 	xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(*node);
 	MenuEntry me;
 	me.name = getAttribute(elem, "name");
+#ifndef USE_WEBSERVER
+	if (me.name.substr(0,9) == "webserver") return;
+#endif
 	me.shortDesc = getText(elem, "short");
 	me.longDesc = getText(elem, "long");
 	configMenu.push_back(me);
