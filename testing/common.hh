@@ -1,13 +1,9 @@
 #pragma once
 
-#ifdef WIN32
-#define _USE_MATH_DEFINES
-#endif
-
 #include <cmath>
 
 #ifdef WIN32
-static constexpr float pi = M_PI;
+static constexpr float pi = 3.14159265359f;
 static constexpr float pi2 = pi * 2.f;
 #else
 static constexpr float pi = std::acos(-1.f);
