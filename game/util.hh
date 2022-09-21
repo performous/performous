@@ -64,3 +64,7 @@ std::string toLower(std::string const&);
 std::string toUpper(std::string const&);
 std::string trim(std::string const&, std::locale const& = std::locale());
 std::string trim(std::string&, std::locale const& = std::locale());
+std::string trimLeft(std::string const&, std::locale const& = std::locale());
+std::string trimLeft(std::string&, std::locale const& = std::locale());
+std::string trimRight(std::string const&, std::locale const& = std::locale());
+std::string trimRight(std::string&, std::locale const& = std::locale());

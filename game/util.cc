@@ -70,3 +70,31 @@ std::string trim(std::string& s, std::locale const& locale) {
 
 	return s;
 }
+
+std::string trimLeft(std::string const& s, std::locale const& locale) {
+	auto const start = std::find_if(s.begin(), s.end(), [&locale](char c){return !std::isspace(c, locale);}) - s.begin();
+
+	return s.substr(start);
+}
+
+std::string trimLeft(std::string& s, std::locale const& locale) {
+	auto const start = std::find_if(s.begin(), s.end(), [&locale](char c){return !std::isspace(c, locale);}) - s.begin();
+
+	s = s.substr(start);
+
+	return s;
+}
+
+std::string trimRight(std::string const& s, std::locale const& locale)  {
+	auto const end = s.length() - (std::find_if(s.rbegin(), s.rend(), [&locale](char c){return !std::isspace(c, locale);}) - s.rbegin());
+
+	return s.substr(0, end);
+}
+
+std::string trimRight(std::string& s, std::locale const& locale) {
+	auto const end = s.length() - (std::find_if(s.rbegin(), s.rend(), [&locale](char c){return !std::isspace(c, locale);}) - s.rbegin());
+
+	s = s.substr(0, end);
+
+	return s;
+}

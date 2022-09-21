@@ -155,4 +155,36 @@ namespace {
 	TEST(UnitTest_Utils, trim_mid_white_spaces) {
 		EXPECT_EQ("X \n\r\tY", trim(" \n\r\tX \n\r\tY \n\r\t"));
 	}
+
+	TEST(UnitTest_Utils, trimLeft_empty) {
+		EXPECT_EQ("", trimLeft(""));
+	}
+
+	TEST(UnitTest_Utils, trimLeft_front) {
+		EXPECT_EQ("A", trimLeft(" A"));
+	}
+
+	TEST(UnitTest_Utils, trimLeft_back) {
+		EXPECT_EQ("A ", trimLeft("A "));
+	}
+
+	TEST(UnitTest_Utils, trimLeft_mid) {
+		EXPECT_EQ("A B", trimLeft("A B"));
+	}
+
+	TEST(UnitTest_Utils, trimRight_empty) {
+		EXPECT_EQ("", trimRight(""));
+	}
+
+	TEST(UnitTest_Utils, trimRight_front) {
+		EXPECT_EQ(" A", trimRight(" A"));
+	}
+
+	TEST(UnitTest_Utils, trimRight_back) {
+		EXPECT_EQ("A", trimRight("A "));
+	}
+
+	TEST(UnitTest_Utils, trimRight_mid) {
+		EXPECT_EQ("A B", trimRight("A B"));
+	}
 }

@@ -61,7 +61,7 @@ namespace {
 	bool parseComment(std::string const& str, std::string const& header, std::string& result) {
 		if (!boost::starts_with(str, header)) return false;
 		result = boost::replace_all_copy(
-		  boost::trim_left_copy(str.substr(header.size())),
+		  trimLeft(str.substr(header.size())),
 		  "&amp;", "&");
 		return true;
 	}
