@@ -41,4 +41,54 @@ namespace {
 		EXPECT_EQ("02:01:00 1970-01-01", format(time, "%H:%M:%S %Y-%m-%d", true));
 		EXPECT_EQ("02:01:00 1970-01-01", format(time, "%X %Y-%m-%d", true));
 	}
+	
+	TEST(UnitTest_Utils, toLower_empty) {
+		EXPECT_EQ("", toLower(""));
+	}
+
+	TEST(UnitTest_Utils, toLower_lower_case) {
+		EXPECT_EQ("lower", toLower("lower"));
+	}
+
+	TEST(UnitTest_Utils, toLower_upper_case) {
+		EXPECT_EQ("upper", toLower("UPPER"));
+	}
+
+	TEST(UnitTest_Utils, toLower_mixed_case) {
+		EXPECT_EQ("mixed", toLower("MiXed"));
+	}
+
+	TEST(UnitTest_Utils, toLower_digits) {
+		EXPECT_EQ("0123", toLower("0123"));
+	}
+
+	TEST(UnitTest_Utils, toLower_umlaute) {
+		// no "umlaute" support
+		EXPECT_NE("äöüäöü", toLower("äöüÄÖÜ"));
+	}
+
+	TEST(UnitTest_Utils, toUpper_empty) {
+		EXPECT_EQ("", toUpper(""));
+	}
+
+	TEST(UnitTest_Utils, toUpper_lower_case) {
+		EXPECT_EQ("LOWER", toUpper("lower"));
+	}
+
+	TEST(UnitTest_Utils, toUpper_upper_case) {
+		EXPECT_EQ("UPPER", toUpper("UPPER"));
+	}
+
+	TEST(UnitTest_Utils, toUpper_mixed_case) {
+		EXPECT_EQ("MIXED", toUpper("MiXed"));
+	}
+
+	TEST(UnitTest_Utils, toUpper_digits) {
+		EXPECT_EQ("0123", toUpper("0123"));
+	}
+
+	TEST(UnitTest_Utils, toUpper_umlaute) {
+		// no "umlaute" support
+		EXPECT_NE("äöüäöü", toUpper("äöüÄÖÜ"));
+	}
 }

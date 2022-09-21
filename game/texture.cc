@@ -5,7 +5,7 @@
 #include "screen.hh"
 #include "svg.hh"
 #include "game.hh"
-#include <boost/algorithm/string/case_conv.hpp>
+#include "util.hh"
 
 #include <atomic>
 #include <cctype>
@@ -41,12 +41,17 @@ class TextureLoader::Impl {
 	/// Load a file from disk into a buffer
 	static void load(Bitmap& bitmap, fs::path const& name) {
 		try {
-			std::string ext = boost::algorithm::to_lower_copy(name.extension().string());
-			if (!fs::is_regular_file(name)) throw std::runtime_error("File not found: " + name.string());
-			else if (ext == ".svg") loadSVG(bitmap, name);
-			else if (ext == ".jpg" || ext == ".jpeg") loadJPEG(bitmap, name);
-			else if (ext == ".png") loadPNG(bitmap, name);
-			else throw std::runtime_error("Unknown image file format: " + name.string());
+			auto const ext = toLower(name.extension().string());
+			if (!fs::is_regular_file(name))
+				throw std::runtime_error("File not found: " + name.string());
+			else if (ext == ".svg")
+				loadSVG(bitmap, name);
+			else if (ext == ".jpg" || ext == ".jpeg")
+				loadJPEG(bitmap, name);
+			else if (ext == ".png")
+				loadPNG(bitmap, name);
+			else
+				throw std::runtime_error("Unknown image file format: " + name.string());
 		} catch (std::exception& e) {
 			std::clog << "image/error: " << e.what() << std::endl;
 		}

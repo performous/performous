@@ -1,8 +1,11 @@
 #include "util.hh"
 
+#include <algorithm>
 #include <iomanip>
 #include <sstream>
 #include <stdexcept>
+
+//#include <boost/algorithm/string/case_conv.hpp>
 
 // Only conversion types used in Performous are provided
 template <> int sconv(std::string const& s) { return std::stoi(s); }
@@ -31,4 +34,23 @@ std::string format(std::chrono::seconds const& unixtime, std::string const& form
 	stream << std::put_time(utc ? std::gmtime(&time) : std::localtime(&time), format.c_str());
 
 	return stream.str();
+}
+
+
+std::string toLower(std::string const& s) {
+	//return boost::algorithm::to_lower_copy(s);
+	auto result = s;
+
+	std::for_each(result.begin(), result.end(), [](auto& c){ c = static_cast<char>(std::tolower(c));});
+
+	return result;
+}
+
+std::string toUpper(std::string const& s) {
+	//return boost::algorithm::to_upper_copy(s);
+	auto result = s;
+
+	std::for_each(result.begin(), result.end(), [](auto& c){ c = static_cast<char>(std::toupper(c));});
+
+	return result;
 }
