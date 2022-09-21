@@ -2,9 +2,9 @@
 #include "fs.hh"
 
 #include "unicode.hh"
-#include <boost/algorithm/string.hpp>
 #include <stdexcept>
 #include "midifile.hh"
+#include "util.hh"
 
 /// @file
 /// Functions used for parsing the Frets on Fire INI song format
@@ -28,9 +28,11 @@ void SongParser::iniParseHeader() {
 		if (line[0] == '[') continue; // Section header
 		std::istringstream iss(line);
 		std::string key, value;
-		if (!std::getline(iss, key, '=') || !std::getline(iss, value)) std::runtime_error("Invalid format, should be key=value");
-		boost::trim(key); key = UnicodeUtil::toLower(key);
-		boost::trim(value);
+		if (!std::getline(iss, key, '=') || !std::getline(iss, value))
+			std::runtime_error("Invalid format, should be key=value");
+		key = UnicodeUtil::toLower(trim(key));
+		value = trim(value);
+
 		// Supported tags
 		if (key == "name") s.title = value;
 		else if (key == "artist") s.artist = value;

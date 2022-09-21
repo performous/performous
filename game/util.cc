@@ -54,3 +54,19 @@ std::string toUpper(std::string const& s) {
 
 	return result;
 }
+
+std::string trim(std::string const& s, std::locale const& locale) {
+	auto const start = std::find_if(s.begin(), s.end(), [&locale](char c){return !std::isspace(c, locale);}) - s.begin();
+	auto const end = s.length() - (std::find_if(s.rbegin(), s.rend(), [&locale](char c){return !std::isspace(c, locale);}) - s.rbegin());
+
+	return s.substr(start, end - start);
+}
+
+std::string trim(std::string& s, std::locale const& locale) {
+	auto const start = std::find_if(s.begin(), s.end(), [&locale](char c){return !std::isspace(c, locale);}) - s.begin();
+	auto const end = s.length() - (std::find_if(s.rbegin(), s.rend(), [&locale](char c){return !std::isspace(c, locale);}) - s.rbegin());
+
+	s = s.substr(start, end - start);
+
+	return s;
+}

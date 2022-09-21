@@ -3,6 +3,7 @@
 #include <chrono>
 #include <cstdint>
 #include <limits>
+#include <locale>
 #include <string>
 #include <vector>
 
@@ -61,3 +62,5 @@ constexpr auto to_underlying(E e) noexcept -> std::enable_if_t<std::is_enum<E>::
 
 std::string toLower(std::string const&);
 std::string toUpper(std::string const&);
+std::string trim(std::string const&, std::locale const& = std::locale());
+std::string trim(std::string&, std::locale const& = std::locale());

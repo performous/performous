@@ -91,4 +91,68 @@ namespace {
 		// no "umlaute" support
 		EXPECT_NE("äöüäöü", toUpper("äöüÄÖÜ"));
 	}
+
+	TEST(UnitTest_Utils, trim_empty) {
+		EXPECT_EQ("", trim(""));
+	}
+
+	TEST(UnitTest_Utils, trim_one_space) {
+		EXPECT_EQ("", trim(" "));
+	}
+
+	TEST(UnitTest_Utils, trim_two_spaces) {
+		EXPECT_EQ("", trim("  "));
+	}
+
+	TEST(UnitTest_Utils, trim_white_spaces) {
+		EXPECT_EQ("", trim(" \n\r\t"));
+	}
+
+	TEST(UnitTest_Utils, trim_front_one_space) {
+		EXPECT_EQ("X", trim(" X"));
+	}
+
+	TEST(UnitTest_Utils, trim_front_two_spaces) {
+		EXPECT_EQ("X", trim("  X"));
+	}
+
+	TEST(UnitTest_Utils, trim_front_white_spaces) {
+		EXPECT_EQ("X", trim(" \n\r\tX"));
+	}
+
+	TEST(UnitTest_Utils, trim_back_one_space) {
+		EXPECT_EQ("X", trim("X "));
+	}
+
+	TEST(UnitTest_Utils, trim_back_two_spaces) {
+		EXPECT_EQ("X", trim("X  "));
+	}
+
+	TEST(UnitTest_Utils, trim_back_white_spaces) {
+		EXPECT_EQ("X", trim("X \n\r\t"));
+	}
+
+	TEST(UnitTest_Utils, trim_both_one_space) {
+		EXPECT_EQ("X", trim(" X "));
+	}
+
+	TEST(UnitTest_Utils, trim_both_two_spaces) {
+		EXPECT_EQ("X", trim("  X  "));
+	}
+
+	TEST(UnitTest_Utils, trim_both_white_spaces) {
+		EXPECT_EQ("X", trim(" \n\r\tX \n\r\t"));
+	}
+
+	TEST(UnitTest_Utils, trim_mid_one_space) {
+		EXPECT_EQ("X Y", trim(" X Y "));
+	}
+
+	TEST(UnitTest_Utils, trim_mid_two_spaces) {
+		EXPECT_EQ("X  Y", trim("  X  Y  "));
+	}
+
+	TEST(UnitTest_Utils, trim_mid_white_spaces) {
+		EXPECT_EQ("X \n\r\tY", trim(" \n\r\tX \n\r\tY \n\r\t"));
+	}
 }
