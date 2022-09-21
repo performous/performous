@@ -2,7 +2,6 @@
 #include "unicode.hh"
 #include "fs.hh"
 
-#include <boost/algorithm/string.hpp>
 #include <algorithm>
 #include <stdexcept>
 #include <map>
@@ -55,7 +54,7 @@ void SongParser::smParse() {
 }
 
 bool SongParser::smParseField(std::string line) {
-	boost::trim(line);
+	trim(line);
 	if (line.empty()) return true;
 	if (line.substr(0, 2) == "//") return true; //jump over possible comments
 	if (line[0] == ';') return true; // HACK: Skip ; left over from previous field
@@ -64,7 +63,7 @@ bool SongParser::smParseField(std::string line) {
 	//However, because of the differing format of notedata the value is analyzed only if key is not NOTES
 	std::string::size_type pos = line.find(':');
 	if (pos == std::string::npos) throw std::runtime_error("Invalid sm format, should be #key:value");
-	std::string key = boost::trim_copy(line.substr(1, pos - 1));
+	std::string key = trim(line.substr(1, pos - 1));
 	if (key == "NOTES") {
 		/*All remaining data is parsed here.
 			All five lines of note metadata is read first and then smParseNotes is called to read
@@ -74,14 +73,14 @@ bool SongParser::smParseField(std::string line) {
 
 		while (getline(line)) {
 			//<NotesType>:
-			std::string notestype = boost::trim_copy(line.substr(0, line.find_first_of(':')));
+			std::string notestype = trim(line.substr(0, line.find_first_of(':')));
 			notestype = UnicodeUtil::toLower(notestype);
 			//<Description>:
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
-			std::string description = boost::trim_copy(line.substr(0, line.find_first_of(':')));
+			std::string description = trim(line.substr(0, line.find_first_of(':')));
 			//<DifficultyClass>:
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
-			std::string difficultyclass = boost::trim_copy(line.substr(0, line.find_first_of(':')));
+			std::string difficultyclass = trim(line.substr(0, line.find_first_of(':')));
 			difficultyclass = UnicodeUtil::toUpper(difficultyclass);
 			DanceDifficulty danceDifficulty = DanceDifficulty::COUNT;
 			if(difficultyclass == "BEGINNER") danceDifficulty = DanceDifficulty::BEGINNER;
@@ -113,12 +112,12 @@ bool SongParser::smParseField(std::string line) {
 		}
 		return false;
 	}
-	std::string value = boost::trim_copy(line.substr(pos + 1));
+	std::string value = trim(line.substr(pos + 1));
 	//In case the value continues to several lines, all text before the ending character ';' is read to single line.
 	while (value[value.size() -1] != ';') {
 		std::string str;
 		if (!getline (str)) throw std::runtime_error("Invalid format, semicolon missing after value of " + key);
-		value += boost::trim_copy(str);
+		value += trim(str);
 	}
 	value = value.substr(0, value.size() - 1);	//Here the end character(';') is eliminated
 	if (value.empty()) return true;
@@ -188,7 +187,7 @@ Notes SongParser::smParseNotes(std::string line) {
 
 	while (forceMeasure || getline(line)) {
 		if (forceMeasure) { line = ";"; forceMeasure = false; }
-		boost::trim(line); // Remove whitespace
+		trim(line); // Remove whitespace
 		if (line.empty()) continue;
 		if (line.substr(0, 2) == "//") continue;  // Skip comments
 		if (line[0] == '#') break;  // HACK: This should read away the next #NOTES: line
