@@ -55,6 +55,22 @@ std::string toUpper(std::string const& s) {
 	return result;
 }
 
+std::string replace(std::string const& s, char from, char to) {
+	auto result = s;
+
+	std::replace_if(result.begin(), result.end(), [from](char c){return c == from;}, to);
+
+	return result;
+}
+
+std::string& replace(std::string& s, char from, char to) {
+	std::replace_if(s.begin(), s.end(), [from](char c){return c == from;}, to);
+
+	return s;
+}
+
+std::string& replace(std::string&);
+
 std::string trim(std::string const& s, std::locale const& locale) {
 	auto const start = std::find_if(s.begin(), s.end(), [&locale](char c){return !std::isspace(c, locale);}) - s.begin();
 	auto const end = s.length() - (std::find_if(s.rbegin(), s.rend(), [&locale](char c){return !std::isspace(c, locale);}) - s.rbegin());
@@ -62,7 +78,7 @@ std::string trim(std::string const& s, std::locale const& locale) {
 	return s.substr(start, end - start);
 }
 
-std::string trim(std::string& s, std::locale const& locale) {
+std::string& trim(std::string& s, std::locale const& locale) {
 	auto const start = std::find_if(s.begin(), s.end(), [&locale](char c){return !std::isspace(c, locale);}) - s.begin();
 	auto const end = s.length() - (std::find_if(s.rbegin(), s.rend(), [&locale](char c){return !std::isspace(c, locale);}) - s.rbegin());
 
@@ -77,7 +93,7 @@ std::string trimLeft(std::string const& s, std::locale const& locale) {
 	return s.substr(start);
 }
 
-std::string trimLeft(std::string& s, std::locale const& locale) {
+std::string& trimLeft(std::string& s, std::locale const& locale) {
 	auto const start = std::find_if(s.begin(), s.end(), [&locale](char c){return !std::isspace(c, locale);}) - s.begin();
 
 	s = s.substr(start);
@@ -91,7 +107,7 @@ std::string trimRight(std::string const& s, std::locale const& locale)  {
 	return s.substr(0, end);
 }
 
-std::string trimRight(std::string& s, std::locale const& locale) {
+std::string& trimRight(std::string& s, std::locale const& locale) {
 	auto const end = s.length() - (std::find_if(s.rbegin(), s.rend(), [&locale](char c){return !std::isspace(c, locale);}) - s.rbegin());
 
 	s = s.substr(0, end);

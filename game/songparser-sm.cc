@@ -2,7 +2,6 @@
 #include "unicode.hh"
 #include "fs.hh"
 
-#include <boost/algorithm/string.hpp>
 #include <algorithm>
 #include <stdexcept>
 #include <map>

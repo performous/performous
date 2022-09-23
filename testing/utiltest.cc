@@ -92,6 +92,14 @@ namespace {
 		EXPECT_NE("äöüäöü", toUpper("äöüÄÖÜ"));
 	}
 
+	TEST(UnitTest_Utils, replace_empty) {
+		EXPECT_EQ("", replace("", 'a', 'b'));
+	}
+
+	TEST(UnitTest_Utils, replace_one) {
+		EXPECT_EQ("bb", replace("ab", 'a', 'b'));
+	}
+
 	TEST(UnitTest_Utils, trim_empty) {
 		EXPECT_EQ("", trim(""));
 	}
