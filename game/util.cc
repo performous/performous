@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <sstream>
 #include <stdexcept>
+#include <string_view>
 
 //#include <boost/algorithm/string/case_conv.hpp>
 
@@ -55,12 +56,25 @@ std::string toUpper(std::string const& s) {
 	return result;
 }
 
+std::string erase(std::string const& s, std::string const& toErase) {
+	auto result = s;
+
+	return erase(result, toErase);
+}
+
+std::string erase(std::string& s, std::string const& toErase) {
+	if(toErase.empty())
+		return s;
+
+	for(auto position = s.find(toErase); position < s.length(); position = s.find(toErase, position))        s.erase(position, toErase.length());
+
+	return s;
+}
+
 std::string replace(std::string const& s, char from, char to) {
 	auto result = s;
 
-	std::replace_if(result.begin(), result.end(), [from](char c){return c == from;}, to);
-
-	return result;
+	return replace(result, from, to);
 }
 
 std::string& replace(std::string& s, char from, char to) {
@@ -69,7 +83,20 @@ std::string& replace(std::string& s, char from, char to) {
 	return s;
 }
 
-std::string& replace(std::string&);
+std::string replace(std::string const& s, std::string const& from, std::string const& to) {
+	auto result = s;
+
+	return replace(result, from, to);
+}
+
+std::string& replace(std::string& s, std::string const& from, std::string const& to) {
+	for(auto position = s.find(from); position < s.length(); position = s.find(from, position)) {
+		s.erase(position, from.length());
+		s.insert(position, to);
+	}
+
+	return s;
+}
 
 std::string trim(std::string const& s, std::locale const& locale) {
 	auto const start = std::find_if(s.begin(), s.end(), [&locale](char c){return !std::isspace(c, locale);}) - s.begin();
@@ -113,4 +140,8 @@ std::string& trimRight(std::string& s, std::locale const& locale) {
 	s = s.substr(0, end);
 
 	return s;
+}
+
+bool startsWith(std::string const& s, std::string const& start) {
+	return std::string_view(s).substr(0, start.length()) == start;
 }

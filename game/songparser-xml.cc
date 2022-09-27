@@ -2,7 +2,6 @@
 
 #include "util.hh"
 #include "libxml++-impl.hh"
-#include <boost/algorithm/string.hpp>
 #include <stdexcept>
 
 /// @file
@@ -41,7 +40,8 @@ struct SSDom: public xmlpp::DomParser {
 		nsmap["ss"] = get_document()->get_root_node()->get_namespace_uri();
 	}
 	bool find(xmlpp::Element const& elem, std::string xpath, xmlpp::const_NodeSet& n) {
-		if (nsmap["ss"].empty()) boost::erase_all(xpath, "ss:");
+		if (nsmap["ss"].empty())
+			erase(xpath, "ss:");
 		n = elem.find(xpath, nsmap);
 		return !n.empty();
 	}
@@ -59,10 +59,9 @@ struct SSDom: public xmlpp::DomParser {
 namespace {
 	/// Parse str (from XML comment node) for header/value and store cleaned up value in result.
 	bool parseComment(std::string const& str, std::string const& header, std::string& result) {
-		if (!boost::starts_with(str, header)) return false;
-		result = boost::replace_all_copy(
-		  trimLeft(str.substr(header.size())),
-		  "&amp;", "&");
+		if (!startsWith(str, header))
+			return false;
+		result = replace(trimLeft(str.substr(header.size())), "&amp;", "&");
 		return true;
 	}
 }
