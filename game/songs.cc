@@ -487,7 +487,7 @@ void Songs::sortChange(SortChange diff) {
 			break;
 		}
 	sort_internal();
-	writeConfig(false);
+	writeConfig(game, audio, false);
 }
 
 void Songs::sortSpecificChange(unsigned short sortOrder, bool descending) {

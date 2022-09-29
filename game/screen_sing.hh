@@ -32,7 +32,7 @@ class Webcam;
 class ScreenSing: public Screen {
   public:
 	/// constructor
-	ScreenSing(std::string const& name, Audio& audio, Database& database, Backgrounds& bgs);
+	ScreenSing(Game &game, std::string const& name, Audio& audio, Database& database, Backgrounds& bgs);
 	void enter();
 	void exit();
 	void reloadGL();

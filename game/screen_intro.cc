@@ -12,11 +12,11 @@
 
 #include <SDL_timer.h>
 
-ScreenIntro::ScreenIntro(std::string const& name, Audio& audio): Screen(name), m_audio(audio), m_first(true) {
+ScreenIntro::ScreenIntro(Game &game, std::string const& name, Audio& audio): Screen(game, name), m_audio(audio), m_first(true) {
 }
 
 void ScreenIntro::enter() {
-	Game::getSingletonPtr()->showLogo();
+	getGame().showLogo();
 
 	m_audio.playMusic(findFile("menu.ogg"), true);
 	m_selAnim = AnimValue(0.0, 10.0);
@@ -25,7 +25,7 @@ void ScreenIntro::enter() {
 	if( m_first ) {
 		std::string msg;
 		if (!m_audio.hasPlayback()) msg = _("No playback devices could be used.\n");
-		if (!msg.empty()) Game::getSingletonPtr()->dialog(msg + _("\nPlease configure some before playing."));
+		if (!msg.empty()) getGame().dialog(msg + _("\nPlease configure some before playing."));
 		m_first = false;
 	}
 	reloadGL();
@@ -70,8 +70,8 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 			m_menu.current().value->reset(modifier & KMOD_ALT);
 		}
 		else if (key == SDL_SCANCODE_S && modifier & Platform::shortcutModifier()) {
-			writeConfig(modifier & KMOD_ALT);
-			Game::getSingletonPtr()->flashMessage((modifier & KMOD_ALT)
+			writeConfig(getGame(), m_audio, modifier & KMOD_ALT);
+			getGame().flashMessage((modifier & KMOD_ALT)
 				? _("Settings saved as system defaults.") : _("Settings saved."));
 		}
 	}
@@ -203,7 +203,7 @@ void ScreenIntro::draw_webserverNotice() {
 	}
 	std::stringstream m_webserverStatusString;
 	if((webserversetting == 1 || webserversetting == 2) && m_drawNotice) {
-		std::string message = Game::getSingletonPtr()->subscribeWebserverMessages();
+		std::string message = getGame().subscribeWebserverMessages();
 		m_webserverStatusString << _("Webserver active!\n connect to this computer\nusing: ") << message;
 		theme->WebserverNotice.draw(m_webserverStatusString.str());
 	}

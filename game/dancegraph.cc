@@ -76,8 +76,8 @@ namespace {
 
 
 /// Constructor
-DanceGraph::DanceGraph(Audio& audio, Song const& song, input::DevicePtr dev):
-  InstrumentGraph(audio, song, dev),
+DanceGraph::DanceGraph(Game &game, Audio& audio, Song const& song, input::DevicePtr dev):
+  InstrumentGraph(game, audio, song, dev),
   m_level(DanceDifficulty::BEGINNER),
   m_beat(findFile("dancebeat.svg")),
   m_arrows(findFile("arrows.svg")),

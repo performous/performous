@@ -21,8 +21,11 @@ void readConfig();
 void populateBackends(const std::list<std::string>& backendList);
 void populateLanguages(const std::map<std::string, std::string>& languages);
 
+class Game;
+class Audio;
+
 /** Write modified config options to user's or system-wide config XML **/
-void writeConfig(bool system = false);
+void writeConfig(Game &game, Audio &audio, bool system = false);
 
 /// struct for entries in menu
 struct MenuEntry {

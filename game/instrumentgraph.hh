@@ -61,13 +61,14 @@ class Popup {
 const unsigned max_panels = 10; // Maximum number of arrow lines / guitar frets
 
 class Audio;
+class Game;
 class Song;
 class ThemeInstrumentMenu;
 
 class InstrumentGraph {
 public:
 	/// Constructor
-	InstrumentGraph(Audio& audio, Song const& song, input::DevicePtr dev);
+	InstrumentGraph(Game &game, Audio& audio, Song const& song, input::DevicePtr dev);
 	/// Virtual destructor
 	virtual ~InstrumentGraph();
 
@@ -88,7 +89,7 @@ public:
 	void drawMenu();
 	void toggleMenu(int forcestate = -1); // 0 = close, 1 = open, -1 = auto/toggle
 	void togglePause(int);
-	void quit(int) { Game::getSingletonPtr()->activateScreen("Songs"); }
+	void quit(int);
 	void unjoin();
 
 	// General getters
@@ -105,6 +106,7 @@ public:
 
   protected:
 	// Core stuff
+	Game& m_game;
 	Audio& m_audio;
 	Song const& m_song;
 	size_t m_stream; /// audio stream number

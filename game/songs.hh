@@ -14,6 +14,7 @@
 #include "screen.hh"
 #include <shared_mutex>
 
+class Game;
 class Song;
 class Database;
 

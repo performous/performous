@@ -100,8 +100,8 @@ void GuitarGraph::initDrums() {
 	//m_samples.push_back("drum tom2");
 }
 
-GuitarGraph::GuitarGraph(Audio& audio, Song const& song, input::DevicePtr dev, int number):
-  InstrumentGraph(audio, song, dev),
+GuitarGraph::GuitarGraph(Game &game, Audio& audio, Song const& song, input::DevicePtr dev, int number):
+  InstrumentGraph(game, audio, song, dev),
   m_tail(findFile("tail.svg")),
   m_tail_glow(findFile("tail_glow.svg")),
   m_tail_drumfill(findFile("tail_drumfill.svg")),

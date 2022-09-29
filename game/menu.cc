@@ -48,7 +48,7 @@ void Menu::select(unsigned sel) {
 	if (sel < menu_stack.back()->size()) selection_stack.back() = sel;
 }
 
-void Menu::action(int dir) {
+void Menu::action(Game &game, int dir) {
 	switch (current().type) {
 		case MenuOption::Type::OPEN_SUBMENU: {
 			if (current().options.empty()) break;
@@ -91,11 +91,10 @@ void Menu::action(int dir) {
 			break;
 		}
 		case MenuOption::Type::ACTIVATE_SCREEN: {
-			Game* gm = Game::getSingletonPtr();
 			std::string screen = current().newValue.s();
 			clear();
-			if (screen.empty()) gm->finished();
-			else gm->activateScreen(screen);
+			if (screen.empty()) game.finished();
+			else game.activateScreen(screen);
 			break;
 		}
 		case MenuOption::Type::CALLBACK_FUNCTION: {

@@ -110,7 +110,7 @@ void mainLoop(std::string const& songlist) {
 	Window window{};
 
 	Game gm(window, audio);
-	WebServer server(songs);
+	WebServer server(gm, songs);
 
 	// Load audio samples
 	gm.loading(_("Loading audio samples..."), 0.5f);
@@ -195,12 +195,12 @@ void mainLoop(std::string const& songlist) {
 			gm.controllers.process(eventTime);
 			checkEvents(gm, eventTime);
 			if (benchmarking) prof("events");
-		} catch (RUNTIME_ERROR& e) {
-			std::cerr << "ERROR: " << e.what() << std::endl;
-			gm.flashMessage(std::string("ERROR: ") + e.what());
+			} catch (RUNTIME_ERROR& e) {
+				std::cerr << "ERROR: " << e.what() << std::endl;
+				gm.flashMessage(std::string("ERROR: ") + e.what());
 		}
 	}
-	writeConfig();
+	writeConfig(gm);
 }
 
 /// Simple test utility to make mapping of joystick buttons/axes easier

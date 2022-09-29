@@ -26,7 +26,7 @@ int getBackend() {
 }
 
 
-ScreenAudioDevices::ScreenAudioDevices(std::string const& name, Audio& audio): Screen(name), m_audio(audio) {
+ScreenAudioDevices::ScreenAudioDevices(Game &game, std::string const& name, Audio& audio): Screen(game, name), m_audio(audio) {
 	m_selector = std::make_unique<Texture>(findFile("device_selector.svg"));
 	m_mic_icon = std::make_unique<Texture>(findFile("sing_pbox.svg"));
 	m_pdev_icon = std::make_unique<Texture>(findFile("icon_pdev.svg"));
@@ -62,7 +62,7 @@ void ScreenAudioDevices::enter() {
 			if (!countRow("out=", *it, countmap["out="])) { ok = false; break; }
 		}
 		if (!ok)
-			Game::getSingletonPtr()->dialog(
+			getGame().dialog(
 				_("It seems you have some manual configurations\nincompatible with this user interface.\nSaving these settings will override\nall existing audio device configuration.\nYour other options changes will be saved too."));
 	}
 	// Populate the mics vector and check open devices
@@ -76,7 +76,6 @@ void ScreenAudioDevices::enter() {
 void ScreenAudioDevices::exit() { m_theme.reset(); }
 
 void ScreenAudioDevices::manageEvent(input::NavEvent const& event) {
-	Game* gm = Game::getSingletonPtr();
 	input::NavButton nav = event.button;
 	int& chpos = m_channels[m_selected_column].pos;
 	const int posN = static_cast<int>(m_devs.size() + 1);
@@ -191,12 +190,12 @@ bool ScreenAudioDevices::save(bool skip_ui_config) {
 		}
 		config["audio/devices"].sl() = devconf;
 	}
-	writeConfig(false); // Save the new config
+	writeConfig(getGame(), m_audio, false); // Save the new config
 	m_audio.restart(); // Reload audio to take the new settings into use
 	m_audio.playMusic(findFile("menu.ogg"), true); // Start music again
 	// Check that all went well
 	bool ret = verify();
-	if (!ret) Game::getSingletonPtr()->dialog(_("Some devices failed to open!"));
+	if (!ret) getGame().dialog(_("Some devices failed to open!"));
 	// Load the new config back for UI
 	load();
 	return ret;

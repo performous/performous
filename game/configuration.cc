@@ -218,7 +218,7 @@ namespace {
 	}
 }
 
-void writeConfig(bool system) {
+void writeConfig(Game& game, bool system) {
 	xmlpp::Document doc;
 	auto nodeRoot = doc.create_root_node("performous");
 	bool dirty = false;
@@ -239,7 +239,8 @@ void writeConfig(bool system) {
 				entryNode->set_attribute("value", std::to_string(newValue));
 				std::clog << "audio/info: Audio backend changed; will now restart audio subsystem." << std::endl;
 				Audio::backendConfig().selectEnum(item.getEnumName());
-				Game::getSingletonPtr()->restartAudio();
+				audio.restart();
+				audio.playMusic(findFile("menu.ogg"), true); // Start music again
 			}
 			else { entryNode->set_attribute("value", std::to_string(oldValue)); }
 		}
