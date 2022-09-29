@@ -73,6 +73,7 @@ private:
 	std::string* commentPtr; ///< Optional pointer to dynamically changing comment
 };
 
+class Game;
 
 /// Menu for selecting difficulty etc.
 class Menu {
@@ -86,7 +87,7 @@ public:
 	/// set selection
 	void select(unsigned sel);
 	/// adjust the selected value
-	void action(int dir = 1);
+	void action(Game &game, int dir = 1);
 	/// clear items
 	void clear(bool save_root = false);
 	/// closes submenu or if in root menu, closes the whole menu

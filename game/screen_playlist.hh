@@ -28,7 +28,7 @@ class ScreenPlaylist : public Screen
 {
 public:
 	typedef std::vector< std::shared_ptr<Song> > SongList;
-	ScreenPlaylist(std::string const& name, Audio& audio, Songs& songs, Backgrounds& bgs);
+	ScreenPlaylist(Game &game, std::string const& name, Audio& audio, Songs& songs, Backgrounds& bgs);
 	void manageEvent(input::NavEvent const& event);
 	void manageEvent(SDL_Event);
 	void prepare();

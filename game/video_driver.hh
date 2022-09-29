@@ -55,12 +55,14 @@ private:
 /// Performs a GL transform for displaying background image at far distance
 glmath::mat4 farTransform();
 
+class Game;
+
 /// handles the window
 class Window {
 public:
 	Window();
 	~Window();
-	void render(std::function<void (void)> drawFunc);
+	void render(Game &game, std::function<void (void)> drawFunc);
 	/// clears window
 	void blank();
 	/// Initialize VAO and VBO.
@@ -73,21 +75,21 @@ public:
 	void resize();
 	/// take a screenshot
 	void screenshot();
-	
+
 	/// Return reference to Uniform Buffer Object.
-	static GLuint const& UBO() { return Window::m_ubo; }	
+	static GLuint const& UBO() { return Window::m_ubo; }
 	/// Return reference to Vertex Array Object.
 	GLuint const& VAO() const { return Window::m_vao; }
 	/// Return reference to Vertex Buffer Object.
 	GLuint const& VBO() const { return Window::m_vbo; }
 	/// Store value of GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT.
 	static GLint bufferOffsetAlignment;
-	
+
 	/// Construct a new shader or return an existing one by name
 	Shader& shader(std::string const& name) {
 		ShaderMap::iterator it = m_shaders.find(name);
 		if (it != m_shaders.end()) return *it->second;
-		std::pair<std::string, std::unique_ptr<Shader>> kv = std::make_pair(name, std::make_unique<Shader>(name)); 
+		std::pair<std::string, std::unique_ptr<Shader>> kv = std::make_pair(name, std::make_unique<Shader>(name));
 		return *m_shaders.insert(std::move(kv)).first->second;
 	}
 	/// Compiles and links all shaders.

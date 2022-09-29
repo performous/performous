@@ -11,7 +11,8 @@ namespace {
 //const unsigned InstrumentGraph::max_panels = 10; // Maximum number of arrow lines / guitar frets
 
 
-InstrumentGraph::InstrumentGraph(Audio& audio, Song const& song, input::DevicePtr dev):
+InstrumentGraph::InstrumentGraph(Game &game, Audio& audio, Song const& song, input::DevicePtr dev):
+  m_game(game),
   m_audio(audio), m_song(song),
   m_stream(),
   m_dev(dev),
@@ -69,6 +70,10 @@ void InstrumentGraph::doUpdates() {
 
 void InstrumentGraph::togglePause(int) {
 	m_audio.togglePause();
+}
+
+void InstrumentGraph::quit(int) {
+	m_game.activateScreen("Songs");
 }
 
 void InstrumentGraph::toggleMenu(int forcestate) {

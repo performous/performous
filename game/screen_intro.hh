@@ -14,7 +14,7 @@ class MenuOption;
 class ScreenIntro : public Screen {
   public:
 	/// constructor
-	ScreenIntro(std::string const& name, Audio& audio);
+	ScreenIntro(Game &game, std::string const& name, Audio& audio);
 	void enter();
 	void exit();
 	void reloadGL();
