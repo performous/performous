@@ -4,7 +4,8 @@
 
 #include <algorithm>
 
-ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
+ScoreWindow::ScoreWindow(Game& game, Instruments& instruments, Database& database):
+  m_game(game),
   m_database(database),
   m_pos(0.8f, 2.0f),
   m_bg(findFile("score_window.svg")),
@@ -12,7 +13,7 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
   m_score_text(findFile("score_txt.svg")),
   m_score_rank(findFile("score_rank.svg"))
 {
-	Game::getSingletonPtr()->showLogo();
+	game.showLogo();
 	m_pos.setTarget(0.0);
 	m_database.scores.clear();
 
@@ -71,25 +72,26 @@ ScoreWindow::ScoreWindow(Instruments& instruments, Database& database):
 
 void ScoreWindow::draw() {
 	using namespace glmath;
-	Transform trans(translate(vec3(0.0f, static_cast<float>(m_pos.get()), 0.0f)));
-	m_bg.draw();
+	auto& window = m_game.getWindow();
+	Transform trans(window, translate(vec3(0.0f, static_cast<float>(m_pos.get()), 0.0f)));
+	m_bg.draw(window);
 	const float spacing = 0.1f + 0.1f / static_cast<float>(m_database.scores.size());
 	unsigned i = 0;
 	for (ScoreItem const& s: m_database.scores) {
 		unsigned score = s.score;
-		ColorTrans c(s.color);
+		ColorTrans c(window, s.color);
 		float x = spacing * (0.5f + static_cast<float>(i) - 0.5f * static_cast<float>(m_database.scores.size()));
 		m_scoreBar.dimensions.fixedWidth(0.09f).middle(x).bottom(0.20f);
-		m_scoreBar.draw(static_cast<float>(score) / 10000.0f);
+		m_scoreBar.draw(window, static_cast<float>(score) / 10000.0f);
 		m_score_text.render(std::to_string(score));
 		m_score_text.dimensions().middle(x).top(0.24f).fixedHeight(0.042f);
-		m_score_text.draw();
+		m_score_text.draw(window);
 		m_score_text.render(s.track_simple);
 		m_score_text.dimensions().middle(x).top(0.20f).fixedHeight(0.042f);
-		m_score_text.draw();
+		m_score_text.draw(window);
 		++i;
 	}
-	m_score_rank.draw(m_rank);
+	m_score_rank.draw(window, m_rank);
 }
 
 bool ScoreWindow::empty() {

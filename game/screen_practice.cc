@@ -14,7 +14,7 @@ ScreenPractice::ScreenPractice(Game &game, std::string const& name, Audio& audio
 {}
 
 void ScreenPractice::enter() {
-	m_audio.playMusic(findFile("practice.ogg"));
+	m_audio.playMusic(getGame(), findFile("practice.ogg"));
 	// draw vu meters
 	for (size_t i = 0, mics = m_audio.analyzers().size(); i < mics; ++i) {
 		auto progressBarPtr = std::unique_ptr<ProgressBar>(std::make_unique<ProgressBar>(findFile("vumeter_bg.svg"), findFile("vumeter_fg.svg"), ProgressBar::Mode::VERTICAL, 0.136, 0.023));
@@ -43,7 +43,7 @@ void ScreenPractice::exit() {
 
 void ScreenPractice::manageEvent(input::NavEvent const& event) {
 	input::NavButton nav = event.button;
-	if (nav == input::NavButton::CANCEL || nav == input::NavButton::START) gm->activateScreen("Intro");
+	if (nav == input::NavButton::CANCEL || nav == input::NavButton::START) getGame().activateScreen("Intro");
 	else if (nav == input::NavButton::PAUSE) m_audio.togglePause();
 	// Process all instrument events that are available, then throw away the instruments...
 	input::DevicePtr dev = getGame().controllers.registerDevice(event.source);
@@ -60,11 +60,13 @@ void ScreenPractice::manageEvent(input::NavEvent const& event) {
 }
 
 void ScreenPractice::draw() {
-	theme->bg.draw();
+	auto& window = getGame().getWindow();
+	theme->bg.draw(window);
 	this->draw_analyzers();
 }
 
 void ScreenPractice::draw_analyzers() {
+	auto& window = getGame().getWindow();
 	theme->note.dimensions.fixedHeight(0.03f);
 	theme->sharp.dimensions.fixedHeight(0.09f);
 	auto& analyzers = m_audio.analyzers();
@@ -85,7 +87,7 @@ void ScreenPractice::draw_analyzers() {
 		// getPeak returns 0.0 when clipping, negative values when not that loud.
 		// Normalizing to [0,1], where 0 is -43 dB or less (to match the vumeter graphic)
 		m_vumeters[i]->dimensions.screenBottom().left(-0.4f + static_cast<float>(i) * 0.08f).fixedWidth(0.04f); //0.08 was originally 0.2. Now 11 in a row fits
-		m_vumeters[i]->draw(static_cast<float>(analyzer.getPeak() / 43.0 + 1.0));
+		m_vumeters[i]->draw(window, static_cast<float>(analyzer.getPeak() / 43.0 + 1.0));
 
 		if (freq != 0.0) {
 			Analyzer::tones_t tones = analyzer.getTones();
@@ -98,15 +100,16 @@ void ScreenPractice::draw_analyzers() {
 				float posYnote = static_cast<float>(-0.03 - line * 0.015);  // On treble key (C4), plus offset (lines)
 
 				theme->note.dimensions.left(posXnote).center(posYnote);
-				theme->note.draw();
+				theme->note.draw(window);
 				// Draw # for sharp notes
 				if (scale.isSharp()) {
 					theme->sharp.dimensions.right(posXnote).center(posYnote);
-					theme->sharp.draw();
+					theme->sharp.draw(window);
 				}
 			}
 		}
 	}
 	// Display note and frequency
-	if (textFreq > 0.0) theme->note_txt.draw(scale.setFreq(textFreq).getStr());
+	if (textFreq > 0.0)
+		theme->note_txt.draw(window, scale.setFreq(textFreq).getStr());
 }

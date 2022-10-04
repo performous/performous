@@ -239,10 +239,15 @@ void writeConfig(Game& game, bool system) {
 				entryNode->set_attribute("value", std::to_string(newValue));
 				std::clog << "audio/info: Audio backend changed; will now restart audio subsystem." << std::endl;
 				Audio::backendConfig().selectEnum(item.getEnumName());
+
+				auto& audio = game.getAudio();
+
 				audio.restart();
-				audio.playMusic(findFile("menu.ogg"), true); // Start music again
+				audio.playMusic(game, findFile("menu.ogg"), true); // Start music again
 			}
-			else { entryNode->set_attribute("value", std::to_string(oldValue)); }
+			else {
+				entryNode->set_attribute("value", std::to_string(oldValue));
+			}
 		}
 		else if (name == "game/language") {
 			auto currentLanguageStr = TranslationEngine::getCurrentLanguage().second;

@@ -100,17 +100,17 @@ class Audio {
 	 * @param fadeTime time to fade
 	 * @param startPos starting position
 	 */
-	void playMusic(fs::path const& filename, bool preview = false, double fadeTime = 0.5, double startPos = 0.0);
+	void playMusic(Game&, fs::path const& filename, bool preview = false, double fadeTime = 0.5, double startPos = 0.0);
 	/** Plays a list of songs **/
-	void playMusic(Files const& filenames, bool preview = false, double fadeTime = 0.5, double startPos = 0.0);
+	void playMusic(Game&, Files const& filenames, bool preview = false, double fadeTime = 0.5, double startPos = 0.0);
 	/** Loads/plays/unloads a sample **/
 	void loadSample(std::string const& streamId, fs::path const& filename);
 	void playSample(std::string const& streamId);
 	void unloadSample(std::string const& streamId);
 	/** Stops music **/
-	void stopMusic();
+	void stopMusic(Game&);
 	/** Fades music out **/
-	void fadeout(double time = 1.0);
+	void fadeout(Game&, double time = 1.0);
 	/** Get the length of the currently playing song, in seconds. **/
 	double getLength() const;
 	/**
@@ -165,7 +165,7 @@ class Music {
 	double fadeLevel = 0.0;
 	double fadeRate = 0.0;
 	using Buffer = std::vector<float>;
-	Music(Audio::Files const& files, unsigned int sr, bool preview);
+	Music(Game&, Audio::Files const& files, unsigned int sr, bool preview);
 	/// Sums the stream to output sample range, returns true if the stream still has audio left afterwards.
 	bool operator()(float* begin, float* end);
 	void seek(double time) { m_pos = static_cast<std::int64_t>(time * srate * 2.0); }
@@ -176,4 +176,7 @@ class Music {
 	bool prepare();
 	void trackFade(std::string const& name, double fadeLevel);
 	void trackPitchBend(std::string const& name, double pitchFactor);
+
+  private:
+	Game& m_game;
 };

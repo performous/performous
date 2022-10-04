@@ -12,7 +12,7 @@ class Dialog {
 	/// constructor
 	Dialog(std::string const& text);
 	/// draws dialogue
-	void draw();
+	void draw(Window&);
 
   private:
 	std::string m_text;

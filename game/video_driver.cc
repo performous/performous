@@ -289,7 +289,8 @@ void Window::updateTransforms() {
 
 void Window::render(Game &game, std::function<void (void)> drawFunc) {
 	glutil::GLErrorChecker glerror("Window::render");
-	ViewTrans trans;  // Default frustum
+	auto& window = game.getWindow();
+	ViewTrans trans(*this);  // Default frustum
 	bool stereo = config["graphic/stereo3d"].b();
 	unsigned type = config["graphic/stereo3dtype"].ui();
 
@@ -325,7 +326,7 @@ void Window::render(Game &game, std::function<void (void)> drawFunc) {
 	}
 	glerror.check("Render to FBO");
 	// Render to actual framebuffer from FBOs
-	UseTexture use(getFBO().getTexture());
+	UseTexture use(window, getFBO().getTexture());
 	view(0);  // Viewport for drawable area
 	glDisable(GL_BLEND);
 	glmath::mat4 colorMatrix = glmath::mat4(1.0f);
@@ -349,8 +350,9 @@ void Window::render(Game &game, std::function<void (void)> drawFunc) {
 				}
 			}
 		}
+		auto& window = game.getWindow();
 		// Render FBO with 1:1 pixels, properly filtered/positioned for 3d
-		ColorTrans c(colorMatrix);
+		ColorTrans c(window, colorMatrix);
 		Dimensions dim = Dimensions(getFBO().width() / getFBO().height()).fixedWidth(1.0f);
 		dim.center((num == 0 ? 0.25f : -0.25f) * dim.h());
 		if (num == 1) {
@@ -358,7 +360,7 @@ void Window::render(Game &game, std::function<void (void)> drawFunc) {
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_ONE, GL_ONE);
 		}
-		getFBO().getTexture().draw(dim, TexCoords(0.0f, 1.0f, 1.0f, 0));
+		getFBO().getTexture().draw(window, dim, TexCoords(0.0f, 1.0f, 1.0f, 0));
 	}
 }
 
@@ -443,7 +445,7 @@ void Window::setWindowPosition(const Sint32& x, const Sint32& y)
 }
 
 FBO& Window::getFBO() {
-	if (!m_fbo) m_fbo = std::make_unique<FBO>(s_width, (2 * s_height));
+	if (!m_fbo) m_fbo = std::make_unique<FBO>(*this, s_width, (2 * s_height));
 	return *m_fbo;
 }
 
@@ -526,33 +528,33 @@ void Window::screenshot() {
 	std::clog << "video/info: Screenshot taken: " << filename << " (" << img.width << "x" << img.height << ")" << std::endl;
 }
 
-ColorTrans::ColorTrans(Color const& c): m_old(g_color) {
+ColorTrans::ColorTrans(Window& window, Color const& c) : m_window(window), m_old(g_color) {
 	using namespace glmath;
 	g_color = g_color * diagonal(c.linear());
-	Game::getSingletonPtr()->window().updateColor();
+	window.updateColor();
 }
 
-LyricColorTrans::LyricColorTrans(Color const& fill, Color const& stroke, Color const& newFill, Color const& newStroke) {
+LyricColorTrans::LyricColorTrans(Window& window, Color const& fill, Color const& stroke, Color const& newFill, Color const& newStroke) : m_window(window) {
 	oldFill = fill.linear();
 	oldStroke = stroke.linear();
-	Game::getSingletonPtr()->window().updateLyricHighlight(fill.linear(), stroke.linear(), newFill.linear(), newStroke.linear());
+	window.updateLyricHighlight(fill.linear(), stroke.linear(), newFill.linear(), newStroke.linear());
 }
 
 LyricColorTrans::~LyricColorTrans() {
-	Game::getSingletonPtr()->window().updateLyricHighlight(oldFill, oldStroke);
+	m_window.updateLyricHighlight(oldFill, oldStroke);
 }
 
-ColorTrans::ColorTrans(glmath::mat4 const& mat): m_old(g_color) {
+ColorTrans::ColorTrans(Window& window, glmath::mat4 const& mat): m_window(window), m_old(g_color) {
 	g_color = g_color * mat;
-	Game::getSingletonPtr()->window().updateColor();
+	window.updateColor();
 }
 
 ColorTrans::~ColorTrans() {
 	g_color = m_old;
-	Game::getSingletonPtr()->window().updateColor();
+	m_window.updateColor();
 }
 
-ViewTrans::ViewTrans(float offsetX, float offsetY, float frac): m_old(g_projection) {
+ViewTrans::ViewTrans(Window& window, float offsetX, float offsetY, float frac) : m_window(window), m_old(g_projection) {
 	// Setup the projection matrix for 2D translates
 	using namespace glmath;
 	float h = virtH();
@@ -567,27 +569,27 @@ ViewTrans::ViewTrans(float offsetX, float offsetY, float frac): m_old(g_projecti
 	// Perspective projection + the rest of the offset in eye (world) space
 	g_projection = glm::frustum(f * x1, f * x2, f * y1, f * y2, near_, far_)
 	  * translate(vec3(offsetX - persX, offsetY - persY, -z0));
-	Game::getSingletonPtr()->window().updateTransforms();
+	window.updateTransforms();
 }
 
-ViewTrans::ViewTrans(glmath::mat4 const& m): m_old(g_projection) {
+ViewTrans::ViewTrans(Window& window, glmath::mat4 const& m) : m_window(window), m_old(g_projection) {
 	g_projection = g_projection * m;
-	Game::getSingletonPtr()->window().updateTransforms();
+	m_window.updateTransforms();
 }
 
 ViewTrans::~ViewTrans() {
 	g_projection = m_old;
-	Game::getSingletonPtr()->window().updateTransforms();
+	m_window.updateTransforms();
 }
 
-Transform::Transform(glmath::mat4 const& m): m_old(g_modelview) {
+Transform::Transform(Window& window, glmath::mat4 const& m) : m_window(window), m_old(g_modelview) {
 	g_modelview = g_modelview * m;
-	Game::getSingletonPtr()->window().updateTransforms();
+	window.updateTransforms();
 }
 
 Transform::~Transform() {
 	g_modelview = m_old;
-	Game::getSingletonPtr()->window().updateTransforms();
+	m_window.updateTransforms();
 }
 
 glmath::mat4 farTransform() {

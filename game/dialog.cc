@@ -10,7 +10,7 @@ Dialog::Dialog(std::string const& text) :
 		m_state = State::SLIDEIN;
 	}
 
-void Dialog::draw() {
+void Dialog::draw(Window& window) {
 	float verticaloffset = 1.0;
 	switch(m_state) {
 	case State::IDLE:
@@ -34,7 +34,7 @@ void Dialog::draw() {
 
 
 	m_dialog.dimensions.fixedHeight(0.15f).right(0.5f).screenTop(-0.10f + 0.11f - verticaloffset);
-	m_dialog.draw();
+	m_dialog.draw(window);
 	m_svgText.dimensions.right(0.35f).screenTop(0.08f - 0.10f + 0.11f - verticaloffset);
-	m_svgText.draw(m_text);
+	m_svgText.draw(window, m_text);
 }

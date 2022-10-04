@@ -134,14 +134,14 @@ OpenGLText::OpenGLText(TextStyle& _text, float m) {
 	m_y /= m;
 }
 
-void OpenGLText::draw() {
-	m_texture.draw();
+void OpenGLText::draw(Window& window) {
+	m_texture.draw(window);
 }
 
-void OpenGLText::draw(Dimensions &_dim, TexCoords &_tex) {
+void OpenGLText::draw(Window& window, Dimensions &_dim, TexCoords &_tex) {
 	m_texture.dimensions = _dim;
 	m_texture.tex = _tex;
-	m_texture.draw();
+	m_texture.draw(window);
 }
 
 namespace {
@@ -220,8 +220,8 @@ void SvgTxtThemeSimple::render(std::string _text) {
 	}
 }
 
-void SvgTxtThemeSimple::draw() {
-	m_opengl_text->draw();
+void SvgTxtThemeSimple::draw(Window& window) {
+	m_opengl_text->draw(window);
 }
 
 SvgTxtTheme::SvgTxtTheme(fs::path const& themeFile, float factor): m_align(), m_factor(factor) {
@@ -235,17 +235,16 @@ void SvgTxtTheme::setHighlight(fs::path const& themeFile) {
 	parseTheme(themeFile, m_text_highlight, a, b, c, d, e);
 }
 
-void SvgTxtTheme::draw(std::string _text) {
+void SvgTxtTheme::draw(Window& window, std::string _text) {
 	std::vector<TZoomText> tmp;
 	TZoomText t;
 	t.string = _text;
 	t.factor = 1.0f;
 	tmp.push_back(t);
-	draw(tmp);
+	draw(window, tmp);
 }
 
-void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool lyrics) {
-
+void SvgTxtTheme::draw(Window& window, std::vector<TZoomText>& _text, bool lyrics) {
 	std::string tmp;
 	for (auto& zt: _text) { tmp += zt.string; }
 	if (m_opengl_text.size() != _text.size() || m_cache_text != tmp) {
@@ -287,11 +286,11 @@ void SvgTxtTheme::draw(std::vector<TZoomText>& _text, bool lyrics) {
 		TexCoords tex;
 		float factor = _text[i].factor;
 		if (factor > 1.0f) {
-			LyricColorTrans lc(m_text.fill_col, m_text.stroke_col, m_text_highlight.fill_col, m_text_highlight.stroke_col);
+			LyricColorTrans lc(window, m_text.fill_col, m_text.stroke_col, m_text_highlight.fill_col, m_text_highlight.stroke_col);
 			dim.fixedWidth(dim.w() * factor);
-			m_opengl_text[i]->draw(dim, tex);
+			m_opengl_text[i]->draw(window, dim, tex);
 		}
-		else { m_opengl_text[i]->draw(dim, tex); }
+		else { m_opengl_text[i]->draw(window, dim, tex); }
 		position_x += (syllable_width / factor) * (lyrics ? 1.1f : 1.0f);
 	}
 }

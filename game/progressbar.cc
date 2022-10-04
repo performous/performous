@@ -8,11 +8,11 @@ ProgressBar::ProgressBar(fs::path const& bg, fs::path const& bar, Mode mode, flo
   m_bg(bg), m_bar(bar), m_mode(mode), m_begin(begin), m_end(end), m_sliding(sliding), dimensions(m_bg.dimensions)
 {}
 
-void ProgressBar::draw(float value) {
+void ProgressBar::draw(Window& window, float value) {
 	value = clamp(value);
 	float scale = 1.0f - m_begin - m_end;
 	float off = (1.0f - value) * scale;  // Offset for sliding mode
-	m_bg.draw(dimensions);
+	m_bg.draw(window, dimensions);
 	switch (m_mode) {
 	  case Mode::HORIZONTAL:
 		{
@@ -20,7 +20,7 @@ void ProgressBar::draw(float value) {
 			TexCoords tex;
 			if (m_sliding) { dim.move(-off * dim.w(), 0.0f); tex.x1 = m_begin + off; }
 			else { tex.x1 = m_begin; tex.x2 = tex.x1 + value * scale; }
-			m_bar.drawCropped(dim, tex);
+			m_bar.drawCropped(window, dim, tex);
 		}
 		break;
 	  case Mode::VERTICAL:
@@ -29,12 +29,12 @@ void ProgressBar::draw(float value) {
 			TexCoords tex;
 			if (m_sliding) { dim.move(0.0f, off * dim.h()); tex.y2 = 1.0f - m_begin - off; }
 			else { tex.y2 = 1.0f - m_begin; tex.y1 = tex.y2 - value * scale; }
-			m_bar.drawCropped(dim, tex);
+			m_bar.drawCropped(window, dim, tex);
 		}
 		break;
 	  case Mode::CIRCULAR:
 		{
-			UseTexture texblock(m_bar);
+			UseTexture texblock(window, m_bar);
 			throw std::logic_error("ProgressBar::draw(): CIRCULAR not implemented yet");  // TODO: Implement
 		}
 		break;

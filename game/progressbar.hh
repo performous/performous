@@ -18,7 +18,7 @@ class ProgressBar {
 	**/
 	ProgressBar(fs::path const& bg, fs::path const& bar, Mode mode = Mode::HORIZONTAL, float begin = 0.0f, float end = 0.0f, bool sliding = false);
 	/** Draw a progress bar with the given percentage [0, 1] **/
-	void draw(float value);
+	void draw(Window& window, float value);
   private:
 	Texture m_bg, m_bar;
 	Mode m_mode;

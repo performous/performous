@@ -108,25 +108,24 @@ private:
 	static bool test(float x) { return x < 0.0f || x > 1.0f; }
 };
 
-/// This function hides the ugly global vari-- I mean singleton access to ScreenManager...
-Shader& getShader(std::string const& name);
+Shader& getShader(Window&, std::string const& name);
 
 /** @short A RAII wrapper for allocating/deallocating OpenGL texture ID **/
 template <GLenum Type> class OpenGLTexture {
   public:
 	OpenGLTexture(const OpenGLTexture&) = delete;
-  	const OpenGLTexture& operator=(const OpenGLTexture&) = delete;
+	const OpenGLTexture& operator=(const OpenGLTexture&) = delete;
 	/// return Type
 	static GLenum type() { return Type; };
-	static Shader& shader() { return getShader("texture"); }
+	static Shader& shader(Window& window) { return getShader(window, "texture"); }
 	OpenGLTexture(): m_id() { glGenTextures(1, &m_id); }
 	~OpenGLTexture() { glDeleteTextures(1, &m_id); }
 	/// returns id
 	GLuint id() const { return m_id; };
 	/// draw in given dimensions, with given texture coordinates
-	void draw(Dimensions const& dim, TexCoords const& tex = TexCoords()) const;
+	void draw(Window&, Dimensions const& dim, TexCoords const& tex = TexCoords()) const;
 	/// draw a subsection of the orig dimensions, cropping by tex
-	void drawCropped(Dimensions const& orig, TexCoords const& tex) const;
+	void drawCropped(Window&, Dimensions const& orig, TexCoords const& tex) const;
   private:
 	GLuint m_id;
 };
@@ -134,21 +133,25 @@ template <GLenum Type> class OpenGLTexture {
 /** @short A RAII wrapper for binding to a texture (using it, modifying it) **/
 class UseTexture {
   public:
-  	UseTexture(const UseTexture&) = delete;
-  	const UseTexture& operator=(const UseTexture&) = delete;
+	UseTexture(const UseTexture&) = delete;
+	const UseTexture& operator=(const UseTexture&) = delete;
 	/// constructor
-	template <GLenum Type> UseTexture(OpenGLTexture<Type> const& tex):
-	  m_shader(/* hack of the year */ (glutil::GLErrorChecker("UseTexture"), glActiveTexture(GL_TEXTURE0), glBindTexture(Type, tex.id()), tex.shader())) {}
+	template <GLenum Type> UseTexture(Window& window, OpenGLTexture<Type> const& tex):
+	  m_shader(
+		  /* hack of the year */
+		  (glutil::GLErrorChecker("UseTexture"), glActiveTexture(GL_TEXTURE0),
+		  glBindTexture(Type, tex.id()), tex.shader(window))) {
+	  }
 
   private:
 	UseShader m_shader;
 };
 
-template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, TexCoords const& tex) const {
+template <GLenum Type> void OpenGLTexture<Type>::draw(Window& window, Dimensions const& dim, TexCoords const& tex) const {
 	glutil::GLErrorChecker glerror("OpenGLTexture::draw()");
 	glutil::VertexArray va;
 
-	UseTexture texture(*this);
+	UseTexture texture(window, *this);
 	glerror.check("texture");
 
 	// The texture wraps over at the edges (repeat)
@@ -165,14 +168,14 @@ template <GLenum Type> void OpenGLTexture<Type>::draw(Dimensions const& dim, Tex
 	va.draw();
 }
 
-template <GLenum Type> void OpenGLTexture<Type>::drawCropped(Dimensions const& orig, TexCoords const& tex) const {
+template <GLenum Type> void OpenGLTexture<Type>::drawCropped(Window& window, Dimensions const& orig, TexCoords const& tex) const {
 	Dimensions dim(
 	  orig.x1() + tex.x1 * orig.w(),
 	  orig.y1() + tex.y1 * orig.h(),
 	  orig.w() * (tex.x2 - tex.x1),
 	  orig.h() * (tex.y2 - tex.y1)
 	);
-	draw(dim, tex);
+	draw(window, dim, tex);
 }
 
 void updateTextures();
@@ -193,11 +196,11 @@ public:
 	~Texture();
 	bool empty() const { return m_width * m_height == 0; } ///< Test if the loading has failed
 	/// draws texture
-	void draw() const;
+	void draw(Window&) const;
 	using OpenGLTexture<GL_TEXTURE_2D>::draw;
 	/// loads texture into buffer
 	void load(Bitmap const& bitmap, bool isText = false);
-	Shader& shader() { return m_texture.shader(); }
+	Shader& shader(Window& window) { return m_texture.shader(window); }
 	float width() const { return m_width; }
 	float height() const { return m_height; }
 private:

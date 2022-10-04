@@ -201,7 +201,7 @@ void RequestHandler::Post(web::http::http_request request)
         try {
             unsigned songIdToMove = jsonPostBody["songId"].as_number().to_uint32();
             unsigned positionToMoveTo = jsonPostBody["position"].as_number().to_uint32();
-            unsigned sizeOfPlaylist = static_cast<unsigned>(gm->getCurrentPlayList().getList().size());
+			unsigned sizeOfPlaylist = static_cast<unsigned>(m_game.getCurrentPlayList().getList().size());
             if(songIdToMove > sizeOfPlaylist - 1) {
                 request.reply(web::http::status_codes::BadRequest, "Not gonna move the unknown song you've provided \"" + std::to_string(songIdToMove + 1) + "\". Please make a valid request.");
                 return;

@@ -10,9 +10,8 @@
 #include <stdexcept>
 #include <cstdlib>
 
-Game::Game(Window& _window):
-  m_window(_window), m_finished(false), newScreen(), currentScreen(), currentPlaylist(),
-  m_timeToFadeIn(), m_timeToFadeOut(), m_timeToShow(), m_message(),
+Game::Game(Window& window):
+  m_window(window),
   m_messagePopup(0.0, 1.0), m_textMessage(findFile("message_text.svg"), config["graphic/text_lod"].f()),
   m_loadingProgress(0.0f), m_logo(findFile("logo.svg")), m_logoAnim(0.0, 0.5)
 {
@@ -68,8 +67,8 @@ void Game::drawLoading() {
 	const float spacing = 0.01f;
 	const float sq_size = (2*x - (maxi-1)*spacing) / maxi;
 	for (float f = 0.0f; f <= m_loadingProgress * maxi; ++f) {
-		ColorTrans c(Color(0.2f, 0.7f, 0.7f, (m_loadingProgress + 1.0f)*0.5f));
-		UseShader shader(getShader("color"));
+		ColorTrans c(m_window, Color(0.2f, 0.7f, 0.7f, (m_loadingProgress + 1.0f)*0.5f));
+		UseShader shader(getShader(m_window, "color"));
 		float cx = -x + f * (sq_size + spacing);
 		float cy = 0;
 		float r = sq_size/2;
@@ -112,7 +111,7 @@ bool Game::closeDialog() {
 
 void Game::drawLogo() {
 	m_logo.dimensions.fixedHeight(0.1f).left(-0.45f).screenTop(-0.1f + 0.11f * static_cast<float>(smoothstep(m_logoAnim.get())));
-	m_logo.draw();
+	m_logo.draw(m_window);
 }
 
 void Game::drawNotifications() {
@@ -129,12 +128,12 @@ void Game::drawNotifications() {
 			if (time >= m_messagePopup.getTarget()) m_messagePopup.setTarget(0.0, true); // Reset if fade out finished
 		}
 
-		ColorTrans c(Color::alpha(fadeValue));
-		m_textMessage.draw(m_message); // Draw the message
+		ColorTrans c(m_window, Color::alpha(fadeValue));
+		m_textMessage.draw(m_window, m_message); // Draw the message
 	}
 	// Dialog
 	if (m_dialog) {
-		m_dialog->draw();
+		m_dialog->draw(m_window);
 		if(m_dialogTimeOut.get() == 0) closeDialog();
 	}
 }

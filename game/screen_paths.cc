@@ -8,7 +8,9 @@
 #include "i18n.hh"
 #include "game.hh"
 
-ScreenPaths::ScreenPaths(Game &game, std::string const& name, Audio& audio, Songs& songs): Screen(game, name), m_audio(audio), m_songs(songs) {}
+ScreenPaths::ScreenPaths(Game &game, std::string const& name, Audio& audio, Songs& songs)
+: Screen(game, name), m_audio(audio), m_songs(songs) {
+}
 
 void ScreenPaths::enter() {
 	m_theme = std::make_unique<ThemeAudioDevices>();
@@ -31,7 +33,7 @@ void ScreenPaths::manageEvent(SDL_Event event) {
 			// TODO: Save
 		}
 		else if (key == SDL_SCANCODE_S && modifier & Platform::shortcutModifier()) {
-			writeConfig(getGame(), m_audio, modifier & KMOD_ALT);
+			writeConfig(getGame(), modifier & KMOD_ALT);
 			getGame().flashMessage((modifier & KMOD_ALT)
 				? _("Settings saved as system defaults.") : _("Settings saved."));
 		}
@@ -47,7 +49,7 @@ void ScreenPaths::manageEvent(input::NavEvent const& ev) {
 	else if (ev.button == input::NavButton::MOREDOWN) m_menu.move(5); //five down (page-dwon-key)
 	else if (ev.button == input::NavButton::UP) m_menu.move(-1); //one up
 	else if (ev.button == input::NavButton::MOREUP) m_menu.move(-5); //five up (page up key)
-	else if (ev.button == input::NavButton::START) m_menu.action(); //enter: execute currently selected option.
+	else if (ev.button == input::NavButton::START) m_menu.action(getGame()); //enter: execute currently selected option.
 }
 
 void ScreenPaths::generateMenuFromPath(fs::path path) {
@@ -124,8 +126,9 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 
 
 void ScreenPaths::draw() {
+	auto& window = getGame().getWindow();
 
-	m_theme->bg.draw();
+	m_theme->bg.draw(window);
 
 	//draw menu:
 	{
@@ -145,25 +148,25 @@ void ScreenPaths::draw() {
 				double selanim = m_selAnim.get() - start_i;
 				if (selanim < 0.0) { selanim = 0.0; }
 				m_theme->back_h.dimensions.left(x - sel_margin).center(static_cast<float>(start_y + selanim*0.08f));
-				m_theme->back_h.draw();
+				m_theme->back_h.draw(window);
 				// Draw the text, dim if option not available
 				{
-					ColorTrans c(Color::alpha(opt.isActive() ? 1.0f : 0.5f));
+					ColorTrans c(window, Color::alpha(opt.isActive() ? 1.0f : 0.5f));
 					m_theme->device.dimensions.left(x).center(start_y + static_cast<float>(ii)*0.03f);
-					m_theme->device.draw(opt.getName());
+					m_theme->device.draw(window, opt.getName());
 				} // to make the colortrans object go out of scope
 				wcounter = std::max(wcounter, m_theme->device.w() + 2.0f * sel_margin); // Calculate the widest entry
 				// If this is a config item, show the value below
 			} else {
-				ColorTrans c(Color::alpha(opt.isActive() ? 0.8f : 0.5f));
+				ColorTrans c(window, Color::alpha(opt.isActive() ? 0.8f : 0.5f));
 				m_theme->device.dimensions.left(x).center(start_y + static_cast<float>(ii)*0.03f);
-				m_theme->device.draw(opt.getName());
+				m_theme->device.draw(window, opt.getName());
 			}
 		}
 	} //draw menu
 	m_theme->comment_bg.dimensions.center().screenBottom(-0.01f);
-	m_theme->comment_bg.draw();
+	m_theme->comment_bg.draw(window);
 	m_theme->comment.dimensions.left(-0.48f).screenBottom(-0.028f);
-	m_theme->comment.draw(m_menu.current().getComment());
+	m_theme->comment.draw(window, m_menu.current().getComment());
 
 }

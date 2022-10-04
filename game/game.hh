@@ -3,7 +3,6 @@
 #include <memory>
 #include <string>
 
-#include "singleton.hh"
 #include "animvalue.hh"
 #include "opengl_text.hh"
 #include "video_driver.hh"
@@ -14,20 +13,13 @@
 #include "screen.hh"
 #include "i18n.hh"
 
-/// Manager for screens and Playlist
-/** manages screens
- * @see Singleton
- */
-class Game: public Singleton <Game> {
+class Game {
   public:
-	/// constructor
 	Game(Window& window);
 	~Game();
 	/// Adds a screen to the manager
 	void addScreen(std::unique_ptr<Screen> s) {
-		std::string screenName = s.get()->getName();
-		std::pair<std::string, std::unique_ptr<Screen>> kv = std::make_pair(screenName, std::move(s));
-		screens.insert(std::move(kv));
+		screens.insert(std::make_pair(s->getName(), std::move(s)));
 	}
 	/// Switches active screen
 	void activateScreen(std::string const& name);
@@ -78,14 +70,18 @@ class Game: public Singleton <Game> {
 	std::string subscribeWebserverMessages() { return m_webserverMessage; }
 #endif
 
+	Window& getWindow() { return m_window; }
+	Audio& getAudio() { return m_audio; }
+
 private:
 	Window& m_window;
+	Audio m_audio;
 
 public:
 	input::Controllers controllers;
 
 private:
-	bool m_finished;
+	bool m_finished = false;
 	typedef std::map<std::string, std::unique_ptr<Screen>> screenmap_t;
 	screenmap_t screens;
 	Screen* newScreen;

@@ -33,7 +33,7 @@ void ScreenPlayers::enter() {
 	m_emptyCover = std::make_unique<Texture>(findFile("no_player_image.svg"));
 	m_search.text.clear();
 	m_players.setFilter(m_search.text);
-	m_audio.fadeout();
+	m_audio.fadeout(getGame());
 	m_quitTimer.setValue(config["game/highscore_timeout"].ui());
 	if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
 		getGame().activateScreen("Playlist");
@@ -116,12 +116,13 @@ Texture* ScreenPlayers::loadTextureFromMap(fs::path path) {
 }
 
 void ScreenPlayers::draw() {
+	auto& window = getGame().getWindow();
 	m_players.update(); // Poll for new players
 	double length = m_audio.getLength();
 	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
-	if (m_songbg.get()) m_songbg->draw();
-	if (m_video.get()) m_video->render(time);
-	theme->bg.draw();
+	if (m_songbg.get()) m_songbg->draw(window);
+	if (m_video.get()) m_video->render(window, time);
+	theme->bg.draw(window);
 	std::string music, songbg, video;
 	double videoGap = 0.0;
 	std::ostringstream oss_song, oss_order;
@@ -162,12 +163,12 @@ void ScreenPlayers::draw() {
 			float diff = (i == 0 ? static_cast<float>((0.5 - fabs(shift)) * 0.07) : 0.0f);
 			float y = 0.27f + 0.5f * diff;
 			// Draw the cover
-			s.dimensions.middle(static_cast<float>(-0.2f + 0.17f * (i - shift))).bottom(y - 0.2f * diff).fitInside(0.14f + diff, 0.14f + diff); s.draw();
+			s.dimensions.middle(static_cast<float>(-0.2f + 0.17f * (i - shift))).bottom(y - 0.2f * diff).fitInside(0.14f + diff, 0.14f + diff); s.draw(window);
 			// Draw the reflection
 			s.dimensions.top(y + 0.2f * diff); s.tex = TexCoords(0, 1, 1, 0);
 			{
-				ColorTrans c(Color::alpha(0.4f));
-				s.draw();
+				ColorTrans c(window, Color::alpha(0.4f));
+				s.draw(window);
 			}
 			s.tex = TexCoords();
 		}
@@ -179,8 +180,8 @@ void ScreenPlayers::draw() {
 	}
 
 	// Draw song and order texts
-	theme->song.draw(oss_song.str());
-	theme->order.draw(oss_order.str());
+	theme->song.draw(window, oss_song.str());
+	theme->order.draw(window, oss_order.str());
 
 	// Schedule playback change if the chosen song has changed
 	if (music != m_playReq) { m_playReq = music; m_playTimer.setValue(0.0); }
@@ -188,10 +189,13 @@ void ScreenPlayers::draw() {
 	// Play/stop preview playback (if it is the time)
 	if (music != m_playing && m_playTimer.get() > 0.4) {
 		m_songbg.reset(); m_video.reset();
-		if (music.empty()) m_audio.fadeout(1.0); else m_audio.playMusic(music, true, 2.0);
+		if (music.empty())
+			m_audio.fadeout(getGame(), 1.0f);
+		else
+			m_audio.playMusic(getGame(), music, true, 2.0);
 		if (!songbg.empty()) try { m_songbg = std::make_unique<Texture>(songbg); } catch (std::exception const&) {}
 		if (!video.empty() && config["graphic/video"].b()) m_video = std::make_unique<Video>(video, videoGap);
 		m_playing = music;
 	}
-	m_layout_singer->drawScore(LayoutSinger::PositionMode::TOP);
+	m_layout_singer->drawScore(window, LayoutSinger::PositionMode::TOP);
 }

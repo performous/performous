@@ -5,15 +5,15 @@
 #include <deque>
 #include <future>
 #include <string>
-   
-/// class for playing videos  
+
+/// class for playing videos
 class Video {
   public:
 	/// opens given video file
 	Video(fs::path const& videoFile, double videoGap = 0.0);
 	~Video();
 	void prepare(double time);  ///< Load the current video frame into a texture
-	void render(double time);  ///< Render the prepared video frame
+	void render(Window&, double time);  ///< Render the prepared video frame
 	/// returns Dimensions of video clip
 	Dimensions const& dimensions() const { return m_texture.dimensions; }
 

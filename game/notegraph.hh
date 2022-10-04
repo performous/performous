@@ -7,6 +7,7 @@
 
 class Song;
 class Database;
+class Window;
 
 /// handles drawing of notes and waves
 class NoteGraph {
@@ -20,14 +21,16 @@ class NoteGraph {
 	 * @param time at which time to draw
 	 * @param players reference to the list of singing Players
 	 */
-	void draw(double time, Database const& database, Position position = NoteGraph::Position::FULLSCREEN);
+	void draw(Window&, double time, Database const& database, Position position = NoteGraph::Position::FULLSCREEN);
+
   private:
 	/// draw notebars
-	void drawNotes();
+	void drawNotes(Window&);
 	/// draw waves (what players are singing)
-	void drawWaves(Database const& database);
- 	float barHeight();
- 	float waveThickness();
+	void drawWaves(Window&, Database const& database);
+	float barHeight();
+	float waveThickness();
+
 	VocalTrack const& m_vocal;
 	Texture m_notelines;
 	Texture m_wave;

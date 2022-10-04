@@ -84,7 +84,8 @@ void InstrumentGraph::toggleMenu(int forcestate) {
 
 
 void InstrumentGraph::drawMenu() {
-	ViewTrans view(static_cast<float>(m_cx.get()), 0.0f, 0.75f);  // Apply a per-player local perspective
+	auto& window = m_game.getWindow();
+	ViewTrans view(window, static_cast<float>(m_cx.get()), 0.0f, 0.75f);  // Apply a per-player local perspective
 	if (m_menu.empty()) return;
 	Dimensions dimensions(1.0f); // FIXME: bogus aspect ratio (is this fixable?)
 	if (getGraphType() == input::DevType::DANCEPAD) dimensions.screenTop().middle().stretch(static_cast<float>(m_width.get()), 1.0);
@@ -98,7 +99,7 @@ void InstrumentGraph::drawMenu() {
 	const auto cur = &m_menu.current();
 	float w = m_menu.dimensions.w();
 	const float s = static_cast<float>(std::min(m_width.get(), 0.5) / w);
-	Transform trans(glmath::scale(s));  // Fit better menu on screen
+	Transform trans(window, glmath::scale(s));  // Fit better menu on screen
 	// We need to multiply offset by inverse scale factor to keep it always constant
 	// All these vars are ultimately affected by the scaling matrix
 	const float txth = th.option_selected.h();
@@ -111,7 +112,7 @@ void InstrumentGraph::drawMenu() {
 	float xx = w*.5f - step - button_margin;
 	// Background
 	th.bg.dimensions.middle().center().stretch(w, h);
-	th.bg.draw();
+	th.bg.draw(window);
 	// Loop through menu items
 	w = 0;
 	unsigned i = 0;
@@ -133,18 +134,18 @@ void InstrumentGraph::drawMenu() {
 				m_arrow_left.dimensions.middle(x - button_margin).center(y);
 				m_arrow_right.dimensions.middle(xx + button_margin).center(y);
 			}
-			m_arrow_left.draw();
-			m_arrow_right.draw();
+			m_arrow_left.draw(window);
+			m_arrow_right.draw(window);
 
 			// Up/down icons
 			if (getGraphType() != input::DevType::GUITAR) {
 				if (i > 0) { // Up
 					m_arrow_up.dimensions.middle(x - button_margin).center(y - step);
-					m_arrow_up.draw();
+					m_arrow_up.draw(window);
 				}
 				if (i < m_menu.getOptions().size()-1) { // Down
 					m_arrow_down.dimensions.middle(x - button_margin).center(y + step);
-					m_arrow_down.draw();
+					m_arrow_down.draw(window);
 				}
 			}
 
@@ -156,32 +157,32 @@ void InstrumentGraph::drawMenu() {
 					std::string hintletter = (getGraphType() == input::DevType::GUITAR ? (m_leftymode.b() ? "Z" : "1") : "U");
 					SvgTxtTheme& hintfont = th.getCachedOption(hintletter);
 					hintfont.dimensions.left(leftx).center(y);
-					hintfont.draw(hintletter);
+					hintfont.draw(window, hintletter);
 				}{
 					std::string hintletter = (getGraphType() == input::DevType::GUITAR ? (m_leftymode.b() ? "X" : "2") : "P");
 					SvgTxtTheme& hintfont = th.getCachedOption(hintletter);
 					hintfont.dimensions.right(rightx).center(y);
-					hintfont.draw(hintletter);
+					hintfont.draw(window, hintletter);
 				}
 				// Only drums has up/down
 				if (getGraphType() == input::DevType::DRUMS) {
 					if (i > 0) {  // Up
 						SvgTxtTheme& hintfont = th.getCachedOption("I");
 						hintfont.dimensions.left(leftx).center(y - step);
-						hintfont.draw("I");
+						hintfont.draw(window, "I");
 					}
 					if (i < m_menu.getOptions().size()-1) {  // Down
 						SvgTxtTheme& hintfont = th.getCachedOption("O");
 						hintfont.dimensions.left(leftx).center(y + step);
-						hintfont.draw("O");
+						hintfont.draw(window, "O");
 					}
 				}
 			}
 		}
 		// Finally we are at the actual menu item text drawing
-		ColorTrans c(Color::alpha(it->isActive() ? 1.0f : 0.5f));
+		ColorTrans c(window, Color::alpha(it->isActive() ? 1.0f : 0.5f));
 		txt->dimensions.middle(x).center(y);
-		txt->draw(menutext);
+		txt->draw(window, menutext);
 		w = std::max(w, txt->w() + 2 * step + button_margin * 2); // Calculate the widest entry
 		y += step; // Move draw position down for the next option
 	}
@@ -190,20 +191,21 @@ void InstrumentGraph::drawMenu() {
 		//th.comment_bg.dimensions.middle().screenBottom(-0.2);
 		//th.comment_bg.draw();
 		th.comment.dimensions.middle().screenBottom(-0.12f);
-		th.comment.draw(cur->getComment());
+		th.comment.draw(window, cur->getComment());
 	}
 	// Save the calculated menu dimensions
 	m_menu.dimensions.stretch(w, h);
 }
 
-
 void InstrumentGraph::drawPopups() {
 	for (auto it = m_popups.begin(); it != m_popups.end(); ) {
-		if (!it->draw()) { it = m_popups.erase(it); continue; }
+		if (!it->draw(m_game.getWindow())) {
+			it = m_popups.erase(it);
+			continue;
+		}
 		++it;
 	}
 }
-
 
 void InstrumentGraph::handleCountdown(double time, double beginTime) {
 	if (!dead() && time < beginTime && time >= beginTime - m_countdown - 1) {
@@ -213,7 +215,6 @@ void InstrumentGraph::handleCountdown(double time, double beginTime) {
 		  --m_countdown;
 	}
 }
-
 
 Color const& InstrumentGraph::color(unsigned fret) const {
 	static Color fretColors[5] = {
@@ -230,7 +231,6 @@ Color const& InstrumentGraph::color(unsigned fret) const {
 	}
 	return fretColors[static_cast<size_t>(fret)];
 }
-
 
 void InstrumentGraph::unjoin() {
 	m_jointime = getNaN();

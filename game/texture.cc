@@ -15,8 +15,8 @@
 #include <thread>
 #include <vector>
 
-Shader& getShader(std::string const& name) {
-	return Game::getSingletonPtr()->window().shader(name);  // FIXME
+Shader& getShader(Window& window, std::string const& name) {
+	return window.shader(name);  // FIXME
 }
 
 float Dimensions::screenY() const {
@@ -177,7 +177,10 @@ void Texture::load(Bitmap const& bitmap, bool isText) {
 	m_height = static_cast<float>(bitmap.height);
 	dimensions = Dimensions(bitmap.ar).fixedWidth(1.0f);
 	m_premultiplied = bitmap.linearPremul;
-	UseTexture texture(*this);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(type(), id());
+
 	// When texture area is small, bilinear filter the closest mipmap
 	glTexParameterf(type(), GL_TEXTURE_MIN_FILTER, isText ? GL_LINEAR : GL_LINEAR_MIPMAP_NEAREST);
 	// When texture area is large, bilinear filter the original
@@ -198,10 +201,10 @@ void Texture::load(Bitmap const& bitmap, bool isText) {
 	if (!isText) glGenerateMipmap(type());
 }
 
-void Texture::draw() const {
+void Texture::draw(Window& window) const {
 	if (empty()) return;
 	// FIXME: This gets image alpha handling right but our ColorMatrix system always assumes premultiplied alpha
 	// (will produce incorrect results for fade effects)
 	glBlendFunc(m_premultiplied ? GL_ONE : GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	draw(dimensions, TexCoords(tex.x1, tex.y1, tex.x2, tex.y2));
+	draw(window, dimensions, TexCoords(tex.x1, tex.y1, tex.x2, tex.y2));
 }

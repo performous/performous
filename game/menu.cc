@@ -48,7 +48,7 @@ void Menu::select(unsigned sel) {
 	if (sel < menu_stack.back()->size()) selection_stack.back() = sel;
 }
 
-void Menu::action(Game &game, int dir) {
+void Menu::action(Game& game, int dir) {
 	switch (current().type) {
 		case MenuOption::Type::OPEN_SUBMENU: {
 			if (current().options.empty()) break;
@@ -73,13 +73,13 @@ void Menu::action(Game &game, int dir) {
 				} else if (current().value->getName() == "graphic/stereo3d") {
 					try {
 						std::clog << "video/info: Stereo 3D configuration changed, will reset shaders.\n";
-						Game::getSingletonPtr()->window().resetShaders();
+						game.getWindow().resetShaders();
 					} catch (const std::exception &) {
 						std::cerr << "video/info: Disable Stereo 3D because shader creation failed.\n";
 						current().value->b() = false; // Disable 3D if shader fails
 						throw;
 					}
-								}
+				}
 			}
 			break;
 		}

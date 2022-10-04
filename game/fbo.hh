@@ -7,9 +7,10 @@
 class FBO {
   public:
 	FBO(const FBO&) = delete;
-  	const FBO& operator=(const FBO&) = delete;
+	const FBO& operator=(const FBO&) = delete;
 	/// Generate the FBO and attach a fresh texture to it
-	FBO(float w, float h): m_w(w), m_h(h) {
+	FBO(Window& window, float w, float h)
+	: m_window(window), m_w(w), m_h(h) {
 		// Create FBO
 		if (glIsFramebuffer(m_fbo) != GL_TRUE) glGenFramebuffers(1, &m_fbo);
 		update();
@@ -40,12 +41,12 @@ class FBO {
 	float height() const { return m_h; }
 	void update() {
 		{
-			UseTexture tex(m_texture);
+			UseTexture tex(m_window, m_texture);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, static_cast<GLsizei>(m_w), static_cast<GLsizei>(m_h), 0, GL_RGBA, GL_FLOAT, nullptr);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 		}
 		{
-			UseTexture tex(m_depth);
+			UseTexture tex(m_window, m_depth);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, static_cast<GLsizei>(m_w), static_cast<GLsizei>(m_h), 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 		}
@@ -56,8 +57,9 @@ class FBO {
 		unbind();
 	}
   private:
-  	float m_w;
-  	float m_h;
+	Window& m_window;
+	float m_w;
+	float m_h;
 	GLuint m_fbo {0};
 	OpenGLTexture<GL_TEXTURE_2D> m_texture;
 	OpenGLTexture<GL_TEXTURE_2D> m_depth;
