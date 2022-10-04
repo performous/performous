@@ -45,7 +45,7 @@ void ScreenSing::enter() {
 	getGame().loading(_("Initializing webcam..."), 0.1f);
 	if (config["graphic/webcam"].b() && Webcam::enabled()) {
 		try {
-			m_cam = std::make_unique<Webcam>(config["graphic/webcamid"].ui());
+			m_cam = std::make_unique<Webcam>(getGame().getWindow(), config["graphic/webcamid"].ui());
 		} catch (std::exception& e) { std::cout << e.what() << std::endl; };
 	}
 	// Load video
@@ -415,8 +415,14 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		// Toggle webcam
 		if (key == SDL_SCANCODE_A && Webcam::enabled()) {
 			// Initialize if we haven't done that already
-			if (!m_cam) { try { m_cam = std::make_unique<Webcam>(config["graphic/webcamid"].ui()); } catch (...) { }; }
-			if (m_cam) { dispInFlash(getGame(), ++config["graphic/webcam"]); m_cam->pause(!config["graphic/webcam"].b()); }
+			if (!m_cam) {
+				try {
+					m_cam = std::make_unique<Webcam>(getGame().getWindow(), config["graphic/webcamid"].ui()); }
+				catch (...) {}
+			}
+			if (m_cam) {
+				dispInFlash(getGame(), ++config["graphic/webcam"]); m_cam->pause(!config["graphic/webcam"].b());
+			}
 		}
 		// Latency settings
 		if (key == SDL_SCANCODE_COMMA) dispInFlash(getGame(), --config["audio/video_delay"]);

@@ -21,7 +21,7 @@ struct CamFrame {
 
 class Webcam {
   public:
-	Webcam(int cam_id = 0);
+	Webcam(Window&, int cam_id = 0);
 	~Webcam();
 
 	/// Thread runs here, don't call directly
@@ -38,13 +38,14 @@ class Webcam {
 	Dimensions const& dimensions() const { return m_texture.dimensions; }
 
   private:
+	Window& m_window;
 	std::unique_ptr<std::thread> m_thread;
 	mutable std::mutex m_mutex;
 	std::unique_ptr<cv::VideoCapture> m_capture;
 	std::unique_ptr<cv::VideoWriter> m_writer;
 	CamFrame m_frame;
 	Texture m_texture;
-	bool m_frameAvailable;
+	bool m_frameAvailable = false;
 	std::atomic<bool> m_running{ false };
 	std::atomic<bool> m_quit{ false };
 	#ifdef USE_OPENCV

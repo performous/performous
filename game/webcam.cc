@@ -18,8 +18,8 @@ namespace cv {
 }
 #endif
 
-Webcam::Webcam(int cam_id):
-  m_thread(), m_capture(), m_writer(), m_frameAvailable(false)
+Webcam::Webcam(Window& window, int cam_id):
+  m_window(window)
 {
 	#ifdef USE_OPENCV
 	// Initialize the capture device
@@ -119,7 +119,7 @@ void Webcam::render() {
 		m_frameAvailable = false;
 	}
 	using namespace glmath;
-	Transform trans(scale(vec3(-1.0f, 1.0f, 1.0f)));
-	m_texture.draw(); // Draw
+	Transform trans(m_window, scale(vec3(-1.0f, 1.0f, 1.0f)));
+	m_texture.draw(m_window); // Draw
 	#endif
 }
