@@ -32,7 +32,7 @@ class LyricRow {
 		return time > lastTime;
 	}
 	/// draw/print lyrics
-	void draw(SvgTxtTheme& txt, double time, Dimensions &dim) const {
+	void draw(Window& window, SvgTxtTheme& txt, double time, Dimensions &dim) const {
 		std::vector<TZoomText> sentence;
 		for (Iterator it = m_begin; it != m_end; ++it) {
 			sentence.push_back(TZoomText(it->syllable));
@@ -44,9 +44,9 @@ class LyricRow {
 			sentence.back().factor = static_cast<float>(current ? std::min(1.0 + (0.15 * (time - it->begin) / (it->end - it->begin)), 1.1) : 1.0); // Zoom-in and out syllable proportionally to their length.
 			}
 		}
-		ColorTrans c(Color::alpha(static_cast<float>(fade.get())));
+		ColorTrans c(window, Color::alpha(static_cast<float>(fade.get())));
 		txt.dimensions = dim;
-		txt.draw(sentence, true);
+		txt.draw(window, sentence, true);
 	}
 
   private:
@@ -60,10 +60,11 @@ class LayoutSinger {
 	LayoutSinger(VocalTrack& vocal, Database& database, NoteGraphScalerPtr const&, std::shared_ptr<ThemeSing> theme = std::make_shared<ThemeSing>());
 	~LayoutSinger();
 	void reset();
-	void draw(double time, PositionMode position = LayoutSinger::PositionMode::FULL);
-	void drawScore(PositionMode position);
+	void draw(Window&, double time, PositionMode position = LayoutSinger::PositionMode::FULL);
+	void drawScore(Window&, PositionMode position);
 	double lyrics_begin() const;
 	void hideLyrics(bool hide = true) { m_hideLyrics = hide; }
+
   private:
 	VocalTrack& m_vocal;
 	NoteGraph m_noteGraph;

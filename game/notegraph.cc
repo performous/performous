@@ -30,9 +30,9 @@ void NoteGraph::reset() {
 }
 
 namespace {
-	void drawNotebar(Texture const& texture, float x, float ybeg, float yend, float w, float h_x, float h_y) {
+	void drawNotebar(Window& window, Texture const& texture, float x, float ybeg, float yend, float w, float h_x, float h_y) {
 		glutil::VertexArray va;
-		UseTexture tblock(texture);
+		UseTexture tblock(window, texture);
 
 		// The front cap begins
 		va.texCoord(0.0f, 0.0f).vertex(x, ybeg);
@@ -67,7 +67,7 @@ namespace {
 const float baseLine = -0.2f;
 const float pixUnit = 0.2f;
 
-void NoteGraph::draw(double time, Database const& database, Position position) {
+void NoteGraph::draw(Window& window, double time, Database const& database, Position position) {
 	if (time < m_time) reset();
 	m_time = time;
 	// Update m_songit (which note to start the rendering from)
@@ -110,10 +110,11 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 	else if (m_notealpha < 1.0f) m_notealpha += 0.02f;
 	if (m_notealpha <= 0.0f) { m_notealpha = 0.0f; return; }
 
-	ColorTrans c(Color::alpha(m_notealpha));
+	ColorTrans c(window, Color::alpha(m_notealpha));
 
-	drawNotes();
-	if (config["game/pitch"].b()) drawWaves(database);
+	drawNotes(window);
+	if (config["game/pitch"].b())
+		drawWaves(window, database);
 
 	// Draw a star for well sung notes
 	for (auto it = m_songit; it != m_vocal.notes.end() && it->begin < m_time - (baseLine - 0.5f) / pixUnit; ++it) {
@@ -128,20 +129,20 @@ void NoteGraph::draw(double time, Database const& database, Position position) {
 			bool smallerNoteGraph = ((position == NoteGraph::Position::TOP) || (position == NoteGraph::Position::BOTTOM));
 			float zoom = (std::abs((rot-180) / 360.0f) * 0.8f + 0.6f) * (smallerNoteGraph ? 2.3f : 2.0f) * hh;
 			using namespace glmath;
-			Transform trans(translate(vec3(centerx, centery, 0.0f)) * rotate(rot, vec3(0.0f, 0.0f, 1.0f)));
+			Transform trans(window, translate(vec3(centerx, centery, 0.0f)) * rotate(rot, vec3(0.0f, 0.0f, 1.0f)));
 			{
-				ColorTrans c(Color(it_col->r, it_col->g, it_col->b, it_col->a));
-				m_star_hl.draw(Dimensions().stretch(zoom*1.2f, zoom*1.2f).center().middle(), TexCoords());
+				ColorTrans c(window, Color(it_col->r, it_col->g, it_col->b, it_col->a));
+				m_star_hl.draw(window, Dimensions().stretch(zoom*1.2f, zoom*1.2f).center().middle(), TexCoords());
 			}
-			m_star.draw(Dimensions().stretch(zoom, zoom).center().middle(), TexCoords());
+			m_star.draw(window, Dimensions().stretch(zoom, zoom).center().middle(), TexCoords());
 			player_star_offset += 0.8f;
 		}
 	}
 }
 
-void NoteGraph::drawNotes() {
+void NoteGraph::drawNotes(Window& window) {
 	// Draw note lines
-	m_notelines.draw(Dimensions().stretch(dimensions.w(), (m_max - m_min - 13) * m_noteUnit).middle(dimensions.xc()).center(dimensions.yc()), TexCoords(0.0f, (-m_min - 7.0f) / 12.0f, 1.0f, (-m_max + 6.0f) / 12.0f));
+	m_notelines.draw(window, Dimensions().stretch(dimensions.w(), (m_max - m_min - 13) * m_noteUnit).middle(dimensions.xc()).center(dimensions.yc()), TexCoords(0.0f, (-m_min - 7.0f) / 12.0f, 1.0f, (-m_max + 6.0f) / 12.0f));
 
 	// Draw notes
 	for (auto it = m_songit; it != m_vocal.notes.end() && it->begin < m_time - (baseLine - 0.5f) / pixUnit; ++it) {
@@ -150,9 +151,9 @@ void NoteGraph::drawNotes() {
 		Texture* t1;
 		Texture* t2;
 		switch (it->type) {
-			case Note::Type::NORMAL: 
-			case Note::Type::SLIDE: 
-				t1 = &m_notebar; t2 = &m_notebar_hl; 
+			case Note::Type::NORMAL:
+			case Note::Type::SLIDE:
+				t1 = &m_notebar; t2 = &m_notebar_hl;
 			break;
 			case Note::Type::GOLDEN:
 			case Note::Type::GOLDEN2: //fallthrough
@@ -164,10 +165,10 @@ void NoteGraph::drawNotes() {
 				Dimensions dim;
 				dim.middle(static_cast<float>(m_baseX + 0.5f * (it->begin + it->end) * pixUnit)).center(static_cast<float>(m_baseY + it->note * m_noteUnit)).stretch(static_cast<float>(it->end - it->begin) * pixUnit, -m_noteUnit * 12.0f);
 				float xoffset = static_cast<float>(0.1 * m_time / m_notebarfs.dimensions.ar());
-				m_notebarfs.draw(dim, TexCoords(xoffset, 0.0f, xoffset + dim.ar() / m_notebarfs.dimensions.ar(), 1.0f));
+				m_notebarfs.draw(window, dim, TexCoords(xoffset, 0.0f, xoffset + dim.ar() / m_notebarfs.dimensions.ar(), 1.0f));
 				if (alpha > 0.0f) {
 					float xoffset = static_cast<float>(rand() / double(RAND_MAX));
-					m_notebarfs_hl.draw(dim, TexCoords(xoffset, 0.0f, xoffset + dim.ar() / m_notebarfs_hl.dimensions.ar(), 1.0f));
+					m_notebarfs_hl.draw(window, dim, TexCoords(xoffset, 0.0f, xoffset + dim.ar() / m_notebarfs_hl.dimensions.ar(), 1.0f));
 				}
 			}
 			continue;
@@ -178,7 +179,7 @@ void NoteGraph::drawNotes() {
 			case Note::Type::ROLL:
 			case Note::Type::MINE:
 			case Note::Type::LIFT:
-			default: 
+			default:
 				throw std::logic_error("Unknown note type: don't know how to render");
 		}
 		float x = static_cast<float>(m_baseX + it->begin * pixUnit + m_noteUnit); // left x coordinate: begin minus border (side borders -noteUnit wide)
@@ -188,10 +189,10 @@ void NoteGraph::drawNotes() {
 		float w = static_cast<float>(it->end - it->begin) * pixUnit - m_noteUnit * 2.0f; // width: including borders on both sides
 		float h_x = -m_noteUnit * 2.0f; // height: 0.5 border + 1.0 bar + 0.5 border = 2.0
 		float h_y = h_x * bar_height; //
-		drawNotebar(*t1, x, ybeg, yend, w, h_x, h_y);
+		drawNotebar(window, *t1, x, ybeg, yend, w, h_x, h_y);
 		if (alpha > 0.0f) {
-			ColorTrans c(Color::alpha(alpha));
-			drawNotebar(*t2, x, ybeg, yend, w, h_x, h_y);
+			ColorTrans c(window, Color::alpha(alpha));
+			drawNotebar(window, *t2, x, ybeg, yend, w, h_x, h_y);
 		}
 	}
 }
@@ -211,9 +212,9 @@ namespace {
 	}
 }
 
-void NoteGraph::drawWaves(Database const& database) {
+void NoteGraph::drawWaves(Window& window, Database const& database) {
 	if (m_vocal.notes.empty()) return; // Cannot draw without notes
-	UseTexture tblock(m_wave);
+	UseTexture tblock(window, m_wave);
 	auto sortedPlayers = std::list<std::reference_wrapper<const Player>>(database.cur.begin(), database.cur.end());
 	sortedPlayers.sort([](const Player& playerOne, const Player& playerTwo) {return playerOne.m_score < playerTwo.m_score; });
 	for (const Player& player: sortedPlayers) {

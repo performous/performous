@@ -98,7 +98,6 @@ static void checkEvents(Game& gm, Time eventTime) {
 void mainLoop(std::string const& songlist) {
 	Platform platform;
 	std::clog << "core/notice: Starting the audio subsystem (errors printed on console may be ignored)." << std::endl;
-	Audio audio;
 	std::clog << "core/info: Loading assets." << std::endl;
 	TranslationEngine localization;
 	TextureLoader m_loader;
@@ -108,9 +107,10 @@ void mainLoop(std::string const& songlist) {
 	loadFonts();
 
 	Window window{};
-
-	Game gm(window, audio);
+	Game gm(window);
 	WebServer server(gm, songs);
+
+	auto& audio = gm.getAudio();
 
 	// Load audio samples
 	gm.loading(_("Loading audio samples..."), 0.5f);
@@ -129,14 +129,14 @@ void mainLoop(std::string const& songlist) {
 	audio.loadSample("notice.ogg",findFile("notice.ogg"));
 	// Load screens
 	gm.loading(_("Creating screens..."), 0.7f);
-	gm.addScreen(std::make_unique<ScreenIntro>("Intro", audio));
-	gm.addScreen(std::make_unique<ScreenSongs>("Songs", audio, songs, database));
-	gm.addScreen(std::make_unique<ScreenSing>("Sing", audio, database, backgrounds));
-	gm.addScreen(std::make_unique<ScreenPractice>("Practice", audio));
-	gm.addScreen(std::make_unique<ScreenAudioDevices>("AudioDevices", audio));
-	gm.addScreen(std::make_unique<ScreenPaths>("Paths", audio, songs));
-	gm.addScreen(std::make_unique<ScreenPlayers>("Players", audio, database));
-	gm.addScreen(std::make_unique<ScreenPlaylist>("Playlist", audio, songs, backgrounds));
+	gm.addScreen(std::make_unique<ScreenIntro>(gm, "Intro", audio));
+	gm.addScreen(std::make_unique<ScreenSongs>(gm, "Songs", audio, songs, database));
+	gm.addScreen(std::make_unique<ScreenSing>(gm, "Sing", audio, database, backgrounds));
+	gm.addScreen(std::make_unique<ScreenPractice>(gm, "Practice", audio));
+	gm.addScreen(std::make_unique<ScreenAudioDevices>(gm, "AudioDevices", audio));
+	gm.addScreen(std::make_unique<ScreenPaths>(gm, "Paths", audio, songs));
+	gm.addScreen(std::make_unique<ScreenPlayers>(gm, "Players", audio, database));
+	gm.addScreen(std::make_unique<ScreenPlaylist>(gm, "Playlist", audio, songs, backgrounds));
 	gm.activateScreen("Intro");
 	gm.loading(_("Entering main menu..."), 0.8f);
 	gm.updateScreen();  // exit/enter, any exception is fatal error
@@ -167,7 +167,7 @@ void mainLoop(std::string const& songlist) {
 		try {
 			window.blank();
 			// Draw
-			window.render([&gm]{ gm.drawScreen(); });
+			window.render(gm, [&gm]{ gm.drawScreen(); });
 			if (benchmarking) { glFinish(); prof("draw"); }
 			// Display (and wait until next frame)
 			window.swap();
@@ -200,6 +200,7 @@ void mainLoop(std::string const& songlist) {
 				gm.flashMessage(std::string("ERROR: ") + e.what());
 		}
 	}
+
 	writeConfig(gm);
 }
 
@@ -311,7 +312,7 @@ int main(int argc, char** argv) try {
 	}
 
 	Logger logger(loglevel);
-	
+
 	outputOptionalFeatureStatus();
 
 	readConfig();

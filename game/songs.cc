@@ -334,7 +334,7 @@ void Songs::filter_internal() {
 			std::shared_lock<std::shared_mutex> l(m_mutex);
 			filtered = m_songs;
 		} else {
-		
+
 			auto filter = icu::UnicodeString::fromUTF8(
 				UnicodeUtil::convertToUTF8(m_filter)
 				);
@@ -468,7 +468,7 @@ std::string Songs::getSortDescription() const {
 	return str;
 }
 
-void Songs::sortChange(SortChange diff) {
+void Songs::sortChange(Game& game, SortChange diff) {
 	m_order = static_cast<unsigned short>(m_order + to_underlying(diff)) % orders;
 	if (m_order >= orders) m_order += orders;
 	RestoreSel restore(*this);
@@ -487,7 +487,7 @@ void Songs::sortChange(SortChange diff) {
 			break;
 		}
 	sort_internal();
-	writeConfig(game, audio, false);
+	writeConfig(game, false);
 }
 
 void Songs::sortSpecificChange(unsigned short sortOrder, bool descending) {
@@ -541,14 +541,14 @@ void Songs::sort_internal(bool descending) {
 }
 
 std::shared_ptr<Song> Songs::currentPtr() const try {
-	return m_filtered.at(static_cast<size_t>(math_cover.getTarget())); 
+	return m_filtered.at(static_cast<size_t>(math_cover.getTarget()));
 } catch (std::out_of_range const& e) { return nullptr; }
 
-Song& Songs::current() try { 
+Song& Songs::current() try {
 	return *m_filtered.at(static_cast<size_t>(math_cover.getTarget()));
 } catch (std::out_of_range const& e) { throw std::runtime_error(std::string("songs/error: out-of-bounds access attempt for Songs: ") + e.what()); }
 
-Song const& Songs::current() const try { 
+Song const& Songs::current() const try {
 	return *m_filtered.at(static_cast<size_t>(math_cover.getTarget()));
 } catch (std::out_of_range const& e) { throw std::runtime_error(std::string("songs/error: out-of-bounds access attempt for Songs: ") + e.what()); }
 

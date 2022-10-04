@@ -28,9 +28,9 @@ void LayoutSinger::reset() {
 	m_lyrics.clear();
 }
 
-void LayoutSinger::drawScore(PositionMode position) {
+void LayoutSinger::drawScore(Window& window, PositionMode position) {
 	unsigned int i = 0;
-    float j = 0.0f;
+	float j = 0.0f;
 	for (std::list<Player>::const_iterator p = m_database.cur.begin(); p != m_database.cur.end(); ++p, ++i) {
 		if (p->m_vocal.name != m_vocal.name) continue;
 		Color color(p->m_color.r, p->m_color.g, p->m_color.b, p->activity());
@@ -61,9 +61,9 @@ void LayoutSinger::drawScore(PositionMode position) {
 				break;
 		}
 		{
-			ColorTrans c(color);
-			m_player_icon->draw();
-			m_score_text[i%4]->draw();
+			ColorTrans c(window, color);
+			m_player_icon->draw(window);
+			m_score_text[i%4]->draw(window);
 		}
 		// Give some feedback on how well the last lyrics row went
 		double fact = p->m_feedbackFader.get();
@@ -93,30 +93,30 @@ void LayoutSinger::drawScore(PositionMode position) {
 			}
 			{
 				color.a = static_cast<float>(clamp(fact*2.0));
-				ColorTrans c(color);
-				m_line_rank_text[i%4]->draw();
+				ColorTrans c(window, color);
+				m_line_rank_text[i%4]->draw(window);
 			}
 		}
 		++j;
 	}
 }
 
-void LayoutSinger::draw(double time, PositionMode position) {
+void LayoutSinger::draw(Window& window, double time, PositionMode position) {
 	// Draw notes and pitch waves (only when not in karaoke mode)
 	if (!config["game/karaoke_mode"].ui()) {
 		switch(position) {
 			case LayoutSinger::PositionMode::FULL:
-				m_noteGraph.draw(time, m_database, NoteGraph::Position::FULLSCREEN);
+				m_noteGraph.draw(window, time, m_database, NoteGraph::Position::FULLSCREEN);
 				break;
 			case LayoutSinger::PositionMode::TOP:
-				m_noteGraph.draw(time, m_database, NoteGraph::Position::TOP);
+				m_noteGraph.draw(window, time, m_database, NoteGraph::Position::TOP);
 				break;
 			case LayoutSinger::PositionMode::BOTTOM:
-				m_noteGraph.draw(time, m_database, NoteGraph::Position::BOTTOM);
+				m_noteGraph.draw(window, time, m_database, NoteGraph::Position::BOTTOM);
 				break;
 			case LayoutSinger::PositionMode::LEFT:
 			case LayoutSinger::PositionMode::RIGHT:
-				m_noteGraph.draw(time, m_database, NoteGraph::Position::LEFT);
+				m_noteGraph.draw(window, time, m_database, NoteGraph::Position::LEFT);
 				break;
 		}
 	}
@@ -166,13 +166,16 @@ void LayoutSinger::draw(double time, PositionMode position) {
 		{
 			for (size_t i = 0; i < m_lyrics.size(); ++i, pos.move(0.0f, linespacing)) {
 				pos.move(0.0f, static_cast<float>(m_lyrics[i].extraspacing.get() * linespacing));
-				if (i == 0) m_lyrics[0].draw(m_theme->lyrics_now, time, pos);
-				else if (i == 1) m_lyrics[1].draw(m_theme->lyrics_next, time, pos);
+				if (i == 0)
+					m_lyrics[0].draw(window, m_theme->lyrics_now, time, pos);
+				else if (i == 1)
+					m_lyrics[1].draw(window, m_theme->lyrics_next, time, pos);
 			}
 		}
 	}
 
-	if (!config["game/karaoke_mode"].ui() ) drawScore(position); // draw score if not in karaoke mode
+	if (!config["game/karaoke_mode"].ui())
+		drawScore(window, position); // draw score if not in karaoke mode
 }
 
 double LayoutSinger::lyrics_begin() const {

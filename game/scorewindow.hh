@@ -11,13 +11,14 @@ class Database;
 /// shows score at end of song
 class ScoreWindow {
   public:
-	ScoreWindow(Instruments& instruments, Database& database);
-    
+	ScoreWindow(Game&, Instruments& instruments, Database& database);
+
 	/// draws ScoreWindow
 	void draw();
 	bool empty();
-    
+
   private:
+	Game& m_game;
 	Database& m_database;
 	AnimValue m_pos;
 	Texture m_bg;

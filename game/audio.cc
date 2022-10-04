@@ -128,7 +128,8 @@ Seconds AudioClock::pos() const {
 	return pos_internal(Clock::now());
 }
 
-Music::Music(Audio::Files const& files, unsigned int sr, bool preview): srate(sr), m_preview(preview) {
+Music::Music(Game& game, Audio::Files const& files, unsigned int sr, bool preview)
+: m_game(game), srate(sr), m_preview(preview) {
 	for (auto const& tf /* trackname-filename pair */: files) {
 		if (tf.second.empty()) continue; // Skip tracks with no filenames; FIXME: Why do we even have those here, shouldn't they be eliminated earlier?
 		tracks.emplace(tf.first, std::make_unique<Track>(tf.second, sr));
@@ -218,8 +219,7 @@ bool Music::prepare() {
 				intptr_t readptr = 0;
 				fvec_t* tempoSamplePtr = new_fvec(Audio::aubio_hop_size);
 				std::lock_guard<std::recursive_mutex> l(Audio::aubio_mutex);
-				Game* gm = Game::getSingletonPtr();
-				ScreenSongs* sSongs = static_cast<ScreenSongs *>(gm->getScreen("Songs"));
+				ScreenSongs* sSongs = static_cast<ScreenSongs *>(m_game.getScreen("Songs"));
 				if (!sSongs->getSongs().currentPtr()) return false;
 				double pstart = sSongs->getSongs().currentPtr()->preview_start;
 				pstart = (std::isnan(pstart) ? 0.0 : pstart);
@@ -628,9 +628,9 @@ void Audio::unloadSample(std::string const& streamId) {
 	self->output.samples.erase(streamId);
 }
 
-void Audio::playMusic(Audio::Files const& filenames, bool preview, double fadeTime, double startPos) {
+void Audio::playMusic(Game& game, Audio::Files const& filenames, bool preview, double fadeTime, double startPos) {
 	Output& o = self->output;
-	auto m = std::make_unique<Music>(filenames, getSR(), preview);
+	auto m = std::make_unique<Music>(game, filenames, getSR(), preview);
 	m->seek(startPos);
 	m->fadeRate = 1.0 / getSR() / fadeTime;
 	// Format debug message
@@ -646,14 +646,14 @@ void Audio::playMusic(Audio::Files const& filenames, bool preview, double fadeTi
 	o.commands.clear();  // Remove old unprocessed commands (they should not apply to the new music)
 }
 
-void Audio::playMusic(fs::path const& filename, bool preview, double fadeTime, double startPos) {
+void Audio::playMusic(Game& game, fs::path const& filename, bool preview, double fadeTime, double startPos) {
 	Audio::Files m;
 	m["MAIN"] = filename;
-	playMusic(m, preview, fadeTime, startPos);
+	playMusic(game, m, preview, fadeTime, startPos);
 }
 
-void Audio::stopMusic() {
-	playMusic(Audio::Files(), false, 0.0);
+void Audio::stopMusic(Game& game) {
+	playMusic(game, Audio::Files(), false, 0.0);
 	{
 		Output& o = self->output;
 		// stop synth when music is stopped
@@ -662,8 +662,8 @@ void Audio::stopMusic() {
 	}
 }
 
-void Audio::fadeout(double fadeTime) {
-	playMusic(Audio::Files(), false, fadeTime);
+void Audio::fadeout(Game& game, double fadeTime) {
+	playMusic(game, Audio::Files(), false, fadeTime);
 	{
 		Output& o = self->output;
 		// stop synth when music is stopped

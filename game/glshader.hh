@@ -26,7 +26,7 @@ struct Uniform {
 
 struct Shader {
 	Shader(const Shader&) = delete;
-  	const Shader& operator=(const Shader&) = delete;
+	const Shader& operator=(const Shader&) = delete;
 	/// Print compile errors and such
 	/// @param id of shader or program
 	void dumpInfoLog(GLuint id);
@@ -60,9 +60,9 @@ struct Shader {
 
 private:
 	std::string name; ///< for debugging purposes only
-	GLuint program; ///< shader program object id
+	GLuint program = 0; ///< shader program object id
 	int gl_response; ///< save last return state
-	
+
 	const static std::forward_list<std::pair<std::string, unsigned int>> m_uniformblocks;
 
 	std::string defs;

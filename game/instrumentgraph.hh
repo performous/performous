@@ -28,22 +28,22 @@ class Popup {
 	}
 	/// Draw the popup
 	/// Returns false if it is expired
-	bool draw() {
+	bool draw(Window& window) {
 		double anim = m_anim.get();
 		if (anim <= 0.0 || !m_popupText) return false;
 		float a = static_cast<float>(1.0 - anim);
 		m_color.a = a;
-		ColorTrans color(m_color);
+		ColorTrans color(window, m_color);
 		m_popupText->render(m_msg);
 		{
 			using namespace glmath;
-			Transform trans(translate(vec3(0.0f, 0.0f, 0.5f * anim)));
+			Transform trans(window, translate(vec3(0.0f, 0.0f, 0.5f * anim)));
 			m_popupText->dimensions().center(static_cast<float>(0.1f - 0.03f * anim)).middle().stretch(0.2f, 0.2f);
-			m_popupText->draw();
+			m_popupText->draw(window);
 		}
 		if (m_info != "" && m_infoText) {
 			m_infoText->dimensions.screenBottom(-0.02f).middle(-0.12f);
-			m_infoText->draw(m_info);
+			m_infoText->draw(window, m_info);
 		}
 		if (anim > 0.999) m_anim.setTarget(0.0, true);
 		return true;
@@ -117,7 +117,7 @@ public:
 		AnimValue glow;
 		AnimValue whammy;
 		unsigned type; // 0 = miss (pick), 1 = tap, 2 = pick
-        int fret;
+		int fret;
 		Duration const* dur;
 		double holdTime;
 		Event(double t, unsigned ty, int f = -1, Duration const* d = nullptr): time(t), glow(0.0, 5.0), whammy(0.0, 0.5), type(ty), fret(f), dur(d), holdTime(d ? d->begin : getNaN()) { if (type > 0) glow.setValue(1.0); }

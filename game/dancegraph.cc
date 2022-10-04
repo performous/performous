@@ -261,8 +261,8 @@ void DanceGraph::engine() {
 		// Menu keys
 		if (menuOpen() && ev.value != 0.0) {
 			if (ev.nav == input::NavButton::START || ev.nav == input::NavButton::CANCEL) m_menu.close();
-			else if (ev.nav == input::NavButton::RIGHT) m_menu.action(1);
-			else if (ev.nav == input::NavButton::LEFT) m_menu.action(-1);
+			else if (ev.nav == input::NavButton::RIGHT) m_menu.action(m_game, 1);
+			else if (ev.nav == input::NavButton::LEFT) m_menu.action(m_game, -1);
 			else if (ev.nav == input::NavButton::UP) m_menu.move(-1);
 			else if (ev.nav == input::NavButton::DOWN) m_menu.move(1);
 			difficulty_changed = true;
@@ -396,21 +396,22 @@ void DanceGraph::draw(double time) {
 		time -= stop.second;
 	}
 
+	auto& window = m_game.getWindow();
 	Dimensions dimensions(1.0f); // FIXME: bogus aspect ratio (is this fixable?)
 	dimensions.screenTop().middle(static_cast<float>(m_cx.get())).stretch(static_cast<float>(m_width.get()), 1.0f);
-	ViewTrans view(0.5f * (dimensions.x1() + dimensions.x2()), 0.0f, 0.75f);  // Apply a per-player local perspective
+	ViewTrans view(window, 0.5f * (dimensions.x1() + dimensions.x2()), 0.0f, 0.75f);  // Apply a per-player local perspective
 	{
 		using namespace glmath;
 		// Some matrix magic to get the viewport right
 		float temp_s = dimensions.w() / 8.0f; // Allow for 8 pads to fit on a track
-		Transform trans(translate(vec3(0.0f, dimensions.y1(), 0.0f)) * scale(temp_s));
+		Transform trans(window, translate(vec3(0.0f, dimensions.y1(), 0.0f)) * scale(temp_s));
 
 		// Draw the "neck" graph (beat lines)
 		drawBeats(time);
 
 		// Arrows on cursor
 		{
-			UseShader us(getShader("dancenote"));
+			UseShader us(getShader(window, "dancenote"));
 			m_uniforms.clock = static_cast<float>(time);
 			m_uniforms.noteType = 0;
 			m_uniforms.scale = getScale();
@@ -436,7 +437,8 @@ void DanceGraph::draw(double time) {
 }
 
 void DanceGraph::drawBeats(double time) {
-	UseTexture tex(m_beat);
+	auto& window = m_game.getWindow();
+	UseTexture tex(window, m_beat);
 	glutil::VertexArray va;
 	float texCoord = 0.0f;
 	double tBeg = 0.0f, tEnd;
@@ -458,6 +460,7 @@ void DanceGraph::drawBeats(double time) {
 
 /// Draws a single note (or hold)
 void DanceGraph::drawNote(DanceNote& note, double time) {
+	auto& window = m_game.getWindow();
 	double tBeg = note.note.begin - time;
 	double tEnd = note.note.end - time;
 	float arrow_i = note.note.note;
@@ -474,7 +477,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	double glow = note.hitAnim.get();
 
 	{
-		UseShader us(getShader("dancenote"));
+		UseShader us(getShader(window, "dancenote"));
 		m_uniforms.hitAnim = static_cast<float>(glow);
 		m_uniforms.clock = static_cast<float>(time);
 		m_uniforms.scale = getScale();
@@ -525,12 +528,13 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 			text = note.score ? getRank(note.error) : "FAIL!";
 		}
 		if (!text.empty()) {
+			auto& window = m_game.getWindow();
 			double sc = getScale() * 0.6 * arrowSize * (3.0 + glow);
-			Transform trans(glmath::translate(glmath::vec3(0.0f, 0.0f, 0.5f * static_cast<float>(glow)))); // Slightly elevated
-			ColorTrans c(Color::alpha(static_cast<float>(std::sqrt(alpha))));
+			Transform trans(window, glmath::translate(glmath::vec3(0.0f, 0.0f, 0.5f * static_cast<float>(glow)))); // Slightly elevated
+			ColorTrans c(window, Color::alpha(static_cast<float>(std::sqrt(alpha))));
 			m_popupText->render(_(text));
 			m_popupText->dimensions().middle(x).center(time2y(0.0f)).stretch(static_cast<float>(sc), static_cast<float>(sc/2.0));
-			m_popupText->draw();
+			m_popupText->draw(window);
 		}
 	}
 }
@@ -538,11 +542,12 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 /// Draw popups and other info texts
 void DanceGraph::drawInfo(double /*time*/, Dimensions dimensions) {
 	if (!menuOpen()) {
+		auto& window = m_game.getWindow();
 		// Draw scores
 		m_text.dimensions.screenBottom(-0.35f).middle(0.32f * dimensions.w());
-		m_text.draw(std::to_string(unsigned(getScore())));
+		m_text.draw(window, std::to_string(unsigned(getScore())));
 		m_text.dimensions.screenBottom(-0.32f).middle(0.32f * dimensions.w());
-		m_text.draw(std::to_string(unsigned(m_streak)) + "/"
+		m_text.draw(window, std::to_string(unsigned(m_streak)) + "/"
 		  + std::to_string(unsigned(m_longestStreak)));
 	}
 	drawPopups();

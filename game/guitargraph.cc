@@ -344,15 +344,15 @@ void GuitarGraph::engine() {
 		if (menuOpen()) {
 			// Check first regular keys
 			if (ev.pressed()) {
-				if (ev.nav == input::NavButton::START) m_menu.action();
-				else if (ev.nav == input::NavButton::LEFT) m_menu.action(-1);
+				if (ev.nav == input::NavButton::START) m_menu.action(m_game);
+				else if (ev.nav == input::NavButton::LEFT) m_menu.action(m_game, -1);
 				else if (ev.nav == input::NavButton::UP) m_menu.move(-1);
 				else if (ev.nav == input::NavButton::DOWN) m_menu.move(1);
-				else if (ev.nav == input::NavButton::RIGHT) m_menu.action(1);
+				else if (ev.nav == input::NavButton::RIGHT) m_menu.action(m_game, 1);
 				else if (ev.nav == input::NavButton::CANCEL) m_menu.close();
 				if (!m_drums) {
-					if (ev.button == input::ButtonId::GUITAR_GREEN) m_menu.action(-1);
-					else if (ev.button == input::ButtonId::GUITAR_RED) m_menu.action(1);
+					if (ev.button == input::ButtonId::GUITAR_GREEN) m_menu.action(m_game, -1);
+					else if (ev.button == input::ButtonId::GUITAR_RED) m_menu.action(m_game, 1);
 				}
 			}
 			// See if anything changed
@@ -849,7 +849,9 @@ void GuitarGraph::drawNotes(double time) {
 	m_neckglowColor = glmath::mix(m_neckglowColor, neckglow, 0.05f);
 }
 
-float GuitarGraph::neckWidth() const { return static_cast<float>(std::min(0.5, m_width.get())); }
+float GuitarGraph::neckWidth() const {
+	return static_cast<float>(std::min(0.5, m_width.get()));
+}
 
 void GuitarGraph::drawNeckStuff(double time) {
 	using namespace glmath;
@@ -860,12 +862,14 @@ void GuitarGraph::drawNeckStuff(double time) {
 		if (jumpanim == 1.0f) m_drumJump.setTarget(0.0f);
 		if (jumpanim > 0.0f) m = translate(vec3(0.0f, -m_drumJump.get() * 0.01f, 0.0f)) * m;
 	}
+
+	auto& window = m_game.getWindow();
 	//Transform trans(m);
-	ViewTrans trans(m);
+	ViewTrans trans(window, m);
 
 	// Draw the neck
 	{
-		UseTexture tex(*m_neck);
+		UseTexture tex(m_game.getWindow(), *m_neck);
 		glutil::VertexArray va;
 		float w = (m_drums ? 2.0f : 2.5f);
 		float texCoord = 0.0f;
@@ -889,7 +893,7 @@ void GuitarGraph::drawNeckStuff(double time) {
 		// Draw the cursor
 		{
 			float level = static_cast<float>(m_pressed_anim[0].get());
-			ColorTrans c(Color(level, level, level));
+			ColorTrans c(window, Color(level, level, level));
 			drawBar(0.0f, 0.01f);
 		}
 		// Fret buttons on cursor
@@ -898,15 +902,15 @@ void GuitarGraph::drawNeckStuff(double time) {
 			float l = static_cast<float>(m_pressed_anim[fret + !m_drums].get());
 			// The note head
 			{
-				ColorTrans c(colorize(color(fret), time)); // Get a color for the fret and adjust it if GodMode is on
+				ColorTrans c(window, colorize(color(fret), time)); // Get a color for the fret and adjust it if GodMode is on
 				m_button.dimensions.center(time2y(0.0f)).middle(x);
-				m_button.draw();
+				m_button.draw(window);
 			}
 			// Tap note indicator
 			{
-				ColorTrans c(Color(l, l, l));
+				ColorTrans c(window, Color(l, l, l));
 				m_tap.dimensions = m_button.dimensions;
-				m_tap.draw();
+				m_tap.draw(window);
 			}
 		}
 	}
@@ -929,7 +933,7 @@ void GuitarGraph::drawNeckStuff(double time) {
 				continue;
 			}
 			float h = flameAnim * 4.0f * fretWid;
-			UseTexture tblock(*ftex);
+			UseTexture tblock(window, *ftex);
 			glutil::VertexArray va;
 			glmath::vec4 c(1.0f, 1.0f, 1.0f, 1.0f - flameAnim);
 			va.texCoord(0.0f, 1.0f).color(c).vertex(x - fretWid, time2y(0.0f), 0.0f);
@@ -941,7 +945,7 @@ void GuitarGraph::drawNeckStuff(double time) {
 		}
 	}
 	// Accuracy indicator
-	UseShader us(getShader("color"));
+	UseShader us(getShader(window, "color"));
 	float maxsize = 1.5f;
 	float thickness = 0.12f;
 	float x = -2.5f - thickness;
@@ -978,16 +982,17 @@ void GuitarGraph::drawNeckStuff(double time) {
 /// Main drawing function (projection, neck, cursor...)
 void GuitarGraph::draw(double time) {
 	glutil::GLErrorChecker ec("GuitarGraph::draw");
-	ViewTrans view(static_cast<float>(m_cx.get()), 0.0f, 0.75f);  // Apply a per-player local perspective
+	auto& window = m_game.getWindow();
+	ViewTrans view(window, static_cast<float>(m_cx.get()), 0.0f, 0.75f);  // Apply a per-player local perspective
 
 	drawNeckStuff(time);
 
 	if (m_neckglowColor.w > 0.0f) {
 		// Neck glow drawing
 		using namespace glmath;
-		ColorTrans c(glmath::diagonal(m_neckglowColor));
+		ColorTrans c(window, glmath::diagonal(m_neckglowColor));
 		m_neckglow.dimensions.screenBottom(0.0f).middle().fixedWidth(neckWidth());
-		m_neckglow.draw();
+		m_neckglow.draw(window);
 	}
 
 	drawInfo(time); // Go draw some texts and other interface stuff
@@ -996,13 +1001,14 @@ void GuitarGraph::draw(double time) {
 /// Draws a single note
 /// The times passed are normalized to [past, future]
 void GuitarGraph::drawNote(unsigned fret, Color color, double tBeg, double tEnd, float whammy, bool tappable, bool hit, double hitAnim, double releaseTime) {
+	auto& window = m_game.getWindow();
 	float x = getFretX(fret);
 	unsigned drumsKickButtonId = to_underlying(input::ButtonId::DRUMS_KICK);
 	if (m_drums && fret == drumsKickButtonId) { // Bass drum? That's easy
 		if (hit || hitAnim > 0) return;	// Hide it if it's hit
 		color.a = time2a(static_cast<float>(tBeg));
 		{
-			ColorTrans c(color);
+			ColorTrans c(window, color);
 			drawBar(tBeg, 0.015f);
 		}
 		return;
@@ -1025,7 +1031,7 @@ void GuitarGraph::drawNote(unsigned fret, Color color, double tBeg, double tEnd,
 		// Render the middle
 		bool doanim = hit || hitAnim > 0.0f; // Enable glow?
 		Texture const& tex(doanim ? m_tail_glow : m_tail); // Select texture
-		UseTexture tblock(tex);
+		UseTexture tblock(window, tex);
 		glutil::VertexArray va;
 		double t = m_audio.getPosition() * 10.0; // Get adjusted time value for animation
 		vertexPair(va, x, y, color, doanim ? tc(static_cast<float>(y + t)) : 1.0f); // First vertex pair
@@ -1046,8 +1052,8 @@ void GuitarGraph::drawNote(unsigned fret, Color color, double tBeg, double tEnd,
 		glEnable(GL_DEPTH_TEST);
 		// Render the fret object
 		{
-			ColorTrans c(color);
-			m_fretObj.draw(x, fretY, 0.0f);
+			ColorTrans c(window, color);
+			m_fretObj.draw(window, x, fretY, 0.0f);
 		}
 	} else {
 		// Too short note: only render the ring
@@ -1055,14 +1061,14 @@ void GuitarGraph::drawNote(unsigned fret, Color color, double tBeg, double tEnd,
 			float s = static_cast<float>(1.0f - hitAnim);
 			color.a = s;
 			{
-				ColorTrans c(color);
-				m_fretObj.draw(x, yBeg, 0.0f, s);
+				ColorTrans c(window, color);
+				m_fretObj.draw(window, x, yBeg, 0.0f, s);
 			}
 		} else {
 			color.a = clamp(time2a(static_cast<float>(tBeg))*2.0f,0.0f,1.0f);
 			{
-				ColorTrans c(color);
-				m_fretObj.draw(x, yBeg, 0.0f);
+				ColorTrans c(window, color);
+				m_fretObj.draw(window, x, yBeg, 0.0f);
 			}
 		}
 	}
@@ -1070,20 +1076,22 @@ void GuitarGraph::drawNote(unsigned fret, Color color, double tBeg, double tEnd,
 	if (tappable) {
 		float l = std::max(0.3f, static_cast<float>(m_correctness.get()));
 		float s = static_cast<float>(1.0f - hitAnim);
-		ColorTrans c(Color(l, l, l, s));
-		m_tappableObj.draw(x, yBeg, 0.0f, s);
+		ColorTrans c(window, Color(l, l, l, s));
+		m_tappableObj.draw(window, x, yBeg, 0.0f, s);
 	}
 }
 
 /// Draws a drum fill
 void GuitarGraph::drawDrumfill(double tBeg, double tEnd) {
+	auto& window = m_game.getWindow();
+
 	for (unsigned fret = m_drums; fret < m_pads; ++fret) { // Loop through the frets
 		float x = -2.0f + static_cast<float>(fret) - 0.5f * m_drums;
 		float yBeg = time2y(static_cast<float>(tBeg));
 		float yEnd = time2y(static_cast<float>(tEnd <= future ? tEnd : future));
 		float tcEnd = tEnd <= future ? 0.0f : 0.25f;
 		Color c = color(fret);
-		UseTexture tblock(m_tail_drumfill);
+		UseTexture tblock(window, m_tail_drumfill);
 		glutil::VertexArray va;
 		vertexPair(va, x, yBeg, c, 1.0f); // First vertex pair
 		if (std::abs(yEnd - yBeg) > 4.0 * fretWid) {
@@ -1100,39 +1108,42 @@ void GuitarGraph::drawDrumfill(double tBeg, double tEnd) {
 
 /// Draw popups and other info texts
 void GuitarGraph::drawInfo(double time) {
+	auto& window = m_game.getWindow();
 	// Draw score/streak counters
 	if (!menuOpen()) {
 		using namespace glmath;
-		Transform trans(translate(vec3(0.0f, 0.0f, -0.5f)));  // Add some depth
+		Transform trans(window, translate(vec3(0.0f, 0.0f, -0.5f)));  // Add some depth
 		double w = neckWidth();
 		float xcor = static_cast<float>(0.53f * w);
 		float h = static_cast<float>(0.15f * w);
 		// Draw scores
 		{
-			ColorTrans c(Color(0.1f, 0.3f, 1.0f, 0.9f));
+			ColorTrans c(window, Color(0.1f, 0.3f, 1.0f, 0.9f));
 			m_scoreText->render(fmt::format("{:04d}", getScore()));
 			m_scoreText->dimensions().middle(-xcor).fixedHeight(h).screenBottom(-0.22f);
-			m_scoreText->draw();
+			m_scoreText->draw(window);
 		}
 		// Draw streak counter
 		{
-			ColorTrans c(Color(0.6f, 0.6f, 0.7f, 0.95f));
+			ColorTrans c(window, Color(0.6f, 0.6f, 0.7f, 0.95f));
 			m_streakText->render(std::to_string(unsigned(m_streak)) + "/"
 			  + std::to_string(unsigned(m_longestStreak)));
 			m_streakText->dimensions().middle(-xcor).fixedHeight(h*0.75f).screenBottom(-0.18f);
-			m_streakText->draw();
+			m_streakText->draw(window);
 		}
 	}
 	// Status text at the bottom
 	{
-		ColorTrans c(Color::alpha(static_cast<float>(std::abs(std::fmod(time, 1.0) - 0.5) * 2.0)));
+		ColorTrans c(window, Color::alpha(static_cast<float>(std::abs(std::fmod(time, 1.0) - 0.5) * 2.0)));
 		if (canActivateStarpower()) {
 			m_text.dimensions.screenBottom(-0.02f).middle(-0.12f);
-			if (!m_drums) m_text.draw(_("God Mode Ready!"));
-			else if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin && time <= m_dfIt->end) m_text.draw(_("Drum Fill!"));
+			if (!m_drums)
+				m_text.draw(window, _("God Mode Ready!"));
+			else if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin && time <= m_dfIt->end)
+				m_text.draw(window, _("Drum Fill!"));
 		} else if (m_solo) {
 			m_text.dimensions.screenBottom(-0.02f).middle(-0.03f);
-			m_text.draw(_("Solo!"));
+			m_text.draw(window, _("Solo!"));
 		}
 	}
 	drawPopups();
@@ -1140,7 +1151,8 @@ void GuitarGraph::drawInfo(double time) {
 
 /// Draw a bar for drum bass pedal/note
 void GuitarGraph::drawBar(double time, float h) {
-	UseShader shader(getShader("color"));
+	auto& window = m_game.getWindow();
+	UseShader shader(getShader(window, "color"));
 	glutil::VertexArray va;
 
 	va.normal(0.0f, 1.0f, 0.0f).texCoord(0,0).vertex(-2.5f, time2y(static_cast<float>(time + h)));
@@ -1167,7 +1179,9 @@ bool GuitarGraph::updateTom(unsigned int tomTrack, int fretId) {
 
 /// Create the Chord structures for the current track/difficulty level
 void GuitarGraph::updateChords() {
-	m_chords.clear(); m_solos.clear(); m_drumfills.clear();
+	m_chords.clear();
+	m_solos.clear();
+	m_drumfills.clear();
 	m_scoreFactor = 0;
 	NoteMap const& nm = m_track_index->second->nm;
 

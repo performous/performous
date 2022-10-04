@@ -32,7 +32,7 @@ ScreenSongs::ScreenSongs(Game &game, std::string const& name, Audio& audio, Song
 void ScreenSongs::enter() {
 	m_menu.close();
 	m_songs.setFilter(m_search.text);
-	m_audio.fadeout();
+	m_audio.fadeout(getGame());
 	m_menuPos = 1;
 	m_infoPos = 0;
 	m_jukebox = false;
@@ -73,7 +73,7 @@ void ScreenSongs::menuBrowse(Songs::SortChange dir) {
 	switch (m_menuPos) {
 		case 4: m_infoPos = (m_infoPos + to_underlying(dir) + 5) % 5; break;
 		case 3: m_songs.typeChange(dir); break;
-		case 2: m_songs.sortChange(getGame(), m_audio, dir); break;
+		case 2: m_songs.sortChange(getGame(), dir); break;
 		case 1: m_songs.advance(to_underlying(dir)); break;
 		case 0: /* no function on playlist yet */ break;
 	}
@@ -161,7 +161,7 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 				m_songs.setFilter(m_search.text);
 				}
 			// Shortcut keys for accessing different type filter modes.
-			if (key == SDL_SCANCODE_TAB) m_songs.sortChange(Songs::SortChange::FORWARD);
+			if (key == SDL_SCANCODE_TAB) m_songs.sortChange(getGame(), Songs::SortChange::FORWARD);
 			if (key == SDL_SCANCODE_F5) m_songs.typeCycle(2);
 			if (key == SDL_SCANCODE_F6) m_songs.typeCycle(3);
 			if (key == SDL_SCANCODE_F7) m_songs.typeCycle(4);
@@ -205,7 +205,7 @@ void ScreenSongs::update() {
 	// Clear the old content and load new content if available
 	m_songbg.reset(); m_video.reset();
 	double pstart = (!m_jukebox && song ? song->preview_start : 0.0);
-	m_audio.playMusic(music, true, 1.0, pstart);
+	m_audio.playMusic(getGame(), music, true, 1.0, pstart);
 	if (song) {
 		fs::path const& background = song->background.empty() ? song->cover : song->background;
 		if (!background.empty()) try { m_songbg = std::make_unique<Texture>(background); } catch (std::exception const&) {}
@@ -232,6 +232,7 @@ void ScreenSongs::prepare() {
 }
 
 void ScreenSongs::drawJukebox() {
+	auto& window = getGame().getWindow();
 	double pos = m_audio.getPosition();
 	double len = m_audio.getLength();
 	double diff = len - pos;
@@ -245,38 +246,39 @@ void ScreenSongs::drawJukebox() {
 		if (cover && !cover->empty()) {
 			Texture& s = *cover;
 			s.dimensions.left(theme->song.dimensions.x1()).top(theme->song.dimensions.y2() + 0.05f).fitInside(0.15f, 0.15f);
-			s.draw();
+			s.draw(window);
 		}
 		// Format && draw the song information text
 		std::ostringstream oss_song;
 		oss_song << song.title << '\n' << song.artist;
-		theme->song.draw(oss_song.str());
+		theme->song.draw(window, oss_song.str());
 	}
 }
 
 void ScreenSongs::drawMultimedia() {
+	auto& window = getGame().getWindow();
 	if (!m_songs.empty()) {
-		Transform ft(farTransform());  // 3D effect
+		Transform ft(window, farTransform());  // 3D effect
 		double length = m_audio.getLength();
 		double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
-		m_songbg_default->draw();   // Default bg
+		m_songbg_default->draw(window);   // Default bg
 		if (m_songbg.get() && !m_video.get()) {
 			if (m_songbg->width() > 512 && m_songbg->dimensions.ar() > 1.1f) {
 				// Full screen mode
 				float s = static_cast<float>(sin(m_clock.get()) * 0.15 + 1.15);
-				Transform sc(glmath::scale(glmath::vec3(s, s, s)));
-				m_songbg->draw();
+				Transform sc(window, glmath::scale(glmath::vec3(s, s, s)));
+				m_songbg->draw(window);
 			} else {
 				// Low res texture or cover image, render in tiled mode
 				double x = 0.05 * m_clock.get();
-				m_songbg->draw(m_songbg->dimensions, TexCoords(static_cast<float>(x), 0.0f, static_cast<float>(x + 5.0), 5.0f));
+				m_songbg->draw(window, m_songbg->dimensions, TexCoords(static_cast<float>(x), 0.0f, static_cast<float>(x + 5.0), 5.0f));
 			}
 		}
-		if (m_video.get()) m_video->render(time);
+		if (m_video.get()) m_video->render(window, time);
 	}
 	if (!m_jukebox) {
-		m_songbg_ground->draw();
-		theme->bg.draw();
+		m_songbg_ground->draw(window);
+		theme->bg.draw(window);
 		drawCovers();
 	}
 }
@@ -328,17 +330,19 @@ void ScreenSongs::draw() {
 
 	if (m_jukebox) drawJukebox();
 	else {
+		auto& window = getGame().getWindow();
 		// Draw song and order texts
-		theme->song.draw(oss_song.str());
-		theme->order.draw(oss_order.str());
+		theme->song.draw(window, oss_song.str());
+		theme->order.draw(window, oss_order.str());
 		drawInstruments(Dimensions(1.0f).fixedHeight(0.09f).right(0.45f).screenTop(0.02f));
-		theme->hiscores.draw(oss_hiscore.str());
+		theme->hiscores.draw(window, oss_hiscore.str());
 	}
 	// Menus on top of everything
 	if (m_menu.isOpen()) drawMenu();
 }
 
 void ScreenSongs::drawCovers() {
+	auto& window = getGame().getWindow();
 	double spos = m_songs.currentPosition(); // This needs to be polled to run the animation
 	int ss = static_cast<int>(m_songs.size());
 	std::ptrdiff_t currentId = m_songs.currentId();
@@ -390,30 +394,30 @@ void ScreenSongs::drawCovers() {
 		float c = 0.4f + 0.6f * highlightf(0.0f);
 		if (m_menuPos == 1 /* Cover browser */ && idx + i == currentId) c = static_cast<float>(beat);
 		using namespace glmath;
-		Transform trans(translate(vec3(x, y, z)) * rotate(angle, vec3(0.0f, 1.0f, 0.0f)));
-		ColorTrans c1(Color(c, c, c));
+		Transform trans(window, translate(vec3(x, y, z)) * rotate(angle, vec3(0.0f, 1.0f, 0.0f)));
+		ColorTrans c1(window, Color(c, c, c));
 		s.dimensions.middle().screenCenter().bottom().fitInside(0.17f, 0.17f);
 		// Draw the cover normally
-		s.draw();
+		s.draw(window);
 		// Draw the reflection
-		Transform transMirror(scale(vec3(1.0f, -1.0f, 1.0f)));
-		ColorTrans c2(Color::alpha(0.4f));
-		s.draw();
+		Transform transMirror(window, scale(vec3(1.0f, -1.0f, 1.0f)));
+		ColorTrans c2(window, Color::alpha(0.4f));
+		s.draw(window);
 	}
 	// Draw the playlist
 	auto const& playlist = getGame().getCurrentPlayList().getList();
 	float c = static_cast<float>(m_menuPos == 0 /* Playlist */ ? beat : 1.0);
-	ColorTrans c1(Color(c, c, c));
+	ColorTrans c1(window, Color(c, c, c));
 	for (size_t i = playlist.size() - 1; i < playlist.size(); --i) {
 		Texture& s = getCover(*playlist[i]);
 		float pos =  static_cast<float>(i) / std::max<float>(5.0f, static_cast<float>(playlist.size()));
 		using namespace glmath;
-		Transform trans(
+		Transform trans(window,
 		  translate(vec3(-0.35f + 0.06f * pos, 0.0f, 0.3f - 0.2f * pos))
 		  * rotate(-0.0f, vec3(0.0f, 1.0f, 0.0f))
 		);
 		s.dimensions.middle().screenBottom(-0.06f).fitInside(0.08f, 0.08f);
-		s.draw();
+		s.draw(window);
 	}
 }
 
@@ -483,7 +487,7 @@ void ScreenSongs::drawInstruments(Dimensions dim) const {
 		if (isTrackInside(song.instrumentTracks,TrackName::BASS)) { guitarCount++; have_bass = true; }
 	}
 
-	UseTexture tex(*m_instrumentList);
+	UseTexture tex(getGame().getWindow(), *m_instrumentList);
 	float x = dim.x1();
 	// dancing
 	if (have_dance) {
@@ -508,6 +512,7 @@ void ScreenSongs::drawInstruments(Dimensions dim) const {
 
 void ScreenSongs::drawMenu() {
 	if (m_menu.empty()) return;
+	auto& window = getGame().getWindow();
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
 	const auto cur = &m_menu.current();
@@ -519,7 +524,7 @@ void ScreenSongs::drawMenu() {
 	float x = -w * .5f + step;
 	// Background
 	th.bg.dimensions.middle(0).center(0).stretch(w, h);
-	th.bg.draw();
+	th.bg.draw(window);
 	// Loop through menu items
 	w = 0;
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it) {
@@ -529,13 +534,13 @@ void ScreenSongs::drawMenu() {
 			txt = &(th.getCachedOption(it->getName()));
 		// Set dimensions and draw
 		txt->dimensions.middle(x).center(y);
-		txt->draw(it->getName());
+		txt->draw(window, it->getName());
 		w = std::max(w, txt->w() + 2 * step); // Calculate the widest entry
 		y += step;
 	}
 	if (cur->getComment() != "") {
 		th.comment.dimensions.middle(0).screenBottom(-0.12f);
-		th.comment.draw(cur->getComment());
+		th.comment.draw(window, cur->getComment());
 	}
 	m_menu.dimensions.stretch(w, h);
 }

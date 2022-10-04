@@ -18,7 +18,7 @@ ScreenIntro::ScreenIntro(Game &game, std::string const& name, Audio& audio): Scr
 void ScreenIntro::enter() {
 	getGame().showLogo();
 
-	m_audio.playMusic(findFile("menu.ogg"), true);
+	m_audio.playMusic(getGame(), findFile("menu.ogg"), true);
 	m_selAnim = AnimValue(0.0, 10.0);
 	m_submenuAnim = AnimValue(0.0, 3.0);
 	populateMenu();
@@ -50,11 +50,11 @@ void ScreenIntro::manageEvent(input::NavEvent const& event) {
 	}
 	else if (nav == input::NavButton::DOWN || nav == input::NavButton::MOREDOWN) m_menu.move(1);
 	else if (nav == input::NavButton::UP || nav == input::NavButton::MOREUP) m_menu.move(-1);
-	else if (nav == input::NavButton::RIGHT && m_menu.getSubmenuLevel() >= 2) m_menu.action(1); // Config menu
-	else if (nav == input::NavButton::LEFT && m_menu.getSubmenuLevel() >= 2) m_menu.action(-1); // Config menu
+	else if (nav == input::NavButton::RIGHT && m_menu.getSubmenuLevel() >= 2) m_menu.action(getGame(), 1); // Config menu
+	else if (nav == input::NavButton::LEFT && m_menu.getSubmenuLevel() >= 2) m_menu.action(getGame(), -1); // Config menu
 	else if (nav == input::NavButton::RIGHT && m_menu.getSubmenuLevel() < 2) m_menu.move(1); // Instrument nav hack
 	else if (nav == input::NavButton::LEFT && m_menu.getSubmenuLevel() < 2) m_menu.move(-1); // Instrument nav hack
-	else if (nav == input::NavButton::START) m_menu.action();
+	else if (nav == input::NavButton::START) m_menu.action(getGame());
 	else if (nav == input::NavButton::PAUSE) m_audio.togglePause();
 	// Animation targets
 	m_selAnim.setTarget(m_menu.curIndex());
@@ -70,7 +70,7 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 			m_menu.current().value->reset(modifier & KMOD_ALT);
 		}
 		else if (key == SDL_SCANCODE_S && modifier & Platform::shortcutModifier()) {
-			writeConfig(getGame(), m_audio, modifier & KMOD_ALT);
+			writeConfig(getGame(), modifier & KMOD_ALT);
 			getGame().flashMessage((modifier & KMOD_ALT)
 				? _("Settings saved as system defaults.") : _("Settings saved."));
 		}
@@ -78,6 +78,7 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 }
 
 void ScreenIntro::draw_menu_options() {
+	auto& window = getGame().getWindow();
 	// Variables used for positioning and other stuff
 	float wcounter = 0.0f;
 	const unsigned showopts = 5; // Show at most 5 options simultaneously
@@ -95,7 +96,7 @@ void ScreenIntro::draw_menu_options() {
 	// Loop the currently visible options
 	for (unsigned i = static_cast<unsigned>(start_i), ii = 0; ii < showopts && i < static_cast<unsigned>(opts.size()); ++i, ++ii) {
 		MenuOption const& opt = opts[i];
-		ColorTrans c(Color::alpha(static_cast<float>(submenuanim)));
+		ColorTrans c(window, Color::alpha(static_cast<float>(submenuanim)));
 
 		// Selection
 		if (i == m_menu.curIndex()) {
@@ -103,28 +104,28 @@ void ScreenIntro::draw_menu_options() {
 			double selanim = m_selAnim.get() - start_i;
 			if (selanim < 0.0) selanim = 0.0;
 			theme->back_h.dimensions.left(x - sel_margin).center(static_cast<float>(start_y + selanim*0.065));
-			theme->back_h.draw();
+			theme->back_h.draw(window);
 			// Draw the text, dim if option not available
 			{
-				ColorTrans c(Color::alpha(opt.isActive() ? 1.0f : 0.5f));
+				ColorTrans c(window, Color::alpha(opt.isActive() ? 1.0f : 0.5f));
 				theme->option_selected.dimensions.left(x).center(start_y + static_cast<float>(ii)*0.065f);
-				theme->option_selected.draw(_(opt.getName()));
+				theme->option_selected.draw(window, _(opt.getName()));
 			}
 			wcounter = std::max(wcounter, theme->option_selected.w() + 2.0f * sel_margin); // Calculate the widest entry
 			// If this is a config item, show the value below
 			if (opt.type == MenuOption::Type::CHANGE_VALUE) {
 				++ii; // Use a slot for the value
 				theme->option_selected.dimensions.left(x + sel_margin).center(static_cast<float>(-0.1 + (selanim+1.0)*0.065));
-				theme->option_selected.draw("<  " + _(opt.value->getValue()) + "  >");
+				theme->option_selected.draw(window, "<  " + _(opt.value->getValue()) + "  >");
 			}
 
 		// Regular option (not selected)
 		} else {
 			std::string title = _(opt.getName());
 			SvgTxtTheme& txt = getTextObject(title);
-			ColorTrans c(Color::alpha(opt.isActive() ? 1.0f : 0.5f));
+			ColorTrans c(window, Color::alpha(opt.isActive() ? 1.0f : 0.5f));
 			txt.dimensions.left(x).center(start_y + static_cast<float>(ii)*0.065f);
-			txt.draw(title);
+			txt.draw(window, title);
 			wcounter = std::max(wcounter, txt.w() + 2.0f * sel_margin); // Calculate the widest entry
 		}
 	}
@@ -132,25 +133,26 @@ void ScreenIntro::draw_menu_options() {
 }
 
 void ScreenIntro::draw() {
+	auto& window = getGame().getWindow();
 	glutil::GLErrorChecker glerror("ScreenIntro::draw()");
 	{
 		float anim = static_cast<float>(SDL_GetTicks() % 20000 / 20000.0);
-		ColorTrans c(glmath::rotate(static_cast<float>(TAU * anim), glmath::vec3(1.0f, 1.0f, 1.0f)));
-		theme->bg.draw();
+		ColorTrans c(window, glmath::rotate(static_cast<float>(TAU * anim), glmath::vec3(1.0f, 1.0f, 1.0f)));
+		theme->bg.draw(window);
 	}
-	if (m_menu.current().image) m_menu.current().image->draw();
+	if (m_menu.current().image) m_menu.current().image->draw(window);
 	// Comment
 	theme->comment_bg.dimensions.center().screenBottom(-0.01f);
-	theme->comment_bg.draw();
+	theme->comment_bg.draw(window);
 	theme->comment.dimensions.left(-0.48f).screenBottom(-0.028f);
-	theme->comment.draw(_(m_menu.current().getComment()));
+	theme->comment.draw(window, _(m_menu.current().getComment()));
 	// Key help for config
 	if (m_menu.getSubmenuLevel() > 0) {
 		theme->short_comment_bg.dimensions.stretch(theme->short_comment.w() + 0.065f, 0.025f);
 		theme->short_comment_bg.dimensions.left(-0.54f).screenBottom(-0.054f);
-		theme->short_comment_bg.draw();
+		theme->short_comment_bg.draw(window);
 		theme->short_comment.dimensions.left(-0.48f).screenBottom(-0.067f);
-		theme->short_comment.draw(_("Ctrl + S to save, Ctrl + R to reset defaults"));
+		theme->short_comment.draw(window, _("Ctrl + S to save, Ctrl + R to reset defaults"));
 	}
 	// Menu
 	draw_menu_options();
@@ -197,6 +199,7 @@ void ScreenIntro::populateMenu() {
 #ifdef USE_WEBSERVER
 
 void ScreenIntro::draw_webserverNotice() {
+	auto& window = getGame().getWindow();
 	if(m_webserverNoticeTimeout.get() == 0) {
 		m_drawNotice = !m_drawNotice;
 		m_webserverNoticeTimeout.setValue(5);
@@ -205,7 +208,7 @@ void ScreenIntro::draw_webserverNotice() {
 	if((webserversetting == 1 || webserversetting == 2) && m_drawNotice) {
 		std::string message = getGame().subscribeWebserverMessages();
 		m_webserverStatusString << _("Webserver active!\n connect to this computer\nusing: ") << message;
-		theme->WebserverNotice.draw(m_webserverStatusString.str());
+		theme->WebserverNotice.draw(window, m_webserverStatusString.str());
 	}
 }
 

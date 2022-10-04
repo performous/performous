@@ -25,7 +25,7 @@ class Game;
 class Audio;
 
 /** Write modified config options to user's or system-wide config XML **/
-void writeConfig(Game &game, Audio &audio, bool system = false);
+void writeConfig(Game &game, bool system = false);
 
 /// struct for entries in menu
 struct MenuEntry {

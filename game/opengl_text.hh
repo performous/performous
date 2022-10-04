@@ -28,12 +28,12 @@ struct TZoomText {
 struct TextStyle {
 	cairo_line_join_t LineJoin() {	///< convert svg string to cairo enum.
 		if (UnicodeUtil::caseEqual(stroke_linejoin, "round")) return CAIRO_LINE_JOIN_ROUND;
-		if (UnicodeUtil::caseEqual(stroke_linejoin, "bevel")) return CAIRO_LINE_JOIN_BEVEL;	
+		if (UnicodeUtil::caseEqual(stroke_linejoin, "bevel")) return CAIRO_LINE_JOIN_BEVEL;
 		return CAIRO_LINE_JOIN_MITER;
 	};
 	cairo_line_cap_t LineCap() {	///< convert svg string to cairo enum.
 		if (UnicodeUtil::caseEqual(stroke_linecap, "round")) return CAIRO_LINE_CAP_ROUND;
-		if (UnicodeUtil::caseEqual(stroke_linecap, "square")) return CAIRO_LINE_CAP_SQUARE;	
+		if (UnicodeUtil::caseEqual(stroke_linecap, "square")) return CAIRO_LINE_CAP_SQUARE;
 		return CAIRO_LINE_CAP_BUTT;
 	};
 	Color fill_col; ///< fill color
@@ -61,9 +61,9 @@ public:
 	/// constructor
 	OpenGLText(TextStyle &_text, float m);
 	/// draws area
-	void draw(Dimensions &_dim, TexCoords &_tex);
+	void draw(Window&, Dimensions &_dim, TexCoords &_tex);
 	/// draws full texture
-	void draw();
+	void draw(Window&);
 	/// @return x
 	float x() const { return m_x; }
 	/// @return y
@@ -85,7 +85,7 @@ public:
 	/// renders text
 	void render(std::string _text);
 	/// draws texture
-	void draw();
+	void draw(Window&);
 	/// gets dimensions
 	Dimensions& dimensions() { return m_opengl_text->dimensions(); }
 
@@ -143,9 +143,9 @@ public:
 	/// constructor
 	SvgTxtTheme(fs::path const& themeFile, float factor = 1.0f);
 	/// draws text with alpha
-	void draw(std::vector<TZoomText>& _text, bool lyrics = false);
+	void draw(Window&, std::vector<TZoomText>& _text, bool lyrics = false);
 	/// draw text with alpha
-	void draw(std::string _text);
+	void draw(Window&, std::string _text);
 	/// sets highlight
 	void setHighlight(fs::path const& themeFile);
 	/// width

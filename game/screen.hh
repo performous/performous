@@ -33,6 +33,7 @@ class Screen {
 	std::string getName() const { return m_name; }
 	/// returns game
 	Game& getGame() const { return m_game; }
+
   private:
 	Game &m_game;
 	std::string m_name;
