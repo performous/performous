@@ -18,8 +18,10 @@ void ScreenPlaylist::enter() {
 	getGame().loading(_("Initializing webcam..."), 0.1f);
 	if (config["graphic/webcam"].b() && Webcam::enabled()) {
 		try {
-			m_cam = std::make_unique<Webcam>(config["graphic/webcamid"].ui());
-		} catch (std::exception& e) { std::cout << e.what() << std::endl; };
+			m_cam = std::make_unique<Webcam>(getGame().getWindow(), config["graphic/webcamid"].ui());
+		} catch (std::exception& e) {
+			std::cout << e.what() << std::endl;
+		}
 	}
 	m_audio.togglePause();
 	if (getGame().getCurrentPlayList().isEmpty()) {
