@@ -60,7 +60,7 @@ struct Performous_Server_Traits : public restinio::default_traits_t {
 	using timer_manager_t = restinio::asio_timer_manager_t;
 	using logger_t = restinio::shared_performous_logger_t;
 	using request_handler_t = Performous_Router_t;
-	using strand_t = boost::asio::strand<boost::asio::executor>;
+	using strand_t = boost::asio::strand<restinio::default_asio_executor>;
 	using ip_blocker_t = Performous_IP_Blocker;
 };
 
