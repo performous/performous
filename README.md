@@ -18,7 +18,6 @@ Latest builds
 - [Windows (MSVC)](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-msvc.exe.zip)
 - [Windows (MinGW-w64)](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-mingw-w64.exe.zip)
 - [Mac OS X](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest.dmg.zip)
-- [Linux - Ubuntu 18.04](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-ubuntu_18.04.deb.zip)
 - [Linux - Ubuntu 20.04](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-ubuntu_20.04.deb.zip)
 - [Linux - Ubuntu 22.04](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-ubuntu_22.04.deb.zip)
 - [Linux - Debian 10](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-debian_10.deb.zip)
