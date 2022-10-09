@@ -49,7 +49,7 @@ jobs:
           echo "::set-output name=version_minor::$(cut -d '.' -f 2 <<< $(git describe --tags --abbrev=0 || echo 1.0.0))"
           echo "::set-output name=version_patch::$(cut -d '.' -f 3 <<< $(git describe --tags --abbrev=0 || echo 1.0.0))"
           echo "::set-output name=version_tweak::0"
-          echo "::set-output name=complete_version::$(if [ $GITHUB_REF_TYPE == 'tag' ]; then echo $GITHUB_REF_NAME; elif [ $GITHUB_REF_TYPE == 'branch' ] && [ $GITHUB_REF_NAME == 'master' ]; then echo $LATEST_FULL_TAG_VERSION-beta; elif [ $GITHUB_REF_TYPE == 'branch' ] && [ $GITHUB_REF_NAME != 'master' ]; then echo $LATEST_TAG_VERSION-${{github.event.pull_request.number}}-${GITHUB_SHA::7}-alpha; fi)"
+          echo "::set-output name=complete_version::$(if [ $GITHUB_REF_TYPE = 'tag' ]; then echo $GITHUB_REF_NAME; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME = 'master' ]; then echo $LATEST_FULL_TAG_VERSION-beta; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME != 'master' ]; then echo $LATEST_TAG_VERSION-${{github.event.pull_request.number}}-${GITHUB_SHA::7}-alpha; fi)"
           rm -rf performous
 
   # Set up a release that packages will be published to.
@@ -102,7 +102,6 @@ jobs:
           # Images must be added to 
           # https://github.com/performous/performous-docker with
           # a successful run on master before they can be used here
-          - ubuntu18.04
           - ubuntu20.04
           - ubuntu22.04
           - fedora34
@@ -159,18 +158,14 @@ jobs:
           . /etc/os-release
 
           ## Set up some special cmake flags for fedora
-          if [ "${ID}" == "fedora" ]; then
+          if ([ "${ID}" = "fedora" ]); then
             EXTRA_CMAKE_ARGS="-DUSE_BOOST_REGEX=1"
           fi
 
-          if ([ "${ID}" = "ubuntu" ] && [ "${VERSION_ID}" = "18.04" ]) || ([ "${ID}" = "debian" ] && [ "${VERSION_ID}" = "10" ]); then
-            # Ubuntu 18.04 and Debian Buster has system Aubio 0.4.5, this is not enough
+          if ([ "${ID}" = "debian" ] && [ "${VERSION_ID}" = "10" ]); then
+            # Debian Buster has system Aubio 0.4.5, this is not enough
             # because performous requires a minimum version of 0.4.9.
             EXTRA_CMAKE_ARGS="${EXTRA_CMAKE_ARGS} -DSELF_BUILT_AUBIO=ALWAYS -DSELF_BUILT_JSON=ALWAYS"
-            if ([ "${ID}" = "ubuntu" ]); then
-              export CC=gcc-8
-              export CXX=g++-8
-            fi
           fi
 
           ## Figure out what type of packages we need to generate
