@@ -36,6 +36,10 @@ to save the current settings to XML.
 			<short>Paths</short>
 			<long>Setup song and data paths.</long>
 		</entry>
+		<entry name="webserver">
+			<short>Webserver</short>
+			<long>Setup Webserver</long>
+		</entry>
 	</menu>
 
 	<!-- Gameplay preferences -->
@@ -111,30 +115,9 @@ to save the current settings to XML.
 		<short>Date time format</short>
 		<long>Define how date time should be displayed.</long>
 	</entry>
-	<entry name="game/webserver_access" type="uint" value="0">
-		<limits>
-			<enum>Disabled</enum>
-			<enum>Localhost </enum>
-			<enum>All connections</enum>
-		</limits>
-		<short>Webserver access</short>
-		<long>Define if you want to control performous remotely with web interface (requires restart).</long>
-	</entry>
 	<entry name="game/case-sorting" type="bool" value="false">
 		<short>Case-sensitive sorting.</short>
 		<long>Make a difference between uppercase and lowercase letters when sorting.</long>
-	</entry>
-	<entry name="game/webserver_port" type="uint" value="8000">
-		<!-- maximum of 16 bit is 65536, so 60000 should be a nice upper-limit -->
-		<limits min="0" max="60000" step="1" />
-		<short>Webserver port</short>
-		<long>Port to use for the webserver. Choose one that is not used by other applications.</long>
-	</entry>
-	<entry name="game/webserver_fallback_port" type="uint" value="8001">
-		<!-- maximum of 16 bit is 65536, so 60000 should be a nice upper-limit -->
-		<limits min="0" max="60000" step="1" />
-		<short>Webserver fallback port</short>
-		<long>Port to use in case original webserver port is in use. Choose one that you know for sure is not used by other applications.</long>
 	</entry>
 	<entry name="game/notegraphscalingmode" type="uint" value="0">
 		<limits>
@@ -438,5 +421,101 @@ to save the current settings to XML.
 		<limits min="0" max="6" step="1" />
 		<short>Sort order</short>
 		<long>Currently active sort order.</long>
+	</entry>	
+
+	<!-- Webserver Settings -->	
+	<entry name="webserver/access" type="uint" value="0">
+		<limits>
+			<enum>Disabled</enum>
+			<enum>localhost</enum>
+			<enum>All Connections</enum>
+			<enum>Custom Netmask</enum>
+		</limits>
+		<short>Webserver access</short>
+		<long>Define if you want to control performous remotely with web interface.</long>
+	</entry>
+	<entry name="webserver/netmask" type="uint" value="8">
+		<limits>
+		<!-- You can uncomment the following cases to enable them; note though that already /16 is a ridiculusly big subnet for the purposes of this game. -->
+<!-- 
+		<enum>1</enum>
+		<enum>2</enum>
+		<enum>3</enum>
+		<enum>4</enum>
+		<enum>5</enum>
+		<enum>6</enum>
+		<enum>7</enum>
+		<enum>8</enum>
+		<enum>9</enum>
+		<enum>10</enum>
+		<enum>11</enum>
+		<enum>12</enum>
+		<enum>13</enum>
+		<enum>14</enum>
+		<enum>15</enum>
+ -->
+		<enum>16</enum>
+		<enum>17</enum>
+		<enum>18</enum>
+		<enum>19</enum>
+		<enum>20</enum>
+		<enum>21</enum>
+		<enum>22</enum>
+		<enum>23</enum>
+		<enum>24</enum>
+		<enum>25</enum>
+		<enum>26</enum>
+		<enum>27</enum>
+		<enum>28</enum>
+		<enum>29</enum>
+		<enum>30</enum>
+		<enum>31</enum>
+		</limits>
+		<short>Server Netmask</short>
+		<long>Subnet from which connections will be allowed. Ignored unless access is set to "Custom Netmask."</long>
+		<stringvalue></stringvalue>
+		</entry>
+	<entry name="webserver/port" type="uint" value="8000">
+		<!-- allow all port values that would make any sense. -->
+		<limits min="1" max="65535" step="1" />
+		<short>Webserver port</short>
+		<long>Port to use for the web server. Choose one that is not used by other applications.</long>
+	</entry>
+	<entry name="webserver/fallback_port" type="uint" value="8001">
+		<!-- allow all port values that would make any sense. -->
+		<limits min="1" max="65535" step="1" />
+		<short>Webserver fallback port</short>
+		<long>Port to use in case original webserver port is in use. Choose one that you know for sure is not used by other applications.</long>
+	</entry>
+	<entry name="webserver/threads" type="uint" value="8">
+		<!-- 32 is a lot of threads. -->
+		<limits min="1" max="32" step="1" />
+		<short>Webserver Threads</short>
+		<long>Size of threadpool alloted for handling webserver connections.</long>
+	</entry>
+	<entry name="webserver/timeout" type="uint" value="15">
+		<limits min="5" max="180" step="1" />
+		<short>Handler Timeout</short>
+		<long>Seconds the request handler can take to generate a response.</long>
+	</entry>
+	<entry name="webserver/http_timelimit" type="uint" value="300">
+		<limits min="5" max="180" step="1" />
+		<short>Connection Timelimit</short>
+		<long>Seconds to hold a connection before responding to a new HTTP request.</long>
+	</entry>
+	<entry name="webserver/write_http_timelimit" type="uint" value="15">
+		<limits min="5" max="180" step="1" />
+		<short>Write Timeout</short>
+		<long>Seconds to wait for HTTP response to be written to a socket.</long>
+	</entry>
+	<entry name="webserver/buffer_size" type="uint" value="4096">
+		<limits min="1024" max="524288" step="512" />
+		<short>Buffer Size</short>
+		<long>Size of buffer for reading when receiving HTTP request.</long>
+	</entry>
+	<entry name="webserver/request_pipeline" type="uint" value="15">
+		<limits min="1" max="100" step="1" />
+		<short>Request Pipeline</short>
+		<long>Maximum number of pipelined requests per connection.</long>
 	</entry>
 </performous>

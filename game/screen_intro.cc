@@ -30,7 +30,7 @@ void ScreenIntro::enter() {
 		m_first = false;
 	}
 	reloadGL();
-	webserversetting = config["game/webserver_access"].ui();
+	webserversetting = config["webserver/access"].ui();
 	m_audio.playSample("notice.ogg");
 }
 

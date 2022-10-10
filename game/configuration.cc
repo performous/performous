@@ -1,22 +1,23 @@
-#include "audio.hh"
 #include "configuration.hh"
-#include "libxml++-impl.hh"
-
+#include "audio.hh"
 #include "fs.hh"
-#include "util.hh"
+#include "game.hh"
 #include "i18n.hh"
+#include "libxml++-impl.hh"
 #include "screen_intro.hh"
 #include "util.hh"
-#include "game.hh"
+#include "util.hh"
+
 #include <fmt/format.h>
+#include <boost/asio/ip/address_v4.hpp>
 
 #include <algorithm>
+#include <cmath>
 #include <future>
 #include <iomanip>
-#include <stdexcept>
 #include <iostream>
-#include <cmath>
 #include <map>
+#include <stdexcept>
 #include <string>
 
 
@@ -216,6 +217,17 @@ namespace {
 		else std::clog << "audio/warning: Currently selected audio backend is unavailable on this system, will default to Auto." << std::endl;
 		return "Auto";
 	}
+	std::string getValue_netmask(ConfigItem const& item) {
+		unsigned short slashNotation = item.ui();
+		std::uint64_t subNetValue = 1;
+		subNetValue <<= 32;
+		subNetValue -= (1 << (32 - slashNotation));
+		std::clog << "webserver/debug: slashNotation: " << std::to_string(slashNotation) << ", subNetValue: " << std::to_string(subNetValue) << std::endl;
+		std::string slashString = std::to_string(slashNotation);
+		std::string displayValue(boost::asio::ip::make_address_v4(subNetValue).to_string());
+		displayValue += (" (/"+slashString+")");
+		return displayValue;
+	}
 }
 
 void writeConfig(Game& game, bool system) {
@@ -368,6 +380,8 @@ void readConfigXML(fs::path const& file, unsigned mode) {
 					item.setGetValueFunction(getValue_language);
 				else if (item.getName() == "audio/backend")
 					item.setGetValueFunction(getValue_audio_backend);
+				else if (item.getName() == "webserver/netmask")
+					item.setGetValueFunction(getValue_netmask);
 			}
 			else {
 				if (it == config.end()) {
