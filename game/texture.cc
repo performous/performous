@@ -59,7 +59,11 @@ class TextureLoader::Impl {
 	std::thread m_thread;
 public:
 	Impl(): m_quit(), m_thread(&Impl::run, this) {}
-	~Impl() { m_quit = true; m_condition.notify_one(); m_thread.join(); }
+	~Impl() { 
+		m_quit = true;
+		m_condition.notify_one();
+		if (m_thread.joinable()) m_thread.join();
+		}
 	/// The loader main loop: poll for image load jobs and load into RAM
 	void run() {
 		while (!m_quit) {

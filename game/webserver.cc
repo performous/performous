@@ -60,7 +60,7 @@ WebServer::~WebServer() {
 	if( m_server ) {
             try {
 		m_server->close().wait();
-		m_serverThread->join();
+		if (m_serverThread && m_serverThread->joinable()) m_serverThread->join();
             } catch (const pplx::invalid_operation &e) {
                 std::clog << "webserver/error: stoping webserver failed: " << e.what() << std::endl;
             }

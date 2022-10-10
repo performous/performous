@@ -26,7 +26,7 @@ class Engine {
 	/// Terminates processing
 	void kill() { 
 		m_quit = true;
-		if (m_thread->joinable()) m_thread->join();
+		if (m_thread && m_thread->joinable()) m_thread->join();
 		}
 	/** Used internally for std::thread. Do not call this yourself. (std::thread requires this to be public). **/
 	void operator()();

@@ -66,7 +66,7 @@ Webcam::Webcam(int cam_id):
 Webcam::~Webcam() {
 	m_quit = true;
 	#ifdef USE_OPENCV
-	if (m_thread) m_thread->join();
+	if (m_thread && m_thread->joinable()) m_thread->join();
 	#endif
 }
 

@@ -32,7 +32,7 @@ Songs::Songs(Database & database, std::string const& songlist):
 
 Songs::~Songs() {
 	m_loading = false; // Terminate song loading if currently in progress
-	m_thread->join();
+	if (m_thread && m_thread->joinable()) m_thread->join();
 }
 
 void Songs::reload() {
@@ -43,7 +43,7 @@ void Songs::reload() {
 	}
 	// Run loading thread
 	m_loading = true;
-	if (m_thread) m_thread->join();
+	if (m_thread && m_thread->joinable()) m_thread->join();
 	m_thread = std::make_unique<std::thread>([this]{ reload_internal(); });
 }
 
