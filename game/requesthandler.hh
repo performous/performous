@@ -64,8 +64,6 @@ class RequestHandler
         RequestHandler(Game &game, std::string url, unsigned short port, Songs& songs);
         ~RequestHandler();
         const boost::asio::ip::address_v4& getLocalIP() const { return m_local_ip; };
-        pplx::task<void>open() { return m_listener.open(); }
-        pplx::task<void>close() { return m_listener.close(); }
 
 		template < typename RESP >
 		static	RESP
@@ -76,36 +74,19 @@ class RequestHandler
 			.append_header("Content-Type", mime);
 			return resp;
 		}
-
-    protected:
 		std::string getContentType(const std::string& extension);
 
     private:
-        void Get(web::http::http_request request);
-        void Put(web::http::http_request request);
-        void Post(web::http::http_request request);
-        void Delete(web::http::http_request request);
-        void Error(pplx::task<void>& t);
-        
         std::unique_ptr<Performous_Router_t> init_webserver_router();
         static std::string m_ip_address;
         static boost::asio::ip::address_v4 getLocalIP(const std::string& service);
 
-        web::json::value ExtractJsonFromRequest(web::http::http_request request);
-        nlohmann::json ExtractJsonFromRequest_New(web::http::http_request request);
-        
-        nlohmann::json convertFromCppRest(web::json::value const& jsonDoc);
-        web::json::value convertToCppRest(nlohmann::json const& jsonDoc);
-
-        void HandleFile(web::http::http_request request, std::string filePath = "");
-        web::json::value SongsToJsonObject();
         restinio::request_handling_status_t HandleFile(std::shared_ptr<restinio::request_t> request, const fs::path& filePath);
         nlohmann::json SongsToJsonObject();
         std::map<std::string, std::string> GenerateLocaleDict();
         std::vector<std::string> GetTranslationKeys();
         std::shared_ptr<Song> GetSongFromJSON(nlohmann::json);
 	Performous_Server_Settings make_server_settings(const std::string &url, unsigned short port);
-        web::http::experimental::listener::http_listener m_listener;
         Game& m_game;
         Songs& m_songs;
         restinio::http_server_t<Performous_Server_Traits> m_restinio_server;

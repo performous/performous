@@ -88,15 +88,12 @@ set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES})
 # Build main executable
 add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
 # Libraries
-
-find_package(Boost 1.55 REQUIRED COMPONENTS program_options iostreams system locale)
+find_package(Boost ${NEEDED_BOOST_VERSION} REQUIRED COMPONENTS program_options iostreams system locale)
 target_link_libraries(performous PRIVATE Boost::program_options Boost::iostreams Boost::locale Boost::system Boost::boost)
-
 add_library(fs STATIC fs.cc)
 target_include_directories(fs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 if (USE_BOOST_FS)
-	find_package(Boost 1.55 REQUIRED COMPONENTS filesystem)
-
+    find_package(Boost ${NEEDED_BOOST_VERSION} REQUIRED COMPONENTS filesystem)
 	message (STATUS "Using boost::filesystem")
 	target_link_libraries(fs PUBLIC Boost::filesystem)
 	target_compile_definitions(fs PUBLIC -DUSE_BOOST_FS)
@@ -202,31 +199,32 @@ set(ENABLE_WEBSERVER AUTO CACHE STRING "Use webserver")
 set_property(CACHE ENABLE_WEBSERVER PROPERTY STRINGS AUTO ON OFF)
 if("AUTO" STREQUAL "${ENABLE_WEBSERVER}")
 	# webserver not requested explicitly, best effort try to find it
-	find_package(CppRest QUIET)
-	if(CppRest_FOUND)
+	find_package(RESTinio QUIET)
+	if(RESTinio_FOUND)
 		message(STATUS "Webserver support: Enabled (automatically found)")
 	else()
-		message(STATUS "Webserver support: Disabled (cpprestsdk not found)")
+		message(STATUS "Webserver support: Disabled (Restinio not found)")
 		SET (ENABLE_WEBSERVER OFF FORCE)
 	endif()
 elseif(ENABLE_WEBSERVER)
 	# webserver explicitly requested, make it mandatory
-	find_package(CppRest REQUIRED)
+	find_package(RESTinio REQUIRED)
 	message(STATUS "Webserver support: Enabled (explicitly enabled)")
 else()
 	# webserver explicitly disabled
 	message(STATUS "Webserver support: Disabled (explicitly disabled)")
 endif()
-
-# if cpprest is found, add it to the dependencies
-if(CppRest_FOUND)
-	# add other required dependencies then
-	# FIXME: move this to the CppRest package includes if possible
-	find_package(Boost 1.55 REQUIRED COMPONENTS chrono thread)
-	target_include_directories(performous SYSTEM PRIVATE ${CppRest_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
-	target_link_libraries(performous PRIVATE ${CppRest_LIBRARIES} ${Boost_LIBRARIES})
-
+# if Restinio is found, add it to the dependencies
+if(RESTinio_FOUND)
+	target_link_libraries(performous PRIVATE RESTinio::RESTinio)
 	add_definitions("-DUSE_WEBSERVER")
+endif()
+
+if(ENABLE_WEBSERVER)
+	set(NEEDED_BOOST_VERSION 1.69)
+else()
+	set(NEEDED_BOOST_VERSION 1.58)
+	message(STATUS "Webserver support: Disabled (explicitly disabled)")
 endif()
 
 if(WIN32)
