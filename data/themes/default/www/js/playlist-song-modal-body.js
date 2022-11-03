@@ -30,7 +30,7 @@ $(function () {
         };
 
         $.ajax({
-            url: "api/setposition",
+            url: "/api/setposition",
             type: "POST",
             data: JSON.stringify(data),
             contentType: "application/json; charset=utf-8",
@@ -75,7 +75,7 @@ $(function () {
             "songId": songId
         };
         $.ajax({
-            url: "api/remove",
+            url: "/api/remove",
             type: "POST",
             data: JSON.stringify(data),
             contentType: "application/json; charset=utf-8",

@@ -11,7 +11,7 @@
 */
 function addSong(songObjectToSend) {
     $.ajax({
-        url: "api/add",
+        url: "/api/add",
         type: "POST",
         data: songObjectToSend,
         contentType: "application/json; charset=utf-8",
