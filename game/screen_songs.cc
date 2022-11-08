@@ -399,7 +399,7 @@ void ScreenSongs::drawCovers() {
 	double beat = 0.5 + m_idleTimer.get() / 2.0;  // 30 BPM
 	if (ss > 0) {
 		// Use actual song BPM. FIXME: Should only do this if currentId is also playing.
-		if (m_songs.currentPtr()->music == m_playing) {
+		if (m_songs.currentPtr() && m_songs.currentPtr()->music == m_playing) {
 				if (m_songs.currentPtr()->hasControllers() || !m_songs.currentPtr()->beats.empty()) {
 				double t = m_audio.getPosition() - config["audio/video_delay"].f();
 				Song::Beats const& beats = m_songs.current().beats;
@@ -409,7 +409,7 @@ void ScreenSongs::drawCovers() {
 					beat = (t - t1) / (t2 - t1);
 				}
 			}
-			else if (m_songs.currentPtr() && !m_songs.currentPtr()->m_bpms.empty()) {
+			else if (!m_songs.currentPtr()->m_bpms.empty()) {
 				float tempo = static_cast<float>(m_songs.currentPtr()->m_bpms.front().step * 4.0);
 				if (static_cast<unsigned>(tempo) <= 100u) tempo *= 2.0f;
 				else if (static_cast<unsigned>(tempo) > 400u) tempo /= 4.0f;
