@@ -68,6 +68,6 @@ AppDir:
     ## This needs to be copied to make Arch work
     cp $TARGET_APPDIR/runtime/compat/lib/x86_64-linux-gnu/libcrypt.so.1 $TARGET_APPDIR/
 AppImage:
-  arch: x86_64
+  arch: arm64
   update-information: None
   sign-key: None

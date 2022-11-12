@@ -50,7 +50,8 @@
 # default search dirs
 set(_glm_HEADER_SEARCH_DIRS
     "/usr/include"
-    "/usr/local/include")
+    "/usr/local/include"
+    "/opt/homebrew/include")
 
 # check environment variable
 set(_glm_ENV_ROOT_DIR "$ENV{GLM_ROOT_DIR}")
