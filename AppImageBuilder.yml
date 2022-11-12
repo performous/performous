@@ -10,7 +10,7 @@ AppDir:
     exec: usr/bin/performous
     exec_args: $@
   apt:
-    arch: amd64
+    arch: x86_64
     allow_unauthenticated: true
     sources:
       - sourceline: deb http://archive.ubuntu.com/ubuntu/ focal main restricted universe multiverse
@@ -68,6 +68,6 @@ AppDir:
     ## This needs to be copied to make Arch work
     cp $TARGET_APPDIR/runtime/compat/lib/x86_64-linux-gnu/libcrypt.so.1 $TARGET_APPDIR/
 AppImage:
-  arch: arm64
+  arch: x86_64
   update-information: None
   sign-key: None
