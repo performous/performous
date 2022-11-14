@@ -27,7 +27,6 @@ class ConfigItem {
 	ConfigItem& operator--() { return incdec(-1); } ///< decrements config value
 	/// Is the current value the same as the default value (factory setting or system setting)
 	bool isDefault(bool factory = false) const { return isDefaultImpl(factory ? m_factoryDefaultValue : m_defaultValue); }
-	std::string get_type() const { return m_type; } ///< get the field type
 	std::string getType() const { return m_type; } ///< get the field type
 	void setType(std::string const& type) { m_type = type; }
 	int& i(); ///< Access integer item
