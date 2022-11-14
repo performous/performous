@@ -37,6 +37,9 @@ Song::Song(nlohmann::json const& song): dummyVocal(TrackName::LEAD_VOCAL), rando
 	music[TrackName::GUITAR] = getJsonEntry<std::string>(song, "guitar").value_or("");
 	music[TrackName::BASS] = getJsonEntry<std::string>(song, "bass").value_or("");
 	music[TrackName::DRUMS] = getJsonEntry<std::string>(song, "drums").value_or("");
+	music[TrackName::DRUMS_SNARE] = getJsonEntry<std::string>(song, "drumsSnare").value_or("");
+	music[TrackName::DRUMS_CYMBALS] = getJsonEntry<std::string>(song, "drumsCymbals").value_or("");
+	music[TrackName::DRUMS_TOMS] = getJsonEntry<std::string>(song, "drumsToms").value_or("");
 	music[TrackName::KEYBOARD] = getJsonEntry<std::string>(song, "keyboard").value_or("");
 	music[TrackName::GUITAR_COOP] = getJsonEntry<std::string>(song, "guitarCoop").value_or("");
 	music[TrackName::GUITAR_RHYTHM] = getJsonEntry<std::string>(song, "guitarRhythm").value_or("");
@@ -53,6 +56,9 @@ Song::Song(nlohmann::json const& song): dummyVocal(TrackName::LEAD_VOCAL), rando
 
 	if (getJsonEntry<bool>(song, "drumTracks").value_or(false)) {
 		instrumentTracks.insert(make_pair(TrackName::DRUMS, InstrumentTrack(TrackName::DRUMS)));
+		instrumentTracks.insert(make_pair(TrackName::DRUMS_SNARE, InstrumentTrack(TrackName::DRUMS_SNARE)));
+		instrumentTracks.insert(make_pair(TrackName::DRUMS_CYMBALS, InstrumentTrack(TrackName::DRUMS_CYMBALS)));
+		instrumentTracks.insert(make_pair(TrackName::DRUMS_TOMS, InstrumentTrack(TrackName::DRUMS_TOMS)));
 	}
 	if (getJsonEntry<bool>(song, "danceTracks").value_or(false)) {
 		DanceDifficultyMap danceDifficultyMap;

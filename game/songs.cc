@@ -185,6 +185,15 @@ void Songs::CacheSonglist() {
 		if(!song->music[TrackName::DRUMS].string().empty()) {
 			songObject["drums"] = song->music[TrackName::DRUMS].string();
 		}
+		if(!song->music[TrackName::DRUMS_SNARE].string().empty()) {
+			songObject["drumsSnare"] = song->music[TrackName::DRUMS_SNARE].string();
+		}
+		if(!song->music[TrackName::DRUMS_CYMBALS].string().empty()) {
+			songObject["drumsCymbals"] = song->music[TrackName::DRUMS_CYMBALS].string();
+		}
+		if(!song->music[TrackName::DRUMS_TOMS].string().empty()) {
+			songObject["drumsToms"] = song->music[TrackName::DRUMS_TOMS].string();
+		}
 		if(!song->music[TrackName::KEYBOARD].string().empty()) {
 			songObject["keyboard"] = song->music[TrackName::KEYBOARD].string();
 		}
