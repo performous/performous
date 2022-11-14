@@ -12,3 +12,4 @@ CMakeFiles
 *.xcodeproj
 /.semaphore/keys-secret.yml
 .vs
+.vscode

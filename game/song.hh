@@ -22,6 +22,10 @@ namespace TrackName {
 	const std::string BASS = "Bass";
 	const std::string KEYBOARD = "Keyboard";
 	const std::string DRUMS = "Drums";
+	const std::string DRUMS_KICK = "Kick Drum";
+	const std::string DRUMS_SNARE = "Snare Drum";
+	const std::string DRUMS_CYMBALS = "Drum Cymbals";
+	const std::string DRUMS_TOMS = "Drum Toms";
 	const std::string LEAD_VOCAL = "Vocals";
 	#if 0 // Here is some dummy gettext calls to populate the dictionary
 	_("Guitar") _("Coop guitar") _("Rhythm guitar") _("Bass") _("Drums") _("Vocals")  _("Harmonic 1") _("Harmonic 2") _("Harmonic 3")
