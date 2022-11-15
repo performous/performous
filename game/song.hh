@@ -22,7 +22,6 @@ namespace TrackName {
 	const std::string BASS = "Bass";
 	const std::string KEYBOARD = "Keyboard";
 	const std::string DRUMS = "Drums";
-	const std::string DRUMS_KICK = "Kick Drum";
 	const std::string DRUMS_SNARE = "Snare Drum";
 	const std::string DRUMS_CYMBALS = "Drum Cymbals";
 	const std::string DRUMS_TOMS = "Drum Toms";

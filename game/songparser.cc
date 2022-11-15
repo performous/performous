@@ -135,7 +135,7 @@ void SongParser::guessFiles () {
 		{ &m_song.midifilename, R"(\.mid$)" },
 		{ &m_song.music[TrackName::PREVIEW], R"(^preview\.(mp3|ogg|aac)$)" },
 		{ &m_song.music[TrackName::GUITAR], R"(^guitar\.(mp3|ogg|aac)$)" },
-		{ &m_song.music[TrackName::BASS], R"(^rhythm\.(mp3|ogg|aac)$)" },
+		{ &m_song.music[TrackName::BASS], R"(^(bass|rhythm)\.(mp3|ogg|aac)$)" },
 		{ &m_song.music[TrackName::DRUMS], R"(^drums(_1)?\.(mp3|ogg|aac)$)" },
 		{ &m_song.music[TrackName::DRUMS_SNARE], R"(^drums_2\.(mp3|ogg|aac)$)" },
 		{ &m_song.music[TrackName::DRUMS_CYMBALS], R"(^drums_3\.(mp3|ogg|aac)$)" },
