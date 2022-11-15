@@ -181,7 +181,7 @@ VocalTrack& Song::getVocalTrack(std::string vocalTrack) {
 VocalTrack& Song::getVocalTrack(unsigned idx) {
 	if (idx >= static_cast<unsigned>(vocalTracks.size())) {
 		throw std::logic_error("Index " + std::to_string(idx) + " out of bounds in Song::getVocalTrack (size: " + std::to_string(vocalTracks.size()) +").");
-		}
+	}
 	VocalTracks::iterator it = vocalTracks.begin();
 	std::advance(it, idx);
 	return it->second;
