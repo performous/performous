@@ -130,7 +130,7 @@ void SongParser::guessFiles () {
 		{ &m_song.background, R"((background|bg|\[bg\])\.(png|jpeg|jpg|svg)$)" },
 		{ &m_song.cover, R"(\.(png|jpeg|jpg|svg)$)" },
 		{ &m_song.background, R"(\.(png|jpeg|jpg|svg)$)" },
-		{ &m_song.video, R"(\.(avi|mpg|mpeg|flv|mov|mp4|mkv|m4v)$)" },
+		{ &m_song.video, R"(\.(avi|mpg|mpeg|flv|mov|mp4|mkv|m4v|webm)$)" },
 		{ &m_song.midifilename, R"(^notes\.mid$)" },
 		{ &m_song.midifilename, R"(\.mid$)" },
 		{ &m_song.music[TrackName::PREVIEW], R"(^preview\.(mp3|m4a|ogg|opus|aac)$)" },
