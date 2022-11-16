@@ -140,11 +140,13 @@ void SongParser::guessFiles () {
 		{ &m_song.music[TrackName::DRUMS_SNARE], R"(^drums_2\.(mp3|m4a|ogg|aac)$)" },
 		{ &m_song.music[TrackName::DRUMS_CYMBALS], R"(^drums_3\.(mp3|m4a|ogg|aac)$)" },
 		{ &m_song.music[TrackName::DRUMS_TOMS], R"(^drums_4\.(mp3|m4a|ogg|aac)$)" },
-		{ &m_song.music[TrackName::KEYBOARD], R"(^(keyboard|keys)\.(mp3|m4a|ogg|aac)$)" },
+		{ &m_song.music[TrackName::KEYBOARD], R"(^key(board|s)\.(mp3|m4a|ogg|aac)$)" },
 		{ &m_song.music[TrackName::GUITAR_COOP], R"(^guitar_coop\.(mp3|m4a|ogg|aac)$)"},
 		{ &m_song.music[TrackName::GUITAR_RHYTHM], R"(^guitar_rhythm\.(mp3|m4a|ogg|aac)$)"},
-		{ &m_song.music[TrackName::LEAD_VOCAL], R"(^vocals(_1)?\.(mp3|m4a|ogg|aac)$)" },
-		{ &m_song.music[TrackName::BGMUSIC], R"(^song\.(mp3|m4a|ogg|aac)$)" },
+		{ &m_song.music[TrackName::LEAD_VOCAL], R"(^vocals_1\.(mp3|m4a|ogg|aac)$)" },
+		{ &m_song.music[TrackName::LEAD_VOCAL], R"(^vocals\.(mp3|m4a|ogg|aac)$)" },
+		{ &m_song.music[TrackName::BACKING_VOCAL], R"(^vocals_2\.(mp3|m4a|ogg|aac)$)" },
+		{ &m_song.music[TrackName::BGMUSIC], R"(^song(s)?\.(mp3|m4a|ogg|aac)$)" },
 		{ &m_song.music[TrackName::BGMUSIC], R"(\.(mp3|m4a|ogg|aac)$)" },
 	};
 

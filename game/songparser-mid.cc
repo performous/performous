@@ -16,6 +16,7 @@ const std::string HARMONIC_3 = "Harmonic 3";
 namespace {
 	bool isVocalTrack(std::string name) {
 		if(name == TrackName::LEAD_VOCAL) return true;
+		else if(name == TrackName::BACKING_VOCAL) return true;
 		else if(name == HARMONIC_1) return true;
 		else if(name == HARMONIC_2) return true;
 		else if(name == HARMONIC_3) return true;
