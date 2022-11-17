@@ -15,8 +15,8 @@ const std::string HARMONIC_3 = "Harmonic 3";
 
 namespace {
 	bool isVocalTrack(std::string name) {
-		if(name == TrackName::LEAD_VOCAL) return true;
-		else if(name == TrackName::BACKING_VOCAL) return true;
+		if(name == TrackName::VOCAL_LEAD) return true;
+		else if(name == TrackName::VOCAL_BACKING) return true;
 		else if(name == HARMONIC_1) return true;
 		else if(name == HARMONIC_2) return true;
 		else if(name == HARMONIC_3) return true;
@@ -37,7 +37,7 @@ namespace {
 		else if (name == "BASS") name = TrackName::BASS;
 		else if (name == "KEYS") return false; // TODO: RB3 5 lane keyboard track
 		else if (name == "GUITAR") name = TrackName::GUITAR;
-		else if (name == "VOCALS") name = TrackName::LEAD_VOCAL;
+		else if (name == "VOCALS") name = TrackName::VOCAL_LEAD;
 		else if (name == "HARM1") name = HARMONIC_1;
 		else if (name == "HARM2") name = HARMONIC_2;
 		else if (name == "HARM3") name = HARMONIC_3;

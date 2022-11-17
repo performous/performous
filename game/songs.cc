@@ -170,8 +170,11 @@ void Songs::CacheSonglist() {
 		if(!std::isnan(song->preview_start)) {
 			songObject["previewStart"] = song->preview_start;
 		}
-		if(!song->music[TrackName::LEAD_VOCAL].string().empty()) {
-			songObject["vocals"] = song->music[TrackName::LEAD_VOCAL].string();
+		if(!song->music[TrackName::VOCAL_LEAD].string().empty()) {
+			songObject["vocals"] = song->music[TrackName::VOCAL_LEAD].string();
+		}
+		if(!song->music[TrackName::VOCAL_BACKING].string().empty()) {
+			songObject["vocalsBacking"] = song->music[TrackName::VOCAL_BACKING].string();
 		}
 		if(!song->music[TrackName::PREVIEW].string().empty()) {
 			songObject["preview"] = song->music[TrackName::PREVIEW].string();
