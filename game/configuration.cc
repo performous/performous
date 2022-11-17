@@ -108,7 +108,11 @@ void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, unsigne
 			item.setLongDescription(getText(elem, "long"));
 		}
 		else {
-			const auto type = getAttribute(elem, "type");
+			std::string type{getAttribute(elem, "type")};
+			if (item.getType() == "uint" && type == "int") {
+				type = "uint"; // Convert old config values.
+				std::clog << "configuration/info: Converting config value: " + getAttribute(elem, "name") + ", to type uint." << std::endl;
+			}
 			if (!type.empty() && type != item.getType())
 				throw std::runtime_error("Entry type mismatch: " + getAttribute(elem, "name") + ": schema type = " + item.getType() + ", config type = " + type);
 		}
@@ -225,7 +229,7 @@ void writeConfig(bool system) {
 		dirty = true;
 		xmlpp::Element* entryNode = xmlpp::add_child_element(nodeRoot, "entry");
 		entryNode->set_attribute("name", name);
-		std::string type = item.get_type();
+		std::string type = item.getType();
 		entryNode->set_attribute("type", type);
 		if (name == "audio/backend") {
 			std::string currentBackEnd = Audio::backendConfig().getOldValue();
@@ -258,11 +262,11 @@ void writeConfig(bool system) {
 		else if (type == "uint") entryNode->set_attribute("value",std::to_string(item.ui()));
 		else if (type == "bool") entryNode->set_attribute("value", item.b() ? "true" : "false");
 		else if (type == "float") entryNode->set_attribute("value", std::to_string(item.f()));
-		else if (item.get_type() == "string") xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(item.s());
-		else if (item.get_type() == "string_list") {
+		else if (item.getType() == "string") xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(item.s());
+		else if (item.getType() == "string_list") {
 			for (auto const& str : item.sl()) xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(str);
 		}
-		else if (item.get_type() == "option_list") {
+		else if (item.getType() == "option_list") {
 			//TODO: Write selected also (as attribute?)
 			for (auto const& str : item.ol()) xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(str);
 		}

@@ -25,7 +25,7 @@ bool MenuOption::isActive() const {
 	if (type == Type::OPEN_SUBMENU && options.empty()) return false;
 	if (type == Type::CHANGE_VALUE) {
 		if (!value) return false;
-		if (value->get_type() == "option_list" && value->ol().size() <= 1) return false;
+		if (value->getType() == "option_list" && value->ol().size() <= 1) return false;
 	}
 	return true;
 }
