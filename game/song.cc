@@ -14,7 +14,7 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
-Song::Song(nlohmann::json const& song): dummyVocal(TrackName::LEAD_VOCAL), randomIdx(rand()) {
+Song::Song(nlohmann::json const& song): dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()) {
 	path = getJsonEntry<std::string>(song, "txtFileFolder").value_or("");
 	filename = getJsonEntry<std::string>(song, "txtFile").value_or("");
 	artist = getJsonEntry<std::string>(song, "artist").value_or("");
@@ -32,8 +32,8 @@ Song::Song(nlohmann::json const& song): dummyVocal(TrackName::LEAD_VOCAL), rando
 	preview_start = getJsonEntry<double>(song, "previewStart").value_or(0.0);
 	m_duration = getJsonEntry<double>(song, "duration").value_or(0.0);
 	music[TrackName::BGMUSIC] = getJsonEntry<std::string>(song, "songFile").value_or("");
-	music[TrackName::LEAD_VOCAL] = getJsonEntry<std::string>(song, "vocals").value_or("");
-	music[TrackName::VOCAL_BG] = getJsonEntry<std::string>(song, "vocalsBacking").value_or("");
+	music[TrackName::VOCAL_LEAD] = getJsonEntry<std::string>(song, "vocals").value_or("");
+	music[TrackName::VOCAL_BACKING] = getJsonEntry<std::string>(song, "vocalsBacking").value_or("");
 	music[TrackName::PREVIEW] = getJsonEntry<std::string>(song, "preview").value_or("");
 	music[TrackName::GUITAR] = getJsonEntry<std::string>(song, "guitar").value_or("");
 	music[TrackName::BASS] = getJsonEntry<std::string>(song, "bass").value_or("");
@@ -75,7 +75,7 @@ Song::Song(nlohmann::json const& song): dummyVocal(TrackName::LEAD_VOCAL), rando
 }
 
 Song::Song(fs::path const& path, fs::path const& filename):
-  dummyVocal(TrackName::LEAD_VOCAL), path(path), filename(filename), randomIdx(rand())
+  dummyVocal(TrackName::VOCAL_LEAD), path(path), filename(filename), randomIdx(rand())
 {
 	SongParser(*this);
 	collateUpdate();
@@ -172,7 +172,7 @@ VocalTrack& Song::getVocalTrack(std::string vocalTrack) {
 	if (it != vocalTracks.end()) {
 		return it->second;
 	} else {
-		it = vocalTracks.find(TrackName::LEAD_VOCAL);
+		it = vocalTracks.find(TrackName::VOCAL_LEAD);
 		if (it != vocalTracks.end()) return it->second;
 		else if (!vocalTracks.empty()) return vocalTracks.begin()->second;
 		else return dummyVocal;

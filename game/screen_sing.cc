@@ -36,7 +36,7 @@ namespace {
 
 ScreenSing::ScreenSing(std::string const& name, Audio& audio, Database& database, Backgrounds& bgs):
 	Screen(name), m_audio(audio), m_database(database), m_backgrounds(bgs),
-	m_selectedTrack(TrackName::LEAD_VOCAL)
+	m_selectedTrack(TrackName::VOCAL_LEAD)
 {}
 
 void ScreenSing::enter() {
@@ -98,7 +98,7 @@ void ScreenSing::prepareVoicesMenu(unsigned moveSelectionTo) {
 			for (auto const& track: tracks) vocalTrack.addEnum(track.second.name);
 			if (tracks.size() > 1) {
 				if (player % 2) vocalTrack.selectEnum(m_song->getVocalTrack(SongParserUtil::DUET_P2).name);  // Every other player gets the second track
-				else vocalTrack.selectEnum(m_song->getVocalTrack(TrackName::LEAD_VOCAL).name);
+				else vocalTrack.selectEnum(m_song->getVocalTrack(TrackName::VOCAL_LEAD).name);
 			}
 			m_menu.add(MenuOption("", _("Change vocal track"))).changer(vocalTrack);
 			if (m_duet.ui() == 1) {

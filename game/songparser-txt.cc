@@ -20,7 +20,7 @@ bool SongParser::txtCheck(std::string const& data) const {
 void SongParser::txtParseHeader() {
 	Song& s = m_song;
 	std::string line;
-	s.insertVocalTrack(TrackName::LEAD_VOCAL, VocalTrack(TrackName::LEAD_VOCAL)); // Dummy note to indicate there is a track
+	s.insertVocalTrack(TrackName::VOCAL_LEAD, VocalTrack(TrackName::VOCAL_LEAD)); // Dummy note to indicate there is a track
 	while (getline(line) && txtParseField(line)) {}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 	if (m_bpm != 0.0f) addBPM(0, m_bpm);
@@ -31,7 +31,7 @@ void SongParser::txtParse() {
 	std::string line;
 	m_curSinger = CurrentSinger::P1;
 	if (!m_song.vocalTracks.empty()) { m_song.vocalTracks.clear(); }
-	m_song.insertVocalTrack(TrackName::LEAD_VOCAL, VocalTrack(TrackName::LEAD_VOCAL));
+	m_song.insertVocalTrack(TrackName::VOCAL_LEAD, VocalTrack(TrackName::VOCAL_LEAD));
 	m_song.insertVocalTrack(DUET_P2, VocalTrack(DUET_P2));
 	while (getline(line) && txtParseField(line)) {} // Parse the header again
 	txtResetState();
@@ -39,7 +39,7 @@ void SongParser::txtParse() {
 	// Workaround for the terminating : 1 0 0 line, written by some converters
 	// FIXME: Should we do this for all tracks?	
 	
-	for (auto const& name: { TrackName::LEAD_VOCAL, DUET_P2 }) {
+	for (auto const& name: { TrackName::VOCAL_LEAD, DUET_P2 }) {
 		Notes& notes = m_song.getVocalTrack(name).notes;
 		auto it = notes.rbegin();
 		if (!notes.empty() && it->type != Note::Type::SLEEP && it->begin == it->end) notes.pop_back();
@@ -49,11 +49,11 @@ void SongParser::txtParse() {
 	if (m_song.hasDuet()) {
 		bool skip;
 		Notes s1, s2, merged, finalDuet;
-		s1 = m_song.getVocalTrack(TrackName::LEAD_VOCAL).notes;
+		s1 = m_song.getVocalTrack(TrackName::VOCAL_LEAD).notes;
 		s2 = m_song.getVocalTrack(SongParserUtil::DUET_P2).notes;
 		std::merge(s1.begin(), s1.end(), s2.begin(), s2.end(), std::back_inserter(merged), Note::ltBegin);
 		VocalTracks const& tracks = m_song.vocalTracks;
-		std::string duetName = tracks.at(TrackName::LEAD_VOCAL).name + " & " + tracks.at(SongParserUtil::DUET_P2).name;
+		std::string duetName = tracks.at(TrackName::VOCAL_LEAD).name + " & " + tracks.at(SongParserUtil::DUET_P2).name;
 		m_song.insertVocalTrack(SongParserUtil::DUET_BOTH, duetName);
 		VocalTrack& duetTrack = m_song.getVocalTrack(SongParserUtil::DUET_BOTH);
 		Notes& duetNotes = duetTrack.notes;
@@ -90,8 +90,8 @@ void SongParser::txtParse() {
 		auto finalNote = std::unique(finalDuet.begin(), finalDuet.end(), Note::equal);
 		finalDuet.erase(finalNote, finalDuet.end());
 		duetNotes.swap(finalDuet);
-		duetTrack.noteMin = std::min(m_song.getVocalTrack(TrackName::LEAD_VOCAL).noteMin, m_song.getVocalTrack(SongParserUtil::DUET_P2).noteMin);
-		duetTrack.noteMax = std::max(m_song.getVocalTrack(TrackName::LEAD_VOCAL).noteMax, m_song.getVocalTrack(SongParserUtil::DUET_P2).noteMax);
+		duetTrack.noteMin = std::min(m_song.getVocalTrack(TrackName::VOCAL_LEAD).noteMin, m_song.getVocalTrack(SongParserUtil::DUET_P2).noteMin);
+		duetTrack.noteMax = std::max(m_song.getVocalTrack(TrackName::VOCAL_LEAD).noteMax, m_song.getVocalTrack(SongParserUtil::DUET_P2).noteMax);
 	} 
 }
 
@@ -108,7 +108,7 @@ bool SongParser::txtParseField(std::string const& line) {
 	if (key == "BPM") assign(m_bpm, value);
 	else if (key == "RELATIVE") assign(m_relative, value);
 	else if (key == "GAP") { assign(m_gap, value); m_gap *= 1e-3; }
-	else if (key == "DUETSINGERP1" || key == "P1") m_song.insertVocalTrack(TrackName::LEAD_VOCAL, VocalTrack(value.substr(value.find_first_not_of(" "))));
+	else if (key == "DUETSINGERP1" || key == "P1") m_song.insertVocalTrack(TrackName::VOCAL_LEAD, VocalTrack(value.substr(value.find_first_not_of(" "))));
 	// Strong hint that this is a duet, so it will be readily displayed with two singers in browser and properly filtered
 	else if (key == "DUETSINGERP2" || key == "P2") m_song.insertVocalTrack(DUET_P2, VocalTrack(value.substr(value.find_first_not_of(" "))));
 	
@@ -205,7 +205,7 @@ bool SongParser::txtParseNote(std::string line) {
 	n.begin = tsTime(ts);
 	VocalTrack& vocal = m_song.getVocalTrack(
 	  (m_curSinger == CurrentSinger::P1) || (m_curSinger == CurrentSinger::BOTH)
-	  ? TrackName::LEAD_VOCAL : DUET_P2);
+	  ? TrackName::VOCAL_LEAD : DUET_P2);
 	Notes& notes = vocal.notes;
 	if (m_relative && notes.empty()) m_txt.relativeShift = ts;
 	m_txt.prevts = ts;
