@@ -219,7 +219,7 @@ bool Music::prepare() {
 				intptr_t readptr = 0;
 				fvec_t* tempoSamplePtr = new_fvec(Audio::aubio_hop_size);
 				std::lock_guard<std::recursive_mutex> l(Audio::aubio_mutex);
-				ScreenSongs* sSongs = static_cast<ScreenSongs *>(m_game.getScreen("Songs"));
+				ScreenSongs* sSongs = dynamic_cast<ScreenSongs*>(m_game.getScreen("Songs"));
 				if (!sSongs->getSongs().currentPtr()) return false;
 				double pstart = sSongs->getSongs().currentPtr()->preview_start;
 				pstart = (std::isnan(pstart) ? 0.0 : pstart);
