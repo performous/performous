@@ -43,13 +43,13 @@ jobs:
           cd performous
           LATEST_TAG_VERSION=$(git describe --tags --abbrev=0 || echo 1.0.0)
           LATEST_FULL_TAG_VERSION=$(git describe --tags || echo 1.0.0)
-          echo "::set-output name=latest_tag_version::$(git describe --tags --abbrev=0 || echo 1.0.0)"
-          echo "::set-output name=latest_full_tag_version::$(git describe --tags || echo 1.0.0)"
-          echo "::set-output name=version_major::$(cut -d '.' -f 1 <<< $(git describe --tags --abbrev=0 || echo 1.0.0))"
-          echo "::set-output name=version_minor::$(cut -d '.' -f 2 <<< $(git describe --tags --abbrev=0 || echo 1.0.0))"
-          echo "::set-output name=version_patch::$(cut -d '.' -f 3 <<< $(git describe --tags --abbrev=0 || echo 1.0.0))"
-          echo "::set-output name=version_tweak::0"
-          echo "::set-output name=complete_version::$(if [ $GITHUB_REF_TYPE = 'tag' ]; then echo $GITHUB_REF_NAME; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME = 'master' ]; then echo $LATEST_FULL_TAG_VERSION-beta; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME != 'master' ]; then echo $LATEST_TAG_VERSION-${{github.event.pull_request.number}}-${GITHUB_SHA::7}-alpha; fi)"
+          echo "latest_tag_version=$(git describe --tags --abbrev=0 || echo 1.0.0)" >> $GITHUB_OUTPUT
+          echo "latest_full_tag_version=$(git describe --tags || echo 1.0.0)" >> $GITHUB_OUTPUT
+          echo "version_major=$(cut -d '.' -f 1 <<< $(git describe --tags --abbrev=0 || echo 1.0.0))" >> $GITHUB_OUTPUT
+          echo "version_minor=$(cut -d '.' -f 2 <<< $(git describe --tags --abbrev=0 || echo 1.0.0))" >> $GITHUB_OUTPUT
+          echo "version_patch=$(cut -d '.' -f 3 <<< $(git describe --tags --abbrev=0 || echo 1.0.0))" >> $GITHUB_OUTPUT
+          echo "version_tweak=0" >> $GITHUB_OUTPUT
+          echo "complete_version=$(if [ $GITHUB_REF_TYPE = 'tag' ]; then echo $GITHUB_REF_NAME; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME = 'master' ]; then echo $LATEST_FULL_TAG_VERSION-beta; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME != 'master' ]; then echo $LATEST_TAG_VERSION-${{github.event.pull_request.number}}-${GITHUB_SHA::7}-alpha; fi)" >> $GITHUB_OUTPUT
           rm -rf performous
 
   # Set up a release that packages will be published to.
@@ -556,7 +556,7 @@ jobs:
         shell: bash
         run: |
           echo '::echo::on'
-          echo '::set-output name=action_echo::enabled'
+          echo 'action_echo=enabled' >> $GITHUB_OUTPUT
           echo workpath=$(echo '${{ github.workspace }}' | sed 's|\\|/|g') >> $GITHUB_ENV
       - name: Install MSYS2.
         uses: msys2/setup-msys2@v2
@@ -655,10 +655,3 @@ jobs:
           asset_path: ${{ env.ARTIFACT_PATH }}
           asset_name: ${{ env.ARTIFACT_FILENAME }}
           asset_content_type: application/octet-stream
-
-#      - name: Start SSH session
-#        if: ${{ always() }}
-#        uses: luchihoratiu/debug-via-ssh@main
-#        with:
-#          NGROK_AUTH_TOKEN: ${{ secrets.LK_NGROK_TOKEN }}
-#          SSH_PASS: ${{ secrets.LK_SSH_PASSWORD }}
