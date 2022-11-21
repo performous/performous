@@ -1,0 +1,39 @@
+ARG OS_VERSION
+## Use the official Debian <OS_VERSION> Image from Dockerhub
+FROM docker.io/library/debian:${OS_VERSION}
+
+## Copy OS_VERSION into ENV so we can use it in scripts too
+ARG OS_VERSION
+ENV OS_VERSION=${OS_VERSION}
+
+## Set up environment variables so the tzdata install doesn't
+## hang on asking for user input for configuration
+ARG DEBIAN_FRONTEND="noninteractive"
+ARG TZ="America/New_York"
+
+## Install the deps and create the build directory
+RUN if [ ${OS_VERSION} -eq 10 ]; then \
+      apt-get update && \
+      apt-get install -y wget gpg && \
+      wget -nc https://apt.kitware.com/keys/kitware-archive-latest.asc && \
+      apt-key add kitware-archive-latest.asc && \
+      echo 'deb https://apt.kitware.com/ubuntu/ bionic main' | tee /etc/apt/sources.list.d/kitware.list >/dev/null; fi && \
+    apt-get update &&\
+    apt-get install -y --no-install-recommends git cmake build-essential \
+      gettext help2man libopenblas-dev libfftw3-dev libicu-dev libepoxy-dev \
+      libsdl2-dev libfreetype6-dev libpango1.0-dev librsvg2-dev libxml++2.6-dev \
+      libavcodec-dev libavformat-dev libswscale-dev libjpeg-dev \
+      portaudio19-dev libglm-dev libboost-filesystem-dev \
+      libboost-iostreams-dev libboost-locale-dev libboost-system-dev \
+      libboost-program-options-dev libssl-dev libcpprest-dev \
+      libportmidi-dev libopencv-dev libaubio-dev nlohmann-json3-dev \
+      libfmt-dev ca-certificates file && \
+    if [ ${OS_VERSION} -eq 11 ]; then \
+       apt-get -y install libgmock-dev libgtest-dev; fi && \
+    apt-get clean && \
+    mkdir /root/performous
+
+## Copy in the build script to make things easy
+COPY build_performous.sh /root/performous/build_performous.sh
+
+WORKDIR /root/performous
