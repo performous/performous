@@ -1,0 +1,27 @@
+ARG OS_VERSION
+## Use the official Ubuntu <OS_VERSION> Image from Dockerhub
+FROM docker.io/library/ubuntu:${OS_VERSION}
+
+## Set up environment variables so the tzdata install doesn't
+## hang on asking for user input for configuration
+ARG DEBIAN_FRONTEND="noninteractive"
+ARG TZ="America/New_York"
+
+## Install the deps and create the build directory
+RUN apt-get update && \ 
+    apt-get install -y --no-install-recommends git cmake build-essential \
+      gettext help2man libopenblas-dev libfftw3-dev libicu-dev libepoxy-dev \
+      libsdl2-dev libfreetype6-dev libpango1.0-dev librsvg2-dev libxml++2.6-dev \
+      libavcodec-dev libavformat-dev libswscale-dev libjpeg-dev \
+      portaudio19-dev libglm-dev libboost-filesystem-dev nlohmann-json3-dev\
+      libboost-iostreams-dev libboost-locale-dev libboost-system-dev \
+      libboost-program-options-dev libssl-dev libcpprest-dev \
+      libportmidi-dev libopencv-dev libaubio-dev \
+      libfmt-dev ca-certificates file libgtest-dev libgmock-dev && \
+    apt-get clean && \
+    mkdir /root/performous
+
+## Copy in the build script to make things easy
+COPY build_performous.sh /root/performous/build_performous.sh
+
+WORKDIR /root/performous

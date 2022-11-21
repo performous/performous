@@ -1,0 +1,19 @@
+ARG OS_VERSION
+## Use the official Fedora <OS_VERSION> Image from Dockerhub
+FROM docker.io/library/fedora:${OS_VERSION}
+
+## Install the deps and create the working directory
+## Enable the RPM Fusion Free Repo
+RUN dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm &&\
+    dnf install -y git cmake gcc-c++ gettext cairo-devel librsvg2-devel libsigc++20-devel \
+        glibmm24-devel libxml++-devel boost-devel SDL2-devel libepoxy-devel ffmpeg-devel \
+        portaudio-devel help2man redhat-lsb opencv-devel portmidi-devel libjpeg-turbo-devel \
+        pango-devel jsoncpp-devel glm-devel openblas-devel fftw-devel cpprest-devel \
+        aubio-devel json-devel rpm-build fmt-devel gtest-devel gmock-devel && \
+    dnf clean all && \
+    mkdir /root/performous
+
+## Copy in the build script to make things easy
+COPY build_performous.sh /root/performous/build_performous.sh
+
+WORKDIR /root/performous
