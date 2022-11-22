@@ -90,6 +90,7 @@ jobs:
 
   # Pull in the docker build workflow
   build_docker:
+    name: Build the docker containers
     if: ${{ needs.determine_docker_version.outputs.build_docker_containers }}
     uses: ./.github/workflows/docker.yml
     needs:

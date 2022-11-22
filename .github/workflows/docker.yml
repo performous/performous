@@ -31,7 +31,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Determine the branch name
         id: branch_name
@@ -49,17 +49,17 @@ jobs:
           - 22.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Login to the container registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ env.REPO_NAME }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Ubuntu ${{ matrix.os }} Container
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: docker/
           file: ./docker/Dockerfile.ubuntu
@@ -72,7 +72,7 @@ jobs:
           docker run --rm ubuntu${{ matrix.os }}-test ./build_performous.sh -g -R
  
       - name: Push container
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: docker/
           push: true
@@ -91,17 +91,17 @@ jobs:
           - 11 # Bullseye
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Login to the container registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}                
           username: ${{ env.REPO_NAME }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Debian ${{ matrix.os }} Container
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: docker/
           file: ./docker/Dockerfile.debian
@@ -114,7 +114,7 @@ jobs:
           docker run --rm debian${{ matrix.os }}-test ./build_performous.sh -g -R
 
       - name: Push container
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: docker/
           file: ./docker/Dockerfile.debian
@@ -134,17 +134,17 @@ jobs:
           - 36
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Login to the container registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}                
           username: ${{ env.REPO_NAME }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Fedora ${{ matrix.os }} Container
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: docker/
           file: ./docker/Dockerfile.fedora
@@ -157,7 +157,7 @@ jobs:
           docker run --rm fedora${{ matrix.os }}-test ./build_performous.sh -g -R
 
       - name: Push container
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: docker/
           file: ./docker/Dockerfile.fedora
