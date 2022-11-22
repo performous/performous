@@ -35,5 +35,7 @@ RUN if [ ${OS_VERSION} -eq 10 ]; then \
 
 ## Copy in the build script to make things easy
 COPY build_performous.sh /root/performous/build_performous.sh
+COPY run_ctest.sh /root/performous/run_ctest.sh
+COPY run_gtest.sh /root/performous/run_gtest.sh
 
 WORKDIR /root/performous

@@ -1,0 +1,194 @@
+name: Build Linux Packages
+
+on:
+  # Run on a schedule to get monthly updates
+  schedule:
+    - cron: "* * 28 * *"
+
+  # Run when called from other workflows
+  workflow_call:
+    inputs:
+      package_complete_version:
+        description: 'The output of the complete_version of the "determine_version" job from the build_and_release.yml workflow'
+        required: true
+        type: string
+      release_upload_url:
+        description: 'The output of the "create_release" job from the build_and_release.yml workflow'
+        required: true
+        type: string
+
+env:
+  REGISTRY: ghcr.io
+  REPO_NAME: ${{ github.repository_owner }}
+
+jobs:
+  # Decide if we need to build the containers on this run
+  determine_docker_version:
+    name: Determine whether to build the containers or not
+    runs-on: ubuntu-latest
+    outputs:
+      build_docker_containers: ${{ steps.version.outputs.build_docker_containers }}
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Determine version
+        id: version
+        run: |
+          # Only run the container builds when something in the docker folder or
+          # this workflow has changed from master, or if it was cron triggered
+          GIT_OUTPUT="$(git log -n 2 --stat)"
+          if [ $(echo ${GIT_OUTPUT} | grep -c docker/) -gt 0 ] || [ $(echo ${GIT_OUTPUT} | grep -c .github/workflows/linux.yml) -gt 0 ] || [ '${{ github.event_name }}' = 'schedule' ]; then
+            echo "build_docker_containers=true" >> $GITHUB_OUTPUT
+          else
+            echo "build_docker_containers=false" >> $GITHUB_OUTPUT
+          fi
+
+  build_packages:
+    name: Build the Linux packages
+    runs-on: ubuntu-latest
+    needs:
+      - determine_docker_version
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu
+            version: 20.04
+          - os: ubuntu
+            version: 22.04
+          - os: debian
+            version: 10
+          - os: debian
+            version: 11
+          - os: fedora
+            version: 34
+          - os: fedora
+            version: 35
+          - os: fedora
+            version: 36
+    steps:
+      - name: Container name
+        run: |
+          # Figure out the container name we'll use for the build
+          BUILD_CONTAINER=${{ env.REGISTRY }}/${{ env.REPO_NAME }}/deps:${{ matrix.os }}-${{ matrix.version }}
+          echo "CONTAINER_NAME=${BUILD_CONTAINER}" >> $GITHUB_ENV
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Login to the container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.REPO_NAME }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build ${{ matrix.os }} ${{ matrix.version }} Container
+        if: ${{ needs.determine_docker_version.outputs.build_docker_containers == 'true' }}
+        uses: docker/build-push-action@v3
+        with:
+          context: docker/
+          file: ./docker/Dockerfile.${{ matrix.os }}
+          load: true
+          tags: ${{ env.CONTAINER_NAME }} 
+          build-args: OS_VERSION=${{ matrix.version }}
+
+      - name: Build package
+        # Don't build the packages if triggered by cron because it will not
+        # have the correct inputs required to construct the package names correctly.
+        # The cron schedule is really for making sure the docker containers are
+        # up-to-date anyway.
+        if: ${{ github.event_name != 'schedule' }}
+        run: |
+          # Set the correct version in cmake
+          PACKAGE_VERSION=${{ inputs.package_complete_version }}
+          EXTRA_CMAKE_ARGS="-DPERFORMOUS_VERSION=${PACKAGE_VERSION}"
+
+          # Decide if we should build a 'Release' package or a 'RelWithDebInfo' (default)
+          # For some reason, building with 'RelWithDebInfo' (default) doesn't work 
+          # specifically on PRs, so we'll just build Releases for everything for now
+          #if [ '${{ github.event_name }}' != 'pull_request' ]; then
+            RELEASE_TYPE="-R"
+          #fi
+
+          # Only pull the container if it wasn't built locally
+          if [ '${{ needs.determine_docker_version.outputs.build_docker_containers }}' = 'false' ]; then
+            docker pull ${{ env.CONTAINER_NAME }}
+          fi
+
+          # Run the build inside the docker containers using the
+          # build script that was pulled inside during the build
+          docker run --rm -v $(pwd):/github_actions_build/ ${{ env.CONTAINER_NAME }} ./build_performous.sh -g -D /github_actions_build/ -E ${EXTRA_CMAKE_ARGS} ${RELEASE_TYPE}
+          # Do some mangling to make a unique name based on the OS
+          # This is needed so we don't overwite in the release each time.
+          # We should probably investigate what cmake can do for package output
+          # to make this cleaner in the future
+          WORK_DIR=$(pwd)
+          PACKAGE_PATH=$(ls ${WORK_DIR}/build/Performous*-Linux.*)
+          PACKAGE_NAME=$(basename ${PACKAGE_PATH})
+          PACKAGE_SUFFIX=$(echo ${PACKAGE_NAME} | sed 's/^.*\(.\{4\}\)/\1/')
+          NEW_PACKAGE_NAME="${WORK_DIR}/Performous-${PACKAGE_VERSION}-${{ matrix.os }}_${{ matrix.version }}${PACKAGE_SUFFIX}"
+          MASTER_NEW_PACKAGE_NAME="${WORK_DIR}/Performous-latest-${{ matrix.os }}_${{ matrix.version }}${PACKAGE_SUFFIX}"
+          cp ${PACKAGE_PATH} ${MASTER_NEW_PACKAGE_NAME}
+          cp ${PACKAGE_PATH} ${NEW_PACKAGE_NAME}
+          ARTIFACT_NAME=$(basename ${NEW_PACKAGE_NAME})
+          MASTER_ARTIFACT_NAME=$(basename ${MASTER_NEW_PACKAGE_NAME})
+          echo "ARTIFACT_PATH=${NEW_PACKAGE_NAME}" >> ${GITHUB_ENV}
+          echo "ARTIFACT_NAME=${ARTIFACT_NAME}" >> ${GITHUB_ENV}
+          echo "MASTER_ARTIFACT_PATH=${MASTER_NEW_PACKAGE_NAME}" >> ${GITHUB_ENV}
+          echo "MASTER_ARTIFACT_NAME=${MASTER_ARTIFACT_NAME}" >> ${GITHUB_ENV}
+
+      - name: Run unittests directly called
+        if: ${{ github.event_name != 'schedule' }}
+        run: |
+          # Run the containers with the script for each testing suite
+          docker run --rm -v $(pwd):/github_actions_build/ ${{ env.CONTAINER_NAME }} ./run_gtest.sh
+
+      - name: Run unittests by ctest
+        if: ${{ github.event_name != 'schedule' }}
+        run: |
+          docker run --rm -v $(pwd):/github_actions_build/ ${{ env.CONTAINER_NAME }} ./run_ctest.sh
+
+      # Upload artifacts during pull-requests
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.ARTIFACT_PATH }}
+
+      # Upload artifacts on master
+      - name: Upload artifact with unified name
+        if: ${{ github.ref == 'refs/heads/master' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.MASTER_ARTIFACT_NAME }}
+          path: ${{ env.MASTER_ARTIFACT_PATH }}
+
+      # Upload artifacts to releases only during Release events
+      - name: Upload artifacts to tagged release
+        id: upload_assets
+        if: ${{ github.event_name != 'pull_request' && github.ref_type == 'tag' }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ inputs.release_upload_url }}
+          asset_path: ${{ env.ARTIFACT_PATH }}
+          asset_name: ${{ env.ARTIFACT_NAME }}
+          asset_content_type: application/octet-stream
+
+      - name: Push container
+        uses: docker/build-push-action@v3
+        # Containers can't be pushed during PRs because of the way permissions
+        # are delegated to secrets.GITHUB_TOKEN
+        if: ${{ needs.determine_docker_version.outputs.build_docker_containers == 'true' && github.event_name != 'pull_request' }}
+        with:
+          context: docker/
+          file: ./docker/Dockerfile.${{ matrix.os }}
+          push: true
+          tags: ${{ env.CONTAINER_NAME }}
+          build-args: OS_VERSION=${{ matrix.version }}
