@@ -13,8 +13,10 @@ usage() {
   echo ""
   echo "Optional Arguments:"
   echo "  -b <Git Branch>: Build the specified git branch, tag, or sha"
-  echo "  -p <Pull Request #>: Build the specified Github Pull Request number"
+  echo "  -D </path/to/build/directory>: Disable cloning the repo from git and build in the specified directory"
+  echo "  -E <'Extra Cmake Args'>: A quoted list of extra arguments to pass directly to cmake"
   echo "  -g : Generate Packages"
+  echo "  -p <Pull Request #>: Build the specified Github Pull Request number"
   echo "  -r <Repository URL>: Git repository to pull from"
   echo "  -R : Perform a 'Release' Cmake Build (Default is 'RelWithDebInfo')"
   echo "  -h : Show this help message"
@@ -22,14 +24,18 @@ usage() {
 }
 
 ## Set up getopts
-while getopts "b:p:gr:Rh" OPTION; do
+while getopts "b:D:E:gp:r:Rh" OPTION; do
   case ${OPTION} in
     "b")
       GIT_BRANCH=${OPTARG};;
-    "p")
-      PULL_REQUEST=${OPTARG};;
+    "D")
+      BUILD_DIRECTORY=${OPTARG};;
+    "E")
+      EXTRA_CMAKE_ARGS=${OPTARG};;
     "g")
       GENERATE_PACKAGES=true;;
+    "p")
+      PULL_REQUEST=${OPTARG};;
     "r")
       GIT_REPOSITORY=${OPTARG};;
     "R")
@@ -41,23 +47,26 @@ done
 
 if [ ${HELP} ]; then
   usage
-  exit 2
 fi
 
 ## All the git stuff
-git clone ${GIT_REPOSITORY}
-cd performous
-if [ ${PULL_REQUEST} ]; then
-  git fetch origin pull/${PULL_REQUEST}/head:pr
-  git checkout pr
-elif [ ${GIT_BRANCH} ]; then
-  git checkout ${GIT_BRANCH}
+if [ -z ${BUILD_DIRECTORY} ]; then
+  git clone ${GIT_REPOSITORY}
+  cd performous
+  if [ ${PULL_REQUEST} ]; then
+    git fetch origin pull/${PULL_REQUEST}/head:pr
+    git checkout pr
+  elif [ ${GIT_BRANCH} ]; then
+    git checkout ${GIT_BRANCH}
+  fi
+  git submodule update --init --recursive
+else
+  cd ${BUILD_DIRECTORY}
 fi
-git submodule update --init --recursive
 
 ## Set up some special cmake flags for fedora
 if [ "${ID}" == "fedora" ]; then
-  EXTRA_CMAKE_ARGS='-DUSE_BOOST_REGEX=1'
+  EXTRA_CMAKE_ARGS="${EXTRA_CMAKE_ARGS} -DUSE_BOOST_REGEX=1"
 fi
 
 ## Set more cmake flags for Debian 10
@@ -69,16 +78,6 @@ fi
 
 if [ "${RELEASE_BUILD}" ]; then
   EXTRA_CMAKE_ARGS="${EXTRA_CMAKE_ARGS} -DCMAKE_BUILD_TYPE=Release"
-fi
-
-if ([ "${ID}" = "ubuntu" ] && [ "${VERSION_ID}" = "18.04" ]) || ([ "${ID}" = "debian" ] && [ "${VERSION_ID}" = "10" ]); then
-  # Ubuntu 18.04 and Debian Buster has system Aubio 0.4.5, this is not enough
-  # because performous requires a minimum version of 0.4.9.
-  EXTRA_CMAKE_ARGS="${EXTRA_CMAKE_ARGS} -DSELF_BUILT_AUBIO=ALWAYS"
-  if ([ "${ID}" = "ubuntu" ]); then
-    export CC=gcc-8
-    export CXX=g++-8
-  fi
 fi
 
 ## Figure out what type of packages we need to generate

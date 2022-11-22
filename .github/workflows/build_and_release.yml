@@ -33,8 +33,6 @@ jobs:
       version_patch: ${{ steps.versioning.outputs.version_patch }}
       version_tweak: ${{ steps.versioning.outputs.version_tweak }}
       complete_version: ${{ steps.versioning.outputs.complete_version }}
-      build_docker_containers: ${{ steps.versioning.outputs.build_docker_containers }}
-      docker_branch_name: ${{ steps.versioning.outputs.docker_branch_name }}
     steps:
       - name: Determine the complete version
         id: versioning
@@ -52,49 +50,6 @@ jobs:
           echo "version_patch=$(cut -d '.' -f 3 <<< $(git describe --tags --abbrev=0 || echo 1.0.0))" >> $GITHUB_OUTPUT
           echo "version_tweak=0" >> $GITHUB_OUTPUT
           echo "complete_version=$(if [ $GITHUB_REF_TYPE = 'tag' ]; then echo $GITHUB_REF_NAME; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME = 'master' ]; then echo $LATEST_FULL_TAG_VERSION-beta; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME != 'master' ]; then echo $LATEST_TAG_VERSION-${{github.event.pull_request.number}}-${GITHUB_SHA::7}-alpha; fi)" >> $GITHUB_OUTPUT
-
-
-  determine_docker_version:
-    name: Determine whether to build the containers or not
-    runs-on: ubuntu-latest
-    outputs:
-      build_docker_containers: ${{ steps.version.outputs.build_docker_containers }}
-      docker_branch_name: ${{ steps.version.outputs.docker_branch_name }}
-    steps:
-      - name: Checkout
-        id: checkout
-        uses: actions/checkout@v2
-
-      - name: Determine version
-        id: version
-        run: |
-          # Only run the container builds when something in the docker or
-          # github workflow folders has changes
-          GIT_OUTPUT="$(git log --stat -1)"
-          if [ $(echo ${GIT_OUTPUT} | grep -c docker/) -gt 0 ] || [ $(echo ${GIT_OUTPUT} | grep -c .github/workflows/docker.yml) -gt 0 ]; then
-            echo "build_docker_containers=true" >> $GITHUB_OUTPUT
-            BUILD_DOCKER="true"
-          else
-            echo "build_docker_containers=false" >> $GITHUB_OUTPUT
-          fi
-          # Figure out which version of the docker containers we will use.
-          # If we are building the containers this run and are on a branch,
-          # we should use those. Otherwise, use the ones from master
-          if [ ${BUILD_DOCKER} ]; then
-            DOCKER_BRANCH_NAME="$(git branch --show-current)"
-          else
-            DOCKER_BRANCH_NAME="master"
-          fi
-          echo "docker_branch_name=${DOCKER_BRANCH_NAME}" >> $GITHUB_OUTPUT
-          rm -rf performous
-
-  # Pull in the docker build workflow
-  build_docker:
-    name: Build the docker containers
-    if: ${{ needs.determine_docker_version.outputs.build_docker_containers }}
-    uses: ./.github/workflows/docker.yml
-    needs:
-      - determine_docker_version
 
   # Set up a release that packages will be published to.
   create_release:
@@ -117,169 +72,17 @@ jobs:
           draft: true
           prerelease: false
 
-  # Create the Linux Packages
-  # This is done in containers created from the docker/ directory since
-  # github actions provides only Ubuntu
+  # Pull in the Linux build workflow
   Linux_Packages:
-    # The upload step needs the release to be created first so it
-    # can access the upload_url output. This step also needs the output from
-    # the version dteremination job to name things correctly.
-    name: Create Linux packages
+    name: Build the Linux packages
+    uses: ./.github/workflows/linux.yml
+    with:
+      package_complete_version: ${{ needs.determine_version.outputs.complete_version }}
+      release_upload_url: ${{ needs.create_release.outputs.upload_url }}
     needs:
-      - build_docker
       - determine_version
       - create_release
-    # Ubuntu required for Linux containers
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/${{ github.repository_owner }}/deps:${{ matrix.os }}-${{ needs.determine_version.outputs.docker_branch_name }}
-      credentials:
-        username: ${{ github.repository_owner }}
-        password: ${{ secrets.GITHUB_TOKEN }}
 
-    strategy:
-      matrix:
-        os:
-          # Images must be added to 
-          # https://github.com/performous/performous-docker with
-          # a successful run on master before they can be used here
-          - ubuntu20.04
-          - ubuntu22.04
-          - fedora34
-          - fedora35
-          - fedora36
-          - debian10
-          - debian11
-    steps:
-      - name: Checkout Git
-        id: checkout_git
-        uses: actions/checkout@v3
-        with:
-          path: performous
-
-      - name: Build package
-        id: build_package
-        run: |
-          cd performous
-          # Pull in OS variables to figure out options later
-          . /etc/os-release
-
-          ## Set up some special cmake flags for fedora
-          if ([ "${ID}" = "fedora" ]); then
-            EXTRA_CMAKE_ARGS="-DUSE_BOOST_REGEX=1"
-          fi
-
-          if ([ "${ID}" = "debian" ] && [ "${VERSION_ID}" = "10" ]); then
-            # Debian Buster has system Aubio 0.4.5, this is not enough
-            # because performous requires a minimum version of 0.4.9.
-            EXTRA_CMAKE_ARGS="${EXTRA_CMAKE_ARGS} -DSELF_BUILT_AUBIO=ALWAYS -DSELF_BUILT_JSON=ALWAYS"
-          fi
-
-          ## Figure out what type of packages we need to generate
-          case ${ID} in
-            'fedora')
-              PACKAGE_TYPE='RPM';;
-            'ubuntu'|'debian')
-              PACKAGE_TYPE='DEB';;
-            *)
-              PACKAGE_TYPE='TGZ';;
-          esac
-
-          PACKAGE_VERSION=${{ needs.determine_version.outputs.complete_version }}
-          echo $PACKAGE_VERSION
-
-          # Build the Packages
-          mkdir build_cmake
-          cd build_cmake
-          cmake ${EXTRA_CMAKE_ARGS} -DCMAKE_BUILD_TYPE=Release \
-            -DPERFORMOUS_VERSION=$PACKAGE_VERSION \
-            -DENABLE_WEBSERVER=ON \
-            -DCMAKE_VERBOSE_MAKEFILE=1 \
-            -DENABLE_WEBCAM=ON ..
-          CPU_CORES=$(nproc --all)
-          make -j${CPU_CORES}
-          cpack -G ${PACKAGE_TYPE}
-          
-          # Do some mangling to make a unique name based on the OS
-          # This is needed so we don't overwite in the release each time.
-          # We should probably investigate what cmake can do for package output
-          # to make this cleaner in the future
-          WORK_DIR=$(pwd)
-          PACKAGE_PATH=$(ls ${WORK_DIR}/Performous*-Linux.*)
-          PACKAGE_NAME=$(echo ${PACKAGE_PATH} | sed 's/\(Performous\).*$/\1/')
-          PACKAGE_SUFFIX=$(echo ${PACKAGE_PATH} | sed 's/^.*\(.\{4\}\)/\1/')
-          NEW_PACKAGE_NAME="${PACKAGE_NAME}-${PACKAGE_VERSION}-${ID}_${VERSION_ID}${PACKAGE_SUFFIX}"
-          MASTER_NEW_PACKAGE_NAME="${PACKAGE_NAME}-latest-${ID}_${VERSION_ID}${PACKAGE_SUFFIX}"
-          cp ${PACKAGE_PATH} ${MASTER_NEW_PACKAGE_NAME}
-          mv ${PACKAGE_PATH} ${NEW_PACKAGE_NAME}
-          ARTIFACT_NAME=$( echo ${NEW_PACKAGE_NAME} | rev | cut -d '/' -f1 | rev)
-          MASTER_ARTIFACT_NAME=$( echo ${MASTER_NEW_PACKAGE_NAME} | rev | cut -d '/' -f1 | rev)
-          echo "ARTIFACT_PATH=${NEW_PACKAGE_NAME}" >> ${GITHUB_ENV}
-          echo "ARTIFACT_NAME=${ARTIFACT_NAME}" >> ${GITHUB_ENV}
-          echo "MASTER_ARTIFACT_PATH=${MASTER_NEW_PACKAGE_NAME}" >> ${GITHUB_ENV}
-          echo "MASTER_ARTIFACT_NAME=${MASTER_ARTIFACT_NAME}" >> ${GITHUB_ENV}
-
-      # Upload artifacts during pull-requests
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        if: ${{ github.event_name == 'pull_request' }}
-        with:
-          name: ${{ env.ARTIFACT_NAME }}
-          path: ${{ env.ARTIFACT_PATH }}
-
-      # Upload artifacts on master
-      - name: Upload artifact with unified name
-        if: ${{ github.ref == 'refs/heads/master' }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ env.MASTER_ARTIFACT_NAME }}
-          path: ${{ env.MASTER_ARTIFACT_PATH }}
- 
-      # Upload artifacts to releases only during Release events
-      - name: Upload artifacts to tagged release
-        id: upload_assets
-        if: ${{ github.event_name != 'pull_request' && github.ref_type == 'tag' }}
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: ${{ env.ARTIFACT_PATH }}
-          asset_name: ${{ env.ARTIFACT_NAME }}
-          asset_content_type: application/octet-stream
- 
-      - name: Run unittests directly called
-        #working-directory: performous/build_cmake/testing
-        shell: bash
-        run: |
-          . /etc/os-release
-          if ([ "${ID}" = "ubuntu" ] || ([ "${ID}" = "fedora" ])); then
-            echo "Run unit tests"
-            cd performous/build_cmake/testing
-            ./performous_test --gtest_filter=UnitTest*
-          fi
-          if ([ "${ID}" = "debian" ] && ([ "${VERSION_ID}" = "11" ]) ); then
-            echo "Run unit tests"
-            cd performous/build_cmake/testing
-            ./performous_test --gtest_filter=UnitTest*
-          fi
-
-      - name: Run unittests by ctest
-        #working-directory: performous/build_cmake/testing
-        shell: bash
-        run: |
-          . /etc/os-release
-          if ([ "${ID}" = "ubuntu" ] || ([ "${ID}" = "fedora" ])); then
-            echo "Run unit tests"
-            cd performous/build_cmake
-            make test
-          fi
-          if ([ "${ID}" = "debian" ] && ([ "${VERSION_ID}" = "11" ]) ); then
-            echo "Run unit tests"
-            cd performous/build_cmake
-            make test
-          fi
-          
   # Create the AppImage
   AppImage:
     name: Create the AppImage
