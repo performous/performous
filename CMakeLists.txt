@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.14.5)
 project(Performous CXX C)
 
+include(GNUInstallDirs)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -23,9 +25,11 @@ string(TIMESTAMP YEAR "%Y")
 message("Building ${PROJECT_NAME} ${PROJECT_VERSION}")
 
 # Avoid source tree pollution
-if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+get_filename_component(REAL_SOURCE_DIR "${CMAKE_SOURCE_DIR}" REALPATH)
+get_filename_component(REAL_BUILD_DIR "${CMAKE_BINARY_DIR}" REALPATH)
+if(REAL_SOURCE_DIR STREQUAL REAL_BUILD_DIR)
 	message(FATAL_ERROR "In-source builds are not permitted. Make a separate folder for building:\nmkdir build; cd build; cmake ..\nBefore that, remove the files already created:\nrm -rf CMakeCache.txt CMakeFiles")
-endif(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+endif(REAL_SOURCE_DIR STREQUAL REAL_BUILD_DIR)
 
 # Add a sensible build type default and warning because empty means no optimization and no debug info.
 if(NOT DEFINED CMAKE_BUILD_TYPE)
@@ -61,20 +65,17 @@ if(WIN32)
 		set(CPACK_MINGW_SYSTEM_PREFIX "C:/msys64/mingw64" CACHE PATH "Path to the mingw-w64 system root.")
 	endif()
 	set(CMAKE_CXX_FLAGS "-DWIN32_LEAN_AND_MEAN ${CMAKE_CXX_FLAGS}")
-	set(SHARE_INSTALL_DEFAULT ".")
-	set(LOCALE_DIR_DEFAULT "locale")
-elseif(APPLE)
-	set(SHARE_INSTALL_DEFAULT "Resources")
-	set(LOCALE_DIR_DEFAULT "Resources/Locale")
-else()
-	set(SHARE_INSTALL_DEFAULT "share/games/performous")
-	set(LOCALE_DIR_DEFAULT "share/locale")
+	set(CMAKE_INSTALL_DATAROOTDIR ".")
+	set(CMAKE_INSTALL_LOCALEDIR "locale")
+elseif(NOT APPLE)
+	set(CMAKE_INSTALL_DATAROOTDIR "share/games/performous")
+	set(CMAKE_INSTALL_LOCALEDIR "share/locale")
 endif()
 
-set(SHARE_INSTALL "${SHARE_INSTALL_DEFAULT}" CACHE STRING "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
+set(SHARE_INSTALL "${CMAKE_INSTALL_DATAROOTDIR}" CACHE STRING "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
 mark_as_advanced(SHARE_INSTALL)
 
-set(LOCALE_DIR "${LOCALE_DIR_DEFAULT}" CACHE STRING "Locale file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
+set(LOCALE_DIR "${CMAKE_INSTALL_LOCALEDIR}" CACHE STRING "Locale file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
 mark_as_advanced(LOCALE_DIR)
 
 find_package(Gettext)

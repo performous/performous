@@ -5,21 +5,16 @@ mark_as_advanced(GZIP)
 if(HELP2MAN AND GZIP)
 	set(MANFILE ${CMAKE_CURRENT_BINARY_DIR}/performous.6.gz)
 	set(H2MFILE ${CMAKE_CURRENT_SOURCE_DIR}/performous.h2m)
-	set(PERFORMOUS_EXEC ${CMAKE_BINARY_DIR}/performous)
 	add_custom_command(
 		OUTPUT ${MANFILE}
-		COMMAND ${HELP2MAN} ${PERFORMOUS_EXEC} -s 6 -i ${H2MFILE} -N | ${GZIP} > ${MANFILE}
+		COMMAND ${HELP2MAN} "$<TARGET_FILE:performous>" -s 6 -i ${H2MFILE} -N | ${GZIP} > ${MANFILE}
 		MAIN_DEPENDENCY ${H2MFILE}
-		DEPENDS ${PERFORMOUS_EXEC}
+		DEPENDS performous
 		COMMENT "Building Performous man page"
 		VERBATIM
 	)
 	add_custom_target(manpage ALL DEPENDS ${MANFILE})
-	iF (APPLE)
-	    install(FILES ${MANFILE} DESTINATION Resources/man/man6)
-	else(APPLE)
-    	install(FILES ${MANFILE} DESTINATION share/man/man6)
-	endif()
+	install(FILES ${MANFILE} TYPE MAN)
 else(HELP2MAN AND GZIP)
 	message("WARNING: One of the following is missing: help2man, gzip; performous man page will not be generated")
 endif(HELP2MAN AND GZIP)
