@@ -184,7 +184,7 @@ jobs:
           # Build the Packages
           mkdir build_cmake
           cd build_cmake
-          cmake ${EXTRA_CMAKE_ARGS} -DCMAKE_BUILD_TYPE=Release \
+          cmake ${EXTRA_CMAKE_ARGS} -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DPERFORMOUS_VERSION=$PACKAGE_VERSION \
             -DENABLE_WEBSERVER=ON \
             -DCMAKE_VERBOSE_MAKEFILE=1 \
@@ -314,7 +314,7 @@ jobs:
           sed -i s/@@VERSION@@/${PACKAGE_VERSION}/ AppImageBuilder.yml
           mkdir build
           cd build
-          cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DENABLE_WEBSERVER=ON -DENABLE_WEBCAM=ON -DPERFORMOUS_VERSION=$PACKAGE_VERSION ..
+          cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo -DENABLE_WEBSERVER=ON -DENABLE_WEBCAM=ON -DPERFORMOUS_VERSION=$PACKAGE_VERSION -DSHARE_INSTALL="share" ..
           make -j$(nproc) install DESTDIR=../AppDir
           cd ..
           appimage-builder --recipe AppImageBuilder.yml --skip-test
