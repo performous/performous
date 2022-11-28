@@ -233,9 +233,11 @@ function main {
 			echo "--- Will create bundle for debugging..."
 			RELTYPE=Debug
 			ENABLE_TOOLS=OFF
+			PERFORMOUS_LOG_LEVEL=debug
 	else
 		RELTYPE=Release
 		ENABLE_TOOLS=ON
+		PERFORMOUS_LOG_LEVEL=info
 		if exists dylibbundler
 			then
 				echo "--- dylibbundler found!"
@@ -269,10 +271,10 @@ function main {
 # first compile performous, build dir shouldn't exist at this stage
 
 # define Bundle structure
-	TEMPDIR="${PERFORMOUS_OUTPUT_DIR}/Performous.app/Contents"
+	TEMPDIR="${PERFORMOUS_OUTPUT_DIR}/${PACKAGE_VERSION}/"
 	RESDIR="${TEMPDIR}/Resources"
 	LIBDIR="${RESDIR}/lib"
-	LOCALEDIR="${RESDIR}/Locales"
+	LOCALEDIR="${RESDIR}/Locale"
 	FRAMEWORKDIR="${RESDIR}/Frameworks"
 	BINDIR="${TEMPDIR}/MacOS"
 	ETCDIR="${RESDIR}/etc"
@@ -286,8 +288,8 @@ function main {
 				then
 					echo "--- Wiping output folder..."
 					printf "\n"
-					rm -rf "${TEMPDIR}"
-					mkdir -p "${TEMPDIR}"
+					rm -rf "${TEMPDIR}/Performous.app"
+# 					mkdir -p "${TEMPDIR}"
 			fi
 		else
 			echo "--- No-clean mode enabled; preserving previous build directory."
@@ -297,8 +299,8 @@ function main {
 					echo "--- We aren't making an Xcode Project or bundle..."
 					printf "\n"
 					echo "--- Wiping output folder..."
-					rm -rf "${TEMPDIR}"
-					mkdir -p "${TEMPDIR}"
+					rm -rf "${TEMPDIR}/Performous.app"
+# 					mkdir -p "${TEMPDIR}"
 			fi
 	fi
 	
@@ -333,6 +335,9 @@ function main {
 			  -DCMAKE_CXX_FLAGS="-Wall -Wextra" \
 			  -DCMAKE_XCODE_GENERATE_SCHEME="${XCODE_GENERATE_SCHEME}" \
 			  -DPERFORMOUS_VERSION="${PACKAGE_VERSION}" \
+			  -DPERFORMOUS_SHORT_VERSION="${PACKAGE_MAJOR}.${PACKAGE_MINOR}" \
+			  -DPERFORMOUS_SEMVER="${PACKAGE_SEM_VER}" \
+			  -DPERFORMOUS_LOG_LEVEL="${PERFORMOUS_LOG_LEVEL}" \
 			  -DSELF_BUILT_AUBIO="ALWAYS" \
 			  -DFETCHCONTENT_QUIET="ON" \
 			  -B "${PERFORMOUS_BUILD_DIR}" \
@@ -357,7 +362,7 @@ function main {
 				then
 					echo "--- Finalizing bundle created by Xcode"
 			fi
-			finalize_bundle
+# 			finalize_bundle
 	
 		cd "$CURRDIR"
 	# then build the disk image

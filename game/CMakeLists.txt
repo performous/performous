@@ -240,7 +240,9 @@ list(APPEND LIBS ${BLAS_LIBRARIES})
 find_package(Threads)
 target_link_libraries(performous PRIVATE fs ced aubio ${LIBS} PkgConfig::deps Threads::Threads)
 
-install(TARGETS performous DESTINATION ${BIN_INSTALL})
+if (NOT APPLE)
+	install(TARGETS performous DESTINATION ${BIN_INSTALL})
+endif()
 
 if (APPLE AND ${CMAKE_GENERATOR} STREQUAL "Xcode")
 	set(PATH "$ENV{PATH}")
@@ -266,16 +268,9 @@ if (APPLE AND ${CMAKE_GENERATOR} STREQUAL "Xcode")
 	set_target_properties(performous PROPERTIES
 	XCODE_SCHEME_EXECUTABLE "${CMAKE_INSTALL_PREFIX}/${BIN_INSTALL}/performous"
 	XCODE_SCHEME_ARGUMENTS "--log debug"
-	XCODE_SCHEME_ENVIRONMENT "FONTCONFIG_PATH=\"${CMAKE_INSTALL_PREFIX}/${SHARE_INSTALL}/etc/fonts\";
+	XCODE_SCHEME_ENVIRONMENT "FONTCONFIG_PATH=\"${CMAKE_INSTALL_SYSCONFDIR}/fonts\";
 	GDK_PIXBUF_MODULE_FILE=\"\";
 	LANG=\"${PERFORMOUS_LANG}.UTF-8\""
-	)
-	install (CODE
-	"SET(ENV{PATH} \"${PATH}\")
-	EXECUTE_PROCESS(
-		COMMAND \"${Performous_SOURCE_DIR}/osx-utils/performous-app-build.sh\" --xcode-bundle --no-clean --no-regenerate
-		COMMAND_ECHO STDOUT
-		)"
 	)
 endif()
 

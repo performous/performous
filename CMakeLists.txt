@@ -70,12 +70,29 @@ if(WIN32)
 elseif(NOT APPLE)
 	set(CMAKE_INSTALL_DATAROOTDIR "share/games/performous")
 	set(CMAKE_INSTALL_LOCALEDIR "share/locale")
+elseif(APPLE)
+	set(PERFORMOUS_BUNDLE_LOCATION "${CMAKE_INSTALL_PREFIX}" CACHE PATH "Location to put the Performous app bundle in." FORCE)
+	mark_as_advanced(PERFORMOUS_BUNDLE_LOCATION)
+	# make sure CMAKE_INSTALL_PREFIX ends in /
+	if(NOT CMAKE_INSTALL_PREFIX MATCHES "/$")
+		string(APPEND CMAKE_INSTALL_PREFIX "/")
+	set (CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE PATH "Location to put the Performous app bundle in.")
+	endif()
+	string(APPEND CMAKE_INSTALL_PREFIX "Performous.app/Contents")
+	set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
+	set(CMAKE_INSTALL_DATAROOTDIR "${CMAKE_INSTALL_PREFIX}/Resources")
+	set(CMAKE_INSTALL_DATADIR "${CMAKE_INSTALL_DATAROOTDIR}")
+	set(CMAKE_INSTALL_LOCALEDIR "${CMAKE_INSTALL_DATAROOTDIR}/Locale")
+	set(CMAKE_INSTALL_SYSCONFDIR "${CMAKE_INSTALL_PREFIX}/Resources/etc")
+	set(CMAKE_INSTALL_BINDIR "${CMAKE_INSTALL_PREFIX}/MacOS")
+	set(CMAKE_INSTALL_MANDIR "${CMAKE_INSTALL_PREFIX}/Resources/man/man6")
 endif()
 
-set(SHARE_INSTALL "${CMAKE_INSTALL_DATAROOTDIR}" CACHE STRING "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
+
+set(SHARE_INSTALL "${CMAKE_INSTALL_DATAROOTDIR}" CACHE INTERNAL "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
 mark_as_advanced(SHARE_INSTALL)
 
-set(LOCALE_DIR "${CMAKE_INSTALL_LOCALEDIR}" CACHE STRING "Locale file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
+set(LOCALE_DIR "${CMAKE_INSTALL_LOCALEDIR}" CACHE INTERNAL "Locale file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
 mark_as_advanced(LOCALE_DIR)
 
 find_package(Gettext)
@@ -94,6 +111,10 @@ target_compile_options(performous PRIVATE -Wall $<$<NOT:$<CXX_COMPILER_ID:MSVC>>
 
 
 add_subdirectory(docs)
+
+if(APPLE)
+	add_subdirectory(osx-utils)
+endif()
 
 if(NOT APPLE)
   # uninstall target
@@ -192,6 +213,9 @@ if (APPLE)
 	set(CPACK_SOURCE_GENERATOR "")
 	set(CPACK_GENERATOR "Bundle")
 	set(CMAKE_XCODE_ATTRIBUTE_MARKETING_VERSION "${PROJECT_VERSION}")
+	set(CMAKE_XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "org.performous.Performous")
+	set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
+	set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "")
 elseif(WIN32)
 	set(CPACK_GENERATOR "NSIS64;TGZ;ZIP")
 else()
