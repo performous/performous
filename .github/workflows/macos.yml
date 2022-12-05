@@ -47,28 +47,31 @@ jobs:
             aubio fftw glm nlohmann-json fmt
            brew link --force --overwrite ffmpeg@4
 
+      - name: Setup Python
+        id: setup_python
+        uses: actions/setup-python@v4 
+        with:
+            python-version: 'pypy3.9' 
+            cache: 'pip'
+            cache-dependency-path: "${{ github.workspace }}/performous/osx-utils/macos-bundler-requirements.txt"
+
       - name: Build package
         id: build_package
         run: |
           cd performous/osx-utils
           # This export is required because the variable is consumed by the 
           # MacOS build script to set the version correctly
-          export PACKAGE_VERSION=${{ inputs.package_complete_version }}
-          echo $PACKAGE_VERSION
-          chmod +x ./performous-app-build.sh
-          WORK_DIR=$(pwd)
-          mkdir -p out
-          export PERFORMOUS_OUTPUT_DIR="${WORK_DIR}/out"
-          ./performous-app-build.sh
-          PACKAGE_PATH=$(ls ${PERFORMOUS_OUTPUT_DIR}/Performous*.dmg)
-          PACKAGE_NAME=$(echo ${PACKAGE_PATH} | sed 's/\(Performous\).*$/\1/')
-          PACKAGE_SUFFIX=$(echo ${PACKAGE_PATH} | sed 's/^.*\(.\{4\}\)/\1/')
-          NEW_PACKAGE_NAME="${PACKAGE_NAME}-${PACKAGE_VERSION}${PACKAGE_SUFFIX}"
-          MASTER_NEW_PACKAGE_NAME="${PACKAGE_NAME}-latest${PACKAGE_SUFFIX}"
+          export PACKAGE_VERSION=${{ needs.determine_version.outputs.complete_version }}
+          chmod +x ./macos-bundler.py
+          pip3 install -r ./macos-bundler-requirements.txt
+          ./macos-bundler.py --flat-output
+          PACKAGE_PATH=$(ls ./out/Performous-${PACKAGE_VERSION}.dmg)
+          NEW_PACKAGE_NAME=$(basename ${PACKAGE_PATH})
+          MASTER_NEW_PACKAGE_NAME="Performous-latest.dmg"
           cp ${PACKAGE_PATH} ${MASTER_NEW_PACKAGE_NAME}
           mv ${PACKAGE_PATH} ${NEW_PACKAGE_NAME}
-          ARTIFACT_NAME=$( echo ${NEW_PACKAGE_NAME} | rev | cut -d '/' -f1 | rev)
-          MASTER_ARTIFACT_NAME=$( echo ${MASTER_NEW_PACKAGE_NAME} | rev | cut -d '/' -f1 | rev)
+          ARTIFACT_NAME=$(echo ${NEW_PACKAGE_NAME})
+          MASTER_ARTIFACT_NAME=$(echo ${MASTER_NEW_PACKAGE_NAME})
           echo "ARTIFACT_PATH=${NEW_PACKAGE_NAME}" >> ${GITHUB_ENV}
           echo "ARTIFACT_NAME=${ARTIFACT_NAME}" >> ${GITHUB_ENV}
           echo "MASTER_ARTIFACT_PATH=${MASTER_NEW_PACKAGE_NAME}" >> ${GITHUB_ENV}

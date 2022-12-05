@@ -1,11 +1,12 @@
 [bB]uild/*
+[bB]uild.xcode
 CMakeLists.txt.user*
 *~
 *.mo
 dylibbundler.log
 performous-app-build.sh
 osx-utils/out
-osx-utils/Performous.dmg
+osx-utils/Performous*.dmg
 osx-utils/CMakeCache.txt
 CMakeCache.txt
 CMakeFiles
@@ -13,3 +14,4 @@ CMakeFiles
 /.semaphore/keys-secret.yml
 .vs
 .vscode
+/osx-utils/macos-bundler

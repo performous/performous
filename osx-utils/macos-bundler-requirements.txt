@@ -1,0 +1,4 @@
+dmgbuild==1.6.0
+docopt-ng @ git+https://github.com/jazzband/docopt-ng.git@130a5422feab5d4233a5a81102b02054634e36ce
+ds-store==1.3.1
+mac-alias==2.2.1
