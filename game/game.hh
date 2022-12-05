@@ -84,8 +84,8 @@ private:
 	bool m_finished = false;
 	typedef std::map<std::string, std::unique_ptr<Screen>> screenmap_t;
 	screenmap_t screens;
-	Screen* newScreen;
-	Screen* currentScreen;
+	Screen* newScreen = nullptr;
+	Screen* currentScreen = nullptr;
 	PlayList currentPlaylist;
 	// Flash messages members
 	float m_timeToFadeIn;
