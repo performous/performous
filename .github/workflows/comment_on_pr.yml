@@ -14,15 +14,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Get the PR number
+        id: get_pr
         run: |
           # Query the issue search API to get the PR associated with it
           PR_RAW=$(curl 'https://api.github.com/search/issues?q=${{ github.event.workflow_run.head_commit.id }}')
           # Get the event number from the search results, which will
           # be the PR number
           PR_NUM=$(echo $PR_RAW | jq '.items[].number')
-          echo "PR_NUM=${PR_NUM}" >> ${GITHUB_ENV}
+          echo "PR_NUM=${PR_NUM}" >> $GITHUB_OUTPUT
 
       - name: Comment on PR
+        needs:
+           - get_pr
         uses: actions/github-script@v5
         with:
           # This snippet is public-domain, taken from
@@ -61,5 +64,5 @@ jobs:
             }
             body += `  \n\nThis service is provided by [nightly.link](https://github.com/oprypin/nightly.link). These artifacts will expire in 90 days and will not be available for download after that time.`;
             core.info("Review thread message body:", body);
-            await upsertComment(owner, repo, ${{ env.PR_NUM }},
+            await upsertComment(owner, repo, ${{ needs.get_pr.outputs.PR_NUM }},
               "nightly-link", body);

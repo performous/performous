@@ -34,12 +34,19 @@ jobs:
       version_tweak: ${{ steps.versioning.outputs.version_tweak }}
       complete_version: ${{ steps.versioning.outputs.complete_version }}
     steps:
+      - name: Checkout Git
+        id: checkout_git
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          path: performous
+          fetch-depth: 0
+ 
       - name: Determine the complete version
         id: versioning
         run: |
           # Always check the tags on master since it will have the latest.
           # Tags will trigger their own workflow and version names
-          git clone --recursive ${{ github.server_url }}/${{ github.repository }}
           cd performous
           LATEST_TAG_VERSION=$(git describe --tags --abbrev=0 || echo 1.0.0)
           LATEST_FULL_TAG_VERSION=$(git describe --tags || echo 1.0.0)
@@ -49,7 +56,7 @@ jobs:
           echo "::set-output name=version_minor::$(cut -d '.' -f 2 <<< $(git describe --tags --abbrev=0 || echo 1.0.0))"
           echo "::set-output name=version_patch::$(cut -d '.' -f 3 <<< $(git describe --tags --abbrev=0 || echo 1.0.0))"
           echo "::set-output name=version_tweak::0"
-          echo "::set-output name=complete_version::$(if [ $GITHUB_REF_TYPE = 'tag' ]; then echo $GITHUB_REF_NAME; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME = 'master' ]; then echo $LATEST_FULL_TAG_VERSION-beta; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME != 'master' ]; then echo $LATEST_TAG_VERSION-${{github.event.pull_request.number}}-${GITHUB_SHA::7}-alpha; fi)"
+          echo "::set-output name=complete_version::$(if [ $GITHUB_REF_TYPE = 'tag' ]; then echo $GITHUB_REF_NAME; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME = 'master' ]; then echo $LATEST_FULL_TAG_VERSION-beta; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME != 'master' ]; then echo $LATEST_TAG_VERSION-${{github.event.pull_request.number}}-$(git rev-parse --short=7 $(git describe))-alpha; fi)"
           rm -rf performous
 
   # Set up a release that packages will be published to.
@@ -413,18 +420,14 @@ jobs:
           export PACKAGE_VERSION=${{ needs.determine_version.outputs.complete_version }}
           chmod +x ./macos-bundler.py
           pip3 install -r ./macos-bundler-requirements.txt
-          ./macos-bundler.py --flat-output
-          PACKAGE_PATH=$(ls ./out/Performous-${PACKAGE_VERSION}.dmg)
-          NEW_PACKAGE_NAME=$(basename ${PACKAGE_PATH})
-          MASTER_NEW_PACKAGE_NAME="Performous-latest.dmg"
-          cp ${PACKAGE_PATH} ${MASTER_NEW_PACKAGE_NAME}
-          mv ${PACKAGE_PATH} ${NEW_PACKAGE_NAME}
-          ARTIFACT_NAME=$(echo ${NEW_PACKAGE_NAME})
-          MASTER_ARTIFACT_NAME=$(echo ${MASTER_NEW_PACKAGE_NAME})
-          echo "ARTIFACT_PATH=${NEW_PACKAGE_NAME}" >> ${GITHUB_ENV}
-          echo "ARTIFACT_NAME=${ARTIFACT_NAME}" >> ${GITHUB_ENV}
-          echo "MASTER_ARTIFACT_PATH=${MASTER_NEW_PACKAGE_NAME}" >> ${GITHUB_ENV}
-          echo "MASTER_ARTIFACT_NAME=${MASTER_ARTIFACT_NAME}" >> ${GITHUB_ENV}
+          ./macos-bundler.py --flat-output --package-version="${{ needs.determine_version.outputs.complete_version }}"
+          PACKAGE_PATH=$(ls "${{ github.workspace }}/performous/osx-utils/out/Performous-${PACKAGE_VERSION}.dmg")
+          MASTER_PACKAGE_PATH="${{ github.workspace }}/performous/osx-utils/out/Performous-latest.dmg"
+          cp -v ${PACKAGE_PATH} ${MASTER_PACKAGE_PATH}
+          echo "ARTIFACT_PATH=${PACKAGE_PATH}" >> ${GITHUB_ENV}
+          echo "ARTIFACT_NAME=$(basename ${PACKAGE_PATH})" >> ${GITHUB_ENV}
+          echo "MASTER_ARTIFACT_PATH=${MASTER_PACKAGE_PATH}" >> ${GITHUB_ENV}
+          echo "MASTER_ARTIFACT_NAME=$(basename ${MASTER_PACKAGE_PATH})" >> ${GITHUB_ENV}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
