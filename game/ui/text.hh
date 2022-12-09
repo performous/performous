@@ -18,6 +18,9 @@ public:
 	void draw(float x, float y, float width, float height);
 	void drawCentered(float x, float y, float width, float height);
 
+	//float measureWidth(std::string const&) const;
+	//float measureHeight(std::string const&) const;
+
 private:
 	GraphicContext* m_gc = nullptr;
 	std::string m_text;

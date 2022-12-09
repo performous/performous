@@ -2,11 +2,11 @@
 #include "graphiccontext.hh"
 
 TextBox::TextBox(std::string const& text, Control* parent)
-: Control(parent), m_text(text),  m_background(findFile("mainmenu_back_highlight.svg")) {
+: Control(parent), m_text(text), m_background(findFile("mainmenu_back_highlight.svg")), m_cursor(findFile("cursor.svg")) {
 }
 
 TextBox::TextBox(Control* parent, std::string const& text)
-: Control(parent), m_text(text),  m_background(findFile("mainmenu_back_highlight.svg")) {
+: Control(parent), m_text(text),  m_background(findFile("mainmenu_back_highlight.svg")), m_cursor(findFile("cursor.svg")) {
 }
 
 TextBox& TextBox::setText(std::string const& text, bool keepCursorPosition) {
@@ -125,6 +125,14 @@ void TextBox::draw(GraphicContext& gc) {
 
 	if(hasFocus()) {
 		// draw cursor
+		/*
+		auto const x = getX() + m_text.;
+		auto const y = getY() + getHeight() * 0.05f;
+		auto const w = getHeight() * 0.9f * 0.05f;
+		auto const h = getHeight() * 0.9f;
+
+		m_cursor.dimensions.left(x).top(y).stretch(w, h);
+		m_cursor.draw(gc.getWindow());*/
 	}
 }
 

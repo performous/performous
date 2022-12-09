@@ -263,7 +263,7 @@ void ScreenPlayerSetup::shiftAvatarLeft() {
 	std::cout << "current: " << id << std::endl;
 
 	if(id == -1)
-		id = m_avatars.size() - 1;
+		id = static_cast<int>(m_avatars.size()) - 1;
 	else
 		--id;
 
