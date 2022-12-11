@@ -239,3 +239,7 @@ Size SvgTxtTheme::measure(std::string const& text) {
 	return TextRenderer().measure(text, m_textstyle, m_factor) / width;
 }
 
+Size SvgTxtTheme::measure(std::string const& text) {
+	return TextRenderer().measure(text, m_textstyle, m_factor);
+}
+

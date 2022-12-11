@@ -39,17 +39,7 @@ void Text::drawCentered(float x, float y, float width, float height) {
 	m_svg->setAlign(SvgTxtTheme::Align::CENTER);
 	m_svg->draw(m_gc->getWindow(), m_text);
 }
-/*
-float Text::measureWidth(std::string const& text) const {
-	return m_svq->measure(text);
+
+Size Text::measure(std::string const& text) {
+	return m_svg->measure(text);
 }
-
-float Text::measureHeight(std::string const& text) const {
-	auto result = 0.f;
-
-	for (size_t i = 0; i < text.size(); ++i)
-		result = std::max(result, m_opengl_text[i]->y());
-
-	return result;
-}
-*/
