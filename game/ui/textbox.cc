@@ -98,13 +98,12 @@ void TextBox::draw(GraphicContext& gc) {
 	drawFocus(gc);
 
 	const auto color = ColorTrans(gc.getWindow(), hasFocus() ? Color(1.f, 1.f, 1.f) : Color(0.6f, 0.6f, 0.6f));
+	auto text = m_text.getText();
 
 	m_background.dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());
 	m_background.draw(gc.getWindow());
 
 	if(hasFocus()) {
-		auto text = m_text.getText();
-
 		if(m_cursorPosition < text.size() && text[m_cursorPosition] != '|')
 			text.insert(m_cursorPosition, 1, '|');
 		else if(m_cursorPosition == text.size())
@@ -113,8 +112,6 @@ void TextBox::draw(GraphicContext& gc) {
 		m_text.setText(text);
 	}
 	else {
-		auto text = m_text.getText();
-
 		if(m_cursorPosition < text.size() && text[m_cursorPosition] == '|')
 			text.erase(m_cursorPosition, 1);
 
@@ -125,14 +122,15 @@ void TextBox::draw(GraphicContext& gc) {
 
 	if(hasFocus()) {
 		// draw cursor
-		/*
-		auto const x = getX() + m_text.;
+		auto const textBeforeCursor = m_text.getText().substr(m_cursorPosition);
+		auto const width = m_text.measure(textBeforeCursor).width;
+		auto const x = getX() + width;
 		auto const y = getY() + getHeight() * 0.05f;
 		auto const w = getHeight() * 0.9f * 0.05f;
 		auto const h = getHeight() * 0.9f;
 
 		m_cursor.dimensions.left(x).top(y).stretch(w, h);
-		m_cursor.draw(gc.getWindow());*/
+		m_cursor.draw(gc.getWindow());
 	}
 }
 
