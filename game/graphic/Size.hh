@@ -8,6 +8,9 @@ struct Size {
 	Size& operator=(Size const&) = default;
 	Size& operator=(Size&&) = default;
 
+	Size operator*(float) const;
+	Size operator/(float) const;
+
 	float getWidth() const;
 	float getHeight() const;
 

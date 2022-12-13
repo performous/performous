@@ -40,6 +40,14 @@ void Text::drawCentered(float x, float y, float width, float height) {
 	m_svg->draw(m_gc->getWindow(), m_text);
 }
 
+float Text::getWidth() const {
+	return m_svg->getWidth();
+}
+
+float Text::getHeight() const {
+	return m_svg->getHeight();
+}
+
 Size Text::measure(std::string const& text) {
 	return m_svg->measure(text);
 }

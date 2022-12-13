@@ -95,7 +95,7 @@ OpenGLText TextRenderer::render(const std::string& text, const TextStyle& style,
 	texture->load(bitmap, true);
 
 	// We don't want text quality multiplier m to affect rendering size...
-	return OpenGLText(texture, width / m, height / m);
+	return OpenGLText(text, texture, width / m, height / m);
 }
 
 Size TextRenderer::measure(const std::string& text, const TextStyle& style, float m) {

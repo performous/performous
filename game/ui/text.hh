@@ -18,6 +18,8 @@ public:
 	void draw(float x, float y, float width, float height);
 	void drawCentered(float x, float y, float width, float height);
 
+	float getWidth() const;
+	float getHeight() const;
 	Size measure(std::string const& text);
 
 private:

@@ -103,33 +103,21 @@ void TextBox::draw(GraphicContext& gc) {
 	m_background.dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());
 	m_background.draw(gc.getWindow());
 
-	if(hasFocus()) {
-		if(m_cursorPosition < text.size() && text[m_cursorPosition] != '|')
-			text.insert(m_cursorPosition, 1, '|');
-		else if(m_cursorPosition == text.size())
-			text.append(1, '|');
-
-		m_text.setText(text);
-	}
-	else {
-		if(m_cursorPosition < text.size() && text[m_cursorPosition] == '|')
-			text.erase(m_cursorPosition, 1);
-
-		m_text.setText(text);
-	}
+	m_text.setText(text);
 
 	gc.draw(m_text, getX(), getY(), getWidth(), getHeight());
 
 	if(hasFocus()) {
 		// draw cursor
-		auto const textBeforeCursor = m_text.getText().substr(m_cursorPosition);
-		auto const width = m_text.measure(textBeforeCursor).width;
+		auto const textBeforeCursor = m_text.getText().substr(0, m_cursorPosition);
+		auto const width = m_text.measure(textBeforeCursor).width * m_text.getWidth();
 		auto const x = getX() + width;
 		auto const y = getY() + getHeight() * 0.05f;
 		auto const w = getHeight() * 0.9f * 0.05f;
 		auto const h = getHeight() * 0.9f;
 
 		m_cursor.dimensions.left(x).top(y).stretch(w, h);
+		//m_cursor.dimensions.left(-0.05).top(-0.05).stretch(0.1f, 0.1f);
 		m_cursor.draw(gc.getWindow());
 	}
 }
