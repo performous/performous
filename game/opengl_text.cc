@@ -37,21 +37,22 @@ void loadFonts() {
 	}
 }
 
-OpenGLText::OpenGLText(std::unique_ptr<Texture>& texture, float width, float height)
-: m_texture(std::move(texture)), m_x(width), m_y(height) {
+OpenGLText::OpenGLText(std::string const& text, std::unique_ptr<Texture>& texture, float width, float height)
+: m_text(text), m_texture(std::move(texture)), m_width(width), m_height(height) {
 }
 
 OpenGLText::OpenGLText(OpenGLText&& other)
-: m_texture(std::move(other.m_texture)), m_x(other.m_x), m_y(other.m_y) {
-	other.m_x = other.m_y = 0.f;
+: m_text(std::move(other.m_text)), m_texture(std::move(other.m_texture)), m_width(other.m_width), m_height(other.m_height) {
+	other.m_width = other.m_height = 0.f;
 }
 
 OpenGLText& OpenGLText::operator=(OpenGLText&& other) {
+    m_text = std::move(other.m_text);
 	m_texture = std::move(other.m_texture);
-	m_x = other.m_x;
-	m_y = other.m_y;
+	m_width = other.m_width;
+	m_height = other.m_height;
 
-	other.m_x = other.m_y = 0.f;
+	other.m_width = other.m_height = 0.f;
 
 	return *this;
 }
@@ -134,14 +135,13 @@ SvgTxtThemeSimple::SvgTxtThemeSimple(fs::path const& themeFile, float factor) : 
 	parseTheme(themeFile, m_text, tmp, tmp, tmp, tmp, a);
 }
 
-void SvgTxtThemeSimple::render(std::string _text) {
-	if (!m_opengl_text.get() || m_cache_text != _text) {
-		m_cache_text = _text;
-		m_text.text = _text;
+void SvgTxtThemeSimple::render(std::string const& text) {
+	if (!m_opengl_text.get() || m_cache_text != text) {
+		m_cache_text = text;
 
 		auto renderer = TextRenderer();
 
-		m_opengl_text = std::make_unique<OpenGLText>(renderer.render(_text, m_text, m_factor));
+		m_opengl_text = std::make_unique<OpenGLText>(renderer.render(text, m_text, m_factor));
 	}
 }
 
@@ -150,14 +150,14 @@ void SvgTxtThemeSimple::draw(Window& window) {
 }
 
 SvgTxtTheme::SvgTxtTheme(fs::path const& themeFile, float factor): m_align(), m_factor(factor) {
-	parseTheme(themeFile, m_text, m_width, m_height, m_x, m_y, m_align);
+	parseTheme(themeFile, m_textstyle, m_width, m_height, m_x, m_y, m_align);
 	dimensions.stretch(0.0f, 0.0f).middle(-0.5f + m_x / m_width).center((m_y - 0.5f * m_height) / m_width);
 }
 
 void SvgTxtTheme::setHighlight(fs::path const& themeFile) {
 	float a,b,c,d;
 	Align e;
-	parseTheme(themeFile, m_text_highlight, a, b, c, d, e);
+	parseTheme(themeFile, m_textstyle_highlight, a, b, c, d, e);
 }
 
 void SvgTxtTheme::draw(Window& window, std::string _text) {
@@ -171,14 +171,16 @@ void SvgTxtTheme::draw(Window& window, std::string _text) {
 
 void SvgTxtTheme::draw(Window& window, std::vector<TZoomText>& _text, bool lyrics) {
 	std::string tmp;
-	for (auto& zt: _text) { tmp += zt.string; }
+
+	for (auto& zt: _text)
+		tmp += zt.string;
+
 	if (m_opengl_text.size() != _text.size() || m_cache_text != tmp) {
 		m_cache_text = tmp;
 		m_opengl_text.clear();
 		auto renderer = TextRenderer();
 		for (auto& zt: _text) {
-			m_text.text = zt.string;
-			auto openGlPtr = std::make_unique<OpenGLText>(renderer.render(zt.string, m_text, m_factor));
+			auto openGlPtr = std::make_unique<OpenGLText>(renderer.render(zt.string, m_textstyle, m_factor));
 			m_opengl_text.push_back(std::move(openGlPtr));
 		}
 	}
@@ -186,8 +188,8 @@ void SvgTxtTheme::draw(Window& window, std::vector<TZoomText>& _text, bool lyric
 	float text_y = 0.0f;
 	// First compute maximum height and whole length
 	for (size_t i = 0; i < _text.size(); i++ ) {
-		text_x += m_opengl_text[i]->x();
-		text_y = std::max(text_y, m_opengl_text[i]->y());
+		text_x += m_opengl_text[i]->getWidth();
+		text_y = std::max(text_y, m_opengl_text[i]->getHeight());
 	}
 
 	float texture_ar = text_x / text_y;
@@ -202,7 +204,7 @@ void SvgTxtTheme::draw(Window& window, std::vector<TZoomText>& _text, bool lyric
 	}
 	m_texture_height = m_texture_width / texture_ar; // Keep aspect ratio.
 	for (size_t i = 0; i < _text.size(); i++) {
-		float syllable_x = m_opengl_text[i]->x();
+		float syllable_x = m_opengl_text[i]->getWidth();
 		float syllable_width = syllable_x *  m_texture_width / text_x * _text[i].factor;
 		float syllable_height = m_texture_height * _text[i].factor;
 		float syllable_ar = syllable_width / syllable_height;
@@ -212,11 +214,25 @@ void SvgTxtTheme::draw(Window& window, std::vector<TZoomText>& _text, bool lyric
 		TexCoords tex;
 		float factor = _text[i].factor;
 		if (factor > 1.0f) {
-			LyricColorTrans lc(window, m_text.fill_col, m_text.stroke_col, m_text_highlight.fill_col, m_text_highlight.stroke_col);
+			LyricColorTrans lc(window, m_textstyle.fill_col, m_textstyle.stroke_col, m_textstyle_highlight.fill_col, m_textstyle_highlight.stroke_col);
 			dim.fixedWidth(dim.w() * factor);
 			m_opengl_text[i]->draw(window, dim, tex);
 		}
-		else { m_opengl_text[i]->draw(window, dim, tex); }
+		else {
+			m_opengl_text[i]->draw(window, dim, tex);
+		}
 		position_x += (syllable_width / factor) * (lyrics ? 1.1f : 1.0f);
 	}
 }
+
+Size SvgTxtTheme::measure(std::string const& text) {
+	auto width = 0.0f;
+
+	for (auto&& t : m_opengl_text)
+		width += t->getWidth();
+
+	//std::cout << "svg width: " << width << std::endl;
+
+	return TextRenderer().measure(text, m_textstyle, m_factor) / width;
+}
+
