@@ -208,3 +208,11 @@ void Texture::draw(Window& window) const {
 	glBlendFunc(m_premultiplied ? GL_ONE : GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	draw(window, dimensions, TexCoords(tex.x1, tex.y1, tex.x2, tex.y2));
 }
+
+void Texture::draw(Window& window, glmath::mat3 const& matrix) const {
+	if (empty()) return;
+	// FIXME: This gets image alpha handling right but our ColorMatrix system always assumes premultiplied alpha
+	// (will produce incorrect results for fade effects)
+	glBlendFunc(m_premultiplied ? GL_ONE : GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	draw(window, dimensions, TexCoords(tex.x1, tex.y1, tex.x2, tex.y2), matrix);
+}
