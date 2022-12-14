@@ -3,7 +3,6 @@
 #include "color.hh"
 #include "texture.hh"
 #include "unicode.hh"
-#include <pango/pangocairo.h>
 #include <vector>
 
 /// Load custom fonts from current theme and data folders
@@ -58,8 +57,11 @@ struct TextStyle {
  */
 class OpenGLText {
 public:
-	/// constructor
-	OpenGLText(TextStyle &_text, float m);
+	OpenGLText(std::unique_ptr<Texture>&, float width, float height);
+	OpenGLText(OpenGLText&&);
+
+	OpenGLText& operator=(OpenGLText&&);
+
 	/// draws area
 	void draw(Window&, Dimensions &_dim, TexCoords &_tex);
 	/// draws full texture
@@ -69,12 +71,12 @@ public:
 	/// @return y
 	float y() const { return m_y; }
 	/// @returns dimension of texture
-	Dimensions& dimensions() { return m_texture.dimensions; }
+	Dimensions& dimensions() { return m_texture->dimensions; }
 
 private:
 	float m_x;
 	float m_y;
-	Texture m_texture;
+	std::unique_ptr<Texture> m_texture;
 };
 
 /// themed svg texts (simple)
