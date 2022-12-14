@@ -3,6 +3,9 @@
 #include "color.hh"
 #include "texture.hh"
 #include "unicode.hh"
+#include "graphic/Size.hh"
+#include <memory>
+#include <string>
 #include <vector>
 
 /// Load custom fonts from current theme and data folders
@@ -25,29 +28,27 @@ struct TZoomText {
  * the font{family,style,weight,align} are the one found into SVGs
  */
 struct TextStyle {
-	cairo_line_join_t LineJoin() {	///< convert svg string to cairo enum.
+	cairo_line_join_t LineJoin() const {	///< convert svg string to cairo enum.
 		if (UnicodeUtil::caseEqual(stroke_linejoin, "round")) return CAIRO_LINE_JOIN_ROUND;
 		if (UnicodeUtil::caseEqual(stroke_linejoin, "bevel")) return CAIRO_LINE_JOIN_BEVEL;
 		return CAIRO_LINE_JOIN_MITER;
 	};
-	cairo_line_cap_t LineCap() {	///< convert svg string to cairo enum.
+	cairo_line_cap_t LineCap() const {	///< convert svg string to cairo enum.
 		if (UnicodeUtil::caseEqual(stroke_linecap, "round")) return CAIRO_LINE_CAP_ROUND;
 		if (UnicodeUtil::caseEqual(stroke_linecap, "square")) return CAIRO_LINE_CAP_SQUARE;
 		return CAIRO_LINE_CAP_BUTT;
 	};
 	Color fill_col; ///< fill color
 	Color stroke_col; ///< stroke color
-	float stroke_width; ///< stroke thickness
-	float stroke_miterlimit; ///< stroke miter limit
-	float fontsize; ///< fontsize
+	float stroke_width = 0.f; ///< stroke thickness
+	float stroke_miterlimit = 1.0f; ///< stroke miter limit
+	float fontsize = 16.f; ///< fontsize
 	std::string fontfamily; ///< fontfamily
 	std::string fontstyle; ///< fontstyle
 	std::string fontweight; ///< fontweight
 	std::string fontalign; ///< alignment
 	std::string	stroke_linejoin; ///< stroke line-join type
 	std::string	stroke_linecap; ///< stroke line-join type
-	std::string text; ///< text
-	TextStyle(): stroke_width(), stroke_miterlimit(1.0f), fontsize() {}
 };
 
 /// this class will enable to create a texture from a themed text structure
@@ -57,7 +58,7 @@ struct TextStyle {
  */
 class OpenGLText {
 public:
-	OpenGLText(std::unique_ptr<Texture>&, float width, float height);
+	OpenGLText(std::string const& text, std::unique_ptr<Texture>&, float width, float height);
 	OpenGLText(OpenGLText&&);
 
 	OpenGLText& operator=(OpenGLText&&);
@@ -66,26 +67,24 @@ public:
 	void draw(Window&, Dimensions &_dim, TexCoords &_tex);
 	/// draws full texture
 	void draw(Window&);
-	/// @return x
-	float x() const { return m_x; }
-	/// @return y
-	float y() const { return m_y; }
+	float getWidth() const { return m_width; }
+	float getHeight() const { return m_height; }
 	/// @returns dimension of texture
 	Dimensions& dimensions() { return m_texture->dimensions; }
 
 private:
-	float m_x;
-	float m_y;
+	std::string m_text;
 	std::unique_ptr<Texture> m_texture;
+	float m_width;
+	float m_height;
 };
 
 /// themed svg texts (simple)
 class SvgTxtThemeSimple {
 public:
-	/// constructor
 	SvgTxtThemeSimple(fs::path const& themeFile, float factor = 1.0f);
 	/// renders text
-	void render(std::string _text);
+	void render(std::string const& text);
 	/// draws texture
 	void draw(Window&);
 	/// gets dimensions
@@ -142,17 +141,20 @@ public:
 	enum class Align { A_ASIS, LEFT, CENTER, RIGHT };
 	/// dimensions, what else
 	Dimensions dimensions;
-	/// constructor
+
 	SvgTxtTheme(fs::path const& themeFile, float factor = 1.0f);
 	/// draws text with alpha
 	void draw(Window&, std::vector<TZoomText>& _text, bool lyrics = false);
 	/// draw text with alpha
 	void draw(Window&, std::string _text);
+	Size measure(std::string const& text);
 	/// sets highlight
 	void setHighlight(fs::path const& themeFile);
 	/// width
+	float getWidth() const { return m_texture_width; }
 	float w() const { return m_texture_width; }
 	/// height
+	float getHeight() const { return m_texture_height; }
 	float h() const { return m_texture_height; }
 	/// set align
 	void setAlign(Align align) { m_align = align; }
@@ -168,7 +170,6 @@ private:
 	float m_texture_width;
 	float m_texture_height;
 	std::string m_cache_text;
-	TextStyle m_text;
-	TextStyle m_text_highlight;
+	TextStyle m_textstyle;
+	TextStyle m_textstyle_highlight;
 };
-

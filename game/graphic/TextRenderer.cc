@@ -25,10 +25,15 @@ namespace {
 		if (fontstyle == "oblique") return PANGO_STYLE_OBLIQUE;
 		throw std::logic_error(fontstyle + ": Unknown font style (opengl_text.cc)");
 	}
+    
+    void alignFactor(float& factor) {
+        factor *= 2.0f;  // HACK to improve text quality without affecting compatibility with old versions
+    }
 }
 
-OpenGLText TextRenderer::render(std::string const& text, TextStyle& style, float m) {
-	m *= 2.0f;  // HACK to improve text quality without affecting compatibility with old versions
+OpenGLText TextRenderer::render(std::string const& text, TextStyle const& style, float m) {
+    alignFactor(m);
+    
 	// Setup font settings
 	auto alignment = parseAlignment(style.fontalign);
 	std::shared_ptr<PangoFontDescription> desc(pango_font_description_new(), pango_font_description_free);
@@ -97,5 +102,39 @@ OpenGLText TextRenderer::render(std::string const& text, TextStyle& style, float
 	texture->load(bitmap, true);
 
 	// We don't want text quality multiplier m to affect rendering size...
-	return OpenGLText(texture, width / m, height / m);
+	return OpenGLText(text, texture, width / m, height / m);
 }
+
+Size TextRenderer::measure(const std::string& text, const TextStyle& style, float m) {
+    alignFactor(m);
+
+	// Setup font settings
+	auto alignment = parseAlignment(style.fontalign);
+	std::shared_ptr<PangoFontDescription> desc(pango_font_description_new(), pango_font_description_free);
+	pango_font_description_set_weight(desc.get(), parseWeight(style.fontweight));
+	pango_font_description_set_style(desc.get(), parseStyle(style.fontstyle));
+	pango_font_description_set_family(desc.get(), style.fontfamily.c_str());
+	pango_font_description_set_absolute_size(desc.get(), style.fontsize * PANGO_SCALE * m);
+	auto border = style.stroke_width * m;
+	// Setup Pango context and layout
+	std::shared_ptr<PangoContext> ctx(pango_font_map_create_context(pango_cairo_font_map_get_default()), g_object_unref);
+	std::shared_ptr<PangoLayout> layout(pango_layout_new(ctx.get()), g_object_unref);
+	pango_layout_set_alignment(layout.get(), alignment);
+	pango_layout_set_font_description(layout.get(), desc.get());
+	pango_layout_set_text(layout.get(), text.c_str(), -1);
+
+	auto width = 0.f;
+	auto height = 0.f;
+
+	// Compute text extents
+	{
+		PangoRectangle rec;
+		pango_layout_get_pixel_extents(layout.get(), nullptr, &rec);
+		width = static_cast<float>(rec.width) + border;  // Add twice half a border for margins
+		height = static_cast<float>(rec.height) + border;
+	}
+
+	// We don't want text quality multiplier m to affect rendering size...
+	return {width / m, height / m};
+}
+
