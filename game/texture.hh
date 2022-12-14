@@ -124,6 +124,7 @@ template <GLenum Type> class OpenGLTexture {
 	GLuint id() const { return m_id; };
 	/// draw in given dimensions, with given texture coordinates
 	void draw(Window&, Dimensions const& dim, TexCoords const& tex = TexCoords()) const;
+	void draw(Window&, Dimensions const& dim, TexCoords const& tex, glmath::mat3 const& matrix) const;
 	/// draw a subsection of the orig dimensions, cropping by tex
 	void drawCropped(Window&, Dimensions const& orig, TexCoords const& tex) const;
   private:
@@ -168,6 +169,32 @@ template <GLenum Type> void OpenGLTexture<Type>::draw(Window& window, Dimensions
 	va.draw();
 }
 
+template <GLenum Type> void OpenGLTexture<Type>::draw(Window& window, Dimensions const& dim, TexCoords const& tex, glmath::mat3 const& matrix) const {
+	glutil::GLErrorChecker glerror("OpenGLTexture::draw()");
+	glutil::VertexArray va;
+
+	UseTexture texture(window, *this);
+	glerror.check("texture");
+
+	// The texture wraps over at the edges (repeat)
+	const bool repeating = tex.outOfBounds();
+	glTexParameterf(type(), GL_TEXTURE_WRAP_S, repeating ? GL_REPEAT : GL_CLAMP_TO_EDGE);
+	glTexParameterf(type(), GL_TEXTURE_WRAP_T, repeating ? GL_REPEAT : GL_CLAMP_TO_EDGE);
+	glerror.check("repeat mode");
+
+	auto const v0 = matrix * glmath::vec3(dim.x1(), dim.y1(), 1);
+	auto const v1 = matrix * glmath::vec3(dim.x2(), dim.y1(), 1);
+	auto const v2 = matrix * glmath::vec3(dim.x1(), dim.y2(), 1);
+	auto const v3 = matrix * glmath::vec3(dim.x2(), dim.y2(), 1);
+
+	va.texCoord(tex.x1, tex.y1).vertex(v0);
+	va.texCoord(tex.x2, tex.y1).vertex(v1);
+	va.texCoord(tex.x1, tex.y2).vertex(v2);
+	va.texCoord(tex.x2, tex.y2).vertex(v3);
+
+	va.draw();
+}
+
 template <GLenum Type> void OpenGLTexture<Type>::drawCropped(Window& window, Dimensions const& orig, TexCoords const& tex) const {
 	Dimensions dim(
 	  orig.x1() + tex.x1 * orig.w(),
@@ -190,13 +217,14 @@ public:
 	Dimensions dimensions;
 	/// texture coordinates
 	TexCoords tex;
-	Texture(): m_width(0), m_height(0), m_premultiplied(true) {}
+	Texture() = default;
 	/// creates texture from file
 	Texture(fs::path const& filename);
 	~Texture();
-	bool empty() const { return m_width * m_height == 0; } ///< Test if the loading has failed
+	bool empty() const { return m_width * m_height == 0.f; } ///< Test if the loading has failed
 	/// draws texture
 	void draw(Window&) const;
+	void draw(Window&, glmath::mat3 const&) const;
 	using OpenGLTexture<GL_TEXTURE_2D>::draw;
 	/// loads texture into buffer
 	void load(Bitmap const& bitmap, bool isText = false);
@@ -204,8 +232,9 @@ public:
 	float width() const { return m_width; }
 	float height() const { return m_height; }
 private:
-	float m_width, m_height;
-	bool m_premultiplied;
+	float m_width = 0.f;
+	float m_height = 0.f;
+	bool m_premultiplied = true;
 	OpenGLTexture<GL_TEXTURE_2D> m_texture;
 };
 
