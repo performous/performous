@@ -15,7 +15,7 @@ class BorderDefinition : public Texture {
 	float getBorderWidth() const;
 
   private:
-	  float m_borderWidth = 0.2f;
+	float m_borderWidth = 0.2f;
 };
 
 using BorderDefinitionPtr = std::shared_ptr<BorderDefinition>;

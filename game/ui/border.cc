@@ -62,9 +62,9 @@ void Border::draw(Window& window) {
 
 	auto const dim = Dimensions().left(getX()).top(getY()).stretch(getWidth(), getHeight());
 	auto const left = m_definition->getBorderWidth();
-	auto const right = 1.0 - left;
+	auto const right = 1.f - left;
 	auto const top = m_definition->getBorderWidth();
-	auto const bottom = 1.0 - top;
+	auto const bottom = 1.f - top;
 	auto const border = m_border;
 	auto const x1 = dim.x1() - border;
 	auto const x2 = dim.x2() + border;
@@ -76,36 +76,36 @@ void Border::draw(Window& window) {
 	auto const yb = dim.y2();
 
 	glutil::VertexArray va0;
-	va0.texCoord(0, 0).vertex(x1, y1);
-	va0.texCoord(0, top).vertex(x1, yt);
-	va0.texCoord(left, 0).vertex(xl, y1);
+	va0.texCoord(0.f, 0.f).vertex(x1, y1);
+	va0.texCoord(0.f, top).vertex(x1, yt);
+	va0.texCoord(left, 0.f).vertex(xl, y1);
 	va0.texCoord(left, top).vertex(xl, yt);
-	va0.texCoord(right, 0).vertex(xr, y1);
+	va0.texCoord(right, 0.f).vertex(xr, y1);
 	va0.texCoord(right, top).vertex(xr, yt);
-	va0.texCoord(1, 0).vertex(x2, y1);
-	va0.texCoord(1, top).vertex(x2, yt);
+	va0.texCoord(1.f, 0.f).vertex(x2, y1);
+	va0.texCoord(1.f, top).vertex(x2, yt);
 	va0.draw();
 
 	glutil::VertexArray va1;
-	va1.texCoord(0, top).vertex(x1, yt);
-	va1.texCoord(0, bottom).vertex(x1, yb);
+	va1.texCoord(0.f, top).vertex(x1, yt);
+	va1.texCoord(0.f, bottom).vertex(x1, yb);
 	va1.texCoord(left, top).vertex(xl, yt);
 	va1.texCoord(left, bottom).vertex(xl, yb);
 	va1.texCoord(right, top).vertex(xr, yt);
 	va1.texCoord(right, bottom).vertex(xr, yb);
-	va1.texCoord(1, top).vertex(x2, yt);
-	va1.texCoord(1, bottom).vertex(x2, yb);
+	va1.texCoord(1.f, top).vertex(x2, yt);
+	va1.texCoord(1.f, bottom).vertex(x2, yb);
 	va1.draw();
 
 	glutil::VertexArray va2;
-	va2.texCoord(0, bottom).vertex(x1, yb);
-	va2.texCoord(0, 1).vertex(x1, y2);
+	va2.texCoord(0.f, bottom).vertex(x1, yb);
+	va2.texCoord(0.f, 1.f).vertex(x1, y2);
 	va2.texCoord(left, bottom).vertex(xl, yb);
-	va2.texCoord(left, 1).vertex(xl, y2);
+	va2.texCoord(left, 1.f).vertex(xl, y2);
 	va2.texCoord(right, bottom).vertex(xr, yb);
-	va2.texCoord(right, 1).vertex(xr, y2);
-	va2.texCoord(1, bottom).vertex(x2, yb);
-	va2.texCoord(1, 1).vertex(x2, y2);
+	va2.texCoord(right, 1.f).vertex(xr, y2);
+	va2.texCoord(1.f, bottom).vertex(x2, yb);
+	va2.texCoord(1.f, 1.f).vertex(x2, y2);
 	va2.draw();
 
 }
