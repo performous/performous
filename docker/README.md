@@ -1,6 +1,8 @@
-This repository contains Dockerfiles which will install all dependencies needed to build [Performous](https://github.com/performous/performous/wiki/Building-and-installing-from-source).  
+This folder contains Dockerfiles which will install all dependencies needed to build [Performous](https://github.com/performous/performous/wiki/Building-and-installing-from-source).  
 
 These containers are to be used as `base images` to provide higher-level builds and packages and to produce artifacts for downstream consumption. These containers **do not** provide a running version of `Performous` or contain the project source in any usable form.  
+
+These containers are built automatically during our CI/CD workflow, and are used to support Linux Distros that are no available by default from Github Actions.  
 
 ## Building containers
 The build is a pretty standard `docker build`, just make sure you explicitly call out a `Dockerfile` with `-f Dockerfile.<distro>` and supply the correct distro version as a `build-arg`:  
@@ -9,7 +11,7 @@ docker build -t performous-docker-build:ubuntu20.04 -f Dockerfile.ubuntu --build
 ```
 
 Currently supported distros are:
-- Ubuntu (18.04, 20.04, 22.04)
+- Ubuntu (20.04, 22.04)
 - Fedora (34, 35, 36)
 - Debian (10, 11)
 
