@@ -100,8 +100,8 @@
 				<button hw="7" map="start" />
 				<hat hw="0" up="pick_up" down="pick_down" />
 				<axis hw="1" negative="pick_up" positive="pick_down"/>
-				<axis hw="2" map="whammy" />
-				<axis hw="3" map="godmode"/>
+				<axis hw="2" map="godmode" />
+				<axis hw="3" map="whammy"/>
 				<!--<axis hw="4" negative="left" positive="right" />-->
 				<!--<axis hw="5" negative="up" positive="down" />-->
 			</mapping>
