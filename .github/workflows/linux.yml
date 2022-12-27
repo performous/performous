@@ -141,16 +141,11 @@ jobs:
           echo "MASTER_ARTIFACT_PATH=${MASTER_NEW_PACKAGE_NAME}" >> ${GITHUB_ENV}
           echo "MASTER_ARTIFACT_NAME=${MASTER_ARTIFACT_NAME}" >> ${GITHUB_ENV}
 
-      - name: Run unittests directly called
+      - name: Run unit tests
         if: ${{ github.event_name != 'schedule' }}
         run: |
           # Run the containers with the script for each testing suite
-          docker run --rm -v $(pwd):/github_actions_build/ ${{ env.CONTAINER_NAME }} ./run_gtest.sh
-
-      - name: Run unittests by ctest
-        if: ${{ github.event_name != 'schedule' }}
-        run: |
-          docker run --rm -v $(pwd):/github_actions_build/ ${{ env.CONTAINER_NAME }} ./run_ctest.sh
+          docker run --rm -v $(pwd):/github_actions_build/ ${{ env.CONTAINER_NAME }} ./run_tests.sh
 
       # Upload artifacts during pull-requests
       - name: Upload artifact
