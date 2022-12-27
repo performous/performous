@@ -15,7 +15,6 @@ RUN dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-rele
 
 ## Copy in the build script to make things easy
 COPY build_performous.sh /root/performous/build_performous.sh
-COPY run_ctest.sh /root/performous/run_ctest.sh
-COPY run_gtest.sh /root/performous/run_gtest.sh
+COPY run_tests.sh /root/performous/run_tests.sh
 
 WORKDIR /root/performous
