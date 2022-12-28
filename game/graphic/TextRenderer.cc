@@ -9,21 +9,21 @@ namespace {
 		if (fontalign == "start") return PANGO_ALIGN_LEFT;
 		if (fontalign == "center" || fontalign == "middle") return PANGO_ALIGN_CENTER;
 		if (fontalign == "end") return PANGO_ALIGN_RIGHT;
-		throw std::logic_error(fontalign + ": Unknown font alignment (opengl_text.cc)");
+		throw std::logic_error("Unknown font alignment '" + fontalign + "'");
 	}
 
 	PangoWeight parseWeight(std::string const& fontweight) {
 		if (fontweight == "normal") return PANGO_WEIGHT_NORMAL;
 		if (fontweight == "bold") return PANGO_WEIGHT_BOLD;
 		if (fontweight == "bolder") return PANGO_WEIGHT_ULTRABOLD;
-		throw std::logic_error(fontweight + ": Unknown font weight (opengl_text.cc)");
+		throw std::logic_error("Unknown font weight '" + fontweight + "'");
 	}
 
 	PangoStyle parseStyle(std::string const& fontstyle) {
 		if (fontstyle == "normal") return PANGO_STYLE_NORMAL;
 		if (fontstyle == "italic") return PANGO_STYLE_ITALIC;
 		if (fontstyle == "oblique") return PANGO_STYLE_OBLIQUE;
-		throw std::logic_error(fontstyle + ": Unknown font style (opengl_text.cc)");
+		throw std::logic_error("Unknown font style '" + fontstyle + "'");
 	}
     
     void alignFactor(float& factor) {
