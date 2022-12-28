@@ -19,16 +19,16 @@ usage() {
   echo "  -g : Run only the gtest suite"
   echo "  -D <clone/directory>: The absolute path to the directory where Performous"
   echo "     is cloned to from GitHub. Defaults to ${CLONE_DIRECTORY}"
-  echo "  -t <test/directory>: The relative path to the testing directory for google tests"
-  echo "     under the clone of the Performous repo. Defaults to ${GTEST_TESTING_DIRECTORY}"
-  echo "  -T <test/directory>: The relative path to the testing directory for 'make test'"
+  echo "  -M <test/directory>: The relative path to the testing directory for 'make test'"
   echo "     under the clone of the Performous repo. Defaults to ${CTEST_TESTING_DIRECTORY}"
+  echo "  -T <test/directory>: The relative path to the testing directory for google tests"
+  echo "     under the clone of the Performous repo. Defaults to ${GTEST_TESTING_DIRECTORY}"
   echo "  -h : Show this help message"
   exit 1
 }
 
 ## Set up getopts
-while getopts "cgD:t:T:h" OPTION; do
+while getopts "cgD:M:T:h" OPTION; do
   case ${OPTION} in
     "c")
       RUN_GTEST=false;;
@@ -36,10 +36,10 @@ while getopts "cgD:t:T:h" OPTION; do
       RUN_CTEST=false;;
     "D")
       CLONE_DIRECTORY=${OPTARG};;
-    "t")
-      GTEST_TESTING_DIRECTORY=${OPTARG};;
-    "T")
+    "M")
       CTEST_TESTING_DIRECTORY=${OPTARG};;
+    "T")
+      GTEST_TESTING_DIRECTORY=${OPTARG};;
     "h")
       HELP=true;;
   esac
