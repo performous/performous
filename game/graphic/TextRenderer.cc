@@ -123,16 +123,12 @@ Size TextRenderer::measure(const std::string& text, const TextStyle& style, floa
 	pango_layout_set_font_description(layout.get(), desc.get());
 	pango_layout_set_text(layout.get(), text.c_str(), -1);
 
-	auto width = 0.f;
-	auto height = 0.f;
-
 	// Compute text extents
-	{
-		PangoRectangle rec;
-		pango_layout_get_pixel_extents(layout.get(), nullptr, &rec);
-		width = static_cast<float>(rec.width) + border;  // Add twice half a border for margins
-		height = static_cast<float>(rec.height) + border;
-	}
+	PangoRectangle rec;
+	pango_layout_get_pixel_extents(layout.get(), nullptr, &rec);
+
+    auto const width = static_cast<float>(rec.width) + border;  // Add twice half a border for margins
+	auto const height = static_cast<float>(rec.height) + border;
 
 	// We don't want text quality multiplier m to affect rendering size...
 	return {width / m, height / m};
