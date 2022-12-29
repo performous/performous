@@ -139,7 +139,7 @@ void SvgTxtThemeSimple::render(std::string const& text) {
 	if (!m_opengl_text.get() || m_cache_text != text) {
 		m_cache_text = text;
 
-		auto renderer = TextRenderer();
+		static TextRenderer renderer;
 
 		m_opengl_text = std::make_unique<OpenGLText>(renderer.render(text, m_text, m_factor));
 	}
