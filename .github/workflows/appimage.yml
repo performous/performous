@@ -90,7 +90,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          upload_url: ${{ inputs.release_upload_url }}
           asset_path: ${{ env.ARTIFACT_PATH }}
           asset_name: ${{ env.ARTIFACT_NAME }}
           asset_content_type: application/octet-stream
