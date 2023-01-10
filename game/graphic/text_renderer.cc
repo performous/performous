@@ -1,4 +1,4 @@
-#include "TextRenderer.hh"
+#include "text_renderer.hh"
 
 #include <pango/pangocairo.h>
 
@@ -25,15 +25,15 @@ namespace {
 		if (fontstyle == "oblique") return PANGO_STYLE_OBLIQUE;
 		throw std::logic_error("Unknown font style '" + fontstyle + "'");
 	}
-    
-    void alignFactor(float& factor) {
-        factor *= 2.0f;  // HACK to improve text quality without affecting compatibility with old versions
-    }
+
+	void alignFactor(float& factor) {
+		factor *= 2.0f;  // HACK to improve text quality without affecting compatibility with old versions
+	}
 }
 
 OpenGLText TextRenderer::render(std::string const& text, TextStyle const& style, float m) {
-    alignFactor(m);
-    
+	alignFactor(m);
+
 	// Setup font settings
 	auto alignment = parseAlignment(style.fontalign);
 	std::shared_ptr<PangoFontDescription> desc(pango_font_description_new(), pango_font_description_free);
@@ -106,7 +106,7 @@ OpenGLText TextRenderer::render(std::string const& text, TextStyle const& style,
 }
 
 Size TextRenderer::measure(const std::string& text, const TextStyle& style, float m) {
-    alignFactor(m);
+	alignFactor(m);
 
 	// Setup font settings
 	auto alignment = parseAlignment(style.fontalign);
@@ -127,7 +127,7 @@ Size TextRenderer::measure(const std::string& text, const TextStyle& style, floa
 	PangoRectangle rec;
 	pango_layout_get_pixel_extents(layout.get(), nullptr, &rec);
 
-    auto const width = static_cast<float>(rec.width) + border;  // Add twice half a border for margins
+	auto const width = static_cast<float>(rec.width) + border;  // Add twice half a border for margins
 	auto const height = static_cast<float>(rec.height) + border;
 
 	// We don't want text quality multiplier m to affect rendering size...

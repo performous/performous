@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Size.hh"
+#include "size.hh"
 #include "opengl_text.hh"
 
 #include <string>
