@@ -3,7 +3,7 @@
 #include "color.hh"
 #include "texture.hh"
 #include "unicode.hh"
-#include "graphic/Size.hh"
+#include "graphic/size.hh"
 #include <memory>
 #include <string>
 #include <vector>

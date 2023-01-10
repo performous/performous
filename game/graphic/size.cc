@@ -1,4 +1,4 @@
-#include "Size.hh"
+#include "size.hh"
 
 Size::Size(float width, float height)
 : width(width), height(height) {

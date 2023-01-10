@@ -7,7 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include "fs.hh"
-#include "graphic/TextRenderer.hh"
+#include "graphic/text_renderer.hh"
 #include "fontconfig/fontconfig.h"
 #include <pango/pangocairo.h>
 
@@ -47,7 +47,7 @@ OpenGLText::OpenGLText(OpenGLText&& other)
 }
 
 OpenGLText& OpenGLText::operator=(OpenGLText&& other) {
-    m_text = std::move(other.m_text);
+	m_text = std::move(other.m_text);
 	m_texture = std::move(other.m_texture);
 	m_width = other.m_width;
 	m_height = other.m_height;
