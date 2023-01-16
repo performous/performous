@@ -172,16 +172,16 @@ void SvgTxtTheme::draw(Window& window, std::string _text) {
 void SvgTxtTheme::draw(Window& window, std::vector<TZoomText>& _text, bool lyrics) {
 	std::string tmp;
 
-	for (auto& zt: _text)
+	for (auto& zt: _text) {
 		tmp += zt.string;
+	}
 
 	if (m_opengl_text.size() != _text.size() || m_cache_text != tmp) {
 		m_cache_text = tmp;
 		m_opengl_text.clear();
 		auto renderer = TextRenderer();
-		for (auto& zt: _text) {
-			auto openGlPtr = std::make_unique<OpenGLText>(renderer.render(zt.string, m_textstyle, m_factor));
-			m_opengl_text.push_back(std::move(openGlPtr));
+		for (const auto& zt: _text) {
+			m_opengl_text.emplace_back(std::make_unique<OpenGLText>(renderer.render(zt.string, m_textstyle, m_factor)));
 		}
 	}
 	float text_x = 0.0f;
