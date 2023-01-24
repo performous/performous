@@ -97,11 +97,11 @@ jobs:
           - os: debian
             version: 11
           - os: fedora
-            version: 34
-          - os: fedora
             version: 35
           - os: fedora
             version: 36
+          - os: fedora
+            version: 37
     steps:
       - name: Container name
         run: |
