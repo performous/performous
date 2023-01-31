@@ -139,6 +139,7 @@ private:
 };
 
 using SongPtr = std::shared_ptr<Song>;
+using SongCollection = std::vector<SongPtr>;
 
 /// Print a SongParserException in a format suitable for the logging system.
 std::ostream& operator<<(std::ostream& os, SongParserException const& e);
