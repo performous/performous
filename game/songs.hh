@@ -12,6 +12,7 @@
 #include <thread>
 #include <vector>
 #include "screen.hh"
+#include "songorder.hh"
 #include <shared_mutex>
 
 class Game;
@@ -80,14 +81,13 @@ class Songs {
 	std::atomic<bool> doneLoading{ false };
 	std::atomic<bool> displayedAlert{ false };
 	size_t loadedSongs() const { std::shared_lock<std::shared_mutex> l(m_mutex); return m_songs.size(); }
+	void addSongOrder(SongOrderPtr);
 
   private:
 	void LoadCache();
 	void CacheSonglist();
 
 	class RestoreSel;
-	using SongPtr = std::shared_ptr<Song>;
-	using SongCollection = std::vector<SongPtr>;
 	std::string m_songlist;
 	// Careful the m_songs needs to be correctly locked when accessed, and
 	// especially, the reload_internal thread expects to be the only thread
@@ -109,4 +109,5 @@ class Songs {
 	std::atomic<bool> m_loading{ false };
 	std::unique_ptr<std::thread> m_thread;
 	mutable std::shared_mutex m_mutex;
+	std::vector<SongOrderPtr> m_songOrders;
 };

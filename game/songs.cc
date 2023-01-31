@@ -11,6 +11,15 @@
 #include "song.hh"
 #include "unicode.hh"
 
+#include "songorder/artist_song_order.hh"
+#include "songorder/edition_song_order.hh"
+#include "songorder/genre_song_order.hh"
+#include "songorder/language_song_order.hh"
+#include "songorder/name_song_order.hh"
+#include "songorder/path_song_order.hh"
+#include "songorder/random_song_order.hh"
+#include "songorder/score_song_order.hh"
+
 #include <fmt/format.h>
 #include <unicode/stsearch.h>
 
@@ -22,11 +31,27 @@
 #include <regex>
 #include <stdexcept>
 
+namespace {
+	void initializeSongOrders(Songs& songs) {
+		songs.addSongOrder(std::make_shared<RandomSongOrder>());
+		songs.addSongOrder(std::make_shared<NameSongOrder>());
+		songs.addSongOrder(std::make_shared<ArtistSongOrder>());
+		songs.addSongOrder(std::make_shared<EditionSongOrder>());
+		songs.addSongOrder(std::make_shared<GenreSongOrder>());
+		songs.addSongOrder(std::make_shared<PathSongOrder>());
+		songs.addSongOrder(std::make_shared<LanguageSongOrder>());
+		songs.addSongOrder(std::make_shared<ScoreSongOrder>());
+	}
+}
+
 Songs::Songs(Database & database, std::string const& songlist):
   m_songlist(songlist),
   m_database(database),
   m_order(config["songs/sort-order"].ui()) {
 	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
+
+	initializeSongOrders(*this);
+
 	reload();
 }
 
@@ -328,16 +353,15 @@ void Songs::filter_internal() {
 	m_dirty = false;
 	RestoreSel restore(*this);
 	try {
-		SongCollection filtered = SongCollection();
+		auto filtered = SongCollection();
 		// if filter text is blank and no type filter is set, just display all songs.
 		if (m_filter == std::string() && m_type == 0) {
 			std::shared_lock<std::shared_mutex> l(m_mutex);
 			filtered = m_songs;
 		} else {
-
 			auto filter = icu::UnicodeString::fromUTF8(
 				UnicodeUtil::convertToUTF8(m_filter)
-				);
+			);
 			icu::ErrorCode icuError;
 
 			std::shared_lock<std::shared_mutex> l(m_mutex);
@@ -415,7 +439,7 @@ namespace {
 	/// A helper for easily constructing CmpByField objects
 	template <typename T> CmpByField<T> customComparator(T Song::*field, bool ascending) { return CmpByField<T>(field, ascending); }
 
-	static const unsigned short types = 7, orders = 8;
+	static const unsigned short types = 7;
 }
 
 std::string Songs::typeDesc() const {
@@ -453,24 +477,19 @@ void Songs::typeCycle(unsigned short cat) {
 }
 
 std::string Songs::getSortDescription() const {
-	std::string str;
-	switch (m_order) {
-	  case 0: str = _("random order"); break;
-	  case 1: str = _("sorted by song"); break;
-	  case 2: str = _("sorted by artist"); break;
-	  case 3: str = _("sorted by edition"); break;
-	  case 4: str = _("sorted by genre"); break;
-	  case 5: str = _("sorted by path"); break;
-	  case 6: str = _("sorted by language"); break;
-	  case 7: str = _("sorted by score"); break;
-	  default: throw std::logic_error("Internal error: unknown sort order in Songs::getSortDescription");
-	}
-	return str;
+	if(m_order < m_songOrders.size())
+		return m_songOrders[m_order]->getDescription();
+
+	throw std::logic_error("Internal error: unknown sort order in Songs::getSortDescription");
 }
 
 void Songs::sortChange(Game& game, SortChange diff) {
+	auto const orders = static_cast<decltype(m_order)>(m_songOrders.size());
 	m_order = static_cast<unsigned short>(m_order + to_underlying(diff)) % orders;
-	if (m_order >= orders) m_order += orders;
+
+	if (m_order >= orders)
+		m_order += orders;
+
 	RestoreSel restore(*this);
 	config["songs/sort-order"].ui() = m_order;
 	switch (m_order) {
@@ -491,53 +510,30 @@ void Songs::sortChange(Game& game, SortChange diff) {
 }
 
 void Songs::sortSpecificChange(unsigned short sortOrder, bool descending) {
-	if(sortOrder < orders) m_order = sortOrder;
-	else m_order = 0;
+	if(sortOrder < m_songOrders.size())
+		m_order = sortOrder;
+	else
+		m_order = 0;
+
 	RestoreSel restore(*this);
 	config["songs/sort-order"].ui() = m_order;
 	sort_internal(descending);
 }
 
 void Songs::sort_internal(bool descending) {
-	if(m_order == 0)
-		std::stable_sort(m_filtered.begin(), m_filtered.end(), customComparator(&Song::randomIdx, true));
-	else {
+	if(m_order < m_songOrders.size()) {
 		auto begin = m_filtered.begin();
 		auto end = m_filtered.end();
+		auto& order = *m_songOrders[m_order];
 
-		switch (m_order) {
-		  case 1: std::sort(begin, end, customComparator(&Song::collateByTitle, !descending)); break;
-		  case 2: std::sort(begin, end, customComparator(&Song::collateByArtist, !descending)); break;
-		  case 3: std::sort(begin, end, customComparator(&Song::edition, !descending)); break;
-		  case 4: std::sort(begin, end, customComparator(&Song::genre, !descending)); break;
-		  case 5: std::sort(begin, end, customComparator(&Song::path, !descending)); break;
-		  case 6: std::sort(begin, end, customComparator(&Song::language, !descending)); break;
-		  case 7: {
-			auto const songToHiscore = [begin, end, this](){
-				auto result = std::map<SongPtr, unsigned>{};
+		order.prepare(m_filtered, m_database);
 
-				std::for_each(begin, end, [&result, this](SongPtr const& song) {
-					try {
-						result[song] = m_database.getHiscore(song);
-					}
-					catch(std::exception const&) {
-						result[song] = 0;
-					}
-				});
+		std::stable_sort(begin, end, [&](SongPtr const& a, SongPtr const& b) { return order(*a, *b) ? !descending : descending; });
 
-				return result;
-			}();
-
-			std::sort(begin, end, [&songToHiscore, &descending](SongPtr const& a, SongPtr const& b){
-				auto const scoreA = songToHiscore.find(a)->second;
-				auto const scoreB = songToHiscore.find(b)->second;
-				return scoreA > scoreB ? !descending : descending;
-			});
-		  }
-		  break;
-		  default: throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
-		}
+		return;
 	}
+
+	throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
 }
 
 std::shared_ptr<Song> Songs::currentPtr() const try {
@@ -594,4 +590,8 @@ void Songs::dumpSongs_internal() const {
 	fs::path coverpath = fs::path(m_songlist) / "covers";
 	fs::create_directories(coverpath);
 	dumpXML(svec, m_songlist + "/songlist.xml");
+}
+
+void Songs::addSongOrder(SongOrderPtr order) {
+	m_songOrders.emplace_back(order);
 }
