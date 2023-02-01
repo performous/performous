@@ -103,6 +103,12 @@ to save the current settings to XML.
 		<short>Language</short>
 		<long>Language to show Performous in</long>
 	</entry>
+	<entry name="game/datetime_format" type="string" value="0">
+		<stringvalue>%X %d.%m.%Y</stringvalue>
+		<stringvalue>%Y-%m-%d %X</stringvalue>
+		<short>Date time format</short>
+		<long>Define how date time should be displayed.</long>
+	</entry>
 	<entry name="game/webserver_access" type="uint" value="0">
 		<limits>
 			<enum>Disabled</enum>
@@ -194,7 +200,7 @@ to save the current settings to XML.
 	</entry>
 	<entry name="game/instruments" type="string_list">
 		<!-- Should be SDL_ID:{GUITAR_GUITARHERO|GUITAR_GUITARHERO_XPLORER|GUITAR_ROCKBAND_PS3|GUITAR_ROCKBAND_XB360|DRUMS_GUITARHERO|DRUMS_ROCKBAND_PS3|DRUMS_ROCKBAND_XB360|DRUMS_MIDI|DANCEPAD_GENERIC|DANCEPAD_TIGERGAME|DANCEPAD_2TECH}
-		     example:
+			 example:
 			<stringvalue>0:GUITAR_GUITARHERO</stringvalue>
 		-->
 		<short>Joystick configuration</short>
@@ -205,7 +211,7 @@ to save the current settings to XML.
 		<long>Regex for matching the MIDI devices to use. The default is to use all available devices.</long>
 		<stringvalue></stringvalue>
 	</entry>
-<!-- 
+<!--
 	<entry name="game/fallback_encoding" type="int" value="2">
 		<limits>
 			<enum>CP1250</enum>
@@ -222,7 +228,7 @@ to save the current settings to XML.
 		<long>Pick the text codec used for song files that are not UTF-8.</long>
 	</entry>
  -->
- 
+
 	<entry name="game/sorting_ignore" type="string_list">
 		<stringvalue>The</stringvalue>
 		<stringvalue>A</stringvalue>
@@ -233,7 +239,7 @@ to save the current settings to XML.
 		<short>Word Collation</short>
 		<long>Words that should be ignored when sorting.</long>
 	</entry>
- 
+
 	<!-- Graphic preferences -->
 	<entry name="graphic/window_width" type="int" value="1366" hidden="true">
 		<ui unit=" pixels" />

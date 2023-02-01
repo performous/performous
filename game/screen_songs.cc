@@ -15,7 +15,9 @@
 #include "graphic/video_driver.hh"
 
 #include "aubio/aubio.h"
+
 #include <iostream>
+#include <iomanip>
 #include <mutex>
 #include <sstream>
 
@@ -287,7 +289,10 @@ void ScreenSongs::drawMultimedia() {
 void ScreenSongs::draw() {
 	update();
 	drawMultimedia();
-	std::ostringstream oss_song, oss_order, oss_hiscore;
+
+	std::ostringstream oss_song, oss_order;
+	auto hiscore = std::string{};
+
 	// Test if there are no songs
 	if (m_songs.empty()) {
 		// Format the song information text
@@ -305,8 +310,7 @@ void ScreenSongs::draw() {
 		Song& song = m_songs.current();
 		// Format the song information text
 		oss_song << song.artist << ": " << song.title;
-		// Get hiscores from database
-		m_database.queryPerSongHiscore(oss_hiscore, m_songs.currentPtr());
+		hiscore = getHighScoreText();
 		// Escaped bytes of UTF-8 must be used here for compatibility with Windows (MSVC, mingw)
 		char const* VERT_ARROW = "\xe2\x86\x95 ";  // ↕
 		char const* HORIZ_ARROW = "\xe2\x86\x94 ";  // ↔
@@ -336,10 +340,45 @@ void ScreenSongs::draw() {
 		theme->song.draw(window, oss_song.str());
 		theme->order.draw(window, oss_order.str());
 		drawInstruments(Dimensions(1.0f).fixedHeight(0.09f).right(0.45f).screenTop(0.02f));
-		theme->hiscores.draw(window, oss_hiscore.str());
+		theme->hiscores.draw(window, hiscore);
 	}
 	// Menus on top of everything
 	if (m_menu.isOpen()) drawMenu();
+}
+
+std::string ScreenSongs::getHighScoreText() const {
+	auto const scores = m_database.queryPerSongHiscore(m_songs.currentPtr());
+	auto const datetimeFormat = config["game/datetime_format"].s("%X %d-%m-%Y");
+	auto const maxLines = 8;
+
+	// Reorder hiscores by track / score
+	std::map<std::string, std::multiset<HiscoreItem>> scoresByTrack;
+	for (auto const& hi: scores)
+		scoresByTrack[hi.track].insert(hi);
+
+	auto stream = std::stringstream();
+	auto n = 0;
+	for (auto const& score: scoresByTrack) {
+		stream << score.first << ":\n";
+		for (auto const& hi: score.second) {
+			auto const time = hi.unixtime.count();
+
+			stream.width(10);
+			stream << std::right << hi.score<< " \t";
+			stream.width(25);
+			stream << std::left << m_database.getPlayers().lookup(hi.playerid).value_or("Unknown player Id " + std::to_string(hi.playerid));
+
+			if(time)
+				stream << " \t" << std::put_time(std::localtime(&time), datetimeFormat.c_str());
+
+			stream << "\n";
+		}
+		stream << "\n";
+		if(++n == maxLines)
+			break;
+	}
+
+	return stream.str();
 }
 
 void ScreenSongs::drawCovers() {
