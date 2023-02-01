@@ -153,3 +153,15 @@ unsigned Database::getHiscore(SongPtr const& s) const {
 	}
 }
 
+std::vector<HiscoreItem> Database::getHiscores(SongPtr const& s) const {
+	try {
+		auto const songid = m_songs.getSongId(s);
+
+		return m_hiscores.getHiscores(songid);
+	} catch (const std::exception& e) {
+		std::clog << "database/error: Invalid song ID for song: " + s->artist + " - " + s->title << std::endl;
+		std::clog << "database/error: message: " << e.what() << std::endl;
+		throw;
+	}
+}
+

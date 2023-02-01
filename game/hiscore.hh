@@ -38,16 +38,19 @@ public:
 	  HiscoreException will be raised.
 	  */
 	void addHiscore(unsigned score, const PlayerId& playerid, SongId songid, unsigned short level, std::string const& track);
+	void addHiscore(HiscoreItem&&);
 
 	using HiscoreVector = std::vector<HiscoreItem>;
 
 	/// This queries the database for a sorted vector of highscores. The defaults mean to query everything.
 	/// @param max limits the number of elements returned.
 	unsigned getHiscore(unsigned songid) const;
+	std::vector<HiscoreItem> getHiscores(unsigned songid) const;
 	HiscoreVector queryHiscore(std::optional<PlayerId> playerid, std::optional<SongId> songid, std::string const& track, std::optional<unsigned> max = std::nullopt) const;
 	bool hasHiscore(const SongId& songid) const;
 	std::size_t size() const { return m_hiscore.size(); }
-private:
+
+  private:
 	using hiscore_t = std::multiset<HiscoreItem>;
 	hiscore_t m_hiscore;
 	unsigned short currentLevel() const;
