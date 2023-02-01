@@ -1,5 +1,3 @@
-#pragma once
-
 #include "random_song_order.hh"
 
 std::string RandomSongOrder::getDescription() const {
