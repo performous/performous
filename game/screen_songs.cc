@@ -348,7 +348,7 @@ void ScreenSongs::draw() {
 
 std::string ScreenSongs::getHighScoreText() const {
 	auto const scores = m_database.queryPerSongHiscore(m_songs.currentPtr());
-	auto const datetimeFormat = config["game/datetime_format"].s("%X %d-%m-%Y");
+	auto const datetimeFormat = config["game/datetime_format"].so();
 	auto const maxLines = 8;
 
 	// Reorder hiscores by track / score
