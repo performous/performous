@@ -13,7 +13,6 @@
 
 
 using Config = ConfigItemMap;
-using Config = std::map<std::string, ConfigItem>;
 extern Config config; ///< A global variable that contains all config items
 
 /** Read config schema and configuration from XML files **/

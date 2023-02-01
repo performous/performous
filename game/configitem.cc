@@ -112,6 +112,13 @@ std::string& ConfigItem::s() {
 	verifyType("string");
 	return std::get<std::string>(m_value);
 }
+std::string ConfigItem::s(std::string const& defaultValue) const {
+	verifyType("string");
+
+	auto const result = std::get<std::string>(m_value);
+
+	return result.empty() ? defaultValue : result;
+}
 ConfigItem::StringList& ConfigItem::sl() {
 	verifyType("string_list");
 	return std::get<StringList>(m_value);

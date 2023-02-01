@@ -10,6 +10,6 @@ struct MostSungSongOrder : public SongOrder {
 	bool operator()(Song const& a, Song const& b) const override;
 
   private:
-	std::map<Song const*, unsigned> m_rateMap;
+	std::map<Song const*, size_t> m_rateMap;
 };
 

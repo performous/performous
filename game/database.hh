@@ -70,6 +70,7 @@ public: // methods for database management
 
 	/**A facade for Players::addPlayer.*/
 	void addPlayer(std::string const& name, std::string const& picture = "", std::optional<PlayerId> id = std::nullopt);
+	Players const& getPlayers() const;
 	/**A facade for SongItems::addSong.*/
 	void addSong(std::shared_ptr<Song> s);
 	/**A facade for Hiscore::addHiscore.
@@ -84,9 +85,7 @@ public: // methods for database queries
 	 */
 	bool reachedHiscore(std::shared_ptr<Song> s) const;
 
-	void queryOverallHiscore(std::ostream & os, std::string const& track = std::string()) const;
-	void queryPerSongHiscore(std::ostream & os, std::shared_ptr<Song> s, std::string const& track = std::string()) const;
-	void queryPerPlayerHiscore(std::ostream & os, std::string const& track = std::string()) const;
+	std::vector<HiscoreItem> queryPerSongHiscore(std::shared_ptr<Song> s, std::string const& track = {}) const;
 
 	bool hasHiscore(Song const& s) const;
 	unsigned getHiscore(Song const& s) const;

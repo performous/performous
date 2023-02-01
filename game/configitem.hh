@@ -36,6 +36,7 @@ class ConfigItem {
 	bool& b(); ///< Access boolean item
 	float& f(); ///< Access floating-point item
 	std::string& s(); ///< Access string item
+	std::string s(std::string const& defaultValue) const; ///< Access string item
 	StringList& sl(); ///< Access stringlist item
 	OptionList& ol(); ///< Access optionlist item
 	std::string& so(); ///< Access currently selected string option

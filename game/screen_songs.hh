@@ -50,6 +50,7 @@ private:
 	void sing(); ///< Enter singing screen with current playlist.
 	void createPlaylistMenu();
 	Texture* loadTextureFromMap(fs::path path);
+	std::string getHighScoreText() const;
 
 	Audio& m_audio;
 	Songs& m_songs;
