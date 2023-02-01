@@ -13,8 +13,10 @@
 
 #include "songorder/artist_song_order.hh"
 #include "songorder/edition_song_order.hh"
+#include "songorder/file_time_song_order.hh"
 #include "songorder/genre_song_order.hh"
 #include "songorder/language_song_order.hh"
+#include "songorder/most_sung_song_order.hh"
 #include "songorder/name_song_order.hh"
 #include "songorder/path_song_order.hh"
 #include "songorder/random_song_order.hh"
@@ -41,6 +43,8 @@ namespace {
 		songs.addSongOrder(std::make_shared<PathSongOrder>());
 		songs.addSongOrder(std::make_shared<LanguageSongOrder>());
 		songs.addSongOrder(std::make_shared<ScoreSongOrder>());
+		songs.addSongOrder(std::make_shared<MostSungSongOrder>());
+		songs.addSongOrder(std::make_shared<FileTimeSongOrder>());
 	}
 }
 
@@ -485,10 +489,22 @@ std::string Songs::getSortDescription() const {
 
 void Songs::sortChange(Game& game, SortChange diff) {
 	auto const orders = static_cast<decltype(m_order)>(m_songOrders.size());
-	m_order = static_cast<unsigned short>(m_order + to_underlying(diff)) % orders;
 
-	if (m_order >= orders)
-		m_order += orders;
+	switch(diff) {
+		case SortChange::BACK:
+			if(m_order == 0)
+				m_order = orders - 1;
+			else
+				--m_order;
+		break;
+		case SortChange::FORWARD:
+			if(++m_order == orders)
+				m_order = 0;
+		break;
+		case SortChange::RESET:
+			m_order = 0;
+		break;
+	}
 
 	RestoreSel restore(*this);
 	config["songs/sort-order"].ui() = m_order;
