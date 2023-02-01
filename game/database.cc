@@ -100,18 +100,36 @@ void Database::queryOverallHiscore(std::ostream & os, std::string const& track) 
 }
 
 void Database::queryPerSongHiscore(std::ostream & os, std::shared_ptr<Song> s, std::string const& track) const {
-	const auto maybe_songid = m_songs.lookup(s);
-	if (!maybe_songid) return; // song not yet in database.
-		const auto songid = maybe_songid.value();
+	auto const maybe_songid = m_songs.lookup(s);
+	if (!maybe_songid)
+		return; // song not yet in database.
+
+	auto const maxLines = 8;
+	auto const songid = maybe_songid.value();
 	// Reorder hiscores by track / score
 	std::map<std::string, std::multiset<HiscoreItem>> scoresByTrack;
-	for (HiscoreItem const& hi: m_hiscores.queryHiscore(std::nullopt, songid, track, std::nullopt)) scoresByTrack[hi.track].insert(hi);
+	for (HiscoreItem const& hi: m_hiscores.queryHiscore(std::nullopt, songid, track, std::nullopt))
+		scoresByTrack[hi.track].insert(hi);
+
+	auto n = 0;
 	for (auto const& hiv: scoresByTrack) {
 		os << hiv.first << ":\n";
 		for (auto const& hi: hiv.second) {
-			os << "\t" << hi.score << "\t" << m_players.lookup(hi.playerid).value_or("Unknown player Id " + std::to_string(hi.playerid)) << "\n";
+			auto const time = hi.unixtime.count();
+
+			os.width(10);
+			os << std::right << hi.score<< " \t";
+			os.width(25);
+			os << std::left << m_players.lookup(hi.playerid).value_or("Unknown player Id " + std::to_string(hi.playerid));
+
+			if(time)
+				os << " \t" << std::put_time(std::localtime(&time), "%X %d-%m-%Y");
+
+			os << "\n";
 		}
 		os << "\n";
+		if(++n == maxLines)
+			break;
 	}
 }
 
