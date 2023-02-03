@@ -20,6 +20,7 @@ set(GAME_SOURCES
 	"../game/notes.cc"
 	"../game/notegraphscalerfactory.cc"
 	"../game/tone.cc"
+	"../game/util.cc"
 )
 
 set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${GAME_SOURCES})

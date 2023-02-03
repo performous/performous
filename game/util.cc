@@ -1,5 +1,7 @@
 #include "util.hh"
 
+#include <iomanip>
+#include <sstream>
 #include <stdexcept>
 
 // Only conversion types used in Performous are provided
@@ -20,4 +22,13 @@ unsigned stou(std::string const & str, size_t * idx, int base) {
 			uival = static_cast<unsigned>(result);
 		else throw std::out_of_range(str + " is out of range of unsigned.");
 	return uival;
+}
+
+std::string format(std::chrono::seconds const& unixtime, std::string const& format) {
+	auto const time = static_cast<std::time_t>(unixtime.count());
+	auto stream = std::stringstream();
+
+	stream << std::put_time(std::localtime(&time), format.c_str());
+
+	return stream.str();
 }

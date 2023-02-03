@@ -361,15 +361,13 @@ std::string ScreenSongs::getHighScoreText() const {
 	for (auto const& score: scoresByTrack) {
 		stream << score.first << ":\n";
 		for (auto const& hi: score.second) {
-			auto const time = static_cast<std::time_t>(hi.unixtime.count());
-
 			stream.width(10);
 			stream << std::right << hi.score<< " \t";
 			stream.width(25);
 			stream << std::left << m_database.getPlayers().lookup(hi.playerid).value_or("Unknown player Id " + std::to_string(hi.playerid));
 
 			if(time)
-				stream << " \t" << std::put_time(std::localtime(&time), datetimeFormat.c_str());
+				stream << " \t" << format(hi.unixtime, datetimeFormat);
 
 			stream << "\n";
 		}
