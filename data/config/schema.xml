@@ -106,6 +106,7 @@ to save the current settings to XML.
 	<entry name="game/datetime_format" type="option_list" value="0">
 		<stringvalue>%X %d.%m.%Y</stringvalue>
 		<stringvalue>%Y-%m-%d %X</stringvalue>
+		<stringvalue>%c</stringvalue>
 		<short>Date time format</short>
 		<long>Define how date time should be displayed.</long>
 	</entry>
