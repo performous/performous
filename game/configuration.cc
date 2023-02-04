@@ -228,9 +228,10 @@ void writeConfig(Game& game, bool system) {
 		if (item.isDefault(system) && name != "audio/backend" && name != "graphic/stereo3d") continue; // No need to save settings with default values
 		dirty = true;
 		xmlpp::Element* entryNode = xmlpp::add_child_element(nodeRoot, "entry");
-		entryNode->set_attribute("name", name);
-		std::string type = item.getType();
+		auto type = item.getType();
+
 		entryNode->set_attribute("type", type);
+		entryNode->set_attribute("name", name);
 		if (name == "audio/backend") {
 			std::string currentBackEnd = Audio::backendConfig().getOldValue();
 			int oldValue = PaHostApiNameToHostApiTypeId(currentBackEnd);
@@ -268,13 +269,19 @@ void writeConfig(Game& game, bool system) {
 		else if (type == "uint") entryNode->set_attribute("value",std::to_string(item.ui()));
 		else if (type == "bool") entryNode->set_attribute("value", item.b() ? "true" : "false");
 		else if (type == "float") entryNode->set_attribute("value", std::to_string(item.f()));
-		else if (item.getType() == "string") xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(item.s());
-		else if (item.getType() == "string_list") {
-			for (auto const& str : item.sl()) xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(str);
+		else if (type == "string") xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(item.s());
+		else if (type == "string_list") {
+			for (auto const& str : item.sl())
+				xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(str);
 		}
-		else if (item.getType() == "option_list") {
+		else if (type == "option_list") {
 			//TODO: Write selected also (as attribute?)
-			for (auto const& str : item.ol()) xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(str);
+			auto const selectedValue = item.so();
+			xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(selectedValue);
+
+			for (auto const& str : item.ol())
+				if(str != selectedValue)
+					xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(str);
 		}
 	}
 	fs::path const& conf = system ? systemConfFile : userConfFile;
