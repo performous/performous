@@ -366,7 +366,7 @@ std::string ScreenSongs::getHighScoreText() const {
 			stream.width(25);
 			stream << std::left << m_database.getPlayers().lookup(hi.playerid).value_or("Unknown player Id " + std::to_string(hi.playerid));
 
-			if(time)
+			if(hi.unixtime.count())
 				stream << " \t" << format(hi.unixtime, datetimeFormat);
 
 			stream << "\n";
