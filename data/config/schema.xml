@@ -104,8 +104,9 @@ to save the current settings to XML.
 		<long>Language to show Performous in</long>
 	</entry>
 	<entry name="game/datetime_format" type="option_list" value="0">
-		<stringvalue>%X %d.%m.%Y</stringvalue>
-		<stringvalue>%Y-%m-%d %X</stringvalue>
+		<stringvalue>%H:%M %d.%m.%Y</stringvalue>
+		<stringvalue>%H:%M %m/%d/%Y </stringvalue>
+		<stringvalue>%Y-%m-%d %H:%M</stringvalue>
 		<stringvalue>%c</stringvalue>
 		<short>Date time format</short>
 		<long>Define how date time should be displayed.</long>
