@@ -221,14 +221,17 @@ namespace {
 void writeConfig(Game& game, bool system) {
 	xmlpp::Document doc;
 	auto nodeRoot = doc.create_root_node("performous");
-	bool dirty = false;
+	auto dirty = false;
 	for (auto& elem : config) {
 		ConfigItem& item = elem.second;
-		std::string name = elem.first;
-		if (item.isDefault(system) && name != "audio/backend" && name != "graphic/stereo3d") continue; // No need to save settings with default values
+		auto const name = elem.first;
+		auto const type = item.getType();
+
+		if (item.isDefault(system) && name != "audio/backend" && name != "graphic/stereo3d")
+			continue; // No need to save settings with default values
+
 		dirty = true;
 		xmlpp::Element* entryNode = xmlpp::add_child_element(nodeRoot, "entry");
-		auto type = item.getType();
 
 		entryNode->set_attribute("type", type);
 		entryNode->set_attribute("name", name);
