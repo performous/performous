@@ -63,6 +63,10 @@ ConfigItem& ConfigItem::incdec(int dir) {
 	return *this;
 }
 
+bool ConfigItem::isDefault(bool factory) const {
+	return isDefaultImpl(factory ? m_factoryDefaultValue : m_defaultValue);
+}
+
 bool ConfigItem::isDefaultImpl(ConfigItem::Value const& defaultValue) const {
 	if (m_type == "bool") return std::get<bool>(m_value) == std::get<bool>(defaultValue);
 	if (m_type == "int") return std::get<int>(m_value) == std::get<int>(defaultValue);
@@ -70,7 +74,9 @@ bool ConfigItem::isDefaultImpl(ConfigItem::Value const& defaultValue) const {
 	if (m_type == "float") return std::get<float>(m_value) == std::get<float>(defaultValue);
 	if (m_type == "string") return std::get<std::string>(m_value) == std::get<std::string>(defaultValue);
 	if (m_type == "string_list") return std::get<StringList>(m_value) == std::get<StringList>(defaultValue);
-	if (m_type == "option_list") return std::get<OptionList>(m_value) == std::get<OptionList>(defaultValue);
+	if (m_type == "option_list") {
+		return false;
+	}
 	throw std::logic_error("ConfigItem::is_default doesn't know type '" + m_type + "'");
 }
 
