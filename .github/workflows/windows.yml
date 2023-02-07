@@ -40,11 +40,11 @@ jobs:
         uses: seanmiddleditch/gha-setup-ninja@master
 
       - name: Download and build our dependencies using vcpkg
-        uses: Lord-Kamina/vcpkg-action@master
+        uses: Lord-Kamina/vcpkg-action@update_cache
         with:
-          pkgs: aubio boost-iostreams boost-locale boost-program-options boost-system cairo cpprestsdk ffmpeg fftw3 fmt fontconfig gdk-pixbuf gettext glibmm glm gtest icu libepoxy librsvg libsigcpp libxml2 libxmlpp nlohmann-json openblas opencv openssl pango portaudio portmidi pthreads sdl2
+          pkgs: "\"aubio[core,tools]\" \"boost-algorithm[core]\" \"boost-align[core]\" \"boost-any[core]\" \"boost-array[core]\" \"boost-assert[core]\" \"boost-atomic[core]\" \"boost-bind[core]\" \"boost-build[core]\" \"boost-chrono[core]\" \"boost-concept-check[core]\" \"boost-config[core]\" \"boost-container[core]\" \"boost-container-hash[core]\" \"boost-conversion[core]\" \"boost-core[core]\" \"boost-date-time[core]\" \"boost-detail[core]\" \"boost-dynamic-bitset[core]\" \"boost-exception[core]\" \"boost-function[core]\" \"boost-function-types[core]\" \"boost-fusion[core]\" \"boost-integer[core]\" \"boost-intrusive[core]\" \"boost-io[core]\" \"boost-iostreams[bzip2,core,lzma,zlib,zstd]\" \"boost-iterator[core]\" \"boost-lexical-cast[core]\" \"boost-locale[core]\" \"boost-modular-build-helper[core]\" \"boost-move[core]\" \"boost-mp11[core]\" \"boost-mpl[core]\" \"boost-numeric-conversion[core]\" \"boost-optional[core]\" \"boost-predef[core]\" \"boost-preprocessor[core]\" \"boost-program-options[core]\" \"boost-random[core]\" \"boost-range[core]\" \"boost-ratio[core]\" \"boost-rational[core]\" \"boost-regex[core]\" \"boost-smart-ptr[core]\" \"boost-static-assert[core]\" \"boost-system[core]\" \"boost-thread[core]\" \"boost-throw-exception[core]\" \"boost-tokenizer[core]\" \"boost-tuple[core]\" \"boost-type-index[core]\" \"boost-type-traits[core]\" \"boost-typeof[core]\" \"boost-uninstall[core]\" \"boost-uninstall[core]\" \"boost-unordered[core]\" \"boost-utility[core]\" \"boost-variant2[core]\" \"boost-vcpkg-helpers[core]\" \"boost-winapi[core]\" \"brotli[core]\" \"bzip2[core,tool]\" \"cairo[core,fontconfig,freetype,gobject]\" \"cpprestsdk[brotli,compression,core,default-features]\" \"dirent[core]\" \"dirent[core]\" \"expat[core]\" \"ffmpeg[avcodec,avdevice,avfilter,avformat,core,swresample,swscale]\" \"fftw3[core]\" \"fmt[core]\" \"fontconfig[core]\" \"freetype[brotli,bzip2,core,png,zlib]\" \"fribidi[core]\" \"fribidi[core]\" \"gdk-pixbuf[core]\" \"getopt[core]\" \"getopt-win32[core]\" \"gettext[core]\" \"gettext[core]\" \"glib[core]\" \"glib[core]\" \"glibmm[core]\" \"glm[core]\" \"gperf[core]\" \"gtest[core]\" \"harfbuzz[core]\" \"icu[core]\" \"icu[core]\" \"libcroco[core]\" \"libepoxy[core]\" \"libffi[core]\" \"libffi[core]\" \"libflac[core]\" \"libiconv[core]\" \"libiconv[core]\" \"libjpeg-turbo[core]\" \"liblzma[core]\" \"libogg[core]\" \"libpng[core]\" \"librsvg[core]\" \"libsigcpp[core]\" \"libsigcpp-3[core]\" \"libsndfile[core,external-libs,mpeg]\" \"libvorbis[core]\" \"libwebp[core,libwebpmux,nearlossless,simd,unicode]\" \"libxml2[core]\" \"libxmlpp[core]\" \"lzo[core]\" \"mp3lame[core]\" \"mpg123[core]\" \"nlohmann-json[core]\" \"openblas[core]\" \"openblas[core]\" \"opencv[core,default-features]\" \"opencv4[core,default-features,dnn,jpeg,png,quirc,tiff,webp]\" \"openssl[core]\" \"opus[core]\" \"pango[core]\" \"pcre[core]\" \"pcre2[core]\" \"pcre2[core]\" \"pixman[core]\" \"pkgconf[core]\" \"portaudio[core]\" \"portmidi[core]\" \"protobuf[core]\" \"protobuf[core]\" \"pthread[core]\" \"pthreads[core]\" \"quirc[core]\" \"sdl2[core]\" \"tiff[core,jpeg,lzma,zip]\"  \"yasm[core,tools]\" \"yasm-tool-helper[core]\" \"zlib[core]\" \"zlib[core]\" \"zstd[core]\""
           triplet: x64-windows-release
-          extra-args: --clean-after-build
+          extra-args: '--clean-after-build --overlay-triplets="${{ github.workspace }}\performous\cmake\triplets"'
           cache-key: win64-vcpkg
           revision: 4715616818c2ac225a13dd05e31c3bbbf904ec65
 
@@ -52,10 +52,10 @@ jobs:
         env:
           PERFORMOUS_VERSION: ${{ inputs.package_complete_version }}
         run: |
-          set VCPKG_DEFAULT_BINARY_CACHE=${{ github.workspace }}/vcpkg_cache
+          set VCPKG_BINARY_SOURCES="files,${{ github.workspace }}\vcpkg_cache,read"
           cd ${{ github.workspace }}/performous
           echo $PERFORMOUS_VERSION
-          cmake --preset "x64-release" -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-release
+          cmake --preset "x64-release" -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_OVERLAY_TRIPLETS="${{ github.workspace }}\performous\cmake\triplets"
           cmake --build --preset "x64-release"
       - name: Run unittests directly called.
         run: |
@@ -71,10 +71,10 @@ jobs:
            cd performous/build/x64-release
            cpack -G NSIS64 x64-release
            Copy-Item $(Get-ChildItem -Filter '*win64.exe').Name "Performous-latest-msvc.exe"
-           Rename-Item $(Get-ChildItem -Filter '*win64.exe').Name -NewName "Performous-${{ inputs.package_complete_version }}.exe"
+           Rename-Item $(Get-ChildItem -Filter '*win64.exe').Name -NewName "Performous-${{ inputs.package_complete_version }}-msvc.exe"
            chcp 65001 #set code page to utf-8
-           echo ("ARTIFACT_PATH=${{ github.workspace }}/performous/build/x64-release/Performous-${{ inputs.package_complete_version }}.exe") >> $env:GITHUB_ENV
-           echo ("ARTIFACT_FILENAME=Performous-${{ inputs.package_complete_version }}.exe") >> $env:GITHUB_ENV
+           echo ("ARTIFACT_PATH=${{ github.workspace }}/performous/build/x64-release/Performous-${{ inputs.package_complete_version }}-msvc.exe") >> $env:GITHUB_ENV
+           echo ("ARTIFACT_FILENAME=Performous-${{ inputs.package_complete_version }}-msvc.exe") >> $env:GITHUB_ENV
            echo ("MASTER_ARTIFACT_PATH=${{ github.workspace }}/performous/build/x64-release/Performous-latest-msvc.exe") >> $env:GITHUB_ENV
            echo ("MASTER_ARTIFACT_FILENAME=Performous-latest-msvc.exe") >> $env:GITHUB_ENV
 

@@ -25,6 +25,8 @@ jobs:
   determine_version:
     name: Determine the version to be used
     runs-on: ubuntu-latest
+    env:
+      ACTIONS_STEP_DEBUG: true
     outputs:
       latest_tag_version: ${{ steps.versioning.outputs.latest_tag_version }}
       latest_full_tag_version: ${{ steps.versioning.outputs.latest_full_tag_version }}
@@ -34,12 +36,18 @@ jobs:
       version_tweak: ${{ steps.versioning.outputs.version_tweak }}
       complete_version: ${{ steps.versioning.outputs.complete_version }}
     steps:
+      - name: Checkout Performous
+        uses: actions/checkout@v3
+        with:
+          path: ${{ github.workspace }}/performous
+          repository: '${{ github.repository }}'
+          ref: '${{ github.event.pull_request.head.ref }}'
+          fetch-depth: 0
       - name: Determine the complete version
         id: versioning
         run: |
           # Always check the tags on master since it will have the latest.
           # Tags will trigger their own workflow and version names
-          git clone --recursive ${{ github.server_url }}/${{ github.repository }}
           cd performous
           LATEST_TAG_VERSION=$(git describe --tags --abbrev=0 || echo 1.0.0)
           LATEST_FULL_TAG_VERSION=$(git describe --tags || echo 1.0.0)
@@ -49,7 +57,8 @@ jobs:
           echo "version_minor=$(cut -d '.' -f 2 <<< $(git describe --tags --abbrev=0 || echo 1.0.0))" >> $GITHUB_OUTPUT
           echo "version_patch=$(cut -d '.' -f 3 <<< $(git describe --tags --abbrev=0 || echo 1.0.0))" >> $GITHUB_OUTPUT
           echo "version_tweak=0" >> $GITHUB_OUTPUT
-          echo "complete_version=$(if [ $GITHUB_REF_TYPE = 'tag' ]; then echo $GITHUB_REF_NAME; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME = 'master' ]; then echo $LATEST_FULL_TAG_VERSION-beta; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME != 'master' ]; then echo $LATEST_TAG_VERSION-${{github.event.pull_request.number}}-${GITHUB_SHA::7}-alpha; fi)" >> $GITHUB_OUTPUT
+          echo "complete_version=$(if [ $GITHUB_REF_TYPE = 'tag' ]; then echo $GITHUB_REF_NAME; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME = 'master' ]; then echo $LATEST_FULL_TAG_VERSION-beta; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME != 'master' ]; then echo $LATEST_TAG_VERSION-${{github.event.pull_request.number}}-$(git rev-parse --short=7 $(git describe))-alpha; fi)" >> $GITHUB_OUTPUT
+
 
   # Set up a release that packages will be published to.
   create_release:
