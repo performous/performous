@@ -1,9 +1,10 @@
 #include "border.hh"
+
 #include <glutil.hh>
 #include <texture.hh>
 #include <util.hh>
 #include <game.hh>
-#include <video_driver.hh>
+#include <graphic/video_driver.hh>
 
 BorderDefinition::BorderDefinition(const std::string& texture)
 	: Texture(texture) {

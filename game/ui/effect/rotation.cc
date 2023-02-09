@@ -11,7 +11,9 @@ void Rotation::setConsumer(std::function<void(float)> consumer) {
 }
 
 namespace {
+#ifdef GLM_FORCE_RADIANS
 	float const pi(atanf(1.f) * 4.f);
+#endif
 }
 
 void Rotation::process(EffectContext& context) {

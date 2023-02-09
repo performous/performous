@@ -28,14 +28,14 @@ void Text::draw(float x, float y) {
 	m_svg->draw(m_gc->getWindow(), m_text);
 }
 
-void Text::draw(float x, float y, float width, float height) {
-	m_svg->dimensions.left(x).center(y + height * 0.5);
+void Text::draw(float x, float y, float, float height) {
+	m_svg->dimensions.left(x).center(y + height * 0.5f);
 	m_svg->setAlign(SvgTxtTheme::Align::LEFT);
 	m_svg->draw(m_gc->getWindow(), m_text);
 }
 
 void Text::drawCentered(float x, float y, float width, float height) {
-	m_svg->dimensions.middle(x + width * 0.5).center(y + height * 0.5);
+	m_svg->dimensions.middle(x + width * 0.5f).center(y + height * 0.5f);
 	m_svg->setAlign(SvgTxtTheme::Align::CENTER);
 	m_svg->draw(m_gc->getWindow(), m_text);
 }

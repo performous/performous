@@ -19,7 +19,7 @@ namespace {
 		for(auto i = 0U; i < avatars.size(); ++i) {
 			std::cout << avatars[i] << " = " << current << std::endl;
 			if(avatars[i] == current)
-				return i;
+				return static_cast<int>(i);
 		}
 
 		return -1;
@@ -32,7 +32,7 @@ namespace {
 		else if(id == int(avatars.size()))
 			setAvatar(avatar, -1, avatars);
 		else
-			avatar.setTexture(avatars[id]);
+			avatar.setTexture(avatars[static_cast<size_t>(id)]);
 	}
 	void setAvatar(Image& avatar, Image& previousAvatar, Image& nextAvatar, int id, std::vector<std::string> const& avatars) {
 		setAvatar(avatar, id, avatars);
@@ -274,8 +274,8 @@ void ScreenPlayerSetup::shiftAvatarLeft() {
 		player.setAvatarPath(findFile("no_player_image.svg"));
 	}
 	else {
-		player.setAvatar(m_avatars[id]);
-		player.setAvatarPath(findFile(m_avatars[id]));
+		player.setAvatar(m_avatars[static_cast<size_t>(id)]);
+		player.setAvatarPath(findFile(m_avatars[static_cast<size_t>(id)]));
 	}
 
 	setAvatar(m_avatar, m_avatarPrevious, m_avatarNext, id, m_avatars);
@@ -301,8 +301,8 @@ void ScreenPlayerSetup::shiftAvatarRight() {
 		player.setAvatarPath(findFile("no_player_image.svg"));
 	}
 	else {
-		player.setAvatar(m_avatars[id]);
-		player.setAvatarPath(findFile(m_avatars[id]));
+		player.setAvatar(m_avatars[static_cast<size_t>(id)]);
+		player.setAvatarPath(findFile(m_avatars[static_cast<size_t>(id)]));
 	}
 
 	setAvatar(m_avatar, m_avatarPrevious, m_avatarNext, id, m_avatars);

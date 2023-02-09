@@ -14,7 +14,7 @@ class Label : public Control {
 	bool canFocused() const override { return false; }
 	void draw(GraphicContext&) override;
 
-	operator Text&() { return *this; }
+	operator Text&() { return m_text; }
 
   private:
 	Text m_text;

@@ -7,6 +7,7 @@
 #include "ui/effect/generic.hh"
 #include "ui/effect/combination.hh"
 #include "ui/graphiccontext.hh"
+#include "graphic/color_trans.hh"
 
 #include "fs.hh"
 

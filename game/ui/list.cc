@@ -1,5 +1,6 @@
 #include "list.hh"
 #include "graphiccontext.hh"
+#include "graphic/color_trans.hh"
 
 Item::Item(std::string const& text)
 : m_id(text), m_text(text) {
@@ -47,7 +48,7 @@ void Item::setUserData(std::any const& data) {
 }
 
 
-const size_t List::None = -1;
+const size_t List::None = size_t(-1);
 
 List::List(std::vector<Item> const& items, Control* parent)
 : Control(parent), m_background(findFile("mainmenu_back_highlight.svg")), m_selectedBackground(findFile("mainmenu_back_highlight.svg")), m_items(items) {
@@ -145,10 +146,10 @@ void List::onKey(Key key) {
 
 	switch(key) {
 		case Key::Up:
-			select(std::max(int(m_selected) - 1, 0));
+			select(static_cast<size_t>(std::max(int(m_selected) - 1, 0)));
 			break;
 		case Key::Down:
-			select(std::min(m_selected + 1, countItems() - 1));
+			select(static_cast<size_t>(std::min(m_selected + 1, countItems() - 1)));
 			break;
 		case Key::Space:
 			if(isDisplayingCheckBox() && m_selected != None)

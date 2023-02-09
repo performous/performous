@@ -1,5 +1,6 @@
 #include "select.hh"
 #include "graphiccontext.hh"
+#include "graphic/color_trans.hh"
 
 Select::Select(std::vector<std::string> const& items, Control* parent)
 : Control(parent), m_text(""), m_background(findFile("mainmenu_comment_bg.svg")), m_items(items) {

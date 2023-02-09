@@ -1,6 +1,7 @@
 #include "ui/effect/texturedrawer.hh"
 #include "ui/effect/effectcontext.hh"
 #include "ui/graphiccontext.hh"
+#include "graphic/color_trans.hh"
 
 #include <glm/gtx/matrix_transform_2d.hpp>
 

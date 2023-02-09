@@ -1,5 +1,6 @@
 #include "textbox.hh"
 #include "graphiccontext.hh"
+#include "graphic/color_trans.hh"
 
 TextBox::TextBox(std::string const& text, Control* parent)
 : Control(parent), m_text(text), m_background(findFile("mainmenu_back_highlight.svg")), m_cursor(findFile("cursor.svg")) {
