@@ -40,13 +40,51 @@ jobs:
         run: |
           # Only run the container builds when something in the docker folder or
           # this workflow has changed from master, or if it was cron triggered
-          GIT_OUTPUT="$(git log -n 2 --stat)"
-          if [ $(echo ${GIT_OUTPUT} | grep -c docker/) -gt 0 ] || [ $(echo ${GIT_OUTPUT} | grep -c .github/workflows/linux.yml) -gt 0 ] || [ '${{ github.event_name }}' = 'schedule' ]; then
+          cd ./.github/workflows
+          DIFF_YML=$(curl -L https://github.com/performous/performous/raw/master/.github/workflows/linux.yml 2>/dev/null | diff -q  -- ./linux.yml - 1>/dev/null ; echo $?)
+
+          if [[ $DIFF_YML == 1 || '${{ github.event_name }}' == 'schedule' ]]; then
+            echo "Refresh all containers: TRUE"
             echo "build_docker_containers=true" >> $GITHUB_OUTPUT
           else
+            echo "Refresh all containers: FALSE"
             echo "build_docker_containers=false" >> $GITHUB_OUTPUT
           fi
 
+          cd ../../
+          git worktree add ./docker-master --no-checkout --detach
+          cd docker-master
+          git checkout origin/${GITHUB_BASE_REF} -- docker
+
+          DIFF_UBUNTU=$(diff -q ./docker/Dockerfile.ubuntu ../docker/Dockerfile.ubuntu 1>/dev/null ; echo $?)
+          DIFF_FEDORA=$(diff -q ./docker/Dockerfile.fedora ../docker/Dockerfile.fedora 1>/dev/null ; echo $?)
+          DIFF_DEBIAN=$(diff -q ./docker/Dockerfile.debian ../docker/Dockerfile.debian 1>/dev/null ; echo $?)
+          cd ..
+          git worktree remove docker-master --force
+
+          if [[ $DIFF_UBUNTU == 1 ]]; then
+            echo "Refresh Ubuntu containers: TRUE"
+            echo "build_ubuntu_containers=true" >> $GITHUB_OUTPUT
+          else
+            echo "Refresh Ubuntu containers: FALSE"
+            echo "build_ubuntu_containers=false" >> $GITHUB_OUTPUT
+          fi
+
+          if [[ $DIFF_FEDORA == 1 ]]; then
+            echo "Refresh FEDORA containers: TRUE"
+            echo "build_fedora_containers=true" >> $GITHUB_OUTPUT
+          else
+            echo "Refresh FEDORA containers: FALSE"
+            echo "build_fedora_containers=false" >> $GITHUB_OUTPUT
+          fi
+
+          if [[ $DIFF_debian == 1 ]]; then
+            echo "Refresh DEBIAN containers: TRUE"
+            echo "build_debian_containers=true" >> $GITHUB_OUTPUT
+          else
+            echo "Refresh DEBIAN containers: FALSE"
+            echo "build_debian_containers=false" >> $GITHUB_OUTPUT
+          fi
   build_packages:
     name: Build the Linux packages
     runs-on: ubuntu-latest
@@ -87,7 +125,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build ${{ matrix.os }} ${{ matrix.version }} Container
-        if: ${{ needs.determine_docker_version.outputs.build_docker_containers == 'true' }}
+        if: >-
+          ${{
+          needs.determine_docker_version.outputs.build_docker_containers == 'true' ||
+          format('needs.determine_docker_version.outputs.build_{0}_containers', matrix.os) == 'true'
+          }}
         uses: docker/build-push-action@v3
         with:
           context: docker/
