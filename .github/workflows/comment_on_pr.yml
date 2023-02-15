@@ -24,8 +24,6 @@ jobs:
           echo "PR_NUM=${PR_NUM}" >> $GITHUB_OUTPUT
 
       - name: Comment on PR
-        needs:
-           - get_pr
         uses: actions/github-script@v5
         with:
           # This snippet is public-domain, taken from
@@ -64,5 +62,5 @@ jobs:
             }
             body += `  \n\nThis service is provided by [nightly.link](https://github.com/oprypin/nightly.link). These artifacts will expire in 90 days and will not be available for download after that time.`;
             core.info("Review thread message body:", body);
-            await upsertComment(owner, repo, ${{ needs.get_pr.outputs.PR_NUM }},
+            await upsertComment(owner, repo, ${{ steps.get_pr.outputs.PR_NUM }},
               "nightly-link", body);
