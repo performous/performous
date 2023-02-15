@@ -54,6 +54,9 @@ jobs:
           cd ../../
           git worktree add ./docker-master --no-checkout --detach
           cd docker-master
+          if [[ ${GITHUB_BASE_REF} == "" ]]; then
+            GITHUB_BASE_REF = "master"
+          fi
           git checkout origin/${GITHUB_BASE_REF} -- docker
 
           DIFF_UBUNTU=$(diff -q ./docker/Dockerfile.ubuntu ../docker/Dockerfile.ubuntu 1>/dev/null ; echo $?)
