@@ -40,10 +40,13 @@ jobs:
         run: |
           # Only run the container builds when something in the docker folder or
           # this workflow has changed from master, or if it was cron triggered
-          cd ./.github/workflows
-          DIFF_YML=$(curl -L https://github.com/performous/performous/raw/master/.github/workflows/linux.yml 2>/dev/null | diff -q  -- ./linux.yml - 1>/dev/null ; echo $?)
-
-          if [[ $DIFF_YML == 1 || '${{ github.event_name }}' == 'schedule' ]]; then
+          if [[ '${{ github.event_name }}' == 'push' ]]; then
+            base_version='${{ github.event.before }}'
+          else
+            base_version='origin/master'
+          fi
+          DIFF_YML=$((git rev-parse HEAD:.github/workflows/linux.yml && git diff --merge-base ${base_version} --exit-code -- .github/workflows/linux.yml) ; echo $?)
+          if [[ $DIFF_YML != 0 || '${{ github.event_name }}' == 'schedule' ]]; then
             echo "Refresh all containers: TRUE"
             echo "build_docker_containers=true" >> $GITHUB_OUTPUT
           else
@@ -51,19 +54,15 @@ jobs:
             echo "build_docker_containers=false" >> $GITHUB_OUTPUT
           fi
 
-          cd ../../
-          git worktree add ./docker-master --no-checkout --detach
-          cd docker-master
-          if [[ ${GITHUB_BASE_REF} == "" ]]; then
-            GITHUB_BASE_REF="master"
-          fi
-          git checkout origin/${GITHUB_BASE_REF} -- docker
+          git worktree add ./docker-base --no-checkout --detach
+          cd docker-base
+          git checkout ${base_version} -- docker
 
           DIFF_UBUNTU=$(diff -q ./docker/Dockerfile.ubuntu ../docker/Dockerfile.ubuntu 1>/dev/null ; echo $?)
           DIFF_FEDORA=$(diff -q ./docker/Dockerfile.fedora ../docker/Dockerfile.fedora 1>/dev/null ; echo $?)
           DIFF_DEBIAN=$(diff -q ./docker/Dockerfile.debian ../docker/Dockerfile.debian 1>/dev/null ; echo $?)
           cd ..
-          git worktree remove docker-master --force
+          git worktree remove docker-base --force
 
           if [[ $DIFF_UBUNTU == 1 ]]; then
             echo "Refresh Ubuntu containers: TRUE"
@@ -81,7 +80,7 @@ jobs:
             echo "build_fedora_containers=false" >> $GITHUB_OUTPUT
           fi
 
-          if [[ $DIFF_debian == 1 ]]; then
+          if [[ $DIFF_DEBIAN == 1 ]]; then
             echo "Refresh DEBIAN containers: TRUE"
             echo "build_debian_containers=true" >> $GITHUB_OUTPUT
           else
