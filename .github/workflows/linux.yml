@@ -45,7 +45,7 @@ jobs:
           else
             base_version='origin/master'
           fi
-          DIFF_YML=$((git rev-parse HEAD:.github/workflows/linux.yml && git diff --merge-base ${base_version} --exit-code -- .github/workflows/linux.yml) ; echo $?)
+          DIFF_YML=$((git rev-parse HEAD:.github/workflows/linux.yml && git diff --merge-base ${base_version} --exit-code -- .github/workflows/linux.yml) > /dev/null 2>&1 ; echo $?)
           if [[ $DIFF_YML != 0 || '${{ github.event_name }}' == 'schedule' ]]; then
             echo "Refresh all containers: TRUE"
             echo "build_docker_containers=true" >> $GITHUB_OUTPUT
