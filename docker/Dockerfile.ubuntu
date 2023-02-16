@@ -26,3 +26,4 @@ COPY build_performous.sh /root/performous/build_performous.sh
 COPY run_tests.sh /root/performous/run_tests.sh
 
 WORKDIR /root/performous
+##
