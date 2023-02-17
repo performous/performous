@@ -492,14 +492,17 @@ void Songs::sortChange(Game& game, SortChange diff) {
 
 	switch(diff) {
 		case SortChange::BACK:
-			if(m_order == 0)
+			if(m_order == 0) {
 				m_order = orders - 1;
-			else
+			}
+			else {
 				--m_order;
+			}
 		break;
 		case SortChange::FORWARD:
-			if(++m_order == orders)
+			if(++m_order == orders) {
 				m_order = 0;
+			}
 		break;
 		case SortChange::RESET:
 			m_order = 0;

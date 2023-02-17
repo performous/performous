@@ -8,11 +8,17 @@
 #include <sstream>
 #include <stdexcept>
 
+const unsigned Hiscore::MaximumScorePoints = 2000;
+const unsigned Hiscore::MinimumRecognizedScorePoints = 10000;
+const unsigned Hiscore::MaximumStoredScores = 16;
+
 bool Hiscore::reachedHiscore(unsigned score, SongId songid, unsigned short level, std::string const& track) const {
-	if (score > 10000)
+	if (score > MaximumScorePoints) {
 		throw std::logic_error("Invalid score value");
-	if (score < 2000)
+	}
+	if (score < MinimumRecognizedScorePoints) {
 		return false; // come on, did you even try to sing?
+	}
 
 	unsigned position = 0;
 	for (auto const& elem: m_hiscore) {
@@ -20,7 +26,7 @@ bool Hiscore::reachedHiscore(unsigned score, SongId songid, unsigned short level
 		if (elem.track != track) continue;
 		if (elem.level != level) continue;
 		if (score > elem.score) return true;
-		if (++position == 16) return false;
+		if (++position >= MaximumStoredScores) return false;
 	}
 	return true; // nothing found for that song -> true
 }
@@ -57,18 +63,23 @@ bool Hiscore::hasHiscore(const SongId& songid) const {
 }
 
 unsigned Hiscore::getHiscore(SongId songid) const {
-	for (auto const& score: m_hiscore)
-		if (songid == score.songid && currentLevel() == score.level)
+	for (auto const& score: m_hiscore) {
+		if (songid == score.songid && currentLevel() == score.level) {
 			return score.score;
+		}
+	}
+
 	return 0;
 }
 
 std::vector<HiscoreItem> Hiscore::getHiscores(SongId songid) const {
 	auto scores = std::vector<HiscoreItem>{};
 
-	for (auto const& score: m_hiscore)
-		if (songid == score.songid && currentLevel() == score.level)
+	for (auto const& score: m_hiscore) {
+		if (songid == score.songid && currentLevel() == score.level) {
 			scores.emplace_back(score);
+		}
+	}
 
 	return scores;
 }
@@ -77,11 +88,13 @@ void Hiscore::load(xmlpp::NodeSet const& nodes) {
 	for (auto const& n: nodes) {
 		xmlpp::Element& element = dynamic_cast<xmlpp::Element&>(*n);
 		xmlpp::Attribute* a_playerid = element.get_attribute("playerid");
-		if (!a_playerid)
+		if (!a_playerid) {
 			throw std::runtime_error("Attribute playerid not found");
+		}
 		xmlpp::Attribute* a_songid = element.get_attribute("songid");
-		if (!a_songid)
+		if (!a_songid) {
 			throw std::runtime_error("Attribute songid not found");
+		}
 		xmlpp::Attribute* a_track = element.get_attribute("track");
 		xmlpp::Attribute* a_level = element.get_attribute("level");
 		xmlpp::Attribute* a_time = element.get_attribute("unixtime");
@@ -89,17 +102,21 @@ void Hiscore::load(xmlpp::NodeSet const& nodes) {
 		PlayerId playerid = stou(a_playerid->get_value());
 		SongId songid = stou(a_songid->get_value());
 		unsigned short level = 0;
-		if (a_level)
+		if (a_level) {
 			level = static_cast<unsigned short>(stou(a_level->get_value()));
+		}
 
 		auto tn = xmlpp::get_first_child_text(element);
-		if (!tn)
+		if (!tn) {
 			throw std::runtime_error("Score not found");
+		}
+
 		unsigned score = stou(tn->get_content());
 		auto unixtime = std::chrono::seconds{};
 
-		if(a_time)
+		if(a_time) {
 			unixtime = std::chrono::seconds(stou(a_time->get_value()));
+		}
 
 		addHiscore({score, playerid, songid, level, a_track ? a_track->get_value() : "vocals", unixtime});
 	}
