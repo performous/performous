@@ -25,8 +25,6 @@ jobs:
   determine_version:
     name: Determine the version to be used
     runs-on: ubuntu-latest
-    env:
-      ACTIONS_STEP_DEBUG: true
     outputs:
       latest_tag_version: ${{ steps.versioning.outputs.latest_tag_version }}
       latest_full_tag_version: ${{ steps.versioning.outputs.latest_full_tag_version }}
@@ -40,8 +38,8 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: ${{ github.workspace }}/performous
-          repository: '${{ github.repository }}'
-          ref: '${{ github.event.pull_request.head.ref }}'
+          repository: ${{ github.event.repository.full_name }}
+          ref: '${{ github.event.head.ref }}'
           fetch-depth: 0
       - name: Determine the complete version
         id: versioning
