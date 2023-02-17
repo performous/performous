@@ -227,8 +227,9 @@ void writeConfig(Game& game, bool system) {
 		auto const name = elem.first;
 		auto const type = item.getType();
 
-		if (item.isDefault(system) && name != "audio/backend" && name != "graphic/stereo3d")
+		if (item.isDefault(system) && name != "audio/backend" && name != "graphic/stereo3d") {
 			continue; // No need to save settings with default values
+		}
 
 		dirty = true;
 		xmlpp::Element* entryNode = xmlpp::add_child_element(nodeRoot, "entry");
@@ -274,8 +275,9 @@ void writeConfig(Game& game, bool system) {
 		else if (type == "float") entryNode->set_attribute("value", std::to_string(item.f()));
 		else if (type == "string") xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(item.s());
 		else if (type == "string_list") {
-			for (auto const& str : item.sl())
+			for (auto const& str : item.sl()) {
 				xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(str);
+			}
 		}
 		else if (type == "option_list") {
 			//TODO: Write selected also (as attribute?)

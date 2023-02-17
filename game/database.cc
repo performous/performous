@@ -95,8 +95,9 @@ bool Database::reachedHiscore(std::shared_ptr<Song> s) const {
 std::vector<HiscoreItem> Database::queryPerSongHiscore(std::shared_ptr<Song> s, std::string const& track) const {
 	auto const maybe_songid = m_songs.lookup(s);
 
-	if (!maybe_songid)
+	if (!maybe_songid) {
 		return {}; // song not yet in database.
+	}
 
 	auto const songid = maybe_songid.value();
 
