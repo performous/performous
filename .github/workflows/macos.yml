@@ -22,6 +22,31 @@ jobs:
   MacOS_Packages:
     name: Create MacOS dmg
     runs-on: macos-latest
+    env:
+      MACOS_DEPS: >-
+        aubio
+        boost
+        cairo
+        cmake
+        dylibbundler
+        ffmpeg@4
+        fftw
+        fmt
+        fontconfig
+        freetype
+        glm
+        help2man
+        icu4c
+        libepoxy
+        librsvg
+        libxml++3
+        nlohmann-json
+        opencv
+        pango
+        pkg-config
+        portaudio
+        portmidi
+        sdl2
     steps:
       - name: Checkout Git
         id: checkout_git
@@ -35,18 +60,12 @@ jobs:
       - name: Fetch Dependencies
         id: fetch_deps
         run: |
-          brew fetch --deps boost cmake ffmpeg@4 help2man icu4c portaudio\
-            portmidi opencv libepoxy librsvg libxml++3 sdl2 dylibbundler\
-            aubio fftw glm nlohmann-json fmt
+          brew fetch --deps $MACOS_DEPS
 
       - name: Install Dependencies
         id: install_deps
         run: |
-           brew install boost cmake ffmpeg@4 help2man icu4c portaudio\
-            portmidi opencv libepoxy librsvg libxml++3 sdl2 dylibbundler\
-            aubio fftw glm nlohmann-json fmt
-           brew link --force --overwrite ffmpeg@4
-
+           brew install $MACOS_DEPS
       - name: Setup Python
         id: setup_python
         uses: actions/setup-python@v4 
