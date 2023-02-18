@@ -19,6 +19,7 @@
 #include "webcam.hh"
 #include "screen_songs.hh"
 #include "notegraphscalerfactory.hh"
+#include "graphic/video_driver.hh"
 
 #include <fmt/format.h>
 #include <iostream>

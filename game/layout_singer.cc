@@ -4,6 +4,7 @@
 #include "fs.hh"
 #include "song.hh"
 #include "database.hh"
+#include "graphic/color_trans.hh"
 
 #include <list>
 #include <fmt/format.h>

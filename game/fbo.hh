@@ -1,7 +1,7 @@
 #pragma once
 
 #include "texture.hh"
-#include "video_driver.hh"
+#include "graphic/window.hh"
 
 /// Frame Buffer Object class
 class FBO {

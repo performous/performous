@@ -8,6 +8,8 @@
 #include <sstream>
 #include "fs.hh"
 #include "graphic/text_renderer.hh"
+#include "graphic/lyrics_color_trans.hh"
+#include "graphic/video_driver.hh"
 #include "fontconfig/fontconfig.h"
 #include <pango/pangocairo.h>
 
@@ -193,7 +195,7 @@ void SvgTxtTheme::draw(Window& window, std::vector<TZoomText>& _text, bool lyric
 	}
 
 	float texture_ar = text_x / text_y;
-	m_texture_width = std::min(0.96f, text_x / targetWidth); // targetWidth is defined in video_driver.cc, it's the base rendering width, used to project the svg onto a gltexture. currently we're targeting 1366x768 as base resolution.
+	m_texture_width = std::min(0.96f, text_x / Constant::targetWidth); // targetWidth is defined in video_driver.cc, it's the base rendering width, used to project the svg onto a gltexture. currently we're targeting 1366x768 as base resolution.
 	float position_x = dimensions.x1();
 
 	if (m_align == Align::CENTER) position_x -= 0.5f * m_texture_width;

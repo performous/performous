@@ -5,6 +5,7 @@
 #include "configuration.hh"
 #include "glutil.hh"
 #include "util.hh"
+#include "graphic/color_trans.hh"
 
 #include <thread>
 #include <stdexcept>

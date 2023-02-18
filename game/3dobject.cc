@@ -5,6 +5,7 @@
 #include <sstream>
 
 #include "texture.hh"
+#include "graphic/transform.hh"
 
 // TODO: test & fix faces that doesn't have texcoords in the file
 // TODO: group handling for loader

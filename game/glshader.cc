@@ -1,7 +1,8 @@
 #include "glshader.hh"
 
 #include "glutil.hh"
-#include "video_driver.hh"
+#include "graphic/video_driver.hh"
+#include "graphic/window.hh"
 #include <algorithm>
 #include <ios>
 #include <fstream>

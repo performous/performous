@@ -1,27 +1,28 @@
+#include "window.hh"
+
+#include "color_trans.hh"
+#include "configuration.hh"
+#include "game.hh"
+#include "platform.hh"
+#include "view_trans.hh"
 #include "video_driver.hh"
 
-#include "chrono.hh"
-#include "config.hh"
-#include "controllers.hh"
-#include "fs.hh"
-#include "glmath.hh"
-#include "image.hh"
-#include "platform.hh"
-#include "screen.hh"
-#include "game.hh"
-#include "util.hh"
-#include "fs.hh"
 #include <SDL.h>
 #include <SDL_hints.h>
 #include <SDL_rect.h>
 #include <SDL_video.h>
-#include <cstdint>
 
 #define stringify( name ) #name
+
+GLuint Window::m_ubo = 0;
+GLuint Window::m_vao = 0;
+GLuint Window::m_vbo = 0;
+GLint Window::bufferOffsetAlignment = -1;
 
 namespace {
 	float s_width;
 	float s_height;
+
 	/// Attempt to set attribute and report errors.
 	/// Tests for success when destoryed.
 	struct GLattrSetter {
@@ -38,30 +39,13 @@ namespace {
 		SDL_GLattr m_attr;
 		int m_value;
 	};
-
-	float getSeparation() {
-		return config["graphic/stereo3d"].b() ? 0.001f * config["graphic/stereo3dseparation"].f() : 0.0f;
-	}
-
-	// stump: under MSVC, near and far are #defined to nothing for compatibility with ancient code, hence the underscores.
-	const float near_ = 0.1f; // This determines the near clipping distance (must be > 0)
-	const float far_ = 110.0f; // How far away can things be seen
-	const float z0 = 1.5f; // This determines FOV: the value is your distance from the monitor (the unit being the width of the Performous window)
-
-	glmath::mat4 g_color = glmath::mat4(1.0f);
-	glmath::mat4 g_projection = glmath::mat4(1.0f);
-	glmath::mat4 g_modelview = glmath::mat4(1.0f);
 }
 
 float screenW() { return s_width; }
 float screenH() { return s_height; }
 
-GLuint Window::m_ubo = 0;
-GLuint Window::m_vao = 0;
-GLuint Window::m_vbo = 0;
-GLint Window::bufferOffsetAlignment = -1;
-
-Window::Window() : screen(nullptr, &SDL_DestroyWindow), glContext(nullptr, &SDL_GL_DeleteContext) {
+Window::Window()
+: screen(nullptr, &SDL_DestroyWindow), glContext(nullptr, &SDL_GL_DeleteContext) {
 	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK))
 		throw std::runtime_error(std::string("SDL_Init failed: ") + SDL_GetError());
 	SDL_JoystickEventState(SDL_ENABLE);
@@ -254,13 +238,13 @@ void Window::blank() {
 void Window::updateStereo(float sepFactor) {
 		try {
 			m_stereoUniforms.sepFactor = sepFactor;
-			m_stereoUniforms.z0 = (z0 - 2.0f * near_);
+			m_stereoUniforms.z0 = (Constant::z0 - 2.0f * Constant::near_);
 			glBufferSubData(GL_UNIFORM_BUFFER, m_stereoUniforms.offset(), m_stereoUniforms.size(), &m_stereoUniforms);
 		} catch(...) {}  // Not fatal if 3d shader is missing
 }
 
 void Window::updateColor() {
-	m_matrixUniforms.colorMatrix = g_color;
+	m_matrixUniforms.colorMatrix = Global::color;
 	glBufferSubData(GL_UNIFORM_BUFFER, (glutil::shaderMatrices::offset() + static_cast<GLint>(offsetof(glutil::shaderMatrices, colorMatrix))), sizeof(glmath::mat4), &m_matrixUniforms.colorMatrix);
 }
 
@@ -280,9 +264,9 @@ void Window::updateLyricHighlight(glmath::vec4 const& fill, glmath::vec4 const& 
 
 void Window::updateTransforms() {
 	using namespace glmath;
-	mat4 normal(g_modelview);
-	m_matrixUniforms.projMatrix = g_projection;
-	m_matrixUniforms.mvMatrix = g_modelview;
+	mat4 normal(Global::modelview);
+	m_matrixUniforms.projMatrix = Global::projection;
+	m_matrixUniforms.mvMatrix = Global::modelview;
 	m_matrixUniforms.normalMatrix = normal;
 	glBufferSubData(GL_UNIFORM_BUFFER, m_matrixUniforms.offset(), m_matrixUniforms.size(), &m_matrixUniforms);
 }
@@ -528,74 +512,4 @@ void Window::screenshot() {
 	std::clog << "video/info: Screenshot taken: " << filename << " (" << img.width << "x" << img.height << ")" << std::endl;
 }
 
-ColorTrans::ColorTrans(Window& window, Color const& c) : m_window(window), m_old(g_color) {
-	using namespace glmath;
-	g_color = g_color * diagonal(c.linear());
-	window.updateColor();
-}
 
-LyricColorTrans::LyricColorTrans(Window& window, Color const& fill, Color const& stroke, Color const& newFill, Color const& newStroke) : m_window(window) {
-	oldFill = fill.linear();
-	oldStroke = stroke.linear();
-	window.updateLyricHighlight(fill.linear(), stroke.linear(), newFill.linear(), newStroke.linear());
-}
-
-LyricColorTrans::~LyricColorTrans() {
-	m_window.updateLyricHighlight(oldFill, oldStroke);
-}
-
-ColorTrans::ColorTrans(Window& window, glmath::mat4 const& mat): m_window(window), m_old(g_color) {
-	g_color = g_color * mat;
-	window.updateColor();
-}
-
-ColorTrans::~ColorTrans() {
-	g_color = m_old;
-	m_window.updateColor();
-}
-
-ViewTrans::ViewTrans(Window& window, float offsetX, float offsetY, float frac) : m_window(window), m_old(g_projection) {
-	// Setup the projection matrix for 2D translates
-	using namespace glmath;
-	float h = virtH();
-	const float f = near_ / z0;  // z0 to nearplane conversion factor
-	// Corners of the screen at z0
-	float x1 = -0.5f, x2 = 0.5f;
-	float y1 = 0.5f * h, y2 = -0.5f * h;
-	// Move the perspective point by frac of offset (i.e. move the image)
-	float persX = frac * offsetX, persY = frac * offsetY;
-	x1 -= persX; x2 -= persX;
-	y1 -= persY; y2 -= persY;
-	// Perspective projection + the rest of the offset in eye (world) space
-	g_projection = glm::frustum(f * x1, f * x2, f * y1, f * y2, near_, far_)
-	  * translate(vec3(offsetX - persX, offsetY - persY, -z0));
-	window.updateTransforms();
-}
-
-ViewTrans::ViewTrans(Window& window, glmath::mat4 const& m) : m_window(window), m_old(g_projection) {
-	g_projection = g_projection * m;
-	m_window.updateTransforms();
-}
-
-ViewTrans::~ViewTrans() {
-	g_projection = m_old;
-	m_window.updateTransforms();
-}
-
-Transform::Transform(Window& window, glmath::mat4 const& m) : m_window(window), m_old(g_modelview) {
-	g_modelview = g_modelview * m;
-	window.updateTransforms();
-}
-
-Transform::~Transform() {
-	g_modelview = m_old;
-	m_window.updateTransforms();
-}
-
-glmath::mat4 farTransform() {
-	float z = far_ - 0.1f;  // Very near the far plane but just a bit closer to avoid accidental clipping
-	float s = z / z0;  // Scale the image so that it looks the same size
-	s *= 1.0f + 2.0f * getSeparation(); // A bit more for stereo3d (avoid black borders)
-	using namespace glmath;
-	return translate(vec3(0.0f, 0.0f, -z + z0)) * scale(s); // Very near the farplane
-}

@@ -12,6 +12,7 @@
 #include "theme.hh"
 #include "util.hh"
 #include "playlist.hh"
+#include "graphic/video_driver.hh"
 
 #include "aubio/aubio.h"
 #include <iostream>

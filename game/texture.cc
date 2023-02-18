@@ -1,7 +1,7 @@
 #include "texture.hh"
 
 #include "configuration.hh"
-#include "video_driver.hh"
+#include "graphic/video_driver.hh"
 #include "screen.hh"
 #include "svg.hh"
 #include "game.hh"
