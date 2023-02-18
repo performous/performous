@@ -12,7 +12,7 @@
 #include "profiler.hh"
 #include "screen.hh"
 #include "songs.hh"
-#include "video_driver.hh"
+#include "graphic/window.hh"
 #include "webcam.hh"
 #include "webserver.hh"
 
@@ -255,7 +255,7 @@ void outputOptionalFeatureStatus();
 
 static void fatalError(const std::string &msg) {
 	auto errMsg = msg + "\nIf you think this is a bug in Performous, please report it at \n"
-	                    "  https://github.com/performous/performous/issues";
+						"  https://github.com/performous/performous/issues";
 	auto title = "FATAL ERROR";
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, errMsg.c_str(), nullptr);
 	std::cerr << title << ": " << msg << std::endl;

@@ -4,6 +4,8 @@
 #include "database.hh"
 #include "engine.hh"
 #include "player.hh"
+#include "graphic/color_trans.hh"
+#include "graphic/transform.hh"
 
 Dimensions dimensions; // Make a public member variable
 

@@ -1,69 +1,20 @@
 #pragma once
 
+#include <functional>
+#include <map>
+#include <SDL_events.h>
 #include "glmath.hh"
 #include "glshader.hh"
 #include "glutil.hh"
-#include <map>
-#include <functional>
-#include <SDL_events.h>
-
-float screenW();
-float screenH();
-const float targetWidth = 1366.0f; // One of the most common desktop resolutions in use today.
-static inline float virtH() { return float(screenH()) / screenW(); }
 
 struct SDL_Surface;
 struct SDL_Window;
 class FBO;
-class Window;
-
-struct ColorTrans {
-	ColorTrans(Window&, Color const& c);
-	ColorTrans(Window&, glmath::mat4 const& mat);
-	~ColorTrans();
-
-  private:
-	Window& m_window;
-	glmath::mat4 m_old;
-};
-
-struct LyricColorTrans {
-	LyricColorTrans(Window&, Color const& fill, Color const& stroke, Color const& newFill, Color const& newStroke);
-	~LyricColorTrans();
-
-  private:
-	Window& m_window;
-	glmath::vec4 oldFill;
-	glmath::vec4 oldStroke;
-};
-
-class ViewTrans {
-  public:
-	/// Apply a translation on top of current viewport translation
-	ViewTrans(Window&, glmath::mat4 const& m);
-	/// Apply a subviewport with different perspective projection
-	ViewTrans(Window&, float offsetX = 0.0f, float offsetY = 0.0f, float frac = 1.0f);
-	~ViewTrans();
-
- private:
-	Window& m_window;
-	glmath::mat4 m_old;
-};
-
-/// Apply a transform to current modelview stack
-class Transform {
-  public:
-	Transform(Window&, glmath::mat4 const& m);
-	~Transform();
-
-  private:
-	Window& m_window;
-	glmath::mat4 m_old;
-};
-
-/// Performs a GL transform for displaying background image at far distance
-glmath::mat4 farTransform();
 class Game;
+
+float screenW();
+float screenH();
+static inline float virtH() { return float(screenH()) / screenW(); }
 
 /// handles the window
 class Window {
@@ -138,4 +89,3 @@ private:
 	public:
 	FBO& getFBO();
 };
-

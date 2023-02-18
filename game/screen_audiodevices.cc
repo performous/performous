@@ -7,6 +7,7 @@
 #include "theme.hh"
 #include "i18n.hh"
 #include "game.hh"
+#include "graphic/color_trans.hh"
 
 namespace {
 	static const int unassigned_id = -1;  // mic.dev value for unassigned

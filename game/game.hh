@@ -5,7 +5,7 @@
 
 #include "animvalue.hh"
 #include "opengl_text.hh"
-#include "video_driver.hh"
+#include "graphic/window.hh"
 #include "dialog.hh"
 #include "playlist.hh"
 #include "fbo.hh"

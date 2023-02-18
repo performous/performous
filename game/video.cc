@@ -2,6 +2,8 @@
 
 #include "ffmpeg.hh"
 #include "util.hh"
+#include "graphic/color_trans.hh"
+
 #include <cmath>
 
 bool Video::tryPop(Bitmap& f, double timestamp) {

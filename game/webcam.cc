@@ -2,6 +2,8 @@
 
 #include "chrono.hh"
 #include "fs.hh"
+#include "graphic/transform.hh"
+
 #include <cstdint>
 #include <iostream>
 #include <stdexcept>

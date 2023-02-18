@@ -2,6 +2,7 @@
 #include "i18n.hh"
 #include "glutil.hh"
 #include "theme.hh"
+#include "graphic/view_trans.hh"
 
 namespace {
 	const double join_delay = 3.0; // Time after join menu before playing when joining mid-game

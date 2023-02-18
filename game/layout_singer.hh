@@ -4,6 +4,7 @@
 #include "opengl_text.hh"
 #include "notegraph.hh"
 #include "configuration.hh"
+#include "graphic/color_trans.hh"
 
 #include <deque>
 

@@ -14,6 +14,8 @@
 #include "screen.hh"
 #include "fs.hh"
 #include "util.hh"
+#include "graphic/color_trans.hh"
+#include "graphic/transform.hh"
 
 #include <cstdint>
 

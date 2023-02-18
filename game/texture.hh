@@ -2,7 +2,7 @@
 
 #include "glutil.hh"
 #include "image.hh"
-#include "video_driver.hh"
+#include "graphic/window.hh"
 
 #include <cairo.h>
 
