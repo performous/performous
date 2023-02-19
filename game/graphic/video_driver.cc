@@ -28,7 +28,7 @@ float getSeparation() {
 }
 
 glmath::mat4 farTransform() {
-	float z = Constant::far_ - 0.1f;  // Very near the far plane but just a bit closer to avoid accidental clipping
+	float z = Constant::far - 0.1f;  // Very near the far plane but just a bit closer to avoid accidental clipping
 	float s = z / Constant::z0;  // Scale the image so that it looks the same size
 	s *= 1.0f + 2.0f * getSeparation(); // A bit more for stereo3d (avoid black borders)
 	using namespace glmath;

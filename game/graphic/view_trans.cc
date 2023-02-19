@@ -8,7 +8,7 @@ ViewTrans::ViewTrans(Window& window, float offsetX, float offsetY, float frac)
 	// Setup the projection matrix for 2D translates
 	using namespace glmath;
 	float h = virtH();
-	const float f = Constant::near_ / Constant::z0;  // z0 to nearplane conversion factor
+	const float f = Constant::near / Constant::z0;  // z0 to nearplane conversion factor
 	// Corners of the screen at z0
 	float x1 = -0.5f, x2 = 0.5f;
 	float y1 = 0.5f * h, y2 = -0.5f * h;
@@ -17,7 +17,7 @@ ViewTrans::ViewTrans(Window& window, float offsetX, float offsetY, float frac)
 	x1 -= persX; x2 -= persX;
 	y1 -= persY; y2 -= persY;
 	// Perspective projection + the rest of the offset in eye (world) space
-	Global::projection = glm::frustum(f * x1, f * x2, f * y1, f * y2, Constant::near_, Constant::far_)
+	Global::projection = glm::frustum(f * x1, f * x2, f * y1, f * y2, Constant::near, Constant::far)
 	  * translate(vec3(offsetX - persX, offsetY - persY, -Constant::z0));
 	window.updateTransforms();
 }

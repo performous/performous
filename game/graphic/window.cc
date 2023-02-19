@@ -64,8 +64,12 @@ Window::Window()
 		GLattrSetter attr_d(SDL_GL_DEPTH_SIZE, 24);
 		GLattrSetter attr_db(SDL_GL_DOUBLEBUFFER, 1);
 		Uint32 flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL;
-		if (config["graphic/highdpi"].b()) { flags |= SDL_WINDOW_ALLOW_HIGHDPI; }
-		else { SDL_SetHintWithPriority("SDL_HINT_VIDEO_HIGHDPI_DISABLED", "1", SDL_HINT_OVERRIDE); }
+		if (config["graphic/highdpi"].b()) {
+			flags |= SDL_WINDOW_ALLOW_HIGHDPI;
+		}
+		else {
+			SDL_SetHintWithPriority("SDL_HINT_VIDEO_HIGHDPI_DISABLED", "1", SDL_HINT_OVERRIDE);
+		}
 		int width = config["graphic/window_width"].i();
 		int height = config["graphic/window_height"].i();
 		int windowPosX = config["graphic/window_pos_x"].i();
@@ -102,31 +106,37 @@ Window::Window()
 		}
 		SDL_Point winOrigin {windowPosX, windowPosY};
 		if (SDL_PointInRect(&winOrigin, &totalSize) == SDL_FALSE) {
-			if (winOrigin.x < totalSize.x) { winOrigin.x = totalSize.x; }
-			else if (winOrigin.x > totalSize.w) { winOrigin.x = (totalSize.w - width); }
-			if (winOrigin.y < totalSize.y) { winOrigin.y = totalSize.y; }
-			else if (winOrigin.y > totalSize.h) { winOrigin.y = (totalSize.h - height); }
+			if (winOrigin.x < totalSize.x) {
+				winOrigin.x = totalSize.x;
+			}
+			else if (winOrigin.x > totalSize.w) {
+				winOrigin.x = (totalSize.w - width);
+			}
+			if (winOrigin.y < totalSize.y) {
+				winOrigin.y = totalSize.y;
+			}
+			else if (winOrigin.y > totalSize.h) {
+				winOrigin.y = (totalSize.h - height);
+			}
 			std::clog << "video/info: Saved window position outside of current display set-up; resetting to " << winOrigin.x << "," << winOrigin.y << std::endl;
 		}
 		SDL_Point winEnd {(winOrigin.x + width), (winOrigin.y + height)};
 		if (SDL_PointInRect(&winEnd, &totalSize) == SDL_FALSE) {
 			if (winEnd.x > totalSize.w) {
-			width = totalSize.w;
-			winOrigin.x = (totalSize.w - width);
+				width = totalSize.w;
+				winOrigin.x = (totalSize.w - width);
 			}
 			if (winEnd.y > totalSize.h) {
-			height = totalSize.h;
-			winOrigin.y = (totalSize.y - height);
+				height = totalSize.h;
+				winOrigin.y = (totalSize.y - height);
 			}
 			std::clog << "video/info: Saved window size outside of current display set-up; resetting to " << width << "x" << height << std::endl;
 		}
 
-		if (winOrigin.x == 0)
-		{
+		if (winOrigin.x == 0) {
 			winOrigin.x = SDL_WINDOWPOS_UNDEFINED;
 		}
-		if (winOrigin.y == 0)
-		{
+		if (winOrigin.y == 0) {
 			winOrigin.y = SDL_WINDOWPOS_UNDEFINED;
 		}
 
@@ -159,15 +169,15 @@ void Window::createShaders() {
 	// but not GL_ARB_viewport_array, so we just check for the extension here.
 	if (config["graphic/stereo3d"].b()) {
 		if (epoxy_has_gl_extension("GL_ARB_viewport_array")) {
-		// Compile geometry shaders when stereo is requested
-		shader("color").compileFile(findFile("shaders/stereo3d.geom"));
-		shader("texture").compileFile(findFile("shaders/stereo3d.geom"));
-		shader("3dobject").compileFile(findFile("shaders/stereo3d.geom"));
-		shader("dancenote").compileFile(findFile("shaders/stereo3d.geom"));
+			// Compile geometry shaders when stereo is requested
+			shader("color").compileFile(findFile("shaders/stereo3d.geom"));
+			shader("texture").compileFile(findFile("shaders/stereo3d.geom"));
+			shader("3dobject").compileFile(findFile("shaders/stereo3d.geom"));
+			shader("dancenote").compileFile(findFile("shaders/stereo3d.geom"));
 		}
 		else {
-		std::clog << "video/warning: Stereo3D was enabled but the 'GL_ARB_viewport_array' extension is unsupported; will now disable Stereo3D." << std::endl;
-		config["graphic/stereo3d"].b() = false;
+			std::clog << "video/warning: Stereo3D was enabled but the 'GL_ARB_viewport_array' extension is unsupported; will now disable Stereo3D." << std::endl;
+			config["graphic/stereo3d"].b() = false;
 		}
 	}
 
@@ -236,11 +246,11 @@ void Window::blank() {
 }
 
 void Window::updateStereo(float sepFactor) {
-		try {
-			m_stereoUniforms.sepFactor = sepFactor;
-			m_stereoUniforms.z0 = (Constant::z0 - 2.0f * Constant::near_);
-			glBufferSubData(GL_UNIFORM_BUFFER, m_stereoUniforms.offset(), m_stereoUniforms.size(), &m_stereoUniforms);
-		} catch(...) {}  // Not fatal if 3d shader is missing
+	try {
+		m_stereoUniforms.sepFactor = sepFactor;
+		m_stereoUniforms.z0 = (Constant::z0 - 2.0f * Constant::near);
+		glBufferSubData(GL_UNIFORM_BUFFER, m_stereoUniforms.offset(), m_stereoUniforms.size(), &m_stereoUniforms);
+	} catch(...) {}  // Not fatal if 3d shader is missing
 }
 
 void Window::updateColor() {
@@ -296,7 +306,11 @@ void Window::render(Game &game, std::function<void (void)> drawFunc) {
 	updateStereo(stereo ? getSeparation() : 0.0f);
 	glerror.check("setup");
 	// Can we do direct to framebuffer rendering (no FBO)?
-	if (!stereo || type == 2) { view(stereo); drawFunc(); return; }
+	if (!stereo || type == 2) {
+		view(stereo);
+		drawFunc();
+		return;
+	}
 	// Render both eyes to FBO (full resolution top/bottom for anaglyph)
 
 	glerror.check("FBO");
@@ -402,14 +416,16 @@ void Window::event(Uint8 const& eventID, Sint32 const& data1, Sint32 const& data
 		case SDL_WINDOWEVENT_MAXIMIZED:
 			if (Platform::currentOS() == Platform::HostOS::OS_MAC) {
 				config["graphic/fullscreen"].b() = true;
-				}
+			}
 			else { m_needResize = true; }
 			break;
 		case SDL_WINDOWEVENT_RESTORED:
 			if (Platform::currentOS() == Platform::HostOS::OS_MAC) {
 				config["graphic/fullscreen"].b() = false;
-				}
-			else { m_needResize = true; }
+			}
+			else {
+				m_needResize = true;
+			}
 			break;
 		case SDL_WINDOWEVENT_SHOWN:
 			[[fallthrough]];
@@ -429,7 +445,9 @@ void Window::setWindowPosition(const Sint32& x, const Sint32& y)
 }
 
 FBO& Window::getFBO() {
-	if (!m_fbo) m_fbo = std::make_unique<FBO>(*this, s_width, (2 * s_height));
+	if (!m_fbo) {
+		m_fbo = std::make_unique<FBO>(*this, s_width, (2 * s_height));
+	}
 	return *m_fbo;
 }
 
@@ -472,7 +490,9 @@ void Window::resize() {
 	if (std::stoi(SDL_GetHint("SDL_HINT_VIDEO_HIGHDPI_DISABLED")) == 1) {
 		SDL_GetWindowSize(screen.get(), &nativeW, &nativeH);
 	}
-	else { SDL_GL_GetDrawableSize(screen.get(), &nativeW, &nativeH); }
+	else {
+		SDL_GL_GetDrawableSize(screen.get(), &nativeW, &nativeH);
+	}
 	s_width = static_cast<float>(nativeW);
 	s_height = static_cast<float>(nativeH);
 	// Enforce aspect ratio limits
@@ -481,7 +501,9 @@ void Window::resize() {
 	std::clog << "video/info: Window size " << w << "x" << h;
 	if (w != nativeW) std::clog << " (HiDPI " << nativeW << "x" << nativeH << ")";
 	std::clog << ", rendering in " << s_width << "x" << s_height << std::endl;
-	if (m_fbo) { m_fbo->resize(s_width, 2 * s_height); }
+	if (m_fbo) {
+		m_fbo->resize(s_width, 2 * s_height);
+	}
 }
 
 void Window::screenshot() {
@@ -491,7 +513,9 @@ void Window::screenshot() {
 	if (std::stoi(SDL_GetHint("SDL_HINT_VIDEO_HIGHDPI_DISABLED")) == 1) {
 		SDL_GetWindowSize(screen.get(), &nativeW, &nativeH);
 	}
-	else { SDL_GL_GetDrawableSize(screen.get(), &nativeW, &nativeH); }
+	else {
+		SDL_GL_GetDrawableSize(screen.get(), &nativeW, &nativeH);
+	}
 	img.width = static_cast<unsigned>(nativeW);
 	img.height = static_cast<unsigned>(nativeH);
 	unsigned stride = (img.width * 3 + 3) & ~3u;  // Rows are aligned to 4 byte boundaries
@@ -511,5 +535,3 @@ void Window::screenshot() {
 	writePNG(filename.string(), img, stride);
 	std::clog << "video/info: Screenshot taken: " << filename << " (" << img.width << "x" << img.height << ")" << std::endl;
 }
-
-

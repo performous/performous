@@ -18,7 +18,7 @@ static inline float virtH() { return float(screenH()) / screenW(); }
 
 /// handles the window
 class Window {
-public:
+  public:
 	Window();
 	~Window();
 	void render(Game &game, std::function<void (void)> drawFunc);
@@ -41,6 +41,8 @@ public:
 	GLuint const& VAO() const { return Window::m_vao; }
 	/// Return reference to Vertex Buffer Object.
 	GLuint const& VBO() const { return Window::m_vbo; }
+	FBO& getFBO();
+
 	/// Store value of GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT.
 	static GLint bufferOffsetAlignment;
 
@@ -58,17 +60,19 @@ public:
 	void updateLyricHighlight(glmath::vec4 const& fill, glmath::vec4 const& stroke, glmath::vec4 const& newFill, glmath::vec4 const& newStroke);
 	void updateLyricHighlight(glmath::vec4 const& fill, glmath::vec4 const& stroke);
 	void updateTransforms();
-private:
-	const GLuint vertPos = 0;
-	const GLuint vertTexCoord = 1;
-	const GLuint vertNormal = 2;
-	const GLuint vertColor = 3;
+
+  private:
 	void setWindowPosition(const Sint32& x, const Sint32& y);
 	void setFullscreen();
 	/// Setup everything for drawing a view.
 	/// @param num 0 = no stereo, 1 = left eye, 2 = right eye
 	void view(unsigned num);
 	void updateStereo(float separation);
+
+	const GLuint vertPos = 0;
+	const GLuint vertTexCoord = 1;
+	const GLuint vertNormal = 2;
+	const GLuint vertColor = 3;
 	bool m_fullscreen = false;
 	bool m_needResize = true;
 	static GLuint m_ubo;
@@ -86,6 +90,4 @@ private:
 	// Careful, Shaders depends on SDL_Window, thus m_shaders need to be
 	// destroyed before screen (and thus be creater after)
 	ShaderMap m_shaders; ///< Shader programs by name
-	public:
-	FBO& getFBO();
 };
