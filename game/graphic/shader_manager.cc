@@ -1,16 +1,5 @@
 #include "shader_manager.hh"
 
-ShaderManager::ShaderManager(std::shared_ptr<SDL_Window> sdlWindow)
-: m_sdlWindow(sdlWindow) {
-}
-
-ShaderManager::~ShaderManager() {
-	// Careful, Shaders depends on SDL_Window, thus m_shaders need to be
-	// destroyed before screen (and thus be creater after)
-	resetShaders();
-	releaseSDL();
-}
-
 Shader& ShaderManager::createOrGet(std::string const& name) {
 	auto it = m_shaders.find(name);
 
@@ -25,8 +14,4 @@ Shader& ShaderManager::createOrGet(std::string const& name) {
 
 void ShaderManager::resetShaders() {
 	m_shaders.clear();
-}
-
-void ShaderManager::releaseSDL() {
-	m_sdlWindow.reset();
 }

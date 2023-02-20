@@ -46,8 +46,8 @@ float screenH() { return s_height; }
 
 Window::Window()
 : screen(nullptr, &SDL_DestroyWindow), glContext(nullptr, &SDL_GL_DeleteContext) {
-	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK))
-		throw std::runtime_error(std::string("SDL_Init failed: ") + SDL_GetError());
+	m_system = std::make_unique<SDLSystem>();
+
 	SDL_JoystickEventState(SDL_ENABLE);
 	{ // Setup GL attributes for context creation
 		SDL_SetHintWithPriority("SDL_HINT_VIDEO_HIGHDPI_DISABLED", "0", SDL_HINT_DEFAULT);
@@ -141,11 +141,11 @@ Window::Window()
 		}
 
 		std::clog << "video/info: Create window dimensions: " << width << "x" << height << " on screen position: " << winOrigin.x << "x" << winOrigin.y << std::endl;
-		screen.reset(SDL_CreateWindow(PACKAGE " " VERSION, winOrigin.x, winOrigin.y, width, height, flags), &SDL_DestroyWindow);
+		screen.reset(SDL_CreateWindow(PACKAGE " " VERSION, winOrigin.x, winOrigin.y, width, height, flags));
 		if (!screen) {
 			throw std::runtime_error(std::string("SDL_CreateWindow failed: ") + SDL_GetError());
 		}
-		m_shaderManager = std::make_unique<ShaderManager>(screen);
+		m_shaderManager = std::make_unique<ShaderManager>();
 		glContext.reset(SDL_GL_CreateContext(screen.get()));
 		if (glContext == nullptr) throw std::runtime_error(std::string("SDL_GL_CreateContext failed with error: ") + SDL_GetError());
 		if (epoxy_gl_version() < 33) throw std::runtime_error("Performous needs at least OpenGL 3.3+ Core profile to run.");
@@ -174,7 +174,6 @@ Window::~Window() {
 	glDeleteBuffers(1, &m_vbo);
 	glDeleteBuffers(1, &m_ubo);
 	glDeleteVertexArrays(1, &m_vao);
-	SDL_Quit();
 }
 
 void Window::createShaders() {
@@ -546,4 +545,13 @@ void Window::screenshot() {
 	// Save to disk
 	writePNG(filename.string(), img, stride);
 	std::clog << "video/info: Screenshot taken: " << filename << " (" << img.width << "x" << img.height << ")" << std::endl;
+}
+
+Window::SDLSystem::SDLSystem() {
+	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK))
+		throw std::runtime_error(std::string("SDL_Init failed: ") + SDL_GetError());
+}
+
+Window::SDLSystem::~SDLSystem() {
+	SDL_Quit();
 }
