@@ -24,6 +24,9 @@ class Window {
   public:
 	Window();
 	~Window();
+
+	void shutdown();
+
 	void render(Game &game, std::function<void (void)> drawFunc);
 	/// clears window
 	void blank();
@@ -67,6 +70,11 @@ class Window {
 	void view(unsigned num);
 	void updateStereo(float separation);
 
+	struct SDLSystem {
+		SDLSystem();
+		~SDLSystem();
+	};
+
 	const GLuint vertPos = 0;
 	const GLuint vertTexCoord = 1;
 	const GLuint vertNormal = 2;
@@ -82,7 +90,13 @@ class Window {
 	std::unique_ptr<FBO> m_fbo;
 	int m_windowX = 0;
 	int m_windowY = 0;
-	std::shared_ptr<SDL_Window> screen;
+
+	// Careful, Shaders depends on SDL_Window, thus m_shaders need to be
+	// destroyed before screen (and thus be creater after)
+	// Keep the sequence of following members
+
+	std::unique_ptr<SDLSystem> m_system;
+	std::unique_ptr<SDL_Window, void (*)(SDL_Window*)> screen;
 	std::unique_ptr<std::remove_pointer_t<SDL_GLContext> /* SDL_GLContext is a void* */, void (*)(SDL_GLContext)> glContext;
 	std::unique_ptr<ShaderManager> m_shaderManager;
 };
