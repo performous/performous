@@ -1,7 +1,10 @@
 #pragma once
 
+#include "shader_manager.hh"
+
 #include <functional>
 #include <map>
+#include <memory>
 #include <SDL_events.h>
 #include "glmath.hh"
 #include "glshader.hh"
@@ -47,15 +50,10 @@ class Window {
 	static GLint bufferOffsetAlignment;
 
 	/// Construct a new shader or return an existing one by name
-	Shader& shader(std::string const& name) {
-		ShaderMap::iterator it = m_shaders.find(name);
-		if (it != m_shaders.end()) return *it->second;
-		std::pair<std::string, std::unique_ptr<Shader>> kv = std::make_pair(name, std::make_unique<Shader>(name));
-		return *m_shaders.insert(std::move(kv)).first->second;
-	}
+	Shader& shader(std::string const& name);
 	/// Compiles and links all shaders.
 	void createShaders();
-	void resetShaders() { m_shaders.clear(); createShaders(); };
+	void resetShaders();
 	void updateColor();
 	void updateLyricHighlight(glmath::vec4 const& fill, glmath::vec4 const& stroke, glmath::vec4 const& newFill, glmath::vec4 const& newStroke);
 	void updateLyricHighlight(glmath::vec4 const& fill, glmath::vec4 const& stroke);
@@ -84,10 +82,7 @@ class Window {
 	std::unique_ptr<FBO> m_fbo;
 	int m_windowX = 0;
 	int m_windowY = 0;
-	std::unique_ptr<SDL_Window, void (*)(SDL_Window*)> screen;
+	std::shared_ptr<SDL_Window> screen;
 	std::unique_ptr<std::remove_pointer_t<SDL_GLContext> /* SDL_GLContext is a void* */, void (*)(SDL_GLContext)> glContext;
-	using ShaderMap = std::map<std::string, std::unique_ptr<Shader>>;
-	// Careful, Shaders depends on SDL_Window, thus m_shaders need to be
-	// destroyed before screen (and thus be creater after)
-	ShaderMap m_shaders; ///< Shader programs by name
+	std::unique_ptr<ShaderManager> m_shaderManager;
 };

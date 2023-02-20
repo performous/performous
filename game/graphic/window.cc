@@ -141,8 +141,11 @@ Window::Window()
 		}
 
 		std::clog << "video/info: Create window dimensions: " << width << "x" << height << " on screen position: " << winOrigin.x << "x" << winOrigin.y << std::endl;
-		screen.reset(SDL_CreateWindow(PACKAGE " " VERSION, winOrigin.x, winOrigin.y, width, height, flags));
-		if (!screen) throw std::runtime_error(std::string("SDL_CreateWindow failed: ") + SDL_GetError());
+		screen.reset(SDL_CreateWindow(PACKAGE " " VERSION, winOrigin.x, winOrigin.y, width, height, flags), &SDL_DestroyWindow);
+		if (!screen) {
+			throw std::runtime_error(std::string("SDL_CreateWindow failed: ") + SDL_GetError());
+		}
+		m_shaderManager = std::make_unique<ShaderManager>(screen);
 		glContext.reset(SDL_GL_CreateContext(screen.get()));
 		if (glContext == nullptr) throw std::runtime_error(std::string("SDL_GL_CreateContext failed with error: ") + SDL_GetError());
 		if (epoxy_gl_version() < 33) throw std::runtime_error("Performous needs at least OpenGL 3.3+ Core profile to run.");
@@ -162,6 +165,16 @@ Window::Window()
 	createShaders();
 	resize();
 	SDL_ShowWindow(screen.get());
+}
+
+Window::~Window() {
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	glBindVertexArray(0);
+	glDeleteBuffers(1, &m_vbo);
+	glDeleteBuffers(1, &m_ubo);
+	glDeleteVertexArrays(1, &m_vao);
+	SDL_Quit();
 }
 
 void Window::createShaders() {
@@ -212,6 +225,15 @@ void Window::createShaders() {
 	view(0);  // For loading screens
 }
 
+Shader& Window::shader(std::string const& name) {
+	return m_shaderManager->createOrGet(name);
+}
+
+void Window::resetShaders() {
+	m_shaderManager->resetShaders();
+	createShaders();
+}
+
 void Window::initBuffers() {
 	glGenVertexArrays(1, &Window::m_vao); // Create VAO.
 	glBindVertexArray(Window::m_vao);
@@ -229,16 +251,6 @@ void Window::initBuffers() {
 	glVertexAttribPointer(vertNormal, 3, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(glutil::VertexInfo, vertNormal));
 	glEnableVertexAttribArray(vertColor);
 	glVertexAttribPointer(vertColor, 4, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(glutil::VertexInfo, vertColor));
-}
-
-Window::~Window() {
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-	glBindVertexArray(0);
-	glDeleteBuffers(1, &m_vbo);
-	glDeleteBuffers(1, &m_ubo);
-	glDeleteVertexArrays(1, &m_vao);
-	SDL_Quit();
 }
 
 void Window::blank() {
