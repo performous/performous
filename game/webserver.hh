@@ -14,10 +14,10 @@ public:
 	~WebServer();
 
 private:
-	void StartServer(int tried, bool fallbackPortInUse);
 	std::shared_ptr<std::thread> m_serverThread;
 	std::shared_ptr<RequestHandler> m_server;
 	Game& m_game;
+	void startServer(int tried, bool fallbackPortInUse);
 	Songs& m_songs;
 };
 #else
