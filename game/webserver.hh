@@ -14,15 +14,15 @@ class WebServer
 public:
 	WebServer(Game &game, Songs& songs);
 	~WebServer() = default;
-	void restartServer();
-	void stopServer();
+	void restartServer(); ///< Public interface to restart WebServer if configuration changes.
+	void stopServer(); ///< Stop the WebServer; called before restarting the webserver, and when quitting Performous.
 	
 private:
 	Game& m_game;
-	void startServer(int tried, bool fallbackPortInUse);
-	std::unique_ptr<std::thread> m_serverThread = nullptr;
-	std::unique_ptr<RequestHandler> m_server = nullptr;
-	Songs& m_songs;
+	void startServer(int tried, bool fallbackPortInUse); ///< Start the WebServer.
+	std::unique_ptr<std::thread> m_serverThread = nullptr; ///< Thread responsible for initializing the RequestHandler.
+	std::unique_ptr<RequestHandler> m_server = nullptr; ///< The actual server.
+	Songs& m_songs; ///< Reference to the Songs database.
 };
 #else
 

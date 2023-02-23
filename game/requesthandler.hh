@@ -27,8 +27,12 @@ using Performous_Router_t = restinio::router::express_router_t<restinio::router:
 #include <memory>
 #include <vector>
 
+/**
+* Class in charge of accepting remote connections. In practice, it's only used if a custom Subnet mask is set for the server.
+**/
 class Performous_IP_Blocker {
 	public:
+		/// Determines whether to allow a connection.
 		restinio::ip_blocker::inspection_result_t inspect(restinio::ip_blocker::incoming_info_t const& info) noexcept {
 			boost::asio::ip::address_v4 remote_ip = info.remote_endpoint().address().to_v4();
 			if (config["webserver/access"].ui() != 3) {
@@ -39,6 +43,7 @@ class Performous_IP_Blocker {
 				}
 			return restinio::ip_blocker::deny();
 		}
+		/// Calculates all possible hosts in a given subnet.
 		static void setAllowedSubnet(boost::asio::ip::address_v4 const& ipAddress) {
 			if (config["webserver/access"].ui() == 3) {
 				unsigned slashNotation = stou(config["webserver/netmask"].getEnumName());
@@ -50,10 +55,11 @@ class Performous_IP_Blocker {
 			}
 		}
 	private:
-		static boost::asio::ip::address_v4_range hosts() { return m_allowed_subnet.hosts(); };
-		static boost::asio::ip::network_v4 m_allowed_subnet;
+		static boost::asio::ip::address_v4_range hosts() { return m_allowed_subnet.hosts(); }; ///< Just for convenience and shorter ifs.
+		static boost::asio::ip::network_v4 m_allowed_subnet; ///< Network describing the subnet we'll allow connections from.
 };
 
+/// Basic RESTinio configuration.
 struct Performous_Server_Traits : public restinio::default_traits_t {
 	using timer_manager_t = restinio::asio_timer_manager_t;
 	using logger_t = restinio::shared_performous_logger_t;
@@ -61,16 +67,19 @@ struct Performous_Server_Traits : public restinio::default_traits_t {
 	using strand_t = boost::asio::strand<boost::asio::executor>;
 	using ip_blocker_t = Performous_IP_Blocker;
 };
-	 
+
 using Performous_Server_Settings = restinio::run_on_thread_pool_settings_t<Performous_Server_Traits>;
 
+/**
+* Wrapper class for the RESTinio webserver and everything it needs to function properly.
+**/
 class RequestHandler
 {
     public:
     	friend class WebServer;
         RequestHandler(Game &game, std::string url, unsigned short port, Songs& songs);
         ~RequestHandler();
-        const boost::asio::ip::address_v4& getLocalIP() const { return m_local_ip; };
+        const boost::asio::ip::address_v4& getLocalIP() const { return m_local_ip; }; ///< Query local IP.
 
 		template < typename RESP >
 		static	RESP
@@ -80,25 +89,24 @@ class RequestHandler
 			.append_header(restinio::http_field::cache_control, "no-cache, max-age=20, stale-while-revalidate=60")
 			.append_header("Content-Type", mime);
 			return resp;
-		}
-		std::string getContentType(const std::string& extension);
+		} ///< Helper with HTTP header boilerplate.
+		std::string getContentType(const std::string& extension); ///< Returns mimetype for a given extension.
 
     private:
-        std::unique_ptr<Performous_Router_t> init_webserver_router();
-        static std::string m_ip_address;
-        static boost::asio::ip::address_v4 getLocalIP(const std::string& service);
+        std::unique_ptr<Performous_Router_t> init_webserver_router(); ///< Initializes the Router for HTTP Requests.
+        static boost::asio::ip::address_v4 getLocalIP(const std::string& service); ///< Queries 1.1.1.1 (CloudFlare DNS) to determine our network interface and thus address.
 
-        restinio::request_handling_status_t HandleFile(std::shared_ptr<restinio::request_t> request, const fs::path& filePath);
-        nlohmann::json SongsToJsonObject();
-        std::map<std::string, std::string> GenerateLocaleDict();
-        std::vector<std::string> GetTranslationKeys();
-        std::shared_ptr<Song> GetSongFromJSON(nlohmann::json);
-	Performous_Server_Settings make_server_settings(const std::string &url, unsigned short port);
-        Game& m_game;
-        Songs& m_songs;
-        boost::asio::io_context m_io_context;
-        std::unique_ptr<restinio::http_server_t<Performous_Server_Traits> > m_restinio_server = nullptr;
-        boost::asio::ip::address_v4 m_local_ip;
+        restinio::request_handling_status_t HandleFile(std::shared_ptr<restinio::request_t> request, const fs::path& filePath); ///< Send file to client.
+        nlohmann::json SongsToJsonObject(); ///< Iterates Songs and builds a JSON object from its contents.
+        std::map<std::string, std::string> GenerateLocaleDict(); ///< Looks up the generated translation keys.
+        std::vector<std::string> GetTranslationKeys(); ///< Gets key-mappings for localized text.
+        std::shared_ptr<Song> GetSongFromJSON(nlohmann::json); ///< Initializes a Song from a JSON Object.
+		Performous_Server_Settings make_server_settings(const std::string &url, unsigned short port); ///< Sets the RESTinio server up prior to stating it.
+		nlohmann::json m_contentTypes = nlohmann::json::object();
+        Songs& m_songs; ///< Reference to Songs.
+        boost::asio::io_context m_io_context; ///< ASIO io_context that holds the webserver logic.
+        std::unique_ptr<restinio::http_server_t<Performous_Server_Traits> > m_restinio_server = nullptr; ///< RESTinio server instance.
+        boost::asio::ip::address_v4 m_local_ip; ///< Local IP Address.
 };
 #else
 class RequestHandler
