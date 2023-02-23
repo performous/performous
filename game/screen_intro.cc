@@ -1,4 +1,4 @@
-﻿#include "screen_intro.hh"
+#include "screen_intro.hh"
 
 #include "fs.hh"
 #include "glmath.hh"
@@ -207,8 +207,8 @@ void ScreenIntro::draw_webserverNotice() {
 	}
 	std::stringstream m_webserverStatusString;
 	if((webserversetting >= 1) && m_drawNotice) {
-		std::string message = Game::getSingletonPtr()->subscribeWebserverMessages();
-		m_webserverStatusString << _("Webserver active!\n connect to this computer\nusing: ") << message;
+		std::string message(m_game.subscribeWebserverMessages());
+		m_webserverStatusString << _("Webserver active!\n connect to this computer\nusing ") << message;
 		theme->WebserverNotice.draw(window, m_webserverStatusString.str());
 	}
 }
