@@ -46,7 +46,7 @@ void WebServer::startServer(int tried, bool fallbackPortInUse) {
 	}
 	std::clog << message << std::endl;
 	try {
-		m_server = std::make_unique<RequestHandler>(addr, portToUse, m_songs);
+		m_server = std::make_unique<RequestHandler>(addr, portToUse, m_io_context, m_songs, m_game);
 		m_game.notificationFromWebserver(message);
 	} catch (std::exception& e) {
 		tried = tried + 1;
@@ -57,14 +57,14 @@ void WebServer::startServer(int tried, bool fallbackPortInUse) {
 		startServer(tried, fallbackPortInUse);
 	}
 	try {
-		boost::asio::post(m_server->m_io_context, [&] {
+		boost::asio::post(*m_io_context, [&] {
         		m_server->m_restinio_server->open_sync();
 				std::string message(m_server->getLocalIP().to_string()+":");
 				message += std::to_string(portToUse);
 		m_game.notificationFromWebserver(message);
 				});
     	Performous_IP_Blocker::setAllowedSubnet(m_server->getLocalIP());
-		m_server->m_io_context.run();
+		m_io_context->run();
 	} catch (std::exception& e) {
 		std::string message("webserver/error: " + std::string(e.what()) + ". Trying again... (tried " + std::to_string(tried) + " times.)");
 		std::clog << message << std::endl;
@@ -74,9 +74,9 @@ void WebServer::startServer(int tried, bool fallbackPortInUse) {
 	}
 }
 
-WebServer::WebServer(Game &game, Songs& songs) : m_game(game), m_songs(songs {
+WebServer::WebServer(Game &game, Songs& songs) : m_game(game), m_songs(songs) {
 	restartServer();
-	}
+}
 
 void WebServer::stopServer() {
 	try {
