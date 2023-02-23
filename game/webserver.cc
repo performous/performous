@@ -26,7 +26,7 @@ void WebServer::startServer(int tried, bool fallbackPortInUse) {
 			return;
 		}
 		message += _("on either port; will now disable it.");
-		std::clog << "webserver/warning: " << message << std::endl;
+		std::clog << std::string("webserver/warning: " ) + message << std::endl;
 		m_game.notificationFromWebserver(message);
 			return;
 		}
@@ -54,7 +54,7 @@ void WebServer::startServer(int tried, bool fallbackPortInUse) {
 		++tried;
 		message = std::string(e.what() + std::string(". \n"));
 		message += _("Trying again... (tried ") += std::to_string(tried) += std::string(" times).");
-		std::clog << "webserver/error: " << message << std::endl;
+		std::clog << std::string("webserver/error: ") + message << std::endl;
 ;
 		m_game.notificationFromWebserver(message);
 		std::this_thread::sleep_for(20s);
@@ -73,7 +73,7 @@ void WebServer::startServer(int tried, bool fallbackPortInUse) {
 		++tried;
 		message = std::string(e.what() + std::string(". \n"));
 		message += _("Trying again... (tried ") += std::to_string(tried) += std::string(" times).");
-		std::clog << "webserver/error: " << message << std::endl;
+		std::clog << std::string("webserver/error: ") + message << std::endl;
 		m_game.notificationFromWebserver(message);
 		std::this_thread::sleep_for(20s);
 		startServer(tried, fallbackPortInUse);
@@ -92,7 +92,7 @@ void WebServer::stopServer() {
 		if (m_io_context) m_io_context->stop();
 		if (m_serverThread && m_serverThread->joinable()) { m_serverThread->join(); }
 	} catch (const std::exception &e) {
-		std::clog << "webserver/error: Failed to close RESTinio server due to: " << e.what() << "." << std::endl;
+		std::clog << std::string("webserver/error: Failed to close RESTinio server due to: ") + e.what() << std::endl;
 		}
 }
 

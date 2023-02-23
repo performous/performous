@@ -71,10 +71,8 @@ class Game {
 	void drawLogo();
 	///global playlist access
 	PlayList& getCurrentPlayList() { return currentPlaylist; }
-#ifdef USE_WEBSERVER
 	void notificationFromWebserver(std::string message) { m_webserverMessage = message; }
 	std::string subscribeWebserverMessages() { return m_webserverMessage; }
-#endif
 
 	Window& getWindow() { return m_window; }
 	Audio& getAudio() { return m_audio; }

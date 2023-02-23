@@ -197,20 +197,16 @@ void ScreenIntro::populateMenu() {
 	m_menu.add(MenuOption(translate_noop("Quit"), translate_noop("Leave the game."), imgQuit)).screen("");
 }
 
-#ifdef USE_WEBSERVER
-
 void ScreenIntro::draw_webserverNotice() {
+#ifdef USE_WEBSERVER
 	auto& window = getGame().getWindow();
 	if(m_webserverNoticeTimeout.get() == 0) {
 		m_drawNotice = !m_drawNotice;
 		m_webserverNoticeTimeout.setValue(5);
 	}
 	if((webserversetting >= 1) && m_drawNotice) {
-		std::string message(m_game.subscribeWebserverMessages());
-		theme->WebserverNotice.draw(window, m_webserverStatusString.str());
+		theme->WebserverNotice.draw(window, m_game.subscribeWebserverMessages());
+		);
 	}
-}
-
-#else
-void ScreenIntro::draw_webserverNotice() {}
 #endif
+}
