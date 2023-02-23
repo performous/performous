@@ -16,10 +16,10 @@ public:
 	~WebServer();
 
 private:
-	std::shared_ptr<std::thread> m_serverThread;
-	std::shared_ptr<RequestHandler> m_server;
 	Game& m_game;
 	void startServer(int tried, bool fallbackPortInUse);
+	std::unique_ptr<std::thread> m_serverThread = nullptr;
+	std::unique_ptr<RequestHandler> m_server = nullptr;
 	Songs& m_songs;
 };
 #else

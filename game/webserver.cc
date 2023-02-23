@@ -42,7 +42,7 @@ void WebServer::startServer(int tried, bool fallbackPortInUse) {
 	}
 	std::clog << message << std::endl;
 	try {
-		m_server = std::shared_ptr<RequestHandler>(new RequestHandler(addr, portToUse, m_songs));
+		m_server = std::make_unique<RequestHandler>(addr, portToUse, m_songs);
 		m_game.notificationFromWebserver(message);
 	} catch (std::exception& e) {
 		tried = tried + 1;
@@ -70,14 +70,13 @@ void WebServer::startServer(int tried, bool fallbackPortInUse) {
 	}
 }
 
-WebServer::WebServer(Game &game, Songs& songs)
-: m_game(game), m_songs(songs)
-{
+WebServer::WebServer(Game &game, Songs& songs) : m_game(game), m_songs(songs {
 	if(config["webserver/access"].ui() == 0) {
 		std::clog << "webserver/notice: Not starting webserver." << std::endl;
-	} else {
 	}
+	else {
 		m_serverThread = std::make_unique<std::thread>([this] { startServer(0, false); });
+	}
 }
 
 WebServer::~WebServer() {
