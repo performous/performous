@@ -71,11 +71,11 @@ using Performous_Server_Settings = restinio::run_on_thread_pool_settings_t<Perfo
 **/
 class RequestHandler
 {
-    public:
-    	friend class WebServer;
+	public:
+		friend class WebServer;
         RequestHandler(Game &game, std::string url, unsigned short port, Songs& songs);
-        ~RequestHandler();
-        const boost::asio::ip::address_v4& getLocalIP() const { return m_local_ip; }; ///< Query local IP.
+		~RequestHandler();
+		const boost::asio::ip::address_v4& getLocalIP() const { return m_local_ip; }; ///< Query local IP.
 
 		template < typename RESP >
 		static	RESP
@@ -88,21 +88,21 @@ class RequestHandler
 		} ///< Helper with HTTP header boilerplate.
 		std::string getContentType(const std::string& extension); ///< Returns mimetype for a given extension.
 
-    private:
-        std::unique_ptr<Performous_Router_t> init_webserver_router(); ///< Initializes the Router for HTTP Requests.
-        static boost::asio::ip::address_v4 getLocalIP(const std::string& service); ///< Queries 1.1.1.1 (CloudFlare DNS) to determine our network interface and thus address.
+	private:
+		std::unique_ptr<Performous_Router_t> init_webserver_router(); ///< Initializes the Router for HTTP Requests.
+		static boost::asio::ip::address_v4 getLocalIP(const std::string& service); ///< Queries 1.1.1.1 (CloudFlare DNS) to determine our network interface and thus address.
 
-        restinio::request_handling_status_t HandleFile(std::shared_ptr<restinio::request_t> request, const fs::path& filePath); ///< Send file to client.
-        nlohmann::json SongsToJsonObject(); ///< Iterates Songs and builds a JSON object from its contents.
-        std::map<std::string, std::string> GenerateLocaleDict(); ///< Looks up the generated translation keys.
-        std::vector<std::string> GetTranslationKeys(); ///< Gets key-mappings for localized text.
-        std::shared_ptr<Song> GetSongFromJSON(nlohmann::json); ///< Initializes a Song from a JSON Object.
+		restinio::request_handling_status_t HandleFile(std::shared_ptr<restinio::request_t> request, const fs::path& filePath); ///< Send file to client.
+		nlohmann::json SongsToJsonObject(); ///< Iterates Songs and builds a JSON object from its contents.
+		std::map<std::string, std::string> GenerateLocaleDict(); ///< Looks up the generated translation keys.
+		std::vector<std::string> GetTranslationKeys(); ///< Gets key-mappings for localized text.
+		std::shared_ptr<Song> GetSongFromJSON(nlohmann::json); ///< Initializes a Song from a JSON Object.
 		Performous_Server_Settings make_server_settings(const std::string &url, unsigned short port); ///< Sets the RESTinio server up prior to stating it.
-		nlohmann::json m_contentTypes = nlohmann::json::object();
-        Songs& m_songs; ///< Reference to Songs.
-        boost::asio::io_context m_io_context; ///< ASIO io_context that holds the webserver logic.
-        std::unique_ptr<restinio::http_server_t<Performous_Server_Traits> > m_restinio_server = nullptr; ///< RESTinio server instance.
-        boost::asio::ip::address_v4 m_local_ip; ///< Local IP Address.
+		nlohmann::json m_contentTypes = nlohmann::json::object(); ///< JSON container for file-extension/mime-type pairings; in practice it behaves the same as a std::map.
+		Songs& m_songs; ///< Reference to Songs.
+		boost::asio::io_context m_io_context; ///< ASIO io_context that holds the webserver logic.
+		std::unique_ptr<restinio::http_server_t<Performous_Server_Traits> > m_restinio_server = nullptr; ///< RESTinio server instance.
+		boost::asio::ip::address_v4 m_local_ip; ///< Local IP Address.
 };
 #else
 class RequestHandler
