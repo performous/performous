@@ -59,7 +59,8 @@ void WebServer::startServer(int tried, bool fallbackPortInUse) {
 	try {
 		boost::asio::post(*m_io_context, [&] {
         		m_server->m_restinio_server->open_sync();
-				std::string message(m_server->getLocalIP().to_string()+":");
+        		std::string ip((config["webserver/access"].i() == 1) ? "localhost" : m_server->getLocalIP().to_string());
+				std::string message("http://"+ip+":");
 				message += std::to_string(portToUse);
 		m_game.notificationFromWebserver(message);
 				});
