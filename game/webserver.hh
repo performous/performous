@@ -18,7 +18,7 @@ public:
 	~WebServer() = default;
 	void restartServer(); ///< Public interface to restart WebServer if configuration changes.
 	void stopServer(); ///< Stop the WebServer; called before restarting the webserver, and when quitting Performous.
-	
+
 private:
 	Game& m_game;
 	void startServer(int tried, bool fallbackPortInUse); ///< Start the WebServer.

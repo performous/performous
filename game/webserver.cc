@@ -50,7 +50,7 @@ void WebServer::startServer(int tried, bool fallbackPortInUse) {
 		m_game.notificationFromWebserver(message);
 	} catch (std::exception& e) {
 		tried = tried + 1;
-		std::string message("webserver/error: " + std::string(e.what()) + ". Trying again... (tried " + std::to_string(tried) + " times)."); 
+		std::string message("webserver/error: " + std::string(e.what()) + ". Trying again... (tried " + std::to_string(tried) + " times).");
 		std::clog << message << std::endl;
 		m_game.notificationFromWebserver(message);
 		std::this_thread::sleep_for(20s);
