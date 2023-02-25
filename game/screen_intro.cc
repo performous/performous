@@ -13,7 +13,7 @@
 
 #include <SDL_timer.h>
 
-ScreenIntro::ScreenIntro(Game &game, std::string const& name, Audio& audio): Screen(game, name), m_audio(audio), m_first(true) {
+ScreenIntro::ScreenIntro(Game &game, std::string const& name, Audio& audio): Screen(game, name), m_audio(audio), m_first(true), m_webserverSetting(config["webserver/access"]) {
 }
 
 void ScreenIntro::enter() {
@@ -30,7 +30,6 @@ void ScreenIntro::enter() {
 		m_first = false;
 	}
 	reloadGL();
-	webserversetting = config["webserver/access"].ui();
 	m_audio.playSample("notice.ogg");
 }
 
@@ -204,9 +203,8 @@ void ScreenIntro::draw_webserverNotice() {
 		m_drawNotice = !m_drawNotice;
 		m_webserverNoticeTimeout.setValue(5);
 	}
-	if((webserversetting >= 1) && m_drawNotice) {
-		theme->WebserverNotice.draw(window, m_game.subscribeWebserverMessages());
-		);
+	if((m_webserverSetting.ui() >= 1) && m_drawNotice) {
+		theme->WebserverNotice.draw(window, getGame().subscribeWebserverMessages());
 	}
 #endif
 }
