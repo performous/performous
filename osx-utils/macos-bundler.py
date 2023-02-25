@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!./macos-bundler/bin/python3
 
 from docopt import docopt
 
@@ -23,10 +23,10 @@ script_prefix: Path = None
 performous_source_dir = None
 
 include_feature_args = ["--enable-webcam", "--enable-midi", "--enable-webserver"]
-include_feature_opts = ["auto", "on", "off" ]
+include_feature_opts = ["AUTO", "ON", "OFF" ]
 
 find_dep_args = ["--internal-aubio", "--internal-restinio", "--internal-json"]
-find_dep_opts = ["auto", "always", "never"]
+find_dep_opts = ["AUTO", "ALWAYS", "NEVER"]
 
 majorVer = None
 minorVer = None
@@ -196,8 +196,8 @@ def bundle_libs():
 usageHelp = f"""\nPerformous macOS Bundler
 
 Usage:
-	macos_bundler.py [--arch <architecture>]... [--prefer-macports | --prefer-homebrew] [options]
-	macos_bundler.py [options]
+	macos-bundler.py [--arch <architecture>]... [--prefer-macports | --prefer-homebrew] [options]
+	macos-bundler.py [options]
 
 Options:
 	-h --help  Show this help message.
@@ -241,12 +241,12 @@ if __name__ == "__main__":
 		sys.exit(0)
 
 	for arg in find_dep_args:
-		if (arguments[arg] not in find_dep_opts):
+		if (arguments[arg].upper() not in find_dep_opts):
 			print(f"Invalid value for {arg}; options are: {', '.join(find_dep_opts)}")
 			sys.exit(1)
 
 	for arg in include_feature_args:
-		if (arguments[arg] not in include_feature_opts):
+		if (arguments[arg].upper() not in include_feature_opts):
 			print(f"Invalid value for {arg}; options are: {', '.join(include_feature_opts)}")
 			sys.exit(1)
 
@@ -330,12 +330,12 @@ if __name__ == "__main__":
 		-DCMAKE_INSTALL_PREFIX:PATH="{str(performous_out_dir)}" \
 		-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
 		-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON \
-		-DSELF_BUILT_AUBIO:STRING="{arguments['--internal-aubio']}" \
-		-DSELF_BUILT_JSON:STRING="{arguments['--internal-json']}" \
-		-DSELF_BUILT_RESTINIO:STRING={arguments['--internal-restinio']}" \
-		-DENABLE_MIDI:STRING="{arguments['--enable-midi']}" \
-		-DENABLE_WEBCAM:STRING="{arguments['--enable-webcam']}" \
-		-DENABLE_WEBSERVER:STRING="{arguments['--enable-webserver']}" \
+		-DSELF_BUILT_AUBIO:STRING="{arguments['--internal-aubio'].upper()}" \
+		-DSELF_BUILT_JSON:STRING="{arguments['--internal-json'].upper()}" \
+		-DSELF_BUILT_RESTINIO:STRING="{arguments['--internal-restinio'].upper()}" \
+		-DENABLE_MIDI:STRING="{arguments['--enable-midi'].upper()}" \
+		-DENABLE_WEBCAM:STRING="{arguments['--enable-webcam'].upper()}" \
+		-DENABLE_WEBSERVER:STRING="{arguments['--enable-webserver'].upper()}" \
 		-DFETCHCONTENT_QUIET:BOOL=ON \
 		-DCMAKE_POLICY_DEFAULT_CMP0126=NEW \
 		-DCMAKE_PREFIX_PATH:STRING="{prefix}" \
