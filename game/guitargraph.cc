@@ -60,11 +60,11 @@ void GuitarGraph::initGuitar() {
 	// Copy all tracks of guitar types (not DRUMS and not KEYBOARD) to m_instrumentTracks
 	for (auto const& elem: m_song.instrumentTracks) {
 		std::string index = elem.first;
-		if (index != TrackName::DRUMS
-			&& index != TrackName::DRUMS_SNARE
-			&& index != TrackName::DRUMS_CYMBALS
-			&& index != TrackName::DRUMS_TOMS
-			&& index != TrackName::KEYBOARD)  {
+		if (index != TrackName::DRUMS &&
+			index != TrackName::DRUMS_SNARE &&
+			index != TrackName::DRUMS_CYMBALS &&
+			index != TrackName::DRUMS_TOMS &&
+			index != TrackName::KEYBOARD)  {
 				m_instrumentTracks[index] = &elem.second;
 			}
 	}
@@ -83,10 +83,10 @@ void GuitarGraph::initDrums() {
 	// Copy all tracks of drum type to m_instrumentTracks
 	for (auto const& elem: m_song.instrumentTracks) {
 		std::string index = elem.first;
-		if (index == TrackName::DRUMS
-			|| index == TrackName::DRUMS_SNARE
-			|| index == TrackName::DRUMS_CYMBALS
-			|| index == TrackName::DRUMS_TOMS ) {
+		if (index == TrackName::DRUMS ||
+			index == TrackName::DRUMS_SNARE ||
+			index == TrackName::DRUMS_CYMBALS ||
+			index == TrackName::DRUMS_TOMS ) {
 				m_instrumentTracks[index] = &elem.second;
 			}
 	}

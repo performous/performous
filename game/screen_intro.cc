@@ -184,13 +184,13 @@ void ScreenIntro::populateMenu() {
 			for (auto const& item: submenu.items) {
 				ConfigItem& c = config[item];
 				opts.emplace_back(MenuOption(c.getShortDesc(), c.getLongDesc()));
-								opts.back().changer(c);
+				opts.back().changer(c);
 			}
 			configmain.emplace_back(MenuOption(submenu.shortDesc, submenu.longDesc, imgConfig));
-						configmain.back().submenu(std::move(opts));
+			configmain.back().submenu(std::move(opts));
 		} else {
 			configmain.emplace_back(MenuOption(submenu.shortDesc, submenu.longDesc, imgConfig));
-						configmain.back().screen(submenu.name);
+			configmain.back().screen(submenu.name);
 		}
 	}
 	m_menu.add(MenuOption(translate_noop("Configure"), translate_noop("Configure audio and game options."), imgConfig)).submenu(std::move(configmain));
