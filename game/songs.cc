@@ -549,11 +549,15 @@ SongPtr Songs::currentPtr(bool webServer) const try {
 
 Song& Songs::current(bool webServer) try { 
 	return *getSongs(webServer).at(static_cast<size_t>(math_cover.getTarget()));
-} catch (std::out_of_range const& e) { throw std::runtime_error(std::string("songs/error: out-of-bounds access attempt for Songs: ") + e.what()); }
+} catch (std::out_of_range const& e) { 
+	return *getSongs(webServer).back();
+}
 
 Song const& Songs::current(bool webServer) const try { 
 	return *getSongs(webServer).at(static_cast<size_t>(math_cover.getTarget()));
-} catch (std::out_of_range const& e) { throw std::runtime_error(std::string("songs/error: out-of-bounds access attempt for Songs: ") + e.what()); }
+} catch (std::out_of_range const& e) {
+	return *getSongs(webServer).back();
+}
 
 namespace {
 	void dumpCover(xmlpp::Element* song, Song const& s, size_t num) {
