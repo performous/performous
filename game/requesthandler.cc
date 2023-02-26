@@ -1,5 +1,5 @@
 #include "requesthandler.hh"
-#include "game.hh
+#include "game.hh"
 #include "screen_playlist.hh"
 #include "songs.hh"
 #include "unicode.hh"

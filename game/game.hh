@@ -41,6 +41,8 @@ class Game {
 	Screen* getScreen(std::string const& name);
 	/// Returns a reference to the window
 	Window& window() { return m_window; }
+	/// Restart Webserver.
+	void restartWebServer();
 
 	/// Draw a loading progress indication
 	void loading(std::string const& message, float progress);

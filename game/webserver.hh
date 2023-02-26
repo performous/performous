@@ -13,8 +13,10 @@ class WebServer
 {
 public:
 	WebServer(Game &game, Songs& songs);
-	~WebServer();
-
+	~WebServer() = default;
+	void restartServer();
+	void stopServer();
+	
 private:
 	Game& m_game;
 	void startServer(int tried, bool fallbackPortInUse);

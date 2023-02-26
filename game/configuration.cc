@@ -226,7 +226,6 @@ namespace {
 		std::uint64_t subNetValue = 1;
 		subNetValue <<= 32;
 		subNetValue -= (1 << (32 - slashNotation));
-		std::clog << "webserver/debug: slashNotation: " << std::to_string(slashNotation) << ", subNetValue: " << std::to_string(subNetValue) << std::endl;
 		std::string slashString = std::to_string(slashNotation);
 		std::string displayValue(boost::asio::ip::make_address_v4(static_cast<unsigned>(subNetValue)).to_string());
 		displayValue += (" (/"+std::to_string(slashNotation)+")");
@@ -239,10 +238,13 @@ void writeConfig(Game& game, bool system) {
 	xmlpp::Document doc;
 	auto nodeRoot = doc.create_root_node("performous");
 	auto dirty = false;
+#ifdef USE_WEBSERVER
+	bool webServerNeedsRestart = false;
+#endif
 	for (auto& elem : config) {
 		ConfigItem& item = elem.second;
-		auto const name = elem.first;
-		auto const type = item.getType();
+		const std::string name = elem.first;
+		const std::string type = item.getType();
 
 		if (item.isDefault(system) && name != "audio/backend" && name != "graphic/stereo3d") {
 			continue; // No need to save settings with default values
@@ -252,7 +254,18 @@ void writeConfig(Game& game, bool system) {
 		xmlpp::Element* entryNode = xmlpp::add_child_element(nodeRoot, "entry");
 
 		entryNode->set_attribute("type", type);
-		entryNode->set_attribute("name", name);
+		entryNode->set_attribute("name", name);		
+#ifdef USE_WEBSERVER
+		if (name.substr(0,10) == "webserver/") {
+			if (!item.getOldValue().empty() && (item.getOldValue() != item.getValue()) && !game.isFinished()) {
+				if (name == "webserver/access" && item.ui() == 0) {
+					continue; // Don't restart webserver if the new value is "Disabled."
+				}
+				webServerNeedsRestart  = true;
+				std::clog << "webserver/notice: WebServer configuration changed; we'll need to restart it." << std::endl;
+			}
+		}
+#endif
 		if (name == "audio/backend") {
 			std::string currentBackEnd = Audio::backendConfig().getOldValue();
 			int oldValue = PaHostApiNameToHostApiTypeId(currentBackEnd);
@@ -316,6 +329,9 @@ void writeConfig(Game& game, bool system) {
 		if (dirty) {
 			rename(tmp, conf);
 			std::cerr << "Saved configuration to " << conf << std::endl;
+#ifdef USE_WEBSERVER
+			if (webServerNeedsRestart) game.restartWebServer();
+#endif
 		}
 		else {
 			std::cerr << "Using default settings, no configuration file needed." << std::endl;

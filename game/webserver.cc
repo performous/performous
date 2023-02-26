@@ -10,6 +10,10 @@
 #include <boost/asio/ip/address_v4_range.hpp>
 
 void WebServer::startServer(int tried, bool fallbackPortInUse) {
+	if(config["webserver/access"].ui() == 0) {
+		std::clog << "webserver/notice: Not starting webserver because it's been explicitly turned off." << std::endl;
+		return;
+	}
 	if(tried > 2) {
 			std::string message("webserver/error: Couldn't start webserver after 3 tries");
 		if(fallbackPortInUse == false) {
@@ -71,23 +75,24 @@ void WebServer::startServer(int tried, bool fallbackPortInUse) {
 }
 
 WebServer::WebServer(Game &game, Songs& songs) : m_game(game), m_songs(songs {
-	if(config["webserver/access"].ui() == 0) {
-		std::clog << "webserver/notice: Not starting webserver." << std::endl;
+	restartServer();
 	}
-	else {
-		m_serverThread = std::make_unique<std::thread>([this] { startServer(0, false); });
-	}
-}
 
-WebServer::~WebServer() {
+void WebServer::stopServer() {
 	try {
-		if (m_server) {
-			m_server->m_restinio_server->close_sync();
-			m_server->m_io_context.stop();
-		} 
-		if (m_serverThread) { m_serverThread->detach(); } // Using join results in a potential crash and/or locks-up forever waiting for the thread.
+		if (m_server && m_io_context) {
+			boost::asio::post(*m_io_context, [&] { m_server->m_restinio_server->close_sync(); });
+		}
+		if (m_io_context) m_io_context->stop();
+		if (m_serverThread && m_serverThread->joinable()) { m_serverThread->join(); }
 	} catch (const std::exception &e) {
 		std::clog << "webserver/error: Failed to close RESTinio server due to: " << e.what() << "." << std::endl;
 		}
 }
+
+void WebServer::restartServer() {
+	stopServer();
+	m_serverThread = std::make_unique<std::thread>([this] { startServer(0, false); });
+}
+
 #endif
