@@ -12,10 +12,11 @@
 #include "audio.hh"
 #include "screen.hh"
 #include "i18n.hh"
+class Songs;
 
 class Game {
   public:
-	Game(Window& window);
+	Game(Window& window, Songs& songs);
 	~Game();
 	/// Adds a screen to the manager
 	void addScreen(std::unique_ptr<Screen> s) {
@@ -76,6 +77,7 @@ class Game {
 private:
 	Window& m_window;
 	Audio m_audio;
+	std::unique_ptr<WebServer> m_webserver;
 
 public:
 	input::Controllers controllers;

@@ -107,8 +107,7 @@ void mainLoop(std::string const& songlist) {
 	loadFonts();
 
 	Window window{};
-	Game gm(window);
-	WebServer server(gm, songs);
+	Game gm(window, songs);
 
 	auto& audio = gm.getAudio();
 
