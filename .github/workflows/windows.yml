@@ -8,7 +8,7 @@ on:
         description: 'The output of the complete_version of the "determine_version" job from the build_and_release.yml workflow'
         required: true
         type: string
-      release_upload_url:
+      release_id:
         description: 'The output of the "create_release" job from the build_and_release.yml workflow'
         required: true
         type: string
@@ -91,15 +91,13 @@ jobs:
 
       - name: Upload artifacts to tagged release
         id: upload_assets
-        uses: actions/upload-release-asset@v1
         if: ${{ github.event_name != 'pull_request' && github.ref_type == 'tag' }}
+        uses: xresloader/upload-to-github-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ inputs.release_upload_url }}
-          asset_path: ${{ env.ARTIFACT_PATH }}
-          asset_name: ${{ env.ARTIFACT_FILENAME }}
-          asset_content_type: application/octet-stream
+          release_id: ${{ inputs.release_id }}
+          file: ${{ env.ARTIFACT_PATH }}
 
   Windows_MinGW-w64_Packages:
     name: Create Windows installer with MinGW-w64
@@ -207,12 +205,10 @@ jobs:
 
       - name: Upload artifacts to tagged release
         id: upload_assets
-        uses: actions/upload-release-asset@v1
         if: ${{ github.event_name != 'pull_request' && github.ref_type == 'tag' }}
+        uses: xresloader/upload-to-github-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ inputs.release_upload_url }}
-          asset_path: ${{ env.ARTIFACT_PATH }}
-          asset_name: ${{ env.ARTIFACT_FILENAME }}
-          asset_content_type: application/octet-stream
+          release_id: ${{ inputs.release_id }}
+          file: ${{ env.ARTIFACT_PATH }}

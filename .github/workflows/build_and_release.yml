@@ -69,17 +69,15 @@ jobs:
     # Make sure the output variable for this step is set so it
     # can be consumed by later build steps
     outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      release_id: ${{ steps.create_release.outputs.id }}
     steps:
       - name: Create the Main release
         id: create_release
         if: ${{ github.event_name != 'pull_request' && github.ref_type == 'tag' }}
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref_name }}
-          release_name: Performous ${{ github.ref_name }}
+          name: Performous ${{ github.ref_name }}
           draft: true
           prerelease: false
 
@@ -89,7 +87,7 @@ jobs:
     uses: ./.github/workflows/linux.yml
     with:
       package_complete_version: ${{ needs.determine_version.outputs.complete_version }}
-      release_upload_url: ${{ needs.create_release.outputs.upload_url }}
+      release_id: ${{ needs.create_release.outputs.release_id }}
     needs:
       - determine_version
       - create_release
@@ -100,7 +98,7 @@ jobs:
     uses: ./.github/workflows/appimage.yml
     with:
       package_complete_version: ${{ needs.determine_version.outputs.complete_version }}
-      release_upload_url: ${{ needs.create_release.outputs.upload_url }}
+      release_id: ${{ needs.create_release.outputs.release_id }}
     needs:
       - determine_version
       - create_release
@@ -111,7 +109,7 @@ jobs:
     uses: ./.github/workflows/macos.yml
     with:
       package_complete_version: ${{ needs.determine_version.outputs.complete_version }}
-      release_upload_url: ${{ needs.create_release.outputs.upload_url }}
+      release_id: ${{ needs.create_release.outputs.release_id }}
     needs:
       - determine_version
       - create_release
@@ -122,7 +120,7 @@ jobs:
     uses: ./.github/workflows/windows.yml
     with:
       package_complete_version: ${{ needs.determine_version.outputs.complete_version }}
-      release_upload_url: ${{ needs.create_release.outputs.upload_url }}
+      release_id: ${{ needs.create_release.outputs.release_id }}
     needs:
       - determine_version
       - create_release
