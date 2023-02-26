@@ -131,6 +131,9 @@ jobs:
 
       - name: Build package
         run: |
+          # Pull in our common build functions
+          . .github/workflows/build_functions.sh
+
           # Set the correct version in cmake
           PACKAGE_VERSION=${{ inputs.package_complete_version }}
           EXTRA_CMAKE_ARGS="-DPERFORMOUS_VERSION=${PACKAGE_VERSION}"
@@ -150,24 +153,9 @@ jobs:
           # Run the build inside the docker containers using the
           # build script that was pulled inside during the build
           docker run --rm -v $(pwd):/github_actions_build/ ${{ env.CONTAINER_NAME }} ./build_performous.sh -g -D /github_actions_build/ -E ${EXTRA_CMAKE_ARGS} ${RELEASE_TYPE}
-          # Do some mangling to make a unique name based on the OS
-          # This is needed so we don't overwite in the release each time.
-          # We should probably investigate what cmake can do for package output
-          # to make this cleaner in the future
-          WORK_DIR=$(pwd)
-          PACKAGE_PATH=$(ls ${WORK_DIR}/build/Performous*-Linux.*)
-          PACKAGE_NAME=$(basename ${PACKAGE_PATH})
-          PACKAGE_SUFFIX=$(echo ${PACKAGE_NAME} | sed 's/^.*\(.\{4\}\)/\1/')
-          NEW_PACKAGE_NAME="${WORK_DIR}/Performous-${PACKAGE_VERSION}-${{ matrix.os }}_${{ matrix.version }}${PACKAGE_SUFFIX}"
-          MASTER_NEW_PACKAGE_NAME="${WORK_DIR}/Performous-latest-${{ matrix.os }}_${{ matrix.version }}${PACKAGE_SUFFIX}"
-          cp ${PACKAGE_PATH} ${MASTER_NEW_PACKAGE_NAME}
-          cp ${PACKAGE_PATH} ${NEW_PACKAGE_NAME}
-          ARTIFACT_NAME=$(basename ${NEW_PACKAGE_NAME})
-          MASTER_ARTIFACT_NAME=$(basename ${MASTER_NEW_PACKAGE_NAME})
-          echo "ARTIFACT_PATH=${NEW_PACKAGE_NAME}" >> ${GITHUB_ENV}
-          echo "ARTIFACT_NAME=${ARTIFACT_NAME}" >> ${GITHUB_ENV}
-          echo "MASTER_ARTIFACT_PATH=${MASTER_NEW_PACKAGE_NAME}" >> ${GITHUB_ENV}
-          echo "MASTER_ARTIFACT_NAME=${MASTER_ARTIFACT_NAME}" >> ${GITHUB_ENV}
+
+          # Provided by the common build functions
+          package_name "$(pwd)/build" "Performous*-Linux.*" "${PACKAGE_VERSION}" "${{ matrix.os }}" "${{ matrix.version }}"
 
       - name: Run unit tests
         run: |
