@@ -4,6 +4,7 @@
 #include "fs.hh"
 #include "configuration.hh"
 #include "glutil.hh"
+#include "songs.hh"
 #include "util.hh"
 #include "graphic/color_trans.hh"
 
@@ -12,11 +13,11 @@
 #include <cstdlib>
 
 Game::Game(Window& _window, Songs& _songs):
-  m_window(window),
+  m_window(_window),
   m_messagePopup(0.0, 1.0), m_textMessage(findFile("message_text.svg"), config["graphic/text_lod"].f()),
   m_loadingProgress(0.0f), m_logo(findFile("logo.svg")), m_logoAnim(0.0, 0.5)
 {
-	m_webserver = std::make_unique<WebServer>(_songs);
+	m_webserver = std::make_unique<WebServer>(*this, _songs);
 	m_textMessage.dimensions.middle().center(-0.05f);
 }
 
