@@ -21,7 +21,7 @@ static inline float virtH() { return float(screenH()) / screenW(); }
 
 /// handles the window
 class Window {
-	enum class Stereo3dType {RedCyan, GreenMagenta, OverUnder};
+	enum class Stereo3dType {RedCyan = 0, GreenMagenta = 1, OverUnder = 2};
 
   public:
 	Window();
