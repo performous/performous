@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14.5)
+cmake_minimum_required(VERSION 3.18.0)
 
 file(GLOB SOURCE_FILES
 	"*.cc"
@@ -205,9 +205,9 @@ if("AUTO" STREQUAL "${ENABLE_WEBSERVER}")
 		message(STATUS "Webserver support: Enabled (automatically found)")
 	else()
 		message(STATUS "Webserver support: Disabled (Restinio not found)")
-		SET (ENABLE_WEBSERVER OFF FORCE)
+		SET (ENABLE_WEBSERVER OFF CACHE FORCE)
 	endif()
-elseif("ALWAYS" STREQUAL "${ENABLE_WEBSERVER}")
+elseif("ON" STREQUAL "${ENABLE_WEBSERVER}")
 	# webserver explicitly requested, make it mandatory
 	find_package(RESTinio REQUIRED)
 	message(STATUS "Webserver support: Enabled (explicitly enabled)")

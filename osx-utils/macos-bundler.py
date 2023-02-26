@@ -22,6 +22,12 @@ opencv_prefix: Path = None
 script_prefix: Path = None
 performous_source_dir = None
 
+include_feature_args = ["--enable-webcam", "--enable-midi", "--enable-webserver"]
+include_feature_opts = ["auto", "on", "off" ]
+
+find_dep_args = ["--internal-aubio", "--internal-restinio", "--internal-json"]
+find_dep_opts = ["auto", "always", "never"]
+
 majorVer = None
 minorVer = None
 semVersion = None
@@ -203,12 +209,18 @@ Options:
 	-n --no-regenerate  Don't regenerate the CMake build system.
 	-v <version>, --package-version <version>  Sets the version on the Info.plist of the created .app. By default, it's calculated according to the latest stable version and hash of the latest commit.
 	-x --xcode-project  Generate an XCode project suitable for debugging. Note: to use this project, it's necessary to build the install target from XCode and then the performous target (or, alternatively, mirror the settings for the performous scheme on the install target)
+	--enable-midi <auto | on | off>  Defines whether to include MIDI support [default: auto]
+	--enable-webcam <auto | on | off>  Defines whether to include webcam support [default: auto]
+	--enable-webserver <auto | on | off>  Defines whether to include webserver support [default: auto]
 	--script-debug  Print the resolved arguments and options passed to this utility.
 
 Environment:
 	--arch <architecture>...  Target architecture names passed to the compiler. Defaults to the currently detected architecture as reported by uname. [default: {uname().machine}] 
 	--cc <path/to/compiler>  Change C compiler [default: /usr/bin/clang]
 	--cxx <path/to/compiler>  Change C compiler [default: /usr/bin/clang++]
+	--internal-aubio <auto | always | never>  Find previously installed aubio on system [default: auto]
+	--internal-json <auto | always | never>  Find previously installed nlohmann-json on system [default: auto]
+	--internal-restinio <auto | always | never>  Find previously installed restinio on system [default: always]
 	-p <prefix>, --prefix <prefix>  Set prefix path for searching of libraries and headers. By default, the tool tries to detect whether MacPorts or Homebrew are installed and the prefix is set accordingly. Note: If both are installed, you can choose.
 	(--prefer-macports | --prefer-homebrew)  Prefer either MacPorts or Homebrew.
 	-s <path>, --source <path>  Path to the Performous source. Defaults to ../
@@ -227,6 +239,16 @@ if __name__ == "__main__":
 	if arguments["--help"] == True:
 		print (usageHelp)
 		sys.exit(0)
+
+	for arg in find_dep_args:
+		if (arguments[arg] not in find_dep_opts):
+			print(f"Invalid value for {arg}; options are: {', '.join(find_dep_opts)}")
+			sys.exit(1)
+
+	for arg in include_feature_args:
+		if (arguments[arg] not in include_feature_opts):
+			print(f"Invalid value for {arg}; options are: {', '.join(include_feature_opts)}")
+			sys.exit(1)
 
 	detect_prefix()
 	set_version()
@@ -308,7 +330,12 @@ if __name__ == "__main__":
 		-DCMAKE_INSTALL_PREFIX:PATH="{str(performous_out_dir)}" \
 		-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
 		-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON \
-		-DSELF_BUILT_AUBIO:STRING=ALWAYS \
+		-DSELF_BUILT_AUBIO:STRING="{arguments['--internal-aubio']}" \
+		-DSELF_BUILT_JSON:STRING="{arguments['--internal-json']}" \
+		-DSELF_BUILT_RESTINIO:STRING={arguments['--internal-restinio']}" \
+		-DENABLE_MIDI:STRING="{arguments['--enable-midi']}" \
+		-DENABLE_WEBCAM:STRING="{arguments['--enable-webcam']}" \
+		-DENABLE_WEBSERVER:STRING="{arguments['--enable-webserver']}" \
 		-DFETCHCONTENT_QUIET:BOOL=ON \
 		-DCMAKE_POLICY_DEFAULT_CMP0126=NEW \
 		-DCMAKE_PREFIX_PATH:STRING="{prefix}" \

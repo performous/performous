@@ -97,8 +97,6 @@ jobs:
           - os: debian
             version: 11
           - os: fedora
-            version: 34
-          - os: fedora
             version: 35
           - os: fedora
             version: 36
@@ -136,7 +134,7 @@ jobs:
 
           # Set the correct version in cmake
           PACKAGE_VERSION=${{ inputs.package_complete_version }}
-          EXTRA_CMAKE_ARGS="-DPERFORMOUS_VERSION=${PACKAGE_VERSION}"
+          EXTRA_CMAKE_ARGS="-DPERFORMOUS_VERSION=${PACKAGE_VERSION} -DSELF_BUILT_RESTINIO=ALWAYS -DRESTINIO_FMT_HEADER_ONLY=ON"
 
           # Decide if we should build a 'Release' package or a 'RelWithDebInfo' (default)
           # For some reason, building with 'RelWithDebInfo' (default) doesn't work 
@@ -152,7 +150,7 @@ jobs:
 
           # Run the build inside the docker containers using the
           # build script that was pulled inside during the build
-          docker run --rm -v $(pwd):/github_actions_build/ ${{ env.CONTAINER_NAME }} ./build_performous.sh -g -D /github_actions_build/ -E ${EXTRA_CMAKE_ARGS} ${RELEASE_TYPE}
+          docker run --rm -v $(pwd):/github_actions_build/ ${{ env.CONTAINER_NAME }} ./build_performous.sh -g -D /github_actions_build/ -E "${EXTRA_CMAKE_ARGS}" ${RELEASE_TYPE}
 
           # Provided by the common build functions
           package_name "$(pwd)/build" "Performous*-Linux.*" "${PACKAGE_VERSION}" "${{ matrix.os }}" "${{ matrix.version }}"

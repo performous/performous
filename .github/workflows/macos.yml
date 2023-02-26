@@ -43,6 +43,7 @@ jobs:
         portaudio
         portmidi
         sdl2
+    #  restinio // Currently using a modded version so we'll provide it ourselves.
     steps:
       - name: Checkout Git
         id: checkout_git
@@ -76,7 +77,7 @@ jobs:
           cd performous/osx-utils
           chmod +x ./macos-bundler.py
           pip3 install -r ./macos-bundler-requirements.txt
-          ./macos-bundler.py --flat-output --package-version="${{ inputs.package_complete_version }}"
+          python3 ./macos-bundler.py --flat-output --package-version="${{ inputs.package_complete_version }}" --internal-restinio=always --enable-webserver=on --enable-midi=on --enable-webcam=on
           PACKAGE_PATH=$(ls "${{ github.workspace }}/performous/osx-utils/out/Performous-${{ inputs.package_complete_version }}.dmg")
           MASTER_PACKAGE_PATH="${{ github.workspace }}/performous/osx-utils/out/Performous-latest.dmg"
           cp -v ${PACKAGE_PATH} ${MASTER_PACKAGE_PATH}

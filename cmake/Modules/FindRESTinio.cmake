@@ -16,7 +16,7 @@ set(RESTinio_GIT_VERSION "performous")
 if(SELF_BUILT_RESTINIO STREQUAL "ALWAYS")
 	message(STATUS "RESTinio forced to build from source")
 	cmake_policy(SET CMP0077 NEW) # Ignore option directives from the RESTinio CMakeLists.
-	set (RESTINIO_FMT_HEADER_ONLY ON CACHE INTERNAL "Hacks for building as a Performous dependency." FORCE)
+	set (RESTINIO_FMT_HEADER_ONLY OFF CACHE INTERNAL "Hacks for building as a Performous dependency." FORCE)
 	set (RESTINIO_PERFORMOUS_HACK ON CACHE INTERNAL "Hacks for building as a Performous dependency." FORCE)
 	set (RESTINIO_FIND_DEPS ON CACHE INTERNAL "Hacks for building as a Performous dependency." FORCE)
 	libfetch_git_pkg(RESTinio
@@ -24,9 +24,6 @@ if(SELF_BUILT_RESTINIO STREQUAL "ALWAYS")
 		REFERENCE  ${RESTinio_GIT_VERSION}
 		SOURCE_SUBDIR dev
 	)
-	if (TARGET RESTinio AND NOT TARGET restinio::restinio)
-		add_library(restinio::restinio ALIAS RESTinio)
-	endif()
 	set (RESTinio_FOUND TRUE CACHE INTERNAL "Got RESTinio" FORCE)
 elseif(SELF_BUILT_RESTINIO STREQUAL "NEVER")
 	find_package(restinio REQUIRED CONFIG)
@@ -36,7 +33,7 @@ elseif(SELF_BUILT_RESTINIO STREQUAL "AUTO")
 	if(NOT restinio_FOUND)
 		message(STATUS "RESTInio build from source because not found on system")
 		cmake_policy(SET CMP0077 NEW) # Ignore option directives from the RESTinio CMakeLists.
-		set (RESTINIO_FMT_HEADER_ONLY ON CACHE INTERNAL "Hacks for building as a Performous dependency." FORCE)
+		set (RESTINIO_FMT_HEADER_ONLY OFF CACHE INTERNAL "Hacks for building as a Performous dependency." FORCE)
 		set (RESTINIO_PERFORMOUS_HACK ON CACHE INTERNAL "Hacks for building as a Performous dependency." FORCE)
 		set (RESTINIO_FIND_DEPS ON CACHE INTERNAL "Hacks for building as a Performous dependency." FORCE)
 		libfetch_git_pkg(RESTinio
@@ -44,9 +41,6 @@ elseif(SELF_BUILT_RESTINIO STREQUAL "AUTO")
 			REFERENCE  ${RESTinio_GIT_VERSION}
 			SOURCE_SUBDIR dev
 		)
-	if (TARGET RESTinio AND NOT TARGET restinio::restinio)
-		add_library(restinio::restinio ALIAS RESTinio)
-	endif()
 	set (RESTinio_FOUND TRUE CACHE INTERNAL "Got RESTinio" FORCE)
 	else()
 		set(RESTinio_VERSION ${RESTINIO_VERSION})
@@ -54,4 +48,9 @@ elseif(SELF_BUILT_RESTINIO STREQUAL "AUTO")
 	message(STATUS "Found RESTinio ${RESTINIO_VERSION}")
 else()
 	message(FATAL_ERROR "unknown SELF_BUILT_RESTINIO value \"${SELF_BUILT_RESTINIO}\". Allowed values are NEVER, AUTO and ALWAYS")
+endif()
+
+if (TARGET RESTinio AND (NOT TARGET restinio::restinio))
+	message(STATUS "Debug... making restinio alias target")
+	add_library(restinio::restinio ALIAS RESTinio)
 endif()

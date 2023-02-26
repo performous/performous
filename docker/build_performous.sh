@@ -13,7 +13,7 @@ usage() {
   echo ""
   echo "Optional Arguments:"
   echo "  -b <Git Branch>: Build the specified git branch, tag, or sha"
-  echo "  -D </path/to/build/directory>: Disable cloning the repo from git and build in the specified directory"
+  echo "  -T </path/to/temp-build/directory>: Disable cloning the repo from git and build in the specified directory"
   echo "  -E <'Extra Cmake Args'>: A quoted list of extra arguments to pass directly to cmake"
   echo "  -g : Generate Packages"
   echo "  -p <Pull Request #>: Build the specified Github Pull Request number"
@@ -65,15 +65,26 @@ else
 fi
 
 ## Set up some special cmake flags for fedora
-if [ "${ID}" == "fedora" ]; then
+if [[ "${ID}" == "fedora" ]]; then
   EXTRA_CMAKE_ARGS="${EXTRA_CMAKE_ARGS} -DUSE_BOOST_REGEX=1"
 fi
 
 ## Set more cmake flags for Debian 10
 # Debian Buster has system Aubio 0.4.5, this is not enough
 # because performous requires a minimum version of 0.4.9.
-if ([ "${ID}" = "debian" ] && [ "${VERSION_ID}" = "10" ]); then
+if ([[ "${ID}" == "debian" ]] && [[ "${VERSION_ID}" == "10" ]]); then
   EXTRA_CMAKE_ARGS="${EXTRA_CMAKE_ARGS} -DSELF_BUILT_AUBIO=ALWAYS -DSELF_BUILT_JSON=ALWAYS"
+  echo 'deb http://deb.debian.org/debian buster-backports main' >> /etc/apt/sources.list
+  apt-get -y update
+  apt-get -y install libfmt-dev/buster-backports
+elif ([[ "${ID}" == "ubuntu" ]] && [[ "${VERSION_ID}" == "20.04" ]]); then
+  apt-get -y update
+  apt-get -y install gnupg wget
+  wget -O ./key.asc https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null
+  gpg -v -o /usr/share/keyrings/kitware-archive-keyring.gpg --dearmor ./key.asc
+  `echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' | tee /etc/apt/sources.list.d/kitware.list >/dev/null`
+  apt-get -y update
+  apt-get -y install cmake
 fi
 
 if [ "${RELEASE_BUILD}" ]; then

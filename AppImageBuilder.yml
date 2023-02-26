@@ -27,7 +27,6 @@ AppDir:
       - libboost-program-options1.71.0
       - libc6
       - libcairo2
-      - libcpprest2.10
       - libepoxy0
       - libfontconfig1
       - libgcc-s1

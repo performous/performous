@@ -25,7 +25,7 @@ RUN if [ ${OS_VERSION} -eq 10 ]; then \
       libavcodec-dev libavformat-dev libswscale-dev libjpeg-dev \
       portaudio19-dev libglm-dev libboost-filesystem-dev \
       libboost-iostreams-dev libboost-locale-dev libboost-system-dev \
-      libboost-program-options-dev libssl-dev libcpprest-dev \
+      libboost-program-options-dev libssl-dev \
       libportmidi-dev libopencv-dev libaubio-dev nlohmann-json3-dev \
       libfmt-dev ca-certificates file && \
     if [ ${OS_VERSION} -eq 11 ]; then \
