@@ -1,11 +1,13 @@
 #pragma once
 
-#ifdef USE_WEBSERVER
-
-#include "requesthandler.hh"
+class Game;
 class Songs;
 
-class Game;
+#ifdef USE_WEBSERVER
+#include "requesthandler.hh"
+
+#include <memory>
+#include <thread>
 
 class WebServer
 {
@@ -21,8 +23,6 @@ private:
 	Songs& m_songs;
 };
 #else
-class Songs;
-class Game;
 
 class WebServer
 {

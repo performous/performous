@@ -6,34 +6,36 @@
 #include "engine.hh"
 #include "fs.hh"
 #include "glutil.hh"
+#include "graphic/window.hh"
 #include "i18n.hh"
 #include "log.hh"
 #include "platform.hh"
 #include "profiler.hh"
 #include "screen.hh"
 #include "songs.hh"
-#include "graphic/window.hh"
 #include "webcam.hh"
 #include "webserver.hh"
 
 // Screens
-#include "screen_intro.hh"
-#include "screen_songs.hh"
-#include "screen_sing.hh"
-#include "screen_practice.hh"
 #include "screen_audiodevices.hh"
+#include "screen_intro.hh"
 #include "screen_paths.hh"
 #include "screen_players.hh"
 #include "screen_playlist.hh"
+#include "screen_practice.hh"
+#include "screen_sing.hh"
+#include "screen_songs.hh"
 
-#include <fmt/format.h>
 #include <boost/program_options.hpp>
-#include <cstdlib>
-#include <cstdint>
+#include <fmt/format.h>
+
 #include <csignal>
+#include <cstdint>
+#include <cstdlib>
 #include <string>
 #include <thread>
 #include <vector>
+
 
 // Disable main level exception handling for debug builds (because gdb cannot properly catch throwing otherwise)
 #define RUNTIME_ERROR std::runtime_error

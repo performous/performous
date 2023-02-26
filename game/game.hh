@@ -1,17 +1,20 @@
 #pragma once
 
+#include "animvalue.hh"
+#include "audio.hh"
+#include "dialog.hh"
+#include "fbo.hh"
+#include "graphic/window.hh"
+#include "i18n.hh"
+#include "opengl_text.hh"
+#include "playlist.hh"
+#include "screen.hh"
+#include "singleton.hh"
+#include "webserver.hh"
+
 #include <memory>
 #include <string>
 
-#include "animvalue.hh"
-#include "opengl_text.hh"
-#include "graphic/window.hh"
-#include "dialog.hh"
-#include "playlist.hh"
-#include "fbo.hh"
-#include "audio.hh"
-#include "screen.hh"
-#include "i18n.hh"
 class Songs;
 
 class Game {

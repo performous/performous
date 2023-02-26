@@ -1,14 +1,20 @@
 #pragma once
+
+class Game;
+class Songs;
+
 #ifdef USE_WEBSERVER
+class Song;
+#include "configuration.hh"
+#include "fs.hh"
+#include "restinio_performous_logger_adapter.hh"
 #include "util.hh"
 
 #include <boost/asio.hpp>
 #include <boost/asio/ip/network_v4.hpp>
-#include <chrono>
 #include <nlohmann/json.hpp>
 #include <restinio/all.hpp>
 #include <restinio/helpers/http_field_parsers/cache-control.hpp>
-
 #ifdef USE_BOOST_REGEX
 #include <restinio/router/boost_regex_engine.hpp>
 using Performous_Router_t = restinio::router::express_router_t<restinio::router::boost_regex_engine_t>;
@@ -17,8 +23,10 @@ using Performous_Router_t = restinio::router::express_router_t<restinio::router:
 using Performous_Router_t = restinio::router::express_router_t<restinio::router::std_regex_engine_t>;
 #endif
 
-#include "screen_playlist.hh"
-#include "restinio_performous_logger_adapter.hh"
+#include <map>
+#include <memory>
+#include <vector>
+
 class Performous_IP_Blocker {
 	public:
 		restinio::ip_blocker::inspection_result_t inspect(restinio::ip_blocker::incoming_info_t const& info) noexcept {
@@ -60,7 +68,6 @@ class RequestHandler
 {
     public:
     	friend class WebServer;
-        RequestHandler(Game &game, Songs& songs);
         RequestHandler(Game &game, std::string url, unsigned short port, Songs& songs);
         ~RequestHandler();
         const boost::asio::ip::address_v4& getLocalIP() const { return m_local_ip; };
@@ -93,9 +100,6 @@ class RequestHandler
         boost::asio::ip::address_v4 m_local_ip;
 };
 #else
-class Songs;
-class Game;
-
 class RequestHandler
 {
 public:
