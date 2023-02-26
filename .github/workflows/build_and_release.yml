@@ -2,6 +2,10 @@ name: Build and Release Performous
 
 # Controls when the workflow will run
 on:
+  # Run on a schedule to get weekly updates for the Linux containers
+  # and keep the cache fresh for Windows builds. Runs Sundays at midnight.
+  schedule:
+    - cron: "0 0 * * 0"
   # Triggers the workflow on merges to master, release branches,
   # all PRs, and release tags 
   push:

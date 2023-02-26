@@ -1,10 +1,6 @@
 name: Build AppImage Packages
 
 on:
-  # Run on a schedule to get monthly updates
-  schedule:
-    - cron: "0 0 28 * *"
-
   # Run when called from other workflows
   workflow_call:
     inputs:

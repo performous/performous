@@ -1,11 +1,7 @@
 name: Build Linux Packages
 
 on:
-  # Run on a schedule to get monthly updates
-  schedule:
-    - cron: "0 0 28 * *"
-
-  # Run when called from other workflows
+  # Run when called from other workflows only
   workflow_call:
     inputs:
       package_complete_version:
@@ -134,11 +130,6 @@ jobs:
           build-args: OS_VERSION=${{ matrix.version }}
 
       - name: Build package
-        # Don't build the packages if triggered by cron because it will not
-        # have the correct inputs required to construct the package names correctly.
-        # The cron schedule is really for making sure the docker containers are
-        # up-to-date anyway.
-        if: ${{ github.event_name != 'schedule' }}
         run: |
           # Set the correct version in cmake
           PACKAGE_VERSION=${{ inputs.package_complete_version }}
@@ -179,7 +170,6 @@ jobs:
           echo "MASTER_ARTIFACT_NAME=${MASTER_ARTIFACT_NAME}" >> ${GITHUB_ENV}
 
       - name: Run unit tests
-        if: ${{ github.event_name != 'schedule' }}
         run: |
           # Run the containers with the script for each testing suite
           docker run --rm -v $(pwd):/github_actions_build/ ${{ env.CONTAINER_NAME }} ./run_tests.sh
