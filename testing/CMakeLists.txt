@@ -4,6 +4,7 @@ set(SOURCE_FILES
 	"analyzertest.cc"
 	"colortest.cc"
 	"configitemtest.cc"
+	"cycletest.cc"
 	"fixednotegraphscalertest.cc"
 	"notegraphscalerfactorytest.cc"
 	"printer.cc"

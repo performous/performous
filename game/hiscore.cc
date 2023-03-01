@@ -75,11 +75,8 @@ unsigned Hiscore::getHiscore(SongId songid) const {
 std::vector<HiscoreItem> Hiscore::getHiscores(SongId songid) const {
 	auto scores = std::vector<HiscoreItem>{};
 
-	for (auto const& score: m_hiscore) {
-		if (songid == score.songid && currentLevel() == score.level) {
-			scores.emplace_back(score);
-		}
-	}
+	std::copy_if(m_hiscore.begin(), m_hiscore.end(), std::back_inserter(scores),
+		[&](auto const& score){return songid == score.songid && currentLevel() == score.level;});
 
 	return scores;
 }
