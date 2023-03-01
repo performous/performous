@@ -356,25 +356,33 @@ std::string ScreenSongs::getHighScoreText() const {
 	for (auto const& hi: scores)
 		scoresByTrack[hi.track].insert(hi);
 
+	auto const scoreFormatter = [](auto& stream, auto const& score){
+		stream << std::setw(10) << std::right << score << " \t";
+	};
+	auto const playerFormatter = [this](auto& stream, auto const& playerId) {
+		const auto player = m_database.getPlayers().lookup(playerId);
+
+		stream << std::setw(25) << std::left << player.value_or("Unknown player Id " + std::to_string(playerId));
+	};
+	auto const timeFormatter = [datetimeFormat](auto& stream, auto const& unixtime){
+		if(unixtime.count()) {
+			stream << " \t" << format(unixtime, datetimeFormat);
+		}
+	};
 	auto stream = std::stringstream();
 	auto n = 0;
-	for (auto const& score: scoresByTrack) {
-		stream << score.first << ":\n";
-		for (auto const& hi: score.second) {
-			stream.width(10);
-			stream << std::right << hi.score<< " \t";
-			stream.width(25);
-			stream << std::left << m_database.getPlayers().lookup(hi.playerid).value_or("Unknown player Id " + std::to_string(hi.playerid));
-
-			if(hi.unixtime.count()) {
-				stream << " \t" << format(hi.unixtime, datetimeFormat);
-			}
-
+	for (auto const& [track, scores]: scoresByTrack) {
+		stream << track << ":\n";
+		for (auto const& score: scores) {
+			scoreFormatter(stream, score.score);
+			playerFormatter(stream, score.playerid);
+			timeFormatter(stream, score.unixtime);
 			stream << "\n";
 		}
 		stream << "\n";
-		if(++n == maxLines)
+		if(++n == maxLines) {
 			break;
+		}
 	}
 
 	return stream.str();

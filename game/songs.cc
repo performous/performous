@@ -9,7 +9,6 @@
 #include "platform.hh"
 #include "profiler.hh"
 #include "song.hh"
-#include "unicode.hh"
 
 #include "songorder/artist_song_order.hh"
 #include "songorder/edition_song_order.hh"
@@ -48,13 +47,13 @@ namespace {
 	}
 }
 
-Songs::Songs(Database & database, std::string const& songlist):
-  m_songlist(songlist),
-  m_database(database),
-  m_order(config["songs/sort-order"].ui()) {
+Songs::Songs(Database & database, std::string const& songlist)
+ : m_songlist(songlist),  m_database(database) {
 	m_updateTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
 
 	initializeSongOrders(*this);
+
+	m_order = Cycle<unsigned short>(config["songs/sort-order"].ui(), static_cast<unsigned short>(m_songOrders.size() - 1));
 
 	reload();
 }
@@ -488,42 +487,21 @@ std::string Songs::getSortDescription() const {
 }
 
 void Songs::sortChange(Game& game, SortChange diff) {
-	auto const orders = static_cast<decltype(m_order)>(m_songOrders.size());
-
 	switch(diff) {
 		case SortChange::BACK:
-			if(m_order == 0) {
-				m_order = orders - 1;
-			}
-			else {
-				--m_order;
-			}
+			m_order.backward();
 		break;
 		case SortChange::FORWARD:
-			if(++m_order == orders) {
-				m_order = 0;
-			}
+			m_order.forward();
 		break;
 		case SortChange::RESET:
-			m_order = 0;
+			m_order.set(0u);
 		break;
 	}
 
 	RestoreSel restore(*this);
 	config["songs/sort-order"].ui() = m_order;
-	switch (m_order) {
-		case 1:
-		 [[fallthrough]];
-		case 2:
-		 [[fallthrough]];
-		case 3:
-		 [[fallthrough]];
-		case 4:
-		 [[fallthrough]];
-		case 6:
-			UnicodeUtil::m_sortCollator->setStrength(config["game/case-sorting"].b() ? icu::Collator::TERTIARY : icu::Collator::SECONDARY);
-			break;
-		}
+
 	sort_internal();
 	writeConfig(game, false);
 }
@@ -540,19 +518,16 @@ void Songs::sortSpecificChange(unsigned short sortOrder, bool descending) {
 }
 
 void Songs::sort_internal(bool descending) {
-	if(m_order < m_songOrders.size()) {
-		auto begin = m_filtered.begin();
-		auto end = m_filtered.end();
-		auto& order = *m_songOrders[m_order];
-
-		order.prepare(m_filtered, m_database);
-
-		std::stable_sort(begin, end, [&](SongPtr const& a, SongPtr const& b) { return order(*a, *b) ? !descending : descending; });
-
-		return;
+	if(m_order >= m_songOrders.size()) {
+		throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
 	}
 
-	throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
+	auto& order = *m_songOrders[m_order];
+
+	order.prepare(m_filtered, m_database);
+
+	std::stable_sort(m_filtered.begin(), m_filtered.end(),
+		[&](SongPtr const& a, SongPtr const& b) { return order(*a, *b) ? !descending : descending; });
 }
 
 std::shared_ptr<Song> Songs::currentPtr() const try {

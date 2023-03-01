@@ -2,6 +2,10 @@
 
 #include "animvalue.hh"
 #include "fs.hh"
+#include "screen.hh"
+#include "songorder.hh"
+#include "utils/cycle.hh"
+
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
@@ -11,8 +15,6 @@
 #include <sstream>
 #include <thread>
 #include <vector>
-#include "screen.hh"
-#include "songorder.hh"
 #include <shared_mutex>
 
 class Game;
@@ -87,6 +89,13 @@ class Songs {
 	void LoadCache();
 	void CacheSonglist();
 
+	void dumpSongs_internal() const;
+	void reload_internal();
+	void reload_internal(fs::path const& p);
+	void randomize_internal();
+	void filter_internal();
+	void sort_internal(bool descending = false);
+
 	class RestoreSel;
 	std::string m_songlist;
 	// Careful the m_songs needs to be correctly locked when accessed, and
@@ -98,13 +107,7 @@ class Songs {
 	std::string m_filter;
 	Database & m_database;
 	unsigned short m_type = 0;
-	unsigned short m_order;  // Set by constructor
-	void dumpSongs_internal() const;
-	void reload_internal();
-	void reload_internal(fs::path const& p);
-	void randomize_internal();
-	void filter_internal();
-	void sort_internal(bool descending = false);
+	Cycle<unsigned short> m_order;  // Set by constructor
 	std::atomic<bool> m_dirty{ false };
 	std::atomic<bool> m_loading{ false };
 	std::unique_ptr<std::thread> m_thread;

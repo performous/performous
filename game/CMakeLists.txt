@@ -1,7 +1,18 @@
 cmake_minimum_required(VERSION 3.14.5)
 
-file(GLOB SOURCE_FILES "*.cc" "graphic/*.cc" "songorder/*.cc")
-file(GLOB HEADER_FILES "*.hh" "graphic/*.hh" "songorder/*.hh" "libda/*.hpp")
+file(GLOB SOURCE_FILES
+	"*.cc"
+	"graphic/*.cc"
+	"songorder/*.cc"
+	"utils/*.cc"
+)
+file(GLOB HEADER_FILES
+	"*.hh"
+	"graphic/*.hh"
+	"songorder/*.hh"
+	"utils/*.hh"
+	"libda/*.hpp"
+)
 
 # Fs is compiled/linked separately to ease switch boost/c++17
 list(REMOVE_ITEM SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/fs.cc)

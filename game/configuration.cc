@@ -284,9 +284,10 @@ void writeConfig(Game& game, bool system) {
 			auto const selectedValue = item.so();
 			xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(selectedValue);
 
-			for (auto const& str : item.ol())
+			for (auto const& str : item.ol()) {
 				if(str != selectedValue)
 					xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(str);
+			}
 		}
 	}
 	fs::path const& conf = system ? systemConfFile : userConfFile;

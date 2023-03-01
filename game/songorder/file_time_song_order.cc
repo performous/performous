@@ -13,7 +13,6 @@ namespace {
 	}
 }
 
-
 std::string FileTimeSongOrder::getDescription() const {
 	return _("sort by file time");
 }
