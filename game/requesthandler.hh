@@ -75,7 +75,7 @@ class RequestHandler
 {
 	public:
 		friend class WebServer;
-		RequestHandler(std::string url, unsigned short port, std::unique_ptr<boost::asio::io_context>& io_context, Songs& songs, Game& game);
+		RequestHandler(std::string url, unsigned short port, Songs& songs, Game& game);
 		~RequestHandler() = default;
 		boost::asio::ip::address_v4& getLocalIP() { return m_local_ip; }; ///< Query local IP.
 

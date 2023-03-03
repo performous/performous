@@ -6,10 +6,10 @@
 
 #ifdef USE_WEBSERVER
 
-RequestHandler::RequestHandler(std::string url, unsigned short port, std::unique_ptr<boost::asio::io_context>& io_context, Songs& songs, Game& game): m_songs(songs), m_game(game) {
+RequestHandler::RequestHandler(std::string url, unsigned short port, Songs& songs, Game& game): m_songs(songs), m_game(game) {
 	m_blocker = std::make_shared<Performous_IP_Blocker>();
 	m_restinio_server = std::make_unique<Performous_Server>(
-		restinio::external_io_context(*io_context),
+		restinio::own_io_context(),
 		make_server_settings(url, port));
 	m_local_ip = RequestHandler::getLocalIP(std::string("1.1.1.1"));
 	fs::path extensionsConfig = getConfigDir() / std::string("file-extensions.json");

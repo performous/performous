@@ -25,7 +25,6 @@ private:
 	std::unique_ptr<std::thread> m_serverThread = nullptr; ///< Thread responsible for initializing the RequestHandler.
 	std::unique_ptr<RequestHandler> m_server = nullptr; ///< The actual server.
 	Songs& m_songs; ///< Reference to the Songs database.
-	std::unique_ptr<boost::asio::io_context> m_io_context = nullptr; ///< ASIO io_context that holds the webserver logic.
 };
 
 #else

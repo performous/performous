@@ -48,7 +48,7 @@ void WebServer::startServer(int tried, bool fallbackPortInUse) {
 	}
 	std::clog << logMsg << std::endl;
 	try {
-		m_server = std::make_unique<RequestHandler>(addr, portToUse, m_io_context, m_songs, m_game);
+		m_server = std::make_unique<RequestHandler>(addr, portToUse, m_songs, m_game);
 		m_game.notificationFromWebserver(message);
 	} catch (std::exception& e) {
 		++tried;
@@ -61,14 +61,14 @@ void WebServer::startServer(int tried, bool fallbackPortInUse) {
 		startServer(tried, fallbackPortInUse);
 	}
 	try {
-		boost::asio::post(*m_io_context, [&] {
+		boost::asio::post(m_server->m_restinio_server->io_context(), [&] {
 				m_server->m_restinio_server->open_sync();
 				std::string ip((config["webserver/access"].ui() == 1) ? "localhost" : m_server->getLocalIP().to_string());
 				message += std::string("http://") += ip += std::string(":") += std::to_string(portToUse);
 		m_game.notificationFromWebserver(message);
 				});
 		Performous_IP_Blocker::setAllowedSubnet(m_server->getLocalIP());
-		m_io_context->run();
+		m_server->m_restinio_server->io_context().run();
 	} catch (std::exception& e) {
 		++tried;
 		message = std::string(e.what() + std::string(". \n"));
@@ -86,10 +86,9 @@ WebServer::WebServer(Game &game, Songs& songs) : m_game(game), m_songs(songs) {
 
 void WebServer::stopServer() {
 	try {
-		if (m_server && m_io_context) {
-			boost::asio::post(*m_io_context, [&] { m_server->m_restinio_server->close_sync(); });
+		if (m_server) {
+			boost::asio::post(m_server->m_restinio_server->io_context(), [&] { m_server->m_restinio_server->close_sync(); });
 		}
-		if (m_io_context) m_io_context->stop();
 		if (m_serverThread && m_serverThread->joinable()) { m_serverThread->join(); }
 	} catch (const std::exception &e) {
 		std::clog << std::string("webserver/error: Failed to close RESTinio server due to: ") + e.what() << std::endl;
