@@ -149,7 +149,7 @@ void Game::drawNotifications() {
 
 void Game::finished() {
 #ifdef USE_WEBSERVER
-	m_webserver->stopServer();
+	m_webserver->forceQuitServer();
 #endif
 	m_finished = true;
 }

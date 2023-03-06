@@ -10,27 +10,30 @@
 #include <boost/asio/ip/network_v4.hpp>
 #include <boost/asio/ip/address_v4_range.hpp>
 
-void WebServer::startServer(int tried, bool fallbackPortInUse) {
-	std::string message(_("Webserver active!\nConnect to this computer\nusing "));
+void WebServer::startServer() {
 	if(config["webserver/access"].ui() == 0) {
 		std::clog << "webserver/notice: Not starting webserver because it's been explicitly turned off." << std::endl;
 		return;
 	}
+	std::string message(_("Webserver active!\nConnect to this computer\nusing "));
 	if(tried > 2) {
 		message = _("Couldn't start webserver");
-		if(fallbackPortInUse == false) {
+		if(fallBackPort == false) {
 			message += _("; trying fallback port...");
 			std::clog << message << std::endl;
 			m_game.notificationFromWebserver("Couldn't start webserver tried 3 times. Trying fallback port...");
 			startServer(0, true);
+			tried = 0;
+			fallBackPort = true;
 			return;
 		}
 		message += _("on either port; will now disable it.");
 		std::clog << std::string("webserver/warning: " ) + message << std::endl;
 		m_game.notificationFromWebserver(message);
-			return;
+		_stop.set_value();
+		return;
 		}
-	unsigned short portToUse = fallbackPortInUse ? config["webserver/fallback_port"].ui() : config["webserver/port"].ui();
+	unsigned short portToUse = fallBackPort ? config["webserver/fallback_port"].ui() : config["webserver/port"].ui();
 	std::string addr;
 	std::string logMsg("webserver/notice: Starting webserver, binding to ");
 	if (config["webserver/access"].ui() == 1) {
@@ -50,33 +53,27 @@ void WebServer::startServer(int tried, bool fallbackPortInUse) {
 	try {
 		m_server = std::make_unique<RequestHandler>(addr, portToUse, m_songs, m_game);
 		m_game.notificationFromWebserver(message);
+		_stop.set_value();
 	} catch (std::exception& e) {
 		++tried;
-		message = std::string(e.what() + std::string(". \n"));
-		message += _("Trying again... (tried ") += std::to_string(tried) += std::string(" times).");
-		std::clog << std::string("webserver/error: ") + message << std::endl;
-;
+		message = fmt::format(_("{0}.\nTrying again... (tried {1} times.)"), e.what(), tried);		std::clog << std::string("webserver/error: ") + message << std::endl;
 		m_game.notificationFromWebserver(message);
-		std::this_thread::sleep_for(20s);
-		startServer(tried, fallbackPortInUse);
+		return;
 	}
 	try {
 		boost::asio::post(m_server->m_restinio_server->io_context(), [&] {
-				m_server->m_restinio_server->open_sync();
-				std::string ip((config["webserver/access"].ui() == 1) ? "localhost" : m_server->getLocalIP().to_string());
-				message += std::string("http://") += ip += std::string(":") += std::to_string(portToUse);
-		m_game.notificationFromWebserver(message);
+			m_server->m_restinio_server->open_sync();
+			std::string ip((config["webserver/access"].ui() == 1) ? "localhost" : m_server->getLocalIP().to_string());
+			message += std::string("http://") += ip += std::string(":") += std::to_string(portToUse);
+	m_game.notificationFromWebserver(message);
 				});
 		Performous_IP_Blocker::setAllowedSubnet(m_server->getLocalIP());
 		m_server->m_restinio_server->io_context().run();
 	} catch (std::exception& e) {
 		++tried;
-		message = std::string(e.what() + std::string(". \n"));
-		message += _("Trying again... (tried ") += std::to_string(tried) += std::string(" times).");
+		message = fmt::format(_("{0}.\nTrying again... (tried {1} times.)"), e.what(), tried);
 		std::clog << std::string("webserver/error: ") + message << std::endl;
 		m_game.notificationFromWebserver(message);
-		std::this_thread::sleep_for(20s);
-		startServer(tried, fallbackPortInUse);
 	}
 }
 
@@ -88,6 +85,7 @@ void WebServer::stopServer() {
 	try {
 		if (m_server) {
 			boost::asio::post(m_server->m_restinio_server->io_context(), [&] { m_server->m_restinio_server->close_sync(); });
+		m_server->m_restinio_server->io_context().stop();
 		}
 		if (m_serverThread && m_serverThread->joinable()) { m_serverThread->join(); }
 	} catch (const std::exception &e) {
@@ -97,7 +95,32 @@ void WebServer::stopServer() {
 
 void WebServer::restartServer() {
 	stopServer();
-	m_serverThread = std::make_unique<std::thread>([this] { startServer(0, false); });
+	std::promise<void>().swap(_stop);
+	auto future = std::shared_future<void>(_stop.get_future());
+	m_serverThread = std::make_unique<std::thread>([this, future]{
+		std::future_status status;
+		startServer();
+		do {
+			status = future.wait_for(std::chrono::seconds(20));
+			if (status == std::future_status::timeout) {
+				startServer();
+			} 
+			else if (status == std::future_status::ready) {
+				return;
+			}
+		} while (status != std::future_status::ready);
+	return;
+	});
 }
+
+void WebServer::forceQuitServer() {
+	try {
+		_stop.set_value();
+	} catch (std::future_error const& e) {
+		if (e.code() != std::future_errc::promise_already_satisfied) throw e;
+	}
+	stopServer();
+}
+
 
 #endif
