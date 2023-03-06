@@ -21,13 +21,12 @@ void WebServer::startServer() {
 		if(fallBackPort == false) {
 			message += _("; trying fallback port...");
 			std::clog << message << std::endl;
-			m_game.notificationFromWebserver("Couldn't start webserver tried 3 times. Trying fallback port...");
-			startServer(0, true);
+			m_game.notificationFromWebserver(_("Couldn't start webserver (tried 3 times.)\nTrying fallback port..."));
 			tried = 0;
 			fallBackPort = true;
 			return;
 		}
-		message += _("on either port; will now disable it.");
+		message += _(" on either port; will now disable it.");
 		std::clog << std::string("webserver/warning: " ) + message << std::endl;
 		m_game.notificationFromWebserver(message);
 		_stop.set_value();

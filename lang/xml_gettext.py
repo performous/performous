@@ -63,7 +63,7 @@ for filename in xmlfiles:
                 f'msgid "{text}"\n'
                 'msgstr ""\n'
             )
-        if elem.tag in ("enum"):
+        if elem.tag in ("enum") and elem.text:
             text = (
                 elem.text
                 .replace('\\', '\\\\')
