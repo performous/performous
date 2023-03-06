@@ -13,7 +13,7 @@ class Songs;
 class WebServer
 {
 public:
-	WebServer(Game &game, Songs& songs);
+	WebServer(Game& game, Songs& songs);
 	WebServer(WebServer&) = delete;
 	~WebServer() = default;
 	void restartServer(); ///< Public interface to restart WebServer if configuration changes.
