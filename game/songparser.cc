@@ -1,4 +1,5 @@
 #include "songparser.hh"
+#include "songparserexception.hh"
 #include "unicode.hh"
 #include "i18n.hh"
 #include "util.hh"

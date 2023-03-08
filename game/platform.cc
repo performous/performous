@@ -1,18 +1,23 @@
 #include "platform.hh"
 #include "fs.hh"
 
+#include <SDL_events.h>
+
 Platform::HostOS Platform::currentOS() {
-if constexpr(BOOST_OS_WINDOWS != 0) { return HostOS::OS_WIN; }
-else if constexpr(BOOST_OS_LINUX != 0) { return HostOS::OS_LINUX; }
-else if constexpr(BOOST_OS_MACOS != 0) { return HostOS::OS_MAC; }
-else if constexpr(BOOST_OS_BSD != 0) { return HostOS::OS_BSD; }
-else if constexpr(BOOST_OS_SOLARIS != 0) { return HostOS::OS_SOLARIS; }
-else if constexpr(BOOST_OS_UNIX != 0) { return HostOS::OS_UNIX; }
+	if constexpr(BOOST_OS_WINDOWS != 0) { return HostOS::OS_WIN; }
+	else if constexpr(BOOST_OS_LINUX != 0) { return HostOS::OS_LINUX; }
+	else if constexpr(BOOST_OS_MACOS != 0) { return HostOS::OS_MAC; }
+	else if constexpr(BOOST_OS_BSD != 0) { return HostOS::OS_BSD; }
+	else if constexpr(BOOST_OS_SOLARIS != 0) { return HostOS::OS_SOLARIS; }
+	else if constexpr(BOOST_OS_UNIX != 0) { return HostOS::OS_UNIX; }
 }
 
 std::uint16_t Platform::shortcutModifier(bool eitherSide) {
-	if (currentOS() == HostOS::OS_MAC) { return eitherSide ? KMOD_GUI : KMOD_LGUI; }
-	else { return eitherSide ? KMOD_CTRL : KMOD_LCTRL; }
+	if (currentOS() == HostOS::OS_MAC) {
+		return eitherSide ? KMOD_GUI : KMOD_LGUI;
+	}
+
+	return eitherSide ? KMOD_CTRL : KMOD_LCTRL;
 }
 
 Platform::Platform() {

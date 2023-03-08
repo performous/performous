@@ -107,7 +107,7 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 	} else if (nav == input::NavButton::CANCEL) {
 		if (m_menuPos != 1) m_menuPos = 1;  // Exit menu (back to song selection)
 		else if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }  // Clear search
-		else if (m_songs.typeNum()) m_songs.typeChange(Songs::SortChange::RESET);  // Clear type filter
+		else if (m_songs.typeNum() != FilterType::None) m_songs.typeChange(Songs::SortChange::RESET);  // Clear type filter
 		else getGame().activateScreen("Intro");
 	}
 	// The rest are only available when there are songs available
@@ -306,7 +306,7 @@ void ScreenSongs::draw() {
 		if (!m_search.text.empty()) {
 			oss_song << _("Sorry, no songs match the search!");
 			oss_order << m_search.text;
-		} else if (m_songs.typeNum()) {
+		} else if (m_songs.typeNum() != FilterType::None) {
 			oss_song << _("Sorry, no songs match the filter!");
 			oss_order << m_songs.typeDesc();
 		} else {
@@ -326,7 +326,7 @@ void ScreenSongs::draw() {
 		switch (m_menuPos) {
 		case 1:
 			if (!m_search.text.empty()) oss_order << m_search.text;
-			else if (m_songs.typeNum()) oss_order << m_songs.typeDesc();
+			else if (m_songs.typeNum() != FilterType::None) oss_order << m_songs.typeDesc();
 			else if (m_songs.sortNum()) oss_order << m_songs.getSortDescription();
 			else oss_order << _("<type in to search>") << PAD << HORIZ_ARROW << _("songs") << PAD << VERT_ARROW << _("options");
 			break;

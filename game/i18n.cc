@@ -1,7 +1,6 @@
 #include "i18n.hh"
 
 #include "config.hh"
-#include "configuration.hh"
 #include "fs.hh"
 #include "unicode.hh"
 
@@ -12,17 +11,17 @@ std::string TranslationEngine::m_package = PACKAGE;
 boost::locale::generator TranslationEngine::m_gen{};
 std::map<std::string, std::string> TranslationEngine::m_languages{};
 
-TranslationEngine::TranslationEngine() {
+TranslationEngine::TranslationEngine(ConfigItemMap& configuration) {
 	initializeAllLanguages();
 	/* set all languages in configuration.
 	 * They are kept untranslated internally which prevents having issues
 	 * when changing languages (and need to update internal stuff with
 	 * translations) */
-	populateLanguages(GetAllLanguages());
+	populateLanguages(GetAllLanguages(), configuration);
 
 	std::clog << "locale/debug: Checking if language is set in config." << std::endl;
 
-	auto prefValue = config["game/language"].getEnumName();
+	auto prefValue = configuration["game/language"].getEnumName();
 	auto lang = getLanguageByHumanReadableName(prefValue);
 
 	setLanguage(lang);
@@ -33,7 +32,7 @@ void TranslationEngine::initializeAllLanguages() {
 		std::cout << "add locale path: " << path << std::endl;
 		m_gen.add_messages_path(path);
 	}
-        
+
 	m_gen.add_messages_domain(m_package);
 	m_gen.locale_cache_enabled(true);
 
@@ -82,13 +81,13 @@ void TranslationEngine::setLanguage(const std::string& language, bool fromSettin
 	icu::RuleBasedCollator* search;
 	icu::RuleBasedCollator* sort;
 
-	error.reset();	
+	error.reset();
 	search = dynamic_cast<icu::RuleBasedCollator*>(icu::RuleBasedCollator::createInstance(searchLocale, error));
 	if (!search || error.isFailure()) throw std::runtime_error("Unable to create search collator. error: " + std::to_string(error.get()) + ": " + error.errorName());
 
 	error.reset();
 	sort = dynamic_cast<icu::RuleBasedCollator*>(icu::RuleBasedCollator::createInstance(sortLocale, error));
-	if (!sort || error.isFailure()) throw std::runtime_error("Unable to create search collator. error: " + 
+	if (!sort || error.isFailure()) throw std::runtime_error("Unable to create search collator. error: " +
 std::to_string(error.get()) + ": " + error.errorName());
 
 	UnicodeUtil::m_searchCollator.reset(search);
@@ -102,7 +101,7 @@ std::string TranslationEngine::getLanguageByHumanReadableName(const std::string&
 		return boost::locale::util::get_system_locale(true);
 	}
 
-	auto allLanguages = GetAllLanguages();	
+	auto allLanguages = GetAllLanguages();
 	std::string languageKey;
 	for (auto const& lang : allLanguages) {
 		if (lang.second == language) {
@@ -125,8 +124,8 @@ std::string TranslationEngine::getLanguageByKey(const std::string& languageKey) 
 	return allLanguages.at(languageKey);
 }
 
-std::pair<std::string, std::string> const& TranslationEngine::getCurrentLanguage() { 
-	return TranslationEngine::m_currentLanguage; 
+std::pair<std::string, std::string> const& TranslationEngine::getCurrentLanguage() {
+	return TranslationEngine::m_currentLanguage;
 }
 
 std::string TranslationEngine::getCurrentLanguageCode() {
@@ -168,19 +167,19 @@ std::map<std::string, std::string> TranslationEngine::GetAllLanguages(bool refre
 
 std::vector<std::string> TranslationEngine::getLocalePaths() {
 	auto paths = std::vector<std::string>{ ".", "./lang" };
-        
+
 	auto const* root = getenv("PERFORMOUS_ROOT");
-        
+
 	if(root) {
 		paths.emplace_back(root);
 		paths.emplace_back(root + std::string{"/lang"});
 	}
-        
+
 	auto const path = getLocaleDir().string();
-        
+
 	if(!path.empty())
 		paths.emplace_back(path);
-        
+
 	return paths;
 }
 

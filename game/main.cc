@@ -25,6 +25,7 @@
 #include "screen_paths.hh"
 #include "screen_players.hh"
 #include "screen_playlist.hh"
+#include "screen_songfilter.hh"
 
 #include <fmt/format.h>
 #include <boost/program_options.hpp>
@@ -101,7 +102,7 @@ void mainLoop(std::string const& songlist) {
 	Platform platform;
 	std::clog << "core/notice: Starting the audio subsystem (errors printed on console may be ignored)." << std::endl;
 	std::clog << "core/info: Loading assets." << std::endl;
-	TranslationEngine localization;
+	TranslationEngine localization(config);
 	TextureLoader m_loader;
 	Backgrounds backgrounds;
 	Database database(getConfigDir() / "database.xml");
@@ -164,6 +165,7 @@ void mainLoop(std::string const& songlist) {
 			}
 			g_take_screenshot = false;
 		}
+		gm.addScreen(std::make_unique<ScreenSongFilter>(gm, songs));
 		gm.updateScreen();  // exit/enter, any exception is fatal error
 		if (benchmarking) prof("misc");
 		try {
@@ -264,7 +266,7 @@ static void fatalError(const std::string &msg) {
 	std::clog << "core/error: " << errMsg << std::endl;
 }
 
-int main(int argc, char** argv) try {
+int main(int argc, char* argv[]) try {
 	Platform::setupPlatform();
 	std::srand(static_cast<unsigned>(std::time(nullptr)));
 	// Parse commandline options
