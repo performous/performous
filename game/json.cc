@@ -32,3 +32,13 @@ void writeJSON(nlohmann::json const& json, fs::path const& filename) {
 		std::clog << "fs/error: Could not save " + filename.string() + ": " + e.what() << std::endl;
 	}
 }
+
+bool contains(nlohmann::json const& json, const char* name) {
+    //if (json.contains(name))
+	if (json.find(name) != json.end())
+		return true;
+	
+	return false;
+
+}
+

@@ -1,5 +1,7 @@
 #include "random_song_order.hh"
 
+#include "i18n.hh"
+
 std::string RandomSongOrder::getDescription() const {
 	return _("random order");
 }
