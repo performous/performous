@@ -1,5 +1,6 @@
 #pragma once
 
+#include "fsdef.hh"
 #include "config.hh"
 
 #include <cstdint>
@@ -7,14 +8,6 @@
 #include <list>
 #include <vector>
 
-namespace fs {
-	using namespace std::filesystem;
-	using std::ifstream;
-	using std::fstream;
-	using std::ofstream;
-}
-
-using Paths = std::list<fs::path>;
 
 namespace {
 	struct PathCache {
@@ -29,27 +22,12 @@ namespace {
 
 		/// Expand a path specifier as a list of actual paths. Expands ~ (home) and DATADIR (Performous search path).
 		Paths pathExpand(fs::path p);
-
 		void pathBootstrap();
 		void pathInit();
 	} cache;
 }
 
-// Reimplment boost's absolute function with 2 parameters, according to its documentation:
-// https://www.boost.org/doc/libs/1_51_0/libs/filesystem/doc/reference.html#absolute
-static inline fs::path absolute(const fs::path& p, const fs::path& base) {
-	if (p.has_root_directory()) {
-		if (p.has_root_name())
-			return p;
-		else
-			return fs::absolute(base).root_name() / p;
-	} else {
-		if (p.has_root_name())
-			return p.root_name() / fs::absolute(base).root_directory() / fs::absolute(base).relative_path() / p.relative_path();
-		else
-			return fs::absolute(base) / p;
-	}
-}
+
 
 using BinaryBuffer = std::vector<std::uint8_t>;
 
@@ -83,7 +61,7 @@ fs::path getLocaleDir();  ///< Get the system local folder.
 
 fs::path findFile(fs::path const& filename);  ///< Look for the specified file in theme and data folders.
 
-BinaryBuffer readFile(fs::path const& path); ///< Reads a file into a buffer. 
+BinaryBuffer readFile(fs::path const& path); ///< Reads a file into a buffer.
 
 Paths listFiles(fs::path const& dir);  ///< List contents of specified folder in theme and data folders (omit duplicates).
 
