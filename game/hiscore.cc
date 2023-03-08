@@ -81,14 +81,6 @@ std::vector<HiscoreItem> Hiscore::getHiscores(SongId songid) const {
 	return scores;
 }
 
-unsigned Hiscore::getHiscore(unsigned songid) const {
-	for (auto const& score: m_hiscore) 
-		if (songid == score.songid && currentLevel() == score.level) 
-			return score.score;
-
-	return 0;
-}
-
 void Hiscore::load(xmlpp::NodeSet const& nodes) {
 	for (auto const& n: nodes) {
 		xmlpp::Element& element = dynamic_cast<xmlpp::Element&>(*n);

@@ -4,6 +4,7 @@
 
 #include "libxml++.hh"
 
+#include <optional>
 #include <memory>
 #include <set>
 #include <vector>

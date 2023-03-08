@@ -117,34 +117,26 @@ public:
 	bool hasGuitars() const { return instrumentTracks.size() - hasDrums() - hasKeyboard(); }
 	bool hasVocals() const { return !vocalTracks.empty(); }
 	bool hasDuet() const { return vocalTracks.size() > 1; }
+	bool hasSoloVocals() const { return vocalTracks.size() == 1; }
+	bool hasDuetVocals() const { return vocalTracks.size() == 2; }
 	bool hasControllers() const { return !danceTracks.empty() || !instrumentTracks.empty(); }
 	bool getNextSection(double pos, SongSection &section);
 	bool getPrevSection(double pos, SongSection &section);
+
+	void setTitle(std::string const&);
+	void setArtist(std::string const&);
+
+	using Year = unsigned;
+
+	Year getYear() const;
+	void setYear(Year year);
+
 private:
 	void collateUpdate();   ///< Rebuild collate variables (used for sorting) from other strings
 
 	ISongParser& m_parser;
-	unsigned m_year = 0;
-};
-
-/// Thrown by SongParser when there is an error
-struct SongParserException: public std::runtime_error {
-	/// constructor
-	SongParserException(Song& s, std::string const& msg, unsigned int linenum, bool sil = false): runtime_error(msg), m_filename(s.filename), m_linenum(linenum), m_silent(sil) {
-		if (!sil) s.b0rked += msg + '\n';
-	}
-	~SongParserException() noexcept = default;
-	fs::path const& file() const { return m_filename; } ///< file in which the error occured
-	unsigned int line() const { return m_linenum; } ///< line in which the error occured
-	bool silent() const { return m_silent; } ///< if the error should not be printed to user (file skipped)
-private:
-	fs::path m_filename;
-	unsigned int m_linenum;
-	bool m_silent;
+	Year m_year = 0;
 };
 
 using SongPtr = std::shared_ptr<Song>;
 using SongCollection = std::vector<SongPtr>;
-
-/// Print a SongParserException in a format suitable for the logging system.
-std::ostream& operator<<(std::ostream& os, SongParserException const& e);

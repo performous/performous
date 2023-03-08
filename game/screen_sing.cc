@@ -14,6 +14,7 @@
 #include "platform.hh"
 #include "screen_players.hh"
 #include "songparser.hh"
+#include "songparserexception.hh"
 #include "util.hh"
 #include "video.hh"
 #include "webcam.hh"

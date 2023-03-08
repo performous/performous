@@ -67,7 +67,7 @@ std::string UnicodeUtil::convertToUTF8 (std::string_view str, std::string _filen
 	if (assumeUTF8) charset = "UTF-8";
 	else charset = UnicodeUtil::getCharset(str);
 		if (charset != "UTF-8") {
-			if (!_filename.empty()) std::clog << "unicode/info: " << _filename << " does not appear to be UTF-8; (" << charset << ") detected." << std::endl; 
+			if (!_filename.empty()) std::clog << "unicode/info: " << _filename << " does not appear to be UTF-8; (" << charset << ") detected." << std::endl;
 			ustring = UnicodeUtil::getConverter(charset).convertToUTF8(str);
 		}
 	else { ustring = icu::UnicodeString::fromUTF8(str.data()); }
@@ -163,7 +163,7 @@ std::string UnicodeUtil::toTitle (std::string_view str) {
 }
 
 void UnicodeUtil::collate (songMetadata& stringmap) {
-	for (auto const& [key, value]: stringmap) { 
+	for (auto const& [key, value]: stringmap) {
 		ConfigItem::StringList termsToCollate = config["game/sorting_ignore"].sl();
 		std::string pattern = std::string ("^((");
 		for (auto term : termsToCollate) {
@@ -175,8 +175,7 @@ void UnicodeUtil::collate (songMetadata& stringmap) {
 				pattern += std::string(")\\s(.+))$");
 			}
 		}
-		std::string collatedString = regex_replace(convertToUTF8(value),
-		std::regex(pattern, std::regex_constants::icase), "$3,$2");
+		std::string collatedString = regex_replace(convertToUTF8(value), std::regex(pattern, std::regex_constants::icase), "$3,$2");
 		stringmap[key] = collatedString;
 	}
 }

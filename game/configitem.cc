@@ -203,7 +203,6 @@ void ConfigItem::selectEnum(std::string const& name) {
 	ui() = static_cast<unsigned short>(it - m_enums.begin());
 }
 
-
 std::string const ConfigItem::getEnumName() const {
 	unsigned short const& val = ui();
 	if (val < m_enums.size())
@@ -212,3 +211,14 @@ std::string const ConfigItem::getEnumName() const {
 	return {};
 }
 
+
+void populateLanguages(const std::map<std::string, std::string>& languages, ConfigItemMap& configuration) {
+	auto& languageConfig = configuration["game/language"];
+
+	for (auto const& language : languages) {
+		languageConfig.addEnum(language.second);
+	}
+
+	languageConfig.selectEnum(languageConfig.getValue());
+	languageConfig.setOldValue(languageConfig.getEnumName());
+}

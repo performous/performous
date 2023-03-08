@@ -15,7 +15,7 @@ extern "C" {
 }
 
 Song::Song(ISongParser& parser, nlohmann::json const& song)
-: m_parser(parser), dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()) {
+: dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()), m_parser(parser) {
 	path = getJsonEntry<std::string>(song, "txtFileFolder").value_or("");
 	filename = getJsonEntry<std::string>(song, "txtFile").value_or("");
 	artist = getJsonEntry<std::string>(song, "artist").value_or("");
@@ -77,15 +77,16 @@ Song::Song(ISongParser& parser, nlohmann::json const& song)
 }
 
 Song::Song(ISongParser& parser,fs::path const& path, fs::path const& filename):
-  m_parser(parser), dummyVocal(TrackName::VOCAL_LEAD), path(path), filename(filename), randomIdx(rand())
+  dummyVocal(TrackName::VOCAL_LEAD), path(path), filename(filename), randomIdx(rand()), m_parser(parser)
 {
 	parser.parse(*this);
 	collateUpdate();
 }
 
 Song::Song(ISongParser& parser)
-: m_parser(parser), dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()) {
+: dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()), m_parser(parser) {
 }
+
 
 void Song::reload(bool errorIgnore) {
 	try {
@@ -168,13 +169,6 @@ bool Song::getPrevSection(double pos, SongSection &section) {
 	return false;
 }
 
-std::ostream& operator<<(std::ostream& os, SongParserException const& e) {
-	os << (e.silent() ? "songparser/debug: " : "songparser/warning: ") << e.file().string();
-	if (e.line()) os << ":" << e.line();
-	os << ":\n  " << e.what() << std::endl;
-	return os;
-}
-
 void Song::insertVocalTrack(std::string vocalTrack, VocalTrack track) {
 	eraseVocalTrack(vocalTrack);
 	vocalTracks.insert(std::make_pair(vocalTrack, track));
@@ -198,12 +192,12 @@ VocalTrack& Song::getVocalTrack(std::string vocalTrack) {
 
 VocalTrack& Song::getVocalTrack(unsigned idx) {
 	if (idx >= static_cast<unsigned>(vocalTracks.size())) {
-        return dummyVocal;
+		return dummyVocal;
 	} else {
-        VocalTracks::iterator it = vocalTracks.begin();
-        std::advance(it, idx);
-        return it->second;
-    }
+		VocalTracks::iterator it = vocalTracks.begin();
+		std::advance(it, idx);
+		return it->second;
+	}
 }
 
 double Song::getDurationSeconds() {
@@ -223,7 +217,9 @@ double Song::getDurationSeconds() {
 	}
 }
 
-std::string Song::str() const { return title + "  by  " + artist; }
+std::string Song::str() const {
+	return title + "  by  " + artist;
+}
 
 std::string Song::strFull() const {
 	return title + "\n" + artist + "\n" + genre + "\n" + edition + "\n" + path.string();
@@ -233,4 +229,24 @@ std::vector<std::string> Song::getVocalTrackNames() const {
 	std::vector<std::string> result;
 	for (auto const& kv: vocalTracks) result.push_back(kv.first);
 	return result;
+}
+
+void Song::setTitle(std::string const& title) {
+	this->title = title;
+
+	collateUpdate();
+}
+
+void Song::setArtist(std::string const& artist)	{
+	this->artist = artist;
+
+	collateUpdate();
+}
+
+Song::Year Song::getYear() const {
+	return m_year;
+}
+
+void Song::setYear(Year year) {
+	m_year = year;
 }
