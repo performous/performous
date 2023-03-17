@@ -11,8 +11,7 @@ std::string TranslationEngine::m_package = PACKAGE;
 boost::locale::generator TranslationEngine::m_gen{};
 std::map<std::string, std::string> TranslationEngine::m_languages{};
 
-TranslationEngine::TranslationEngine(ConfigItemMap& configuration)
-: m_configuration(configuration) {
+TranslationEngine::TranslationEngine(ConfigItemMap& configuration) {
 	initializeAllLanguages();
 	/* set all languages in configuration.
 	 * They are kept untranslated internally which prevents having issues

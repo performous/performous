@@ -25,7 +25,7 @@ namespace std {
 //		auto r = std::distance(it, c.end());
 //		c.erase(it, c.end());
 //		return r;
-		auto n = 0;
+		auto n = 0u;
 		for(auto it = c.begin(); it != c.end();) {
 			if(pred(*it)) {
 				it = c.erase(it);

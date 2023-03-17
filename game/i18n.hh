@@ -30,6 +30,4 @@ private:
 	static std::string m_package;
 	static boost::locale::generator m_gen;
 	static std::map<std::string, std::string> m_languages;
-
-	ConfigItemMap& m_configuration;
 };

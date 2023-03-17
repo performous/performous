@@ -79,7 +79,7 @@ class List : public Control {
 	std::vector<Text> m_texts;
 	std::vector<std::unique_ptr<Image>> m_icons;
 	std::vector<std::unique_ptr<CheckBox>> m_checkBoxs;
-	size_t m_selected = -1;
+	size_t m_selected = size_t(-1);
 	std::function<void(List&, size_t, size_t)> m_onSelectionChanged;
 	bool m_displayIcon = false;
 	bool m_displayCheckBox = false;

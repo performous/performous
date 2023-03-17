@@ -5,11 +5,12 @@
 
 namespace {
 	struct TestParser : public ISongParser {
-		void parse(Song& ) override {}
+		void parse(Song&) override {
+		}
 	};
-	
+
 	TestParser parser;
-	
+
 	Song createSong(int year) {
 		auto&& song = Song(parser);
 

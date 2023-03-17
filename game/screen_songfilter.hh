@@ -21,7 +21,7 @@ class ScreenSongFilter : public FormScreen {
 	void draw() override;
 	void enter() override;
 	void exit() override;
-	void reloadGL() { exit(); enter(); }
+	void reloadGL() override { exit(); enter(); }
 
   protected:
 	void onCancel() override;

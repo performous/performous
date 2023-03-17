@@ -37,7 +37,7 @@ SongCollectionFilter::SongCollection SongCollectionFilter::filter(SongCollection
 			if (!m_filterString.empty()) {
 				icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8(song->strFull()), UnicodeUtil::m_searchCollator.get(), nullptr, icuError);
 
-				return (search.first(icuError) != USEARCH_DONE);
+				return search.first(icuError) == USEARCH_DONE;
 			}
 
 			// If we still haven't returned, it must be a type match with an empty search string.

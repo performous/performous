@@ -1,7 +1,7 @@
 #include "unicode.hh"
 
 #include "configuration.hh"
-#include "game.hh"
+//#include "game.hh"
 
 #include <regex>
 #include <stdexcept>
@@ -9,6 +9,7 @@
 #include <unicode/ustream.h>
 #include <unicode/ubidi.h>
 #include "compact_enc_det/compact_enc_det.h"
+#include "i18n.hh"
 
 std::unique_ptr<icu::RuleBasedCollator> UnicodeUtil::m_searchCollator;
 std::unique_ptr<icu::RuleBasedCollator> UnicodeUtil::m_sortCollator;

@@ -264,7 +264,7 @@ static void fatalError(const std::string &msg) {
 	std::clog << "core/error: " << errMsg << std::endl;
 }
 
-int main(int argc, char** argv) try {
+int main(int argc, char* argv[]) try {
 	Platform::setupPlatform();
 	std::srand(static_cast<unsigned>(std::time(nullptr)));
 	// Parse commandline options

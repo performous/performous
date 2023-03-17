@@ -1,7 +1,6 @@
 #pragma once
 
-#include "fs.hh"
-#include "i18n.hh"
+#include "fsdef.hh"
 #include "json.hh"
 #include "notes.hh"
 #include "isongparser.hh"
@@ -105,7 +104,7 @@ public:
 	std::string str() const;  ///< Return "title by artist" string for UI
 	std::string strFull() const;  ///< Return multi-line full song info (used for searching)
 	/** Get the song status at a given timestamp **/
-	Status status(double time, ScreenSing* song);
+	Status status(double time, bool menuOpen, bool singingDuet, unsigned selectedVocalTrack);
 	// Get a selected track, or VOCAL_LEAD if not found or the first one if not found
 	VocalTrack& getVocalTrack(std::string vocalTrack = TrackName::VOCAL_LEAD);
 	VocalTrack& getVocalTrack(unsigned idx = 0);

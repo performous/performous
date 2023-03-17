@@ -28,6 +28,6 @@ class Select : public Control {
 	Text m_text;
 	Texture m_background;
 	std::vector<std::string> m_items;
-	size_t m_selected = -1;
+	size_t m_selected = size_t(-1);
 };
 

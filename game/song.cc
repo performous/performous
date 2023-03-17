@@ -1,6 +1,6 @@
 #include "song.hh"
 #include "config.hh"
-#include "screen_sing.hh"
+//#include "screen_sing.hh"
 #include "songparser.hh"
 #include "unicode.hh"
 #include "util.hh"
@@ -70,7 +70,7 @@ Song::Song(ISongParser& parser, nlohmann::json const& song)
 	if (getJsonEntry<bool>(song, "guitarTracks").value_or(false)) {
 		instrumentTracks.insert(std::make_pair(TrackName::GUITAR, InstrumentTrack(TrackName::GUITAR)));
 	}
-	if (song.contains("bpm")) {
+	if (contains(song, "bpm")) {
 		m_bpms.push_back(BPM(0, 0, song.at("bpm").get<float>()));
 	}
 	collateUpdate();
@@ -127,18 +127,18 @@ void Song::collateUpdate() {
 	collateByArtistOnly = collateInfo["artist"];
 }
 
-Song::Status Song::status(double time, ScreenSing* song) {
-	if (song->getMenu().isOpen()) return Status::NORMAL; // This should prevent querying getVocalTrack with an out-of-bounds/uninitialized index.
+Song::Status Song::status(double time, bool menuOpen, bool singingDuet, unsigned selectedVocalTrack) {
+	if (menuOpen) return Status::NORMAL; // This should prevent querying getVocalTrack with an out-of-bounds/uninitialized index.
 	if (vocalTracks.empty()) return Status::NORMAL;  // To avoid crash with non-vocal songs (dance, guitar) -- FIXME: what should we actually do?
 	Note target; target.end = time;
 	Notes* notes = nullptr;
 	Notes::const_iterator it;
 
-	if (song->singingDuet()) {
+	if (singingDuet) {
 		notes = &getVocalTrack(SongParserUtil::DUET_BOTH).notes;
 	}
 	else {
-		notes = &getVocalTrack(song->selectedVocalTrack()).notes;
+		notes = &getVocalTrack(selectedVocalTrack).notes;
 	}
 	it = std::lower_bound(notes->begin(), notes->end(), target, [](Note const& a, Note const& b) { return a.end < b.end; });
 	if (it == notes->end()) return Status::FINISHED;
