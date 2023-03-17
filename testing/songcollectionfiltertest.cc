@@ -37,9 +37,9 @@ struct UnitTest_SongCollectionFilter : public testing::Test {
 	SongCollection makeCollection() {
 		auto songs = SongCollection();
 
-		songs.emplace_back(makeSong("song x", 1991, "en"));
-		songs.emplace_back(makeSong("song y", 1995, "de"));
-		songs.emplace_back(makeSong("song z", 1981, "fr"));
+		songs.emplace_back(makeSong("song 1", 1991, "en"));
+		songs.emplace_back(makeSong("song 2", 1995, "de"));
+		songs.emplace_back(makeSong("song 3", 1981, "fr"));
 
 		return songs;
 	}
@@ -71,9 +71,9 @@ TEST_F(UnitTest_SongCollectionFilter, type_drums) {
 	EXPECT_THAT(result.size(), Eq(0));
 }
 
-TEST_F(UnitTest_SongCollectionFilter, DISABLED_string_x) {
+TEST_F(UnitTest_SongCollectionFilter, string_1) {
 	auto songs = makeCollection();
-	auto const filter = SongCollectionFilter().setFilter("x");
+	auto const filter = SongCollectionFilter().setFilter("1");
 	auto const result = filter.filter(songs);
 
 	EXPECT_THAT(result.size(), Eq(1));

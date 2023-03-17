@@ -94,6 +94,11 @@ if(GTest_FOUND)
 	target_include_directories(performous_test SYSTEM PRIVATE ${ICU_INCLUDE_DIRS})
 	target_link_libraries(performous_test PRIVATE ${ICU_LIBRARIES})
 
+# Generate config.hh
+configure_file("../game/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
+include_directories("${CMAKE_CURRENT_BINARY_DIR}")
+
+
 	target_include_directories(performous_test PRIVATE "." ".." "../game" "../3rdparty/ced")
 	target_link_libraries(performous_test PRIVATE fs ced aubio)
 
