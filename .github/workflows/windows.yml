@@ -53,27 +53,27 @@ jobs:
           set VCPKG_BINARY_SOURCES="files,${{ github.workspace }}\vcpkg_cache,read"
           cd ${{ github.workspace }}/performous
           echo $PERFORMOUS_VERSION
-          cmake --preset "x64-release" -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_OVERLAY_TRIPLETS="${{ github.workspace }}\performous\cmake\triplets"
-          cmake --build --preset "x64-release"
+          cmake --preset "x64-debinfo" -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_OVERLAY_TRIPLETS="${{ github.workspace }}\performous\cmake\triplets"
+          cmake --build --preset "x64-debinfo"
       - name: Run unittests directly called.
         run: |
-          cd "performous/build/x64-release/testing"
+          cd "performous/build/x64-debinfo/testing"
           ./performous_test.exe --gtest_filter=UnitTest*
       - name: Run unittests by ctest.
         run: |
-          cd "performous/build/x64-release"
+          cd "performous/build/x64-debinfo"
           ninja testing/test
       - name: Create Installer
         id: package_performous_x64
         run: |
-           cd performous/build/x64-release
-           cpack -G NSIS64 x64-release
+           cd performous/build/x64-debinfo
+           cpack -G NSIS64 x64-debinfo
            Copy-Item $(Get-ChildItem -Filter '*win64.exe').Name "Performous-latest-msvc.exe"
            Rename-Item $(Get-ChildItem -Filter '*win64.exe').Name -NewName "Performous-${{ inputs.package_complete_version }}-msvc.exe"
            chcp 65001 #set code page to utf-8
-           echo ("ARTIFACT_PATH=${{ github.workspace }}/performous/build/x64-release/Performous-${{ inputs.package_complete_version }}-msvc.exe") >> $env:GITHUB_ENV
+           echo ("ARTIFACT_PATH=${{ github.workspace }}/performous/build/x64-debinfo/Performous-${{ inputs.package_complete_version }}-msvc.exe") >> $env:GITHUB_ENV
            echo ("ARTIFACT_FILENAME=Performous-${{ inputs.package_complete_version }}-msvc.exe") >> $env:GITHUB_ENV
-           echo ("MASTER_ARTIFACT_PATH=${{ github.workspace }}/performous/build/x64-release/Performous-latest-msvc.exe") >> $env:GITHUB_ENV
+           echo ("MASTER_ARTIFACT_PATH=${{ github.workspace }}/performous/build/x64-debinfo/Performous-latest-msvc.exe") >> $env:GITHUB_ENV
            echo ("MASTER_ARTIFACT_FILENAME=Performous-latest-msvc.exe") >> $env:GITHUB_ENV
 
       - name: Upload artifacts
@@ -166,7 +166,7 @@ jobs:
           mkdir build
           for f in $(ls -Q ./lang/*.po); do mkdir -pv "./build/lang/$(basename $f | cut -d. -f1)/LC_MESSAGES";done
           cd build
-          "${{ env.workpath }}/msys64/mingw64/bin/cmake.exe" -G "MinGW Makefiles" .. -DCMAKE_BUILD_TYPE="Release" -DSELF_BUILT_AUBIO=ALWAYS -DENABLE_WEBSERVER=ON             -DSELF_BUILT_RESTINIO=ALWAYS -DRESTINIO_FMT_HEADER_ONLY=ON -DPERFORMOUS_VERSION=${{ env.PERFORMOUS_VERSION }} -DCMAKE_VERBOSE_MAKEFILE=ON -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64"
+          "${{ env.workpath }}/msys64/mingw64/bin/cmake.exe" -G "MinGW Makefiles" .. -DCMAKE_BUILD_TYPE="RelWithDebInfo" -DSELF_BUILT_AUBIO=ALWAYS -DENABLE_WEBSERVER=ON             -DSELF_BUILT_RESTINIO=ALWAYS -DRESTINIO_FMT_HEADER_ONLY=ON -DPERFORMOUS_VERSION=${{ env.PERFORMOUS_VERSION }} -DCMAKE_VERBOSE_MAKEFILE=ON -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64"
           "${{ env.workpath }}/msys64/mingw64/bin/cmake.exe" --build ./ --verbose --parallel 3
       - name: Run unittests directly called.
         shell: msys2 {0}
@@ -183,7 +183,7 @@ jobs:
         shell: msys2 {0}
         run: |
            cd "${{ env.workpath }}/performous/build"
-           "${{ env.workpath }}/msys64/mingw64/bin/cpack.exe" -G NSIS64 -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64" -DCPACK_NSIS_EXECUTABLE="${{ env.workpath }}/msys64/mingw64/bin/makensis.exe" -DCMAKE_BUILD_TYPE="Release" --verbose
+           "${{ env.workpath }}/msys64/mingw64/bin/cpack.exe" -G NSIS64 -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64" -DCPACK_NSIS_EXECUTABLE="${{ env.workpath }}/msys64/mingw64/bin/makensis.exe" -DCMAKE_BUILD_TYPE="RelWithDebInfo" --verbose
            powershell -command "Copy-Item \$(Get-ChildItem -Filter '*win64.exe').Name 'Performous-latest-mingw-w64.exe'"
            powershell -command "Rename-Item \$(Get-ChildItem -Filter '*win64.exe').Name -NewName 'Performous-${{ inputs.package_complete_version }}-mingw-w64.exe'"
            powershell -command "echo ('ARTIFACT_PATH=${{ env.workpath }}/performous/build/Performous-${{ inputs.package_complete_version }}-mingw-w64.exe') >> \$env:GITHUB_ENV"
