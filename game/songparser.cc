@@ -1,8 +1,11 @@
 #include "songparser.hh"
 #include "unicode.hh"
+#include "i18n.hh"
 #include "util.hh"
+
 #include <cmath>
 #include <regex>
+#include <set>
 
 #include <boost/algorithm/string.hpp>
 #include <fstream>
@@ -52,25 +55,25 @@ namespace SongParserUtil {
 	}
 }
 
-SongParser::SongParser(Song& s): m_song(s) {
+void SongParser::parse(Song& song) {
 	try {
 		enum class Type { NONE, TXT, XML, INI, SM } type = Type::NONE;
 		// Read the file, determine the type and do some initial validation checks
-		std::ifstream f (s.filename.string(), std::ios::binary);
+		std::ifstream f (song.filename.string(), std::ios::binary);
 		if (!f.is_open()) {
-			throw SongParserException (s, "Could not open song file", 0);
+			throw SongParserException (song, "Could not open song file", 0);
 		}
 		m_ss << f.rdbuf();
 		size_t size = m_ss.str().length();
 		if ((size < 10) || (size > 100000)) {
-			throw SongParserException (s, "Does not look like a song file (wrong size)", 1, true);
+			throw SongParserException (song, "Does not look like a song file (wrong size)", 1, true);
 		}
 		// Convert m_ss; filename supplied for possible warning messages
 		if (xmlCheck (m_ss.str())) {
 			type = Type::XML;	// XMLPP should deal with encoding so we don't have to.
 		}
 		else {
-			std::string ss = UnicodeUtil::convertToUTF8(m_ss.str(), s.filename.string());
+			std::string ss = UnicodeUtil::convertToUTF8(m_ss.str(), song.filename.string());
 			if (smCheck (ss)) type = Type::SM;
 			else if (txtCheck (ss)) {
 				type = Type::TXT;
@@ -79,75 +82,78 @@ SongParser::SongParser(Song& s): m_song(s) {
 				type = Type::INI;
 			}
 			else {
-				throw SongParserException (s, "Does not look like a song file (wrong header)", 1, true);
+				throw SongParserException (song, "Does not look like a song file (wrong header)", 1, true);
 			}
 			m_ss.str(ss);
 		}
 		// Header already parsed?
-		if (s.loadStatus == Song::LoadStatus::HEADER) {
-			if (!s.m_bpms.empty()) {
-				float bpm = static_cast<float>(15.0 / s.m_bpms.front().step);
-				s.m_bpms.clear();
-				addBPM(0, bpm);
+		if (song.loadStatus == Song::LoadStatus::HEADER) {
+			if (!song.m_bpms.empty()) {
+				float bpm = static_cast<float>(15.0 / song.m_bpms.front().step);
+				song.m_bpms.clear();
+				addBPM(song, 0, bpm);
 			}
-			if (type == Type::TXT) txtParse();
-			else if (type == Type::INI) midParse();  // INI doesn't contain notes, parse those from MIDI
-			else if (type == Type::XML) xmlParse();
-			else if (type == Type::SM) smParse();
-			finalize();  // Do some adjusting to the notes
-			s.loadStatus = Song::LoadStatus::FULL;
+			if (type == Type::TXT) txtParse(song);
+			else if (type == Type::INI) midParse(song);  // INI doesn't contain notes, parse those from MIDI
+			else if (type == Type::XML) xmlParse(song);
+			else if (type == Type::SM) smParse(song);
+			finalize(song);  // Do some adjusting to the notes
+			song.loadStatus = Song::LoadStatus::FULL;
 			return;
 		}
 		// Parse only header to speed up loading and conserve memory
-		if (type == Type::TXT) txtParseHeader();
-		else if (type == Type::INI) iniParseHeader();
-		else if (type == Type::XML) xmlParseHeader();
+		if (type == Type::TXT) txtParseHeader(song);
+		else if (type == Type::INI) iniParseHeader(song);
+		else if (type == Type::XML) xmlParseHeader(song);
 		else if (type == Type::SM) {
-			smParseHeader(); s.dropNotes();  // Hack: drop notes here (load again when playing the song)
+			smParseHeader(song);
+			song.dropNotes();  // Hack: drop notes here (load again when playing the song)
 		}
 
 		// Default for preview position if none was specified in header
-		if (std::isnan(s.preview_start)) {
-			s.preview_start = ((type == Type::INI || s.getDurationSeconds() < 50.0) ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
+		if (std::isnan(song.preview_start)) {
+			song.preview_start = ((type == Type::INI || song.getDurationSeconds() < 50.0) ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
 		}
-		guessFiles();
-		if (!m_song.midifilename.empty()) {midParseHeader(); }
+		guessFiles(song);
+		if (!song.midifilename.empty()) {
+			midParseHeader(song);
+		}
 
-		s.loadStatus = Song::LoadStatus::HEADER;
+		song.loadStatus = Song::LoadStatus::HEADER;
 	} catch (SongParserException&) {
 		throw;
 	} catch (std::runtime_error& e) {
-		throw SongParserException (m_song, e.what(), m_linenum);
+		throw SongParserException (song, e.what(), m_linenum);
 	} catch (std::exception& e) {
-		throw SongParserException (m_song, "Internal error: " + std::string (e.what()), m_linenum);
+		throw SongParserException (song, "Internal error: " + std::string (e.what()), m_linenum);
 	}
 }
 
-void SongParser::guessFiles () {
+void SongParser::guessFiles (Song& song) {
 	// List of fields containing filenames, and auto-matching regexps, in order of priority
 	const std::vector<std::pair<fs::path*, char const*> > fields = {
-		{ &m_song.cover, R"((cover|album|label|banner|bn|\[co\])\.(png|jpeg|jpg|svg)$)" },
-		{ &m_song.background, R"((background|bg|\[bg\])\.(png|jpeg|jpg|svg)$)" },
-		{ &m_song.cover, R"(\.(png|jpeg|jpg|svg)$)" },
-		{ &m_song.background, R"(\.(png|jpeg|jpg|svg)$)" },
-		{ &m_song.video, R"(\.(avi|mpg|mpeg|flv|mov|mp4|mkv|m4v|webm)$)" },
-		{ &m_song.midifilename, R"(^notes\.mid$)" },
-		{ &m_song.midifilename, R"(\.mid$)" },
-		{ &m_song.music[TrackName::PREVIEW], R"(^preview\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &m_song.music[TrackName::GUITAR], R"(^guitar\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &m_song.music[TrackName::BASS], R"(^(bass|rhythm)\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &m_song.music[TrackName::DRUMS], R"(^drums(_1)?\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &m_song.music[TrackName::DRUMS_SNARE], R"(^drums_2\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &m_song.music[TrackName::DRUMS_CYMBALS], R"(^drums_3\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &m_song.music[TrackName::DRUMS_TOMS], R"(^drums_4\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &m_song.music[TrackName::KEYBOARD], R"(^key(board|s)\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &m_song.music[TrackName::GUITAR_COOP], R"(^guitar_coop\.(mp3|m4a|ogg|opus|aac)$)"},
-		{ &m_song.music[TrackName::GUITAR_RHYTHM], R"(^guitar_rhythm\.(mp3|m4a|ogg|opus|aac)$)"},
-		{ &m_song.music[TrackName::VOCAL_LEAD], R"(^vocals_1\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &m_song.music[TrackName::VOCAL_LEAD], R"(^vocals\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &m_song.music[TrackName::VOCAL_BACKING], R"(^vocals_2\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &m_song.music[TrackName::BGMUSIC], R"(^song(s)?\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &m_song.music[TrackName::BGMUSIC], R"(\.(mp3|m4a|ogg|opus|aac)$)" },
+		{ &song.cover, R"((cover|album|label|banner|bn|\[co\])\.(png|jpeg|jpg|svg)$)" },
+		{ &song.background, R"((background|bg|\[bg\])\.(png|jpeg|jpg|svg)$)" },
+		{ &song.cover, R"(\.(png|jpeg|jpg|svg)$)" },
+		{ &song.background, R"(\.(png|jpeg|jpg|svg)$)" },
+		{ &song.video, R"(\.(avi|mpg|mpeg|flv|mov|mp4|mkv|m4v|webm)$)" },
+		{ &song.midifilename, R"(^notes\.mid$)" },
+		{ &song.midifilename, R"(\.mid$)" },
+		{ &song.music[TrackName::PREVIEW], R"(^preview\.(mp3|m4a|ogg|opus|aac)$)" },
+		{ &song.music[TrackName::GUITAR], R"(^guitar\.(mp3|m4a|ogg|opus|aac)$)" },
+		{ &song.music[TrackName::BASS], R"(^(bass|rhythm)\.(mp3|m4a|ogg|opus|aac)$)" },
+		{ &song.music[TrackName::DRUMS], R"(^drums(_1)?\.(mp3|m4a|ogg|opus|aac)$)" },
+		{ &song.music[TrackName::DRUMS_SNARE], R"(^drums_2\.(mp3|m4a|ogg|opus|aac)$)" },
+		{ &song.music[TrackName::DRUMS_CYMBALS], R"(^drums_3\.(mp3|m4a|ogg|opus|aac)$)" },
+		{ &song.music[TrackName::DRUMS_TOMS], R"(^drums_4\.(mp3|m4a|ogg|opus|aac)$)" },
+		{ &song.music[TrackName::KEYBOARD], R"(^key(board|s)\.(mp3|m4a|ogg|opus|aac)$)" },
+		{ &song.music[TrackName::GUITAR_COOP], R"(^guitar_coop\.(mp3|m4a|ogg|opus|aac)$)"},
+		{ &song.music[TrackName::GUITAR_RHYTHM], R"(^guitar_rhythm\.(mp3|m4a|ogg|opus|aac)$)"},
+		{ &song.music[TrackName::VOCAL_LEAD], R"(^vocals_1\.(mp3|m4a|ogg|opus|aac)$)" },
+		{ &song.music[TrackName::VOCAL_LEAD], R"(^vocals\.(mp3|m4a|ogg|opus|aac)$)" },
+		{ &song.music[TrackName::VOCAL_BACKING], R"(^vocals_2\.(mp3|m4a|ogg|opus|aac)$)" },
+		{ &song.music[TrackName::BGMUSIC], R"(^song(s)?\.(mp3|m4a|ogg|opus|aac)$)" },
+		{ &song.music[TrackName::BGMUSIC], R"(\.(mp3|m4a|ogg|opus|aac)$)" },
 	};
 
 	std::string logMissing, logFound;
@@ -169,7 +175,7 @@ void SongParser::guessFiles () {
 		return;	// All OK!
 	}
 	// Try matching all files in song folder with any field
-	std::set<fs::path> files (fs::directory_iterator {m_song.path}, fs::directory_iterator {});
+	std::set<fs::path> files (fs::directory_iterator {song.path}, fs::directory_iterator {});
 	for (unsigned i = 0; i < fields.size(); ++i) {
 		fs::path& field = *fields[i].first;
 		if (field.empty()) {
@@ -183,12 +189,12 @@ void SongParser::guessFiles () {
 		files.erase (field);  // Remove from available options
 	}
 
-	m_song.music[TrackName::PREVIEW].clear();  // We don't currently support preview tracks (TODO: proper handling in audio.cc).
+	song.music[TrackName::PREVIEW].clear();  // We don't currently support preview tracks (TODO: proper handling in audio.cc).
 
 	if (logFound.empty() && logMissing.empty()) {
 		return;
 	}
-	std::clog << "songparser/" << (logMissing.empty() ? "debug" : "notice") << ": " + m_song.filename.string() + ":\n";
+	std::clog << "songparser/" << (logMissing.empty() ? "debug" : "notice") << ": " + song.filename.string() + ":\n";
 	if (!logMissing.empty()) {
 		std::clog << "  Not found:    " + logMissing + "\n";
 	}
@@ -198,9 +204,9 @@ void SongParser::guessFiles () {
 	std::clog << std::flush;
 }
 
-void SongParser::vocalsTogether () {
-	auto togetherIt = m_song.vocalTracks.find ("Together");
-	if (togetherIt == m_song.vocalTracks.end()) {return; }
+void SongParser::vocalsTogether (Song& song) {
+	auto togetherIt = song.vocalTracks.find ("Together");
+	if (togetherIt == song.vocalTracks.end()) {return; }
 	Notes& together = togetherIt->second.notes;
 	if (!together.empty()) {return; }
 	Notes notes;
@@ -212,7 +218,7 @@ void SongParser::vocalsTogether () {
 			it (begin), end (end) {}
 	};
 	std::vector<TrackInfo> tracks;
-	for (auto& nt : m_song.vocalTracks) {
+	for (auto& nt : song.vocalTracks) {
 		togetherIt->second.noteMin = std::min (togetherIt->second.noteMin, nt.second.noteMin);
 		togetherIt->second.noteMax = std::max (togetherIt->second.noteMax, nt.second.noteMax);
 
@@ -240,21 +246,21 @@ void SongParser::vocalsTogether () {
 	together.swap (notes);
 }
 
-void SongParser::finalize () {
-	vocalsTogether();
-	for (auto& nt : m_song.vocalTracks) {
+void SongParser::finalize (Song& song) {
+	vocalsTogether(song);
+	for (auto& nt : song.vocalTracks) {
 		VocalTrack& vocal = nt.second;
 		// Remove empty sentences
 		{
 			Note::Type lastType = Note::Type::NORMAL;
-			std::clog << "songparser/debug: In " << m_song.artist << " - " << m_song.title << std::endl;
+			std::clog << "songparser/debug: In " << song.artist << " - " << song.title << std::endl;
 			for (auto itn = vocal.notes.begin(); itn != vocal.notes.end();) {
 				if (itn->type == Note::Type::SLEEP) { itn->end = itn->begin; ++itn; continue; }
 				auto next = (itn +1);
 
 				// Try to fix overlapping syllables.
 				if (next != vocal.notes.end() && Note::overlapping(*itn, *next)) {
-					double beatDur = getBPM(m_song, itn->begin).step;
+					double beatDur = getBPM(song, itn->begin).step;
 					double newEnd = (next->begin - beatDur);
 					std::clog << "songparser/info: Trying to correct duration of overlapping notes (" << itn->syllable << " & " << next->syllable << ")..." << std::endl;
 					std::clog << "songparser/info: Changing ending to: " << newEnd << ", will give a length of: " << (newEnd - (itn->begin)) << std::endl;
@@ -271,7 +277,7 @@ void SongParser::finalize () {
 				}
 				Note::Type type = itn->type;
 				if(type == Note::Type::SLEEP && lastType == Note::Type::SLEEP) {
-					std::clog << "songparser/info: " + m_song.filename.string() + ": Discarding empty sentence" << std::endl;
+					std::clog << "songparser/info: " + song.filename.string() + ": Discarding empty sentence" << std::endl;
 					itn = vocal.notes.erase(itn);
 				} else {
 					++itn;
@@ -298,7 +304,7 @@ void SongParser::finalize () {
 	}
 	if (m_tsPerBeat) {
 		// Add song beat markers
-		for (unsigned ts = 0; ts < m_tsEnd; ts += m_tsPerBeat) { m_song.beats.push_back (tsTime (static_cast<double>(ts))); }
+		for (unsigned ts = 0; ts < m_tsEnd; ts += m_tsPerBeat) { song.beats.push_back (tsTime (song, static_cast<double>(ts))); }
 	}
 }
 
@@ -309,23 +315,21 @@ Song::BPM SongParser::getBPM(Song const& s, double ts) const {
 	throw std::runtime_error("No BPM definition prior to this note...");
 }
 
-void SongParser::addBPM(double ts, float bpm) {
-	Song& s = m_song;
+void SongParser::addBPM(Song& song, double ts, float bpm) {
 	if (!(( bpm >= 1.0f) && ( bpm < 1e12) )) { throw std::runtime_error("Invalid BPM value"); }
-	if (!s.m_bpms.empty() && ( s.m_bpms.back().ts >= ts) ) {
-		if (s.m_bpms.back().ts < ts) { throw std::runtime_error("Invalid BPM timestamp"); }
-		s.m_bpms.pop_back();	// Some ITG songs contain repeated BPM definitions...
+	if (!song.m_bpms.empty() && ( song.m_bpms.back().ts >= ts) ) {
+		if (song.m_bpms.back().ts < ts) { throw std::runtime_error("Invalid BPM timestamp"); }
+		song.m_bpms.pop_back();	// Some ITG songs contain repeated BPM definitions...
 	}
-	s.m_bpms.push_back (Song::BPM (tsTime (ts), ts, bpm));
+	song.m_bpms.push_back (Song::BPM (tsTime (song, ts), ts, bpm));
 }
 
-double SongParser::tsTime(double ts) const {
-	Song& s = m_song;
-	if (s.m_bpms.empty()) {
+double SongParser::tsTime(Song& song, double ts) const {
+	if (song.m_bpms.empty()) {
 		if (ts != 0) { throw std::runtime_error("BPM data missing"); }
 		return m_gap;
 	}
-	for (std::vector<Song::BPM>::const_reverse_iterator it = s.m_bpms.rbegin(); it != s.m_bpms.rend(); ++it) {
+	for (std::vector<Song::BPM>::const_reverse_iterator it = song.m_bpms.rbegin(); it != song.m_bpms.rend(); ++it) {
 		if (it->ts <= ts) { return it->begin + (ts - it->ts) * it->step; }
 	}
 	throw std::logic_error("INTERNAL ERROR: BPM data invalid");
