@@ -14,7 +14,8 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
-Song::Song(nlohmann::json const& song) : dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()) {
+Song::Song(ISongParser& parser, nlohmann::json const& song)
+: dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()), m_parser(parser) {
     path = getJsonEntry<std::string>(song, "txtFileFolder").value_or("");
     filename = getJsonEntry<std::string>(song, "txtFile").value_or("");
     artist = getJsonEntry<std::string>(song, "artist").value_or("");
@@ -86,27 +87,35 @@ Song::Song(nlohmann::json const& song) : dummyVocal(TrackName::VOCAL_LEAD), rand
     collateUpdate();
 }
 
-Song::Song(fs::path const& filename):
-  dummyVocal(TrackName::VOCAL_LEAD), path(filename.parent_path()), filename(filename), randomIdx(rand())
+Song::Song(ISongParser& parser, fs::path const& filename):
+  dummyVocal(TrackName::VOCAL_LEAD), path(filename.parent_path()), filename(filename), randomIdx(rand()), m_parser(parser) 
 {
-    SongParser(*this);
+	parser.parse(*this);
     collateUpdate();
 }
 
+Song::Song(ISongParser& parser)
+: dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()), m_parser(parser) {
+}
+
 void Song::reload(bool errorIgnore) {
-    try { 
-        *this = Song(filename); 
-    }
-    catch (...) { 
-        if (!errorIgnore) 
-            throw; 
-    }
+	try {
+		m_parser.parse(*this);
+		collateUpdate();
+	} catch (...) {
+		if (!errorIgnore)
+			throw;
+	}
 }
 
 void Song::loadNotes(bool errorIgnore) {
-    if (loadStatus == LoadStatus::FULL) return;
-    try { SongParser(*this); }
-    catch (...) { if (!errorIgnore) throw; }
+	if (loadStatus == LoadStatus::FULL)
+		return;
+	try {
+		m_parser.parse(*this);
+	} catch (...) {
+		if (!errorIgnore) throw;
+	}
 }
 
 void Song::dropNotes() {

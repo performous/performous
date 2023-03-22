@@ -58,7 +58,9 @@ void ScreenSing::enter() {
 	reloadGL();
 	// Load song notes
 	getGame().loading(_("Loading song..."), 0.4f);
-	try { m_song->loadNotes(false /* don't ignore errors */); }
+	try {
+		m_song->loadNotes(false /* don't ignore errors */);
+	}
 	catch (SongParserException& e) {
 		std::clog << e;
 		getGame().activateScreen("Songs");
