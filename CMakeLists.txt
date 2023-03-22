@@ -160,6 +160,7 @@ set_property(CACHE BUILD_TESTS PROPERTY STRINGS AUTO ON OFF)
 
 
 if(BUILD_TESTS STREQUAL "AUTO" OR BUILD_TESTS STREQUAL "ON")
+	enable_testing()
 	add_subdirectory(testing)
 endif()
 

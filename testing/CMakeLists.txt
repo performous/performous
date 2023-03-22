@@ -26,20 +26,14 @@ set(GAME_SOURCES
 )
 
 set(GTEST_REQUIRED "")
-enable_testing()
 
 if(BUILD_TESTS STREQUAL "ON")
 	set(GTEST_REQUIRED "REQUIRED")
 endif()
 
-if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.20)
-	find_package(GTest CONFIG)
-endif()
-message("GTEST REQUIRED? ${GTEST_REQUIRED}, CMAKE VERSION: ${CMAKE_VERSION}, GTest_FOUND?: ${GTest_FOUND}")
-if(CMAKE_VERSION VERSION_LESS 3.20 OR NOT GTest_FOUND)
-	find_package(GTest ${GTEST_REQUIRED})
-endif()
+find_package(GTest ${GTEST_REQUIRED})
 
+message("GTEST REQUIRED? ${GTEST_REQUIRED}, CMAKE VERSION: ${CMAKE_VERSION}, GTest_FOUND?: ${GTest_FOUND}")
 
 if(GTest_FOUND)
 	message(STATUS "Testing enabled: Building test host")
