@@ -4,14 +4,14 @@
 #include "i18n.hh"
 #include "json.hh"
 #include "notes.hh"
+#include "isongparser.hh"
 #include "util.hh"
 
 #include <cstdint>
 #include <memory>
 #include <stdexcept>
 #include <string>
-
-class SongParser;
+#include <vector>
 
 namespace TrackName {
 	const std::string BGMUSIC = "background";
@@ -93,8 +93,10 @@ public:
 	int randomIdx = 0; ///< sorting index used for random order
 
 	// Functions only below this line
-	Song(nlohmann::json const& song);  ///< Load song from cache.
-	Song(fs::path const& path, fs::path const& filename);  ///< Load song from specified path and filename
+	Song(ISongParser&, nlohmann::json const& song);  ///< Load song from cache.
+	Song(ISongParser&, fs::path const& path, fs::path const& filename);  ///< Load song from specified path and filename
+	Song(ISongParser&);
+
 	void reload(bool errorIgnore = true);  ///< Reset and reload the entire song from file
 	void loadNotes(bool errorIgnore = true);  ///< Load note data (called when entering singing screen, headers preloaded).
 	void dropNotes();  ///< Remove note data (when exiting singing screen), to conserve RAM
@@ -120,6 +122,9 @@ public:
 	bool getPrevSection(double pos, SongSection &section);
 private:
 	void collateUpdate();   ///< Rebuild collate variables (used for sorting) from other strings
+
+	ISongParser& m_parser;
+	unsigned m_year = 0;
 };
 
 /// Thrown by SongParser when there is an error
