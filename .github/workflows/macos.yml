@@ -31,6 +31,7 @@ jobs:
         fontconfig
         freetype
         glm
+        googletest
         help2man
         icu4c
         libepoxy
@@ -84,6 +85,14 @@ jobs:
           echo "ARTIFACT_NAME=$(basename ${PACKAGE_PATH})" >> ${GITHUB_ENV}
           echo "MASTER_ARTIFACT_PATH=${MASTER_PACKAGE_PATH}" >> ${GITHUB_ENV}
           echo "MASTER_ARTIFACT_NAME=$(basename ${MASTER_PACKAGE_PATH})" >> ${GITHUB_ENV}
+      - name: Run unittests directly called.
+        run: |
+          cd "${{ github.workspace }}/performous/build/testing"
+          ./performous_test --gtest_filter=UnitTest*
+      - name: Run unittests by ctest.
+        run: |
+          cd "${{ github.workspace }}/performous/build"
+          make test
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3

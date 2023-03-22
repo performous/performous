@@ -65,15 +65,26 @@ else
 fi
 
 ## Set up some special cmake flags for fedora
-if [ "${ID}" == "fedora" ]; then
+if [[ "${ID}" == "fedora" ]]; then
   EXTRA_CMAKE_ARGS="${EXTRA_CMAKE_ARGS} -DUSE_BOOST_REGEX=1"
 fi
 
 ## Set more cmake flags for Debian 10
 # Debian Buster has system Aubio 0.4.5, this is not enough
 # because performous requires a minimum version of 0.4.9.
-if ([ "${ID}" = "debian" ] && [ "${VERSION_ID}" = "10" ]); then
+if ([[ "${ID}" == "debian" && "${VERSION_ID}" == "10" ]]); then
   EXTRA_CMAKE_ARGS="${EXTRA_CMAKE_ARGS} -DSELF_BUILT_AUBIO=ALWAYS -DSELF_BUILT_JSON=ALWAYS"
+  echo 'deb http://deb.debian.org/debian buster-backports main' >> /etc/apt/sources.list
+  apt-get -y update
+  apt-get -y install libfmt-dev/buster-backports
+elif ([[ "${ID}" == "ubuntu" && "${VERSION_ID}" == "20.04" ]]); then
+  apt-get -y update
+  apt-get -y install gnupg wget
+  wget -O ./key.asc https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null
+  gpg -v -o /usr/share/keyrings/kitware-archive-keyring.gpg --dearmor ./key.asc
+  `echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' | tee /etc/apt/sources.list.d/kitware.list >/dev/null`
+  apt-get -y update
+  apt-get -y install cmake
 fi
 
 if [ "${RELEASE_BUILD}" ]; then
@@ -93,7 +104,7 @@ esac
 ## Build with cmake 
 mkdir build
 cd build
-cmake ${EXTRA_CMAKE_ARGS} -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DENABLE_WEBCAM=ON ..
+cmake ${EXTRA_CMAKE_ARGS} -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DENABLE_WEBCAM=ON -DBUILD_TESTS=ON ..
 CPU_CORES=$(nproc --all)
 make -j${CPU_CORES}
 if [ ${GENERATE_PACKAGES} ]; then
