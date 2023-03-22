@@ -5,14 +5,14 @@
 #include "json.hh"
 #include "log.hh"
 #include "notes.hh"
+#include "isongparser.hh"
 #include "util.hh"
 
 #include <cstdint>
 #include <memory>
 #include <stdexcept>
 #include <string>
-
-class SongParser;
+#include <vector>
 
 namespace TrackName {
 	const std::string BGMUSIC = "background";
@@ -103,8 +103,10 @@ public:
 	std::int64_t mtime = 0; ///< modification time of song file (for cache invalidation)
 
 	// Functions only below this line
-	Song(nlohmann::json const& song);  ///< Load song from cache.
-	Song(fs::path const& filename);  ///< Load song from specified path and filename
+	Song(ISongParser&, nlohmann::json const& song);  ///< Load song from cache.
+	Song(ISongParser&, fs::path const& path, fs::path const& filename);  ///< Load song from specified path and filename
+	Song(ISongParser&);
+
 	void reload(bool errorIgnore = true);  ///< Reset and reload the entire song from file
 	void loadNotes(bool errorIgnore = true);  ///< Load note data (called when entering singing screen, headers preloaded).
 	void dropNotes();  ///< Remove note data (when exiting singing screen), to conserve RAM
@@ -137,6 +139,9 @@ private:
 	void collateUpdate();   ///< Rebuild collate variables (used for sorting) from other strings
 
 	bool m_broken = false;
+
+	ISongParser& m_parser;
+	unsigned m_year = 0;
 };
 
 /// Thrown by SongParser when there is an error
@@ -166,7 +171,7 @@ struct fmt::formatter<SongParserException>: formatter<std::string_view> {
 		std::string ret{fmt::format("Error parsing songfile={}", e.file())};
 		if (e.line()) fmt::format_to(std::back_inserter(ret), ", line={}", e.line());
 		fmt::format_to(std::back_inserter(ret), ":\n{}{}", SpdLogger::newLineDec, e.what());
-		
+
 		// Write the scancode name to the output
 		return formatter<std::string_view>::format(ret, ctx);
 	}

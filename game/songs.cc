@@ -131,7 +131,7 @@ Songs::Cache Songs::loadCache() {
 	auto jsonRoot = readJSON(songsMetaFile);
 	Cache cache;
 	for (auto const& songData : jsonRoot) {
-		auto song = std::make_shared<Song> (songData);
+		auto song = std::make_shared<Song>(m_parser, songData);
 		cache[song->filename.string()] = std::move(song);
 	}
 	return cache;
@@ -323,11 +323,11 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 						song = match->second;
 					} else {
 						SpdLogger::info(LogSystem::SONGS, "Song={} has been modified on disk, re-reading.", p);
-						song = std::make_shared<Song> (p);
+						song = std::make_shared<Song>(m_parser, p.parent_path(), p);
 					}
 				} else {
 					SpdLogger::info(LogSystem::SONGS, "Found song={}, which was not present in the cache.", p);
-					song = std::make_shared<Song> (p);
+					song = std::make_shared<Song>(m_parser, p.parent_path(), p);
 				}
 				std::unique_lock<std::shared_mutex> l(m_mutex);
 				m_songs.emplace_back(song); //put it in the database, if found twice will appear in double

@@ -54,12 +54,15 @@ namespace {
 	}
 }
 
-void SongParser::midParseHeader() {
-	Song& s = m_song;
-	if (!m_song.vocalTracks.empty()) { m_song.vocalTracks.clear(); }
-	if (!m_song.instrumentTracks.empty()) { m_song.instrumentTracks.clear(); }
+void SongParser::midParseHeader(Song& song) {
+	if (!song.vocalTracks.empty()) {
+		song.vocalTracks.clear();
+	}
+	if (!song.instrumentTracks.empty()) {
+		song.instrumentTracks.clear();
+	}
 	// Parse tracks from midi
-	MidiFileParser midi(s.midifilename);
+	MidiFileParser midi(song.midifilename);
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
 		std::string name = it->name;
@@ -73,27 +76,26 @@ void SongParser::midParseHeader() {
 			else continue; // not a valid track
 		}
 		// Add dummy notes to tracks so that they can be seen in song browser
-		if (isVocalTrack(name)) s.insertVocalTrack(name, VocalTrack(name));
+		if (isVocalTrack(name)) song.insertVocalTrack(name, VocalTrack(name));
 		else {
 			for (auto const& elem: it->notes) {
 				// If a track has not enough notes on any level, ignore it
-				if (elem.second.size() > 3) { s.instrumentTracks.insert(make_pair(name,InstrumentTrack(name))); break; }
+				if (elem.second.size() > 3) { song.instrumentTracks.insert(make_pair(name,InstrumentTrack(name))); break; }
 			}
 		}
 	}
-	addBPM(0, static_cast<float>(6e7 / midi.tempochanges.front().value));
+	addBPM(song, 0, static_cast<float>(6e7 / midi.tempochanges.front().value));
 	SpdLogger::debug(LogSystem::SONGPARSER, "MIDI Parser --  Got a BPM: {}", 6e7 / midi.tempochanges.front().value);
 }
 
 /// Parse notes
-void SongParser::midParse() {
-	Song& s = m_song;
-	s.vocalTracks.clear();
-	s.instrumentTracks.clear();
+void SongParser::midParse(Song& song) {
+	song.vocalTracks.clear();
+	song.instrumentTracks.clear();
 
-	MidiFileParser midi(s.midifilename);
+	MidiFileParser midi(song.midifilename);
 	int reversedNoteCount = 0;
-	for (std::uint32_t ts = 0, end = midi.ts_last + midi.division; ts < end; ts += midi.division) s.beats.push_back(midi.get_seconds(ts)+s.start);
+	for (std::uint32_t ts = 0, end = midi.ts_last + midi.division; ts < end; ts += midi.division) song.beats.push_back(midi.get_seconds(ts) + song.start);
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
 		std::string name = it->name;
@@ -109,14 +111,14 @@ void SongParser::midParse() {
 		if (!isVocalTrack(name)) {
 			// Process non-vocal tracks
 			double trackEnd = 0.0;
-			s.instrumentTracks.insert(make_pair(name,InstrumentTrack(name)));
-			NoteMap& nm2 = s.instrumentTracks.find(name)->second.nm;
+			song.instrumentTracks.insert(make_pair(name,InstrumentTrack(name)));
+			NoteMap& nm2 = song.instrumentTracks.find(name)->second.nm;
 			for (auto const& elem: it->notes) {
 				Durations& dur = nm2[elem.first];
 				MidiFileParser::Notes const& notes = elem.second;
 				for (auto const& note: notes) {
-					double beg = midi.get_seconds(note.begin)+s.start;
-					double end = midi.get_seconds(note.end)+s.start;
+					double beg = midi.get_seconds(note.begin) + song.start;
+					double end = midi.get_seconds(note.end) + song.start;
 					if (end == 0) continue; // Note with no ending
 					if (beg > end) { // Reversed note
 						if (beg - end > 0.001) { reversedNoteCount++; continue; }
@@ -128,14 +130,14 @@ void SongParser::midParse() {
 			}
 			// Discard empty tracks
 			// Note: some songs have notes at the very beginning (but are otherwise empty)
-			if (trackEnd < 1.0) s.instrumentTracks.erase(name);
+			if (trackEnd < 1.0) song.instrumentTracks.erase(name);
 		} else {
 			// Process vocal tracks
 			VocalTrack vocal(name);
 			for (auto const& lyric: it->lyrics) {
 				Note n;
-				n.begin = midi.get_seconds(lyric.begin)+s.start;
-				n.end = midi.get_seconds(lyric.end)+s.start;
+				n.begin = midi.get_seconds(lyric.begin) + song.start;
+				n.end = midi.get_seconds(lyric.end) + song.start;
 				n.notePrev = n.note = lyric.note;
 				n.type = n.note > 100 ? Note::Type::SLEEP : Note::Type::NORMAL;
 				if(n.note == 116 || n.note == 103 || n.note == 124)
@@ -171,7 +173,7 @@ void SongParser::midParse() {
 					if (n.type == Note::Type::SLIDE) {
 						auto prev = vocal.notes.rbegin();
 						while (prev != vocal.notes.rend() && prev->type == Note::Type::SLEEP) ++prev;
-						if (prev == vocal.notes.rend()) throw SongParserException(m_song, "The song begins with a slide note", 1);
+						if (prev == vocal.notes.rend()) throw SongParserException(song, "The song begins with a slide note", 1);
 						eraseLast(prev->syllable); // Erase the space if there is any
 						{
 							// insert new sliding note
@@ -202,7 +204,7 @@ void SongParser::midParse() {
 			for (auto const& lyric: it->lyrics) {
 				if(lyric.note == 116 || lyric.note == 103 || lyric.note == 124) {
 					for (auto& n: vocal.notes) {
-						if (n.begin == midi.get_seconds(lyric.begin) + s.start && n.type == Note::Type::NORMAL) {
+						if (n.begin == midi.get_seconds(lyric.begin) + song.start && n.type == Note::Type::NORMAL) {
 							if (lyric.note == 124) {
 								n.type = Note::Type::FREESTYLE;
 							} else {
@@ -213,21 +215,21 @@ void SongParser::midParse() {
 					}
 				}
 			}
-			s.insertVocalTrack(name, vocal);
+			song.insertVocalTrack(name, vocal);
 		}
 	}
 	// Figure out if we have BRE in the song
 	for (MidiFileParser::CommandEvents::const_iterator it = midi.cmdevents.begin(); it != midi.cmdevents.end(); ++it) {
-		if (*it == "[section big_rock_ending]") s.hasBRE = true;
+		if (*it == "[section big_rock_ending]") song.hasBRE = true;
 	}
 	// Output some warning
 	if (reversedNoteCount > 0) {
-		SpdLogger::notice(LogSystem::SONGPARSER, "MIDI Parser -- Skipping {} reversed notes in {}", reversedNoteCount, s.midifilename);
+		SpdLogger::notice(LogSystem::SONGPARSER, "MIDI Parser -- Skipping {} reversed notes in {}", reversedNoteCount, song.midifilename.string());
 	}
 	// copy midi sections to song section
 	// design goals: (1) keep midi parser free of dependencies on song (2) store data in song as parsers are discarded before song
 	// one option would be to pass a song reference to the midi parser however, that conflicts with goal (1)
-	for (auto& sect: midi.midisections) s.songsections.emplace_back(sect.name, sect.begin);
+	for (auto& sect: midi.midisections) {
+		song.songsections.emplace_back(sect.name, sect.begin);
+	}
 }
-
-

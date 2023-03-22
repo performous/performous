@@ -4,6 +4,7 @@
 #include "fs.hh"
 #include "screen.hh"
 #include "songorder.hh"
+#include "songparser.hh"
 #include "utils/cycle.hh"
 
 #include <atomic>
@@ -110,4 +111,5 @@ class Songs {
 	std::unique_ptr<std::thread> m_thread;
 	mutable std::shared_mutex m_mutex;
 	std::vector<SongOrderPtr> m_songOrders;
+	SongParser m_parser;
 };

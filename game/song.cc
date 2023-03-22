@@ -17,7 +17,8 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
-Song::Song(nlohmann::json const& song) : dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()) {
+Song::Song(ISongParser& parser, nlohmann::json const& song)
+: dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()), m_parser(parser) {
 	path = getJsonEntry<std::string>(song, "txtFileFolder").value_or("");
 	filename = getJsonEntry<std::string>(song, "txtFile").value_or("");
 	mtime = getJsonEntry<std::int64_t>(song, "mtime").value_or(0);
@@ -94,30 +95,38 @@ Song::Song(nlohmann::json const& song) : dummyVocal(TrackName::VOCAL_LEAD), rand
 	collateUpdate();
 }
 
-Song::Song(fs::path const& filename):
-  dummyVocal(TrackName::VOCAL_LEAD), path(filename.parent_path()), filename(filename), randomIdx(rand())
+Song::Song(ISongParser& parser,fs::path const& path, fs::path const& filename):
+  dummyVocal(TrackName::VOCAL_LEAD), path(path), filename(filename), randomIdx(rand()), m_parser(parser)
 {
-	if (fs::is_regular_file(filename)) {
-		mtime = static_cast<int64_t>(fs::last_write_time(filename).time_since_epoch().count());  // .count() can return __int128
+	if (fs::is_regular_file(path)) {
+		mtime = static_cast<int64_t>(fs::last_write_time(path).time_since_epoch().count());  // .count() can return __int128
 	}
-	SongParser(*this);
+	parser.parse(*this);
 	collateUpdate();
+}
+
+Song::Song(ISongParser& parser)
+: dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()), m_parser(parser) {
 }
 
 void Song::reload(bool errorIgnore) {
 	try {
-		*this = Song(filename);
-	}
-	catch (...) {
+		m_parser.parse(*this);
+		collateUpdate();
+	} catch (...) {
 		if (!errorIgnore)
 			throw;
 	}
 }
 
 void Song::loadNotes(bool errorIgnore) {
-	if (loadStatus == LoadStatus::FULL) return;
-	try { SongParser(*this); }
-	catch (SongParserException const&) { if (!errorIgnore) throw; }
+	if (loadStatus == LoadStatus::FULL)
+		return;
+	try {
+		m_parser.parse(*this);
+	} catch (...) {
+		if (!errorIgnore) throw;
+	}
 }
 
 void Song::dropNotes() {
