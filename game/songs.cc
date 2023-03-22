@@ -128,7 +128,7 @@ Songs::Cache Songs::loadCache() {
 	auto jsonRoot = readJSON(songsMetaFile);
 	Cache cache;
 	for (auto const& songData : jsonRoot) {
-		auto song = std::make_shared<Song> (songData);
+		auto song = std::make_shared<Song>(m_parser, songData);
 		cache[song->filename.string()] = std::move(song);
 	}
 	return cache;
@@ -278,7 +278,7 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 					song = match->second;
 				} else {
 					std::clog << "songs/notice: Found song which was not in the cache: " << p.string() << std::endl;
-					song = std::make_shared<Song> (p);
+					song = std::make_shared<Song>(m_parser, p);
 				}
 				std::unique_lock<std::shared_mutex> l(m_mutex);
 				m_songs.emplace_back(song); //put it in the database, if found twice will appear in double
@@ -512,7 +512,10 @@ void Songs::sort_internal(bool descending) {
 
 std::shared_ptr<Song> Songs::currentPtr() const try {
 	return m_filtered.at(static_cast<size_t>(math_cover.getTarget()));
-} catch (std::out_of_range const& e) { return nullptr; }
+} 
+catch (std::out_of_range const&) { 
+	return nullptr; 
+}
 
 Song& Songs::current() try {
 	return *m_filtered.at(static_cast<size_t>(math_cover.getTarget()));
