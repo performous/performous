@@ -42,7 +42,7 @@ jobs:
           sed -i s/@@VERSION@@/${PACKAGE_VERSION}/ AppImageBuilder.yml
           mkdir build
           cd build
-          cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DENABLE_WEBSERVER=ON -DENABLE_WEBCAM=ON -DSELF_BUILT_RESTINIO=ALWAYS -DRESTINIO_FMT_HEADER_ONLY=ON -DPERFORMOUS_VERSION=$PACKAGE_VERSION ..
+          cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DENABLE_WEBSERVER=ON -DENABLE_WEBCAM=ON -DSELF_BUILT_RESTINIO=ALWAYS -DRESTINIO_FMT_HEADER_ONLY=ON -DBUILD_TESTS=ON -DPERFORMOUS_VERSION=$PACKAGE_VERSION ..
           make -j$(nproc) install DESTDIR=../AppDir
           cd ..
           appimage-builder --recipe AppImageBuilder.yml --skip-test

@@ -166,7 +166,7 @@ jobs:
           mkdir build
           for f in $(ls -Q ./lang/*.po); do mkdir -pv "./build/lang/$(basename $f | cut -d. -f1)/LC_MESSAGES";done
           cd build
-          "${{ env.workpath }}/msys64/mingw64/bin/cmake.exe" -G "MinGW Makefiles" .. -DCMAKE_BUILD_TYPE="RelWithDebInfo" -DSELF_BUILT_AUBIO=ALWAYS -DENABLE_WEBSERVER=ON             -DSELF_BUILT_RESTINIO=ALWAYS -DRESTINIO_FMT_HEADER_ONLY=ON -DPERFORMOUS_VERSION=${{ env.PERFORMOUS_VERSION }} -DCMAKE_VERBOSE_MAKEFILE=ON -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64"
+          "${{ env.workpath }}/msys64/mingw64/bin/cmake.exe" -G "MinGW Makefiles" -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE="RelWithDebInfo" -DSELF_BUILT_AUBIO=ALWAYS -DENABLE_WEBSERVER=ON             -DSELF_BUILT_RESTINIO=ALWAYS -DRESTINIO_FMT_HEADER_ONLY=ON -DPERFORMOUS_VERSION=${{ env.PERFORMOUS_VERSION }} -DCMAKE_VERBOSE_MAKEFILE=ON -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64" ..
           "${{ env.workpath }}/msys64/mingw64/bin/cmake.exe" --build ./ --verbose --parallel 3
       - name: Run unittests directly called.
         shell: msys2 {0}
@@ -183,7 +183,7 @@ jobs:
         shell: msys2 {0}
         run: |
            cd "${{ env.workpath }}/performous/build"
-           "${{ env.workpath }}/msys64/mingw64/bin/cpack.exe" -G NSIS64 -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64" -DCPACK_NSIS_EXECUTABLE="${{ env.workpath }}/msys64/mingw64/bin/makensis.exe" -DCMAKE_BUILD_TYPE="RelWithDebInfo" --verbose
+           "${{ env.workpath }}/msys64/mingw64/bin/cpack.exe" -G NSIS64 -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64" -DCPACK_NSIS_EXECUTABLE="${{ env.workpath }}/msys64/mingw64/bin/makensis.exe" -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE="RelWithDebInfo" --verbose
            powershell -command "Copy-Item \$(Get-ChildItem -Filter '*win64.exe').Name 'Performous-latest-mingw-w64.exe'"
            powershell -command "Rename-Item \$(Get-ChildItem -Filter '*win64.exe').Name -NewName 'Performous-${{ inputs.package_complete_version }}-mingw-w64.exe'"
            powershell -command "echo ('ARTIFACT_PATH=${{ env.workpath }}/performous/build/Performous-${{ inputs.package_complete_version }}-mingw-w64.exe') >> \$env:GITHUB_ENV"

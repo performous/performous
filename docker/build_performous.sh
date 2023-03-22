@@ -73,7 +73,7 @@ fi
 # Debian Buster has system Aubio 0.4.5, this is not enough
 # because performous requires a minimum version of 0.4.9.
 if ([[ "${ID}" == "debian" ]] && [[ "${VERSION_ID}" == "10" ]]); then
-  EXTRA_CMAKE_ARGS="${EXTRA_CMAKE_ARGS} -DSELF_BUILT_AUBIO=ALWAYS -DSELF_BUILT_JSON=ALWAYS"
+  EXTRA_CMAKE_ARGS="${EXTRA_CMAKE_ARGS} -DSELF_BUILT_AUBIO=ALWAYS -DSELF_BUILT_JSON=ALWAYS -DBUILD_TESTS=ON"
   echo 'deb http://deb.debian.org/debian buster-backports main' >> /etc/apt/sources.list
   apt-get -y update
   apt-get -y install libfmt-dev/buster-backports

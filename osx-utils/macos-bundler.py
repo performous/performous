@@ -22,7 +22,7 @@ opencv_prefix: Path = None
 script_prefix: Path = None
 performous_source_dir = None
 
-include_feature_args = ["--enable-webcam", "--enable-midi", "--enable-webserver"]
+include_feature_args = ["--enable-webcam", "--enable-midi", "--enable-webserver", "--build-tests"]
 include_feature_opts = ["AUTO", "ON", "OFF" ]
 
 find_dep_args = ["--internal-aubio", "--internal-restinio", "--internal-json"]
@@ -212,6 +212,7 @@ Options:
 	--enable-midi <auto | on | off>  Defines whether to include MIDI support [default: auto]
 	--enable-webcam <auto | on | off>  Defines whether to include webcam support [default: auto]
 	--enable-webserver <auto | on | off>  Defines whether to include webserver support [default: auto]
+	--build-tests <auto | on | off>  Defines whether to build unit tests [default: auto]
 	--script-debug  Print the resolved arguments and options passed to this utility.
 
 Environment:
