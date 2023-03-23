@@ -50,21 +50,12 @@ if [ ${HELP} ]; then
 fi
 
 ## Run the ctests
-## This crazy if statement detecting the OS's can be removed once
-## Debian 10 is retired, since it doesn't have the versions of software
-## available to run the tests. Once it is retired, just the RUN_CTEST
-## statement should be all that is needed.
-if ([ "${ID}" = "ubuntu" ] || [ "${ID}" = "fedora" ] || ([ "${ID}" = "debian" ] && [ "${VERSION_ID}" = "11" ])) && [ ${RUN_CTEST} = true ]; then
   echo "Run unit tests"
   cd ${CLONE_DIRECTORY}/${CTEST_TESTING_DIRECTORY}
   make test
   echo -e "\n\n\n\n\n"
-fi
 
 ## Run the gtests
-## See the comment above for a note about this if statement
-if ([ "${ID}" = "ubuntu" ] || [ "${ID}" = "fedora" ] || ([ "${ID}" = "debian" ] && [ "${VERSION_ID}" = "11" ])) && [ ${RUN_GTEST} = true ]; then
   echo "Run gtest unit tests"
   cd ${CLONE_DIRECTORY}/${GTEST_TESTING_DIRECTORY}
   ./performous_test --gtest_filter=UnitTest*
-fi

@@ -14,7 +14,7 @@
     The autocomplete makes use of the TypeAhead library.
 */
 $("#search-tab").click(function (){
-    $.get("api/getDataBase.json?sort=artist&order=ascending", function (data) {
+    $.get("/api/getDataBase.json?sort=artist&order=ascending", function (data) {
         var database = data;
         var input = $("#search-field");
         input.typeahead({
@@ -45,7 +45,7 @@ $("#search-tab").click(function (){
 $("#search-database").click(function (e, callback) {
     var query = $("#search-field").val();
     if(query.length == 0) {
-        $.get("api/getDataBase.json?sort=artist&order=ascending", function (data) {
+        $.get("/api/getDataBase.json?sort=artist&order=ascending", function (data) {
             var database = data;
             clearList("searched-songs");
 
@@ -71,7 +71,7 @@ $("#search-database").click(function (e, callback) {
     };
 
     $.ajax({
-        url: "api/search",
+        url: "/api/search",
         type: "POST",
         data: JSON.stringify(searchData),
         contentType: "application/json; charset=utf-8",

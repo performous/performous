@@ -11,7 +11,7 @@
     When the table is build add a songObject as JSON to each row. This is used for adding the song once clicked.
 */
 $("#refresh-database").click(function () {
-    $.get("api/getDataBase.json", function (data) {
+    $.get("/api/getDataBase.json", function (data) {
         var database = data;
         clearTable("database-songs");
 
@@ -33,7 +33,7 @@ $("#refresh-database").click(function () {
 $("a[id^='sort-by-']").click(function () {
     var sortOrderToBe = $(this).data("sort-ascending") ? "descending" : "ascending";
     var sortBy = $(this).attr("id").replace("sort-by-", "");
-    var url = "api/getDataBase.json?sort=" + sortBy + "&order=" + sortOrderToBe;
+    var url = "/api/getDataBase.json?sort=" + sortBy + "&order=" + sortOrderToBe;
 
     $(this).data("sort-ascending", sortOrderToBe === "descending" ? false : true);
     $(this).find("span").toggleClass("glyphicon-menu-down").toggleClass("glyphicon-menu-up");

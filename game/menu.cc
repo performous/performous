@@ -64,6 +64,9 @@ void Menu::action(Game& game, int dir) {
 				else if (current().value->getName() == "graphic/stereo3d") {
 					current().value->setOldValue(current().value->getValue());
 				}
+				else if (current().value->getName().substr(0,10) == "webserver/") {
+					current().value->setOldValue(current().value->getValue());
+				}
 				if (dir > 0) ++(*(current().value));
 				else if (dir < 0) --(*(current().value));
 

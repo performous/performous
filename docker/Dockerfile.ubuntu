@@ -15,9 +15,9 @@ RUN apt-get update && \
       libavcodec-dev libavformat-dev libswscale-dev libjpeg-dev \
       portaudio19-dev libglm-dev libboost-filesystem-dev nlohmann-json3-dev\
       libboost-iostreams-dev libboost-locale-dev libboost-system-dev \
-      libboost-program-options-dev libssl-dev libcpprest-dev \
+      libboost-program-options-dev libssl-dev \
       libportmidi-dev libopencv-dev libaubio-dev \
-      libfmt-dev ca-certificates file libgtest-dev libgmock-dev && \
+      libfmt-dev ca-certificates file libgtest-dev libgmock-dev google-mock && \
     apt-get clean && \
     mkdir /root/performous
 

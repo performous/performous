@@ -12,9 +12,9 @@
     This will be shown through a modal. One can also change the position and remove the song from playlist again.
 */
 $("#refresh-playlist").click(function () {
-    $.get("api/getCurrentPlaylist.json", function (data) {
+    $.get("/api/getCurrentPlaylist.json", function (data) {
         var database = data;//JSON.parse(data);
-        $.get("api/getplaylistTimeout", function (playlistTimeOut) {
+        $.get("/api/getplaylistTimeout", function (playlistTimeOut) {
             var timeout = parseInt(playlistTimeOut);
             var totalTime = 0;
 
@@ -117,7 +117,7 @@ $("a[href='#playlist']").on("shown.bs.tab", function () {
             };
 
             $.ajax({
-                url: "api/setposition",
+                url: "/api/setposition",
                 type: "POST",
                 data: JSON.stringify(data),
                 contentType: "application/json; charset=utf-8",

@@ -1,22 +1,26 @@
-#include "audio.hh"
 #include "configuration.hh"
-#include "libxml++-impl.hh"
-
+#include "audio.hh"
 #include "fs.hh"
-#include "util.hh"
+#include "game.hh"
 #include "i18n.hh"
+#include "libxml++-impl.hh"
 #include "screen_intro.hh"
 #include "util.hh"
-#include "game.hh"
+#include "util.hh"
+
 #include <fmt/format.h>
 
+#ifdef USE_WEBSERVER
+#include <boost/asio/ip/address_v4.hpp>
+#endif
+
 #include <algorithm>
+#include <cmath>
 #include <future>
 #include <iomanip>
-#include <stdexcept>
 #include <iostream>
-#include <cmath>
 #include <map>
+#include <stdexcept>
 #include <string>
 
 
@@ -216,16 +220,31 @@ namespace {
 		else std::clog << "audio/warning: Currently selected audio backend is unavailable on this system, will default to Auto." << std::endl;
 		return "Auto";
 	}
+#ifdef USE_WEBSERVER
+	std::string getValue_netmask(ConfigItem const& item) {
+		unsigned slashNotation = stou(item.getEnumName());
+		std::uint64_t subNetValue = 1;
+		subNetValue <<= 32;
+		subNetValue -= (1 << (32 - slashNotation));
+		std::string slashString = std::to_string(slashNotation);
+		std::string displayValue(boost::asio::ip::make_address_v4(static_cast<unsigned>(subNetValue)).to_string());
+		displayValue += (" (/"+std::to_string(slashNotation)+")");
+		return displayValue;
+	}
+#endif
 }
 
 void writeConfig(Game& game, bool system) {
 	xmlpp::Document doc;
 	auto nodeRoot = doc.create_root_node("performous");
 	auto dirty = false;
+#ifdef USE_WEBSERVER
+	bool webServerNeedsRestart = false;
+#endif
 	for (auto& elem : config) {
 		ConfigItem& item = elem.second;
-		auto const name = elem.first;
-		auto const type = item.getType();
+		const std::string name = elem.first;
+		const std::string type = item.getType();
 
 		if (item.isDefault(system) && name != "audio/backend" && name != "graphic/stereo3d") {
 			continue; // No need to save settings with default values
@@ -235,7 +254,18 @@ void writeConfig(Game& game, bool system) {
 		xmlpp::Element* entryNode = xmlpp::add_child_element(nodeRoot, "entry");
 
 		entryNode->set_attribute("type", type);
-		entryNode->set_attribute("name", name);
+		entryNode->set_attribute("name", name);		
+#ifdef USE_WEBSERVER
+		if (name.substr(0,10) == "webserver/") {
+			if (!item.getOldValue().empty() && (item.getOldValue() != item.getValue()) && !game.isFinished()) {
+				if (name == "webserver/access" && item.ui() == 0) {
+					continue; // Don't restart webserver if the new value is "Disabled."
+				}
+				webServerNeedsRestart  = true;
+				std::clog << "webserver/notice: WebServer configuration changed; we'll need to restart it." << std::endl;
+			}
+		}
+#endif
 		if (name == "audio/backend") {
 			std::string currentBackEnd = Audio::backendConfig().getOldValue();
 			int oldValue = PaHostApiNameToHostApiTypeId(currentBackEnd);
@@ -299,6 +329,9 @@ void writeConfig(Game& game, bool system) {
 		if (dirty) {
 			rename(tmp, conf);
 			std::cerr << "Saved configuration to " << conf << std::endl;
+#ifdef USE_WEBSERVER
+			if (webServerNeedsRestart) game.restartWebServer();
+#endif
 		}
 		else {
 			std::cerr << "Using default settings, no configuration file needed." << std::endl;
@@ -320,6 +353,9 @@ void readMenuXML(xmlpp::Node* node) {
 	xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(*node);
 	MenuEntry me;
 	me.name = getAttribute(elem, "name");
+#ifndef USE_WEBSERVER
+	if (me.name.substr(0,9) == "webserver") return;
+#endif
 	me.shortDesc = getText(elem, "short");
 	me.longDesc = getText(elem, "long");
 	configMenu.push_back(me);
@@ -368,6 +404,10 @@ void readConfigXML(fs::path const& file, unsigned mode) {
 					item.setGetValueFunction(getValue_language);
 				else if (item.getName() == "audio/backend")
 					item.setGetValueFunction(getValue_audio_backend);
+#ifdef USE_WEBSERVER
+				else if (item.getName() == "webserver/netmask")
+					item.setGetValueFunction(getValue_netmask);
+#endif
 			}
 			else {
 				if (it == config.end()) {

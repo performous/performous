@@ -155,13 +155,13 @@ if(NOT CPACK_PACKAGE_VERSION)
 endif()
 set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CMAKE_BINARY_DIR};${PROJECT_NAME};ALL;/")
 
-enable_testing()
-find_package(GTest)
-if(GTest_FOUND)
-	message(STATUS "Testing enabled: Building test host")
+set(BUILD_TESTS AUTO CACHE STRING "Build tests [OFF|AUTO*|ON]")
+set_property(CACHE BUILD_TESTS PROPERTY STRINGS AUTO ON OFF)
+
+
+if(BUILD_TESTS STREQUAL "AUTO" OR BUILD_TESTS STREQUAL "ON")
+	enable_testing()
 	add_subdirectory(testing)
-else()
-	message(STATUS "Testing disabled: Package gtest missing")
 endif()
 
 # Debian specific settings
@@ -171,7 +171,7 @@ set(CPACK_DEBIAN_PACKAGE_SECTION "Games")
 # RPM specific settings
 set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
 
-set(CPACK_RPM_PACKAGE_REQUIRES "cairo-devel, librsvg2-devel, glibmm24-devel, libxml++-devel, boost-devel, SDL2-devel, libepoxy-devel, ffmpeg-devel, portaudio-devel, opencv-devel, portmidi-devel, libjpeg-turbo-devel, pango-devel, libpng-devel, glm-devel, openblas-devel, fftw-devel, cpprest-devel")
+set(CPACK_RPM_PACKAGE_REQUIRES "cairo-devel, librsvg2-devel, glibmm24-devel, libxml++-devel, boost-devel, SDL2-devel, libepoxy-devel, ffmpeg-devel, portaudio-devel, opencv-devel, portmidi-devel, libjpeg-turbo-devel, pango-devel, libpng-devel, glm-devel, openblas-devel, fftw-devel")
 set(CPACK_RPM_PACKAGE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.md")
 
 set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "${LC_MESSAGES_DIRS}")

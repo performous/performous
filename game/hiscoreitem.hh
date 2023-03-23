@@ -5,11 +5,12 @@
 
 /// This struct holds together information for a single item of a highscore.
 struct HiscoreItem {
-	unsigned score, playerid, songid, level;
+	unsigned score, playerid, songid;
+	unsigned short level;
 	std::string track;
 	std::chrono::seconds unixtime;
 
-	HiscoreItem(unsigned score, unsigned playerid, unsigned songid, unsigned level, std::string const& track, std::chrono::seconds unixtime = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()))
+	HiscoreItem(unsigned score, unsigned playerid, unsigned songid, unsigned short level, std::string const& track, std::chrono::seconds unixtime = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()))
 	: score(score), playerid(playerid), songid(songid), level(level), track(track), unixtime(unixtime) {
 	}
 

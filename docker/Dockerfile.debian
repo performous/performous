@@ -25,13 +25,14 @@ RUN if [ ${OS_VERSION} -eq 10 ]; then \
       libavcodec-dev libavformat-dev libswscale-dev libjpeg-dev \
       portaudio19-dev libglm-dev libboost-filesystem-dev \
       libboost-iostreams-dev libboost-locale-dev libboost-system-dev \
-      libboost-program-options-dev libssl-dev libcpprest-dev \
+      libboost-program-options-dev libssl-dev \
       libportmidi-dev libopencv-dev libaubio-dev nlohmann-json3-dev \
-      libfmt-dev ca-certificates file && \
-    if [ ${OS_VERSION} -eq 11 ]; then \
-       apt-get -y install libgmock-dev libgtest-dev; fi && \
+      libfmt-dev ca-certificates file libgmock-dev libgtest-dev && \
     apt-get clean && \
     mkdir /root/performous
+      
+    #if [ ${OS_VERSION} -eq 11 ]; then \
+    #fi 
 
 ## Copy in the build script to make things easy
 COPY build_performous.sh /root/performous/build_performous.sh

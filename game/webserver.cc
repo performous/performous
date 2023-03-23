@@ -2,85 +2,124 @@
 #include "game.hh"
 
 #ifdef USE_WEBSERVER
-#include <boost/asio.hpp>
+#include "i18n.hh"
+#include "requesthandler.hh"
+#include "screen.hh"
 
-void WebServer::StartServer(int tried, bool fallbackPortInUse) {
+#include <boost/asio.hpp>
+#include <boost/asio/ip/network_v4.hpp>
+#include <boost/asio/ip/address_v4_range.hpp>
+
+void WebServer::startServer() {
+	if(config["webserver/access"].ui() == 0) {
+		std::clog << "webserver/notice: Not starting webserver because it's been explicitly turned off." << std::endl;
+		return;
+	}
+	std::string message(_("Webserver active!\nConnect to this computer\nusing "));
 	if(tried > 2) {
-		if(fallbackPortInUse == false) {
-			std::clog << "webserver/error: Couldn't start webserver tried 3 times. Trying fallback port.." << std::endl;
-			m_game.notificationFromWebserver("Couldn't start webserver tried 3 times. Trying fallback port...");
-			StartServer(0, true);
+		message = _("Couldn't start webserver");
+		if(fallBackPort == false) {
+			message += _("; trying fallback port...");
+			std::clog << message << std::endl;
+			m_game.notificationFromWebserver(_("Couldn't start webserver (tried 3 times.)\nTrying fallback port..."));
+			tried = 0;
+			fallBackPort = true;
 			return;
 		}
-
-		std::clog << "webserver/error: Couldn't start webserver tried 3 times using normal port and 3 times using fallback port. Stopping webserver." << std::endl;
-		m_game.notificationFromWebserver("Couldn't start webserver.");
-		if(m_server) {
-			m_server->close().wait();
+		message += _(" on either port; will now disable it.");
+		std::clog << std::string("webserver/warning: " ) + message << std::endl;
+		m_game.notificationFromWebserver(message);
+		_stop.set_value();
+		return;
 		}
+	unsigned short portToUse = fallBackPort ? config["webserver/fallback_port"].ui() : config["webserver/port"].ui();
+	std::string addr;
+	std::string logMsg("webserver/notice: Starting webserver, binding to ");
+	if (config["webserver/access"].ui() == 1) {
+		addr = "127.0.0.1";
+		logMsg += addr;
+		logMsg += ", listening to connections from localhost";
+	} else if (config["webserver/access"].ui() >= 2) {
+		addr = "0.0.0.0";
+		logMsg += addr;
+		logMsg += std::string("; listening to any connections");
+		if (config["webserver/access"].ui() == 3) {
+			logMsg += std::string(" originating from subnet ") += config["webserver/netmask"].getValue();
+		}
+		logMsg += std::string(".");
 	}
-
-	std::string portToUse = fallbackPortInUse ? std::to_string(config["game/webserver_fallback_port"].ui()) : std::to_string(config["game/webserver_port"].ui());
-	std::string addr("");
-	if(config["game/webserver_access"].ui() == 1) {
-		addr = "http://127.0.0.1:" + portToUse;
-		std::clog << "webserver/notice: Starting local server on: " << addr <<std::endl;
-	} else {
-		addr = "http://0.0.0.0:" + portToUse;
-		std::clog << "webserver/notice: Starting public server on: " << addr << std::endl;
-	}
-
+	std::clog << logMsg << std::endl;
 	try {
-		m_server = std::shared_ptr<RequestHandler>(new RequestHandler(m_game, addr, m_songs));
-		m_server->open().wait();
-		std::string message = getIPaddr() + ":" +  portToUse;
+		m_server = std::make_unique<RequestHandler>(addr, portToUse, m_songs, m_game);
 		m_game.notificationFromWebserver(message);
+		_stop.set_value();
 	} catch (std::exception& e) {
-		tried = tried + 1;
-		std::clog << "webserver/error: " << e.what() << " Trying again... (tried " << tried << " times)." << std::endl;
-		std::string message(e.what());
-		message += " Trying again... (tried " + std::to_string(tried) +" times).";
+		++tried;
+		message = fmt::format(_("{0}.\nTrying again... (tried {1} times.)"), e.what(), tried);		std::clog << std::string("webserver/error: ") + message << std::endl;
 		m_game.notificationFromWebserver(message);
-		std::this_thread::sleep_for(20s);
-		StartServer(tried, fallbackPortInUse);
+		return;
 	}
-}
-
-WebServer::WebServer(Game &game, Songs& songs)
-: m_game(game), m_songs(songs)
-{
-	if(config["game/webserver_access"].ui() == 0) {
-		std::clog << "webserver/notice: Not starting webserver." << std::endl;
-	} else {
-		m_serverThread = std::make_unique<std::thread>([this] { StartServer(0, false); });
-	}
-}
-
-WebServer::~WebServer() {
-	if( m_server ) {
-            try {
-		m_server->close().wait();
-		m_serverThread->join();
-            } catch (const pplx::invalid_operation &e) {
-                std::clog << "webserver/error: stoping webserver failed: " << e.what() << std::endl;
-            }
-	}
-}
-
-std::string WebServer::getIPaddr() {
 	try {
-		boost::asio::io_service netService;
-		boost::asio::ip::udp::resolver resolver(netService);
-		boost::asio::ip::udp::resolver::query query(boost::asio::ip::udp::v4(), "1.1.1.1", "80");
-		boost::asio::ip::udp::resolver::iterator endpoints = resolver.resolve(query);
-		boost::asio::ip::udp::endpoint ep = *endpoints;
-		boost::asio::ip::udp::socket socket(netService);
-		socket.connect(ep);
-		boost::asio::ip::address addr = socket.local_endpoint().address();
-		return addr.to_string();
-	} catch(std::exception& e) {
-		std::string ip = boost::asio::ip::host_name();
-		return ip.empty() ? "localhost" : ip;
+		boost::asio::post(m_server->m_restinio_server->io_context(), [&] {
+			m_server->m_restinio_server->open_sync();
+			std::string ip((config["webserver/access"].ui() == 1) ? "localhost" : m_server->getLocalIP().to_string());
+			message += std::string("http://") += ip += std::string(":") += std::to_string(portToUse);
+	m_game.notificationFromWebserver(message);
+				});
+		Performous_IP_Blocker::setAllowedSubnet(m_server->getLocalIP());
+		m_server->m_restinio_server->io_context().run();
+	} catch (std::exception& e) {
+		++tried;
+		message = fmt::format(_("{0}.\nTrying again... (tried {1} times.)"), e.what(), tried);
+		std::clog << std::string("webserver/error: ") + message << std::endl;
+		m_game.notificationFromWebserver(message);
 	}
 }
+
+WebServer::WebServer(Game &game, Songs& songs) : m_game(game), m_songs(songs) {
+	restartServer();
+}
+
+void WebServer::stopServer() {
+	try {
+		if (m_server) {
+			boost::asio::post(m_server->m_restinio_server->io_context(), [&] { m_server->m_restinio_server->close_sync(); });
+		m_server->m_restinio_server->io_context().stop();
+		}
+		if (m_serverThread && m_serverThread->joinable()) { m_serverThread->join(); }
+	} catch (const std::exception &e) {
+		std::clog << std::string("webserver/error: Failed to close RESTinio server due to: ") + e.what() << std::endl;
+		}
+}
+
+void WebServer::restartServer() {
+	stopServer();
+	std::promise<void>().swap(_stop);
+	auto future = std::shared_future<void>(_stop.get_future());
+	m_serverThread = std::make_unique<std::thread>([this, future]{
+		std::future_status status;
+		startServer();
+		do {
+			status = future.wait_for(std::chrono::seconds(20));
+			if (status == std::future_status::timeout) {
+				startServer();
+			} 
+			else if (status == std::future_status::ready) {
+				return;
+			}
+		} while (status != std::future_status::ready);
+	return;
+	});
+}
+
+void WebServer::forceQuitServer() {
+	try {
+		_stop.set_value();
+	} catch (std::future_error const& e) {
+		if (e.code() != std::future_errc::promise_already_satisfied) throw e;
+	}
+	stopServer();
+}
+
+
 #endif

@@ -201,7 +201,7 @@ double Song::getDurationSeconds() {
 		}
 		std::clog << "song/info: >>> Couldn't open file for calculating duration." << std::endl;
 		return 0.0;
-	} else { //duration is still in memmory that means we already loaded it
+	} else { //duration is still in memory that means we already loaded it
 		return m_duration;
 	}
 }

@@ -1,4 +1,4 @@
-﻿#include "screen_intro.hh"
+#include "screen_intro.hh"
 
 #include "fs.hh"
 #include "glmath.hh"
@@ -13,7 +13,7 @@
 
 #include <SDL_timer.h>
 
-ScreenIntro::ScreenIntro(Game &game, std::string const& name, Audio& audio): Screen(game, name), m_audio(audio), m_first(true) {
+ScreenIntro::ScreenIntro(Game &game, std::string const& name, Audio& audio): Screen(game, name), m_audio(audio), m_first(true), m_webserverSetting(config["webserver/access"]) {
 }
 
 void ScreenIntro::enter() {
@@ -30,7 +30,6 @@ void ScreenIntro::enter() {
 		m_first = false;
 	}
 	reloadGL();
-	webserversetting = config["game/webserver_access"].ui();
 	m_audio.playSample("notice.ogg");
 }
 
@@ -197,22 +196,15 @@ void ScreenIntro::populateMenu() {
 	m_menu.add(MenuOption(translate_noop("Quit"), translate_noop("Leave the game."), imgQuit)).screen("");
 }
 
-#ifdef USE_WEBSERVER
-
 void ScreenIntro::draw_webserverNotice() {
+#ifdef USE_WEBSERVER
 	auto& window = getGame().getWindow();
 	if(m_webserverNoticeTimeout.get() == 0) {
 		m_drawNotice = !m_drawNotice;
 		m_webserverNoticeTimeout.setValue(5);
 	}
-	std::stringstream m_webserverStatusString;
-	if((webserversetting == 1 || webserversetting == 2) && m_drawNotice) {
-		std::string message = getGame().subscribeWebserverMessages();
-		m_webserverStatusString << _("Webserver active!\n connect to this computer\nusing: ") << message;
-		theme->WebserverNotice.draw(window, m_webserverStatusString.str());
+	if((m_webserverSetting.ui() >= 1) && m_drawNotice) {
+		theme->WebserverNotice.draw(window, getGame().subscribeWebserverMessages());
 	}
-}
-
-#else
-void ScreenIntro::draw_webserverNotice() {}
 #endif
+}

@@ -1,21 +1,25 @@
 #pragma once
 
+#include "animvalue.hh"
+#include "audio.hh"
+#include "dialog.hh"
+#include "fbo.hh"
+#include "graphic/window.hh"
+#include "i18n.hh"
+#include "opengl_text.hh"
+#include "playlist.hh"
+#include "screen.hh"
+#include "singleton.hh"
+#include "webserver.hh"
+
 #include <memory>
 #include <string>
 
-#include "animvalue.hh"
-#include "opengl_text.hh"
-#include "graphic/window.hh"
-#include "dialog.hh"
-#include "playlist.hh"
-#include "fbo.hh"
-#include "audio.hh"
-#include "screen.hh"
-#include "i18n.hh"
+class Songs;
 
 class Game {
   public:
-	Game(Window& window);
+	Game(Window& window, Songs& songs);
 	~Game();
 	/// Adds a screen to the manager
 	void addScreen(std::unique_ptr<Screen> s) {
@@ -37,6 +41,8 @@ class Game {
 	Screen* getScreen(std::string const& name);
 	/// Returns a reference to the window
 	Window& window() { return m_window; }
+	/// Restart Webserver.
+	void restartWebServer();
 
 	/// Draw a loading progress indication
 	void loading(std::string const& message, float progress);
@@ -65,10 +71,8 @@ class Game {
 	void drawLogo();
 	///global playlist access
 	PlayList& getCurrentPlayList() { return currentPlaylist; }
-#ifdef USE_WEBSERVER
 	void notificationFromWebserver(std::string message) { m_webserverMessage = message; }
 	std::string subscribeWebserverMessages() { return m_webserverMessage; }
-#endif
 
 	Window& getWindow() { return m_window; }
 	Audio& getAudio() { return m_audio; }
@@ -76,6 +80,7 @@ class Game {
 private:
 	Window& m_window;
 	Audio m_audio;
+	std::unique_ptr<WebServer> m_webserver;
 
 public:
 	input::Controllers controllers;

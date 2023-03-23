@@ -10,6 +10,7 @@ if(SELF_BUILT_AUBIO STREQUAL "ALWAYS")
 		REFERENCE  ${Aubio_GIT_VERSION}
 		#FIND_PATH  aubio/aubio.h
 	)
+	set (Aubio_INCLUDE_DIRS "${FETCHCONTENT_BASE_DIR}/aubio-src-build/include" CACHE INTERNAL "Aubio includes" FORCE)
 elseif(SELF_BUILT_AUBIO STREQUAL "NEVER")
 	find_package(PkgConfig REQUIRED)
 	pkg_check_modules(AUBIO REQUIRED QUIET IMPORTED_TARGET GLOBAL aubio>=${Aubio_FIND_VERSION})
@@ -25,6 +26,7 @@ elseif(SELF_BUILT_AUBIO STREQUAL "AUTO")
 			REFERENCE  ${Aubio_GIT_VERSION}
 			#FIND_PATH  aubio/aubio.h
 		)
+		set (Aubio_INCLUDE_DIRS "${FETCHCONTENT_BASE_DIR}/aubio-src-build/include" CACHE INTERNAL "Aubio includes" FORCE)
 	else()
 		add_library(aubio ALIAS PkgConfig::AUBIO)
 		set(Aubio_VERSION ${AUBIO_VERSION})

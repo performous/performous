@@ -259,7 +259,7 @@ void Window::blank() {
 void Window::updateStereo(float sepFactor) {
 	try {
 		m_stereoUniforms.sepFactor = sepFactor;
-		m_stereoUniforms.z0 = (Constant::z0 - 2.0f * Constant::near);
+		m_stereoUniforms.z0 = (Constant::z0 - 2.0f * Constant::nearDistance);
 		glBufferSubData(GL_UNIFORM_BUFFER, m_stereoUniforms.offset(), m_stereoUniforms.size(), &m_stereoUniforms);
 	} catch(...) {}  // Not fatal if 3d shader is missing
 }

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14.5)
+cmake_minimum_required(VERSION 3.18.0)
 
 file(GLOB SOURCE_FILES
 	"*.cc"
@@ -88,16 +88,12 @@ set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES})
 # Build main executable
 add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
 # Libraries
-
-find_package(Boost 1.55 REQUIRED COMPONENTS program_options iostreams system locale)
-target_include_directories(performous SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
-target_link_libraries(performous PRIVATE ${Boost_LIBRARIES})
-
+find_package(Boost ${NEEDED_BOOST_VERSION} REQUIRED COMPONENTS program_options iostreams system locale)
+target_link_libraries(performous PRIVATE Boost::program_options Boost::iostreams Boost::locale Boost::system Boost::boost)
 add_library(fs STATIC fs.cc)
 target_include_directories(fs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 if (USE_BOOST_FS)
-	find_package(Boost 1.55 REQUIRED COMPONENTS filesystem)
-
+    find_package(Boost ${NEEDED_BOOST_VERSION} REQUIRED COMPONENTS filesystem)
 	message (STATUS "Using boost::filesystem")
 	target_link_libraries(fs PUBLIC Boost::filesystem)
 	target_compile_definitions(fs PUBLIC -DUSE_BOOST_FS)
@@ -123,6 +119,7 @@ pkg_check_modules(deps REQUIRED IMPORTED_TARGET glib-2.0 gio-2.0 gobject-2.0)
 set(SELF_BUILT_GIT_BASE "https://github.com/performous" CACHE STRING "base path of the git trees used for self built dependencies")
 set(SELF_BUILT_AUBIO "NEVER" CACHE STRING "rule to allow self build of Aubio dependency library [NEVER*|AUTO|ALWAYS]")
 set(SELF_BUILT_JSON "NEVER" CACHE STRING "rule to allow self build of Json dependency library [NEVER*|AUTO|ALWAYS]")
+set(SELF_BUILT_RESTINIO "NEVER" CACHE STRING "rule to allow self build of RESTinio library [NEVER*|AUTO|ALWAYS]")
 
 set(Aubio_REQUIRED_VERSION "0.4.9")
 
@@ -203,31 +200,34 @@ set(ENABLE_WEBSERVER AUTO CACHE STRING "Use webserver")
 set_property(CACHE ENABLE_WEBSERVER PROPERTY STRINGS AUTO ON OFF)
 if("AUTO" STREQUAL "${ENABLE_WEBSERVER}")
 	# webserver not requested explicitly, best effort try to find it
-	find_package(CppRest QUIET)
-	if(CppRest_FOUND)
+	find_package(RESTinio QUIET)
+	if(RESTinio_FOUND)
 		message(STATUS "Webserver support: Enabled (automatically found)")
 	else()
-		message(STATUS "Webserver support: Disabled (cpprestsdk not found)")
-		SET (ENABLE_WEBSERVER OFF FORCE)
+		message(STATUS "Webserver support: Disabled (Restinio not found)")
+		SET (ENABLE_WEBSERVER OFF CACHE FORCE)
 	endif()
-elseif(ENABLE_WEBSERVER)
+elseif("ON" STREQUAL "${ENABLE_WEBSERVER}")
 	# webserver explicitly requested, make it mandatory
-	find_package(CppRest REQUIRED)
+	find_package(RESTinio REQUIRED)
 	message(STATUS "Webserver support: Enabled (explicitly enabled)")
 else()
 	# webserver explicitly disabled
 	message(STATUS "Webserver support: Disabled (explicitly disabled)")
 endif()
+# if Restinio is found, add it to the dependencies
+if(RESTinio_FOUND)
+	get_target_property(RESTinio_INCLUDE_DIRS restinio::restinio INTERFACE_INCLUDE_DIRECTORIES)
+	message(STATUS "RESTinio include directories: ${RESTinio_INCLUDE_DIRS}")
+	target_link_libraries(performous PRIVATE restinio::restinio)
+	target_compile_definitions(performous PRIVATE "-DUSE_WEBSERVER")
+endif()
 
-# if cpprest is found, add it to the dependencies
-if(CppRest_FOUND)
-	# add other required dependencies then
-	# FIXME: move this to the CppRest package includes if possible
-	find_package(Boost 1.55 REQUIRED COMPONENTS chrono thread)
-	target_include_directories(performous SYSTEM PRIVATE ${CppRest_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
-	target_link_libraries(performous PRIVATE ${CppRest_LIBRARIES} ${Boost_LIBRARIES})
-
-	add_definitions("-DUSE_WEBSERVER")
+if(ENABLE_WEBSERVER)
+	set(NEEDED_BOOST_VERSION 1.69)
+else()
+	set(NEEDED_BOOST_VERSION 1.58)
+	message(STATUS "Webserver support: Disabled (explicitly disabled)")
 endif()
 
 if(WIN32)
