@@ -33,8 +33,6 @@ endif()
 
 find_package(GTest ${GTEST_REQUIRED})
 
-message("GTEST REQUIRED? ${GTEST_REQUIRED}, CMAKE VERSION: ${CMAKE_VERSION}, GTest_FOUND?: ${GTest_FOUND}")
-
 if(GTest_FOUND)
 	message(STATUS "Testing enabled: Building test host")
 

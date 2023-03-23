@@ -53,7 +53,7 @@ jobs:
           set VCPKG_BINARY_SOURCES="files,${{ github.workspace }}\vcpkg_cache,read"
           cd ${{ github.workspace }}/performous
           echo $PERFORMOUS_VERSION
-          cmake --preset "x64-debinfo" --debug-find-pkg=GTest -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_OVERLAY_TRIPLETS="${{ github.workspace }}\performous\cmake\triplets"
+          cmake --preset "x64-debinfo" -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_OVERLAY_TRIPLETS="${{ github.workspace }}\performous\cmake\triplets"
           cmake --build --preset "x64-debinfo"
       - name: Run unittests directly called.
         run: |
@@ -166,7 +166,7 @@ jobs:
           mkdir build
           for f in $(ls -Q ./lang/*.po); do mkdir -pv "./build/lang/$(basename $f | cut -d. -f1)/LC_MESSAGES";done
           cd build
-          "${{ env.workpath }}/msys64/mingw64/bin/cmake.exe" --debug-find-pkg=GTest -G "MinGW Makefiles" -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE="RelWithDebInfo" -DSELF_BUILT_AUBIO=ALWAYS -DENABLE_WEBSERVER=ON             -DSELF_BUILT_RESTINIO=ALWAYS -DRESTINIO_FMT_HEADER_ONLY=ON -DPERFORMOUS_VERSION=${{ env.PERFORMOUS_VERSION }} -DCMAKE_VERBOSE_MAKEFILE=ON -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64" ..
+          "${{ env.workpath }}/msys64/mingw64/bin/cmake.exe" -G "MinGW Makefiles" -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE="RelWithDebInfo" -DSELF_BUILT_AUBIO=ALWAYS -DENABLE_WEBSERVER=ON             -DSELF_BUILT_RESTINIO=ALWAYS -DRESTINIO_FMT_HEADER_ONLY=ON -DPERFORMOUS_VERSION=${{ env.PERFORMOUS_VERSION }} -DCMAKE_VERBOSE_MAKEFILE=ON -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64" ..
           "${{ env.workpath }}/msys64/mingw64/bin/cmake.exe" --build ./ --verbose --parallel 3
       - name: Run unittests directly called.
         shell: msys2 {0}
