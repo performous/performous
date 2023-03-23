@@ -9,7 +9,7 @@ RUN dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-rele
         glibmm24-devel libxml++-devel boost-devel SDL2-devel libepoxy-devel ffmpeg-devel \
         portaudio-devel help2man redhat-lsb opencv-devel portmidi-devel libjpeg-turbo-devel \
         pango-devel jsoncpp-devel glm-devel openblas-devel fftw-devel \
-        aubio-devel json-devel rpm-build fmt-devel gtest-devel gmock-devel && \
+        aubio-devel json-devel rpm-build fmt-devel gtest-devel gmock-devel gtest && \
     dnf clean all && \
     mkdir /root/performous
 
