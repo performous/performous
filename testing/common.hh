@@ -6,8 +6,8 @@
 static constexpr float pi = 3.14159265359f;
 static constexpr float pi2 = pi * 2.f;
 #else
-static constexpr float pi = std::acos(-1.f);
-static constexpr float pi2 = pi * 2.f;
+static const float pi = std::acos(-1.f);
+static const float pi2 = pi * 2.f;
 #endif
 
 #include <gtest/gtest.h>
