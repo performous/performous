@@ -32,3 +32,12 @@ std::string format(std::chrono::seconds const& unixtime, std::string const& form
 
 	return stream.str();
 }
+
+int getTimezoneOffset() {
+	auto const now = std::time(nullptr);
+	auto const local = *std::localtime(&now);
+	auto const utc = *std::gmtime(&now);
+
+	return local.tm_hour - utc.tm_hour;
+}
+
