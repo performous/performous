@@ -37,8 +37,8 @@ namespace {
 		// next two tests are not working when compiled with mingw. see https://sourceforge.net/p/mingw-w64/bugs/793/
 		//EXPECT_EQ("01/01/70 02:01", format(time, "%D %R"));
 		//EXPECT_EQ("02:01:00 1970-01-01", format(time, "%T %F"));
-		EXPECT_EQ("01/01/70 02:01", format(time, "%m/%d/%y %H:%M"));
-		EXPECT_EQ("02:01:00 1970-01-01", format(time, "%H:%M:%S %Y-%m-%d"));
-		EXPECT_EQ("02:01:00 1970-01-01", format(time, "%X %Y-%m-%d"));
+		EXPECT_EQ("01/01/70 02:01", format(time, "%m/%d/%y %H:%M", true));
+		EXPECT_EQ("02:01:00 1970-01-01", format(time, "%H:%M:%S %Y-%m-%d", true));
+		EXPECT_EQ("02:01:00 1970-01-01", format(time, "%X %Y-%m-%d", true));
 	}
 }

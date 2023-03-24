@@ -24,11 +24,11 @@ unsigned stou(std::string const & str, size_t * idx, int base) {
 	return uival;
 }
 
-std::string format(std::chrono::seconds const& unixtime, std::string const& format) {
+std::string format(std::chrono::seconds const& unixtime, std::string const& format, bool utc) {
 	auto const time = static_cast<std::time_t>(unixtime.count());
 	auto stream = std::stringstream();
 
-	stream << std::put_time(std::localtime(&time), format.c_str());
+	stream << std::put_time(utc ? std::gmtime(&time) : std::localtime(&time), format.c_str());
 
 	return stream.str();
 }
