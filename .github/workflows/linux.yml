@@ -142,7 +142,7 @@ jobs:
           # For some reason, building with 'RelWithDebInfo' (default) doesn't work 
           # specifically on PRs, so we'll just build Releases for everything for now
           #if [ '${{ github.event_name }}' != 'pull_request' ]; then
-            RELEASE_TYPE="-R"
+            RELEASE_TYPE="RelWithDebInfo"
           #fi
 
           # Only pull the container if it wasn't built locally
