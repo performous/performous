@@ -51,7 +51,7 @@ struct UnlockGuard {
 };
 
 std::uint32_t stou(std::string const & str, size_t * idx = nullptr, int base = 10);
-std::string format(std::chrono::seconds const& unixtime, std::string const& format);
+std::string format(std::chrono::seconds const& unixtime, std::string const& format, bool utc = false);
 
 /** Templated conversion from strongly typed enums to the underlying type. **/
 template <typename E>
