@@ -82,3 +82,12 @@ bool isText(const std::string& text, size_t bytesToCheck) {
 
     return true;
 }
+
+int getTimezoneOffset() {
+	auto const now = std::time(nullptr);
+	auto const local = *std::localtime(&now);
+	auto const utc = *std::gmtime(&now);
+
+	return local.tm_hour - utc.tm_hour;
+}
+

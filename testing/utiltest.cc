@@ -31,8 +31,12 @@ namespace {
 		EXPECT_EQ(1.0, smoothstep(-1., 1., 2.0));
 	}
 
+	TEST(UnitTest_Utils, DISABLED_getTimezoneOffset) {
+		EXPECT_EQ(1, getTimezoneOffset());
+	}
+
 	TEST(UnitTest_Utils, format) {
-		auto const time = std::chrono::seconds(7260);
+		auto const time = std::chrono::seconds(7260 - 3600 * getTimezoneOffset());
 
 		// next two tests are not working when compiled with mingw. see https://sourceforge.net/p/mingw-w64/bugs/793/
 		//EXPECT_EQ("01/01/70 02:01", format(time, "%D %R"));

@@ -52,6 +52,7 @@ struct UnlockGuard {
 
 std::uint32_t stou(std::string const & str, size_t * idx = nullptr, int base = 10);
 std::string format(std::chrono::seconds const& unixtime, std::string const& format, bool utc = false);
+int getTimezoneOffset();
 
 bool startsWithUTF8BOM(std::string const& s);
 bool isText(std::string const& s, size_t bytesToCheck = 32);
