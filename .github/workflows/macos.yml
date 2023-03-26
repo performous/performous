@@ -61,6 +61,7 @@ jobs:
           path: performous
 
       - name: Start SSH session
+        if: ${{ failure() }}
         id: ssh_debug
         uses: luchihoratiu/debug-via-ssh@main
         with:

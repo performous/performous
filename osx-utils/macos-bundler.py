@@ -19,6 +19,8 @@ import tty
 port_location = None
 brew_location = None
 opencv_prefix: Path = None
+openssl_prefix: Path = None
+openssl_root = ""
 script_prefix: Path = None
 performous_source_dir = None
 
@@ -72,7 +74,7 @@ def check_installed_port(name : str, file : str) -> Optional[str]:
 		return None
 
 def detect_prefix():
-	global opencv_prefix, script_prefix
+	global opencv_prefix, script_prefix, openssl_prefix, openssl_root
 	port_location = check_installed('port')
 	brew_location = check_installed('brew')
 	if port_location != None:
@@ -100,6 +102,11 @@ def detect_prefix():
 			if check_opencv != None:
 				opencv_prefix = str(check_opencv.parent)
 				print("--- OpenCV 3 detected at: " + str(opencv_prefix) + "\n")
+		check_openssl = check_brew_formula("openssl", "libcrypto.pc")
+		if check_openssl != None:
+			openssl_prefix = str(check_openssl)
+			openssl_root = f"-DOPENSSL_ROOT_DIR='{str(check_openssl.parent.parent)}'"
+			print("--- OpenSSL detected at: " + str(openssl_prefix) + "\n")
 	else:
 		print("--- Homebrew does not appear to be installed.\n")
 
@@ -325,8 +332,12 @@ if __name__ == "__main__":
 		prefix = str(script_prefix)
 		if opencv_prefix != None:
 			prefix += (";" + str(opencv_prefix))
+		if openssl_prefix != None:
+			prefix += (";" + str(openssl_prefix))
 		command = fr"""
 		cmake \
+		{openssl_root} \
+		-DPKG_CONFIG_USE_CMAKE_PREFIX_PATH:BOOL=ON \
 		-DCMAKE_INSTALL_PREFIX:PATH="{str(performous_out_dir)}" \
 		-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
 		-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON \
