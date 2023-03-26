@@ -233,20 +233,18 @@ elseif(ENABLE_WEBSERVER)
 endif()
 
 # if cpprest is found, add it to the dependencies
-if(cpprestsdk_FOUND)
+if(cpprestsdk_FOUND OR CppRest_FOUND)
 	# add other required dependencies then
 	# FIXME: move this to the CppRest package includes if possible
 	find_package(Boost 1.55 REQUIRED COMPONENTS chrono thread)
-	target_link_libraries(performous PRIVATE cpprestsdk::cpprest)
-
-	add_definitions("-DUSE_WEBSERVER")
-elseif(CppRest_FOUND)
-	# add other required dependencies then
-	# FIXME: move this to the CppRest package includes if possible
-	find_package(Boost 1.55 REQUIRED COMPONENTS chrono thread)
-	target_include_directories(performous SYSTEM PRIVATE ${CppRest_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
-	target_link_libraries(performous PRIVATE ${CppRest_LIBRARIES} ${Boost_LIBRARIES})
-
+	find_package(OpenSSL REQUIRED)
+	if(cpprestsdk_FOUND)
+		target_link_libraries(performous PRIVATE cpprestsdk::cpprest)
+	else()
+		target_include_directories(performous SYSTEM PRIVATE ${CppRest_INCLUDE_DIRS})
+		target_link_libraries(performous PRIVATE ${CppRest_LIBRARIES})
+	endif()
+	target_link_libraries(performous PRIVATE Boost::boost Boost::chrono OpenSSL::SSL OpenSSL::Crypto)
 	add_definitions("-DUSE_WEBSERVER")
 endif()
 
