@@ -141,6 +141,11 @@ foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWS
 endforeach(lib)
 
 find_package(fmt REQUIRED CONFIG)
+# CppRESTSDK and their godforsaken U macro.
+if(fmt_VERSION VERSION_GREATER_EQUAL 9.0.0)
+	target_compile_definitions(performous PRIVATE -D_TURN_OFF_PLATFORM_STRING)
+endif()
+
 target_link_libraries(performous PRIVATE fmt::fmt)
 
 target_include_directories(fs PRIVATE ${SDL2_INCLUDE_DIRS})
