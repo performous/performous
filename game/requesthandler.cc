@@ -37,7 +37,7 @@ void RequestHandler::HandleFile(web::http::http_request request, std::string fil
 
     std::string fileToSend = findFile(fileName).string();
 
-    concurrency::streams::fstream::open_istream(U(fileToSend), std::ios::in).then([=](concurrency::streams::istream is) {
+    concurrency::streams::fstream::open_istream(utility::conversions::to_string_t(fileToSend), std::ios::in).then([=](concurrency::streams::istream is) {
         std::string content_type = "";
         if(path.find(".html") != std::string::npos) {
             content_type = "text/html";
@@ -53,7 +53,7 @@ void RequestHandler::HandleFile(web::http::http_request request, std::string fil
             content_type = "image/x-icon";
         }
 
-        request.reply(web::http::status_codes::OK, is, U(content_type)).then([](pplx::task<void> t) {
+        request.reply(web::http::status_codes::OK, is, utility::conversions::to_string_t(content_type)).then([](pplx::task<void> t) {
             try {
                 t.get();
             } catch(...){
@@ -65,7 +65,7 @@ void RequestHandler::HandleFile(web::http::http_request request, std::string fil
         try {
             t.get();
         } catch(...) {
-            request.reply(web::http::status_codes::InternalError,U("INTERNAL ERROR "));
+            request.reply(web::http::status_codes::InternalError,utility::conversions::to_string_t("INTERNAL ERROR "));
         }
     });
 }
@@ -136,7 +136,7 @@ void RequestHandler::Get(web::http::http_request request)
         request.reply(web::http::status_codes::OK, jsonRoot);
         return;
     } else if(path == "/api/getplaylistTimeout") {
-        request.reply(web::http::status_codes::OK, U(config["game/playlist_screen_timeout"].ui()));
+        request.reply(web::http::status_codes::OK, std::to_string(config["game/playlist_screen_timeout"].ui()));
         return;
     } else {
         HandleFile(request);
