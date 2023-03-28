@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.14.5)
 project(Performous CXX C)
 
+set(CMAKE_VERBOSE_MAKEFILE TRUE CACHE BOOL "Produce verbose makefile" FORCE)
+
 include(GNUInstallDirs)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -33,8 +35,8 @@ endif(REAL_SOURCE_DIR STREQUAL REAL_BUILD_DIR)
 
 # Add a sensible build type default and warning because empty means no optimization and no debug info.
 if(NOT DEFINED CMAKE_BUILD_TYPE)
-	message("WARNING: CMAKE_BUILD_TYPE is not defined!\n         Defaulting to CMAKE_BUILD_TYPE=RelWithDebInfo. Use ccmake to set a proper value.")
-	set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
+	message("WARNING: CMAKE_BUILD_TYPE is not defined!\n         Defaulting to CMAKE_BUILD_TYPE=RelWithDebInfo. Use ccmake or the command-line to set a proper value.")
+	set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif(NOT DEFINED CMAKE_BUILD_TYPE)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -88,6 +90,7 @@ elseif(APPLE)
 	set(CMAKE_INSTALL_MANDIR "${CMAKE_INSTALL_PREFIX}/Resources/man/man6")
 endif()
 
+set(CMAKE_CXX_FLAGS_RelWithDebInfo "${CMAKE_CXX_FLAGS_RelWithDebInfo} -O3")
 
 set(SHARE_INSTALL "${CMAKE_INSTALL_DATAROOTDIR}" CACHE INTERNAL "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
 mark_as_advanced(SHARE_INSTALL)
