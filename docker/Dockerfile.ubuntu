@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 ARG OS_VERSION
 ## Use the official Ubuntu <OS_VERSION> Image from Dockerhub
 FROM docker.io/library/ubuntu:${OS_VERSION}
@@ -6,9 +7,25 @@ FROM docker.io/library/ubuntu:${OS_VERSION}
 ## hang on asking for user input for configuration
 ARG DEBIAN_FRONTEND="noninteractive"
 ARG TZ="America/New_York"
+ENV PACKAGE_TYPE="DEB"
 
 ## Install the deps and create the build directory
-RUN apt-get update && \ 
+RUN <<EOR
+  #!/bin/bash -x
+  if [[ "${VERSION_ID}" == "20.04" ]]; then
+    apt-get -y update
+    apt-get -y install gnupg wget
+    wget -O ./key.asc https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null
+    gpg -v -o /usr/share/keyrings/kitware-archive-keyring.gpg --dearmor ./key.asc
+    echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' | tee /etc/apt/sources.list.d/kitware.list >/dev/null
+    apt-get -y update
+    apt-get -y install cmake
+fi
+EOR
+
+RUN <<EOR
+    #!/bin/bash -x
+    apt-get update
     apt-get install -y --no-install-recommends git cmake build-essential \
       gettext help2man libopenblas-dev libfftw3-dev libicu-dev libepoxy-dev \
       libsdl2-dev libfreetype6-dev libpango1.0-dev librsvg2-dev libxml++2.6-dev \
@@ -17,9 +34,10 @@ RUN apt-get update && \
       libboost-iostreams-dev libboost-locale-dev libboost-system-dev \
       libboost-program-options-dev libssl-dev libcpprest-dev \
       libportmidi-dev libopencv-dev libaubio-dev \
-      libfmt-dev ca-certificates file libgtest-dev libgmock-dev google-mock && \
-    apt-get clean && \
-    mkdir /root/performous
+      libfmt-dev ca-certificates file libgtest-dev libgmock-dev google-mock
+    apt-get clean
+    mkdir -p /root/performous
+EOR
 
 ## Copy in the build script to make things easy
 COPY build_performous.sh /root/performous/build_performous.sh

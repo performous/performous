@@ -2,6 +2,8 @@
 ## Pull in /etc/os-release so we can see what we're running on
 . /etc/os-release
 
+test -f ./platform_flags.sh && . ./platform_flags.sh
+
 ## Default Vars
 GIT_REPOSITORY='https://github.com/performous/performous.git'
 
@@ -24,14 +26,14 @@ usage() {
 }
 
 ## Set up getopts
-while getopts "b:D:E:gp:r:Rh" OPTION; do
+while getopts "b:D:E:gp:r:R:h" OPTION; do
   case ${OPTION} in
     "b")
       GIT_BRANCH=${OPTARG};;
     "D")
       BUILD_DIRECTORY=${OPTARG};;
     "E")
-      EXTRA_CMAKE_ARGS=${OPTARG};;
+      EXTRA_CMAKE_ARGS="${EXTRA_CMAKE_ARGS} ${OPTARG}";;
     "g")
       GENERATE_PACKAGES=true;;
     "p")
@@ -39,75 +41,58 @@ while getopts "b:D:E:gp:r:Rh" OPTION; do
     "r")
       GIT_REPOSITORY=${OPTARG};;
     "R")
-      RELEASE_BUILD=true;;
+      PERFORMOUS_BUILD_TYPE=${OPTARG};;
     "h")
       HELP=true;;
   esac
 done
 
-if [ ${HELP} ]; then
+if [[ "${HELP}" == "true" ]]; then
   usage
 fi
 
+# Pull in any platform-specific flags that may have been set under each docker container.
+if [[ "$(command -v import_platform_flags > /dev/null ; echo $?)" == "0" ]]; then
+	import_platform_flags
+fi
+
 ## All the git stuff
-if [ -z ${BUILD_DIRECTORY} ]; then
+if [[ "${BUILD_DIRECTORY}" == "" ]]; then
   git clone ${GIT_REPOSITORY}
   cd performous
-  if [ ${PULL_REQUEST} ]; then
+  if [[ "${PULL_REQUEST}" != "" ]]; then
     git fetch origin pull/${PULL_REQUEST}/head:pr
     git checkout pr
-  elif [ ${GIT_BRANCH} ]; then
+  elif [[ "${GIT_BRANCH}" != "" ]]; then
     git checkout ${GIT_BRANCH}
   fi
   git submodule update --init --recursive
 else
-  cd ${BUILD_DIRECTORY}
+  mkdir -p "${BUILD_DIRECTORY}"
+  cd "${BUILD_DIRECTORY}"
 fi
 
-## Set up some special cmake flags for fedora
-if [[ "${ID}" == "fedora" ]]; then
-  EXTRA_CMAKE_ARGS="${EXTRA_CMAKE_ARGS} -DUSE_BOOST_REGEX=1"
+
+## If PACKAGE_TYPE is unset, use tgz.
+if [[ "${PACKAGE_TYPE}" == "" ]]; then
+    PACKAGE_TYPE="TGZ"
 fi
 
-## Set more cmake flags for Debian 10
-# Debian Buster has system Aubio 0.4.5, this is not enough
-# because performous requires a minimum version of 0.4.9.
-if ([[ "${ID}" == "debian" && "${VERSION_ID}" == "10" ]]); then
-  EXTRA_CMAKE_ARGS="${EXTRA_CMAKE_ARGS} -DSELF_BUILT_AUBIO=ALWAYS -DSELF_BUILT_JSON=ALWAYS"
-  echo 'deb http://deb.debian.org/debian buster-backports main' >> /etc/apt/sources.list
-  apt-get -y update
-  apt-get -y install libfmt-dev/buster-backports
-elif ([[ "${ID}" == "ubuntu" && "${VERSION_ID}" == "20.04" ]]); then
-  apt-get -y update
-  apt-get -y install gnupg wget
-  wget -O ./key.asc https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null
-  gpg -v -o /usr/share/keyrings/kitware-archive-keyring.gpg --dearmor ./key.asc
-  `echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' | tee /etc/apt/sources.list.d/kitware.list >/dev/null`
-  apt-get -y update
-  apt-get -y install cmake
-fi
 
-if [ "${RELEASE_BUILD}" ]; then
-  EXTRA_CMAKE_ARGS="${EXTRA_CMAKE_ARGS} -DCMAKE_BUILD_TYPE=Release"
-fi
-
-## Figure out what type of packages we need to generate
-case ${ID} in
-  'fedora')
-    PACKAGE_TYPE='RPM';;
-  'ubuntu'|'debian')
-    PACKAGE_TYPE='DEB';;
-  *)
-    PACKAGE_TYPE='TGZ';;
-esac
-
-## Build with cmake 
+## Build with cmake
 mkdir build
 cd build
-cmake ${EXTRA_CMAKE_ARGS} -DENABLE_WEBSERVER=ON -DCMAKE_VERBOSE_MAKEFILE=1 -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DENABLE_WEBCAM=ON -DBUILD_TESTS=ON ..
+cmake ${EXTRA_CMAKE_ARGS} \
+	${PLATFORM_CMAKE_FLAGS} \
+    -DENABLE_WEBSERVER=ON \
+    -DCMAKE_VERBOSE_MAKEFILE=ON \
+    -DENABLE_WEBCAM=ON \
+    -DCMAKE_BUILD_TYPE=${PERFORMOUS_BUILD_TYPE} \
+    -DBUILD_TESTS=ON \
+    ..
 CPU_CORES=$(nproc --all)
 make -j${CPU_CORES}
-if [ ${GENERATE_PACKAGES} ]; then
+if [[ "${GENERATE_PACKAGES}" == "true" ]]; then
   cpack -G ${PACKAGE_TYPE}
 fi
 cd ..
