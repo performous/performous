@@ -11,32 +11,32 @@ ENV PACKAGE_TYPE="DEB"
 
 ## Install the deps and create the build directory
 RUN <<EOR
-  #!/bin/bash -x
-  if [[ "${VERSION_ID}" == "20.04" ]]; then
-    apt-get -y update
-    apt-get -y install gnupg wget
-    wget -O ./key.asc https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null
-    gpg -v -o /usr/share/keyrings/kitware-archive-keyring.gpg --dearmor ./key.asc
-    echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' | tee /etc/apt/sources.list.d/kitware.list >/dev/null
-    apt-get -y update
-    apt-get -y install cmake
-fi
+#!/bin/bash -x
+	if [[ "${VERSION_ID}" == "20.04" ]]; then
+		apt-get -y update
+		apt-get -y install gnupg wget
+		wget -O ./key.asc https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null
+		gpg -v -o /usr/share/keyrings/kitware-archive-keyring.gpg --dearmor ./key.asc
+		echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' | tee /etc/apt/sources.list.d/kitware.list >/dev/null
+		apt-get -y update
+		apt-get -y install cmake
+	fi
 EOR
 
 RUN <<EOR
-    #!/bin/bash -x
-    apt-get update
-    apt-get install -y --no-install-recommends git cmake build-essential \
-      gettext help2man libopenblas-dev libfftw3-dev libicu-dev libepoxy-dev \
-      libsdl2-dev libfreetype6-dev libpango1.0-dev librsvg2-dev libxml++2.6-dev \
-      libavcodec-dev libavformat-dev libswscale-dev libjpeg-dev \
-      portaudio19-dev libglm-dev libboost-filesystem-dev nlohmann-json3-dev\
-      libboost-iostreams-dev libboost-locale-dev libboost-system-dev \
-      libboost-program-options-dev libssl-dev libcpprest-dev \
-      libportmidi-dev libopencv-dev libaubio-dev \
-      libfmt-dev ca-certificates file libgtest-dev libgmock-dev google-mock
-    apt-get clean
-    mkdir -p /root/performous
+#!/bin/bash -x
+	apt-get update
+	apt-get install -y --no-install-recommends git cmake build-essential \
+		gettext help2man libopenblas-dev libfftw3-dev libicu-dev libepoxy-dev \
+		libsdl2-dev libfreetype6-dev libpango1.0-dev librsvg2-dev libxml++2.6-dev \
+		libavcodec-dev libavformat-dev libswscale-dev libjpeg-dev \
+		portaudio19-dev libglm-dev libboost-filesystem-dev nlohmann-json3-dev\
+		libboost-iostreams-dev libboost-locale-dev libboost-system-dev \
+		libboost-program-options-dev libssl-dev libcpprest-dev \
+		libportmidi-dev libopencv-dev libaubio-dev \
+		libfmt-dev ca-certificates file libgtest-dev libgmock-dev google-mock
+	apt-get clean
+	mkdir -p /root/performous
 EOR
 
 ## Copy in the build script to make things easy
