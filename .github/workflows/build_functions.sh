@@ -32,10 +32,10 @@ function package_name () {
   PACKAGE_OS=${4}
   PACKAGE_OS_VERSION=${5}
 
-  if [ ${PACKAGE_OS} ]; then
+  if [[ "${PACKAGE_OS}" != "" ]]; then
     PACKAGE_OS_NAME="-${PACKAGE_OS}"
   fi
-  if [ ${PACKAGE_OS_VERSION} ]; then
+  if [[ "${PACKAGE_OS_VERSION}" != "" ]]; then
     PACKAGE_OS_VERSION_NAME="_${PACKAGE_OS_VERSION}"
   fi
   PACKAGE_PATH=$(ls ${WORK_DIR}/${PACKAGE_REGEX})
