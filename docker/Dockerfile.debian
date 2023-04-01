@@ -17,34 +17,35 @@ COPY platform_flags.sh ./platform_flags.sh
 
 ## Install the deps and create the build directory
 RUN <<EOR
-    #!/bin/bash -x
-    if [[ "${OS_VERSION}" == "10" ]]; then
-        . ./platform_flags.sh
-        apt-get update
-        apt-get install -y wget gpg
-        wget -nc https://apt.kitware.com/keys/kitware-archive-latest.asc
-        apt-key add kitware-archive-latest.asc
-        echo 'deb https://apt.kitware.com/ubuntu/ bionic main' | tee /etc/apt/sources.list.d/kitware.list >/dev/null
-        echo 'deb http://deb.debian.org/debian buster-backports main' | tee /etc/apt/sources.list.d/backports.list
-        export_platform_flags '-DSELF_BUILT_AUBIO=ALWAYS -DSELF_BUILT_JSON=ALWAYS'
-        apt-get -y update
-        apt-get -y install libfmt-dev/buster-backports
-    fi
+#!/bin/bash -x
+	if [[ "${OS_VERSION}" == "10" ]]; then
+		. ./platform_flags.sh
+		apt-get update
+		apt-get install -y wget gpg
+		wget -nc https://apt.kitware.com/keys/kitware-archive-latest.asc
+		apt-key add kitware-archive-latest.asc
+		echo 'deb https://apt.kitware.com/ubuntu/ bionic main' | tee /etc/apt/sources.list.d/kitware.list >/dev/null
+		echo 'deb http://deb.debian.org/debian buster-backports main' | tee /etc/apt/sources.list.d/backports.list
+		export_platform_flags '-DSELF_BUILT_AUBIO=ALWAYS -DSELF_BUILT_JSON=ALWAYS'
+		apt-get -y update
+		apt-get -y install libfmt-dev/buster-backports
+	fi
 EOR
+
 RUN <<EOR
-    #!/bin/bash -x
-    apt-get update
-    apt-get install -y --no-install-recommends git cmake build-essential \
-      gettext help2man libopenblas-dev libfftw3-dev libicu-dev libepoxy-dev \
-      libsdl2-dev libfreetype6-dev libpango1.0-dev librsvg2-dev libxml++2.6-dev \
-      libavcodec-dev libavformat-dev libswscale-dev libjpeg-dev \
-      portaudio19-dev libglm-dev libboost-filesystem-dev \
-      libboost-iostreams-dev libboost-locale-dev libboost-system-dev \
-      libboost-program-options-dev libssl-dev libcpprest-dev \
-      libportmidi-dev libopencv-dev libaubio-dev nlohmann-json3-dev \
-      libfmt-dev ca-certificates file libgmock-dev libgtest-dev
-    apt-get clean
-    mkdir -p /root/performous
+#!/bin/bash -x
+	apt-get update
+	apt-get install -y --no-install-recommends git cmake build-essential \
+		gettext help2man libopenblas-dev libfftw3-dev libicu-dev libepoxy-dev \
+		libsdl2-dev libfreetype6-dev libpango1.0-dev librsvg2-dev libxml++2.6-dev \
+		libavcodec-dev libavformat-dev libswscale-dev libjpeg-dev \
+		portaudio19-dev libglm-dev libboost-filesystem-dev \
+		libboost-iostreams-dev libboost-locale-dev libboost-system-dev \
+		libboost-program-options-dev libssl-dev libcpprest-dev \
+		libportmidi-dev libopencv-dev libaubio-dev nlohmann-json3-dev \
+		libfmt-dev ca-certificates file libgmock-dev libgtest-dev
+	apt-get clean
+	mkdir -p /root/performous
 EOR
 
 ## Copy in the build script to make things easy
