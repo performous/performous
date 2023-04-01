@@ -42,7 +42,7 @@ jobs:
           triplet: x64-windows-release
           extra-args: '--clean-after-build --overlay-triplets="${{ github.workspace }}\performous\cmake\triplets"'
           cache-key: win64-vcpkg
-          #revision: 4715616818c2ac225a13dd05e31c3bbbf904ec65
+          revision: 69efe9cc2df0015f0bb2d37d55acde4a75c9a25b
           api-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run cmake to configure the project and build it
