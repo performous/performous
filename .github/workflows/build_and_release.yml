@@ -45,6 +45,16 @@ jobs:
           repository: ${{ github.event.repository.full_name }}
           ref: '${{ github.event.head.ref }}'
           fetch-depth: 0
+      - name: Debug various env stuff
+        run: |
+          echo "github.sha: ${{ github.sha }}, push.after: ${{ github.event.push.after }}, push.head_commit_sha: ${{ github.event.push.head_commit.commit_sha }}"
+      - name: Start SSH session
+        if: ${{ always() }}
+        id: ssh_debug
+        uses: luchihoratiu/debug-via-ssh@main
+        with:
+          NGROK_AUTH_TOKEN: ${{ secrets.NGROK_SSH_TOKEN }}
+          SSH_PASS: ${{ secrets.NGROK_SSH_PASS }}
       - name: Determine the complete version
         id: versioning
         run: |

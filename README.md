@@ -2,7 +2,7 @@
 Performous
 ==========
 
-[![Build Status](https://github.com/performous/performous/actions/workflows/build_and_release.yml/badge.svg?branch=master)](https://github.com/performous/performous/actions?query=branch%3Amaster+workflow%3A%22Build+and+Release+Performous%22+is%3Asuccess)
+[![Build Status](https://github.com/performous/performous/actions/workflows/build_and_release.yml/badge.svg?branch=master)](https://github.com/performous/performous/actions/workflows/build_and_release.yml)
 
 An open-source karaoke, band and dancing game where one or more players perform a song and the game scores their performances. Supports songs in UltraStar, Frets on Fire and StepMania formats. Microphones and instruments from SingStar, Guitar Hero and Rock Band as well as some dance pads are autodetected.
 
