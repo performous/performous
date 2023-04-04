@@ -90,7 +90,7 @@ elseif(APPLE)
 	set(CMAKE_INSTALL_MANDIR "${CMAKE_INSTALL_PREFIX}/Resources/man/man6")
 endif()
 
-set(CMAKE_CXX_FLAGS_RelWithDebInfo "${CMAKE_CXX_FLAGS_RelWithDebInfo} -O3")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O3")
 
 set(SHARE_INSTALL "${CMAKE_INSTALL_DATAROOTDIR}" CACHE INTERNAL "Data file install path. Must be a relative path (from CMAKE_INSTALL_PREFIX), with no trailing slash.")
 mark_as_advanced(SHARE_INSTALL)
