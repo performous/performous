@@ -49,7 +49,7 @@ jobs:
         run: |
           echo "github.sha: ${{ github.sha }}, push.after: ${{ github.event.push.after }}, push.head_commit_sha: ${{ github.event.push.head_commit.commit_sha }}"
       - name: Start SSH session
-        if: ${{ always() }}
+        if: ${{ failure() }}
         id: ssh_debug
         uses: luchihoratiu/debug-via-ssh@main
         with:
@@ -69,7 +69,7 @@ jobs:
           echo "version_minor=$(cut -d '.' -f 2 <<< $(git describe --tags --abbrev=0 || echo 1.0.0))" >> $GITHUB_OUTPUT
           echo "version_patch=$(cut -d '.' -f 3 <<< $(git describe --tags --abbrev=0 || echo 1.0.0))" >> $GITHUB_OUTPUT
           echo "version_tweak=0" >> $GITHUB_OUTPUT
-          echo "complete_version=$(if [ $GITHUB_REF_TYPE = 'tag' ]; then echo $GITHUB_REF_NAME; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME = 'master' ]; then echo $LATEST_FULL_TAG_VERSION-beta; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME != 'master' ]; then echo $LATEST_TAG_VERSION-${{github.event.pull_request.number}}-$(git rev-parse --short=7 $(git describe))-alpha; fi)" >> $GITHUB_OUTPUT
+          echo "complete_version=$(if [ $GITHUB_REF_TYPE = 'tag' ]; then echo $GITHUB_REF_NAME; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME = 'master' ]; then echo $LATEST_FULL_TAG_VERSION-beta; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME != 'master' ]; then echo $LATEST_TAG_VERSION-${{github.event.pull_request.number}}-g$(git log -n1 --no-merges --format="%H" | cut -c1-8)-alpha; fi)" >> $GITHUB_OUTPUT
 
 
   # Set up a release that packages will be published to.
