@@ -311,6 +311,12 @@ if(WIN32)
 	set_target_properties(performous PROPERTIES OUTPUT_NAME "Performous")
 endif()
 
+if(WIN32)
+	target_compile_options(performous PUBLIC /WX)
+else()
+	target_compile_options(performous PUBLIC -Werror)
+endif()
+
 # Generate config.hh
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")

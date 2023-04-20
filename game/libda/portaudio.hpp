@@ -18,6 +18,18 @@
 
 #define PORTAUDIO_CHECKED(func, args) portaudio::internal::check(func args, #func)
 
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+const PaHostApiTypeId V1337 = PaHostApiTypeId(1337);
+#pragma GCC diagnostic pop
+#else
+#pragma warning(push)
+#pragma warning(disable: C4244)
+const PaHostApiTypeId V1337 = PaHostApiTypeId(1337);
+#pragma warning(pop)
+#endif
+
 namespace portaudio {
 	class Error: public std::runtime_error {
 	public:
@@ -57,7 +69,7 @@ namespace portaudio {
 	typedef std::vector<DeviceInfo> DeviceInfos;
 	struct AudioDevices {
 		static int count() { return Pa_GetDeviceCount(); }
-		static const PaHostApiTypeId AutoBackendType = PaHostApiTypeId(1337);
+		static const PaHostApiTypeId AutoBackendType {V1337};
 		static PaHostApiTypeId defaultBackEnd() {
 			return PaHostApiTypeId(Platform::defaultBackEnd());
 		}
