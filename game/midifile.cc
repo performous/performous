@@ -54,10 +54,12 @@ class MidiStream {
 		std::uint16_t read_uint16() { consume(2); return ms.read_uint16(); }
 		std::uint32_t read_uint32() { consume(4); return ms.read_uint32(); }
 		std::uint32_t read_varlen();
-		template <typename T> T read(T& value) {
+		template <typename T>
+		T read(T& value) {
 			consume(sizeof(T));
 			value = 0;
-			for (int i = sizeof(T) - 1; i >= 0; --i) value |= static_cast<T>(ms.f.get() << (8 * i));
+			for (int i = sizeof(T) - 1; i >= 0; --i)
+				value = static_cast<T>(value | (ms.f.get() << (8 * i)));
 			return value;
 		}
 		std::string read_bytes(std::uint32_t size) { consume(size); return ms.read_bytes(size); }
@@ -247,7 +249,7 @@ MidiFileParser::Track MidiFileParser::read_track(MidiStream& stream) {
 			// Midi event
 			std::uint8_t arg1 = riff.read_uint8();
 			std::uint8_t arg2 = 0;
-			std::uint8_t ev = event >> 4;
+			auto ev = static_cast<std::uint8_t>(event >> 4);
 			switch (ev) {
 			case 0x8: case 0x9: case 0xA: case 0xB: case 0xE: arg2 = riff.read_uint8(); break;
 			case 0xC: case 0xD: break;  // These only take one argument

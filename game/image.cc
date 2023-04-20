@@ -56,7 +56,7 @@ namespace {
 
 	#if JPEG_LIB_VERSION < 80 && !defined(MEM_SRCDST_SUPPORTED)
 	// Implementation of jpeg_mem_src from
-	// http://stackoverflow.com/questions/5280756/libjpeg-ver-6b-jpeg-stdio-src-vs-jpeg-mem-src 
+	// http://stackoverflow.com/questions/5280756/libjpeg-ver-6b-jpeg-stdio-src-vs-jpeg-mem-src
 
 	/* Read JPEG image from a memory segment */
 	static void init_source(j_decompress_ptr /*cinfo*/) {}
@@ -166,7 +166,7 @@ void loadJPEG(Bitmap& bitmap, fs::path const& filename) {
 		throw std::runtime_error("Error in libjpeg when decoding " + filename.string());
 	}
 	jpeg_create_decompress(&cinfo);
-	jpeg_mem_src(&cinfo, data.data(), data.size());
+	jpeg_mem_src(&cinfo, data.data(), static_cast<long unsigned>(data.size()));
 	if (jpeg_read_header(&cinfo, TRUE) != JPEG_HEADER_OK) throw std::runtime_error("Cannot read header of " + filename.string());
 	jpeg_start_decompress(&cinfo);
 	bitmap.resize(cinfo.output_width, cinfo.output_height);
