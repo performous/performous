@@ -129,7 +129,7 @@ Seconds AudioClock::pos() const {
 }
 
 Music::Music(Game& game, Audio::Files const& files, unsigned int sr, bool preview)
-: m_game(game), srate(sr), m_preview(preview) {
+: srate(sr), m_preview(preview), m_game(game) {
 	for (auto const& tf /* trackname-filename pair */: files) {
 		if (tf.second.empty()) continue; // Skip tracks with no filenames; FIXME: Why do we even have those here, shouldn't they be eliminated earlier?
 		tracks.emplace(tf.first, std::make_unique<Track>(tf.second, sr));

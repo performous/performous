@@ -58,6 +58,12 @@ if(GTest_FOUND)
 
 	target_include_directories(performous_test PRIVATE ".." "../game")
 
+	if(WIN32)
+		target_compile_options(performous_test PUBLIC /WX)
+	else()
+		target_compile_options(performous_test PUBLIC -Werror)
+	endif()
+
 	gtest_discover_tests(performous_test)
 
 else()
