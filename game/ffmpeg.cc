@@ -13,6 +13,11 @@
 #include <system_error>
 #include <thread>
 
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -308,7 +313,7 @@ void FFmpeg::avcodec_free_context(AVCodecContext *avctx) {
 void FFmpeg::handleOneFrame() {
 	bool read_one = false;
 	do {
-                std::unique_ptr<AVPacket, std::function<void(AVPacket*)>> pkt(av_packet_alloc(), [] (auto *pkt) { av_packet_free(&pkt); });
+				std::unique_ptr<AVPacket, std::function<void(AVPacket*)>> pkt(av_packet_alloc(), [] (auto *pkt) { av_packet_free(&pkt); });
 		auto ret = av_read_frame(m_formatContext.get(), pkt.get());
 		if(ret == AVERROR_EOF) {
 			// End of file: no more data to read.
@@ -319,16 +324,16 @@ void FFmpeg::handleOneFrame() {
 
 		if (pkt->stream_index != m_streamId) continue;
 
-                ret = avcodec_send_packet(m_codecContext.get(), pkt.get());
-                if(ret == AVERROR_EOF) {
-                        // End of file: no more data to read.
-                        throw Eof();
-                } else if(ret == AVERROR(EAGAIN)) {
-                        // no room for new data, need to get more frames out of the decoder by
-                        // calling avcodec_receive_frame()
-                } else if(ret < 0) {
-                        throw Error(*this, ret);
-                }
+				ret = avcodec_send_packet(m_codecContext.get(), pkt.get());
+				if(ret == AVERROR_EOF) {
+						// End of file: no more data to read.
+						throw Eof();
+				} else if(ret == AVERROR(EAGAIN)) {
+						// no room for new data, need to get more frames out of the decoder by
+						// calling avcodec_receive_frame()
+				} else if(ret < 0) {
+						throw Error(*this, ret);
+				}
 		handleSomeFrames();
 		read_one = true;
 	} while (!read_one);
@@ -348,8 +353,8 @@ void AudioFFmpeg::seek(double time) {
 }
 
 void FFmpeg::handleSomeFrames() {
-        int ret;
-        do {
+		int ret;
+		do {
 		uFrame frame{av_frame_alloc()};
 		ret = avcodec_receive_frame(m_codecContext.get(), frame.get());
 		if (ret == AVERROR_EOF) {
@@ -405,3 +410,8 @@ void AudioFFmpeg::processFrame(uFrame frame) {
 	m_position_in_48k_frames += out_samples;
 	m_position += frame->nb_samples * av_q2d(m_formatContext->streams[m_streamId]->time_base);
 }
+
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif

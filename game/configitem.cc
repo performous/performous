@@ -150,7 +150,7 @@ namespace {
 		T m = std::get<T>(multiplier);
 		T s = static_cast<T>(std::abs(m * std::get<T>(step)));
 		unsigned precision = 0;
-		while (s > static_cast<T>(0) && (static_cast<T>(s *= static_cast<T>(10))) < static_cast<T>(10))
+		while (s > static_cast<T>(0) && (static_cast<T>(s = static_cast<T>(s * 10))) < static_cast<T>(10))
 			++precision;
 		// Format the output
 		return fmt::format("{:.{}f}", double(m) * std::get<T>(value), precision);

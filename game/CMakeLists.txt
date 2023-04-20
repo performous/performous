@@ -311,7 +311,7 @@ if(WIN32)
 	set_target_properties(performous PROPERTIES OUTPUT_NAME "Performous")
 endif()
 
-if(WIN32)
+if(WIN32 AND MSVC)
 	target_compile_options(performous PUBLIC /WX)
 else()
 	target_compile_options(performous PUBLIC -Werror)

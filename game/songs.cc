@@ -463,7 +463,8 @@ void Songs::typeChange(SortChange diff) {
 	else {
 		int dir = to_underlying(diff);
 		m_type = static_cast<unsigned short>((m_type + dir) % types);
-		if (m_type >= types) m_type += types;
+		if (m_type >= types)
+			m_type = static_cast<unsigned short>(m_type + types);
 	}
 	filter_internal();
 }
@@ -472,7 +473,7 @@ void Songs::typeCycle(unsigned short cat) {
 	static const unsigned short categories[types] = { 0, 1, 2, 2, 3, 3, 4 };
 	// Find the next matching category
 	unsigned short type = 0;
-	for (unsigned short t = (categories[m_type] == cat ? m_type + 1 : 0); t < types; ++t) {
+	for (unsigned short t = static_cast<unsigned short>(categories[m_type] == cat ? m_type + 1 : 0); t < types; ++t) {
 		if (categories[t] == cat) { type = t; break; }
 	}
 	m_type = type;
