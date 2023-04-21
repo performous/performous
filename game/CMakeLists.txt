@@ -312,7 +312,7 @@ if(WIN32)
 endif()
 
 if(WIN32 AND MSVC)
-	target_compile_options(performous PUBLIC /WX)
+#	target_compile_options(performous PUBLIC /WX)
 else()
 	target_compile_options(performous PUBLIC -Werror)
 endif()
