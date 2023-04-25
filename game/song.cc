@@ -15,7 +15,7 @@ extern "C" {
 }
 
 Song::Song(ISongParser& parser, nlohmann::json const& song)
-: m_parser(parser), dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()) {
+: dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()), m_parser(parser) {
 	path = getJsonEntry<std::string>(song, "txtFileFolder").value_or("");
 	filename = getJsonEntry<std::string>(song, "txtFile").value_or("");
 	artist = getJsonEntry<std::string>(song, "artist").value_or("");
@@ -75,15 +75,14 @@ Song::Song(ISongParser& parser, nlohmann::json const& song)
 	collateUpdate();
 }
 
-Song::Song(ISongParser& parser,fs::path const& path, fs::path const& filename):
-  m_parser(parser), dummyVocal(TrackName::VOCAL_LEAD), path(path), filename(filename), randomIdx(rand())
-{
+Song::Song(ISongParser& parser,fs::path const& path, fs::path const& filename)
+:  dummyVocal(TrackName::VOCAL_LEAD), path(path), filename(filename), randomIdx(rand()), m_parser(parser) {
 	parser.parse(*this);
 	collateUpdate();
 }
 
 Song::Song(ISongParser& parser)
-: m_parser(parser), dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()) {
+: dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()), m_parser(parser) {
 }
 
 void Song::reload(bool errorIgnore) {
@@ -197,12 +196,12 @@ VocalTrack& Song::getVocalTrack(std::string vocalTrack) {
 
 VocalTrack& Song::getVocalTrack(unsigned idx) {
 	if (idx >= static_cast<unsigned>(vocalTracks.size())) {
-        return dummyVocal;
+		return dummyVocal;
 	} else {
-        VocalTracks::iterator it = vocalTracks.begin();
-        std::advance(it, idx);
-        return it->second;
-    }
+		VocalTracks::iterator it = vocalTracks.begin();
+		std::advance(it, idx);
+		return it->second;
+	}
 }
 
 double Song::getDurationSeconds() {
