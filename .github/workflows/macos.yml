@@ -27,7 +27,6 @@ jobs:
     runs-on: macos-latest
     env:
       MACOS_DEPS: >-
-        aubio
         boost
         cairo
         cmake
@@ -61,15 +60,45 @@ jobs:
           path: performous
       # brew fetch runs downloads in parallel, which is faster.
       # than letting install do it
-      - name: Fetch Dependencies
+      - name: Get full list of dependencies for cache key
+        id: get_key
+        run: |
+          brew uninstall --force --formula ant apr apr-util argon2 aria2 aspell aws-sam-cli azure-cli bazelisk azure/bicep/bicep blackhole-2ch capstone carthage chromedriver colima composer firefox freetds gd geckodriver ghostscript gnupg go google-chrome gradle httpd hub imagemagick jasper jbig2dec jq julia kotlin krb5 libassuan libavif libeventt libidn libksba liblqr libpq libraw libslirp libssh libusb libxft libzip lima llvm@15 mad maven microsoft-edge mongodb/brew/mongodb-community@5.0 mongodb/brew/mongodb-database-tools mongosh  nginx node@18 npth oniguruma openjdk openjdk@17 opusfile p7zip packer php pinentry pipx postgresql@14 qemu r rustup-init sbt selenium-server session-manager-plugin six sox subversion swiftformat swig switchaudio-osx tcl-tk tidy-html5 unixodbc utf8proc vagrant vde virtualbox yq
+          brew deps --union --formulae $MACOS_DEPS 1>homebrew-deps.txt 2>/dev/null
+          echo $MACOS_DEPS | tee -a homebrew-deps.txt
+          echo "HOMEBREW_ALL_DEPS=$(cat homebrew-deps.txt | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/ /g')" >> ${GITHUB_ENV}
+          echo "HOMEBREW_PREFIX_DIR=$(brew --prefix)" >> ${GITHUB_ENV}
+          echo "HOMEBREW_CACHE_DIR=$(brew --cache)" >> ${GITHUB_ENV}
+          echo "HOMEBREW_CELLAR_DIR=$(brew --cellar)" >> ${GITHUB_ENV}
+          echo "HOMEBREW_CACHE_KEY=${{ runner.os }}-$(sw_vers -productVersion)-brew-$(shasum -a 256 ./homebrew-deps.txt | cut -d ' ' -f1)" >> ${GITHUB_ENV}
+      - name: get-cached-packages
+        id: get-cached-packages
+        uses: Lord-Kamina/always-upload-cache/restore@refresh-cache
+        continue-on-error: true
+        with:
+          path: |
+            ${{ env.HOMEBREW_PREFIX_DIR }}/opt
+            ${{ env.HOMEBREW_CELLAR_DIR }}
+          key: ${{ env.HOMEBREW_CACHE_KEY }}
+          fail-on-cache-miss: 'true'
+        env:
+          GITHUB_TOKEN: "${{ inputs.api-token }}"
+      - name: Fetch and install dependencies
+        if: ${{ steps.get-cached-packages.outcome == 'failure' }}
         id: fetch_deps
         run: |
-          brew fetch --deps $MACOS_DEPS
-
-      - name: Install Dependencies
-        id: install_deps
+          brew developer on
+          brew fetch  --deps --quiet ${{ env.HOMEBREW_ALL_DEPS }}
+          brew install --formula --ignore-dependencies --force --adopt ${{ env.HOMEBREW_ALL_DEPS }}
+          brew cleanup
+        env:
+          HOMEBREW_NO_INSTALL_CLEANUP: true
+      - name: Relink Dependencies
+        if: ${{ steps.get-cached-packages.outcome == 'success' }}
+        id: relink_deps
         run: |
-           brew install $MACOS_DEPS
+          brew unlink ${{ env.HOMEBREW_ALL_DEPS }} 2>/dev/null && brew link --overwrite ${{ env.HOMEBREW_ALL_DEPS }} 2>/dev/null
+          brew list
       - name: Setup Python
         id: setup_python
         uses: actions/setup-python@v4 
@@ -77,7 +106,16 @@ jobs:
             python-version: 'pypy3.9' 
             cache: 'pip'
             cache-dependency-path: "${{ github.workspace }}/performous/osx-utils/macos-bundler-requirements.txt"
-
+      - name: save-packages-cache
+        id: save-packages-cache
+        uses: Lord-Kamina/always-upload-cache/save@refresh-cache
+        with:
+          path: |
+            ${{ env.HOMEBREW_PREFIX_DIR }}/opt
+            ${{ env.HOMEBREW_CELLAR_DIR }}
+          key: ${{ env.HOMEBREW_CACHE_KEY }}
+        env:
+          GITHUB_TOKEN: "${{ inputs.api-token }}"
       - name: Build package
         id: build_package
         run: |
