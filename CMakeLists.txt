@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14.5)
+cmake_minimum_required(VERSION 3.15)
 project(Performous CXX C)
 
 set(CMAKE_VERBOSE_MAKEFILE TRUE CACHE BOOL "Produce verbose makefile" FORCE)
@@ -110,7 +110,7 @@ add_subdirectory(data)
 
 add_subdirectory(game)
 
-target_compile_options(performous PRIVATE -Wall $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wextra> $<$<CXX_COMPILER_ID:gcc>:-fcx-limited-range> $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wconversion>)
+target_compile_options(performous PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/W4> $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall> $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wextra> $<$<CXX_COMPILER_ID:gcc>:-fcx-limited-range> $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wconversion>)
 
 
 add_subdirectory(docs)
