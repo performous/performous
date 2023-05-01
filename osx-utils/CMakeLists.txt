@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14.5)
+cmake_minimum_required(VERSION 3.15)
 
 set(PERFORMOUS_SEMVER "" CACHE STRING "Version in semver format")
 set(PERFORMOUS_LOG_LEVEL "" CACHE STRING "Log level to set in launcher script")

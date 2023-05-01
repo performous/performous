@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.15)
 include(FetchContent)
 
 # Simple function to abstract fetching a dependency from Git.
