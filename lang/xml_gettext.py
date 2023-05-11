@@ -44,7 +44,7 @@ for filename in xmlfiles:
     doc = ET.parse(filename, parser=Parser())
     parent = {c: p for p in doc.iter() for c in p}
     for elem in doc.iter():
-        if elem.tag in ("short", "long"):
+        if elem.tag in ("short", "long") and not elem.text is None:
             text = (
                 elem.text
                 .replace('\\', '\\\\')
