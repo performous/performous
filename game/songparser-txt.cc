@@ -1,5 +1,7 @@
 ﻿#include "songparser.hh"
 
+#include "songparserutil.hh"
+
 #include "fs.hh"
 #include "log.hh"
 #include "unicode.hh"

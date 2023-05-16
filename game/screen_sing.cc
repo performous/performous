@@ -14,7 +14,7 @@
 #include "microphones.hh"
 #include "platform.hh"
 #include "screen_players.hh"
-#include "songparser.hh"
+#include "songparserutil.hh"
 #include "util.hh"
 #include "video.hh"
 #include "webcam.hh"

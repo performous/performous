@@ -5,6 +5,7 @@
 #include "log.hh"
 #include "screen_sing.hh"
 #include "songparser.hh"
+#include "songparserutil.hh"
 #include "unicode.hh"
 #include "util.hh"
 
@@ -102,6 +103,7 @@ Song::Song(ISongParser& parser,fs::path const& path, fs::path const& filename):
 		mtime = static_cast<int64_t>(fs::last_write_time(path).time_since_epoch().count());  // .count() can return __int128
 	}
 	parser.parse(*this);
+
 	collateUpdate();
 }
 
@@ -112,6 +114,7 @@ Song::Song(ISongParser& parser)
 void Song::reload(bool errorIgnore) {
 	try {
 		m_parser.parse(*this);
+
 		collateUpdate();
 	} catch (...) {
 		if (!errorIgnore)

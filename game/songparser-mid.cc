@@ -1,6 +1,10 @@
 #include "songparser.hh"
 
 #include "log.hh"
+#include "songparserutil.hh"
+
+#include <boost/algorithm/string.hpp>
+#include <stdexcept>
 #include "midifile.hh"
 
 #include <stdexcept>

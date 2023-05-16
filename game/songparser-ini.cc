@@ -1,6 +1,8 @@
 #include "songparser.hh"
 
 #include "i18n.hh"
+#include "songparserutil.hh"
+
 #include "fs.hh"
 #include "midifile.hh"
 #include "unicode.hh"

@@ -2,6 +2,7 @@
 
 #include "libxml++.hh"
 #include "song.hh"
+#include "songparserutil.hh"
 #include "unicode.hh"
 #include "fs.hh"
 #include "isongparser.hh"
@@ -55,29 +56,13 @@ namespace SongParserUtil {
 	const static std::regex brTag(
 		R"(<br>|<br[ ]*/?>)", regex_icase                       // match <br>, <br/> or <br />, allowing for any number of spaces between br and the /.
 	);
-
-	const std::string DUET_P2 = "Duet singer";	// FIXME
-	const std::string DUET_BOTH = "Both singers";	// FIXME
-	/// Parse an int from string and assign it to a variable
-	void assign(int& var, std::string const& str);
-	/// Parse an unsigned int from string and assign it to a variable
-	void assign(unsigned& var, std::string const& str);
-	/// Parse a double from string and assign it to a variable
-	void assign(double& var, std::string str);
-	/// Parse a float from string and assign it to a variable
-	void assign(float& var, std::string str);
-	/// Parse a boolean from string and assign it to a variable
-	void assign(bool& var, std::string const& str);
-	/// Erase last character if it matches
-	void eraseLast(std::string& s, char ch = ' ');
 }
 
 /// Parse a song file; this object is only used while parsing and is discarded once done.
 /// Format-specific member functions are implemented in songparser-*.cc.
 class SongParser : public ISongParser {
 public:
-	/// Parse into s
-	void parse(Song & s) override;
+	void parse(Song&) override;
 
 private:
 	// Variables and types
