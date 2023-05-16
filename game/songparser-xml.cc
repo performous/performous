@@ -1,5 +1,7 @@
 #include "songparser.hh"
 
+#include "songparserutil.hh"
+
 #include "i18n.hh"
 #include "util.hh"
 #include "libxml++-impl.hh"

@@ -2,6 +2,7 @@
 #include "config.hh"
 #include "screen_sing.hh"
 #include "songparser.hh"
+#include "songparserutil.hh"
 #include "unicode.hh"
 #include "util.hh"
 
@@ -78,6 +79,7 @@ Song::Song(ISongParser& parser, nlohmann::json const& song)
 Song::Song(ISongParser& parser,fs::path const& path, fs::path const& filename)
 :  dummyVocal(TrackName::VOCAL_LEAD), path(path), filename(filename), randomIdx(rand()), m_parser(parser) {
 	parser.parse(*this);
+
 	collateUpdate();
 }
 
@@ -88,6 +90,7 @@ Song::Song(ISongParser& parser)
 void Song::reload(bool errorIgnore) {
 	try {
 		m_parser.parse(*this);
+
 		collateUpdate();
 	} catch (...) {
 		if (!errorIgnore)
