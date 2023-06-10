@@ -96,6 +96,8 @@ jobs:
             version: 10
           - os: debian
             version: 11
+          - os: debian
+            version: 12
           - os: fedora
             version: 35
           - os: fedora
