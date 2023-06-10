@@ -22,6 +22,7 @@ Latest builds
 - [Linux - Ubuntu 22.04](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-ubuntu_22.04.deb.zip)
 - [Linux - Debian 10](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-debian_10.deb.zip)
 - [Linux - Debian 11](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-debian_11.deb.zip)
+- [Linux - Debian 12](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-debian_12.deb.zip)
 - [Linux - Fedora 35](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-fedora_35.rpm.zip)
 - [Linux - Fedora 36](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-fedora_36.rpm.zip)
 - [Linux - Fedora 37](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-fedora_37.rpm.zip)
