@@ -17,7 +17,7 @@ jobs:
   # Create the AppImage
   AppImage:
     name: Create the AppImage
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Install the AppImage bundler and Performous deps
         id: fetch_deps
@@ -26,7 +26,7 @@ jobs:
           chmod +x appimage-builder-x86_64.AppImage
           sudo mv appimage-builder-x86_64.AppImage /usr/local/bin/appimage-builder
           sudo apt update
-          sudo apt-get install -y --no-install-recommends git cmake build-essential gettext help2man libopenblas-dev libfftw3-dev libicu-dev libepoxy-dev libsdl2-dev libfreetype6-dev libpango1.0-dev librsvg2-dev libxml++2.6-dev libavcodec-dev libavformat-dev libswscale-dev libjpeg-dev portaudio19-dev libglm-dev libboost-filesystem-dev libboost-iostreams-dev libboost-locale-dev libboost-system-dev libboost-program-options-dev libssl-dev libcpprest-dev libgtest-dev libgmock-dev google-mock libportmidi-dev libopencv-dev libaubio-dev nlohmann-json3-dev libfmt-dev
+          sudo apt-get install -y --no-install-recommends git cmake build-essential gettext help2man libopenblas-dev libfftw3-dev libicu-dev libepoxy-dev libsdl2-dev libfreetype6-dev libpango1.0-dev librsvg2-dev libxml++2.6-dev libavcodec-dev libavformat-dev libswscale-dev libjpeg-dev portaudio19-dev libglm-dev libboost-filesystem-dev libboost-iostreams-dev libboost-locale-dev libboost-system-dev libboost-program-options-dev libssl-dev libcpprest-dev libgtest-dev libgmock-dev google-mock libportmidi-dev libopencv-dev libaubio-dev nlohmann-json3-dev libfmt-dev libfuse2
 
       - name: Checkout Git
         id: checkout_git

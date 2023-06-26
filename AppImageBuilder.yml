@@ -13,30 +13,31 @@ AppDir:
     arch: amd64
     allow_unauthenticated: true
     sources:
-      - sourceline: deb http://archive.ubuntu.com/ubuntu/ focal main restricted universe multiverse
-      - sourceline: deb http://archive.ubuntu.com/ubuntu/ focal-updates main restricted universe multiverse
+      - sourceline: deb http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse
+      - sourceline: deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted universe multiverse
     include:
       ## All of these dependencies can be found by downloading the Performous
-      ## package for Ubuntu 20.04 and doing a dpkg -I on it
+      ## package for Ubuntu 22.04 and doing a dpkg -I on it
       - libaubio5
       - libavcodec58
       - libavformat58
       - libavutil56
-      - libboost-iostreams1.71.0
-      - libboost-locale1.71.0
-      - libboost-program-options1.71.0
+      - libboost-iostreams1.74.0
+      - libboost-locale1.74.0
+      - libboost-program-options1.74.0
       - libc6
       - libcairo2
       - libcpprest2.10
       - libepoxy0
+      - libfmt8
       - libfontconfig1
       - libgcc-s1
       - libglib2.0-0
       - libglibmm-2.4-1v5
-      - libicu66
+      - libicu70
       - libjpeg8
-      - libopencv-core4.2
-      - libopencv-videoio4.2
+      - libopencv-core4.5d
+      - libopencv-videoio4.5d
       - libpango-1.0-0
       - libpangocairo-1.0-0
       - libpng16-16
@@ -44,7 +45,7 @@ AppDir:
       - libportmidi0
       - librsvg2-2
       - libsdl2-2.0-0
-      - libssl1.1
+      - libssl3
       - libstdc++6
       - libswresample3
       - libswscale5
