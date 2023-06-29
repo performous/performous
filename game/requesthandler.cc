@@ -131,6 +131,10 @@ void RequestHandler::Get(web::http::http_request request)
             songObject[utility::conversions::to_string_t("Language")] = web::json::value::string(utility::conversions::to_string_t(song->language));
             songObject[utility::conversions::to_string_t("Creator")] = web::json::value::string(utility::conversions::to_string_t(song->creator));
             songObject[utility::conversions::to_string_t("Duration")] = web::json::value(song->getDurationSeconds());
+            songObject[utility::conversions::to_string_t("Source")] = web::json::value(utility::conversions::to_string_t(song->source));
+            songObject[utility::conversions::to_string_t("App")] = web::json::value(utility::conversions::to_string_t(song->app));
+            songObject[utility::conversions::to_string_t("AppVersion")] = web::json::value(utility::conversions::to_string_t(song->appVersion));
+            songObject[utility::conversions::to_string_t("Comment")] = web::json::value(utility::conversions::to_string_t(song->comment));
             jsonRoot[i] = songObject;
             i++;
         }
@@ -236,6 +240,10 @@ void RequestHandler::Post(web::http::http_request request)
             songObject[utility::conversions::to_string_t("Edition")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->edition));
             songObject[utility::conversions::to_string_t("Language")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->language));
             songObject[utility::conversions::to_string_t("Creator")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->creator));
+            songObject[utility::conversions::to_string_t("Source")] = web::json::value(utility::conversions::to_string_t(m_songs[i]->source));
+            songObject[utility::conversions::to_string_t("App")] = web::json::value(utility::conversions::to_string_t(m_songs[i]->app));
+            songObject[utility::conversions::to_string_t("AppVersion")] = web::json::value(utility::conversions::to_string_t(m_songs[i]->appVersion));
+            songObject[utility::conversions::to_string_t("Comment")] = web::json::value(utility::conversions::to_string_t(m_songs[i]->comment));
             jsonRoot[i] = songObject;
         }
         request.reply(web::http::status_codes::OK, jsonRoot);
@@ -284,6 +292,10 @@ web::json::value RequestHandler::SongsToJsonObject() {
         songObject[utility::conversions::to_string_t("Language")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->language));
         songObject[utility::conversions::to_string_t("Creator")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->creator));
         songObject[utility::conversions::to_string_t("name")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->artist + " " + m_songs[i]->title));
+        songObject[utility::conversions::to_string_t("Source")] = web::json::value(utility::conversions::to_string_t(m_songs[i]->source));
+        songObject[utility::conversions::to_string_t("App")] = web::json::value(utility::conversions::to_string_t(m_songs[i]->app));
+        songObject[utility::conversions::to_string_t("AppVersion")] = web::json::value(utility::conversions::to_string_t(m_songs[i]->appVersion));
+        songObject[utility::conversions::to_string_t("Comment")] = web::json::value(utility::conversions::to_string_t(m_songs[i]->comment));
         jsonRoot[i] = songObject;
     }
 
@@ -298,7 +310,11 @@ std::shared_ptr<Song> RequestHandler::GetSongFromJSON(web::json::value jsonDoc) 
            m_songs[i]->artist == utility::conversions::to_utf8string(jsonDoc[utility::conversions::to_string_t("Artist")].as_string()) &&
            m_songs[i]->edition == utility::conversions::to_utf8string(jsonDoc[utility::conversions::to_string_t("Edition")].as_string()) &&
            m_songs[i]->language == utility::conversions::to_utf8string(jsonDoc[utility::conversions::to_string_t("Language")].as_string()) &&
-           m_songs[i]->creator == utility::conversions::to_utf8string(jsonDoc[utility::conversions::to_string_t("Creator")].as_string()) ) {
+           m_songs[i]->creator == utility::conversions::to_utf8string(jsonDoc[utility::conversions::to_string_t("Creator")].as_string()) &&
+           m_songs[i]->source == utility::conversions::to_utf8string(jsonDoc[utility::conversions::to_string_t("Source")].as_string()) &&
+           m_songs[i]->app == utility::conversions::to_utf8string(jsonDoc[utility::conversions::to_string_t("App")].as_string()) &&
+           m_songs[i]->appVersion == utility::conversions::to_utf8string(jsonDoc[utility::conversions::to_string_t("AppVersion")].as_string()) &&
+            m_songs[i]->comment == utility::conversions::to_utf8string(jsonDoc[utility::conversions::to_string_t("Comment")].as_string())) {
             std::clog << "webserver/info: Found requested song." << std::endl;
             return m_songs[i];
         }

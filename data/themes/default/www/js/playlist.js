@@ -22,9 +22,16 @@ $("#refresh-playlist").click(function () {
 
             $.each(database, function (iterator, songObject) {
                 totalTime += songObject.Duration + timeout;
-                var position = String(iterator + 1).padStart(2, '0') + ".";
-                $("#playlist-songs").append("<a id=\"playlist-songs-" + iterator + "\" href=\"#\" class=\"list-group-item\" data-toggle=\"modal\" data-target=\"#dynamic-modal\">" + position + " " + songObject.Artist + " - " + songObject.Title + " - " + secondsToDate(totalTime) + "<span class=\"glyphicon glyphicon-info-sign\"></span></a>");
-                $("#playlist-songs-sortable").append("<a id=\"playlist-songs-sortable-" + iterator + "\" href=\"#\" class=\"list-group-item\" data-toggle=\"modal\" data-target=\"#dynamic-modal\">" + position + " " + songObject.Artist + " - " + songObject.Title + " - " + secondsToDate(totalTime) + "<span class=\"glyphicon glyphicon-info-sign\"></span></a>");
+                var songMeta = "";
+                songMeta += songObject.Language.length > 0 ? " | " + songObject.Language : "";
+                songMeta += songObject.Edition.length > 0 ? " | " + songObject.Edition : "";
+                songMeta += songObject.Source.length > 0 ? " | " + songObject.Source : "";
+                songMeta += songObject.App.length > 0 ? " | " + songObject.App : "";
+                songMeta += songObject.AppVersion.length > 0 ? " | " + songObject.AppVersion : "";
+                songMeta += songObject.Comment.length > 0 ? " | " + songObject.Comment : "";
+				var position = String(iterator + 1).padStart(2, '0') + ".";
+                $("#playlist-songs").append("<a id=\"playlist-songs-" + iterator + "\" href=\"#\" class=\"list-group-item\" data-toggle=\"modal\" data-target=\"#dynamic-modal\">" + position + " " + songObject.Artist + " - " + songObject.Title + songMeta + " - " + secondsToDate(totalTime) + "<span class=\"glyphicon glyphicon-info-sign\"></span></a>");
+                $("#playlist-songs-sortable").append("<a id=\"playlist-songs-sortable-" + iterator + "\" href=\"#\" class=\"list-group-item\" data-toggle=\"modal\" data-target=\"#dynamic-modal\">" + position + " " + songObject.Artist + " - " + songObject.Title + songMeta + " - " + secondsToDate(totalTime) + "<span class=\"glyphicon glyphicon-info-sign\"></span></a>");
                 songObject.Position = iterator;
                 songObject.PositionStr = position;
                 $("#playlist-songs-" + iterator).data("modal-songObject", JSON.stringify(songObject));

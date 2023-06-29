@@ -136,6 +136,50 @@ $(function () {
     }
 
     /*
+        If our song contains a source show it.
+        Else hide the complete div.
+    */
+    if (songObject.Source.length > 1) {
+        $("#playlist-song-modal-body #modal-source-div").show();
+        $("#playlist-song-modal-body #modal-source-value").text(songObject.Source);
+    } else {
+        $("#playlist-song-modal-body #modal-source-div").hide();
+    }
+
+    /*
+        If our song contains an app show it.
+        Else hide the complete div.
+    */
+    if (songObject.App.length > 1) {
+        $("#playlist-song-modal-body #modal-app-div").show();
+        $("#playlist-song-modal-body #modal-app-value").text(songObject.App);
+    } else {
+        $("#playlist-song-modal-body #modal-app-div").hide();
+    }
+
+    /*
+        If our song contains an appversion show it.
+        Else hide the complete div.
+    */
+    if (songObject.AppVersion.length > 1) {
+        $("#playlist-song-modal-body #modal-appversion-div").show();
+        $("#playlist-song-modal-body #modal-appversion-value").text(songObject.AppVersion);
+    } else {
+        $("#playlist-song-modal-body #modal-appversion-div").hide();
+    }
+
+    /*
+        If our song contains a comment show it.
+        Else hide the complete div.
+    */
+    if (songObject.Comment.length > 1) {
+        $("#playlist-song-modal-body #modal-comment-div").show();
+        $("#playlist-song-modal-body #modal-comment-value").text(songObject.Comment);
+    } else {
+        $("#playlist-song-modal-body #modal-comment-div").hide();
+    }
+
+    /*
         Click event handlers to either change a position of the song or remove the song.
     */
     $("#playlist-song-modal-body #modal-move-song-up").click(function () {

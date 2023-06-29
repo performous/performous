@@ -53,6 +53,10 @@ $("#search-database").click(function (e, callback) {
                 var songMeta = "";
                 songMeta += songObject.Language.length > 0 ? " | " + songObject.Language : "";
                 songMeta += songObject.Edition.length > 0 ? " | " + songObject.Edition : "";
+                songMeta += songObject.Source.length > 0 ? " | " + songObject.Source : "";
+                songMeta += songObject.App.length > 0 ? " | " + songObject.App : "";
+                songMeta += songObject.AppVersion.length > 0 ? " | " + songObject.AppVersion : "";
+                songMeta += songObject.Comment.length > 0 ? " | " + songObject.Comment : "";
                 $("#searched-songs").append("<a href=\"#\" id=\"searched-songs-" + iterator + "\" class=\"list-group-item\" >" + songObject.Artist + " - " + songObject.Title + songMeta + "<span class=\"glyphicon glyphicon-plus\"></span></a>");
                 $("#searched-songs-"+iterator).data("songObject", JSON.stringify(songObject));
             });
@@ -84,6 +88,10 @@ $("#search-database").click(function (e, callback) {
                 var songMeta = "";
                 songMeta += songObject.Language.length > 0 ? " | " + songObject.Language : "";
                 songMeta += songObject.Edition.length > 0 ? " | " + songObject.Edition : "";
+                songMeta += songObject.Source.length > 0 ? " | " + songObject.Source : "";
+                songMeta += songObject.App.length > 0 ? " | " + songObject.App : "";
+                songMeta += songObject.AppVersion.length > 0 ? " | " + songObject.AppVersion : "";
+                songMeta += songObject.Comment.length > 0 ? " | " + songObject.Comment : "";
                 $("#searched-songs").append("<a href=\"#\" id=\"searched-songs-" + iterator + "\" class=\"list-group-item\" >" + songObject.Artist + " - " + songObject.Title + songMeta + "<span class=\"glyphicon glyphicon-plus\"></span></a>");
                 $("#searched-songs-"+iterator).data("songObject", JSON.stringify(songObject));
             });
