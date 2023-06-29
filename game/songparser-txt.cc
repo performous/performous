@@ -134,6 +134,8 @@ bool SongParser::txtParseField(std::string const& line) {
 	else if (key == "VIDEOGAP") assign(m_song.videoGap, value);
 	else if (key == "PREVIEWSTART") assign(m_song.preview_start, value);
 	else if (key == "LANGUAGE") m_song.language = value.substr(value.find_first_not_of(" "));
+	else if (key == "PROVIDEDBY") m_song.providedBy = value.substr(value.find_first_not_of(" "));
+	else if (key == "COMMENT") m_song.comment = value.substr(value.find_first_not_of(" "));
 	return true;
 }
 
