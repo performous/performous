@@ -22,6 +22,8 @@ Song::Song(nlohmann::json const& song) : dummyVocal(TrackName::VOCAL_LEAD), rand
     language = getJsonEntry<std::string>(song, "language").value_or("");
     edition = getJsonEntry<std::string>(song, "edition").value_or("");
     creator = getJsonEntry<std::string>(song, "creator").value_or("");
+    providedBy = getJsonEntry<std::string>(song, "providedBy").value_or("");
+    comment = getJsonEntry<std::string>(song, "comment").value_or("");
     genre = getJsonEntry<std::string>(song, "genre").value_or("");
     cover = getJsonEntry<std::string>(song, "cover").value_or("");
     background = getJsonEntry<std::string>(song, "background").value_or("");

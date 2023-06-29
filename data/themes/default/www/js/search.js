@@ -49,13 +49,15 @@ $("#search-database").click(function (e, callback) {
             var database = data;
             clearList("searched-songs");
 
-            $.each(database, function (iterator, songObject){
+            $.each(database, function (iterator, songObject) {
                 var songMeta = "";
                 songMeta += songObject.Language.length > 0 ? " | " + songObject.Language : "";
                 songMeta += songObject.Edition.length > 0 ? " | " + songObject.Edition : "";
+                songMeta += songObject.ProvidedBy.length > 0 ? " | " + songObject.ProvidedBy : "";
+                songMeta += songObject.Comment.length > 0 ? " | " + songObject.Comment : "";
                 var errorMeta = songObject.HasError ? "⚠️" : "";
                 $("#searched-songs").append("<a href=\"#\" id=\"searched-songs-" + iterator + "\" class=\"list-group-item\" >" + errorMeta + songObject.Artist + " - " + songObject.Title + songMeta + "<span class=\"glyphicon glyphicon-plus\"></span></a>");
-                $("#searched-songs-"+iterator).data("songObject", JSON.stringify(songObject));
+                $("#searched-songs-" + iterator).data("songObject", JSON.stringify(songObject));
             });
 
             if(database.length === 0) {
@@ -80,14 +82,17 @@ $("#search-database").click(function (e, callback) {
             var database = data;
 
             clearList("searched-songs");
-
-            $.each(database, function (iterator, songObject){
+            $.each(database, function (iterator, songObject) {
                 var songMeta = "";
                 songMeta += songObject.Language.length > 0 ? " | " + songObject.Language : "";
                 songMeta += songObject.Edition.length > 0 ? " | " + songObject.Edition : "";
+                songMeta += songObject.Source.length > 0 ? " | " + songObject.Source : "";
+                songMeta += songObject.App.length > 0 ? " | " + songObject.App : "";
+                songMeta += songObject.AppVersion.length > 0 ? " | " + songObject.AppVersion : "";
+                songMeta += songObject.Comment.length > 0 ? " | " + songObject.Comment : "";
                 var errorMeta = songObject.HasError ? "⚠️" : "";
                 $("#searched-songs").append("<a href=\"#\" id=\"searched-songs-" + iterator + "\" class=\"list-group-item\" >" + errorMeta + songObject.Artist + " - " + songObject.Title + songMeta + "<span class=\"glyphicon glyphicon-plus\"></span></a>");
-                $("#searched-songs-"+iterator).data("songObject", JSON.stringify(songObject));
+                $("#searched-songs-" + iterator).data("songObject", JSON.stringify(songObject));
             });
 
             if(database.length === 0) {
