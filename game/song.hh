@@ -66,6 +66,8 @@ public:
 	std::string text; ///< songtext
 	std::string creator; ///< creator
 	std::string language; ///< language
+	std::string providedBy; ///< source of the mapped file.
+	std::string comment; ///< comment of the mapped file.
 	using MusicFiles = std::map<std::string, fs::path>;
 	MusicFiles music; ///< music files (background, guitar, rhythm/bass, drums, vocals)
 	fs::path cover; ///< cd cover

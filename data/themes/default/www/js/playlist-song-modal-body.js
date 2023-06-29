@@ -136,6 +136,28 @@ $(function () {
     }
 
     /*
+        If our song contains a ProvidedBy show it.
+        Else hide the complete div.
+    */
+    if (songObject.ProvidedBy.length > 1) {
+        $("#playlist-song-modal-body #modal-providedby-div").show();
+        $("#playlist-song-modal-body #modal-providedby-value").text(songObject.ProvidedBy);
+    } else {
+        $("#playlist-song-modal-body #modal-providedby-div").hide();
+    }
+
+    /*
+        If our song contains a comment show it.
+        Else hide the complete div.
+    */
+    if (songObject.Comment.length > 1) {
+        $("#playlist-song-modal-body #modal-comment-div").show();
+        $("#playlist-song-modal-body #modal-comment-value").text(songObject.Comment);
+    } else {
+        $("#playlist-song-modal-body #modal-comment-div").hide();
+    }
+
+    /*
         Click event handlers to either change a position of the song or remove the song.
     */
     $("#playlist-song-modal-body #modal-move-song-up").click(function () {

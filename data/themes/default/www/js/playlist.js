@@ -22,10 +22,15 @@ $("#refresh-playlist").click(function () {
 
             $.each(database, function (iterator, songObject) {
                 totalTime += songObject.Duration + timeout;
+                var songMeta = "";
+                songMeta += songObject.Language.length > 0 ? " | " + songObject.Language : "";
+                songMeta += songObject.Edition.length > 0 ? " | " + songObject.Edition : "";
+                songMeta += songObject.ProvidedBy.length > 0 ? " | " + songObject.ProvidedBy : "";
+                songMeta += songObject.Comment.length > 0 ? " | " + songObject.Comment : "";
                 var position = String(iterator + 1).padStart(2, '0') + ".";
                 var errorMeta = songObject.HasError ? "⚠️" : "";
-                $("#playlist-songs").append("<a id=\"playlist-songs-" + iterator + "\" href=\"#\" class=\"list-group-item\" data-toggle=\"modal\" data-target=\"#dynamic-modal\">" + errorMeta + position + " " + songObject.Artist + " - " + songObject.Title + " - " + secondsToDate(totalTime) + "<span class=\"glyphicon glyphicon-info-sign\"></span></a>");
-                $("#playlist-songs-sortable").append("<a id=\"playlist-songs-sortable-" + iterator + "\" href=\"#\" class=\"list-group-item\" data-toggle=\"modal\" data-target=\"#dynamic-modal\">" + errorMeta + position + " " + songObject.Artist + " - " + songObject.Title + " - " + secondsToDate(totalTime) + "<span class=\"glyphicon glyphicon-info-sign\"></span></a>");
+                $("#playlist-songs").append("<a id=\"playlist-songs-" + iterator + "\" href=\"#\" class=\"list-group-item\" data-toggle=\"modal\" data-target=\"#dynamic-modal\">" + errorMeta + position + " " + songObject.Artist + " - " + songObject.Title + songMeta + " - " + secondsToDate(totalTime) + "<span class=\"glyphicon glyphicon-info-sign\"></span></a>");
+                $("#playlist-songs-sortable").append("<a id=\"playlist-songs-sortable-" + iterator + "\" href=\"#\" class=\"list-group-item\" data-toggle=\"modal\" data-target=\"#dynamic-modal\">" + errorMeta + position + " " + songObject.Artist + " - " + songObject.Title + songMeta + " - " + secondsToDate(totalTime) + "<span class=\"glyphicon glyphicon-info-sign\"></span></a>");
                 songObject.Position = iterator;
                 songObject.PositionStr = position;
                 $("#playlist-songs-" + iterator).data("modal-songObject", JSON.stringify(songObject));
