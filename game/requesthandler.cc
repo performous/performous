@@ -204,7 +204,7 @@ void RequestHandler::Post(web::http::http_request request)
                 return;
             }
             if (positionToMoveTo <= sizeOfPlaylist - 1) {
-                m_game.getCurrentPlayList().setPosition(songIdToMove, positionToMoveTo);
+                m_game.getCurrentPlayList().swap(songIdToMove, positionToMoveTo);
                 ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(m_game.getScreen("Playlist"));
                 m_pp->triggerSongListUpdate();
                 request.reply(web::http::status_codes::OK, "success");
