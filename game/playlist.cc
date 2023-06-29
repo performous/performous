@@ -47,21 +47,6 @@ void PlayList::swap(unsigned index1, unsigned index2) {
 	m_list[index1] = m_list[index2];
 	m_list[index2] = song1;
 }
-void PlayList::setPosition(unsigned index1, unsigned index2) {
-	if(index1 != index2) {	
-		unsigned diff = index1 - index2;
-		if(diff > 0) {
-			// Going to Top
-			swap(index1, index1 - 1u);
-			setPosition(index1 - 1u, index2);
-		} else {
-			// Going to Bottom
-			swap(index1, index1 + 1u);
-			setPosition(index1 + 1u, index2);
-		} 
-	}
-}
-
 
 std::shared_ptr<Song> PlayList::getSong(unsigned index) {
 	std::lock_guard<std::mutex> l(m_mutex);
