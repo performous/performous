@@ -9,7 +9,7 @@ $(function () {
         Under the hood this function uses 'buildAlertMessage' functionality to reduce copied code.
         The function 'buildAlertMessage' can be found within 'site.js'.
     */
-    function setSongToPosition(songId, newPosition, successMessage = "successfully_changed_position_of_song", failureMessage = "failed_changing_position_of_song") {
+    function setSongToPosition(songId, newPosition, successMessage = "successfully_changed_position_of_song.", failureMessage = "failed_changing_position_of_song!") {
         var position = 0;
         if (newPosition || newPosition === 0) {
             position = newPosition;
@@ -49,7 +49,7 @@ $(function () {
         Under the hood this function uses "setSongToPosition" functionality to reduce copied code.
     */
     function moveSongUp(songId) {
-        setSongToPosition(songId, songId - 1, "successfully_moved_song_up", "failed_moving_song_up");
+        setSongToPosition(songId, songId - 1, "successfully_moved_song_up.", "failed_moving_song_up!");
     }
 
     /*
@@ -57,7 +57,7 @@ $(function () {
         Under the hood this function uses "setSongToPosition" functionality to reduce copied code.
     */
     function moveSongDown(songId) {
-        setSongToPosition(songId, songId + 1, "successfully_moved_song_down", "failed_moving_song_down");
+        setSongToPosition(songId, songId + 1, "successfully_moved_song_down.", "failed_moving_song_down!");
     }
 
     /*
@@ -69,7 +69,7 @@ $(function () {
     function removeSongFromPlaylist(songId) {
         songId = parseInt(songId);
         if(isNaN(songId)) {
-            return buildAlertMessage("failed_removing_song_from_playlist", "danger");
+            return buildAlertMessage("failed_removing_song_from_playlist!", "danger");
         }
         var data = {
             "songId": songId
@@ -80,11 +80,11 @@ $(function () {
             data: JSON.stringify(data),
             contentType: "application/json; charset=utf-8",
             success: function(data, textStatus, jqXHR) {
-                buildAlertMessage("successfully_removed_song_from_playlist", "success");
+                buildAlertMessage("successfully_removed_song_from_playlist.", "success");
                 $("#refresh-playlist").click();
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                buildAlertMessage("failed_removing_song_from_playlist", "danger");
+                buildAlertMessage("failed_removing_song_from_playlist!", "danger");
             }
         });
     }

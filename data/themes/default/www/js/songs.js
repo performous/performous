@@ -16,11 +16,11 @@ function addSong(songObjectToSend) {
         data: songObjectToSend,
         contentType: "application/json; charset=utf-8",
         success: function(data, textStatus, jqXHR) {
-            buildAlertMessage("successfully_added_song_to_the_playlist", "success");
+            buildAlertMessage("successfully_added_song_to_the_playlist.", "success");
             $("a[href='#playlist']").tab("show");
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            buildAlertMessage("failed_adding_song_to_the_playlist", "danger");
+            buildAlertMessage("failed_adding_song_to_the_playlist!", "danger");
         }
     });
 }

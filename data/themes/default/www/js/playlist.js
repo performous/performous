@@ -107,7 +107,7 @@ $("a[href='#playlist']").on("shown.bs.tab", function () {
             var position = parseInt(evt.newIndex);
 
             if(isNaN(songId) || isNaN(position)) {
-                buildAlertMessage("failed_changing_position_of_song", "danger");
+                buildAlertMessage("failed_changing_position_of_song!", "danger");
                 return;
             }
 
@@ -122,11 +122,11 @@ $("a[href='#playlist']").on("shown.bs.tab", function () {
                 data: JSON.stringify(data),
                 contentType: "application/json; charset=utf-8",
                 success: function(data, textStatus, jqXHR) {
-                    buildAlertMessage("successfully_changed_position_of_song", "success");
+                    buildAlertMessage("successfully_changed_position_of_song.", "success");
                     $("#refresh-playlist").click();
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
-                    buildAlertMessage("failed_changing_position_of_song", "danger");
+                    buildAlertMessage("failed_changing_position_of_song!", "danger");
                 }
             });
         }
