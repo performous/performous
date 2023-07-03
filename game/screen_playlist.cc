@@ -372,7 +372,6 @@ void ScreenPlaylist::createSongMenu(unsigned songNumber) {
 	});
 	if (songNumber >= 2u) { //can't move up first song
 		overlay_menu.add(MenuOption(_("Move up"), _("Move this song up the list"))).call([this, songNumber]() {
-			getGame().getCurrentPlayList().swap(songNumber -1, songNumber -2);
 			getGame().getCurrentPlayList().swap(songNumber -1u, songNumber -2u);
 			createSongListMenu();
 			overlay_menu.close();
