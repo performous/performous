@@ -58,7 +58,7 @@ $("#search-database").click(function (e, callback) {
             });
 
             if(database.length === 0) {
-                buildAlertMessage("no_songs_found_with_current_filter", "warning");
+                buildAlertMessage("no_songs_found_with_current_filtery.", "warning");
             }
             if(typeof callback === "function") {
                 callback();
@@ -89,7 +89,7 @@ $("#search-database").click(function (e, callback) {
             });
 
             if(database.length === 0) {
-                buildAlertMessage("no_songs_found_with_current_filter", "warning");
+                buildAlertMessage("no_songs_found_with_current_filter.", "warning");
             }
             if(typeof callback === "function") {
                 callback();
