@@ -47,6 +47,18 @@ void PlayList::swap(unsigned index1, unsigned index2) {
 	m_list[index1] = m_list[index2];
 	m_list[index2] = song1;
 }
+void PlayList::move(unsigned fromIndex, unsigned toIndex)
+{
+	std::lock_guard<std::mutex> l(m_mutex);
+	if (fromIndex > toIndex)
+	{
+		std::rotate(m_list.rend() - fromIndex - 1, m_list.rend() - fromIndex, m_list.rend() - toIndex);
+	}
+	else 
+	{
+		std::rotate(m_list.begin() + fromIndex, m_list.begin() + fromIndex + 1, m_list.begin() + toIndex + 1);
+	}
+}
 
 std::shared_ptr<Song> PlayList::getSong(unsigned index) {
 	std::lock_guard<std::mutex> l(m_mutex);

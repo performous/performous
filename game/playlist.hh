@@ -33,6 +33,8 @@ public:
 	void removeSong(unsigned index);
 	/// swaps two songs
 	void swap (unsigned index1, unsigned index2);
+	/// Moves a song from an index to another index.
+	void move(unsigned fromIndex, unsigned toIndex);
 	/// gets a specific song and removes it from the queue
 	std::shared_ptr<Song> getSong(unsigned index);
 	/// this is for the webserver, to avoid crashing when adding the current playing song
