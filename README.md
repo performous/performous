@@ -1,20 +1,19 @@
-![alt text](http://performous.org/imgs/title.png "Performous")
-Performous
-==========
+![alt text](https://performous.org/imgs/title.png "Performous")
+
+# Performous
 
 [![Build Status](https://github.com/performous/performous/actions/workflows/build_and_release.yml/badge.svg?branch=master)](https://github.com/performous/performous/actions?query=branch%3Amaster+workflow%3A%22Build+and+Release+Performous%22+is%3Asuccess)
 
 An open-source karaoke, band and dancing game where one or more players perform a song and the game scores their performances. Supports songs in UltraStar, Frets on Fire and StepMania formats. Microphones and instruments from SingStar, Guitar Hero and Rock Band as well as some dance pads are autodetected.
 
-Website at http://performous.org/ << If you can't reach it try the mirror https://performous.asgardsings.nl
-Wiki at https://github.com/performous/performous/wiki
+Website at https://performous.org/ << If you can't reach it try the mirror https://performous.asgardsings.nl  
+Wiki at https://github.com/performous/performous/wiki  
 Discord at https://discord.gg/NS3m3ad
 
 For compiling instructions, see docs/Compiling.txt or visit the wiki page: https://github.com/performous/performous/wiki/Building-and-installing-from-source
 
+# Latest builds
 
-Latest builds
-==========
 - [Windows (MSVC)](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-msvc.exe.zip)
 - [Windows (MinGW-w64)](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-mingw-w64.exe.zip)
 - [Mac OS X](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest.dmg.zip)
