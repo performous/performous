@@ -95,6 +95,10 @@ void RequestHandler::Get(web::http::http_request request)
             m_songs.sortSpecificChange(3);
         } else if(query == "sort=edition&order=descending") {
             m_songs.sortSpecificChange(3, true);
+        } else if(query == "sort=creator&order=ascending") {
+            m_songs.sortSpecificChange(10);
+        } else if(query == "sort=creator&order=descending") {
+            m_songs.sortSpecificChange(10, true);
         }
         web::json::value jsonRoot = SongsToJsonObject();
         request.reply(web::http::status_codes::OK, jsonRoot);
