@@ -50,6 +50,17 @@ TEST(UnitTest_Cycle, set_bounds) {
 	EXPECT_THROW(Cycle<unsigned short>(1, 2, 1).set(3), std::logic_error);
 }
 
+TEST(UnitTest_Cycle, operator_equals) {
+	EXPECT_EQ(2, Cycle<unsigned short>(0, 2, 0) = 2);
+	EXPECT_EQ(0, Cycle<unsigned short>(1, 2, 0) = 0);
+	EXPECT_EQ(1, Cycle<unsigned short>(2, 2, 0) = 1);
+}
+
+TEST(UnitTest_Cycle, operator_equals_bounds) {
+	EXPECT_THROW(Cycle<unsigned short>(1, 2, 1) = 0, std::logic_error);
+	EXPECT_THROW(Cycle<unsigned short>(1, 2, 1) = 3, std::logic_error);
+}
+
 TEST(UnitTest_Cycle, forward) {
 	EXPECT_EQ(1, Cycle<unsigned short>(0, 2, 0).forward());
 	EXPECT_EQ(2, Cycle<unsigned short>(0, 2, 0).forward().forward());
