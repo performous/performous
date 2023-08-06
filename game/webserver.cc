@@ -1,5 +1,6 @@
 #include "webserver.hh"
 #include "game.hh"
+#include "platform.hh"
 
 #ifdef USE_WEBSERVER
 #include <boost/asio.hpp>
@@ -26,7 +27,14 @@ void WebServer::StartServer(int tried, bool fallbackPortInUse) {
 		addr = "http://127.0.0.1:" + portToUse;
 		std::clog << "webserver/notice: Starting local server on: " << addr <<std::endl;
 	} else {
-		addr = "http://0.0.0.0:" + portToUse;
+		if (Platform::currentOS() == Platform::HostOS::OS_WIN)
+		{
+			addr = "http://*:" + portToUse; // Allow Windows to accept all connections. Needs admin privileges though.
+		}
+		else 
+		{
+			addr = "http://0.0.0.0:" + portToUse;
+		}
 		std::clog << "webserver/notice: Starting public server on: " << addr << std::endl;
 	}
 
