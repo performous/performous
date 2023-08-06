@@ -100,6 +100,8 @@ void RequestHandler::Get(web::http::http_request request)
         } else if(query == "sort=creator&order=descending") {
             m_songs.sortSpecificChange(10, true);
         }
+        // make sure to apply the filtering
+        m_songs.update();
         web::json::value jsonRoot = SongsToJsonObject();
         request.reply(web::http::status_codes::OK, jsonRoot);
         return;
