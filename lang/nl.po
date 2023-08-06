@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: performous\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-13 10:59+0200\n"
-"PO-Revision-Date: 2023-05-13 11:06+0200\n"
+"POT-Creation-Date: 2023-08-06 14:48+0200\n"
+"PO-Revision-Date: 2023-08-06 14:48+0200\n"
 "Last-Translator: Arjan Speiard | Asgard Sings! <arjan.spieard@gmail.com>\n"
 "Language-Team: \n"
 "Language: nl\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _;translate_noop\n"
 "X-Poedit-Basepath: .\n"
-"X-Generator: Poedit 3.3\n"
+"X-Generator: Poedit 3.3.2\n"
 "X-Poedit-SearchPath-0: ../game\n"
 "X-Poedit-SearchPath-1: ../data\n"
 
@@ -136,7 +136,7 @@ msgstr "Verberg toonhoogte, noten en sores."
 #. name: game/difficulty
 #. type: uint
 #. value: 0
-#: ../data/config/schema.xml:53 ../game/requesthandler.cc:324
+#: ../data/config/schema.xml:53 ../game/requesthandler.cc:327
 msgid "Normal"
 msgstr "Normaal"
 
@@ -324,7 +324,7 @@ msgstr ""
 #. name: game/language
 #. type: uint
 #. value: 1337
-#: ../data/config/schema.xml:103 ../game/requesthandler.cc:320
+#: ../data/config/schema.xml:103 ../game/requesthandler.cc:323
 msgid "Language"
 msgstr "Taal"
 
@@ -1495,7 +1495,7 @@ msgstr ""
 #. type: uint
 #. value: 0
 #. hidden: true
-#: ../data/config/schema.xml:439 ../game/requesthandler.cc:323
+#: ../data/config/schema.xml:439 ../game/requesthandler.cc:326
 msgid "Sort order"
 msgstr "Sorteervolgorde"
 
@@ -1822,63 +1822,63 @@ msgstr "Schermafdruk genomen!"
 msgid "Screenshot failed!"
 msgstr "Schermafdruk nemen mislukt!"
 
-#: ../game/requesthandler.cc:313
+#: ../game/requesthandler.cc:316
 msgid "Performous web frontend"
 msgstr "Performous website"
 
-#: ../game/requesthandler.cc:314
+#: ../game/requesthandler.cc:317
 msgid "View database"
 msgstr "Bekijk database"
 
-#: ../game/requesthandler.cc:315 ../game/screen_songs.cc:610
+#: ../game/requesthandler.cc:318 ../game/screen_songs.cc:610
 msgid "View playlist"
 msgstr "Bekijk afspeellijst"
 
-#: ../game/requesthandler.cc:316
+#: ../game/requesthandler.cc:319
 msgid "Search and add"
 msgstr "Zoeken & toevoegen"
 
-#: ../game/requesthandler.cc:317
+#: ../game/requesthandler.cc:320
 msgid "Sort by"
 msgstr "Gesorteerd op"
 
-#: ../game/requesthandler.cc:318
+#: ../game/requesthandler.cc:321
 msgid "Artist"
 msgstr "Artiest"
 
-#: ../game/requesthandler.cc:319
+#: ../game/requesthandler.cc:322
 msgid "Title"
 msgstr "Titel"
 
-#: ../game/requesthandler.cc:321
+#: ../game/requesthandler.cc:324
 msgid "Edition"
 msgstr "Editie"
 
-#: ../game/requesthandler.cc:322
+#: ../game/requesthandler.cc:325
 msgid "Creator"
 msgstr "Maker"
 
-#: ../game/requesthandler.cc:325
+#: ../game/requesthandler.cc:328
 msgid "Inverted"
 msgstr "Omgekeerd"
 
-#: ../game/requesthandler.cc:326
+#: ../game/requesthandler.cc:329
 msgid "Update every 10 sec"
 msgstr "Ververs iedere 10 seconden"
 
-#: ../game/requesthandler.cc:327
+#: ../game/requesthandler.cc:330
 msgid "Refresh database"
 msgstr "Ververs database"
 
-#: ../game/requesthandler.cc:328
+#: ../game/requesthandler.cc:331
 msgid "Upcoming songs"
 msgstr "Aankomende liedjes"
 
-#: ../game/requesthandler.cc:329
+#: ../game/requesthandler.cc:332
 msgid "Refresh playlist"
 msgstr "Vernieuw afspeellijst"
 
-#: ../game/requesthandler.cc:330
+#: ../game/requesthandler.cc:333
 msgid ""
 "Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding "
 "Performous see /docs/Authors.txt"
@@ -1886,99 +1886,99 @@ msgstr ""
 "Web interface gemaakt door Niek Nooijens en Arjan Speiard, voor de volledige "
 "lijst bekijk /docs/Authors.txt"
 
-#: ../game/requesthandler.cc:331
+#: ../game/requesthandler.cc:334
 msgid "Search"
 msgstr "Zoeken"
 
-#: ../game/requesthandler.cc:332
+#: ../game/requesthandler.cc:335
 msgid "Available songs"
 msgstr "Beschikbare liedjes"
 
-#: ../game/requesthandler.cc:333
+#: ../game/requesthandler.cc:336
 msgid "Search for songs"
 msgstr "Zoek een liedje"
 
-#: ../game/requesthandler.cc:334
+#: ../game/requesthandler.cc:337
 msgid "Yes"
 msgstr "Ja"
 
-#: ../game/requesthandler.cc:335
+#: ../game/requesthandler.cc:338
 msgid "No"
 msgstr "Nee"
 
-#: ../game/requesthandler.cc:336 ../game/screen_playlist.cc:374
+#: ../game/requesthandler.cc:339 ../game/screen_playlist.cc:374
 msgid "Move up"
 msgstr "Omhoog"
 
-#: ../game/requesthandler.cc:337 ../game/screen_playlist.cc:383
+#: ../game/requesthandler.cc:340 ../game/screen_playlist.cc:382
 msgid "Move down"
 msgstr "Omlaag"
 
-#: ../game/requesthandler.cc:338
+#: ../game/requesthandler.cc:341
 msgid "Set position"
 msgstr "Naar positie"
 
-#: ../game/requesthandler.cc:339
+#: ../game/requesthandler.cc:342
 msgid "Remove song"
 msgstr "Verwijder liedje"
 
-#: ../game/requesthandler.cc:340
+#: ../game/requesthandler.cc:343
 msgid "Desired position of song"
 msgstr "Gewenste positie van het liedje"
 
-#: ../game/requesthandler.cc:341
+#: ../game/requesthandler.cc:344
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: ../game/requesthandler.cc:342
+#: ../game/requesthandler.cc:345
 msgid "Successfully removed song from playlist."
 msgstr "Sucecsvol verwijderd van de afspeellijst."
 
-#: ../game/requesthandler.cc:343
+#: ../game/requesthandler.cc:346
 msgid "Failed removing song from playlist!"
 msgstr ""
 "Er is een probleem opgetreden tijden het verwijderen van een liedje uit de "
 "playlist!"
 
-#: ../game/requesthandler.cc:344
+#: ../game/requesthandler.cc:347
 msgid "Successfully changed position of song."
 msgstr "Succesvol de positie gewijzigd van het liedje."
 
-#: ../game/requesthandler.cc:345
+#: ../game/requesthandler.cc:348
 msgid "Failed changing position of song!"
 msgstr ""
 "Er is een probleem opgetreden tijdens het wijzigen van de positie van een "
 "liedje!"
 
-#: ../game/requesthandler.cc:346
+#: ../game/requesthandler.cc:349
 msgid "Successfully moved song up."
 msgstr "Succesvol het liedje omhoog verplaatst."
 
-#: ../game/requesthandler.cc:347
+#: ../game/requesthandler.cc:350
 msgid "Failed moving song up!"
 msgstr ""
 "Er is een probleem opgetreden tijdens het omhoog verplaatsen van het liedje!"
 
-#: ../game/requesthandler.cc:348
+#: ../game/requesthandler.cc:351
 msgid "Successfully moved song down."
 msgstr "Succesvol het liedje omlaag verplaatst."
 
-#: ../game/requesthandler.cc:349
+#: ../game/requesthandler.cc:352
 msgid "Failed moving song down!"
 msgstr ""
 "Er is een probleem opgetreden tijdens het omlaag verplaatsen van het liedje!"
 
-#: ../game/requesthandler.cc:350
+#: ../game/requesthandler.cc:353
 msgid "Successfully added song to the playlist."
 msgstr "Succesvol het liedje toegevoegd aan de afspeellijst."
 
-#: ../game/requesthandler.cc:351
+#: ../game/requesthandler.cc:354
 msgid "Failed adding song to the playlist!"
 msgstr ""
 "Er is een probleem opgetreden tijdens het toevoegen van een liedje aan de "
 "afspeellijst!"
 
-#: ../game/requesthandler.cc:352
+#: ../game/requesthandler.cc:355
 msgid "No songs found with current filter."
 msgstr "Geen liedjes gevonden met het huidige filter."
 
@@ -2233,12 +2233,12 @@ msgstr "Leegmaken en afsluiten"
 msgid "Remove all the songs from the list"
 msgstr "Haal alle nummers uit de lijst"
 
-#: ../game/screen_playlist.cc:205 ../game/screen_playlist.cc:389
+#: ../game/screen_playlist.cc:205 ../game/screen_playlist.cc:388
 #: ../game/screen_songs.cc:616
 msgid "Back"
 msgstr "Terug"
 
-#: ../game/screen_playlist.cc:205 ../game/screen_playlist.cc:389
+#: ../game/screen_playlist.cc:205 ../game/screen_playlist.cc:388
 msgid "Back to playlist viewer"
 msgstr "Terug naar afspeellijstoverzicht"
 
@@ -2278,7 +2278,7 @@ msgstr "Verwijder dit lied uit de lijst"
 msgid "Move this song up the list"
 msgstr "Verplaats dit lied omhoog in de lijst"
 
-#: ../game/screen_playlist.cc:383
+#: ../game/screen_playlist.cc:382
 msgid "Move this song down the list"
 msgstr "Verplaats dit lied omlaag in de lijst"
 
