@@ -11,6 +11,7 @@
 #include "song.hh"
 
 #include "songorder/artist_song_order.hh"
+#include "songorder/creator_song_order.hh"
 #include "songorder/edition_song_order.hh"
 #include "songorder/file_time_song_order.hh"
 #include "songorder/genre_song_order.hh"
@@ -44,6 +45,7 @@ namespace {
 		songs.addSongOrder(std::make_shared<ScoreSongOrder>());
 		songs.addSongOrder(std::make_shared<MostSungSongOrder>());
 		songs.addSongOrder(std::make_shared<FileTimeSongOrder>());
+		songs.addSongOrder(std::make_shared<CreatorSongOrder>());
 	}
 }
 
@@ -528,7 +530,11 @@ void Songs::sort_internal(bool descending) {
 	order.prepare(m_filtered, m_database);
 
 	std::stable_sort(m_filtered.begin(), m_filtered.end(),
-		[&](SongPtr const& a, SongPtr const& b) { return order(*a, *b) ? !descending : descending; });
+		[&](SongPtr const& a, SongPtr const& b) { return order(*a, *b); });
+
+	if (descending) {
+		std::reverse(m_filtered.begin(), m_filtered.end());
+	}
 }
 
 std::shared_ptr<Song> Songs::currentPtr() const try {

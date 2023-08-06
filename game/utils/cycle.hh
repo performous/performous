@@ -11,6 +11,7 @@ class Cycle {
 	Cycle& backward();
 
 	operator Type() const;
+	Cycle& operator=(Type value);
 
 	Type getMin() const;
 	Type getMax() const;
@@ -55,6 +56,11 @@ Cycle<Type>& Cycle<Type>::set(Type value) {
 	m_value = value;
 
 	return *this;
+}
+
+template<class Type>
+Cycle<Type>& Cycle<Type>::operator=(Type value) {
+	return set(value);
 }
 
 template<class Type>
