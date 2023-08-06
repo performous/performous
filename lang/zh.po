@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: performous 0.6.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-20 16:02-0300\n"
-"PO-Revision-Date: 2021-09-20 16:16-0300\n"
-"Last-Translator: Gregorio Litenstein <g.litenstein@gmail.com>\n"
+"POT-Creation-Date: 2023-08-06 14:49+0200\n"
+"PO-Revision-Date: 2023-08-06 14:49+0200\n"
+"Last-Translator: Arjan Speiard | Asgard Sings! <arjan.spieard@gmail.com>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
@@ -18,1036 +18,9 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Poedit-KeywordsList: _;translate_noop\n"
 "X-Poedit-Basepath: .\n"
-"X-Generator: Poedit 3.0\n"
+"X-Generator: Poedit 3.3.2\n"
 "X-Poedit-SearchPath-0: ../game\n"
 "X-Poedit-SearchPath-1: ../data\n"
-
-#: ../game/configuration.cc:147
-msgid "Enabled"
-msgstr "已啟用"
-
-#: ../game/configuration.cc:147 ../game/menu.cc:64
-msgid "Disabled"
-msgstr "已停用"
-
-#: ../game/configuration.cc:151
-#, c-format
-msgid "%d items"
-msgstr "%d 項"
-
-#: ../game/configuration.cc:452 ../game/i18n.hh:101
-msgid "Asturian"
-msgstr ""
-
-#: ../game/configuration.cc:453 ../game/i18n.hh:102
-msgid "Danish"
-msgstr ""
-
-#: ../game/configuration.cc:454 ../game/i18n.hh:103
-msgid "German"
-msgstr ""
-
-#: ../game/configuration.cc:455 ../game/i18n.hh:104
-msgid "English"
-msgstr ""
-
-#: ../game/configuration.cc:456 ../game/i18n.hh:105
-msgid "Spanish"
-msgstr ""
-
-#: ../game/configuration.cc:457 ../game/i18n.hh:106
-msgid "Persian"
-msgstr ""
-
-#: ../game/configuration.cc:458 ../game/i18n.hh:107
-msgid "Finnish"
-msgstr ""
-
-#: ../game/configuration.cc:459 ../game/i18n.hh:108
-msgid "French"
-msgstr ""
-
-#: ../game/configuration.cc:460 ../game/i18n.hh:109
-msgid "Hungarian"
-msgstr ""
-
-#: ../game/configuration.cc:461 ../game/i18n.hh:110
-msgid "Italian"
-msgstr ""
-
-#: ../game/configuration.cc:462 ../game/i18n.hh:111
-msgid "Japanese"
-msgstr ""
-
-#: ../game/configuration.cc:463 ../game/i18n.hh:112
-msgid "Dutch"
-msgstr ""
-
-#: ../game/configuration.cc:464 ../game/i18n.hh:113
-msgid "Polish"
-msgstr ""
-
-#: ../game/configuration.cc:465 ../game/i18n.hh:114
-msgid "Portuguese"
-msgstr ""
-
-#: ../game/configuration.cc:466 ../game/i18n.hh:115
-msgid "Swedish"
-msgstr ""
-
-#: ../game/configuration.cc:467 ../game/i18n.hh:116
-msgid "Chinese"
-msgstr ""
-
-#: ../game/dancegraph.cc:17
-msgid "Beginner"
-msgstr "初學者"
-
-#: ../game/dancegraph.cc:17 ../game/guitargraph.cc:13
-msgid "Easy"
-msgstr "輕鬆"
-
-#: ../game/dancegraph.cc:17 ../game/guitargraph.cc:13
-msgid "Medium"
-msgstr "中等"
-
-#: ../game/dancegraph.cc:17 ../game/guitargraph.cc:13
-msgid "Hard"
-msgstr "硬底"
-
-#: ../game/dancegraph.cc:17
-msgid "Challenge"
-msgstr "挑戰"
-
-#: ../game/dancegraph.cc:51 ../game/dancegraph.cc:59
-msgid "Perfect!"
-msgstr ""
-
-#: ../game/dancegraph.cc:52
-msgid "Excellent!-"
-msgstr ""
-
-#: ../game/dancegraph.cc:53
-msgid "Great!-"
-msgstr ""
-
-#: ../game/dancegraph.cc:54
-msgid " Good!- "
-msgstr ""
-
-#: ../game/dancegraph.cc:55
-msgid "  OK!-  "
-msgstr ""
-
-#: ../game/dancegraph.cc:56
-msgid "Late!-"
-msgstr ""
-
-#: ../game/dancegraph.cc:57 ../game/dancegraph.cc:65
-msgid "Way off!"
-msgstr ""
-
-#: ../game/dancegraph.cc:60
-msgid "-Excellent!"
-msgstr ""
-
-#: ../game/dancegraph.cc:61
-msgid "-Great!"
-msgstr ""
-
-#: ../game/dancegraph.cc:62
-msgid " -Good! "
-msgstr ""
-
-#: ../game/dancegraph.cc:63
-msgid "  -OK!  "
-msgstr ""
-
-#: ../game/dancegraph.cc:64
-msgid "-Early!"
-msgstr ""
-
-#: ../game/dancegraph.cc:106 ../game/guitargraph.cc:194
-msgid "Ready!"
-msgstr "就緒！"
-
-#: ../game/dancegraph.cc:106 ../game/guitargraph.cc:194
-#: ../game/screen_intro.cc:174
-msgid "Start performing!"
-msgstr "開始歡唱！"
-
-#: ../game/dancegraph.cc:117 ../game/guitargraph.cc:183
-msgid "Select track"
-msgstr "選取軌段"
-
-#: ../game/dancegraph.cc:133 ../game/guitargraph.cc:163
-msgid "Select difficulty"
-msgstr "選取難度"
-
-#: ../game/dancegraph.cc:136 ../game/guitargraph.cc:200
-#: ../game/instrumentgraph.cc:59 ../game/screen_intro.cc:192
-#: ../game/screen_sing.cc:108 ../game/screen_sing.cc:155
-msgid "Quit"
-msgstr "離開"
-
-#: ../game/dancegraph.cc:136 ../game/guitargraph.cc:200
-#: ../game/instrumentgraph.cc:59 ../game/screen_sing.cc:108
-#: ../game/screen_sing.cc:155
-msgid "Exit to song browser"
-msgstr "離開到歌曲瀏覽器"
-
-#: ../game/dancegraph.cc:247
-msgid "STOP!"
-msgstr "停止！"
-
-#: ../game/dancegraph.cc:321 ../game/guitargraph.cc:454
-msgid "Streak!"
-msgstr "劃線！"
-
-#: ../game/guitargraph.cc:13
-msgid "Kids"
-msgstr "兒童"
-
-#: ../game/guitargraph.cc:13
-msgid "Expert"
-msgstr "專家"
-
-#: ../game/guitargraph.cc:169 ../game/guitargraph.cc:186
-msgid "Lefty-mode"
-msgstr "左手模式"
-
-#: ../game/guitargraph.cc:207
-msgid "ON"
-msgstr "開"
-
-#: ../game/guitargraph.cc:207
-msgid "OFF"
-msgstr "關閉"
-
-#: ../game/guitargraph.cc:208
-msgid "Toggle lefty-mode"
-msgstr "切換左手模式"
-
-#: ../game/guitargraph.cc:466
-msgid ""
-"God Mode\n"
-"Activated!"
-msgstr ""
-"上帝模式\n"
-"啟用！"
-
-#: ../game/guitargraph.cc:467
-msgid "Mistakes ignored!"
-msgstr "忽略錯誤！"
-
-#: ../game/guitargraph.cc:1119
-msgid "God Mode Ready!"
-msgstr "上帝模式就緒！"
-
-#: ../game/guitargraph.cc:1120
-msgid "Drum Fill!"
-msgstr "填滿鼓聲！"
-
-#: ../game/guitargraph.cc:1123
-msgid "Solo!"
-msgstr "獨唱！"
-
-#: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:149
-msgid "Resume"
-msgstr "再續"
-
-#: ../game/instrumentgraph.cc:56 ../game/screen_sing.cc:149
-msgid "Back to performing!"
-msgstr "回到歡唱！"
-
-#: ../game/instrumentgraph.cc:57
-msgid "Rejoin"
-msgstr "重新連結"
-
-#: ../game/instrumentgraph.cc:57
-msgid "Change selections"
-msgstr "變更選擇"
-
-#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:150
-msgid "Restart"
-msgstr "重新啟動"
-
-#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:150
-msgid ""
-"Start the song\n"
-"from the beginning"
-msgstr ""
-"從開始部分\n"
-"播放歌曲"
-
-#: ../game/layout_singer.cc:72
-msgid "Perfect"
-msgstr ""
-
-#: ../game/layout_singer.cc:73
-msgid "Excellent"
-msgstr ""
-
-#: ../game/layout_singer.cc:74
-msgid "Great"
-msgstr ""
-
-#: ../game/layout_singer.cc:75
-msgid "Good"
-msgstr ""
-
-#: ../game/layout_singer.cc:76
-msgid "OK"
-msgstr ""
-
-#: ../game/main.cc:148
-msgid "Loading audio samples..."
-msgstr "載入音效樣本…"
-
-#: ../game/main.cc:163
-msgid "Creating screens..."
-msgstr "建立畫面…"
-
-#: ../game/main.cc:173
-#, fuzzy
-#| msgid "Entering main menu"
-msgid "Entering main menu..."
-msgstr "進入主選單"
-
-#: ../game/main.cc:175
-#, fuzzy
-#| msgid "Loading complete"
-msgid "Loading complete!"
-msgstr "載入完成"
-
-#: ../game/main.cc:184
-msgid ""
-"Done Loading!\n"
-" Loaded "
-msgstr ""
-
-#: ../game/main.cc:190
-msgid "Screenshot taken!"
-msgstr "拍下螢幕快照！"
-
-#: ../game/main.cc:193
-msgid "Screenshot failed!"
-msgstr "螢幕快照失敗！"
-
-#: ../game/requesthandler.cc:332
-msgid "Performous web frontend"
-msgstr ""
-
-#: ../game/requesthandler.cc:333
-msgid "View database"
-msgstr ""
-
-#: ../game/requesthandler.cc:334 ../game/screen_songs.cc:565
-msgid "View playlist"
-msgstr ""
-
-#: ../game/requesthandler.cc:335
-msgid "Search and add"
-msgstr ""
-
-#: ../game/requesthandler.cc:336
-msgid "Sort by"
-msgstr ""
-
-#: ../game/requesthandler.cc:337
-msgid "Artist"
-msgstr ""
-
-#: ../game/requesthandler.cc:338
-msgid "Title"
-msgstr ""
-
-#. Language
-#. Language to show Performous in
-#. name: game/language
-#. type: int
-#. value: 1337
-#: ../game/requesthandler.cc:339 ../data/config/schema.xml:103
-msgid "Language"
-msgstr ""
-
-#: ../game/requesthandler.cc:340
-msgid "Edition"
-msgstr ""
-
-#: ../game/requesthandler.cc:341
-msgid "Creator"
-msgstr ""
-
-#. Sort order
-#. Currently active sort order.
-#. name: songs/sort-order
-#. type: int
-#. value: 0
-#. hidden: true
-#: ../game/requesthandler.cc:342 ../data/config/schema.xml:428
-msgid "Sort order"
-msgstr ""
-
-#: ../game/requesthandler.cc:343
-msgid "Normal"
-msgstr ""
-
-#: ../game/requesthandler.cc:344
-msgid "Inverted"
-msgstr ""
-
-#: ../game/requesthandler.cc:345
-msgid "Update every 10 sec"
-msgstr ""
-
-#: ../game/requesthandler.cc:346
-msgid "Refresh database"
-msgstr ""
-
-#: ../game/requesthandler.cc:347
-msgid "Upcoming songs"
-msgstr ""
-
-#: ../game/requesthandler.cc:348
-msgid "Refresh playlist"
-msgstr ""
-
-#: ../game/requesthandler.cc:349
-msgid ""
-"Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding "
-"Performous see /docs/Authors.txt"
-msgstr ""
-
-#: ../game/requesthandler.cc:350
-msgid "Search"
-msgstr ""
-
-#: ../game/requesthandler.cc:351
-msgid "Available songs"
-msgstr ""
-
-#: ../game/requesthandler.cc:352
-msgid "Search for songs"
-msgstr ""
-
-#: ../game/requesthandler.cc:353
-msgid "Yes"
-msgstr ""
-
-#: ../game/requesthandler.cc:354
-msgid "No"
-msgstr ""
-
-#: ../game/requesthandler.cc:355 ../game/screen_playlist.cc:376
-msgid "Move up"
-msgstr ""
-
-#: ../game/requesthandler.cc:356 ../game/screen_playlist.cc:386
-msgid "Move down"
-msgstr ""
-
-#: ../game/requesthandler.cc:357
-msgid "Set position"
-msgstr ""
-
-#: ../game/requesthandler.cc:358
-msgid "Remove song"
-msgstr ""
-
-#: ../game/requesthandler.cc:359
-msgid "Desired position of song"
-msgstr ""
-
-#: ../game/requesthandler.cc:360
-msgid "Cancel"
-msgstr ""
-
-#: ../game/requesthandler.cc:361
-msgid "Successfully removed song from playlist."
-msgstr ""
-
-#: ../game/requesthandler.cc:362
-msgid "Failed removing song from playlist!"
-msgstr ""
-
-#: ../game/requesthandler.cc:363
-msgid "Successfully changed position of song."
-msgstr ""
-
-#: ../game/requesthandler.cc:364
-msgid "Failed changing position of song!"
-msgstr ""
-
-#: ../game/requesthandler.cc:365
-msgid "Successfully moved song up."
-msgstr ""
-
-#: ../game/requesthandler.cc:366
-msgid "Failed moving song up!"
-msgstr ""
-
-#: ../game/requesthandler.cc:367
-msgid "Successfully moved song down."
-msgstr ""
-
-#: ../game/requesthandler.cc:368
-msgid "Failed moving song down!"
-msgstr ""
-
-#: ../game/requesthandler.cc:369
-msgid "Successfully added song to the playlist."
-msgstr ""
-
-#: ../game/requesthandler.cc:370
-msgid "Failed adding song to the playlist!"
-msgstr ""
-
-#: ../game/requesthandler.cc:371
-msgid "No songs found with current filter."
-msgstr ""
-
-#: ../game/screen_audiodevices.cc:66
-msgid ""
-"It seems you have some manual configurations\n"
-"incompatible with this user interface.\n"
-"Saving these settings will override\n"
-"all existing audio device configuration.\n"
-"Your other options changes will be saved too."
-msgstr ""
-"您似乎有某些手動的組態\n"
-"與這個使用者介面不相容。\n"
-"儲存這些設定值將會強制變更\n"
-"所有現存音效裝置的組態。\n"
-"您的其他選項變更也將被儲存。"
-
-#: ../game/screen_audiodevices.cc:129
-msgid "- Unassigned -"
-msgstr "- 未賦值的 -"
-
-#: ../game/screen_audiodevices.cc:150
-msgid ""
-"Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select "
-"to cancel. Ctrl + R to reset defaults"
-msgstr ""
-"使用方向鍵以組配。點擊 輸入/開始 以儲存與測試，或 Esc/選取 以取消。Ctrl + R "
-"以重置預設值"
-
-#: ../game/screen_audiodevices.cc:155
-msgid ""
-"For advanced device configuration, use command line parameter --audio (use --"
-"audiohelp for details)."
-msgstr ""
-"使用命令列參數 --audio (使用 --audiohelp 以瞭解細節) 用於進階裝置組態。"
-
-#: ../game/screen_audiodevices.cc:199
-msgid "Some devices failed to open!"
-msgstr "無法開啟某些裝置！"
-
-#: ../game/screen_intro.cc:27
-msgid "No playback devices could be used.\n"
-msgstr "沒有播放控制裝置可供使用。\n"
-
-#: ../game/screen_intro.cc:28
-msgid ""
-"\n"
-"Please configure some before playing."
-msgstr ""
-"\n"
-"請於播放前設定一些項目。"
-
-#: ../game/screen_intro.cc:75 ../game/screen_paths.cc:36
-msgid "Settings saved as system defaults."
-msgstr ""
-
-#: ../game/screen_intro.cc:75 ../game/screen_paths.cc:36
-msgid "Settings saved."
-msgstr ""
-
-#: ../game/screen_intro.cc:154
-msgid "Ctrl + S to save, Ctrl + R to reset defaults"
-msgstr "Ctrl + S 以儲存，Ctrl + R 以重置預設值"
-
-#: ../game/screen_intro.cc:174
-msgid "Perform"
-msgstr "開唱"
-
-#: ../game/screen_intro.cc:175
-msgid "Practice"
-msgstr "練習"
-
-#: ../game/screen_intro.cc:175
-#, fuzzy
-#| msgid "Check your skills or test the microphones"
-msgid "Check your skills or test the microphones."
-msgstr "檢查您的技巧或測試一下麥克風"
-
-#: ../game/screen_intro.cc:191
-msgid "Configure"
-msgstr "設定"
-
-#: ../game/screen_intro.cc:191
-#, fuzzy
-#| msgid "Configure audio and game options"
-msgid "Configure audio and game options."
-msgstr "組配音效和遊戲選項"
-
-#: ../game/screen_intro.cc:192
-#, fuzzy
-#| msgid "Leave the game"
-msgid "Leave the game."
-msgstr "離開遊戲"
-
-#: ../game/screen_intro.cc:205
-msgid ""
-"Webserver active!\n"
-" connect to this computer\n"
-"using: "
-msgstr ""
-
-#: ../game/screen_paths.cc:69
-msgid "Hide hidden folders"
-msgstr ""
-
-#. Show hidden folders
-#. When true the screen 'Paths' will also show hidden folders.
-#. name: paths/showhiddenfolders
-#. type: bool
-#. value: false
-#: ../game/screen_paths.cc:74 ../data/config/schema.xml:399
-msgid "Show hidden folders"
-msgstr ""
-
-#: ../game/screen_paths.cc:81
-msgid "Remove this folder"
-msgstr ""
-
-#: ../game/screen_paths.cc:81
-msgid "Remove current folder from song folders"
-msgstr ""
-
-#: ../game/screen_paths.cc:87
-msgid "Add this folder"
-msgstr ""
-
-#: ../game/screen_paths.cc:87
-msgid "Add current folder to song folders"
-msgstr ""
-
-#: ../game/screen_paths.cc:95
-msgid ".."
-msgstr ""
-
-#: ../game/screen_paths.cc:95
-msgid "Go to parent folder"
-msgstr ""
-
-#: ../game/screen_paths.cc:122
-msgid "Open folder"
-msgstr ""
-
-#: ../game/screen_players.cc:134
-msgid "No players found!"
-msgstr "找不到演唱者！"
-
-#: ../game/screen_players.cc:135
-msgid "Enter a name to create a new player."
-msgstr "輸入名稱以建立新的演唱者。"
-
-#: ../game/screen_players.cc:137
-msgid "Press enter to create player!"
-msgstr "按下輸入以建立演唱者！"
-
-#: ../game/screen_players.cc:141
-#, fuzzy
-msgid "No players worth mentioning!"
-msgstr "找不到演唱者！"
-
-#: ../game/screen_players.cc:146
-msgid "You reached %1% points!"
-msgstr "您得到了 %1% 分！"
-
-#: ../game/screen_players.cc:147
-msgid "Change player with arrow keys."
-msgstr "利用方向鍵變更演唱者。"
-
-#: ../game/screen_players.cc:148
-msgid "Name:"
-msgstr "名稱："
-
-#: ../game/screen_players.cc:151
-msgid "Type text to filter or create a new player."
-msgstr "輸入文字到篩選器或建立新的演唱者。"
-
-#: ../game/screen_players.cc:151
-msgid "Search Text:"
-msgstr "搜尋文字："
-
-#: ../game/screen_playlist.cc:19 ../game/screen_sing.cc:46
-msgid "Initializing webcam..."
-msgstr "初始化網路攝影機…"
-
-#: ../game/screen_playlist.cc:38
-msgid "Loading song timestamps..."
-msgstr ""
-
-#: ../game/screen_playlist.cc:181 ../game/screen_playlist.cc:352
-msgid "Continue"
-msgstr ""
-
-#: ../game/screen_playlist.cc:181
-msgid "Continue playing"
-msgstr ""
-
-#: ../game/screen_playlist.cc:195
-msgid "Add songs"
-msgstr ""
-
-#: ../game/screen_playlist.cc:195
-msgid "Open the song browser to add more songs"
-msgstr ""
-
-#: ../game/screen_playlist.cc:196 ../game/screen_songs.cc:559
-msgid "Shuffle"
-msgstr ""
-
-#: ../game/screen_playlist.cc:196
-msgid "Randomize the order of the playlist"
-msgstr ""
-
-#: ../game/screen_playlist.cc:202
-msgid "Clear and exit"
-msgstr ""
-
-#: ../game/screen_playlist.cc:202
-msgid "Remove all the songs from the list"
-msgstr ""
-
-#: ../game/screen_playlist.cc:208 ../game/screen_playlist.cc:393
-#: ../game/screen_songs.cc:572
-msgid "Back"
-msgstr ""
-
-#: ../game/screen_playlist.cc:208 ../game/screen_playlist.cc:393
-msgid "Back to playlist viewer"
-msgstr ""
-
-#: ../game/screen_playlist.cc:335
-msgid "Press enter to view song options"
-msgstr ""
-
-#: ../game/screen_playlist.cc:344
-msgid "View more options"
-msgstr ""
-
-#: ../game/screen_playlist.cc:344
-#, fuzzy
-msgid "View general playlist settings"
-msgstr "組配一般音效設定值"
-
-#: ../game/screen_playlist.cc:352
-msgid "Play first"
-msgstr ""
-
-#: ../game/screen_playlist.cc:354
-msgid "Ignore the playlist's order and play this song first"
-msgstr ""
-
-#: ../game/screen_playlist.cc:355
-msgid "Start the song already!"
-msgstr ""
-
-#: ../game/screen_playlist.cc:364
-msgid "Remove"
-msgstr ""
-
-#: ../game/screen_playlist.cc:364
-msgid "Remove this song from the list"
-msgstr ""
-
-#: ../game/screen_playlist.cc:376
-msgid "Move this song up the list"
-msgstr ""
-
-#: ../game/screen_playlist.cc:386
-msgid "Move this song down the list"
-msgstr ""
-
-#: ../game/screen_sing.cc:53
-msgid "Loading video..."
-msgstr "載入影像…"
-
-#: ../game/screen_sing.cc:59
-msgid "Loading song..."
-msgstr "載入歌曲…"
-
-#: ../game/screen_sing.cc:66
-msgid "Song contains broken tracks!"
-msgstr "歌曲含有不完整的軌段！"
-
-#: ../game/screen_sing.cc:71
-msgid "Loading menu..."
-msgstr "載入選單…"
-
-#: ../game/screen_sing.cc:81
-msgid "Loading complete"
-msgstr "載入完成"
-
-#: ../game/screen_sing.cc:87
-#, fuzzy
-msgid "Start"
-msgstr "重新啟動"
-
-#: ../game/screen_sing.cc:87
-#, fuzzy
-msgid "Start performing"
-msgstr "開始歡唱！"
-
-#: ../game/screen_sing.cc:90
-#, fuzzy
-msgid "Duet mode"
-msgstr "左手模式"
-
-#: ../game/screen_sing.cc:91
-#, fuzzy
-msgid "Normal mode"
-msgstr "卡拉ＯＫ模式"
-
-#: ../game/screen_sing.cc:92
-msgid "Switch between duet and regular singing mode"
-msgstr ""
-
-#: ../game/screen_sing.cc:102
-#, fuzzy
-msgid "Change vocal track"
-msgstr ""
-"變更人聲軌段\n"
-"(需要重新啟動)"
-
-#: ../game/screen_sing.cc:153
-msgid "Skip"
-msgstr ""
-
-#: ../game/screen_sing.cc:153
-msgid "Skip current song"
-msgstr ""
-
-#: ../game/screen_sing.cc:308
-msgid "Press UP to join dance!"
-msgstr ""
-
-#: ../game/screen_sing.cc:308
-msgid "Step UP to join!"
-msgstr ""
-
-#: ../game/screen_sing.cc:313
-msgid "Press 1 to join guitar!"
-msgstr ""
-
-#: ../game/screen_sing.cc:313
-msgid "Press GREEN to join!"
-msgstr ""
-
-#: ../game/screen_sing.cc:318
-msgid "Press SPACE to join drums!"
-msgstr ""
-
-#: ../game/screen_sing.cc:318
-msgid "KICK to join!"
-msgstr ""
-
-#: ../game/screen_sing.cc:557
-msgid "   ENTER to skip instrumental break"
-msgstr "   按下輸入鍵以跳過樂器演奏中斷時間"
-
-#: ../game/screen_sing.cc:562 ../game/screen_sing.cc:583
-msgid "   Autoplay enabled"
-msgstr ""
-
-#: ../game/screen_sing.cc:565 ../game/screen_sing.cc:577
-msgid "   Remember to wait for grading!"
-msgstr "   記得等一下看評分！"
-
-#: ../game/screen_sing.cc:567
-msgid "   Prepare for the next song!"
-msgstr ""
-
-#: ../game/screen_sing.cc:579
-msgid "   Choose your next song!"
-msgstr ""
-
-#: ../game/screen_sing.cc:713
-msgid "No player!"
-msgstr "沒有演唱者！"
-
-#: ../game/screen_sing.cc:721
-msgid "Hit singer"
-msgstr "熱門歌手"
-
-#: ../game/screen_sing.cc:722
-msgid "Lead singer"
-msgstr "領先歌手"
-
-#: ../game/screen_sing.cc:723 ../game/screen_sing.cc:729
-#: ../game/screen_sing.cc:735
-msgid "Rising star"
-msgstr "上升之星"
-
-#: ../game/screen_sing.cc:724 ../game/screen_sing.cc:730
-#: ../game/screen_sing.cc:736
-msgid "Amateur"
-msgstr "業餘"
-
-#: ../game/screen_sing.cc:725 ../game/screen_sing.cc:737
-msgid "Tone deaf"
-msgstr "音癡"
-
-#: ../game/screen_sing.cc:727
-msgid "Maniac"
-msgstr "瘋子"
-
-#: ../game/screen_sing.cc:728
-msgid "Hoofer"
-msgstr "舞者"
-
-#: ../game/screen_sing.cc:731
-msgid "Loser"
-msgstr "輸家"
-
-#: ../game/screen_sing.cc:733
-msgid "Virtuoso"
-msgstr "鑒賞家"
-
-#: ../game/screen_sing.cc:734
-msgid "Rocker"
-msgstr "搖滾者"
-
-#: ../game/screen_songs.cc:296
-#, fuzzy
-msgid "Sorry, no songs match the search!"
-msgstr "沒有符合搜尋的歌曲"
-
-#: ../game/screen_songs.cc:299
-#, fuzzy
-msgid "Sorry, no songs match the filter!"
-msgstr "沒有符合搜尋的歌曲"
-
-#: ../game/screen_songs.cc:302
-msgid "No songs found!"
-msgstr "找不到歌曲！"
-
-#: ../game/screen_songs.cc:303
-#, fuzzy
-msgid "Visit performous.org for free songs"
-msgstr ""
-"造訪 performous.org\n"
-"以取得免費歌曲"
-
-#: ../game/screen_songs.cc:321
-msgid "<type in to search>"
-msgstr "<輸入以搜尋>"
-
-#: ../game/screen_songs.cc:321
-msgid "songs"
-msgstr ""
-
-#: ../game/screen_songs.cc:321
-msgid "options"
-msgstr ""
-
-#: ../game/screen_songs.cc:323
-msgid "sort order: "
-msgstr ""
-
-#: ../game/screen_songs.cc:324
-msgid "type filter: "
-msgstr ""
-
-#: ../game/screen_songs.cc:325
-msgid "hiscores"
-msgstr ""
-
-#: ../game/screen_songs.cc:325
-msgid "jukebox mode"
-msgstr ""
-
-#: ../game/screen_songs.cc:328
-msgid "start a playlist with this song!"
-msgstr ""
-
-#: ../game/screen_songs.cc:328
-msgid "open the playlist menu"
-msgstr ""
-
-#: ../game/screen_songs.cc:552
-msgid "Play"
-msgstr ""
-
-#: ../game/screen_songs.cc:566
-msgid "Clear playlist"
-msgstr ""
-
-#: ../game/songparser-xml.cc:117
-msgid "Together"
-msgstr ""
-
-#: ../game/songs.cc:439
-msgid "show all songs"
-msgstr ""
-
-#: ../game/songs.cc:440
-msgid "has dance"
-msgstr ""
-
-#: ../game/songs.cc:441
-#, fuzzy
-msgid "has vocals"
-msgstr "人聲"
-
-#: ../game/songs.cc:442
-msgid "has duet"
-msgstr ""
-
-#: ../game/songs.cc:443
-#, fuzzy
-msgid "has guitar"
-msgstr "節奏吉他"
-
-#: ../game/songs.cc:444
-msgid "drums or keytar"
-msgstr ""
-
-#: ../game/songs.cc:445
-msgid "full band"
-msgstr ""
-
-#: ../game/songs.cc:473
-msgid "random order"
-msgstr "隨機排序"
-
-#: ../game/songs.cc:474
-msgid "sorted by song"
-msgstr "依歌曲排序"
-
-#: ../game/songs.cc:475
-msgid "sorted by artist"
-msgstr "依歌手排序"
-
-#: ../game/songs.cc:476
-msgid "sorted by edition"
-msgstr "依專輯排序"
-
-#: ../game/songs.cc:477
-msgid "sorted by genre"
-msgstr "依類型排序"
-
-#: ../game/songs.cc:478
-msgid "sorted by path"
-msgstr "依路徑排序"
-
-#: ../game/songs.cc:479
-msgid "sorted by language"
-msgstr "依語言排序"
 
 #. Game
 #. Gameplay related options.
@@ -1131,7 +104,34 @@ msgstr "設定歌曲和資料路徑"
 #. Karaoke mode
 #. Hide pitch wave, notes and scoring.
 #. name: game/karaoke_mode
-#. type: int
+#. type: uint
+#. value: 0
+#: ../data/config/schema.xml:44
+msgid "Off"
+msgstr ""
+
+#. Karaoke mode
+#. Hide pitch wave, notes and scoring.
+#. name: game/karaoke_mode
+#. type: uint
+#. value: 0
+#: ../data/config/schema.xml:45
+msgid "On - normal text"
+msgstr ""
+
+#. Karaoke mode
+#. Hide pitch wave, notes and scoring.
+#. name: game/karaoke_mode
+#. type: uint
+#. value: 0
+#: ../data/config/schema.xml:46
+msgid "On - centered text"
+msgstr ""
+
+#. Karaoke mode
+#. Hide pitch wave, notes and scoring.
+#. name: game/karaoke_mode
+#. type: uint
 #. value: 0
 #: ../data/config/schema.xml:48
 #, fuzzy
@@ -1141,7 +141,7 @@ msgstr "效能評定模式"
 #. Lyric highlight style
 #. Hide pitch wave, notes and scoring.
 #. name: game/Textstyle
-#. type: int
+#. type: uint
 #. value: 0
 #: ../data/config/schema.xml:67
 msgid "Hide pitch wave, notes and scoring."
@@ -1150,7 +150,35 @@ msgstr "隱藏音高、音符和評分。"
 #. Difficulty
 #. Game difficulty.
 #. name: game/difficulty
-#. type: int
+#. type: uint
+#. value: 0
+#: ../data/config/schema.xml:53 ../game/requesthandler.cc:327
+msgid "Normal"
+msgstr ""
+
+#. Difficulty
+#. Game difficulty.
+#. name: game/difficulty
+#. type: uint
+#. value: 0
+#: ../data/config/schema.xml:54 ../game/dancegraph.cc:18
+#: ../game/guitargraph.cc:14
+msgid "Hard"
+msgstr "硬底"
+
+#. Difficulty
+#. Game difficulty.
+#. name: game/difficulty
+#. type: uint
+#. value: 0
+#: ../data/config/schema.xml:55 ../game/layout_singer.cc:74
+msgid "Perfect"
+msgstr ""
+
+#. Difficulty
+#. Game difficulty.
+#. name: game/difficulty
+#. type: uint
 #. value: 0
 #: ../data/config/schema.xml:57
 #, fuzzy
@@ -1161,7 +189,7 @@ msgstr "選取難度"
 #. Difficulty
 #. Game difficulty.
 #. name: game/difficulty
-#. type: int
+#. type: uint
 #. value: 0
 #: ../data/config/schema.xml:58
 #, fuzzy
@@ -1172,7 +200,26 @@ msgstr "選取難度"
 #. Lyric highlight style
 #. Hide pitch wave, notes and scoring.
 #. name: game/Textstyle
-#. type: int
+#. type: uint
+#. value: 0
+#: ../data/config/schema.xml:63
+#, fuzzy
+msgid "Western mode"
+msgstr "左手模式"
+
+#. Lyric highlight style
+#. Hide pitch wave, notes and scoring.
+#. name: game/Textstyle
+#. type: uint
+#. value: 0
+#: ../data/config/schema.xml:64
+msgid "Asian mode"
+msgstr ""
+
+#. Lyric highlight style
+#. Hide pitch wave, notes and scoring.
+#. name: game/Textstyle
+#. type: uint
 #. value: 0
 #: ../data/config/schema.xml:66
 msgid "Lyric highlight style"
@@ -1217,8 +264,8 @@ msgstr "啟用歌唱音高顯示 (當不在卡拉ＯＫ模式下)。"
 #. Theme
 #. Name of the theme to use.
 #. name: game/theme
-#. type: int
-#. value: -1
+#. type: uint
+#. value: 1337
 #: ../data/config/schema.xml:80
 msgid "Theme"
 msgstr "布景主題"
@@ -1226,8 +273,8 @@ msgstr "布景主題"
 #. Theme
 #. Name of the theme to use.
 #. name: game/theme
-#. type: int
-#. value: -1
+#. type: uint
+#. value: 1337
 #: ../data/config/schema.xml:81
 #, fuzzy
 msgid "Name of the theme to use."
@@ -1236,7 +283,7 @@ msgstr "使用的布景主題名稱或是布景主題資料夾的絕對路徑。
 #. Playlist screen timeout
 #. How long it will take before the next song in the playlist starts automatically.
 #. name: game/playlist_screen_timeout
-#. type: int
+#. type: uint
 #. value: 15
 #: ../data/config/schema.xml:85
 msgid "Playlist screen timeout"
@@ -1245,7 +292,7 @@ msgstr ""
 #. Playlist screen timeout
 #. How long it will take before the next song in the playlist starts automatically.
 #. name: game/playlist_screen_timeout
-#. type: int
+#. type: uint
 #. value: 15
 #: ../data/config/schema.xml:86
 msgid ""
@@ -1256,7 +303,7 @@ msgstr ""
 #. Song results timeout
 #. How long the scores will be displayed for after finishing a song.
 #. name: game/results_timeout
-#. type: int
+#. type: uint
 #. value: 5
 #: ../data/config/schema.xml:90
 msgid "Song results timeout"
@@ -1265,7 +312,7 @@ msgstr ""
 #. Song results timeout
 #. How long the scores will be displayed for after finishing a song.
 #. name: game/results_timeout
-#. type: int
+#. type: uint
 #. value: 5
 #: ../data/config/schema.xml:91
 msgid "How long the scores will be displayed for after finishing a song."
@@ -1274,7 +321,7 @@ msgstr ""
 #. High-score timeout
 #. How long the high-scores screen will wait for input before going to the next song.
 #. name: game/highscore_timeout
-#. type: int
+#. type: uint
 #. value: 5
 #: ../data/config/schema.xml:95
 msgid "High-score timeout"
@@ -1283,7 +330,7 @@ msgstr ""
 #. High-score timeout
 #. How long the high-scores screen will wait for input before going to the next song.
 #. name: game/highscore_timeout
-#. type: int
+#. type: uint
 #. value: 5
 #: ../data/config/schema.xml:96
 msgid ""
@@ -1294,27 +341,82 @@ msgstr ""
 #. Language
 #. Language to show Performous in
 #. name: game/language
-#. type: int
+#. type: uint
+#. value: 1337
+#: ../data/config/schema.xml:103 ../game/requesthandler.cc:323
+msgid "Language"
+msgstr ""
+
+#. Language
+#. Language to show Performous in
+#. name: game/language
+#. type: uint
 #. value: 1337
 #: ../data/config/schema.xml:104
 msgid "Language to show Performous in"
 msgstr ""
 
+#. Date time format
+#. Define how date time should be displayed.
+#. name: game/datetime_format
+#. type: option_list
+#. value: %c
+#: ../data/config/schema.xml:111
+msgid "Date time format"
+msgstr ""
+
+#. Date time format
+#. Define how date time should be displayed.
+#. name: game/datetime_format
+#. type: option_list
+#. value: %c
+#: ../data/config/schema.xml:112
+msgid "Define how date time should be displayed."
+msgstr ""
+
 #. Webserver access
 #. Define if you want to control performous remotely with web interface (requires restart).
 #. name: game/webserver_access
-#. type: int
+#. type: uint
 #. value: 0
-#: ../data/config/schema.xml:112
+#: ../data/config/schema.xml:116 ../game/configitem.cc:176
+msgid "Disabled"
+msgstr "已停用"
+
+#. Webserver access
+#. Define if you want to control performous remotely with web interface (requires restart).
+#. name: game/webserver_access
+#. type: uint
+#. value: 0
+#: ../data/config/schema.xml:117
+#, fuzzy
+msgid "Localhost "
+msgstr "人聲"
+
+#. Webserver access
+#. Define if you want to control performous remotely with web interface (requires restart).
+#. name: game/webserver_access
+#. type: uint
+#. value: 0
+#: ../data/config/schema.xml:118
+msgid "All connections"
+msgstr ""
+
+#. Webserver access
+#. Define if you want to control performous remotely with web interface (requires restart).
+#. name: game/webserver_access
+#. type: uint
+#. value: 0
+#: ../data/config/schema.xml:120
 msgid "Webserver access"
 msgstr ""
 
 #. Webserver access
 #. Define if you want to control performous remotely with web interface (requires restart).
 #. name: game/webserver_access
-#. type: int
+#. type: uint
 #. value: 0
-#: ../data/config/schema.xml:113
+#: ../data/config/schema.xml:121
 msgid ""
 "Define if you want to control performous remotely with web interface "
 "(requires restart)."
@@ -1325,7 +427,7 @@ msgstr ""
 #. name: game/case-sorting
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:116
+#: ../data/config/schema.xml:124
 msgid "Case-sensitive sorting."
 msgstr ""
 
@@ -1334,25 +436,25 @@ msgstr ""
 #. name: game/case-sorting
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:117
+#: ../data/config/schema.xml:125
 msgid "Make a difference between uppercase and lowercase letters when sorting."
 msgstr ""
 
 #. Webserver port
 #. Port to use for the webserver. Choose one that is not used by other applications.
 #. name: game/webserver_port
-#. type: int
+#. type: uint
 #. value: 8000
-#: ../data/config/schema.xml:122
+#: ../data/config/schema.xml:130
 msgid "Webserver port"
 msgstr ""
 
 #. Webserver port
 #. Port to use for the webserver. Choose one that is not used by other applications.
 #. name: game/webserver_port
-#. type: int
+#. type: uint
 #. value: 8000
-#: ../data/config/schema.xml:123
+#: ../data/config/schema.xml:131
 msgid ""
 "Port to use for the webserver. Choose one that is not used by other "
 "applications."
@@ -1361,18 +463,18 @@ msgstr ""
 #. Webserver fallback port
 #. Port to use in case original webserver port is in use. Choose one that you know for sure is not used by other applications.
 #. name: game/webserver_fallback_port
-#. type: int
+#. type: uint
 #. value: 8001
-#: ../data/config/schema.xml:128
+#: ../data/config/schema.xml:136
 msgid "Webserver fallback port"
 msgstr ""
 
 #. Webserver fallback port
 #. Port to use in case original webserver port is in use. Choose one that you know for sure is not used by other applications.
 #. name: game/webserver_fallback_port
-#. type: int
+#. type: uint
 #. value: 8001
-#: ../data/config/schema.xml:129
+#: ../data/config/schema.xml:137
 msgid ""
 "Port to use in case original webserver port is in use. Choose one that you "
 "know for sure is not used by other applications."
@@ -1381,18 +483,72 @@ msgstr ""
 #. Notegraph Scaling
 #. Choose whether the notegraph keeps a fixed scale or is adjusted according to the current song.
 #. name: game/notegraphscalingmode
-#. type: int
+#. type: uint
 #. value: 0
-#: ../data/config/schema.xml:140
+#: ../data/config/schema.xml:141
+msgid "Dynamic"
+msgstr ""
+
+#. Notegraph Scaling
+#. Choose whether the notegraph keeps a fixed scale or is adjusted according to the current song.
+#. name: game/notegraphscalingmode
+#. type: uint
+#. value: 0
+#: ../data/config/schema.xml:142
+msgid "Fixed"
+msgstr ""
+
+#. Notegraph Scaling
+#. Choose whether the notegraph keeps a fixed scale or is adjusted according to the current song.
+#. name: game/notegraphscalingmode
+#. type: uint
+#. value: 0
+#: ../data/config/schema.xml:143
+msgid "Auto (1 octave)"
+msgstr ""
+
+#. Notegraph Scaling
+#. Choose whether the notegraph keeps a fixed scale or is adjusted according to the current song.
+#. name: game/notegraphscalingmode
+#. type: uint
+#. value: 0
+#: ../data/config/schema.xml:144
+msgid "Auto (1.5 octaves)"
+msgstr ""
+
+#. Notegraph Scaling
+#. Choose whether the notegraph keeps a fixed scale or is adjusted according to the current song.
+#. name: game/notegraphscalingmode
+#. type: uint
+#. value: 0
+#: ../data/config/schema.xml:145
+msgid "Auto (2 octaves)"
+msgstr ""
+
+#. Notegraph Scaling
+#. Choose whether the notegraph keeps a fixed scale or is adjusted according to the current song.
+#. name: game/notegraphscalingmode
+#. type: uint
+#. value: 0
+#: ../data/config/schema.xml:146
+msgid "Auto (2.5 octaves)"
+msgstr ""
+
+#. Notegraph Scaling
+#. Choose whether the notegraph keeps a fixed scale or is adjusted according to the current song.
+#. name: game/notegraphscalingmode
+#. type: uint
+#. value: 0
+#: ../data/config/schema.xml:148
 msgid "Notegraph Scaling"
 msgstr ""
 
 #. Notegraph Scaling
 #. Choose whether the notegraph keeps a fixed scale or is adjusted according to the current song.
 #. name: game/notegraphscalingmode
-#. type: int
+#. type: uint
 #. value: 0
-#: ../data/config/schema.xml:141
+#: ../data/config/schema.xml:149
 msgid ""
 "Choose whether the notegraph keeps a fixed scale or is adjusted according to "
 "the current song."
@@ -1403,7 +559,7 @@ msgstr ""
 #. name: game/keyboard_guitar
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:144
+#: ../data/config/schema.xml:152
 msgid "Keyboard as guitar"
 msgstr "鍵盤做為吉他"
 
@@ -1412,7 +568,7 @@ msgstr "鍵盤做為吉他"
 #. name: game/keyboard_guitar
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:145
+#: ../data/config/schema.xml:153
 msgid "Enable keyboard as guitar (Frets on Fire mode)."
 msgstr "啟用鍵盤做為吉他 (Frets on Fire 模式)。"
 
@@ -1421,7 +577,7 @@ msgstr "啟用鍵盤做為吉他 (Frets on Fire 模式)。"
 #. name: game/keyboard_drumkit
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:148
+#: ../data/config/schema.xml:156
 msgid "Keyboard as drumkit"
 msgstr "鍵盤做為爵士鼓"
 
@@ -1430,7 +586,7 @@ msgstr "鍵盤做為爵士鼓"
 #. name: game/keyboard_drumkit
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:149
+#: ../data/config/schema.xml:157
 msgid "Enable keyboard as drumkit."
 msgstr "啟用鍵盤做為爵士鼓。"
 
@@ -1439,7 +595,7 @@ msgstr "啟用鍵盤做為爵士鼓。"
 #. name: game/drum_promode
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:152
+#: ../data/config/schema.xml:160
 msgid "Drums use Pro mode"
 msgstr ""
 
@@ -1448,7 +604,7 @@ msgstr ""
 #. name: game/drum_promode
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:153
+#: ../data/config/schema.xml:161
 msgid "Drums use Pro mode. (Toms are not cymbals.)"
 msgstr ""
 
@@ -1457,7 +613,7 @@ msgstr ""
 #. name: game/keyboard_dancepad
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:156
+#: ../data/config/schema.xml:164
 msgid "Keyboard as dance pad"
 msgstr "鍵盤做為舞墊"
 
@@ -1466,7 +622,7 @@ msgstr "鍵盤做為舞墊"
 #. name: game/keyboard_dancepad
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:157
+#: ../data/config/schema.xml:165
 msgid "Enable keyboard as dance pad."
 msgstr "啟用鍵盤做為舞墊。"
 
@@ -1475,7 +631,7 @@ msgstr "啟用鍵盤做為舞墊。"
 #. name: game/keyboard_keytar
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:160
+#: ../data/config/schema.xml:168
 #, fuzzy
 msgid "Keyboard as keytar"
 msgstr "鍵盤做為吉他"
@@ -1485,26 +641,35 @@ msgstr "鍵盤做為吉他"
 #. name: game/keyboard_keytar
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:161
+#: ../data/config/schema.xml:169
 #, fuzzy
 msgid "Enable keyboard as keytar."
 msgstr "啟用鍵盤做為爵士鼓。"
 
+#. Audio Backend
+#. Configure which audio backend to use; not all backends will be supported on all platforms.
+#. name: audio/backend
+#. type: uint
+#. value: 1337
+#: ../data/config/schema.xml:336 ../game/i18n.cc:146
+msgid "Auto"
+msgstr ""
+
 #. Force controller A's type
 #. Override autodetection and force the first controller to the given type.
 #. name: game/instrument0
-#. type: int
+#. type: uint
 #. value: 0
-#: ../data/config/schema.xml:168
+#: ../data/config/schema.xml:176
 msgid "Force controller A's type"
 msgstr ""
 
 #. Force controller A's type
 #. Override autodetection and force the first controller to the given type.
 #. name: game/instrument0
-#. type: int
+#. type: uint
 #. value: 0
-#: ../data/config/schema.xml:169
+#: ../data/config/schema.xml:177
 msgid ""
 "Override autodetection and force the first controller to the given type."
 msgstr ""
@@ -1512,18 +677,18 @@ msgstr ""
 #. Force controller B's type
 #. Override autodetection and force the second controller to the given type.
 #. name: game/instrument1
-#. type: int
+#. type: uint
 #. value: 0
-#: ../data/config/schema.xml:176
+#: ../data/config/schema.xml:184
 msgid "Force controller B's type"
 msgstr ""
 
 #. Force controller B's type
 #. Override autodetection and force the second controller to the given type.
 #. name: game/instrument1
-#. type: int
+#. type: uint
 #. value: 0
-#: ../data/config/schema.xml:177
+#: ../data/config/schema.xml:185
 msgid ""
 "Override autodetection and force the second controller to the given type."
 msgstr ""
@@ -1531,18 +696,18 @@ msgstr ""
 #. Force controller C's type
 #. Override autodetection and force the third controller to the given type.
 #. name: game/instrument2
-#. type: int
+#. type: uint
 #. value: 0
-#: ../data/config/schema.xml:184
+#: ../data/config/schema.xml:192
 msgid "Force controller C's type"
 msgstr ""
 
 #. Force controller C's type
 #. Override autodetection and force the third controller to the given type.
 #. name: game/instrument2
-#. type: int
+#. type: uint
 #. value: 0
-#: ../data/config/schema.xml:185
+#: ../data/config/schema.xml:193
 msgid ""
 "Override autodetection and force the third controller to the given type."
 msgstr ""
@@ -1550,18 +715,18 @@ msgstr ""
 #. Force controller D's type
 #. Override autodetection and force the fourth controller to the given type.
 #. name: game/instrument3
-#. type: int
+#. type: uint
 #. value: 0
-#: ../data/config/schema.xml:192
+#: ../data/config/schema.xml:200
 msgid "Force controller D's type"
 msgstr ""
 
 #. Force controller D's type
 #. Override autodetection and force the fourth controller to the given type.
 #. name: game/instrument3
-#. type: int
+#. type: uint
 #. value: 0
-#: ../data/config/schema.xml:193
+#: ../data/config/schema.xml:201
 msgid ""
 "Override autodetection and force the fourth controller to the given type."
 msgstr ""
@@ -1570,7 +735,7 @@ msgstr ""
 #. Force joystick to some kind of instrument.
 #. name: game/instruments
 #. type: string_list
-#: ../data/config/schema.xml:200
+#: ../data/config/schema.xml:208
 msgid "Joystick configuration"
 msgstr "搖桿組態"
 
@@ -1578,7 +743,7 @@ msgstr "搖桿組態"
 #. Force joystick to some kind of instrument.
 #. name: game/instruments
 #. type: string_list
-#: ../data/config/schema.xml:201
+#: ../data/config/schema.xml:209
 msgid "Force joystick to some kind of instrument."
 msgstr "強制搖桿成為某種樂器。"
 
@@ -1586,7 +751,7 @@ msgstr "強制搖桿成為某種樂器。"
 #. Regex for matching the MIDI devices to use. The default is to use all available devices.
 #. name: game/midi_input
 #. type: string
-#: ../data/config/schema.xml:204
+#: ../data/config/schema.xml:212
 msgid "Hardware MIDI input device"
 msgstr "硬體 MIDI 輸入裝置"
 
@@ -1594,7 +759,7 @@ msgstr "硬體 MIDI 輸入裝置"
 #. Regex for matching the MIDI devices to use. The default is to use all available devices.
 #. name: game/midi_input
 #. type: string
-#: ../data/config/schema.xml:205
+#: ../data/config/schema.xml:213
 msgid ""
 "Regex for matching the MIDI devices to use. The default is to use all "
 "available devices."
@@ -1604,7 +769,7 @@ msgstr ""
 #. Words that should be ignored when sorting.
 #. name: game/sorting_ignore
 #. type: string_list
-#: ../data/config/schema.xml:233
+#: ../data/config/schema.xml:241
 msgid "Word Collation"
 msgstr ""
 
@@ -1612,8 +777,14 @@ msgstr ""
 #. Words that should be ignored when sorting.
 #. name: game/sorting_ignore
 #. type: string_list
-#: ../data/config/schema.xml:234
+#: ../data/config/schema.xml:242
 msgid "Words that should be ignored when sorting."
+msgstr ""
+
+#. Sort order
+#. Currently active sort order.
+#: ../data/config/schema.xml:437
+msgid " pixels"
 msgstr ""
 
 #. Windowed width
@@ -1622,7 +793,7 @@ msgstr ""
 #. type: int
 #. value: 1366
 #. hidden: true
-#: ../data/config/schema.xml:241
+#: ../data/config/schema.xml:249
 msgid "Windowed width"
 msgstr "視窗寬度"
 
@@ -1632,7 +803,7 @@ msgstr "視窗寬度"
 #. type: int
 #. value: 1366
 #. hidden: true
-#: ../data/config/schema.xml:242
+#: ../data/config/schema.xml:250
 msgid "The width of the window."
 msgstr "視窗的寬度。"
 
@@ -1642,7 +813,7 @@ msgstr "視窗的寬度。"
 #. type: int
 #. value: 768
 #. hidden: true
-#: ../data/config/schema.xml:247
+#: ../data/config/schema.xml:255
 msgid "Windowed height"
 msgstr "視窗高度"
 
@@ -1652,7 +823,7 @@ msgstr "視窗高度"
 #. type: int
 #. value: 768
 #. hidden: true
-#: ../data/config/schema.xml:248
+#: ../data/config/schema.xml:256
 msgid "The height of the window."
 msgstr "視窗的高度。"
 
@@ -1662,7 +833,7 @@ msgstr "視窗的高度。"
 #. type: int
 #. value: 0
 #. hidden: true
-#: ../data/config/schema.xml:253
+#: ../data/config/schema.xml:261
 #, fuzzy
 #| msgid "The width of the window."
 msgid "X-Position of the window"
@@ -1674,7 +845,7 @@ msgstr "視窗的寬度。"
 #. type: int
 #. value: 0
 #. hidden: true
-#: ../data/config/schema.xml:254
+#: ../data/config/schema.xml:262
 #, fuzzy
 #| msgid "The width of the window."
 msgid "The X-Position of the window."
@@ -1686,7 +857,7 @@ msgstr "視窗的寬度。"
 #. type: int
 #. value: 0
 #. hidden: true
-#: ../data/config/schema.xml:259
+#: ../data/config/schema.xml:267
 #, fuzzy
 #| msgid "The width of the window."
 msgid "Y-Position of the window"
@@ -1698,7 +869,7 @@ msgstr "視窗的寬度。"
 #. type: int
 #. value: 0
 #. hidden: true
-#: ../data/config/schema.xml:260
+#: ../data/config/schema.xml:268
 #, fuzzy
 #| msgid "The width of the window."
 msgid "The Y-Position of the window."
@@ -1709,7 +880,7 @@ msgstr "視窗的寬度。"
 #. name: graphic/highdpi
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:263
+#: ../data/config/schema.xml:271
 #, fuzzy
 #| msgid "Graphics"
 msgid "High DPI Graphics"
@@ -1720,7 +891,7 @@ msgstr "圖形"
 #. name: graphic/highdpi
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:264
+#: ../data/config/schema.xml:272
 msgid "Enable High-DPI (Retina) graphics when supported; requires restart."
 msgstr ""
 
@@ -1729,7 +900,7 @@ msgstr ""
 #. name: graphic/fullscreen
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:267
+#: ../data/config/schema.xml:275
 msgid "Fullscreen mode"
 msgstr "全螢幕模式"
 
@@ -1738,7 +909,7 @@ msgstr "全螢幕模式"
 #. name: graphic/fullscreen
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:268
+#: ../data/config/schema.xml:276
 msgid "Enable fullscreen mode on startup."
 msgstr "啟動時啟用全螢幕模式。"
 
@@ -1747,7 +918,7 @@ msgstr "啟動時啟用全螢幕模式。"
 #. name: graphic/stereo3d
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:271
+#: ../data/config/schema.xml:279
 msgid "Stereoscopic 3D"
 msgstr ""
 
@@ -1756,26 +927,59 @@ msgstr ""
 #. name: graphic/stereo3d
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:272
+#: ../data/config/schema.xml:280
 msgid "Enable 3D rendering of Performous."
 msgstr ""
 
 #. Stereo3D type
 #. Some modes may only get activated in fullscreen mode.
 #. name: graphic/stereo3dtype
-#. type: int
+#. type: uint
 #. value: 0
-#: ../data/config/schema.xml:280
+#: ../data/config/schema.xml:284
+msgid "Red/Cyan"
+msgstr ""
+
+#. Stereo3D type
+#. Some modes may only get activated in fullscreen mode.
+#. name: graphic/stereo3dtype
+#. type: uint
+#. value: 0
+#: ../data/config/schema.xml:285
+msgid "Green/Magenta"
+msgstr ""
+
+#. Stereo3D type
+#. Some modes may only get activated in fullscreen mode.
+#. name: graphic/stereo3dtype
+#. type: uint
+#. value: 0
+#: ../data/config/schema.xml:286
+msgid "Over/Under"
+msgstr ""
+
+#. Stereo3D type
+#. Some modes may only get activated in fullscreen mode.
+#. name: graphic/stereo3dtype
+#. type: uint
+#. value: 0
+#: ../data/config/schema.xml:288
 msgid "Stereo3D type"
 msgstr ""
 
 #. Stereo3D type
 #. Some modes may only get activated in fullscreen mode.
 #. name: graphic/stereo3dtype
-#. type: int
+#. type: uint
 #. value: 0
-#: ../data/config/schema.xml:281
+#: ../data/config/schema.xml:289
 msgid "Some modes may only get activated in fullscreen mode."
+msgstr ""
+
+#. Failure volume
+#. The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!
+#: ../data/config/schema.xml:381
+msgid " %"
 msgstr ""
 
 #. Stereo3D separation
@@ -1783,7 +987,7 @@ msgstr ""
 #. name: graphic/stereo3dseparation
 #. type: float
 #. value: 50
-#: ../data/config/schema.xml:286
+#: ../data/config/schema.xml:294
 msgid "Stereo3D separation"
 msgstr ""
 
@@ -1792,7 +996,7 @@ msgstr ""
 #. name: graphic/stereo3dseparation
 #. type: float
 #. value: 50
-#: ../data/config/schema.xml:287
+#: ../data/config/schema.xml:295
 msgid ""
 "The strength of the effect. Experiment with different settings for best "
 "results."
@@ -1803,7 +1007,7 @@ msgstr ""
 #. name: graphic/video
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:290
+#: ../data/config/schema.xml:298
 msgid "Video playback"
 msgstr "影像播放控制"
 
@@ -1812,7 +1016,7 @@ msgstr "影像播放控制"
 #. name: graphic/video
 #. type: bool
 #. value: true
-#: ../data/config/schema.xml:291
+#: ../data/config/schema.xml:299
 msgid ""
 "Allows completely disabling background videos. It is recommended to leave "
 "this enabled as Performous will still smoothly fade out the video if your "
@@ -1826,7 +1030,7 @@ msgstr ""
 #. name: graphic/webcam
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:294
+#: ../data/config/schema.xml:302
 msgid "Webcam background"
 msgstr "網路攝影機背景"
 
@@ -1835,7 +1039,7 @@ msgstr "網路攝影機背景"
 #. name: graphic/webcam
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:295
+#: ../data/config/schema.xml:303
 #, fuzzy
 msgid ""
 "Performous can use webcam as a background video. Disable it if Performous "
@@ -1846,18 +1050,18 @@ msgstr ""
 #. Webcam id
 #. Use 0 to autodetect or a number starting from 1 to choose specific device.
 #. name: graphic/webcamid
-#. type: int
+#. type: uint
 #. value: 0
-#: ../data/config/schema.xml:299
+#: ../data/config/schema.xml:307
 msgid "Webcam id"
 msgstr "網路攝影機識別號"
 
 #. Webcam id
 #. Use 0 to autodetect or a number starting from 1 to choose specific device.
 #. name: graphic/webcamid
-#. type: int
+#. type: uint
 #. value: 0
-#: ../data/config/schema.xml:300
+#: ../data/config/schema.xml:308
 #, fuzzy
 #| msgid ""
 #| "Use -1 to autodetect or a number starting from 0 to choose specific "
@@ -1866,12 +1070,18 @@ msgid ""
 "Use 0 to autodetect or a number starting from 1 to choose specific device."
 msgstr "使用 -1 以自動偵測，或是一個從 0 開始的數字以選擇特定的裝置。"
 
+#. Text quality
+#. Larger numbers cause text to be rendered in higher resolution. Decrease this to make everything a little faster.
+#: ../data/config/schema.xml:317
+msgid "x"
+msgstr ""
+
 #. SVG quality
 #. Larger numbers cause vector graphics to be rendered in higher resolution. Decrease this to make navigating in menus faster.
 #. name: graphic/svg_lod
 #. type: float
 #. value: 1.5
-#: ../data/config/schema.xml:305
+#: ../data/config/schema.xml:313
 msgid "SVG quality"
 msgstr "SVG 品質"
 
@@ -1880,7 +1090,7 @@ msgstr "SVG 品質"
 #. name: graphic/svg_lod
 #. type: float
 #. value: 1.5
-#: ../data/config/schema.xml:306
+#: ../data/config/schema.xml:314
 msgid ""
 "Larger numbers cause vector graphics to be rendered in higher resolution. "
 "Decrease this to make navigating in menus faster."
@@ -1891,7 +1101,7 @@ msgstr "較大的數字會造成向量圖形以較高解析度進行潤算。減
 #. name: graphic/text_lod
 #. type: float
 #. value: 1.5
-#: ../data/config/schema.xml:311
+#: ../data/config/schema.xml:319
 msgid "Text quality"
 msgstr "文字品質"
 
@@ -1900,7 +1110,7 @@ msgstr "文字品質"
 #. name: graphic/text_lod
 #. type: float
 #. value: 1.5
-#: ../data/config/schema.xml:312
+#: ../data/config/schema.xml:320
 msgid ""
 "Larger numbers cause text to be rendered in higher resolution. Decrease this "
 "to make everything a little faster."
@@ -1911,7 +1121,7 @@ msgstr "較大的數字會造成文字以較高解析度進行潤算。減少它
 #. name: graphic/fps
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:315
+#: ../data/config/schema.xml:323
 msgid "Benchmark mode"
 msgstr "效能評定模式"
 
@@ -1920,7 +1130,7 @@ msgstr "效能評定模式"
 #. name: graphic/fps
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:316
+#: ../data/config/schema.xml:324
 msgid ""
 "Framerate limit of 100 FPS is removed and the game instead renders at full "
 "speed. FPS values are printed to console. Please note that the display "
@@ -1929,12 +1139,18 @@ msgstr ""
 "已移除 100 FPS 的影格率限制，遊戲則以全速進行潤算。FPS 值已印出至主控臺。要注"
 "意的是，顯示卡驅動程式也許仍然會限制潤算速度為螢幕重新整理速率。"
 
+#. Audio/controller latency
+#. Affects instruments and dancing only. The total of USB (guitar or dance pad) latency combined with audio output latency. Adjust so that you can hit the notes best when playing by ear (not looking on screen). Use 'Ctrl + [' or 'Ctrl + ]' to adjust while performing.
+#: ../data/config/schema.xml:355
+msgid " ms"
+msgstr ""
+
 #. Suggested latency
 #. This is a hint for the audio engine about the desired latency. Set this as low as possible while retaining clear audio playback. Requires restart.
 #. name: audio/latency
 #. type: float
 #. value: 0.075
-#: ../data/config/schema.xml:323
+#: ../data/config/schema.xml:331
 msgid "Suggested latency"
 msgstr "建議的延時"
 
@@ -1943,7 +1159,7 @@ msgstr "建議的延時"
 #. name: audio/latency
 #. type: float
 #. value: 0.075
-#: ../data/config/schema.xml:324
+#: ../data/config/schema.xml:332
 msgid ""
 "This is a hint for the audio engine about the desired latency. Set this as "
 "low as possible while retaining clear audio playback. Requires restart."
@@ -1954,9 +1170,9 @@ msgstr ""
 #. Audio Backend
 #. Configure which audio backend to use; not all backends will be supported on all platforms.
 #. name: audio/backend
-#. type: int
+#. type: uint
 #. value: 1337
-#: ../data/config/schema.xml:331
+#: ../data/config/schema.xml:339
 #, fuzzy
 #| msgid "Audio Devices"
 msgid "Audio Backend"
@@ -1965,9 +1181,9 @@ msgstr "音效裝置"
 #. Audio Backend
 #. Configure which audio backend to use; not all backends will be supported on all platforms.
 #. name: audio/backend
-#. type: int
+#. type: uint
 #. value: 1337
-#: ../data/config/schema.xml:332
+#: ../data/config/schema.xml:340
 msgid ""
 "Configure which audio backend to use; not all backends will be supported on "
 "all platforms."
@@ -1978,7 +1194,7 @@ msgstr ""
 #. name: audio/video_delay
 #. type: float
 #. value: 0.06
-#: ../data/config/schema.xml:337
+#: ../data/config/schema.xml:345
 msgid "Audio/video latency"
 msgstr "音效/影像延時"
 
@@ -1987,7 +1203,7 @@ msgstr "音效/影像延時"
 #. name: audio/video_delay
 #. type: float
 #. value: 0.06
-#: ../data/config/schema.xml:338
+#: ../data/config/schema.xml:346
 #, fuzzy
 #| msgid ""
 #| "Affects all modes. Use negative value if your display input lag is "
@@ -2011,7 +1227,7 @@ msgstr ""
 #. name: audio/round-trip
 #. type: float
 #. value: 0.09
-#: ../data/config/schema.xml:343
+#: ../data/config/schema.xml:351
 msgid "Audio round-trip latency"
 msgstr "音效往返延時"
 
@@ -2020,7 +1236,7 @@ msgstr "音效往返延時"
 #. name: audio/round-trip
 #. type: float
 #. value: 0.09
-#: ../data/config/schema.xml:344
+#: ../data/config/schema.xml:352
 #, fuzzy
 #| msgid ""
 #| "Affects singing only. The time it takes for Performous playback to reach "
@@ -2042,7 +1258,7 @@ msgstr ""
 #. name: audio/controller_delay
 #. type: float
 #. value: 0.08
-#: ../data/config/schema.xml:349
+#: ../data/config/schema.xml:357
 msgid "Audio/controller latency"
 msgstr "音效/控制器延時"
 
@@ -2051,13 +1267,13 @@ msgstr "音效/控制器延時"
 #. name: audio/controller_delay
 #. type: float
 #. value: 0.08
-#: ../data/config/schema.xml:350
+#: ../data/config/schema.xml:358
 #, fuzzy
 #| msgid ""
 #| "Affects instruments and dancing only. The total of USB (guitar or dance "
 #| "pad) latency combined with audio output latency. Adjust so that you can "
-#| "hit the notes best when playing by ear (not looking on screen). Use Ctrl"
-#| "+F5/F6 to adjust while performing."
+#| "hit the notes best when playing by ear (not looking on screen). Use "
+#| "Ctrl+F5/F6 to adjust while performing."
 msgid ""
 "Affects instruments and dancing only. The total of USB (guitar or dance pad) "
 "latency combined with audio output latency. Adjust so that you can hit the "
@@ -2065,15 +1281,15 @@ msgid ""
 "'Ctrl + ]' to adjust while performing."
 msgstr ""
 "只會影響樂器和跳舞。USB 裝置(吉他或舞墊) 與音效輸出延時合併的延時總計。如此調"
-"整您就可以很好地經由聽聲音而點擊音符 (不需要看著螢幕)。執行時期可以使用 Ctrl"
-"+F5/F6 來調整它。"
+"整您就可以很好地經由聽聲音而點擊音符 (不需要看著螢幕)。執行時期可以使用 "
+"Ctrl+F5/F6 來調整它。"
 
 #. Audio devices
 #. List of audio devices to try.
 #. name: audio/devices
 #. type: string_list
 #. hidden: true
-#: ../data/config/schema.xml:357
+#: ../data/config/schema.xml:365
 msgid "Audio devices"
 msgstr "音效裝置"
 
@@ -2082,43 +1298,43 @@ msgstr "音效裝置"
 #. name: audio/devices
 #. type: string_list
 #. hidden: true
-#: ../data/config/schema.xml:358
+#: ../data/config/schema.xml:366
 msgid "List of audio devices to try."
 msgstr "要嘗試的音效裝置清單。"
 
 #. Menu volume
 #. The volume level of menus, song previews and jukebox mode.
 #. name: audio/preview_volume
-#. type: int
+#. type: uint
 #. value: 70
-#: ../data/config/schema.xml:363
+#: ../data/config/schema.xml:371
 msgid "Menu volume"
 msgstr "選單音量"
 
 #. Menu volume
 #. The volume level of menus, song previews and jukebox mode.
 #. name: audio/preview_volume
-#. type: int
+#. type: uint
 #. value: 70
-#: ../data/config/schema.xml:364
+#: ../data/config/schema.xml:372
 msgid "The volume level of menus, song previews and jukebox mode."
 msgstr "選單、歌曲預覽和媒體櫃模式的音量等級。"
 
 #. Music volume
 #. The ingame music volume. Values above 90 are not recommended as distortion may occur.
 #. name: audio/music_volume
-#. type: int
+#. type: uint
 #. value: 90
-#: ../data/config/schema.xml:369
+#: ../data/config/schema.xml:377
 msgid "Music volume"
 msgstr "音樂音量"
 
 #. Music volume
 #. The ingame music volume. Values above 90 are not recommended as distortion may occur.
 #. name: audio/music_volume
-#. type: int
+#. type: uint
 #. value: 90
-#: ../data/config/schema.xml:370
+#: ../data/config/schema.xml:378
 msgid ""
 "The ingame music volume. Values above 90 are not recommended as distortion "
 "may occur."
@@ -2127,18 +1343,18 @@ msgstr "遊戲時音樂音量。不建議 90 以上的值，因為也許會發�
 #. Failure volume
 #. The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!
 #. name: audio/fail_volume
-#. type: int
+#. type: uint
 #. value: 90
-#: ../data/config/schema.xml:375
+#: ../data/config/schema.xml:383
 msgid "Failure volume"
 msgstr "失敗音量"
 
 #. Failure volume
 #. The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!
 #. name: audio/fail_volume
-#. type: int
+#. type: uint
 #. value: 90
-#: ../data/config/schema.xml:376
+#: ../data/config/schema.xml:384
 msgid ""
 "The ingame fail sound volume. Values above 90 are not recommended as "
 "distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!"
@@ -2151,7 +1367,7 @@ msgstr ""
 #. name: audio/pass-through
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:379
+#: ../data/config/schema.xml:387
 msgid "Microphone pass-through"
 msgstr ""
 
@@ -2160,8 +1376,14 @@ msgstr ""
 #. name: audio/pass-through
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:380
+#: ../data/config/schema.xml:388
 msgid "Send captured singing voice to speakers."
+msgstr ""
+
+#. Pass-through volume ratio
+#. How much voice is amplified compared to the music.
+#: ../data/config/schema.xml:391
+msgid " x"
 msgstr ""
 
 #. Pass-through volume ratio
@@ -2169,7 +1391,7 @@ msgstr ""
 #. name: audio/pass-through_ratio
 #. type: float
 #. value: 2.0
-#: ../data/config/schema.xml:385
+#: ../data/config/schema.xml:393
 msgid "Pass-through volume ratio"
 msgstr ""
 
@@ -2178,7 +1400,7 @@ msgstr ""
 #. name: audio/pass-through_ratio
 #. type: float
 #. value: 2.0
-#: ../data/config/schema.xml:386
+#: ../data/config/schema.xml:394
 msgid "How much voice is amplified compared to the music."
 msgstr ""
 
@@ -2187,7 +1409,7 @@ msgstr ""
 #. name: audio/suppress_center_channel
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:389
+#: ../data/config/schema.xml:397
 msgid "Suppress center channel"
 msgstr ""
 
@@ -2196,8 +1418,29 @@ msgstr ""
 #. name: audio/suppress_center_channel
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:390
+#: ../data/config/schema.xml:398
 msgid "Suppress audio of center channel (e.g. vocals)."
+msgstr ""
+
+#. Mute the vocals track
+#. Mute the vocals track if a vocals.ogg is found.
+#. name: audio/mute_vocals_track
+#. type: bool
+#. value: false
+#: ../data/config/schema.xml:401
+#, fuzzy
+msgid "Mute the vocals track"
+msgstr ""
+"變更人聲軌段\n"
+"(需要重新啟動)"
+
+#. Mute the vocals track
+#. Mute the vocals track if a vocals.ogg is found.
+#. name: audio/mute_vocals_track
+#. type: bool
+#. value: false
+#: ../data/config/schema.xml:402
+msgid "Mute the vocals track if a vocals.ogg is found."
 msgstr ""
 
 #. Song folders
@@ -2205,7 +1448,7 @@ msgstr ""
 #. name: paths/songs
 #. type: string_list
 #. hidden: false
-#: ../data/config/schema.xml:395
+#: ../data/config/schema.xml:407
 msgid "Song folders"
 msgstr "歌曲資料夾"
 
@@ -2213,7 +1456,7 @@ msgstr "歌曲資料夾"
 #. Where to recursively look for songs. DATADIR at the beginning means all Performous data folders.
 #. name: paths/system-songs
 #. type: string_list
-#: ../data/config/schema.xml:418
+#: ../data/config/schema.xml:429
 msgid ""
 "Where to recursively look for songs. DATADIR at the beginning means all "
 "Performous data folders."
@@ -2224,7 +1467,16 @@ msgstr "遞迴找尋歌曲的位置。起始部分的 DATADIR 表示所有 Perfo
 #. name: paths/showhiddenfolders
 #. type: bool
 #. value: false
-#: ../data/config/schema.xml:400
+#: ../data/config/schema.xml:411 ../game/screen_paths.cc:76
+msgid "Show hidden folders"
+msgstr ""
+
+#. Show hidden folders
+#. When true the screen 'Paths' will also show hidden folders.
+#. name: paths/showhiddenfolders
+#. type: bool
+#. value: false
+#: ../data/config/schema.xml:412
 msgid "When true the screen 'Paths' will also show hidden folders."
 msgstr ""
 
@@ -2232,7 +1484,7 @@ msgstr ""
 #. Where to recursively look for songs. DATADIR at the beginning means all Performous data folders.
 #. name: paths/system-songs
 #. type: string_list
-#: ../data/config/schema.xml:417
+#: ../data/config/schema.xml:428
 #, fuzzy
 #| msgid "Song folders"
 msgid "Default Song folders"
@@ -2242,7 +1494,7 @@ msgstr "歌曲資料夾"
 #. System defaults are included automatically. Additional paths can be added here.
 #. name: paths/system
 #. type: string_list
-#: ../data/config/schema.xml:421
+#: ../data/config/schema.xml:432
 msgid "Base folders for data"
 msgstr "資料的基底資料夾"
 
@@ -2250,7 +1502,7 @@ msgstr "資料的基底資料夾"
 #. System defaults are included automatically. Additional paths can be added here.
 #. name: paths/system
 #. type: string_list
-#: ../data/config/schema.xml:422
+#: ../data/config/schema.xml:433
 msgid ""
 "System defaults are included automatically. Additional paths can be added "
 "here."
@@ -2259,66 +1511,1080 @@ msgstr "自動會包含系統預設值。可以在此加入額外路徑。"
 #. Sort order
 #. Currently active sort order.
 #. name: songs/sort-order
-#. type: int
+#. type: uint
 #. value: 0
 #. hidden: true
-#: ../data/config/schema.xml:429
+#: ../data/config/schema.xml:439 ../game/requesthandler.cc:326
+msgid "Sort order"
+msgstr ""
+
+#. Sort order
+#. Currently active sort order.
+#. name: songs/sort-order
+#. type: uint
+#. value: 0
+#. hidden: true
+#: ../data/config/schema.xml:440
 msgid "Currently active sort order."
 msgstr ""
 
-#: ../data/performous.desktop:3
+#: ../data/performous.desktop:4
 msgid "Performous"
 msgstr ""
 
-#: ../data/performous.desktop:4
+#: ../data/performous.desktop:5
 msgid "A karaoke game"
 msgstr ""
 
 #: ../data/performous.desktop:17
-msgid "song;music;dance;karaoke;microphone;sound;singing;"
+msgid "game;song;music;dance;karaoke;microphone;sound;singing;"
 msgstr ""
 
-#: ../game/i18n.hh:63 ../game/i18n.hh:100
-msgid "Auto"
+#: ../game/configitem.cc:176
+msgid "Enabled"
+msgstr "已啟用"
+
+#: ../game/configitem.cc:181
+#, fuzzy
+#| msgid "%d items"
+msgid "{:d} items"
+msgstr "%d 項"
+
+#: ../game/dancegraph.cc:18
+msgid "Beginner"
+msgstr "初學者"
+
+#: ../game/dancegraph.cc:18 ../game/guitargraph.cc:14
+msgid "Easy"
+msgstr "輕鬆"
+
+#: ../game/dancegraph.cc:18 ../game/guitargraph.cc:14
+msgid "Medium"
+msgstr "中等"
+
+#: ../game/dancegraph.cc:18
+msgid "Challenge"
+msgstr "挑戰"
+
+#: ../game/dancegraph.cc:53 ../game/dancegraph.cc:61
+msgid "Perfect!"
 msgstr ""
 
-#: ../game/song.hh:28
+#: ../game/dancegraph.cc:54
+msgid "Excellent!-"
+msgstr ""
+
+#: ../game/dancegraph.cc:55
+msgid "Great!-"
+msgstr ""
+
+#: ../game/dancegraph.cc:56
+msgid " Good!- "
+msgstr ""
+
+#: ../game/dancegraph.cc:57
+msgid "  OK!-  "
+msgstr ""
+
+#: ../game/dancegraph.cc:58
+msgid "Late!-"
+msgstr ""
+
+#: ../game/dancegraph.cc:59 ../game/dancegraph.cc:67
+msgid "Way off!"
+msgstr ""
+
+#: ../game/dancegraph.cc:62
+msgid "-Excellent!"
+msgstr ""
+
+#: ../game/dancegraph.cc:63
+msgid "-Great!"
+msgstr ""
+
+#: ../game/dancegraph.cc:64
+msgid " -Good! "
+msgstr ""
+
+#: ../game/dancegraph.cc:65
+msgid "  -OK!  "
+msgstr ""
+
+#: ../game/dancegraph.cc:66
+msgid "-Early!"
+msgstr ""
+
+#: ../game/dancegraph.cc:108 ../game/guitargraph.cc:206
+msgid "Ready!"
+msgstr "就緒！"
+
+#: ../game/dancegraph.cc:108 ../game/guitargraph.cc:206
+#: ../game/screen_intro.cc:176
+msgid "Start performing!"
+msgstr "開始歡唱！"
+
+#: ../game/dancegraph.cc:119 ../game/guitargraph.cc:195
+msgid "Select track"
+msgstr "選取軌段"
+
+#: ../game/dancegraph.cc:135 ../game/guitargraph.cc:175
+msgid "Select difficulty"
+msgstr "選取難度"
+
+#: ../game/dancegraph.cc:138 ../game/guitargraph.cc:212
+#: ../game/instrumentgraph.cc:61 ../game/screen_intro.cc:197
+#: ../game/screen_sing.cc:108 ../game/screen_sing.cc:156
+msgid "Quit"
+msgstr "離開"
+
+#: ../game/dancegraph.cc:138 ../game/guitargraph.cc:212
+#: ../game/instrumentgraph.cc:61 ../game/screen_sing.cc:108
+#: ../game/screen_sing.cc:156
+msgid "Exit to song browser"
+msgstr "離開到歌曲瀏覽器"
+
+#: ../game/dancegraph.cc:249
+msgid "STOP!"
+msgstr "停止！"
+
+#: ../game/dancegraph.cc:323 ../game/guitargraph.cc:466
+msgid "Streak!"
+msgstr "劃線！"
+
+#: ../game/guitargraph.cc:14
+msgid "Kids"
+msgstr "兒童"
+
+#: ../game/guitargraph.cc:14
+msgid "Expert"
+msgstr "專家"
+
+#: ../game/guitargraph.cc:181 ../game/guitargraph.cc:198
+msgid "Lefty-mode"
+msgstr "左手模式"
+
+#: ../game/guitargraph.cc:219
+msgid "ON"
+msgstr "開"
+
+#: ../game/guitargraph.cc:219
+msgid "OFF"
+msgstr "關閉"
+
+#: ../game/guitargraph.cc:220
+msgid "Toggle lefty-mode"
+msgstr "切換左手模式"
+
+#: ../game/guitargraph.cc:478
+msgid ""
+"God Mode\n"
+"Activated!"
+msgstr ""
+"上帝模式\n"
+"啟用！"
+
+#: ../game/guitargraph.cc:479
+msgid "Mistakes ignored!"
+msgstr "忽略錯誤！"
+
+#: ../game/guitargraph.cc:1142
+msgid "God Mode Ready!"
+msgstr "上帝模式就緒！"
+
+#: ../game/guitargraph.cc:1144
+msgid "Drum Fill!"
+msgstr "填滿鼓聲！"
+
+#: ../game/guitargraph.cc:1147
+msgid "Solo!"
+msgstr "獨唱！"
+
+#: ../game/i18n.cc:147
+msgid "Asturian"
+msgstr ""
+
+#: ../game/i18n.cc:148
+msgid "Danish"
+msgstr ""
+
+#: ../game/i18n.cc:149
+msgid "German"
+msgstr ""
+
+#: ../game/i18n.cc:150
+msgid "English"
+msgstr ""
+
+#: ../game/i18n.cc:151
+msgid "Spanish"
+msgstr ""
+
+#: ../game/i18n.cc:152
+msgid "Persian"
+msgstr ""
+
+#: ../game/i18n.cc:153
+msgid "Finnish"
+msgstr ""
+
+#: ../game/i18n.cc:154
+msgid "French"
+msgstr ""
+
+#: ../game/i18n.cc:155
+msgid "Hungarian"
+msgstr ""
+
+#: ../game/i18n.cc:156
+msgid "Italian"
+msgstr ""
+
+#: ../game/i18n.cc:157
+msgid "Japanese"
+msgstr ""
+
+#: ../game/i18n.cc:158
+msgid "Dutch"
+msgstr ""
+
+#: ../game/i18n.cc:159
+msgid "Polish"
+msgstr ""
+
+#: ../game/i18n.cc:160
+msgid "Portuguese"
+msgstr ""
+
+#: ../game/i18n.cc:161
+msgid "Slovak"
+msgstr ""
+
+#: ../game/i18n.cc:162
+msgid "Swedish"
+msgstr ""
+
+#: ../game/i18n.cc:163
+msgid "Chinese"
+msgstr ""
+
+#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:151
+msgid "Resume"
+msgstr "再續"
+
+#: ../game/instrumentgraph.cc:58 ../game/screen_sing.cc:151
+msgid "Back to performing!"
+msgstr "回到歡唱！"
+
+#: ../game/instrumentgraph.cc:59
+msgid "Rejoin"
+msgstr "重新連結"
+
+#: ../game/instrumentgraph.cc:59
+msgid "Change selections"
+msgstr "變更選擇"
+
+#: ../game/instrumentgraph.cc:60 ../game/screen_sing.cc:152
+msgid "Restart"
+msgstr "重新啟動"
+
+#: ../game/instrumentgraph.cc:60 ../game/screen_sing.cc:152
+msgid ""
+"Start the song\n"
+"from the beginning"
+msgstr ""
+"從開始部分\n"
+"播放歌曲"
+
+#: ../game/layout_singer.cc:75
+msgid "Excellent"
+msgstr ""
+
+#: ../game/layout_singer.cc:76
+msgid "Great"
+msgstr ""
+
+#: ../game/layout_singer.cc:77
+msgid "Good"
+msgstr ""
+
+#: ../game/layout_singer.cc:78
+msgid "OK"
+msgstr ""
+
+#: ../game/main.cc:116
+msgid "Loading audio samples..."
+msgstr "載入音效樣本…"
+
+#: ../game/main.cc:131
+msgid "Creating screens..."
+msgstr "建立畫面…"
+
+#: ../game/main.cc:141
+#, fuzzy
+#| msgid "Entering main menu"
+msgid "Entering main menu..."
+msgstr "進入主選單"
+
+#: ../game/main.cc:143
+#, fuzzy
+#| msgid "Loading complete"
+msgid "Loading complete!"
+msgstr "載入完成"
+
+#: ../game/main.cc:152
+msgid ""
+"Done Loading!\n"
+" Loaded {0} songs."
+msgstr ""
+
+#: ../game/main.cc:158
+msgid "Screenshot taken!"
+msgstr "拍下螢幕快照！"
+
+#: ../game/main.cc:161
+msgid "Screenshot failed!"
+msgstr "螢幕快照失敗！"
+
+#: ../game/requesthandler.cc:316
+msgid "Performous web frontend"
+msgstr ""
+
+#: ../game/requesthandler.cc:317
+msgid "View database"
+msgstr ""
+
+#: ../game/requesthandler.cc:318 ../game/screen_songs.cc:610
+msgid "View playlist"
+msgstr ""
+
+#: ../game/requesthandler.cc:319
+msgid "Search and add"
+msgstr ""
+
+#: ../game/requesthandler.cc:320
+msgid "Sort by"
+msgstr ""
+
+#: ../game/requesthandler.cc:321
+msgid "Artist"
+msgstr ""
+
+#: ../game/requesthandler.cc:322
+msgid "Title"
+msgstr ""
+
+#: ../game/requesthandler.cc:324
+msgid "Edition"
+msgstr ""
+
+#: ../game/requesthandler.cc:325
+msgid "Creator"
+msgstr ""
+
+#: ../game/requesthandler.cc:328
+msgid "Inverted"
+msgstr ""
+
+#: ../game/requesthandler.cc:329
+msgid "Update every 10 sec"
+msgstr ""
+
+#: ../game/requesthandler.cc:330
+msgid "Refresh database"
+msgstr ""
+
+#: ../game/requesthandler.cc:331
+msgid "Upcoming songs"
+msgstr ""
+
+#: ../game/requesthandler.cc:332
+msgid "Refresh playlist"
+msgstr ""
+
+#: ../game/requesthandler.cc:333
+msgid ""
+"Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding "
+"Performous see /docs/Authors.txt"
+msgstr ""
+
+#: ../game/requesthandler.cc:334
+msgid "Search"
+msgstr ""
+
+#: ../game/requesthandler.cc:335
+msgid "Available songs"
+msgstr ""
+
+#: ../game/requesthandler.cc:336
+msgid "Search for songs"
+msgstr ""
+
+#: ../game/requesthandler.cc:337
+msgid "Yes"
+msgstr ""
+
+#: ../game/requesthandler.cc:338
+msgid "No"
+msgstr ""
+
+#: ../game/requesthandler.cc:339 ../game/screen_playlist.cc:374
+msgid "Move up"
+msgstr ""
+
+#: ../game/requesthandler.cc:340 ../game/screen_playlist.cc:382
+msgid "Move down"
+msgstr ""
+
+#: ../game/requesthandler.cc:341
+msgid "Set position"
+msgstr ""
+
+#: ../game/requesthandler.cc:342
+msgid "Remove song"
+msgstr ""
+
+#: ../game/requesthandler.cc:343
+msgid "Desired position of song"
+msgstr ""
+
+#: ../game/requesthandler.cc:344
+msgid "Cancel"
+msgstr ""
+
+#: ../game/requesthandler.cc:345
+msgid "Successfully removed song from playlist."
+msgstr ""
+
+#: ../game/requesthandler.cc:346
+msgid "Failed removing song from playlist!"
+msgstr ""
+
+#: ../game/requesthandler.cc:347
+msgid "Successfully changed position of song."
+msgstr ""
+
+#: ../game/requesthandler.cc:348
+msgid "Failed changing position of song!"
+msgstr ""
+
+#: ../game/requesthandler.cc:349
+msgid "Successfully moved song up."
+msgstr ""
+
+#: ../game/requesthandler.cc:350
+msgid "Failed moving song up!"
+msgstr ""
+
+#: ../game/requesthandler.cc:351
+msgid "Successfully moved song down."
+msgstr ""
+
+#: ../game/requesthandler.cc:352
+msgid "Failed moving song down!"
+msgstr ""
+
+#: ../game/requesthandler.cc:353
+msgid "Successfully added song to the playlist."
+msgstr ""
+
+#: ../game/requesthandler.cc:354
+msgid "Failed adding song to the playlist!"
+msgstr ""
+
+#: ../game/requesthandler.cc:355
+msgid "No songs found with current filter."
+msgstr ""
+
+#: ../game/scorewindow.cc:43
+msgid "No player!"
+msgstr "沒有演唱者！"
+
+#: ../game/scorewindow.cc:51
+msgid "Hit singer"
+msgstr "熱門歌手"
+
+#: ../game/scorewindow.cc:52
+msgid "Lead singer"
+msgstr "領先歌手"
+
+#: ../game/scorewindow.cc:53 ../game/scorewindow.cc:59
+#: ../game/scorewindow.cc:65
+msgid "Rising star"
+msgstr "上升之星"
+
+#: ../game/scorewindow.cc:54 ../game/scorewindow.cc:60
+#: ../game/scorewindow.cc:66
+msgid "Amateur"
+msgstr "業餘"
+
+#: ../game/scorewindow.cc:55 ../game/scorewindow.cc:67
+msgid "Tone deaf"
+msgstr "音癡"
+
+#: ../game/scorewindow.cc:57
+msgid "Maniac"
+msgstr "瘋子"
+
+#: ../game/scorewindow.cc:58
+msgid "Hoofer"
+msgstr "舞者"
+
+#: ../game/scorewindow.cc:61
+msgid "Loser"
+msgstr "輸家"
+
+#: ../game/scorewindow.cc:63
+msgid "Virtuoso"
+msgstr "鑒賞家"
+
+#: ../game/scorewindow.cc:64
+msgid "Rocker"
+msgstr "搖滾者"
+
+#: ../game/screen_audiodevices.cc:68
+msgid ""
+"It seems you have some manual configurations\n"
+"incompatible with this user interface.\n"
+"Saving these settings will override\n"
+"all existing audio device configuration.\n"
+"Your other options changes will be saved too."
+msgstr ""
+"您似乎有某些手動的組態\n"
+"與這個使用者介面不相容。\n"
+"儲存這些設定值將會強制變更\n"
+"所有現存音效裝置的組態。\n"
+"您的其他選項變更也將被儲存。"
+
+#: ../game/screen_audiodevices.cc:135
+msgid "- Unassigned -"
+msgstr "- 未賦值的 -"
+
+#: ../game/screen_audiodevices.cc:156
+msgid ""
+"Use arrow keys to configure. Hit Enter/Start to save and test or Esc/Select "
+"to cancel. Ctrl + R to reset defaults"
+msgstr ""
+"使用方向鍵以組配。點擊 輸入/開始 以儲存與測試，或 Esc/選取 以取消。Ctrl + R "
+"以重置預設值"
+
+#: ../game/screen_audiodevices.cc:161
+msgid ""
+"For advanced device configuration, use command line parameter --audio (use --"
+"audiohelp for details)."
+msgstr ""
+"使用命令列參數 --audio (使用 --audiohelp 以瞭解細節) 用於進階裝置組態。"
+
+#: ../game/screen_audiodevices.cc:205
+msgid "Some devices failed to open!"
+msgstr "無法開啟某些裝置！"
+
+#: ../game/screen_intro.cc:28
+msgid "No playback devices could be used.\n"
+msgstr "沒有播放控制裝置可供使用。\n"
+
+#: ../game/screen_intro.cc:29
+msgid ""
+"\n"
+"Please configure some before playing."
+msgstr ""
+"\n"
+"請於播放前設定一些項目。"
+
+#: ../game/screen_intro.cc:76 ../game/screen_paths.cc:39
+msgid "Settings saved as system defaults."
+msgstr ""
+
+#: ../game/screen_intro.cc:76 ../game/screen_paths.cc:39
+msgid "Settings saved."
+msgstr ""
+
+#: ../game/screen_intro.cc:156
+msgid "Ctrl + S to save, Ctrl + R to reset defaults"
+msgstr "Ctrl + S 以儲存，Ctrl + R 以重置預設值"
+
+#: ../game/screen_intro.cc:176
+msgid "Perform"
+msgstr "開唱"
+
+#: ../game/screen_intro.cc:177
+msgid "Practice"
+msgstr "練習"
+
+#: ../game/screen_intro.cc:177
+#, fuzzy
+#| msgid "Check your skills or test the microphones"
+msgid "Check your skills or test the microphones."
+msgstr "檢查您的技巧或測試一下麥克風"
+
+#: ../game/screen_intro.cc:196
+msgid "Configure"
+msgstr "設定"
+
+#: ../game/screen_intro.cc:196
+#, fuzzy
+#| msgid "Configure audio and game options"
+msgid "Configure audio and game options."
+msgstr "組配音效和遊戲選項"
+
+#: ../game/screen_intro.cc:197
+#, fuzzy
+#| msgid "Leave the game"
+msgid "Leave the game."
+msgstr "離開遊戲"
+
+#: ../game/screen_intro.cc:211
+msgid ""
+"Webserver active!\n"
+" connect to this computer\n"
+"using: "
+msgstr ""
+
+#: ../game/screen_paths.cc:71
+msgid "Hide hidden folders"
+msgstr ""
+
+#: ../game/screen_paths.cc:83
+msgid "Remove this folder"
+msgstr ""
+
+#: ../game/screen_paths.cc:83
+msgid "Remove current folder from song folders"
+msgstr ""
+
+#: ../game/screen_paths.cc:89
+msgid "Add this folder"
+msgstr ""
+
+#: ../game/screen_paths.cc:89
+msgid "Add current folder to song folders"
+msgstr ""
+
+#: ../game/screen_paths.cc:97
+msgid ".."
+msgstr ""
+
+#: ../game/screen_paths.cc:97
+msgid "Go to parent folder"
+msgstr ""
+
+#: ../game/screen_paths.cc:124
+msgid "Open folder"
+msgstr ""
+
+#: ../game/screen_players.cc:133
+msgid "No players found!"
+msgstr "找不到演唱者！"
+
+#: ../game/screen_players.cc:134
+msgid "Enter a name to create a new player."
+msgstr "輸入名稱以建立新的演唱者。"
+
+#: ../game/screen_players.cc:136
+msgid "Press enter to create player!"
+msgstr "按下輸入以建立演唱者！"
+
+#: ../game/screen_players.cc:140
+#, fuzzy
+msgid "No players worth mentioning!"
+msgstr "找不到演唱者！"
+
+#: ../game/screen_players.cc:144
+#, fuzzy
+#| msgid "You reached %1% points!"
+msgid "You reached {0} points!"
+msgstr "您得到了 %1% 分！"
+
+#: ../game/screen_players.cc:145
+msgid "Change player with arrow keys."
+msgstr "利用方向鍵變更演唱者。"
+
+#: ../game/screen_players.cc:146
+msgid "Name:"
+msgstr "名稱："
+
+#: ../game/screen_players.cc:149
+msgid "Type text to filter or create a new player."
+msgstr "輸入文字到篩選器或建立新的演唱者。"
+
+#: ../game/screen_players.cc:149
+msgid "Search Text:"
+msgstr "搜尋文字："
+
+#: ../game/screen_playlist.cc:18 ../game/screen_sing.cc:46
+msgid "Initializing webcam..."
+msgstr "初始化網路攝影機…"
+
+#: ../game/screen_playlist.cc:39
+msgid "Loading song timestamps..."
+msgstr ""
+
+#: ../game/screen_playlist.cc:181 ../game/screen_playlist.cc:349
+msgid "Continue"
+msgstr ""
+
+#: ../game/screen_playlist.cc:181
+msgid "Continue playing"
+msgstr ""
+
+#: ../game/screen_playlist.cc:194
+msgid "Add songs"
+msgstr ""
+
+#: ../game/screen_playlist.cc:194
+msgid "Open the song browser to add more songs"
+msgstr ""
+
+#: ../game/screen_playlist.cc:195 ../game/screen_songs.cc:605
+msgid "Shuffle"
+msgstr ""
+
+#: ../game/screen_playlist.cc:195
+msgid "Randomize the order of the playlist"
+msgstr ""
+
+#: ../game/screen_playlist.cc:200
+msgid "Clear and exit"
+msgstr ""
+
+#: ../game/screen_playlist.cc:200
+msgid "Remove all the songs from the list"
+msgstr ""
+
+#: ../game/screen_playlist.cc:205 ../game/screen_playlist.cc:388
+#: ../game/screen_songs.cc:616
+msgid "Back"
+msgstr ""
+
+#: ../game/screen_playlist.cc:205 ../game/screen_playlist.cc:388
+msgid "Back to playlist viewer"
+msgstr ""
+
+#: ../game/screen_playlist.cc:332
+msgid "Press enter to view song options"
+msgstr ""
+
+#: ../game/screen_playlist.cc:341
+msgid "View more options"
+msgstr ""
+
+#: ../game/screen_playlist.cc:341
+#, fuzzy
+msgid "View general playlist settings"
+msgstr "組配一般音效設定值"
+
+#: ../game/screen_playlist.cc:349
+msgid "Play first"
+msgstr ""
+
+#: ../game/screen_playlist.cc:351
+msgid "Ignore the playlist's order and play this song first"
+msgstr ""
+
+#: ../game/screen_playlist.cc:352
+msgid "Start the song already!"
+msgstr ""
+
+#: ../game/screen_playlist.cc:363
+msgid "Remove"
+msgstr ""
+
+#: ../game/screen_playlist.cc:363
+msgid "Remove this song from the list"
+msgstr ""
+
+#: ../game/screen_playlist.cc:374
+msgid "Move this song up the list"
+msgstr ""
+
+#: ../game/screen_playlist.cc:382
+msgid "Move this song down the list"
+msgstr ""
+
+#: ../game/screen_sing.cc:53
+msgid "Loading video..."
+msgstr "載入影像…"
+
+#: ../game/screen_sing.cc:59
+msgid "Loading song..."
+msgstr "載入歌曲…"
+
+#: ../game/screen_sing.cc:66
+msgid "Song contains broken tracks!"
+msgstr "歌曲含有不完整的軌段！"
+
+#: ../game/screen_sing.cc:71
+msgid "Loading menu..."
+msgstr "載入選單…"
+
+#: ../game/screen_sing.cc:81
+msgid "Loading complete"
+msgstr "載入完成"
+
+#: ../game/screen_sing.cc:87
+#, fuzzy
+msgid "Start"
+msgstr "重新啟動"
+
+#: ../game/screen_sing.cc:87
+#, fuzzy
+msgid "Start performing"
+msgstr "開始歡唱！"
+
+#: ../game/screen_sing.cc:90
+#, fuzzy
+msgid "Duet mode"
+msgstr "左手模式"
+
+#: ../game/screen_sing.cc:91
+#, fuzzy
+msgid "Normal mode"
+msgstr "卡拉ＯＫ模式"
+
+#: ../game/screen_sing.cc:92
+msgid "Switch between duet and regular singing mode"
+msgstr ""
+
+#: ../game/screen_sing.cc:102
+#, fuzzy
+msgid "Change vocal track"
+msgstr ""
+"變更人聲軌段\n"
+"(需要重新啟動)"
+
+#: ../game/screen_sing.cc:154
+msgid "Skip"
+msgstr ""
+
+#: ../game/screen_sing.cc:154
+msgid "Skip current song"
+msgstr ""
+
+#: ../game/screen_sing.cc:309
+msgid "Press UP to join dance!"
+msgstr ""
+
+#: ../game/screen_sing.cc:309
+msgid "Step UP to join!"
+msgstr ""
+
+#: ../game/screen_sing.cc:314
+msgid "Press 1 to join guitar!"
+msgstr ""
+
+#: ../game/screen_sing.cc:314
+msgid "Press GREEN to join!"
+msgstr ""
+
+#: ../game/screen_sing.cc:319
+msgid "Press SPACE to join drums!"
+msgstr ""
+
+#: ../game/screen_sing.cc:319
+msgid "KICK to join!"
+msgstr ""
+
+#: ../game/screen_sing.cc:581
+msgid "   ENTER to skip instrumental break"
+msgstr "   按下輸入鍵以跳過樂器演奏中斷時間"
+
+#: ../game/screen_sing.cc:586 ../game/screen_sing.cc:607
+msgid "   Autoplay enabled"
+msgstr ""
+
+#: ../game/screen_sing.cc:589 ../game/screen_sing.cc:601
+msgid "   Remember to wait for grading!"
+msgstr "   記得等一下看評分！"
+
+#: ../game/screen_sing.cc:591
+msgid "   Prepare for the next song!"
+msgstr ""
+
+#: ../game/screen_sing.cc:603
+msgid "   Choose your next song!"
+msgstr ""
+
+#: ../game/screen_songs.cc:300
+#, fuzzy
+msgid "Sorry, no songs match the search!"
+msgstr "沒有符合搜尋的歌曲"
+
+#: ../game/screen_songs.cc:303
+#, fuzzy
+msgid "Sorry, no songs match the filter!"
+msgstr "沒有符合搜尋的歌曲"
+
+#: ../game/screen_songs.cc:306
+msgid "No songs found!"
+msgstr "找不到歌曲！"
+
+#: ../game/screen_songs.cc:307
+#, fuzzy
+msgid "Visit performous.org for free songs"
+msgstr ""
+"造訪 performous.org\n"
+"以取得免費歌曲"
+
+#: ../game/screen_songs.cc:324
+msgid "<type in to search>"
+msgstr "<輸入以搜尋>"
+
+#: ../game/screen_songs.cc:324
+msgid "songs"
+msgstr ""
+
+#: ../game/screen_songs.cc:324
+msgid "options"
+msgstr ""
+
+#: ../game/screen_songs.cc:326
+msgid "sort order: "
+msgstr ""
+
+#: ../game/screen_songs.cc:327
+msgid "type filter: "
+msgstr ""
+
+#: ../game/screen_songs.cc:328
+msgid "hiscores"
+msgstr ""
+
+#: ../game/screen_songs.cc:328
+msgid "jukebox mode"
+msgstr ""
+
+#: ../game/screen_songs.cc:331
+msgid "start a playlist with this song!"
+msgstr ""
+
+#: ../game/screen_songs.cc:331
+msgid "open the playlist menu"
+msgstr ""
+
+#: ../game/screen_songs.cc:599
+msgid "Play"
+msgstr ""
+
+#: ../game/screen_songs.cc:611
+msgid "Clear playlist"
+msgstr ""
+
+#: ../game/song.hh:31
 msgid "Guitar"
 msgstr "吉他"
 
-#: ../game/song.hh:28
+#: ../game/song.hh:31
 msgid "Coop guitar"
 msgstr "合奏吉他"
 
-#: ../game/song.hh:28
+#: ../game/song.hh:31
 #, fuzzy
 msgid "Rhythm guitar"
 msgstr "節奏吉他"
 
-#: ../game/song.hh:28
+#: ../game/song.hh:31
 msgid "Bass"
 msgstr "低音"
 
-#: ../game/song.hh:28
+#: ../game/song.hh:31
 msgid "Drums"
 msgstr "鼓聲"
 
-#: ../game/song.hh:28
+#: ../game/song.hh:31
 #, fuzzy
 msgid "Vocals"
 msgstr "人聲"
 
-#: ../game/song.hh:28
+#: ../game/song.hh:31
 msgid "Harmonic 1"
 msgstr "調和 1"
 
-#: ../game/song.hh:28
+#: ../game/song.hh:31
 msgid "Harmonic 2"
 msgstr "調和 2"
 
-#: ../game/song.hh:28
+#: ../game/song.hh:31
 msgid "Harmonic 3"
 msgstr "調和 3"
+
+#: ../game/songorder/artist_song_order.cc:7
+msgid "sorted by artist"
+msgstr "依歌手排序"
+
+#: ../game/songorder/edition_song_order.cc:7
+msgid "sorted by edition"
+msgstr "依專輯排序"
+
+#: ../game/songorder/file_time_song_order.cc:17
+#, fuzzy
+#| msgid "sorted by edition"
+msgid "sort by file time"
+msgstr "依專輯排序"
+
+#: ../game/songorder/genre_song_order.cc:7
+msgid "sorted by genre"
+msgstr "依類型排序"
+
+#: ../game/songorder/language_song_order.cc:7
+msgid "sorted by language"
+msgstr "依語言排序"
+
+#: ../game/songorder/most_sung_song_order.cc:6
+#, fuzzy
+#| msgid "sorted by song"
+msgid "sort by most sung"
+msgstr "依歌曲排序"
+
+#: ../game/songorder/name_song_order.cc:7
+msgid "sorted by song"
+msgstr "依歌曲排序"
+
+#: ../game/songorder/path_song_order.cc:4
+msgid "sorted by path"
+msgstr "依路徑排序"
+
+#: ../game/songorder/random_song_order.cc:4
+msgid "random order"
+msgstr "隨機排序"
+
+#: ../game/songorder/score_song_order.cc:6
+#, fuzzy
+#| msgid "sorted by song"
+msgid "sorted by score"
+msgstr "依歌曲排序"
+
+#: ../game/songparser-xml.cc:117
+msgid "Together"
+msgstr ""
+
+#: ../game/songs.cc:450
+msgid "show all songs"
+msgstr ""
+
+#: ../game/songs.cc:451
+msgid "has dance"
+msgstr ""
+
+#: ../game/songs.cc:452
+#, fuzzy
+msgid "has vocals"
+msgstr "人聲"
+
+#: ../game/songs.cc:453
+msgid "has duet"
+msgstr ""
+
+#: ../game/songs.cc:454
+#, fuzzy
+msgid "has guitar"
+msgstr "節奏吉他"
+
+#: ../game/songs.cc:455
+msgid "drums or keytar"
+msgstr ""
+
+#: ../game/songs.cc:456
+msgid "full band"
+msgstr ""
 
 #~ msgid ""
 #~ "This tool is not yet available.\n"
