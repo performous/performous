@@ -13,19 +13,20 @@
 */
 $("#refresh-playlist").click(function () {
     $.get("api/getCurrentPlaylist.json", function (data) {
-        var database = data;//JSON.parse(data);
+        var database = data;
         $.get("api/getplaylistTimeout", function (playlistTimeOut) {
             var timeout = parseInt(playlistTimeOut);
             var totalTime = 0;
-
             clearList("playlist-songs");
             clearList("playlist-songs-sortable");
 
             $.each(database, function (iterator, songObject) {
                 totalTime += songObject.Duration + timeout;
-                $("#playlist-songs").append("<a id=\"playlist-songs-" + iterator + "\" href=\"#\" class=\"list-group-item\" data-toggle=\"modal\" data-target=\"#dynamic-modal\">" + songObject.Artist + " - " + songObject.Title + " - " + secondsToDate(totalTime) + "<span class=\"glyphicon glyphicon-info-sign\"></span></a>");
-                $("#playlist-songs-sortable").append("<a id=\"playlist-songs-sortable-" + iterator + "\" href=\"#\" class=\"list-group-item\" data-toggle=\"modal\" data-target=\"#dynamic-modal\">" + songObject.Artist + " - " + songObject.Title + " - " + secondsToDate(totalTime) + "<span class=\"glyphicon glyphicon-info-sign\"></span></a>");
+                var position = String(iterator + 1).padStart(2, '0') + ".";
+                $("#playlist-songs").append("<a id=\"playlist-songs-" + iterator + "\" href=\"#\" class=\"list-group-item\" data-toggle=\"modal\" data-target=\"#dynamic-modal\">" + position + " " + songObject.Artist + " - " + songObject.Title + " - " + secondsToDate(totalTime) + "<span class=\"glyphicon glyphicon-info-sign\"></span></a>");
+                $("#playlist-songs-sortable").append("<a id=\"playlist-songs-sortable-" + iterator + "\" href=\"#\" class=\"list-group-item\" data-toggle=\"modal\" data-target=\"#dynamic-modal\">" + position + " " + songObject.Artist + " - " + songObject.Title + " - " + secondsToDate(totalTime) + "<span class=\"glyphicon glyphicon-info-sign\"></span></a>");
                 songObject.Position = iterator;
+                songObject.PositionStr = position;
                 $("#playlist-songs-" + iterator).data("modal-songObject", JSON.stringify(songObject));
                 $("#playlist-songs-sortable-" + iterator).data("modal-songObject", JSON.stringify(songObject));
             });
@@ -46,7 +47,7 @@ $("#refresh-playlist").click(function () {
 $("[id^=playlist-songs]").on("click", "a", function () {
     var jsonSongObject = $(this).data("modal-songObject");
     var songObject = JSON.parse(jsonSongObject);
-    var title = songObject.Artist + " - " + songObject.Title;
+    var title = songObject.PositionStr + " " + songObject.Artist + " - " + songObject.Title;
 
     var tempElement = $("<div>");
     $(tempElement).load("playlist-song-modal-body.html", function (data) {
