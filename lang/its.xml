@@ -1,0 +1,15 @@
+<!-- https://www.w3.org/TR/its/#trans-datacat -->
+<its:rules version="2.0" xmlns:its="http://www.w3.org/2005/11/its">
+    <its:translateRule translate="no" selector="//*"/>
+    <!-- metainfo -->
+    <its:translateRule translate="yes" selector="//name"/>
+    <its:translateRule translate="yes" selector="//summary"/>
+    <its:translateRule translate="yes" selector="//description"/>
+    <its:translateRule translate="yes" selector="//description/*"/>
+    <its:translateRule translate="yes" selector="//releases/release/description"/>
+    <!-- config schema -->
+    <its:translateRule translate="yes" selector="//*/short"/>
+    <its:translateRule translate="yes" selector="//*/long"/>
+    <its:translateRule translate="yes" selector="//*/enum"/>
+    <its:translateRule translate="yes" selector="//*/ui/@unit"/>
+</its:rules>

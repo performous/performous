@@ -1,0 +1,11 @@
+FIND_PROGRAM(ITSTOOL_EXECUTABLE itstool)
+
+if (ITSTOOL_EXECUTABLE)
+   set(Itstool_FOUND TRUE)
+   message(STATUS "Found itstool at ${ITSTOOL_EXECUTABLE}")
+else ()
+   set(Itstool_FOUND FALSE)
+   if (Itstool_FIND_REQUIRED)
+      message(FATAL_ERROR "Itstool not found")
+   endif ()
+endif ()
