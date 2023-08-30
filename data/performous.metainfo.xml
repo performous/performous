@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.performous.Performous</id>
+  <metadata_license>CC0</metadata_license>
+  <project_license>GPL-2.0-or-later</project_license>
+  <name>Performous</name>
+  <summary>Music and rhythm / party game</summary>
+  <description>
+    <p>
+      A karaoke, band and dancing game where one or more players perform a
+      song and the game scores their performances.
+    </p>
+    <p>
+      Supports songs in UltraStar, Frets on Fire and StepMania formats.
+      Microphones and instruments from SingStar, Guitar Hero and Rock Band
+      as well as some dance pads are auto-detected.
+    </p>
+  </description>
+  <screenshots>
+    <screenshot type="default">
+      <image type="source" width="1536" height="96">http://performous.org/imgs/showcase.jpg</image>
+    </screenshot>
+  </screenshots>
+  <url type="homepage">https://performous.org</url>
+  <content_rating type="oars-1.1" />
+  <launchable type="desktop-id">performous.desktop</launchable>
+  <releases>
+    <release version="1.2.0" date="2022-03-27">
+      <artifacts>
+        <artifact type="source">
+          <location>https://github.com/performous/performous/archive/refs/tags/1.2.0.tar.gz</location>
+          <checksum type="sha256">c88438bb3b9400a2254a99284375157534ae38befc48ba27254bc3b9e7ef50ef</checksum>
+        </artifact>
+      </artifacts>
+    </release>
+  </releases>
+</component>
