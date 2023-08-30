@@ -13,6 +13,7 @@
         "BUILD_SHARED_LIBS": "ON",
         "ENABLE_WEBSERVER": "AUTO",
         "SELF_BUILT_AUBIO": "ALWAYS",
+        "SELF_BUILT_CED": "ALWAYS",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/${presetName}-install",
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
         "PERFORMOUS_VERSION": "$env{PERFORMOUS_VERSION}"
