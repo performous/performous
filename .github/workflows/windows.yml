@@ -165,7 +165,7 @@ jobs:
           mkdir build
           for f in $(ls -Q ./lang/*.po); do mkdir -pv "./build/lang/$(basename $f | cut -d. -f1)/LC_MESSAGES";done
           cd build
-          "${{ env.workpath }}/msys64/mingw64/bin/cmake.exe" -G "MinGW Makefiles" .. -DCMAKE_BUILD_TYPE="RelWithDebInfo" -DSELF_BUILT_AUBIO=ALWAYS -DENABLE_WEBSERVER=OFF \
+          "${{ env.workpath }}/msys64/mingw64/bin/cmake.exe" -G "MinGW Makefiles" .. -DCMAKE_BUILD_TYPE="RelWithDebInfo" -DSELF_BUILT_AUBIO=ALWAYS -DSELF_BUILT_CED=ALWAYS -DENABLE_WEBSERVER=OFF \
           -DPERFORMOUS_VERSION=${{ env.PERFORMOUS_VERSION }} -DBUILD_TESTS=ON \
           -DCMAKE_VERBOSE_MAKEFILE=ON -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64"
           "${{ env.workpath }}/msys64/mingw64/bin/cmake.exe" --build ./ --verbose --parallel 3

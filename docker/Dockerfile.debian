@@ -26,7 +26,7 @@ RUN <<EOR
 		apt-key add kitware-archive-latest.asc
 		echo 'deb https://apt.kitware.com/ubuntu/ bionic main' | tee /etc/apt/sources.list.d/kitware.list >/dev/null
 		echo 'deb http://deb.debian.org/debian buster-backports main' | tee /etc/apt/sources.list.d/backports.list
-		export_platform_flags '-DSELF_BUILT_AUBIO=ALWAYS -DSELF_BUILT_JSON=ALWAYS'
+		export_platform_flags '-DSELF_BUILT_AUBIO=ALWAYS -DSELF_BUILT_CED=ALWAYS -DSELF_BUILT_JSON=ALWAYS'
 		apt-get -y update
 		apt-get -y install libfmt-dev/buster-backports
 	fi
