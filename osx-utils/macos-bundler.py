@@ -27,7 +27,7 @@ performous_source_dir = None
 include_feature_args = ["--enable-webcam", "--enable-midi", "--enable-webserver", "--build-tests"]
 include_feature_opts = ["AUTO", "ON", "OFF" ]
 
-find_dep_args = ["--internal-aubio", "--internal-json"]
+find_dep_args = ["--internal-aubio", "--internal-ced", "--internal-json"]
 find_dep_opts = ["AUTO", "ALWAYS", "NEVER"]
 
 majorVer = None
@@ -227,6 +227,7 @@ Environment:
 	--cc <path/to/compiler>  Change C compiler [default: /usr/bin/clang]
 	--cxx <path/to/compiler>  Change C compiler [default: /usr/bin/clang++]
 	--internal-aubio <auto | always | never>  Find previously installed aubio on system [default: auto]
+	--internal-ced <auto | always | never>  Find previously installed ced on system [default: auto]
 	--internal-json <auto | always | never>  Find previously installed nlohmann-json on system [default: auto]
 	-p <prefix>, --prefix <prefix>  Set prefix path for searching of libraries and headers. By default, the tool tries to detect whether MacPorts or Homebrew are installed and the prefix is set accordingly. Note: If both are installed, you can choose.
 	(--prefer-macports | --prefer-homebrew)  Prefer either MacPorts or Homebrew.
@@ -342,6 +343,7 @@ if __name__ == "__main__":
 		-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
 		-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON \
 		-DSELF_BUILT_AUBIO:STRING="{arguments['--internal-aubio'].upper()}" \
+		-DSELF_BUILT_CED:STRING="{arguments['--internal-ced'].upper()}" \
 		-DSELF_BUILT_JSON:STRING="{arguments['--internal-json'].upper()}" \
 		-DENABLE_MIDI:STRING="{arguments['--enable-midi'].upper()}" \
 		-DENABLE_WEBCAM:STRING="{arguments['--enable-webcam'].upper()}" \

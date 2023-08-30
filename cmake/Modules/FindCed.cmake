@@ -4,6 +4,7 @@ include(LibFetchMacros)
 set(Ced_GIT_VERSION "master")
 
 if(SELF_BUILT_CED STREQUAL "ALWAYS")
+	message(STATUS "ced forced to build from source")
 	libfetch_git_pkg(Ced
 		REPOSITORY ${SELF_BUILT_GIT_BASE}/compact_enc_det.git
 		#https://github.com/google/compact_enc_det.git
@@ -33,7 +34,7 @@ elseif(SELF_BUILT_CED STREQUAL "AUTO")
 		set(Ced_INCLUDE_DIRS ${CED_INCLUDE_DIRS})
 	endif()
 else()
-	message(FATAL_ERROR "unknown SELF_BUILD_CED value \"${SELF_BUILT_CED}\". Allowed values are NEVER, AUTO and ALWAYS")
+	message(FATAL_ERROR "unknown SELF_BUILT_CED value \"${SELF_BUILT_CED}\". Allowed values are NEVER, AUTO and ALWAYS")
 endif()
 
 message(STATUS "Found Google CED ${Ced_VERSION}")
