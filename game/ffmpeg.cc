@@ -249,7 +249,7 @@ FFmpeg::FFmpeg(fs::path const& _filename, int mediaType) : m_filename(_filename)
 	av_log_set_level(AV_LOG_ERROR);
 	{
 		AVFormatContext *avfctx = nullptr;
-		auto err = avformat_open_input(&avfctx, m_filename.string().c_str(), nullptr, nullptr);
+		auto err = avformat_open_input(&avfctx, m_filename.u8string().c_str(), nullptr, nullptr);
 		if (err) throw Error(*this, err);
 		m_formatContext.reset(avfctx);
 	}
