@@ -192,7 +192,7 @@ VocalTrack& Song::getVocalTrack(unsigned idx) {
 double Song::getDurationSeconds() {
 	if(m_duration == 0.0 || m_duration < 1.0) {
 		AVFormatContext *pFormatCtx = avformat_alloc_context();
-		if (avformat_open_input(&pFormatCtx, music["background"].string().c_str(), nullptr, nullptr) == 0) {
+		if (avformat_open_input(&pFormatCtx, music["background"].u8string().c_str(), nullptr, nullptr) == 0) {
 			avformat_find_stream_info(pFormatCtx, nullptr);
 			m_duration = static_cast<double>(pFormatCtx->duration) / static_cast<double>(AV_TIME_BASE);
 			avformat_close_input(&pFormatCtx);
