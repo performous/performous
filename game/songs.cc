@@ -126,7 +126,7 @@ void Songs::LoadCache() {
 	std::vector<std::string> allPaths;
 	for(const auto& songPaths : {getPathsConfig("paths/system-songs"), getPathsConfig("paths/songs")}) {
 		for(const auto& songPath: songPaths) {
-			allPaths.push_back(songPath.string());
+			allPaths.push_back(songPath.u8string());
 		}
 	}
 
@@ -138,8 +138,7 @@ void Songs::LoadCache() {
 			[songPath](const std::string& userSongItem) {
 				return songPath.find(userSongItem) != std::string::npos;
 			}) != allPaths.end();
-		STAT buffer;
-		if(_STAT(songPath.c_str(), &buffer) == 0 && isSongPathInConfiguredPaths) {
+		if (fs::exists(fs::u8path(songPath)) && isSongPathInConfiguredPaths) {
 			auto realSong = std::make_shared<Song>(song);
 			std::unique_lock<std::shared_mutex> l(m_mutex);
 			m_songs.push_back(std::move(realSong));
@@ -153,10 +152,10 @@ void Songs::CacheSonglist() {
 	for (auto const& song : m_songs) {
 		auto songObject = nlohmann::json::object();
 		if(!song->path.string().empty()) {
-			songObject["txtFileFolder"] = song->path.string();
+			songObject["txtFileFolder"] = song->path.u8string();
 		}
 		if(!song->filename.string().empty()) {
-			songObject["txtFile"] = song->filename.string();
+			songObject["txtFile"] = song->filename.u8string();
 		}
 		if(!song->title.empty()) {
 			songObject["title"] = song->title;
@@ -177,19 +176,19 @@ void Songs::CacheSonglist() {
 			songObject["genre"] = song->genre;
 		}
 		if(!song->cover.string().empty()) {
-			songObject["cover"] = song->cover.string();
+			songObject["cover"] = song->cover.u8string();
 		}
 		if(!song->background.string().empty()) {
-			songObject["background"] = song->background.string();
+			songObject["background"] = song->background.u8string();
 		}
 		if(!song->music[TrackName::BGMUSIC].string().empty()) {
-			songObject["songFile"] = song->music[TrackName::BGMUSIC].string();
+			songObject["songFile"] = song->music[TrackName::BGMUSIC].u8string();
 		}
 		if(!song->midifilename.string().empty()) {
-			songObject["midiFile"] = song->midifilename.string();
+			songObject["midiFile"] = song->midifilename.u8string();
 		}
 		if(!song->video.string().empty()) {
-			songObject["videoFile"] = song->video.string();
+			songObject["videoFile"] = song->video.u8string();
 		}
 		if(!std::isnan(song->start)) {
 			songObject["start"] = song->start;
@@ -201,40 +200,40 @@ void Songs::CacheSonglist() {
 			songObject["previewStart"] = song->preview_start;
 		}
 		if(!song->music[TrackName::VOCAL_LEAD].string().empty()) {
-			songObject["vocals"] = song->music[TrackName::VOCAL_LEAD].string();
+			songObject["vocals"] = song->music[TrackName::VOCAL_LEAD].u8string();
 		}
 		if(!song->music[TrackName::VOCAL_BACKING].string().empty()) {
-			songObject["vocalsBacking"] = song->music[TrackName::VOCAL_BACKING].string();
+			songObject["vocalsBacking"] = song->music[TrackName::VOCAL_BACKING].u8string();
 		}
 		if(!song->music[TrackName::PREVIEW].string().empty()) {
-			songObject["preview"] = song->music[TrackName::PREVIEW].string();
+			songObject["preview"] = song->music[TrackName::PREVIEW].u8string();
 		}
 		if(!song->music[TrackName::GUITAR].string().empty()) {
-			songObject["guitar"] = song->music[TrackName::GUITAR].string();
+			songObject["guitar"] = song->music[TrackName::GUITAR].u8string();
 		}
 		if(!song->music[TrackName::BASS].string().empty()) {
-			songObject["bass"] = song->music[TrackName::BASS].string();
+			songObject["bass"] = song->music[TrackName::BASS].u8string();
 		}
 		if(!song->music[TrackName::DRUMS].string().empty()) {
-			songObject["drums"] = song->music[TrackName::DRUMS].string();
+			songObject["drums"] = song->music[TrackName::DRUMS].u8string();
 		}
 		if(!song->music[TrackName::DRUMS_SNARE].string().empty()) {
-			songObject["drumsSnare"] = song->music[TrackName::DRUMS_SNARE].string();
+			songObject["drumsSnare"] = song->music[TrackName::DRUMS_SNARE].u8string();
 		}
 		if(!song->music[TrackName::DRUMS_CYMBALS].string().empty()) {
-			songObject["drumsCymbals"] = song->music[TrackName::DRUMS_CYMBALS].string();
+			songObject["drumsCymbals"] = song->music[TrackName::DRUMS_CYMBALS].u8string();
 		}
 		if(!song->music[TrackName::DRUMS_TOMS].string().empty()) {
-			songObject["drumsToms"] = song->music[TrackName::DRUMS_TOMS].string();
+			songObject["drumsToms"] = song->music[TrackName::DRUMS_TOMS].u8string();
 		}
 		if(!song->music[TrackName::KEYBOARD].string().empty()) {
-			songObject["keyboard"] = song->music[TrackName::KEYBOARD].string();
+			songObject["keyboard"] = song->music[TrackName::KEYBOARD].u8string();
 		}
 		if(!song->music[TrackName::GUITAR_COOP].string().empty()) {
-			songObject["guitarCoop"] = song->music[TrackName::GUITAR_COOP].string();
+			songObject["guitarCoop"] = song->music[TrackName::GUITAR_COOP].u8string();
 		}
 		if(!song->music[TrackName::GUITAR_RHYTHM].string().empty()) {
-			songObject["guitarRhythm"] = song->music[TrackName::GUITAR_RHYTHM].string();
+			songObject["guitarRhythm"] = song->music[TrackName::GUITAR_RHYTHM].u8string();
 		}
 
 		double duration = song->getDurationSeconds();
@@ -275,7 +274,7 @@ void Songs::reload_internal(fs::path const& parent) {
 				{
 					std::shared_lock<std::shared_mutex> l(m_mutex);
 					auto it = std::find_if(m_songs.begin(), m_songs.end(), [p](std::shared_ptr<Song> n) {
-						return n->filename == p;
+						return n->filename == fs::u8path(p.u8string());
 					});
 					auto const alreadyInCache =  it != m_songs.end();
 
