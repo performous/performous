@@ -1,0 +1,500 @@
+<?xml version='1.0' encoding='utf-8'?>
+<component type="desktop-application">
+  <id>org.performous.Performous</id>
+  <metadata_license>CC0</metadata_license>
+  <project_license>GPL-2.0-or-later</project_license>
+  <name>Performous</name>
+  <summary>Music and rhythm / party game</summary>
+  <description>
+    <p>
+      A karaoke, band and dancing game where one or more players perform a
+      song and the game scores their performances.
+    </p>
+    <p>
+      Supports songs in UltraStar, Frets on Fire and StepMania formats.
+      Microphones and instruments from SingStar, Guitar Hero and Rock Band
+      as well as some dance pads are auto-detected.
+    </p>
+  </description>
+  <screenshots>
+    <screenshot type="default">
+      <image type="source" width="1536" height="96">http://performous.org/imgs/showcase.jpg</image>
+    </screenshot>
+  </screenshots>
+  <url type="homepage">https://performous.org</url>
+  <content_rating type="oars-1.1" />
+  <launchable type="desktop-id">performous.desktop</launchable>
+  <releases>
+    <release version="1.3.0-rc1" date="2023-08-02" type="development">
+      <description>The past couple of months the focus was to ease the life of developers.
+This meant we had to make some more gains in automation, discuss a lot about how we want things to be done and standardizing and testing the code base.
+
+In between the discussing a couple of bugs and new features were also fixed and added.
+
+# Pre Release
+Since this is a pre-release please help us test the latest version and make sure to report any issues you encounter.
+We'll then determine the priority and check if it gets fixed within the official release or not.
+
+Issues can be made by using the [issue template](https://github.com/performous/performous/issues/new/choose)
+Questions can be asked within our [Discord - User Support channel](https://discord.gg/NS3m3ad)
+
+# New features
+
+* Finally a working webserver on windows (see notes) @Baklap4
+* Readme now contains latest build artifacts @ooshlablu
+* Code is somewhat warning free thanks @Lord-Kamina
+* Unittests are introduced thanks to @twollgam
+* A new green theme thanks to @Darkmagister
+* Using less boost functionality as a lot has been ported over to std library thanks to @OznOg &amp; @twollgam
+* WebM video's are now working @taynaron
+* Multitrack drums @taynaron
+* Support for opus audio format @taynaron
+
+# Bugfixes
+
+* Some webcam fixes @twollgam
+* Whammy and godmode mapping for X-Plorer @ooshlablu
+* Hi-scores are now shown for tracks without vocals @Darkmagister
+* Fixes a bug where performous couldn't start on Windows @Baklap4
+
+# Translations
+
+* Dutch @Baklap4
+* Italian @Darkmagister
+* German @twollgam
+
+# Other
+
+* Lots of performance and memory fixes thanks @OznOg &amp; @twollgam
+* A good bit of the code is refactored into more readable and maintainable code thanks @twollgam
+* More improvements to Github Actions thanks to @ooshlablu &amp; @Lord-Kamina  &amp; @Baklap4
+
+# Notes
+
+On Windows you might want to enable UTF-8 support throughout the system. This way windows can support special characters within song paths. You can enable this by doing this:
+
+1. Windows btn + R -&gt; intl.cpl
+2. Hit the 2nd tab called "administritive"
+3. Hit the button "Change System Locale..."
+4. Tick the checkbox "Beta: Use Unicode UTF-8 for worldwide language support"
+5. Restart pc</description>
+      <url>https://github.com/performous/performous/releases/tag/1.3.0-rc1</url>
+      <artifacts>
+        <artifact type="source">
+          <location>https://github.com/performous/performous/archive/refs/tags/1.3.0-rc1.tar.gz</location>
+          <checksum type="sha256">46062a4fb813bcf47725750db148dcd8957b80db1fcdaee2537ce09bf813f6aa</checksum>
+          <size type="download">7687139</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.3.0-rc1/Performous-1.3.0-rc1-debian_10.deb</location>
+          <checksum type="sha256">95b2ce173c0186c448ffdfcfc7d18a54ccb1994b8465eb754543777a1b4e8149</checksum>
+          <size type="download">45385102</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.3.0-rc1/Performous-1.3.0-rc1-debian_11.deb</location>
+          <checksum type="sha256">754c0f0221ba360d94a2b7690f72885a9e64189dba9fd6c406d74cb6b907eecc</checksum>
+          <size type="download">38544006</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.3.0-rc1/Performous-1.3.0-rc1-debian_12.deb</location>
+          <checksum type="sha256">0cd631919c1bb76c51a2f43f4b9a7a05ddff201e636114cfdc9b2eddd8b61246</checksum>
+          <size type="download">37104304</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.3.0-rc1/Performous-1.3.0-rc1-fedora_35.rpm</location>
+          <checksum type="sha256">d62bbc2bdbc9ab9dc426afd467778050d4ba7ff4f23872b269facbacc1144449</checksum>
+          <size type="download">5005893</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.3.0-rc1/Performous-1.3.0-rc1-fedora_36.rpm</location>
+          <checksum type="sha256">ab51ecd19dba50e15a55ff4e9e75525cb33e5f6e0c2ef3eeae018b28b45d9a39</checksum>
+          <size type="download">5027950</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.3.0-rc1/Performous-1.3.0-rc1-fedora_37.rpm</location>
+          <checksum type="sha256">692997c55dda1e3f066be77e22d98022c0311794ea378538f0b4dc7602bd2768</checksum>
+          <size type="download">5045511</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.3.0-rc1/Performous-1.3.0-rc1-fedora_38.rpm</location>
+          <checksum type="sha256">033ae8994e70898c9297ca330782ec68d0be17ce4152a138a74ec39b2a655550</checksum>
+          <size type="download">5061120</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.3.0-rc1/Performous-1.3.0-rc1-mingw-w64.exe</location>
+          <checksum type="sha256">d7c4d46ae54762c8da3e11053bbc6c5b6fb5a198edbde537c6d988b357d0337d</checksum>
+          <size type="download">81150510</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.3.0-rc1/Performous-1.3.0-rc1-msvc.exe</location>
+          <checksum type="sha256">6b4f3efe8321488173910a7495b6d2399c4089473ca29dd8778d5be6ce395c21</checksum>
+          <size type="download">31152591</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.3.0-rc1/Performous-1.3.0-rc1-ubuntu_20.04.deb</location>
+          <checksum type="sha256">fceda563c8165648b3cb1b9489bb42b9114b2e125dc1d80e9471061590876274</checksum>
+          <size type="download">48848808</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.3.0-rc1/Performous-1.3.0-rc1-ubuntu_22.04.deb</location>
+          <checksum type="sha256">4f84388554cd9a477bc9e5fb145b0dc0815c55f16a54f02b7931807dd09e9482</checksum>
+          <size type="download">37703146</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.3.0-rc1/Performous-1.3.0-rc1.AppImage</location>
+          <checksum type="sha256">4300f80c54a7c4fcb909af313a8a555524342ea14cdfe271712d54950be4a2cc</checksum>
+          <size type="download">179102912</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.3.0-rc1/Performous-1.3.0-rc1.dmg</location>
+          <checksum type="sha256">0fc3b49a1b1c418d204d9d876cc9d489c5c8390067736f9af3d30f84a69177b8</checksum>
+          <size type="download">94067008</size>
+        </artifact>
+      </artifacts>
+    </release>
+    <release version="1.2.0" date="2022-03-27" type="stable">
+      <description>Now for real an official new version where we patched a couple of things from the rc1 version.
+
+It's been quite some time we've made a release (almost 6 years). Within this release we've mainly stabilized Performous and focused on automation and solving bugs.
+However there are also a few new features within this release!
+
+# Upcoming releases
+
+We've made some big gains in automation. This is why we're going to change the releasing strategy.
+With the upcoming release we'll have a release candidate. A release candidate will be a branch on its own (with a tag) where only hotfixes will be applied to.
+After a succesful testing period we'll then make a release. If the testing period is not succesful we'll create a new release candidate and repeat the testing.
+Once a release candidate is ready we'll make a release branch and tag that branch as the official release.
+
+We'll try to create more releases in less time. Preferably after every PR. As we always did we will use semver as version strategy.
+
+# New features
+
+- Webserver overhaul (@baklap4)
+    - _Not enabled on Windows builds._
+- Add song paths in game (@nieknooijens)
+- Configurable playlist duration (@nieknooijens)
+- Audio system overhaul (@Lord-Kamina)
+- Added Pro Mode to the drums (@earlye)
+- Metadata caching (@baklap4)
+- Changing languages from within the menu (@baklap4)
+- Windows installer (@baklap4)
+- Improved frequency detection while singing (@Tronic)
+- Note graph scaling: Static, dynamic (@twollgam)
+- Difficulty levels for singing (@isadofschi)
+- Proper support for Hi-DPI displays (@Lord-Kamina)
+- Auto-merging of duet tracks (@Lord-Kamina)
+
+# Bugfixes
+
+- Remembering sort order (@nieknooijens)
+- Fullscreen mode on MacOS (@Tronic)
+- Fix a crash in playlist screen when there was an empty playlist (@nieknooijens)
+- Several memory leaks (@OznOg)
+- Shortcuts in game representation (@baklap4)
+- Path screen selection on top (@OznOg)
+- Devices were off by one (@OznOg)
+- Missing cache entries (@OznOg)
+- Autodetecting webcam (@baklap4)
+- Pitchwave order is now based on score. Highest gets shown on top (@baklap4)
+- Fix a crash where a player gets more than 10k points (@baklap4)
+- Nav keys getting stuck (@Tronic)
+- Fixed a couple missing glyphs in the `Goblin One` font (@Lord-Kamina)
+- Updated version of `Droid Sans` font (@Lord-Kamina)
+- Default aspect ratio is now 16:9 (@Lord-Kamina)
+- Fix backward audio seeking (@OznOg)
+- Better error handling with corrupt files (@OznOg)
+
+# Translations
+
+- Dutch (@baklap4 &amp; @nieknooijens)
+- German (@twollgam)
+- French (@OznOg)
+- Spanish (@Lord-Kamina)
+- Hungarian (@skyli91)
+- Slovak (@jose1711)
+- Japanese (@nieknooijens)
+
+# Other
+
+- using c++ std more (@Tronic &amp; @OznOg)
+- Use libxml++3 or libxml++5 when available (@yoda-jm &amp; @baklap4)
+- Better unicode handling (@Lord-Kamina)
+- Change from OpenGL 2.1 to OpenGL 3.3 and fixed display issues on older intel GPUs (@Tronic, @Lord-Kamina)
+- CI + Artifacts (@baklap4, @Lord-Kamina, @deuteragenie, @ooshlablu)
+- Native compilation on Windows (@baklap4)
+- Lots of cmake fixes and cleanup (@OznOg, @Lord-Kamina, @yoda, @baklap4)
+- Refactoring (@twollgam)
+- Meson build support (@Tronic, @deuteragenie)
+- Using libglm instead of in-house math. (@Lord-Kamina)
+- Various fixes in the macOS bundling script (and better support for Homebrew) (@Lord-Kamina, @deuteragenie)
+
+# Notes
+
+On Windows you might want to enable UTF-8 support throughout the system. This way windows can support special characters within song paths. You can enable this by doing this:
+1. Windows btn + R -&gt; `intl.cpl`
+2. Hit the 2nd tab called "administritive"
+3. Hit the button "Change System Locale..."
+4. Tick the checkbox "Beta: Use Unicode UTF-8 for worldwide language support"
+5. Restart pc</description>
+      <url>https://github.com/performous/performous/releases/tag/1.2.0</url>
+      <artifacts>
+        <artifact type="source">
+          <location>https://github.com/performous/performous/archive/refs/tags/1.2.0.tar.gz</location>
+          <checksum type="sha256">c88438bb3b9400a2254a99284375157534ae38befc48ba27254bc3b9e7ef50ef</checksum>
+          <size type="download">7240476</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.2.0/Performous-1.2.0-fedora33.rpm</location>
+          <checksum type="sha256">6d43cea424e77262a37f032392627f075b06d1c73fd99db1be50c283ce6ee9e3</checksum>
+          <size type="download">4912500</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.2.0/Performous-1.2.0-fedora34.rpm</location>
+          <checksum type="sha256">1d4a85d53ad8a4d2d81073aea399237e1628b5900a72c6102c3c093f1f117ca7</checksum>
+          <size type="download">5015927</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.2.0/Performous-1.2.0-fedora35.rpm</location>
+          <checksum type="sha256">95ba0d8cf6100ee28dc48ab43ab5f38660cbb95495e09190c05f377d3d2ce673</checksum>
+          <size type="download">5011800</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.2.0/Performous-1.2.0-ubuntu1804.deb</location>
+          <checksum type="sha256">1da8524e037fab849b09902e3b09017bf95266887367f9817a8db45a8adb5384</checksum>
+          <size type="download">5738658</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.2.0/Performous-1.2.0-ubuntu2004.deb</location>
+          <checksum type="sha256">b1231fe1638c8c6b7725d7f0e001e4d4a9eb649f4deabac6ebe3108a22a257d8</checksum>
+          <size type="download">5742162</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.2.0/Performous-1.2.0-ubuntu2204.deb</location>
+          <checksum type="sha256">bf3dde7ec138372d7b8bcbf0cbfcbaa01feb7dcfb5b94a33b8dc01b73dc75eea</checksum>
+          <size type="download">5787600</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.2.0/Performous-1.2.0.dmg</location>
+          <checksum type="sha256">f633bedfb6b0f537cf4e886b26c7174e1e54a8b47302f1e82ac253bf1172dae5</checksum>
+          <size type="download">52368070</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.2.0/Performous-1.2.0.exe</location>
+          <checksum type="sha256">a3be06242bee5c38d8dceebd75ddd7e88e9f8f7fa32021644a32811c32354b90</checksum>
+          <size type="download">29816472</size>
+        </artifact>
+      </artifacts>
+    </release>
+    <release version="1.2.0-rc1" date="2021-09-22" type="development">
+      <description>It's been quite some time we've made a release (almost 6 years). Within this release we've mainly stabilized Performous and focused on automation and solving bugs.
+However there are also a few new features within this release!
+
+# Upcoming releases
+
+We've made some big gains in automation. This is why we're going to change the releasing strategy.
+With the upcoming release we'll have a release candidate. A release candidate will be a branch on its own (with a tag) where only hotfixes will be applied to.
+After a succesful testing period we'll then make a release. If the testing period is not succesful we'll create a new release candidate and repeat the testing.
+Once a release candidate is ready we'll make a release branch and tag that branch as the official release.
+
+We'll try to create more releases in less time. Preferably after every PR. As we always did we will use semver as version strategy.
+
+# New features
+
+- Webserver overhaul (@baklap4)
+- Add song paths in game (@nieknooijens)
+- Configurable playlist duration (@nieknooijens)
+- Audio system overhaul (@Lord-Kamina)
+- Added Pro Mode to the drums (@earlye)
+- Metadata caching (@baklap4)
+- Changing languages from within the menu (@baklap4)
+- Windows installer (@baklap4)
+- Improved frequency detection while singing (@Tronic)
+- Note graph scaling: Static, dynamic (@twollgam)
+- Difficulty levels for singing (@isadofschi)
+- Proper support for Hi-DPI displays (@Lord-Kamina)
+- Auto-merging of duet tracks (@Lord-Kamina)
+
+# Bugfixes
+
+- Remembering sort order (@nieknooijens)
+- Fullscreen mode on MacOS (@Tronic)
+- Fix a crash in playlist screen when there was an empty playlist (@nieknooijens)
+- Several memory leaks (@OznOg)
+- Shortcuts in game representation (@baklap4)
+- Path screen selection on top (@OznOg)
+- Devices were off by one (@OznOg)
+- Missing cache entries (@OznOg)
+- Autodetecting webcam (@baklap4)
+- Pitchwave order is now based on score. Highest gets shown on top (@baklap4)
+- Fix a crash where a player gets more than 10k points (@baklap4)
+- Nav keys getting stuck (@Tronic)
+- Fixed a couple missing glyphs in the `Goblin One` font (@Lord-Kamina)
+- Updated version of `Droid Sans` font (@Lord-Kamina)
+- Default aspect ratio is now 16:9 (@Lord-Kamina)
+- Fix backward audio seeking (@OznOg)
+- Better error handling with corrupt files (@OznOg)
+
+# Translations
+
+- Dutch (@baklap4 &amp; @nieknooijens)
+- German (@twollgam)
+- French (@OznOg)
+- Spanish (@Lord-Kamina)
+- Hungarian (@skyli91)
+- Slovak (@jose1711)
+- Japanese (@nieknooijens)
+
+# Other
+
+- using c++ std more (@Tronic &amp; @OznOg)
+- Use libxml++3 or libxml++5 when available (@yoda-jm &amp; @baklap4)
+- Better unicode handling (@Lord-Kamina)
+- Change from OpenGL 2.1 to OpenGL 3.3 and fixed display issues on older intel GPUs (@Tronic, @Lord-Kamina)
+- CI + Artifacts (@baklap4, @Lord-Kamina, @deuteragenie, @ooshlablu)
+- Native compilation on Windows (@baklap4)
+- Lots of cmake fixes and cleanup (@OznOg, @Lord-Kamina, @yoda, @baklap4)
+- Refactoring (@twollgam)
+- Meson build support (@Tronic, @deuteragenie)
+- Using libglm instead of in-house math. (@Lord-Kamina)
+- Various fixes in the macOS bundling script (and better support for Homebrew) (@Lord-Kamina, @deuteragenie)
+
+# Notes
+
+On Windows you might want to enable UTF-8 support throughout the system. This way windows can support special characters within song paths. You can enable this by doing this:
+1. Windows btn + R -&gt; `intl.cpl`
+2. Hit the 2nd tab called "administritive"
+3. Hit the button "Change System Locale..."
+4. Tick the checkbox "Beta: Use Unicode UTF-8 for worldwide language support"
+5. Restart pc</description>
+      <url>https://github.com/performous/performous/releases/tag/1.2.0-rc1</url>
+      <artifacts>
+        <artifact type="source">
+          <location>https://github.com/performous/performous/archive/refs/tags/1.2.0-rc1.tar.gz</location>
+          <checksum type="sha256">a3c0d559604207b872baf78d62a99a3dc60d2e4612efbfed6dfa9f5d39c6214f</checksum>
+          <size type="download">7240502</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.2.0-rc1/Performous-1.2.0-rc1-fedora32.rpm</location>
+          <checksum type="sha256">ca7c9e19ff5f6ae0a67b99281910b14f122c63a7a20ba1e73a916201c1c56b3b</checksum>
+          <size type="download">4967149</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.2.0-rc1/Performous-1.2.0-rc1-fedora33.rpm</location>
+          <checksum type="sha256">352983d411190aea33a73df92b12544fbd8a812dc7fd407f07c6a95813a3b082</checksum>
+          <size type="download">4912958</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.2.0-rc1/Performous-1.2.0-rc1-fedora34.rpm</location>
+          <checksum type="sha256">76c2fdb96156cdfd5def7585959925c322711b6c5e039a74fee5897b23d8976e</checksum>
+          <size type="download">5018508</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.2.0-rc1/Performous-1.2.0-rc1-ubuntu1804.deb</location>
+          <checksum type="sha256">6edfb0c960b406b0066a416e50a031a95ce8e48a95c322b6e8ea10e5dc39db76</checksum>
+          <size type="download">5737194</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.2.0-rc1/Performous-1.2.0-rc1-ubuntu2004.deb</location>
+          <checksum type="sha256">d37a747a6746a81ca4ae8843b218cc514db3952f90d2e8021f64c9ad186f6bcb</checksum>
+          <size type="download">5740506</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.2.0-rc1/Performous-1.2.0-rc1-ubuntu2104.deb</location>
+          <checksum type="sha256">2722be8f7756bd99087e1bab49e2950374819f35eff678deae1a8d2715776c5a</checksum>
+          <size type="download">5796526</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.2.0-rc1/Performous-1.2.0-rc1.dmg</location>
+          <checksum type="sha256">b59c748575c331cdc779003aaa2c68f06fc239771985ecc2a94804b79f6b5d4f</checksum>
+          <size type="download">55089665</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.2.0-rc1/Performous-1.2.0-rc1.exe</location>
+          <checksum type="sha256">06179eddff5ea1fca48f9031c66011f55abff8a4ea00e0034787cb3f24d0fc8f</checksum>
+          <size type="download">29710403</size>
+        </artifact>
+      </artifacts>
+    </release>
+    <release version="1.1" date="2016-01-23" type="stable">
+      <description>This is mostly a bugfix release. But there are some small new features as well:
+- You can now enable a "center channel suppressor" (poor-man's karaoke) in the options of with Ctrl+C (thanks to Matthias Keysermann)
+- You can now use up to 8 microphones (thanks to Arjan Spieard)
+- Startup errors are not silent anymore (you get an error dialog)
+- Support for more controllers was added
+- On dual-GPU systems we request the high-performance GPU
+
+And some bugfixes:
+- UTF-8 encoded files with BOM are handled correctly (in all text files)
+- Fixed some OpenGL issues with shaders especially on Intel card
+- Fixed font loading: Pango is now used on all platforms, so Performous should look the same everywhere
+- More minor fixes (OS X build, clan build, fixes for crashes)
+
+Under the hood we now support compiling with newer ffmpeg versions and switched from GLEW to libepoxy, which should make GL support a bit more robust across all hardware.
+</description>
+      <url>https://github.com/performous/performous/releases/tag/1.1</url>
+      <artifacts>
+        <artifact type="source">
+          <location>https://github.com/performous/performous/archive/refs/tags/1.1.tar.gz</location>
+          <checksum type="sha256">17d47da4092ffa0dc2087f69b8b9d4f920aa7d16ee80020bb5445f95d22b6a71</checksum>
+          <size type="download">3965473</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.1/Performous-1.1.dmg</location>
+          <checksum type="sha256">5f7e9f728bfb1e045158a6b9bbd278dd3c16471af69ffd9d3ce044089881102d</checksum>
+          <size type="download">42271136</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.1/Performous-1.1.exe</location>
+          <checksum type="sha256">b8c4530ff91e5c4794002e2a37dbf66792b3d9454f4d72bcfc76d0b4ee4a2277</checksum>
+          <size type="download">16459864</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.1/performous-dbg_1.1.git150721-1build1_amd64.deb</location>
+          <checksum type="sha256">a8cf9f5218af7fdca5f00895d4ca6db8279f841ebf41fd3a582172df757a9f79</checksum>
+          <size type="download">16788052</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.1/performous-tools_1.1.git150721-1build1_amd64.deb</location>
+          <checksum type="sha256">b92ab3957b957d50cd4c47908d293c7d831fff82696d7214c6d4b6bb944980ba</checksum>
+          <size type="download">148662</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.1/performous_1.1.git150721-1build1_amd64.deb</location>
+          <checksum type="sha256">7aa7ff8df89972443550a1c0c7036ab2988e2f0b7410281ab843878a18f45c19</checksum>
+          <size type="download">3856428</size>
+        </artifact>
+      </artifacts>
+    </release>
+    <release version="1.0" date="2014-11-01" type="stable">
+      <description>This release comes with some new features and quite a lot of changes "under the hood".
+Most notable for user, we have a working Windows and OS X release again.
+This brings Windows users all the cool features from the 0.7.0 release like duet-mode
+and everything this release has to offer!
+- We have a new song browser menu
+- You can now build playlists, so you don't have to return to the songbrowser between songs!
+- There is now experimental support for microphone pass-through, so you don't have to fiddle with ALSA or such stuff, just enable it in the settings and "enjoy" hearing your own voice through the speakers!
+- The duet mode is better than ever, we fixed some corner cases and show microphone icons in duet menu, so you know which microphone has to sing which part before staring the song
+
+Performous was changed to use SDL2 instead of SDL, which should give a much better experience with fullscreen among other things.
+</description>
+      <url>https://github.com/performous/performous/releases/tag/1.0</url>
+      <artifacts>
+        <artifact type="source">
+          <location>https://github.com/performous/performous/archive/refs/tags/1.0.tar.gz</location>
+          <checksum type="sha256">da9f39d281dbfe0849897dc98dc72cfc5a54be53f67c29b6430e57aefcc86b50</checksum>
+          <size type="download">3950246</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.0/Performous-1.0.dmg</location>
+          <checksum type="sha256">9312bbcbbca4a6097eddead769b69ed082668244ddc82fe5716191aa2eb8af9d</checksum>
+          <size type="download">44126884</size>
+        </artifact>
+        <artifact type="binary">
+          <location>https://github.com/performous/performous/releases/download/1.0/Performous-1.0.exe</location>
+          <checksum type="sha256">53df1aef532e4524bcf6e48d9f0f57a9d9f2f848b2ac286f8f82c48ed4e4a672</checksum>
+          <size type="download">15195181</size>
+        </artifact>
+      </artifacts>
+    </release>
+  </releases>
+</component>

@@ -43,7 +43,7 @@ RUN <<EOR
 		libboost-iostreams-dev libboost-locale-dev libboost-system-dev \
 		libboost-program-options-dev libssl-dev libcpprest-dev \
 		libportmidi-dev libopencv-dev libaubio-dev nlohmann-json3-dev \
-		libfmt-dev ca-certificates file libgmock-dev libgtest-dev
+		libfmt-dev ca-certificates file libgmock-dev libgtest-dev itstool
 	apt-get clean
 	mkdir -p /root/performous
 EOR
