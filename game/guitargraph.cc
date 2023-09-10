@@ -420,12 +420,12 @@ void GuitarGraph::engine() {
 	if (!m_drums) {
 		// FIXME: Why do we have per-fret hold handling, why not just as a part of the current chord?
 		// FIXME: Use polyphony from proper chord (which isn't always m_chordIt); now it only counts frets currently held
-		unsigned count = 0, polyphony = 0;
+		unsigned count = 0;
 		bool holds = false;
 		for (unsigned fret = 0; fret < m_pads; ++fret) {
 			if (!m_holds[fret]) continue;
 			holds = true;
-			++polyphony;
+			// ++polyphony;
 			Event& ev = m_events[m_holds[fret] - 1];
 			ev.glow.setTarget(1.0, true);
 			// Whammy animvalue mangling
