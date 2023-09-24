@@ -39,7 +39,7 @@ class Song {
 	friend class SongParser;
 public:
 	/// Is the song parsed from the file yet?
-	enum class LoadStatus { NONE, HEADER, FULL } loadStatus = LoadStatus::NONE;
+	enum class LoadStatus { NONE = 0, HEADER = 1, FULL = 2, ERROR = -1 } loadStatus = LoadStatus::NONE;
 	/// status of song
 	enum class Status { NORMAL, INSTRUMENTAL_BREAK, FINISHED };
 	VocalTracks vocalTracks; ///< notes for the sing part

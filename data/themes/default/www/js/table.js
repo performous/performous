@@ -1,4 +1,4 @@
-/*
+﻿/*
     Helper functions for tables.
 */
 "use strict";
@@ -24,6 +24,8 @@ function buildTable(database) {
         r[++j] = database[key].Edition;
         r[++j] = "</td><td class='hidden-xs hidden-sm hidden-md'>";
         r[++j] = database[key].Creator;
+        r[++j] = "</td><td class='hidden-xs hidden-sm hidden-md'>";
+        r[++j] = database[key].HasError ? "⚠️" : "";
         r[++j] = "</td><td class='text-right text-nowrap fixed-pixel-glyphicon'>";
         r[++j] = "<span class='glyphicon glyphicon-plus'></span>";
         r[++j] = "</td></tr>";

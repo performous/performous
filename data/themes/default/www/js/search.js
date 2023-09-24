@@ -1,4 +1,4 @@
-/*
+﻿/*
     Scripts related to the search tab.
     Most of these are click events on the search tab.
 */
@@ -53,7 +53,8 @@ $("#search-database").click(function (e, callback) {
                 var songMeta = "";
                 songMeta += songObject.Language.length > 0 ? " | " + songObject.Language : "";
                 songMeta += songObject.Edition.length > 0 ? " | " + songObject.Edition : "";
-                $("#searched-songs").append("<a href=\"#\" id=\"searched-songs-" + iterator + "\" class=\"list-group-item\" >" + songObject.Artist + " - " + songObject.Title + songMeta + "<span class=\"glyphicon glyphicon-plus\"></span></a>");
+                var errorMeta = songObject.HasError ? "⚠️" : "";
+                $("#searched-songs").append("<a href=\"#\" id=\"searched-songs-" + iterator + "\" class=\"list-group-item\" >" + errorMeta + songObject.Artist + " - " + songObject.Title + songMeta + "<span class=\"glyphicon glyphicon-plus\"></span></a>");
                 $("#searched-songs-"+iterator).data("songObject", JSON.stringify(songObject));
             });
 
@@ -84,7 +85,8 @@ $("#search-database").click(function (e, callback) {
                 var songMeta = "";
                 songMeta += songObject.Language.length > 0 ? " | " + songObject.Language : "";
                 songMeta += songObject.Edition.length > 0 ? " | " + songObject.Edition : "";
-                $("#searched-songs").append("<a href=\"#\" id=\"searched-songs-" + iterator + "\" class=\"list-group-item\" >" + songObject.Artist + " - " + songObject.Title + songMeta + "<span class=\"glyphicon glyphicon-plus\"></span></a>");
+                var errorMeta = songObject.HasError ? "⚠️" : "";
+                $("#searched-songs").append("<a href=\"#\" id=\"searched-songs-" + iterator + "\" class=\"list-group-item\" >" + errorMeta + songObject.Artist + " - " + songObject.Title + songMeta + "<span class=\"glyphicon glyphicon-plus\"></span></a>");
                 $("#searched-songs-"+iterator).data("songObject", JSON.stringify(songObject));
             });
 

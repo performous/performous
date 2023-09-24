@@ -23,6 +23,11 @@ void SongParser::txtParseHeader() {
 	s.insertVocalTrack(TrackName::VOCAL_LEAD, VocalTrack(TrackName::VOCAL_LEAD)); // Dummy note to indicate there is a track
 	while (getline(line) && txtParseField(line)) {}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
+	if (!fs::exists(s.music[TrackName::BGMUSIC]))
+	{
+		s.loadStatus = Song::LoadStatus::ERROR;
+		std::clog << "songparser/error: Required MP3 '" << s.music[TrackName::BGMUSIC].string() << "' file isn't available." << std::endl;
+	}
 	if (m_bpm != 0.0f) addBPM(0, m_bpm);
 }
 
@@ -121,8 +126,8 @@ bool SongParser::txtParseField(std::string const& line) {
 	else if (key == "GENRE") m_song.genre = value.substr(value.find_first_not_of(" "));
 	else if (key == "CREATOR") m_song.creator = value.substr(value.find_first_not_of(" "));
 	else if (key == "COVER") m_song.cover = absolute(value, m_song.path);
-	else if (key == "MP3") m_song.music["background"] = absolute(value, m_song.path);
-	else if (key == "VOCALS") m_song.music["vocals"] = absolute(value, m_song.path);
+	else if (key == "MP3") m_song.music[TrackName::BGMUSIC] = absolute(value, m_song.path);
+	else if (key == "VOCALS") m_song.music[TrackName::VOCAL_LEAD] = absolute(value, m_song.path);
 	else if (key == "VIDEO") m_song.video = absolute(value, m_song.path);
 	else if (key == "BACKGROUND") m_song.background = absolute(value, m_song.path);
 	else if (key == "START") assign(m_song.start, value);

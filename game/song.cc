@@ -44,7 +44,8 @@ Song::Song(nlohmann::json const& song): dummyVocal(TrackName::VOCAL_LEAD), rando
 	music[TrackName::KEYBOARD] = getJsonEntry<std::string>(song, "keyboard").value_or("");
 	music[TrackName::GUITAR_COOP] = getJsonEntry<std::string>(song, "guitarCoop").value_or("");
 	music[TrackName::GUITAR_RHYTHM] = getJsonEntry<std::string>(song, "guitarRhythm").value_or("");
-	loadStatus = Song::LoadStatus::HEADER;
+	loadStatus = static_cast<Song::LoadStatus>(getJsonEntry<int>(song, "loadStatus").value_or(1));
+	//loadStatus = Song::LoadStatus::HEADER;
 
 	for (size_t i = 0; i < getJsonEntry<size_t>(song, "vocalTracks").value_or(0); i++) {
 		std::string track = "DummyTrack" + std::to_string(i);
@@ -192,7 +193,7 @@ VocalTrack& Song::getVocalTrack(unsigned idx) {
 double Song::getDurationSeconds() {
 	if(m_duration == 0.0 || m_duration < 1.0) {
 		AVFormatContext *pFormatCtx = avformat_alloc_context();
-		if (avformat_open_input(&pFormatCtx, music["background"].string().c_str(), nullptr, nullptr) == 0) {
+		if (avformat_open_input(&pFormatCtx, music[TrackName::BGMUSIC].string().c_str(), nullptr, nullptr) == 0) {
 			avformat_find_stream_info(pFormatCtx, nullptr);
 			m_duration = static_cast<double>(pFormatCtx->duration) / static_cast<double>(AV_TIME_BASE);
 			avformat_close_input(&pFormatCtx);

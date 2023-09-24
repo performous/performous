@@ -218,9 +218,16 @@ void ScreenSongs::update() {
 
 bool ScreenSongs::addSong() {
 	auto& pl = getGame().getCurrentPlayList();
-	bool empty = pl.getList().empty();
-	pl.addSong(m_songs.currentPtr());
-	return empty;
+	auto song = m_songs.currentPtr();
+	if (song->loadStatus != Song::LoadStatus::ERROR) {
+		pl.addSong(song);
+	}
+	else {
+		getGame().dialog(_("Song load status is error. Please check what's wrong with it."));
+	}
+	auto size = pl.getList().size();
+
+	return size == 1;
 }
 
 void ScreenSongs::sing() {
