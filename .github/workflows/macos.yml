@@ -24,7 +24,7 @@ jobs:
   # Create the MacOS dmg
   MacOS_Packages:
     name: Create MacOS dmg
-    runs-on: macos-latest
+    runs-on: macos-13
     env:
       MACOS_DEPS: >-
         aubio
