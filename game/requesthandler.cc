@@ -131,6 +131,7 @@ void RequestHandler::Get(web::http::http_request request)
             songObject[utility::conversions::to_string_t("Language")] = web::json::value::string(utility::conversions::to_string_t(song->language));
             songObject[utility::conversions::to_string_t("Creator")] = web::json::value::string(utility::conversions::to_string_t(song->creator));
             songObject[utility::conversions::to_string_t("Duration")] = web::json::value(song->getDurationSeconds());
+            songObject[utility::conversions::to_string_t("HasError")] = web::json::value::boolean(song->loadStatus == Song::LoadStatus::ERROR);
             jsonRoot[i] = songObject;
             i++;
         }
@@ -169,7 +170,13 @@ void RequestHandler::Post(web::http::http_request request)
         if(!songPointer) {
             request.reply(web::http::status_codes::NotFound, "Song \"" + utility::conversions::to_utf8string(jsonPostBody[utility::conversions::to_string_t("Artist")].as_string()) + " - " + utility::conversions::to_utf8string(jsonPostBody[utility::conversions::to_string_t("Title")].as_string()) + "\" was not found.");
             return;
-        } else {
+        }
+        else if (songPointer->loadStatus == Song::LoadStatus::ERROR)
+        {
+            request.reply(web::http::status_codes::NotFound, "Song \"" + utility::conversions::to_utf8string(jsonPostBody[utility::conversions::to_string_t("Artist")].as_string()) + " - " + utility::conversions::to_utf8string(jsonPostBody[utility::conversions::to_string_t("Title")].as_string()) + "\" Song load status is error. Please check what's wrong with it.");
+            return;
+        }
+        else {
             std::clog << "requesthandler/debug: Adding " << songPointer->artist << " - " << songPointer->title << " to the playlist " << std::endl;
             m_game.getCurrentPlayList().addSong(songPointer);
             ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(m_game.getScreen("Playlist"));
@@ -236,6 +243,7 @@ void RequestHandler::Post(web::http::http_request request)
             songObject[utility::conversions::to_string_t("Edition")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->edition));
             songObject[utility::conversions::to_string_t("Language")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->language));
             songObject[utility::conversions::to_string_t("Creator")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->creator));
+            songObject[utility::conversions::to_string_t("HasError")] = web::json::value::boolean(m_songs[i]->loadStatus == Song::LoadStatus::ERROR);
             jsonRoot[i] = songObject;
         }
         request.reply(web::http::status_codes::OK, jsonRoot);
@@ -284,6 +292,7 @@ web::json::value RequestHandler::SongsToJsonObject() {
         songObject[utility::conversions::to_string_t("Language")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->language));
         songObject[utility::conversions::to_string_t("Creator")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->creator));
         songObject[utility::conversions::to_string_t("name")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->artist + " " + m_songs[i]->title));
+        songObject[utility::conversions::to_string_t("HasError")] = web::json::value::boolean(m_songs[i]->loadStatus == Song::LoadStatus::ERROR);
         jsonRoot[i] = songObject;
     }
 
@@ -358,7 +367,8 @@ std::vector<std::string> RequestHandler::GetTranslationKeys() {
 		translate_noop("Failed moving song down!"),
 		translate_noop("Successfully added song to the playlist."),
 		translate_noop("Failed adding song to the playlist!"),
-		translate_noop("No songs found with current filter.")
+		translate_noop("No songs found with current filter."),
+        translate_noop("Has error")
 	};
 
 	return tranlationKeys;

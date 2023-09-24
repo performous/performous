@@ -253,6 +253,7 @@ void Songs::CacheSonglist() {
 		songObject["drumTracks"] = song->hasDrums();
 		songObject["danceTracks"] = song->hasDance();
 		songObject["guitarTracks"] = song->hasGuitars();
+		songObject["loadStatus"] = static_cast<int>(song->loadStatus);
 		if(songObject != nlohmann::json::object()) {
 			jsonRoot.push_back(songObject);
 		}

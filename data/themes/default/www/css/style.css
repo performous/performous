@@ -27,10 +27,6 @@
     width:14px;
 }
 
-.fixed-pixel-glyphicon {
-    width: 31px;
-}
-
 td {
     max-width: 0;
     overflow: hidden;

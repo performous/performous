@@ -112,8 +112,10 @@ SongParser::SongParser(Song& s): m_song(s) {
 		}
 		guessFiles();
 		if (!m_song.midifilename.empty()) {midParseHeader(); }
-
-		s.loadStatus = Song::LoadStatus::HEADER;
+		if(s.loadStatus != Song::LoadStatus::ERROR)
+		{
+			s.loadStatus = Song::LoadStatus::HEADER;
+		}
 	} catch (SongParserException&) {
 		throw;
 	} catch (std::runtime_error& e) {
