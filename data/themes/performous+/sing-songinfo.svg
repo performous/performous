@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.0"
+   width="1000"
+   height="800"
+   id="svg3465"
+   sodipodi:version="0.32"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   sodipodi:docname="sing-songinfo.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <metadata
+     id="metadata3115">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     inkscape:window-height="1017"
+     inkscape:window-width="1920"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     guidetolerance="10.0"
+     gridtolerance="10.0"
+     objecttolerance="10.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base"
+     showgrid="false"
+     inkscape:zoom="0.67625"
+     inkscape:cx="312.70678"
+     inkscape:cy="281.32174"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:current-layer="svg3465"
+     inkscape:window-maximized="1"
+     inkscape:pagecheckerboard="true" />
+  <defs
+     id="defs3467">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 300 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="800 : 300 : 1"
+       inkscape:persp3d-origin="400 : 200 : 1"
+       id="perspective9" />
+  </defs>
+  <text
+     xml:space="preserve"
+     id="timer_text"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.70819187px;line-height:0%;font-family:'Droid Sans Mono';text-align:start;text-anchor:start;display:inline;fill:#ffffff;fill-opacity:0;stroke:#000000;stroke-width:0.35300532;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0;"
+     y="53.911625"
+     x="8.2869492"
+     transform="scale(1.1354379,0.88071748)"><tspan
+       id="tspan4717"
+       y="56.371544"
+       x="8.2869492"
+       style="font-size:14.12021351px;text-align:start;text-anchor:start;fill:#ffffff;fill-opacity:0;stroke:#000000;stroke-width:0.35300532;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0;">00:00</tspan></text>
+  <!--       style="font-size:25px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;opacity:1;fill:black;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.56078384;display:inline;font-family:Droid Sans Mono"
+-->
+  <text
+     xml:space="preserve"
+     id="timer_text-5"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:15.99999998px;line-height:0%;font-family:FreeSans;text-align:start;text-anchor:start;display:inline;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.34604928;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.47058824;-inkscape-font-specification:'FreeSans, Bold';writing-mode:lr;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;"
+     y="38.431652"
+     x="727.9519"
+     transform="scale(1.2106374,0.82601116)"><tspan
+       id="tspan4717-7"
+       y="40.84309"
+       x="727.9519"
+       style="font-size:15.99999998px;text-align:start;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.34604928;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.47058824;-inkscape-font-specification:'FreeSans, Bold';font-family:FreeSans;font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal;writing-mode:lr;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;">00:00</tspan></text>
+  <text
+     xml:space="preserve"
+     id="timer_text-1"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:21.3333333px;line-height:0%;font-family:FreeSans;text-align:start;text-anchor:start;display:inline;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.65597421;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.47058824;-inkscape-font-specification:'FreeSans, Bold';writing-mode:lr;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;"
+     y="917.49847"
+     x="32.476929"
+     transform="scale(1.2106374,0.82601116)"><tspan
+       id="tspan4717-2"
+       y="922.06946"
+       x="32.476929"
+       style="font-size:21.3333333px;text-align:start;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.65597421;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.47058824;-inkscape-font-specification:'FreeSans, Bold';font-family:FreeSans;font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal;writing-mode:lr;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;">00:00</tspan></text>
+</svg>

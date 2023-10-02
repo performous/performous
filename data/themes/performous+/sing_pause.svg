@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="500"
+   height="400"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   version="1.0"
+   sodipodi:docname="sing_pause.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+     id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective10" />
+    <inkscape:perspective
+       id="perspective2963"
+       inkscape:persp3d-origin="88 : 58.666667 : 1"
+       inkscape:vp_z="176 : 88 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 88 : 1"
+       sodipodi:type="inkscape:persp3d" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="-30.397829"
+     inkscape:cy="233.3315"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,80)">
+    <rect
+       style="fill:#000000;fill-opacity:0.65016502;stroke:none;stroke-width:1.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect2383"
+       width="478.5"
+       height="378.5"
+       x="10.75"
+       y="-69.25"
+       rx="53.877144"
+       ry="55.004662" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:53.3966217px;line-height:0%;font-family:'Droid Sans Mono';-inkscape-font-specification:'Droid Sans Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:4.44971848"
+       x="125.80161"
+       y="2.3047173"
+       id="text3179"
+       transform="scale(0.93017475,1.0750668)"><tspan
+         sodipodi:role="line"
+         id="tspan3181"
+         x="125.80161"
+         y="2.3047173"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:53.3966217px;line-height:1.25;font-family:'Droid Sans Mono';-inkscape-font-specification:'Droid Sans Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke-width:4.44971848">QUIT NOW?</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.79019928px;line-height:0%;font-family:'Droid Sans Mono';-inkscape-font-specification:'Droid Sans Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:2.06584978"
+       x="104.14982"
+       y="245.64513"
+       id="text2817"><tspan
+         sodipodi:role="line"
+         x="104.14982"
+         y="245.64513"
+         id="tspan2823"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.79019928px;line-height:1.25;font-family:'Droid Sans Mono';-inkscape-font-specification:'Droid Sans Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke-width:2.06584978">Enter/Start to quit</tspan><tspan
+         sodipodi:role="line"
+         x="104.14982"
+         y="276.63287"
+         id="tspan2821"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.79019928px;line-height:1.25;font-family:'Droid Sans Mono';-inkscape-font-specification:'Droid Sans Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke-width:2.06584978"> </tspan></text>
+    <g
+       id="g2966"
+       transform="translate(159.78738,34.3101)"
+       style="fill:#ffffff">
+      <path
+         id="path2955"
+         d="M 0,87.7 C 0,39.2 39.2,0 87.7,0 l 0,0 v 15 15 c -16,0 -30.3,6.4 -40.8,16.9 l 0,0 C 36.4,57.4 30,71.7 30,87.7 l 0,0 c 0,16 6.4,30.3 16.9,40.8 l 0,0 c 10.5,10.5 24.8,16.9 40.8,16.9 l 0,0 c 16,0 30.3,-6.4 40.8,-16.9 l 0,0 C 139,118 145.4,103.7 145.4,87.7 l 0,0 c 0,-16 -6.4,-30.3 -16.9,-40.8 l 0,0 C 118,36.4 103.6,30 87.7,30 l 0,0 V 15 0 c 48.4,0 87.7,39.2 87.7,87.7 l 0,0 c 0,48.4 -39.2,87.7 -87.7,87.7 l 0,0 C 39.2,175.3 0,136.1 0,87.7 l 0,0 z"
+         style="fill:#ffffff" />
+      <path
+         id="path2957"
+         d="m 72.7,115.4 v -55 c 0,-8.3 6.7,-15 15,-15 l 0,0 c 8.3,0 15,6.7 15,15 l 0,0 v 55 c 0,8.3 -6.7,15 -15,15 l 0,0 c -8.3,0 -15,-6.8 -15,-15 l 0,0 z"
+         style="fill:#ffffff" />
+    </g>
+  </g>
+</svg>

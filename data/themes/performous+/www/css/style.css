@@ -1,0 +1,95 @@
+.header {
+    background: #393939;
+    color: #FFFFFF;
+    height: 35px;
+    line-height: 35px;
+    font-weight: bold;
+}
+
+.navbar-nav {
+    width:100%;
+}
+
+.navbar-nav li {
+    width: 33.3333333%;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.glyph-centered {
+    display:block;
+    text-align:center;
+}
+
+.list-group-item .glyphicon {
+    text-align: right;
+    float:right;
+    width:14px;
+}
+
+.fixed-pixel-glyphicon {
+    width: 31px;
+}
+
+td {
+    max-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#playlist-song-modal-body span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.btn:last-child {
+    margin-bottom: 15px;
+}
+
+.drag-drop a {
+    background-color: #fff;
+}
+.drag-drop .sortable-ghost {
+    opacity: 0.4;
+    background-color: #F4E2C9;
+}
+
+.drag-drop a:first-letter {
+    text-transform: uppercase;
+}
+
+.validation-summary-valid.alert-danger {
+    display: none;
+}
+
+.navbar-default {
+    background-image: -webkit-linear-gradient(top,#393939 0,#393939 100%);
+    background-image: -o-linear-gradient(top,#393939 0,#393939 100%);
+    background-image: -webkit-gradient(linear,left top,left bottom,from(#393939),to(#393939));
+    background-image: linear-gradient(to top,#393939 0,#393939 100%);
+    background-color: #393939;
+    border-color: #393939;
+    border-radius: 0px;
+}
+.navbar-default .navbar-nav>.active>a {
+    background-image: -webkit-linear-gradient(top,#61A0CD 0,#61A0CD 100%);
+    background-image: -o-linear-gradient(top,#61A0CD 0,##61A0CD 100%);
+    background-image: -webkit-gradient(linear,left top,left bottom,from(#61A0CD),to(#61A0CD));
+    background-image: linear-gradient(to bottom,#61A0CD 0,#61A0CD 100%);
+    background-color: #61A0CD;
+    border-radius: 0px;
+}
+
+.navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:focus, .navbar-default .navbar-nav>.active>a:hover {
+    color: #FFFFFF;
+}
+
+.navbar-default .navbar-nav>li>a, .navbar-default .navbar-nav>li>a:focus, .navbar-default .navbar-nav>li>a:hover {
+    color: #FFFFFF;
+}
+
+.btn-secondary:hover {
+    background-color: #61A0CD;
+}
