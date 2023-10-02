@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="658.31732"
+   height="378.5"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.48.3.1 r9886"
+   version="1.0"
+   sodipodi:docname="instrumentmenu_bg.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient3897">
+      <stop
+         id="stop3899"
+         offset="0"
+         style="stop-color:#ffffff;stop-opacity:0.88554215;" />
+      <stop
+         style="stop-color:#b0b0b0;stop-opacity:0.78313255;"
+         offset="0.30000001"
+         id="stop3903" />
+      <stop
+         id="stop3901"
+         offset="1"
+         style="stop-color:#0e0f11;stop-opacity:0.83734941;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3879">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop3881" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop3883" />
+    </linearGradient>
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective10" />
+    <inkscape:perspective
+       id="perspective2963"
+       inkscape:persp3d-origin="88 : 58.666667 : 1"
+       inkscape:vp_z="176 : 88 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 88 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <radialGradient
+       r="500"
+       fy="757.60583"
+       fx="727.25122"
+       cy="757.60583"
+       cx="727.25122"
+       gradientTransform="matrix(0.43355171,-0.84504566,1.805509,0.92631863,-980.8803,536.04792)"
+       gradientUnits="userSpaceOnUse"
+       id="radialGradient3750"
+       xlink:href="#linearGradient3629-3"
+       inkscape:collect="always" />
+    <linearGradient
+       id="linearGradient3629-3">
+      <stop
+         style="stop-color:#00cbff;stop-opacity:0.8012048;"
+         offset="0"
+         id="stop3631-1" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0.88554215;"
+         offset="1"
+         id="stop3633-4" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.49497475"
+     inkscape:cx="-77.406281"
+     inkscape:cy="220.56135"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1053"
+     inkscape:window-x="0"
+     inkscape:window-y="-1"
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(369.06735,69.25)">
+    <rect
+       style="opacity:0.79237288;fill:#000000;fill-opacity:1;stroke:none"
+       id="rect2383"
+       width="658.31732"
+       height="378.5"
+       x="-369.06735"
+       y="-69.25"
+       rx="31.697433"
+       ry="31.697433" />
+  </g>
+</svg>
