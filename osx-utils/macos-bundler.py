@@ -69,7 +69,10 @@ def check_installed_port(name : str, file : str) -> Optional[str]:
 	p = subprocess.run(args = ["port", "contents", name], encoding="utf-8", capture_output=True)
 	if p.returncode == 0:
 		p2 = subprocess.run(args = ["grep", file], encoding="utf-8", capture_output=True, input=p.stdout)
-		return str(str_to_path(p2.stdout.strip()).parent.parent)
+		if p2.returncode == 0:
+			return str(str_to_path(p2.stdout.strip()).parent.parent)
+		else:
+			return None
 	else:
 		return None
 
