@@ -25,7 +25,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
       <cc:Work
          rdf:about="">
@@ -38,8 +38,8 @@
   <defs
      id="defs5" />
   <sodipodi:namedview
-     inkscape:window-height="801"
-     inkscape:window-width="1439"
+     inkscape:window-height="1017"
+     inkscape:window-width="1920"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      guidetolerance="10.0"
@@ -49,9 +49,9 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="6.1666667"
-     inkscape:cx="-15.432432"
-     inkscape:cy="75.341373"
+     inkscape:zoom="4.3604918"
+     inkscape:cx="-37.025827"
+     inkscape:cy="85.390315"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:current-layer="svg2"
@@ -60,9 +60,14 @@
      height="150px"
      inkscape:pagecheckerboard="true"
      inkscape:window-maximized="1" />
-  <path
-     style="fill:#ffffff"
-     d="M 9.5186641,131.30669 C 9.5186641,113.18383 9.4060341,112.71134 5.2352651,113.33693 C 1.3752881,113.91594 0.89447711,113.01437 0.37132411,104.21651 C -0.15465039,95.371246 0.24796011,94.26612 4.6547231,92.458659 C 9.1961101,90.596035 9.5186641,89.560389 9.5186641,76.841322 C 9.5186641,63.33628 9.4776701,63.230019 4.7593321,64.507506 C 0.16666811,65.751012 8.108108e-09,65.44296 8.108108e-09,55.711236 C 8.108108e-09,46.666741 0.49100311,45.493368 4.7593321,44.337717 C 9.4172991,43.076551 9.5186641,42.634412 9.5186641,23.57824 C 9.5186641,11.966774 10.287106,4.107366 11.422395,4.107366 C 12.552339,4.107366 13.32613,11.717374 13.32613,22.830041 C 13.32613,41.243946 13.396771,41.532306 17.609527,40.314407 C 19.965391,39.633325 22.963784,39.063447 24.272601,39.048026 C 26.007516,39.027591 26.652268,33.733912 26.652268,19.509996 C 26.652268,7.8724459 27.420444,-5.8656388e-15 28.556,-5.8656388e-15 C 29.681927,-5.8656388e-15 30.459732,7.43524 30.459732,18.19837 L 30.459732,36.396739 L 35.219064,35.415262 C 39.742736,34.482399 39.978378,34.905746 39.978378,43.965612 C 39.978378,52.243239 39.352141,53.754282 35.219064,55.449475 C 30.802631,57.260829 30.459732,58.382973 30.459732,71.023888 C 30.459732,84.604925 30.474492,84.642301 35.320687,83.330196 C 40.122009,82.030213 40.174558,82.147196 39.604085,92.862535 C 39.100381,102.32385 38.478791,103.79493 34.743132,104.36728 C 30.646879,104.99488 30.459732,105.86979 30.459732,124.39072 C 30.459732,149.00403 26.985202,150.04501 26.247768,125.65262 L 25.7004,107.54741 L 19.513258,109.28188 L 13.32613,111.01635 L 13.32613,130.46761 C 13.32613,142.06603 12.557553,149.91892 11.422395,149.91892 C 10.293282,149.91892 9.5186641,142.34572 9.5186641,131.30669 z M 23.640954,87.061824 C 27.513014,85.458957 28.108842,59.539669 24.272601,59.584851 C 14.703403,59.697646 13.32613,61.662185 13.32613,75.19899 C 13.32613,88.954187 14.846289,90.702513 23.640954,87.061824 z "
-     id="path2161"
-     sodipodi:nodetypes="csssssssssssssscccssssssscccccsccssc" />
+  <g
+     aria-label="#"
+     transform="matrix(1.8875817,0,0,1.8875817,248.14384,-28.428408)"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;line-height:1.25;font-family:arciform;-inkscape-font-specification:arciform;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none"
+     id="flowRoot812">
+    <path
+       d="m -109.94375,40.555547 -1.44,7.84 h 3.72 v 2.72 h -4.24 l -1.24,6.96 h 4.2 v 2.72 h -4.68 l -1.56,8.44 h -3.04 l 1.52,-8.44 h -4.96 l -1.56,8.44 h -3.04 l 1.52,-8.44 h -4.04 v -2.72 h 4.56 l 1.24,-6.96 h -4.32 v -2.72 h 4.84 l 1.44,-7.84 h 3.04 l -1.44,7.84 h 5 l 1.4,-7.84 z m -5,10.56 h -4.96 l -1.28,6.96 h 5 z"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:40px;font-family:FreeSans;-inkscape-font-specification:'FreeSans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ffffff"
+       id="path820" />
+  </g>
 </svg>

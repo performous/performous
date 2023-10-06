@@ -14,10 +14,11 @@
    height="64"
    id="svg2463"
    sodipodi:version="0.32"
-   inkscape:version="0.47 r22583"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
    version="1.0"
    sodipodi:docname="star_glow.svg"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   enable-background="new">
   <defs
      id="defs2465">
     <linearGradient
@@ -151,6 +152,24 @@
          in2="result3"
          operator="atop" />
     </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter1150"
+       x="-0.12003243"
+       width="1.2400649"
+       y="-0.12003243"
+       height="1.2400649">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="3.1794026"
+         id="feGaussianBlur1152" />
+      <feBlend
+         inkscape:collect="always"
+         mode="overlay"
+         in2="BackgroundImage"
+         id="feBlend1154" />
+    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -163,16 +182,17 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:zoom="5.6"
-     inkscape:cx="26.939127"
+     inkscape:cx="-14.310873"
      inkscape:cy="25.003406"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1440"
-     inkscape:window-height="852"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1" />
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:pagecheckerboard="true" />
   <metadata
      id="metadata2468">
     <rdf:RDF>
@@ -181,6 +201,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -191,19 +212,19 @@
      transform="translate(-110.35967,-771.51188)">
     <path
        sodipodi:type="star"
-       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;filter:url(#filter3086)"
+       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;filter:url(#filter1150)"
        id="path2822"
-       sodipodi:sides="5"
+       sodipodi:sides="4"
        sodipodi:cx="31.964287"
        sodipodi:cy="31.857143"
-       sodipodi:r1="32.125885"
-       sodipodi:r2="20.280416"
+       sodipodi:r1="7.0676947"
+       sodipodi:r2="32.125885"
        sodipodi:arg1="0.93111088"
-       sodipodi:arg2="1.55929"
+       sodipodi:arg2="1.716509"
        inkscape:flatsided="false"
        inkscape:rounded="0"
        inkscape:randomized="0"
-       d="M 51.141613,57.631213 32.197635,52.136217 13.377809,58.06049 12.74985,38.345649 1.2998864,22.277632 19.855764,15.588186 31.599122,-0.26666619 43.695245,15.313869 62.403003,21.583048 51.322941,37.901795 51.141613,57.631213 z"
-       transform="matrix(1.0474097,0,0,1.0972591,108.99816,771.80448)" />
+       d="M 36.183298,37.527439 27.299686,63.64258 26.293992,36.076155 0.17885012,27.192542 27.745275,26.186848 36.628888,0.07170672 37.634582,27.638132 63.749723,36.521744 Z"
+       transform="matrix(0.55162432,0,0,0.5511057,124.84559,789.20337)" />
   </g>
 </svg>

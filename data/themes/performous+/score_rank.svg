@@ -28,7 +28,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -45,7 +45,7 @@
      pagecolor="#ffffff"
      id="base"
      inkscape:zoom="1.26"
-     inkscape:cx="315.38818"
+     inkscape:cx="429.77608"
      inkscape:cy="363.49206"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
@@ -64,13 +64,13 @@
        id="perspective8" />
   </defs>
   <text
-     x="405.96152"
+     x="395.96152"
      y="116.96658"
-     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:56.98380661px;line-height:0%;font-family:Goblin;text-align:center;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.29055405;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:32px;line-height:0%;font-family:FreeSans;-inkscape-font-specification:'FreeSans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.29055405;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
      id="text10203"
      xml:space="preserve"><tspan
-       x="405.96152"
+       x="395.96152"
        y="116.96658"
        id="tspan10205"
-       style="font-size:56.98380661px;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.29055405">Lead Singer</tspan></text>
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:32px;font-family:FreeSans;-inkscape-font-specification:'FreeSans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.29055405">Lead Singer</tspan></text>
 </svg>

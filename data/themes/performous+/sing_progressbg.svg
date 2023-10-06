@@ -25,13 +25,13 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
      inkscape:cy="20"
-     inkscape:cx="199.81107"
+     inkscape:cx="76.1494"
      inkscape:zoom="1.868"
      inkscape:window-height="1017"
      inkscape:window-width="1920"
@@ -84,8 +84,8 @@
     </linearGradient>
   </defs>
   <path
-     style="display:inline;overflow:visible;visibility:visible;opacity:0.7;fill:#d2d2d2;fill-opacity:0.82352941;fill-rule:nonzero;stroke:none;stroke-width:0.92460841;stroke-opacity:1;marker:none;enable-background:accumulate"
-     d="m 484,19 v 3 H 4 v -3 z"
+     style="display:inline;overflow:visible;visibility:visible;opacity:0.7;fill:#d2d2d2;fill-opacity:0.82352941;fill-rule:nonzero;stroke:none;stroke-width:1.19366431;stroke-opacity:1;marker:none;enable-background:accumulate"
+     d="m 484,17 v 5 H 4 v -5 z"
      id="rect2380-1"
      sodipodi:nodetypes="ccccc"
      inkscape:connector-curvature="0" />
