@@ -42,7 +42,7 @@
      id="base"
      showgrid="false"
      inkscape:zoom="1.3525"
-     inkscape:cx="94.136983"
+     inkscape:cx="138.3853"
      inkscape:cy="382.13672"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
@@ -59,17 +59,17 @@
        id="perspective9" />
   </defs>
   <g
-     style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-opacity:0.47058824;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none"
+     style="opacity:1;fill:#c8c8c8;fill-opacity:0.90196079;stroke:none;stroke-opacity:0.47058824;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none"
      id="layer15">
     <text
        x="102.33772"
        y="94.271713"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:40px;line-height:0%;font-family:'Droid Sans Mono';text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.47058824"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:40px;line-height:0%;font-family:'Droid Sans Mono';text-align:start;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#c8c8c8;fill-opacity:0.90196079;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.47058824"
        id="text10199"
        xml:space="preserve"><tspan
          x="102.33772"
          y="94.271713"
-         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.47058824"
+         style="fill:#c8c8c8;fill-opacity:0.90196079;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.47058824"
          id="tspan10201">0000</tspan></text>
   </g>
 </svg>

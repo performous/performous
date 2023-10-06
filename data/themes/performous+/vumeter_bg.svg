@@ -34,9 +34,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.757874"
-     inkscape:cx="-219.01008"
-     inkscape:cy="92.407472"
+     inkscape:zoom="1.2430046"
+     inkscape:cx="-374.21592"
+     inkscape:cy="149.53456"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      gridtolerance="10000"
@@ -62,7 +62,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -83,13 +83,13 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:5.73041487px;line-height:0%;font-family:'Droid Sans Mono';fill:#d9d9d9;fill-opacity:1;stroke:none;stroke-width:0.47753459px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="48.84782"
+       x="36.273357"
        y="195.36281"
        id="text3152"
        transform="scale(0.79526285,1.2574459)"><tspan
          sodipodi:role="line"
          id="tspan3154"
-         x="48.84782"
+         x="36.273357"
          y="195.36281"
          style="font-size:14.08196354px;line-height:1.25;stroke-width:0.47753459px">dB</tspan></text>
     <text
@@ -148,33 +148,5 @@
          x="15"
          y="161"
          style="font-size:20px;line-height:1.25">-30</tspan></text>
-    <g
-       transform="matrix(0.10288232,0,0,0.10288232,10.162328,223.48935)"
-       id="g14"
-       style="fill:#ffffff">
-      <g
-         id="g12"
-         style="fill:#ffffff">
-        <g
-           id="g10"
-           style="fill:#ffffff">
-          <path
-             style="fill:#ffffff"
-             inkscape:connector-curvature="0"
-             d="m 192.3,28.2 c -0.2,0.1 -1,0.3 -1.7,0.4 -3.1,0.7 -6.4,5.2 -6.4,8.8 0,3.1 1.4,5.3 5.6,8.9 21.7,18.2 34.7,44.2 37.3,74.3 2.4,26.9 -4.3,52.5 -18.7,71.7 -3.5,4.7 -11.5,12.7 -15.4,15.4 -6,4.2 -6.7,4.9 -7.7,6.9 -3.5,7 3.1,15 10.5,12.8 4.1,-1.2 12,-7.3 19.6,-15.1 22.1,-22.8 33,-56.2 30.1,-92.4 -2.1,-26.9 -11.6,-51.1 -28,-71.6 -5.6,-7 -16.3,-17.2 -20.2,-19.2 -0.9,-0.6 -4.3,-1.1 -5,-0.9 z"
-             id="path4" />
-          <path
-             style="fill:#ffffff"
-             inkscape:connector-curvature="0"
-             d="m 126.7,35 c -1.1,0.6 -17.8,14.3 -37.1,30.4 L 54.3,94.8 H 37 c -12.3,0 -17.9,0.2 -19.3,0.6 -2.5,0.7 -6.4,4.6 -7.1,7.1 -0.8,2.7 -0.8,48.3 0,51.1 0.7,2.5 4.6,6.4 7.1,7.1 1.3,0.4 7,0.6 19.2,0.6 h 17.4 l 34.9,29.1 c 19.2,16 35.7,29.6 36.6,30.2 2.3,1.5 5.1,1.9 6.6,0.9 0.6,-0.5 1.6,-1.7 2.1,-2.7 0.8,-1.9 0.9,-4.6 0.9,-90.7 0,-85.7 0,-88.8 -0.9,-90.6 -1.5,-3.6 -4.2,-4.4 -7.8,-2.5 z"
-             id="path6" />
-          <path
-             style="fill:#ffffff"
-             inkscape:connector-curvature="0"
-             d="m 163.4,64.9 c -3.6,1.1 -6.3,5 -6.3,8.8 0,3.1 1.4,5.5 4.4,7.9 1.5,1.2 4.1,3.5 5.8,5.3 16.5,16.9 21.6,44 12.5,65.9 -3.4,8.1 -10.1,16.5 -16.7,20.7 -3.5,2.3 -4.4,3.1 -5.3,5.4 -2.9,6.9 3.7,14.5 10.9,12.4 4.7,-1.4 14.2,-9.5 19.7,-16.8 8.9,-11.8 13.6,-25.2 14.2,-41.3 0.8,-21 -5.5,-39.7 -19,-55.7 -3.9,-4.7 -10.6,-10.7 -13.1,-11.9 -2,-1 -5.3,-1.3 -7.1,-0.7 z"
-             id="path8" />
-        </g>
-      </g>
-    </g>
   </g>
 </svg>
