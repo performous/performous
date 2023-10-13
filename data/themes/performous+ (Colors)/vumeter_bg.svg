@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="64"
+   height="256"
+   id="svg1901"
+   sodipodi:version="0.32"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   sodipodi:docname="vumeter_bg.svg"
+   version="1.0"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+     id="defs1903">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective7" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.2430046"
+     inkscape:cx="-374.21592"
+     inkscape:cy="149.53456"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     gridtolerance="10000"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     showgrid="true"
+     inkscape:showpageshadow="false"
+     inkscape:pagecheckerboard="true"
+     inkscape:window-maximized="1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3164"
+       visible="true"
+       enabled="true" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata1906">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Taso 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="opacity:1">
+    <rect
+       style="fill:#000000;fill-opacity:0.75294119;stroke:none;stroke-width:0.05000000000000000;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect2380"
+       width="62"
+       height="254"
+       x="1"
+       y="1"
+       rx="5"
+       ry="5" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:5.73041487px;line-height:0%;font-family:'Droid Sans Mono';fill:#d9d9d9;fill-opacity:1;stroke:none;stroke-width:0.47753459px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="36.273357"
+       y="195.36281"
+       id="text3152"
+       transform="scale(0.79526285,1.2574459)"><tspan
+         sodipodi:role="line"
+         id="tspan3154"
+         x="36.273357"
+         y="195.36281"
+         style="font-size:14.08196354px;line-height:1.25;stroke-width:0.47753459px">dB</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0%;font-family:'Droid Sans Mono';fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="4.7968478"
+       y="21.889374"
+       id="text3156"
+       transform="scale(1.0423512,0.9593696)"><tspan
+         sodipodi:role="line"
+         id="tspan3158"
+         x="4.7968478"
+         y="21.889374"
+         style="font-size:20.84702301px;line-height:1.25">CLIP</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0%;font-family:'Droid Sans Mono';fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="15"
+       y="111"
+       id="text3160"><tspan
+         sodipodi:role="line"
+         id="tspan3162"
+         x="15"
+         y="111"
+         style="font-size:20px;line-height:1.25">-20</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0%;font-family:'Droid Sans Mono';opacity:1;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="15"
+       y="61"
+       id="text3166"><tspan
+         sodipodi:role="line"
+         id="tspan3168"
+         x="15"
+         y="61"
+         style="font-size:20px;line-height:1.25">-10</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0%;font-family:'Droid Sans Mono';opacity:1;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="15"
+       y="211"
+       id="text3170"><tspan
+         sodipodi:role="line"
+         id="tspan3172"
+         x="15"
+         y="211"
+         style="font-size:20px;line-height:1.25">-40</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0%;font-family:'Droid Sans Mono';opacity:1;fill:#808080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="15"
+       y="161"
+       id="text3174"><tspan
+         sodipodi:role="line"
+         id="tspan3176"
+         x="15"
+         y="161"
+         style="font-size:20px;line-height:1.25">-30</tspan></text>
+  </g>
+</svg>
