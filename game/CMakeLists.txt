@@ -121,9 +121,10 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(deps REQUIRED IMPORTED_TARGET glib-2.0 gio-2.0 gobject-2.0)
 
 set(SELF_BUILT_GIT_BASE "https://github.com/performous" CACHE STRING "base path of the git trees used for self built dependencies")
-set(SELF_BUILT_AUBIO "NEVER" CACHE STRING "rule to allow self build of Aubio dependency library [NEVER*|AUTO|ALWAYS]")
-set(SELF_BUILT_CED "NEVER" CACHE STRING "rule to allow self build of Ced dependency library [NEVER*|AUTO|ALWAYS]")
-set(SELF_BUILT_JSON "NEVER" CACHE STRING "rule to allow self build of Json dependency library [NEVER*|AUTO|ALWAYS]")
+set(SELF_BUILT_AUBIO "AUTO" CACHE STRING "rule to allow self build of Aubio dependency library [NEVER|AUTO*|ALWAYS]")
+set(SELF_BUILT_JSON "AUTO" CACHE STRING "rule to allow self build of Json dependency library [NEVER|AUTO*|ALWAYS]")
+# This is AUTO cause CED is not available on ubuntu
+set(SELF_BUILT_CED "AUTO" CACHE STRING "rule to allow self build of Ced dependency library [NEVER|AUTO*|ALWAYS]")
 
 set(Aubio_REQUIRED_VERSION "0.4.9")
 
