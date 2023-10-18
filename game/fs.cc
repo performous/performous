@@ -63,7 +63,7 @@ namespace {
 	} cache;
 
 	std::mutex mutex;
-	using Lock = std::lock_guard<std::mutex>;
+	using Lock = std::scoped_lock<std::mutex>;
 }
 
 BinaryBuffer readFile(fs::path const& path) {
