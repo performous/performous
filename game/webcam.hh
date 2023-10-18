@@ -38,6 +38,9 @@ class Webcam {
 	Dimensions const& dimensions() const { return m_texture.dimensions; }
 
   private:
+#ifdef __clang__
+	[[maybe_unused]]
+#endif
 	Window& m_window;
 	std::unique_ptr<std::thread> m_thread;
 	mutable std::mutex m_mutex;
