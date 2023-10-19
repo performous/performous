@@ -4,12 +4,19 @@
 			// Base (e.g. /usr/local), share (src or installed data files) and locale (built or installed .mo files)
 			{
 				char const* root = getenv("PERFORMOUS_ROOT");
+				std::string pRoot{root ? root : ""};
+				std::cout << "PERFORMOUS_ROOT: " << pRoot << std::endl;
+				std::cout << "execname: " << execname() << std::endl;
 				base = fs::absolute(root ? root : execname().parent_path());
+				std::cout << "parent_path: " << execname().parent_path() << std::endl;
+				std::cout << "base: " << base << std::endl;
 				do {
 					if (base.empty()) throw std::runtime_error("Unable to find Performous data files. Install properly or set environment variable PERFORMOUS_ROOT.");
 					for (fs::path const& infix: { fs::path(SHARED_DATA_DIR), fs::path("data"), fs::path() }) {
+						std::cout << "base: " << base.string() << ", infix: " << infix.string() << std::endl;
 						if (!fs::exists(base / infix / configSchema)) continue;
 						share = base / infix;
+						std::cout << "share: " << share.string() << std::endl;
 						goto found;
 					}
 					// Use locale .mo files from build folder?
