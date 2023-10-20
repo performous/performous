@@ -24,12 +24,12 @@ file(READ
 	PERFORMOUS_FONTS_CONF
 )
 
-string(REPLACE "<dir>@PERFORMOUS_SYSTEM_PREFIX@"
-	"<dir prefix='relative'>../../../Resources" PERFORMOUS_FONTS_CONF
+string(REPLACE "<dir>${PERFORMOUS_SYSTEM_PREFIX}/share/fonts"
+	"<dir prefix='relative'>../../../Resources/fonts" PERFORMOUS_FONTS_CONF
 	"${PERFORMOUS_FONTS_CONF}")
 
-string(REPLACE "<dir>@PERFORMOUS_SYSTEM_PREFIX@/var/cache"
-	"~/.cache" PERFORMOUS_FONTS_CONF
+string(REPLACE "<cachedir>${PERFORMOUS_SYSTEM_PREFIX}/var/cache"
+	"<cachedir>~/Library/Caches/Performous" PERFORMOUS_FONTS_CONF
 	"${PERFORMOUS_FONTS_CONF}")
 
 string(REPLACE "<!-- Font directory list -->"
@@ -37,12 +37,12 @@ string(REPLACE "<!-- Font directory list -->"
 	<dir prefix='relative'>../../pixmaps</dir>]=] PERFORMOUS_FONTS_CONF
 	"${PERFORMOUS_FONTS_CONF}")
 
-string(REPLACE "@PERFORMOUS_SYSTEM_PREFIX@/share"
+string(REPLACE "${PERFORMOUS_SYSTEM_PREFIX}/share"
 	"../../../Resources" PERFORMOUS_FONTS_CONF
 	"${PERFORMOUS_FONTS_CONF}")
 
 file(WRITE
-	"${CMAKE_INSTALL_SYSCONFDIR}/fonts/fonts.conf"
+	"${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_SYSCONFDIR}/fonts/fonts.conf"
 	"${PERFORMOUS_FONTS_CONF}")
 
 install(DIRECTORY
