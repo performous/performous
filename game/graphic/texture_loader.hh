@@ -32,10 +32,6 @@ template <typename T> void load(T* target, fs::path const& path) {
 	bitmap.filepath = path;
 	bitmap.fmt = pix::Format::RGB;
 	bitmap.resize(1, 1);
-	bitmap.data()[0] = 255;
-	bitmap.data()[1] = 255;
-	bitmap.data()[2] = 255;
-	bitmap.data()[3] = 255;
 	
 	target->load(bitmap, false);
 
