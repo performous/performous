@@ -1,7 +1,7 @@
 #pragma once
 
 #include "instrumentgraph.hh"
-#include "3dobject.hh"
+#include "graphic/3dobject.hh"
 
 #include <cstdint>
 

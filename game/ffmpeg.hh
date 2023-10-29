@@ -1,7 +1,7 @@
 #pragma once
 
 #include "chrono.hh"
-#include "texture.hh"
+#include "graphic/texture.hh"
 #include "util.hh"
 #include "libda/sample.hpp"
 #include "aubio/aubio.h"

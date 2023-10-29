@@ -4,11 +4,11 @@
 #include <string>
 
 #include "animvalue.hh"
-#include "opengl_text.hh"
+#include "graphic/opengl_text.hh"
 #include "graphic/window.hh"
 #include "dialog.hh"
 #include "playlist.hh"
-#include "fbo.hh"
+#include "graphic/fbo.hh"
 #include "audio.hh"
 #include "screen.hh"
 #include "i18n.hh"
