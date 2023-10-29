@@ -92,11 +92,11 @@ private:
 	float m_timeToFadeOut;
 	float m_timeToShow;
 	std::string m_message;
-	AnimValue m_messagePopup;
+	AnimValue m_messagePopup{ 0.0, 1.0 };
 	SvgTxtTheme m_textMessage;
-	float m_loadingProgress;
+	float m_loadingProgress{ 0.0f };
 	Texture m_logo;
-	AnimValue m_logoAnim;
+	AnimValue m_logoAnim{ 0.0, 0.5 };
 	AnimValue m_dialogTimeOut;
 	// Dialog members
 	std::unique_ptr<Dialog> m_dialog;

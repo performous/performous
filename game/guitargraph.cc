@@ -110,25 +110,10 @@ GuitarGraph::GuitarGraph(Game &game, Audio& audio, Song const& song, input::Devi
   m_flame_godmode(findFile("flame_godmode.svg")),
   m_tap(findFile("tap.svg")),
   m_neckglow(findFile("neck_glow.svg")),
-  m_neckglowColor(),
   m_drums(dev->type == input::DevType::DRUMS),
-  m_level(),
   m_track_index(m_instrumentTracks.end()),
   m_dfIt(m_drumfills.end()),
-  m_errorMeter(0.0, 2.0),
-  m_errorMeterFlash(0.0, 4.0),
-  m_errorMeterFade(0.0, 0.333),
-  m_drumJump(0.0, 12.0),
-  m_starpower(0.0, 0.1),
-  m_starmeter(),
-  m_drumfillHits(),
-  m_drumfillScore(),
-  m_soloTotal(),
-  m_soloScore(),
-  m_solo(),
-  m_hasTomTrack(false),
-  m_proMode(config["game/drum_promode"].b()),
-  m_whammy(0)
+  m_proMode(config["game/drum_promode"].b())
 {
 	if(m_drums) {
 		initDrums();

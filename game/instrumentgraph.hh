@@ -1,6 +1,5 @@
 #pragma once
 
-#include <vector>
 
 #include "game.hh"
 #include "audio.hh"
@@ -9,15 +8,17 @@
 #include "controllers.hh"
 #include "texture.hh"
 #include "opengl_text.hh"
-#include "glutil.hh"
+#include "graphic/glutil.hh"
 #include "menu.hh"
 #include "screen.hh"
+#include "theme.hh"
 #include "fs.hh"
 #include "util.hh"
 #include "graphic/color_trans.hh"
 #include "graphic/transform.hh"
 
 #include <cstdint>
+#include <vector>
 
 /// Represents popup messages
 class Popup {
@@ -72,7 +73,7 @@ public:
 	/// Constructor
 	InstrumentGraph(Game &game, Audio& audio, Song const& song, input::DevicePtr dev);
 	/// Virtual destructor
-	virtual ~InstrumentGraph();
+	virtual ~InstrumentGraph() = default;  // For destruction of unique_ptrs (only forward-declared in header)
 
 	// Interface functions
 	virtual void draw(double time) = 0;
@@ -106,6 +107,14 @@ public:
 	virtual double getWhammy() const { return 0; }
 	bool isKeyboard() const { return m_dev->source.isKeyboard(); }
 
+protected:
+	// Shared functions for derived classes
+	void drawPopups();
+	void handleCountdown(double time, double beginTime);
+
+	// Functions not really shared, but needed here
+	Color const& color(unsigned fret) const;
+
   protected:
 	// Core stuff
 	Game& m_game;
@@ -113,7 +122,7 @@ public:
 	Song const& m_song;
 	size_t m_stream; /// audio stream number
 	input::DevicePtr m_dev;
-	AnimValue m_cx, m_width; /// controls horizontal position and width smoothly
+	AnimValue m_cx{ 0.0, 0.2 }, m_width{ 0.5, 0.4 }; /// controls horizontal position and width smoothly
 	struct Event {
 		double time;
 		AnimValue glow;
@@ -130,13 +139,6 @@ public:
 	Popups m_popups;
 	Menu m_menu;
 
-	// Shared functions for derived classes
-	void drawPopups();
-	void handleCountdown(double time, double beginTime);
-
-	// Functions not really shared, but needed here
-	Color const& color(unsigned fret) const;
-
 	// Media
 	Texture m_button;
 	Texture m_arrow_up;
@@ -149,9 +151,9 @@ public:
 
 	// Dynamic stuff for join menu
 	ConfigItem m_selectedTrack; /// menu modifies this to select track
-	ConfigItem m_selectedDifficulty; /// menu modifies this to select difficulty
-	ConfigItem m_rejoin; /// menu sets this if we want to re-join
-	ConfigItem m_leftymode; /// switch guitar notes to right-to-left direction
+	ConfigItem m_selectedDifficulty{ 0 }; /// menu modifies this to select difficulty
+	ConfigItem m_rejoin{ false }; /// menu sets this if we want to re-join
+	ConfigItem m_leftymode{ false }; /// switch guitar notes to right-to-left direction
 	std::string m_trackOpt;
 	std::string m_difficultyOpt;
 	std::string m_leftyOpt;
@@ -160,14 +162,14 @@ public:
 	unsigned m_pads; /// how many panels the current gaming mode uses
 	bool m_pressed[max_panels]; /// is certain panel pressed currently
 	AnimValue m_pressed_anim[max_panels]; /// animation for panel pressing
-	AnimValue m_correctness;
+	AnimValue m_correctness{ 1.0, 5.0 };
 	double m_score; /// unnormalized scores
 	double m_scoreFactor; /// normalization factor
 	double m_starmeter; /// when this is high enough, GodMode becomes available
 	int m_streak; /// player's current streak/combo
 	int m_longestStreak; /// player's longest streak/combo
 	int m_bigStreak; /// next limit when a popup appears
-	int m_countdown; /// countdown counter
+	int m_countdown{ 3 }; /// countdown counter / Display countdown 3 secs before note start
 	double m_jointime; /// when the player joined
 	unsigned m_dead; /// how many notes has been passed without hitting buttons
 	bool m_ready;
