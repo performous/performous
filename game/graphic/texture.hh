@@ -47,13 +47,3 @@ public:
 	void update() override;
 };
 
-/// A RAII wrapper for texture loading worker thread. There must be exactly one (global) instance whenever any Textures exist.
-class TextureLoader {
-public:
-	TextureLoader();
-	~TextureLoader();
-	class Impl;
-
-	static void updateTextures();
-};
-

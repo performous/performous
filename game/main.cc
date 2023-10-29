@@ -6,6 +6,7 @@
 #include "engine.hh"
 #include "fs.hh"
 #include "graphic/glutil.hh"
+#include "graphic/texture_loader.hh"
 #include "i18n.hh"
 #include "log.hh"
 #include "platform.hh"
@@ -100,7 +101,7 @@ void mainLoop(std::string const& songlist) {
 	std::clog << "core/notice: Starting the audio subsystem (errors printed on console may be ignored)." << std::endl;
 	std::clog << "core/info: Loading assets." << std::endl;
 	TranslationEngine localization;
-	TextureLoader m_loader;
+	TextureLoaderScopedKeeper keeper;
 	Backgrounds backgrounds;
 	Database database(getConfigDir() / "database.xml");
 	Songs songs(database, songlist);
@@ -172,7 +173,7 @@ void mainLoop(std::string const& songlist) {
 			// Display (and wait until next frame)
 			window.swap();
 			if (benchmarking) { glFinish(); prof("swap"); }
-			TextureLoader::updateTextures();
+			updateTextures();
 			gm.prepareScreen();
 			if (benchmarking) { glFinish(); prof("textures"); }
 			if (benchmarking) {
