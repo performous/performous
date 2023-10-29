@@ -19,15 +19,6 @@ Shader& getShader(Window& window, std::string const& name) {
 	return window.shader(name);  // FIXME
 }
 
-float Dimensions::screenY() const {
-	switch (m_screenAnchor) {
-	  case YAnchor::CENTER: return 0.0f;
-	  case YAnchor::TOP: return -0.5f * virtH();
-	  case YAnchor::BOTTOM: return 0.5f * virtH();
-	}
-	throw std::logic_error("Dimensions::screenY(): unknown m_screenAnchor value");
-}
-
 struct Job {
 	fs::path name;
 	typedef std::function<void (Bitmap& bitmap)> ApplyFunc;
