@@ -6,14 +6,16 @@
 #include "shader_manager.hh"
 #include "window.hh"
 
-template <GLenum Type> class OpenGLTexture {
+template <GLenum Type> class OpenGLTexture : public ChangeReceiver {
 public:
 	OpenGLTexture();
 	OpenGLTexture(TextureReferencePtr texture);
 	OpenGLTexture(OpenGLTexture const&) = default;
-	~OpenGLTexture() = default;
+	OpenGLTexture(OpenGLTexture&&) = default;
+	virtual ~OpenGLTexture() = default;
 
-	OpenGLTexture& operator=(const OpenGLTexture&) = default;
+	OpenGLTexture& operator=(OpenGLTexture const&) = default;
+	OpenGLTexture& operator=(OpenGLTexture&&) = default;
 
 	static GLenum type() { return Type; };
 	static Shader& shader(Window& window) { return window.getShader("texture"); }
@@ -35,8 +37,30 @@ public:
 	float getHeight() const { return m_textureReference->getHeight(); }
 	float getAspectRatio() const { return m_textureReference->getAspectRatio(); }
 	bool isPremultiplied() const { return m_textureReference->isPremultiplied(); }
+	OpenGLTexture& setGeometry(float width, float height) {
+		m_textureReference->setGeometry(width, height);
+
+		return *this;
+	}
+	OpenGLTexture& setGeometry(float width, float height, float aspectRatio) {
+		m_textureReference->setGeometry(width, height, aspectRatio);
+
+		return *this;
+	};
+	OpenGLTexture& setPremultiplied(bool premultiplied = true) {
+		m_textureReference->setPremultiplied(premultiplied);
+
+		return *this;
+	}
 
 	operator TextureReferencePtr() const { return m_textureReference; }
+
+protected:
+	virtual void update() {
+	}
+	void onChange(ChangeNotifier&) override {
+		update();
+	}
 
 private:
 	TextureReferencePtr m_textureReference;
@@ -62,10 +86,14 @@ private:
 
 template <GLenum Type> OpenGLTexture<Type>::OpenGLTexture() {
 	m_textureReference = std::make_shared<TextureReference>(); 
+
+	m_textureReference->addChangeReceiver(this);
 }
 
 template <GLenum Type> OpenGLTexture<Type>::OpenGLTexture(TextureReferencePtr texture)
 	: m_textureReference(texture) {
+
+	m_textureReference->addChangeReceiver(this);
 }
 
 template <GLenum Type> void OpenGLTexture<Type>::draw(Window& window, Dimensions const& dim, TexCoords const& tex) const {

@@ -1,14 +1,18 @@
 #pragma once
 
+#include "utils/change_notifier.hh"
+
 #include <memory>
 
 #include <epoxy/gl.h>
 
-struct TextureReference {
+struct TextureReference : public ChangeNotifier {
     TextureReference();
+    TextureReference(const TextureReference&) = delete;
     ~TextureReference();
 
-    operator GLuint () const;
+    TextureReference& operator=(const TextureReference&) = delete;
+
     GLuint getId() const;
 
     float getWidth() const;
@@ -18,6 +22,8 @@ struct TextureReference {
     float getAspectRatio() const;
     bool isPremultiplied() const;
     TextureReference& setPremultiplied(bool = true);
+
+    void changed();
 
 private:
     GLuint m_id;

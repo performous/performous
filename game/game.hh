@@ -5,6 +5,7 @@
 
 #include "animvalue.hh"
 #include "graphic/opengl_text.hh"
+#include "graphic/texture_manager.hh"
 #include "graphic/window.hh"
 #include "dialog.hh"
 #include "playlist.hh"
@@ -73,6 +74,8 @@ class Game {
 	Window& getWindow() { return m_window; }
 	Audio& getAudio() { return m_audio; }
 
+	TextureManager& getTextureManager();
+
 private:
 	Window& m_window;
 	Audio m_audio;
@@ -81,6 +84,7 @@ public:
 	input::Controllers controllers;
 
 private:
+	TextureManager m_textureManager;
 	bool m_finished = false;
 	typedef std::map<std::string, std::unique_ptr<Screen>> screenmap_t;
 	screenmap_t screens;

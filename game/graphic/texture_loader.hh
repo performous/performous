@@ -3,23 +3,27 @@
 #include "bitmap.hh"
 #include "texture_reference.hh"
 
+#include <functional>
+
 struct TextureLoaderScopedKeeper {
 	TextureLoaderScopedKeeper();
 	~TextureLoaderScopedKeeper();
 };
 
-struct Job {
+struct TextureLoadJob {
 	using ApplyFunc = std::function<void(Bitmap& bitmap)>;
 	fs::path name;
 	ApplyFunc apply;
 	Bitmap bitmap;
 	bool done = false;
 
-	Job() = default;
-	Job(fs::path const& n, ApplyFunc const& a) : name(n), apply(a) {}
+	TextureLoadJob() = default;
+	TextureLoadJob(fs::path const& name, ApplyFunc const& apply) 
+		: name(name), apply(apply) {
+	}
 };
 
-void loadAsync(Job const&);
+void loadAsync(TextureLoadJob const&);
 
 template <typename T> void load(T* target, fs::path const& path) {
 	// Temporarily add 1x1 pixel black texture
@@ -35,7 +39,7 @@ template <typename T> void load(T* target, fs::path const& path) {
 	
 	target->load(bitmap, false);
 
-	loadAsync(Job(path, [target](Bitmap& bitmap) {
+	loadAsync(TextureLoadJob(path, [target](Bitmap& bitmap) {
 		target->load(bitmap, false);
 	}));
 }
