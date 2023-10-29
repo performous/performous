@@ -64,7 +64,7 @@ namespace {
             }
         }
         /// Add a new job, using calling Texture's address as unique ID.
-        void push(Job const& job) {
+        void push(TextureLoadJob const& job) {
             std::lock_guard<std::mutex> l(m_mutex);
             m_jobs.emplace_back(job);
             m_condition.notify_one();
@@ -95,7 +95,7 @@ namespace {
         std::atomic<bool> m_quit{ false };
         std::mutex m_mutex;
         std::condition_variable m_condition;
-        using Jobs = std::list<Job>;
+        using Jobs = std::list<TextureLoadJob>;
         Jobs m_jobs;
         std::thread m_thread;
 
@@ -109,7 +109,7 @@ void updateTextures() {
     TextureLoader::instance().apply();
 }
 
-void loadAsync(Job const& job) {
+void loadAsync(TextureLoadJob const& job) {
     // Ask the loader to retrieve the image
     TextureLoader::instance().push(job);
 }
@@ -173,6 +173,8 @@ void TextureReferenceLoader::load(Bitmap const& bitmap, bool isText) {
     glTexImage2D(GL_TEXTURE_2D, 0, internalFormat(bitmap.linearPremul), bitmap.width, bitmap.height, 0, f.format, f.type, bitmap.data());
     if (!isText)
         glGenerateMipmap(GL_TEXTURE_2D);
+
+    m_textureReference->changed();
 }
 
 TextureLoaderScopedKeeper::TextureLoaderScopedKeeper()

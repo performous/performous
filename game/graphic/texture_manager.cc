@@ -3,11 +3,14 @@
 #include "texture_loader.hh"
 
 TextureManager::TextureManager() {
-    get(findFile("patterns-warning-black-yellow.png"));
+//    get(findFile("patterns-warning-black-yellow.png"));
 }
 
 Texture TextureManager::get(fs::path const& filepath) {
     auto const filename = filepath.string();
+
+    //if (!m_fileTextureMap.empty())
+    //    return m_fileTextureMap.begin()->second;
 
     {
         auto&& guard = std::lock_guard<std::mutex>(m_mutex);

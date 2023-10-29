@@ -33,7 +33,7 @@ public:
 	Texture(TextureReferencePtr textureReference) : OpenGLTexture(textureReference) {}
 	~Texture();
 
-	bool empty() const { return m_width * m_height == 0.f; } ///< Test if the loading has failed
+	bool empty() const { return width() * height() == 0.f; } ///< Test if the loading has failed
 	/// draws texture
 	void draw(Window&) const;
 	void draw(Window&, glmath::mat3 const&) const;
@@ -41,13 +41,10 @@ public:
 	/// loads texture into buffer
 	void load(Bitmap const& bitmap, bool isText = false);
 	Shader& shader(Window& window) { return OpenGLTexture::shader(window); }
-	float width() const { return m_width; }
-	float height() const { return m_height; }
+	float width() const { return getWidth(); }
+	float height() const { return getHeight(); }
 
-private:
-	float m_width = 0.f;
-	float m_height = 0.f;
-	bool m_premultiplied = true;
+	void update() override;
 };
 
 /// A RAII wrapper for texture loading worker thread. There must be exactly one (global) instance whenever any Textures exist.
