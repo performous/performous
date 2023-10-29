@@ -100,7 +100,8 @@ template <GLenum Type> void OpenGLTexture<Type>::draw(Window& window, Dimensions
 	glutil::GLErrorChecker glerror("OpenGLTexture::draw()");
 	glutil::VertexArray va;
 
-	auto const&& binder = UseTexture(window, *this);
+	auto binder = UseTexture(window, *this);
+
 	glerror.check("texture");
 
 	// The texture wraps over at the edges (repeat)
@@ -121,7 +122,8 @@ template <GLenum Type> void OpenGLTexture<Type>::draw(Window& window, Dimensions
 	glutil::GLErrorChecker glerror("OpenGLTexture::draw()");
 	glutil::VertexArray va;
 
-	auto&& binder = UseTexture(window, *this);
+	auto binder = UseTexture(window, *this);
+
 	glerror.check("texture");
 
 	// The texture wraps over at the edges (repeat)

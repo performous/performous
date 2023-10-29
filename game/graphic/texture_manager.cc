@@ -13,7 +13,7 @@ Texture TextureManager::get(fs::path const& filepath) {
     //    return m_fileTextureMap.begin()->second;
 
     {
-        auto&& guard = std::lock_guard<std::mutex>(m_mutex);
+        auto guard = std::lock_guard<std::mutex>(m_mutex);
         auto const it = m_fileTextureMap.find(filename);
 
         if (it != m_fileTextureMap.end()) {
@@ -24,7 +24,7 @@ Texture TextureManager::get(fs::path const& filepath) {
     auto reference = std::make_shared<TextureReference>();
 
     {
-        auto&& guard = std::lock_guard<std::mutex>(m_mutex);
+        auto guard = std::lock_guard<std::mutex>(m_mutex);
         m_fileTextureMap[filename] = reference;
     }
 
@@ -38,7 +38,7 @@ void TextureManager::load(Bitmap const& bitmap, bool isText) {
 
     std::cout << "set texture " << filename << std::endl;
 
-    auto&& guard = std::lock_guard<std::mutex>(m_mutex);
+    auto guard = std::lock_guard<std::mutex>(m_mutex);
     auto it = m_fileTextureMap.find(filename);
 
     if (it == m_fileTextureMap.end())
