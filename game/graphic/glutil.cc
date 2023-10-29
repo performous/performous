@@ -34,7 +34,10 @@ namespace glutil {
 		stack.back() = info;
 	}
 
-	GLErrorChecker::~GLErrorChecker() { check("after finishing"); stack.pop_back(); }
+	GLErrorChecker::~GLErrorChecker() {
+		check("after finishing"); 
+		stack.pop_back(); 
+	}
 
 	void GLErrorChecker::check(std::string const& what) {
 		GLenum err = glGetError();

@@ -5,7 +5,7 @@
 #include "database.hh"
 #include "engine.hh"
 #include "fs.hh"
-#include "glutil.hh"
+#include "graphic/glutil.hh"
 #include "i18n.hh"
 #include "log.hh"
 #include "platform.hh"

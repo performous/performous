@@ -3,7 +3,7 @@
 #include "audio.hh"
 #include "fs.hh"
 #include "configuration.hh"
-#include "glutil.hh"
+#include "graphic/glutil.hh"
 #include "util.hh"
 #include "graphic/color_trans.hh"
 
@@ -13,8 +13,8 @@
 
 Game::Game(Window& window):
   m_window(window),
-  m_messagePopup(0.0, 1.0), m_textMessage(findFile("message_text.svg"), config["graphic/text_lod"].f()),
-  m_loadingProgress(0.0f), m_logo(findFile("logo.svg")), m_logoAnim(0.0, 0.5)
+  m_textMessage(findFile("message_text.svg"), config["graphic/text_lod"].f()),
+  m_logo(findFile("logo.svg"))
 {
 	m_textMessage.dimensions.middle().center(-0.05f);
 }
