@@ -172,7 +172,7 @@ void mainLoop(std::string const& songlist) {
 			// Display (and wait until next frame)
 			window.swap();
 			if (benchmarking) { glFinish(); prof("swap"); }
-			updateTextures();
+			TextureLoader::updateTextures();
 			gm.prepareScreen();
 			if (benchmarking) { glFinish(); prof("textures"); }
 			if (benchmarking) {

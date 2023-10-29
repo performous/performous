@@ -56,5 +56,7 @@ public:
 	TextureLoader();
 	~TextureLoader();
 	class Impl;
+
+	static void updateTextures();
 };
 

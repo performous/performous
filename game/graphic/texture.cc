@@ -110,9 +110,16 @@ TextureLoader::TextureLoader() {
 	ldr = std::make_unique<Impl>();
 }
 
-TextureLoader::~TextureLoader() { ldr.reset(); }
+TextureLoader::~TextureLoader() { 
+	ldr.reset(); 
+}
 
-void updateTextures() { ldr->apply(); }
+void updateTextures();
+
+void TextureLoader::updateTextures() { 
+	ldr->apply();
+	::updateTextures();
+}
 
 template <typename T> void loader(T* target, fs::path const& name) {
 	// Temporarily add 1x1 pixel black texture
