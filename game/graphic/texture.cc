@@ -15,10 +15,6 @@
 #include <thread>
 #include <vector>
 
-Shader& getShader(Window& window, std::string const& name) {
-	return window.shader(name);  // FIXME
-}
-
 struct Job {
 	fs::path name;
 	typedef std::function<void (Bitmap& bitmap)> ApplyFunc;

@@ -409,7 +409,7 @@ void DanceGraph::draw(double time) {
 
 		// Arrows on cursor
 		{
-			UseShader us(getShader(window, "dancenote"));
+			UseShader us(window.getShader("dancenote"));
 			m_uniforms.clock = static_cast<float>(time);
 			m_uniforms.noteType = 0;
 			m_uniforms.scale = getScale();
@@ -475,7 +475,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	double glow = note.hitAnim.get();
 
 	{
-		UseShader us(getShader(window, "dancenote"));
+		UseShader us(window.getShader("dancenote"));
 		m_uniforms.hitAnim = static_cast<float>(glow);
 		m_uniforms.clock = static_cast<float>(time);
 		m_uniforms.scale = getScale();

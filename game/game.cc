@@ -69,7 +69,7 @@ void Game::drawLoading() {
 	const float sq_size = (2*x - (maxi-1)*spacing) / maxi;
 	for (float f = 0.0f; f <= m_loadingProgress * maxi; ++f) {
 		ColorTrans c(m_window, Color(0.2f, 0.7f, 0.7f, (m_loadingProgress + 1.0f)*0.5f));
-		UseShader shader(getShader(m_window, "color"));
+		UseShader shader(m_window.getShader("color"));
 		float cx = -x + f * (sq_size + spacing);
 		float cy = 0;
 		float r = sq_size/2;

@@ -4,8 +4,7 @@
 #include "texture_reference.hh"
 #include "texture_coordinates.hh"
 #include "shader_manager.hh"
-
-Shader& getShader(Window&, std::string const& name);
+#include "window.hh"
 
 template <GLenum Type> class OpenGLTexture {
 public:
@@ -17,7 +16,7 @@ public:
 	OpenGLTexture& operator=(const OpenGLTexture&) = default;
 
 	static GLenum type() { return Type; };
-	static Shader& shader(Window& window) { return getShader(window, "texture"); }
+	static Shader& shader(Window& window) { return window.getShader("texture"); }
 
 
 	/// returns id

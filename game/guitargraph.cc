@@ -930,7 +930,7 @@ void GuitarGraph::drawNeckStuff(double time) {
 		}
 	}
 	// Accuracy indicator
-	UseShader us(getShader(window, "color"));
+	UseShader us(window.getShader("color"));
 	float maxsize = 1.5f;
 	float thickness = 0.12f;
 	float x = -2.5f - thickness;
@@ -1137,7 +1137,7 @@ void GuitarGraph::drawInfo(double time) {
 /// Draw a bar for drum bass pedal/note
 void GuitarGraph::drawBar(double time, float h) {
 	auto& window = m_game.getWindow();
-	UseShader shader(getShader(window, "color"));
+	UseShader shader(window.getShader("color"));
 	glutil::VertexArray va;
 
 	va.normal(0.0f, 1.0f, 0.0f).texCoord(0,0).vertex(-2.5f, time2y(static_cast<float>(time + h)));
