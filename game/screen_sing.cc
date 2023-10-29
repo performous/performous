@@ -479,7 +479,7 @@ namespace {
 		va.texCoord(0,0).vertex(dim.x2(), dim.y1());
 		va.texCoord(0,0).vertex(dim.x1(), dim.y2());
 		va.texCoord(0,0).vertex(dim.x2(), dim.y2());
-		getShader(window, "texture").bind();
+		window.getShader("texture").bind();
 		va.draw();
 	}
 }

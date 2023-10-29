@@ -225,6 +225,10 @@ void Window::createShaders() {
 }
 
 Shader& Window::shader(std::string const& name) {
+	return getShader(name);
+}
+
+Shader& Window::getShader(std::string const& name) {
 	return m_shaderManager->createOrGet(name);
 }
 

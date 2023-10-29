@@ -15,7 +15,6 @@
 #include <string>
 #include <vector>
 
-Shader& getShader(Window&, std::string const& name);
 void updateTextures();
 
 /**
