@@ -23,9 +23,11 @@ struct TextureLoadJob {
 	}
 };
 
-void loadAsync(TextureLoadJob const&);
+using TextureLoadingId = size_t;
 
-template <typename T> void load(T* target, fs::path const& path) {
+TextureLoadingId loadAsync(TextureLoadJob const&);
+
+template <typename T> TextureLoadingId loadTexture(T* target, fs::path const& path) {
 	// Temporarily add 1x1 pixel black texture
 	Bitmap bitmap;
 
@@ -35,10 +37,12 @@ template <typename T> void load(T* target, fs::path const& path) {
 	
 	target->load(bitmap, false);
 
-	loadAsync(TextureLoadJob(path, [target](Bitmap& bitmap) {
+	return loadAsync(TextureLoadJob(path, [target](Bitmap& bitmap) {
 		target->load(bitmap, false);
 	}));
 }
+
+void abortTextureLoading(TextureLoadingId);
 
 struct TextureReferenceLoader {
 	TextureReferenceLoader(TextureReferencePtr textureReference) : m_textureReference(textureReference) {
