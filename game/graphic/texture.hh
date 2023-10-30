@@ -28,13 +28,21 @@ public:
 	Dimensions dimensions;
 	/// texture coordinates
 	TexCoords tex;
+
 	Texture() = default;
 	/// creates texture from file
 	Texture(fs::path const& filename);
-	Texture(TextureReferencePtr textureReference) : OpenGLTexture(textureReference) {}
+	Texture(TextureReferencePtr textureReference);
+	Texture(Texture const&) = default;
+	Texture(Texture&&) = default;
 	~Texture();
 
+	Texture& operator=(Texture const&) = default;
+	Texture& operator=(Texture&&) = default;
+
 	bool empty() const { return width() * height() == 0.f; } ///< Test if the loading has failed
+	Texture& clip(unsigned left, unsigned top, unsigned right, unsigned bottom);
+
 	/// draws texture
 	void draw(Window&) const;
 	void draw(Window&, glmath::mat3 const&) const;
@@ -49,5 +57,6 @@ public:
 
 private:
 	TextureLoadingId m_loadingId{ TextureLoadingId(-1)};
+	Clip m_clip;
 };
 

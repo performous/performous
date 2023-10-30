@@ -18,10 +18,18 @@ namespace pix {
 	}; 
 }
 
+struct Clip {
+	unsigned left = 0;
+	unsigned top = 0;
+	unsigned right = 0;
+	unsigned bottom = 0;
+};
+
 struct Bitmap {
 	std::vector<unsigned char> buf;  // Pixel data if owned by Bitmap
 	unsigned char* ptr;  // Pixel data if owned by someone else
 	unsigned width, height;
+	Clip clip;
 	float ar;  // Aspect ratio
 	double timestamp;  // Used for video frames
 	pix::Format fmt;

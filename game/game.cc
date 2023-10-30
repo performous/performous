@@ -14,7 +14,7 @@
 Game::Game(Window& window) :
     m_window(window),
     m_textMessage(findFile("message_text.svg"), config["graphic/text_lod"].f()),
-    m_logo(m_textureManager.get(findFile("logo.svg")))
+    m_logo(m_textureManager.get(findFile("logo.json")))
 {
     m_textMessage.dimensions.middle().center(-0.05f);
 }
