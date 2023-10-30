@@ -436,7 +436,7 @@ void DanceGraph::draw(double time) {
 
 void DanceGraph::drawBeats(double time) {
 	auto& window = m_game.getWindow();
-	UseTexture tex(window, m_beat);
+	TextureBinder tex(window, m_beat);
 	glutil::VertexArray va;
 	float texCoord = 0.0f;
 	double tBeg = 0.0f, tEnd;

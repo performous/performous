@@ -68,12 +68,12 @@ private:
 
 
 /** @short A RAII wrapper for binding to a texture (using it, modifying it) **/
-class UseTexture {
+class TextureBinder {
 public:
-	UseTexture(const UseTexture&) = delete;
-	const UseTexture& operator=(const UseTexture&) = delete;
+	TextureBinder(const TextureBinder&) = delete;
+	const TextureBinder& operator=(const TextureBinder&) = delete;
 	/// constructor
-	template <GLenum Type> UseTexture(Window& window, OpenGLTexture<Type> const& tex) :
+	template <GLenum Type> TextureBinder(Window& window, OpenGLTexture<Type> const& tex) :
 		m_shader(
 			/* hack of the year */
 			(glutil::GLErrorChecker("UseTexture"), glActiveTexture(GL_TEXTURE0),
@@ -100,7 +100,7 @@ template <GLenum Type> void OpenGLTexture<Type>::draw(Window& window, Dimensions
 	glutil::GLErrorChecker glerror("OpenGLTexture::draw()");
 	glutil::VertexArray va;
 
-	auto binder = UseTexture(window, *this);
+	auto binder = TextureBinder(window, *this);
 
 	glerror.check("texture");
 
@@ -122,7 +122,7 @@ template <GLenum Type> void OpenGLTexture<Type>::draw(Window& window, Dimensions
 	glutil::GLErrorChecker glerror("OpenGLTexture::draw()");
 	glutil::VertexArray va;
 
-	auto binder = UseTexture(window, *this);
+	auto binder = TextureBinder(window, *this);
 
 	glerror.check("texture");
 
