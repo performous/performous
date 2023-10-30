@@ -37,9 +37,9 @@ namespace {
                     // Poll for jobs to be done
                     std::unique_lock<std::mutex> l(m_mutex);
                     for (auto& job : m_jobs) {
-                        if (job.done)
+                        if (job.second.done)
                             continue;  // Job already done
-                        name = job.name;
+                        name = job.second.name;
                         break;
                     }
                     // If not found, wait for one
@@ -49,43 +49,41 @@ namespace {
                     }
                 }
                 // Load image file into buffer
-                std::cout << "load bitmap " << name.string() << std::endl;
                 Bitmap bitmap;
                 load(bitmap, name);
                 // Store the result
                 std::lock_guard<std::mutex> l(m_mutex);
                 for (auto& job : m_jobs) {
-                    if (job.name == name) {
-                        job.done = true;  // Mark the job completed
-                        job.bitmap.swap(bitmap);  // Store the bitmap (if we got any)
-                        std::cout << "done loading " << name.string() << std::endl;
+                    if (job.second.name == name) {
+                        job.second.done = true;  // Mark the job completed
+                        job.second.bitmap.swap(bitmap);  // Store the bitmap (if we got any)
                     }
                 }
             }
         }
         /// Add a new job, using calling Texture's address as unique ID.
-        void push(TextureLoadJob const& job) {
+        TextureLoadingId push(TextureLoadJob const& job) {
             std::lock_guard<std::mutex> l(m_mutex);
-            m_jobs.emplace_back(job);
+            const auto id = m_id++;
+            m_jobs[id] = job;
             m_condition.notify_one();
+
+            return id;
         }
         /// Cancel a job in progress (no effect if the job has already completed)
-    //    void remove(void const* t) {
-    //        std::lock_guard<std::mutex> l(m_mutex);
-    //        std::cout << "remove " << m_jobs[t].name.string() << std::endl;
-    //        m_jobs.erase(t);
-    //    }
+        void remove(TextureLoadingId id) {
+            std::lock_guard<std::mutex> l(m_mutex);
+            m_jobs.erase(id);
+        }
         /// Upload all completed jobs to OpenGL (must be called from a valid OpenGL context)
         void apply() {
             std::lock_guard<std::mutex> l(m_mutex);
             for (auto it = m_jobs.begin(); it != m_jobs.end();) {
-                auto& job = *it;
+                auto& job = it->second;
                 if (!job.done) {   // Job incomplete, skip it
-                    std::cout << "pending " << job.name.string() << std::endl;
                     ++it;
                     continue;
                 }
-                std::cout << "apply " << job.name.string() << std::endl;
                 job.apply(job.bitmap);  // Upload to OpenGL
                 it = m_jobs.erase(it);
             }
@@ -95,9 +93,10 @@ namespace {
         std::atomic<bool> m_quit{ false };
         std::mutex m_mutex;
         std::condition_variable m_condition;
-        using Jobs = std::list<TextureLoadJob>;
+        using Jobs = std::map<TextureLoadingId, TextureLoadJob>;
         Jobs m_jobs;
         std::thread m_thread;
+        TextureLoadingId m_id = 0;
 
         static std::unique_ptr<TextureLoader> m_instance;
     };
@@ -109,9 +108,14 @@ void updateTextures() {
     TextureLoader::instance().apply();
 }
 
-void loadAsync(TextureLoadJob const& job) {
+TextureLoadingId loadAsync(TextureLoadJob const& job) {
     // Ask the loader to retrieve the image
-    TextureLoader::instance().push(job);
+    return TextureLoader::instance().push(job);
+}
+
+void abortTextureLoading(TextureLoadingId id)
+{
+    TextureLoader::instance().remove(id);
 }
 
 // Stuff for converting pix::Format into OpenGL enum values & other flags
@@ -177,8 +181,8 @@ void TextureReferenceLoader::load(Bitmap const& bitmap, bool isText) {
     m_textureReference->changed();
 }
 
-TextureLoaderScopedKeeper::TextureLoaderScopedKeeper()
-{
+TextureLoaderScopedKeeper::TextureLoaderScopedKeeper() {
+    // do nothing (lazy initialization)
 }
 
 TextureLoaderScopedKeeper::~TextureLoaderScopedKeeper() {

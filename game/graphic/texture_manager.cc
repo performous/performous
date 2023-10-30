@@ -9,9 +9,6 @@ TextureManager::TextureManager() {
 Texture TextureManager::get(fs::path const& filepath) {
     auto const filename = filepath.string();
 
-    //if (!m_fileTextureMap.empty())
-    //    return m_fileTextureMap.begin()->second;
-
     {
         auto guard = std::lock_guard<std::mutex>(m_mutex);
         auto const it = m_fileTextureMap.find(filename);
@@ -28,15 +25,13 @@ Texture TextureManager::get(fs::path const& filepath) {
         m_fileTextureMap[filename] = reference;
     }
 
-    ::load(this, filepath);
+    ::loadTexture(this, filepath);
 
     return Texture(reference);
 }
 
 void TextureManager::load(Bitmap const& bitmap, bool isText) {
     auto const filename = bitmap.filepath.string();
-
-    std::cout << "set texture " << filename << std::endl;
 
     auto guard = std::lock_guard<std::mutex>(m_mutex);
     auto it = m_fileTextureMap.find(filename);

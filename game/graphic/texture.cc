@@ -19,10 +19,11 @@
 void updateTextures();
 
 Texture::Texture(fs::path const& filename) { 
-    ::load(this, filename);
+    m_loadingId = ::loadTexture(this, filename);
 }
 
 Texture::~Texture() {
+    ::abortTextureLoading(m_loadingId);
 }
 
 void Texture::load(Bitmap const& bitmap, bool isText) {

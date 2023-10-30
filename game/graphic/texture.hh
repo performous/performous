@@ -5,6 +5,7 @@
 #include "graphic/window.hh"
 #include "graphic/dimensions.hh"
 #include "graphic/texture_coordinates.hh"
+#include "graphic/texture_loader.hh"
 #include "graphic/opengl_texture.hh"
 
 #include <cairo.h>
@@ -45,5 +46,8 @@ public:
 	float height() const { return getHeight(); }
 
 	void update() override;
+
+private:
+	TextureLoadingId m_loadingId{ TextureLoadingId(-1)};
 };
 
