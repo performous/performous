@@ -2,7 +2,7 @@
 #include "menu.hh"
 #include "screen_sing.hh"
 #include "playlist.hh"
-#include "theme.hh"
+#include "theme/theme.hh"
 #include "util.hh"
 #include "i18n.hh"
 
@@ -47,7 +47,7 @@ void ScreenPlaylist::prepare() {
 }
 
 void ScreenPlaylist::reloadGL() {
-	theme = std::make_unique<ThemePlaylistScreen>();
+	m_theme = std::make_unique<ThemePlaylistScreen>();
 	m_menuTheme = std::make_unique<ThemeInstrumentMenu>();
 	m_singCover = std::make_unique<Texture>(findFile("no_cover.svg"));
 	m_instrumentCover = std::make_unique<Texture>(findFile("instrument_cover.svg"));
@@ -59,7 +59,7 @@ void ScreenPlaylist::exit() {
 	overlay_menu.clear();
 	songlist_menu.clear();
 	m_menuTheme.reset();
-	theme.reset();
+	m_theme.reset();
 	m_audio.togglePause();
 	m_background.reset();
 	m_cam.reset();
@@ -269,15 +269,15 @@ void ScreenPlaylist::draw_menu_options() {
 			// Draw the text, dim if option not available
 			{
 				ColorTrans c(window, Color::alpha(opt.isActive() ? 1.0f : 0.5f));
-				theme->option_selected.dimensions.left(x).center(start_y + static_cast<float>(ii)*0.049f);
-				theme->option_selected.draw(window, opt.getName());
+				m_theme->option_selected.dimensions.left(x).center(start_y + static_cast<float>(ii)*0.049f);
+				m_theme->option_selected.draw(window, opt.getName());
 			}
-			wcounter = std::max(wcounter, theme->option_selected.w() + 2.0f * sel_margin); // Calculate the widest entry
+			wcounter = std::max(wcounter, m_theme->option_selected.w() + 2.0f * sel_margin); // Calculate the widest entry
 			// If this is a config item, show the value below
 			if (opt.type == MenuOption::Type::CHANGE_VALUE) {
 				++ii; // Use a slot for the value
-				theme->option_selected.dimensions.left(x + sel_margin).center(static_cast<float>(-0.1 + (selanim+1.0)*0.08));
-				theme->option_selected.draw(window, "<  " + opt.value->getValue() + "  >");
+				m_theme->option_selected.dimensions.left(x + sel_margin).center(static_cast<float>(-0.1 + (selanim+1.0)*0.08));
+				m_theme->option_selected.draw(window, "<  " + opt.value->getValue() + "  >");
 			}
 
 		// Regular option (not selected)
@@ -294,10 +294,10 @@ void ScreenPlaylist::draw_menu_options() {
 }
 
 SvgTxtTheme& ScreenPlaylist::getTextObject(std::string const& txt) {
-	if (theme->options.find(txt) != theme->options.end()) return (*theme->options.at(txt).get());
+	if (m_theme->options.find(txt) != m_theme->options.end()) return (*m_theme->options.at(txt).get());
 	std::pair<std::string, std::unique_ptr<SvgTxtTheme>> kv = std::make_pair(txt, std::make_unique<SvgTxtTheme>(findFile("mainmenu_option.svg"), config["graphic/text_lod"].f()));
-	theme->options.insert(std::move(kv));
-	return (*theme->options.at(txt).get());
+	m_theme->options.insert(std::move(kv));
+	return (*m_theme->options.at(txt).get());
 }
 
 void ScreenPlaylist::createSongListMenu() {

@@ -1,7 +1,7 @@
 #include "instrumentgraph.hh"
 #include "i18n.hh"
 #include "graphic/glutil.hh"
-#include "theme.hh"
+#include "theme/theme.hh"
 #include "graphic/view_trans.hh"
 
 namespace {

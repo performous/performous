@@ -4,7 +4,7 @@
 #include "configuration.hh"
 #include "controllers.hh"
 #include "platform.hh"
-#include "theme.hh"
+#include "theme/theme.hh"
 #include "i18n.hh"
 #include "game.hh"
 #include "graphic/color_trans.hh"

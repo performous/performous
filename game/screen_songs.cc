@@ -9,7 +9,7 @@
 #include "screen_sing.hh"
 #include "screen_playlist.hh"
 #include "songs.hh"
-#include "theme.hh"
+#include "theme/theme.hh"
 #include "util.hh"
 #include "playlist.hh"
 #include "graphic/video_driver.hh"
@@ -43,7 +43,7 @@ void ScreenSongs::enter() {
 }
 
 void ScreenSongs::reloadGL() {
-	theme = std::make_unique<ThemeSongs>();
+	m_theme = std::make_unique<ThemeSongs>();
 	m_menuTheme = std::make_unique<ThemeInstrumentMenu>();
 	m_songbg_default = std::make_unique<Texture>(findFile("songs_bg_default.svg"));
 	m_songbg_ground = std::make_unique<Texture>(findFile("songs_bg_ground.svg"));
@@ -63,7 +63,7 @@ void ScreenSongs::exit() {
 	m_danceCover.reset();
 	m_bandCover.reset();
 	m_instrumentList.reset();
-	theme.reset();
+	m_theme.reset();
 	m_video.reset();
 	m_songbg.reset();
 	m_songbg_default.reset();
@@ -248,13 +248,13 @@ void ScreenSongs::drawJukebox() {
 		if (!song.cover.empty()) cover = loadTextureFromMap(song.cover);
 		if (cover && !cover->empty()) {
 			Texture& s = *cover;
-			s.dimensions.left(theme->song.dimensions.x1()).top(theme->song.dimensions.y2() + 0.05f).fitInside(0.15f, 0.15f);
+			s.dimensions.left(m_theme->song.dimensions.x1()).top(m_theme->song.dimensions.y2() + 0.05f).fitInside(0.15f, 0.15f);
 			s.draw(window);
 		}
 		// Format && draw the song information text
 		std::ostringstream oss_song;
 		oss_song << song.title << '\n' << song.artist;
-		theme->song.draw(window, oss_song.str());
+		m_theme->song.draw(window, oss_song.str());
 	}
 }
 
@@ -281,7 +281,7 @@ void ScreenSongs::drawMultimedia() {
 	}
 	if (!m_jukebox) {
 		m_songbg_ground->draw(window);
-		theme->bg.draw(window);
+		m_theme->bg.draw(window);
 		drawCovers();
 	}
 }
@@ -337,10 +337,10 @@ void ScreenSongs::draw() {
 	else {
 		auto& window = getGame().getWindow();
 		// Draw song and order texts
-		theme->song.draw(window, oss_song.str());
-		theme->order.draw(window, oss_order.str());
+		m_theme->song.draw(window, oss_song.str());
+		m_theme->order.draw(window, oss_order.str());
 		drawInstruments(Dimensions(1.0f).fixedHeight(0.09f).right(0.45f).screenTop(0.02f));
-		theme->hiscores.draw(window, hiscore);
+		m_theme->hiscores.draw(window, hiscore);
 	}
 	// Menus on top of everything
 	if (m_menu.isOpen()) drawMenu();

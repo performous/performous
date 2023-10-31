@@ -8,7 +8,7 @@
 #include "fs.hh"
 #include "util.hh"
 #include "layout_singer.hh"
-#include "theme.hh"
+#include "theme/theme.hh"
 #include "video.hh"
 #include "i18n.hh"
 #include "controllers.hh"
@@ -29,7 +29,7 @@ void ScreenPlayers::enter() {
 	keyPressed = false;
 	const auto scaler = NoteGraphScalerFactory(config).create(m_song->getVocalTrack(0u));
 	m_layout_singer = std::make_unique<LayoutSinger>(m_song->getVocalTrack(0u), m_database, scaler);
-	theme = std::make_unique<ThemeSongs>();
+	m_theme = std::make_unique<ThemeSongs>();
 	m_emptyCover = std::make_unique<Texture>(findFile("no_player_image.svg"));
 	m_search.text.clear();
 	m_players.setFilter(m_search.text);
@@ -45,7 +45,7 @@ void ScreenPlayers::exit() {
 
 	m_covers.clear();
 	m_emptyCover.reset();
-	theme.reset();
+	m_theme.reset();
 	m_video.reset();
 	m_songbg.reset();
 	m_playing.clear();
@@ -122,7 +122,7 @@ void ScreenPlayers::draw() {
 	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
 	if (m_songbg.get()) m_songbg->draw(window);
 	if (m_video.get()) m_video->render(window, time);
-	theme->bg.draw(window);
+	m_theme->bg.draw(window);
 	std::string music, songbg, video;
 	double videoGap = 0.0;
 	std::ostringstream oss_song, oss_order;
@@ -180,8 +180,8 @@ void ScreenPlayers::draw() {
 	}
 
 	// Draw song and order texts
-	theme->song.draw(window, oss_song.str());
-	theme->order.draw(window, oss_order.str());
+	m_theme->song.draw(window, oss_song.str());
+	m_theme->order.draw(window, oss_order.str());
 
 	// Schedule playback change if the chosen song has changed
 	if (music != m_playReq) { m_playReq = music; m_playTimer.setValue(0.0); }

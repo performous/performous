@@ -9,7 +9,7 @@
 #include "scorewindow.hh"
 #include "screen.hh"
 #include "graphic/texture.hh"
-#include "theme.hh"
+#include "theme/theme.hh"
 #include "instrumentgraph.hh"
 #include "instruments.hh"
 
@@ -83,7 +83,7 @@ class ScreenSing: public Screen {
 	std::unique_ptr<ThemeInstrumentMenu> m_menuTheme;
 	Menu m_menu;
 	Instruments m_instruments;
-	std::shared_ptr<ThemeSing> theme;
+	std::shared_ptr<ThemeSing> m_theme;
 	AnimValue m_quitTimer;
 	AnimValue m_statusTextSwitch;
 	AnimValue m_DuetTimeout;

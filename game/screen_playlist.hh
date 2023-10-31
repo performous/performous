@@ -10,7 +10,7 @@
 #include "songs.hh"
 #include "graphic/texture.hh"
 #include "webcam.hh"
-#include "theme.hh"
+#include "theme/theme.hh"
 #include "configuration.hh"
 #include <mutex>
 #include <vector>
@@ -53,7 +53,7 @@ private:
 	Backgrounds& m_backgrounds;
 	std::unordered_map<fs::path, std::unique_ptr<Texture>, FsPathHash> m_covers;
 	std::unique_ptr<ThemeInstrumentMenu> m_menuTheme;
-	std::unique_ptr<ThemePlaylistScreen> theme;
+	std::unique_ptr<ThemePlaylistScreen> m_theme;
 	std::unique_ptr<Texture> m_background;
 	SvgTxtTheme& getTextObject(std::string const& txt);
 	AnimValue m_nextTimer;

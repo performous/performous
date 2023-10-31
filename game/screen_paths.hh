@@ -5,7 +5,7 @@
 #include "screen.hh"
 #include "songs.hh"
 #include "textinput.hh"
-#include "theme.hh"
+#include "theme/theme.hh"
 #include "fs.hh"
 #include <iostream>
 #include <map>

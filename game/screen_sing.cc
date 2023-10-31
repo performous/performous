@@ -127,7 +127,7 @@ void ScreenSing::setupVocals() {
 		//if (shownTracks.size() > 2) throw std::runtime_error("Too many tracks chosen. Only two vocal tracks can be used simultaneously.")
 		for (auto const& trk: shownTracks) {
 			const auto scaler = NoteGraphScalerFactory(config).create(*trk);
-			auto layoutSingerPtr = std::unique_ptr<LayoutSinger>(std::make_unique<LayoutSinger>(*trk, m_database, scaler, theme));
+			auto layoutSingerPtr = std::unique_ptr<LayoutSinger>(std::make_unique<LayoutSinger>(*trk, m_database, scaler, m_theme));
 			m_layout_singer.push_back(std::move(layoutSingerPtr));
 		}
 		// Note: Engine maps tracks with analyzers 1:1. If user doesn't have mics, we still want to have singer layout enabled but without engine...
@@ -161,7 +161,7 @@ void ScreenSing::createPauseMenu() {
 
 void ScreenSing::reloadGL() {
 	// Load UI graphics
-	theme = std::make_shared<ThemeSing>();
+	m_theme = std::make_shared<ThemeSing>();
 	m_menuTheme = std::make_unique<ThemeInstrumentMenu>();
 	m_pause_icon = std::make_unique<Texture>(findFile("sing_pause.svg"));
 	m_player_icon = std::make_unique<Texture>(findFile("sing_pbox.svg")); // For duet menu
@@ -186,7 +186,7 @@ void ScreenSing::exit() {
 	m_background.reset();
 	m_song->dropNotes();
 	m_menuTheme.reset();
-	theme.reset();
+	m_theme.reset();
 	m_audio.fadeout(getGame(), 0);
 	if (m_audio.isPaused()) m_audio.togglePause();
 	getGame().showLogo();
@@ -543,10 +543,10 @@ void ScreenSing::draw() {
 		// Top/bottom borders
 		ar = clamp(ar, arMin, arMax);
 		float offset = 0.5f / ar + 0.2f;
-		theme->bg_bottom.dimensions.fixedWidth(1.0f).bottom(offset);
-		theme->bg_bottom.draw(window);
-		theme->bg_top.dimensions.fixedWidth(1.0f).top(-offset);
-		theme->bg_top.draw(window);
+		m_theme->bg_bottom.dimensions.fixedWidth(1.0f).bottom(offset);
+		m_theme->bg_bottom.draw(window);
+		m_theme->bg_top.dimensions.fixedWidth(1.0f).top(-offset);
+		m_theme->bg_top.draw(window);
 	}
 
 	for (unsigned i = 0; i < m_layout_singer.size(); ++i) m_layout_singer[i]->hideLyrics(m_audio.isPaused());
@@ -564,8 +564,8 @@ void ScreenSing::draw() {
 	{
 		unsigned t = static_cast<unsigned>(clamp(time, 0.0, length));
 		m_progress->dimensions.fixedWidth(0.4f).left(-0.5f).screenTop();
-		theme->timer.dimensions.screenTop(0.5f * m_progress->dimensions.h());
-		theme->songinfo.dimensions.screenBottom(-0.01f);
+		m_theme->timer.dimensions.screenTop(0.5f * m_progress->dimensions.h());
+		m_theme->songinfo.dimensions.screenBottom(-0.01f);
 		m_progress->draw(window, static_cast<float>(songPercent));
 
 		Song::SongSection section("error", 0);
@@ -608,7 +608,7 @@ void ScreenSing::draw() {
 			}
 		}
 
-		theme->timer.draw(window, statustxt);
+		m_theme->timer.draw(window, statustxt);
 	}
 
 	if (config["game/karaoke_mode"].ui() && !m_song->hasControllers()) { //guitar track? display the score window anyway!
@@ -645,7 +645,7 @@ void ScreenSing::draw() {
 		m_menu.action(getGame());
 	}
 	std::string songinfo = m_song->artist + " - " + m_song->title;
-	theme->songinfo.draw(window, songinfo);
+	m_theme->songinfo.draw(window, songinfo);
 }
 
 void ScreenSing::drawMenu() {

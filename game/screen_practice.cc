@@ -4,7 +4,7 @@
 #include "util.hh"
 #include "fs.hh"
 #include "controllers.hh"
-#include "theme.hh"
+#include "theme/theme.hh"
 #include "progressbar.hh"
 #include "game.hh"
 #include "analyzer.hh"
@@ -31,14 +31,14 @@ void ScreenPractice::enter() {
 }
 
 void ScreenPractice::reloadGL() {
-	theme = std::make_unique<ThemePractice>();
+	m_theme = std::make_unique<ThemePractice>();
 }
 
 void ScreenPractice::exit() {
 	getGame().controllers.enableEvents(false);
 	m_vumeters.clear();
 	m_samples.clear();
-	theme.reset();
+	m_theme.reset();
 }
 
 void ScreenPractice::manageEvent(input::NavEvent const& event) {
@@ -61,14 +61,14 @@ void ScreenPractice::manageEvent(input::NavEvent const& event) {
 
 void ScreenPractice::draw() {
 	auto& window = getGame().getWindow();
-	theme->bg.draw(window);
+	m_theme->bg.draw(window);
 	this->draw_analyzers();
 }
 
 void ScreenPractice::draw_analyzers() {
 	auto& window = getGame().getWindow();
-	theme->note.dimensions.fixedHeight(0.03f);
-	theme->sharp.dimensions.fixedHeight(0.09f);
+	m_theme->note.dimensions.fixedHeight(0.03f);
+	m_theme->sharp.dimensions.fixedHeight(0.09f);
 	auto& analyzers = m_audio.analyzers();
 	if (analyzers.empty()) return;
 	MusicalScale scale;
@@ -99,17 +99,17 @@ void ScreenPractice::draw_analyzers() {
 				float posXnote = static_cast<float>(-0.25 + 0.2 * i + 0.002 * t->stabledb);  // Wiggle horizontally based on volume
 				float posYnote = static_cast<float>(-0.03 - line * 0.015);  // On treble key (C4), plus offset (lines)
 
-				theme->note.dimensions.left(posXnote).center(posYnote);
-				theme->note.draw(window);
+				m_theme->note.dimensions.left(posXnote).center(posYnote);
+				m_theme->note.draw(window);
 				// Draw # for sharp notes
 				if (scale.isSharp()) {
-					theme->sharp.dimensions.right(posXnote).center(posYnote);
-					theme->sharp.draw(window);
+					m_theme->sharp.dimensions.right(posXnote).center(posYnote);
+					m_theme->sharp.draw(window);
 				}
 			}
 		}
 	}
 	// Display note and frequency
 	if (textFreq > 0.0)
-		theme->note_txt.draw(window, scale.setFreq(textFreq).getStr());
+		m_theme->note_txt.draw(window, scale.setFreq(textFreq).getStr());
 }

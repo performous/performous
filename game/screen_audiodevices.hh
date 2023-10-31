@@ -3,7 +3,7 @@
 #include "screen.hh"
 #include "graphic/glutil.hh"
 #include "libda/portaudio.hpp"
-#include "theme.hh"
+#include "theme/theme.hh"
 #include <map>
 
 class Audio;

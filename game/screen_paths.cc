@@ -3,7 +3,7 @@
 #include "configuration.hh"
 #include "controllers.hh"
 #include "platform.hh"
-#include "theme.hh"
+#include "theme/theme.hh"
 #include "audio.hh"
 #include "i18n.hh"
 #include "game.hh"

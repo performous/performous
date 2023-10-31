@@ -6,14 +6,16 @@
 #include "i18n.hh"
 #include "controllers.hh"
 #include "platform.hh"
-#include "theme.hh"
+#include "theme/theme.hh"
+#include "theme/theme_loader.hh"
 #include "menu.hh"
 #include "game.hh"
 #include "graphic/color_trans.hh"
 
 #include <SDL_timer.h>
 
-ScreenIntro::ScreenIntro(Game &game, std::string const& name, Audio& audio): Screen(game, name), m_audio(audio), m_first(true) {
+ScreenIntro::ScreenIntro(Game &game, std::string const& name, Audio& audio)
+	: Screen(game, name), m_audio(audio), m_first(true) {
 }
 
 void ScreenIntro::enter() {
@@ -25,8 +27,10 @@ void ScreenIntro::enter() {
 	populateMenu();
 	if( m_first ) {
 		std::string msg;
-		if (!m_audio.hasPlayback()) msg = _("No playback devices could be used.\n");
-		if (!msg.empty()) getGame().dialog(msg + _("\nPlease configure some before playing."));
+		if (!m_audio.hasPlayback())
+			msg = _("No playback devices could be used.\n");
+		if (!msg.empty())
+			getGame().dialog(msg + _("\nPlease configure some before playing."));
 		m_first = false;
 	}
 	reloadGL();
@@ -35,12 +39,17 @@ void ScreenIntro::enter() {
 }
 
 void ScreenIntro::reloadGL() {
-	theme = std::make_unique<ThemeIntro>();
+	auto loader = ThemeLoader();
+
+	m_theme = loader.load<ThemeIntro>(getName());
+
+	if (!m_theme)
+		m_theme = std::make_unique<ThemeIntro>();
 }
 
 void ScreenIntro::exit() {
 	m_menu.clear();
-	theme.reset();
+	m_theme.reset();
 }
 
 void ScreenIntro::manageEvent(input::NavEvent const& event) {
@@ -88,8 +97,8 @@ void ScreenIntro::draw_menu_options() {
 	const float sel_margin = 0.03f;
 	const MenuOptions &opts = m_menu.getOptions();
 	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get()-m_menu.getSubmenuLevel()));
-	theme->back_h.dimensions.fixedHeight(0.038f);
-	theme->back_h.dimensions.stretch(m_menu.dimensions.w(), theme->back_h.dimensions.h());
+	m_theme->back_h.dimensions.fixedHeight(0.038f);
+	m_theme->back_h.dimensions.stretch(m_menu.dimensions.w(), m_theme->back_h.dimensions.h());
 	// Determine from which item to start
 	int start_i = std::min(static_cast<int>(m_menu.curIndex() - 1), static_cast<int>(opts.size() - showopts + (m_menu.getSubmenuLevel() == 2 ? 1 : 0))); // Hack to counter side-effects from displaying the value inside the menu
 	if (start_i < 0 || opts.size() == showopts) start_i = 0;
@@ -104,20 +113,20 @@ void ScreenIntro::draw_menu_options() {
 			// Animate selection higlight moving
 			double selanim = m_selAnim.get() - start_i;
 			if (selanim < 0.0) selanim = 0.0;
-			theme->back_h.dimensions.left(x - sel_margin).center(static_cast<float>(start_y + selanim*0.065));
-			theme->back_h.draw(window);
+			m_theme->back_h.dimensions.left(x - sel_margin).center(static_cast<float>(start_y + selanim*0.065));
+			m_theme->back_h.draw(window);
 			// Draw the text, dim if option not available
 			{
 				ColorTrans c(window, Color::alpha(opt.isActive() ? 1.0f : 0.5f));
-				theme->option_selected.dimensions.left(x).center(start_y + static_cast<float>(ii)*0.065f);
-				theme->option_selected.draw(window, _(opt.getName()));
+				m_theme->option_selected.dimensions.left(x).center(start_y + static_cast<float>(ii)*0.065f);
+				m_theme->option_selected.draw(window, _(opt.getName()));
 			}
-			wcounter = std::max(wcounter, theme->option_selected.w() + 2.0f * sel_margin); // Calculate the widest entry
+			wcounter = std::max(wcounter, m_theme->option_selected.w() + 2.0f * sel_margin); // Calculate the widest entry
 			// If this is a config item, show the value below
 			if (opt.type == MenuOption::Type::CHANGE_VALUE) {
 				++ii; // Use a slot for the value
-				theme->option_selected.dimensions.left(x + sel_margin).center(static_cast<float>(-0.1 + (selanim+1.0)*0.065));
-				theme->option_selected.draw(window, "<  " + _(opt.value->getValue()) + "  >");
+				m_theme->option_selected.dimensions.left(x + sel_margin).center(static_cast<float>(-0.1 + (selanim+1.0)*0.065));
+				m_theme->option_selected.draw(window, "<  " + _(opt.value->getValue()) + "  >");
 			}
 
 		// Regular option (not selected)
@@ -137,23 +146,30 @@ void ScreenIntro::draw() {
 	auto& window = getGame().getWindow();
 	glutil::GLErrorChecker glerror("ScreenIntro::draw()");
 	{
-		float anim = static_cast<float>(SDL_GetTicks() % 20000 / 20000.0);
-		ColorTrans c(window, glmath::rotate(static_cast<float>(TAU * anim), glmath::vec3(1.0f, 1.0f, 1.0f)));
-		theme->bg.draw(window);
+		if (m_theme->colorcycling) {
+			auto const cycleDurationMS = m_theme->colorcycleduration * 1000;
+			auto anim = static_cast<float>(SDL_GetTicks() % cycleDurationMS) / float(cycleDurationMS);
+			auto c = ColorTrans(window, glmath::rotate(static_cast<float>(TAU * anim), glmath::vec3(1.0f, 1.0f, 1.0f)));
+
+			m_theme->bg.draw(window);
+		}
+		else {
+			m_theme->bg.draw(window);
+		}
 	}
 	if (m_menu.current().image) m_menu.current().image->draw(window);
 	// Comment
-	theme->comment_bg.dimensions.center().screenBottom(-0.01f);
-	theme->comment_bg.draw(window);
-	theme->comment.dimensions.left(-0.48f).screenBottom(-0.028f);
-	theme->comment.draw(window, _(m_menu.current().getComment()));
+	m_theme->comment_bg.dimensions.center().screenBottom(-0.01f);
+	m_theme->comment_bg.draw(window);
+	m_theme->comment.dimensions.left(-0.48f).screenBottom(-0.028f);
+	m_theme->comment.draw(window, _(m_menu.current().getComment()));
 	// Key help for config
 	if (m_menu.getSubmenuLevel() > 0) {
-		theme->short_comment_bg.dimensions.stretch(theme->short_comment.w() + 0.065f, 0.025f);
-		theme->short_comment_bg.dimensions.left(-0.54f).screenBottom(-0.054f);
-		theme->short_comment_bg.draw(window);
-		theme->short_comment.dimensions.left(-0.48f).screenBottom(-0.067f);
-		theme->short_comment.draw(window, _("Ctrl + S to save, Ctrl + R to reset defaults"));
+		m_theme->short_comment_bg.dimensions.stretch(m_theme->short_comment.w() + 0.065f, 0.025f);
+		m_theme->short_comment_bg.dimensions.left(-0.54f).screenBottom(-0.054f);
+		m_theme->short_comment_bg.draw(window);
+		m_theme->short_comment.dimensions.left(-0.48f).screenBottom(-0.067f);
+		m_theme->short_comment.draw(window, _("Ctrl + S to save, Ctrl + R to reset defaults"));
 	}
 	// Menu
 	draw_menu_options();
@@ -161,10 +177,10 @@ void ScreenIntro::draw() {
 }
 
 SvgTxtTheme& ScreenIntro::getTextObject(std::string const& txt) {
-	if (theme->options.find(txt) != theme->options.end()) return (*theme->options.at(txt).get());
+	if (m_theme->options.find(txt) != m_theme->options.end()) return (*m_theme->options.at(txt).get());
 	std::pair<std::string, std::unique_ptr<SvgTxtTheme>> kv = std::make_pair(txt, std::make_unique<SvgTxtTheme>(findFile("mainmenu_option.svg"), config["graphic/text_lod"].f()));
-	theme->options.insert(std::move(kv));
-	return (*theme->options.at(txt).get());
+	m_theme->options.insert(std::move(kv));
+	return (*m_theme->options.at(txt).get());
 }
 
 void ScreenIntro::populateMenu() {

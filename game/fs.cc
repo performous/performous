@@ -158,13 +158,15 @@ fs::path findFile(fs::path const& filename) {
 	if (filename.empty()) throw std::logic_error("findFile expects a filename.");
 	if (filename.is_absolute()) throw std::logic_error("findFile expects a filename without path.");
 	Paths list;
-	for (fs::path p: getThemePaths()) {
+	for (fs::path p : getThemePaths()) {
 		p /= filename;
 		list.push_back(p);
-		if (fs::exists(p)) return p.string();
+		if (fs::exists(p)) 
+			return p.string();
 	}
 	std::string logmsg = "fs/error: Unable to locate data file, tried:\n";
-	for (auto const& p: list) logmsg += " " + p.string() + '\n';
+	for (auto const& p: list)
+		logmsg += " " + p.string() + '\n';
 	std::clog << logmsg << std::flush;
 	throw std::runtime_error("Cannot find file \"" + filename.string() + "\" in Performous theme or data folders");
 }

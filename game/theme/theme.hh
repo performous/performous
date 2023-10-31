@@ -8,7 +8,9 @@
 class Theme {
 protected:
 	Theme(const Theme&) = delete;
-  	const Theme& operator=(const Theme&) = delete;
+	Theme(Theme&&) = default;
+	Theme& operator=(const Theme&) = delete;
+	Theme& operator=(Theme&&) = default;
 	Theme();
 	Theme(fs::path const& path); ///< creates theme from path
 public:
@@ -96,6 +98,8 @@ public:
 	Texture comment_bg;
 	/// configuration comment background (short tip)
 	Texture short_comment_bg;
+	bool colorcycling = true;
+	unsigned colorcycleduration = 20;
 };
 
 /// theme for instrument menu

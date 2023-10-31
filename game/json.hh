@@ -10,6 +10,8 @@ nlohmann::json readJSON(fs::path const& filename); ///< Reads a JSON file into m
 void writeJSON(nlohmann::json const& json, fs::path const& filename); ///< Write a JSON file.
 
 template <typename T> std::optional<T> getJsonEntry(nlohmann::json const& json, const char *name) {
-        if (json.contains(name)) return json.at(name).get<T>();
-        return {};
+	if (json.contains(name))
+		return json.at(name).get<T>();
+
+	return {};
 }

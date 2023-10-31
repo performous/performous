@@ -3,7 +3,7 @@
 #include "animvalue.hh"
 #include "menu.hh"
 #include "screen.hh"
-#include "theme.hh"
+#include "theme/theme.hh"
 
 class Audio;
 class ThemeIntro;
@@ -29,7 +29,7 @@ class ScreenIntro : public Screen {
 	SvgTxtTheme& getTextObject(std::string const& txt);
 
 	Audio& m_audio;
-	std::unique_ptr<ThemeIntro> theme;
+	std::shared_ptr<ThemeIntro> m_theme;
 	Menu m_menu;
 	bool m_first;
 	AnimValue m_selAnim;
