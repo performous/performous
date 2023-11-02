@@ -1,0 +1,22 @@
+<!-- Playlist tab. This shows the current playlist. -->
+<div class="container-fluid">
+	<!--
+		While on large screens one can use drag and drop functionality to order the songs as you wish.
+		While on small screens you cannot use this functionality since people will mess up the playlist order.
+	-->
+    <div class="col-sm-12">
+		<button id="refresh-playlist" class="btn btn-secondary btn-block" type="button"><span class="glyphicon glyphicon-refresh glyph-centered"></span>Refresh</button>
+	</div>
+	<div class="col-sm-12">
+		<div id="playlist-songs-sortable" class="list-group songs drag-drop hidden-xs hidden-sm"></div>
+		<div id="playlist-songs" class="list-group songs hidden-md hidden-lg"></div>
+	</div>
+
+	<div class="col-sm-12">
+		<!-- Toggle to update every 10 seconds. -->
+		<div class="form-group">
+			<label for="refresh-playlist-toggle" class="control-label">update_every_10_sec</label>
+			<input id="refresh-playlist-toggle" class="form-control" type="checkbox" checked data-toggle="toggle" data-on="yes" data-off="no" data-onstyle="success" data-offstyle="danger">
+		</div>
+	</div>
+</div>
