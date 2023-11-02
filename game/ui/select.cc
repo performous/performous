@@ -1,13 +1,14 @@
 #include "select.hh"
 #include "graphiccontext.hh"
+#include "game.hh"
 #include "graphic/color_trans.hh"
 
 Select::Select(std::vector<std::string> const& items, Control* parent)
-: Control(parent), m_text(""), m_background(findFile("mainmenu_comment_bg.svg")), m_items(items) {
+: Control(parent), m_text(""), m_items(items) {
 }
 
 Select::Select(Control* parent, std::vector<std::string> const& items)
-: Control(parent), m_text(""), m_background(findFile("mainmenu_comment_bg.svg")), m_items(items) {
+: Control(parent), m_text(""), m_items(items) {
 }
 
 void Select::setItems(std::vector<std::string> const& items) {
@@ -60,4 +61,10 @@ void Select::draw(GraphicContext& gc) {
 	m_background.draw(gc.getWindow());
 
 	gc.drawCentered(m_text, getX(), getY(), getWidth(), getHeight());
+}
+
+void Select::initialize(Game& game) {
+	m_background = game.getTextureManager().get(findFile("mainmenu_comment_bg.svg"));
+
+	Control::initialize(game);
 }

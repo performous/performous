@@ -7,40 +7,41 @@ TextureManager::TextureManager() {
 }
 
 Texture TextureManager::get(fs::path const& filepath) {
-    auto const filename = filepath.string();
+	auto const filename = filepath.string();
 
-    {
-        auto guard = std::lock_guard<std::mutex>(m_mutex);
-        auto const it = m_fileTextureMap.find(filename);
+	{
+		auto guard = std::lock_guard<std::mutex>(m_mutex);
+		auto const it = m_fileTextureMap.find(filename);
 
-        if (it != m_fileTextureMap.end()) {
-            return Texture(it->second);
-        }
-    }
+		if (it != m_fileTextureMap.end()) {
+			std::clog << "reuse " << it->second.use_count() << " of texture " << it->first << std::endl;
+			return Texture(it->second);
+		}
+	}
 
-    auto reference = std::make_shared<TextureReference>();
+	auto reference = std::make_shared<TextureReference>();
 
-    {
-        auto guard = std::lock_guard<std::mutex>(m_mutex);
-        m_fileTextureMap[filename] = reference;
-    }
+	{
+		auto guard = std::lock_guard<std::mutex>(m_mutex);
+		m_fileTextureMap[filename] = reference;
+	}
 
-    ::loadTexture(this, filepath);
+	::loadTexture(this, filepath);
 
-    return Texture(reference);
+	return Texture(reference);
 }
 
 void TextureManager::load(Bitmap const& bitmap, bool isText) {
-    auto const filename = bitmap.filepath.string();
+	auto const filename = bitmap.filepath.string();
 
-    auto guard = std::lock_guard<std::mutex>(m_mutex);
-    auto it = m_fileTextureMap.find(filename);
+	auto guard = std::lock_guard<std::mutex>(m_mutex);
+	auto it = m_fileTextureMap.find(filename);
 
-    if (it == m_fileTextureMap.end())
-        return;
+	if (it == m_fileTextureMap.end())
+		return;
 
-    auto referencePtr = it->second;
+	auto referencePtr = it->second;
 
-    TextureReferenceLoader(referencePtr).load(bitmap, isText);
+	TextureReferenceLoader(referencePtr).load(bitmap, isText);
 }
 

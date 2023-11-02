@@ -115,8 +115,8 @@ void ScreenPlayerSetup::initializeControls() {
 	m_grid.resizeColumns({0.33f, 0.67f});
 	m_grid.setGeometry(horizontalOffset, verticalOffset, -horizontalOffset * 2.0f, -verticalOffset * 2.0f);
 
-	m_grid(0, 0) = &m_playerList;
-	m_grid(1, 0) = &m_panel;
+	m_grid.setControl(0, 0, &m_playerList);
+	m_grid.setControl(1, 0, &m_panel);
 
 	m_playerList.displayIcon(true);
 	m_playerList.displayCheckBox(true);
@@ -251,14 +251,29 @@ void ScreenPlayerSetup::initializeControls() {
 	m_deletePlayerButton.setTabIndex(4);
 	m_deletePlayerButton.onClicked([&](Button&){deletePlayer();});
 
+	getForm().initialize(m_game);
+
 	m_grid.layout();
 	getForm().focus(m_playerList);
+
+	if (m_players.isEmpty())
+		setAvatar(m_avatar, m_avatarPrevious, m_avatarNext, 0, m_avatars);
+}
+
+int ScreenPlayerSetup::getCurrentId() const {
+	if (m_playerList.countItems() > 0) {
+		auto& player = *m_playerList.getSelected().getUserData<PlayerItem*>();
+		auto avatar = player.getAvatar();
+		auto id = getId(m_avatars, avatar);
+
+		return id;
+	}
+
+	return m_avatarId;
 }
 
 void ScreenPlayerSetup::shiftAvatarLeft() {
-	auto& player = *m_playerList.getSelected().getUserData<PlayerItem*>();
-	auto avatar = player.getAvatar();
-	auto id = getId(m_avatars, avatar);
+	auto id = getCurrentId();
 
 	std::cout << "current: " << id << std::endl;
 
@@ -269,23 +284,28 @@ void ScreenPlayerSetup::shiftAvatarLeft() {
 
 	std::cout << "new current: " << id << std::endl;
 
-	if(id == -1) {
-		player.setAvatar("");
-		player.setAvatarPath(findFile("no_player_image.svg"));
-	}
-	else {
-		player.setAvatar(m_avatars[static_cast<size_t>(id)]);
-		player.setAvatarPath(findFile(m_avatars[static_cast<size_t>(id)]));
+	setAvatar(m_avatar, m_avatarPrevious, m_avatarNext, id, m_avatars);
+
+	if (m_playerList.countItems() > 0) {
+		auto& player = *m_playerList.getSelected().getUserData<PlayerItem*>();
+
+		if (id == -1) {
+			player.setAvatar("");
+			player.setAvatarPath(findFile("no_player_image.svg"));
+		}
+		else {
+			player.setAvatar(m_avatars[static_cast<size_t>(id)]);
+			player.setAvatarPath(findFile(m_avatars[static_cast<size_t>(id)]));
+		}
+
+		m_playerList.getSelected().setIcon(player.getAvatarPath().string());
 	}
 
-	setAvatar(m_avatar, m_avatarPrevious, m_avatarNext, id, m_avatars);
-	m_playerList.getSelected().setIcon(player.getAvatarPath().string());
+	m_avatarId = id;
 }
 
 void ScreenPlayerSetup::shiftAvatarRight() {
-	auto& player = *m_playerList.getSelected().getUserData<PlayerItem*>();
-	auto avatar = player.getAvatar();
-	auto id = getId(m_avatars, avatar);
+	auto id = getCurrentId();
 
 	std::cout << "current: " << id << std::endl;
 
@@ -296,17 +316,24 @@ void ScreenPlayerSetup::shiftAvatarRight() {
 
 	std::cout << "new current: " << id << std::endl;
 
-	if(id == -1) {
-		player.setAvatar("");
-		player.setAvatarPath(findFile("no_player_image.svg"));
-	}
-	else {
-		player.setAvatar(m_avatars[static_cast<size_t>(id)]);
-		player.setAvatarPath(findFile(m_avatars[static_cast<size_t>(id)]));
+	setAvatar(m_avatar, m_avatarPrevious, m_avatarNext, id, m_avatars);
+
+	if (m_playerList.countItems() > 0) {
+		auto& player = *m_playerList.getSelected().getUserData<PlayerItem*>();
+
+		if (id == -1) {
+			player.setAvatar("");
+			player.setAvatarPath(findFile("no_player_image.svg"));
+		}
+		else {
+			player.setAvatar(m_avatars[static_cast<size_t>(id)]);
+			player.setAvatarPath(findFile(m_avatars[static_cast<size_t>(id)]));
+		}
+
+		m_playerList.getSelected().setIcon(player.getAvatarPath().string());
 	}
 
-	setAvatar(m_avatar, m_avatarPrevious, m_avatarNext, id, m_avatars);
-	m_playerList.getSelected().setIcon(player.getAvatarPath().string());
+	m_avatarId = id;
 }
 
 void ScreenPlayerSetup::addPlayer() {

@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 
-#include "../opengl_text.hh"
+#include "graphic/opengl_text.hh"
 #include "../fs.hh"
 
 #include "effect/ieffect.hh"

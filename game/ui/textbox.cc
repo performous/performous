@@ -1,13 +1,14 @@
 #include "textbox.hh"
 #include "graphiccontext.hh"
+#include "game.hh"
 #include "graphic/color_trans.hh"
 
 TextBox::TextBox(std::string const& text, Control* parent)
-: Control(parent), m_text(text), m_background(findFile("mainmenu_back_highlight.svg")), m_cursor(findFile("cursor.svg")) {
+: Control(parent), m_text(text) {
 }
 
 TextBox::TextBox(Control* parent, std::string const& text)
-: Control(parent), m_text(text),  m_background(findFile("mainmenu_back_highlight.svg")), m_cursor(findFile("cursor.svg")) {
+: Control(parent), m_text(text) {
 }
 
 TextBox& TextBox::setText(std::string const& text, bool keepCursorPosition) {
@@ -121,5 +122,12 @@ void TextBox::draw(GraphicContext& gc) {
 		//m_cursor.dimensions.left(-0.05).top(-0.05).stretch(0.1f, 0.1f);
 		m_cursor.draw(gc.getWindow());
 	}
+}
+
+void TextBox::initialize(Game& game) {
+	m_background = game.getTextureManager().get(findFile("mainmenu_back_highlight.svg"));
+	m_cursor = game.getTextureManager().get(findFile("cursor.svg"));
+
+	Control::initialize(game);
 }
 

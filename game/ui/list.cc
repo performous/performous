@@ -1,5 +1,6 @@
 #include "list.hh"
 #include "graphiccontext.hh"
+#include "game.hh"
 #include "graphic/color_trans.hh"
 
 Item::Item(std::string const& text)
@@ -51,11 +52,11 @@ void Item::setUserData(std::any const& data) {
 const size_t List::None = size_t(-1);
 
 List::List(std::vector<Item> const& items, Control* parent)
-: Control(parent), m_background(findFile("mainmenu_back_highlight.svg")), m_selectedBackground(findFile("mainmenu_back_highlight.svg")), m_items(items) {
+: Control(parent), m_items(items) {
 }
 
 List::List(Control* parent, std::vector<Item> const& items)
-: Control(parent), m_background(findFile("mainmenu_back_highlight.svg")), m_selectedBackground(findFile("mainmenu_back_highlight.svg")), m_items(items) {
+: Control(parent), m_items(items) {
 }
 
 void List::setItems(std::vector<Item> const& items) {
@@ -253,6 +254,18 @@ void List::draw(GraphicContext& gc) {
 
 		y += lineHeight;
 	}
+}
+
+void List::initialize(Game& game) {
+	m_background = game.getTextureManager().get(findFile("mainmenu_back_highlight.svg"));
+	m_selectedBackground = game.getTextureManager().get(findFile("mainmenu_back_highlight.svg"));
+
+	for(auto& icon : m_icons)
+		icon->initialize(game);
+	for (auto& checkBox : m_checkBoxs)
+		checkBox->initialize(game);
+
+	Control::initialize(game);
 }
 
 

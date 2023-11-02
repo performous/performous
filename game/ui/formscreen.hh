@@ -14,6 +14,8 @@ class FormScreen: public Screen {
 	void manageEvent(SDL_Event) override;
 	void draw() override;
 
+	void initialize(Game&);
+
   protected:
 	Form& getForm() { return m_control; }
 	GraphicContext& getGraphicContext() { return m_gc; }

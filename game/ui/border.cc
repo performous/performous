@@ -1,16 +1,16 @@
 #include "border.hh"
 
-#include <glutil.hh>
-#include <texture.hh>
+#include "graphic/glutil.hh"
+#include "graphic/texture.hh"
 #include <util.hh>
 #include <game.hh>
 #include <graphic/video_driver.hh>
 
-BorderDefinition::BorderDefinition(const std::string& texture)
+BorderDefinition::BorderDefinition(Texture const& texture)
 	: Texture(texture) {
 }
 
-BorderDefinition::BorderDefinition(const std::string& texture, float borderWidthInPixel)
+BorderDefinition::BorderDefinition(Texture const& texture, float borderWidthInPixel)
 	: Texture(texture), m_borderWidth(borderWidthInPixel) {
 }
 
@@ -54,7 +54,7 @@ float Border::getHeight() const {
 void Border::draw(Window& window) {
 	glutil::GLErrorChecker glerror("Border::draw()");
 
-	auto const texture = UseTexture(window, *m_definition);
+	auto const texture = TextureBinder(window, *m_definition);
 	glerror.check("texture");
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -108,7 +108,6 @@ void Border::draw(Window& window) {
 	va2.texCoord(1.f, bottom).vertex(x2, yb);
 	va2.texCoord(1.f, 1.f).vertex(x2, y2);
 	va2.draw();
-
 }
 
 PathPtr Border::getPath() const {

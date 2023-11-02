@@ -10,13 +10,15 @@
 #include "graphic/color_trans.hh"
 
 #include "fs.hh"
+#include "game.hh"
 
 #include <glm/gtx/matrix_transform_2d.hpp>
 
 #include <iostream>
 
 Control::Control(Control* parent)
-: m_parent(parent), m_focusEffectImage(findFile("star_glow.svg")) {
+: m_parent(parent),
+	m_focusEffectImage(findFile("star_glow.svg")) {
 	m_focusEffectImage.dimensions.stretch(0.01f, 0.01f);
 	m_focusEffectImage.dimensions.left(-0.005f).top(-0.005f);
 
@@ -139,6 +141,23 @@ void Control::onKeyUp(std::function<void(Control&, Key)> const& callback) {
 	m_onKeyUp = callback;
 }
 
+void Control::initialize(Game& game) {
+	auto const& path = findFile("ui_focused.svg").string();
+	auto borderTexture = game.getTextureManager().get(path);
+
+	m_focus = Border{ std::make_shared<BorderDefinition>(borderTexture) };
+
+	setInitialized();
+}
+
+void Control::setInitialized() {
+	m_initialized = true;
+}
+
+bool Control::isInitialied() const {
+	return m_initialized;
+}
+
 void Control::sendOnKeyDown(Key key) {
 	std::cout << "sendOnKeyDown" << std::endl;
 	if(m_onKeyDown)
@@ -159,4 +178,11 @@ void Control::drawFocus(GraphicContext& gc) {
 	else {
 		gc.remove(m_focusEffect);
 	}
+}
+
+Game& Control::getGame() {
+	if (m_parent)
+		return m_parent->getGame();
+
+	throw std::logic_error("Failed to get game cause no parent set!");
 }

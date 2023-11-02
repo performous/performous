@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 
-#include "../opengl_text.hh"
+#include "graphic/opengl_text.hh"
 
 class GraphicContext;
 

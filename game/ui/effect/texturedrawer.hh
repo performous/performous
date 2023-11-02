@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ui/effect/ieffect.hh"
-#include "texture.hh"
+#include "graphic/texture.hh"
 
 #include <optional>
 

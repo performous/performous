@@ -1,7 +1,7 @@
 #pragma once
 
 #include "screen.hh"
-#include "texture.hh"
+#include "graphic/texture.hh"
 #include "ui/button.hh"
 #include "ui/formscreen.hh"
 #include "ui/layout/grid.hh"
@@ -29,6 +29,7 @@ class ScreenPlayerSetup: public FormScreen {
 
   private:
 	void initializeControls();
+	int getCurrentId() const;
 	void initialize();
 	void shiftAvatarLeft();
 	void shiftAvatarRight();
@@ -58,4 +59,5 @@ class ScreenPlayerSetup: public FormScreen {
 	Grid m_grid;
 	Panel m_panel;
 	std::vector<std::string> m_avatars;
+	int m_avatarId = 0;
 };

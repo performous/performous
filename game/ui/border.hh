@@ -1,6 +1,6 @@
 #pragma once
 
-#include "texture.hh"
+#include "graphic/texture.hh"
 #include "ui/path/ipathprovider.hh"
 #include "ui/path/borderpath.hh"
 
@@ -9,8 +9,8 @@
 
 class BorderDefinition : public Texture {
   public:
-	BorderDefinition(std::string const& texture);
-	BorderDefinition(std::string const& texture, float borderWidthInPixel);
+	BorderDefinition(Texture const& texture);
+	BorderDefinition(Texture const& texture, float borderWidthInPixel);
 
 	float getBorderWidth() const;
 

@@ -1,9 +1,10 @@
 #include "button.hh"
 
 #include "graphiccontext.hh"
+#include "game.hh"
 
 Button::Button(std::string const& text, Control* parent)
-: Control(parent), m_text(text),  m_background(findFile("mainmenu_back_highlight.svg")) {
+: Control(parent), m_text(text) {
 }
 
 Button::Button(Control* parent, std::string const& text)
@@ -34,6 +35,12 @@ void Button::draw(GraphicContext& gc) {
 	m_background.draw(gc.getWindow());
 
 	gc.drawCentered(m_text, getX(), getY(), getWidth(), getHeight());
+}
+
+void Button::initialize(Game& game) {
+	m_background = game.getTextureManager().get(findFile("mainmenu_back_highlight.svg"));
+
+	Control::initialize(game);
 }
 
 

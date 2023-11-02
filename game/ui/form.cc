@@ -1,5 +1,9 @@
 #include "form.hh"
 
+Form::Form(Game& game)
+: m_game(game) {
+}
+
 void Form::focus(Control const& control) {
 	auto children = collectChildren([](Control const& control){return control.canFocused();});
 
@@ -116,5 +120,9 @@ void Form::onKeyUp(Key key) {
 			if(m_focus)
 				m_focus->sendOnKeyUp(key);
 	}
+}
+
+Game& Form::getGame() {
+	return m_game;
 }
 

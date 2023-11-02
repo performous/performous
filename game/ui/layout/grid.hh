@@ -13,9 +13,9 @@ class Grid : public UserControl, public ILayoutable {
 	unsigned countRows() const;
 
 	Control const* operator()(unsigned column, unsigned row) const;
-	Control*& operator()(unsigned column, unsigned row);
 	Control const* getControl(unsigned column, unsigned row) const;
-	Control*& getControl(unsigned column, unsigned row);
+	Control* getControl(unsigned column, unsigned row);
+	void setControl(unsigned column, unsigned row, Control*);
 
 	void layout() override;
 
@@ -25,6 +25,8 @@ class Grid : public UserControl, public ILayoutable {
 	void resizeRows(std::vector<float> const&);
 
 	void draw(GraphicContext& gc) override;
+
+	void initialize(Game&) override;
 
   private:
 	unsigned m_columns;

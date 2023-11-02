@@ -1,7 +1,8 @@
 #pragma once
 
 #include "control.hh"
-#include <texture.hh>
+#include "graphic/texture.hh"
+
 #include <memory>
 
 class Image : public Control {
@@ -15,8 +16,10 @@ class Image : public Control {
 	void canBeFocused(bool value) { m_canBeFocused = value; }
 	void draw(GraphicContext&) override;
 
+	void initialize(Game&) override;
+
   private:
-	std::unique_ptr<Texture> m_texture;
+	Texture m_texture;
 	Texture m_background;
 	std::string m_path;
 	bool m_canBeFocused = false;

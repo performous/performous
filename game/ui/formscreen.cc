@@ -3,7 +3,7 @@
 #include "game.hh"
 
 FormScreen::FormScreen(Game& game, const std::string& name)
-: Screen(game, name), m_gc(game.getWindow(), m_effectManager) {
+: Screen(game, name), m_gc(game.getWindow(), m_effectManager), m_control(game) {
 }
 
 void FormScreen::manageEvent(input::NavEvent const& event) {
@@ -211,5 +211,9 @@ void FormScreen::draw() {
 	m_control.draw(m_gc);
 
 	m_effectManager.process(m_gc, getSecondsSinceLastFrame(), getSecondsSinceStart());
+}
+
+void FormScreen::initialize(Game& game) {
+	m_control.initialize(game);
 }
 

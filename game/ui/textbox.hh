@@ -1,7 +1,7 @@
 #pragma once
 
 #include "control.hh"
-#include "../texture.hh"
+#include "graphic/texture.hh"
 #include "text.hh"
 
 #include <functional>
@@ -21,6 +21,8 @@ class TextBox : public Control {
 	void onKey(Key) override;
 
 	void draw(GraphicContext&) override;
+
+	void initialize(Game&) override;
 
   private:
 	Text m_text;

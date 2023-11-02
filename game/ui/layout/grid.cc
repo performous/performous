@@ -19,16 +19,24 @@ Control const* Grid::operator()(unsigned column, unsigned row) const {
 	return m_controls.at(column + row * m_columns);
 }
 
-Control*& Grid::operator()(unsigned column, unsigned row) {
-	return m_controls.at(column + row * m_columns);
-}
-
 Control const* Grid::getControl(unsigned column, unsigned row) const {
 	return m_controls.at(column + row * m_columns);
 }
 
-Control*& Grid::getControl(unsigned column, unsigned row) {
+Control* Grid::getControl(unsigned column, unsigned row) {
 	return m_controls.at(column + row * m_columns);
+}
+
+void Grid::setControl(unsigned column, unsigned row, Control* child) {
+	auto oldChild = getControl(column, row);
+
+	if (oldChild && oldChild->getParent() == this)
+		oldChild->setParent(nullptr);
+
+	m_controls.at(column + row * m_columns) = child;
+
+	if (child)
+		child->setParent(this);
 }
 
 void Grid::layout() {
@@ -84,4 +92,12 @@ void Grid::draw(GraphicContext& gc) {
 	for(auto* child : m_controls)
 		if(child)
 			child->draw(gc);
+}
+
+void Grid::initialize(Game& game) {
+	for (auto* child : m_controls)
+		if (child)
+			child->initialize(game);
+
+	UserControl::initialize(game);
 }

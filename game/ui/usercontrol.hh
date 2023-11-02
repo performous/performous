@@ -15,6 +15,8 @@ class UserControl : public Control {
 
 	void draw(GraphicContext&) override;
 
+	void initialize(Game&) override;
+
   private:
 	std::set<Control*> m_children;
 };

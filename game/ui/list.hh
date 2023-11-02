@@ -4,7 +4,7 @@
 #include "checkbox.hh"
 #include "image.hh"
 #include "text.hh"
-#include "../texture.hh"
+#include "graphic/texture.hh"
 
 #include <any>
 #include <functional>
@@ -66,6 +66,8 @@ class List : public Control {
 	void onKey(Key) override;
 
 	void draw(GraphicContext&) override;
+
+	void initialize(Game&) override;
 
   private:
 	void updateTexts();

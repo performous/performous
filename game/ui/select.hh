@@ -2,7 +2,7 @@
 
 #include "control.hh"
 #include "text.hh"
-#include "../texture.hh"
+#include "graphic/texture.hh"
 
 #include <vector>
 
@@ -23,6 +23,8 @@ class Select : public Control {
 	void onKey(Key) override;
 
 	void draw(GraphicContext&) override;
+
+	void initialize(Game&) override;
 
   private:
 	Text m_text;

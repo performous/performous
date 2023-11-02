@@ -18,6 +18,8 @@ class Button : public Control {
 	bool canFocused() const override { return true; }
 	void draw(GraphicContext&) override;
 
+	void initialize(Game&) override;
+
   private:
 	Text m_text;
 	Texture m_background;

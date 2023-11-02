@@ -1,8 +1,9 @@
 #include "checkbox.hh"
 #include "graphiccontext.hh"
+#include "game.hh"
 
 CheckBox::CheckBox(bool checked, Control* parent)
-: Control(parent), m_checkedImage(findFile("checkbox_checked.svg")), m_uncheckedImage(findFile("checkbox_unchecked.svg")), m_checked(checked) {
+: Control(parent), m_checked(checked) {
 }
 
 CheckBox::CheckBox(Control* parent, bool checked)
@@ -51,6 +52,13 @@ void CheckBox::draw(GraphicContext& gc) {
 		m_checkedImage.dimensions.left(getX()).top(getY()).stretch(0, 0);
 		m_checkedImage.draw(gc.getWindow());
 	}
+}
+
+void CheckBox::initialize(Game& game) {
+	m_checkedImage = game.getTextureManager().get(findFile("checkbox_checked.svg"));
+	m_uncheckedImage = game.getTextureManager().get(findFile("checkbox_unchecked.svg"));
+
+	Control::initialize(game);
 }
 
 

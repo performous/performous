@@ -54,3 +54,10 @@ void UserControl::draw(GraphicContext& gc) {
 	for(auto* child : m_children)
 		child->draw(gc);
 }
+
+void UserControl::initialize(Game& game) {
+	for (auto* child : m_children)
+		child->initialize(game);
+
+	Control::initialize(game);
+}

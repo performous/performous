@@ -54,12 +54,18 @@ class Control {
 
 	virtual void draw(GraphicContext&) = 0;
 
+	virtual void initialize(Game&);
+	void setInitialized();
+	bool isInitialied() const;
+
   protected:
 	friend class Form;
 	void sendOnKeyDown(Key);
 	void sendOnKeyUp(Key);
 
 	void drawFocus(GraphicContext&);
+
+	virtual Game& getGame();
 
   protected:
 	Control* m_parent = nullptr;
@@ -73,10 +79,11 @@ class Control {
 	bool m_focused = false;
 	bool m_enabled = true;
 	unsigned m_tabIndex = 0;
-	Border m_focus{std::make_shared<BorderDefinition>(findFile("ui_focused.svg").string())};
+	Border m_focus{ nullptr };
 	Texture m_focusEffectImage;
 	EffectPtr m_focusEffect;
 	glmath::mat3 m_matrix{1.f};
 	std::function<void(Control&, Key)> m_onKeyDown;
 	std::function<void(Control&, Key)> m_onKeyUp;
+	bool m_initialized = false;
 };
