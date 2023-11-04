@@ -1,6 +1,8 @@
 {
 	"Intro" : {
-		"background": "introscreen_background.png",
-		"colorcycling": false
+		"background": {
+			"image": "introscreen_background.png",
+			"colorcycling": false
+		}
 	}
 }

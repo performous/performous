@@ -38,19 +38,23 @@ ThemePtr ThemeLoader::load(std::string const& screenName)
 			auto const screenConfig = config.at(screenName);
 
 			if (screenConfig.contains("background")) {
-				auto const filename = screenConfig.at("background").get<std::string>();
+				auto const backgroundConfig = screenConfig.at("background");
 
-				loadTexture(screen->bg, filename);
-			}
-			if (screenConfig.contains("colorcycling")) {
-				auto const colorcycling = screenConfig.at("colorcycling").get<bool>();
+				if (backgroundConfig.contains("image")) {
+					auto const filename = backgroundConfig.at("image").get<std::string>();
 
-				screen->colorcycling = colorcycling;
-			}
-			if (screenConfig.contains("colorcycleduration")) {
-				auto const colorcycleduration = screenConfig.at("colorcycleduration").get<unsigned>();
+					loadTexture(screen->bg, filename);
+				}
+				if (backgroundConfig.contains("colorcycling")) {
+					auto const colorcycling = backgroundConfig.at("colorcycling").get<bool>();
 
-				screen->colorcycleduration = colorcycleduration;
+					screen->colorcycling = colorcycling;
+				}
+				if (backgroundConfig.contains("colorcycleduration")) {
+					auto const colorcycleduration = backgroundConfig.at("colorcycleduration").get<unsigned>();
+
+					screen->colorcycleduration = colorcycleduration;
+				}
 			}
 		}
 	}
