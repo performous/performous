@@ -3,6 +3,7 @@ include(GoogleTest)
 
 set(SOURCE_FILES
 	"analyzertest.cc"
+	"animvalue_test.cc"
 	"colortest.cc"
 	"configitemtest.cc"
 	"cycletest.cc"

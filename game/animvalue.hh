@@ -10,8 +10,11 @@
 /// class for simple/linear animation/transition of values
 class AnimValue {
   public:
+	using TimePoint = decltype(Clock::now());
+
+  public:
 	/// constructor
-	AnimValue(double value = 0.0, double rate = 1.0): m_value(value), m_target(value), m_rate(rate), m_time(Clock::now()) {}
+	AnimValue(double value = 0.0, double rate = 1.0, TimePoint start = Clock::now()): m_value(value), m_target(value), m_rate(rate), m_time(start) {}
 	/// move animation forward by diff
 	void move(double diff) { m_value += diff; }
 	/// gets animition target
@@ -28,8 +31,8 @@ class AnimValue {
 	/// set the adjustment rate
 	void setRate(double value) { m_rate = value; }
 	/// get current anim value
-	double get() const {
-		double maxadj = m_rate * duration();
+	double get(TimePoint timePoint = Clock::now()) const {
+		double maxadj = m_rate * duration(timePoint);
 		double diff = m_value - m_target;
 		double adj = std::min(maxadj, std::fabs(diff));
 		if (diff > 0.0) m_value -= adj; else m_value += adj;
@@ -37,10 +40,9 @@ class AnimValue {
 	}
 
   private:
-	double duration() const {
-		auto newtime = Clock::now();
-		Seconds t = newtime - m_time;
-		m_time = newtime;
+	double duration(TimePoint timePoint) const {
+		Seconds t = timePoint - m_time;
+		m_time = timePoint;
 		return clamp(t.count());
 	}
 	mutable double m_value;
