@@ -5,7 +5,7 @@
 
 Theme::Theme()
 {}
-Theme::Theme(fs::path const& path) : bg(path)
+Theme::Theme(fs::path const& path) : bg(std::make_unique<Texture>(path))
 {}
 
 ThemeSongs::ThemeSongs():

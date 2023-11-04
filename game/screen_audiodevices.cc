@@ -110,7 +110,7 @@ void ScreenAudioDevices::manageEvent(SDL_Event event) {
 void ScreenAudioDevices::draw() {
 	auto& window = getGame().getWindow();
 
-	m_theme->bg.draw(window);
+	m_theme->bg->draw(window);
 	if (m_devs.empty()) return;
 	// Calculate spacing between columns/rows
 	const float xstep = (xoff - 0.5f + xoff) / static_cast<float>(m_channels.size());

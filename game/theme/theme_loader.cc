@@ -43,7 +43,7 @@ ThemePtr ThemeLoader::load(std::string const& screenName)
 				if (backgroundConfig.contains("image")) {
 					auto const filename = backgroundConfig.at("image").get<std::string>();
 
-					loadTexture(screen->bg, filename);
+					loadTexture(*screen->bg, filename);
 				}
 				if (backgroundConfig.contains("colorcycling")) {
 					auto const colorcycling = backgroundConfig.at("colorcycling").get<bool>();

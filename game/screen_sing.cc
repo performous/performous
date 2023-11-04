@@ -661,8 +661,8 @@ void ScreenSing::drawMenu() {
 	float y = -h * .5f + step;
 	float x = -w * .5f + step;
 	// Background
-	th.bg.dimensions.middle(0).center(0).stretch(w, h);
-	th.bg.draw(window);
+	th.bg->dimensions.middle(0).center(0).stretch(w, h);
+	th.bg->draw(window);
 	// Loop through menu items
 	w = 0;
 	std::size_t player = 0;

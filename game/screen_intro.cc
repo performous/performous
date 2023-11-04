@@ -151,10 +151,10 @@ void ScreenIntro::draw() {
 			auto anim = static_cast<float>(SDL_GetTicks() % cycleDurationMS) / float(cycleDurationMS);
 			auto c = ColorTrans(window, glmath::rotate(static_cast<float>(TAU * anim), glmath::vec3(1.0f, 1.0f, 1.0f)));
 
-			m_theme->bg.draw(window);
+			m_theme->bg->draw(window);
 		}
 		else {
-			m_theme->bg.draw(window);
+			m_theme->bg->draw(window);
 		}
 	}
 	if (m_menu.current().image) m_menu.current().image->draw(window);

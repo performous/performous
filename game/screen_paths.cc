@@ -129,7 +129,7 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 void ScreenPaths::draw() {
 	auto& window = getGame().getWindow();
 
-	m_theme->bg.draw(window);
+	m_theme->bg->draw(window);
 
 	//draw menu:
 	{

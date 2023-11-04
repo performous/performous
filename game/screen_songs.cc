@@ -281,7 +281,7 @@ void ScreenSongs::drawMultimedia() {
 	}
 	if (!m_jukebox) {
 		m_songbg_ground->draw(window);
-		m_theme->bg.draw(window);
+		m_theme->bg->draw(window);
 		drawCovers();
 	}
 }
@@ -570,8 +570,8 @@ void ScreenSongs::drawMenu() {
 	float y = -h * .5f + step;
 	float x = -w * .5f + step;
 	// Background
-	th.bg.dimensions.middle(0).center(0).stretch(w, h);
-	th.bg.draw(window);
+	th.bg->dimensions.middle(0).center(0).stretch(w, h);
+	th.bg->draw(window);
 	// Loop through menu items
 	w = 0;
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it) {

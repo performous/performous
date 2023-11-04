@@ -122,7 +122,7 @@ void ScreenPlayers::draw() {
 	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
 	if (m_songbg.get()) m_songbg->draw(window);
 	if (m_video.get()) m_video->render(window, time);
-	m_theme->bg.draw(window);
+	m_theme->bg->draw(window);
 	std::string music, songbg, video;
 	double videoGap = 0.0;
 	std::ostringstream oss_song, oss_order;

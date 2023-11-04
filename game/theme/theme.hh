@@ -16,7 +16,7 @@ protected:
 
 public:
 	/// background image for theme
-	Texture bg;
+	std::unique_ptr<Texture> bg; // temporary unique_ptr
 	bool colorcycling = true;
 	unsigned colorcycleduration = 20;
 };

@@ -93,8 +93,8 @@ void InstrumentGraph::drawMenu() {
 	float x = -w*.5f + step + button_margin;
 	float xx = w*.5f - step - button_margin;
 	// Background
-	th.bg.dimensions.middle().center().stretch(w, h);
-	th.bg.draw(window);
+	th.bg->dimensions.middle().center().stretch(w, h);
+	th.bg->draw(window);
 	// Loop through menu items
 	w = 0;
 	unsigned i = 0;
