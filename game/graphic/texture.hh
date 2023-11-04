@@ -23,7 +23,6 @@ void updateTextures();
 **/
 class Texture: public OpenGLTexture<GL_TEXTURE_2D> {
 public:
-	struct Impl;
 	/// dimensions
 	Dimensions dimensions;
 	/// texture coordinates

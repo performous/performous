@@ -1,5 +1,4 @@
 #include "opengl_text.hh"
-#include "graphic/text_renderer.hh"
 
 #include "graphic/text_renderer.hh"
 #include "graphic/lyrics_color_trans.hh"

@@ -156,10 +156,10 @@ void ScreenPlayers::draw() {
 		double shift = spos - baseidx;
 		// FIXME: 3D browser
 		for (int i = -2; i < 5; ++i) {
-			auto const& player_display = m_players[static_cast<unsigned>(baseidx + i)];
-
 			if (static_cast<unsigned>(baseidx + i) >= ss)
 				continue;
+
+			auto const& player_display = m_players[static_cast<unsigned>(baseidx + i)];
 
 			Texture& s = !player_display.path.empty() ? *loadTextureFromMap(player_display.path) : *m_emptyCover;
 			float diff = (i == 0 ? static_cast<float>((0.5 - fabs(shift)) * 0.07) : 0.0f);

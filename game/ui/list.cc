@@ -178,6 +178,8 @@ void List::updateIcons() {
 				m_icons[i] = std::make_unique<Image>(path, this);
 			else
 				m_icons[i]->setTexture(path);
+
+			m_icons[i]->initialize(getGame());
 		}
 	}
 }
@@ -195,6 +197,7 @@ void List::updateCheckBoxs() {
 						std::cout << "set item " << i << " to " << (checked ? "checked" : "unchecked") << std::endl;
 						std::cout << "set item " << i << " to " << (m_items[i].isChecked() ? "checked" : "unchecked") << std::endl;
 					});
+				m_checkBoxs[i]->initialize(getGame());
 			}
 		}
 	}

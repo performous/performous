@@ -17,8 +17,6 @@ void Image::setTexture(std::string const& texture) {
 		m_path = texture;
 		return;
 	}
-	if (m_path == texture)
-		return;
 
 	m_path = texture;
 
@@ -26,7 +24,9 @@ void Image::setTexture(std::string const& texture) {
 
 	std::cout << "path: " << m_path << "   " << fs::path(m_path).is_absolute() << std::endl;
 
-	if (fs::path(m_path).is_absolute())
+	if (m_path.empty())
+		m_texture.setVisible(false);
+	else if (fs::path(m_path).is_absolute())
 		m_texture = game.getTextureManager().get(m_path);
 	else
 		m_texture = game.getTextureManager().get(findFile(m_path));

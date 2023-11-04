@@ -185,13 +185,18 @@ void ScreenPlayerSetup::initializeControls() {
 	m_avatarLabel.setGeometry(0.01f, y, horizontalLabelSpace, lineHeight);
 	m_avatarLabel.setText(_("Avatar:"));
 
+	auto const sideSize = 0.75f;
+	auto const avatarWidth = horizontalSpace * 0.6f;
+	auto const avatarHeight = avatarWidth * 1.5f;
+	auto const avatarSideWidth = avatarWidth * sideSize;
+	auto const avatarSideHeight = avatarHeight * sideSize;
 	auto x = 0.01f + horizontalLabelSpace + 0.01f;
-	auto y2 = y + (horizontalSpace * (0.6f - 0.15f)) * 0.5f;
+	auto y2 = y + (avatarHeight - avatarSideHeight) * 0.5f;
 	m_panel.addControl(m_avatarPrevious);
-	m_avatarPrevious.setGeometry(x, y2, horizontalSpace * 0.15f, horizontalSpace * 0.15f);
-	x += horizontalSpace * 0.2f;
+	m_avatarPrevious.setGeometry(x, y2, avatarSideWidth, avatarSideHeight);
+	x += avatarSideWidth + horizontalSpace * 0.05f;
 	m_panel.addControl(m_avatar);
-	m_avatar.setGeometry(x, y, horizontalSpace * 0.6f, horizontalSpace * 0.6f);
+	m_avatar.setGeometry(x, y, avatarWidth, avatarHeight);
 	m_avatar.canBeFocused(true);
 	m_avatar.setTabIndex(2);
 	m_avatar.onKeyUp(
@@ -202,11 +207,11 @@ void ScreenPlayerSetup::initializeControls() {
 				shiftAvatarRight();
 		}
 	);
-	x += horizontalSpace * 0.65f;
+	x += avatarWidth + horizontalSpace * 0.05f;
 	m_panel.addControl(m_avatarNext);
-	m_avatarNext.setGeometry(x, y2, horizontalSpace * 0.15f, horizontalSpace * 0.15f);
+	m_avatarNext.setGeometry(x, y2, avatarSideWidth, avatarSideHeight);
 
-	y += horizontalSpace * 0.6f + verticalSpace;
+	y += avatarHeight + verticalSpace;
 
 	m_panel.addControl(m_bestScoreLabel);
 	m_bestScoreLabel.setGeometry(0.01f, y, horizontalLabelSpace, lineHeight);

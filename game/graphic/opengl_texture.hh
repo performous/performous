@@ -53,6 +53,15 @@ public:
 		return *this;
 	}
 
+
+	bool isVisible() const {
+		return m_visible;
+	}
+
+	void setVisible(bool visible) {
+		m_visible = visible;
+	}
+
 	operator TextureReferencePtr() const { return m_textureReference; }
 
 protected:
@@ -64,6 +73,7 @@ protected:
 
 private:
 	TextureReferencePtr m_textureReference;
+	bool m_visible = true;
 };
 
 
@@ -85,7 +95,7 @@ private:
 };
 
 template <GLenum Type> OpenGLTexture<Type>::OpenGLTexture() {
-	m_textureReference = std::make_shared<TextureReference>(); 
+	m_textureReference = std::make_shared<TextureReference>();
 
 	m_textureReference->addChangeReceiver(this);
 }
@@ -97,6 +107,9 @@ template <GLenum Type> OpenGLTexture<Type>::OpenGLTexture(TextureReferencePtr te
 }
 
 template <GLenum Type> void OpenGLTexture<Type>::draw(Window& window, Dimensions const& dim, TexCoords const& tex) const {
+	if (!isVisible())
+		return;
+
 	glutil::GLErrorChecker glerror("OpenGLTexture::draw()");
 	glutil::VertexArray va;
 
@@ -119,6 +132,9 @@ template <GLenum Type> void OpenGLTexture<Type>::draw(Window& window, Dimensions
 }
 
 template <GLenum Type> void OpenGLTexture<Type>::draw(Window& window, Dimensions const& dim, TexCoords const& tex, glmath::mat3 const& matrix) const {
+	if (!isVisible())
+		return;
+
 	glutil::GLErrorChecker glerror("OpenGLTexture::draw()");
 	glutil::VertexArray va;
 
