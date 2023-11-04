@@ -225,7 +225,7 @@ void ScreenIntro::draw_webserverNotice() {
 	if((webserversetting == 1 || webserversetting == 2) && m_drawNotice) {
 		std::string message = getGame().subscribeWebserverMessages();
 		m_webserverStatusString << _("Webserver active!\n connect to this computer\nusing: ") << message;
-		theme->WebserverNotice.draw(window, m_webserverStatusString.str());
+		m_theme->WebserverNotice.draw(window, m_webserverStatusString.str());
 	}
 }
 
