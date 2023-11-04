@@ -13,9 +13,12 @@ protected:
 	Theme& operator=(Theme&&) = default;
 	Theme();
 	Theme(fs::path const& path); ///< creates theme from path
+
 public:
 	/// background image for theme
 	Texture bg;
+	bool colorcycling = true;
+	unsigned colorcycleduration = 20;
 };
 
 /// theme for song selection
@@ -98,8 +101,6 @@ public:
 	Texture comment_bg;
 	/// configuration comment background (short tip)
 	Texture short_comment_bg;
-	bool colorcycling = true;
-	unsigned colorcycleduration = 20;
 };
 
 /// theme for instrument menu

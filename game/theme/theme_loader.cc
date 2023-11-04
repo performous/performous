@@ -5,6 +5,10 @@ namespace {
 	ThemePtr createTheme(std::string const& screen) {
 		if (screen == "Intro")
 			return std::make_shared<ThemeIntro>();
+		if (screen == "Songs")
+			return std::make_shared<ThemeSongs>();
+		if (screen == "Practice")
+			return std::make_shared<ThemePractice>();
 
 		throw std::logic_error("creation of theme for screen '" + screen + "' is not implemented!");
 	}
@@ -21,32 +25,32 @@ namespace {
 	}
 }
 
-ThemePtr ThemeLoader::load(std::string const& screen)
+ThemePtr ThemeLoader::load(std::string const& screenName)
 {
-	auto theme = createTheme(screen);
+	auto theme = createTheme(screenName);
 
 	try {
 		auto const fullpath = findFile("theme.json");
 		auto const config = readJSON(fullpath);
 
-		if (config.contains(screen)) {
-			auto introScreen = std::static_pointer_cast<ThemeIntro>(theme);
-			auto const screenConfig = config.at(screen);
+		if (config.contains(screenName)) {
+			auto screen = std::static_pointer_cast<Theme>(theme);
+			auto const screenConfig = config.at(screenName);
 
 			if (screenConfig.contains("background")) {
 				auto const filename = screenConfig.at("background").get<std::string>();
 
-				loadTexture(introScreen->bg, filename);
+				loadTexture(screen->bg, filename);
 			}
 			if (screenConfig.contains("colorcycling")) {
 				auto const colorcycling = screenConfig.at("colorcycling").get<bool>();
 
-				introScreen->colorcycling = colorcycling;
+				screen->colorcycling = colorcycling;
 			}
 			if (screenConfig.contains("colorcycleduration")) {
 				auto const colorcycleduration = screenConfig.at("colorcycleduration").get<unsigned>();
 
-				introScreen->colorcycleduration = colorcycleduration;
+				screen->colorcycleduration = colorcycleduration;
 			}
 		}
 	}

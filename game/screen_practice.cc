@@ -5,9 +5,13 @@
 #include "fs.hh"
 #include "controllers.hh"
 #include "theme/theme.hh"
+#include "theme/theme_loader.hh"
 #include "progressbar.hh"
 #include "game.hh"
 #include "analyzer.hh"
+#include "graphic/color_trans.hh"
+
+#include <SDL_timer.h>
 
 ScreenPractice::ScreenPractice(Game &game, std::string const& name, Audio& audio):
   Screen(game, name), m_audio(audio)
@@ -31,7 +35,12 @@ void ScreenPractice::enter() {
 }
 
 void ScreenPractice::reloadGL() {
-	m_theme = std::make_unique<ThemePractice>();
+	auto loader = ThemeLoader();
+
+	m_theme = loader.load<ThemePractice>(getName());
+
+	if (!m_theme)
+		m_theme = std::make_unique<ThemePractice>();
 }
 
 void ScreenPractice::exit() {
@@ -61,7 +70,18 @@ void ScreenPractice::manageEvent(input::NavEvent const& event) {
 
 void ScreenPractice::draw() {
 	auto& window = getGame().getWindow();
-	m_theme->bg.draw(window);
+	{
+		if (m_theme->colorcycling) {
+			auto const cycleDurationMS = m_theme->colorcycleduration * 1000;
+			auto anim = static_cast<float>(SDL_GetTicks() % cycleDurationMS) / float(cycleDurationMS);
+			auto c = ColorTrans(window, glmath::rotate(static_cast<float>(TAU * anim), glmath::vec3(1.0f, 1.0f, 1.0f)));
+
+			m_theme->bg.draw(window);
+		}
+		else {
+			m_theme->bg.draw(window);
+		}
+	}
 	this->draw_analyzers();
 }
 
