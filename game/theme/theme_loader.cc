@@ -1,5 +1,6 @@
 #include "theme_loader.hh"
 #include "json.hh"
+#include "value/json_to_value_converter.hh"
 
 namespace {
 	ThemePtr createTheme(std::string const& screen) {
@@ -28,6 +29,7 @@ namespace {
 ThemePtr ThemeLoader::load(std::string const& screenName)
 {
 	auto theme = createTheme(screenName);
+	auto converter = JsonToValueConverter();
 
 	try {
 		auto const fullpath = findFile("theme.json");
