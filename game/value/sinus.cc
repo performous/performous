@@ -1,6 +1,7 @@
 #include "sinus.hh"
 
 #include "value.hh"
+#include "utils/math.hh"
 
 #include <cmath>
 
@@ -9,7 +10,7 @@ SinusValue::SinusValue(Value const& value)
 }
 
 float SinusValue::get() const {
-	auto const value = m_value * M_PI / 180.0;
+	auto const value = m_value * pi() / 180.0;
 
 	return static_cast<float>(::sin(value));
 }
