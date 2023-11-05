@@ -1,6 +1,8 @@
 #pragma once
 
 #include "controllers.hh"
+#include "theme/theme.hh"
+
 #include <SDL_events.h>
 #include <cstdint>
 #include <string>
@@ -33,6 +35,8 @@ class Screen {
 	std::string getName() const { return m_name; }
 	/// returns game
 	Game& getGame() const { return m_game; }
+
+	void drawImages(Theme&);
 
   private:
 	Game &m_game;

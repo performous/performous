@@ -15,10 +15,19 @@ protected:
 	Theme(fs::path const& path); ///< creates theme from path
 
 public:
+	struct Image {
+		std::string id;
+		std::unique_ptr<Texture> texture; // temporary unique_ptr
+		float x;
+		float y;
+		float scale = 1.f;
+		bool applied = false;
+	};
 	/// background image for theme
 	std::unique_ptr<Texture> bg; // temporary unique_ptr
 	bool colorcycling = true;
 	unsigned colorcycleduration = 20;
+	std::vector<Image> images;
 };
 
 /// theme for song selection

@@ -3,6 +3,16 @@
 		"background" : {
 			"colorcycling": true,
 			"colorcycleduration": 2
-		}
+		},
+		"images": [
+			{
+				"id": "logo",
+				"image": "logo.svg",
+				"x": 0.0,
+				"y": 0.0,
+				"scale": 0.3
+			}
+		]
+
 	}
 }

@@ -174,6 +174,7 @@ void ScreenIntro::draw() {
 	// Menu
 	draw_menu_options();
 	draw_webserverNotice();
+	drawImages(*m_theme);
 }
 
 SvgTxtTheme& ScreenIntro::getTextObject(std::string const& txt) {
