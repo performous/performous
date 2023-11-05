@@ -22,6 +22,7 @@ public:
 		float y;
 		float scale = 1.f;
 		bool applied = false;
+		Value angle = 0.f;
 	};
 	/// background image for theme
 	std::unique_ptr<Texture> bg; // temporary unique_ptr
@@ -31,7 +32,13 @@ public:
 };
 
 /// theme for song selection
-class ThemeSongs: public Theme {
+class ThemeGlobal : public Theme {
+public:
+	ThemeGlobal() = default;
+};
+
+/// theme for song selection
+class ThemeSongs : public Theme {
 public:
 	ThemeSongs();
 	/// song display

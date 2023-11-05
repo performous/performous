@@ -64,6 +64,8 @@ class Game {
 	void showLogo(bool show = true) { m_logoAnim.setTarget(show ? 1.0 : 0.0); }
 	/// Draw the logo
 	void drawLogo();
+	void drawImages();
+	void setImages(std::vector<Theme::Image>&&);
 	///global playlist access
 	PlayList& getCurrentPlayList() { return currentPlaylist; }
 #ifdef USE_WEBSERVER
@@ -104,6 +106,7 @@ private:
 	AnimValue m_dialogTimeOut;
 	// Dialog members
 	std::unique_ptr<Dialog> m_dialog;
+	std::vector<Theme::Image> m_images;
 #ifdef USE_WEBSERVER
 	std::string m_webserverMessage = "Trying to connect to webserver";
 #endif

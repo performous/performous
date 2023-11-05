@@ -4,6 +4,8 @@
 
 namespace {
 	ThemePtr createTheme(std::string const& screen) {
+		if (screen == "Global")
+			return std::make_shared<ThemeGlobal>();
 		if (screen == "Intro")
 			return std::make_shared<ThemeIntro>();
 		if (screen == "Songs")

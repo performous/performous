@@ -36,7 +36,8 @@ class Screen {
 	/// returns game
 	Game& getGame() const { return m_game; }
 
-	void drawImages(Theme&);
+	void drawImages(Theme const&);
+	void drawImages(std::vector<Theme::Image> const&);
 
   private:
 	Game &m_game;

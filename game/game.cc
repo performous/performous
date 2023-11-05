@@ -6,6 +6,7 @@
 #include "graphic/glutil.hh"
 #include "util.hh"
 #include "graphic/color_trans.hh"
+#include "theme/theme_loader.hh"
 
 #include <thread>
 #include <stdexcept>
@@ -17,6 +18,11 @@ Game::Game(Window& window) :
     m_logo(m_textureManager.get(findFile("logo.svg")))
 {
     m_textMessage.dimensions.middle().center(-0.05f);
+
+	auto loader = ThemeLoader();
+	auto theme = loader.load<Theme>("Global");
+
+	setImages(std::move(theme->images));
 }
 
 void Game::activateScreen(std::string const& name) {
@@ -48,6 +54,7 @@ void Game::prepareScreen() {
 void Game::drawScreen() {
     getCurrentScreen()->draw();
     drawLogo();
+	drawImages();
     drawNotifications();
 }
 
@@ -113,6 +120,14 @@ bool Game::closeDialog() {
 void Game::drawLogo() {
     m_logo.dimensions.fixedHeight(0.1f).left(-0.45f).screenTop(-0.1f + 0.11f * static_cast<float>(smoothstep(m_logoAnim.get())));
     m_logo.draw(m_window);
+}
+
+void Game::drawImages() {
+	getCurrentScreen()->drawImages(m_images);
+}
+
+void Game::setImages(std::vector<Theme::Image>&& images) {
+	m_images = std::move(images);
 }
 
 TextureManager& Game::getTextureManager()
