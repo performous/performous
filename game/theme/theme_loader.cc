@@ -50,9 +50,15 @@ ThemePtr ThemeLoader::load(std::string const& screenName)
 				auto const backgroundConfig = screenConfig.at("background");
 
 				if (backgroundConfig.contains("image")) {
-					auto const filename = backgroundConfig.at("image").get<std::string>();
+					if (backgroundConfig.at("image").is_string()) {
+						auto const filename = backgroundConfig.at("image").get<std::string>();
 
-					loadTexture(*theme->bg, filename);
+						loadTexture(*theme->bg, filename);
+					}
+					else if (backgroundConfig.at("image").is_array()) {
+						for (auto const& image : backgroundConfig.at("image"))
+							theme->backgrounds.emplace_back(image.get<std::string>());
+					}
 				}
 				if (backgroundConfig.contains("colorcycling")) {
 					auto const colorcycling = backgroundConfig.at("colorcycling").get<bool>();

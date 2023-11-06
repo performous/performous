@@ -67,14 +67,13 @@ class ScreenSing: public Screen {
 	size_t players() const; // Always have at least one player to display lyrics and prevent crashes.
 	void onEnter(EventParameter const&);
 
-
 	Audio& m_audio;
 	Database& m_database;
 	Backgrounds& m_backgrounds;
 	std::shared_ptr<Song> m_song; /// Pointer to the current song
 	std::unique_ptr<ScoreWindow> m_score_window;
 	std::unique_ptr<ProgressBar> m_progress;
-	std::unique_ptr<Texture> m_background;
+	std::shared_ptr<Texture> m_background;
 	std::unique_ptr<Video> m_video;
 	std::unique_ptr<Webcam> m_cam;
 	std::unique_ptr<Texture> m_pause_icon;
