@@ -3,6 +3,9 @@
 namespace {
 
 	Value parseValue(nlohmann::json const& valueConfig) {
+		if(!valueConfig.is_object()) {
+			return value::Float(valueConfig.get<float>());
+		}
 		if (valueConfig.contains("value")) {
 			return value::Float(valueConfig.at("value").get<float>());
 		}
@@ -31,7 +34,10 @@ namespace {
 			return value::Multiply(parseValue(valueConfig.at("multiply").at("value0")), parseValue(valueConfig.at("multiply").at("value1")));
 		}
 		if (valueConfig.contains("add")) {
-			return value::Multiply(parseValue(valueConfig.at("add").at("value0")), parseValue(valueConfig.at("add").at("value1")));
+			return value::Add(parseValue(valueConfig.at("add").at("value0")), parseValue(valueConfig.at("add").at("value1")));
+		}
+		if (valueConfig.contains("subtract")) {
+			return value::Subtract(parseValue(valueConfig.at("subtract").at("value0")), parseValue(valueConfig.at("subtract").at("value1")));
 		}
 		if (valueConfig.contains("random")) {
 			auto min = Value(0.0f);

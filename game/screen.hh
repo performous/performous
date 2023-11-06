@@ -39,6 +39,9 @@ class Screen {
 	void drawImages(Theme const&);
 	void drawImages(std::vector<Theme::Image> const&);
 
+  protected:
+	Theme::Image* findImage(std::string const& id, Theme& theme);
+
   private:
 	Game &m_game;
 	std::string m_name;

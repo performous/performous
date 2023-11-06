@@ -30,13 +30,24 @@ void Game::activateScreen(std::string const& name) {
 }
 
 void Game::updateScreen() {
-    if (!newScreen) return;
-    Screen* s = newScreen;  // A local copy in case exit() or enter() want to change screens again
-    newScreen = nullptr;
-    if (currentScreen) currentScreen->exit();
-    currentScreen = nullptr;  // Exception safety, do not remove
-    s->enter();
-    currentScreen = s;
+	if (!newScreen)
+		return;
+	if (currentScreen && currentScreen->getName() == newScreen->getName())
+		return;
+
+	auto const from = (currentScreen ? currentScreen->getName() : std::string{});
+	auto const to = newScreen->getName();
+
+	auto* screen = newScreen;  // A local copy in case exit() or enter() want to change screens again
+	newScreen = nullptr;
+	if (currentScreen)
+		currentScreen->exit();
+	currentScreen = nullptr;  // Exception safety, do not remove
+	screen->enter();
+	currentScreen = screen;
+
+	getEventManager().sendEvent("onleave", EventParameter({ {"screen", {from}}, {"next", {to}} }));
+	getEventManager().sendEvent("onenter", { { {"screen", {to}}, {"previous", {from}} } });
 }
 
 Screen* Game::getScreen(std::string const& name) {
@@ -128,6 +139,18 @@ void Game::drawImages() {
 
 void Game::setImages(std::vector<Theme::Image>&& images) {
 	m_images = std::move(images);
+}
+
+Theme::Image* Game::findImage(std::string const& id) {
+	for (auto& image : m_images)
+		if (image.id == id)
+			return &image;
+
+	return nullptr;
+}
+
+EventManager& Game::getEventManager() {
+	return m_eventManager;
 }
 
 TextureManager& Game::getTextureManager()

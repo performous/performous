@@ -83,3 +83,16 @@ SvgTxtTheme& ThemeInstrumentMenu::getCachedOption(const std::string& text) {
 	options.insert(std::move(kv));
 	return (*options.at(text).get());
 }
+
+void Theme::ImageConfig::update(Image& image) const {
+	if (x.has_value())
+		image.x = x.value();
+	if (y.has_value())
+		image.y = y.value();
+	if (alpha.has_value())
+		image.alpha = alpha.value();
+	if (angle.has_value())
+		image.angle = angle.value();
+	if (scale.has_value())
+		image.scale = scale.value();
+}

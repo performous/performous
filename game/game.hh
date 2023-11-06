@@ -5,6 +5,7 @@
 
 #include "animvalue.hh"
 #include "graphic/opengl_text.hh"
+#include "event_manager.hh"
 #include "graphic/texture_manager.hh"
 #include "graphic/window.hh"
 #include "dialog.hh"
@@ -66,6 +67,7 @@ class Game {
 	void drawLogo();
 	void drawImages();
 	void setImages(std::vector<Theme::Image>&&);
+	Theme::Image* findImage(std::string const& id);
 	///global playlist access
 	PlayList& getCurrentPlayList() { return currentPlaylist; }
 #ifdef USE_WEBSERVER
@@ -75,6 +77,7 @@ class Game {
 
 	Window& getWindow() { return m_window; }
 	Audio& getAudio() { return m_audio; }
+	EventManager& getEventManager();
 
 	TextureManager& getTextureManager();
 
@@ -107,6 +110,7 @@ private:
 	// Dialog members
 	std::unique_ptr<Dialog> m_dialog;
 	std::vector<Theme::Image> m_images;
+	EventManager m_eventManager;
 #ifdef USE_WEBSERVER
 	std::string m_webserverMessage = "Trying to connect to webserver";
 #endif

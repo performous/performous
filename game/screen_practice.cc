@@ -13,9 +13,10 @@
 
 #include <SDL_timer.h>
 
-ScreenPractice::ScreenPractice(Game &game, std::string const& name, Audio& audio):
-  Screen(game, name), m_audio(audio)
-{}
+ScreenPractice::ScreenPractice(Game& game, std::string const& name, Audio& audio)
+	: Screen(game, name), m_audio(audio) {
+	game.getEventManager().addReceiver("onenter", std::bind(&ScreenPractice::onEnter, this, std::placeholders::_1));
+}
 
 void ScreenPractice::enter() {
 	m_audio.playMusic(getGame(), findFile("practice.ogg"));
@@ -83,6 +84,7 @@ void ScreenPractice::draw() {
 		}
 	}
 	this->draw_analyzers();
+	drawImages(*m_theme);
 }
 
 void ScreenPractice::draw_analyzers() {
@@ -132,4 +134,21 @@ void ScreenPractice::draw_analyzers() {
 	// Display note and frequency
 	if (textFreq > 0.0)
 		m_theme->note_txt.draw(window, scale.setFreq(textFreq).getStr());
+}
+
+void ScreenPractice::onEnter(EventParameter const& parameter) {
+	if (parameter.get<std::string>("screen", "") != getName())
+		return;
+
+	auto const it = m_theme->events.find("onenter");
+
+	if (it == m_theme->events.end())
+		return;
+
+	for (auto const& imageConfig : it->second.images) {
+		auto image = findImage(imageConfig.id, *m_theme);
+
+		if (image)
+			imageConfig.update(*image);
+	}
 }

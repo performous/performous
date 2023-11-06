@@ -12,3 +12,11 @@ void Screen::drawImages(std::vector<Theme::Image> const& images) {
 		image.texture->draw(getGame().getWindow());
 	}
 }
+
+Theme::Image* Screen::findImage(std::string const& id, Theme& theme) {
+	for (auto& image : theme.images)
+		if (image.id == id)
+			return &image;
+
+	return getGame().findImage(id);
+}

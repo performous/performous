@@ -65,6 +65,8 @@ class ScreenSing: public Screen {
 	void prepareVoicesMenu(unsigned moveSelectionTo = 0);
 	bool devCanParticipate(input::DevType const& devType) const;
 	size_t players() const; // Always have at least one player to display lyrics and prevent crashes.
+	void onEnter(EventParameter const&);
+
 
 	Audio& m_audio;
 	Database& m_database;

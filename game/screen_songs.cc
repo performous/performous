@@ -9,10 +9,11 @@
 #include "screen_sing.hh"
 #include "screen_playlist.hh"
 #include "songs.hh"
-#include "theme/theme.hh"
 #include "util.hh"
 #include "playlist.hh"
 #include "graphic/video_driver.hh"
+#include "theme/theme.hh"
+#include "theme/theme_loader.hh"
 
 #include "aubio/aubio.h"
 
@@ -23,13 +24,13 @@
 
 static const double IDLE_TIMEOUT = 35.0; // seconds
 
-ScreenSongs::ScreenSongs(Game &game, std::string const& name, Audio& audio, Songs& songs, Database& database):
-  Screen(game, name), m_audio(audio), m_songs(songs), m_database(database)
-{
+ScreenSongs::ScreenSongs(Game &game, std::string const& name, Audio& audio, Songs& songs, Database& database)
+  : Screen(game, name), m_audio(audio), m_songs(songs), m_database(database) {
 	m_songs.setAnimMargins(5.0, 5.0);
 	// Using AnimValues as a simple timers counting seconds
 	m_clock.setTarget(getInf());
 	m_idleTimer.setTarget(getInf());
+	game.getEventManager().addReceiver("onenter", std::bind(&ScreenSongs::onEnter, this, std::placeholders::_1));
 }
 
 void ScreenSongs::enter() {
@@ -43,7 +44,13 @@ void ScreenSongs::enter() {
 }
 
 void ScreenSongs::reloadGL() {
-	m_theme = std::make_unique<ThemeSongs>();
+	auto loader = ThemeLoader();
+
+	m_theme = loader.load<ThemeSongs>(getName());
+
+	if (!m_theme)
+		m_theme = std::make_unique<ThemeSongs>();
+
 	m_menuTheme = std::make_unique<ThemeInstrumentMenu>();
 	m_songbg_default = std::make_unique<Texture>(findFile("songs_bg_default.svg"));
 	m_songbg_ground = std::make_unique<Texture>(findFile("songs_bg_ground.svg"));
@@ -342,6 +349,9 @@ void ScreenSongs::draw() {
 		drawInstruments(Dimensions(1.0f).fixedHeight(0.09f).right(0.45f).screenTop(0.02f));
 		m_theme->hiscores.draw(window, hiscore);
 	}
+
+	drawImages(*m_theme);
+
 	// Menus on top of everything
 	if (m_menu.isOpen()) drawMenu();
 }
@@ -386,6 +396,23 @@ std::string ScreenSongs::getHighScoreText() const {
 	}
 
 	return stream.str();
+}
+
+void ScreenSongs::onEnter(EventParameter const& parameter) {
+	if (parameter.get<std::string>("screen", "") != getName())
+		return;
+
+	auto const it = m_theme->events.find("onenter");
+
+	if (it == m_theme->events.end())
+		return;
+
+	for (auto const& imageConfig : it->second.images) {
+		auto image = findImage(imageConfig.id, *m_theme);
+
+		if (image)
+			imageConfig.update(*image);
+	}
 }
 
 void ScreenSongs::drawCovers() {

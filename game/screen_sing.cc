@@ -20,6 +20,7 @@
 #include "screen_songs.hh"
 #include "notegraphscalerfactory.hh"
 #include "graphic/video_driver.hh"
+#include "theme/theme_loader.hh"
 
 #include <fmt/format.h>
 #include <iostream>
@@ -160,8 +161,14 @@ void ScreenSing::createPauseMenu() {
 }
 
 void ScreenSing::reloadGL() {
+	auto loader = ThemeLoader();
+
+	m_theme = loader.load<ThemeSing>(getName());
+
+	if (!m_theme)
+		m_theme = std::make_unique<ThemeSing>();
+
 	// Load UI graphics
-	m_theme = std::make_shared<ThemeSing>();
 	m_menuTheme = std::make_unique<ThemeInstrumentMenu>();
 	m_pause_icon = std::make_unique<Texture>(findFile("sing_pause.svg"));
 	m_player_icon = std::make_unique<Texture>(findFile("sing_pbox.svg")); // For duet menu
@@ -512,6 +519,23 @@ size_t ScreenSing::players() const {
 	auto& analyzers = m_audio.analyzers();
 
 	return (analyzers.empty() ? 1 : analyzers.size());
+}
+
+void ScreenSing::onEnter(EventParameter const& parameter) {
+	if (parameter.get<std::string>("screen", "") != getName())
+		return;
+
+	auto const it = m_theme->events.find("onenter");
+
+	if (it == m_theme->events.end())
+		return;
+
+	for (auto const& imageConfig : it->second.images) {
+		auto image = findImage(imageConfig.id, *m_theme);
+
+		if (image)
+			imageConfig.update(*image);
+	}
 }
 
 void ScreenSing::draw() {

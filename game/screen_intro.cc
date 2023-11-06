@@ -14,8 +14,13 @@
 
 #include <SDL_timer.h>
 
-ScreenIntro::ScreenIntro(Game &game, std::string const& name, Audio& audio)
+ScreenIntro::ScreenIntro(Game& game, std::string const& name, Audio& audio)
 	: Screen(game, name), m_audio(audio), m_first(true) {
+
+	game.getEventManager().addReceiver("onload", std::bind(&ScreenIntro::onLoad, this, std::placeholders::_1));
+	game.getEventManager().addReceiver("onenter", std::bind(&ScreenIntro::onEnter, this, std::placeholders::_1));
+
+	reloadGL();
 }
 
 void ScreenIntro::enter() {
@@ -25,7 +30,7 @@ void ScreenIntro::enter() {
 	m_selAnim = AnimValue(0.0, 10.0);
 	m_submenuAnim = AnimValue(0.0, 3.0);
 	populateMenu();
-	if( m_first ) {
+	if (m_first) {
 		std::string msg;
 		if (!m_audio.hasPlayback())
 			msg = _("No playback devices could be used.\n");
@@ -95,8 +100,8 @@ void ScreenIntro::draw_menu_options() {
 	const float x = -0.35f;
 	const float start_y = -0.1f;
 	const float sel_margin = 0.03f;
-	const MenuOptions &opts = m_menu.getOptions();
-	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get()-m_menu.getSubmenuLevel()));
+	const MenuOptions& opts = m_menu.getOptions();
+	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get() - m_menu.getSubmenuLevel()));
 	m_theme->back_h.dimensions.fixedHeight(0.038f);
 	m_theme->back_h.dimensions.stretch(m_menu.dimensions.w(), m_theme->back_h.dimensions.h());
 	// Determine from which item to start
@@ -113,28 +118,29 @@ void ScreenIntro::draw_menu_options() {
 			// Animate selection higlight moving
 			double selanim = m_selAnim.get() - start_i;
 			if (selanim < 0.0) selanim = 0.0;
-			m_theme->back_h.dimensions.left(x - sel_margin).center(static_cast<float>(start_y + selanim*0.065));
+			m_theme->back_h.dimensions.left(x - sel_margin).center(static_cast<float>(start_y + selanim * 0.065));
 			m_theme->back_h.draw(window);
 			// Draw the text, dim if option not available
 			{
 				ColorTrans c(window, Color::alpha(opt.isActive() ? 1.0f : 0.5f));
-				m_theme->option_selected.dimensions.left(x).center(start_y + static_cast<float>(ii)*0.065f);
+				m_theme->option_selected.dimensions.left(x).center(start_y + static_cast<float>(ii) * 0.065f);
 				m_theme->option_selected.draw(window, _(opt.getName()));
 			}
 			wcounter = std::max(wcounter, m_theme->option_selected.w() + 2.0f * sel_margin); // Calculate the widest entry
 			// If this is a config item, show the value below
 			if (opt.type == MenuOption::Type::CHANGE_VALUE) {
 				++ii; // Use a slot for the value
-				m_theme->option_selected.dimensions.left(x + sel_margin).center(static_cast<float>(-0.1 + (selanim+1.0)*0.065));
+				m_theme->option_selected.dimensions.left(x + sel_margin).center(static_cast<float>(-0.1 + (selanim + 1.0) * 0.065));
 				m_theme->option_selected.draw(window, "<  " + _(opt.value->getValue()) + "  >");
 			}
 
-		// Regular option (not selected)
-		} else {
+			// Regular option (not selected)
+		}
+		else {
 			std::string title = _(opt.getName());
 			SvgTxtTheme& txt = getTextObject(title);
 			ColorTrans c(window, Color::alpha(opt.isActive() ? 1.0f : 0.5f));
-			txt.dimensions.left(x).center(start_y + static_cast<float>(ii)*0.065f);
+			txt.dimensions.left(x).center(start_y + static_cast<float>(ii) * 0.065f);
 			txt.draw(window, title);
 			wcounter = std::max(wcounter, txt.w() + 2.0f * sel_margin); // Calculate the widest entry
 		}
@@ -184,6 +190,37 @@ SvgTxtTheme& ScreenIntro::getTextObject(std::string const& txt) {
 	return (*m_theme->options.at(txt).get());
 }
 
+void ScreenIntro::onLoad(EventParameter const&) {
+	auto const it = m_theme->events.find("onload");
+
+	if (it == m_theme->events.end())
+		return;
+
+	for (auto const& imageConfig : it->second.images) {
+		auto image = findImage(imageConfig.id, *m_theme);
+
+		if (image)
+			imageConfig.update(*image);
+	}
+}
+
+void ScreenIntro::onEnter(EventParameter const& parameter) {
+	if (parameter.get<std::string>("screen", "") != getName())
+		return;
+
+	auto const it = m_theme->events.find("onenter");
+
+	if (it == m_theme->events.end())
+		return;
+
+	for (auto const& imageConfig : it->second.images) {
+		auto image = findImage(imageConfig.id, *m_theme);
+
+		if (image)
+			imageConfig.update(*image);
+	}
+}
+
 void ScreenIntro::populateMenu() {
 	MenuImage imgSing(new Texture(findFile("intro_sing.svg")));
 	MenuImage imgPractice(new Texture(findFile("intro_practice.svg")));
@@ -194,18 +231,19 @@ void ScreenIntro::populateMenu() {
 	m_menu.add(MenuOption(translate_noop("Practice"), translate_noop("Check your skills or test the microphones."), imgPractice)).screen("Practice");
 	// Configure menu + submenu options
 	MenuOptions configmain;
-	for (auto const& submenu: configMenu) {
+	for (auto const& submenu : configMenu) {
 		if (!submenu.items.empty()) {
 			MenuOptions opts;
 			// Process items that belong to that submenu
-			for (auto const& item: submenu.items) {
+			for (auto const& item : submenu.items) {
 				ConfigItem& c = config[item];
 				opts.emplace_back(MenuOption(c.getShortDesc(), c.getLongDesc()));
 				opts.back().changer(c);
 			}
 			configmain.emplace_back(MenuOption(submenu.shortDesc, submenu.longDesc, imgConfig));
 			configmain.back().submenu(std::move(opts));
-		} else {
+		}
+		else {
 			configmain.emplace_back(MenuOption(submenu.shortDesc, submenu.longDesc, imgConfig));
 			configmain.back().screen(submenu.name);
 		}
@@ -218,12 +256,12 @@ void ScreenIntro::populateMenu() {
 
 void ScreenIntro::draw_webserverNotice() {
 	auto& window = getGame().getWindow();
-	if(m_webserverNoticeTimeout.get() == 0) {
+	if (m_webserverNoticeTimeout.get() == 0) {
 		m_drawNotice = !m_drawNotice;
 		m_webserverNoticeTimeout.setValue(5);
 	}
 	std::stringstream m_webserverStatusString;
-	if((webserversetting == 1 || webserversetting == 2) && m_drawNotice) {
+	if ((webserversetting == 1 || webserversetting == 2) && m_drawNotice) {
 		std::string message = getGame().subscribeWebserverMessages();
 		m_webserverStatusString << _("Webserver active!\n connect to this computer\nusing: ") << message;
 		m_theme->WebserverNotice.draw(window, m_webserverStatusString.str());

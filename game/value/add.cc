@@ -1,7 +1,5 @@
 #include "add.hh"
 
-#include "value.hh"
-
 AddValue::AddValue(Value const& valueA, Value const& valueB)
 	: m_valueA(valueA), m_valueB(valueB) {
 }

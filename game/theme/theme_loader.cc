@@ -8,12 +8,18 @@ namespace {
 			return std::make_shared<ThemeGlobal>();
 		if (screen == "Intro")
 			return std::make_shared<ThemeIntro>();
-		if (screen == "Songs")
-			return std::make_shared<ThemeSongs>();
 		if (screen == "Practice")
 			return std::make_shared<ThemePractice>();
+		if (screen == "Songs")
+			return std::make_shared<ThemeSongs>();
+		if (screen == "Sing")
+			return std::make_shared<ThemeSing>();
 
 		throw std::logic_error("creation of theme for screen '" + screen + "' is not implemented!");
+	}
+
+	Value getValue(nlohmann::json const& config, JsonToValueConverter& converter) {
+		return converter.convert(config);
 	}
 
 	void loadTexture(Texture& texture, std::string const& filename) {
@@ -23,7 +29,7 @@ namespace {
 			texture.load(fullpath);
 		}
 		catch (std::exception const& e) {
-			std::clog << "caught exception while loading texture for theme: " << e.what() << std::endl;
+			std::clog << "theme/error: " << "caught exception while loading texture for theme: " << e.what() << std::endl;
 		}
 	}
 }
@@ -74,23 +80,59 @@ ThemePtr ThemeLoader::load(std::string const& screenName)
 						image.texture = std::make_unique<Texture>(fullpath);
 					}
 					catch (std::exception const& e) {
-						std::clog << "caught exception while loading texture for image: " << e.what() << std::endl;
+						std::clog << "theme/error: " << "caught exception while loading texture for image: " << e.what() << std::endl;
 						continue;
 					}
+					if (imageConfig.contains("id"))
+						image.id = imageConfig.at("id").get<std::string>();
 					if (imageConfig.contains("x"))
 						image.x = imageConfig.at("x").get<float>();
 					if (imageConfig.contains("y"))
 						image.y = imageConfig.at("y").get<float>();
 					if (imageConfig.contains("scale"))
 						image.scale = imageConfig.at("scale").get<float>();
+					if (imageConfig.contains("angle"))
+						image.angle = getValue(imageConfig.at("angle"), converter);
 
 					theme->images.emplace_back(std::move(image));
+				}
+			}
+			if (screenConfig.contains("events")) {
+				auto const events = screenConfig.at("events");
+
+				for (auto const& eventConfig : events.items()) {
+					auto const eventName = eventConfig.key();
+					auto event = Theme::Event();
+
+					for (auto const& imageConfig : eventConfig.value().at("images")) {
+						if (!imageConfig.contains("id"))
+							continue;
+
+						auto image = Theme::ImageConfig();
+
+						image.id = imageConfig.at("id").get<std::string>();
+
+						if (imageConfig.contains("x"))
+							image.x = getValue(imageConfig.at("x"), converter);
+						if (imageConfig.contains("y"))
+							image.y = getValue(imageConfig.at("y"), converter);
+						if (imageConfig.contains("scale"))
+							image.scale = getValue(imageConfig.at("scale"), converter);
+						if (imageConfig.contains("alpha"))
+							image.alpha = getValue(imageConfig.at("alpha"), converter);
+						if (imageConfig.contains("angle"))
+							image.angle = getValue(imageConfig.at("angle"), converter);
+
+						event.images.emplace_back(image);
+					}
+
+					theme->events[eventName] = std::move(event);
 				}
 			}
 		}
 	}
 	catch (std::exception const& e) {
-		std::clog << "caught exception while loading theme config: " << e.what() << std::endl;
+		std::clog << "theme/error: " << "caught exception while loading theme config: " << e.what() << std::endl;
 	}
 
 	return theme;

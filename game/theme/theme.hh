@@ -2,6 +2,9 @@
 
 #include "graphic/opengl_text.hh"
 #include "graphic/texture.hh"
+#include "value/value.hh"
+
+#include <optional>
 #include <string>
 
 /// abstract theme class
@@ -24,11 +27,26 @@ public:
 		bool applied = false;
 		Value angle = 0.f;
 	};
+	struct ImageConfig {
+		std::string id;
+		std::optional<Value> x;
+		std::optional<Value> y;
+		std::optional<Value> scale = 1.f;
+		std::optional<Value> alpha = 1.f;
+		std::optional<Value> angle = 0.f;
+
+		void update(Image&) const;
+	};
+	struct Event {
+		std::string name;
+		std::vector<ImageConfig> images;
+	};
 	/// background image for theme
 	std::unique_ptr<Texture> bg; // temporary unique_ptr
 	bool colorcycling = true;
 	unsigned colorcycleduration = 20;
 	std::vector<Image> images;
+	std::map<std::string, Event> events;
 };
 
 /// theme for song selection

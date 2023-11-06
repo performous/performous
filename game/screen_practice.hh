@@ -3,6 +3,7 @@
 #include "controllers.hh"
 #include "screen.hh"
 #include "theme/theme.hh"
+#include "event_manager.hh"
 
 class Audio;
 class Sample;
@@ -22,6 +23,9 @@ class ScreenPractice : public Screen {
 
 	/// draw analyzers
 	void draw_analyzers();
+
+  private:
+	  void onEnter(EventParameter const&);
 
   private:
 	Audio& m_audio;
