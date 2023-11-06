@@ -14,7 +14,11 @@ FloatValue::operator float() const {
 	return m_value;
 }
 
-namespace values {
+ValuePtr FloatValue::clone() const {
+	return std::make_shared<FloatValue>(m_value);
+}
+
+namespace value {
 	ValuePtr Float(float value) {
 		return std::make_shared<FloatValue>(value);
 	}

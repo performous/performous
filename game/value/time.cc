@@ -16,7 +16,11 @@ TimeValue::operator float() const {
 	return get();
 }
 
-namespace values {
+ValuePtr TimeValue::clone() const {
+	return value::Time();
+}
+
+namespace value {
 	ValuePtr Time() {
 		return std::make_shared<TimeValue>();
 	}

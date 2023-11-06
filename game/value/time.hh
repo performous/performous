@@ -13,6 +13,8 @@ public:
 	float get() const override;
 	operator float() const override;
 
+	ValuePtr clone() const override;
+
 private:
 	TimePoint m_start;
 };

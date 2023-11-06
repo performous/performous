@@ -22,7 +22,16 @@ MinValue::operator float() const {
 	return get();
 }
 
-namespace values {
+ValuePtr MinValue::clone() const {
+	auto clonedValues = std::vector<Value>{};
+
+	for (auto const& value : m_values)
+		clonedValues.emplace_back(value.clone());
+
+	return value::Min(clonedValues);
+}
+
+namespace value {
 	ValuePtr Min(std::vector<Value> const& values) {
 		return std::make_shared<MinValue>(values);
 	}

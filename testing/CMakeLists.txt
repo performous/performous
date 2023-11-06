@@ -12,6 +12,7 @@ set(SOURCE_FILES
 	"printer.cc"
 	"ringbuffertest.cc"
 	"utiltest.cc"
+	"value_test.cc"
 )
 set(GAME_SOURCES
 	"../game/analyzer.cc"
@@ -24,6 +25,16 @@ set(GAME_SOURCES
 	"../game/notegraphscalerfactory.cc"
 	"../game/tone.cc"
 	"../game/util.cc"
+	"../game/utils/math.cc"
+	"../game/value/value.cc"
+	"../game/value/float.cc"
+	"../game/value/time.cc"
+	"../game/value/random.cc"
+	"../game/value/min.cc"
+	"../game/value/max.cc"
+	"../game/value/add.cc"
+	"../game/value/multiply.cc"
+	"../game/value/sinus.cc"
 )
 
 set(GTEST_REQUIRED "")

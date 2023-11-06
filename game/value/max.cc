@@ -22,7 +22,16 @@ MaxValue::operator float() const {
 	return get();
 }
 
-namespace values {
+ValuePtr MaxValue::clone() const {
+	auto clonedValues = std::vector<Value>{};
+
+	for (auto const& value : m_values)
+		clonedValues.emplace_back(value.clone());
+
+	return value::Max(clonedValues);
+}
+
+namespace value {
 	ValuePtr Max(std::vector<Value> const& values) {
 		return std::make_shared<MaxValue>(values);
 	}

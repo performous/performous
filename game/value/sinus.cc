@@ -19,7 +19,11 @@ SinusValue::operator float() const {
 	return get();
 }
 
-namespace values {
+ValuePtr SinusValue::clone() const {
+	return value::Sinus(m_value.clone());
+}
+
+namespace value {
 	ValuePtr Sinus(Value const& value) {
 		return std::make_shared<SinusValue>(value);
 	}

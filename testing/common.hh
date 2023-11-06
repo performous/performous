@@ -19,6 +19,8 @@ using ::testing::FloatEq;
 using ::testing::FloatNear;
 using ::testing::IsEmpty;
 using ::testing::IsNull;
+using ::testing::Eq;
+using ::testing::Ne;
 using ::testing::Ge;
 using ::testing::Gt;
 using ::testing::Le;

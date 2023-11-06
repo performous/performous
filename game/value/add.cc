@@ -14,7 +14,11 @@ AddValue::operator float() const {
 	return get();
 }
 
-namespace values {
+ValuePtr AddValue::clone() const {
+	return value::Add(m_valueA.clone(), m_valueB.clone());
+}
+
+namespace value {
 	ValuePtr Add(Value const& valueA, Value const& valueB) {
 		return std::make_shared<AddValue>(valueA, valueB);
 	}

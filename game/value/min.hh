@@ -11,6 +11,8 @@ public:
 	float get() const override;
 	operator float() const override;
 
+	ValuePtr clone() const override;
+
 private:
 	std::vector<Value> m_values;
 };

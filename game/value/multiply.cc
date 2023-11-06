@@ -14,7 +14,11 @@ MultiplyValue::operator float() const {
 	return get();
 }
 
-namespace values {
+ValuePtr MultiplyValue::clone() const {
+	return value::Multiply(m_valueA.clone(), m_valueB.clone());
+}
+
+namespace value {
 	ValuePtr Multiply(Value const& valueA, Value const& valueB) {
 		return std::make_shared<MultiplyValue>(valueA, valueB);
 	}

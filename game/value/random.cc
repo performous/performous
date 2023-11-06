@@ -16,7 +16,11 @@ RandomValue::operator float() const {
 	return get();
 }
 
-namespace values {
+ValuePtr RandomValue::clone() const {
+	return value::Random(m_min.clone(), m_max.clone());
+}
+
+namespace value {
 	ValuePtr Random(Value const& min, Value const& max) {
 		return std::make_shared<RandomValue>(min, max);
 	}
