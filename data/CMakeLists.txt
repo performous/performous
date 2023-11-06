@@ -7,5 +7,5 @@ if(UNIX AND NOT APPLE)
 	install(FILES "${PIXMAP_FILE}" DESTINATION "${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps/" RENAME "performous.svg")
 endif()
 
-install(DIRECTORY config fonts sounds themes xsl DESTINATION ${SHARE_INSTALL})
+install(DIRECTORY backgrounds config fonts sounds themes xsl DESTINATION ${SHARE_INSTALL})
 
