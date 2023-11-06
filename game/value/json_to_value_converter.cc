@@ -53,6 +53,9 @@ namespace {
 		if (valueConfig.contains("sinus")) {
 			return value::Sinus(parseValue(valueConfig.at("sinus").at("degree")));
 		}
+		if (valueConfig.contains("squareroot")) {
+			return value::Sinus(parseValue(valueConfig.at("squareroot").at("value")));
+		}
 
 		throw std::runtime_error("value configuration contains no supported type!");
 	}
