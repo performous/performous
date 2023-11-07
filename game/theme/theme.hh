@@ -47,6 +47,7 @@ public:
 	unsigned colorcycleduration = 20;
 	std::vector<Image> images;
 	std::map<std::string, Event> events;
+	std::map<std::string, Value> values;
 };
 
 /// theme for song selection

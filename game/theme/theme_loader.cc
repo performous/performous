@@ -37,14 +37,24 @@ namespace {
 ThemePtr ThemeLoader::load(std::string const& screenName)
 {
 	auto theme = createTheme(screenName);
-	auto converter = JsonToValueConverter();
+	auto converter = JsonToValueConverter(theme->values);
 
 	try {
 		auto const fullpath = findFile("theme.json");
 		auto const config = readJSON(fullpath);
 
+		if (config.contains("values")) {
+			auto const valuesConfig = config.at("values");
+
+			for (auto const& valueConfig : valuesConfig.items()) {
+				auto const id = valueConfig.key();
+				auto const value = getValue(valueConfig.value(), converter);
+
+				theme->values[id] = value;
+			}
+		}
 		if (config.contains(screenName)) {
-			auto const screenConfig = config.at(screenName);
+				auto const screenConfig = config.at(screenName);
 
 			if (screenConfig.contains("background")) {
 				auto const backgroundConfig = screenConfig.at("background");

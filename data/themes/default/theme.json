@@ -1,4 +1,23 @@
 {
+	"values": {
+		"scale_logo_on_enter": {
+			"add": {
+				"value0": 0.3,
+				"value1": {
+					"multiply": {
+						"value0": {
+							"sinus": { "degree": { "multiply": {
+								"value0": {
+									"min": [ {"time": ""}, 1.0 ]
+								},
+								"value1": { "value": 180}
+						}}}},
+						"value1": 0.1
+					}
+				}
+			}
+		}
+	},
 	"Global" : {
 		"images": [
 			{
@@ -53,23 +72,7 @@
 					{
 						"id": "logo",
 						"alpha": 1.0,
-						"scale": {
-							"add": {
-								"value0": 0.3,
-								"value1": {
-									"multiply": {
-										"value0": {
-											"sinus": { "degree": { "multiply": {
-												"value0": {
-													"min": [ {"time": ""}, 1.0 ]
-												},
-												"value1": { "value": 180}
-										}}}},
-										"value1": 0.1
-									}
-								}
-							}
-						}
+						"scale": "scale_logo_on_enter"
 					}
 				]
 			}
@@ -82,23 +85,7 @@
 					{
 						"id": "logo",
 						"alpha": 1.0,
-						"scale": {
-							"add": {
-								"value0": 0.3,
-								"value1": {
-									"multiply": {
-										"value0": {
-											"sinus": { "degree": { "multiply": {
-												"value0": {
-													"min": [ {"time": ""}, 1.0 ]
-												},
-												"value1": { "value": 180}
-										}}}},
-										"value1": 0.1
-									}
-								}
-							}
-						}
+						"scale": "scale_logo_on_enter"
 					}
 				]
 			}
