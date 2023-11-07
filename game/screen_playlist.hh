@@ -11,9 +11,7 @@
 #include "graphic/texture.hh"
 #include "webcam.hh"
 #include "theme/theme.hh"
-#include "event_manager.hh"
 #include "configuration.hh"
-
 #include <mutex>
 #include <vector>
 #include <unordered_map>
@@ -40,32 +38,30 @@ public:
 	void reloadGL();
 	void triggerSongListUpdate();
 private:
-	void createSongListMenu();
-	void createEscMenu();
-	void createSongMenu(unsigned songNumber);
-	void drawMenu();
-	void createMenuFromPlaylist();
-	SvgTxtTheme& getTextObject(std::string const& txt);
-	Texture* loadTextureFromMap(fs::path path);
-	void draw_menu_options();
-	Texture& getCover(Song const& song);
-	void onEnter(EventParameter const&);
-
 	Menu overlay_menu;
 	Menu songlist_menu;
 	AnimValue m_selAnim;
 	AnimValue m_submenuAnim;
 	Audio& m_audio;
 	Songs& m_songs;
+	void createSongListMenu();
+	void createEscMenu();
+	void createSongMenu(unsigned songNumber);
+	void drawMenu();
+	void createMenuFromPlaylist();
+	Texture* loadTextureFromMap(fs::path path);
 	Backgrounds& m_backgrounds;
 	std::unordered_map<fs::path, std::unique_ptr<Texture>, FsPathHash> m_covers;
 	std::unique_ptr<ThemeInstrumentMenu> m_menuTheme;
 	std::unique_ptr<ThemePlaylistScreen> m_theme;
-	std::shared_ptr<Texture> m_background;
+	std::unique_ptr<Texture> m_background;
+	SvgTxtTheme& getTextObject(std::string const& txt);
 	AnimValue m_nextTimer;
+	void draw_menu_options();
 	bool keyPressed;
 	bool needsUpdate = false;
 	mutable std::mutex m_mutex;
+	Texture& getCover(Song const& song);
 	std::unique_ptr<Texture> m_singCover;
 	std::unique_ptr<Texture> m_instrumentCover;
 	std::unique_ptr<Texture> m_bandCover;

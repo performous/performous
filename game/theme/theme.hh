@@ -18,9 +18,6 @@ protected:
 	Theme(fs::path const& path); ///< creates theme from path
 
 public:
-	std::shared_ptr<Texture> getBackgroundImage() const;
-
-public:
 	struct Image {
 		std::string id;
 		std::unique_ptr<Texture> texture; // temporary unique_ptr
@@ -45,8 +42,7 @@ public:
 		std::vector<ImageConfig> images;
 	};
 	/// background image for theme
-	std::shared_ptr<Texture> bg; // temporary unique_ptr
-	std::vector<std::string> backgrounds;
+	std::unique_ptr<Texture> bg; // temporary unique_ptr
 	bool colorcycling = true;
 	unsigned colorcycleduration = 20;
 	std::vector<Image> images;

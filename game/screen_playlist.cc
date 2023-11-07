@@ -10,9 +10,8 @@
 #include <sstream>
 
 ScreenPlaylist::ScreenPlaylist(Game &game, std::string const& name,Audio& audio, Songs& songs, Backgrounds& bgs):
-	Screen(game, name), m_audio(audio), m_songs(songs), m_backgrounds(bgs), keyPressed() {
-	game.getEventManager().addReceiver("onenter", std::bind(&ScreenPlaylist::onEnter, this, std::placeholders::_1));
-}
+	Screen(game, name), m_audio(audio), m_songs(songs), m_backgrounds(bgs), keyPressed()
+{}
 
 void ScreenPlaylist::enter() {
 	// Initialize webcam
@@ -104,12 +103,7 @@ void ScreenPlaylist::manageEvent(SDL_Event) {
 
 void ScreenPlaylist::draw() {
 	auto& window = getGame().getWindow();
-	if (!m_background || m_background->empty()) {
-		if (!m_theme || m_theme->backgrounds.empty())
-			m_background = std::make_unique<Texture>(m_backgrounds.getRandom());
-		else
-			m_background = m_theme->getBackgroundImage();
-	}
+	if (!m_background || m_background->empty()) m_background = std::make_unique<Texture>(m_backgrounds.getRandom());
 	m_background->draw(window);
 	if (m_nextTimer.get() == 0.0 && keyPressed == false) {
 		Screen* s = getGame().getScreen("Sing");
@@ -180,23 +174,6 @@ Texture& ScreenPlaylist::getCover(Song const& song) {
 		}
 	}
 	return *cover;
-}
-
-void ScreenPlaylist::onEnter(EventParameter const& parameter) {
-	if (parameter.get<std::string>("screen", "") != getName())
-		return;
-
-	auto const it = m_theme->events.find("onenter");
-
-	if (it == m_theme->events.end())
-		return;
-
-	for (auto const& imageConfig : it->second.images) {
-		auto image = findImage(imageConfig.id, *m_theme);
-
-		if (image)
-			imageConfig.update(*image);
-	}
 }
 
 void ScreenPlaylist::createEscMenu() {

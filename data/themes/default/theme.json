@@ -123,9 +123,6 @@
 		}
 	},
 	"Sing": {
-		"background": {
-			"image": ["blue_band.svg", "classig_bg.svg"]
-		},
 		"events" : {
 			"onenter": {
 				"images": [

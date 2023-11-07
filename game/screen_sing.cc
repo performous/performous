@@ -37,9 +37,8 @@ namespace {
 
 ScreenSing::ScreenSing(Game &game, std::string const& name, Audio& audio, Database& database, Backgrounds& bgs):
 	Screen(game, name), m_audio(audio), m_database(database), m_backgrounds(bgs),
-	m_selectedTrack(TrackName::VOCAL_LEAD) {
-	game.getEventManager().addReceiver("onenter", std::bind(&ScreenSing::onEnter, this, std::placeholders::_1));
-}
+	m_selectedTrack(TrackName::VOCAL_LEAD)
+{}
 
 void ScreenSing::enter() {
 	keyPressed = false;
@@ -552,12 +551,7 @@ void ScreenSing::draw() {
 		Transform ft(window, farTransform());
 		float ar = arMax;
 		// Background image
-		if (!m_background || m_background->empty()) {
-			if (!m_theme || m_theme->backgrounds.empty())
-				m_background = std::make_unique<Texture>(m_backgrounds.getRandom());
-			else
-				m_background = m_theme->getBackgroundImage();
-		}
+		if (!m_background || m_background->empty()) m_background = std::make_unique<Texture>(m_backgrounds.getRandom());
 		ar = m_background->dimensions.ar();
 		if (ar > arMax || (m_video && ar > arMin)) fillBG(window);  // Fill white background to avoid black borders
 		m_background->draw(window);

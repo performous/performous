@@ -3,32 +3,10 @@
 #include "fs.hh"
 #include "configuration.hh"
 
-Theme::Theme() {
-}
-
-Theme::Theme(fs::path const& path)
-  : bg(std::make_shared<Texture>(path)){
-}
-
-std::shared_ptr<Texture> Theme::getBackgroundImage() const {
-	if (bg)
-		return bg;
-
-	if(backgrounds.empty())
-		return nullptr;
-
-	try {
-		auto const index = (rand() % backgrounds.size());
-		auto const path = findFile(backgrounds[index]);
-
-		return std::make_shared<Texture>(path);
-	}
-	catch (std::exception const& e) {
-		std::clog << "theme/error: " << e.what() << std::endl;
-	}
-
-	return nullptr;
-}
+Theme::Theme()
+{}
+Theme::Theme(fs::path const& path) : bg(std::make_unique<Texture>(path))
+{}
 
 ThemeSongs::ThemeSongs():
 	Theme(findFile("songs_bg.svg")),
