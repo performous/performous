@@ -26,4 +26,5 @@ For compiling instructions, see docs/Compiling.txt or visit the wiki page: https
 - [Linux - Fedora 36](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-fedora_36.rpm.zip)
 - [Linux - Fedora 37](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-fedora_37.rpm.zip)
 - [Linux - Fedora 38](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-fedora_38.rpm.zip)
+- [Linux - Fedora 39](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-fedora_39.rpm.zip)
 - [Linux - AppImage](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest.AppImage.zip)
