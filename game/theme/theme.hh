@@ -45,6 +45,7 @@ public:
 	std::unique_ptr<Texture> bg; // temporary unique_ptr
 	bool colorcycling = true;
 	unsigned colorcycleduration = 20;
+	bool drawlogo = true;
 	std::vector<Image> images;
 	std::map<std::string, Event> events;
 	std::map<std::string, Value> values;
@@ -60,6 +61,20 @@ public:
 class ThemeSongs : public Theme {
 public:
 	ThemeSongs();
+	/// song display
+	SvgTxtTheme song;
+	/// ordering display
+	SvgTxtTheme order;
+	/// has hiscore display
+	SvgTxtTheme has_hiscore;
+	/// hiscores display
+	SvgTxtTheme hiscores;
+};
+
+/// theme for song selection
+class ThemePlayers : public Theme {
+public:
+	ThemePlayers();
 	/// song display
 	SvgTxtTheme song;
 	/// ordering display
@@ -101,9 +116,25 @@ public:
 };
 
 /// theme for audio device screen
-class ThemeAudioDevices: public Theme {
+class ThemeAudioDevices : public Theme {
 public:
 	ThemeAudioDevices();
+	/// device item
+	SvgTxtTheme device;
+	/// device item background
+	Texture device_bg;
+	/// comment text
+	SvgTxtTheme comment;
+	/// comment background
+	Texture comment_bg;
+	/// back highlight for selected option
+	Texture back_h;
+};
+
+/// theme for paths screen
+class ThemePaths : public Theme {
+public:
+	ThemePaths();
 	/// device item
 	SvgTxtTheme device;
 	/// device item background

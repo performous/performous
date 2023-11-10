@@ -8,7 +8,7 @@
 #include "fs.hh"
 #include "util.hh"
 #include "layout_singer.hh"
-#include "theme/theme.hh"
+#include "theme/theme_loader.hh"
 #include "video.hh"
 #include "i18n.hh"
 #include "controllers.hh"
@@ -23,13 +23,21 @@ ScreenPlayers::ScreenPlayers(Game &game, std::string const& name, Audio& audio, 
 {
 	m_players.setAnimMargins(5.0, 5.0);
 	m_playTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
+	game.getEventManager().addReceiver("onenter", std::bind(&ScreenPlayers::onEnter, this, std::placeholders::_1));
 }
 
 void ScreenPlayers::enter() {
 	keyPressed = false;
 	const auto scaler = NoteGraphScalerFactory(config).create(m_song->getVocalTrack(0u));
 	m_layout_singer = std::make_unique<LayoutSinger>(m_song->getVocalTrack(0u), m_database, scaler);
-	m_theme = std::make_unique<ThemeSongs>();
+
+	auto loader = ThemeLoader();
+
+	m_theme = loader.load<ThemePlayers>(getName());
+
+	if (!m_theme)
+		m_theme = std::make_unique<ThemePlayers>();
+
 	m_emptyCover = std::make_unique<Texture>(findFile("no_player_image.svg"));
 	m_search.text.clear();
 	m_players.setFilter(m_search.text);
@@ -113,6 +121,23 @@ Texture* ScreenPlayers::loadTextureFromMap(fs::path path) {
 		return m_covers.at(path).get();
 	} catch (std::exception const&) {}
 	return nullptr;
+}
+
+void ScreenPlayers::onEnter(EventParameter const& parameter) {
+	if (parameter.get<std::string>("screen", "") != getName())
+		return;
+
+	auto const it = m_theme->events.find("onenter");
+
+	if (it == m_theme->events.end())
+		return;
+
+	for (auto const& imageConfig : it->second.images) {
+		auto image = findImage(imageConfig.id, *m_theme);
+
+		if (image)
+			imageConfig.update(*image);
+	}
 }
 
 void ScreenPlayers::draw() {

@@ -8,7 +8,17 @@ Theme::Theme()
 Theme::Theme(fs::path const& path) : bg(std::make_unique<Texture>(path))
 {}
 
-ThemeSongs::ThemeSongs():
+ThemeSongs::ThemeSongs() :
+	Theme(findFile("songs_bg.svg")),
+	song(findFile("songs_song.svg"), config["graphic/text_lod"].f()),
+	order(findFile("songs_order.svg"), config["graphic/text_lod"].f()),
+	has_hiscore(findFile("songs_has_hiscore.svg"), config["graphic/text_lod"].f()),
+	hiscores(findFile("songs_hiscores.svg"), config["graphic/text_lod"].f())
+{
+	order.dimensions.screenBottom(-0.03f);
+}
+
+ThemePlayers::ThemePlayers() :
 	Theme(findFile("songs_bg.svg")),
 	song(findFile("songs_song.svg"), config["graphic/text_lod"].f()),
 	order(findFile("songs_order.svg"), config["graphic/text_lod"].f()),
@@ -43,6 +53,15 @@ ThemeAudioDevices::ThemeAudioDevices():
 	comment(findFile("mainmenu_comment.svg"), config["graphic/text_lod"].f()),
 	comment_bg(findFile("mainmenu_comment_bg.svg"))
 {}
+
+
+ThemePaths::ThemePaths()
+: Theme(findFile("audiodevices_bg.svg")),
+	device(findFile("mainmenu_comment.svg"), config["graphic/text_lod"].f()),
+	device_bg(findFile("audiodevices_dev_bg.svg")),
+	comment(findFile("mainmenu_comment.svg"), config["graphic/text_lod"].f()),
+	comment_bg(findFile("mainmenu_comment_bg.svg")) {
+}
 
 ThemeIntro::ThemeIntro():
 	Theme(findFile("intro_bg.svg")),

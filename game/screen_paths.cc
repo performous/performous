@@ -3,7 +3,7 @@
 #include "configuration.hh"
 #include "controllers.hh"
 #include "platform.hh"
-#include "theme/theme.hh"
+#include "theme/theme_loader.hh"
 #include "audio.hh"
 #include "i18n.hh"
 #include "game.hh"
@@ -11,10 +11,17 @@
 
 ScreenPaths::ScreenPaths(Game &game, std::string const& name, Audio& audio, Songs& songs)
 : Screen(game, name), m_audio(audio), m_songs(songs) {
+	game.getEventManager().addReceiver("onenter", std::bind(&ScreenPaths::onEnter, this, std::placeholders::_1));
 }
 
 void ScreenPaths::enter() {
-	m_theme = std::make_unique<ThemeAudioDevices>();
+	auto loader = ThemeLoader();
+
+	m_theme = loader.load<ThemePaths>(getName());
+
+	if (!m_theme)
+		m_theme = std::make_unique<ThemePaths>();
+
 	generateMenuFromPath(getHomeDir());
 }
 
@@ -122,6 +129,23 @@ void ScreenPaths::generateMenuFromPath(fs::path path) {
 	// Add entries to menu
 	for (const auto &p : directories) {
 		m_menu.add(MenuOption(p.string(), _("Open folder"))).call([this, p] { generateMenuFromPath(p); });
+	}
+}
+
+void ScreenPaths::onEnter(EventParameter const& parameter) {
+	if (parameter.get<std::string>("screen", "") != getName())
+		return;
+
+	auto const it = m_theme->events.find("onenter");
+
+	if (it == m_theme->events.end())
+		return;
+
+	for (auto const& imageConfig : it->second.images) {
+		auto image = findImage(imageConfig.id, *m_theme);
+
+		if (image)
+			imageConfig.update(*image);
 	}
 }
 

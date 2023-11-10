@@ -4,6 +4,8 @@
 #include "graphic/glutil.hh"
 #include "libda/portaudio.hpp"
 #include "theme/theme.hh"
+#include "event_manager.hh"
+
 #include <map>
 
 class Audio;
@@ -29,9 +31,10 @@ class ScreenAudioDevices: public Screen {
 	void load(); ///< Check what devices are open
 	bool save(bool skip_ui_config = false); ///< Save the config to disk xml and then reload
 	bool verify(); ///< Check that all were opened after audio reset
+	void onEnter(EventParameter const&);
 
 	Audio& m_audio;
-	std::unique_ptr<ThemeAudioDevices> m_theme;
+	std::shared_ptr<ThemeAudioDevices> m_theme;
 	unsigned int m_selected_column = 0;
 	portaudio::DeviceInfos m_devs;
 	std::vector<Channel> m_channels;

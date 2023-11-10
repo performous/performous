@@ -6,7 +6,9 @@
 #include "songs.hh"
 #include "textinput.hh"
 #include "theme/theme.hh"
+#include "event_manager.hh"
 #include "fs.hh"
+
 #include <iostream>
 #include <map>
 #include <string>
@@ -27,9 +29,11 @@ class ScreenPaths: public Screen {
 	void generateMenuFromPath(fs::path path);
 
   private:
+	void onEnter(EventParameter const&);
+
 	Audio& m_audio;
 	Songs& m_songs;
-	std::unique_ptr<ThemeAudioDevices> m_theme;
+	std::shared_ptr<ThemePaths> m_theme;
 	Menu m_menu;
 	AnimValue m_selAnim;
 };

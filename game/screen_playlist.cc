@@ -2,7 +2,7 @@
 #include "menu.hh"
 #include "screen_sing.hh"
 #include "playlist.hh"
-#include "theme/theme.hh"
+#include "theme/theme_loader.hh"
 #include "util.hh"
 #include "i18n.hh"
 
@@ -47,7 +47,13 @@ void ScreenPlaylist::prepare() {
 }
 
 void ScreenPlaylist::reloadGL() {
-	m_theme = std::make_unique<ThemePlaylistScreen>();
+	auto loader = ThemeLoader();
+
+	m_theme = loader.load<ThemePlaylistScreen>(getName());
+
+	if (!m_theme)
+		m_theme = std::make_unique<ThemePlaylistScreen>();
+
 	m_menuTheme = std::make_unique<ThemeInstrumentMenu>();
 	m_singCover = std::make_unique<Texture>(findFile("no_cover.svg"));
 	m_instrumentCover = std::make_unique<Texture>(findFile("instrument_cover.svg"));
@@ -391,6 +397,7 @@ void ScreenPlaylist::createSongMenu(unsigned songNumber) {
 }
 
 void ScreenPlaylist::triggerSongListUpdate() {
-std::lock_guard<std::mutex> l (m_mutex);
-needsUpdate = true;
+	std::lock_guard<std::mutex> l (m_mutex);
+	needsUpdate = true;
 }
+

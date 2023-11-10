@@ -8,12 +8,20 @@ namespace {
 			return std::make_shared<ThemeGlobal>();
 		if (screen == "Intro")
 			return std::make_shared<ThemeIntro>();
-		if (screen == "Practice")
-			return std::make_shared<ThemePractice>();
 		if (screen == "Songs")
 			return std::make_shared<ThemeSongs>();
 		if (screen == "Sing")
 			return std::make_shared<ThemeSing>();
+		if (screen == "Practice")
+			return std::make_shared<ThemePractice>();
+		if (screen == "AudioDevices")
+			return std::make_shared<ThemeAudioDevices>();
+		if (screen == "Paths")
+			return std::make_shared<ThemePaths>();
+		if (screen == "Players")
+			return std::make_shared<ThemePlayers>();
+		if (screen == "Playlist")
+			return std::make_shared<ThemePlaylistScreen>();
 
 		throw std::logic_error("creation of theme for screen '" + screen + "' is not implemented!");
 	}
@@ -54,7 +62,7 @@ ThemePtr ThemeLoader::load(std::string const& screenName)
 			}
 		}
 		if (config.contains(screenName)) {
-				auto const screenConfig = config.at(screenName);
+			auto const screenConfig = config.at(screenName);
 
 			if (screenConfig.contains("background")) {
 				auto const backgroundConfig = screenConfig.at("background");

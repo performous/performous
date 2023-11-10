@@ -4,7 +4,7 @@
 #include "configuration.hh"
 #include "controllers.hh"
 #include "platform.hh"
-#include "theme/theme.hh"
+#include "theme/theme_loader.hh"
 #include "i18n.hh"
 #include "game.hh"
 #include "graphic/color_trans.hh"
@@ -32,12 +32,20 @@ ScreenAudioDevices::ScreenAudioDevices(Game &game, std::string const& name, Audi
 	m_selector = std::make_unique<Texture>(findFile("device_selector.svg"));
 	m_mic_icon = std::make_unique<Texture>(findFile("sing_pbox.svg"));
 	m_pdev_icon = std::make_unique<Texture>(findFile("icon_pdev.svg"));
+
+	game.getEventManager().addReceiver("onenter", std::bind(&ScreenAudioDevices::onEnter, this, std::placeholders::_1));
 }
 
 void ScreenAudioDevices::enter() {
 	int bend = getBackend();
 	std::clog << "audio-devices/debug: Entering audio Devices... backend has been detected as: " << bend << std::endl;
-	m_theme = std::make_unique<ThemeAudioDevices>();
+	auto loader = ThemeLoader();
+
+	m_theme = loader.load<ThemeAudioDevices>(getName());
+
+	if (!m_theme)
+		m_theme = std::make_unique<ThemeAudioDevices>();
+
 	PaHostApiTypeId backend = PaHostApiTypeId(bend);
 	portaudio::AudioDevices ads(backend);
 	m_devs = ads.devices;
@@ -217,4 +225,21 @@ bool ScreenAudioDevices::verify() {
 		found:;
 	}
 	return true;
+}
+
+void ScreenAudioDevices::onEnter(EventParameter const& parameter) {
+	if (parameter.get<std::string>("screen", "") != getName())
+		return;
+
+	auto const it = m_theme->events.find("onenter");
+
+	if (it == m_theme->events.end())
+		return;
+
+	for (auto const& imageConfig : it->second.images) {
+		auto image = findImage(imageConfig.id, *m_theme);
+
+		if (image)
+			imageConfig.update(*image);
+	}
 }
