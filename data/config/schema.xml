@@ -18,10 +18,12 @@ to save the current settings to XML.
 		<entry name="game">
 			<short>Game</short>
 			<long>Gameplay related options.</long>
+			<event screen="Intro">onenter</event>
 		</entry>
 		<entry name="graphic">
 			<short>Graphic</short>
 			<long>Configure rendering and video settings.</long>
+			<event screen="Intro">onenter</event>
 		</entry>
 		<entry name="AudioDevices">
 			<!-- Handled internally by Performous -->
@@ -31,6 +33,7 @@ to save the current settings to XML.
 		<entry name="audio">
 			<short>Audio</short>
 			<long>Configure general audio settings.</long>
+			<event screen="Intro">onenter</event>
 		</entry>
 		<entry name="Paths">
 			<short>Paths</short>
@@ -79,6 +82,7 @@ to save the current settings to XML.
 		<!-- Enum options added dynamically by scanning theme folders -->
 		<short>Theme</short>
 		<long>Name of the theme to use.</long>
+		<event>onreloadtheme</event>
 	</entry>
 	<entry name="game/playlist_screen_timeout" type="uint" value="15">
 		<limits min="0" max="60" step="5" />

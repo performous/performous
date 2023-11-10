@@ -3,10 +3,15 @@
 #include "graphic/texture.hh"
 #include "fs.hh"
 #include "game.hh"
+#include "event_manager.hh"
 
-MenuOption::MenuOption(std::string const& nm, std::string const& comm, MenuImage img):
-  type(), value(), newValue(), callback(), image(img), name(nm), comment(comm), namePtr(), commentPtr()
-{}
+MenuOption::MenuOption(std::string const& nm, std::string const& comm, MenuImage img)
+: image(img), name(nm), comment(comm) {
+}
+
+MenuOption::MenuOption(std::string const& nm, std::string const& comm, std::string const& event, std::map<std::string, std::string> const& eventParameter, MenuImage img):
+  image(img), name(nm), comment(comm), m_event(event), m_eventParameter(eventParameter) {
+}
 
 std::string MenuOption::getName() const {
 	if (namePtr) return *namePtr;
@@ -19,7 +24,9 @@ std::string MenuOption::getVirtName() const {
 	return virtualName.empty() ? std::string() : virtualName;
 }
 
-const std::string& MenuOption::getComment() const { return commentPtr ? *commentPtr : comment; }
+const std::string& MenuOption::getComment() const {
+	return commentPtr ? *commentPtr : comment;
+}
 
 bool MenuOption::isActive() const {
 	if (type == Type::OPEN_SUBMENU && options.empty()) return false;
@@ -28,6 +35,17 @@ bool MenuOption::isActive() const {
 		if (value->getType() == "option_list" && value->ol().size() <= 1) return false;
 	}
 	return true;
+}
+
+void MenuOption::sendEvent(Game& game) {
+	if (!m_event.empty()) {
+		auto parameter = EventParameter{};
+
+		for (auto const& item : m_eventParameter)
+			parameter.add(item.first, item.second);
+
+		game.getEventManager().sendEvent(m_event, parameter);
+	}
 }
 
 
@@ -49,6 +67,8 @@ void Menu::select(unsigned sel) {
 }
 
 void Menu::action(Game& game, int dir) {
+	current().sendEvent(game);
+
 	switch (current().type) {
 		case MenuOption::Type::OPEN_SUBMENU: {
 			if (current().options.empty()) break;

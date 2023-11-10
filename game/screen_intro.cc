@@ -240,15 +240,15 @@ void ScreenIntro::populateMenu() {
 				opts.emplace_back(MenuOption(c.getShortDesc(), c.getLongDesc()));
 				opts.back().changer(c);
 			}
-			configmain.emplace_back(MenuOption(submenu.shortDesc, submenu.longDesc, imgConfig));
+			configmain.emplace_back(MenuOption(submenu.shortDesc, submenu.longDesc, submenu.event, submenu.eventParameter, imgConfig));
 			configmain.back().submenu(std::move(opts));
 		}
 		else {
-			configmain.emplace_back(MenuOption(submenu.shortDesc, submenu.longDesc, imgConfig));
+			configmain.emplace_back(MenuOption(submenu.shortDesc, submenu.longDesc, submenu.event, submenu.eventParameter, imgConfig));
 			configmain.back().screen(submenu.name);
 		}
 	}
-	m_menu.add(MenuOption(translate_noop("Configure"), translate_noop("Configure audio and game options."), imgConfig)).submenu(std::move(configmain));
+	m_menu.add(MenuOption(translate_noop("Configure"), translate_noop("Configure audio and game options."), "onenter", { {"screen", "Intro"}}, imgConfig)).submenu(std::move(configmain));
 	m_menu.add(MenuOption(translate_noop("Quit"), translate_noop("Leave the game."), imgQuit)).screen("");
 }
 
