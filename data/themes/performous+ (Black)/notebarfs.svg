@@ -98,7 +98,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.0728926"
-     inkscape:cx="44.118471"
+     inkscape:cx="143.49651"
      inkscape:cy="176.60375"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -109,15 +109,19 @@
      inkscape:window-y="-8"
      showgrid="false"
      inkscape:snap-global="false"
-     inkscape:window-maximized="1">
+     inkscape:window-maximized="1"
+     inkscape:pagecheckerboard="true">
     <inkscape:grid
        type="xygrid"
        id="grid3154"
        visible="true"
        enabled="true"
        dotted="false"
-       spacingx="1px"
-       empspacing="8" />
+       spacingx="1"
+       empspacing="8"
+       originx="0"
+       originy="0"
+       spacingy="1" />
   </sodipodi:namedview>
   <metadata
      id="metadata1906">
@@ -127,6 +131,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -136,9 +141,20 @@
      id="layer1"
      style="opacity:1"
      transform="translate(-255.99998,-508.36216)">
+    <path
+       style="fill:#ffffff;fill-opacity:0.94117647;stroke:none;stroke-width:0.05;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 16 0 L 0 16 L 0 18.373047 L 16 3.2558594 L 32 18.373047 L 32 16 L 16 0 z M 0 236.66211 L 0 240 L 16 256 L 32 240 L 32 236.66211 L 16 251.7793 L 0 236.66211 z "
+       transform="translate(255.99998,508.36216)"
+       id="rect31607" />
+    <path
+       style="opacity:1;fill:#000000;fill-opacity:0.15686275;stroke:none;stroke-width:0.05465397;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 255.99998,526.73536 v 218.28876 l 16,15.11716 16,-15.11716 V 526.73536 l -16,-15.11716 z"
+       id="path31629"
+       sodipodi:nodetypes="ccccccc"
+       inkscape:connector-curvature="0" />
     <text
        xml:space="preserve"
-       style="font-size:160px;font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;font-family:Goblin;-inkscape-font-specification:Goblin"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;line-height:0%;font-family:Goblin;-inkscape-font-specification:Goblin;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        x="414.11746"
        y="740.15057"
        id="text3170"><tspan
@@ -146,10 +162,10 @@
          id="tspan3172"
          x="414.11746"
          y="740.15057"
-         style="fill:#ffffff;fill-opacity:1;stroke-width:1.25;stroke-miterlimit:4;stroke-dasharray:none" /></text>
+         style="font-size:160px;line-height:1.25;fill:#ffffff;fill-opacity:1;stroke-width:1.25;stroke-miterlimit:4;stroke-dasharray:none"> </tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:160px;font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;font-family:Goblin;-inkscape-font-specification:Goblin"
+       style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;line-height:0%;font-family:Goblin;-inkscape-font-specification:Goblin;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        x="424.41928"
        y="727.78839"
        id="text3174"><tspan
@@ -157,10 +173,10 @@
          id="tspan3176"
          x="424.41928"
          y="727.78839"
-         style="fill:#ffffff;fill-opacity:1;stroke-width:1.25;stroke-miterlimit:4;stroke-dasharray:none" /></text>
+         style="font-size:160px;line-height:1.25;fill:#ffffff;fill-opacity:1;stroke-width:1.25;stroke-miterlimit:4;stroke-dasharray:none"> </tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:52px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;font-family:Goblin;-inkscape-font-specification:Goblin"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:Goblin;-inkscape-font-specification:Goblin;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        x="227.65469"
        y="623.74011"
        id="text2433"><tspan
@@ -168,78 +184,9 @@
          id="tspan2435"
          x="227.65469"
          y="623.74011"
-         style="fill:#ffffff;fill-opacity:1;stroke-width:1.25;stroke-miterlimit:4;stroke-dasharray:none" /></text>
+         style="font-size:52px;line-height:1.25;fill:#ffffff;fill-opacity:1;stroke-width:1.25;stroke-miterlimit:4;stroke-dasharray:none"> </tspan></text>
     <g
        id="g3044"
-       transform="translate(0,19.296706)"
-       style="opacity:0">
-      <text
-         inkscape:tile-y0="16.344164"
-         inkscape:tile-x0="-24.188238"
-         inkscape:tile-h="32.000003"
-         inkscape:tile-w="24.000001"
-         inkscape:tile-cy="32.344166"
-         inkscape:tile-cx="-12.188238"
-         transform="matrix(0.5999227,-0.8243114,0.6961004,0.710419,0,0)"
-         id="text2437"
-         y="562.86029"
-         x="-366.6051"
-         style="font-size:22.18232727px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;font-family:Goblin"
-         xml:space="preserve"><tspan
-           style="fill:#ffffff;fill-opacity:1;stroke-width:1.25;stroke-miterlimit:4;stroke-dasharray:none"
-           y="562.86029"
-           x="-366.6051"
-           id="tspan2439"
-           sodipodi:role="line">FREESTYLE</tspan></text>
-      <use
-         height="64"
-         width="128"
-         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.25;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-         id="use31509"
-         xlink:href="#text2437"
-         inkscape:tiled-clone-of="#text2437"
-         y="0"
-         x="0" />
-      <use
-         height="64"
-         width="128"
-         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.25;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-         id="use31511"
-         transform="translate(32.000642,0)"
-         xlink:href="#text2437"
-         inkscape:tiled-clone-of="#text2437"
-         y="0"
-         x="0" />
-      <use
-         height="64"
-         width="128"
-         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.25;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-         id="use31513"
-         transform="translate(64.001284,0)"
-         xlink:href="#text2437"
-         inkscape:tiled-clone-of="#text2437"
-         y="0"
-         x="0" />
-      <use
-         height="64"
-         width="128"
-         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.25;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-         id="use31515"
-         transform="translate(96.001924,0)"
-         xlink:href="#text2437"
-         inkscape:tiled-clone-of="#text2437"
-         y="0"
-         x="0" />
-      <use
-         height="64"
-         width="128"
-         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.25;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-         id="use31517"
-         transform="translate(128.00257,0)"
-         xlink:href="#text2437"
-         inkscape:tiled-clone-of="#text2437"
-         y="0"
-         x="0" />
-    </g>
+       transform="translate(0,19.296706)" />
   </g>
 </svg>
