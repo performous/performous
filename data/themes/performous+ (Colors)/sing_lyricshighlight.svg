@@ -25,7 +25,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -42,7 +42,7 @@
      pagecolor="#ffffff"
      id="base"
      inkscape:zoom="3.5826743"
-     inkscape:cx="392.44442"
+     inkscape:cx="304.80039"
      inkscape:cy="143.34004"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
@@ -65,12 +65,12 @@
     <text
        x="400"
        y="527.52618"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:36.74266561px;line-height:0%;font-family:FreeSans;text-align:center;writing-mode:lr;text-anchor:middle;display:inline;opacity:1;fill:#c6c6c6;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.47058824;-inkscape-font-specification:'FreeSans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:36.74266561px;line-height:0%;font-family:FreeSans;text-align:center;writing-mode:lr;text-anchor:middle;display:inline;opacity:1;fill:#00ade5;fill-opacity:1;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.47058824;-inkscape-font-specification:'FreeSans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal"
        id="text10203"
        xml:space="preserve"><tspan
          x="400"
          y="527.52618"
          id="tspan10205"
-         style="font-size:36.74266561px;text-align:center;text-anchor:middle;fill:#c6c6c6;fill-opacity:1;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;-inkscape-font-specification:'FreeSans, Bold';font-family:FreeSans;font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal;writing-mode:lr;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;stroke:#000000;stroke-opacity:0.47058824;">lyrics</tspan></text>
+         style="font-size:36.74266561px;text-align:center;text-anchor:middle;fill:#00ade5;fill-opacity:1;stroke-width:0.5;stroke-miterlimit:4;stroke-dasharray:none;-inkscape-font-specification:'FreeSans, Bold';font-family:FreeSans;font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal;writing-mode:lr;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;stroke:#000000;stroke-opacity:0.47058824">lyrics</tspan></text>
   </g>
 </svg>
