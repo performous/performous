@@ -168,12 +168,16 @@ void RequestHandler::Post(web::http::http_request request)
         m_songs.setFilter("");
         std::shared_ptr<Song> songPointer = GetSongFromJSON(jsonPostBody);
         if(!songPointer) {
-            request.reply(web::http::status_codes::NotFound, "Song \"" + utility::conversions::to_utf8string(jsonPostBody[utility::conversions::to_string_t("Artist")].as_string()) + " - " + utility::conversions::to_utf8string(jsonPostBody[utility::conversions::to_string_t("Title")].as_string()) + "\" was not found.");
+            auto artist = utility::conversions::to_utf8string(jsonPostBody[utility::conversions::to_string_t("Artist")].as_string());
+            auto title = utility::conversions::to_utf8string(jsonPostBody[utility::conversions::to_string_t("Title")].as_string());
+            request.reply(web::http::status_codes::NotFound, "Song \"" + artist + " - " + title + "\" was not found.");
             return;
         }
         else if (songPointer->loadStatus == Song::LoadStatus::ERROR)
         {
-            request.reply(web::http::status_codes::NotFound, "Song \"" + utility::conversions::to_utf8string(jsonPostBody[utility::conversions::to_string_t("Artist")].as_string()) + " - " + utility::conversions::to_utf8string(jsonPostBody[utility::conversions::to_string_t("Title")].as_string()) + "\" Song load status is error. Please check what's wrong with it.");
+	    auto artist = utility::conversions::to_utf8string(jsonPostBody[utility::conversions::to_string_t("Artist")].as_string());
+            auto title = utility::conversions::to_utf8string(jsonPostBody[utility::conversions::to_string_t("Title")].as_string());
+            request.reply(web::http::status_codes::NotFound, "Song \"" + artist + " - " + title + "\" Song load status is error. Please check what's wrong with it.");
             return;
         }
         else {
