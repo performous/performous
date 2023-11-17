@@ -262,15 +262,8 @@ static void fatalError(const std::string &msg) {
 	std::clog << "core/error: " << errMsg << std::endl;
 }
 
-void setupPreconditions() {
-#ifdef WIN32
-	// set the locale to UTF-8 on windows
-	setlocale(LC_ALL, ".UTF8");
-#endif
-}
-
 int main(int argc, char** argv) try {
-	setupPreconditions();
+	Platform::setupPlatform();
 	std::srand(static_cast<unsigned>(std::time(nullptr)));
 	// Parse commandline options
 	std::vector<std::string> devices;
