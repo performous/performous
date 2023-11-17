@@ -21,6 +21,13 @@ Platform::Platform() {
 	#endif
 }
 
+void Platform::setupPlatform() {
+#if (BOOST_OS_WINDOWS)
+	// set the locale to UTF-8 on windows
+	setlocale(LC_ALL, ".UTF8");
+#endif
+}
+
 const std::array<const char*,6> Platform::platformNames = {{ "Windows", "Linux", "MacOS", "BSD", "Solaris", "Unix" }}; // Relevant for debug only.
 
 int Platform::defaultBackEnd() {

@@ -27,6 +27,7 @@ Platform();
 static HostOS currentOS();
 static std::uint16_t shortcutModifier(bool eitherSide = true);
 static int defaultBackEnd();
+static void setupPlatform();
 
 private:
 static const std::array<const char*,6> platformNames;
