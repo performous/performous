@@ -1,6 +1,10 @@
+html {
+    min-height: 100%
+}
+
 body {
     color: #eee;
-    background-color: #333;
+    background: linear-gradient(0deg, #4b6cb7 0%, #182848 100%);
 }
 
 .header {
