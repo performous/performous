@@ -68,9 +68,15 @@ ThemePtr ThemeLoader::load(std::string const& screenName)
 				auto const backgroundConfig = screenConfig.at("background");
 
 				if (backgroundConfig.contains("image")) {
-					auto const filename = backgroundConfig.at("image").get<std::string>();
+					if (backgroundConfig.at("image").is_string()) {
+						auto const filename = backgroundConfig.at("image").get<std::string>();
 
-					loadTexture(*theme->bg, filename);
+						loadTexture(*theme->bg, filename);
+					}
+					else if (backgroundConfig.at("image").is_array()) {
+						for (auto const& image : backgroundConfig.at("image"))
+							theme->backgrounds.emplace_back(image.get<std::string>());
+					}
 				}
 				if (backgroundConfig.contains("colorcycling")) {
 					auto const colorcycling = backgroundConfig.at("colorcycling").get<bool>();
@@ -81,6 +87,15 @@ ThemePtr ThemeLoader::load(std::string const& screenName)
 					auto const colorcycleduration = backgroundConfig.at("colorcycleduration").get<unsigned>();
 
 					theme->colorcycleduration = colorcycleduration;
+				}
+			}
+			if (screenConfig.contains("logo")) {
+				auto const logoConfig = screenConfig.at("logo");
+
+				if (logoConfig.contains("drawlogo")) {
+					auto const drawlogo = logoConfig.at("drawlogo").get<bool>();
+
+					theme->drawlogo = drawlogo;
 				}
 			}
 			if (screenConfig.contains("images")) {
@@ -107,8 +122,17 @@ ThemePtr ThemeLoader::load(std::string const& screenName)
 						image.x = imageConfig.at("x").get<float>();
 					if (imageConfig.contains("y"))
 						image.y = imageConfig.at("y").get<float>();
-					if (imageConfig.contains("scale"))
-						image.scale = imageConfig.at("scale").get<float>();
+					if (imageConfig.contains("scale")) {
+						if (imageConfig.at("scale").is_array()) {
+							image.scaleHorizontal = getValue(imageConfig.at("scale").at(0), converter);
+							image.scaleVertical = getValue(imageConfig.at("scale").at(1), converter);
+						}
+						else {
+							image.scaleHorizontal = image.scaleVertical = getValue(imageConfig.at("scale"), converter);
+						}
+					}
+					if (imageConfig.contains("alpha"))
+						image.alpha = getValue(imageConfig.at("alpha"), converter);
 					if (imageConfig.contains("angle"))
 						image.angle = getValue(imageConfig.at("angle"), converter);
 
@@ -134,8 +158,15 @@ ThemePtr ThemeLoader::load(std::string const& screenName)
 							image.x = getValue(imageConfig.at("x"), converter);
 						if (imageConfig.contains("y"))
 							image.y = getValue(imageConfig.at("y"), converter);
-						if (imageConfig.contains("scale"))
-							image.scale = getValue(imageConfig.at("scale"), converter);
+						if (imageConfig.contains("scale")) {
+							if (imageConfig.at("scale").is_array()) {
+								image.scaleHorizontal = getValue(imageConfig.at("scale").at(0), converter);
+								image.scaleVertical = getValue(imageConfig.at("scale").at(1), converter);
+							}
+							else {
+								image.scaleHorizontal = image.scaleVertical = getValue(imageConfig.at("scale"), converter);
+							}
+						}
 						if (imageConfig.contains("alpha"))
 							image.alpha = getValue(imageConfig.at("alpha"), converter);
 						if (imageConfig.contains("angle"))

@@ -18,20 +18,27 @@ protected:
 	Theme(fs::path const& path); ///< creates theme from path
 
 public:
+	std::shared_ptr<Texture> getBackgroundImage() const;
+
+public:
 	struct Image {
 		std::string id;
 		std::unique_ptr<Texture> texture; // temporary unique_ptr
 		float x;
 		float y;
-		float scale = 1.f;
-		bool applied = false;
+		Value x;
+		Value y;
+		Value scaleHorizontal = 1.f;
+		Value scaleVertical = 1.f;
+		Value alpha = 1.f;
 		Value angle = 0.f;
 	};
 	struct ImageConfig {
 		std::string id;
 		std::optional<Value> x;
 		std::optional<Value> y;
-		std::optional<Value> scale = 1.f;
+		std::optional<Value> scaleHorizontal = 1.f;
+		std::optional<Value> scaleVertical = 1.f;
 		std::optional<Value> alpha = 1.f;
 		std::optional<Value> angle = 0.f;
 
@@ -42,7 +49,8 @@ public:
 		std::vector<ImageConfig> images;
 	};
 	/// background image for theme
-	std::unique_ptr<Texture> bg; // temporary unique_ptr
+	std::shared_ptr<Texture> bg; // temporary unique_ptr
+	std::vector<std::string> backgrounds;
 	bool colorcycling = true;
 	unsigned colorcycleduration = 20;
 	bool drawlogo = true;

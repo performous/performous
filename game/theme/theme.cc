@@ -112,6 +112,8 @@ void Theme::ImageConfig::update(Image& image) const {
 		image.alpha = alpha.value();
 	if (angle.has_value())
 		image.angle = angle.value();
-	if (scale.has_value())
-		image.scale = scale.value();
+	if (scaleHorizontal.has_value())
+		image.scaleHorizontal = scaleHorizontal.value();
+	if (scaleVertical.has_value())
+		image.scaleVertical = scaleVertical.value();
 }
