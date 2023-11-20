@@ -39,12 +39,10 @@ ScreenAudioDevices::ScreenAudioDevices(Game &game, std::string const& name, Audi
 void ScreenAudioDevices::enter() {
 	int bend = getBackend();
 	std::clog << "audio-devices/debug: Entering audio Devices... backend has been detected as: " << bend << std::endl;
-	auto loader = ThemeLoader();
 
-	m_theme = loader.load<ThemeAudioDevices>(getName());
+	m_theme = Screen::load<ThemeAudioDevices>();
 
-	if (!m_theme)
-		m_theme = std::make_unique<ThemeAudioDevices>();
+	setBackground(m_theme->getBackgroundImage());
 
 	PaHostApiTypeId backend = PaHostApiTypeId(bend);
 	portaudio::AudioDevices ads(backend);
@@ -118,8 +116,11 @@ void ScreenAudioDevices::manageEvent(SDL_Event event) {
 void ScreenAudioDevices::draw() {
 	auto& window = getGame().getWindow();
 
-	m_theme->bg->draw(window);
-	if (m_devs.empty()) return;
+	drawBackground();
+
+	if (m_devs.empty())
+		return;
+
 	// Calculate spacing between columns/rows
 	const float xstep = (xoff - 0.5f + xoff) / static_cast<float>(m_channels.size());
 	const float ystep = yoff*2 / static_cast<float>(m_devs.size());

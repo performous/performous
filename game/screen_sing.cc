@@ -162,12 +162,9 @@ void ScreenSing::createPauseMenu() {
 }
 
 void ScreenSing::reloadGL() {
-	auto loader = ThemeLoader();
+	m_theme = load<ThemeSing>();
 
-	m_theme = loader.load<ThemeSing>(getName());
-
-	if (!m_theme)
-		m_theme = std::make_unique<ThemeSing>();
+	setBackground(m_theme->getBackgroundImage());
 
 	// Load UI graphics
 	m_menuTheme = std::make_unique<ThemeInstrumentMenu>();

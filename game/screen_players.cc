@@ -31,12 +31,9 @@ void ScreenPlayers::enter() {
 	const auto scaler = NoteGraphScalerFactory(config).create(m_song->getVocalTrack(0u));
 	m_layout_singer = std::make_unique<LayoutSinger>(m_song->getVocalTrack(0u), m_database, scaler);
 
-	auto loader = ThemeLoader();
+	m_theme = load<ThemePlayers>();
 
-	m_theme = loader.load<ThemePlayers>(getName());
-
-	if (!m_theme)
-		m_theme = std::make_unique<ThemePlayers>();
+	setBackground(m_theme->getBackgroundImage());
 
 	m_emptyCover = std::make_unique<Texture>(findFile("no_player_image.svg"));
 	m_search.text.clear();
@@ -145,9 +142,13 @@ void ScreenPlayers::draw() {
 	m_players.update(); // Poll for new players
 	double length = m_audio.getLength();
 	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
-	if (m_songbg.get()) m_songbg->draw(window);
-	if (m_video.get()) m_video->render(window, time);
-	m_theme->bg->draw(window);
+	if (m_songbg.get())
+		m_songbg->draw(window);
+	if (m_video.get())
+		m_video->render(window, time);
+
+	drawBackground();
+
 	std::string music, songbg, video;
 	double videoGap = 0.0;
 	std::ostringstream oss_song, oss_order;
