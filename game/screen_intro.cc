@@ -44,12 +44,9 @@ void ScreenIntro::enter() {
 }
 
 void ScreenIntro::reloadGL() {
-	auto loader = ThemeLoader();
+	m_theme = load<ThemeIntro>();
 
-	m_theme = loader.load<ThemeIntro>(getName());
-
-	if (!m_theme)
-		m_theme = std::make_unique<ThemeIntro>();
+	setBackground(m_theme->getBackgroundImage());
 }
 
 void ScreenIntro::exit() {
@@ -151,19 +148,12 @@ void ScreenIntro::draw_menu_options() {
 void ScreenIntro::draw() {
 	auto& window = getGame().getWindow();
 	glutil::GLErrorChecker glerror("ScreenIntro::draw()");
-	{
-		if (m_theme->colorcycling) {
-			auto const cycleDurationMS = m_theme->colorcycleduration * 1000;
-			auto anim = static_cast<float>(SDL_GetTicks() % cycleDurationMS) / float(cycleDurationMS);
-			auto c = ColorTrans(window, glmath::rotate(static_cast<float>(TAU * anim), glmath::vec3(1.0f, 1.0f, 1.0f)));
 
-			m_theme->bg->draw(window);
-		}
-		else {
-			m_theme->bg->draw(window);
-		}
-	}
-	if (m_menu.current().image) m_menu.current().image->draw(window);
+	drawBackground();
+
+	if (m_menu.current().image)
+		m_menu.current().image->draw(window);
+
 	// Comment
 	m_theme->comment_bg.dimensions.center().screenBottom(-0.01f);
 	m_theme->comment_bg.draw(window);
@@ -206,6 +196,8 @@ void ScreenIntro::onLoad(EventParameter const&) {
 
 void ScreenIntro::onEnter(EventParameter const& parameter) {
 	if (parameter.get<std::string>("screen", "") != getName())
+		return;
+	if (parameter.get<std::string>("previous", "") == "") // use onLoad in this case
 		return;
 
 	auto const it = m_theme->events.find("onenter");

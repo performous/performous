@@ -4,11 +4,12 @@
 #include "configuration.hh"
 #include "utils/random.hh"
 
-Theme::Theme() {
+Theme::Theme()
+: m_name(config["game/theme"].getEnumName()) {
 }
 
 Theme::Theme(fs::path const& path)
-	: bg(std::make_shared<Texture>(path)) {
+	: bg(std::make_shared<Texture>(path)), m_name(config["game/theme"].getEnumName()) {
 }
 
 std::shared_ptr<Texture> Theme::getBackgroundImage() const {
@@ -49,6 +50,10 @@ void Theme::setBackgroundImages(std::vector<std::string> const& images) {
 	}
 
 	std::clog << "theme/error: there could no of the configured background image(s) be found!" << std::endl;
+}
+
+std::string Theme::getName() const {
+	return m_name;
 }
 
 ThemeSongs::ThemeSongs() :

@@ -1,18 +1,33 @@
 #include "json_to_value_converter.hh"
 
+#include "util.hh"
+
 #include <iostream>
 
 JsonToValueConverter::JsonToValueConverter(std::map<std::string, Value> const& values)
 	: m_values(values) {
 }
 
+namespace {
+	std::pair<std::string, bool> getIdAndSign(std::string const& s) {
+		if (s.empty())
+			return {};
+
+		return { trim(s, "- "), s[0] == '-' };
+	}
+}
+
 Value JsonToValueConverter::convert(nlohmann::json const& valueConfig) {
 	if (valueConfig.is_string()) {
-		auto const id = valueConfig.get<std::string>();
+		auto const [id, sign] = getIdAndSign(valueConfig.get<std::string>());
 		auto const it = m_values.find(id);
 
-		if (it != m_values.end())
+		if (it != m_values.end()) {
+			if (sign)
+				return value::Negate(it->second);
+
 			return it->second;
+		}
 
 		std::clog << "theme/error: no value with id '" << id << "' was defined!" << std::endl;
 
@@ -48,14 +63,17 @@ Value JsonToValueConverter::convert(nlohmann::json const& valueConfig) {
 	if (valueConfig.contains("time")) {
 		return value::Time();
 	}
-	if (valueConfig.contains("multiply")) {
-		return value::Multiply(convert(valueConfig.at("multiply").at("value0")), convert(valueConfig.at("multiply").at("value1")));
-	}
 	if (valueConfig.contains("add")) {
 		return value::Add(convert(valueConfig.at("add").at("value0")), convert(valueConfig.at("add").at("value1")));
 	}
 	if (valueConfig.contains("subtract")) {
 		return value::Subtract(convert(valueConfig.at("subtract").at("value0")), convert(valueConfig.at("subtract").at("value1")));
+	}
+	if (valueConfig.contains("multiply")) {
+		return value::Multiply(convert(valueConfig.at("multiply").at("value0")), convert(valueConfig.at("multiply").at("value1")));
+	}
+	if (valueConfig.contains("mix")) {
+		return value::Mix(convert(valueConfig.at("mix").at("value0")), convert(valueConfig.at("mix").at("value1")), convert(valueConfig.at("mix").at("a")));
 	}
 	if (valueConfig.contains("random")) {
 		auto min = Value(0.0f);

@@ -67,7 +67,6 @@ class ScreenSing: public Screen {
 	size_t players() const; // Always have at least one player to display lyrics and prevent crashes.
 	void onEnter(EventParameter const&);
 
-
 	Audio& m_audio;
 	Database& m_database;
 	Backgrounds& m_backgrounds;

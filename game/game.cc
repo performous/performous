@@ -19,19 +19,25 @@ Game::Game(Window& window) :
 {
 	m_textMessage.dimensions.middle().center(-0.05f);
 
-	auto loader = ThemeLoader();
-	auto theme = loader.load<Theme>("Global");
-
-	setImages(std::move(theme->images));
+	m_constantValueProvider->setValue("screen.left", -0.5f);
+	m_constantValueProvider->setValue("screen.center", 0.f);
+	m_constantValueProvider->setValue("screen.right", 0.5f);
+	m_constantValueProvider->setValue("screen.top", -0.5f * virtH());
+	m_constantValueProvider->setValue("screen.middle", 0.f);
+	m_constantValueProvider->setValue("screen.bottom", 0.5f *virtH());
 }
 
 void Game::loadTheme() {
-	auto loader = ThemeLoader();
+	auto loader = ThemeLoader(m_constantValueProvider);
 	auto theme = loader.load<Theme>("Global");
 
-	m_drawLogo = theme->drawlogo;
+	if (theme && theme->getName() != m_currentThemeName) {
+		m_drawLogo = theme->drawlogo;
 
-	setImages(std::move(theme->images));
+		setImages(std::move(theme->images));
+
+		m_currentThemeName = theme->getName();
+	}
 }
 
 void Game::activateScreen(std::string const& name) {
@@ -55,6 +61,8 @@ void Game::updateScreen() {
 	screen->enter();
 	currentScreen = screen;
 
+	loadTheme();
+
 	getEventManager().sendEvent("onleave", EventParameter({ {"screen", {from}}, {"next", {to}} }));
 	getEventManager().sendEvent("onenter", { { {"screen", {to}}, {"previous", {from}} } });
 }
@@ -76,6 +84,12 @@ void Game::drawScreen() {
 	drawLogo();
 	drawImages();
 	drawNotifications();
+}
+
+/// Reload OpenGL resources (after fullscreen toggle etc)
+void Game::reloadGL() {
+	if (currentScreen)
+		currentScreen->reloadGL();
 }
 
 void Game::loading(std::string const& message, float progress) {
@@ -169,6 +183,11 @@ TextureManager& Game::getTextureManager()
 	return m_textureManager;
 }
 
+ConstantValueProviderPtr Game::getConstantValueProvider() const {
+	return m_constantValueProvider;
+}
+
+
 void Game::drawNotifications() {
 	double time = m_messagePopup.get();
 	if (time != 0.0) {
@@ -199,7 +218,13 @@ void Game::finished() {
 }
 
 Game::~Game() {
-	if (currentScreen) currentScreen->exit();
+	if (currentScreen)
+		currentScreen->exit();
+}
+
+/// Adds a screen to the manager
+void Game::addScreen(std::unique_ptr<Screen> s) {
+	screens.insert(std::make_pair(s->getName(), std::move(s)));
 }
 
 bool Game::isFinished() {

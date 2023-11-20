@@ -40,12 +40,31 @@ namespace {
 			std::clog << "theme/error: " << "caught exception while loading texture for theme: " << e.what() << std::endl;
 		}
 	}
+
+	void addConstants(std::map<std::string, Value>& values, ConstantValueProviderPtr provider) {
+		values["screen.left"] = value::Constant("screen.left", provider);
+		values["screen.right"] = value::Constant("screen.right", provider);
+		values["screen.top"] = value::Constant("screen.top", provider);
+		values["screen.botton"] = value::Constant("screen.bottom", provider);
+		values["screen.center"] = value::Constant("screen.center", provider);
+		values["screen.middle"] = value::Constant("screen.middle", provider);
+		values["image.left"] = value::Constant("image.left", provider);
+		values["image.right"] = value::Constant("image.right", provider);
+		values["image.top"] = value::Constant("image.top", provider);
+		values["image.botton"] = value::Constant("image.bottom", provider);
+		values["image.center"] = value::Constant("image.center", provider);
+		values["image.middle"] = value::Constant("image.middle", provider);
+		values["image.width"] = value::Constant("image.width", provider);
+		values["image.height"] = value::Constant("image.height", provider);
+	}
 }
 
 ThemePtr ThemeLoader::load(std::string const& screenName)
 {
 	auto theme = createTheme(screenName);
 	auto converter = JsonToValueConverter(theme->values);
+
+	addConstants(theme->values, m_provider);
 
 	try {
 		auto const fullpath = findFile("theme.json");
@@ -185,4 +204,8 @@ ThemePtr ThemeLoader::load(std::string const& screenName)
 	}
 
 	return theme;
+}
+
+ThemeLoader::ThemeLoader(ConstantValueProviderPtr provider)
+	: m_provider(provider) {
 }

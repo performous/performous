@@ -22,6 +22,8 @@ public:
 	void addBackgroundImage(std::string const&);
 	void setBackgroundImages(std::vector<std::string> const&);
 
+	std::string getName() const;
+
 public:
 	struct Image {
 		std::string id;
@@ -59,6 +61,7 @@ public:
 
 private:
 	std::vector<std::shared_ptr<Texture>> m_backgrounds;
+	std::string m_name;
 };
 
 /// theme for song selection

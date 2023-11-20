@@ -1,10 +1,10 @@
 #pragma once
 
 #include "ivalue.hh"
+#include "constant_value_provider.hh"
 
 #include <chrono>
 #include <vector>
-
 
 class Value : public IValue {
 public:
@@ -34,7 +34,6 @@ namespace value {
 	ValuePtr Max(std::vector<Value> const& values);
 	ValuePtr Clamp(Value const& value, Value const& min, Value const& max);
 
-
 	ValuePtr Negate(Value const& value);
 
 	ValuePtr Add(Value const& valueA, Value const& valueB);
@@ -49,4 +48,6 @@ namespace value {
 
 	ValuePtr Random();
 	ValuePtr Random(Value const& min, Value const& max);
+
+	ValuePtr Constant(std::string const&, ConstantValueProviderPtr);
 }

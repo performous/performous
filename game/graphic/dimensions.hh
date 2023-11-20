@@ -40,8 +40,8 @@ public:
 	Dimensions& screenBottom(float y = 0.0f);
 	/// move the object without affecting anchoring
 	Dimensions& move(float x, float y);
-	Dimensions& scale(float f) { m_scaleHorizontal = m_scaleVertical = f; return *this; }
-	Dimensions& scale(float horizontal, float vertical) { m_scaleHorizontal = horizontal; m_scaleVertical = vertical; return *this; }
+	Dimensions& scale(float f);
+	Dimensions& scale(float horizontal, float vertical);
 	/// returns ar XXX
 	float ar() const;
 	/// returns left

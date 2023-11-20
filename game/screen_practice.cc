@@ -36,12 +36,9 @@ void ScreenPractice::enter() {
 }
 
 void ScreenPractice::reloadGL() {
-	auto loader = ThemeLoader();
+	m_theme = load<ThemePractice>();
 
-	m_theme = loader.load<ThemePractice>(getName());
-
-	if (!m_theme)
-		m_theme = std::make_unique<ThemePractice>();
+	setBackground(m_theme->getBackgroundImage());
 }
 
 void ScreenPractice::exit() {
@@ -70,19 +67,8 @@ void ScreenPractice::manageEvent(input::NavEvent const& event) {
 }
 
 void ScreenPractice::draw() {
-	auto& window = getGame().getWindow();
-	{
-		if (m_theme->colorcycling) {
-			auto const cycleDurationMS = m_theme->colorcycleduration * 1000;
-			auto anim = static_cast<float>(SDL_GetTicks() % cycleDurationMS) / float(cycleDurationMS);
-			auto c = ColorTrans(window, glmath::rotate(static_cast<float>(TAU * anim), glmath::vec3(1.0f, 1.0f, 1.0f)));
+	drawBackground();
 
-			m_theme->bg->draw(window);
-		}
-		else {
-			m_theme->bg->draw(window);
-		}
-	}
 	this->draw_analyzers();
 	drawImages(*m_theme);
 }
