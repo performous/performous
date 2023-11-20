@@ -19,6 +19,8 @@ protected:
 
 public:
 	std::shared_ptr<Texture> getBackgroundImage() const;
+	void addBackgroundImage(std::string const&);
+	void setBackgroundImages(std::vector<std::string> const&);
 
 public:
 	struct Image {
@@ -50,13 +52,15 @@ public:
 	};
 	/// background image for theme
 	std::shared_ptr<Texture> bg; // temporary unique_ptr
-	std::vector<std::string> backgrounds;
 	bool colorcycling = true;
 	unsigned colorcycleduration = 20;
 	bool drawlogo = true;
 	std::vector<Image> images;
 	std::map<std::string, Event> events;
 	std::map<std::string, Value> values;
+
+private:
+	std::vector<std::shared_ptr<Texture>> m_backgrounds;
 };
 
 /// theme for song selection

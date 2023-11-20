@@ -75,7 +75,7 @@ ThemePtr ThemeLoader::load(std::string const& screenName)
 					}
 					else if (backgroundConfig.at("image").is_array()) {
 						for (auto const& image : backgroundConfig.at("image"))
-							theme->backgrounds.emplace_back(image.get<std::string>());
+							theme->addBackgroundImage(image.get<std::string>());
 					}
 				}
 				if (backgroundConfig.contains("colorcycling")) {

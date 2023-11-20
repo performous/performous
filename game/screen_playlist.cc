@@ -9,9 +9,10 @@
 #include <iostream>
 #include <sstream>
 
-ScreenPlaylist::ScreenPlaylist(Game &game, std::string const& name,Audio& audio, Songs& songs, Backgrounds& bgs):
-	Screen(game, name), m_audio(audio), m_songs(songs), m_backgrounds(bgs), keyPressed()
-{}
+ScreenPlaylist::ScreenPlaylist(Game& game, std::string const& name, Audio& audio, Songs& songs, Backgrounds& bgs) :
+	Screen(game, name), m_audio(audio), m_songs(songs), m_backgrounds(bgs), keyPressed() {
+	game.getEventManager().addReceiver("onenter", std::bind(&ScreenPlaylist::onEnter, this, std::placeholders::_1));
+}
 
 void ScreenPlaylist::enter() {
 	// Initialize webcam
@@ -25,13 +26,13 @@ void ScreenPlaylist::enter() {
 	}
 	m_audio.togglePause();
 	if (getGame().getCurrentPlayList().isEmpty()) {
-		if(!config["game/autoplay"].b()) {
+		if (!config["game/autoplay"].b()) {
 			getGame().activateScreen("Songs");
 		}
 	}
 	keyPressed = false;
 	auto timervalue = config["game/playlist_screen_timeout"].ui();
-	if(timervalue < 0.0) {
+	if (timervalue < 0.0) {
 		timervalue = 0.0;
 	}
 	m_nextTimer.setValue(timervalue);
@@ -80,7 +81,7 @@ void ScreenPlaylist::manageEvent(input::NavEvent const& event) {
 		keyPressed = true;
 
 	if (nav == input::NavButton::CANCEL) {
-		if(overlay_menu.isOpen()) {
+		if (overlay_menu.isOpen()) {
 			overlay_menu.close();
 		} else {
 			createEscMenu();
@@ -109,13 +110,19 @@ void ScreenPlaylist::manageEvent(SDL_Event) {
 
 void ScreenPlaylist::draw() {
 	auto& window = getGame().getWindow();
-	if (!m_background || m_background->empty()) m_background = std::make_unique<Texture>(m_backgrounds.getRandom());
-	m_background->draw(window);
+	if (!m_background || m_background->empty()) {
+		if (m_theme)
+			m_background = m_theme->getBackgroundImage();
+		else
+			m_background = std::make_unique<Texture>(m_backgrounds.getRandom());
+	}
+	if (m_background)
+		m_background->draw(window);
 	if (m_nextTimer.get() == 0.0 && keyPressed == false) {
 		Screen* s = getGame().getScreen("Sing");
 		ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
 		assert(ss);
-		if(getGame().getCurrentPlayList().isEmpty()) {
+		if (getGame().getCurrentPlayList().isEmpty()) {
 			m_songs.setFilter("");
 			unsigned randomsong = static_cast<unsigned>(std::rand()) % static_cast<unsigned>(m_songs.size());
 			ss->setSong(m_songs[randomsong]);
@@ -130,20 +137,20 @@ void ScreenPlaylist::draw() {
 	if (overlay_menu.isOpen()) {
 		drawMenu();
 	}
-	if(needsUpdate) {
+	if (needsUpdate) {
 		std::lock_guard<std::mutex> l(m_mutex);
 		createSongListMenu();
 		needsUpdate = false;
 	}
 	auto const& playlist = getGame().getCurrentPlayList().getList();
 	for (size_t i = playlist.size() - 1; i < playlist.size(); --i) {
-		if(i < 9) { //only draw the first 9 covers
+		if (i < 9) { //only draw the first 9 covers
 			Texture& s = getCover(*playlist[i]);
-			float pos =  static_cast<float>(i) / std::max<float>(9, 9);
+			float pos = static_cast<float>(i) / std::max<float>(9, 9);
 			using namespace glmath;
 			Transform trans(window,
-			  translate(vec3(-0.4f + 0.9f * pos, 0.045f, 0.0f)) //vec3(horizontal-offset-from-center, vertical offset from screen_bottom)
-			  * rotate(-0.0, vec3(0.0f, 1.0f, 0.0f))
+				translate(vec3(-0.4f + 0.9f * pos, 0.045f, 0.0f)) //vec3(horizontal-offset-from-center, vertical offset from screen_bottom)
+				* rotate(-0.0, vec3(0.0f, 1.0f, 0.0f))
 			);
 			s.dimensions.middle().screenBottom(-0.06f).fitInside(0.08f, 0.08f);
 			s.draw(window);
@@ -152,7 +159,7 @@ void ScreenPlaylist::draw() {
 }
 
 Texture* ScreenPlaylist::loadTextureFromMap(fs::path path) {
-	if(m_covers.find(path) == m_covers.end()) {
+	if (m_covers.find(path) == m_covers.end()) {
 		m_covers.insert({ path, std::make_unique<Texture>(path) });
 	}
 	try {
@@ -169,7 +176,7 @@ Texture& ScreenPlaylist::getCover(Song const& song) {
 	if (!cover && !song.background.empty()) cover = loadTextureFromMap(song.background);
 	// Use empty cover
 	if (!cover) {
-		if(song.hasDance()) {
+		if (song.hasDance()) {
 			cover = m_danceCover.get();
 		} else if(song.hasDrums()) {
 			cover = m_bandCover.get();
@@ -182,13 +189,30 @@ Texture& ScreenPlaylist::getCover(Song const& song) {
 	return *cover;
 }
 
+void ScreenPlaylist::onEnter(EventParameter const& parameter) {
+	if (parameter.get<std::string>("screen", "") != getName())
+		return;
+
+	auto const it = m_theme->events.find("onenter");
+
+	if (it == m_theme->events.end())
+		return;
+
+	for (auto const& imageConfig : it->second.images) {
+		auto image = findImage(imageConfig.id, *m_theme);
+
+		if (image)
+			imageConfig.update(*image);
+	}
+}
+
 void ScreenPlaylist::createEscMenu() {
 	overlay_menu.clear();
 	overlay_menu.add(MenuOption(_("Continue"), _("Continue playing"))).call([this]() {
 		Screen* s = getGame().getScreen("Sing");
 		ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
 		assert(ss);
-		if(!getGame().getCurrentPlayList().isEmpty()) {
+		if (!getGame().getCurrentPlayList().isEmpty()) {
 			ss->setSong(getGame().getCurrentPlayList().getNext());
 		} else {
 			m_songs.setFilter("");
@@ -196,21 +220,21 @@ void ScreenPlaylist::createEscMenu() {
 			ss->setSong(m_songs[randomsong]);
 		}
 		getGame().activateScreen("Sing");
-	});
+		});
 	overlay_menu.add(MenuOption(_("Add songs"), _("Open the song browser to add more songs"))).screen("Songs");
 	overlay_menu.add(MenuOption(_("Shuffle"), _("Randomize the order of the playlist"))).call([this]() {
 		getGame().getCurrentPlayList().shuffle();
 		overlay_menu.close();
 		createSongListMenu();
-	});
+		});
 	overlay_menu.add(MenuOption(_("Clear and exit"), _("Remove all the songs from the list"))).call([this]() {
 		getGame().getCurrentPlayList().clear();
 		overlay_menu.close();
 		getGame().activateScreen("Songs");
-	});
+		});
 	overlay_menu.add(MenuOption(_("Back"), _("Back to playlist viewer"))).call([this]() {
 		overlay_menu.close();
-	});
+		});
 }
 
 void ScreenPlaylist::drawMenu() {
@@ -256,8 +280,8 @@ void ScreenPlaylist::draw_menu_options() {
 	const float x = -0.35f; // x xcoordinate from screen center, the menu should be aligned left of the center therefore it´s negative.n
 	const float start_y = -0.15f;
 	const float sel_margin = 0.04f;
-	const MenuOptions &opts = songlist_menu.getOptions();
-	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get()-songlist_menu.getSubmenuLevel()));
+	const MenuOptions& opts = songlist_menu.getOptions();
+	double submenuanim = 1.0 - std::min(1.0, std::abs(m_submenuAnim.get() - songlist_menu.getSubmenuLevel()));
 	// Determine from which item to start
 	int start_i = std::min(static_cast<int>(songlist_menu.curIndex() - 1), static_cast<int>(opts.size() - showopts + (songlist_menu.getSubmenuLevel() == 2 ? 1 : 0))); // Hack to counter side-effects from displaying the value inside the menu
 	if (start_i < 0 || opts.size() == showopts) start_i = 0;
@@ -275,23 +299,23 @@ void ScreenPlaylist::draw_menu_options() {
 			// Draw the text, dim if option not available
 			{
 				ColorTrans c(window, Color::alpha(opt.isActive() ? 1.0f : 0.5f));
-				m_theme->option_selected.dimensions.left(x).center(start_y + static_cast<float>(ii)*0.049f);
+				m_theme->option_selected.dimensions.left(x).center(start_y + static_cast<float>(ii) * 0.049f);
 				m_theme->option_selected.draw(window, opt.getName());
 			}
 			wcounter = std::max(wcounter, m_theme->option_selected.w() + 2.0f * sel_margin); // Calculate the widest entry
 			// If this is a config item, show the value below
 			if (opt.type == MenuOption::Type::CHANGE_VALUE) {
 				++ii; // Use a slot for the value
-				m_theme->option_selected.dimensions.left(x + sel_margin).center(static_cast<float>(-0.1 + (selanim+1.0)*0.08));
+				m_theme->option_selected.dimensions.left(x + sel_margin).center(static_cast<float>(-0.1 + (selanim + 1.0) * 0.08));
 				m_theme->option_selected.draw(window, "<  " + opt.value->getValue() + "  >");
 			}
 
-		// Regular option (not selected)
+			// Regular option (not selected)
 		} else {
 			std::string title = opt.getName();
 			SvgTxtTheme& txt = getTextObject(title);
 			ColorTrans c(window, Color::alpha(opt.isActive() ? 1.0f : 0.5f));
-			txt.dimensions.left(x).center(start_y + static_cast<float>(ii)*0.05f);
+			txt.dimensions.left(x).center(start_y + static_cast<float>(ii) * 0.05f);
 			txt.draw(window, title);
 			wcounter = std::max(wcounter, txt.w() + 2.0f * sel_margin); // Calculate the widest entry
 		}
@@ -312,42 +336,42 @@ void ScreenPlaylist::createSongListMenu() {
 	songlist_menu.clear();
 	SongList& currentList = getGame().getCurrentPlayList().getList();
 	float totaldurationSeconds = 0.0;
-	for (auto const& song: currentList) {
+	for (auto const& song : currentList) {
 		//timestamp handles
 		unsigned hours = 0;
 		unsigned minutes = 0;
 		unsigned seconds = static_cast<unsigned>(totaldurationSeconds);
-		while(seconds >= 60) {
+		while (seconds >= 60) {
 			minutes++;
 			seconds -= 60;
 		}
-		while(minutes >= 60) {
-			hours ++;
-			minutes -=60;
+		while (minutes >= 60) {
+			hours++;
+			minutes -= 60;
 		}
 		oss_playlist << "#" << count << " : " << song->artist << " - " << song->title << "  +";
-		if(hours > 0) {
+		if (hours > 0) {
 			oss_playlist << std::setw(2) << std::setfill('0') << hours << ":";
 		}
-			oss_playlist << std::setw(2) << std::setfill('0') << minutes << ":" << std::setw(2) << std::setfill('0') << seconds;
+		oss_playlist << std::setw(2) << std::setfill('0') << minutes << ":" << std::setw(2) << std::setfill('0') << seconds;
 		std::string songinfo = oss_playlist.str();
 		if (songinfo.length() > 20) {
 			songinfo = songinfo + "                           >"; //FIXME: ugly hack to make the text scale so it fits on screen!
 		}
 		//then add it to the menu:
-		songlist_menu.add(MenuOption(_(songinfo.c_str()),_("Press enter to view song options"))).call([this, count]() {
+		songlist_menu.add(MenuOption(_(songinfo.c_str()), _("Press enter to view song options"))).call([this, count]() {
 			createSongMenu(count);
 			overlay_menu.open();
-		});
+			});
 		oss_playlist.str("");
 		count++;
 		totaldurationSeconds += static_cast<float>(song->getDurationSeconds());
 		totaldurationSeconds += static_cast<float>(config["game/playlist_screen_timeout"].ui());
 	}
-	songlist_menu.add(MenuOption(_("View more options"),_("View general playlist settings"))).call([this]() {
+	songlist_menu.add(MenuOption(_("View more options"), _("View general playlist settings"))).call([this]() {
 		createEscMenu();
 		overlay_menu.open();
-	});
+		});
 }
 
 void ScreenPlaylist::createSongMenu(unsigned songNumber) {
@@ -365,7 +389,7 @@ void ScreenPlaylist::createSongMenu(unsigned songNumber) {
 		assert(ss);
 		ss->setSong(game.getCurrentPlayList().getSong(songNumber - 1u));
 		game.activateScreen("Sing");
-	});
+		});
 	overlay_menu.add(MenuOption(_("Remove"), _("Remove this song from the list"))).call([this, songNumber]() {
 		// Minus 1 so it doesn´t remove #2 when you´ve selected #1
 		getGame().getCurrentPlayList().removeSong(songNumber - 1u);
@@ -375,29 +399,29 @@ void ScreenPlaylist::createSongMenu(unsigned songNumber) {
 		} else {
 			createSongListMenu();
 		}
-	});
+		});
 	if (songNumber >= 2u) { //can't move up first song
 		overlay_menu.add(MenuOption(_("Move up"), _("Move this song up the list"))).call([this, songNumber]() {
-			getGame().getCurrentPlayList().swap(songNumber -1u, songNumber -2u);
+			getGame().getCurrentPlayList().swap(songNumber - 1u, songNumber - 2u);
 			createSongListMenu();
 			overlay_menu.close();
-		});
+			});
 	}
 	unsigned size = static_cast<unsigned>(getGame().getCurrentPlayList().getList().size());
 	if (songNumber < size) { //can't move down the last song
 		overlay_menu.add(MenuOption(_("Move down"), _("Move this song down the list"))).call([this, songNumber]() {
-			getGame().getCurrentPlayList().swap(songNumber -1, songNumber);
+			getGame().getCurrentPlayList().swap(songNumber - 1, songNumber);
 			createSongListMenu();
 			overlay_menu.close();
-		});
+			});
 	}
 	overlay_menu.add(MenuOption(_("Back"), _("Back to playlist viewer"))).call([this]() {
 		overlay_menu.close();
-	});
+		});
 }
 
 void ScreenPlaylist::triggerSongListUpdate() {
-	std::lock_guard<std::mutex> l (m_mutex);
+	std::lock_guard<std::mutex> l(m_mutex);
 	needsUpdate = true;
 }
 
