@@ -11,7 +11,7 @@
 #include "graphic/glutil.hh"
 #include "menu.hh"
 #include "screen.hh"
-#include "theme.hh"
+#include "theme/theme.hh"
 #include "fs.hh"
 #include "util.hh"
 #include "graphic/color_trans.hh"

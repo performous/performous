@@ -24,6 +24,9 @@ Value JsonToValueConverter::convert(nlohmann::json const& valueConfig) {
 	if (valueConfig.contains("value")) {
 		return value::Float(valueConfig.at("value").get<float>());
 	}
+	if (valueConfig.contains("negate")) {
+		return value::Negate(convert(valueConfig.at("negate").at("value")));
+	}
 	if (valueConfig.contains("min")) {
 		auto values = std::vector<Value>();
 

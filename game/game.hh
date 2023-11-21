@@ -80,6 +80,7 @@ class Game {
 	EventManager& getEventManager();
 
 	TextureManager& getTextureManager();
+	void loadTheme();
 
 private:
 	Window& m_window;
@@ -111,6 +112,7 @@ private:
 	std::unique_ptr<Dialog> m_dialog;
 	std::vector<Theme::Image> m_images;
 	EventManager m_eventManager;
+	bool m_drawLogo = true;
 #ifdef USE_WEBSERVER
 	std::string m_webserverMessage = "Trying to connect to webserver";
 #endif

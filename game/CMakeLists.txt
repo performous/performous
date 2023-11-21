@@ -6,6 +6,7 @@ file(GLOB SOURCE_FILES
 	"songorder/*.cc"
 	"theme/*.cc"
 	"utils/*.cc"
+	"value/*.cc"
 )
 file(GLOB HEADER_FILES
 	"*.hh"
@@ -13,6 +14,7 @@ file(GLOB HEADER_FILES
 	"songorder/*.hh"
 	"theme/*.hh"
 	"utils/*.hh"
+	"value/*.hh"
 	"libda/*.hpp"
 )
 

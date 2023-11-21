@@ -48,7 +48,7 @@ find_package(GTest ${GTEST_REQUIRED})
 if(GTest_FOUND)
 	message(STATUS "Testing enabled: Building test host")
 
-	set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${GAME_SOURCES})
+	set(SOURCES ${SOURCE_FILES} ${GAME_SOURCES})
 
 	add_executable(performous_test ${SOURCES})
 

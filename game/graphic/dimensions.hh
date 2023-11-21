@@ -40,6 +40,8 @@ public:
 	Dimensions& screenBottom(float y = 0.0f);
 	/// move the object without affecting anchoring
 	Dimensions& move(float x, float y);
+	Dimensions& scale(float f) { m_scaleHorizontal = m_scaleVertical = f; return *this; }
+	Dimensions& scale(float horizontal, float vertical) { m_scaleHorizontal = horizontal; m_scaleVertical = vertical; return *this; }
 	/// returns ar XXX
 	float ar() const;
 	/// returns left
@@ -64,6 +66,8 @@ private:
 
 	float m_ar;
 	float m_x, m_y, m_w, m_h;
+	float m_scaleHorizontal = 1.f;
+	float m_scaleVertical = 1.f;
 	enum class XAnchor { MIDDLE, LEFT, RIGHT } m_xAnchor;
 	enum class YAnchor { CENTER, TOP, BOTTOM } m_yAnchor, m_screenAnchor;
 };

@@ -41,6 +41,7 @@ public:
 	using OpenGLTexture<GL_TEXTURE_2D>::draw;
 	/// loads texture into buffer
 	void load(Bitmap const& bitmap, bool isText = false);
+	void load(fs::path const&);
 	Shader& shader(Window& window) { return OpenGLTexture::shader(window); }
 	float width() const { return getWidth(); }
 	float height() const { return getHeight(); }

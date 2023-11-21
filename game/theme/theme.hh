@@ -26,8 +26,6 @@ public:
 	struct Image {
 		std::string id;
 		std::unique_ptr<Texture> texture; // temporary unique_ptr
-		float x;
-		float y;
 		Value x;
 		Value y;
 		Value scaleHorizontal = 1.f;

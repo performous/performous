@@ -74,7 +74,7 @@ class ScreenSing: public Screen {
 	std::shared_ptr<Song> m_song; /// Pointer to the current song
 	std::unique_ptr<ScoreWindow> m_score_window;
 	std::unique_ptr<ProgressBar> m_progress;
-	std::unique_ptr<Texture> m_background;
+	std::shared_ptr<Texture> m_background;
 	std::unique_ptr<Video> m_video;
 	std::unique_ptr<Webcam> m_cam;
 	std::unique_ptr<Texture> m_pause_icon;
