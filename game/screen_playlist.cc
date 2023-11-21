@@ -48,9 +48,12 @@ void ScreenPlaylist::prepare() {
 }
 
 void ScreenPlaylist::reloadGL() {
-	m_theme = load<ThemePlaylistScreen>();
+	auto loader = ThemeLoader();
 
-	setBackground(m_theme->getBackgroundImage());
+	m_theme = loader.load<ThemePlaylistScreen>(getName());
+
+	if (!m_theme)
+		m_theme = std::make_unique<ThemePlaylistScreen>();
 
 	m_menuTheme = std::make_unique<ThemeInstrumentMenu>();
 	m_singCover = std::make_unique<Texture>(findFile("no_cover.svg"));

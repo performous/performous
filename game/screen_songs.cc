@@ -44,9 +44,12 @@ void ScreenSongs::enter() {
 }
 
 void ScreenSongs::reloadGL() {
-	m_theme = load<ThemeSongs>();
+	auto loader = ThemeLoader();
 
-	setBackground(m_theme->getBackgroundImage());
+	m_theme = loader.load<ThemeSongs>(getName());
+
+	if (!m_theme)
+		m_theme = std::make_unique<ThemeSongs>();
 
 	m_menuTheme = std::make_unique<ThemeInstrumentMenu>();
 	m_songbg_default = std::make_unique<Texture>(findFile("songs_bg_default.svg"));
@@ -204,8 +207,8 @@ void ScreenSongs::update() {
 	if (!songChange) return;
 	ScreenSongs::previewBeatsBuffer.reset(new_fvec(1));
 	{
-		std::lock_guard<std::recursive_mutex> l(Audio::aubio_mutex);
-		Audio::aubioTempo.reset(new_aubio_tempo("default", Audio::aubio_win_size, Audio::aubio_hop_size, static_cast<uint_t>(Audio::getSR())));
+	std::lock_guard<std::recursive_mutex> l(Audio::aubio_mutex);
+	Audio::aubioTempo.reset(new_aubio_tempo("default", Audio::aubio_win_size, Audio::aubio_hop_size, static_cast<uint_t>(Audio::getSR())));
 	}
 	if (song && song->hasControllers()) { song->loadNotes(); } // Needed for BPM info.
 	m_playing = music;

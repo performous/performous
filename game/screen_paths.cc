@@ -15,9 +15,12 @@ ScreenPaths::ScreenPaths(Game &game, std::string const& name, Audio& audio, Song
 }
 
 void ScreenPaths::enter() {
-	m_theme = load<ThemePaths>();
+	auto loader = ThemeLoader();
 
-	setBackground(m_theme->getBackgroundImage());
+	m_theme = loader.load<ThemePaths>(getName());
+
+	if (!m_theme)
+		m_theme = std::make_unique<ThemePaths>();
 
 	generateMenuFromPath(getHomeDir());
 }
@@ -150,7 +153,7 @@ void ScreenPaths::onEnter(EventParameter const& parameter) {
 void ScreenPaths::draw() {
 	auto& window = getGame().getWindow();
 
-	drawBackground();
+	m_theme->bg->draw(window);
 
 	//draw menu:
 	{
