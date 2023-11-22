@@ -36,7 +36,7 @@ std::string format(std::chrono::seconds const& unixtime, std::string const& form
 std::string reverse(const std::string& s) {
 	auto result = std::string{};
 
-	for (auto i = 0UL, j = s.size() - 1; i < s.size(); ++i, --j)
+	for (auto i = size_t(0), j = s.size() - 1; i < s.size(); ++i, --j)
 		result += s[j];
 
 	return result;

@@ -8,7 +8,4 @@ public:
 	~ScopedImageConstantsSetter();
 
 private:
-	Theme::Image const& m_image;
-	Theme& m_theme;
-	ConstantValueProviderPtr m_provider;
 };
