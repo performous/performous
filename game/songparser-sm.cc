@@ -1,4 +1,7 @@
 #include "songparser.hh"
+
+#include "songparserutil.hh"
+
 #include "unicode.hh"
 #include "fs.hh"
 
@@ -33,28 +36,29 @@ reaches value #NOTES.
 /// Parse header data for Songs screen
 // TODO: This actually parses the whole thing
 // TODO: Songparser drops parsed notes, remove it when smParseHeader is more intelligent
-void SongParser::smParseHeader() {
-	Song& s = m_song;
+void SongParser::smParseHeader(Song& song) {
 	std::string line;
-	if (!m_song.danceTracks.empty()) { m_song.danceTracks.clear(); }
+	if (!song.danceTracks.empty()) { song.danceTracks.clear(); }
 	// Parse the the entire file
-	while (getline(line) && smParseField(line)) {}
-	if (m_song.danceTracks.empty() ) throw std::runtime_error("No note data in the file");
-	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
+	while (getline(line) && smParseField(song, line)) {}
+	if (song.danceTracks.empty() ) throw std::runtime_error("No note data in the file");
+	if (song.title.empty() || song.artist.empty()) throw std::runtime_error("Required header fields missing");
 	// Convert stops to the format required in Song
-	s.stops.resize(m_stops.size());
-	for (std::size_t i = 0; i < m_stops.size(); ++i) s.stops[i] = smStopConvert(m_stops[i]);
+	song.stops.resize(m_stops.size());
+	for (std::size_t i = 0; i < m_stops.size(); ++i) {
+		song.stops[i] = smStopConvert(song, m_stops[i]);
+	}
 	m_tsPerBeat = 4;
 }
 
 /// Parse remaining stuff
-void SongParser::smParse() {
-	m_song.stops.clear();
-	m_song.danceTracks.clear();
-	smParseHeader();
+void SongParser::smParse(Song& song) {
+	song.stops.clear();
+	song.danceTracks.clear();
+	smParseHeader(song);
 }
 
-bool SongParser::smParseField(std::string line) {
+bool SongParser::smParseField(Song& song, std::string line) {
 	boost::trim(line);
 	if (line.empty()) return true;
 	if (line.substr(0, 2) == "//") return true; //jump over possible comments
@@ -96,7 +100,7 @@ bool SongParser::smParseField(std::string line) {
 			if(!getline(line)) { throw std::runtime_error("Required note data missing"); }
 
 			//<NoteData>:
-			Notes notes = smParseNotes(line);
+			Notes notes = smParseNotes(song, line);
 
 			//Here all note data from the current track is inserted into containers
 			// TODO: support other track types. For now all others are simply ignored.
@@ -104,11 +108,11 @@ bool SongParser::smParseField(std::string line) {
 			  || notestype == "pump-single" || notestype == "ez2-single" || notestype == "ez2-real"
 			  || notestype == "para-single") {
 				DanceTrack danceTrack(description, notes);
-				if (m_song.danceTracks.find(notestype) == m_song.danceTracks.end() ) {
+				if (song.danceTracks.find(notestype) == song.danceTracks.end() ) {
 					DanceDifficultyMap danceDifficultyMap;
-					m_song.danceTracks.insert(std::make_pair(notestype, danceDifficultyMap));
+					song.danceTracks.insert(std::make_pair(notestype, danceDifficultyMap));
 				}
-				m_song.danceTracks[notestype].insert(std::make_pair(danceDifficulty, danceTrack));
+				song.danceTracks[notestype].insert(std::make_pair(danceDifficulty, danceTrack));
 			}
 		}
 		return false;
@@ -131,7 +135,7 @@ bool SongParser::smParseField(std::string line) {
 			char chr;
 			while (iss >> ts >> chr >> bpm) {
 				if (ts == 0.0) m_bpm = static_cast<float>(bpm);
-				addBPM(ts * 4.0, m_bpm);
+				addBPM(song, ts * 4.0, m_bpm);
 				if (!(iss >> chr)) break;
 			}
 	}
@@ -145,15 +149,15 @@ bool SongParser::smParseField(std::string line) {
 			}
 	}
 
-	if (m_song.loadStatus >= Song::LoadStatus::HEADER) return true;  // Only re-parsing now, skip any other data
+	if (song.loadStatus >= Song::LoadStatus::HEADER) return true;  // Only re-parsing now, skip any other data
 
 	// Parse header data that is directly stored in m_song
-	if (key == "TITLE") m_song.title = value.substr(value.find_first_not_of(" :"));
-	else if (key == "ARTIST") m_song.artist = value.substr(value.find_first_not_of(" "));
-	else if (key == "BANNER") m_song.cover = absolute(value, m_song.path);
-	else if (key == "MUSIC") m_song.music[TrackName::BGMUSIC] = absolute(value, m_song.path);
-	else if (key == "BACKGROUND") m_song.background = absolute(value, m_song.path);
-	else if (key == "SAMPLESTART") assign(m_song.preview_start, value);
+	if (key == "TITLE") song.title = value.substr(value.find_first_not_of(" :"));
+	else if (key == "ARTIST") song.artist = value.substr(value.find_first_not_of(" "));
+	else if (key == "BANNER") song.cover = absolute(value, song.path);
+	else if (key == "MUSIC") song.music[TrackName::BGMUSIC] = absolute(value, song.path);
+	else if (key == "BACKGROUND") song.background = absolute(value, song.path);
+	else if (key == "SAMPLESTART") assign(song.preview_start, value);
 	/*.sm fileformat has also the following constants but they are ignored in this version of the parser:
 	#SUBTITLE
 	#TITLETRANSLIT
@@ -173,7 +177,7 @@ bool SongParser::smParseField(std::string line) {
 
 
 
-Notes SongParser::smParseNotes(std::string line) {
+Notes SongParser::smParseNotes(Song& song, std::string line) {
 	//container for dance songs
 	typedef std::map<unsigned, Note> DanceChord;	//int indicates "arrow" position (cmp. fret in guitar)
 	typedef std::vector<DanceChord> DanceChords;
@@ -193,7 +197,7 @@ Notes SongParser::smParseNotes(std::string line) {
 		if (line.substr(0, 2) == "//") continue;  // Skip comments
 		if (line[0] == '#') break;  // HACK: This should read away the next #NOTES: line
 		if (line[0] == ',' || line[0] == ';') {
-			double end = tsTime(measure * 16.0);
+			double end = tsTime(song, measure * 16.0);
 			unsigned div = static_cast<unsigned>(chords.size());
 			double step = (end - begin) / div;
 			for (unsigned note = 0u; note < div; ++note) {
@@ -257,7 +261,7 @@ Notes SongParser::smParseNotes(std::string line) {
 }
 
 /// Convert a stop into <time, duration> (as stored in the song)
-std::pair<double, double> SongParser::smStopConvert(std::pair<double, double> s) {
-	s.first = tsTime(s.first);
+std::pair<double, double> SongParser::smStopConvert(Song& song, std::pair<double, double> s) {
+	s.first = tsTime(song, s.first);
 	return s;
 }

@@ -1,4 +1,7 @@
 ﻿#include "songparser.hh"
+
+#include "songparserutil.hh"
+
 #include "unicode.hh"
 #include "fs.hh"
 
@@ -17,51 +20,52 @@ bool SongParser::txtCheck(std::string const& data) const {
 }
 
 /// Parse header data for Songs screen
-void SongParser::txtParseHeader() {
-	Song& s = m_song;
+void SongParser::txtParseHeader(Song& song) {
 	std::string line;
-	s.insertVocalTrack(TrackName::VOCAL_LEAD, VocalTrack(TrackName::VOCAL_LEAD)); // Dummy note to indicate there is a track
-	while (getline(line) && txtParseField(line)) {}
-	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
-	if (m_bpm != 0.0f) addBPM(0, m_bpm);
+	song.insertVocalTrack(TrackName::VOCAL_LEAD, VocalTrack(TrackName::VOCAL_LEAD)); // Dummy note to indicate there is a track
+	while (getline(line) && txtParseField(song, line)) {}
+	if (song.title.empty() || song.artist.empty())
+		throw std::runtime_error("Required header fields missing");
+	if (m_bpm != 0.0f)
+		addBPM(song, 0, m_bpm);
 }
 
 /// Parse notes
-void SongParser::txtParse() {
+void SongParser::txtParse(Song& song) {
 	std::string line;
 	m_curSinger = CurrentSinger::P1;
-	if (!m_song.vocalTracks.empty()) { m_song.vocalTracks.clear(); }
-	m_song.insertVocalTrack(TrackName::VOCAL_LEAD, VocalTrack(TrackName::VOCAL_LEAD));
-	m_song.insertVocalTrack(DUET_P2, VocalTrack(DUET_P2));
-	while (getline(line) && txtParseField(line)) {} // Parse the header again
-	txtResetState();
-	while (txtParseNote(line) && getline(line)) {} // Parse notes
+	if (!song.vocalTracks.empty()) { song.vocalTracks.clear(); }
+	song.insertVocalTrack(TrackName::VOCAL_LEAD, VocalTrack(TrackName::VOCAL_LEAD));
+	song.insertVocalTrack(DUET_P2, VocalTrack(DUET_P2));
+	while (getline(line) && txtParseField(song, line)) {} // Parse the header again
+	txtResetState(song);
+	while (txtParseNote(song, line) && getline(line)) {} // Parse notes
 	// Workaround for the terminating : 1 0 0 line, written by some converters
-	// FIXME: Should we do this for all tracks?	
-	
+	// FIXME: Should we do this for all tracks?
+
 	for (auto const& name: { TrackName::VOCAL_LEAD, DUET_P2 }) {
-		Notes& notes = m_song.getVocalTrack(name).notes;
+		Notes& notes = song.getVocalTrack(name).notes;
 		auto it = notes.rbegin();
 		if (!notes.empty() && it->type != Note::Type::SLEEP && it->begin == it->end) notes.pop_back();
-		if (notes.empty()) m_song.eraseVocalTrack(name);
+		if (notes.empty()) song.eraseVocalTrack(name);
 	}
-	
-	if (m_song.hasDuet()) {
+
+	if (song.hasDuet()) {
 		bool skip;
 		Notes s1, s2, merged, finalDuet;
-		s1 = m_song.getVocalTrack(TrackName::VOCAL_LEAD).notes;
-		s2 = m_song.getVocalTrack(SongParserUtil::DUET_P2).notes;
+		s1 = song.getVocalTrack(TrackName::VOCAL_LEAD).notes;
+		s2 = song.getVocalTrack(SongParserUtil::DUET_P2).notes;
 		std::merge(s1.begin(), s1.end(), s2.begin(), s2.end(), std::back_inserter(merged), Note::ltBegin);
-		VocalTracks const& tracks = m_song.vocalTracks;
+		VocalTracks const& tracks = song.vocalTracks;
 		std::string duetName = tracks.at(TrackName::VOCAL_LEAD).name + " & " + tracks.at(SongParserUtil::DUET_P2).name;
-		m_song.insertVocalTrack(SongParserUtil::DUET_BOTH, duetName);
-		VocalTrack& duetTrack = m_song.getVocalTrack(SongParserUtil::DUET_BOTH);
+		song.insertVocalTrack(SongParserUtil::DUET_BOTH, duetName);
+		VocalTrack& duetTrack = song.getVocalTrack(SongParserUtil::DUET_BOTH);
 		Notes& duetNotes = duetTrack.notes;
 		duetNotes.clear();
-		
+
 		for (auto currentNote: merged) {
 			skip = false;
-			if (!finalDuet.empty()) { 
+			if (!finalDuet.empty()) {
 				if (currentNote.type == Note::Type::SLEEP) {
 					auto prevToLast = ++(finalDuet.rbegin());
 					if (prevToLast->type == Note::Type::SLEEP) {
@@ -74,7 +78,7 @@ void SongParser::txtParse() {
 						std::clog << "songparser/info: Will try to fix overlap (most likely between both singers) with a linebreak." << std::endl;
 						Note lineBreak = Note();
 						lineBreak.type = Note::Type::SLEEP;
-						double beatDur = getBPM(m_song, finalDuet.back().begin).step;
+						double beatDur = getBPM(song, finalDuet.back().begin).step;
 						double newEnd = (currentNote.begin - 2*beatDur);
 						lineBreak.begin = lineBreak.end = newEnd;
 						if (finalDuet.back().type != Note::Type::SLEEP) {
@@ -83,19 +87,19 @@ void SongParser::txtParse() {
 							if (!skip) { finalDuet.push_back(lineBreak); }
 						}
 					}
-				}	
+				}
 			}
 			if (!skip) { finalDuet.push_back(currentNote); }
 		}
 		auto finalNote = std::unique(finalDuet.begin(), finalDuet.end(), Note::equal);
 		finalDuet.erase(finalNote, finalDuet.end());
 		duetNotes.swap(finalDuet);
-		duetTrack.noteMin = std::min(m_song.getVocalTrack(TrackName::VOCAL_LEAD).noteMin, m_song.getVocalTrack(SongParserUtil::DUET_P2).noteMin);
-		duetTrack.noteMax = std::max(m_song.getVocalTrack(TrackName::VOCAL_LEAD).noteMax, m_song.getVocalTrack(SongParserUtil::DUET_P2).noteMax);
-	} 
+		duetTrack.noteMin = std::min(song.getVocalTrack(TrackName::VOCAL_LEAD).noteMin, song.getVocalTrack(SongParserUtil::DUET_P2).noteMin);
+		duetTrack.noteMax = std::max(song.getVocalTrack(TrackName::VOCAL_LEAD).noteMax, song.getVocalTrack(SongParserUtil::DUET_P2).noteMax);
+	}
 }
 
-bool SongParser::txtParseField(std::string const& line) {
+bool SongParser::txtParseField(Song& song, std::string const& line) {
 	if (line.empty()) return true;
 	if (line[0] != '#') return false;
 	std::string::size_type pos = line.find(':');
@@ -103,36 +107,36 @@ bool SongParser::txtParseField(std::string const& line) {
 	std::string key = UnicodeUtil::toUpper(boost::trim_copy(line.substr(1, pos - 1)));
 	std::string value = boost::trim_copy(line.substr(pos + 1));
 	if (value.empty()) return true;
-	
+
 	// Parse header data that is stored in SongParser rather than in song (and thus needs to be read every time)
 	if (key == "BPM") assign(m_bpm, value);
 	else if (key == "RELATIVE") assign(m_relative, value);
 	else if (key == "GAP") { assign(m_gap, value); m_gap *= 1e-3; }
-	else if (key == "DUETSINGERP1" || key == "P1") m_song.insertVocalTrack(TrackName::VOCAL_LEAD, VocalTrack(value.substr(value.find_first_not_of(" "))));
+	else if (key == "DUETSINGERP1" || key == "P1") song.insertVocalTrack(TrackName::VOCAL_LEAD, VocalTrack(value.substr(value.find_first_not_of(" "))));
 	// Strong hint that this is a duet, so it will be readily displayed with two singers in browser and properly filtered
-	else if (key == "DUETSINGERP2" || key == "P2") m_song.insertVocalTrack(DUET_P2, VocalTrack(value.substr(value.find_first_not_of(" "))));
-	
-	if (m_song.loadStatus >= Song::LoadStatus::HEADER) return true;  // Only re-parsing now, skip any other data
-	
+	else if (key == "DUETSINGERP2" || key == "P2") song.insertVocalTrack(DUET_P2, VocalTrack(value.substr(value.find_first_not_of(" "))));
+
+	if (song.loadStatus >= Song::LoadStatus::HEADER) return true;  // Only re-parsing now, skip any other data
+
 	// Parse header data that is directly stored in m_song
-	if (key == "TITLE") m_song.title = value.substr(value.find_first_not_of(" :"));
-	else if (key == "ARTIST") m_song.artist = value.substr(value.find_first_not_of(" "));
-	else if (key == "EDITION") m_song.edition = value.substr(value.find_first_not_of(" "));
-	else if (key == "GENRE") m_song.genre = value.substr(value.find_first_not_of(" "));
-	else if (key == "CREATOR") m_song.creator = value.substr(value.find_first_not_of(" "));
-	else if (key == "COVER") m_song.cover = absolute(value, m_song.path);
-	else if (key == "MP3") m_song.music["background"] = absolute(value, m_song.path);
-	else if (key == "VOCALS") m_song.music["vocals"] = absolute(value, m_song.path);
-	else if (key == "VIDEO") m_song.video = absolute(value, m_song.path);
-	else if (key == "BACKGROUND") m_song.background = absolute(value, m_song.path);
-	else if (key == "START") assign(m_song.start, value);
-	else if (key == "VIDEOGAP") assign(m_song.videoGap, value);
-	else if (key == "PREVIEWSTART") assign(m_song.preview_start, value);
-	else if (key == "LANGUAGE") m_song.language = value.substr(value.find_first_not_of(" "));
+	if (key == "TITLE") song.title = value.substr(value.find_first_not_of(" :"));
+	else if (key == "ARTIST") song.artist = value.substr(value.find_first_not_of(" "));
+	else if (key == "EDITION") song.edition = value.substr(value.find_first_not_of(" "));
+	else if (key == "GENRE") song.genre = value.substr(value.find_first_not_of(" "));
+	else if (key == "CREATOR") song.creator = value.substr(value.find_first_not_of(" "));
+	else if (key == "COVER") song.cover = absolute(value, song.path);
+	else if (key == "MP3") song.music["background"] = absolute(value, song.path);
+	else if (key == "VOCALS") song.music["vocals"] = absolute(value, song.path);
+	else if (key == "VIDEO") song.video = absolute(value, song.path);
+	else if (key == "BACKGROUND") song.background = absolute(value, song.path);
+	else if (key == "START") assign(song.start, value);
+	else if (key == "VIDEOGAP") assign(song.videoGap, value);
+	else if (key == "PREVIEWSTART") assign(song.preview_start, value);
+	else if (key == "LANGUAGE") song.language = value.substr(value.find_first_not_of(" "));
 	return true;
 }
 
-bool SongParser::txtParseNote(std::string line) {
+bool SongParser::txtParseNote(Song& song, std::string line) {
 	if (line.empty() || line == "\r") return true;
 	if (line[0] == '#') throw std::runtime_error("Key found in the middle of notes");
 	if (line[line.size() - 1] == '\r') line.erase(line.size() - 1);
@@ -143,7 +147,7 @@ bool SongParser::txtParseNote(std::string line) {
 		float bpm;
 		iss.ignore();
 		if (!(iss >> ts >> bpm)) throw std::runtime_error("Invalid BPM line format");
-		addBPM(ts, bpm);
+		addBPM(song, ts, bpm);
 		return true;
 	}
 	if (line[0] == 'P') {
@@ -158,7 +162,7 @@ bool SongParser::txtParseNote(std::string line) {
 		else if (line[2] == '2') m_curSinger = CurrentSinger::P2;
 		else if (line[2] == '3') m_curSinger = CurrentSinger::BOTH;
 		else throw std::runtime_error("Invalid player info line [malformed]: " + line);
-		txtResetState();
+		txtResetState(song);
 		return true;
 	}
 	Note n;
@@ -177,7 +181,7 @@ bool SongParser::txtParseNote(std::string line) {
 			n.notePrev = n.note; // No slide notes in TXT yet.
 			if (m_relative) ts += m_txt.relativeShift;
 			if (iss.get() == ' ') std::getline(iss, n.syllable);
-			n.end = tsTime(ts + length);
+			n.end = tsTime(song, ts + length);
 		}
 		break;
 		case Note::Type::SLEEP:
@@ -189,7 +193,7 @@ bool SongParser::txtParseNote(std::string line) {
 				end += m_txt.relativeShift;
 				m_txt.relativeShift = end;
 			}
-			n.end = tsTime(end);
+			n.end = tsTime(song, end);
 		}
 		break;
 		case Note::Type::SLIDE:
@@ -199,11 +203,11 @@ bool SongParser::txtParseNote(std::string line) {
 		case Note::Type::ROLL:
 		case Note::Type::MINE:
 		case Note::Type::LIFT:
-		default: 
+		default:
 			throw std::runtime_error("Unknown note type");
 	}
-	n.begin = tsTime(ts);
-	VocalTrack& vocal = m_song.getVocalTrack(
+	n.begin = tsTime(song, ts);
+	VocalTrack& vocal = song.getVocalTrack(
 	  (m_curSinger == CurrentSinger::P1) || (m_curSinger == CurrentSinger::BOTH)
 	  ? TrackName::VOCAL_LEAD : DUET_P2);
 	Notes& notes = vocal.notes;
@@ -217,8 +221,8 @@ bool SongParser::txtParseNote(std::string line) {
 			Note& p = notes.back();
 			if (p.begin > n.begin) {
 				std::string msg = "Skipped overlapping notes:\n" + p.syllable + ", " + n.syllable + "\n";
-				m_song.b0rked += msg;
-				std::clog << "songparser/notice: " + m_song.filename.string() + ": " + msg << std::endl;
+				song.b0rked += msg;
+				std::clog << "songparser/notice: " + song.filename.string() + ": " + msg << std::endl;
 				return true;
 			}
 		} else throw std::runtime_error("The first note has negative timestamp");
@@ -234,18 +238,18 @@ bool SongParser::txtParseNote(std::string line) {
 		else {
 			Note& p = notes.back();
 			n.begin = n.end = prevtime; // Normalize sleep notes
-			
+
 			if (p.type == Note::Type::SLEEP) return true; // Ignore consecutive sleeps
 		}
 	}
 	notes.push_back(n);
-	if (m_curSinger == CurrentSinger::BOTH) { m_song.getVocalTrack(DUET_P2).notes.push_back(n); }
+	if (m_curSinger == CurrentSinger::BOTH) { song.getVocalTrack(DUET_P2).notes.push_back(n); }
 	return true;
 }
 
-void SongParser::txtResetState() {
+void SongParser::txtResetState(Song& song) {
 	m_txt = TXTState();
-	m_song.m_bpms.clear();
-	if (m_bpm != 0.0f) { addBPM (0, m_bpm); }
+	song.m_bpms.clear();
+	if (m_bpm != 0.0f) { addBPM (song, 0, m_bpm); }
 }
 

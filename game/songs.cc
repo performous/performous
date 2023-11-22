@@ -140,7 +140,7 @@ void Songs::LoadCache() {
 			}) != allPaths.end();
 		STAT buffer;
 		if(_STAT(songPath.c_str(), &buffer) == 0 && isSongPathInConfiguredPaths) {
-			auto realSong = std::make_shared<Song>(song);
+			auto realSong = std::make_shared<Song>(m_parser, song);
 			std::unique_lock<std::shared_mutex> l(m_mutex);
 			m_songs.push_back(std::move(realSong));
 		}
@@ -287,7 +287,7 @@ void Songs::reload_internal(fs::path const& parent) {
 
 				std::clog << "songs/notice: Found song which was not in the cache: " << p.string() << std::endl;
 
-				std::shared_ptr<Song>s(new Song(p.parent_path(), p));
+				std::shared_ptr<Song>s(new Song(m_parser, p.parent_path(), p));
 				std::ptrdiff_t AdditionalFileIndex = -1;
 				{
 					std::shared_lock<std::shared_mutex> l(m_mutex);

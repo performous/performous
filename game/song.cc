@@ -2,6 +2,7 @@
 #include "config.hh"
 #include "screen_sing.hh"
 #include "songparser.hh"
+#include "songparserutil.hh"
 #include "unicode.hh"
 #include "util.hh"
 
@@ -14,7 +15,8 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
-Song::Song(nlohmann::json const& song): dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()) {
+Song::Song(ISongParser& parser, nlohmann::json const& song)
+: dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()), m_parser(parser) {
 	path = getJsonEntry<std::string>(song, "txtFileFolder").value_or("");
 	filename = getJsonEntry<std::string>(song, "txtFile").value_or("");
 	artist = getJsonEntry<std::string>(song, "artist").value_or("");
@@ -74,20 +76,36 @@ Song::Song(nlohmann::json const& song): dummyVocal(TrackName::VOCAL_LEAD), rando
 	collateUpdate();
 }
 
-Song::Song(fs::path const& path, fs::path const& filename):
-  dummyVocal(TrackName::VOCAL_LEAD), path(path), filename(filename), randomIdx(rand())
-{
-	SongParser(*this);
+Song::Song(ISongParser& parser,fs::path const& path, fs::path const& filename)
+:  dummyVocal(TrackName::VOCAL_LEAD), path(path), filename(filename), randomIdx(rand()), m_parser(parser) {
+	parser.parse(*this);
+
 	collateUpdate();
 }
 
+Song::Song(ISongParser& parser)
+: dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()), m_parser(parser) {
+}
+
 void Song::reload(bool errorIgnore) {
-	try { *this = Song(path, filename); } catch (...) { if (!errorIgnore) throw; }
+	try {
+		m_parser.parse(*this);
+
+		collateUpdate();
+	} catch (...) {
+		if (!errorIgnore)
+			throw;
+	}
 }
 
 void Song::loadNotes(bool errorIgnore) {
-	if (loadStatus == LoadStatus::FULL) return;
-	try { SongParser(*this); } catch (...) { if (!errorIgnore) throw; }
+	if (loadStatus == LoadStatus::FULL)
+		return;
+	try {
+		m_parser.parse(*this);
+	} catch (...) {
+		if (!errorIgnore) throw;
+	}
 }
 
 void Song::dropNotes() {
@@ -181,12 +199,12 @@ VocalTrack& Song::getVocalTrack(std::string vocalTrack) {
 
 VocalTrack& Song::getVocalTrack(unsigned idx) {
 	if (idx >= static_cast<unsigned>(vocalTracks.size())) {
-        return dummyVocal;
+		return dummyVocal;
 	} else {
-        VocalTracks::iterator it = vocalTracks.begin();
-        std::advance(it, idx);
-        return it->second;
-    }
+		VocalTracks::iterator it = vocalTracks.begin();
+		std::advance(it, idx);
+		return it->second;
+	}
 }
 
 double Song::getDurationSeconds() {

@@ -4,36 +4,20 @@
 #include "song.hh"
 #include "unicode.hh"
 #include "fs.hh"
+#include "isongparser.hh"
+
 #include <cstdint>
 #include <boost/range/adaptor/reversed.hpp>
 #include <sstream>
 
-namespace SongParserUtil {
-	const std::string DUET_P2 = "Duet singer";	// FIXME
-	const std::string DUET_BOTH = "Both singers";	// FIXME
-	/// Parse an int from string and assign it to a variable
-	void assign(int& var, std::string const& str);
-	/// Parse an unsigned int from string and assign it to a variable
-	void assign(unsigned& var, std::string const& str);
-	/// Parse a double from string and assign it to a variable
-	void assign(double& var, std::string str);
-	/// Parse a float from string and assign it to a variable
-	void assign(float& var, std::string str);
-	/// Parse a boolean from string and assign it to a variable
-	void assign(bool& var, std::string const& str);
-	/// Erase last character if it matches
-	void eraseLast(std::string& s, char ch = ' ');
-}
-
 /// Parse a song file; this object is only used while parsing and is discarded once done.
 /// Format-specific member functions are implemented in songparser-*.cc.
-class SongParser {
+class SongParser : public ISongParser {
 public:
-	/// Parse into s
-	SongParser (Song & s);
+	void parse(Song&) override;
+
 private:
 	// Variables and types
-	Song& m_song;
 	std::stringstream m_ss;
 	unsigned m_linenum = 0;
 	bool m_relative = false;
@@ -50,32 +34,32 @@ private:
 		unsigned relativeShift = 0;
 	} m_txt;
 	// Functions
-	void finalize();
-	void vocalsTogether();
-	void guessFiles();
+	void finalize(Song&);
+	void vocalsTogether(Song&);
+	void guessFiles(Song&);
 	bool getline (std::string& line) { ++m_linenum; return (bool) std::getline (m_ss, line); }
 	Song::BPM getBPM(Song const& s, double ts) const;
-	void addBPM(double ts, float bpm);
-	double tsTime(double ts) const;  ///< Convert a timestamp (beats) into time (seconds)
+	void addBPM(Song&, double ts, float bpm);
+	double tsTime(Song&, double ts) const;  ///< Convert a timestamp (beats) into time (seconds)
 	bool txtCheck(std::string const& data) const;
-	void txtParseHeader();
-	void txtParse();
-	bool txtParseField(std::string const& line);
-	bool txtParseNote(std::string line);
-	void txtResetState();
+	void txtParseHeader(Song&);
+	void txtParse(Song&);
+	bool txtParseField(Song&, std::string const& line);
+	bool txtParseNote(Song&, std::string line);
+	void txtResetState(Song&);
 	bool iniCheck(std::string const& data) const;
-	void iniParseHeader();
+	void iniParseHeader(Song&);
 	bool midCheck(std::string const& data) const;
-	void midParseHeader();
-	void midParse();
+	void midParseHeader(Song&);
+	void midParse(Song&);
 	bool xmlCheck(std::string const& data) const;
-	void xmlParseHeader();
-	void xmlParse();
-	Note xmlParseNote(xmlpp::Element const& noteNode, unsigned& ts);
+	void xmlParseHeader(Song&);
+	void xmlParse(Song&);
+	Note xmlParseNote(Song&, xmlpp::Element const& noteNode, unsigned& ts);
 	bool smCheck(std::string const& data) const;
-	void smParseHeader();
-	void smParse();
-	bool smParseField(std::string line);
-	Notes smParseNotes(std::string line);
-	std::pair<double, double> smStopConvert(std::pair<double, double> s);
+	void smParseHeader(Song&);
+	void smParse(Song&);
+	bool smParseField(Song&, std::string line);
+	Notes smParseNotes(Song&, std::string line);
+	std::pair<double, double> smStopConvert(Song&, std::pair<double, double> s);
 };
