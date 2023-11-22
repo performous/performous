@@ -60,6 +60,10 @@ public:
 	float w() const;
 	/// returns height
 	float h() const;
+	/// returns width
+	float getWidth(bool scaled = true) const;
+	/// returns height
+	float getHeight(bool scaled = true) const;
 
 private:
 	float screenY() const;

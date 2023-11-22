@@ -56,6 +56,10 @@ namespace {
 		values["image.middle"] = value::Constant("image.middle", provider);
 		values["image.width"] = value::Constant("image.width", provider);
 		values["image.height"] = value::Constant("image.height", provider);
+		values["image.width_half"] = value::Constant("image.width_half", provider);
+		values["image.height_half"] = value::Constant("image.height_half", provider);
+		values["image.width_origin"] = value::Constant("image.width_origin", provider);
+		values["image.height_origin"] = value::Constant("image.height_origin", provider);
 	}
 }
 
@@ -72,12 +76,40 @@ ThemePtr ThemeLoader::load(std::string const& screenName)
 
 		if (config.contains("values")) {
 			auto const valuesConfig = config.at("values");
+			//auto values = std::vector<nlohmann::json>(valuesConfig.items().begin(), valuesConfig.items().end());
+			auto valuesToParse = std::map<std::string, nlohmann::json>();
 
 			for (auto const& valueConfig : valuesConfig.items()) {
-				auto const id = valueConfig.key();
-				auto const value = getValue(valueConfig.value(), converter);
+				valuesToParse[valueConfig.key()] = valueConfig.value();
+			}
 
-				theme->values[id] = value;
+			auto changed = true;
+			auto message = std::string{};
+
+			while (!valuesToParse.empty() && changed) {
+				auto values = valuesToParse;
+
+				changed = false;
+				message.clear();
+
+				for (auto const& item : values) {
+					try {
+						auto const id = item.first;
+						auto const value = getValue(item.second, converter);
+
+						theme->values[id] = value;
+
+						valuesToParse.erase(id);
+						changed = true;
+					}
+					catch (std::exception const& e) {
+						message += std::string{ "\n" } + e.what();
+					}
+				}
+			}
+
+			if (!changed) {
+				std::clog << "theme/error: cannot solve all values!" << message << std::endl;
 			}
 		}
 		if (config.contains(screenName)) {

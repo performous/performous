@@ -126,6 +126,24 @@ Dimensions& Dimensions::scale(float horizontal, float vertical) {
 	return *this;
 }
 
+float Dimensions::x1() const {
+	switch (m_xAnchor) {
+	case XAnchor::LEFT: return m_x;
+	case XAnchor::MIDDLE: return m_x - 0.5f * w();
+	case XAnchor::RIGHT: return m_x - w();
+	}
+	throw std::logic_error("Unknown value in Dimensions::m_xAnchor");
+}
+
+float Dimensions::y1() const {
+	switch (m_yAnchor) {
+	case YAnchor::TOP: return screenY() + m_y;
+	case YAnchor::CENTER: return screenY() + m_y - 0.5f * h();
+	case YAnchor::BOTTOM: return screenY() + m_y - h();
+	}
+	throw std::logic_error("Unknown value in Dimensions::m_yAnchor");
+}
+
 float Dimensions::ar() const {
 	return m_ar;
 }
@@ -150,8 +168,20 @@ float Dimensions::w() const {
 	return m_w * m_scaleHorizontal;
 }
 
+float Dimensions::getWidth(bool scaled) const {
+	if (scaled)
+		return m_w * m_scaleHorizontal;
+	return m_w;
+}
+
 float Dimensions::h() const {
 	return m_h * m_scaleVertical;
+}
+
+float Dimensions::getHeight(bool scaled) const {
+	if (scaled)
+		return m_h * m_scaleVertical;
+	return m_h;
 }
 
 float Dimensions::screenY() const {
@@ -162,23 +192,4 @@ float Dimensions::screenY() const {
 	}
 	throw std::logic_error("Dimensions::screenY(): unknown m_screenAnchor value");
 }
-
-float Dimensions::x1() const {
-	switch (m_xAnchor) {
-	case XAnchor::LEFT: return m_x;
-	case XAnchor::MIDDLE: return m_x - 0.5f * m_w * m_scaleHorizontal;
-	case XAnchor::RIGHT: return m_x - m_w * m_scaleHorizontal;
-	}
-	throw std::logic_error("Unknown value in Dimensions::m_xAnchor");
-}
-
-float Dimensions::y1() const {
-	switch (m_yAnchor) {
-	case YAnchor::TOP: return screenY() + m_y;
-	case YAnchor::CENTER: return screenY() + m_y - 0.5f * m_h * m_scaleVertical;
-	case YAnchor::BOTTOM: return screenY() + m_y - m_h * m_scaleVertical;
-	}
-	throw std::logic_error("Unknown value in Dimensions::m_yAnchor");
-}
-
 

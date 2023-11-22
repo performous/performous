@@ -31,7 +31,7 @@ Value JsonToValueConverter::convert(nlohmann::json const& valueConfig) {
 
 		std::clog << "theme/error: no value with id '" << id << "' was defined!" << std::endl;
 
-		return 0.f;
+		throw std::runtime_error("theme/error: no value with id '" + id + "' was defined!");
 	}
 	if (!valueConfig.is_object()) {
 		return value::Float(valueConfig.get<float>());

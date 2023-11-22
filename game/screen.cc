@@ -18,8 +18,6 @@ void Screen::drawImages(std::vector<Theme::Image> const& images) {
 		ScopedImageConstantsSetter constants(image, *m_theme, getGame().getConstantValueProvider());
 		ColorTrans c(window, Color::alpha(image.alpha));
 
-		std::cout << "id: " << image.id << " x: " << image.x.get() << " y: " << image.y.get() << std::endl;
-
 		image.texture->dimensions.center(image.y).middle(image.x).scale(image.scaleHorizontal, image.scaleVertical);
 		image.texture->draw(window);
 	}
