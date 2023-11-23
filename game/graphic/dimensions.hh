@@ -42,6 +42,8 @@ public:
 	Dimensions& move(float x, float y);
 	Dimensions& scale(float f);
 	Dimensions& scale(float horizontal, float vertical);
+	Dimensions& setAngle(float radian);
+	Dimensions& rotate(float radian);
 	/// returns ar XXX
 	float ar() const;
 	/// returns left
@@ -64,6 +66,7 @@ public:
 	float getWidth(bool scaled = true) const;
 	/// returns height
 	float getHeight(bool scaled = true) const;
+	float getAngle() const;
 
 private:
 	float screenY() const;
@@ -72,6 +75,7 @@ private:
 	float m_x, m_y, m_w, m_h;
 	float m_scaleHorizontal = 1.f;
 	float m_scaleVertical = 1.f;
+	float m_angle = 0.f;
 	enum class XAnchor { MIDDLE, LEFT, RIGHT } m_xAnchor;
 	enum class YAnchor { CENTER, TOP, BOTTOM } m_yAnchor, m_screenAnchor;
 };

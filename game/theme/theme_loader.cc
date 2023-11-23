@@ -1,6 +1,7 @@
 #include "theme_loader.hh"
 #include "json.hh"
 #include "value/json_to_value_converter.hh"
+#include "utils/math.hh"
 
 namespace {
 	ThemePtr createTheme(std::string const& screen) {

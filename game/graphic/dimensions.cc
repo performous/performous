@@ -126,6 +126,18 @@ Dimensions& Dimensions::scale(float horizontal, float vertical) {
 	return *this;
 }
 
+Dimensions& Dimensions::setAngle(float radian) {
+	m_angle = radian;
+
+	return *this;
+}
+
+Dimensions& Dimensions::rotate(float radian) {
+	m_angle += radian;
+
+	return *this;
+}
+
 float Dimensions::x1() const {
 	switch (m_xAnchor) {
 	case XAnchor::LEFT: return m_x;
@@ -184,6 +196,10 @@ float Dimensions::getHeight(bool scaled) const {
 	return m_h;
 }
 
+float Dimensions::getAngle() const {
+	return m_angle;
+}
+
 float Dimensions::screenY() const {
 	switch (m_screenAnchor) {
 	case YAnchor::CENTER: return 0.0f;
@@ -192,4 +208,3 @@ float Dimensions::screenY() const {
 	}
 	throw std::logic_error("Dimensions::screenY(): unknown m_screenAnchor value");
 }
-

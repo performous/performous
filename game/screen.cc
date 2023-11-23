@@ -5,6 +5,7 @@
 #include "theme/image_constants_setter.hh"
 
 #include <SDL_timer.h>
+#include "utils/math.hh"
 
 
 void Screen::drawImages(Theme const& theme) {
@@ -18,7 +19,9 @@ void Screen::drawImages(std::vector<Theme::Image> const& images) {
 		ScopedImageConstantsSetter constants(image, *m_theme, getGame().getConstantValueProvider());
 		ColorTrans c(window, Color::alpha(image.alpha));
 
-		image.texture->dimensions.center(image.y).middle(image.x).scale(image.scaleHorizontal, image.scaleVertical);
+		std::cout << "angle: " << image.angle.get() << std::endl;
+
+		image.texture->dimensions.center(image.y).middle(image.x).scale(image.scaleHorizontal, image.scaleVertical).setAngle(image.angle * pi() / 180.0f);
 		image.texture->draw(window);
 	}
 }
