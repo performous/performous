@@ -174,6 +174,8 @@ ThemePtr ThemeLoader::load(std::string const& screenName)
 						image.x = imageConfig.at("x").get<float>();
 					if (imageConfig.contains("y"))
 						image.y = imageConfig.at("y").get<float>();
+					if (imageConfig.contains("z"))
+						image.z = imageConfig.at("z").get<float>();
 					if (imageConfig.contains("scale")) {
 						if (imageConfig.at("scale").is_array()) {
 							image.scaleHorizontal = getValue(imageConfig.at("scale").at(0), converter);
@@ -210,6 +212,8 @@ ThemePtr ThemeLoader::load(std::string const& screenName)
 							image.x = getValue(imageConfig.at("x"), converter);
 						if (imageConfig.contains("y"))
 							image.y = getValue(imageConfig.at("y"), converter);
+						if (imageConfig.contains("z"))
+							image.z = getValue(imageConfig.at("z"), converter);
 						if (imageConfig.contains("scale")) {
 							if (imageConfig.at("scale").is_array()) {
 								image.scaleHorizontal = getValue(imageConfig.at("scale").at(0), converter);

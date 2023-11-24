@@ -27,9 +27,10 @@ public:
 public:
 	struct Image {
 		std::string id;
-		std::unique_ptr<Texture> texture; // temporary unique_ptr
+		std::shared_ptr<Texture> texture;
 		Value x;
 		Value y;
+		Value z = 1000;
 		Value scaleHorizontal = 1.f;
 		Value scaleVertical = 1.f;
 		Value alpha = 1.f;
@@ -39,6 +40,7 @@ public:
 		std::string id;
 		std::optional<Value> x;
 		std::optional<Value> y;
+		std::optional<Value> z;
 		std::optional<Value> scaleHorizontal = 1.f;
 		std::optional<Value> scaleVertical = 1.f;
 		std::optional<Value> alpha = 1.f;

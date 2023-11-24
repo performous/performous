@@ -15,14 +15,20 @@ void Screen::drawImages(Theme const& theme) {
 void Screen::drawImages(std::vector<Theme::Image> const& images) {
 	auto& window = getGame().getWindow();
 
-	for (auto const& image : images) {
-		ScopedImageConstantsSetter constants(image, *m_theme, getGame().getConstantValueProvider());
-		ColorTrans c(window, Color::alpha(image.alpha));
+	auto imageMap = std::map<float, std::vector<Theme::Image const*>>{};
 
-		std::cout << "angle: " << image.angle.get() << std::endl;
+	for (auto const& image : images)
+		imageMap[image.z].emplace_back(&image);
 
-		image.texture->dimensions.center(image.y).middle(image.x).scale(image.scaleHorizontal, image.scaleVertical).setAngle(image.angle * pi() / 180.0f);
-		image.texture->draw(window);
+	for (auto const& [z, images] : imageMap) {
+		for (auto& imagePtr : images) {
+			auto& image = *imagePtr;
+			ScopedImageConstantsSetter constants(image, *m_theme, getGame().getConstantValueProvider());
+			ColorTrans c(window, Color::alpha(image.alpha));
+
+			image.texture->dimensions.center(image.y).middle(image.x).scale(image.scaleHorizontal, image.scaleVertical).setAngle(image.angle * pi() / 180.0f);
+			image.texture->draw(window);
+		}
 	}
 }
 

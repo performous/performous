@@ -156,6 +156,8 @@ void Theme::ImageConfig::update(Image& image) const {
 		image.x = x.value();
 	if (y.has_value())
 		image.y = y.value();
+	if (z.has_value())
+		image.z = z.value();
 	if (alpha.has_value())
 		image.alpha = alpha.value();
 	if (angle.has_value())
