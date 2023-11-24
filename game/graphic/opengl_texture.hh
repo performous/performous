@@ -6,6 +6,8 @@
 #include "shader_manager.hh"
 #include "window.hh"
 
+#include <glm/gtx/matrix_transform_2d.hpp>
+
 template <GLenum Type> class OpenGLTexture : public ChangeReceiver {
 public:
 	OpenGLTexture();
@@ -85,7 +87,7 @@ private:
 };
 
 template <GLenum Type> OpenGLTexture<Type>::OpenGLTexture() {
-	m_textureReference = std::make_shared<TextureReference>(); 
+	m_textureReference = std::make_shared<TextureReference>();
 
 	m_textureReference->addChangeReceiver(this);
 }
@@ -98,7 +100,19 @@ template <GLenum Type> OpenGLTexture<Type>::OpenGLTexture(TextureReferencePtr te
 
 template <GLenum Type> void OpenGLTexture<Type>::draw(Window& window, Dimensions const& dim, TexCoords const& tex) const {
 	glutil::GLErrorChecker glerror("OpenGLTexture::draw()");
-	glutil::VertexArray va;
+
+	if (dim.getAngle() != 0.f) {
+		auto matrix = glm::mat3(1.f);
+
+		matrix = glm::scale(matrix, glmath::vec2(0.33f));
+		matrix = glm::translate(matrix, glmath::vec2(dim.xc(), dim.yc()));
+		matrix = glm::rotate(matrix, dim.getAngle());
+		matrix = glm::translate(matrix, glmath::vec2(-dim.xc(), -dim.yc()));
+
+		draw(window, dim, tex, matrix);
+
+		return;
+	}
 
 	auto binder = TextureBinder(window, *this);
 
@@ -110,6 +124,7 @@ template <GLenum Type> void OpenGLTexture<Type>::draw(Window& window, Dimensions
 	glTexParameterf(type(), GL_TEXTURE_WRAP_T, repeating ? GL_REPEAT : GL_CLAMP_TO_EDGE);
 	glerror.check("repeat mode");
 
+	glutil::VertexArray va;
 	va.texCoord(tex.x1, tex.y1).vertex(dim.x1(), dim.y1());
 	va.texCoord(tex.x2, tex.y1).vertex(dim.x2(), dim.y1());
 	va.texCoord(tex.x1, tex.y2).vertex(dim.x1(), dim.y2());

@@ -32,3 +32,30 @@ std::string format(std::chrono::seconds const& unixtime, std::string const& form
 
 	return stream.str();
 }
+
+std::string reverse(const std::string& s) {
+	auto result = std::string{};
+
+	for (auto i = size_t(0), j = s.size() - 1; i < s.size(); ++i, --j)
+		result += s[j];
+
+	return result;
+}
+
+std::string trim(const std::string& s, const std::string& charactersToRemove) {
+	auto result = s;
+	const auto start = result.find_first_not_of(charactersToRemove);
+
+	if (start == std::string::npos)
+		return {};
+
+	result = result.substr(start);
+	result = reverse(result);
+
+	const auto end = result.find_first_not_of(charactersToRemove);
+
+	if (end != std::string::npos)
+		result = result.substr(end);
+
+	return reverse(result);
+}

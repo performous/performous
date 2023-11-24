@@ -2,7 +2,8 @@
 
 #include "controllers.hh"
 #include "screen.hh"
-#include "theme.hh"
+#include "theme/theme.hh"
+#include "event_manager.hh"
 
 class Audio;
 class Sample;
@@ -24,8 +25,11 @@ class ScreenPractice : public Screen {
 	void draw_analyzers();
 
   private:
+	  void onEnter(EventParameter const&);
+
+  private:
 	Audio& m_audio;
 	std::vector<std::string> m_samples;
 	std::vector<std::unique_ptr<ProgressBar>> m_vumeters;
-	std::unique_ptr<ThemePractice> theme;
+	std::shared_ptr<ThemePractice> m_theme;
 };

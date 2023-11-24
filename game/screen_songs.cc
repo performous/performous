@@ -9,10 +9,11 @@
 #include "screen_sing.hh"
 #include "screen_playlist.hh"
 #include "songs.hh"
-#include "theme.hh"
 #include "util.hh"
 #include "playlist.hh"
 #include "graphic/video_driver.hh"
+#include "theme/theme.hh"
+#include "theme/theme_loader.hh"
 
 #include "aubio/aubio.h"
 
@@ -23,13 +24,13 @@
 
 static const double IDLE_TIMEOUT = 35.0; // seconds
 
-ScreenSongs::ScreenSongs(Game &game, std::string const& name, Audio& audio, Songs& songs, Database& database):
-  Screen(game, name), m_audio(audio), m_songs(songs), m_database(database)
-{
+ScreenSongs::ScreenSongs(Game &game, std::string const& name, Audio& audio, Songs& songs, Database& database)
+  : Screen(game, name), m_audio(audio), m_songs(songs), m_database(database) {
 	m_songs.setAnimMargins(5.0, 5.0);
 	// Using AnimValues as a simple timers counting seconds
 	m_clock.setTarget(getInf());
 	m_idleTimer.setTarget(getInf());
+	game.getEventManager().addReceiver("onenter", std::bind(&ScreenSongs::onEnter, this, std::placeholders::_1));
 }
 
 void ScreenSongs::enter() {
@@ -43,7 +44,10 @@ void ScreenSongs::enter() {
 }
 
 void ScreenSongs::reloadGL() {
-	theme = std::make_unique<ThemeSongs>();
+	m_theme = load<ThemeSongs>();
+
+	setBackground(m_theme->getBackgroundImage());
+
 	m_menuTheme = std::make_unique<ThemeInstrumentMenu>();
 	m_songbg_default = std::make_unique<Texture>(findFile("songs_bg_default.svg"));
 	m_songbg_ground = std::make_unique<Texture>(findFile("songs_bg_ground.svg"));
@@ -63,7 +67,7 @@ void ScreenSongs::exit() {
 	m_danceCover.reset();
 	m_bandCover.reset();
 	m_instrumentList.reset();
-	theme.reset();
+	m_theme.reset();
 	m_video.reset();
 	m_songbg.reset();
 	m_songbg_default.reset();
@@ -200,8 +204,8 @@ void ScreenSongs::update() {
 	if (!songChange) return;
 	ScreenSongs::previewBeatsBuffer.reset(new_fvec(1));
 	{
-	std::lock_guard<std::recursive_mutex> l(Audio::aubio_mutex);
-	Audio::aubioTempo.reset(new_aubio_tempo("default", Audio::aubio_win_size, Audio::aubio_hop_size, static_cast<uint_t>(Audio::getSR())));
+		std::lock_guard<std::recursive_mutex> l(Audio::aubio_mutex);
+		Audio::aubioTempo.reset(new_aubio_tempo("default", Audio::aubio_win_size, Audio::aubio_hop_size, static_cast<uint_t>(Audio::getSR())));
 	}
 	if (song && song->hasControllers()) { song->loadNotes(); } // Needed for BPM info.
 	m_playing = music;
@@ -248,13 +252,13 @@ void ScreenSongs::drawJukebox() {
 		if (!song.cover.empty()) cover = loadTextureFromMap(song.cover);
 		if (cover && !cover->empty()) {
 			Texture& s = *cover;
-			s.dimensions.left(theme->song.dimensions.x1()).top(theme->song.dimensions.y2() + 0.05f).fitInside(0.15f, 0.15f);
+			s.dimensions.left(m_theme->song.dimensions.x1()).top(m_theme->song.dimensions.y2() + 0.05f).fitInside(0.15f, 0.15f);
 			s.draw(window);
 		}
 		// Format && draw the song information text
 		std::ostringstream oss_song;
 		oss_song << song.title << '\n' << song.artist;
-		theme->song.draw(window, oss_song.str());
+		m_theme->song.draw(window, oss_song.str());
 	}
 }
 
@@ -281,7 +285,7 @@ void ScreenSongs::drawMultimedia() {
 	}
 	if (!m_jukebox) {
 		m_songbg_ground->draw(window);
-		theme->bg.draw(window);
+		m_theme->bg->draw(window);
 		drawCovers();
 	}
 }
@@ -337,11 +341,14 @@ void ScreenSongs::draw() {
 	else {
 		auto& window = getGame().getWindow();
 		// Draw song and order texts
-		theme->song.draw(window, oss_song.str());
-		theme->order.draw(window, oss_order.str());
+		m_theme->song.draw(window, oss_song.str());
+		m_theme->order.draw(window, oss_order.str());
 		drawInstruments(Dimensions(1.0f).fixedHeight(0.09f).right(0.45f).screenTop(0.02f));
-		theme->hiscores.draw(window, hiscore);
+		m_theme->hiscores.draw(window, hiscore);
 	}
+
+	drawImages(*m_theme);
+
 	// Menus on top of everything
 	if (m_menu.isOpen()) drawMenu();
 }
@@ -386,6 +393,23 @@ std::string ScreenSongs::getHighScoreText() const {
 	}
 
 	return stream.str();
+}
+
+void ScreenSongs::onEnter(EventParameter const& parameter) {
+	if (parameter.get<std::string>("screen", "") != getName())
+		return;
+
+	auto const it = m_theme->events.find("onenter");
+
+	if (it == m_theme->events.end())
+		return;
+
+	for (auto const& imageConfig : it->second.images) {
+		auto image = findImage(imageConfig.id, *m_theme);
+
+		if (image)
+			imageConfig.update(*image);
+	}
 }
 
 void ScreenSongs::drawCovers() {
@@ -570,8 +594,8 @@ void ScreenSongs::drawMenu() {
 	float y = -h * .5f + step;
 	float x = -w * .5f + step;
 	// Background
-	th.bg.dimensions.middle(0).center(0).stretch(w, h);
-	th.bg.draw(window);
+	th.bg->dimensions.middle(0).center(0).stretch(w, h);
+	th.bg->draw(window);
 	// Loop through menu items
 	w = 0;
 	for (MenuOptions::const_iterator it = m_menu.begin(); it != m_menu.end(); ++it) {

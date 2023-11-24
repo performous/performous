@@ -20,6 +20,7 @@
 #include "screen_songs.hh"
 #include "notegraphscalerfactory.hh"
 #include "graphic/video_driver.hh"
+#include "theme/theme_loader.hh"
 
 #include <fmt/format.h>
 #include <iostream>
@@ -29,15 +30,16 @@
 
 namespace {
 	/// Add a flash message about the state of a config item
-	void dispInFlash(Game &game, ConfigItem& ci) {
+	void dispInFlash(Game& game, ConfigItem& ci) {
 		game.flashMessage(ci.getShortDesc() + ": " + ci.getValue());
 	}
 }
 
-ScreenSing::ScreenSing(Game &game, std::string const& name, Audio& audio, Database& database, Backgrounds& bgs):
+ScreenSing::ScreenSing(Game& game, std::string const& name, Audio& audio, Database& database, Backgrounds& bgs) :
 	Screen(game, name), m_audio(audio), m_database(database), m_backgrounds(bgs),
-	m_selectedTrack(TrackName::VOCAL_LEAD)
-{}
+	m_selectedTrack(TrackName::VOCAL_LEAD) {
+	game.getEventManager().addReceiver("onenter", std::bind(&ScreenSing::onEnter, this, std::placeholders::_1));
+}
 
 void ScreenSing::enter() {
 	keyPressed = false;
@@ -82,33 +84,33 @@ void ScreenSing::enter() {
 }
 
 void ScreenSing::prepareVoicesMenu(unsigned moveSelectionTo) {
-		VocalTracks const& tracks = m_song->vocalTracks;
-		m_menu.clear();
-		m_menu.add(MenuOption(_("Start"), _("Start performing"))).call([this]{ setupVocals(); });
+	VocalTracks const& tracks = m_song->vocalTracks;
+	m_menu.clear();
+	m_menu.add(MenuOption(_("Start"), _("Start performing"))).call([this] { setupVocals(); });
 
-		if (players() > 1) { // Duet toggle
-			m_duet.addEnum(_("Duet mode"));
-			m_duet.addEnum(_("Normal mode"));
-			m_menu.add(MenuOption("", _("Switch between duet and regular singing mode"))).changer(m_duet,"song/duet");
+	if (players() > 1) { // Duet toggle
+		m_duet.addEnum(_("Duet mode"));
+		m_duet.addEnum(_("Normal mode"));
+		m_menu.add(MenuOption("", _("Switch between duet and regular singing mode"))).changer(m_duet, "song/duet");
+	}
+	// Add vocal track selector for each player
+	for (size_t player = 0; player < players(); ++player) {
+		ConfigItem& vocalTrack = m_vocalTracks[player];
+		for (auto const& track : tracks) vocalTrack.addEnum(track.second.name);
+		if (tracks.size() > 1) {
+			if (player % 2) vocalTrack.selectEnum(m_song->getVocalTrack(SongParserUtil::DUET_P2).name);  // Every other player gets the second track
+			else vocalTrack.selectEnum(m_song->getVocalTrack(TrackName::VOCAL_LEAD).name);
 		}
-		// Add vocal track selector for each player
-		for (size_t player = 0; player < players(); ++player) {
-			ConfigItem& vocalTrack = m_vocalTracks[player];
-			for (auto const& track: tracks) vocalTrack.addEnum(track.second.name);
-			if (tracks.size() > 1) {
-				if (player % 2) vocalTrack.selectEnum(m_song->getVocalTrack(SongParserUtil::DUET_P2).name);  // Every other player gets the second track
-				else vocalTrack.selectEnum(m_song->getVocalTrack(TrackName::VOCAL_LEAD).name);
-			}
-			m_menu.add(MenuOption("", _("Change vocal track"))).changer(vocalTrack);
-			if (m_duet.ui() == 1) {
-				vocalTrack.selectEnum(m_song->getVocalTrack(SongParserUtil::DUET_BOTH).name);
-				break; // If duet mode is disabled, the vocal track selection for players beyond the first is ignored anyway.
-			}
+		m_menu.add(MenuOption("", _("Change vocal track"))).changer(vocalTrack);
+		if (m_duet.ui() == 1) {
+			vocalTrack.selectEnum(m_song->getVocalTrack(SongParserUtil::DUET_BOTH).name);
+			break; // If duet mode is disabled, the vocal track selection for players beyond the first is ignored anyway.
 		}
-		m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"))).screen("Songs");
-		m_menu.select(moveSelectionTo);
-		m_menu.open();
-		if (tracks.size() <= 1) setupVocals();  // No duet menu
+	}
+	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"))).screen("Songs");
+	m_menu.select(moveSelectionTo);
+	m_menu.open();
+	if (tracks.size() <= 1) setupVocals();  // No duet menu
 }
 
 void ScreenSing::setupVocals() {
@@ -125,9 +127,9 @@ void ScreenSing::setupVocals() {
 		}
 
 		//if (shownTracks.size() > 2) throw std::runtime_error("Too many tracks chosen. Only two vocal tracks can be used simultaneously.")
-		for (auto const& trk: shownTracks) {
+		for (auto const& trk : shownTracks) {
 			const auto scaler = NoteGraphScalerFactory(config).create(*trk);
-			auto layoutSingerPtr = std::unique_ptr<LayoutSinger>(std::make_unique<LayoutSinger>(*trk, m_database, scaler, theme));
+			auto layoutSingerPtr = std::unique_ptr<LayoutSinger>(std::make_unique<LayoutSinger>(*trk, m_database, scaler, m_theme));
 			m_layout_singer.push_back(std::move(layoutSingerPtr));
 		}
 		// Note: Engine maps tracks with analyzers 1:1. If user doesn't have mics, we still want to have singer layout enabled but without engine...
@@ -150,18 +152,21 @@ void ScreenSing::createPauseMenu() {
 	m_menu.clear();
 	m_menu.add(MenuOption(_("Resume"), _("Back to performing!")));
 	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning"))).screen("Sing");
-	if(!getGame().getCurrentPlayList().isEmpty() || config["game/autoplay"].b()){
+	if (!getGame().getCurrentPlayList().isEmpty() || config["game/autoplay"].b()) {
 		m_menu.add(MenuOption(_("Skip"), _("Skip current song"))).screen("Playlist");
 	}
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"))).call([&game]() {
 		game.activateScreen("Songs");
-	});
+		});
 	m_menu.close();
 }
 
 void ScreenSing::reloadGL() {
+	m_theme = load<ThemeSing>();
+
+	setBackground(m_theme->getBackgroundImage());
+
 	// Load UI graphics
-	theme = std::make_shared<ThemeSing>();
 	m_menuTheme = std::make_unique<ThemeInstrumentMenu>();
 	m_pause_icon = std::make_unique<Texture>(findFile("sing_pause.svg"));
 	m_player_icon = std::make_unique<Texture>(findFile("sing_pbox.svg")); // For duet menu
@@ -186,7 +191,7 @@ void ScreenSing::exit() {
 	m_background.reset();
 	m_song->dropNotes();
 	m_menuTheme.reset();
-	theme.reset();
+	m_theme.reset();
 	m_audio.fadeout(getGame(), 0);
 	if (m_audio.isPaused()) m_audio.togglePause();
 	getGame().showLogo();
@@ -228,14 +233,14 @@ void ScreenSing::instrumentLayout(double time) {
 			CountSum& cs = volume[(*it)->getTrack()];
 			cs.first++;
 			cs.second += (*it)->correctness();
-		}{
+		} {
 			CountSum& cs = pitchbend[(*it)->getTrack()];
 			cs.first++;
 			cs.second += (*it)->getWhammy();
 		}
 	}
 	// Set volume levels (averages of all instruments playing that track)
-	for (auto const& track: m_song->music) {
+	for (auto const& track : m_song->music) {
 		std::string const& name = track.first;
 		std::string locName = _(name.c_str());  // FIXME: There should NOT be gettext calls here!
 		double level = 1.0;
@@ -267,7 +272,7 @@ void ScreenSing::activateNextScreen()
 	}
 
 	// Score window visible -> Enter quits to Players Screen
-	if(!config["game/karaoke_mode"].ui()) {
+	if (!config["game/karaoke_mode"].ui()) {
 		Screen* s = getGame().getScreen("Players");
 		ScreenPlayers* ss = dynamic_cast<ScreenPlayers*> (s);
 		assert(ss);
@@ -344,7 +349,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 		else if (nav == input::NavButton::RIGHT) {
 			if (m_menu.current().type == MenuOption::Type::CHANGE_VALUE) { do_action = 1; }
 			else { m_menu.move(1); return; }
-			}
+		}
 		else if (nav == input::NavButton::DOWN) { m_menu.move(1); return; }
 		else if (nav == input::NavButton::UP) { m_menu.move(-1); return; }
 
@@ -387,7 +392,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 	keyPressed = true;
 	// Check to see if a menu is open and bail out before changes can be made
 	if (m_score_window.get() || m_menu.isOpen()) return;
-	for (auto& i: m_instruments) if (!i->menuOpen()) return;
+	for (auto& i : m_instruments) if (!i->menuOpen()) return;
 	double time = m_audio.getPosition();
 	SDL_Scancode key = event.key.keysym.scancode;
 	// Ctrl combinations that can be used while performing
@@ -403,15 +408,15 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			m_audio.streamFade("Vocals", config["audio/mute_vocals_track"].b() ? 0.0 : 1.0);
 			dispInFlash(getGame(), config["audio/mute_vocals_track"]);
 		}
-		if (key == SDL_SCANCODE_K)  { // Toggle karaoke mode
-			if(config["game/karaoke_mode"].ui() >=2) config["game/karaoke_mode"].ui() = 0;
+		if (key == SDL_SCANCODE_K) { // Toggle karaoke mode
+			if (config["game/karaoke_mode"].ui() >= 2) config["game/karaoke_mode"].ui() = 0;
 			else ++config["game/karaoke_mode"];
 			dispInFlash(getGame(), config["game/karaoke_mode"]);
 		}
 		if (key == SDL_SCANCODE_H) {
 			config["game/Textstyle"].ui() ? config["game/Textstyle"].ui() = 0 : ++config["game/Textstyle"].ui();
 			dispInFlash(getGame(), config["game/Textstyle"]);
-			}
+		}
 		if (key == SDL_SCANCODE_W) dispInFlash(getGame(), ++config["game/pitch"]); // Toggle pitch wave
 		// Toggle webcam
 		if (key == SDL_SCANCODE_A && Webcam::enabled()) {
@@ -475,10 +480,10 @@ namespace {
 		Dimensions dim(arMin);
 		dim.fixedWidth(1.0f);
 		glutil::VertexArray va;
-		va.texCoord(0,0).vertex(dim.x1(), dim.y1());
-		va.texCoord(0,0).vertex(dim.x2(), dim.y1());
-		va.texCoord(0,0).vertex(dim.x1(), dim.y2());
-		va.texCoord(0,0).vertex(dim.x2(), dim.y2());
+		va.texCoord(0, 0).vertex(dim.x1(), dim.y1());
+		va.texCoord(0, 0).vertex(dim.x2(), dim.y1());
+		va.texCoord(0, 0).vertex(dim.x1(), dim.y2());
+		va.texCoord(0, 0).vertex(dim.x2(), dim.y2());
 		window.getShader("texture").bind();
 		va.draw();
 	}
@@ -493,7 +498,7 @@ void ScreenSing::prepare() {
 	// We don't allow instrument menus during global menu
 	// except for joining, in which case global menu is closed
 	if (m_menu.isOpen()) {
-		for (auto& i: m_instruments) {
+		for (auto& i : m_instruments) {
 			if (i->joining(time)) m_menu.close(); else i->toggleMenu(0);
 		}
 	}
@@ -514,6 +519,23 @@ size_t ScreenSing::players() const {
 	return (analyzers.empty() ? 1 : analyzers.size());
 }
 
+void ScreenSing::onEnter(EventParameter const& parameter) {
+	if (parameter.get<std::string>("screen", "") != getName())
+		return;
+
+	auto const it = m_theme->events.find("onenter");
+
+	if (it == m_theme->events.end())
+		return;
+
+	for (auto const& imageConfig : it->second.images) {
+		auto image = findImage(imageConfig.id, *m_theme);
+
+		if (image)
+			imageConfig.update(*image);
+	}
+}
+
 void ScreenSing::draw() {
 	auto& window = getGame().getWindow();
 	// Get the time in the song
@@ -527,10 +549,18 @@ void ScreenSing::draw() {
 		Transform ft(window, farTransform());
 		float ar = arMax;
 		// Background image
-		if (!m_background || m_background->empty()) m_background = std::make_unique<Texture>(m_backgrounds.getRandom());
-		ar = m_background->dimensions.ar();
-		if (ar > arMax || (m_video && ar > arMin)) fillBG(window);  // Fill white background to avoid black borders
-		m_background->draw(window);
+		if (!m_background || m_background->empty()) {
+			if (m_theme)
+				m_background = m_theme->getBackgroundImage();
+			else
+				m_background = std::make_unique<Texture>(m_backgrounds.getRandom());
+		}
+		if (m_background) {
+			ar = m_background->dimensions.ar();
+			if (ar > arMax || (m_video && ar > arMin))
+				fillBG(window);  // Fill white background to avoid black borders
+			m_background->draw(window);
+		}
 		// Webcam
 		if (m_cam && config["graphic/webcam"].b())
 			m_cam->render();
@@ -543,10 +573,10 @@ void ScreenSing::draw() {
 		// Top/bottom borders
 		ar = clamp(ar, arMin, arMax);
 		float offset = 0.5f / ar + 0.2f;
-		theme->bg_bottom.dimensions.fixedWidth(1.0f).bottom(offset);
-		theme->bg_bottom.draw(window);
-		theme->bg_top.dimensions.fixedWidth(1.0f).top(-offset);
-		theme->bg_top.draw(window);
+		m_theme->bg_bottom.dimensions.fixedWidth(1.0f).bottom(offset);
+		m_theme->bg_bottom.draw(window);
+		m_theme->bg_top.dimensions.fixedWidth(1.0f).top(-offset);
+		m_theme->bg_top.draw(window);
 	}
 
 	for (unsigned i = 0; i < m_layout_singer.size(); ++i) m_layout_singer[i]->hideLyrics(m_audio.isPaused());
@@ -564,8 +594,8 @@ void ScreenSing::draw() {
 	{
 		unsigned t = static_cast<unsigned>(clamp(time, 0.0, length));
 		m_progress->dimensions.fixedWidth(0.4f).left(-0.5f).screenTop();
-		theme->timer.dimensions.screenTop(0.5f * m_progress->dimensions.h());
-		theme->songinfo.dimensions.screenBottom(-0.01f);
+		m_theme->timer.dimensions.screenTop(0.5f * m_progress->dimensions.h());
+		m_theme->songinfo.dimensions.screenBottom(-0.01f);
 		m_progress->draw(window, static_cast<float>(songPercent));
 
 		Song::SongSection section("error", 0);
@@ -581,23 +611,23 @@ void ScreenSing::draw() {
 				statustxt += _("   ENTER to skip instrumental break");
 			}
 			if (status == Song::Status::FINISHED && !config["game/karaoke_mode"].ui()) {
-				if(config["game/autoplay"].b()) {
-					if(m_displayAutoPlay) {
+				if (config["game/autoplay"].b()) {
+					if (m_displayAutoPlay) {
 						statustxt += _("   Autoplay enabled");
 					} else {
-						if(!m_audio.analyzers().empty()) {
+						if (!m_audio.analyzers().empty()) {
 							statustxt += _("   Remember to wait for grading!");
 						} else {
 							statustxt += _("   Prepare for the next song!");
 						}
 					}
 
-					if(m_statusTextSwitch.get() == 0) {
+					if (m_statusTextSwitch.get() == 0) {
 						m_displayAutoPlay = !m_displayAutoPlay;
 						m_statusTextSwitch.setValue(1);
 					}
 				} else {
-					if(!m_audio.analyzers().empty()) {
+					if (!m_audio.analyzers().empty()) {
 						statustxt += _("   Remember to wait for grading!");
 					} else {
 						statustxt += _("   Choose your next song!");
@@ -608,7 +638,7 @@ void ScreenSing::draw() {
 			}
 		}
 
-		theme->timer.draw(window, statustxt);
+		m_theme->timer.draw(window, statustxt);
 	}
 
 	if (config["game/karaoke_mode"].ui() && !m_song->hasControllers()) { //guitar track? display the score window anyway!
@@ -627,7 +657,7 @@ void ScreenSing::draw() {
 			}
 		}
 		else if (!m_audio.isPlaying() || (status == Song::Status::FINISHED
-		  && m_audio.getLength() - time <= (m_song->instrumentTracks.empty() && m_song->danceTracks.empty() ? 3.0 : 0.2) )) {
+			&& m_audio.getLength() - time <= (m_song->instrumentTracks.empty() && m_song->danceTracks.empty() ? 3.0 : 0.2))) {
 			// Time to create the score window
 			m_quitTimer.setValue(config["game/results_timeout"].ui());
 			if (m_engine) m_engine->kill(); // kill the engine thread (to avoid consuming memory)
@@ -636,16 +666,16 @@ void ScreenSing::draw() {
 	}
 
 	// Menus on top of everything
-	for (auto& i: m_instruments)
+	for (auto& i : m_instruments)
 		if (i->menuOpen())
 			i->drawMenu();
 	if (m_menu.isOpen())
 		drawMenu();
-	if(!keyPressed && m_DuetTimeout.get() == 0) {
+	if (!keyPressed && m_DuetTimeout.get() == 0) {
 		m_menu.action(getGame());
 	}
 	std::string songinfo = m_song->artist + " - " + m_song->title;
-	theme->songinfo.draw(window, songinfo);
+	m_theme->songinfo.draw(window, songinfo);
 }
 
 void ScreenSing::drawMenu() {
@@ -661,8 +691,8 @@ void ScreenSing::drawMenu() {
 	float y = -h * .5f + step;
 	float x = -w * .5f + step;
 	// Background
-	th.bg.dimensions.middle(0).center(0).stretch(w, h);
-	th.bg.draw(window);
+	th.bg->dimensions.middle(0).center(0).stretch(w, h);
+	th.bg->draw(window);
 	// Loop through menu items
 	w = 0;
 	std::size_t player = 0;

@@ -2,13 +2,61 @@
 
 #include "fs.hh"
 #include "configuration.hh"
+#include "utils/random.hh"
 
 Theme::Theme()
-{}
-Theme::Theme(fs::path const& path) : bg(path)
-{}
+: m_name(config["game/theme"].getEnumName()) {
+}
 
-ThemeSongs::ThemeSongs():
+Theme::Theme(fs::path const& path)
+	: bg(std::make_shared<Texture>(path)), m_name(config["game/theme"].getEnumName()) {
+}
+
+std::shared_ptr<Texture> Theme::getBackgroundImage() const {
+	if (bg)
+		return bg;
+
+	if (m_backgrounds.empty()) {
+		std::clog << "theme/error: there is no background image(s) defined!" << std::endl;
+		throw std::runtime_error("Theme error: There is no background image(s) defined!");
+	}
+
+	auto const index = random(m_backgrounds.size() - 1);
+
+	return m_backgrounds[index];
+}
+
+void Theme::addBackgroundImage(std::string const& filename) {
+	try {
+		auto const path = findFile(filename, "backgrounds");
+
+		m_backgrounds.emplace_back(std::make_shared<Texture>(path));
+	}
+	catch (std::exception const& e) {
+		std::clog << "theme/error: " << e.what() << std::endl;
+	}
+}
+
+void Theme::setBackgroundImages(std::vector<std::string> const& images) {
+	for (auto i = 0UL; i < images.size(); ++i) {
+		try {
+			auto const path = findFile(images[i], "backgrounds");
+
+			m_backgrounds.emplace_back(std::make_shared<Texture>(path));
+		}
+		catch (std::exception const& e) {
+			std::clog << "theme/error: " << e.what() << std::endl;
+		}
+	}
+
+	std::clog << "theme/error: there could no of the configured background image(s) be found!" << std::endl;
+}
+
+std::string Theme::getName() const {
+	return m_name;
+}
+
+ThemeSongs::ThemeSongs() :
 	Theme(findFile("songs_bg.svg")),
 	song(findFile("songs_song.svg"), config["graphic/text_lod"].f()),
 	order(findFile("songs_order.svg"), config["graphic/text_lod"].f()),
@@ -18,14 +66,24 @@ ThemeSongs::ThemeSongs():
 	order.dimensions.screenBottom(-0.03f);
 }
 
-ThemePractice::ThemePractice():
+ThemePlayers::ThemePlayers() :
+	Theme(findFile("songs_bg.svg")),
+	song(findFile("songs_song.svg"), config["graphic/text_lod"].f()),
+	order(findFile("songs_order.svg"), config["graphic/text_lod"].f()),
+	has_hiscore(findFile("songs_has_hiscore.svg"), config["graphic/text_lod"].f()),
+	hiscores(findFile("songs_hiscores.svg"), config["graphic/text_lod"].f())
+{
+	order.dimensions.screenBottom(-0.03f);
+}
+
+ThemePractice::ThemePractice() :
 	Theme(findFile("practice_bg.svg")),
 	note(findFile("practice_note.svg")),
 	sharp(findFile("practice_sharp.svg")),
 	note_txt(findFile("practice_txt.svg"), config["graphic/text_lod"].f())
 {}
 
-ThemeSing::ThemeSing():
+ThemeSing::ThemeSing() :
 	bg_top(findFile("sing_bg_top.svg")),
 	bg_bottom(findFile("sing_bg_bottom.svg")),
 	lyrics_now(findFile("sing_lyricscurrent.svg"), config["graphic/text_lod"].f()),
@@ -36,7 +94,7 @@ ThemeSing::ThemeSing():
 	lyrics_now.setHighlight(findFile("sing_lyricshighlight.svg"));
 }
 
-ThemeAudioDevices::ThemeAudioDevices():
+ThemeAudioDevices::ThemeAudioDevices() :
 	Theme(findFile("audiodevices_bg.svg")),
 	device(findFile("mainmenu_comment.svg"), config["graphic/text_lod"].f()),
 	device_bg(findFile("audiodevices_dev_bg.svg")),
@@ -44,7 +102,16 @@ ThemeAudioDevices::ThemeAudioDevices():
 	comment_bg(findFile("mainmenu_comment_bg.svg"))
 {}
 
-ThemeIntro::ThemeIntro():
+
+ThemePaths::ThemePaths()
+	: Theme(findFile("audiodevices_bg.svg")),
+	device(findFile("mainmenu_comment.svg"), config["graphic/text_lod"].f()),
+	device_bg(findFile("audiodevices_dev_bg.svg")),
+	comment(findFile("mainmenu_comment.svg"), config["graphic/text_lod"].f()),
+	comment_bg(findFile("mainmenu_comment_bg.svg")) {
+}
+
+ThemeIntro::ThemeIntro() :
 	Theme(findFile("intro_bg.svg")),
 	back_h(findFile("mainmenu_back_highlight.svg")),
 	options(),
@@ -56,7 +123,7 @@ ThemeIntro::ThemeIntro():
 	short_comment_bg(findFile("mainmenu_scomment_bg.svg"))
 {}
 
-ThemeInstrumentMenu::ThemeInstrumentMenu():
+ThemeInstrumentMenu::ThemeInstrumentMenu() :
 	Theme(findFile("instrumentmenu_bg.svg")),
 	back_h(findFile("instrumentmenu_back_highlight.svg")),
 	options(),
@@ -67,7 +134,7 @@ ThemeInstrumentMenu::ThemeInstrumentMenu():
 	comment.setAlign(SvgTxtTheme::Align::CENTER);
 }
 //at the moment just a copy of themeSong
-ThemePlaylistScreen::ThemePlaylistScreen():
+ThemePlaylistScreen::ThemePlaylistScreen() :
 	Theme(findFile("songs_bg.svg")),
 	options(),
 	option_selected(findFile("mainmenu_option_selected.svg"), config["graphic/text_lod"].f()),
@@ -82,4 +149,21 @@ SvgTxtTheme& ThemeInstrumentMenu::getCachedOption(const std::string& text) {
 	std::pair<std::string, std::unique_ptr<SvgTxtTheme>> kv = std::make_pair(text, std::make_unique<SvgTxtTheme>(findFile("instrumentmenu_option.svg"), config["graphic/text_lod"].f()));
 	options.insert(std::move(kv));
 	return (*options.at(text).get());
+}
+
+void Theme::ImageConfig::update(Image& image) const {
+	if (x.has_value())
+		image.x = x.value();
+	if (y.has_value())
+		image.y = y.value();
+	if (z.has_value())
+		image.z = z.value();
+	if (alpha.has_value())
+		image.alpha = alpha.value();
+	if (angle.has_value())
+		image.angle = angle.value();
+	if (scaleHorizontal.has_value())
+		image.scaleHorizontal = scaleHorizontal.value();
+	if (scaleVertical.has_value())
+		image.scaleVertical = scaleVertical.value();
 }

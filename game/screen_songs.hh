@@ -3,7 +3,7 @@
 #include "animvalue.hh"
 #include "controllers.hh"
 #include "screen.hh"
-#include "theme.hh"
+#include "theme/theme.hh"
 #include "song.hh" // for MusicFiles class
 #include "songs.hh"
 #include "textinput.hh"
@@ -12,6 +12,7 @@
 #include "menu.hh"
 #include "aubio/aubio.h"
 #include <unordered_map>
+#include <event_manager.hh>
 
 class Audio;
 class Database;
@@ -51,13 +52,15 @@ private:
 	void createPlaylistMenu();
 	Texture* loadTextureFromMap(fs::path path);
 	std::string getHighScoreText() const;
+	void onEnter(EventParameter const&);
 
+private:
 	Audio& m_audio;
 	Songs& m_songs;
 	Database& m_database;
 	std::unique_ptr<Texture> m_songbg, m_songbg_ground, m_songbg_default;
 	std::unique_ptr<Video> m_video;
-	std::unique_ptr<ThemeSongs> theme;
+	std::shared_ptr<ThemeSongs> m_theme;
 	Song::MusicFiles m_playing;
 	AnimValue m_clock;
 	AnimValue m_idleTimer;

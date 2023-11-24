@@ -1,0 +1,93 @@
+#include "screen.hh"
+
+#include "game.hh"
+#include "graphic/color_trans.hh"
+#include "theme/image_constants_setter.hh"
+
+#include <SDL_timer.h>
+#include "utils/math.hh"
+
+
+void Screen::drawImages(Theme const& theme) {
+	drawImages(theme.images);
+}
+
+void Screen::drawImages(std::vector<Theme::Image> const& images) {
+	auto& window = getGame().getWindow();
+
+	auto imageMap = std::map<float, std::vector<Theme::Image const*>>{};
+
+	for (auto const& image : images)
+		imageMap[image.z].emplace_back(&image);
+
+	for (auto const& [z, images] : imageMap) {
+		for (auto& imagePtr : images) {
+			auto& image = *imagePtr;
+			ScopedImageConstantsSetter constants(image, *m_theme, getGame().getConstantValueProvider());
+			ColorTrans c(window, Color::alpha(image.alpha));
+
+			image.texture->dimensions.center(image.y).middle(image.x).scale(image.scaleHorizontal, image.scaleVertical).setAngle(image.angle * pi() / 180.0f);
+			image.texture->draw(window);
+		}
+	}
+}
+
+void Screen::setTheme(std::shared_ptr<Theme> theme) {
+	m_theme = theme;
+}
+
+std::shared_ptr<Theme> Screen::getTheme() {
+	return m_theme;
+}
+
+void Screen::setBackground(std::shared_ptr<Texture> image) {
+	m_background = image;
+}
+
+namespace {
+	using ColorModifier = std::vector<std::unique_ptr<ColorTrans>>;
+
+	ColorModifier makeColorModifier(Theme const& theme, float alpha, Window& window) {
+		auto result = ColorModifier{};
+
+		if (theme.colorcycling) {
+			auto const cycleDurationMS = theme.colorcycleduration * 1000;
+			auto anim = static_cast<float>(SDL_GetTicks() % cycleDurationMS) / float(cycleDurationMS);
+
+			result.emplace_back(std::make_unique<ColorTrans>(window, glmath::rotate(static_cast<float>(TAU * anim), glmath::vec3(1.0f, 1.0f, 1.0f))));
+		}
+		if(alpha != 1.f)
+			result.emplace_back(std::make_unique<ColorTrans>(window, Color::alpha(alpha)));
+
+		return result;
+	}
+}
+
+void Screen::drawBackground() {
+	auto& window = getGame().getWindow();
+
+	if (m_background) {
+		if (m_theme) {
+			auto const* image = findImage("background", *m_theme);
+			auto alpha = 1.0f;
+
+			if (image)
+				alpha = image->alpha;
+
+			auto const colorModifier = makeColorModifier(*m_theme, alpha, window);
+
+			m_background->draw(window);
+		}
+		else {
+			m_background->draw(window);
+		}
+	}
+}
+
+Theme::Image* Screen::findImage(std::string const& id, Theme& theme) {
+	for (auto& image : theme.images)
+		if (image.id == id)
+			return &image;
+
+	return getGame().findImage(id);
+}

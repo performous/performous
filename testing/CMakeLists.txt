@@ -3,6 +3,7 @@ include(GoogleTest)
 
 set(SOURCE_FILES
 	"analyzertest.cc"
+	"animvalue_test.cc"
 	"colortest.cc"
 	"configitemtest.cc"
 	"cycletest.cc"
@@ -11,6 +12,7 @@ set(SOURCE_FILES
 	"printer.cc"
 	"ringbuffertest.cc"
 	"utiltest.cc"
+	"value_test.cc"
 )
 set(GAME_SOURCES
 	"../game/analyzer.cc"
@@ -23,6 +25,16 @@ set(GAME_SOURCES
 	"../game/notegraphscalerfactory.cc"
 	"../game/tone.cc"
 	"../game/util.cc"
+	"../game/utils/math.cc"
+	"../game/value/value.cc"
+	"../game/value/float.cc"
+	"../game/value/time.cc"
+	"../game/value/random.cc"
+	"../game/value/min.cc"
+	"../game/value/max.cc"
+	"../game/value/add.cc"
+	"../game/value/multiply.cc"
+	"../game/value/sinus.cc"
 )
 
 set(GTEST_REQUIRED "")
@@ -36,7 +48,7 @@ find_package(GTest ${GTEST_REQUIRED})
 if(GTest_FOUND)
 	message(STATUS "Testing enabled: Building test host")
 
-	set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${GAME_SOURCES})
+	set(SOURCES ${SOURCE_FILES} ${GAME_SOURCES})
 
 	add_executable(performous_test ${SOURCES})
 

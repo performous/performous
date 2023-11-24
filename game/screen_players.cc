@@ -8,7 +8,7 @@
 #include "fs.hh"
 #include "util.hh"
 #include "layout_singer.hh"
-#include "theme.hh"
+#include "theme/theme_loader.hh"
 #include "video.hh"
 #include "i18n.hh"
 #include "controllers.hh"
@@ -23,13 +23,18 @@ ScreenPlayers::ScreenPlayers(Game &game, std::string const& name, Audio& audio, 
 {
 	m_players.setAnimMargins(5.0, 5.0);
 	m_playTimer.setTarget(getInf()); // Using this as a simple timer counting seconds
+	game.getEventManager().addReceiver("onenter", std::bind(&ScreenPlayers::onEnter, this, std::placeholders::_1));
 }
 
 void ScreenPlayers::enter() {
 	keyPressed = false;
 	const auto scaler = NoteGraphScalerFactory(config).create(m_song->getVocalTrack(0u));
 	m_layout_singer = std::make_unique<LayoutSinger>(m_song->getVocalTrack(0u), m_database, scaler);
-	theme = std::make_unique<ThemeSongs>();
+
+	m_theme = load<ThemePlayers>();
+
+	setBackground(m_theme->getBackgroundImage());
+
 	m_emptyCover = std::make_unique<Texture>(findFile("no_player_image.svg"));
 	m_search.text.clear();
 	m_players.setFilter(m_search.text);
@@ -45,7 +50,7 @@ void ScreenPlayers::exit() {
 
 	m_covers.clear();
 	m_emptyCover.reset();
-	theme.reset();
+	m_theme.reset();
 	m_video.reset();
 	m_songbg.reset();
 	m_playing.clear();
@@ -115,14 +120,35 @@ Texture* ScreenPlayers::loadTextureFromMap(fs::path path) {
 	return nullptr;
 }
 
+void ScreenPlayers::onEnter(EventParameter const& parameter) {
+	if (parameter.get<std::string>("screen", "") != getName())
+		return;
+
+	auto const it = m_theme->events.find("onenter");
+
+	if (it == m_theme->events.end())
+		return;
+
+	for (auto const& imageConfig : it->second.images) {
+		auto image = findImage(imageConfig.id, *m_theme);
+
+		if (image)
+			imageConfig.update(*image);
+	}
+}
+
 void ScreenPlayers::draw() {
 	auto& window = getGame().getWindow();
 	m_players.update(); // Poll for new players
 	double length = m_audio.getLength();
 	double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
-	if (m_songbg.get()) m_songbg->draw(window);
-	if (m_video.get()) m_video->render(window, time);
-	theme->bg.draw(window);
+	if (m_songbg.get())
+		m_songbg->draw(window);
+	if (m_video.get())
+		m_video->render(window, time);
+
+	drawBackground();
+
 	std::string music, songbg, video;
 	double videoGap = 0.0;
 	std::ostringstream oss_song, oss_order;
@@ -180,8 +206,8 @@ void ScreenPlayers::draw() {
 	}
 
 	// Draw song and order texts
-	theme->song.draw(window, oss_song.str());
-	theme->order.draw(window, oss_order.str());
+	m_theme->song.draw(window, oss_song.str());
+	m_theme->order.draw(window, oss_order.str());
 
 	// Schedule playback change if the chosen song has changed
 	if (music != m_playReq) { m_playReq = music; m_playTimer.setValue(0.0); }
@@ -194,10 +220,10 @@ void ScreenPlayers::draw() {
 		else
 			m_audio.playMusic(getGame(), music, true, 2.0);
 		if (!songbg.empty())
-			try { 
+			try {
 				m_songbg = std::make_unique<Texture>(songbg);
-			} 
-			catch (std::exception const&) 
+			}
+			catch (std::exception const&)
 			{
 			}
 		if (!video.empty() && config["graphic/video"].b()) m_video = std::make_unique<Video>(video, videoGap);

@@ -1,27 +1,29 @@
 #pragma once
 
-#include <memory>
-#include <string>
-
 #include "animvalue.hh"
 #include "graphic/opengl_text.hh"
+#include "controllers.hh"
+#include "event_manager.hh"
 #include "graphic/texture_manager.hh"
 #include "graphic/window.hh"
 #include "dialog.hh"
 #include "playlist.hh"
 #include "graphic/fbo.hh"
 #include "audio.hh"
-#include "screen.hh"
 #include "i18n.hh"
+#include "theme/theme.hh"
+
+#include <memory>
+#include <string>
+
+class Screen;
 
 class Game {
   public:
 	Game(Window& window);
 	~Game();
 	/// Adds a screen to the manager
-	void addScreen(std::unique_ptr<Screen> s) {
-		screens.insert(std::make_pair(s->getName(), std::move(s)));
-	}
+	void addScreen(std::unique_ptr<Screen> s);
 	/// Switches active screen
 	void activateScreen(std::string const& name);
 	/// Does actual switching of screens (if necessary)
@@ -31,7 +33,7 @@ class Game {
 	/// Draws the current screen and possible transition effects
 	void drawScreen();
 	/// Reload OpenGL resources (after fullscreen toggle etc)
-	void reloadGL() { if (currentScreen) currentScreen->reloadGL(); }
+	void reloadGL();
 	/// Returns pointer to current Screen
 	Screen* getCurrentScreen() { return currentScreen; }
 	/// Returns pointer to Screen for given name
@@ -64,6 +66,9 @@ class Game {
 	void showLogo(bool show = true) { m_logoAnim.setTarget(show ? 1.0 : 0.0); }
 	/// Draw the logo
 	void drawLogo();
+	void drawImages();
+	void setImages(std::vector<Theme::Image>&&);
+	Theme::Image* findImage(std::string const& id);
 	///global playlist access
 	PlayList& getCurrentPlayList() { return currentPlaylist; }
 #ifdef USE_WEBSERVER
@@ -73,8 +78,11 @@ class Game {
 
 	Window& getWindow() { return m_window; }
 	Audio& getAudio() { return m_audio; }
+	EventManager& getEventManager();
+	ConstantValueProviderPtr getConstantValueProvider() const;
 
 	TextureManager& getTextureManager();
+	void loadTheme();
 
 private:
 	Window& m_window;
@@ -104,6 +112,12 @@ private:
 	AnimValue m_dialogTimeOut;
 	// Dialog members
 	std::unique_ptr<Dialog> m_dialog;
+	std::vector<Theme::Image> m_images;
+	EventManager m_eventManager;
+	bool m_drawLogo = true;
+	std::string m_currentThemeName;
+	ConstantValueProviderPtr m_constantValueProvider = std::make_shared<ConstantValueProvider>();
+
 #ifdef USE_WEBSERVER
 	std::string m_webserverMessage = "Trying to connect to webserver";
 #endif

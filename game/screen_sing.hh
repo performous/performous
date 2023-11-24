@@ -9,7 +9,7 @@
 #include "scorewindow.hh"
 #include "screen.hh"
 #include "graphic/texture.hh"
-#include "theme.hh"
+#include "theme/theme.hh"
 #include "instrumentgraph.hh"
 #include "instruments.hh"
 
@@ -65,6 +65,7 @@ class ScreenSing: public Screen {
 	void prepareVoicesMenu(unsigned moveSelectionTo = 0);
 	bool devCanParticipate(input::DevType const& devType) const;
 	size_t players() const; // Always have at least one player to display lyrics and prevent crashes.
+	void onEnter(EventParameter const&);
 
 	Audio& m_audio;
 	Database& m_database;
@@ -72,7 +73,7 @@ class ScreenSing: public Screen {
 	std::shared_ptr<Song> m_song; /// Pointer to the current song
 	std::unique_ptr<ScoreWindow> m_score_window;
 	std::unique_ptr<ProgressBar> m_progress;
-	std::unique_ptr<Texture> m_background;
+	std::shared_ptr<Texture> m_background;
 	std::unique_ptr<Video> m_video;
 	std::unique_ptr<Webcam> m_cam;
 	std::unique_ptr<Texture> m_pause_icon;
@@ -83,7 +84,7 @@ class ScreenSing: public Screen {
 	std::unique_ptr<ThemeInstrumentMenu> m_menuTheme;
 	Menu m_menu;
 	Instruments m_instruments;
-	std::shared_ptr<ThemeSing> theme;
+	std::shared_ptr<ThemeSing> m_theme;
 	AnimValue m_quitTimer;
 	AnimValue m_statusTextSwitch;
 	AnimValue m_DuetTimeout;

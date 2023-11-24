@@ -1,0 +1,124 @@
+{
+	"values": {
+		"scale_logo_on_enter": {
+			"add": {
+				"value0": 0.3,
+				"value1": {
+					"multiply": {
+						"value0": {
+							"sinus": { "degree": { "multiply": {
+								"value0": {
+									"min": [ {"time": ""}, 1.0 ]
+								},
+								"value1": { "value": 180}
+						}}}},
+						"value1": 0.1
+					}
+				}
+			}
+		}
+	},
+	"Global" : {
+		"images": [
+			{
+				"id": "logo",
+				"image": "logo.svg"
+			}
+		]
+	},
+	"Intro": {
+		"background": {
+			"colorcycling": true,
+			"colorcycleduration": 2
+		},
+		"events" : {
+			"onload": {
+				"images": [
+					{
+						"id": "logo",
+						"x": {
+							"min": [
+								{
+									"multiply": {
+										"value0": {"time": ""},
+										"value1": {"value": 0.1}
+									}
+								},
+								{
+									"value": 0.11
+								}
+							]
+						},
+						"y": -0.1,
+						"scale": 0.3,
+						"alpha": {
+							"min": [
+								{
+									"multiply": {
+										"value0": {"time": ""},
+										"value1": {"value": 0.1}
+									}
+								},
+								{
+									"value": 1.0
+								}
+							]
+						}
+					}
+				]
+			},
+			"onenter": {
+				"images": [
+					{
+						"id": "logo",
+						"alpha": 1.0,
+						"scale": "scale_logo_on_enter"
+					}
+				]
+			}
+		}
+	},
+	"Practice": {
+		"events" : {
+			"onenter": {
+				"images": [
+					{
+						"id": "logo",
+						"alpha": 1.0,
+						"scale": "scale_logo_on_enter"
+					}
+				]
+			}
+		}
+	},
+	"Songs": {
+		"events" : {
+			"onenter": {
+				"images": [
+					{
+						"id": "logo",
+						"scale": 0.3,
+						"alpha": {
+							"subtract": {
+								"value0": 1.0,
+								"value1": {"min": [ 1.0, { "time": ""}]}
+							}
+						}
+					}
+				]
+			}
+		}
+	},
+	"Sing": {
+		"events" : {
+			"onenter": {
+				"images": [
+					{
+						"id": "logo",
+						"alpha": 0.0
+					}
+				]
+			}
+		}
+	}
+}

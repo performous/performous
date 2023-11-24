@@ -1,7 +1,7 @@
 #include "dancegraph.hh"
 #include "song.hh"
 #include "i18n.hh"
-#include "theme.hh"
+#include "theme/theme.hh"
 #include "graphic/view_trans.hh"
 
 #include <stdexcept>

@@ -1,0 +1,234 @@
+{
+	"values": {
+		"logo_scale": 0.3,
+		"logo_width": {"multiply": {"value0" : "image.width_origin", "value1": "logo_scale"}},
+		"logo_height": {"multiply": {"value0" : "image.height_origin", "value1": "logo_scale"}},
+		"logo_x": {"add": {
+			"value0": "screen.left",
+			"value1": {"multiply": {"value0" : "logo_width", "value1": 0.75}}
+		}},
+		"logo_y": {"add": {
+			"value0": "screen.top",
+			"value1": {"multiply": {"value0" : "logo_height", "value1": 0.75}}
+		}},
+		"logo_x_start": {"subtract": {"value0": "screen.left", "value1": "logo_width"}},
+		"logo_x_end": "logo_x",
+		"scale_logo_on_enter": {
+			"add": {
+				"value0": "logo_scale",
+				"value1": {
+					"multiply": {
+						"value0": {
+							"sinus": { "degree": { "multiply": {
+								"value0": {
+									"min": [ {"time": ""}, 1.0 ]
+								},
+								"value1": 180
+						}}}},
+						"value1": 0.1
+					}
+				}
+			}
+		},
+		"popup_logo_on_enter": {
+			"sinus": {
+				"degree": {
+					"multiply": {
+						"value0": {
+							"min": [ {"time": ""}, 1.0 ]
+						},
+						"value1": 180.0
+					}
+				}
+			}
+		}
+	},
+	"Global" : {
+		"logo": {
+			"drawlogo": false
+		},
+		"images": [
+			{
+				"id": "logo",
+				"image": "logo.svg"
+			}
+		]
+	},
+	"Intro": {
+		"background": {
+			"colorcycling": true,
+			"colorcycleduration": 2
+		},
+		"events" : {
+			"onload": {
+				"images": [
+					{
+						"id": "logo",
+						"x": {
+							"mix": { "value0": "logo_x_start", "value1": "logo_x_end", "a":
+								{ "min": [
+									{
+										"multiply": {
+											"value0": {"time": ""},
+											"value1": {"value": 0.5}
+										}
+									},
+									{
+										"value": 1.0
+									}
+								]}
+							}
+						},
+						"y": "logo_y",
+						"scale": "logo_scale",
+						"alpha": {
+							"min": [
+								{
+									"multiply": {
+										"value0": {"time": ""},
+										"value1": {"value": 0.2}
+									}
+								},
+								{
+									"value": 1.0
+								}
+							]
+						},
+						"angle": {
+							"min": [
+								{
+									"multiply": {
+										"value0": {"time": ""},
+										"value1": {"value": 180.0}
+									}
+								},
+								{
+									"value": 360.0
+								}
+							]
+						}
+					}
+				]
+			},
+			"onenter": {
+				"images": [
+					{
+						"id": "logo",
+						"x": "logo_x",
+						"y": "logo_y",
+						"alpha": 1.0,
+						"scale": "scale_logo_on_enter"
+					}
+				]
+			}
+		}
+	},
+	"Songs": {
+		"events" : {
+			"onenter": {
+				"images": [
+					{
+						"id": "logo",
+						"x": "logo_x",
+						"y": "logo_y",
+						"alpha": 1.0,
+						"scale": "scale_logo_on_enter"
+					}
+				]
+			}
+		}
+	},
+	"Sing": {
+		"background": {
+			"image": ["not_existing.svg", "blue_band.svg", "classig_bg.svg"]
+		},
+		"events" : {
+			"onenter": {
+				"images": [
+					{
+						"id": "logo",
+						"x": "logo_x",
+						"y": "logo_y",
+						"alpha": 1.0,
+						"scale": "scale_logo_on_enter"
+					}
+				]
+			}
+		}
+	},
+	"Practice": {
+		"events" : {
+			"onenter": {
+				"images": [
+					{
+						"id": "logo",
+						"x": "logo_x",
+						"y": "logo_y",
+						"alpha": 1.0,
+						"scale": "scale_logo_on_enter"
+					}
+				]
+			}
+		}
+	},
+	"AudioDevices": {
+		"events" : {
+			"onenter": {
+				"images": [
+					{
+						"id": "logo",
+						"x": "logo_x",
+						"y": "logo_y",
+						"alpha": 1.0,
+						"scale": "scale_logo_on_enter"
+					}
+				]
+			}
+		}
+	},
+	"Paths": {
+		"events" : {
+			"onenter": {
+				"images": [
+					{
+						"id": "logo",
+						"x": "logo_x",
+						"y": "logo_y",
+						"alpha": 1.0,
+						"scale": "scale_logo_on_enter"
+					}
+				]
+			}
+		}
+	},
+	"Players": {
+		"events" : {
+			"onenter": {
+				"images": [
+					{
+						"id": "logo",
+						"x": "logo_x",
+						"y": "logo_y",
+						"alpha": 1.0,
+						"scale": "scale_logo_on_enter"
+					}
+				]
+			}
+		}
+	},
+	"Playlist": {
+		"events" : {
+			"onenter": {
+				"images": [
+					{
+						"id": "logo",
+						"x": "logo_x",
+						"y": "logo_y",
+						"alpha": 1.0,
+						"scale": "scale_logo_on_enter"
+					}
+				]
+			}
+		}
+	}
+}

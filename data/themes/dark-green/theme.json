@@ -1,0 +1,8 @@
+{
+	"Intro" : {
+		"background" : {
+			"colorcycling": true,
+			"colorcycleduration": 20
+		}
+	}
+}

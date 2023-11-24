@@ -6,7 +6,7 @@ class Database;
 #include "instruments.hh"
 #include "progressbar.hh"
 #include "graphic/texture.hh"
-#include "theme.hh"
+#include "theme/theme.hh"
 
 /// shows score at end of song
 class ScoreWindow {

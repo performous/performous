@@ -53,6 +53,9 @@ struct UnlockGuard {
 std::uint32_t stou(std::string const & str, size_t * idx = nullptr, int base = 10);
 std::string format(std::chrono::seconds const& unixtime, std::string const& format, bool utc = false);
 
+std::string trim(const std::string&, const std::string& charactersToRemove = " ");
+std::string reverse(const std::string&);
+
 /** Templated conversion from strongly typed enums to the underlying type. **/
 template <typename E>
 constexpr auto to_underlying(E e) noexcept -> std::enable_if_t<std::is_enum<E>::value, std::underlying_type_t<E>> {

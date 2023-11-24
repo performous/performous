@@ -1,9 +1,11 @@
 #pragma once
 #include "animvalue.hh"
+#include "event_manager.hh"
 #include "screen.hh"
-#include "theme.hh"
+#include "theme/theme.hh"
 #include "textinput.hh"
 #include "layout_singer.hh"
+
 #include <unordered_map>
 
 class Song;
@@ -36,13 +38,15 @@ class ScreenPlayers : public Screen {
 
   private:
 	Texture* loadTextureFromMap(fs::path path);
-  	Audio& m_audio;
+	void onEnter(EventParameter const&);
+
+	Audio& m_audio;
 	Database& m_database;
 	Players& m_players;
 	std::shared_ptr<Song> m_song; /// Pointer to the current song
 	std::unique_ptr<Texture> m_songbg;
 	std::unique_ptr<Video> m_video;
-	std::unique_ptr<ThemeSongs> theme;
+	std::shared_ptr<ThemePlayers> m_theme;
 	std::string m_playing;
 	std::string m_playReq;
 	AnimValue m_playTimer;

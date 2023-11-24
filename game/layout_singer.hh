@@ -1,6 +1,6 @@
 #pragma once
 
-#include "theme.hh"
+#include "theme/theme.hh"
 #include "graphic/opengl_text.hh"
 #include "notegraph.hh"
 #include "configuration.hh"

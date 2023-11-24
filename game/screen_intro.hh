@@ -3,7 +3,8 @@
 #include "animvalue.hh"
 #include "menu.hh"
 #include "screen.hh"
-#include "theme.hh"
+#include "theme/theme.hh"
+#include "event_manager.hh"
 
 class Audio;
 class ThemeIntro;
@@ -27,9 +28,11 @@ class ScreenIntro : public Screen {
 	void draw_webserverNotice();
 	void populateMenu();
 	SvgTxtTheme& getTextObject(std::string const& txt);
+	void onLoad(EventParameter const&);
+	void onEnter(EventParameter const&);
 
 	Audio& m_audio;
-	std::unique_ptr<ThemeIntro> theme;
+	std::shared_ptr<ThemeIntro> m_theme;
 	Menu m_menu;
 	bool m_first;
 	AnimValue m_selAnim;

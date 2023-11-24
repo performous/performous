@@ -31,6 +31,8 @@ struct MenuEntry {
 	std::string name; ///< name of the menu entry
 	std::string shortDesc; ///< a short description
 	std::string longDesc; ///< a longer description
+	std::string event; ///< a event to send
+	std::map<std::string, std::string> eventParameter;
 	std::vector<std::string> items; ///< selectable options
 };
 

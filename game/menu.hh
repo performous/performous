@@ -26,7 +26,8 @@ public:
 	/// @param nm Name (menu item title)
 	/// @param comm Comment
 	/// @param img Image filename
-	MenuOption(const std::string& nm, const std::string& comm, MenuImage img = MenuImage());
+	MenuOption(std::string const& nm, std::string const& comm, MenuImage img = MenuImage());
+	MenuOption(std::string const& nm, std::string const& comm, std::string const& event, std::map<std::string, std::string> const& eventParameter = {}, MenuImage img = MenuImage());
 
 	MenuOption(const MenuOption&) = delete;
 	MenuOption &operator=(const MenuOption&) = delete;
@@ -60,7 +61,9 @@ public:
 	const std::string& getComment() const;
 	/// Check if this option can be selected
 	bool isActive() const;
-	ConfigItem* value;  ///< Setting to be adjusted
+	void sendEvent(Game&);
+
+	ConfigItem* value = nullptr;  ///< Setting to be adjusted
 	ConfigItem newValue;  ///< Value to be set or screen name
 	MenuOptions options;  ///< Submenu
 	MenuOptionCallback callback;  ///< Callback function
@@ -69,8 +72,10 @@ private:
 	std::string virtualName; ///< Non-localized name for referring to options that exist only on-screen.
 	std::string name;        ///< Option name (it will be displayed as this)
 	std::string comment;     ///< Extended information about the option displayed usually when selected
-	std::string* namePtr;    ///< Optional pointer to dynamically changing name
-	std::string* commentPtr; ///< Optional pointer to dynamically changing comment
+	std::string* namePtr = nullptr;    ///< Optional pointer to dynamically changing name
+	std::string* commentPtr = nullptr; ///< Optional pointer to dynamically changing comment
+	std::string m_event;
+	std::map<std::string, std::string> m_eventParameter;
 };
 
 class Game;

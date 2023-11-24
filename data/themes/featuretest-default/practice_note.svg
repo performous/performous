@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="80"
+   height="50"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   version="1.0"
+   sodipodi:docbase="/root/USNG/branches/hacking/themes/lima"
+   sodipodi:docname="practice_note.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+	 id="defs4" />
+  <sodipodi:namedview
+	 id="base"
+	 pagecolor="#ffffff"
+	 bordercolor="#666666"
+	 borderopacity="1.0"
+	 inkscape:pageopacity="0.0"
+	 inkscape:pageshadow="2"
+	 inkscape:zoom="9.04"
+	 inkscape:cx="44.454683"
+	 inkscape:cy="21.792349"
+	 inkscape:document-units="px"
+	 inkscape:current-layer="layer1"
+	 inkscape:window-width="822"
+	 inkscape:window-height="722"
+	 inkscape:window-x="608"
+	 inkscape:window-y="100"
+	 showgrid="false"
+	 width="80px"
+	 height="50px" />
+  <metadata
+	 id="metadata7">
+	<rdf:RDF>
+	  <cc:Work
+		 rdf:about="">
+		<dc:format>image/svg+xml</dc:format>
+		<dc:type
+		   rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+	  </cc:Work>
+	  <cc:Work
+		 rdf:about="">
+		<dc:format>image/svg+xml</dc:format>
+		<dc:type
+		   rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+	  </cc:Work>
+	</rdf:RDF>
+  </metadata>
+  <g
+	 inkscape:label="Calque 1"
+	 inkscape:groupmode="layer"
+	 id="layer1"
+	 transform="translate(-247.7219,-621.15445)">
+	<path
+	   style="fill:#000000"
+	   d="M 267.56476,668.82743 C 253.30212,663.34553 247.81274,656.94529 247.72256,645.69277 C 247.60494,631.01587 263.31926,621.12949 286.72594,621.15449 C 301.83554,621.17061 311.88394,624.42323 320.26658,632.01135 C 332.61008,643.18489 329.36062,657.70735 312.4874,666.77825 C 303.64922,671.52953 277.67742,672.71429 267.56476,668.82743 z M 299.89352,664.50729 C 305.17218,660.52725 304.77702,643.80935 299.22126,636.06521 C 290.68224,624.16267 275.94586,622.52677 272.065,633.05053 C 265.23,651.58501 285.95748,675.01491 299.89352,664.50729 z "
+	   id="path2266" />
+  </g>
+</svg>

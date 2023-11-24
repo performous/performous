@@ -51,6 +51,22 @@ namespace {
 		if (!a) throw XMLError(elem, "attribute " + attr + " not found");
 		return a->get_value();
 	}
+	std::map<std::string, std::string> getAttributes(xmlpp::Element const& elem) {
+		auto const attributeList = elem.get_attributes();
+		auto attributes = std::map<std::string, std::string>{};
+
+		for (auto&& attribute : attributeList)
+			attributes[attribute->get_name()] = attribute->get_value();
+
+		return attributes;
+	}
+	std::map<std::string, std::string> getAttributes(xmlpp::Element const& elem, std::string const& path) {
+		auto ns = elem.find(path);
+		if (ns.empty())
+			return {};
+
+		return getAttributes(dynamic_cast<xmlpp::Element const&>(*ns[0]));
+	}
 	template <typename T, typename V> void setLimits(xmlpp::Element& e, V& min, V& max, V& step) {
 		xmlpp::Attribute* a = e.get_attribute("min");
 		if (a) min = sconv<T>(a->get_value());
@@ -108,7 +124,7 @@ void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, unsigne
 			item.setLongDescription(getText(elem, "long"));
 		}
 		else {
-			std::string type{getAttribute(elem, "type")};
+			std::string type{ getAttribute(elem, "type") };
 			if (item.getType() == "uint" && type == "int") {
 				type = "uint"; // Convert old config values.
 				std::clog << "configuration/info: Converting config value: " + getAttribute(elem, "name") + ", to type uint." << std::endl;
@@ -130,7 +146,8 @@ void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, unsigne
 			if (!value_string.empty())
 				item.setValue(std::stoi(value_string));
 			updateNumeric<int>(item, elem, mode);
-		} else if (item.getType() == "uint") {
+		}
+		else if (item.getType() == "uint") {
 			std::string value_string = getAttribute(elem, "value");
 			if (!value_string.empty())
 				item.setValue(static_cast<unsigned short>(std::stoi(value_string)));
@@ -270,7 +287,7 @@ void writeConfig(Game& game, bool system) {
 			}
 		}
 		else if (type == "int") entryNode->set_attribute("value", std::to_string(item.i()));
-		else if (type == "uint") entryNode->set_attribute("value",std::to_string(item.ui()));
+		else if (type == "uint") entryNode->set_attribute("value", std::to_string(item.ui()));
 		else if (type == "bool") entryNode->set_attribute("value", item.b() ? "true" : "false");
 		else if (type == "float") entryNode->set_attribute("value", std::to_string(item.f()));
 		else if (type == "string") xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(item.s());
@@ -285,7 +302,7 @@ void writeConfig(Game& game, bool system) {
 			xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(selectedValue);
 
 			for (auto const& str : item.ol()) {
-				if(str != selectedValue)
+				if (str != selectedValue)
 					xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(str);
 			}
 		}
@@ -322,6 +339,9 @@ void readMenuXML(xmlpp::Node* node) {
 	me.name = getAttribute(elem, "name");
 	me.shortDesc = getText(elem, "short");
 	me.longDesc = getText(elem, "long");
+	me.event = getText(elem, "event");
+	me.eventParameter = getAttributes(elem, "event");
+
 	configMenu.push_back(me);
 }
 
