@@ -182,6 +182,12 @@ void ScreenIntro::populateMenu() {
 			MenuOptions opts;
 			// Process items that belong to that submenu
 			for (auto const& item: submenu.items) {
+#ifdef USE_WEBSERVER
+#else
+				if (item.find("game/webserver") != std::string::npos) {
+					continue;
+				}
+#endif
 				ConfigItem& c = config[item];
 				opts.emplace_back(MenuOption(c.getShortDesc(), c.getLongDesc()));
 				opts.back().changer(c);
