@@ -79,6 +79,17 @@ namespace portaudio {
 			if (backendIndex == paHostApiNotFound) backendIndex = Pa_HostApiTypeIdToHostApiIndex(defaultBackEnd());
 			for (int i = 0, end = Pa_GetHostApiInfo(backendIndex)->deviceCount; i != end; ++i) {
 				PaDeviceInfo const* info = Pa_GetDeviceInfo(Pa_HostApiDeviceIndexToDeviceIndex(backendIndex, i));
+				std::clog << "audio/info: -----------------------------" << std::endl;
+				std::clog << "audio/info: structVersion = " << info->structVersion << std::endl;
+				std::clog << "audio/info: name = " << info->name << std::endl;
+				std::clog << "audio/info: hostApi = " << info->hostApi << std::endl;
+				std::clog << "audio/info: maxInputChannels = " << info->maxInputChannels << std::endl;
+				std::clog << "audio/info: maxOutputChannels = " << info->maxOutputChannels << std::endl;
+				std::clog << "audio/info: defaultLowInputLatency = " << info->defaultLowInputLatency << std::endl;
+				std::clog << "audio/info: defaultLowOutputLatency = " << info->defaultLowOutputLatency << std::endl;
+				std::clog << "audio/info: defaultHighInputLatency = " << info->defaultHighInputLatency << std::endl;
+				std::clog << "audio/info: defaultHighOutputLatency = " << info->defaultHighOutputLatency << std::endl;
+				std::clog << "audio/info: defaultSampleRate = " << info->defaultSampleRate << std::endl;
 				if (!info) continue;
 				std::string name = UnicodeUtil::convertToUTF8(info->name);
 				/// Omit some useless legacy devices of PortAudio/ALSA from our list
@@ -86,6 +97,14 @@ namespace portaudio {
 					if (name.find(dev) != std::string::npos) name.clear();
 				}
 				if (name.empty()) continue;  // No acceptable device found
+				if (backend == 12) {
+					if (info->maxInputChannels == 0 && info->maxOutputChannels == 0)
+						continue;
+					if (info->maxInputChannels == 0 && info->defaultLowOutputLatency == 0)
+						continue;
+					if (info->maxOutputChannels == 0 && info->defaultLowInputLatency == 0)
+						continue;
+				}
 				// Verify that the name is unique (haven't seen duplicate names occur though)
 				std::string n = name;
 				while (true) {
@@ -97,7 +116,16 @@ namespace portaudio {
 					oss << name << " #" << ++num;
 					n = oss.str();
 				};
-				devices.push_back(DeviceInfo(i, name, info->maxInputChannels, info->maxOutputChannels, Pa_HostApiDeviceIndexToDeviceIndex(backendIndex, i)));
+				auto maxInputChannels = info->maxInputChannels;
+				auto maxOutputChannels = info->maxOutputChannels;
+				if (backend == 12) {
+					maxInputChannels /= 2;
+					if (info->defaultLowInputLatency == 0)
+						maxInputChannels = 0;
+					if (info->defaultLowOutputLatency == 0)
+						maxOutputChannels = 0;
+				}
+				devices.push_back(DeviceInfo(i, name, maxInputChannels, maxOutputChannels, Pa_HostApiDeviceIndexToDeviceIndex(backendIndex, i)));
 			}
 			for (auto& dev: devices) {
 				// Array of regex - replacement pairs
