@@ -120,7 +120,7 @@ protected:
 	Game& m_game;
 	Audio& m_audio;
 	Song const& m_song;
-	size_t m_stream; /// audio stream number
+	size_t m_stream = 0; /// audio stream number
 	input::DevicePtr m_dev;
 	AnimValue m_cx{ 0.0, 0.2 }, m_width{ 0.5, 0.4 }; /// controls horizontal position and width smoothly
 	struct Event {
@@ -150,7 +150,7 @@ protected:
 	std::unique_ptr<ThemeInstrumentMenu> m_menuTheme;
 
 	// Dynamic stuff for join menu
-	ConfigItem m_selectedTrack; /// menu modifies this to select track
+	ConfigItem m_selectedTrack{ 0 }; /// menu modifies this to select track
 	ConfigItem m_selectedDifficulty{ 0 }; /// menu modifies this to select difficulty
 	ConfigItem m_rejoin{ false }; /// menu sets this if we want to re-join
 	ConfigItem m_leftymode{ false }; /// switch guitar notes to right-to-left direction
@@ -159,18 +159,18 @@ protected:
 	std::string m_leftyOpt;
 
 	// Misc counters etc.
-	unsigned m_pads; /// how many panels the current gaming mode uses
+	unsigned m_pads = 0; /// how many panels the current gaming mode uses
 	bool m_pressed[max_panels]; /// is certain panel pressed currently
 	AnimValue m_pressed_anim[max_panels]; /// animation for panel pressing
 	AnimValue m_correctness{ 1.0, 5.0 };
-	double m_score; /// unnormalized scores
-	double m_scoreFactor; /// normalization factor
-	double m_starmeter; /// when this is high enough, GodMode becomes available
-	int m_streak; /// player's current streak/combo
-	int m_longestStreak; /// player's longest streak/combo
-	int m_bigStreak; /// next limit when a popup appears
+	double m_score = 0.0; /// unnormalized scores
+	double m_scoreFactor = 0.0; /// normalization factor
+	double m_starmeter = 0.0; /// when this is high enough, GodMode becomes available
+	int m_streak = 0; /// player's current streak/combo
+	int m_longestStreak = 0; /// player's longest streak/combo
+	int m_bigStreak = 0; /// next limit when a popup appears
 	int m_countdown{ 3 }; /// countdown counter / Display countdown 3 secs before note start
-	double m_jointime; /// when the player joined
-	unsigned m_dead; /// how many notes has been passed without hitting buttons
-	bool m_ready;
+	double m_jointime = 0.0; /// when the player joined
+	unsigned m_dead = 0; /// how many notes has been passed without hitting buttons
+	bool m_ready = false;
 };
