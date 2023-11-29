@@ -47,7 +47,9 @@ float screenH() { return s_height; }
 Window::Window()
 : screen(nullptr, &SDL_DestroyWindow), glContext(nullptr, &SDL_GL_DeleteContext) {
 	m_system = std::make_unique<SDLSystem>();
+}
 
+void Window::start() {
 	SDL_JoystickEventState(SDL_ENABLE);
 	{ // Setup GL attributes for context creation
 		SDL_SetHintWithPriority("SDL_HINT_VIDEO_HIGHDPI_DISABLED", "0", SDL_HINT_DEFAULT);
