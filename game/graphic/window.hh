@@ -27,6 +27,7 @@ class Window {
 	Window();
 	~Window();
 
+	void start();
 	void shutdown();
 
 	void render(Game &game, std::function<void (void)> drawFunc);
