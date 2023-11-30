@@ -58,7 +58,6 @@ namespace SongParserUtil {
 
 SongParser::SongParser(Song& s) : m_song(s) {
 	try {
-		enum class Type { NONE, TXT, XML, INI, SM } type = Type::NONE;
 		// Read the file, determine the type and do some initial validation checks
 		std::ifstream f(s.filename.string(), std::ios::binary);
 		if (!f.is_open()) {
@@ -74,20 +73,17 @@ SongParser::SongParser(Song& s) : m_song(s) {
 		}
 		// Convert m_ss; filename supplied for possible warning messages
 		if (xmlCheck(m_ss.str())) {
-			type = Type::XML;	// XMLPP should deal with encoding so we don't have to.
+			s.type = Song::Type::XML;	// XMLPP should deal with encoding so we don't have to.
 		}
 		else {
 			std::string ss = UnicodeUtil::convertToUTF8(m_ss.str(), s.filename.string());
-			if (smCheck(ss)) {
-				type = Type::SM;
-			}
-			else if (txtCheck(ss)) {
-				type = Type::TXT;
-			}
-			else if (iniCheck(ss)) {
-				type = Type::INI;
-			}
-			else {
+			if (txtCheck(ss)) {
+				s.type = Song::Type::TXT;
+			} else if (smCheck(ss)) {
+				s.type = Song::Type::SM;
+			} else if (iniCheck(ss)) {
+				s.type = Song::Type::INI;
+			} else {
 				throw SongParserException(s, "Does not look like a song file (wrong header)", 1, true);
 			}
 			m_ss.str(ss);
@@ -99,26 +95,22 @@ SongParser::SongParser(Song& s) : m_song(s) {
 				s.m_bpms.clear();
 				addBPM(0, bpm);
 			}
-			if (type == Type::TXT) txtParse();
-			else if (type == Type::INI) midParse();  // INI doesn't contain notes, parse those from MIDI
-			else if (type == Type::XML) xmlParse();
-			else if (type == Type::SM) smParse();
+			if (s.type == Song::Type::TXT) txtParse();
+			else if (s.type == Song::Type::INI) midParse();  // INI doesn't contain notes, parse those from MIDI
+			else if (s.type == Song::Type::XML) xmlParse();
+			else if (s.type == Song::Type::SM) smParse();
 			finalize();  // Do some adjusting to the notes
 			s.loadStatus = Song::LoadStatus::FULL;
 			return;
 		}
 		// Parse only header to speed up loading and conserve memory
-		if (type == Type::TXT) txtParseHeader();
-		else if (type == Type::INI) iniParseHeader();
-		else if (type == Type::XML) xmlParseHeader();
-		else if (type == Type::SM) {
+		if (s.type == Song::Type::TXT) txtParseHeader();
+		else if (s.type == Song::Type::INI) iniParseHeader();
+		else if (s.type == Song::Type::XML) xmlParseHeader();
+		else if (s.type == Song::Type::SM) {
 			smParseHeader(); s.dropNotes();  // Hack: drop notes here (load again when playing the song)
 		}
 
-		// Default for preview position if none was specified in header
-		if (std::isnan(s.preview_start)) {
-			s.preview_start = ((type == Type::INI || s.getDurationSeconds() < 50.0) ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
-		}
 		guessFiles();
 		if (!m_song.midifilename.empty()) { 
 			midParseHeader(); 
@@ -168,29 +160,31 @@ void SongParser::guessFiles() {
 	std::string logMissing, logFound;
 
 	// Run checks, remove bogus values and construct regexps
-	std::vector<std::regex> regexps;
 	bool missing = false;
 	for (auto const& p : fields) {
 		fs::path& file = *p.first;
 		if (!file.empty() && !is_regular_file(file)) {
 			logMissing += "  " + file.filename().string();
 			file.clear();
+			missing = true; 
 		}
-		if (file.empty()) { missing = true; }
-		regexps.emplace_back(p.second, std::regex_constants::icase);
 	}
 
 	if (!missing) {
 		return;	// All OK!
 	}
+
+	std::clog << "songparse/notice: Missing files for " << m_song.title << std::endl;
+
 	// Try matching all files in song folder with any field
 	std::set<fs::path> files(fs::directory_iterator{ m_song.path }, fs::directory_iterator{});
 	for (unsigned i = 0; i < fields.size(); ++i) {
 		fs::path& field = *fields[i].first;
 		if (field.empty()) {
+			std::regex regexp(fields[i].second, std::regex_constants::icase);
 			for (fs::path const& f : files) {
 				std::string name = f.filename().string();  // File basename
-				if (!regex_search(name, regexps[i])) continue;  // No match for current file
+				if (!regex_search(name, regexp)) continue;  // No match for current file
 				field = f;
 				logFound += "  " + name;
 			}
