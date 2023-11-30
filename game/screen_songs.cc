@@ -207,7 +207,7 @@ void ScreenSongs::update() {
 	m_playing = music;
 	// Clear the old content and load new content if available
 	m_songbg.reset(); m_video.reset();
-	double pstart = (!m_jukebox && song ? song->preview_start : 0.0);
+	double pstart = (!m_jukebox && song ? song->getPreviewStart() : 0.0);
 	m_audio.playMusic(getGame(), music, true, 1.0, pstart);
 	if (song) {
 		fs::path const& background = song->background.empty() ? song->cover : song->background;

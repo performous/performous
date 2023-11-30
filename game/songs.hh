@@ -24,6 +24,7 @@ class Database;
 /// songs class for songs screen
 class Songs {
   public:
+	typedef std::unordered_map<std::string, std::shared_ptr<Song>> Cache;
 	Songs(const Songs&) = delete;
 	const Songs& operator=(const Songs&) = delete;
 	/// constructor
@@ -86,12 +87,12 @@ class Songs {
 	void addSongOrder(SongOrderPtr);
 
   private:
-	void LoadCache();
+	Cache loadCache();
 	void CacheSonglist();
 
 	void dumpSongs_internal() const;
 	void reload_internal();
-	void reload_internal(fs::path const& p);
+	void reload_internal(fs::path const& p, Cache cache);
 	void randomize_internal();
 	void filter_internal();
 	void sort_internal(bool descending = false);
