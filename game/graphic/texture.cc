@@ -22,6 +22,11 @@ Texture::Texture(fs::path const& filename) {
     m_loadingId = ::loadTexture(this, filename);
 }
 
+Texture::Texture(TextureReferencePtr textureReference) 
+    : OpenGLTexture(textureReference) {
+    update();
+}
+
 Texture::~Texture() {
     ::abortTextureLoading(m_loadingId);
 }
