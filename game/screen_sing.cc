@@ -168,7 +168,8 @@ void ScreenSing::reloadGL() {
 	m_help = std::make_unique<Texture>(findFile("instrumenthelp.svg"));
 	m_progress = std::make_unique<ProgressBar>(findFile("sing_progressbg.svg"), findFile("sing_progressfg.svg"), ProgressBar::Mode::HORIZONTAL, 0.01f, 0.01f, true);
 	// Load background
-	if (!m_song->background.empty()) m_background = std::make_unique<Texture>(m_song->background);
+	if (!m_song->background.empty()) 
+		m_background = std::make_unique<Texture>(m_song->background);
 }
 
 void ScreenSing::exit() {
@@ -188,7 +189,8 @@ void ScreenSing::exit() {
 	m_menuTheme.reset();
 	theme.reset();
 	m_audio.fadeout(getGame(), 0);
-	if (m_audio.isPaused()) m_audio.togglePause();
+	if (m_audio.isPaused())
+		m_audio.togglePause();
 	getGame().showLogo();
 }
 

@@ -43,19 +43,21 @@ void ScreenSongs::enter() {
 }
 
 void ScreenSongs::reloadGL() {
+	auto& textureManager = getGame().getTextureManager();
+
 	theme = std::make_unique<ThemeSongs>();
 	m_menuTheme = std::make_unique<ThemeInstrumentMenu>();
-	m_songbg_default = std::make_unique<Texture>(findFile("songs_bg_default.svg"));
-	m_songbg_ground = std::make_unique<Texture>(findFile("songs_bg_ground.svg"));
-	m_singCover = std::make_unique<Texture>(findFile("no_cover.svg"));
-	m_instrumentCover = std::make_unique<Texture>(findFile("instrument_cover.svg"));
-	m_bandCover = std::make_unique<Texture>(findFile("band_cover.svg"));
-	m_danceCover = std::make_unique<Texture>(findFile("dance_cover.svg"));
-	m_instrumentList = std::make_unique<Texture>(findFile("instruments.svg"));
+	m_songbg_default = std::make_unique<Texture>(textureManager.get(findFile("songs_bg_default.svg")));
+	m_songbg_ground = std::make_unique<Texture>(textureManager.get(findFile("songs_bg_ground.svg")));
+	m_singCover = std::make_unique<Texture>(textureManager.get(findFile("no_cover.svg")));
+	m_instrumentCover = std::make_unique<Texture>(textureManager.get(findFile("instrument_cover.svg")));
+	m_bandCover = std::make_unique<Texture>(textureManager.get(findFile("band_cover.svg")));
+	m_danceCover = std::make_unique<Texture>(textureManager.get(findFile("dance_cover.svg")));
+	m_instrumentList = std::make_unique<Texture>(textureManager.get(findFile("instruments.svg")));
 }
 
 void ScreenSongs::exit() {
-	m_covers.clear();
+	//m_covers.clear();
 	m_menu.clear();
 	m_menuTheme.reset();
 	m_singCover.reset();
@@ -88,27 +90,47 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 	m_idleTimer.setValue(0.0);  // Reset idle timer
 	if (nav == input::NavButton::PAUSE) m_audio.togglePause();
 	else if (event.menu == input::NavMenu::A_PREV) {
-		if (m_menu.isOpen()) m_menu.move(-1);
-		else menuBrowse(Songs::SortChange::BACK);
+		if (m_menu.isOpen())
+			m_menu.move(-1);
+		else 
+			menuBrowse(Songs::SortChange::BACK);
 	}
 	else if (event.menu == input::NavMenu::A_NEXT) {
-		if (m_menu.isOpen()) m_menu.move(1);
-		else menuBrowse(Songs::SortChange::FORWARD);
+		if (m_menu.isOpen())
+			m_menu.move(1);
+		else
+			menuBrowse(Songs::SortChange::FORWARD);
 	}
-	else if (nav == input::NavButton::MOREUP) m_songs.advance(-10);
-	else if (nav == input::NavButton::MOREDOWN) m_songs.advance(10);
+	else if (nav == input::NavButton::MOREUP) 
+		m_songs.advance(-10);
+	else if (nav == input::NavButton::MOREDOWN)
+		m_songs.advance(10);
 	else if (m_jukebox) {
-		if (nav == input::NavButton::CANCEL) m_jukebox = false;
-		else if (nav == input::NavButton::START) { addSong(); sing(); }
-		else if (event.menu == input::NavMenu::B_NEXT)  m_audio.seek(-5);
-		else if (event.menu == input::NavMenu::B_PREV) m_audio.seek(5);
-		else if (nav == input::NavButton::MOREUP) m_audio.seek(-30);
-		else if (nav == input::NavButton::MOREDOWN) m_audio.seek(30);
+		if (nav == input::NavButton::CANCEL)
+			m_jukebox = false;
+		else if (nav == input::NavButton::START) { 
+			addSong();
+			sing(); 
+		}
+		else if (event.menu == input::NavMenu::B_NEXT)
+			m_audio.seek(-5);
+		else if (event.menu == input::NavMenu::B_PREV)
+			m_audio.seek(5);
+		else if (nav == input::NavButton::MOREUP)
+			m_audio.seek(-30);
+		else if (nav == input::NavButton::MOREDOWN) 
+			m_audio.seek(30);
 	} else if (nav == input::NavButton::CANCEL) {
-		if (m_menuPos != 1) m_menuPos = 1;  // Exit menu (back to song selection)
-		else if (!m_search.text.empty()) { m_search.text.clear(); m_songs.setFilter(m_search.text); }  // Clear search
-		else if (m_songs.typeNum()) m_songs.typeChange(Songs::SortChange::RESET);  // Clear type filter
-		else getGame().activateScreen("Intro");
+		if (m_menuPos != 1)
+			m_menuPos = 1;  // Exit menu (back to song selection)
+		else if (!m_search.text.empty()) {
+			m_search.text.clear();
+			m_songs.setFilter(m_search.text);
+		}  // Clear search
+		else if (m_songs.typeNum())
+			m_songs.typeChange(Songs::SortChange::RESET);  // Clear type filter
+		else 
+			getGame().activateScreen("Intro");
 	}
 	// The rest are only available when there are songs available
 	else if (m_songs.empty()) return;
@@ -117,7 +139,8 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 			m_menu.action(getGame());
 		}
 		else if (m_menuPos == 1 /* Cover browser */) {
-			if (addSong()) sing();  // Add song and sing if it was the first to be added
+			if (addSong())
+				sing();  // Add song and sing if it was the first to be added
 		}
 		else if (m_menuPos == 4) {
 			m_menuPos = 1;
@@ -134,12 +157,16 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 		}
 	}
 	else if (event.menu == input::NavMenu::B_PREV) {
-		if (m_menu.isOpen()) m_menu.move(-1);
-		else if (m_menuPos < 4) ++m_menuPos;
+		if (m_menu.isOpen())
+			m_menu.move(-1);
+		else if (m_menuPos < 4)
+			++m_menuPos;
 	}
 	else if (event.menu == input::NavMenu::B_NEXT) {
-		if (m_menu.isOpen()) m_menu.move(1);
-		else if (m_menuPos > 0) --m_menuPos;
+		if (m_menu.isOpen()) 
+			m_menu.move(1);
+		else if (m_menuPos > 0)
+			--m_menuPos;
 	}
 }
 
@@ -153,7 +180,8 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 		SDL_Keysym keysym = event.key.keysym;
 		int key = keysym.scancode;
 		std::uint16_t mod = event.key.keysym.mod;
-		if (key == SDL_SCANCODE_F4) m_jukebox = !m_jukebox;
+		if (key == SDL_SCANCODE_F4)
+			m_jukebox = !m_jukebox;
 		else if (key == SDL_SCANCODE_BACKSPACE) {
 			m_search.backspace();
 			m_songs.setFilter(m_search.text);
@@ -162,21 +190,28 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			if (key == SDL_SCANCODE_R && mod & Platform::shortcutModifier()) {
 				m_songs.reload();
 				m_songs.setFilter(m_search.text);
-				}
+			}
 			// Shortcut keys for accessing different type filter modes.
-			if (key == SDL_SCANCODE_TAB) m_songs.sortChange(getGame(), Songs::SortChange::FORWARD);
-			if (key == SDL_SCANCODE_F5) m_songs.typeCycle(2);
-			if (key == SDL_SCANCODE_F6) m_songs.typeCycle(3);
-			if (key == SDL_SCANCODE_F7) m_songs.typeCycle(4);
-			if (key == SDL_SCANCODE_F8) m_songs.typeCycle(1);
+			if (key == SDL_SCANCODE_TAB)
+				m_songs.sortChange(getGame(), Songs::SortChange::FORWARD);
+			if (key == SDL_SCANCODE_F5)
+				m_songs.typeCycle(2);
+			if (key == SDL_SCANCODE_F6)
+				m_songs.typeCycle(3);
+			if (key == SDL_SCANCODE_F7) 
+				m_songs.typeCycle(4);
+			if (key == SDL_SCANCODE_F8)
+				m_songs.typeCycle(1);
 		}
 	}
-	if (m_songs.empty()) m_jukebox = false;
+	if (m_songs.empty())
+		m_jukebox = false;
 }
 
 void ScreenSongs::update() {
 	getGame().showLogo(!m_jukebox);
-	if (m_idleTimer.get() < 0.3) return;  // Only update when the user gives us a break
+	if (m_idleTimer.get() < 0.3)
+		return;  // Only update when the user gives us a break
 	m_songs.update(); // Poll for new songs
 	bool songChange = false;  // Do we need to switch songs?
 	// Automatic song browsing
@@ -194,25 +229,37 @@ void ScreenSongs::update() {
 	// Check out if the music has changed
 	std::shared_ptr<Song> song = m_songs.currentPtr();
 	Song::MusicFiles music;
-	if (song) music = song->music;
-	if (m_playing != music) songChange = true;
+	if (song)
+		music = song->music;
+	if (m_playing != music)
+		songChange = true;
 	// Switch songs if needed, only when the user is not browsing for a moment
-	if (!songChange) return;
+	if (!songChange)
+		return;
 	ScreenSongs::previewBeatsBuffer.reset(new_fvec(1));
 	{
-	std::lock_guard<std::recursive_mutex> l(Audio::aubio_mutex);
-	Audio::aubioTempo.reset(new_aubio_tempo("default", Audio::aubio_win_size, Audio::aubio_hop_size, static_cast<uint_t>(Audio::getSR())));
+		std::lock_guard<std::recursive_mutex> l(Audio::aubio_mutex);
+		Audio::aubioTempo.reset(new_aubio_tempo("default", Audio::aubio_win_size, Audio::aubio_hop_size, static_cast<uint_t>(Audio::getSR())));
 	}
-	if (song && song->hasControllers()) { song->loadNotes(); } // Needed for BPM info.
+	if (song && song->hasControllers()) { 
+		song->loadNotes(); 
+	} // Needed for BPM info.
 	m_playing = music;
 	// Clear the old content and load new content if available
-	m_songbg.reset(); m_video.reset();
+	m_songbg.reset();
+	m_video.reset();
 	double pstart = (!m_jukebox && song ? song->preview_start : 0.0);
 	m_audio.playMusic(getGame(), music, true, 1.0, pstart);
 	if (song) {
 		fs::path const& background = song->background.empty() ? song->cover : song->background;
-		if (!background.empty()) try { m_songbg = std::make_unique<Texture>(background); } catch (std::exception const&) {}
-		if (!song->video.empty() && config["graphic/video"].b()) m_video = std::make_unique<Video>(song->video, song->videoGap);
+		if (!background.empty()) 
+			try {
+				m_songbg = std::make_unique<Texture>(background);
+			} 
+			catch (std::exception const&) {
+			}
+		if (!song->video.empty() && config["graphic/video"].b()) 
+			m_video = std::make_unique<Video>(song->video, song->videoGap);
 	}
 }
 
@@ -231,7 +278,8 @@ void ScreenSongs::sing() {
 
 void ScreenSongs::prepare() {
 	double time = m_audio.getPosition() - config["audio/video_delay"].f();
-	if (m_video) m_video->prepare(time);
+	if (m_video)
+		m_video->prepare(time);
 }
 
 void ScreenSongs::drawJukebox() {
@@ -239,13 +287,16 @@ void ScreenSongs::drawJukebox() {
 	double pos = m_audio.getPosition();
 	double len = m_audio.getLength();
 	double diff = len - pos;
-	if (pos < diff) diff = pos;  // Diff from beginning instead of from end
-	if (!m_songbg.get() && !m_video.get()) diff = 0.0;  // Always display song name if there is no background
+	if (pos < diff) 
+		diff = pos;  // Diff from beginning instead of from end
+	if (!m_songbg.get() && !m_video.get())
+		diff = 0.0;  // Always display song name if there is no background
 	if (diff < 3.0) {
 		Song& song = m_songs.current();
 		// Draw the cover
 		Texture* cover = nullptr;
-		if (!song.cover.empty()) cover = loadTextureFromMap(song.cover);
+		if (!song.cover.empty())
+			cover = loadTextureFromMap(song.cover);
 		if (cover && !cover->empty()) {
 			Texture& s = *cover;
 			s.dimensions.left(theme->song.dimensions.x1()).top(theme->song.dimensions.y2() + 0.05f).fitInside(0.15f, 0.15f);
@@ -277,7 +328,8 @@ void ScreenSongs::drawMultimedia() {
 				m_songbg->draw(window, m_songbg->dimensions, TexCoords(static_cast<float>(x), 0.0f, static_cast<float>(x + 5.0), 5.0f));
 			}
 		}
-		if (m_video.get()) m_video->render(window, time);
+		if (m_video.get()) 
+			m_video->render(window, time);
 	}
 	if (!m_jukebox) {
 		m_songbg_ground->draw(window);
@@ -333,7 +385,8 @@ void ScreenSongs::draw() {
 		}
 	}
 
-	if (m_jukebox) drawJukebox();
+	if (m_jukebox) 
+		drawJukebox();
 	else {
 		auto& window = getGame().getWindow();
 		// Draw song and order texts
@@ -343,7 +396,8 @@ void ScreenSongs::draw() {
 		theme->hiscores.draw(window, hiscore);
 	}
 	// Menus on top of everything
-	if (m_menu.isOpen()) drawMenu();
+	if (m_menu.isOpen())
+		drawMenu();
 }
 
 std::string ScreenSongs::getHighScoreText() const {
@@ -400,7 +454,7 @@ void ScreenSongs::drawCovers() {
 	if (ss > 0) {
 		// Use actual song BPM. FIXME: Should only do this if currentId is also playing.
 		if (m_songs.currentPtr() && m_songs.currentPtr()->music == m_playing) {
-				if (m_songs.currentPtr()->hasControllers() || !m_songs.currentPtr()->beats.empty()) {
+			if (m_songs.currentPtr()->hasControllers() || !m_songs.currentPtr()->beats.empty()) {
 				double t = m_audio.getPosition() - config["audio/video_delay"].f();
 				Song::Beats const& beats = m_songs.current().beats;
 				auto it = std::lower_bound(m_songs.currentPtr()->hasControllers() ? beats.begin() : (beats.begin() + 1), beats.end(), t);
@@ -411,10 +465,14 @@ void ScreenSongs::drawCovers() {
 			}
 			else if (!m_songs.currentPtr()->m_bpms.empty()) {
 				float tempo = static_cast<float>(m_songs.currentPtr()->m_bpms.front().step * 4.0);
-				if (static_cast<unsigned>(tempo) <= 100u) tempo *= 2.0f;
-				else if (static_cast<unsigned>(tempo) > 400u) tempo /= 4.0f;
-				else if (static_cast<unsigned>(tempo) > 300u) tempo /= 3.0f;
-				else if (static_cast<unsigned>(tempo) > 190u) tempo /= 2.0f;
+				if (static_cast<unsigned>(tempo) <= 100u) 
+					tempo *= 2.0f;
+				else if (static_cast<unsigned>(tempo) > 400u)
+					tempo /= 4.0f;
+				else if (static_cast<unsigned>(tempo) > 300u)
+					tempo /= 3.0f;
+				else if (static_cast<unsigned>(tempo) > 190u) 
+					tempo /= 2.0f;
 				beat = 0.5 + m_idleTimer.get() / tempo;
 			}
 		}
@@ -423,9 +481,9 @@ void ScreenSongs::drawCovers() {
 	// Draw covers and reflections
 	int idx = static_cast<int>(baseidx);
 	for (int i = -2; i < 6; ++i) {
-		if (idx + i < 0 || idx + i >= ss) continue;
+		if (idx + i < 0 || idx + i >= ss)
+			continue;
 		Song& song = *m_songs[static_cast<unsigned>(idx + i)];
-		Texture& s = getCover(song);
 		// Calculate dimensions for cover and instrument markers
 		float pos = static_cast<float>(static_cast<double>(i) - shift);
 		// Function for highlight effect (offset = 0 for current cover), returns 0..1 highlight level
@@ -439,10 +497,18 @@ void ScreenSongs::drawCovers() {
 		float x = xtrans(0.0f);
 		float z = ztrans(0.0f);
 		float c = 0.4f + 0.6f * highlightf(0.0f);
-		if (m_menuPos == 1 /* Cover browser */ && idx + i == currentId) c = static_cast<float>(beat);
+		if (m_menuPos == 1 /* Cover browser */ && idx + i == currentId) {
+			c = static_cast<float>(beat);
+
+			if (isNaN(c))
+				c = 1.f;
+			else
+				c = clamp(c);
+		}
 		using namespace glmath;
 		Transform trans(window, translate(vec3(x, y, z)) * rotate(angle, vec3(0.0f, 1.0f, 0.0f)));
 		ColorTrans c1(window, Color(c, c, c));
+		Texture& s = getCover(song);
 		s.dimensions.middle().screenCenter().bottom().fitInside(0.17f, 0.17f);
 		// Draw the cover normally
 		s.draw(window);
@@ -470,20 +536,25 @@ void ScreenSongs::drawCovers() {
 
 Texture* ScreenSongs::loadTextureFromMap(fs::path path) {
 	if(m_covers.find(path) == m_covers.end()) {
-		m_covers.insert({ path, std::make_unique<Texture>(path) });
+		m_covers.insert({ path, std::make_unique<Texture>(getGame().getTextureManager().get(path)) });
 	}
 	try {
 		return m_covers.at(path).get();
-	} catch (std::exception const&) {}
+	}
+	catch (std::exception const&) {
+	}
+
 	return nullptr;
 }
 
 Texture& ScreenSongs::getCover(Song const& song) {
 	Texture* cover = nullptr;
 	// Fetch cover image from cache or try loading it
-	if (!song.cover.empty()) cover = loadTextureFromMap(song.cover);
+	if (!song.cover.empty())
+		cover = loadTextureFromMap(song.cover);
 	// Fallback to background image as cover if needed
-	if (!cover && !song.background.empty()) cover = loadTextureFromMap(song.background);
+	if (!cover && !song.background.empty())
+		cover = loadTextureFromMap(song.background);
 	// Use empty cover
 	if (!cover) {
 		if(song.hasDance()) {
@@ -492,8 +563,10 @@ Texture& ScreenSongs::getCover(Song const& song) {
 			cover = m_bandCover.get();
 		} else {
 			size_t tracks = song.instrumentTracks.size();
-			if (tracks == 0) cover = m_singCover.get();
-			else cover = m_instrumentCover.get();
+			if (tracks == 0) 
+				cover = m_singCover.get();
+			else 
+				cover = m_instrumentCover.get();
 		}
 	}
 	return *cover;
