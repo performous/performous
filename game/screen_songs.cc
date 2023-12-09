@@ -57,7 +57,7 @@ void ScreenSongs::reloadGL() {
 }
 
 void ScreenSongs::exit() {
-	//m_covers.clear();
+	m_covers.clear();
 	m_menu.clear();
 	m_menuTheme.reset();
 	m_singCover.reset();
