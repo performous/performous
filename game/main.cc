@@ -272,7 +272,11 @@ int main(int argc, char** argv) try {
 	namespace po = boost::program_options;
 	po::options_description opt1("Generic options");
 	std::string songlist;
+
 	std::string loglevel;
+#ifndef NDEBUG
+	loglevel = "debug";
+#endif
 	opt1.add_options()
 	  ("help,h", "you are viewing it")
 	  ("log,l", po::value<std::string>(&loglevel), "subsystem name or minimum level to log")
