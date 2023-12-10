@@ -1,7 +1,6 @@
 #include "dancegraph.hh"
 #include "song.hh"
 #include "i18n.hh"
-#include "theme.hh"
 #include "graphic/view_trans.hh"
 
 #include <stdexcept>
@@ -76,6 +75,8 @@ namespace {
 	};
 }
 
+
+/// Constructor
 DanceGraph::DanceGraph(Game &game, Audio& audio, Song const& song, input::DevicePtr dev):
   InstrumentGraph(game, audio, song, dev),
   m_level(DanceDifficulty::BEGINNER),
@@ -83,7 +84,8 @@ DanceGraph::DanceGraph(Game &game, Audio& audio, Song const& song, input::Device
   m_arrows(findFile("arrows.svg")),
   m_arrows_cursor(findFile("arrows_cursor.svg")),
   m_arrows_hold(findFile("arrows_hold.svg")),
-  m_mine(findFile("mine.svg"))
+  m_mine(findFile("mine.svg")),
+  m_insideStop()
 {
 	// Initialize some arrays
 	for (size_t i = 0; i < max_panels; i++) {
@@ -97,6 +99,7 @@ DanceGraph::DanceGraph(Game &game, Audio& audio, Song const& song, input::Device
 	changeTrack(0); // Get an initial game mode and notes for it
 	setupJoinMenu(); // Finally setup the menu
 }
+
 
 void DanceGraph::setupJoinMenu() {
 	m_menu.clear();
@@ -409,7 +412,7 @@ void DanceGraph::draw(double time) {
 
 		// Arrows on cursor
 		{
-			UseShader us(window.getShader("dancenote"));
+			UseShader us(getShader(window, "dancenote"));
 			m_uniforms.clock = static_cast<float>(time);
 			m_uniforms.noteType = 0;
 			m_uniforms.scale = getScale();
@@ -436,7 +439,7 @@ void DanceGraph::draw(double time) {
 
 void DanceGraph::drawBeats(double time) {
 	auto& window = m_game.getWindow();
-	TextureBinder tex(window, m_beat);
+	UseTexture tex(window, m_beat);
 	glutil::VertexArray va;
 	float texCoord = 0.0f;
 	double tBeg = 0.0f, tEnd;
@@ -475,7 +478,7 @@ void DanceGraph::drawNote(DanceNote& note, double time) {
 	double glow = note.hitAnim.get();
 
 	{
-		UseShader us(window.getShader("dancenote"));
+		UseShader us(getShader(window, "dancenote"));
 		m_uniforms.hitAnim = static_cast<float>(glow);
 		m_uniforms.clock = static_cast<float>(time);
 		m_uniforms.scale = getScale();

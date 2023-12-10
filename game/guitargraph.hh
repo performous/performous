@@ -1,7 +1,7 @@
 #pragma once
 
 #include "instrumentgraph.hh"
-#include "graphic/3dobject.hh"
+#include "3dobject.hh"
 
 #include <cstdint>
 
@@ -45,15 +45,6 @@ static inline bool operator==(GuitarChord const& a, GuitarChord const& b) {
 
 /// handles drawing of notes and waves
 class GuitarGraph: public InstrumentGraph {
-	enum class Difficulty : int {
-		KIDS,     // Kids
-		SUPAEASY, // Easy
-		EASY,     // Medium
-		MEDIUM,   // Hard
-		AMAZING,  // Expert
-		COUNT
-	};
-
   public:
 	/// constructor
 	GuitarGraph(Game &game, Audio& audio, Song const& song, input::DevicePtr dev, int number);
@@ -89,28 +80,6 @@ class GuitarGraph: public InstrumentGraph {
 	void drumHit(double time, unsigned layer, unsigned fret);
 	void guitarPlay(double time, input::Event const& ev);
 
-	void setupJoinMenu();
-	void updateJoinMenu();
-	void nextTrack(bool fast = false);
-	void setTrack(const std::string& track);
-	void difficultyAuto(bool tryKeepCurrent = false);
-	bool difficulty(Difficulty level, bool check_only = false);
-
-	// Graphics functions
-	Color const colorize(Color c, double time) const;
-	void drawNeckStuff(double time);  ///< Anything in neck coordinates
-	void drawNotes(double time);  ///< Frets etc.
-	void drawBar(double time, float h);
-	void drawNote(unsigned fret, Color, double tBeg, double tEnd, float whammy = 0.0f, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
-	void drawDrumfill(double tBeg, double tEnd);
-	void drawInfo(double time);
-	float getFretX(unsigned fret) { return (-2.0f + static_cast<float>(fret) - (m_drums ? 0.5f : 0.0f)) * (m_leftymode.b() ? -1 : 1); }
-	float neckWidth() const; ///< Get the currently effective neck width (0.5 or less)
-	// Chords & notes
-	void updateChords();
-	bool updateTom(unsigned int tomTrack, int fretId); // returns true if this tom track exists
-	double getNotesBeginTime() const { return m_chords.front().begin; }
-
 	// Media
 	Texture m_tail;
 	Texture m_tail_glow;
@@ -131,11 +100,38 @@ class GuitarGraph: public InstrumentGraph {
 	bool m_drums; /// are we using drums?
 
 	// Track stuff
-	Difficulty m_level;
+	enum class Difficulty : int {
+		KIDS,     // Kids
+		SUPAEASY, // Easy
+		EASY,     // Medium
+		MEDIUM,   // Hard
+		AMAZING,  // Expert
+		COUNT
+	} m_level;
+	void setupJoinMenu();
+	void updateJoinMenu();
+	void nextTrack(bool fast = false);
+	void setTrack(const std::string& track);
+	void difficultyAuto(bool tryKeepCurrent = false);
+	bool difficulty(Difficulty level, bool check_only = false);
 	InstrumentTracksConstPtr m_instrumentTracks; /// tracks
 	InstrumentTracksConstPtr::const_iterator m_track_index;
 	unsigned m_holds[max_panels]; /// active hold notes
 
+	// Graphics functions
+	Color const colorize(Color c, double time) const;
+	void drawNeckStuff(double time);  ///< Anything in neck coordinates
+	void drawNotes(double time);  ///< Frets etc.
+	void drawBar(double time, float h);
+	void drawNote(unsigned fret, Color, double tBeg, double tEnd, float whammy = 0.0f, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);
+	void drawDrumfill(double tBeg, double tEnd);
+	void drawInfo(double time);
+	float getFretX(unsigned fret) { return (-2.0f + static_cast<float>(fret) - (m_drums ? 0.5f : 0.0f)) * (m_leftymode.b() ? -1 : 1); }
+	float neckWidth() const; ///< Get the currently effective neck width (0.5 or less)
+	// Chords & notes
+	void updateChords();
+	bool updateTom(unsigned int tomTrack, int fretId); // returns true if this tom track exists
+	double getNotesBeginTime() const { return m_chords.front().begin; }
 	typedef std::vector<GuitarChord> Chords;
 	Chords m_chords;
 	Chords::iterator m_chordIt;
@@ -147,18 +143,18 @@ class GuitarGraph: public InstrumentGraph {
 
 	// Animation & misc score keeping
 	std::vector<AnimValue> m_flames[max_panels]; /// flame effect queues for each fret
-	AnimValue m_errorMeter{0.0, 2.0 };
-	AnimValue m_errorMeterFlash{ 0.0, 4.0 };
-	AnimValue m_errorMeterFade{ 0.0, 0.333 };
-	AnimValue m_drumJump{ 0.0, 12.0 };
-	AnimValue m_starpower{ 0.0, 0.1 }; /// how long the GodMode lasts (also used in fading the effect)
+	AnimValue m_errorMeter;
+	AnimValue m_errorMeterFlash;
+	AnimValue m_errorMeterFade;
+	AnimValue m_drumJump;
+	AnimValue m_starpower; /// how long the GodMode lasts (also used in fading the effect)
 	float m_starmeter; /// when this is high enough, GodMode becomes available
 	float m_drumfillHits; /// keeps track that enough hits are scored
 	float m_drumfillScore; /// max score for the notes under drum fill
 	float m_soloTotal; /// maximum solo score
 	float m_soloScore; /// score during solo
 	bool m_solo; /// are we currently playing a solo
-	bool m_hasTomTrack = false; /// true if the track has at least one tom track
+	bool m_hasTomTrack; /// true if the track has at least one tom track
 	bool m_proMode; /// true if pro drums. (it would be better to split guitar/trum tracks into sep classes)
-	double m_whammy = 0.0; /// whammy value for pitch shift
+	double m_whammy; /// whammy value for pitch shift
 };

@@ -1,10 +1,5 @@
 #include "opengl_text.hh"
 
-#include "graphic/text_renderer.hh"
-#include "graphic/lyrics_color_trans.hh"
-#include "graphic/video_driver.hh"
-#include "fontconfig/fontconfig.h"
-
 #include "libxml++-impl.hh"
 
 #include <cstdint>
@@ -12,6 +7,10 @@
 #include <iostream>
 #include <sstream>
 #include "fs.hh"
+#include "graphic/text_renderer.hh"
+#include "graphic/lyrics_color_trans.hh"
+#include "graphic/video_driver.hh"
+#include "fontconfig/fontconfig.h"
 #include <pango/pangocairo.h>
 
 void loadFonts() {

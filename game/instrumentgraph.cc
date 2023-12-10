@@ -1,6 +1,6 @@
 #include "instrumentgraph.hh"
 #include "i18n.hh"
-#include "graphic/glutil.hh"
+#include "glutil.hh"
 #include "theme.hh"
 #include "graphic/view_trans.hh"
 
@@ -15,13 +15,31 @@ namespace {
 InstrumentGraph::InstrumentGraph(Game &game, Audio& audio, Song const& song, input::DevicePtr dev):
   m_game(game),
   m_audio(audio), m_song(song),
+  m_stream(),
   m_dev(dev),
+  m_cx(0.0, 0.2), m_width(0.5, 0.4),
+  m_menu(),
   m_button(findFile("button.svg")),
   m_arrow_up(findFile("arrow_button_up.svg")),
   m_arrow_down(findFile("arrow_button_down.svg")),
   m_arrow_left(findFile("arrow_button_left.svg")),
   m_arrow_right(findFile("arrow_button_right.svg")),
-  m_text(findFile("sing_timetxt.svg"), config["graphic/text_lod"].f())
+  m_text(findFile("sing_timetxt.svg"), config["graphic/text_lod"].f()),
+  m_selectedTrack(),
+  m_selectedDifficulty(0),
+  m_rejoin(false),
+  m_leftymode(false),
+  m_pads(),
+  m_correctness(1.0, 5.0),
+  m_score(),
+  m_scoreFactor(),
+  m_starmeter(),
+  m_streak(),
+  m_longestStreak(),
+  m_bigStreak(),
+  m_countdown(3), // Display countdown 3 secs before note start
+  m_dead(),
+  m_ready()
 {
 	double time = m_audio.getPosition();
 	m_jointime = time < 0.0 ? -1.0 : time + join_delay;
@@ -31,9 +49,9 @@ InstrumentGraph::InstrumentGraph(Game &game, Audio& audio, Song const& song, inp
 	for (auto& elem: m_pressed) elem = false;
 }
 
-bool InstrumentGraph::dead() const { 
-	return m_jointime != m_jointime || m_dead >= death_delay;
-}
+InstrumentGraph::~InstrumentGraph() = default;  // For destruction of unique_ptrs (only forward-declared in header)
+
+bool InstrumentGraph::dead() const { return m_jointime != m_jointime || m_dead >= death_delay; }
 
 void InstrumentGraph::setupPauseMenu() {
 	m_menu.clear();
@@ -42,6 +60,7 @@ void InstrumentGraph::setupPauseMenu() {
 	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning"))).screen("Sing");
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"))).screen("Songs");
 }
+
 
 void InstrumentGraph::doUpdates() {
 	if (!menuOpen() && !m_ready) {

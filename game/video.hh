@@ -1,7 +1,7 @@
 #pragma once
 
 #include "animvalue.hh"
-#include "graphic/texture.hh"
+#include "texture.hh"
 #include <deque>
 #include <future>
 #include <string>

@@ -8,7 +8,7 @@
 #include "playlist.hh"
 #include "controllers.hh"
 #include "songs.hh"
-#include "graphic/texture.hh"
+#include "texture.hh"
 #include "webcam.hh"
 #include "theme.hh"
 #include "configuration.hh"

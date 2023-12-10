@@ -1,7 +1,7 @@
 ﻿#include "screen_intro.hh"
 
 #include "fs.hh"
-#include "graphic/glmath.hh"
+#include "glmath.hh"
 #include "audio.hh"
 #include "i18n.hh"
 #include "controllers.hh"
