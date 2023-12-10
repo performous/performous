@@ -4,12 +4,11 @@
 #include <string>
 
 #include "animvalue.hh"
-#include "graphic/opengl_text.hh"
-#include "graphic/texture_manager.hh"
+#include "opengl_text.hh"
 #include "graphic/window.hh"
 #include "dialog.hh"
 #include "playlist.hh"
-#include "graphic/fbo.hh"
+#include "fbo.hh"
 #include "audio.hh"
 #include "screen.hh"
 #include "i18n.hh"
@@ -74,8 +73,6 @@ class Game {
 	Window& getWindow() { return m_window; }
 	Audio& getAudio() { return m_audio; }
 
-	TextureManager& getTextureManager();
-
 private:
 	Window& m_window;
 	Audio m_audio;
@@ -84,7 +81,6 @@ public:
 	input::Controllers controllers;
 
 private:
-	TextureManager m_textureManager;
 	bool m_finished = false;
 	typedef std::map<std::string, std::unique_ptr<Screen>> screenmap_t;
 	screenmap_t screens;
@@ -96,11 +92,11 @@ private:
 	float m_timeToFadeOut;
 	float m_timeToShow;
 	std::string m_message;
-	AnimValue m_messagePopup{ 0.0, 1.0 };
+	AnimValue m_messagePopup;
 	SvgTxtTheme m_textMessage;
-	float m_loadingProgress{ 0.0f };
+	float m_loadingProgress;
 	Texture m_logo;
-	AnimValue m_logoAnim{ 0.0, 0.5 };
+	AnimValue m_logoAnim;
 	AnimValue m_dialogTimeOut;
 	// Dialog members
 	std::unique_ptr<Dialog> m_dialog;

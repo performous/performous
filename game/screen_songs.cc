@@ -541,7 +541,7 @@ void ScreenSongs::drawInstruments(Dimensions dim) const {
 		if (isTrackInside(song.instrumentTracks,TrackName::BASS)) { guitarCount++; have_bass = true; }
 	}
 
-	TextureBinder tex(getGame().getWindow(), *m_instrumentList);
+	UseTexture tex(getGame().getWindow(), *m_instrumentList);
 	float x = dim.x1();
 	// dancing
 	if (have_dance) {

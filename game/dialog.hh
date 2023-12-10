@@ -2,8 +2,8 @@
 
 #include "configuration.hh"
 #include "fs.hh"
-#include "graphic/opengl_text.hh"
-#include "graphic/texture.hh"
+#include "opengl_text.hh"
+#include "texture.hh"
 #include "animvalue.hh"
 
 /// class for printing dialogues

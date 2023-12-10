@@ -103,9 +103,9 @@ void Object3d::load(fs::path const& filepath, fs::path const& texturepath, float
 }
 
 void Object3d::draw(Window& window) {
-	UseShader us(window.getShader("3dobject"));
+	UseShader us(getShader(window, "3dobject"));
 	if (m_texture) {
-		TextureBinder tex(window, *m_texture);
+		UseTexture tex(window, *m_texture);
 		m_va.draw(GL_TRIANGLES);
 	} else {
 		m_va.draw(GL_TRIANGLES);

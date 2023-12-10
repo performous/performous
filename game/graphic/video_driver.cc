@@ -5,7 +5,7 @@
 #include "controllers.hh"
 #include "fs.hh"
 #include "glmath.hh"
-#include "graphic/bitmap.hh"
+#include "image.hh"
 #include "platform.hh"
 #include "screen.hh"
 #include "game.hh"

@@ -5,7 +5,7 @@
 #include "database.hh"
 #include "engine.hh"
 #include "fs.hh"
-#include "graphic/glutil.hh"
+#include "glutil.hh"
 #include "guitargraph.hh"
 #include "i18n.hh"
 #include "layout_singer.hh"
@@ -479,7 +479,7 @@ namespace {
 		va.texCoord(0,0).vertex(dim.x2(), dim.y1());
 		va.texCoord(0,0).vertex(dim.x1(), dim.y2());
 		va.texCoord(0,0).vertex(dim.x2(), dim.y2());
-		window.getShader("texture").bind();
+		getShader(window, "texture").bind();
 		va.draw();
 	}
 }

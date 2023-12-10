@@ -34,7 +34,7 @@ void ProgressBar::draw(Window& window, float value) {
 		break;
 	  case Mode::CIRCULAR:
 		{
-			TextureBinder texblock(window, m_bar);
+			UseTexture texblock(window, m_bar);
 			throw std::logic_error("ProgressBar::draw(): CIRCULAR not implemented yet");  // TODO: Implement
 		}
 		break;

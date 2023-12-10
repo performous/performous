@@ -1,7 +1,7 @@
 #pragma once
 
-#include "graphic/opengl_text.hh"
-#include "graphic/texture.hh"
+#include "opengl_text.hh"
+#include "texture.hh"
 #include <string>
 
 /// abstract theme class

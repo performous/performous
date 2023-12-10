@@ -4,11 +4,11 @@
 #include "audio.hh" // for AUDIO_MAX_ANALYZERS
 #include "configuration.hh"
 #include "menu.hh"
-#include "graphic/opengl_text.hh"
+#include "opengl_text.hh"
 #include "progressbar.hh"
 #include "scorewindow.hh"
 #include "screen.hh"
-#include "graphic/texture.hh"
+#include "texture.hh"
 #include "theme.hh"
 #include "instrumentgraph.hh"
 #include "instruments.hh"

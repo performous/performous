@@ -1,6 +1,6 @@
 #pragma once
 
-#include "graphic/opengl_text.hh"
+#include "opengl_text.hh"
 #include "configuration.hh"
 #include <cstdint>
 #include <functional>

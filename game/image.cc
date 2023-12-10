@@ -1,5 +1,5 @@
-#include "bitmap.hh"
 #include "fs.hh"
+#include "image.hh"
 
 #include <jpeglib.h>
 #include <png.h>
@@ -8,9 +8,6 @@
 #include <iostream>
 #include <string>
 #include <cstring>
-
-#include <boost/algorithm/string/case_conv.hpp>
-#include "svg.hh"
 
 namespace {
 	void writePngHelper(png_structp pngPtr, png_bytep data, png_size_t length) {
@@ -217,25 +214,4 @@ void Bitmap::copyFromCairo(cairo_surface_t* surface) {
 	unsigned height = static_cast<unsigned>(cairo_image_surface_get_height(surface));
 	resize(width, height);
 	std::memcpy(&buf[0], cairo_image_surface_get_data(surface), buf.size());
-}
-
-/// Load a file from disk into a buffer
-void load(Bitmap& bitmap, fs::path const& name) {
-	try {
-		std::string ext = boost::algorithm::to_lower_copy(name.extension().string());
-		if (!fs::is_regular_file(name)) throw std::runtime_error("File not found: " + name.string());
-		else if (ext == ".svg") 
-			loadSVG(bitmap, name);
-		else if (ext == ".jpg" || ext == ".jpeg")
-			loadJPEG(bitmap, name);
-		else if (ext == ".png") 
-			loadPNG(bitmap, name);
-		else 
-			throw std::runtime_error("Unknown image file format: " + name.string());
-
-		bitmap.filepath = name;
-	}
-	catch (std::exception const& e) {
-		std::clog << "image/error: " << e.what() << std::endl;
-	}
 }

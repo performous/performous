@@ -1,7 +1,7 @@
 #pragma once
 
 #include "screen.hh"
-#include "graphic/glutil.hh"
+#include "glutil.hh"
 #include "libda/portaudio.hpp"
 #include "theme.hh"
 #include <map>

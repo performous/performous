@@ -82,13 +82,9 @@ struct UseShader {
 		glGetIntegerv(GL_CURRENT_PROGRAM, &m_old);
 		m_shader.bind();
 	}
-	~UseShader() { 
-		glUseProgram(m_old);
-	}
+	~UseShader() { glUseProgram(m_old); }
 	/// Access the bound shader
-	Shader& operator()() { 
-		return m_shader;
-	}
+	Shader& operator()() { return m_shader; }
 
   private:
 	Shader& m_shader;
