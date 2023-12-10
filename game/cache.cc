@@ -13,4 +13,7 @@ namespace cache {
 
 		return getCacheDir() / "misc" / fs::path(fullpath).relative_path() / cache_basename;
 	}
+	void clear() {
+		fs::remove_all(getCacheDir() / "misc");
+	}
 }
