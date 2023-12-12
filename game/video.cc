@@ -94,7 +94,8 @@ Video::Video(fs::path const& _videoFile, double videoGap): m_videoGap(videoGap),
 }
 
 void Video::prepare(double time) {
-	if (std::isnan(time)) return;
+	if (std::isnan(time)) 
+		return;
 
 	// shift video timestamp if gap is declared in song config
 	time += m_videoGap;
@@ -111,7 +112,8 @@ void Video::render(Window& window, double time) {
 	double tdist = std::abs(m_textureTime - time);
 	m_alpha.setTarget(tdist < 0.4 ? 1.2f : -0.5f);
 	float alpha = static_cast<float>(clamp(m_alpha.get()));
-	if (alpha == 0.0f) return;
+	if (alpha == 0.0f)
+		return;
 	ColorTrans c(window, Color::alpha(alpha));
 	m_texture.draw(window);
 }
