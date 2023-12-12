@@ -48,6 +48,8 @@ public:
 	void update() override;
 
 private:
-	TextureLoadingId m_loadingId{ TextureLoadingId(-1)};
+	static TextureLoadingId None;
+
+	TextureLoadingId m_loadingId{ None };
 };
 
