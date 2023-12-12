@@ -57,6 +57,7 @@ namespace {
                     if (job.second.name == name) {
                         job.second.done = true;  // Mark the job completed
                         job.second.bitmap.swap(bitmap);  // Store the bitmap (if we got any)
+                        break;
                     }
                 }
             }
