@@ -127,11 +127,11 @@ void ScreenSing::setupVocals() {
 		//if (shownTracks.size() > 2) throw std::runtime_error("Too many tracks chosen. Only two vocal tracks can be used simultaneously.")
 		for (auto const& trk: shownTracks) {
 			const auto scaler = NoteGraphScalerFactory(config).create(*trk);
-			auto layoutSingerPtr = std::unique_ptr<LayoutSinger>(std::make_unique<LayoutSinger>(*trk, m_database, scaler, theme));
-			m_layout_singer.push_back(std::move(layoutSingerPtr));
+			m_layout_singer.push_back(std::make_unique<LayoutSinger>(*trk, m_database, scaler, getGame().getTextureManager(), theme));
 		}
 		// Note: Engine maps tracks with analyzers 1:1. If user doesn't have mics, we still want to have singer layout enabled but without engine...
-		if (!analyzers.empty()) m_engine = std::make_unique<Engine>(m_audio, selectedTracks, m_database);
+		if (!analyzers.empty())
+			m_engine = std::make_unique<Engine>(m_audio, selectedTracks, m_database);
 	}
 	createPauseMenu();
 	bool sameVoice = true;
@@ -168,7 +168,8 @@ void ScreenSing::reloadGL() {
 	m_help = std::make_unique<Texture>(findFile("instrumenthelp.svg"));
 	m_progress = std::make_unique<ProgressBar>(findFile("sing_progressbg.svg"), findFile("sing_progressfg.svg"), ProgressBar::Mode::HORIZONTAL, 0.01f, 0.01f, true);
 	// Load background
-	if (!m_song->background.empty()) m_background = std::make_unique<Texture>(m_song->background);
+	if (!m_song->background.empty()) 
+		m_background = std::make_unique<Texture>(m_song->background);
 }
 
 void ScreenSing::exit() {
@@ -188,7 +189,8 @@ void ScreenSing::exit() {
 	m_menuTheme.reset();
 	theme.reset();
 	m_audio.fadeout(getGame(), 0);
-	if (m_audio.isPaused()) m_audio.togglePause();
+	if (m_audio.isPaused())
+		m_audio.togglePause();
 	getGame().showLogo();
 }
 
@@ -286,13 +288,18 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	Song::Status status = m_song->status(time, this);
 	// When score window is displayed
 	if (m_score_window.get()) {
-		if (nav == input::NavButton::START || nav == input::NavButton::CANCEL) activateNextScreen();
+		if (nav == input::NavButton::START || nav == input::NavButton::CANCEL)
+			activateNextScreen();
 		return;  // The rest are only available when score window is not displayed
 	}
 	// Instant quit with CANCEL at the very beginning
 	if (nav == input::NavButton::CANCEL && time < 1.0) {
-		if (m_menu.isOpen()) { m_menu.moveToLast(); }
-		else { getGame().activateScreen(config["game/autoplay"].b() ? "Songs" : "Playlist"); }
+		if (m_menu.isOpen()) {
+			m_menu.moveToLast();
+		}
+		else {
+			getGame().activateScreen(config["game/autoplay"].b() ? "Songs" : "Playlist");
+		}
 		return;
 	}
 
@@ -303,23 +310,30 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 			input::DevType type = input::DevType::GENERIC;
 			std::string msg;
 			for (input::Event ev; dev->getEvent(ev);) {
-				if (ev.value == 0.0) continue;
+				if (ev.value == 0.0)
+					continue;
 				if (dev->type == input::DevType::DANCEPAD && m_song->hasDance()) {
-					if (ev.button == input::ButtonId::DANCEPAD_UP) type = dev->type;
-					else msg = dev->source.isKeyboard() ? _("Press UP to join dance!") : _("Step UP to join!");
+					if (ev.button == input::ButtonId::DANCEPAD_UP)
+						type = dev->type;
+					else
+						msg = dev->source.isKeyboard() ? _("Press UP to join dance!") : _("Step UP to join!");
 				}
 				else if (dev->type == input::DevType::GUITAR && m_song->hasGuitars()) {
-					if (ev.button == input::ButtonId::GUITAR_GREEN) type = dev->type;
+					if (ev.button == input::ButtonId::GUITAR_GREEN)
+						type = dev->type;
 					else if (ev.button != input::ButtonId::GUITAR_WHAMMY && ev.button != input::ButtonId::GUITAR_GODMODE) {
 						msg = dev->source.isKeyboard() ? _("Press 1 to join guitar!") : _("Press GREEN to join!");
 					}
 				}
 				else if (dev->type == input::DevType::DRUMS && m_song->hasDrums()) {
-					if (ev.button == input::ButtonId::DRUMS_KICK) type = dev->type;
-					else msg = dev->source.isKeyboard() ? _("Press SPACE to join drums!") : _("KICK to join!");
+					if (ev.button == input::ButtonId::DRUMS_KICK)
+						type = dev->type;
+					else
+						msg = dev->source.isKeyboard() ? _("Press SPACE to join drums!") : _("KICK to join!");
 				}
 			}
-			if (!msg.empty()) getGame().flashMessage(msg, 0.0f, 0.1f, 0.1f);
+			if (!msg.empty())
+				getGame().flashMessage(msg, 0.0f, 0.1f, 0.1f);
 			else if (type == input::DevType::DANCEPAD)
 				m_instruments.push_back(std::make_unique<DanceGraph>(getGame(), m_audio, *m_song, dev));
 			else if (type != input::DevType::GENERIC)
@@ -336,22 +350,42 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	// Global/singer pause menu navigation
 	if (m_menu.isOpen()) {
 		int do_action = 0;
-		if (nav == input::NavButton::START) { do_action = 1; }
+		if (nav == input::NavButton::START) {
+			do_action = 1;
+		}
 		else if (nav == input::NavButton::LEFT) {
-			if (m_menu.current().type == MenuOption::Type::CHANGE_VALUE) { do_action = -1; }
-			else { m_menu.move(-1); return; }
+			if (m_menu.current().type == MenuOption::Type::CHANGE_VALUE) {
+				do_action = -1;
+			}
+			else {
+				m_menu.move(-1);
+				return;
+			}
 		}
 		else if (nav == input::NavButton::RIGHT) {
-			if (m_menu.current().type == MenuOption::Type::CHANGE_VALUE) { do_action = 1; }
-			else { m_menu.move(1); return; }
+			if (m_menu.current().type == MenuOption::Type::CHANGE_VALUE) {
+				do_action = 1;
 			}
-		else if (nav == input::NavButton::DOWN) { m_menu.move(1); return; }
-		else if (nav == input::NavButton::UP) { m_menu.move(-1); return; }
+			else {
+				m_menu.move(1);
+				return;
+			}
+		}
+		else if (nav == input::NavButton::DOWN) {
+			m_menu.move(1);
+			return;
+		}
+		else if (nav == input::NavButton::UP) {
+			m_menu.move(-1);
+			return;
+		}
 
 		if (do_action != 0) {
 			std::string currentOption = m_menu.current().getVirtName();
 			m_menu.action(getGame(), do_action);
-			if (currentOption == "song/duet") { prepareVoicesMenu(m_menu.curIndex()); }
+			if (currentOption == "song/duet") {
+				prepareVoicesMenu(m_menu.curIndex());
+			}
 			// Did the action close the menu?
 			if (!m_menu.isOpen() && m_audio.isPaused()) {
 				m_audio.togglePause();
@@ -363,20 +397,24 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	if (nav == input::NavButton::START && m_instruments.empty() && !m_layout_singer.empty() && !m_audio.isPaused()) {
 		// Open score dialog early
 		if (status == Song::Status::FINISHED) {
-			if (m_engine) m_engine->kill(); // Kill the engine thread
+			if (m_engine)
+				m_engine->kill(); // Kill the engine thread
 			m_score_window = std::make_unique<ScoreWindow>(getGame(), m_instruments, m_database); // Song finished, but no score window -> show it
 		}
 		// Skip instrumental breaks
 		else if (status == Song::Status::INSTRUMENTAL_BREAK) {
-			if (time < 0) m_audio.seek(0.0);
+			if (time < 0)
+				m_audio.seek(0.0);
 			else {
 				// TODO: Instead of calculating here, calculate instrumental breaks right after song loading and store in Song data structures
 				double diff = getNaN();
 				for (size_t i = 0; i < m_layout_singer.size(); ++i) {
 					double d = m_layout_singer[i]->lyrics_begin() - 3.0 - time;
-					if (!(d > diff)) diff = d;  // Store smallest d in diff (notice NaN handling)
+					if (!(d > diff))
+						diff = d;  // Store smallest d in diff (notice NaN handling)
 				}
-				if (diff > 0.0) m_audio.seek(diff);
+				if (diff > 0.0)
+					m_audio.seek(diff);
 			}
 		}
 	}
@@ -386,8 +424,11 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 void ScreenSing::manageEvent(SDL_Event event) {
 	keyPressed = true;
 	// Check to see if a menu is open and bail out before changes can be made
-	if (m_score_window.get() || m_menu.isOpen()) return;
-	for (auto& i: m_instruments) if (!i->menuOpen()) return;
+	if (m_score_window.get() || m_menu.isOpen())
+		return;
+	for (auto& i: m_instruments)
+		if (!i->menuOpen())
+			return;
 	double time = m_audio.getPosition();
 	SDL_Scancode key = event.key.keysym.scancode;
 	// Ctrl combinations that can be used while performing
@@ -397,22 +438,26 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			++config["audio/suppress_center_channel"];
 			dispInFlash(getGame(), config["audio/suppress_center_channel"]);
 		}
-		if (key == SDL_SCANCODE_S) m_audio.toggleSynth(m_song->getVocalTrack(m_selectedTrack).notes);
+		if (key == SDL_SCANCODE_S)
+			m_audio.toggleSynth(m_song->getVocalTrack(m_selectedTrack).notes);
 		if (key == SDL_SCANCODE_V) {
 			config["audio/mute_vocals_track"].b() = !config["audio/mute_vocals_track"].b();
 			m_audio.streamFade("Vocals", config["audio/mute_vocals_track"].b() ? 0.0 : 1.0);
 			dispInFlash(getGame(), config["audio/mute_vocals_track"]);
 		}
 		if (key == SDL_SCANCODE_K)  { // Toggle karaoke mode
-			if(config["game/karaoke_mode"].ui() >=2) config["game/karaoke_mode"].ui() = 0;
-			else ++config["game/karaoke_mode"];
+			if(config["game/karaoke_mode"].ui() >=2)
+				config["game/karaoke_mode"].ui() = 0;
+			else
+				++config["game/karaoke_mode"];
 			dispInFlash(getGame(), config["game/karaoke_mode"]);
 		}
 		if (key == SDL_SCANCODE_H) {
 			config["game/Textstyle"].ui() ? config["game/Textstyle"].ui() = 0 : ++config["game/Textstyle"].ui();
 			dispInFlash(getGame(), config["game/Textstyle"]);
 			}
-		if (key == SDL_SCANCODE_W) dispInFlash(getGame(), ++config["game/pitch"]); // Toggle pitch wave
+		if (key == SDL_SCANCODE_W)
+			dispInFlash(getGame(), ++config["game/pitch"]); // Toggle pitch wave
 		// Toggle webcam
 		if (key == SDL_SCANCODE_A && Webcam::enabled()) {
 			// Initialize if we haven't done that already
@@ -435,14 +480,19 @@ void ScreenSing::manageEvent(SDL_Event event) {
 		bool seekback = false;
 
 		if (m_song->danceTracks.empty()) { // Seeking backwards is currently not permitted for dance songs
-			if (key == SDL_SCANCODE_HOME) { m_audio.seekPos(0.0); seekback = true; }
+			if (key == SDL_SCANCODE_HOME) {
+				m_audio.seekPos(0.0);
+				seekback = true;
+			}
 			if (key == SDL_SCANCODE_LEFT) {
 				Song::SongSection section("error", 0);
 				if (m_song->getPrevSection(m_audio.getPosition(), section)) {
 					m_audio.seekPos(section.begin);
 					// TODO: display popup with section.name here
 					std::cout << section.name << std::endl;
-				} else m_audio.seek(-5.0);
+				}
+				else
+					m_audio.seek(-5.0);
 				seekback = true;
 			}
 		}
@@ -452,7 +502,9 @@ void ScreenSing::manageEvent(SDL_Event event) {
 				m_audio.seekPos(section.begin);
 				// TODO: display popup with section.name here
 				std::cout << section.name << std::endl;
-			} else m_audio.seek(5.0);
+			}
+			else
+				m_audio.seek(5.0);
 		}
 
 		// Some things must be reset after seeking backwards
@@ -461,7 +513,9 @@ void ScreenSing::manageEvent(SDL_Event event) {
 				m_layout_singer[i]->reset();
 		// Reload current song
 		if (key == SDL_SCANCODE_R) {
-			exit(); m_song->reload(); enter();
+			exit();
+			m_song->reload();
+			enter();
 			m_audio.seek(time);
 		}
 	}
@@ -488,13 +542,17 @@ void ScreenSing::prepare() {
 	// Enable/disable controllers as needed (mostly so that keyboard navigation will not be obstructed).
 	getGame().controllers.enableEvents(m_song->hasControllers() && !m_menu.isOpen() && !m_score_window.get());
 	double time = m_audio.getPosition();
-	if (m_video) m_video->prepare(time);
+	if (m_video)
+		m_video->prepare(time);
 	// Menu mangling
 	// We don't allow instrument menus during global menu
 	// except for joining, in which case global menu is closed
 	if (m_menu.isOpen()) {
 		for (auto& i: m_instruments) {
-			if (i->joining(time)) m_menu.close(); else i->toggleMenu(0);
+			if (i->joining(time))
+				m_menu.close();
+			else
+				i->toggleMenu(0);
 		}
 	}
 }
@@ -502,9 +560,12 @@ void ScreenSing::prepare() {
 /// Test if a given device type can join the current song.
 // TODO: Somehow avoid duplicating these same checks in ScreenSing::prepare.
 bool ScreenSing::devCanParticipate(input::DevType const& devType) const {
-	if (devType == input::DevType::DANCEPAD && m_song->hasDance()) return true;
-	if (devType == input::DevType::GUITAR && m_song->hasGuitars()) return true;
-	if (devType == input::DevType::DRUMS && m_song->hasDrums()) return true;
+	if (devType == input::DevType::DANCEPAD && m_song->hasDance())
+		return true;
+	if (devType == input::DevType::GUITAR && m_song->hasGuitars())
+		return true;
+	if (devType == input::DevType::DRUMS && m_song->hasDrums())
+		return true;
 	return false;
 }
 
@@ -527,9 +588,11 @@ void ScreenSing::draw() {
 		Transform ft(window, farTransform());
 		float ar = arMax;
 		// Background image
-		if (!m_background || m_background->empty()) m_background = std::make_unique<Texture>(m_backgrounds.getRandom());
+		if (!m_background || m_background->empty())
+			m_background = std::make_unique<Texture>(m_backgrounds.getRandom());
 		ar = m_background->dimensions.ar();
-		if (ar > arMax || (m_video && ar > arMin)) fillBG(window);  // Fill white background to avoid black borders
+		if (ar > arMax || (m_video && ar > arMin))
+			fillBG(window);  // Fill white background to avoid black borders
 		m_background->draw(window);
 		// Webcam
 		if (m_cam && config["graphic/webcam"].b())
@@ -538,7 +601,8 @@ void ScreenSing::draw() {
 		if (m_video) {
 			m_video->render(window, time);
 			float tmp = m_video->dimensions().ar();
-			if (tmp > 0.0f) ar = tmp;
+			if (tmp > 0.0f)
+				ar = tmp;
 		}
 		// Top/bottom borders
 		ar = clamp(ar, arMin, arMax);
@@ -549,7 +613,8 @@ void ScreenSing::draw() {
 		theme->bg_top.draw(window);
 	}
 
-	for (unsigned i = 0; i < m_layout_singer.size(); ++i) m_layout_singer[i]->hideLyrics(m_audio.isPaused());
+	for (unsigned i = 0; i < m_layout_singer.size(); ++i)
+		m_layout_singer[i]->hideLyrics(m_audio.isPaused());
 
 	instrumentLayout(time);
 
@@ -620,9 +685,15 @@ void ScreenSing::draw() {
 		if (m_score_window.get()) {
 			// Score window has been created (we are near the end)
 			if (m_score_window->empty()) {  // No players to display scores for
-				if (!m_audio.isPlaying()) { activateNextScreen(); return; }
+				if (!m_audio.isPlaying()) {
+					activateNextScreen();
+					return;
+				}
 			} else {  // Window being displayed
-				if (m_quitTimer.get() == 0.0 && !m_audio.isPaused()) { activateNextScreen(); return; }
+				if (m_quitTimer.get() == 0.0 && !m_audio.isPaused()) {
+					activateNextScreen();
+					return;
+				}
 				m_score_window->draw();
 			}
 		}
@@ -630,7 +701,8 @@ void ScreenSing::draw() {
 		  && m_audio.getLength() - time <= (m_song->instrumentTracks.empty() && m_song->danceTracks.empty() ? 3.0 : 0.2) )) {
 			// Time to create the score window
 			m_quitTimer.setValue(config["game/results_timeout"].ui());
-			if (m_engine) m_engine->kill(); // kill the engine thread (to avoid consuming memory)
+			if (m_engine)
+				m_engine->kill(); // kill the engine thread (to avoid consuming memory)
 			m_score_window = std::make_unique<ScoreWindow>(getGame(), m_instruments, m_database);
 		}
 	}
@@ -649,7 +721,8 @@ void ScreenSing::draw() {
 }
 
 void ScreenSing::drawMenu() {
-	if (m_menu.empty()) return;
+	if (m_menu.empty())
+		return;
 	auto& window = getGame().getWindow();
 	// Some helper vars
 	ThemeInstrumentMenu& th = *m_menuTheme;
@@ -682,7 +755,7 @@ void ScreenSing::drawMenu() {
 				m_player_icon->dimensions.right(x).fixedHeight(0.040f).center(y);
 				m_player_icon->draw(window);
 			}
-			player++;
+			++player;
 		}
 
 		w = std::max(w, txt->w() + 2 * step); // Calculate the widest entry

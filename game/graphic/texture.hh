@@ -31,7 +31,7 @@ public:
 	Texture() = default;
 	/// creates texture from file
 	Texture(fs::path const& filename);
-	Texture(TextureReferencePtr textureReference) : OpenGLTexture(textureReference) {}
+	Texture(TextureReferencePtr textureReference);
 	~Texture();
 
 	bool empty() const { return width() * height() == 0.f; } ///< Test if the loading has failed
@@ -48,6 +48,8 @@ public:
 	void update() override;
 
 private:
-	TextureLoadingId m_loadingId{ TextureLoadingId(-1)};
+	static TextureLoadingId None;
+
+	TextureLoadingId m_loadingId{ None };
 };
 

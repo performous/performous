@@ -119,7 +119,7 @@ class GuitarGraph: public InstrumentGraph {
 	Texture m_flame_godmode;
 	Texture m_tap; /// image for 2d HOPO note cap
 	Texture m_neckglow; /// image for the glow from the bottom of the neck
-	glmath::vec4 m_neckglowColor;
+	glmath::vec4 m_neckglowColor{};
 	Object3d m_fretObj; /// 3d object for regular note
 	Object3d m_tappableObj; /// 3d object for the HOPO note cap
 	std::vector<std::string> m_samples; /// sound effects
@@ -128,10 +128,10 @@ class GuitarGraph: public InstrumentGraph {
 	std::unique_ptr<SvgTxtThemeSimple> m_streakText;
 
 	// Flags
-	bool m_drums; /// are we using drums?
+	bool m_drums = false; /// are we using drums?
 
 	// Track stuff
-	Difficulty m_level;
+	Difficulty m_level = Difficulty::MEDIUM;
 	InstrumentTracksConstPtr m_instrumentTracks; /// tracks
 	InstrumentTracksConstPtr::const_iterator m_track_index;
 	unsigned m_holds[max_panels]; /// active hold notes
@@ -152,13 +152,13 @@ class GuitarGraph: public InstrumentGraph {
 	AnimValue m_errorMeterFade{ 0.0, 0.333 };
 	AnimValue m_drumJump{ 0.0, 12.0 };
 	AnimValue m_starpower{ 0.0, 0.1 }; /// how long the GodMode lasts (also used in fading the effect)
-	float m_starmeter; /// when this is high enough, GodMode becomes available
-	float m_drumfillHits; /// keeps track that enough hits are scored
-	float m_drumfillScore; /// max score for the notes under drum fill
-	float m_soloTotal; /// maximum solo score
-	float m_soloScore; /// score during solo
-	bool m_solo; /// are we currently playing a solo
+	float m_starmeter = 0.f; /// when this is high enough, GodMode becomes available
+	float m_drumfillHits = 0.f; /// keeps track that enough hits are scored
+	float m_drumfillScore = 0.f; /// max score for the notes under drum fill
+	float m_soloTotal = 0.f; /// maximum solo score
+	float m_soloScore = 0.f; /// score during solo
+	bool m_solo = false; /// are we currently playing a solo
 	bool m_hasTomTrack = false; /// true if the track has at least one tom track
-	bool m_proMode; /// true if pro drums. (it would be better to split guitar/trum tracks into sep classes)
+	bool m_proMode = false; /// true if pro drums. (it would be better to split guitar/trum tracks into sep classes)
 	double m_whammy = 0.0; /// whammy value for pitch shift
 };
