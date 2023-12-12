@@ -289,7 +289,7 @@ void ScreenSongs::drawJukebox() {
 	double diff = len - pos;
 	if (pos < diff) 
 		diff = pos;  // Diff from beginning instead of from end
-	if (!m_songbg.get() && !m_video.get())
+	if (!m_songbg && !m_video)
 		diff = 0.0;  // Always display song name if there is no background
 	if (diff < 3.0) {
 		Song& song = m_songs.current();
