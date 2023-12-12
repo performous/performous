@@ -18,6 +18,8 @@
 
 void updateTextures();
 
+TextureLoadingId Texture::None{ TextureLoadingId(-1) };
+
 Texture::Texture(fs::path const& filename) { 
     m_loadingId = ::loadTexture(this, filename);
 }
@@ -28,7 +30,8 @@ Texture::Texture(TextureReferencePtr textureReference)
 }
 
 Texture::~Texture() {
-    ::abortTextureLoading(m_loadingId);
+    if(m_loadingId != None)
+        ::abortTextureLoading(m_loadingId);
 }
 
 void Texture::load(Bitmap const& bitmap, bool isText) {

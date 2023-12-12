@@ -254,7 +254,7 @@ void ScreenSongs::update() {
 		fs::path const& background = song->background.empty() ? song->cover : song->background;
 		if (!background.empty()) 
 			try {
-				m_songbg = std::make_unique<Texture>(background);
+				m_songbg = std::make_unique<Texture>(getGame().getTextureManager().get(background));
 			} 
 			catch (std::exception const&) {
 			}
@@ -316,7 +316,7 @@ void ScreenSongs::drawMultimedia() {
 		double length = m_audio.getLength();
 		double time = clamp(m_audio.getPosition() - config["audio/video_delay"].f(), 0.0, length);
 		m_songbg_default->draw(window);   // Default bg
-		if (m_songbg.get() && !m_video.get()) {
+		if (m_songbg && !m_video) {
 			if (m_songbg->width() > 512 && m_songbg->dimensions.ar() > 1.1f) {
 				// Full screen mode
 				float s = static_cast<float>(sin(m_clock.get()) * 0.15 + 1.15);
@@ -328,7 +328,7 @@ void ScreenSongs::drawMultimedia() {
 				m_songbg->draw(window, m_songbg->dimensions, TexCoords(static_cast<float>(x), 0.0f, static_cast<float>(x + 5.0), 5.0f));
 			}
 		}
-		if (m_video.get()) 
+		if (m_video) 
 			m_video->render(window, time);
 	}
 	if (!m_jukebox) {
