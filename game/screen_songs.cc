@@ -500,7 +500,7 @@ void ScreenSongs::drawCovers() {
 		if (m_menuPos == 1 /* Cover browser */ && idx + i == currentId) {
 			c = static_cast<float>(beat);
 
-			if (isNaN(c))
+			if (std::isnan(c))
 				c = 1.f;
 			else
 				c = clamp(c);

@@ -13,16 +13,6 @@ template <> float sconv(std::string const& s) { return std::stof(s); }
 template <> double sconv(std::string const& s) { return std::stod(s); }
 template <> std::string sconv(std::string const& s) { return s; }
 
-bool isNaN(float f) {
-#ifdef _WIN32
-	return _isnanf(f);
-#elif defined(__APPLE__)
-	return isnan(f);
-#else
-	return isnanf(f);
-#endif
-}
-
 /** Converts a std::string into an unsigned int. **/
 unsigned stou(std::string const & str, size_t * idx, int base) {
 	std::uint64_t result = std::stoul(str, idx, base);

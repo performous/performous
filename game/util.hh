@@ -28,8 +28,6 @@ static inline constexpr double getNaN() { return std::numeric_limits<double>::qu
 /** A convenient way for getting infs **/
 static inline constexpr double getInf() { return std::numeric_limits<double>::infinity(); }
 
-bool isNaN(float);
-
 /** OpenGL smoothstep function **/
 template <typename T> T smoothstep(T edge0, T edge1, T x) {
 	x = clamp((x - edge0) / (edge1 - edge0));
