@@ -41,4 +41,59 @@ namespace {
 		EXPECT_EQ("02:01:00 1970-01-01", format(time, "%H:%M:%S %Y-%m-%d", true));
 		EXPECT_EQ("02:01:00 1970-01-01", format(time, "%X %Y-%m-%d", true));
 	}
+
+	TEST(UnitTest_Utils, startsWithUTF8BOM_empty) {
+		EXPECT_FALSE(startsWithUTF8BOM(""));
+	}
+
+	TEST(UnitTest_Utils, startsWithUTF8BOM_bom) {
+		auto const bom = std::string{ char(0xEF), char(0xBB), char(0xBF) };
+
+		EXPECT_TRUE(startsWithUTF8BOM(bom));
+	}
+
+	TEST(UnitTest_Utils, startsWithUTF8BOM_bom_and_text) {
+		auto const bom = std::string{ char(0xEF), char(0xBB), char(0xBF) };
+
+		EXPECT_TRUE(startsWithUTF8BOM(bom + "text"));
+	}
+
+	TEST(UnitTest_Utils, isText_text) {
+		EXPECT_TRUE(isText("text"));
+	}
+
+	TEST(UnitTest_Utils, isText_text_and_binary) {
+		auto const binary = std::string{ char(0x01), char(0x02), char(0x03) };
+		EXPECT_FALSE(isText("text" + binary + "other"));
+	}
+
+	TEST(UnitTest_Utils, isText_bom_and_text) {
+		auto const bom = std::string{ char(0xEF), char(0xBB), char(0xBF) };
+
+		EXPECT_TRUE(isText(bom + "text"));
+	}
+
+	TEST(UnitTest_Utils, isText_bom_and_text_and_binary) {
+		auto const bom = std::string{ char(0xEF), char(0xBB), char(0xBF) };
+
+		EXPECT_TRUE(isText(bom + "text\0other"));
+	}
+
+	TEST(UnitTest_Utils, isText_binary) {
+		auto const binary = std::string{ char(0x01), char(0x02), char(0x03) };
+
+		EXPECT_FALSE(isText(binary));
+	}
+
+	TEST(UnitTest_Utils, isText_with_nl) {
+		EXPECT_TRUE(isText("first\nsecond"));
+	}
+
+	TEST(UnitTest_Utils, isText_with_lf) {
+		EXPECT_TRUE(isText("first\rsecond"));
+	}
+
+	TEST(UnitTest_Utils, isText_with_tab) {
+		EXPECT_TRUE(isText("first\tsecond"));
+	}
 }
