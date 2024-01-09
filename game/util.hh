@@ -57,6 +57,9 @@ std::string replaceFirst(std::string const& s, std::string const& from, std::str
 
 bool isText(std::string const& s, size_t bytesToCheck = 32);
 
+bool startsWithUTF8BOM(std::string const& s);
+bool isText(std::string const& s, size_t bytesToCheck = 32);
+
 /** Templated conversion from strongly typed enums to the underlying type. **/
 template <typename E>
 constexpr auto to_underlying(E e) noexcept -> std::enable_if_t<std::is_enum<E>::value, std::underlying_type_t<E>> {
