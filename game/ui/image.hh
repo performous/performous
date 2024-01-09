@@ -2,6 +2,7 @@
 
 #include "control.hh"
 #include "graphic/texture.hh"
+#include "imagemodifier/iimagemodifier.hh"
 
 #include <memory>
 
@@ -16,11 +17,18 @@ class Image : public Control {
 	void canBeFocused(bool value) { m_canBeFocused = value; }
 	void draw(GraphicContext&) override;
 
+	void setModifier(ImageModifier);
+
 	void initialize(Game&) override;
+
+	Image& setBackgroundDrawing(bool draw);
+	bool getBackgroundDrawing() const;
 
   private:
 	Texture m_texture;
 	Texture m_background;
+	bool m_drawBackground = true;
 	std::string m_path;
 	bool m_canBeFocused = false;
+	ImageModifier m_modifier;
 };

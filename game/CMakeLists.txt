@@ -8,6 +8,7 @@ file(GLOB SOURCE_FILES
 	"ui/layout/*.cc"
 	"ui/path/*.cc"
 	"ui/effect/*.cc"
+	"ui/imagemodifier/*.cc"
 	"utils/*.cc"
 )
 file(GLOB HEADER_FILES
@@ -18,6 +19,7 @@ file(GLOB HEADER_FILES
 	"ui/layout/*.hh"
 	"ui/path/*.hh"
 	"ui/effect/*.hh"
+	"ui/imagemodifier/*.hh"
 	"utils/*.hh"
 	"libda/*.hpp"
 )

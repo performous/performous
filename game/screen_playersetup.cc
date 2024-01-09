@@ -4,6 +4,7 @@
 #include "i18n.hh"
 #include "controllers.hh"
 #include "database.hh"
+#include <ui/imagemodifier/dimmer.hh>
 
 namespace {
 	void loadAvatars(std::vector<std::string>& avatars) {
@@ -194,6 +195,7 @@ void ScreenPlayerSetup::initializeControls() {
 	auto y2 = y + (avatarHeight - avatarSideHeight) * 0.5f;
 	m_panel.addControl(m_avatarPrevious);
 	m_avatarPrevious.setGeometry(x, y2, avatarSideWidth, avatarSideHeight);
+	m_avatarPrevious.setModifier(std::make_unique<Dimmer>(0.7f));
 	x += avatarSideWidth + horizontalSpace * 0.05f;
 	m_panel.addControl(m_avatar);
 	m_avatar.setGeometry(x, y, avatarWidth, avatarHeight);
@@ -210,6 +212,7 @@ void ScreenPlayerSetup::initializeControls() {
 	x += avatarWidth + horizontalSpace * 0.05f;
 	m_panel.addControl(m_avatarNext);
 	m_avatarNext.setGeometry(x, y2, avatarSideWidth, avatarSideHeight);
+	m_avatarNext.setModifier(std::make_unique<Dimmer>(0.7f));
 
 	y += avatarHeight + verticalSpace;
 
