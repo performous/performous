@@ -21,6 +21,6 @@ void Dimmer::dimm(float value) {
     m_value = value;
 }
 
-ImageModification Dimmer::modify(Image const& image, Window& window) {
+ImageModification Dimmer::modify(Image const&, Window& window) {
     return std::make_shared<ImageDimming>(std::make_unique<ColorTrans>(window, Color::alpha(m_value)));
 }

@@ -20,7 +20,7 @@ void Colorizer::setColor(Color const& color) {
     m_color = color;
 }
 
-ImageModification Colorizer::modify(Image const& image, Window& window) {
+ImageModification Colorizer::modify(Image const&, Window& window) {
     return std::make_shared<ImageColorizer>(std::make_unique<ColorTrans>(window, m_color));
 }
 

@@ -55,14 +55,6 @@ namespace SongParserUtil {
 		if (!s.empty() && (*s.rbegin() == ch)) { s.erase(s.size() - 1); }
 	}
 }
-namespace {
-	bool isText(std::string const& s) {
-		if (s[0] < 32)
-			return false;
-
-		return true;
-	}
-}
 
 SongParser::SongParser(Song& s) : m_song(s) {
 	try {
@@ -79,9 +71,6 @@ SongParser::SongParser(Song& s) : m_song(s) {
 		}
 		if (!isText(m_ss.str())) {
 			throw SongParserException(s, "Does not look like a song file (binary)", 1, true);
-		}
-		if (!isText(m_ss.str())) {
-			throw SongParserException(s, "Does not look like a song file (not text)", 1, true);
 		}
 		// Convert m_ss; filename supplied for possible warning messages
 		if (xmlCheck(m_ss.str())) {

@@ -47,7 +47,10 @@ void ScreenSing::enter() {
 	if (config["graphic/webcam"].b() && Webcam::enabled()) {
 		try {
 			m_cam = std::make_unique<Webcam>(getGame().getWindow(), config["graphic/webcamid"].ui());
-		} catch (std::exception& e) { std::cout << e.what() << std::endl; };
+		} 
+		catch (std::exception& e) {
+			std::cout << e.what() << std::endl; 
+		};
 	}
 	// Load video
 	getGame().loading(_("Loading video..."), 0.2f);
@@ -57,7 +60,9 @@ void ScreenSing::enter() {
 	reloadGL();
 	// Load song notes
 	getGame().loading(_("Loading song..."), 0.4f);
-	try { m_song->loadNotes(false /* don't ignore errors */); }
+	try { 
+		m_song->loadNotes(false /* don't ignore errors */);
+	}
 	catch (SongParserException& e) {
 		std::clog << e;
 		getGame().activateScreen("Songs");
@@ -82,33 +87,35 @@ void ScreenSing::enter() {
 }
 
 void ScreenSing::prepareVoicesMenu(unsigned moveSelectionTo) {
-		VocalTracks const& tracks = m_song->vocalTracks;
-		m_menu.clear();
-		m_menu.add(MenuOption(_("Start"), _("Start performing"))).call([this]{ setupVocals(); });
+	VocalTracks const& tracks = m_song->vocalTracks;
+	m_menu.clear();
+	m_menu.add(MenuOption(_("Start"), _("Start performing"))).call([this]{ setupVocals(); });
 
-		if (players() > 1) { // Duet toggle
-			m_duet.addEnum(_("Duet mode"));
-			m_duet.addEnum(_("Normal mode"));
-			m_menu.add(MenuOption("", _("Switch between duet and regular singing mode"))).changer(m_duet,"song/duet");
+	if (players() > 1) { // Duet toggle
+		m_duet.addEnum(_("Duet mode"));
+		m_duet.addEnum(_("Normal mode"));
+		m_menu.add(MenuOption("", _("Switch between duet and regular singing mode"))).changer(m_duet,"song/duet");
+	}
+	// Add vocal track selector for each player
+	for (size_t player = 0; player < players(); ++player) {
+		ConfigItem& vocalTrack = m_vocalTracks[player];
+		for (auto const& track: tracks) 
+			vocalTrack.addEnum(track.second.name);
+		if (tracks.size() > 1) {
+			if (player % 2) vocalTrack.selectEnum(m_song->getVocalTrack(SongParserUtil::DUET_P2).name);  // Every other player gets the second track
+			else vocalTrack.selectEnum(m_song->getVocalTrack(TrackName::VOCAL_LEAD).name);
 		}
-		// Add vocal track selector for each player
-		for (size_t player = 0; player < players(); ++player) {
-			ConfigItem& vocalTrack = m_vocalTracks[player];
-			for (auto const& track: tracks) vocalTrack.addEnum(track.second.name);
-			if (tracks.size() > 1) {
-				if (player % 2) vocalTrack.selectEnum(m_song->getVocalTrack(SongParserUtil::DUET_P2).name);  // Every other player gets the second track
-				else vocalTrack.selectEnum(m_song->getVocalTrack(TrackName::VOCAL_LEAD).name);
-			}
-			m_menu.add(MenuOption("", _("Change vocal track"))).changer(vocalTrack);
-			if (m_duet.ui() == 1) {
-				vocalTrack.selectEnum(m_song->getVocalTrack(SongParserUtil::DUET_BOTH).name);
-				break; // If duet mode is disabled, the vocal track selection for players beyond the first is ignored anyway.
-			}
+		m_menu.add(MenuOption("", _("Change vocal track"))).changer(vocalTrack);
+		if (m_duet.ui() == 1) {
+			vocalTrack.selectEnum(m_song->getVocalTrack(SongParserUtil::DUET_BOTH).name);
+			break; // If duet mode is disabled, the vocal track selection for players beyond the first is ignored anyway.
 		}
-		m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"))).screen("Songs");
-		m_menu.select(moveSelectionTo);
-		m_menu.open();
-		if (tracks.size() <= 1) setupVocals();  // No duet menu
+	}
+	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"))).screen("Songs");
+	m_menu.select(moveSelectionTo);
+	m_menu.open();
+	if (tracks.size() <= 1) 
+		setupVocals();  // No duet menu
 }
 
 void ScreenSing::setupVocals() {
@@ -137,8 +144,13 @@ void ScreenSing::setupVocals() {
 	bool sameVoice = true;
 	for (size_t player = 0; player < players(); ++player) {
 		ConfigItem& vocalTrack = m_vocalTracks[player];
-		if (player == 0) { m_selectedVocal = vocalTrack.ui(); }
-		if (vocalTrack.ui() != m_selectedVocal) { sameVoice = false; break; }
+		if (player == 0) { 
+			m_selectedVocal = vocalTrack.ui();
+		}
+		if (vocalTrack.ui() != m_selectedVocal) { 
+			sameVoice = false; 
+			break;
+		}
 	}
 	m_singingDuet = (m_song->hasDuet() && m_duet.ui() == 0 && players() > 1 && sameVoice != true);
 	m_audio.pause(false);
@@ -206,13 +218,15 @@ void ScreenSing::instrumentLayout(double time) {
 			continue;
 		}
 		++count_alive;
-		if ((*it)->menuOpen()) ++count_menu;
+		if ((*it)->menuOpen()) 
+			++count_menu;
 		++it;
 	}
 	if (count_alive > 0) {
 		// Handle pause
 		bool shouldPause = count_menu > 0 || m_menu.isOpen();
-		if (shouldPause != m_audio.isPaused()) m_audio.togglePause();
+		if (shouldPause != m_audio.isPaused())
+			m_audio.togglePause();
 	} else if (time < -0.5) {
 		// Display help if no-one has joined yet
 		ColorTrans c(window, Color::alpha(static_cast<float>(clamp(-1.0 - 2.0 * time))));
@@ -243,8 +257,10 @@ void ScreenSing::instrumentLayout(double time) {
 		double level = 1.0;
 		if (volume.find(locName) != volume.end()) {
 			CountSum cs = volume[locName];
-			if (cs.first > 0) level = cs.second / cs.first;
-			if (m_song->music.size() <= 1) level = std::max(0.333, level);
+			if (cs.first > 0) 
+				level = cs.second / cs.first;
+			if (m_song->music.size() <= 1)
+				level = std::max(0.333, level);
 		}
 		if (name == "Vocals") {
 			m_audio.streamFade(name, config["audio/mute_vocals_track"].b() ? 0.0 : 1.0);
