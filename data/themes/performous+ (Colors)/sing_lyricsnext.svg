@@ -65,13 +65,13 @@
     <text
        x="421.95126"
        y="567.68427"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:45.70231628px;line-height:0%;font-family:FreeSans;-inkscape-font-specification:'FreeSans Bold';text-align:center;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#d3d3d3;fill-opacity:1;stroke:#000000;stroke-width:1.52341032;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.58823529"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:45.70231628px;line-height:0%;font-family:FreeSans;-inkscape-font-specification:'FreeSans Bold';text-align:center;writing-mode:lr-tb;text-anchor:middle;display:inline;fill:#d3d3d3;fill-opacity:1;stroke:#000000;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="text6611"
        xml:space="preserve"
        transform="scale(0.99957298,1.0004272)"><tspan
          x="421.95126"
          y="567.68427"
          id="tspan6613"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:45.70231628px;font-family:FreeSans;-inkscape-font-specification:'FreeSans Bold';text-align:center;text-anchor:middle;fill:#d3d3d3;fill-opacity:1;stroke:#000000;stroke-width:1.52341032;stroke-opacity:0.58823529">lyrics</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:45.70231628px;font-family:FreeSans;-inkscape-font-specification:'FreeSans Bold';text-align:center;text-anchor:middle;fill:#d3d3d3;fill-opacity:1;stroke:#000000;stroke-width:1.5;stroke-opacity:1">lyrics</tspan></text>
   </g>
 </svg>
