@@ -15,4 +15,4 @@ CMakeFiles
 .vs
 .vscode
 /osx-utils/macos-bundler
-out/*
+out/

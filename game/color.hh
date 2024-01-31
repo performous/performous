@@ -1,6 +1,7 @@
 #pragma once
 
-#include "glmath.hh"
+#include "graphic/glmath.hh"
+
 #include <istream>
 
 /// A struct for holding RGBA color in non-premultiplied linear RGB format (and conversions)
