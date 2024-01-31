@@ -193,7 +193,13 @@ void ScreenPlayers::draw() {
 			m_audio.fadeout(getGame(), 1.0f);
 		else
 			m_audio.playMusic(getGame(), music, true, 2.0);
-		if (!songbg.empty()) try { m_songbg = std::make_unique<Texture>(songbg); } catch (std::exception const&) {}
+		if (!songbg.empty())
+			try { 
+				m_songbg = std::make_unique<Texture>(songbg);
+			} 
+			catch (std::exception const&) 
+			{
+			}
 		if (!video.empty() && config["graphic/video"].b()) m_video = std::make_unique<Video>(video, videoGap);
 		m_playing = music;
 	}

@@ -225,6 +225,10 @@ void Window::createShaders() {
 }
 
 Shader& Window::shader(std::string const& name) {
+	return getShader(name);
+}
+
+Shader& Window::getShader(std::string const& name) {
 	return m_shaderManager->createOrGet(name);
 }
 
@@ -335,7 +339,7 @@ void Window::render(Game &game, std::function<void (void)> drawFunc) {
 	}
 	glerror.check("Render to FBO");
 	// Render to actual framebuffer from FBOs
-	UseTexture use(window, getFBO().getTexture());
+	TextureBinder use(window, getFBO().getTexture());
 	view(0);  // Viewport for drawable area
 	glDisable(GL_BLEND);
 	glmath::mat4 colorMatrix = glmath::mat4(1.0f);

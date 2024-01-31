@@ -1,7 +1,7 @@
 #pragma once
 
 #include "theme.hh"
-#include "opengl_text.hh"
+#include "graphic/opengl_text.hh"
 #include "notegraph.hh"
 #include "configuration.hh"
 #include "graphic/color_trans.hh"

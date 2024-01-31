@@ -34,7 +34,7 @@ void NoteGraph::reset() {
 namespace {
 	void drawNotebar(Window& window, Texture const& texture, float x, float ybeg, float yend, float w, float h_x, float h_y) {
 		glutil::VertexArray va;
-		UseTexture tblock(window, texture);
+		TextureBinder tblock(window, texture);
 
 		// The front cap begins
 		va.texCoord(0.0f, 0.0f).vertex(x, ybeg);
@@ -216,7 +216,7 @@ namespace {
 
 void NoteGraph::drawWaves(Window& window, Database const& database) {
 	if (m_vocal.notes.empty()) return; // Cannot draw without notes
-	UseTexture tblock(window, m_wave);
+	TextureBinder tblock(window, m_wave);
 	auto sortedPlayers = std::list<std::reference_wrapper<const Player>>(database.cur.begin(), database.cur.end());
 	sortedPlayers.sort([](const Player& playerOne, const Player& playerTwo) {return playerOne.m_score < playerTwo.m_score; });
 	for (const Player& player: sortedPlayers) {

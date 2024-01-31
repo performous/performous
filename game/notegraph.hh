@@ -1,7 +1,7 @@
 #pragma once
 
 #include "animvalue.hh"
-#include "texture.hh"
+#include "graphic/texture.hh"
 #include "notes.hh"
 #include "dynamicnotegraphscaler.hh"
 

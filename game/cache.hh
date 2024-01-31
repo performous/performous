@@ -17,7 +17,11 @@ namespace cache {
 		if (!fs::is_regular_file(cache_filename)) return false;
 		if (fs::last_write_time(source_filename) > fs::last_write_time(cache_filename)) return false;
 		// Try to load the cached file		
-		try { loadPNG(target, cache_filename.string()); } catch( ... ) { return false; }
+		try { 
+			loadPNG(target, cache_filename.string()); 
+		} catch( ... ) {
+			return false;
+		}
 		return true;
 	}
 }
