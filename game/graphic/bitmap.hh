@@ -27,6 +27,7 @@ struct Bitmap {
 	pix::Format fmt;
 	bool linearPremul;  // Is the data linear RGB and premultiplied (as opposed to sRGB and non-premultiplied)
 	bool bottomFirst;  // Upside-down (only used for taking screenshots)
+	fs::path filepath;
 	Bitmap(unsigned char* ptr = nullptr): ptr(ptr), width(), height(), ar(), timestamp(), fmt(pix::Format::CHAR_RGBA), linearPremul(), bottomFirst() {}
 	void resize(unsigned w, unsigned h) {
 		if (!ptr) buf.resize(w * h * 4); else buf.clear();
@@ -35,13 +36,16 @@ struct Bitmap {
 		ar = float(w) / float(h);
 	}
 	void swap(Bitmap& b) {
-		if (ptr || b.ptr) throw std::logic_error("Cannot Bitmap::swap foreign pointers.");
+		if (ptr || b.ptr) 
+			throw std::logic_error("Cannot Bitmap::swap foreign pointers.");
+
 		buf.swap(b.buf);
 		std::swap(width, b.width);
 		std::swap(height, b.height);
 		std::swap(ar, b.ar);
 		std::swap(timestamp, b.timestamp);
 		std::swap(fmt, b.fmt);
+		std::swap(filepath, b.filepath);
 	}
 	unsigned char const* data() const { return ptr ? ptr : buf.data(); }
 	unsigned char* data() { return ptr ? ptr : buf.data(); }
@@ -54,3 +58,4 @@ void writePNG(fs::path const& filename, Bitmap const& bitmap, unsigned stride = 
 void loadPNG(Bitmap& bitmap, fs::path const& filename);
 void loadJPEG(Bitmap& bitmap, fs::path const& filename);
 
+void load(Bitmap& bitmap, fs::path const& name);

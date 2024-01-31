@@ -56,6 +56,7 @@ class Window {
 
 	/// Construct a new shader or return an existing one by name
 	Shader& shader(std::string const& name);
+	Shader& getShader(std::string const& name);
 	/// Compiles and links all shaders.
 	void createShaders();
 	void resetShaders();

@@ -41,12 +41,12 @@ class FBO {
 	float height() const { return m_h; }
 	void update() {
 		{
-			UseTexture tex(m_window, m_texture);
+			TextureBinder tex(m_window, m_texture);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, static_cast<GLsizei>(m_w), static_cast<GLsizei>(m_h), 0, GL_RGBA, GL_FLOAT, nullptr);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 		}
 		{
-			UseTexture tex(m_window, m_depth);
+			TextureBinder tex(m_window, m_depth);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, static_cast<GLsizei>(m_w), static_cast<GLsizei>(m_h), 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 		}

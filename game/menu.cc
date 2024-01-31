@@ -1,6 +1,6 @@
 #include "menu.hh"
 #include "screen.hh"
-#include "texture.hh"
+#include "graphic/texture.hh"
 #include "fs.hh"
 #include "game.hh"
 
