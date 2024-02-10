@@ -13,10 +13,27 @@ namespace {
 	static const int unassigned_id = -1;  // mic.dev value for unassigned
 	static const float yoff = 0.18f; // Offset from center where to place top row
 	static const float xoff = 0.45f; // Offset from middle where to place first column
+	auto const colorNames = std::vector<std::string>{ "blue", "red", "green", "yellow", "fuchsia", "oranage", "purple", "aqua", "white", "gray", "black", "out=" };
+	auto const names = std::vector<std::string>{ "blue", "red", "green", "yellow", "fuchsia", "orange", "purple", "aqua", "white", "gray", "black", "OUT" };
+
 
 	bool countRow(std::string needle, std::string const& haystack, int& count) {
-		if (haystack.find(needle) != std::string::npos) ++count;
-		if (count > 1) return false;
+		if (haystack.find(needle) != std::string::npos)
+			++count;
+		if (count > 1)
+			return false;
+		return true;
+	}
+
+	bool count(ConfigItem::StringList const& devconf, std::map<std::string, int>& countmap) {
+		for (auto& deviceConfig : devconf) {
+			for (auto const& colorName : colorNames) {
+				if (!countRow(colorName, deviceConfig, countmap[colorName])) {
+					return false;
+				}
+			}
+		}
+
 		return true;
 	}
 }
@@ -42,27 +59,14 @@ void ScreenAudioDevices::enter() {
 	portaudio::AudioDevices ads(backend);
 	m_devs = ads.devices;
 	// FIXME: Something more elegant, like a warning box
-	if (m_devs.empty()) throw std::runtime_error("No audio devices found!");
+	if (m_devs.empty()) 
+		throw std::runtime_error("No audio devices found!");
 	m_selected_column = 0;
 	// Detect if there is existing advanced configuration and warn that this will override
 	if (!config["audio/devices"].isDefault()) {
-		ConfigItem::StringList devconf = config["audio/devices"].sl();
-		std::map<std::string, int> countmap;
-		bool ok = true;
-		for (ConfigItem::StringList::const_iterator it = devconf.begin(); it != devconf.end(); ++it) {
-			if (!countRow("blue", *it, countmap["blue"])) { ok = false; break; }
-			if (!countRow("red", *it, countmap["red"])) { ok = false; break; }
-			if (!countRow("green", *it, countmap["green"])) { ok = false; break; }
-			if (!countRow("yellow", *it, countmap["yellow"])) { ok = false; break; }
-			if(!countRow("fuchsia", *it, countmap["fuchsia"])) { ok = false; break; }
-			if(!countRow("orange", *it, countmap["orange"])) { ok = false; break; }
-			if(!countRow("purple", *it, countmap["purple"])) { ok = false; break; }
-			if(!countRow("aqua", *it, countmap["aqua"])) { ok = false; break; }
-			if(!countRow("white", *it, countmap["white"])) { ok = false; break; }
-			if(!countRow("gray", *it, countmap["gray"])) { ok = false; break; }
-			if(!countRow("black", *it, countmap["black"])) { ok = false; break; }
-			if (!countRow("out=", *it, countmap["out="])) { ok = false; break; }
-		}
+		auto const devconf = config["audio/devices"].sl();
+		auto countmap = std::map<std::string, int>{};
+		auto const ok = count(devconf, countmap);
 		if (!ok)
 			getGame().dialog(
 				_("It seems you have some manual configurations\nincompatible with this user interface.\nSaving these settings will override\nall existing audio device configuration.\nYour other options changes will be saved too."));
@@ -125,8 +129,10 @@ void ScreenAudioDevices::draw() {
 		const bool isDevice = (i < m_devs.size());
 		if (isDevice) {
 			// "Grey out" devices that doesn't fit the selection
-			if (m_channels[m_selected_column].name == "OUT" && !m_devs[i].out) alpha = 0.5f;
-			else if (m_channels[m_selected_column].name != "OUT" && !m_devs[i].in) alpha = 0.5f;
+			if (m_channels[m_selected_column].name == "OUT" && !m_devs[i].out)
+				alpha = 0.5f;
+			else if (m_channels[m_selected_column].name != "OUT" && !m_devs[i].in)
+				alpha = 0.5f;
 		}
 		m_theme->device_bg.dimensions.center(y);
 		m_theme->device_bg.draw(window);
@@ -140,7 +146,8 @@ void ScreenAudioDevices::draw() {
 		{
 			ColorTrans c(window, MicrophoneColor::get(m_channels[i].name));
 			int pos = m_channels[i].pos;
-			if (pos == unassigned_id) pos = static_cast<int>(m_devs.size());  // Transform -1 to the bottom of the list
+			if (pos == unassigned_id) 
+				pos = static_cast<int>(m_devs.size());  // Transform -1 to the bottom of the list
 			srf.dimensions.middle(-xoff + xstep*0.5f + static_cast<float>(i)*xstep).center(-yoff+static_cast<float>(pos)*ystep);
 			srf.draw(window);
 		}
@@ -162,14 +169,15 @@ void ScreenAudioDevices::draw() {
 }
 
 void ScreenAudioDevices::load() {
-	std::string names[] = { "blue", "red", "green", "yellow", "fuchsia", "orange", "purple", "aqua", "white", "gray", "black", "OUT" }; //there were 4 colors here
 	m_channels.assign(std::begin(names), std::end(names));
 	// Get the currently assigned devices for each channel (FIXME: this is a really stupid algorithm)
-	for (auto const& d: m_audio.devices()) {
-		for (auto& c: m_channels) {
-			if (!d.isChannel(c.name)) continue;
+	for (auto const& device: m_audio.devices()) {
+		for (auto& channel: m_channels) {
+			if (!device.isChannel(channel.name))
+				continue;
 			for (int i = 0; i < static_cast<int>(m_devs.size()); ++i) {
-				if (m_devs[static_cast<size_t>(i)].index == d.dev) c.pos = i;
+				if (m_devs[static_cast<size_t>(i)].index == device.dev) 
+					channel.pos = i;
 			}
 		}
 	}
@@ -182,18 +190,24 @@ bool ScreenAudioDevices::save(bool skip_ui_config) {
 		for (auto const& d: m_devs) {  // PortAudio devices
 			std::string mics = "", pdev = "";
 			for (auto const& c: m_channels) {  // blue, red, ..., OUT
-			if (c.pos == unassigned_id || m_devs[static_cast<size_t>(c.pos)].idx != d.idx) continue;
-				if (c.name == "OUT") pdev = "out=2"; // Pdev, only stereo supported
+				if (c.pos == unassigned_id || m_devs[static_cast<size_t>(c.pos)].idx != d.idx) 
+					continue;
+				if (c.name == "OUT")
+					pdev = "out=2"; // Pdev, only stereo supported
 				else { // Mic
-					if (!mics.empty()) mics += ","; // Add separator if needed
+					if (!mics.empty())
+						mics += ","; // Add separator if needed
 					mics += c.name; // Append mic color
 				}
 			}
-			if (mics.empty() && pdev.empty()) continue; // Continue looping if device is not used
+			if (mics.empty() && pdev.empty())
+				continue; // Continue looping if device is not used
 			std::string dev = "dev=\"" + d.flex + "\""; // Use flexible name for more robustness
 			// Use half duplex I/O even if the same device is used for capture and playback (works better)
-			if (!mics.empty()) devconf.push_back(dev + " mics=" + mics);
-			if (!pdev.empty()) devconf.push_back(dev + " " + pdev);
+			if (!mics.empty())
+				devconf.push_back(dev + " mics=" + mics);
+			if (!pdev.empty())
+				devconf.push_back(dev + " " + pdev);
 		}
 		config["audio/devices"].sl() = devconf;
 	}
@@ -202,7 +216,8 @@ bool ScreenAudioDevices::save(bool skip_ui_config) {
 	m_audio.playMusic(getGame(), findFile("menu.ogg"), true); // Start music again
 	// Check that all went well
 	bool ret = verify();
-	if (!ret) getGame().dialog(_("Some devices failed to open!"));
+	if (!ret)
+		getGame().dialog(_("Some devices failed to open!"));
 	// Load the new config back for UI
 	load();
 	return ret;

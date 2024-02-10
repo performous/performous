@@ -9,11 +9,10 @@
 class Audio;
 class ThemeAudioDevices;
 
-/// options dialogue
 class ScreenAudioDevices: public Screen {
   public:
-	/// constructor
 	ScreenAudioDevices(Game &game, std::string const& name, Audio& m_audio);
+
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);
