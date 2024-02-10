@@ -56,7 +56,7 @@ jobs:
     steps:
       - name: Checkout Git
         id: checkout_git
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: performous
 
@@ -80,7 +80,7 @@ jobs:
            brew install $MACOS_DEPS
       - name: Setup Python
         id: setup_python
-        uses: actions/setup-python@v4 
+        uses: actions/setup-python@v5 
         with:
             python-version: 'pypy3.9' 
             cache: 'pip'
@@ -110,7 +110,7 @@ jobs:
           make test
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ github.event_name == 'pull_request' }}
         with:
           name: ${{ env.ARTIFACT_NAME }}
@@ -118,7 +118,7 @@ jobs:
 
       - name: Upload artifact with unified name
         if: ${{ github.ref == 'refs/heads/master' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.MASTER_ARTIFACT_NAME }}
           path: ${{ env.MASTER_ARTIFACT_PATH }}

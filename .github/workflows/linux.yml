@@ -30,7 +30,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -116,10 +116,10 @@ jobs:
           echo "CONTAINER_NAME=${BUILD_CONTAINER}" >> $GITHUB_ENV
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Login to the container registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ env.REPO_NAME }}
@@ -127,7 +127,7 @@ jobs:
 
       - name: Build ${{ matrix.os }} ${{ matrix.version }} Container
         if: needs.determine_docker_version.outputs[format('build_{0}_containers', matrix.os)] == 'true' || needs.determine_docker_version.outputs['build_docker_containers'] == 'true'
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: docker/
           file: ./docker/Dockerfile.${{ matrix.os }}
@@ -163,7 +163,7 @@ jobs:
 
       # Upload artifacts during pull-requests
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ github.event_name == 'pull_request' }}
         with:
           name: ${{ env.ARTIFACT_NAME }}
@@ -172,7 +172,7 @@ jobs:
       # Upload artifacts on master
       - name: Upload artifact with unified name
         if: ${{ github.ref == 'refs/heads/master' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.MASTER_ARTIFACT_NAME }}
           path: ${{ env.MASTER_ARTIFACT_PATH }}
@@ -189,7 +189,7 @@ jobs:
           file: ${{ env.ARTIFACT_PATH }}
 
       - name: Push container
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         # Containers can't be pushed during PRs because of the way permissions
         # are delegated to secrets.GITHUB_TOKEN
         if: ${{ needs.determine_docker_version.outputs.build_docker_containers == 'true' && github.event_name != 'pull_request' }}
