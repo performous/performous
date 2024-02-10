@@ -24,7 +24,7 @@ jobs:
     steps:
       - name: Checkout Git
         id: checkout_git
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: performous
 
@@ -76,7 +76,7 @@ jobs:
            echo ("MASTER_ARTIFACT_FILENAME=Performous-latest-msvc.exe") >> $env:GITHUB_ENV
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ github.event_name == 'pull_request' }}
         with:
           name: ${{ env.ARTIFACT_FILENAME }}
@@ -84,7 +84,7 @@ jobs:
 
       - name: Upload artifact with unified name
         if: ${{ github.ref == 'refs/heads/master' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.MASTER_ARTIFACT_FILENAME }}
           path: ${{ env.MASTER_ARTIFACT_PATH }}
@@ -108,7 +108,7 @@ jobs:
     steps:
       - name: Checkout Git
         id: checkout_git
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: performous
       - name: Setup action env and echoing
@@ -192,7 +192,7 @@ jobs:
            powershell -command "echo ('MASTER_ARTIFACT_PATH=${{ env.workpath }}/performous/build/Performous-latest-mingw-w64.exe') >> \$env:GITHUB_ENV"
            powershell -command "echo ('MASTER_ARTIFACT_FILENAME=Performous-latest-mingw-w64.exe') >> \$env:GITHUB_ENV"
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ github.event_name == 'pull_request' }}
         with:
           name: ${{ env.ARTIFACT_FILENAME }}
@@ -200,7 +200,7 @@ jobs:
 
       - name: Upload artifact with unified name
         if: ${{ github.ref == 'refs/heads/master' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.MASTER_ARTIFACT_FILENAME }}
           path: ${{ env.MASTER_ARTIFACT_PATH }}

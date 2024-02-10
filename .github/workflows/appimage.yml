@@ -30,7 +30,7 @@ jobs:
 
       - name: Checkout Git
         id: checkout_git
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Build the AppImage
         id: build_appimage
@@ -52,7 +52,7 @@ jobs:
 
       # Upload artifacts during pull-requests
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ github.event_name == 'pull_request' }}
         with:
           name: ${{ env.ARTIFACT_NAME }}
@@ -61,7 +61,7 @@ jobs:
       # Upload artifacts on master
       - name: Upload artifact with unified name
         if: ${{ github.ref == 'refs/heads/master' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.MASTER_ARTIFACT_NAME }}
           path: ${{ env.MASTER_ARTIFACT_PATH }}

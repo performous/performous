@@ -39,7 +39,7 @@ jobs:
       complete_version: ${{ steps.versioning.outputs.complete_version }}
     steps:
       - name: Checkout Performous
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: ${{ github.workspace }}/performous
           repository: ${{ github.event.repository.full_name }}
@@ -74,7 +74,7 @@ jobs:
       - name: Create the Main release
         id: create_release
         if: ${{ github.event_name != 'pull_request' && github.ref_type == 'tag' }}
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v0.1.15
         with:
           tag_name: ${{ github.ref_name }}
           name: Performous ${{ github.ref_name }}
