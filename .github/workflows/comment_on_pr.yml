@@ -24,11 +24,12 @@ jobs:
           echo "PR_NUM=${PR_NUM}" >> $GITHUB_OUTPUT
 
       - name: Comment on PR
-        uses: actions/github-script@v5
+        uses: actions/github-script@v6
         with:
           # This snippet is public-domain, taken from
           # https://github.com/oprypin/nightly.link/blob/master/.github/workflows/pr-comment.yml
           # and modified to allow comments on external PRs
+          retries: 3
           script: |
             async function upsertComment(owner, repo, issue_number, purpose, body) {
               const {data: comments} = await github.rest.issues.listComments(
