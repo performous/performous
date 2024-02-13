@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "configurePresets": [
     {
       "name": "windows-base",
@@ -7,6 +7,11 @@
       "hidden": true,
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
       "cacheVariables": {
         "CMAKE_C_COMPILER": "cl.exe",
         "CMAKE_CXX_COMPILER": "cl.exe",
@@ -20,43 +25,22 @@
       }
     },
     {
-      "name": "x64-debug",
-      "displayName": "x64 Debug",
-      "description": "Target Windows Debug (64-bit).",
-      "inherits": "windows-base",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
-    },
-    {
-      "name": "x64-release",
-      "displayName": "x64 Release",
-      "description": "Target Windows Release (64-bit).",
-      "inherits": "windows-base",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
-    },
-    {
-      "name": "x64-debinfo",
-      "displayName": "x64 Release with Debug info",
-      "description": "Target Windows Release with Debug info (64-bit).",
-      "inherits": "x64-release",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
-      }
-    },
-    {
-      "name": "linux-default",
-      "displayName": "Linux Debug",
-      "description": "Sets Ninja generator, compilers, build and install directory, debug build type",
+      "name": "linux-base",
+      "description": "Target Linux with the Visual Studio development environment.",
+      "hidden": true,
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
+        "ENABLE_WEBSERVER": "AUTO",
         "SELF_BUILT_AUBIO": "ALWAYS",
         "SELF_BUILT_CED": "ALWAYS",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/${presetName}-install"
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
@@ -66,25 +50,98 @@
           "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"
         }
       }
-    }  ],
+    },
+    {
+      "name": "windows-x64-debug",
+      "displayName": "Windows - x64 Debug",
+      "description": "Target Windows Debug (64-bit).",
+      "inherits": "windows-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "linux-x64-debug",
+      "displayName": "Linux - x64 Debug",
+      "description": "Target Linux Debug (64-bit).",
+      "inherits": "linux-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "windows-x64-release",
+      "displayName": "Windows - x64 Release",
+      "description": "Target Windows Release (64-bit).",
+      "inherits": "windows-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "linux-x64-release",
+      "displayName": "Linux - x64 Release",
+      "description": "Target Linux Release (64-bit).",
+      "inherits": "linux-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "windows-x64-debinfo",
+      "displayName": "x64 Release with Debug info",
+      "description": "Target Windows Release with Debug info (64-bit).",
+      "inherits": "windows-x64-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+    {
+      "name": "linux-x64-debinfo",
+      "displayName": "Linux - x64 Release with Debug info",
+      "description": "Target Linux Release with Debug info (64-bit).",
+      "inherits": "linux-x64-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    }
+  ],
   "buildPresets": [
     {
-      "name": "x64-debug",
-      "configurePreset": "x64-debug",
-      "displayName": "Build x64-debug.",
-      "description": "Build x64-debug."
+      "name": "windows-x64-debug",
+      "configurePreset": "windows-x64-debug",
+      "displayName": "Build Windows x64-debug.",
+      "description": "Build Windows x64-debug."
     },
     {
-      "name": "x64-release",
-      "configurePreset": "x64-release",
-      "displayName": "Build x64-release.",
-      "description": "Build x64-release."
+      "name": "linux-x64-debug",
+      "configurePreset": "linux-x64-debug",
+      "displayName": "Build Linux x64-debug.",
+      "description": "Build Linux x64-debug."
     },
     {
-      "name": "x64-debinfo",
-      "configurePreset": "x64-debinfo",
-      "displayName": "Build x64-debinfo.",
-      "description": "Build x64-debinfo."
+      "name": "windows-x64-release",
+      "configurePreset": "windows-x64-release",
+      "displayName": "Build Windows x64-release.",
+      "description": "Build Windows x64-release."
+    },
+    {
+      "name": "linux-x64-release",
+      "configurePreset": "linux-x64-release",
+      "displayName": "Build Linux x64-release.",
+      "description": "Build Linux x64-release."
+    },
+    {
+      "name": "windows-x64-debinfo",
+      "configurePreset": "windows-x64-debinfo",
+      "displayName": "Build Windows x64-debinfo.",
+      "description": "Build Windows x64-debinfo."
+    },
+    {
+      "name": "linux-x64-debinfo",
+      "configurePreset": "linux-x64-debinfo",
+      "displayName": "Build Linux x64-debinfo.",
+      "description": "Build Linux x64-debinfo."
     }
   ]
 
