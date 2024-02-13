@@ -52,27 +52,27 @@ jobs:
           set VCPKG_BINARY_SOURCES="files,${{ github.workspace }}\vcpkg_cache,read"
           cd ${{ github.workspace }}/performous
           echo $PERFORMOUS_VERSION
-          cmake --preset "x64-debinfo" -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_OVERLAY_TRIPLETS="${{ github.workspace }}\performous\cmake\triplets"
-          cmake --build --preset "x64-debinfo"
+          cmake --preset "windows-x64-debinfo" -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_OVERLAY_TRIPLETS="${{ github.workspace }}\performous\cmake\triplets"
+          cmake --build --preset "windows-x64-debinfo"
       - name: Run unittests directly called.
         run: |
-          cd "performous/build/x64-debinfo/testing"
+          cd "performous/build/windows-x64-debinfo/testing"
           ./performous_test.exe --gtest_filter=UnitTest*
       - name: Run unittests by ctest.
         run: |
-          cd "performous/build/x64-debinfo"
+          cd "performous/build/windows-x64-debinfo"
           ninja testing/test
       - name: Create Installer
         id: package_performous_x64
         run: |
-           cd performous/build/x64-debinfo
-           cpack -G NSIS64 x64-debinfo
+           cd performous/build/windows-x64-debinfo
+           cpack -G NSIS64 windows-x64-debinfo
            Copy-Item $(Get-ChildItem -Filter '*win64.exe').Name "Performous-latest-msvc.exe"
            Rename-Item $(Get-ChildItem -Filter '*win64.exe').Name -NewName "Performous-${{ inputs.package_complete_version }}-msvc.exe"
            chcp 65001 #set code page to utf-8
-           echo ("ARTIFACT_PATH=${{ github.workspace }}/performous/build/x64-debinfo/Performous-${{ inputs.package_complete_version }}-msvc.exe") >> $env:GITHUB_ENV
+           echo ("ARTIFACT_PATH=${{ github.workspace }}/performous/build/windows-x64-debinfo/Performous-${{ inputs.package_complete_version }}-msvc.exe") >> $env:GITHUB_ENV
            echo ("ARTIFACT_FILENAME=Performous-${{ inputs.package_complete_version }}-msvc.exe") >> $env:GITHUB_ENV
-           echo ("MASTER_ARTIFACT_PATH=${{ github.workspace }}/performous/build/x64-debinfo/Performous-latest-msvc.exe") >> $env:GITHUB_ENV
+           echo ("MASTER_ARTIFACT_PATH=${{ github.workspace }}/performous/build/windows-x64-debinfo/Performous-latest-msvc.exe") >> $env:GITHUB_ENV
            echo ("MASTER_ARTIFACT_FILENAME=Performous-latest-msvc.exe") >> $env:GITHUB_ENV
 
       - name: Upload artifacts
