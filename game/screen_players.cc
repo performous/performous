@@ -28,7 +28,7 @@ ScreenPlayers::ScreenPlayers(Game &game, std::string const& name, Audio& audio, 
 void ScreenPlayers::enter() {
 	keyPressed = false;
 	const auto scaler = NoteGraphScalerFactory(config).create(m_song->getVocalTrack(0u));
-	m_layout_singer = std::make_unique<LayoutSinger>(m_song->getVocalTrack(0u), m_database, scaler);
+	m_layout_singer = std::make_unique<LayoutSinger>(m_song->getVocalTrack(0u), m_database, scaler, getGame().getTextureManager());
 	theme = std::make_unique<ThemeSongs>();
 	m_emptyCover = std::make_unique<Texture>(findFile("no_player_image.svg"));
 	m_search.text.clear();
@@ -193,7 +193,13 @@ void ScreenPlayers::draw() {
 			m_audio.fadeout(getGame(), 1.0f);
 		else
 			m_audio.playMusic(getGame(), music, true, 2.0);
-		if (!songbg.empty()) try { m_songbg = std::make_unique<Texture>(songbg); } catch (std::exception const&) {}
+		if (!songbg.empty())
+			try {
+				m_songbg = std::make_unique<Texture>(songbg);
+			}
+			catch (std::exception const&)
+			{
+			}
 		if (!video.empty() && config["graphic/video"].b()) m_video = std::make_unique<Video>(video, videoGap);
 		m_playing = music;
 	}
