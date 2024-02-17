@@ -13,8 +13,8 @@ namespace {
 	static const int unassigned_id = -1;  // mic.dev value for unassigned
 	static const float yoff = 0.18f; // Offset from center where to place top row
 	static const float xoff = 0.45f; // Offset from middle where to place first column
-	auto const colorNames = std::vector<std::string>{ "blue", "red", "green", "yellow", "fuchsia", "oranage", "purple", "aqua", "white", "gray", "black", "out=" };
-	auto const names = std::vector<std::string>{ "blue", "red", "green", "yellow", "fuchsia", "orange", "purple", "aqua", "white", "gray", "black", "OUT" };
+	auto const colorNames = std::vector<std::string>{"out=", "blue", "red", "green", "yellow", "fuchsia", "oranage", "purple", "aqua", "white", "gray", "black" };
+	auto const names = std::vector<std::string>{"OUT", "blue", "red", "green", "yellow", "fuchsia", "orange", "purple", "aqua", "white", "gray", "black" };
 
 
 	bool countRow(std::string needle, std::string const& haystack, int& count) {
@@ -142,7 +142,7 @@ void ScreenAudioDevices::draw() {
 	}
 	// Icons
 	for (size_t i = 0; i < m_channels.size(); ++i) {
-		Texture& srf = (i < m_channels.size()-1) ? *m_mic_icon : *m_pdev_icon;
+		auto& srf = m_channels[i].name != "OUT" ? *m_mic_icon : *m_pdev_icon;
 		{
 			ColorTrans c(window, MicrophoneColor::get(m_channels[i].name));
 			int pos = m_channels[i].pos;
