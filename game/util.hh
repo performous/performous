@@ -60,22 +60,22 @@ constexpr auto to_underlying(E e) noexcept -> std::enable_if_t<std::is_enum<E>::
 	return static_cast<std::underlying_type_t<E>>(e);
 }
 
-std::string toLower(std::string const&);
-std::string toUpper(std::string const&);
+std::string toLower(std::string const&, std::locale const& = std::locale());
+std::string toUpper(std::string const&, std::locale const& = std::locale());
 
 std::string erase(std::string const&, std::string const& toErase);
 std::string erase(std::string&, std::string const& toErase);
 
-std::string replace(std::string const&, char from, char to);
-std::string& replace(std::string&, char from, char to);
-std::string replace(std::string const&, std::string const& from, std::string const& to);
-std::string& replace(std::string&, std::string const& from, std::string const& to);
+std::string replace(std::string const&, char from, char to, bool ignoreCase = false);
+std::string& replace(std::string&, char from, char to, bool ignoreCase = false);
+std::string replace(std::string const&, std::string const& from, std::string const& to, bool ignoreCase = false);
+std::string& replace(std::string&, std::string const& from, std::string const& to, bool ignoreCase = false);
 
 std::string trim(std::string const&, std::locale const& = std::locale());
 std::string& trim(std::string&, std::locale const& = std::locale());
-std::string trimLeft(std::string const&, std::locale const& = std::locale());
-std::string& trimLeft(std::string&, std::locale const& = std::locale());
-std::string trimRight(std::string const&, std::locale const& = std::locale());
-std::string& trimRight(std::string&, std::locale const& = std::locale());
+std::string trimFront(std::string const&, std::locale const& = std::locale());
+std::string& trimFront(std::string&, std::locale const& = std::locale());
+std::string trimBack(std::string const&, std::locale const& = std::locale());
+std::string& trimBack(std::string&, std::locale const& = std::locale());
 
 bool startsWith(std::string const&, std::string const&);

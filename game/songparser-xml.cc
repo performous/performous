@@ -61,7 +61,7 @@ namespace {
 	bool parseComment(std::string const& str, std::string const& header, std::string& result) {
 		if (!startsWith(str, header))
 			return false;
-		result = replace(trimLeft(str.substr(header.size())), "&amp;", "&");
+		result = replace(trimFront(str.substr(header.size())), "&amp;", "&");
 		return true;
 	}
 }

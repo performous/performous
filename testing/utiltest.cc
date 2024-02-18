@@ -129,7 +129,11 @@ namespace {
 	}
 
 	TEST(UnitTest_Utils, replace_char_one) {
-		EXPECT_EQ("bb", replace("ab", 'a', 'b'));
+		EXPECT_EQ("bAb", replace("aAb", 'a', 'b'));
+	}
+
+	TEST(UnitTest_Utils, replace_char_one_ignore_case) {
+		EXPECT_EQ("ccb", replace("aAb", 'A', 'c', true));
 	}
 
 	TEST(UnitTest_Utils, replace_string_empty) {
@@ -137,7 +141,11 @@ namespace {
 	}
 
 	TEST(UnitTest_Utils, replace_string_one_by_one) {
-		EXPECT_EQ("bb", replace("ab", "a", "b"));
+		EXPECT_EQ("bAb", replace("aAb", "a", "b"));
+	}
+
+	TEST(UnitTest_Utils, replace_string_one_by_one_ignore_case) {
+		EXPECT_EQ("ccb", replace("aAb", "a", "c", true));
 	}
 
 	TEST(UnitTest_Utils, replace_string_not_found) {
@@ -149,7 +157,11 @@ namespace {
 	}
 
 	TEST(UnitTest_Utils, replace_string_one_by_two) {
-		EXPECT_EQ("dcb", replace("ab", "a", "dc"));
+		EXPECT_EQ("dcAb", replace("aAb", "a", "dc"));
+	}
+
+	TEST(UnitTest_Utils, replace_string_one_by_two_ignore_case) {
+		EXPECT_EQ("dcdcb", replace("aAb", "a", "dc", true));
 	}
 
 	TEST(UnitTest_Utils, trim_empty) {
@@ -216,36 +228,36 @@ namespace {
 		EXPECT_EQ("X \n\r\tY", trim(" \n\r\tX \n\r\tY \n\r\t"));
 	}
 
-	TEST(UnitTest_Utils, trimLeft_empty) {
-		EXPECT_EQ("", trimLeft(""));
+	TEST(UnitTest_Utils, trimFront_empty) {
+		EXPECT_EQ("", trimFront(""));
 	}
 
-	TEST(UnitTest_Utils, trimLeft_front) {
-		EXPECT_EQ("A", trimLeft(" A"));
+	TEST(UnitTest_Utils, trimFront_front) {
+		EXPECT_EQ("A", trimFront(" A"));
 	}
 
-	TEST(UnitTest_Utils, trimLeft_back) {
-		EXPECT_EQ("A ", trimLeft("A "));
+	TEST(UnitTest_Utils, trimFront_back) {
+		EXPECT_EQ("A ", trimFront("A "));
 	}
 
-	TEST(UnitTest_Utils, trimLeft_mid) {
-		EXPECT_EQ("A B", trimLeft("A B"));
+	TEST(UnitTest_Utils, trimFront_mid) {
+		EXPECT_EQ("A B", trimFront("A B"));
 	}
 
-	TEST(UnitTest_Utils, trimRight_empty) {
-		EXPECT_EQ("", trimRight(""));
+	TEST(UnitTest_Utils, trimBack_empty) {
+		EXPECT_EQ("", trimBack(""));
 	}
 
-	TEST(UnitTest_Utils, trimRight_front) {
-		EXPECT_EQ(" A", trimRight(" A"));
+	TEST(UnitTest_Utils, trimBack_front) {
+		EXPECT_EQ(" A", trimBack(" A"));
 	}
 
-	TEST(UnitTest_Utils, trimRight_back) {
-		EXPECT_EQ("A", trimRight("A "));
+	TEST(UnitTest_Utils, trimBack_back) {
+		EXPECT_EQ("A", trimBack("A "));
 	}
 
-	TEST(UnitTest_Utils, trimRight_mid) {
-		EXPECT_EQ("A B", trimRight("A B"));
+	TEST(UnitTest_Utils, trimBack_mid) {
+		EXPECT_EQ("A B", trimBack("A B"));
 	}
 
 	TEST(UnitTest_Utils, startsWith_empty_empty) {
