@@ -41,4 +41,246 @@ namespace {
 		EXPECT_EQ("02:01:00 1970-01-01", format(time, "%H:%M:%S %Y-%m-%d", true));
 		EXPECT_EQ("02:01:00 1970-01-01", format(time, "%X %Y-%m-%d", true));
 	}
+	
+	TEST(UnitTest_Utils, toLower_empty) {
+		EXPECT_EQ("", toLower(""));
+	}
+
+	TEST(UnitTest_Utils, toLower_lower_case) {
+		EXPECT_EQ("lower", toLower("lower"));
+	}
+
+	TEST(UnitTest_Utils, toLower_upper_case) {
+		EXPECT_EQ("upper", toLower("UPPER"));
+	}
+
+	TEST(UnitTest_Utils, toLower_mixed_case) {
+		EXPECT_EQ("mixed", toLower("MiXed"));
+	}
+
+	TEST(UnitTest_Utils, toLower_digits) {
+		EXPECT_EQ("0123", toLower("0123"));
+	}
+
+	TEST(UnitTest_Utils, toLower_umlaute) {
+		// no "umlaute" support
+		EXPECT_NE("äöüäöü", toLower("äöüÄÖÜ"));
+	}
+
+	TEST(UnitTest_Utils, toUpper_empty) {
+		EXPECT_EQ("", toUpper(""));
+	}
+
+	TEST(UnitTest_Utils, toUpper_lower_case) {
+		EXPECT_EQ("LOWER", toUpper("lower"));
+	}
+
+	TEST(UnitTest_Utils, toUpper_upper_case) {
+		EXPECT_EQ("UPPER", toUpper("UPPER"));
+	}
+
+	TEST(UnitTest_Utils, toUpper_mixed_case) {
+		EXPECT_EQ("MIXED", toUpper("MiXed"));
+	}
+
+	TEST(UnitTest_Utils, toUpper_digits) {
+		EXPECT_EQ("0123", toUpper("0123"));
+	}
+
+	TEST(UnitTest_Utils, toUpper_umlaute) {
+		// no "umlaute" support
+		EXPECT_NE("äöüäöü", toUpper("äöüÄÖÜ"));
+	}
+
+	TEST(UnitTest_Utils, erase_empty_empty) {
+		EXPECT_EQ("", erase("", ""));
+	}
+
+	TEST(UnitTest_Utils, erase_empty_x) {
+		EXPECT_EQ("", erase("", "x"));
+	}
+
+	TEST(UnitTest_Utils, erase_x_empty) {
+		EXPECT_EQ("x", erase("x", ""));
+	}
+
+	TEST(UnitTest_Utils, erase_x_x) {
+		EXPECT_EQ("", erase("x", "x"));
+	}
+
+	TEST(UnitTest_Utils, erase_xy_x) {
+		EXPECT_EQ("y", erase("xy", "x"));
+	}
+
+	TEST(UnitTest_Utils, erase_yx_x) {
+		EXPECT_EQ("y", erase("yx", "x"));
+	}
+
+	TEST(UnitTest_Utils, erase_yx_xy) {
+		EXPECT_EQ("yx", erase("yx", "xy"));
+	}
+
+	TEST(UnitTest_Utils, erase_xyx_xy) {
+		EXPECT_EQ("x", erase("xyx", "xy"));
+	}
+
+	TEST(UnitTest_Utils, replace_char_empty) {
+		EXPECT_EQ("", replace("", 'a', 'b'));
+	}
+
+	TEST(UnitTest_Utils, replace_char_one) {
+		EXPECT_EQ("bAb", replace("aAb", 'a', 'b'));
+	}
+
+	TEST(UnitTest_Utils, replace_char_one_ignore_case) {
+		EXPECT_EQ("ccb", replace("aAb", 'A', 'c', true));
+	}
+
+	TEST(UnitTest_Utils, replace_string_empty) {
+		EXPECT_EQ("", replace("", "a", "b"));
+	}
+
+	TEST(UnitTest_Utils, replace_string_one_by_one) {
+		EXPECT_EQ("bAb", replace("aAb", "a", "b"));
+	}
+
+	TEST(UnitTest_Utils, replace_string_one_by_one_ignore_case) {
+		EXPECT_EQ("ccb", replace("aAb", "a", "c", true));
+	}
+
+	TEST(UnitTest_Utils, replace_string_not_found) {
+		EXPECT_EQ("ab", replace("ab", "c", "b"));
+	}
+
+	TEST(UnitTest_Utils, replace_string_by_empty) {
+		EXPECT_EQ("b", replace("ab", "a", ""));
+	}
+
+	TEST(UnitTest_Utils, replace_string_one_by_two) {
+		EXPECT_EQ("dcAb", replace("aAb", "a", "dc"));
+	}
+
+	TEST(UnitTest_Utils, replace_string_one_by_two_ignore_case) {
+		EXPECT_EQ("dcdcb", replace("aAb", "a", "dc", true));
+	}
+
+	TEST(UnitTest_Utils, trim_empty) {
+		EXPECT_EQ("", trim(""));
+	}
+
+	TEST(UnitTest_Utils, trim_one_space) {
+		EXPECT_EQ("", trim(" "));
+	}
+
+	TEST(UnitTest_Utils, trim_two_spaces) {
+		EXPECT_EQ("", trim("  "));
+	}
+
+	TEST(UnitTest_Utils, trim_white_spaces) {
+		EXPECT_EQ("", trim(" \n\r\t"));
+	}
+
+	TEST(UnitTest_Utils, trim_front_one_space) {
+		EXPECT_EQ("X", trim(" X"));
+	}
+
+	TEST(UnitTest_Utils, trim_front_two_spaces) {
+		EXPECT_EQ("X", trim("  X"));
+	}
+
+	TEST(UnitTest_Utils, trim_front_white_spaces) {
+		EXPECT_EQ("X", trim(" \n\r\tX"));
+	}
+
+	TEST(UnitTest_Utils, trim_back_one_space) {
+		EXPECT_EQ("X", trim("X "));
+	}
+
+	TEST(UnitTest_Utils, trim_back_two_spaces) {
+		EXPECT_EQ("X", trim("X  "));
+	}
+
+	TEST(UnitTest_Utils, trim_back_white_spaces) {
+		EXPECT_EQ("X", trim("X \n\r\t"));
+	}
+
+	TEST(UnitTest_Utils, trim_both_one_space) {
+		EXPECT_EQ("X", trim(" X "));
+	}
+
+	TEST(UnitTest_Utils, trim_both_two_spaces) {
+		EXPECT_EQ("X", trim("  X  "));
+	}
+
+	TEST(UnitTest_Utils, trim_both_white_spaces) {
+		EXPECT_EQ("X", trim(" \n\r\tX \n\r\t"));
+	}
+
+	TEST(UnitTest_Utils, trim_mid_one_space) {
+		EXPECT_EQ("X Y", trim(" X Y "));
+	}
+
+	TEST(UnitTest_Utils, trim_mid_two_spaces) {
+		EXPECT_EQ("X  Y", trim("  X  Y  "));
+	}
+
+	TEST(UnitTest_Utils, trim_mid_white_spaces) {
+		EXPECT_EQ("X \n\r\tY", trim(" \n\r\tX \n\r\tY \n\r\t"));
+	}
+
+	TEST(UnitTest_Utils, trimFront_empty) {
+		EXPECT_EQ("", trimFront(""));
+	}
+
+	TEST(UnitTest_Utils, trimFront_front) {
+		EXPECT_EQ("A", trimFront(" A"));
+	}
+
+	TEST(UnitTest_Utils, trimFront_back) {
+		EXPECT_EQ("A ", trimFront("A "));
+	}
+
+	TEST(UnitTest_Utils, trimFront_mid) {
+		EXPECT_EQ("A B", trimFront("A B"));
+	}
+
+	TEST(UnitTest_Utils, trimBack_empty) {
+		EXPECT_EQ("", trimBack(""));
+	}
+
+	TEST(UnitTest_Utils, trimBack_front) {
+		EXPECT_EQ(" A", trimBack(" A"));
+	}
+
+	TEST(UnitTest_Utils, trimBack_back) {
+		EXPECT_EQ("A", trimBack("A "));
+	}
+
+	TEST(UnitTest_Utils, trimBack_mid) {
+		EXPECT_EQ("A B", trimBack("A B"));
+	}
+
+	TEST(UnitTest_Utils, startsWith_empty_empty) {
+		EXPECT_TRUE(startsWith("", ""));
+	}
+
+	TEST(UnitTest_Utils, startsWith_empty_x) {
+		EXPECT_FALSE(startsWith("", "x"));
+	}
+
+	TEST(UnitTest_Utils, startsWith_x_empty) {
+		EXPECT_TRUE(startsWith("x", ""));
+	}
+
+	TEST(UnitTest_Utils, startsWith_x_x) {
+		EXPECT_TRUE(startsWith("x", "x"));
+	}
+
+	TEST(UnitTest_Utils, startsWith_xy_x) {
+		EXPECT_TRUE(startsWith("xy", "x"));
+	}
+
+	TEST(UnitTest_Utils, startsWith_yx_x) {
+		EXPECT_FALSE(startsWith("yx", "x"));
+	}
 }
