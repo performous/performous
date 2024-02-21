@@ -3,6 +3,14 @@
 #include "game/util.hh"
 
 namespace {
+	TEST(UnitTest_Utils, isNaN) {
+		EXPECT_TRUE(isNaN(getNaN()));
+		EXPECT_FALSE(isNaN(getInf()));
+		EXPECT_FALSE(isNaN(1.f));
+		EXPECT_FALSE(isNaN(0.f));
+		EXPECT_FALSE(isNaN(-14.f));
+	}
+
 	TEST(UnitTest_Utils, clamp) {
 		EXPECT_EQ(0.0, clamp(-1.0, 0.0, 1.0));
 		EXPECT_EQ(0.5, clamp(0.5, 0.0, 1.0));

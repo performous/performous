@@ -55,7 +55,7 @@ void ScreenSongs::reloadGL() {
 }
 
 void ScreenSongs::exit() {
-	m_covers.clear();
+	//m_covers.clear();
 	m_menu.clear();
 	m_menuTheme.reset();
 	m_singCover.reset();
@@ -252,7 +252,8 @@ void ScreenSongs::drawJukebox() {
 		Song& song = m_songs.current();
 		// Draw the cover
 		Texture* cover = nullptr;
-		if (!song.cover.empty()) cover = loadTextureFromMap(song.cover);
+		if (!song.cover.empty())
+			cover = loadTextureFromMap(song.cover);
 		if (cover && !cover->empty()) {
 			Texture& s = *cover;
 			s.dimensions.left(theme->song.dimensions.x1()).top(theme->song.dimensions.y2() + 0.05f).fitInside(0.15f, 0.15f);
@@ -446,7 +447,12 @@ void ScreenSongs::drawCovers() {
 		float x = xtrans(0.0f);
 		float z = ztrans(0.0f);
 		float c = 0.4f + 0.6f * highlightf(0.0f);
-		if (m_menuPos == 1 /* Cover browser */ && idx + i == currentId) c = static_cast<float>(beat);
+		if (m_menuPos == 1 /* Cover browser */ && idx + i == currentId) {
+			c = static_cast<float>(beat);
+
+			if (isNaN(c))
+				c = 1.f;
+		}
 		using namespace glmath;
 		Transform trans(window, translate(vec3(x, y, z)) * rotate(angle, vec3(0.0f, 1.0f, 0.0f)));
 		ColorTrans c1(window, Color(c, c, c));
@@ -477,20 +483,25 @@ void ScreenSongs::drawCovers() {
 
 Texture* ScreenSongs::loadTextureFromMap(fs::path path) {
 	if(m_covers.find(path) == m_covers.end()) {
-		m_covers.insert({ path, std::make_unique<Texture>(path) });
+		m_covers.insert({ path, std::make_unique<Texture>(getGame().getTextureManager().get(path)) });
 	}
 	try {
 		return m_covers.at(path).get();
-	} catch (std::exception const&) {}
+	}
+	catch (std::exception const&) {
+	}
+
 	return nullptr;
 }
 
 Texture& ScreenSongs::getCover(Song const& song) {
 	Texture* cover = nullptr;
 	// Fetch cover image from cache or try loading it
-	if (!song.cover.empty()) cover = loadTextureFromMap(song.cover);
+	if (!song.cover.empty())
+		cover = loadTextureFromMap(song.cover);
 	// Fallback to background image as cover if needed
-	if (!cover && !song.background.empty()) cover = loadTextureFromMap(song.background);
+	if (!cover && !song.background.empty())
+		cover = loadTextureFromMap(song.background);
 	// Use empty cover
 	if (!cover) {
 		if(song.hasDance()) {
