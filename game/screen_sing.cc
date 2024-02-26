@@ -9,8 +9,9 @@
 #include "guitargraph.hh"
 #include "i18n.hh"
 #include "layout_singer.hh"
-#include "menu.hh"
 #include "analyzer.hh"
+#include "menu.hh"
+#include "microphones.hh"
 #include "platform.hh"
 #include "screen_players.hh"
 #include "songparser.hh"
@@ -677,7 +678,7 @@ void ScreenSing::drawMenu() {
 		txt->draw(window, it->getName());
 		if (it->value == &m_vocalTracks[player]) {
 			if (player < analyzers.size()) {
-				Color color = MicrophoneColor::get(analyzers[player].getId());
+				auto const color = getMicrophoneColor(analyzers[player].getId());
 				ColorTrans c(window, color);
 				m_player_icon->dimensions.right(x).fixedHeight(0.040f).center(y);
 				m_player_icon->draw(window);

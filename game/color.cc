@@ -66,18 +66,3 @@ bool Color::operator==(Color const& other) const {
 bool Color::operator!=(Color const& other) const {
 	return !operator==(other);
 }
-
-Color MicrophoneColor::get(std::string name) {
-	if (name == "black") return Color(3.0f/255.0f, 3.0f/255.0f, 3.0f/255.0f, 1.0f);
-	else if (name == "gray") return Color(24.0f/255.0f, 24.0f/255.0f, 24.0f/255.0f, 1.0f);
-	else if (name == "white") return Color(1.0f, 1.0f, 1.0f, 1.0f);
-	else if (name == "aqua") return Color(0.0f, 1.0f, 1.0f, 1.0f);
-	else if (name == "purple") return Color(63.0f/255.0f, 0.0f, 1.0f, 1.0f);
-	else if (name == "orange") return Color(1.0f, 52.0f/255.0f, 0.0f, 1.0f);
-	else if (name == "fuchsia") return Color(1.0f, 0.06f, 127/255.0f, 1.0f);
-	else if (name == "yellow") return Color(1.0f, 1.0f, 0.0f, 1.0f);
-	else if (name == "green") return Color(0.0f, 1.0f, 0.0f, 1.0f);
-	else if (name == "red") return Color(1, 0.0f, 0.0f, 1.0f);
-	else if (name == "blue") return Color(0.0f, 43.75f/255.0f, 1.0f, 1.0f);
-	else return Color(0.5f, 0.5f, 0.5f, 1.0f);
-}
