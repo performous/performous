@@ -13,8 +13,10 @@ static const float pi2 = pi * 2.f;
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+using ::testing::_;
 using ::testing::Contains;
 using ::testing::ElementsAre;
+//using ::testing::FieldsAre;
 using ::testing::FloatEq;
 using ::testing::FloatNear;
 using ::testing::IsEmpty;

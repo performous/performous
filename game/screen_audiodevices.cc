@@ -3,6 +3,7 @@
 #include "audio.hh"
 #include "configuration.hh"
 #include "controllers.hh"
+#include "microphones.hh"
 #include "platform.hh"
 #include "theme.hh"
 #include "i18n.hh"
@@ -13,9 +14,15 @@ namespace {
 	static const int unassigned_id = -1;  // mic.dev value for unassigned
 	static const float yoff = 0.18f; // Offset from center where to place top row
 	static const float xoff = 0.45f; // Offset from middle where to place first column
-	auto const colorNames = std::vector<std::string>{"out=", "blue", "red", "green", "yellow", "fuchsia", "oranage", "purple", "aqua", "white", "gray", "black" };
-	auto const names = std::vector<std::string>{"OUT", "blue", "red", "green", "yellow", "fuchsia", "orange", "purple", "aqua", "white", "gray", "black" };
 
+	std::vector<std::string> getMicrophoneColorNames(std::string const& prepend) {
+		auto const config = getMicrophoneConfig();
+		auto result = std::vector<std::string>{ prepend };
+
+		std::for_each(config.begin(), config.end(), [&result](auto const& config) { result.emplace_back(config.colorname); });
+
+		return result;
+	}
 
 	bool countRow(std::string needle, std::string const& haystack, int& count) {
 		if (haystack.find(needle) != std::string::npos)
@@ -26,6 +33,8 @@ namespace {
 	}
 
 	bool count(ConfigItem::StringList const& devconf, std::map<std::string, int>& countmap) {
+		auto const colorNames = getMicrophoneColorNames("out=");
+
 		for (auto& deviceConfig : devconf) {
 			for (auto const& colorName : colorNames) {
 				if (!countRow(colorName, deviceConfig, countmap[colorName])) {
@@ -144,7 +153,7 @@ void ScreenAudioDevices::draw() {
 	for (size_t i = 0; i < m_channels.size(); ++i) {
 		auto& srf = m_channels[i].name != "OUT" ? *m_mic_icon : *m_pdev_icon;
 		{
-			ColorTrans c(window, MicrophoneColor::get(m_channels[i].name));
+			ColorTrans c(window, getMicrophoneColor(m_channels[i].name));
 			int pos = m_channels[i].pos;
 			if (pos == unassigned_id) 
 				pos = static_cast<int>(m_devs.size());  // Transform -1 to the bottom of the list
@@ -169,7 +178,8 @@ void ScreenAudioDevices::draw() {
 }
 
 void ScreenAudioDevices::load() {
-	m_channels.assign(std::begin(names), std::end(names));
+	assignChannels();
+
 	// Get the currently assigned devices for each channel (FIXME: this is a really stupid algorithm)
 	for (auto const& device: m_audio.devices()) {
 		for (auto& channel: m_channels) {
@@ -224,12 +234,21 @@ bool ScreenAudioDevices::save(bool skip_ui_config) {
 }
 
 bool ScreenAudioDevices::verify() {
-	for (auto const& c: m_channels) {
-		if (c.pos == unassigned_id) continue;  // No checking needed of unassigned channels
+	for (auto const& channel: m_channels) {
+		if (channel.pos == unassigned_id) 
+			continue;  // No checking needed of unassigned channels
 		// Find the device
-		for (auto const& d: m_audio.devices()) if (d.isChannel(c.name)) goto found;
+		for (auto const& device: m_audio.devices()) 
+			if (device.isChannel(channel.name))
+				goto found;
 		return false;
 		found:;
 	}
 	return true;
+}
+
+void ScreenAudioDevices::assignChannels() {
+	auto const colorNames = getMicrophoneColorNames("OUT");
+
+	m_channels.assign(std::begin(colorNames), std::end(colorNames));
 }
