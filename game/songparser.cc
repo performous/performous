@@ -318,8 +318,9 @@ void SongParser::finalize() {
 }
 
 Song::BPM SongParser::getBPM(Song const& s, double ts) const {
-	for (auto& itb : boost::adaptors::reverse(s.m_bpms)) {
-		if (itb.begin <= ts) return itb;
+	for (auto& itb : reverse(s.m_bpms)) {
+		if (itb.begin <= ts) 
+			return itb;
 	}
 	throw std::runtime_error("No BPM definition prior to this note...");
 }

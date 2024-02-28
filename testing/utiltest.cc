@@ -1,4 +1,4 @@
-#include <gtest/gtest.h>
+#include "common.hh"
 
 #include "game/util.hh"
 
@@ -39,6 +39,42 @@ TEST(UnitTest_Utils, format) {
     EXPECT_EQ("01/01/70 02:01", format(time, "%m/%d/%y %H:%M", true));
     EXPECT_EQ("02:01:00 1970-01-01", format(time, "%H:%M:%S %Y-%m-%d", true));
     EXPECT_EQ("02:01:00 1970-01-01", format(time, "%X %Y-%m-%d", true));
+}
+
+TEST(UnitTest_Utils, replaceFirst_no_hit) {
+    EXPECT_EQ("Nothing to replace here", replaceFirst("Nothing to replace here", "hello", "world"));
+}
+
+TEST(UnitTest_Utils, replaceFirst_one_hit) {
+    EXPECT_EQ("Something to see here", replaceFirst("Something to replace here", "replace", "see"));
+}
+
+TEST(UnitTest_Utils, replaceFirst_one_hit_wrong_case) {
+    EXPECT_EQ("Something to replace here", replaceFirst("Something to replace here", "Replace", "see"));
+}
+
+TEST(UnitTest_Utils, replaceFirst_two_hits) {
+    EXPECT_EQ("Something to replace there and here", replaceFirst("Something to replace here and here", "here", "there"));
+}
+
+TEST(UnitTest_Utils, make_iterator_range) {
+    auto const v = std::vector<int>{ 0, 2, 4, 3, 1 };
+    auto const begin = v.begin();
+    auto const end = v.end();
+    auto const range = make_iterator_range(begin, end);
+
+    auto it = v.begin();
+
+    for (auto const i : range)
+        EXPECT_EQ(*it++, i);
+}
+
+TEST(UnitTest_Utils, reverse) {
+    auto const v = std::vector<int>{ 0, 2, 4, 3, 1 };
+    auto it = v.rbegin();
+
+    for (auto const i : reverse(v))
+        EXPECT_EQ(*it++, i);
 }
 
 TEST(UnitTest_Utils, isText_text) {
@@ -136,3 +172,4 @@ TEST(UnitTest_Utils, isText_utf8_euro_border_2) {
     auto const euro_utf8 = std::string{ char(0xE2), char(0x82), char(0xAC) };
     EXPECT_TRUE(isText("euro sign: " + euro_utf8, 13));
 }
+
