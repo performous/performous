@@ -82,3 +82,16 @@ bool isText(const std::string& text, size_t bytesToCheck) {
 
     return true;
 }
+
+std::string replaceFirst(std::string const& s, std::string const& from, std::string const& to) {
+	auto const position = s.find(from);
+
+	if (position == std::string::npos)
+		return s;
+
+	auto result = s;
+
+	result.replace(position, from.length(), to);
+
+	return result;
+}

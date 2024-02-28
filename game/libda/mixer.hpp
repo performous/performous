@@ -221,8 +221,8 @@ namespace da {
 
 	class mixer {
 	  public:
-		mixer(): m_mutex(boost::ref(m_select)) { init(); }
-		mixer(settings& s): m_mutex(boost::ref(m_select)) { init(); start(s); }
+		mixer(): m_mutex(std::ref(m_select)) { init(); }
+		mixer(settings& s): m_mutex(std::ref(m_select)) { init(); start(s); }
 		~mixer() {
 			// Make sure that all processing has stopped before exiting
 			scoped_lock l(m_mutex);
@@ -232,7 +232,7 @@ namespace da {
 		void start(settings& s) { m_settings = s; start(); s = m_settings; }
 		void start() {
 			stop();
-			m_settings.set_callback(boost::ref(m_mutex));
+			m_settings.set_callback(std::ref(m_mutex));
 			m_playback.reset(new playback(m_settings));
 		}
 		void stop() { m_playback.reset(); }
@@ -291,10 +291,10 @@ namespace da {
 	  private:
 		void init() {
 			m_master.add(zero);
-			m_master.add(boost::ref(m_user));
-			m_master.add(boost::ref(m_volume));
+			m_master.add(std::ref(m_user));
+			m_master.add(std::ref(m_volume));
 			m_select.insert("paused", zero);
-			m_select.insert("normal", boost::ref(m_master));
+			m_select.insert("normal", std::ref(m_master));
 			pause(false);
 			clear();
 		}
