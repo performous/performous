@@ -2,6 +2,7 @@
 
 #include "configuration.hh"
 #include "platform.hh"
+#include "util.hh"
 
 #include <algorithm>
 #include <cstdlib>
@@ -11,7 +12,6 @@
 #include <sstream>
 #include <regex>
 
-#include <boost/algorithm/string/replace.hpp>
 #include <boost/range.hpp>
 
 #if (BOOST_OS_WINDOWS)
@@ -92,11 +92,15 @@ void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destina
 	for (const auto& dirEnt : fs::recursive_directory_iterator{sourceDir}) {
 		const auto& path = dirEnt.path();
 #endif
-		auto relativePathStr = path.string();
-		boost::algorithm::replace_first(relativePathStr, sourceDir.string(), "");
+		auto relativePathStr = replaceFirst(path.string(), sourceDir.string(), "");
+
 		try { 
-			if (!fs::is_directory(path)) { fs::copy_file(path, destinationDir / relativePathStr); }
-			else { create_directory(destinationDir / relativePathStr, path); }
+			if (!fs::is_directory(path)) { 
+				fs::copy_file(path, destinationDir / relativePathStr); 
+			}
+			else { 
+				create_directory(destinationDir / relativePathStr, path);
+			}
 		} catch (...) {
 			throw std::runtime_error("Cannot copy file " + path.string() + ", because it already exists in the destination folder.");
 		}

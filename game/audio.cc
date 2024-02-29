@@ -10,7 +10,6 @@
 #include "util.hh"
 
 #include "aubio/aubio.h"
-#include <boost/range/iterator_range.hpp>
 
 #include <cmath>
 #include <future>
@@ -403,7 +402,9 @@ struct Output {
 		if (mics.size() > 0 && config["audio/pass-through"].b()) {
 			// Decrease music volume
 			float amp = 1.0f / config["audio/pass-through_ratio"].f();
-			if (amp != 1.0f) for (auto& s: boost::make_iterator_range(begin, end)) s *= amp;
+			if (amp != 1.0f) 
+				for (auto& s : make_iterator_range(begin, end)) 
+					s *= amp;
 			// Do the mixing
 			for (auto& m: mics) if (m) m->output(begin, end, rate);
 		}
