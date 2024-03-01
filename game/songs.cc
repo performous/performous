@@ -32,6 +32,7 @@
 #include <fstream>
 #include <regex>
 #include <stdexcept>
+#include <future>
 
 namespace {
 	void initializeSongOrders(Songs& songs) {
@@ -94,18 +95,25 @@ void Songs::reload_internal() {
 	Paths systemSongs = getPathsConfig("paths/system-songs");
 	Paths paths = getPathsConfig("paths/songs");
 	paths.insert(paths.begin(), systemSongs.begin(), systemSongs.end());
-
+	std::vector<std::future<void>> futures;
 	for (auto it = paths.begin(); m_loading && it != paths.end(); ++it) { //loop through stored directories from config
-		try {
-			if (!fs::is_directory(*it)) { std::clog << "songs/info: >>> Not scanning: " << *it << " (no such directory)\n"; continue; }
-			std::clog << "songs/info: >>> Scanning " << *it << std::endl;
-			size_t count = loadedSongs();
-			reload_internal(*it);
-			size_t diff = loadedSongs() - count;
-			if (diff > 0 && m_loading) std::clog << "songs/info: " << diff << " songs loaded\n";
-		} catch (std::exception& e) {
-			std::clog << "songs/error: >>> Error scanning " << *it << ": " << e.what() << '\n';
-		}
+		futures.push_back(std::async(std::launch::async, [this, it] {
+			try {
+				if (!fs::is_directory(*it)) { std::clog << "songs/info: >>> Not scanning: " << *it << " (no such directory)\n"; return; }
+				std::clog << "songs/info: >>> Scanning " << *it << std::endl;
+				size_t count = loadedSongs();
+				reload_internal(*it);
+				size_t diff = loadedSongs() - count;
+				if (diff > 0 && m_loading) std::clog << "songs/info: " << diff << " songs loaded\n";
+			}
+			catch (std::exception& e) {
+				std::clog << "songs/error: >>> Error scanning " << *it << ": " << e.what() << '\n';
+			}
+			}));
+	}
+	// Wait for all tasks to complete
+	for (auto& future : futures) {
+		future.wait();
 	}
 	prof("total");
 	if (m_loading) dumpSongs_internal(); // Dump the songlist to file (if requested)
