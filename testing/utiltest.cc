@@ -79,6 +79,18 @@ namespace {
 		EXPECT_TRUE(isText(bom + "text\0other"));
 	}
 
+	TEST(UnitTest_Utils, isText_binary_zeros) {
+		auto const binary = std::string{ char(0x00), char(0x00), char(0x00), char(0x00) };
+
+		EXPECT_FALSE(isText(binary));
+	}
+
+	TEST(UnitTest_Utils, isText_binary_ffs) {
+		auto const binary = std::string{ char(0xff), char(0xff), char(0xff), char(0xff) };
+
+		EXPECT_FALSE(isText(binary));
+	}
+
 	TEST(UnitTest_Utils, isText_binary) {
 		auto const binary = std::string{ char(0x01), char(0x02), char(0x03) };
 
@@ -95,5 +107,20 @@ namespace {
 
 	TEST(UnitTest_Utils, isText_with_tab) {
 		EXPECT_TRUE(isText("first\tsecond"));
+	}
+
+	TEST(UnitTest_Utils, isText_utf8_umla) {
+		auto const auml_utf8 = std::string{ char(0xC3), char(0xA4) };
+		EXPECT_TRUE(isText("German auml: " + auml_utf8));
+	}
+
+	TEST(UnitTest_Utils, isText_utf8_euro) {
+		auto const euro_utf8 = std::string{ char(0xE2), char(0x82), char(0xAC) };
+		EXPECT_TRUE(isText("euro sign: " + euro_utf8));
+	}
+
+	TEST(UnitTest_Utils, isText_utf8_euro_wrong_follow_byte) {
+		auto const euro_utf8 = std::string{ char(0xE2), char(0x82), char(0xAC), char(0xAC), char(0xAC) };
+		EXPECT_FALSE(isText("euro sign: " + euro_utf8));
 	}
 }

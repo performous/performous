@@ -46,12 +46,33 @@ bool startsWithUTF8BOM(std::string const& s) {
 }
 
 bool isText(std::string const& s, size_t bytesToCheck) {
+    enum ByteType { ASCII, Start, Follow };
     auto const start = startsWithUTF8BOM(s) ? 3U : 0U;
     auto const end = std::min(bytesToCheck, s.size());
+    auto byteType = ASCII;
+    auto follow = 0;
 
     for (auto n = start; n < end; ++n) {
-        if (s[n] < 32 && s[n] != '\n' && s[n] != '\r' && s[n] != '\t')
-            return false;
+        auto const unsignedChar = static_cast<unsigned char>(s[n]);
+
+        if ((unsignedChar & 0xC0) == 0xC0) {
+            if ((unsignedChar & 0xF0) == 0xF0 && (unsignedChar & 0x0F) > 4)
+                return false;
+            byteType = Start;
+            follow = 0;
+        }
+        else if ((unsignedChar & 0x80) == 0x80) {
+            if (byteType == ASCII)
+                return false;
+            if (++follow == 4)
+                return false;
+            byteType = Follow;
+        }
+        else {
+            if (s[n] < 32 && s[n] != '\n' && s[n] != '\r' && s[n] != '\t')
+                return false;
+            byteType = ASCII;
+        }
     }
 
     return true;
