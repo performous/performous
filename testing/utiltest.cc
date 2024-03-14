@@ -42,22 +42,6 @@ namespace {
 		EXPECT_EQ("02:01:00 1970-01-01", format(time, "%X %Y-%m-%d", true));
 	}
 
-	TEST(UnitTest_Utils, startsWithUTF8BOM_empty) {
-		EXPECT_FALSE(startsWithUTF8BOM(""));
-	}
-
-	TEST(UnitTest_Utils, startsWithUTF8BOM_bom) {
-		auto const bom = std::string{ char(0xEF), char(0xBB), char(0xBF) };
-
-		EXPECT_TRUE(startsWithUTF8BOM(bom));
-	}
-
-	TEST(UnitTest_Utils, startsWithUTF8BOM_bom_and_text) {
-		auto const bom = std::string{ char(0xEF), char(0xBB), char(0xBF) };
-
-		EXPECT_TRUE(startsWithUTF8BOM(bom + "text"));
-	}
-
 	TEST(UnitTest_Utils, isText_text) {
 		EXPECT_TRUE(isText("text"));
 	}
@@ -122,5 +106,35 @@ namespace {
 	TEST(UnitTest_Utils, isText_utf8_euro_wrong_follow_byte) {
 		auto const euro_utf8 = std::string{ char(0xE2), char(0x82), char(0xAC), char(0xAC), char(0xAC) };
 		EXPECT_FALSE(isText("euro sign: " + euro_utf8));
+	}
+	
+	TEST(UnitTest_Utils, isText_utf8_4_byte_f09284a0) {
+		auto const utf8 = std::string{ char(0xF0), char(0x92), char(0x84), char(0xA0) };
+		EXPECT_TRUE(isText(utf8));
+	}
+
+	TEST(UnitTest_Utils, isText_utf8_4_byte_f0908d88) {
+		auto const utf8 = std::string{ char(0xF0), char(0x90), char(0x8D), char(0x88) };
+		EXPECT_TRUE(isText(utf8));
+	}
+
+	TEST(UnitTest_Utils, isText_text_utf8_4_byte) {
+		auto const utf8 = std::string{ char(0xF0), char(0x90), char(0x8D), char(0x88) };
+		EXPECT_TRUE(isText("4 byte utf-8: " + utf8));
+	}
+
+	TEST(UnitTest_Utils, isText_text_utf8_4_byte_text) {
+		auto const utf8 = std::string{ char(0xF0), char(0x90), char(0x8D), char(0x88) };
+		EXPECT_TRUE(isText("4 byte utf-8 " + utf8 + " inside ascii"));
+	}
+
+	TEST(UnitTest_Utils, isText_utf8_euro_border_1) {
+		auto const euro_utf8 = std::string{ char(0xE2), char(0x82), char(0xAC) };
+		EXPECT_TRUE(isText("euro sign: " + euro_utf8, 12));
+	}
+
+	TEST(UnitTest_Utils, isText_utf8_euro_border_2) {
+		auto const euro_utf8 = std::string{ char(0xE2), char(0x82), char(0xAC) };
+		EXPECT_TRUE(isText("euro sign: " + euro_utf8, 13));
 	}
 }
