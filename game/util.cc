@@ -33,46 +33,51 @@ std::string format(std::chrono::seconds const& unixtime, std::string const& form
     return stream.str();
 }
 
-bool startsWithUTF8BOM(std::string const& s) {
-    if (s.size() < 3)
-        return false;
-    auto const b0 = static_cast<unsigned char>(s[0]);
-    auto const b1 = static_cast<unsigned char>(s[1]);
-    auto const b2 = static_cast<unsigned char>(s[2]);
-    if (b0 == 0xEF && b1 == 0xBB && b2 == 0xBF)
-        return true;
-
-    return false;
+bool isSingleByteCharacter(char c) {
+    return (static_cast<unsigned char>(c) & 0b10000000) == 0;
 }
 
-bool isText(std::string const& s, size_t bytesToCheck) {
-    enum ByteType { ASCII, Start, Follow };
-    auto const start = startsWithUTF8BOM(s) ? 3U : 0U;
-    auto const end = std::min(bytesToCheck, s.size());
-    auto byteType = ASCII;
-    auto follow = 0;
+bool isTwoByteCharacter(char c) {
+    return (static_cast<unsigned char>(c) & 0b11100000) == 0b11000000;
+}
 
-    for (auto n = start; n < end; ++n) {
-        auto const unsignedChar = static_cast<unsigned char>(s[n]);
+bool isThreeByteCharacter(char c) {
+    return (static_cast<unsigned char>(c) & 0b11110000) == 0b11100000;
+}
 
-        if ((unsignedChar & 0xC0) == 0xC0) {
-            if ((unsignedChar & 0xF0) == 0xF0 && (unsignedChar & 0x0F) > 4)
+bool isFourByteCharacter(char c) {
+    return (static_cast<unsigned char>(c) & 0b11111000) == 0b11110000;
+}
+
+bool isInvalidFollowByte(char c) {
+    return (static_cast<unsigned char>(c) & 0b11000000) != 0b10000000;
+}
+
+bool isASCII(char c) {
+    return static_cast<unsigned char>(c) >= 32 || std::isspace(static_cast<unsigned char>(c));
+}
+
+bool isText(const std::string& text, size_t bytesToCheck) {
+    bytesToCheck = std::min(bytesToCheck, text.size());
+    for (size_t i = 0; i < bytesToCheck; ++i) {
+        if (isSingleByteCharacter(text[i])) {
+            if (!isASCII(text[i]))
                 return false;
-            byteType = Start;
-            follow = 0;
         }
-        else if ((unsignedChar & 0x80) == 0x80) {
-            if (byteType == ASCII)
+        else if (isTwoByteCharacter(text[i])) {
+            if (i + 1 >= text.size() || isInvalidFollowByte(text[++i]))
                 return false;
-            if (++follow == 4)
-                return false;
-            byteType = Follow;
         }
-        else {
-            if (s[n] < 32 && s[n] != '\n' && s[n] != '\r' && s[n] != '\t')
+        else if (isThreeByteCharacter(text[i])) {
+            if (i + 2 >= text.size() || isInvalidFollowByte(text[++i]) || isInvalidFollowByte(text[++i]))
                 return false;
-            byteType = ASCII;
         }
+        else if (isFourByteCharacter(text[i])) {
+            if (i + 3 >= text.size() || isInvalidFollowByte(text[++i]) || isInvalidFollowByte(text[++i]) || isInvalidFollowByte(text[++i]))
+                return false;
+        }
+        else // Invalid UTF-8 sequence
+            return false;
     }
 
     return true;
