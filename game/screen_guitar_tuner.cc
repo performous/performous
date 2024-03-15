@@ -25,13 +25,13 @@ void ScreenGuitarTuner::enter() {
 }
 
 void ScreenGuitarTuner::reloadGL() {
-	theme = std::make_unique<ThemePractice>();
+	m_theme = std::make_unique<ThemeGuitarTuner>();
 }
 
 void ScreenGuitarTuner::exit() {
 	getGame().controllers.enableEvents(false);
 	m_vumeters.clear();
-	theme.reset();
+	m_theme.reset();
 }
 
 void ScreenGuitarTuner::manageEvent(input::NavEvent const& event) {
@@ -51,7 +51,9 @@ void ScreenGuitarTuner::manageEvent(input::NavEvent const& event) {
 void ScreenGuitarTuner::draw() {
 	auto& window = getGame().getWindow();
 
-	theme->bg.draw(window);
+	m_theme->bg.draw(window);
+	m_theme->fret.dimensions.left(-0.25f).top(-0.15f).stretch(0.5f, 0.3f);
+	m_theme->fret.draw(window);
 
 	draw_analyzers();
 }
@@ -59,8 +61,8 @@ void ScreenGuitarTuner::draw() {
 void ScreenGuitarTuner::draw_analyzers() {
 	auto& window = getGame().getWindow();
 
-	theme->note.dimensions.fixedHeight(0.03f);
-	theme->sharp.dimensions.fixedHeight(0.09f);
+	//m_theme->note.dimensions.fixedHeight(0.03f);
+	//m_theme->sharp.dimensions.fixedHeight(0.09f);
 
 	auto& analyzers = m_audio.analyzers();
 
@@ -100,17 +102,17 @@ void ScreenGuitarTuner::draw_analyzers() {
 				float posXnote = static_cast<float>(-0.25 + 0.2 * i + 0.002 * t->stabledb);  // Wiggle horizontally based on volume
 				float posYnote = static_cast<float>(-0.03 - line * 0.015);  // On treble key (C4), plus offset (lines)
 
-				theme->note.dimensions.left(posXnote).center(posYnote);
-				theme->note.draw(window);
+				//m_theme->note.dimensions.left(posXnote).center(posYnote);
+				//m_theme->note.draw(window);
 				// Draw # for sharp notes
 				if (scale.isSharp()) {
-					theme->sharp.dimensions.right(posXnote).center(posYnote);
-					theme->sharp.draw(window);
+					//m_theme->sharp.dimensions.right(posXnote).center(posYnote);
+					//m_theme->sharp.draw(window);
 				}
 			}
 		}
 	}
 
 	if (textFreq > 0.0)
-		theme->note_txt.draw(window, scale.setFreq(textFreq).getStr());
+		m_theme->note_txt.draw(window, scale.setFreq(textFreq).getStr());
 }

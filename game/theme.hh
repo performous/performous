@@ -42,6 +42,14 @@ public:
 	SvgTxtTheme note_txt;
 };
 
+class ThemeGuitarTuner : public Theme {
+public:
+	ThemeGuitarTuner();
+
+	Texture fret;
+	SvgTxtTheme note_txt;
+};
+
 /// theme for singing screen
 class ThemeSing: public Theme {
 public:

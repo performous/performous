@@ -6,7 +6,6 @@
 class Audio;
 class Sample;
 class ProgressBar;
-class ThemePractice;
 
 class ScreenGuitarTuner : public Screen {
 public:
@@ -24,5 +23,5 @@ private:
 	Audio& m_audio;
 	std::vector<std::string> m_samples;
 	std::vector<std::unique_ptr<ProgressBar>> m_vumeters;
-	std::unique_ptr<ThemePractice> theme;
+	std::unique_ptr<ThemeGuitarTuner> m_theme;
 };
