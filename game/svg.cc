@@ -2,7 +2,7 @@
 
 #include "cache.hh"
 #include "configuration.hh"
-#include "image.hh"
+#include "graphic/bitmap.hh"
 
 #include <librsvg/rsvg.h>
 #include <cstdint>

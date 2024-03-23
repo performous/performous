@@ -5,7 +5,7 @@ class Database;
 #include "animvalue.hh"
 #include "instruments.hh"
 #include "progressbar.hh"
-#include "texture.hh"
+#include "graphic/texture.hh"
 #include "theme.hh"
 
 /// shows score at end of song

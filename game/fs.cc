@@ -33,7 +33,7 @@ namespace {
 	}
 
 	const fs::path performous = "performous";
-	const fs::path configSchema = "config/schema.xml";	
+	const fs::path configSchema = "config/schema.xml";
 
 	struct PathCache {
 		Paths paths;
@@ -54,7 +54,7 @@ namespace {
 		// 1. Default constructor runs in static context (before main) and cannot do much
 		// 2. pathBootstrap is called to find out static system paths (critical for logging and for loading config files)
 		// 3. pathInit is called to process the full search path, using config settings
-		
+
 	#if (BOOST_OS_WINDOWS)
 	#include "platform/fs_paths.win.inc"
 	#else
@@ -94,7 +94,7 @@ void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destina
 #endif
 		auto relativePathStr = path.string();
 		boost::algorithm::replace_first(relativePathStr, sourceDir.string(), "");
-		try { 
+		try {
 			if (!fs::is_directory(path)) { fs::copy_file(path, destinationDir / relativePathStr); }
 			else { create_directory(destinationDir / relativePathStr, path); }
 		} catch (...) {
@@ -127,7 +127,7 @@ Paths getThemePaths() {
 
 	std::string theme = config["game/theme"].getEnumName();
 	Paths paths = getPaths();
-	Paths infixes = { 
+	Paths infixes = {
 		themes / theme,
 		themes / theme / www,
 		themes / theme / www / js,
@@ -155,16 +155,20 @@ Paths getThemePaths() {
 }
 
 fs::path findFile(fs::path const& filename) {
-	if (filename.empty()) throw std::logic_error("findFile expects a filename.");
-	if (filename.is_absolute()) throw std::logic_error("findFile expects a filename without path.");
+	if (filename.empty())
+		throw std::logic_error("findFile expects a filename.");
+	if (filename.is_absolute())
+		throw std::logic_error("findFile expects a filename without path.");
 	Paths list;
 	for (fs::path p: getThemePaths()) {
 		p /= filename;
 		list.push_back(p);
-		if (fs::exists(p)) return p.string();
+		if (fs::exists(p))
+			return p.string();
 	}
 	std::string logmsg = "fs/error: Unable to locate data file, tried:\n";
-	for (auto const& p: list) logmsg += " " + p.string() + '\n';
+	for (auto const& p: list)
+		logmsg += " " + p.string() + '\n';
 	std::clog << logmsg << std::flush;
 	throw std::runtime_error("Cannot find file \"" + filename.string() + "\" in Performous theme or data folders");
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "instrumentgraph.hh"
-#include "3dobject.hh"
+#include "graphic/3dobject.hh"
 
 #include <cstdint>
 
@@ -45,6 +45,15 @@ static inline bool operator==(GuitarChord const& a, GuitarChord const& b) {
 
 /// handles drawing of notes and waves
 class GuitarGraph: public InstrumentGraph {
+	enum class Difficulty : int {
+		KIDS,     // Kids
+		SUPAEASY, // Easy
+		EASY,     // Medium
+		MEDIUM,   // Hard
+		AMAZING,  // Expert
+		COUNT
+	};
+
   public:
 	/// constructor
 	GuitarGraph(Game &game, Audio& audio, Song const& song, input::DevicePtr dev, int number);
@@ -80,43 +89,12 @@ class GuitarGraph: public InstrumentGraph {
 	void drumHit(double time, unsigned layer, unsigned fret);
 	void guitarPlay(double time, input::Event const& ev);
 
-	// Media
-	Texture m_tail;
-	Texture m_tail_glow;
-	Texture m_tail_drumfill;
-	Texture m_flame;
-	Texture m_flame_godmode;
-	Texture m_tap; /// image for 2d HOPO note cap
-	Texture m_neckglow; /// image for the glow from the bottom of the neck
-	glmath::vec4 m_neckglowColor;
-	Object3d m_fretObj; /// 3d object for regular note
-	Object3d m_tappableObj; /// 3d object for the HOPO note cap
-	std::vector<std::string> m_samples; /// sound effects
-	std::unique_ptr<Texture> m_neck; /// necks
-	std::unique_ptr<SvgTxtThemeSimple> m_scoreText;
-	std::unique_ptr<SvgTxtThemeSimple> m_streakText;
-
-	// Flags
-	bool m_drums; /// are we using drums?
-
-	// Track stuff
-	enum class Difficulty : int {
-		KIDS,     // Kids
-		SUPAEASY, // Easy
-		EASY,     // Medium
-		MEDIUM,   // Hard
-		AMAZING,  // Expert
-		COUNT
-	} m_level;
 	void setupJoinMenu();
 	void updateJoinMenu();
 	void nextTrack(bool fast = false);
 	void setTrack(const std::string& track);
 	void difficultyAuto(bool tryKeepCurrent = false);
 	bool difficulty(Difficulty level, bool check_only = false);
-	InstrumentTracksConstPtr m_instrumentTracks; /// tracks
-	InstrumentTracksConstPtr::const_iterator m_track_index;
-	unsigned m_holds[max_panels]; /// active hold notes
 
 	// Graphics functions
 	Color const colorize(Color c, double time) const;
@@ -132,6 +110,32 @@ class GuitarGraph: public InstrumentGraph {
 	void updateChords();
 	bool updateTom(unsigned int tomTrack, int fretId); // returns true if this tom track exists
 	double getNotesBeginTime() const { return m_chords.front().begin; }
+
+	// Media
+	Texture m_tail;
+	Texture m_tail_glow;
+	Texture m_tail_drumfill;
+	Texture m_flame;
+	Texture m_flame_godmode;
+	Texture m_tap; /// image for 2d HOPO note cap
+	Texture m_neckglow; /// image for the glow from the bottom of the neck
+	glmath::vec4 m_neckglowColor{};
+	Object3d m_fretObj; /// 3d object for regular note
+	Object3d m_tappableObj; /// 3d object for the HOPO note cap
+	std::vector<std::string> m_samples; /// sound effects
+	std::unique_ptr<Texture> m_neck; /// necks
+	std::unique_ptr<SvgTxtThemeSimple> m_scoreText;
+	std::unique_ptr<SvgTxtThemeSimple> m_streakText;
+
+	// Flags
+	bool m_drums = false; /// are we using drums?
+
+	// Track stuff
+	Difficulty m_level = Difficulty::MEDIUM;
+	InstrumentTracksConstPtr m_instrumentTracks; /// tracks
+	InstrumentTracksConstPtr::const_iterator m_track_index;
+	unsigned m_holds[max_panels]; /// active hold notes
+
 	typedef std::vector<GuitarChord> Chords;
 	Chords m_chords;
 	Chords::iterator m_chordIt;
@@ -143,18 +147,18 @@ class GuitarGraph: public InstrumentGraph {
 
 	// Animation & misc score keeping
 	std::vector<AnimValue> m_flames[max_panels]; /// flame effect queues for each fret
-	AnimValue m_errorMeter;
-	AnimValue m_errorMeterFlash;
-	AnimValue m_errorMeterFade;
-	AnimValue m_drumJump;
-	AnimValue m_starpower; /// how long the GodMode lasts (also used in fading the effect)
-	float m_starmeter; /// when this is high enough, GodMode becomes available
-	float m_drumfillHits; /// keeps track that enough hits are scored
-	float m_drumfillScore; /// max score for the notes under drum fill
-	float m_soloTotal; /// maximum solo score
-	float m_soloScore; /// score during solo
-	bool m_solo; /// are we currently playing a solo
-	bool m_hasTomTrack; /// true if the track has at least one tom track
-	bool m_proMode; /// true if pro drums. (it would be better to split guitar/trum tracks into sep classes)
-	double m_whammy; /// whammy value for pitch shift
+	AnimValue m_errorMeter{0.0, 2.0 };
+	AnimValue m_errorMeterFlash{ 0.0, 4.0 };
+	AnimValue m_errorMeterFade{ 0.0, 0.333 };
+	AnimValue m_drumJump{ 0.0, 12.0 };
+	AnimValue m_starpower{ 0.0, 0.1 }; /// how long the GodMode lasts (also used in fading the effect)
+	float m_starmeter = 0.f; /// when this is high enough, GodMode becomes available
+	float m_drumfillHits = 0.f; /// keeps track that enough hits are scored
+	float m_drumfillScore = 0.f; /// max score for the notes under drum fill
+	float m_soloTotal = 0.f; /// maximum solo score
+	float m_soloScore = 0.f; /// score during solo
+	bool m_solo = false; /// are we currently playing a solo
+	bool m_hasTomTrack = false; /// true if the track has at least one tom track
+	bool m_proMode = false; /// true if pro drums. (it would be better to split guitar/trum tracks into sep classes)
+	double m_whammy = 0.0; /// whammy value for pitch shift
 };

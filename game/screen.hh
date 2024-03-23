@@ -14,7 +14,7 @@ class Screen {
   public:
 	/// counstructor
 	Screen(Game &game, std::string const& name): m_game(game), m_name(name) {}
-	virtual ~Screen() {}
+	virtual ~Screen() = default;
 	/// Event handler for navigation events
 	virtual void manageEvent(input::NavEvent const& event) = 0;
 	/// Event handler for SDL events

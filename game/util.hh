@@ -15,6 +15,9 @@ template <typename T> T sconv(std::string const& s);
 template <typename T> constexpr T clamp(T val, T min = 0, T max = 1) {
 	return (val < min) ? min : (val > max) ? max : val;
 }
+template <typename T> constexpr T lerp(T a, T b, T t) {
+	return a + t * (b - a);
+}
 
 template <typename Numeric> struct MinMax {
 	Numeric min, max;
