@@ -34,6 +34,7 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <screen_guitar_tuner.hh>
 
 // Disable main level exception handling for debug builds (because gdb cannot properly catch throwing otherwise)
 #define RUNTIME_ERROR std::runtime_error
@@ -133,6 +134,7 @@ void mainLoop(std::string const& songlist) {
 	gm.addScreen(std::make_unique<ScreenSongs>(gm, "Songs", audio, songs, database));
 	gm.addScreen(std::make_unique<ScreenSing>(gm, "Sing", audio, database, backgrounds));
 	gm.addScreen(std::make_unique<ScreenPractice>(gm, "Practice", audio));
+	gm.addScreen(std::make_unique<ScreenGuitarTuner>(gm, "GuitarTuner", audio));
 	gm.addScreen(std::make_unique<ScreenAudioDevices>(gm, "AudioDevices", audio));
 	gm.addScreen(std::make_unique<ScreenPaths>(gm, "Paths", audio, songs));
 	gm.addScreen(std::make_unique<ScreenPlayers>(gm, "Players", audio, database));
