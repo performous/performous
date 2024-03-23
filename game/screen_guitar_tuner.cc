@@ -8,6 +8,7 @@
 #include "progressbar.hh"
 #include "game.hh"
 #include "analyzer.hh"
+#include <guitar/guitar_strings.hh>
 
 
 
@@ -16,8 +17,12 @@ ScreenGuitarTuner::ScreenGuitarTuner(Game& game, std::string const& name, Audio&
 }
 
 void ScreenGuitarTuner::enter() {
+	m_audio.fadeout(getGame());
+
 	for (size_t i = 0, mics = m_audio.analyzers().size(); i < mics; ++i) {
-		m_vumeters.emplace_back(std::make_unique<ProgressBar>(findFile("vumeter_bg.svg"), findFile("vumeter_fg.svg"), ProgressBar::Mode::VERTICAL, 0.136, 0.023));
+		m_bars.emplace_back();
+		for(auto n = 0; n < 7; ++n)
+			m_bars[i].emplace_back(std::make_unique<Texture>(findFile("bar.svg")));
 	}
 
 	reloadGL();
@@ -30,7 +35,7 @@ void ScreenGuitarTuner::reloadGL() {
 
 void ScreenGuitarTuner::exit() {
 	getGame().controllers.enableEvents(false);
-	m_vumeters.clear();
+	m_bars.clear();
 	m_theme.reset();
 }
 
@@ -51,8 +56,13 @@ void ScreenGuitarTuner::manageEvent(input::NavEvent const& event) {
 void ScreenGuitarTuner::draw() {
 	auto& window = getGame().getWindow();
 
+	auto const width = m_theme->fretWidth;
+	auto const height = m_theme->fretHeight;
+	auto const left = width * -0.5f;
+	auto const top = height * -0.5f;
+
 	m_theme->bg.draw(window);
-	m_theme->fret.dimensions.left(-0.25f).top(-0.15f).stretch(0.5f, 0.3f);
+	m_theme->fret.dimensions.left(left).top(top).stretch(width, height);
 	m_theme->fret.draw(window);
 
 	draw_analyzers();
@@ -60,18 +70,18 @@ void ScreenGuitarTuner::draw() {
 
 void ScreenGuitarTuner::draw_analyzers() {
 	auto& window = getGame().getWindow();
-
-	//m_theme->note.dimensions.fixedHeight(0.03f);
-	//m_theme->sharp.dimensions.fixedHeight(0.09f);
-
 	auto& analyzers = m_audio.analyzers();
 
 	if (analyzers.empty())
 		return;
 
+	auto const paddingTop = m_theme->paddingTop;
+	auto const paddingBottom = m_theme->paddingBottom;
+	auto const height = m_theme->fretHeight - m_theme->fretHeight * (paddingTop + paddingBottom);
+
 	MusicalScale scale;
-	double textPower = -getInf();
-	double textFreq = 0.0;
+	auto textPower = -getInf();
+	auto textFreq = 0.0;
 
 	for (unsigned int i = 0; i < analyzers.size(); ++i) {
 		auto& analyzer = analyzers[i];
@@ -84,35 +94,39 @@ void ScreenGuitarTuner::draw_analyzers() {
 			textPower = tone->db;
 			textFreq = freq;
 		}
-		// getPeak returns 0.0 when clipping, negative values when not that loud.
-		// Normalizing to [0,1], where 0 is -43 dB or less (to match the vumeter graphic)
-		m_vumeters[i]->dimensions.screenBottom().left(-0.4f + static_cast<float>(i) * 0.08f).fixedWidth(0.04f); //0.08 was originally 0.2. Now 11 in a row fits
-		m_vumeters[i]->draw(window, static_cast<float>(analyzer.getPeak() / 43.0 + 1.0));
 
 		if (freq != 0.0) {
-			auto tones = analyzer.getTones();
+			auto const tones = analyzer.getTones();
+			auto n = 0U;
 
-			for (auto t = tones.begin(); t != tones.end(); ++t) {
-				if (t->age < Tone::MINAGE)
+			for (auto& tone : tones) {
+				if (tone.age < Tone::MINAGE)
 					continue;
-				if (!scale.setFreq(t->freq).isValid())
-					continue;
+				//if (!scale.setFreq(tone.freq).isValid())
+				//	continue;
 
-				double line = scale.getNoteLine() + 0.4 * scale.getNoteOffset();
-				float posXnote = static_cast<float>(-0.25 + 0.2 * i + 0.002 * t->stabledb);  // Wiggle horizontally based on volume
-				float posYnote = static_cast<float>(-0.03 - line * 0.015);  // On treble key (C4), plus offset (lines)
+				auto const string = GuitarStrings().getString(static_cast<Frequency>(tone.freq));
+				auto const base = GuitarStrings().getBaseFrequency(string);
+				auto const difference = base - static_cast<Frequency>(tone.freq);
+				auto const x = difference / base;
+				auto const line = static_cast<float>(static_cast<int>(string)) / 5.f;
+				auto const y = height * (-0.5f + line);
 
-				//m_theme->note.dimensions.left(posXnote).center(posYnote);
-				//m_theme->note.draw(window);
-				// Draw # for sharp notes
-				if (scale.isSharp()) {
-					//m_theme->sharp.dimensions.right(posXnote).center(posYnote);
-					//m_theme->sharp.draw(window);
-				}
+				m_bars[i][n]->dimensions.middle(x).center(y).stretch(0.04f, 0.04f /* * static_cast<float>(tone.db) / 40.f*/);
+				m_bars[i][n]->draw(window);
+
+				if (++n == m_bars[i].size())
+					break;
 			}
 		}
 	}
 
-	if (textFreq > 0.0)
+	if (textFreq > 0.0) {
+		auto const string = GuitarStrings().getString(static_cast<Frequency>(textFreq));
+		auto const line = static_cast<float>(static_cast<int>(string)) / 5.f;
+		auto const y = height * (-0.5f + line);
+
+		m_theme->note_txt.dimensions.center(y).right(m_theme->fretWidth * -0.5f - 0.2f);
 		m_theme->note_txt.draw(window, scale.setFreq(textFreq).getStr());
+	}
 }

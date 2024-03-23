@@ -22,6 +22,6 @@ public:
 private:
 	Audio& m_audio;
 	std::vector<std::string> m_samples;
-	std::vector<std::unique_ptr<ProgressBar>> m_vumeters;
+	std::vector<std::vector<std::unique_ptr<Texture>>> m_bars;
 	std::unique_ptr<ThemeGuitarTuner> m_theme;
 };

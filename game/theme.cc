@@ -29,6 +29,7 @@ ThemePractice::ThemePractice():
 ThemeGuitarTuner::ThemeGuitarTuner()
 : Theme(findFile("bg_guitar_tuner.svg")), 
     fret(findFile("Guitar6Strings.png")), 
+    bar(findFile("bar.svg")), 
 	note_txt(findFile("practice_txt.svg"), config["graphic/text_lod"].f()) {
 }
 

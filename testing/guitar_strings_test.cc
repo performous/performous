@@ -46,3 +46,34 @@ TEST(UnitTest_GuitarStrings, getFrequency_fret_12) {
 	EXPECT_NEAR(493.88f, GuitarStrings().getFrequency(StringName::B, 12), 0.1f);
 	EXPECT_NEAR(659.26f, GuitarStrings().getFrequency(StringName::E_High, 12), 0.1f);
 }
+
+TEST(UnitTest_GuitarStrings, getString_E_LOW) {
+	EXPECT_EQ(GuitarStrings().getString(82.0f), StringName::E_Low);
+	EXPECT_EQ(GuitarStrings().getString(83.0f), StringName::E_Low);
+}
+
+TEST(UnitTest_GuitarStrings, getString_A) {
+	EXPECT_EQ(GuitarStrings().getString(108.0f), StringName::A);
+	EXPECT_EQ(GuitarStrings().getString(112.0f), StringName::A);
+}
+
+TEST(UnitTest_GuitarStrings, getString_D) {
+	EXPECT_EQ(GuitarStrings().getString(145.0f), StringName::D);
+	EXPECT_EQ(GuitarStrings().getString(147.0f), StringName::D);
+}
+
+TEST(UnitTest_GuitarStrings, getString_G) {
+	EXPECT_EQ(GuitarStrings().getString(194.0f), StringName::G);
+	EXPECT_EQ(GuitarStrings().getString(198.0f), StringName::G);
+}
+
+TEST(UnitTest_GuitarStrings, getString_B) {
+	EXPECT_EQ(GuitarStrings().getString(240.0f), StringName::B);
+	EXPECT_EQ(GuitarStrings().getString(248.0f), StringName::B);
+}
+
+TEST(UnitTest_GuitarStrings, getString_E_HIGH) {
+	EXPECT_EQ(GuitarStrings().getString(325.0f), StringName::E_High);
+	EXPECT_EQ(GuitarStrings().getString(330.0f), StringName::E_High);
+}
+

@@ -8,6 +8,7 @@ enum class StringName {
 
 class GuitarStrings {
 public:
+	StringName getString(Frequency frequency) const;
 	Frequency getFrequency(StringName string, int fret = 0) const;
 	Frequency getBaseFrequency(StringName string) const;
 };
