@@ -32,17 +32,20 @@ struct SongItem
 	std::string artist;
 	std::string title;
 
-	/** This shared pointer is stored to access all song
-	  information available.
-	  E.g. the full artist information can be accessed using
-	  this pointer.
-	 */
-	std::shared_ptr<Song> song;
+	std::shared_ptr<Song> getSong() const;
+	void setSong(std::shared_ptr<Song>);
+
+	bool isBroken() const;
+	void setBroken(bool broken = true);
 
 	bool operator< (SongItem const& other) const
 	{
 		return id < other.id;
 	}
+
+private:
+	bool m_broken = false;
+	std::shared_ptr<Song> m_song;
 };
 
 /**A list of songs for the database.
@@ -67,7 +70,7 @@ public:
 	  There will be no check if artist and title already exist - if you
 	  need that you want addSong().
 	 */
-	SongId addSongItem(std::string const& artist, std::string const& title, std::optional<SongId> id = std::nullopt);
+	SongId addSongItem(std::string const& artist, std::string const& title, bool broken = false, std::optional<SongId> id = std::nullopt);
 	/**Adds or Links an already existing song with an songitem.
 
 	  The id will be assigned and artist and title will be filled in.
@@ -87,6 +90,7 @@ public:
 	std::optional<SongId> lookup(Song const& song) const;
 
 	SongId getSongId(SongPtr const&) const;
+	SongPtr getSong(SongId) const;
 
 	/**Lookup the artist + title for a specific song.
 	  @return "Unknown Song" if nothing is found.
