@@ -37,9 +37,11 @@ Converter& UnicodeUtil::getConverter(std::string const& s) {
 }
 
 std::string UnicodeUtil::getCharset (std::string_view& str) {
+	if (removeUTF8BOM(str)) 
+		return "UTF-8";
+
 	int bytes_consumed;
 	bool is_reliable;
-	if (removeUTF8BOM(str)) return "UTF-8";
 
 	Encoding encoding = CompactEncDet::DetectEncoding(
 		str.data(), static_cast<int>(str.size()),
@@ -52,12 +54,10 @@ std::string UnicodeUtil::getCharset (std::string_view& str) {
 		&is_reliable);
 
 	if (!is_reliable) {
-			std::clog << "unicode/warning: detected encoding (" <<
-			MimeEncodingName(encoding) << ") for text: " <<
-			((str.size() <= 256) ? str : str.substr(0,255)) <<
-			" was flagged as not reliable." <<
-			std::endl; // Magic number, so sue me.
-		}
+			std::clog << "unicode/warning: detected encoding (" << MimeEncodingName(encoding) << ") for text: " << ((str.size() <= 256) ? str : str.substr(0,255)) <<
+			" was flagged as not reliable." << std::endl; // Magic number, so sue me.
+	}
+
 	return MimeEncodingName(encoding);
 }
 
