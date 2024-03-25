@@ -9,7 +9,6 @@
 #include "theme.hh"
 #include "menu.hh"
 #include "game.hh"
-#include "screen_songfilter.hh"
 #include "graphic/color_trans.hh"
 
 #include <SDL_timer.h>
@@ -33,8 +32,6 @@ void ScreenIntro::enter() {
 	reloadGL();
 	webserversetting = config["game/webserver_access"].ui();
 	m_audio.playSample("notice.ogg");
-
-	dynamic_cast<ScreenSongFilter*>(getGame().getScreen("SongFilter"))->onExitSwitchTo(getName());
 }
 
 void ScreenIntro::reloadGL() {
@@ -178,7 +175,6 @@ void ScreenIntro::populateMenu() {
 	m_menu.clear();
 	m_menu.add(MenuOption(translate_noop("Perform"), translate_noop("Start performing!"), imgSing)).screen("Songs");
 	m_menu.add(MenuOption(translate_noop("Practice"), translate_noop("Check your skills or test the microphones."), imgPractice)).screen("Practice");
-	m_menu.add(MenuOption(_("Songfilter"), _("Configure song filters"), imgConfig)).screen("SongFilter");
 	// Configure menu + submenu options
 	MenuOptions configmain;
 	for (auto const& submenu: configMenu) {
