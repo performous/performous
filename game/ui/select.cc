@@ -3,11 +3,11 @@
 #include "graphic/color_trans.hh"
 
 Select::Select(std::vector<std::string> const& items, Control* parent)
-: Control(parent), m_text(""), m_background(findFile("mainmenu_comment_bg.svg")), m_items(items) {
+: Control(parent), m_text(""), m_items(items) {
 }
 
 Select::Select(Control* parent, std::vector<std::string> const& items)
-: Control(parent), m_text(""), m_background(findFile("mainmenu_comment_bg.svg")), m_items(items) {
+: Control(parent), m_text(""), m_items(items) {
 }
 
 void Select::setItems(std::vector<std::string> const& items) {
@@ -58,8 +58,21 @@ void Select::draw(GraphicContext& gc) {
 
 	const auto color = ColorTrans(gc.getWindow(), hasFocus() ? Color(1.f, 1.f, 1.f) : Color(0.6f, 0.6f, 0.6f));
 
-	m_background.dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());
-	m_background.draw(gc.getWindow());
+	if (!m_background || !m_up_down) {
+		m_background = gc.getTheme().getSelectBG();
+		m_up_down = gc.getTheme().getSelectUpDown();
+	}
+
+	m_background->dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());
+	m_background->draw(gc.getWindow());
+
+	auto const width = getHeight() * 0.4f;
+	auto const height = getHeight() * 0.8f;
+	auto const x = width * 0.1f;
+	auto const y = height * 0.1f;
+
+	m_up_down->dimensions.left(getX() + x).top(getY() + y).fixedHeight(height);
+	m_up_down->draw(gc.getWindow());
 
 	gc.drawCentered(m_text, getX(), getY(), getWidth(), getHeight());
 }

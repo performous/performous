@@ -23,8 +23,8 @@ class CheckBox : public Control {
 	void draw(GraphicContext&) override;
 
   private:
-	Texture m_checkedImage;
-	Texture m_uncheckedImage;
+	std::unique_ptr<Texture> m_checkedImage;
+	std::unique_ptr<Texture> m_uncheckedImage;
 	bool m_checked;
 	std::function<void(CheckBox&, bool)> m_onStateChanged;
 };
