@@ -8,6 +8,7 @@
 #include "platform.hh"
 #include "screen_sing.hh"
 #include "screen_playlist.hh"
+#include "screen_songfilter.hh"
 #include "songs.hh"
 #include "theme.hh"
 #include "util.hh"
@@ -162,7 +163,13 @@ void ScreenSongs::manageEvent(SDL_Event event) {
 			if (key == SDL_SCANCODE_R && mod & Platform::shortcutModifier()) {
 				m_songs.reload();
 				m_songs.setFilter(m_search.text);
-				}
+			}
+			if (key == SDL_SCANCODE_F && mod & Platform::shortcutModifier()) {
+				auto filterScreen = dynamic_cast<ScreenSongFilter*>(getGame().getScreen("SongFilter"));
+
+				filterScreen->onExitSwitchTo(getName());
+				getGame().activateScreen("SongFilter");
+			}
 			// Shortcut keys for accessing different type filter modes.
 			if (key == SDL_SCANCODE_TAB) m_songs.sortChange(getGame(), Songs::SortChange::FORWARD);
 			if (key == SDL_SCANCODE_F5) m_songs.typeCycle(2);

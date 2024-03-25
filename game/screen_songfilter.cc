@@ -63,6 +63,10 @@ ScreenSongFilter::ScreenSongFilter(Game& game, Songs& songs)
 	initializeControls();
 }
 
+void ScreenSongFilter::onExitSwitchTo(std::string const& screen) {
+	m_nextScreen = screen;
+}
+
 void ScreenSongFilter::initializeControls() {
 	const auto songSummery = collectSummery(m_songs);
 	const auto verticalSpace = 0.05f;
@@ -256,7 +260,7 @@ void ScreenSongFilter::updateResult() {
 }
 
 void ScreenSongFilter::onCancel() {
-	m_game.activateScreen("Intro");
+	m_game.activateScreen(m_nextScreen);
 }
 
 void ScreenSongFilter::onAfterEventProcessing() {
