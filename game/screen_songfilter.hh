@@ -17,6 +17,8 @@ class ScreenSongFilter : public FormScreen {
 	ScreenSongFilter(Game&, Songs&);
 	~ScreenSongFilter() override = default;
 
+	void onExitSwitchTo(std::string const&);
+
 	void prepare() override {}
 	void draw() override;
 	void enter() override;
@@ -35,6 +37,7 @@ class ScreenSongFilter : public FormScreen {
   private:
 	Game& m_game;
 	Songs& m_songs;
+	std::string m_nextScreen = "Intro";
 	Texture m_background;
 	Label m_labelLanguage;
 	Select m_selectLanguage0;
