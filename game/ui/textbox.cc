@@ -3,11 +3,11 @@
 #include "graphic/color_trans.hh"
 
 TextBox::TextBox(std::string const& text, Control* parent)
-: Control(parent), m_text(text), m_background(findFile("mainmenu_back_highlight.svg")), m_cursor(findFile("cursor.svg")) {
+: Control(parent), m_text(text) {
 }
 
 TextBox::TextBox(Control* parent, std::string const& text)
-: Control(parent), m_text(text),  m_background(findFile("mainmenu_back_highlight.svg")), m_cursor(findFile("cursor.svg")) {
+: Control(parent), m_text(text) {
 }
 
 TextBox& TextBox::setText(std::string const& text, bool keepCursorPosition) {
@@ -98,11 +98,16 @@ void TextBox::onKey(Key key) {
 void TextBox::draw(GraphicContext& gc) {
 	drawFocus(gc);
 
+	if (!m_background || !m_cursor) {
+		m_background = gc.getTheme().getTextboxBG();
+		m_cursor = gc.getTheme().getTextboxCursor();
+	}
+
 	const auto color = ColorTrans(gc.getWindow(), hasFocus() ? Color(1.f, 1.f, 1.f) : Color(0.6f, 0.6f, 0.6f));
 	auto text = m_text.getText();
-
-	m_background.dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());
-	m_background.draw(gc.getWindow());
+	
+	m_background->dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());
+	m_background->draw(gc.getWindow());
 
 	m_text.setText(text);
 
@@ -117,9 +122,9 @@ void TextBox::draw(GraphicContext& gc) {
 		auto const w = getHeight() * 0.9f * 0.05f;
 		auto const h = getHeight() * 0.9f;
 
-		m_cursor.dimensions.left(x).top(y).stretch(w, h);
+		m_cursor->dimensions.left(x).top(y).stretch(w, h);
 		//m_cursor.dimensions.left(-0.05).top(-0.05).stretch(0.1f, 0.1f);
-		m_cursor.draw(gc.getWindow());
+		m_cursor->draw(gc.getWindow());
 	}
 }
 

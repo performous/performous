@@ -24,8 +24,8 @@ class TextBox : public Control {
 
   private:
 	Text m_text;
-	Texture m_background;
-	Texture m_cursor;
+	std::unique_ptr<Texture> m_background;
+	std::unique_ptr<Texture> m_cursor;
 	size_t m_cursorPosition = 0;
 	size_t m_maxLength = size_t(-1);
 	std::function<void(TextBox&, std::string const&, std::string const&)> m_onTextChanged;

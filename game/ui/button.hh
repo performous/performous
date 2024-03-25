@@ -20,7 +20,7 @@ class Button : public Control {
 
   private:
 	Text m_text;
-	Texture m_background;
+	std::unique_ptr<Texture> m_background;
 	std::function<void(Button&)> m_onClicked;
 };
 

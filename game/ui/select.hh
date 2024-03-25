@@ -26,7 +26,8 @@ class Select : public Control {
 
   private:
 	Text m_text;
-	Texture m_background;
+	std::unique_ptr<Texture> m_background;
+	std::unique_ptr<Texture> m_up_down;
 	std::vector<std::string> m_items;
 	size_t m_selected = size_t(-1);
 };

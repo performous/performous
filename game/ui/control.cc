@@ -20,48 +20,15 @@ Control::Control(Control* parent)
 	m_focusEffectImage.dimensions.stretch(0.01f, 0.01f);
 	m_focusEffectImage.dimensions.left(-0.005f).top(-0.005f);
 
-	auto drawer =  std::make_shared<TextureDrawer>(m_focusEffectImage);
-	auto pathChaser = std::make_shared<PathChaser>(m_focus);
-
-	pathChaser->setConsumer([&](Point const& point) {
-		//std::cout << "consumer: " << point << std::endl;
-		//m_focusEffectImage.dimensions.left(point.getX() - 0.005f).top(point.getY() - 0.005f);
-		auto v = glmath::vec2();
-
-		v[0] = point.getX();
-		v[1] = point.getY();
-
-		m_matrix = glm::mat3(1.f);
-		m_matrix = glm::scale(m_matrix, glmath::vec2(0.33f));
-		m_matrix = glm::translate(m_matrix, v);
-		//m_matrix = glm::scale(m_matrix, glmath::vec2(0.25f));
-	});
-
-	auto rotation = std::make_shared<Rotation>();
-
-	rotation->setConsumer([&](float angle) {
-		//std::cout << "consumer: " << angle << std::endl;
-		//m_matrix = glm::mat3(1.f);
-		m_matrix = glm::rotate(m_matrix, angle);
-	});
-
-	auto generic = std::make_shared<Generic>([&, drawer](EffectContext& context){
-		//std::cout << "generic" << std::endl;
-		const auto v = context.getSecondsSinceStart() * 0.5f;
-		const auto a = v - floor(v);
-		drawer->setMatrix(m_matrix);
-		drawer->setColor(Color(1.f, 0.f, 0.f, a));
-	});
-
 	auto border = std::make_shared<Sinus>(1.f, 0.f, 1.f);
 
 	border->setConsumer([&](float value, EffectContext& context){
 		//std::cout << "border: " << v << std::endl;
 		auto const color = ColorTrans(context.getGraphicContext().getWindow(), Color::alpha(value));
-		m_focus.draw(context.getGraphicContext().getWindow());
+		m_focus->draw(context.getGraphicContext().getWindow());
 	});
 
-	m_focusEffect = combine(border/*, pathChaser, rotation, generic, drawer*/);
+	m_focusEffect = combine(border);
 }
 
 Control* Control::getParent() {
@@ -151,8 +118,11 @@ void Control::sendOnKeyUp(Key key) {
 }
 
 void Control::drawFocus(GraphicContext& gc) {
+	if (!m_focus)
+		m_focus = std::make_unique<Border>(gc.getTheme().getFocus());
+
 	if(hasFocus()) {
-		m_focus.setGeometry(getX(), getY(), getWidth(), getHeight());
+		m_focus->setGeometry(getX(), getY(), getWidth(), getHeight());
 
 		gc.add(m_focusEffect);
 	}
