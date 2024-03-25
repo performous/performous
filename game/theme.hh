@@ -133,3 +133,8 @@ public:
 	/// configuration comment background (short tip)
 	Texture short_comment_bg;
 };
+
+class ThemeSongFilterScreen: public Theme {
+public:
+	ThemeSongFilterScreen();
+};

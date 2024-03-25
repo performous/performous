@@ -83,3 +83,7 @@ SvgTxtTheme& ThemeInstrumentMenu::getCachedOption(const std::string& text) {
 	options.insert(std::move(kv));
 	return (*options.at(text).get());
 }
+
+ThemeSongFilterScreen::ThemeSongFilterScreen()
+: Theme(findFile("songfilter_bg.svg")) {
+}

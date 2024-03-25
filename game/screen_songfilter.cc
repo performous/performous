@@ -59,7 +59,7 @@ namespace {
 }
 
 ScreenSongFilter::ScreenSongFilter(Game& game, Songs& songs)
-: FormScreen(game, "SongFilter"), m_game(game), m_songs(songs), m_background(findFile("intro_bg.svg")) {
+: FormScreen(game, "SongFilter"), m_game(game), m_songs(songs) {
 	initializeControls();
 }
 
@@ -268,13 +268,17 @@ void ScreenSongFilter::onAfterEventProcessing() {
 }
 
 void ScreenSongFilter::draw() {
-	m_background.draw(m_game.getWindow());
+	m_theme->bg.draw(m_game.getWindow());
 	FormScreen::draw();
 }
 
+void ScreenSongFilter::reloadGL() {
+}
+
 void ScreenSongFilter::enter() {
+	m_theme = std::make_unique<ThemeSongFilterScreen>();
 }
 
 void ScreenSongFilter::exit() {
+	m_theme.reset();
 }
-
