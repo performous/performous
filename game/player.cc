@@ -1,7 +1,9 @@
 ﻿#include "player.hh"
+
 #include "analyzer.hh"
-#include "song.hh"
 #include "engine.hh" // just for Engine::TIMESTEP
+#include "microphones.hh"
+#include "song.hh"
 
 Player::Player(VocalTrack& vocal, Analyzer& analyzer, size_t frames):
 	  m_vocal(vocal), m_analyzer(analyzer), m_pitch(frames, std::make_pair(getNaN(),
@@ -12,7 +14,7 @@ Player::Player(VocalTrack& vocal, Analyzer& analyzer, size_t frames):
 	// Initialize note powers
 	for (Notes::const_iterator it = m_vocal.notes.begin(); it != m_vocal.notes.end(); ++it) it->power = 0.0f;
 	// Assign colors
-	m_color = MicrophoneColor::get(m_analyzer.getId());
+	m_color = getMicrophoneColor(m_analyzer.getId());
 }
 
 void Player::prepare() {

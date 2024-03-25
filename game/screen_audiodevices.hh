@@ -9,11 +9,10 @@
 class Audio;
 class ThemeAudioDevices;
 
-/// options dialogue
 class ScreenAudioDevices: public Screen {
   public:
-	/// constructor
 	ScreenAudioDevices(Game &game, std::string const& name, Audio& m_audio);
+
 	void enter();
 	void exit();
 	void manageEvent(SDL_Event event);
@@ -29,6 +28,7 @@ class ScreenAudioDevices: public Screen {
 	void load(); ///< Check what devices are open
 	bool save(bool skip_ui_config = false); ///< Save the config to disk xml and then reload
 	bool verify(); ///< Check that all were opened after audio reset
+	void assignChannels();
 
 	Audio& m_audio;
 	std::unique_ptr<ThemeAudioDevices> m_theme;

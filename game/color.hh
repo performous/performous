@@ -26,6 +26,3 @@ struct Color {
 
 std::istream& operator>>(std::istream& is, Color& color);
 
-namespace MicrophoneColor {
-	Color get(std::string name);
-}
