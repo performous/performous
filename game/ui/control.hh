@@ -73,7 +73,7 @@ class Control {
 	bool m_focused = false;
 	bool m_enabled = true;
 	unsigned m_tabIndex = 0;
-	Border m_focus{std::make_shared<BorderDefinition>(findFile("ui_focused.svg").string())};
+	std::unique_ptr<Border> m_focus;
 	Texture m_focusEffectImage;
 	EffectPtr m_focusEffect;
 	glmath::mat3 m_matrix{1.f};

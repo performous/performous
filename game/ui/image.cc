@@ -2,12 +2,12 @@
 #include "graphiccontext.hh"
 
 Image::Image(std::string const& texture, Control* parent)
-: Control(parent), m_background(findFile("mainmenu_back_highlight.svg")) {
+: Control(parent) {
 	setTexture(texture);
 }
 
 Image::Image(Control* parent, std::string const& texture)
-: Control(parent), m_background(findFile("mainmenu_back_highlight.svg")) {
+: Control(parent) {
 	setTexture(texture);
 }
 
@@ -32,8 +32,11 @@ void Image::draw(GraphicContext& gc) {
 
 	drawFocus(gc);
 
-	m_background.dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());
-	m_background.draw(gc.getWindow());
+	if (!m_background)
+		m_background = gc.getTheme().getImageBG();
+
+	m_background->dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());
+	m_background->draw(gc.getWindow());
 
 	if(m_texture) {
 		m_texture->dimensions.left(getX() + xOffset).top(getY() + yOffset).stretch(width, height);

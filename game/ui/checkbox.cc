@@ -2,7 +2,7 @@
 #include "graphiccontext.hh"
 
 CheckBox::CheckBox(bool checked, Control* parent)
-: Control(parent), m_checkedImage(findFile("checkbox_checked.svg")), m_uncheckedImage(findFile("checkbox_unchecked.svg")), m_checked(checked) {
+: Control(parent), m_checked(checked) {
 }
 
 CheckBox::CheckBox(Control* parent, bool checked)
@@ -39,17 +39,21 @@ void CheckBox::onKey(Key key) {
 }
 
 void CheckBox::draw(GraphicContext& gc) {
+	if (!m_checkedImage || !m_uncheckedImage) {
+		m_checkedImage = gc.getTheme().getCheckboxCheck();
+		m_uncheckedImage = gc.getTheme().getCheckboxUncheck();
+	}
 	if(m_checked) {
-		m_checkedImage.dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());
-		m_checkedImage.draw(gc.getWindow());
-		m_uncheckedImage.dimensions.left(getX()).top(getY()).stretch(0, 0);
-		m_uncheckedImage.draw(gc.getWindow());
+		m_checkedImage->dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());
+		m_checkedImage->draw(gc.getWindow());
+		m_uncheckedImage->dimensions.left(getX()).top(getY()).stretch(0, 0);
+		m_uncheckedImage->draw(gc.getWindow());
 	}
 	else {
-		m_uncheckedImage.dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());
-		m_uncheckedImage.draw(gc.getWindow());
-		m_checkedImage.dimensions.left(getX()).top(getY()).stretch(0, 0);
-		m_checkedImage.draw(gc.getWindow());
+		m_uncheckedImage->dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());
+		m_uncheckedImage->draw(gc.getWindow());
+		m_checkedImage->dimensions.left(getX()).top(getY()).stretch(0, 0);
+		m_checkedImage->draw(gc.getWindow());
 	}
 }
 

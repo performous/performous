@@ -9,12 +9,16 @@
 
 #include "effect/ieffect.hh"
 
+#include "theme.hh"
+
 class Text;
 class EffectManager;
 
 class GraphicContext {
 public:
 	GraphicContext(Window&, EffectManager&);
+
+	ThemeUI const& getTheme() const;
 
 	void addFont(std::string const& font, fs::path const& file);
 
@@ -32,5 +36,6 @@ public:
 private:
 	Window& m_window;
 	EffectManager& m_effectManager;
+	ThemeUI m_theme;
 	std::map<std::string, std::pair<fs::path, double>> m_fonts;
 };
