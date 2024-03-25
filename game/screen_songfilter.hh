@@ -2,6 +2,7 @@
 
 #include "screen.hh"
 #include "isongfilter.hh"
+#include "theme.hh"
 #include "ui/graphiccontext.hh"
 #include "ui/form.hh"
 #include "ui/formscreen.hh"
@@ -23,7 +24,7 @@ class ScreenSongFilter : public FormScreen {
 	void draw() override;
 	void enter() override;
 	void exit() override;
-	void reloadGL() override { exit(); enter(); }
+	void reloadGL() override;
 
   protected:
 	void onCancel() override;
@@ -37,8 +38,8 @@ class ScreenSongFilter : public FormScreen {
   private:
 	Game& m_game;
 	Songs& m_songs;
+	std::unique_ptr<ThemeSongFilterScreen> m_theme;
 	std::string m_nextScreen = "Intro";
-	Texture m_background;
 	Label m_labelLanguage;
 	Select m_selectLanguage0;
 	Select m_selectLanguage1;

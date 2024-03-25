@@ -10,6 +10,10 @@ GraphicContext::GraphicContext(Window& window, EffectManager& manager)
 	addFont("ui", "mainmenu_comment.svg");
 }
 
+ThemeUI const& GraphicContext::getTheme() const {
+	return m_theme;
+}
+
 void GraphicContext::addFont(std::string const& font, fs::path const& file) {
 	m_fonts.emplace(font, std::make_pair(findFile(file), config["graphic/text_lod"].f()));
 }
