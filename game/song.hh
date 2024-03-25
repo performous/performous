@@ -118,8 +118,14 @@ public:
 	bool hasControllers() const { return !danceTracks.empty() || !instrumentTracks.empty(); }
 	bool getNextSection(double pos, SongSection &section);
 	bool getPrevSection(double pos, SongSection &section);
+
+	bool isBroken() const;
+	void setBroken(bool broken = true);
+
 private:
 	void collateUpdate();   ///< Rebuild collate variables (used for sorting) from other strings
+
+	bool m_broken = false;
 };
 
 /// Thrown by SongParser when there is an error
