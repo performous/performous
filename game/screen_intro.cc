@@ -9,6 +9,7 @@
 #include "theme.hh"
 #include "menu.hh"
 #include "game.hh"
+#include "screen_songfilter.hh"
 #include "graphic/color_trans.hh"
 
 #include <SDL_timer.h>
@@ -32,6 +33,8 @@ void ScreenIntro::enter() {
 	reloadGL();
 	webserversetting = config["game/webserver_access"].ui();
 	m_audio.playSample("notice.ogg");
+
+	dynamic_cast<ScreenSongFilter*>(getGame().getScreen("SongFilter"))->onExitSwitchTo(getName());
 }
 
 void ScreenIntro::reloadGL() {
