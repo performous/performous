@@ -68,6 +68,7 @@ void SongParser::parse(Song& song) {
 		if (!f.is_open()) {
 			throw SongParserException (song, "Could not open song file", 0);
 		}
+		m_ss.str({});
 		m_ss << f.rdbuf();
 		size_t size = m_ss.str().length();
 		if ((size < 10) || (size > 100000)) {
