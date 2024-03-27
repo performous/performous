@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <limits>
@@ -14,6 +15,27 @@ template <typename T> T sconv(std::string const& s);
 /** Limit val to range [min, max] **/
 template <typename T> constexpr T clamp(T val, T min = 0, T max = 1) {
 	return (val < min) ? min : (val > max) ? max : val;
+}
+
+// available wih c++20
+namespace std {
+	template<class Type, class Alloc, class Pred>
+	constexpr typename std::vector<Type, Alloc>::size_type erase_if(std::vector<Type, Alloc>& c, Pred pred) {
+//		auto it = std::remove_if(c.begin(), c.end(), pred);
+//		auto r = std::distance(it, c.end());
+//		c.erase(it, c.end());
+//		return r;
+		auto n = 0u;
+		for(auto it = c.begin(); it != c.end();) {
+			if(pred(*it)) {
+				it = c.erase(it);
+				++n;
+			}
+			else
+				++it;
+		}
+		return n;
+	}
 }
 
 template <typename Numeric> struct MinMax {
@@ -37,6 +59,10 @@ template <typename T> T smoothstep(T edge0, T edge1, T x) {
 /** Convenience smoothstep wrapper with edges at 0 and 1 **/
 template <typename T> T smoothstep(T x) { return smoothstep<T>(0, 1, x); }
 
+std::string toLower(std::string const& s);
+std::string toUpper(std::string const& s);
+bool containsNoCase(std::string const& word, std::string const& part);
+
 /** Symetric of lock_guard: release a lock in constructor and take it back in destructor */
 template <class Lockable>
 struct UnlockGuard {
@@ -52,6 +78,7 @@ struct UnlockGuard {
 
 std::uint32_t stou(std::string const & str, size_t * idx = nullptr, int base = 10);
 std::string format(std::chrono::seconds const& unixtime, std::string const& format, bool utc = false);
+int getTimezoneOffset();
 
 bool startsWithUTF8BOM(std::string const& s);
 bool isText(std::string const& s, size_t bytesToCheck = 32);

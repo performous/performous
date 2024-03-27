@@ -14,6 +14,7 @@
 #include "platform.hh"
 #include "screen_players.hh"
 #include "songparser.hh"
+#include "songparserexception.hh"
 #include "util.hh"
 #include "video.hh"
 #include "webcam.hh"
@@ -57,7 +58,9 @@ void ScreenSing::enter() {
 	reloadGL();
 	// Load song notes
 	getGame().loading(_("Loading song..."), 0.4f);
-	try { m_song->loadNotes(false /* don't ignore errors */); }
+	try {
+		m_song->loadNotes(false /* don't ignore errors */);
+	}
 	catch (SongParserException& e) {
 		std::clog << e;
 		getGame().activateScreen("Songs");
@@ -283,7 +286,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	input::NavButton nav = event.button;
 	m_quitTimer.setValue(config["game/results_timeout"].ui());
 	double time = m_audio.getPosition();
-	Song::Status status = m_song->status(time, this);
+	Song::Status status = m_song->status(time, m_menu.isOpen(), singingDuet(), selectedVocalTrack());
 	// When score window is displayed
 	if (m_score_window.get()) {
 		if (nav == input::NavButton::START || nav == input::NavButton::CANCEL) activateNextScreen();
@@ -558,7 +561,7 @@ void ScreenSing::draw() {
 		m_layout_singer[i]->draw(window, time, fullSinger ? LayoutSinger::PositionMode::FULL : (i == 0 ? LayoutSinger::PositionMode::TOP : LayoutSinger::PositionMode::BOTTOM));
 	}
 
-	Song::Status status = m_song->status(time, this);
+	Song::Status status = m_song->status(time, m_menu.isOpen(), singingDuet(), selectedVocalTrack());
 
 	// Compute and draw the timer and the progressbar
 	{

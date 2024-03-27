@@ -1,5 +1,7 @@
 #include "path_song_order.hh"
 
+#include "i18n.hh"
+
 std::string PathSongOrder::getDescription() const {
 	return _("sorted by path");
 }

@@ -1,5 +1,7 @@
 #include "file_time_song_order.hh"
 
+#include "i18n.hh"
+
 #include <filesystem>
 
 namespace {
