@@ -129,7 +129,7 @@ Songs::Cache Songs::loadCache() {
 	Cache cache;
 	for (auto const& songData : jsonRoot) {
 		auto song = std::make_shared<Song> (songData);
-		cache[song->filename] = std::move(song);
+		cache[song->filename.string()] = std::move(song);
 	}
 	return cache;
 }
