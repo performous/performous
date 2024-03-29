@@ -55,7 +55,6 @@ TEST(UnitTest_Microphones, getMicrophoneConfig_sequence) {
     auto const sut = getMicrophoneConfig();
 
     EXPECT_THAT(sut, ElementsAre(
-        //FieldsAre("blue", _), // not available on all platforms
         ColorNameIs("blue"),
         ColorNameIs("red"),
         ColorNameIs("green"),

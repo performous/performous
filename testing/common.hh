@@ -16,7 +16,6 @@ static const float pi2 = pi * 2.f;
 using ::testing::_;
 using ::testing::Contains;
 using ::testing::ElementsAre;
-//using ::testing::FieldsAre;
 using ::testing::FloatEq;
 using ::testing::FloatNear;
 using ::testing::IsEmpty;
