@@ -3,9 +3,10 @@
 #include "screen.hh"
 #include "isongfilter.hh"
 #include "theme.hh"
-#include "ui/graphiccontext.hh"
+#include "ui/button.hh"
 #include "ui/form.hh"
 #include "ui/formscreen.hh"
+#include "ui/graphiccontext.hh"
 #include "ui/label.hh"
 #include "ui/select.hh"
 #include "ui/textbox.hh"
@@ -33,6 +34,7 @@ class ScreenSongFilter : public FormScreen {
   private:
 	void initializeControls();
 	void updateResult();
+	void resetFilter();
 	SongFilterPtr makeFilter() const;
 
   private:
@@ -59,6 +61,7 @@ class ScreenSongFilter : public FormScreen {
 	Label m_labelArtist;
 	TextBox m_textBoxArtist;
 	Label m_labelResults;
+	Button m_buttonReset;
 };
 
 
