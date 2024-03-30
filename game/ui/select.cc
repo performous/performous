@@ -66,10 +66,11 @@ void Select::draw(GraphicContext& gc) {
 	m_background->dimensions.left(getX()).top(getY()).stretch(getWidth(), getHeight());
 	m_background->draw(gc.getWindow());
 
-	auto const width = getHeight() * 0.4f;
-	auto const height = getHeight() * 0.8f;
-	auto const x = width * 0.1f;
-	auto const y = height * 0.1f;
+	auto const up_down_left = false;
+	auto const width = getHeight() * 0.3f;
+	auto const height = getHeight() * 0.6f;
+	auto const x = up_down_left ? getHeight() * 0.1f : getWidth() - getHeight() * 0.1f - width;
+	auto const y = (getHeight() - height) * 0.5f;
 
 	m_up_down->dimensions.left(getX() + x).top(getY() + y).fixedHeight(height);
 	m_up_down->draw(gc.getWindow());
