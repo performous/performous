@@ -1,4 +1,5 @@
 #include "screen_songfilter.hh"
+#include "screen_songfilter.hh"
 
 #include "fs.hh"
 #include "i18n.hh"
@@ -165,6 +166,11 @@ void ScreenSongFilter::initializeControls() {
 	getForm().addControl(m_labelResults);
 	m_labelResults.setGeometry(horizontalOffset, verticalOffset + n * verticalSpace, horizontalSpace, lineHeight);
 
+	getForm().addControl(m_buttonReset);
+	m_buttonReset.setText(_("Reset"));
+	m_buttonReset.setGeometry(horizontalOffset + horizontalSpace * 3, verticalOffset + n * verticalSpace, 0.2f, lineHeight);
+	m_buttonReset.onClicked([&](auto&) { resetFilter(); });
+
 	getForm().focusNext();
 }
 
@@ -257,6 +263,23 @@ void ScreenSongFilter::updateResult() {
 
 //	if(filtered != all && !x) x = true;
 //	if(filtered == all && x) throw "";
+}
+
+void ScreenSongFilter::resetFilter() {
+	m_selectLanguage0.select(0);
+	m_selectLanguage1.select(0);
+	m_selectLanguage2.select(0);
+	m_selectGenre0.select(0);
+	m_selectGenre1.select(0);
+	m_selectGenre2.select(0);
+	m_selectYear0.select(0);
+	m_selectYear1.select(0);
+	m_selectYear2.select(0);
+	m_selectMode.select(0);
+	m_textBoxArtist.setText({});
+	m_textBoxTitle.setText({});
+
+	updateResult();
 }
 
 void ScreenSongFilter::onCancel() {
