@@ -3,9 +3,13 @@
 #include <algorithm>
 #include <random>
 
-void PlayList::addSong(std::shared_ptr<Song> song) {
-	std::lock_guard<std::mutex> l(m_mutex);
-	m_list.push_back(song);
+bool PlayList::addSong(std::shared_ptr<Song> song) {
+	if(m_limit == 0 || m_limit >= m_list.size() + 1) {
+		std::lock_guard<std::mutex> l(m_mutex);
+		m_list.push_back(song);
+		return true;
+	}
+	return false;
 }
 
 std::shared_ptr<Song> PlayList::getNext() {

@@ -222,7 +222,9 @@ bool ScreenSongs::addSong() {
 	auto& pl = getGame().getCurrentPlayList();
 	auto song = m_songs.currentPtr();
 	if (song->loadStatus != Song::LoadStatus::PARSERERROR) {
-		pl.addSong(song);
+		if(!pl.addSong(song)) {
+			getGame().dialog(_("The playlist size reached it's configured limit."));
+		}
 	}
 	else {
 		getGame().dialog(_("Song load status is error. Please check what's wrong with it."));
@@ -609,10 +611,13 @@ std::unique_ptr<fvec_t, void(*)(fvec_t*)> ScreenSongs::previewBeatsBuffer = std:
 void ScreenSongs::createPlaylistMenu() {
 	m_menu.clear();
 	m_menu.add(MenuOption(_("Play"), "")).call([this]() {
-		getGame().getCurrentPlayList().addSong(m_songs.currentPtr());
-		m_menuPos = 1;
-		m_menu.close();
-		sing();
+		if(!getGame().getCurrentPlayList().addSong(m_songs.currentPtr())) {
+			getGame().dialog(_("Playlist reached its configured limit."));
+		} else {
+			m_menuPos = 1;
+			m_menu.close();
+			sing();
+		}
 	});
 	m_menu.add(MenuOption(_("Shuffle"), "")).call([this]() {
 		getGame().getCurrentPlayList().shuffle();
