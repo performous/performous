@@ -36,6 +36,11 @@ to save the current settings to XML.
 			<short>Paths</short>
 			<long>Setup song and data paths.</long>
 		</entry>
+		<entry name="kioskmode">
+			<short>Kiosk mode</short>
+			<long>Setup automatic song play for event displays</long>
+		</entry>
+		
 	</menu>
 
 	<!-- Gameplay preferences -->
@@ -439,4 +444,21 @@ to save the current settings to XML.
 		<short>Sort order</short>
 		<long>Currently active sort order.</long>
 	</entry>
+	<!-- Kiosk mode -->
+	<entry name="kioskmode/startupscreen" type="uint" value="0">
+		<limits>
+			<enum>Main menu</enum>
+			<enum>Song browser</enum>
+			<enum>Sing screen</enum>
+		</limits>
+		<short>Startup screen</short>
+		<long>Define which screen the game should start in (requires restart).</long>
+	</entry>
+	<entry name="kioskmode/playlist_limit" type="uint" value="0">
+		<!-- maximum of 16 bit is 65536, so 60000 should be a nice upper-limit -->
+		<limits min="0" max="100" step="1" />
+		<short>Max playlist length</short>
+		<long>The maximum amount of songs allowed in the playlist. (0 = unlimited)</long>
+	</entry>
+	
 </performous>
