@@ -11,6 +11,7 @@ set(SOURCE_FILES
 	"printer.cc"
 	"ringbuffertest.cc"
 	"utiltest.cc"
+	"utils_network_test.cc"
 )
 set(GAME_SOURCES
 	"../game/analyzer.cc"
@@ -23,7 +24,9 @@ set(GAME_SOURCES
 	"../game/notegraphscalerfactory.cc"
 	"../game/tone.cc"
 	"../game/util.cc"
+	"../game/utils/network.cc"
 )
+
 
 set(GTEST_REQUIRED "")
 
