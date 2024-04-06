@@ -67,6 +67,10 @@ if(GTest_FOUND)
 		target_compile_options(performous_test PUBLIC -Werror)
 	endif()
 
+	if(WIN32 OR MINGW)
+		target_link_libraries(performous_test PRIVATE ws2_32 iphlpapi)
+	endif()
+
 	gtest_discover_tests(performous_test TEST_PREFIX UnitTest)
 else()
 	message(STATUS "Testing disabled: Package gtest missing")

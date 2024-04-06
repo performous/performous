@@ -2,13 +2,10 @@
 
 #include "utils/network.hh"
 
-#ifdef WIN32
+#if defined(WIN32) || defined(__MINGW32__)
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iphlpapi.h>
-
-#pragma comment(lib, "iphlpapi.lib")
-#pragma comment(lib, "Ws2_32.lib")
 #else
 #include <arpa/inet.h>
 #endif
