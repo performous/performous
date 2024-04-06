@@ -32,6 +32,7 @@
 #include <fstream>
 #include <regex>
 #include <stdexcept>
+#include <future>
 
 namespace {
 	void initializeSongOrders(Songs& songs) {
@@ -94,18 +95,31 @@ void Songs::reload_internal() {
 	Paths systemSongs = getPathsConfig("paths/system-songs");
 	Paths paths = getPathsConfig("paths/songs");
 	paths.insert(paths.begin(), systemSongs.begin(), systemSongs.end());
-
-	for (auto it = paths.begin(); m_loading && it != paths.end(); ++it) { //loop through stored directories from config
-		try {
-			if (!fs::is_directory(*it)) { std::clog << "songs/info: >>> Not scanning: " << *it << " (no such directory)\n"; continue; }
-			std::clog << "songs/info: >>> Scanning " << *it << std::endl;
-			size_t count = loadedSongs();
-			reload_internal(*it);
-			size_t diff = loadedSongs() - count;
-			if (diff > 0 && m_loading) std::clog << "songs/info: " << diff << " songs loaded\n";
-		} catch (std::exception& e) {
-			std::clog << "songs/error: >>> Error scanning " << *it << ": " << e.what() << '\n';
-		}
+	auto futures = std::vector<std::future<void>>();
+	for (const auto& path : paths) { // loop through stored directories from config
+		if (!m_loading)
+			break;
+		futures.emplace_back(std::async(std::launch::async, [this, &path] {
+			try {
+				if (!fs::is_directory(path)) {
+					std::clog << "songs/info: >>> Not scanning: " << path << " (no such directory)\n";
+					return;
+				}
+				std::clog << "songs/info: >>> Scanning " << path << std::endl;
+				auto const count = loadedSongs();
+				reload_internal(path);
+				auto const diff = loadedSongs() - count;
+				if (diff > 0 && m_loading)
+					std::clog << "songs/info: " << diff << " songs loaded. Path " << path << "\n";
+			}
+			catch (std::exception& e) {
+				std::clog << "songs/error: >>> Error scanning " << path << ": " << e.what() << '\n';
+			}
+			}));
+	}
+	// Wait for all tasks to complete
+	for (auto& future : futures) {
+		future.wait();
 	}
 	prof("total");
 	if (m_loading) dumpSongs_internal(); // Dump the songlist to file (if requested)
