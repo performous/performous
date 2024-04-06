@@ -67,8 +67,7 @@ if(GTest_FOUND)
 		target_compile_options(performous_test PUBLIC -Werror)
 	endif()
 
-	gtest_discover_tests(performous_test)
-
+	gtest_discover_tests(performous_test TEST_PREFIX UnitTest)
 else()
 	message(STATUS "Testing disabled: Package gtest missing")
 endif()
