@@ -59,7 +59,8 @@ TEST(UnitTest_getLocalIPAddresses, ipv4) {
 
 // This test will not succeed in the github pipeline due to missing ipv6 addresses.
 // So it is marked as developer test.
-TEST(DeveloperTest_getLocalIPAddresses, ipv6) {
+// Disabled until the ctest run in pipeline will filter for UnitTest.
+TEST(DeveloperTest_getLocalIPAddresses, DISABLED_ipv6) {
     auto const ips = getLocalIPAddresses(false, IPFilter::IPV6);
 
     EXPECT_THAT(ips, Not(Contains("127.0.0.1")));
