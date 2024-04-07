@@ -1,6 +1,6 @@
 #include "instrumentgraph.hh"
 #include "i18n.hh"
-#include "glutil.hh"
+#include "graphic/glutil.hh"
 #include "theme.hh"
 #include "graphic/view_trans.hh"
 
@@ -13,45 +13,28 @@ namespace {
 
 
 InstrumentGraph::InstrumentGraph(Game &game, Audio& audio, Song const& song, input::DevicePtr dev):
-  m_game(game),
-  m_audio(audio), m_song(song),
-  m_stream(),
-  m_dev(dev),
-  m_cx(0.0, 0.2), m_width(0.5, 0.4),
-  m_menu(),
-  m_button(findFile("button.svg")),
-  m_arrow_up(findFile("arrow_button_up.svg")),
-  m_arrow_down(findFile("arrow_button_down.svg")),
-  m_arrow_left(findFile("arrow_button_left.svg")),
-  m_arrow_right(findFile("arrow_button_right.svg")),
-  m_text(findFile("sing_timetxt.svg"), config["graphic/text_lod"].f()),
-  m_selectedTrack(),
-  m_selectedDifficulty(0),
-  m_rejoin(false),
-  m_leftymode(false),
-  m_pads(),
-  m_correctness(1.0, 5.0),
-  m_score(),
-  m_scoreFactor(),
-  m_starmeter(),
-  m_streak(),
-  m_longestStreak(),
-  m_bigStreak(),
-  m_countdown(3), // Display countdown 3 secs before note start
-  m_dead(),
-  m_ready()
+	m_game(game),
+	m_audio(audio), m_song(song),
+	m_dev(dev),
+	m_button(findFile("button.svg")),
+	m_arrow_up(findFile("arrow_button_up.svg")),
+	m_arrow_down(findFile("arrow_button_down.svg")),
+	m_arrow_left(findFile("arrow_button_left.svg")),
+	m_arrow_right(findFile("arrow_button_right.svg")),
+	m_text(findFile("sing_timetxt.svg"), config["graphic/text_lod"].f())
 {
 	double time = m_audio.getPosition();
 	m_jointime = time < 0.0 ? -1.0 : time + join_delay;
 
 	m_popupText = std::make_unique<SvgTxtThemeSimple>(findFile("sing_popup_text.svg"), config["graphic/text_lod"].f());
 	m_menuTheme = std::make_unique<ThemeInstrumentMenu>();
-	for (auto& elem: m_pressed) elem = false;
+	for (auto& elem: m_pressed) 
+		elem = false;
 }
 
-InstrumentGraph::~InstrumentGraph() = default;  // For destruction of unique_ptrs (only forward-declared in header)
-
-bool InstrumentGraph::dead() const { return m_jointime != m_jointime || m_dead >= death_delay; }
+bool InstrumentGraph::dead() const { 
+	return m_jointime != m_jointime || m_dead >= death_delay;
+}
 
 void InstrumentGraph::setupPauseMenu() {
 	m_menu.clear();
@@ -60,7 +43,6 @@ void InstrumentGraph::setupPauseMenu() {
 	m_menu.add(MenuOption(_("Restart"), _("Start the song\nfrom the beginning"))).screen("Sing");
 	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"))).screen("Songs");
 }
-
 
 void InstrumentGraph::doUpdates() {
 	if (!menuOpen() && !m_ready) {
@@ -78,8 +60,14 @@ void InstrumentGraph::quit(int) {
 }
 
 void InstrumentGraph::toggleMenu(int forcestate) {
-	if (forcestate == 1) { m_menu.open(); return; }
-	else if (forcestate == 0) { m_menu.close(); return; }
+	if (forcestate == 1) {
+		m_menu.open();
+		return;
+	}
+	if (forcestate == 0) { 
+		m_menu.close();
+		return; 
+	}
 	m_menu.toggle();
 }
 
@@ -87,10 +75,13 @@ void InstrumentGraph::toggleMenu(int forcestate) {
 void InstrumentGraph::drawMenu() {
 	auto& window = m_game.getWindow();
 	ViewTrans view(window, static_cast<float>(m_cx.get()), 0.0f, 0.75f);  // Apply a per-player local perspective
-	if (m_menu.empty()) return;
+	if (m_menu.empty())
+		return;
 	Dimensions dimensions(1.0f); // FIXME: bogus aspect ratio (is this fixable?)
-	if (getGraphType() == input::DevType::DANCEPAD) dimensions.screenTop().middle().stretch(static_cast<float>(m_width.get()), 1.0);
-	else dimensions.screenBottom().middle().fixedWidth(static_cast<float>(std::min(m_width.get(), 0.5)));
+	if (getGraphType() == input::DevType::DANCEPAD) 
+		dimensions.screenTop().middle().stretch(static_cast<float>(m_width.get()), 1.0);
+	else 
+		dimensions.screenBottom().middle().fixedWidth(static_cast<float>(std::min(m_width.get(), 0.5)));
 	ThemeInstrumentMenu& th = *m_menuTheme;
 	th.back_h.dimensions.fixedHeight(0.08f);
 	m_arrow_up.dimensions.stretch(0.05f, 0.05f);
@@ -225,7 +216,8 @@ Color const& InstrumentGraph::color(unsigned fret) const {
 		Color(0.0f, 0.0f, 1.0f),
 		Color(0.9f, 0.4f, 0.0f)
 	};
-	if (fret >= m_pads) throw std::logic_error("Invalid fret number in InstrumentGraph::color");
+	if (fret >= m_pads) 
+		throw std::logic_error("Invalid fret number in InstrumentGraph::color");
 	if (getGraphType() == input::DevType::DRUMS) {
 		if (fret == 0) fret = 4;
 		else if (fret == 4) fret = 0;

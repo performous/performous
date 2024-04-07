@@ -1,5 +1,6 @@
 #include "util.hh"
 
+#include <cmath>
 #include <iomanip>
 #include <sstream>
 #include <stdexcept>

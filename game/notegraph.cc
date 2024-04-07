@@ -5,23 +5,30 @@
 #include "engine.hh"
 #include "player.hh"
 #include "graphic/color_trans.hh"
+#include "graphic/texture_manager.hh"
 #include "graphic/transform.hh"
 
 Dimensions dimensions; // Make a public member variable
 
-NoteGraph::NoteGraph(VocalTrack const& vocal, NoteGraphScalerPtr const& scaler):
-  m_vocal(vocal),
-  m_notelines(findFile("notelines.svg")), m_wave(findFile("wave.svg")),
-  m_star(findFile("star.svg")), m_star_hl(findFile("star_glow.svg")),
-  m_notebar(findFile("notebar.svg")), m_notebar_hl(findFile("notebar_hi.svg")),
-  m_notebarfs(findFile("notebarfs.svg")), m_notebarfs_hl(findFile("notebarfs_hi.svg")),
-  m_notebargold(findFile("notebargold.svg")), m_notebargold_hl(findFile("notebargold_hi.svg")),
-  m_notealpha(0.0f), m_nlTop(0.0, 4.0), m_nlBottom(0.0, 4.0), m_time(), m_scaler(scaler)
+NoteGraph::NoteGraph(VocalTrack const& vocal, NoteGraphScalerPtr const& scaler, TextureManager& textureManager):
+	m_vocal(vocal),
+	m_notelines(textureManager.get(findFile("notelines.svg"))),
+	m_wave(textureManager.get(findFile("wave.svg"))),
+	m_star(textureManager.get(findFile("star.svg"))),
+	m_star_hl(textureManager.get(findFile("star_glow.svg"))),
+	m_notebar(textureManager.get(findFile("notebar.svg"))),
+	m_notebar_hl(textureManager.get(findFile("notebar_hi.svg"))),
+	m_notebarfs(textureManager.get(findFile("notebarfs.svg"))),
+	m_notebarfs_hl(textureManager.get(findFile("notebarfs_hi.svg"))),
+	m_notebargold(textureManager.get(findFile("notebargold.svg"))),
+	m_notebargold_hl(textureManager.get(findFile("notebargold_hi.svg"))),
+	m_scaler(scaler)
 {
 	dimensions.stretch(1.0f, 0.5f); // Initial dimensions, probably overridden from somewhere
 	m_nlTop.setTarget(m_vocal.noteMax, true);
 	m_nlBottom.setTarget(m_vocal.noteMin, true);
-	for (auto const& n: m_vocal.notes) n.stars.clear(); // Reset stars
+	for (auto const& n: m_vocal.notes)
+		n.stars.clear(); // Reset stars
 	reset();
 
 	m_scaler->initialize(vocal);
@@ -34,7 +41,7 @@ void NoteGraph::reset() {
 namespace {
 	void drawNotebar(Window& window, Texture const& texture, float x, float ybeg, float yend, float w, float h_x, float h_y) {
 		glutil::VertexArray va;
-		UseTexture tblock(window, texture);
+		TextureBinder tblock(window, texture);
 
 		// The front cap begins
 		va.texCoord(0.0f, 0.0f).vertex(x, ybeg);
@@ -70,10 +77,12 @@ const float baseLine = -0.2f;
 const float pixUnit = 0.2f;
 
 void NoteGraph::draw(Window& window, double time, Database const& database, Position position) {
-	if (time < m_time) reset();
+	if (time < m_time)
+		reset();
 	m_time = time;
 	// Update m_songit (which note to start the rendering from)
-	while (m_songit != m_vocal.notes.end() && (m_songit->type == Note::Type::SLEEP || m_songit->end < time - (baseLine + 0.5f) / pixUnit)) ++m_songit;
+	while (m_songit != m_vocal.notes.end() && (m_songit->type == Note::Type::SLEEP || m_songit->end < time - (baseLine + 0.5f) / pixUnit))
+		++m_songit;
 
 	// Automatically zooming notelines
 	{
@@ -108,9 +117,14 @@ void NoteGraph::draw(Window& window, double time, Database const& database, Posi
 	m_baseX = static_cast<float>(baseLine - m_time * pixUnit + dimensions.xc());  // FIXME: Moving in X direction requires additional love (is b0rked now, keep it centered at zero)
 
 	// Fading notelines handing
-	if (m_songit == m_vocal.notes.end() || m_songit->begin > m_time + 3.0) m_notealpha -= 0.02f;
-	else if (m_notealpha < 1.0f) m_notealpha += 0.02f;
-	if (m_notealpha <= 0.0f) { m_notealpha = 0.0f; return; }
+	if (m_songit == m_vocal.notes.end() || m_songit->begin > m_time + 3.0)
+		m_notealpha -= 0.02f;
+	else if (m_notealpha < 1.0f)
+		m_notealpha += 0.02f;
+	if (m_notealpha <= 0.0f) {
+		m_notealpha = 0.0f;
+		return;
+	}
 
 	ColorTrans c(window, Color::alpha(m_notealpha));
 
@@ -148,7 +162,8 @@ void NoteGraph::drawNotes(Window& window) {
 
 	// Draw notes
 	for (auto it = m_songit; it != m_vocal.notes.end() && it->begin < m_time - (baseLine - 0.5f) / pixUnit; ++it) {
-		if (it->type == Note::Type::SLEEP) continue;
+		if (it->type == Note::Type::SLEEP)
+			continue;
 		float alpha = it->power;
 		Texture* t1;
 		Texture* t2;
@@ -209,16 +224,20 @@ float NoteGraph::waveThickness(){
 
 namespace {
 	void strip(glutil::VertexArray& va) {
-		if (va.size() > 3) va.draw();
+		if (va.size() > 3)
+			va.draw();
 		va.clear();
 	}
 }
 
 void NoteGraph::drawWaves(Window& window, Database const& database) {
-	if (m_vocal.notes.empty()) return; // Cannot draw without notes
-	UseTexture tblock(window, m_wave);
+	if (m_vocal.notes.empty())
+		return; // Cannot draw without notes
+	TextureBinder tblock(window, m_wave);
 	auto sortedPlayers = std::list<std::reference_wrapper<const Player>>(database.cur.begin(), database.cur.end());
-	sortedPlayers.sort([](const Player& playerOne, const Player& playerTwo) {return playerOne.m_score < playerTwo.m_score; });
+	sortedPlayers.sort([](const Player& playerOne, const Player& playerTwo) {
+		return playerOne.m_score < playerTwo.m_score;
+	});
 	for (const Player& player: sortedPlayers) {
 		if (player.m_vocal.name != m_vocal.name)
 			continue;
@@ -228,7 +247,9 @@ void NoteGraph::drawWaves(Window& window, Database const& database) {
 		size_t const endIdx = player.m_pos;
 		size_t idx = beginIdx;
 		// Go back until silence (NaN freq) to allow proper wave phase to be calculated
-		if (beginIdx < endIdx) while (idx > 0 && pitch[idx].first == pitch[idx].first) --idx;
+		if (beginIdx < endIdx)
+			while (idx > 0 && pitch[idx].first == pitch[idx].first)
+				--idx;
 		// Start processing
 		float tex = texOffset;
 		double t = static_cast<double>(idx) * Engine::TIMESTEP;
@@ -239,20 +260,30 @@ void NoteGraph::drawWaves(Window& window, Database const& database) {
 		for (; idx < endIdx; ++idx, t += Engine::TIMESTEP) {
 			double const freq = pitch[idx].first;
 			// If freq is NaN, we have nothing to process
-			if (freq != freq) { oldval = getNaN(); tex = texOffset; continue; }
+			if (freq != freq) {
+				oldval = getNaN();
+				tex = texOffset;
+				continue;
+			}
 			tex += static_cast<float>(freq * 0.001); // Wave phase (texture coordinate)
-			if (idx < beginIdx) continue; // Skip graphics rendering if out of screen
+			if (idx < beginIdx)
+				continue; // Skip graphics rendering if out of screen
 			float x = static_cast<float>(-0.2f + (t - m_time) * pixUnit);
 			// Find the currently active note(s)
-			while (noteIt != m_vocal.notes.end() && (noteIt->type == Note::Type::SLEEP || t > noteIt->end)) ++noteIt;
+			while (noteIt != m_vocal.notes.end() && (noteIt->type == Note::Type::SLEEP || t > noteIt->end))
+				++noteIt;
 			auto notePrev = noteIt;
-			while (notePrev != m_vocal.notes.begin() && (notePrev->type == Note::Type::SLEEP || t < notePrev->begin)) --notePrev;
+			while (notePrev != m_vocal.notes.begin() && (notePrev->type == Note::Type::SLEEP || t < notePrev->begin))
+				--notePrev;
 			bool hasNote = (noteIt != m_vocal.notes.end());
 			bool hasPrev = notePrev->type != Note::Type::SLEEP && t >= notePrev->begin;
 			double val;
-			if (hasNote && hasPrev) val = 0.5 * (noteIt->note + notePrev->note);
-			else if (hasNote) val = noteIt->note;
-			else val = notePrev->note;
+			if (hasNote && hasPrev)
+				val = 0.5 * (noteIt->note + notePrev->note);
+			else if (hasNote)
+				val = noteIt->note;
+			else
+				val = notePrev->note;
 			// Now val contains the active note value. The following calculates note value for current freq:
 			val += Note::diff(val, MusicalScale(m_vocal.scale).setFreq(freq).getNote());
 			// Graphics positioning & animation:
@@ -261,9 +292,11 @@ void NoteGraph::drawWaves(Window& window, Database const& database) {
 			thickness *= NoteGraph::waveThickness() * (1.0 + 0.2 * std::sin(tex - 2.0 * texOffset)); // Further animation :)
 			thickness *= -m_noteUnit;
 			// If there has been a break or if the pitch change is too fast, terminate and begin a new one
-			if (oldval != oldval || std::abs(oldval - val) > 1) strip(va);
+			if (oldval != oldval || std::abs(oldval - val) > 1)
+				strip(va);
 			// Add a point or a pair of points
-			if (!va.size()) va.texCoord(tex, 0.5f).color(c).vertex(x, y);
+			if (!va.size())
+				va.texCoord(tex, 0.5f).color(c).vertex(x, y);
 			else {
 				va.texCoord(tex, 0.0f).color(c).vertex(x, y - static_cast<float>(thickness));
 				va.texCoord(tex, 1.0f).color(c).vertex(x, y + static_cast<float>(thickness));

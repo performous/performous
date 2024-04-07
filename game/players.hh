@@ -35,12 +35,12 @@ struct PlayersException: public std::runtime_error {
  */
 class Players {
   private:
-	typedef std::set<PlayerItem> players_t;
-	typedef std::vector<PlayerItem> fplayers_t;
+	using players_t = std::set<std::shared_ptr<PlayerItem>>;
+	using fplayers_t = std::vector<std::shared_ptr<PlayerItem>>;
 
   public:
 	Players(const Players&) = delete;
-  	const Players& operator=(const Players&) = delete;
+	const Players& operator=(const Players&) = delete;
 	Players() = default;
 
 	void load(xmlpp::NodeSet const& n);
@@ -57,11 +57,20 @@ class Players {
 	std::optional<std::string> lookup(const PlayerId &id) const;
 
 	/// add a player with a displayed name and an optional picture; if no id is given one will be assigned
-	void addPlayer (std::string const& name, std::string const& picture = "", std::optional<PlayerId> id = std::nullopt);
+	PlayerId addPlayer (std::string const& name, std::string const& picture = "", std::optional<PlayerId> id = std::nullopt);
+	void addPlayer(PlayerItem const&);
+	void assignIds();
+
+	void removePlayer(PlayerId);
+	void removePlayer(PlayerItem const&);
+
+	players_t const& getPlayers() const { return  m_players; }
 
 	/// const array access
-	PlayerItem operator[](unsigned pos) const;
+	PlayerItem const& operator[](unsigned pos) const;
+	PlayerItem& operator[](unsigned pos);
 	unsigned count() const { return static_cast<unsigned>(m_filtered.size()); }
+
 	bool isEmpty() const { return m_filtered.empty(); }
 	/// advances to next player
 	void advance(std::ptrdiff_t diff);
@@ -74,10 +83,10 @@ class Players {
 	/// sets margins for animation
 	void setAnimMargins(double left, double right) { math_cover.setMargins(left, right); }
 	/// @return current PlayerItem (the copy is very cheap at the moment)
-	PlayerItem current() const;
+	PlayerItem const& current() const;
 	/// filters playerlist by regular expression
 	void setFilter(std::string const& regex);
-  
+
 private:
 	PlayerId assign_id_internal(); /// returns the next available id
 	void filter_internal();
@@ -88,6 +97,4 @@ private:
 
 	std::string m_filter;
 	AnimAcceleration math_cover;
-
-	bool m_dirty = false;
 };

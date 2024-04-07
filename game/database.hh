@@ -23,7 +23,7 @@
   The current lists (Players and scores) are used
   to pass the information which players have won
   to the ScoreScreen and then to the players window.
- */
+  */
 class Database {
 public:
 	/**Will try to load the database.
@@ -73,10 +73,12 @@ public: // methods for database management
 	Players const& getPlayers() const;
 	/**A facade for SongItems::addSong.*/
 	void addSong(std::shared_ptr<Song> s);
+	SongItems const& getSongs() const { return m_songs; }
 	/**A facade for Hiscore::addHiscore.
 	 The ids will be looked up first by using the songs and current players data.
 	 */
 	void addHiscore(std::shared_ptr<Song> s);
+	Hiscore const& getHighScores() const { return m_hiscores; }
 
 public: // methods for database queries
 	/**A facade for Hiscore::reachedHiscore.
@@ -92,6 +94,7 @@ public: // methods for database queries
 	unsigned getHiscore(SongPtr const& s) const;
 	std::vector<HiscoreItem> getHiscores(SongPtr const& s) const;
 	bool noPlayers() const;
+	Players& getPlayers() { return m_players; }
 
 private:
 	fs::path m_filename;

@@ -73,8 +73,12 @@ using PlayerId = unsigned;
 struct PlayerItem {
 	PlayerItem() = default;
 	PlayerItem(const PlayerId& _id) : id{_id} {}
+	PlayerItem(PlayerItem const&) = default;
+	PlayerItem& operator=(PlayerItem const&) = default;
+	PlayerItem(PlayerItem&&) = default;
+	PlayerItem& operator=(PlayerItem&&) = default;
 
-	PlayerId id; ///< unique identifier for this PlayerItem, Link to hiscore
+	std::optional<PlayerId> id; ///< unique identifier for this PlayerItem, Link to hiscore
 
 	std::string name; ///< name displayed and used for searching the player
 	fs::path picture; ///< the filename which was passed from xml (and is written back)
@@ -97,4 +101,32 @@ struct PlayerItem {
 	{
 		return name == pi.name;
 	}
+
+	std::string getName() const {
+		return name;
+	}
+	void setName(std::string const& newName) {
+		name = newName;
+	}
+	std::string getAvatar() const {
+		return picture.string();
+	}
+	void setAvatar(std::string const& newPicture) {
+		picture = newPicture;
+	}
+	fs::path getAvatarPath() const {
+		return path;
+	}
+	void setAvatarPath(fs::path const& newPath) {
+		path = newPath;
+	}
+	bool isActive() const {
+		return m_active;
+	}
+	void setActive(bool active) {
+		m_active = active;
+	}
+
+  private:
+	bool m_active = true;
 };
