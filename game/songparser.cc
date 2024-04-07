@@ -181,10 +181,12 @@ void SongParser::guessFiles() {
 	for (unsigned i = 0; i < fields.size(); ++i) {
 		fs::path& field = *fields[i].first;
 		if (field.empty()) {
-			std::regex regexp(fields[i].second, std::regex_constants::icase);
+			auto const regexp = std::regex(fields[i].second, std::regex_constants::icase);
 			for (fs::path const& f : files) {
 				std::string name = f.filename().string();  // File basename
-				if (!regex_search(name, regexp)) continue;  // No match for current file
+				if (!regex_search(name, regexp)) {
+					continue;  // No match for current file
+				}
 				field = f;
 				logFound += "  " + name;
 			}

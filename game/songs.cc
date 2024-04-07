@@ -245,7 +245,7 @@ void Songs::CacheSonglist() {
 		songObject["collateByArtistOnly"] = song->collateByArtistOnly;
 
 		if(songObject != nlohmann::json::object()) {
-			jsonRoot.push_back(std::move(songObject));
+			jsonRoot.emplace_back(std::move(songObject));
 		}
 	}
 
@@ -272,7 +272,7 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 				continue; //if the folder does not contain any of the requested files, ignore it
 			}
 			try { //found song file, make a new song with it.
-				std::shared_ptr<Song> song = nullptr;
+				auto song = std::shared_ptr<Song>{};
 				auto match = cache.find(p.string());
 				if ( match != cache.end()) {
 					song = match->second;
@@ -280,8 +280,8 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 					std::clog << "songs/notice: Found song which was not in the cache: " << p.string() << std::endl;
 					song = std::make_shared<Song> (p);
 				}
-
-				m_songs.push_back(song); //put it in the database, if found twice will appear in double
+				std::unique_lock<std::shared_mutex> l(m_mutex);
+				m_songs.emplace_back(song); //put it in the database, if found twice will appear in double
 				m_database.addSong(song);
 				m_dirty = true;
 			} catch (SongParserException& e) {
