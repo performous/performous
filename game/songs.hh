@@ -24,7 +24,7 @@ class Database;
 /// songs class for songs screen
 class Songs {
   public:
-	typedef std::unordered_map<std::string, std::shared_ptr<Song>> Cache;
+	using Cache = std::unordered_map<std::string, std::shared_ptr<Song>>;
 	Songs(const Songs&) = delete;
 	const Songs& operator=(const Songs&) = delete;
 	/// constructor
