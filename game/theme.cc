@@ -3,10 +3,11 @@
 #include "fs.hh"
 #include "configuration.hh"
 
-Theme::Theme()
-{}
-Theme::Theme(fs::path const& path) : bg(path)
-{}
+Theme::Theme() {
+}
+
+Theme::Theme(fs::path const& path) : bg(path) {
+}
 
 ThemeSongs::ThemeSongs():
 	Theme(findFile("songs_bg.svg")),
@@ -24,6 +25,13 @@ ThemePractice::ThemePractice():
 	sharp(findFile("practice_sharp.svg")),
 	note_txt(findFile("practice_txt.svg"), config["graphic/text_lod"].f())
 {}
+
+ThemeGuitarTuner::ThemeGuitarTuner()
+: Theme(findFile("bg_guitar_tuner.svg")), 
+    fret(findFile("Guitar6Strings.png")), 
+    bar(findFile("bar.svg")), 
+	note_txt(findFile("practice_txt.svg"), config["graphic/text_lod"].f()) {
+}
 
 ThemeSing::ThemeSing():
 	bg_top(findFile("sing_bg_top.svg")),
@@ -83,3 +91,4 @@ SvgTxtTheme& ThemeInstrumentMenu::getCachedOption(const std::string& text) {
 	options.insert(std::move(kv));
 	return (*options.at(text).get());
 }
+

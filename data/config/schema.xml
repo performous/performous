@@ -213,6 +213,15 @@ to save the current settings to XML.
 		<long>Regex for matching the MIDI devices to use. The default is to use all available devices.</long>
 		<stringvalue></stringvalue>
 	</entry>
+	<entry name="game/unstable_features" type="uint" value="0">
+		<limits>
+			<enum>Only stable features</enum>
+			<enum>Enable features in beta state</enum>
+			<enum>Enable features in alpha and beta state</enum>
+		</limits>
+		<short>Feature state selection</short>
+		<long>Choose if performous should offer unstable features. Those features are not tested enough and may crash.</long>
+	</entry>
 <!--
 	<entry name="game/fallback_encoding" type="int" value="2">
 		<limits>

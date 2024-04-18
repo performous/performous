@@ -42,6 +42,21 @@ public:
 	SvgTxtTheme note_txt;
 };
 
+class ThemeGuitarTuner : public Theme {
+public:
+	ThemeGuitarTuner();
+
+	Texture fret;
+	Texture bar;
+	SvgTxtTheme note_txt;
+	float fretWidth = 0.5f;
+	float fretHeight = 0.3f;
+	float paddingLeft = 0.f;
+	float paddingRight = 0.f;
+	float paddingTop = 31.f / 278.f;
+	float paddingBottom = 21.f / 278.f;
+};
+
 /// theme for singing screen
 class ThemeSing: public Theme {
 public:

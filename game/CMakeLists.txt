@@ -3,12 +3,14 @@ cmake_minimum_required(VERSION 3.15)
 file(GLOB SOURCE_FILES
 	"*.cc"
 	"graphic/*.cc"
+	"guitar/*.cc"
 	"songorder/*.cc"
 	"utils/*.cc"
 )
 file(GLOB HEADER_FILES
 	"*.hh"
 	"graphic/*.hh"
+	"guitar/*.hh"
 	"songorder/*.hh"
 	"utils/*.hh"
 	"libda/*.hpp"
