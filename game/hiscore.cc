@@ -9,14 +9,12 @@
 #include <stdexcept>
 
 const unsigned Hiscore::MaximumScorePoints = 10000;
-const unsigned Hiscore::MinimumRecognizedScorePoints = 2000;
-const unsigned Hiscore::MaximumStoredScores = 16;
 
 bool Hiscore::reachedHiscore(unsigned score, SongId songid, unsigned short level, std::string const& track) const {
 	if (score > MaximumScorePoints) {
 		throw std::logic_error("Invalid score value, maximum is " + std::to_string(MaximumScorePoints) + " but got " + std::to_string(score));
 	}
-	if (score < MinimumRecognizedScorePoints) {
+	if (score < config["game/highscore_minimum_recognized_score_points"].ui()) {
 		return false; // come on, did you even try to sing?
 	}
 
@@ -26,7 +24,7 @@ bool Hiscore::reachedHiscore(unsigned score, SongId songid, unsigned short level
 		if (elem.track != track) continue;
 		if (elem.level != level) continue;
 		if (score > elem.score) return true;
-		if (++position >= MaximumStoredScores) return false;
+		if (config["game/highscore_limit_stored_scores"].b() && ++position >= config["game/highscore_maximum_stored_scores"].ui()) return false;
 	}
 	return true; // nothing found for that song -> true
 }

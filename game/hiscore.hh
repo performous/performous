@@ -12,8 +12,6 @@
 class Hiscore {
 public:
 	static const unsigned MaximumScorePoints;
-	static const unsigned MinimumRecognizedScorePoints;
-	static const unsigned MaximumStoredScores;
 
 	void load(xmlpp::NodeSet const& n);
 	void save(xmlpp::Element *players);
