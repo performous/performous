@@ -41,6 +41,12 @@ void Hiscore::addHiscore(HiscoreItem&& item) {
 	m_hiscore.insert(std::move(item));
 }
 
+void Hiscore::loadHiscore(HiscoreItem&& item) {
+	if (item.track.empty())
+		throw std::runtime_error("No track given");
+	m_hiscore.insert(std::move(item));
+}
+
 Hiscore::HiscoreVector Hiscore::queryHiscore(std::optional<PlayerId> playerid, std::optional<SongId> songid, std::string const& track, std::optional<unsigned> max) const {
 	HiscoreVector hv;
 	for (auto const& h: m_hiscore) {
@@ -113,7 +119,7 @@ void Hiscore::load(xmlpp::NodeSet const& nodes) {
 			unixtime = std::chrono::seconds(stou(a_time->get_value()));
 		}
 
-		addHiscore({score, playerid, songid, level, a_track ? a_track->get_value() : "vocals", unixtime});
+		loadHiscore({score, playerid, songid, level, a_track ? a_track->get_value() : "vocals", unixtime});
 	}
 }
 

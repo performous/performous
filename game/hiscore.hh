@@ -36,11 +36,19 @@ public:
 	  To check this, use reachedHiscore() first.
 
 	  The method will check if all ids are non-negative and the score
-	  in its valid interval. If one of this conditions is not net a
+	  in its valid interval. If one of these conditions is not met a
 	  HiscoreException will be raised.
 	  */
 	void addHiscore(unsigned score, const PlayerId& playerid, SongId songid, unsigned short level, std::string const& track);
 	void addHiscore(HiscoreItem&&);
+
+	/**Load a specific highscore from the database into the list.
+
+	  @pre Hiscore is loaded from database.
+
+	  There is no check regarding if it is useful to add this hiscore.
+	  */
+	void loadHiscore(HiscoreItem&&);
 
 	using HiscoreVector = std::vector<HiscoreItem>;
 
