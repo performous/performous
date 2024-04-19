@@ -131,7 +131,7 @@ set(Aubio_REQUIRED_VERSION "0.4.9")
 # Find all the libs that don't require extra parameters
 
 if (MINGW)
-	target_link_libraries(performous PRIVATE mingw32)
+	target_link_libraries(performous PRIVATE mingw32 ws2_32 iphlpapi)
 endif()
 
 foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM Json Ced Aubio)
@@ -254,8 +254,9 @@ if(WIN32)
 	add_definitions("-DEPOXY_SHARED")
 	set(BIN_INSTALL .)  # Straight to Program Files/Performous with no bin subfolder.
 	if(ENABLE_WEBSERVER)
-	  target_link_libraries(performous PRIVATE wsock32 ws2_32)
+		target_link_libraries(performous PRIVATE wsock32)
 	endif()
+	target_link_libraries(performous PRIVATE ws2_32 iphlpapi)
 elseif(APPLE)
 	set(BIN_INSTALL MacOS)
 else()

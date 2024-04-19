@@ -159,7 +159,7 @@ jobs:
       - name: Run unit tests
         run: |
           # Run the containers with the script for each testing suite
-          docker run --rm -v $(pwd):/github_actions_build/ ${{ env.CONTAINER_NAME }} ./run_tests.sh
+          docker run --rm -v $(pwd):/github_actions_build/ ${{ env.CONTAINER_NAME }} ./run_tests.sh -g
 
       # Upload artifacts during pull-requests
       - name: Upload artifact

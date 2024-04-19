@@ -11,6 +11,7 @@ set(SOURCE_FILES
 	"printer.cc"
 	"ringbuffertest.cc"
 	"utiltest.cc"
+	"utils_network_test.cc"
 )
 set(GAME_SOURCES
 	"../game/analyzer.cc"
@@ -23,7 +24,9 @@ set(GAME_SOURCES
 	"../game/notegraphscalerfactory.cc"
 	"../game/tone.cc"
 	"../game/util.cc"
+	"../game/utils/network.cc"
 )
+
 
 set(GTEST_REQUIRED "")
 
@@ -64,8 +67,11 @@ if(GTest_FOUND)
 		target_compile_options(performous_test PUBLIC -Werror)
 	endif()
 
-	gtest_discover_tests(performous_test)
+	if(WIN32 OR MINGW)
+		target_link_libraries(performous_test PRIVATE ws2_32 iphlpapi)
+	endif()
 
+	gtest_discover_tests(performous_test TEST_PREFIX UnitTest)
 else()
 	message(STATUS "Testing disabled: Package gtest missing")
 endif()
