@@ -380,9 +380,9 @@ std::string ScreenSongs::getHighScoreText() const {
 	auto stream = std::stringstream();
 	auto n = 0;
 	for (auto const& [track, scores]: scoresByTrack) {
+		if (n + 2 >= maxLines) break; // don't print a track if no scores for it would be printed
 		stream << track << ":\n";
 		n++;
-		if (n >= maxLines) break;
 
 		for (auto const& score: scores) {
 			scoreFormatter(stream, score.score);
