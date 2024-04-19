@@ -42,6 +42,7 @@ public:
 	enum class LoadStatus { NONE = 0, HEADER = 1, FULL = 2, ERROR = -1 } loadStatus = LoadStatus::NONE;
 	/// status of song
 	enum class Status { NORMAL, INSTRUMENTAL_BREAK, FINISHED };
+	enum class Type { NONE, TXT, XML, INI, SM } type = Type::NONE;
 	VocalTracks vocalTracks; ///< notes for the sing part
 	VocalTrack dummyVocal; ///< notes for the sing part
 	InstrumentTracks instrumentTracks; ///< guitar etc. notes for this song
@@ -94,7 +95,7 @@ public:
 
 	// Functions only below this line
 	Song(nlohmann::json const& song);  ///< Load song from cache.
-	Song(fs::path const& path, fs::path const& filename);  ///< Load song from specified path and filename
+	Song(fs::path const& filename);  ///< Load song from specified path and filename
 	void reload(bool errorIgnore = true);  ///< Reset and reload the entire song from file
 	void loadNotes(bool errorIgnore = true);  ///< Load note data (called when entering singing screen, headers preloaded).
 	void dropNotes();  ///< Remove note data (when exiting singing screen), to conserve RAM
@@ -118,6 +119,7 @@ public:
 	bool hasControllers() const { return !danceTracks.empty() || !instrumentTracks.empty(); }
 	bool getNextSection(double pos, SongSection &section);
 	bool getPrevSection(double pos, SongSection &section);
+	double getPreviewStart();
 private:
 	void collateUpdate();   ///< Rebuild collate variables (used for sorting) from other strings
 };

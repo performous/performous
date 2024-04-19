@@ -221,7 +221,7 @@ bool Music::prepare() {
 				std::lock_guard<std::recursive_mutex> l(Audio::aubio_mutex);
 				ScreenSongs* sSongs = dynamic_cast<ScreenSongs*>(m_game.getScreen("Songs"));
 				if (!sSongs->getSongs().currentPtr()) return false;
-				double pstart = sSongs->getSongs().currentPtr()->preview_start;
+				double pstart = sSongs->getSongs().currentPtr()->getPreviewStart();
 				pstart = (std::isnan(pstart) ? 0.0 : pstart);
 				double first_period = 0.0, first_beat = 0.0;
 				std::vector<double> extra_beats;

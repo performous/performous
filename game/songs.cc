@@ -78,6 +78,8 @@ void Songs::reload() {
 	m_thread = std::make_unique<std::thread>([this]{ reload_internal(); });
 }
 
+const std::string SONGS_CACHE_JSON_FILE = "songs.json";
+
 void Songs::reload_internal() {
 	{
 		std::unique_lock<std::shared_mutex> l(m_mutex);
@@ -85,43 +87,50 @@ void Songs::reload_internal() {
 		m_dirty = true;
 	}
 	std::clog << "songs/notice: Starting to load all songs from cache." << std::endl;
-	LoadCache();
-	// the following code is used to check that load <=> save are idempotent
-	//CacheSonglist();
-	//return;
-	std::clog << "songs/notice: Done loading the cache. You now have " << loadedSongs() << " songs in your list." << std::endl;
-	std::clog << "songs/notice: Starting to load all songs from disk, to update the cache." << std::endl;
+
 	Profiler prof("songloader");
+
+	auto cache = loadCache();
+
+    prof("load-cache");
+
+	std::clog << "songs/notice: Done loading the cache." << std::endl;
+	std::clog << "songs/notice: Starting to load all songs from disk, to update the cache." << std::endl;
+
 	Paths systemSongs = getPathsConfig("paths/system-songs");
 	Paths paths = getPathsConfig("paths/songs");
 	paths.insert(paths.begin(), systemSongs.begin(), systemSongs.end());
+
 	auto futures = std::vector<std::future<void>>();
 	for (const auto& path : paths) { // loop through stored directories from config
 		if (!m_loading)
 			break;
-		futures.emplace_back(std::async(std::launch::async, [this, &path] {
+		futures.emplace_back(std::async(std::launch::async, [this, &path, &cache] {
 			try {
 				if (!fs::is_directory(path)) {
-					std::clog << "songs/info: >>> Not scanning: " << path << " (no such directory)\n";
+					std::clog << "songs/info: >>> Not scanning: " << path << " (no such directory)" << std::endl;
 					return;
 				}
 				std::clog << "songs/info: >>> Scanning " << path << std::endl;
 				auto const count = loadedSongs();
-				reload_internal(path);
+				reload_internal(path, cache);
 				auto const diff = loadedSongs() - count;
 				if (diff > 0 && m_loading)
-					std::clog << "songs/info: " << diff << " songs loaded. Path " << path << "\n";
+					std::clog << "songs/info: " << diff << " songs loaded. Path " << path << std::endl;
 			}
 			catch (std::exception& e) {
-				std::clog << "songs/error: >>> Error scanning " << path << ": " << e.what() << '\n';
+				std::clog << "songs/error: >>> Error scanning " << path << ": " << e.what() << std::endl;
 			}
-			}));
+		}));
 	}
+
 	// Wait for all tasks to complete
 	for (auto& future : futures) {
 		future.wait();
 	}
-	prof("total");
+
+	prof("build-list");
+
 	if (m_loading) dumpSongs_internal(); // Dump the songlist to file (if requested)
 	std::clog << std::flush;
 	m_loading = false;
@@ -131,34 +140,15 @@ void Songs::reload_internal() {
 	doneLoading = true;
 }
 
-const std::string SONGS_CACHE_JSON_FILE = "songs.json";
-
-void Songs::LoadCache() {
+Songs::Cache Songs::loadCache() {
 	const fs::path songsMetaFile = getCacheDir() / SONGS_CACHE_JSON_FILE;
 	auto jsonRoot = readJSON(songsMetaFile);
-	if (jsonRoot.empty()) return;
-	std::vector<std::string> allPaths;
-	for(const auto& songPaths : {getPathsConfig("paths/system-songs"), getPathsConfig("paths/songs")}) {
-		for(const auto& songPath: songPaths) {
-			allPaths.push_back(songPath.string());
-		}
+	Cache cache;
+	for (auto const& songData : jsonRoot) {
+		auto song = std::make_shared<Song> (songData);
+		cache[song->filename.string()] = std::move(song);
 	}
-
-	for(auto const& song : jsonRoot) {
-		const auto songPath = song.at("txtFile").get<std::string>();
-		const bool isSongPathInConfiguredPaths = std::find_if(
-			allPaths.begin(),
-			allPaths.end(),
-			[songPath](const std::string& userSongItem) {
-				return songPath.find(userSongItem) != std::string::npos;
-			}) != allPaths.end();
-		STAT buffer;
-		if(_STAT(songPath.c_str(), &buffer) == 0 && isSongPathInConfiguredPaths) {
-			auto realSong = std::make_shared<Song>(song);
-			std::unique_lock<std::shared_mutex> l(m_mutex);
-			m_songs.push_back(std::move(realSong));
-		}
-	}
+	return cache;
 }
 
 void Songs::CacheSonglist() {
@@ -251,10 +241,6 @@ void Songs::CacheSonglist() {
 			songObject["guitarRhythm"] = song->music[TrackName::GUITAR_RHYTHM].string();
 		}
 
-		double duration = song->getDurationSeconds();
-		if(!std::isnan(duration)) {
-			songObject["duration"] = duration;
-		}
 		if (!song->m_bpms.empty()) {
 			songObject["bpm"] = 15 / song->m_bpms.front().step;
 		}
@@ -268,8 +254,15 @@ void Songs::CacheSonglist() {
 		songObject["danceTracks"] = song->hasDance();
 		songObject["guitarTracks"] = song->hasGuitars();
 		songObject["loadStatus"] = static_cast<int>(song->loadStatus);
+
+		// Collate info
+		songObject["collateByTitle"] = song->collateByTitle;
+		songObject["collateByTitleOnly"] = song->collateByTitleOnly;
+		songObject["collateByArtist"] = song->collateByArtist;
+		songObject["collateByArtistOnly"] = song->collateByArtistOnly;
+
 		if(songObject != nlohmann::json::object()) {
-			jsonRoot.push_back(songObject);
+			jsonRoot.emplace_back(std::move(songObject));
 		}
 	}
 
@@ -277,54 +270,36 @@ void Songs::CacheSonglist() {
 	writeJSON(jsonRoot, cacheDir);
 	}
 
-void Songs::reload_internal(fs::path const& parent) {
-	if (std::distance(parent.begin(), parent.end()) > 20) { std::clog << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)\n"; return; }
+void Songs::reload_internal(fs::path const& parent, Cache cache) {
 	try {
 		std::regex expression(R"((\.txt|^song\.ini|^notes\.xml|\.sm)$)", std::regex_constants::icase);
-		for (const auto &dir : fs::directory_iterator(parent)) { //loop through files
+		auto iterator = fs::recursive_directory_iterator(parent, fs::directory_options::follow_directory_symlink);
+		auto maxDepth = iterator.depth() + 10;
+		for (const auto &dir : iterator) { //loop through files
 			if (!m_loading) return; // early return in case scanning is long and user wants to exit quickly
+			if (dir.is_directory()) {
+				continue;
+			}
+			if (iterator.depth() > maxDepth) {
+				std::clog << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)\n";
+				continue; 
+			}
 			fs::path p = dir.path();
-			if (fs::is_directory(p)) { reload_internal(p); continue; } //if the file is a folder redo this function with this folder as path
-			if (!regex_search(p.filename().string(), expression)) continue; //if the folder does not contain any of the requested files, ignore it
+			if (!regex_search(p.filename().string(), expression)) {
+				continue; //if the folder does not contain any of the requested files, ignore it
+			}
 			try { //found song file, make a new song with it.
-				{
-					std::shared_lock<std::shared_mutex> l(m_mutex);
-					auto it = std::find_if(m_songs.begin(), m_songs.end(), [p](std::shared_ptr<Song> n) {
-						return n->filename == p;
-					});
-					auto const alreadyInCache =  it != m_songs.end();
-
-					if(alreadyInCache) {
-						m_database.addSong(*it);
-						continue;
-					}
+				auto song = std::shared_ptr<Song>{};
+				auto match = cache.find(p.string());
+				if ( match != cache.end()) {
+					song = match->second;
+				} else {
+					std::clog << "songs/notice: Found song which was not in the cache: " << p.string() << std::endl;
+					song = std::make_shared<Song> (p);
 				}
-
-				std::clog << "songs/notice: Found song which was not in the cache: " << p.string() << std::endl;
-
-				std::shared_ptr<Song>s(new Song(p.parent_path(), p));
-				std::ptrdiff_t AdditionalFileIndex = -1;
-				{
-					std::shared_lock<std::shared_mutex> l(m_mutex);
-					for(auto const& song: m_songs) {
-						if(s->filename.extension() != song->filename.extension() && s->filename.stem() == song->filename.stem() &&
-								s->title == song->title && s->artist == song->artist) {
-							std::clog << "songs/info: >>> Found additional song file: " << s->filename << " for: " << song->filename << std::endl;
-							AdditionalFileIndex = &song - &m_songs[0];
-						}
-					}
-				}
-
-				if(AdditionalFileIndex > 0) { //TODO: add it to existing song
-					std::clog << "songs/info: >>> not yet implemented " << std::endl;
-				}
-				s->getDurationSeconds();
-
-				// there is not race while the lock being released as this thread is the only one to modify the song list.
 				std::unique_lock<std::shared_mutex> l(m_mutex);
-				m_songs.push_back(s); //put it in the database, if found twice will appear in double
-				m_database.addSong(s);
-
+				m_songs.emplace_back(song); //put it in the database, if found twice will appear in double
+				m_database.addSong(song);
 				m_dirty = true;
 			} catch (SongParserException& e) {
 				std::clog << e;

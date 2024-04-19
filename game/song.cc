@@ -47,6 +47,11 @@ Song::Song(nlohmann::json const& song): dummyVocal(TrackName::VOCAL_LEAD), rando
 	loadStatus = static_cast<Song::LoadStatus>(getJsonEntry<int>(song, "loadStatus").value_or(1));
 	//loadStatus = Song::LoadStatus::HEADER;
 
+	collateByTitle = getJsonEntry<std::string>(song, "collateByTitle").value_or("");
+	collateByTitleOnly = getJsonEntry<std::string>(song, "collateByTitleOnly").value_or("");
+	collateByArtist = getJsonEntry<std::string>(song, "collateByArtist").value_or("");
+	collateByArtistOnly = getJsonEntry<std::string>(song, "collateByArtistOnly").value_or("");
+
 	for (size_t i = 0; i < getJsonEntry<size_t>(song, "vocalTracks").value_or(0); i++) {
 		std::string track = "DummyTrack" + std::to_string(i);
 		insertVocalTrack(track, VocalTrack(track));
@@ -72,18 +77,17 @@ Song::Song(nlohmann::json const& song): dummyVocal(TrackName::VOCAL_LEAD), rando
 	if (song.contains("bpm")) {
 		m_bpms.push_back(BPM(0, 0, song.at("bpm").get<float>()));
 	}
-	collateUpdate();
 }
 
-Song::Song(fs::path const& path, fs::path const& filename):
-  dummyVocal(TrackName::VOCAL_LEAD), path(path), filename(filename), randomIdx(rand())
+Song::Song(fs::path const& filename):
+  dummyVocal(TrackName::VOCAL_LEAD), path(filename.parent_path()), filename(filename), randomIdx(rand())
 {
 	SongParser(*this);
 	collateUpdate();
 }
 
 void Song::reload(bool errorIgnore) {
-	try { *this = Song(path, filename); } catch (...) { if (!errorIgnore) throw; }
+	try { *this = Song(filename); } catch (...) { if (!errorIgnore) throw; }
 }
 
 void Song::loadNotes(bool errorIgnore) {
@@ -205,6 +209,13 @@ double Song::getDurationSeconds() {
 	} else { //duration is still in memmory that means we already loaded it
 		return m_duration;
 	}
+}
+
+double Song::getPreviewStart() {
+	if (std::isnan(preview_start)) {
+		preview_start = ((type == Type::INI || getDurationSeconds() < 50.0) ? 5.0 : 30.0);  // 5 s for band mode, 30 s for others
+	}
+	return preview_start;
 }
 
 std::string Song::str() const { return title + "  by  " + artist; }

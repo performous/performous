@@ -96,6 +96,8 @@ static void checkEvents(Game& gm, Time eventTime) {
 }
 
 void mainLoop(std::string const& songlist) {
+	Window window{};
+
 	Platform platform;
 	std::clog << "core/notice: Starting the audio subsystem (errors printed on console may be ignored)." << std::endl;
 	std::clog << "core/info: Loading assets." << std::endl;
@@ -106,7 +108,7 @@ void mainLoop(std::string const& songlist) {
 	Songs songs(database, songlist);
 	loadFonts();
 
-	Window window{};
+	window.start();
 	Game gm(window);
 	WebServer server(gm, songs);
 
@@ -271,7 +273,11 @@ int main(int argc, char** argv) try {
 	namespace po = boost::program_options;
 	po::options_description opt1("Generic options");
 	std::string songlist;
+
 	std::string loglevel;
+#ifndef NDEBUG
+	loglevel = "debug";
+#endif
 	opt1.add_options()
 	  ("help,h", "you are viewing it")
 	  ("log,l", po::value<std::string>(&loglevel), "subsystem name or minimum level to log")
