@@ -393,10 +393,10 @@ std::string ScreenSongs::getHighScoreText() const {
 			if (n >= maxLines) break;
 		}
 
-		if(n >= maxLines) break;
+		if (n >= maxLines) break;
 		stream << "\n";
 		n++;
-		if(n >= maxLines) break;
+		if (n >= maxLines) break;
 	}
 
 	return stream.str();
