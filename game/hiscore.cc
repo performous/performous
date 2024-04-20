@@ -20,11 +20,16 @@ bool Hiscore::reachedHiscore(unsigned score, SongId songid, unsigned short level
 
 	unsigned position = 0;
 	for (auto const& elem: m_hiscore) {
-		if (elem.songid != songid) continue;
-		if (elem.track != track) continue;
-		if (elem.level != level) continue;
-		if (score > elem.score) return true;
-		if (config["game/highscore_limit_stored_scores"].b() && ++position >= config["game/highscore_maximum_stored_scores"].ui()) return false;
+		if (elem.songid != songid)
+			continue;
+		if (elem.track != track)
+			continue;
+		if (elem.level != level)
+			continue;
+		if (score > elem.score)
+			return true;
+		if (config["game/highscore_limit_stored_scores"].b() && ++position >= config["game/highscore_maximum_stored_scores"].ui())
+			return false;
 	}
 	return true; // nothing found for that song -> true
 }
