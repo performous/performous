@@ -9,9 +9,11 @@ set(SOURCE_FILES
 	"fixednotegraphscalertest.cc"
 	"microphones_test.cc"
 	"notegraphscalerfactorytest.cc"
-	"printer.cc"
 	"ringbuffertest.cc"
 	"utiltest.cc"
+
+	"main.cc"
+	"printer.cc"
 )
 set(GAME_SOURCES
 	"../game/analyzer.cc"
