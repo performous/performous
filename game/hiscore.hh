@@ -43,8 +43,8 @@ public:
 
 	  @pre Hiscore is added without checks.
 
-	  There is no check regarding if this is a hiscore based on.
-	  To check this, use addHiscore().
+	  There is no check regarding if this is a hiscore based on the constraints
+	  described in reachedHiscore(). To check this, use addHiscore().
 	  */
 	void addHiscoreUnconditionally(HiscoreItem&&);
 
