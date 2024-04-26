@@ -92,8 +92,8 @@ jobs:
             version: 20.04
           - os: ubuntu
             version: 22.04
-          - os: debian
-            version: 10
+          - os: ubuntu
+            version: 24.04
           - os: debian
             version: 11
           - os: debian
@@ -108,6 +108,8 @@ jobs:
             version: 38
           - os: fedora
             version: 39
+          - os: fedora
+            version: 40
     steps:
       - name: Container name
         run: |

@@ -105,6 +105,10 @@ jobs:
 
   # Pull in the MacOS build workflow
   MacOS_Package:
+    ## Something is going on with the FFMPEG deps
+    ## For some reason AvUtil doesn't appear to be included in the Homebrew
+    ## formula anymore
+    if: ${{ false }}
     name: Build the MacOS package
     uses: ./.github/workflows/macos.yml
     secrets: inherit
