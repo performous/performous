@@ -18,14 +18,18 @@ ScoreWindow::ScoreWindow(Game& game, Instruments& instruments, Database& databas
 	m_database.scores.clear();
 
 	// Singers
-	m_database.cur.remove_if([](Player const& p){ return p.getScore() < 500; }); // Dead.
-	for (Player const& p: m_database.cur) {
-		m_database.scores.emplace_back(p.getScore(), input::DevType::VOCALS, "Vocals", "vocals", Color(p.m_color.r, p.m_color.g, p.m_color.b));
+	m_database.cur.remove_if([](auto const& p){ 
+		return p.getScore() < 500;  // Dead.
+	});
+	for (auto const& player: m_database.cur) {
+		m_database.scores.emplace_back(player.getScore(), input::DevType::VOCALS, "Vocals", "vocals", Color(player.m_color));
 	}
-
+	
 	// Instruments
-	std::remove_if(instruments.begin(), instruments.end(),[](std::unique_ptr<InstrumentGraph> const& i){ return i->getScore() < 100; }); // Dead.
-	for (std::unique_ptr<InstrumentGraph> const& i: instruments) {
+	instruments.erase(std::remove_if(instruments.begin(), instruments.end(),[](std::unique_ptr<InstrumentGraph> const& i){ 
+		return i->getScore() < 100; // Dead. 
+	}), instruments.end());
+	for (auto const& i: instruments) {
 		input::DevType const& type = i->getGraphType();
 		std::string const& track_simple = i->getTrack();
 		std::string const& track = UnicodeUtil::toTitle(i->getModeId()); // Capitalize
