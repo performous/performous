@@ -23,6 +23,13 @@ void Database::load() {
 		m_players.load(nodeRoot->find("/performous/players/player"));
 		m_songs.load(nodeRoot->find("/performous/songs/song"));
 		m_hiscores.load(nodeRoot->find("/performous/hiscores/hiscore"));
+		
+		for (auto const& [song_id, song] : m_songs.getSongItems()) {
+			if (song.timesPlayed < 0) {
+				m_songs.addSongItem(song.artist, song.title, m_hiscores.getHiscores(song.id).size(), song.id);
+			}
+		}
+
 		std::clog << "database/info: Loaded " << m_players.count() << " players, " << m_songs.size() << " songs and " << m_hiscores.size() << " hiscores from " << m_filename.string() << std::endl;
 	} catch (std::exception const& e) {
 		std::clog << "database/error: Error loading " + m_filename.string() + ": " + e.what() << std::endl;
@@ -57,6 +64,10 @@ Players const& Database::getPlayers() const {
 	return m_players;
 }
 
+void Database::incrementSongPlayed(std::shared_ptr<Song> s) {
+	m_songs.incrementSongPlayed(s);
+}
+
 void Database::addSong(std::shared_ptr<Song> s) {
 	m_songs.addSong(s);
 }
@@ -70,43 +81,43 @@ void Database::addHiscore(std::shared_ptr<Song> s) {
 	auto playerid = maybe_playerid.value();
 	unsigned score = scores.front().score;
 	std::string track = scores.front().track;
-	const auto songid = m_songs.lookup(s);
-	if(!songid.has_value()) {
-		std::clog << "database/error: Invalid song ID for song: " + s->artist + " - " + s->title << std::endl;
-		return;
-	}
 	unsigned short level = config["game/difficulty"].ui();
-	m_hiscores.addHiscore(score, playerid, songid.value(), level, track);
-	std::clog << "database/info: Added new hiscore " << score << " points on track " << track << " of songid " << std::to_string(songid.value()) << " level "<< level<< std::endl;
+	m_hiscores.addHiscore(score, playerid, s->id, level, track);
+	std::clog << "database/info: Added new hiscore " << score << " points on track " << track << " of songid " << std::to_string(s->id) << " level "<< level<< std::endl;
 }
 
 bool Database::reachedHiscore(std::shared_ptr<Song> s) const {
 	unsigned score = scores.front().score;
 	const auto track = scores.front().track;
-	const auto songid = m_songs.lookup(s);
-	if (!songid) {
-		std::clog << "database/error: Invalid song ID for song: " + s->artist + " - " + s->title << std::endl;
-		return false;
-	}
 	unsigned short level = config["game/difficulty"].ui();
-	return m_hiscores.reachedHiscore(score, songid.value(), level, track);
+	return m_hiscores.reachedHiscore(score, s->id, level, track);
 }
 
 std::vector<HiscoreItem> Database::queryPerSongHiscore(std::shared_ptr<Song> s, std::string const& track) const {
-	auto const maybe_songid = m_songs.lookup(s);
+	return m_hiscores.queryHiscore(std::nullopt, s->id, track, std::nullopt);
+}
 
-	if (!maybe_songid) {
-		return {}; // song not yet in database.
+unsigned Database::resolveToSongId(Song const& s) const {
+	try {
+		return m_songs.resolveToSongId(s);
 	}
+	catch (const std::exception&) {
+		return -1;
+	}
+}
 
-	auto const songid = maybe_songid.value();
-
-	return m_hiscores.queryHiscore(std::nullopt, songid, track, std::nullopt);
+unsigned Database::getTimesPlayed(Song const& s) const {
+	try {
+		return m_songs.getSongItemById(s.id)->timesPlayed;
+	}
+	catch (const std::exception&) {
+		return 0;
+	}
 }
 
 bool Database::hasHiscore(Song const& s) const {
 	try {
-		return m_hiscores.hasHiscore(m_songs.lookup(s).value());
+		return m_hiscores.hasHiscore(s.id);
 	} catch (const std::exception&) {
 		return false;
 	}
@@ -114,8 +125,7 @@ bool Database::hasHiscore(Song const& s) const {
 
 unsigned Database::getHiscore(Song const& s) const {
 	try {
-		const auto songid = m_songs.lookup(s);
-		return m_hiscores.getHiscore(songid.value());
+		return m_hiscores.getHiscore(s.id);
 	} catch (const std::exception&) {
 		return 0;
 	}
@@ -123,9 +133,7 @@ unsigned Database::getHiscore(Song const& s) const {
 
 unsigned Database::getHiscore(SongPtr const& s) const {
 	try {
-		auto const songid = m_songs.getSongId(s);
-
-		return m_hiscores.getHiscore(songid);
+		return m_hiscores.getHiscore(s->id);
 	} catch (const std::exception& e) {
 		std::clog << "database/error: Invalid song ID for song: " + s->artist + " - " + s->title << std::endl;
 		std::clog << "database/error: message: " << e.what() << std::endl;
@@ -135,9 +143,7 @@ unsigned Database::getHiscore(SongPtr const& s) const {
 
 std::vector<HiscoreItem> Database::getHiscores(SongPtr const& s) const {
 	try {
-		auto const songid = m_songs.getSongId(s);
-
-		return m_hiscores.getHiscores(songid);
+		return m_hiscores.getHiscores((*s).id);
 	} catch (const std::exception& e) {
 		std::clog << "database/error: Invalid song ID for song: " + s->artist + " - " + s->title << std::endl;
 		std::clog << "database/error: message: " << e.what() << std::endl;
