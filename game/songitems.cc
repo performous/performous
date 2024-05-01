@@ -95,9 +95,8 @@ int SongItems::resolveToSongId(Song const& song) const {
 	return -1;
 }
 
-SongItem* SongItems::getSongItemById(SongId const& id) const {
-	SongItem si = m_songs_map.at(id);
-	return &si;
+SongItem SongItems::getSongItemById(SongId const& id) const {
+	return m_songs_map.at(id);
 }
 
 std::unordered_map<SongId, SongItem> SongItems::getSongItems() const {

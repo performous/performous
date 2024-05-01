@@ -82,6 +82,8 @@ public:
 	  */
 	void addSong(std::shared_ptr<Song> song);
 
+	/**Increments the timesPlayed counter for a given Song in the database
+	  */
 	void incrementSongPlayed(std::shared_ptr<Song> song);
 
 	/**Lookup the ID for a specific song.
