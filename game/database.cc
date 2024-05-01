@@ -108,7 +108,7 @@ unsigned Database::resolveToSongId(Song const& s) const {
 
 unsigned Database::getTimesPlayed(Song const& s) const {
 	try {
-		return m_songs.getSongItemById(s.id)->timesPlayed;
+		return m_songs.getSongItemById(s.id).timesPlayed;
 	}
 	catch (const std::exception&) {
 		return 0;
