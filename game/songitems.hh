@@ -94,7 +94,7 @@ public:
 	/**Lookup the SongItem for a specific song id.
 	  @return the SongItem for the specified song id.
 	  */
-	SongItem* getSongItemById(SongId const& id) const;
+	SongItem getSongItemById(SongId const& id) const;
 
 	/**Fetch all SongItems.
 	  @return all SongItems.
