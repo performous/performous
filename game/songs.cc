@@ -139,6 +139,8 @@ void Songs::CacheSonglist() {
 	std::shared_lock<std::shared_mutex> l(m_mutex);
 	for (auto const& song : m_songs) {
 		auto songObject = nlohmann::json::object();
+
+		songObject["id"] = static_cast<int>(song->id);
 		if(!song->path.string().empty()) {
 			songObject["txtFileFolder"] = song->path.string();
 		}
@@ -238,6 +240,11 @@ void Songs::CacheSonglist() {
 		songObject["guitarTracks"] = song->hasGuitars();
 		songObject["loadStatus"] = static_cast<int>(song->loadStatus);
 
+		songObject["highestScoreNormal"] = static_cast<int>(song->highestScores[GameDifficulty::NORMAL]);
+		songObject["highestScoreHard"] = static_cast<int>(song->highestScores[GameDifficulty::HARD]);
+		songObject["highestScorePerfect"] = static_cast<int>(song->highestScores[GameDifficulty::PERFECT]);
+		songObject["timesPlayed"] = static_cast<int>(song->timesPlayed);
+
 		// Collate info
 		songObject["collateByTitle"] = song->collateByTitle;
 		songObject["collateByTitleOnly"] = song->collateByTitleOnly;
@@ -274,8 +281,16 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 			try { //found song file, make a new song with it.
 				auto song = std::shared_ptr<Song>{};
 				auto match = cache.find(p.string());
-				if ( match != cache.end()) {
+				if (match != cache.end()) {
 					song = match->second;
+					if (song->id < 0)
+						song->id = m_database.resolveToSongId(*song);
+
+					// if song was in cache but can't be found in database drop it
+					if ((*song).id < 0) {
+						std::clog << "songs/error: Found song in the cache which is not in the database: " << p.string() << std::endl;
+						continue;
+					}
 				} else {
 					std::clog << "songs/notice: Found song which was not in the cache: " << p.string() << std::endl;
 					song = std::make_shared<Song> (p);
@@ -283,6 +298,9 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 				std::unique_lock<std::shared_mutex> l(m_mutex);
 				m_songs.emplace_back(song); //put it in the database, if found twice will appear in double
 				m_database.addSong(song);
+
+				// if song had timesPlayed and hiscores in the db update the song object accordingly
+				song->timesPlayed = m_database.getTimesPlayed(*song);
 				m_dirty = true;
 			} catch (SongParserException& e) {
 				std::clog << e;

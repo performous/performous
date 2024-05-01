@@ -31,6 +31,7 @@ struct SongItem
 	  */
 	std::string artist;
 	std::string title;
+	int timesPlayed = 0;
 
 	/** This shared pointer is stored to access all song
 	  information available.
@@ -60,14 +61,14 @@ struct SongItem
 class SongItems {
 public:
 	void load(xmlpp::NodeSet const& n);
-	void save(xmlpp::Element *players);
+	void save(xmlpp::Element* songs);
 
 	/**Adds a song item.
 	  If the id does not exist or is not unique, a new one will be assigned.
 	  There will be no check if artist and title already exist - if you
 	  need that you want addSong().
 	 */
-	SongId addSongItem(std::string const& artist, std::string const& title, std::optional<SongId> id = std::nullopt);
+	SongId addSongItem(std::string const& artist, std::string const& title, std::optional<int> const& _timesPlayed = std::nullopt, std::optional<SongId> id = std::nullopt);
 	/**Adds or Links an already existing song with an songitem.
 
 	  The id will be assigned and artist and title will be filled in.
@@ -81,23 +82,29 @@ public:
 	  */
 	void addSong(std::shared_ptr<Song> song);
 
-	/**Lookup a songid for a specific song.
-	  @return a value only if a song was found.*/
-	std::optional<SongId> lookup(std::shared_ptr<Song> song) const { if (song) return lookup(*song); return std::nullopt; };
-	std::optional<SongId> lookup(Song const& song) const;
+	void incrementSongPlayed(std::shared_ptr<Song> song);
 
-	SongId getSongId(SongPtr const&) const;
-
-	/**Lookup the artist + title for a specific song.
-	  @return "Unknown Song" if nothing is found.
+	/**Lookup the ID for a specific song.
+	  @return -1 if nothing is found.
 	  */
-	std::optional<std::string> lookup (const SongId& id) const;
+	int resolveToSongId(Song const& song) const;
 
-	std::size_t size() const { return m_songs.size(); }
+	/**Lookup the SongItem for a specific song id.
+	  @return the SongItem for the specified song id.
+	  */
+	SongItem* getSongItemById(SongId const& id) const;
+
+	/**Fetch all SongItems.
+	  @return all SongItems.
+	  */
+	std::unordered_map<SongId, SongItem> SongItems::getSongItems() const;
+
+	std::size_t size() const { return m_songs_map.size(); }
 
 private:
 	SongId assign_id_internal() const;
+	std::unordered_map<SongId, SongItem>::const_iterator lookup_by_name_internal(Song const& song) const;
 
-	using songs_t = std::set<SongItem>;
-	songs_t m_songs;
+	using songs_map_t = std::unordered_map<SongId, SongItem>;
+	songs_map_t m_songs_map;
 };

@@ -38,6 +38,7 @@ class ScreenSing;
 class Song {
 	friend class SongParser;
 public:
+	int id = -1;
 	/// Is the song parsed from the file yet?
 	enum class LoadStatus { NONE = 0, HEADER = 1, FULL = 2, ERROR = -1 } loadStatus = LoadStatus::NONE;
 	/// status of song
@@ -75,6 +76,9 @@ public:
 	std::string collateByTitleOnly;  ///< String for sorting by title only
 	std::string collateByArtist;  ///< String for sorting by artist, title
 	std::string collateByArtistOnly;  ///< String for sorting by artist only
+	using HighestScores = std::map<GameDifficulty, std::uint32_t>;
+	HighestScores highestScores; ///< Highest scores for sorting
+	std::uint32_t timesPlayed = 0; ///< Amount of times played for sorting
 	double videoGap = 0.0; ///< gap with video
 	double start = 0.0; ///< start of song
 	double preview_start = getNaN(); ///< starting time for the preview

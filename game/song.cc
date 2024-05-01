@@ -15,6 +15,7 @@ extern "C" {
 }
 
 Song::Song(nlohmann::json const& song): dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()) {
+	id = getJsonEntry<std::int32_t>(song, "id").value_or(-1);
 	path = getJsonEntry<std::string>(song, "txtFileFolder").value_or("");
 	filename = getJsonEntry<std::string>(song, "txtFile").value_or("");
 	artist = getJsonEntry<std::string>(song, "artist").value_or("");
@@ -51,6 +52,11 @@ Song::Song(nlohmann::json const& song): dummyVocal(TrackName::VOCAL_LEAD), rando
 	collateByTitleOnly = getJsonEntry<std::string>(song, "collateByTitleOnly").value_or("");
 	collateByArtist = getJsonEntry<std::string>(song, "collateByArtist").value_or("");
 	collateByArtistOnly = getJsonEntry<std::string>(song, "collateByArtistOnly").value_or("");
+
+	highestScores[GameDifficulty::NORMAL] = getJsonEntry<std::uint32_t>(song, "highestScoreNormal").value_or(0);
+	highestScores[GameDifficulty::HARD] = getJsonEntry<std::uint32_t>(song, "highestScoreHard").value_or(0);
+	highestScores[GameDifficulty::PERFECT] = getJsonEntry<std::uint32_t>(song, "highestScorePerfect").value_or(0);
+	timesPlayed = getJsonEntry<std::uint32_t>(song, "timesPlayed").value_or(0);
 
 	for (size_t i = 0; i < getJsonEntry<size_t>(song, "vocalTracks").value_or(0); i++) {
 		std::string track = "DummyTrack" + std::to_string(i);
