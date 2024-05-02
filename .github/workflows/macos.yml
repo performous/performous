@@ -33,7 +33,6 @@ jobs:
         cmake
         cpprestsdk
         dylibbundler
-        ffmpeg@4
         fftw
         fmt
         fontconfig
@@ -78,6 +77,12 @@ jobs:
         id: install_deps
         run: |
            brew install $MACOS_DEPS
+
+      - name: Install dependency FFMPEG from source
+        id: install_ffmpeg_deps
+        run: |
+           brew install ffmpeg@4 --build-from-source 
+
       - name: Setup Python
         id: setup_python
         uses: actions/setup-python@v5 
@@ -89,6 +94,7 @@ jobs:
       - name: Build package
         id: build_package
         run: |
+          export PKG_CONFIG_PATH="/opt/homebrew/opt/ffmpeg@4/lib/pkgconfig"
           cd performous/osx-utils
           chmod +x ./macos-bundler.py
           pip3 install -r ./macos-bundler-requirements.txt
