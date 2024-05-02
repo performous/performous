@@ -24,7 +24,7 @@ ScoreWindow::ScoreWindow(Game& game, Instruments& instruments, Database& databas
 	}
 
 	// Instruments
-	std::remove_if(instruments.begin(), instruments.end(),[](std::unique_ptr<InstrumentGraph> const& i){ return i->getScore() < 100; }); // Dead.
+	instruments.erase(std::remove_if(instruments.begin(), instruments.end(),[](std::unique_ptr<InstrumentGraph> const& i){ return i->getScore() < 100; }), instruments.end()); // Dead.
 	for (std::unique_ptr<InstrumentGraph> const& i: instruments) {
 		input::DevType const& type = i->getGraphType();
 		std::string const& track_simple = i->getTrack();
