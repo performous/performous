@@ -95,6 +95,7 @@ class Songs {
 	void reload_internal(fs::path const& p, Cache cache);
 	void randomize_internal();
 	void filter_internal();
+	void initialize_sort_internal();
 	void sort_internal(bool descending = false);
 
 	class RestoreSel;
