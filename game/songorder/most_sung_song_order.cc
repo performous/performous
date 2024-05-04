@@ -1,7 +1,6 @@
 #include "most_sung_song_order.hh"
 
 #include "database.hh"
-#include "profiler.hh"
 
 std::string MostSungSongOrder::getDescription() const {
 	return _("sort by most sung");

@@ -1,7 +1,6 @@
 #include "score_song_order.hh"
 
 #include "database.hh"
-#include "profiler.hh"
 
 std::string ScoreSongOrder::getDescription() const {
 	return _("sorted by score");
