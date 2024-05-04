@@ -71,7 +71,7 @@ void Database::addHiscore(std::shared_ptr<Song> s) {
 	unsigned score = scores.front().score;
 	std::string track = scores.front().track;
 	unsigned short level = config["game/difficulty"].ui();
-	m_hiscores.addHiscore(score, playerid, s->id, level, track);
+	m_hiscores.addHiscore(score, playerid, SongId(s->id), level, track);
 	std::clog << "database/info: Added new hiscore " << score << " points on track " << track << " of songid " << std::to_string(s->id) << " level "<< level<< std::endl;
 }
 
@@ -79,12 +79,12 @@ bool Database::reachedHiscore(std::shared_ptr<Song> s) const {
 	unsigned score = scores.front().score;
 	const auto track = scores.front().track;
 	unsigned short level = config["game/difficulty"].ui();
-	return m_hiscores.reachedHiscore(score, s->id, level, track);
+	return m_hiscores.reachedHiscore(score, SongId(s->id), level, track);
 }
 
 bool Database::hasHiscore(Song const& s) const {
 	try {
-		return m_hiscores.hasHiscore(s.id);
+		return m_hiscores.hasHiscore(SongId(s.id));
 	} catch (const std::exception&) {
 		return false;
 	}
@@ -92,7 +92,7 @@ bool Database::hasHiscore(Song const& s) const {
 
 unsigned Database::getHiscore(Song const& s) const {
 	try {
-		return m_hiscores.getHiscore(s.id);
+		return m_hiscores.getHiscore(SongId(s.id));
 	} catch (const std::exception&) {
 		return 0;
 	}
@@ -100,7 +100,7 @@ unsigned Database::getHiscore(Song const& s) const {
 
 unsigned Database::getHiscore(SongPtr const& s) const {
 	try {
-		return m_hiscores.getHiscore(s->id);
+		return m_hiscores.getHiscore(SongId(s->id));
 	} catch (const std::exception& e) {
 		std::clog << "database/error: Invalid song ID for song: " + s->artist + " - " + s->title << std::endl;
 		std::clog << "database/error: message: " << e.what() << std::endl;
@@ -109,9 +109,9 @@ unsigned Database::getHiscore(SongPtr const& s) const {
 }
 
 std::vector<HiscoreItem> Database::getHiscores(SongPtr const& s) const {
-	return m_hiscores.getHiscores(s->id);
+	return m_hiscores.getHiscores(SongId(s->id));
 }
 
 size_t Database::getAllHiscoresCount(SongPtr const& s) const {
-	return m_hiscores.getAllHiscoresCount(s->id);
+	return m_hiscores.getAllHiscoresCount(SongId(s->id));
 }
