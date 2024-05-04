@@ -140,5 +140,5 @@ std::size_t Hiscore::size() const {
 	std::vector<size_t> sizes(m_hiscore_map.size(), 0);
 	auto map_func = [](std::pair<SongId, hiscore_t> songHiscores) {return songHiscores.second.size();};
 	std::transform(m_hiscore_map.begin(), m_hiscore_map.end(), sizes.begin(), map_func);
-	return std::accumulate(sizes.begin(), sizes.end(), 0, std::plus{});
+	return std::size_t(std::accumulate(sizes.begin(), sizes.end(), 0, std::plus{}));
 }
