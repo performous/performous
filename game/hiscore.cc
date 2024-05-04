@@ -20,11 +20,13 @@ bool Hiscore::reachedHiscore(unsigned score, SongId songid, unsigned short level
 		return false; // come on, did you even try to sing?
 	}
 
+	HiscoreItemBySongAndLevelKey const& key = { songid, level };
+	if (m_hiscore_map_with_level.find(key) == m_hiscore_map_with_level.end())
+		return true;
+
 	unsigned position = 0;
-	for (auto const& elem: m_hiscore) {
-		if (elem.songid != songid) continue;
+	for (auto const& elem: m_hiscore_map_with_level.at(key)) {
 		if (elem.track != track) continue;
-		if (elem.level != level) continue;
 		if (score > elem.score) return true;
 		if (++position >= MaximumStoredScores) return false;
 	}
@@ -41,28 +43,12 @@ void Hiscore::addHiscore(HiscoreItem&& item) {
 	if (!reachedHiscore(item.score, item.songid, item.level, item.track))
 		return;
 
-	m_hiscore.insert(item);
 	m_hiscore_map[item.songid].insert(item);
 	m_hiscore_map_with_level[{item.songid, item.level}].insert(item);
 }
 
-Hiscore::HiscoreVector Hiscore::queryHiscore(std::optional<PlayerId> playerid, std::optional<SongId> songid, std::string const& track, std::optional<unsigned> max) const {
-	HiscoreVector hv;
-	for (auto const& h: m_hiscore) {
-		if (playerid && playerid.value() != h.playerid) continue;
-		if (songid && songid.value() != h.songid) continue;
-		if (currentLevel() != h.level) continue;
-		if (!track.empty() && track != h.track) continue;
-		if (max && --max.value() == 0) break;
-		hv.push_back(h);
-	}
-	return hv;
-}
-
 bool Hiscore::hasHiscore(const SongId& songid) const {
-	return std::any_of(m_hiscore.begin(),m_hiscore.end(), [&songid, level = currentLevel()](auto const& h) {
-		return songid == h.songid && level == h.level;
-	});
+	return !m_hiscore_map_with_level.at({ songid, currentLevel() }).empty();
 }
 
 unsigned Hiscore::getHiscore(const SongId songid) const {
@@ -124,17 +110,27 @@ void Hiscore::load(xmlpp::NodeSet const& nodes) {
 }
 
 void Hiscore::save(xmlpp::Element *hiscores) {
-	for (auto const& h: m_hiscore) {
-		xmlpp::Element* hiscore = xmlpp::add_child_element(hiscores, "hiscore");
-		hiscore->set_attribute("playerid", std::to_string(h.playerid));
-		hiscore->set_attribute("songid", std::to_string(h.songid));
-		hiscore->set_attribute("track", h.track);
-		hiscore->set_attribute("level", std::to_string(h.level));
-		hiscore->set_attribute("unixtime", std::to_string(h.unixtime.count()));
-		hiscore->add_child_text(std::to_string(h.score));
+	for (auto const& [song_id, song_hiscores] : m_hiscore_map) {
+		for (auto const& h : song_hiscores) {
+			xmlpp::Element* hiscore = xmlpp::add_child_element(hiscores, "hiscore");
+			hiscore->set_attribute("playerid", std::to_string(h.playerid));
+			hiscore->set_attribute("songid", std::to_string(h.songid));
+			hiscore->set_attribute("track", h.track);
+			hiscore->set_attribute("level", std::to_string(h.level));
+			hiscore->set_attribute("unixtime", std::to_string(h.unixtime.count()));
+			hiscore->add_child_text(std::to_string(h.score));
+		}
 	}
 }
 
 unsigned short Hiscore::currentLevel() const {
 	return config["game/difficulty"].ui();
+}
+
+// to count all hiscores sum up the sizes of all songs' hiscores
+std::size_t Hiscore::size() const {
+	std::vector<size_t> sizes(m_hiscore_map.size(), 0);
+	auto map_func = [](std::pair<SongId, hiscore_t> songHiscores) {return songHiscores.second.size();};
+	std::transform(m_hiscore_map.begin(), m_hiscore_map.end(), sizes.begin(), map_func);
+	return std::accumulate(sizes.begin(), sizes.end(), 0, std::plus{});
 }
