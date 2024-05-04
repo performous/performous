@@ -90,7 +90,6 @@ public:
 
 private:
 	SongId assign_id_internal() const;
-	std::unordered_map<SongId, SongItem>::const_iterator lookup_by_name_internal(Song const& song) const;
 	bool match_artist_and_title_internal(Song const& song, SongItem const& songItem) const;
 
 	using songs_map_t = std::unordered_map<SongId, SongItem>;

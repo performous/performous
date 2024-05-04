@@ -82,10 +82,6 @@ bool Database::reachedHiscore(std::shared_ptr<Song> s) const {
 	return m_hiscores.reachedHiscore(score, s->id, level, track);
 }
 
-std::vector<HiscoreItem> Database::queryPerSongHiscore(std::shared_ptr<Song> s, std::string const& track) const {
-	return m_hiscores.queryHiscore(std::nullopt, s->id, track, std::nullopt);
-}
-
 std::optional<SongId> Database::resolveToSongId(Song const& s) const {
 	try {
 		return m_songs.resolveToSongId(s);
