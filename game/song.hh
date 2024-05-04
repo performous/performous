@@ -38,7 +38,7 @@ class ScreenSing;
 class Song {
 	friend class SongParser;
 public:
-	int id = -1;
+	SongId id;
 	/// Is the song parsed from the file yet?
 	enum class LoadStatus { NONE = 0, HEADER = 1, FULL = 2, ERROR = -1 } loadStatus = LoadStatus::NONE;
 	/// status of song
