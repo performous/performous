@@ -27,12 +27,7 @@ void SongItems::load(xmlpp::NodeSet const& n) {
 			throw SongItemsException("No attribute title");
 		auto title = a_title->get_value();
 
-		xmlpp::Attribute* a_timesPlayed = element.get_attribute("timesPlayed");
-		auto timesPlayed = -1;
-		if (a_timesPlayed)
-			timesPlayed = std::stoi(a_timesPlayed->get_value());
-
-		addSongItem(artist, title, timesPlayed, id);
+		addSongItem(artist, title, id);
 	}
 }
 
@@ -42,11 +37,10 @@ void SongItems::save(xmlpp::Element* songs) {
 		element->set_attribute("id", std::to_string(song.id));
 		element->set_attribute("artist", song.artist);
 		element->set_attribute("title", song.title);
-		element->set_attribute("timesPlayed", std::to_string(song.timesPlayed));
 	}
 }
 
-SongId SongItems::addSongItem(std::string const& artist, std::string const& title, std::optional<int> const& _timesPlayed, std::optional<SongId> _id) {
+SongId SongItems::addSongItem(std::string const& artist, std::string const& title, std::optional<SongId> _id) {
 	SongItem si;
 
 	if (_id.has_value() && m_songs_map.find(_id.value()) != m_songs_map.end()) {
@@ -58,30 +52,20 @@ SongId SongItems::addSongItem(std::string const& artist, std::string const& titl
 	UnicodeUtil::collate(collateInfo);
 	si.artist = collateInfo["artist"];
 	si.title = collateInfo["title"];
-	si.timesPlayed = _timesPlayed.value_or(si.timesPlayed);
 
 	m_songs_map[si.id] = si;
 	return si.id;
 }
 
-void SongItems::incrementSongPlayed(SongPtr song) {
-	SongItem si = m_songs_map.at(song->id);
-	++m_songs_map.at(song->id).timesPlayed;
-	song->timesPlayed = si.timesPlayed;
-}
-
-void SongItems::addSong(SongPtr song) {
+SongId SongItems::addSong(SongPtr song) {
 	auto song_id = resolveToSongId(*song);
-	song_id = song_id < 0 ? (addSongItem(song->artist, song->title, song->timesPlayed)) : song_id;
+	song_id = song_id < 0 ? (addSongItem(song->artist, song->title)) : song_id;
 
 	SongItem si = m_songs_map.at(song_id);
 
-	// if a song was not in the cache, but had hiscores in the db which were counted to set an initial value for timesPlayed make sure to use that instead of 0
-	si.timesPlayed = si.timesPlayed < 0 ? song->timesPlayed : std::max(song->timesPlayed, uint32_t(si.timesPlayed));
-	si.song = song;
-	song->id = song_id;
-
 	m_songs_map[si.id] = si;
+
+	return si.id;
 }
 
 int SongItems::resolveToSongId(Song const& song) const {
@@ -108,5 +92,5 @@ SongId SongItems::assign_id_internal() const {
 	// use the last one with highest id
 	auto it = std::max_element(m_songs_map.begin(), m_songs_map.end());
 	if (it != m_songs_map.end()) return it->second.id+1;
-	return 0; // empty set
+	return 0; // empty map
 }

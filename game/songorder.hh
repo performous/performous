@@ -18,6 +18,9 @@ struct SongOrder {
 	// called before every sort
 	virtual void prepare(SongCollection const&, Database const&) {}
 
+	// called when data related to a song changed
+	virtual void update(SongPtr const&, Database const&) {}
+
 	virtual bool operator()(Song const& a, Song const& b) const = 0;
 };
 

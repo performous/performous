@@ -23,13 +23,6 @@ void Database::load() {
 		m_players.load(nodeRoot->find("/performous/players/player"));
 		m_songs.load(nodeRoot->find("/performous/songs/song"));
 		m_hiscores.load(nodeRoot->find("/performous/hiscores/hiscore"));
-		
-		for (auto const& [song_id, song] : m_songs.getSongItems()) {
-			if (song.timesPlayed < 0) {
-				m_songs.addSongItem(song.artist, song.title, m_hiscores.getHiscores(song.id).size(), song.id);
-			}
-		}
-
 		std::clog << "database/info: Loaded " << m_players.count() << " players, " << m_songs.size() << " songs and " << m_hiscores.size() << " hiscores from " << m_filename.string() << std::endl;
 	} catch (std::exception const& e) {
 		std::clog << "database/error: Error loading " + m_filename.string() + ": " + e.what() << std::endl;
@@ -64,12 +57,8 @@ Players const& Database::getPlayers() const {
 	return m_players;
 }
 
-void Database::incrementSongPlayed(std::shared_ptr<Song> s) {
-	m_songs.incrementSongPlayed(s);
-}
-
-void Database::addSong(std::shared_ptr<Song> s) {
-	m_songs.addSong(s);
+SongId Database::addSong(std::shared_ptr<Song> s) {
+	return m_songs.addSong(s);
 }
 
 void Database::addHiscore(std::shared_ptr<Song> s) {
@@ -103,15 +92,6 @@ unsigned Database::resolveToSongId(Song const& s) const {
 	}
 	catch (const std::exception&) {
 		return -1;
-	}
-}
-
-unsigned Database::getTimesPlayed(Song const& s) const {
-	try {
-		return m_songs.getSongItemById(s.id).timesPlayed;
-	}
-	catch (const std::exception&) {
-		return 0;
 	}
 }
 

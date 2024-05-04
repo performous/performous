@@ -122,7 +122,6 @@ void Songs::reload_internal() {
 	std::clog << "songs/notice: Done Caching." << std::endl;
 	doneLoading = true;
 	initialize_sort_internal();
-	//sort_internal();
 }
 
 Songs::Cache Songs::loadCache() {
@@ -242,11 +241,6 @@ void Songs::CacheSonglist() {
 		songObject["guitarTracks"] = song->hasGuitars();
 		songObject["loadStatus"] = static_cast<int>(song->loadStatus);
 
-		songObject["highestScoreNormal"] = static_cast<int>(song->highestScores[GameDifficulty::NORMAL]);
-		songObject["highestScoreHard"] = static_cast<int>(song->highestScores[GameDifficulty::HARD]);
-		songObject["highestScorePerfect"] = static_cast<int>(song->highestScores[GameDifficulty::PERFECT]);
-		songObject["timesPlayed"] = static_cast<int>(song->timesPlayed);
-
 		// Collate info
 		songObject["collateByTitle"] = song->collateByTitle;
 		songObject["collateByTitleOnly"] = song->collateByTitleOnly;
@@ -298,11 +292,10 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 					song = std::make_shared<Song> (p);
 				}
 				std::unique_lock<std::shared_mutex> l(m_mutex);
-				m_songs.emplace_back(song); //put it in the database, if found twice will appear in double
-				m_database.addSong(song);
 
-				// if song had timesPlayed and hiscores in the db update the song object accordingly
-				song->timesPlayed = m_database.getTimesPlayed(*song);
+				song->id = m_database.addSong(song);
+
+				m_songs.emplace_back(song);
 				m_dirty = true;
 			} catch (SongParserException& e) {
 				std::clog << e;
@@ -390,6 +383,13 @@ void Songs::filter_internal() {
 	}
 	prof("filtered");
 	sort_internal();
+}
+
+// TODO: determine appropriate time and location to call this function
+void Songs::updateSongOrders(SongPtr const& song) {
+	for (auto order : m_songOrders) {
+		order->update(song, m_database);
+	}
 }
 
 namespace {
@@ -498,10 +498,6 @@ void Songs::sortChange(Game& game, SortChange diff) {
 	}
 
 	RestoreSel restore(*this);
-
-	if (m_order >= m_songOrders.size())
-		m_order = 0;
-
 	config["songs/sort-order"].ui() = m_order;
 
 	initialize_sort_internal();
@@ -534,6 +530,9 @@ void Songs::initialize_sort_internal() {
 }
 
 void Songs::sort_internal(bool descending) {
+	if (m_order >= m_songOrders.size())
+		m_order.set(0u);
+
 	Profiler prof("sort_internal");
 
 	auto& order = *m_songOrders[m_order];

@@ -7,6 +7,8 @@ struct ScoreSongOrder : public SongOrder {
 
 	void initialize(SongCollection const& songs, Database const& database) override;
 
+	void update(SongPtr const& songs, Database const& database) override;
+
 	bool operator()(Song const& a, Song const& b) const override ;
 
   private:

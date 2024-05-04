@@ -98,6 +98,10 @@ class Songs {
 	void initialize_sort_internal();
 	void sort_internal(bool descending = false);
 
+	/// call to ensure SongOrders which depend on mutable song data are updated
+	/// TODO: determine appropriate time and location to call this function
+	void updateSongOrders(SongPtr const& song);
+
 	class RestoreSel;
 	std::string m_songlist;
 	// Careful the m_songs needs to be correctly locked when accessed, and
