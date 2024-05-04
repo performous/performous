@@ -52,7 +52,6 @@ struct std::hash<HiscoreItemBySongAndLevelKey>
 		// Compute individual hash values for first,
 		// and second and combine them using XOR
 		// and bit shifting:
-
 		return (hash<int>()(k.songid)
 			^ (hash<int>()(k.level) << 1));
 	}

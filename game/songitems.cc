@@ -63,6 +63,7 @@ SongId SongItems::addSong(SongPtr song) {
 		// else the song has a wrong ID and should take on whatever ID is assigned during addSongItem
 	}
 
+	// if the song can be resolved to an ID that means there is an entry for it in the DB -> no new song will be added
 	auto const& maybe_id = resolveToSongId(*song);
 
 	// Do NOT use .value_or() here; it gets evaluated and addSongItem() runs regardless of whether we have a value, which results in duplicate entries in the database.
