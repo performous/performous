@@ -11,8 +11,6 @@ void MostSungSongOrder::initialize(SongCollection const& songs, Database const& 
 	if (initialized)
 		return;
 
-	Profiler prof("MostSungSongOrder_initialize");
-
 	std::for_each(songs.begin(), songs.end(), [&](SongPtr const& song) {
 		try {
 			m_rateMap[song.get()] = database.getAllHiscoresCount(song);
@@ -23,7 +21,6 @@ void MostSungSongOrder::initialize(SongCollection const& songs, Database const& 
 	});
 
 	initialized = true;
-	prof("initialized");
 }
 
 void MostSungSongOrder::update(SongPtr const& song, Database const& database) {

@@ -11,8 +11,6 @@ void ScoreSongOrder::initialize(SongCollection const& songs, Database const& dat
 	if (initialized)
 		return;
 
-	Profiler prof("ScoreSongOrder_initialize");
-
 	std::for_each(songs.begin(), songs.end(), [&](SongPtr const& song) {
 		try {
 			m_scoreMap[song.get()] = database.getHiscore(song);
@@ -23,7 +21,6 @@ void ScoreSongOrder::initialize(SongCollection const& songs, Database const& dat
 	});
 
 	initialized = true;
-	prof("initialized");
 }
 
 void ScoreSongOrder::update(SongPtr const& song, Database const& database) {

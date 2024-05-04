@@ -126,5 +126,5 @@ std::vector<HiscoreItem> Database::getHiscores(SongPtr const& s) const {
 }
 
 size_t Database::getAllHiscoresCount(SongPtr const& s) const {
-	return m_hiscores.getAllHiscores(s->id).size();
+	return m_hiscores.getAllHiscoresCount(s->id);
 }
