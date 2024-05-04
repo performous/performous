@@ -76,16 +76,6 @@ public:
 	  */
 	std::optional<SongId> resolveToSongId(Song const& song) const;
 
-	/**Lookup the SongItem for a specific song id.
-	  @return the SongItem for the specified song id.
-	  */
-	SongItem getSongItemById(SongId const& id) const;
-
-	/**Fetch all SongItems.
-	  @return all SongItems.
-	  */
-	std::unordered_map<SongId, SongItem> getSongItems() const;
-
 	std::size_t size() const { return m_songs_map.size(); }
 
 private:

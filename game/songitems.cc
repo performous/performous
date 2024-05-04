@@ -86,14 +86,6 @@ bool SongItems::match_artist_and_title_internal(Song const& song, SongItem const
 	return UnicodeUtil::caseEqual(song.collateByArtistOnly, songItem.artist, true) && UnicodeUtil::caseEqual(song.collateByTitleOnly, songItem.title, true);
 }
 
-SongItem SongItems::getSongItemById(SongId const& id) const {
-	return m_songs_map.at(id);
-}
-
-std::unordered_map<SongId, SongItem> SongItems::getSongItems() const {
-	return m_songs_map;
-}
-
 SongId SongItems::assign_id_internal() const {
 	// use the last one with highest id
 	auto it = std::max_element(m_songs_map.begin(), m_songs_map.end());
