@@ -518,8 +518,8 @@ void Songs::initialize_sort_internal() {
 
 	Profiler prof("initialize_sort_internal");
 
-	auto& const order = *m_songOrders[m_order];
-		order.initialize(m_songs, m_database);
+	auto& order = *m_songOrders[m_order];
+	order.initialize(m_songs, m_database);
 	prof("initialize");
 }
 
