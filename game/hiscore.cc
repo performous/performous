@@ -73,14 +73,6 @@ unsigned Hiscore::getHiscore(const SongId songid) const {
 	return 0;
 }
 
-unsigned Hiscore::getHiscoreForLevel(const SongId songid, unsigned short level) const {
-	auto const& scores = m_hiscore_map_with_level.at({ songid, level });
-	if (scores.empty())
-		return 0;
-
-	return scores.begin()->score;
-}
-
 Hiscore::HiscoreVector Hiscore::getHiscores(SongId songid) const {
 	HiscoreVector hv;
 	auto const& from_map = m_hiscore_map_with_level.at({ songid, currentLevel() });

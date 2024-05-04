@@ -47,7 +47,6 @@ public:
 	using HiscoreVector = std::vector<HiscoreItem>;
 
 	unsigned getHiscore(SongId songid) const;
-	unsigned getHiscoreForLevel(SongId songid, unsigned short level) const;
 	HiscoreVector getHiscores(SongId songid) const;
 	size_t getAllHiscoresCount(SongId songid) const;
 
