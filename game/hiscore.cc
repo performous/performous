@@ -48,20 +48,28 @@ void Hiscore::addHiscore(HiscoreItem&& item) {
 }
 
 bool Hiscore::hasHiscore(const SongId& songid) const {
-	return !m_hiscore_map_with_level.at({ songid, currentLevel() }).empty();
+	HiscoreItemBySongAndLevelKey const& key = { songid, currentLevel() };
+	if ((m_hiscore_map_with_level.find(key) == m_hiscore_map_with_level.end()))
+		return true;
+	return !m_hiscore_map_with_level.at(key).empty();
 }
 
 unsigned Hiscore::getHiscore(const SongId songid) const {
-	if (m_hiscore_map_with_level.find({ songid, currentLevel() }) != m_hiscore_map_with_level.end()) {
-		return  m_hiscore_map_with_level.at({ songid, currentLevel() }).begin()->score;
-	}
+	HiscoreItemBySongAndLevelKey const& key = { songid, currentLevel() };
+	if ((m_hiscore_map_with_level.find(key) == m_hiscore_map_with_level.end()))
+		return 0;
 
-	return 0;
+	return  m_hiscore_map_with_level.at(key).begin()->score;
 }
 
 Hiscore::HiscoreVector Hiscore::getHiscores(SongId songid) const {
 	HiscoreVector hv;
-	auto const& from_map = m_hiscore_map_with_level.at({ songid, currentLevel() });
+
+	HiscoreItemBySongAndLevelKey const& key = { songid, currentLevel() };
+	if ((m_hiscore_map_with_level.find(key) == m_hiscore_map_with_level.end()))
+		return hv;
+
+	auto const& from_map = m_hiscore_map_with_level.at(key);
 	std::copy(from_map.begin(), from_map.end(), std::back_inserter(hv));
 
 	return hv;
