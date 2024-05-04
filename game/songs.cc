@@ -516,16 +516,18 @@ void Songs::initialize_sort_internal() {
 		return;
 	}
 
-	auto& order = *m_songOrders[m_order];
+	Profiler prof("initialize_sort_internal");
 
-	order.initialize(m_songs, m_database);
+	auto& const order = *m_songOrders[m_order];
+		order.initialize(m_songs, m_database);
+	prof("initialize");
 }
 
 void Songs::sort_internal(bool descending) {
+	Profiler prof("sort_internal");
+
 	if (m_order >= m_songOrders.size())
 		m_order.set(0u);
-
-	Profiler prof("sort_internal");
 
 	auto& order = *m_songOrders[m_order];
 

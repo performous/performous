@@ -49,7 +49,7 @@ public:
 	unsigned getHiscore(SongId songid) const;
 	unsigned getHiscoreForLevel(SongId songid, unsigned short level) const;
 	HiscoreVector getHiscores(SongId songid) const;
-	HiscoreVector getAllHiscores(SongId songid) const;
+	size_t getAllHiscoresCount(SongId songid) const;
 
 	/// This queries the database for a sorted vector of highscores. The defaults mean to query everything.
 	/// @param max limits the number of elements returned.

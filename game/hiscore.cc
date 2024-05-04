@@ -89,12 +89,8 @@ Hiscore::HiscoreVector Hiscore::getHiscores(SongId songid) const {
 	return hv;
 }
 
-Hiscore::HiscoreVector Hiscore::getAllHiscores(SongId songid) const {
-	HiscoreVector hv;
-	auto const& from_map = m_hiscore_map.at(songid);
-	std::copy(from_map.begin(), from_map.end(), std::back_inserter(hv));
-
-	return hv;
+size_t Hiscore::getAllHiscoresCount(SongId songid) const {
+	return m_hiscore_map.at(songid).size();
 }
 
 void Hiscore::load(xmlpp::NodeSet const& nodes) {
