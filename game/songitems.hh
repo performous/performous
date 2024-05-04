@@ -74,18 +74,18 @@ public:
 	SongId addSongItem(std::string const& artist, std::string const& title, bool broken = false, std::optional<int> const& _timesPlayed = std::nullopt, std::optional<SongId> id = std::nullopt);
 	/**Adds or Links an already existing song with an songitem.
 
-		The ID will be assigned.
+	  The ID will be assigned.
 	  If there is already a song with the same artist and title the existing
-		will be used.
-	  @return the ID for the given song.
+	  will be used.
+	  @return the ID which has been determined for the given song.
 	  */
-	SongId addSong(std::shared_ptr<Song> song);
+	SongId addSong(SongPtr song);
 
 
 	/**Lookup the ID for a specific song.
-	  @return -1 if nothing is found.
+	  @return the song ID if a song could be found.
 	  */
-	int resolveToSongId(Song const& song) const;
+	std::optional<SongId> resolveToSongId(Song const& song) const;
 	SongPtr getSong(SongId) const;
 
 	/**Lookup the SongItem for a specific song id.
@@ -103,6 +103,7 @@ public:
 private:
 	SongId assign_id_internal() const;
 	std::unordered_map<SongId, SongItem>::const_iterator lookup_by_name_internal(Song const& song) const;
+	bool match_artist_and_title_internal(Song const& song, SongItem const& songItem) const;
 
 	using songs_map_t = std::unordered_map<SongId, SongItem>;
 	songs_map_t m_songs_map;

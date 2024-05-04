@@ -279,14 +279,6 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 				auto match = cache.find(p.string());
 				if (match != cache.end()) {
 					song = match->second;
-					if (song->id < 0)
-						song->id = m_database.resolveToSongId(*song);
-
-					// if song was in cache but can't be found in database drop it
-					if ((*song).id < 0) {
-						std::clog << "songs/error: Found song in the cache which is not in the database: " << p.string() << std::endl;
-						continue;
-					}
 				} else {
 					std::clog << "songs/notice: Found song which was not in the cache: " << p.string() << std::endl;
 					song = std::make_shared<Song> (p);

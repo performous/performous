@@ -52,7 +52,7 @@ public:
 	HiscoreVector getAllHiscores(SongId songid) const;
 
 	/// This queries the database for a sorted vector of highscores. The defaults mean to query everything.
-/// @param max limits the number of elements returned.
+	/// @param max limits the number of elements returned.
 	HiscoreVector queryHiscore(std::optional<PlayerId> playerid, std::optional<SongId> songid, std::string const& track, std::optional<unsigned> max = std::nullopt) const;
 	bool hasHiscore(const SongId& songid) const;
 	std::size_t size() const { return m_hiscore.size(); }
