@@ -53,11 +53,8 @@ void SongItems::save(xmlpp::Element* songs) {
 SongId SongItems::addSongItem(std::string const& artist, std::string const& title, bool broken, std::optional<int> const& _timesPlayed, std::optional<SongId> _id) {
     SongItem si;
 
-	if (_id.has_value() && m_songs_map.find(_id.value()) != m_songs_map.end()) {
-		si = m_songs_map.at(_id.value());
-	}
+	si.id = _id.has_value() ? _id.value() : assign_id_internal();
 
-    si.id = _id.value_or(assign_id_internal());
     songMetadata collateInfo{ {"artist", artist}, {"title", title} };
     UnicodeUtil::collate(collateInfo);
     si.artist = collateInfo["artist"];
@@ -75,12 +72,10 @@ SongId SongItems::addSong(SongPtr song) {
 		// verify artist and title match
 		if (match_artist_and_title_internal(*song, m_songs_map.at(song->id)))
 			return song->id;
-		// else the song has a wrong ID and should take on whichever ID is returned below
+		// else the song has a wrong ID and should take on whatever ID is assigned during addSongItem
 	}
 
-	auto const& song_id = resolveToSongId(*song).value_or(addSongItem(song->artist, song->title));
-
-    SongItem si = m_songs_map.at(song_id);
+	auto const& maybe_id = resolveToSongId(*song);
 
 	// if a song was not in the cache, but had hiscores in the db which were counted to set an initial value for timesPlayed make sure to use that instead of 0
     si.timesPlayed = si.timesPlayed < 0 ? song->timesPlayed : std::max(song->timesPlayed, uint32_t(si.timesPlayed));
