@@ -58,8 +58,15 @@ SongId SongItems::addSongItem(std::string const& artist, std::string const& titl
 }
 
 SongId SongItems::addSong(SongPtr song) {
-	auto song_id = resolveToSongId(*song);
-	song_id = song_id < 0 ? (addSongItem(song->artist, song->title)) : song_id;
+	// if song is already in db verify integrity and return
+	if (song->id >= 0 && m_songs_map.find(song->id) != m_songs_map.end()) {
+		// verify artist and title match
+		if (matchArtistAndTitle(*song, m_songs_map.at(song->id)))
+			return song->id;
+		// else the song has a wrong ID and should take on whichever ID is returned below
+	}
+
+	auto const& song_id = resolveToSongId(*song).value_or(addSongItem(song->artist, song->title));
 
 	SongItem si = m_songs_map.at(song_id);
 
@@ -68,16 +75,21 @@ SongId SongItems::addSong(SongPtr song) {
 	return si.id;
 }
 
-int SongItems::resolveToSongId(Song const& song) const {
-	auto const si = std::find_if(m_songs_map.begin(), m_songs_map.end(), [&song](std::pair<const SongId, SongItem> const& si) {
-
-	// This is not always really correct but in most cases these inputs should have been normalized into unicode at one point during their life time.
-	if (song.collateByArtistOnly.length() != si.second.artist.length() ||
-		song.collateByTitleOnly.length() != si.second.title.length()) return false;
-		return UnicodeUtil::caseEqual(song.collateByArtistOnly, si.second.artist, true) && UnicodeUtil::caseEqual(song.collateByTitleOnly, si.second.title, true);
+std::optional<SongId> SongItems::resolveToSongId(Song const& song) const {
+	auto const si = std::find_if(m_songs_map.begin(), m_songs_map.end(), [&song, this](std::pair<const SongId, SongItem> const& si) {
+		return match_artist_and_title_internal(song, si.second);
 	});
-	if (si != m_songs_map.end()) return si->second.id;
-	return -1;
+	if (si != m_songs_map.end())
+		return si->second.id;
+	return std::nullopt;
+}
+
+bool SongItems::match_artist_and_title_internal(Song const& song, SongItem const& songItem) const {
+	// This is not always really correct but in most cases these inputs should have been normalized into unicode at one point during their life time.
+	if (song.collateByArtistOnly.length() != songItem.artist.length() || song.collateByTitleOnly.length() != songItem.title.length())
+		return false;
+
+	return UnicodeUtil::caseEqual(song.collateByArtistOnly, songItem.artist, true) && UnicodeUtil::caseEqual(song.collateByTitleOnly, songItem.title, true);
 }
 
 SongItem SongItems::getSongItemById(SongId const& id) const {

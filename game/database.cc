@@ -86,7 +86,7 @@ std::vector<HiscoreItem> Database::queryPerSongHiscore(std::shared_ptr<Song> s, 
 	return m_hiscores.queryHiscore(std::nullopt, s->id, track, std::nullopt);
 }
 
-unsigned Database::resolveToSongId(Song const& s) const {
+std::optional<SongId> Database::resolveToSongId(Song const& s) const {
 	try {
 		return m_songs.resolveToSongId(s);
 	}
