@@ -73,7 +73,7 @@ SongId SongItems::addSong(SongPtr song) {
 	// if song is already in db verify integrity and return
 	if (song->id >= 0 && m_songs_map.find(song->id) != m_songs_map.end()) {
 		// verify artist and title match
-		if (matchArtistAndTitle(*song, m_songs_map.at(song->id)))
+		if (match_artist_and_title_internal(*song, m_songs_map.at(song->id)))
 			return song->id;
 		// else the song has a wrong ID and should take on whichever ID is returned below
 	}
