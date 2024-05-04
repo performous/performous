@@ -26,4 +26,3 @@ bool ScoreSongOrder::operator()(Song const& a, Song const& b) const {
 
 	return scoreA > scoreB;
 }
-

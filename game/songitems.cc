@@ -79,6 +79,7 @@ void SongItems::addSong(SongPtr song) {
 	// if a song was not in the cache, but had hiscores in the db which were counted to set an initial value for timesPlayed make sure to use that instead of 0
 	si.timesPlayed = si.timesPlayed < 0 ? song->timesPlayed : std::max(song->timesPlayed, uint32_t(si.timesPlayed));
 	si.song = song;
+	song->id = song_id;
 
 	m_songs_map[si.id] = si;
 }
