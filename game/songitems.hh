@@ -74,20 +74,13 @@ public:
 	SongId addSongItem(std::string const& artist, std::string const& title, bool broken = false, std::optional<int> const& _timesPlayed = std::nullopt, std::optional<SongId> id = std::nullopt);
 	/**Adds or Links an already existing song with an songitem.
 
-	  The id will be assigned and artist and title will be filled in.
+		The ID will be assigned.
 	  If there is already a song with the same artist and title the existing
-	  will be used.
-
-	  Afterwards the pointer to the song will be stored for entire available
-	  song information.
-
-	  lookup is used internally to achieve that.
+		will be used.
+	  @return the ID for the given song.
 	  */
-	void addSong(std::shared_ptr<Song> song);
+	SongId addSong(std::shared_ptr<Song> song);
 
-	/**Increments the timesPlayed counter for a given Song in the database
-	  */
-	void incrementSongPlayed(std::shared_ptr<Song> song);
 
 	/**Lookup the ID for a specific song.
 	  @return -1 if nothing is found.

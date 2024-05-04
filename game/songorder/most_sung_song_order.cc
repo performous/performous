@@ -26,6 +26,18 @@ void MostSungSongOrder::initialize(SongCollection const& songs, Database const& 
 	prof("initialized");
 }
 
+void MostSungSongOrder::update(SongPtr const& song, Database const& database) {
+	if (!initialized)
+		return;
+
+	try {
+		m_rateMap[song.get()] = database.getAllHiscoresCount(song);
+	}
+	catch (std::exception const&) {
+		m_rateMap[song.get()] = 0;
+	}
+}
+
 bool MostSungSongOrder::operator()(const Song& a, const Song& b) const {
 	if (!initialized)
 		return false;

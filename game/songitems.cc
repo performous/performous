@@ -69,15 +69,9 @@ SongId SongItems::addSongItem(std::string const& artist, std::string const& titl
     return si.id;
 }
 
-void SongItems::incrementSongPlayed(SongPtr song) {
-	SongItem si = m_songs_map.at(song->id);
-	++m_songs_map.at(song->id).timesPlayed;
-	song->timesPlayed = si.timesPlayed;
-}
-
-void SongItems::addSong(SongPtr song) {
+SongId SongItems::addSong(SongPtr song) {
 	auto song_id = resolveToSongId(*song);
-	song_id = song_id < 0 ? (addSongItem(song->artist, song->title, song->timesPlayed)) : song_id;
+	song_id = song_id < 0 ? (addSongItem(song->artist, song->title)) : song_id;
 
     SongItem si = m_songs_map.at(song_id);
 
@@ -88,6 +82,8 @@ void SongItems::addSong(SongPtr song) {
 	song->id = song_id;
 
 	m_songs_map[si.id] = si;
+
+	return si.id;
 }
 
 int SongItems::resolveToSongId(Song const& song) const {
@@ -115,7 +111,7 @@ SongId SongItems::assign_id_internal() const {
     auto it = std::max_element(m_songs_map.begin(), m_songs_map.end());
     if (it != m_songs_map.end())
         return it->second.id + 1;
-    return 0; // empty set
+    return 0; // empty map
 }
 
 
