@@ -121,6 +121,8 @@ void Songs::reload_internal() {
 	CacheSonglist();
 	std::clog << "songs/notice: Done Caching." << std::endl;
 	doneLoading = true;
+	initialize_sort_internal();
+	//sort_internal();
 }
 
 Songs::Cache Songs::loadCache() {
@@ -345,6 +347,7 @@ void Songs::setFilter(std::string const& val) {
 }
 
 void Songs::filter_internal() {
+	Profiler prof("filter_internal");
 	m_updateTimer.setValue(0.0);
 	m_dirty = false;
 	RestoreSel restore(*this);
@@ -385,6 +388,7 @@ void Songs::filter_internal() {
 		std::shared_lock<std::shared_mutex> l(m_mutex);
 		SongCollection(m_songs.begin(), m_songs.end()).swap(m_filtered);  // Invalid regex => copy everything
 	}
+	prof("filtered");
 	sort_internal();
 }
 
@@ -494,8 +498,13 @@ void Songs::sortChange(Game& game, SortChange diff) {
 	}
 
 	RestoreSel restore(*this);
+
+	if (m_order >= m_songOrders.size())
+		m_order = 0;
+
 	config["songs/sort-order"].ui() = m_order;
 
+	initialize_sort_internal();
 	sort_internal();
 	writeConfig(game, false);
 }
@@ -508,15 +517,24 @@ void Songs::sortSpecificChange(unsigned short sortOrder, bool descending) {
 
 	RestoreSel restore(*this);
 	config["songs/sort-order"].ui() = m_order;
+
+	initialize_sort_internal();
 	sort_internal(descending);
+}
+
+void Songs::initialize_sort_internal() {
+	// don't initialize if loading is still in progress
+	if (!doneLoading) {
+		return;
+	}
+
+	auto& order = *m_songOrders[m_order];
+
+	order.initialize(m_songs, m_database);
 }
 
 void Songs::sort_internal(bool descending) {
 	Profiler prof("sort_internal");
-
-	if(m_order >= m_songOrders.size()) {
-		throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
-	}
 
 	auto& order = *m_songOrders[m_order];
 

@@ -95,6 +95,7 @@ public: // methods for database queries
 	unsigned getHiscore(Song const& s) const;
 	unsigned getHiscore(SongPtr const& s) const;
 	std::vector<HiscoreItem> getHiscores(SongPtr const& s) const;
+	size_t getAllHiscoresCount(SongPtr const& s) const;
 	bool noPlayers() const;
 
 private:
