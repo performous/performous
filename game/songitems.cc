@@ -43,11 +43,8 @@ void SongItems::save(xmlpp::Element* songs) {
 SongId SongItems::addSongItem(std::string const& artist, std::string const& title, std::optional<SongId> _id) {
 	SongItem si;
 
-	if (_id.has_value() && m_songs_map.find(_id.value()) != m_songs_map.end()) {
-		si = m_songs_map.at(_id.value());
-	}
+	si.id = _id.has_value() ? _id.value() : assign_id_internal();
 
-	si.id = _id.value_or(assign_id_internal());
 	songMetadata collateInfo {{"artist", artist}, {"title", title}};
 	UnicodeUtil::collate(collateInfo);
 	si.artist = collateInfo["artist"];
@@ -63,16 +60,13 @@ SongId SongItems::addSong(SongPtr song) {
 		// verify artist and title match
 		if (match_artist_and_title_internal(*song, m_songs_map.at(song->id)))
 			return song->id;
-		// else the song has a wrong ID and should take on whichever ID is returned below
+		// else the song has a wrong ID and should take on whatever ID is assigned during addSongItem
 	}
 
-	auto const& song_id = resolveToSongId(*song).value_or(addSongItem(song->artist, song->title));
+	auto const& maybe_id = resolveToSongId(*song);
 
-	SongItem si = m_songs_map.at(song_id);
-
-	m_songs_map[si.id] = si;
-
-	return si.id;
+	// Do NOT use .value_or() here; it gets evaluated and addSongItem() runs regardless of whether we have a value, which results in duplicate entries in the database.
+	return maybe_id.has_value() ? maybe_id.value() : addSongItem(song->artist, song->title);
 }
 
 std::optional<SongId> SongItems::resolveToSongId(Song const& song) const {
