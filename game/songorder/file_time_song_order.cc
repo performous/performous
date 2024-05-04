@@ -1,7 +1,6 @@
 #include "file_time_song_order.hh"
 
 #include <filesystem>
-#include "profiler.hh"
 
 namespace {
 	std::chrono::seconds getFileWriteTime(Song const& song) {
@@ -22,8 +21,6 @@ void FileTimeSongOrder::initialize(SongCollection const& songs, Database const&)
 	if (initialized)
 		return;
 
-	Profiler prof("FileTimeSongOrder_initialize");
-
 	auto begin = songs.begin();
 	auto end = songs.end();
 
@@ -32,7 +29,6 @@ void FileTimeSongOrder::initialize(SongCollection const& songs, Database const&)
 	});
 
 	initialized = true;
-	prof("initialized");
 }
 
 bool FileTimeSongOrder::operator()(const Song& a, const Song& b) const {
