@@ -85,6 +85,7 @@ void SongItems::addSong(SongPtr song) {
     si.timesPlayed = si.timesPlayed < 0 ? song->timesPlayed : std::max(song->timesPlayed, uint32_t(si.timesPlayed));
     si.setBroken(it->isBroken());
     si.setSong(song);
+	song->id = song_id;
 
 	m_songs_map[si.id] = si;
 }

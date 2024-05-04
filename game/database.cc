@@ -150,4 +150,3 @@ std::vector<HiscoreItem> Database::getHiscores(SongPtr const& s) const {
 		throw;
 	}
 }
-

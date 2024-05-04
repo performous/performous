@@ -258,7 +258,7 @@ void Songs::CacheSonglist() {
 
 	fs::path cacheDir = getCacheDir() / SONGS_CACHE_JSON_FILE;
 	writeJSON(jsonRoot, cacheDir);
-	}
+}
 
 void Songs::reload_internal(fs::path const& parent, Cache cache) {
 	try {
@@ -512,6 +512,8 @@ void Songs::sortSpecificChange(unsigned short sortOrder, bool descending) {
 }
 
 void Songs::sort_internal(bool descending) {
+	Profiler prof("sort_internal");
+
 	if(m_order >= m_songOrders.size()) {
 		throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
 	}
@@ -519,6 +521,7 @@ void Songs::sort_internal(bool descending) {
 	auto& order = *m_songOrders[m_order];
 
 	order.prepare(m_filtered, m_database);
+	prof("prepare");
 
 	std::stable_sort(m_filtered.begin(), m_filtered.end(),
 		[&](SongPtr const& a, SongPtr const& b) { return order(*a, *b); });
@@ -526,6 +529,7 @@ void Songs::sort_internal(bool descending) {
 	if (descending) {
 		std::reverse(m_filtered.begin(), m_filtered.end());
 	}
+	prof("sort");
 }
 
 std::shared_ptr<Song> Songs::currentPtr() const try {

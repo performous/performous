@@ -46,10 +46,12 @@ public:
 
 	using HiscoreVector = std::vector<HiscoreItem>;
 
+	unsigned getHiscore(SongId songid) const;
+	unsigned getHiscoreForLevel(SongId songid, unsigned short level) const;
+	HiscoreVector getHiscores(SongId songid) const;
+
 	/// This queries the database for a sorted vector of highscores. The defaults mean to query everything.
-	/// @param max limits the number of elements returned.
-	unsigned getHiscore(unsigned songid) const;
-	std::vector<HiscoreItem> getHiscores(unsigned songid) const;
+/// @param max limits the number of elements returned.
 	HiscoreVector queryHiscore(std::optional<PlayerId> playerid, std::optional<SongId> songid, std::string const& track, std::optional<unsigned> max = std::nullopt) const;
 	bool hasHiscore(const SongId& songid) const;
 	std::size_t size() const { return m_hiscore.size(); }
@@ -57,5 +59,9 @@ public:
   private:
 	using hiscore_t = std::multiset<HiscoreItem>;
 	hiscore_t m_hiscore;
+	using hiscore_map_t = std::unordered_map<SongId, hiscore_t>;
+	hiscore_map_t m_hiscore_map;
+	using hiscore_map_with_level_t = std::unordered_map<HiscoreItemBySongAndLevelKey, hiscore_t>;
+	hiscore_map_with_level_t m_hiscore_map_with_level;
 	unsigned short currentLevel() const;
 };
