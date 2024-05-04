@@ -82,15 +82,6 @@ bool Database::reachedHiscore(std::shared_ptr<Song> s) const {
 	return m_hiscores.reachedHiscore(score, s->id, level, track);
 }
 
-std::optional<SongId> Database::resolveToSongId(Song const& s) const {
-	try {
-		return m_songs.resolveToSongId(s);
-	}
-	catch (const std::exception&) {
-		return -1;
-	}
-}
-
 bool Database::hasHiscore(Song const& s) const {
 	try {
 		return m_hiscores.hasHiscore(s.id);

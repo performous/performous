@@ -75,6 +75,7 @@ SongId SongItems::addSong(SongPtr song) {
 		// else the song has a wrong ID and should take on whatever ID is assigned during addSongItem
 	}
 
+	// if the song can be resolved to an ID that means there is an entry for it in the DB -> no new song will be added
 	auto const& maybe_id = resolveToSongId(*song);
 
 	// if a song was not in the cache, but had hiscores in the db which were counted to set an initial value for timesPlayed make sure to use that instead of 0
