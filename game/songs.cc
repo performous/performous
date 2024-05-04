@@ -285,7 +285,7 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 				}
 				std::unique_lock<std::shared_mutex> l(m_mutex);
 
-				song->id = m_database.addSong(song);
+				song->id = int(m_database.addSong(song));
 
 				m_songs.emplace_back(song);
 				m_dirty = true;
