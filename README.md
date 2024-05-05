@@ -10,7 +10,7 @@ Website at https://performous.org/ << If you can't reach it try the mirror https
 Wiki at https://github.com/performous/performous/wiki  
 Discord at https://discord.gg/NS3m3ad
 
-For compiling instructions, see docs/Compiling.txt or visit the wiki page: https://github.com/performous/performous/wiki/Building-and-installing-from-source
+For compiling instructions visit the wiki page: https://github.com/performous/performous/wiki/Building-and-installing-from-source
 
 # Latest builds
 
