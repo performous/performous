@@ -16,7 +16,7 @@ public:
 	static const unsigned MaximumStoredScores;
 
 	void load(xmlpp::NodeSet const& n);
-	void save(xmlpp::Element *players);
+	void save(xmlpp::Element *hiscores);
 
 	/**Check if you reached a new highscore.
 

@@ -19,8 +19,6 @@ struct SongItemsException: public std::runtime_error {
 	{}
 };
 
-using SongId = unsigned;
-
 struct SongItem
 {
 	SongId id = 0; ///< The unique id for every song
@@ -92,7 +90,7 @@ public:
 
 private:
 	SongId assign_id_internal() const;
-	bool match_artist_and_title_internal(Song const& song, SongItem const& songItem) const;
+	static bool match_artist_and_title_internal(Song const& song, SongItem const& songItem) ;
 
 	using songs_map_t = std::unordered_map<SongId, SongItem>;
 	songs_map_t m_songs_map;
