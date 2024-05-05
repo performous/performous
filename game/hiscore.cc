@@ -138,7 +138,7 @@ unsigned short Hiscore::currentLevel() const {
 // to count all hiscores sum up the sizes of all songs' hiscores
 std::size_t Hiscore::size() const {
 	std::vector<size_t> sizes(m_hiscore_map.size(), 0);
-	auto map_func = [](std::pair<SongId, hiscore_t> songHiscores) {return songHiscores.second.size();};
+	auto map_func = [](const std::pair<SongId, hiscore_t>& songHiscores) {return songHiscores.second.size();};
 	std::transform(m_hiscore_map.begin(), m_hiscore_map.end(), sizes.begin(), map_func);
 	return std::size_t(std::accumulate(sizes.begin(), sizes.end(), 0, std::plus{}));
 }

@@ -56,10 +56,10 @@ SongId SongItems::addSongItem(std::string const& artist, std::string const& titl
 
 SongId SongItems::addSong(SongPtr song) {
 	// if song is already in db verify integrity and return
-	if (song->id >= 0 && m_songs_map.find(SongId(song->id)) != m_songs_map.end()) {
+	if (song->id.has_value() && m_songs_map.find(song->id.value()) != m_songs_map.end()) {
 		// verify artist and title match
-		if (match_artist_and_title_internal(*song, m_songs_map.at(SongId(song->id))))
-			return SongId(song->id);
+		if (match_artist_and_title_internal(*song, m_songs_map.at(song->id.value())))
+			return song->id.value();
 		// else the song has a wrong ID and should take on whatever ID is assigned during addSongItem
 	}
 
@@ -71,15 +71,15 @@ SongId SongItems::addSong(SongPtr song) {
 }
 
 std::optional<SongId> SongItems::resolveToSongId(Song const& song) const {
-	auto const si = std::find_if(m_songs_map.begin(), m_songs_map.end(), [&song, this](std::pair<const SongId, SongItem> const& si) {
-		return match_artist_and_title_internal(song, si.second);
+	auto const si = std::find_if(m_songs_map.begin(), m_songs_map.end(), [&song, this](std::pair<const SongId, SongItem> const& item) {
+		return match_artist_and_title_internal(song, item.second);
 	});
 	if (si != m_songs_map.end())
 		return si->second.id;
 	return std::nullopt;
 }
 
-bool SongItems::match_artist_and_title_internal(Song const& song, SongItem const& songItem) const {
+bool SongItems::match_artist_and_title_internal(Song const& song, SongItem const& songItem) {
 	// This is not always really correct but in most cases these inputs should have been normalized into unicode at one point during their life time.
 	if (song.collateByArtistOnly.length() != songItem.artist.length() || song.collateByTitleOnly.length() != songItem.title.length())
 		return false;

@@ -141,7 +141,9 @@ void Songs::CacheSonglist() {
 	for (auto const& song : m_songs) {
 		auto songObject = nlohmann::json::object();
 
-		songObject["id"] = static_cast<int>(song->id);
+		if(song->id.has_value()) {
+			songObject["id"] = song->id.value();
+		}
 		if(!song->path.string().empty()) {
 			songObject["txtFileFolder"] = song->path.string();
 		}
@@ -285,7 +287,7 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 				}
 				std::unique_lock<std::shared_mutex> l(m_mutex);
 
-				song->id = int(m_database.addSong(song));
+				song->id = m_database.addSong(song);
 
 				m_songs.emplace_back(song);
 				m_dirty = true;

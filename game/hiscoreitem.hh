@@ -53,6 +53,6 @@ struct std::hash<HiscoreItemBySongAndLevelKey>
 		// and second and combine them using XOR
 		// and bit shifting:
 		return (hash<SongId>()(k.songid)
-			^ (hash<SongId>()(k.level) << 1));
+			^ (hash<unsigned short>()(k.level) << 1));
 	}
 };
