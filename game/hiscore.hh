@@ -3,7 +3,6 @@
 #include "hiscoreitem.hh"
 #include "libxml++.hh"
 #include "player.hh"
-#include "songitems.hh"
 
 #include <set>
 #include <string>
@@ -50,7 +49,6 @@ public:
 	HiscoreVector getHiscores(SongId songid) const;
 	size_t getAllHiscoresCount(SongId songid) const;
 
-	bool hasHiscore(const SongId& songid) const;
 	std::size_t size() const;
 
   private:
