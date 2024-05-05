@@ -160,6 +160,12 @@ void Songs::CacheSonglist() {
 		if(!song->creator.empty()) {
 			songObject["creator"] = song->creator;
 		}
+		if (!song->providedBy.empty()) {
+			songObject["providedBy"] = song->providedBy;
+		}
+		if (!song->comment.empty()) {
+			songObject["comment"] = song->comment;
+		}
 		if(!song->genre.empty()) {
 			songObject["genre"] = song->genre;
 		}
