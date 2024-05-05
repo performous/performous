@@ -118,16 +118,22 @@ void Hiscore::load(xmlpp::NodeSet const& nodes) {
 }
 
 void Hiscore::save(xmlpp::Element *hiscores) {
+	std::vector<HiscoreItem> hiscore_items;
 	for (auto const& [song_id, song_hiscores] : m_hiscore_map) {
-		for (auto const& h : song_hiscores) {
-			xmlpp::Element* hiscore = xmlpp::add_child_element(hiscores, "hiscore");
-			hiscore->set_attribute("playerid", std::to_string(h.playerid));
-			hiscore->set_attribute("songid", std::to_string(h.songid));
-			hiscore->set_attribute("track", h.track);
-			hiscore->set_attribute("level", std::to_string(h.level));
-			hiscore->set_attribute("unixtime", std::to_string(h.unixtime.count()));
-			hiscore->add_child_text(std::to_string(h.score));
-		}
+		hiscore_items.insert(hiscore_items.end(), song_hiscores.begin(), song_hiscores.end());
+	}
+
+	std::stable_sort(hiscore_items.begin(), hiscore_items.end(),
+	[&](HiscoreItem const& a, HiscoreItem const& b) { return b.unixtime < a.unixtime; });
+
+	for (auto const& hiscore_item: hiscore_items) {
+		xmlpp::Element* hiscore = xmlpp::add_child_element(hiscores, "hiscore");
+		hiscore->set_attribute("playerid", std::to_string(hiscore_item.playerid));
+		hiscore->set_attribute("songid", std::to_string(hiscore_item.songid));
+		hiscore->set_attribute("track", hiscore_item.track);
+		hiscore->set_attribute("level", std::to_string(hiscore_item.level));
+		hiscore->set_attribute("unixtime", std::to_string(hiscore_item.unixtime.count()));
+		hiscore->add_child_text(std::to_string(hiscore_item.score));
 	}
 }
 
