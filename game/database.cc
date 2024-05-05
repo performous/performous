@@ -8,6 +8,8 @@
 #include <iostream>
 #include <utility>
 
+#include "profiler.hh"
+
 Database::Database(fs::path const& filename): m_filename(filename) {
 	load();
 }
@@ -31,6 +33,7 @@ void Database::load() {
 }
 
 void Database::save() {
+	Profiler prof("save");
 	try {
 		create_directories(m_filename.parent_path());
 		fs::path tmp = m_filename.string() + ".tmp";
@@ -38,12 +41,16 @@ void Database::save() {
 			xmlpp::Document doc;
 			auto nodeRoot = doc.create_root_node("performous");
 			m_players.save(xmlpp::add_child_element(nodeRoot, "players"));
+			prof("players");
 			m_songs.save(xmlpp::add_child_element(nodeRoot, "songs"));
+			prof("songs");
 			m_hiscores.save(xmlpp::add_child_element(nodeRoot, "hiscores"));
+			prof("hiscores");
 			doc.write_to_file_formatted(tmp.string(), "UTF-8");
 		}
 		rename(tmp, m_filename);
 		std::clog << "database/info: Saved " << m_players.count() << " players, " << m_songs.size() << " songs and " << m_hiscores.size() << " hiscores to " << m_filename.string() << std::endl;
+		prof("write-to-file");
 	} catch (std::exception const& e) {
 		std::clog << "database/error: Could not save " + m_filename.string() + ": " + e.what() << std::endl;
 		return;

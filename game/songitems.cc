@@ -7,7 +7,6 @@
 #include <memory>
 #include <string>
 
-
 void SongItems::load(xmlpp::NodeSet const& n) {
     for (auto const& elem : n) {
         xmlpp::Element& element = dynamic_cast<xmlpp::Element&>(*elem);
@@ -40,7 +39,19 @@ void SongItems::load(xmlpp::NodeSet const& n) {
 }
 
 void SongItems::save(xmlpp::Element* songs) {
-	for (auto const& [song_id, song] : m_songs_map) {
+    std::vector<SongItem> song_items;
+
+    std::transform(
+	    m_songs_map.begin(),
+	    m_songs_map.end(),
+	    std::back_inserter(song_items),
+	    [](auto &kv) { return kv.second; }
+    );
+
+	std::stable_sort(song_items.begin(), song_items.end(),
+	[&](SongItem const& a, SongItem const& b) { return a.id < b.id; });
+
+	for (auto const& song : song_items) {
         xmlpp::Element* element = xmlpp::add_child_element(songs, "song");
         element->set_attribute("id", std::to_string(song.id));
         element->set_attribute("artist", song.artist);
