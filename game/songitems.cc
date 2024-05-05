@@ -56,10 +56,8 @@ SongId SongItems::addSongItem(std::string const& artist, std::string const& titl
 
 	si.id = _id.has_value() ? _id.value() : assign_id_internal();
 
-	songMetadata collateInfo {{"artist", artist}, {"title", title}};
-	UnicodeUtil::collate(collateInfo);
-	si.artist = collateInfo["artist"];
-	si.title = collateInfo["title"];
+	si.artist = artist;
+	si.title = title;
 
 	m_songs_map[si.id] = si;
 	return si.id;
@@ -92,10 +90,10 @@ std::optional<SongId> SongItems::resolveToSongId(Song const& song) const {
 
 bool SongItems::match_artist_and_title_internal(Song const& song, SongItem const& songItem) {
 	// This is not always really correct but in most cases these inputs should have been normalized into unicode at one point during their life time.
-	if (song.collateByArtistOnly.length() != songItem.artist.length() || song.collateByTitleOnly.length() != songItem.title.length())
+	if (song.artist.length() != songItem.artist.length() || song.title.length() != songItem.title.length())
 		return false;
 
-	return UnicodeUtil::caseEqual(song.collateByArtistOnly, songItem.artist, true) && UnicodeUtil::caseEqual(song.collateByTitleOnly, songItem.title, true);
+	return UnicodeUtil::caseEqual(song.artist, songItem.artist, true) && UnicodeUtil::caseEqual(song.title, songItem.title, true);
 }
 
 SongId SongItems::assign_id_internal() const {
