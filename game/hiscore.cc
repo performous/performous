@@ -47,13 +47,6 @@ void Hiscore::addHiscore(HiscoreItem&& item) {
 	m_hiscore_map_with_level[{item.songid, item.level}].insert(item);
 }
 
-bool Hiscore::hasHiscore(const SongId& songid) const {
-	HiscoreItemBySongAndLevelKey const& key = { songid, currentLevel() };
-	if ((m_hiscore_map_with_level.find(key) == m_hiscore_map_with_level.end()))
-		return true;
-	return !m_hiscore_map_with_level.at(key).empty();
-}
-
 unsigned Hiscore::getHiscore(const SongId songid) const {
 	HiscoreItemBySongAndLevelKey const& key = { songid, currentLevel() };
 	if ((m_hiscore_map_with_level.find(key) == m_hiscore_map_with_level.end()))

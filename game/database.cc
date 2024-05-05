@@ -90,14 +90,6 @@ bool Database::reachedHiscore(std::shared_ptr<Song> s) const {
 	return m_hiscores.reachedHiscore(score, s->id.value(), level, track);
 }
 
-bool Database::hasHiscore(Song const& s) const {
-	try {
-		return m_hiscores.hasHiscore(s.id.value());
-	} catch (const std::exception&) {
-		return false;
-	}
-}
-
 unsigned Database::getHiscore(Song const& s) const {
 	try {
 		return m_hiscores.getHiscore(s.id.value());

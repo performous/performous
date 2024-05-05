@@ -85,7 +85,6 @@ public: // methods for database queries
 	 */
 	bool reachedHiscore(std::shared_ptr<Song> s) const;
 
-	bool hasHiscore(Song const& s) const;
 	unsigned getHiscore(Song const& s) const;
 	unsigned getHiscore(SongPtr const& s) const;
 	std::vector<HiscoreItem> getHiscores(SongPtr const& s) const;
