@@ -71,7 +71,7 @@ SongId SongItems::addSong(SongPtr song) {
 }
 
 std::optional<SongId> SongItems::resolveToSongId(Song const& song) const {
-	auto const si = std::find_if(m_songs_map.begin(), m_songs_map.end(), [&song, this](std::pair<const SongId, SongItem> const& item) {
+	auto const si = std::find_if(m_songs_map.begin(), m_songs_map.end(), [&song](std::pair<const SongId, SongItem> const& item) {
 		return match_artist_and_title_internal(song, item.second);
 	});
 	if (si != m_songs_map.end())
