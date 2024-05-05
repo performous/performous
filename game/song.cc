@@ -54,8 +54,11 @@ Song::Song(nlohmann::json const& song) : dummyVocal(TrackName::VOCAL_LEAD), rand
 	music[TrackName::KEYBOARD] = getJsonEntry<std::string>(song, "keyboard").value_or("");
 	music[TrackName::GUITAR_COOP] = getJsonEntry<std::string>(song, "guitarCoop").value_or("");
 	music[TrackName::GUITAR_RHYTHM] = getJsonEntry<std::string>(song, "guitarRhythm").value_or("");
-	loadStatus = static_cast<Song::LoadStatus>(getJsonEntry<int>(song, "loadStatus").value_or(1));
-	//loadStatus = Song::LoadStatus::HEADER;
+
+	// never load loadStatus as FULL, as that is only true after it has been fully parsed
+	// a song loaded from cache only ever has the header information at best and should not be considered
+	// fully parsed
+	loadStatus = std::min(getJsonEntry<LoadStatus>(song, "loadStatus").value_or(LoadStatus::NONE), LoadStatus::HEADER);
 
 	collateByTitle = getJsonEntry<std::string>(song, "collateByTitle").value_or("");
 	collateByTitleOnly = getJsonEntry<std::string>(song, "collateByTitleOnly").value_or("");
@@ -98,12 +101,12 @@ Song::Song(fs::path const& filename):
 }
 
 void Song::reload(bool errorIgnore) {
-	try { 
-		*this = Song(filename); 
+	try {
+		*this = Song(filename);
 	}
-	catch (...) { 
-		if (!errorIgnore) 
-			throw; 
+	catch (...) {
+		if (!errorIgnore)
+			throw;
 	}
 }
 
