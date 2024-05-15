@@ -27,6 +27,7 @@ extern "C" {
 #include <libavutil/opt.h>
 #include <libavutil/mathematics.h>
 #include <libavutil/error.h>
+#include <libavutil/replaygain.h>
 }
 
 #define AUDIO_CHANNELS 2
@@ -151,11 +152,13 @@ bool AudioBuffer::read(float* begin, std::int64_t samples, std::int64_t pos, flo
 }
 
 double AudioBuffer::duration() { return m_duration; }
+double AudioBuffer::replayGain() { return m_replaygain; }   // perceived loudness in dB
 
 AudioBuffer::AudioBuffer(fs::path const& file, unsigned rate, size_t size):
 	m_data(size), m_sps(rate * AUDIO_CHANNELS) {
 		auto ffmpeg = std::make_unique<AudioFFmpeg>(file, rate, std::ref(*this));
 		const_cast<double&>(m_duration) = ffmpeg->duration();
+		const_cast<double&>(m_replaygain) = ffmpeg->replayGain();
 		reader_thread = std::async(std::launch::async, [this, ffmpeg = std::move(ffmpeg)] {
 			auto errors = 0u;
 			std::unique_lock<std::mutex> l(m_mutex);
@@ -264,6 +267,9 @@ FFmpeg::FFmpeg(fs::path const& _filename, int mediaType) : m_filename(_filename)
 	m_streamId = av_find_best_stream(m_formatContext.get(), static_cast<AVMediaType>(mediaType), -1, -1, &codec, 0);
 	if (m_streamId < 0) throw Error(*this, m_streamId);
 
+	// Possibly the stream defines a Replay Gain factor; read it
+	readReplayGain(m_formatContext->streams[m_streamId]);
+
 	decltype(m_codecContext) pCodecCtx{avcodec_alloc_context3(codec), avcodec_free_context};
 	avcodec_parameters_to_context(pCodecCtx.get(), m_formatContext->streams[m_streamId]->codecpar);
 	{
@@ -276,6 +282,39 @@ FFmpeg::FFmpeg(fs::path const& _filename, int mediaType) : m_filename(_filename)
 	pCodecCtx->workaround_bugs = FF_BUG_AUTODETECT;
 	m_codecContext = std::move(pCodecCtx);
 }
+
+
+/**
+  * \brief    Fetch the Replay Gain "loudness" factor from the stream
+  *
+  * \details  Replay Gain is a decibels "loudness" factor that can be used to normalise
+  *           the human-perceived loudness of a given audio sample.  It is useful for
+  *           normalising the volume of recordings mastered at different volumes.
+  *           Libav reads this information in, storing it in the side channel blocks.
+  *           This function requests this value from the side channel.
+  *
+  *           Ref: https://en.wikipedia.org/wiki/ReplayGain
+  *                https://www.smithsonianmag.com/smart-news/music-does-get-louder-every-year-835681/
+  *
+  * \returns  True if a Replay Gain value was found in the stream
+  */
+bool FFmpeg::readReplayGain(const AVStream *stream)
+{
+	bool rg_read = false;
+	// assert(stream)
+	m_replaygain = 0.0;
+	if (stream != nullptr) {
+		int replay_gain_size = 0;
+		const AVReplayGain *replay_gain = (AVReplayGain *)av_stream_get_side_data(stream, AV_PKT_DATA_REPLAYGAIN, &replay_gain_size);
+		if (replay_gain_size > 0 && replay_gain != nullptr) {
+			m_replaygain = static_cast<double>(replay_gain->track_gain);
+			m_replaygain /= 1000.0;   // convert from milli decibels to decibels
+			rg_read = true;
+		}
+	}
+	return rg_read;
+}
+
 
 VideoFFmpeg::VideoFFmpeg(fs::path const& filename, VideoCb videoCb) : FFmpeg(filename, AVMEDIA_TYPE_VIDEO), handleVideoData(videoCb) {
 	// Setup software scaling context for YUV to RGB conversion
@@ -300,6 +339,8 @@ AudioFFmpeg::AudioFFmpeg(fs::path const& filename, int rate, AudioCb audioCb) :
 	}
 
 double FFmpeg::duration() const { return double(m_formatContext->duration) / double(AV_TIME_BASE); }
+
+double FFmpeg::replayGain() const { return m_replaygain; }
 
 void FFmpeg::avformat_close_input(AVFormatContext *fctx) {
 	if (fctx) ::avformat_close_input(&fctx);
