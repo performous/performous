@@ -261,7 +261,6 @@ void ScreenSing::instrumentLayout(double time) {
 
 void ScreenSing::activateNextScreen()
 {
-	m_database.addSong(m_song);
 	if (m_database.scores.empty() || !m_database.reachedHiscore(m_song)) {
 		// if no highscore reached..
 		getGame().activateScreen("Playlist");
