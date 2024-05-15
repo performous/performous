@@ -20,6 +20,7 @@
 #include "songorder/name_song_order.hh"
 #include "songorder/path_song_order.hh"
 #include "songorder/random_song_order.hh"
+#include "songorder/recently_sung_order.hh"
 #include "songorder/score_song_order.hh"
 
 #include <fmt/format.h>
@@ -44,6 +45,7 @@ namespace {
 		songs.addSongOrder(std::make_shared<LanguageSongOrder>());
 		songs.addSongOrder(std::make_shared<ScoreSongOrder>());
 		songs.addSongOrder(std::make_shared<MostSungSongOrder>());
+		songs.addSongOrder(std::make_shared<RecentlySungSongOrder>());
 		songs.addSongOrder(std::make_shared<FileTimeSongOrder>());
 		songs.addSongOrder(std::make_shared<CreatorSongOrder>());
 	}
@@ -121,6 +123,7 @@ void Songs::reload_internal() {
 	CacheSonglist();
 	std::clog << "songs/notice: Done Caching." << std::endl;
 	doneLoading = true;
+	initialize_sort_internal();
 }
 
 Songs::Cache Songs::loadCache() {
@@ -139,6 +142,10 @@ void Songs::CacheSonglist() {
 	std::shared_lock<std::shared_mutex> l(m_mutex);
 	for (auto const& song : m_songs) {
 		auto songObject = nlohmann::json::object();
+
+		if(song->id.has_value()) {
+			songObject["id"] = song->id.value();
+		}
 		if(!song->path.string().empty()) {
 			songObject["txtFileFolder"] = song->path.string();
 		}
@@ -236,7 +243,11 @@ void Songs::CacheSonglist() {
 		songObject["drumTracks"] = song->hasDrums();
 		songObject["danceTracks"] = song->hasDance();
 		songObject["guitarTracks"] = song->hasGuitars();
-		songObject["loadStatus"] = static_cast<int>(song->loadStatus);
+
+		// do not store loadStatus as FULL, as that is only true after it has been fully parsed
+		// a song loaded from cache only ever has the header information at best and should not be considered
+		// fully parsed
+		songObject["loadStatus"] = std::min(song->loadStatus, Song::LoadStatus::HEADER);
 
 		// Collate info
 		songObject["collateByTitle"] = song->collateByTitle;
@@ -251,7 +262,7 @@ void Songs::CacheSonglist() {
 
 	fs::path cacheDir = getCacheDir() / SONGS_CACHE_JSON_FILE;
 	writeJSON(jsonRoot, cacheDir);
-	}
+}
 
 void Songs::reload_internal(fs::path const& parent, Cache cache) {
 	try {
@@ -265,7 +276,7 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 			}
 			if (iterator.depth() > maxDepth) {
 				std::clog << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)\n";
-				continue; 
+				continue;
 			}
 			fs::path p = dir.path();
 			if (!regex_search(p.filename().string(), expression)) {
@@ -274,15 +285,17 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 			try { //found song file, make a new song with it.
 				auto song = std::shared_ptr<Song>{};
 				auto match = cache.find(p.string());
-				if ( match != cache.end()) {
+				if (match != cache.end()) {
 					song = match->second;
 				} else {
 					std::clog << "songs/notice: Found song which was not in the cache: " << p.string() << std::endl;
 					song = std::make_shared<Song> (p);
 				}
 				std::unique_lock<std::shared_mutex> l(m_mutex);
-				m_songs.emplace_back(song); //put it in the database, if found twice will appear in double
-				m_database.addSong(song);
+
+				song->id = m_database.addSong(song);
+
+				m_songs.emplace_back(song);
 				m_dirty = true;
 			} catch (SongParserException& e) {
 				std::clog << e;
@@ -327,6 +340,7 @@ void Songs::setFilter(std::string const& val) {
 }
 
 void Songs::filter_internal() {
+	Profiler prof("filter_internal");
 	m_updateTimer.setValue(0.0);
 	m_dirty = false;
 	RestoreSel restore(*this);
@@ -367,7 +381,15 @@ void Songs::filter_internal() {
 		std::shared_lock<std::shared_mutex> l(m_mutex);
 		SongCollection(m_songs.begin(), m_songs.end()).swap(m_filtered);  // Invalid regex => copy everything
 	}
+	prof("filtered");
 	sort_internal();
+}
+
+// TODO: determine appropriate time and location to call this function
+void Songs::updateSongOrders(SongPtr const& song) {
+	for (auto order : m_songOrders) {
+		order->update(song, m_database);
+	}
 }
 
 namespace {
@@ -478,6 +500,7 @@ void Songs::sortChange(Game& game, SortChange diff) {
 	RestoreSel restore(*this);
 	config["songs/sort-order"].ui() = m_order;
 
+	initialize_sort_internal();
 	sort_internal();
 	writeConfig(game, false);
 }
@@ -490,17 +513,34 @@ void Songs::sortSpecificChange(unsigned short sortOrder, bool descending) {
 
 	RestoreSel restore(*this);
 	config["songs/sort-order"].ui() = m_order;
+
+	initialize_sort_internal();
 	sort_internal(descending);
 }
 
-void Songs::sort_internal(bool descending) {
-	if(m_order >= m_songOrders.size()) {
-		throw std::logic_error("Internal error: unknown sort order in Songs::sortChange");
+void Songs::initialize_sort_internal() {
+	// don't initialize if loading is still in progress
+	if (!doneLoading) {
+		return;
 	}
+
+	Profiler prof("initialize_sort_internal");
+
+	auto& order = *m_songOrders[m_order];
+	order.initialize(m_songs, m_database);
+	prof("initialize");
+}
+
+void Songs::sort_internal(bool descending) {
+	Profiler prof("sort_internal");
+
+	if (m_order >= m_songOrders.size())
+		m_order.set(0u);
 
 	auto& order = *m_songOrders[m_order];
 
 	order.prepare(m_filtered, m_database);
+	prof("prepare");
 
 	std::stable_sort(m_filtered.begin(), m_filtered.end(),
 		[&](SongPtr const& a, SongPtr const& b) { return order(*a, *b); });
@@ -508,6 +548,7 @@ void Songs::sort_internal(bool descending) {
 	if (descending) {
 		std::reverse(m_filtered.begin(), m_filtered.end());
 	}
+	prof("sort");
 }
 
 std::shared_ptr<Song> Songs::currentPtr() const try {

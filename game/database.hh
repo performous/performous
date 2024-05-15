@@ -72,7 +72,7 @@ public: // methods for database management
 	void addPlayer(std::string const& name, std::string const& picture = "", std::optional<PlayerId> id = std::nullopt);
 	Players const& getPlayers() const;
 	/**A facade for SongItems::addSong.*/
-	void addSong(std::shared_ptr<Song> s);
+	SongId addSong(std::shared_ptr<Song> s);
 	/**A facade for Hiscore::addHiscore.
 	 The ids will be looked up first by using the songs and current players data.
 	 */
@@ -85,12 +85,10 @@ public: // methods for database queries
 	 */
 	bool reachedHiscore(std::shared_ptr<Song> s) const;
 
-	std::vector<HiscoreItem> queryPerSongHiscore(std::shared_ptr<Song> s, std::string const& track = {}) const;
-
-	bool hasHiscore(Song const& s) const;
 	unsigned getHiscore(Song const& s) const;
 	unsigned getHiscore(SongPtr const& s) const;
 	std::vector<HiscoreItem> getHiscores(SongPtr const& s) const;
+	size_t getAllHiscoresCount(SongPtr const& s) const;
 	bool noPlayers() const;
 
 private:

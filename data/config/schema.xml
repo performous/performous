@@ -95,6 +95,20 @@ to save the current settings to XML.
 		<short>High-score timeout</short>
 		<long>How long the high-scores screen will wait for input before going to the next song.</long>
 	</entry>
+	<entry name="game/highscore_limit_stored_scores" type="bool" value="false">
+		<short>Limit high-scores</short>
+		<long>Limit the amount of high-scores saved per song.</long>
+	</entry>
+	<entry name="game/highscore_maximum_stored_scores" type="uint" value="16">
+		<limits min="0" max="64000" step="16" />
+		<short>High-scores limit</short>
+		<long>How many high-scores will be saved per song. Only has effect if "Limit high-scores saved per song" is enabled.</long>
+	</entry>
+	<entry name="game/highscore_minimum_recognized_score_points" type="uint" value="2000">
+		<limits min="0" max="10000" step="100" />
+		<short>Minimum high-score</short>
+		<long>Minimum required score for saving. Scoring below this will skip the option to save the high-score.</long>
+	</entry>
 	<entry name="game/language" type="uint" value="1337">
 		<limits>
 		<enum/>
