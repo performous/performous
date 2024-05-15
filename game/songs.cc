@@ -20,6 +20,7 @@
 #include "songorder/name_song_order.hh"
 #include "songorder/path_song_order.hh"
 #include "songorder/random_song_order.hh"
+#include "songorder/recently_sung_order.hh"
 #include "songorder/score_song_order.hh"
 
 #include <fmt/format.h>
@@ -44,6 +45,7 @@ namespace {
 		songs.addSongOrder(std::make_shared<LanguageSongOrder>());
 		songs.addSongOrder(std::make_shared<ScoreSongOrder>());
 		songs.addSongOrder(std::make_shared<MostSungSongOrder>());
+		songs.addSongOrder(std::make_shared<RecentlySungSongOrder>());
 		songs.addSongOrder(std::make_shared<FileTimeSongOrder>());
 		songs.addSongOrder(std::make_shared<CreatorSongOrder>());
 	}
