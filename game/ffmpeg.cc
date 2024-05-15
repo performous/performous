@@ -268,6 +268,7 @@ FFmpeg::FFmpeg(fs::path const& _filename, int mediaType) : m_filename(_filename)
 	if (m_streamId < 0) throw Error(*this, m_streamId);
 
 	// Possibly the stream defines a Replay Gain factor; read it
+	std::clog << "ffmpeg/debug: FFmpeg::FFmpeg Replay Gain on [" << _filename << "] reading..." << std::endl;
 	readReplayGain(m_formatContext->streams[m_streamId]);
 
 	decltype(m_codecContext) pCodecCtx{avcodec_alloc_context3(codec), avcodec_free_context};
@@ -304,19 +305,18 @@ bool FFmpeg::readReplayGain(const AVStream *stream)
 	// assert(stream)
 	m_replaygain = 0.0;
 	if (stream != nullptr) {
-        std::clog << "ffmpeg/debug: readReplayGain() - reading..." << std::endl;
 		int replay_gain_size = 0;
 		const AVReplayGain *replay_gain = (AVReplayGain *)av_stream_get_side_data(stream, AV_PKT_DATA_REPLAYGAIN, &replay_gain_size);
 		if (replay_gain_size > 0 && replay_gain != nullptr) {
 			m_replaygain = static_cast<double>(replay_gain->track_gain);
 			m_replaygain /= 1000.0;   // convert from milli decibels to decibels
 			rg_read = true;
-            std::clog << "ffmpeg/debug: readReplayGain() - GAIN IS [" << std::setprecision(2) << m_replaygain << "] dB" << std::endl;
+			std::clog << "ffmpeg/debug: readReplayGain() - GAIN IS [" << std::setprecision(2) << m_replaygain << "] dB" << std::endl;
 		}
-        else
-        {
-            std::clog << "ffmpeg/debug: readReplayGain() - NO GAIN" << std::endl;
-        }
+		else
+		{
+			std::clog << "ffmpeg/debug: readReplayGain() - NO GAIN" << std::endl;
+		}
 	}
 	return rg_read;
 }
