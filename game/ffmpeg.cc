@@ -309,13 +309,12 @@ bool FFmpeg::readReplayGain(const AVStream *stream)
 		const AVReplayGain *replay_gain = (AVReplayGain *)av_stream_get_side_data(stream, AV_PKT_DATA_REPLAYGAIN, &replay_gain_size);
 		if (replay_gain_size > 0 && replay_gain != nullptr) {
 			m_replaygain = static_cast<double>(replay_gain->track_gain);
-			m_replaygain /= 1000.0;   // convert from milli decibels to decibels
+			m_replaygain /= 100000.0;   // convert from microbels to decibels
 			rg_read = true;
-			std::clog << "ffmpeg/debug: readReplayGain() - GAIN IS [" << std::setprecision(2) << m_replaygain << "] dB" << std::endl;
+			std::clog << "ffmpeg/debug: readReplayGain() - GAIN IS [" << std::fixed << std::setprecision(2) << m_replaygain << "] dB" << std::endl;
 		}
-		else
-		{
-			std::clog << "ffmpeg/debug: readReplayGain() - NO GAIN" << std::endl;
+		else {
+			std::clog << "ffmpeg/debug: readReplayGain() - no gain" << std::endl;
 		}
 	}
 	return rg_read;
