@@ -3,7 +3,6 @@
 #include "hiscoreitem.hh"
 #include "libxml++.hh"
 #include "player.hh"
-#include "songitems.hh"
 
 #include <set>
 #include <string>
@@ -16,7 +15,7 @@ public:
 	static const unsigned MaximumStoredScores;
 
 	void load(xmlpp::NodeSet const& n);
-	void save(xmlpp::Element *players);
+	void save(xmlpp::Element *hiscores);
 
 	/**Check if you reached a new highscore.
 
@@ -46,16 +45,17 @@ public:
 
 	using HiscoreVector = std::vector<HiscoreItem>;
 
-	/// This queries the database for a sorted vector of highscores. The defaults mean to query everything.
-	/// @param max limits the number of elements returned.
-	unsigned getHiscore(unsigned songid) const;
-	std::vector<HiscoreItem> getHiscores(unsigned songid) const;
-	HiscoreVector queryHiscore(std::optional<PlayerId> playerid, std::optional<SongId> songid, std::string const& track, std::optional<unsigned> max = std::nullopt) const;
-	bool hasHiscore(const SongId& songid) const;
-	std::size_t size() const { return m_hiscore.size(); }
+	unsigned getHiscore(SongId songid) const;
+	HiscoreVector getHiscores(SongId songid) const;
+	size_t getAllHiscoresCount(SongId songid) const;
+
+	std::size_t size() const;
 
   private:
 	using hiscore_t = std::multiset<HiscoreItem>;
-	hiscore_t m_hiscore;
+	using hiscore_map_t = std::unordered_map<SongId, hiscore_t>;
+	hiscore_map_t m_hiscore_map;
+	using hiscore_map_with_level_t = std::unordered_map<HiscoreItemBySongAndLevelKey, hiscore_t>;
+	hiscore_map_with_level_t m_hiscore_map_with_level;
 	unsigned short currentLevel() const;
 };

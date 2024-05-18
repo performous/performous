@@ -7,11 +7,11 @@
 struct FileTimeSongOrder : public SongOrder {
 	std::string getDescription() const override;
 
-	void prepare(SongCollection const& , Database const&) override;
+	void initialize(SongCollection const& , Database const&) override;
 
 	bool operator()(Song const& a, Song const& b) const override;
 
   private:
-	std::map<Song const*, std::chrono::seconds> m_dateMap;
+	std::unordered_map<Song const*, std::chrono::seconds> m_dateMap;
+	bool initialized;
 };
-
