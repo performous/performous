@@ -2,6 +2,7 @@
 
 #include "opengl_text.hh"
 #include "texture.hh"
+#include "ui/border.hh"
 #include <string>
 
 /// abstract theme class
@@ -132,4 +133,38 @@ public:
 	Texture comment_bg;
 	/// configuration comment background (short tip)
 	Texture short_comment_bg;
+};
+
+class ThemeSongFilterScreen: public Theme {
+public:
+	ThemeSongFilterScreen();
+};
+
+struct ThemeUI {
+	ThemeUI();
+
+	std::unique_ptr<Texture> getButtonBG() const;
+	std::unique_ptr<Texture> getCheckboxCheck() const;
+	std::unique_ptr<Texture> getCheckboxUncheck() const;
+	std::unique_ptr<Texture> getImageBG() const;
+	std::unique_ptr<Texture> getListBG() const;
+	std::unique_ptr<Texture> getListSelectedBG() const;
+	std::unique_ptr<Texture> getSelectBG() const;
+	std::unique_ptr<Texture> getSelectUpDown() const;
+	std::unique_ptr<Texture> getTextboxBG() const;
+	std::unique_ptr<Texture> getTextboxCursor() const;
+	std::unique_ptr<BorderDefinition> getFocus() const;
+
+private:
+	std::string button_bg;
+	std::string checkbox_checked;
+	std::string checkbox_unchecked;
+	std::string image_bg;
+	std::string list_bg;
+	std::string list_selected_bg;
+	std::string select_bg;
+	std::string select_up_down;
+	std::string textbox_bg;
+	std::string textbox_cursor;
+	std::string focus;
 };

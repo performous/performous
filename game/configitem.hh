@@ -92,3 +92,7 @@ class ConfigItem {
 };
 
 using ConfigItemMap = std::map<std::string, ConfigItem>;
+using Config = ConfigItemMap;
+extern Config config; ///< A global variable that contains all config items
+
+void populateLanguages(const std::map<std::string, std::string>& languages, ConfigItemMap&);

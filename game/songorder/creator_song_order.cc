@@ -1,6 +1,7 @@
 #include "creator_song_order.hh"
 
 #include "configuration.hh"
+#include "i18n.hh"
 #include "unicode.hh"
 
 std::string CreatorSongOrder::getDescription() const {

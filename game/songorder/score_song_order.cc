@@ -1,6 +1,7 @@
 #include "score_song_order.hh"
 
 #include "database.hh"
+#include "i18n.hh"
 
 std::string ScoreSongOrder::getDescription() const {
 	return _("sorted by score");
