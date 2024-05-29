@@ -166,3 +166,18 @@ private:
 	Mode m_mode;
 };
 
+
+class BrokenFilter : public ISongFilter {
+public:
+	BrokenFilter(bool broken);
+
+	bool filter(Song const&) const override;
+
+	std::string toString() const override {
+		return std::string{ "broken=" } + (m_broken ? "true" : "false");
+	}
+
+private:
+	bool m_broken;
+};
+

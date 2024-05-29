@@ -60,6 +60,8 @@ class ScreenSongFilter : public FormScreen {
 	TextBox m_textBoxTitle;
 	Label m_labelArtist;
 	TextBox m_textBoxArtist;
+	Label m_labelBroken;
+	Select m_selectBroken;
 	Label m_labelResults;
 	Button m_buttonReset;
 };

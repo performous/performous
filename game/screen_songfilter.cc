@@ -159,6 +159,16 @@ void ScreenSongFilter::initializeControls() {
 	m_textBoxArtist.setMaxLength(24);
 
 	++n;
+
+	getForm().addControl(m_labelBroken);
+	m_labelBroken.setText(_("Misc") + ":");
+	m_labelBroken.setGeometry(horizontalOffset, verticalOffset + n * verticalSpace, horizontalSpace, lineHeight);
+	getForm().addControl(m_selectBroken);
+	m_selectBroken.setItems({ none, "Correct", "Broken" });
+	m_selectBroken.select(0);
+	m_selectBroken.setGeometry(horizontalOffset + horizontalSpace, verticalOffset + n * verticalSpace, 0.2f, lineHeight);
+
+	++n;
 	//++n;
 	//++n;
 	//++n;
@@ -242,6 +252,9 @@ SongFilterPtr ScreenSongFilter::makeFilter() const {
 	if(!m_textBoxArtist.getText().empty())
 		result->add(std::make_shared<ArtistFilter>(m_textBoxArtist.getText()));
 
+	if (m_selectBroken.getSelectedIndex() != 0)
+		result->add(std::make_shared<BrokenFilter>(m_selectBroken.getSelectedIndex() == 2));
+
 	return result;
 }
 
@@ -258,11 +271,6 @@ void ScreenSongFilter::updateResult() {
 	std::cout << "filter: " << filter->toString() << std::endl;
 
 	m_songs.setFilter(filter);
-
-//	static bool x = false;
-
-//	if(filtered != all && !x) x = true;
-//	if(filtered == all && x) throw "";
 }
 
 void ScreenSongFilter::resetFilter() {
@@ -278,6 +286,7 @@ void ScreenSongFilter::resetFilter() {
 	m_selectMode.select(0);
 	m_textBoxArtist.setText({});
 	m_textBoxTitle.setText({});
+	m_selectBroken.select(0);
 
 	updateResult();
 }
