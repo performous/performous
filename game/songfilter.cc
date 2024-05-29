@@ -102,3 +102,12 @@ bool ModeFilter::filter(Song const& song) const {
 	return false;
 }
 
+BrokenFilter::BrokenFilter(bool broken)
+	: m_broken(broken) {
+}
+
+bool BrokenFilter::filter(Song const& song) const {
+	return song.isBroken() == m_broken;
+}
+
+
