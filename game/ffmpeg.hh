@@ -22,6 +22,7 @@ extern "C" {
   struct AVCodecContext;
   struct AVFormatContext;
   struct AVFrame;
+  struct AVStream;
   void av_frame_free(AVFrame **);
   struct SwrContext;
   void swr_free(struct SwrContext **);
