@@ -29,16 +29,6 @@ extern "C" {
     void swr_close(struct SwrContext *);
     struct SwsContext;
     void sws_freeContext(struct SwsContext *);
-
-    struct AVFilterGraph;
-    struct AVFilterContext;
-    struct AVFilterInOut;
-    struct AVFilterLink;
-    struct AVFilter;
-    struct AVRational;
-    void avfilter_graph_free(struct AVFilterGraph **);
-    void avfilter_free(struct AVFilterContext *);
-    void avfilter_inout_free(AVFilterInOut **);
 }
 
 /// ffmpeg class
@@ -99,20 +89,11 @@ class AudioFFmpeg : public FFmpeg {
     void processFrameOld(uFrame frame);
     void createFilter();
 
-
-
     private:
     std::int64_t m_position_in_48k_frames = -1;
     int m_rate = 0;
     AudioCb handleAudioData;
     std::unique_ptr<SwrContext, void(*)(SwrContext*)> m_resampleContext{nullptr, [] (auto p) { swr_close(p); swr_free(&p); }};
-    std::unique_ptr<AVFilterGraph, void(*)(AVFilterGraph*)> m_filterGraph{nullptr, [] (auto p) { avfilter_graph_free(&p); }};
-
-    //std::unique_ptr<AVFilterContext, void(*)(AVFilterContext*)> m_filterBufSrc{nullptr, [] (auto p) { avfilter_free(p); }};
-    //std::unique_ptr<AVFilterContext, void(*)(AVFilterContext*)> m_filterBufSink{nullptr, [] (auto p) { avfilter_free(p); }};
-    AVFilterContext *m_filterBufSrc  = nullptr;   // The libav API wants the address of this pointer, not sure how to handle??
-    AVFilterContext *m_filterBufSink = nullptr;
-
 };
 
 class VideoFFmpeg : public FFmpeg {
