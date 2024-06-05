@@ -126,7 +126,7 @@ if (MINGW)
     target_link_libraries(performous PRIVATE mingw32)
 endif()
 
-foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat AVFilter SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM Json Ced Aubio)
+foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM Json Ced Aubio)
     find_package(${lib} ${${lib}_REQUIRED_VERSION} REQUIRED)
     message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
     target_include_directories(performous SYSTEM PRIVATE ${${lib}_INCLUDE_DIRS})
