@@ -12,7 +12,6 @@
 #include <stdexcept>
 #include <system_error>
 #include <thread>
-#include <algorithm>
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
@@ -29,9 +28,6 @@ extern "C" {
 #include <libavutil/mathematics.h>
 #include <libavutil/error.h>
 #include <libavutil/replaygain.h>
-#include <libavfilter/avfilter.h>
-#include <libavfilter/buffersink.h>
-#include <libavfilter/buffersrc.h>
 #include <libavutil/channel_layout.h>
 #include <libavutil/samplefmt.h>
 }
@@ -84,6 +80,7 @@ void AudioBuffer::operator()(const std::int16_t *data, std::int64_t count, std::
         return;
     }
 
+    /*
     std::int64_t amount = std::min( count, 32L );
     std::stringstream msg;
     msg << "Audio Data is [";
@@ -95,6 +92,7 @@ void AudioBuffer::operator()(const std::int16_t *data, std::int64_t count, std::
     }
     msg << "] ...";
     std::clog << "ffmpeg/debug: " << msg.str() << "]" << std::endl;
+*/
 
     m_cond.wait(l, [this]{ return  condition(); });
     if (m_quit || m_seek_asked)
@@ -150,6 +148,18 @@ bool AudioBuffer::read(float* begin, std::int64_t samples, std::int64_t pos, flo
     if (eof(pos + samples) || m_quit)
         return false;
 
+
+    // Calculate volume adjustment factor from Replay Gain (if defined)
+    // Ref: https://stackoverflow.com/a/1149105/1730895
+    bool  hasGain = false;
+    float replayGainVolume = 1.0f;
+    if ( m_replaygain != 0.0 )
+    {
+        hasGain = true;
+        replayGainVolume = powf( 10.0F, static_cast<float>(m_replaygain) / 20.0F );
+        // Noisy!  std::clog << "audio/debug: Music Replay Gain is [" << std::setprecision(2) << m_replaygain << "] dB, applying [" << replayGainVolume << "] multiplier" << std::endl;
+    }
+
     // one cannot read more data than the size of buffer
     std::int64_t size = static_cast<std::int64_t>(m_data.size());
     samples = std::min(samples, size);
@@ -165,8 +175,18 @@ bool AudioBuffer::read(float* begin, std::int64_t samples, std::int64_t pos, flo
         return true;
     }
 
-    for (std::int64_t s = 0; s < samples; ++s) {
-        begin[s] += volume * da::conv_from_s16(m_data[static_cast<size_t>((m_read_pos + s)) % m_data.size()]);
+    if ( hasGain )
+    {
+        // A replay gain was defined, apply it and the volume to the samples
+        for (std::int64_t s = 0; s < samples; ++s) {
+            begin[s] += replayGainVolume * volume * da::conv_from_s16(m_data[static_cast<size_t>((m_read_pos + s)) % m_data.size()]);
+        }
+    }
+    else
+    {
+        for (std::int64_t s = 0; s < samples; ++s) {
+            begin[s] += volume * da::conv_from_s16(m_data[static_cast<size_t>((m_read_pos + s)) % m_data.size()]);
+        }
     }
 
     m_read_pos = pos + samples;
@@ -232,7 +252,6 @@ static void printFFmpegInfo() {
     bool matches = LIBAVUTIL_VERSION_INT == avutil_version() &&
         LIBAVCODEC_VERSION_INT == avcodec_version() &&
         LIBAVFORMAT_VERSION_INT == avformat_version() &&
-        LIBAVFILTER_VERSION_INT == avfilter_version() &&
         LIBSWSCALE_VERSION_INT == swscale_version();
 
     if (matches) {
@@ -240,7 +259,6 @@ static void printFFmpegInfo() {
             " avutil:" + ffversion(LIBAVUTIL_VERSION_INT) +
             " avcodec:" + ffversion(LIBAVCODEC_VERSION_INT) +
             " avformat:" + ffversion(LIBAVFORMAT_VERSION_INT) +
-            " avfilter:" + ffversion(LIBAVFILTER_VERSION_INT) +
             " swresample:" + ffversion(LIBSWRESAMPLE_VERSION_INT) +
             " swscale:" + ffversion(LIBSWSCALE_VERSION_INT)
             << std::endl;
@@ -249,7 +267,6 @@ static void printFFmpegInfo() {
             " avutil:" + ffversion(LIBAVUTIL_VERSION_INT) + "/" + ffversion(avutil_version()) +
             " avcodec:" + ffversion(LIBAVCODEC_VERSION_INT) + "/" + ffversion(avcodec_version()) +
             " avformat:" + ffversion(LIBAVFORMAT_VERSION_INT) + "/" + ffversion(avformat_version()) +
-            " avfilter:" + ffversion(LIBAVFILTER_VERSION_INT) + "/" + ffversion(avfilter_version()) +
             " swresample:" + ffversion(LIBSWRESAMPLE_VERSION_INT) + "/" + ffversion(swresample_version()) +
             " swscale:" + ffversion(LIBSWSCALE_VERSION_INT) + "/" + ffversion(swscale_version())
             << std::endl;
@@ -359,10 +376,6 @@ VideoFFmpeg::VideoFFmpeg(fs::path const& filename, VideoCb videoCb) : FFmpeg(fil
 AudioFFmpeg::AudioFFmpeg(fs::path const& filename, int rate, AudioCb audioCb) :
     FFmpeg(filename, AVMEDIA_TYPE_AUDIO), m_rate(rate), handleAudioData(audioCb) {
 
-        // setup filter to resample, with gain
-        createFilter();
-
-
         // setup resampler
         m_resampleContext.reset(swr_alloc());
         if (!m_resampleContext) throw std::runtime_error("Cannot create resampling context");
@@ -374,160 +387,6 @@ AudioFFmpeg::AudioFFmpeg(fs::path const& filename, int rate, AudioCb audioCb) :
         av_opt_set_int(m_resampleContext.get(), "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
         swr_init(m_resampleContext.get());
     }
-
-void AudioFFmpeg::createFilter()
-{
-    // Setup Audio Filter
-    //
-    // Essentially this needs a source and a sink.
-    // The frame-data goes into the source, and is read from the sink
-    //
-    // Based on: https://raw.githubusercontent.com/FFmpeg/FFmpeg/master/doc/examples/decode_filter_audio.c
-
-    // The filter resamples to m_rate, AUDIO_CHANNELS (1|2)
-    // It normalises the human perceived "loudness" to the Relay Gain factor (if any)
-
-    char args[128];  // used by ffmpeg channel describer
-    int  ret = 0;
-    const AVFilter *abufferSrc  = avfilter_get_by_name("abuffer");           // audio data goes into the filter here
-    const AVFilter *abufferSink = avfilter_get_by_name("abuffersink");       // audio data is read out of the filter here
-
-    static const enum AVSampleFormat outSampleFmts[] = { AV_SAMPLE_FMT_S16, AV_SAMPLE_FMT_NONE };
-    static const int outSampleRates[] = { static_cast<int>(m_rate), -1 };
-    static const char *outSampleLayouts = "stereo";  // Is this OK?  What about 7.1?
-    if (AUDIO_CHANNELS == 1)
-        outSampleLayouts = "mono";
-    else
-        std::clog << "ffmpeg/error: Not correctly handling AUDIO_CHANNELS of [" << AUDIO_CHANNELS << "]" << std::endl;  // not mono, not stereo
-
-    // Filter re-samples to Configured Audio Format with Replay Gain "loudness" normalisation
-    // Leaving "s16" as it seems to be non-configurable
-    char filterStr[128];
-    std::snprintf( filterStr,
-                   sizeof(filterStr),
-                   "aresample=%d,aformat=sample_fmts=s16:channel_layouts=%s,volume=replaygain=track",  // "s16" is AV_SAMPLE_FMT_S16
-                   outSampleRates[0],  // e.g.: 48000
-                   outSampleLayouts ); // e.g.: "stereo"
-
-    AVFilterInOut *inputs   = avfilter_inout_alloc();   // libav API wants address of this pointers, can't use std::unique_ptr?
-    AVFilterInOut *outputs  = avfilter_inout_alloc();
-    AVRational     timeBase = m_formatContext.get()->streams[m_streamId]->time_base;
-
-    m_filterGraph.reset( avfilter_graph_alloc() );
-    if ( outputs == nullptr || inputs == nullptr || m_filterGraph.get() == nullptr )
-    {
-        std::clog << "ffmpeg/error: Not enough memory to create filter" << std::endl;
-        throw Error(*this, AVERROR(ENOMEM));
-    }
-
-    // buffer audio source: the decoded frames from the decoder will be inserted here.
-    if ( m_codecContext.get()->ch_layout.order == AV_CHANNEL_ORDER_UNSPEC)
-    {
-        av_channel_layout_default(&(m_codecContext.get()->ch_layout), m_codecContext.get()->ch_layout.nb_channels);
-    }
-    ret = snprintf(args,
-                   sizeof(args),
-                   "time_base=%d/%d:sample_rate=%d:sample_fmt=%s:channel_layout=",  // channel_layout intentionally blank
-                   timeBase.num,
-                   timeBase.den, m_codecContext.get()->sample_rate,
-                   av_get_sample_fmt_name(m_codecContext.get()->sample_fmt));
-
-    av_channel_layout_describe(&(m_codecContext.get()->ch_layout), args + ret, sizeof(args) - static_cast<size_t>( ret ));
-    ret = avfilter_graph_create_filter(&m_filterBufSrc, abufferSrc, "in", args, nullptr, m_filterGraph.get());
-    if ( ret < 0 )
-    {
-        std::clog << "ffmpeg/error: Cannot create audio buffer source" << std::endl;
-        throw Error(*this, ret );
-    }
-
-    // buffer audio sink: to terminate the filter chain.
-    // The filtered audio frames are read from this buffer
-    ret = avfilter_graph_create_filter(&m_filterBufSink, abufferSink, "out", nullptr, nullptr, m_filterGraph.get());
-    if (ret < 0)
-    {
-        std::clog << "ffmpeg/error: Cannot create audio buffer sink" << std::endl;
-        throw Error(*this, ret );
-    }
-
-    //ret = av_opt_set_int_list(m_filterBufSink, "sample_fmts", outSampleFmts, -1, AV_OPT_SEARCH_CHILDREN);  // macro uses mixed result-types
-    int size = static_cast<int>(av_int_list_length(outSampleFmts, -1) * sizeof(*(outSampleFmts)));
-    ret = av_opt_set_bin(m_filterBufSink, "sample_fmts", (const uint8_t *)(outSampleFmts), size , AV_OPT_SEARCH_CHILDREN);
-    if (ret < 0)
-    {
-        std::clog << "ffmpeg/error: Cannot set output sample format" << std::endl;
-        throw Error(*this, ret );
-    }
-
-    ret = av_opt_set(m_filterBufSink, "ch_layouts", outSampleLayouts, AV_OPT_SEARCH_CHILDREN);
-    if (ret < 0)
-    {
-        std::clog << "ffmpeg/error: Cannot set output channel layout" << std::endl;
-        throw Error(*this, ret );
-    }
-
-    //ret = av_opt_set_int_list(m_filterBufSink, "sample_rates", outSampleRates, -1, AV_OPT_SEARCH_CHILDREN);  // macro uses mixed result-types Grrr!
-    size = static_cast<int>(av_int_list_length(outSampleRates, -1) * sizeof(*(outSampleRates)));
-    ret = av_opt_set_bin(m_filterBufSink, "sample_rates", (const uint8_t *)(outSampleRates), size, AV_OPT_SEARCH_CHILDREN);
-
-    if (ret < 0)
-    {
-        std::clog << "ffmpeg/error: Cannot set output sample rate" << std::endl;
-        throw Error(*this, ret );
-    }
-
-    // Set the endpoints for the filter graph. The filter_graph will
-    // be linked to the graph described by filters_descr.
-
-    // The buffer source output must be connected to the input pad of
-    // the first filter described by filters_descr; since the first
-    // filter input label is not specified, it is set to "in" by
-    // default.
-    outputs->name       = av_strdup("in");
-    outputs->filter_ctx = m_filterBufSrc;
-    outputs->pad_idx    = 0;
-    outputs->next       = nullptr;
-
-    // The buffer sink input must be connected to the output pad of
-    // the last filter described by filters_descr; since the last
-    // filter output label is not specified, it is set to "out" by
-    // default.
-    inputs->name       = av_strdup("out");
-    inputs->filter_ctx = m_filterBufSink;
-    inputs->pad_idx    = 0;
-    inputs->next       = nullptr;
-
-    // Finally we parse the filter string
-    int parseRet  = avfilter_graph_parse_ptr(m_filterGraph.get(), filterStr, &inputs, &outputs, nullptr);
-    if ( parseRet < 0 )
-    {
-        std::clog << "ffmpeg/error: Failed to parse filter specification" << std::endl;
-        throw Error(*this, parseRet );
-    }
-
-    int configRet = avfilter_graph_config(m_filterGraph.get(), nullptr);
-    if ( configRet < 0 )
-    {
-        std::clog << "ffmpeg/error: Failed to configure filter" << std::endl;
-        throw Error(*this, configRet );
-    }
-
-
-    // Print summary of the sink buffer
-    // Note: args buffer is reused to store channel layout string
-    const AVFilterLink *outlink = m_filterBufSink->inputs[0];
-    av_channel_layout_describe(&outlink->ch_layout, args, sizeof(args));
-    std::clog << "ffmpeg/debug: Filter Output: sample-rate="
-              << outlink->sample_rate
-              << "Hz  format="
-              << (char *)av_x_if_null(av_get_sample_fmt_name( static_cast<enum AVSampleFormat>(outlink->format)), "?")
-              << "  channel-layout="
-              << args
-              << std::endl;
-
-
-    avfilter_inout_free(&inputs);
-    avfilter_inout_free(&outputs);
-}
 
 double FFmpeg::duration() const { return double(m_formatContext->duration) / double(AV_TIME_BASE); }
 
@@ -638,7 +497,7 @@ void VideoFFmpeg::processFrame(uFrame frame) {
     handleVideoData(std::move(f));  // Takes ownership and may block until there is space
 }
 
-void AudioFFmpeg::processFrameOld(uFrame frame) {
+void AudioFFmpeg::processFrame(uFrame frame) {
     // resample to output
     std::int16_t *output;
     int out_samples = swr_get_out_samples(m_resampleContext.get(), frame->nb_samples);
@@ -655,67 +514,6 @@ void AudioFFmpeg::processFrameOld(uFrame frame) {
     m_position_in_48k_frames += out_samples;
     m_position += frame->nb_samples * av_q2d(m_formatContext->streams[m_streamId]->time_base);
 }
-
-void AudioFFmpeg::processFrame(uFrame frame) {
-    int ret;
-    AVFrame *filt_frame = av_frame_alloc();  // TODO: can we use a qtd::unique_ptr<> for this ?
-
-    // push the audio data from decoded frame into the filtergraph
-    if (av_buffersrc_add_frame_flags(m_filterBufSrc, frame.get(), AV_BUFFERSRC_FLAG_KEEP_REF) < 0) {
-        std::clog << "ffmpeg/error: Error while feeding the audio filtergraph" << std::endl;
-        throw Error(*this, -1 );
-    }
-
-    // Try to read frame(s) out of the filter
-    while (1) {
-        ret = av_buffersink_get_frame(m_filterBufSink, filt_frame);
-        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF){
-            break;
-        }
-        else if (ret < 0)
-        {
-            std::clog << "ffmpeg/error: Error getting frame from filter" << std::endl;
-            throw Error(*this, ret );
-        }
-
-        // Get the samples from the filtered frame, they do not need resampling
-        std::int16_t *output;
-        int out_samples = filt_frame->nb_samples;
-        //av_samples_alloc((std::uint8_t**)&output, nullptr, AUDIO_CHANNELS, out_samples, AV_SAMPLE_FMT_S16, 0);
-        //av_samples_copy( (std::uint8_t**)&output, (std::uint8_t**)&(filt_frame->data), 0, 0, out_samples, AUDIO_CHANNELS,  AV_SAMPLE_FMT_S16 );
-        output = (std::int16_t*)filt_frame->data;
-
-        std::clog << "ffmpeg/debug: fetched [" << out_samples << "] samples, of [" << filt_frame->ch_layout.nb_channels << "] channels from filter" << std::endl;
-
-        std::int64_t amount = std::min( out_samples, 32 );
-        std::stringstream msg;
-        msg << "Audio Data is [";
-        for ( ssize_t i=0; i<amount; i++)
-        {
-            msg << output[i];
-            if ( i <amount-1 )
-                msg << ", ";
-        }
-        msg << "] ...";
-        std::clog << "ffmpeg/debug: " << msg.str() << "]" << std::endl;
-
-
-        // The output is now an interleaved array of 16-bit samples
-        if (m_position_in_48k_frames == -1) {
-            m_position_in_48k_frames = static_cast<std::int64_t>(m_position * m_rate + 0.5f);
-        }
-        handleAudioData(output, out_samples * AUDIO_CHANNELS, m_position_in_48k_frames * AUDIO_CHANNELS /* pass in samples */);
-        //av_freep(&output);
-        m_position_in_48k_frames += out_samples;
-        m_position += filt_frame->nb_samples * av_q2d(m_formatContext->streams[m_streamId]->time_base);
-
-        av_frame_unref(filt_frame);
-
-    }
-    av_frame_free(&filt_frame);
-    av_frame_unref(frame.get());
-}
-
 
 
 #if defined(__GNUC__)
