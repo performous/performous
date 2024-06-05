@@ -291,13 +291,6 @@ struct Sample {
 			eof = true;
 		}
 
-		// TODO: use ReplayGain to normalise audio volume
-		double replayGain = audioBuffer.replayGain();
-		if ( replayGain != 0.0 )
-		{
-			std::clog << "Sample() Replay Gain is [" << std::setprecision(3) << replayGain << "] dB" << std::endl;
-		}
-
 		const auto failVolume = static_cast<float>(config["audio/fail_volume"].ui()) / 100.0f;
 		for (size_t i = 0, iend = mixbuf.size(); i != iend; ++i) {
 			begin[i] += mixbuf[i] * failVolume;
