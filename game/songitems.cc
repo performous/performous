@@ -7,32 +7,46 @@
 #include <memory>
 #include <string>
 
-
 void SongItems::load(xmlpp::NodeSet const& n) {
     for (auto const& elem : n) {
         xmlpp::Element& element = dynamic_cast<xmlpp::Element&>(*elem);
 
-        xmlpp::Attribute* a_id = element.get_attribute("id");
-        if (!a_id)
-            throw SongItemsException("No attribute id");
+		xmlpp::Attribute* a_id = element.get_attribute("id");
+		if (!a_id)
+			throw SongItemsException("No attribute id");
+		auto id = std::stoi(a_id->get_value());
 
-        xmlpp::Attribute* a_artist = element.get_attribute("artist");
-        if (!a_artist)
-            throw SongItemsException("No attribute artist");
+		xmlpp::Attribute* a_artist = element.get_attribute("artist");
+		if (!a_artist)
+			throw SongItemsException("No attribute artist");
+		auto artist = a_artist->get_value();
 
-        xmlpp::Attribute* a_title = element.get_attribute("title");
-        if (!a_title)
-            throw SongItemsException("No attribute title");
+		xmlpp::Attribute* a_title = element.get_attribute("title");
+		if (!a_title)
+			throw SongItemsException("No attribute title");
+		auto title = a_title->get_value();
 
         auto a_broken = element.get_attribute("broken");
         auto const broken = (a_broken && a_broken->get_value() == "true");
 
-        addSongItem(a_artist->get_value(), a_title->get_value(), broken, std::stoi(a_id->get_value()));
-    }
+		addSongItem(a_artist->get_value(), a_title->get_value(), broken, std::stoi(a_id->get_value()));
+	}
 }
 
 void SongItems::save(xmlpp::Element* songs) {
-    for (auto const& song : m_songs) {
+    std::vector<SongItem> song_items;
+
+    std::transform(
+	    m_songs_map.begin(),
+	    m_songs_map.end(),
+	    std::back_inserter(song_items),
+	    [](auto &kv) { return kv.second; }
+    );
+
+	std::stable_sort(song_items.begin(), song_items.end(),
+	[&](SongItem const& a, SongItem const& b) { return a.id < b.id; });
+
+	for (auto const& song : song_items) {
         xmlpp::Element* element = xmlpp::add_child_element(songs, "song");
         element->set_attribute("id", std::to_string(song.id));
         element->set_attribute("artist", song.artist);
@@ -42,91 +56,59 @@ void SongItems::save(xmlpp::Element* songs) {
 }
 
 SongId SongItems::addSongItem(std::string const& artist, std::string const& title, bool broken, std::optional<SongId> _id) {
-    SongItem si;
-    si.id = _id.value_or(assign_id_internal());
-    songMetadata collateInfo{ {"artist", artist}, {"title", title} };
-    UnicodeUtil::collate(collateInfo);
-    si.artist = collateInfo["artist"];
-    si.title = collateInfo["title"];
+	SongItem si;
+
+	si.id = _id.has_value() ? _id.value() : assign_id_internal();
+
+	songMetadata collateInfo {{"artist", artist}, {"title", title}};
+	UnicodeUtil::collate(collateInfo);
+	si.artist = collateInfo["artist"];
+	si.title = collateInfo["title"];
     si.setBroken(broken);
-    std::pair<songs_t::iterator, bool> ret = m_songs.insert(si);
-    if (!ret.second)
-    {
-        si.id = assign_id_internal();
-        m_songs.insert(si); // now do the insert with the fresh id
-    }
-    return si.id;
+
+	m_songs_map[si.id] = si;
+	return si.id;
 }
 
-void SongItems::addSong(SongPtr song) {
-    SongItem si;
-    // Do NOT use .value_or() here; it gets evaluated and addSongItem() runs regardless of whether we have a value, which results in duplicate entries in the database.
-    auto val = lookup(song);
-    si.id = val ? val.value() : (addSongItem(song->artist, song->title));;
-    auto it = m_songs.find(si);
-    if (it == m_songs.end())
-        throw SongItemsException("Cant find song which was added just before");
-    // it->song.reset(song); // does not work, it is a read only structure...
+SongId SongItems::addSong(SongPtr song) {
+	// if song is already in db verify integrity and return
+	if (song->id.has_value() && m_songs_map.find(song->id.value()) != m_songs_map.end()) {
+		// verify artist and title match
+		if (match_artist_and_title_internal(*song, m_songs_map.at(song->id.value())))
+			return song->id.value();
+		// else the song has a wrong ID and should take on whatever ID is assigned during addSongItem
+	}
 
-    // fill up the rest of the information
-    si.artist = it->artist;
-    si.title = it->title;
-    si.setBroken(it->isBroken());
-    si.setSong(song);
+	// if the song can be resolved to an ID that means there is an entry for it in the DB -> no new song will be added
+	auto const& maybe_id = resolveToSongId(*song);
 
-    m_songs.erase(it);
-    m_songs.insert(si);
+	// Do NOT use .value_or() here; it gets evaluated and addSongItem() runs regardless of whether we have a value, which results in duplicate entries in the database.
+	return maybe_id.has_value() ? maybe_id.value() : addSongItem(song->artist, song->title);
 }
 
-std::optional<SongId> SongItems::lookup(Song const& song) const {
-    auto const si = std::find_if(m_songs.begin(), m_songs.end(), [&song](SongItem const& si) {
-
-        // This is not always really correct but in most cases these inputs should have been normalized into unicode at one point during their life time.
-        if (song.collateByArtistOnly.length() != si.artist.length() ||
-            song.collateByTitleOnly.length() != si.title.length()) return false;
-
-        return UnicodeUtil::caseEqual(song.collateByArtistOnly, si.artist, true) && UnicodeUtil::caseEqual(song.collateByTitleOnly, si.title, true);
+std::optional<SongId> SongItems::resolveToSongId(Song const& song) const {
+    auto const si = std::find_if(m_songs_map.begin(), m_songs_map.end(), [&song](std::pair<const SongId, SongItem> const& item) {
+            return match_artist_and_title_internal(song, item.second);
         });
-    if (si != m_songs.end()) return si->id;
+    if (si != m_songs_map.end())
+		return si->second.id;
     return std::nullopt;
 }
 
-SongId SongItems::getSongId(SongPtr const& song) const {
-    auto const it = std::find_if(m_songs.begin(), m_songs.end(), [song](auto const& item) { return item.getSong() == song; });
+bool SongItems::match_artist_and_title_internal(Song const& song, SongItem const& songItem) {
+	// This is not always really correct but in most cases these inputs should have been normalized into unicode at one point during their life time.
+	if (song.collateByArtistOnly.length() != songItem.artist.length() || song.collateByTitleOnly.length() != songItem.title.length())
+		return false;
 
-    if (it == m_songs.end())
-        throw std::logic_error("SongItems::getSongId: Did not find an item matching to song!");
-
-    return it->id;
-}
-
-SongPtr SongItems::getSong(SongId id) const
-{
-	auto const it = std::find_if(m_songs.begin(), m_songs.end(), [id](auto const& item) { return item.id == id; });
-
-	if (it == m_songs.end())
-		return {};
-		
-	return it->getSong();
-}
-
-std::optional<std::string> SongItems::lookup(const SongId& id) const {
-    SongItem si;
-    si.id = id;
-    auto it = m_songs.find(si);
-    if (it == m_songs.end())
-        return std::nullopt;
-    if (!it->getSong())
-        return it->artist + " - " + it->title;
-    return it->getSong()->artist + " - " + it->getSong()->title;
+	return UnicodeUtil::caseEqual(song.collateByArtistOnly, songItem.artist, true) && UnicodeUtil::caseEqual(song.collateByTitleOnly, songItem.title, true);
 }
 
 SongId SongItems::assign_id_internal() const {
     // use the last one with highest id
-    auto it = std::max_element(m_songs.begin(), m_songs.end());
-    if (it != m_songs.end())
-        return it->id + 1;
-    return 0; // empty set
+    auto it = std::max_element(m_songs_map.begin(), m_songs_map.end());
+    if (it != m_songs_map.end())
+        return it->second.id + 1;
+    return 0; // empty map
 }
 
 
