@@ -104,7 +104,7 @@ to save the current settings to XML.
 		<short>High-scores limit</short>
 		<long>How many high-scores will be saved per song. Only has effect if "Limit high-scores saved per song" is enabled.</long>
 	</entry>
-	<entry name="game/highscore_minimum_recognized_score_points" type="uint" value="2000">
+	<entry name="game/highscore_minimum_recognized_score_points" type="uint" value="300">
 		<limits min="0" max="10000" step="100" />
 		<short>Minimum high-score</short>
 		<long>Minimum required score for saving. Scoring below this will skip the option to save the high-score.</long>
