@@ -130,17 +130,10 @@ bool AudioBuffer::read(float* begin, std::int64_t samples, std::int64_t pos, flo
 		return false;
 
 
-	// Only if Replay Gain is defined for the audio track
-	// Calculate volume adjustment factor from Replay Gain (if defined)
-	if ( m_replaygain != 0.0 )
+	if ( m_replayGainDecibels != 0.0 )  // If Replay Gain is defined at all
 	{
-		// Ref: https://stackoverflow.com/a/1149105/1730895
-		float replayGainVolume = powf( 10.0F, static_cast<float>(m_replaygain) / 20.0F );
-
-		// A replay gain was defined, apply it and the volume to the samples
-		volume *= replayGainVolume;
-
-		// This log is really noisy. std::clog << "audio/debug: Music Replay Gain is [" << std::setprecision(2) << m_replaygain << "] dB, applying [" << replayGainVolume << "] multiplier" << std::endl; Restore if you want to see each gain as its applied
+		// A replay gain was defined, apply the linear gain factor and the volume to the samples
+		volume *= static_cast<float>(m_replayGainFactor);
 	}
 
 	// one cannot read more data than the size of buffer
@@ -168,13 +161,13 @@ bool AudioBuffer::read(float* begin, std::int64_t samples, std::int64_t pos, flo
 }
 
 double AudioBuffer::duration() { return m_duration; }
-double AudioBuffer::replayGain() { return m_replaygain; }   // perceived loudness in dB
 
 AudioBuffer::AudioBuffer(fs::path const& file, unsigned rate, size_t size):
 	m_data(size), m_sps(rate * AUDIO_CHANNELS) {
 		auto ffmpeg = std::make_unique<AudioFFmpeg>(file, rate, std::ref(*this));
 		const_cast<double&>(m_duration) = ffmpeg->duration();
-        const_cast<double&>(m_replaygain) = ffmpeg->replayGain();
+		const_cast<double&>(m_replayGainDecibels) = ffmpeg->getReplayGainInDecibels();
+		const_cast<double&>(m_replayGainFactor) = ffmpeg->getReplayGainVolumeFactor();
 		reader_thread = std::async(std::launch::async, [this, ffmpeg = std::move(ffmpeg)] {
 			auto errors = 0u;
 			std::unique_lock<std::mutex> l(m_mutex);
@@ -283,9 +276,9 @@ FFmpeg::FFmpeg(fs::path const& _filename, int mediaType) : m_filename(_filename)
 	m_streamId = av_find_best_stream(m_formatContext.get(), static_cast<AVMediaType>(mediaType), -1, -1, &codec, 0);
 	if (m_streamId < 0) throw Error(*this, m_streamId);
 
-    // Possibly the stream defines a Replay Gain factor; read it
-    std::clog << "ffmpeg/debug: FFmpeg::FFmpeg Replay Gain on [" << _filename << "] reading..." << std::endl;
-    readReplayGain(m_formatContext->streams[m_streamId]);
+	// Possibly the stream defines a Replay Gain factor; read it
+	std::clog << "ffmpeg/debug: FFmpeg::FFmpeg Replay Gain on [" << _filename << "] reading..." << std::endl;
+	readReplayGain(m_formatContext->streams[m_streamId]);
 
 	decltype(m_codecContext) pCodecCtx{avcodec_alloc_context3(codec), avcodec_free_context};
 	avcodec_parameters_to_context(pCodecCtx.get(), m_formatContext->streams[m_streamId]->codecpar);
@@ -315,30 +308,40 @@ FFmpeg::FFmpeg(fs::path const& _filename, int mediaType) : m_filename(_filename)
   *
   * \note     The libav function av_stream_get_side_data() has been deprecated
   *           It will need to be updated along with all the others
-  *
-  * \returns  True if a Replay Gain value was found in the stream
   */
-bool FFmpeg::readReplayGain(const AVStream *stream)
+void FFmpeg::readReplayGain(const AVStream *stream)
 {
-    bool rg_read = false;
-    // assert(stream)
-    m_replaygain = 0.0;
-    if (stream != nullptr) {
-        size_t replay_gain_size = 0;
-        const AVReplayGain *replay_gain = (AVReplayGain *)av_stream_get_side_data(stream, AV_PKT_DATA_REPLAYGAIN, &replay_gain_size);
-        if (replay_gain_size > 0 && replay_gain != nullptr) {
-            m_replaygain = static_cast<double>(replay_gain->track_gain);
-            m_replaygain /= 100000.0;   // convert from microbels to decibels
-            rg_read = true;
-            std::clog << "ffmpeg/debug: readReplayGain() - GAIN IS [" << std::fixed << std::setprecision(2) << m_replaygain << "] dB" << std::endl;
-        }
-        else {
-            std::clog << "ffmpeg/debug: readReplayGain() - no gain" << std::endl;
-        }
-    }
-    return rg_read;
+	// assert(stream)
+	m_replayGainDecibels = 0.0;  // 0.0 indicates not defined
+	m_replayGainFactor = 1.0;
+	if (stream != nullptr) {
+		size_t replay_gain_size = 0;
+		const AVReplayGain *replay_gain = (AVReplayGain *)av_stream_get_side_data(stream, AV_PKT_DATA_REPLAYGAIN, &replay_gain_size);
+		if (replay_gain_size > 0 && replay_gain != nullptr) {
+			m_replayGainDecibels = static_cast<double>(replay_gain->track_gain);
+			m_replayGainDecibels /= 100000.0;   // convert from microbels to decibels
+			m_replayGainFactor = calculateLinearGain(m_replayGainDecibels);
+			std::clog << "ffmpeg/debug: readReplayGain() - GAIN IS [" << std::fixed << std::setprecision(2) << m_replayGainDecibels << "] dB, Linear Gain is [" << m_replayGainFactor <<"]" << std::endl;
+		}
+		else {
+			std::clog << "ffmpeg/debug: readReplayGain() - no gain" << std::endl;
+		}
+	}
 }
 
+/**
+  * \brief    Calculate the linear gain, given a decibels factor
+  *
+  * \note     This function will return a gain of 1 for zero decibels, but
+  *           in this case, it's better to not apply the gain at all
+  */
+double FFmpeg::calculateLinearGain(double gainInDB) {
+	// Ref: https://stackoverflow.com/a/1149105/1730895
+	if (gainInDB == 0.0)
+		return 1.0;
+	else
+		return pow(10.0, gainInDB / 20.0);
+}
 
 VideoFFmpeg::VideoFFmpeg(fs::path const& filename, VideoCb videoCb) : FFmpeg(filename, AVMEDIA_TYPE_VIDEO), handleVideoData(videoCb) {
 	// Setup software scaling context for YUV to RGB conversion
@@ -364,7 +367,8 @@ AudioFFmpeg::AudioFFmpeg(fs::path const& filename, int rate, AudioCb audioCb) :
 
 double FFmpeg::duration() const { return double(m_formatContext->duration) / double(AV_TIME_BASE); }
 
-double FFmpeg::replayGain() const { return m_replaygain; }
+double FFmpeg::getReplayGainInDecibels() const { return m_replayGainDecibels; }
+double FFmpeg::getReplayGainVolumeFactor() const { return m_replayGainFactor; }
 
 void FFmpeg::avformat_close_input(AVFormatContext *fctx) {
 	if (fctx) ::avformat_close_input(&fctx);
