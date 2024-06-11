@@ -60,13 +60,15 @@ class FFmpeg {
 	double duration() const;
 
 	/// replay gain, in +/- decibels.  Can be zero, and is zero if not defined for the track
-	double replayGain() const;
+	double getReplayGainInDecibels() const;
+	double getReplayGainVolumeFactor() const;
+	double calculateLinearGain(double gainInDB);
 
 	virtual ~FFmpeg() = default;
 
   protected:
 	static void frameDeleter(AVFrame *f) { if (f) av_frame_free(&f); }
-	bool readReplayGain(const AVStream *stream);
+	void readReplayGain(const AVStream *stream);
 	using uFrame = std::unique_ptr<AVFrame, std::integral_constant<decltype(&frameDeleter), &frameDeleter>>;
 
 	virtual void processFrame(uFrame frame) = 0;
@@ -79,7 +81,8 @@ class FFmpeg {
 	fs::path m_filename;
 	double m_position = 0.0;
 	double m_duration = 0.0;
-	double m_replaygain = 0.0;   ///< dB gain factor to normalise perceived loudness
+	double m_replayGainDecibels = 0.0; ///< dB gain factor to normalise perceived loudness
+	double m_replayGainFactor = 0.0;   ///< Replay Gain converted into a volume correction
 	// libav-specific variables
 	int m_streamId = -1;
 	std::unique_ptr<AVFormatContext, decltype(&avformat_close_input)> m_formatContext{nullptr, avformat_close_input};
@@ -110,7 +113,7 @@ class VideoFFmpeg : public FFmpeg {
 	void processFrame(uFrame frame) override;
   private:
 	std::unique_ptr<SwsContext, void(*)(SwsContext*)> m_swsContext{nullptr, sws_freeContext};
-        VideoCb handleVideoData;
+	VideoCb handleVideoData;
 
 };
 
@@ -127,7 +130,8 @@ class AudioBuffer {
 	bool read(float* begin, std::int64_t samples, std::int64_t pos, float volume = 1.0f);
 	bool terminating();
 	double duration();
-	double replayGain();
+//	double getReplayGain();
+//	double getReplayGainVolume();
 
   private:
 	// must be called holding the mutex
@@ -150,7 +154,8 @@ class AudioBuffer {
 
 	const unsigned m_sps;
 	const double m_duration{ 0 };
-	const double m_replaygain{0.0};  // units: dB
+	const double m_replayGainDecibels{0.0};
+	const double m_replayGainFactor{0.0};
 	bool m_seek_asked { false };
 	bool m_quit{ false };
 	std::future<void> reader_thread;
