@@ -1,6 +1,6 @@
 #pragma once
 
-#include "texture.hh"
+#include "graphic/texture.hh"
 #include <cstdint>
 #include <atomic>
 #include <mutex>
