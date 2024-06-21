@@ -315,7 +315,11 @@ void FFmpeg::readReplayGain(const AVStream *stream)
 	m_replayGainDecibels = 0.0;  // 0.0 indicates not defined
 	m_replayGainFactor = 1.0;
 	if (stream != nullptr) {
-		size_t replay_gain_size = 0;
+#if LIBAVFORMAT_VERSION_MAJOR <= 58
+		int replay_gain_size;
+#else
+		size_t replay_gain_size;
+#endif
 		const AVReplayGain *replay_gain = (AVReplayGain *)av_stream_get_side_data(stream, AV_PKT_DATA_REPLAYGAIN, &replay_gain_size);
 		if (replay_gain_size > 0 && replay_gain != nullptr) {
 			m_replayGainDecibels = static_cast<double>(replay_gain->track_gain);
