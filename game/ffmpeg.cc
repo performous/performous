@@ -315,7 +315,7 @@ void FFmpeg::readReplayGain(const AVStream *stream)
 	m_replayGainDecibels = 0.0;  // 0.0 indicates not defined
 	m_replayGainFactor = 1.0;
 	if (stream != nullptr) {
-#if LIBAVFORMAT_VERSION_MAJOR <= 58
+#if (LIBAVFORMAT_VERSION_MAJOR) <= 58
 		int replay_gain_size;
 #else
 		size_t replay_gain_size;
