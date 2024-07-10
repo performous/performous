@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string>performous-launcher</string>
+	<string>Performous</string>
 	<key>CFBundleGetInfoString</key>
 	<string>Performous</string>
 	<key>CFBundleIconFile</key>

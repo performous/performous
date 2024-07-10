@@ -190,11 +190,6 @@ function createdmg {
 
 function finalize_bundle {
 # 	mv "${TEMPDIR}/bin" "${BINDIR}"
-	cp -v "${PERFORMOUS_SOURCE_DIR}/osx-utils/resources/performous-launcher" "${BINDIR}/"
-	if [[ "${DEBUG}" = 1 ]]
-		then
-			sed -i '' -e 's|"\${CURRDIR}\/performous"|"\${CURRDIR}\/performous" --log debug|g' "$BINDIR/performous-launcher" # enable debug logging.
-	fi
 	cp -v "${PERFORMOUS_SOURCE_DIR}/osx-utils/resources/performous.icns" "${RESDIR}"
 
 	## Copy Info.plist and change the token values
@@ -233,11 +228,9 @@ function main {
 			echo "--- Will create bundle for debugging..."
 			RELTYPE=Debug
 			ENABLE_TOOLS=OFF
-			PERFORMOUS_LOG_LEVEL=debug
 	else
 		RELTYPE=Release
 		ENABLE_TOOLS=ON
-		PERFORMOUS_LOG_LEVEL=info
 		if exists dylibbundler
 			then
 				echo "--- dylibbundler found!"
@@ -337,7 +330,6 @@ function main {
 			  -DPERFORMOUS_VERSION="${PACKAGE_VERSION}" \
 			  -DPERFORMOUS_SHORT_VERSION="${PACKAGE_MAJOR}.${PACKAGE_MINOR}" \
 			  -DPERFORMOUS_SEMVER="${PACKAGE_SEM_VER}" \
-			  -DPERFORMOUS_LOG_LEVEL="${PERFORMOUS_LOG_LEVEL}" \
 			  -DSELF_BUILT_AUBIO="ALWAYS" \
 			  -DSELF_BUILT_CED="ALWAYS" \
 			  -DFETCHCONTENT_QUIET="ON" \
