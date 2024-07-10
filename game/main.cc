@@ -277,6 +277,8 @@ int main(int argc, char** argv) try {
 	std::string loglevel;
 #ifndef NDEBUG
 	loglevel = "debug";
+#elif (BOOST_OS_MACOS)
+	loglevel = "debug";
 #endif
 	opt1.add_options()
 	  ("help,h", "you are viewing it")

@@ -302,14 +302,12 @@ if __name__ == "__main__":
 
 	if arguments["--debug"] != True:
 		release_type = "RelWithDebInfo"
-		log_level = "info"
 		
 		if check_installed("dylibbundler") == None:
 			raise FileNotFoundError("dylibbundler needs to be installed in order to create a release application bundle.")
 		
 	else:
 		release_type = "Debug"
-		log_level = "debug"
 	
 	temp_dir = performous_out_dir / "Performous.app/Contents"
 	res_dir = temp_dir / "Resources"
@@ -361,7 +359,6 @@ if __name__ == "__main__":
 		-DCMAKE_CXX_COMPILER:PATH="{arguments['--cxx']}" \
 		-DCMAKE_OSX_ARCHITECTURES="{";".join(arguments['--arch'])}" \
 		-DCMAKE_XCODE_GENERATE_SCHEME:BOOL={xcode_gen_scheme} \
-		-DPERFORMOUS_LOG_LEVEL:STRING="{log_level}" \
 		-DPERFORMOUS_VERSION:STRING="{package_version}" \
 		-DPERFORMOUS_SEMVER:STRING="{semVersion}" \
 		-DPERFORMOUS_SHORT_VERSION:STRING="{majorVer}.{minorVer}" \
