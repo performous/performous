@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
 set(PERFORMOUS_SEMVER "" CACHE STRING "Version in semver format")
-set(PERFORMOUS_LOG_LEVEL "" CACHE STRING "Log level to set in launcher script")
 set(PERFORMOUS_SHORT_VERSION "" CACHE STRING "Short version string")
 
 set_target_properties(performous PROPERTIES
@@ -48,17 +47,6 @@ file(WRITE
 install(DIRECTORY
 	"${PERFORMOUS_SYSTEM_PREFIX}/etc/fonts/conf.d"
 	DESTINATION "${CMAKE_INSTALL_SYSCONFDIR}/fonts/"
-)
-
-configure_file(
-	"resources/performous-launcher.in"
-	"performous-launcher"
-	@ONLY
-)
-	
-install(PROGRAMS
-	"${CMAKE_CURRENT_BINARY_DIR}/performous-launcher"
-	TYPE BIN
 )
 
 install(TARGETS performous BUNDLE
