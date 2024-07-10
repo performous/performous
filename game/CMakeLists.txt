@@ -255,7 +255,7 @@ else()
 endif()
 
 if(APPLE)
-	list(APPEND LIBS "-framework Accelerate")
+	list(APPEND LIBS "-framework Accelerate -framework CoreFoundation")
 endif()
 list(APPEND LIBS ${FFTW3_LIBRARIES})
 list(APPEND LIBS ${BLAS_LIBRARIES})
