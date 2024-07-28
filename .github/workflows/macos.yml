@@ -24,7 +24,7 @@ jobs:
   # Create the MacOS dmg
   MacOS_Packages:
     name: Create MacOS dmg
-    runs-on: macos-latest
+    runs-on: macos-13
     env:
       MACOS_DEPS: >-
         aubio
@@ -81,24 +81,26 @@ jobs:
       - name: Install dependency FFMPEG from source
         id: install_ffmpeg_deps
         run: |
-           brew install ffmpeg@4 --build-from-source 
+           brew -v install ffmpeg@4 --build-from-source 
 
       - name: Setup Python
         id: setup_python
         uses: actions/setup-python@v5 
         with:
-            python-version: 'pypy3.9' 
+            python-version: 'pypy3.10' 
             cache: 'pip'
             cache-dependency-path: "${{ github.workspace }}/performous/osx-utils/macos-bundler-requirements.txt"
 
       - name: Build package
         id: build_package
         run: |
-          export PKG_CONFIG_PATH="/opt/homebrew/opt/ffmpeg@4/lib/pkgconfig"
+          export PKG_CONFIG_PATH="/usr/local/opt/ffmpeg@4/lib/pkgconfig:$PKG_CONFIG_PATH"
+          ls -l /usr/local/opt/ffmpeg@4/lib/
+          ls -l /usr/local/opt/ffmpeg@4/lib/pkgconfig
           cd performous/osx-utils
           chmod +x ./macos-bundler.py
           pip3 install -r ./macos-bundler-requirements.txt
-          python3 ./macos-bundler.py --flat-output --package-version="${{ inputs.package_complete_version }}" --enable-webserver=on --enable-midi=on --enable-webcam=on --build-tests=on
+          python3 ./macos-bundler.py --flat-output --package-version="${{ inputs.package_complete_version }}" --enable-webserver=on --enable-midi=on --enable-webcam=on --build-tests=on --target=12.0
           PACKAGE_PATH=$(ls "${{ github.workspace }}/performous/osx-utils/out/Performous-${{ inputs.package_complete_version }}.dmg")
           MASTER_PACKAGE_PATH="${{ github.workspace }}/performous/osx-utils/out/Performous-latest.dmg"
           cp -v ${PACKAGE_PATH} ${MASTER_PACKAGE_PATH}
