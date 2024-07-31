@@ -29,7 +29,7 @@ void SongItems::load(xmlpp::NodeSet const& n) {
         auto a_broken = element.get_attribute("broken");
         auto const broken = (a_broken && a_broken->get_value() == "true");
 
-		addSongItem(a_artist->get_value(), a_title->get_value(), broken, std::stoi(a_id->get_value()));
+		addSongItem(artist, title, broken, id);
 	}
 }
 

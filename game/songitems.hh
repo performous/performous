@@ -30,6 +30,9 @@ struct SongItem
 	std::string artist;
 	std::string title;
 
+	std::shared_ptr<Song> getSong() const;
+	void setSong(std::shared_ptr<Song>);
+
 	bool isBroken() const;
 	void setBroken(bool broken = true);
 
@@ -37,9 +40,6 @@ struct SongItem
 	{
 		return id < other.id;
 	}
-
-private:
-	bool m_broken = false;
 
 private:
 	bool m_broken = false;
@@ -69,7 +69,7 @@ public:
 	  need that you want addSong().
 	 */
 	SongId addSongItem(std::string const& artist, std::string const& title, bool broken = false, std::optional<SongId> id = std::nullopt);
-	/**Adds a song to the database.
+	/**Adds or Links an already existing song with an songitem.
 
 	  The ID will be assigned.
 	  If there is already a song with the same artist and title the existing
@@ -83,6 +83,7 @@ public:
 	  @return the song ID if a song could be found.
 	  */
 	std::optional<SongId> resolveToSongId(Song const& song) const;
+	SongPtr getSong(SongId) const;
 
 	std::size_t size() const { return m_songs_map.size(); }
 
