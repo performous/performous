@@ -29,7 +29,6 @@ struct SongItem
 	  */
 	std::string artist;
 	std::string title;
-	int timesPlayed = 0;
 
 	std::shared_ptr<Song> getSong() const;
 	void setSong(std::shared_ptr<Song>);
@@ -69,7 +68,7 @@ public:
 	  There will be no check if artist and title already exist - if you
 	  need that you want addSong().
 	 */
-	SongId addSongItem(std::string const& artist, std::string const& title, bool broken = false, std::optional<int> const& _timesPlayed = std::nullopt, std::optional<SongId> id = std::nullopt);
+	SongId addSongItem(std::string const& artist, std::string const& title, bool broken = false, std::optional<SongId> id = std::nullopt);
 	/**Adds or Links an already existing song with an songitem.
 
 	  The ID will be assigned.

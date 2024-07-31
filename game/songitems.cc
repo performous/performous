@@ -29,12 +29,7 @@ void SongItems::load(xmlpp::NodeSet const& n) {
         auto a_broken = element.get_attribute("broken");
         auto const broken = (a_broken && a_broken->get_value() == "true");
 
-		xmlpp::Attribute* a_timesPlayed = element.get_attribute("timesPlayed");
-		auto timesPlayed = -1;
-		if (a_timesPlayed)
-			timesPlayed = std::stoi(a_timesPlayed->get_value());
-
-		addSongItem(artist, title, broken, timesPlayed, id);
+		addSongItem(artist, title, broken, id);
     }
 }
 
@@ -57,11 +52,10 @@ void SongItems::save(xmlpp::Element* songs) {
         element->set_attribute("artist", song.artist);
         element->set_attribute("title", song.title);
 		element->set_attribute("broken", song.isBroken() ? "true" : "false");
-		element->set_attribute("timesPlayed", std::to_string(song.timesPlayed));
     }
 }
 
-SongId SongItems::addSongItem(std::string const& artist, std::string const& title, bool broken, std::optional<int> const& _timesPlayed, std::optional<SongId> _id) {
+SongId SongItems::addSongItem(std::string const& artist, std::string const& title, bool broken, std::optional<SongId> _id) {
     SongItem si;
 
 	si.id = _id.has_value() ? _id.value() : assign_id_internal();
@@ -71,7 +65,6 @@ SongId SongItems::addSongItem(std::string const& artist, std::string const& titl
     si.artist = collateInfo["artist"];
     si.title = collateInfo["title"];
     si.setBroken(broken);
-	si.timesPlayed = _timesPlayed.value_or(si.timesPlayed);
 
 	m_songs_map[si.id] = si;
     return si.id;
@@ -89,15 +82,8 @@ SongId SongItems::addSong(SongPtr song) {
 	// if the song can be resolved to an ID that means there is an entry for it in the DB -> no new song will be added
 	auto const& maybe_id = resolveToSongId(*song);
 
-	// if a song was not in the cache, but had hiscores in the db which were counted to set an initial value for timesPlayed make sure to use that instead of 0
-    si.timesPlayed = si.timesPlayed < 0 ? song->timesPlayed : std::max(song->timesPlayed, uint32_t(si.timesPlayed));
-    si.setBroken(it->isBroken());
-    si.setSong(song);
-	song->id = song_id;
-
-	m_songs_map[si.id] = si;
-
-	return si.id;
+	// Do NOT use .value_or() here; it gets evaluated and addSongItem() runs regardless of whether we have a value, which results in duplicate entries in the database.
+	return maybe_id.has_value() ? maybe_id.value() : addSongItem(song->artist, song->title);
 }
 
 std::optional<SongId> SongItems::resolveToSongId(Song const& song) const {
