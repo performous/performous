@@ -158,7 +158,7 @@ void mainLoop(std::string const& songlist) {
 			ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
 			while(songs.empty()) { //waiting for songs to become available
 				gm.loading(_("loading songs... please wait"), 0.8f);
-				std::this_thread::sleep_for(10ms); //sleep 1s to avoid busy wait.
+				std::this_thread::sleep_for(1s); //sleep 1s to avoid busy wait.
 				songs.update();
 			}
 			unsigned randomsong = static_cast<unsigned>(std::rand()) % static_cast<unsigned>(songs.size());
