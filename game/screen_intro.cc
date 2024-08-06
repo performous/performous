@@ -72,6 +72,7 @@ void ScreenIntro::manageEvent(SDL_Event event) {
 		}
 		else if (key == SDL_SCANCODE_S && modifier & Platform::shortcutModifier()) {
 			writeConfig(getGame(), modifier & KMOD_ALT);
+			getGame().getCurrentPlayList().setLimit(config["kioskmode/playlist_limit"].ui());
 			getGame().flashMessage((modifier & KMOD_ALT)
 				? _("Settings saved as system defaults.") : _("Settings saved."));
 		}
