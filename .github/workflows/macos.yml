@@ -24,7 +24,7 @@ jobs:
   # Create the MacOS dmg
   MacOS_Packages:
     name: Create MacOS dmg
-    runs-on: macos-13
+    runs-on: macos-12
     env:
       MACOS_DEPS: >-
         aubio
@@ -76,6 +76,7 @@ jobs:
       - name: Install Dependencies
         id: install_deps
         run: |
+           brew unlink python@2
            brew install $MACOS_DEPS
 
       - name: Install dependency FFMPEG from source
