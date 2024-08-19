@@ -76,21 +76,13 @@ jobs:
       - name: Install Dependencies
         id: install_deps
         run: |
-           brew unlink python@2
+           brew unlink python
            brew install $MACOS_DEPS
 
       - name: Install dependency FFMPEG from source
         id: install_ffmpeg_deps
         run: |
            brew -v install ffmpeg@4 --build-from-source 
-
-      - name: Setup Python
-        id: setup_python
-        uses: actions/setup-python@v5 
-        with:
-            python-version: 'pypy3.10' 
-            cache: 'pip'
-            cache-dependency-path: "${{ github.workspace }}/performous/osx-utils/macos-bundler-requirements.txt"
 
       - name: Build package
         id: build_package
