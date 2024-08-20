@@ -158,7 +158,7 @@ void NoteGraph::drawNotes(Window& window) {
 				t1 = &m_notebar; t2 = &m_notebar_hl;
 			break;
 			case Note::Type::GOLDEN:
-			case Note::Type::GOLDEN2: //fallthrough
+			case Note::Type::GOLDENRAP: //fallthrough
 				t1 = &m_notebargold; t2 = &m_notebargold_hl;
 			break;
 			case Note::Type::FREESTYLE:  // Freestyle notes use custom handling

@@ -20,6 +20,8 @@ Song::Song(nlohmann::json const& song) : dummyVocal(TrackName::VOCAL_LEAD), rand
     artist = getJsonEntry<std::string>(song, "artist").value_or("");
     title = getJsonEntry<std::string>(song, "title").value_or("");
     language = getJsonEntry<std::string>(song, "language").value_or("");
+    tags = getJsonEntry<std::string>(song, "tags").value_or("");
+    version = getJsonEntry<std::string>(song, "version").value_or("");
     edition = getJsonEntry<std::string>(song, "edition").value_or("");
     creator = getJsonEntry<std::string>(song, "creator").value_or("");
     providedBy = getJsonEntry<std::string>(song, "providedBy").value_or("");
@@ -31,6 +33,8 @@ Song::Song(nlohmann::json const& song) : dummyVocal(TrackName::VOCAL_LEAD), rand
     midifilename = getJsonEntry<std::string>(song, "midiFile").value_or("");
     videoGap = getJsonEntry<double>(song, "videoGap").value_or(0.0);
     start = getJsonEntry<double>(song, "start").value_or(0.0);
+    end = getJsonEntry<double>(song, "end").value_or(0.0);
+    year = getJsonEntry<int>(song, "year").value_or(0.0);
     preview_start = getJsonEntry<double>(song, "previewStart").value_or(0.0);
     m_duration = getJsonEntry<double>(song, "duration").value_or(0.0);
     music[TrackName::BGMUSIC] = getJsonEntry<std::string>(song, "songFile").value_or("");

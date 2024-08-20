@@ -109,6 +109,8 @@ bool SongParser::txtParseField(std::string const& line) {
 	std::string value = trim(line.substr(pos + 1));
 	if (value.empty()) return true;
 
+	if (key == "VERSION") m_song.version = value.substr(value.find_first_not_of(" "));
+
 	// Parse header data that is stored in SongParser rather than in song (and thus needs to be read every time)
 	if (key == "BPM") assign(m_bpm, value);
 	else if (key == "RELATIVE") assign(m_relative, value);
@@ -126,16 +128,20 @@ bool SongParser::txtParseField(std::string const& line) {
 	else if (key == "GENRE") m_song.genre = value.substr(value.find_first_not_of(" "));
 	else if (key == "CREATOR") m_song.creator = value.substr(value.find_first_not_of(" "));
 	else if (key == "COVER") m_song.cover = absolute(value, m_song.path);
-	else if (key == "MP3") m_song.music[TrackName::BGMUSIC] = absolute(value, m_song.path);
+	else if (key == "MP3" || key == "AUDIO") m_song.music[TrackName::BGMUSIC] = absolute(value, m_song.path);
+	else if (key == "INSTRUMENTAL") m_song.music[TrackName::INSTRUMENTAL] = absolute(value, m_song.path);
 	else if (key == "VOCALS") m_song.music[TrackName::VOCAL_LEAD] = absolute(value, m_song.path);
 	else if (key == "VIDEO") m_song.video = absolute(value, m_song.path);
 	else if (key == "BACKGROUND") m_song.background = absolute(value, m_song.path);
 	else if (key == "START") assign(m_song.start, value);
+	else if (key == "END") assign(m_song.end, value);
+	else if (key == "YEAR") assign(m_song.year, value);
 	else if (key == "VIDEOGAP") assign(m_song.videoGap, value);
 	else if (key == "PREVIEWSTART") assign(m_song.preview_start, value);
 	else if (key == "LANGUAGE") m_song.language = value.substr(value.find_first_not_of(" "));
 	else if (key == "PROVIDEDBY") m_song.providedBy = value.substr(value.find_first_not_of(" "));
 	else if (key == "COMMENT") m_song.comment = value.substr(value.find_first_not_of(" "));
+	else if (key == "TAGS") m_song.tags = value.substr(value.find_first_not_of(" "));
 	return true;
 }
 
@@ -176,7 +182,7 @@ bool SongParser::txtParseNote(std::string line) {
 		case Note::Type::RAP:
 		case Note::Type::FREESTYLE:
 		case Note::Type::GOLDEN:
-		case Note::Type::GOLDEN2:
+		case Note::Type::GOLDENRAP:
 		{
 			unsigned int length = 0;
 			if (!(iss >> ts >> length >> n.note)) throw std::runtime_error("Invalid note line format");

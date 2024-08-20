@@ -15,6 +15,7 @@ class SongParser;
 
 namespace TrackName {
 	const std::string BGMUSIC = "background";
+	const std::string INSTRUMENTAL = "Instrumental";
 	const std::string PREVIEW = "Preview";
 	const std::string GUITAR = "Guitar";
 	const std::string GUITAR_COOP = "Coop guitar";
@@ -60,6 +61,7 @@ public:
 	std::vector<BPM> m_bpms;
 	std::vector<std::string> category; ///< category of song
 	std::string genre; ///< genre
+	std::string tags; ///< tags
 	std::string edition; ///< license
 	std::string title; ///< songtitle
 	std::string artist; ///< artist
@@ -68,6 +70,7 @@ public:
 	std::string language; ///< language
 	std::string providedBy; ///< source of the mapped file.
 	std::string comment; ///< comment of the mapped file.
+	std::string version; ///< version of the mapped file.
 	using MusicFiles = std::map<std::string, fs::path>;
 	MusicFiles music; ///< music files (background, guitar, rhythm/bass, drums, vocals)
 	fs::path cover; ///< cd cover
@@ -79,6 +82,8 @@ public:
 	std::string collateByArtistOnly;  ///< String for sorting by artist only
 	double videoGap = 0.0; ///< gap with video
 	double start = 0.0; ///< start of song
+	double end = 0.0; ///< end of song
+	int year = 0; ///< year of the song
 	double preview_start = getNaN(); ///< starting time for the preview
 	double m_duration = 0.0;
 	using Stops = std::vector<std::pair<double,double> >;
