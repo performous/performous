@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
+from dmgbuild.core import build_dmg
 from docopt import docopt
 
 from os import cpu_count, uname
 from re import match, search
 from typing import Optional
 from pathlib import Path
-
 
 import platform
 import shutil
@@ -181,15 +181,34 @@ def clean_build_dir():
 
 def create_dmg(fancy: bool = True):
 	outFile = (performous_out_dir / ("Performous-" + package_version + ".dmg"))
-	execute(fr"""
-		dmgbuild \
-		-s "{str(performous_source_dir / 'osx-utils/performous-dmg-settings.py')}" \
-		-Dapp="{str(performous_out_dir / 'Performous.app')}" \
-		-Dbackground="{str(performous_source_dir / 'osx-utils/resources/dmg-bg.png')}" \
-		-Dlicense="{str(performous_source_dir / 'LICENSE.md')}" \
-		"Performous-{package_version}" \
-		"{outFile}"
-	""")
+	dmgDefines = {
+		'app':str(performous_out_dir / 'Performous.app'),
+		'background':str(performous_source_dir / 'osx-utils/resources/dmg-bg.png'),
+		'license':str(performous_source_dir / 'LICENSE.md')
+	}
+	dmgVolumeName = f"Performous-{package_version}"
+	dmgOutFile = outFile
+	dmgSettingsFile = str(performous_source_dir / 'osx-utils/performous-dmg-settings.py')
+	print(fr"""
+		Will build dmg image with the following settings:
+
+		build_dmg(
+			{dmgOutFile},
+			{dmgVolumeName},
+			{dmgSettingsFile},
+			defines={dmgDefines},
+			lookForHiDPI=True,
+			detach_retries=10
+		)
+		""")
+	build_dmg(
+		dmgOutFile,
+		dmgVolumeName,
+		dmgSettingsFile,
+		defines=dmgDefines,
+		lookForHiDPI=True,
+		detach_retries=10
+	)
 
 def bundle_libs():
 	global performous_out_dir
