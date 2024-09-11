@@ -277,7 +277,6 @@ FFmpeg::FFmpeg(fs::path const& _filename, int mediaType) : m_filename(_filename)
 	if (m_streamId < 0) throw Error(*this, m_streamId);
 
 	// Possibly the stream defines a Replay Gain factor; read it
-	std::clog << "ffmpeg/debug: FFmpeg::FFmpeg Replay Gain on [" << _filename << "] reading..." << std::endl;
 	readReplayGain(m_formatContext->streams[m_streamId]);
 
 	decltype(m_codecContext) pCodecCtx{avcodec_alloc_context3(codec), avcodec_free_context};
@@ -313,8 +312,10 @@ void FFmpeg::readReplayGain(const AVStream *stream)
 {
 	// assert(stream)
 	m_replayGainDecibels = 0.0;  // 0.0 indicates not defined
-	m_replayGainFactor = 1.0;
-	if (stream != nullptr) {
+	m_replayGainFactor   = 1.0;
+
+    // Only use Replay Gain if the option for normalisation is enabled
+	if (stream != nullptr && config["audio/normalize_songs"].b() == true) {
 #if (LIBAVFORMAT_VERSION_MAJOR) <= 58
 		int replay_gain_size;
 #else
