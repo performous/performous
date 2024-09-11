@@ -166,8 +166,8 @@ AudioBuffer::AudioBuffer(fs::path const& file, unsigned rate, size_t size):
 	m_data(size), m_sps(rate * AUDIO_CHANNELS) {
 		auto ffmpeg = std::make_unique<AudioFFmpeg>(file, rate, std::ref(*this));
 		const_cast<double&>(m_duration) = ffmpeg->duration();
-		const_cast<double&>(m_replayGainDecibels) = ffmpeg->getReplayGainInDecibels();
-		const_cast<double&>(m_replayGainFactor) = ffmpeg->getReplayGainVolumeFactor();
+		m_replayGainDecibels = ffmpeg->getReplayGainInDecibels();
+		m_replayGainFactor   = ffmpeg->getReplayGainVolumeFactor();
 		reader_thread = std::async(std::launch::async, [this, ffmpeg = std::move(ffmpeg)] {
 			auto errors = 0u;
 			std::unique_lock<std::mutex> l(m_mutex);
@@ -340,7 +340,7 @@ void FFmpeg::readReplayGain(const AVStream *stream)
   * \note     This function will return a gain of 1 for zero decibels, but
   *           in this case, it's better to not apply the gain at all
   */
-double FFmpeg::calculateLinearGain(double gainInDB) {
+double FFmpeg::calculateLinearGain(double gainInDB) const {
 	// Ref: https://stackoverflow.com/a/1149105/1730895
 	if (gainInDB == 0.0)
 		return 1.0;
