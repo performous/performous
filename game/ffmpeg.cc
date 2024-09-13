@@ -6,8 +6,8 @@
 #include "util.hh"
 
 #include "aubio/aubio.h"
-#include <memory>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <system_error>
@@ -31,6 +31,11 @@ extern "C" {
 
 #define AUDIO_CHANNELS 2
 
+#if !defined(__PRETTY_FUNCTION__) && defined(_MSC_VER)
+#define __PRETTY_FUNCTION__ __FUNCSIG__
+#endif
+
+#define FFMPEG_CHECKED(func, args, caller) FFmpeg::check(func args, caller)
 
 namespace {
 	std::string ffversion(unsigned ver) {
@@ -229,18 +234,13 @@ static void printFFmpegInfo() {
 #endif
 }
 
-class FFmpeg::Error: public std::runtime_error {
-  public:
-	Error(const FFmpeg &self, int errorValue): std::runtime_error(msgFmt(self, errorValue)) {}
-  private:
-	static std::string msgFmt(const FFmpeg &self, int errorValue) {
+std::string FFmpeg::Error::msgFmt(const FFmpeg &self, int errorValue, const char *func) {
 		char message[AV_ERROR_MAX_STRING_SIZE];
 		av_strerror(errorValue, message, AV_ERROR_MAX_STRING_SIZE);
 		std::ostringstream oss;
-		oss << "FFmpeg Error: Processing file " << self.m_filename << " code=" << errorValue << ", error=" << message;
+		oss << "FFmpeg Error: Processing file " << self.m_filename << " code=" << errorValue << ", error=" << message << ", in function=" << func;
 		return oss.str();
-	}
-};
+}
 
 FFmpeg::FFmpeg(fs::path const& _filename, int mediaType) : m_filename(_filename) {
 	static std::once_flag static_infos;
@@ -249,12 +249,10 @@ FFmpeg::FFmpeg(fs::path const& _filename, int mediaType) : m_filename(_filename)
 	av_log_set_level(AV_LOG_ERROR);
 	{
 		AVFormatContext *avfctx = nullptr;
-		auto err = avformat_open_input(&avfctx, m_filename.string().c_str(), nullptr, nullptr);
-		if (err) throw Error(*this, err);
+		FFMPEG_CHECKED(avformat_open_input, (&avfctx, m_filename.string().c_str(), nullptr, nullptr), __PRETTY_FUNCTION__);
 		m_formatContext.reset(avfctx);
 	}
-	auto err = avformat_find_stream_info(m_formatContext.get(), nullptr);
-	if (err < 0) throw Error(*this, err);
+	FFMPEG_CHECKED(avformat_find_stream_info, (m_formatContext.get(), nullptr), __PRETTY_FUNCTION__);
 	m_formatContext->flags |= AVFMT_FLAG_GENPTS;
 	// Find a track and open the codec
 #if (LIBAVFORMAT_VERSION_INT) >= (AV_VERSION_INT(59, 0, 100))
@@ -262,7 +260,7 @@ FFmpeg::FFmpeg(fs::path const& _filename, int mediaType) : m_filename(_filename)
 #endif
 	AVCodec* codec = nullptr;
 	m_streamId = av_find_best_stream(m_formatContext.get(), static_cast<AVMediaType>(mediaType), -1, -1, &codec, 0);
-	if (m_streamId < 0) throw Error(*this, m_streamId);
+	if (m_streamId < 0) throw Error(*this, m_streamId, __PRETTY_FUNCTION__);
 
 	decltype(m_codecContext) pCodecCtx{avcodec_alloc_context3(codec), avcodec_free_context};
 	avcodec_parameters_to_context(pCodecCtx.get(), m_formatContext->streams[m_streamId]->codecpar);
@@ -270,8 +268,7 @@ FFmpeg::FFmpeg(fs::path const& _filename, int mediaType) : m_filename(_filename)
 		static std::mutex s_avcodec_mutex;
 		// ffmpeg documentation is clear on the fact that avcodec_open2 is not thread safe.
 		std::lock_guard<std::mutex> l(s_avcodec_mutex);
-		err = avcodec_open2(pCodecCtx.get(), codec, nullptr);
-		if (err < 0) throw Error(*this, err);
+		FFMPEG_CHECKED(avcodec_open2, (pCodecCtx.get(), codec, nullptr), __PRETTY_FUNCTION__);
 	}
 	pCodecCtx->workaround_bugs = FF_BUG_AUTODETECT;
 	m_codecContext = std::move(pCodecCtx);
@@ -290,13 +287,29 @@ AudioFFmpeg::AudioFFmpeg(fs::path const& filename, int rate, AudioCb audioCb) :
 		// setup resampler
 		m_resampleContext.reset(swr_alloc());
 		if (!m_resampleContext) throw std::runtime_error("Cannot create resampling context");
-		av_opt_set_int(m_resampleContext.get(), "in_channel_layout", m_codecContext->channel_layout ? static_cast<std::int64_t>(m_codecContext->channel_layout) : av_get_default_channel_layout(m_codecContext->channels), 0);
-		av_opt_set_int(m_resampleContext.get(), "out_channel_layout", av_get_default_channel_layout(AUDIO_CHANNELS), 0);
-		av_opt_set_int(m_resampleContext.get(), "in_sample_rate", m_codecContext->sample_rate, 0);
-		av_opt_set_int(m_resampleContext.get(), "out_sample_rate", static_cast<int>(m_rate), 0);
-		av_opt_set_int(m_resampleContext.get(), "in_sample_fmt", m_codecContext->sample_fmt, 0);
-		av_opt_set_int(m_resampleContext.get(), "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
-		swr_init(m_resampleContext.get());
+
+#if (LIBAVFORMAT_VERSION_INT) >= (AV_VERSION_INT(59,0,0))
+	AVChannelLayout inLayout;
+	AVChannelLayout outLayout;
+	av_channel_layout_default(&outLayout, AUDIO_CHANNELS);
+	if (m_codecContext->ch_layout.order != AV_CHANNEL_ORDER_UNSPEC) {
+		FFMPEG_CHECKED(av_channel_layout_copy, (&inLayout, &m_codecContext->ch_layout), __PRETTY_FUNCTION__);
+	}
+	else {
+		av_channel_layout_default(&inLayout, m_codecContext->ch_layout.nb_channels);
+	}
+	av_channel_layout_default(&outLayout, AUDIO_CHANNELS);
+	FFMPEG_CHECKED(av_opt_set_chlayout, (m_resampleContext.get(), "in_chlayout", &inLayout, 0), __PRETTY_FUNCTION__);
+	FFMPEG_CHECKED(av_opt_set_chlayout, (m_resampleContext.get(), "out_chlayout", &outLayout, 0), __PRETTY_FUNCTION__);
+#else
+	FFMPEG_CHECKED(av_opt_set_int, (m_resampleContext.get(), "in_channel_layout", m_codecContext->channel_layout ? static_cast<std::int64_t>(m_codecContext->channel_layout) : av_get_default_channel_layout(m_codecContext->channels), 0), __PRETTY_FUNCTION__);
+	FFMPEG_CHECKED(av_opt_set_int, (m_resampleContext.get(), "out_channel_layout", av_get_default_channel_layout(AUDIO_CHANNELS), 0), __PRETTY_FUNCTION__);
+#endif
+	FFMPEG_CHECKED(av_opt_set_int, (m_resampleContext.get(), "in_sample_rate", m_codecContext->sample_rate, 0), __PRETTY_FUNCTION__);
+	FFMPEG_CHECKED(av_opt_set_int, (m_resampleContext.get(), "out_sample_rate", static_cast<int>(m_rate), 0), __PRETTY_FUNCTION__);
+	FFMPEG_CHECKED(av_opt_set_sample_fmt, (m_resampleContext.get(), "in_sample_fmt", m_codecContext->sample_fmt, 0), __PRETTY_FUNCTION__);
+	FFMPEG_CHECKED(av_opt_set_sample_fmt, (m_resampleContext.get(), "out_sample_fmt", AV_SAMPLE_FMT_S16, 0), __PRETTY_FUNCTION__);
+	FFMPEG_CHECKED(swr_init, (m_resampleContext.get()), __PRETTY_FUNCTION__);
 	}
 
 double FFmpeg::duration() const { return double(m_formatContext->duration) / double(AV_TIME_BASE); }
@@ -319,7 +332,7 @@ void FFmpeg::handleOneFrame() {
 			// End of file: no more data to read.
 			throw Eof();
 		} else if(ret < 0) {
-			throw Error(*this, ret);
+			throw Error(*this, ret, __PRETTY_FUNCTION__);
 		}
 
 		if (pkt->stream_index != m_streamId) continue;
@@ -332,7 +345,7 @@ void FFmpeg::handleOneFrame() {
 						// no room for new data, need to get more frames out of the decoder by
 						// calling avcodec_receive_frame()
 				} else if(ret < 0) {
-						throw Error(*this, ret);
+						throw Error(*this, ret, __PRETTY_FUNCTION__);
 				}
 		handleSomeFrames();
 		read_one = true;
@@ -364,7 +377,7 @@ void FFmpeg::handleSomeFrames() {
 			// not enough data to decode a frame, go read more and feed more to the decoder
 			break;
 		} else if (ret < 0) {
-			throw Error(*this, ret);
+			throw Error(*this, ret, __PRETTY_FUNCTION__);
 		}
 		// frame is available here
 		if (frame->pts != std::int64_t(AV_NOPTS_VALUE)) {
