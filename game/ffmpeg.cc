@@ -288,7 +288,7 @@ AudioFFmpeg::AudioFFmpeg(fs::path const& filename, int rate, AudioCb audioCb) :
 		m_resampleContext.reset(swr_alloc());
 		if (!m_resampleContext) throw std::runtime_error("Cannot create resampling context");
 
-#if (LIBAVFORMAT_VERSION_INT) >= (AV_VERSION_INT(59,0,0))
+#if (LIBAVUTIL_VERSION_INT) >= (AV_VERSION_INT(57,28,100)) // ffmpeg 5.1
 	AVChannelLayout inLayout;
 	AVChannelLayout outLayout;
 	av_channel_layout_default(&outLayout, AUDIO_CHANNELS);
