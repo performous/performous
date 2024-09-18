@@ -20,6 +20,7 @@ port_location = None
 brew_location = None
 opencv_prefix: Path = None
 openssl_prefix: Path = None
+ffmpeg_prefix: Path = None
 openssl_root = ""
 script_prefix: Path = None
 performous_source_dir = None
@@ -65,46 +66,51 @@ def check_brew_formula(name : str, file : str) -> Optional[Path]:
 	else:
 		return None
 
-def check_installed_port(name : str, file : str) -> Optional[str]:
+def check_installed_port(name : str, file : str) -> Optional[Path]:
 	p = subprocess.run(args = ["port", "contents", name], encoding="utf-8", capture_output=True)
 	if p.returncode == 0:
 		p2 = subprocess.run(args = ["grep", file], encoding="utf-8", capture_output=True, input=p.stdout)
 		if p2.returncode == 0:
-			return str(str_to_path(p2.stdout.strip()).parent.parent)
+			return str_to_path(p2.stdout.strip()).parent.parent
 		else:
 			return None
 	else:
 		return None
 
 def detect_prefix():
-	global opencv_prefix, script_prefix, openssl_prefix, openssl_root
+	global opencv_prefix, script_prefix, openssl_prefix, ffmpeg_prefix, openssl_root
 	port_location = check_installed('port')
 	brew_location = check_installed('brew')
 	if port_location != None:
 		print("--- MacPorts install detected at: " + str(port_location) + "\n")
-		check_opencv = check_installed_port("opencv4", "OpenCVConfig.cmake")
-		if check_opencv != None:
-			opencv_prefix = str(check_opencv)
-			print("--- OpenCV 4+ detected at: " + str(opencv_prefix) + "\n")
-		else:
-			check_opencv = check_installed_port("opencv3", "OpenCVConfig.cmake")
+		for opencv_version in ["4", "3"]:
+			check_opencv = check_installed_port(f"opencv{opencv_version}", "OpenCVConfig.cmake")
 			if check_opencv != None:
 				opencv_prefix = str(check_opencv)
-				print("--- OpenCV 3 detected at: " + str(opencv_prefix) + "\n")
-
+				print(f"--- OpenCV {opencv_version} detected at: " + str(opencv_prefix) + "\n")
+				break
+		for ffmpeg_version in ["7", "6", ""]:
+			check_ffmpeg = check_installed_port(f"ffmpeg{ffmpeg_version}", "libavcodec.pc")
+			if check_ffmpeg != None:
+				ffmpeg_prefix = str(check_ffmpeg.parent)
+				print(f"--- FFMpeg {ffmpeg_version or '4'} detected at: " + str(ffmpeg_prefix) + "\n")
+				break
 	else:
 		print("--- MacPorts does not appear to be installed.\n")
 	if brew_location != None:
 		print("--- Homebrew install detected at: " + str(brew_location))
-		check_opencv = check_brew_formula("opencv", "OpenCVConfig.cmake")
-		if check_opencv != None:
-			opencv_prefix = str(check_opencv.parent)
-			print("--- OpenCV 4+ detected at: " + str(opencv_prefix) + "\n")
-		else:
-			check_opencv = check_brew_formula("opencv@3", "OpenCVConfig.cmake")
+		for opencv_version in ["4", "3"]:
+			check_opencv = check_brew_formula("opencv@{opencv_version}", "OpenCVConfig.cmake")
 			if check_opencv != None:
 				opencv_prefix = str(check_opencv.parent)
-				print("--- OpenCV 3 detected at: " + str(opencv_prefix) + "\n")
+				print("--- OpenCV {opencv_version} detected at: " + str(opencv_prefix) + "\n")
+				break
+		for ffmpeg_version in ["7", "6", "5", "4"]:
+			check_ffmpeg = check_brew_formula(f"ffmpeg@{ffmpeg_version}", "libavcodec.pc")
+			if check_ffmpeg != None:
+				ffmpeg_prefix = str(check_ffmpeg.parent)
+				print(f"--- FFMpeg {ffmpeg_version} detected at: " + str(ffmpeg_prefix) + "\n")
+				break
 		check_openssl = check_brew_formula("openssl", "libcrypto.pc")
 		if check_openssl != None:
 			openssl_prefix = str(check_openssl)
@@ -355,6 +361,8 @@ if __name__ == "__main__":
 			prefix += (";" + str(opencv_prefix))
 		if openssl_prefix != None:
 			prefix += (";" + str(openssl_prefix))
+		if ffmpeg_prefix != None:
+			prefix += (";" + str(ffmpeg_prefix))
 		command = fr"""
 		cmake \
 		{openssl_root} \

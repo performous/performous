@@ -19,6 +19,7 @@
 
 // ffmpeg forward declarations
 extern "C" {
+  struct AVChannelLayout;
   struct AVCodecContext;
   struct AVFormatContext;
   struct AVFrame;
@@ -36,9 +37,17 @@ class FFmpeg {
   public:
 	// Exceptions thrown by class
 	class Eof: public std::exception {};
-	class Error;
+	class Error : public std::runtime_error {
+	  public:
+		Error(const FFmpeg &self, int errorValue, const char *func): std::runtime_error(msgFmt(self, errorValue, func)) {}
+	  private:
+		static std::string msgFmt(const FFmpeg &self, int errorValue, const char *func);
+	};
 	friend Error;
 
+	void inline check(int errorCode, const char* func = "") {
+		if (errorCode < 0) throw Error(*this, errorCode, func);
+	};
 	/// Decode file, depending on media type audio.
 	FFmpeg(fs::path const& filename, int mediaType);
 
