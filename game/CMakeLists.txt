@@ -258,7 +258,6 @@ if(APPLE)
 	list(APPEND LIBS "-framework Accelerate -framework CoreFoundation")
 endif()
 list(APPEND LIBS ${FFTW3_LIBRARIES})
-list(APPEND LIBS ${BLAS_LIBRARIES})
 
 find_package(Threads)
 target_link_libraries(performous PRIVATE fs ced aubio ${LIBS} PkgConfig::deps Threads::Threads)
