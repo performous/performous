@@ -123,7 +123,6 @@ set(Aubio_REQUIRED_VERSION "0.4.9")
 if (MINGW)
 	target_link_libraries(performous PRIVATE mingw32)
 endif()
-
 foreach(lib SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM Json Ced Aubio)
 	find_package(${lib} ${${lib}_REQUIRED_VERSION} REQUIRED)
 	message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
@@ -138,7 +137,13 @@ if(fmt_VERSION VERSION_GREATER_EQUAL 9.0.0)
 	target_compile_definitions(performous PRIVATE -D_TURN_OFF_PLATFORM_STRING)
 endif()
 
-target_link_libraries(performous PRIVATE fmt::fmt)
+
+set(CMAKE_FIND_DEBUG_MODE TRUE)
+find_package(spdlog REQUIRED PATHS /usr/lib PATH_SUFFIXES ${CMAKE_CXX_LIBRARY_ARCHITECTURE}/cmake/spdlog)
+set(CMAKE_FIND_DEBUG_MODE FALSE)
+
+target_compile_definitions(performous PUBLIC SPDLOG_FMT_EXTERNAL FMT_USE_CONSTEXPR)
+target_link_libraries(performous PRIVATE fmt::fmt spdlog::spdlog_header_only)
 
 # Activating MIDI hardware (e-drums with USB/MIDI connection)
 set(ENABLE_MIDI AUTO CACHE STRING "Use midi hardware (e-drums with USB/MIDI connection)")
