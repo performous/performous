@@ -61,7 +61,7 @@ jobs:
           path: performous
 
       - name: Start SSH session
-        if: ${{ failure() }}
+        if: false
         id: ssh_debug
         uses: luchihoratiu/debug-via-ssh@main
         with:
@@ -78,7 +78,7 @@ jobs:
         id: install_deps
         run: |
            brew unlink python
-           brew install $MACOS_DEPS
+           brew install $MACOS_DEPS 2>&1
 
       - name: Build package
         id: build_package
