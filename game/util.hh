@@ -3,7 +3,6 @@
 #include <chrono>
 #include <cstdint>
 #include <limits>
-#include <locale>
 #include <string>
 #include <vector>
 
@@ -62,17 +61,6 @@ template <typename E>
 constexpr auto to_underlying(E e) noexcept -> std::enable_if_t<std::is_enum<E>::value, std::underlying_type_t<E>> {
 	return static_cast<std::underlying_type_t<E>>(e);
 }
-
-std::string toLower(std::string const&);
-std::string toUpper(std::string const&);
-std::string replace(std::string const&, char from, char to);
-std::string& replace(std::string&, char from, char to);
-std::string trim(std::string const&, std::locale const& = std::locale());
-std::string& trim(std::string&, std::locale const& = std::locale());
-std::string trimLeft(std::string const&, std::locale const& = std::locale());
-std::string& trimLeft(std::string&, std::locale const& = std::locale());
-std::string trimRight(std::string const&, std::locale const& = std::locale());
-std::string& trimRight(std::string&, std::locale const& = std::locale());
 
 template <typename R> struct reverse {
 	reverse(R const& origin) : origin(origin) {}

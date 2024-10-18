@@ -44,127 +44,21 @@ TEST(UnitTest_Utils, format) {
     EXPECT_EQ("02:01:00 1970-01-01", format(time, "%X %Y-%m-%d", true));
 }
 
-    TEST(UnitTest_Utils, toLower_empty) {
-        EXPECT_EQ("", toLower(""));
-    }
+TEST(UnitTest_Utils, replaceFirst_no_hit) {
+    EXPECT_EQ("Nothing to replace here", replaceFirst("Nothing to replace here", "hello", "world"));
+}
 
-    TEST(UnitTest_Utils, toLower_lower_case) {
-        EXPECT_EQ("lower", toLower("lower"));
-    }
+TEST(UnitTest_Utils, replaceFirst_one_hit) {
+    EXPECT_EQ("Something to see here", replaceFirst("Something to replace here", "replace", "see"));
+}
 
-    TEST(UnitTest_Utils, toLower_upper_case) {
-        EXPECT_EQ("upper", toLower("UPPER"));
-    }
+TEST(UnitTest_Utils, replaceFirst_one_hit_wrong_case) {
+    EXPECT_EQ("Something to replace here", replaceFirst("Something to replace here", "Replace", "see"));
+}
 
-    TEST(UnitTest_Utils, toLower_mixed_case) {
-        EXPECT_EQ("mixed", toLower("MiXed"));
-    }
-
-    TEST(UnitTest_Utils, toLower_digits) {
-        EXPECT_EQ("0123", toLower("0123"));
-    }
-
-    TEST(UnitTest_Utils, toLower_umlaute) {
-        // no "umlaute" support
-        EXPECT_NE("äöüäöü", toLower("äöüÄÖÜ"));
-    }
-
-    TEST(UnitTest_Utils, toUpper_empty) {
-        EXPECT_EQ("", toUpper(""));
-    }
-
-    TEST(UnitTest_Utils, toUpper_lower_case) {
-        EXPECT_EQ("LOWER", toUpper("lower"));
-    }
-
-    TEST(UnitTest_Utils, toUpper_upper_case) {
-        EXPECT_EQ("UPPER", toUpper("UPPER"));
-    }
-
-    TEST(UnitTest_Utils, toUpper_mixed_case) {
-        EXPECT_EQ("MIXED", toUpper("MiXed"));
-    }
-
-    TEST(UnitTest_Utils, toUpper_digits) {
-        EXPECT_EQ("0123", toUpper("0123"));
-    }
-
-    TEST(UnitTest_Utils, toUpper_umlaute) {
-        // no "umlaute" support
-        EXPECT_NE("äöüäöü", toUpper("äöüÄÖÜ"));
-    }
-
-	TEST(UnitTest_Utils, replace_empty) {
-		EXPECT_EQ("", replace("", 'a', 'b'));
-	}
-
-	TEST(UnitTest_Utils, replace_one) {
-		EXPECT_EQ("bb", replace("ab", 'a', 'b'));
-	}
-
-	TEST(UnitTest_Utils, trim_empty) {
-		EXPECT_EQ("", trim(""));
-	}
-
-	TEST(UnitTest_Utils, trim_one_space) {
-		EXPECT_EQ("", trim(" "));
-	}
-
-	TEST(UnitTest_Utils, trim_two_spaces) {
-		EXPECT_EQ("", trim("  "));
-	}
-
-	TEST(UnitTest_Utils, trim_white_spaces) {
-		EXPECT_EQ("", trim(" \n\r\t"));
-	}
-
-	TEST(UnitTest_Utils, trim_front_one_space) {
-		EXPECT_EQ("X", trim(" X"));
-	}
-
-	TEST(UnitTest_Utils, trim_front_two_spaces) {
-		EXPECT_EQ("X", trim("  X"));
-	}
-
-	TEST(UnitTest_Utils, trim_front_white_spaces) {
-		EXPECT_EQ("X", trim(" \n\r\tX"));
-	}
-
-	TEST(UnitTest_Utils, trim_back_one_space) {
-		EXPECT_EQ("X", trim("X "));
-	}
-
-	TEST(UnitTest_Utils, trim_back_two_spaces) {
-		EXPECT_EQ("X", trim("X  "));
-	}
-
-	TEST(UnitTest_Utils, trim_back_white_spaces) {
-		EXPECT_EQ("X", trim("X \n\r\t"));
-	}
-
-	TEST(UnitTest_Utils, trim_both_one_space) {
-		EXPECT_EQ("X", trim(" X "));
-	}
-
-	TEST(UnitTest_Utils, trim_both_two_spaces) {
-		EXPECT_EQ("X", trim("  X  "));
-	}
-
-	TEST(UnitTest_Utils, trim_both_white_spaces) {
-		EXPECT_EQ("X", trim(" \n\r\tX \n\r\t"));
-	}
-
-	TEST(UnitTest_Utils, trim_mid_one_space) {
-		EXPECT_EQ("X Y", trim(" X Y "));
-	}
-
-	TEST(UnitTest_Utils, trim_mid_two_spaces) {
-		EXPECT_EQ("X  Y", trim("  X  Y  "));
-	}
-
-	TEST(UnitTest_Utils, trim_mid_white_spaces) {
-		EXPECT_EQ("X \n\r\tY", trim(" \n\r\tX \n\r\tY \n\r\t"));
-	}
+TEST(UnitTest_Utils, replaceFirst_two_hits) {
+    EXPECT_EQ("Something to replace there and here", replaceFirst("Something to replace here and here", "here", "there"));
+}
 
 TEST(UnitTest_Utils, make_iterator_range) {
     auto const v = std::vector<int>{ 0, 2, 4, 3, 1 };
