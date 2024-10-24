@@ -162,10 +162,11 @@ void SongParser::guessFiles() {
 	// Run checks, remove bogus values and construct regexps
 	bool missing = false;
 	for (auto const& p : fields) {
-		fs::path& file = *p.first;
-		if (!file.empty() && !is_regular_file(file)) {
+		const fs::path& file = *p.first;
+		if (file.empty()) {
+			missing = true; 
+		} else if (!is_regular_file(file)) {
 			logMissing += "  " + file.filename().string();
-			file.clear();
 			missing = true; 
 		}
 	}
