@@ -76,21 +76,25 @@ struct StderrGrabber {
 	StderrGrabber(): stream(dup(STDERR_FILENO), boost::iostreams::close_handle), backup(std::cerr.rdbuf()) {
 		std::cerr.rdbuf(stream.rdbuf());  // Make std::cerr write to our stream (which connects to normal stderr)
 		int fd[2];
-		if (pipe(fd) == -1) std::clog << "stderr/notice: `pipe` returned an error: " << std::strerror(errno) << std::endl;
+		if (pipe(fd) == -1) SpdLogger::notice(LogSystem::STDERR, "`pipe` returned an error: {}", std::strerror(errno));
 		dup2(fd[1], STDERR_FILENO);  // Close stderr and replace it with a copy of pipe begin
 		close(fd[1]);  // Close the original pipe begin
-		std::clog << "stderr/info: Standard error output redirected here\n" << std::flush;
+		SpdLogger::info(LogSystem::STDERR, "Standard error output redirected here.");
 		logger = std::async(std::launch::async, [fdpipe = fd[0]] {
 			std::string line;
 			unsigned count = 0;
 			for (char ch; read(fdpipe, &ch, 1) == 1;) {
 				line += ch;
 				if (ch != '\n') continue;
+				SpdLogger::info(LogSystem::STDERR, fmt::format("stderr redirect: {}", line));
 				std::clog << "stderr/info: " + line << std::flush;
 				line.clear(); ++count;
 			}
 			close(fdpipe);  // Close this end of pipe
-			if (count > 0) std::clog << "stderr/notice: " << count << " messages logged to stderr/info\n" << std::flush;
+			if (count > 0) {
+				SpdLogger::notice(LogSystem::STDERR, "{} messages redirected to log.", count);
+				std::clog << "stderr/notice: " << count << " messages logged to stderr/info\n" << std::flush;
+			}
 		});
 	}
 	~StderrGrabber() {
