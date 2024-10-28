@@ -321,7 +321,7 @@ int main(int argc, char** argv) try {
 	}
 
 	Logger logger(loglevel);
-
+	SpdLogger spdLogger(spdlog::level::debug);
 	outputOptionalFeatureStatus();
 
 	readConfig();
