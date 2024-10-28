@@ -21,7 +21,8 @@
 #define close _close
 #define dup _dup
 #define dup2 _dup2
-#define open _open#define pipe _pipe
+#define open _open
+#define pipe _pipe
 #define STDERR_FILENO 2
 #endif
 
@@ -37,8 +38,7 @@
  * Each message may contain newlines and flushing the stream (i.e. by std::endl or std::flush) must be done
  * when and only when the message is complete.
  *
- * Any lower-case subsystem name including hyphens may be used. The levels, in descending order of priority
- * are as follows:
+ * Any lower-case subsystem name including hyphens may be used. The levels, in descending order of priority * are as follows:
  *
  * error    A serious and rare message that usually means that a function requested by user cannot be completed.
  * warning  Less critical errors that should still be emitted sparingly (consider using "debug" for repeated warnings).
