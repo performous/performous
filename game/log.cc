@@ -1,8 +1,14 @@
 #include "log.hh"
 
 #include "fs.hh"
+#include "profiler.hh"
 #include <boost/iostreams/device/file_descriptor.hpp>
 #include <boost/iostreams/stream.hpp>
+#include <fmt/chrono.h>
+#include <spdlog/sinks/ostream_sink.h>
+#include <spdlog/sinks/rotating_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 
 #include <cerrno>
 #include <chrono>
@@ -14,7 +20,11 @@
 #include <memory>
 #include <mutex>
 #include <stdexcept>
+#include <string>
+#include <string_view>
 #include <vector>
+
+
 #if defined(__unix__) || defined(__APPLE__)
 #include <unistd.h>
 #elif defined(_MSC_VER) || defined (__MINGW32__)
@@ -184,7 +194,6 @@ Logger::Logger(std::string const& level) {
 		atexit(Logger::teardown);
 	}
 	std::clog << msg << std::endl;
-	grabber = std::make_unique<StderrGrabber>();
 }
 
 Logger::~Logger() {
@@ -201,4 +210,115 @@ void Logger::teardown() {
 	sb.close();
 	file.close();
 	default_ClogBuf = nullptr;
+}
+
+std::unordered_map<LogSystem, loggerPtr> SpdLogger::builtLoggers;
+std::shared_ptr<spdlog::sinks::dist_sink_mt> SpdLogger::m_sink;
+std::shared_mutex SpdLogger::m_LoggerRegistryMutex;
+loggerPtr SpdLogger::m_defaultLogger;
+
+SpdLogger::SpdLogger (spdlog::level::level_enum const& consoleLevel) {
+	Profiler prof("spdLogger-init");
+	spdlog::init_thread_pool(2048, 1);
+
+	auto time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+	std::string logHeader(fmt::format(
+		"{0:*^80}\n"
+		"{1:*^80}\n",
+			fmt::format(" {} {} starting, {:%Y/%m/%d @ %H:%M:%S} ", PACKAGE, VERSION, fmt::localtime(time)),
+			fmt::format(" Logging any events of level {}, or higher. ", spdlog::level::to_string_view(consoleLevel))));
+	std::clog << "logger/debug: " << logHeader << std::endl;
+	spdlog::filename_t filename = getLogFilename_new().u8string();
+	
+// 	auto stderror_graber_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>();
+	m_sink = std::make_shared<spdlog::sinks::dist_sink_mt>();
+	
+	auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+	stdout_sink->set_color(spdlog::level::critical, logger_colors(bold_on_red)); // Error.
+	stdout_sink->set_color(spdlog::level::err, logger_colors(yellow_bold)); // Warning.
+	stdout_sink->set_color(spdlog::level::warn, logger_colors(green)); // Notice.
+	stdout_sink->set_color(spdlog::level::info, logger_colors(white));
+	stdout_sink->set_color(spdlog::level::debug, logger_colors(blue));
+	stdout_sink->set_color(spdlog::level::trace, logger_colors(cyan));
+
+	spdlog::file_event_handlers handlers;
+	handlers.after_open = [logHeader](spdlog::filename_t filename, std::FILE *fstream) { writeLogHeader(filename, fstream, logHeader); };
+
+	m_sink->add_sink(stdout_sink);
+	m_sink->set_pattern("[%T]:::%^%n / %l%$::: %v");
+	m_sink->set_level(spdlog::level::trace);
+
+	m_defaultLogger = std::make_shared<spdlog::async_logger>(LogSystem{LogSystem::LOGGER}.toString(), m_sink, spdlog::thread_pool(), spdlog::async_overflow_policy::block);
+	m_defaultLogger->set_level(spdlog::level::trace);
+
+	auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(filename, 1024 * 1024 * 2, 5, true, handlers);
+	m_sink->add_sink(file_sink);
+
+	auto headerLogger = std::make_shared<spdlog::async_logger>(PACKAGE, stdout_sink, spdlog::thread_pool(), spdlog::async_overflow_policy::block);
+	headerLogger->log(spdlog::level::warn, logHeader);
+	
+	for (const auto& system: LogSystem()) {
+		if (system == LogSystem::LOGGER) continue;
+		std::unique_lock lock(m_LoggerRegistryMutex);
+		auto newLogger = m_defaultLogger->clone(system);
+		spdlog::register_logger(newLogger);
+		builtLoggers.try_emplace(system, newLogger);
+		newLogger->log(spdlog::level::trace, fmt::format("Logger subsystem initialized, system: {}", system));
+	}
+	
+	grabber = std::make_unique<StderrGrabber>();
+}
+
+void SpdLogger::writeLogHeader(spdlog::filename_t filename, std::FILE* fd, std::string header) {
+	fs::path _filename{filename};
+	if (fs::exists(_filename) && fs::file_size(_filename) >30) {
+		trace(LogSystem::LOGGER, "Not writing header to {}. File is not empty, probably a previous log being rotated.", filename);
+		std::clog << "logger/debug: Not writing header to " << filename << ". Size > 0, so probably a log being rotated." << std::endl; 
+		return;
+	}
+	if (fd == nullptr) {
+		error(LogSystem::LOGGER, "Unable to write to logfile at {}, invalid fstream.", filename);
+		return;
+		}
+	header.append("\n");
+	int ret = std::fputs(header.c_str(), fd);
+	if (ret == EOF) {
+		error(LogSystem::LOGGER, "Unable to write to logfile at {}, error: {}", filename, std::strerror(errno));
+	}
+}
+
+SpdLogger::~SpdLogger() {
+	notice(LogSystem::LOGGER, "More details might be available in {}", getLogFilename_new().u8string());
+	spdlog::shutdown();
+}
+
+const loggerPtr SpdLogger::getLogger(LogSystem loggerName) {
+	if (loggerName == LogSystem::LOGGER) {
+		return m_defaultLogger;
+	}
+	loggerPtr ret;
+	Profiler prof("getLogger");
+	try {
+		std::shared_lock lock(m_LoggerRegistryMutex);
+		ret = builtLoggers.at(loggerName);
+	} catch (std::out_of_range const&) {
+		// logger not found, did we already build it?
+		auto ptr = spdlog::get(loggerName.toString());
+		if (ptr) {
+			std::unique_lock lock(m_LoggerRegistryMutex);
+			builtLoggers.try_emplace(loggerName, ptr);
+			ret = builtLoggers.at(loggerName);
+		}
+		else {
+			std::unique_lock lock(m_LoggerRegistryMutex);
+			auto newLogger = std::make_shared<spdlog::async_logger>(loggerName, m_sink, spdlog::thread_pool(), spdlog::async_overflow_policy::block);
+			spdlog::register_logger(newLogger);
+			builtLoggers.try_emplace(loggerName, newLogger);
+			ret = newLogger;
+		}
+	}
+	if (ret == nullptr) {
+		throw std::runtime_error(fmt::format("Couldn't find nor construct logger for subsystem={}", loggerName.toString()));
+	}
+	return ret;
 }
