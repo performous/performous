@@ -3,6 +3,8 @@
 #include "fs.hh"
 #include <boost/iostreams/device/file_descriptor.hpp>
 #include <boost/iostreams/stream.hpp>
+
+#include <cerrno>
 #include <chrono>
 #include <cstddef>
 #include <cstdio>
@@ -12,7 +14,6 @@
 #include <memory>
 #include <mutex>
 #include <stdexcept>
-#include <errno.h>
 #include <vector>
 #if defined(__unix__) || defined(__APPLE__) || defined (__MINGW32__)
 #include <unistd.h>
@@ -20,8 +21,7 @@
 #define close _close
 #define dup _dup
 #define dup2 _dup2
-#define open _open
-#define pipe _pipe
+#define open _open#define pipe _pipe
 #define STDERR_FILENO 2
 #endif
 
@@ -68,7 +68,7 @@ struct StderrGrabber {
 	StderrGrabber(): stream(dup(STDERR_FILENO), boost::iostreams::close_handle), backup(std::cerr.rdbuf()) {
 		std::cerr.rdbuf(stream.rdbuf());  // Make std::cerr write to our stream (which connects to normal stderr)
 		int fd[2];
-		if (pipe(fd) == -1) std::clog << "stderr/notice: `pipe` returned an error: " << strerror(errno) << std::endl;
+		if (pipe(fd) == -1) std::clog << "stderr/notice: `pipe` returned an error: " << std::strerror(errno) << std::endl;
 		dup2(fd[1], STDERR_FILENO);  // Close stderr and replace it with a copy of pipe begin
 		close(fd[1]);  // Close the original pipe begin
 		std::clog << "stderr/info: Standard error output redirected here\n" << std::flush;
