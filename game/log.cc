@@ -3,21 +3,34 @@
 #include "fs.hh"
 #include <boost/iostreams/device/file_descriptor.hpp>
 #include <boost/iostreams/stream.hpp>
+#include <chrono>
 #include <cstddef>
+#include <cstdio>
+#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <mutex>
 #include <stdexcept>
 #include <errno.h>
+#include <vector>
+#if defined(__unix__) || defined(__APPLE__) || defined (__MINGW32__)
+#include <unistd.h>
+#elif defined(_MSC_VER)
+#define close _close
+#define dup _dup
+#define dup2 _dup2
+#define open _open
+#define pipe _pipe
+#define STDERR_FILENO 2
+#endif
 
 /** \file
  * \brief The std::clog logger.
  *
  * General message format: <tt>subsystem/level: message</tt>
  *
- * Example:
- * \code
+ * Example: * \code
  * std::clog << "foo/info: Here's an info message from subsystem foo" << std::endl;
  * \endcode
  *
@@ -47,8 +60,6 @@ std::mutex log_lock;
 
 // Capture stderr spam from other libraries and log it properly
 // Note: std::cerr retains its normal functionality but other means of writing stderr get redirected to std::clog
-#if defined(__unix__) || defined(__APPLE__)
-#include <unistd.h>
 #include <future>
 struct StderrGrabber {
 	boost::iostreams::stream<boost::iostreams::file_descriptor_sink> stream;
@@ -79,17 +90,16 @@ struct StderrGrabber {
 		std::cerr.rdbuf(backup);  // Restore original rdbuf (that writes to normal stderr)
 	}
 };
-#else
-struct StderrGrabber {};  // Not supported on Windows
-#endif
+// #else
+// struct StderrGrabber {};  // Not supported on Windows
+// #endif
 
 std::unique_ptr<StderrGrabber> grabber;
 
 /** \internal The implementation of the stream filter that handles the message filtering. **/
 class VerboseMessageSink : public boost::iostreams::sink {
   public:
-	std::streamsize write(const char* s, std::streamsize n);
-};
+	std::streamsize write(const char* s, std::streamsize n);};
 
 // defining them in main() causes segfault at exit as they apparently got free'd before we're done using them
 static boost::iostreams::stream_buffer<VerboseMessageSink> sb; //!< \internal
@@ -97,7 +107,6 @@ static VerboseMessageSink vsm; //!< \internal
 
 //! \internal used to store the default/original clog buffer.
 static std::streambuf* default_ClogBuf = nullptr;
-
 fs::ofstream file;
 
 std::string target;
