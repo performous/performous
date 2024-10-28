@@ -3,29 +3,40 @@
 #include "fs.hh"
 #include <boost/iostreams/device/file_descriptor.hpp>
 #include <boost/iostreams/stream.hpp>
+
+#include <cerrno>
+#include <chrono>
 #include <cstddef>
+#include <cstdio>
+#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <mutex>
 #include <stdexcept>
-#include <errno.h>
+#include <vector>
+#if defined(__unix__) || defined(__APPLE__)
+#include <unistd.h>
+#elif defined(_MSC_VER) || defined (__MINGW32__)
+#include <io.h>
+#pragma warning(disable : 4996)
+#define pipe(fd) _pipe(fd, 4096, _O_BINARY)
+#define STDERR_FILENO 2
+#endif
 
 /** \file
  * \brief The std::clog logger.
  *
  * General message format: <tt>subsystem/level: message</tt>
  *
- * Example:
- * \code
+ * Example: * \code
  * std::clog << "foo/info: Here's an info message from subsystem foo" << std::endl;
  * \endcode
  *
  * Each message may contain newlines and flushing the stream (i.e. by std::endl or std::flush) must be done
  * when and only when the message is complete.
  *
- * Any lower-case subsystem name including hyphens may be used. The levels, in descending order of priority
- * are as follows:
+ * Any lower-case subsystem name including hyphens may be used. The levels, in descending order of priority * are as follows:
  *
  * error    A serious and rare message that usually means that a function requested by user cannot be completed.
  * warning  Less critical errors that should still be emitted sparingly (consider using "debug" for repeated warnings).
@@ -47,8 +58,6 @@ std::mutex log_lock;
 
 // Capture stderr spam from other libraries and log it properly
 // Note: std::cerr retains its normal functionality but other means of writing stderr get redirected to std::clog
-#if defined(__unix__) || defined(__APPLE__)
-#include <unistd.h>
 #include <future>
 struct StderrGrabber {
 	boost::iostreams::stream<boost::iostreams::file_descriptor_sink> stream;
@@ -57,7 +66,7 @@ struct StderrGrabber {
 	StderrGrabber(): stream(dup(STDERR_FILENO), boost::iostreams::close_handle), backup(std::cerr.rdbuf()) {
 		std::cerr.rdbuf(stream.rdbuf());  // Make std::cerr write to our stream (which connects to normal stderr)
 		int fd[2];
-		if (pipe(fd) == -1) std::clog << "stderr/notice: `pipe` returned an error: " << strerror(errno) << std::endl;
+		if (pipe(fd) == -1) std::clog << "stderr/notice: `pipe` returned an error: " << std::strerror(errno) << std::endl;
 		dup2(fd[1], STDERR_FILENO);  // Close stderr and replace it with a copy of pipe begin
 		close(fd[1]);  // Close the original pipe begin
 		std::clog << "stderr/info: Standard error output redirected here\n" << std::flush;
@@ -79,17 +88,16 @@ struct StderrGrabber {
 		std::cerr.rdbuf(backup);  // Restore original rdbuf (that writes to normal stderr)
 	}
 };
-#else
-struct StderrGrabber {};  // Not supported on Windows
-#endif
+// #else
+// struct StderrGrabber {};  // Not supported on Windows
+// #endif
 
 std::unique_ptr<StderrGrabber> grabber;
 
 /** \internal The implementation of the stream filter that handles the message filtering. **/
 class VerboseMessageSink : public boost::iostreams::sink {
   public:
-	std::streamsize write(const char* s, std::streamsize n);
-};
+	std::streamsize write(const char* s, std::streamsize n);};
 
 // defining them in main() causes segfault at exit as they apparently got free'd before we're done using them
 static boost::iostreams::stream_buffer<VerboseMessageSink> sb; //!< \internal
@@ -97,7 +105,6 @@ static VerboseMessageSink vsm; //!< \internal
 
 //! \internal used to store the default/original clog buffer.
 static std::streambuf* default_ClogBuf = nullptr;
-
 fs::ofstream file;
 
 std::string target;
