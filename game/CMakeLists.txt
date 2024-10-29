@@ -142,12 +142,14 @@ endif()
 target_include_directories(fs PRIVATE ${SDL2_INCLUDE_DIRS})
 target_link_libraries(fs PRIVATE ${SDL2_LIBRARIES})
 
-find_package(spdlog REQUIRED)
+message("CMAKE_CXX_LIBRARY_ARCHITECTURE: ${CMAKE_CXX_LIBRARY_ARCHITECTURE}")
 
-target_compile_definitions(fs PRIVATE SPDLOG_FMT_EXTERNAL)
+find_package(spdlog REQUIRED HINTS ${CMAKE_CXX_LIBRARY_ARCHITECTURE})
+
+target_compile_definitions(fs PRIVATE SPDLOG_FMT_EXTERNAL FMT_USE_CONSTEXPR )
 target_link_libraries(fs PRIVATE fmt::fmt spdlog::spdlog_header_only)
 
-target_compile_definitions(performous PRIVATE SPDLOG_FMT_EXTERNAL)
+target_compile_definitions(performous PRIVATE SPDLOG_FMT_EXTERNAL FMT_USE_CONSTEXPR)
 target_link_libraries(performous PRIVATE fmt::fmt spdlog::spdlog_header_only)
 
 # Activating MIDI hardware (e-drums with USB/MIDI connection)
