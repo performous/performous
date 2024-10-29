@@ -118,10 +118,6 @@ set(SELF_BUILT_JSON "AUTO" CACHE STRING "rule to allow self build of Json depend
 # This is AUTO cause CED is not available on ubuntu
 set(SELF_BUILT_CED "AUTO" CACHE STRING "rule to allow self build of Ced dependency library [NEVER|AUTO*|ALWAYS]")
 
-# We can use spdlog as either a compiled library, or a header-only library. Compiled (default) is faster.
-set(USE_COMPILED_SPDLOG ON CACHE BOOL "Use spdlog as a compiled(faster) library, or the header-only version [ON*|OFF")
-
-
 set(Aubio_REQUIRED_VERSION "0.4.9")
 
 # Find all the libs that don't require extra parameters
@@ -143,24 +139,18 @@ if(fmt_VERSION VERSION_GREATER_EQUAL 9.0.0)
 	target_compile_definitions(performous PRIVATE -D_TURN_OFF_PLATFORM_STRING)
 endif()
 
-target_compile_definitions(performous PRIVATE SPDLOG_FMT_EXTERNAL)
-
-#add_definitions(-DSPDLOG_LEVEL_NAMES="{'TRACE', 'DEBUG', 'INFO', 'NOTICE', 'WARNING', 'ERROR', 'OFF' }")
-
-find_package(spdlog REQUIRED)
-target_link_libraries(fs PRIVATE spdlog::spdlog_header_only)
-target_link_libraries(performous PRIVATE fmt::fmt)
-
-
-if(USE_COMPILED_SPDLOG)
-	target_link_libraries(performous PRIVATE spdlog::spdlog_header_only)
-else()
-	target_link_libraries(performous PRIVATE spdlog::spdlog_header_only)
-endif()
-
-
 target_include_directories(fs PRIVATE ${SDL2_INCLUDE_DIRS})
 target_link_libraries(fs PRIVATE ${SDL2_LIBRARIES})
+
+set(CMAKE_FIND_DEBUG_MODE TRUE)
+find_package(spdlog REQUIRED PATHS /usr/lib PATH_SUFFIXES ${CMAKE_CXX_LIBRARY_ARCHITECTURE}/cmake/spdlog)
+set(CMAKE_FIND_DEBUG_MODE FALSE)
+
+target_compile_definitions(fs PUBLIC SPDLOG_FMT_EXTERNAL FMT_USE_CONSTEXPR)
+target_link_libraries(fs PRIVATE fmt::fmt spdlog::spdlog_header_only)
+
+target_compile_definitions(performous PUBLIC SPDLOG_FMT_EXTERNAL FMT_USE_CONSTEXPR)
+target_link_libraries(performous PRIVATE fmt::fmt spdlog::spdlog_header_only)
 
 # Activating MIDI hardware (e-drums with USB/MIDI connection)
 set(ENABLE_MIDI AUTO CACHE STRING "Use midi hardware (e-drums with USB/MIDI connection)")
