@@ -154,7 +154,7 @@ jobs:
             mingw-w64-x86_64-portaudio
             mingw-w64-x86_64-portmidi
             mingw-w64-x86_64-SDL2
-            mingw-w64-spdlog
+            mingw-w64-x86_64-spdlog
             mingw-w64-x86_64-winpthreads-git
 
       - name: Run cmake to configure the project and build it
