@@ -3,7 +3,9 @@
 #include "logger_subsystem.hh"
 #include "platform.hh"
 
-#define SPDLOG_LEVEL_NAMES { "TRACE", "DEBUG", "INFO", "NOTICE", "WARNING", "ERROR", "OFF" }
+#include <string_view>
+using namespace std::string_view_literals;
+#define SPDLOG_LEVEL_NAMES { "TRACE"sv, "DEBUG"sv, "INFO"sv, "NOTICE"sv, "WARNING"sv, "ERROR"sv, "OFF"sv }
 
 #if (BOOST_OS_WINDOWS)
 #include <cstdint>
