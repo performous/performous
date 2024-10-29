@@ -34,11 +34,9 @@
 			}
 			// Config
 			{
-				ITEMIDLIST* pidl;
-				HRESULT hRes = SHGetSpecialFolderLocation(nullptr, CSIDL_APPDATA|CSIDL_FLAG_CREATE, &pidl);
+				PWSTR p;
+				HRESULT hRes = SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, nullptr, &p);
 				if (hRes != NOERROR) throw std::runtime_error("Unable to determine where Application Data is stored");
-				char p[MAX_PATH];
-				SHGetPathFromIDList(pidl, p);
 				conf = p;
 				conf /= performous;
 			}

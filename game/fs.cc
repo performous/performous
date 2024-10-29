@@ -15,7 +15,6 @@
 #include <boost/range.hpp>
 
 #if (BOOST_OS_WINDOWS)
-#include <windows.h>
 #include <shlobj.h>
 #endif
 
