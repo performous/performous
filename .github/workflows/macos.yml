@@ -73,6 +73,7 @@ jobs:
       - name: Fetch Dependencies
         id: fetch_deps
         run: |
+          ls -l /usr/local/include
           brew fetch --deps $MACOS_DEPS
 
       - name: Install Dependencies
