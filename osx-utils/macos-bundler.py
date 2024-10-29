@@ -390,7 +390,6 @@ if __name__ == "__main__":
 		-DFETCHCONTENT_QUIET:BOOL=ON \
 		-DCMAKE_POLICY_DEFAULT_CMP0126=NEW \
 		-DCMAKE_PREFIX_PATH:STRING="{prefix}" \
-		-DCMAKE_IGNORE_PATH:STRING="/usr/local/include/fmt" \
 		-DCMAKE_BUILD_TYPE:STRING={release_type} \
 		-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING={arguments['--target']} \
 		-DCMAKE_C_COMPILER:PATH="{arguments['--cc']}" \
