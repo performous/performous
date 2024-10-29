@@ -96,7 +96,7 @@ def detect_prefix():
 				ffmpeg_prefix = str(check_ffmpeg.parent)
 				print(f"--- FFMpeg {ffmpeg_version or '4'} detected at: " + str(ffmpeg_prefix) + "\n")
 				break
-		for fmt_version in ["10", "9", "8", "7"]:
+		for fmt_version in ["11", "10", "9", "8", "7"]:
 			check_fmt = check_installed_port(f"libfmt{fmt_version}", "fmt-config.cmake")
 			if check_fmt != None:
 				fmt_prefix = str(check_fmt.parent)
