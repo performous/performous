@@ -100,7 +100,7 @@ struct StderrGrabber {
 	}
 	~StderrGrabber() {
 	int handle;
-#if defined(BOOST_OS_WINDOWS)
+#if (BOOST_OS_WINDOWS)
 	handle = fileno(stream->handle());
 #else
 	handle = stream->handle();
