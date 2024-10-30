@@ -28,6 +28,7 @@
 #if defined(__unix__) || defined(__APPLE__)
 #include <unistd.h>
 #elif defined(_MSC_VER) || defined (__MINGW32__)
+#include <fcntl.h>
 #include <io.h>
 #pragma warning(disable : 4996)
 #define pipe(fd) _pipe(fd, 4096, _O_BINARY)
@@ -98,7 +99,13 @@ struct StderrGrabber {
 		});
 	}
 	~StderrGrabber() {
-		dup2(stream->handle(), STDERR_FILENO);  // Restore stderr (closes the pipe, terminating the thread)
+	int handle;
+#if (BOOST_OS_WINDOWS)
+	handle = fileno(stream->handle());
+#else
+	handle = stream->handle();
+#endif
+		dup2(handle, STDERR_FILENO);  // Restore stderr (closes the pipe, terminating the thread)
 		std::cerr.rdbuf(backup);  // Restore original rdbuf (that writes to normal stderr)
 	}
 };
