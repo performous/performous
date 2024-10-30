@@ -28,12 +28,8 @@
 #if defined(__unix__) || defined(__APPLE__)
 #include <unistd.h>
 #elif defined(_MSC_VER) || defined (__MINGW32__)
-#undef dup // deprecated aliases, will generate a warning on MSVC.
-#undef dup2 
-#define close _close
-#define dup _dup
-#define dup2 _dup2
-#define open _open
+#include <io.h>
+#pragma warning(disable : 4996)
 #define pipe(fd) _pipe(fd, 4096, _O_BINARY)
 #define STDERR_FILENO 2
 #endif
