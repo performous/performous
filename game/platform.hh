@@ -1,7 +1,5 @@
 #pragma once
 
-#include "log.hh"
-
 #include <array>
 #include <cstdint>
 #include <iostream>
