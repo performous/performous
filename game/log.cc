@@ -61,7 +61,7 @@ namespace {
 #if (!BOOST_OS_WINDOWS)
 	constexpr int stderr_fd = STDERR_FILENO;
 #else
-	int stderr_fd = fileno(stderr);
+	int stderr_fd;
 #endif
 }
 
@@ -105,17 +105,30 @@ struct StderrGrabber {
 	IOStream stream;
 	std::streambuf* backup;
 	std::future<void> logger;
+#if (BOOST_OS_WINDOWS)
+	int handle_fd;
+#endif
 	StderrGrabber(): backup(std::cerr.rdbuf()) {
 #if (BOOST_OS_WINDOWS)
-	HANDLE stderrHandle = (HANDLE)_get_osfhandle(stderr_fd);
-// 	GetStdHandle(STD_ERROR_HANDLE);
-	if (stderrHandle == INVALID_HANDLE_VALUE) {
-		SpdLogger::notice(LogSystem::STDERR, "Failed to get stderr handle, error code={}", GetLastError());
-		return;
+	if (AttachConsole(ATTACH_PARENT_PROCESS) == 0) {
+		SpdLogger::trace(LogSystem::LOGGER, "Failed to attach to console, error code={}, will try to create a new console.", GetLastError());
+		if (AllocConsole() == 0) {
+			SpdLogger::trace(LogSystem::LOGGER, "Failed to initialize console, error code={}", GetLastError());
+		}
 	}
+	freopen_s ((FILE**)stdout, "CONOUT$", "w", stdout); 
+	freopen_s ((FILE**)stderr, "CONOUT$", "w", stderr); 
+ 	stderr_fd = fileno(stderr);
+ 	SpdLogger::trace(LogSystem::LOGGER, "stderr fileno={}, stdout fileno={}, handle_fd={}", stderr_fd, fileno(stdout), handle_fd);
+// 	HANDLE stderrHandle = (HANDLE)_get_osfhandle(stderr_fd);
+// 	GetStdHandle(STD_ERROR_HANDLE);
+// 	if (stderrHandle == INVALID_HANDLE_VALUE) {
+// 		SpdLogger::warn(LogSystem::STDERR, "Failed to get stderr handle, error code={}", GetLastError());
+// 		return;
+// 	}
 // 	stderr_handle = _open_osfhandle((intptr_t)stderrHandle, _O_TEXT);
-	
-	stream.open(dup(stderr_fd), boost::iostreams::close_handle);
+	handle_fd = dup(stderr_fd);
+	stream.open((HANDLE)_get_osfhandle(handle_fd), boost::iostreams::close_handle);
 #else
 	stream.open(dup(stderr_fd), boost::iostreams::close_handle);
 #endif
@@ -145,6 +158,8 @@ struct StderrGrabber {
 	~StderrGrabber() {
 #if (BOOST_OS_WINDOWS)
 // 	handle = fileno(stream->handle());
+	dup2(handle_fd, stderr_fd);
+	FreeConsole();
 #else
 	int handle = stream->handle();
 		dup2(handle, stderr_fd);  // Restore stderr (closes the pipe, terminating the thread)
@@ -181,6 +196,7 @@ void writeLog(std::string const& msg) {
 }
 
 int numeric(std::string const& level) {
+	if (level == "trace") return 0;
 	if (level == "debug") return 0;
 	if (level == "info") return 1;
 	if (level == "notice") return 2;
@@ -295,6 +311,8 @@ SpdLogger::SpdLogger (spdlog::level::level_enum const& consoleLevel) {
 	stdout_sink->set_color(spdlog::level::debug, logger_colors(blue));
 	stdout_sink->set_color(spdlog::level::trace, logger_colors(cyan));
 
+	if (Platform::currentOS() == Platform::HostOS::OS_WIN) { stdout_sink->set_color_mode(spdlog::color_mode::never); }
+
 	spdlog::file_event_handlers handlers;
 	handlers.after_open = [logHeader](spdlog::filename_t filename, std::FILE *fstream) { writeLogHeader(filename, fstream, logHeader); };
 
@@ -303,6 +321,7 @@ SpdLogger::SpdLogger (spdlog::level::level_enum const& consoleLevel) {
 	m_sink->set_level(spdlog::level::trace);
 
 	m_defaultLogger = std::make_shared<spdlog::async_logger>(LogSystem{LogSystem::LOGGER}.toString(), m_sink, spdlog::thread_pool(), spdlog::async_overflow_policy::block);
+	m_defaultLogger->set_pattern("[%T]:::%^%n / %l%$::: %v");
 	m_defaultLogger->set_level(spdlog::level::trace);
 
 	auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(filename, 1024 * 1024 * 2, 5, true, handlers);
