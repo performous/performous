@@ -36,6 +36,23 @@
 #include <stdio.h>
 #pragma warning(disable : 4996)
 #define pipe(fd) _pipe(fd, 4096, _O_BINARY)
+
+namespace logger_color_codes {
+	LoggerColor black = 0;
+	LoggerColor red = LOGGER_RED | LOGGER_INTENSITY; // Actually light_red.
+	LoggerColor green = LOGGER_GREEN;
+	LoggerColor yellow = LOGGER_RED | LOGGER_GREEN | LOGGER_INTENSITY; // Not gonna use it for now.
+	LoggerColor blue = LOGGER_BLUE;
+	LoggerColor magenta = LOGGER_BLUE | LOGGER_RED | LOGGER_INTENSITY; // Actually light_magenta according to windows, normal magenta is actually purple.
+	LoggerColor cyan = LOGGER_BLUE | LOGGER_GREEN | LOGGER_INTENSITY; // Actually light_cyan according to windows, normal cyan is actually light blue.
+	LoggerColor white = LOGGER_BLUE | LOGGER_GREEN | LOGGER_RED | LOGGER_INTENSITY;
+
+	LoggerColor yellow_bold = LOGGER_RED | LOGGER_GREEN; // Actually brown, default win console colors are atrocious.
+	LoggerColor red_bold = LOGGER_RED; // Actually normal red (which is darker).
+	LoggerColor bold_on_red = white | LOGGER_BACKGROUND(LOGGER_RED); 
+}
+#define logger_colors(color) logger_color_codes::color
+
 #endif
 
 namespace {
