@@ -28,13 +28,15 @@
 #if defined(__unix__) || defined(__APPLE__)
 #include <unistd.h>
 #elif (BOOST_OS_WINDOWS)
+#if defined(_MSC_VER)
+#pragma warning(disable : 4996)
+#endif
 #include <errhandlingapi.h>
 #include <fcntl.h>
 #include <fileapi.h>
 #include <io.h>
 #include <ProcessEnv.h>
 #include <stdio.h>
-#pragma warning(disable : 4996)
 #define pipe(fd) _pipe(fd, 4096, _O_BINARY)
 
 namespace logger_color_codes {
