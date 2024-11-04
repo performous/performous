@@ -36,7 +36,6 @@
 #include <stdio.h>
 #pragma warning(disable : 4996)
 #define pipe(fd) _pipe(fd, 4096, _O_BINARY)
-#define 
 #endif
 
 namespace {
@@ -125,13 +124,12 @@ struct StderrGrabber {
 		});
 	}
 	~StderrGrabber() {
-	int handle;
 #if (BOOST_OS_WINDOWS)
 // 	handle = fileno(stream->handle());
 #else
-	handle = stream->handle();
+	int handle = stream->handle();
 #endif
-		dup2(stderr_fd, stderr_fd);  // Restore stderr (closes the pipe, terminating the thread)
+		dup2(handle, stderr_fd);  // Restore stderr (closes the pipe, terminating the thread)
 		std::cerr.rdbuf(backup);  // Restore original rdbuf (that writes to normal stderr)
 	}
 };
