@@ -113,6 +113,7 @@ struct StderrGrabber {
 		}
 	}
  	stderr_fd = fileno(stderr);
+ 	SpdLogger::notice(LogSystem::LOGGER, "stderr fileno={}", stderr_fd);
 	HANDLE stderrHandle = (HANDLE)_get_osfhandle(stderr_fd);
 // 	GetStdHandle(STD_ERROR_HANDLE);
 	if (stderrHandle == INVALID_HANDLE_VALUE) {
