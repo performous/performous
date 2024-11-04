@@ -27,7 +27,7 @@
 
 #if defined(__unix__) || defined(__APPLE__)
 #include <unistd.h>
-#elif (BOOST_OS_WINDOW)S
+#elif (BOOST_OS_WINDOWS)
 #include <errhandlingapi.h>
 #include <fcntl.h>
 #include <fileapi.h>
@@ -42,8 +42,9 @@
 namespace {
 #if (!BOOST_OS_WINDOWS)
 	constexpr int stderr_fd = STDERR_FILENO;
-#endif
+#else
 	int stderr_fd = fileno(stderr);
+#endif
 }
 
 /** \file
@@ -95,7 +96,8 @@ struct StderrGrabber {
 		return;
 	}
 // 	stderr_handle = _open_osfhandle((intptr_t)stderrHandle, _O_TEXT);
-	IOStream stream(dup(stderrHandle), boost::iostreams::close_handle);
+	
+	IOStream stream(dup(stderr_fd), boost::iostreams::close_handle);
 #else
 	IOStream stream(dup(stderr_fd), boost::iostreams::close_handle);
 #endif
