@@ -248,7 +248,6 @@ Logger::Logger(std::string const& level) {
 		atexit(Logger::teardown);
 	}
 	std::clog << msg << std::endl;
-	grabber = std::make_unique<StderrGrabber>();
 }
 
 Logger::~Logger() {
@@ -298,24 +297,29 @@ SpdLogger::SpdLogger (spdlog::level::level_enum const& consoleLevel) {
 
 	spdlog::file_event_handlers handlers;
 	handlers.after_open = [logHeader](spdlog::filename_t filename, std::FILE *fstream) { writeLogHeader(filename, fstream, logHeader); };
-	auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(filename, 1024 * 1024 * 2, 5, true, handlers);
 
-	m_sink->add_sink(file_sink);
 	m_sink->add_sink(stdout_sink);
 	m_sink->set_pattern("[%T]:::%^%n / %l%$::: %v");
 
 	m_defaultLogger = std::make_shared<spdlog::async_logger>(LogSystem{LogSystem::LOGGER}.toString(), m_sink, spdlog::thread_pool(), spdlog::async_overflow_policy::block);
-	m_defaultLogger->set_level(spdlog::level::debug);
+	m_defaultLogger->set_level(spdlog::level::trace);
+
+	auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(filename, 1024 * 1024 * 2, 5, true, handlers);
+	m_sink->add_sink(file_sink);
+
+	auto headerLogger = std::make_shared<spdlog::async_logger>(PACKAGE, stdout_sink, spdlog::thread_pool(), spdlog::async_overflow_policy::block);
+	headerLogger->log(spdlog::level::warn, logHeader);
 	
 	for (const auto& system: LogSystem()) {
+		if (system == LogSystem::LOGGER) continue;
+		std::unique_lock lock(m_LoggerRegistryMutex);
 		auto newLogger = m_defaultLogger->clone(system);
 		spdlog::register_logger(newLogger);
 		builtLoggers.try_emplace(system, newLogger);
 		newLogger->log(spdlog::level::trace, fmt::format("Logger subsystem initialized, system: {}", system));
 	}
 	
-	auto headerLogger = std::make_shared<spdlog::async_logger>(PACKAGE, stdout_sink, spdlog::thread_pool(), spdlog::async_overflow_policy::block);
-	headerLogger->log(spdlog::level::warn, logHeader);
+	grabber = std::make_unique<StderrGrabber>();
 }
 
 void SpdLogger::writeLogHeader(spdlog::filename_t filename, std::FILE* fd, std::string header) {
