@@ -33,6 +33,7 @@
 #include <fileapi.h>
 #include <io.h>
 #include <ProcessEnv.h>
+#include <stdio.h>
 #pragma warning(disable : 4996)
 #define pipe(fd) _pipe(fd, 4096, _O_BINARY)
 #define 
@@ -40,9 +41,9 @@
 
 namespace {
 #if (!BOOST_OS_WINDOWS)
-	constexpr
+	constexpr int stderr_fd = STDERR_FILENO;
 #endif
-	int stderr_fd = STDERR_FILENO;
+	int stderr_fd = fileno(stderr);
 }
 
 /** \file
@@ -87,13 +88,14 @@ struct StderrGrabber {
 	std::future<void> logger;
 	StderrGrabber(): backup(std::cerr.rdbuf()) {
 #if (BOOST_OS_WINDOWS)
-	HANDLE stderrHandle = GetStdHandle(STD_ERROR_HANDLE);
+	HANDLE stderrHandle = (HANDLE)_get_osfhandle(stderr_fd);
+// 	GetStdHandle(STD_ERROR_HANDLE);
 	if (stderrHandle == INVALID_HANDLE_VALUE) {
 		SpdLogger::notice(LogSystem::STDERR, "Failed to get stderr handle, error code={}", GetLastError());
 		return;
 	}
-	stderr_fd = _open_osfhandle((intptr_t)stderrHandle, _O_TEXT);
-	IOStream stream(dup(stderr_fd), boost::iostreams::close_handle);
+// 	stderr_handle = _open_osfhandle((intptr_t)stderrHandle, _O_TEXT);
+	IOStream stream(dup(stderrHandle), boost::iostreams::close_handle);
 #else
 	IOStream stream(dup(stderr_fd), boost::iostreams::close_handle);
 #endif
@@ -123,11 +125,11 @@ struct StderrGrabber {
 	~StderrGrabber() {
 	int handle;
 #if (BOOST_OS_WINDOWS)
-	handle = fileno(stream->handle());
+// 	handle = fileno(stream->handle());
 #else
 	handle = stream->handle();
 #endif
-		dup2(handle, stderr_fd);  // Restore stderr (closes the pipe, terminating the thread)
+		dup2(stderr_fd, stderr_fd);  // Restore stderr (closes the pipe, terminating the thread)
 		std::cerr.rdbuf(backup);  // Restore original rdbuf (that writes to normal stderr)
 	}
 };
