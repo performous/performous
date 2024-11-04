@@ -61,7 +61,7 @@ namespace {
 #if (!BOOST_OS_WINDOWS)
 	constexpr int stderr_fd = STDERR_FILENO;
 #else
-	int stderr_fd = fileno(stderr);
+	int stderr_fd;
 #endif
 }
 
@@ -107,6 +107,12 @@ struct StderrGrabber {
 	std::future<void> logger;
 	StderrGrabber(): backup(std::cerr.rdbuf()) {
 #if (BOOST_OS_WINDOWS)
+	if (AttachConsole(ATTACH_PARENT_PROCESS) == 0) {
+		if (AllocConsole() == 0) {
+			SpdLogger::notice(LogSystem::LOGGER, "Failed to initialize console, error code={}", GetLastError());
+		}
+	}
+ 	stderr_fd = fileno(stderr);
 	HANDLE stderrHandle = (HANDLE)_get_osfhandle(stderr_fd);
 // 	GetStdHandle(STD_ERROR_HANDLE);
 	if (stderrHandle == INVALID_HANDLE_VALUE) {
