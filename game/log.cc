@@ -83,7 +83,7 @@ using IOStream = boost::iostreams::stream<boost::iostreams::file_descriptor_sink
 // Note: std::cerr retains its normal functionality but other means of writing stderr get redirected to std::clog
 #include <future>
 struct StderrGrabber {
-	boost::iostreams::stream<boost::iostreams::file_descriptor_sink> stream;
+	IOStream stream;
 	std::streambuf* backup;
 	std::future<void> logger;
 	StderrGrabber(): backup(std::cerr.rdbuf()) {
@@ -96,9 +96,9 @@ struct StderrGrabber {
 	}
 // 	stderr_handle = _open_osfhandle((intptr_t)stderrHandle, _O_TEXT);
 	
-	IOStream stream(dup(stderr_fd), boost::iostreams::close_handle);
+	stream.open(dup(stderr_fd), boost::iostreams::close_handle);
 #else
-	IOStream stream(dup(stderr_fd), boost::iostreams::close_handle);
+	stream.open(dup(stderr_fd), boost::iostreams::close_handle);
 #endif
 		std::cerr.rdbuf(stream.rdbuf());  // Make std::cerr write to our stream (which connects to normal stderr)
 		int fd[2];
@@ -128,8 +128,8 @@ struct StderrGrabber {
 // 	handle = fileno(stream->handle());
 #else
 	int handle = stream->handle();
-#endif
 		dup2(handle, stderr_fd);  // Restore stderr (closes the pipe, terminating the thread)
+#endif
 		std::cerr.rdbuf(backup);  // Restore original rdbuf (that writes to normal stderr)
 	}
 };
