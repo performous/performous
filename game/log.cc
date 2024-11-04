@@ -27,13 +27,23 @@
 
 #if defined(__unix__) || defined(__APPLE__)
 #include <unistd.h>
-#elif defined(_MSC_VER) || defined (__MINGW32__)
+#elif (BOOST_OS_WINDOW)S
+#include <errhandlingapi.h>
 #include <fcntl.h>
+#include <fileapi.h>
 #include <io.h>
+#include <ProcessEnv.h>
 #pragma warning(disable : 4996)
 #define pipe(fd) _pipe(fd, 4096, _O_BINARY)
-#define STDERR_FILENO 2
+#define 
 #endif
+
+namespace {
+#if (!BOOST_OS_WINDOWS)
+	constexpr
+#endif
+	int stderr_fd = STDERR_FILENO;
+}
 
 /** \file
  * \brief The std::clog logger.
@@ -66,6 +76,7 @@
  * \attention This only guards from multiple clog interleaving, not other console I/O.
  */
 std::mutex log_lock;
+using IOStream = boost::iostreams::stream<boost::iostreams::file_descriptor_sink>;
 
 // Capture stderr spam from other libraries and log it properly
 // Note: std::cerr retains its normal functionality but other means of writing stderr get redirected to std::clog
@@ -74,11 +85,22 @@ struct StderrGrabber {
 	boost::iostreams::stream<boost::iostreams::file_descriptor_sink> stream;
 	std::streambuf* backup;
 	std::future<void> logger;
-	StderrGrabber(): stream(dup(STDERR_FILENO), boost::iostreams::close_handle), backup(std::cerr.rdbuf()) {
+	StderrGrabber(): backup(std::cerr.rdbuf()) {
+#if (BOOST_OS_WINDOWS)
+	HANDLE stderrHandle = GetStdHandle(STD_ERROR_HANDLE);
+	if (stderrHandle == INVALID_HANDLE_VALUE) {
+		SpdLogger::notice(LogSystem::STDERR, "Failed to get stderr handle, error code={}", GetLastError());
+		return;
+	}
+	stderr_fd = _open_osfhandle((intptr_t)stderrHandle, _O_TEXT);
+	IOStream stream(dup(stderr_fd), boost::iostreams::close_handle);
+#else
+	IOStream stream(dup(stderr_fd), boost::iostreams::close_handle);
+#endif
 		std::cerr.rdbuf(stream.rdbuf());  // Make std::cerr write to our stream (which connects to normal stderr)
 		int fd[2];
 		if (pipe(fd) == -1) SpdLogger::notice(LogSystem::STDERR, "`pipe` returned an error: {}", std::strerror(errno));
-		dup2(fd[1], STDERR_FILENO);  // Close stderr and replace it with a copy of pipe begin
+		dup2(fd[1], stderr_fd);  // Close stderr and replace it with a copy of pipe begin
 		close(fd[1]);  // Close the original pipe begin
 		SpdLogger::info(LogSystem::STDERR, "Standard error output redirected here.");
 		logger = std::async(std::launch::async, [fdpipe = fd[0]] {
@@ -105,7 +127,7 @@ struct StderrGrabber {
 #else
 	handle = stream->handle();
 #endif
-		dup2(handle, STDERR_FILENO);  // Restore stderr (closes the pipe, terminating the thread)
+		dup2(handle, stderr_fd);  // Restore stderr (closes the pipe, terminating the thread)
 		std::cerr.rdbuf(backup);  // Restore original rdbuf (that writes to normal stderr)
 	}
 };
