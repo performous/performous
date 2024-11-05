@@ -196,6 +196,7 @@ void writeLog(std::string const& msg) {
 }
 
 int numeric(std::string const& level) {
+	if (level == "trace") return 0;
 	if (level == "debug") return 0;
 	if (level == "info") return 1;
 	if (level == "notice") return 2;
