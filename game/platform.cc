@@ -1,5 +1,7 @@
 #include "platform.hh"
+
 #include "fs.hh"
+#include "log.hh"
 
 #include <cstdlib>
 #include <exception>
@@ -41,16 +43,12 @@ std::uint16_t Platform::shortcutModifier(bool eitherSide) {
 	else { return eitherSide ? KMOD_CTRL : KMOD_LCTRL; }
 }
 
-Platform::Platform() {
-	#if (BOOST_OS_WINDOWS)
-	_putenv_s("FONTCONFIG_PATH",".\\");
-	#endif
-}
-
 void Platform::setupPlatform() {
 #if (BOOST_OS_WINDOWS)
 	// set the locale to UTF-8 on windows
+	_putenv_s("FONTCONFIG_PATH",".\\");
 	setlocale(LC_ALL, ".UTF8");
+	initWindowsConsole();
 #elif (BOOST_OS_MACOS)
 	CFURLRef resDirURL = CFBundleCopyResourcesDirectoryURL(CFBundleGetMainBundle());
 	CFStringRef resDir = CFURLCopyPath(CFURLCopyAbsoluteURL(resDirURL));
@@ -102,6 +100,26 @@ int Platform::defaultBackEnd() {
 }
 
 #if (BOOST_OS_WINDOWS)
+#include <errhandlingapi.h>
+#include <fcntl.h>
+#include <ProcessEnv.h>
+#include <stdio.h>
+#include <wincon.h>
+
+int Platform::stderr_fd;
+
+void Platform::initWindowsConsole() {
+	if (AttachConsole(ATTACH_PARENT_PROCESS) == 0) {
+		SpdLogger::trace(LogSystem::LOGGER, "Failed to attach to console, error code={}, will try to create a new console.", GetLastError());
+	if (AllocConsole() == 0) {
+		SpdLogger::trace(LogSystem::LOGGER, "Failed to initialize console, error code={}", GetLastError());
+	}
+}
+	freopen_s ((FILE**)stdout, "CONOUT$", "w", stdout); 
+	freopen_s ((FILE**)stderr, "CONOUT$", "w", stderr); 
+	stderr_fd = fileno(stderr);
+}
+
 extern "C" {
 // For DWORD (see end of file)
 #include <IntSafe.h>

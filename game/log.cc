@@ -57,14 +57,6 @@ namespace logger_color_codes {
 
 #endif
 
-namespace {
-#if (!BOOST_OS_WINDOWS)
-	constexpr int stderr_fd = STDERR_FILENO;
-#else
-	int stderr_fd;
-#endif
-}
-
 /** \file
  * \brief The std::clog logger.
  *
@@ -110,16 +102,6 @@ struct StderrGrabber {
 #endif
 	StderrGrabber(): backup(std::cerr.rdbuf()) {
 #if (BOOST_OS_WINDOWS)
-	if (AttachConsole(ATTACH_PARENT_PROCESS) == 0) {
-		SpdLogger::trace(LogSystem::LOGGER, "Failed to attach to console, error code={}, will try to create a new console.", GetLastError());
-		if (AllocConsole() == 0) {
-			SpdLogger::trace(LogSystem::LOGGER, "Failed to initialize console, error code={}", GetLastError());
-		}
-	}
-	freopen_s ((FILE**)stdout, "CONOUT$", "w", stdout); 
-	freopen_s ((FILE**)stderr, "CONOUT$", "w", stderr); 
- 	stderr_fd = fileno(stderr);
- 	SpdLogger::trace(LogSystem::LOGGER, "stderr fileno={}, stdout fileno={}, handle_fd={}", stderr_fd, fileno(stdout), handle_fd);
 // 	HANDLE stderrHandle = (HANDLE)_get_osfhandle(stderr_fd);
 // 	GetStdHandle(STD_ERROR_HANDLE);
 // 	if (stderrHandle == INVALID_HANDLE_VALUE) {
@@ -127,15 +109,16 @@ struct StderrGrabber {
 // 		return;
 // 	}
 // 	stderr_handle = _open_osfhandle((intptr_t)stderrHandle, _O_TEXT);
-	handle_fd = dup(stderr_fd);
+	handle_fd = dup(Platform::stderr_fd);
+ 	SpdLogger::trace(LogSystem::LOGGER, "stderr fileno={}, stdout fileno={}, handle_fd={}", Platform::stderr_fd, fileno(stdout), handle_fd);
 	stream.open((HANDLE)_get_osfhandle(handle_fd), boost::iostreams::close_handle);
 #else
-	stream.open(dup(stderr_fd), boost::iostreams::close_handle);
+	stream.open(dup(Platform::stderr_fd), boost::iostreams::close_handle);
 #endif
 		std::cerr.rdbuf(stream.rdbuf());  // Make std::cerr write to our stream (which connects to normal stderr)
 		int fd[2];
 		if (pipe(fd) == -1) SpdLogger::notice(LogSystem::STDERR, "`pipe` returned an error: {}", std::strerror(errno));
-		dup2(fd[1], stderr_fd);  // Close stderr and replace it with a copy of pipe begin
+		dup2(fd[1], Platform::stderr_fd);  // Close stderr and replace it with a copy of pipe begin
 		close(fd[1]);  // Close the original pipe begin
 		SpdLogger::info(LogSystem::STDERR, "Standard error output redirected here.");
 		logger = std::async(std::launch::async, [fdpipe = fd[0]] {
@@ -158,11 +141,11 @@ struct StderrGrabber {
 	~StderrGrabber() {
 #if (BOOST_OS_WINDOWS)
 // 	handle = fileno(stream->handle());
-	dup2(handle_fd, stderr_fd);
+	dup2(handle_fd, Platform::stderr_fd);
 	FreeConsole();
 #else
 	int handle = stream->handle();
-		dup2(handle, stderr_fd);  // Restore stderr (closes the pipe, terminating the thread)
+		dup2(handle, Platform::stderr_fd);  // Restore stderr (closes the pipe, terminating the thread)
 #endif
 		std::cerr.rdbuf(backup);  // Restore original rdbuf (that writes to normal stderr)
 	}
