@@ -86,6 +86,7 @@ class SpdLogger {
 
 
   private:
+	inline static const std::string formatString{"[%T]:::%^%n / %l%$::: %v"};
 	static std::unordered_map<LogSystem, loggerPtr> builtLoggers;
 	static const loggerPtr getLogger(LogSystem);
 	static std::shared_ptr<spdlog::sinks::dist_sink_mt> m_sink;
