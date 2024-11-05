@@ -20,13 +20,15 @@ using STAT = struct stat;
 #endif
 
 struct Platform {
-enum class HostOS { OS_WIN, OS_LINUX, OS_MAC, OS_BSD, OS_SOLARIS, OS_UNIX };
-Platform();
-static HostOS currentOS();
-static std::uint16_t shortcutModifier(bool eitherSide = true);
-static int defaultBackEnd();
-static void setupPlatform();
+	Platform();
 
-private:
-static const std::array<const char*,6> platformNames;
+	enum class HostOS { OS_WIN, OS_LINUX, OS_MAC, OS_BSD, OS_SOLARIS, OS_UNIX };
+
+	static HostOS currentOS();
+	static std::uint16_t shortcutModifier(bool eitherSide = true);
+	static int defaultBackEnd();
+	static void setupPlatform();
+
+  private:
+	static const std::array<const char*,6> platformNames;
 };
