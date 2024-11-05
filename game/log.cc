@@ -272,7 +272,6 @@ Logger::~Logger() {
 }
 
 void Logger::teardown() {
-	grabber.reset();
 	if (default_ClogBuf) std::clog << "logger/info: Exiting normally." << std::endl;
 	std::lock_guard<std::mutex> l(log_lock);
 	if (!default_ClogBuf) return;
@@ -362,6 +361,7 @@ void SpdLogger::writeLogHeader(spdlog::filename_t filename, std::FILE* fd, std::
 
 SpdLogger::~SpdLogger() {
 	notice(LogSystem::LOGGER, "More details might be available in {}", getLogFilename_new().u8string());
+	grabber.reset();
 	spdlog::shutdown();
 }
 
