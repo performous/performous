@@ -310,6 +310,8 @@ SpdLogger::SpdLogger (spdlog::level::level_enum const& consoleLevel) {
 	stdout_sink->set_color(spdlog::level::debug, logger_colors(blue));
 	stdout_sink->set_color(spdlog::level::trace, logger_colors(cyan));
 
+	if (Platform::currentOS() == Platform::HostOS::OS_WIN) { stdout_sink->set_color_mode(spdlog::color_mode::never); }
+
 	spdlog::file_event_handlers handlers;
 	handlers.after_open = [logHeader](spdlog::filename_t filename, std::FILE *fstream) { writeLogHeader(filename, fstream, logHeader); };
 
