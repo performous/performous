@@ -5,7 +5,6 @@
 #include <iostream>
 
 #include <boost/predef/os.h>
-
 #include <SDL_events.h>
 
 #if (BOOST_OS_WINDOWS) 
@@ -15,6 +14,7 @@
 using STAT = struct _stat;
 #else
 #include <sys/stat.h>
+#include <unistd.h>
 #define _STAT(x, y) stat(x, y)
 using STAT = struct stat;
 #endif
@@ -28,7 +28,14 @@ struct Platform {
 	static std::uint16_t shortcutModifier(bool eitherSide = true);
 	static int defaultBackEnd();
 	static void setupPlatform();
+	
+#if (!BOOST_OS_WINDOWS)
+	static constexpr int stderr_fd = STDERR_FILENO;
+#else
+	static int stderr_fd;
+#endif
 
   private:
 	static const std::array<const char*,6> platformNames;
+	static void initWindowsConsole();
 };
