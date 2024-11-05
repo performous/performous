@@ -317,6 +317,7 @@ SpdLogger::SpdLogger (spdlog::level::level_enum const& consoleLevel) {
 
 	m_sink->add_sink(stdout_sink);
 	m_sink->set_pattern("[%T]:::%^%n / %l%$::: %v");
+	m_sink->set_level(spdlog::level::trace);
 
 	m_defaultLogger = std::make_shared<spdlog::async_logger>(LogSystem{LogSystem::LOGGER}.toString(), m_sink, spdlog::thread_pool(), spdlog::async_overflow_policy::block);
 	m_defaultLogger->set_pattern("[%T]:::%^%n / %l%$::: %v");
