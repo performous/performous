@@ -98,7 +98,6 @@ static void checkEvents(Game& gm, Time eventTime) {
 void mainLoop(std::string const& songlist) {
 	Window window{};
 
-	Platform platform;
 	std::clog << "core/notice: Starting the audio subsystem (errors printed on console may be ignored)." << std::endl;
 	std::clog << "core/info: Loading assets." << std::endl;
 	TranslationEngine localization;
