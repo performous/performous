@@ -292,26 +292,30 @@ SpdLogger::SpdLogger (spdlog::level::level_enum const& consoleLevel) {
 	stdout_sink->set_color(spdlog::level::info, logger_colors(white));
 	stdout_sink->set_color(spdlog::level::debug, logger_colors(blue));
 	stdout_sink->set_color(spdlog::level::trace, logger_colors(cyan));
+	
+	stdout_sink->set_pattern(formatString); //Need to set it separately for the header.
 
-	if (Platform::currentOS() == Platform::HostOS::OS_WIN) { stdout_sink->set_color_mode(spdlog::color_mode::never); }
+// 	if (Platform::currentOS() == Platform::HostOS::OS_WIN) { stdout_sink->set_color_mode(spdlog::color_mode::never); }
 
 	spdlog::file_event_handlers handlers;
 	handlers.after_open = [logHeader](spdlog::filename_t filename, std::FILE *fstream) { writeLogHeader(filename, fstream, logHeader); };
 
 	m_sink->add_sink(stdout_sink);
-	m_sink->set_pattern("[%T]:::%^%n / %l%$::: %v");
 	m_sink->set_level(spdlog::level::trace);
 
 	m_defaultLogger = std::make_shared<spdlog::async_logger>(LogSystem{LogSystem::LOGGER}.toString(), m_sink, spdlog::thread_pool(), spdlog::async_overflow_policy::block);
-	m_defaultLogger->set_pattern("[%T]:::%^%n / %l%$::: %v");
-	m_defaultLogger->set_level(spdlog::level::trace);
 
 	auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(filename, 1024 * 1024 * 2, 5, true, handlers);
 	m_sink->add_sink(file_sink);
 
 	auto headerLogger = std::make_shared<spdlog::async_logger>(PACKAGE, stdout_sink, spdlog::thread_pool(), spdlog::async_overflow_policy::block);
+// 	headerLogger->set_pattern(formatString);
 	headerLogger->log(spdlog::level::warn, logHeader);
 	
+	m_defaultLogger->set_level(spdlog::level::trace);
+// 	m_defaultLogger->set_pattern(formatString);
+	m_sink->set_pattern(formatString);
+
 	for (const auto& system: LogSystem()) {
 		if (system == LogSystem::LOGGER) continue;
 		std::unique_lock lock(m_LoggerRegistryMutex);
