@@ -104,7 +104,7 @@ class VideoFFmpeg : public FFmpeg {
 	void processFrame(uFrame frame) override;
   private:
 	std::unique_ptr<SwsContext, void(*)(SwsContext*)> m_swsContext{nullptr, sws_freeContext};
-	VideoCb handleVideoData;
+        VideoCb handleVideoData;
 
 };
 
