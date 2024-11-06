@@ -111,9 +111,9 @@ int Platform::stderr_fd;
 void Platform::initWindowsConsole() {
 	if (AttachConsole(ATTACH_PARENT_PROCESS) == 0) {
 		SpdLogger::trace(LogSystem::LOGGER, "Failed to attach to console, error code={}, will try to create a new console.", GetLastError());
-	if (AllocConsole() == 0) {
-		SpdLogger::trace(LogSystem::LOGGER, "Failed to initialize console, error code={}", GetLastError());
-	}
+// 	if (AllocConsole() == 0) {
+// 		SpdLogger::trace(LogSystem::LOGGER, "Failed to initialize console, error code={}", GetLastError());
+// 	}
 }
 	freopen_s ((FILE**)stdout, "CONOUT$", "w", stdout); 
 	freopen_s ((FILE**)stderr, "CONOUT$", "w", stderr); 
