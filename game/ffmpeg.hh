@@ -121,6 +121,8 @@ class AudioBuffer {
 	bool read(float* begin, std::int64_t samples, std::int64_t pos, float volume = 1.0f);
 	bool terminating();
 	double duration();
+//	double getReplayGain();
+//	double getReplayGainVolume();
 
   private:
 	// must be called holding the mutex
