@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Performous\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-06 14:48+0200\n"
-"PO-Revision-Date: 2023-08-06 14:48+0200\n"
+"PO-Revision-Date: 2024-09-11 19:00+1000\n"
 "Last-Translator: Arjan Speiard | Asgard Sings! <arjan.spieard@gmail.com>\n"
 "Language-Team: \n"
 "Language: ja_JP\n"
@@ -13,7 +13,7 @@ msgstr ""
 "X-Poedit-KeywordsList: _;translate_noop\n"
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SourceCharset: UTF-8\n"
-"X-Generator: Poedit 3.3.2\n"
+"X-Generator: Poedit 3.2.2\n"
 "X-Poedit-SearchPath-0: ../data\n"
 "X-Poedit-SearchPath-1: ../game\n"
 
@@ -1652,11 +1652,11 @@ msgstr ""
 
 #: ../game/i18n.cc:149
 msgid "German"
-msgstr ""
+msgstr "ドイツ語"
 
 #: ../game/i18n.cc:150
 msgid "English"
-msgstr ""
+msgstr "英語"
 
 #: ../game/i18n.cc:151
 msgid "Spanish"
@@ -1672,7 +1672,7 @@ msgstr ""
 
 #: ../game/i18n.cc:154
 msgid "French"
-msgstr ""
+msgstr "フランス語"
 
 #: ../game/i18n.cc:155
 msgid "Hungarian"
@@ -1684,7 +1684,7 @@ msgstr ""
 
 #: ../game/i18n.cc:157
 msgid "Japanese"
-msgstr ""
+msgstr "日本語"
 
 #: ../game/i18n.cc:158
 msgid "Dutch"
