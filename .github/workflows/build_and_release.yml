@@ -46,7 +46,8 @@ jobs:
           ref: '${{ github.event.head.ref }}'
           fetch-depth: 0
       - name: Dump Github Context
-        env: GITHUB_CONTEXT: ${{ toJson(github) }}
+        env: 
+          GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
       - name: Determine the complete version
         id: versioning
