@@ -3,6 +3,7 @@
 #include "fs.hh"
 #include "log.hh"
 
+#include <cerrno>
 #include <cstdlib>
 #include <exception>
 #include <string>
