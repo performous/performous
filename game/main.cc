@@ -325,7 +325,7 @@ int main(int argc, char** argv) try {
 		return EXIT_SUCCESS;
 	}
 
-	Logger logger(loglevel);
+// 	Logger logger(loglevel);
 	SpdLogger spdLogger(spdlog::level::debug);
 	spdLogger.notice(LogSystem::LOGGER, "Testing whether spdlog works? {}", true);
 	spdLogger.notice(LogSystem::LOGGER, "And does it work without a parameter?");
