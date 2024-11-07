@@ -31,19 +31,19 @@ namespace {
 	}
 }
 
-void TextRenderer::renderTextFill( std::shared_ptr<cairo_t> dc, TextStyle const& style, bool complete )
+void TextRenderer::renderTextFill( std::shared_ptr<cairo_t> dc, TextStyle const& style, bool complete ) const
 {
 	// Render text
 	if (style.fill_col.a > 0.0f) {
 		cairo_set_source_rgba(dc.get(), style.fill_col.r, style.fill_col.g, style.fill_col.b, style.fill_col.a);
-        if ( complete )
-            cairo_fill(dc.get());
-        else
-            cairo_fill_preserve(dc.get());
+		if ( complete )
+			cairo_fill(dc.get());
+		else
+			cairo_fill_preserve(dc.get());
 	}
 }
 
-void TextRenderer::renderTextStroke( std::shared_ptr<cairo_t> dc, TextStyle const& style, float border, bool complete )
+void TextRenderer::renderTextStroke( std::shared_ptr<cairo_t> dc, TextStyle const& style, float border, bool complete ) const
 {
 	// Render text border
 	if (style.stroke_col.a > 0.0f) {
@@ -54,10 +54,10 @@ void TextRenderer::renderTextStroke( std::shared_ptr<cairo_t> dc, TextStyle cons
 		cairo_set_miter_limit(dc.get(), style.stroke_miterlimit);
 		cairo_set_line_width(dc.get(), border);
 		cairo_set_source_rgba(dc.get(), style.stroke_col.r, style.stroke_col.g, style.stroke_col.b, style.stroke_col.a);
-        if ( complete )
-            cairo_stroke(dc.get());
-        else
-            cairo_stroke_preserve(dc.get());
+		if ( complete )
+			cairo_stroke(dc.get());
+		else
+			cairo_stroke_preserve(dc.get());
 	}
 }
 
@@ -104,19 +104,19 @@ OpenGLText TextRenderer::render(std::string const& text, TextStyle const& style,
 	pango_cairo_update_layout(dc.get(), layout.get());
 	pango_cairo_layout_path(dc.get(), layout.get());
 
-    // The paint order is defined by the SVG via the Theme
-    if (style.stroke_paintfirst)
-    {
-        // render text stroke, then fill (font-fill is on top of stroke)
-        renderTextStroke(dc, style, border, false);
-        renderTextFill(dc, style, true);
-    }
-    else
-    {
-        // render text fill, then stroke (font-stroke is on top of fill)
-        renderTextFill(dc, style, false);
-        renderTextStroke(dc, style, border, true);
-    }
+	// The paint order is defined by the SVG via the Theme
+	if (style.stroke_paintfirst)
+	{
+		// render text stroke, then fill (font-fill is on top of stroke)
+		renderTextStroke(dc, style, border, false);
+		renderTextFill(dc, style, true);
+	}
+	else
+	{
+		// render text fill, then stroke (font-stroke is on top of fill)
+		renderTextFill(dc, style, false);
+		renderTextStroke(dc, style, border, true);
+	}
 
 	cairo_pop_group_to_source (dc.get());
 	cairo_set_operator(dc.get(),CAIRO_OPERATOR_OVER);
