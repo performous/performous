@@ -116,11 +116,17 @@ void Platform::initWindowsConsole() {
 // 	}
 	HANDLE _stdout;
 	HANDLE _stderr;
-	SetStdHandle(STD_ERROR_HANDLE, &_stderr);
-	SetStdHandle(STD_OUTPUT_HANDLE, &_stdout);
+	if (SetStdHandle(STD_ERROR_HANDLE, &_stderr) == 0) {
+		std::clog << "platform/debug: SetStdHandle failed for stderr. last error code=" << GetLastError() << std::endl;
 	}
-	freopen_s ((FILE**)stdout, "CONOUT$", "w", stdout); 
-	freopen_s ((FILE**)stderr, "CONOUT$", "w", stderr); 
+	if (SetStdHandle(STD_OUTPUT_HANDLE, &_stdout) == 0) {
+		std::clog << "platform/debug: SetStdHandle failed for stdout. last error code=" << GetLastError() << std::endl;
+	}
+	std::errno_t retStdOut = freopen_s ((FILE**)stdout, "CONOUT$", "w", stdout);
+	
+	std::clog << "platform/debug: freopen_s for stdout error value=" << std::strerr(retStdOut) << std::endl;
+	std::errno_t retStdErr = freopen_s ((FILE**)stderr, "CONOUT$", "w", stderr);
+	std::clog << "platform/debug: freopen_s for stderr error value=" << std::strerr(retStdErr) << std::endl;
 	stderr_fd = fileno(stderr);
 }
 
