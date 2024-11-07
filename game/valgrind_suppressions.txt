@@ -1,0 +1,40 @@
+{
+   name libportaudio_cond
+   Memcheck:Cond
+   obj:/usr/lib/x86_64-linux-gnu/libportaudio.so.2.0.0
+}
+{
+   name libportaudio_free
+   Memcheck:Free
+   obj:/usr/lib/x86_64-linux-gnu/libportaudio.so.2.0.0
+}
+{
+   name libportaudio_value8
+   Memcheck:Value8
+   obj:/usr/lib/x86_64-linux-gnu/libportaudio.so.2.0.0
+}
+{
+   name libportaudio_value4
+   Memcheck:Value4
+   obj:/usr/lib/x86_64-linux-gnu/libportaudio.so.2.0.0
+}
+{
+   name libasound_cond
+   Memcheck:Cond
+   obj:/usr/lib/x86_64-linux-gnu/libasound.so.2.0.0
+}
+{
+   name libasound_free
+   Memcheck:Free
+   obj:/usr/lib/x86_64-linux-gnu/libasound.so.2.0.0
+}
+{
+   name libasound_value8
+   Memcheck:Value8
+   obj:/usr/lib/x86_64-linux-gnu/libasound.so.2.0.0
+}
+{
+   name libasound_value4
+   Memcheck:Value4
+   obj:/usr/lib/x86_64-linux-gnu/libasound.so.2.0.0
+}
