@@ -116,13 +116,14 @@ void Platform::initWindowsConsole() {
 // 	if (AllocConsole() == 0) {
 // 		SpdLogger::trace(LogSystem::LOGGER, "Failed to initialize console, error code={}", GetLastError());
 // 	}
-	HANDLE _stdout;
-	HANDLE _stderr;
-	if (SetStdHandle(STD_ERROR_HANDLE, &_stderr) == 0) {
-		std::clog << "platform/debug: SetStdHandle failed for stderr. last error code=" << GetLastError() << std::endl;
-	}
-	if (SetStdHandle(STD_OUTPUT_HANDLE, &_stdout) == 0) {
-		std::clog << "platform/debug: SetStdHandle failed for stdout. last error code=" << GetLastError() << std::endl;
+		HANDLE _stdout;
+		HANDLE _stderr;
+		if (SetStdHandle(STD_ERROR_HANDLE, &_stderr) == 0) {
+			std::clog << "platform/debug: SetStdHandle failed for stderr. last error code=" << GetLastError() << std::endl;
+		}
+		if (SetStdHandle(STD_OUTPUT_HANDLE, &_stdout) == 0) {
+			std::clog << "platform/debug: SetStdHandle failed for stdout. last error code=" << GetLastError() << std::endl;
+		}
 	}
 	int retStdOut = freopen_s ((FILE**)stdout, "CONOUT$", "w", stdout);
 	std::clog << "platform/debug: freopen_s for stdout error value=" << std::strerror(retStdOut) << std::endl;
