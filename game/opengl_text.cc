@@ -118,14 +118,14 @@ namespace {
 				else if (value == "middle") _align = SvgTxtTheme::Align::CENTER;
 				else if (value == "end") _align = SvgTxtTheme::Align::RIGHT;
 			}
-            else if (token == "paint-order") {
+			else if (token == "paint-order") {
 				std::string value;
 				std::getline(iss2, value);
-                if (value.find("stroke") == 0) _paintorder = SvgTxtTheme::PaintOrder::STROKE_FIRST;
-                else if (value.find("fill") == 0) _paintorder = SvgTxtTheme::PaintOrder::FILL_FIRST;
-                else if (value.find("markers") == 0) _paintorder = SvgTxtTheme::PaintOrder::MARKERS_FIRST;
-                _theme.stroke_paintfirst = (_paintorder != SvgTxtTheme::PaintOrder::FILL_FIRST);  // Not handling marker-first yet (TODO)
-            }
+				if (value.find("stroke") == 0) _paintorder = SvgTxtTheme::PaintOrder::STROKE_FIRST;
+				else if (value.find("fill") == 0) _paintorder = SvgTxtTheme::PaintOrder::FILL_FIRST;
+				else if (value.find("markers") == 0) _paintorder = SvgTxtTheme::PaintOrder::MARKERS_FIRST;
+				_theme.stroke_paintfirst = (_paintorder != SvgTxtTheme::PaintOrder::FILL_FIRST);  // Not handling marker-first yet (TODO)
+			}
 		}
 		// Parse x and y attributes
 		n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@x",nsmap);
@@ -168,7 +168,7 @@ SvgTxtTheme::SvgTxtTheme(fs::path const& themeFile, float factor): m_align(), m_
 void SvgTxtTheme::setHighlight(fs::path const& themeFile) {
 	float a,b,c,d;
 	Align e;
-    PaintOrder f{SvgTxtTheme::PaintOrder::STROKE_FIRST};
+	PaintOrder f{SvgTxtTheme::PaintOrder::STROKE_FIRST};
 	parseTheme(themeFile, m_textstyle_highlight, a, b, c, d, e, f);
 }
 
