@@ -36,7 +36,7 @@
 #include <fileapi.h>
 #include <io.h>
 #include <ProcessEnv.h>
-#include <stdio.h>
+#include <cstdio>
 #define pipe(fd) _pipe(fd, 4096, _O_BINARY)
 
 namespace logger_color_codes {

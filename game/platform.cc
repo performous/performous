@@ -103,7 +103,7 @@ int Platform::defaultBackEnd() {
 #include <errhandlingapi.h>
 #include <fcntl.h>
 #include <ProcessEnv.h>
-#include <stdio.h>
+#include <cstdio>
 #include <wincon.h>
 
 int Platform::stderr_fd;
