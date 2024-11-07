@@ -5,6 +5,7 @@
 
 #include <cerrno>
 #include <cstdlib>
+#include <cstring>
 #include <exception>
 #include <string>
 
@@ -123,11 +124,10 @@ void Platform::initWindowsConsole() {
 	if (SetStdHandle(STD_OUTPUT_HANDLE, &_stdout) == 0) {
 		std::clog << "platform/debug: SetStdHandle failed for stdout. last error code=" << GetLastError() << std::endl;
 	}
-	std::errno_t retStdOut = freopen_s ((FILE**)stdout, "CONOUT$", "w", stdout);
-	
-	std::clog << "platform/debug: freopen_s for stdout error value=" << std::strerr(retStdOut) << std::endl;
-	std::errno_t retStdErr = freopen_s ((FILE**)stderr, "CONOUT$", "w", stderr);
-	std::clog << "platform/debug: freopen_s for stderr error value=" << std::strerr(retStdErr) << std::endl;
+	int retStdOut = freopen_s ((FILE**)stdout, "CONOUT$", "w", stdout);
+	std::clog << "platform/debug: freopen_s for stdout error value=" << std::strerror(retStdOut) << std::endl;
+	int retStdErr = freopen_s ((FILE**)stderr, "CONOUT$", "w", stderr);
+	std::clog << "platform/debug: freopen_s for stderr error value=" << std::strerror(retStdErr) << std::endl;
 	stderr_fd = fileno(stderr);
 }
 
