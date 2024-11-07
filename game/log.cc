@@ -142,7 +142,6 @@ struct StderrGrabber {
 #if (BOOST_OS_WINDOWS)
 // 	handle = fileno(stream->handle());
 	dup2(handle_fd, Platform::stderr_fd);
-	FreeConsole();
 #else
 	int handle = stream->handle();
 		dup2(handle, Platform::stderr_fd);  // Restore stderr (closes the pipe, terminating the thread)
