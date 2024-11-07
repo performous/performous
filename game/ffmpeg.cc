@@ -156,7 +156,6 @@ bool AudioBuffer::read(float* begin, std::int64_t samples, std::int64_t pos, flo
 }
 
 double AudioBuffer::duration() { return m_duration; }
-double AudioBuffer::replayGain() { return m_replaygain; }   // perceived loudness in dB
 
 AudioBuffer::AudioBuffer(fs::path const& file, unsigned rate, size_t size):
 	m_data(size), m_sps(rate * AUDIO_CHANNELS) {

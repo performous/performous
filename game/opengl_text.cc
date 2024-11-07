@@ -70,7 +70,7 @@ void OpenGLText::draw(Window& window, Dimensions &_dim, TexCoords &_tex) {
 }
 
 namespace {
-	void parseTheme(fs::path const& themeFile, TextStyle &_theme, float &_width, float &_height, float &_x, float &_y, SvgTxtTheme::Align& _align) {
+	void parseTheme(fs::path const& themeFile, TextStyle &_theme, float &_width, float &_height, float &_x, float &_y, SvgTxtTheme::Align& _align, SvgTxtTheme::PaintOrder _paintorder) {
 		xmlpp::Node::PrefixNsMap nsmap;
 		nsmap["svg"] = "http://www.w3.org/2000/svg";
 		xmlpp::DomParser dom(themeFile.string());
@@ -118,6 +118,14 @@ namespace {
 				else if (value == "middle") _align = SvgTxtTheme::Align::CENTER;
 				else if (value == "end") _align = SvgTxtTheme::Align::RIGHT;
 			}
+            else if (token == "paint-order") {
+				std::string value;
+				std::getline(iss2, value);
+                if (value.find("stroke") == 0) _paintorder = SvgTxtTheme::PaintOrder::STROKE_FIRST;
+                else if (value.find("fill") == 0) _paintorder = SvgTxtTheme::PaintOrder::FILL_FIRST;
+                else if (value.find("markers") == 0) _paintorder = SvgTxtTheme::PaintOrder::MARKERS_FIRST;
+                _theme.stroke_paintfirst = (_paintorder != SvgTxtTheme::PaintOrder::FILL_FIRST);  // Not handling marker-first yet (TODO)
+            }
 		}
 		// Parse x and y attributes
 		n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@x",nsmap);
@@ -133,8 +141,9 @@ namespace {
 
 SvgTxtThemeSimple::SvgTxtThemeSimple(fs::path const& themeFile, float factor) : m_factor(factor) {
 	SvgTxtTheme::Align a;
+	SvgTxtTheme::PaintOrder p{SvgTxtTheme::PaintOrder::STROKE_FIRST};
 	float tmp;
-	parseTheme(themeFile, m_text, tmp, tmp, tmp, tmp, a);
+	parseTheme(themeFile, m_text, tmp, tmp, tmp, tmp, a, p);
 }
 
 void SvgTxtThemeSimple::render(std::string const& text) {
@@ -152,14 +161,15 @@ void SvgTxtThemeSimple::draw(Window& window) {
 }
 
 SvgTxtTheme::SvgTxtTheme(fs::path const& themeFile, float factor): m_align(), m_factor(factor) {
-	parseTheme(themeFile, m_textstyle, m_width, m_height, m_x, m_y, m_align);
+	parseTheme(themeFile, m_textstyle, m_width, m_height, m_x, m_y, m_align, m_paintorder);
 	dimensions.stretch(0.0f, 0.0f).middle(-0.5f + m_x / m_width).center((m_y - 0.5f * m_height) / m_width);
 }
 
 void SvgTxtTheme::setHighlight(fs::path const& themeFile) {
 	float a,b,c,d;
 	Align e;
-	parseTheme(themeFile, m_textstyle_highlight, a, b, c, d, e);
+    PaintOrder f{SvgTxtTheme::PaintOrder::STROKE_FIRST};
+	parseTheme(themeFile, m_textstyle_highlight, a, b, c, d, e, f);
 }
 
 void SvgTxtTheme::draw(Window& window, std::string _text) {

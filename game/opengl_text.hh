@@ -49,6 +49,7 @@ struct TextStyle {
 	std::string fontalign; ///< alignment
 	std::string	stroke_linejoin; ///< stroke line-join type
 	std::string	stroke_linecap; ///< stroke line-join type
+    bool stroke_paintfirst; ///< paint the stroke, or the fill first
 };
 
 /// this class will enable to create a texture from a themed text structure
@@ -139,6 +140,8 @@ public:
 	/// TODO anchors
 	/// horizontal align
 	enum class Align { A_ASIS, LEFT, CENTER, RIGHT };
+    /// order of text-painting operations
+    enum class PaintOrder { FILL_FIRST, STROKE_FIRST, MARKERS_FIRST }; // No support for markers at the moment
 	/// dimensions, what else
 	Dimensions dimensions;
 
@@ -162,6 +165,7 @@ public:
 private:
 	std::vector<std::unique_ptr<OpenGLText>> m_opengl_text;
 	Align m_align;
+    PaintOrder m_paintorder{PaintOrder::FILL_FIRST}; // Fill, then Stroke is SVG default
 	float m_x;
 	float m_y;
 	float m_width;
