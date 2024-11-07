@@ -114,7 +114,11 @@ void Platform::initWindowsConsole() {
 // 	if (AllocConsole() == 0) {
 // 		SpdLogger::trace(LogSystem::LOGGER, "Failed to initialize console, error code={}", GetLastError());
 // 	}
-}
+	HANDLE _stdout;
+	HANDLE _stderr;
+	SetStdHandle(STD_ERROR_HANDLE, &_stderr);
+	SetStdHandle(STD_OUTPUT_HANDLE, &_stdout);
+	}
 	freopen_s ((FILE**)stdout, "CONOUT$", "w", stdout); 
 	freopen_s ((FILE**)stderr, "CONOUT$", "w", stderr); 
 	stderr_fd = fileno(stderr);
