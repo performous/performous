@@ -111,12 +111,12 @@ int Platform::defaultBackEnd() {
 int Platform::stderr_fd;
 
 void Platform::initWindowsConsole() {
+	Logger logger("trace");
 	if (AttachConsole(ATTACH_PARENT_PROCESS) == 0) {
 // 		SpdLogger::trace(LogSystem::LOGGER, "Failed to attach to console, error code={}, will try to create a new console.", GetLastError());
 // 	if (AllocConsole() == 0) {
 // 		SpdLogger::trace(LogSystem::LOGGER, "Failed to initialize console, error code={}", GetLastError());
 // 	}
-	Logger logger("trace");
 		HANDLE _stdout;
 		HANDLE _stderr;
 		if (SetStdHandle(STD_ERROR_HANDLE, &_stderr) == 0) {
