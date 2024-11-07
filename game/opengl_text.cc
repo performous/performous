@@ -124,7 +124,7 @@ namespace {
 				if (value.find("stroke") == 0) _paintorder = SvgTxtTheme::PaintOrder::STROKE_FIRST;
 				else if (value.find("fill") == 0) _paintorder = SvgTxtTheme::PaintOrder::FILL_FIRST;
 				else if (value.find("markers") == 0) _paintorder = SvgTxtTheme::PaintOrder::MARKERS_FIRST;
-				_theme.stroke_paintfirst = (_paintorder != SvgTxtTheme::PaintOrder::FILL_FIRST);  // Not handling marker-first yet (TODO)
+				_theme.stroke_paintfirst = (_paintorder != SvgTxtTheme::PaintOrder::FILL_FIRST);  // Not handling marker-first
 			}
 		}
 		// Parse x and y attributes
