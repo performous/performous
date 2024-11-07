@@ -35,6 +35,10 @@
 #include <thread>
 #include <vector>
 
+#if (BOOST_OS_WINDOWS)
+#include <wincon.h>
+#endif
+
 // Disable main level exception handling for debug builds (because gdb cannot properly catch throwing otherwise)
 #define RUNTIME_ERROR std::runtime_error
 #define EXCEPTION std::exception
@@ -363,10 +367,15 @@ int main(int argc, char** argv) try {
 	}
 	// Run the game init and main loop
 	mainLoop(songlist);
-
+	#if (BOOST_OS_WINDOWS)
+	FreeConsole();
+	#endif
 	return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
 } catch (EXCEPTION& e) {
 	fatalError(e.what());
+	#if (BOOST_OS_WINDOWS)
+	FreeConsole();
+	#endif
 	return EXIT_FAILURE;
 }
 
