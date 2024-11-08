@@ -117,20 +117,27 @@ void Platform::initWindowsConsole() {
 // 	if (AllocConsole() == 0) {
 // 		SpdLogger::trace(LogSystem::LOGGER, "Failed to initialize console, error code={}", GetLastError());
 // 	}
+		std::clog << "log/warning: Failed to attach to console, error code=" << GetLastError() << std::endl;
 		HANDLE _stdout;
 		HANDLE _stderr;
 		if (SetStdHandle(STD_ERROR_HANDLE, &_stderr) == 0) {
-			std::clog << "platform/warn: SetStdHandle failed for stderr. last error code=" << GetLastError() << std::endl;
+			std::clog << "platform/warning: SetStdHandle failed for stderr. last error code=" << GetLastError() << std::endl;
+		}
+		else {
+			std::clog << "platform/warning: SetStdHandle succeeded for stderr? fileno(stderr)=" << fileno(stderr) << ", fileno(_stderr)=" << fileno(_stderr) << std::endl;
 		}
 		if (SetStdHandle(STD_OUTPUT_HANDLE, &_stdout) == 0) {
-			std::clog << "platform/warn: SetStdHandle failed for stdout. last error code=" << GetLastError() << std::endl;
+			std::clog << "platform/warning: SetStdHandle failed for stdout. last error code=" << GetLastError() << std::endl;
+		}
+		else {
+			std::clog << "platform/warning: SetStdHandle succeeded for stdou? fileno(stdout)=" << fileno(stdout) << ", fileno(_stdout)=" << fileno(_stdout) << std::endl;
 		}
 	}
 	else {
 		int retStdOut = freopen_s ((FILE**)stdout, "CONOUT$", "w", stdout);
-		std::clog << "platform/warn: freopen_s for stdout error value=" << std::strerror(retStdOut) << std::endl;
+		std::clog << "platform/warning: freopen_s for stdout error value=" << std::strerror(retStdOut) << std::endl;
 		int retStdErr = freopen_s ((FILE**)stderr, "CONOUT$", "w", stderr);
-		std::clog << "platform/warn: freopen_s for stderr error value=" << std::strerror(retStdErr) << std::endl;	
+		std::clog << "platform/warning: freopen_s for stderr error value=" << std::strerror(retStdErr) << std::endl;	
 	}
 	stderr_fd = fileno(stderr);
 }
