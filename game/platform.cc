@@ -117,19 +117,38 @@ void Platform::initWindowsConsole() {
 // 	if (AllocConsole() == 0) {
 // 		SpdLogger::trace(LogSystem::LOGGER, "Failed to initialize console, error code={}", GetLastError());
 // 	}
+		std::clog << "log/warning: Failed to attach to console, error code=" << GetLastError() << std::endl;
 		HANDLE _stdout;
 		HANDLE _stderr;
-		if (SetStdHandle(STD_ERROR_HANDLE, &_stderr) == 0) {
-			std::clog << "platform/warn: SetStdHandle failed for stderr. last error code=" << GetLastError() << std::endl;
+		if (fileno(stdout) == -2 || fileno(stderr) == -2) {
+			_stdout = CreateFile("CONOUT$", GENERIC_READ|GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+			_stderr = CreateFile("CONOUT$", GENERIC_READ|GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);			
+			if (SetStdHandle(STD_ERROR_HANDLE, _stderr) == 0) {
+				std::clog << "platform/warning: SetStdHandle failed for stderr. last error code=" << GetLastError() << std::endl;
+			}
+			else {
+				std::clog << "platform/warning: SetStdHandle succeeded for stderr? fileno(stderr)=" << fileno(stderr) << std::endl;
+				HANDLE errHandle = GetStdHandle(STD_ERROR_HANDLE);
+				if (errHandle == INVALID_HANDLE_VALUE || errHandle == NULL) {
+					std::clog << "platform/warning: GetStdHandle failed for stderr" << std::endl;
+				}
+			}
+			if (SetStdHandle(STD_OUTPUT_HANDLE, _stdout) == 0) {
+				std::clog << "platform/warning: SetStdHandle failed for stdout. last error code=" << GetLastError() << std::endl;
+			}
+			else {
+				std::clog << "platform/warning: SetStdHandle succeeded for stdou? fileno(stdout)=" << fileno(stdout) << std::endl;
+				HANDLE outHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+				if (outHandle == INVALID_HANDLE_VALUE || outHandle == NULL) {
+					std::clog << "platform/warning: GetStdHandle failed for stdour" << std::endl;
+				}
+
+			}
 		}
-		if (SetStdHandle(STD_OUTPUT_HANDLE, &_stdout) == 0) {
-			std::clog << "platform/warn: SetStdHandle failed for stdout. last error code=" << GetLastError() << std::endl;
-		}
-	}
 	int retStdOut = freopen_s ((FILE**)stdout, "CONOUT$", "w", stdout);
-	std::clog << "platform/warn: freopen_s for stdout error value=" << std::strerror(retStdOut) << std::endl;
+	std::clog << "platform/warning: freopen_s for stdout error value=" << std::strerror(retStdOut) << std::endl;
 	int retStdErr = freopen_s ((FILE**)stderr, "CONOUT$", "w", stderr);
-	std::clog << "platform/warn: freopen_s for stderr error value=" << std::strerror(retStdErr) << std::endl;
+	std::clog << "platform/warning: freopen_s for stderr error value=" << std::strerror(retStdErr) << std::endl;	
 	stderr_fd = fileno(stderr);
 }
 
