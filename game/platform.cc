@@ -124,13 +124,13 @@ void Platform::initWindowsConsole() {
 			std::clog << "platform/warning: SetStdHandle failed for stderr. last error code=" << GetLastError() << std::endl;
 		}
 		else {
-			std::clog << "platform/warning: SetStdHandle succeeded for stderr? fileno(stderr)=" << fileno(stderr) << ", fileno(_stderr)=" << fileno(_stderr) << std::endl;
+			std::clog << "platform/warning: SetStdHandle succeeded for stderr? fileno(stderr)=" << fileno(stderr) << std::endl;
 		}
 		if (SetStdHandle(STD_OUTPUT_HANDLE, &_stdout) == 0) {
 			std::clog << "platform/warning: SetStdHandle failed for stdout. last error code=" << GetLastError() << std::endl;
 		}
 		else {
-			std::clog << "platform/warning: SetStdHandle succeeded for stdou? fileno(stdout)=" << fileno(stdout) << ", fileno(_stdout)=" << fileno(_stdout) << std::endl;
+			std::clog << "platform/warning: SetStdHandle succeeded for stdou? fileno(stdout)=" << fileno(stdout) << std::endl;
 		}
 	}
 	else {
