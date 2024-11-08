@@ -126,10 +126,12 @@ void Platform::initWindowsConsole() {
 			std::clog << "platform/warn: SetStdHandle failed for stdout. last error code=" << GetLastError() << std::endl;
 		}
 	}
-	int retStdOut = freopen_s ((FILE**)stdout, "CONOUT$", "w", stdout);
-	std::clog << "platform/warn: freopen_s for stdout error value=" << std::strerror(retStdOut) << std::endl;
-	int retStdErr = freopen_s ((FILE**)stderr, "CONOUT$", "w", stderr);
-	std::clog << "platform/warn: freopen_s for stderr error value=" << std::strerror(retStdErr) << std::endl;
+	else {
+		int retStdOut = freopen_s ((FILE**)stdout, "CONOUT$", "w", stdout);
+		std::clog << "platform/warn: freopen_s for stdout error value=" << std::strerror(retStdOut) << std::endl;
+		int retStdErr = freopen_s ((FILE**)stderr, "CONOUT$", "w", stderr);
+		std::clog << "platform/warn: freopen_s for stderr error value=" << std::strerror(retStdErr) << std::endl;	
+	}
 	stderr_fd = fileno(stderr);
 }
 
