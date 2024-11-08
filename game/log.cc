@@ -110,7 +110,7 @@ struct StderrGrabber {
 // 	}
 // 	stderr_handle = _open_osfhandle((intptr_t)stderrHandle, _O_TEXT);
 	handle_fd = dup(Platform::stderr_fd);
-	std::clog << "log/warn: stderr fileno=" << Platform::stderr_fd << ", stdout fileno=" << fileno(stdout) << ", handle_fd=" << handle_fd << std::endl;
+	std::clog << "log/warning: stderr fileno=" << Platform::stderr_fd << ", stdout fileno=" << fileno(stdout) << ", handle_fd=" << handle_fd << std::endl;
  	SpdLogger::trace(LogSystem::LOGGER, "stderr fileno={}, stdout fileno={}, handle_fd={}", Platform::stderr_fd, fileno(stdout), handle_fd);
 	stream.open((HANDLE)_get_osfhandle(handle_fd), boost::iostreams::close_handle);
 #else
