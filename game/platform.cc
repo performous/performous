@@ -119,11 +119,11 @@ void Platform::initWindowsConsole() {
 // 	}
 		std::clog << "log/warning: Failed to attach to console, error code=" << GetLastError() << std::endl;
 		FILE* _stdout, _stderr;
-		int ret = freopen_s(&_stdout, "NUL", "w", stdout);
+		int ret = freopen_s(_stdout, "NUL", "w", stdout);
 		if (ret != 0) {
 			std::clog << "platform/warning: freopen_s for stdout error value=" << std::strerror(ret) << std::endl;
 		}
-		ret = freopen_s(&_stderr, "NUL", "w", stderr);
+		ret = freopen_s(_stderr, "NUL", "w", stderr);
 		if (ret != 0) {
 			std::clog << "platform/warning: freopen_s for stderr error value=" << std::strerror(ret) << std::endl;
 		}
