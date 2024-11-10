@@ -9,7 +9,14 @@
 #include <exception>
 #include <string>
 
-#if (BOOST_OS_MACOS)
+#if (BOOST_OS_WINDOWS)
+#include <errhandlingapi.h>
+#include <fcntl.h>
+#include <IntSafe.h>
+#include <ProcessEnv.h>
+#include <wincon.h>
+
+#elif (BOOST_OS_MACOS)
 #include <CoreFoundation/CoreFoundation.h>
 
 char * CFStringCopyUTF8String(CFStringRef aString) {
@@ -45,8 +52,8 @@ std::uint16_t Platform::shortcutModifier(bool eitherSide) {
 	else { return eitherSide ? KMOD_CTRL : KMOD_LCTRL; }
 }
 
-void Platform::setupPlatform() {
-#if (BOOST_OS_WINDOWS)
+Platform::Platform() {
+#if (BOOST_OS_WINDOWS) 
 	// set the locale to UTF-8 on windows
 	_putenv_s("FONTCONFIG_PATH",".\\");
 	setlocale(LC_ALL, ".UTF8");
@@ -86,7 +93,11 @@ void Platform::setupPlatform() {
 #endif
 }
 
-const std::array<const char*,6> Platform::platformNames = {{ "Windows", "Linux", "MacOS", "BSD", "Solaris", "Unix" }}; // Relevant for debug only.
+Platform::~Platform() {
+#if (BOOST_OS_WINDOWS)
+	FreeConsole();
+#endif
+}
 
 int Platform::defaultBackEnd() {
 		switch (Platform::currentOS()) {
@@ -102,50 +113,22 @@ int Platform::defaultBackEnd() {
 }
 
 #if (BOOST_OS_WINDOWS)
-#include <errhandlingapi.h>
-#include <fcntl.h>
-#include <ProcessEnv.h>
-#include <wincon.h>
-
 int Platform::stderr_fd;
-FILE* Platform::stdErrStream;
 
 void Platform::initWindowsConsole() {
 	if (AttachConsole(ATTACH_PARENT_PROCESS) == 0 || fileno(stdout) == -2 || fileno(stderr) == -2) {
-// 		SpdLogger::trace(LogSystem::LOGGER, "Failed to attach to console, error code={}, will try to create a new console.", GetLastError());
-// 	if (AllocConsole() == 0) {
-// 		SpdLogger::trace(LogSystem::LOGGER, "Failed to initialize console, error code={}", GetLastError());
-// 	}
-		std::clog << "log/warning: Failed to attach to console, error code=" << GetLastError() << std::endl;
-		int ret;
-// 		ret = freopen_s(&stdOutStream, "NUL", "w", stdout);
-// 		if (ret != 0) {
-// 			std::clog << "platform/warning: freopen_s for stdout error value=" << std::strerror(ret) << std::endl;
-// 		}
-// 		else {
-// 			std::clog << "platform/warning: freopen_s for stdout returned 0." << std::endl;
-// 		}
-		ret = freopen_s(&stdErrStream, "NUL", "w", stderr);
-		if (ret != 0) {
-			std::clog << "platform/warning: freopen_s for stderr error value=" << std::strerror(ret) << std::endl;
-		}
-		else {
-			std::clog << "platform/warning: freopen_s for stderr returned 0." << std::endl;
-		}
+		auto ptr = stdErrStream.get();
+		freopen_s(&ptr, "NUL", "w", stderr);
 	}
 	else {
-		int ret = freopen_s ((FILE**)stdout, "CONOUT$", "w", stdout);
-		std::clog << "platform/warning: freopen_s for stdout error value=" << std::strerror(ret) << std::endl;
-		ret = freopen_s ((FILE**)stderr, "CONOUT$", "w", stderr);
-		std::clog << "platform/warning: freopen_s for stderr error value=" << std::strerror(ret) << std::endl;
+		freopen_s ((FILE**)stdout, "CONOUT$", "w", stdout);
+		freopen_s ((FILE**)stderr, "CONOUT$", "w", stderr);
 	}
 	stderr_fd = fileno(stderr);
-	std::clog << "platform/warning: stderr_fd=" << stderr_fd << ", stdout fd=" << fileno(stdout) << std::endl;
 }
 
 extern "C" {
 // For DWORD (see end of file)
-#include <IntSafe.h>
 // Force high-performance graphics on dual-GPU systems
 	// http://developer.download.nvidia.com/devzone/devcenter/gamegraphics/files/OptimusRenderingPolicies.pdf
 	__declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
