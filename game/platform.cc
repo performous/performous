@@ -105,7 +105,6 @@ int Platform::defaultBackEnd() {
 #include <errhandlingapi.h>
 #include <fcntl.h>
 #include <ProcessEnv.h>
-#include <cstdio>
 #include <wincon.h>
 
 int Platform::stderr_fd;
@@ -117,15 +116,14 @@ void Platform::initWindowsConsole() {
 // 		SpdLogger::trace(LogSystem::LOGGER, "Failed to initialize console, error code={}", GetLastError());
 // 	}
 		std::clog << "log/warning: Failed to attach to console, error code=" << GetLastError() << std::endl;
-		FILE* stdOutStream;
-		FILE* stdErrStream;
-		int ret = freopen_s(&stdOutStream, "NUL", "w", stdout);
-		if (ret != 0) {
-			std::clog << "platform/warning: freopen_s for stdout error value=" << std::strerror(ret) << std::endl;
-		}
-		else {
-			std::clog << "platform/warning: freopen_s for stdout returned 0." << std::endl;
-		}
+		int ret;
+// 		ret = freopen_s(&stdOutStream, "NUL", "w", stdout);
+// 		if (ret != 0) {
+// 			std::clog << "platform/warning: freopen_s for stdout error value=" << std::strerror(ret) << std::endl;
+// 		}
+// 		else {
+// 			std::clog << "platform/warning: freopen_s for stdout returned 0." << std::endl;
+// 		}
 		ret = freopen_s(&stdErrStream, "NUL", "w", stderr);
 		if (ret != 0) {
 			std::clog << "platform/warning: freopen_s for stderr error value=" << std::strerror(ret) << std::endl;
@@ -133,7 +131,6 @@ void Platform::initWindowsConsole() {
 		else {
 			std::clog << "platform/warning: freopen_s for stderr returned 0." << std::endl;
 		}
-
 	}
 	else {
 		int ret = freopen_s ((FILE**)stdout, "CONOUT$", "w", stdout);
