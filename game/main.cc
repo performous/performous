@@ -35,10 +35,6 @@
 #include <thread>
 #include <vector>
 
-#if (BOOST_OS_WINDOWS)
-#include <wincon.h>
-#endif
-
 // Disable main level exception handling for debug builds (because gdb cannot properly catch throwing otherwise)
 #define RUNTIME_ERROR std::runtime_error
 #define EXCEPTION std::exception
@@ -271,7 +267,8 @@ static void fatalError(const std::string &msg) {
 
 int main(int argc, char** argv) try {
 	Logger logger("trace");
-	Platform::setupPlatform();
+	Platform platform;
+	SpdLogger spdLogger(spdlog::level::debug);
 	std::srand(static_cast<unsigned>(std::time(nullptr)));
 	// Parse commandline options
 	std::vector<std::string> devices;
@@ -326,7 +323,6 @@ int main(int argc, char** argv) try {
 		return EXIT_SUCCESS;
 	}
 
-	SpdLogger spdLogger(spdlog::level::debug);
 	spdLogger.notice(LogSystem::LOGGER, "Testing whether spdlog works? {}", true);
 	spdLogger.notice(LogSystem::LOGGER, "And does it work without a parameter?");
 	spdLogger.notice(LogSystem::SONGS, "And does it work without a parameter?");
@@ -367,15 +363,9 @@ int main(int argc, char** argv) try {
 	}
 	// Run the game init and main loop
 	mainLoop(songlist);
-	#if (BOOST_OS_WINDOWS)
-	FreeConsole();
-	#endif
 	return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
 } catch (EXCEPTION& e) {
 	fatalError(e.what());
-	#if (BOOST_OS_WINDOWS)
-	FreeConsole();
-	#endif
 	return EXIT_FAILURE;
 }
 
