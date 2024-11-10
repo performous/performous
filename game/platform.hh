@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdint>
 #include <iostream>
+#include <memory>
 
 #include <boost/predef/os.h>
 #include <SDL_events.h>
@@ -22,22 +23,24 @@ using STAT = struct stat;
 
 struct Platform {
 	Platform();
+	~Platform();
 
 	enum class HostOS { OS_WIN, OS_LINUX, OS_MAC, OS_BSD, OS_SOLARIS, OS_UNIX };
 
 	static HostOS currentOS();
 	static std::uint16_t shortcutModifier(bool eitherSide = true);
 	static int defaultBackEnd();
-	static void setupPlatform();
 	
-#if (!BOOST_OS_WINDOWS)
-	static constexpr int stderr_fd = STDERR_FILENO;
-#else
+#if (BOOST_OS_WINDOWS)
 	static int stderr_fd;
-	static FILE* stdErrStream;
+  private:
+	std::unique_ptr<FILE, decltype(&fclose)> stdErrStream{nullptr, fclose};
+#else
+	static constexpr int stderr_fd = STDERR_FILENO;
 #endif
 
   private:
-	static const std::array<const char*,6> platformNames;
-	static void initWindowsConsole();
+#if (BOOST_OS_WINDOWS)
+	void initWindowsConsole();
+#endif
 };
