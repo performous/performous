@@ -268,6 +268,7 @@ static void fatalError(const std::string &msg) {
 }
 
 int main(int argc, char** argv) try {
+	Logger logger("trace");
 	Platform::setupPlatform();
 	std::srand(static_cast<unsigned>(std::time(nullptr)));
 	// Parse commandline options
@@ -323,7 +324,6 @@ int main(int argc, char** argv) try {
 		return EXIT_SUCCESS;
 	}
 
-// 	Logger logger(loglevel);
 	SpdLogger spdLogger(spdlog::level::debug);
 	spdLogger.notice(LogSystem::LOGGER, "Testing whether spdlog works? {}", true);
 	spdLogger.notice(LogSystem::LOGGER, "And does it work without a parameter?");

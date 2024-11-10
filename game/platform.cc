@@ -111,7 +111,6 @@ int Platform::defaultBackEnd() {
 int Platform::stderr_fd;
 
 void Platform::initWindowsConsole() {
-	Logger logger("trace");
 	if (AttachConsole(ATTACH_PARENT_PROCESS) == 0 || fileno(stdout) == -2 || fileno(stderr) == -2) {
 // 		SpdLogger::trace(LogSystem::LOGGER, "Failed to attach to console, error code={}, will try to create a new console.", GetLastError());
 // 	if (AllocConsole() == 0) {
