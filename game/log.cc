@@ -350,6 +350,7 @@ SpdLogger::~SpdLogger() {
 	notice(LogSystem::LOGGER, "More details might be available in {}", getLogFilename_new().u8string());
 	grabber.reset();
 	spdlog::shutdown();
+	fclose(Platform::stdErrStream);
 }
 
 const loggerPtr SpdLogger::getLogger(LogSystem loggerName) {

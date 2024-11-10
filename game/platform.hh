@@ -8,6 +8,7 @@
 #include <SDL_events.h>
 
 #if (BOOST_OS_WINDOWS) 
+#include <cstdio>
 #include <sys/types.h>
 #include <sys/stat.h>
 #define _STAT(x, y) _stat(x, y)
@@ -33,6 +34,7 @@ struct Platform {
 	static constexpr int stderr_fd = STDERR_FILENO;
 #else
 	static int stderr_fd;
+	static FILE* stdErrStream;
 #endif
 
   private:
