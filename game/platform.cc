@@ -108,6 +108,7 @@ int Platform::defaultBackEnd() {
 #include <wincon.h>
 
 int Platform::stderr_fd;
+FILE* Platform::stdErrStream;
 
 void Platform::initWindowsConsole() {
 	if (AttachConsole(ATTACH_PARENT_PROCESS) == 0 || fileno(stdout) == -2 || fileno(stderr) == -2) {

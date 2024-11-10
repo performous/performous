@@ -34,7 +34,7 @@ struct Platform {
 	static constexpr int stderr_fd = STDERR_FILENO;
 #else
 	static int stderr_fd;
-	FILE* stdErrStream;
+	static FILE* stdErrStream;
 #endif
 
   private:
