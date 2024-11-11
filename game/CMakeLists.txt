@@ -115,6 +115,7 @@ set(SELF_BUILT_AUBIO "AUTO" CACHE STRING "rule to allow self build of Aubio depe
 set(SELF_BUILT_JSON "AUTO" CACHE STRING "rule to allow self build of Json dependency library [NEVER|AUTO*|ALWAYS]")
 # This is AUTO cause CED is not available on ubuntu
 set(SELF_BUILT_CED "AUTO" CACHE STRING "rule to allow self build of Ced dependency library [NEVER|AUTO*|ALWAYS]")
+set(SELF_BUILT_SPDLOG "AUTO" CACHE STRING "rule to allow self build of Spdlog dependency library [NEVER|AUTO*|ALWAYS]")
 
 set(Aubio_REQUIRED_VERSION "0.4.9")
 
@@ -137,10 +138,7 @@ if(fmt_VERSION VERSION_GREATER_EQUAL 9.0.0)
 	target_compile_definitions(performous PRIVATE -D_TURN_OFF_PLATFORM_STRING)
 endif()
 
-
-set(CMAKE_FIND_DEBUG_MODE TRUE)
-find_package(spdlog REQUIRED PATHS /usr/lib PATH_SUFFIXES ${CMAKE_CXX_LIBRARY_ARCHITECTURE}/cmake/spdlog)
-set(CMAKE_FIND_DEBUG_MODE FALSE)
+find_package(Spdlog REQUIRED MODULE)
 
 target_compile_definitions(performous PUBLIC SPDLOG_FMT_EXTERNAL FMT_USE_CONSTEXPR)
 target_link_libraries(performous PRIVATE fmt::fmt spdlog::spdlog_header_only)
