@@ -80,7 +80,6 @@ fi
 
 
 ## Build with cmake
-ls -l /usr/lib/x86_64-linux-gnu/cmake/spdlog
 mkdir build
 cd build
 cmake ${EXTRA_CMAKE_ARGS} \

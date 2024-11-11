@@ -18,25 +18,21 @@ COPY platform_flags.sh ./platform_flags.sh
 ## Install the deps and create the build directory
 RUN <<EOR
 #!/bin/bash -x
-	if [[ "${OS_VERSION}" == "10" ]]; then
+	touch /etc/SHOULD_USE_BACKPORTS
+	if [[ "${OS_VERSION}" == "11" ]]; then
 		. ./platform_flags.sh
-		apt-get update
-		apt-get install -y wget gpg
-		wget -nc https://apt.kitware.com/keys/kitware-archive-latest.asc
-		apt-key add kitware-archive-latest.asc
-		echo 'deb https://apt.kitware.com/ubuntu/ bionic main' | tee /etc/apt/sources.list.d/kitware.list >/dev/null
-		echo 'deb http://deb.debian.org/debian buster-backports main' | tee /etc/apt/sources.list.d/backports.list
+		echo 'deb http://deb.debian.org/debian bullseye-backports main' | tee /etc/apt/sources.list.d/backports.list
 		export_platform_flags '-DSELF_BUILT_AUBIO=ALWAYS -DSELF_BUILT_CED=ALWAYS -DSELF_BUILT_JSON=ALWAYS'
-		apt-get -y update
-		apt-get -y install libfmt-dev/buster-backports
+		echo 'export USE_BACKPORTS="-t bullseye-backports"' | tee /etc/SHOULD_USE_BACKPORTS
 	fi
 EOR
 
 RUN <<EOR
 #!/bin/bash -x
-	apt-get update
-	apt-get install -y --no-install-recommends git cmake build-essential \
-		gettext help2man libopenblas-dev libfftw3-dev libicu-dev libepoxy-dev \
+	. /etc/SHOULD_USE_BACKPORTS
+	apt-get -y update
+	apt-get install -y ${USE_BACKPORTS} git cmake cmake-data build-essential \
+		gcc g++ gettext help2man libopenblas-dev libfftw3-dev libicu-dev libepoxy-dev \
 		libsdl2-dev libfreetype6-dev libpango1.0-dev librsvg2-dev libxml++2.6-dev \
 		libavcodec-dev libavformat-dev libswscale-dev libjpeg-dev \
 		portaudio19-dev libglm-dev libboost-filesystem-dev \
