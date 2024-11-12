@@ -23,10 +23,7 @@ function (libfetch_git_pkg PREFIX)
 			set(argname pkgfindpath)
 		elseif ("${i}" STREQUAL "REFERENCE")
 			set(argname pkgreference)
-		elseif ("${i}" STREQUAL "FIND_PACKAGE_ARGS")
-			set(argname pkgfindargs)
 		else ()
-			message("\${argname}: ${argname}, \${\${argname}}: ${${argname}}, i: ${i}")
 			set(${argname} ${${argname}} ${i})
 		endif()
 	endforeach()
@@ -50,7 +47,6 @@ function (libfetch_git_pkg PREFIX)
 		GIT_SHALLOW    TRUE
 		GIT_TAG        ${pkgreference}
 		SOURCE_DIR     ${pkgname}-src
-		FIND_PACKAGE_ARGS "${pkgfindargs}"
 	)
 
 	FetchContent_MakeAvailable(${pkgname})
