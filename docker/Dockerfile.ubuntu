@@ -10,13 +10,13 @@ ARG TZ="America/New_York"
 ENV PACKAGE_TYPE="DEB"
 
 ## Install the deps and create the build directory
+ADD https://apt.kitware.com/keys/kitware-archive-latest.asc ./key.asc
 RUN <<EOR
 #!/bin/bash -x
 	. /etc/os-release
 	if [[ "${VERSION_ID}" == "20.04" || "${VERSION_ID}" == "22.04" ]]; then
 		apt-get -y update
-		apt-get -y install ca-certificates wget gpg
-		wget -O ./key.asc https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null
+		apt-get -y install --no-install-recommends gnupg ca-certificates
 		gpg -v -o /usr/share/keyrings/kitware-archive-keyring.gpg --dearmor ./key.asc
 		if [[ "${VERSION_ID}" == "20.04" ]]; then
 			echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' | tee /etc/apt/sources.list.d/kitware.list >/dev/null
@@ -27,12 +27,8 @@ RUN <<EOR
 		fi
 		apt-get -y update
 		test -f /usr/share/doc/kitware-archive-keyring/copyright || rm /usr/share/keyrings/kitware-archive-keyring.gpg
-		apt-get install kitware-archive-keyring
+		apt-get install -y --no-install-recommends kitware-archive-keyring
 	fi
-EOR
-
-RUN <<EOR
-#!/bin/bash -x
 	apt-get -y update
 	apt-get install -y --no-install-recommends git cmake build-essential \
 		gettext help2man libopenblas-dev libfftw3-dev libicu-dev libepoxy-dev \
