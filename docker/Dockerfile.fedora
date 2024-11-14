@@ -21,8 +21,6 @@ RUN <<EOR
 		pango-devel glm-devel openblas-devel fftw-devel cpprest-devel \
 		aubio-devel json-devel rpm-build fmt-devel gtest-devel gmock-devel gtest spdlog-devel
 	dnf clean all
-#	dnf --showduplicates list gcc
-#	dnf --showduplicates list fmt-devel
 	if [[ "$(rpm -E %fedora)" == "39" ]]; then
 		dnf install -y clang
 		platform_flags="-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++"
