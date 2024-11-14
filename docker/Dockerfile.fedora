@@ -5,11 +5,13 @@ FROM docker.io/library/fedora:${OS_VERSION}
 
 ## Install the deps and create the working directory
 ## Enable the RPM Fusion Free Repo
-ENV PLATFORM_CMAKE_FLAGS="-DUSE_BOOST_REGEX=1"
 ENV PACKAGE_TYPE="RPM"
+
+COPY platform_flags.sh ./platform_flags.sh
 
 RUN <<EOR
 #!/bin/bash -x
+	. ./platform_flags.sh
 	dnf install -y \
 		https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm	
 #		https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
@@ -22,8 +24,10 @@ RUN <<EOR
 #	dnf --showduplicates list gcc
 #	dnf --showduplicates list fmt-devel
 	if [[ "$(rpm -E %fedora)" == "39" ]]; then
-		dnf install -y gcc-13.2.1-3.fc39
+		dnf install -y clang
+		platform_flags="-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++"
 	fi
+	export_platform_flags "${platform_flags}"
 	mkdir -p /root/performous
 EOR
 
