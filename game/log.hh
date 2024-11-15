@@ -61,34 +61,34 @@ class SpdLogger {
 	~SpdLogger();
 
 	template <typename... Args>
-	static void log(LogSystem subsystem, spdlog::level::level_enum level, Args &&...args) {
+	static void log(LogSystem::Values subsystem, spdlog::level::level_enum level, Args &&...args) {
 		auto logger = getLogger(subsystem);
 		logger->log(level, std::forward<Args>(args)...);
 	}
 
 	template <typename... Args>
-	static void error(LogSystem subsystem, Args &&...args) { log(subsystem, spdlog::level::critical, std::forward<Args>(args)...); }
+	static void error(LogSystem::Values subsystem, Args &&...args) { log(subsystem, spdlog::level::critical, std::forward<Args>(args)...); }
 	
 	template <typename... Args>
-	static void warn(LogSystem subsystem, Args &&...args) { log(subsystem, spdlog::level::err, std::forward<Args>(args)...); }
+	static void warn(LogSystem::Values subsystem, Args &&...args) { log(subsystem, spdlog::level::err, std::forward<Args>(args)...); }
 
 	template <typename... Args>
-	static void notice(LogSystem subsystem, Args &&...args) { log(subsystem, spdlog::level::warn, std::forward<Args>(args)...); }
+	static void notice(LogSystem::Values subsystem, Args &&...args) { log(subsystem, spdlog::level::warn, std::forward<Args>(args)...); }
 	
 	template <typename... Args>
-	static void info(LogSystem subsystem, Args &&...args) { log(subsystem, spdlog::level::info, std::forward<Args>(args)...); }
+	static void info(LogSystem::Values subsystem, Args &&...args) { log(subsystem, spdlog::level::info, std::forward<Args>(args)...); }
 
 	template <typename... Args>
-	static void debug(LogSystem subsystem, Args &&...args) { log(subsystem, spdlog::level::debug, std::forward<Args>(args)...); }
+	static void debug(LogSystem::Values subsystem, Args &&...args) { log(subsystem, spdlog::level::debug, std::forward<Args>(args)...); }
 	
 	template <typename... Args>
-	static void trace(LogSystem subsystem, Args &&...args) { log(subsystem, spdlog::level::trace, std::forward<Args>(args)...); }
+	static void trace(LogSystem::Values subsystem, Args &&...args) { log(subsystem, spdlog::level::trace, std::forward<Args>(args)...); }
 
 
   private:
 	inline static const std::string formatString{"[%T]:::%^%n / %l%$::: %v"};
 	static std::unordered_map<LogSystem, loggerPtr> builtLoggers;
-	static const loggerPtr getLogger(LogSystem);
+	static const loggerPtr getLogger(LogSystem::Values const& loggerName);
 	static std::shared_ptr<spdlog::sinks::dist_sink_mt> m_sink;
 	static std::shared_mutex m_LoggerRegistryMutex;
 	static loggerPtr m_defaultLogger;
