@@ -3,6 +3,8 @@
 #include <iterator>
 #include <string>
 
+class SpdLogger;
+
 class LogSystem {
   public:
 	enum Values : std::size_t {
@@ -41,7 +43,7 @@ class LogSystem {
 	using reference = LogSystem&;
 
 	LogSystem() : value(static_cast<Values>(0)) {}
-	LogSystem(Values value) : value(value) {}
+	LogSystem(Values val) : value(val) {}
 	LogSystem begin() const { return LogSystem(LogSystem::Values::AUDIO); }
 	LogSystem end() const { return LogSystem(LogSystem::Values::COUNT); }
 
@@ -58,7 +60,7 @@ class LogSystem {
 	LogSystem& operator++() {
 		if (value != Values::COUNT) {
 			// Increment until COUNT
-			value = static_cast<Values>(static_cast<int>(value) + 1);
+			value = static_cast<Values>(static_cast<std::size_t>(value) + 1);
 		}
 		return *this;
 	}
@@ -73,9 +75,9 @@ class LogSystem {
 	std::string toString() const {
 		return subsystemToString(value);
 	}
-	friend std::string subsystemToString(LogSystem::Values const& value) {
+	friend std::string subsystemToString(LogSystem::Values const& val) {
 		std::string subsystem_string("UNKNOWN");
-		switch(value) {
+		switch(val) {
 			case LogSystem::Values::AUDIO:
 				subsystem_string = "AUDIO";
 				break;
@@ -141,9 +143,8 @@ class LogSystem {
 		return subsystem_string;
 	}
 	friend std::hash<LogSystem>;
+	friend class SpdLogger;
 };
-
-// std::string subsystemToString(LogSystem::Values const& value) 
 
 template<>
 struct std::hash<LogSystem>
