@@ -16,7 +16,8 @@ RUN <<EOR
 	. /etc/os-release
 	if [[ "${VERSION_ID}" == "20.04" || "${VERSION_ID}" == "22.04" ]]; then
 		apt-get -y update
-		apt-get -y install --no-install-recommends ca-certificates gpg
+		apt-get -y install --no-install-recommends gnupg ca-certificates
+		apt-get -y update
 		gpg -v -o /usr/share/keyrings/kitware-archive-keyring.gpg --dearmor ./key.asc
 		if [[ "${VERSION_ID}" == "20.04" ]]; then
 			echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' | tee /etc/apt/sources.list.d/kitware.list >/dev/null
