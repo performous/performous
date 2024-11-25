@@ -98,7 +98,6 @@ static void checkEvents(Game& gm, Time eventTime) {
 void mainLoop(std::string const& songlist) {
 	Window window{};
 
-	Platform platform;
 	std::clog << "core/notice: Starting the audio subsystem (errors printed on console may be ignored)." << std::endl;
 	std::clog << "core/info: Loading assets." << std::endl;
 	TranslationEngine localization;
@@ -265,7 +264,9 @@ static void fatalError(const std::string &msg) {
 }
 
 int main(int argc, char** argv) try {
-	Platform::setupPlatform();
+	Logger logger("trace");
+	Platform platform;
+	SpdLogger spdLogger(spdlog::level::debug);
 	std::srand(static_cast<unsigned>(std::time(nullptr)));
 	// Parse commandline options
 	std::vector<std::string> devices;
@@ -320,8 +321,16 @@ int main(int argc, char** argv) try {
 		return EXIT_SUCCESS;
 	}
 
-	Logger logger(loglevel);
-
+	spdLogger.notice(LogSystem::LOGGER, "Testing whether spdlog works? {}", true);
+	spdLogger.notice(LogSystem::LOGGER, "And does it work without a parameter?");
+	spdLogger.notice(LogSystem::SONGS, "And does it work without a parameter?");
+	spdLogger.notice(LogSystem::AUDIO, "And does it work without a parameter?");
+	spdLogger.notice(LogSystem::CACHE, "And does it work without a parameter?");
+	spdLogger.notice(LogSystem::GAME, "And does it work without a parameter?");
+	spdLogger.notice(LogSystem::SONGPARSER, "And does it work without a parameter?");
+	spdLogger.notice(LogSystem::TEXT, "And does it work without a parameter?");
+	spdLogger.notice(LogSystem::WEBCAM, "And does it work without a parameter?");
+	std::fputs("Testing printing to stderr\n", stderr);
 	outputOptionalFeatureStatus();
 
 	readConfig();
@@ -352,7 +361,6 @@ int main(int argc, char** argv) try {
 	}
 	// Run the game init and main loop
 	mainLoop(songlist);
-
 	return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
 } catch (EXCEPTION& e) {
 	fatalError(e.what());

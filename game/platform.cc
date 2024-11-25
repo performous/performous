@@ -1,11 +1,22 @@
 #include "platform.hh"
-#include "fs.hh"
 
+#include "fs.hh"
+#include "log.hh"
+
+#include <cerrno>
 #include <cstdlib>
+#include <cstring>
 #include <exception>
 #include <string>
 
-#if (BOOST_OS_MACOS)
+#if (BOOST_OS_WINDOWS)
+#include <errhandlingapi.h>
+#include <fcntl.h>
+#include <IntSafe.h>
+#include <ProcessEnv.h>
+#include <wincon.h>
+
+#elif (BOOST_OS_MACOS)
 #include <CoreFoundation/CoreFoundation.h>
 
 char * CFStringCopyUTF8String(CFStringRef aString) {
@@ -42,15 +53,11 @@ std::uint16_t Platform::shortcutModifier(bool eitherSide) {
 }
 
 Platform::Platform() {
-	#if (BOOST_OS_WINDOWS)
-	_putenv_s("FONTCONFIG_PATH",".\\");
-	#endif
-}
-
-void Platform::setupPlatform() {
-#if (BOOST_OS_WINDOWS)
+#if (BOOST_OS_WINDOWS) 
 	// set the locale to UTF-8 on windows
+	_putenv_s("FONTCONFIG_PATH",".\\");
 	setlocale(LC_ALL, ".UTF8");
+	initWindowsConsole();
 #elif (BOOST_OS_MACOS)
 	CFURLRef resDirURL = CFBundleCopyResourcesDirectoryURL(CFBundleGetMainBundle());
 	CFStringRef resDir = CFURLCopyPath(CFURLCopyAbsoluteURL(resDirURL));
@@ -86,7 +93,11 @@ void Platform::setupPlatform() {
 #endif
 }
 
-const std::array<const char*,6> Platform::platformNames = {{ "Windows", "Linux", "MacOS", "BSD", "Solaris", "Unix" }}; // Relevant for debug only.
+Platform::~Platform() {
+#if (BOOST_OS_WINDOWS)
+	FreeConsole();
+#endif
+}
 
 int Platform::defaultBackEnd() {
 		switch (Platform::currentOS()) {
@@ -102,9 +113,22 @@ int Platform::defaultBackEnd() {
 }
 
 #if (BOOST_OS_WINDOWS)
+int Platform::stderr_fd;
+
+void Platform::initWindowsConsole() {
+	if (AttachConsole(ATTACH_PARENT_PROCESS) == 0 || fileno(stdout) == -2 || fileno(stderr) == -2) {
+		auto ptr = stdErrStream.get();
+		freopen_s(&ptr, "NUL", "w", stderr);
+	}
+	else {
+		freopen_s ((FILE**)stdout, "CONOUT$", "w", stdout);
+		freopen_s ((FILE**)stderr, "CONOUT$", "w", stderr);
+	}
+	stderr_fd = fileno(stderr);
+}
+
 extern "C" {
 // For DWORD (see end of file)
-#include "windows.h"
 // Force high-performance graphics on dual-GPU systems
 	// http://developer.download.nvidia.com/devzone/devcenter/gamegraphics/files/OptimusRenderingPolicies.pdf
 	__declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
