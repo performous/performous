@@ -28,4 +28,5 @@ For compiling instructions visit the wiki page: https://github.com/performous/pe
 - [Linux - Fedora 38](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-fedora_38.rpm.zip)
 - [Linux - Fedora 39](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-fedora_39.rpm.zip)
 - [Linux - Fedora 40](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-fedora_40.rpm.zip)
+- [Linux - Fedora 41](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-fedora_41.rpm.zip)
 - [Linux - AppImage](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest.AppImage.zip)
