@@ -18,7 +18,7 @@ class Backgrounds {
 	}
 	~Backgrounds() {
 		m_loading = false; // Terminate loading if currently in progress
-		m_thread->join();
+		if (m_thread && m_thread->joinable()) m_thread->join();
 	}
 	/// reloads backgrounds list
 	void reload();
