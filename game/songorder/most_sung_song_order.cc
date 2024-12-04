@@ -6,26 +6,40 @@ std::string MostSungSongOrder::getDescription() const {
 	return _("sort by most sung");
 }
 
-void MostSungSongOrder::prepare(SongCollection const& songs, Database const& database) {
-	auto begin = songs.begin();
-	auto end = songs.end();
+void MostSungSongOrder::initialize(SongCollection const& songs, Database const& database) {
+	if (initialized)
+		return;
 
-	std::for_each(begin, end, [&](SongPtr const& song) {
+	std::for_each(songs.begin(), songs.end(), [&](SongPtr const& song) {
 		try {
-			m_rateMap[song.get()] = database.getHiscores(song).size();
+			m_rateMap[song.get()] = database.getAllHiscoresCount(song);
 		}
-		catch(std::exception const&) {
+		catch (std::exception const&) {
 			m_rateMap[song.get()] = 0;
 		}
 	});
+
+	initialized = true;
+}
+
+void MostSungSongOrder::update(SongPtr const& song, Database const& database) {
+	if (!initialized)
+		return;
+
+	try {
+		m_rateMap[song.get()] = database.getAllHiscoresCount(song);
+	}
+	catch (std::exception const&) {
+		m_rateMap[song.get()] = 0;
+	}
 }
 
 bool MostSungSongOrder::operator()(const Song& a, const Song& b) const {
+	if (!initialized)
+		return false;
+
 	auto const rateA = m_rateMap.find(&a)->second;
 	auto const rateB = m_rateMap.find(&b)->second;
 
 	return rateA > rateB;
 }
-
-
-

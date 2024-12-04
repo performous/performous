@@ -17,16 +17,24 @@ std::string FileTimeSongOrder::getDescription() const {
 	return _("sort by file time");
 }
 
-void FileTimeSongOrder::prepare(SongCollection const& songs, Database const&) {
+void FileTimeSongOrder::initialize(SongCollection const& songs, Database const&) {
+	if (initialized)
+		return;
+
 	auto begin = songs.begin();
 	auto end = songs.end();
 
 	std::for_each(begin, end, [&](SongPtr const& song) {
 		m_dateMap[song.get()] = getFileWriteTime(*song);
 	});
+
+	initialized = true;
 }
 
 bool FileTimeSongOrder::operator()(const Song& a, const Song& b) const {
+	if (!initialized)
+		return false;
+
 	auto const dateA = m_dateMap.find(&a)->second;
 	auto const dateB = m_dateMap.find(&b)->second;
 

@@ -6,7 +6,6 @@
 #include "notes.hh"
 #include "util.hh"
 
-#include <cstdint>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -34,10 +33,13 @@ namespace TrackName {
 
 class ScreenSing;
 
+using SongId = unsigned;
+
 /// Song object contains all information about a song (headers, notes)
 class Song {
 	friend class SongParser;
 public:
+	std::optional<SongId> id = std::nullopt;
 	/// Is the song parsed from the file yet?
 	enum class LoadStatus { NONE = 0, HEADER = 1, FULL = 2, ERROR = -1 } loadStatus = LoadStatus::NONE;
 	/// status of song

@@ -15,37 +15,37 @@ extern "C" {
 }
 
 Song::Song(nlohmann::json const& song) : dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()) {
-    path = getJsonEntry<std::string>(song, "txtFileFolder").value_or("");
-    filename = getJsonEntry<std::string>(song, "txtFile").value_or("");
-    artist = getJsonEntry<std::string>(song, "artist").value_or("");
-    title = getJsonEntry<std::string>(song, "title").value_or("");
-    language = getJsonEntry<std::string>(song, "language").value_or("");
-    edition = getJsonEntry<std::string>(song, "edition").value_or("");
-    creator = getJsonEntry<std::string>(song, "creator").value_or("");
-    genre = getJsonEntry<std::string>(song, "genre").value_or("");
-    cover = getJsonEntry<std::string>(song, "cover").value_or("");
-    background = getJsonEntry<std::string>(song, "background").value_or("");
-    video = getJsonEntry<std::string>(song, "videoFile").value_or("");
-    midifilename = getJsonEntry<std::string>(song, "midiFile").value_or("");
-    videoGap = getJsonEntry<double>(song, "videoGap").value_or(0.0);
-    start = getJsonEntry<double>(song, "start").value_or(0.0);
-    preview_start = getJsonEntry<double>(song, "previewStart").value_or(0.0);
-    m_duration = getJsonEntry<double>(song, "duration").value_or(0.0);
-    music[TrackName::BGMUSIC] = getJsonEntry<std::string>(song, "songFile").value_or("");
-    music[TrackName::VOCAL_LEAD] = getJsonEntry<std::string>(song, "vocals").value_or("");
-    music[TrackName::VOCAL_BACKING] = getJsonEntry<std::string>(song, "vocalsBacking").value_or("");
-    music[TrackName::PREVIEW] = getJsonEntry<std::string>(song, "preview").value_or("");
-    music[TrackName::GUITAR] = getJsonEntry<std::string>(song, "guitar").value_or("");
-    music[TrackName::BASS] = getJsonEntry<std::string>(song, "bass").value_or("");
-    music[TrackName::DRUMS] = getJsonEntry<std::string>(song, "drums").value_or("");
-    music[TrackName::DRUMS_SNARE] = getJsonEntry<std::string>(song, "drumsSnare").value_or("");
-    music[TrackName::DRUMS_CYMBALS] = getJsonEntry<std::string>(song, "drumsCymbals").value_or("");
-    music[TrackName::DRUMS_TOMS] = getJsonEntry<std::string>(song, "drumsToms").value_or("");
-    music[TrackName::KEYBOARD] = getJsonEntry<std::string>(song, "keyboard").value_or("");
-    music[TrackName::GUITAR_COOP] = getJsonEntry<std::string>(song, "guitarCoop").value_or("");
-    music[TrackName::GUITAR_RHYTHM] = getJsonEntry<std::string>(song, "guitarRhythm").value_or("");
-    loadStatus = static_cast<Song::LoadStatus>(getJsonEntry<int>(song, "loadStatus").value_or(1));
-    //loadStatus = Song::LoadStatus::HEADER;
+    id = getJsonEntry<SongId>(song, "id");
+	path = getJsonEntry<std::string>(song, "txtFileFolder").value_or("");
+	filename = getJsonEntry<std::string>(song, "txtFile").value_or("");
+	artist = getJsonEntry<std::string>(song, "artist").value_or("");
+	title = getJsonEntry<std::string>(song, "title").value_or("");
+	language = getJsonEntry<std::string>(song, "language").value_or("");
+	edition = getJsonEntry<std::string>(song, "edition").value_or("");
+	creator = getJsonEntry<std::string>(song, "creator").value_or("");
+	genre = getJsonEntry<std::string>(song, "genre").value_or("");
+	cover = getJsonEntry<std::string>(song, "cover").value_or("");
+	background = getJsonEntry<std::string>(song, "background").value_or("");
+	video = getJsonEntry<std::string>(song, "videoFile").value_or("");
+	midifilename = getJsonEntry<std::string>(song, "midiFile").value_or("");
+	videoGap = getJsonEntry<double>(song, "videoGap").value_or(0.0);
+	start = getJsonEntry<double>(song, "start").value_or(0.0);
+	preview_start = getJsonEntry<double>(song, "previewStart").value_or(0.0);
+	m_duration = getJsonEntry<double>(song, "duration").value_or(0.0);
+	music[TrackName::BGMUSIC] = getJsonEntry<std::string>(song, "songFile").value_or("");
+	music[TrackName::VOCAL_LEAD] = getJsonEntry<std::string>(song, "vocals").value_or("");
+	music[TrackName::VOCAL_BACKING] = getJsonEntry<std::string>(song, "vocalsBacking").value_or("");
+	music[TrackName::PREVIEW] = getJsonEntry<std::string>(song, "preview").value_or("");
+	music[TrackName::GUITAR] = getJsonEntry<std::string>(song, "guitar").value_or("");
+	music[TrackName::BASS] = getJsonEntry<std::string>(song, "bass").value_or("");
+	music[TrackName::DRUMS] = getJsonEntry<std::string>(song, "drums").value_or("");
+	music[TrackName::DRUMS_SNARE] = getJsonEntry<std::string>(song, "drumsSnare").value_or("");
+	music[TrackName::DRUMS_CYMBALS] = getJsonEntry<std::string>(song, "drumsCymbals").value_or("");
+	music[TrackName::DRUMS_TOMS] = getJsonEntry<std::string>(song, "drumsToms").value_or("");
+	music[TrackName::KEYBOARD] = getJsonEntry<std::string>(song, "keyboard").value_or("");
+	music[TrackName::GUITAR_COOP] = getJsonEntry<std::string>(song, "guitarCoop").value_or("");
+	music[TrackName::GUITAR_RHYTHM] = getJsonEntry<std::string>(song, "guitarRhythm").value_or("");
+	loadStatus = static_cast<Song::LoadStatus>(getJsonEntry<int>(song, "loadStatus").value_or(1));
 
 	collateByTitle = getJsonEntry<std::string>(song, "collateByTitle").value_or("");
 	collateByTitleOnly = getJsonEntry<std::string>(song, "collateByTitleOnly").value_or("");
@@ -88,12 +88,12 @@ Song::Song(fs::path const& filename):
 }
 
 void Song::reload(bool errorIgnore) {
-    try { 
-        *this = Song(filename); 
+    try {
+        *this = Song(filename);
     }
-    catch (...) { 
-        if (!errorIgnore) 
-            throw; 
+    catch (...) {
+        if (!errorIgnore)
+            throw;
     }
 }
 
