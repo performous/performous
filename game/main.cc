@@ -91,7 +91,7 @@ static void checkEvents(Game& gm, Time eventTime) {
 		gm.getCurrentScreen()->manageEvent(event);
 	}
 
-	// Need to toggle full screen mode or adjust resolution?
+    // Need to toggle full screen mode or adjust resolution?
 	window.resize();
 }
 
@@ -139,10 +139,37 @@ void mainLoop(std::string const& songlist) {
 	gm.addScreen(std::make_unique<ScreenPaths>(gm, "Paths", audio, songs));
 	gm.addScreen(std::make_unique<ScreenPlayers>(gm, "Players", audio, database));
 	gm.addScreen(std::make_unique<ScreenPlaylist>(gm, "Playlist", audio, songs, backgrounds));
-	gm.activateScreen("Intro");
-	gm.loading(_("Entering main menu..."), 0.8f);
-	gm.updateScreen();  // exit/enter, any exception is fatal error
-	gm.loading(_("Loading complete!"), 1.0f);
+
+	switch((e_startup_screens)config["kioskmode/startupscreen"].ui()) {
+		case SCREEN_INTRO:
+			gm.activateScreen("Intro");
+			gm.loading(_("Entering main menu..."), 0.8f);
+			gm.updateScreen();  // exit/enter, any exception is fatal error
+			gm.loading(_("Loading complete!"), 1.0f);
+		break;
+		case SCREEN_SONGS:
+			gm.activateScreen("Songs");
+			gm.loading(_("Entering song select..."), 0.8f);
+			gm.updateScreen();  // exit/enter, any exception is fatal error
+			gm.loading(_("Loading complete!"), 1.0f);
+		break;
+		case SCREEN_SING:
+			Screen* s = gm.getScreen("Sing");
+			ScreenSing* ss = dynamic_cast<ScreenSing*> (s);
+			while(songs.empty()) { //waiting for songs to become available
+				gm.loading(_("loading songs... please wait"), 0.8f);
+				std::this_thread::sleep_for(1s); //sleep 1s to avoid busy wait.
+				songs.update();
+			}
+			unsigned randomsong = static_cast<unsigned>(std::rand()) % static_cast<unsigned>(songs.size());
+			ss->setSong(songs[randomsong]);
+			gm.activateScreen("Sing");
+			gm.loading(_("Entering karaoke display..."), 0.8f);
+			gm.updateScreen();  // exit/enter, any exception is fatal error
+			gm.loading(_("Loading complete!"), 1.0f);
+		break;
+	}
+
 	// Main loop
 	auto time = Clock::now();
 	unsigned frames = 0;
