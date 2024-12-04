@@ -9,8 +9,8 @@
 #include <list>
 #include <fmt/format.h>
 
-LayoutSinger::LayoutSinger(VocalTrack& vocal, Database& database, NoteGraphScalerPtr const& scaler, std::shared_ptr<ThemeSing> theme):
-  m_vocal(vocal), m_noteGraph(vocal, scaler), m_lyricit(vocal.notes.begin()), m_lyrics(), m_database(database), m_theme(theme), m_hideLyrics() {
+LayoutSinger::LayoutSinger(VocalTrack& vocal, Database& database, NoteGraphScalerPtr const& scaler, TextureManager& textureManager, std::shared_ptr<ThemeSing> theme):
+  m_vocal(vocal), m_noteGraph(vocal, scaler, textureManager), m_lyricit(vocal.notes.begin()), m_lyrics(), m_database(database), m_theme(theme) {
 	m_score_text[0] = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f());
 	m_score_text[1] = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f());
 	m_score_text[2] = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f());
@@ -33,9 +33,11 @@ void LayoutSinger::drawScore(Window& window, PositionMode position) {
 	unsigned int i = 0;
 	float j = 0.0f;
 	for (std::list<Player>::const_iterator p = m_database.cur.begin(); p != m_database.cur.end(); ++p, ++i) {
-		if (p->m_vocal.name != m_vocal.name) continue;
+		if (p->m_vocal.name != m_vocal.name)
+			continue;
 		Color color(p->m_color.r, p->m_color.g, p->m_color.b, p->activity());
-		if (color.a == 0.0f) continue;
+		if (color.a == 0.0f)
+			continue;
 		m_score_text[i % 4]->render(fmt::format("{:04d}", p->getScore()));
 		switch(position) {
 			case LayoutSinger::PositionMode::FULL:

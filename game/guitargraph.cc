@@ -110,25 +110,10 @@ GuitarGraph::GuitarGraph(Game &game, Audio& audio, Song const& song, input::Devi
   m_flame_godmode(findFile("flame_godmode.svg")),
   m_tap(findFile("tap.svg")),
   m_neckglow(findFile("neck_glow.svg")),
-  m_neckglowColor(),
   m_drums(dev->type == input::DevType::DRUMS),
-  m_level(),
   m_track_index(m_instrumentTracks.end()),
   m_dfIt(m_drumfills.end()),
-  m_errorMeter(0.0, 2.0),
-  m_errorMeterFlash(0.0, 4.0),
-  m_errorMeterFade(0.0, 0.333),
-  m_drumJump(0.0, 12.0),
-  m_starpower(0.0, 0.1),
-  m_starmeter(),
-  m_drumfillHits(),
-  m_drumfillScore(),
-  m_soloTotal(),
-  m_soloScore(),
-  m_solo(),
-  m_hasTomTrack(false),
-  m_proMode(config["game/drum_promode"].b()),
-  m_whammy(0)
+  m_proMode(config["game/drum_promode"].b())
 {
 	if(m_drums) {
 		initDrums();
@@ -869,7 +854,7 @@ void GuitarGraph::drawNeckStuff(double time) {
 
 	// Draw the neck
 	{
-		UseTexture tex(m_game.getWindow(), *m_neck);
+		TextureBinder tex(m_game.getWindow(), *m_neck);
 		glutil::VertexArray va;
 		float w = (m_drums ? 2.0f : 2.5f);
 		float texCoord = 0.0f;
@@ -933,7 +918,7 @@ void GuitarGraph::drawNeckStuff(double time) {
 				continue;
 			}
 			float h = flameAnim * 4.0f * fretWid;
-			UseTexture tblock(window, *ftex);
+			TextureBinder tblock(window, *ftex);
 			glutil::VertexArray va;
 			glmath::vec4 c(1.0f, 1.0f, 1.0f, 1.0f - flameAnim);
 			va.texCoord(0.0f, 1.0f).color(c).vertex(x - fretWid, time2y(0.0f), 0.0f);
@@ -945,7 +930,7 @@ void GuitarGraph::drawNeckStuff(double time) {
 		}
 	}
 	// Accuracy indicator
-	UseShader us(getShader(window, "color"));
+	UseShader us(window.getShader("color"));
 	float maxsize = 1.5f;
 	float thickness = 0.12f;
 	float x = -2.5f - thickness;
@@ -1031,7 +1016,7 @@ void GuitarGraph::drawNote(unsigned fret, Color color, double tBeg, double tEnd,
 		// Render the middle
 		bool doanim = hit || hitAnim > 0.0f; // Enable glow?
 		Texture const& tex(doanim ? m_tail_glow : m_tail); // Select texture
-		UseTexture tblock(window, tex);
+		TextureBinder tblock(window, tex);
 		glutil::VertexArray va;
 		double t = m_audio.getPosition() * 10.0; // Get adjusted time value for animation
 		vertexPair(va, x, y, color, doanim ? tc(static_cast<float>(y + t)) : 1.0f); // First vertex pair
@@ -1091,7 +1076,7 @@ void GuitarGraph::drawDrumfill(double tBeg, double tEnd) {
 		float yEnd = time2y(static_cast<float>(tEnd <= future ? tEnd : future));
 		float tcEnd = tEnd <= future ? 0.0f : 0.25f;
 		Color c = color(fret);
-		UseTexture tblock(window, m_tail_drumfill);
+		TextureBinder tblock(window, m_tail_drumfill);
 		glutil::VertexArray va;
 		vertexPair(va, x, yBeg, c, 1.0f); // First vertex pair
 		if (std::abs(yEnd - yBeg) > 4.0 * fretWid) {
@@ -1152,7 +1137,7 @@ void GuitarGraph::drawInfo(double time) {
 /// Draw a bar for drum bass pedal/note
 void GuitarGraph::drawBar(double time, float h) {
 	auto& window = m_game.getWindow();
-	UseShader shader(getShader(window, "color"));
+	UseShader shader(window.getShader("color"));
 	glutil::VertexArray va;
 
 	va.normal(0.0f, 1.0f, 0.0f).texCoord(0,0).vertex(-2.5f, time2y(static_cast<float>(time + h)));

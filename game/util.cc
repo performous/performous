@@ -1,6 +1,7 @@
 #include "util.hh"
 
 #include <algorithm>
+#include <cmath>
 #include <iomanip>
 #include <sstream>
 #include <stdexcept>
