@@ -154,11 +154,26 @@ void Songs::CacheSonglist() {
 		if(!song->edition.empty()) {
 			songObject["edition"] = song->edition;
 		}
+		if (!song->tags.empty()) {
+			songObject["tags"] = song->tags;
+		}
+		if (!song->version.empty()) {
+			songObject["version"] = song->version;
+		}
+		if (song->year != 0) {
+			songObject["year"] = song->year;
+		}
 		if(!song->language.empty()) {
 			songObject["language"] = song->language;
 		}
 		if(!song->creator.empty()) {
 			songObject["creator"] = song->creator;
+		}
+		if (!song->providedBy.empty()) {
+			songObject["providedBy"] = song->providedBy;
+		}
+		if (!song->comment.empty()) {
+			songObject["comment"] = song->comment;
 		}
 		if(!song->genre.empty()) {
 			songObject["genre"] = song->genre;
@@ -172,6 +187,9 @@ void Songs::CacheSonglist() {
 		if(!song->music[TrackName::BGMUSIC].string().empty()) {
 			songObject["songFile"] = song->music[TrackName::BGMUSIC].string();
 		}
+		if (!song->music[TrackName::INSTRUMENTAL].string().empty()) {
+			songObject["instrumental"] = song->music[TrackName::INSTRUMENTAL].string();
+		}
 		if(!song->midifilename.string().empty()) {
 			songObject["midiFile"] = song->midifilename.string();
 		}
@@ -180,6 +198,9 @@ void Songs::CacheSonglist() {
 		}
 		if(!std::isnan(song->start)) {
 			songObject["start"] = song->start;
+		}
+		if (!std::isnan(song->end)) {
+			songObject["end"] = song->end;
 		}
 		if(!std::isnan(song->videoGap)) {
 			songObject["videoGap"] = song->videoGap;
