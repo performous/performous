@@ -1,17 +1,18 @@
-#pragma once
-
 #include "songorder.hh"
 
-struct ScoreSongOrder : public SongOrder {
+#include <chrono>
+
+struct RecentlySungSongOrder : public SongOrder {
 	std::string getDescription() const override;
 
 	void initialize(SongCollection const& songs, Database const& database) override;
 
 	void update(SongPtr const& songs, Database const& database) override;
 
-	bool operator()(Song const& a, Song const& b) const override ;
+	bool operator()(Song const& a, Song const& b) const override;
 
   private:
-	std::unordered_map<Song const*, unsigned> m_scoreMap;
+	std::map<Song const*, std::chrono::seconds> m_dateMap;
 	bool initialized;
 };
+
