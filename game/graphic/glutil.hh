@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "color.hh"
+#include "../color.hh"
 #include "glmath.hh"
 #include <epoxy/gl.h>
 #include <string>
