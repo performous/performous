@@ -1,11 +1,14 @@
 #include "glshader.hh"
 
 #include "glutil.hh"
-#include "graphic/video_driver.hh"
-#include "graphic/window.hh"
+#include "video_driver.hh"
+#include "window.hh"
+#include "../log.hh"
+
 #include <algorithm>
 #include <ios>
 #include <fstream>
+#include <regex>
 #include <stdexcept>
 
 using namespace glutil;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "glutil.hh"
+#include "graphic/glutil.hh"
 #include "image.hh"
 #include "graphic/window.hh"
 

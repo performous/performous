@@ -1,6 +1,7 @@
 #include "glutil.hh"
-#include "graphic/video_driver.hh"
-#include "graphic/window.hh"
+#include "../log.hh"
+#include "video_driver.hh"
+#include "window.hh"
 
 namespace glutil {
 
