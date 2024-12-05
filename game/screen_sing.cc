@@ -5,7 +5,7 @@
 #include "database.hh"
 #include "engine.hh"
 #include "fs.hh"
-#include "glutil.hh"
+#include "graphic/glutil.hh"
 #include "guitargraph.hh"
 #include "i18n.hh"
 #include "layout_singer.hh"
