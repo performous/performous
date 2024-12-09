@@ -1,7 +1,7 @@
 #pragma once
 
 #include "theme.hh"
-#include "opengl_text.hh"
+#include "graphic/opengl_text.hh"
 #include "notegraph.hh"
 #include "configuration.hh"
 #include "graphic/color_trans.hh"
@@ -58,7 +58,7 @@ class LayoutSinger {
   public:
 	enum class PositionMode { FULL, TOP, BOTTOM, LEFT, RIGHT };
 	/// ThemeSing is optional if you want to use drawScore only
-	LayoutSinger(VocalTrack& vocal, Database& database, NoteGraphScalerPtr const&, std::shared_ptr<ThemeSing> theme = std::make_shared<ThemeSing>());
+	LayoutSinger(VocalTrack& vocal, Database& database, NoteGraphScalerPtr const&, TextureManager&, std::shared_ptr<ThemeSing> theme = std::make_shared<ThemeSing>());
 	~LayoutSinger();
 	void reset();
 	void draw(Window&, double time, PositionMode position = LayoutSinger::PositionMode::FULL);
@@ -77,5 +77,5 @@ class LayoutSinger {
 	Database& m_database;
 	std::shared_ptr<ThemeSing> m_theme;
 	AnimValue m_feedbackFader;
-	bool m_hideLyrics;
+	bool m_hideLyrics = false;
 };

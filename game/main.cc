@@ -1,11 +1,13 @@
 #include "backgrounds.hh"
+#include "cache.hh"
 #include "chrono.hh"
 #include "config.hh"
 #include "controllers.hh"
 #include "database.hh"
 #include "engine.hh"
 #include "fs.hh"
-#include "glutil.hh"
+#include "graphic/glutil.hh"
+#include "graphic/texture_loader.hh"
 #include "i18n.hh"
 #include "log.hh"
 #include "platform.hh"
@@ -102,7 +104,7 @@ void mainLoop(std::string const& songlist) {
 	std::clog << "core/notice: Starting the audio subsystem (errors printed on console may be ignored)." << std::endl;
 	std::clog << "core/info: Loading assets." << std::endl;
 	TranslationEngine localization;
-	TextureLoader m_loader;
+	TextureLoaderScopedKeeper keeper;
 	Backgrounds backgrounds;
 	Database database(getConfigDir() / "database.xml");
 	Songs songs(database, songlist);
@@ -294,7 +296,8 @@ int main(int argc, char** argv) try {
 	  ("jstest", "utility to get joystick button mappings");
 	po::options_description opt3("Hidden options");
 	opt3.add_options()
-	  ("songdir", po::value<std::vector<std::string> >(&songdirs)->composing(), "");
+	  ("songdir", po::value<std::vector<std::string> >(&songdirs)->composing(), "")
+	  ("clearcache", "clear the cache at start");
 	// Process flagless options as songdirs
 	po::positional_options_description p;
 	p.add("songdir", -1);
@@ -345,6 +348,9 @@ int main(int argc, char** argv) try {
 	confOverride(songdirs, "paths/songs");
 	confOverride(devices, "audio/devices");
 	getPaths(); // Initialize paths before other threads start
+	if (vm.count("clearcache")) {
+		cache::clear();
+	}
 	if (vm.count("jstest")) { // Joystick test program
 		std::clog << "core/notice: Starting jstest input test utility." << std::endl;
 		std::cout << std::endl << "Joystick utility - Touch your joystick to see buttons here" << std::endl
