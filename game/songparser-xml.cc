@@ -80,7 +80,7 @@ void SongParser::xmlParseHeader() {
 		dom.find("/ss:MELODY/comment()", comments) || dom.find("/ss:MELODY/../comment()", comments);
 		for (auto const& node: comments) {
 			std::string str = dynamic_cast<xmlpp::CommentNode const&>(*node).get_content();
-			trim(str);
+			boost::trim(str);
 			parseComment(str, "Artist:", s.artist) || parseComment(str, "Title:", s.title);
 		}
 		if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");

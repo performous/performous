@@ -1,8 +1,8 @@
 ﻿#include "songparser.hh"
 #include "unicode.hh"
 #include "fs.hh"
-#include "util.hh"
 
+#include <boost/algorithm/string.hpp>
 #include <algorithm>
 #include <stdexcept>
 
@@ -42,15 +42,15 @@ void SongParser::txtParse() {
 	txtResetState();
 	while (txtParseNote(line) && getline(line)) {} // Parse notes
 	// Workaround for the terminating : 1 0 0 line, written by some converters
-	// FIXME: Should we do this for all tracks?
-
+	// FIXME: Should we do this for all tracks?	
+	
 	for (auto const& name: { TrackName::VOCAL_LEAD, DUET_P2 }) {
 		Notes& notes = m_song.getVocalTrack(name).notes;
 		auto it = notes.rbegin();
 		if (!notes.empty() && it->type != Note::Type::SLEEP && it->begin == it->end) notes.pop_back();
 		if (notes.empty()) m_song.eraseVocalTrack(name);
 	}
-
+	
 	if (m_song.hasDuet()) {
 		bool skip;
 		Notes s1, s2, merged, finalDuet;
@@ -63,10 +63,10 @@ void SongParser::txtParse() {
 		VocalTrack& duetTrack = m_song.getVocalTrack(SongParserUtil::DUET_BOTH);
 		Notes& duetNotes = duetTrack.notes;
 		duetNotes.clear();
-
+		
 		for (auto currentNote: merged) {
 			skip = false;
-			if (!finalDuet.empty()) {
+			if (!finalDuet.empty()) { 
 				if (currentNote.type == Note::Type::SLEEP) {
 					auto prevToLast = ++(finalDuet.rbegin());
 					if (prevToLast->type == Note::Type::SLEEP) {
@@ -88,7 +88,7 @@ void SongParser::txtParse() {
 							if (!skip) { finalDuet.push_back(lineBreak); }
 						}
 					}
-				}
+				}	
 			}
 			if (!skip) { finalDuet.push_back(currentNote); }
 		}
@@ -97,7 +97,7 @@ void SongParser::txtParse() {
 		duetNotes.swap(finalDuet);
 		duetTrack.noteMin = std::min(m_song.getVocalTrack(TrackName::VOCAL_LEAD).noteMin, m_song.getVocalTrack(SongParserUtil::DUET_P2).noteMin);
 		duetTrack.noteMax = std::max(m_song.getVocalTrack(TrackName::VOCAL_LEAD).noteMax, m_song.getVocalTrack(SongParserUtil::DUET_P2).noteMax);
-	}
+	} 
 }
 
 bool SongParser::txtParseField(std::string const& line) {
@@ -105,10 +105,10 @@ bool SongParser::txtParseField(std::string const& line) {
 	if (line[0] != '#') return false;
 	std::string::size_type pos = line.find(':');
 	if (pos == std::string::npos) throw std::runtime_error("Invalid txt format, should be #key:value");
-	std::string key = UnicodeUtil::toUpper(trim(line.substr(1, pos - 1)));
-	std::string value = trim(line.substr(pos + 1));
+	std::string key = UnicodeUtil::toUpper(boost::trim_copy(line.substr(1, pos - 1)));
+	std::string value = boost::trim_copy(line.substr(pos + 1));
 	if (value.empty()) return true;
-
+	
 	// Parse header data that is stored in SongParser rather than in song (and thus needs to be read every time)
 	if (key == "BPM") assign(m_bpm, value);
 	else if (key == "RELATIVE") assign(m_relative, value);
@@ -116,9 +116,9 @@ bool SongParser::txtParseField(std::string const& line) {
 	else if (key == "DUETSINGERP1" || key == "P1") m_song.insertVocalTrack(TrackName::VOCAL_LEAD, VocalTrack(value.substr(value.find_first_not_of(" "))));
 	// Strong hint that this is a duet, so it will be readily displayed with two singers in browser and properly filtered
 	else if (key == "DUETSINGERP2" || key == "P2") m_song.insertVocalTrack(DUET_P2, VocalTrack(value.substr(value.find_first_not_of(" "))));
-
+	
 	if (m_song.loadStatus >= Song::LoadStatus::HEADER) return true;  // Only re-parsing now, skip any other data
-
+	
 	// Parse header data that is directly stored in m_song
 	if (key == "TITLE") m_song.title = value.substr(value.find_first_not_of(" :"));
 	else if (key == "ARTIST") m_song.artist = value.substr(value.find_first_not_of(" "));
@@ -204,7 +204,7 @@ bool SongParser::txtParseNote(std::string line) {
 		case Note::Type::ROLL:
 		case Note::Type::MINE:
 		case Note::Type::LIFT:
-		default:
+		default: 
 			throw std::runtime_error("Unknown note type");
 	}
 	n.begin = tsTime(ts);
@@ -239,7 +239,7 @@ bool SongParser::txtParseNote(std::string line) {
 		else {
 			Note& p = notes.back();
 			n.begin = n.end = prevtime; // Normalize sleep notes
-
+			
 			if (p.type == Note::Type::SLEEP) return true; // Ignore consecutive sleeps
 		}
 	}
