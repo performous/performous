@@ -1,13 +1,12 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 [[ ${PV} = 9999 ]] && GIT="git-r3"
 
-CMAKE_REMOVE_MODULES="yes"
-CMAKE_REMOVE_MODULES_LIST="FindALSA FindBoost FindGettext FindJpeg FindPng FindTiff FindZ"
+CMAKE_REMOVE_MODULES_LIST=(FindALSA FindBoost FindGettext FindJpeg FindPng FindTiff FindZ)
 
-inherit eutils cmake-utils ${GIT}
+inherit cmake ${GIT}
 
 SONGS_PN=ultrastar-songs
 
@@ -20,17 +19,19 @@ SRC_URI="songs? (
 	mirror://sourceforge/performous/${SONGS_PN}-shearer-1.zip
 )"
 
+GIT_BASE_URI="https://github.com/performous"
+
 PATCHES=(
 )
 
+CMAKE_MAKEFILE_GENERATOR="emake"
 if [ "$PV" != "9999" ]; then
-    SRC_URI="https://github.com/performous/performous/archive/${PV}.tar.gz -> ${P}.tar.gz $SRC_URI"
+    SRC_URI="${GIT_BASE_URI}/performous/archive/${PV}.tar.gz -> ${P}.tar.gz $SRC_URI"
 	PATCHES=(
 		$PATCHES
 	)
 else
-    EGIT_REPO_URI="https://github.com/performous/performous.git"
-	EGIT_SUBMODULES=( ced )
+    EGIT_REPO_URI="${GIT_BASE_URI}/performous.git"
 	PATCHES=(
 		$PATCHES
 	)
@@ -45,7 +46,7 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE="midi songs tools webcam"
 
-RDEPEND="dev-cpp/libxmlpp:2.6
+RDEPEND="dev-cpp/libxmlpp:3.0
 	media-libs/portaudio
 	dev-libs/boost[threads(+)]
 	dev-libs/glib
@@ -59,7 +60,9 @@ RDEPEND="dev-cpp/libxmlpp:2.6
 	virtual/ffmpeg
 	virtual/opengl
 	virtual/glu
+	virtual/cblas
 	sys-libs/zlib
+	dev-libs/libfmt
 	virtual/libintl
 	x11-libs/cairo
 	x11-libs/gdk-pixbuf
@@ -74,6 +77,10 @@ DEPEND="${RDEPEND}
 src_unpack() {
 	if [[ ${PV} == 9999 ]]; then
 		git-r3_src_unpack
+		for dep in compact_enc_det aubio; do
+			git-r3_fetch "${GIT_BASE_URI}/${dep}.git/"
+			git-r3_checkout "${GIT_BASE_URI}/${dep}.git/" "deps/${dep}.git"
+		done
 	else
 		unpack ${P}.tar.gz
 	fi
@@ -85,7 +92,7 @@ src_unpack() {
 }
 
 src_prepare() {
-	cmake-utils_src_prepare
+	cmake_src_prepare
 }
 
 src_configure() {
@@ -96,15 +103,22 @@ src_configure() {
 		-DENABLE_MIDI="$(usex midi)"
 		-DENABLE_WEBSERVER=OFF
 	)
-	cmake-utils_src_configure
+	if [[ ${PV} == 9999 ]]; then
+		mycmakeargs+=(
+			-DSELF_BUILT_GIT_BASE=${WORKDIR}/deps/
+			-DSELF_BUILT_AUBIO=NEVER
+			-DSELF_BUILT_CED=ALWAYS
+		)
+	fi
+	cmake_src_configure
 }
 
 src_compile() {
-	cmake-utils_src_compile
+	cmake_src_compile
 }
 
 src_install() {
-	cmake-utils_src_install
+	cmake_src_install
 	if use songs ; then
 		insinto "${EPREFIX}/usr/share"/${PN}
 		doins -r "${WORKDIR}/songs"
