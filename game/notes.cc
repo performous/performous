@@ -23,7 +23,7 @@ double Note::score(double n, double b, double e) const {
 double Note::scoreMultiplier() const {
 	switch(type) {
 		case Note::Type::GOLDEN:
-		case Note::Type::GOLDEN2:
+		case Note::Type::GOLDENRAP:
 			return 2.0;
 		case Note::Type::SLEEP:
 			return 0.0;

@@ -57,7 +57,7 @@ void Player::update() {
 		}
 		if (endTime < m_scoreIt->end) break;  // The note continues past this timestep
 		// Check if we got a star
-		if ((m_scoreIt->type == Note::Type::NORMAL || m_scoreIt->type == Note::Type::SLIDE || m_scoreIt->type == Note::Type::GOLDEN || m_scoreIt->type == Note::Type::GOLDEN2)
+		if ((m_scoreIt->type == Note::Type::NORMAL || m_scoreIt->type == Note::Type::SLIDE || m_scoreIt->type == Note::Type::GOLDEN || m_scoreIt->type == Note::Type::GOLDENRAP)
 		  && (m_noteScore / m_vocal.m_scoreFactor / m_scoreIt->maxScore() > 0.8)) {
 			m_scoreIt->stars.push_back(m_color);
 		}
