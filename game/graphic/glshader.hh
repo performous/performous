@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fs.hh"
+#include "../fs.hh"
 #include "glutil.hh"
 #include <forward_list>
 #include <map>

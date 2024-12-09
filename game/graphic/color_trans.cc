@@ -1,6 +1,6 @@
 #include "color_trans.hh"
 
-#include "color.hh"
+#include "../color.hh"
 #include "window.hh"
 #include "video_driver.hh"
 
