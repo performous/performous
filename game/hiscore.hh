@@ -12,8 +12,6 @@
 class Hiscore {
 public:
 	static const unsigned MaximumScorePoints;
-	static const unsigned MinimumRecognizedScorePoints;
-	static const unsigned MaximumStoredScores;
 
 	void load(xmlpp::NodeSet const& n);
 	void save(xmlpp::Element *players);
@@ -24,9 +22,9 @@ public:
 	  This is because it will take forever to fill more.
 	  And people refuse to enter their names if they are not close to the top.
 
-	  @param score is a value between 0 and 10000. values below 2000 will lead to instant disqualification.
-	  @return true if the score make it into the list
-	  @return false if addNewHiscore does not make sense for that score.
+	  @param score is a value between 0 and 10000. values below 2000 will lead to instant disqualification by default.
+	  @return true if the score makes it into the list.
+	  @return false if addHiscore does not make sense for that score.
 	  */
 	bool reachedHiscore(unsigned score, SongId songid, unsigned short level, std::string const& track) const;
 
@@ -34,15 +32,21 @@ public:
 
 	  @pre Hiscore is added.
 
-	  There is no check regarding if it is useful to add this hiscore.
-	  To check this, use reachedHiscore() first.
-
 	  The method will check if all ids are non-negative and the score
-	  in its valid interval. If one of this conditions is not net a
+	  is in its valid interval. If one of these conditions is not met a
 	  HiscoreException will be raised.
 	  */
 	void addHiscore(unsigned score, const PlayerId& playerid, SongId songid, unsigned short level, std::string const& track);
 	void addHiscore(HiscoreItem&&);
+
+	/**Add a specific highscore into the list.
+
+	  @pre Hiscore is added without checks.
+
+	  There is no check regarding if this is a hiscore based on the constraints
+	  described in reachedHiscore(). To check this, use addHiscore().
+	  */
+	void addHiscoreUnconditionally(HiscoreItem&&);
 
 	using HiscoreVector = std::vector<HiscoreItem>;
 
