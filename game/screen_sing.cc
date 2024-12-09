@@ -154,11 +154,11 @@ void ScreenSing::createPauseMenu() {
 	if(!getGame().getCurrentPlayList().isEmpty() || config["game/autoplay"].b()){
 		m_menu.add(MenuOption(_("Skip"), _("Skip current song"))).screen("Playlist");
 	}
-	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"))).call([&game]() {
-		game.activateScreen("Songs");
-	});
 	m_menu.add(MenuOption(_("Abort"), _("Exit to song browser and mark song broken"))).call([&]() {
 		m_song->setBroken();
+		game.activateScreen("Songs");
+	});
+	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"))).call([&game]() {
 		game.activateScreen("Songs");
 	});
 	m_menu.close();
