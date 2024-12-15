@@ -78,10 +78,11 @@ SongParser::SongParser(Song& s) : m_song(s) {
 			ss = m_ss.str();
 		}
 		else {
-			if (txtCheck(ss)) {
-				s.type = Song::Type::TXT;
-			} else if (smCheck(ss)) {
+			// For determining song type, SM has to come first as it's very similar in structure to the TXT format and thus it's possible for SM songs to be erroneously categorized as TXT songs.
+			if (smCheck(ss)) {
 				s.type = Song::Type::SM;
+			} else if (txtCheck(ss)) {
+				s.type = Song::Type::TXT;
 			} else if (iniCheck(ss)) {
 				s.type = Song::Type::INI;
 			} else {
