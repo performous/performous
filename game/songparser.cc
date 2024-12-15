@@ -68,15 +68,16 @@ SongParser::SongParser(Song& s) : m_song(s) {
 		if ((size < 10) || (size > 100000)) {
 			throw SongParserException(s, "Does not look like a song file (wrong size)", 1, true);
 		}
-		if (!isText(m_ss.str())) {
+		std::string ss = UnicodeUtil::convertToUTF8(m_ss.str(), s.filename.string());
+		if (!isText(ss)) {
 			throw SongParserException(s, "Does not look like a song file (binary)", 1, true);
 		}
 		// Convert m_ss; filename supplied for possible warning messages
 		if (xmlCheck(m_ss.str())) {
-			s.type = Song::Type::XML;	// XMLPP should deal with encoding so we don't have to.
+			s.type = Song::Type::XML; // XMLPP should deal with encoding so we don't have to.
+			ss = m_ss.str();
 		}
 		else {
-			std::string ss = UnicodeUtil::convertToUTF8(m_ss.str(), s.filename.string());
 			if (txtCheck(ss)) {
 				s.type = Song::Type::TXT;
 			} else if (smCheck(ss)) {
