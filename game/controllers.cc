@@ -2,7 +2,7 @@
 
 #include "chrono.hh"
 #include "fs.hh"
-#include "libxml++-impl.hh"
+#include "libxml++.hh"
 #include "unicode.hh"
 
 #include <fmt/format.h>
@@ -15,31 +15,6 @@
 #include <stdexcept>
 #include <string>
 
-namespace {
-	struct XMLError {
-		XMLError(xmlpp::Element const& e, std::string const& msg): elem(e), message(msg) {}
-		xmlpp::Element const& elem;
-		std::string message;
-	};
-	std::string getAttribute(xmlpp::Element const& elem, std::string const& attr) {
-		xmlpp::Attribute const* a = elem.get_attribute(attr);
-		if (!a) throw XMLError(elem, "attribute " + attr + " not found");
-		return a->get_value();
-	}
-	template <typename T> bool tryGetAttribute(xmlpp::Element const& elem, std::string const& attr, T& var) {
-		xmlpp::Attribute const* a = elem.get_attribute(attr);
-		if (!a) return false;
-		try {
-			var = sconv<T>(a->get_value());
-		} catch (std::exception&) {
-			throw XMLError(elem, "attribute " + attr + " value invalid: " + a->get_value());
-		}
-		return true;
-	}
-	template <typename Numeric> void parse(MinMax<Numeric>& range, xmlpp::Element const& elem) {
-		tryGetAttribute(elem, "min", range.min);
-		tryGetAttribute(elem, "max", range.max);
-	}
 namespace input {
 	// Return a NavButton corresponding to an Event
 	NavButton navigation(Event const& ev) {
@@ -163,7 +138,7 @@ namespace input {
 			try {
 				parseControllers(domParser, "/controllers/joystick/controller", SourceType::JOYSTICK);
 				parseControllers(domParser, "/controllers/midi/controller", SourceType::MIDI);
-			} catch (XMLError& e) {
+			} catch (xmlpp::XMLError& e) {
 				int line = e.elem.get_line();
 				std::string name = e.elem.get_name();
 				throw std::runtime_error(file.string() + ":" + std::to_string(line) + " element " + name + " " + e.message);
@@ -175,11 +150,11 @@ namespace input {
 			for (auto nodeit = n.begin(), end = n.end(); nodeit != end; ++nodeit) {
 				const xmlpp::Element& elem = dynamic_cast<const xmlpp::Element&>(**nodeit);
 				ControllerDef def;
-				def.name = getAttribute(elem, "name");
+				def.name = xmlpp::getAttribute(elem, "name");
 				def.sourceType = sourceType;
 				// Device type
 				{
-					std::string type = getAttribute(elem, "type");
+					std::string type = xmlpp::getAttribute(elem, "type");
 					if (type == "guitar") def.devType = DevType::GUITAR;
 					else if (type == "drumkit") def.devType = DevType::DRUMS;
 					else if (type == "keytar") def.devType = DevType::KEYTAR;
@@ -198,10 +173,10 @@ namespace input {
 				if (ns.size() == 1) {
 					const xmlpp::Element& elem = dynamic_cast<const xmlpp::Element&>(*ns[0]);
 					std::string regex;
-					if (tryGetAttribute(elem, "regex", regex)) { def.deviceRegex = regex; }
+					if (xmlpp::tryGetAttribute(elem, "regex", regex)) { def.deviceRegex = regex; }
 					xmlpp::parse(def.deviceMinMax, elem);
 					double latency;
-					if (tryGetAttribute(elem, "latency", latency)) def.latency = latency;
+					if (xmlpp::tryGetAttribute(elem, "latency", latency)) def.latency = latency;
 				}
 				ns = elem.find("channel");
 				if (ns.size() == 1) xmlpp::parse(def.channelMinMax, dynamic_cast<const xmlpp::Element&>(*ns[0]));
@@ -210,7 +185,7 @@ namespace input {
 				for (auto nodeit2 = ns.begin(), end = ns.end(); nodeit2 != end; ++nodeit2) {
 					const xmlpp::Element& elem = dynamic_cast<const xmlpp::Element&>(**nodeit2);
 					HWButton hw;
-					if (!tryGetAttribute(elem, "hw", hw)) throw XMLError(elem, "Mandatory attribute hw is missing or invalid");
+					if (!xmlpp::tryGetAttribute(elem, "hw", hw)) throw xmlpp::XMLError(elem, "Mandatory attribute hw is missing or invalid");
 					// Axes and hats use different HWButton ranges internally
 					if (elem.get_name() == "axis") hw = HWButton(hw + hwIsAxis.min);
 					else if (elem.get_name() == "hat") hw = HWButton(hw + hwIsHat.min);
@@ -232,7 +207,7 @@ namespace input {
 		/// Read a button attribute from XML element
 		Button parseButton(xmlpp::Element const& elem, std::string const& attr, ControllerDef const& def) {
 			std::string action;
-			tryGetAttribute(elem, attr, action);
+			xmlpp::tryGetAttribute(elem, attr, action);
 			return findButton(def.devType, action);
 		}
 		/// Find button by name, either of given type or of generic type

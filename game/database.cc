@@ -1,7 +1,7 @@
 #include "database.hh"
 
 #include "configuration.hh"
-#include "libxml++-impl.hh"
+#include "libxml++.hh"
 #include "fs.hh"
 #include "i18n.hh"
 
