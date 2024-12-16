@@ -3,7 +3,7 @@
 
 #include "configuration.hh"
 #include "fs.hh"
-#include "libxml++-impl.hh"
+#include "libxml++.hh"
 
 #include <algorithm>
 #include <unicode/stsearch.h>
