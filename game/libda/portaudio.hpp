@@ -4,8 +4,10 @@
  * @file portaudio.hpp OOP / RAII wrappers & utilities for PortAudio library.
  */
 
-#include "../unicode.hh"
+#include "../log.hh"
 #include "../platform.hh"
+#include "../unicode.hh"
+
 #include <portaudio.h>
 #include <cstddef>
 #include <cstdint>
@@ -52,13 +54,12 @@ namespace portaudio {
 	struct DeviceInfo {
 		DeviceInfo(int id, std::string n = std::string(), int i = 0, int o = 0, int index = 0): name(n), flex(n), idx(id), in(i), out(o), index(index) {}
 		std::string desc() const {
-			std::ostringstream oss;
-			oss << name << " (";
-			if (in) oss << in << " in";
-			if (in && out) oss << ", ";
-			if (out) oss << out << " out";
-			oss << ")";
-			return oss.str();
+			std::string desc;
+			fmt::format_to(std::back_inserter(desc), "{} (", name);
+			if (in > 0) fmt::format_to(std::back_inserter(desc), "{} in", in);
+			if (in > 0 && out > 0) desc.append(", ");
+			if (out > 0) fmt::format_to(std::back_inserter(desc), "{} out", out);
+			return desc.append(")");
 		}
 		std::string name;  ///< Full device name in UTF-8
 		std::string flex;  ///< Modified name that is less specific but still unique (allow device numbers to change)
@@ -119,9 +120,11 @@ namespace portaudio {
 		}
 		/// Get a printable dump of the devices
 		std::string dump() const {
-			std::ostringstream oss;
-			for (auto const& d: devices) { oss << "    #" << d.idx << " " << d.desc() << std::endl; }
-			return oss.str();
+			std::string dump;
+			for (auto const& d: devices) {
+				fmt::format_to(std::back_inserter(dump), "      {}#{}: {}\n", SpdLogger::newLineDec, d.idx, d.desc()); // 6 extra spaces, so it looks like a tree.
+			}
+			return dump;
 		}
 		DeviceInfo const& find(std::string const& name, bool output, int num) {
 			if (name.empty()) { return findByChannels(output, num); }
@@ -155,10 +158,8 @@ namespace portaudio {
 		PaHostApiTypeId type;
 		int devices;
 		std::string desc () const {
-		std::ostringstream oss;
-		oss << "  #" << idx << ": " << name << " (" << devices << " devices):" << std::endl;
-		oss << portaudio::AudioDevices(type).dump();
-		return oss.str();
+			std::string desc{fmt::format("#{}: {} ({} devices):\n", idx, name, devices)};
+			return desc.append(portaudio::AudioDevices(type).dump());
 		}
 	};
 
@@ -196,11 +197,13 @@ namespace portaudio {
 		BackendInfos backends;
 
 		std::string dump() const {
-		std::ostringstream oss;
-		oss << "audio/info: PortAudio backends:" << std::endl;
-		for (auto const& b: backends) { oss << b.desc() << std::endl; }
-			return oss.str();
+			std::string dump{"PortAudio backends:\n"};
+			for (auto const& b: backends) {
+				fmt::format_to(std::back_inserter(dump), "{}{}", SpdLogger::newLineDec, b.desc());  // 13 spaces to account for the log timestamp plus the ::: separator.
+			}
+			return dump;
 		}
+
 		std::list<std::string> getBackends() {
 			std::set<std::string> bends;
 			for (auto const& temp: backends) {
@@ -238,7 +241,9 @@ namespace portaudio {
 	class Stream {
 		static void shutdownPaStream(PaStream *s) {
 			try { PORTAUDIO_CHECKED(Pa_CloseStream, (s)); }
-			catch(const std::exception &e) { std::cerr << "Failed to close stream " << s << " " << e.what() << '\n'; }
+			catch(const std::exception &e) {
+				SpdLogger::error(LogSystem::AUDIO, "Stream id={} failed to close. Exception={}", fmt::ptr(s), e.what());
+			}
 		}
 
 		std::unique_ptr<PaStream, decltype(&shutdownPaStream)> m_handle{nullptr, &shutdownPaStream};
