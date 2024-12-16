@@ -1,7 +1,7 @@
 #include "hiscore.hh"
 
 #include "configuration.hh"
-#include "libxml++-impl.hh"
+#include "libxml++.hh"
 
 
 #include <algorithm>
