@@ -4,7 +4,7 @@
 #include "fs.hh"
 #include "i18n.hh"
 #include "json.hh"
-#include "libxml++-impl.hh"
+#include "libxml++.hh"
 #include "log.hh"
 #include "platform.hh"
 #include "profiler.hh"
