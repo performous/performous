@@ -61,41 +61,10 @@ namespace logger_color_codes {
 
 #endif
 
-/** \file
- * \brief The std::clog logger.
- *
- * General message format: <tt>subsystem/level: message</tt>
- *
- * Example: * \code
- * std::clog << "foo/info: Here's an info message from subsystem foo" << std::endl;
- * \endcode
- *
- * Each message may contain newlines and flushing the stream (i.e. by std::endl or std::flush) must be done
- * when and only when the message is complete.
- *
- * Any lower-case subsystem name including hyphens may be used. The levels, in descending order of priority * are as follows:
- *
- * error    A serious and rare message that usually means that a function requested by user cannot be completed.
- * warning  Less critical errors that should still be emitted sparingly (consider using "debug" for repeated warnings).
- * notice   A non-error situation that might still require user attention (the lowest level displayed by default).
- * info     Any information that might be of interest but that does not appear too often and glog the log output.
- * debug    Any information that is flooded so much that it should normally be suppressed.
- *
- * The user may either choose a desired level of messages to emit, or he may choose a specific subsystem (by
- * substring search) to be monitored all the way down to debug level, in which case only errors from any other
- * subsystems will be printed.
- *
- **/
-
-/** \internal
- * Guard to ensure we're atomically printing to cerr.
- * \attention This only guards from multiple clog interleaving, not other console I/O.
- */
-std::mutex log_lock;
 using IOStream = boost::iostreams::stream<boost::iostreams::file_descriptor_sink>;
 
 // Capture stderr spam from other libraries and log it properly
-// Note: std::cerr retains its normal functionality but other means of writing stderr get redirected to std::clog
+
 struct StderrGrabber {
 	IOStream stream;
 	std::streambuf* backup;
@@ -106,7 +75,6 @@ struct StderrGrabber {
 	StderrGrabber(): backup(std::cerr.rdbuf()) {
 #if (BOOST_OS_WINDOWS)
 	handle_fd = dup(Platform::stderr_fd);
-	std::clog << "log/warning: stderr fileno=" << Platform::stderr_fd << ", stdout fileno=" << fileno(stdout) << ", handle_fd=" << handle_fd << std::endl;
  	SpdLogger::trace(LogSystem::LOGGER, "stderr fileno={}, stdout fileno={}, handle_fd={}", Platform::stderr_fd, fileno(stdout), handle_fd);
 	stream.open((HANDLE)_get_osfhandle(handle_fd), boost::iostreams::close_handle);
 #else
@@ -124,14 +92,10 @@ struct StderrGrabber {
 			for (char ch; read(fdpipe, &ch, 1) == 1;) {
 				line += ch;
 				if (ch != '\n') continue;
-				SpdLogger::info(LogSystem::STDERR, fmt::format("stderr redirect: {}", line));
-				std::clog << "stderr/info: " + line << std::flush;
-				line.clear(); ++count;
 			}
 			close(fdpipe);  // Close this end of pipe
 			if (count > 0) {
 				SpdLogger::notice(LogSystem::STDERR, "{} messages redirected to log.", count);
-				std::clog << "stderr/notice: " << count << " messages logged to stderr/info\n" << std::flush;
 			}
 		});
 	}
@@ -146,114 +110,13 @@ struct StderrGrabber {
 	}
 };
 
-std::unique_ptr<StderrGrabber> grabber;
 
-/** \internal The implementation of the stream filter that handles the message filtering. **/
-class VerboseMessageSink : public boost::iostreams::sink {
-  public:
-	std::streamsize write(const char* s, std::streamsize n);};
 
-// defining them in main() causes segfault at exit as they apparently got free'd before we're done using them
-static boost::iostreams::stream_buffer<VerboseMessageSink> sb; //!< \internal
-static VerboseMessageSink vsm; //!< \internal
-
-//! \internal used to store the default/original clog buffer.
-static std::streambuf* default_ClogBuf = nullptr;
-fs::ofstream file;
-
-std::string target;
-int minLevel;
-
-void writeLog(std::string const& msg) {
-	std::lock_guard<std::mutex> l(log_lock);
-	std::cerr << msg << std::flush;
-	file << msg << std::flush;
-}
-
-int numeric(std::string const& level) {
-	if (level == "trace") return 0;
-	if (level == "debug") return 0;
-	if (level == "info") return 1;
-	if (level == "notice") return 2;
-	if (level == "warning") return 3;
-	if (level == "error") return 4;
-	return -1;
-}
-
-std::streamsize VerboseMessageSink::write(const char* s, std::streamsize n) {
-	std::string line(s, static_cast<size_t>(n));  // Note: s is *not* a c-string, thus we must stop after n chars.
-	// Parse prefix as subsystem/level:...
-	size_t slash = line.find('/');
-	size_t colon = line.find(": ", slash);
-	if (slash == std::string::npos || colon == std::string::npos) {
-		std::string msg = "logger/error: Invalid log prefix on line [[[\n" + line + "]]]\n";
-		write(msg.data(), static_cast<std::streamsize>(msg.size()));
-		return n;
 	}
-	std::string subsystem(line, 0, slash);
-	std::string level(line, slash + 1, colon - slash - 1);
-	int lev = numeric(level);
-	if (lev == -1) {
-		std::string msg = "logger/error: Invalid level '" + level + "' line [[[\n" + line + "]]]\n";
-		write(msg.data(), static_cast<std::streamsize>(msg.size()));
-		return n;
 	}
-	if (lev >= minLevel || (!target.empty() && subsystem.find(target) != std::string::npos)) {
-		writeLog(line);
-	}
-	return n;
 }
 
-Logger::Logger(std::string const& level) {
-	if (default_ClogBuf) throw std::logic_error("Multiple loggers constructed. There can only be one.");
-	if (level.find_first_of(":/_* ") != std::string::npos) throw std::runtime_error("Invalid logging level specified. Specify either a subsystem name (e.g. logger) or a level (debug, info, notice, warning, error).");
-	pathBootstrap();  // So that log filename is known...
-	std::string msg = "logger/notice: Logging ";
-	{
-		std::lock_guard<std::mutex> l(log_lock);
-		if (level.empty()) {
-			minLevel = 2;  // Display all notices, warnings and errors
-			msg += "all notices, warnings and errors.";
-		} else if (level == "none") {
-			minLevel = 100;
-			msg += "disabled.";  // No-one will see this, so what's the point? :)
-		} else {
-			minLevel = numeric(level);
-			if (minLevel == -1 /* Not a valid level name */) {
-				minLevel = 4;  // Display errors from any subsystem
-				target = level;  // All messages from the given subsystem
-				msg += "everything from subsystem " + target + " and all errors.";
-			} else {
-				msg += "any events of " + level + " or higher level.";
-			}
-		}
-		if (minLevel < 100) {
-			fs::path name = getLogFilename();
-			fs::create_directories(name.parent_path());
-			file.open(name);
-			msg += " Log file: " + name.string();
-		}
-		sb.open(vsm);
-		default_ClogBuf = std::clog.rdbuf();
-		std::clog.rdbuf(&sb);
-		atexit(Logger::teardown);
 	}
-	std::clog << msg << std::endl;
-}
-
-Logger::~Logger() {
-	std::clog << "core/notice: More details might be available in " << getLogFilename() << ".\n";
-	teardown();
-}
-
-void Logger::teardown() {
-	if (default_ClogBuf) std::clog << "logger/info: Exiting normally." << std::endl;
-	std::lock_guard<std::mutex> l(log_lock);
-	if (!default_ClogBuf) return;
-	std::clog.rdbuf(default_ClogBuf);
-	sb.close();
-	file.close();
-	default_ClogBuf = nullptr;
 }
 
 std::unordered_map<LogSystem, loggerPtr> SpdLogger::builtLoggers;
@@ -271,9 +134,8 @@ SpdLogger::SpdLogger (spdlog::level::level_enum const& consoleLevel) {
 		"{1:*^80}\n",
 			fmt::format(" {} {} starting, {:%Y/%m/%d @ %H:%M:%S} ", PACKAGE, VERSION, fmt::localtime(time)),
 			fmt::format(" Logging any events of level {}, or higher. ", spdlog::level::to_string_view(consoleLevel))));
-	std::clog << "logger/debug: " << logHeader << std::endl;
 	spdlog::filename_t filename = getLogFilename_new().u8string();
-	
+
 	m_sink = std::make_shared<spdlog::sinks::dist_sink_mt>();
 	
 	auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
@@ -318,7 +180,6 @@ SpdLogger::SpdLogger (spdlog::level::level_enum const& consoleLevel) {
 void SpdLogger::writeLogHeader(spdlog::filename_t filename, std::FILE* fd, std::string header) {
 	if (fs::path _filename{filename}; fs::exists(_filename) && fs::file_size(_filename) >30) {
 		trace(LogSystem::LOGGER, "Not writing header to {}. File is not empty, probably a previous log being rotated.", filename);
-		std::clog << "logger/debug: Not writing header to " << filename << ". Size > 0, so probably a log being rotated." << std::endl; 
 		return;
 	}
 	if (fd == nullptr) {
