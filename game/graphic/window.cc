@@ -3,6 +3,7 @@
 #include "color_trans.hh"
 #include "configuration.hh"
 #include "game.hh"
+#include "log.hh"
 #include "platform.hh"
 #include "view_trans.hh"
 #include "video_driver.hh"
@@ -11,8 +12,6 @@
 #include <SDL_hints.h>
 #include <SDL_rect.h>
 #include <SDL_video.h>
-
-#define stringify( name ) #name
 
 GLuint Window::m_ubo = 0;
 GLuint Window::m_vao = 0;
@@ -23,18 +22,50 @@ namespace {
 	float s_width;
 	float s_height;
 
+	std::string GetSDLGLattrName(SDL_GLattr attr) {
+		switch (attr) {
+			case SDL_GL_RED_SIZE: return "SDL_GL_RED_SIZE";
+			case SDL_GL_GREEN_SIZE: return "SDL_GL_GREEN_SIZE";
+			case SDL_GL_BLUE_SIZE: return "SDL_GL_BLUE_SIZE";
+			case SDL_GL_ALPHA_SIZE: return "SDL_GL_ALPHA_SIZE";
+			case SDL_GL_BUFFER_SIZE: return "SDL_GL_BUFFER_SIZE";
+			case SDL_GL_DOUBLEBUFFER: return "SDL_GL_DOUBLEBUFFER";
+			case SDL_GL_DEPTH_SIZE: return "SDL_GL_DEPTH_SIZE";
+			case SDL_GL_STENCIL_SIZE: return "SDL_GL_STENCIL_SIZE";
+			case SDL_GL_ACCUM_RED_SIZE: return "SDL_GL_ACCUM_RED_SIZE";
+			case SDL_GL_ACCUM_GREEN_SIZE: return "SDL_GL_ACCUM_GREEN_SIZE";
+			case SDL_GL_ACCUM_BLUE_SIZE: return "SDL_GL_ACCUM_BLUE_SIZE";
+			case SDL_GL_ACCUM_ALPHA_SIZE: return "SDL_GL_ACCUM_ALPHA_SIZE";
+			case SDL_GL_STEREO: return "SDL_GL_STEREO";
+			case SDL_GL_MULTISAMPLEBUFFERS: return "SDL_GL_MULTISAMPLEBUFFERS";
+			case SDL_GL_MULTISAMPLESAMPLES: return "SDL_GL_MULTISAMPLESAMPLES";
+			case SDL_GL_ACCELERATED_VISUAL: return "SDL_GL_ACCELERATED_VISUAL";
+			case SDL_GL_CONTEXT_MAJOR_VERSION: return "SDL_GL_CONTEXT_MAJOR_VERSION";
+			case SDL_GL_CONTEXT_MINOR_VERSION: return "SDL_GL_CONTEXT_MINOR_VERSION";
+			case SDL_GL_CONTEXT_EGL: return "SDL_GL_CONTEXT_EGL";
+			case SDL_GL_CONTEXT_FLAGS: return "SDL_GL_CONTEXT_FLAGS";
+			case SDL_GL_CONTEXT_PROFILE_MASK: return "SDL_GL_CONTEXT_PROFILE_MASK";
+			case SDL_GL_SHARE_WITH_CURRENT_CONTEXT: return "SDL_GL_SHARE_WITH_CURRENT_CONTEXT";
+			case SDL_GL_FRAMEBUFFER_SRGB_CAPABLE: return "SDL_GL_FRAMEBUFFER_SRGB_CAPABLE";
+			case SDL_GL_CONTEXT_RELEASE_BEHAVIOR: return "SDL_GL_CONTEXT_RELEASE_BEHAVIOR";
+			case SDL_GL_CONTEXT_RESET_NOTIFICATION: return "SDL_GL_CONTEXT_RESET_NOTIFICATION";
+			case SDL_GL_CONTEXT_NO_ERROR: return "SDL_GL_CONTEXT_NO_ERROR";
+			default: return "Unknown SDL_GLattr";
+		}
+	}
+
 	/// Attempt to set attribute and report errors.
 	/// Tests for success when destoryed.
 	struct GLattrSetter {
 		GLattrSetter(SDL_GLattr attr, int value): m_attr(attr), m_value(value) {
-			if (SDL_GL_SetAttribute(attr, value)) std::clog << "video/warning: Error setting GLattr " << stringify(m_attr) << std::endl;
+			if (SDL_GL_SetAttribute(attr, value)) SpdLogger::warn(LogSystem::OPENGL, "Error setting GLattr {}", GetSDLGLattrName(m_attr));
 		}
 		~GLattrSetter() {
 			int value;
 			SDL_GL_GetAttribute(m_attr, &value);
-			if (value != m_value)
-				std::clog << "video/warning: Error setting GLattr " << stringify (m_attr)
-				<< ": requested " << m_value << ", got " << value << std::endl;
+			if (value != m_value) {
+				SpdLogger::warn(LogSystem::OPENGL, "Error setting GLattr {}. Value requested={}, Value received={}", GetSDLGLattrName(m_attr), m_value, value);
+			}
 		}
 		SDL_GLattr m_attr;
 		int m_value;
@@ -54,10 +85,10 @@ void Window::start() {
 	{ // Setup GL attributes for context creation
 		SDL_SetHintWithPriority("SDL_HINT_VIDEO_HIGHDPI_DISABLED", "0", SDL_HINT_DEFAULT);
 		GLattrSetter attr_hw(SDL_GL_ACCELERATED_VISUAL, 1);
-		GLattrSetter attr_flush(SDL_GL_CONTEXT_RELEASE_BEHAVIOR, SDL_GL_CONTEXT_RELEASE_BEHAVIOR_FLUSH);
 		GLattrSetter attr_glmaj(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 		GLattrSetter attr_glmin(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 		GLattrSetter attr_glprof(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+		GLattrSetter attr_flush(SDL_GL_CONTEXT_RELEASE_BEHAVIOR, SDL_GL_CONTEXT_RELEASE_BEHAVIOR_FLUSH);
 		GLattrSetter attr_r(SDL_GL_RED_SIZE, 8);
 		GLattrSetter attr_g(SDL_GL_GREEN_SIZE, 8);
 		GLattrSetter attr_b(SDL_GL_BLUE_SIZE, 8);
@@ -120,7 +151,7 @@ void Window::start() {
 			else if (winOrigin.y > totalSize.h) {
 				winOrigin.y = (totalSize.h - height);
 			}
-			std::clog << "video/info: Saved window position outside of current display set-up; resetting to " << winOrigin.x << "," << winOrigin.y << std::endl;
+			SpdLogger::info(LogSystem::OPENGL, "Previous window position outside of current display set-up; resetting origin to: {},{}", winOrigin.x, winOrigin.y);
 		}
 		SDL_Point winEnd {(winOrigin.x + width), (winOrigin.y + height)};
 		if (SDL_PointInRect(&winEnd, &totalSize) == SDL_FALSE) {
@@ -132,7 +163,7 @@ void Window::start() {
 				height = totalSize.h;
 				winOrigin.y = (totalSize.y - height);
 			}
-			std::clog << "video/info: Saved window size outside of current display set-up; resetting to " << width << "x" << height << std::endl;
+			SpdLogger::info(LogSystem::OPENGL, "Previous window size larger than current display set-up; resetting to: {}x{}", width, height);
 		}
 
 		if (winOrigin.x == 0) {
@@ -141,8 +172,7 @@ void Window::start() {
 		if (winOrigin.y == 0) {
 			winOrigin.y = SDL_WINDOWPOS_UNDEFINED;
 		}
-
-		std::clog << "video/info: Create window dimensions: " << width << "x" << height << " on screen position: " << winOrigin.x << "x" << winOrigin.y << std::endl;
+		SpdLogger::info(LogSystem::OPENGL, "Creating window, dimensions={}x{} on screen coordinates={},{}", width, height, winOrigin.x, winOrigin.y);
 		screen.reset(SDL_CreateWindow(PACKAGE " " VERSION, winOrigin.x, winOrigin.y, width, height, flags));
 		if (!screen) {
 			throw std::runtime_error(std::string("SDL_CreateWindow failed: ") + SDL_GetError());
@@ -159,11 +189,19 @@ void Window::start() {
 	SDL_SetWindowMinimumSize(screen.get(), 640, 360);
 	SDL_GetWindowPosition(screen.get(), &m_windowX, &m_windowY);
 	// Dump some OpenGL info
-	std::clog << "video/info: GL_VENDOR:     " << glGetString(GL_VENDOR) << std::endl;
-	std::clog << "video/info: GL_VERSION:    " << glGetString(GL_VERSION) << std::endl;
-	std::clog << "video/info: GL_RENDERER:   " << glGetString(GL_RENDERER) << std::endl;
-	// Extensions would need more complex outputting, otherwise they will break clog.
-	//std::clog << "video/info: GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl;
+	std::string glVendor{reinterpret_cast<const char*>(glGetString(GL_VENDOR))};
+	std::string glVersion{reinterpret_cast<const char*>(glGetString(GL_VERSION))};
+	std::string glRenderer{reinterpret_cast<const char*>(glGetString(GL_RENDERER))};
+	SpdLogger::info(LogSystem::OPENGL,
+		"\n"
+		"{3}GL_VENDOR: {0}.\n"
+		"{3}GL_VERSION: {1}.\n"
+		"{3}GL_RENDERER: {2}.",
+		glVendor,
+		glVersion,
+		glRenderer,
+		SpdLogger::newLineDec
+		);
 	createShaders();
 	resize();
 	SDL_ShowWindow(screen.get());
@@ -190,9 +228,9 @@ void Window::createShaders() {
 			shader("dancenote").compileFile(findFile("shaders/stereo3d.geom"));
 		}
 		else {
-			std::clog << "video/warning: Stereo3D was enabled but the 'GL_ARB_viewport_array' extension is unsupported; will now disable Stereo3D." << std::endl;
+			SpdLogger::warning(LogSystem::OPENGL, "Stereo3D was enabled but the 'GL_ARB_viewport_array' extension is unsupported; will now disable Stereo3D.");
 			config["graphic/stereo3d"].b() = false;
-		}
+		} 
 	}
 
 	shader("color")
@@ -307,7 +345,7 @@ void Window::render(Game &game, std::function<void (void)> drawFunc) {
 		stereo = false;
 		if (!warn3d) {
 			warn3d = true;
-			std::clog << "video/warning: Your GPU does not support Stereo3D mode (OpenGL extension ARB_viewport_array is required)" << std::endl;
+			SpdLogger::warning(LogSystem::OPENGL, "Your GPU does not support Stereo3D mode (OpenGL extension ARB_viewport_array is required)");
 			game.flashMessage("Your GPU does not support Stereo3D mode");
 		}
 	}
@@ -467,14 +505,14 @@ FBO& Window::getFBO() {
 void Window::setFullscreen() {
 	if (m_fullscreen == config["graphic/fullscreen"].b()) return;  // We are done here
 	m_fullscreen = config["graphic/fullscreen"].b();
-	std::clog << "video/info: Toggle into " << (m_fullscreen ? "FULL SCREEN MODE" : "WINDOWED MODE") << std::endl;
+	SpdLogger::info(LogSystem::OPENGL, fmt::runtime("Toggle into {} MODE"), m_fullscreen ? "FULL SCREEN" : "WINDOWED");
 	auto ret = SDL_SetWindowFullscreen(screen.get(), (m_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0 ));
-	if (ret < 0) std::clog << "video/error: SDL_SetWindowFullscreen returned " << ret << std::endl;
+	if (ret < 0) SpdLogger::error(LogSystem::OPENGL, "SDL_SetWindowFullscreen error code={}", ret);
 	// Resize window to old size and position (if windowed now)
 	if (!m_fullscreen) {
 		int w = config["graphic/window_width"].i();
 		int h = config["graphic/window_height"].i();
-		std::clog << "video/debug: Restoring window size " << w << "x" << h << " and position " << m_windowX << "," << m_windowY << std::endl;
+		SpdLogger::debug(LogSystem::OPENGL, "Restoring window size={}x{} at position={},{}", w, h, m_windowX, m_windowY);
 		SDL_SetWindowSize(screen.get(), w, h);
 		SDL_SetWindowPosition(screen.get(), m_windowX, m_windowY);
 	}
@@ -511,9 +549,12 @@ void Window::resize() {
 	// Enforce aspect ratio limits
 	if (s_height < 0.56f * s_width) s_width = round(s_height / 0.56f);
 	if (s_height > 0.8f * s_width) s_height = round(0.8f * s_width);
-	std::clog << "video/info: Window size " << w << "x" << h;
-	if (w != nativeW) std::clog << " (HiDPI " << nativeW << "x" << nativeH << ")";
-	std::clog << ", rendering in " << s_width << "x" << s_height << std::endl;
+	std::string message{fmt::format("Window size={}x{}", w, h)};
+	if (w != nativeW) {
+		fmt::format_to(std::back_inserter(message), " (HiDPI {}x{})", nativeW, nativeH);
+	}
+	fmt::format_to(std::back_inserter(message), ", rendering in={}x{}.", s_width, s_height);
+	SpdLogger::info(LogSystem::OPENGL, message);
 	if (m_fbo) {
 		m_fbo->resize(s_width, 2 * s_height);
 	}
@@ -546,7 +587,7 @@ void Window::screenshot() {
 	}
 	// Save to disk
 	writePNG(filename.string(), img, stride);
-	std::clog << "video/info: Screenshot taken: " << filename << " (" << img.width << "x" << img.height << ")" << std::endl;
+	SpdLogger::info(LogSystem::OPENGL, "Screenshot taken, file={} ({}x{}).", filename, img.width, img.height);
 }
 
 Window::SDLSystem::SDLSystem() {
