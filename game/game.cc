@@ -5,6 +5,7 @@
 #include "fs.hh"
 #include "graphic/glutil.hh"
 #include "graphic/color_trans.hh"
+#include "log.hh"
 #include "screen.hh"
 #include "util.hh"
 
@@ -17,6 +18,7 @@ Game::Game(Window& window):
   m_messagePopup(0.0, 1.0), m_textMessage(findFile("message_text.svg"), config["graphic/text_lod"].f()),
   m_loadingProgress(0.0f), m_logo(findFile("logo.svg")), m_logoAnim(0.0, 0.5)
 {
+	SpdLogger::notice(LogSystem::AUDIO, "Starting the audio subsystem (errors printed on console may be ignored).");
 	m_textMessage.dimensions.middle().center(-0.05f);
 }
 
