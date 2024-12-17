@@ -10,6 +10,7 @@ class WebServer
 public:
 	WebServer(Game &game, Songs& songs);
 	~WebServer();
+	static bool enabled() { return true; }
 
 private:
 	void StartServer(int tried, bool fallbackPortInUse);
@@ -28,5 +29,6 @@ class WebServer
 {
 public:
 	WebServer(Game&, Songs&) {}
+	static bool enabled() { return false; }
 };
 #endif
