@@ -39,8 +39,7 @@ using LoggerColor = std::string_view;
 #define logger_colors(color) stdout_sink->color
 #endif
 
-using loggerPtr = std::shared_ptr<spdlog::logger>;
-
+using LoggerPtr = std::shared_ptr<spdlog::logger>;
 
 template<>
 struct fmt::formatter<LogSystem> : fmt::formatter<std::string> {
@@ -49,6 +48,8 @@ struct fmt::formatter<LogSystem> : fmt::formatter<std::string> {
 		return format_to(ctx.out(), "{}", subsystem.toString());
 	}
 };
+
+struct StderrGrabber;
 
 class SpdLogger {
   public:
@@ -82,13 +83,19 @@ class SpdLogger {
 	template <typename... Args>
 	static void trace(LogSystem::Values subsystem, Args &&...args) { log(subsystem, spdlog::level::trace, std::forward<Args>(args)...); }
 
+	static bool initialized() { return m_defaultLogger != nullptr; }
 
+	inline static const std::string newLineDec = "             └---"; // new line decorator.
   private:
 	inline static const std::string formatString{"[%T]:::%^%n / %l%$::: %v"};
-	static std::unordered_map<LogSystem, loggerPtr> builtLoggers;
-	static loggerPtr getLogger(LogSystem::Values const& loggerName);
+	static std::unordered_map<LogSystem, LoggerPtr> builtLoggers;
+	static LoggerPtr getLogger(LogSystem::Values const& loggerName);
 	static std::shared_ptr<spdlog::sinks::dist_sink_mt> m_sink;
 	static std::shared_mutex m_LoggerRegistryMutex;
-	static loggerPtr m_defaultLogger;
+	static LoggerPtr m_defaultLogger;
 	static void writeLogHeader(spdlog::filename_t filename, std::FILE* fd, std::string header);
+	static void initializeSinks(spdlog::level::level_enum const& consoleLevel = spdlog::level::info);
+	static LoggerPtr constructLogger(const LogSystem system);
+	static std::unique_ptr<StderrGrabber> grabber;
+
 };

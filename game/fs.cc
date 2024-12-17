@@ -301,7 +301,6 @@ std::string formatPath(const fs::path& target) {
 }
 
 fs::path getLogFilename() { Lock l(mutex); return cache.cache / "infolog.txt"; }
-fs::path getLogFilename_new() { Lock l(mutex); return cache.cache / "infolog-new.txt"; }
 fs::path getSchemaFilename() { Lock l(mutex); return cache.share / configSchema; }
 fs::path getHomeDir() { Lock l(mutex); return cache.home; }
 fs::path getShareDir() { Lock l(mutex); return cache.share; }
