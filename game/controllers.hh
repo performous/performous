@@ -2,8 +2,12 @@
 
 #include "chrono.hh"
 #include "configuration.hh"
+#include "log.hh"
 #include "util.hh"
+
+#include <fmt/format.h>
 #include <SDL_events.h>
+
 #include <climits>
 #include <cstdint>
 #include <deque>
@@ -55,6 +59,7 @@ namespace input {
 		/// Provide numeric conversion for comparison and ordered containers
 		operator unsigned() const { return static_cast<unsigned>(type)<<20 | device<<10 | channel; }
 		bool isKeyboard() const { return type == SourceType::KEYBOARD; }  ///< This is so common test that a helper is provided
+		std::string toString() const;
 	};
 	
 	struct Event {
@@ -67,6 +72,8 @@ namespace input {
 		DevType devType; ///< Device type
 		Event(): source(), hw(), nav(NavButton::NONE), value(), time(), devType() {}
 		bool pressed() const { return value != 0.0; }
+	
+		std::string toString() const;
 	};
 
 	/// NavEvent is a menu navigation event, generalized for all controller type so that the user doesn't need to know about controllers.
@@ -141,5 +148,41 @@ namespace input {
 	Hardware::ptr constructJoysticks();
 	Hardware::ptr constructMidi();
 }
+// Custom formatter for SDL_Keymod
+template <>
+struct fmt::formatter<SDL_Keymod>: formatter<std::string_view> {
+	// Format function
+	template <typename FormatContext>
+	auto format(const SDL_Keymod& mod, FormatContext& ctx) const {
+		// Convert mod flags into a readable string
+		std::string mod_str;
+		if (mod & KMOD_CTRL) mod_str.append("CTRL+");
+		if (mod & KMOD_SHIFT) mod_str.append("SHIFT+");
+		if (mod & KMOD_ALT) mod_str.append("ALT+");
+		if (mod & KMOD_GUI) mod_str.append("GUI+");
 
+		// Remove trailing '+' if any
+		if (!mod_str.empty()) {
+			mod_str.pop_back();
+		} else {
+			mod_str = "NONE";
+		}
 
+		// Write the formatted string to the output
+		return formatter<std::string_view>::format(mod_str, ctx);
+	}
+};
+
+template <>
+struct fmt::formatter<SDL_Scancode>: formatter<std::string_view> {
+	// Format function
+	template <typename FormatContext>
+	auto format(const SDL_Scancode& scancode, FormatContext& ctx) const{
+		// Get the scancode name
+		const char* scancode_name = SDL_GetScancodeName(scancode);
+		std::string name = scancode_name && *scancode_name ? scancode_name : "UNKNOWN";
+
+		// Write the scancode name to the output
+		return formatter<std::string_view>::format(name, ctx);
+	}
+};
