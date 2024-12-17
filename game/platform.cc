@@ -79,8 +79,7 @@ Platform::Platform() {
 		}
 	}
 	catch (std::exception const& e) {
-		std::string error("platform/warning: error getting OS language from AppleDefaults: " + std::string(e.what()) + ", will default to en_US.UTF-8");
-		std::cerr << error << std::endl;
+		SpdLogger::error(LogSystem::LOGGER, "Language will default to en_US.UTF-8, due to error getting OS language from AppleDefaults. Exception={}.", e.what());
 	}
 	fs::path fcPath(resDirPath / "etc" / "fonts");
 	fs::path pangoLibDir(resDirPath / "lib");
