@@ -4,4 +4,4 @@
 
 struct Tone;
 
-void PrintTo(Tone const& tone, std::ostream* os);
+void PrintTo(Tone const& tone);
