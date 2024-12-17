@@ -53,4 +53,5 @@ class UnicodeUtil {
 
 	static std::unique_ptr<icu::RuleBasedCollator> m_searchCollator;
 	static std::unique_ptr<icu::RuleBasedCollator> m_sortCollator;
+	static std::mutex m_convertersMutex;
 };
