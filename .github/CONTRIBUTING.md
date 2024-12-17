@@ -21,7 +21,8 @@ sudo apt-get install git-core cmake build-essential gettext help2man \
    libepoxy-dev libsdl2-dev libcairo2-dev libpango1.0-dev librsvg2-dev \
    libboost-all-dev libavcodec-dev libavformat-dev libswscale-dev libswresample-dev \
    libpng-dev libjpeg-dev libxml++2.6-dev portaudio19-dev \
-   libopencv-dev libportmidi-dev libcpprest-dev nlohmann-json3-dev libfmt-dev
+   libopencv-dev libportmidi-dev libcpprest-dev nlohmann-json3-dev libfmt-dev \
+   libwebp-dev
 ```
 
 Notice: Dependency problems may prevent installation of portaudio19-dev. At least with Ubuntu 13.04 this can be solved by first installing libjack-jackd2-dev, even though that package is not actually needed for Performous.
@@ -53,7 +54,7 @@ It's best to fetch and install this first, as the package-install below depends 
 sudo yum install git cmake gcc-c++ gettext cairo-devel librsvg2-devel libsigc++20-devel \
    glibmm24-devel libxml++-devel boost-devel SDL2-devel libepoxy-devel ffmpeg-devel \
    portaudio-devel help2man redhat-lsb opencv-devel portmidi-devel libjpeg-turbo-devel \
-   pango-devel jsoncpp-devel fmt-devel
+   pango-devel jsoncpp-devel fmt-devel libwebp-devel
 ```
 
 If you also plan to run unit tests, further packages are required.  

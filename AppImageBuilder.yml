@@ -21,6 +21,7 @@ AppDir:
     include:
       ## All of these dependencies can be found by downloading the Performous
       ## package for Ubuntu 22.04 and doing a dpkg -I on it
+      - fonts-noto-mono
       - libaubio5
       - libavcodec60
       - libavformat60
@@ -56,6 +57,7 @@ AppDir:
       - libxml++2.6-2v5
       - libcrypt1
       - libnsl2
+      - libwebp7
     exclude:
       - libasound2
   files:

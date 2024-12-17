@@ -96,7 +96,7 @@ if(GTest_FOUND)
 	gtest_discover_tests(performous_test PROPERTIES TEST_DISCOVERY_TIMEOUT 30)
 
 	# Image formats
-	foreach(lib PangoCairo LibRSVG ZLIB JPEG PNG)
+	foreach(lib PangoCairo LibRSVG ZLIB JPEG PNG WebP)
 		find_package(${lib} ${${lib}_REQUIRED_VERSION} REQUIRED)
 		message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
 		target_include_directories(performous_test SYSTEM PRIVATE ${${lib}_INCLUDE_DIRS})

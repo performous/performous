@@ -155,7 +155,7 @@ jobs:
           PERFORMOUS_RELEASE_TYPE="RelWithDebInfo"
           
           # Only pull the container if it wasn't built locally
-          if [ '${{ needs.determine_docker_version.outputs.build_docker_containers }}' = 'false' ]; then
+          if [ "${{ needs.determine_docker_version.outputs[format('build_{0}_containers', matrix.os)] }}" = "false" ] && [ '${{ needs.determine_docker_version.outputs.build_docker_containers }}' = 'false' ]; then
             docker pull ${{ env.CONTAINER_NAME }}
           fi
 
