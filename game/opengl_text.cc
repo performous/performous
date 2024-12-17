@@ -1,26 +1,29 @@
 #include "opengl_text.hh"
 
-#include "libxml++-impl.hh"
 
-#include <cstdint>
-#include <cmath>
-#include <iostream>
-#include <sstream>
 #include "fs.hh"
 #include "graphic/text_renderer.hh"
 #include "graphic/lyrics_color_trans.hh"
 #include "graphic/video_driver.hh"
 #include "fontconfig/fontconfig.h"
+#include "libxml++.hh"
+#include "log.hh"
+
 #include <pango/pangocairo.h>
+
+#include <cstdint>
+#include <cmath>
+#include <iostream>
+#include <sstream>
 
 void loadFonts() {
 	auto config = std::unique_ptr<FcConfig, decltype(&FcConfigDestroy)>(FcInitLoadConfig(), &FcConfigDestroy);
 	for (fs::path const& font: listFiles("fonts")) {
 		FcBool err = FcConfigAppFontAddFile(config.get(), reinterpret_cast<const FcChar8*>(font.string().c_str()));
-		std::clog << "font/info: Loading font " << font << ": " << ((err == FcTrue)?"ok":"error") << std::endl;
+		SpdLogger::info(LogSystem::TEXT, fmt::runtime("Loading font={} : {})"), font, err == FcTrue ? "OK" : "Error");
 	}
 	if (!FcConfigBuildFonts(config.get()))
-		throw std::logic_error("Could not build font database.");
+		throw std::runtime_error("Could not build font database.");
 
 		// FcConfigSetCurrent increments the refcount of config, thus the local handle on config can be deleted safely.
 	FcConfigSetCurrent(config.get());
@@ -28,14 +31,16 @@ void loadFonts() {
 	// This would all be very useless if pango+cairo didn't use the fontconfig+freetype backend:
 
 	PangoCairoFontMap *map = PANGO_CAIRO_FONT_MAP(pango_cairo_font_map_get_default());
-	std::clog << "font/info: PangoCairo is using font map " << G_OBJECT_TYPE_NAME(map) << std::endl;
+	SpdLogger::info(LogSystem::TEXT, "PangoCairo using font map={}.", G_OBJECT_TYPE_NAME(map));
 	if (pango_cairo_font_map_get_font_type(map) != CAIRO_FONT_TYPE_FT) {
 		PangoCairoFontMap *ftMap = PANGO_CAIRO_FONT_MAP(pango_cairo_font_map_new_for_font_type(CAIRO_FONT_TYPE_FT));
 		if (ftMap) {
-			std::clog << "font/info: Switching to font map " << G_OBJECT_TYPE_NAME(ftMap) << std::endl;
+			SpdLogger::info(LogSystem::TEXT, "Switching to font map={}.", G_OBJECT_TYPE_NAME(ftMap));
 			pango_cairo_font_map_set_default(ftMap);
-		} else
-			std::clog << "font/error: Can't switch to FreeType, fonts will be unavailable!" << std::endl;
+		}
+		else {
+			SpdLogger::error(LogSystem::TEXT, "Can't switch to FreeType; fonts will be unavailable!");
+		}
 	}
 }
 
