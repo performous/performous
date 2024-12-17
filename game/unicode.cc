@@ -28,7 +28,7 @@ Converter::Converter(Converter&& c) noexcept:
 
 icu::UnicodeString Converter::convertToUTF8(std::string_view sv) {
 	std::scoped_lock l(m_lock);
-	icu::UnicodeString ret(sv.data(), -1, m_converter.get(), m_error);
+	icu::UnicodeString ret(sv.data(), static_cast<int>(sv.length()), m_converter.get(), m_error);
 	if (m_error.isFailure()) throw std::runtime_error("Couldn't convert string: " + std::string(sv) + " to UTF-8. Error: " + std::to_string(m_error.get()) + ": " + m_error.errorName());
 	return ret;
 }
@@ -98,10 +98,20 @@ std::string UnicodeUtil::convertToUTF8 (std::string_view str, std::string _filen
 			std::clog << "unicode/error: tried to convert text in an unknown encoding: " << charset << std::endl;
 		}
 	}
+	removeUTF8BOM(ret);
 	return ret;
 }
 
 bool UnicodeUtil::removeUTF8BOM(std::string_view& str) {
+	// Test for UTF-8 BOM (a three-byte sequence at the beginning of a file)
+	if (str.substr(0, 3) == "\xEF\xBB\xBF") {
+		str = str.substr(3); // Remove BOM if there is one
+		return true;
+	}
+	return false;
+}
+
+bool UnicodeUtil::removeUTF8BOM(std::string& str) {
 	// Test for UTF-8 BOM (a three-byte sequence at the beginning of a file)
 	if (str.substr(0, 3) == "\xEF\xBB\xBF") {
 		str = str.substr(3); // Remove BOM if there is one
@@ -143,7 +153,7 @@ bool UnicodeUtil::isRTL(std::string_view str) {
 	ubidi_setPara(
 		_uBiDiObj.get(),
 		ustring.getBuffer(),
-		-1,
+		ustring.length(),
 		UBIDI_DEFAULT_LTR,
 		nullptr,
 		_unicodeError
