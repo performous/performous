@@ -14,6 +14,7 @@ std::unique_ptr<icu::RuleBasedCollator> UnicodeUtil::m_searchCollator;
 std::unique_ptr<icu::RuleBasedCollator> UnicodeUtil::m_sortCollator;
 
 std::map<std::string, Converter> UnicodeUtil::m_converters{};
+std::mutex UnicodeUtil::m_convertersMutex;
 
 Converter::Converter(std::string const& codepage): m_codepage(codepage), m_converter(nullptr, &ucnv_close) {
 	m_converter = std::unique_ptr<UConverter, decltype(&ucnv_close)>(ucnv_open(m_codepage.c_str(), m_error), &ucnv_close);
@@ -33,6 +34,7 @@ icu::UnicodeString Converter::convertToUTF8(std::string_view sv) {
 }
 
 Converter& UnicodeUtil::getConverter(std::string const& s) {
+	std::scoped_lock l{m_convertersMutex};
 	return m_converters.try_emplace(s, Converter(s)).first->second;
 }
 
