@@ -1,9 +1,9 @@
 #include "tone.hh"
 
+#include "log.hh"
 #include "util.hh"
+
 #include <cmath>
-#include <iostream>
-#include <iomanip>
 
 Tone::Tone():
   db(-getInf()), stabledb(-getInf()) {
@@ -13,16 +13,11 @@ Tone::Tone():
 void Tone::print() const {
 	if (age < Tone::MINAGE)
 		return;
-	std::cout << std::fixed << std::setprecision(1) << freq << " Hz, age " << age << ", " << db << " dB:";
-	for (std::size_t i = 0; i < 8; ++i)
-		std::cout << " " << harmonics[i];
-	std::cout << std::endl;
-}
-
-void Tone::print(std::ostream& os) const {
-	os << std::fixed << std::setprecision(1) << freq << " Hz, age " << age << ", " << db << " dB:";
-	for (std::size_t i = 0; i < 8; ++i)
-		os << " " << harmonics[i];
+	std::string ret{fmt::format("Tone freq={:.1f} Hz, age={}, loudnesss={:.1f} dB. Harmonics: ", freq, age, db)};
+	for (std::size_t i = 0; i < 8; ++i) {
+		fmt::format_to(std::back_inserter(ret), fmt::runtime("{:.1f} Hz{}"), harmonics[i], i < 7 ? ", " : ".");
+	}
+	SpdLogger::info(LogSystem::ENGINE, ret);
 }
 
 bool Tone::operator==(double f) const {
