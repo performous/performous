@@ -13,22 +13,26 @@ class LogSystem {
 		CACHE,
 		CONFIG,
 		CONTROLLERS,
+		DANCING,
 		DATABASE,
+		ENGINE,
 		FFMPEG,
 		FILESYSTEM,
-		GAME,
 		I18N,
 		IMAGE,
+		INSTRUMENTS,
 		JSON,
 		LOGGER,
 		MIDI,
 		OPENGL,
 		PROFILER,
+		SINGING,
 		SONGPARSER,
 		SONGS,
 		STDERR,
 		TEXT,
 		WEBCAM,
+		WEBSERVER,
 		COUNT // Sentinel value for iteration
 	};
 
@@ -90,8 +94,14 @@ class LogSystem {
 			case LogSystem::Values::CONTROLLERS:
 				subsystem_string = "CONTROLLERS";
 				break;
+			case LogSystem::Values::DANCING:
+				subsystem_string = "DANCING";
+				break;
 			case LogSystem::Values::DATABASE:
 				subsystem_string = "DATABASE";
+				break;
+			case LogSystem::Values::ENGINE:
+				subsystem_string = "ENGINE";
 				break;
 			case LogSystem::Values::FFMPEG:
 				subsystem_string = "FFMPEG";
@@ -99,14 +109,14 @@ class LogSystem {
 			case LogSystem::Values::FILESYSTEM:
 				subsystem_string = "FILESYSTEM";
 				break;
-			case LogSystem::Values::GAME:
-				subsystem_string = "GAME";
-				break;
 			case LogSystem::Values::I18N:
 				subsystem_string = "I18N";
 				break;
 			case LogSystem::Values::IMAGE:
 				subsystem_string = "IMAGE";
+				break;
+			case LogSystem::Values::INSTRUMENTS:
+				subsystem_string = "INSTRUMENTS";
 				break;
 			case LogSystem::Values::JSON:
 				subsystem_string = "JSON";
@@ -123,6 +133,9 @@ class LogSystem {
 			case LogSystem::Values::PROFILER:
 				subsystem_string = "PROFILER";
 				break;
+			case LogSystem::Values::SINGING:
+				subsystem_string = "SINGING";
+				break;
 			case LogSystem::Values::SONGPARSER:
 				subsystem_string = "SONGPARSER";
 				break;
@@ -137,6 +150,9 @@ class LogSystem {
 				break;
 			case LogSystem::Values::WEBCAM:
 				subsystem_string = "WEBCAM";
+				break;
+			case LogSystem::Values::WEBSERVER:
+				subsystem_string = "WEBSERVER";
 				break;
 			default: break;
 		}
