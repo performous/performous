@@ -23,9 +23,9 @@ void Database::load() {
 		m_players.load(nodeRoot->find("/performous/players/player"));
 		m_songs.load(nodeRoot->find("/performous/songs/song"));
 		m_hiscores.load(nodeRoot->find("/performous/hiscores/hiscore"));
-		std::clog << "database/info: Loaded " << m_players.count() << " players, " << m_songs.size() << " songs and " << m_hiscores.size() << " hiscores from " << m_filename.string() << std::endl;
+		SpdLogger::info(LogSystem::DATABASE, "Loaded {} players, {} songs, and {} hiscores from {}.", m_players.count(), m_songs.size(), m_hiscores.size(), m_filename);
 	} catch (std::exception const& e) {
-		std::clog << "database/error: Error loading " + m_filename.string() + ": " + e.what() << std::endl;
+		SpdLogger::error(LogSystem::DATABASE, "Error loading file={}, error={}", m_filename, e.what());
 	}
 }
 
@@ -42,9 +42,9 @@ void Database::save() {
 			doc.write_to_file_formatted(tmp.string(), "UTF-8");
 		}
 		rename(tmp, m_filename);
-		std::clog << "database/info: Saved " << m_players.count() << " players, " << m_songs.size() << " songs and " << m_hiscores.size() << " hiscores to " << m_filename.string() << std::endl;
+		SpdLogger::info(LogSystem::DATABASE, "Saved {} players, {} songs, and {} hiscores to {}.", m_players.count(), m_songs.size(), m_hiscores.size(), m_filename);
 	} catch (std::exception const& e) {
-		std::clog << "database/error: Could not save " + m_filename.string() + ": " + e.what() << std::endl;
+		SpdLogger::error(LogSystem::DATABASE, "Error saving file={}, error={}.", m_filename, e.what());
 		return;
 	}
 }
@@ -64,7 +64,7 @@ void Database::addSong(std::shared_ptr<Song> s) {
 void Database::addHiscore(std::shared_ptr<Song> s) {
 	auto maybe_playerid = m_players.lookup(m_players.current().name);
 	if (!maybe_playerid.has_value()) {
-		std::cerr << "database/error: cannot find player ID for player '" + m_players.current().name << "'\n";
+		SpdLogger::error(LogSystem::DATABASE, "Cannot find player id for player={}", m_players.current().name);
 		return;
 	}
 	auto playerid = maybe_playerid.value();
@@ -72,12 +72,12 @@ void Database::addHiscore(std::shared_ptr<Song> s) {
 	std::string track = scores.front().track;
 	const auto songid = m_songs.lookup(s);
 	if(!songid.has_value()) {
-		std::clog << "database/error: Invalid song ID for song: " + s->artist + " - " + s->title << std::endl;
+		SpdLogger::error(LogSystem::DATABASE, "Invalid song ID for song: artist={}, title={}", s->artist, s->title);
 		return;
 	}
 	unsigned short level = config["game/difficulty"].ui();
 	m_hiscores.addHiscore(score, playerid, songid.value(), level, track);
-	std::clog << "database/info: Added new hiscore " << score << " points on track " << track << " of songid " << std::to_string(songid.value()) << " level "<< level<< std::endl;
+	SpdLogger::info(LogSystem::DATABASE, "Added new hiscore. Score={} on track={} for song id={}, on level={}", score, track, songid.value(), level);
 }
 
 bool Database::reachedHiscore(std::shared_ptr<Song> s) const {
@@ -85,7 +85,7 @@ bool Database::reachedHiscore(std::shared_ptr<Song> s) const {
 	const auto track = scores.front().track;
 	const auto songid = m_songs.lookup(s);
 	if (!songid) {
-		std::clog << "database/error: Invalid song ID for song: " + s->artist + " - " + s->title << std::endl;
+		SpdLogger::error(LogSystem::DATABASE, "Invalid song ID for song: artist={}, title={}", s->artist, s->title);
 		return false;
 	}
 	unsigned short level = config["game/difficulty"].ui();
@@ -127,8 +127,7 @@ unsigned Database::getHiscore(SongPtr const& s) const {
 
 		return m_hiscores.getHiscore(songid);
 	} catch (const std::exception& e) {
-		std::clog << "database/error: Invalid song ID for song: " + s->artist + " - " + s->title << std::endl;
-		std::clog << "database/error: message: " << e.what() << std::endl;
+		SpdLogger::error(LogSystem::DATABASE, "Invalid song ID for song: artist={}, title={}, error={}", s->artist, s->title, e.what());
 		throw;
 	}
 }
@@ -139,8 +138,7 @@ std::vector<HiscoreItem> Database::getHiscores(SongPtr const& s) const {
 
 		return m_hiscores.getHiscores(songid);
 	} catch (const std::exception& e) {
-		std::clog << "database/error: Invalid song ID for song: " + s->artist + " - " + s->title << std::endl;
-		std::clog << "database/error: message: " << e.what() << std::endl;
+		SpdLogger::error(LogSystem::DATABASE, "Invalid song ID for song: artist={}, title={}, error={}", s->artist, s->title, e.what());
 		throw;
 	}
 }

@@ -1,8 +1,10 @@
 #include "menu.hh"
-#include "screen.hh"
-#include "texture.hh"
+
 #include "fs.hh"
 #include "game.hh"
+#include "log.hh"
+#include "screen.hh"
+#include "texture.hh"
 
 MenuOption::MenuOption(std::string const& nm, std::string const& comm, MenuImage img):
   type(), value(), newValue(), callback(), image(img), name(nm), comment(comm), namePtr(), commentPtr()
@@ -72,10 +74,10 @@ void Menu::action(Game& game, int dir) {
 					TranslationEngine::setLanguage(value.getValue(), true);
 				} else if (current().value->getName() == "graphic/stereo3d") {
 					try {
-						std::clog << "video/info: Stereo 3D configuration changed, will reset shaders.\n";
+						SpdLogger::info(LogSystem::OPENGL, "Stereo 3D configuration changed, will reset shaders.");
 						game.getWindow().resetShaders();
-					} catch (const std::exception &) {
-						std::cerr << "video/info: Disable Stereo 3D because shader creation failed.\n";
+					} catch (std::exception const& e) {
+						SpdLogger::error(LogSystem::OPENGL, "Stereo 3D disabled because shader creation failed. Exception={}", e.what());
 						current().value->b() = false; // Disable 3D if shader fails
 						throw;
 					}
