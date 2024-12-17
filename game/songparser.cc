@@ -133,10 +133,10 @@ SongParser::SongParser(Song& s) : m_song(s) {
 void SongParser::guessFiles() {
 	// List of fields containing filenames, and auto-matching regexps, in order of priority
 	const std::vector<std::pair<fs::path*, char const*> > fields = {
-		{ &m_song.cover, R"((cover|album|label|banner|bn|\[co\])\.(png|jpeg|jpg|svg)$)" },
-		{ &m_song.background, R"((background|bg|\[bg\])\.(png|jpeg|jpg|svg)$)" },
-		{ &m_song.cover, R"(\.(png|jpeg|jpg|svg)$)" },
-		{ &m_song.background, R"(\.(png|jpeg|jpg|svg)$)" },
+		{ &m_song.cover, R"((cover|album|label|banner|bn|\[co\])\.(png|jpeg|jpg|webp|svg)$)" },
+		{ &m_song.background, R"((background|bg|\[bg\])\.(png|jpeg|jpg|webp|svg)$)" },
+		{ &m_song.cover, R"(\.(png|jpeg|jpg|webp|svg)$)" },
+		{ &m_song.background, R"(\.(png|jpeg|jpg|webp|svg)$)" },
 		{ &m_song.video, R"(\.(avi|mpg|mpeg|flv|mov|mp4|mkv|m4v|webm)$)" },
 		{ &m_song.midifilename, R"(^notes\.mid$)" },
 		{ &m_song.midifilename, R"(\.mid$)" },

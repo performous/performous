@@ -54,7 +54,7 @@ void Backgrounds::reload_internal(fs::path const& parent) {
 	}
 	try {
 		// Find suitable file formats
-		std::regex expression(R"(\.(png|jpeg|jpg|svg)$)", std::regex_constants::icase);
+		std::regex expression(R"(\.(png|jpeg|jpg|webp|svg)$)", std::regex_constants::icase);
 		for (fs::directory_iterator dirIt(parent), dirEnd; m_loading && dirIt != dirEnd; ++dirIt) {
 			fs::path p = dirIt->path();
 			if (fs::is_directory(p)) { reload_internal(p); continue; }
