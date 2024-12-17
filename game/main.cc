@@ -264,15 +264,17 @@ template <typename Container> void confOverride(Container const& c, std::string 
 void outputOptionalFeatureStatus();
 
 static void fatalError(const std::string &msg) {
-	auto errMsg = msg + "\nIf you think this is a bug in Performous, please report it at \n"
-						"  https://github.com/performous/performous/issues";
+	auto errorMsg = fmt::format(
+	"{}"
+	"\nIf you think this is a bug in Performous, please report it at \n"
+	"  https://github.com/performous/performous/issues"
+	, msg);
 	auto title = "FATAL ERROR";
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, errMsg.c_str(), nullptr);
-	std::cerr << title << ": " << msg << std::endl;
-	std::clog << "core/error: " << errMsg << std::endl;
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, errorMsg.c_str(), nullptr);
+	SpdLogger::error(LogSystem::LOGGER, msg);
 }
 
-int main(int argc, char** argv) try {
+int main(int argc, char** argv) {
 	Platform platform;
 	std::srand(static_cast<unsigned>(std::time(nullptr)));
 	// Parse commandline options
@@ -335,45 +337,47 @@ int main(int argc, char** argv) try {
 	}
 	pathBootstrap();
 	SpdLogger spdLogger(levelEnum);
+	try {
+		outputOptionalFeatureStatus();
 
-	outputOptionalFeatureStatus();
+		readConfig();
 
-	readConfig();
-
-	if (vm.count("audiohelp")) {
-		SpdLogger::notice(LogSystem::LOGGER, "Starting the audio subsystem for audiohelp (errors printed on console may be ignored).");
-		Audio audio;
-		// Print the devices
-		std::cout << portaudio::AudioBackends().dump();
-		// Some examples
-		std::cout << "Example --audio parameters" << std::endl;
-		std::cout << "  --audio \"out=2\"         # Pick first working two-channel playback device" << std::endl;
-		std::cout << "  --audio \"dev=1 out=2\"   # Pick device id 1 and assign stereo playback" << std::endl;
-		std::cout << "  --audio 'dev=\"HDA Intel\" mics=blue,red'   # HDA Intel with two mics" << std::endl;
-		std::cout << "  --audio 'dev=pulse out=2 mics=blue'       # PulseAudio with input and output" << std::endl;
-		return EXIT_SUCCESS;
-	}
-	// Override XML config for options that were specified from commandline or performous.conf
-	confOverride(songdirs, "paths/songs");
-	confOverride(devices, "audio/devices");
-	getPaths(); // Initialize paths before other threads start
-	if (vm.count("jstest")) { // Joystick test program
-		SpdLogger::info(LogSystem::CONTROLLERS, 
-			"Starting jstest input test utility.\n"
-			"Joystick utility - Touch your joystick to see buttons here\n"
-			"Hit ESC (window focused) to quit"
-		);
-		jstestLoop();
+		if (vm.count("audiohelp")) {
+			SpdLogger::notice(LogSystem::LOGGER, "Starting the audio subsystem for audiohelp (errors printed on console may be ignored).");
+			Audio audio;
+			// Print the devices
+			std::cout << portaudio::AudioBackends().dump();
+			// Some examples
+			std::cout << "Example --audio parameters" << std::endl;
+			std::cout << "  --audio \"out=2\"         # Pick first working two-channel playback device" << std::endl;
+			std::cout << "  --audio \"dev=1 out=2\"   # Pick device id 1 and assign stereo playback" << std::endl;
+			std::cout << "  --audio 'dev=\"HDA Intel\" mics=blue,red'   # HDA Intel with two mics" << std::endl;
+			std::cout << "  --audio 'dev=pulse out=2 mics=blue'       # PulseAudio with input and output" << std::endl;
+			return EXIT_SUCCESS;
+		}
+		// Override XML config for options that were specified from commandline or performous.conf
+		confOverride(songdirs, "paths/songs");
+		confOverride(devices, "audio/devices");
+		getPaths(); // Initialize paths before other threads start
+		if (vm.count("jstest")) { // Joystick test program
+			SpdLogger::info(LogSystem::CONTROLLERS, 
+				"Starting jstest input test utility.\n"
+				"Joystick utility - Touch your joystick to see buttons here\n"
+				"Hit ESC (window focused) to quit"
+			);
+			jstestLoop();
+			SpdLogger::info(LogSystem::LOGGER, "Exiting normally.");
+			return EXIT_SUCCESS;
+		}
+		// Run the game init and main loop
+		mainLoop(songlist);
 		SpdLogger::info(LogSystem::LOGGER, "Exiting normally.");
-		return EXIT_SUCCESS;
 	}
-	// Run the game init and main loop
-	mainLoop(songlist);
-	SpdLogger::info(LogSystem::LOGGER, "Exiting normally.");
+	catch (EXCEPTION& e) {
+		fatalError(e.what());
+		return EXIT_FAILURE;
+	}
 	return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
-} catch (EXCEPTION& e) {
-	fatalError(e.what());
-	return EXIT_FAILURE;
 }
 
 void outputOptionalFeatureStatus() {
