@@ -336,17 +336,6 @@ int main(int argc, char** argv) try {
 	pathBootstrap();
 	SpdLogger spdLogger(levelEnum);
 
-	spdLogger.notice(LogSystem::LOGGER, "Testing whether spdlog works? {}", true);
-	spdLogger.notice(LogSystem::LOGGER, "And does it work without a parameter?");
-	spdLogger.notice(LogSystem::SONGS, "And does it work without a parameter?");
-	spdLogger.notice(LogSystem::AUDIO, "And does it work without a parameter?");
-	spdLogger.notice(LogSystem::CACHE, "And does it work without a parameter?");
-	spdLogger.notice(LogSystem::ENGINE, "And does it work without a parameter?");
-	spdLogger.notice(LogSystem::SONGPARSER, "And does it work without a parameter?");
-	spdLogger.notice(LogSystem::TEXT, "And does it work without a parameter?");
-	spdLogger.error(LogSystem::TEXT, "Testing an error.");
-	spdLogger.notice(LogSystem::WEBCAM, "And does it work without a parameter?");
-	std::fputs("Testing printing to stderr\n", stderr);
 	outputOptionalFeatureStatus();
 
 	readConfig();
