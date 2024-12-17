@@ -10,13 +10,15 @@ namespace input {
 		Joysticks() {
 			for (int id = 0; id < SDL_NumJoysticks(); ++id) {
 				JoyPtr joy(SDL_JoystickOpen(id), SDL_JoystickClose);
-				std::ostringstream oss;
-				oss << "controller-joystick/info: Opened joystick " << id << ": " << getName(id) << " ("
-				  << SDL_JoystickNumButtons(joy.get()) << " buttons, "
-				  << SDL_JoystickNumAxes(joy.get()) << " axes, "
-				  << SDL_JoystickNumHats(joy.get()) << " hats, "
-				  << SDL_JoystickNumBalls(joy.get()) << " balls)";
-				std::clog << oss.str() << std::endl;  // Logging system barks if this is not one atomic write (thus the ostringstream).
+				SpdLogger::info(LogSystem::CONTROLLERS,
+					"Joystick {} opened: {} ({} buttons, {} axes, {} hats, {} balls.)",
+					id,
+					getName(id),
+					SDL_JoystickNumButtons(joy.get()),
+					SDL_JoystickNumAxes(joy.get()),
+					SDL_JoystickNumHats(joy.get()),
+					SDL_JoystickNumBalls(joy.get())
+				);
 				m_joysticks.push_back(joy);
 			}
 		}
@@ -41,7 +43,7 @@ namespace input {
 			try {
 			event.source = SourceId(SourceType::JOYSTICK, static_cast<unsigned>(sdlEv.jbutton.which));  // All j* structures have .which at the same position as jbutton
 			} catch (std::exception const&) {
-				std::clog << "joystick/error: " + std::to_string(sdlEv.jbutton.which) + " is an invalid SDL_JoystickID." << std::endl;
+				SpdLogger::error(LogSystem::CONTROLLERS, "Invalid SDL_JoystickID: {}", std::to_string(sdlEv.jbutton.which));
 			}
 			return true;
 		}
@@ -89,7 +91,7 @@ void init() {
 		char ch;
 		std::string type;
 		if (!(iss >> sdl_id >> ch >> type) || ch != ':') {
-			std::clog << "controllers/error: \"" << *it << "\" invalid syntax, should be SDL_ID:CONTROLLER_TYPE" << std::endl;
+			SpdLogger::error(LogSystem::CONTROLLERS, "Invalid syntax in: {}, should be SDL_ID:CONTROLLER_TYPE", *it);
 			continue;
 		} else {
 			bool found = false;
@@ -100,7 +102,7 @@ void init() {
 					break;
 				}
 			}
-			if (!found) std::clog << "controllers/error: Controller type \"" << type << "\" unknown" << std::endl;
+			if (!found) SpdLogger::error(LogSystem::CONTROLLERS, "Unknown controller type: {}.", type);
 		}
 	}
 
