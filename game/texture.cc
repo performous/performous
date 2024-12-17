@@ -1,10 +1,11 @@
 #include "texture.hh"
 
 #include "configuration.hh"
+#include "game.hh"
 #include "graphic/video_driver.hh"
+#include "log.hh"
 #include "screen.hh"
 #include "svg.hh"
-#include "game.hh"
 #include "util.hh"
 
 #include <atomic>
@@ -52,8 +53,9 @@ class TextureLoader::Impl {
 				loadPNG(bitmap, name);
 			else
 				throw std::runtime_error("Unknown image file format: " + name.string());
-		} catch (std::exception& e) {
-			std::clog << "image/error: " << e.what() << std::endl;
+		}
+		catch (std::exception& e) {
+			SpdLogger::error(LogSystem::IMAGE, "Error loading texture, exception={}", e.what());
 		}
 	}
 	std::atomic<bool> m_quit{ false };

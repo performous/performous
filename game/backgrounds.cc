@@ -1,7 +1,8 @@
 #include "backgrounds.hh"
-#include "fs.hh"
-
 #include "configuration.hh"
+#include "fs.hh"
+#include "log.hh"
+
 #include <algorithm>
 #include <iostream>
 #include <sstream>
@@ -27,12 +28,15 @@ void Backgrounds::reload_internal() {
 	for (auto it = paths.begin(); m_loading && it != paths.end(); ++it) {
 		if (!m_loading) break;
 		*it /= "backgrounds";
-		if (!fs::is_directory(*it)) { std::clog << "backgrounds/info: >>> Not scanning for backgrounds: " << *it << " (no such directory)" << std::endl; continue; }
-		std::clog << "backgrounds/info: >>> Scanning " << *it << " (for backgrounds)" << std::endl;
+		if (!fs::is_directory(*it)) {
+			SpdLogger::info(LogSystem::IMAGE, ">>> Not scanning for backgrounds on {}, directory not found.", *it);
+			continue;
+		}
+		SpdLogger::info(LogSystem::IMAGE, ">>> Scanning for backgrounds on {}", *it);
 		size_t count = m_bgs.size();
 		reload_internal(*it); // Scan the found folder
 		size_t diff = m_bgs.size() - count;
-		if (diff > 0 && m_loading) std::clog << "backgrounds/info: " << diff << " backgrounds loaded" << std::endl;
+		if (diff > 0 && m_loading) 		SpdLogger::info(LogSystem::IMAGE, "{} backgrounds loaded.", diff);
 	}
 	m_loading = false;
 	{	// Randomize the order
@@ -44,7 +48,10 @@ void Backgrounds::reload_internal() {
 }
 
 void Backgrounds::reload_internal(fs::path const& parent) {
-	if (std::distance(parent.begin(), parent.end()) > 20) { std::clog << "backgrounds/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)" << std::endl; return; }
+	if (std::distance(parent.begin(), parent.end()) > 20) {
+		SpdLogger::info(LogSystem::IMAGE, ">>> Not scanning for backgrounds on {}, maximum depth reached (possibly due to cyclic symlinks.)", parent);
+		return;
+	}
 	try {
 		// Find suitable file formats
 		std::regex expression(R"(\.(png|jpeg|jpg|svg)$)", std::regex_constants::icase);
@@ -62,7 +69,7 @@ void Backgrounds::reload_internal(fs::path const& parent) {
 			}
 		}
 	} catch (std::exception const& e) {
-		std::cout << "Exception thrown: " + std::string(e.what()) + ", error accessing " + parent.string() << std::endl;
+		SpdLogger::error(LogSystem::IMAGE, "Error accessing path={}, error={}", parent, e.what());
 	}
 }
 
