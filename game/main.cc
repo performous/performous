@@ -273,7 +273,6 @@ static void fatalError(const std::string &msg) {
 }
 
 int main(int argc, char** argv) try {
-	Logger logger("trace");
 	Platform platform;
 	std::srand(static_cast<unsigned>(std::time(nullptr)));
 	// Parse commandline options
@@ -334,7 +333,7 @@ int main(int argc, char** argv) try {
 		std::cout << cmdline << "\n  Any arguments without a switch are interpreted as song folders.\n" << std::endl;
 		return EXIT_SUCCESS;
 	}
-
+	pathBootstrap();
 	SpdLogger spdLogger(levelEnum);
 
 	spdLogger.notice(LogSystem::LOGGER, "Testing whether spdlog works? {}", true);

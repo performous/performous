@@ -41,12 +41,6 @@ using LoggerColor = std::string_view;
 
 using loggerPtr = std::shared_ptr<spdlog::logger>;
 
-class Logger {
-public:
-	Logger(std::string const& level);
-	~Logger();
-	static void teardown();
-};
 
 template<>
 struct fmt::formatter<LogSystem> : fmt::formatter<std::string> {

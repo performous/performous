@@ -237,9 +237,6 @@ Size SvgTxtTheme::measure(std::string const& text) {
 
 	for (auto&& t : m_opengl_text)
 		width += t->getWidth();
-
-	//std::cout << "svg width: " << width << std::endl;
-
 	return TextRenderer().measure(text, m_textstyle, m_factor) / width;
 }
 
