@@ -3,6 +3,7 @@
 #include "audio.hh"
 #include "configuration.hh"
 #include "controllers.hh"
+#include "log.hh"
 #include "microphones.hh"
 #include "platform.hh"
 #include "theme.hh"
@@ -62,7 +63,7 @@ ScreenAudioDevices::ScreenAudioDevices(Game &game, std::string const& name, Audi
 
 void ScreenAudioDevices::enter() {
 	int bend = getBackend();
-	std::clog << "audio-devices/debug: Entering audio Devices... backend has been detected as: " << bend << std::endl;
+	SpdLogger::debug(LogSystem::AUDIO, "Entering Audio Devices... detected backend={}", bend);
 	m_theme = std::make_unique<ThemeAudioDevices>();
 	PaHostApiTypeId backend = PaHostApiTypeId(bend);
 	portaudio::AudioDevices ads(backend);
