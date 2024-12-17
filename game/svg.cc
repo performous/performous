@@ -3,6 +3,7 @@
 #include "cache.hh"
 #include "configuration.hh"
 #include "image.hh"
+#include "log.hh"
 
 #include <librsvg/rsvg.h>
 #include <cstdint>
@@ -17,7 +18,7 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	float factor = config["graphic/svg_lod"].f();
 	// Try to load a cached PNG instead
 	if (cache::loadSVG(bitmap, filename, factor)) return;
-	std::clog << "image/debug: Loading SVG: " + filename.string() << std::endl;
+	SpdLogger::debug(LogSystem::IMAGE, "Loading SVG file, path={}.", filename);
 	// Open the SVG file in librsvg
 #if !GLIB_CHECK_VERSION(2, 36, 0)   // Avoid deprecation warnings
 	g_type_init();
