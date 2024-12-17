@@ -3,6 +3,7 @@
 #include "fs.hh"
 #include "i18n.hh"
 #include "json.hh"
+#include "log.hh"
 #include "notes.hh"
 #include "util.hh"
 
@@ -140,21 +141,32 @@ private:
 /// Thrown by SongParser when there is an error
 struct SongParserException: public std::runtime_error {
 	/// constructor
-	SongParserException(Song& s, std::string const& msg, unsigned int linenum, bool sil = false): runtime_error(msg), m_filename(s.filename), m_linenum(linenum), m_silent(sil) {
-		if (!sil) s.b0rked += msg + '\n';
+	SongParserException(Song& s, std::string const& msg, unsigned int linenum = 1, bool showInGUI = true): runtime_error(msg), m_filename(s.filename), m_linenum(linenum) {
+		if (showInGUI) {
+			fmt::format_to(std::back_inserter(s.b0rked), fmt::runtime("{}{}"), !s.b0rked.empty() ? "\n" : "", msg);
+		}
 	}
 	~SongParserException() noexcept = default;
 	fs::path const& file() const { return m_filename; } ///< file in which the error occured
 	unsigned int line() const { return m_linenum; } ///< line in which the error occured
-	bool silent() const { return m_silent; } ///< if the error should not be printed to user (file skipped)
 private:
 	fs::path m_filename;
 	unsigned int m_linenum;
-	bool m_silent;
 };
 
 using SongPtr = std::shared_ptr<Song>;
 using SongCollection = std::vector<SongPtr>;
 
-/// Print a SongParserException in a format suitable for the logging system.
-std::ostream& operator<<(std::ostream& os, SongParserException const& e);
+template <>
+struct fmt::formatter<SongParserException>: formatter<std::string_view> {
+	// Format function
+	template <typename FormatContext>
+	auto format(const SongParserException& e, FormatContext& ctx) const{
+		std::string ret{fmt::format("Error parsing songfile={}", e.file())};
+		if (e.line()) fmt::format_to(std::back_inserter(ret), ", line={}", e.line());
+		fmt::format_to(std::back_inserter(ret), ":\n{}{}", SpdLogger::newLineDec, e.what());
+		
+		// Write the scancode name to the output
+		return formatter<std::string_view>::format(ret, ctx);
+	}
+};

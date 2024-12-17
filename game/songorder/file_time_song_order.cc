@@ -1,4 +1,5 @@
 #include "file_time_song_order.hh"
+#include "log.hh"
 
 #include <filesystem>
 
@@ -6,8 +7,7 @@ namespace {
 	std::chrono::seconds getFileWriteTime(Song const& song) {
 		auto const time = std::filesystem::last_write_time(song.path);
 		auto const seconds = std::chrono::duration_cast<std::chrono::seconds>(time.time_since_epoch());
-
-		std::cout << song.path << ": " << seconds.count() << std::endl;
+		SpdLogger::debug(LogSystem::SONGS, "Song file={}, time since last write={}", seconds.count());
 
 		return seconds;
 	}
