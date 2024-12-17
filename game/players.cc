@@ -1,9 +1,10 @@
 #include "players.hh"
-#include "unicode.hh"
 
 #include "configuration.hh"
 #include "fs.hh"
 #include "libxml++.hh"
+#include "log.hh"
+#include "unicode.hh"
 
 #include <algorithm>
 #include <unicode/stsearch.h>
@@ -74,7 +75,7 @@ void Players::addPlayer (std::string const& name, std::string const& picture, st
 			pi.path =  findFile(fs::path("pictures") / pi.picture);
 		} catch (std::runtime_error const& e)
 		{
-			std::cerr << e.what() << std::endl;
+		SpdLogger::error(LogSystem::DATABASE, "Error finding player picture for player {}, id={}, exception={}.", pi.name, pi.id, e.what());
 		}
 	}
 
