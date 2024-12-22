@@ -45,13 +45,15 @@ if(GTest_FOUND)
 	message(STATUS "Testing enabled: Building test host")
 
 	set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${GAME_SOURCES})
-
+	
 	add_executable(performous_test ${SOURCES})
 
 	find_package(Boost 1.55 REQUIRED COMPONENTS program_options iostreams system locale)
 	target_link_libraries(performous_test PRIVATE ${Boost_LIBRARIES})
 
 	find_package(fmt REQUIRED CONFIG)
+
+
 	target_link_libraries(performous_test PRIVATE fmt::fmt)
 
 	if(${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.20)
@@ -73,13 +75,19 @@ if(GTest_FOUND)
 	endif()
 	
 	find_package(SDL2 REQUIRED)
-	target_link_libraries(performous_test PRIVATE ${SDL2_LIBRARIES})
+	if (TARGET SDL2::SDL2)
+		target_link_libraries(performous_test PRIVATE SDL2::SDL2)
+	else()
+		list(REMOVE_ITEM SDL2_LIBRARIES SDL2::SDL2main)
+		target_link_libraries(performous_test PRIVATE ${SDL2_LIBRARIES})
+	endif()
+	target_include_directories(performous_test PRIVATE ${SDL2_INCLUDE_DIRS}) # Newer SDL versions have proper CMake targets making this unnecessary, but we can't take it for granted.
 
 	if(APPLE)
 	target_link_libraries(performous_test PRIVATE "-framework CoreFoundation")
 	endif()
 
-	gtest_discover_tests(performous_test)
+	gtest_discover_tests(performous_test PROPERTIES TEST_DISCOVERY_TIMEOUT 30)
 
 else()
 	message(STATUS "Testing disabled: Package gtest missing")
