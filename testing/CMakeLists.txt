@@ -20,11 +20,15 @@ set(GAME_SOURCES
 	"../game/color.cc"
 	"../game/configitem.cc"
 	"../game/dynamicnotegraphscaler.cc"
+	"../game/execname.cc"
 	"../game/fixednotegraphscaler.cc"
+	"../game/fs.cc"
+	"../game/log.cc"
 	"../game/microphones.cc"
 	"../game/musicalscale.cc"
 	"../game/notes.cc"
 	"../game/notegraphscalerfactory.cc"
+	"../game/platform.cc"
 	"../game/tone.cc"
 	"../game/util.cc"
 )
@@ -60,12 +64,19 @@ if(GTest_FOUND)
 		target_link_libraries(performous_test PRIVATE GTest::GTest GTest::Main GTest::gmock)
 	endif()
 
-	target_include_directories(performous_test PRIVATE ".." "../game")
+	target_include_directories(performous_test PRIVATE ".." "../game" "${Performous_BINARY_DIR}/game")
 
 	if(WIN32 AND MSVC)
 #		target_compile_options(performous_test PUBLIC /WX)
 	else()
 		target_compile_options(performous_test PUBLIC -Werror)
+	endif()
+	
+	find_package(SDL2 REQUIRED)
+	target_link_libraries(performous_test PRIVATE ${SDL2_LIBRARIES})
+
+	if(APPLE)
+	target_link_libraries(performous_test PRIVATE "-framework CoreFoundation")
 	endif()
 
 	gtest_discover_tests(performous_test)
