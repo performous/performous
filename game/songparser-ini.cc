@@ -1,11 +1,13 @@
 #include "songparser.hh"
-#include "fs.hh"
 
-#include "unicode.hh"
-#include <stdexcept>
+#include "i18n.hh"
+#include "fs.hh"
 #include "midifile.hh"
+#include "unicode.hh"
 #include "util.hh"
 
+#include <regex>
+#include <stdexcept>
 /// @file
 /// Functions used for parsing the Frets on Fire INI song format
 
@@ -13,8 +15,7 @@ using namespace SongParserUtil;
 
 /// 'Magick' to check if this file looks like correct format
 bool SongParser::iniCheck(std::string const& data) const {
-	static const std::string header = "[song]";
-	return std::equal(header.begin(), header.end(), data.begin());
+	return std::regex_search(data.substr(0,1024), iniCheckHeader);
 }
 
 /// Parse header data for Songs screen
@@ -23,17 +24,23 @@ void SongParser::iniParseHeader() {
 	if (!m_song.vocalTracks.empty()) { m_song.vocalTracks.clear(); }
 	if (!m_song.instrumentTracks.empty()) { m_song.instrumentTracks.clear(); }
 	std::string line;
+	
 	while (getline(line)) {
 		if (line.empty()) continue;
-		if (line[0] == '[') continue; // Section header
-		std::istringstream iss(line);
-		std::string key, value;
-		if (!std::getline(iss, key, '=') || !std::getline(iss, value))
-			std::runtime_error("Invalid format, should be key=value");
-		key = UnicodeUtil::toLower(trim(key));
-		value = trim(value);
-
+		if (trim(line)[0] == '[') { // Section header.
+			if (line.find("[song]") != std::string::npos) continue;
+			break; // Keys should be under the correct section.
+		}
+		if ((line[0] == ';' || line[0] == '#') && line[1] == ' ') continue; // Comment. 
+		std::string key;
+		std::string value;
+		std::smatch match;
+		if (std::regex_search(line, match, iniParseLine)) {
+			key = UnicodeUtil::toLower(match[1].str());
+			value = match[2].str();
+		}
 		// Supported tags
+		if (key == "cassettecolor") continue; // Ignore.
 		if (key == "name") s.title = value;
 		else if (key == "artist") s.artist = value;
 		else if (key == "cover") s.cover = absolute(value, s.path);
