@@ -28,7 +28,7 @@ jobs:
     env:
       MACOS_DEPS: >-
         aubio
-        boost
+        boost@1.85
         cairo
         cmake
         cpprestsdk
@@ -79,6 +79,8 @@ jobs:
         run: |
            brew unlink python
            brew install $MACOS_DEPS 2>&1
+           brew unlink boost@1.87
+           brew link --force boost@1.85
 
       - name: Build package
         id: build_package
