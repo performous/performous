@@ -1,15 +1,15 @@
 #include "songparser.hh"
 #include "unicode.hh"
 #include "util.hh"
-#include <cmath>
-#include <regex>
 
 #include <boost/algorithm/string.hpp>
+
+#include <cmath>
 #include <fstream>
+#include <regex>
 
 
 namespace SongParserUtil {
-
 	void assign(int& var, std::string const& str) {
 		try {
 			var = std::stoi(str);
