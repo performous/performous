@@ -12,16 +12,24 @@ ENV PACKAGE_TYPE="DEB"
 ## Install the deps and create the build directory
 RUN <<EOR
 #!/bin/bash -x
+	. /etc/os-release
 	if [[ "${VERSION_ID}" == "20.04" ]]; then
 		apt-get -y update
 		apt-get -y install gnupg wget
 		wget -O ./key.asc https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null
 		gpg -v -o /usr/share/keyrings/kitware-archive-keyring.gpg --dearmor ./key.asc
 		echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' | tee /etc/apt/sources.list.d/kitware.list >/dev/null
-		apt-get -y update
 		apt-get -y install cmake
 	fi
+	if [[ "${VERSION_ID}" == "20.04" || "${VERSION_ID}" == "22.04" ]]; then
+		apt-get -y update
+		apt-get -y install software-properties-common
+		add-apt-repository ppa:savoury1/gcc-defaults-12
+		apt-get -y update
+		apt-get -y install gcc-12 gcc g++
+	fi
 EOR
+
 
 RUN <<EOR
 #!/bin/bash -x
