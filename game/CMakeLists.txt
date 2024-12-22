@@ -14,10 +14,6 @@ file(GLOB HEADER_FILES
 	"libda/*.hpp"
 )
 
-# Fs is compiled/linked separately to ease switch boost/c++17
-list(REMOVE_ITEM SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/fs.cc)
-list(REMOVE_ITEM HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/fs.hh)
-
 if(WIN32)
 	# We want to support all these version numbers:
 	# 1.0 1.0.1 1.0+ 1.0.1+ 1.0-2-g123abcd 1.0.1-5-g123abcd
@@ -86,19 +82,12 @@ endif()
 set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES})
 
 # Build main executable
-add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES} ${SDL2_SOURCES})
+add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES})
 # Libraries
 
 find_package(Boost 1.55 REQUIRED COMPONENTS program_options iostreams system locale)
 target_include_directories(performous SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
 target_link_libraries(performous PRIVATE ${Boost_LIBRARIES})
-
-add_library(fs STATIC fs.cc)
-target_include_directories(fs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-find_package(Filesystem REQUIRED)
-message (STATUS "Using std::filesystem")
-target_link_libraries(fs PRIVATE std::filesystem)
-
 find_package(ICU 60 REQUIRED uc data i18n io)
 target_include_directories(performous SYSTEM PRIVATE ${ICU_INCLUDE_DIRS})
 target_link_libraries(performous PRIVATE ${ICU_LIBRARIES})
@@ -141,9 +130,6 @@ if(fmt_VERSION VERSION_GREATER_EQUAL 9.0.0)
 endif()
 
 target_link_libraries(performous PRIVATE fmt::fmt)
-
-target_include_directories(fs PRIVATE ${SDL2_INCLUDE_DIRS})
-target_link_libraries(fs PRIVATE ${SDL2_LIBRARIES})
 
 # Activating MIDI hardware (e-drums with USB/MIDI connection)
 set(ENABLE_MIDI AUTO CACHE STRING "Use midi hardware (e-drums with USB/MIDI connection)")
@@ -260,7 +246,7 @@ endif()
 list(APPEND LIBS ${FFTW3_LIBRARIES})
 
 find_package(Threads)
-target_link_libraries(performous PRIVATE fs ced aubio ${LIBS} PkgConfig::deps Threads::Threads)
+target_link_libraries(performous PRIVATE ced aubio ${LIBS} PkgConfig::deps Threads::Threads)
 
 if (NOT APPLE)
 	install(TARGETS performous DESTINATION ${BIN_INSTALL})
@@ -312,7 +298,7 @@ endif()
 
 # Generate config.hh
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
-include_directories("${CMAKE_CURRENT_BINARY_DIR}")
+target_include_directories(performous PRIVATE "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
 
 if(WIN32 AND MSVC)
 	install(CODE [[
