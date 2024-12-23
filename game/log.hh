@@ -6,6 +6,7 @@
 #include <fmt/format.h>
 
 #include <shared_mutex>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -58,7 +59,14 @@ class SpdLogger {
 
 	template <typename... Args>
 	static void log(LogSystem::Values subsystem, spdlog::level::level_enum level, Args &&...args) {
-		auto logger = getLogger(subsystem);
+		LoggerPtr logger;
+		try {
+			logger = getLogger(subsystem);
+		}
+		catch (std::runtime_error const& e) {
+			logger = m_defaultLogger;
+			logger->log(spdlog::level::critical, e.what());
+		}
 		logger->log(level, std::forward<Args>(args)...);
 	}
 
