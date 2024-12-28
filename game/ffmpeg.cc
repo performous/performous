@@ -311,7 +311,7 @@ void FFmpeg::readReplayGain(const AVStream *stream)
 	m_replayGainDecibels = 0.0;  // 0.0 indicates not defined
 	m_replayGainFactor   = 1.0;
 
-    // Only use Replay Gain if the option for normalisation is enabled
+	// Only use Replay Gain if the option for normalisation is enabled
 	if (stream != nullptr && config["audio/normalize_songs"].b() == true) {
 		size_t replay_gain_size;
 		const AVReplayGain *replay_gain = (AVReplayGain *)av_stream_get_side_data(stream, AV_PKT_DATA_REPLAYGAIN, &replay_gain_size);
