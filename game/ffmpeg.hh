@@ -9,7 +9,6 @@
 #include <condition_variable>
 #include <cstdint>
 #include <exception>
-#include <future>
 #include <deque>
 #include <iostream>
 #include <memory>
@@ -158,6 +157,6 @@ class AudioBuffer {
 	const double m_replayGainFactor{0.0};
 	bool m_seek_asked { false };
 	bool m_quit{ false };
-	std::future<void> reader_thread;
+	std::unique_ptr<std::thread> m_reader_thread;
 };
 

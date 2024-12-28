@@ -173,7 +173,7 @@ AudioBuffer::AudioBuffer(fs::path const& file, unsigned rate, size_t size):
 		const_cast<double&>(m_duration) = ffmpeg->duration();
 		const_cast<double&>(m_replayGainDecibels) = ffmpeg->getReplayGainInDecibels();
 		const_cast<double&>(m_replayGainFactor) = ffmpeg->getReplayGainVolumeFactor();
-		reader_thread = std::async(std::launch::async, [this, ffmpeg = std::move(ffmpeg)] {
+		m_reader_thread = std::unique_ptr<std::thread>( new std::thread( [this, ffmpeg = std::move(ffmpeg)] {
 			auto errors = 0u;
 			std::unique_lock<std::mutex> l(m_mutex);
 			while (!m_quit) {
@@ -201,10 +201,11 @@ AudioBuffer::AudioBuffer(fs::path const& file, unsigned rate, size_t size):
 				} catch (const std::exception& e) {
 					UnlockGuard<decltype(l)> unlocked(l); // unlock while doing IOs
 					std::clog << "ffmpeg/error: " << e.what() << std::endl;
-					if (++errors > 2) std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl;
+					if (++errors > 2) 
+						std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl;
 				}
 			}
-		});
+		}) );
 }
 
 AudioBuffer::~AudioBuffer() {
@@ -216,7 +217,12 @@ AudioBuffer::~AudioBuffer() {
 		m_quit = true;
 	}
 	m_cond.notify_all();
-	reader_thread.get();
+	try {
+		m_reader_thread.get()->join();
+	}
+	catch ( const std::system_error &e ) {
+		std::clog << "ffmpeg/error: [destructor] " << e.what() << std::endl;
+	}
 }
 
 static void printFFmpegInfo() {
