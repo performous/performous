@@ -103,14 +103,12 @@ OpenGLText TextRenderer::render(std::string const& text, TextStyle const& style,
 	pango_cairo_layout_path(dc.get(), layout.get());
 
 	// The paint order is defined by the SVG via the Theme
-	if (style.stroke_paintfirst)
-	{
+	if (style.stroke_paintfirst) {
 		// render text stroke, then fill (font-fill is on top of stroke)
 		renderTextStroke(dc, style, border, false);
 		renderTextFill(dc, style, true);
 	}
-	else
-	{
+	else {
 		// render text fill, then stroke (font-stroke is on top of fill)
 		renderTextFill(dc, style, false);
 		renderTextStroke(dc, style, border, true);
