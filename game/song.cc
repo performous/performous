@@ -14,8 +14,14 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
+namespace {
+    int makeRandomIdx() {
+        return random<int>();
+    }
+}
+
 Song::Song(ISongParser& parser, nlohmann::json const& song)
-: dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()), m_parser(parser) {
+: dummyVocal(TrackName::VOCAL_LEAD), randomIdx(makeRandomIdx()), m_parser(parser) {
     path = getJsonEntry<std::string>(song, "txtFileFolder").value_or("");
     filename = getJsonEntry<std::string>(song, "txtFile").value_or("");
     artist = getJsonEntry<std::string>(song, "artist").value_or("");
@@ -82,14 +88,14 @@ Song::Song(ISongParser& parser, nlohmann::json const& song)
 }
 
 Song::Song(ISongParser& parser, fs::path const& filename):
-    dummyVocal(TrackName::VOCAL_LEAD), path(filename.parent_path()), filename(filename), randomIdx(rand()), m_parser(parser)
+    dummyVocal(TrackName::VOCAL_LEAD), path(filename.parent_path()), filename(filename), randomIdx(makeRandomIdx()), m_parser(parser)
 {
 	parser.parse(*this);
     collateUpdate();
 }
 
 Song::Song(ISongParser& parser)
-: dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()), m_parser(parser) {
+: dummyVocal(TrackName::VOCAL_LEAD), randomIdx(makeRandomIdx()), m_parser(parser) {
 }
 
 
