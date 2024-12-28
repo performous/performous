@@ -34,10 +34,11 @@ void Form::focusNext() {
 		m_focus = children.front();
 	else {
 		auto it = std::find(children.begin(), children.end(), m_focus);
+        auto next = it++;
 
 		m_focus->setFocus(false);
 
-		if(it == children.end() || ++it == children.end())
+		if(it == children.end() || next == children.end())
 			m_focus = *children.begin();
 		else
 			m_focus = *it;

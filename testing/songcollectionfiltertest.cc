@@ -38,12 +38,32 @@ struct UnitTest_SongCollectionFilter : public testing::Test {
 		return song;
 	}
 
+	SongPtr makeDance(std::string const& title, int year = 2000, std::string const& lang = "en", std::string const& artist = "unknown") {
+		return makeDance(title, artist, year, lang);
+	}
+
+	SongPtr makeDance(std::string const& title, std::string const& artist = "unknown", int year = 2000, std::string const& lang = "en") {
+		auto song = std::make_shared<Song>(m_parser);
+
+		auto filename = fs::path();
+
+		song->filename = filename;
+		song->title = title;
+		song->artist = artist;
+		song->language = lang;
+		song->setYear(year);
+		song->danceTracks["dummy"] = { };
+
+		return song;
+	}
+
 	SongCollection makeCollection() {
 		auto songs = SongCollection();
 
 		songs.emplace_back(makeSong("song one 1", 1991, "en"));
 		songs.emplace_back(makeSong("song two 2", 1995, "de"));
 		songs.emplace_back(makeSong("song three 3", 1981, "fr"));
+		songs.emplace_back(makeDance("dance first", 1999, "dk"));
 
 		return songs;
 	}
@@ -56,7 +76,7 @@ TEST_F(UnitTest_SongCollectionFilter, empty) {
 	auto const filter = SongCollectionFilter();
 	auto const result = filter.filter(songs);
 
-	EXPECT_THAT(result.size(), Eq(3));
+	EXPECT_THAT(result.size(), Eq(4));
 }
 
 TEST_F(UnitTest_SongCollectionFilter, type_vocal) {
@@ -65,6 +85,14 @@ TEST_F(UnitTest_SongCollectionFilter, type_vocal) {
 	auto const result = filter.filter(songs);
 
 	EXPECT_THAT(result.size(), Eq(3));
+}
+
+TEST_F(UnitTest_SongCollectionFilter, type_dance) {
+	auto songs = makeCollection();
+	auto const filter = SongCollectionFilter().setType(FilterType::HasDance);
+	auto const result = filter.filter(songs);
+
+	EXPECT_THAT(result.size(), Eq(1));
 }
 
 TEST_F(UnitTest_SongCollectionFilter, type_drums) {
@@ -88,7 +116,7 @@ TEST_F(UnitTest_SongCollectionFilter, string_t) {
 	auto const filter = SongCollectionFilter().setFilter("t");
 	auto const result = filter.filter(songs);
 
-	EXPECT_THAT(result.size(), Eq(2));
+	EXPECT_THAT(result.size(), Eq(3));
 }
 
 TEST_F(UnitTest_SongCollectionFilter, string_tw) {
@@ -152,7 +180,7 @@ TEST_F(UnitTest_SongCollectionFilter, string_unknown) {
 	auto const filter = SongCollectionFilter().setFilter("unknown");
 	auto const result = filter.filter(songs);
 
-	EXPECT_THAT(result.size(), Eq(3));
+	EXPECT_THAT(result.size(), Eq(4));
 }
 
 TEST_F(UnitTest_SongCollectionFilter, filter_language_match_de) {
@@ -173,7 +201,7 @@ TEST_F(UnitTest_SongCollectionFilter, filter_language_not_match_gr) {
 
 TEST_F(UnitTest_SongCollectionFilter, filter_year_match_2) {
 	auto songs = makeCollection();
-	auto const filter = SongCollectionFilter().setFilter(std::make_shared<YearFilter>(1990, 1999));
+	auto const filter = SongCollectionFilter().setFilter(std::make_shared<YearFilter>(1990, 1998));
 	auto const result = filter.filter(songs);
 
 	EXPECT_THAT(result.size(), Eq(2));

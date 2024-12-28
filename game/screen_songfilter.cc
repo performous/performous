@@ -179,7 +179,7 @@ void ScreenSongFilter::initializeControls() {
 	getForm().addControl(m_buttonReset);
 	m_buttonReset.setText(_("Reset"));
 	m_buttonReset.setGeometry(horizontalOffset + horizontalSpace * 3, verticalOffset + n * verticalSpace, 0.2f, lineHeight);
-	m_buttonReset.onClicked([&](auto&) { resetFilter(); });
+	m_buttonReset.onClicked([this](auto&) { resetFilter(); });
 
 	getForm().focusNext();
 }
@@ -302,9 +302,6 @@ void ScreenSongFilter::onAfterEventProcessing() {
 void ScreenSongFilter::draw() {
 	m_theme->bg.draw(m_game.getWindow());
 	FormScreen::draw();
-}
-
-void ScreenSongFilter::reloadGL() {
 }
 
 void ScreenSongFilter::enter() {

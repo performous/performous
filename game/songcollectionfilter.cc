@@ -7,6 +7,26 @@
 
 #include <unicode/stsearch.h>
 
+namespace {
+    bool filterByType(Song const& song, FilterType type) {
+        switch (type) {
+        case FilterType::HasDance:
+            return !song.hasDance();
+        case FilterType::HasVocals:
+            return !song.hasVocals();
+        case FilterType::HasDuet:
+            return !song.hasDuet();
+        case FilterType::HasGuitar:
+            return !song.hasGuitars();
+        case FilterType::HasDrumsOrKeyboard:
+            return !song.hasDrums() && !song.hasKeyboard();
+        case FilterType::FullBand:
+            return !song.hasVocals() || !song.hasGuitars() || (!song.hasDrums() && !song.hasKeyboard());
+        default:
+            return false;
+        }
+    }
+}
 
 SongCollectionFilter::SongCollection SongCollectionFilter::filter(SongCollection const& collection) const {
 	auto filtered = collection;
@@ -26,12 +46,8 @@ SongCollectionFilter::SongCollection SongCollectionFilter::filter(SongCollection
 
 		std::erase_if (filtered, [&](auto const& song){
 			// Filter by type first.
-			if (m_type == FilterType::HasDance && !song->hasDance()) return true;
-			if (m_type == FilterType::HasVocals && !song->hasVocals()) return true;
-			if (m_type == FilterType::HasDuet && !song->hasDuet()) return true;
-			if (m_type == FilterType::HasGuitar && !song->hasGuitars()) return true;
-			if (m_type == FilterType::HasDrumsOrKeyboard && (!song->hasDrums() && !song->hasKeyboard())) return true;
-			if (m_type == FilterType::FullBand && (!song->hasVocals() || !song->hasGuitars() || (!song->hasDrums() && !song->hasKeyboard()))) return true;
+			if (filterByType(*song, m_type))
+				return true;
 
 			// If search is not empty, filter by search term.
 			if (!m_filterString.empty()) {
