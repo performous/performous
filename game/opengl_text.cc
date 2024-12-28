@@ -70,43 +70,44 @@ void OpenGLText::draw(Window& window, Dimensions &_dim, TexCoords &_tex) {
 }
 
 namespace {
-    void parseToken(const std::string &token, std::istringstream &iss2, TextStyle &_theme, SvgTxtTheme::Align& _align, SvgTxtTheme::PaintOrder _paintorder) {
-        if (token == "font-size") {
-            // Parse as int because https://llvm.org/bugs/show_bug.cgi?id=17782
-            int value;
-            iss2 >> value;
-            _theme.fontsize = static_cast<float>(value);
-        }
-        else if (token == "font-family") std::getline(iss2, _theme.fontfamily);
-        else if (token == "font-style") std::getline(iss2, _theme.fontstyle);
-        else if (token == "font-weight") std::getline(iss2, _theme.fontweight);
-        else if (token == "stroke-width") iss2 >> _theme.stroke_width;
-        else if (token == "stroke-opacity") iss2 >> _theme.stroke_col.a;
-        else if (token == "stroke-linejoin") iss2 >> _theme.stroke_linejoin;
-        else if (token == "stroke-miterlimit") iss2 >> _theme.stroke_miterlimit;
-        else if (token == "stroke-linecap") iss2 >> _theme.stroke_linecap;
-        else if (token == "fill-opacity") iss2 >> _theme.fill_col.a;
-        else if (token == "fill") iss2 >> _theme.fill_col;
-        else if (token == "stroke") iss2 >> _theme.stroke_col;
-        else if (token == "text-anchor") {
-            std::string value;
-            std::getline(iss2, value);
-            _theme.fontalign = value;
-            if (value == "start") _align = SvgTxtTheme::Align::LEFT;
-            else if (value == "middle") _align = SvgTxtTheme::Align::CENTER;
-            else if (value == "end") _align = SvgTxtTheme::Align::RIGHT;
-        }
-        else if (token == "paint-order") {
-            std::string value;
-            std::getline(iss2, value);
-            if (value.find("stroke") == 0) _paintorder = SvgTxtTheme::PaintOrder::STROKE_FIRST;
-            else if (value.find("fill") == 0) _paintorder = SvgTxtTheme::PaintOrder::FILL_FIRST;
-            else if (value.find("markers") == 0) _paintorder = SvgTxtTheme::PaintOrder::MARKERS_FIRST;
-            _theme.stroke_paintfirst = (_paintorder != SvgTxtTheme::PaintOrder::FILL_FIRST);  // Not handling marker-first
-        }
-    }
+	void parseToken(const std::string &token, std::istringstream &iss2, TextStyle &_theme, SvgTxtTheme::Align& _align, SvgTxtTheme::PaintOrder _paintorder) {
+		if (token == "font-size") {
+			// Parse as int because https://llvm.org/bugs/show_bug.cgi?id=17782
+			int value;
+			iss2 >> value;
+			_theme.fontsize = static_cast<float>(value);
+		}
+		else if (token == "font-family") std::getline(iss2, _theme.fontfamily);
+		else if (token == "font-style") std::getline(iss2, _theme.fontstyle);
+		else if (token == "font-weight") std::getline(iss2, _theme.fontweight);
+		else if (token == "stroke-width") iss2 >> _theme.stroke_width;
+		else if (token == "stroke-opacity") iss2 >> _theme.stroke_col.a;
+		else if (token == "stroke-linejoin") iss2 >> _theme.stroke_linejoin;
+		else if (token == "stroke-miterlimit") iss2 >> _theme.stroke_miterlimit;
+		else if (token == "stroke-linecap") iss2 >> _theme.stroke_linecap;
+		else if (token == "fill-opacity") iss2 >> _theme.fill_col.a;
+		else if (token == "fill") iss2 >> _theme.fill_col;
+		else if (token == "stroke") iss2 >> _theme.stroke_col;
+		else if (token == "text-anchor") {
+			std::string value;
+			std::getline(iss2, value);
+			_theme.fontalign = value;
+			if (value == "start") _align = SvgTxtTheme::Align::LEFT;
+			else if (value == "middle") _align = SvgTxtTheme::Align::CENTER;
+			else if (value == "end") _align = SvgTxtTheme::Align::RIGHT;
+		}
+		else if (token == "paint-order") {
+			std::string value;
+			std::getline(iss2, value);
+			if (value.find("stroke") == 0) _paintorder = SvgTxtTheme::PaintOrder::STROKE_FIRST;
+			else if (value.find("fill") == 0) _paintorder = SvgTxtTheme::PaintOrder::FILL_FIRST;
+			else if (value.find("markers") == 0) _paintorder = SvgTxtTheme::PaintOrder::MARKERS_FIRST;
+			_theme.stroke_paintfirst = (_paintorder != SvgTxtTheme::PaintOrder::FILL_FIRST);  // Not handling marker-first
+		}
+	}
 
-	void parseTheme(fs::path const& themeFile, TextStyle &_theme, float &_width, float &_height, float &_x, float &_y, SvgTxtTheme::Align& _align, SvgTxtTheme::PaintOrder _paintorder) {
+	// REMOVE void parseTheme(fs::path const& themeFile, TextStyle &_theme, float &_width, float &_height, float &_x, float &_y, SvgTxtTheme::Align& _align, SvgTxtTheme::PaintOrder _paintorder) {
+	void parseTheme(fs::path const& themeFile, TextStyle &_theme, SvgTxtRect &_rect, SvgTxtTheme::Align& _align, SvgTxtTheme::PaintOrder _paintorder) {
 		xmlpp::Node::PrefixNsMap nsmap;
 		nsmap["svg"] = "http://www.w3.org/2000/svg";
 		xmlpp::DomParser dom(themeFile.string());
@@ -114,12 +115,12 @@ namespace {
 		auto n = dom.get_document()->get_root_node()->find("/svg:svg/@width",nsmap);
 		if (n.empty()) throw std::runtime_error("Unable to find text theme info width in "+themeFile.string());
 		xmlpp::Attribute& width = dynamic_cast<xmlpp::Attribute&>(*n[0]);
-		_width = std::stof(width.get_value());
+		_rect.width = std::stof(width.get_value());
 		// Parse height attribute
 		n = dom.get_document()->get_root_node()->find("/svg:svg/@height",nsmap);
 		if (n.empty()) throw std::runtime_error("Unable to find text theme info height in "+themeFile.string());
 		xmlpp::Attribute& height = dynamic_cast<xmlpp::Attribute&>(*n[0]);
-		_height = std::stof(height.get_value());
+		_rect.height = std::stof(height.get_value());
 		// Parse text style attribute (CSS rules)
 		n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@style",nsmap);
 		if (n.empty()) throw std::runtime_error("Unable to find text theme info style in "+themeFile.string());
@@ -129,25 +130,25 @@ namespace {
 		while (std::getline(iss, token, ';')) {
 			std::istringstream iss2(token);
 			std::getline(iss2, token, ':');
-            parseToken(token, iss2, _theme, _align, _paintorder);
+			parseToken(token, iss2, _theme, _align, _paintorder);
 		}
 		// Parse x and y attributes
 		n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@x",nsmap);
 		if (n.empty()) throw std::runtime_error("Unable to find text theme info x in "+themeFile.string());
 		xmlpp::Attribute& x = dynamic_cast<xmlpp::Attribute&>(*n[0]);
-		_x = std::stof(x.get_value());
+		_rect.x = std::stof(x.get_value());
 		n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@y",nsmap);
 		if (n.empty()) throw std::runtime_error("Unable to find text theme info y in "+themeFile.string());
 		xmlpp::Attribute& y = dynamic_cast<xmlpp::Attribute&>(*n[0]);
-		_y = std::stof(y.get_value());
+		_rect.y = std::stof(y.get_value());
 	}
 }
 
 SvgTxtThemeSimple::SvgTxtThemeSimple(fs::path const& themeFile, float factor) : m_factor(factor) {
-	SvgTxtTheme::Align a;
-	SvgTxtTheme::PaintOrder p{SvgTxtTheme::PaintOrder::STROKE_FIRST};
-	float tmp;
-	parseTheme(themeFile, m_text, tmp, tmp, tmp, tmp, a, p);
+	SvgTxtTheme::Align tmpAlign;
+	SvgTxtTheme::PaintOrder tmpPO{SvgTxtTheme::PaintOrder::STROKE_FIRST};
+	SvgTxtRect tmpRect;
+	parseTheme(themeFile, m_text, tmpRect, tmpAlign, tmpPO);
 }
 
 void SvgTxtThemeSimple::render(std::string const& text) {
@@ -165,15 +166,15 @@ void SvgTxtThemeSimple::draw(Window& window) {
 }
 
 SvgTxtTheme::SvgTxtTheme(fs::path const& themeFile, float factor): m_align(), m_factor(factor) {
-	parseTheme(themeFile, m_textstyle, m_width, m_height, m_x, m_y, m_align, m_paintorder);
-	dimensions.stretch(0.0f, 0.0f).middle(-0.5f + m_x / m_width).center((m_y - 0.5f * m_height) / m_width);
+	parseTheme(themeFile, m_textstyle, m_rect, m_align, m_paintorder);
+	dimensions.stretch(0.0f, 0.0f).middle(-0.5f + m_rect.x / m_rect.width).center((m_rect.y - 0.5f * m_rect.height) / m_rect.width);
 }
 
 void SvgTxtTheme::setHighlight(fs::path const& themeFile) {
-	float a,b,c,d;
-	Align e;
-	PaintOrder f{SvgTxtTheme::PaintOrder::STROKE_FIRST};
-	parseTheme(themeFile, m_textstyle_highlight, a, b, c, d, e, f);
+	SvgTxtRect tmpRect;
+	Align tmpAlign;
+	PaintOrder tmpPO{SvgTxtTheme::PaintOrder::STROKE_FIRST};
+	parseTheme(themeFile, m_textstyle_highlight, tmpRect, tmpAlign, tmpPO);
 }
 
 void SvgTxtTheme::draw(Window& window, std::string _text) {

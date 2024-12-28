@@ -98,6 +98,16 @@ private:
 	float m_factor;
 };
 
+class SvgTxtRect
+{
+    public:
+    // specifically not using m_ syntax for the sake of brevity, e.g.:  m_rect.m_x
+    float x{0.0f};
+    float y{0.0f};
+    float width{0.0f};
+    float height{0.0f};
+};
+
 /// themed svg texts
 class SvgTxtTheme {
 public:
@@ -166,10 +176,11 @@ private:
 	std::vector<std::unique_ptr<OpenGLText>> m_opengl_text;
 	Align m_align;
 	PaintOrder m_paintorder{PaintOrder::FILL_FIRST}; // Fill, then Stroke is SVG default
-	float m_x;
-	float m_y;
-	float m_width;
-	float m_height;
+	//float m_x;
+	//float m_y;
+	//float m_width;
+	//float m_height;
+    SvgTxtRect m_rect;
 	float m_factor;
 	float m_texture_width;
 	float m_texture_height;
