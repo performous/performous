@@ -176,10 +176,6 @@ private:
 	std::vector<std::unique_ptr<OpenGLText>> m_opengl_text;
 	Align m_align;
 	PaintOrder m_paintorder{PaintOrder::FILL_FIRST}; // Fill, then Stroke is SVG default
-	//float m_x;
-	//float m_y;
-	//float m_width;
-	//float m_height;
     SvgTxtRect m_rect;
 	float m_factor;
 	float m_texture_width;

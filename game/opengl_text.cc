@@ -106,7 +106,6 @@ namespace {
 		}
 	}
 
-	// REMOVE void parseTheme(fs::path const& themeFile, TextStyle &_theme, float &_width, float &_height, float &_x, float &_y, SvgTxtTheme::Align& _align, SvgTxtTheme::PaintOrder _paintorder) {
 	void parseTheme(fs::path const& themeFile, TextStyle &_theme, SvgTxtRect &_rect, SvgTxtTheme::Align& _align, SvgTxtTheme::PaintOrder _paintorder) {
 		xmlpp::Node::PrefixNsMap nsmap;
 		nsmap["svg"] = "http://www.w3.org/2000/svg";
