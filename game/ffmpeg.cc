@@ -326,6 +326,7 @@ void FFmpeg::readReplayGain(const AVStream *stream)
 		size_t replay_gain_size;
 #endif
 
+	if (stream != nullptr) {
 		const AVReplayGain *replay_gain = (AVReplayGain *)av_stream_get_side_data(stream, AV_PKT_DATA_REPLAYGAIN, &replay_gain_size);
 		if (replay_gain_size > 0 && replay_gain != nullptr) {
 			m_replayGainDecibels = static_cast<double>(replay_gain->track_gain);
