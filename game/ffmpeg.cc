@@ -313,7 +313,14 @@ void FFmpeg::readReplayGain(const AVStream *stream)
 
 	// Only use Replay Gain if the option for normalisation is enabled
 	if (stream != nullptr && config["audio/normalize_songs"].b() == true) {
-		size_t replay_gain_size;
+
+// Note: as-of 2024-12-29 this is required for the Linux build
+#if (LIBAVFORMAT_VERSION_MAJOR) <= 58
+        int replay_gain_size;
+#else
+        size_t replay_gain_size;
+#endif
+
 		const AVReplayGain *replay_gain = (AVReplayGain *)av_stream_get_side_data(stream, AV_PKT_DATA_REPLAYGAIN, &replay_gain_size);
 		if (replay_gain_size > 0 && replay_gain != nullptr) {
 			m_replayGainDecibels = static_cast<double>(replay_gain->track_gain);
