@@ -70,6 +70,42 @@ void OpenGLText::draw(Window& window, Dimensions &_dim, TexCoords &_tex) {
 }
 
 namespace {
+    void parseToken(const std::string &token, std::istringstream &iss2, TextStyle &_theme, SvgTxtTheme::Align& _align, SvgTxtTheme::PaintOrder _paintorder) {
+        if (token == "font-size") {
+            // Parse as int because https://llvm.org/bugs/show_bug.cgi?id=17782
+            int value;
+            iss2 >> value;
+            _theme.fontsize = static_cast<float>(value);
+        }
+        else if (token == "font-family") std::getline(iss2, _theme.fontfamily);
+        else if (token == "font-style") std::getline(iss2, _theme.fontstyle);
+        else if (token == "font-weight") std::getline(iss2, _theme.fontweight);
+        else if (token == "stroke-width") iss2 >> _theme.stroke_width;
+        else if (token == "stroke-opacity") iss2 >> _theme.stroke_col.a;
+        else if (token == "stroke-linejoin") iss2 >> _theme.stroke_linejoin;
+        else if (token == "stroke-miterlimit") iss2 >> _theme.stroke_miterlimit;
+        else if (token == "stroke-linecap") iss2 >> _theme.stroke_linecap;
+        else if (token == "fill-opacity") iss2 >> _theme.fill_col.a;
+        else if (token == "fill") iss2 >> _theme.fill_col;
+        else if (token == "stroke") iss2 >> _theme.stroke_col;
+        else if (token == "text-anchor") {
+            std::string value;
+            std::getline(iss2, value);
+            _theme.fontalign = value;
+            if (value == "start") _align = SvgTxtTheme::Align::LEFT;
+            else if (value == "middle") _align = SvgTxtTheme::Align::CENTER;
+            else if (value == "end") _align = SvgTxtTheme::Align::RIGHT;
+        }
+        else if (token == "paint-order") {
+            std::string value;
+            std::getline(iss2, value);
+            if (value.find("stroke") == 0) _paintorder = SvgTxtTheme::PaintOrder::STROKE_FIRST;
+            else if (value.find("fill") == 0) _paintorder = SvgTxtTheme::PaintOrder::FILL_FIRST;
+            else if (value.find("markers") == 0) _paintorder = SvgTxtTheme::PaintOrder::MARKERS_FIRST;
+            _theme.stroke_paintfirst = (_paintorder != SvgTxtTheme::PaintOrder::FILL_FIRST);  // Not handling marker-first
+        }
+    }
+
 	void parseTheme(fs::path const& themeFile, TextStyle &_theme, float &_width, float &_height, float &_x, float &_y, SvgTxtTheme::Align& _align, SvgTxtTheme::PaintOrder _paintorder) {
 		xmlpp::Node::PrefixNsMap nsmap;
 		nsmap["svg"] = "http://www.w3.org/2000/svg";
@@ -93,39 +129,7 @@ namespace {
 		while (std::getline(iss, token, ';')) {
 			std::istringstream iss2(token);
 			std::getline(iss2, token, ':');
-			if (token == "font-size") {
-				// Parse as int because https://llvm.org/bugs/show_bug.cgi?id=17782
-				int value;
-				iss2 >> value;
-				_theme.fontsize = static_cast<float>(value);
-			}
-			else if (token == "font-family") std::getline(iss2, _theme.fontfamily);
-			else if (token == "font-style") std::getline(iss2, _theme.fontstyle);
-			else if (token == "font-weight") std::getline(iss2, _theme.fontweight);
-			else if (token == "stroke-width") iss2 >> _theme.stroke_width;
-			else if (token == "stroke-opacity") iss2 >> _theme.stroke_col.a;
-			else if (token == "stroke-linejoin") iss2 >> _theme.stroke_linejoin;
-			else if (token == "stroke-miterlimit") iss2 >> _theme.stroke_miterlimit;
-			else if (token == "stroke-linecap") iss2 >> _theme.stroke_linecap;
-			else if (token == "fill-opacity") iss2 >> _theme.fill_col.a;
-			else if (token == "fill") iss2 >> _theme.fill_col;
-			else if (token == "stroke") iss2 >> _theme.stroke_col;
-			else if (token == "text-anchor") {
-				std::string value;
-				std::getline(iss2, value);
-				_theme.fontalign = value;
-				if (value == "start") _align = SvgTxtTheme::Align::LEFT;
-				else if (value == "middle") _align = SvgTxtTheme::Align::CENTER;
-				else if (value == "end") _align = SvgTxtTheme::Align::RIGHT;
-			}
-			else if (token == "paint-order") {
-				std::string value;
-				std::getline(iss2, value);
-				if (value.find("stroke") == 0) _paintorder = SvgTxtTheme::PaintOrder::STROKE_FIRST;
-				else if (value.find("fill") == 0) _paintorder = SvgTxtTheme::PaintOrder::FILL_FIRST;
-				else if (value.find("markers") == 0) _paintorder = SvgTxtTheme::PaintOrder::MARKERS_FIRST;
-				_theme.stroke_paintfirst = (_paintorder != SvgTxtTheme::PaintOrder::FILL_FIRST);  // Not handling marker-first
-			}
+            parseToken(token, iss2, _theme, _align, _paintorder);
 		}
 		// Parse x and y attributes
 		n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@x",nsmap);
