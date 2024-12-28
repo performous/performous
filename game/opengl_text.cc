@@ -70,7 +70,7 @@ void OpenGLText::draw(Window& window, Dimensions &_dim, TexCoords &_tex) {
 }
 
 namespace {
-	void parseToken(const std::string &token, std::istringstream &iss2, TextStyle &_theme, SvgTxtTheme::Align& _align, SvgTxtTheme::PaintOrder _paintorder) {
+	void parseToken(const std::string_view &token, std::istringstream &iss2, TextStyle &_theme, SvgTxtTheme::Align& _align, SvgTxtTheme::PaintOrder _paintorder) {
 		if (token == "font-size") {
 			// Parse as int because https://llvm.org/bugs/show_bug.cgi?id=17782
 			int value;
