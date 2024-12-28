@@ -31,8 +31,7 @@ namespace {
 	}
 }
 
-void TextRenderer::renderTextFill( std::shared_ptr<cairo_t> dc, TextStyle const& style, bool complete ) const
-{
+void TextRenderer::renderTextFill( std::shared_ptr<cairo_t> dc, TextStyle const& style, bool complete ) const {
 	// Render text
 	if (style.fill_col.a > 0.0f) {
 		cairo_set_source_rgba(dc.get(), style.fill_col.r, style.fill_col.g, style.fill_col.b, style.fill_col.a);
@@ -43,8 +42,7 @@ void TextRenderer::renderTextFill( std::shared_ptr<cairo_t> dc, TextStyle const&
 	}
 }
 
-void TextRenderer::renderTextStroke( std::shared_ptr<cairo_t> dc, TextStyle const& style, float border, bool complete ) const
-{
+void TextRenderer::renderTextStroke( std::shared_ptr<cairo_t> dc, TextStyle const& style, float border, bool complete ) const {
 	// Render text border
 	if (style.stroke_col.a > 0.0f) {
 		// Use proper line-joins and caps.
