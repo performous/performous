@@ -74,17 +74,17 @@ std::string UnicodeUtil::convertToUTF8 (std::string_view str, std::string _filen
 		}
 	else {
 		if (toCase == CaseMapping::NONE) return std::string{str.data(), str.length()}; // If it's already UTF-8, and we don't need to case-convert, we can just return right away.
-		ustring = icu::UnicodeString::fromUTF8(str.data());
+		ustring = icu::UnicodeString::fromUTF8(str); // StringPiece can be implicitly converted from a string_view.
 	}
 	switch(toCase) {
 		case CaseMapping::UPPER:
-			ustring.toUpper();
+			ustring.toUpper(TranslationEngine::getIcuLocale());
 			break;
 		case CaseMapping::LOWER:
-			ustring.toLower();
+			ustring.toLower(TranslationEngine::getIcuLocale());
 			break;
 		case CaseMapping::TITLE:
-			ustring.toTitle(0, icu::Locale(TranslationEngine::getCurrentLanguageCode().c_str()), U_TITLECASE_NO_LOWERCASE);
+			ustring.toTitle(0, TranslationEngine::getIcuLocale(), 0);
 			break;
 		case CaseMapping::NONE:
 			break;
@@ -127,13 +127,13 @@ bool UnicodeUtil::caseEqual (std::string_view lhs, std::string_view rhs, bool as
 	icu::UnicodeString lhsUniString;
 	icu::UnicodeString rhsUniString;
 	if (lhsCharset != "UTF-8" && !assumeUTF8) {
-		lhsUniString = UnicodeUtil::getConverter(lhsCharset).convertToUTF8(lhs);
+		lhsUniString = UnicodeUtil::getConverter(lhsCharset).convertToUTF8(lhs); 
 	}
-	else lhsUniString = icu::UnicodeString::fromUTF8(lhs.data());
+	else lhsUniString = icu::UnicodeString::fromUTF8(lhs); // StringPiece can be implicitly converted from a string_view.
 	if (rhsCharset != "UTF-8" && !assumeUTF8) {
 		rhsUniString = UnicodeUtil::getConverter(rhsCharset).convertToUTF8(rhs);
 	}
-	else rhsUniString = icu::UnicodeString::fromUTF8(rhs.data());
+	else rhsUniString = icu::UnicodeString::fromUTF8(rhs); // StringPiece can be implicitly converted from a string_view.
 	int8_t result = lhsUniString.caseCompare(rhsUniString, U_FOLD_CASE_DEFAULT);
 	return (result == 0);
 }
