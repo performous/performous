@@ -41,13 +41,7 @@ class Songs {
 	/// true if empty
 	bool empty() const { return m_filtered.empty(); }
 	/// advances to next song
-	void advance(int diff) {
-		std::ptrdiff_t size = static_cast<int>(m_filtered.size());
-		if (size == 0) return;  // Do nothing if no songs are available
-		std::ptrdiff_t _current = (math_cover.getTarget() + diff) % size;
-		if (_current < 0) _current += size;
-		math_cover.setTarget(_current, size);
-	}
+	void advance(int diff);
 	/// sets to a specified song index
 	void setToTarget(int target);
 	/// get current id
