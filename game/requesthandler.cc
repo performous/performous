@@ -99,6 +99,10 @@ void RequestHandler::Get(web::http::http_request request)
 			m_songs.sortSpecificChange(10);
 		} else if(query == "sort=creator&order=descending") {
 			m_songs.sortSpecificChange(10, true);
+		} else if(query == "sort=has_error&order=ascending") {
+			m_songs.sortSpecificChange(11);
+		} else if(query == "sort=has_error&order=descending") {
+			m_songs.sortSpecificChange(11, true);
 		}
 		// make sure to apply the filtering
 		m_songs.update();
