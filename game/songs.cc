@@ -602,3 +602,14 @@ void Songs::dumpSongs_internal() const {
 void Songs::addSongOrder(SongOrderPtr order) {
 	m_songOrders.emplace_back(order);
 }
+
+void Songs::setToTarget(int target) {
+    std::ptrdiff_t size = static_cast<int>(m_filtered.size());
+    std::ptrdiff_t _current_target = static_cast<int>(target);
+    if (size == 0) return;  // Do nothing if no songs are available
+    _current_target = _current_target % size; // Ensure we do not go out of bounds
+    if (_current_target < 0) {
+        _current_target = size + _current_target;
+    }
+    math_cover.setTarget(_current_target, size);
+}
