@@ -9,6 +9,8 @@
 #include "platform.hh"
 #include "profiler.hh"
 #include "song.hh"
+#include "songparserexception.hh"
+#include "songcollectionfilter.hh"
 
 #include "songorder/artist_song_order.hh"
 #include "songorder/creator_song_order.hh"
@@ -32,6 +34,7 @@
 #include <fstream>
 #include <regex>
 #include <stdexcept>
+#include <sstream>
 
 namespace {
 	void initializeSongOrders(Songs& songs) {
@@ -128,7 +131,7 @@ Songs::Cache Songs::loadCache() {
 	auto jsonRoot = readJSON(songsMetaFile);
 	Cache cache;
 	for (auto const& songData : jsonRoot) {
-		auto song = std::make_shared<Song> (songData);
+		auto song = std::make_shared<Song>(m_parser, songData);
 		cache[song->filename.string()] = std::move(song);
 	}
 	return cache;
@@ -278,7 +281,7 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 					song = match->second;
 				} else {
 					std::clog << "songs/notice: Found song which was not in the cache: " << p.string() << std::endl;
-					song = std::make_shared<Song> (p);
+					song = std::make_shared<Song>(m_parser, p);
 				}
 				std::unique_lock<std::shared_mutex> l(m_mutex);
 				m_songs.emplace_back(song); //put it in the database, if found twice will appear in double
@@ -305,7 +308,7 @@ class Songs::RestoreSel {
 	~RestoreSel() {
 		std::ptrdiff_t pos = 0;
 		if (auto song = m_sel.lock()) {
-			SongCollection& f = m_s.m_filtered;
+			auto& f = m_s.m_filtered;
 			auto it = std::find(f.begin(), f.end(), song);
 			if (it != f.end()) pos = it - f.begin();
 		}
@@ -326,43 +329,25 @@ void Songs::setFilter(std::string const& val) {
 	filter_internal();
 }
 
+void Songs::setFilter(SongFilterPtr filter) {
+	std::cout << "set filter" << std::endl;
+
+	m_songFilter = filter;
+	filter_internal();
+}
+
 void Songs::filter_internal() {
 	m_updateTimer.setValue(0.0);
 	m_dirty = false;
 	RestoreSel restore(*this);
 	try {
-		auto filtered = SongCollection();
-		// if filter text is blank and no type filter is set, just display all songs.
-		if (m_filter == std::string() && m_type == 0) {
-			std::shared_lock<std::shared_mutex> l(m_mutex);
-			filtered = m_songs;
-		} else {
-			auto filter = icu::UnicodeString::fromUTF8(
-				UnicodeUtil::convertToUTF8(m_filter)
-			);
-			icu::ErrorCode icuError;
+		auto const filter = SongCollectionFilter().setFilter(m_songFilter).setFilter(m_filter).setType(m_type);
+		std::shared_lock<std::shared_mutex> l(m_mutex);
+		auto filtered = filter.filter(m_songs);
 
-			std::shared_lock<std::shared_mutex> l(m_mutex);
-			std::copy_if (m_songs.begin(), m_songs.end(), std::back_inserter(filtered), [&](std::shared_ptr<Song> it){
-			// Filter by type first.
-				if (m_type == 1 && !(*it).hasDance()) return false;
-				if (m_type == 2 && !(*it).hasVocals()) return false;
-				if (m_type == 3 && !(*it).hasDuet()) return false;
-				if (m_type == 4 && !(*it).hasGuitars()) return false;
-				if (m_type == 5 && !(*it).hasDrums() && !(*it).hasKeyboard()) return false;
-				if (m_type == 6 && (!(*it).hasVocals() || !(*it).hasGuitars() || (!(*it).hasDrums() && !(*it).hasKeyboard()))) return false;
-
-		  // If search is not empty, filter by search term.
-				if (!m_filter.empty()) {
-					icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8((*it).strFull()), UnicodeUtil::m_searchCollator.get(), nullptr, icuError);
-					return (search.first(icuError) != USEARCH_DONE);
-					}
-
-		// If we still haven't returned, it must be a type match with an empty search string.
-				return true;
-			});
-		}
 		m_filtered.swap(filtered);
+
+		std::cout << "use " << m_filtered.size() << " of " << m_songs.size() << std::endl;
 	} catch (...) {
 		std::shared_lock<std::shared_mutex> l(m_mutex);
 		SongCollection(m_songs.begin(), m_songs.end()).swap(m_filtered);  // Invalid regex => copy everything
@@ -421,25 +406,20 @@ namespace {
 }
 
 std::string Songs::typeDesc() const {
-	switch (m_type) {
-		case 0: return _("show all songs");
-		case 1: return _("has dance");
-		case 2: return _("has vocals");
-		case 3: return _("has duet");
-		case 4: return _("has guitar");
-		case 5: return _("drums or keytar");
-		case 6: return _("full band");
-	}
-	throw std::logic_error("Internal error: unknown type filter in Songs::typeDesc");
+	std::stringstream stream;
+
+	stream << m_type;
+
+	return stream.str();
 }
 
 void Songs::typeChange(SortChange diff) {
-	if (diff == SortChange::RESET) m_type = 0;
+	if (diff == SortChange::RESET) {
+		m_type = FilterType::None;
+	}
 	else {
 		int dir = to_underlying(diff);
-		m_type = static_cast<unsigned short>((m_type + dir) % types);
-		if (m_type >= types)
-			m_type = static_cast<unsigned short>(m_type + types);
+		m_type = static_cast<FilterType>((static_cast<int>(m_type) + dir) % types);
 	}
 	filter_internal();
 }
@@ -447,9 +427,12 @@ void Songs::typeChange(SortChange diff) {
 void Songs::typeCycle(unsigned short cat) {
 	static const unsigned short categories[types] = { 0, 1, 2, 2, 3, 3, 4 };
 	// Find the next matching category
-	unsigned short type = 0;
-	for (unsigned short t = static_cast<unsigned short>(categories[m_type] == cat ? m_type + 1 : 0); t < types; ++t) {
-		if (categories[t] == cat) { type = t; break; }
+	auto type = FilterType::None;
+	for (unsigned short t = (categories[to_underlying(m_type)] == cat ? static_cast<unsigned short>( to_underlying(m_type) + 1) : 0); t < types; ++t) {
+		if (categories[t] == cat) {
+			type = static_cast<FilterType>(t);
+			break;
+		}
 	}
 	m_type = type;
 	filter_internal();
@@ -512,7 +495,10 @@ void Songs::sort_internal(bool descending) {
 
 std::shared_ptr<Song> Songs::currentPtr() const try {
 	return m_filtered.at(static_cast<size_t>(math_cover.getTarget()));
-} catch (std::out_of_range const& e) { return nullptr; }
+} 
+catch (std::out_of_range const&) { 
+	return nullptr; 
+}
 
 Song& Songs::current() try {
 	return *m_filtered.at(static_cast<size_t>(math_cover.getTarget()));

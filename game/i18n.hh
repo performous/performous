@@ -1,5 +1,7 @@
 #pragma once
 
+#include "configitem.hh"
+
 #include <boost/locale.hpp>
 #include <iostream>
 #include <string>
@@ -10,7 +12,7 @@
 
 class TranslationEngine {
 public:
-	TranslationEngine();
+	TranslationEngine(ConfigItemMap&);
 
 	static void initializeAllLanguages();
 	static void setLanguage(const std::string& language, bool fromSettings = false);
@@ -22,7 +24,7 @@ public:
 
 private:
 	static std::vector<std::string> getLocalePaths();
-    
+
 private:
 	static std::pair<std::string, std::string> m_currentLanguage;
 	static std::string m_package;

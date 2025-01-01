@@ -1,6 +1,7 @@
 #include "edition_song_order.hh"
 
 #include "configuration.hh"
+#include "i18n.hh"
 #include "unicode.hh"
 
 std::string EditionSongOrder::getDescription() const {
