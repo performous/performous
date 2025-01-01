@@ -236,7 +236,11 @@ void Songs::CacheSonglist() {
 		songObject["drumTracks"] = song->hasDrums();
 		songObject["danceTracks"] = song->hasDance();
 		songObject["guitarTracks"] = song->hasGuitars();
-		songObject["loadStatus"] = static_cast<int>(song->loadStatus);
+
+		// do not store loadStatus as FULL, as that is only true after it has been fully parsed
+		// a song loaded from cache only ever has the header information at best and should not be considered
+		// fully parsed
+		songObject["loadStatus"] = std::min(song->loadStatus, Song::LoadStatus::HEADER);
 
 		// Collate info
 		songObject["collateByTitle"] = song->collateByTitle;
@@ -265,7 +269,7 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 			}
 			if (iterator.depth() > maxDepth) {
 				std::clog << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)\n";
-				continue; 
+				continue;
 			}
 			fs::path p = dir.path();
 			if (!regex_search(p.filename().string(), expression)) {
