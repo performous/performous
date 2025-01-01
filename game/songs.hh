@@ -48,11 +48,16 @@ class Songs {
 		if (_current < 0) _current += size;
 		math_cover.setTarget(_current, size);
 	}
-	// goes to the first song in the list
-	void setToFirst() {
+	// goes to a specified song index
+	void setToTarget(int target) {
 		std::ptrdiff_t size = static_cast<int>(m_filtered.size());
+		std::ptrdiff_t _current_target = static_cast<int>(target);
 		if (size == 0) return;  // Do nothing if no songs are available
-		math_cover.setTarget(0, size);  // Set the target to the first object
+		_current_target = _current_target % size; // Ensure we do not go out of bounds
+		if (_current_target < 0) {
+		    _current_target = size + _current_target;
+		}
+		math_cover.setTarget(_current_target, size);
 	}
 	/// get current id
 	std::ptrdiff_t currentId() const { return math_cover.getTarget(); }
