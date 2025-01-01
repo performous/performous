@@ -95,6 +95,7 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 		if (m_menu.isOpen()) m_menu.move(1);
 		else menuBrowse(Songs::SortChange::FORWARD);
 	}
+	else if (nav == input::NavButton::HOME) m_songs.setToFirst();
 	else if (nav == input::NavButton::MOREUP) m_songs.advance(-10);
 	else if (nav == input::NavButton::MOREDOWN) m_songs.advance(10);
 	else if (m_jukebox) {
