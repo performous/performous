@@ -256,6 +256,10 @@ void Songs::CacheSonglist() {
 void Songs::reload_internal(fs::path const& parent, Cache cache) {
 	try {
 		std::regex expression(R"((\.txt|^song\.ini|^notes\.xml|\.sm)$)", std::regex_constants::icase);
+		if (fs::is_empty(parent)) {
+			std::clog << "songs/notice: Directory " << parent << " is empty. Skipping directory. " << '\n';
+			return;
+		}
 		auto iterator = fs::recursive_directory_iterator(parent, fs::directory_options::follow_directory_symlink);
 		auto maxDepth = iterator.depth() + 10;
 		for (const auto &dir : iterator) { //loop through files
@@ -265,7 +269,7 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 			}
 			if (iterator.depth() > maxDepth) {
 				std::clog << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)\n";
-				continue; 
+				continue;
 			}
 			fs::path p = dir.path();
 			if (!regex_search(p.filename().string(), expression)) {
