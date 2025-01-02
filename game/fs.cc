@@ -256,13 +256,8 @@ void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destina
 	if (!fs::create_directory(destinationDir) && !fs::exists(destinationDir)) {
 		throw std::runtime_error("Cannot create destination directory " + destinationDir.string());
 	}
-#if ((BOOST_VERSION / 100 % 1000) < 55)
-	for (fs::recursive_directory_iterator dirEnt(sourceDir); dirEnt !=fs::recursive_directory_iterator(); ++dirEnt) {
-		const auto& path = dirEnt->path();
-#else
 	for (const auto& dirEnt : fs::recursive_directory_iterator{sourceDir}) {
 		const auto& path = dirEnt.path();
-#endif
 		auto relativePathStr = replaceFirst(path.string(), sourceDir.string(), "");
 
 		try {
