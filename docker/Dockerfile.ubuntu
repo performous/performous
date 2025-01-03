@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-ARG OS_VERSION
+ARG OS_VERSION="22.04"
 ## Use the official Ubuntu <OS_VERSION> Image from Dockerhub
 FROM docker.io/library/ubuntu:${OS_VERSION}
 
@@ -10,9 +10,11 @@ ARG TZ="America/New_York"
 ENV PACKAGE_TYPE="DEB"
 
 ## Install the deps and create the build directory
+ARG OS_VERSION="22.04"
 RUN <<EOR
 #!/bin/bash -x
-	if [[ "${VERSION_ID}" == "20.04" ]]; then
+	set -euo pipefail
+	if [[ "${OS_VERSION}" == "20.04" ]]; then
 		apt-get -y update
 		apt-get -y install gnupg wget
 		wget -O ./key.asc https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null
@@ -25,6 +27,7 @@ EOR
 
 RUN <<EOR
 #!/bin/bash -x
+	set -euo pipefail
 	apt-get update
 	apt-get install -y --no-install-recommends git cmake build-essential \
 		gettext help2man libopenblas-dev libfftw3-dev libicu-dev libepoxy-dev \
@@ -37,6 +40,18 @@ RUN <<EOR
 		libfmt-dev ca-certificates file libgtest-dev libgmock-dev google-mock
 	apt-get clean
 	mkdir -p /root/performous
+EOR
+
+# extra for appimage building
+RUN <<EOR
+#!/bin/bash -x
+	set -euo pipefail
+	apt-get update
+	apt-get install -y --no-install-recommends libfuse2 wget
+	wget -O appimage-builder-x86_64.AppImage https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.0.0-beta.1/appimage-builder-1.0.0-677acbd-x86_64.AppImage
+	chmod +x appimage-builder-x86_64.AppImage
+	mv appimage-builder-x86_64.AppImage /usr/local/bin/appimage-builder
+	apt-get clean
 EOR
 
 ## Copy in the build script to make things easy
