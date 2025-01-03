@@ -21,6 +21,7 @@ brew_location = None
 opencv_prefix: Path = None
 openssl_prefix: Path = None
 ffmpeg_prefix: Path = None
+icu_root = ""
 openssl_root = ""
 script_prefix: Path = None
 performous_source_dir = None
@@ -78,7 +79,7 @@ def check_installed_port(name : str, file : str) -> Optional[Path]:
 		return None
 
 def detect_prefix():
-	global opencv_prefix, script_prefix, openssl_prefix, ffmpeg_prefix, openssl_root
+	global opencv_prefix, script_prefix, openssl_prefix, ffmpeg_prefix, icu_root, openssl_root
 	port_location = check_installed('port')
 	brew_location = check_installed('brew')
 	if port_location != None:
@@ -116,6 +117,10 @@ def detect_prefix():
 			openssl_prefix = str(check_openssl)
 			openssl_root = f"-DOPENSSL_ROOT_DIR='{str(check_openssl.parent.parent)}'"
 			print("--- OpenSSL detected at: " + str(openssl_prefix) + "\n")
+		check_icu = check_brew_formula("icu4c", "utypes.h")
+		if check_icu != None:
+			icu_root = f"-DICU_ROOT='{str(check_icu.parent.parent)}'"
+			print("--- ICU detected at: " + str(check_icu.parent.parent) + "\n")
 	else:
 		print("--- Homebrew does not appear to be installed.\n")
 
@@ -365,6 +370,7 @@ if __name__ == "__main__":
 			prefix += (";" + str(ffmpeg_prefix))
 		command = fr"""
 		cmake \
+		{icu_root} \
 		{openssl_root} \
 		-DPKG_CONFIG_USE_CMAKE_PREFIX_PATH:BOOL=ON \
 		-DCMAKE_INSTALL_PREFIX:PATH="{str(performous_out_dir)}" \
