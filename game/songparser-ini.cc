@@ -39,6 +39,13 @@ void SongParser::iniParseHeader() {
 			key = UnicodeUtil::toLower(match[1].str());
 			value = match[2].str();
 		}
+		// Strip rich-text tags.
+		if (value.find("<") != std::string::npos) {
+			// Step 1: Replace <br> with \n
+			value = std::regex_replace(value, brTag, "\n");
+			// Step 2: Remove explicitly listed tags.
+			value = std::regex_replace(value, richTags, "");
+		}
 		// Supported tags
 		if (key == "cassettecolor") continue; // Ignore.
 		if (key == "name") s.title = value;
