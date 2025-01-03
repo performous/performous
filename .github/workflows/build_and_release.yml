@@ -45,6 +45,10 @@ jobs:
           repository: ${{ github.event.repository.full_name }}
           ref: '${{ github.event.head.ref }}'
           fetch-depth: 0
+      - name: Dump Github Context
+        env: 
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
       - name: Determine the complete version
         id: versioning
         run: |
@@ -60,6 +64,7 @@ jobs:
           echo "version_patch=$(cut -d '.' -f 3 <<< $(git describe --tags --abbrev=0 || echo 1.0.0))" >> $GITHUB_OUTPUT
           echo "version_tweak=0" >> $GITHUB_OUTPUT
           echo "complete_version=$(if [ $GITHUB_REF_TYPE = 'tag' ]; then echo $GITHUB_REF_NAME; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME = 'master' ]; then echo $LATEST_FULL_TAG_VERSION-beta; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME != 'master' ]; then echo $LATEST_TAG_VERSION-${{github.event.pull_request.number}}-$(git rev-parse --short=7 $(git describe))-alpha; fi)" >> $GITHUB_OUTPUT
+          echo "what about ${{ github.event.pull_request.head.sha }}?"
 
 
   # Set up a release that packages will be published to.
