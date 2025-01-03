@@ -205,6 +205,6 @@ license = {
 		# RTF (in which case it must start "{\rtf1"), or a path to a file
 		# containing the license text.	If you're using RTF,
 		# watch out for Python escaping (or read it from a file).
-		'en_US': '../../LICENSE.md',
+		'en_US': '../LICENSE.md',
 	},
 }
