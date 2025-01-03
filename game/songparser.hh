@@ -23,9 +23,13 @@ namespace SongParserUtil {
 
 
 	// There is some weird bug with std::regex and boost::locale on libc++ that makes regex fail if a global locale with a collation facet has been installed before instantiating patterns.
-	const static std::regex iniParseLine = std::regex(R"(^[^\S^\r\n]*([a-zA-Z0-9._-]+)[^\S^\r\n]*=[^\S^\r\n]*([^\n\r]*?)(?=[^\S^\r\n]*$))", regex_multiline);
-	const static std::regex iniCheckHeader = std::regex(R"(^[^\S^\r\n]*\[song\][^\S^\r\n]*(?:$|[;#]))", regex_multiline);
-
+	const static std::regex iniParseLine(R"(^[^\S^\r\n]*([a-zA-Z0-9._-]+)[^\S^\r\n]*=[^\S^\r\n]*([^\n\r]*?)(?=[^\S^\r\n]*$))", regex_multiline);
+	const static std::regex iniCheckHeader(R"(^[^\S^\r\n]*\[song\][^\S^\r\n]*(?:$|[;#]))", regex_multiline);
+	const static std::regex brTag(R"(<br>|<br[ ]*/?>)", std::regex_constants::icase);
+	const static std::regex richTags(
+	  R"(</?(b|i|u|s|size|font|align|gradient|sub|sup|link)(=[^>]*)?( [^>]*)?>|<(color)(=[^>]*)?>|</(color)>)", 
+	  std::regex_constants::icase
+	);
 	const std::string DUET_P2 = "Duet singer";	// FIXME
 	const std::string DUET_BOTH = "Both singers";	// FIXME
 	/// Parse an int from string and assign it to a variable
@@ -73,7 +77,7 @@ private:
 	bool getline (std::string& line) { ++m_linenum; return (bool) std::getline (m_ss, line); }
 	Song::BPM getBPM(Song const& s, double ts) const;
 	void addBPM(double ts, float bpm);
-	double tsTime(double ts) const;  ///< Convert a timestamp (beats) into time (seconds)
+	double tsTime(double ts) const;	 ///< Convert a timestamp (beats) into time (seconds)
 	bool txtCheck(std::string const& data) const;
 	void txtParseHeader();
 	void txtParse();
