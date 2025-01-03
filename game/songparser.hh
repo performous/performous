@@ -23,7 +23,7 @@ namespace SongParserUtil {
 
 
 	// There is some weird bug with std::regex and boost::locale on libc++ that makes regex fail if a global locale with a collation facet has been installed before instantiating patterns.
-	const static std::regex iniParseLine = std::regex(R"(^[^\S^\r\n]*([a-zA-Z0-9._-]+)[^\S^\r\n]*=[^\S^\r\n]*([^\n\r]*?)(?=[^\S^\r\n]*[;#]|$))", regex_multiline);
+	const static std::regex iniParseLine = std::regex(R"(^[^\S^\r\n]*([a-zA-Z0-9._-]+)[^\S^\r\n]*=[^\S^\r\n]*([^\n\r]*?)(?=[^\S^\r\n]*$))", regex_multiline);
 	const static std::regex iniCheckHeader = std::regex(R"(^[^\S^\r\n]*\[song\][^\S^\r\n]*(?:$|[;#]))", regex_multiline);
 
 	const std::string DUET_P2 = "Duet singer";	// FIXME
