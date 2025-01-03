@@ -26,7 +26,7 @@ Converter::Converter(Converter&& c) noexcept:
 	m_converter(std::move(c.m_converter)),
 	m_error(std::move(c.m_error)) {}
 
-icu::UnicodeString Converter::convertToUTF8(std::string_view sv) {
+icu::UnicodeString Converter::convertToUTF16(std::string_view sv) {
 	std::scoped_lock l(m_lock);
 	icu::UnicodeString ret(sv.data(), static_cast<int>(sv.length()), m_converter.get(), m_error);
 	if (m_error.isFailure()) throw std::runtime_error("Couldn't convert string: " + std::string(sv) + " to UTF-8. Error: " + std::to_string(m_error.get()) + ": " + m_error.errorName());
@@ -70,7 +70,7 @@ std::string UnicodeUtil::convertToUTF8 (std::string_view str, std::string _filen
 	else charset = UnicodeUtil::getCharset(str);
 		if (charset != "UTF-8") {
 			if (!_filename.empty()) std::clog << "unicode/info: " << _filename << " does not appear to be UTF-8; (" << charset << ") detected." << std::endl; 
-			ustring = UnicodeUtil::getConverter(charset).convertToUTF8(str);
+			ustring = UnicodeUtil::getConverter(charset).convertToUTF16(str);
 		}
 	else {
 		if (toCase == CaseMapping::NONE) return std::string{str.data(), str.length()}; // If it's already UTF-8, and we don't need to case-convert, we can just return right away.
@@ -127,11 +127,11 @@ bool UnicodeUtil::caseEqual (std::string_view lhs, std::string_view rhs, bool as
 	icu::UnicodeString lhsUniString;
 	icu::UnicodeString rhsUniString;
 	if (lhsCharset != "UTF-8" && !assumeUTF8) {
-		lhsUniString = UnicodeUtil::getConverter(lhsCharset).convertToUTF8(lhs); 
+		lhsUniString = UnicodeUtil::getConverter(lhsCharset).convertToUTF16(lhs); 
 	}
 	else lhsUniString = icu::UnicodeString::fromUTF8(lhs); // StringPiece can be implicitly converted from a string_view.
 	if (rhsCharset != "UTF-8" && !assumeUTF8) {
-		rhsUniString = UnicodeUtil::getConverter(rhsCharset).convertToUTF8(rhs);
+		rhsUniString = UnicodeUtil::getConverter(rhsCharset).convertToUTF16(rhs);
 	}
 	else rhsUniString = icu::UnicodeString::fromUTF8(rhs); // StringPiece can be implicitly converted from a string_view.
 	int8_t result = lhsUniString.caseCompare(rhsUniString, U_FOLD_CASE_DEFAULT);
@@ -142,7 +142,7 @@ bool UnicodeUtil::isRTL(std::string_view str) {
 	bool _return = false;
 	icu::ErrorCode _unicodeError;
 	std::string charset(UnicodeUtil::getCharset(str));
-	icu::UnicodeString ustring = UnicodeUtil::getConverter(charset).convertToUTF8(str);
+	icu::UnicodeString ustring = UnicodeUtil::getConverter(charset).convertToUTF16(str);
 	 std::unique_ptr<UBiDi,void(*)(UBiDi*)> _uBiDiObj(
 		ubidi_open(),
 		[](UBiDi* p) {

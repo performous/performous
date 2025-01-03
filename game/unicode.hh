@@ -22,7 +22,7 @@ struct Converter {
 	Converter(Converter& c) = delete;
 	Converter(Converter const& c) = delete;
 
-	icu::UnicodeString convertToUTF8(std::string_view sv); ///< Do the actual conversion.
+	icu::UnicodeString convertToUTF16(std::string_view sv); ///< Do the actual conversion.
 
 	private:
 	std::string m_codepage;
