@@ -67,13 +67,15 @@ jobs:
         run: |
            cd performous/build/windows-x64-debinfo
            cpack -G NSIS64 windows-x64-debinfo
-           Copy-Item $(Get-ChildItem -Filter '*win64.exe').Name "Performous-latest-msvc.exe"
-           Rename-Item $(Get-ChildItem -Filter '*win64.exe').Name -NewName "Performous-${{ inputs.package_complete_version }}-msvc.exe"
+           $MASTER_ARTIFACT_FILENAME = "Performous-master[${{ inputs.package_complete_version }}]-msvc.exe"
+           $ARTIFACT_FILENAME = "Performous-${{ inputs.package_complete_version }}-msvc.exe"
+           Copy-Item $(Get-ChildItem -Filter '*win64.exe').Name $MASTER_ARTIFACT_FILENAME
+           Rename-Item $(Get-ChildItem -Filter '*win64.exe').Name -NewName $ARTIFACT_FILENAME
            chcp 65001 #set code page to utf-8
-           echo ("ARTIFACT_PATH=${{ github.workspace }}/performous/build/windows-x64-debinfo/Performous-${{ inputs.package_complete_version }}-msvc.exe") >> $env:GITHUB_ENV
-           echo ("ARTIFACT_FILENAME=Performous-${{ inputs.package_complete_version }}-msvc.exe") >> $env:GITHUB_ENV
-           echo ("MASTER_ARTIFACT_PATH=${{ github.workspace }}/performous/build/windows-x64-debinfo/Performous-latest-msvc.exe") >> $env:GITHUB_ENV
-           echo ("MASTER_ARTIFACT_FILENAME=Performous-latest-msvc.exe") >> $env:GITHUB_ENV
+           echo ("ARTIFACT_PATH=${{ github.workspace }}/performous/build/windows-x64-debinfo/$ARTIFACT_FILENAME") >> $env:GITHUB_ENV
+           echo ("ARTIFACT_FILENAME=$ARTIFACT_FILENAME") >> $env:GITHUB_ENV
+           echo ("MASTER_ARTIFACT_PATH=${{ github.workspace }}/performous/build/windows-x64-debinfo/$MASTER_ARTIFACT_FILENAME") >> $env:GITHUB_ENV
+           echo ("MASTER_ARTIFACT_FILENAME=$MASTER_ARTIFACT_FILENAME") >> $env:GITHUB_ENV
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -185,12 +187,14 @@ jobs:
         run: |
            cd "${{ env.workpath }}/performous/build"
            "${{ env.workpath }}/msys64/mingw64/bin/cpack.exe" -G NSIS64 -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64" -DCPACK_NSIS_EXECUTABLE="${{ env.workpath }}/msys64/mingw64/bin/makensis.exe" -DCMAKE_BUILD_TYPE="RelWithDebInfo" --verbose
-           powershell -command "Copy-Item \$(Get-ChildItem -Filter '*win64.exe').Name 'Performous-latest-mingw-w64.exe'"
-           powershell -command "Rename-Item \$(Get-ChildItem -Filter '*win64.exe').Name -NewName 'Performous-${{ inputs.package_complete_version }}-mingw-w64.exe'"
-           powershell -command "echo ('ARTIFACT_PATH=${{ env.workpath }}/performous/build/Performous-${{ inputs.package_complete_version }}-mingw-w64.exe') >> \$env:GITHUB_ENV"
-           powershell -command "echo ('ARTIFACT_FILENAME=Performous-${{ inputs.package_complete_version }}-mingw-w64.exe') >> \$env:GITHUB_ENV"
-           powershell -command "echo ('MASTER_ARTIFACT_PATH=${{ env.workpath }}/performous/build/Performous-latest-mingw-w64.exe') >> \$env:GITHUB_ENV"
-           powershell -command "echo ('MASTER_ARTIFACT_FILENAME=Performous-latest-mingw-w64.exe') >> \$env:GITHUB_ENV"
+           MASTER_ARTIFACT_FILENAME="Performous-master[${{ inputs.package_complete_version }}]-mingw-w64.exe"
+           ARTIFACT_FILENAME="Performous-${{ inputs.package_complete_version }}-mingw-w64.exe"
+           powershell -command "Copy-Item \$(Get-ChildItem -Filter '*win64.exe').Name '${MASTER_ARTIFACT_FILENAME}'"
+           powershell -command "Rename-Item \$(Get-ChildItem -Filter '*win64.exe').Name -NewName '${ARTIFACT_FILENAME}'"
+           powershell -command "echo ('ARTIFACT_PATH=${{ env.workpath }}/performous/build/${ARTIFACT_FILENAME}') >> \$env:GITHUB_ENV"
+           powershell -command "echo ('ARTIFACT_FILENAME=${ARTIFACT_FILENAME}') >> \$env:GITHUB_ENV"
+           powershell -command "echo ('MASTER_ARTIFACT_PATH=${{ env.workpath }}/performous/build/${MASTER_ARTIFACT_FILENAME}') >> \$env:GITHUB_ENV"
+           powershell -command "echo ('MASTER_ARTIFACT_FILENAME=${MASTER_ARTIFACT_FILENAME}') >> \$env:GITHUB_ENV"
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         if: ${{ github.event_name == 'pull_request' }}
