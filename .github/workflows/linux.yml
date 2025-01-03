@@ -15,7 +15,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  REPO_NAME: ${{ github.repository_owner }}
 
 jobs:
   # Decide if we need to build the containers on this run
@@ -28,6 +27,9 @@ jobs:
       build_ubuntu_containers: ${{ steps.version.outputs.build_ubuntu_containers }}
       build_fedora_containers: ${{ steps.version.outputs.build_fedora_containers }}
     steps:
+      - name: Get docker repo name (format to lowercase)
+        run: |
+          echo "REPO_OWNER=${${{ github.repository_owner }}@L}" >> $GITHUB_ENV
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
@@ -116,7 +118,8 @@ jobs:
       - name: Container name
         run: |
           # Figure out the container name we'll use for the build
-          BUILD_CONTAINER=${{ env.REGISTRY }}/${{ env.REPO_NAME }}/deps:${{ matrix.os }}-${{ matrix.version }}
+
+          BUILD_CONTAINER=${{ env.REGISTRY }}/${{ env.REPO_OWNER }}/deps:${{ matrix.os }}-${{ matrix.version }}
           echo "CONTAINER_NAME=${BUILD_CONTAINER}" >> $GITHUB_ENV
 
       - name: Checkout
@@ -126,7 +129,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ env.REPO_NAME }}
+          username: ${{ env.REPO_OWNER }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build ${{ matrix.os }} ${{ matrix.version }} Container
