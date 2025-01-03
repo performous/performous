@@ -20,9 +20,9 @@ struct Converter {
 	Converter(std::string const& codepage);
 	Converter(Converter&& c) noexcept;
 	Converter(Converter& c) = delete;
-	Converter(Converter const& c) = delete;	
+	Converter(Converter const& c) = delete;
 
-	icu::UnicodeString convertToUTF8(std::string_view sv); ///< Do the actual conversion.
+	icu::UnicodeString convertToUTF16(std::string_view sv); ///< Do the actual conversion.
 
 	private:
 	std::string m_codepage;
@@ -39,7 +39,8 @@ class UnicodeUtil {
 	static std::string getCharset(std::string_view& str);
 	static Converter& getConverter(std::string const& s);
 	static bool removeUTF8BOM(std::string_view& str);
-	
+	static bool removeUTF8BOM(std::string& str);
+
 	public:
 	UnicodeUtil() = delete;
 	~UnicodeUtil() = delete;
@@ -53,4 +54,5 @@ class UnicodeUtil {
 
 	static std::unique_ptr<icu::RuleBasedCollator> m_searchCollator;
 	static std::unique_ptr<icu::RuleBasedCollator> m_sortCollator;
+	static std::mutex m_convertersMutex;
 };

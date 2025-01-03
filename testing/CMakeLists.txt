@@ -53,8 +53,10 @@ if(GTest_FOUND)
 
 	find_package(fmt REQUIRED CONFIG)
 
-
 	target_link_libraries(performous_test PRIVATE fmt::fmt)
+
+	find_package(ICU 65 REQUIRED uc data i18n io)
+	target_link_libraries(performous_test PRIVATE ICU::uc ICU::data ICU::i18n ICU::io)
 
 	if(${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.20)
 		target_link_libraries(performous_test PRIVATE GTest::gtest GTest::gtest_main GTest::gmock)

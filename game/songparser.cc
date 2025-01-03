@@ -1,15 +1,15 @@
 #include "songparser.hh"
 #include "unicode.hh"
 #include "util.hh"
-#include <cmath>
-#include <regex>
 
 #include <boost/algorithm/string.hpp>
+
+#include <cmath>
 #include <fstream>
+#include <regex>
 
 
 namespace SongParserUtil {
-
 	void assign(int& var, std::string const& str) {
 		try {
 			var = std::stoi(str);
@@ -68,19 +68,21 @@ SongParser::SongParser(Song& s) : m_song(s) {
 		if ((size < 10) || (size > 100000)) {
 			throw SongParserException(s, "Does not look like a song file (wrong size)", 1, true);
 		}
-		if (!isText(m_ss.str())) {
+		std::string ss = UnicodeUtil::convertToUTF8(m_ss.str(), s.filename.string());
+		if (!isText(ss)) {
 			throw SongParserException(s, "Does not look like a song file (binary)", 1, true);
 		}
 		// Convert m_ss; filename supplied for possible warning messages
 		if (xmlCheck(m_ss.str())) {
-			s.type = Song::Type::XML;	// XMLPP should deal with encoding so we don't have to.
+			s.type = Song::Type::XML; // XMLPP should deal with encoding so we don't have to.
+			ss = m_ss.str();
 		}
 		else {
-			std::string ss = UnicodeUtil::convertToUTF8(m_ss.str(), s.filename.string());
-			if (txtCheck(ss)) {
-				s.type = Song::Type::TXT;
-			} else if (smCheck(ss)) {
+			// For determining song type, SM has to come first as it's very similar in structure to the TXT format and thus it's possible for SM songs to be erroneously categorized as TXT songs.
+			if (smCheck(ss)) {
 				s.type = Song::Type::SM;
+			} else if (txtCheck(ss)) {
+				s.type = Song::Type::TXT;
 			} else if (iniCheck(ss)) {
 				s.type = Song::Type::INI;
 			} else {

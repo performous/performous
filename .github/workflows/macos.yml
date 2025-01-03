@@ -81,6 +81,7 @@ jobs:
            brew install $MACOS_DEPS 2>&1
            brew unlink boost@1.87
            brew link --force boost@1.85
+           brew link --force icu4c
 
       - name: Build package
         id: build_package
