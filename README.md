@@ -12,21 +12,8 @@ Discord at https://discord.gg/NS3m3ad
 
 For compiling instructions visit the wiki page: https://github.com/performous/performous/wiki/Building-and-installing-from-source
 
-# Latest builds
+# Pre-compiled builds
+Performous currently builds on Windows(MSVC and MinGW-w64), macOS, and various versions of Ubuntu, Debian, Fedora, as well as an AppImage build.
 
-- [Windows (MSVC)](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-msvc.exe.zip)
-- [Windows (MinGW-w64)](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-mingw-w64.exe.zip)
-- [Mac OS X](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest.dmg.zip)
-- [Linux - Ubuntu 20.04](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-ubuntu_20.04.deb.zip)
-- [Linux - Ubuntu 22.04](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-ubuntu_22.04.deb.zip)
-- [Linux - Ubuntu 24.04](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-ubuntu_24.04.deb.zip)
-- [Linux - Debian 11](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-debian_11.deb.zip)
-- [Linux - Debian 12](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-debian_12.deb.zip)
-- [Linux - Fedora 35](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-fedora_35.rpm.zip)
-- [Linux - Fedora 36](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-fedora_36.rpm.zip)
-- [Linux - Fedora 37](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-fedora_37.rpm.zip)
-- [Linux - Fedora 38](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-fedora_38.rpm.zip)
-- [Linux - Fedora 39](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-fedora_39.rpm.zip)
-- [Linux - Fedora 40](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-fedora_40.rpm.zip)
-- [Linux - Fedora 41](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest-fedora_41.rpm.zip)
-- [Linux - AppImage](https://nightly.link/performous/performous/workflows/build_and_release/master/Performous-latest.AppImage.zip)
+- Latest Performous Release: https://github.com/performous/performous/releases/latest
+- Weekly BETA builds from the `master` branch: https://nightly.link/performous/performous/workflows/build_and_release/master?preview
