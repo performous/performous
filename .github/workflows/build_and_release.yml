@@ -61,19 +61,19 @@ jobs:
           echo "version_tweak=0" >> $GITHUB_OUTPUT
 
           if [[ ${{ github.event_name }} == "push" ]]; then
-              COMMIT_SHA=$(git rev-parse --short=7 ${{ github.event.after }})
+            COMMIT_SHA=$(git rev-parse --short=7 ${{ github.event.after }})
           elif [[ ${{ github.event_name }} == "pull_request" ]]; then
-              COMMIT_SHA=$(git rev-parse --short=7 ${{ github.event.pull_request.head.sha }})
+            COMMIT_SHA=$(git rev-parse --short=7 ${{ github.event.pull_request.head.sha }})
           fi
 
           if [[ ${{ github.ref_type }} == "tag" ]]; then
-              echo "complete_version=${{github.ref_name}}" >> $GITHUB_OUTPUT
+            echo "complete_version=${{github.ref_name}}" >> $GITHUB_OUTPUT
           elif [[ ${{ github.ref_type }} == "branch" ]]; then
-              if [[ ${{ github.ref_name}} == "master" ]]; then
-                  echo "complete_version=$LATEST_TAG_VERSION+git-${COMMIT_SHA}-beta" >> $GITHUB_OUTPUT
-              else
-                  echo "complete_version=$LATEST_TAG_VERSION+git-${COMMIT_SHA}-PR${{github.event.pull_request.number}}-alpha" >> $GITHUB_OUTPUT
-              fi
+            if [[ ${{ github.ref_name}} == "master" ]]; then
+              echo "complete_version=$LATEST_TAG_VERSION+git-${COMMIT_SHA}-beta" >> $GITHUB_OUTPUT
+            else
+              echo "complete_version=$LATEST_TAG_VERSION+git-${COMMIT_SHA}-PR${{github.event.pull_request.number}}-alpha" >> $GITHUB_OUTPUT
+            fi
           fi
 
 
