@@ -105,7 +105,7 @@ add_definitions(-DSDL_MAIN_HANDLED)
 
 
 	target_include_directories(performous_test PRIVATE "." ".." "../game" "../3rdparty/ced")
-	target_link_libraries(performous_test PRIVATE fs ced aubio)
+	target_link_libraries(performous_test PRIVATE ced aubio)
 
 	if(WIN32 AND MSVC)
 #		target_compile_options(performous_test PUBLIC /WX)
