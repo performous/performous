@@ -2,6 +2,7 @@
 
 #include "configuration.hh"
 #include "fs.hh"
+#include "i18n.hh"
 #include "song.hh"
 #include "database.hh"
 #include "graphic/color_trans.hh"

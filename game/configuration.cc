@@ -437,10 +437,5 @@ void populateBackends(const std::list<std::string>& backendList) {
 }
 
 void populateLanguages(const std::map<std::string, std::string>& languages) {
-	ConfigItem& languageConfig = config["game/language"];
-	for (auto const& language : languages) {
-		languageConfig.addEnum(language.second);
-	}
-	languageConfig.selectEnum(languageConfig.getValue());
-	languageConfig.setOldValue(languageConfig.getEnumName());
+	populateLanguages(languages, config);
 }

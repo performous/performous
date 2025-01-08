@@ -1,17 +1,16 @@
 #pragma once
 
-#include "fs.hh"
-#include "i18n.hh"
+#include "fsdef.hh"
 #include "json.hh"
 #include "notes.hh"
+#include "isongparser.hh"
 #include "util.hh"
 
 #include <cstdint>
 #include <memory>
 #include <stdexcept>
 #include <string>
-
-class SongParser;
+#include <vector>
 
 namespace TrackName {
 	const std::string BGMUSIC = "background";
@@ -101,8 +100,10 @@ public:
 	int randomIdx = 0; ///< sorting index used for random order
 
 	// Functions only below this line
-	Song(nlohmann::json const& song);  ///< Load song from cache.
-	Song(fs::path const& filename);  ///< Load song from specified path and filename
+	Song(ISongParser&, nlohmann::json const& song);  ///< Load song from cache.
+	Song(ISongParser&, fs::path const& filename);  ///< Load song from specified path and filename
+	Song(ISongParser&);
+
 	void reload(bool errorIgnore = true);  ///< Reset and reload the entire song from file
 	void loadNotes(bool errorIgnore = true);  ///< Load note data (called when entering singing screen, headers preloaded).
 	void dropNotes();  ///< Remove note data (when exiting singing screen), to conserve RAM
@@ -111,7 +112,7 @@ public:
 	std::string str() const;  ///< Return "title by artist" string for UI
 	std::string strFull() const;  ///< Return multi-line full song info (used for searching)
 	/** Get the song status at a given timestamp **/
-	Status status(double time, ScreenSing* song);
+	Status status(double time, bool menuOpen, bool singingDuet, unsigned selectedVocalTrack);
 	// Get a selected track, or VOCAL_LEAD if not found or the first one if not found
 	VocalTrack& getVocalTrack(std::string vocalTrack = TrackName::VOCAL_LEAD);
 	VocalTrack& getVocalTrack(unsigned idx = 0);
@@ -123,6 +124,8 @@ public:
 	bool hasGuitars() const { return instrumentTracks.size() - hasDrums() - hasKeyboard(); }
 	bool hasVocals() const { return !vocalTracks.empty(); }
 	bool hasDuet() const { return vocalTracks.size() > 1; }
+	bool hasSoloVocals() const { return vocalTracks.size() == 1; }
+	bool hasDuetVocals() const { return vocalTracks.size() == 2; }
 	bool hasControllers() const { return !danceTracks.empty() || !instrumentTracks.empty(); }
 	bool getNextSection(double pos, SongSection &section);
 	bool getPrevSection(double pos, SongSection &section);
@@ -130,31 +133,22 @@ public:
 
 	bool isBroken() const;
 	void setBroken(bool broken = true);
+	
+	void setTitle(std::string const&);
+	void setArtist(std::string const&);
+
+	using Year = unsigned;
+
+	Year getYear() const;
+	void setYear(Year year);
 
 private:
 	void collateUpdate();   ///< Rebuild collate variables (used for sorting) from other strings
 
+	ISongParser& m_parser;
 	bool m_broken = false;
-};
-
-/// Thrown by SongParser when there is an error
-struct SongParserException: public std::runtime_error {
-	/// constructor
-	SongParserException(Song& s, std::string const& msg, unsigned int linenum, bool sil = false): runtime_error(msg), m_filename(s.filename), m_linenum(linenum), m_silent(sil) {
-		if (!sil) s.b0rked += msg + '\n';
-	}
-	~SongParserException() noexcept = default;
-	fs::path const& file() const { return m_filename; } ///< file in which the error occured
-	unsigned int line() const { return m_linenum; } ///< line in which the error occured
-	bool silent() const { return m_silent; } ///< if the error should not be printed to user (file skipped)
-private:
-	fs::path m_filename;
-	unsigned int m_linenum;
-	bool m_silent;
+	Year m_year = 0;
 };
 
 using SongPtr = std::shared_ptr<Song>;
 using SongCollection = std::vector<SongPtr>;
-
-/// Print a SongParserException in a format suitable for the logging system.
-std::ostream& operator<<(std::ostream& os, SongParserException const& e);
