@@ -20,16 +20,38 @@ namespace SongParserUtil {
 	const auto regex_multiline = std::regex::multiline;
 #endif
 
-
-
 	// There is some weird bug with std::regex and boost::locale on libc++ that makes regex fail if a global locale with a collation facet has been installed before instantiating patterns.
-	const static std::regex iniParseLine(R"(^[^\S^\r\n]*([a-zA-Z0-9._-]+)[^\S^\r\n]*=[^\S^\r\n]*([^\n\r]*?)(?=[^\S^\r\n]*$))", regex_multiline);
-	const static std::regex iniCheckHeader(R"(^[^\S^\r\n]*\[song\][^\S^\r\n]*(?:$|[;#]))", regex_multiline);
-	const static std::regex brTag(R"(<br>|<br[ ]*/?>)", std::regex_constants::icase);
-	const static std::regex richTags(
-	  R"(</?(b|i|u|s|size|font|align|gradient|sub|sup|link)(=[^>]*)?( [^>]*)?>|<(color)(=[^>]*)?>|</(color)>)", 
-	  std::regex_constants::icase
+
+	const static std::regex iniParseLine(
+		R"(^[^\S^\r\n]*)"                                       // Any number of white-space characters that are neither \n nor \r
+		R"(([a-zA-Z0-9._-]+))"                                  // INI key is one or more characters, letters and numbers, plus '.', '_' and '-'
+		R"([^\S^\r\n]*)"                                        // Any number of white-space characters that are neither \n nor \r
+		R"(=)"                                                  // Delimiter
+		R"([^\S^\r\n]*)"                                        // Any number of white-space characters that are neither \n nor \r
+		R"(([^\n\r]*?))"                                        // Non-greedy matching any character that is neither \r nor \n, and
+		R"((?=[^\S^\r\n]*$))", regex_multiline                  // That is followed by any number of white-space characters that are neither \n nor \r, and the end of the line.
 	);
+
+	const static std::regex iniCheckHeader(
+		R"(^[^\S^\r\n]*)"                                       // Any number of white-space characters that are neither \n nor \r
+		R"(\[song\])"                                           // literal matching of [song]
+		R"([^\S^\r\n]*)"                                        // Any number of white-space characters that are neither \n nor \r
+		R"((?:$|[;#]))", regex_multiline                        // Non-capturing group; match end-of-line or either ';' or '#', which denote a trailing comment.
+	);
+
+	const static std::regex richTags(
+		R"(</?)"                                                // A '<', followed by either 0 or 1 slashes.
+		R"((b|i|u|s|size|font|align|gradient|sub|sup|link))"    // Any one of these tags
+		R"((=[^>]*)?)"                                          // A group of: '=' followed by any characters that are not >, appearing just 0 or 1 times as a whole.
+		R"(( [^>]*)?>)"                                         // A group of: ' ' followed by any characters that are not >, appearing just 0 or 1 times as a whole, and finishing with >
+		R"(|<color(=[^>]*)?>)"                                  // OR a <color> tag with an equal sign followed by anything that isn't '>'
+		R"(|</color>)", std::regex_constants::icase             // OR the closing </color> tag. 
+	);
+
+	const static std::regex brTag(
+		R"(<br>|<br[ ]*/?>)", std::regex_constants::icase       // match <br>, <br/> or <br />, allowing for any number of spaces between br and the /.
+	);
+
 	const std::string DUET_P2 = "Duet singer";	// FIXME
 	const std::string DUET_BOTH = "Both singers";	// FIXME
 	/// Parse an int from string and assign it to a variable
