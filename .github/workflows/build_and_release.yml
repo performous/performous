@@ -70,7 +70,8 @@ jobs:
             echo "complete_version=${{github.ref_name}}" >> $GITHUB_OUTPUT
           elif [[ ${{ github.ref_type }} == "branch" ]]; then
             if [[ ${{ github.ref_name}} == "master" ]]; then
-              echo "complete_version=$LATEST_TAG_VERSION+git-${COMMIT_SHA}-beta" >> $GITHUB_OUTPUT
+              NUMCOMMITS=$(git describe --tags | sed "s|$(git describe --tags --abbrev=0)-||" | cut -d- -f1)
+              echo "complete_version=$LATEST_TAG_VERSION+${NUMCOMMITS}-git-${COMMIT_SHA}" >> $GITHUB_OUTPUT
             else
               echo "complete_version=$LATEST_TAG_VERSION+git-${COMMIT_SHA}-PR${{github.event.pull_request.number}}-alpha" >> $GITHUB_OUTPUT
             fi
