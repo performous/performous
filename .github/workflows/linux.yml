@@ -101,11 +101,7 @@ jobs:
           - os: ubuntu
             version: 24.04
           - os: debian
-            version: 11
-          - os: debian
             version: 12
-          - os: fedora
-            version: 35
           - os: fedora
             version: 36
           - os: fedora

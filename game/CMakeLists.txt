@@ -88,9 +88,8 @@ add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES})
 find_package(Boost 1.55 REQUIRED COMPONENTS program_options iostreams system locale)
 target_include_directories(performous SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
 target_link_libraries(performous PRIVATE ${Boost_LIBRARIES})
-find_package(ICU 60 REQUIRED uc data i18n io)
-target_include_directories(performous SYSTEM PRIVATE ${ICU_INCLUDE_DIRS})
-target_link_libraries(performous PRIVATE ${ICU_LIBRARIES})
+find_package(ICU 65 REQUIRED uc data i18n io)
+target_link_libraries(performous PRIVATE ICU::uc ICU::data ICU::i18n ICU::io)
 
 # LibEpoxy < 1.2 crashes with binary drivers (nvidia & fglrx) when creating shaders
 # (see https://github.com/anholt/libepoxy/issues/23 for the exact problem)

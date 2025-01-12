@@ -11,6 +11,7 @@ std::pair<std::string, std::string> TranslationEngine::m_currentLanguage{"en_US.
 std::string TranslationEngine::m_package = PACKAGE;
 boost::locale::generator TranslationEngine::m_gen{};
 std::map<std::string, std::string> TranslationEngine::m_languages{};
+std::unique_ptr<icu::Locale> TranslationEngine::m_icuLocale = std::make_unique<icu::Locale>(icu::Locale::getEnglish());
 
 TranslationEngine::TranslationEngine() {
 	initializeAllLanguages();
@@ -82,7 +83,7 @@ void TranslationEngine::setLanguage(const std::string& language, bool fromSettin
 	icu::RuleBasedCollator* search;
 	icu::RuleBasedCollator* sort;
 
-	error.reset();	
+	error.reset();
 	search = dynamic_cast<icu::RuleBasedCollator*>(icu::RuleBasedCollator::createInstance(searchLocale, error));
 	if (!search || error.isFailure()) throw std::runtime_error("Unable to create search collator. error: " + std::to_string(error.get()) + ": " + error.errorName());
 
@@ -95,6 +96,10 @@ std::to_string(error.get()) + ": " + error.errorName());
 	UnicodeUtil::m_sortCollator.reset(sort);
 	UnicodeUtil::m_searchCollator->setStrength(icu::Collator::PRIMARY);
 	UnicodeUtil::m_sortCollator->setStrength(icu::Collator::SECONDARY);
+
+	// We ideally want an ICU locale to feed to the case-mapping functions in UnicodeUtil.
+	auto icuLoc = icu::Locale::createCanonical(getCurrentLanguage().first.c_str());
+	TranslationEngine::m_icuLocale = std::make_unique<icu::Locale>(icuLoc);
 }
 
 std::string TranslationEngine::getLanguageByHumanReadableName(const std::string& language) {
@@ -102,7 +107,7 @@ std::string TranslationEngine::getLanguageByHumanReadableName(const std::string&
 		return boost::locale::util::get_system_locale(true);
 	}
 
-	auto allLanguages = GetAllLanguages();	
+	auto allLanguages = GetAllLanguages();
 	std::string languageKey;
 	for (auto const& lang : allLanguages) {
 		if (lang.second == language) {
