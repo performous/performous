@@ -27,7 +27,7 @@ void SongParser::txtParseHeader() {
 	if (s.title.empty() || s.artist.empty()) throw SongParserException(s, "Required header fields missing", 0);
 	if (!fs::exists(s.music[TrackName::BGMUSIC]))
 	{
-		s.loadStatus = Song::LoadStatus::ERROR;
+		s.loadStatus = Song::LoadStatus::PARSERERROR;
 		SpdLogger::error(LogSystem::SONGPARSER, "TXT Parser ({}) -- Required song file is not available at path={}", m_song.filename, s.music[TrackName::BGMUSIC].string());
 	}
 	if (m_bpm != 0.0f) addBPM(0, m_bpm);

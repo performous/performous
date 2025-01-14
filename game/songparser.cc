@@ -118,7 +118,7 @@ SongParser::SongParser(Song& s) : m_song(s) {
 		if (!m_song.midifilename.empty()) { 
 			midParseHeader(); 
 		}
-		if (s.loadStatus != Song::LoadStatus::ERROR) {
+		if (s.loadStatus != Song::LoadStatus::PARSERERROR) {
 			s.loadStatus = Song::LoadStatus::HEADER;
 		}
 	}
