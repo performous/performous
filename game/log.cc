@@ -167,7 +167,7 @@ void SpdLogger::initializeSinks(spdlog::level::level_enum const& consoleLevel) {
 	
 	auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 	stdout_sink->set_color(spdlog::level::critical, logger_colors(bold_on_red)); // Error.
-	stdout_sink->set_color(spdlog::level::err, logger_colors(yellow_bold)); // Warning.
+	stdout_sink->set_color(spdlog::level::err, logger_colors(yellow)); // Warning.
 	stdout_sink->set_color(spdlog::level::warn, logger_colors(green)); // Notice.
 	stdout_sink->set_color(spdlog::level::info, logger_colors(white));
 	stdout_sink->set_color(spdlog::level::debug, logger_colors(blue));
@@ -177,7 +177,7 @@ void SpdLogger::initializeSinks(spdlog::level::level_enum const& consoleLevel) {
 
 	auto stderr_sink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
 	stderr_sink->set_color(spdlog::level::critical, logger_colors(bold_on_red)); // Error.
-	stderr_sink->set_color(spdlog::level::err, logger_colors(yellow_bold)); // Warning.
+	stderr_sink->set_color(spdlog::level::err, logger_colors(yellow)); // Warning.
 	stderr_sink->set_color(spdlog::level::warn, logger_colors(green)); // Notice.
 	stderr_sink->set_color(spdlog::level::info, logger_colors(white));
 	stderr_sink->set_color(spdlog::level::debug, logger_colors(blue));
