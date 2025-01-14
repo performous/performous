@@ -219,7 +219,7 @@ void ScreenSongs::update() {
 bool ScreenSongs::addSong() {
 	auto& pl = getGame().getCurrentPlayList();
 	auto song = m_songs.currentPtr();
-	if (song->loadStatus != Song::LoadStatus::ERROR) {
+	if (song->loadStatus != Song::LoadStatus::PARSERERROR) {
 		pl.addSong(song);
 	}
 	else {
