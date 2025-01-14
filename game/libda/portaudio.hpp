@@ -47,6 +47,12 @@ namespace portaudio {
 		char const* m_func;
 	};
 
+	/// The only purpose of this is throwing a _different_ error so we can report it as less severe to the user.
+	class DeviceNotFoundError : public std::runtime_error {
+		public:
+			DeviceNotFoundError(std::string const& str) : std::runtime_error(str) {}
+	}; 
+
 	namespace internal {
 		void inline check(PaError code, char const* func) { if (code != paNoError) throw Error(code, func); }
 	}
@@ -139,14 +145,14 @@ namespace portaudio {
 				if (dev.name.find(name) != std::string::npos) { return dev; }
 				if (dev.flex.find(name) != std::string::npos) { return dev; }
 			}
-			throw std::runtime_error("No such device.");
+			throw DeviceNotFoundError{"No such device."};
 		}
 		DeviceInfo const& findByChannels(bool output, int num) {
 			for (auto const& dev: devices) {
 				int reqChannels = output ? dev.out : dev.in;
 				if (reqChannels >= num) { return dev;  }
 			}
-			throw std::runtime_error("No such device.");
+			throw DeviceNotFoundError{"No such device."};
 		}
 		DeviceInfos devices;
 	};

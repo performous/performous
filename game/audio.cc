@@ -563,7 +563,11 @@ struct Audio::Impl {
 				// NOTE: When it throws we want to keep the device in devices to avoid calling ~Device
 				// which often would hit the Pa_CloseStream hang bug and terminate the application.
 				d.start();
-			} catch(std::runtime_error& e) {
+			}
+			catch (portaudio::DeviceNotFoundError const& e) {
+				SpdLogger::warn(LogSystem::AUDIO, "Audio device={}, exception={}", *it, e.what());
+			}
+			catch(std::runtime_error const& e) {
 				SpdLogger::error(LogSystem::AUDIO, "Audio device={}, exception={}", *it, e.what());
 			}
 		}
