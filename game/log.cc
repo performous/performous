@@ -195,10 +195,11 @@ void SpdLogger::initializeSinks(spdlog::level::level_enum const& consoleLevel) {
 	m_defaultLogger->set_level(spdlog::level::trace);
 	spdlog::set_default_logger(m_defaultLogger);
 
+	stdout_sink->set_level(consoleLevel); // Set console level before opening file to prevent trace from the file rotation.
+
 	auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(filename, 1024 * 1024 * 2, 5, true, handlers);
 	m_sink->add_sink(file_sink);
 
-	stdout_sink->set_level(consoleLevel);
 	file_sink->set_level(consoleLevel == spdlog::level::trace ? consoleLevel : spdlog::level::debug);
 	stderr_sink->set_level(spdlog::level::critical);
 
