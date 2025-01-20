@@ -26,6 +26,13 @@ jobs:
           chmod +x appimage-builder-x86_64.AppImage
           sudo mv appimage-builder-x86_64.AppImage /usr/local/bin/appimage-builder
           sudo apt update
+          sudo apt-get -y install ca-certificates wget gpg
+          wget -O ./key.asc https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null
+          gpg -v -o /usr/share/keyrings/kitware-archive-keyring.gpg --dearmor ./key.asc
+          echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null
+          sudo apt-get -y update
+          test -f /usr/share/doc/kitware-archive-keyring/copyright || sudo rm /usr/share/keyrings/kitware-archive-keyring.gpg
+          sudo apt-get install kitware-archive-keyring
           sudo apt-get install -y --no-install-recommends git cmake build-essential gettext help2man libopenblas-dev libfftw3-dev libicu-dev libepoxy-dev libsdl2-dev libfreetype6-dev libpango1.0-dev librsvg2-dev libxml++2.6-dev libavcodec-dev libavformat-dev libswscale-dev libjpeg-dev portaudio19-dev libglm-dev libboost-iostreams-dev libboost-locale-dev libboost-system-dev libboost-program-options-dev libssl-dev libcpprest-dev libgtest-dev libgmock-dev google-mock libportmidi-dev libopencv-dev libaubio-dev nlohmann-json3-dev libfmt-dev libfuse2 libspdlog-dev
 
       - name: Checkout Git
