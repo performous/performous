@@ -21,6 +21,8 @@ RUN <<EOR
 		gpg -v -o /usr/share/keyrings/kitware-archive-keyring.gpg --dearmor ./key.asc
 		if [[ "${VERSION_ID}" == "20.04" ]]; then
 			echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' | tee /etc/apt/sources.list.d/kitware.list >/dev/null
+			echo 'deb https://ppa.launchpadcontent.net/litenstein/libfmt-performous-bkp/ubuntu focal main'| tee /etc/apt/sources.list.d/libfmt8.list
+			apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1E0A4B32AA748B9D11C4528301A509285F2EA337
 		elif [[ "${VERSION_ID}" == "22.04" ]]; then
 			echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ jammy main' | tee /etc/apt/sources.list.d/kitware.list >/dev/null
 		fi
@@ -43,7 +45,8 @@ RUN <<EOR
 		libboost-iostreams-dev libboost-locale-dev libboost-system-dev \
 		libboost-program-options-dev libssl-dev libcpprest-dev \
 		libportmidi-dev libopencv-dev libaubio-dev \
-		libfmt-dev ca-certificates file libgtest-dev libgmock-dev google-mock libspdlog-dev
+		ca-certificates file libgtest-dev libgmock-dev google-mock libspdlog-dev
+		apt-get -y satisfy "libfmt-dev (>= 8)" "Conflicts: libspdlog-dev (<< 1.12)"
 	apt-get clean
 	mkdir -p /root/performous
 EOR

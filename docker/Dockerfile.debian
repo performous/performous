@@ -22,8 +22,14 @@ RUN <<EOR
 	if [[ "${OS_VERSION}" == "11" ]]; then
 		. ./platform_flags.sh
 		echo 'deb http://deb.debian.org/debian bullseye-backports main' | tee /etc/apt/sources.list.d/backports.list
-		export_platform_flags '-DSELF_BUILT_AUBIO=ALWAYS -DSELF_BUILT_CED=ALWAYS -DSELF_BUILT_JSON=ALWAYS'
+		export_platform_flags '-DSELF_BUILT_AUBIO=ALWAYS -DSELF_BUILT_CED=ALWAYS -DSELF_BUILT_JSON=ALWAYS -DSPDLOG_FMT_EXTERNAL_HO=ON -DSPDLOG_FMT_EXTERNAL=OFF'
 		echo 'export USE_BACKPORTS="-t bullseye-backports"' | tee /etc/SHOULD_USE_BACKPORTS
+		apt-get -y update
+		apt-get -y install ca-certificates gpg
+		echo 'deb https://ppa.launchpadcontent.net/litenstein/libfmt-performous-bkp/ubuntu focal main'| tee /etc/apt/sources.list.d/libfmt8.list
+		apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1E0A4B32AA748B9D11C4528301A509285F2EA337
+		apt-get -y update
+		apt-get install -y libfmt8/focal libfmt-dev/focal
 	fi
 EOR
 
@@ -39,7 +45,8 @@ RUN <<EOR
 		libboost-iostreams-dev libboost-locale-dev libboost-system-dev \
 		libboost-program-options-dev libssl-dev libcpprest-dev \
 		libportmidi-dev libopencv-dev libaubio-dev nlohmann-json3-dev \
-		libfmt-dev ca-certificates file libgmock-dev libgtest-dev libspdlog-dev
+		libfmt-dev ca-certificates file libgmock-dev libgtest-dev
+	apt-get -y satisfy "libfmt-dev (>= 8)" "Conflicts: libspdlog-dev (<< 1.12)"
 	apt-get clean
 	mkdir -p /root/performous
 EOR

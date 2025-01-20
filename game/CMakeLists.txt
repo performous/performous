@@ -132,7 +132,7 @@ foreach(lib SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JP
 	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
 
-find_package(fmt REQUIRED CONFIG)
+find_package(fmt 8.1 REQUIRED CONFIG)
 # CppRESTSDK and their godforsaken U macro.
 if(fmt_VERSION VERSION_GREATER_EQUAL 9.0.0)
 	target_compile_definitions(performous PRIVATE -D_TURN_OFF_PLATFORM_STRING)
@@ -140,8 +140,8 @@ endif()
 
 find_package(Spdlog REQUIRED MODULE)
 
-target_compile_definitions(performous PUBLIC SPDLOG_FMT_EXTERNAL FMT_USE_CONSTEXPR)
-target_link_libraries(performous PRIVATE fmt::fmt spdlog::spdlog_header_only)
+target_compile_definitions(performous PRIVATE $<IF:$<NOT:$<BOOL:${SPDLOG_FMT_EXTERNAL_HO}>>,SPDLOG_FMT_EXTERNAL,SPDLOG_FMT_EXTERNAL_HO> FMT_USE_CONSTEXPR)
+target_link_libraries(performous PRIVATE $<IF:$<NOT:$<BOOL:${SPDLOG_FMT_EXTERNAL_HO}>>,fmt::fmt,fmt::fmt-header-only> spdlog::spdlog_header_only)
 
 # Activating MIDI hardware (e-drums with USB/MIDI connection)
 set(ENABLE_MIDI AUTO CACHE STRING "Use midi hardware (e-drums with USB/MIDI connection)")
