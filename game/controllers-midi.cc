@@ -3,6 +3,7 @@
 #include "controllers.hh"
 #include "fs.hh"
 #include "portmidi.hh"
+
 #include <regex>
 #include <unordered_map>
 #include <sstream>
@@ -22,9 +23,9 @@ namespace input {
 					if (!regex_search(name, re)) continue;
 					// Now actually open the device
 					m_streams.emplace(dev, std::unique_ptr<pm::Input>(new pm::Input(dev)));
-					std::clog << "controller-midi/info: Opened MIDI device " << name << std::endl;
+					SpdLogger::info(LogSystem::CONTROLLERS, "MIDI device {} opened.", name);
 				} catch (std::runtime_error& e) {
-					std::clog << "controller-midi/warning: " << e.what() << std::endl;
+					SpdLogger::warn(LogSystem::CONTROLLERS, "MIDI device error: {}.", e.what());
 				}
 			}
 		}
@@ -45,7 +46,7 @@ namespace input {
 				unsigned chan = (ev.message & 0x0F) + 1;  // It is conventional to use one-based indexing
 				if (evnt == 0x80 /* NOTE OFF */) { evnt = static_cast<unsigned char>(0x90); vel = 0; }  // Translate NOTE OFF into NOTE ON with zero-velocity
 				if (evnt != 0x90 /* NOTE ON */) continue;  // Ignore anything that isn't NOTE ON/OFF
-				std::clog << "controller-midi/info: MIDI NOTE ON/OFF event: ch=" << unsigned(chan) << " note=" << unsigned(note) << " vel=" << unsigned(vel) << std::endl;
+				SpdLogger::info(LogSystem::CONTROLLERS, "MIDI note ON/OFF event: ch={}, note={}, vel={}", chan, unsigned(note), unsigned(vel));
 				event.value = vel / 127.0;
 				event.source = SourceId(SourceType::MIDI, it->first, chan);
 				event.hw = static_cast<unsigned>(note);

@@ -20,7 +20,7 @@ void ScreenPlaylist::enter() {
 		try {
 			m_cam = std::make_unique<Webcam>(getGame().getWindow(), config["graphic/webcamid"].ui());
 		} catch (std::exception& e) {
-			std::cout << e.what() << std::endl;
+			SpdLogger::error(LogSystem::WEBCAM, "Exception={}", e.what());
 		}
 	}
 	m_audio.togglePause();

@@ -3,9 +3,9 @@
 #include "chrono.hh"
 #include "fs.hh"
 #include "graphic/transform.hh"
+#include "log.hh"
 
 #include <cstdint>
-#include <iostream>
 #include <stdexcept>
 #include <thread>
 
@@ -28,7 +28,7 @@ Webcam::Webcam(Window& window, int cam_id):
 	m_capture.reset(new cv::VideoCapture(cam_id));
 	if (!m_capture->isOpened()) {
 		if (cam_id != m_autoDetect) {
-			std::clog << "Webcam/warning: Webcam id " << cam_id << " failed, trying autodetecting...";
+			SpdLogger::warn(LogSystem::WEBCAM, "Failed opening webcam id={}. Trying autoddection...", cam_id);
 			m_capture.reset(new cv::VideoCapture(m_autoDetect));
 		}
 		if (!m_capture->isOpened())
@@ -41,9 +41,7 @@ Webcam::Webcam(Window& window, int cam_id):
 		m_capture->set(cv::CAP_PROP_FRAME_HEIGHT, 480);
 	}
 	// Print actual values
-	std::cout << "Webcam frame properties: "
-	  << m_capture->get(cv::CAP_PROP_FRAME_WIDTH) << "x"
-	  << m_capture->get(cv::CAP_PROP_FRAME_HEIGHT) << std::endl;
+	SpdLogger::info(LogSystem::WEBCAM, "Frame dimensions={}x{}", m_capture->get(cv::CAP_PROP_FRAME_WIDTH), m_capture->get(cv::CAP_PROP_FRAME_HEIGHT));
 
 	// Initialize the video writer
 	#ifdef SAVE_WEBCAM_VIDEO
@@ -54,7 +52,7 @@ Webcam::Webcam(Window& window, int cam_id):
 	std::string out_file = (getHomeDir() / "performous-webcam_out.mpg").string();
 	m_writer.reset(new cv::VideoWriter(out_file.c_str(), codec, fps > 0 ? fps : 30.0f, cv::cvSize(framew,frameh)));
 	if (!m_writer->isOpened()) {
-		std::cout << "Could not initialize webcam video saving!" << std::endl;
+		SpdLogger::warning(LogSystem::WEBCAM, "Could not initialize saving of webcam video.");
 		m_writer.reset();
 	}
 	#endif
@@ -89,7 +87,10 @@ void Webcam::operator()() {
 				m_frame.data.assign(frame.data, frame.data + (m_frame.width * m_frame.height * 3));
 				// Notify renderer
 				m_frameAvailable = true;
-			} catch (std::exception&) { std::cerr << "Error capturing webcam frame!" << std::endl; }
+			}
+			catch (std::exception const& e) { 
+				SpdLogger::warning(LogSystem::WEBCAM, "Error capturing frame. Exception={}", e.what());
+			}
 		}
 		// Sleep a little, much if the cam isn't active
 		std::this_thread::sleep_for(m_running ? 10ms : 500ms);
