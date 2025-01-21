@@ -46,6 +46,7 @@ void SongParser::iniParseHeader() {
 			// Step 2: Remove explicitly listed tags.
 			value = std::regex_replace(value, richTags, "");
 		}
+		if (trim(value).empty()) continue;
 		// Supported tags
 		if (key == "cassettecolor") continue; // Ignore.
 		if (key == "name") s.title = value;
