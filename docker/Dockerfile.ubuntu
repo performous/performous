@@ -16,8 +16,7 @@ RUN <<EOR
 	. /etc/os-release
 	if [[ "${VERSION_ID}" == "20.04" || "${VERSION_ID}" == "22.04" ]]; then
 		apt-get -y update
-		apt-get -y install --no-install-recommends ca-certificates gnupg
-		apt-get -y install --no-install-recommends software-properties-common
+		apt-get -y install --no-install-recommends ca-certificates gnupg software-properties-common
 		gpg -v -o /usr/share/keyrings/kitware-archive-keyring.gpg --dearmor ./key.asc
 		if [[ "${VERSION_ID}" == "20.04" ]]; then
 			echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ focal main' | tee /etc/apt/sources.list.d/kitware.list >/dev/null
@@ -26,9 +25,9 @@ RUN <<EOR
 		elif [[ "${VERSION_ID}" == "22.04" ]]; then
 			echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ jammy main' | tee /etc/apt/sources.list.d/kitware.list >/dev/null
 		fi
-		test -f /usr/share/doc/kitware-archive-keyring/copyright || rm /usr/share/keyrings/kitware-archive-keyring.gpg
 		add-apt-repository ppa:savoury1/gcc-defaults-12
 		apt-get -y update
+		test -f /usr/share/doc/kitware-archive-keyring/copyright || rm /usr/share/keyrings/kitware-archive-keyring.gpg
 		apt-get install -y --no-install-recommends kitware-archive-keyring
 		apt-get install -y --no-install-recommends gcc-12 gcc g++
 	fi
