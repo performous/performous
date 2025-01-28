@@ -132,11 +132,6 @@ SpdLogger::SpdLogger (spdlog::level::level_enum const& consoleLevel) {
 		constructLogger(system);
 	}
 	grabber = std::make_unique<StderrGrabber>();
-// 	for (auto const& sink: m_sink->sinks()) {
-// 		SpdLogger::warn(LogSystem::LOGGER, "Sink level: {}", spdlog::level::to_string_view(sink->level()));
-// 	}
-// 	SpdLogger::warn(LogSystem::LOGGER, "m_sink level: {}", spdlog::level::to_string_view(m_sink->level()));
-// 	SpdLogger::warn(LogSystem::LOGGER, "m_defaultLogger level(): {}", spdlog::level::to_string_view(m_defaultLogger->level()));
 }
 
 LoggerPtr SpdLogger::constructLogger(const LogSystem system) {
@@ -150,7 +145,6 @@ LoggerPtr SpdLogger::constructLogger(const LogSystem system) {
 	}
 	builtLoggers.try_emplace(system, newLogger);
 	newLogger->log(spdlog::level::trace, fmt::format("Logger subsystem initialized, system: {}", system));
-// 	newLogger->log(spdlog::level::warn, "New logger level(): {}", spdlog::level::to_string_view(newLogger->level()));
 	return newLogger;
 }
 
