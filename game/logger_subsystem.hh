@@ -7,6 +7,7 @@ class SpdLogger;
 
 class LogSystem {
   public:
+	// The actual underlying values are not really important. These are just so we don't accidentally construct or try to use loggers for inexistent subsystems. If you add or remove a value, for the love of god keep them sorted, and add the corresponding case to the switch statement below.
 	enum Values : std::size_t {
 		BEGIN = 0,
 		AUDIO = BEGIN,

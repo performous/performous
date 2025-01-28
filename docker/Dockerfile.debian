@@ -16,22 +16,14 @@ ARG TZ="America/New_York"
 COPY platform_flags.sh ./platform_flags.sh
 
 ## Install the deps and create the build directory
+
+## Keeping these lines around just for future reference in case we need to use this hack in the future.
+## 	touch /etc/SHOULD_USE_BACKPORTS
+##	echo 'export USE_BACKPORTS="-t bullseye-backports"' | tee /etc/SHOULD_USE_BACKPORTS
+##	. /etc/SHOULD_USE_BACKPORTS
+
 RUN <<EOR
 #!/bin/bash -x
-	touch /etc/SHOULD_USE_BACKPORTS
-	if [[ "${OS_VERSION}" == "11" ]]; then
-		. ./platform_flags.sh
-		echo 'deb https://deb.debian.org/debian bullseye-backports main' | tee /etc/apt/sources.list.d/backports.list
-		export_platform_flags '-DSELF_BUILT_AUBIO=ALWAYS -DSELF_BUILT_CED=ALWAYS -DSELF_BUILT_JSON=ALWAYS -DSPDLOG_FMT_EXTERNAL_HO=ON -DSPDLOG_FMT_EXTERNAL=OFF'
-		echo 'export USE_BACKPORTS="-t bullseye-backports"' | tee /etc/SHOULD_USE_BACKPORTS
-		apt-get -y update
-		apt-get -y install --no-install-recommends gnupg ca-certificates
-		echo 'deb https://ppa.launchpadcontent.net/litenstein/libfmt-performous-bkp/ubuntu focal main'| tee /etc/apt/sources.list.d/libfmt8.list
-		apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1E0A4B32AA748B9D11C4528301A509285F2EA337
-		apt-get -y update
-		apt-get install -y --no-install-recommends libfmt8/focal libfmt-dev/focal
-	fi
-	. /etc/SHOULD_USE_BACKPORTS
 	apt-get -y update
 	apt-get install -y --no-install-recommends ${USE_BACKPORTS} git cmake cmake-data build-essential \
 		gcc g++ gettext help2man libopenblas-dev libfftw3-dev libicu-dev libepoxy-dev \
