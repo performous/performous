@@ -64,7 +64,7 @@ jobs:
             COMMIT_SHA=$(git rev-parse --short=7 ${{ github.event.after }})
           elif [[ ${{ github.event_name }} == "pull_request" ]]; then
             COMMIT_SHA=$(git rev-parse --short=7 ${{ github.event.pull_request.head.sha }})
-          elif [[ ${{ github.event_name }} == "schedule" ]]; then
+          elif [[ ${{ github.event_name }} == "schedule" || ${{ github.event_name }} == "workflow_dispatch" ]]; then
             COMMIT_SHA=$(git rev-parse --short=7 ${{ github.sha }})
           fi
 
