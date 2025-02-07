@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.24)
 include(GoogleTest)
 
 set(SOURCE_FILES
@@ -51,22 +51,24 @@ if(GTest_FOUND)
 	find_package(Boost 1.55 REQUIRED COMPONENTS program_options iostreams system locale)
 	target_link_libraries(performous_test PRIVATE ${Boost_LIBRARIES})
 
-	find_package(fmt REQUIRED CONFIG)
-
+	find_package(fmt 8.1 REQUIRED CONFIG)
 	target_link_libraries(performous_test PRIVATE fmt::fmt)
+
+	# CppRESTSDK and their godforsaken U macro.
+	if(fmt_VERSION VERSION_GREATER_EQUAL 9.0.0)
+		target_compile_definitions(performous_test PRIVATE -D_TURN_OFF_PLATFORM_STRING)
+	endif()
 
 	find_package(ICU 65 REQUIRED uc data i18n io)
 	target_link_libraries(performous_test PRIVATE ICU::uc ICU::data ICU::i18n ICU::io)
 
-	if(${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.20)
-		target_link_libraries(performous_test PRIVATE GTest::gtest GTest::gtest_main GTest::gmock)
-	else()
-		if(NOT TARGET GTest::gmock)
-			find_package(GMock MODULE REQUIRED)
-			add_library(GTest::gmock ALIAS GMock)
-		endif()
-		target_link_libraries(performous_test PRIVATE GTest::GTest GTest::Main GTest::gmock)
-	endif()
+
+	find_package(Spdlog REQUIRED MODULE)
+
+	target_link_libraries(performous_test PRIVATE GTest::gtest GTest::gtest_main GTest::gmock)
+
+	target_compile_definitions(performous_test PRIVATE $<IF:$<NOT:$<BOOL:${SPDLOG_FMT_EXTERNAL_HO}>>,SPDLOG_FMT_EXTERNAL,SPDLOG_FMT_EXTERNAL_HO> FMT_USE_CONSTEXPR)
+	target_link_libraries(performous_test PRIVATE $<IF:$<NOT:$<BOOL:${SPDLOG_FMT_EXTERNAL_HO}>>,fmt::fmt,fmt::fmt-header-only> spdlog::spdlog_header_only)
 
 	target_include_directories(performous_test PRIVATE ".." "../game" "${Performous_BINARY_DIR}/game")
 
