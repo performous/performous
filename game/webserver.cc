@@ -77,11 +77,10 @@ WebServer::~WebServer() {
 
 std::string WebServer::getIPaddr() {
 	try {
-		boost::asio::io_service netService;
+		boost::asio::io_context netService;
 		boost::asio::ip::udp::resolver resolver(netService);
-		boost::asio::ip::udp::resolver::query query(boost::asio::ip::udp::v4(), "1.1.1.1", "80");
-		boost::asio::ip::udp::resolver::iterator endpoints = resolver.resolve(query);
-		boost::asio::ip::udp::endpoint ep = *endpoints;
+		auto endpoints = resolver.resolve("1.1.1.1", "80");
+		boost::asio::ip::udp::endpoint ep = endpoints.begin()->endpoint();
 		boost::asio::ip::udp::socket socket(netService);
 		socket.connect(ep);
 		boost::asio::ip::address addr = socket.local_endpoint().address();
