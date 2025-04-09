@@ -114,6 +114,8 @@ jobs:
             version: 40
           - os: fedora
             version: 41
+          - os: fedora
+            version: 42
     steps:
       - name: Container name
         run: |
