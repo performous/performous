@@ -1,5 +1,9 @@
 #pragma once
 
+#include "config.hh"
+
+#include <fmt/format.h>
+
 #include <iterator>
 #include <string>
 
@@ -167,7 +171,7 @@ template<>
 struct std::hash<LogSystem>
 {
 	std::size_t operator()(const LogSystem& sys) const noexcept {
-	std::size_t baseHash = std::hash<std::string>{}("PACKAGE_LogSystem");
+	std::size_t baseHash = std::hash<std::string>{}(fmt::format("{}_LogSystem", PACKAGE));
 	std::size_t enumHash = std::hash<std::size_t>{}(sys.value);
 	return baseHash * enumHash;
 	}
