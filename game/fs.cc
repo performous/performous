@@ -301,6 +301,25 @@ std::string formatPath(const fs::path& target) {
 }
 
 fs::path getLogFilename() { Lock l(mutex); return cache.cache / "infolog.txt"; }
+fs::path getProfilerLogFilename() { 
+	Lock l(mutex);
+	std::string baseName{"profiler.txt"};
+	unsigned logRotate = 5;
+	do {
+		fs::path newPath = cache.cache / fmt::format("profiler.{}.txt", logRotate);
+		fs::path oldPath = cache.cache / (logRotate == 1 ? "profiler.txt" : fmt::format(fmt::runtime("profiler.{}.txt"), logRotate - 1));
+		if (fs::exists(oldPath)) {
+			if (logRotate == 5 && fs::exists(newPath)) {
+				fs::remove(newPath); // delete profiler.5.txt if it exists
+			}
+			fs::rename(oldPath, newPath); // rotate
+		}
+		logRotate--;
+	}
+	while (logRotate >= 1);
+	return cache.cache / "profiler.txt";
+}
+
 fs::path getSchemaFilename() { Lock l(mutex); return cache.share / configSchema; }
 fs::path getHomeDir() { Lock l(mutex); return cache.home; }
 fs::path getShareDir() { Lock l(mutex); return cache.share; }

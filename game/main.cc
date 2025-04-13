@@ -341,6 +341,7 @@ int main(int argc, char** argv) {
 		outputOptionalFeatureStatus();
 
 		readConfig();
+		SpdLogger::toggleProfilerLogger();
 
 		if (vm.count("audiohelp")) {
 			SpdLogger::notice(LogSystem::LOGGER, "Starting the audio subsystem for audiohelp (errors printed on console may be ignored).");

@@ -18,6 +18,7 @@ using namespace std::string_view_literals;
 #define SPDLOG_LEVEL_NAMES { "TRACE"sv, "DEBUG"sv, "INFO"sv, "NOTICE"sv, "WARNING"sv, "ERROR"sv, "OFF"sv }
 
 #include <spdlog/async.h>
+#include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/dist_sink.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 
@@ -70,6 +71,8 @@ class SpdLogger {
 		logger->log(level, std::forward<Args>(args)...);
 	}
 
+	static void toggleProfilerLogger();
+
 	template <typename... Args>
 	static void error(LogSystem::Values subsystem, Args &&...args) { log(subsystem, spdlog::level::critical, std::forward<Args>(args)...); }
 	
@@ -98,9 +101,11 @@ class SpdLogger {
 	inline static const std::string formatString{"[%T]:::%^%n / %l%$::: %v"};
 	static std::unordered_map<LogSystem, LoggerPtr> builtLoggers;
 	static LoggerPtr getLogger(LogSystem::Values const& loggerName);
+	static std::shared_ptr<spdlog::sinks::basic_file_sink_mt> m_profilerSink;
 	static std::shared_ptr<spdlog::sinks::dist_sink_mt> m_sink;
 	static std::shared_mutex m_LoggerRegistryMutex;
 	static LoggerPtr m_defaultLogger;
+	static LoggerPtr m_ProfilerLogger;
 	static void writeLogHeader(spdlog::filename_t filename, std::FILE* fd, std::string header);
 	static void initializeSinks(spdlog::level::level_enum const& consoleLevel = spdlog::level::info);
 	static LoggerPtr constructLogger(const LogSystem system);
