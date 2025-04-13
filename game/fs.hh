@@ -88,6 +88,7 @@ bool pathRootHack(fs::path& p, std::string const& name);
 
 fs::path execname(); ///< Get the path and filename of the main executable.
 fs::path getLogFilename();  ///< Get the log filename.
+fs::path getProfilerLogFilename();  ///< Profiler get its own log, or it obliterates everything else.
 fs::path getSchemaFilename();  ///< Get the config schema filename.
 fs::path getHomeDir();  ///< Get user's home folder.
 fs::path getConfigDir();  ///< Get user-writable Performous config folder.

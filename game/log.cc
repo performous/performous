@@ -1,15 +1,19 @@
 #include "log.hh"
 
+#include "configuration.hh"
 #include "fs.hh"
 #include "profiler.hh"
+
 #include <boost/iostreams/device/file_descriptor.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <fmt/chrono.h>
+#include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/ostream_sink.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
+#include <algorithm>
 #include <array>
 #include <cerrno>
 #include <chrono>
@@ -119,8 +123,10 @@ struct StderrGrabber {
 std::unique_ptr<StderrGrabber> SpdLogger::grabber;
 std::unordered_map<LogSystem, LoggerPtr> SpdLogger::builtLoggers;
 std::shared_ptr<spdlog::sinks::dist_sink_mt> SpdLogger::m_sink;
+std::shared_ptr<spdlog::sinks::basic_file_sink_mt> SpdLogger::m_profilerSink;
 std::shared_mutex SpdLogger::m_LoggerRegistryMutex;
 LoggerPtr SpdLogger::m_defaultLogger;
+LoggerPtr SpdLogger::m_ProfilerLogger;
 
 SpdLogger::SpdLogger (spdlog::level::level_enum const& consoleLevel) {
 	spdlog::init_thread_pool(2048, 1);
@@ -129,6 +135,7 @@ SpdLogger::SpdLogger (spdlog::level::level_enum const& consoleLevel) {
 
 	for (const auto& system: LogSystem()) {
 		if (system == LogSystem::LOGGER) continue;
+		if (system == LogSystem::PROFILER) continue;
 		constructLogger(system);
 	}
 	grabber = std::make_unique<StderrGrabber>();
@@ -156,7 +163,7 @@ void SpdLogger::initializeSinks(spdlog::level::level_enum const& consoleLevel) {
 			fmt::format(" {} {} starting, {:%Y/%m/%d @ %H:%M:%S} ", PACKAGE, VERSION, fmt::localtime(time)),
 			fmt::format(" Logging any events of level {}, or higher. ", spdlog::level::to_string_view(consoleLevel))));
 	spdlog::filename_t filename = getLogFilename().u8string();
-
+	spdlog::filename_t profilerLogFilename = getProfilerLogFilename().u8string();
 	m_sink = std::make_shared<spdlog::sinks::dist_sink_mt>();
 	
 	auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
@@ -186,21 +193,44 @@ void SpdLogger::initializeSinks(spdlog::level::level_enum const& consoleLevel) {
 	m_sink->add_sink(stderr_sink);
 
 	m_defaultLogger = std::make_shared<spdlog::async_logger>(LogSystem{LogSystem::LOGGER}.toString(), m_sink, spdlog::thread_pool(), spdlog::async_overflow_policy::block);
+	
 	m_defaultLogger->set_level(spdlog::level::trace);
 	spdlog::set_default_logger(m_defaultLogger);
 
 	stdout_sink->set_level(consoleLevel); // Set console level before opening file to prevent trace from the file rotation.
 
-	auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(filename, 1024 * 1024 * 2, 5, true, handlers);
+	auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(filename, 1024 * 1024 * 3, 5, true, handlers);
+
+	m_profilerSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(profilerLogFilename, true, handlers);
+
 	m_sink->add_sink(file_sink);
 
 	file_sink->set_level(consoleLevel == spdlog::level::trace ? consoleLevel : spdlog::level::debug);
+
+	m_profilerSink->set_level(consoleLevel == spdlog::level::trace ? consoleLevel : spdlog::level::debug);
 	stderr_sink->set_level(spdlog::level::critical);
 
 	auto headerLogger = std::make_shared<spdlog::async_logger>(PACKAGE, stdout_sink, spdlog::thread_pool(), spdlog::async_overflow_policy::block);
 	headerLogger->log(spdlog::level::warn, logHeader);
 	
 	m_sink->set_pattern(formatString);
+
+}
+
+void SpdLogger::toggleProfilerLogger() {
+	if (!m_ProfilerLogger) {
+		m_ProfilerLogger = std::make_shared<spdlog::async_logger>(LogSystem{LogSystem::PROFILER}.toString(), m_profilerSink, spdlog::thread_pool(), spdlog::async_overflow_policy::block);
+		m_ProfilerLogger->set_level(spdlog::level::trace);
+	}
+	if (config["graphic/fps"].b() == true && std::find(m_sink->sinks().begin(), m_sink->sinks().end(), m_profilerSink) == m_sink->sinks().end())  {
+		m_sink->add_sink(m_profilerSink); // Profiler gets its own log, but we should also include everything else, to help make sense of it.
+		m_profilerSink->set_pattern(formatString);
+		notice(LogSystem::LOGGER, "Starting profiler... saving log at={}", getProfilerLogFilename());
+	}
+	else {
+		m_sink->remove_sink(m_profilerSink);
+		notice(LogSystem::LOGGER, "Stopping profiler...");
+	}
 }
 
 void SpdLogger::writeLogHeader(spdlog::filename_t filename, std::FILE* fd, std::string header) {
@@ -228,6 +258,9 @@ SpdLogger::~SpdLogger() {
 LoggerPtr SpdLogger::getLogger(LogSystem::Values const& loggerName) {
 	if (loggerName == LogSystem::LOGGER) {
 		return m_defaultLogger;
+	}
+	if (loggerName == LogSystem::PROFILER) {
+		return m_ProfilerLogger;
 	}
 	LoggerPtr ret;
 	try {
