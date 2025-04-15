@@ -79,7 +79,9 @@ private:
 /** Temporarily switch shader in a RAII manner. */
 struct UseShader {
 	UseShader(Shader& new_shader): m_shader(new_shader) {
-		glGetIntegerv(GL_CURRENT_PROGRAM, &m_old);
+		GLint _temp;
+		glGetIntegerv(GL_CURRENT_PROGRAM, &_temp);
+		m_old = static_cast<GLuint>(_temp);
 		m_shader.bind();
 	}
 	~UseShader() { glUseProgram(m_old); }
@@ -88,5 +90,5 @@ struct UseShader {
 
   private:
 	Shader& m_shader;
-	GLint m_old;
+	GLuint m_old;
 };
