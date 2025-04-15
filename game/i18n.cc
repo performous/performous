@@ -3,6 +3,7 @@
 #include "config.hh"
 #include "configuration.hh"
 #include "fs.hh"
+#include "log.hh"
 #include "unicode.hh"
 
 #include <unicode/locid.h>
@@ -21,17 +22,15 @@ TranslationEngine::TranslationEngine() {
 	 * translations) */
 	populateLanguages(GetAllLanguages());
 
-	std::clog << "locale/debug: Checking if language is set in config." << std::endl;
-
 	auto prefValue = config["game/language"].getEnumName();
 	auto lang = getLanguageByHumanReadableName(prefValue);
-
+	SpdLogger::debug(LogSystem::I18N, "Checking if language is set in config... Language={}", lang);
 	setLanguage(lang);
 }
 
 void TranslationEngine::initializeAllLanguages() {
 	for(auto const& path : getLocalePaths()) {
-		std::cout << "add locale path: " << path << std::endl;
+		SpdLogger::debug(LogSystem::I18N, "Add locale path={}", path);
 		m_gen.add_messages_path(path);
 	}
         
@@ -45,7 +44,7 @@ void TranslationEngine::initializeAllLanguages() {
 }
 
 void TranslationEngine::setLanguage(const std::string& language, bool fromSettings) {
-	std::clog << "locale/notice: Setting language to: '" << language << "'" << std::endl;
+	SpdLogger::notice(LogSystem::I18N, "Setting language to: {}.", language);
 
 	if (fromSettings) {
 		TranslationEngine::m_currentLanguage = { getLanguageByHumanReadableName(language) , language };
@@ -73,10 +72,10 @@ void TranslationEngine::setLanguage(const std::string& language, bool fromSettin
 #endif
 		if (error.isFailure()) throw std::runtime_error("Error " + std::to_string(error.get()) + " creating search locale: " + error.errorName());
 		std::locale::global(m_gen(m_currentLanguage.first));
-		std::cout << "locale/notice: Current language is: '" << m_currentLanguage.second << "'" << std::endl;
+		SpdLogger::notice(LogSystem::I18N, "Current language: {}.", m_currentLanguage.second);
 	}
 	catch (std::runtime_error& e) {
-		std::clog << "locale/warning: Unable to detect locale, will try to fallback to en_US.UTF-8. Exception: " << e.what() << std::endl;
+		SpdLogger::warning(LogSystem::I18N, "Unable to configure locale, will try to fallback to en_US.UTF-8. Exception={}", e.what());
 		std::locale::global(m_gen("en_US.UTF-8"));
 	}
 

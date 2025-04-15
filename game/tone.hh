@@ -1,6 +1,6 @@
 #pragma once
 
-#include <iostream>
+#include <cstddef>
 
 /// struct to represent tones
 struct Tone {
@@ -14,8 +14,7 @@ struct Tone {
 
 	Tone();
 
-	void print() const; ///< Prints Tone to std::cout
-	void print(std::ostream&) const; ///< Prints Tone to std::cout
+	void print() const; ///< Prints Tone to log.
 	bool operator==(double f) const; ///< Compare for rough frequency match
 	/// Less-than compare by levels (instead of frequencies like operator< does)
 	static bool dbCompare(Tone const& l, Tone const& r) { return l.db < r.db; }
