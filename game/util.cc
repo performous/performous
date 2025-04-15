@@ -17,14 +17,14 @@ template <> std::string sconv(std::string const& s) { return s; }
 
 /** Converts a std::string into an unsigned int. **/
 unsigned stou(std::string const& str, size_t* idx, int base) {
-    std::uint64_t result = std::stoul(str, idx, base);
-    unsigned uival;
-    std::uint64_t mask = ~0xfffffffful;
-    //Do we want this this function to throw? STL functions just overflow.
-    if ((result & mask) == 0)
-        uival = static_cast<unsigned>(result);
-    else throw std::out_of_range(str + " is out of range of unsigned.");
-    return uival;
+	std::uint64_t result = std::stoul(str, idx, base);
+	unsigned uival;
+	std::uint64_t mask = ~0xfffffffful;
+	//Do we want this this function to throw? STL functions just overflow.
+	if ((result & mask) == 0)
+		uival = static_cast<unsigned>(result);
+	else throw std::out_of_range(str + " is out of range of unsigned.");
+	return uival;
 }
 
 std::string format(std::chrono::seconds const& unixtime, std::string const& format_spec, bool utc) {
@@ -39,139 +39,139 @@ std::string format(std::chrono::seconds const& unixtime, std::string const& form
 }
 
 bool isSingleByteCharacter(char c) {
-    return (static_cast<unsigned char>(c) & 0b10000000) == 0;
+	return (static_cast<unsigned char>(c) & 0b10000000) == 0;
 }
 
 bool isTwoByteCharacter(char c) {
-    return (static_cast<unsigned char>(c) & 0b11100000) == 0b11000000;
+	return (static_cast<unsigned char>(c) & 0b11100000) == 0b11000000;
 }
 
 bool isThreeByteCharacter(char c) {
-    return (static_cast<unsigned char>(c) & 0b11110000) == 0b11100000;
+	return (static_cast<unsigned char>(c) & 0b11110000) == 0b11100000;
 }
 
 bool isFourByteCharacter(char c) {
-    return (static_cast<unsigned char>(c) & 0b11111000) == 0b11110000;
+	return (static_cast<unsigned char>(c) & 0b11111000) == 0b11110000;
 }
 
 bool isInvalidFollowByte(char c) {
-    return (static_cast<unsigned char>(c) & 0b11000000) != 0b10000000;
+	return (static_cast<unsigned char>(c) & 0b11000000) != 0b10000000;
 }
 
 bool isASCII(char c) {
-    return static_cast<unsigned char>(c) >= 32 || std::isspace(static_cast<unsigned char>(c));
+	return static_cast<unsigned char>(c) >= 32 || std::isspace(static_cast<unsigned char>(c));
 }
 
 bool isText(const std::string& text, size_t bytesToCheck) {
-    bytesToCheck = std::min(bytesToCheck, text.size());
-    for (size_t i = 0; i < bytesToCheck; ++i) {
-        if (isSingleByteCharacter(text[i])) {
-            if (!isASCII(text[i]))
-                return false;
-        }
-        else if (isTwoByteCharacter(text[i])) {
-            if (i + 1 >= text.size() || isInvalidFollowByte(text[++i]))
-                return false;
-        }
-        else if (isThreeByteCharacter(text[i])) {
-            if (i + 2 >= text.size() || isInvalidFollowByte(text[++i]) || isInvalidFollowByte(text[++i]))
-                return false;
-        }
-        else if (isFourByteCharacter(text[i])) {
-            if (i + 3 >= text.size() || isInvalidFollowByte(text[++i]) || isInvalidFollowByte(text[++i]) || isInvalidFollowByte(text[++i]))
-                return false;
-        }
-        else // Invalid UTF-8 sequence
-            return false;
-    }
+	bytesToCheck = std::min(bytesToCheck, text.size());
+	for (size_t i = 0; i < bytesToCheck; ++i) {
+		if (isSingleByteCharacter(text[i])) {
+			if (!isASCII(text[i]))
+				return false;
+		}
+		else if (isTwoByteCharacter(text[i])) {
+			if (i + 1 >= text.size() || isInvalidFollowByte(text[++i]))
+				return false;
+		}
+		else if (isThreeByteCharacter(text[i])) {
+			if (i + 2 >= text.size() || isInvalidFollowByte(text[++i]) || isInvalidFollowByte(text[++i]))
+				return false;
+		}
+		else if (isFourByteCharacter(text[i])) {
+			if (i + 3 >= text.size() || isInvalidFollowByte(text[++i]) || isInvalidFollowByte(text[++i]) || isInvalidFollowByte(text[++i]))
+				return false;
+		}
+		else // Invalid UTF-8 sequence
+			return false;
+	}
 
-    return true;
+	return true;
 }
 
 
 std::string toLower(std::string const& s) {
-    //return boost::algorithm::to_lower_copy(s);
-    auto result = s;
+	//return boost::algorithm::to_lower_copy(s);
+	auto result = s;
 
-    std::for_each(result.begin(), result.end(), [](auto& c) { c = static_cast<char>(std::tolower(c)); });
+	std::for_each(result.begin(), result.end(), [](auto& c) { c = static_cast<char>(std::tolower(c)); });
 
-    return result;
+	return result;
 }
 
 std::string toUpper(std::string const& s) {
-    //return boost::algorithm::to_upper_copy(s);
-    auto result = s;
+	//return boost::algorithm::to_upper_copy(s);
+	auto result = s;
 
-    std::for_each(result.begin(), result.end(), [](auto& c) { c = static_cast<char>(std::toupper(c)); });
+	std::for_each(result.begin(), result.end(), [](auto& c) { c = static_cast<char>(std::toupper(c)); });
 
-    return result;
+	return result;
 }
 
 std::string replace(std::string const& s, char from, char to) {
-    auto result = s;
+	auto result = s;
 
-    std::replace_if(result.begin(), result.end(), [from](char c) {return c == from; }, to);
+	std::replace_if(result.begin(), result.end(), [from](char c) {return c == from; }, to);
 
-    return result;
+	return result;
 }
 
 std::string& replace(std::string& s, char from, char to) {
-    std::replace_if(s.begin(), s.end(), [from](char c) {return c == from; }, to);
+	std::replace_if(s.begin(), s.end(), [from](char c) {return c == from; }, to);
 
-    return s;
+	return s;
 }
 
 std::string substr(std::string const& s, ptrdiff_t start) {
-    return s.substr(static_cast<std::size_t>(start));
+	return s.substr(static_cast<std::size_t>(start));
 }
 
 template<class Type>
 std::string substr(std::string const& s, ptrdiff_t start, Type end) {
-    return s.substr(static_cast<std::size_t>(start), static_cast<std::size_t>(static_cast<ptrdiff_t>(end) - start));
+	return s.substr(static_cast<std::size_t>(start), static_cast<std::size_t>(static_cast<ptrdiff_t>(end) - start));
 }
 
 std::string trim(std::string const& s, std::locale const& locale) {
-    auto const start = std::find_if(s.begin(), s.end(), [&locale](char c) {return !std::isspace(c, locale); }) - s.begin();
-    auto const end = static_cast<ptrdiff_t>(s.length()) - (std::find_if(s.rbegin(), s.rend(), [&locale](char c) {return !std::isspace(c, locale); }) - s.rbegin());
+	auto const start = std::find_if(s.begin(), s.end(), [&locale](char c) {return !std::isspace(c, locale); }) - s.begin();
+	auto const end = static_cast<ptrdiff_t>(s.length()) - (std::find_if(s.rbegin(), s.rend(), [&locale](char c) {return !std::isspace(c, locale); }) - s.rbegin());
 
-    return substr(s, start, end);
+	return substr(s, start, end);
 }
 
 std::string& trim(std::string& s, std::locale const& locale) {
-    auto const start = std::find_if(s.begin(), s.end(), [&locale](char c) {return !std::isspace(c, locale); }) - s.begin();
-    auto const end = static_cast<ptrdiff_t>(s.length()) - (std::find_if(s.rbegin(), s.rend(), [&locale](char c) {return !std::isspace(c, locale); }) - s.rbegin());
+	auto const start = std::find_if(s.begin(), s.end(), [&locale](char c) {return !std::isspace(c, locale); }) - s.begin();
+	auto const end = static_cast<ptrdiff_t>(s.length()) - (std::find_if(s.rbegin(), s.rend(), [&locale](char c) {return !std::isspace(c, locale); }) - s.rbegin());
 
-    s = substr(s, start, end);
+	s = substr(s, start, end);
 
-    return s;
+	return s;
 }
 
 std::string trimLeft(std::string const& s, std::locale const& locale) {
-    auto const start = std::find_if(s.begin(), s.end(), [&locale](char c) {return !std::isspace(c, locale); }) - s.begin();
+	auto const start = std::find_if(s.begin(), s.end(), [&locale](char c) {return !std::isspace(c, locale); }) - s.begin();
 
-    return substr(s, start);
+	return substr(s, start);
 }
 
 std::string& trimLeft(std::string& s, std::locale const& locale) {
-    auto const start = std::find_if(s.begin(), s.end(), [&locale](char c) {return !std::isspace(c, locale); }) - s.begin();
+	auto const start = std::find_if(s.begin(), s.end(), [&locale](char c) {return !std::isspace(c, locale); }) - s.begin();
 
-    s = substr(s, start);
+	s = substr(s, start);
 
-    return s;
+	return s;
 }
 
 std::string trimRight(std::string const& s, std::locale const& locale) {
-    auto const end = static_cast<ptrdiff_t>(s.length()) - (std::find_if(s.rbegin(), s.rend(), [&locale](char c) {return !std::isspace(c, locale); }) - s.rbegin());
+	auto const end = static_cast<ptrdiff_t>(s.length()) - (std::find_if(s.rbegin(), s.rend(), [&locale](char c) {return !std::isspace(c, locale); }) - s.rbegin());
 
-    return substr(s, 0, end);
+	return substr(s, 0, end);
 }
 
 std::string& trimRight(std::string& s, std::locale const& locale) {
-    auto const end = static_cast<ptrdiff_t>(s.length()) - (std::find_if(s.rbegin(), s.rend(), [&locale](char c) {return !std::isspace(c, locale); }) - s.rbegin());
+	auto const end = static_cast<ptrdiff_t>(s.length()) - (std::find_if(s.rbegin(), s.rend(), [&locale](char c) {return !std::isspace(c, locale); }) - s.rbegin());
 
-    s = substr(s, 0, end);
+	s = substr(s, 0, end);
 
-    return s;
+	return s;
 }
 
 std::string replaceFirst(std::string const& s, std::string const& from, std::string const& to) {
