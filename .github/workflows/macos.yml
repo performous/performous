@@ -28,7 +28,7 @@ jobs:
     env:
       MACOS_DEPS: >-
         aubio
-        boost
+        boost@stable
         cairo
         cmake
         cpprestsdk
