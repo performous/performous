@@ -28,7 +28,7 @@ jobs:
     env:
       MACOS_DEPS: >-
         aubio
-        boost@stable
+        boost
         cairo
         cmake
         cpprestsdk
@@ -67,6 +67,11 @@ jobs:
         with:
           NGROK_AUTH_TOKEN: ${{ secrets.NGROK_SSH_TOKEN }}
           SSH_PASS: ${{ secrets.NGROK_SSH_PASS }}
+
+      - name: "Update Brew"
+        id: update_brew
+        run: |
+          brew update
       # brew fetch runs downloads in parallel, which is faster
       # than letting install do it
       - name: Fetch Dependencies
