@@ -87,6 +87,28 @@ jobs:
            #brew unlink boost@1.87
            #brew link --force boost@1.85
 
+           # uninstall version 4 of cmake
+           brew uninstall cmake
+
+           # we need to create a tap of the core formulae in order for this to work
+           # this will auto-enable developer mode (we'll turn it off later)
+           brew tap --force homebrew/core 
+
+           # create a new, local tap to work in
+           # by default, this creates a Git repos for the tap
+           # add --no-git if you don't want a repos to be created
+           brew tap-new --no-git performous/pinned_cmake
+
+            # copy the formula for cmake 3 to the local tap
+            brew extract cmake --version 3.31.6 performous/pinned_cmake
+
+            # install the formula (this will build locally)
+            brew install performous/pinned_cmake/cmake@3.31.6
+
+            # cleanup the stuff we don't need anymore
+            brew untap homebrew/core
+            brew developer off
+
       - name: Build package
         id: build_package
         run: |
