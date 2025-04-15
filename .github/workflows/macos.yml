@@ -82,7 +82,7 @@ jobs:
       - name: Install Dependencies
         id: install_deps
         run: |
-           brew unlink python
+           brew unlink python && brew link --overwrite python
            brew install $MACOS_DEPS 2>&1
            #brew unlink boost@1.87
            #brew link --force boost@1.85
