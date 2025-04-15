@@ -6,8 +6,7 @@
 #include "util.hh"
 #include "i18n.hh"
 
-#include <iostream>
-#include <sstream>
+#include <fmt/chrono.h>
 
 ScreenPlaylist::ScreenPlaylist(Game &game, std::string const& name,Audio& audio, Songs& songs, Backgrounds& bgs):
 	Screen(game, name), m_audio(audio), m_songs(songs), m_backgrounds(bgs), keyPressed()
@@ -301,39 +300,24 @@ SvgTxtTheme& ScreenPlaylist::getTextObject(std::string const& txt) {
 }
 
 void ScreenPlaylist::createSongListMenu() {
-	std::ostringstream oss_playlist;
+// 	std::string playlist;
 	unsigned count = 1;
 	songlist_menu.clear();
 	SongList& currentList = getGame().getCurrentPlayList().getList();
 	float totaldurationSeconds = 0.0;
 	for (auto const& song: currentList) {
 		//timestamp handles
-		unsigned hours = 0;
-		unsigned minutes = 0;
-		unsigned seconds = static_cast<unsigned>(totaldurationSeconds);
-		while(seconds >= 60) {
-			minutes++;
-			seconds -= 60;
-		}
-		while(minutes >= 60) {
-			hours ++;
-			minutes -=60;
-		}
-		oss_playlist << "#" << count << " : " << song->artist << " - " << song->title << "  +";
-		if(hours > 0) {
-			oss_playlist << std::setw(2) << std::setfill('0') << hours << ":";
-		}
-			oss_playlist << std::setw(2) << std::setfill('0') << minutes << ":" << std::setw(2) << std::setfill('0') << seconds;
-		std::string songinfo = oss_playlist.str();
+
+		std::string songinfo = fmt::format("#{}: {} - {} +{:%T}", count, song->artist, song->title, std::chrono::seconds(static_cast<unsigned>(totaldurationSeconds)));
+
 		if (songinfo.length() > 20) {
-			songinfo = songinfo + "                           >"; //FIXME: ugly hack to make the text scale so it fits on screen!
+			songinfo.append("                           >"); //FIXME: ugly hack to make the text scale so it fits on screen!
 		}
 		//then add it to the menu:
 		songlist_menu.add(MenuOption(_(songinfo.c_str()),_("Press enter to view song options"))).call([this, count]() {
 			createSongMenu(count);
 			overlay_menu.open();
 		});
-		oss_playlist.str("");
 		count++;
 		totaldurationSeconds += static_cast<float>(song->getDurationSeconds());
 		totaldurationSeconds += static_cast<float>(config["game/playlist_screen_timeout"].ui());
