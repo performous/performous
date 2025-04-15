@@ -85,9 +85,19 @@ set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES})
 add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES})
 # Libraries
 
-find_package(Boost 1.55 REQUIRED COMPONENTS program_options iostreams system locale)
-target_include_directories(performous SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
-target_link_libraries(performous PRIVATE ${Boost_LIBRARIES})
+find_package(Boost 1.55 CONFIG QUIET COMPONENTS program_options iostreams system locale)
+if(NOT Boost_FOUND)
+  find_package(Boost 1.55 REQUIRED COMPONENTS program_options iostreams system locale)
+endif()
+if(TARGET Boost::system)
+  message(STATUS "Using Boost targets")
+  target_link_libraries(performous PRIVATE Boost::program_options Boost::iostreams Boost::system Boost::locale)
+else()
+  message(STATUS "Using legacy Boost variables")
+  target_include_directories(performous SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
+  target_link_libraries(performous PRIVATE ${Boost_LIBRARIES})
+endif()
+
 find_package(ICU 65 REQUIRED uc data i18n io)
 target_link_libraries(performous PRIVATE ICU::uc ICU::data ICU::i18n ICU::io)
 
