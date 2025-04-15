@@ -1,7 +1,8 @@
 #include "musicalscale.hh"
-
 #include "util.hh"
-#include <sstream>
+
+#include <fmt/format.h>
+
 #include <stdexcept>
 
 MusicalScale& MusicalScale::clear() { m_freq = m_note = getNaN(); return *this; }
@@ -31,9 +32,7 @@ static const unsigned noteLines[12] = { 0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6 };
 
 std::string MusicalScale::getStr() const {
 	if (!isValid()) return std::string();
-	std::ostringstream oss;
-	oss << noteNames[getNum()] << " " << round(m_freq) << " Hz";
-	return oss.str();
+	return fmt::format("{} {} Hz", noteNames[getNum()], round(m_freq));
 }
 
 unsigned MusicalScale::getNoteLine() const {

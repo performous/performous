@@ -8,7 +8,9 @@
 #include "../platform.hh"
 #include "../unicode.hh"
 
+#include <fmt/format.h>
 #include <portaudio.h>
+
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
@@ -97,12 +99,10 @@ namespace portaudio {
 				std::string n = name;
 				while (true) {
 					int num = 1;
-					for (auto& dev: devices) if (dev.name == n) goto rename;
+					for (auto& dev: devices) if (dev.name == n) goto rename;  // FIXME: Possibly use std::find_if instead?
 					break;
 				rename:
-					std::ostringstream oss;
-					oss << name << " #" << ++num;
-					n = oss.str();
+					n = fmt::format("{} #{}", name, ++num);
 				};
 				devices.push_back(DeviceInfo(i, name, info->maxInputChannels, info->maxOutputChannels, Pa_HostApiDeviceIndexToDeviceIndex(backendIndex, i)));
 			}

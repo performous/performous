@@ -1,5 +1,7 @@
 #include "util.hh"
 
+#include <fmt/chrono.h>
+
 #include <algorithm>
 #include <iomanip>
 #include <sstream>
@@ -25,13 +27,15 @@ unsigned stou(std::string const& str, size_t* idx, int base) {
     return uival;
 }
 
-std::string format(std::chrono::seconds const& unixtime, std::string const& format, bool utc) {
-    auto const time = static_cast<std::time_t>(unixtime.count());
-    auto stream = std::stringstream();
-
-    stream << std::put_time(utc ? std::gmtime(&time) : std::localtime(&time), format.c_str());
-
-    return stream.str();
+std::string format(std::chrono::seconds const& unixtime, std::string const& format_spec, bool utc) {
+	auto const tp = std::chrono::system_clock::time_point(unixtime);
+	std::string fmt_string{"{:" + format_spec + "}"};
+	if (utc) {
+		return fmt::format(fmt::runtime(fmt_string), fmt::gmtime(tp));
+	}
+	else {
+		return fmt::format(fmt::runtime(fmt_string), tp);
+	}
 }
 
 bool isSingleByteCharacter(char c) {
