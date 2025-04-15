@@ -53,6 +53,7 @@ void Menu::select(unsigned sel) {
 void Menu::action(Game& game, int dir) {
 	switch (current().type) {
 		case MenuOption::Type::OPEN_SUBMENU: {
+			SpdLogger::debug(LogSystem::LOGGER, "Selected menu option={}", current().getName());
 			if (current().options.empty()) break;
 			menu_stack.push_back(&current().options);
 			selection_stack.push_back(0);
@@ -60,6 +61,7 @@ void Menu::action(Game& game, int dir) {
 		}
 		case MenuOption::Type::CHANGE_VALUE: {
 			if (current().value) {
+				SpdLogger::debug(LogSystem::LOGGER, "Trying to change value for menu option={}", current().getName());
 				if (current().value->getName() == "audio/backend") {
 					current().value->setOldValue(current().value->getValue());
 				}
@@ -86,6 +88,7 @@ void Menu::action(Game& game, int dir) {
 			break;
 		}
 		case MenuOption::Type::SET_AND_CLOSE:
+			SpdLogger::debug(LogSystem::LOGGER, "Selected menu option={}", current().getName());
 			if (current().value) *(current().value) = current().newValue;
 			[[fallthrough]];  // Continuing to CLOSE_SUBMENU is intentional
 		case MenuOption::Type::CLOSE_SUBMENU: {
@@ -94,12 +97,14 @@ void Menu::action(Game& game, int dir) {
 		}
 		case MenuOption::Type::ACTIVATE_SCREEN: {
 			std::string screen = current().newValue.s();
+			SpdLogger::debug(LogSystem::LOGGER, "Entering screen={}...", screen);
 			clear();
 			if (screen.empty()) game.finished();
 			else game.activateScreen(screen);
 			break;
 		}
 		case MenuOption::Type::CALLBACK_FUNCTION: {
+			SpdLogger::debug(LogSystem::LOGGER, "Selected menu option={}", current().getName());
 			if (current().callback) current().callback();
 			break;
 		}
