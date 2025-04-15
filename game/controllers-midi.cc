@@ -4,9 +4,10 @@
 #include "fs.hh"
 #include "portmidi.hh"
 
+#include <fmt/format.h>
+
 #include <regex>
 #include <unordered_map>
-#include <sstream>
 
 namespace input {
 
@@ -32,9 +33,7 @@ namespace input {
 		std::string getName(int dev) const override {
 			PmDeviceInfo const* info = Pm_GetDeviceInfo(dev);
 			if (!info) throw std::logic_error("Invalid MIDI device requested in Midi::getName");
-			std::ostringstream name;
-			name << dev << ": " << info->name;
-			return name.str();
+			return fmt::format("{}: {}", dev, info->name);
 		}
 		bool process(Event& event) override {
 			PmEvent ev;

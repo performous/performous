@@ -181,9 +181,7 @@ void mainLoop(std::string const& songlist) {
 			if (benchmarking) {
 				++frames;
 				if (Clock::now() - time > 1s) {
-					std::ostringstream oss;
-					oss << frames << " FPS";
-					gm.flashMessage(oss.str());
+					gm.flashMessage(fmt::format("{} FPS", frames));
 					time += 1s;
 					frames = 0;
 				}
