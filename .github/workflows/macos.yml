@@ -114,6 +114,8 @@ jobs:
         run: |
           cd performous/osx-utils
           chmod +x ./macos-bundler.py
+          python3 -m venv ./bundler-venv
+          source ./bundler-venv/bin/activate
           pip3 install -r ./macos-bundler-requirements.txt
           python3 ./macos-bundler.py --flat-output --package-version="${{ inputs.package_complete_version }}" --enable-webserver=on --enable-midi=on --enable-webcam=on --build-tests=on --target=12.0
           PACKAGE_PATH=$(ls "${{ github.workspace }}/performous/osx-utils/out/Performous-${{ inputs.package_complete_version }}.dmg")
