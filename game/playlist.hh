@@ -16,7 +16,7 @@ public:
 	typedef std::vector< std::shared_ptr<Song> > SongList;
 
 	/// Adds a new song to the queue
-	void addSong(std::shared_ptr<Song> song);
+	bool addSong(std::shared_ptr<Song> song);
 	/// Returns the next song and removes it from the queue
 	std::shared_ptr<Song> getNext();
 	/// Returns all currently queued songs
@@ -33,6 +33,8 @@ public:
 	void removeSong(unsigned index);
 	/// swaps two songs
 	void swap (unsigned index1, unsigned index2);
+	/// sets limit to the max amount of songs
+	void setLimit(unsigned int limit) { m_limit = limit; };
 	/// Moves a song from an index to another index.
 	void move(unsigned fromIndex, unsigned toIndex);
 	/// gets a specific song and removes it from the queue
@@ -42,5 +44,6 @@ public:
 private:
 	SongList m_list;
 	mutable std::mutex m_mutex;
+	unsigned int m_limit = 0;
 };
 
