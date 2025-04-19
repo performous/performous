@@ -101,7 +101,7 @@ html {
     flex: 1 0 0;
 }
 
-#app .top-bar img {
+#app .top-bar svg {
     max-height: 2rem;
 }
 
