@@ -152,20 +152,6 @@ void RequestHandler::HandleFile(web::http::http_request request, std::string fil
 			});
 }
 
-std::string RequestHandler::DecodeUri(std::string uri) {
-	std::string newUri = uri.substr(0);
-	size_t index = newUri.find_first_of("%");
-	int charNum;
-	char character;
-	while (index != std::string::npos) {
-		sscanf(newUri.substr(index + 1, 2).c_str(), "%x", &charNum);
-		character = static_cast<char>(charNum);
-		newUri = newUri.substr(0, index) + character + newUri.substr(index + 3);
-		index = newUri.find_first_of("%");
-	}
-	return newUri;
-}
-
 void RequestHandler::Get(web::http::http_request request)
 {
 	std::string content_type = "text/html";
