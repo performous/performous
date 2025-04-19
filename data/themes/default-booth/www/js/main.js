@@ -31,12 +31,18 @@ const init = async () => {
     await loadJS('./js/vue.global.js');
     await loadJS('./js/vuex.global.js');
     await loadJS('./js/vue3-sfc-loader.js');
+    await loadJS('./js/constants.js');
+    await loadJS('./js/helpers.js');
+    await loadJS('./js/store.js');
     
     const { loadModule } = window['vue3-sfc-loader'];
 
     const options = {
         moduleCache: {
-            vue: Vue
+            vue: Vue,
+            vuex: Vuex,
+            '@constants': constants,
+            '@helpers': helpers,
         },
         async getFile(url) {
             const res = await fetch(url);
@@ -52,156 +58,6 @@ const init = async () => {
             document.head.insertBefore(style, ref);
         },
     };
-
-    async function getApi(request, query = '') {
-        const res = await fetch(`./api/${request}${query ? `?${query}` : ''}`);
-        return await res.json();
-    }
-
-    const store = Vuex.createStore({
-        state () {
-            return {
-                screen: 'folder',
-                screenQuery: '',
-                ...(JSON.parse(window.localStorage.getItem('performous_web_frontend_settings') ?? '{}')),
-                language: {},
-                database: [],
-                folders: [],
-                playlist: [],
-                timeout: 10,
-            };
-        },
-        mutations: {
-            storeDatabase(state, value) {
-                state.database = value;
-                state.folders = value.reduce((list, song) => {
-                    const folder = song.Path;
-                    if (!list.includes(folder)) {
-                        list.push(folder);
-                    }
-                    return list;
-                }, []).sort();
-            },
-            storeLanguage(state, value) {
-                state.language = value;
-            },
-            storePlaylist(state, value) {
-                state.playlist = value;
-            },
-            storeSong(state, value) {
-                state.song = value;
-            },
-            setTimeout(state, value) {
-                state.timeout = value;
-            },
-            setScreen(state, value) {
-                state.screen = value;
-            },
-            setScreenQuery(state, value) {
-                state.screenQuery = value;
-            },
-        },
-        actions: {
-            async refreshDatabase({ commit }, query = '') {
-                const database = await getApi(`getDataBase.json${query ? `?${query}` : ''}`);
-                commit('storeDatabase', database);
-            },
-            async refreshLanguage({ commit }) {
-                const language = await getApi('language');
-                commit('storeLanguage', language);
-            },
-            async refreshPlaylist({ commit, dispatch }) {
-                const playlist = await getApi('getCurrentPlaylist.json');
-                commit('storePlaylist', playlist);
-                dispatch('refreshSong');
-                const res = await fetch('api/getplaylistTimeout');
-                const timeoutStr = await res.text();
-                const timeout = parseInt(timeoutStr);
-                commit('setTimeout', timeout);
-            },
-            async refreshSong({ commit, dispatch, state }) {
-                const song = await getApi('getCurrentSong');
-                if ((state.song && !song) || (!state.song && song)) {
-                    dispatch('refreshPlaylist');
-                }
-                commit('storeSong', song);
-            },
-            async playSong({ dispatch }, song) {
-                if (song.songId) {
-                    await fetch('./api/play', {
-                        method: 'post',
-                        body: JSON.stringify(song),
-                        headers: {
-                            'Content-Type': 'application/json; charset=utf-8',
-                        },
-                    });
-                } else {
-                    await fetch('./api/add/play', {
-                        method: 'post',
-                        body: JSON.stringify(song),
-                        headers: {
-                            'Content-Type': 'application/json; charset=utf-8',
-                        },
-                    });
-                }
-                dispatch('refreshPlaylist');
-            },
-            async addSong({ dispatch }, song) {
-                await fetch('./api/add', {
-                    method: 'post',
-                    body: JSON.stringify(song),
-                    headers: {
-                        'Content-Type': 'application/json; charset=utf-8',
-                    },
-                });
-                dispatch('refreshPlaylist');
-            },
-            async prioritizeSong({ dispatch }, song) {
-                await fetch('./api/add/priority', {
-                    method: 'post',
-                    body: JSON.stringify(song),
-                    headers: {
-                        'Content-Type': 'application/json; charset=utf-8',
-                    },
-                });
-                dispatch('refreshPlaylist');
-            },
-            async removeSong({ dispatch }, song) {
-                await fetch('./api/remove', {
-                    method: 'post',
-                    body: JSON.stringify(song),
-                    headers: {
-                        'Content-Type': 'application/json; charset=utf-8',
-                    },
-                });
-                dispatch('refreshPlaylist');
-            },
-            async moveSong({ dispatch }, song) {
-                await fetch('./api/setposition', {
-                    method: 'post',
-                    body: JSON.stringify(song),
-                    headers: {
-                        'Content-Type': 'application/json; charset=utf-8',
-                    },
-                });
-                dispatch('refreshPlaylist');
-            },
-            setScreen({ commit, dispatch }, screen) {
-                commit('setScreen', screen);
-                dispatch('saveLocalStorage');
-            },
-            setScreenQuery({ commit, dispatch }, query) {
-                commit('setScreenQuery', query);
-                dispatch('saveLocalStorage');
-            },
-            saveLocalStorage({ state }) {
-                window.localStorage.setItem('performous_web_frontend_settings', JSON.stringify({
-                    screen: state.screen,
-                    screenQuery: state.screenQuery,
-                }));
-            },
-        }
-    });
 
     const app = Vue.createApp({
         components: {
