@@ -48,8 +48,28 @@ html {
     border-collapse: collapse;
 }
 
+#app .songlist thead tr {
+    background-color: var(--primary);
+    color: var(--primary-text);
+    line-height: 1rem;
+}
+
+#app .songlist thead tr .sort-icon {
+    width: 1rem;
+    margin-right: 0.5rem;
+    display: inline-block;
+}
+
+#app .songlist thead tr .sort-icon > svg {
+    width: 1rem;
+    height: 1rem;
+    margin: -0.25rem 0;
+}
+
 #app .songlist th, #app .songlist td {
     border: none;
+    text-align: left;
+    padding: 0.5rem;
 }
 
 #app .songlist th.artist, #app .songlist th.creator, #app .songlist th.edition {
@@ -73,10 +93,6 @@ html {
 #app .songlist tbody tr:hover {
     background-color: var(--hover);
     color: var(--hover-text);
-}
-
-#app .songlist tbody tr td {
-    padding: 0.5rem;
 }
 
 #app .songlist .flag-icons {

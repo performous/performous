@@ -66,16 +66,19 @@ const init = async () => {
         template: '<app />',
     }).use(store).mount('#app');
 
-    let query = '';
-
     const settings = JSON.parse(window.localStorage.getItem('performous_web_frontend_settings') ?? '{}');
 
+    const query = [];
+
+    query.push(`sort=${settings.sort || 'artist'}`);
+    query.push(`order=${settings.descending ? 'descending' : 'ascending'}`)
+
     if (settings.screen === 'search' && settings.screenQuery?.search) {
-        query = `query=${settings.screenQuery?.search}`;
+        query.push(`query=${settings.screenQuery?.search}`);
     }
 
     app.$store.dispatch('refreshLanguage');
-    app.$store.dispatch('refreshDatabase', query);
+    app.$store.dispatch('refreshDatabase', query.join('&'));
     app.$store.dispatch('refreshPlaylist');
     app.$store.dispatch('refreshSong');
 

@@ -148,11 +148,14 @@ void RequestHandler::Get(web::http::http_request request)
 		size_t limit = 0;
 
 		std::map<std::string, int> sortTypes = {
-			{"", 0},
-			{"artist", 2},
+			{"", 2},
+			{"random", 0},
 			{"title", 1},
-			{"language", 6},
+			{"artist", 2},
 			{"edition", 3},
+			{"genre", 4},
+			{"folder", 5},
+			{"language", 6},
 			{"creator", 10}
 		};
 
