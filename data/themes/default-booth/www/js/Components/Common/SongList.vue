@@ -1,7 +1,8 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 
+import SortIcon from './SongList/SortIcon.vue';
 import ArrowDown from '../Icons/ArrowDownIcon.vue';
 import ArrowUp from '../Icons/ArrowUpIcon.vue';
 import ArrowUpDown from '../Icons/ArrowUpDownIcon.vue';
@@ -29,6 +30,51 @@ const songIndex = ref(null);
 const desiredIndex = ref(null);
 
 const store = useStore();
+
+const sort = computed({
+    get() {
+        if (!store.state.screenQuery?.sort) {
+            return '';
+        }
+        return store.state.screenQuery.sort;
+    },
+    set(value) {
+        const newQuery = { ...store.state.screenQuery };
+        newQuery.sort = value;
+        store.dispatch('setScreenQuery', newQuery);
+    },
+});
+
+const descending = computed({
+    get() {
+        if (!store.state.screenQuery?.descending) {
+            return false;
+        }
+        return store.state.screenQuery.descending;
+    },
+    set(value) {
+        const newQuery = { ...store.state.screenQuery };
+        newQuery.descending = value;
+        store.dispatch('setScreenQuery', newQuery);
+    },
+});
+
+function setSort(sortType) {
+    if (sortType !== sort.value) {
+        descending.value = false;
+        sort.value = sortType;
+    } else if (descending.value) {
+        descending.value = false;
+        sort.value = '';
+    } else {
+        descending.value = true;
+    }
+    const query = [`sort=${sort.value || 'artist'}`, `order=${descending.value ? 'descending' : 'ascending'}`];
+    if (store.state.screenQuery.search) {
+        query.push(`query=${store.state.screenQuery.search}`);
+    }
+    store.dispatch('refreshDatabase', query.join('&'));
+}
 
 function setCurrentSong(song, index) {
     currentSong.value = song;
@@ -119,11 +165,11 @@ onMounted(() => {
     <table class="songlist">
         <thead>
             <tr>
-                <th class="artist">{{ $store.state.language.artist }}</th>
-                <th class="title">{{ $store.state.language.title }}</th>
-                <th class="creator">{{ $store.state.language.creator }}</th>
+                <th class="artist" @click="setSort('artist')"><SortIcon type="artist" />{{ $store.state.language.artist }}</th>
+                <th class="title" @click="setSort('title')"><SortIcon type="title" />{{ $store.state.language.title }}</th>
+                <th class="creator" @click="setSort('creator')"><SortIcon type="creator" />{{ $store.state.language.creator }}</th>
                 <template v-if="!playlist">
-                    <th class="edition">{{ $store.state.language.edition }}</th>
+                    <th class="edition" @click="setSort('edition')"><SortIcon type="edition" />{{ $store.state.language.edition }}</th>
                     <th class="comment">Comment</th>
                 </template>
                 <th class="year">Year</th>
