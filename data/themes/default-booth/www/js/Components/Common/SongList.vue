@@ -1,4 +1,8 @@
 <script setup>
+import { onMounted, ref } from 'vue';
+import { useStore } from 'vuex';
+import { getLanguageName } from '@helpers';
+
 import ArrowDown from '../Icons/ArrowDownIcon.vue';
 import ArrowUp from '../Icons/ArrowUpIcon.vue';
 import ArrowUpDown from '../Icons/ArrowUpDownIcon.vue';
@@ -6,13 +10,13 @@ import Cross from '../Icons/CrossIcon.vue';
 import Play from '../Icons/PlayIcon.vue';
 import Plus from '../Icons/PlusIcon.vue';
 import TriangleAlert from '../Icons/TriangleAlertIcon.vue';
-const { onMounted, ref } = Vue;
-const { useStore } = Vuex;
+import Flag from './Flag.vue';
 
 const { songs } = defineProps({
     songs: {
         type: Array,
-        required: true,
+        required: false,
+        default: () => [],
     },
     playlist: {
         type: Boolean,
@@ -117,6 +121,7 @@ onMounted(() => {
     <table class="songlist">
         <thead>
             <tr>
+                <th></th>
                 <th class="artist">{{ $store.state.language.artist }}</th>
                 <th class="title">{{ $store.state.language.title }}</th>
                 <th class="creator">{{ $store.state.language.creator }}</th>
@@ -130,6 +135,11 @@ onMounted(() => {
         </thead>
         <tbody>
             <tr v-for="(song, index) in songs" @click="setCurrentSong(song, index)" :key="`song-${song.Artist}-${song.Title}-${index}`">
+                <td>
+                    <div v-if="song.Language && song.Language.trim()" class="flag-icons">
+                        <Flag :language ignore-missing v-for="language in song.Language.split(',').map(getLanguageName).sort()" :key="language" />
+                    </div>
+                </td>
                 <td>{{ song.Artist }}</td>
                 <td>{{ song.Title }}</td>
                 <td>{{ song.Creator }}</td>
