@@ -139,39 +139,47 @@ void RequestHandler::Get(web::http::http_request request)
 	}
 	else if (path == "/api/getDataBase.json") { //get database
 		m_songs.setFilter("");
-		if (query == "sort=artist&order=ascending") {
-			m_songs.sortSpecificChange(2);
+		// parse query to key-value pairs
+		auto queryParams = web::uri::split_query(web::uri::decode(utility::conversions::to_string_t(query)));
+
+		int sort = -1;
+		bool descending = queryParams.count(utility::conversions::to_string_t("order")) && utility::conversions::to_utf8string(queryParams.at(utility::conversions::to_string_t("order"))) == "descending";
+		size_t offset = 0;
+		size_t limit = 0;
+
+		std::map<std::string, int> sortTypes = {
+			{"", 0},
+			{"artist", 2},
+			{"title", 1},
+			{"language", 6},
+			{"edition", 3},
+			{"creator", 10}
+		};
+
+		if (queryParams.count(utility::conversions::to_string_t("sort")) && sortTypes.count(utility::conversions::to_utf8string(queryParams.at(utility::conversions::to_string_t("sort"))))) {
+			sort = sortTypes.at(utility::conversions::to_utf8string(queryParams.at(utility::conversions::to_string_t("sort"))));
 		}
-		else if (query == "sort=artist&order=descending") {
-			m_songs.sortSpecificChange(2, true);
+
+		// we only want to sort if a valid sorting option is picked
+		if (sort > -1) {
+			m_songs.sortSpecificChange(sort, descending);
 		}
-		else if (query == "sort=title&order=ascending") {
-			m_songs.sortSpecificChange(1);
+
+		if (queryParams.count(utility::conversions::to_string_t("query"))) {
+			m_songs.setFilter(utility::conversions::to_utf8string(queryParams.at(utility::conversions::to_string_t("query"))));
 		}
-		else if (query == "sort=title&order=descending") {
-			m_songs.sortSpecificChange(1, true);
+
+		if (queryParams.count(utility::conversions::to_string_t("offset"))) {
+			sscanf(utility::conversions::to_utf8string(queryParams.at(utility::conversions::to_string_t("offset"))).c_str(), "%zu", &offset);
 		}
-		else if (query == "sort=language&order=ascending") {
-			m_songs.sortSpecificChange(6);
+
+		if (queryParams.count(utility::conversions::to_string_t("limit"))) {
+			sscanf(utility::conversions::to_utf8string(queryParams.at(utility::conversions::to_string_t("limit"))).c_str(), "%zu", &limit);
 		}
-		else if (query == "sort=language&order=descending") {
-			m_songs.sortSpecificChange(6, true);
-		}
-		else if (query == "sort=edition&order=ascending") {
-			m_songs.sortSpecificChange(3);
-		}
-		else if (query == "sort=edition&order=descending") {
-			m_songs.sortSpecificChange(3, true);
-		}
-		else if (query == "sort=creator&order=ascending") {
-			m_songs.sortSpecificChange(10);
-		}
-		else if (query == "sort=creator&order=descending") {
-			m_songs.sortSpecificChange(10, true);
-		}
+
 		// make sure to apply the filtering
 		m_songs.update();
-		web::json::value jsonRoot = SongsToJsonObject();
+		web::json::value jsonRoot = SongsToJsonObject(offset, limit);
 		request.reply(web::http::status_codes::OK, jsonRoot);
 		return;
 	}
@@ -434,9 +442,28 @@ web::json::value RequestHandler::ExtractJsonFromRequest(web::http::http_request 
 }
 
 
-web::json::value RequestHandler::SongsToJsonObject() {
+web::json::value RequestHandler::SongsToJsonObject(size_t start, size_t limit) {
+	size_t startIndex = start;
+	size_t endIndex;
+	size_t limitCount = limit;
+	size_t songCount = m_songs.size();
+
+	if (startIndex < 0) {
+		startIndex = 0;
+	}
+	if (startIndex > songCount) {
+		startIndex = songCount;
+	}
+	if (limitCount < 1) {
+		limitCount = songCount;
+	}
+	endIndex = startIndex + limitCount;
+	if (endIndex > songCount) {
+		endIndex = songCount;
+	}
+
 	web::json::value jsonRoot = web::json::value::array();
-	for (size_t i = 0; i < m_songs.size(); i++) {
+	for (size_t i = startIndex; i < endIndex; i++) {
 		web::json::value songObject = web::json::value::object();
 		songObject[utility::conversions::to_string_t("Title")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->title));
 		songObject[utility::conversions::to_string_t("Artist")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->artist));
@@ -448,7 +475,7 @@ web::json::value RequestHandler::SongsToJsonObject() {
 		songObject[utility::conversions::to_string_t("ProvidedBy")] = web::json::value(utility::conversions::to_string_t(m_songs[i]->providedBy));
 		songObject[utility::conversions::to_string_t("Comment")] = web::json::value(utility::conversions::to_string_t(m_songs[i]->comment));
 		songObject[utility::conversions::to_string_t("Path")] = web::json::value(utility::conversions::to_string_t(std::filesystem::path(m_songs[i]->path.parent_path()).filename()));
-		jsonRoot[i] = songObject;
+		jsonRoot[i - startIndex] = songObject;
 	}
 
 	return jsonRoot;
