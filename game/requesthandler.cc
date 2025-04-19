@@ -1,6 +1,8 @@
 #include "requesthandler.hh"
 #include "unicode.hh"
 #include "game.hh"
+#include "screen_sing.hh"
+#include "screen_playlist.hh"
 
 #include <cstdint>
 
@@ -215,6 +217,37 @@ void RequestHandler::Get(web::http::http_request request)
 		request.reply(web::http::status_codes::OK, std::to_string(config["game/playlist_screen_timeout"].ui()));
 		return;
 	}
+	else if (path == "/api/getCurrentSong") {
+		auto const& screen = m_game.getCurrentScreen();
+		
+		if (!screen || (screen->getName() != "Sing" && screen->getName() != "Playlist")) {
+			request.reply(web::http::status_codes::OK, web::json::value::null());
+			return;
+		}
+		if (screen->getName() == "Playlist") {
+			ScreenPlaylist& sp = dynamic_cast<ScreenPlaylist&>(*m_game.getScreen("Playlist"));
+			request.reply(web::http::status_codes::OK, web::json::value::number(sp.getTimer()));
+			return;
+		}
+
+		ScreenSing& ss = dynamic_cast<ScreenSing&>(*m_game.getScreen("Sing"));
+
+		web::json::value songObject = web::json::value::object();
+		songObject[utility::conversions::to_string_t("Title")] = web::json::value::string(utility::conversions::to_string_t(ss.getSong()->title));
+		songObject[utility::conversions::to_string_t("Artist")] = web::json::value::string(utility::conversions::to_string_t(ss.getSong()->artist));
+		songObject[utility::conversions::to_string_t("Edition")] = web::json::value::string(utility::conversions::to_string_t(ss.getSong()->edition));
+		songObject[utility::conversions::to_string_t("Language")] = web::json::value::string(utility::conversions::to_string_t(ss.getSong()->language));
+		songObject[utility::conversions::to_string_t("Creator")] = web::json::value::string(utility::conversions::to_string_t(ss.getSong()->creator));
+		songObject[utility::conversions::to_string_t("Duration")] = web::json::value(ss.getSong()->getDurationSeconds());
+		songObject[utility::conversions::to_string_t("HasError")] = web::json::value::boolean(ss.getSong()->loadStatus == Song::LoadStatus::ERROR);
+		songObject[utility::conversions::to_string_t("ProvidedBy")] = web::json::value(utility::conversions::to_string_t(ss.getSong()->providedBy));
+		songObject[utility::conversions::to_string_t("Comment")] = web::json::value(utility::conversions::to_string_t(ss.getSong()->comment));
+		songObject[utility::conversions::to_string_t("Path")] = web::json::value(utility::conversions::to_string_t(std::filesystem::path(ss.getSong()->path.parent_path()).filename()));
+		songObject[utility::conversions::to_string_t("Position")] = web::json::value(ss.getSongPosition());
+
+		request.reply(web::http::status_codes::OK, songObject);
+		return;
+	}
 	else {
 		HandleFile(request);
 	}
@@ -238,7 +271,7 @@ void RequestHandler::Post(web::http::http_request request)
 		return;
 	}
 
-	if (path == "/api/add") {
+	if (path == "/api/add" || path == "/api/add/priority" || path =="/api/add/play") {
 		m_songs.setFilter("");
 		std::shared_ptr<Song> songPointer = GetSongFromJSON(jsonPostBody);
 		if (!songPointer) {
@@ -256,6 +289,16 @@ void RequestHandler::Post(web::http::http_request request)
 		else {
 			SpdLogger::debug(LogSystem::WEBSERVER, "Adding {} - {} to the playlist.", songPointer->artist, songPointer->title);
 			m_game.getCurrentPlayList().addSong(songPointer);
+			if (path == "/api/add/priority" || path == "/api/add/play") {
+				m_game.getCurrentPlayList().move(m_game.getCurrentPlayList().getList().size() - 1, 0);
+
+				if (path == "/api/add/play") {
+					std::shared_ptr<Song> songPointer = m_game.getCurrentPlayList().getNext();
+					m_game.activateScreen("Sing");
+					ScreenSing* m_pp = dynamic_cast<ScreenSing*>(m_game.getScreen("Sing"));
+					m_pp->setSong(songPointer);
+				}
+			}
 			ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(m_game.getScreen("Playlist"));
 			m_pp->triggerSongListUpdate();
 
@@ -307,6 +350,29 @@ void RequestHandler::Post(web::http::http_request request)
 				request.reply(web::http::status_codes::BadRequest, "Not gonna move the song to \"" + std::to_string(positionToMoveTo + 1) + "\" since the list ain't that long. Please make a valid request.");
 				return;
 			}
+		}
+		catch (web::json::json_exception const& e) {
+			std::string str = std::string("JSON Exception: ") + e.what();
+			request.reply(web::http::status_codes::BadRequest, str);
+			return;
+		}
+	}
+	else if (path == "/api/play") {
+		if (m_game.getCurrentPlayList().isEmpty()) {
+			request.reply(web::http::status_codes::BadRequest, "Playlist is empty.");
+			return;
+		}
+		try {
+			unsigned songIdToPlay = jsonPostBody[utility::conversions::to_string_t("songId")].as_number().to_uint32();
+			std::shared_ptr<Song> songPointer = m_game.getCurrentPlayList().getSong(songIdToPlay);
+			ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(m_game.getScreen("Playlist"));
+			m_pp->triggerSongListUpdate();
+			m_game.activateScreen("Sing");
+			ScreenSing* m_pp2 = dynamic_cast<ScreenSing*>(m_game.getScreen("Sing"));
+			m_pp2->setSong(songPointer);
+
+			request.reply(web::http::status_codes::OK, "success");
+			return;
 		}
 		catch (web::json::json_exception const& e) {
 			std::string str = std::string("JSON Exception: ") + e.what();
