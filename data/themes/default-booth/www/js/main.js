@@ -66,8 +66,16 @@ const init = async () => {
         template: '<app />',
     }).use(store).mount('#app');
 
+    let query = '';
+
+    const settings = JSON.parse(window.localStorage.getItem('performous_web_frontend_settings') ?? '{}');
+
+    if (settings.screen === 'search' && settings.screenQuery?.search) {
+        query = `query=${settings.screenQuery?.search}`;
+    }
+
     app.$store.dispatch('refreshLanguage');
-    app.$store.dispatch('refreshDatabase');
+    app.$store.dispatch('refreshDatabase', query);
     app.$store.dispatch('refreshPlaylist');
     app.$store.dispatch('refreshSong');
 

@@ -389,24 +389,29 @@ void RequestHandler::Post(web::http::http_request request)
 		}
 	}
 	else if (path == "/api/search") {
-		auto query = utility::conversions::to_utf8string(jsonPostBody[utility::conversions::to_string_t("query")].as_string());
-		m_songs.setFilter(query);
-		web::json::value jsonRoot = web::json::value::array();
-		for (size_t i = 0; i < m_songs.size(); i++) {
-			web::json::value songObject = web::json::value::object();
-			songObject[utility::conversions::to_string_t("Title")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->title));
-			songObject[utility::conversions::to_string_t("Artist")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->artist));
-			songObject[utility::conversions::to_string_t("Edition")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->edition));
-			songObject[utility::conversions::to_string_t("Language")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->language));
-			songObject[utility::conversions::to_string_t("Creator")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->creator));
-			songObject[utility::conversions::to_string_t("HasError")] = web::json::value::boolean(m_songs[i]->loadStatus == Song::LoadStatus::PARSERERROR);
-			songObject[utility::conversions::to_string_t("ProvidedBy")] = web::json::value(utility::conversions::to_string_t(m_songs[i]->providedBy));
-			songObject[utility::conversions::to_string_t("Comment")] = web::json::value(utility::conversions::to_string_t(m_songs[i]->comment));
-			songObject[utility::conversions::to_string_t("Path")] = web::json::value(utility::conversions::to_string_t(std::filesystem::path(m_songs[i]->path.parent_path()).filename()));
-			jsonRoot[i] = songObject;
+		try {
+			auto query = utility::conversions::to_utf8string(jsonPostBody[utility::conversions::to_string_t("query")].as_string());
+			m_songs.setFilter(query);
+			size_t offset = 0;
+			size_t limit = 0;
+
+			if (!jsonPostBody[utility::conversions::to_string_t("offset")].is_null()) {
+				offset = jsonPostBody[utility::conversions::to_string_t("offset")].as_integer();
+			}
+			if (!jsonPostBody[utility::conversions::to_string_t("limit")].is_null()) {
+				limit = jsonPostBody[utility::conversions::to_string_t("limit")].as_integer();
+			}
+
+			web::json::value jsonRoot = SongsToJsonObject(offset, limit);
+
+			request.reply(web::http::status_codes::OK, jsonRoot);
+			return;
 		}
-		request.reply(web::http::status_codes::OK, jsonRoot);
-		return;
+		catch (web::json::json_exception const& e) {
+			std::string str = std::string("JSON Exception: ") + e.what();
+			request.reply(web::http::status_codes::BadRequest, str);
+			return;
+		}
 	}
 	else {
 		request.reply(web::http::status_codes::NotFound, "The path \"" + path + "\" was not found.");
