@@ -2,9 +2,7 @@
 import Folders from './Content/Folders.vue';
 import Search from './Content/Search.vue';
 import Playlist from './Content/Playlist.vue';
-
-const { watch } = Vue;
-const { useStore } = Vuex;
+import Languages from './Content/Languages.vue';
 
 const { content } = defineProps({
     content: {
@@ -13,10 +11,9 @@ const { content } = defineProps({
     },
 });
 
-const store = useStore();
-
 const map = {
     folders: Folders,
+    languages: Languages,
     search: Search,
     playlist: Playlist,
 };

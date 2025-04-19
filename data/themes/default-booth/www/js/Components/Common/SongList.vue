@@ -1,4 +1,7 @@
 <script setup>
+import { onMounted, ref } from 'vue';
+import { useStore } from 'vuex';
+
 import ArrowDown from '../Icons/ArrowDownIcon.vue';
 import ArrowUp from '../Icons/ArrowUpIcon.vue';
 import ArrowUpDown from '../Icons/ArrowUpDownIcon.vue';
@@ -6,13 +9,12 @@ import Cross from '../Icons/CrossIcon.vue';
 import Play from '../Icons/PlayIcon.vue';
 import Plus from '../Icons/PlusIcon.vue';
 import TriangleAlert from '../Icons/TriangleAlertIcon.vue';
-const { onMounted, ref } = Vue;
-const { useStore } = Vuex;
 
 const { songs } = defineProps({
     songs: {
         type: Array,
-        required: true,
+        required: false,
+        default: () => [],
     },
     playlist: {
         type: Boolean,

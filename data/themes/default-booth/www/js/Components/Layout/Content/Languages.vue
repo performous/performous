@@ -1,10 +1,11 @@
 <script setup>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
+import { getLanguageName } from '@helpers';
 import Category from './Category.vue';
 import Cover from '../../Common/Cover.vue';
 import ContentBar from './ContentBar.vue';
-import Folder from '../../Common/Folder.vue';
+import Flag from '../../Common/Flag.vue';
 
 const store = useStore();
 
@@ -22,36 +23,41 @@ const category = computed({
     },
 });
 
-const folders = computed(() => store.state.folders);
+const languages = computed(() => store.state.languages);
 
-const folderList = computed(() => {
+const languageList = computed(() => {
     const list = {};
-    folders.value.forEach((folder) => {
-        list[folder] = [];
+    languages.value.forEach((language) => {
+        list[language] = [];
     });
 
     store.state.database.forEach((song) => {
-        list[song.Path].push(song);
+        if (song.Language && song.Language.trim()) {
+            song.Language.split(',').forEach((lang) => {
+                const l = getLanguageName(lang);
+                list[l].push(song);
+            });
+        }
     });
 
     return list;
 });
 </script>
 <template>
-    <Category v-if="category" :songs="folderList[category]" v-model="category" />
+    <Category v-if="category" :songs="languageList[category]" v-model="category" />
     <div v-else>
         <ContentBar />
         <div class="folderlist">
             <div
-                v-for="folder in folders"
+                v-for="language in languages"
             >
                 <button
                     type="button"
-                    @click="category = folder"
+                    @click="category = language"
                 >
-                    <Folder :folder="folder" />
-                    <p class="category">{{ folder }}</p>
-                    <p>{{ $store.state.language.available_songs }}: {{ folderList[folder].length }}</p>
+                    <Flag :language />
+                    <p class="category">{{ language }}</p>
+                    <p>{{ $store.state.language.available_songs }}: {{ languageList[language].length }}</p>
                 </button>
             </div>
         </div>

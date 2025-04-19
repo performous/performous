@@ -1,7 +1,7 @@
 <script setup>
+import { computed, ref, watch } from 'vue';
+import { useStore } from 'vuex';
 import NoCover from './Cover/NoCover.vue';
-const { computed, ref, watch } = Vue;
-const { useStore } = Vuex;
 
 const { file: fileProp } = defineProps({
     file: {
@@ -12,10 +12,13 @@ const { file: fileProp } = defineProps({
         type: String,
         required: false,
         default: null,
-    }
+    },
+    ignoreMissing: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
 });
-
-const store = useStore();
 
 const file = computed(() => fileProp);
 const image = ref(null);
@@ -37,5 +40,5 @@ loadImage(file.value);
 </script>
 <template>
     <img v-if="url" :src="url" :alt="alt ?? file" />
-    <NoCover v-else />
+    <NoCover v-else-if="!ignoreMissing" />
 </template>

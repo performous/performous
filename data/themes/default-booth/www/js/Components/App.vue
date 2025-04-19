@@ -1,10 +1,9 @@
 <script setup>
+import { computed, provide, watch } from 'vue';
+import { useStore } from 'vuex';
 import Bar from './Layout/Bar.vue';
 import Content from './Layout/Content.vue';
 import Footer from './Layout/Footer.vue';
-
-const { computed, ref, watch } = Vue;
-const { useStore } = Vuex;
 
 const store = useStore();
 const content = computed({
@@ -14,6 +13,8 @@ const content = computed({
         store.dispatch('setScreen', value);
     }
 });
+
+provide('content', content);
 
 const pageTitle = computed(() => store.state.language.performous_web_frontend ?? 'performous_web_frontend');
 
