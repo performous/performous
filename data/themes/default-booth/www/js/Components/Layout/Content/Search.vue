@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
 import SongList from '../../Common/SongList.vue';
 
@@ -13,23 +13,14 @@ const search = computed({
         return store.state.screenQuery.search;
     },
     set(value) {
-        const newQuery = { ...store.state.screenQuery };
-        newQuery.search = value;
-        store.dispatch('setScreenQuery', newQuery);
+        store.dispatch('search', value);
     },
 });
 
-const songs = computed(() => {
-    if (!search.value) {
-        return store.state.database;
-    }
-    const query = search.value.toLowerCase().replaceAll(/[^a-z0-9]/g, '');
-    // Search regardless of order
-    return store.state.database.filter((song) => {
-        const title = song.Title.toLowerCase().replaceAll(/[^a-z0-9]/g, '');
-        const artist = song.Artist.toLowerCase().replaceAll(/[^a-z0-9]/g, '');
-        return `${title}${artist}`.includes(query) || `${artist}${title}`.includes(query);
-    });
+const songs = computed(() => store.state.database);
+
+onBeforeUnmount(() => {
+    store.dispatch('refreshDatabase');
 });
 </script>
 <template>
