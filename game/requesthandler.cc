@@ -30,7 +30,7 @@ void RequestHandler::Error(pplx::task<void>& t) {
 
 void RequestHandler::HandleFile(web::http::http_request request, std::string filePath) {
 	auto path = filePath != "" ? utility::conversions::to_utf8string(utility::conversions::to_string_t(filePath)) : utility::conversions::to_utf8string(request.relative_uri().path());
-	path = DecodeUri(path);
+	path = utility::conversions::to_utf8string(web::uri::decode(utility::conversions::to_string_t(path)));
 	auto fileName = path.substr(path.find_last_of("/\\") + 1);
 
 	std::string fileToSend;
@@ -108,20 +108,6 @@ void RequestHandler::HandleFile(web::http::http_request request, std::string fil
 				request.reply(web::http::status_codes::InternalError, utility::conversions::to_string_t("INTERNAL ERROR "));
 			}
 			});
-}
-
-std::string RequestHandler::DecodeUri(std::string uri) {
-	std::string newUri = uri.substr(0);
-	size_t index = newUri.find_first_of("%");
-	int charNum;
-	char character;
-	while (index != std::string::npos) {
-		sscanf(newUri.substr(index + 1, 2).c_str(), "%x", &charNum);
-		character = static_cast<char>(charNum);
-		newUri = newUri.substr(0, index) + character + newUri.substr(index + 3);
-		index = newUri.find_first_of("%");
-	}
-	return newUri;
 }
 
 void RequestHandler::Get(web::http::http_request request)
