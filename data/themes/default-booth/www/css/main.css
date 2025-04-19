@@ -1,0 +1,251 @@
+:root {
+    --primary: #61A0CD;
+    --primary-text: #ffffff;
+    --secondary:  #ffffff;
+    --secondary-text: #111111;
+    --tertiary:  #eeeeee;
+    --secondary-text: #111111;
+    --hover:  #dddddd;
+    --hover-text: #111111;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary: #333333;
+        --primary-text: #ffffff;
+        --secondary:  #111111;
+        --secondary-text: #ffffff;
+        --tertiary:  #222222;
+        --secondary-text: #ffffff;
+        --hover:  #333333;
+        --hover-text: #ffffff;
+    }
+}
+
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+html {
+    font-family: 'Montserrat', sans-serif;
+    background-color: var(--secondary);
+    color: var(--secondary-text);
+}
+
+#app .app {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: max-content 1fr max-content;
+}
+
+#app .songlist {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#app .songlist th, #app .songlist td {
+    border: none;
+}
+
+#app .songlist th.artist, #app .songlist th.creator, #app .songlist th.edition {
+    width: 10%;
+}
+
+#app .songlist th.year {
+    width: 5%;
+    min-width: 6rem;
+}
+
+#app .songlist tbody tr:nth-child(2n) {
+    background-color: var(--tertiary);
+    color: var(--tertiary-text);
+}
+
+#app .songlist tbody tr {
+    cursor: pointer;
+}
+
+#app .songlist tbody tr:hover {
+    background-color: var(--hover);
+    color: var(--hover-text);
+}
+
+#app .songlist tbody tr td {
+    padding: 0.5rem;
+}
+
+#app .top-bar {
+    padding: 1rem;
+    background-color: var(--primary);
+    color: var(--primary-text);
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+#app .top-bar .brand, #app .top-bar .spacer {
+    flex: 1 0 0;
+}
+
+#app .top-bar svg {
+    max-height: 2rem;
+}
+
+#app .top-bar a {
+    color: var(--primary-text);
+    text-decoration: none;
+}
+
+#app .content {
+    display: flex;
+    align-items: stretch;
+    justify-content: stretch;
+    overflow: hidden;
+}
+
+#app .content > * {
+    width: 100%;
+    padding: 1rem;
+    overflow: auto;
+}
+
+#app .header {
+    font-size: 3rem;
+    font-weight: 900;
+    text-align: center;
+    position: relative;
+}
+#app .header .back {
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 1rem;
+    font-weight: 400;
+    cursor: pointer;
+    padding: 1rem;
+}
+
+#app .content .folderlist {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+#app .content .folderlist button {
+    padding: 1rem;
+    border: none;
+    background-image: none;
+    background-color: var(--primary);
+    color: var(--primary-text);
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    width: 21rem;
+}
+
+#app .content .folderlist button img {
+    max-width: 100%;
+}
+
+#app .content .folderlist button .category {
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+#app .footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: var(--primary);
+    color: var(--primary-text);
+    font-weight: 700;
+}
+
+#app dialog {
+    padding: 0;
+    overflow: hidden;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+#app dialog .dialog-content {
+    padding: 1rem;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+
+#app dialog .dialog-content .header {
+    width: 100%;
+    font-size: 1.5rem;
+    font-weight: 900;
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis ellipsis;
+}
+
+#app dialog .dialog-content > .buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    width: 100%;
+}
+
+#app dialog .dialog-content > .buttons > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+}
+
+#app dialog .dialog-content > .buttons input {
+    max-width: 100%;
+    padding: 0.5rem 1rem;
+    font-family: 'Montserrat', sans-serif;
+    background-color: var(--primary);
+    color: var(--primary-text);
+    border: none;
+    border-top: 1px solid var(--primary-text);
+}
+
+#app dialog .dialog-content > .buttons input::placeholder {
+    color: var(--primary-text);
+}
+
+#app .search .input {
+    display: flex;
+    justify-content: stretch;
+    padding-bottom: 1rem;
+}
+
+#app .search input {
+    flex: 1 0 0;
+    border-radius: 10rem;
+    padding: 1rem;
+    font-family: 'Montserrat', sans-serif;
+    background-color: var(--secondary);
+    color: var(--secondary-text);
+    border: 1px solid var(--secondary-text);
+}
+
+#app .action {
+    padding: 1rem;
+    border: none;
+    background-image: none;
+    background-color: var(--primary);
+    color: var(--primary-text);
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+}
+
+#app .credits {
+    font-size: 0.75rem;
+}
+
+#app td.right {
+    text-align: right;
+}
