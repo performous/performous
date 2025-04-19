@@ -9,7 +9,11 @@ const store = useStore();
 const content = computed({
     get: () => store.state.screen,
     set(value) {
-        store.dispatch('setScreenQuery', null);
+        const { sort = '', descending = false } = store.state.screenQuery ?? {};
+        store.dispatch('setScreenQuery', {
+            sort,
+            descending,
+        });
         store.dispatch('setScreen', value);
     }
 });
@@ -23,7 +27,11 @@ function setPageTitle(newPageTitle) {
 }
 
 function switchContent(newContent) {
-    store.dispatch('setScreenQuery', null);
+    const { sort = '', descending = false } = store.state.screenQuery ?? {};
+    store.dispatch('setScreenQuery', {
+        sort,
+        descending,
+    });
     content.value = newContent;
 }
 
