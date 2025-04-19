@@ -51,6 +51,16 @@ class ScreenSing: public Screen {
 		m_song = song_;
 	}
 
+	std::shared_ptr<Song> getSong()
+	{
+		return m_song;
+	}
+
+	double getSongPosition()
+	{
+		return m_audio.getPosition();
+	}
+
   private:
 	/**Activates Songs Screen or Players Screen.
 	  This depends on
