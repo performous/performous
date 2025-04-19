@@ -1,9 +1,10 @@
 <script setup>
-import SongList from '../../../Common/SongList.vue';
+import SongList from '../../Common/SongList.vue';
 const { songs } = defineProps({
     songs: {
         type: Array,
-        required: true,
+        required: false,
+        default: () => [],
     },
 });
 
