@@ -31,7 +31,42 @@ void RequestHandler::HandleFile(web::http::http_request request, std::string fil
 	path = DecodeUri(path);
 	auto fileName = path.substr(path.find_last_of("/\\") + 1);
 
-	std::string fileToSend = findFile(fileName).string();
+	std::string fileToSend;
+	try {
+		fileToSend = findFile(fileName).string();
+	}
+	catch (...) {
+		try {
+			// We need to ensure that files will only be picked from trusted locations.
+			std::string folderCheck = path.substr(path.find_first_not_of("/\\"));
+			std::vector<std::string> subFolderChecks = { "images", "fonts", "css", "js" };
+
+			if (folderCheck.find_first_of("/\\") == std::string::npos) {
+				request.reply(web::http::status_codes::NotFound, utility::conversions::to_string_t("NOT FOUND "));
+				return;
+			}
+
+			bool isValid = false;
+
+			for (std::string check : subFolderChecks) {
+				if (folderCheck.rfind(check, 0)) {
+					isValid = true;
+					break;
+				}
+			}
+
+			if (!isValid ) {
+				request.reply(web::http::status_codes::NotFound, utility::conversions::to_string_t("NOT FOUND "));
+				return;
+			}
+			fileName = folderCheck.substr(folderCheck.find_first_of("/\\") + 1);
+			fileToSend = findFile(fileName).string();
+		}
+		catch (...) {
+			request.reply(web::http::status_codes::NotFound, utility::conversions::to_string_t("NOT FOUND " + fileName));
+			return;
+		}
+	}
 
 	concurrency::streams::fstream::open_istream(utility::conversions::to_string_t(fileToSend), std::ios::in).then([=](concurrency::streams::istream is) {
 		std::string content_type = "";
