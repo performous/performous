@@ -37,6 +37,9 @@ public:
 	void exit();
 	void reloadGL();
 	void triggerSongListUpdate();
+	double getTimer() {
+		return m_nextTimer.get();
+	}
 private:
 	Menu overlay_menu;
 	Menu songlist_menu;
