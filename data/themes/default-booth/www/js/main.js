@@ -31,6 +31,8 @@ const init = async () => {
     await loadJS('./js/vue.global.js');
     await loadJS('./js/vuex.global.js');
     await loadJS('./js/vue3-sfc-loader.js');
+    await loadJS('./js/vueuse.shared.min.js');
+    await loadJS('./js/vueuse.core.min.js');
     await loadJS('./js/constants.js');
     await loadJS('./js/helpers.js');
     await loadJS('./js/store.js');
@@ -41,6 +43,7 @@ const init = async () => {
         moduleCache: {
             vue: Vue,
             vuex: Vuex,
+            '@vueuse/core': VueUse,
             '@constants': constants,
             '@helpers': helpers,
         },
