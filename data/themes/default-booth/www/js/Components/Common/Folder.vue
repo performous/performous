@@ -1,10 +1,10 @@
 <script setup>
-import { computed, defineAsyncComponent } from 'vue';
+import { computed, defineAsyncComponent, ref } from 'vue';
 import { remapFolders } from '@constants';
 import Cover from './Cover.vue';
 import NoCover from './Cover/NoCover.vue';
 
-const { folder } = defineProps({
+const { folder, ignoreMissing } = defineProps({
     folder: {
         type: String,
         required: true,
@@ -17,16 +17,21 @@ const { folder } = defineProps({
 });
 
 const remapFolderCover = computed(() => remapFolders[folder] ?? folder);
+const status = ref('loading');
 
 const asyncComponent = defineAsyncComponent({
-    loader: () => import(`./Folders/${remapFolderCover.value}.vue`),
+    loader: () => {
+        status.value = 'loading';
+        return import(`./Folders/${remapFolderCover.value}.vue`);
+    },
     loadingComponent: NoCover,
     delay: 200,
     errorComponent: null,
-    onError: () => null,
+    onError: () => status.value = 'error',
+    onSuccess: () => status.value = 'success',
 });
 </script>
 <template>
-    <component v-if="asyncComponent" :is="asyncComponent" />
+    <component v-if="status !== 'error'" :is="asyncComponent" />
     <Cover v-else :file="`folders/${folder}`" :alt="folder" :ignore-missing />
 </template>
