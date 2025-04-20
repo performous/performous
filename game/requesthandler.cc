@@ -383,10 +383,10 @@ void RequestHandler::Post(web::http::http_request request)
 			size_t limit = 0;
 
 			if (!jsonPostBody[utility::conversions::to_string_t("offset")].is_null()) {
-				offset = jsonPostBody[utility::conversions::to_string_t("offset")].as_integer();
+				offset = jsonPostBody[utility::conversions::to_string_t("offset")].as_number().to_uint32();
 			}
 			if (!jsonPostBody[utility::conversions::to_string_t("limit")].is_null()) {
-				limit = jsonPostBody[utility::conversions::to_string_t("limit")].as_integer();
+				limit = jsonPostBody[utility::conversions::to_string_t("limit")].as_number().to_uint32();
 			}
 
 			web::json::value jsonRoot = SongsToJsonObject(offset, limit);
