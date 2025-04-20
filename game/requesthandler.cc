@@ -142,12 +142,13 @@ void RequestHandler::Get(web::http::http_request request)
 		// parse query to key-value pairs
 		auto queryParams = web::uri::split_query(web::uri::decode(utility::conversions::to_string_t(query)));
 
-		int sort = -1;
+		// we want to fall back to the current sort number
+		unsigned short sort = m_songs.sortNum();
 		bool descending = queryParams.count(utility::conversions::to_string_t("order")) && utility::conversions::to_utf8string(queryParams.at(utility::conversions::to_string_t("order"))) == "descending";
 		size_t offset = 0;
 		size_t limit = 0;
 
-		std::map<std::string, int> sortTypes = {
+		std::map<std::string, unsigned short> sortTypes = {
 			{"", 2},
 			{"random", 0},
 			{"title", 1},
@@ -163,10 +164,7 @@ void RequestHandler::Get(web::http::http_request request)
 			sort = sortTypes.at(utility::conversions::to_utf8string(queryParams.at(utility::conversions::to_string_t("sort"))));
 		}
 
-		// we only want to sort if a valid sorting option is picked
-		if (sort > -1) {
-			m_songs.sortSpecificChange(sort, descending);
-		}
+		m_songs.sortSpecificChange(sort, descending);
 
 		if (queryParams.count(utility::conversions::to_string_t("query"))) {
 			m_songs.setFilter(utility::conversions::to_utf8string(queryParams.at(utility::conversions::to_string_t("query"))));
