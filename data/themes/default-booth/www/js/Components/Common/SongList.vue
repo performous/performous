@@ -1,6 +1,7 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, useTemplateRef } from 'vue';
 import { useStore } from 'vuex';
+import { useIntersectionObserver } from '@vueuse/core';
 
 import SortIcon from './SongList/SortIcon.vue';
 import ArrowDown from '../Icons/ArrowDownIcon.vue';
@@ -22,7 +23,13 @@ const { songs } = defineProps({
         required: false,
         default: false,
     },
-})
+});
+
+const renderLimit = defineModel({
+    type: Number,
+    required: false,
+    default: -1,
+});
 
 const dialog = ref(null);
 const currentSong = ref(null);
@@ -30,6 +37,16 @@ const songIndex = ref(null);
 const desiredIndex = ref(null);
 
 const store = useStore();
+
+const target = useTemplateRef('target');
+const { stop } = useIntersectionObserver(
+    target,
+    ([entry], observerElement) => {
+        if (entry.isIntersecting) {
+            renderLimit.value+= 100;
+        }
+    }
+);
 
 const sort = computed({
     get() {
@@ -115,7 +132,7 @@ function priority() {
 
 onMounted(() => {
     dialog.value.addEventListener('click', closeModal);
-})
+});
 </script>
 <template>
     <dialog ref="dialog">
@@ -177,7 +194,7 @@ onMounted(() => {
             </tr>
         </thead>
         <tbody>
-            <tr v-for="(song, index) in songs" @click="setCurrentSong(song, index)" :key="`song-${song.Artist}-${song.Title}-${index}`">
+            <tr v-for="(song, index) in (renderLimit >= 0 ? songs.slice(0, renderLimit) : songs)" @click="setCurrentSong(song, index)" :key="`song-${song.Artist}-${song.Title}-${index}`">
                 <td>{{ song.Artist }}</td>
                 <td>{{ song.Title }}</td>
                 <td>{{ song.Creator }}</td>
@@ -192,4 +209,5 @@ onMounted(() => {
             </tr>
         </tbody>
     </table>
+    <div v-if="renderLimit >= 0 && songs.length > renderLimit" ref="target">Loading...</div>
 </template>
