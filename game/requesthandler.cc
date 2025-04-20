@@ -454,9 +454,6 @@ web::json::value RequestHandler::SongsToJsonObject(size_t start, size_t limit) {
 	size_t limitCount = limit;
 	size_t songCount = m_songs.size();
 
-	if (startIndex < 0) {
-		startIndex = 0;
-	}
 	if (startIndex > songCount) {
 		startIndex = songCount;
 	}
