@@ -299,7 +299,7 @@ void RequestHandler::Post(web::http::http_request request)
 			SpdLogger::debug(LogSystem::WEBSERVER, "Adding {} - {} to the playlist.", songPointer->artist, songPointer->title);
 			m_game.getCurrentPlayList().addSong(songPointer);
 			if (path == "/api/add/priority" || path == "/api/add/play") {
-				m_game.getCurrentPlayList().move(m_game.getCurrentPlayList().getList().size() - 1, 0);
+				m_game.getCurrentPlayList().move(static_cast<unsigned int>(m_game.getCurrentPlayList().getList().size()) - 1, 0);
 
 				if (path == "/api/add/play") {
 					std::shared_ptr<Song> songPointer = m_game.getCurrentPlayList().getNext();
@@ -397,10 +397,10 @@ void RequestHandler::Post(web::http::http_request request)
 			size_t limit = 0;
 
 			if (!jsonPostBody[utility::conversions::to_string_t("offset")].is_null()) {
-				offset = jsonPostBody[utility::conversions::to_string_t("offset")].as_integer();
+				offset = jsonPostBody[utility::conversions::to_string_t("offset")].as_number().to_uint32();
 			}
 			if (!jsonPostBody[utility::conversions::to_string_t("limit")].is_null()) {
-				limit = jsonPostBody[utility::conversions::to_string_t("limit")].as_integer();
+				limit = jsonPostBody[utility::conversions::to_string_t("limit")].as_number().to_uint32();
 			}
 
 			web::json::value jsonRoot = SongsToJsonObject(offset, limit);
