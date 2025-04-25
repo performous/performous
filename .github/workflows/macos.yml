@@ -30,7 +30,7 @@ jobs:
         aubio
         boost
         cairo
-        cmake
+        performous/pinned_cmake3/cmake@3.31.7
         cpprestsdk
         dylibbundler
         ffmpeg@7
@@ -72,42 +72,55 @@ jobs:
         id: update_brew
         run: |
           brew update
+
       # brew fetch runs downloads in parallel, which is faster
       # than letting install do it
-      - name: Fetch Dependencies
-        id: fetch_deps
+
+#      - name: Fetch Dependencies
+#        id: fetch_deps
+#        run: |
+#          brew fetch --deps $MACOS_DEPS
+
+      - name: Install cmake3
         run: |
-          brew fetch --deps $MACOS_DEPS
+            # uninstall version 4 of cmake
+            brew uninstall cmake
+            brew tap performous/pinned_cmake3
 
-      - name: Install Dependencies
-        id: install_deps
-        run: |
-           brew unlink python && brew link --overwrite python
-           brew install $MACOS_DEPS 2>&1
-           #brew unlink boost@1.87
-           #brew link --force boost@1.85
+      - name: Install dependencies with homebrew.
+        uses: gerlero/brew-install@v1
+        with:
+          packages: ${{ env.MACOS_DEPS }}
 
-           # uninstall version 4 of cmake
-           brew uninstall cmake
-
-           # we need to create a tap of the core formulae in order for this to work
-           # this will auto-enable developer mode (we'll turn it off later)
-           brew tap --force homebrew/core 
-
-           # create a new, local tap to work in
-           # by default, this creates a Git repos for the tap
-           # add --no-git if you don't want a repos to be created
-           brew tap-new --no-git performous/pinned_cmake
-
-            # copy the formula for cmake 3 to the local tap
-            brew extract cmake --version 3.31.6 performous/pinned_cmake
-
-            # install the formula (this will build locally)
-            brew install performous/pinned_cmake/cmake@3.31.6
-
-            # cleanup the stuff we don't need anymore
-            brew untap homebrew/core
-            brew developer off
+#      - name: Install Dependencies
+#        id: install_deps
+#        run: |
+#           brew unlink python && brew link --overwrite python
+#           brew install $MACOS_DEPS 2>&1
+#           #brew unlink boost@1.87
+#           #brew link --force boost@1.85
+#
+#           # uninstall version 4 of cmake
+#           brew uninstall cmake
+#
+#           # we need to create a tap of the core formulae in order for this to work
+#           # this will auto-enable developer mode (we'll turn it off later)
+#           brew tap --force homebrew/core 
+#
+#           # create a new, local tap to work in
+#           # by default, this creates a Git repos for the tap
+#           # add --no-git if you don't want a repos to be created
+#           brew tap-new --no-git performous/pinned_cmake
+#
+#            # copy the formula for cmake 3 to the local tap
+#            brew extract cmake --version 3.31.6 performous/pinned_cmake
+#
+#            # install the formula (this will build locally)
+#            brew install performous/pinned_cmake/cmake@3.31.6
+#
+#            # cleanup the stuff we don't need anymore
+#            brew untap homebrew/core
+#            brew developer off
 
       - name: Build package
         id: build_package
