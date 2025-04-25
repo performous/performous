@@ -159,7 +159,7 @@ jobs:
 
           # Run the build inside the docker containers using the
           # build script that was pulled inside during the build
-          docker run --env EXTRA_CMAKE_ARGS --rm -v $(pwd):/github_actions_build/ ${{ env.CONTAINER_NAME }}   ./build_performous.sh -g -D /github_actions_build/ -E ${EXTRA_CMAKE_ARGS} -R ${PERFORMOUS_RELEASE_TYPE}
+          docker run --env EXTRA_CMAKE_ARGS --rm -v $(pwd):/github_actions_build/ ${{ env.CONTAINER_NAME }} ./build_performous.sh -g -D /github_actions_build/ -E ${EXTRA_CMAKE_ARGS} -R ${PERFORMOUS_RELEASE_TYPE}
 
           # Provided by the common build functions
           package_name "$(pwd)/build" "Performous*-Linux.*" "${PACKAGE_VERSION}" "${{ matrix.os }}" "${{ matrix.version }}"

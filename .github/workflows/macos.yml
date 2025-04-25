@@ -53,6 +53,7 @@ jobs:
         portaudio
         portmidi
         sdl2
+        spdlog
     steps:
       - name: Checkout Git
         id: checkout_git
