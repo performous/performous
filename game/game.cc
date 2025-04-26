@@ -18,6 +18,7 @@ Game::Game(Window& window):
   m_loadingProgress(0.0f), m_logo(findFile("logo.svg")), m_logoAnim(0.0, 0.5)
 {
 	m_textMessage.dimensions.middle().center(-0.05f);
+	currentPlaylist.setLimit(config["kioskmode/playlist_limit"].ui());
 }
 
 void Game::activateScreen(std::string const& name) {
