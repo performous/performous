@@ -132,7 +132,19 @@ jobs:
     needs:
       - determine_version
       - create_release
-  
+
+  MacPorts_Package:
+    name: Build the MacOS package with MacPorts
+    uses: ./.github/workflows/macports.yml
+    secrets: inherit
+    with:
+      package_complete_version: ${{ needs.determine_version.outputs.complete_version }}
+      release_id: ${{ needs.create_release.outputs.release_id }}
+    needs:
+      - determine_version
+      - create_release
+
+
   # Pull in the Windows build workflow
   Windows_Packages:
     name: Build the Windows packages
