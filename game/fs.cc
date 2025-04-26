@@ -1,6 +1,7 @@
 #include "fs.hh"
 
 #include "configuration.hh"
+#include "log.hh"
 #include "platform.hh"
 #include "util.hh"
 
@@ -157,22 +158,25 @@ namespace {
 	void PathCache::pathInit() {
 		bool bootstrapping = paths.empty();  // The first run (during bootstrap)
 		if (!bootstrapping) {
-			std::string logmsg = "fs/info: Found system paths:\n";
-			logmsg += "  base:     " + base.string() + '\n';
-			logmsg += "  share:    " + share.string() + '\n';
-			logmsg += "  locale:   " + locale.string() + '\n';
-			logmsg += "  sysConf:  " + sysConf.string() + '\n';
-			logmsg += "  home:     " + home.string() + '\n';
-			logmsg += "  config:   " + conf.string() + '\n';
-			logmsg += "  data:     " + data.string() + '\n';
-			logmsg += "  cache:    " + cache.string() + '\n';
-			std::clog << logmsg << std::flush;
+			std::string logmsg{fmt::format(
+			"Found system paths:\n"
+			"{8}base:          {0}\n"
+			"{8}share:         {1}\n"
+			"{8}locale:        {2}\n"
+			"{8}sysConf:       {3}\n"
+			"{8}home           {4}\n"
+			"{8}config:        {5}\n"
+			"{8}data:          {6}\n"
+			"{8}cache:         {7}",
+			base, share, locale, sysConf, home, conf, data, cache, SpdLogger::newLineDec
+			)};
+			SpdLogger::info(LogSystem::FILESYSTEM, logmsg);
 		}
 			if (Platform::currentOS() == Platform::HostOS::OS_MAC) {
 			char const* p = getenv("XDG_CONFIG_HOME");
 			fs::path oldConf = (p ? p : home / ".config/performous");
 			if (fs::is_directory(oldConf)) {
-				std::clog << "fs/info: Configuration files found in old path, " << oldConf << std::endl;
+				SpdLogger::info(LogSystem::FILESYSTEM, "Configuration files found in old location, path={}", oldConf);
 				conf = home / "Library" / "Preferences" / "Performous";
 				if (bootstrapping) {
 					copyDirectoryRecursively(oldConf, conf);
@@ -182,15 +186,17 @@ namespace {
 						fs::remove_all(oldCache);
 						didMigrateConfig = true;
 					}
-					catch (...) {
-						throw std::runtime_error("There was an error migrating configuration to " + conf.string());
+					catch (fs::filesystem_error const& e) {
+						throw std::runtime_error(fmt::format("There was an error migrating configuration to path={}. Exception={}", conf, e.what()));
 					}
 				}
 			}
-			if (didMigrateConfig) { std::clog << "fs/info: Successfully moved configuration files to their new location: " << conf.string() << std::endl; }
+			if (didMigrateConfig) {
+				SpdLogger::info(LogSystem::FILESYSTEM, "Successfully moved configuration files to their new location, path={}", conf);
+				}
 			}
 		// Data dirs
-		std::string logmsg = "fs/info: Determining data dirs (search path):\n";
+		std::string logmsg{"Determining data dirs (search path):"};
 		{
 			Paths dirs;
 			dirs.push_back(data);  // Adding user's data dir
@@ -212,15 +218,15 @@ namespace {
 			paths.clear();
 			std::set<fs::path> used;
 			for (auto dir: dirs) {
-				dir = fs::absolute(dir);
+				dir = fs::weakly_canonical(dir);
 				if (used.find(dir) != used.end()) continue;
-				logmsg += "  " + dir.string() + '\n';
+				fmt::format_to(std::back_inserter(logmsg), "\n{}{}", SpdLogger::newLineDec, dir);
 				paths.push_back(dir);
 				used.insert(dir);
 			}
 		}
 		if (!bootstrapping) {
-			if (!bootstrapping) std::clog << logmsg << std::flush;
+			SpdLogger::info(LogSystem::FILESYSTEM, logmsg);
 		}
 	}
 
@@ -275,7 +281,45 @@ void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destina
 
 void pathBootstrap() { Lock l(mutex); cache.pathBootstrap(); }
 void pathInit() { Lock l(mutex); cache.pathInit(); }
+
+std::string formatPath(const fs::path& target) {
+	// Normalize the paths by resolving symlinks and removing redundant elements.
+	// But, if just a filename, keep it as is.
+	fs::path canonicalTarget = target.has_parent_path() ? fs::weakly_canonical(target) : target;
+	if (canonicalTarget == cache.base) {
+	// Return the absolute path if referring to the base directory.
+		return cache.base.string();
+	}
+	// Check if the target is a descendant of base.
+	if (std::mismatch(cache.base.begin(), cache.base.end(), canonicalTarget.begin()).first == cache.base.end()) {
+		// If target is a descendant of base, return the relative path starting from base's parent.
+		return fs::relative(canonicalTarget, cache.base.parent_path()).string();
+	} else {
+		// Otherwise, return the absolute path to target.
+		return canonicalTarget.string();
+	}
+}
+
 fs::path getLogFilename() { Lock l(mutex); return cache.cache / "infolog.txt"; }
+fs::path getProfilerLogFilename() { 
+	Lock l(mutex);
+	std::string baseName{"profiler.txt"};
+	unsigned logRotate = 5;
+	do {
+		fs::path newPath = cache.cache / fmt::format("profiler.{}.txt", logRotate);
+		fs::path oldPath = cache.cache / (logRotate == 1 ? "profiler.txt" : fmt::format(fmt::runtime("profiler.{}.txt"), logRotate - 1));
+		if (fs::exists(oldPath)) {
+			if (logRotate == 5 && fs::exists(newPath)) {
+				fs::remove(newPath); // delete profiler.5.txt if it exists
+			}
+			fs::rename(oldPath, newPath); // rotate
+		}
+		logRotate--;
+	}
+	while (logRotate >= 1);
+	return cache.cache / "profiler.txt";
+}
+
 fs::path getSchemaFilename() { Lock l(mutex); return cache.share / configSchema; }
 fs::path getHomeDir() { Lock l(mutex); return cache.home; }
 fs::path getShareDir() { Lock l(mutex); return cache.share; }
@@ -333,9 +377,9 @@ fs::path findFile(fs::path const& filename) {
 		list.push_back(p);
 		if (fs::exists(p)) return p.string();
 	}
-	std::string logmsg = "fs/error: Unable to locate data file, tried:\n";
-	for (auto const& p: list) logmsg += " " + p.string() + '\n';
-	std::clog << logmsg << std::flush;
+	std::string logmsg{"Unable to locate data file, tried:"};
+	for (auto const& p: list) fmt::format_to(std::back_inserter(logmsg), "\n{}", p);
+	SpdLogger::error(LogSystem::FILESYSTEM, logmsg);
 	throw std::runtime_error("Cannot find file \"" + filename.string() + "\" in Performous theme or data folders");
 }
 

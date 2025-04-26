@@ -26,11 +26,15 @@
 #include "screen_players.hh"
 #include "screen_playlist.hh"
 
-#include <fmt/format.h>
 #include <boost/program_options.hpp>
+#include <fmt/format.h>
+#include <SDL_keyboard.h>
+#include <SDL_scancode.h>
+
 #include <cstdlib>
 #include <cstdint>
 #include <csignal>
+#include <iostream>
 #include <string>
 #include <thread>
 #include <vector>
@@ -97,10 +101,7 @@ static void checkEvents(Game& gm, Time eventTime) {
 
 void mainLoop(std::string const& songlist) {
 	Window window{};
-
-	Platform platform;
-	std::clog << "core/notice: Starting the audio subsystem (errors printed on console may be ignored)." << std::endl;
-	std::clog << "core/info: Loading assets." << std::endl;
+	SpdLogger::info(LogSystem::LOGGER, "Loading assets...");
 	TranslationEngine localization;
 	TextureLoader m_loader;
 	Backgrounds backgrounds;
@@ -146,7 +147,7 @@ void mainLoop(std::string const& songlist) {
 	// Main loop
 	auto time = Clock::now();
 	unsigned frames = 0;
-	std::clog << "core/info: Assets loaded, entering main loop." << std::endl;
+	SpdLogger::info(LogSystem::LOGGER, "Assets loaded, entering main loop.");
 	while (!gm.isFinished()) {
 		Profiler prof("mainloop");
 		bool benchmarking = config["graphic/fps"].b();
@@ -159,7 +160,7 @@ void mainLoop(std::string const& songlist) {
 				window.screenshot();
 				gm.flashMessage(_("Screenshot taken!"));
 			} catch (EXCEPTION& e) {
-				std::cerr << "ERROR: " << e.what() << std::endl;
+				SpdLogger::error(LogSystem::IMAGE, "Screenshot failed, exception={}", e.what());
 				gm.flashMessage(_("Screenshot failed!"));
 			}
 			g_take_screenshot = false;
@@ -180,9 +181,7 @@ void mainLoop(std::string const& songlist) {
 			if (benchmarking) {
 				++frames;
 				if (Clock::now() - time > 1s) {
-					std::ostringstream oss;
-					oss << frames << " FPS";
-					gm.flashMessage(oss.str());
+					gm.flashMessage(fmt::format("{} FPS", frames));
 					time += 1s;
 					frames = 0;
 				}
@@ -198,7 +197,7 @@ void mainLoop(std::string const& songlist) {
 			checkEvents(gm, eventTime);
 			if (benchmarking) prof("events");
 			} catch (RUNTIME_ERROR& e) {
-				std::cerr << "ERROR: " << e.what() << std::endl;
+				SpdLogger::error(LogSystem::LOGGER, "Caught error, exception={}", e.what());
 				gm.flashMessage(std::string("ERROR: ") + e.what());
 		}
 	}
@@ -222,28 +221,33 @@ void jstestLoop() {
 		while (true) {
 			SDL_Event e;
 			while(SDL_PollEvent(&e) == 1) {
+				std::string ret;
 				if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE)) {
 					return;
 				} else if (e.type == SDL_KEYDOWN) {
-					std::cout << "Keyboard key: " << int(e.key.keysym.scancode) << ", mod: " << int(e.key.keysym.mod) << std::endl;
+					SDL_Scancode key = e.key.keysym.scancode;
+					ret = fmt::format("Keyboard key={}({}), modifier={}.", int(key), key, SDL_Keymod(e.key.keysym.mod));
 				} else if (e.type == SDL_JOYBUTTONDOWN) {
-					std::cout << "JoyID: " << int(e.jbutton.which) << ", button: " << int(e.jbutton.button) << ", state: " << int(e.jbutton.state) << std::endl;
+					ret = fmt::format("Joy ID={}, button={}, state={}.", int(e.jbutton.which), int(e.jbutton.button), int(e.jbutton.state));
 				} else if (e.type == SDL_JOYAXISMOTION) {
 					if ((oldjoy != int(e.jaxis.which)) || (oldaxis != int(e.jaxis.axis)) || (oldvalue != int(e.jaxis.value))) {
-						std::cout << "JoyID: " << int(e.jaxis.which) << ", axis: " << int(e.jaxis.axis) << ", value: " << int(e.jaxis.value) << std::endl;
+						ret = fmt::format("Joy ID={}, axis={}, value={}.", int(e.jaxis.which), int(e.jaxis.axis), int(e.jaxis.value));
 						oldjoy = int(e.jaxis.which);
 						oldaxis = int(e.jaxis.axis);
 						oldvalue = int(e.jaxis.value);
 					}
 				} else if (e.type == SDL_JOYHATMOTION) {
-					std::cout << "JoyID: " << int(e.jhat.which) << ", hat: " << int(e.jhat.hat) << ", value: " << int(e.jhat.value) << std::endl;
+					ret = fmt::format("Joy ID={}, hat={}, value={}.", int(e.jhat.which), int(e.jhat.hat), int(e.jhat.value));
+				}
+				if (!ret.empty()) {
+					std::cout << ret << std::endl;	
 				}
 			}
 			window.blank(); window.swap();
 			std::this_thread::sleep_for(10ms); // Max 100 FPS
 		}
 	} catch (EXCEPTION& e) {
-		std::cerr << "ERROR: " << e.what() << std::endl;
+		SpdLogger::error(LogSystem::CONTROLLERS, "Caught error, exception={}", e.what());
 	}
 	return;
 }
@@ -258,40 +262,37 @@ template <typename Container> void confOverride(Container const& c, std::string 
 void outputOptionalFeatureStatus();
 
 static void fatalError(const std::string &msg) {
-	auto errMsg = msg + "\nIf you think this is a bug in Performous, please report it at \n"
-						"  https://github.com/performous/performous/issues";
+	auto errorMsg = fmt::format(
+	"{}"
+	"\nIf you think this is a bug in Performous, please report it at \n"
+	"  https://github.com/performous/performous/issues"
+	, msg);
 	auto title = "FATAL ERROR";
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, errMsg.c_str(), nullptr);
-	std::cerr << title << ": " << msg << std::endl;
-	std::clog << "core/error: " << errMsg << std::endl;
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, errorMsg.c_str(), nullptr);
+	SpdLogger::error(LogSystem::LOGGER, msg);
 }
 
-int main(int argc, char** argv) try {
-	Platform::setupPlatform();
+int main(int argc, char** argv) {
+	Platform platform;
 	std::srand(static_cast<unsigned>(std::time(nullptr)));
 	// Parse commandline options
 	std::vector<std::string> devices;
 	std::vector<std::string> songdirs;
 	namespace po = boost::program_options;
-	po::options_description opt1("Generic options");
+	po::options_description opt1("Generic options", 160, 80);
 	std::string songlist;
-
-	std::string loglevel;
-#ifndef NDEBUG
-	loglevel = "debug";
-#elif (BOOST_OS_MACOS)
-	loglevel = "debug";
-#endif
+	std::string logLevel;
 	opt1.add_options()
-	  ("help,h", "you are viewing it")
-	  ("log,l", po::value<std::string>(&loglevel), "subsystem name or minimum level to log")
-	  ("version,v", "display version number")
-	  ("songlist", po::value<std::string>(&songlist), "save a list of songs in the specified folder");
-	po::options_description opt2("Configuration options");
+	  ("help,h", "Print this message.")
+	  ("?,?", "Print this message.")
+	  ("log,l", po::value<std::string>(&logLevel)->value_name("<level>"), "Minimum level to log to console. Possible values are: trace, debug, info, notice, warn, error and off. Default is 'notice'. Unless 'trace' is specified, the logfile will always be set to 'debug'.")
+	  ("version,v", "Display version number")
+	  ("songlist", po::value<std::string>(&songlist)->value_name("<path>"), "Save a list of songs in the specified folder");
+	po::options_description opt2("Configuration options", 160, 80);
 	opt2.add_options()
-	  ("audio", po::value<std::vector<std::string> >(&devices)->composing(), "specify an audio device to use")
-	  ("audiohelp", "print audio related information")
-	  ("jstest", "utility to get joystick button mappings");
+	  ("audio", po::value<std::vector<std::string> >(&devices)->value_name("<device>")->composing(), "Specify a string to match audio devices to use; see audiohelp for details.")
+	  ("audiohelp", "Print audio related information")
+	  ("jstest", "Utility to get joystick button mappings");
 	po::options_description opt3("Hidden options");
 	opt3.add_options()
 	  ("songdir", po::value<std::vector<std::string> >(&songdirs)->composing(), "");
@@ -306,65 +307,92 @@ int main(int argc, char** argv) try {
 		po::options_description allopts(cmdline);
 		allopts.add(opt3);
 		po::store(po::command_line_parser(argc, argv).options(allopts).positional(p).run(), vm);
-	} catch (EXCEPTION& e) {
-		std::cerr << cmdline << std::endl;
-		std::cerr << "ERROR: " << e.what() << std::endl;
+	}	
+	catch (boost::program_options::unknown_option const& e) {
+		std::cerr << e.what() << '\n' << std::endl;
+		std::cout << cmdline << "\n  Any arguments without a switch are interpreted as song folders.\n" << std::endl;
+		return EXIT_SUCCESS;
+	}
+	catch (EXCEPTION& e) {
+		std::cerr << "Error parsing program options. Exception=" << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
 	po::notify(vm);
-
+	auto levelString = UnicodeUtil::toUpper(logLevel);
+	auto levelEnum = spdlog::level::from_str(levelString);
+	
+	if (levelString != "OFF" && levelEnum == spdlog::level::off) {
+		// spdlog::level::off is the default fallback for level::from_str, so only take that value into account if it was explicitly requested.
+		levelEnum = spdlog::level::warn; // The default warn is our notice.
+	}	
 	if (vm.count("version")) {
 		std::cout << PACKAGE " " VERSION << std::endl;
 		return EXIT_SUCCESS;
 	}
-	if (vm.count("help")) {
-		std::cout << cmdline << "  any arguments without a switch are interpreted as song folders.\n" << std::endl;
+	if (vm.count("help") || vm.count("?")) {
+		std::cout << cmdline << "\n  Any arguments without a switch are interpreted as song folders.\n" << std::endl;
 		return EXIT_SUCCESS;
 	}
+	pathBootstrap();
+	SpdLogger spdLogger(levelEnum);
+	try {
+		outputOptionalFeatureStatus();
 
-	Logger logger(loglevel);
+		readConfig();
+		SpdLogger::toggleProfilerLogger();
 
-	outputOptionalFeatureStatus();
-
-	readConfig();
-
-	if (vm.count("audiohelp")) {
-		std::clog << "core/notice: Starting audio subsystem for audiohelp (errors printed on console may be ignored)." << std::endl;
-		Audio audio;
-		// Print the devices
-		std::cout << portaudio::AudioBackends().dump();
-		// Some examples
-		std::cout << "Example --audio parameters" << std::endl;
-		std::cout << "  --audio \"out=2\"         # Pick first working two-channel playback device" << std::endl;
-		std::cout << "  --audio \"dev=1 out=2\"   # Pick device id 1 and assign stereo playback" << std::endl;
-		std::cout << "  --audio 'dev=\"HDA Intel\" mics=blue,red'   # HDA Intel with two mics" << std::endl;
-		std::cout << "  --audio 'dev=pulse out=2 mics=blue'       # PulseAudio with input and output" << std::endl;
-		return EXIT_SUCCESS;
+		if (vm.count("audiohelp")) {
+			SpdLogger::notice(LogSystem::LOGGER, "Starting the audio subsystem for audiohelp (errors printed on console may be ignored).");
+			Audio audio;
+			// Print the devices
+			std::cout << portaudio::AudioBackends().dump();
+			// Some examples
+			std::cout << "Example --audio parameters" << std::endl;
+			std::cout << "  --audio \"out=2\"         # Pick first working two-channel playback device" << std::endl;
+			std::cout << "  --audio \"dev=1 out=2\"   # Pick device id 1 and assign stereo playback" << std::endl;
+			std::cout << "  --audio 'dev=\"HDA Intel\" mics=blue,red'   # HDA Intel with two mics" << std::endl;
+			std::cout << "  --audio 'dev=pulse out=2 mics=blue'       # PulseAudio with input and output" << std::endl;
+			return EXIT_SUCCESS;
+		}
+		// Override XML config for options that were specified from commandline or performous.conf
+		confOverride(songdirs, "paths/songs");
+		confOverride(devices, "audio/devices");
+		getPaths(); // Initialize paths before other threads start
+		if (vm.count("jstest")) { // Joystick test program
+			SpdLogger::info(LogSystem::CONTROLLERS, 
+				"Starting jstest input test utility.\n"
+				"Joystick utility - Touch your joystick to see buttons here\n"
+				"Hit ESC (window focused) to quit"
+			);
+			jstestLoop();
+			SpdLogger::info(LogSystem::LOGGER, "Exiting normally.");
+			return EXIT_SUCCESS;
+		}
+		// Run the game init and main loop
+		mainLoop(songlist);
+		SpdLogger::info(LogSystem::LOGGER, "Exiting normally.");
 	}
-	// Override XML config for options that were specified from commandline or performous.conf
-	confOverride(songdirs, "paths/songs");
-	confOverride(devices, "audio/devices");
-	getPaths(); // Initialize paths before other threads start
-	if (vm.count("jstest")) { // Joystick test program
-		std::clog << "core/notice: Starting jstest input test utility." << std::endl;
-		std::cout << std::endl << "Joystick utility - Touch your joystick to see buttons here" << std::endl
-		<< "Hit ESC (window focused) to quit" << std::endl << std::endl;
-		jstestLoop();
-		return EXIT_SUCCESS;
+	catch (EXCEPTION& e) {
+		fatalError(e.what());
+		return EXIT_FAILURE;
 	}
-	// Run the game init and main loop
-	mainLoop(songlist);
-
 	return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
-} catch (EXCEPTION& e) {
-	fatalError(e.what());
-	return EXIT_FAILURE;
 }
 
 void outputOptionalFeatureStatus() {
-	std::clog << "core/notice: " PACKAGE " " VERSION " starting..."
-	  << "\n  Internationalization: " << ("Enabled")
-	  << "\n  MIDI Hardware I/O:    " << (input::Hardware::midiEnabled() ? "Enabled" : "Disabled")
-	  << "\n  Webcam support:       " << (Webcam::enabled() ? "Enabled" : "Disabled")
-	  << std::endl;
+	SpdLogger::notice(LogSystem::LOGGER,
+		fmt::runtime(
+			"{0} {1} starting...\n"
+			"{5}Internationalization:     Enabled.\n"
+			"{5}MIDI Hardware I/O:        {2}.\n"
+			"{5}Webcam support:           {3}.\n"
+			"{5}Webserver support:        {4}.\n"
+		),
+		PACKAGE,
+		VERSION,
+		input::Hardware::midiEnabled() ? "Enabled" : "Disabled",
+		Webcam::enabled() ? "Enabled" : "Disabled",
+		WebServer::enabled() ? "Enabled" : "Disabled",
+		SpdLogger::newLineDec
+	);
 }

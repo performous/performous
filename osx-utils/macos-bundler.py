@@ -21,6 +21,7 @@ brew_location = None
 opencv_prefix: Path = None
 openssl_prefix: Path = None
 ffmpeg_prefix: Path = None
+fmt_prefix : Path = None
 icu_root = ""
 openssl_root = ""
 script_prefix: Path = None
@@ -79,7 +80,7 @@ def check_installed_port(name : str, file : str) -> Optional[Path]:
 		return None
 
 def detect_prefix():
-	global opencv_prefix, script_prefix, openssl_prefix, ffmpeg_prefix, icu_root, openssl_root
+	global opencv_prefix, script_prefix, openssl_prefix, ffmpeg_prefix, fmt_prefix, icu_root, openssl_root
 	port_location = check_installed('port')
 	brew_location = check_installed('brew')
 	if port_location != None:
@@ -96,6 +97,13 @@ def detect_prefix():
 				ffmpeg_prefix = str(check_ffmpeg.parent)
 				print(f"--- FFMpeg {ffmpeg_version or '4'} detected at: " + str(ffmpeg_prefix) + "\n")
 				break
+		for fmt_version in ["11", "10", "9", "8", "7"]:
+			check_fmt = check_installed_port(f"libfmt{fmt_version}", "fmt-config.cmake")
+			if check_fmt != None:
+				fmt_prefix = str(check_fmt.parent)
+				print(f"--- LibFMT {fmt_version} detected at: " + str(fmt_prefix) + "\n")
+				break
+
 	else:
 		print("--- MacPorts does not appear to be installed.\n")
 	if brew_location != None:
@@ -368,6 +376,8 @@ if __name__ == "__main__":
 			prefix += (";" + str(openssl_prefix))
 		if ffmpeg_prefix != None:
 			prefix += (";" + str(ffmpeg_prefix))
+		if fmt_prefix != None:
+			prefix += (";" + str(fmt_prefix + "/cmake"))
 		command = fr"""
 		cmake \
 		{icu_root} \

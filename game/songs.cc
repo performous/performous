@@ -4,7 +4,7 @@
 #include "fs.hh"
 #include "i18n.hh"
 #include "json.hh"
-#include "libxml++-impl.hh"
+#include "libxml++.hh"
 #include "log.hh"
 #include "platform.hh"
 #include "profiler.hh"
@@ -85,41 +85,44 @@ void Songs::reload_internal() {
 		m_songs.clear();
 		m_dirty = true;
 	}
-	std::clog << "songs/notice: Starting to load all songs from cache." << std::endl;
-
+	SpdLogger::notice(LogSystem::CACHE, "Reading song cache file...");
 	Profiler prof("songloader");
 
 	auto cache = loadCache();
 
     prof("load-cache");
-
-	std::clog << "songs/notice: Done loading the cache." << std::endl;
-	std::clog << "songs/notice: Starting to load all songs from disk, to update the cache." << std::endl;
+	SpdLogger::notice(LogSystem::CACHE, "Finished reading the song cache. Will now check songs on disk to update it if necessary.");
 
 	Paths systemSongs = getPathsConfig("paths/system-songs");
 	Paths paths = getPathsConfig("paths/songs");
 	paths.insert(paths.begin(), systemSongs.begin(), systemSongs.end());
 
 	for (auto it = paths.begin(); m_loading && it != paths.end(); ++it) { //loop through stored directories from config
+		std::string msg{fmt::format("Scanning directory={}.", *it)};
 		try {
-			if (!fs::is_directory(*it)) { std::clog << "songs/info: >>> Not scanning: " << *it << " (no such directory)\n"; continue; }
-			std::clog << "songs/info: >>> Scanning " << *it << std::endl;
+			if (!fs::is_directory(*it)) {
+				SpdLogger::info(LogSystem::SONGS, "Not scanning directory={} (no such directory).", *it);
+				continue;
+			}
 			size_t count = loadedSongs();
 			reload_internal(*it, cache);
 			size_t diff = loadedSongs() - count;
-			if (diff > 0 && m_loading) std::clog << "songs/info: " << diff << " songs loaded\n";
+			if (diff > 0 && m_loading) {
+				fmt::format_to(std::back_inserter(msg), "\n{}Loaded {} songs.", SpdLogger::newLineDec, diff);
+				SpdLogger::info(LogSystem::SONGS, msg);
+			}
 		} catch (std::exception& e) {
-			std::clog << "songs/error: >>> Error scanning " << *it << ": " << e.what() << '\n';
+			fmt::format_to(std::back_inserter(msg), "\n{}Error scanning folder. Exception={}", SpdLogger::newLineDec, e.what());
+			SpdLogger::error(LogSystem::SONGS, msg);
 		}
 	}
 	prof("build-list");
 
 	if (m_loading) dumpSongs_internal(); // Dump the songlist to file (if requested)
-	std::clog << std::flush;
 	m_loading = false;
-	std::clog << "songs/notice: Done Loading. Loaded " << loadedSongs() << " Songs." << std::endl;
+	SpdLogger::notice(LogSystem::SONGS, "Done. Loaded {} songs.", loadedSongs());
 	CacheSonglist();
-	std::clog << "songs/notice: Done Caching." << std::endl;
+	SpdLogger::notice(LogSystem::SONGS, "Done updating cache.");
 	doneLoading = true;
 }
 
@@ -278,7 +281,7 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 	try {
 		std::regex expression(R"((\.txt|^song\.ini|^notes\.xml|\.sm)$)", std::regex_constants::icase);
 		if (fs::is_empty(parent)) {
-			std::clog << "songs/notice: Directory " << parent << " is empty. Skipping directory. " << '\n';
+			SpdLogger::notice(LogSystem::SONGS, "Empty directory={}, skipping from song search.", parent);
 			return;
 		}
 		auto iterator = fs::recursive_directory_iterator(parent, fs::directory_options::follow_directory_symlink);
@@ -289,7 +292,7 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 				continue;
 			}
 			if (iterator.depth() > maxDepth) {
-				std::clog << "songs/info: >>> Not scanning: " << parent.string() << " (maximum depth reached, possibly due to cyclic symlinks)\n";
+				SpdLogger::info(LogSystem::SONGS, ">>> Not scanning for songs on {}, maximum depth reached (possibly due to cyclic symlinks.)", parent);
 				continue;
 			}
 			fs::path p = dir.path();
@@ -302,19 +305,19 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 				if ( match != cache.end()) {
 					song = match->second;
 				} else {
-					std::clog << "songs/notice: Found song which was not in the cache: " << p.string() << std::endl;
+					SpdLogger::info(LogSystem::SONGS, "Found song={}, which was not present in the cache.", p);
 					song = std::make_shared<Song> (p);
 				}
 				std::unique_lock<std::shared_mutex> l(m_mutex);
 				m_songs.emplace_back(song); //put it in the database, if found twice will appear in double
 				m_database.addSong(song);
 				m_dirty = true;
-			} catch (SongParserException& e) {
-				std::clog << e;
+			} catch (SongParserException const& e) {
+				SpdLogger::warn(LogSystem::SONGS, "{}", e);
 			}
 		}
 	} catch (std::exception const& e) {
-		std::clog << "songs/error: Error accessing " << parent << ": " << e.what() << '\n';
+		SpdLogger::error(LogSystem::SONGS, "Error accessing {}. Exception={}", parent, e.what());
 	}
 }
 
@@ -558,7 +561,7 @@ namespace {
 				xmlpp::set_first_child_text(xmlpp::add_child_element(song, "cover"), coverlink);
 			}
 		} catch (std::exception& e) {
-			std::cerr << "Songlist error handling cover image: " << e.what() << std::endl;
+			SpdLogger::error(LogSystem::SONGS, "Error setting cover image for song={}({}). Exception={}", s.str(), s.path, e.what());
 		}
 	}
 

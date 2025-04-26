@@ -1,10 +1,13 @@
 #pragma once
 
 #include "chrono.hh"
+#include "log.hh"
+
+#include <fmt/format.h>
+
 #include <iomanip>
 #include <iostream>
 #include <map>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -22,14 +25,19 @@ struct ProfCP {
 	}
 };
 
-static inline std::ostream& operator<<(std::ostream& os, ProfCP const& cp) {
-	os << std::fixed << std::setprecision(1);
-	if (cp.samples == 0) return os << "no data";
-	if (cp.samples > 1) os << cp.samples << "x ";
-	os << cp.avg * 1000.0 << " ms";
-	if (cp.peak > 2.0 * cp.avg) os << " peak " << cp.peak * 1000.0 << " ms";
-	return os;
-}
+template <>
+struct fmt::formatter<ProfCP>: formatter<std::string_view> {
+	// Format function
+	template <typename FormatContext>
+	auto format(const ProfCP& cp, FormatContext& ctx) const{
+		std::string ret;
+		if (cp.samples == 0) ret = "No data.";
+		else if (cp.samples > 1) ret = fmt::format("Samples={}x", cp.samples);
+		fmt::format_to(std::back_inserter(ret), "{:.2f} ms average", cp.avg * 1000.0);
+		if (cp.peak > 2.0 * cp.avg) fmt::format_to(std::back_inserter(ret), " Peak={:.2f} ms", cp.peak * 1000.0);
+		return formatter<std::string_view>::format(ret, ctx);
+	}
+};
 
 /// @short A simple performance profiling tool
 class Profiler {
@@ -52,17 +60,16 @@ class Profiler {
 		m_checkpoints[tag].add(t);
 	}
 	/// Dump current stats to log and reset
-	void dump(std::string const& level = "debug") {
+	void dump() {
 		if (m_checkpoints.empty()) return;
-		if (level.empty()) { m_checkpoints.clear(); return; }
 		std::vector<Pair> cps(m_checkpoints.begin(), m_checkpoints.end());
 		m_checkpoints.clear();
 		std::sort(cps.begin(), cps.end(), cmpFunc);
-		std::ostringstream oss;
-		oss << "profiler-" << m_name << "/" << level << ":";
+		std::string prof{fmt::format("PROFILING {}::: ", m_name)};
 		for (std::vector<Pair>::const_iterator it = cps.begin(); it != cps.end(); ++it) {
-			oss << "  " << it->first << " (" << it->second << ")";
+			fmt::format_to(std::back_inserter(prof), "{}: ({}). ", it->first, it->second);
 		}
-		std::clog << oss.str() << std::endl;
+		
+		SpdLogger::debug(LogSystem::PROFILER, prof);
 	}
 };
