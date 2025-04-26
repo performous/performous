@@ -9,24 +9,27 @@
 #include <stdexcept>
 
 const unsigned Hiscore::MaximumScorePoints = 10000;
-const unsigned Hiscore::MinimumRecognizedScorePoints = 2000;
-const unsigned Hiscore::MaximumStoredScores = 16;
 
 bool Hiscore::reachedHiscore(unsigned score, SongId songid, unsigned short level, std::string const& track) const {
 	if (score > MaximumScorePoints) {
 		throw std::logic_error("Invalid score value, maximum is " + std::to_string(MaximumScorePoints) + " but got " + std::to_string(score));
 	}
-	if (score < MinimumRecognizedScorePoints) {
+	if (score < config["game/highscore_minimum_recognized_score_points"].ui()) {
 		return false; // come on, did you even try to sing?
 	}
 
 	unsigned position = 0;
 	for (auto const& elem: m_hiscore) {
-		if (elem.songid != songid) continue;
-		if (elem.track != track) continue;
-		if (elem.level != level) continue;
-		if (score > elem.score) return true;
-		if (++position >= MaximumStoredScores) return false;
+		if (elem.songid != songid)
+			continue;
+		if (elem.track != track)
+			continue;
+		if (elem.level != level)
+			continue;
+		if (score > elem.score)
+			return true;
+		if (config["game/highscore_limit_stored_scores"].b() && ++position >= config["game/highscore_maximum_stored_scores"].ui())
+			return false;
 	}
 	return true; // nothing found for that song -> true
 }
@@ -40,6 +43,12 @@ void Hiscore::addHiscore(HiscoreItem&& item) {
 		throw std::runtime_error("No track given");
 	if (!reachedHiscore(item.score, item.songid, item.level, item.track))
 		return;
+	m_hiscore.insert(std::move(item));
+}
+
+void Hiscore::addHiscoreUnconditionally(HiscoreItem&& item) {
+	if (item.track.empty())
+		throw std::runtime_error("No track given");
 	m_hiscore.insert(std::move(item));
 }
 
@@ -115,7 +124,7 @@ void Hiscore::load(xmlpp::NodeSet const& nodes) {
 			unixtime = std::chrono::seconds(stou(a_time->get_value()));
 		}
 
-		addHiscore({score, playerid, songid, level, a_track ? a_track->get_value() : "vocals", unixtime});
+		addHiscoreUnconditionally({score, playerid, songid, level, a_track ? a_track->get_value() : "vocals", unixtime});
 	}
 }
 

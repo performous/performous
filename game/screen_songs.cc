@@ -356,7 +356,8 @@ void ScreenSongs::draw() {
 std::string ScreenSongs::getHighScoreText() const {
 	auto const scores = m_database.queryPerSongHiscore(m_songs.currentPtr());
 	auto const datetimeFormat = config["game/datetime_format"].so();
-	auto const maxLines = 8;
+	// allows for example for 16 entries for a single track
+	auto const maxLines = 17;
 
 	// Reorder hiscores by track / score
 	std::map<std::string, std::multiset<HiscoreItem>> scoresByTrack;
@@ -379,17 +380,27 @@ std::string ScreenSongs::getHighScoreText() const {
 	auto stream = std::stringstream();
 	auto n = 0;
 	for (auto const& [track, scores]: scoresByTrack) {
+		if (n + 2 >= maxLines)
+			break; // don't print a track if no scores for it would be printed
 		stream << track << ":\n";
+		++n;
+
 		for (auto const& score: scores) {
 			scoreFormatter(stream, score.score);
 			playerFormatter(stream, score.playerid);
 			timeFormatter(stream, score.unixtime);
 			stream << "\n";
+			++n;
+			if (n >= maxLines)
+				break;
 		}
-		stream << "\n";
-		if(++n == maxLines) {
+
+		if (n >= maxLines)
 			break;
-		}
+		stream << "\n";
+		++n;
+		if (n >= maxLines)
+			break;
 	}
 
 	return stream.str();
