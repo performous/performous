@@ -15,6 +15,7 @@ extern "C" {
 }
 
 Song::Song(nlohmann::json const& song) : dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()) {
+	id = getJsonEntry<SongId>(song, "id");
     path = getJsonEntry<std::string>(song, "txtFileFolder").value_or("");
     filename = getJsonEntry<std::string>(song, "txtFile").value_or("");
     artist = getJsonEntry<std::string>(song, "artist").value_or("");
@@ -51,7 +52,6 @@ Song::Song(nlohmann::json const& song) : dummyVocal(TrackName::VOCAL_LEAD), rand
     music[TrackName::GUITAR_COOP] = getJsonEntry<std::string>(song, "guitarCoop").value_or("");
     music[TrackName::GUITAR_RHYTHM] = getJsonEntry<std::string>(song, "guitarRhythm").value_or("");
     loadStatus = static_cast<Song::LoadStatus>(getJsonEntry<int>(song, "loadStatus").value_or(1));
-    //loadStatus = Song::LoadStatus::HEADER;
 
 	collateByTitle = getJsonEntry<std::string>(song, "collateByTitle").value_or("");
 	collateByTitleOnly = getJsonEntry<std::string>(song, "collateByTitleOnly").value_or("");
@@ -94,12 +94,12 @@ Song::Song(fs::path const& filename):
 }
 
 void Song::reload(bool errorIgnore) {
-    try { 
-        *this = Song(filename); 
+    try {
+        *this = Song(filename);
     }
-    catch (...) { 
-        if (!errorIgnore) 
-            throw; 
+    catch (...) {
+        if (!errorIgnore)
+            throw;
     }
 }
 

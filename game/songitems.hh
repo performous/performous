@@ -19,8 +19,6 @@ struct SongItemsException: public std::runtime_error {
 	{}
 };
 
-using SongId = unsigned;
-
 struct SongItem
 {
 	SongId id = 0; ///< The unique id for every song
@@ -63,7 +61,7 @@ private:
 class SongItems {
 public:
 	void load(xmlpp::NodeSet const& n);
-	void save(xmlpp::Element *players);
+	void save(xmlpp::Element* songs);
 
 	/**Adds a song item.
 	  If the id does not exist or is not unique, a new one will be assigned.
@@ -73,35 +71,26 @@ public:
 	SongId addSongItem(std::string const& artist, std::string const& title, bool broken = false, std::optional<SongId> id = std::nullopt);
 	/**Adds or Links an already existing song with an songitem.
 
-	  The id will be assigned and artist and title will be filled in.
+	  The ID will be assigned.
 	  If there is already a song with the same artist and title the existing
 	  will be used.
-
-	  Afterwards the pointer to the song will be stored for entire available
-	  song information.
-
-	  lookup is used internally to achieve that.
+	  @return the ID which has been determined for the given song.
 	  */
-	void addSong(std::shared_ptr<Song> song);
+	SongId addSong(SongPtr song);
 
-	/**Lookup a songid for a specific song.
-	  @return a value only if a song was found.*/
-	std::optional<SongId> lookup(std::shared_ptr<Song> song) const { if (song) return lookup(*song); return std::nullopt; };
-	std::optional<SongId> lookup(Song const& song) const;
 
-	SongId getSongId(SongPtr const&) const;
+	/**Lookup the ID for a specific song.
+	  @return the song ID if a song could be found.
+	  */
+	std::optional<SongId> resolveToSongId(Song const& song) const;
 	SongPtr getSong(SongId) const;
 
-	/**Lookup the artist + title for a specific song.
-	  @return "Unknown Song" if nothing is found.
-	  */
-	std::optional<std::string> lookup (const SongId& id) const;
-
-	std::size_t size() const { return m_songs.size(); }
+	std::size_t size() const { return m_songs_map.size(); }
 
 private:
 	SongId assign_id_internal() const;
+	static bool match_artist_and_title_internal(Song const& song, SongItem const& songItem) ;
 
-	using songs_t = std::set<SongItem>;
-	songs_t m_songs;
+	using songs_map_t = std::unordered_map<SongId, SongItem>;
+	songs_map_t m_songs_map;
 };
