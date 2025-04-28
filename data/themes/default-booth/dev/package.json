@@ -1,0 +1,25 @@
+{
+  "name": "performous-web-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "build:watch": "vue-tsc -b && vite build --watch",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@vueuse/core": "^13.1.0",
+    "vue": "^3.5.13",
+    "vuex": "^4.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.2",
+    "@vitejs/plugin-vue": "^5.2.2",
+    "@vue/tsconfig": "^0.7.0",
+    "typescript": "~5.7.2",
+    "vite": "^6.3.1",
+    "vue-tsc": "^2.2.8"
+  }
+}
