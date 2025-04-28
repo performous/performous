@@ -31,7 +31,7 @@ async function init(): Promise<void> {
 
     const query: string[] = [];
     
-    query.push(`sort=${screenQuery?.sort || 'artist'}`);
+    query.push(`sort=${screenQuery?.sort ? screenQuery.sort : 'artist'}`);
     query.push(`order=${screenQuery?.descending ? 'descending' : 'ascending'}`)
 
     if (screen === 'search' && screenQuery?.search) {
