@@ -15,7 +15,10 @@ const progress = computed(() => {
     const position = Math.floor(song.value.Position);
     const withHour = length >= 3600;
 
-    return `${duration(position, withHour)} / ${duration(length, withHour)}`;
+    const positionTime = duration(position, withHour);
+    const lengthTime = duration(length, withHour);
+
+    return `${positionTime} / ${lengthTime}`;
 });
 </script>
 

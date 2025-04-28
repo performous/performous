@@ -21,8 +21,8 @@ export function storeDatabase(state: State, value: Song[]): void {
         }
     });
 
-    state.folders = folders.sort();
-    state.languages = languages.sort();
+    state.folders = folders.toSorted((a, b) => a.localeCompare(b));
+    state.languages = languages.toSorted((a, b) => a.localeCompare(b));
 }
 
 export function storeLanguage(state: State, value: StringDict): void {

@@ -15,8 +15,6 @@ const headPlugin = () => {
 
 // https://vite.dev/config/
 export default ({ command } : { command:string }) => {
-  // Object.assign(process.env, loadEnv(mode, process.cwd()));
-  
   return defineConfig({
     plugins: [
       vue(),
