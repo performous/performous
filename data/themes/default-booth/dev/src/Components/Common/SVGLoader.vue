@@ -15,9 +15,7 @@ const svgComponent = ref<VNode|null>(null);
 function parseSVG(nodes:HTMLCollection):VNode[] {
     const components:VNode[] = [];
 
-    for (let index = 0; index < nodes.length; index += 1) {
-        const node:Element = nodes[index];
-        
+    Array.from(nodes).forEach((node:Element) => {
         const name = node.nodeName;
         const attributes:Data = {};
         for (const attribute of node.attributes) {
@@ -26,7 +24,8 @@ function parseSVG(nodes:HTMLCollection):VNode[] {
         const children:VNode[] = node.children.length ? parseSVG(node.children) : [];
 
         components.push(h(name, attributes, children));
-    }
+    });
+
     return components;
 }
 
@@ -38,23 +37,20 @@ async function loadSVG(file:string|null) {
         svgComponent.value = null;
         return;
     }
-    try {
-        const res = await fetch(file);
-        if (!res.ok) {
-            throw new Error();
-        }
-        const svg = await res.text();
-
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(svg, 'image/svg+xml');
-
-        svgComponent.value = parseSVG(doc.children)[0];
-        isLoading.value = false;
-        isLoaded.value = true;
-    } catch (_e) {
+    const res = await fetch(file);
+    if (!res.ok) {
         isLoading.value = false;
         svgComponent.value = null;
+        return;
     }
+    const svg = await res.text();
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svg, 'image/svg+xml');
+
+    svgComponent.value = parseSVG(doc.children)[0];
+    isLoading.value = false;
+    isLoaded.value = true;
 }
 
 watch(url, loadSVG);

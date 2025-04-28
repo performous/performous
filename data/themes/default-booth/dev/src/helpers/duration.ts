@@ -1,4 +1,7 @@
 export default function duration(time: number, withHour: boolean = false) {
-    const seconds = Math.floor(time);
-    return `${withHour ? `${Math.floor(seconds / 3600)}:` : ''}${`${Math.floor(seconds / 60) % 60}`.padStart(2, '0')}:${`${seconds % 60}`.padStart(2, '0')}`;
+    const timeSeconds = Math.floor(time);
+    const hours = withHour ? `${Math.floor(timeSeconds / 3600)}:` : '';
+    const minutes = `${Math.floor(timeSeconds / 60) % 60}`.padStart(2, '0');
+    const seconds = `${timeSeconds % 60}`.padStart(2, '0');
+    return `${hours}${minutes}:${seconds}`;
 }

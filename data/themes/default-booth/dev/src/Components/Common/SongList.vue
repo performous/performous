@@ -1,15 +1,9 @@
 <script setup>
-import { computed, onMounted, ref, useTemplateRef } from 'vue';
+import { computed, ref, useTemplateRef } from 'vue';
 import { useStore } from 'vuex';
 import { useIntersectionObserver } from '@vueuse/core';
 
 import SortIcon from './SongList/SortIcon.vue';
-import ArrowDown from '../Icons/ArrowDownIcon.vue';
-import ArrowUp from '../Icons/ArrowUpIcon.vue';
-import ArrowUpDown from '../Icons/ArrowUpDownIcon.vue';
-import Cross from '../Icons/CrossIcon.vue';
-import Play from '../Icons/PlayIcon.vue';
-import Plus from '../Icons/PlusIcon.vue';
 import TriangleAlert from '../Icons/TriangleAlertIcon.vue';
 import Dialog from './SongList/Dialog.vue';
 

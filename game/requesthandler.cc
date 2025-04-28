@@ -55,7 +55,7 @@ void RequestHandler::HandleFile(web::http::http_request request, std::string fil
 			bool isValid = false;
 
 			for (std::string check : subFolderChecks) {
-				if (folderCheck.rfind(check, 0)) {
+				if (folderCheck.rfind(check, 0) != std::string::npos) {
 					isValid = true;
 					break;
 				}
