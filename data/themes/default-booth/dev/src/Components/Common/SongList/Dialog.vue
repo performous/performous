@@ -80,11 +80,11 @@ onMounted(() => {
                         <CrossIcon />
                         <p>Remove from queue</p>
                     </button>
-                    <button type="button" @click="move(index - 1)" v-if="index && index > 0">
+                    <button type="button" @click="move(index - 1)" v-if="(index || index === 0) && index > 0">
                         <ArrowUpIcon />
                         <p>Move song up</p>
                     </button>
-                    <button type="button" @click="move(index + 1)" v-if="index && index < (songs.length - 1)">
+                    <button type="button" @click="move(index + 1)" v-if="(index || index === 0) && index < (songs.length - 1)">
                         <ArrowDownIcon />
                         <p>Move song down</p>
                     </button>
