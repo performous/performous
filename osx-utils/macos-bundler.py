@@ -24,6 +24,7 @@ ffmpeg_prefix: Path = None
 fmt_prefix : Path = None
 icu_root = ""
 openssl_root = ""
+brew_prefix: Path = None
 script_prefix: Path = None
 performous_source_dir = None
 
@@ -80,7 +81,7 @@ def check_installed_port(name : str, file : str) -> Optional[Path]:
 		return None
 
 def detect_prefix():
-	global opencv_prefix, script_prefix, openssl_prefix, ffmpeg_prefix, fmt_prefix, icu_root, openssl_root
+	global opencv_prefix, script_prefix, openssl_prefix, ffmpeg_prefix, fmt_prefix, icu_root, openssl_root, brew_prefix
 	port_location = check_installed('port')
 	brew_location = check_installed('brew')
 	if port_location != None:
@@ -107,6 +108,7 @@ def detect_prefix():
 	else:
 		print("--- MacPorts does not appear to be installed.\n")
 	if brew_location != None:
+		brew_prefix = subprocess.run(args = ["brew", "--prefix"], encoding="utf-8", capture_output=True).stdout.replace("\n", "")
 		print("--- Homebrew install detected at: " + str(brew_location))
 		for opencv_version in ["4", "3"]:
 			check_opencv = check_brew_formula("opencv@{opencv_version}", "OpenCVConfig.cmake")
@@ -146,14 +148,15 @@ def detect_prefix():
 				print("\n--- WARNING: Homebrew requested, but not found: defaulting to MacPorts install.\n")
 				script_prefix = port_location.parent.parent
 				return
-
+			script_prefix = brew_prefix
 		elif arguments["--prefer-macports"] == True:
 			if port_location == None and brew_location != None:
 				print("\n--- WARNING: Macports requested, but not found: defaulting to Homebrew install.\n")
-				script_prefix = brew_location.parent.parent
+				script_prefix = brew_prefix
 				return
+			script_prefix = port_location.parent.parent
 		else:
-			script_prefix = port_location.parent.parent if port_location != None else brew_location.parent.parent
+			script_prefix = port_location.parent.parent if port_location != None else brew_prefix
 
 def ask_user(prompt : str, opt1 : str = "y", opt2 : str = "n") -> bool:
 	stdin = sys.stdin.fileno()
@@ -369,10 +372,12 @@ if __name__ == "__main__":
 	print("--- Performous output folder: " + str(performous_out_dir) + "\n")
 	
 	if arguments["--no-regenerate"] != True:
-		prefix = str(script_prefix)
+		prefix = ""
+		if script_prefix != None:
+			prefix += str(script_prefix)
 		if opencv_prefix != None:
 			prefix += (";" + str(opencv_prefix))
-		if openssl_prefix != None:
+		if openssl_prefix != None and brew_prefix != None and arguments["--prefer-macports"] != True:
 			prefix += (";" + str(openssl_prefix))
 		if ffmpeg_prefix != None:
 			prefix += (";" + str(ffmpeg_prefix))
