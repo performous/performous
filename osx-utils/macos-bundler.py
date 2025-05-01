@@ -202,7 +202,7 @@ def clean_build_dir():
 	performous_build_dir.mkdir(mode=0o755, exist_ok=True)
 
 def create_dmg(fancy: bool = True):
-	outFile = (performous_out_dir / ("Performous-" + package_version + ".dmg"))
+	outFile = (performous_out_dir / (f"Performous-{package_version}-{arguments['--arch']}.dmg"))
 	dmgDefines = {
 		'app':str(performous_out_dir / 'Performous.app'),
 		'background':str(performous_source_dir / 'osx-utils/resources/dmg-bg.png'),
@@ -247,7 +247,7 @@ def bundle_libs():
 usageHelp = f"""\nPerformous macOS Bundler
 
 Usage:
-	macos_bundler.py [--arch <architecture>]... [--prefer-macports | --prefer-homebrew] [options]
+	macos_bundler.py [--arch <architecture>] [--prefer-macports | --prefer-homebrew] [options]
 	macos_bundler.py [options]
 
 Options:
@@ -267,7 +267,7 @@ Options:
 	--script-debug  Print the resolved arguments and options passed to this utility.
 
 Environment:
-	--arch <architecture>...  Target architecture names passed to the compiler. Defaults to the currently detected architecture as reported by uname. [default: {uname().machine}] 
+	--arch <architecture>  Target architecture name passed to the compiler. Defaults to the currently detected architecture as reported by uname. [default: {uname().machine}] 
 	--cc <path/to/compiler>  Change C compiler [default: /usr/bin/clang]
 	--cxx <path/to/compiler>  Change C compiler [default: /usr/bin/clang++]
 	--internal-aubio <auto | always | never>  Find previously installed aubio on system [default: auto]
@@ -405,7 +405,7 @@ if __name__ == "__main__":
 		-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING={arguments['--target']} \
 		-DCMAKE_C_COMPILER:PATH="{arguments['--cc']}" \
 		-DCMAKE_CXX_COMPILER:PATH="{arguments['--cxx']}" \
-		-DCMAKE_OSX_ARCHITECTURES="{";".join(arguments['--arch'])}" \
+		-DCMAKE_OSX_ARCHITECTURES="{arguments['--arch']}" \
 		-DCMAKE_XCODE_GENERATE_SCHEME:BOOL={xcode_gen_scheme} \
 		-DPERFORMOUS_VERSION:STRING="{package_version}" \
 		-DPERFORMOUS_SEMVER:STRING="{semVersion}" \
