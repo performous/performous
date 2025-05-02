@@ -29,7 +29,6 @@ jobs:
     runs-on: '${{ matrix.os }}'
     env:
       MACOS_DEPS: >-
-        aubio
         boost187
         boost
         cairo
@@ -89,7 +88,14 @@ jobs:
         id: restore_cache
         uses: Lord-Kamina/always-upload-cache/restore@refresh-cache
         with:
-          path: /opt/local
+          path: |
+            /opt/local
+            /Applications/MacPorts
+            !/opt/local/libexec/macports
+            !/opt/local/bin/port
+            !/opt/local/bin/portindex
+            !/opt/local/bin/portmirror
+            !/opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/base
           key: macports-${{matrix.os}}-${{ hashFiles('./cache-key.txt') }}
 
       - name: Unlink Homebrew
@@ -108,28 +114,31 @@ jobs:
           else
             echo buildfromsource always | tee -a /opt/local/etc/macports/macports.conf
           fi
-          sudo port install zlib
-          sudo port -b install libiconv gperf libtextstyle ncurses
-          sudo port install gettext icu 
-          sudo port -b install $(port echo rdepof:openssl | xargs) 
-          sudo port install openssl
+          sudo port install zlib boost.version=1.87
+          sudo port -b install libiconv gperf libtextstyle ncurses boost.version=1.87
+          sudo port install gettext icu  boost.version=1.87
+          sudo port -b install $(port echo rdepof:openssl | xargs)  boost.version=1.87
+          sudo port install openssl boost.version=1.87
           sudo port selfupdate
+          sudo portindex -f /opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/ports/ 
           echo "What depends on clangs?" 
           echo "Clang-14: $(port echo depends:clang-14 | xargs)"
           echo "Clang-17: $(port echo depends:clang-17 | xargs)"
           echo "Clang-19: $(port echo depends:clang-19 | xargs)"
           echo "Clang-20: $(port echo depends:clang-20 | xargs)"
           if [[ "${{ steps.restore_cache.outputs.cache-hit }}" != "true" ]]; then
-            sudo port -b install cmake python312 python313 clang-14 clang-17 clang-19 clang-20 gcc14 help2man +perl5_34 meson perl5.34 pkgconfig
+            sudo port -b install cmake python312 python313 clang-14 clang-17 clang-19 clang-20 gcc14 help2man +perl5_34 meson perl5.34 pkgconfig boost.version=1.87
           fi
 
-          sudo port install glib2
+          sudo port install glib2 boost.version=1.87
 
           if [[ "${{ steps.restore_cache.outputs.cache-hit }}" != "true" ]]; then
-            sudo port -b install $(port echo rdepof:shared-mime-info | xargs) shared-mime-info rust cargo
+            sudo port -b install $(port echo rdepof:shared-mime-info | xargs) shared-mime-info rust cargo boost.version=1.87
 
           fi
-          sudo port -v install ${MACOS_DEPS}
+          sudo port -v install ffmpeg7 boost.version=1.87
+          sudo ln -sf /opt/local/libexec/ffmpeg7/lib/libavcodec.dylib /opt/local/lib/libavcodec.dylib
+          sudo port -v install ${MACOS_DEPS} 
           echo "Installed ports: "
           port installed
           echo "Port leaves: "
@@ -144,6 +153,11 @@ jobs:
           path: |
             /opt/local
             /Applications/MacPorts
+            !/opt/local/libexec/macports
+            !/opt/local/bin/port
+            !/opt/local/bin/portindex
+            !/opt/local/bin/portmirror
+            !/opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/base
           key: macports-${{matrix.os}}-${{ hashFiles('./cache-key.txt') }}
 
       - name: Build package
