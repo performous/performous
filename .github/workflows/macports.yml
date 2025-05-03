@@ -12,6 +12,10 @@ on:
         description: 'The output of the "create_release" job from the build_and_release.yml workflow'
         required: true
         type: string
+      boost_version:
+        required: false
+        type: string
+        default: "1.87"
     secrets:
       NGROK_SSH_TOKEN:
         description: 'Token for SSH debug'
@@ -29,11 +33,10 @@ jobs:
     runs-on: '${{ matrix.os }}'
     env:
       MACOS_DEPS: >-
-        boost187
-        boost
+        boost boost.version=${{ inputs.boost_version }}
         cairo
         cmake
-        cpprestsdk
+        cpprestsdk boost.version=${{ inputs.boost_version }}
         dylibbundler
         ffmpeg7
         fftw-3-single
@@ -54,7 +57,6 @@ jobs:
         pango
         portaudio
         portmidi
-        boost.version=1.87
     steps:
       - name: Checkout Git
         id: checkout_git
@@ -75,12 +77,38 @@ jobs:
           echo buildmakejobs 0 | tee -a /opt/local/etc/macports/macports.conf
           echo startupitem_type none | tee -a /opt/local/etc/macports/macports.conf
           echo build_arch $(uname -m) | tee -a /opt/local/etc/macports/macports.conf
+          echo boost.version ${{ inputs.boost_version }} | tee -a /opt/local/etc/macports/macports.conf
+
+          sudo mkdir -p /opt/custom_portfiles/www/
+          sudo cp -Rvf $(dirname $(port file cpprestsdk)) /opt/custom_portfiles/www/
+          sudo mkdir -p /opt/custom_portfiles/www/cpprestsdk/files
+
+          sudo cp -vf ./performous/.github/support-boost-1.87.patch /opt/custom_portfiles/www/cpprestsdk/files/
+
+          sudo cat <<EOF | sudo tee -a /opt/custom_portfiles/www/cpprestsdk/Portfile
+            patchfiles-append support-boost-1.87.patch
+            configure.args-append -DCPPREST_EXCLUDE_WEBSOCKETS=ON
+            depends_build-delete port:websocketpp
+          EOF
+          
+          echo "sources.conf before: "
+          cat /opt/local/etc/macports/sources.conf
+          
+          sudo cat <<EOF | sudo tee /opt/local/etc/macports/sources.conf
+          file:///opt/custom_portfiles [nosync]
+          rsync://rsync.macports.org/macports/release/tarballs/ports.tar [default]
+          EOF
+          
+          echo "sources.conf after: "
+          cat /opt/local/etc/macports/sources.conf
+          
+          sudo portindex /opt/custom_portfiles
 
       - name: Determine cache key
         run: |
           echo macOS $(sw_vers -productVersion | cut -f1 -d.) | tee ./cache-key.txt
           echo CPU Type: $(uname -m) | tee -a ./cache-key.txt
-          port info --fullname all and \( ${MACOS_DEPS} \)  | grep -v -e'^--$' | cut -w -f2-3 | tee -a ./cache-key.txt
+          port info --fullname ${MACOS_DEPS} boost.version=${{ inputs.boost_version }} | grep -v -e'^--$' | cut -w -f2-3 | tee -a ./cache-key.txt
           echo contents of cache-key-file: 
           cat ./cache-key.txt
 
@@ -110,46 +138,66 @@ jobs:
         # and to install from packaged binaries everything else we need but not at runtime (i.e. cmake and various versions of python and/or compilers)
         run: |
           set -x
-          sudo port rdependents boost*
           if [[ "${{ steps.restore_cache.outputs.cache-hit }}" == "true" ]]; then
             sudo port sync
+            sudo port activate installed
+
             echo buildfromsource never | tee -a /opt/local/etc/macports/macports.conf
           else
+            sudo portindex -f /opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/ports
+            sudo portindex /opt/custom_portfiles
+
             echo buildfromsource always | tee -a /opt/local/etc/macports/macports.conf
           fi
-          sudo port install zlib boost.version=1.87
-          sudo port -b install libiconv gperf libtextstyle ncurses boost.version=1.87
-          sudo port install gettext icu  boost.version=1.87
-          sudo port -b install $(port echo rdepof:openssl | xargs)  boost.version=1.87
-          sudo port install openssl boost.version=1.87
-          sudo portindex -f /opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/ports/ 
-          echo "What depends on clangs?" 
-          echo "Clang-14: $(port echo depends:clang-14 | xargs)"
-          echo "Clang-17: $(port echo depends:clang-17 | xargs)"
-          echo "Clang-19: $(port echo depends:clang-19 | xargs)"
-          echo "Clang-20: $(port echo depends:clang-20 | xargs)"
-          if [[ "${{ steps.restore_cache.outputs.cache-hit }}" != "true" ]]; then
-            sudo port -b install cmake python312 python313 clang-14 clang-17 clang-19 clang-20 gcc14 help2man +perl5_34 meson perl5.34 pkgconfig boost.version=1.87
-          fi
-
-          sudo port install glib2 boost.version=1.87
+          sudo port install zlib boost.version=${{ inputs.boost_version }}
+          sudo port -b install libiconv gperf libtextstyle ncurses boost.version=${{ inputs.boost_version }}
+          sudo port install boost boost.version=${{ inputs.boost_version }}
+          sudo port install gettext icu  boost.version=${{ inputs.boost_version }}
+          sudo port -b install $(port echo rdepof:openssl | xargs) boost.version=${{ inputs.boost_version }}
+          sudo port install openssl boost.version=${{ inputs.boost_version }} 
 
           if [[ "${{ steps.restore_cache.outputs.cache-hit }}" != "true" ]]; then
-            sudo port -b install $(port echo rdepof:shared-mime-info | xargs) shared-mime-info rust cargo boost.version=1.87
-
+            sudo port -b install cmake python311 python312 python313 clang-17 gcc14 clang-20 help2man +perl5_34 meson perl5.34 pkgconfig boost.version=${{ inputs.boost_version }}
           fi
-          sudo port -v install ffmpeg7 boost.version=1.87
+
+          sudo port install glib2 boost.version=${{ inputs.boost_version }}
+
+          if [[ "${{ steps.restore_cache.outputs.cache-hit }}" != "true" ]]; then
+            sudo port -b install $(port echo rdepof:shared-mime-info | xargs) shared-mime-info rust cargo gmake nasm boost.version=${{ inputs.boost_version }}
+          fi
+
+          sudo port install x265 boost.version=${{ inputs.boost_version }} build.makejobs=1
+          sudo port install ffmpeg7 boost.version=${{ inputs.boost_version }}
           sudo ln -sf /opt/local/libexec/ffmpeg7/lib/libavcodec.dylib /opt/local/lib/libavcodec.dylib
-          sudo port -v install ${MACOS_DEPS} 
+
+          sudo port install ${MACOS_DEPS} boost.version=${{ inputs.boost_version }}
           echo "Installed ports: "
           port installed
-          echo "Port leaves: "
-          port echo leaves
+
           sudo port uninstall gcc14 clang* llvm* python310 python311
           sudo port clean --all installed
+          
+          # Deactivate everything before caching, in order to reduce the cache size.
+          sudo port deactivate installed
+
+      - name: Get logs from last failed job
+        if: ${{ failure() && !cancelled() }}
+        id: get-logs
+        run: |
+          cd /opt/local/var/macports
+          tar -czf ./MacPorts-log-${{ matrix.os }}.tar.gz ./logs
+          echo "log_path=/opt/local/var/macports/MacPorts-log-${{ matrix.os }}.tar.gz" >> $GITHUB_OUTPUT
+
+      - name: Upload logs
+        if: ${{ steps.get-logs.outputs.log_path != null && failure() }}
+        id: upload-logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: "MacPorts-log-${{ matrix.os }}.tar.gz"
+          path: "${{ steps.get-logs.outputs.log_path }}"
 
       - name: Start SSH session
-        if: true
+        if: false
         id: ssh_debug
         uses: luchihoratiu/debug-via-ssh@main
         with:
@@ -174,6 +222,7 @@ jobs:
       - name: Build package
         id: build_package
         run: |
+          sudo port activate installed
           cd performous/osx-utils
           chmod +x ./macos-bundler.py
           python3 -m venv ./bundler-venv
