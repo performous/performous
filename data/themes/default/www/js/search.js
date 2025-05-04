@@ -55,6 +55,7 @@ $("#search-database").click(function (e, callback) {
                 songMeta += songObject.Edition.length > 0 ? " | " + songObject.Edition : "";
                 songMeta += songObject.ProvidedBy.length > 0 ? " | " + songObject.ProvidedBy : "";
                 songMeta += songObject.Comment.length > 0 ? " | " + songObject.Comment : "";
+                songMeta += songObject.Tags.length > 0 ? " | " + songObject.Tags : "";
                 var errorMeta = songObject.HasError ? "⚠️" : "";
                 $("#searched-songs").append("<a href=\"#\" id=\"searched-songs-" + iterator + "\" class=\"list-group-item\" >" + errorMeta + songObject.Artist + " - " + songObject.Title + songMeta + "<span class=\"glyphicon glyphicon-plus\"></span></a>");
                 $("#searched-songs-" + iterator).data("songObject", JSON.stringify(songObject));
@@ -90,6 +91,7 @@ $("#search-database").click(function (e, callback) {
                 songMeta += songObject.App.length > 0 ? " | " + songObject.App : "";
                 songMeta += songObject.AppVersion.length > 0 ? " | " + songObject.AppVersion : "";
                 songMeta += songObject.Comment.length > 0 ? " | " + songObject.Comment : "";
+                songMeta += songObject.Tags.length > 0 ? " | " + songObject.Tags : "";
                 var errorMeta = songObject.HasError ? "⚠️" : "";
                 $("#searched-songs").append("<a href=\"#\" id=\"searched-songs-" + iterator + "\" class=\"list-group-item\" >" + errorMeta + songObject.Artist + " - " + songObject.Title + songMeta + "<span class=\"glyphicon glyphicon-plus\"></span></a>");
                 $("#searched-songs-" + iterator).data("songObject", JSON.stringify(songObject));
