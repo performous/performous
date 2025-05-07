@@ -3,9 +3,9 @@ import SVGLoader from '../Common/SVGLoader.vue';
 import Brand from './Header/Brand.vue';
 defineEmits(['switch']);
 const contentList = {
-    folders: 'List',
-    search: 'Search',
-    playlist: 'Queue',
+    folders: 'list',
+    search: 'search',
+    playlist: 'queue',
 };
 </script>
 
@@ -21,7 +21,7 @@ const contentList = {
             :key
             href="#"
             @click.prevent="$emit('switch', key)">
-            {{ label }}
+            {{ $translate(label) }}
         </a>
         <div class="spacer"></div>
     </header>

@@ -61,6 +61,10 @@ export async function playSong({ dispatch }: { dispatch: Dispatch }, song: Song|
     dispatch('refreshPlaylist');
 }
 
+export async function skipSong(): Promise<void> {
+    await getApi('skip');
+}
+
 export async function addSong({ dispatch }: { dispatch: Dispatch }, song: Song): Promise<void> {
     console.log(song);
     await postApi('add', song);
