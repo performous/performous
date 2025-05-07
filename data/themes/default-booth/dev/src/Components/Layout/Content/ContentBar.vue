@@ -4,13 +4,13 @@ import { inject } from 'vue';
 const content = inject('content');
 
 const buttons = {
-    "folders": "Playlists",
-    "languages": "Languages"
+    "folders": "playlists",
+    "languages": "languages"
 };
 </script>
 <template>
     <div class="content-bar">
-        <button v-for="(label, cat) in buttons" type="button" @click="content = cat" :disabled="content === cat">{{ label }}</button>
+        <button v-for="(label, cat) in buttons" type="button" @click="content = cat" :disabled="content === cat">{{ $translate(label) }}</button>
     </div>
 </template>
 
