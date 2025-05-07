@@ -257,6 +257,24 @@ void RequestHandler::Get(web::http::http_request request)
 		request.reply(web::http::status_codes::OK, songObject);
 		return;
 	}
+	else if (path == "/api/skip") {
+		try {
+			m_game.activateScreen("Playlist");
+
+			request.reply(web::http::status_codes::OK, "success");
+			return;
+		}
+		catch (web::json::json_exception const& e) {
+			std::string str = std::string("JSON Exception: ") + e.what();
+			request.reply(web::http::status_codes::BadRequest, str);
+			return;
+		}
+		catch (const std::exception& e) {
+			std::string str = std::string("Exception: ") + e.what();
+			request.reply(web::http::status_codes::BadRequest, str);
+			return;
+		}
+	}
 	else {
 		HandleFile(request);
 	}

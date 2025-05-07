@@ -5,7 +5,7 @@ import { useIntersectionObserver } from '@vueuse/core';
 
 import SortIcon from './SongList/SortIcon.vue';
 import TriangleAlert from '../Icons/TriangleAlertIcon.vue';
-import Dialog from './SongList/Dialog.vue';
+import SongDialog from './SongList/SongDialog.vue';
 
 const { songs } = defineProps({
     songs: {
@@ -98,7 +98,7 @@ function setCurrentSong(song, index) {
 
 </script>
 <template>
-    <Dialog ref="dialog" v-model:song="currentSong" v-model:index="songIndex" :songs :playlist />
+    <SongDialog ref="dialog" v-model:song="currentSong" v-model:index="songIndex" :songs :playlist />
     <table class="song-list">
         <thead>
             <tr class="bg-primary-bg text-primary-fg leading-4 *:[th]:text-left *:[th]:p-2">
@@ -107,10 +107,10 @@ function setCurrentSong(song, index) {
                 <th class="creator" @click="setSort('creator')"><SortIcon type="creator" />{{ $translate('creator') }}</th>
                 <template v-if="!playlist">
                     <th class="edition" @click="setSort('edition')"><SortIcon type="edition" />{{ $translate('edition') }}</th>
-                    <th class="comment">Comment</th>
+                    <th class="comment">{{ $translate('comment') }}</th>
                 </template>
-                <th class="year">Year</th>
-                <th class="wait-time" v-if="playlist">Wait time</th>
+                <th class="year">{{ $translate('year') }}</th>
+                <th class="wait-time" v-if="playlist">{{ $translate('wait_time') }}</th>
             </tr>
         </thead>
         <tbody class="*:[tr]:even:bg-secondary-bg *:[tr]:even:text-secondary-fg *:[tr]:cursor-pointer *:[tr]:hover:bg-hover-bg *:[tr]:hover:text-hover-fg **:[td]:text-left **:[td]:p-2">
