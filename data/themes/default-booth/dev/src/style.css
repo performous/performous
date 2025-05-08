@@ -1,0 +1,88 @@
+/* Preflight */
+
+*,
+::after,
+::before,
+::backdrop,
+::file-selector-button {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border: 0 solid;
+}
+
+html {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-general-fg);
+  background-color: var(--color-general-bg);
+  font-family: var(--font-display);
+}
+
+body {
+  color: var(--color-general-fg);
+  background-color: var(--color-general-bg);
+}
+
+a, a:hover, a:focus, a:visited {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+button {
+  background: inherit;
+  border: inherit;
+  color: inherit;
+  outline: inherit;
+  font-family: inherit;
+}
+
+button:focus {
+  outline: inherit;
+}
+
+img,
+svg {
+  display: block;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+:root {
+  --font-display: sans-serif;
+
+  --color-general-fg: #111111;
+  --color-general-bg: #ffffff;
+  --color-primary-fg: #ffffff;
+  --color-primary-bg: #61a0cd;
+  --color-primary-bg-hover: #82bce6;
+  --color-secondary-fg: #111111;
+  --color-secondary-bg: #eeeeee;
+  --color-hover-fg: #111111;
+  --color-hover-bg: #dddddd;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-general-fg: #ffffff;
+    --color-general-bg: #111111;
+    --color-primary-fg: #ffffff;
+    --color-primary-bg: #333333;
+    --color-primary-bg-hover: #444444;
+    --color-secondary-fg: #ffffff;
+    --color-secondary-bg: #222222;
+    --color-hover-fg: #ffffff;
+    --color-hover-bg: #444444;
+  }
+}
+
+.heading {
+  position: relative;
+  font-size: 2rem;
+  font-weight: 900;
+  padding: 1rem 0;
+  text-align: center;
+}
