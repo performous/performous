@@ -77,6 +77,10 @@ jobs:
           echo buildmakejobs 0 | tee -a /opt/local/etc/macports/macports.conf
           echo startupitem_type none | tee -a /opt/local/etc/macports/macports.conf
           echo build_arch $(uname -m) | tee -a /opt/local/etc/macports/macports.conf
+          if [[ "$(uname -m)" == "arm64" ]]; then
+            echo universal_archs arm64 x86_64 | tee -a /opt/local/etc/macports/macports.conf
+          fi
+          echo build_arch $(uname -m) | tee -a /opt/local/etc/macports/macports.conf
           echo boost.version ${{ inputs.boost_version }} | tee -a /opt/local/etc/macports/macports.conf
 
           sudo mkdir -p /opt/custom_portfiles/www/
@@ -84,6 +88,10 @@ jobs:
           sudo mkdir -p /opt/custom_portfiles/www/cpprestsdk/files
 
           sudo cp -vf ./performous/.github/support-boost-1.87.patch /opt/custom_portfiles/www/cpprestsdk/files/
+          
+          echo configure.cxxflags-append -DBOOST_CONTEXT_ABI=sysv -DBOOST_CONTEXT_ARCHITECTURE=combined | sudo tee -a $(port file boost$(echo ${{ inputs.boost_version }} | sed 's|\.||'))
+          echo "Boost portfile: "
+          cat $(port file boost$(echo ${{ inputs.boost_version }} | sed 's|\.||'))
 
           sudo cat <<EOF | sudo tee -a /opt/custom_portfiles/www/cpprestsdk/Portfile
             patchfiles-append support-boost-1.87.patch
@@ -104,13 +112,35 @@ jobs:
           
           sudo portindex /opt/custom_portfiles
 
-      - name: Determine cache key
+      - name: Generate versions file for cache-key.
         run: |
           echo macOS $(sw_vers -productVersion | cut -f1 -d.) | tee ./cache-key.txt
           echo CPU Type: $(uname -m) | tee -a ./cache-key.txt
-          port info --fullname ${MACOS_DEPS} boost.version=${{ inputs.boost_version }} | grep -v -e'^--$' | cut -w -f2-3 | tee -a ./cache-key.txt
+
+          echo macOS $(sw_vers -productVersion | cut -f1 -d.) | tee "${{ github.workspace }}/cache-key-new.txt"
+          echo CPU Type: $(uname -m) | tee -a "${{ github.workspace }}/cache-key-new.txt"
+
+
+          port info --fullname ${MACOS_DEPS} boost.version=${{ inputs.boost_version }} | \
+          grep -v -e'^--$' | cut -w -f2-3 | \
+          tee -a ./cache-key.txt
+
+          port info --fullname ${MACOS_DEPS} boost.version=${{ inputs.boost_version }} | \
+          grep -v -e'^--$' | cut -w -f2-3 | \
+          sed -E 's/@([[:digit:]]+)\.([[:digit:]]+)\.([[:digit:]]+){1}((\+|-)[a-zA-Z0-9_]+)*/@\1.\2/g' | \
+          tee -a "${{ github.workspace }}/cache-key-new.txt"
+
+
           echo contents of cache-key-file: 
           cat ./cache-key.txt
+          
+          echo contents of new cache-key-file: 
+          cat "${{ github.workspace }}/cache-key-new.txt"
+
+      - name: Compute cache-key
+        id: cache-key
+        run: |
+          echo "computed_cache_key=macports-${{matrix.os}}-${{ hashFiles('cache-key-new.txt') }}" >> $GITHUB_OUTPUT
 
       - name: Try to restore cache
         id: restore_cache
