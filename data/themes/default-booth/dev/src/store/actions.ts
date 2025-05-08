@@ -5,6 +5,7 @@ import debounce from '../helpers/debounce';
 
 let songInterval: number;
 let playlistInterval: number;
+let refreshTimeout: number;
 
 const debounceQuery = debounce(async (commit: Commit, query: string): Promise<void> => {
     let database: Song[];
@@ -16,9 +17,20 @@ const debounceQuery = debounce(async (commit: Commit, query: string): Promise<vo
     commit('storeDatabase', database);
 });
 
-export async function refreshDatabase({ commit }: { commit: Commit }, query: string = ''): Promise<void> {
-    const database: Song[] = await getApi(`getDataBase.json`, query);
-    commit('storeDatabase', database);
+export async function refreshDatabase({ state, commit, dispatch }: { state: State, commit: Commit, dispatch: Dispatch }, query: string = ''): Promise<void> {
+    try {
+        const database: Song[] = await getApi(`getDataBase.json`, query);
+        commit('storeDatabase', database);
+        if (state.offline) {
+            commit('storeOfflineState', false);
+            dispatch('setIntervals');
+            dispatch('refreshPlaylist');
+        }
+        clearTimeout(refreshTimeout);
+    } catch (_e) {
+        clearTimeout(refreshTimeout);
+        refreshTimeout = setTimeout(() => dispatch('refreshDatabase', query), 60000);
+    }
 }
 
 export async function refreshLanguage({ commit }: { commit: Commit }): Promise<void> {
@@ -26,7 +38,7 @@ export async function refreshLanguage({ commit }: { commit: Commit }): Promise<v
     commit('storeLanguage', language);
 }
 
-export async function refreshPlaylist({ commit, dispatch }: { commit: Commit, dispatch: Dispatch }): Promise<void> {
+export async function refreshPlaylist({ state, commit, dispatch }: { state: State, commit: Commit, dispatch: Dispatch }): Promise<void> {
     try {
         const playlist: Song[] = await getApi('getCurrentPlaylist.json');
         commit('storePlaylist', playlist);
@@ -35,7 +47,11 @@ export async function refreshPlaylist({ commit, dispatch }: { commit: Commit, di
         commit('storeTimeout', timeout);
     }
     catch (_e) {
+        commit('storeOfflineState', true);
         clearInterval(playlistInterval);
+
+        clearTimeout(refreshTimeout);
+        refreshTimeout = setTimeout(() => dispatch('refreshDatabase', state.screen === 'search' && state.screenQuery?.search ? state.screenQuery.search : ''), 60000);
     }
 }
 
@@ -48,7 +64,12 @@ export async function refreshSong({ commit, dispatch, state }: { commit: Commit,
         commit('storeSong', song);
     }
     catch (_e) {
+        commit('storeSong', null);
+        commit('storeOfflineState', true);
         clearInterval(songInterval);
+        
+        clearTimeout(refreshTimeout);
+        refreshTimeout = setTimeout(() => dispatch('refreshDatabase', state.screen === 'search' && state.screenQuery?.search ? state.screenQuery.search : ''), 60000);
     }
 }
 
@@ -66,7 +87,6 @@ export async function skipSong(): Promise<void> {
 }
 
 export async function addSong({ dispatch }: { dispatch: Dispatch }, song: Song): Promise<void> {
-    console.log(song);
     await postApi('add', song);
     dispatch('refreshPlaylist');
 }
@@ -108,6 +128,19 @@ export function search({ commit, dispatch, state }: { commit: Commit, dispatch: 
     newQuery.search = query;
     dispatch('setScreenQuery', newQuery);
     debounceQuery(commit, query);
+}
+
+export async function restorePlaylist({ commit, dispatch }: { commit: Commit, dispatch: Dispatch }): Promise<void> {
+    const oldPlaylist = JSON.parse(sessionStorage.getItem('performous_playlist') ?? '[]');
+    for (const song of oldPlaylist) {
+        await postApi('add', song);
+    }
+    dispatch('refreshPlaylist');
+    commit('storePreservedPlaylist', false);
+}
+
+export function removePlaylist({ commit }: { commit: Commit }): void {
+    commit('storePreservedPlaylist', false);
 }
 
 export function setIntervals({ dispatch }: { dispatch: Dispatch }): void {

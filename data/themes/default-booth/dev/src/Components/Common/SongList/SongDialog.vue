@@ -99,7 +99,7 @@ defineExpose({
                     <PlayIcon />
                     <p>{{ $translate('play_song') }}</p>
                 </button>
-                <button type="button" @click="console.log('x'); enqueue()">
+                <button type="button" @click="enqueue()">
                     <PlusIcon />
                     <p>{{ $translate('add_song') }}</p>
                 </button>
