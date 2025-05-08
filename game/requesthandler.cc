@@ -553,6 +553,7 @@ std::vector<std::string> RequestHandler::GetTranslationKeys() {
 		translate_noop("Upcoming songs"),
 		translate_noop("Refresh playlist"),
 		translate_noop("Performous has disconnected."),
+		translate_noop("Reconnect"),
 		translate_noop("A previous playlist has been found."),
 		translate_noop("Restore playlist"),
 		translate_noop("Remove playlist"),
