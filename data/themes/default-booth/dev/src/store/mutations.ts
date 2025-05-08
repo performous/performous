@@ -48,3 +48,18 @@ export function storeScreen(state: State, value: string): void {
 export function storeScreenQuery(state: State, value: ScreenQuery): void {
     state.screenQuery = value;
 }
+
+export function storeOfflineState(state: State, value: boolean): void {
+    state.offline = value;
+    if (value && state.playlist.length > 0) {
+        sessionStorage.setItem('performous_playlist', JSON.stringify(state.playlist));
+        state.hasPreservedPlaylist = true;
+    }
+}
+
+export function storePreservedPlaylist(state: State, value: boolean): void {
+    state.hasPreservedPlaylist = value;
+    if (!value) {
+        sessionStorage.removeItem('performous_playlist');
+    }
+}

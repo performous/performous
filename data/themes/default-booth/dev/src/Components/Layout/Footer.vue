@@ -5,6 +5,7 @@ import duration from '../../helpers/duration';
 import FastForwardIcon from '../Icons/FastForwardIcon.vue';
 import PreviousIcon from '../Icons/PreviousIcon.vue';
 import Dialog from '../Common/Dialog.vue';
+import RefreshIcon from '../Icons/RefreshIcon.vue';
 
 const store = useStore();
 
@@ -32,6 +33,18 @@ function restart() {
 
 function skipConfirm() {
     dialogRef.value?.dialog?.showModal();
+}
+
+function reconnect() {
+    store.dispatch('refreshDatabase', store.state.screen === 'search' && store.state.screenQuery?.search ? store.state.screenQuery.search : '');
+}
+
+function restorePlaylist() {
+    store.dispatch('restorePlaylist');
+}
+
+function removePlaylist() {
+    store.dispatch('removePlaylist');
 }
 
 function skip() {
@@ -70,6 +83,27 @@ function closeSkipConfirm() {
                 </button>
             </div>
         </div>
+        <div v-if="store.state.offline" class="offline">
+            {{ $translate('performous_has_disconnected.') }}
+            
+            <div class="button-group">
+                <button type="button" @click="reconnect">
+                    <RefreshIcon />
+                    <div>{{ $translate('reconnect') }}</div>
+                </button>
+            </div>
+        </div>
+        <div v-else-if="store.state.hasPreservedPlaylist" class="preserved-playlist">
+            {{ $translate('a_previous_playlist_has_been_found.') }}
+            <div class="button-group">
+                <button type="button" @click="restorePlaylist">
+                    {{ $translate('restore_playlist') }}
+                </button>
+                <button type="button" @click="removePlaylist">
+                    {{ $translate('remove_playlist') }}
+                </button>
+            </div>
+        </div>
         <p class="credits">{{ $translate('credits') }}</p>
         <div v-if="song && typeof song === 'object'" class="progress">
             <div class="bar" :style="{
@@ -87,12 +121,13 @@ function closeSkipConfirm() {
     background-color: var(--color-primary-bg);
 }
 
-.current-playing {
+.current-playing, .offline, .preserved-playlist {
     position: relative;
     margin-bottom: 1rem;
 }
 
-.current-playing .button-group {
+.current-playing .button-group,
+.offline .button-group {
     position: absolute;
     right: 0;
     top: 0;
@@ -100,12 +135,31 @@ function closeSkipConfirm() {
     gap: 1rem;
 }
 
-.current-playing .button-group button {
+.current-playing .button-group button,
+.offline .button-group button {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     font-size: 0.625rem;
+}
+
+.preserved-playlist .button-group {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.preserved-playlist .button-group button {
+    background-color: var(--color-secondary-bg);
+    color: var(--color-secondary-fg);
+    padding: 1rem;
+}
+
+.preserved-playlist .button-group button:hover {
+    background-color: var(--color-hover-bg);
 }
 
 .credits {

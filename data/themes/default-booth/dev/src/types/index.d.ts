@@ -40,5 +40,7 @@ export interface State {
     languages: string[]
     playlist: Song[]
     timeout: number,
-    song: Song|number|null
+    song: Song|number|null,
+    offline: boolean,
+    hasPreservedPlaylist: boolean,
 }
