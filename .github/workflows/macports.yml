@@ -88,11 +88,49 @@ jobs:
           sudo mkdir -p /opt/custom_portfiles/www/cpprestsdk/files
 
           sudo cp -vf ./performous/.github/support-boost-1.87.patch /opt/custom_portfiles/www/cpprestsdk/files/
-          
-          echo configure.cxxflags-append -DBOOST_CONTEXT_ABI=sysv -DBOOST_CONTEXT_ARCHITECTURE=combined | sudo tee -a $(port file boost$(echo ${{ inputs.boost_version }} | sed 's|\.||'))
-          echo "Boost portfile: "
-          cat $(port file boost$(echo ${{ inputs.boost_version }} | sed 's|\.||'))
 
+          boost_version=$(echo ${{ inputs.boost_version }} | sed 's|\.||')
+
+          sudo mkdir -p /opt/custom_portfiles/devel/
+          sudo cp -Rvf $(dirname $(port file boost${boost_version})) /opt/custom_portfiles/devel/
+          sudo cp -vf ./performous/.github/fix-boost187-universal.patch /opt/custom_portfiles/devel/boost${boost_version}/files/
+          
+          echo patchfiles-append fix-boost187-universal.patch | sudo tee -a /opt/custom_portfiles/devel/boost${boost_version}/Portfile
+
+          sudo mkdir -p /opt/custom_portfiles/graphics/harfbuzz/files
+          sudo cp -Rv $(dirname $(port file harfbuzz))/files /opt/custom_portfiles/graphics/harfbuzz/
+
+            awk '
+            # Store pattern matches and their line numbers (NR)
+            # Only store the *first* match for each pattern
+            /PortGroup[[:space:]]+gobject_introspection/ && lineA_num == 0 {
+                lineA_num = NR
+                lineA_content = $0
+            }
+            /PortGroup[[:space:]]+meson/ && lineB_num == 0 {
+                lineB_num = NR
+                lineB_content = $0
+            }
+
+            # Store all lines in an array
+            { lines[NR] = $0 }
+
+            # After reading the whole file
+            END {
+                # Check if both patterns were found and A came before B
+                if (lineA_num > 0 && lineB_num > 0 && lineA_num < lineB_num) {
+                    # Swap the content in our stored lines array
+                    lines[lineA_num] = lineB_content
+                    lines[lineB_num] = lineA_content
+                }
+
+                # Print all lines (original or swapped)
+                for (i = 1; i <= NR; i++) {
+                    print lines[i]
+                }
+            }
+            ' $(port file harfbuzz) | sudo tee /opt/custom_portfiles/graphics/harfbuzz/Portfile
+          sudo patch -Tp0 < ./performous/.github/patch_gobject_pg.patch
           sudo cat <<EOF | sudo tee -a /opt/custom_portfiles/www/cpprestsdk/Portfile
             patchfiles-append support-boost-1.87.patch
             configure.args-append -DCPPREST_EXCLUDE_WEBSOCKETS=ON
@@ -111,6 +149,9 @@ jobs:
           cat /opt/local/etc/macports/sources.conf
           
           sudo portindex /opt/custom_portfiles
+          echo "Boost portfile: "
+          cat $(port file boost${boost_version})
+
 
       - name: Generate versions file for cache-key.
         run: |
@@ -168,6 +209,7 @@ jobs:
         # and to install from packaged binaries everything else we need but not at runtime (i.e. cmake and various versions of python and/or compilers)
         run: |
           set -x
+          try_binary_first() { sudo port -b install "$@" || sudo port install "$@"; }
           if [[ "${{ steps.restore_cache.outputs.cache-hit }}" == "true" ]]; then
             sudo port sync
             sudo port activate installed
@@ -177,26 +219,26 @@ jobs:
             sudo portindex -f /opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/ports
             sudo portindex /opt/custom_portfiles
 
-            echo buildfromsource always | tee -a /opt/local/etc/macports/macports.conf
+            echo buildfromsource ifneeded | tee -a /opt/local/etc/macports/macports.conf
           fi
-          sudo port install zlib boost.version=${{ inputs.boost_version }}
-          sudo port -b install libiconv gperf libtextstyle ncurses boost.version=${{ inputs.boost_version }}
+          sudo port install zlib  boost.version=${{ inputs.boost_version }}
+          try_binary_first libiconv gperf libtextstyle ncurses boost.version=${{ inputs.boost_version }}
           sudo port install boost boost.version=${{ inputs.boost_version }}
           sudo port install gettext icu  boost.version=${{ inputs.boost_version }}
-          sudo port -b install $(port echo rdepof:openssl | xargs) boost.version=${{ inputs.boost_version }}
+          sudo port install $(port echo rdepof:openssl | xargs) boost.version=${{ inputs.boost_version }}
           sudo port install openssl boost.version=${{ inputs.boost_version }} 
 
           if [[ "${{ steps.restore_cache.outputs.cache-hit }}" != "true" ]]; then
-            sudo port -b install cmake python311 python312 python313 clang-17 gcc14 clang-20 help2man +perl5_34 meson perl5.34 pkgconfig boost.version=${{ inputs.boost_version }}
+            try_binary_first cmake -universal python311 -universal python312 -universal python313
+            try_binary_first clang-17 -universal gcc14 -universal clang-20 -universal help2man -universal +perl5_34 meson -universal perl5.34 -universal pkgconfig -universal boost.version=${{ inputs.boost_version }}
           fi
 
-          sudo port install glib2 boost.version=${{ inputs.boost_version }}
+          sudo port install libelf +universal pcre2 +universal glib2 +universal boost.version=${{ inputs.boost_version }}
 
           if [[ "${{ steps.restore_cache.outputs.cache-hit }}" != "true" ]]; then
-            sudo port -b install $(port echo rdepof:shared-mime-info | xargs) shared-mime-info rust cargo gmake nasm boost.version=${{ inputs.boost_version }}
+            try_binary_first $(port echo rdepof:shared-mime-info | xargs) shared-mime-info rust -universal cargo -universal gmake -universal nasm boost.version=${{ inputs.boost_version }}
           fi
 
-          sudo port install x265 boost.version=${{ inputs.boost_version }} build.makejobs=1
           sudo port install ffmpeg7 boost.version=${{ inputs.boost_version }}
           sudo ln -sf /opt/local/libexec/ffmpeg7/lib/libavcodec.dylib /opt/local/lib/libavcodec.dylib
 

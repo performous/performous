@@ -132,7 +132,7 @@ jobs:
           source ./bundler-venv/bin/activate
           pip3 install -r ./macos-bundler-requirements.txt
           python3 ./macos-bundler.py --flat-output --package-version="${{ inputs.package_complete_version }}" --enable-webserver=on --enable-midi=on --enable-webcam=on --build-tests=on --target=12.0
-          PACKAGE_PATH=$(ls "${{ github.workspace }}/performous/osx-utils/out/Performous-${{ inputs.package_complete_version }}.dmg")
+          PACKAGE_PATH="${{ github.workspace }}/performous/osx-utils/out/Performous-${{ inputs.package_complete_version }}.dmg"
           MASTER_PACKAGE_PATH="${{ github.workspace }}/performous/osx-utils/out/Performous-master[${{ inputs.package_complete_version }}].dmg"
           cp -v ${PACKAGE_PATH} ${MASTER_PACKAGE_PATH}
           echo "ARTIFACT_PATH=${PACKAGE_PATH}" >> ${GITHUB_ENV}
