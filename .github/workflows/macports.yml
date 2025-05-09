@@ -88,10 +88,15 @@ jobs:
           sudo mkdir -p /opt/custom_portfiles/www/cpprestsdk/files
 
           sudo cp -vf ./performous/.github/support-boost-1.87.patch /opt/custom_portfiles/www/cpprestsdk/files/
-          
-          echo configure.cxxflags-append -DBOOST_CONTEXT_ABI=sysv -DBOOST_CONTEXT_ARCHITECTURE=combined | sudo tee -a $(port file boost$(echo ${{ inputs.boost_version }} | sed 's|\.||'))
-          echo "Boost portfile: "
-          cat $(port file boost$(echo ${{ inputs.boost_version }} | sed 's|\.||'))
+
+          boost_version=$(echo ${{ inputs.boost_version }} | sed 's|\.||')
+
+          sudo mkdir -p /opt/custom_portfiles/devel/
+          sudo cp -Rvf $(dirname $(port file boost${boost_version})) /opt/custom_portfiles/devel/
+          sudo cp -vf ./performous/.github/fix-boost187-universal.patch /opt/custom_portfiles/devel/boost${boost_version}/files/
+           if [[ "$(port info --revision boost${boost_version} 2>/dev/null | grep revision)" == "revision: 1" ]]; then
+             echo patchfiles-append fix-boost187-universal.patch | sudo tee -a /opt/custom_portfiles/devel/boost${boost_version}/Portfile
+           fi
 
           sudo cat <<EOF | sudo tee -a /opt/custom_portfiles/www/cpprestsdk/Portfile
             patchfiles-append support-boost-1.87.patch
@@ -111,6 +116,9 @@ jobs:
           cat /opt/local/etc/macports/sources.conf
           
           sudo portindex /opt/custom_portfiles
+          echo "Boost portfile: "
+          cat $(port file boost${boost_version})
+
 
       - name: Generate versions file for cache-key.
         run: |
@@ -187,6 +195,7 @@ jobs:
           sudo port install openssl boost.version=${{ inputs.boost_version }} 
 
           if [[ "${{ steps.restore_cache.outputs.cache-hit }}" != "true" ]]; then
+            sudo port -s install nghttp2
             sudo port -b install cmake python311 python312 python313 clang-17 gcc14 clang-20 help2man +perl5_34 meson perl5.34 pkgconfig boost.version=${{ inputs.boost_version }}
           fi
 
