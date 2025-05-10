@@ -1,0 +1,9 @@
+version: ''
+prefix: '/opt/local'
+variants:
+  select:
+    - quartz
+    - universal
+  deselect:
+    - x11
+ports:
