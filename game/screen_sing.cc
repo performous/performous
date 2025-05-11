@@ -255,6 +255,9 @@ void ScreenSing::instrumentLayout(double time) {
 		if (name == "Vocals") {
 			m_audio.streamFade(name, config["audio/mute_vocals_track"].b() ? 0.0 : 1.0);
 		}
+		else if (name == "background" && m_song->music.find("Instrumental") != m_song->music.end() && m_song->music["Instrumental"] != "") {
+			m_audio.streamFade(name, config["audio/mute_vocals_track"].b() ? level : 0.0);
+		}
 		else {
 			m_audio.streamFade(name, level);
 		}
