@@ -262,8 +262,11 @@ void ScreenSing::instrumentLayout(double time) {
 		if (name == "Vocals") {
 			m_audio.streamFade(name, config["audio/mute_vocals_track"].b() ? 0.0 : 1.0);
 		}
-		else if (name == "background" && m_song->music["Instrumental"] != "") {
-			m_audio.streamFade(name, config["audio/mute_vocals_track"].b() ? level : 0.0);
+		else if (name == "background" && !m_song->music["Instrumental"].string().empty()) {
+			m_audio.streamFade(name, m_song->music["Vocals"].string().empty() && !config["audio/mute_vocals_track"].b() ? level : 0.0);
+		}
+		else if (name == "Instrumental") {
+			m_audio.streamFade(name, m_song->music["Vocals"].string().empty() && !config["audio/mute_vocals_track"].b() ? 0.0 : level);
 		}
 		else {
 			m_audio.streamFade(name, level);
