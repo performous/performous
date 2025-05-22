@@ -23,6 +23,7 @@ extern "C" {
   struct AVCodecContext;
   struct AVFormatContext;
   struct AVFrame;
+  struct AVStream;
   void av_frame_free(AVFrame **);
   struct SwrContext;
   void swr_free(struct SwrContext **);
@@ -58,10 +59,16 @@ class FFmpeg {
 	/// duration
 	double duration() const;
 
+	/// replay gain, in +/- decibels.  Can be zero, and is zero if not defined for the track
+	double getReplayGainInDecibels() const;
+	double getReplayGainVolumeFactor() const;
+	double calculateLinearGain(double gainInDB);
+
 	virtual ~FFmpeg() = default;
 
   protected:
 	static void frameDeleter(AVFrame *f) { if (f) av_frame_free(&f); }
+	void readReplayGain(const AVStream *stream);
 	using uFrame = std::unique_ptr<AVFrame, std::integral_constant<decltype(&frameDeleter), &frameDeleter>>;
 
 	virtual void processFrame(uFrame frame) = 0;
@@ -74,6 +81,8 @@ class FFmpeg {
 	fs::path m_filename;
 	double m_position = 0.0;
 	double m_duration = 0.0;
+	double m_replayGainDecibels = 0.0; ///< dB gain factor to normalise perceived loudness
+	double m_replayGainFactor = 0.0;   ///< Replay Gain converted into a volume correction
 	// libav-specific variables
 	int m_streamId = -1;
 	std::unique_ptr<AVFormatContext, decltype(&avformat_close_input)> m_formatContext{nullptr, avformat_close_input};
@@ -143,6 +152,8 @@ class AudioBuffer {
 
 	const unsigned m_sps;
 	const double m_duration{ 0 };
+	const double m_replayGainDecibels{ 0.0 };
+	const double m_replayGainFactor{ 0.0 };
 	bool m_seek_asked { false };
 	bool m_quit{ false };
 	std::future<void> reader_thread;
