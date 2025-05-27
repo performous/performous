@@ -77,9 +77,9 @@ jobs:
           echo buildmakejobs 0 | tee -a /opt/local/etc/macports/macports.conf
           echo startupitem_type none | tee -a /opt/local/etc/macports/macports.conf
           echo build_arch $(uname -m) | tee -a /opt/local/etc/macports/macports.conf
-          if [[ "$(uname -m)" == "arm64" ]]; then
-            echo universal_archs arm64 x86_64 | tee -a /opt/local/etc/macports/macports.conf
-          fi
+          #if [[ "$(uname -m)" == "arm64" ]]; then
+          #  echo universal_archs arm64 x86_64 | tee -a /opt/local/etc/macports/macports.conf
+          #fi
           echo build_arch $(uname -m) | tee -a /opt/local/etc/macports/macports.conf
           echo boost.version ${{ inputs.boost_version }} | tee -a /opt/local/etc/macports/macports.conf
 
@@ -97,91 +97,39 @@ jobs:
           
           echo patchfiles-append fix-boost187-universal.patch | sudo tee -a /opt/custom_portfiles/devel/boost${boost_version}/Portfile
 
-          sudo mkdir -p /opt/custom_portfiles/graphics/harfbuzz/files
-          sudo cp -Rv $(dirname $(port file harfbuzz))/files /opt/custom_portfiles/graphics/harfbuzz/
+          #sudo mkdir -p /opt/custom_portfiles/graphics/harfbuzz/files
+          #sudo cp -Rv $(dirname $(port file harfbuzz))/files /opt/custom_portfiles/graphics/harfbuzz/
 
-            awk '
-            # Store pattern matches and their line numbers (NR)
-            # Only store the *first* match for each pattern
-            /PortGroup[[:space:]]+gobject_introspection/ && lineA_num == 0 {
-                lineA_num = NR
-                lineA_content = $0
-            }
-            /PortGroup[[:space:]]+meson/ && lineB_num == 0 {
-                lineB_num = NR
-                lineB_content = $0
-            }
-
-            # Store all lines in an array
-            { lines[NR] = $0 }
-
-            # After reading the whole file
-            END {
-                # Check if both patterns were found and A came before B
-                if (lineA_num > 0 && lineB_num > 0 && lineA_num < lineB_num) {
-                    # Swap the content in our stored lines array
-                    lines[lineA_num] = lineB_content
-                    lines[lineB_num] = lineA_content
-                }
-
-                # Print all lines (original or swapped)
-                for (i = 1; i <= NR; i++) {
-                    print lines[i]
-                }
-            }
-            ' $(port file harfbuzz) | sudo tee /opt/custom_portfiles/graphics/harfbuzz/Portfile
-          sudo patch -Tp0 < ./performous/.github/patch_gobject_pg.patch
           sudo cat <<EOF | sudo tee -a /opt/custom_portfiles/www/cpprestsdk/Portfile
             patchfiles-append support-boost-1.87.patch
             configure.args-append -DCPPREST_EXCLUDE_WEBSOCKETS=ON
             depends_build-delete port:websocketpp
           EOF
-          
-          echo "sources.conf before: "
-          cat /opt/local/etc/macports/sources.conf
-          
+
           sudo cat <<EOF | sudo tee /opt/local/etc/macports/sources.conf
           file:///opt/custom_portfiles [nosync]
           rsync://rsync.macports.org/macports/release/tarballs/ports.tar [default]
           EOF
-          
-          echo "sources.conf after: "
-          cat /opt/local/etc/macports/sources.conf
-          
-          sudo portindex /opt/custom_portfiles
-          echo "Boost portfile: "
-          cat $(port file boost${boost_version})
 
+          sudo portindex /opt/custom_portfiles
 
       - name: Generate versions file for cache-key.
         run: |
-          echo macOS $(sw_vers -productVersion | cut -f1 -d.) | tee ./cache-key.txt
-          echo CPU Type: $(uname -m) | tee -a ./cache-key.txt
-
-          echo macOS $(sw_vers -productVersion | cut -f1 -d.) | tee "${{ github.workspace }}/cache-key-new.txt"
-          echo CPU Type: $(uname -m) | tee -a "${{ github.workspace }}/cache-key-new.txt"
-
-
-          port info --fullname ${MACOS_DEPS} boost.version=${{ inputs.boost_version }} | \
-          grep -v -e'^--$' | cut -w -f2-3 | \
-          tee -a ./cache-key.txt
+          echo macOS $(sw_vers -productVersion | cut -f1 -d.) | tee "${{ github.workspace }}/cache-key.txt"
+          echo CPU Type: $(uname -m) | tee -a "${{ github.workspace }}/cache-key.txt"
 
           port info --fullname ${MACOS_DEPS} boost.version=${{ inputs.boost_version }} | \
           grep -v -e'^--$' | cut -w -f2-3 | \
           sed -E 's/@([[:digit:]]+)\.([[:digit:]]+)\.([[:digit:]]+){1}((\+|-)[a-zA-Z0-9_]+)*/@\1.\2/g' | \
-          tee -a "${{ github.workspace }}/cache-key-new.txt"
-
-
-          echo contents of cache-key-file: 
-          cat ./cache-key.txt
+          tee -a "${{ github.workspace }}/cache-key.txt"
           
-          echo contents of new cache-key-file: 
-          cat "${{ github.workspace }}/cache-key-new.txt"
+          echo contents of cache-key-file: 
+          cat "${{ github.workspace }}/cache-key.txt"
 
       - name: Compute cache-key
         id: cache-key
         run: |
-          echo "computed_cache_key=macports-${{matrix.os}}-${{ hashFiles('cache-key-new.txt') }}" >> $GITHUB_OUTPUT
+          echo "computed_cache_key=macports-${{matrix.os}}-${{ hashFiles('cache-key.txt') }}" >> $GITHUB_OUTPUT
 
       - name: Try to restore cache
         id: restore_cache
@@ -196,7 +144,7 @@ jobs:
             !/opt/local/bin/portindex/*/*/*/*/*/*
             !/opt/local/bin/portmirror/*/*/*/*/*/*
             !/opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/base
-          key: macports-${{matrix.os}}-${{ hashFiles('./cache-key.txt') }}
+          key: '${{ steps.cache-key.outputs.computed_cache_key }}'
 
       - name: Unlink Homebrew
         run: |
@@ -210,33 +158,32 @@ jobs:
         run: |
           set -x
           try_binary_first() { sudo port -b install "$@" || sudo port install "$@"; }
+
           if [[ "${{ steps.restore_cache.outputs.cache-hit }}" == "true" ]]; then
             sudo port sync
             sudo port activate installed
-
-            echo buildfromsource never | tee -a /opt/local/etc/macports/macports.conf
           else
             sudo portindex -f /opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/ports
             sudo portindex /opt/custom_portfiles
-
-            echo buildfromsource ifneeded | tee -a /opt/local/etc/macports/macports.conf
           fi
+
+          echo buildfromsource ifneeded | tee -a /opt/local/etc/macports/macports.conf
           sudo port install zlib  boost.version=${{ inputs.boost_version }}
           try_binary_first libiconv gperf libtextstyle ncurses boost.version=${{ inputs.boost_version }}
           sudo port install boost boost.version=${{ inputs.boost_version }}
-          sudo port install gettext icu  boost.version=${{ inputs.boost_version }}
+          sudo port install gettext icu boost.version=${{ inputs.boost_version }}
           sudo port install $(port echo rdepof:openssl | xargs) boost.version=${{ inputs.boost_version }}
           sudo port install openssl boost.version=${{ inputs.boost_version }} 
 
           if [[ "${{ steps.restore_cache.outputs.cache-hit }}" != "true" ]]; then
-            try_binary_first cmake -universal python311 -universal python312 -universal python313
-            try_binary_first clang-17 -universal gcc14 -universal clang-20 -universal help2man -universal +perl5_34 meson -universal perl5.34 -universal pkgconfig -universal boost.version=${{ inputs.boost_version }}
+            try_binary_first cmake python311 python312 python313
+            try_binary_first clang-17 gcc14 clang-20 help2man +perl5_34 meson perl5.34 pkgconfig boost.version=${{ inputs.boost_version }}
           fi
 
-          sudo port install libelf +universal pcre2 +universal glib2 +universal boost.version=${{ inputs.boost_version }}
+          sudo port install libelf pcre2 glib2 boost.version=${{ inputs.boost_version }}
 
           if [[ "${{ steps.restore_cache.outputs.cache-hit }}" != "true" ]]; then
-            try_binary_first $(port echo rdepof:shared-mime-info | xargs) shared-mime-info rust -universal cargo -universal gmake -universal nasm boost.version=${{ inputs.boost_version }}
+            try_binary_first $(port echo rdepof:shared-mime-info | xargs) shared-mime-info rust cargo gmake  nasm boost.version=${{ inputs.boost_version }}
           fi
 
           sudo port install ffmpeg7 boost.version=${{ inputs.boost_version }}
@@ -289,7 +236,7 @@ jobs:
             !/opt/local/bin/portindex/*/*/*/*/*/*
             !/opt/local/bin/portmirror/*/*/*/*/*/*
             !/opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/base
-          key: macports-${{matrix.os}}-${{ hashFiles('./cache-key.txt') }}
+          key: '${{ steps.cache-key.outputs.computed_cache_key }}'
 
       - name: Build package
         id: build_package
