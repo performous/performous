@@ -338,7 +338,7 @@ void FFmpeg::readReplayGain(const AVStream *stream)
   * \note     This function will return a gain of 1 for zero decibels, but
   *           in this case, it's better to not apply the gain at all
   */
-double FFmpeg::calculateLinearGain(double gainInDB) {
+double FFmpeg::calculateLinearGain(double gainInDB) const {
 	// Ref: https://stackoverflow.com/a/1149105/1730895
 	if (gainInDB == 0.0)
 		return 1.0;

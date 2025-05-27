@@ -62,7 +62,7 @@ class FFmpeg {
 	/// replay gain, in +/- decibels.  Can be zero, and is zero if not defined for the track
 	double getReplayGainInDecibels() const;
 	double getReplayGainVolumeFactor() const;
-	double calculateLinearGain(double gainInDB);
+	double calculateLinearGain(double gainInDB) const;
 
 	virtual ~FFmpeg() = default;
 
