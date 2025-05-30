@@ -163,9 +163,9 @@ double AudioBuffer::duration() { return m_duration; }
 AudioBuffer::AudioBuffer(fs::path const& file, unsigned rate, size_t size):
 	m_data(size), m_sps(rate * AUDIO_CHANNELS) {
 		auto ffmpeg = std::make_unique<AudioFFmpeg>(file, rate, std::ref(*this));
-		const_cast<double&>(m_duration) = ffmpeg->duration();
-		const_cast<double&>(m_replayGainDecibels) = ffmpeg->getReplayGainInDecibels();
-		const_cast<double&>(m_replayGainFactor) = ffmpeg->getReplayGainVolumeFactor();
+		m_duration = ffmpeg->duration();
+		m_replayGainDecibels = ffmpeg->getReplayGainInDecibels();
+		m_replayGainFactor = ffmpeg->getReplayGainVolumeFactor();
 		reader_thread = std::async(std::launch::async, [this, ffmpeg = std::move(ffmpeg)] {
 			auto errors = 0u;
 			std::unique_lock<std::mutex> l(m_mutex);
