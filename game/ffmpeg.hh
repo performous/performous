@@ -151,9 +151,9 @@ class AudioBuffer {
 	std::int64_t m_eof_pos = -1; // -1 until we get the read end from ffmpeg
 
 	const unsigned m_sps;
-	const double m_duration{ 0 };
-	const double m_replayGainDecibels{ 0.0 };
-	const double m_replayGainFactor{ 0.0 };
+	double m_duration{ 0 };
+	double m_replayGainDecibels{ 0.0 };
+	double m_replayGainFactor{ 0.0 };
 	bool m_seek_asked { false };
 	bool m_quit{ false };
 	std::future<void> reader_thread;
