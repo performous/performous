@@ -60,7 +60,7 @@ class Players {
 	void addPlayer (std::string const& name, std::string const& picture = "", std::optional<PlayerId> id = std::nullopt);
 
 	/// const array access
-	PlayerItem operator[](unsigned pos) const;
+	PlayerItem operator[](ssize_t pos) const;
 	unsigned count() const { return static_cast<unsigned>(m_filtered.size()); }
 	bool isEmpty() const { return m_filtered.empty(); }
 	/// advances to next player
