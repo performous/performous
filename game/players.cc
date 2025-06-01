@@ -137,25 +137,35 @@ void Players::filter_internal() {
 	math_cover.setTarget(pos, count());
 }
 
-PlayerItem Players::operator[](unsigned pos) const {
-    if (pos < count()) 
-        return m_filtered[pos];
-    
-    return PlayerItem();
+
+/**
+  * \details   Get the player at pos, but acting like a circular buffer,
+  *            so [-1] gives the last, and [size] gives the first, etc.
+  *
+  * \pos       The position within the m_filtered players
+  * \returns   A copy of the PlayerItem
+  */
+PlayerItem Players::operator[](ssize_t pos) const {
+	if (m_filtered.empty())
+		return PlayerItem();
+	// wrap the index between 0 and count()-1
+	ssize_t size  = m_filtered.size();
+	ssize_t index = ((pos % size) + size) % size;
+	return m_filtered[index];
 }
 
 void Players::advance(std::ptrdiff_t diff) {
-    const unsigned size = count();
-    if (size == 0) return; // Do nothing if no players are available
-    std::ptrdiff_t current = 0;
-        current = (static_cast<std::ptrdiff_t>(math_cover.getTarget()) + diff) % size;
-    if (current < 0)
-        current += count();
-    math_cover.setTarget(current, count());
+	const unsigned size = count();
+	if (size == 0) return; // Do nothing if no players are available
+	std::ptrdiff_t current = 0;
+		current = (static_cast<std::ptrdiff_t>(math_cover.getTarget()) + diff) % size;
+	if (current < 0)
+		current += count();
+	math_cover.setTarget(current, count());
 }
 
 PlayerItem Players::current() const {
-    if (math_cover.getTarget() < static_cast<ptrdiff_t>(m_filtered.size())) return m_filtered[static_cast<unsigned>(math_cover.getTarget())];
-    
-    return PlayerItem();
+	if (math_cover.getTarget() < static_cast<ptrdiff_t>(m_filtered.size())) return m_filtered[static_cast<unsigned>(math_cover.getTarget())];
+	
+	return PlayerItem();
 }

@@ -150,22 +150,36 @@ void ScreenPlayers::draw() {
 			<< '\n';
 		double spos = m_players.currentPosition(); // This needs to be polled to run the animation
 
-		// Draw the covers
-		const unsigned ss = m_players.count();
+		// Draw the player avatars
 		double baseidx = spos + 1.5f; --baseidx; // Round correctly
 		double shift = spos - baseidx;
 		// FIXME: 3D browser
-		for (int i = -2; i < 5; ++i) {
-			PlayerItem player_display = m_players[static_cast<unsigned>(baseidx + i)];
-			if (static_cast<unsigned>(baseidx + i) >= ss) continue;
+
+		// Draw 7 avatars, from either #1 or the last selected
+		// The 3rd avatar position is the last selected, current default
+		unsigned drawn_already = 0;
+		for (int i=-2; i<5; ++i) {  
+			int player_index = static_cast<int>(baseidx) + i;
+			if (drawn_already++ >= m_players.count()) 
+				continue;  // Don't re-paint avatars
+
+			PlayerItem player_display = m_players[player_index];  // [] operator will handle out-of-bounds, wrapping around
+
+			// If there's less than half a screen of avatars, shift to the right,
+			// as the 3rd avatar is the current selection
+			int reposition = i;
+			if (m_players.count() < 3)
+				reposition += 3 - m_players.count();
 
 			Texture& s = !player_display.path.empty() ? *loadTextureFromMap(player_display.path) : *m_emptyCover;
-			float diff = (i == 0 ? static_cast<float>((0.5 - fabs(shift)) * 0.07) : 0.0f);
+			float diff = (reposition == 0 ? static_cast<float>((0.5 - fabs(shift)) * 0.07) : 0.0f);
 			float y = 0.27f + 0.5f * diff;
-			// Draw the cover
-			s.dimensions.middle(static_cast<float>(-0.2f + 0.17f * (i - shift))).bottom(y - 0.2f * diff).fitInside(0.14f + diff, 0.14f + diff); s.draw(window);
+			// Draw the avatar
+			s.dimensions.middle(static_cast<float>(-0.2f + 0.17f * (reposition - shift))).bottom(y - 0.2f * diff).fitInside(0.14f + diff, 0.14f + diff); 
+			s.draw(window);
 			// Draw the reflection
-			s.dimensions.top(y + 0.2f * diff); s.tex = TexCoords(0, 1, 1, 0);
+			s.dimensions.top(y + 0.2f * diff); 
+			s.tex = TexCoords(0, 1, 1, 0);
 			{
 				ColorTrans c(window, Color::alpha(0.4f));
 				s.draw(window);
