@@ -143,7 +143,7 @@ void Players::filter_internal() {
   * \details   Get the player at pos, but acting like a circular buffer,
   *            so [-1] gives the last, and [size] gives the first, etc.
   *
-  * \pos       The position within the m_filtered players
+  * \pos       The position within the m_filtered players, or not
   * \returns   A copy of the PlayerItem
   */
 PlayerItem Players::operator[](ssize_t pos) const {
