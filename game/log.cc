@@ -3,6 +3,7 @@
 #include "configuration.hh"
 #include "fs.hh"
 #include "profiler.hh"
+#include "util.hh"
 
 #include <boost/iostreams/device/file_descriptor.hpp>
 #include <boost/iostreams/stream.hpp>
@@ -156,11 +157,11 @@ LoggerPtr SpdLogger::constructLogger(const LogSystem system) {
 }
 
 void SpdLogger::initializeSinks(spdlog::level::level_enum const& consoleLevel) {
-	auto time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+	auto const time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch());
 	std::string logHeader(fmt::format(
 		"{0:*^80}\n"
 		"{1:*^80}\n",
-			fmt::format(" {} {} starting, {:%Y/%m/%d @ %H:%M:%S} ", PACKAGE, VERSION, fmt::localtime(time)),
+			fmt::format(" {} {} starting, {} ", PACKAGE, VERSION, timeFormat(time, "%Y/%m/%d @ %H:%M:%S")),
 			fmt::format(" Logging any events of level {}, or higher. ", spdlog::level::to_string_view(consoleLevel))));
 	spdlog::filename_t filename = getLogFilename().u8string();
 	spdlog::filename_t profilerLogFilename = getProfilerLogFilename().u8string();
