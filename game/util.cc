@@ -27,7 +27,7 @@ unsigned stou(std::string const& str, size_t* idx, int base) {
 	return uival;
 }
 
-std::string format(std::chrono::seconds const& unixtime, std::string const& format_spec, bool utc) {
+std::string timeFormat(std::chrono::seconds const& unixtime, std::string const& format_spec, bool utc) {
 	auto const tp = std::chrono::system_clock::time_point(unixtime);
 	std::string fmt_string{"{:" + format_spec + "}"};
 	if (utc) {
