@@ -3,6 +3,7 @@
 #include <fmt/chrono.h>
 
 #include <algorithm>
+#include <ctime>
 #include <iomanip>
 #include <sstream>
 #include <stdexcept>
@@ -29,12 +30,30 @@ unsigned stou(std::string const& str, size_t* idx, int base) {
 
 std::string timeFormat(std::chrono::seconds const& unixtime, std::string const& format_spec, bool utc) {
 	auto const tp = std::chrono::system_clock::time_point(unixtime);
-	std::string fmt_string{"{:" + format_spec + "}"};
+	std::string fmt_string{fmt::format("{{:{}}}", format_spec)};
 	if (utc) {
 		return fmt::format(fmt::runtime(fmt_string), fmt::gmtime(tp));
 	}
 	else {
-		return fmt::format(fmt::runtime(fmt_string), tp);
+		const auto tt = std::chrono::system_clock::to_time_t(tp);
+#ifdef _WIN32
+		struct tm ltime;
+		errno_t err = localtime_s(&ltime, &tt);
+		if (err != EINVAL) {
+			return fmt::format(fmt::runtime(fmt_string), ltime);
+		}
+		else {
+		// If local-time conversion fails, just return utc time, no big deal.
+			return fmt::format(fmt::runtime(fmt_string), fmt::gmtime(tp));
+		}
+#else
+		struct tm ltime;
+		localtime_r(&tt, &ltime);
+		if (errno != EOVERFLOW) {
+			return fmt::format(fmt::runtime(fmt_string), ltime);
+		}
+			return fmt::format(fmt::runtime(fmt_string), fmt::gmtime(tp));
+#endif
 	}
 }
 
