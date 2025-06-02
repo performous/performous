@@ -7,7 +7,7 @@ namespace {
 	std::chrono::seconds getFileWriteTime(Song const& song) {
 		auto const time = std::filesystem::last_write_time(song.path);
 		auto const seconds = std::chrono::duration_cast<std::chrono::seconds>(time.time_since_epoch());
-		SpdLogger::debug(LogSystem::SONGS, "Song file={}, time since last write={}", seconds.count());
+		SpdLogger::debug(LogSystem::SONGS, "Song file={}, time since last write={}", song.path, seconds.count());
 
 		return seconds;
 	}
