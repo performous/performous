@@ -1,4 +1,6 @@
 #include "midifile.hh"
+
+#include "log.hh"
 #include "unicode.hh"
 
 #include <algorithm>
@@ -31,7 +33,7 @@ class MidiStream {
 	MidiStream(fs::path const& file) {
 		std::ifstream ifs(file.string(), std::ios::binary);
 #if MIDI_DEBUG_LEVEL > 1
-		std::cout << "Opening file: " << file << std::endl;
+		SpdLogger::debug(LogSystem::MIDI, "Opening file={}", file);
 #endif
 		f << ifs.rdbuf();
 		f.exceptions(std::ios::failbit);
@@ -86,7 +88,8 @@ MidiStream::Riff::Riff(MidiStream& ms): ms(ms), name(ms.read_bytes(4)), size(ms.
 
 MidiStream::Riff::~Riff() {
 #if MIDI_DEBUG_LEVEL > 0
-	if (has_more_data()) std::clog << "midistream/warning: Only " << offset << " of " << size << " bytes read of RIFF chunk " << name << std::endl;
+	
+	if (has_more_data()) SpdLogger::warning(LogSystem::MIDI, "Only {} of {} bytes read of RIFF chunk {}", offset, site, name);
 #endif
 	ms.f.seekg(pos + size);
 }
@@ -145,7 +148,7 @@ std::uint16_t MidiFileParser::parse_header(MidiStream& stream) {
 	riff.read(division);
 	if (division & 0x8000) throw std::runtime_error("SMPTE type divisions not supported");
 #if MIDI_DEBUG_LEVEL > 1
-	std::cout << "Division: " << division << std::endl;
+	SpdLogger::debug(LogSystem::MIDI, "Division={}", division);
 #endif
 	return ntracks;
 }
@@ -188,7 +191,8 @@ MidiFileParser::Track MidiFileParser::read_track(MidiStream& stream) {
 						sect_name = std::regex_replace(UnicodeUtil::toTitle(sect_name), std::regex("_"), " ");
 						// replace gtr => guitar
 #if MIDI_DEBUG_LEVEL > 2
-						std::cout << "Section: " << sect_name << " at " << get_seconds(miditime) << std::endl;
+
+						SpdLogger::debug(LogSystem::MIDI, "Section={}, at={}s", sect_name, miditime);
 #endif
 						midisections.push_back(MidiSection(sect_name, get_seconds(miditime)));
 					}
@@ -196,21 +200,21 @@ MidiFileParser::Track MidiFileParser::read_track(MidiStream& stream) {
 				}
 				else cmdevents.emplace_back(std::string(data));
 #if MIDI_DEBUG_LEVEL > 2
-				std::cout << "Text: " << data << std::endl;
+				SpdLogger::debug(LogSystem::MIDI, "Text={}", data);
 #endif
 			  } break;
 			  // 0x02: Copyright Notice
 			  case 0x03: // Sequence or Track Name
 				track.name = data;
 #if MIDI_DEBUG_LEVEL > 1
-				std::cout << "Track name: " << data << std::endl;
+				SpdLogger::debug(LogSystem::MIDI, "Track name={}", data);
 #endif
 				break;
 			  // 0x04: Instrument Name
 			  case 0x05: // Lyric Text
 				m_lyric = data;
 #if MIDI_DEBUG_LEVEL > 2
-				std::cout << "Lyric: " << data << std::endl;
+				SpdLogger::debug(LogSystem::MIDI, "Lyric={}", data);
 #endif
 				break;
 			  // 0x06: Marker Text
@@ -227,14 +231,14 @@ MidiFileParser::Track MidiFileParser::read_track(MidiStream& stream) {
 				if (data.size() != 4) throw std::runtime_error("Invalid time signature event");
 #if MIDI_DEBUG_LEVEL > 3
 				// if none is found "4/4, 24,8" should be assume
-				std::cout << "Time signature: " << int(data[0]) << "/" << int(data[1]) << ", " << int(data[2]) << ", " << int(data[3]) << std::endl;
+				SpdLogger::debug(LogSystem::MIDI, "Time signature={}/{}, {}, {}", int(data[0]), int(data[1]), int(data[2]), int(data[3]));
 #endif
 				break;
 			  // 0x59: Key Signature
 			  // 0x7f: Sequencer Specific Event
 			  default:
 #if MIDI_DEBUG_LEVEL > 1
-				std::cout << "Unhandled meta event  type=" << int(type) << " (" << data.size() << " bytes)" << std::endl;
+				SpdLogger::debug(LogSystem::MIDI, "Unhandled meta-even type={} ({} bytes)", int(type), data.size());
 #endif
 				break;
 			}
@@ -243,7 +247,7 @@ MidiFileParser::Track MidiFileParser::read_track(MidiStream& stream) {
 			std::uint32_t size = riff.read_varlen();
 			riff.ignore(size);
 #if MIDI_DEBUG_LEVEL > 1
-			std::cout << "System exclusive event ignored (" << size << " bytes)" << std::endl;
+			SpdLogger::debug(LogSystem::MIDI, "System exclusive event ignored ({} bytes)", size);
 #endif
 		} else {
 			// Midi event
@@ -272,24 +276,24 @@ void MidiFileParser::add_tempo_change(std::uint32_t miditime, std::uint32_t temp
 		if (tempochanges.back().miditime >= miditime) throw std::runtime_error("Invalid MIDI file (unexpected tempo change)");
 	}
 #if MIDI_DEBUG_LEVEL > 2
-	std::cout << "Tempo change at miditime=" << miditime << ":  " << tempo << " us/QN  " << 6e7 / tempo << " BPM" << std::endl;
+	SpdLogger::debug(LogSystem::MIDI, "Tempo change at miditime={}: {} us/QN {} BPM.", miditime, tempo, 6e7 / tempo);
 #endif
 	tempochanges.push_back(TempoChange(miditime, tempo));
 }
 
 void MidiFileParser::cout_midi_event(std::uint8_t t, std::uint8_t arg1, std::uint8_t arg2, std::uint32_t miditime) {
-	std::cout << "Midi event:" << std::setw(12) << miditime << std::fixed << std::setprecision(2) << std::setw(12) << get_seconds(miditime) << "  ";
+	std::string ret{fmt::format("MIDI event: {:12}{:12.2f} ", miditime, get_seconds(miditime))};
 	switch (t) {
-	  case 0x8: std::cout << "note off   pitch=" << int(arg1) << " velocity=" << int(arg2); break;
-	  case 0x9: std::cout << "note on   pitch=" << int(arg1) << " velocity=" << int(arg2); break;
-	  case 0xA: std::cout << "aftertouch pitch=" << int(arg1) << " value=" << int(arg2); break;
-	  case 0xB: std::cout << "controller num=" << int(arg1) << " value=" << int(arg2); break;
-	  case 0xC: std::cout << "program change num=" << int(arg1); break;
-	  case 0xD: std::cout << "channel value =" << int(arg1); break;
-	  case 0xE: std::cout << "pitch bend value=" << (arg2 << 8 | arg1); break;
-	  default: std::cout << "UNKNOWN EVENT=0x" << std::hex << int(t) << std::dec << ")"; break;
+	  case 0x8: fmt::format_to(std::back_inserter(ret), "note-off, pitch={}, velocity={}.", int(arg1), int(arg2)); break;
+	  case 0x9: fmt::format_to(std::back_inserter(ret), "note-on, pitch={}, velocity={}.", int(arg1), int(arg2)); break;
+	  case 0xA: fmt::format_to(std::back_inserter(ret), "aftertouch, pitch={}, value={}.", int(arg1), int(arg2)); break;
+	  case 0xB: fmt::format_to(std::back_inserter(ret), "controller, num={}, value={}.", int(arg1), int(arg2)); break;
+	  case 0xC: fmt::format_to(std::back_inserter(ret), "program change, num={}.", int(arg1)); break;
+	  case 0xD: fmt::format_to(std::back_inserter(ret), "channel value={}.", int(arg1)); break;
+	  case 0xE: fmt::format_to(std::back_inserter(ret), "pitch-bend, value={}.", arg2 << 8 | arg1); break;
+	  default: fmt::format_to(std::back_inserter(ret), "UNKNOWN EVENT={:#x}.", int(t)); break;
 	}
-	std::cout << std::endl;
+	SpdLogger::debug(LogSystem::MIDI, ret);
 }
 
 std::uint64_t MidiFileParser::get_us(std::uint32_t miditime) {

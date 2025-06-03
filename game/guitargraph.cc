@@ -1,5 +1,7 @@
 #include "guitargraph.hh"
+
 #include "fs.hh"
+#include "log.hh"
 #include "song.hh"
 #include "i18n.hh"
 #include "graphic/view_trans.hh"
@@ -566,7 +568,7 @@ void GuitarGraph::updateDrumFill(double time) {
 
 /// Handle drum hit scoring
 void GuitarGraph::drumHit(double time, unsigned layer, unsigned fret) {
-	std::cout << "drumHit: " << time << " layer:" << layer << " fret:" << fret << std::endl;
+	SpdLogger::debug(LogSystem::INSTRUMENTS, "DrumHit={}, Layer={}, Fret={}.", time, layer, fret);
 	// Handle drum fills
 	if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin - maxTolerance
 	  && time <= m_dfIt->end + maxTolerance) {

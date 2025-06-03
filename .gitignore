@@ -16,3 +16,5 @@ CMakeFiles
 .vscode
 /osx-utils/macos-bundler
 out/*
+profiler*.txt
+infolog*.txt
