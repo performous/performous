@@ -90,6 +90,11 @@ to save the current settings to XML.
 		<short>Song results timeout</short>
 		<long>How long the scores will be displayed for after finishing a song.</long>
 	</entry>
+	<entry name="game/highscore_minimum" type="uint" value="2000">
+		<limits min="200" max="8000" step="200" />
+		<short>High-score Minimum</short>
+		<long>The minimum score that is elgible for recording.</long>
+	</entry>
 	<entry name="game/highscore_timeout" type="uint" value="5">
 		<limits min="0" max="30" step="5" />
 		<short>High-score timeout</short>
