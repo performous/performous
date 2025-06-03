@@ -149,10 +149,10 @@ void Players::filter_internal() {
 PlayerItem Players::operator[](ssize_t pos) const {
 	if (m_filtered.empty())
 		return PlayerItem();
-	// wrap the index between 0 and count()-1
-	ssize_t size  = m_filtered.size();
+	// wrap the index between 0 and count()-1 the signed types are important here
+	ssize_t size  = static_cast<ssize_t>( m_filtered.size() );
 	ssize_t index = ((pos % size) + size) % size;
-	return m_filtered[index];
+	return m_filtered[static_cast<size_t>( index )];
 }
 
 void Players::advance(std::ptrdiff_t diff) {
