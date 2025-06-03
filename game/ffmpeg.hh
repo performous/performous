@@ -4,7 +4,11 @@
 #include "texture.hh"
 #include "util.hh"
 #include "libda/sample.hpp"
+
 #include "aubio/aubio.h"
+
+#include <fmt/format.h>
+
 #include <atomic>
 #include <condition_variable>
 #include <cstdint>
@@ -19,6 +23,8 @@
 
 // ffmpeg forward declarations
 extern "C" {
+  #include <libavutil/avutil.h> // For AVMediaType
+
   struct AVChannelLayout;
   struct AVCodecContext;
   struct AVFormatContext;
@@ -39,6 +45,7 @@ class FFmpeg {
 	class Error : public std::runtime_error {
 	  public:
 		Error(const FFmpeg &self, int errorValue, const char *func): std::runtime_error(msgFmt(self, errorValue, func)) {}
+		friend struct fmt::formatter<FFmpeg::Error>;
 	  private:
 		static std::string msgFmt(const FFmpeg &self, int errorValue, const char *func);
 	};
@@ -78,6 +85,18 @@ class FFmpeg {
 	int m_streamId = -1;
 	std::unique_ptr<AVFormatContext, decltype(&avformat_close_input)> m_formatContext{nullptr, avformat_close_input};
 	std::unique_ptr<AVCodecContext, decltype(&avcodec_free_context)> m_codecContext{nullptr, avcodec_free_context};
+};
+
+#if !defined(__PRETTY_FUNCTION__) && defined(_MSC_VER)
+#define __PRETTY_FUNCTION__ __FUNCSIG__
+#endif
+
+#define FFMPEG_CHECKED(func, args, caller) FFmpeg::check(func args, caller)
+
+class DurationFFmpeg : public FFmpeg {
+  public:public:
+	DurationFFmpeg(fs::path const& file) : FFmpeg(file, AVMEDIA_TYPE_AUDIO) {};
+	void processFrame(uFrame) override { return; };
 };
 
 class AudioFFmpeg : public FFmpeg {
@@ -147,4 +166,3 @@ class AudioBuffer {
 	bool m_quit{ false };
 	std::future<void> reader_thread;
 };
-

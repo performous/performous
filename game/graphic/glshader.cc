@@ -47,14 +47,12 @@ void Shader::dumpInfoLog(GLuint id) {
 	// Ignore success messages that the Radeon driver always seems to give
 	if (std::equal(infoLog.data(), infoLog.data() + infoLogLength, "Vertex shader(s) linked, fragment shader(s) linked, geometry shader(s) linked.")) return;
 	// Format a (possibly multi-line) log message
-	std::string prefix = "opengl/error: Shader [" + name + "]: ";
-	std::string logmsg = prefix;
-	for (char ch: std::string(infoLog.data())) {
-		if (logmsg.back() == '\n') logmsg += prefix;
-		logmsg += ch;
-	}
-	if (logmsg.back() != '\n') logmsg += '\n';
-	std::clog << logmsg << std::flush;
+	std::string logmsg{fmt::format("Shader={}: ", name)};
+
+	std::string logString{infoLog.data()};
+	std::regex newline_regex("\\n(?!$)");
+	std::string reString {"\n" + SpdLogger::newLineDec};
+	SpdLogger::error(LogSystem::OPENGL, logmsg.append(std::regex_replace(logString, newline_regex, reString)));
 }
 
 void Shader::bindUniformBlocks() {
@@ -99,7 +97,7 @@ Shader::~Shader() {
 }
 
 Shader& Shader::compileFile(fs::path const& filename) {
-	std::clog << "opengl/info: Compiling " << filename.string() << std::endl;
+	SpdLogger::info(LogSystem::OPENGL, "Compiling shader {}", filename);
 	fs::path ext = filename.extension();
 	GLenum type;
 	if (ext == ".vert") type = GL_VERTEX_SHADER;

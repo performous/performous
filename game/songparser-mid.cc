@@ -1,8 +1,9 @@
 #include "songparser.hh"
 
-#include <stdexcept>
+#include "log.hh"
 #include "midifile.hh"
 
+#include <stdexcept>
 /// @file
 /// Functions used for parsing MIDI files (FoF and other song formats)
 
@@ -75,7 +76,7 @@ void SongParser::midParseHeader() {
 		}
 	}
 	addBPM(0, static_cast<float>(6e7 / midi.tempochanges.front().value));
-	std::clog << "songparser-mid/debug: Got a bpm: " << (6e7 / midi.tempochanges.front().value) << std::endl;
+	SpdLogger::debug(LogSystem::SONGPARSER, "MIDI Parser --  Got a BPM: {}", 6e7 / midi.tempochanges.front().value);
 }
 
 /// Parse notes
@@ -157,7 +158,7 @@ void SongParser::midParse() {
 					if (n.type == Note::Type::SLIDE) {
 						auto prev = vocal.notes.rbegin();
 						while (prev != vocal.notes.rend() && prev->type == Note::Type::SLEEP) ++prev;
-						if (prev == vocal.notes.rend()) throw std::runtime_error("The song begins with a slide note");
+						if (prev == vocal.notes.rend()) throw SongParserException(m_song, "The song begins with a slide note", 1);
 						eraseLast(prev->syllable); // Erase the space if there is any
 						{
 							// insert new sliding note
@@ -208,9 +209,7 @@ void SongParser::midParse() {
 	}
 	// Output some warning
 	if (reversedNoteCount > 0) {
-		std::ostringstream oss;
-		oss << "songparser/notice: Skipping " << reversedNoteCount << " reversed note(s) in " << s.midifilename.string();
-		std::clog << oss.str() << std::endl; // More likely to be atomic when written as one string
+		SpdLogger::notice(LogSystem::SONGPARSER, "MIDI Parser -- Skipping {} reversed notes in {}", reversedNoteCount, s.midifilename);
 	}
 	// copy midi sections to song section
 	// design goals: (1) keep midi parser free of dependencies on song (2) store data in song as parsers are discarded before song
