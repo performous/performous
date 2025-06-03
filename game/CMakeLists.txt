@@ -115,6 +115,7 @@ set(SELF_BUILT_AUBIO "AUTO" CACHE STRING "rule to allow self build of Aubio depe
 set(SELF_BUILT_JSON "AUTO" CACHE STRING "rule to allow self build of Json dependency library [NEVER|AUTO*|ALWAYS]")
 # This is AUTO cause CED is not available on ubuntu
 set(SELF_BUILT_CED "AUTO" CACHE STRING "rule to allow self build of Ced dependency library [NEVER|AUTO*|ALWAYS]")
+set(SELF_BUILT_SPDLOG "AUTO" CACHE STRING "rule to allow self build of Spdlog dependency library [NEVER|AUTO*|ALWAYS]")
 
 set(Aubio_REQUIRED_VERSION "0.4.9")
 
@@ -123,8 +124,7 @@ set(Aubio_REQUIRED_VERSION "0.4.9")
 if (MINGW)
 	target_link_libraries(performous PRIVATE mingw32)
 endif()
-
-foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM Json Ced Aubio)
+foreach(lib SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM Json Ced Aubio)
 	find_package(${lib} ${${lib}_REQUIRED_VERSION} REQUIRED)
 	message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
 	target_include_directories(performous SYSTEM PRIVATE ${${lib}_INCLUDE_DIRS})
@@ -132,13 +132,16 @@ foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWS
 	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
 
-find_package(fmt REQUIRED CONFIG)
+find_package(fmt 8.1 REQUIRED CONFIG)
 # CppRESTSDK and their godforsaken U macro.
 if(fmt_VERSION VERSION_GREATER_EQUAL 9.0.0)
 	target_compile_definitions(performous PRIVATE -D_TURN_OFF_PLATFORM_STRING)
 endif()
 
-target_link_libraries(performous PRIVATE fmt::fmt)
+find_package(Spdlog REQUIRED MODULE)
+
+target_compile_definitions(performous PRIVATE $<IF:$<NOT:$<BOOL:${SPDLOG_FMT_EXTERNAL_HO}>>,SPDLOG_FMT_EXTERNAL,SPDLOG_FMT_EXTERNAL_HO> FMT_USE_CONSTEXPR)
+target_link_libraries(performous PRIVATE $<IF:$<NOT:$<BOOL:${SPDLOG_FMT_EXTERNAL_HO}>>,fmt::fmt,fmt::fmt-header-only> spdlog::spdlog_header_only)
 
 # Activating MIDI hardware (e-drums with USB/MIDI connection)
 set(ENABLE_MIDI AUTO CACHE STRING "Use midi hardware (e-drums with USB/MIDI connection)")

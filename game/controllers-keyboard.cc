@@ -1,4 +1,5 @@
 #include "controllers.hh"
+
 #include "platform.hh"
 
 #include <set>
@@ -31,15 +32,15 @@ namespace input {
 				// Enable/disable keyboard instruments based on current config
 				std::string msg;
 				if (g_enableInstruments) {
-					msg += setMode(m_guitar, "guitar");
-					msg += setMode(m_keytar, "keytar");
-					msg += setMode(m_drumkit, "drumkit");
-					msg += setMode(m_dancepad, "dancepad");
+					msg.append(setMode(m_guitar, "guitar"));
+					msg.append(setMode(m_keytar, "keytar"));
+					msg.append(setMode(m_drumkit, "drumkit"));
+					msg.append(setMode(m_dancepad, "dancepad"));
 				} else if (m_guitar || m_keytar || m_drumkit || m_dancepad) {
 					msg = " all instruments disabled.";
 					m_guitar = m_keytar = m_drumkit = m_dancepad = false;
 				}
-				if (!msg.empty()) std::clog << "controller-keyboard/info: Mode change:" + msg << std::endl;
+				if (!msg.empty()) SpdLogger::info(LogSystem::CONTROLLERS, "Keyboard mode change: {}.", msg);
 			}
 			// Convert SDL event into controller Event
 			event.source = SourceId(SourceType::KEYBOARD, 0);

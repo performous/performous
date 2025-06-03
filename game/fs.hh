@@ -2,9 +2,12 @@
 
 #include "config.hh"
 
+#include <fmt/format.h>
+
 #include <cstdint>
 #include <filesystem>
 #include <list>
+#include <string_view>
 #include <vector>
 
 namespace fs {
@@ -34,6 +37,19 @@ namespace {
 		void pathInit();
 	} cache;
 }
+
+std::string formatPath(const fs::path& target);
+
+// Make std::filesystem::path formattable.
+template <>
+struct fmt::formatter<std::filesystem::path>: formatter<std::string_view>
+{
+	template <typename FormatContext>
+	auto format(const std::filesystem::path& path, FormatContext& ctx) const 
+	{
+		return formatter<std::string_view>::format(formatPath(path), ctx);
+	}
+};
 
 // Reimplment boost's absolute function with 2 parameters, according to its documentation:
 // https://www.boost.org/doc/libs/1_51_0/libs/filesystem/doc/reference.html#absolute
@@ -72,6 +88,7 @@ bool pathRootHack(fs::path& p, std::string const& name);
 
 fs::path execname(); ///< Get the path and filename of the main executable.
 fs::path getLogFilename();  ///< Get the log filename.
+fs::path getProfilerLogFilename();  ///< Profiler get its own log, or it obliterates everything else.
 fs::path getSchemaFilename();  ///< Get the config schema filename.
 fs::path getHomeDir();  ///< Get user's home folder.
 fs::path getConfigDir();  ///< Get user-writable Performous config folder.
