@@ -48,7 +48,10 @@ void ScreenSing::enter() {
 	if (config["graphic/webcam"].b() && Webcam::enabled()) {
 		try {
 			m_cam = std::make_unique<Webcam>(getGame().getWindow(), config["graphic/webcamid"].ui());
-		} catch (std::exception& e) { std::cout << e.what() << std::endl; };
+		}
+		catch (std::exception& e) {
+			SpdLogger::error(LogSystem::WEBCAM, "Exception={}", e.what());
+		};
 	}
 	// Load video
 	getGame().loading(_("Loading video..."), 0.2f);
@@ -60,7 +63,7 @@ void ScreenSing::enter() {
 	getGame().loading(_("Loading song..."), 0.4f);
 	try { m_song->loadNotes(false /* don't ignore errors */); }
 	catch (SongParserException& e) {
-		std::clog << e;
+		SpdLogger::warning(LogSystem::SINGING, "Aborting Song: {}", e.what());
 		getGame().activateScreen("Songs");
 	}
 	// Notify about broken tracks
@@ -446,7 +449,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 				if (m_song->getPrevSection(m_audio.getPosition(), section)) {
 					m_audio.seekPos(section.begin);
 					// TODO: display popup with section.name here
-					std::cout << section.name << std::endl;
+					SpdLogger::info(LogSystem::DANCING, "Section={}", section.name);
 				} else m_audio.seek(-5.0);
 				seekback = true;
 			}
@@ -456,7 +459,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			if (m_song->getNextSection(m_audio.getPosition(), section)) {
 				m_audio.seekPos(section.begin);
 				// TODO: display popup with section.name here
-				std::cout << section.name << std::endl;
+				SpdLogger::info(LogSystem::DANCING, "Section={}", section.name);
 			} else m_audio.seek(5.0);
 		}
 

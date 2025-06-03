@@ -14,9 +14,9 @@
 #include "controllers.hh"
 #include "notegraphscalerfactory.hh"
 
-#include <iostream>
-#include <sstream>
 #include <fmt/format.h>
+
+#include <iostream>
 
 ScreenPlayers::ScreenPlayers(Game &game, std::string const& name, Audio& audio, Database& database):
   Screen(game, name), m_audio(audio), m_database(database), m_players(database.m_players)
@@ -125,29 +125,32 @@ void ScreenPlayers::draw() {
 	theme->bg.draw(window);
 	std::string music, songbg, video;
 	double videoGap = 0.0;
-	std::ostringstream oss_song, oss_order;
+	std::string oss_song, oss_order;
 	// Test if there are no players currently selected
 	if (m_players.isEmpty()) {
 		// Format the song information text
 		if (m_search.text.empty()) {
-			oss_song << _("No players found!");
-			oss_order << _("Enter a name to create a new player.");
+			oss_song = _("No Players found!");
+			oss_order = _("Enter a name to create a new player.");
 		} else {
-			oss_song << _("Press enter to create player!");
-			oss_order << m_search.text << '\n';
+			oss_song = _("Press enter to create player!");
+			oss_order = fmt::format("{}\n", m_search.text);
 		}
 	} else if (m_database.scores.empty()) {
-		oss_song << _("No players worth mentioning!");
+		oss_song = _("No players worth mentioning!");
 	} else {
 		// Format the player information text
-		oss_song << m_database.scores.front().track << '\n';
-		oss_song << fmt::format(_("You reached {0} points!"), m_database.scores.front().score);
-		oss_order << _("Change player with arrow keys.") << '\n'
-			<< _("Name:") << ' ' << m_players.current().name << '\n';
+
+		oss_song =  fmt::format("{}\n{}", m_database.scores.front().track, fmt::format(_("You reached {0} points!"), m_database.scores.front().score));
+		oss_order = fmt::format("{}\n{} {}\n", _("Change player with arrow keys."), _("Name:"), m_players.current().name);
 		//m_database.queryPerPlayerHiscore(oss_order);
-		oss_order << '\n'
-			<< (m_search.text.empty() ? _("Type text to filter or create a new player.") : std::string(_("Search Text:")) + " " + m_search.text)
-			<< '\n';
+		oss_order.append("\n");
+		if (m_search.text.empty()) {
+			oss_order.append(_("Type text to filter or create a new player."));
+		}
+		else {
+			oss_order.append(fmt::format("{} {}\n", _("Search Text:"), m_search.text));
+		}
 		double spos = m_players.currentPosition(); // This needs to be polled to run the animation
 
 		// Draw the player avatars
@@ -194,8 +197,8 @@ void ScreenPlayers::draw() {
 	}
 
 	// Draw song and order texts
-	theme->song.draw(window, oss_song.str());
-	theme->order.draw(window, oss_order.str());
+	theme->song.draw(window, oss_song);
+	theme->order.draw(window, oss_order);
 
 	// Schedule playback change if the chosen song has changed
 	if (music != m_playReq) { m_playReq = music; m_playTimer.setValue(0.0); }

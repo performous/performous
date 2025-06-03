@@ -2,13 +2,14 @@
 
 #include "chrono.hh"
 #include "config.hh"
+#include "log.hh"
 #include "screen_songs.hh"
 #include "util.hh"
 
 #include "aubio/aubio.h"
+
 #include <iostream>
 #include <memory>
-#include <sstream>
 #include <stdexcept>
 #include <system_error>
 #include <thread>
@@ -31,20 +32,12 @@ extern "C" {
 
 #define AUDIO_CHANNELS 2
 
-#if !defined(__PRETTY_FUNCTION__) && defined(_MSC_VER)
-#define __PRETTY_FUNCTION__ __FUNCSIG__
-#endif
-
-#define FFMPEG_CHECKED(func, args, caller) FFmpeg::check(func args, caller)
-
 namespace {
 	std::string ffversion(unsigned ver) {
 		unsigned major = ver >> 16;
 		unsigned minor = (ver >> 8) & 0xFF;
 		unsigned micro = ver & 0xFF;
-		std::ostringstream oss;
-		oss << major << "." << minor << "." << micro << (micro >= 100 ? "(ff)" : "(lav)");
-		return oss.str();
+		return fmt::format("{}.{}.{}", major, minor, micro);
 	}
 }
 
@@ -71,7 +64,7 @@ bool AudioBuffer::condition() {
 
 void AudioBuffer::operator()(const std::int16_t *data, std::int64_t count, std::int64_t sample_position) {
 	if (sample_position < 0) {
-		std::clog << "ffmpeg/warning: Negative audio sample_position " << sample_position << " seconds, frame ignored." << std::endl;
+		SpdLogger::warn(LogSystem::FFMPEG, "Negative audio sample_position={} seconds, frame ignored.", sample_position);
 		return;
 	}
 
@@ -85,7 +78,7 @@ void AudioBuffer::operator()(const std::int16_t *data, std::int64_t count, std::
 	if (m_quit || m_seek_asked) return;
 
 	if (m_write_pos != sample_position) {
-		std::clog << "ffmpeg/debug: Gap in audio: expected=" << m_write_pos << " received=" << sample_position << '\n';
+		SpdLogger::debug(LogSystem::FFMPEG, "Audio gap: expected={}, received={}.", m_write_pos, sample_position);
 	}
 
 	m_write_pos = sample_position;
@@ -188,8 +181,8 @@ AudioBuffer::AudioBuffer(fs::path const& file, unsigned rate, size_t size):
 					m_cond.wait(l, [this]{ return m_quit || m_seek_asked; });
 				} catch (const std::exception& e) {
 					UnlockGuard<decltype(l)> unlocked(l); // unlock while doing IOs
-					std::clog << "ffmpeg/error: " << e.what() << std::endl;
-					if (++errors > 2) std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl;
+					SpdLogger::error(LogSystem::FFMPEG, "Error={}.", e.what());
+					if (++errors > 2) SpdLogger::error(LogSystem::FFMPEG, "Terminating due to multiple errors.");
 				}
 			}
 		});
@@ -213,21 +206,34 @@ static void printFFmpegInfo() {
 		LIBAVFORMAT_VERSION_INT == avformat_version() &&
 		LIBSWSCALE_VERSION_INT == swscale_version();
 	if (matches) {
-		std::clog << "ffmpeg/info: "
-			" avutil:" + ffversion(LIBAVUTIL_VERSION_INT) +
-			" avcodec:" + ffversion(LIBAVCODEC_VERSION_INT) +
-			" avformat:" + ffversion(LIBAVFORMAT_VERSION_INT) +
-			" swresample:" + ffversion(LIBSWRESAMPLE_VERSION_INT) +
-			" swscale:" + ffversion(LIBSWSCALE_VERSION_INT)
-			<< std::endl;
-	} else {
-		std::clog << "ffmpeg/error: header/lib version mismatch:"
-			" avutil:" + ffversion(LIBAVUTIL_VERSION_INT) + "/" + ffversion(avutil_version()) +
-			" avcodec:" + ffversion(LIBAVCODEC_VERSION_INT) + "/" + ffversion(avcodec_version()) +
-			" avformat:" + ffversion(LIBAVFORMAT_VERSION_INT) + "/" + ffversion(avformat_version()) +
-			" swresample:" + ffversion(LIBSWRESAMPLE_VERSION_INT) + "/" + ffversion(swresample_version()) +
-			" swscale:" + ffversion(LIBSWSCALE_VERSION_INT) + "/" + ffversion(swscale_version())
-			<< std::endl;
+		SpdLogger::info(LogSystem::FFMPEG,
+			"\n{5}libavutil: {0}\n"
+			"{5}libavcodec: {1}\n"
+			"{5}libavformat: {2}\n"
+			"{5}libswresample: {3}\n"
+			"{5}libswscale: {4}",
+			ffversion(LIBAVUTIL_VERSION_INT),
+			ffversion(LIBAVCODEC_VERSION_INT),
+			ffversion(LIBAVFORMAT_VERSION_INT),
+			ffversion(LIBSWRESAMPLE_VERSION_INT),
+			ffversion(LIBSWSCALE_VERSION_INT),
+			SpdLogger::newLineDec
+		);
+	}
+	else {
+		SpdLogger::info(LogSystem::FFMPEG,
+			"\n{10}libavutil: {0}/{1}\n"
+			"{10}libavcodec: {2}/{3}\n"
+			"{10}libavformat: {4}/{5}\n"
+			"{10}libswresample: {6}/{7}\n"
+			"{10}libswscale: {8}/{9}",
+			ffversion(LIBAVUTIL_VERSION_INT), ffversion(avutil_version()),
+			ffversion(LIBAVCODEC_VERSION_INT), ffversion(avcodec_version()),
+			ffversion(LIBAVFORMAT_VERSION_INT), ffversion(avformat_version()),
+			ffversion(LIBSWRESAMPLE_VERSION_INT), ffversion(swresample_version()),
+			ffversion(LIBSWSCALE_VERSION_INT), ffversion(swscale_version()),
+			SpdLogger::newLineDec
+		);
 	}
 #if (LIBAVFORMAT_VERSION_INT) < (AV_VERSION_INT(58,0,0))
 	av_register_all();
@@ -237,9 +243,7 @@ static void printFFmpegInfo() {
 std::string FFmpeg::Error::msgFmt(const FFmpeg &self, int errorValue, const char *func) {
 		char message[AV_ERROR_MAX_STRING_SIZE];
 		av_strerror(errorValue, message, AV_ERROR_MAX_STRING_SIZE);
-		std::ostringstream oss;
-		oss << "FFmpeg Error: Processing file " << self.m_filename << " code=" << errorValue << ", error=" << message << ", in function=" << func;
-		return oss.str();
+		return fmt::format("Error processing file={}, error={}({}), in function={}.", self.m_filename, errorValue, message, func);
 }
 
 FFmpeg::FFmpeg(fs::path const& _filename, int mediaType) : m_filename(_filename) {
