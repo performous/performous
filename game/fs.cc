@@ -283,17 +283,21 @@ void pathBootstrap() { Lock l(mutex); cache.pathBootstrap(); }
 void pathInit() { Lock l(mutex); cache.pathInit(); }
 
 std::string formatPath(const fs::path& target) {
+	if (target.empty()) {
+		return "<blank>";
+	}
+	fs::path baseDir = getBaseDir();
 	// Normalize the paths by resolving symlinks and removing redundant elements.
 	// But, if just a filename, keep it as is.
 	fs::path canonicalTarget = target.has_parent_path() ? fs::weakly_canonical(target) : target;
-	if (canonicalTarget == cache.base) {
+	if (canonicalTarget == baseDir) {
 	// Return the absolute path if referring to the base directory.
-		return cache.base.string();
+		return baseDir.string();
 	}
 	// Check if the target is a descendant of base.
-	if (std::mismatch(cache.base.begin(), cache.base.end(), canonicalTarget.begin()).first == cache.base.end()) {
+	if (std::mismatch(baseDir.begin(), baseDir.end(), canonicalTarget.begin()).first == baseDir.end()) {
 		// If target is a descendant of base, return the relative path starting from base's parent.
-		return fs::relative(canonicalTarget, cache.base.parent_path()).string();
+		return fs::relative(canonicalTarget, baseDir.parent_path()).string();
 	} else {
 		// Otherwise, return the absolute path to target.
 		return canonicalTarget.string();
@@ -321,6 +325,7 @@ fs::path getProfilerLogFilename() {
 }
 
 fs::path getSchemaFilename() { Lock l(mutex); return cache.share / configSchema; }
+fs::path getBaseDir() { Lock l(mutex); return cache.base; }
 fs::path getHomeDir() { Lock l(mutex); return cache.home; }
 fs::path getShareDir() { Lock l(mutex); return cache.share; }
 fs::path getLocaleDir() { Lock l(mutex); return cache.locale; }

@@ -90,6 +90,7 @@ fs::path execname(); ///< Get the path and filename of the main executable.
 fs::path getLogFilename();  ///< Get the log filename.
 fs::path getProfilerLogFilename();  ///< Profiler get its own log, or it obliterates everything else.
 fs::path getSchemaFilename();  ///< Get the config schema filename.
+fs::path getBaseDir();  ///< Get Performous base folder.
 fs::path getHomeDir();  ///< Get user's home folder.
 fs::path getConfigDir();  ///< Get user-writable Performous config folder.
 fs::path getSysConfigDir();  ///< Get root-writable Performous config folder.
