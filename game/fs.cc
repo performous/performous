@@ -35,8 +35,8 @@ namespace {
 	const fs::path performous = "performous";
 	const fs::path configSchema = "config/schema.xml";
 
-	std::mutex mutex;
-	using Lock = std::lock_guard<std::mutex>;
+	std::recursive_mutex mutex;
+	using Lock = std::lock_guard<std::recursive_mutex>;
 
 	void PathCache::pathBootstrap() {
 		if (!base.empty()) return;  // Only bootstrap once
@@ -286,10 +286,10 @@ std::string formatPath(const fs::path& target) {
 	if (target.empty()) {
 		return "<blank>";
 	}
-	fs::path baseDir = getBaseDir();
 	// Normalize the paths by resolving symlinks and removing redundant elements.
 	// But, if just a filename, keep it as is.
 	fs::path canonicalTarget = target.has_parent_path() ? fs::weakly_canonical(target) : target;
+	fs::path baseDir = getBaseDir();
 	if (canonicalTarget == baseDir) {
 	// Return the absolute path if referring to the base directory.
 		return baseDir.string();
