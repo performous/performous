@@ -13,6 +13,8 @@
 #include <sstream>
 #include <regex>
 
+#include <fmt/std.h> // needed to format std::filesystem::path
+
 #include <boost/range.hpp>
 
 #if (BOOST_OS_WINDOWS)
@@ -286,6 +288,8 @@ std::string formatPath(const fs::path& target) {
 	// Normalize the paths by resolving symlinks and removing redundant elements.
 	// But, if just a filename, keep it as is.
 	fs::path canonicalTarget = target.has_parent_path() ? fs::weakly_canonical(target) : target;
+
+    Lock l(mutex);
 	if (canonicalTarget == cache.base) {
 	// Return the absolute path if referring to the base directory.
 		return cache.base.string();
