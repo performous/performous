@@ -25,7 +25,7 @@ namespace input {
 		NONE /* No NavEvent emitted */, SOME /* Major gameplay button with no direct nav function, used for joining instruments */,
 		START, CANCEL, PAUSE,
 		REPEAT = 0x80 /* Anything after this is auto-repeating */,
-		UP, DOWN, LEFT, RIGHT, MOREUP, MOREDOWN, VOLUME_UP, VOLUME_DOWN
+		UP, DOWN, LEFT, RIGHT, MOREUP, MOREDOWN, VOLUME_UP, VOLUME_DOWN, HOME, END
 	};
 	/// Alternative orientation-agnostic mapping where A axis is the one that is easiest to access (e.g. guitar pick) and B might not be available on all devices
 	enum class NavMenu { NONE, A_PREV, A_NEXT, B_PREV, B_NEXT };
