@@ -24,7 +24,7 @@ void Backgrounds::reload_internal() {
 		m_dirty = true;
 	}
 	// Go through the background paths
-	Paths paths = getPaths();
+    Paths paths = PathCache::getInstance().getPaths();
 	for (auto it = paths.begin(); m_loading && it != paths.end(); ++it) {
 		if (!m_loading) break;
 		*it /= "backgrounds";
