@@ -211,6 +211,9 @@ void Songs::CacheSonglist() {
 		if(!std::isnan(song->preview_start)) {
 			songObject["previewStart"] = song->preview_start;
 		}
+		if(!song->music[TrackName::INSTRUMENTAL].string().empty()) {
+			songObject["instrumental"] = song->music[TrackName::INSTRUMENTAL].string();
+		}
 		if(!song->music[TrackName::VOCAL_LEAD].string().empty()) {
 			songObject["vocals"] = song->music[TrackName::VOCAL_LEAD].string();
 		}
