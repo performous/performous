@@ -10,7 +10,7 @@
     Upon success the player will be moved to the playlist tab.
 */
 function addSong(songObjectToSend) {
-    $.ajax({
+    return $.ajax({
         url: "api/add",
         type: "POST",
         data: songObjectToSend,
