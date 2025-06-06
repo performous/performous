@@ -30,18 +30,18 @@ TEST(UnitTest_Utils, smoothstep_3_clamping) {
     EXPECT_EQ(1.0, smoothstep(-1., 1., 2.0));
 }
 
-TEST(UnitTest_Utils, format) {
+TEST(UnitTest_Utils, timeFormat) {
     auto const time = std::chrono::seconds(7260);
 
 #ifndef __MINGW32__
     // next two tests are not working when compiled with mingw. see https://sourceforge.net/p/mingw-w64/bugs/793/
-    EXPECT_EQ("01/01/70 02:01", format(time, "%D %R", true));
-    EXPECT_EQ("02:01:00 1970-01-01", format(time, "%T %F", true));
+    EXPECT_EQ("01/01/70 02:01", timeFormat(time, "%D %R", true));
+    EXPECT_EQ("02:01:00 1970-01-01", timeFormat(time, "%T %F", true));
 #endif
 
-    EXPECT_EQ("01/01/70 02:01", format(time, "%m/%d/%y %H:%M", true));
-    EXPECT_EQ("02:01:00 1970-01-01", format(time, "%H:%M:%S %Y-%m-%d", true));
-    EXPECT_EQ("02:01:00 1970-01-01", format(time, "%X %Y-%m-%d", true));
+    EXPECT_EQ("01/01/70 02:01", timeFormat(time, "%m/%d/%y %H:%M", true));
+    EXPECT_EQ("02:01:00 1970-01-01", timeFormat(time, "%H:%M:%S %Y-%m-%d", true));
+    EXPECT_EQ("02:01:00 1970-01-01", timeFormat(time, "%X %Y-%m-%d", true));
 }
 
     TEST(UnitTest_Utils, toLower_empty) {

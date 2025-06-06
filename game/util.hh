@@ -52,7 +52,7 @@ struct UnlockGuard {
 };
 
 std::uint32_t stou(std::string const & str, size_t * idx = nullptr, int base = 10);
-std::string format(std::chrono::seconds const& unixtime, std::string const& format, bool utc = false);
+std::string timeFormat(std::chrono::seconds const& unixtime, std::string const& format, bool utc = false);
 std::string replaceFirst(std::string const& s, std::string const& from, std::string const& toB);
 
 bool isText(std::string const& s, size_t bytesToCheck = 32);

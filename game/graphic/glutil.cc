@@ -40,12 +40,11 @@ namespace glutil {
 	void GLErrorChecker::check(std::string const& what) {
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
-			stack.back() = info + " " + what;
+			stack.back()= fmt::format("{} {}", info, what);
 			// Prefix with all currently active GLErrorChecker contexts
-			std::string logmsg = "opengl/error: ";
-			for (auto s: stack) logmsg += s + ": ";
-			logmsg += msg(err) + "\n";
-			std::clog << logmsg << std::flush;
+			std::string logmsg;
+			for (auto s: stack) fmt::format_to(std::back_inserter(logmsg), "{}: ", s);
+			SpdLogger::error(LogSystem::OPENGL, logmsg.append(msg(err)));
 		}
 		stack.back() = info + " after " + what;
 	}

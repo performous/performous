@@ -219,7 +219,7 @@ void ScreenSongs::update() {
 bool ScreenSongs::addSong() {
 	auto& pl = getGame().getCurrentPlayList();
 	auto song = m_songs.currentPtr();
-	if (song->loadStatus != Song::LoadStatus::ERROR) {
+	if (song->loadStatus != Song::LoadStatus::PARSERERROR) {
 		pl.addSong(song);
 	}
 	else {
@@ -259,9 +259,7 @@ void ScreenSongs::drawJukebox() {
 			s.draw(window);
 		}
 		// Format && draw the song information text
-		std::ostringstream oss_song;
-		oss_song << song.title << '\n' << song.artist;
-		theme->song.draw(window, oss_song.str());
+		theme->song.draw(window, fmt::format("{}\n{}", song.title, song.artist));
 	}
 }
 
@@ -297,45 +295,43 @@ void ScreenSongs::draw() {
 	update();
 	drawMultimedia();
 
-	std::ostringstream oss_song, oss_order;
 	auto hiscore = std::string{};
-
+	std::string songText, orderText;
 	// Test if there are no songs
 	if (m_songs.empty()) {
 		// Format the song information text
 		if (!m_search.text.empty()) {
-			oss_song << _("Sorry, no songs match the search!");
-			oss_order << m_search.text;
+			songText = _("Sorry, no songs match the search!");
+			orderText = m_search.text;
 		} else if (m_songs.typeNum()) {
-			oss_song << _("Sorry, no songs match the filter!");
-			oss_order << m_songs.typeDesc();
+			songText = _("Sorry, no songs match the filter!");
+			orderText = m_songs.typeDesc();
 		} else {
-			oss_song << _("No songs found!");
-			oss_order << _("Visit performous.org for free songs");
+			songText = _("No songs found!");
+			orderText = _("Visit performous.org for free songs");
 		}
 	} else {
 		Song& song = m_songs.current();
 		// Format the song information text
-		oss_song << song.artist << ": " << song.title;
+		songText = fmt::format("{}: {}", song.artist, song.title);
 		hiscore = getHighScoreText();
 		// Escaped bytes of UTF-8 must be used here for compatibility with Windows (MSVC, mingw)
-		char const* VERT_ARROW = "\xe2\x86\x95 ";  // ↕
-		char const* HORIZ_ARROW = "\xe2\x86\x94 ";  // ↔
-		char const* ENTER = "\xe2\x86\xb5 ";  // ↵
-		char const* PAD = "   ";
+		char const* VERT_ARROW = "\xe2\x86\x95";  // ↕
+		char const* HORIZ_ARROW = "\xe2\x86\x94";  // ↔
+		char const* ENTER = "\xe2\x86\xb5";  // ↵
 		switch (m_menuPos) {
 		case 1:
-			if (!m_search.text.empty()) oss_order << m_search.text;
-			else if (m_songs.typeNum()) oss_order << m_songs.typeDesc();
-			else if (m_songs.sortNum()) oss_order << m_songs.getSortDescription();
-			else oss_order << _("<type in to search>") << PAD << HORIZ_ARROW << _("songs") << PAD << VERT_ARROW << _("options");
+			if (!m_search.text.empty()) orderText.append(m_search.text);
+			else if (m_songs.typeNum()) orderText.append(m_songs.typeDesc());
+			else if (m_songs.sortNum()) orderText.append(m_songs.getSortDescription());
+			else fmt::format_to(std::back_inserter(orderText), "{}   {} {}    {} {}", _("<type in to search>"), HORIZ_ARROW, _("songs"), VERT_ARROW, _("options"));
 			break;
-		case 2: oss_order << HORIZ_ARROW << _("sort order: ") << m_songs.getSortDescription(); break;
-		case 3: oss_order << HORIZ_ARROW << _("type filter: ") << m_songs.typeDesc(); break;
-		case 4: oss_order << HORIZ_ARROW << _("hiscores") << PAD << ENTER << _("jukebox mode"); break;
+		case 2: fmt::format_to(std::back_inserter(orderText), "{} {} {}", HORIZ_ARROW, _("sort order: "), m_songs.getSortDescription()); break;
+		case 3: fmt::format_to(std::back_inserter(orderText), "{} {} {}", HORIZ_ARROW, _("type filter: "), m_songs.typeDesc()); break;
+		case 4: fmt::format_to(std::back_inserter(orderText), "{} {}   {} {}", HORIZ_ARROW, _("hiscores"), ENTER, _("jukebox mode")); break;
 		case 0:
-			bool empty = getGame().getCurrentPlayList().isEmpty();
-			oss_order << ENTER << (empty ? _("start a playlist with this song!") : _("open the playlist menu"));
+			bool empty = getGame().getCurrentPlayList().isEmpty(); 
+			orderText = fmt::format(fmt::runtime("{} {}"), ENTER, empty ? _("start a playlist with this song!") : _("open the playlist menu"));
 			break;
 		}
 	}
@@ -344,8 +340,8 @@ void ScreenSongs::draw() {
 	else {
 		auto& window = getGame().getWindow();
 		// Draw song and order texts
-		theme->song.draw(window, oss_song.str());
-		theme->order.draw(window, oss_order.str());
+		theme->song.draw(window, songText);
+		theme->order.draw(window, orderText);
 		drawInstruments(Dimensions(1.0f).fixedHeight(0.09f).right(0.45f).screenTop(0.02f));
 		theme->hiscores.draw(window, hiscore);
 	}
@@ -363,36 +359,32 @@ std::string ScreenSongs::getHighScoreText() const {
 	for (auto const& hi: scores)
 		scoresByTrack[hi.track].insert(hi);
 
-	auto const scoreFormatter = [](auto& stream, auto const& score){
-		stream << std::setw(10) << std::right << score << " \t";
-	};
-	auto const playerFormatter = [this](auto& stream, auto const& playerId) {
+	auto const playerFormatter = [this](std::string& string, auto const& playerId) {
 		const auto player = m_database.getPlayers().lookup(playerId);
-
-		stream << std::setw(25) << std::left << player.value_or("Unknown player Id " + std::to_string(playerId));
+		fmt::format_to(std::back_inserter(string), "{: <}", player.value_or(fmt::format("Unknown player ID: {}", playerId)));
 	};
-	auto const timeFormatter = [datetimeFormat](auto& stream, auto const& unixtime){
+	auto const timeFormatter = [datetimeFormat](std::string& string, auto const& unixtime) {
 		if(unixtime.count()) {
-			stream << " \t" << format(unixtime, datetimeFormat);
+			fmt::format_to(std::back_inserter(string), " \t{}", timeFormat(unixtime, datetimeFormat));
 		}
 	};
-	auto stream = std::stringstream();
+	std::string ret;
 	auto n = 0;
 	for (auto const& [track, scores]: scoresByTrack) {
-		stream << track << ":\n";
+		fmt::format_to(std::back_inserter(ret), "{}:\n");
 		for (auto const& score: scores) {
-			scoreFormatter(stream, score.score);
-			playerFormatter(stream, score.playerid);
-			timeFormatter(stream, score.unixtime);
-			stream << "\n";
+			fmt::format_to(std::back_inserter(ret), "{:0>10L}\t", score.score);
+			playerFormatter(ret, score.playerid);
+			timeFormatter(ret, score.unixtime);
+			ret.append("\n");
 		}
-		stream << "\n";
+		ret.append("\n");
 		if(++n == maxLines) {
 			break;
 		}
 	}
 
-	return stream.str();
+	return ret;
 }
 
 void ScreenSongs::drawCovers() {

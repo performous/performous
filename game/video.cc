@@ -1,6 +1,7 @@
 #include "video.hh"
 
 #include "ffmpeg.hh"
+#include "log.hh"
 #include "util.hh"
 #include "graphic/color_trans.hh"
 
@@ -75,20 +76,20 @@ Video::Video(fs::path const& _videoFile, double videoGap): m_videoGap(videoGap),
 					{
 						UnlockGuard<decltype(l)> unlocked(l);  // release lock for possibly blocking calls
 						push(Bitmap());						   // EOF marker
-						std::clog << "ffmpeg/debug: done loading " << file << std::endl;
+						SpdLogger::debug(LogSystem::FFMPEG, "File={}, done loading.", file);
 					}
 					m_cond.wait(l, [this] { return m_quit || m_seek_asked; });
 				} catch (std::exception& e) {
 					UnlockGuard<decltype(l)> unlocked(l);  // release lock for possibly blocking calls
-					std::clog << "ffmpeg/error: " << file << ": " << e.what() << std::endl;
+					SpdLogger::error(LogSystem::FFMPEG, "Error={}, reading file={}.", file, e.what());
 					if (++errors > 2) {
-						std::clog << "ffmpeg/error: FFMPEG terminating due to multiple errors" << std::endl;
+						SpdLogger::error(LogSystem::FFMPEG, "Terminating due to multiple errors.");
 						break;
 					}
 				}
 			}
 		} catch (std::exception& e) {
-			std::clog << "ffmpeg/error: " << file << ": " << e.what() << std::endl;
+			SpdLogger::error(LogSystem::FFMPEG, "Error={}, reading file={}.", file, e.what());
 		}
 	});
 }

@@ -2,6 +2,7 @@
 
 #include "configuration.hh"
 #include "game.hh"
+#include "log.hh"
 
 #include <regex>
 #include <stdexcept>
@@ -56,10 +57,9 @@ std::string UnicodeUtil::getCharset (std::string_view& str) {
 		&is_reliable);
 
 	if (!is_reliable) {
-			std::clog << "unicode/warning: detected encoding (" << MimeEncodingName(encoding) << ") for text: " << ((str.size() <= 256) ? str : str.substr(0,255)) <<
-			" was flagged as not reliable." << std::endl; // Magic number, so sue me.
+		std::string_view textSample{str.data(), str.size() <= 256 ? str.length() : 255}; // Magic number, so sue me.
+		SpdLogger::info(LogSystem::I18N, "Detected encoding={}, for text sample='{}' not reliable.", MimeEncodingName(encoding), textSample); 
 	}
-
 	return MimeEncodingName(encoding);
 }
 
@@ -69,7 +69,9 @@ std::string UnicodeUtil::convertToUTF8 (std::string_view str, std::string _filen
 	if (assumeUTF8) charset = "UTF-8";
 	else charset = UnicodeUtil::getCharset(str);
 		if (charset != "UTF-8") {
-			if (!_filename.empty()) std::clog << "unicode/info: " << _filename << " does not appear to be UTF-8; (" << charset << ") detected." << std::endl; 
+			if (!_filename.empty()) {
+				SpdLogger::info(LogSystem::I18N, "Filename={} does not seem to be UTF-8. Detected encoding={}", _filename, charset);
+			}
 			ustring = UnicodeUtil::getConverter(charset).convertToUTF16(str);
 		}
 	else {
@@ -95,7 +97,7 @@ std::string UnicodeUtil::convertToUTF8 (std::string_view str, std::string _filen
 	}
 	else {
 		if (!ret.empty()) {
-			std::clog << "unicode/error: tried to convert text in an unknown encoding: " << charset << std::endl;
+			SpdLogger::error(LogSystem::I18N, "Unable to convert text in unknown encoding={}", charset);
 		}
 	}
 	removeUTF8BOM(ret);
@@ -160,8 +162,8 @@ bool UnicodeUtil::isRTL(std::string_view str) {
 	);
 	if (_unicodeError.isSuccess()) _return = (ubidi_getDirection(_uBiDiObj.get()) != UBIDI_LTR);
 	else {
-		std::clog << "unicode/warning: Error (" << std::to_string(_unicodeError.get()) << ": " << _unicodeError.errorName() << "), determining text direction for: " << str << ", will assume LTR." << std::endl;
-		}
+		SpdLogger::warning(LogSystem::I18N, "Error determining text direction. Will assume LTR. Text='{}', error={}: {}", str, static_cast<int>(_unicodeError.get()), _unicodeError.errorName());
+	}
 	return _return;
 }
 
