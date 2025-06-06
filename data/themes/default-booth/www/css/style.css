@@ -1,0 +1,30 @@
+/* Add custom styles here */
+@import url("../fonts/Montserrat.css");
+
+:root {
+  --font-display: 'Montserrat', sans-serif;
+
+  --color-general-fg: #111111;
+  --color-general-bg: #ffffff;
+  --color-primary-fg: #ffffff;
+  --color-primary-bg: #61a0cd;
+  --color-primary-bg-hover: #82bce6;
+  --color-secondary-fg: #111111;
+  --color-secondary-bg: #eeeeee;
+  --color-hover-fg: #111111;
+  --color-hover-bg: #dddddd;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-general-fg: #ffffff;
+    --color-general-bg: #111111;
+    --color-primary-fg: #ffffff;
+    --color-primary-bg: #333333;
+    --color-primary-bg-hover: #444444;
+    --color-secondary-fg: #ffffff;
+    --color-secondary-bg: #222222;
+    --color-hover-fg: #ffffff;
+    --color-hover-bg: #444444;
+  }
+}
