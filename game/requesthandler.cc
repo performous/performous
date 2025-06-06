@@ -248,7 +248,7 @@ void RequestHandler::Get(web::http::http_request request)
 		songObject[utility::conversions::to_string_t("Language")] = web::json::value::string(utility::conversions::to_string_t(ss.getSong()->language));
 		songObject[utility::conversions::to_string_t("Creator")] = web::json::value::string(utility::conversions::to_string_t(ss.getSong()->creator));
 		songObject[utility::conversions::to_string_t("Duration")] = web::json::value(ss.getSong()->getDurationSeconds());
-		songObject[utility::conversions::to_string_t("HasError")] = web::json::value::boolean(ss.getSong()->loadStatus == Song::LoadStatus::ERROR);
+		songObject[utility::conversions::to_string_t("HasError")] = web::json::value::boolean(ss.getSong()->loadStatus == Song::LoadStatus::PARSERERROR);
 		songObject[utility::conversions::to_string_t("ProvidedBy")] = web::json::value(utility::conversions::to_string_t(ss.getSong()->providedBy));
 		songObject[utility::conversions::to_string_t("Comment")] = web::json::value(utility::conversions::to_string_t(ss.getSong()->comment));
 		songObject[utility::conversions::to_string_t("Path")] = web::json::value(utility::conversions::to_string_t(std::filesystem::path(ss.getSong()->path.parent_path()).filename()));
