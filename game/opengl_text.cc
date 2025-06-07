@@ -18,7 +18,7 @@
 
 void loadFonts() {
 	auto config = std::unique_ptr<FcConfig, decltype(&FcConfigDestroy)>(FcInitLoadConfig(), &FcConfigDestroy);
-	for (fs::path const& font: listFiles("fonts")) {
+	for (fs::path const& font: PathCache::getInstance().listFiles("fonts")) {
 		FcBool err = FcConfigAppFontAddFile(config.get(), reinterpret_cast<const FcChar8*>(font.string().c_str()));
 		SpdLogger::info(LogSystem::TEXT, fmt::runtime("Loading font={} : {})"), font, err == FcTrue ? "OK" : "Error");
 	}

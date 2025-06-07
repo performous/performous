@@ -11,6 +11,6 @@ namespace cache {
 		// Windows drive name handling
 		auto const fullpath = replace(svgfilename.parent_path().string(), ':', '_');
 
-		return getCacheDir() / "misc" / fs::path(fullpath).relative_path() / cache_basename;
+        return PathCache::getInstance().getCacheDir() / "misc" / fs::path(fullpath).relative_path() / cache_basename;
 	}
 }

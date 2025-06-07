@@ -402,17 +402,18 @@ unsigned short LanguageToLanguageId(const std::string& name) {
 }
 
 void readConfig() {
+    PathCache &pc = PathCache::getInstance();
 	// Find config schema
-	fs::path schemaFile = getSchemaFilename();
-	systemConfFile = getSysConfigDir() / "config.xml";
-	userConfFile = getConfigDir() / "config.xml";
+    fs::path schemaFile = pc.getSchemaFilename();
+    systemConfFile = pc.getSysConfigDir() / "config.xml";
+    userConfFile = pc.getConfigDir() / "config.xml";
 	readConfigXML(schemaFile, 0);  // Read schema and defaults
 	readConfigXML(systemConfFile, 1);  // Update defaults with system config
 	readConfigXML(userConfFile, 2);  // Read user settings
-	pathInit();
+    pc.pathInit();
 	// Populate themes
 	ConfigItem& ci = config["game/theme"];
-	for (auto const& theme : getThemes())
+    for (auto const& theme : pc.getThemes())
 		ci.addEnum(theme);
 	if (ci.ui() == 1337)
 		ci.selectEnum("default");  // Select the default theme if nothing is selected

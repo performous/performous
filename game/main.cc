@@ -105,7 +105,7 @@ void mainLoop(std::string const& songlist) {
 	TranslationEngine localization;
 	TextureLoader m_loader;
 	Backgrounds backgrounds;
-	Database database(getConfigDir() / "database.xml");
+	Database database(PathCache::getInstance().getConfigDir() / "database.xml");
 	Songs songs(database, songlist);
 	loadFonts();
 
@@ -333,7 +333,7 @@ int main(int argc, char** argv) {
 		std::cout << cmdline << "\n  Any arguments without a switch are interpreted as song folders.\n" << std::endl;
 		return EXIT_SUCCESS;
 	}
-	pathBootstrap();
+	PathCache::getInstance().pathBootstrap();  
 	SpdLogger spdLogger(levelEnum);
 	try {
 		outputOptionalFeatureStatus();
@@ -357,7 +357,7 @@ int main(int argc, char** argv) {
 		// Override XML config for options that were specified from commandline or performous.conf
 		confOverride(songdirs, "paths/songs");
 		confOverride(devices, "audio/devices");
-		getPaths(); // Initialize paths before other threads start
+		PathCache::getInstance().getPaths(); // Initialize paths before other threads start
 		if (vm.count("jstest")) { // Joystick test program
 			SpdLogger::info(LogSystem::CONTROLLERS, 
 				"Starting jstest input test utility.\n"

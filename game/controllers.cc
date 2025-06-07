@@ -121,8 +121,8 @@ namespace input {
 		Impl(): m_eventsEnabled() {
 			#define DEFINE_BUTTON(devtype, button, num, nav) m_buttons[to_underlying(DevType::devtype)][#button] = ButtonId::devtype##_##button;
 			#include "controllers-buttons.ii"
-			readControllers(getShareDir() / "config/controllers.xml");
-			readControllers(getConfigDir() / "controllers.xml");
+            readControllers(PathCache::getInstance().getShareDir() / "config/controllers.xml");
+            readControllers(PathCache::getInstance().getConfigDir() / "controllers.xml");
 			m_hw[SourceType::KEYBOARD] = constructKeyboard();
 			m_hw[SourceType::JOYSTICK] = constructJoysticks();
 			if (Hardware::midiEnabled()) m_hw[SourceType::MIDI] = constructMidi();

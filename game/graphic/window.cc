@@ -582,7 +582,7 @@ void Window::screenshot() {
 	// Compose filename with first available number
 	fs::path filename;
 	for (unsigned i = 1;; ++i) {
-		filename = getHomeDir() / ("Performous_" + std::to_string(i) + ".png");
+		filename = PathCache::getInstance().getHomeDir() / ("Performous_" + std::to_string(i) + ".png");
 		if (!fs::exists(filename)) break;
 	}
 	// Save to disk
