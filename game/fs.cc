@@ -34,213 +34,219 @@ namespace {
 
 	const fs::path performous = "performous";
 	const fs::path configSchema = "config/schema.xml";
+}
 
-	std::recursive_mutex mutex;
-	using Lock = std::lock_guard<std::recursive_mutex>;
+Paths PathCache::pathExpand(fs::path p) {
+	Paths ret;
+	if (pathRootHack(p, "~")) ret.push_back(home / p);
+	else if (pathRootHack(p, "DATADIR")) {
+		// Add all data paths with p appended to them
+		for (auto const& path: paths) ret.push_back(path / p);
+	}
+	else ret.push_back(p);
+	return ret;
+}
 
-	void PathCache::pathBootstrap() {
-		if (!base.empty()) return;  // Only bootstrap once
-		// Base (e.g. /usr/local), share (src or installed data files) and locale (built or installed .mo files)
-		{
-			char const* root = getenv("PERFORMOUS_ROOT");
-			switch (Platform::currentOS()) {
-				case Platform::HostOS::OS_WIN:
-					base = fs::canonical(root ? root : execname().parent_path());
+void PathCache::pathBootstrap() {
+	if (!base.empty()) return;  // Only bootstrap once
+	// Base (e.g. /usr/local), share (src or installed data files) and locale (built or installed .mo files)
+	{
+		Lock l(m_mutex);
+		char const* root = getenv("PERFORMOUS_ROOT");
+		switch (Platform::currentOS()) {
+			case Platform::HostOS::OS_WIN:
+				base = fs::canonical(root ? root : execname().parent_path());
+				break;
+			case Platform::HostOS::OS_MAC:
+				if (const auto appFolder{execname().parent_path().parent_path().parent_path()}; appFolder.extension() == ".app") {
+					base = fs::canonical(appFolder);
 					break;
-				case Platform::HostOS::OS_MAC:
-					if (const auto appFolder{execname().parent_path().parent_path().parent_path()}; appFolder.extension() == ".app") {
-						base = fs::canonical(appFolder);
-						break;
-					}
-					[[fallthrough]]; // if not running from .app bundle, handle like regular unix.
-				default:
-					base = fs::canonical(root ? root : execname().parent_path().parent_path());
-					break;
-			}
-			std::set<fs::path> infixPaths{fs::path(SHARED_DATA_DIR), fs::path("data"),fs::path()};
-			do {
-				if (base.empty()) throw std::runtime_error("Unable to find Performous data files. Install properly or set environment variable PERFORMOUS_ROOT.");
-				for (auto const& infix : infixPaths) {
-					if (!fs::exists(base / infix / configSchema)) continue;
-					share = base / infix;
-					break; // Found
 				}
-				if (!share.empty()) {
-					break; // Found
-				}
-				base = base.parent_path();
-			} while (true);
-			// Use locale .mo files from build folder?
-			if (Platform::currentOS() == Platform::HostOS::OS_WIN) {
-				auto folder = base.filename();
-				auto reg = "x\\d{2}-([Dd]ebug|[Rr]elease)(-install)?"; // matches all build folders.
-				if ((folder == "build" || std::regex_search(folder.string(), std::regex(reg))) && fs::exists(base / "lang")) {
-					locale = base / "lang";
-				}
-			}
-			else {
-				if (base.filename() == "build" && fs::exists(base / "lang")) {
-					locale = base / "lang";
-				}
-			}
-			if (locale.empty() && fs::exists(base / LOCALE_DIR)) locale = base / LOCALE_DIR;
+				[[fallthrough]]; // if not running from .app bundle, handle like regular unix.
+			default:
+				base = fs::canonical(root ? root : execname().parent_path().parent_path());
+				break;
 		}
-		// System-wide config files
-		{
-			switch (Platform::currentOS()) {
-				case Platform::HostOS::OS_MAC:
-					sysConf = "/Library/Preferences/Performous";
-					break;
-				case Platform::HostOS::OS_WIN:
-					sysConf = execname().parent_path() / "config";
-					break;
-				default:
-					sysConf = "/etc/xdg/performous";
+		std::set<fs::path> infixPaths{fs::path(SHARED_DATA_DIR), fs::path("data"),fs::path()};
+		do {
+			if (base.empty()) throw std::runtime_error("Unable to find Performous data files. Install properly or set environment variable PERFORMOUS_ROOT.");
+			for (auto const& infix : infixPaths) {
+				if (!fs::exists(base / infix / configSchema)) continue;
+				share = base / infix;
+				break; // Found
+			}
+			if (!share.empty()) {
+				break; // Found
+			}
+			base = base.parent_path();
+		} while (true);
+		// Use locale .mo files from build folder?
+		if (Platform::currentOS() == Platform::HostOS::OS_WIN) {
+			auto folder = base.filename();
+			auto reg = "x\\d{2}-([Dd]ebug|[Rr]elease)(-install)?"; // matches all build folders.
+			if ((folder == "build" || std::regex_search(folder.string(), std::regex(reg))) && fs::exists(base / "lang")) {
+				locale = base / "lang";
 			}
 		}
-
-		// Home
-		{
-		char const* p = Platform::currentOS() == Platform::HostOS::OS_WIN ? getenv("USERPROFILE") : getenv("HOME");
-			if (p) home = p;
+		else {
+			if (base.filename() == "build" && fs::exists(base / "lang")) {
+				locale = base / "lang";
+			}
 		}
-		// Config
-		{
+		if (locale.empty() && fs::exists(base / LOCALE_DIR)) locale = base / LOCALE_DIR;
+	}
+	// System-wide config files
+	{
+		Lock l(m_mutex);
+		switch (Platform::currentOS()) {
+			case Platform::HostOS::OS_MAC:
+				sysConf = "/Library/Preferences/Performous";
+				break;
+			case Platform::HostOS::OS_WIN:
+				sysConf = execname().parent_path() / "config";
+				break;
+			default:
+				sysConf = "/etc/xdg/performous";
+		}
+	}
+
+	// Home
+	{
+	Lock l(m_mutex);
+	char const* p = Platform::currentOS() == Platform::HostOS::OS_WIN ? getenv("USERPROFILE") : getenv("HOME");
+		if (p) home = p;
+	}
+	// Config
+	{
+		Lock l(m_mutex);
 #if (BOOST_OS_WINDOWS)
-			PWSTR p;
-			HRESULT hRes = SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, nullptr, &p);
-			if (hRes != NOERROR) throw std::runtime_error("Unable to determine where Application Data is stored");
-			conf = p;
-			conf /= performous;
+		PWSTR p;
+		HRESULT hRes = SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, nullptr, &p);
+		if (hRes != NOERROR) throw std::runtime_error("Unable to determine where Application Data is stored");
+		conf = p;
+		conf /= performous;
 #else
-			if (Platform::currentOS() == Platform::HostOS::OS_MAC) {
-				conf = (home / "Library/Preferences/Performous");
-			}
-			else {
-				char const* p = getenv("XDG_CONFIG_HOME");
-				conf = (p ? p : home / ".config");
-				conf /= performous;
-			}
-#endif
+		if (Platform::currentOS() == Platform::HostOS::OS_MAC) {
+			conf = (home / "Library/Preferences/Performous");
 		}
-
-		// Data
-		{
-			switch (Platform::currentOS()) {
-				case Platform::HostOS::OS_MAC:
-					data = share;
-					break;
-				case Platform::HostOS::OS_WIN:
-					data = conf;
-					break;
-				default:
-					char const* p = getenv("XDG_DATA_HOME");
-					data = (p ? p / performous : home / ".local" / SHARED_DATA_DIR);
-			}
-		}
-		// Cache
-		{
-			switch (Platform::currentOS()) {
-				case Platform::HostOS::OS_MAC:
-					cache = (home / "Library/Caches/Performous");
-					break;
-				case Platform::HostOS::OS_WIN:
-					cache = data / "cache";
-					break;
-				default:
-					char const* p = getenv("XDG_DATA_HOME");
-					cache = (p ? p / performous : home / ".cache" / performous);
-			}
-		}
-		pathInit();
-	}
-
-	void PathCache::pathInit() {
-		bool bootstrapping = paths.empty();  // The first run (during bootstrap)
-		if (!bootstrapping) {
-			std::string logmsg{fmt::format(
-			"Found system paths:\n"
-			"{8}base:          {0}\n"
-			"{8}share:         {1}\n"
-			"{8}locale:        {2}\n"
-			"{8}sysConf:       {3}\n"
-			"{8}home           {4}\n"
-			"{8}config:        {5}\n"
-			"{8}data:          {6}\n"
-			"{8}cache:         {7}",
-			base, share, locale, sysConf, home, conf, data, cache, SpdLogger::newLineDec
-			)};
-			SpdLogger::info(LogSystem::FILESYSTEM, logmsg);
-		}
-			if (Platform::currentOS() == Platform::HostOS::OS_MAC) {
+		else {
 			char const* p = getenv("XDG_CONFIG_HOME");
-			fs::path oldConf = (p ? p : home / ".config/performous");
-			if (fs::is_directory(oldConf)) {
-				SpdLogger::info(LogSystem::FILESYSTEM, "Configuration files found in old location, path={}", oldConf);
-				conf = home / "Library" / "Preferences" / "Performous";
-				if (bootstrapping) {
-					copyDirectoryRecursively(oldConf, conf);
-					try {
-						fs::remove_all(oldConf);
-						fs::path oldCache = (home / ".cache/performous");
-						fs::remove_all(oldCache);
-						didMigrateConfig = true;
-					}
-					catch (fs::filesystem_error const& e) {
-						throw std::runtime_error(fmt::format("There was an error migrating configuration to path={}. Exception={}", conf, e.what()));
-					}
+			conf = (p ? p : home / ".config");
+			conf /= performous;
+		}
+#endif
+	}
+
+	// Data
+	{
+		Lock l(m_mutex);
+		switch (Platform::currentOS()) {
+			case Platform::HostOS::OS_MAC:
+				data = share;
+				break;
+			case Platform::HostOS::OS_WIN:
+				data = conf;
+				break;
+			default:
+				char const* p = getenv("XDG_DATA_HOME");
+				data = (p ? p / performous : home / ".local" / SHARED_DATA_DIR);
+		}
+	}
+	// Cache
+	{
+		Lock l(m_mutex);
+		switch (Platform::currentOS()) {
+			case Platform::HostOS::OS_MAC:
+				cache = (home / "Library/Caches/Performous");
+				break;
+			case Platform::HostOS::OS_WIN:
+				cache = data / "cache";
+				break;
+			default:
+				char const* p = getenv("XDG_DATA_HOME");
+				cache = (p ? p / performous : home / ".cache" / performous);
+		}
+	}
+	pathInit();
+}
+
+void PathCache::pathInit() {
+	bool bootstrapping = paths.empty();  // The first run (during bootstrap)
+	if (!bootstrapping) {
+		std::string logmsg{fmt::format(
+		"Found system paths:\n"
+		"{8}base:          {0}\n"
+		"{8}share:         {1}\n"
+		"{8}locale:        {2}\n"
+		"{8}sysConf:       {3}\n"
+		"{8}home           {4}\n"
+		"{8}config:        {5}\n"
+		"{8}data:          {6}\n"
+		"{8}cache:         {7}",
+		base, share, locale, sysConf, home, conf, data, cache, SpdLogger::newLineDec
+		)};
+		SpdLogger::info(LogSystem::FILESYSTEM, logmsg);
+		fs::path testPath = "";
+		SpdLogger::info(LogSystem::FILESYSTEM, "Testing a blank path: {}", testPath);
+	}
+	if (Platform::currentOS() == Platform::HostOS::OS_MAC) {
+		Lock l(m_mutex);
+		char const* p = getenv("XDG_CONFIG_HOME");
+		fs::path oldConf = (p ? p : home / ".config/performous");
+		if (fs::is_directory(oldConf)) {
+			SpdLogger::info(LogSystem::FILESYSTEM, "Configuration files found in old location, path={}", oldConf);
+			conf = home / "Library" / "Preferences" / "Performous";
+			if (bootstrapping) {
+				copyDirectoryRecursively(oldConf, conf);
+				try {
+					fs::remove_all(oldConf);
+					fs::path oldCache = (home / ".cache/performous");
+					fs::remove_all(oldCache);
+					didMigrateConfig = true;
 				}
-			}
-			if (didMigrateConfig) {
-				SpdLogger::info(LogSystem::FILESYSTEM, "Successfully moved configuration files to their new location, path={}", conf);
+				catch (fs::filesystem_error const& e) {
+					throw std::runtime_error(fmt::format("There was an error migrating configuration to path={}. Exception={}", conf, e.what()));
 				}
-			}
-		// Data dirs
-		std::string logmsg{"Determining data dirs (search path):"};
-		{
-			Paths dirs;
-			dirs.push_back(data);  // Adding user's data dir
-			dirs.push_back(share);  // Adding system data dir (relative to performous executable or PERFORMOUS_ROOT)
-			if (Platform::currentOS() != Platform::HostOS::OS_WIN) {
-				// Adding XDG_DATA_DIRS
-				{
-					char const* xdg_data_dirs = getenv("XDG_DATA_DIRS");
-					std::istringstream iss(xdg_data_dirs ? xdg_data_dirs : "/usr/local/share/:/usr/share/");
-					for (std::string p; std::getline(iss, p, ':'); dirs.push_back(p / performous)) {}
-				}
-			}
-			// Adding paths from config file (during bootstrap config options are not yet available)
-			if (!bootstrapping) {
-				auto const& conf = config["paths/system"].sl();
-				for (std::string const& dir: conf) dirs.splice(dirs.end(), pathExpand(dir));
-			}
-			// Check if they actually exist and print debug
-			paths.clear();
-			std::set<fs::path> used;
-			for (auto dir: dirs) {
-				dir = fs::weakly_canonical(dir);
-				if (used.find(dir) != used.end()) continue;
-				fmt::format_to(std::back_inserter(logmsg), "\n{}{}", SpdLogger::newLineDec, dir);
-				paths.push_back(dir);
-				used.insert(dir);
 			}
 		}
+		if (didMigrateConfig) {
+			SpdLogger::info(LogSystem::FILESYSTEM, "Successfully moved configuration files to their new location, path={}", conf);
+			}
+	}
+	// Data dirs
+	std::string logmsg{"Determining data dirs (search path):"};
+	{
+		Lock l(m_mutex);
+		Paths dirs;
+		dirs.push_back(data);  // Adding user's data dir
+		dirs.push_back(share);  // Adding system data dir (relative to performous executable or PERFORMOUS_ROOT)
+		if (Platform::currentOS() != Platform::HostOS::OS_WIN) {
+			// Adding XDG_DATA_DIRS
+			{
+				char const* xdg_data_dirs = getenv("XDG_DATA_DIRS");
+				std::istringstream iss(xdg_data_dirs ? xdg_data_dirs : "/usr/local/share/:/usr/share/");
+				for (std::string p; std::getline(iss, p, ':'); dirs.push_back(p / performous)) {}
+			}
+		}
+		// Adding paths from config file (during bootstrap config options are not yet available)
 		if (!bootstrapping) {
-			SpdLogger::info(LogSystem::FILESYSTEM, logmsg);
+			auto const& conf = config["paths/system"].sl();
+			for (std::string const& dir: conf) dirs.splice(dirs.end(), pathExpand(dir));
+		}
+		// Check if they actually exist and print debug
+		paths.clear();
+		std::set<fs::path> used;
+		for (auto dir: dirs) {
+			dir = fs::weakly_canonical(dir);
+			if (used.find(dir) != used.end()) continue;
+			fmt::format_to(std::back_inserter(logmsg), "\n{}{}", SpdLogger::newLineDec, dir);
+			paths.push_back(dir);
+			used.insert(dir);
 		}
 	}
-
-	Paths PathCache::pathExpand(fs::path p) {
-		Paths ret;
-		if (pathRootHack(p, "~")) ret.push_back(home / p);
-		else if (pathRootHack(p, "DATADIR")) {
-			// Add all data paths with p appended to them
-			for (auto const& path: paths) ret.push_back(path / p);
-		}
-		else ret.push_back(p);
-		return ret;
+	if (!bootstrapping) {
+		SpdLogger::info(LogSystem::FILESYSTEM, logmsg);
 	}
-
 }
 
 BinaryBuffer readFile(fs::path const& path) {
@@ -254,8 +260,7 @@ BinaryBuffer readFile(fs::path const& path) {
 	return ret;
 }
 
-void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destinationDir)
-{
+void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destinationDir) {
 	if (!fs::exists(sourceDir) || !fs::is_directory(sourceDir)) {
 		throw std::runtime_error("Source directory " + sourceDir.string() + " does not exist or is not a directory");
 	}
@@ -279,8 +284,8 @@ void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destina
 	}
 }
 
-void pathBootstrap() { Lock l(mutex); cache.pathBootstrap(); }
-void pathInit() { Lock l(mutex); cache.pathInit(); }
+// void pathBootstrap() { Lock l(mutex); cache.pathBootstrap(); }
+// void pathInit() { Lock l(mutex); cache.pathInit(); }
 
 std::string formatPath(const fs::path& target) {
 	if (target.empty()) {
@@ -289,7 +294,9 @@ std::string formatPath(const fs::path& target) {
 	// Normalize the paths by resolving symlinks and removing redundant elements.
 	// But, if just a filename, keep it as is.
 	fs::path canonicalTarget = target.has_parent_path() ? fs::weakly_canonical(target) : target;
-	fs::path baseDir = getBaseDir();
+	fs::path baseDir = PathCache::getBaseDir();
+	std::cout << "target path: " << target << ". is it empty?: " << target.empty() << std::endl;
+	std::cout << "base dir: " << baseDir << ". is it empty?: " << baseDir.empty() << std::endl;
 	if (canonicalTarget == baseDir) {
 	// Return the absolute path if referring to the base directory.
 		return baseDir.string();
@@ -304,14 +311,14 @@ std::string formatPath(const fs::path& target) {
 	}
 }
 
-fs::path getLogFilename() { Lock l(mutex); return cache.cache / "infolog.txt"; }
-fs::path getProfilerLogFilename() { 
-	Lock l(mutex);
+const fs::path PathCache::getLogFilename() { Lock l(m_mutex); return cache / "infolog.txt"; }
+const fs::path PathCache::getProfilerLogFilename() { 
+	Lock l(m_mutex);
 	std::string baseName{"profiler.txt"};
 	unsigned logRotate = 5;
 	do {
-		fs::path newPath = cache.cache / fmt::format("profiler.{}.txt", logRotate);
-		fs::path oldPath = cache.cache / (logRotate == 1 ? "profiler.txt" : fmt::format(fmt::runtime("profiler.{}.txt"), logRotate - 1));
+		fs::path newPath = cache / fmt::format("profiler.{}.txt", logRotate);
+		fs::path oldPath = cache / (logRotate == 1 ? "profiler.txt" : fmt::format(fmt::runtime("profiler.{}.txt"), logRotate - 1));
 		if (fs::exists(oldPath)) {
 			if (logRotate == 5 && fs::exists(newPath)) {
 				fs::remove(newPath); // delete profiler.5.txt if it exists
@@ -321,19 +328,31 @@ fs::path getProfilerLogFilename() {
 		logRotate--;
 	}
 	while (logRotate >= 1);
-	return cache.cache / "profiler.txt";
+	return cache / "profiler.txt";
 }
 
-fs::path getSchemaFilename() { Lock l(mutex); return cache.share / configSchema; }
-fs::path getBaseDir() { Lock l(mutex); return cache.base; }
-fs::path getHomeDir() { Lock l(mutex); return cache.home; }
-fs::path getShareDir() { Lock l(mutex); return cache.share; }
-fs::path getLocaleDir() { Lock l(mutex); return cache.locale; }
-fs::path getConfigDir() { Lock l(mutex); return cache.conf; }
-fs::path getSysConfigDir() { Lock l(mutex); return cache.sysConf; }
-fs::path getDataDir() { Lock l(mutex); return cache.data; }
-fs::path getCacheDir() { Lock l(mutex); return cache.cache; }
-Paths const& getPaths() { Lock l(mutex); return cache.paths; }
+std::mutex PathCache::m_mutex;
+Paths PathCache::paths;
+
+fs::path PathCache::base;
+fs::path PathCache::share;
+fs::path PathCache::locale;
+fs::path PathCache::sysConf;
+fs::path PathCache::home;
+fs::path PathCache::conf;
+fs::path PathCache::data;
+fs::path PathCache::cache;
+
+const fs::path PathCache::getSchemaFilename() { Lock l(PathCache::m_mutex); return share / configSchema; }
+fs::path const& PathCache::getBaseDir() { return base; }
+fs::path const& PathCache::getHomeDir() { Lock l(PathCache::m_mutex); return home; }
+fs::path const& PathCache::getShareDir() { Lock l(PathCache::m_mutex); return share; }
+fs::path const& PathCache::getLocaleDir() { Lock l(PathCache::m_mutex); return locale; }
+fs::path const& PathCache::getConfigDir() { Lock l(PathCache::m_mutex); return conf; }
+fs::path const& PathCache::getSysConfigDir() { Lock l(PathCache::m_mutex); return sysConf; }
+fs::path const& PathCache::getDataDir() { Lock l(PathCache::m_mutex); return data; }
+fs::path const& PathCache::getCacheDir() { Lock l(PathCache::m_mutex); return cache; }
+Paths const& PathCache::getPaths() { Lock l(PathCache::m_mutex); return paths; }
 
 Paths getThemePaths() {
 	const fs::path themes = "themes";
@@ -345,7 +364,7 @@ Paths getThemePaths() {
 	const fs::path fonts = "fonts";
 
 	std::string theme = config["game/theme"].getEnumName();
-	Paths paths = getPaths();
+	Paths paths = PathCache::getPaths();
 	Paths infixes = {
 		themes / theme,
 		themes / theme / www,
@@ -408,7 +427,7 @@ Paths listFiles(fs::path const& dir) {
 std::list<std::string> getThemes() {
 	std::set<std::string> themes;
 	// Search all paths for themes folders and add them
-	for (auto p: getPaths()) {
+	for (auto p: PathCache::getPaths()) {
 		p /= "themes";
 		if (!fs::is_directory(p)) continue;
 		// Gather the themes in this folder
@@ -420,11 +439,11 @@ std::list<std::string> getThemes() {
 	return std::list<std::string>(themes.begin(), themes.end());
 }
 
-Paths getPathsConfig(std::string const& confOption) {
-	Lock l(mutex);
+Paths PathCache::getPathsConfig(std::string const& confOption) {
+	Lock l(m_mutex);
 	Paths ret;
 	for (auto const& str: config[confOption].sl()) {
-		ret.splice(ret.end(), cache.pathExpand(str)); // Add expanded paths to ret.
+		ret.splice(ret.end(), pathExpand(str)); // Add expanded paths to ret.
 	}
 	return ret;
 }

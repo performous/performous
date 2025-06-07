@@ -15,7 +15,7 @@ ScreenPaths::ScreenPaths(Game &game, std::string const& name, Audio& audio, Song
 
 void ScreenPaths::enter() {
 	m_theme = std::make_unique<ThemeAudioDevices>();
-	generateMenuFromPath(getHomeDir());
+	generateMenuFromPath(PathCache::getHomeDir());
 }
 
 void ScreenPaths::exit() {
