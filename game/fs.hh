@@ -54,21 +54,20 @@ public:
 	Paths pathExpand(fs::path p);
 
 	std::string formatPath(const fs::path& target);
-	fs::path    getCanonicalPath(const fs::path &target);
-	fs::path    getLogFilename() { Lock l(this->mutex); return cache / INFO_LOG; }  ///< Get the log filename.
+	fs::path    getLogFilename() { Lock l(m_mutex); return m_cache / INFO_LOG; }  ///< Get the log filename.
 	fs::path    getProfilerLogFilename(); /// Profiler get its own log, or it obliterates everything else.
-	fs::path    getSchemaFilename() { Lock l(this->mutex); return share / CONFIG_SCHEMA; } /// Get the config schema filename.
-	fs::path    getBaseDir() { Lock l(this->mutex); return base; }  ///< Get Performous base folder.
-	fs::path    getHomeDir() { Lock l(this->mutex); return home; } ///< Get user's home folder.
-	fs::path    getShareDir() { Lock l(this->mutex); return share; } ///< Get Performous system-level data folder.
-	fs::path    getLocaleDir() { Lock l(this->mutex); return locale; } ///< Get the system locale folder.
-	fs::path    getConfigDir() { Lock l(this->mutex); return conf; }  ///< Get user-writable Performous config folder.
-	fs::path    getSysConfigDir() { Lock l(this->mutex); return sysConf; }  ///< Get root-writable Performous config folder.
-	fs::path    getDataDir() { Lock l(this->mutex); return data; } ///< Get user-writable Performous data folder.
-	fs::path    getCacheDir() { Lock l(this->mutex); return cache; }  ///< Get user-writable temporary folder.
+	fs::path    getSchemaFilename() { Lock l(m_mutex); return m_share / CONFIG_SCHEMA; } /// Get the config schema filename.
+	fs::path    getBaseDir() { Lock l(m_mutex); return m_base; }  ///< Get Performous base folder.
+	fs::path    getHomeDir() { Lock l(m_mutex); return m_home; } ///< Get user's home folder.
+	fs::path    getShareDir() { Lock l(m_mutex); return m_share; } ///< Get Performous system-level data folder.
+	fs::path    getLocaleDir() { Lock l(m_mutex); return m_locale; } ///< Get the system locale folder.
+	fs::path    getConfigDir() { Lock l(m_mutex); return m_conf; }  ///< Get user-writable Performous config folder.
+	fs::path    getSysConfigDir() { Lock l(m_mutex); return m_sysConf; }  ///< Get root-writable Performous config folder.
+	fs::path    getDataDir() { Lock l(m_mutex); return m_data; } ///< Get user-writable Performous data folder.
+	fs::path    getCacheDir() { Lock l(m_mutex); return m_cache; }  ///< Get user-writable temporary folder.
 
 
-	Paths const& getPaths() { Lock l(this->mutex); return paths; } ///< Get the data file search path (includes current and default themes in addition to data folders)
+	Paths const& getPaths() { Lock l(m_mutex); return m_paths; } ///< Get the data file search path (includes current and default themes in addition to data folders)
 	Paths getThemePaths();  ///< Get the data/theme file search path (includes current and default themes in addition to data folders)
 	Paths getPathsConfig(std::string const& confOption);  ///< Return expanded list of paths specified by a path config option
 
@@ -77,6 +76,9 @@ public:
 
 	std::list<std::string> getThemes(); ///< Get a list of available themes by searching for "themes" folders in the data paths.
 
+
+    // Static Functions
+
 	/// Recursively copies a folder, throws on error.
 	static void copyDirectoryRecursively(const fs::path& sourceDir, const fs::path& destinationDir);
 
@@ -84,14 +86,16 @@ public:
 	/// Mostly a workaround for fs::path's crippled API that makes this operation difficult
 	static bool pathRootHack(fs::path& p, std::string const& name);
 
+    /// return the cannonical path of <target>
+	static fs::path getCanonicalPath(const fs::path &target);
 
 
 protected:
-	std::recursive_mutex mutex;
-	Paths paths{};
+	std::recursive_mutex m_mutex;
+	Paths m_paths{};
 	bool didMigrateConfig{false};
-	fs::path cache;
-	fs::path base, share, locale, sysConf, home, conf, data;
+	fs::path m_cache;
+	fs::path m_base, m_share, m_locale, m_sysConf, m_home, m_conf, m_data;
 
 
 
