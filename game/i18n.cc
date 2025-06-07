@@ -180,7 +180,7 @@ std::vector<std::string> TranslationEngine::getLocalePaths() {
 		paths.emplace_back(root + std::string{"/lang"});
 	}
         
-	auto const path = getLocaleDir().string();
+	auto const path = PathCache::getLocaleDir().string();
         
 	if(!path.empty())
 		paths.emplace_back(path);
