@@ -294,14 +294,12 @@ std::string formatPath(const fs::path& target) {
 	// Normalize the paths by resolving symlinks and removing redundant elements.
 	// But, if just a filename, keep it as is.
 	fs::path canonicalTarget = target.has_parent_path() ? fs::weakly_canonical(target) : target;
-	std::cout << "target path: " << target << ". is it empty?: " << target.empty() << std::endl;
-	std::cout << "base dir: " << PathCache::getBaseDir() << ". is it empty?: " << PathCache::getBaseDir().empty() << std::endl;
 	if (canonicalTarget == PathCache::getBaseDir()) {
 	// Return the absolute path if referring to the base directory.
 		return PathCache::getBaseDir().string();
 	}
 	// Check if the target is a descendant of base.
-	if (std::mismatch(PathCache::getBaseDir().begin(), PathCache::getBaseDir().end(), canonicalTarget.begin()).first == PathCache::getBaseDir().end()) {
+	if (std::mismatch(PathCache::getBaseDir().begin(), PathCache::getBaseDir().end(), canonicalTarget.begin(), canonicalTarget.end()).first == PathCache::getBaseDir().end()) {
 		// If target is a descendant of base, return the relative path starting from base's parent.
 		return fs::relative(canonicalTarget, PathCache::getBaseDir().parent_path()).string();
 	} else {
