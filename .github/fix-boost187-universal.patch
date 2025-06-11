@@ -1,0 +1,11 @@
+--- libs/context/build/Jamfile.v2.orig	2025-05-11 13:35:36
++++ libs/context/build/Jamfile.v2	2025-05-11 13:37:02
+@@ -909,7 +909,7 @@
+    : asm/make_combined_sysv_macho_gas.S
+      asm/jump_combined_sysv_macho_gas.S
+      asm/ontop_combined_sysv_macho_gas.S
+-   : <abi>sysv
++   : <address-model>64
+      <architecture>arm+x86
+      <binary-format>mach-o
+    ;
