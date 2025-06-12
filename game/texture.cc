@@ -44,15 +44,23 @@ class TextureLoader::Impl {
 		try {
 			auto const ext = toLower(name.extension().string());
 			if (!fs::is_regular_file(name))
+			{
 				throw std::runtime_error("File not found: " + name.string());
-			else if (ext == ".svg")
-				loadSVG(bitmap, name);
-			else if (ext == ".jpg" || ext == ".jpeg")
-				loadJPEG(bitmap, name);
-			else if (ext == ".png")
-				loadPNG(bitmap, name);
+			}
 			else
-				throw std::runtime_error("Unknown image file format: " + name.string());
+			{
+				const ImageType image_type{getImageType(name.string())};
+				if (image_type == ImageType::UNKNOWN)
+					throw std::runtime_error("Unknown Image Type: " + name.string());
+				else if (image_type == ImageType::SVG)
+					loadSVG(bitmap, name);
+				else if (image_type == ImageType::JPEG)
+					loadJPEG(bitmap, name);
+				else if (image_type == ImageType::PNG)
+					loadPNG(bitmap, name);
+				else
+					throw std::runtime_error("Unknown image file format: " + name.string());
+			}
 		}
 		catch (std::exception& e) {
 			SpdLogger::error(LogSystem::IMAGE, "Error loading texture, exception={}", e.what());
