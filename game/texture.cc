@@ -50,9 +50,7 @@ class TextureLoader::Impl {
 			else
 			{
 				const ImageType image_type{getImageType(name.string())};
-				if (image_type == ImageType::UNKNOWN)
-					throw std::runtime_error("Unknown Image Type: " + name.string());
-				else if (image_type == ImageType::SVG)
+				if (image_type == ImageType::SVG)
 					loadSVG(bitmap, name);
 				else if (image_type == ImageType::JPEG)
 					loadJPEG(bitmap, name);
