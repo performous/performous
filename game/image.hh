@@ -51,7 +51,7 @@ struct Bitmap {
 
 enum class ImageType { UNKNOWN, PNG, JPEG, WEBP, BMP, GIF, SVG };  // Types of images we can identify
 
-ImageType getImageType(const std::string &filePath) noexcept;   ///< Looks inside the file, returning image type
+ImageType getImageType(const std::string &filePath);   ///< Looks inside the file, returning image type
 
 // The total number of bytes per line (stride) may be specified. By default no padding at end of line is assumed.
 void writePNG(fs::path const& filename, Bitmap const& bitmap, unsigned stride = 0);

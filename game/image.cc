@@ -187,71 +187,65 @@ void loadJPEG(Bitmap& bitmap, fs::path const& filename) {
   * \note     Magic Numbers listed in https://en.wikipedia.org/wiki/List_of_file_signatures
   * \returns  ImageType, or ImageType::UNKNOWN
   */
-ImageType getImageType(const std::string &filePath) noexcept
+ImageType getImageType(const std::string &filePath) 
 {
-	try {
-		std::ifstream fin(filePath, std::ios::binary);
-		std::array<unsigned char, 12> buffer{};
-		
-		if (fin) {
-			// reading the first 12 bytes of the file into the buffer
-			fin.read(reinterpret_cast<char*>(buffer.data()), buffer.size());
-			if (static_cast<size_t>(fin.gcount()) < buffer.size()) {
-				return ImageType::UNKNOWN;
-			}
-		}
+    std::ifstream fin(filePath, std::ios::binary);
+    std::array<unsigned char, 12> buffer{};
+    
+    if (fin) {
+        // reading the first 12 bytes of the file into the buffer
+        fin.read(reinterpret_cast<char*>(buffer.data()), buffer.size());
+        if (static_cast<size_t>(fin.gcount()) < buffer.size()) {
+            return ImageType::UNKNOWN;
+        }
+    }
 
-		// Is it a JPEG file?
-		const std::array<unsigned char, 2> JPEG_SIGNATURE = { 0xff, 0xd8 };
-		if (std::equal(buffer.begin(), buffer.begin() + JPEG_SIGNATURE.size(), JPEG_SIGNATURE.begin())) {
-			return ImageType::JPEG;
-		}
+    // Is it a JPEG file?
+    const std::array<unsigned char, 2> JPEG_SIGNATURE = { 0xff, 0xd8 };
+    if (std::equal(buffer.begin(), buffer.begin() + JPEG_SIGNATURE.size(), JPEG_SIGNATURE.begin())) {
+        return ImageType::JPEG;
+    }
 
-		// PNG?
-		const std::array<unsigned char, 8> PNG_SIGNATURE = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
-		if (std::equal(buffer.begin(), buffer.begin() + PNG_SIGNATURE.size(), PNG_SIGNATURE.begin())) {
-			return ImageType::PNG;
-		}
+    // PNG?
+    const std::array<unsigned char, 8> PNG_SIGNATURE = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
+    if (std::equal(buffer.begin(), buffer.begin() + PNG_SIGNATURE.size(), PNG_SIGNATURE.begin())) {
+        return ImageType::PNG;
+    }
 
-		// SVG is multiline text
-		fin.seekg(0, std::ios::beg);
-		std::string line;
-		while (std::getline(fin, line)) {
-			if (line.find("<svg") != std::string::npos || line.find("<svg ") != std::string::npos) {
-				return ImageType::SVG;
-			}
-		}
+    // SVG is multiline text
+    fin.seekg(0, std::ios::beg);
+    std::string line;
+    while (std::getline(fin, line)) {
+        if (line.find("<svg") != std::string::npos) {
+            return ImageType::SVG;
+        }
+    }
 
-		// We don't use these right now, added for the sake of completness
-		// WebP - we probably _should_ handle this, they're getting more comon
-		const std::array<unsigned char, 4> WEBP_SIGNATURE1 = { 0x52, 0x49, 0x46, 0x46 };
-		// the 4 bytes in bwteen are the image dimensions, but "RIFF" is a common header
-		const std::array<unsigned char, 4> WEBP_SIGNATURE2 = { 0x57, 0x45, 0x42, 0x50 };
-		if (std::equal(buffer.begin(), buffer.begin() + 4, WEBP_SIGNATURE1.begin()) 
-			&& std::equal(buffer.begin() + 8, buffer.begin() + 12, WEBP_SIGNATURE2.begin())) {
-			return ImageType::WEBP;
-		}
+    // We don't use these right now, added for the sake of completness
+    // WebP - we probably _should_ handle this, they're getting more comon
+    const std::array<unsigned char, 4> WEBP_SIGNATURE1 = { 0x52, 0x49, 0x46, 0x46 };
+    // the 4 bytes in bwteen are the image dimensions, but "RIFF" is a common header
+    const std::array<unsigned char, 4> WEBP_SIGNATURE2 = { 0x57, 0x45, 0x42, 0x50 };
+    if (std::equal(buffer.begin(), buffer.begin() + 4, WEBP_SIGNATURE1.begin()) 
+        && std::equal(buffer.begin() + 8, buffer.begin() + 12, WEBP_SIGNATURE2.begin())) {
+        return ImageType::WEBP;
+    }
 
-		// GIF
-		const std::array<unsigned char, 6> GIF87_SIGNATURE = { 'G', 'I', 'F', '8', '7', 'a' };
-		const std::array<unsigned char, 6> GIF89_SIGNATURE = { 'G', 'I', 'F', '8', '9', 'a' };
-		if (std::equal(buffer.begin(), buffer.begin() + GIF87_SIGNATURE.size(), GIF87_SIGNATURE.begin()) ||
-			std::equal(buffer.begin(), buffer.begin() + GIF89_SIGNATURE.size(), GIF89_SIGNATURE.begin())) {
-			return ImageType::GIF;
-		}
+    // GIF
+    const std::array<unsigned char, 6> GIF87_SIGNATURE = { 'G', 'I', 'F', '8', '7', 'a' };
+    const std::array<unsigned char, 6> GIF89_SIGNATURE = { 'G', 'I', 'F', '8', '9', 'a' };
+    if (std::equal(buffer.begin(), buffer.begin() + GIF87_SIGNATURE.size(), GIF87_SIGNATURE.begin()) ||
+        std::equal(buffer.begin(), buffer.begin() + GIF89_SIGNATURE.size(), GIF89_SIGNATURE.begin())) {
+        return ImageType::GIF;
+    }
 
-		// BMP?
-		const std::array<unsigned char, 2> BMP_SIGNATURE = { 0x42, 0x4d };
-		if (std::equal(buffer.begin(), buffer.begin() + BMP_SIGNATURE.size(), BMP_SIGNATURE.begin())) {
-			return ImageType::BMP;
-		}
+    // BMP?
+    const std::array<unsigned char, 2> BMP_SIGNATURE = { 0x42, 0x4d };
+    if (std::equal(buffer.begin(), buffer.begin() + BMP_SIGNATURE.size(), BMP_SIGNATURE.begin())) {
+        return ImageType::BMP;
+    }
 
-		// TODO: TIFF images; GIMP xcf; newer versions of JPEG; many more?
-	}
-	// We're specifically catching all exceptions, because if the file is bad
-	// clearly that's _not_ an image type we know
-	catch (const std::exception &e) { }
-	catch (...) { }
+    // TIFF images; GIMP xcf; newer versions of JPEG; many more?
 
 	// If we reach here, the file is not recognized
 	return ImageType::UNKNOWN;
