@@ -194,7 +194,7 @@ ImageType getImageType(const std::string &filePath) noexcept
 		std::array<unsigned char, 12> buffer{};
 		
 		if (fin) {
-			// reading the first 8 bytes of the file into the buffer
+			// reading the first 12 bytes of the file into the buffer
 			fin.read(reinterpret_cast<char*>(buffer.data()), buffer.size());
 			if (static_cast<size_t>(fin.gcount()) < buffer.size()) {
 				return ImageType::UNKNOWN;
