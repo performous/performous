@@ -196,8 +196,9 @@ jobs:
           sudo port uninstall gcc14 clang* llvm* python310 python311
           sudo port clean --all installed
           
-          # Deactivate everything before caching, in order to reduce the cache size.
+          # Deactivate everything but zstd before caching, in order to reduce the cache size. It's easier to do it like this than actually manually excluding zstd and its dependencies.
           sudo port deactivate installed
+          sudo port activate zstd
 
       - name: Get logs from last failed job
         if: ${{ failure() && !cancelled() }}
