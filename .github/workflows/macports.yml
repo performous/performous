@@ -1,4 +1,4 @@
-name: Build MacOS Package
+name: Build MacOS Packages
 
 on:
   # Run when called from other workflows
