@@ -66,10 +66,22 @@ void RequestHandler::HandleFile(web::http::http_request request, std::string fil
 			try {
 				t.get();
 			}
-			catch (...) {
-				request.reply(web::http::status_codes::InternalError, utility::conversions::to_string_t("INTERNAL ERROR "));
+			catch (const web::http::http_exception &e) {
+				std::string errorMsg = std::string("HTTP ERROR: ") + e.what();
+				SpdLogger::debug(LogSystem::WEBSERVER, std::string( "HandleFile() HTTP Exception {}" ), e.what());
+				request.reply(web::http::status_codes::InternalError, utility::conversions::to_string_t(errorMsg));
 			}
-			});
+			catch (const std::exception &e)
+			{
+				std::string errorMsg = std::string("INTERNAL ERROR: ") + e.what();
+				SpdLogger::debug(LogSystem::WEBSERVER, std::string( "HandleFile() Std. Exception {}" ), e.what());
+				request.reply(web::http::status_codes::InternalError, utility::conversions::to_string_t(errorMsg));
+			}
+			catch (...) {
+				SpdLogger::debug(LogSystem::WEBSERVER, "HandleFile() Unknown Exception");
+				request.reply(web::http::status_codes::InternalError, utility::conversions::to_string_t("INTERNAL ERROR: Unknown Exception"));
+			}
+		});
 }
 
 void RequestHandler::Get(web::http::http_request request)
