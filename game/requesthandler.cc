@@ -27,10 +27,21 @@ void RequestHandler::Error(pplx::task<void>& t) {
 }
 
 void RequestHandler::HandleFile(web::http::http_request request, std::string filePath) {
+	std::string fileToSend;
+	std::string clientIp = utility::conversions::to_string_t(request.remote_address());
 	auto path = filePath != "" ? utility::conversions::to_utf8string(utility::conversions::to_string_t(filePath)) : utility::conversions::to_utf8string(request.relative_uri().path());
 	auto fileName = path.substr(path.find_last_of("/\\") + 1);
 
-	std::string fileToSend = findFile(fileName).string();
+	try {
+		fileToSend = findFile(fileName).string();
+	}
+	catch (const std::runtime_error &e) {
+		SpdLogger::error(LogSystem::WEBSERVER, std::string("HandleFile() File Not Found. Client {}. {}"), clientIp, e.what());
+		std::string errorMsg = std::string("INTERNAL ERROR, MISSING FILE: ") + e.what();
+		request.reply(web::http::status_codes::NotFound, utility::conversions::to_string_t(errorMsg));
+		return;
+	}
+
 
 	concurrency::streams::fstream::open_istream(utility::conversions::to_string_t(fileToSend), std::ios::in).then([=](concurrency::streams::istream is) {
 		std::string content_type = "";
@@ -53,6 +64,7 @@ void RequestHandler::HandleFile(web::http::http_request request, std::string fil
 			content_type = "image/x-icon";
 		}
 
+
 		request.reply(web::http::status_codes::OK, is, utility::conversions::to_string_t(content_type)).then([](pplx::task<void> t) {
 			try {
 				t.get();
@@ -67,18 +79,18 @@ void RequestHandler::HandleFile(web::http::http_request request, std::string fil
 				t.get();
 			}
 			catch (const web::http::http_exception &e) {
+				SpdLogger::error(LogSystem::WEBSERVER, std::string("HandleFile() HTTP Exception. Client {}. {}"), clientIp, e.what());
 				std::string errorMsg = std::string("HTTP ERROR: ") + e.what();
-				SpdLogger::debug(LogSystem::WEBSERVER, std::string( "HandleFile() HTTP Exception {}" ), e.what());
 				request.reply(web::http::status_codes::InternalError, utility::conversions::to_string_t(errorMsg));
 			}
 			catch (const std::exception &e)
 			{
+				SpdLogger::error(LogSystem::WEBSERVER, std::string("HandleFile() Std. Exception. Client {}. {}"), clientIp, e.what());
 				std::string errorMsg = std::string("INTERNAL ERROR: ") + e.what();
-				SpdLogger::debug(LogSystem::WEBSERVER, std::string( "HandleFile() Std. Exception {}" ), e.what());
 				request.reply(web::http::status_codes::InternalError, utility::conversions::to_string_t(errorMsg));
 			}
 			catch (...) {
-				SpdLogger::debug(LogSystem::WEBSERVER, "HandleFile() Unknown Exception");
+				SpdLogger::error(LogSystem::WEBSERVER, "HandleFile() Unknown Exception. Client {}.", clientIp);
 				request.reply(web::http::status_codes::InternalError, utility::conversions::to_string_t("INTERNAL ERROR: Unknown Exception"));
 			}
 		});
@@ -320,7 +332,7 @@ web::json::value RequestHandler::ExtractJsonFromRequest(web::http::http_request 
 			}
 			catch (web::json::json_exception const& e)
 			{
-		 	SpdLogger::error(LogSystem::WEBSERVER, "CPPRest JSON ERROR. Exception={}", e.what());
+				SpdLogger::error(LogSystem::WEBSERVER, "CPPRest JSON ERROR. Exception={}", e.what());
 			}
 		}).wait();
 
