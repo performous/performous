@@ -137,13 +137,8 @@ jobs:
         with:
           # Due to a very long-standing bug in cache, excluding only works if all specified paths have the same depth.
           path: |
-            /opt/local/*/*/*/*/*/*/*/*
-            /Applications/MacPorts/*/*/*/*/*/*/*/*
-            !/opt/local/libexec/macports/*/*/*/*/*/*
-            !/opt/local/bin/port/*/*/*/*/*/*
-            !/opt/local/bin/portindex/*/*/*/*/*/*
-            !/opt/local/bin/portmirror/*/*/*/*/*/*
-            !/opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/base
+            /opt/local/
+            /Applications/MacPorts/
           key: '${{ steps.cache-key.outputs.computed_cache_key }}'
 
       - name: Unlink Homebrew
@@ -160,7 +155,7 @@ jobs:
           try_binary_first() { sudo port -b install "$@" || sudo port install "$@"; }
 
           if [[ "${{ steps.restore_cache.outputs.cache-hit }}" == "true" ]]; then
-            sudo port sync
+            sudo port selfupdate
             sudo port activate installed
           else
             sudo portindex -f /opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/ports
@@ -200,6 +195,12 @@ jobs:
           sudo port deactivate installed
           sudo port activate zstd
 
+          # Delete these folders, as we don't want the cache restore overwriting them.
+          # sudo rm -Rfv /opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/base*
+          # sudo rm -Rfv /opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/ports/_resources
+          # sudo rm -Rfv /opt/local/libexec/macports
+          # sudo rm -fv /opt/local/bin/port*
+
       - name: Get logs from last failed job
         if: ${{ failure() && !cancelled() }}
         id: get-logs
@@ -230,13 +231,8 @@ jobs:
           refresh-cache: true
           # Due to a very long-standing bug in cache, excluding only works if all specified paths have the same depth.
           path: |
-            /opt/local/*/*/*/*/*/*/*/*
-            /Applications/MacPorts/*/*/*/*/*/*/*/*
-            !/opt/local/libexec/macports/*/*/*/*/*/*
-            !/opt/local/bin/port/*/*/*/*/*/*
-            !/opt/local/bin/portindex/*/*/*/*/*/*
-            !/opt/local/bin/portmirror/*/*/*/*/*/*
-            !/opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/base
+            /opt/local/
+            /Applications/MacPorts/
           key: '${{ steps.cache-key.outputs.computed_cache_key }}'
 
       - name: Build package
