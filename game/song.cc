@@ -100,6 +100,11 @@ Song::Song(fs::path const& filename):
 	collateUpdate();
 }
 
+Song::Song():
+  dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand())
+{
+}
+
 void Song::reload(bool errorIgnore) {
 	try {
 		*this = Song(filename);
@@ -259,4 +264,24 @@ std::vector<std::string> Song::getVocalTrackNames() const {
 	std::vector<std::string> result;
 	for (auto const& kv : vocalTracks) result.push_back(kv.first);
 	return result;
+}
+
+void Song::setTitle(std::string const& title) {
+    this->title = title;
+
+    collateUpdate();
+}
+
+void Song::setArtist(std::string const& artist) {
+    this->artist = artist;
+
+    collateUpdate();
+}
+
+Song::Year Song::getYear() const {
+    return m_year;
+}
+
+void Song::setYear(Year year) {
+    m_year = year;
 }

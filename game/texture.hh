@@ -4,8 +4,6 @@
 #include "image.hh"
 #include "graphic/window.hh"
 
-#include <cairo.h>
-
 #include <algorithm>
 #include <memory>
 #include <stdexcept>
