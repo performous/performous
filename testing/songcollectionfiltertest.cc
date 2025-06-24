@@ -6,13 +6,6 @@
 #include "game/configitem.hh"
 #include "game/i18n.hh"
 
-namespace {
-	struct TestParser : public ISongParser {
-		void parse(Song& ) override {
-		}
-	};
-}
-
 
 struct UnitTest_SongCollectionFilter : public testing::Test {
 	void SetUp() override {
@@ -24,7 +17,7 @@ struct UnitTest_SongCollectionFilter : public testing::Test {
 	}
 
 	SongPtr makeSong(std::string const& title, std::string const& artist = "unknown", int year = 2000, std::string const& lang = "en") {
-		auto song = std::make_shared<Song>(m_parser);
+		auto song = std::make_shared<Song>();
 
 		auto filename = fs::path();
 
@@ -43,7 +36,7 @@ struct UnitTest_SongCollectionFilter : public testing::Test {
 	}
 
 	SongPtr makeDance(std::string const& title, std::string const& artist = "unknown", int year = 2000, std::string const& lang = "en") {
-		auto song = std::make_shared<Song>(m_parser);
+		auto song = std::make_shared<Song>();
 
 		auto filename = fs::path();
 
@@ -67,8 +60,6 @@ struct UnitTest_SongCollectionFilter : public testing::Test {
 
 		return songs;
 	}
-
-	TestParser m_parser;
 };
 
 TEST_F(UnitTest_SongCollectionFilter, empty) {
