@@ -12,4 +12,9 @@ enum class FilterType {
 	FullBand = 6
 };
 
+int toInt(FilterType type);
+
+FilterType toFilterType(int type);
+
+std::string toString(FilterType const& type);
 std::ostream& operator<<(std::ostream&, FilterType const&);

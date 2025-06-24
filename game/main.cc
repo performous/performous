@@ -103,7 +103,7 @@ static void checkEvents(Game& gm, Time eventTime) {
 void mainLoop(std::string const& songlist) {
 	Window window{};
 	SpdLogger::info(LogSystem::LOGGER, "Loading assets...");
-	TranslationEngine localization(config);
+	TranslationEngine localization;
 	TextureLoader m_loader;
 	Backgrounds backgrounds;
 	Database database(getConfigDir() / "database.xml");

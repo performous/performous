@@ -4,15 +4,8 @@
 #include "game/song.hh"
 
 namespace {
-	struct TestParser : public ISongParser {
-		void parse(Song&) override {
-		}
-	};
-
-	TestParser parser;
-
 	Song createSong(int year) {
-		auto&& song = Song(parser);
+		auto&& song = Song();
 
 		song.setYear(year);
 
@@ -20,7 +13,7 @@ namespace {
 	}
 
 	Song createSong(std::string const& title, std::string const& artist = {}, std::string const& language = {}, int year = 2000) {
-		auto&& song = Song(parser);
+		auto&& song = Song();
 
 		song.title = title;
 		song.artist = artist;
