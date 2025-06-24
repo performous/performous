@@ -1,7 +1,9 @@
 #pragma once
 
 #include "animvalue.hh"
+#include "filtertype.hh"
 #include "fs.hh"
+#include "isongfilter.hh"
 #include "screen.hh"
 #include "songorder.hh"
 #include "utils/cycle.hh"
@@ -60,8 +62,9 @@ class Songs {
 	Song const& current() const;
 	/// filters songlist by regular expression
 	void setFilter(std::string const& regex);
+	void setFilter(SongFilterPtr);
 	/// Get the current song type filter number
-	unsigned short typeNum() const { return m_type; }
+	FilterType typeNum() const { return m_type; }
 	/// Description of the current song type filter
 	std::string typeDesc() const;
 	enum class SortChange : int { BACK = -1, RESET = 0, FORWARD = 1};
@@ -80,12 +83,15 @@ class Songs {
 	std::atomic<bool> doneLoading{ false };
 	std::atomic<bool> displayedAlert{ false };
 	size_t loadedSongs() const { std::shared_lock<std::shared_mutex> l(m_mutex); return m_songs.size(); }
+	std::vector<std::shared_ptr<Song>> getSongs() const { return m_songs; }
 	void addSongOrder(SongOrderPtr);
 
   private:
 	Cache loadCache();
 	void CacheSonglist();
 
+	using SongPtr = std::shared_ptr<Song>;
+	using SongCollection = std::vector<SongPtr>;
 	void dumpSongs_internal() const;
 	void reload_internal();
 	void reload_internal(fs::path const& p, Cache cache);
@@ -102,8 +108,9 @@ class Songs {
 	AnimValue m_updateTimer;
 	AnimAcceleration math_cover;
 	std::string m_filter;
+	SongFilterPtr m_songFilter;
 	Database & m_database;
-	unsigned short m_type = 0;
+	FilterType m_type = FilterType::None;
 	Cycle<unsigned short> m_order;  // Set by constructor
 	std::atomic<bool> m_dirty{ false };
 	std::atomic<bool> m_loading{ false };
