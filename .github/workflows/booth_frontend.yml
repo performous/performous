@@ -1,0 +1,33 @@
+name: Build Booth Frontend
+
+on:
+  # Run when called from other workflows only
+  workflow_call:
+
+jobs:
+  Build_Booth_Frontend:
+    name: Build the Booth frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+      - name: Compile the Booth frontend
+        run: |
+          cd ${{ github.workspace }}/performous/data/themes/default-booth/dev
+          npm ci
+          npm run build
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: booth-frontend
+          path: |
+            ${{ github.workspace }}/performous/data/themes/default-booth/www/index.html
+            ${{ github.workspace }}/performous/data/themes/default-booth/www/js/index.js
+            ${{ github.workspace }}/performous/data/themes/default-booth/www/css/index.css

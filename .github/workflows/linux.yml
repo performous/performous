@@ -125,7 +125,13 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
-
+        
+      # Download the pre-compiled Booth frontend artifacts
+      - name: Download Booth frontend artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: booth-frontend
+          
       - name: Login to the container registry
         uses: docker/login-action@v3
         with:
@@ -168,7 +174,7 @@ jobs:
         run: |
           # Run the containers with the script for each testing suite
           docker run --rm -v $(pwd):/github_actions_build/ ${{ env.CONTAINER_NAME }} ./run_tests.sh
-
+          
       # Upload artifacts during pull-requests
       - name: Upload artifact
         uses: actions/upload-artifact@v4
