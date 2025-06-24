@@ -28,7 +28,7 @@ void RequestHandler::Error(pplx::task<void>& t) {
 
 void RequestHandler::HandleFile(web::http::http_request request, std::string filePath) {
 	std::string fileToSend;
-	std::string clientIp = utility::conversions::to_string_t(request.remote_address());
+	std::string clientIp = utility::conversions::to_utf8string(request.remote_address());
 	auto path = filePath != "" ? utility::conversions::to_utf8string(utility::conversions::to_string_t(filePath)) : utility::conversions::to_utf8string(request.relative_uri().path());
 	auto fileName = path.substr(path.find_last_of("/\\") + 1);
 
