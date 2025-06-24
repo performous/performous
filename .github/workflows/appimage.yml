@@ -43,6 +43,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: booth-frontend
+          path: ${{ github.workspace }}/data/themes/default-booth/www
           
       - name: Build the AppImage
         id: build_appimage

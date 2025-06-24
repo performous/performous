@@ -20,7 +20,7 @@ jobs:
           node-version: '20.x'
       - name: Compile the Booth frontend
         run: |
-          cd ${{ github.workspace }}/performous/data/themes/default-booth/dev
+          cd ${{ github.workspace }}/data/themes/default-booth/dev
           npm ci
           npm run build
       - name: Archive build artifacts
@@ -28,6 +28,6 @@ jobs:
         with:
           name: booth-frontend
           path: |
-            ${{ github.workspace }}/performous/data/themes/default-booth/www/index.html
-            ${{ github.workspace }}/performous/data/themes/default-booth/www/js/index.js
-            ${{ github.workspace }}/performous/data/themes/default-booth/www/css/index.css
+            ${{ github.workspace }}/data/themes/default-booth/www/index.html
+            ${{ github.workspace }}/data/themes/default-booth/www/js/index.js
+            ${{ github.workspace }}/data/themes/default-booth/www/css/index.css

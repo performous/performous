@@ -68,6 +68,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: booth-frontend
+          path: ${{ github.workspace }}/data/themes/default-booth/www
           
       - name: Install Macports
         uses: Lord-Kamina/setup-macports@main
