@@ -163,8 +163,8 @@ void SpdLogger::initializeSinks(spdlog::level::level_enum const& consoleLevel) {
 		"{1:*^80}\n",
 			fmt::format(" {} {} starting, {} ", PACKAGE, VERSION, timeFormat(time, "%Y/%m/%d @ %H:%M:%S")),
 			fmt::format(" Logging any events of level {}, or higher. ", spdlog::level::to_string_view(consoleLevel))));
-	spdlog::filename_t filename = getLogFilename().u8string();
-	spdlog::filename_t profilerLogFilename = getProfilerLogFilename().u8string();
+	spdlog::filename_t filename = PathCache::getLogFilename().u8string();
+	spdlog::filename_t profilerLogFilename = PathCache::getProfilerLogFilename().u8string();
 	m_sink = std::make_shared<spdlog::sinks::dist_sink_mt>();
 	
 	auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
@@ -226,7 +226,7 @@ void SpdLogger::toggleProfilerLogger() {
 	if (config["graphic/fps"].b() == true && std::find(m_sink->sinks().begin(), m_sink->sinks().end(), m_profilerSink) == m_sink->sinks().end())  {
 		m_sink->add_sink(m_profilerSink); // Profiler gets its own log, but we should also include everything else, to help make sense of it.
 		m_profilerSink->set_pattern(formatString);
-		notice(LogSystem::LOGGER, "Starting profiler... saving log at={}", getProfilerLogFilename());
+		notice(LogSystem::LOGGER, "Starting profiler... saving log at={}", PathCache::getProfilerLogFilename());
 	}
 	else {
 		m_sink->remove_sink(m_profilerSink);
@@ -251,7 +251,7 @@ void SpdLogger::writeLogHeader(spdlog::filename_t filename, std::FILE* fd, std::
 }
 
 SpdLogger::~SpdLogger() {
-	notice(LogSystem::LOGGER, "More details might be available in {}", getLogFilename().u8string());
+	notice(LogSystem::LOGGER, "More details might be available in {}", PathCache::getLogFilename().u8string());
 	grabber.reset();
 	spdlog::shutdown();
 }
