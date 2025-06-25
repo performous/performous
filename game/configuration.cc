@@ -403,13 +403,13 @@ unsigned short LanguageToLanguageId(const std::string& name) {
 
 void readConfig() {
 	// Find config schema
-	fs::path schemaFile = getSchemaFilename();
-	systemConfFile = getSysConfigDir() / "config.xml";
-	userConfFile = getConfigDir() / "config.xml";
+	fs::path schemaFile = PathCache::getSchemaFilename();
+	systemConfFile = PathCache::getSysConfigDir() / "config.xml";
+	userConfFile = PathCache::getConfigDir() / "config.xml";
 	readConfigXML(schemaFile, 0);  // Read schema and defaults
 	readConfigXML(systemConfFile, 1);  // Update defaults with system config
 	readConfigXML(userConfFile, 2);  // Read user settings
-	pathInit();
+	PathCache::pathInit();
 	// Populate themes
 	ConfigItem& ci = config["game/theme"];
 	for (auto const& theme : getThemes())

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.19)
 
 set(PERFORMOUS_SEMVER "" CACHE STRING "Version in semver format")
 set(PERFORMOUS_SHORT_VERSION "" CACHE STRING "Short version string")
@@ -44,10 +44,18 @@ file(WRITE
 	"${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_SYSCONFDIR}/fonts/fonts.conf"
 	"${PERFORMOUS_FONTS_CONF}")
 
-install(DIRECTORY
-	"${PERFORMOUS_SYSTEM_PREFIX}/etc/fonts/conf.d"
-	DESTINATION "${CMAKE_INSTALL_SYSCONFDIR}/fonts/"
-)
+file(GLOB fontconfig_rules "${PERFORMOUS_SYSTEM_PREFIX}/etc/fonts/conf.d/*")
+file(MAKE_DIRECTORY "${CMAKE_INSTALL_SYSCONFDIR}/fonts/conf.d")
+
+# Iterate over the files and resolve symlinks
+foreach(file_path ${fontconfig_rules})
+	if(IS_SYMLINK "${file_path}")
+		file(REAL_PATH "${file_path}" real_file_path)
+		install(FILES "${real_file_path}" DESTINATION "${CMAKE_INSTALL_SYSCONFDIR}/fonts/conf.d/" )
+	else()
+		install(FILES "${file_path}" DESTINATION "${CMAKE_INSTALL_SYSCONFDIR}/fonts/conf.d/")
+	endif()
+endforeach()
 
 install(TARGETS performous BUNDLE
 	BUNDLE DESTINATION "${PERFORMOUS_BUNDLE_LOCATION}"
