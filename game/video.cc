@@ -81,7 +81,7 @@ Video::Video(fs::path const& _videoFile, double videoGap): m_videoGap(videoGap),
 					m_cond.wait(l, [this] { return m_quit || m_seek_asked; });
 				} catch (std::exception& e) {
 					UnlockGuard<decltype(l)> unlocked(l);  // release lock for possibly blocking calls
-					SpdLogger::error(LogSystem::FFMPEG, "Error={}, reading file={}.", file, e.what());
+					SpdLogger::error(LogSystem::FFMPEG, "Error={}, reading file={}.", e.what(), file);
 					if (++errors > 2) {
 						SpdLogger::error(LogSystem::FFMPEG, "Terminating due to multiple errors.");
 						break;
@@ -89,7 +89,7 @@ Video::Video(fs::path const& _videoFile, double videoGap): m_videoGap(videoGap),
 				}
 			}
 		} catch (std::exception& e) {
-			SpdLogger::error(LogSystem::FFMPEG, "Error={}, reading file={}.", file, e.what());
+			SpdLogger::error(LogSystem::FFMPEG, "Error={}, reading file={}.", e.what(), file);
 		}
 	});
 }
