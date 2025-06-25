@@ -25,6 +25,7 @@ set(GAME_SOURCES
 #	"../game/configuration.cc"
 	"../game/dynamicnotegraphscaler.cc"
 	"../game/execname.cc"
+	"../game/ffmpeg.cc"
 	"../game/fixednotegraphscaler.cc"
 	"../game/fs.cc"
 	"../game/log.cc"
@@ -78,7 +79,24 @@ if(GTest_FOUND)
 
 	find_package(ICU 65 REQUIRED uc data i18n io)
 	target_link_libraries(performous_test PRIVATE ICU::uc ICU::data ICU::i18n ICU::io)
+	
+	# LibEpoxy < 1.2 crashes with binary drivers (nvidia & fglrx) when creating shaders
+	# (see https://github.com/anholt/libepoxy/issues/23 for the exact problem)
+	find_package(LibEpoxy 1.2 REQUIRED)
+	target_include_directories(performous_test SYSTEM PRIVATE ${LibEpoxy_INCLUDE_DIRS})
+	target_link_libraries(performous_test PRIVATE ${LibEpoxy_LIBRARIES})
 
+	find_package(PkgConfig REQUIRED)
+	pkg_check_modules(deps REQUIRED IMPORTED_TARGET glib-2.0 gio-2.0 gobject-2.0)
+
+	#foreach(lib SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM Json Ced Aubio)
+	foreach(lib PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM Json Ced)
+		find_package(${lib} ${${lib}_REQUIRED_VERSION} REQUIRED)
+		message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
+		target_include_directories(performous_test SYSTEM PRIVATE ${${lib}_INCLUDE_DIRS})
+		target_link_libraries(performous_test PRIVATE ${${lib}_LIBRARIES})
+		add_definitions(${${lib}_DEFINITIONS})
+	endforeach(lib)
 
 	find_package(Spdlog REQUIRED MODULE)
 
@@ -87,35 +105,10 @@ if(GTest_FOUND)
 	target_compile_definitions(performous_test PRIVATE $<IF:$<NOT:$<BOOL:${SPDLOG_FMT_EXTERNAL_HO}>>,SPDLOG_FMT_EXTERNAL,SPDLOG_FMT_EXTERNAL_HO> FMT_USE_CONSTEXPR)
 	target_link_libraries(performous_test PRIVATE $<IF:$<NOT:$<BOOL:${SPDLOG_FMT_EXTERNAL_HO}>>,fmt::fmt,fmt::fmt-header-only> spdlog::spdlog_header_only)
 
+	find_package(Threads)
+	target_link_libraries(performous_test PRIVATE ced aubio ${LIBS} PkgConfig::deps Threads::Threads)
+
 	target_include_directories(performous_test PRIVATE ".." "../game" "${Performous_BINARY_DIR}/game")
-
-	set(Aubio_REQUIRED_VERSION "0.4.9")
-
-	#foreach(lib ${OUR_LIBS} SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JPEG PNG PortAudio Fontconfig GLM Json Ced Aubio)
-    foreach(lib ${OUR_LIBS} PangoCairo LibXML++ AVFormat Ced Aubio)
-		find_package(${lib} ${${lib}_REQUIRED_VERSION} REQUIRED)
-		message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
-		target_include_directories(performous_test SYSTEM PRIVATE ${${lib}_INCLUDE_DIRS})
-		target_link_libraries(performous_test PRIVATE ${${lib}_LIBRARIES})
-		add_definitions(${${lib}_DEFINITIONS})
-	endforeach(lib)
-
-    find_package(SDL2 ${SDL2_REQUIRED_VERSION} REQUIRED)
-    target_include_directories(performous_test SYSTEM PRIVATE ${SDL2_INCLUDE_DIRS})
-    #target_link_libraries(performous_test PRIVATE ${SDL2_LIBRARIES} SDL2main)
-add_definitions(-DSDL_MAIN_HANDLED)
-
-	find_package(ICU 60 REQUIRED uc data i18n io)
-	target_include_directories(performous_test SYSTEM PRIVATE ${ICU_INCLUDE_DIRS})
-	target_link_libraries(performous_test PRIVATE ${ICU_LIBRARIES})
-
-	# Generate config.hh
-	configure_file("../game/config.cmake.hh" "${CMAKE_CURRENT_BINARY_DIR}/config.hh" @ONLY)
-	include_directories("${CMAKE_CURRENT_BINARY_DIR}")
-
-
-	target_include_directories(performous_test PRIVATE "." ".." "../game" "../3rdparty/ced")
-	target_link_libraries(performous_test PRIVATE ced aubio)
 
 	if(WIN32 AND MSVC)
 #		target_compile_options(performous_test PUBLIC /WX)
