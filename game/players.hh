@@ -6,9 +6,9 @@
 #include <vector>
 #include <string>
 #include <stdexcept>
-#include <sys/types.h> // only for ssize_t on mingw
 
 
+#include "platform.hh"
 #include "player.hh"
 #include "unicode.hh"
 #include "animvalue.hh"
