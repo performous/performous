@@ -12,7 +12,6 @@
 class Hiscore {
 public:
 	static const unsigned MaximumScorePoints;
-	static const unsigned MinimumRecognizedScorePoints;
 	static const unsigned MaximumStoredScores;
 
 	void load(xmlpp::NodeSet const& n);
@@ -24,7 +23,7 @@ public:
 	  This is because it will take forever to fill more.
 	  And people refuse to enter their names if they are not close to the top.
 
-	  @param score is a value between 0 and 10000. values below 2000 will lead to instant disqualification.
+	  @param score is a value between 0 and 10000. values below config:"game/highscore_minimum" will lead to instant disqualification.
 	  @return true if the score make it into the list
 	  @return false if addNewHiscore does not make sense for that score.
 	  */
