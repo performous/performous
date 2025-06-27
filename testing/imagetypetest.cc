@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <thread>
+#include <fcntl.h>
 #include <cstdio>
 #include <unistd.h>
 
@@ -24,6 +25,7 @@ const std::vector<uint8_t> EMPTY_FILE{ };
 
 std::string getSecureTmpFile()
 {
+    /*
     std::string result;
     char temple[] = "/tmp/performous/unit_tests-XXXXXX";
     int handle = mkstemp(temple);
@@ -31,6 +33,17 @@ std::string getSecureTmpFile()
     {
         close(handle);
         result = temple;
+    }
+    return result;
+    */
+    std::string result;
+    int handle = open("/tmp", O_TMPFILE | O_RDWR, 0600);
+    if (handle != -1)
+    {
+        char path[128];
+        std::snprintf(path, sizeof(path), "/proc/self/fd/%d", handle);
+        close(handle);
+        result = path;
     }
     return result;
 }
