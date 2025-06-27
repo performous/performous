@@ -210,6 +210,11 @@ ImageType getImageType(const std::string &filePath)
     if (match(buffer, {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a}))
 		return ImageType::PNG;
 
+	// WebP "magic number" is split in two, but the first part "RIFF" is common for different
+    // files, so we must check both parts
+    if (match(buffer, {0x52, 0x49, 0x46, 0x46}) && match(buffer, {0x57, 0x45, 0x42, 0x50}, 8))
+		return ImageType::WEBP;
+
 	// SVG is multiline text
 	fin.seekg(0, std::ios::beg);
 	std::string line;
@@ -218,12 +223,6 @@ ImageType getImageType(const std::string &filePath)
 			return ImageType::SVG;
 		}
 	}
-
-	// WebP "magic number" is split in two, but the first part "RIFF" is common for different
-    // files, so we must check both parts
-	SpdLogger::error(LogSystem::IMAGE, "IS ThIS A WEBP path={}", filePath);
-    if (match(buffer, {0x52, 0x49, 0x46, 0x46}) && match(buffer, {0x57, 0x45, 0x42, 0x50}, 8))
-		return ImageType::WEBP;
 
 	// GIF, BMP, TIFF images; GIMP xcf; newer versions of JPEG; many more?
 
