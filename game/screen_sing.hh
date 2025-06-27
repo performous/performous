@@ -56,6 +56,7 @@ class ScreenSing: public Screen {
 		return m_song;
 	}
 
+	/** Get the current position in seconds. If not known or nothing is playing, NaN is returned. **/
 	double getSongPosition()
 	{
 		return m_audio.getPosition();
