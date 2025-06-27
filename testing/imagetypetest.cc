@@ -4,9 +4,15 @@
 #include <thread>
 #include <fcntl.h>
 #include <cstdio>
-#include <unistd.h>
 #include <random>
 #include <sys/stat.h>
+
+#if defined(__MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+#include <io.h>
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif // #ifdef "windows"
 
 #include "common.hh"
 #include "game/image.hh"
