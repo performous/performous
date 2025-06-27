@@ -11,7 +11,7 @@ set(SOURCE_FILES
 	"notegraphscalerfactorytest.cc"
 	"ringbuffertest.cc"
 	"utiltest.cc"
-    "imagetypetest.cc"
+	"imagetypetest.cc"
 
 	"main.cc"
 	"printer.cc"
@@ -95,14 +95,13 @@ if(GTest_FOUND)
 
 	gtest_discover_tests(performous_test PROPERTIES TEST_DISCOVERY_TIMEOUT 30)
 
-    # Image formats
-    foreach(lib PangoCairo LibRSVG ZLIB JPEG PNG)
-        find_package(${lib} ${${lib}_REQUIRED_VERSION} REQUIRED)
-        message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
-        target_include_directories(performous_test SYSTEM PRIVATE ${${lib}_INCLUDE_DIRS})
-        target_link_libraries(performous_test PRIVATE ${${lib}_LIBRARIES})
-#        add_definitions(${${lib}_DEFINITIONS})
-    endforeach(lib)
+	# Image formats
+	foreach(lib PangoCairo LibRSVG ZLIB JPEG PNG)
+		find_package(${lib} ${${lib}_REQUIRED_VERSION} REQUIRED)
+		message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
+		target_include_directories(performous_test SYSTEM PRIVATE ${${lib}_INCLUDE_DIRS})
+		target_link_libraries(performous_test PRIVATE ${${lib}_LIBRARIES})
+	endforeach(lib)
 
 
 else()
