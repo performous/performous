@@ -25,7 +25,7 @@ const std::vector<uint8_t> EMPTY_FILE{ };
 std::string getSecureTmpFile()
 {
     std::string result;
-    char temple[] = "/tmp/performous_unit_tests-XXXXXX";
+    char temple[] = "/tmp/performous/unit_tests-XXXXXX";
     int handle = mkstemp(temple);
     if (handle > -1)
     {
