@@ -5,6 +5,8 @@
 #include <fcntl.h>
 #include <cstdio>
 #include <unistd.h>
+#include <random>
+#include <sys/stat.h>
 
 #include "common.hh"
 #include "game/image.hh"
@@ -25,27 +27,25 @@ const std::vector<uint8_t> EMPTY_FILE{ };
 
 std::string getSecureTmpFile()
 {
-    /*
-    std::string result;
-    char temple[] = "/tmp/performous/unit_tests-XXXXXX";
-    int handle = mkstemp(temple);
-    if (handle > -1)
-    {
-        close(handle);
-        result = temple;
+    const char* dir = "/tmp";
+    std::string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dist(0, charset.size() - 1);
+
+    for (int attempt = 0; attempt < 100; ++attempt) {
+        std::string name = dir;
+        name += "/myapp-";
+        for (int i = 0; i < 8; ++i)
+            name += charset[dist(gen)];
+
+        int fd = open(name.c_str(), O_CREAT | O_EXCL | O_RDWR, 0600);
+        if (fd != -1) {
+            close(fd);
+            return name;
+        }
     }
-    return result;
-    */
-    std::string result;
-    int handle = open("/tmp", O_TMPFILE | O_RDWR, 0600);
-    if (handle != -1)
-    {
-        char path[128];
-        std::snprintf(path, sizeof(path), "/proc/self/fd/%d", handle);
-        close(handle);
-        result = path;
-    }
-    return result;
+    return std::string();
 }
 
 // create a temporary test file
