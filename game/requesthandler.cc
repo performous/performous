@@ -47,6 +47,48 @@ void RequestHandler::HandleFile(web::http::http_request request, std::string fil
 			std::string folderCheck = path.substr(path.find_first_not_of("/\\"));
 			std::vector<std::string> subFolderChecks = { "images", "fonts", "css", "js" };
 
+			// First, let's simplify the folder by getting rid of the parent directory (..) symbols. If it causes the folder to go outside the root folder, return an error.
+			// Won't be a problem for most browsers, since they automatically do that, this is mainly for the edge cases that don't.
+			std::vector<std::string> folderSegments;
+			size_t pos = 0;
+			std::string folderSegment;
+
+			while ((pos = folderCheck.find_first_of("/\\")) != std::string::npos) {
+				folderSegment = folderCheck.substr(0, pos);
+				if (folderSegment == "..") {
+					if (folderSegments.size() == 0) {
+						request.reply(web::http::status_codes::BadRequest, utility::conversions::to_string_t("INVALID PATH REQUESTED"));
+						return;
+					}
+					folderSegments.pop_back();
+				}
+				else {
+					folderSegments.push_back(folderSegment);
+				}
+				folderCheck.erase(0, pos + 1);
+			}
+			if (folderCheck == "..") {
+				if (folderSegments.size() == 0) {
+					request.reply(web::http::status_codes::BadRequest, utility::conversions::to_string_t("INVALID PATH REQUESTED"));
+					return;
+				}
+				folderSegments.pop_back();
+			}
+			else {
+				folderSegments.push_back(folderCheck);
+			}
+
+			// Rejoin the folder segments.
+			folderCheck = "";
+
+			while (folderSegments.size() > 0) {
+				folderCheck.append(folderSegments.front());
+				folderSegments.erase(folderSegments.begin());
+				if (folderSegments.size() > 0) {
+					folderCheck.append("/");
+				}
+			}
+
 			if (folderCheck.find_first_of("/\\") == std::string::npos) {
 				request.reply(web::http::status_codes::NotFound, utility::conversions::to_string_t("NOT FOUND "));
 				return;
