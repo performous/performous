@@ -27,15 +27,13 @@ const std::vector<uint8_t> EMPTY_FILE{ };
 
 std::string getSecureTmpFile()
 {
-    const char* dir = "/tmp";
     std::string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dist(0, charset.size() - 1);
 
     for (int attempt = 0; attempt < 100; ++attempt) {
-        std::string name = dir;
-        name += "/myapp-";
+        std::string name = "/tmp/performous-unittest-";
         for (int i = 0; i < 8; ++i)
             name += charset[dist(gen)];
 
