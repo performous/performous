@@ -23,17 +23,12 @@ const std::vector<uint8_t> EMPTY_FILE{ };
 
 // create a temporary test file
 std::string tmpTestFile( const std::vector<uint8_t> &image) {
-    auto tmp_dir = std::filesystem::temp_directory_path();
-    tmp_dir /= "/performous_unit_tests";  // Fix sonarcloud warning
-    std::filesystem::create_directories(tmp_dir);
-
-    tmp_dir /= "test_img.tmp";
-
+    std::string tmp_name = std::tmpnam(nullptr);
     try {
-        std::ofstream fout(tmp_dir, std::ios::binary);
+        std::ofstream fout(tmp_name, std::ios::binary);
         fout.write((char*)image.data(), image.size());
         fout.close();
-        return tmp_dir;
+        return tmp_name;
     }
     catch (...) {  // yes, catch _everything_, on purpose.
         return "";
