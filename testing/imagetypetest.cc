@@ -1,8 +1,9 @@
 #include <vector>
-#include <filesystem>
 #include <iostream>
 #include <fstream>
 #include <thread>
+#include <cstdio>
+#include <unistd.h>
 
 #include "common.hh"
 #include "game/image.hh"
@@ -21,9 +22,22 @@ const std::vector<uint8_t> PDF_IMAGE{ 0x25,0x50,0x44,0x46,0x2d,0x31,0x2e,0x35,0x
 const std::vector<uint8_t> SMALL_FILE{ 0x01, 0x02, 0x03 };
 const std::vector<uint8_t> EMPTY_FILE{ };
 
+std::string getSecureTmpFile()
+{
+    std::string result;
+    char temple[] = "/tmp/performous_unit_tests-XXXXXX";
+    int handle = mkstemp(temple);
+    if (handle > -1)
+    {
+        close(handle);
+        result = temple;
+    }
+    return result;
+}
+
 // create a temporary test file
 std::string tmpTestFile( const std::vector<uint8_t> &image) {
-    std::string tmp_name = std::tmpnam(nullptr);
+    std::string tmp_name = getSecureTmpFile();
     try {
         std::ofstream fout(tmp_name, std::ios::binary);
         fout.write((char*)image.data(), image.size());
