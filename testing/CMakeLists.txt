@@ -11,6 +11,7 @@ set(SOURCE_FILES
 	"notegraphscalerfactorytest.cc"
 	"ringbuffertest.cc"
 	"utiltest.cc"
+	"imagetypetest.cc"
 
 	"main.cc"
 	"printer.cc"
@@ -23,6 +24,7 @@ set(GAME_SOURCES
 	"../game/execname.cc"
 	"../game/fixednotegraphscaler.cc"
 	"../game/fs.cc"
+	"../game/image.cc"
 	"../game/log.cc"
 	"../game/microphones.cc"
 	"../game/musicalscale.cc"
@@ -92,6 +94,15 @@ if(GTest_FOUND)
 	endif()
 
 	gtest_discover_tests(performous_test PROPERTIES TEST_DISCOVERY_TIMEOUT 30)
+
+	# Image formats
+	foreach(lib PangoCairo LibRSVG ZLIB JPEG PNG)
+		find_package(${lib} ${${lib}_REQUIRED_VERSION} REQUIRED)
+		message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
+		target_include_directories(performous_test SYSTEM PRIVATE ${${lib}_INCLUDE_DIRS})
+		target_link_libraries(performous_test PRIVATE ${${lib}_LIBRARIES})
+	endforeach(lib)
+
 
 else()
 	message(STATUS "Testing disabled: Package gtest missing")
