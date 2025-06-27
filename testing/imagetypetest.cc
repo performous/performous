@@ -9,7 +9,7 @@
 
 #if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 #include <io.h>
-#include <windows.h>
+#include <Windows.h>
 #else
 #include <unistd.h>
 #endif // #ifdef "building on windows"
