@@ -27,13 +27,25 @@ const std::vector<uint8_t> EMPTY_FILE{ };
 
 std::string getSecureTmpFile()
 {
+#if defined(__MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+    char tempPath[MAX_PATH];
+    char tempFile[MAX_PATH];
+    DWORD pathLen = GetTempPathA(MAX_PATH, tempPath);
+    if (pathLen > 0 && pathLen < MAX_PATH)
+    {
+        if (GetTempFilenameA(tempPath, "performous", 0, tempFile))
+        {
+            return std::string(tempFile);
+        }
+    }
+#else
     std::string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dist(0, charset.size() - 1);
 
     for (int attempt = 0; attempt < 100; ++attempt) {
-        std::string name = "/tmp/performous-unittest-";
+        std::string name = ( std::filesystem::temp_directory_path() / "performous-unittest-" );
         for (int i = 0; i < 8; ++i)
             name += charset[dist(gen)];
 
@@ -43,7 +55,9 @@ std::string getSecureTmpFile()
             return name;
         }
     }
-    return std::string();
+#endif // #ifdef "windows"
+
+    return std::string();  // fail
 }
 
 // create a temporary test file
