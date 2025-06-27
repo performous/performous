@@ -7,7 +7,7 @@
 #include <random>
 #include <sys/stat.h>
 
-#if defined(__MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 #include <io.h>
 #include <windows.h>
 #else
@@ -33,7 +33,7 @@ const std::vector<uint8_t> EMPTY_FILE{ };
 
 std::string getSecureTmpFile()
 {
-#if defined(__MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
     char tempPath[MAX_PATH];
     char tempFile[MAX_PATH];
     DWORD pathLen = GetTempPathA(MAX_PATH, tempPath);
