@@ -12,7 +12,7 @@
 #include <windows.h>
 #else
 #include <unistd.h>
-#endif // #ifdef "windows"
+#endif // #ifdef "building on windows"
 
 #include "common.hh"
 #include "game/image.hh"
@@ -39,7 +39,7 @@ std::string getSecureTmpFile()
     DWORD pathLen = GetTempPathA(MAX_PATH, tempPath);
     if (pathLen > 0 && pathLen < MAX_PATH)
     {
-        if (GetTempFilenameA(tempPath, "performous", 0, tempFile))
+        if (GetTempFileNameA(tempPath, "performous", 0, tempFile))
         {
             return std::string(tempFile);
         }
@@ -61,7 +61,7 @@ std::string getSecureTmpFile()
             return name;
         }
     }
-#endif // #ifdef "windows"
+#endif // #ifdef "building on windows"
 
     return std::string();  // fail
 }
