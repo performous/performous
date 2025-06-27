@@ -1,8 +1,7 @@
 <script setup>
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 import SongList from '../../Common/SongList.vue';
-
-const { computed, ref } = Vue;
-const { useStore } = Vuex;
 
 const store = useStore();
 
