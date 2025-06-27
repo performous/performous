@@ -1,6 +1,7 @@
 #include <vector>
 #include <filesystem>
 #include <iostream>
+#include <fstream>
 #include <thread>
 
 #include "common.hh"
@@ -22,81 +23,69 @@ const std::vector<uint8_t> EMPTY_FILE{ };
 
 // create a temporary test file
 std::string tmpTestFile( const std::vector<uint8_t> &image) {
-    std::string tmp = std::filesystem::temp_directory_path();
-    tmp += "test_";
-    tmp += std::to_string(std::this_thread::get_id()); 
-    tmp += ".tmp";
+    auto tmp_dir = std::filesystem::temp_directory_path();
+    tmp_dir /= "/performous_unit_tests";  // Fix sonarcloud warning
+    std::filesystem::create_directories(tmp_dir);
+
+    tmp_dir /= "test_img.tmp";
+
     try {
-        ofstream fout(tmp, ios::binary);
-        fout.write(image.data(), image.size());
+        std::ofstream fout(tmp_dir, std::ios::binary);
+        fout.write((char*)image.data(), image.size());
         fout.close();
-        return tmp;
+        return tmp_dir;
     }
     catch (...) {  // yes, catch _everything_, on purpose.
         return "";
     }
 }
 
-TEST(PNGImageDetect) {
+TEST(ImageType, PNGImageDetect) {
     std::string filename = tmpTestFile(PNG_IMAGE);
 
     EXPECT_TRUE(filename != "");
     EXPECT_TRUE(getImageType(filename) == ImageType::PNG);
-    if (filename.size() > 0)
-        std::remove(filename);
 }
 
-TEST(JPEGImageDetect) {
+TEST(ImageType, JPEGImageDetect) {
     std::string filename = tmpTestFile(JPEG_IMAGE);
 
     EXPECT_TRUE(filename != "");
     EXPECT_TRUE(getImageType(filename) == ImageType::JPEG);
-    if (filename.size() > 0)
-        std::remove(filename);
 }
 
-TEST(SVGImageDetect) {
+TEST(ImageType, SVGImageDetect) {
     std::string filename = tmpTestFile(SVG_IMAGE);
 
     EXPECT_TRUE(filename != "");
     EXPECT_TRUE(getImageType(filename) == ImageType::SVG);
-    if (filename.size() > 0)
-        std::remove(filename);
 }
 
-TEST(WEBPImageDetect) {
+TEST(ImageType, WEBPImageDetect) {
     std::string filename = tmpTestFile(WEBP_IMAGE);
 
     EXPECT_TRUE(filename != "");
     EXPECT_TRUE(getImageType(filename) == ImageType::WEBP);
-    if (filename.size() > 0)
-        std::remove(filename);
 }
 
-TEST(PDFImageDetect) {
+TEST(ImageType, PDFImageDetect) {
     std::string filename = tmpTestFile(PDF_IMAGE);
 
     EXPECT_TRUE(filename != "");
-    EXPECT_TRUE(getImageType(filename) == ImageType::UNKOWN);
-    if (filename.size() > 0)
-        std::remove(filename);
+    EXPECT_TRUE(getImageType(filename) == ImageType::UNKNOWN);
 }
 
-TEST(ShortImageDetect) {
+TEST(ImageType, ShortImageDetect) {
     std::string filename = tmpTestFile(SMALL_FILE);
 
     EXPECT_TRUE(filename != "");
-    EXPECT_TRUE(getImageType(filename) == ImageType::UNKOWN);
-    if (filename.size() > 0)
-        std::remove(filename);
+    EXPECT_TRUE(getImageType(filename) == ImageType::UNKNOWN);
 }
 
-TEST(ZeroImageDetect) {
-    std::string filename = tmpTestFile(ZERO_FILE);
+TEST(ImageType, ZeroImageDetect) {
+    std::string filename = tmpTestFile(EMPTY_FILE);
 
     EXPECT_TRUE(filename != "");
-    EXPECT_TRUE(getImageType(filename) == ImageType::UNKOWN);
-    if (filename.size() > 0)
-        std::remove(filename);
+    EXPECT_TRUE(getImageType(filename) == ImageType::UNKNOWN);
 }
 
