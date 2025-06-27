@@ -200,17 +200,15 @@ ImageType getImageType(const std::string &filePath)
 		}
 	}
 
-	// Is it a JPEG file?
-	const std::array<unsigned char, 2> JPEG_SIGNATURE = { 0xff, 0xd8 };
-	if (std::equal(buffer.begin(), buffer.begin() + JPEG_SIGNATURE.size(), JPEG_SIGNATURE.begin())) {
-		return ImageType::JPEG;
-	}
+	auto match = [](const auto& buf, const std::vector<unsigned char>& sig, size_t offset = 0) {
+		return std::equal(sig.begin(), sig.end(), buf.begin() + offset);
+	};
 
-	// PNG?
-	const std::array<unsigned char, 8> PNG_SIGNATURE = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
-	if (std::equal(buffer.begin(), buffer.begin() + PNG_SIGNATURE.size(), PNG_SIGNATURE.begin())) {
+    if (match(buffer, {0xff, 0xd8})) 
+        return ImageType::JPEG;
+
+    if (match(buffer, {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a}))
 		return ImageType::PNG;
-	}
 
 	// SVG is multiline text
 	fin.seekg(0, std::ios::beg);
@@ -221,31 +219,13 @@ ImageType getImageType(const std::string &filePath)
 		}
 	}
 
-	// We don't use these right now, added for the sake of completness
-	// WebP - we probably _should_ handle this, they're getting more comon
-	const std::array<unsigned char, 4> WEBP_SIGNATURE1 = { 0x52, 0x49, 0x46, 0x46 };
-	// the 4 bytes in bwteen are the image dimensions, but "RIFF" is a common header
-	const std::array<unsigned char, 4> WEBP_SIGNATURE2 = { 0x57, 0x45, 0x42, 0x50 };
-	if (std::equal(buffer.begin(), buffer.begin() + 4, WEBP_SIGNATURE1.begin()) 
-		&& std::equal(buffer.begin() + 8, buffer.begin() + 12, WEBP_SIGNATURE2.begin())) {
+	// WebP "magic number" is split in two, but the first part "RIFF" is common for different
+    // files, so we must check both parts
+	SpdLogger::error(LogSystem::IMAGE, "IS ThIS A WEBP path={}", filePath);
+    if (match(buffer, {0x52, 0x49, 0x46, 0x46}) && match(buffer, {0x57, 0x45, 0x42, 0x50}, 8))
 		return ImageType::WEBP;
-	}
 
-	// GIF
-	const std::array<unsigned char, 6> GIF87_SIGNATURE = { 'G', 'I', 'F', '8', '7', 'a' };
-	const std::array<unsigned char, 6> GIF89_SIGNATURE = { 'G', 'I', 'F', '8', '9', 'a' };
-	if (std::equal(buffer.begin(), buffer.begin() + GIF87_SIGNATURE.size(), GIF87_SIGNATURE.begin()) ||
-		std::equal(buffer.begin(), buffer.begin() + GIF89_SIGNATURE.size(), GIF89_SIGNATURE.begin())) {
-		return ImageType::GIF;
-	}
-
-	// BMP?
-	const std::array<unsigned char, 2> BMP_SIGNATURE = { 0x42, 0x4d };
-	if (std::equal(buffer.begin(), buffer.begin() + BMP_SIGNATURE.size(), BMP_SIGNATURE.begin())) {
-		return ImageType::BMP;
-	}
-
-	// TIFF images; GIMP xcf; newer versions of JPEG; many more?
+	// GIF, BMP, TIFF images; GIMP xcf; newer versions of JPEG; many more?
 
 	// If we reach here, the file is not recognized
 	return ImageType::UNKNOWN;
