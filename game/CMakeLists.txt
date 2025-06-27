@@ -132,6 +132,21 @@ foreach(lib SDL2 PangoCairo LibRSVG LibXML++ AVFormat SWResample SWScale ZLIB JP
 	add_definitions(${${lib}_DEFINITIONS})
 endforeach(lib)
 
+# Find all the optional libs, and #define HAVE_$lib if found (e.g.: HAVE_WebP)
+# (Code using these libs must conditionally handle it not being available)
+foreach(lib WebP )
+	find_package(${lib} ${${lib}_REQUIRED_VERSION} QUIET)
+    if (${lib}_FOUND)
+        message(STATUS "${lib} includes: ${${lib}_INCLUDE_DIRS}")
+        target_compile_definitions(performous PRIVATE HAVE_${lib}=1)
+    else()
+        message(STATUS "${lib} Library was NOT FOUND, removing support for it")
+    endif()
+	target_include_directories(performous SYSTEM PRIVATE ${${lib}_INCLUDE_DIRS})
+	target_link_libraries(performous PRIVATE ${${lib}_LIBRARIES})
+	add_definitions(${${lib}_DEFINITIONS})
+endforeach(lib)
+
 find_package(fmt 8.1 REQUIRED CONFIG)
 # CppRESTSDK and their godforsaken U macro.
 if(fmt_VERSION VERSION_GREATER_EQUAL 9.0.0)

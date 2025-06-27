@@ -4,11 +4,15 @@
 
 #include <jpeglib.h>
 #include <png.h>
+#ifdef HAVE_WebP    
+#include <webp/decode.h>
+#endif 
 
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <cstring>
+#include <algorithm>
 
 namespace {
 	void writePngHelper(png_structp pngPtr, png_bytep data, png_size_t length) {
@@ -180,6 +184,60 @@ void loadJPEG(Bitmap& bitmap, fs::path const& filename) {
 	}
 	jpeg_destroy_decompress(&cinfo);
 }
+
+/**
+  * \brief    Load a WEBP image from the given filename.  Throws a std::runtime_error on any error
+  *
+  * \note     The support for WebP is compile-time optional.  If the library is found, it is 
+  *           used, otherwise this function is stubbed-out to simply raise an error.
+  *
+  * \param[out] bitmap    Target obejct for the pixel data
+  * \param[in]  filename  Path to load the image from
+  *
+  */
+void loadWEBP([[maybe_unused]] Bitmap& bitmap, fs::path const& filename) {
+	SpdLogger::debug(LogSystem::IMAGE, "Loading WEBP file, path={}", filename);
+#ifdef HAVE_WebP    
+    static WebPDecoderConfig webpConfig;
+    static bool webpConfigured{false};
+
+    if (!webpConfigured)
+    {
+        // The WEBP decoder needs a pre-configuration step
+        if (!WebPInitDecoderConfig(&webpConfig))
+        {
+            throw std::runtime_error("Failed to Initialise WEBP Decoder");
+        }
+        webpConfigured = true;  // configured OK
+    }
+
+    BinaryBuffer webpData = readFile(filename);
+    int width;
+    int height;
+    if (!WebPGetInfo(webpData.data(), webpData.size(), &width, &height) || !(width > 0 && height > 0))
+    {
+        throw std::runtime_error("Failed Checking WEBP file"); // The image loader only catches std::runtime_error
+    }
+
+    std::uint8_t *rawPixelData = WebPDecodeRGBA(webpData.data(), webpData.size(), &width, &height);
+    if (rawPixelData)
+    {
+        unsigned width_u = static_cast<unsigned>(width);  // MacOS build needs unsigned
+        unsigned height_u = static_cast<unsigned>(height);
+        bitmap.resize(width_u, height_u); 
+        std::memcpy(bitmap.data(), rawPixelData, 4*width_u*height_u);
+        WebPFree(rawPixelData); 
+        return; // all ok
+    }
+    else
+    {
+        throw std::runtime_error("Failed Decoding WEBP file");
+    }
+#else
+    throw std::runtime_error("WebP support not compiled in");
+#endif //#ifdef HAVE_WebP    
+}
+  
 
 void Bitmap::crop(const unsigned width, const unsigned height, const unsigned x, const unsigned y) {
 	if (ptr) throw std::logic_error("Cannot Bitmap::crop foreign pointers.");

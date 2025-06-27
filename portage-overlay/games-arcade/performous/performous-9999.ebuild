@@ -4,7 +4,7 @@
 EAPI=8
 [[ ${PV} = 9999 ]] && GIT="git-r3"
 
-CMAKE_REMOVE_MODULES_LIST=(FindALSA FindBoost FindGettext FindJpeg FindPng FindTiff FindZ)
+CMAKE_REMOVE_MODULES_LIST=(FindALSA FindBoost FindGettext FindJpeg FindPng Findwebp FindTiff FindZ)
 
 inherit cmake ${GIT}
 

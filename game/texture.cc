@@ -51,6 +51,8 @@ class TextureLoader::Impl {
 				loadJPEG(bitmap, name);
 			else if (ext == ".png")
 				loadPNG(bitmap, name);
+			else if (ext == ".webp" )
+				loadWEBP(bitmap, name);
 			else
 				throw std::runtime_error("Unknown image file format: " + name.string());
 		}
