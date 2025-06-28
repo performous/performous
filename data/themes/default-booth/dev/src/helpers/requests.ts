@@ -13,7 +13,7 @@ export async function getApi(request: string, query: string = '', asJSON: boolea
     }
 }
 
-export async function postApi(request: string, payload: Dataable = null, asJSON: boolean = false): Promise<any> {
+export async function postApi(request: string, payload: Dataable|null = null, asJSON: boolean = false): Promise<any> {
     const prefix = import.meta.env.DEV ? `http://localhost:${import.meta.env.VITE_SERVER_PORT}` : '.';
     const res = await fetch(`${prefix}/api/${request}`, {
         method: 'post',
