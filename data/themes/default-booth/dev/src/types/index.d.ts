@@ -15,7 +15,7 @@ export type Data = {
     [key: string]: Data|string|number|boolean|null
 }|Array<JSON>
 
-export type Dataable = Data|Song
+export type Dataable = Data|Song|JSON
 
 export interface Song {
     Title: string
