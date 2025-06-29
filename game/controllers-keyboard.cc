@@ -129,6 +129,8 @@ namespace input {
 				if (k == SDL_SCANCODE_PAGEUP) return ButtonId::GENERIC_MOREUP;
 				if (k == SDL_SCANCODE_PAGEDOWN) return ButtonId::GENERIC_MOREDOWN;
 				if (k == SDL_SCANCODE_PAUSE) return ButtonId::GENERIC_PAUSE;
+				if (k == SDL_SCANCODE_HOME) return ButtonId::GENERIC_HOME;
+				if (k == SDL_SCANCODE_END) return ButtonId::GENERIC_END;
 			}
 			else if (m_mod == Platform::shortcutModifier()) {
 				if (k == SDL_SCANCODE_UP) return ButtonId::GENERIC_VOLUME_UP;
