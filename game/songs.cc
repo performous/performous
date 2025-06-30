@@ -299,6 +299,11 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 			if (!regex_search(p.filename().string(), expression)) {
 				continue; //if the folder does not contain any of the requested files, ignore it
 			}
+			std::regex ignoredFiles("^(\\._.*|\\.\\#.*)$");  // skip MacOS meta, common backup files
+			if ( regex_search(p.filename().string(), ignoredFiles)) {
+				SpdLogger::debug(LogSystem::SONGS, "Ignoring metadata/backup file {}", p.filename().string());
+				continue; // skip trying to load these files (which causes an exception log)
+			}
 			try { //found song file, make a new song with it.
 				auto song = std::shared_ptr<Song>{};
 				auto match = cache.find(p.string());

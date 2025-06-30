@@ -401,6 +401,10 @@ to save the current settings to XML.
 		<short>Mute the vocals track</short>
 		<long>Mute the vocals track if a vocals.ogg is found.</long>
 	</entry>
+	<entry name="audio/normalize_songs" type="bool" value="true">
+		<short>Normalize loudness of songs</short>
+		<long>Use "Replay Gain" volume information from each song file to even-out the playback volume.</long>
+	</entry>
 
 	<!-- Paths -->
 	<entry name="paths/songs" type="string_list" hidden="false">
