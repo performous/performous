@@ -7,12 +7,14 @@
 #include <random>
 #include <sys/stat.h>
 
-#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+#include "platform.hh"
+
+#if (BOOST_OS_WINDOWS)
 #include <io.h>
 #include <Windows.h>
 #else
 #include <unistd.h>
-#endif // #ifdef "building on windows"
+#endif //#if BOOST_OS_WINDOWS
 
 #include "common.hh"
 #include "game/image.hh"
@@ -33,7 +35,7 @@ const std::vector<uint8_t> EMPTY_FILE{ };
 
 std::string getSecureTmpFile()
 {
-#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+#if (BOOST_OS_WINDOWS)
     char tempPath[MAX_PATH];
     char tempFile[MAX_PATH];
     DWORD pathLen = GetTempPathA(MAX_PATH, tempPath);
@@ -61,7 +63,7 @@ std::string getSecureTmpFile()
             return name;
         }
     }
-#endif // #ifdef "building on windows"
+#endif // #ifdef BOOST_OS_WINDOWS
 
     return std::string();  // fail
 }
