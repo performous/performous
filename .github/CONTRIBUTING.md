@@ -46,13 +46,20 @@ sudo emerge boost git cmake help2man glew libsdl2 ffmpeg portaudio libxmlpp \
 
 ### Fedora
 
-(You need [http://rpmfusion.org/Configuration RPM Fusion Free] repository for ffmpeg):
+You need [http://rpmfusion.org/Configuration RPM Fusion Free] repository for ffmpeg.
+It's best to fetch and install this first, as the package-install below depends on it.
 
 ```bash
 yum install git cmake gcc-c++ gettext cairo-devel librsvg2-devel libsigc++20-devel \
    glibmm24-devel libxml++-devel boost-devel SDL2-devel libepoxy-devel ffmpeg-devel \
    portaudio-devel help2man redhat-lsb opencv-devel portmidi-devel libjpeg-turbo-devel \
-   pango-devel jsoncpp-devel 
+   pango-devel jsoncpp-devel fmt-devel
+```
+
+If you also plan to run unit tests, further packages are required.  
+(This is **not** needed just to play Performous)
+```bash
+yum install gtest-devel gmock-devel
 ```
 
 ### MacOS
