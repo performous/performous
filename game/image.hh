@@ -49,6 +49,10 @@ struct Bitmap {
 	void crop(const unsigned width, const unsigned height, const unsigned x, const unsigned y);
 };
 
+enum class ImageType { UNKNOWN, PNG, JPEG, WEBP, SVG };  // Types of images we can identify
+
+ImageType getImageType(const std::string &filePath);   ///< Looks inside the file, returning image type
+
 // The total number of bytes per line (stride) may be specified. By default no padding at end of line is assumed.
 void writePNG(fs::path const& filename, Bitmap const& bitmap, unsigned stride = 0);
 void loadPNG(Bitmap& bitmap, fs::path const& filename);
