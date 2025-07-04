@@ -43,7 +43,7 @@ RUN <<EOR
 		portaudio19-dev libglm-dev libboost-filesystem-dev nlohmann-json3-dev\
 		libboost-iostreams-dev libboost-locale-dev libboost-system-dev \
 		libboost-program-options-dev libssl-dev libcpprest-dev \
-		libportmidi-dev libopencv-dev libaubio-dev \
+		libportmidi-dev libopencv-dev libaubio-dev libwebp-dev \
 		ca-certificates file libgtest-dev libgmock-dev google-mock libspdlog-dev
 		apt-get -y satisfy "libfmt-dev (>= 8)" "Conflicts: libspdlog-dev (<< 1.12)"
 	apt-get clean
