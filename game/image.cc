@@ -184,6 +184,56 @@ void loadJPEG(Bitmap& bitmap, fs::path const& filename) {
 	jpeg_destroy_decompress(&cinfo);
 }
 
+/**
+  * \brief    Given a filename, look inside the file to determine what sort of image it is
+  *
+  * \note     Magic Numbers listed in https://en.wikipedia.org/wiki/List_of_file_signatures
+  * \returns  ImageType, or ImageType::UNKNOWN
+  */
+ImageType getImageType(const std::string &filePath) 
+{
+	std::ifstream fin(filePath, std::ios::binary);
+	std::array<unsigned char, 12> buffer{};
+	
+	if (fin) {
+		// reading the first 12 bytes of the file into the buffer
+		fin.read(reinterpret_cast<char*>(buffer.data()), buffer.size());
+		if (static_cast<size_t>(fin.gcount()) < buffer.size()) {
+			return ImageType::UNKNOWN;
+		}
+	}
+
+	auto match = [](const auto& buf, const std::vector<unsigned char>& sig, size_t offset = 0) {
+		return std::equal(sig.begin(), sig.end(), buf.begin() + offset);
+	};
+
+	if (match(buffer, {0xff, 0xd8})) 
+		return ImageType::JPEG;
+
+	if (match(buffer, {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a}))
+		return ImageType::PNG;
+
+	// WebP "magic number" is split in two, but the first part "RIFF" is common for different
+	// files, so we must check both parts
+	if (match(buffer, {0x52, 0x49, 0x46, 0x46}) && match(buffer, {0x57, 0x45, 0x42, 0x50}, 8))
+		return ImageType::WEBP;
+
+	// SVG is multiline text
+	fin.seekg(0, std::ios::beg);
+	std::string line;
+	while (std::getline(fin, line)) {
+		if (line.find("<svg") != std::string::npos) {
+			return ImageType::SVG;
+		}
+	}
+
+	// GIF, BMP, TIFF images; GIMP xcf; newer versions of JPEG; many more?
+
+	// If we reach here, the file is not recognized
+	return ImageType::UNKNOWN;
+}
+
+
 void Bitmap::crop(const unsigned width, const unsigned height, const unsigned x, const unsigned y) {
 	if (ptr) throw std::logic_error("Cannot Bitmap::crop foreign pointers.");
 	if (x + width > this->width || y+ height > this->height)
