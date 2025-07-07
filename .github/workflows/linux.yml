@@ -59,9 +59,9 @@ jobs:
             echo "build_docker_containers=false" >> $GITHUB_OUTPUT
           fi
 
-          DIFF_UBUNTU=$((git rev-parse HEAD:docker/Dockerfile.ubuntu HEAD:docker/build_performous.sh && git diff --merge-base ${base_version} --exit-code -- docker/Dockerfile.ubuntu docker/build_performous.sh) > /dev/null 2>&1 ; echo $?)
-          DIFF_DEBIAN=$((git rev-parse HEAD:docker/Dockerfile.debian HEAD:docker/build_performous.sh && git diff --merge-base ${base_version} --exit-code -- docker/Dockerfile.debian docker/build_performous.sh) > /dev/null 2>&1 ; echo $?)
-          DIFF_FEDORA=$((git rev-parse HEAD:docker/Dockerfile.fedora HEAD:docker/build_performous.sh && git diff --merge-base ${base_version} --exit-code -- docker/Dockerfile.fedora docker/build_performous.sh) > /dev/null 2>&1 ; echo $?)
+          DIFF_UBUNTU=$((git rev-parse HEAD:docker/Dockerfile.ubuntu HEAD:docker/build_performous.sh HEAD:docker/run_tests.sh && git diff --merge-base ${base_version} --exit-code -- docker/Dockerfile.ubuntu docker/build_performous.sh docker/run_tests.sh) > /dev/null 2>&1 ; echo $?)
+          DIFF_DEBIAN=$((git rev-parse HEAD:docker/Dockerfile.debian HEAD:docker/build_performous.sh HEAD:docker/run_tests.sh && git diff --merge-base ${base_version} --exit-code -- docker/Dockerfile.debian docker/build_performous.sh docker/run_tests.sh) > /dev/null 2>&1 ; echo $?)
+          DIFF_FEDORA=$((git rev-parse HEAD:docker/Dockerfile.fedora HEAD:docker/build_performous.sh HEAD:docker/run_tests.sh && git diff --merge-base ${base_version} --exit-code -- docker/Dockerfile.fedora docker/build_performous.sh docker/run_tests.sh) > /dev/null 2>&1 ; echo $?)
 
           if [[ $DIFF_UBUNTU != 0 ]]; then
             echo "Refresh Ubuntu containers: TRUE"
