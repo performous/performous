@@ -31,7 +31,7 @@ void WebServer::StartServer(int tried, bool fallbackPortInUse) {
 	} else {
 		if (Platform::currentOS() == Platform::HostOS::OS_WIN)
 		{
-			addr = "http://*:" + portToUse; // Allow Windows to accept all connections. Needs admin privileges though.
+			addr = "http://+:" + portToUse; // Allow Windows to accept all connections. Needs admin privileges though.
 		}
 		else 
 		{
