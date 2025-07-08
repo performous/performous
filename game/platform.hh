@@ -35,6 +35,10 @@ using STAT = struct _stat;
 using STAT = struct stat;
 #endif
 
+#ifndef ssize_t
+using ssize_t = intmax_t;  // ssize_t is a POSIX type, some platforms (e.g.: mingw) don't have it
+#endif
+
 struct Platform {
 	Platform();
 	~Platform();
