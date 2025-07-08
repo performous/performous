@@ -214,8 +214,27 @@
 				<axis hw="4" negative="left" positive="right" />
 				<axis hw="5" negative="pick_up" positive="pick_down" />
 				<hat hw="0" up="pick_up" down="pick_down" left="left" right="right" />
-        		</mapping>
-    		</controller>
+				</mapping>
+		</controller>
+		<controller type="guitar" name="GUITAR_RETROCULTMODS">
+			<description>RetroCult Mods V3 Wii Guitar Adapter</description>
+			<!-- https://shop.retrocultmods.com/products/v3-wii-adapter-for-clone-hero-and-rb4-rock-band-4
+				 Bus 005 Device 005: ID 1209:2882 Generic V3 Adapter - Guitar (Default)   -->
+			<device regex="RetroCultMods V3 Adapter" />
+			<mapping>
+				<button hw="0" map="green" />
+				<button hw="1" map="red" />
+				<button hw="4" map="yellow" />
+				<button hw="3" map="blue" />
+				<button hw="6" map="orange" />
+				<button hw="11" map="cancel" />  <!-- minus -->
+				<button hw="10" map="start" />   <!-- plus -->
+				<axis hw="0" positive="whammy" />
+				<axis hw="2" positive="godmode" />
+				<hat hw="0" up="pick_up" down="pick_down" left="left" right="right" />
+			</mapping>
+		</controller>
+
 		<!-- Not managed
 		<controller type="guitar" name="GUITAR_PRO_PS3">
 			<description>Rock Band Pro Guitar for PS3</description>
@@ -437,7 +456,7 @@
 				 PortMidi device name for USB-connected drum controllers Millenium MPS-600 and Alesis DM6 is
 				 "e-drum MIDI 1" (same name even if multiple devices are connected at the same time).
 				 Still, we don't want to filter by device here as filtering by channel should be enough.
-            -->
+			-->
 			<!-- Standard MIDI drum channels are 10 and 11. -->
 			<channel min="10" max="11" />
 			<mapping>
