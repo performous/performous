@@ -102,6 +102,7 @@ public:
 	int randomIdx = 0; ///< sorting index used for random order
 
 	// Functions only below this line
+	Song();
 	Song(nlohmann::json const& song);  ///< Load song from cache.
 	Song(fs::path const& filename);  ///< Load song from specified path and filename
 	void reload(bool errorIgnore = true);  ///< Reset and reload the entire song from file
@@ -124,6 +125,8 @@ public:
 	bool hasGuitars() const { return instrumentTracks.size() - hasDrums() - hasKeyboard(); }
 	bool hasVocals() const { return !vocalTracks.empty(); }
 	bool hasDuet() const { return vocalTracks.size() > 1; }
+	bool hasSoloVocals() const { return vocalTracks.size() == 1; }
+	bool hasDuetVocals() const { return vocalTracks.size() == 2; }
 	bool hasControllers() const { return !danceTracks.empty() || !instrumentTracks.empty(); }
 	bool getNextSection(double pos, SongSection &section);
 	bool getPrevSection(double pos, SongSection &section);
@@ -132,10 +135,19 @@ public:
 	bool isBroken() const;
 	void setBroken(bool broken = true);
 
+	void setTitle(std::string const&);
+	void setArtist(std::string const&);
+
+	using Year = unsigned;
+
+	Year getYear() const;
+	void setYear(Year year);
+
 private:
 	void collateUpdate();   ///< Rebuild collate variables (used for sorting) from other strings
 
 	bool m_broken = false;
+	Year m_year = 0; 
 };
 
 /// Thrown by SongParser when there is an error

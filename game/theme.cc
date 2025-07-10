@@ -5,6 +5,7 @@
 
 Theme::Theme()
 {}
+
 Theme::Theme(fs::path const& path) : bg(path)
 {}
 
@@ -78,8 +79,72 @@ ThemePlaylistScreen::ThemePlaylistScreen():
 {}
 
 SvgTxtTheme& ThemeInstrumentMenu::getCachedOption(const std::string& text) {
-	if (options.find(text) != options.end()) return (*options.at(text).get());
-	std::pair<std::string, std::unique_ptr<SvgTxtTheme>> kv = std::make_pair(text, std::make_unique<SvgTxtTheme>(findFile("instrumentmenu_option.svg"), config["graphic/text_lod"].f()));
+	if (options.find(text) != options.end()) 
+		return (*options.at(text).get());
+	auto kv = std::make_pair(text, std::make_unique<SvgTxtTheme>(findFile("instrumentmenu_option.svg"), config["graphic/text_lod"].f()));
 	options.insert(std::move(kv));
 	return (*options.at(text).get());
+}
+
+ThemeSongFilterScreen::ThemeSongFilterScreen()
+: Theme(findFile("songfilter_bg.svg")) {
+}
+
+ThemeUI::ThemeUI()
+: button_bg(findFile("button_bg.svg").string()),
+	checkbox_checked(findFile("checkbox_checked.svg").string()),
+	checkbox_unchecked(findFile("checkbox_unchecked.svg").string()),
+	image_bg(findFile("image_bg.svg").string()),
+	list_bg(findFile("list_bg.svg").string()),
+	list_selected_bg(findFile("list_selected_bg.svg").string()),
+	select_bg(findFile("select_bg.svg").string()),
+	select_up_down(findFile("select_up_down.svg").string()),
+	textbox_bg(findFile("textbox_bg.svg").string()),
+	textbox_cursor(findFile("textbox_cursor.svg").string()),
+	focus(findFile("ui_focused.svg").string())
+{
+}
+
+std::unique_ptr<Texture> ThemeUI::getButtonBG() const {
+	return std::make_unique<Texture>(button_bg);
+}
+
+std::unique_ptr<Texture> ThemeUI::getCheckboxCheck() const {
+	return std::make_unique<Texture>(checkbox_checked);
+}
+
+std::unique_ptr<Texture> ThemeUI::getCheckboxUncheck() const {
+	return std::make_unique<Texture>(checkbox_unchecked);
+}
+
+std::unique_ptr<Texture> ThemeUI::getImageBG() const {
+	return std::make_unique<Texture>(image_bg);
+}
+
+std::unique_ptr<Texture> ThemeUI::getListBG() const {
+	return std::make_unique<Texture>(list_bg);
+}
+
+std::unique_ptr<Texture> ThemeUI::getListSelectedBG() const {
+	return std::make_unique<Texture>(list_selected_bg);
+}
+
+std::unique_ptr<Texture> ThemeUI::getSelectBG() const {
+	return std::make_unique<Texture>(select_bg);
+}
+
+std::unique_ptr<Texture> ThemeUI::getSelectUpDown() const {
+	return std::make_unique<Texture>(select_up_down);
+}
+
+std::unique_ptr<Texture> ThemeUI::getTextboxBG() const {
+	return std::make_unique<Texture>(textbox_bg);
+}
+
+std::unique_ptr<Texture> ThemeUI::getTextboxCursor() const {
+	return std::make_unique<Texture>(textbox_cursor);
+}
+
+std::unique_ptr<BorderDefinition> ThemeUI::getFocus() const {
+	return std::make_unique<BorderDefinition>(focus);
 }
