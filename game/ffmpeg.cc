@@ -328,10 +328,10 @@ void FFmpeg::readReplayGain(const AVStream *stream)
 			m_replayGainDecibels = static_cast<double>(replay_gain->track_gain);
 			m_replayGainDecibels /= 100000.0;   // convert from microbels to decibels
 			m_replayGainFactor = calculateLinearGain(m_replayGainDecibels);
-			std::clog << "ffmpeg/debug: readReplayGain() - GAIN IS [" << std::fixed << std::setprecision(2) << m_replayGainDecibels << "] dB, Linear Gain is [" << m_replayGainFactor <<"]" << std::endl;
+			SpdLogger::debug(LogSystem::FFMPEG, "Audio Gain is [{0:.2f}] dB, Linear Gain is [{1:.2f}]", m_replayGainDecibels, m_replayGainFactor);
 		}
 		else {
-			std::clog << "ffmpeg/debug: readReplayGain() - no gain" << std::endl;
+			SpdLogger::debug(LogSystem::FFMPEG, "No Audio Gain in file");
 		}
 	}
 }
