@@ -11,17 +11,18 @@
 #include "game.hh"
 #include "graphic/color_trans.hh"
 
+#include <map>
+
 namespace {
-	static const int unassigned_id = -1;  // mic.dev value for unassigned
 	static const float yoff = 0.18f; // Offset from center where to place top row
 	static const float xoff = 0.45f; // Offset from middle where to place first column
 
 	std::vector<std::string> getMicrophoneColorNames(std::string const& prepend) {
 		auto const config = getMicrophoneConfig();
 		auto result = std::vector<std::string>{ prepend };
-
-		std::for_each(config.begin(), config.end(), [&result](auto const& config) { result.emplace_back(config.colorname); });
-
+		for (auto const& [key, value] : config) {
+			result.emplace_back(key);
+		}
 		return result;
 	}
 
@@ -95,17 +96,42 @@ void ScreenAudioDevices::exit() {
 
 void ScreenAudioDevices::manageEvent(input::NavEvent const& event) {
 	input::NavButton nav = event.button;
-	int& chpos = m_channels[m_selected_column].pos;
+	std::optional<int>& chpos = m_channels[m_selected_column].pos;
 	const int posN = static_cast<int>(m_devs.size() + 1);
+	switch (nav) {
+	case input::NavButton::CANCEL:
+		getGame().activateScreen("Intro");
+		break;
+	case input::NavButton::PAUSE:
+		m_audio.togglePause();
+		break;
+	default:
+		if (m_devs.empty()) return;
 
-	if (nav == input::NavButton::CANCEL) getGame().activateScreen("Intro");
-	else if (nav == input::NavButton::PAUSE) m_audio.togglePause();
-	else if (m_devs.empty()) return; // The rest work if there are any devices
-	else if (nav == input::NavButton::START) { if (save()) getGame().activateScreen("Intro"); }
-	else if (nav == input::NavButton::LEFT && m_selected_column > 0) --m_selected_column;
-	else if (nav == input::NavButton::RIGHT && m_selected_column < m_channels.size()-1) ++m_selected_column;
-	else if (nav == input::NavButton::UP) chpos = static_cast<int>((chpos + posN) % posN - 1);
-	else if (nav == input::NavButton::DOWN) chpos = static_cast<int>((chpos + posN + 2) % posN - 1);
+		switch (nav) {
+		case input::NavButton::START:
+			if (save()) getGame().activateScreen("Intro");
+			break;
+		case input::NavButton::LEFT:
+			if (m_selected_column > 0)
+				--m_selected_column;
+			break;
+		case input::NavButton::RIGHT:
+			if (m_selected_column < m_channels.size()-1)
+				++m_selected_column;
+			break;
+		case input::NavButton::UP:
+			chpos = static_cast<int>((chpos.value_or(-1) + posN) % posN - 1);
+			break;
+		case input::NavButton::DOWN:
+			chpos = static_cast<int>((chpos.value_or(-1) + posN + 2) % posN - 1);
+			break;
+		default:
+			break;
+		}
+		if (chpos.has_value() && (chpos.value() < 0 || chpos.value() > static_cast<int>(m_channels.size())))
+			chpos.reset();
+	}
 }
 
 void ScreenAudioDevices::manageEvent(SDL_Event event) {
@@ -155,10 +181,10 @@ void ScreenAudioDevices::draw() {
 		auto& srf = m_channels[i].name != "OUT" ? *m_mic_icon : *m_pdev_icon;
 		{
 			ColorTrans c(window, getMicrophoneColor(m_channels[i].name));
-			int pos = m_channels[i].pos;
-			if (pos == unassigned_id) 
+			std::optional<int> pos = m_channels[i].pos;
+			if (!pos.has_value() || pos.value() == -1)
 				pos = static_cast<int>(m_devs.size());  // Transform -1 to the bottom of the list
-			srf.dimensions.middle(-xoff + xstep*0.5f + static_cast<float>(i)*xstep).center(-yoff+static_cast<float>(pos)*ystep);
+			srf.dimensions.middle(-xoff + xstep*0.5f + static_cast<float>(i)*xstep).center(-yoff+static_cast<float>(pos.value())*ystep);
 			srf.draw(window);
 		}
 		// Selection indicator
@@ -201,7 +227,7 @@ bool ScreenAudioDevices::save(bool skip_ui_config) {
 		for (auto const& d: m_devs) {  // PortAudio devices
 			std::string mics = "", pdev = "";
 			for (auto const& c: m_channels) {  // blue, red, ..., OUT
-				if (c.pos == unassigned_id || m_devs[static_cast<size_t>(c.pos)].idx != d.idx) 
+				if (!c.pos.has_value() || m_devs[static_cast<size_t>(c.pos.value())].idx != d.idx) 
 					continue;
 				if (c.name == "OUT")
 					pdev = "out=2"; // Pdev, only stereo supported
@@ -236,14 +262,18 @@ bool ScreenAudioDevices::save(bool skip_ui_config) {
 
 bool ScreenAudioDevices::verify() {
 	for (auto const& channel: m_channels) {
-		if (channel.pos == unassigned_id) 
+		bool found = false;
+		if (!channel.pos.has_value()) 
 			continue;  // No checking needed of unassigned channels
 		// Find the device
-		for (auto const& device: m_audio.devices()) 
-			if (device.isChannel(channel.name))
-				goto found;
-		return false;
-		found:;
+		for (auto const& device: m_audio.devices()) {
+			if (device.isChannel(channel.name)) {
+				found = true;
+				break;
+			}
+		}
+		if (!found)
+			return false;
 	}
 	return true;
 }
