@@ -41,6 +41,7 @@ Song::Song(nlohmann::json const& song) : dummyVocal(TrackName::VOCAL_LEAD), rand
 	preview_start = getJsonEntry<double>(song, "previewStart").value_or(0.0);
 	m_duration = getJsonEntry<double>(song, "duration").value_or(0.0);
 	music[TrackName::BGMUSIC] = getJsonEntry<std::string>(song, "songFile").value_or("");
+	music[TrackName::INSTRUMENTAL] = getJsonEntry<std::string>(song, "instrumental").value_or("");
 	music[TrackName::VOCAL_LEAD] = getJsonEntry<std::string>(song, "vocals").value_or("");
 	music[TrackName::VOCAL_BACKING] = getJsonEntry<std::string>(song, "vocalsBacking").value_or("");
 	music[TrackName::PREVIEW] = getJsonEntry<std::string>(song, "preview").value_or("");

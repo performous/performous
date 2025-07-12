@@ -202,7 +202,14 @@ void ScreenSing::exit() {
 
 /// Manages the instrument drawing
 void ScreenSing::instrumentLayout(double time) {
-	if (!m_song->hasControllers()) return;
+	if (!m_song->hasControllers()) {
+		if (!m_song->music["Instrumental"].string().empty()) {
+			m_audio.streamFade("background", m_song->music["Vocals"].string().empty() && !config["audio/mute_vocals_track"].b() ? 1.0 : 0.0); // Background should be muted if both vocals and instrumental is set
+			m_audio.streamFade("Instrumental", m_song->music["Vocals"].string().empty() && !config["audio/mute_vocals_track"].b() ? 0.0 : 1.0);
+			m_audio.streamFade("Vocals", config["audio/mute_vocals_track"].b() ? 0.0 : 1.0);
+		}
+		return;
+	}
 	auto& window = getGame().getWindow();
 	int count_alive = 0, count_menu = 0, i = 0;
 	// Remove dead instruments and do the counting
@@ -254,6 +261,12 @@ void ScreenSing::instrumentLayout(double time) {
 		}
 		if (name == "Vocals") {
 			m_audio.streamFade(name, config["audio/mute_vocals_track"].b() ? 0.0 : 1.0);
+		}
+		else if (name == "background" && !m_song->music["Instrumental"].string().empty()) {
+			m_audio.streamFade(name, m_song->music["Vocals"].string().empty() && !config["audio/mute_vocals_track"].b() ? level : 0.0);
+		}
+		else if (name == "Instrumental") {
+			m_audio.streamFade(name, m_song->music["Vocals"].string().empty() && !config["audio/mute_vocals_track"].b() ? 0.0 : level);
 		}
 		else {
 			m_audio.streamFade(name, level);
