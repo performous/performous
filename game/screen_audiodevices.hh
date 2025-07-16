@@ -4,7 +4,8 @@
 #include "graphic/glutil.hh"
 #include "libda/portaudio.hpp"
 #include "theme.hh"
-#include <map>
+
+#include <optional>
 
 class Audio;
 class ThemeAudioDevices;
@@ -21,9 +22,9 @@ class ScreenAudioDevices: public Screen {
 
   private:
 	struct Channel {
-		Channel(std::string const& name): name(name), pos(-1) {}
 		std::string name;
-		int pos;
+		std::optional<int> pos;
+		Channel(std::string const& name): name(name), pos() {}
 	};
 	void load(); ///< Check what devices are open
 	bool save(bool skip_ui_config = false); ///< Save the config to disk xml and then reload

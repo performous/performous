@@ -3,7 +3,7 @@
 #include "common.hh"
 
 MATCHER_P(ColorNameIs, n, "") {
-    *result_listener << "where the color name is " << n; return arg.colorname == n; 
+    *result_listener << "where the color name is " << n; return arg.first == n; 
 }
 
 TEST(UnitTest_Microphones, getMicrophoneColor_blue) {
@@ -54,7 +54,7 @@ TEST(UnitTest_Microphones, getMicrophoneColor_unknown) {
 TEST(UnitTest_Microphones, getMicrophoneConfig_sequence) {
     auto const sut = getMicrophoneConfig();
 
-    EXPECT_THAT(sut, ElementsAre(
+    EXPECT_THAT(sut, UnorderedElementsAre(
         ColorNameIs("blue"),
         ColorNameIs("red"),
         ColorNameIs("green"),
