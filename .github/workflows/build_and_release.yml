@@ -99,6 +99,11 @@ jobs:
           draft: true
           prerelease: false
 
+  # Pull in the Node.JS build workflow
+  booth_frontend:
+    name: Build the Booth frontend
+    uses: ./.github/workflows/booth_frontend.yml
+
   # Pull in the Linux build workflow
   Linux_Packages:
     name: Build the Linux packages
@@ -109,6 +114,7 @@ jobs:
     needs:
       - determine_version
       - create_release
+      - booth_frontend
 
   # Pull in the AppImage build workflow
   AppImage_Package:
@@ -120,6 +126,7 @@ jobs:
     needs:
       - determine_version
       - create_release
+      - booth_frontend
 
   MacPorts_Package:
     name: Package macOS builds
@@ -131,6 +138,7 @@ jobs:
     needs:
       - determine_version
       - create_release
+      - booth_frontend
 
 
   # Pull in the Windows build workflow
@@ -143,3 +151,20 @@ jobs:
     needs:
       - determine_version
       - create_release
+      - booth_frontend
+
+  # Clean up Booth frontend artifacts
+  cleanup_artifact:
+    name: Remove the Booth frontend artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Removing artifacts
+        uses: geekyeggo/delete-artifact@v5
+        if: ${{ !cancelled() }}
+        with:
+          name: booth-frontend
+    needs:
+      - Linux_Packages
+      - AppImage_Package
+      - MacPorts_Package
+      - Windows_Packages
