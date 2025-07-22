@@ -6,6 +6,7 @@
 #include <limits>
 #include <locale>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 constexpr double TAU = 2.0 * 3.141592653589793238462643383279502884;  // https://tauday.com/tau-manifesto
@@ -19,8 +20,29 @@ template <typename T> constexpr T clamp(T val, T min = 0, T max = 1) {
 }
 
 /** Absolute-tolerance floating point comparison (avoids exact == on computed doubles/floats) **/
-template <typename T> constexpr bool almostEqual(T a, T b, T epsilon = static_cast<T>(0.001)) {
-	return std::abs(a - b) < epsilon;
+template <typename T> constexpr bool almostEqual(T lhs, T rhs) {
+	static_assert(
+		std::is_floating_point_v<T>,
+		"Called almostEqual on a non floating-point type."
+	);
+	T tolerance;
+	if (sizeof(lhs) == 4) {
+		tolerance = 0.0000001f;
+	}
+	else {
+		tolerance = 0.0000000000000002;
+	}
+	const T largest = std::max(std::abs(lhs),std::abs(rhs));
+	return (std::abs(lhs-rhs) < tolerance * largest || tolerance > largest);
+}
+
+template <typename T> constexpr bool almostEqual(T lhs, T rhs, T epsilon) {
+	static_assert(
+		std::is_floating_point_v<T>,
+		"Called almostEqual on a non floating-point type."
+	);
+	const T largest = std::max(std::abs(lhs),std::abs(rhs));
+	return (std::abs(lhs-rhs) < epsilon * largest || epsilon > largest);
 }
 
 template <typename Numeric> struct MinMax {
