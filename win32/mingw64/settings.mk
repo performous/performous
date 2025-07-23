@@ -8,6 +8,6 @@ MXE_TARGETS := i686-w64-mingw32.shared
 #SOURCEFORGE_MIRROR := downloads.sourceforge.net
 # The three lines below makes `make` build these "local
 # packages" instead of all packages.
-LOCAL_PKG_LIST := sdl2 boost portaudio ffmpeg portmidi pango gdk-pixbuf librsvg libsigc++ libxml++ opencv libepoxy jsoncpp cpp-netlib
+LOCAL_PKG_LIST := sdl2 boost portaudio ffmpeg portmidi pango gdk-pixbuf librsvg libsigc++ libxml++ opencv libepoxy jsoncpp cpp-netlib webp
 .DEFAULT local-pkg-list:
 local-pkg-list: $(LOCAL_PKG_LIST)

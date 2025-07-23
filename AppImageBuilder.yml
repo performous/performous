@@ -18,10 +18,12 @@ AppDir:
     include:
       ## All of these dependencies can be found by downloading the Performous
       ## package for Ubuntu 22.04 and doing a dpkg -I on it
+      - fonts-noto-mono
       - libaubio5
       - libavcodec58
       - libavformat58
       - libavutil56
+      - libboost-filesystem1.74.0
       - libboost-iostreams1.74.0
       - libboost-locale1.74.0
       - libboost-program-options1.74.0
@@ -50,6 +52,7 @@ AppDir:
       - libswresample3
       - libswscale5
       - libxml++2.6-2v5
+      - libwebp7
     exclude:
       - libasound2
   files:

@@ -43,17 +43,17 @@ class TextureLoader::Impl {
 	static void load(Bitmap& bitmap, fs::path const& name) {
 		try {
 			auto const ext = toLower(name.extension().string());
-			if (!fs::is_regular_file(name))
-			{
+			if (!fs::is_regular_file(name)) {
 				throw std::runtime_error("File not found: " + name.string());
 			}
-			else
-			{
+			else {
 				const ImageType image_type{getImageType(name.string())};
 				if (image_type == ImageType::SVG)
 					loadSVG(bitmap, name);
 				else if (image_type == ImageType::JPEG)
 					loadJPEG(bitmap, name);
+				else if (image_type == ImageType::WEBP)
+					loadWEBP(bitmap, name);
 				else if (image_type == ImageType::PNG)
 					loadPNG(bitmap, name);
 				else

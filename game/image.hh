@@ -57,4 +57,5 @@ ImageType getImageType(const std::string &filePath);   ///< Looks inside the fil
 void writePNG(fs::path const& filename, Bitmap const& bitmap, unsigned stride = 0);
 void loadPNG(Bitmap& bitmap, fs::path const& filename);
 void loadJPEG(Bitmap& bitmap, fs::path const& filename);
+void loadWEBP(Bitmap& bitmap, fs::path const& filename);
 
