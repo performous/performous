@@ -112,6 +112,7 @@ jobs:
 
   # Pull in the AppImage build workflow
   AppImage_Package:
+    if: false
     name: Build the AppImage package
     uses: ./.github/workflows/appimage.yml
     with:
