@@ -43,4 +43,5 @@ export interface State {
     song: Song|number|null,
     offline: boolean,
     hasPreservedPlaylist: boolean,
+    exception?: Error,
 }

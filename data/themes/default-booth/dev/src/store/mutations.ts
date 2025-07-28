@@ -63,3 +63,7 @@ export function storePreservedPlaylist(state: State, value: boolean): void {
         sessionStorage.removeItem('performous_playlist');
     }
 }
+
+export function storeException(state: State, exception: Error): void {
+    state.exception = exception;
+}

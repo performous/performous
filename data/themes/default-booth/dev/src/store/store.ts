@@ -16,6 +16,7 @@ export default function initStore() : Store<State> {
         timeout: 15,
         offline: false,
         hasPreservedPlaylist: sessionStorage.getItem('performous_playlist') ? true : false,
+        exception: null,
     };
 
     return createStore({

@@ -17,6 +17,10 @@ const debounceQuery = debounce(async (commit: Commit, query: string): Promise<vo
     commit('storeDatabase', database);
 });
 
+export function saveException({ commit }: { commit: Commit }, exception: Error): void {
+    commit('storeException', exception);
+}
+
 export async function refreshDatabase({ state, commit, dispatch }: { state: State, commit: Commit, dispatch: Dispatch }, query: string = ''): Promise<void> {
     try {
         const database: Song[] = await getApi(`getDataBase.json`, query);
@@ -27,9 +31,10 @@ export async function refreshDatabase({ state, commit, dispatch }: { state: Stat
             dispatch('refreshPlaylist');
         }
         clearTimeout(refreshTimeout);
-    } catch (_e) {
+    } catch (exception) {
         clearTimeout(refreshTimeout);
         refreshTimeout = setTimeout(() => dispatch('refreshDatabase', query), 60000);
+        dispatch('saveException', exception);
     }
 }
 
@@ -46,12 +51,13 @@ export async function refreshPlaylist({ state, commit, dispatch }: { state: Stat
         const timeout = parseInt(await getApi('getplaylistTimeout', '', false)) ?? 15;
         commit('storeTimeout', timeout);
     }
-    catch (_e) {
+    catch (exception) {
         commit('storeOfflineState', true);
         clearInterval(playlistInterval);
 
         clearTimeout(refreshTimeout);
         refreshTimeout = setTimeout(() => dispatch('refreshDatabase', state.screen === 'search' && state.screenQuery?.search ? state.screenQuery.search : ''), 60000);
+        dispatch('saveException', exception);
     }
 }
 
@@ -63,13 +69,14 @@ export async function refreshSong({ commit, dispatch, state }: { commit: Commit,
         }
         commit('storeSong', song);
     }
-    catch (_e) {
+    catch (exception) {
         commit('storeSong', null);
         commit('storeOfflineState', true);
         clearInterval(songInterval);
         
         clearTimeout(refreshTimeout);
         refreshTimeout = setTimeout(() => dispatch('refreshDatabase', state.screen === 'search' && state.screenQuery?.search ? state.screenQuery.search : ''), 60000);
+        dispatch('saveException', exception);
     }
 }
 
