@@ -30,14 +30,14 @@ void RequestHandler::HandleFile(web::http::http_request request, std::string fil
 	std::string fileToSend;
 	std::string clientIp = utility::conversions::to_utf8string(request.remote_address());
 	auto path = filePath != "" ? utility::conversions::to_utf8string(utility::conversions::to_string_t(filePath)) : utility::conversions::to_utf8string(request.relative_uri().path());
-	auto fileName = path.substr(path.find_last_of("/\\") + 1);
+	auto const fileName = fs::path(path).filename().string();
 
 	try {
 		fileToSend = findFile(fileName).string();
 	}
 	catch (const std::runtime_error &e) {
 		SpdLogger::error(LogSystem::WEBSERVER, std::string("HandleFile() File Not Found. Client {}. {}"), clientIp, e.what());
-		std::string errorMsg = std::string("INTERNAL ERROR, MISSING FILE: ") + e.what();
+		auto const errorMsg = std::string("INTERNAL ERROR, MISSING FILE: ") + e.what();
 		request.reply(web::http::status_codes::NotFound, utility::conversions::to_string_t(errorMsg));
 		return;
 	}
@@ -54,16 +54,11 @@ void RequestHandler::HandleFile(web::http::http_request request, std::string fil
 		else if (path.find(".css") != std::string::npos) {
 			content_type = "text/css";
 		}
-		else if (path.find(".png") != std::string::npos) {
-			content_type = "image/png";
+		else
+		{
+			// This will identify most common image types or use "application/octet-stream"
+			content_type = getImageMimeType(path);
 		}
-		else if (path.find(".gif") != std::string::npos) {
-			content_type = "image/gif";
-		}
-		else if (path.find(".ico") != std::string::npos) {
-			content_type = "image/x-icon";
-		}
-
 
 		request.reply(web::http::status_codes::OK, is, utility::conversions::to_string_t(content_type)).then([](pplx::task<void> t) {
 			try {
@@ -80,13 +75,13 @@ void RequestHandler::HandleFile(web::http::http_request request, std::string fil
 			}
 			catch (const web::http::http_exception &e) {
 				SpdLogger::error(LogSystem::WEBSERVER, std::string("HandleFile() HTTP Exception. Client {}. {}"), clientIp, e.what());
-				std::string errorMsg = std::string("HTTP ERROR: ") + e.what();
+				auto const errorMsg = std::string("HTTP ERROR: ") + e.what();
 				request.reply(web::http::status_codes::InternalError, utility::conversions::to_string_t(errorMsg));
 			}
 			catch (const std::exception &e)
 			{
 				SpdLogger::error(LogSystem::WEBSERVER, std::string("HandleFile() Std. Exception. Client {}. {}"), clientIp, e.what());
-				std::string errorMsg = std::string("INTERNAL ERROR: ") + e.what();
+				auto const errorMsg = std::string("INTERNAL ERROR: ") + e.what();
 				request.reply(web::http::status_codes::InternalError, utility::conversions::to_string_t(errorMsg));
 			}
 			catch (...) {
