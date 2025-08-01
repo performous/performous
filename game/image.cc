@@ -269,13 +269,13 @@ ImageType getImageType(const std::string &filePath)
 	if (match(buffer, {0x52, 0x49, 0x46, 0x46}) && match(buffer, {0x57, 0x45, 0x42, 0x50}, 8))
 		return ImageType::WEBP;
 
-    if(match(buffer, {0x47, 0x49, 0x46, 0x38, 0x37, 0x61}) || match(buffer, {0x47, 0x49, 0x46, 0x38, 0x39, 0x61}))
+	if(match(buffer, {0x47, 0x49, 0x46, 0x38, 0x37, 0x61}) || match(buffer, {0x47, 0x49, 0x46, 0x38, 0x39, 0x61}))
 		return ImageType::GIF;  // GIF87a, GIF89a
 
-    if(match(buffer, {0x00, 0x00, 0x01, 0x00}))
+	if(match(buffer, {0x00, 0x00, 0x01, 0x00}))
 		return ImageType::ICON;  // Windows icon file
 
-    if(match(buffer, {0x42, 0x4D}))
+	if(match(buffer, {0x42, 0x4D}))
 		return ImageType::BMP;  // Windows bmp/dib file
 
 	// SVG is multiline text
@@ -295,20 +295,20 @@ ImageType getImageType(const std::string &filePath)
 
 const std::string &getImageMimeType(const std::string &filePath) 
 {
-    switch (getImageType(filePath))
-    {
-        case ImageType::BMP:   return "image/bmp";
-        case ImageType::GIF:   return "image/gif";
-        case ImageType::ICON:  return "image/x-icon";
-        case ImageType::PNG:   return "image/png";
-        case ImageType::JPEG:  return "image/jpg";
-        case ImageType::SVG:   return "image/svg+xml";
-        case ImageType::WEBP:  return "image/webp";
+	switch (getImageType(filePath))
+	{
+		case ImageType::BMP:   return "image/bmp";
+		case ImageType::GIF:   return "image/gif";
+		case ImageType::ICON:  return "image/x-icon";
+		case ImageType::PNG:   return "image/png";
+		case ImageType::JPEG:  return "image/jpg";
+		case ImageType::SVG:   return "image/svg+xml";
+		case ImageType::WEBP:  return "image/webp";
 
-        case ImageType::UNKNOW: 
-        default:
-            return "application/octet-stream";
-    }
+		case ImageType::UNKNOW: 
+		default:
+			return "application/octet-stream";
+	}
 }
 
 void Bitmap::crop(const unsigned width, const unsigned height, const unsigned x, const unsigned y) {
