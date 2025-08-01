@@ -293,22 +293,15 @@ ImageType getImageType(const std::string &filePath)
 	return ImageType::UNKNOWN;
 }
 
+/**
+  * \returns The Image MIME type of the given file, or "application/octet-stream"
+  */
 const std::string &getImageMimeType(const std::string &filePath) 
 {
-	switch (getImageType(filePath))
-	{
-		case ImageType::BMP:   return "image/bmp";
-		case ImageType::GIF:   return "image/gif";
-		case ImageType::ICON:  return "image/x-icon";
-		case ImageType::PNG:   return "image/png";
-		case ImageType::JPEG:  return "image/jpg";
-		case ImageType::SVG:   return "image/svg+xml";
-		case ImageType::WEBP:  return "image/webp";
-
-		case ImageType::UNKNOW: 
-		default:
-			return "application/octet-stream";
-	}
+	ImageType imType = getImageType(filePath);
+	if ( imType >= ImageType::BMP && imType < ImageType::_INVALID )
+		return ImageTypeMime[static_cast<size_t>(imType)];
+	return ImageTypeMime[static_cast<size_t>(ImageType::UNKNOWN)];
 }
 
 void Bitmap::crop(const unsigned width, const unsigned height, const unsigned x, const unsigned y) {

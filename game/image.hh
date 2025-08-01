@@ -49,7 +49,9 @@ struct Bitmap {
 	void crop(const unsigned width, const unsigned height, const unsigned x, const unsigned y);
 };
 
-enum class ImageType { UNKNOWN, PNG, JPEG, WEBP, SVG, ICON, GIF, BMP };  // Types of images we can identify
+enum class ImageType { UNKNOWN, BMP, GIF, ICON, PNG, JPEG, SVG, WEBP,  _INVALID };  // Types of images we can identify
+const std::vector<std::string> ImageTypeMime{ "application/octet-stream", "image/bmp", "image/gif", "image/x-icon", "image/png", "image/jpg", "image/svg+xml", "image/webp" };  // Ordering must match ImageType
+
 
 ImageType getImageType(const std::string &filePath);            ///< Looks inside the file, returning image type
 const std::string &getImageMimeType(const std::string &filePath);   ///< Looks inside the file, returning image MIME-type
