@@ -6,38 +6,41 @@ AppDir:
     id: Performous
     name: Performous
     icon: performous
-    version: @@VERSION@@
+    version: ${PERFORMOUS_PACKAGE_VERSION}
     exec: usr/bin/performous
     exec_args: $@
+  runtime:
+    version: "continuous"
   apt:
     arch: amd64
     allow_unauthenticated: true
     sources:
-      - sourceline: deb http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse
-      - sourceline: deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted universe multiverse
+      - sourceline: deb http://archive.ubuntu.com/ubuntu/ noble main restricted universe multiverse
+        key_url: 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920d1991bc93c'
+      - sourceline: deb http://archive.ubuntu.com/ubuntu/ noble-updates main restricted universe multiverse
     include:
       ## All of these dependencies can be found by downloading the Performous
       ## package for Ubuntu 22.04 and doing a dpkg -I on it
       - libaubio5
-      - libavcodec58
-      - libavformat58
-      - libavutil56
-      - libboost-iostreams1.74.0
-      - libboost-locale1.74.0
-      - libboost-program-options1.74.0
+      - libavcodec60
+      - libavformat60
+      - libavutil58
+      - libboost-iostreams1.83.0
+      - libboost-locale1.83.0
+      - libboost-program-options1.83.0
       - libc6
       - libcairo2
       - libcpprest2.10
       - libepoxy0
-      - libfmt8
+      - libfmt9
       - libfontconfig1
       - libgcc-s1
       - libglib2.0-0
       - libglibmm-2.4-1v5
-      - libicu70
+      - libicu74
       - libjpeg8
-      - libopencv-core4.5d
-      - libopencv-videoio4.5d
+      - libopencv-core406t64
+      - libopencv-videoio406t64
       - libpango-1.0-0
       - libpangocairo-1.0-0
       - libpng16-16
@@ -47,9 +50,11 @@ AppDir:
       - libsdl2-2.0-0
       - libssl3
       - libstdc++6
-      - libswresample3
-      - libswscale5
+      - libswresample4
+      - libswscale7
       - libxml++2.6-2v5
+      - libcrypt1
+      - libnsl2
     exclude:
       - libasound2
   files:
@@ -59,16 +64,8 @@ AppDir:
       - usr/share/doc/*/changelog.*
       - usr/share/doc/*/NEWS.*
       - usr/share/doc/*/TODO.*
-  after_bundle: |
-    ## In Fedora and Gentoo (probably others too), libnsl has been deprecated
-    ## from glibc and is available in another package. It still exists as part
-    ## of the Debian lineage, and must be copied into the project root so it
-    ## can run on Distros where it is not available by default.
-    ## Hopefully this can be removed some day.
-    cp $TARGET_APPDIR/runtime/compat/lib/x86_64-linux-gnu/libnsl.so.1 $TARGET_APPDIR/
-    ## This needs to be copied to make Arch work
-    cp $TARGET_APPDIR/runtime/compat/lib/x86_64-linux-gnu/libcrypt.so.1 $TARGET_APPDIR/
 AppImage:
+  comp: zstd
   arch: x86_64
   update-information: None
   sign-key: None
