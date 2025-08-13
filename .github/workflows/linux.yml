@@ -102,6 +102,8 @@ jobs:
             version: 24.04
           - os: debian
             version: 12
+          - os: debian
+            version: 13
           - os: fedora
             version: 36
           - os: fedora
