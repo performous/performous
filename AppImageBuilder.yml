@@ -39,6 +39,7 @@ AppDir:
       - libglibmm-2.4-1v5
       - libicu74
       - libjpeg8
+      - libopenblas0
       - libopencv-core406t64
       - libopencv-videoio406t64
       - libpango-1.0-0
