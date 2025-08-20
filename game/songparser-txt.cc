@@ -186,10 +186,17 @@ bool SongParser::txtParseNote(std::string line) {
 		case Note::Type::GOLDEN:
 		case Note::Type::GOLDENRAP:
 		{
+			int readTs = 0;  // read as signed int to check for negative values
+			int readLength = 0;
 			unsigned int length = 0;
-			if (!(iss >> ts >> length >> n.note)) throw SongParserException(m_song, "Invalid note line format", m_linenum);
+			// TODO: is it worth checking overly large values too?
+			if (!(iss >> readTs >> readLength >> n.note) || readTs < 0 || readLength < 0) 
+				throw SongParserException(m_song, "Invalid note line format", m_linenum);
+			ts = static_cast<unsigned int>(readTs);
+			length = static_cast<unsigned int>(readLength);
 			if (length < 1) {
-				SpdLogger::info(LogSystem::SONGPARSER, "TXT Parser ({}) -- Notes must have positive durations.", m_song.filename);
+				SpdLogger::info(LogSystem::SONGPARSER, "TXT Parser ({}, line {}) -- Notes must have positive durations.", m_song.filename, m_linenum);
+				length = 1;
 			}
 			n.notePrev = n.note; // No slide notes in TXT yet.
 			if (m_relative) ts += m_txt.relativeShift;
