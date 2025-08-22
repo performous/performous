@@ -14,10 +14,11 @@ on:
         type: string
 
 jobs:
-  # Create the AppImage
   AppImage:
     name: Create the AppImage
     runs-on: ubuntu-24.04
+    permissions:
+      security-events: write
     steps:
       - name: Install the AppImage bundler and Performous deps
         id: fetch_deps
@@ -41,12 +42,17 @@ jobs:
         id: checkout_git
         uses: actions/checkout@v4
 
-      - name: Build the AppImage
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: c-cpp
+          build-mode: manual
+          queries: security-and-quality
+          packs: +githubsecuritylab/codeql-cpp-queries
+
+      - name: Build the Code
         id: build_appimage
         run: |
-          # Pull in our common build functions
-          . .github/workflows/build_functions.sh
-
           export PERFORMOUS_PACKAGE_VERSION=${{ inputs.package_complete_version }}
           mkdir build
           cd build
@@ -54,8 +60,17 @@ jobs:
           make -j$(nproc) install DESTDIR=../AppDir
           cd ..
 
-          appimage-builder --recipe AppImageBuilder.yml --skip-test
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:c-cpp"
 
+      - name: Bundle the AppImage
+        run: |
+          # Pull in our common build functions
+          . .github/workflows/build_functions.sh
+          export PERFORMOUS_PACKAGE_VERSION=${{ inputs.package_complete_version }}
+          appimage-builder --recipe AppImageBuilder.yml --skip-test
           # Provided by the common build functions
           package_name "$(pwd)" "*.AppImage" "${PERFORMOUS_PACKAGE_VERSION}"
 
