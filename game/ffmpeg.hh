@@ -75,7 +75,8 @@ class FFmpeg {
 
   protected:
 	static void frameDeleter(AVFrame *f) { if (f) av_frame_free(&f); }
-	void readReplayGain(const AVStream *stream);
+	bool readReplayGain(const AVStream *stream);
+	bool readR128Gain(const AVStream *stream);
 	using uFrame = std::unique_ptr<AVFrame, std::integral_constant<decltype(&frameDeleter), &frameDeleter>>;
 
 	virtual void processFrame(uFrame frame) = 0;
@@ -132,7 +133,7 @@ class VideoFFmpeg : public FFmpeg {
 	void processFrame(uFrame frame) override;
   private:
 	std::unique_ptr<SwsContext, void(*)(SwsContext*)> m_swsContext{nullptr, sws_freeContext};
-        VideoCb handleVideoData;
+		VideoCb handleVideoData;
 
 };
 

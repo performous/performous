@@ -13,6 +13,7 @@
 #include <stdexcept>
 #include <system_error>
 #include <thread>
+#include <cmath>
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
@@ -278,8 +279,11 @@ FFmpeg::FFmpeg(fs::path const& _filename, int mediaType) : m_filename(_filename)
 	m_streamId = av_find_best_stream(m_formatContext.get(), static_cast<AVMediaType>(mediaType), -1, -1, &codec, 0);
 	if (m_streamId < 0) throw Error(*this, m_streamId, __PRETTY_FUNCTION__);
 
-	// Possibly the stream defines a Replay Gain factor; read it
-	readReplayGain(m_formatContext->streams[m_streamId]);
+	// Possibly the stream defines an audio loudness normalisation factor; read it
+	if (!readR128Gain(m_formatContext->streams[m_streamId])) // Prefer EBU R 128 over REPLAYGAIN 
+	{
+		readReplayGain(m_formatContext->streams[m_streamId]); 
+	}
 
 	decltype(m_codecContext) pCodecCtx{avcodec_alloc_context3(codec), avcodec_free_context};
 	avcodec_parameters_to_context(pCodecCtx.get(), m_formatContext->streams[m_streamId]->codecpar);
@@ -308,10 +312,12 @@ FFmpeg::FFmpeg(fs::path const& _filename, int mediaType) : m_filename(_filename)
   *
   * \note     The libav function av_stream_get_side_data() has been deprecated
   *           It will need to be updated along with all the others
+  *
+  * \return   True if any gain tag was read from the file
   */
-void FFmpeg::readReplayGain(const AVStream *stream)
+bool FFmpeg::readReplayGain(const AVStream *stream)
 {
-	// assert(stream)
+	bool gainFound = false;
 	m_replayGainDecibels = 0.0;  // 0.0 indicates not defined
 	m_replayGainFactor   = 1.0;
 
@@ -328,13 +334,54 @@ void FFmpeg::readReplayGain(const AVStream *stream)
 			m_replayGainDecibels = static_cast<double>(replay_gain->track_gain);
 			m_replayGainDecibels /= 100000.0;   // convert from microbels to decibels
 			m_replayGainFactor = calculateLinearGain(m_replayGainDecibels);
-			SpdLogger::debug(LogSystem::FFMPEG, "Audio Gain is [{0:.2f}] dB, Linear Gain is [{1:.2f}]", m_replayGainDecibels, m_replayGainFactor);
+			SpdLogger::debug(LogSystem::FFMPEG, "REPLAY Audio Gain is [{0:.2f}] dB, Linear Gain is [{1:.2f}]", m_replayGainDecibels, m_replayGainFactor);
+			gainFound = true;
 		}
 		else {
-			SpdLogger::debug(LogSystem::FFMPEG, "No Audio Gain in file");
+			SpdLogger::debug(LogSystem::FFMPEG, "No REPLAY Audio Gain in file");
 		}
 	}
+	return gainFound;
 }
+
+/**
+  * \brief    Fetch the R128 "loudness" factor from the stream
+  *
+  * \details  "EBU R128" was adopted as the loudness calculation standard for television & radio.
+  *           The recommended LUFS setting for EBU R128 is -23, wheres REPLAYGAIN is -18.
+  *           There are arguments about how this is too low, and not everyone uses -23.  
+  *           But it is the standard so we will. Ref: https://en.wikipedia.org/wiki/EBU_R_128
+  *           This function reads any "r128_track_gain" tag in the file (not album gain)
+  *
+  * \return   True if any gain tag was read from the file
+  */
+bool FFmpeg::readR128Gain(const AVStream *stream)
+{
+	const char *R128_GAIN_TAG = "R128_TRACK_GAIN";
+	bool gainFound = false;
+	m_replayGainDecibels = 0.0;  // 0.0 indicates not defined
+	m_replayGainFactor   = 1.0;
+
+	// Only use Replay Gain if the option for normalisation is enabled
+	if (stream != nullptr && config["audio/normalize_songs"].b() == true) {
+		const AVDictionaryEntry *r128Tag = av_dict_get(stream->metadata, R128_GAIN_TAG, nullptr, 0);
+		if (r128Tag != nullptr) {
+			double r128Gain = strtod(r128Tag->value, nullptr);
+			if (std::fpclassify(r128Gain) == FP_NORMAL) { // not zero, nan, etc.
+				// ref: https://github.com/performous/performous/issues/1078#issuecomment-3206359884  Kudos to @complexlogic
+				m_replayGainDecibels = (r128Gain / 256.0) + 5.0;  // +5 to match REPLAYGAIN at -18 LUFS
+				m_replayGainFactor = calculateLinearGain(m_replayGainDecibels);
+				SpdLogger::debug(LogSystem::FFMPEG, "R128 Audio Gain is [{0:.2f}] dB, Linear Gain is [{1:.2f}]", m_replayGainDecibels, m_replayGainFactor);
+				gainFound = true;
+			}
+		}
+		if (!gainFound) {
+			SpdLogger::debug(LogSystem::FFMPEG, "No R128 Audio Gain in file");
+		}
+	}
+	return gainFound;
+}
+
 
 /**
   * \brief    Calculate the linear gain, given a decibels factor
