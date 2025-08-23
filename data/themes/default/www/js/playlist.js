@@ -60,6 +60,13 @@ $(function () {
                         });
                         localize("#dynamic-modal", true);
                         $("#modal-body").html(data);
+                        if ($("#dynamic-modal").data('bs.modal')) {
+                            $("#dynamic-modal").data('bs.modal').options.backdrop = 'static';
+                        } else {
+                            $("#dynamic-modal").modal({
+                                backdrop: "static"
+                            });
+                        }
                         $("#modal-restore-playlist").on("click", function () {
                             database = JSON.parse(window.sessionStorage.getItem("preserved-playlist"));
                             
@@ -70,6 +77,9 @@ $(function () {
                             refreshPlaylist();
                         });
                         $("#dynamic-modal").modal("show");
+                        $("#dynamic-modal").one("hide.bs.modal", function () {
+                            $("#dynamic-modal").data('bs.modal').options.backdrop = true;
+                        });
                     });
                 }
                 firstLoaded = true;
