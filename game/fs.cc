@@ -309,23 +309,30 @@ std::string formatPath(const fs::path& target) {
 }
 
 const fs::path PathCache::getLogFilename() { Lock l(m_mutex); return cache / "infolog.txt"; }
-const fs::path PathCache::getProfilerLogFilename() { 
+const fs::path PathCache::getProfilerLogFilename() {
 	Lock l(m_mutex);
-	std::string baseName{"profiler.txt"};
-	unsigned logRotate = 5;
-	do {
-		fs::path newPath = cache / fmt::format("profiler.{}.txt", logRotate);
-		fs::path oldPath = cache / (logRotate == 1 ? "profiler.txt" : fmt::format(fmt::runtime("profiler.{}.txt"), logRotate - 1));
-		if (fs::exists(oldPath)) {
-			if (logRotate == 5 && fs::exists(newPath)) {
-				fs::remove(newPath); // delete profiler.5.txt if it exists
-			}
-			fs::rename(oldPath, newPath); // rotate
+
+	constexpr unsigned maxRotate = 5;
+
+	// Rotate profiler.(i-1).txt → profiler.i.txt
+	for (unsigned i = maxRotate; i > 1; --i) {
+		fs::path src = cache / fmt::format("profiler.{}.txt", i - 1);
+		fs::path dst = cache / fmt::format("profiler.{}.txt", i);
+		if (fs::exists(src)) {
+			fs::remove(dst); // ignore if not exists
+			fs::rename(src, dst);
 		}
-		logRotate--;
 	}
-	while (logRotate >= 1);
-	return cache / "profiler.txt";
+
+	fs::path profilerTxt = cache / "profiler.txt";
+	fs::path rotated = cache / "profiler.1.txt";
+
+	if (fs::exists(profilerTxt)) {
+		fs::copy_file(profilerTxt, rotated, fs::copy_options::overwrite_existing);
+		std::ofstream(profilerTxt, std::ofstream::trunc); // truncate
+	}
+
+	return profilerTxt;
 }
 
 std::mutex PathCache::m_mutex;
