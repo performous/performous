@@ -35,7 +35,7 @@ void RequestHandler::HandleFile(web::http::http_request request, std::string fil
 	try {
 		fileToSend = findFile(fileName).string();
 	}
-	catch (const std::runtime_error &e) {
+	catch (std::runtime_error const& e) {
 		SpdLogger::error(LogSystem::WEBSERVER, std::string("HandleFile() File Not Found. Client {}. {}"), clientIp, e.what());
 		auto const errorMsg = std::string("INTERNAL ERROR, MISSING FILE: ") + e.what();
 		request.reply(web::http::status_codes::NotFound, utility::conversions::to_string_t(errorMsg));
