@@ -99,7 +99,7 @@ public:
 		SongSection(std::string const& name, const double begin): name(name), begin(begin) {}
 	};
 	std::vector<SongSection> songsections; ///< vector of song sections
-	int randomIdx = 0; ///< sorting index used for random order
+	int randomIdx{ random<decltype(randomIdx)>(0) }; ///< sorting index used for random order
 
 	// Functions only below this line
 	Song();

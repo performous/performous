@@ -124,14 +124,14 @@ private:
 
 template <typename Type> Type random(Type const& min = std::numeric_limits<Type>::min(), Type const& max = std::numeric_limits<Type>::max()) {
     static std::random_device rd;
-    static std::mt19937 gen(rd());
+    //static std::mt19937 gen(rd());
 
     if constexpr (std::is_integral<Type>::value) {
         std::uniform_int_distribution<Type> dis(min, max);
-        return dis(gen);
+        return dis(rd);
     }
     else {
         std::uniform_real_distribution<Type> dis(min, max);
-        return dis(gen);
+        return dis(rd);
     }
 }
