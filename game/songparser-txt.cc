@@ -148,17 +148,20 @@ bool SongParser::txtParseField(std::string const& line) {
 }
 
 bool SongParser::txtParseNote(std::string line) {
+    const int MAX_STARTBEAT = 262144; // 2^18, about 2 hours on an average song (depends on BPM)
+    const int MAX_LENGTH = 2048; // A very long note
 	if (line.empty() || line == "\r") return true;
 	if (line[0] == '#') throw SongParserException(m_song, "Key found in the middle of notes", m_linenum);
 	if (line[line.size() - 1] == '\r') line.erase(line.size() - 1);
 	if (line[0] == 'E') return false;
 	std::istringstream iss(line);
 	if (line[0] == 'B') {
-		unsigned int ts;
+		int ts;
 		float bpm;
 		iss.ignore();
-		if (!(iss >> ts >> bpm)) throw SongParserException(m_song, "Invalid BPM line format", m_linenum);
-		addBPM(ts, bpm);
+		if (!(iss >> ts >> bpm) || ts < 0 || ts > MAX_STARTBEAT) 
+        	throw SongParserException(m_song, "Invalid BPM line format", m_linenum);
+		addBPM(static_cast<unsigned int>(ts), bpm);
 		return true;
 	}
 	if (line[0] == 'P') {
@@ -189,8 +192,7 @@ bool SongParser::txtParseNote(std::string line) {
 			int readTs = 0;  // read as signed int to check for negative values
 			int readLength = 0;
 			unsigned int length = 0;
-			// TODO: is it worth checking overly large values too?
-			if (!(iss >> readTs >> readLength >> n.note) || readTs < 0 || readLength < 0) 
+			if (!(iss >> readTs >> readLength >> n.note) || readTs < 0 || readTs > MAX_STARTBEAT || readLength < 0 || readLength > MAX_LENGTH) 
 				throw SongParserException(m_song, "Invalid note line format", m_linenum);
 			ts = static_cast<unsigned int>(readTs);
 			length = static_cast<unsigned int>(readLength);
