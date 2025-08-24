@@ -8,6 +8,22 @@ $(function () {
     var firstLoaded = false;
     var database = [];
     var timeout = 15;
+    var songModal = null;
+    var songModalScript = null;
+
+    // Preload the modal HTML
+    $.get("playlist-song-modal-body.html", function (data) {
+        songModal = data;
+    });
+    
+    // Preload the modal JavaScript
+    $.ajax({
+        url: "js/playlist-song-modal-body.js",
+        dataType: 'text',
+        success: function (data) {
+            songModalScript = new Function(data);
+        }
+    });
 
     window.showDatabase = function () {
         return database;
@@ -271,18 +287,12 @@ $(function () {
         var jsonSongObject = $(this).data("modal-songObject");
         var songObject = JSON.parse(jsonSongObject);
         var title = songObject.PositionStr + " " + songObject.Artist + " - " + songObject.Title;
-    
-        var tempElement = $("<div>");
-        $(tempElement).load("playlist-song-modal-body.html", function (data) {
-            window.songObject = songObject;
-            $.ajaxSetup({
-                cache: true
-            });
-            $.getScript("js/playlist-song-modal-body.js", function () {
-                $("#modal-title").text(title);
-                $("#modal-body").html(data);
-            });
-        });
+
+        window.songObject = songObject;
+
+        $("#modal-title").text(title);
+        $("#modal-body").html(songModal);
+        songModalScript();
     });
     
     /*
