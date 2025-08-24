@@ -8,10 +8,6 @@
 
 
 struct UnitTest_SongCollectionFilter : public testing::Test {
-	void SetUp() override {
-		TranslationEngine::setLanguage("en", true);
-	}
-
 	SongPtr makeSong(std::string const& title, int year = 2000, std::string const& lang = "en", std::string const& artist = "unknown") {
 		return makeSong(title, artist, year, lang);
 	}
@@ -94,7 +90,19 @@ TEST_F(UnitTest_SongCollectionFilter, type_drums) {
 	EXPECT_THAT(result.size(), Eq(0));
 }
 
-TEST_F(UnitTest_SongCollectionFilter, string_1) {
+
+
+struct IntegrationTest_SongCollectionFilter : public UnitTest_SongCollectionFilter {
+	void SetUp() override {
+		initializeTranslationEngine();
+	}
+
+	void initializeTranslationEngine() {
+		TranslationEngine::setLanguage("en", true);
+	}
+};
+
+TEST_F(IntegrationTest_SongCollectionFilter, string_1) {
 	auto songs = makeCollection();
 	auto const filter = SongCollectionFilter().setFilter("1");
 	auto const result = filter.filter(songs);
@@ -102,7 +110,7 @@ TEST_F(UnitTest_SongCollectionFilter, string_1) {
 	EXPECT_THAT(result.size(), Eq(1));
 }
 
-TEST_F(UnitTest_SongCollectionFilter, string_t) {
+TEST_F(IntegrationTest_SongCollectionFilter, string_t) {
 	auto songs = makeCollection();
 	auto const filter = SongCollectionFilter().setFilter("t");
 	auto const result = filter.filter(songs);
@@ -110,7 +118,7 @@ TEST_F(UnitTest_SongCollectionFilter, string_t) {
 	EXPECT_THAT(result.size(), Eq(3));
 }
 
-TEST_F(UnitTest_SongCollectionFilter, string_tw) {
+TEST_F(IntegrationTest_SongCollectionFilter, string_tw) {
 	auto songs = makeCollection();
 	auto const filter = SongCollectionFilter().setFilter("tw");
 	auto const result = filter.filter(songs);
@@ -118,7 +126,7 @@ TEST_F(UnitTest_SongCollectionFilter, string_tw) {
 	EXPECT_THAT(result.size(), Eq(1));
 }
 
-TEST_F(UnitTest_SongCollectionFilter, string_two) {
+TEST_F(IntegrationTest_SongCollectionFilter, string_two) {
 	auto songs = makeCollection();
 	auto const filter = SongCollectionFilter().setFilter("two");
 	auto const result = filter.filter(songs);
@@ -126,7 +134,7 @@ TEST_F(UnitTest_SongCollectionFilter, string_two) {
 	EXPECT_THAT(result.size(), Eq(1));
 }
 
-TEST_F(UnitTest_SongCollectionFilter, string_thre) {
+TEST_F(IntegrationTest_SongCollectionFilter, string_thre) {
 	auto songs = makeCollection();
 	auto const filter = SongCollectionFilter().setFilter("thre");
 	auto const result = filter.filter(songs);
@@ -134,7 +142,7 @@ TEST_F(UnitTest_SongCollectionFilter, string_thre) {
 	EXPECT_THAT(result.size(), Eq(1));
 }
 
-TEST_F(UnitTest_SongCollectionFilter, string_three) {
+TEST_F(IntegrationTest_SongCollectionFilter, string_three) {
 	auto songs = makeCollection();
 	auto const filter = SongCollectionFilter().setFilter("three");
 	auto const result = filter.filter(songs);
@@ -142,7 +150,7 @@ TEST_F(UnitTest_SongCollectionFilter, string_three) {
 	EXPECT_THAT(result.size(), Eq(1));
 }
 
-TEST_F(UnitTest_SongCollectionFilter, string_song) {
+TEST_F(IntegrationTest_SongCollectionFilter, string_song) {
 	auto songs = makeCollection();
 	auto const filter = SongCollectionFilter().setFilter("song");
 	auto const result = filter.filter(songs);
@@ -150,7 +158,7 @@ TEST_F(UnitTest_SongCollectionFilter, string_song) {
 	EXPECT_THAT(result.size(), Eq(3));
 }
 
-TEST_F(UnitTest_SongCollectionFilter, string_song_two_2) {
+TEST_F(IntegrationTest_SongCollectionFilter, string_song_two_2) {
 	auto songs = makeCollection();
 	auto const filter = SongCollectionFilter().setFilter("song two 2");
 	auto const result = filter.filter(songs);
@@ -158,7 +166,7 @@ TEST_F(UnitTest_SongCollectionFilter, string_song_two_2) {
 	EXPECT_THAT(result.size(), Eq(1));
 }
 
-TEST_F(UnitTest_SongCollectionFilter, string_nonexistent) {
+TEST_F(IntegrationTest_SongCollectionFilter, string_nonexistent) {
 	auto songs = makeCollection();
 	auto const filter = SongCollectionFilter().setFilter("nonexistent");
 	auto const result = filter.filter(songs);
@@ -166,7 +174,7 @@ TEST_F(UnitTest_SongCollectionFilter, string_nonexistent) {
 	EXPECT_THAT(result.size(), Eq(0));
 }
 
-TEST_F(UnitTest_SongCollectionFilter, string_unknown) {
+TEST_F(IntegrationTest_SongCollectionFilter, string_unknown) {
 	auto songs = makeCollection();
 	auto const filter = SongCollectionFilter().setFilter("unknown");
 	auto const result = filter.filter(songs);
@@ -174,7 +182,7 @@ TEST_F(UnitTest_SongCollectionFilter, string_unknown) {
 	EXPECT_THAT(result.size(), Eq(4));
 }
 
-TEST_F(UnitTest_SongCollectionFilter, filter_language_match_de) {
+TEST_F(IntegrationTest_SongCollectionFilter, filter_language_match_de) {
 	auto songs = makeCollection();
 	auto const filter = SongCollectionFilter().setFilter(std::make_shared<LanguageFilter>("de"));
 	auto const result = filter.filter(songs);
@@ -182,7 +190,7 @@ TEST_F(UnitTest_SongCollectionFilter, filter_language_match_de) {
 	EXPECT_THAT(result.size(), Eq(1));
 }
 
-TEST_F(UnitTest_SongCollectionFilter, filter_language_not_match_gr) {
+TEST_F(IntegrationTest_SongCollectionFilter, filter_language_not_match_gr) {
 	auto songs = makeCollection();
 	auto const filter = SongCollectionFilter().setFilter(std::make_shared<LanguageFilter>("gr"));
 	auto const result = filter.filter(songs);
@@ -190,7 +198,7 @@ TEST_F(UnitTest_SongCollectionFilter, filter_language_not_match_gr) {
 	EXPECT_THAT(result.size(), Eq(0));
 }
 
-TEST_F(UnitTest_SongCollectionFilter, filter_year_match_2) {
+TEST_F(IntegrationTest_SongCollectionFilter, filter_year_match_2) {
 	auto songs = makeCollection();
 	auto const filter = SongCollectionFilter().setFilter(std::make_shared<YearFilter>(1990, 1998));
 	auto const result = filter.filter(songs);
