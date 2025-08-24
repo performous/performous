@@ -17,3 +17,5 @@ Performous currently builds on Windows(MSVC and MinGW-w64), macOS, and various v
 
 - Latest Performous Release: https://github.com/performous/performous/releases/latest
 - Weekly BETA builds from the `master` branch: https://nightly.link/performous/performous/workflows/build_and_release/master?preview
+
+MacOS users may need to launch Performous from the Terminal to get microphones working. Be sure to launch `Performous.app/Contents/MacOS/Performous` not just the .app itself.
