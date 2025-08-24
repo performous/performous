@@ -36,6 +36,12 @@ EOR
 RUN <<EOR
 #!/bin/bash -x
 	apt-get -y update
+	apt-get install -y --no-install-recommends curl
+EOR
+
+RUN <<EOR
+#!/bin/bash -x
+	apt-get -y update
 	apt-get install -y --no-install-recommends build-essential cmake \
 		gcc g++ gettext git help2man libopenblas-dev libfftw3-dev libicu-dev libepoxy-dev \
 		libsdl2-dev libfreetype6-dev libpango1.0-dev librsvg2-dev libxml++2.6-dev \
@@ -46,6 +52,8 @@ RUN <<EOR
 		libportmidi-dev libopencv-dev libaubio-dev libwebp-dev \
 		ca-certificates file libgtest-dev libgmock-dev google-mock libspdlog-dev
 		apt-get -y satisfy "libfmt-dev (>= 8)" "Conflicts: libspdlog-dev (<< 1.12)"
+	curl --proto "=https" --tlsv1.2 -sSf -L https://deb.nodesource.com/setup_22.x | bash
+	apt-get install -y --no-install-recommends nodejs
 	apt-get clean
 	mkdir -p /root/performous
 EOR
