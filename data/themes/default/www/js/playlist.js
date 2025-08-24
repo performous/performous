@@ -52,14 +52,15 @@ $(function () {
     
                 renderPlaylist(database);
 
-                if (!database.length && !firstLoaded && window.sessionStorage && window.sessionStorage.getItem("preserved-playlist")) {
+                if (!database.length && !firstLoaded && window.sessionStorage && window.sessionStorage.getItem("preserved-playlist") && window.sessionStorage.getItem("preserved-playlist") != "[]") {
                     var tempElement = $("<div>");
                     $(tempElement).load("playlist-preserve-modal-body.html", function (data) {
                         $.ajaxSetup({
                             cache: true
                         });
-                        localize("#dynamic-modal", true);
                         $("#modal-body").html(data);
+                        localize("#dynamic-modal", true);
+                        // Temporarily make the backdrop static.
                         if ($("#dynamic-modal").data('bs.modal')) {
                             $("#dynamic-modal").data('bs.modal').options.backdrop = 'static';
                         } else {
@@ -67,6 +68,15 @@ $(function () {
                                 backdrop: "static"
                             });
                         }
+                        $("#modal-playlist-json").val(window.sessionStorage.getItem("preserved-playlist"));
+                        $("#modal-check-playlist").on("click", function () {
+                            $("#modal-check-status").text("");
+                            $("#modal-check-status").removeClass("text-success");
+                            $("#modal-check-status").removeClass("text-danger");
+                            database = JSON.parse(window.sessionStorage.getItem("preserved-playlist"));
+                            
+                            checkPlaylist(0);
+                        });
                         $("#modal-restore-playlist").on("click", function () {
                             database = JSON.parse(window.sessionStorage.getItem("preserved-playlist"));
                             
@@ -75,6 +85,16 @@ $(function () {
                         $("#modal-remove-playlist").on("click", function () {
                             window.sessionStorage.removeItem("preserved-playlist");
                             refreshPlaylist();
+                        });
+                        $("#modal-export-playlist").on("click", function () {
+                            var data = "data:text/json;charset=utf-8," + encodeURIComponent(window.sessionStorage.getItem("preserved-playlist"));
+                            var anchor = document.createElement("a");
+                            var date = new Date();
+                            anchor.setAttribute("href", data);
+                            anchor.setAttribute("download", "Playlist " + date.toLocaleString("nl-NL") + ".json");
+                            document.body.appendChild(anchor);
+                            anchor.click();
+                            document.body.removeChild(anchor);
                         });
                         $("#dynamic-modal").modal("show");
                         $("#dynamic-modal").one("hide.bs.modal", function () {
@@ -87,17 +107,54 @@ $(function () {
         }).fail(showDisconnected);
     }
 
+    function checkPlaylist(item) {
+        var songObject = $.extend({}, database[item]);
+        delete songObject.Duration;
+        songObject.name = songObject.Artist + " " + songObject.Title;
+        $.get("api/getDataBase.json", function () {
+            var status = checkSong(JSON.stringify(songObject));
+            status.done(function () {
+                var next = item + 1;
+                if (next < database.length) {
+                    checkPlaylist(next);
+                } else {
+                    $("#modal-check-status").text(localStorage.getItem("all_songs_can_be_added"));
+                    $("#modal-check-status").addClass("text-success");
+                    $("#modal-check-status").removeClass("text-danger");
+                }
+            });
+        });
+    }
+
+    /*
+        Checks whether a song is ready to be added.
+    */
+    function checkSong(songObjectToSend) {
+        return $.ajax({
+            url: "api/check",
+            type: "POST",
+            data: songObjectToSend,
+            contentType: "application/json; charset=utf-8",
+            error: function(jqXHR, textStatus, errorThrown) {
+                $("#modal-check-status").text(localStorage.getItem("there_are_still_songs_missing"));
+                $("#modal-check-status").removeClass("text-success");
+                $("#modal-check-status").addClass("text-danger");
+            }
+        });
+    }
+
     function rebuildPlaylist(item) {
         var songObject = $.extend({}, database[item]);
         delete songObject.Duration;
         songObject.name = songObject.Artist + " " + songObject.Title;
         $.get("api/getDataBase.json", function () {
-            var status = addSong(JSON.stringify(songObject));
+            var status = addSong(JSON.stringify(songObject), true);
             status.done(function () {
                 var next = item + 1;
                 if (next < database.length) {
                     rebuildPlaylist(next);
                 } else {
+                    buildAlertMessage("successfully_restored_playlist.", "success");
                     refreshPlaylist();
                     if (window.sessionStorage) {
                         window.sessionStorage.removeItem("preserved-playlist");
@@ -116,9 +173,88 @@ $(function () {
     */
     $("#refresh-playlist").click(refreshPlaylist);
 
-    $('#reconnect').click(function () {
-        if (window.sessionStorage) {
-        }
+    $("#export-playlist").click(function () {
+        var data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(database));
+        var anchor = document.createElement("a");
+        var date = new Date();
+        anchor.setAttribute("href", data);
+        anchor.setAttribute("download", "Playlist " + date.toLocaleString("nl-NL") + ".json");
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+    });
+
+    $("#import-playlist").click(function () {
+        var tempElement = $("<div>");
+        $(tempElement).load("playlist-import-modal-body.html", function (data) {
+            var clearPlaylist = true;
+            $.ajaxSetup({
+                cache: true
+            });
+            $("#modal-body").html(data);
+            localize("#dynamic-modal", true);
+            $("#modal-upload-playlist").on("change", function () {
+                var files = $("#modal-upload-playlist").prop("files");
+                var file = files[0];
+
+                var reader = new FileReader();
+
+                reader.onload = function (event) {
+                    $("#modal-playlist-json").val(event.target.result);
+                };
+                reader.readAsText(file);
+            });
+            $("#modal-export-playlist").on("click", function () {
+                var newDatabase = [];
+                var databasePromise = Promise.resolve();
+                if (database.length) {
+                    console.log(clearPlaylist);
+                    if (clearPlaylist) {
+                        databasePromise = new Promise(function (resolve) {
+                            function removeSong() {
+                                $.ajax({
+                                    url: "api/remove",
+                                    type: "POST",
+                                    data: JSON.stringify({
+                                        songId: 0
+                                    }),
+                                    contentType: "application/json; charset=utf-8",
+                                    success: function(data, textStatus, jqXHR) {
+                                        database.shift();
+                                        if (database.length) {
+                                            removeSong();
+                                        } else {
+                                            resolve();
+                                        }
+                                    },
+                                    error: function(jqXHR, textStatus, errorThrown) {
+                                        buildAlertMessage("failed_removing_song_from_playlist!", "danger");
+                                    }
+                                });
+                            }
+
+                            removeSong();
+                        });
+                    } else {
+                        newDatabase = database;
+                    }
+                }
+                databasePromise.then(function () {
+                    database = JSON.parse($("#modal-playlist-json").val());
+                    database = newDatabase.concat(database);
+                    if (database && database.length) {
+                        rebuildPlaylist(newDatabase.length);
+                        $("#dynamic-modal").modal("hide");
+                    }
+                });
+            });
+            $("#modal-clear-playlist-toggle").bootstrapToggle("on");
+            $("#modal-clear-playlist-toggle").change(function () {
+                clearPlaylist = $(this).prop("checked");
+            });
+
+            $("#dynamic-modal").modal("show");
+        });
     });
     
     /*
