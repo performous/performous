@@ -103,8 +103,13 @@ public:
 
 	// Functions only below this line
 	Song();
+	Song(Song const&) noexcept = default;
+	Song(Song&&) noexcept = default;
 	Song(nlohmann::json const& song);  ///< Load song from cache.
 	Song(fs::path const& filename);  ///< Load song from specified path and filename
+
+	Song& operator=(Song const&) = default;
+
 	void reload(bool errorIgnore = true);  ///< Reset and reload the entire song from file
 	void loadNotes(bool errorIgnore = true);  ///< Load note data (called when entering singing screen, headers preloaded).
 	void dropNotes();  ///< Remove note data (when exiting singing screen), to conserve RAM
