@@ -57,5 +57,5 @@ cd ${CLONE_DIRECTORY}/${GTEST_TESTING_DIRECTORY}
 ## Run the ctests
 echo "Run unit tests per ctest"
 cd ${CLONE_DIRECTORY}/${CTEST_TESTING_DIRECTORY}
-make test
+make test ARGS="-R ^UnitTest"
 echo -e "\n\n\n\n\n"
