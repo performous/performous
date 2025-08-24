@@ -207,7 +207,16 @@ void RequestHandler::Post(web::http::http_request request)
 		return;
 	}
 
-	if (path == "/api/add") {
+	if (path == "/api/check") {
+		m_songs.setFilter("");
+		std::shared_ptr<Song> songPointer = GetSongFromJSON(jsonPostBody);
+		if (!songPointer || songPointer->loadStatus == Song::LoadStatus::PARSERERROR) {
+			request.reply(web::http::status_codes::NotFound, "not found");
+		}
+		request.reply(web::http::status_codes::OK, "success");
+		return;
+	}
+	else if (path == "/api/add") {
 		m_songs.setFilter("");
 		std::shared_ptr<Song> songPointer = GetSongFromJSON(jsonPostBody);
 		if (!songPointer) {
@@ -410,8 +419,16 @@ std::vector<std::string> RequestHandler::GetTranslationKeys() {
 		translate_noop("Refresh playlist"),
 		translate_noop("Performous has disconnected."),
 		translate_noop("A previous playlist has been found."),
+		translate_noop("Check playlist for missing songs"),
+		translate_noop("There are still songs missing"),
+		translate_noop("All songs can be added"),
 		translate_noop("Restore playlist"),
 		translate_noop("Remove playlist"),
+		translate_noop("Download playlist"),
+		translate_noop("Upload playlist"),
+		translate_noop("Load playlist"),
+		translate_noop("Clear playlist before loading"),
+		translate_noop("Successfully restored playlist."),
 		translate_noop("Web interface by Niek Nooijens and Arjan Speiard, for full credits regarding Performous see /docs/Authors.txt"),
 		translate_noop("Search"),
 		translate_noop("Available songs"),

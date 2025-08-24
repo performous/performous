@@ -8,9 +8,15 @@
 		<div id="playlist-songs-sortable" class="list-group songs drag-drop hidden-xs hidden-sm"></div>
 		<div id="playlist-songs" class="list-group songs hidden-md hidden-lg"></div>
 	</div>
-	<div class="col-sm-12">
+	<div class="col-sm-12 form-group">
 		<button id="refresh-playlist" class="btn btn-secondary btn-block" type="button"><span class="glyphicon glyphicon-refresh glyph-centered"></span>refresh_playlist</button>
 		<p id="disconnected" class="hidden text-danger text-center">performous_has_disconnected.</p>
+	</div>
+	<div class="col-sm-12 col-md-6">
+		<button id="export-playlist" class="btn btn-secondary btn-block" type="button">download_playlist<span class="glyphicon glyphicon-download pull-right"></span></button>
+	</div>
+	<div class="col-sm-12 col-md-6">
+		<button id="import-playlist" class="btn btn-secondary btn-block" type="button">load_playlist<span class="glyphicon glyphicon-upload pull-right"></span></button>
 	</div>
 	<div class="col-sm-12">
 		<!-- Toggle to update every 10 seconds. -->
