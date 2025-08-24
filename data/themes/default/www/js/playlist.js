@@ -24,7 +24,7 @@ $(function () {
             url: "js/playlist-song-modal-body.js",
             dataType: 'text',
             success: function (data) {
-                songModalScript = new Function(data);
+                songModalScript = data;
             }
         });
     }
@@ -279,6 +279,16 @@ $(function () {
             $("#dynamic-modal").modal("show");
         });
     });
+
+    function setPlaylistSongContent(title) {
+        $("#modal-title").text(title);
+        $("#modal-body").html(songModal);
+
+        var script = document.createElement('script');
+        document.body.appendChild(script);
+        $(script).html(songModalScript);
+        document.body.removeChild(script);
+    }
     
     /*
         Whenever an item in the playlist is clicked on a modal will pop up.
@@ -297,11 +307,13 @@ $(function () {
 
         window.songObject = songObject;
 
-        loadSongModal().then(function () {
-            loadSongModalScript().then(function () {
-                $("#modal-title").text(title);
-                $("#modal-body").html(songModal);
-                songModalScript();
+        setPlaylistSongContent(title);
+
+        loadSongModal().always(function () {
+            loadSongModalScript().always(function () {
+                window.songObject = songObject;
+
+                setPlaylistSongContent(title);
             });
         });
     });
