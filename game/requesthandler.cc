@@ -29,14 +29,11 @@ void RequestHandler::Error(pplx::task<void>& t) {
 }
 
 void RequestHandler::HandleFile(web::http::http_request request, std::string filePath) {
-	auto path = filePath != "" ? utility::conversions::to_utf8string(utility::conversions::to_string_t(filePath)) : utility::conversions::to_utf8string(request.relative_uri().path());
-	path = utility::conversions::to_utf8string(web::uri::decode(utility::conversions::to_string_t(path)));
-	auto fileName = path.substr(path.find_last_of("/\\") + 1);
-
 	std::string fileToSend;
 	std::string clientIp = utility::conversions::to_utf8string(request.remote_address());
 	auto path = filePath != "" ? utility::conversions::to_utf8string(utility::conversions::to_string_t(filePath)) : utility::conversions::to_utf8string(request.relative_uri().path());
-	auto const fileName = fs::path(path).filename().string();
+	path = utility::conversions::to_utf8string(web::uri::decode(utility::conversions::to_string_t(path)));
+	auto fileName = path.substr(path.find_last_of("/\\") + 1);
 
 	try {
 		fileToSend = findFile(fileName).string();
@@ -110,7 +107,7 @@ void RequestHandler::HandleFile(web::http::http_request request, std::string fil
 			fileName = folderCheck.substr(folderCheck.find_first_of("/\\") + 1);
 			fileToSend = findFile(fileName).string();
 		}
-		catch (...) {
+		catch (std::runtime_error const& e) {
 			SpdLogger::error(LogSystem::WEBSERVER, std::string("HandleFile() File Not Found. Client {}. {}"), clientIp, e.what());
 			auto const errorMsg = std::string("INTERNAL ERROR, MISSING FILE: ") + e.what();
 			request.reply(web::http::status_codes::NotFound, utility::conversions::to_string_t(errorMsg));
