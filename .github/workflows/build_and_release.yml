@@ -22,6 +22,14 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+permissions:
+  actions: read
+  contents: write
+  packages: write
+  pull-requests: write
+  security-events: write
+  statuses: write
+
 # Note: entire jobs or sections can be disabled by adding
 # if: ${{ false }} to the definition column
 jobs:
@@ -143,3 +151,10 @@ jobs:
     needs:
       - determine_version
       - create_release
+
+
+  CodeQL:
+    name: Static Code Analysis.
+    uses: ./.github/workflows/codeql.yml
+    needs:
+      - determine_version
