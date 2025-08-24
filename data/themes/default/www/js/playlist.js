@@ -12,18 +12,25 @@ $(function () {
     var songModalScript = null;
 
     // Preload the modal HTML
-    $.get("playlist-song-modal-body.html", function (data) {
-        songModal = data;
-    });
+    function loadSongModal() {
+        return $.get("playlist-song-modal-body.html", function (data) {
+            songModal = data;
+        });
+    }
     
     // Preload the modal JavaScript
-    $.ajax({
-        url: "js/playlist-song-modal-body.js",
-        dataType: 'text',
-        success: function (data) {
-            songModalScript = new Function(data);
-        }
-    });
+    function loadSongModalScript() {
+        return $.ajax({
+            url: "js/playlist-song-modal-body.js",
+            dataType: 'text',
+            success: function (data) {
+                songModalScript = new Function(data);
+            }
+        });
+    }
+
+    loadSongModal();
+    loadSongModalScript();
 
     window.showDatabase = function () {
         return database;
@@ -290,9 +297,13 @@ $(function () {
 
         window.songObject = songObject;
 
-        $("#modal-title").text(title);
-        $("#modal-body").html(songModal);
-        songModalScript();
+        loadSongModal().then(function () {
+            loadSongModalScript().then(function () {
+                $("#modal-title").text(title);
+                $("#modal-body").html(songModal);
+                songModalScript();
+            });
+        });
     });
     
     /*
