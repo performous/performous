@@ -9,14 +9,16 @@
     After the API call it builds an alert wether it succeeded or failed.
     Upon success the player will be moved to the playlist tab.
 */
-function addSong(songObjectToSend) {
+function addSong(songObjectToSend, silent = false) {
     return $.ajax({
         url: "api/add",
         type: "POST",
         data: songObjectToSend,
         contentType: "application/json; charset=utf-8",
         success: function(data, textStatus, jqXHR) {
-            buildAlertMessage("successfully_added_song_to_the_playlist.", "success");
+            if (!silent) {
+                buildAlertMessage("successfully_added_song_to_the_playlist.", "success");
+            }
             $("a[href='#playlist']").tab("show");
         },
         error: function(jqXHR, textStatus, errorThrown) {
