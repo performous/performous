@@ -22,7 +22,7 @@ RUN <<EOR
 		aubio-devel json-devel rpm-build fmt-devel gtest-devel gmock-devel gtest spdlog-devel \
 		libwebp-devel
 	if [[ "$(rpm -E %fedora)" < "39" ]]; then
-		dnf module list
+		dnf module list nodejs
 	else
 		dnf install -y nodejs
 	fi
