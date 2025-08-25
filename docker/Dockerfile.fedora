@@ -9,15 +9,6 @@ ENV PACKAGE_TYPE="RPM"
 
 COPY platform_flags.sh ./platform_flags.sh
 
-# Install NVM and NodeJS
-RUN <<EOR
-	curl --proto "=https" --tlsv1.2 -sSf -L -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.0/install.sh | bash
-	export NVM_DIR="/root/.nvm"
-	[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-	nvm install 22
-	nvm use 22
-EOR
-
 RUN <<EOR
 #!/bin/bash -x
 	. ./platform_flags.sh
@@ -30,6 +21,7 @@ RUN <<EOR
 		pango-devel glm-devel openblas-devel fftw-devel cpprest-devel \
 		aubio-devel json-devel rpm-build fmt-devel gtest-devel gmock-devel gtest spdlog-devel \
 		libwebp-devel
+	dnf install -y nodejs
 	dnf clean all
 	if [[ "$(rpm -E %fedora)" == "39" ]]; then
 		dnf install -y clang
