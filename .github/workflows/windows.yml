@@ -43,7 +43,7 @@ jobs:
           extra-args: '--clean-after-build --overlay-triplets="${{ github.workspace }}\performous\cmake\triplets"'
           cache-key: win64-vcpkg
           debug: true
-          revision: bc994510d2eb11aac7b43b03f67a7751d5bfe0e4
+          revision: 6ecbbbdf31cba47aafa7cf6189b1e73e10ac61f8
           api-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run cmake to configure the project and build it
