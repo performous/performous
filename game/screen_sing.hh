@@ -51,6 +51,17 @@ class ScreenSing: public Screen {
 		m_song = song_;
 	}
 
+	std::shared_ptr<Song> getSong()
+	{
+		return m_song;
+	}
+
+	/** Get the current position in seconds. If not known or nothing is playing, NaN is returned. **/
+	double getSongPosition()
+	{
+		return m_audio.getPosition();
+	}
+
   private:
 	/**Activates Songs Screen or Players Screen.
 	  This depends on
