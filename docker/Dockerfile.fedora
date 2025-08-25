@@ -23,7 +23,7 @@ RUN <<EOR
 		libwebp-devel
 	if [[ "$(rpm -E %fedora)" < "39" ]]; then
 		dnf module list
-	elif
+	else
 		dnf install -y nodejs
 	fi
 	dnf clean all
