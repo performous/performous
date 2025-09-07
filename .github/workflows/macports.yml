@@ -152,18 +152,18 @@ jobs:
         # and to install from packaged binaries everything else we need but not at runtime (i.e. cmake and various versions of python and/or compilers)
         run: |
           set -x
-          try_binary_first() { sudo port -b install "$@" || sudo port install "$@"; }
+          try_binary_first() { sudo port -b install "$@" boost.version=${{ inputs.boost_version }} || sudo port install "$@" boost.version=${{ inputs.boost_version }}; }
 
           if [[ "${{ steps.restore_cache.outputs.cache-hit }}" == "true" ]]; then
             sudo port selfupdate
-            sudo port activate installed
+            sudo port activate -f installed boost.version=${{ inputs.boost_version }}
           else
             sudo portindex -f /opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/ports
             sudo portindex /opt/custom_portfiles
           fi
 
           echo buildfromsource ifneeded | tee -a /opt/local/etc/macports/macports.conf
-          sudo port install zlib  boost.version=${{ inputs.boost_version }}
+          sudo port install zlib boost.version=${{ inputs.boost_version }}
           try_binary_first libiconv gperf libtextstyle ncurses boost.version=${{ inputs.boost_version }}
           sudo port install boost boost.version=${{ inputs.boost_version }}
           sudo port install gettext icu boost.version=${{ inputs.boost_version }}
@@ -172,7 +172,7 @@ jobs:
 
           if [[ "${{ steps.restore_cache.outputs.cache-hit }}" != "true" ]]; then
             try_binary_first cmake python311 python312 python313
-            try_binary_first clang-17 gcc14 clang-20 help2man +perl5_34 meson perl5.34 pkgconfig boost.version=${{ inputs.boost_version }}
+            try_binary_first clang-17 gcc14 gcc15 clang-20 help2man +perl5_34 meson perl5.34 pkgconfig boost.version=${{ inputs.boost_version }}
           fi
 
           sudo port install libelf pcre2 glib2 boost.version=${{ inputs.boost_version }}
@@ -181,19 +181,21 @@ jobs:
             try_binary_first $(port echo rdepof:shared-mime-info | xargs) shared-mime-info rust cargo gmake  nasm boost.version=${{ inputs.boost_version }}
           fi
 
-          sudo port install ffmpeg7 boost.version=${{ inputs.boost_version }}
+          sudo port -s install ffmpeg7 boost.version=${{ inputs.boost_version }}
           sudo ln -sf /opt/local/libexec/ffmpeg7/lib/libavcodec.dylib /opt/local/lib/libavcodec.dylib
 
           sudo port install ${MACOS_DEPS} boost.version=${{ inputs.boost_version }}
           echo "Installed ports: "
           port installed
 
-          sudo port uninstall gcc14 clang* llvm* python310 python311
+          sudo port uninstall gcc14 gcc15 clang* llvm* python310 python311
           sudo port clean --all installed
           
           # Deactivate everything but zstd before caching, in order to reduce the cache size. It's easier to do it like this than actually manually excluding zstd and its dependencies.
-          sudo port deactivate installed
-          sudo port activate zstd
+          sudo port -N rev-upgrade
+          sudo port -N uninstall inactive
+          sudo port deactivate -f installed
+          sudo port activate -f zstd boost.version=${{ inputs.boost_version }}
 
           # Delete these folders, as we don't want the cache restore overwriting them.
           # sudo rm -Rfv /opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/base*
@@ -218,7 +220,7 @@ jobs:
           path: "${{ steps.get-logs.outputs.log_path }}"
 
       - name: Start SSH session
-        if: false
+        if: matrix.os == 'macos-14' && false
         id: ssh_debug
         uses: luchihoratiu/debug-via-ssh@main
         with:
@@ -238,7 +240,7 @@ jobs:
       - name: Build package
         id: build_package
         run: |
-          sudo port activate installed
+          sudo port activate -f installed boost.version=${{ inputs.boost_version }}
           cd performous/osx-utils
           chmod +x ./macos-bundler.py
           python3 -m venv ./bundler-venv
