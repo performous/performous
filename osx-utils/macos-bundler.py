@@ -92,7 +92,7 @@ def detect_prefix():
 				opencv_prefix = str(check_opencv)
 				print(f"--- OpenCV {opencv_version} detected at: " + str(opencv_prefix) + "\n")
 				break
-		for ffmpeg_version in ["7", "6", ""]:
+		for ffmpeg_version in ["8", "7", "6", ""]:
 			check_ffmpeg = check_installed_port(f"ffmpeg{ffmpeg_version}", "libavcodec.pc")
 			if check_ffmpeg != None:
 				ffmpeg_prefix = str(check_ffmpeg.parent)
@@ -116,7 +116,7 @@ def detect_prefix():
 				opencv_prefix = str(check_opencv.parent)
 				print("--- OpenCV {opencv_version} detected at: " + str(opencv_prefix) + "\n")
 				break
-		for ffmpeg_version in ["7", "6", "5", "4"]:
+		for ffmpeg_version in ["8", "7", "6", "5", "4"]:
 			check_ffmpeg = check_brew_formula(f"ffmpeg@{ffmpeg_version}", "libavcodec.pc")
 			if check_ffmpeg != None:
 				ffmpeg_prefix = str(check_ffmpeg.parent)

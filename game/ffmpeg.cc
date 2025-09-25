@@ -445,7 +445,6 @@ void FFmpeg::avformat_close_input(AVFormatContext *fctx) {
 }
 void FFmpeg::avcodec_free_context(AVCodecContext *avctx) {
 	if (avctx == nullptr) return;
-	avcodec_close(avctx);
 	::avcodec_free_context(&avctx);
 }
 
