@@ -112,6 +112,7 @@ void Song::reload(bool errorIgnore) {
 
 void Song::loadNotes(bool errorIgnore) {
 	if (loadStatus == LoadStatus::FULL) return;
+	loadStatus = LoadStatus::HEADER;
 	try { SongParser(*this); }
 	catch (SongParserException const&) { if (!errorIgnore) throw; }
 }
