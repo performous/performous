@@ -34,7 +34,7 @@ $(function () {
 
     window.showDatabase = function () {
         return database;
-    }
+    };
 
     function renderPlaylist(data) {
         var totalTime = 0;
@@ -62,8 +62,7 @@ $(function () {
 
     function refreshPlaylist() {
         $.get("api/getCurrentPlaylist.json", function (data) {
-            if (!data.length && database.length && window.sessionStorage) {
-                firstLoaded = false;
+            if (!data.length && database.length && window.sessionStorage && !firstLoaded) {
                 window.sessionStorage.setItem("preserved-playlist", JSON.stringify(database));
             }
             database = data;
