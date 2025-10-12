@@ -375,7 +375,7 @@ std::string ScreenSongs::getHighScoreText() const {
 	for (auto const& [track, scores]: scoresByTrack) {
 		fmt::format_to(std::back_inserter(ret), "{}:\n", track);
 		for (auto const& score: scores) {
-			fmt::format_to(std::back_inserter(ret), "{:0>10L}\t", score.score);
+			fmt::format_to(std::back_inserter(ret), "{:>10L}\t", score.score);
 			playerFormatter(ret, score.playerid);
 			timeFormatter(ret, score.unixtime);
 			ret.append("\n");
