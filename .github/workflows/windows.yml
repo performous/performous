@@ -43,7 +43,8 @@ jobs:
           extra-args: '--clean-after-build --overlay-triplets="${{ github.workspace }}\performous\cmake\triplets"'
           cache-key: win64-vcpkg
           debug: true
-          revision: bc994510d2eb11aac7b43b03f67a7751d5bfe0e4
+          # Get the sha from https://github.com/microsoft/vcpkg/releases
+          revision: 5dfa11cf88a8da8877b54fcbc5f6db78bc13f75a
           api-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install NSIS
         uses: repolevedavaj/install-nsis@v1.0.3
