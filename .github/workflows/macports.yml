@@ -28,7 +28,7 @@ jobs:
   Install_MacPorts:
     strategy:
       matrix:
-        os: [ 'macos-13', 'macos-14' ]
+        os: [ 'macos-14' ]
     name: Install Macports
     runs-on: '${{ matrix.os }}'
     env:
@@ -193,7 +193,7 @@ jobs:
           
           # Deactivate everything but zstd before caching, in order to reduce the cache size. It's easier to do it like this than actually manually excluding zstd and its dependencies.
           sudo port -N rev-upgrade
-          sudo port -N uninstall inactive
+          # sudo port -N uninstall inactive
           sudo port deactivate -f installed
           sudo port activate -f zstd boost.version=${{ inputs.boost_version }}
 
