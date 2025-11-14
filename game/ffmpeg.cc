@@ -323,13 +323,24 @@ bool FFmpeg::readReplayGain(const AVStream *stream)
 
 	// Only use Replay Gain if the option for normalisation is enabled
 	if (stream != nullptr && config["audio/normalize_songs"].b() == true) {
-// Note: as-of 2024-12-29 this is required for the Linux build
+#if (LIBAVFORMAT_VERSION_MAJOR) < 61 // arrived at experimentally with the pipeline
 #if (LIBAVFORMAT_VERSION_MAJOR) <= 58
 		int replay_gain_size;
 #else
 		size_t replay_gain_size;
-#endif
+#endif // <=58
 		const AVReplayGain *replay_gain = (AVReplayGain *)av_stream_get_side_data(stream, AV_PKT_DATA_REPLAYGAIN, &replay_gain_size);
+#else
+        // av_packet_side_data_get() appears first in VERSION 58
+		size_t replay_gain_size = 0;
+        const AVReplayGain *replay_gain = nullptr;
+	    const AVCodecParameters *cp = stream->codecpar;
+	    const AVPacketSideData *psd = av_packet_side_data_get(cp->coded_side_data, cp->nb_coded_side_data, AV_PKT_DATA_REPLAYGAIN);
+        if (psd) {
+            replay_gain_size = psd->size;
+            replay_gain = static_cast<const AVReplayGain*>(static_cast<const void *>(psd->data)); // double-cast ... is there a better way?
+        }
+#endif // <60
 		if (replay_gain_size > 0 && replay_gain != nullptr) {
 			m_replayGainDecibels = static_cast<double>(replay_gain->track_gain);
 			m_replayGainDecibels /= 100000.0;   // convert from microbels to decibels
