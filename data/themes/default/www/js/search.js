@@ -87,9 +87,9 @@ $("#search-database").click(function (e, callback) {
                 var songMeta = "";
                 songMeta += songObject.Language.length > 0 ? " | " + songObject.Language : "";
                 songMeta += songObject.Edition.length > 0 ? " | " + songObject.Edition : "";
-                songMeta += songObject.Source.length > 0 ? " | " + songObject.Source : "";
-                songMeta += songObject.App.length > 0 ? " | " + songObject.App : "";
-                songMeta += songObject.AppVersion.length > 0 ? " | " + songObject.AppVersion : "";
+                songMeta += songObject.ProvidedBy.length > 0 ? " | " + songObject.ProvidedBy : "";
+                songMeta += songObject.App?.length > 0 ? " | " + songObject.App : "";
+                songMeta += songObject.AppVersion?.length > 0 ? " | " + songObject.AppVersion : "";
                 songMeta += songObject.Comment.length > 0 ? " | " + songObject.Comment : "";
                 songMeta += songObject.Tags.length > 0 ? " | " + songObject.Tags : "";
                 var errorMeta = songObject.HasError ? "⚠️" : "";
