@@ -136,8 +136,6 @@ jobs:
             mingw-w64-x86_64-cairo
             mingw-w64-x86_64-cc
             mingw-w64-x86_64-cmake
-            # Removed for now since it targets ffmpeg 8.0 which has some breaking changes.
-            #mingw-w64-x86_64-ffmpeg
             mingw-w64-x86_64-fftw
             mingw-w64-x86_64-fmt
             mingw-w64-x86_64-fontconfig
