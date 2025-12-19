@@ -136,7 +136,8 @@ jobs:
             mingw-w64-x86_64-cairo
             mingw-w64-x86_64-cc
             mingw-w64-x86_64-cmake
-            mingw-w64-x86_64-ffmpeg
+            # Removed for now since it targets ffmpeg 8.0 which has some breaking changes.
+            #mingw-w64-x86_64-ffmpeg
             mingw-w64-x86_64-fftw
             mingw-w64-x86_64-fmt
             mingw-w64-x86_64-fontconfig
@@ -164,6 +165,12 @@ jobs:
             mingw-w64-x86_64-spdlog
             mingw-w64-x86_64-winpthreads-git
             mingw-w64-x86_64-libwebp
+
+      - name: Install FFmpeg 7 (pinned)
+        shell: msys2 {0}
+        run: |
+          curl -LO https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-ffmpeg-7.1.1-7-any.pkg.tar.zst
+          pacman -U --noconfirm mingw-w64-x86_64-ffmpeg-7.1.1-7-any.pkg.tar.zst
 
       - name: Run cmake to configure the project and build it
         env:
