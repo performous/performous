@@ -131,7 +131,6 @@ jobs:
       - Linux_Packages
 
   MacPorts_Package:
-    if: false
     name: Package macOS builds
     uses: ./.github/workflows/macports.yml
     secrets: inherit
