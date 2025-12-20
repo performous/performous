@@ -128,8 +128,10 @@ jobs:
     needs:
       - determine_version
       - create_release
+      - Linux_Packages
 
   MacPorts_Package:
+    if: false
     name: Package macOS builds
     uses: ./.github/workflows/macports.yml
     secrets: inherit

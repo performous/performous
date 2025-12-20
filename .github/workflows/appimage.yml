@@ -16,63 +16,48 @@ on:
 jobs:
   AppImage:
     name: Create the AppImage
-    runs-on: ubuntu-24.04
+    continue-on-error: true
+    runs-on: ${{ matrix.runners }}
+    strategy:
+      matrix:
+          runners:
+            - ubuntu-22.04
+            - ubuntu-22.04-arm
+          # The Performous package version to use when building the AppImage 
+          package_os:
+            - ubuntu_22.04
     permissions:
       security-events: write
     steps:
-      - name: Install the AppImage bundler and Performous deps
+      - name: Install the AppImage bundler
         id: fetch_deps
         run: |
-          wget -O appimage-builder-x86_64.AppImage.tar https://github.com/Lord-Kamina/appimage-builder/releases/download/continuous/appimage-builder_x86_64-AppImage.tar
-          tar xvf appimage-builder-x86_64.AppImage.tar --transform='s/.*\///'
-          mv appimage-builder-*-x86_64.AppImage appimage-builder-x86_64.AppImage
-          chmod +x appimage-builder-x86_64.AppImage
-          sudo mv appimage-builder-x86_64.AppImage /usr/local/bin/appimage-builder
           sudo apt update
-          sudo apt-get -y install ca-certificates wget gpg
-          wget -O ./key.asc https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null
-          gpg -v -o /usr/share/keyrings/kitware-archive-keyring.gpg --dearmor ./key.asc
-          echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ noble main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null
-          sudo apt-get -y update
-          test -f /usr/share/doc/kitware-archive-keyring/copyright || sudo rm /usr/share/keyrings/kitware-archive-keyring.gpg
-          sudo apt-get install kitware-archive-keyring
-          sudo apt-get install -y --no-install-recommends git cmake build-essential gettext help2man libopenblas-dev libfftw3-dev libicu-dev libepoxy-dev libsdl2-dev libfreetype6-dev libpango1.0-dev librsvg2-dev libxml++2.6-dev libavcodec-dev libavformat-dev libswscale-dev libjpeg-dev portaudio19-dev libglm-dev libboost-iostreams-dev libboost-locale-dev libboost-system-dev libboost-program-options-dev libssl-dev libcpprest-dev libgtest-dev libgmock-dev google-mock libportmidi-dev libopencv-dev libaubio-dev nlohmann-json3-dev libfmt-dev libfuse2 libspdlog-dev libwebp-dev
+          sudo apt install -y wget libfuse2
+          wget -c $(wget -q https://api.github.com/repos/AppImageCommunity/pkg2appimage/releases -O - | grep "pkg2appimage-.*-${{ contains(matrix.runners, 'arm') && 'aarch64' || 'x86_64'  }}.AppImage" | grep browser_download_url | head -n 1 | cut -d '"' -f 4)
+          chmod +x ./pkg2appimage-*.AppImage
+          sudo mv ./pkg2appimage-*.AppImage /usr/local/bin/pkg2appimage
 
       - name: Checkout Git
         id: checkout_git
         uses: actions/checkout@v4
 
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+      - name: Download the Ubuntu artifact
+        uses: actions/download-artifact@v5
         with:
-          languages: c-cpp
-          build-mode: manual
-          queries: security-and-quality
-          packs: +githubsecuritylab/codeql-cpp-queries
-
-      - name: Build the Code
-        id: build_appimage
-        run: |
-          export PERFORMOUS_PACKAGE_VERSION=${{ inputs.package_complete_version }}
-          mkdir build
-          cd build
-          cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo -DENABLE_WEBSERVER=ON -DENABLE_WEBCAM=ON -DSELF_BUILT_CED=ALWAYS -DPERFORMOUS_VERSION=$PERFORMOUS_PACKAGE_VERSION ..
-          make -j$(nproc) install DESTDIR=../AppDir
-          cd ..
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
-        with:
-          category: "/language:c-cpp"
+          pattern: Performous-*-${{ matrix.package_os }}-${{ contains(matrix.runners, 'arm') && 'arm64' || 'amd64'  }}.deb 
 
       - name: Bundle the AppImage
         run: |
           # Pull in our common build functions
           . .github/workflows/build_functions.sh
+
           export PERFORMOUS_PACKAGE_VERSION=${{ inputs.package_complete_version }}
-          appimage-builder --recipe AppImageBuilder.yml --skip-test
+          pkg2appimage Performous_AppImage.yaml
+          mv out/*.AppImage ./Performous.AppImage
+
           # Provided by the common build functions
-          package_name "$(pwd)" "*.AppImage" "${PERFORMOUS_PACKAGE_VERSION}"
+          package_name "$(pwd)" "Performous.AppImage" "${PERFORMOUS_PACKAGE_VERSION}"
 
       # Upload artifacts during pull-requests
       - name: Upload artifact
