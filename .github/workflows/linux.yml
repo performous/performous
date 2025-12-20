@@ -88,7 +88,6 @@ jobs:
           fi
   build_packages:
     name: Build the Linux packages
-    continue-on-error: true
     runs-on: ${{ matrix.runners }}
     needs:
       - determine_docker_version

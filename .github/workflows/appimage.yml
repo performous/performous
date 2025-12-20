@@ -16,7 +16,6 @@ on:
 jobs:
   AppImage:
     name: Create the AppImage
-    continue-on-error: true
     runs-on: ${{ matrix.runners }}
     strategy:
       matrix:
