@@ -47,7 +47,6 @@ jobs:
         gtest
         help2man
         icu
-        libepoxy
         librsvg
         libsdl2
         libxmlxx5
@@ -183,6 +182,9 @@ jobs:
 
           sudo port -s install ffmpeg7 boost.version=${{ inputs.boost_version }}
           sudo ln -sf /opt/local/libexec/ffmpeg7/lib/libavcodec.dylib /opt/local/lib/libavcodec.dylib
+
+          ### Install libepoxy since the one from MacPorts is broken on macOS 14 -> https://trac.macports.org/ticket/73336
+          sudo port -s install libepoxy +egl +quartz -x11 boost.version=${{ inputs.boost_version }}
 
           sudo port install ${MACOS_DEPS} boost.version=${{ inputs.boost_version }}
           echo "Installed ports: "
