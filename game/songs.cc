@@ -21,6 +21,7 @@
 #include "songorder/path_song_order.hh"
 #include "songorder/random_song_order.hh"
 #include "songorder/score_song_order.hh"
+#include "songorder/has_error_song_order.hh"
 
 #include <fmt/format.h>
 #include <unicode/stsearch.h>
@@ -46,6 +47,7 @@ namespace {
 		songs.addSongOrder(std::make_shared<MostSungSongOrder>());
 		songs.addSongOrder(std::make_shared<FileTimeSongOrder>());
 		songs.addSongOrder(std::make_shared<CreatorSongOrder>());
+		songs.addSongOrder(std::make_shared<HasErrorSongOrder>());
 	}
 }
 
