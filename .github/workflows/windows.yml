@@ -50,6 +50,42 @@ jobs:
         uses: repolevedavaj/install-nsis@v1.0.3
         with:
           nsis-version: '3.11'
+      - name: Build modern librsvg with Cargo
+        run: |
+          cd ${{ github.workspace }}
+          # Find pkg-config installed by vcpkg
+          $pkgconf = Get-ChildItem -Path "${Env:GITHUB_WORKSPACE}\vcpkg\installed\" -Filter "pkgconf.exe" -Recurse | Select-Object -First 1
+          
+          if ($pkgconf) {
+              Write-Host "Found pkg-config at $($pkgconf.FullName)"
+              # Add it to PATH so cargo/glib-sys can find it
+              $Env:PATH = "$($pkgconf.DirectoryName);$Env:PATH"
+          } else {
+              Write-Error "pkg-config not found!"
+              exit 1;
+          }
+          # Make sure pkg-config finds all vcpkg dependencies
+          # WORKSPACE = D:\a\performous\performous\
+          # VCPKG = $WORKSPACE/vcpkg/vcpkg.exe
+          $Env:PKG_CONFIG_PATH = "${{ github.workspace }}\vcpkg\installed\x64-windows\lib\pkgconfig;${{ github.workspace }}\vcpkg\installed\x64-windows-release\lib\pkgconfig"
+
+
+          # Clone the librsvg repository
+          git clone https://gitlab.gnome.org/GNOME/librsvg.git
+          cd librsvg
+          git checkout 2.61.3  # or the latest stable release
+
+          # Ensure MSVC target is set
+          rustup default stable
+          rustup target add x86_64-pc-windows-msvc
+
+          # Build librsvg with cargo for MSVC
+          cargo build --release --target x86_64-pc-windows-msvc --features capi
+
+          # Show output
+          tree "${{ github.workspace }}\librsvg" /F /A
+          exit 1;
+
       - name: Run cmake to configure the project and build it
         env:
           PERFORMOUS_VERSION: ${{ inputs.package_complete_version }}
