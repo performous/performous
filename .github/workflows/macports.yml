@@ -28,7 +28,7 @@ jobs:
   Install_MacPorts:
     strategy:
       matrix:
-        os: [ 'macos-14' ]
+        os: [ 'macos-15-intel', 'macos-15' ]
     name: Install Macports
     runs-on: '${{ matrix.os }}'
     env:
@@ -84,6 +84,8 @@ jobs:
           echo boost.version ${{ inputs.boost_version }} | tee -a /opt/local/etc/macports/macports.conf
 
           sudo mkdir -p /opt/custom_portfiles/www/
+          portindex \
+          /opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/ports/
           sudo cp -Rvf $(dirname $(port file cpprestsdk)) /opt/custom_portfiles/www/
           sudo mkdir -p /opt/custom_portfiles/www/cpprestsdk/files
 
@@ -97,7 +99,13 @@ jobs:
           
           echo patchfiles-append fix-boost187-universal.patch | sudo tee -a /opt/custom_portfiles/devel/boost${boost_version}/Portfile
 
-          #sudo mkdir -p /opt/custom_portfiles/graphics/harfbuzz/files
+          sudo mkdir -p /opt/custom_portfiles/graphics/
+          sudo cp -Rv $(dirname $(port file librsvg)) /opt/custom_portfiles/graphics/
+
+          sudo cat <<EOF | sudo tee -a /opt/custom_portfiles/graphics/librsvg/Portfile
+          configure.ldflags-append -Wl,-headerpad_max_install_names
+          EOF
+
           #sudo cp -Rv $(dirname $(port file harfbuzz))/files /opt/custom_portfiles/graphics/harfbuzz/
 
           sudo cat <<EOF | sudo tee -a /opt/custom_portfiles/www/cpprestsdk/Portfile
@@ -146,6 +154,14 @@ jobs:
           brew unlink $(brew list --formula)
           echo cmake: $(which cmake)
 
+#      - name: Start SSH session
+#        if: ${{ matrix.os == 'macos-15' && always() }}
+#        id: ssh_debug
+#        uses: Lord-Kamina/debug-via-ssh@main
+#        with:
+#          NGROK_AUTH_TOKEN: ${{ secrets.NGROK_SSH_TOKEN }}
+#          SSH_PASS: ${{ secrets.NGROK_SSH_PASS }}
+
       - name: Install Dependencies
         # First, we install packages that are both direct dependencies of performous, as well as of other packages that we will eventually need.
         # The idea is to build from source everything performous actually depends on to run (so, direct and transitive RUNTIME dependencies),
@@ -158,42 +174,25 @@ jobs:
             sudo port selfupdate
             sudo port activate -f installed boost.version=${{ inputs.boost_version }}
           else
-            sudo portindex -f /opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/ports
             sudo portindex /opt/custom_portfiles
           fi
 
           echo buildfromsource ifneeded | tee -a /opt/local/etc/macports/macports.conf
-          sudo port install zlib boost.version=${{ inputs.boost_version }}
-          try_binary_first libiconv gperf libtextstyle ncurses boost.version=${{ inputs.boost_version }}
-          sudo port install boost boost.version=${{ inputs.boost_version }}
-          sudo port install gettext icu boost.version=${{ inputs.boost_version }}
-          sudo port install $(port echo rdepof:openssl | xargs) boost.version=${{ inputs.boost_version }}
-          sudo port install openssl boost.version=${{ inputs.boost_version }} 
+          echo keeplogs yes | tee -a /opt/local/etc/macports/macports.conf
+          sudo port install -s icu
+          try_binary_first autoconf autoconf-archive automake bison cargo cctools clang-20 cmake docbook-xml docbook-xsl-nons fftw-3-single +clang20+gfortran flex gi-docgen git gmake gperf gtk-doc itstool meson mm-common nasm ninja p7zip perl5 pkgconfig py313-docutils py313-build py313-cython py313-installer py313-wheel python313 rust texinfo unzip vim websocketpp xmlto yasm
 
-          if [[ "${{ steps.restore_cache.outputs.cache-hit }}" != "true" ]]; then
-            try_binary_first cmake python311 python312 python313
-            try_binary_first clang-17 gcc14 gcc15 clang-20 help2man +perl5_34 meson perl5.34 pkgconfig boost.version=${{ inputs.boost_version }}
-          fi
+          sudo port -sv install ${MACOS_DEPS} boost.version=${{ inputs.boost_version }}
 
-          sudo port install libelf pcre2 glib2 boost.version=${{ inputs.boost_version }}
-
-          if [[ "${{ steps.restore_cache.outputs.cache-hit }}" != "true" ]]; then
-            try_binary_first $(port echo rdepof:shared-mime-info | xargs) shared-mime-info rust cargo gmake  nasm boost.version=${{ inputs.boost_version }}
-          fi
-
-          sudo port -s install ffmpeg7 boost.version=${{ inputs.boost_version }}
-          sudo ln -sf /opt/local/libexec/ffmpeg7/lib/libavcodec.dylib /opt/local/lib/libavcodec.dylib
-
-          sudo port install ${MACOS_DEPS} boost.version=${{ inputs.boost_version }}
           echo "Installed ports: "
           port installed
 
-          sudo port uninstall gcc14 gcc15 clang* llvm* python310 python311
+          sudo port -v uninstall gcc* clang* llvm* || true
           sudo port clean --all installed
           
           # Deactivate everything but zstd before caching, in order to reduce the cache size. It's easier to do it like this than actually manually excluding zstd and its dependencies.
           sudo port -N rev-upgrade
-          # sudo port -N uninstall inactive
+          sudo port -N uninstall inactive || true
           sudo port deactivate -f installed
           sudo port activate -f zstd boost.version=${{ inputs.boost_version }}
 
@@ -204,28 +203,20 @@ jobs:
           # sudo rm -fv /opt/local/bin/port*
 
       - name: Get logs from last failed job
-        if: ${{ failure() && !cancelled() }}
+        if: ${{ !cancelled() }}
         id: get-logs
         run: |
           cd /opt/local/var/macports
-          tar -czf ./MacPorts-log-${{ matrix.os }}.tar.gz ./logs
+          tar -czf ./MacPorts-log-${{ matrix.os }}.tar.gz ./logs ./build
           echo "log_path=/opt/local/var/macports/MacPorts-log-${{ matrix.os }}.tar.gz" >> $GITHUB_OUTPUT
 
       - name: Upload logs
-        if: ${{ steps.get-logs.outputs.log_path != null && failure() }}
+        if: ${{ steps.get-logs.outputs.log_path != null && always() }}
         id: upload-logs
         uses: actions/upload-artifact@v4
         with:
           name: "MacPorts-log-${{ matrix.os }}.tar.gz"
           path: "${{ steps.get-logs.outputs.log_path }}"
-
-      - name: Start SSH session
-        if: matrix.os == 'macos-14' && false
-        id: ssh_debug
-        uses: luchihoratiu/debug-via-ssh@main
-        with:
-          NGROK_AUTH_TOKEN: ${{ secrets.NGROK_SSH_TOKEN }}
-          SSH_PASS: ${{ secrets.NGROK_SSH_PASS }}
 
       - name: Cache dependencies
         uses: Lord-Kamina/always-upload-cache/save@refresh-cache
