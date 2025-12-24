@@ -25,6 +25,12 @@ COPY platform_flags.sh ./platform_flags.sh
 RUN <<EOR
 #!/bin/bash -x
 	apt-get -y update
+	apt-get install -y --no-install-recommends curl
+EOR
+
+RUN <<EOR
+#!/bin/bash -x
+	apt-get -y update
 	apt-get install -y --no-install-recommends ${USE_BACKPORTS} git cmake cmake-data build-essential \
 		gcc g++ gettext help2man libopenblas-dev libfftw3-dev libicu-dev libepoxy-dev \
 		libsdl2-dev libfreetype6-dev libpango1.0-dev librsvg2-dev libxml++2.6-dev \
@@ -34,6 +40,8 @@ RUN <<EOR
 		libboost-program-options-dev libssl-dev libcpprest-dev \
 		libportmidi-dev libopencv-dev libaubio-dev nlohmann-json3-dev \
 		libfmt-dev ca-certificates file libgmock-dev libgtest-dev libwebp-dev
+	curl --proto "=https" --tlsv1.2 -sSf -L https://deb.nodesource.com/setup_22.x | bash
+	apt-get install -y --no-install-recommends nodejs
 	apt-get -y satisfy "libfmt-dev (>= 8)" "Conflicts: libspdlog-dev (<< 1.12)"
 	apt-get -y clean
 	mkdir -p /root/performous

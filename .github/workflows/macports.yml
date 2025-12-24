@@ -184,6 +184,9 @@ jobs:
           sudo port -s install ffmpeg7 boost.version=${{ inputs.boost_version }}
           sudo ln -sf /opt/local/libexec/ffmpeg7/lib/libavcodec.dylib /opt/local/lib/libavcodec.dylib
 
+          sudo port install nodejs22
+          sudo port install npm10
+
           sudo port install ${MACOS_DEPS} boost.version=${{ inputs.boost_version }}
           echo "Installed ports: "
           port installed

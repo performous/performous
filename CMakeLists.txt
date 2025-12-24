@@ -148,6 +148,22 @@ if(BUILD_TESTS STREQUAL "AUTO" OR BUILD_TESTS STREQUAL "ON")
 	add_subdirectory(testing)
 endif()
 
+# Default booth
+# Disabled on MINGW due to an issue with NodeJS
+IF(NOT MINGW)
+	IF(WIN32)
+		add_custom_target(
+			defaultbooth ALL
+			COMMAND cd "${CMAKE_CURRENT_SOURCE_DIR}/data/themes/default-booth/dev" && npm install && npm run build && rmdir node_modules /s /q || (exit 0)
+		)
+	else()
+		add_custom_target(
+			defaultbooth ALL
+			COMMAND cd "${CMAKE_CURRENT_SOURCE_DIR}/data/themes/default-booth/dev" && npm install && npm run build && rm -rf node_modules/ || (exit 0)
+		)
+	endif()
+endif()
+
 # Debian specific settings
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 set(CPACK_DEBIAN_PACKAGE_SECTION "Games")
