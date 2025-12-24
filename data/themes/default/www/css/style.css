@@ -89,3 +89,17 @@ td {
 .btn-secondary:hover {
     background-color: #61A0CD;
 }
+
+.btn-file {
+    position: relative;
+}
+
+.btn-file input[type="file"] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
