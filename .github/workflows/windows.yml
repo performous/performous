@@ -82,10 +82,10 @@ jobs:
           # Build librsvg with cargo for MSVC
           cargo build --release --target x86_64-pc-windows-msvc
 
-          # Copy DLL and headers to a known location for CMake
-          mkdir -p ${{ github.workspace }}/deps/librsvg
-          copy target\release\librsvg-2.dll ${{ github.workspace }}/deps/librsvg/
-          copy -Recurse include ${{ github.workspace }}/deps/librsvg/include
+          # Show output
+          tree "${{ github.workspace }}\librsvg" /F /A
+          exit 1;
+
       - name: Run cmake to configure the project and build it
         env:
           PERFORMOUS_VERSION: ${{ inputs.package_complete_version }}
