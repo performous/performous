@@ -64,6 +64,12 @@ jobs:
               Write-Error "pkg-config not found!"
               exit 1;
           }
+          # Make sure pkg-config finds all vcpkg dependencies
+          # WORKSPACE = D:\a\performous\performous\
+          # VCPKG = $WORKSPACE/vcpkg/vcpkg.exe
+          $Env:PKG_CONFIG_PATH = "${{ github.workspace }}\vcpkg\installed\x64-windows\lib\pkgconfig;${{ github.workspace }}\vcpkg\installed\x64-windows-release\lib\pkgconfig"
+
+
           # Clone the librsvg repository
           git clone https://gitlab.gnome.org/GNOME/librsvg.git
           cd librsvg
@@ -72,12 +78,6 @@ jobs:
           # Ensure MSVC target is set
           rustup default stable
           rustup target add x86_64-pc-windows-msvc
-
-          # Make sure pkg-config finds all vcpkg dependencies
-          # WORKSPACE = D:\a\performous\performous\
-          # VCPKG = $WORKSPACE/vcpkg/vcpkg.exe
-          #set PKG_CONFIG_PATH=${{ github.workspace }}\vcpkg\installed\x64-windows-release\lib\pkgconfig
-          #set PKG_CONFIG=$(vcpkg)\installed\x64-windows\tools\pkgconf\pkg-config.exe
 
           # Build librsvg with cargo for MSVC
           cargo build --release --target x86_64-pc-windows-msvc
