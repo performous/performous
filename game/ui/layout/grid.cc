@@ -2,7 +2,9 @@
 
 Grid::Grid(unsigned columns, unsigned rows)
 : m_columns(columns), m_rows(rows) {
-	m_controls.resize(columns * rows);
+	auto const cells = static_cast<size_t>(columns) * static_cast<size_t>(rows);
+
+	m_controls.resize(cells);
 	m_columnWidths.resize(columns, 1.0f / float(columns));
 	m_rowHeights.resize(rows, 1.0f / float(rows));
 }
@@ -43,8 +45,6 @@ void Grid::layout() {
 			if(control) {
 				auto const w = m_columnWidths[column] * getWidth();
 				auto const h = m_rowHeights[row] * getHeight();
-
-				std::cout << x << ", " << y << ", " << w << ", " << h << std::endl;
 
 				control->setGeometry(x, y, w ,h);
 

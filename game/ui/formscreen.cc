@@ -205,10 +205,6 @@ namespace {
 		auto const now = getCurrentTimeInMilliseconds();
 		auto const difference = now - lastFrame;
 
-//        std::cout << "last: " << lastFrame.count() << std::endl;
-//        std::cout << "now:  " << now.count() << std::endl;
-//        std::cout << "diff: " << difference.count() << std::endl;
-
 		lastFrame = now;
 
 		return float(difference.count()) * 0.001f;

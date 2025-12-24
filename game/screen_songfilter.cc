@@ -1,5 +1,4 @@
 #include "screen_songfilter.hh"
-#include "screen_songfilter.hh"
 
 #include "fs.hh"
 #include "i18n.hh"
@@ -12,12 +11,12 @@
 
 namespace {
 	const std::set<std::string> genreTerms{
-		"Alternative", "Country", "Rock", "Pop", "Metal", "Punk", "Folk", "Grunge",
-		"Reggae", "Dance", "House", "Soul", "Musical", "Ballad", "Soundtrack", "Blues",
-		"New age", "R&B", "Oldie", "Ska",
-		"NDW"};
+		"Alternative", "Country", "Rock", "Pop", "Metal", "Punk", "Funk", "Folk", "Grunge",
+		"Reggae", "Dance", "Disco", "House", "Soul", "Musical", "Ballad", "Soundtrack", "Blues",
+		"New age", "R&B", "Gospel", "Oldie", "Ska", "Rap", "Jazz", "Kids", "Latin", "Electro", "Game",
+		"NDW", "Schlager", "Volksmusik"};
 
-	struct SongsSummery {
+	struct SongsSummary {
 		std::vector<std::string> languages;
 		std::vector<std::string> genres;
 	};
@@ -36,9 +35,9 @@ namespace {
 		return result;
 	}
 
-	SongsSummery collectSummery(Songs const& songs) {
+	SongsSummary collectSummary(Songs const& songs) {
 		const auto none = "<" + _("None") + ">";
-		auto result = SongsSummery();
+		auto result = SongsSummary();
 
 		result.languages.emplace_back(none);
 		result.genres.emplace_back(none);
@@ -48,7 +47,6 @@ namespace {
 
 		for(auto const& song : songs.getSongs()) {
 			languages.emplace(song->language);
-//			std::cout << song->genre << std::endl;
 			genres.merge(findMatch(song->genre, genreTerms));
 		}
 
@@ -69,7 +67,7 @@ void ScreenSongFilter::onExitSwitchTo(std::string const& screen) {
 }
 
 void ScreenSongFilter::initializeControls() {
-	const auto songSummery = collectSummery(m_songs);
+	const auto songSummary = collectSummary(m_songs);
 	const auto verticalSpace = 0.05f;
 	const auto verticalOffset = -0.15f;
 	const auto horizontalSpace = 0.225f;
@@ -82,15 +80,15 @@ void ScreenSongFilter::initializeControls() {
 	m_labelLanguage.setText(_("Language") + ":");
 	m_labelLanguage.setGeometry(horizontalOffset, verticalOffset + n * verticalSpace, horizontalSpace, lineHeight);
 	getForm().addControl(m_selectLanguage0);
-	m_selectLanguage0.setItems(songSummery.languages);
+	m_selectLanguage0.setItems(songSummary.languages);
 	m_selectLanguage0.select(0);
 	m_selectLanguage0.setGeometry(horizontalOffset + horizontalSpace, verticalOffset + n * verticalSpace, 0.2f, lineHeight);
 	getForm().addControl(m_selectLanguage1);
-	m_selectLanguage1.setItems(songSummery.languages);
+	m_selectLanguage1.setItems(songSummary.languages);
 	m_selectLanguage1.select(0);
 	m_selectLanguage1.setGeometry(horizontalOffset + horizontalSpace * 2, verticalOffset + n * verticalSpace, 0.2f, lineHeight);
 	getForm().addControl(m_selectLanguage2);
-	m_selectLanguage2.setItems(songSummery.languages);
+	m_selectLanguage2.setItems(songSummary.languages);
 	m_selectLanguage2.select(0);
 	m_selectLanguage2.setGeometry(horizontalOffset + horizontalSpace * 3, verticalOffset + n * verticalSpace, 0.2f, lineHeight);
 
@@ -100,15 +98,15 @@ void ScreenSongFilter::initializeControls() {
 	m_labelGenre.setText(_("Genre") + ":");
 	m_labelGenre.setGeometry(horizontalOffset, verticalOffset + n * verticalSpace, horizontalSpace, lineHeight);
 	getForm().addControl(m_selectGenre0);
-	m_selectGenre0.setItems(songSummery.genres);
+	m_selectGenre0.setItems(songSummary.genres);
 	m_selectGenre0.select(0);
 	m_selectGenre0.setGeometry(horizontalOffset + horizontalSpace, verticalOffset + n * verticalSpace, 0.2f, lineHeight);
 	getForm().addControl(m_selectGenre1);
-	m_selectGenre1.setItems(songSummery.genres);
+	m_selectGenre1.setItems(songSummary.genres);
 	m_selectGenre1.select(0);
 	m_selectGenre1.setGeometry(horizontalOffset + horizontalSpace * 2, verticalOffset + n * verticalSpace, 0.2f, lineHeight);
 	getForm().addControl(m_selectGenre2);
-	m_selectGenre2.setItems(songSummery.genres);
+	m_selectGenre2.setItems(songSummary.genres);
 	m_selectGenre2.select(0);
 	m_selectGenre2.setGeometry(horizontalOffset + horizontalSpace * 3, verticalOffset + n * verticalSpace, 0.2f, lineHeight);
 
@@ -169,9 +167,6 @@ void ScreenSongFilter::initializeControls() {
 	m_selectBroken.setGeometry(horizontalOffset + horizontalSpace, verticalOffset + n * verticalSpace, 0.2f, lineHeight);
 
 	++n;
-	//++n;
-	//++n;
-	//++n;
 
 	getForm().addControl(m_labelResults);
 	m_labelResults.setGeometry(horizontalOffset, verticalOffset + n * verticalSpace, horizontalSpace, lineHeight);

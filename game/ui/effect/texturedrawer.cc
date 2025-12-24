@@ -29,6 +29,5 @@ void TextureDrawer::resetColor() {
 }
 
 void TextureDrawer::setMatrix(const glm::mat3& matrix) {
-   //std::cout << "matrix" << std::endl;
 	m_matrix = matrix;
 }

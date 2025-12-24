@@ -15,8 +15,6 @@ void Image::setTexture(std::string const& texture) {
 	if(m_path != texture) {
 		m_path = texture;
 
-		std::cout << "path: " << texture << "   " << fs::path(texture).is_absolute() << std::endl;
-
 		if(fs::path(texture).is_absolute())
 			m_texture = std::make_unique<Texture>(texture);
 		else
