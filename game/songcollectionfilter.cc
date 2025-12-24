@@ -32,31 +32,23 @@ SongCollectionFilter::SongCollection SongCollectionFilter::filter(SongCollection
 	auto filtered = collection;
 
 	if(m_filter) {
-		std::cout << "filter by filter" << std::endl;
-
-		auto const n = std::erase_if(filtered, [&](auto const& song) { return !m_filter->filter(*song);});
-
-		std::cout << "erased " << n << " of " << collection.size() << " songs" << std::endl;
+		std::erase_if(filtered, [&](auto const& song) { return !m_filter->filter(*song);});
 	}
 
 	if (!m_filterString.empty() || m_type != FilterType::None) {
-		std::cout << "filter by string or type" << std::endl;
 		auto filter = icu::UnicodeString::fromUTF8(UnicodeUtil::convertToUTF8(m_filterString));
 		icu::ErrorCode icuError;
 
 		std::erase_if (filtered, [&](auto const& song){
-			// Filter by type first.
 			if (filterByType(*song, m_type))
 				return true;
 
-			// If search is not empty, filter by search term.
 			if (!m_filterString.empty()) {
 				icu::StringSearch search = icu::StringSearch(filter, icu::UnicodeString::fromUTF8(song->strFull()), UnicodeUtil::m_searchCollator.get(), nullptr, icuError);
 
 				return search.first(icuError) == USEARCH_DONE;
 			}
 
-			// If we still haven't returned, it must be a type match with an empty search string.
 			return false;
 		});
 	}

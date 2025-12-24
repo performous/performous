@@ -30,11 +30,9 @@ bool GenreFilter::filter(Song const& song) const {
 
 LanguageFilter::LanguageFilter(std::string const& language)
 : m_language(language) {
-	//std::cout << "set language " << language << std::endl;
 }
 
 bool LanguageFilter::filter(Song const& song) const {
-	//std::cout << "compare " << song.language << " with " << m_language << std::endl;
 	return song.language == m_language;
 }
 

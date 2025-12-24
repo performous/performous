@@ -23,7 +23,6 @@ Control::Control(Control* parent)
 	auto border = std::make_shared<Sinus>(1.f, 0.f, 1.f);
 
 	border->setConsumer([&](float value, EffectContext& context){
-		//std::cout << "border: " << v << std::endl;
 		auto const color = ColorTrans(context.getGraphicContext().getWindow(), Color::alpha(value));
 		m_focus->draw(context.getGraphicContext().getWindow());
 	});
@@ -107,7 +106,6 @@ void Control::onKeyUp(std::function<void(Control&, Key)> const& callback) {
 }
 
 void Control::sendOnKeyDown(Key key) {
-	std::cout << "sendOnKeyDown" << std::endl;
 	if(m_onKeyDown)
 		m_onKeyDown(*this, key);
 }

@@ -191,8 +191,6 @@ void List::updateCheckBoxs() {
 				m_checkBoxs[i]->onStateChanged
 					([&, i](CheckBox&, bool checked){
 						m_items[i].setChecked(checked);
-						std::cout << "set item " << i << " to " << (checked ? "checked" : "unchecked") << std::endl;
-						std::cout << "set item " << i << " to " << (m_items[i].isChecked() ? "checked" : "unchecked") << std::endl;
 					});
 			}
 		}

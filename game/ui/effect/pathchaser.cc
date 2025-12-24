@@ -13,7 +13,6 @@ void PathChaser::setConsumer(std::function<void(Point const&)> consumer) {
 void PathChaser::process(EffectContext& context) {
 	if (m_consumer)
 		m_consumer(m_pathProvider.getPath()->getPoint(m_position));
-//std::cout << "position: " << m_position << std::endl;
 	m_position += m_speed * context.getSecondsSinceLastFrame() / m_pathProvider.getPath()->getLength();
 
 	while (m_position < 0.0f)
