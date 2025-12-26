@@ -220,8 +220,14 @@ jobs:
       - name: Run unittests directly called.
         shell: msys2 {0}
         run: |
-          cd "${{ env.workpath }}/performous/build/testing"
-          ./performous_test.exe --gtest_filter=UnitTest*
+            set -euo pipefail
+            echo "${{ github.workspace }}/msys64/mingw64/bin" >> $GITHUB_PATH
+            echo "PATH: $GITHUB_PATH"
+            cd "${{ env.workpath }}/performous/build/testing"
+            echo "=== files in testing folder ==="
+            ls -la
+            echo "Running performous_test.exe explicitly"
+            ./performous_test.exe --gtest_filter=UnitTest*
       - name: Run unittests by ctest.
         shell: msys2 {0}
         run: |
