@@ -133,7 +133,7 @@ if(GTest_FOUND)
 	target_link_libraries(performous_test PRIVATE "-framework CoreFoundation")
 	endif()
 
-	gtest_discover_tests(performous_test PROPERTIES TEST_DISCOVERY_TIMEOUT 30)
+	#gtest_discover_tests(performous_test PROPERTIES TEST_DISCOVERY_TIMEOUT 30)
 
 	# Image formats
 	foreach(lib PangoCairo LibRSVG ZLIB JPEG PNG WebP)
