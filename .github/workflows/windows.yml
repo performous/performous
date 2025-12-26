@@ -188,11 +188,13 @@ jobs:
         run: |
             set -e 
             cd "${{ env.workpath }}/performous/build/testing" || exit 0
-            echo "=== files in testing folder ===" ls -la || true
+            echo "=== files in testing folder ===" 
+            ls -la || true
             echo 
             echo "=== objdump -p (DLL dependencies) ===" 
             "${{ env.workpath }}/msys64/mingw64/bin/objdump.exe" -p performous_test.exe || true 
-            echo echo "=== Try to run performous_test.exe (capture missing DLL message) ==="
+            echo 
+            echo "=== Try to run performous_test.exe (capture missing DLL message) ==="
             ./performous_test.exe --gtest_filter=UnitTest* || true 
             echo
             echo "=== head of msys64/mingw64/bin (candidate DLLs) ==="
