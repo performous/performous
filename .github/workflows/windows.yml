@@ -199,6 +199,21 @@ jobs:
             echo
             echo "=== head of msys64/mingw64/bin (candidate DLLs) ==="
             ls -la "${{ env.workpath }}/msys64/mingw64/bin" | head -n 80 || true
+      - name: Debug print PATH and which
+        shell: bash
+        run: |
+            echo "PATH=$PATH"
+            command -v cmake || true
+            command -v bash || true
+            echo "Contents of build/testing:"
+            ls -la performous/build/testing || ls -la build/testing || true
+            echo "If binary exists, show file type and deps:"
+            for f in performous/build/testing/*; do
+              [ -f "$f" ] || continue
+              echo "---- $f ----"
+              file "$f" || true
+              ldd "$f" || objdump -p "$f" | head -n40 || true
+            done
       - name: Add MSYS2 mingw64 to PATH 
         run: | 
             echo "${{ github.workspace }}/msys64/mingw64/bin" >> $GITHUB_PATH
