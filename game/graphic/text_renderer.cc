@@ -55,7 +55,7 @@ size_t TextRenderer::measureColumns(const std::string& text, const TextStyle& st
 	std::string line;
 	while (std::getline(issLines, line)) {
 		// Only consider lines with tab-delimited columns
-		size_t tabCount = std::count(line.begin(), line.end(), '\t');
+		size_t tabCount = static_cast<size_t>(std::count(line.begin(), line.end(), '\t'));
 		if ( tabCount > 0 ) {
 			std::istringstream issCols(line);
 			std::string colText;
