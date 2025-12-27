@@ -1,7 +1,7 @@
 #include "text_renderer.hh"
 
 #include <pango/pangocairo.h>
-
+#include <algorithm>
 #include <memory>
 
 namespace {
@@ -64,7 +64,8 @@ size_t TextRenderer::measureColumns(const std::string& text, const TextStyle& st
 				// Measure this column's text length in pixels
 				auto size = measure(colText, style, m);
                 float factoredSize = m * size.getWidth(); // multiply by m, as bitmap size is m-times bigger
-				columns[colIndex] = std::max(columns[colIndex], factoredSize);
+                float existingValue= columns[colIndex];   // for MSVC's std::max
+				columns[colIndex] = std::max(existingValue, factoredSize);
 				++colIndex;
 				if (colIndex >= columns.size() )
 					break;  // exhausted array columns, give up on this line
