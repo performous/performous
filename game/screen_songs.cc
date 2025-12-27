@@ -351,6 +351,14 @@ void ScreenSongs::draw() {
 	if (m_menu.isOpen()) drawMenu();
 }
 
+
+/**
+  * \brief    Renders the Song's high score table of historical player scores.
+  *
+  * \note     Columns score/player/datestamp are simply tab delimited at this stage, 
+  *           newlines between scores.   We rely on the string->bitmap rendering to 
+  *           align these into columns later.
+  */
 std::string ScreenSongs::getHighScoreText() const {
 	auto const scores = m_database.queryPerSongHiscore(m_songs.currentPtr());
 	auto const datetimeFormat = config["game/datetime_format"].so();
@@ -373,11 +381,12 @@ std::string ScreenSongs::getHighScoreText() const {
 	std::string ret;
 	auto n = 0;
 	for (auto const& [track, scores]: scoresByTrack) {
-		fmt::format_to(std::back_inserter(ret), "{}:\n", track);
+		fmt::format_to(std::back_inserter(ret), "{}:\n", track);  // The part of the song played, e.g: "Vocals"
+		// One line for each player score
 		for (auto const& score: scores) {
-			fmt::format_to(std::back_inserter(ret), "{:0>10L}\t", score.score);
-			playerFormatter(ret, score.playerid);
-			timeFormatter(ret, score.unixtime);
+			fmt::format_to(std::back_inserter(ret), "{:0>10L}\t", score.score);   // score
+			playerFormatter(ret, score.playerid);                                 // player name
+			timeFormatter(ret, score.unixtime);                                   // date-stmap
 			ret.append("\n");
 		}
 		ret.append("\n");
