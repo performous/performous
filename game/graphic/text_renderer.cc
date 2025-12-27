@@ -95,16 +95,17 @@ OpenGLText TextRenderer::render(std::string const& text, TextStyle const& style,
 	// IFF the text has columns (like the historical hiscores table) nicely format the columns
 	std::array<float,MAX_COLUMNS> colWidths;
 	bool hasColumns = (strchr(text.c_str(),'\t') != nullptr);
-	if (hasColumns && measureColumns(text, style, m, colWidths) > 0) {
+	if (hasColumns)
+	{
+		size_t numTabs = measureColumns(text, style, m, colWidths);
 		// Pango defines tab-stops only for extra columns, so the first tab-stop is the pixel location of the second column. 
 		// There is no concept of a first-column tab-stop (or justification)
 		float position = 0.0f;
 		const float SPACER = TextRenderer().measure("WWWW", style, m).getWidth();  // Can't be a constant, needs to match font & screen DPI, etc.
-		int numTabs = static_cast<int>(colWidths.size());
-		PangoTabArray *tabArray = pango_tab_array_new(numTabs, TRUE);  // positions in pixels
-		for (int i=0; i<numTabs; i++) {
+		PangoTabArray *tabArray = pango_tab_array_new(static_cast<int>(numTabs), TRUE);  // positions in pixels
+		for (size_t i=0; i<numTabs; i++) {
 			position += colWidths[i] + SPACER;
-			pango_tab_array_set_tab(tabArray, i, PANGO_TAB_LEFT, static_cast<int>(position+0.5f));
+			pango_tab_array_set_tab(tabArray, static_cast<int>(i), PANGO_TAB_LEFT, static_cast<int>(position+0.5f));
 		}
 		pango_layout_set_tabs(layout.get(), tabArray);
 		pango_tab_array_free(tabArray);
@@ -121,7 +122,6 @@ OpenGLText TextRenderer::render(std::string const& text, TextStyle const& style,
 		width = static_cast<float>(rec.width) + border;  // Add twice half a border for margins
 		height = static_cast<float>(rec.height) + border;
 	}
-
 
 	// Create Cairo surface and drawing context
 	std::shared_ptr<cairo_surface_t> surface(
