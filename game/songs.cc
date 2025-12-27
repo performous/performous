@@ -366,6 +366,15 @@ void Songs::setFilter(std::string const& val) {
 	filter_internal();
 }
 
+void Songs::setFilter(SongFilterPtr filter) {
+	if(m_songFilter == filter)
+		return;
+
+	m_songFilter = filter;
+
+	filter_internal();
+}
+
 void Songs::filter_internal() {
 	m_updateTimer.setValue(0.0);
 	m_dirty = false;
@@ -373,7 +382,7 @@ void Songs::filter_internal() {
 	try {
 		auto filtered = SongCollection();
 		// if filter text is blank and no type filter is set, just display all songs.
-		if (m_filter == std::string() && m_type == 0) {
+		if (m_filter == std::string() && m_type == FilterType::None) {
 			std::shared_lock<std::shared_mutex> l(m_mutex);
 			filtered = m_songs;
 		} else {
@@ -385,12 +394,12 @@ void Songs::filter_internal() {
 			std::shared_lock<std::shared_mutex> l(m_mutex);
 			std::copy_if (m_songs.begin(), m_songs.end(), std::back_inserter(filtered), [&](std::shared_ptr<Song> it){
 			// Filter by type first.
-				if (m_type == 1 && !(*it).hasDance()) return false;
-				if (m_type == 2 && !(*it).hasVocals()) return false;
-				if (m_type == 3 && !(*it).hasDuet()) return false;
-				if (m_type == 4 && !(*it).hasGuitars()) return false;
-				if (m_type == 5 && !(*it).hasDrums() && !(*it).hasKeyboard()) return false;
-				if (m_type == 6 && (!(*it).hasVocals() || !(*it).hasGuitars() || (!(*it).hasDrums() && !(*it).hasKeyboard()))) return false;
+				if (m_type == FilterType::HasDance && !(*it).hasDance()) return false;
+				if (m_type == FilterType::HasVocals && !(*it).hasVocals()) return false;
+				if (m_type == FilterType::HasDuet && !(*it).hasDuet()) return false;
+				if (m_type == FilterType::HasGuitar && !(*it).hasGuitars()) return false;
+				if (m_type == FilterType::HasDrumsOrKeyboard && !(*it).hasDrums() && !(*it).hasKeyboard()) return false;
+				if (m_type == FilterType::FullBand && (!(*it).hasVocals() || !(*it).hasGuitars() || (!(*it).hasDrums() && !(*it).hasKeyboard()))) return false;
 
 		  // If search is not empty, filter by search term.
 				if (!m_filter.empty()) {
@@ -461,25 +470,18 @@ namespace {
 }
 
 std::string Songs::typeDesc() const {
-	switch (m_type) {
-		case 0: return _("show all songs");
-		case 1: return _("has dance");
-		case 2: return _("has vocals");
-		case 3: return _("has duet");
-		case 4: return _("has guitar");
-		case 5: return _("drums or keytar");
-		case 6: return _("full band");
-	}
-	throw std::logic_error("Internal error: unknown type filter in Songs::typeDesc");
+	return toString(m_type);
 }
 
 void Songs::typeChange(SortChange diff) {
-	if (diff == SortChange::RESET) m_type = 0;
+	if (diff == SortChange::RESET)
+		m_type = FilterType::None;
 	else {
+		auto const currentType = toInt(m_type);
 		int dir = to_underlying(diff);
-		m_type = static_cast<unsigned short>((m_type + dir) % types);
-		if (m_type >= types)
-			m_type = static_cast<unsigned short>(m_type + types);
+		m_type = toFilterType((currentType + dir) % types);
+		if (toInt(m_type) >= types)
+			m_type = toFilterType(currentType + types);
 	}
 	filter_internal();
 }
@@ -488,10 +490,14 @@ void Songs::typeCycle(unsigned short cat) {
 	static const unsigned short categories[types] = { 0, 1, 2, 2, 3, 3, 4 };
 	// Find the next matching category
 	unsigned short type = 0;
-	for (unsigned short t = static_cast<unsigned short>(categories[m_type] == cat ? m_type + 1 : 0); t < types; ++t) {
-		if (categories[t] == cat) { type = t; break; }
+	auto const currentType = static_cast<unsigned short>(m_type);
+	for (auto t = static_cast<unsigned short>(categories[currentType] == cat ? currentType + 1 : 0); t < types; ++t) {
+		if (categories[t] == cat) { 
+			type = t;
+			break;
+		}
 	}
-	m_type = type;
+	m_type = static_cast<FilterType>(type);
 	filter_internal();
 }
 

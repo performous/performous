@@ -49,13 +49,13 @@ if [ ${HELP} ]; then
 	usage
 fi
 
-## Run the ctests
-echo "Run unit tests"
-cd ${CLONE_DIRECTORY}/${CTEST_TESTING_DIRECTORY}
-make test
-echo -e "\n\n\n\n\n"
-
 ## Run the gtests
 echo "Run gtest unit tests"
 cd ${CLONE_DIRECTORY}/${GTEST_TESTING_DIRECTORY}
 ./performous_test --gtest_filter=UnitTest*
+
+## Run the ctests
+echo "Run unit tests per ctest"
+cd ${CLONE_DIRECTORY}/${CTEST_TESTING_DIRECTORY}
+make test ARGS="-R ^UnitTest"
+echo -e "\n\n\n\n\n"
