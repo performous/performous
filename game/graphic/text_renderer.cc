@@ -31,6 +31,50 @@ namespace {
 	}
 }
 
+/**
+  * \details   Given a block of text, which possibly contains newlines, and _some_ tab-separated columns,
+  *            measure the width of each column in pixels.  Iterate over each line, determining the
+  *            width of each column, and keep track of the maximum width seen for each column.  
+  *
+  * \note      Since typically we have a mix of single items lines and multi-item lines, we only 
+  *            consider lines with tab-delimiters for measuring column widths.
+  *
+  * \param text    The text to measure
+  * \param style   The style to use for measuring
+  * \param m       The quality multiplier, typically doubles bitmap size
+  * \param columns An array, into which we pack the maximum column widths
+  *
+  * \returns   The maximum number of columns over every line
+  */
+size_t TextRenderer::measureColumns(const std::string& text, const TextStyle& style, float m, std::array<float,MAX_COLUMNS>& columns)
+{
+	// Previous to this call, we've determined there is some columns in the text string.
+	// Iterate over the text, measuring the pixel-width of each column in each line
+	size_t maxCols = 0;
+	std::istringstream issLines(text);
+	std::string line;
+	while (std::getline(issLines, line)) {
+		// Only consider lines with tab-delimited columns
+		size_t tabCount = std::count(line.begin(), line.end(), '\t');
+		if ( tabCount > 0 ) {
+			std::istringstream issCols(line);
+			std::string colText;
+			size_t colIndex = 0;
+			while (std::getline(issCols, colText, '\t')) {
+				// Measure this column's text length in pixels
+				auto size = measure(colText, style, m) * m;  // multiply by m, as bitmap size is m-times bigger
+				columns[colIndex] = std::max(columns[colIndex], size.getWidth());
+				++colIndex;
+				if (colIndex >= columns.size() )
+					break;  // exhausted array columns, give up on this line
+			}
+			maxCols = std::max(maxCols, colIndex);
+		}
+	}
+
+	return maxCols;
+}
+
 OpenGLText TextRenderer::render(std::string const& text, TextStyle const& style, float m) {
 	alignFactor(m);
 
@@ -47,18 +91,38 @@ OpenGLText TextRenderer::render(std::string const& text, TextStyle const& style,
 	std::shared_ptr<PangoLayout> layout(pango_layout_new(ctx.get()), g_object_unref);
 	pango_layout_set_alignment(layout.get(), alignment);
 	pango_layout_set_font_description(layout.get(), desc.get());
-	pango_layout_set_text(layout.get(), text.c_str(), -1);
 
-	auto width = 0.f;
-	auto height = 0.f;
+	// IFF the text has columns (like the historical hiscores table) nicely format the columns
+	std::array<float,MAX_COLUMNS> colWidths;
+	bool hasColumns = (strchr(text.c_str(),'\t') != nullptr);
+	if (hasColumns && measureColumns(text, style, m, colWidths) > 0) {
+		// Pango defines tab-stops only for extra columns, so the first tab-stop is the pixel location of the second column. 
+		// There is no concept of a first-column tab-stop (or justification)
+		float position = 0.0f;
+		const float SPACER = TextRenderer().measure("WWWW", style, m).getWidth();  // Can't be a constant, needs to match font & screen DPI, etc.
+		int numTabs = static_cast<int>(colWidths.size());
+		PangoTabArray *tabArray = pango_tab_array_new(numTabs, TRUE);  // positions in pixels
+		for (int i=0; i<numTabs; i++) {
+			position += colWidths[i] + SPACER;
+			pango_tab_array_set_tab(tabArray, i, PANGO_TAB_LEFT, static_cast<int>(position+0.5f));
+		}
+		pango_layout_set_tabs(layout.get(), tabArray);
+		pango_tab_array_free(tabArray);
+	}
+
+	pango_layout_set_text(layout.get(), text.c_str(), -1);  // Measuring changes the layout text, set it finally
 
 	// Compute text extents
+	auto width = 0.f;
+	auto height = 0.f;
 	{
 		PangoRectangle rec;
 		pango_layout_get_pixel_extents(layout.get(), nullptr, &rec);
 		width = static_cast<float>(rec.width) + border;  // Add twice half a border for margins
 		height = static_cast<float>(rec.height) + border;
 	}
+
+
 	// Create Cairo surface and drawing context
 	std::shared_ptr<cairo_surface_t> surface(
 	  cairo_image_surface_create(CAIRO_FORMAT_ARGB32, static_cast<int>(width), static_cast<int>(height)),
@@ -88,7 +152,7 @@ OpenGLText TextRenderer::render(std::string const& text, TextStyle const& style,
 		cairo_set_source_rgba(dc.get(), style.stroke_col.r, style.stroke_col.g, style.stroke_col.b, style.stroke_col.a);
 		cairo_stroke(dc.get());
 	}
-	cairo_pop_group_to_source (dc.get());
+	cairo_pop_group_to_source(dc.get());
 	cairo_set_operator(dc.get(),CAIRO_OPERATOR_OVER);
 	cairo_paint (dc.get());
 	// Load into m_texture (OpenGL texture)
