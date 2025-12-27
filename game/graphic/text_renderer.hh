@@ -3,6 +3,7 @@
 #include "size.hh"
 #include "opengl_text.hh"
 #include <string>
+#include <array>
 
 using TextExtent = std::pair<size_t,size_t>; // The location and length of a substring
 
