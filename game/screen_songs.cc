@@ -384,7 +384,7 @@ std::string ScreenSongs::getHighScoreText() const {
 		fmt::format_to(std::back_inserter(ret), "{}:\n", track);  // The part of the song played, e.g: "Vocals"
 		// One line for each player score
 		for (auto const& score: scores) {
-			fmt::format_to(std::back_inserter(ret), "{:0>10L}\t", score.score);   // score
+			fmt::format_to(std::back_inserter(ret), "{:>10L}\t", score.score);    // score
 			playerFormatter(ret, score.playerid);                                 // player name
 			timeFormatter(ret, score.unixtime);                                   // date-stmap
 			ret.append("\n");
