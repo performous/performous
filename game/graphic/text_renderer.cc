@@ -62,8 +62,9 @@ size_t TextRenderer::measureColumns(const std::string& text, const TextStyle& st
 			size_t colIndex = 0;
 			while (std::getline(issCols, colText, '\t')) {
 				// Measure this column's text length in pixels
-				auto size = measure(colText, style, m) * m;  // multiply by m, as bitmap size is m-times bigger
-				columns[colIndex] = std::max(columns[colIndex], size.getWidth());
+				auto size = measure(colText, style, m);
+                float factoredSize = m * size.getWidth(); // multiply by m, as bitmap size is m-times bigger
+				columns[colIndex] = std::max(columns[colIndex], factoredSize);
 				++colIndex;
 				if (colIndex >= columns.size() )
 					break;  // exhausted array columns, give up on this line
