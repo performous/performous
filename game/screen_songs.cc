@@ -375,7 +375,9 @@ std::string ScreenSongs::getHighScoreText() const {
 	};
 	auto const timeFormatter = [datetimeFormat](std::string& string, auto const& unixtime) {
 		if(unixtime.count()) {
-			fmt::format_to(std::back_inserter(string), " \t{}", timeFormat(unixtime, datetimeFormat));
+			std::string formatted = timeFormat(unixtime, datetimeFormat);
+			std::replace(formatted.begin(), formatted.end(), ' ', '\t');  // time & date display in columns
+			fmt::format_to(std::back_inserter(string), " \t{}", formatted);
 		}
 	};
 	std::string ret;
