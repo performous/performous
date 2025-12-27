@@ -31,6 +31,38 @@ namespace {
 	}
 }
 
+
+/**
+  * \brief   Split the given text about the given token, populating the extents array with substring positions
+  *
+  * \returns The number of extents found
+  */
+size_t TextRenderer::tokenSplitter( const std::string &text, char token, std::array<TextExtent,MAX_COLUMNS> &extents )
+{
+    size_t extentCount = 0;
+    size_t tokenStart = 0;
+    size_t tokenEnd;
+
+    // Iterate through the text, finding tokens
+    while ((tokenEnd = text.find(token, tokenStart)) != std::string::npos) {
+        if (tokenStart != tokenEnd) {  // Avoid empty tokens
+            extents[extentCount] = { tokenStart, tokenEnd-tokenStart };
+            extentCount += 1;
+        }
+        tokenStart = tokenEnd + 1;
+        if ( extentCount == MAX_COLUMNS )
+            break;  // exhausted extents array
+    }
+    if (tokenStart < text.size() && extentCount < MAX_COLUMNS)
+    {
+        extents[extentCount] = { tokenStart, text.size()-tokenStart };
+        extentCount += 1;
+    }
+
+    return extentCount;
+}
+
+
 /**
   * \details   Given a block of text, which possibly contains newlines, and _some_ tab-separated columns,
   *            measure the width of each column in pixels.  Iterate over each line, determining the
@@ -46,36 +78,48 @@ namespace {
   *
   * \returns   The maximum number of columns over every line
   */
-size_t TextRenderer::measureColumns(const std::string& text, const TextStyle& style, float m, std::array<float,MAX_COLUMNS>& columns)
+size_t TextRenderer::measureColumns(const std::string& text, const TextStyle& style, float m, std::array<float,MAX_COLUMNS>& columnWidths)
 {
-	// Previous to this call, we've determined there is some columns in the text string.
-	// Iterate over the text, measuring the pixel-width of each column in each line
-	size_t maxCols = 0;
-	std::istringstream issLines(text);
-	std::string line;
-	while (std::getline(issLines, line)) {
-		// Only consider lines with tab-delimited columns
-		size_t tabCount = static_cast<size_t>(std::count(line.begin(), line.end(), '\t'));
-		if ( tabCount > 0 ) {
-			std::istringstream issCols(line);
-			std::string colText;
-			size_t colIndex = 0;
-			while (std::getline(issCols, colText, '\t')) {
-				// Measure this column's text length in pixels
+    std::array<TextExtent,MAX_COLUMNS> lines;   // positions of substrings in text
+    std::array<TextExtent,MAX_COLUMNS> columns;
+
+    std::string line, colText;
+    line.reserve(256);   
+    colText.reserve(128);
+    std::fill(columnWidths.begin(), columnWidths.end(), 0.0f);
+
+    size_t maxCols = 0;         // maximum count of columns in any line
+
+    // Loop through the text, finding lines, and then columns in those lines.
+    size_t lineCount = tokenSplitter(text, '\n', lines);  // split text into lines
+    for (size_t i=0; i<lineCount; i++)
+    {
+        size_t lineStart = lines[i].first;
+        size_t lineLength = lines[i].second;
+        line = text.substr(lineStart, lineLength);
+
+        // We're only interested in lines with multiple columns
+        if (strchr(line.c_str(), '\t') != nullptr)
+        {
+            size_t colCount = tokenSplitter(line, '\t', columns);  // split line into column
+            for (size_t j=0; j<colCount; j++)
+            {
+                size_t colStart = columns[j].first;
+                size_t colLength = columns[j].second;
+                colText = line.substr(colStart, colLength);
+
+				// Measure this column's text width in pixels, keep the maximum width
 				auto size = measure(colText, style, m);
                 float factoredSize = m * size.getWidth(); // multiply by m, as bitmap size is m-times bigger
-                float existingValue= columns[colIndex];   // for MSVC's std::max
-				columns[colIndex] = std::max(existingValue, factoredSize);
-				++colIndex;
-				if (colIndex >= columns.size() )
-					break;  // exhausted array columns, give up on this line
+                columnWidths[j] = std::max(factoredSize, columnWidths[j]);
 			}
-			maxCols = std::max(maxCols, colIndex);
-		}
-	}
+			maxCols = std::max(maxCols, colCount);
+        }
+    }
 
-	return maxCols;
+    return maxCols;
 }
+
 
 OpenGLText TextRenderer::render(std::string const& text, TextStyle const& style, float m) {
 	alignFactor(m);
