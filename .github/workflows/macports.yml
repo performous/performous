@@ -168,8 +168,7 @@ jobs:
         # and to install from packaged binaries everything else we need but not at runtime (i.e. cmake and various versions of python and/or compilers)
         run: |
           set -x
-          try_binary_first() { sudo port -b install "$@" boost.version=${{ inputs.boost_version }} || sudo port install "$@" boost.version=${{ inputs.boost_version }}; }
-
+          . "${{ github.workspace}}/performous/.github/try_binary_first.sh"
           if [[ "${{ steps.restore_cache.outputs.cache-hit }}" == "true" ]]; then
             sudo port selfupdate
             sudo port activate -f installed boost.version=${{ inputs.boost_version }}
@@ -180,9 +179,9 @@ jobs:
           echo buildfromsource ifneeded | tee -a /opt/local/etc/macports/macports.conf
           echo keeplogs yes | tee -a /opt/local/etc/macports/macports.conf
           sudo port install -s icu
-          try_binary_first autoconf autoconf-archive automake bison cargo cctools clang-20 cmake docbook-xml docbook-xsl-nons fftw-3-single +clang20+gfortran flex gi-docgen git gmake gperf gtk-doc itstool meson mm-common nasm ninja p7zip perl5 pkgconfig py313-docutils py313-build py313-cython py313-installer py313-wheel python313 rust texinfo unzip vim websocketpp xmlto yasm
+          try_binary_first autoconf autoconf-archive automake bison cargo cctools clang-20 cmake docbook-xml docbook-xsl-nons flex gi-docgen git gmake gperf gtk-doc itstool meson mm-common nasm ninja p7zip perl5 pkgconfig py313-docutils py313-build py313-cython py313-installer py313-wheel python313 rust texinfo unzip vim websocketpp xmlto yasm boost.version=${{ inputs.boost_version }}
 
-          sudo port -sv install ${MACOS_DEPS} boost.version=${{ inputs.boost_version }}
+          sudo port -s install ${MACOS_DEPS} boost.version=${{ inputs.boost_version }}
 
           echo "Installed ports: "
           port installed
@@ -202,22 +201,13 @@ jobs:
           # sudo rm -Rfv /opt/local/libexec/macports
           # sudo rm -fv /opt/local/bin/port*
 
-      - name: Get logs from last failed job
+      - name: Get logs from last job
         if: ${{ !cancelled() }}
         id: get-logs
         run: |
           cd /opt/local/var/macports
           tar -czf ./MacPorts-log-${{ matrix.os }}.tar.gz ./logs ./build
           echo "log_path=/opt/local/var/macports/MacPorts-log-${{ matrix.os }}.tar.gz" >> $GITHUB_OUTPUT
-
-      - name: Upload logs
-        if: ${{ steps.get-logs.outputs.log_path != null && always() }}
-        id: upload-logs
-        uses: actions/upload-artifact@v4
-        with:
-          name: "MacPorts-log-${{ matrix.os }}.tar.gz"
-          path: "${{ steps.get-logs.outputs.log_path }}"
-
       - name: Cache dependencies
         uses: Lord-Kamina/always-upload-cache/save@refresh-cache
         with:
@@ -277,4 +267,12 @@ jobs:
         with:
           release_id: ${{ inputs.release_id }}
           file: ${{ env.ARTIFACT_PATH }}
+
+      - name: Upload logs
+        if: ${{ steps.get-logs.outputs.log_path != null && !cancelled() }}
+        id: upload-logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: "MacPorts-log-${{ matrix.os }}.tar.gz"
+          path: "${{ steps.get-logs.outputs.log_path }}"
 
