@@ -91,14 +91,6 @@ jobs:
 
           sudo cp -vf ./performous/.github/support-boost-1.87.patch /opt/custom_portfiles/www/cpprestsdk/files/
 
-          boost_version=$(echo ${{ inputs.boost_version }} | sed 's|\.||')
-
-          sudo mkdir -p /opt/custom_portfiles/devel/
-          sudo cp -Rvf $(dirname $(port file boost${boost_version})) /opt/custom_portfiles/devel/
-          sudo cp -vf ./performous/.github/fix-boost187-universal.patch /opt/custom_portfiles/devel/boost${boost_version}/files/
-          
-          echo patchfiles-append fix-boost187-universal.patch | sudo tee -a /opt/custom_portfiles/devel/boost${boost_version}/Portfile
-
           sudo mkdir -p /opt/custom_portfiles/graphics/
           sudo cp -Rv $(dirname $(port file librsvg)) /opt/custom_portfiles/graphics/
 
