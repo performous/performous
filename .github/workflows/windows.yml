@@ -87,6 +87,7 @@ jobs:
           # Install meson if not already installed
           python3.exe -m pip install --upgrade pip
           python3.exe -m pip install meson
+          cargo install cargo-c
 
           meson setup _build -Ddocs=disabled -Dintrospection=auto -Dpixbuf=auto -Dvala=enabled -Dtests=false --prefix="${{ github.workspace }}\vcpkg\installed\x64-windows-release"
           meson compile -v -C _build
