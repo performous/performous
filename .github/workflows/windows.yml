@@ -87,7 +87,13 @@ jobs:
           # Install meson if not already installed
           python3.exe -m pip install --upgrade pip
           python3.exe -m pip install meson
+          cargo install pkg-config
           cargo install cargo-c
+
+          # Make sure pkg-config finds all vcpkg dependencies
+          # WORKSPACE = D:\a\performous\performous\
+          # VCPKG = $WORKSPACE/vcpkg/vcpkg.exe
+          $Env:PKG_CONFIG_PATH = "${{ github.workspace }}\vcpkg\installed\x64-windows\lib\pkgconfig;${{ github.workspace }}\vcpkg\installed\x64-windows-release\lib\pkgconfig"
 
           meson setup _build -Ddocs=disabled -Dintrospection=auto -Dpixbuf=auto -Dvala=enabled -Dtests=false --prefix="${{ github.workspace }}\vcpkg\installed\x64-windows-release"
           meson compile -v -C _build
