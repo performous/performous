@@ -95,6 +95,7 @@ jobs:
           #Write-Host "$($Env:PATH)"
           $Env:PKG_CONFIG_PATH = "${{ github.workspace }}\vcpkg\installed\x64-windows\lib\pkgconfig;${{ github.workspace }}\vcpkg\installed\x64-windows-release\lib\pkgconfig"
           $Env:PKG_CONFIG = "$($pkgconf.FullName)"
+          $Env:RUSTFLAGS="-Cprefer-dynamic"
 
           meson setup _build -Ddocs=disabled -Dintrospection=auto -Dpixbuf=auto -Dvala=disabled -Davif=disabled -Dtests=false --prefix="${{ github.workspace }}\vcpkg\installed\x64-windows-release"
           meson compile -v -C _build
