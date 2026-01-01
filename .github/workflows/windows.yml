@@ -88,11 +88,11 @@ jobs:
           python3.exe -m pip install --upgrade pip
           python3.exe -m pip install meson
 
-          python3.exe -b meson -V setup _build -Ddocs=disabled -Dintrospection=auto -Dpixbuf=auto -Dvala=enabled -Dtests=false --prefix="${{ github.workspace }}\vcpkg\installed\x64-windows-release"
-          python3.exe -b meson -V compile -C _build
-          python3.exe -b meson -V install -C _build
+          meson -V setup _build -Ddocs=disabled -Dintrospection=auto -Dpixbuf=auto -Dvala=enabled -Dtests=false --prefix="${{ github.workspace }}\vcpkg\installed\x64-windows-release"
+          meson -V compile -C _build
+          meson -V install -C _build
           # Show output
-          tree "${{ github.workspace }}\librsvg\_build" /F /A
+          tree "${{ github.workspace }}\librsvg\" /F /A
           exit 1;
 
       - name: Run cmake to configure the project and build it
