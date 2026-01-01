@@ -95,7 +95,13 @@ jobs:
           #Write-Host "$($Env:PATH)"
           $Env:PKG_CONFIG_PATH = "${{ github.workspace }}\vcpkg\installed\x64-windows\lib\pkgconfig;${{ github.workspace }}\vcpkg\installed\x64-windows-release\lib\pkgconfig"
           $Env:PKG_CONFIG = "$($pkgconf.FullName)"
+          # Force Rust library to be built as cdylib (DLL)
+          $Env:CARGO_CBUILD_LIBRARY_TYPE="cdylib"
+          
+          # Optional: prefer dynamic linking for Rust dependencies
           $Env:RUSTFLAGS="-Cprefer-dynamic"
+
+          $Env:VERBOSE=1
 
           meson setup _build -Ddocs=disabled -Dintrospection=auto -Dpixbuf=auto -Dvala=disabled -Davif=disabled -Dtests=false --prefix="${{ github.workspace }}\vcpkg\installed\x64-windows-release"
           meson compile -v -C _build
