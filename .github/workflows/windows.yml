@@ -71,10 +71,6 @@ jobs:
 
           .\vcpkg\vcpkg.exe install --debug --binarysource="clear;files,${{ github.workspace}}\vcpkg_cache,readwrite" --overlay-triplets="D:\a\performous\performous\performous\cmake\triplets" vcpkg-tool-meson
 
-          # Where is meson?
-          Get-ChildItem -Path "${{ github.workspace }}\vcpkg\*" -Recurse -Include *meson*.*
-          cmd.exe /c "dir ${{ github.workspace }}\vcpkg\*meson*.* /s /b"
-
           # Clone the librsvg repository
           git clone https://gitlab.gnome.org/GNOME/librsvg.git
 
@@ -88,11 +84,15 @@ jobs:
           # Build librsvg with cargo for MSVC
           New-Item -Type Directory _build
 
+          # Install meson if not already installed
+          python3.exe -m pip install --upgrade pip
+          python3.exe -m pip install meson
+
           python3.exe -b meson -V setup _build -Ddocs=disabled -Dintrospection=auto -Dpixbuf=auto -Dvala=enabled -Dtests=false --prefix="${{ github.workspace }}\vcpkg\installed\x64-windows-release"
           python3.exe -b meson -V compile -C _build
           python3.exe -b meson -V install -C _build
           # Show output
-          tree "${{ github.workspace }}\librsvg" /F /A
+          tree "${{ github.workspace }}\librsvg\_build" /F /A
           exit 1;
 
       - name: Run cmake to configure the project and build it
