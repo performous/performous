@@ -1,29 +1,28 @@
 #!/bin/bash
+
+MAX_RETRIES=3 # Safety cap to prevent infinite loops if the dependency tree is broken
+
 try_binary_first() {
     # 1. --- Input Validation ---
     if [ "$#" -eq 0 ]; then
-        echo "Usage: $0 <port> [+variants] [port2] ... [global_key=value ...]" >&2
-        echo "Example: $0 boost +universal cairo -x11+quartz build_type=Release" >&2
+        echo "Usage: $0 <port> [+variants] ... [global_key=value ...]" >&2
         exit 1
     fi
 
     if ! command -v port &>/dev/null; then
-        echo "Error: The 'port' command was not found." >&2
+        echo "Error: 'port' command not found." >&2
         exit 1
     fi
 
     # 2. --- Argument Parsing ---
     local global_options=()
-    local job_queue=()       # Will hold strings like: "portname +var1 -var2"
+    local job_queue=() 
     
     local current_port_name=""
     local current_port_variants=""
 
-    # Function to commit the current port buffer to the job list
     _flush_port() {
         if [[ -n "$current_port_name" ]]; then
-            # We combine the name and variants into a single string for storage
-            # (Variants already have leading spaces added during collection)
             local job_entry="${current_port_name}${current_port_variants}"
             job_queue+=("$job_entry")
         fi
@@ -31,27 +30,26 @@ try_binary_first() {
         current_port_variants=""
     }
 
-    # Loop through all arguments preserving order
     for arg in "$@"; do
         case "$arg" in
             *=*)
-                # key=value pair -> GLOBAL option
+                # Global Key=Value
                 global_options+=("$arg")
                 ;;
             [-+]*)
-                # Starts with + or - -> VARIANT
+                # Variant specifier (could be mixed like "+univ-debug")
                 if [[ -z "$current_port_name" ]]; then
-                    echo "Error: Variant '$arg' was specified before any port name." >&2
+                    echo "Error: Variant '$arg' without port name." >&2
                     exit 1
                 fi
-                # Append to current variants for the active port
+                # Inject spaces before + or - to split combined variants (e.g., +a-b -> +a -b)
+                # This ensures the 'port' command interprets them correctly as separate flags.
+                
                 current_port_variants+=" $arg"
                 ;;
             *)
-                # Likely a port name
-                # 1. Flush the previous port if pending
+                # Port Name
                 _flush_port
-                # 2. Start tracking the new port
                 current_port_name="$arg"
                 ;;
         esac
@@ -64,42 +62,92 @@ try_binary_first() {
         exit 1
     fi
 
-    # 3. --- Execution Loop ---
-    echo "Starting processing for ${#job_queue[@]} target(s)."
-    echo "Global options applied to all: ${global_options[*]}"
-    echo "---------------------------------------------------"
+    # 3. --- Main Processing Loop ---
+    echo "Processing ${#job_queue[@]} target(s) with global options: ${global_options[*]}"
+    
+    # We use a temp file to capture output because we need to both display it 
+    # to the user (via tee) AND parse it for errors.
+    local log_file
+    log_file=$(mktemp)
+    trap 'rm -f "$log_file"' EXIT
 
     for job in "${job_queue[@]}"; do
-        # 'job' contains "portname +var1 +var2".
-        # We assume spaces separate components (standard for MacPorts names/variants).
-        # We split the string into an array to pass safely to the port command.
         read -r -a port_args <<< "$job"
         local target_name="${port_args[0]}"
+        local attempt_counter=0
+        local job_success=0
 
-        echo
-        echo "==> Processing: $job"
-        
-        # --- Attempt 1: Force Binary Installation ---
-        # -b: fail if binary archive is not found (do not build from source)
-        echo "    [Attempt 1] Trying binary installation..."
-        
-        if sudo port -b install "${port_args[@]}" "${global_options[@]}"; then
-            echo "    [Success] Installed $target_name from binary archive."
-        else
-            # --- Attempt 2: Fallback to Source Build ---
-            # Binary failed (doesn't exist, hash mismatch, or other error).
-            echo "    [Fallback]  Binary installation unavailable or failed."
-            echo "                Swapping to source build mode (-s)..."
+        echo "=========================================================="
+        echo "TARGET: $job"
+        echo "=========================================================="
+
+        while [ $attempt_counter -lt $MAX_RETRIES ]; do
+            ((attempt_counter++))
+
+            echo
+            echo "--- [Attempt $attempt_counter/$MAX_RETRIES] Binary install for: ${port_args[*]}"
             
-            # -s: install by compiling from source (bypassing binaries)
-            if sudo port -s install "${port_args[@]}" "${global_options[@]}"; then
-                 echo "    [Success] Built and installed $target_name from source."
+            # Attempt Binary Install
+            # -b: Binary only (fails if missing)
+            # -N: Non-interactive (don't ask confirmation)
+            local exit_code
+            set -o pipefail
+            sudo port -Nb install "${port_args[@]}" "${global_options[@]}" 2>&1 | tee "$log_file"
+            exit_code=$?
+            set +o pipefail
+            echo "exit code: $exit_code"
+            if [ $exit_code -eq 0 ]; then
+                echo "--> SUCCESS: Installed ${target_name} via binary."
+                job_success=1
+                break
             else
-                 echo "    [Error]   Failed to install $target_name (both binary and source attempts failed)."
-                 # Optional: exit 1 here if you want to stop on the first failure. 
-                 # Currently creates a best-effort behavior.
+            	echo "else clause"
+                echo "--> FAILED: Binary install returned exit code $exit_code."
+                
+                # --- Diagnostic Logic ---
+                # Search for the specific MacPorts error message identifying the missing binary
+                # Regex looks for: "no binary archive found for <identifier>"
+                local missing_port
+                missing_port=$(grep -E "Failed to archivefetch " "$log_file" | sed -E 's/^.+Failed to archivefetch ([a-zA-Z0-9+-_.]+): version (@[a-zA-Z0-9._+-]+):.*/\1\2/')
+
+                if [[ -n "$missing_port" ]]; then
+                    # Trim whitespace
+                    missing_port=$(echo "$missing_port" | xargs)
+                    
+                    echo "--> DIAGNOSIS: Missing binary archive for dependency: '$missing_port'"
+                    echo "--> RECOVERY:  Compiling '$missing_port' from source..."
+                    
+                    # Attempt to install ONLY the missing dependency from source
+                    # Note: We pass global options (like universal), but NOT the top-level variants
+                    # because we are installing a specific dependency by name. 
+                    # MacPorts automatically calculates required variants for dependencies 
+                    # based on the tree, or defaults.
+                    
+                    if sudo port -Ns install "$missing_port" "${global_options[@]}"; then
+                        echo "--> RECOVERY SUCCESS: '$missing_port' built and installed."
+                        echo "--> ACTION: Retrying binary install for top-level '$target_name'..."
+                        # The loop continues here, retrying the `port -b install <TopLevel>`
+                        # which should now find the dependency satisfied.
+                        continue 
+                    else
+                        echo "--> RECOVERY FAILED: Could not build '$missing_port' from source."
+                        break # Stop trying this job
+                    fi
+                else
+                    # Fallback for generic errors (checksum mismatch, configure error, etc)
+                    # OR if we couldn't parse the specific dependency name.
+                    echo "--> ERROR: Could not identify specific missing binary or encountered a generic error."
+                    echo "--> Log output checks didn't match known patterns."
+                    break 
+                fi
             fi
+        done
+
+        if [ $job_success -eq 0 ]; then
+            echo "xxx CRITICAL FAILURE: Unable to install '$target_name' after $attempt_counter attempts."
+            echo "xxx Moving to next job (if any)..."
         fi
+
     done
     
     echo

@@ -159,8 +159,8 @@ jobs:
         # The idea is to build from source everything performous actually depends on to run (so, direct and transitive RUNTIME dependencies),
         # and to install from packaged binaries everything else we need but not at runtime (i.e. cmake and various versions of python and/or compilers)
         run: |
-          set -x
           . "${{ github.workspace}}/performous/.github/try_binary_first.sh"
+          set -x
           if [[ "${{ steps.restore_cache.outputs.cache-hit }}" == "true" ]]; then
             sudo port selfupdate
             sudo port activate -f installed boost.version=${{ inputs.boost_version }}
@@ -170,9 +170,12 @@ jobs:
 
           echo buildfromsource ifneeded | tee -a /opt/local/etc/macports/macports.conf
           echo keeplogs yes | tee -a /opt/local/etc/macports/macports.conf
-          sudo port install -s icu
-          try_binary_first autoconf autoconf-archive automake bison cargo cctools clang-20 cmake docbook-xml docbook-xsl-nons flex gi-docgen git gmake gperf gtk-doc itstool meson mm-common nasm ninja p7zip perl5 pkgconfig py313-docutils py313-build py313-cython py313-installer py313-wheel python313 rust texinfo unzip vim websocketpp xmlto yasm boost.version=${{ inputs.boost_version }}
+          sudo port install -s icu gettext-runtime
 
+          set +x
+          try_binary_first autoconf autoconf-archive automake bison cargo cctools libgcc gcc15 gcc15-libcxx clang-18 cmake docbook-xml docbook-xsl-nons flex gi-docgen git gmake gperf gtk-doc itstool meson mm-common nasm ninja p7zip perl5 pkgconfig py313-docutils py313-build py313-cython py313-installer py313-wheel python313 rust texinfo unzip vim websocketpp xmlto yasm boost.version=${{ inputs.boost_version }}
+
+          set -x
           sudo port -s install ${MACOS_DEPS} boost.version=${{ inputs.boost_version }}
 
           echo "Installed ports: "
@@ -180,7 +183,7 @@ jobs:
 
           sudo port -v uninstall gcc* clang* llvm* || true
           sudo port clean --all installed
-          
+      
           # Deactivate everything but zstd before caching, in order to reduce the cache size. It's easier to do it like this than actually manually excluding zstd and its dependencies.
           sudo port -N rev-upgrade
           sudo port -N uninstall inactive || true
