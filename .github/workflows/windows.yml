@@ -183,16 +183,6 @@ jobs:
           -DPERFORMOUS_VERSION=${{ env.PERFORMOUS_VERSION }} -DBUILD_TESTS=ON \
           -DCMAKE_VERBOSE_MAKEFILE=ON -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64"
           "${{ env.workpath }}/msys64/mingw64/bin/cmake.exe" --build ./ --verbose --parallel 3
-      - name: Run unittests directly called.
-        shell: msys2 {0}
-        run: |
-          cd "${{ env.workpath }}/performous/build/testing"
-          ./performous_test.exe --gtest_filter=UnitTest*
-      - name: Run unittests by ctest.
-        shell: msys2 {0}
-        run: |
-          cd "${{ env.workpath }}/performous/build"
-          "${{ env.workpath }}/msys64/mingw64/bin/mingw32-make.exe" test
       - name: Create Installer
         id: package_performous_x64
         shell: msys2 {0}

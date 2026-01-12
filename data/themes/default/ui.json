@@ -1,0 +1,24 @@
+[
+	{ 
+		"type": "button",
+		"id": "button",
+		"frame": [ {
+				"image": "button_frame_steel.png",
+				"grid": [
+					[ 0, 0, 9, 0, 55, 0, 64, 0 ], 
+					[ 0, 9, 9, 9, 55, 9, 64, 9 ], 
+					[ 0, 55, 9, 55, 55, 55, 64, 55 ], 
+					[ 0, 64, 9, 64, 55, 64, 64, 64 ], 
+				]
+			}
+		],
+		"face": [ {
+				"image": "steel.png",
+				"scale": 0.5
+			}, {		
+				"image": "button_highlight_steel.png",
+				"scale": 0.5
+			}
+		]
+	}
+]

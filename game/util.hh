@@ -1,9 +1,11 @@
 #pragma once
 
+#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <limits>
 #include <locale>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -14,13 +16,34 @@ template <typename T> T sconv(std::string const& s);
 
 /** Limit val to range [min, max] **/
 template <typename T> constexpr T clamp(T val, T min = 0, T max = 1) {
-	return (val < min) ? min : (val > max) ? max : val;
+    return (val < min) ? min : (val > max) ? max : val;
+}
+
+// available wih c++20
+namespace std {
+    template<class Type, class Alloc, class Pred>
+    constexpr typename std::vector<Type, Alloc>::size_type erase_if(std::vector<Type, Alloc>& c, Pred pred) {
+        //		auto it = std::remove_if(c.begin(), c.end(), pred);
+        //		auto r = std::distance(it, c.end());
+        //		c.erase(it, c.end());
+        //		return r;
+        auto n = 0u;
+        for (auto it = c.begin(); it != c.end();) {
+            if (pred(*it)) {
+                it = c.erase(it);
+                ++n;
+            }
+            else
+                ++it;
+        }
+        return n;
+    }
 }
 
 template <typename Numeric> struct MinMax {
-	Numeric min, max;
-	explicit MinMax(Numeric min = std::numeric_limits<Numeric>::min(), Numeric max = std::numeric_limits<Numeric>::max()): min(min), max(max) {}
-	bool matches(Numeric val) const { return val >= min && val <= max; }
+    Numeric min, max;
+    explicit MinMax(Numeric min = std::numeric_limits<Numeric>::min(), Numeric max = std::numeric_limits<Numeric>::max()) : min(min), max(max) {}
+    bool matches(Numeric val) const { return val >= min && val <= max; }
 };
 
 /** A convenient way for getting NaNs **/
@@ -31,27 +54,31 @@ static inline constexpr double getInf() { return std::numeric_limits<double>::in
 
 /** OpenGL smoothstep function **/
 template <typename T> T smoothstep(T edge0, T edge1, T x) {
-	x = clamp((x - edge0) / (edge1 - edge0));
-	return x * x * (3 - 2 * x);
+    x = clamp((x - edge0) / (edge1 - edge0));
+    return x * x * (3 - 2 * x);
 }
 
 /** Convenience smoothstep wrapper with edges at 0 and 1 **/
 template <typename T> T smoothstep(T x) { return smoothstep<T>(0, 1, x); }
 
+std::string toLower(std::string const& s);
+std::string toUpper(std::string const& s);
+bool containsNoCase(std::string const& word, std::string const& part);
+
 /** Symetric of lock_guard: release a lock in constructor and take it back in destructor */
 template <class Lockable>
 struct UnlockGuard {
-	UnlockGuard(Lockable& m) : m_mutex(m) { m_mutex.unlock(); }
-	~UnlockGuard() { m_mutex.lock(); }
+    UnlockGuard(Lockable& m) : m_mutex(m) { m_mutex.unlock(); }
+    ~UnlockGuard() { m_mutex.lock(); }
 
-	UnlockGuard(const UnlockGuard&) = delete;
-	UnlockGuard& operator=(const UnlockGuard&) = delete;
+    UnlockGuard(const UnlockGuard&) = delete;
+    UnlockGuard& operator=(const UnlockGuard&) = delete;
 
-	private:
-	Lockable& m_mutex;
+private:
+    Lockable& m_mutex;
 };
 
-std::uint32_t stou(std::string const & str, size_t * idx = nullptr, int base = 10);
+std::uint32_t stou(std::string const& str, size_t* idx = nullptr, int base = 10);
 std::string timeFormat(std::chrono::seconds const& unixtime, std::string const& format, bool utc = false);
 std::string replaceFirst(std::string const& s, std::string const& from, std::string const& toB);
 
@@ -60,7 +87,7 @@ bool isText(std::string const& s, size_t bytesToCheck = 32);
 /** Templated conversion from strongly typed enums to the underlying type. **/
 template <typename E>
 constexpr auto to_underlying(E e) noexcept -> std::enable_if_t<std::is_enum<E>::value, std::underlying_type_t<E>> {
-	return static_cast<std::underlying_type_t<E>>(e);
+    return static_cast<std::underlying_type_t<E>>(e);
 }
 
 std::string toLower(std::string const&);
@@ -75,23 +102,36 @@ std::string trimRight(std::string const&, std::locale const& = std::locale());
 std::string& trimRight(std::string&, std::locale const& = std::locale());
 
 template <typename R> struct reverse {
-	reverse(R const& origin) : origin(origin) {}
+    reverse(R const& origin) : origin(origin) {}
 
-	auto begin() const { return origin.rbegin(); }
-	auto end() const { return origin.rend(); }
+    auto begin() const { return origin.rbegin(); }
+    auto end() const { return origin.rend(); }
 
 private:
-	R const& origin;
+    R const& origin;
 };
 
 template <typename R> struct make_iterator_range {
-	make_iterator_range(R const& begin, R const& end) : begin_it(begin), end_it(end) {}
+    make_iterator_range(R const& begin, R const& end) : begin_it(begin), end_it(end) {}
 
-	auto begin() const { return begin_it; }
-	auto end() const { return end_it; }
+    auto begin() const { return begin_it; }
+    auto end() const { return end_it; }
 
 private:
-	R const& begin_it;
-	R const& end_it;
+    R const& begin_it;
+    R const& end_it;
 };
 
+template <typename Type> Type random(Type const& min = std::numeric_limits<Type>::min(), Type const& max = std::numeric_limits<Type>::max()) {
+    static std::random_device rd;
+    //static std::mt19937 gen(rd());
+
+    if constexpr (std::is_integral<Type>::value) {
+        std::uniform_int_distribution<Type> dis(min, max);
+        return dis(rd);
+    }
+    else {
+        std::uniform_real_distribution<Type> dis(min, max);
+        return dis(rd);
+    }
+}
