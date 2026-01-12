@@ -50,6 +50,83 @@ jobs:
         uses: repolevedavaj/install-nsis@v1.0.3
         with:
           nsis-version: '3.11'
+      - name: Build modern librsvg with Cargo
+        run: |
+          cd ${{ github.workspace }}
+          # Find pkg-config installed by vcpkg
+          $pkgconf = Get-ChildItem -Path "${Env:GITHUB_WORKSPACE}\vcpkg\installed\" -Filter "pkgconf.exe" -Recurse | Select-Object -First 1
+          
+          if ($pkgconf) {
+              Write-Host "Found pkg-config at $($pkgconf.FullName)"
+              # Add it to PATH so cargo/glib-sys can find it
+              $Env:PATH = "$($pkgconf.DirectoryName);$Env:PATH"
+          } else {
+              Write-Error "pkg-config not found!"
+              exit 1;
+          }
+          # Make sure pkg-config finds all vcpkg dependencies
+          # WORKSPACE = D:\a\performous\performous\
+          # VCPKG = $WORKSPACE/vcpkg/vcpkg.exe
+          $Env:PKG_CONFIG_PATH = "${{ github.workspace }}\vcpkg\installed\x64-windows\lib\pkgconfig;${{ github.workspace }}\vcpkg\installed\x64-windows-release\lib\pkgconfig"
+
+          .\vcpkg\vcpkg.exe install --debug --binarysource="clear;files,${{ github.workspace}}\vcpkg_cache,readwrite" --overlay-triplets="D:\a\performous\performous\performous\cmake\triplets" vcpkg-tool-meson
+
+          # Clone the librsvg repository
+          git clone https://gitlab.gnome.org/GNOME/librsvg.git
+
+          cd librsvg
+          git checkout 2.60.1  # or the latest stable release
+
+          # Ensure MSVC target is set
+          rustup default stable
+          rustup target add x86_64-pc-windows-msvc
+
+          # Build librsvg with cargo for MSVC
+          New-Item -Type Directory _build
+
+          # Install meson if not already installed
+          python3.exe -m pip install --upgrade pip
+          python3.exe -m pip install meson
+          cargo install cargo-c
+
+          # Make sure pkg-config finds all vcpkg dependencies
+          # WORKSPACE = D:\a\performous\performous\
+          # VCPKG = $WORKSPACE/vcpkg/vcpkg.exe
+          #Write-Host "$($Env:PATH)"
+          $Env:PKG_CONFIG_PATH = "${{ github.workspace }}\vcpkg\installed\x64-windows\lib\pkgconfig;${{ github.workspace }}\vcpkg\installed\x64-windows-release\lib\pkgconfig"
+          $Env:PKG_CONFIG = "$($pkgconf.FullName)"
+          # Force Rust library to be built as cdylib (DLL)
+          $Env:CARGO_CBUILD_LIBRARY_TYPE="cdylib"
+          
+          # Optional: prefer dynamic linking for Rust dependencies
+          $Env:RUSTFLAGS="-Cprefer-dynamic"
+
+          $Env:VERBOSE=1
+          $Env:WINAPI_NO_BUNDLED_LIBRARIES=1
+
+
+          meson setup _build `
+                --wrap-mode=nodownload `
+                --buildtype=plain `
+                --default-library=shared `
+                --default-both-libraries=shared `
+                --prefix="${{ github.workspace }}\vcpkg\installed\x64-windows-release" `
+                -Ddocs=disabled `
+                -Dintrospection=auto `
+                -Dpixbuf=auto `
+                -Dpixbuf-loader=disabled `
+                -Dvala=disabled `
+                -Davif=disabled `
+                -Dintrospection=disabled `
+                -Dtests=false `
+                -Dc_link_args=/FORCE:MULTIPLE `
+
+          meson compile -v -C _build
+          meson install -C _build
+          # Show output
+          tree "${{ github.workspace }}\librsvg\" /F /A
+          # exit 1;
+
       - name: Run cmake to configure the project and build it
         env:
           PERFORMOUS_VERSION: ${{ inputs.package_complete_version }}
