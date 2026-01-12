@@ -75,7 +75,7 @@ jobs:
           git clone https://gitlab.gnome.org/GNOME/librsvg.git
 
           cd librsvg
-          git checkout 2.61.3  # or the latest stable release
+          git checkout 2.60.1  # or the latest stable release
 
           # Ensure MSVC target is set
           rustup default stable
@@ -102,13 +102,30 @@ jobs:
           $Env:RUSTFLAGS="-Cprefer-dynamic"
 
           $Env:VERBOSE=1
+          $Env:WINAPI_NO_BUNDLED_LIBRARIES=1
 
-          meson setup _build -Ddocs=disabled -Dintrospection=auto -Dpixbuf=auto -Dvala=disabled -Davif=disabled -Dtests=false --prefix="${{ github.workspace }}\vcpkg\installed\x64-windows-release"
+
+          meson setup _build `
+                --wrap-mode=nodownload `
+                --buildtype=plain `
+                --default-library=shared `
+                --default-both-libraries=shared `
+                --prefix="${{ github.workspace }}\vcpkg\installed\x64-windows-release" `
+                -Ddocs=disabled `
+                -Dintrospection=auto `
+                -Dpixbuf=auto `
+                -Dpixbuf-loader=disabled `
+                -Dvala=disabled `
+                -Davif=disabled `
+                -Dintrospection=disabled `
+                -Dtests=false `
+                -Dc_link_args=/FORCE:MULTIPLE `
+
           meson compile -v -C _build
           meson install -C _build
           # Show output
           tree "${{ github.workspace }}\librsvg\" /F /A
-          exit 1;
+          # exit 1;
 
       - name: Run cmake to configure the project and build it
         env:
