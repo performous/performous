@@ -50,11 +50,8 @@ if(GTest_FOUND)
 	
 	add_executable(performous_test ${SOURCES})
 
-	find_package(Boost 1.55 REQUIRED COMPONENTS program_options iostreams locale OPTIONAL_COMPONENTS system)
-	if(Boost_VERSION VERSION_LESS "1.69.0" AND NOT TARGET Boost::system)
-		message(FATAL_ERROR "Boost::system component is required but not found (Boost ${Boost_VERSION})")
-	endif()
-	target_link_libraries(performous_test PRIVATE Boost::boost Boost::iostreams Boost::program_options Boost::locale $<TARGET_NAME_IF_EXISTS:Boost::system>)
+	find_package(Boost 1.70 CONFIG REQUIRED COMPONENTS program_options iostreams locale)
+	target_link_libraries(performous_test PRIVATE Boost::boost Boost::iostreams Boost::program_options Boost::locale)
 
 	find_package(fmt 8.1 REQUIRED CONFIG)
 	target_link_libraries(performous_test PRIVATE fmt::fmt)

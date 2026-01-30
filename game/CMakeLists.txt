@@ -85,14 +85,8 @@ set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES})
 add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES})
 # Libraries
 
-find_package(Boost 1.55 CONFIG QUIET COMPONENTS program_options iostreams locale OPTIONAL_COMPONENTS system)
-if(NOT Boost_FOUND)
-  find_package(Boost 1.55 REQUIRED COMPONENTS program_options iostreams locale OPTIONAL_COMPONENTS system)
-endif()
-if(Boost_VERSION VERSION_LESS "1.69.0" AND NOT TARGET Boost::system)
-  message(FATAL_ERROR "Boost::system component is required but not found (Boost ${Boost_VERSION})")
-endif()
-target_link_libraries(performous PRIVATE Boost::boost Boost::program_options Boost::iostreams Boost::locale $<TARGET_NAME_IF_EXISTS:Boost::system>)
+find_package(Boost 1.70 CONFIG REQUIRED COMPONENTS program_options iostreams locale)
+target_link_libraries(performous PRIVATE Boost::boost Boost::program_options Boost::iostreams Boost::locale)
 
 find_package(ICU 65 REQUIRED uc data i18n io)
 target_link_libraries(performous PRIVATE ICU::uc ICU::data ICU::i18n ICU::io)
@@ -224,7 +218,7 @@ endif()
 if(cpprestsdk_FOUND OR CppRest_FOUND)
 	# add other required dependencies then
 	# FIXME: move this to the CppRest package includes if possible
-	find_package(Boost 1.55 REQUIRED COMPONENTS chrono thread)
+	find_package(Boost 1.70 CONFIG REQUIRED COMPONENTS chrono thread)
 	find_package(OpenSSL REQUIRED)
 	if(cpprestsdk_FOUND)
 		target_link_libraries(performous PRIVATE cpprestsdk::cpprest)
