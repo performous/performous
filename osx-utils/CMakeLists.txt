@@ -45,7 +45,7 @@ file(WRITE
 	"${PERFORMOUS_FONTS_CONF}")
 
 file(GLOB fontconfig_rules "${PERFORMOUS_SYSTEM_PREFIX}/etc/fonts/conf.d/*")
-file(MAKE_DIRECTORY "${CMAKE_INSTALL_SYSCONFDIR}/fonts/conf.d")
+file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_SYSCONFDIR}/fonts/conf.d")
 
 # Iterate over the files and resolve symlinks
 foreach(file_path ${fontconfig_rules})
