@@ -92,7 +92,7 @@ try_binary_first() {
             # -N: Non-interactive (don't ask confirmation)
             local exit_code
             set -o pipefail
-            sudo port -Nb install "${port_args[@]}" "${global_options[@]}" 2>&1 | tee "$log_file"
+            sudo port -Npb install "${port_args[@]}" "${global_options[@]}" 2>&1 | tee "$log_file"
             exit_code=$?
             set +o pipefail
             echo "exit code: $exit_code"

@@ -162,8 +162,10 @@ jobs:
           . "${{ github.workspace}}/performous/.github/try_binary_first.sh"
           set -x
           if [[ "${{ steps.restore_cache.outputs.cache-hit }}" == "true" ]]; then
-            sudo port selfupdate
+            echo "Installed but inactive ports: "
+            sudo port -v installed inactive
             sudo port activate -f installed boost.version=${{ inputs.boost_version }}
+            sudo port -v sync
           else
             sudo portindex /opt/custom_portfiles
           fi
@@ -205,6 +207,8 @@ jobs:
           echo "log_path=/opt/local/var/macports/MacPorts-log-${{ matrix.os }}.tar.gz" >> $GITHUB_OUTPUT
       - name: Cache dependencies
         uses: Lord-Kamina/always-upload-cache/save@refresh-cache
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           refresh-cache: true
           # Due to a very long-standing bug in cache, excluding only works if all specified paths have the same depth.
