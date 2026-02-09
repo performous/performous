@@ -172,7 +172,7 @@ void RequestHandler::Get(web::http::http_request request)
 		web::json::value jsonRoot = web::json::value::array();
 		unsigned i = 0;
 		for (auto const& song : m_game.getCurrentPlayList().getList()) {
-			web::json::value songObject = SongToJsonObject(m_songs[i]);
+			web::json::value songObject = SongToJsonObject(song);
 			songObject[utility::conversions::to_string_t("Duration")] = web::json::value(song->getDurationSeconds());
 			jsonRoot[i] = songObject;
 			i++;
