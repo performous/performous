@@ -342,10 +342,26 @@ web::json::value RequestHandler::SongToJsonObject(std::shared_ptr<Song> song) {
 	return songObject;
 }
 
-web::json::value RequestHandler::SongsToJsonObject() {
+web::json::value RequestHandler::SongsToJsonObject(size_t start, size_t limit) {
+	size_t startIndex = start;
+	size_t endIndex;
+	size_t limitCount = limit;
+	size_t songCount = m_songs.size();
+
+	if (startIndex > songCount) {
+		startIndex = songCount;
+	}
+	if (limitCount < 1) {
+		limitCount = songCount;
+	}
+	endIndex = startIndex + limitCount;
+	if (endIndex > songCount) {
+		endIndex = songCount;
+	}
+
 	web::json::value jsonRoot = web::json::value::array();
-	for (size_t i = 0; i < m_songs.size(); i++) {
-		jsonRoot[i] = SongToJsonObject(m_songs[i]);
+	for (size_t i = startIndex; i < endIndex; i++) {
+		jsonRoot[i - startIndex] = SongToJsonObject(m_songs[i]);
 	}
 
 	return jsonRoot;
