@@ -162,16 +162,8 @@ void RequestHandler::Get(web::http::http_request request)
 		web::json::value jsonRoot = web::json::value::array();
 		unsigned i = 0;
 		for (auto const& song : m_game.getCurrentPlayList().getList()) {
-			web::json::value songObject = web::json::value::object();
-			songObject[utility::conversions::to_string_t("Title")] = web::json::value::string(utility::conversions::to_string_t(song->title));
-			songObject[utility::conversions::to_string_t("Artist")] = web::json::value::string(utility::conversions::to_string_t(song->artist));
-			songObject[utility::conversions::to_string_t("Edition")] = web::json::value::string(utility::conversions::to_string_t(song->edition));
-			songObject[utility::conversions::to_string_t("Language")] = web::json::value::string(utility::conversions::to_string_t(song->language));
-			songObject[utility::conversions::to_string_t("Creator")] = web::json::value::string(utility::conversions::to_string_t(song->creator));
+			web::json::value songObject = SongToJsonObject(m_songs[i]);
 			songObject[utility::conversions::to_string_t("Duration")] = web::json::value(song->getDurationSeconds());
-			songObject[utility::conversions::to_string_t("HasError")] = web::json::value::boolean(song->loadStatus == Song::LoadStatus::PARSERERROR);
-			songObject[utility::conversions::to_string_t("ProvidedBy")] = web::json::value(utility::conversions::to_string_t(song->providedBy));
-			songObject[utility::conversions::to_string_t("Comment")] = web::json::value(utility::conversions::to_string_t(song->comment));
 			jsonRoot[i] = songObject;
 			i++;
 		}
@@ -287,16 +279,7 @@ void RequestHandler::Post(web::http::http_request request)
 		m_songs.setFilter(query);
 		web::json::value jsonRoot = web::json::value::array();
 		for (size_t i = 0; i < m_songs.size(); i++) {
-			web::json::value songObject = web::json::value::object();
-			songObject[utility::conversions::to_string_t("Title")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->title));
-			songObject[utility::conversions::to_string_t("Artist")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->artist));
-			songObject[utility::conversions::to_string_t("Edition")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->edition));
-			songObject[utility::conversions::to_string_t("Language")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->language));
-			songObject[utility::conversions::to_string_t("Creator")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->creator));
-			songObject[utility::conversions::to_string_t("HasError")] = web::json::value::boolean(m_songs[i]->loadStatus == Song::LoadStatus::PARSERERROR);
-			songObject[utility::conversions::to_string_t("ProvidedBy")] = web::json::value(utility::conversions::to_string_t(m_songs[i]->providedBy));
-			songObject[utility::conversions::to_string_t("Comment")] = web::json::value(utility::conversions::to_string_t(m_songs[i]->comment));
-			jsonRoot[i] = songObject;
+			jsonRoot[i] = SongToJsonObject(m_songs[i]);
 		}
 		request.reply(web::http::status_codes::OK, jsonRoot);
 		return;
@@ -334,21 +317,26 @@ web::json::value RequestHandler::ExtractJsonFromRequest(web::http::http_request 
 		return jsonBody;
 }
 
+web::json::value RequestHandler::SongToJsonObject(std::shared_ptr<Song> song) {
+	web::json::value songObject = web::json::value::object();
+	songObject[utility::conversions::to_string_t("Title")] = web::json::value::string(utility::conversions::to_string_t(song->title));
+	songObject[utility::conversions::to_string_t("Artist")] = web::json::value::string(utility::conversions::to_string_t(song->artist));
+	songObject[utility::conversions::to_string_t("Edition")] = web::json::value::string(utility::conversions::to_string_t(song->edition));
+	songObject[utility::conversions::to_string_t("Language")] = web::json::value::string(utility::conversions::to_string_t(song->language));
+	songObject[utility::conversions::to_string_t("Creator")] = web::json::value::string(utility::conversions::to_string_t(song->creator));
+	songObject[utility::conversions::to_string_t("name")] = web::json::value::string(utility::conversions::to_string_t(song->artist + " " + song->title));
+	songObject[utility::conversions::to_string_t("HasError")] = web::json::value::boolean(song->loadStatus == Song::LoadStatus::PARSERERROR);
+	songObject[utility::conversions::to_string_t("ProvidedBy")] = web::json::value(utility::conversions::to_string_t(song->providedBy));
+	songObject[utility::conversions::to_string_t("Comment")] = web::json::value(utility::conversions::to_string_t(song->comment));
+	songObject[utility::conversions::to_string_t("Tags")] = web::json::value(utility::conversions::to_string_t(song->tags));
+
+	return songObject;
+}
 
 web::json::value RequestHandler::SongsToJsonObject() {
 	web::json::value jsonRoot = web::json::value::array();
 	for (size_t i = 0; i < m_songs.size(); i++) {
-		web::json::value songObject = web::json::value::object();
-		songObject[utility::conversions::to_string_t("Title")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->title));
-		songObject[utility::conversions::to_string_t("Artist")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->artist));
-		songObject[utility::conversions::to_string_t("Edition")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->edition));
-		songObject[utility::conversions::to_string_t("Language")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->language));
-		songObject[utility::conversions::to_string_t("Creator")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->creator));
-		songObject[utility::conversions::to_string_t("name")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->artist + " " + m_songs[i]->title));
-		songObject[utility::conversions::to_string_t("HasError")] = web::json::value::boolean(m_songs[i]->loadStatus == Song::LoadStatus::PARSERERROR);
-		songObject[utility::conversions::to_string_t("ProvidedBy")] = web::json::value(utility::conversions::to_string_t(m_songs[i]->providedBy));
-		songObject[utility::conversions::to_string_t("Comment")] = web::json::value(utility::conversions::to_string_t(m_songs[i]->comment));
-		jsonRoot[i] = songObject;
+		jsonRoot[i] = SongToJsonObject(m_songs[i]);
 	}
 
 	return jsonRoot;
@@ -364,7 +352,8 @@ std::shared_ptr<Song> RequestHandler::GetSongFromJSON(web::json::value jsonDoc) 
 			m_songs[i]->language == utility::conversions::to_utf8string(jsonDoc[utility::conversions::to_string_t("Language")].as_string()) &&
 			m_songs[i]->creator == utility::conversions::to_utf8string(jsonDoc[utility::conversions::to_string_t("Creator")].as_string()) &&
 			m_songs[i]->providedBy == utility::conversions::to_utf8string(jsonDoc[utility::conversions::to_string_t("ProvidedBy")].as_string()) &&
-			m_songs[i]->comment == utility::conversions::to_utf8string(jsonDoc[utility::conversions::to_string_t("Comment")].as_string())) {
+			m_songs[i]->comment == utility::conversions::to_utf8string(jsonDoc[utility::conversions::to_string_t("Comment")].as_string()) &&
+			m_songs[i]->tags == utility::conversions::to_utf8string(jsonDoc[utility::conversions::to_string_t("Tags")].as_string())) {
 				SpdLogger::info(LogSystem::WEBSERVER, "Found requested song, {} - {}", m_songs[i]->artist, m_songs[i]->title);
 				return m_songs[i];
 		}
@@ -394,6 +383,9 @@ std::vector<std::string> RequestHandler::GetTranslationKeys() {
 		translate_noop("Language"),
 		translate_noop("Edition"),
 		translate_noop("Creator"),
+		translate_noop("Provided by"),
+		translate_noop("Comment"),
+		translate_noop("Tags"),
 		translate_noop("Sort order"),
 		translate_noop("Normal"),
 		translate_noop("Inverted"),
