@@ -238,7 +238,7 @@ void RequestHandler::Post(web::http::http_request request)
 		request.reply(web::http::status_codes::OK, "success");
 		return;
 	}
-	else if (path == "/api/add") {
+	else if (path == "/api/add" || path == "/api/add/priority" || path =="/api/add/play") {
 		m_songs.setFilter("");
 		std::shared_ptr<Song> songPointer = GetSongFromJSON(jsonPostBody);
 		if (!songPointer) {
@@ -256,6 +256,17 @@ void RequestHandler::Post(web::http::http_request request)
 		else {
 			SpdLogger::debug(LogSystem::WEBSERVER, "Adding {} - {} to the playlist.", songPointer->artist, songPointer->title);
 			m_game.getCurrentPlayList().addSong(songPointer);
+
+			if (path == "/api/add/priority" || path == "/api/add/play") {
+				m_game.getCurrentPlayList().move(m_game.getCurrentPlayList().getList().size() - 1, 0);
+
+				if (path == "/api/add/play") {
+					std::shared_ptr<Song> songToPlay = m_game.getCurrentPlayList().getNext();
+					m_game.activateScreen("Sing");
+					ScreenSing& ss = dynamic_cast<ScreenSing&>(*m_game.getScreen("Sing"));
+					ss.setSong(songToPlay);
+				}
+			}
 			ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(m_game.getScreen("Playlist"));
 			m_pp->triggerSongListUpdate();
 
