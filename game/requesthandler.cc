@@ -350,10 +350,16 @@ void RequestHandler::Post(web::http::http_request request)
 	else if (path == "/api/search") {
 		auto query = utility::conversions::to_utf8string(jsonPostBody[utility::conversions::to_string_t("query")].as_string());
 		m_songs.setFilter(query);
-		web::json::value jsonRoot = web::json::value::array();
-		for (size_t i = 0; i < m_songs.size(); i++) {
-			jsonRoot[i] = SongToJsonObject(m_songs[i]);
+		size_t offset = 0;
+		size_t limit = 0;
+
+		if (!jsonPostBody[utility::conversions::to_string_t("offset")].is_null() && jsonPostBody[utility::conversions::to_string_t("offset")].is_number()) {
+			offset = jsonPostBody[utility::conversions::to_string_t("offset")].as_number().to_uint32();
 		}
+		if (!jsonPostBody[utility::conversions::to_string_t("limit")].is_null() && jsonPostBody[utility::conversions::to_string_t("limit")].is_number()) {
+			limit = jsonPostBody[utility::conversions::to_string_t("limit")].as_number().to_uint32();
+		}
+		web::json::value jsonRoot = SongsToJsonObject(offset, limit);
 		request.reply(web::http::status_codes::OK, jsonRoot);
 		return;
 	}
