@@ -347,6 +347,24 @@ void RequestHandler::Post(web::http::http_request request)
 			return;
 		}
 	}
+	else if (path == "/api/skip") {
+		try {
+			m_game.activateScreen("Playlist");
+
+			request.reply(web::http::status_codes::OK, "success");
+			return;
+		}
+		catch (web::json::json_exception const& e) {
+			std::string str = std::string("JSON Exception: ") + e.what();
+			request.reply(web::http::status_codes::BadRequest, str);
+			return;
+		}
+		catch (const std::exception& e) {
+			std::string str = std::string("Exception: ") + e.what();
+			request.reply(web::http::status_codes::BadRequest, str);
+			return;
+		}
+	}
 	else if (path == "/api/search") {
 		try {
 			auto query = utility::conversions::to_utf8string(jsonPostBody[utility::conversions::to_string_t("query")].as_string());
