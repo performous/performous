@@ -334,6 +334,10 @@ void RequestHandler::Post(web::http::http_request request)
 		}
 		try {
 			unsigned songIdToPlay = jsonPostBody[utility::conversions::to_string_t("songId")].as_number().to_uint32();
+			if (songIdToPlay - 1 > m_game.getCurrentPlayList().getList().size()) {
+				request.reply(web::http::status_codes::BadRequest, "No song at position \"" + std::to_string(songIdToPlay + 1) + "\".");
+				return;
+			}
 			std::shared_ptr<Song> songToPlay = m_game.getCurrentPlayList().getSong(songIdToPlay);
 			ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(m_game.getScreen("Playlist"));
 			m_pp->triggerSongListUpdate();
