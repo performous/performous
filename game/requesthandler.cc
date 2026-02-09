@@ -1,6 +1,8 @@
 #include "requesthandler.hh"
 #include "unicode.hh"
 #include "game.hh"
+#include "screen_sing.hh"
+#include "screen_playlist.hh"
 
 #include <cstdint>
 
