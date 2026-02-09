@@ -185,6 +185,27 @@ void RequestHandler::Get(web::http::http_request request)
 		request.reply(web::http::status_codes::OK, std::to_string(config["game/playlist_screen_timeout"].ui()));
 		return;
 	}
+	else if (path == "/api/getCurrentSong") {
+		auto const& screen = m_game.getCurrentScreen();
+
+		if (!screen || (screen->getName() != "Sing" && screen->getName() != "Playlist")) {
+			request.reply(web::http::status_codes::OK, web::json::value::null());
+			return;
+		}
+		if (screen->getName() == "Playlist") {
+			ScreenPlaylist* playlistScreen = dynamic_cast<ScreenPlaylist*>(screen);
+			request.reply(web::http::status_codes::OK, web::json::value::number(playlistScreen->getTimer()));
+			return;
+		}
+
+		ScreenSing* singScreen = dynamic_cast<ScreenSing*>(screen);
+
+		web::json::value songObject = SongToJsonObject(singScreen->getSong());
+		songObject[utility::conversions::to_string_t("Position")] = web::json::value(singScreen->getSongPosition());
+
+		request.reply(web::http::status_codes::OK, songObject);
+		return;
+	}
 	else {
 		HandleFile(request);
 	}
