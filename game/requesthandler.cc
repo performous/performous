@@ -325,6 +325,28 @@ void RequestHandler::Post(web::http::http_request request)
 			return;
 		}
 	}
+	else if (path == "/api/play") {
+		if (m_game.getCurrentPlayList().isEmpty()) {
+			request.reply(web::http::status_codes::BadRequest, "Playlist is empty.");
+			return;
+		}
+		try {
+			unsigned songIdToPlay = jsonPostBody[utility::conversions::to_string_t("songId")].as_number().to_uint32();
+			std::shared_ptr<Song> songToPlay = m_game.getCurrentPlayList().getSong(songIdToPlay);
+			ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(m_game.getScreen("Playlist"));
+			m_pp->triggerSongListUpdate();
+			m_game.activateScreen("Sing");
+			ScreenSing& ss = dynamic_cast<ScreenSing&>(*m_game.getScreen("Sing"));
+			ss.setSong(songToPlay);
+			request.reply(web::http::status_codes::OK, "success");
+			return;
+		}
+		catch (std::exception const& e) {
+			std::string str = std::string("JSON Exception: ") + e.what();
+			request.reply(web::http::status_codes::BadRequest, str);
+			return;
+		}
+	}
 	else if (path == "/api/search") {
 		auto query = utility::conversions::to_utf8string(jsonPostBody[utility::conversions::to_string_t("query")].as_string());
 		m_songs.setFilter(query);
