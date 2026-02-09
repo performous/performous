@@ -198,7 +198,16 @@ void RequestHandler::Post(web::http::http_request request)
 		return;
 	}
 
-	if (path == "/api/add") {
+	if (path == "/api/check") {
+		m_songs.setFilter("");
+		std::shared_ptr<Song> songPointer = GetSongFromJSON(jsonPostBody);
+		if (!songPointer || songPointer->loadStatus == Song::LoadStatus::PARSERERROR) {
+			request.reply(web::http::status_codes::NotFound, "not found");
+		}
+		request.reply(web::http::status_codes::OK, "success");
+		return;
+	}
+	else if (path == "/api/add") {
 		m_songs.setFilter("");
 		std::shared_ptr<Song> songPointer = GetSongFromJSON(jsonPostBody);
 		if (!songPointer) {
