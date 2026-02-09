@@ -46,6 +46,11 @@ class ScreenSing: public Screen {
 	bool singingDuet() const { return m_singingDuet; }
 	void setupVocals();
 
+	/** Seek to a specific position in the current song.
+	 * @param offset the position to seek to, in seconds.
+	 **/
+	void seek(unsigned double offset);
+
 	void setSong (std::shared_ptr<Song> song_)
 	{
 		m_song = song_;

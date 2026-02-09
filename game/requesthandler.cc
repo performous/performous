@@ -328,22 +328,40 @@ void RequestHandler::Post(web::http::http_request request)
 		}
 	}
 	else if (path == "/api/play") {
-		if (m_game.getCurrentPlayList().isEmpty()) {
+		bool isSeeking = jsonPostBody[utility::conversions::to_string_t("seek")].is_number();
+		if (m_game.getCurrentPlayList().isEmpty() && !isSeeking) {
 			request.reply(web::http::status_codes::BadRequest, "Playlist is empty.");
 			return;
 		}
 		try {
-			unsigned songIdToPlay = jsonPostBody[utility::conversions::to_string_t("songId")].as_number().to_uint32();
-			if (songIdToPlay - 1 > m_game.getCurrentPlayList().getList().size()) {
-				request.reply(web::http::status_codes::BadRequest, "No song at position \"" + std::to_string(songIdToPlay) + "\".");
-				return;
+			if (jsonPostBody[utility::conversions::to_string_t("songId")].is_null() || !jsonPostBody[utility::conversions::to_string_t("songId")].is_number()) {
+				if (!isSeeking) {
+					request.reply(web::http::status_codes::BadRequest, "Provided song id is not a number. Please make a valid request.");
+					return;
+				}
 			}
-			std::shared_ptr<Song> songToPlay = m_game.getCurrentPlayList().getSong(songIdToPlay);
-			ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(m_game.getScreen("Playlist"));
-			m_pp->triggerSongListUpdate();
-			m_game.activateScreen("Sing");
-			ScreenSing& ss = dynamic_cast<ScreenSing&>(*m_game.getScreen("Sing"));
-			ss.setSong(songToPlay);
+			else {
+				unsigned songIdToPlay = jsonPostBody[utility::conversions::to_string_t("songId")].as_number().to_uint32();
+				if (songIdToPlay > m_game.getCurrentPlayList().getList().size()) {
+					request.reply(web::http::status_codes::BadRequest, "No song at position \"" + std::to_string(songIdToPlay) + "\".");
+					return;
+				}
+				std::shared_ptr<Song> songToPlay = m_game.getCurrentPlayList().getSong(songIdToPlay);
+				ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(m_game.getScreen("Playlist"));
+				m_pp->triggerSongListUpdate();
+				m_game.activateScreen("Sing");
+				ScreenSing& ss = dynamic_cast<ScreenSing&>(*m_game.getScreen("Sing"));
+				ss.setSong(songToPlay);
+			}
+			if (isSeeking) {
+				if (!m_game.getCurrentScreen() || m_game.getCurrentScreen()->getName() != "Sing" || !dynamic_cast<ScreenSing&>(*m_game.getScreen("Sing")).getSong()) {
+					request.reply(web::http::status_codes::BadRequest, "No song is currently playing. Cannot seek.");
+					return;
+				}
+				double seekTo = jsonPostBody[utility::conversions::to_string_t("seek")].as_number().to_double();
+				ScreenSing& ss = dynamic_cast<ScreenSing&>(*m_game.getScreen("Sing"));
+				ss.seek(seekTo);
+			}
 			request.reply(web::http::status_codes::OK, "success");
 			return;
 		}
