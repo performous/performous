@@ -260,7 +260,7 @@ void RequestHandler::Post(web::http::http_request request)
 			m_game.getCurrentPlayList().addSong(songPointer);
 
 			if (path == "/api/add/priority" || path == "/api/add/play") {
-				m_game.getCurrentPlayList().move(m_game.getCurrentPlayList().getList().size() - 1, 0);
+				m_game.getCurrentPlayList().move(static_cast<unsigned int>(m_game.getCurrentPlayList().getList().size()) - 1, 0);
 
 				if (path == "/api/add/play") {
 					std::shared_ptr<Song> songToPlay = m_game.getCurrentPlayList().getNext();
