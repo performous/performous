@@ -49,7 +49,7 @@ class ScreenSing: public Screen {
 	/** Seek to a specific position in the current song.
 	 * @param offset the position to seek to, in seconds.
 	 **/
-	void seek(unsigned double offset);
+	void seek(double offset);
 
 	void setSong (std::shared_ptr<Song> song_)
 	{

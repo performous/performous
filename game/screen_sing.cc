@@ -148,7 +148,7 @@ void ScreenSing::setupVocals() {
 	m_audio.pause(false);
 }
 
-void ScreenSing::seek(unsigned double offset) {
+void ScreenSing::seek(double offset) {
 	// Seeking backwards is currently not permitted for dance songs
 	if (offset >= m_audio.getPosition() || m_song->danceTracks.empty()) {
 		m_audio.seekPos(offset);
