@@ -98,6 +98,10 @@ SongParser::SongParser(Song& s) : m_song(s) {
 				s.m_bpms.clear();
 				addBPM(0, bpm);
 			}
+			// Ensure MIDI filename is known before parsing (for songs that need MIDI)
+			if (s.midifilename.empty()) {
+				guessFiles();
+			}
 			if (s.type == Song::Type::TXT) txtParse();
 			else if (s.type == Song::Type::INI) midParse();  // INI doesn't contain notes, parse those from MIDI
 			else if (s.type == Song::Type::XML) xmlParse();
