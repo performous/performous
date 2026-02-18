@@ -57,6 +57,10 @@ to save the current settings to XML.
 		<short>Difficulty</short>
 		<long>Game difficulty.</long>
 	</entry>
+	<entry name="game/kids_keep_playing" type="bool" value="false">
+		<short>Kids Mode Keep Playing</short>
+		<long>When enabled, the track keeps playing when someone misses a note in Kids difficulty mode, but still plays the failure sound.</long>
+	</entry>
 
 	<entry name="game/Textstyle" type="uint" value="0">
 		<limits>

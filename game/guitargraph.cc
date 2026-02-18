@@ -417,7 +417,13 @@ void GuitarGraph::engine() {
 		++m_chordIt;
 	}
 	// Start decreasing correctness instantly if the current note is being played late (don't wait until maxTolerance)
-	if (m_chordIt != m_chords.end() && m_chordIt->begin < time && m_chordIt->status == 0) m_correctness.setTarget(0.0);
+	if (m_chordIt != m_chords.end() && m_chordIt->begin < time && m_chordIt->status == 0) {
+		// In Kids mode with "keep playing" option enabled, don't fail correctness (mute the track)
+		bool kidsKeepPlaying = (m_level == Difficulty::KIDS) && config["game/kids_keep_playing"].b();
+		if (!kidsKeepPlaying) {
+			m_correctness.setTarget(0.0);
+		}
+	}
 	// Process holds
 	if (!m_drums) {
 		// FIXME: Why do we have per-fret hold handling, why not just as a part of the current chord?
@@ -499,7 +505,13 @@ void GuitarGraph::endHold(unsigned fret, double time) {
 			if (time > chord.begin + maxTolerance && time < chord.end - maxTolerance) {
 				chord.releaseTimes[fret] = time;
 				if (time >= chord.end - maxTolerance) chord.passed = true; // Mark as past note for rewinding
-				else m_correctness.setValue(0.0f);  // Note: if still holding some frets, proper percentage will be set in hold handling
+				else {
+					// In Kids mode with "keep playing" option enabled, don't fail correctness (mute the track)
+					bool kidsKeepPlaying = (m_level == Difficulty::KIDS) && config["game/kids_keep_playing"].b();
+					if (!kidsKeepPlaying) {
+						m_correctness.setValue(0.0f);  // Note: if still holding some frets, proper percentage will be set in hold handling
+					}
+				}
 				break;
 			}
 		}
@@ -521,7 +533,11 @@ void GuitarGraph::fail(double time, int fret) {
 		// kids tend to play a lot of extra notes just for the fun of it.
 		// need to make sure they don't end up with a score of zero
 		m_score -= (m_level == Difficulty::KIDS) ? points(0)/2.0f : points(0);
-		m_correctness.setTarget(0.0, true);  // Instantly fail correctness
+		// In Kids mode with "keep playing" option enabled, don't fail correctness (mute the track)
+		bool kidsKeepPlaying = (m_level == Difficulty::KIDS) && config["game/kids_keep_playing"].b();
+		if (!kidsKeepPlaying) {
+			m_correctness.setTarget(0.0, true);  // Instantly fail correctness
+		}
 	}
 	endStreak();
 }
