@@ -440,10 +440,8 @@ void GuitarGraph::engine() {
 			double t = last - ev.holdTime;
 			if (t < 0) continue;  // FIXME: What is this for, rewinding?
 			// Is the hold being played correctly?
-			bool early = time - ev.dur->begin < 1.5;  // At the beginning we don't require whammy
-			bool whammy = ev.whammy.get() > 0.01f;
-			bool godmode = m_starpower.get() > 0.01f;
-			if (early || whammy || godmode) ++count;
+			// Just holding the fret button sustains the note
+			++count;
 			// Score for holding
 			m_score += t * 50.0f * m_correctness.get();
 			// Whammy fills starmeter much faster
