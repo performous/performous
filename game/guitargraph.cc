@@ -427,7 +427,9 @@ void GuitarGraph::engine() {
 	// - Only after we are so much past them that they can no longer be played (maxTolerance)
 	// - For chords played or skipped by playing (i.e. play another chord that quickly follows), ++m_chordIt is done elsewhere
 	while (m_chordIt != m_chords.end() && m_chordIt->begin + maxTolerance < time) {
-		if (m_chordIt->status < m_chordIt->polyphony) endStreak();
+		// For guitar, status is 0/1/2 (not played/tapped/picked). For drums, status counts pads hit (0 to polyphony).
+		bool chordMissed = m_drums ? (m_chordIt->status < m_chordIt->polyphony) : (m_chordIt->status == 0);
+		if (chordMissed) endStreak();
 		// Calculate solo total score
 		if (m_solo) { m_soloScore += m_chordIt->score; m_soloTotal += static_cast<float>(m_chordIt->polyphony) * static_cast<float>(points(0));
 		// Solo just ended?
