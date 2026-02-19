@@ -23,6 +23,7 @@
 #include "graphic/video_driver.hh"
 
 #include <fmt/format.h>
+#include <algorithm>
 #include <iostream>
 #include <stdexcept>
 #include <cmath>
@@ -121,12 +122,21 @@ void ScreenSing::setupVocals() {
 		Engine::VocalTrackPtrs selectedTracks;
 		auto& analyzers = m_audio.analyzers();
 		//size_t players = (analyzers.empty() ? 1 : analyzers.size());  // Always at least 1; should be number of mics
-		std::set<VocalTrack*> shownTracks;  // Tracks to be included in layout_singer (stored by name for proper sorting and merging duplicates)
+		std::vector<VocalTrack*> shownTracks;  // Tracks to be included in layout_singer (preserve player order, merge duplicates)
 		for (size_t player = 0; player < players(); ++player) {
 			VocalTrack* vocal = &m_song->getVocalTrack(m_vocalTracks[(m_duet.ui() == 0u ? player : 0u)].ui());
 			selectedTracks.push_back(vocal);
-			shownTracks.insert(vocal);
+			if (std::find(shownTracks.begin(), shownTracks.end(), vocal) == shownTracks.end()) {
+				shownTracks.push_back(vocal);
+			}
 		}
+
+		std::string shownTracksStr;
+		for (size_t i = 0; i < shownTracks.size(); ++i) {
+			if (!shownTracksStr.empty()) shownTracksStr += ", ";
+			shownTracksStr += shownTracks[i]->name;
+		}
+		SpdLogger::debug(LogSystem::SINGING, "Vocal layout order={} (top-to-bottom)", shownTracksStr);
 
 		//if (shownTracks.size() > 2) throw std::runtime_error("Too many tracks chosen. Only two vocal tracks can be used simultaneously.")
 		for (auto const& trk: shownTracks) {

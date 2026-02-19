@@ -63,9 +63,15 @@ void SongParser::midParseHeader() {
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
 		std::string name = it->name;
-		if (mangleTrackName(name)) ; // Beautify the track name
-		else if (midi.tracks.size() == 1) name = TrackName::GUITAR; // Original (old) FoF songs only have one track
-		else continue; // not a valid track
+		// Check for harmony tracks first (they don't have "PART " prefix)
+		if (name == "HARM1") name = HARMONIC_1;
+		else if (name == "HARM2") name = HARMONIC_2;
+		else if (name == "HARM3") name = HARMONIC_3;
+		else if (!mangleTrackName(name)) {
+			// Not a recognized track
+			if (midi.tracks.size() == 1) name = TrackName::GUITAR; // Original (old) FoF songs only have one track
+			else continue; // not a valid track
+		}
 		// Add dummy notes to tracks so that they can be seen in song browser
 		if (isVocalTrack(name)) s.insertVocalTrack(name, VocalTrack(name));
 		else {
@@ -82,6 +88,7 @@ void SongParser::midParseHeader() {
 /// Parse notes
 void SongParser::midParse() {
 	Song& s = m_song;
+	s.vocalTracks.clear();
 	s.instrumentTracks.clear();
 
 	MidiFileParser midi(s.midifilename);
@@ -90,9 +97,15 @@ void SongParser::midParse() {
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
 		std::string name = it->name;
-		if (mangleTrackName(name)) ; // Beautify the track name
-		else if (midi.tracks.size() == 1) name = TrackName::GUITAR; // Original (old) FoF songs only have one track
-		else continue; // not a valid track
+		// Check for harmony tracks first (they don't have "PART " prefix)
+		if (name == "HARM1") name = HARMONIC_1;
+		else if (name == "HARM2") name = HARMONIC_2;
+		else if (name == "HARM3") name = HARMONIC_3;
+		else if (!mangleTrackName(name)) {
+			// Not a recognized track
+			if (midi.tracks.size() == 1) name = TrackName::GUITAR; // Original (old) FoF songs only have one track
+			else continue; // not a valid track
+		}
 		if (!isVocalTrack(name)) {
 			// Process non-vocal tracks
 			double trackEnd = 0.0;
