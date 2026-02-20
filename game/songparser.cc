@@ -91,16 +91,25 @@ SongParser::SongParser(Song& s) : m_song(s) {
 			}
 			m_ss.str(ss);
 		}
-		// Header already parsed?
-		if (s.loadStatus == Song::LoadStatus::HEADER) {
+		// Header always parsed after this point
+		bool headerAlreadyParsed = s.loadStatus == Song::LoadStatus::HEADER;
+		if (!headerAlreadyParsed) {
+			// Parse only header to speed up loading and conserve memory
+			if (s.type == Song::Type::TXT) txtParseHeader();
+			else if (s.type == Song::Type::INI) iniParseHeader();
+			else if (s.type == Song::Type::XML) xmlParseHeader();
+			else if (s.type == Song::Type::SM) {
+				smParseHeader(); s.dropNotes();  // Hack: drop notes here (load again when playing the song)
+			}
+		}
+
+		guessFiles();
+
+		if (headerAlreadyParsed) {
 			if (!s.m_bpms.empty()) {
 				float bpm = static_cast<float>(15.0 / s.m_bpms.front().step);
 				s.m_bpms.clear();
 				addBPM(0, bpm);
-			}
-			// Ensure MIDI filename is known before parsing (for songs that need MIDI)
-			if (s.midifilename.empty()) {
-				guessFiles();
 			}
 			if (s.type == Song::Type::TXT) txtParse();
 			else if (s.type == Song::Type::INI) midParse();  // INI doesn't contain notes, parse those from MIDI
@@ -110,15 +119,6 @@ SongParser::SongParser(Song& s) : m_song(s) {
 			s.loadStatus = Song::LoadStatus::FULL;
 			return;
 		}
-		// Parse only header to speed up loading and conserve memory
-		if (s.type == Song::Type::TXT) txtParseHeader();
-		else if (s.type == Song::Type::INI) iniParseHeader();
-		else if (s.type == Song::Type::XML) xmlParseHeader();
-		else if (s.type == Song::Type::SM) {
-			smParseHeader(); s.dropNotes();  // Hack: drop notes here (load again when playing the song)
-		}
-
-		guessFiles();
 		if (!m_song.midifilename.empty()) { 
 			midParseHeader(); 
 		}
