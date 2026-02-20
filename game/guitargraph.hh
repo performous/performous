@@ -72,6 +72,7 @@ class GuitarGraph: public InstrumentGraph {
 	bool canActivateStarpower() { return (m_starmeter > 6000); }
 	void activateStarpower();
 	void errorMeter(double error);
+	double missVolumeTarget() const;
 	void fail(double time, int fret);
 	void endHold(unsigned fret, double time = 0.0);
 	void endBRE();

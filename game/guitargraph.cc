@@ -178,6 +178,30 @@ void GuitarGraph::setupJoinMenuDifficulty() {
 	m_menu.back().setDynamicName(m_difficultyOpt); // Set the title to be dynamic
 }
 
+double GuitarGraph::missVolumeTarget() const {
+	auto missVolumePercent = 0u;
+	switch (m_level) {
+		case Difficulty::KIDS:
+			missVolumePercent = config["audio/miss_volume_kids"].ui();
+			break;
+		case Difficulty::SUPAEASY:
+			missVolumePercent = config["audio/miss_volume_easy"].ui();
+			break;
+		case Difficulty::EASY:
+			missVolumePercent = config["audio/miss_volume_medium"].ui();
+			break;
+		case Difficulty::MEDIUM:
+			missVolumePercent = config["audio/miss_volume_hard"].ui();
+			break;
+		case Difficulty::AMAZING:
+			missVolumePercent = config["audio/miss_volume_expert"].ui();
+			break;
+		default:
+			break;
+	}
+	return clamp(static_cast<double>(missVolumePercent) / 100.0);
+}
+
 void GuitarGraph::setupJoinMenuDrums() {
 	setupJoinMenuDifficulty();
 	m_menu.add(MenuOption(_("Lefty-mode"), "")).changer(m_leftymode);
@@ -418,11 +442,7 @@ void GuitarGraph::engine() {
 	}
 	// Start decreasing correctness instantly if the current note is being played late (don't wait until maxTolerance)
 	if (m_chordIt != m_chords.end() && m_chordIt->begin < time && m_chordIt->status == 0) {
-		// In Kids mode with "keep playing" option enabled, don't fail correctness (mute the track)
-		bool kidsKeepPlaying = (m_level == Difficulty::KIDS) && config["game/kids_keep_playing"].b();
-		if (!kidsKeepPlaying) {
-			m_correctness.setTarget(0.0);
-		}
+		m_correctness.setTarget(missVolumeTarget());
 	}
 	// Process holds
 	if (!m_drums) {
@@ -505,13 +525,7 @@ void GuitarGraph::endHold(unsigned fret, double time) {
 			if (time > chord.begin + maxTolerance && time < chord.end - maxTolerance) {
 				chord.releaseTimes[fret] = time;
 				if (time >= chord.end - maxTolerance) chord.passed = true; // Mark as past note for rewinding
-				else {
-					// In Kids mode with "keep playing" option enabled, don't fail correctness (mute the track)
-					bool kidsKeepPlaying = (m_level == Difficulty::KIDS) && config["game/kids_keep_playing"].b();
-					if (!kidsKeepPlaying) {
-						m_correctness.setValue(0.0f);  // Note: if still holding some frets, proper percentage will be set in hold handling
-					}
-				}
+				else m_correctness.setValue(static_cast<float>(missVolumeTarget()));  // Note: if still holding some frets, proper percentage will be set in hold handling
 				break;
 			}
 		}
@@ -533,11 +547,7 @@ void GuitarGraph::fail(double time, int fret) {
 		// kids tend to play a lot of extra notes just for the fun of it.
 		// need to make sure they don't end up with a score of zero
 		m_score -= (m_level == Difficulty::KIDS) ? points(0)/2.0f : points(0);
-		// In Kids mode with "keep playing" option enabled, don't fail correctness (mute the track)
-		bool kidsKeepPlaying = (m_level == Difficulty::KIDS) && config["game/kids_keep_playing"].b();
-		if (!kidsKeepPlaying) {
-			m_correctness.setTarget(0.0, true);  // Instantly fail correctness
-		}
+		m_correctness.setTarget(missVolumeTarget(), true);
 	}
 	endStreak();
 }

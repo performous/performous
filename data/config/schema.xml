@@ -57,10 +57,6 @@ to save the current settings to XML.
 		<short>Difficulty</short>
 		<long>Game difficulty.</long>
 	</entry>
-	<entry name="game/kids_keep_playing" type="bool" value="false">
-		<short>Kids Mode Keep Playing</short>
-		<long>When enabled, the track keeps playing when someone misses a note in Kids difficulty mode, but still plays the failure sound.</long>
-	</entry>
 
 	<entry name="game/Textstyle" type="uint" value="0">
 		<limits>
@@ -391,6 +387,36 @@ to save the current settings to XML.
 		<limits min="0" max="100" step="5" />
 		<short>Failure volume</short>
 		<long>The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!</long>
+	</entry>
+	<entry name="audio/miss_volume_kids" type="uint" value="0">
+		<ui unit=" %" />
+		<limits min="0" max="100" step="5" />
+		<short>Missed note volume (Kids)</short>
+		<long>Track volume level after missing a note on Kids difficulty for instruments.</long>
+	</entry>
+	<entry name="audio/miss_volume_easy" type="uint" value="0">
+		<ui unit=" %" />
+		<limits min="0" max="100" step="5" />
+		<short>Missed note volume (Easy)</short>
+		<long>Track volume level after missing a note on Easy difficulty for instruments.</long>
+	</entry>
+	<entry name="audio/miss_volume_medium" type="uint" value="0">
+		<ui unit=" %" />
+		<limits min="0" max="100" step="5" />
+		<short>Missed note volume (Medium)</short>
+		<long>Track volume level after missing a note on Medium difficulty for instruments.</long>
+	</entry>
+	<entry name="audio/miss_volume_hard" type="uint" value="0">
+		<ui unit=" %" />
+		<limits min="0" max="100" step="5" />
+		<short>Missed note volume (Hard)</short>
+		<long>Track volume level after missing a note on Hard difficulty for instruments.</long>
+	</entry>
+	<entry name="audio/miss_volume_expert" type="uint" value="0">
+		<ui unit=" %" />
+		<limits min="0" max="100" step="5" />
+		<short>Missed note volume (Expert)</short>
+		<long>Track volume level after missing a note on Expert difficulty for instruments.</long>
 	</entry>
 	<entry name="audio/pass-through" type="bool" value="false">
 		<short>Microphone pass-through</short>
