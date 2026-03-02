@@ -391,8 +391,8 @@ void RequestHandler::Post(web::http::http_request request)
 	}
 	else if (path == "/api/search") {
 		try {
-			auto query = utility::conversions::to_utf8string(jsonPostBody[utility::conversions::to_string_t("query")].as_string());
-			m_songs.setFilter(query);
+			auto searchQuery = utility::conversions::to_utf8string(jsonPostBody[utility::conversions::to_string_t("query")].as_string());
+			m_songs.setFilter(searchQuery);
 			size_t offset = 0;
 			size_t limit = 0;
 
