@@ -50,7 +50,7 @@ jobs:
         libepoxy
         librsvg
         libsdl2
-        libxmlxx5 @5.4.0_1
+        libxmlxx5
         nlohmann-json
         opencv4
         openssl
