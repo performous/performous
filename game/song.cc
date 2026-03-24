@@ -98,7 +98,7 @@ Song::Song(fs::path const& filename):
   dummyVocal(TrackName::VOCAL_LEAD), path(filename.parent_path()), filename(filename), randomIdx(rand())
 {
 	if (fs::is_regular_file(filename)) {
-		mtime = fs::last_write_time(filename).time_since_epoch().count();
+		mtime = static_cast<int64_t>(fs::last_write_time(filename).time_since_epoch().count());  // .count() can return __int128
 	}
 	SongParser(*this);
 	collateUpdate();
