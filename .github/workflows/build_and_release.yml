@@ -23,7 +23,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  actions: read
+  actions: write
   contents: write
   packages: write
   pull-requests: write

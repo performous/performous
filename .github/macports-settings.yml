@@ -2,7 +2,7 @@ version: ''
 prefix: '/opt/local'
 variants:
   select:
-    - clang20
+    - clang18
     - gfortran
     - ffmpeg7
     - python313

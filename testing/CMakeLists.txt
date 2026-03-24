@@ -51,7 +51,7 @@ if(GTest_FOUND)
 	add_executable(performous_test ${SOURCES})
 
 	find_package(Boost 1.55 REQUIRED COMPONENTS program_options iostreams system locale)
-	target_link_libraries(performous_test PRIVATE ${Boost_LIBRARIES})
+	target_link_libraries(performous_test PRIVATE Boost::boost Boost::iostreams Boost::program_options Boost::system Boost::locale)
 
 	find_package(fmt 8.1 REQUIRED CONFIG)
 	target_link_libraries(performous_test PRIVATE fmt::fmt)
