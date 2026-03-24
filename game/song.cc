@@ -20,6 +20,7 @@ extern "C" {
 Song::Song(nlohmann::json const& song) : dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()) {
 	path = getJsonEntry<std::string>(song, "txtFileFolder").value_or("");
 	filename = getJsonEntry<std::string>(song, "txtFile").value_or("");
+	mtime = getJsonEntry<std::int64_t>(song, "mtime").value_or(0);
 	artist = getJsonEntry<std::string>(song, "artist").value_or("");
 	title = getJsonEntry<std::string>(song, "title").value_or("");
 	language = getJsonEntry<std::string>(song, "language").value_or("");
@@ -96,6 +97,9 @@ Song::Song(nlohmann::json const& song) : dummyVocal(TrackName::VOCAL_LEAD), rand
 Song::Song(fs::path const& filename):
   dummyVocal(TrackName::VOCAL_LEAD), path(filename.parent_path()), filename(filename), randomIdx(rand())
 {
+	if (fs::is_regular_file(filename)) {
+		mtime = fs::last_write_time(filename).time_since_epoch().count();
+	}
 	SongParser(*this);
 	collateUpdate();
 }
