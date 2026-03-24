@@ -8,6 +8,7 @@ variants:
     - python313
     - quartz
   deselect:
+    - python314
     - x11
     - universal
 ports:
