@@ -175,7 +175,7 @@ jobs:
           sudo port install -s icu gettext-runtime
 
           set +x
-          try_binary_first autoconf autoconf-archive automake bison cargo cctools libgcc gcc15 gcc15-libcxx clang-18 cmake docbook-xml docbook-xsl-nons flex gi-docgen git gmake gperf gtk-doc itstool meson mm-common nasm ninja p7zip perl5 pkgconfig py313-docutils py313-build py313-cython py313-installer py313-wheel python313 rust texinfo unzip vim websocketpp xmlto yasm boost.version=${{ inputs.boost_version }}
+          try_binary_first autoconf autoconf-archive automake bison cargo cctools clang-18 libgcc gcc15 gcc15-libcxx cmake docbook-xml docbook-xsl-nons flex gi-docgen git gmake gperf gtk-doc itstool meson mm-common nasm ninja p7zip perl5 pkgconfig py313-docutils py313-build py313-cython py313-installer py313-wheel python313 rust texinfo unzip vim websocketpp xmlto yasm boost.version=${{ inputs.boost_version }}
 
           set -x
           sudo port -s install ${MACOS_DEPS} boost.version=${{ inputs.boost_version }}
