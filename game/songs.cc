@@ -320,7 +320,7 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 					// Check if the file has been modified since it was cached
 					auto currentMtime = fs::last_write_time(p).time_since_epoch().count();
 					if (match->second->mtime != 0 && match->second->mtime == currentMtime) {
-					song = match->second;
+						song = match->second;
 					} else {
 						SpdLogger::info(LogSystem::SONGS, "Song={} has been modified on disk, re-reading.", p);
 						song = std::make_shared<Song> (p);
