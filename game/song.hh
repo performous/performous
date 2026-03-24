@@ -100,6 +100,7 @@ public:
 	};
 	std::vector<SongSection> songsections; ///< vector of song sections
 	int randomIdx = 0; ///< sorting index used for random order
+	std::int64_t mtime = 0; ///< modification time of song file (for cache invalidation)
 
 	// Functions only below this line
 	Song(nlohmann::json const& song);  ///< Load song from cache.
