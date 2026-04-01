@@ -49,18 +49,34 @@ sudo emerge boost git cmake help2man glew libsdl2 ffmpeg portaudio libxmlpp \
 
 You need [http://rpmfusion.org/Configuration RPM Fusion Free] repository for ffmpeg.
 It's best to fetch and install this first, as the package-install below depends on it.
-
 ```bash
-sudo yum install git cmake gcc-c++ gettext cairo-devel librsvg2-devel libsigc++20-devel \
+sudo dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+sudo dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+```
+
+#### Fedora 42 and earlier
+```bash
+sudo dnf install git cmake gcc-c++ gettext cairo-devel librsvg2-devel libsigc++20-devel \
    glibmm24-devel libxml++-devel boost-devel SDL2-devel libepoxy-devel ffmpeg-devel \
    portaudio-devel help2man redhat-lsb opencv-devel portmidi-devel libjpeg-turbo-devel \
    pango-devel jsoncpp-devel fmt-devel libwebp-devel
 ```
 
+#### Fedora 43 and later
+```bash
+sudo dnf install git cmake gcc-c++ gettext cairo-devel librsvg2-devel libsigc++20-devel \
+glibmm24-devel libxml++-devel boost-devel SDL2-devel libepoxy-devel ffmpeg-devel \
+portaudio-devel help2man lsb-release opencv-devel portmidi-devel libjpeg-turbo-devel \
+pango-devel jsoncpp-devel glm-devel openblas-devel fftw-devel cpprest-devel \
+libwebp-devel fmt-devel
+```
+(You may need to include `--allowerasing` for this to complete successfully)
+
+#### Unit Tests
 If you also plan to run unit tests, further packages are required.  
 (This is **not** needed just to play Performous)
 ```bash
-sudo yum install gtest-devel gmock-devel
+sudo dnf install gtest-devel gmock-devel
 ```
 
 ### MacOS
