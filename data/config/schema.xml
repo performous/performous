@@ -57,6 +57,10 @@ to save the current settings to XML.
 		<short>Difficulty</short>
 		<long>Game difficulty.</long>
 	</entry>
+	<entry name="game/instrument_miss_penalty" type="bool" value="true">
+		<short>Instrument miss penalty</short>
+		<long>Deduct points when missing notes on instrument and dance tracks.</long>
+	</entry>
 
 	<entry name="game/Textstyle" type="uint" value="0">
 		<limits>

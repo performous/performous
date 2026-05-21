@@ -1,4 +1,5 @@
 #include "dancegraph.hh"
+#include "configuration.hh"
 #include "song.hh"
 #include "i18n.hh"
 #include "graphic/view_trans.hh"
@@ -313,7 +314,9 @@ void DanceGraph::engine() {
 		if(!it->isHit && it->note.type == Note::Type::MINE && m_pressed[static_cast<unsigned>(it->note.note)] &&
 		  it->note.begin >= time - maxTolerance && it->note.end <= time + maxTolerance) {
 			it->isHit = true;
-			m_score -= points(0);
+			if (config["game/instrument_miss_penalty"].b()) {
+				m_score -= points(0);
+			}
 		}
 	}
 
@@ -351,7 +354,9 @@ void DanceGraph::dance(double time, input::Event const& ev) {
 				m_streak++;
 				if (m_streak > m_longestStreak) m_longestStreak = m_streak;
 			} else { // Mine!
-				m_score -= points(0);
+				if (config["game/instrument_miss_penalty"].b()) {
+					m_score -= points(0);
+				}
 				m_streak = 0;
 			}
 			m_activeNotes[buttonId] = it;

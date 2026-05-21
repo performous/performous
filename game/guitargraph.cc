@@ -1,5 +1,6 @@
 #include "guitargraph.hh"
 
+#include "configuration.hh"
 #include "fs.hh"
 #include "log.hh"
 #include "song.hh"
@@ -548,8 +549,10 @@ void GuitarGraph::fail(double time, int fret) {
 		// remove equivalent of 1 perfect hit for every note
 		// kids tend to play a lot of extra notes just for the fun of it.
 		// need to make sure they don't end up with a score of zero
-		m_score -= (m_level == Difficulty::KIDS) ? points(0)/2.0f : points(0);
-		m_correctness.setTarget(missVolumeTarget(), true);
+		if (config["game/instrument_miss_penalty"].b()) {
+			m_score -= (m_level == Difficulty::KIDS) ? points(0)/2.0f : points(0);
+		}
+		m_correctness.setTarget(missVolumeTarget(), true);  // Instantly fail correctness
 	}
 	endStreak();
 }
