@@ -275,6 +275,8 @@ void Songs::CacheSonglist() {
 		songObject["collateByArtist"] = song->collateByArtist;
 		songObject["collateByArtistOnly"] = song->collateByArtistOnly;
 
+		songObject["mtime"] = song->mtime;  // last modified time, for cache invalidation
+
 		if(songObject != nlohmann::json::object()) {
 			jsonRoot.emplace_back(std::move(songObject));
 		}
@@ -315,7 +317,14 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 				auto song = std::shared_ptr<Song>{};
 				auto match = cache.find(p.string());
 				if ( match != cache.end()) {
-					song = match->second;
+					// Check if the file has been modified since it was cached
+					auto currentMtime = fs::last_write_time(p).time_since_epoch().count();
+					if (match->second->mtime != 0 && match->second->mtime == currentMtime) {
+						song = match->second;
+					} else {
+						SpdLogger::info(LogSystem::SONGS, "Song={} has been modified on disk, re-reading.", p);
+						song = std::make_shared<Song> (p);
+					}
 				} else {
 					SpdLogger::info(LogSystem::SONGS, "Found song={}, which was not present in the cache.", p);
 					song = std::make_shared<Song> (p);
