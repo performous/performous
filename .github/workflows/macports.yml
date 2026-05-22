@@ -72,6 +72,7 @@ jobs:
 
       - name: Amend macports configuration
         run: |
+          sudo port sync
           echo macosx_deployment_target 12.0 | tee -a /opt/local/etc/macports/macports.conf
           echo cxx_stdlib libc++ | tee -a /opt/local/etc/macports/macports.conf
           echo buildmakejobs 0 | tee -a /opt/local/etc/macports/macports.conf
@@ -84,7 +85,7 @@ jobs:
           echo boost.version ${{ inputs.boost_version }} | tee -a /opt/local/etc/macports/macports.conf
 
           sudo mkdir -p /opt/custom_portfiles/www/
-          portindex \
+          sudo portindex \
           /opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/ports/
           sudo cp -Rvf $(dirname $(port file cpprestsdk)) /opt/custom_portfiles/www/
           sudo mkdir -p /opt/custom_portfiles/www/cpprestsdk/files
@@ -165,7 +166,6 @@ jobs:
             echo "Installed but inactive ports: "
             sudo port -v installed inactive
             sudo port activate -f installed boost.version=${{ inputs.boost_version }}
-            sudo port -v sync
           else
             sudo portindex /opt/custom_portfiles
           fi
@@ -175,6 +175,8 @@ jobs:
           sudo port install -s icu gettext-runtime
 
           set +x
+          set +e
+          sudo rm -rvf /opt/local/var/macports/build
           try_binary_first autoconf autoconf-archive automake bison cargo cctools clang-18 libgcc gcc15 gcc15-libcxx cmake docbook-xml docbook-xsl-nons flex gi-docgen git gmake gperf gtk-doc itstool meson mm-common nasm ninja p7zip perl5 pkgconfig py313-docutils py313-build py313-cython py313-installer py313-wheel python313 rust texinfo unzip vim websocketpp xmlto yasm boost.version=${{ inputs.boost_version }}
 
           set -x
