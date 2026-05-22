@@ -128,6 +128,7 @@ jobs:
     needs:
       - determine_version
       - create_release
+      - Linux_Packages
 
   MacPorts_Package:
     name: Package macOS builds
