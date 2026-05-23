@@ -16,6 +16,10 @@ template <> float sconv(std::string const& s) { return std::stof(s); }
 template <> double sconv(std::string const& s) { return std::stod(s); }
 template <> std::string sconv(std::string const& s) { return s; }
 
+bool containsNoCase(std::string const& word, std::string const& part) {
+	return toLower(word).find(toLower(part)) != std::string::npos;
+}
+
 /** Converts a std::string into an unsigned int. **/
 unsigned stou(std::string const& str, size_t* idx, int base) {
 	std::uint64_t result = std::stoul(str, idx, base);
@@ -106,7 +110,6 @@ bool isText(const std::string& text, size_t bytesToCheck) {
 
 	return true;
 }
-
 
 std::string toLower(std::string const& s) {
 	//return boost::algorithm::to_lower_copy(s);
