@@ -44,7 +44,7 @@ jobs:
           cache-key: win64-vcpkg
           debug: true
           # Get the sha from https://github.com/microsoft/vcpkg/releases
-          revision: 56bb2411609227288b70117ead2c47585ba07713
+          revision: d015e31e90838a4c9dfa3eed45979bc70d9357fc
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install NSIS
         uses: repolevedavaj/install-nsis@v1.2.0
