@@ -91,7 +91,7 @@ try_binary_first() {
             # -b: Binary only (fails if missing)
             # -N: Non-interactive (don't ask confirmation)
             local exit_code
-            sudo port -Npb install --no-rev-upgrade --unrequested "${port_args[@]}" "${global_options[@]}" 2>&1 | tee "$log_file"
+            sudo port -Nb install --no-rev-upgrade --unrequested "${port_args[@]}" "${global_options[@]}" 2>&1 | tee "$log_file"
             exit_code=$?
             echo "exit code: $exit_code"
             if [ $exit_code -eq 0 ]; then
