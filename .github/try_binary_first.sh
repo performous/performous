@@ -1,8 +1,8 @@
 #!/bin/bash
 
 MAX_RETRIES=3 # Safety cap to prevent infinite loops if the dependency tree is broken
-
 try_binary_first() {
+    set -o pipefail
     # 1. --- Input Validation ---
     if [ "$#" -eq 0 ]; then
         echo "Usage: $0 <port> [+variants] ... [global_key=value ...]" >&2
@@ -91,10 +91,8 @@ try_binary_first() {
             # -b: Binary only (fails if missing)
             # -N: Non-interactive (don't ask confirmation)
             local exit_code
-            set -o pipefail
-            sudo port -Npb install "${port_args[@]}" "${global_options[@]}" 2>&1 | tee "$log_file"
+            sudo port -Nb install --no-rev-upgrade --unrequested "${port_args[@]}" "${global_options[@]}" 2>&1 | tee "$log_file"
             exit_code=$?
-            set +o pipefail
             echo "exit code: $exit_code"
             if [ $exit_code -eq 0 ]; then
                 echo "--> SUCCESS: Installed ${target_name} via binary."
@@ -123,7 +121,7 @@ try_binary_first() {
                     # MacPorts automatically calculates required variants for dependencies 
                     # based on the tree, or defaults.
                     
-                    if sudo port -Ns install "$missing_port" "${global_options[@]}"; then
+                    if sudo port -Ns install --unrequested "$missing_port" "${global_options[@]}"; then
                         echo "--> RECOVERY SUCCESS: '$missing_port' built and installed."
                         echo "--> ACTION: Retrying binary install for top-level '$target_name'..."
                         # The loop continues here, retrying the `port -b install <TopLevel>`
@@ -142,7 +140,6 @@ try_binary_first() {
                 fi
             fi
         done
-
         if [ $job_success -eq 0 ]; then
             echo "xxx CRITICAL FAILURE: Unable to install '$target_name' after $attempt_counter attempts."
             echo "xxx Moving to next job (if any)..."
@@ -152,4 +149,5 @@ try_binary_first() {
     
     echo
     echo "All operations completed."
+	set +o pipefail
 }
