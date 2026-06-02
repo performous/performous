@@ -177,6 +177,8 @@ jobs:
           set +x
           set +e
           sudo rm -rvf /opt/local/var/macports/build
+          
+
           try_binary_first autoconf autoconf-archive automake bison cargo cctools clang-18 libgcc gcc15 gcc15-libcxx cmake docbook-xml docbook-xsl-nons flex gi-docgen git gmake gperf gtk-doc itstool meson mm-common nasm ninja p7zip perl5 pkgconfig py313-docutils py313-build py313-cython py313-installer py313-wheel python313 rust texinfo unzip vim websocketpp xmlto yasm boost.version=${{ inputs.boost_version }}
 
           set -x
@@ -193,7 +195,8 @@ jobs:
           sudo port -N uninstall inactive || true
           sudo port deactivate -f installed
           sudo port activate -f zstd boost.version=${{ inputs.boost_version }}
-
+          # Remove broken symlinks
+          # sudo find -L /opt/local -type d -path /opt/local/var/macports/software -prune -o -type l -exec ls -l {} \; -exec rm -fv {} \;
           # Delete these folders, as we don't want the cache restore overwriting them.
           # sudo rm -Rfv /opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/base*
           # sudo rm -Rfv /opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/ports/_resources
@@ -207,6 +210,11 @@ jobs:
           cd /opt/local/var/macports
           tar -czf ./MacPorts-log-${{ matrix.os }}.tar.gz ./logs ./build
           echo "log_path=/opt/local/var/macports/MacPorts-log-${{ matrix.os }}.tar.gz" >> $GITHUB_OUTPUT
+
+      - name: Clear Extended attributes
+        run: |
+          sudo xattr -c -rsv /opt/local
+
       - name: Cache dependencies
         uses: Lord-Kamina/always-upload-cache/save@refresh-cache
         env:
