@@ -60,7 +60,7 @@ jobs:
     steps:
       - name: Checkout Git
         id: checkout_git
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: performous
 
@@ -258,7 +258,7 @@ jobs:
           make test
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: ${{ github.event_name == 'pull_request' }}
         with:
           name: ${{ env.ARTIFACT_NAME }}
@@ -266,7 +266,7 @@ jobs:
 
       - name: Upload artifact with unified name
         if: ${{ github.ref == 'refs/heads/master' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.MASTER_ARTIFACT_NAME }}
           path: ${{ env.MASTER_ARTIFACT_PATH }}
@@ -284,7 +284,7 @@ jobs:
       - name: Upload logs
         if: ${{ steps.get-logs.outputs.log_path != null && !cancelled() }}
         id: upload-logs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: "MacPorts-log-${{ matrix.os }}.tar.gz"
           path: "${{ steps.get-logs.outputs.log_path }}"
