@@ -40,10 +40,10 @@ jobs:
 
       - name: Checkout Git
         id: checkout_git
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: c-cpp
           build-mode: manual
@@ -61,7 +61,7 @@ jobs:
           cd ..
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         with:
           category: "/language:c-cpp"
 
@@ -76,7 +76,7 @@ jobs:
 
       # Upload artifacts during pull-requests
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: ${{ github.event_name == 'pull_request' }}
         with:
           name: ${{ env.ARTIFACT_NAME }}
@@ -85,7 +85,7 @@ jobs:
       # Upload artifacts on master
       - name: Upload artifact with unified name
         if: ${{ github.ref == 'refs/heads/master' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.MASTER_ARTIFACT_NAME }}
           path: ${{ env.MASTER_ARTIFACT_PATH }}

@@ -24,7 +24,7 @@ jobs:
     steps:
       - name: Checkout Git
         id: checkout_git
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: performous
 
@@ -83,7 +83,7 @@ jobs:
           echo ("MASTER_ARTIFACT_FILENAME=$MASTER_ARTIFACT_FILENAME") >> $env:GITHUB_ENV
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: ${{ github.event_name == 'pull_request' }}
         with:
           name: ${{ env.ARTIFACT_FILENAME }}
@@ -91,7 +91,7 @@ jobs:
 
       - name: Upload artifact with unified name
         if: ${{ github.ref == 'refs/heads/master' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.MASTER_ARTIFACT_FILENAME }}
           path: ${{ env.MASTER_ARTIFACT_PATH }}
@@ -115,7 +115,7 @@ jobs:
     steps:
       - name: Checkout Git
         id: checkout_git
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: performous
       - name: Setup action env and echoing
@@ -208,7 +208,7 @@ jobs:
           powershell -command "echo ('MASTER_ARTIFACT_PATH=${{ env.workpath }}/performous/build/${MASTER_ARTIFACT_FILENAME}') >> \$env:GITHUB_ENV"
           powershell -command "echo ('MASTER_ARTIFACT_FILENAME=${MASTER_ARTIFACT_FILENAME}') >> \$env:GITHUB_ENV"
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: ${{ github.event_name == 'pull_request' }}
         with:
           name: ${{ env.ARTIFACT_FILENAME }}
@@ -216,7 +216,7 @@ jobs:
 
       - name: Upload artifact with unified name
         if: ${{ github.ref == 'refs/heads/master' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.MASTER_ARTIFACT_FILENAME }}
           path: ${{ env.MASTER_ARTIFACT_PATH }}
