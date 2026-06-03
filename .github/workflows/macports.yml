@@ -212,8 +212,8 @@ jobs:
         id: get-logs
         run: |
           cd /opt/local/var/macports
-          tar -czf ./MacPorts-log-${{ matrix.os }}.tar.gz ./logs ./build
-          echo "log_path=/opt/local/var/macports/MacPorts-log-${{ matrix.os }}.tar.gz" >> $GITHUB_OUTPUT
+          tar -czf ${{ github.workspace }}/MacPorts-log-${{ matrix.os }}.tar.gz ./logs ./build
+          echo "log_path=${{ github.workspace }}/MacPorts-log-${{ matrix.os }}.tar.gz" >> $GITHUB_OUTPUT
 
       - name: Clear Extended attributes
         run: |
