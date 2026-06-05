@@ -217,6 +217,7 @@ jobs:
 
       - name: Clear Extended attributes
         run: |
+          sudo find /opt/local/var -type d -a -perm 700 -exec chmod 755 {} \;
           sudo xattr -c -rsv /opt/local
 
       - name: Cache dependencies
