@@ -20,6 +20,9 @@ namespace SongParserUtil {
 	const auto regex_multiline = std::regex::multiline;
 #endif
 
+	const auto regex_icase = std::regex::icase;
+
+
 	// There is some weird bug with std::regex and boost::locale on libc++ that makes regex fail if a global locale with a collation facet has been installed before instantiating patterns.
 
 	const static std::regex iniParseLine(
@@ -36,7 +39,7 @@ namespace SongParserUtil {
 		R"(^[^\S^\r\n]*)"                                       // Any number of white-space characters that are neither \n nor \r
 		R"(\[song\])"                                           // literal matching of [song]
 		R"([^\S^\r\n]*)"                                        // Any number of white-space characters that are neither \n nor \r
-		R"((?:$|[;#]))", regex_multiline                        // Non-capturing group; match end-of-line or either ';' or '#', which denote a trailing comment.
+		R"((?:$|[;#]))", regex_multiline | regex_icase           // Non-capturing group; match end-of-line or either ';' or '#', which denote a trailing comment.
 	);
 
 	const static std::regex richTags(
@@ -45,11 +48,11 @@ namespace SongParserUtil {
 		R"((=[^>]*)?)"                                          // A group of: '=' followed by any characters that are not >, appearing just 0 or 1 times as a whole.
 		R"(( [^>]*)?>)"                                         // A group of: ' ' followed by any characters that are not >, appearing just 0 or 1 times as a whole, and finishing with >
 		R"(|<color(=[^>]*)?>)"                                  // OR a <color> tag with an equal sign followed by anything that isn't '>'
-		R"(|</color>)", std::regex_constants::icase             // OR the closing </color> tag. 
+		R"(|</color>)", regex_icase                             // OR the closing </color> tag.
 	);
 
 	const static std::regex brTag(
-		R"(<br>|<br[ ]*/?>)", std::regex_constants::icase       // match <br>, <br/> or <br />, allowing for any number of spaces between br and the /.
+		R"(<br>|<br[ ]*/?>)", regex_icase                       // match <br>, <br/> or <br />, allowing for any number of spaces between br and the /.
 	);
 
 	const std::string DUET_P2 = "Duet singer";	// FIXME

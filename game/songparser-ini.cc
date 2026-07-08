@@ -24,14 +24,14 @@ void SongParser::iniParseHeader() {
 	if (!m_song.vocalTracks.empty()) { m_song.vocalTracks.clear(); }
 	if (!m_song.instrumentTracks.empty()) { m_song.instrumentTracks.clear(); }
 	std::string line;
-	
+
 	while (getline(line)) {
 		if (line.empty()) continue;
 		if (trim(line)[0] == '[') { // Section header.
-			if (line.find("[song]") != std::string::npos) continue;
+			if (UnicodeUtil::toLower(line).find("[song]") != std::string::npos) continue;
 			break; // Keys should be under the correct section.
 		}
-		if ((line[0] == ';' || line[0] == '#') && line[1] == ' ') continue; // Comment. 
+		if ((line[0] == ';' || line[0] == '#') && line[1] == ' ') continue; // Comment.
 		std::string key;
 		std::string value;
 		std::smatch match;
@@ -63,4 +63,3 @@ void SongParser::iniParseHeader() {
 	}
 	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
 }
-
