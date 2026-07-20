@@ -6,6 +6,7 @@
 
 #include <cstdint>
 #include <filesystem>
+#include <fstream>
 #include <list>
 #include <mutex>
 #include <string_view>
