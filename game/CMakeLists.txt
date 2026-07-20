@@ -295,10 +295,8 @@ if(WIN32)
 	set_target_properties(performous PROPERTIES OUTPUT_NAME "Performous")
 endif()
 
-if(WIN32 AND MSVC)
-#	target_compile_options(performous PUBLIC /WX)
-else()
-	target_compile_options(performous PUBLIC -Werror)
+if(PERFORMOUS_WERROR)
+	target_compile_options(performous PUBLIC ${PERFORMOUS_WERROR_FLAG})
 endif()
 
 # Generate config.hh
