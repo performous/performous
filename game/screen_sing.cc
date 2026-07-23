@@ -158,6 +158,17 @@ void ScreenSing::setupVocals() {
 	m_audio.pause(false);
 }
 
+void ScreenSing::seek(double offset) {
+	// Seeking backwards is currently not permitted for dance songs
+	if (offset >= m_audio.getPosition() || m_song->danceTracks.empty()) {
+		m_audio.seekPos(offset);
+		if (offset < m_audio.getPosition()) {
+			for (unsigned i = 0; i < m_layout_singer.size(); ++i)
+				m_layout_singer[i]->reset();
+		}
+	}
+}
+
 void ScreenSing::createPauseMenu() {
 	auto& game = getGame();
 
