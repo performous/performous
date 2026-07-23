@@ -31,7 +31,19 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	}
 #if LIBRSVG_MAJOR_VERSION >= 2 && LIBRSVG_MINOR_VERSION >= 52
 	gdouble svg_width = 0.0, svg_height = 0.0;
-	rsvg_handle_get_intrinsic_size_in_pixels(svgHandle.get(), &svg_width, &svg_height);
+	gboolean svg_has_viewbox = FALSE;
+	gboolean svg_has_size = rsvg_handle_get_intrinsic_size_in_pixels(svgHandle.get(), &svg_width, &svg_height);
+	if (svg_has_size == FALSE) {
+		SpdLogger::warn(LogSystem::IMAGE, "SVG file, path={} has no defined size, falling back to viewbox.", filename);
+		RsvgRectangle svg_rect;
+		rsvg_handle_get_intrinsic_dimensions(svgHandle.get(), nullptr, nullptr, nullptr, nullptr, &svg_has_viewbox, &svg_rect);
+		if (svg_has_viewbox == FALSE) {
+			SpdLogger::error(LogSystem::IMAGE, "SVG file, path={} has no defined size nor a viewbox.", filename);
+			throw std::runtime_error(fmt::format("SVG file, path={} can't be rendered.", filename));
+		}
+		svg_width = svg_rect.width;
+		svg_height = svg_rect.height;
+	}
 	bitmap.resize(static_cast<unsigned>(svg_width * factor + 0.5f), static_cast<unsigned>(svg_height * factor + 0.5f));
 #else //functions are deprecated since 2.46
 	// Get SVG dimensions
