@@ -74,10 +74,8 @@ if(GTest_FOUND)
 
 	target_include_directories(performous_test PRIVATE ".." "../game" "${Performous_BINARY_DIR}/game")
 
-	if(WIN32 AND MSVC)
-#		target_compile_options(performous_test PUBLIC /WX)
-	else()
-		target_compile_options(performous_test PUBLIC -Werror)
+	if(PERFORMOUS_WERROR)
+		target_compile_options(performous_test PUBLIC ${PERFORMOUS_WERROR_FLAG})
 	endif()
 	
 	find_package(SDL2 REQUIRED)
