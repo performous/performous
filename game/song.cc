@@ -17,7 +17,7 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
-Song::Song(nlohmann::json const& song) : dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()) {
+Song::Song(nlohmann::json const& song) : dummyVocal(TrackName::VOCAL_LEAD) {
 	path = getJsonEntry<std::string>(song, "txtFileFolder").value_or("");
 	filename = getJsonEntry<std::string>(song, "txtFile").value_or("");
 	artist = getJsonEntry<std::string>(song, "artist").value_or("");
@@ -94,10 +94,15 @@ Song::Song(nlohmann::json const& song) : dummyVocal(TrackName::VOCAL_LEAD), rand
 }
 
 Song::Song(fs::path const& filename):
-  dummyVocal(TrackName::VOCAL_LEAD), path(filename.parent_path()), filename(filename), randomIdx(rand())
+  dummyVocal(TrackName::VOCAL_LEAD), path(filename.parent_path()), filename(filename)
 {
 	SongParser(*this);
 	collateUpdate();
+}
+
+Song::Song():
+  dummyVocal(TrackName::VOCAL_LEAD)
+{
 }
 
 void Song::reload(bool errorIgnore) {
@@ -259,4 +264,24 @@ std::vector<std::string> Song::getVocalTrackNames() const {
 	std::vector<std::string> result;
 	for (auto const& kv : vocalTracks) result.push_back(kv.first);
 	return result;
+}
+
+void Song::setTitle(std::string const& title) {
+    this->title = title;
+
+    collateUpdate();
+}
+
+void Song::setArtist(std::string const& artist) {
+    this->artist = artist;
+
+    collateUpdate();
+}
+
+Song::Year Song::getYear() const {
+    return m_year;
+}
+
+void Song::setYear(Year year) {
+    m_year = year;
 }
