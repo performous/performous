@@ -55,10 +55,8 @@ Song::Song(nlohmann::json const& song) : dummyVocal(TrackName::VOCAL_LEAD), rand
 	music[TrackName::GUITAR_COOP] = getJsonEntry<std::string>(song, "guitarCoop").value_or("");
 	music[TrackName::GUITAR_RHYTHM] = getJsonEntry<std::string>(song, "guitarRhythm").value_or("");
 
-	// never load loadStatus as FULL, as that is only true after it has been fully parsed
-	// a song loaded from cache only ever has the header information at best and should not be considered
-	// fully parsed
-	loadStatus = std::min(getJsonEntry<LoadStatus>(song, "loadStatus").value_or(LoadStatus::NONE), LoadStatus::HEADER);
+	// A song loaded from cache already has the header information
+	loadStatus = LoadStatus::HEADER;
 
 	collateByTitle = getJsonEntry<std::string>(song, "collateByTitle").value_or("");
 	collateByTitleOnly = getJsonEntry<std::string>(song, "collateByTitleOnly").value_or("");
