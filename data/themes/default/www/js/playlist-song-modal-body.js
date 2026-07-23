@@ -158,6 +158,17 @@ $(function () {
     }
 
     /*
+        If our song contains a tag show it.
+        Else hide the complete div.
+    */
+    if (songObject.Tags.length > 1) {
+        $("#playlist-song-modal-body #modal-tags-div").show();
+        $("#playlist-song-modal-body #modal-tags-value").text(songObject.Tags);
+    } else {
+        $("#playlist-song-modal-body #modal-tags-div").hide();
+    }
+
+    /*
         Click event handlers to either change a position of the song or remove the song.
     */
     $("#playlist-song-modal-body #modal-move-song-up").click(function () {
