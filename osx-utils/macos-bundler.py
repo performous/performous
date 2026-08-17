@@ -97,7 +97,7 @@ def detect_prefix():
 			return
 		else:
 			raise FileNotFoundError("Specified an inexistent prefix folder.")
-	elif port_location == None:
+	elif port_location is None:
 		raise FileNotFoundError("Can't find a MacPorts install. MacPorts is the only supported package manager for building Performous on macOS.")
 	else:
 		script_prefix = port_location.parent.parent
@@ -330,12 +330,12 @@ if __name__ == "__main__":
 		build_dir = "build.xcode"
 		cmake_gen = "Xcode"
 		xcode_gen_scheme="ON"
-		
+
 	else:
 		build_dir = "build"
 		cmake_gen = "Unix Makefiles"
 		xcode_gen_scheme="OFF"
-	
+
 	performous_build_dir = performous_source_dir / build_dir
 
 	if arguments["--preserve-build"] != True:
@@ -348,7 +348,7 @@ if __name__ == "__main__":
 		performous_out_dir = performous_source_dir / "osx-utils" / out_dir
 		if arguments["--output"] != None:
 			print("\n--- WARNING: Can't find path to Output folder at " + arguments["--output"] + ", defaulting to " + performous_out_dir + "\n")
-			
+
 	if arguments["--flat-output"] != True:
 		performous_out_dir = performous_out_dir / f"Performous-{package_version}"
 	print("Performous source: " + str(performous_source_dir)+"\n\n")
@@ -356,20 +356,20 @@ if __name__ == "__main__":
 
 	if arguments["--debug"] != True:
 		release_type = "RelWithDebInfo"
-		
-		if check_installed("dylibbundler") == None:
+
+		if check_installed("dylibbundler") is None:
 			raise FileNotFoundError("dylibbundler needs to be installed in order to create a release application bundle.")
-		
+
 	else:
 		release_type = "Debug"
-	
+
 	temp_dir = performous_out_dir / "Performous.app/Contents"
 	res_dir = temp_dir / "Resources"
 	etc_dir = temp_dir / "etc"
 	lib_dir = res_dir / "lib"
 	locale_dir = res_dir / "Locale"
 	bin_dir = temp_dir / "MacOS"
-	
+
 	if arguments["--xcode-project"] != True and arguments["--no-clean"] != True:
 		print ("--- Deleting output bundle at: " + str(temp_dir.parent))
 		shutil.rmtree(str(temp_dir.resolve()), ignore_errors=True)
@@ -389,7 +389,7 @@ if __name__ == "__main__":
 	print("--- Performous source: " + str(performous_source_dir))
 	print("--- Performous build folder: " + str(performous_build_dir))
 	print("--- Performous output folder: " + str(performous_out_dir) + "\n")
-	
+
 	if arguments["--no-regenerate"] != True:
 		prefix = ""
 		if script_prefix != None:
