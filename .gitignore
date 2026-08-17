@@ -4,7 +4,6 @@ CMakeLists.txt.user*
 *~
 *.mo
 dylibbundler.log
-performous-app-build.sh
 osx-utils/out
 osx-utils/Performous*.dmg
 osx-utils/CMakeCache.txt

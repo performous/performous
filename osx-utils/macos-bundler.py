@@ -4,7 +4,7 @@ from dmgbuild.core import build_dmg
 from docopt import docopt
 
 from os import cpu_count, uname
-from re import match, search
+from re import match, search, findall
 from typing import Optional
 from pathlib import Path
 
@@ -17,14 +17,9 @@ import tty
 
 
 port_location = None
-brew_location = None
 opencv_prefix: Path = None
-openssl_prefix: Path = None
 ffmpeg_prefix: Path = None
 fmt_prefix : Path = None
-icu_root = ""
-openssl_root = ""
-brew_prefix: Path = None
 script_prefix: Path = None
 performous_source_dir = None
 
@@ -41,7 +36,7 @@ semVersion = None
 def execute(command):
 	print(str(command))
 	subprocess.run(command, shell=True, executable="/bin/bash", stdout=sys.stdout, stderr=subprocess.STDOUT, check=True)
-	
+
 def str_to_path(somePath: str) -> Path:
 	ret : Path = Path(somePath)
 	if somePath[0] == "~":
@@ -61,14 +56,6 @@ def check_installed(name : str) -> Optional[Path]:
 	else:
 		return None
 
-def check_brew_formula(name : str, file : str) -> Optional[Path]:
-	p = subprocess.run(args = ["brew", "ls", "--verbose", name], encoding="utf-8", capture_output=True)
-	if p.returncode == 0:
-		p2 = subprocess.run(args = ["grep", file], encoding="utf-8", capture_output=True, input=p.stdout)
-		return str_to_path(p2.stdout.strip()).parent
-	else:
-		return None
-
 def check_installed_port(name : str, file : str) -> Optional[Path]:
 	p = subprocess.run(args = ["port", "contents", name], encoding="utf-8", capture_output=True)
 	if p.returncode == 0:
@@ -81,9 +68,8 @@ def check_installed_port(name : str, file : str) -> Optional[Path]:
 		return None
 
 def detect_prefix():
-	global opencv_prefix, script_prefix, openssl_prefix, ffmpeg_prefix, fmt_prefix, icu_root, openssl_root, brew_prefix
+	global opencv_prefix, script_prefix, ffmpeg_prefix, fmt_prefix
 	port_location = check_installed('port')
-	brew_location = check_installed('brew')
 	if port_location != None:
 		print("--- MacPorts install detected at: " + str(port_location) + "\n")
 		for opencv_version in ["4", "3"]:
@@ -105,58 +91,16 @@ def detect_prefix():
 				print(f"--- LibFMT {fmt_version} detected at: " + str(fmt_prefix) + "\n")
 				break
 
-	else:
-		print("--- MacPorts does not appear to be installed.\n")
-	if brew_location != None:
-		brew_prefix = subprocess.run(args = ["brew", "--prefix"], encoding="utf-8", capture_output=True).stdout.replace("\n", "")
-		print("--- Homebrew install detected at: " + str(brew_location))
-		for opencv_version in ["4", "3"]:
-			check_opencv = check_brew_formula("opencv@{opencv_version}", "OpenCVConfig.cmake")
-			if check_opencv != None:
-				opencv_prefix = str(check_opencv.parent)
-				print("--- OpenCV {opencv_version} detected at: " + str(opencv_prefix) + "\n")
-				break
-		for ffmpeg_version in ["8", "7", "6", "5", "4"]:
-			check_ffmpeg = check_brew_formula(f"ffmpeg@{ffmpeg_version}", "libavcodec.pc")
-			if check_ffmpeg != None:
-				ffmpeg_prefix = str(check_ffmpeg.parent)
-				print(f"--- FFMpeg {ffmpeg_version} detected at: " + str(ffmpeg_prefix) + "\n")
-				break
-		check_openssl = check_brew_formula("openssl", "libcrypto.pc")
-		if check_openssl != None:
-			openssl_prefix = str(check_openssl)
-			openssl_root = f"-DOPENSSL_ROOT_DIR='{str(check_openssl.parent.parent)}'"
-			print("--- OpenSSL detected at: " + str(openssl_prefix) + "\n")
-		check_icu = check_brew_formula("icu4c", "utypes.h")
-		if check_icu != None:
-			icu_root = f"-DICU_ROOT='{str(check_icu.parent.parent)}'"
-			print("--- ICU detected at: " + str(check_icu.parent.parent) + "\n")
-	else:
-		print("--- Homebrew does not appear to be installed.\n")
-
 	if arguments["--prefix"] != None:
 		if str_to_path(arguments["--prefix"]).is_dir():
 			script_prefix = str_to_path(arguments["--prefix"])
 			return
 		else:
 			raise FileNotFoundError("Specified an inexistent prefix folder.")
-	elif port_location == None and brew_location == None:
-		raise FileNotFoundError("Can't find a suitable package manager.")
+	elif port_location == None:
+		raise FileNotFoundError("Can't find a MacPorts install. MacPorts is the only supported package manager for building Performous on macOS.")
 	else:
-		if arguments["--prefer-homebrew"] == True:
-			if brew_location == None and port_location != None:
-				print("\n--- WARNING: Homebrew requested, but not found: defaulting to MacPorts install.\n")
-				script_prefix = port_location.parent.parent
-				return
-			script_prefix = brew_prefix
-		elif arguments["--prefer-macports"] == True:
-			if port_location == None and brew_location != None:
-				print("\n--- WARNING: Macports requested, but not found: defaulting to Homebrew install.\n")
-				script_prefix = brew_prefix
-				return
-			script_prefix = port_location.parent.parent
-		else:
-			script_prefix = port_location.parent.parent if port_location != None else brew_prefix
+		script_prefix = port_location.parent.parent
 
 def ask_user(prompt : str, opt1 : str = "y", opt2 : str = "n") -> bool:
 	stdin = sys.stdin.fileno()
@@ -232,22 +176,92 @@ def create_dmg(fancy: bool = True):
 		detach_retries=10
 	)
 
+def dedupe_rpaths():
+	# dylibbundler can write the same LC_RPATH entry into a dylib more than once when
+	# it's a shared transitive dependency of several bundled libraries. Recent dyld
+	# versions hard-reject duplicate LC_RPATH entries at load time ("Library not
+	# loaded... duplicate LC_RPATH"), so strip the extras here.
+	bundle_lib_dir = Path(f"{performous_out_dir}/Performous.app/Contents/Resources/lib")
+	targets = list(bundle_lib_dir.glob("*.dylib")) + [Path(f"{performous_out_dir}/Performous.app/Contents/MacOS/Performous")]
+	for target in targets:
+		result = subprocess.run(["otool", "-l", str(target)], capture_output=True, text=True, check=True)
+		rpaths = findall(r"cmd LC_RPATH\n\s+cmdsize \d+\n\s+path (.*?) \(offset \d+\)", result.stdout)
+		seen = set()
+		changed = False
+		for rpath in rpaths:
+			if rpath in seen:
+				subprocess.run(["install_name_tool", "-delete_rpath", rpath, str(target)], check=True)
+				changed = True
+			else:
+				seen.add(rpath)
+		if changed:
+			subprocess.run(["codesign", "--force", "--sign", "-", str(target)], check=True)
+
 def bundle_libs():
 	global performous_out_dir
 	print("Copying dependencies and fixing linkage inside Performous.app...")
-	
+
 	execute(fr"""
 		dylibbundler -od -b \
 		-x "{performous_out_dir}/Performous.app/Contents/MacOS/Performous" \
 		-d "{performous_out_dir}/Performous.app/Contents/Resources/lib" \
 		-p @executable_path/../Resources/lib/
 	""")
+	dedupe_rpaths()
 	return
+
+def verify_bundle():
+	# Guards against shipping a .dmg with a broken .app inside it:
+	# partial build/install, dylibbundler run that silently skipped a dependency,
+	# or leftover stale files from a previous run under --no-clean can all produce an
+	# .app that "successfully" builds but doesn't work.
+	print("--- Verifying the bundle is self-contained and launches...")
+	app_dir = performous_out_dir / "Performous.app"
+	exe = app_dir / "Contents/MacOS/Performous"
+	res_dir = app_dir / "Contents/Resources"
+	lib_dir = res_dir / "lib"
+
+	if not exe.is_file():
+		raise RuntimeError(f"Bundle verification failed: executable not found at {exe}")
+
+	# Game data (themes/sounds/shaders/config/etc) must have been installed alongside
+	# the executable -- a build that only produces the raw binary is not a usable app.
+	for required in ["themes", "sounds", "shaders", "config", "backgrounds"]:
+		required_dir = res_dir / required
+		if not required_dir.is_dir() or not any(required_dir.iterdir()):
+			raise RuntimeError(f"Bundle verification failed: {required_dir} is missing or empty -- game data was not installed into the bundle.")
+
+	if not lib_dir.is_dir() or not any(lib_dir.glob("*.dylib")):
+		raise RuntimeError(f"Bundle verification failed: {lib_dir} has no bundled dylibs -- dependencies were not relinked into the bundle.")
+
+	# No remaining references to the build machine's MacPorts prefix: everything must run standalone
+	targets = [exe] + list(lib_dir.glob("*.dylib"))
+	external_refs = []
+	for target in targets:
+		result = subprocess.run(["otool", "-L", str(target)], capture_output=True, text=True, check=True)
+		for line in result.stdout.splitlines()[1:]:
+			dep = line.strip().split(" (")[0]
+			if dep.startswith("@executable_path") or dep.startswith("/usr/lib/") or dep.startswith("/System/"):
+				continue
+			external_refs.append((str(target.relative_to(app_dir)), dep))
+	if external_refs:
+		details = "\n".join(f"  {t}: {d}" for t, d in external_refs)
+		raise RuntimeError(f"Bundle verification failed: found dependencies not relinked into the bundle (the .app is not standalone):\n{details}")
+
+	# The bundle must actually launch: dyld resolves every dependency before main() runs, so invoke --version
+	# to run without needing a display, audio device, or GUI event loop.
+	try:
+		result = subprocess.run([str(exe), "--version"], capture_output=True, text=True, timeout=30)
+	except subprocess.TimeoutExpired:
+		raise RuntimeError("Bundle verification failed: Performous.app did not respond within 30s.")
+	if result.returncode != 0:
+		raise RuntimeError(f"Bundle verification failed: Performous.app failed to launch (exit {result.returncode}):\n{result.stdout}\n{result.stderr}")
+	print(f"--- Bundle verified OK: {result.stdout.strip()}")
 
 usageHelp = f"""\nPerformous macOS Bundler
 
 Usage:
-	macos_bundler.py [--arch <architecture>] [--prefer-macports | --prefer-homebrew] [options]
+	macos_bundler.py [--arch <architecture>] [options]
 	macos_bundler.py [options]
 
 Options:
@@ -267,14 +281,13 @@ Options:
 	--script-debug  Print the resolved arguments and options passed to this utility.
 
 Environment:
-	--arch <architecture>  Target architecture name passed to the compiler. Defaults to the currently detected architecture as reported by uname. [default: {uname().machine}] 
+	--arch <architecture>  Target architecture name passed to the compiler. Defaults to the currently detected architecture as reported by uname. [default: {uname().machine}]
 	--cc <path/to/compiler>  Change C compiler [default: /usr/bin/clang]
 	--cxx <path/to/compiler>  Change C compiler [default: /usr/bin/clang++]
 	--internal-aubio <auto | always | never>  Find previously installed aubio on system [default: auto]
 	--internal-ced <auto | always | never>  Find previously installed ced on system [default: auto]
 	--internal-json <auto | always | never>  Find previously installed nlohmann-json on system [default: auto]
-	-p <prefix>, --prefix <prefix>  Set prefix path for searching of libraries and headers. By default, the tool tries to detect whether MacPorts or Homebrew are installed and the prefix is set accordingly. Note: If both are installed, you can choose.
-	(--prefer-macports | --prefer-homebrew)  Prefer either MacPorts or Homebrew.
+	-p <prefix>, --prefix <prefix>  Set prefix path for searching of libraries and headers. Defaults to the detected MacPorts install prefix.
 	-s <path>, --source <path>  Path to the Performous source. Defaults to ../
 	-o <path>, --output <path>  Path where the .app will be built. Defaults to <performous-source>/osx-utils/out[/xcode]
 	-t <target>, --target <target>  macOS target version. Defaults to the currently running version, as reported by platform.mac_ver() [default: {str(float('.'.join(platform.mac_ver()[0].split('.')[:2])))}]"""
@@ -364,8 +377,14 @@ if __name__ == "__main__":
 	else:
 		print ("--- No-clean mode enabled. Won't wipe output bundle at: " + str(temp_dir.parent))
 
+	# Clear any stale .dmg from a previous run before starting
+	stale_dmg = performous_out_dir / f"Performous-{package_version}-{arguments['--arch']}.dmg"
+	if stale_dmg.exists():
+		print("--- Removing stale .dmg from a previous run: " + str(stale_dmg))
+		stale_dmg.unlink()
+
 	file_exists(arguments["--cc"])
-	file_exists(arguments["--cxx"]) 
+	file_exists(arguments["--cxx"])
 
 	print("--- Performous source: " + str(performous_source_dir))
 	print("--- Performous build folder: " + str(performous_build_dir))
@@ -377,16 +396,12 @@ if __name__ == "__main__":
 			prefix += str(script_prefix)
 		if opencv_prefix != None:
 			prefix += (";" + str(opencv_prefix))
-		if openssl_prefix != None and brew_prefix != None and arguments["--prefer-macports"] != True:
-			prefix += (";" + str(openssl_prefix))
 		if ffmpeg_prefix != None:
 			prefix += (";" + str(ffmpeg_prefix))
 		if fmt_prefix != None:
 			prefix += (";" + str(fmt_prefix + "/cmake"))
 		command = fr"""
 		cmake \
-		{icu_root} \
-		{openssl_root} \
 		-DPKG_CONFIG_USE_CMAKE_PREFIX_PATH:BOOL=ON \
 		-DCMAKE_INSTALL_PREFIX:PATH="{str(performous_out_dir)}" \
 		-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
@@ -427,4 +442,5 @@ if __name__ == "__main__":
 		execute(f"make -C {performous_build_dir} -j {arguments['--jobs']} install VERBOSE=1")
 		if arguments["--debug"] != True:
 			bundle_libs()
+			verify_bundle()
 			create_dmg()

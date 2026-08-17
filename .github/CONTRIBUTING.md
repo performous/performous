@@ -73,7 +73,7 @@ libwebp-devel fmt-devel
 (You may need to include `--allowerasing` for this to complete successfully)
 
 #### Unit Tests
-If you also plan to run unit tests, further packages are required.  
+If you also plan to run unit tests, further packages are required.
 (This is **not** needed just to play Performous)
 ```bash
 sudo dnf install gtest-devel gmock-devel
@@ -81,133 +81,106 @@ sudo dnf install gtest-devel gmock-devel
 
 ### MacOS
 
-These instructions will walk you through building Performous for macOS (10.9+) and bundling and packaging it inside a DMG ready to install. By default these instructions build the internal webserver, the extra tools (such as Singstar extractor; note, not all are currently working in macOS, even if they all do build successfully), and support for webcam (via OpenCV)
+These instructions cover both a quick dev build (compile and run from the build tree) and building a distributable, relinked `.app`/`.dmg`. MacPorts is the only package manager tested and supported — it's what CI (`.github/workflows/macports.yml`) uses to build and test every push, on both Apple Silicon and Intel. The deployment target is macOS 15.
 
-* These instruction have been tested with macOS 10.12.5 and XCode 8.3.3.
+#### 1. Prerequisites
 
-1.  Install macports first, clean installation is preferred to avoid conflicts.
-2.  Update macports and its port list via 
+* Xcode Command Line Tools: `xcode-select --install`
+* Install [MacPorts](https://www.macports.org/install.php)
 
 ```bash
 sudo port selfupdate
+echo macosx_deployment_target 15.0 | sudo tee -a /opt/local/etc/macports/macports.conf
 ```
 
-* Most dependencies required to use the provided build script must be installed using MacPorts. A couple of them (marked with asterisks, below) are not available in this manner and will have to be obtained and built separately.
-You can use the default 
-  sudo port install <dependency_name>
-to install the dependencies and it's reported to work. However, official macOS releases are built using the following configuration parameters:
+#### 2. Dependencies
 
 ```bash
- sudo /opt/local/bin/port -vsf install <package_name> -universal configure.compiler="clang" \ 
- configure.cxx_stdlib="libc++" configure.macosx_deployment_target="10.9" \
- configure.sdkroot="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk" \
- configure.cxxflags="-std=c++11 -mmacosx-version-min=10.9 -m64 -arch x86_64 -stdlib=libc++ \ 
- -Wl,-headerpad_max_install_names" configure.cflags="-m64 -arch x86_64 -mmacosx-version-min=10.9 \
- -Wl,-headerpad_max_install_names" configure.ldflags="-m64 -arch x86_64 -stdlib=libc++ \ 
- -headerpad_max_install_names -mmacosx-version-min=10.9"
+sudo port install boost cairo cmake cpprestsdk dylibbundler ffmpeg7 \
+   fftw-3-single libfmt11 fontconfig freetype glm help2man icu libepoxy \
+   librsvg libsdl2 libxmlxx5 nlohmann-json opencv4 openssl pango \
+   portaudio portmidi
 ```
 
-and also these, in `~/.macports/macports.conf` (largely they're the same things as the commandline parameters, but Macports is sometimes... well, special, in deciding which things can be configured via command-line and which cannot.
+Some of these (e.g. `ffmpeg7`) have no prebuilt archive for every macOS version and get compiled from source by MacPorts, which can pull in further source builds transitively. If one of those fails with errors like `fatal error: 'memory' file not found`/`'cstdint' file not found` for standard C/C++ headers, your Command Line Tools installation has stale leftover headers (a known MacPorts/CLT interaction — MacPorts prints its own warning about this during `clean`). In this case, just reinstall the CommandLineTools:
 
 ```bash
-  build_arch          	x86_64
-  cxx_stdlib		libc++
-  configure.cxx_stdlib	libc++
-  macosx_deployment_target 10.9
-  configure.cxxflags  "-mmacosx-version-min=10.9 -m64 -arch x86_64 -stdlib=libc++ -Wl,-headerpad_max_install_names"
-  configure.cflags  "-mmacosx-version-min=10.9 -m64 -arch x86_64 -Wl,-headerpad_max_install_names"
-  configure.ldflags "-m64 -arch x86_64 -stdlib=libc++ -headerpad_max_install_names -mmacosx-version-min=10.9"
-  cxxflags  "-mmacosx-version-min=10.9 -m64 -arch x86_64 -stdlib=libc++ -Wl,-headerpad_max_install_names"
-  cflags  "-mmacosx-version-min=10.9 -m64 -arch x86_64 -Wl,-headerpad_max_install_names"
-  ldflags "-m64 -arch x86_64 -stdlib=libc++ -headerpad_max_install_names -mmacosx-version-min=10.9"
-  configure.sdkroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
-  sdkroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
-  universal_archs     	x86_64 noarch
-  buildmakejobs       	0
+sudo rm -rf /Library/Developer/CommandLineTools
+xcode-select --install
 ```
 
-3. Dependencies
+Then re-run the `port install` command above.
 
-* npm
-* boost
-* libxmlxx2
-* libsdl2
-* ffmpeg
-* cmake
-* jsoncpp
-* help2man
-* libepoxy
-* librsvg
-* portaudio
-* portmidi
-* opencv
-* dylibbundler (*)
-* asio-c++ (*)
-* cppnetlib (*)
+If you plan to use the [CMake presets](#quick-dev-build-cmake-presets) below for a plain dev build, also install a generator, like ninja: `sudo port install ninja`. For running unit tests, install gtest: `sudo port install gtest`.
 
-   * Note: Libraries that are required by other dependencies are absent from this list (since they will be installed automatically) in order to simplify the instructions.
-   * Note: Dependencies marked with an asterisk are not available or are outdated in Macports and should be obtained elsewhere.
+#### 3. Clone Performous
 
-4. Download dylibbundler, asioc++ and cpp-netlib version 0.11.2
+Clone the repository as per the standard build instructions (see [Obtain latest source code](#obtain-latest-source-code) below).
 
-* Download dylibbundler from https://github.com/auriamg/macdylibbundler/ and install it according to the README.
-* Download asioc++ from http://think-async.com/Asio/Download, extract it, and open a terminal. Navigate to the folder where the asio folder is, and type the following:
+#### 4. Quick dev build (CMake presets)
 
 ```bash
- mkdir asio-build && cd asio-build
-  ASIO_STANDALONE=1 CXXFLAGS="-std=c++11 -stdlib=libc++" CC="/usr/bin/clang" CXX="/usr/bin/clang++" ../asio-1.10.6/configure --prefix=/opt/local --with-boost=no
- make check && sudo make install
+# Configure (only needed once, or after CMakeLists.txt/preset changes)
+cmake --preset macos-x64-debug
+
+# Build (re-run this after every code change)
+cmake --build --preset macos-x64-debug && cmake --install build/macos-x64-debug
 ```
 
-* Note: Make sure the path to configure is correct, here I am using the default folder to which asioc++ is extracted. 
-
-* Download cpp-netlib 0.11.2 from https://github.com/cpp-netlib/cpp-netlib/releases/tag/cpp-netlib-0.11.2-final
-* Extract it, and once again open a terminal. Navigate to where the cpp-netlib-0.11.2-final folder is, and type the following:
+Swap `debug` for `release` or `debinfo` as needed. This produces a complete `Performous.app` under `build/macos-x64-debug-install/Performous.app`, which you can launch directly:
 
 ```bash
- mkdir cppnetlib-build && cd cppnetlib-build
- cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_CXX_FLAGS="-std=c++11 \
- -stdlib=libc++ -arch x86_64 -Wl,-headerpad_max_install_names" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 \ 
- -DCMAKE_C_FLAGS="-Wl,-headerpad_max_install_names -arch x86_64" -DCMAKE_INSTALL_PREFIX=/opt/local/ \ 
- -DCMAKE_EXE_LINKER_FLAGS=-headerpad_max_install_names -DCPP-NETLIB_BUILD_SHARED_LIBS=ON -DBUILD_SHARED_LIBS=ON \
- -DCMAKE_SHARED_LINKER_FLAGS=-headerpad_max_install_names -DCMAKE_MACOSX_RPATH=ON -DCMAKE_OSX_ARCHITECTURES=x86_64 \
- ../cpp-netlib-0.11.2-final
- make -j0 test && sudo make install
+# Remember to launch the in-app executable to ensure you have access to the microphones
+./build/macos-x64-debug-install/Performous.app/Contents/MacOS/Performous
 ```
 
-* Note: In Sierra, it is possible the mime-roundtrip test fails with a SIGSEGV while using boost 1.59. If this happens you need to install boost 1.60+ (instructions on doing so will require creating a custom port; you can find instructions to do this and the required files in the macports website)
+This is sufficient for running and debugging locally, but it is not relinked for distribution. For a distributable bundle, use the bundler script below instead.
 
-* Note: Make sure the path to configure is correct, here I am using the default folder to which asioc++ is extracted. 
+#### 5. Building a distributable .app/.dmg (macos-bundler.py)
 
-5. Clone Performous from git as per the other build instructions
+`osx-utils/macos-bundler.py` is the script CI uses to produce the actual release `.app`/`.dmg`: it configures and builds Performous, relinks all dependent dylibs into the bundle via `dylibbundler`, and packages a `.dmg`.
 
-6. Run the provided build script
-* Open a terminal and navigate to `performous/osx-tools/`, then type
+MacPorts' stock `librsvg` port isn't built with enough Mach-O header padding for `dylibbundler`'s relinking step, which fails with `larger updated load commands do not fit`. CI works around this with a small local Portfile patch; do the same once, before building:
 
 ```bash
- chmod +x ./performous-app-build.sh && ./performous-app-build.sh
+sudo mkdir -p /opt/custom_portfiles/graphics/
+sudo cp -R $(dirname $(port file librsvg)) /opt/custom_portfiles/graphics/
+sudo bash -c 'cat <<EOF >> /opt/custom_portfiles/graphics/librsvg/Portfile
+configure.ldflags-append -Wl,-headerpad_max_install_names
+EOF'
+sudo bash -c 'cat <<EOF > /opt/local/etc/macports/sources.conf
+file:///opt/custom_portfiles [nosync]
+rsync://rsync.macports.org/macports/release/tarballs/ports.tar [default]
+EOF'
+sudo portindex /opt/custom_portfiles
+sudo port -f uninstall librsvg
+sudo port install librsvg
 ```
 
-   * Note: There might be messages stating you need to install further dependencies for the build process. Follow on-screen instructions here
-   * Note: Make sure to edit the performous-app-build.sh script and change the MAKE_JOBS variable to a number suitable to your machine, as a rule-of-thumb, you should change it to the lesser of how many CPU cores or Gb of RAM your computer has. 
-
-7. This should create a file '''Performous.dmg''' in that directory. Mount that and drag Performous to Applications to install.
-
-8. You'll most likely need to visit the audio configuration first in the configure menu. The integrated webserver can also be configured. Also check the wiki for supported paths for songs.
-
-9. Play and have fun!
-
-
-### MacOS with Homebrew
-
-Building with Homebrew is easier than with MacPorts. However, creation of a software bundle from a Homebrew-build fails, so you will need to run Performous from console.
+Then build:
 
 ```bash
-brew install boost cmake ffmpeg help2man icu4c portaudio portmidi \
-    opencv libepoxy librsvg libxml++3 sdl2
+cd osx-utils
+python3 -m venv ./bundler-venv
+source ./bundler-venv/bin/activate
+pip3 install -r ./macos-bundler-requirements.txt
+python3 ./macos-bundler.py
 ```
 
-Then follow the usual Performous build instructions. No special flags are required and you can do make install without sudo.
+* `--debug` — build a `.app` for local debugging, skipping dylib relinking and `.dmg` creation (fast iteration, not for distribution).
+* `--xcode-project` — generate an Xcode project for debugging in the IDE.
+
+Run `python3 ./macos-bundler.py --help` for the full list of options.
+
+You'll most likely need to visit the audio configuration first in the in-game configure menu. The integrated webserver can also be configured. Also check the wiki for supported paths for songs.
+
+#### Homebrew
+
+Homebrew is **not supported**; use MacPorts.
+
+#### Known issues
+
+* Arabic and other right-to-left text does not currently render correctly on macOS; this is suspected to be a font/fontconfig configuration issue rather than a rendering-engine bug (see `game/unicode.hh`).
 
 ### Windows
 

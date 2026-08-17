@@ -40,9 +40,14 @@ string(REPLACE "${PERFORMOUS_SYSTEM_PREFIX}/share"
 	"../../../Resources" PERFORMOUS_FONTS_CONF
 	"${PERFORMOUS_FONTS_CONF}")
 
-file(WRITE
-	"${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_SYSCONFDIR}/fonts/fonts.conf"
-	"${PERFORMOUS_FONTS_CONF}")
+# Written at install time so a re-install into a wiped/recreated
+# output tree (e.g. via macos-bundler.py) always ships a fonts.conf
+file(GENERATE
+	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/fonts.conf"
+	CONTENT "${PERFORMOUS_FONTS_CONF}")
+
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/fonts.conf"
+	DESTINATION "${CMAKE_INSTALL_SYSCONFDIR}/fonts")
 
 file(GLOB fontconfig_rules "${PERFORMOUS_SYSTEM_PREFIX}/etc/fonts/conf.d/*")
 file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_SYSCONFDIR}/fonts/conf.d")
