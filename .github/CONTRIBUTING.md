@@ -176,7 +176,27 @@ You'll most likely need to visit the audio configuration first in the in-game co
 
 #### Homebrew
 
-Homebrew is **not supported**; use MacPorts.
+MacPorts remains the recommended, CI-verified package manager. Homebrew is community-supported on a best-effort basis for dev builds only.
+
+```bash
+brew install boost cairo cmake cpprestsdk dylibbundler ffmpeg fontconfig freetype \
+   glm googletest help2man icu4c libepoxy librsvg libxml++3 nlohmann-json \
+   opencv pango portaudio portmidi sdl2
+```
+
+(`cpprestsdk` is deprecated upstream — its repository is archived — but Homebrew still bottles it; it's only needed for webserver support.)
+
+Then, from `osx-utils/`, run the bundler script in debug mode with `--prefer-homebrew --debug`. Building the dmg (not using `--debug`) will fail.
+
+```bash
+cd osx-utils
+python3 -m venv ./bundler-venv
+source ./bundler-venv/bin/activate
+pip3 install -r ./macos-bundler-requirements.txt
+python3 ./macos-bundler.py --prefer-homebrew --debug
+```
+
+One known Homebrew-specific issue this project works around: Homebrew's `fmt` package is often newer than this project's vendored `spdlog` expects, which used to cause `-Werror`/`-Wdeprecated-declarations` build failures. This is handled (`cmake/Modules/FindSpdlog.cmake` marks the vendored spdlog headers as system headers), so it shouldn't need any manual workaround. If you hit a similar deprecation error building against a very new Homebrew library, that's the class of issue to look for.
 
 #### Known issues
 

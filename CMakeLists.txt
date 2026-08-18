@@ -11,6 +11,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
+if(APPLE)
+	include(DarwinVersionedPortPrefixes)
+endif()
+
 if(NOT PERFORMOUS_VERSION)
     message("No project version specified. Determining latest tag..")
     include(GetGitRevisionDescription)

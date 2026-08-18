@@ -16,6 +16,36 @@ on:
         required: false
         type: string
         default: "1.87"
+      min_target:
+        description: 'Minimum supported macOS deployment target (compiled on min_runner_arm/min_runner_intel, which may be newer than this).'
+        required: false
+        type: string
+        default: "12.0"
+      min_runner_arm:
+        description: 'Oldest GitHub-hosted arm64 macOS runner currently available, used for the min_target build.'
+        required: false
+        type: string
+        default: "macos-15"
+      min_runner_intel:
+        description: 'Oldest GitHub-hosted Intel macOS runner currently available, used for the min_target build.'
+        required: false
+        type: string
+        default: "macos-15-intel"
+      max_target:
+        description: 'Newest macOS deployment target to verify against (runs natively on max_runner_arm/max_runner_intel).'
+        required: false
+        type: string
+        default: "26.0"
+      max_runner_arm:
+        description: 'Newest GitHub-hosted arm64 macOS runner available.'
+        required: false
+        type: string
+        default: "macos-26"
+      max_runner_intel:
+        description: 'Newest GitHub-hosted Intel macOS runner available. If a future macOS drops Intel, point this at the last Intel-capable runner while max_runner_arm keeps moving.'
+        required: false
+        type: string
+        default: "macos-26-intel"
     secrets:
       NGROK_SSH_TOKEN:
         description: 'Token for SSH debug'
@@ -28,7 +58,19 @@ jobs:
   Install_MacPorts:
     strategy:
       matrix:
-        os: [ 'macos-15-intel', 'macos-15' ]
+        include:
+          - os: '${{ inputs.min_runner_arm }}'
+            target: '${{ inputs.min_target }}'
+            is_min: true
+          - os: '${{ inputs.min_runner_intel }}'
+            target: '${{ inputs.min_target }}'
+            is_min: true
+          - os: '${{ inputs.max_runner_arm }}'
+            target: '${{ inputs.max_target }}'
+            is_min: false
+          - os: '${{ inputs.max_runner_intel }}'
+            target: '${{ inputs.max_target }}'
+            is_min: false
     name: Install Macports
     runs-on: '${{ matrix.os }}'
     env:
@@ -73,7 +115,7 @@ jobs:
       - name: Amend macports configuration
         run: |
           sudo port sync
-          echo macosx_deployment_target 15.0 | tee -a /opt/local/etc/macports/macports.conf
+          echo macosx_deployment_target ${{ matrix.target }} | tee -a /opt/local/etc/macports/macports.conf
           echo cxx_stdlib libc++ | tee -a /opt/local/etc/macports/macports.conf
           echo buildmakejobs 0 | tee -a /opt/local/etc/macports/macports.conf
           echo startupitem_type none | tee -a /opt/local/etc/macports/macports.conf
@@ -118,13 +160,14 @@ jobs:
         run: |
           echo macOS $(sw_vers -productVersion | cut -f1 -d.) | tee "${{ github.workspace }}/cache-key.txt"
           echo CPU Type: $(uname -m) | tee -a "${{ github.workspace }}/cache-key.txt"
+          echo Deployment target: ${{ matrix.target }} | tee -a "${{ github.workspace }}/cache-key.txt"
 
           port info --fullname ${MACOS_DEPS} boost.version=${{ inputs.boost_version }} | \
           grep -v -e'^--$' | cut -w -f2-3 | \
           sed -E 's/@([[:digit:]]+)\.([[:digit:]]+)\.([[:digit:]]+){1}((\+|-)[a-zA-Z0-9_]+)*/@\1.\2/g' | \
           tee -a "${{ github.workspace }}/cache-key.txt"
-          
-          echo contents of cache-key-file: 
+
+          echo contents of cache-key-file:
           cat "${{ github.workspace }}/cache-key.txt"
 
       - name: Compute cache-key
@@ -177,7 +220,7 @@ jobs:
           set +x
           set +e
           sudo rm -rvf /opt/local/var/macports/build
-          
+
 
           try_binary_first autoconf autoconf-archive automake bison cargo cctools clang-18 libgcc gcc15 gcc15-libcxx cmake docbook-xml docbook-xsl-nons flex gi-docgen git gmake gperf gtk-doc itstool meson mm-common nasm ninja p7zip perl5 pkgconfig py313-docutils py313-build py313-cython py313-installer py313-wheel python313 rust texinfo unzip vim websocketpp xmlto yasm boost.version=${{ inputs.boost_version }}
 
@@ -189,7 +232,7 @@ jobs:
 
           sudo port -v uninstall gcc* clang* llvm* || true
           sudo port clean --all installed
-      
+
           # Deactivate everything but zstd before caching, in order to reduce the cache size. It's easier to do it like this than actually manually excluding zstd and its dependencies.
           sudo port -N rev-upgrade
 
@@ -241,14 +284,23 @@ jobs:
           python3 -m venv ./bundler-venv
           source ./bundler-venv/bin/activate
           pip3 install -r ./macos-bundler-requirements.txt
-          python3 ./macos-bundler.py --flat-output --package-version="${{ inputs.package_complete_version }}" --enable-webserver=on --enable-midi=on --enable-webcam=on --build-tests=on
+          python3 ./macos-bundler.py --flat-output --package-version="${{ inputs.package_complete_version }}" --target="${{ matrix.target }}" --enable-webserver=on --enable-midi=on --enable-webcam=on --build-tests=on --prefer-macports
           PACKAGE_PATH="${{ github.workspace }}/performous/osx-utils/out/Performous-${{ inputs.package_complete_version }}-$(uname -m).dmg"
           MASTER_PACKAGE_PATH="${{ github.workspace }}/performous/osx-utils/out/Performous-master[${{ inputs.package_complete_version }}]-$(uname -m).dmg"
           cp -v ${PACKAGE_PATH} ${MASTER_PACKAGE_PATH}
           echo "ARTIFACT_PATH=${PACKAGE_PATH}" >> ${GITHUB_ENV}
-          echo "ARTIFACT_NAME=$(basename ${PACKAGE_PATH})" >> ${GITHUB_ENV}
           echo "MASTER_ARTIFACT_PATH=${MASTER_PACKAGE_PATH}" >> ${GITHUB_ENV}
-          echo "MASTER_ARTIFACT_NAME=$(basename ${MASTER_PACKAGE_PATH})" >> ${GITHUB_ENV}
+          # Multiple matrix entries can share the same architecture (e.g. arm64 at both min_target and
+          # max_target), so the upload-artifact *name* needs to stay unique across the whole workflow run
+          # even though the underlying file on disk keeps its normal name. Only tag non-min builds, so the
+          # canonical min_target (shipped) artifact name is unchanged from before this matrix was widened.
+          if [[ "${{ matrix.is_min }}" == "true" ]]; then
+            echo "ARTIFACT_NAME=$(basename ${PACKAGE_PATH})" >> ${GITHUB_ENV}
+            echo "MASTER_ARTIFACT_NAME=$(basename ${MASTER_PACKAGE_PATH})" >> ${GITHUB_ENV}
+          else
+            echo "ARTIFACT_NAME=$(basename ${PACKAGE_PATH} .dmg)-macos${{ matrix.target }}.dmg" >> ${GITHUB_ENV}
+            echo "MASTER_ARTIFACT_NAME=$(basename ${MASTER_PACKAGE_PATH} .dmg)-macos${{ matrix.target }}.dmg" >> ${GITHUB_ENV}
+          fi
       - name: Run unittests directly called.
         run: |
           cd "${{ github.workspace }}/performous/build/testing"
@@ -274,7 +326,10 @@ jobs:
 
       - name: Upload artifacts to tagged release
         id: upload_assets
-        if: ${{ github.event_name != 'pull_request' && github.ref_type == 'tag' }}
+        # Only the min_target builds (widest end-user compatibility) become the official release asset;
+        # the max_target builds still run the full pipeline as a required CI gate, but their DMG is only
+        # kept as a normal workflow artifact above, to avoid shipping two competing DMGs.
+        if: ${{ github.event_name != 'pull_request' && github.ref_type == 'tag' && matrix.is_min == true }}
         uses: xresloader/upload-to-github-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -290,3 +345,35 @@ jobs:
           name: "MacPorts-log-${{ matrix.os }}.tar.gz"
           path: "${{ steps.get-logs.outputs.log_path }}"
 
+  # Best-effort, non-blocking build via Homebrew. MacPorts remains the
+  # recommended, required macOS build, this job exists purely for regression
+  # visibility on the community-supported Homebrew path and should not block merges.
+  Homebrew_Build:
+    name: Homebrew build (best-effort, non-blocking)
+    continue-on-error: true
+    runs-on: macos-15
+    steps:
+      - name: Checkout Git
+        uses: actions/checkout@v6
+        with:
+          path: performous
+
+      - name: Install Homebrew dependencies
+        run: |
+          brew install boost cairo cmake cpprestsdk dylibbundler ffmpeg fontconfig freetype \
+            glm googletest help2man icu4c libepoxy librsvg libxml++3 nlohmann-json \
+            opencv pango portaudio portmidi sdl2
+
+      - name: Build via macos-bundler.py --prefer-homebrew --debug
+        run: |
+          cd performous/osx-utils
+          chmod +x ./macos-bundler.py
+          python3 -m venv ./bundler-venv
+          source ./bundler-venv/bin/activate
+          pip3 install -r ./macos-bundler-requirements.txt
+          python3 ./macos-bundler.py --prefer-homebrew --debug --enable-webserver=on --enable-midi=on --enable-webcam=on --build-tests=on
+
+      - name: Run unit tests
+        run: |
+          cd performous/build/testing
+          ./performous_test --gtest_filter=UnitTest*

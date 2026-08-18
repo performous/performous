@@ -53,7 +53,7 @@
     },
     {
       "name": "macos-base",
-      "description": "Target macOS with MacPorts (/opt/local) as the dependency prefix. Includes extra CMAKE_PREFIX_PATH entries for MacPorts' versioned ffmpeg7/libfmt11 ports. CMAKE_OSX_DEPLOYMENT_TARGET should be kept in sync with osx-utils/macos-bundler.py's runner-OS-tracking default and macports.yml's macports.conf setting.",
+      "description": "Target macOS with MacPorts (/opt/local) as the dependency prefix.",
       "hidden": true,
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/${presetName}",
@@ -63,7 +63,7 @@
         "rhs": "Darwin"
       },
       "cacheVariables": {
-        "CMAKE_PREFIX_PATH": "/opt/local;/opt/local/libexec/ffmpeg7;/opt/local/lib/libfmt11/cmake;/opt/local/libexec/opencv4",
+        "CMAKE_PREFIX_PATH": "/opt/local",
         "PKG_CONFIG_USE_CMAKE_PREFIX_PATH": "ON",
         "CMAKE_OSX_DEPLOYMENT_TARGET": "15.0",
         "ENABLE_WEBSERVER": "AUTO",

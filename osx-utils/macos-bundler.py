@@ -17,9 +17,14 @@ import tty
 
 
 port_location = None
+brew_location = None
 opencv_prefix: Path = None
+openssl_prefix: Path = None
 ffmpeg_prefix: Path = None
 fmt_prefix : Path = None
+icu_root = ""
+openssl_root = ""
+brew_prefix: Path = None
 script_prefix: Path = None
 performous_source_dir = None
 
@@ -56,6 +61,14 @@ def check_installed(name : str) -> Optional[Path]:
 	else:
 		return None
 
+def check_brew_formula(name : str, file : str) -> Optional[Path]:
+	p = subprocess.run(args = ["brew", "ls", "--verbose", name], encoding="utf-8", capture_output=True)
+	if p.returncode == 0:
+		p2 = subprocess.run(args = ["grep", file], encoding="utf-8", capture_output=True, input=p.stdout)
+		return str_to_path(p2.stdout.strip()).parent
+	else:
+		return None
+
 def check_installed_port(name : str, file : str) -> Optional[Path]:
 	p = subprocess.run(args = ["port", "contents", name], encoding="utf-8", capture_output=True)
 	if p.returncode == 0:
@@ -67,29 +80,65 @@ def check_installed_port(name : str, file : str) -> Optional[Path]:
 	else:
 		return None
 
+def detect_macports():
+	global opencv_prefix, ffmpeg_prefix, fmt_prefix
+	for opencv_version in ["4", "3"]:
+		check_opencv = check_installed_port(f"opencv{opencv_version}", "OpenCVConfig.cmake")
+		if check_opencv != None:
+			opencv_prefix = str(check_opencv)
+			print(f"--- OpenCV {opencv_version} detected at: " + str(opencv_prefix) + "\n")
+			break
+	for ffmpeg_version in ["8", "7", "6", ""]:
+		check_ffmpeg = check_installed_port(f"ffmpeg{ffmpeg_version}", "libavcodec.pc")
+		if check_ffmpeg != None:
+			ffmpeg_prefix = str(check_ffmpeg.parent)
+			print(f"--- FFMpeg {ffmpeg_version or '4'} detected at: " + str(ffmpeg_prefix) + "\n")
+			break
+	for fmt_version in ["11", "10", "9", "8", "7"]:
+		check_fmt = check_installed_port(f"libfmt{fmt_version}", "fmt-config.cmake")
+		if check_fmt != None:
+			fmt_prefix = str(check_fmt.parent)
+			print(f"--- LibFMT {fmt_version} detected at: " + str(fmt_prefix) + "\n")
+			break
+
+def detect_homebrew():
+	global opencv_prefix, openssl_prefix, ffmpeg_prefix, icu_root, openssl_root
+	for opencv_version in ["4", "3"]:
+		check_opencv = check_brew_formula("opencv@{opencv_version}", "OpenCVConfig.cmake")
+		if check_opencv != None:
+			opencv_prefix = str(check_opencv.parent)
+			print("--- OpenCV {opencv_version} detected at: " + str(opencv_prefix) + "\n")
+			break
+	for ffmpeg_version in ["8", "7", "6", "5", "4"]:
+		check_ffmpeg = check_brew_formula(f"ffmpeg@{ffmpeg_version}", "libavcodec.pc")
+		if check_ffmpeg != None:
+			ffmpeg_prefix = str(check_ffmpeg.parent)
+			print(f"--- FFMpeg {ffmpeg_version} detected at: " + str(ffmpeg_prefix) + "\n")
+			break
+	check_openssl = check_brew_formula("openssl", "libcrypto.pc")
+	if check_openssl != None:
+		openssl_prefix = str(check_openssl)
+		openssl_root = f"-DOPENSSL_ROOT_DIR='{str(check_openssl.parent.parent)}'"
+		print("--- OpenSSL detected at: " + str(openssl_prefix) + "\n")
+	check_icu = check_brew_formula("icu4c", "utypes.h")
+	if check_icu != None:
+		icu_root = f"-DICU_ROOT='{str(check_icu.parent.parent)}'"
+		print("--- ICU detected at: " + str(check_icu.parent.parent) + "\n")
+
 def detect_prefix():
-	global opencv_prefix, script_prefix, ffmpeg_prefix, fmt_prefix
+	global script_prefix, brew_prefix
 	port_location = check_installed('port')
+	brew_location = check_installed('brew')
+
 	if port_location != None:
 		print("--- MacPorts install detected at: " + str(port_location) + "\n")
-		for opencv_version in ["4", "3"]:
-			check_opencv = check_installed_port(f"opencv{opencv_version}", "OpenCVConfig.cmake")
-			if check_opencv != None:
-				opencv_prefix = str(check_opencv)
-				print(f"--- OpenCV {opencv_version} detected at: " + str(opencv_prefix) + "\n")
-				break
-		for ffmpeg_version in ["8", "7", "6", ""]:
-			check_ffmpeg = check_installed_port(f"ffmpeg{ffmpeg_version}", "libavcodec.pc")
-			if check_ffmpeg != None:
-				ffmpeg_prefix = str(check_ffmpeg.parent)
-				print(f"--- FFMpeg {ffmpeg_version or '4'} detected at: " + str(ffmpeg_prefix) + "\n")
-				break
-		for fmt_version in ["11", "10", "9", "8", "7"]:
-			check_fmt = check_installed_port(f"libfmt{fmt_version}", "fmt-config.cmake")
-			if check_fmt != None:
-				fmt_prefix = str(check_fmt.parent)
-				print(f"--- LibFMT {fmt_version} detected at: " + str(fmt_prefix) + "\n")
-				break
+	else:
+		print("--- MacPorts does not appear to be installed.\n")
+	if brew_location != None:
+		brew_prefix = subprocess.run(args = ["brew", "--prefix"], encoding="utf-8", capture_output=True).stdout.replace("\n", "")
+		print("--- Homebrew install detected at: " + str(brew_location))
+	else:
+		print("--- Homebrew does not appear to be installed.\n")
 
 	if arguments["--prefix"] != None:
 		if str_to_path(arguments["--prefix"]).is_dir():
@@ -97,9 +146,29 @@ def detect_prefix():
 			return
 		else:
 			raise FileNotFoundError("Specified an inexistent prefix folder.")
-	elif port_location is None:
-		raise FileNotFoundError("Can't find a MacPorts install. MacPorts is the only supported package manager for building Performous on macOS.")
+	elif port_location is None and brew_location is None:
+		raise FileNotFoundError("Can't find a suitable package manager.")
+
+	# Decide which single package manager to use before running any sub-dependency
+	# (opencv/ffmpeg/fmt/openssl/icu) detection
+	use_homebrew = False
+	if arguments["--prefer-homebrew"] == True:
+		if brew_location is None and port_location != None:
+			print("\n--- WARNING: Homebrew requested, but not found: defaulting to MacPorts install.\n")
+		else:
+			use_homebrew = True
+	elif arguments["--prefer-macports"] == True:
+		if port_location is None and brew_location != None:
+			print("\n--- WARNING: Macports requested, but not found: defaulting to Homebrew install.\n")
+			use_homebrew = True
 	else:
+		use_homebrew = port_location is None and brew_location != None
+
+	if use_homebrew:
+		detect_homebrew()
+		script_prefix = brew_prefix
+	else:
+		detect_macports()
 		script_prefix = port_location.parent.parent
 
 def ask_user(prompt : str, opt1 : str = "y", opt2 : str = "n") -> bool:
@@ -273,7 +342,7 @@ def verify_bundle():
 usageHelp = f"""\nPerformous macOS Bundler
 
 Usage:
-	macos_bundler.py [--arch <architecture>] [options]
+	macos_bundler.py [--arch <architecture>] [--prefer-macports | --prefer-homebrew] [options]
 	macos_bundler.py [options]
 
 Options:
@@ -299,7 +368,8 @@ Environment:
 	--internal-aubio <auto | always | never>  Find previously installed aubio on system [default: auto]
 	--internal-ced <auto | always | never>  Find previously installed ced on system [default: auto]
 	--internal-json <auto | always | never>  Find previously installed nlohmann-json on system [default: auto]
-	-p <prefix>, --prefix <prefix>  Set prefix path for searching of libraries and headers. Defaults to the detected MacPorts install prefix.
+	-p <prefix>, --prefix <prefix>  Set prefix path for searching of libraries and headers. By default, the tool tries to detect whether MacPorts or Homebrew are installed and the prefix is set accordingly. Note: If both are installed, MacPorts is preferred unless --prefer-homebrew is passed.
+	(--prefer-macports | --prefer-homebrew)  Prefer either MacPorts or Homebrew. MacPorts is the recommended, CI-verified package manager. --prefer-homebrew requires --debug: dylib relinking/bundling and .dmg creation are not supported with Homebrew, only a plain debug build.
 	-s <path>, --source <path>  Path to the Performous source. Defaults to ../
 	-o <path>, --output <path>  Path where the .app will be built. Defaults to <performous-source>/osx-utils/out[/xcode]
 	-t <target>, --target <target>  macOS target version. Defaults to the currently running version, as reported by platform.mac_ver() [default: {str(float('.'.join(platform.mac_ver()[0].split('.')[:2])))}]"""
@@ -326,6 +396,10 @@ if __name__ == "__main__":
 		if (arguments[arg].upper() not in include_feature_opts):
 			print(f"Invalid value for {arg}; options are: {', '.join(include_feature_opts)}")
 			sys.exit(1)
+
+	if arguments["--prefer-homebrew"] == True and arguments["--debug"] != True:
+		print("--prefer-homebrew requires --debug: dylib relinking/bundling and .dmg creation are not supported with Homebrew, only a plain debug build.")
+		sys.exit(1)
 
 	detect_prefix()
 	set_version()
@@ -408,12 +482,16 @@ if __name__ == "__main__":
 			prefix += str(script_prefix)
 		if opencv_prefix != None:
 			prefix += (";" + str(opencv_prefix))
+		if openssl_prefix != None and brew_prefix != None and arguments["--prefer-macports"] != True:
+			prefix += (";" + str(openssl_prefix))
 		if ffmpeg_prefix != None:
 			prefix += (";" + str(ffmpeg_prefix))
 		if fmt_prefix != None:
 			prefix += (";" + str(fmt_prefix + "/cmake"))
 		command = fr"""
 		cmake \
+		{icu_root} \
+		{openssl_root} \
 		-DPKG_CONFIG_USE_CMAKE_PREFIX_PATH:BOOL=ON \
 		-DCMAKE_INSTALL_PREFIX:PATH="{str(performous_out_dir)}" \
 		-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \

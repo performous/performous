@@ -39,3 +39,14 @@ else()
 endif()
 
 message(STATUS "Found Spdlog ${Spdlog_VERSION}")
+
+# The FetchContent-vendored spdlog headers can trigger deprecation warnings from a
+# newer system fmt than spdlog itself has been updated for (e.g. fmt 12.x's
+# deprecated fmt::runtime() string_view conversion, still present as of spdlog
+# v1.17.0). Since this project builds with -Werror, that would hard-fail the build
+# over a warning in third-party code we don't control. Mark spdlog's headers SYSTEM
+# so our own -Werror doesn't apply to warnings coming from inside them.
+if(TARGET spdlog_header_only)
+	set_target_properties(spdlog_header_only PROPERTIES
+		INTERFACE_SYSTEM_INCLUDE_DIRECTORIES "$<TARGET_PROPERTY:spdlog_header_only,INTERFACE_INCLUDE_DIRECTORIES>")
+endif()
