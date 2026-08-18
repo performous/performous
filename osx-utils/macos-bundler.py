@@ -195,7 +195,9 @@ def dedupe_rpaths():
 			else:
 				seen.add(rpath)
 		if changed:
-			subprocess.run(["codesign", "--force", "--sign", "-", str(target)], check=True)
+			# Match dylibbundler's own signing invocation rather than a bare re-sign
+			# so nothing dylibbundler relied on gets silently dropped here.
+			subprocess.run(["codesign", "--force", "--deep", "--preserve-metadata=entitlements,requirements,flags,runtime", "--sign", "-", str(target)], check=True)
 
 def bundle_libs():
 	global performous_out_dir
@@ -255,7 +257,17 @@ def verify_bundle():
 	except subprocess.TimeoutExpired:
 		raise RuntimeError("Bundle verification failed: Performous.app did not respond within 30s.")
 	if result.returncode != 0:
-		raise RuntimeError(f"Bundle verification failed: Performous.app failed to launch (exit {result.returncode}):\n{result.stdout}\n{result.stderr}")
+		crash_info = ""
+		if result.returncode < 0:
+			try:
+				lldb_result = subprocess.run(
+					["lldb", "-b", "-o", "run", "-o", "bt all", "--", str(exe), "--version"],
+					capture_output=True, text=True, timeout=30,
+				)
+				crash_info = f"\n\n--- lldb backtrace (best-effort) ---\n{lldb_result.stdout}\n{lldb_result.stderr}"
+			except (subprocess.TimeoutExpired, FileNotFoundError) as lldb_error:
+				crash_info = f"\n\n--- lldb backtrace unavailable: {lldb_error} ---"
+		raise RuntimeError(f"Bundle verification failed: Performous.app failed to launch (exit {result.returncode}):\n{result.stdout}\n{result.stderr}{crash_info}")
 	print(f"--- Bundle verified OK: {result.stdout.strip()}")
 
 usageHelp = f"""\nPerformous macOS Bundler
