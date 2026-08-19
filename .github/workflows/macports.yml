@@ -21,11 +21,11 @@ on:
         required: false
         type: string
         default: "12.0"
-      min_runner_arm:
-        description: 'Oldest GitHub-hosted arm64 macOS runner currently available, used for the min_target build.'
-        required: false
-        type: string
-        default: "macos-15"
+      # min_runner_arm:
+      #   description: 'Oldest GitHub-hosted arm64 macOS runner currently available, used for the min_target build.'
+      #   required: false
+      #   type: string
+      #   default: "macos-15"
       min_runner_intel:
         description: 'Oldest GitHub-hosted Intel macOS runner currently available, used for the min_target build.'
         required: false
@@ -41,11 +41,11 @@ on:
         required: false
         type: string
         default: "macos-26"
-      max_runner_intel:
-        description: 'Newest GitHub-hosted Intel macOS runner available. If a future macOS drops Intel, point this at the last Intel-capable runner while max_runner_arm keeps moving.'
-        required: false
-        type: string
-        default: "macos-26-intel"
+      # max_runner_intel:
+      #   description: 'Newest GitHub-hosted Intel macOS runner available. If a future macOS drops Intel, point this at the last Intel-capable runner while max_runner_arm keeps moving.'
+      #   required: false
+      #   type: string
+      #   default: "macos-26-intel"
     secrets:
       NGROK_SSH_TOKEN:
         description: 'Token for SSH debug'
@@ -59,18 +59,18 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: '${{ inputs.min_runner_arm }}'
-            target: '${{ inputs.min_target }}'
-            is_min: true
+          # - os: '${{ inputs.min_runner_arm }}'
+          #   target: '${{ inputs.min_target }}'
+          #   is_min: true
           - os: '${{ inputs.min_runner_intel }}'
             target: '${{ inputs.min_target }}'
             is_min: true
           - os: '${{ inputs.max_runner_arm }}'
             target: '${{ inputs.max_target }}'
             is_min: false
-          - os: '${{ inputs.max_runner_intel }}'
-            target: '${{ inputs.max_target }}'
-            is_min: false
+          # - os: '${{ inputs.max_runner_intel }}'
+          #   target: '${{ inputs.max_target }}'
+          #   is_min: false
     name: Install Macports
     runs-on: '${{ matrix.os }}'
     env:
@@ -360,7 +360,7 @@ jobs:
 
       - name: Install Homebrew dependencies
         run: |
-          brew install boost cairo cmake cpprestsdk dylibbundler ffmpeg fontconfig freetype \
+          brew install boost cairo cmake cpprestsdk dylibbundler ffmpeg fftw fontconfig freetype \
             glm googletest help2man icu4c libepoxy librsvg libxml++3 nlohmann-json \
             opencv pango portaudio portmidi sdl2
 
