@@ -53,7 +53,7 @@ namespace portaudio {
 	class DeviceNotFoundError : public std::runtime_error {
 		public:
 			DeviceNotFoundError(std::string const& str) : std::runtime_error(str) {}
-	}; 
+	};
 
 	namespace internal {
 		void inline check(PaError code, char const* func) { if (code != paNoError) throw Error(code, func); }
@@ -85,7 +85,16 @@ namespace portaudio {
 		/// Constructor gets the PA devices into a vector
 		AudioDevices(PaHostApiTypeId backend = AutoBackendType) {
 			PaHostApiIndex backendIndex = Pa_HostApiTypeIdToHostApiIndex((backend == AutoBackendType ? defaultBackEnd() : backend));
-			if (backendIndex == paHostApiNotFound) backendIndex = Pa_HostApiTypeIdToHostApiIndex(defaultBackEnd());
+			if (backendIndex == paHostApiNotFound) {
+				backendIndex = Pa_HostApiTypeIdToHostApiIndex(defaultBackEnd());
+				// On Linux/Unix: if JACK (default) is not available, fall back to ALSA
+				if (backendIndex == paHostApiNotFound && (
+						Platform::currentOS() == Platform::HostOS::OS_LINUX ||
+						Platform::currentOS() == Platform::HostOS::OS_UNIX)) {
+					SpdLogger::info(LogSystem::AUDIO, "JACK backend not available, falling back to ALSA");
+					backendIndex = Pa_HostApiTypeIdToHostApiIndex(PaHostApiTypeId(8)); // ALSA
+				}
+			}
 			for (int i = 0, end = Pa_GetHostApiInfo(backendIndex)->deviceCount; i != end; ++i) {
 				PaDeviceInfo const* info = Pa_GetDeviceInfo(Pa_HostApiDeviceIndexToDeviceIndex(backendIndex, i));
 				if (!info) continue;

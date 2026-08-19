@@ -107,8 +107,8 @@ int Platform::defaultBackEnd() {
 			case HostOS::OS_MAC: return 5; // CoreAudio
 			case HostOS::OS_SOLARIS: return 7; // OSS
 			case HostOS::OS_BSD: return 7; // OSS
-			case HostOS::OS_LINUX: return 8; // ALSA
-			case HostOS::OS_UNIX: return 8; // ALSA
+			case HostOS::OS_LINUX: return 12;  // JACK
+			case HostOS::OS_UNIX: return 12; // JACK
 			default: break;
 		}
 	throw std::runtime_error("Unable to determine a default Audio backend.");
