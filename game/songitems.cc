@@ -44,10 +44,8 @@ void SongItems::save(xmlpp::Element* songs) {
 SongId SongItems::addSongItem(std::string const& artist, std::string const& title, bool broken, std::optional<SongId> _id) {
     SongItem si;
     si.id = _id.value_or(assign_id_internal());
-    songMetadata collateInfo{ {"artist", artist}, {"title", title} };
-    UnicodeUtil::collate(collateInfo);
-    si.artist = collateInfo["artist"];
-    si.title = collateInfo["title"];
+    si.artist = artist;
+    si.title = title;
     si.setBroken(broken);
     std::pair<songs_t::iterator, bool> ret = m_songs.insert(si);
     if (!ret.second)
@@ -82,12 +80,15 @@ std::optional<SongId> SongItems::lookup(Song const& song) const {
     auto const si = std::find_if(m_songs.begin(), m_songs.end(), [&song](SongItem const& si) {
 
         // This is not always really correct but in most cases these inputs should have been normalized into unicode at one point during their life time.
-        if (song.collateByArtistOnly.length() != si.artist.length() ||
-            song.collateByTitleOnly.length() != si.title.length()) return false;
+        if (song.artist.length() != si.artist.length() || song.title.length() != si.title.length())
+            return false;
 
-        return UnicodeUtil::caseEqual(song.collateByArtistOnly, si.artist, true) && UnicodeUtil::caseEqual(song.collateByTitleOnly, si.title, true);
-        });
-    if (si != m_songs.end()) return si->id;
+        return UnicodeUtil::caseEqual(song.artist, si.artist, true) && UnicodeUtil::caseEqual(song.title, si.title, true);
+    });
+
+    if (si != m_songs.end())
+        return si->id;
+
     return std::nullopt;
 }
 
@@ -106,7 +107,7 @@ SongPtr SongItems::getSong(SongId id) const
 
 	if (it == m_songs.end())
 		return {};
-		
+
 	return it->getSong();
 }
 
