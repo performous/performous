@@ -104,10 +104,10 @@ def detect_macports():
 def detect_homebrew():
 	global opencv_prefix, openssl_prefix, ffmpeg_prefix, icu_root, openssl_root
 	for opencv_version in ["4", "3"]:
-		check_opencv = check_brew_formula("opencv@{opencv_version}", "OpenCVConfig.cmake")
+		check_opencv = check_brew_formula(f"opencv@{opencv_version}", "OpenCVConfig.cmake")
 		if check_opencv != None:
 			opencv_prefix = str(check_opencv.parent)
-			print("--- OpenCV {opencv_version} detected at: " + str(opencv_prefix) + "\n")
+			print(f"--- OpenCV {opencv_version} detected at: " + str(opencv_prefix) + "\n")
 			break
 	for ffmpeg_version in ["8", "7", "6", "5", "4"]:
 		check_ffmpeg = check_brew_formula(f"ffmpeg@{ffmpeg_version}", "libavcodec.pc")
