@@ -360,7 +360,7 @@ jobs:
 
       - name: Install Homebrew dependencies
         run: |
-          brew install boost cairo cmake cpprestsdk dylibbundler ffmpeg fftw fontconfig freetype \
+          brew install boost cairo cmake cpprestsdk dylibbundler ffmpeg fftw fmt fontconfig freetype \
             glm googletest help2man icu4c libepoxy librsvg libxml++3 nlohmann-json \
             opencv pango portaudio portmidi sdl2
 
