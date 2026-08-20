@@ -11,6 +11,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
+if(APPLE)
+	include(DarwinVersionedPortPrefixes)
+endif()
+
 if(NOT PERFORMOUS_VERSION)
     message("No project version specified. Determining latest tag..")
     include(GetGitRevisionDescription)
@@ -188,14 +192,9 @@ set(CPACK_NSIS_MUI_HEADERIMAGE "${CMAKE_CURRENT_SOURCE_DIR}/win32/nsis\\\\header
 set(CPACK_NSIS_MANIFEST_DPI_AWARE ON)
 set(CPACK_NSIS_BRANDING_TEXT "Performous installer ${PROJECT_VERSION} 2009-${YEAR}")
 
-# macOS specific settings
-set(CPACK_BUNDLE_NAME "Performous")
-set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/osx-utils/resources/Info.plist")
-set(CPACK_BUNDLE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/osx-utils/resources/Performous.icns")
-
 if (APPLE)
 	set(CPACK_SOURCE_GENERATOR "")
-	set(CPACK_GENERATOR "Bundle")
+	set(CPACK_GENERATOR "")
 	set(CMAKE_XCODE_ATTRIBUTE_MARKETING_VERSION "${PROJECT_VERSION}")
 	set(CMAKE_XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "org.performous.Performous")
 	set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")

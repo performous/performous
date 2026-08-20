@@ -273,7 +273,6 @@ static void fatalError(const std::string &msg) {
 }
 
 int main(int argc, char** argv) {
-	Platform platform;
 	std::srand(static_cast<unsigned>(std::time(nullptr)));
 	// Parse commandline options
 	std::vector<std::string> devices;
@@ -335,6 +334,7 @@ int main(int argc, char** argv) {
 	}
 	PathCache::pathBootstrap();
 	SpdLogger spdLogger(levelEnum);
+	Platform platform;
 	try {
 		outputOptionalFeatureStatus();
 
