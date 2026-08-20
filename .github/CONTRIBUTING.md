@@ -81,7 +81,7 @@ sudo dnf install gtest-devel gmock-devel
 
 ### MacOS
 
-These instructions cover both a quick dev build (compile and run from the build tree) and building a distributable, relinked `.app`/`.dmg`. MacPorts is the only package manager tested and supported — it's what CI (`.github/workflows/macports.yml`) uses to build and test every push, on both Apple Silicon and Intel. The deployment target is macOS 15.
+These instructions cover both a quick dev build (compile and run from the build tree) and building a distributable, relinked `.app`/`.dmg`. MacPorts is the only package manager tested and supported — it's what CI (`.github/workflows/macports.yml`) uses to build and test every push, on both Apple Silicon and Intel. The [CMake presets](#quick-dev-build-cmake-presets) below default to macOS 15 as a reasonable local baseline.
 
 #### 1. Prerequisites
 
@@ -101,6 +101,10 @@ sudo port install boost cairo cmake cpprestsdk dylibbundler ffmpeg7 \
    librsvg libsdl2 libxmlxx5 nlohmann-json opencv4 openssl pango \
    portaudio portmidi
 ```
+
+`ffmpeg7`, `libfmt11`, and `opencv4` are MacPorts' current major-version-suffixed ports for those
+libraries (MacPorts allows several ABI-incompatible major versions to coexist, so there's no
+version-less alias to install "whichever is newest"). If MacPorts has newer versions available, install whatever's current instead — CMake auto-detects whichever versioned port is installed (see `cmake/Modules/DarwinVersionedPortPrefixes.cmake`), so nothing else needs to change to match.
 
 Some of these (e.g. `ffmpeg7`) have no prebuilt archive for every macOS version and get compiled from source by MacPorts, which can pull in further source builds transitively. If one of those fails with errors like `fatal error: 'memory' file not found`/`'cstdint' file not found` for standard C/C++ headers, your Command Line Tools installation has stale leftover headers (a known MacPorts/CLT interaction — MacPorts prints its own warning about this during `clean`). In this case, just reinstall the CommandLineTools:
 
@@ -179,7 +183,7 @@ You'll most likely need to visit the audio configuration first in the in-game co
 MacPorts remains the recommended, CI-verified package manager. Homebrew is community-supported on a best-effort basis for dev builds only.
 
 ```bash
-brew install boost cairo cmake cpprestsdk dylibbundler ffmpeg fontconfig freetype \
+brew install boost cairo cmake cpprestsdk dylibbundler ffmpeg fftw fmt fontconfig freetype \
    glm googletest help2man icu4c libepoxy librsvg libxml++3 nlohmann-json \
    opencv pango portaudio portmidi sdl2
 ```
