@@ -1,7 +1,7 @@
 #include "unicode.hh"
 
 #include "configuration.hh"
-#include "game.hh"
+#include "i18n.hh"
 #include "log.hh"
 
 #include <regex>
