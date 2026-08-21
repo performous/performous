@@ -32,7 +32,7 @@ void SongParser::txtParseHeader(Song& song) {
 		SpdLogger::error(LogSystem::SONGPARSER, "TXT Parser ({}) -- Required song file is not available at path={}", song.filename, song.music[TrackName::BGMUSIC].string());
 	}
 	if (m_bpm != 0.0f)
-		addBPM(song, 0, m_bpm);
+		addBPM(song, 0, m_bpm, m_gap);
 }
 
 /// Parse notes
@@ -161,7 +161,7 @@ bool SongParser::txtParseNote(Song& song, std::string line) {
 		iss.ignore();
 		if (!(iss >> ts >> bpm) || ts < 0 || ts > MAX_STARTBEAT)
         	throw SongParserException(song, "Invalid BPM line format", m_linenum);
-		addBPM(song, static_cast<unsigned int>(ts), bpm);
+		addBPM(song, static_cast<unsigned int>(ts), bpm, m_gap);
 		return true;
 	}
 	if (line[0] == 'P') {
@@ -203,7 +203,7 @@ bool SongParser::txtParseNote(Song& song, std::string line) {
 			n.notePrev = n.note; // No slide notes in TXT yet.
 			if (m_relative) ts += m_txt.relativeShift;
 			if (iss.get() == ' ') std::getline(iss, n.syllable);
-			n.end = tsTime(song, ts + length);
+			n.end = tsTime(song, ts + length, m_gap);
 		}
 		break;
 		case Note::Type::SLEEP:
@@ -215,7 +215,7 @@ bool SongParser::txtParseNote(Song& song, std::string line) {
 				end += m_txt.relativeShift;
 				m_txt.relativeShift = end;
 			}
-			n.end = tsTime(song, end);
+			n.end = tsTime(song, end, m_gap);
 		}
 		break;
 		case Note::Type::SLIDE:
@@ -228,7 +228,7 @@ bool SongParser::txtParseNote(Song& song, std::string line) {
 		default:
 			throw std::runtime_error("Unknown note type");
 	}
-	n.begin = tsTime(song, ts);
+	n.begin = tsTime(song, ts, m_gap);
 	VocalTrack& vocal = song.getVocalTrack(
 	  (m_curSinger == CurrentSinger::P1) || (m_curSinger == CurrentSinger::BOTH)
 	  ? TrackName::VOCAL_LEAD : DUET_P2);
@@ -272,5 +272,5 @@ bool SongParser::txtParseNote(Song& song, std::string line) {
 void SongParser::txtResetState(Song& song) {
 	m_txt = TXTState();
 	song.m_bpms.clear();
-	if (m_bpm != 0.0f) { addBPM (song, 0, m_bpm); }
+	if (m_bpm != 0.0f) { addBPM (song, 0, m_bpm, m_gap); }
 }

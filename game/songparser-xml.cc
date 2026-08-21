@@ -98,7 +98,7 @@ void SongParser::xmlParseHeader(Song& song) {
 		else if (res == "Demisemiquaver") m_bpm *= 2.0f;
 		else throw std::runtime_error("Unknown tempo resolution: " + res);
 	}
-	addBPM(song, 0, m_bpm);
+	addBPM(song, 0, m_bpm, m_gap);
 
 	// Read TRACK elements (singer names), if available
 	std::string singers;  // Only used for "Together" track
@@ -155,7 +155,7 @@ void SongParser::xmlParse(Song& song) {
 			// Check if SENTENCE has new attributes
 			{
 				auto attr = sentenceNode.get_attribute("Part");
-				if (attr) song.songsections.push_back(Song::SongSection(attr->get_value(), tsTime(song, ts)));
+				if (attr) song.songsections.push_back(Song::SongSection(attr->get_value(), tsTime(song, ts, m_gap)));
 				attr = sentenceNode.get_attribute("Singer");
 				if (attr) sentenceSinger = attr->get_value();
 			}
@@ -163,7 +163,7 @@ void SongParser::xmlParse(Song& song) {
 			{
 				Note sleep;
 				sleep.type = Note::Type::SLEEP;
-				sleep.begin = sleep.end = tsTime(song, ts);
+				sleep.begin = sleep.end = tsTime(song, ts, m_gap);
 				addNoteToTrack(vocal, sleep);
 			}
 			// Notes of a sentence
@@ -201,9 +201,9 @@ Note SongParser::xmlParseNote(Song& song, xmlpp::Element const& noteNode, unsign
 	else if (noteNode.get_attribute("Bonus")) n.type = Note::Type::GOLDEN;
 	else n.type = Note::Type::NORMAL;
 
-	n.begin = tsTime(song, ts);
+	n.begin = tsTime(song, ts, m_gap);
 	ts += static_cast<unsigned>(duration);
-	n.end = tsTime(song, ts);
+	n.end = tsTime(song, ts, m_gap);
 	n.syllable = lyric;
 	n.note = static_cast<float>(note);
 	n.notePrev = static_cast<float>(note);

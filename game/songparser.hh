@@ -82,13 +82,7 @@ private:
 		unsigned relativeShift = 0;
 	} m_txt;
 	// Functions
-	void finalize(Song&);
-	void vocalsTogether(Song&);
-	void guessFiles(Song&);
-	bool getline (std::string& line) { ++m_linenum; return (bool) std::getline (m_ss, line); }
-	Song::BPM getBPM(Song const& s, double ts) const;
-	void addBPM(Song&, double ts, float bpm);
-	double tsTime(Song&, double ts) const;  ///< Convert a timestamp (beats) into time (seconds)
+	bool getline(std::string& line) { return SongParserUtil::getLine(m_ss, line, m_linenum); }
 	bool txtCheck(std::string const& data) const;
 	void txtParseHeader(Song&);
 	void txtParse(Song&);

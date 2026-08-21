@@ -134,7 +134,7 @@ bool SongParser::smParseField(Song& song, std::string line) {
 			char chr;
 			while (iss >> ts >> chr >> bpm) {
 				if (ts == 0.0) m_bpm = static_cast<float>(bpm);
-				addBPM(song, ts * 4.0, m_bpm);
+				addBPM(song, ts * 4.0, m_bpm, m_gap);
 				if (!(iss >> chr)) break;
 			}
 	}
@@ -196,7 +196,7 @@ Notes SongParser::smParseNotes(Song& song, std::string line) {
 		if (line.substr(0, 2) == "//") continue;  // Skip comments
 		if (line[0] == '#') break;  // HACK: This should read away the next #NOTES: line
 		if (line[0] == ',' || line[0] == ';') {
-			double end = tsTime(song, measure * 16.0);
+			double end = tsTime(song, measure * 16.0, m_gap);
 			unsigned div = static_cast<unsigned>(chords.size());
 			double step = (end - begin) / div;
 			for (unsigned note = 0u; note < div; ++note) {
@@ -261,6 +261,6 @@ Notes SongParser::smParseNotes(Song& song, std::string line) {
 
 /// Convert a stop into <time, duration> (as stored in the song)
 std::pair<double, double> SongParser::smStopConvert(Song& song, std::pair<double, double> s) {
-	s.first = tsTime(song, s.first);
+	s.first = tsTime(song, s.first, m_gap);
 	return s;
 }

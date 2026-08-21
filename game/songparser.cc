@@ -6,10 +6,7 @@
 #include <boost/algorithm/string.hpp>
 #include <fmt/format.h>
 
-#include <cmath>
 #include <fstream>
-#include <regex>
-#include <set>
 
 void SongParser::parse(Song& song) {
 	try {
@@ -57,19 +54,19 @@ void SongParser::parse(Song& song) {
 			}
 		}
 
-		guessFiles(song);
+		SongParserUtil::guessFiles(song);
 
 		if (headerAlreadyParsed) {
 			if (!song.m_bpms.empty()) {
 				float bpm = static_cast<float>(15.0 / song.m_bpms.front().step);
 				song.m_bpms.clear();
-				addBPM(song, 0, bpm);
+				SongParserUtil::addBPM(song, 0, bpm, m_gap);
 			}
 			if (song.type == Song::Type::TXT) txtParse(song);
 			else if (song.type == Song::Type::INI) midParse(song);  // INI doesn't contain notes, parse those from MIDI
 			else if (song.type == Song::Type::XML) xmlParse(song);
 			else if (song.type == Song::Type::SM) smParse(song);
-			finalize(song);  // Do some adjusting to the notes
+			SongParserUtil::finalize(song, m_tsPerBeat, m_tsEnd, m_gap);  // Do some adjusting to the notes
 			song.loadStatus = Song::LoadStatus::FULL;
 			return;
 		}
@@ -88,224 +85,3 @@ void SongParser::parse(Song& song) {
 	}
 }
 
-void SongParser::guessFiles(Song& song) {
-	// List of fields containing filenames, and auto-matching regexps, in order of priority
-	const std::vector<std::pair<fs::path*, char const*> > fields = {
-		{ &song.cover, R"((cover|album|label|banner|bn|\[co\])\.(png|jpeg|jpg|webp|svg)$)" },
-		{ &song.background, R"((background|bg|\[bg\])\.(png|jpeg|jpg|webp|svg)$)" },
-		{ &song.cover, R"(\.(png|jpeg|jpg|webp|svg)$)" },
-		{ &song.background, R"(\.(png|jpeg|jpg|webp|svg)$)" },
-		{ &song.video, R"(\.(avi|mpg|mpeg|flv|mov|mp4|mkv|m4v|webm)$)" },
-		{ &song.midifilename, R"(^notes\.mid$)" },
-		{ &song.midifilename, R"(\.mid$)" },
-		{ &song.music[TrackName::PREVIEW], R"(^preview\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &song.music[TrackName::GUITAR], R"(^guitar\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &song.music[TrackName::BASS], R"(^(bass|rhythm)\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &song.music[TrackName::DRUMS], R"(^drums(_1)?\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &song.music[TrackName::DRUMS_SNARE], R"(^drums_2\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &song.music[TrackName::DRUMS_CYMBALS], R"(^drums_3\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &song.music[TrackName::DRUMS_TOMS], R"(^drums_4\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &song.music[TrackName::KEYBOARD], R"(^key(board|s)\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &song.music[TrackName::GUITAR_COOP], R"(^guitar_coop\.(mp3|m4a|ogg|opus|aac)$)"},
-		{ &song.music[TrackName::GUITAR_RHYTHM], R"(^guitar_rhythm\.(mp3|m4a|ogg|opus|aac)$)"},
-		{ &song.music[TrackName::VOCAL_LEAD], R"(^vocals_1\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &song.music[TrackName::VOCAL_LEAD], R"(^vocals\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &song.music[TrackName::VOCAL_BACKING], R"(^vocals_2\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &song.music[TrackName::BGMUSIC], R"(^song(s)?\.(mp3|m4a|ogg|opus|aac)$)" },
-		{ &song.music[TrackName::BGMUSIC], R"(\.(mp3|m4a|ogg|opus|aac)$)" },
-	};
-
-	std::string logMissing, logFound;
-
-	// Run checks, remove bogus values and construct regexps
-	bool missing = false;
-	for (auto const& p : fields) {
-		const fs::path& file = *p.first;
-		if (file.empty()) {
-			missing = true;
-		} else if (!is_regular_file(file)) {
-			fmt::format_to(std::back_inserter(logMissing), "\n    {}{}", SpdLogger::newLineDec, file.filename());
-			missing = true;
-		}
-	}
-
-	if (!missing) {
-		return;	// All OK!
-	}
-	// Try matching all files in song folder with any field
-	std::set<fs::path> files(fs::directory_iterator{ song.path }, fs::directory_iterator{});
-	for (unsigned i = 0; i < fields.size(); ++i) {
-		fs::path& field = *fields[i].first;
-		if (field.empty()) {
-			auto const regexp = std::regex(fields[i].second, std::regex_constants::icase);
-			for (fs::path const& f : files) {
-				std::string name = f.filename().string();  // File basename
-				if (!regex_search(name, regexp)) {
-					continue;  // No match for current file
-				}
-				field = f;
-				fmt::format_to(std::back_inserter(logFound), "\n    {}{}", SpdLogger::newLineDec, f.filename());
-			}
-		}
-		files.erase(field);  // Remove from available options
-	}
-	song.music[TrackName::PREVIEW].clear();  // We don't currently support preview tracks (TODO: proper handling in audio.cc).
-
-	if (logFound.empty() && logMissing.empty()) {
-		return;
-	}
-	if (!logMissing.empty()) {
-		logMissing.insert(0, fmt::format("SongParser, processing song={} - {}({}).\n  {}Missing files:", song.artist, song.title, song.filename, SpdLogger::newLineDec));
-		SpdLogger::notice(LogSystem::SONGPARSER, logMissing);
-	}
-	if (!logFound.empty()) {
-		logFound.insert(0, fmt::format("SongParser, processing song={} - {}({}).\n  {}Autodetected files:", song.artist, song.title, song.filename, SpdLogger::newLineDec));
-		SpdLogger::debug(LogSystem::SONGPARSER, logFound);
-	}
-}
-
-void SongParser::vocalsTogether(Song& song) {
-	auto togetherIt = song.vocalTracks.find("Together");
-	if (togetherIt == song.vocalTracks.end()) { return; }
-	Notes& together = togetherIt->second.notes;
-	if (!together.empty()) { return; }
-	Notes notes;
-	// Collect usable vocal tracks
-	struct TrackInfo {
-		typedef Notes::const_iterator It;
-		It it, end;
-		TrackInfo(It begin, It end) :
-			it(begin), end(end) {}
-	};
-	std::vector<TrackInfo> tracks;
-	for (auto& nt : song.vocalTracks) {
-		togetherIt->second.noteMin = std::min(togetherIt->second.noteMin, nt.second.noteMin);
-		togetherIt->second.noteMax = std::max(togetherIt->second.noteMax, nt.second.noteMax);
-
-		Notes& n = nt.second.notes;
-		if (!n.empty()) { tracks.push_back(TrackInfo(n.begin(), n.end())); }
-	}
-	if (tracks.empty()) { return; }
-	// Combine notes
-	// FIXME: This should do combining on sentence level rather than note-by-note
-	TrackInfo* trk = &tracks.front();
-	while (trk) {
-		Note const& n = *trk->it;
-		// std::cerr << " " << n.syllable << ": " << n.begin << "-" << n.end << std::endl;
-		notes.push_back(n);
-		++trk->it;
-		trk = nullptr;
-		// Iterate all tracks past the processed note and find the new earliest track
-		for (TrackInfo& trk2 : tracks) {
-			// Skip until a sentence that begins after the note ended
-			while (trk2.it != trk2.end && trk2.it->begin < n.end) { ++trk2.it; }
-			if (trk2.it == trk2.end) { continue; }
-			if (!trk || (trk2.it->begin < trk->it->begin)) { trk = &trk2; }
-		}
-	}
-	together.swap(notes);
-}
-
-void SongParser::finalize(Song& song) {
-	vocalsTogether(song);
-	std::string fixUpMsg;
-	for (auto& nt : song.vocalTracks) {
-		VocalTrack& vocal = nt.second;
-		// Remove empty sentences
-		{
-			Note::Type lastType = Note::Type::NORMAL;
-
-			for (auto itn = vocal.notes.begin(); itn != vocal.notes.end();) {
-				if (itn->type == Note::Type::SLEEP) { itn->end = itn->begin; ++itn; continue; }
-				auto next = (itn + 1);
-
-				// Try to fix overlapping syllables.
-				if (next != vocal.notes.end() && Note::overlapping(*itn, *next)) {
-					double beatDur = getBPM(song, itn->begin).step;
-					double newEnd = (next->begin - beatDur);
-					fmt::format_to(std::back_inserter(fixUpMsg), "Overlapping notes=({}, {}). After changing duration, end={}, length={}", itn->syllable, next->syllable, newEnd, newEnd - itn->begin);
-					if ((newEnd - itn->begin) >= beatDur) {
-						itn->end = newEnd;
-					}
-					else if (next->type != Note::Type::SLEEP) {
-						fmt::format_to(std::back_inserter(fixUpMsg), "\n{}Resulting note too short, will combine them instead.", SpdLogger::newLineDec);
-						fmt::format_to(std::back_inserter(itn->syllable), "-{}", next->syllable);
-						itn->end = next->end;
-						vocal.notes.erase(next);
-					}
-					else {
-						next->begin = next->end = itn->end;
-					}
-				}
-				Note::Type type = itn->type;
-				if (type == Note::Type::SLEEP && lastType == Note::Type::SLEEP) {
-					itn = vocal.notes.erase(itn);
-					fmt::format_to(std::back_inserter(fixUpMsg), "\n{}Discarding empty sentence at position={}", SpdLogger::newLineDec, itn->begin);
-				}
-				else {
-					++itn;
-				}
-				lastType = type;
-			}
-		}
-		// Adjust negative notes
-		if (vocal.noteMin <= 0) {
-			float shift = (1.0f - std::floor(vocal.noteMin / 12.0f)) * 12.0f;
-			vocal.noteMin += shift;
-			vocal.noteMax += shift;
-			fmt::format_to(std::back_inserter(fixUpMsg), "\n{}Negative notes found, minimum pitch={}. Will transpose the entire song by {} octaves to compensate.", SpdLogger::newLineDec, vocal.noteMin - shift, shift / 12);
-			for (auto& elem : vocal.notes) {
-				elem.note += shift;
-				elem.notePrev += shift;
-			}
-		}
-		// Set begin/end times
-		if (!vocal.notes.empty()) {
-			vocal.beginTime = vocal.notes.front().begin;
-			vocal.endTime = vocal.notes.back().end;
-		}
-		else {
-			vocal.beginTime = vocal.endTime = 0.0;
-		}
-		// Compute maximum score
-		double max_score = 0.0;
-		for (auto& note : vocal.notes) { max_score += note.maxScore(); }
-		vocal.m_scoreFactor = 1.0 / max_score;
-	}
-	if (!fixUpMsg.empty()) {
-		fixUpMsg.insert(0, fmt::format("SongParser, processing song={} - {}({}).", song.artist, song.title, song.filename));
-		SpdLogger::debug(LogSystem::SONGPARSER, fixUpMsg);
-	}
-	if (m_tsPerBeat) {
-		// Add song beat markers
-		for (unsigned ts = 0; ts < m_tsEnd; ts += m_tsPerBeat) { song.beats.push_back(tsTime(song, static_cast<double>(ts))); }
-	}
-}
-
-Song::BPM SongParser::getBPM(Song const& s, double ts) const {
-	for (auto& itb : reverse(s.m_bpms)) {
-		if (itb.begin <= ts)
-			return itb;
-	}
-	throw std::runtime_error("No BPM definition prior to this note...");
-}
-
-void SongParser::addBPM(Song& song, double ts, float bpm) {
-	if (!((bpm >= 1.0f) && (bpm < 1e12))) { throw std::runtime_error("Invalid BPM value"); }
-	if (!song.m_bpms.empty() && (song.m_bpms.back().ts >= ts)) {
-		if (song.m_bpms.back().ts < ts) { throw std::runtime_error("Invalid BPM timestamp"); }
-		song.m_bpms.pop_back();	// Some ITG songs contain repeated BPM definitions...
-	}
-	song.m_bpms.push_back(Song::BPM(tsTime(song, ts), ts, bpm));
-}
-
-double SongParser::tsTime(Song& song, double ts) const {
-	if (song.m_bpms.empty()) {
-		if (ts != 0) { throw std::runtime_error("BPM data missing"); }
-		return m_gap;
-	}
-	for (std::vector<Song::BPM>::const_reverse_iterator it = song.m_bpms.rbegin(); it != song.m_bpms.rend(); ++it) {
-		if (it->ts <= ts) { return it->begin + (ts - it->ts) * it->step; }
-	}
-	throw std::logic_error("INTERNAL ERROR: BPM data invalid");
-}

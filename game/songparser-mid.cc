@@ -88,7 +88,7 @@ void SongParser::midParseHeader(Song& song) {
 			}
 		}
 	}
-	addBPM(song, 0, static_cast<float>(6e7 / midi.tempochanges.front().value));
+	addBPM(song, 0, static_cast<float>(6e7 / midi.tempochanges.front().value), m_gap);
 	SpdLogger::debug(LogSystem::SONGPARSER, "MIDI Parser --  Got a BPM: {}", 6e7 / midi.tempochanges.front().value);
 }
 
