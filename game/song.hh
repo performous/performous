@@ -5,7 +5,6 @@
 #include "json.hh"
 #include "log.hh"
 #include "notes.hh"
-#include "isongparser.hh"
 #include "util.hh"
 
 #include <cstdint>
@@ -38,7 +37,6 @@ class ScreenSing;
 
 /// Song object contains all information about a song (headers, notes)
 class Song {
-	friend class SongParser;
 public:
 	/// Is the song parsed from the file yet?
 	enum class LoadStatus { NONE = 0, HEADER = 1, FULL = 2, PARSERERROR = -1 } loadStatus = LoadStatus::NONE;
@@ -103,9 +101,9 @@ public:
 	std::int64_t mtime = 0; ///< modification time of song file (for cache invalidation)
 
 	// Functions only below this line
-	Song(ISongParser&, nlohmann::json const& song);  ///< Load song from cache.
-	Song(ISongParser&, fs::path const& path, fs::path const& filename);  ///< Load song from specified path and filename
-	Song(ISongParser&);
+	explicit Song(nlohmann::json const& song);  ///< Load song from cache.
+	Song(fs::path const& path, fs::path const& filename);  ///< Load song from specified path and filename
+	Song();
 
 	void reload(bool errorIgnore = true);  ///< Reset and reload the entire song from file
 	void loadNotes(bool errorIgnore = true);  ///< Load note data (called when entering singing screen, headers preloaded).
@@ -139,12 +137,9 @@ private:
 	void collateUpdate();   ///< Rebuild collate variables (used for sorting) from other strings
 
 	bool m_broken = false;
-
-	ISongParser& m_parser;
-	unsigned m_year = 0;
 };
 
-/// Thrown by SongParser when there is an error
+/// Thrown by song parsers when there is an error
 struct SongParserException: public std::runtime_error {
 	/// constructor
 	SongParserException(Song& s, std::string const& msg, unsigned int linenum = 1, bool showInGUI = true): runtime_error(msg), m_filename(s.filename), m_linenum(linenum) {

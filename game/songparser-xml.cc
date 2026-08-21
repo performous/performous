@@ -1,4 +1,4 @@
-#include "songparser.hh"
+#include "songparser-xml.hh"
 
 #include "songparserutil.hh"
 
@@ -6,6 +6,7 @@
 #include "util.hh"
 #include "libxml++.hh"
 #include <boost/algorithm/string.hpp>
+#include <fmt/format.h>
 #include <stdexcept>
 
 /// @file
@@ -13,8 +14,24 @@
 
 using namespace SongParserUtil;
 
+XmlSongParser::XmlSongParser(std::string content) : m_ss(std::move(content)) {}
+
+void XmlSongParser::parse(Song& song) {
+	try {
+		SongParserUtil::parseSong(song,
+			[this](Song& s) { xmlParseHeader(s); },
+			[this](Song& s) { xmlParse(s); SongParserUtil::finalize(s, 0, 0, 0.0); });
+	}
+	catch (SongParserException&) {
+		throw;
+	}
+	catch (std::exception& e) {
+		throw SongParserException(song, fmt::format("Caught exception={}", e.what()), 0, false);
+	}
+}
+
 /// 'Magick' to check if this file looks like correct format
-bool SongParser::xmlCheck(std::string const& data) const {
+bool XmlSongParser::check(std::string const& data) {
 	static const std::string header = "<?";
 	return std::equal(header.begin(), header.end(), data.begin());
 }
@@ -27,39 +44,39 @@ void enableXMLLogger(std::ostream& os = std::cerr) { xmlSetGenericErrorFunc(&os,
 void disableXMLLogger() { xmlSetGenericErrorFunc(NULL, xmlLogger); }
 */
 
-struct SSDom: public xmlpp::DomParser {
-	xmlpp::Node::PrefixNsMap nsmap;
-	SSDom(std::stringstream const& _ss) {
-		load(_ss.str());
-	}
-	void load(std::string const& buf) {
-		set_substitute_entities();
-		/*
-		struct DisableLogger {
-			DisableLogger() { disableXMLLogger(); }
-			~DisableLogger() { enableXMLLogger(); }
-		} disabler;
-		*/
-		parse_memory(buf);
-		nsmap["ss"] = get_document()->get_root_node()->get_namespace_uri();
-	}
-	bool find(xmlpp::Element const& elem, std::string xpath, xmlpp::const_NodeSet& n) {
-		if (nsmap["ss"].empty()) boost::erase_all(xpath, "ss:");
-		n = elem.find(xpath, nsmap);
-		return !n.empty();
-	}
-	bool find(std::string const& xpath, xmlpp::const_NodeSet& n) {
-		return find(*get_document()->get_root_node(), xpath, n);
-	}
-	bool getValue(std::string const& xpath, std::string& result) {
-		xmlpp::const_NodeSet n;
-		if (!find(xpath, n)) return false;
-		result = xmlpp::get_first_child_text(dynamic_cast<const xmlpp::Element&>(*n[0]))->get_content();
-		return true;
-	}
-};
-
 namespace {
+	struct SSDom: public xmlpp::DomParser {
+		xmlpp::Node::PrefixNsMap nsmap;
+		SSDom(std::stringstream const& _ss) {
+			load(_ss.str());
+		}
+		void load(std::string const& buf) {
+			set_substitute_entities();
+			/*
+			struct DisableLogger {
+				DisableLogger() { disableXMLLogger(); }
+				~DisableLogger() { enableXMLLogger(); }
+			} disabler;
+			*/
+			parse_memory(buf);
+			nsmap["ss"] = get_document()->get_root_node()->get_namespace_uri();
+		}
+		bool find(xmlpp::Element const& elem, std::string xpath, xmlpp::const_NodeSet& n) {
+			if (nsmap["ss"].empty()) boost::erase_all(xpath, "ss:");
+			n = elem.find(xpath, nsmap);
+			return !n.empty();
+		}
+		bool find(std::string const& xpath, xmlpp::const_NodeSet& n) {
+			return find(*get_document()->get_root_node(), xpath, n);
+		}
+		bool getValue(std::string const& xpath, std::string& result) {
+			xmlpp::const_NodeSet n;
+			if (!find(xpath, n)) return false;
+			result = xmlpp::get_first_child_text(dynamic_cast<const xmlpp::Element&>(*n[0]))->get_content();
+			return true;
+		}
+	};
+
 	/// Parse str (from XML comment node) for header/value and store cleaned up value in result.
 	bool parseComment(std::string const& str, std::string const& header, std::string& result) {
 		if (!boost::starts_with(str, header)) return false;
@@ -68,10 +85,21 @@ namespace {
 		  "&amp;", "&");
 		return true;
 	}
+
+	void addNoteToTrack(VocalTrack& vocal, const Note& note) {
+		if (note.type == Note::Type::SLEEP) {
+			// Skip extra sleep notes
+			if (vocal.notes.empty() || vocal.notes.back().type == Note::Type::SLEEP) return;
+		} else {
+			vocal.noteMin = std::min(vocal.noteMin, note.note);
+			vocal.noteMax = std::max(vocal.noteMax, note.note);
+		}
+		vocal.notes.push_back(note);
+	}
 }
 
 /// Parse header data for Songs screen
-void SongParser::xmlParseHeader(Song& song) {
+void XmlSongParser::xmlParseHeader(Song& song) {
 	// Parse notes.xml
 	SSDom dom(m_ss);
 	// Extract artist and title from XML comments
@@ -98,7 +126,7 @@ void SongParser::xmlParseHeader(Song& song) {
 		else if (res == "Demisemiquaver") m_bpm *= 2.0f;
 		else throw std::runtime_error("Unknown tempo resolution: " + res);
 	}
-	addBPM(song, 0, m_bpm, m_gap);
+	addBPM(song, 0, m_bpm, 0.0);
 
 	// Read TRACK elements (singer names), if available
 	std::string singers;  // Only used for "Together" track
@@ -118,19 +146,8 @@ void SongParser::xmlParseHeader(Song& song) {
 	else if (tracks.size() > 1) song.insertVocalTrack("Together", VocalTrack(singers.empty() ? _("Together") : singers));
 }
 
-void addNoteToTrack(VocalTrack& vocal, const Note& note) {
-	if (note.type == Note::Type::SLEEP) {
-		// Skip extra sleep notes
-		if (vocal.notes.empty() || vocal.notes.back().type == Note::Type::SLEEP) return;
-	} else {
-		vocal.noteMin = std::min(vocal.noteMin, note.note);
-		vocal.noteMax = std::max(vocal.noteMax, note.note);
-	}
-	vocal.notes.push_back(note);
-}
-
 /// Parse notes
-void SongParser::xmlParse(Song& song) {
+void XmlSongParser::xmlParse(Song& song) {
 	// Parse notes.xml
 	SSDom dom(m_ss);
 
@@ -155,7 +172,7 @@ void SongParser::xmlParse(Song& song) {
 			// Check if SENTENCE has new attributes
 			{
 				auto attr = sentenceNode.get_attribute("Part");
-				if (attr) song.songsections.push_back(Song::SongSection(attr->get_value(), tsTime(song, ts, m_gap)));
+				if (attr) song.songsections.push_back(Song::SongSection(attr->get_value(), tsTime(song, ts, 0.0)));
 				attr = sentenceNode.get_attribute("Singer");
 				if (attr) sentenceSinger = attr->get_value();
 			}
@@ -163,7 +180,7 @@ void SongParser::xmlParse(Song& song) {
 			{
 				Note sleep;
 				sleep.type = Note::Type::SLEEP;
-				sleep.begin = sleep.end = tsTime(song, ts, m_gap);
+				sleep.begin = sleep.end = tsTime(song, ts, 0.0);
 				addNoteToTrack(vocal, sleep);
 			}
 			// Notes of a sentence
@@ -183,7 +200,7 @@ void SongParser::xmlParse(Song& song) {
 	} // players (vocal tracks)
 }
 
-Note SongParser::xmlParseNote(Song& song, xmlpp::Element const& noteNode, unsigned& ts) {
+Note XmlSongParser::xmlParseNote(Song& song, xmlpp::Element const& noteNode, unsigned& ts) {
 	Note n;
 	std::string lyric = noteNode.get_attribute("Lyric")->get_value();
 	// Pretty print hyphenation
@@ -201,9 +218,9 @@ Note SongParser::xmlParseNote(Song& song, xmlpp::Element const& noteNode, unsign
 	else if (noteNode.get_attribute("Bonus")) n.type = Note::Type::GOLDEN;
 	else n.type = Note::Type::NORMAL;
 
-	n.begin = tsTime(song, ts, m_gap);
+	n.begin = tsTime(song, ts, 0.0);
 	ts += static_cast<unsigned>(duration);
-	n.end = tsTime(song, ts, m_gap);
+	n.end = tsTime(song, ts, 0.0);
 	n.syllable = lyric;
 	n.note = static_cast<float>(note);
 	n.notePrev = static_cast<float>(note);

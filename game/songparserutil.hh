@@ -2,6 +2,7 @@
 
 #include "song.hh"
 
+#include <functional>
 #include <istream>
 #include <string>
 
@@ -35,6 +36,10 @@ namespace SongParserUtil {
 	void vocalsTogether(Song& song);
 	/// Post-process notes after parsing: merge duet tracks, fix overlaps/empty sentences, compute score, add beat markers
 	void finalize(Song& song, unsigned tsPerBeat, unsigned tsEnd, double gap);
+
+	/// Shared two-pass load control flow: header-only pass on first load, full notes pass once the
+	/// header is already known. Also handles guessFiles, BPM recompute, and the MIDI header hook.
+	void parseSong(Song& song, std::function<void(Song&)> const& parseHeader, std::function<void(Song&)> const& parseNotes);
 }
 
 

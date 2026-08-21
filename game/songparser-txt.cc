@@ -1,4 +1,4 @@
-﻿#include "songparser.hh"
+#include "songparser-txt.hh"
 
 #include "songparserutil.hh"
 
@@ -6,6 +6,8 @@
 #include "log.hh"
 #include "unicode.hh"
 #include "util.hh"
+
+#include <fmt/format.h>
 
 #include <algorithm>
 #include <stdexcept>
@@ -15,13 +17,31 @@
 
 using namespace SongParserUtil;
 
+TxtSongParser::TxtSongParser(std::string content) : m_ss(std::move(content)) {}
+
+bool TxtSongParser::getline(std::string& line) { return SongParserUtil::getLine(m_ss, line, m_linenum); }
+
+void TxtSongParser::parse(Song& song) {
+	try {
+		SongParserUtil::parseSong(song,
+			[this](Song& s) { txtParseHeader(s); },
+			[this](Song& s) { txtParse(s); SongParserUtil::finalize(s, 0, 0, m_gap); });
+	}
+	catch (SongParserException&) {
+		throw;
+	}
+	catch (std::exception& e) {
+		throw SongParserException(song, fmt::format("Caught exception={}", e.what()), m_linenum, false);
+	}
+}
+
 /// 'Magick' to check if this file looks like correct format
-bool SongParser::txtCheck(std::string const& data) const {
+bool TxtSongParser::check(std::string const& data) {
 	return data[0] == '#' && data[1] >= 'A' && data[1] <= 'Z';
 }
 
 /// Parse header data for Songs screen
-void SongParser::txtParseHeader(Song& song) {
+void TxtSongParser::txtParseHeader(Song& song) {
 	std::string line;
 	song.insertVocalTrack(TrackName::VOCAL_LEAD, VocalTrack(TrackName::VOCAL_LEAD)); // Dummy note to indicate there is a track
 	while (getline(line) && txtParseField(song, line)) {}
@@ -36,7 +56,7 @@ void SongParser::txtParseHeader(Song& song) {
 }
 
 /// Parse notes
-void SongParser::txtParse(Song& song) {
+void TxtSongParser::txtParse(Song& song) {
 	std::string line;
 	m_curSinger = CurrentSinger::P1;
 	if (!song.vocalTracks.empty()) { song.vocalTracks.clear(); }
@@ -104,7 +124,7 @@ void SongParser::txtParse(Song& song) {
 	}
 }
 
-bool SongParser::txtParseField(Song& song, std::string const& line) {
+bool TxtSongParser::txtParseField(Song& song, std::string const& line) {
 	if (line.empty()) return true;
 	if (line[0] != '#') return false;
 	std::string::size_type pos = line.find(':');
@@ -113,7 +133,7 @@ bool SongParser::txtParseField(Song& song, std::string const& line) {
 	std::string value = trim(line.substr(pos + 1));
 	if (value.empty()) return true;
 
-	// Parse header data that is stored in SongParser rather than in song (and thus needs to be read every time)
+	// Parse header data that is stored in the parser rather than in song (and thus needs to be read every time)
 	if (key == "BPM") assign(m_bpm, value);
 	else if (key == "RELATIVE") assign(m_relative, value);
 	else if (key == "GAP") { assign(m_gap, value); m_gap *= 1e-3; }
@@ -147,7 +167,7 @@ bool SongParser::txtParseField(Song& song, std::string const& line) {
 	return true;
 }
 
-bool SongParser::txtParseNote(Song& song, std::string line) {
+bool TxtSongParser::txtParseNote(Song& song, std::string line) {
     const int MAX_STARTBEAT = 262144; // 2^18, about 2 hours on an average song (depends on BPM)
     const int MAX_LENGTH = 2048; // A very long note
 	if (line.empty() || line == "\r") return true;
@@ -269,7 +289,7 @@ bool SongParser::txtParseNote(Song& song, std::string line) {
 	return true;
 }
 
-void SongParser::txtResetState(Song& song) {
+void TxtSongParser::txtResetState(Song& song) {
 	m_txt = TXTState();
 	song.m_bpms.clear();
 	if (m_bpm != 0.0f) { addBPM (song, 0, m_bpm, m_gap); }

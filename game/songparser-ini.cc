@@ -1,12 +1,14 @@
-#include "songparser.hh"
+#include "songparser-ini.hh"
 
 #include "i18n.hh"
+#include "songparser-mid.hh"
 #include "songparserutil.hh"
 
 #include "fs.hh"
-#include "midifile.hh"
 #include "unicode.hh"
 #include "util.hh"
+
+#include <fmt/format.h>
 
 #include <regex>
 #include <stdexcept>
@@ -15,13 +17,73 @@
 
 using namespace SongParserUtil;
 
+namespace {
+#if defined(_MSC_VER)
+	const auto regex_multiline = std::regex_constants::ECMAScript; // MSVC hasn't implemented multiline.
+#else
+	const auto regex_multiline = std::regex::multiline;
+#endif
+
+	const auto regex_icase = std::regex::icase;
+
+	// There is some weird bug with std::regex and boost::locale on libc++ that makes regex fail if a global locale with a collation facet has been installed before instantiating patterns.
+
+	const std::regex iniParseLine(
+		R"(^[^\S^\r\n]*)"                                       // Any number of white-space characters that are neither \n nor \r
+		R"(([a-zA-Z0-9._-]+))"                                  // INI key is one or more characters, letters and numbers, plus '.', '_' and '-'
+		R"([^\S^\r\n]*)"                                        // Any number of white-space characters that are neither \n nor \r
+		R"(=)"                                                  // Delimiter
+		R"([^\S^\r\n]*)"                                        // Any number of white-space characters that are neither \n nor \r
+		R"(([^\n\r]*?))"                                        // Non-greedy matching any character that is neither \r nor \n, and
+		R"((?=[^\S^\r\n]*$))", regex_multiline                  // That is followed by any number of white-space characters that are neither \n nor \r, and the end of the line.
+	);
+
+	const std::regex iniCheckHeader(
+		R"(^[^\S^\r\n]*)"                                       // Any number of white-space characters that are neither \n nor \r
+		R"(\[song\])"                                           // literal matching of [song]
+		R"([^\S^\r\n]*)"                                        // Any number of white-space characters that are neither \n nor \r
+		R"((?:$|[;#]))", regex_multiline | regex_icase           // Non-capturing group; match end-of-line or either ';' or '#', which denote a trailing comment.
+	);
+
+	const std::regex richTags(
+		R"(</?)"                                                // A '<', followed by either 0 or 1 slashes.
+		R"((b|i|u|s|size|font|align|gradient|sub|sup|link))"    // Any one of these tags
+		R"((=[^>]*)?)"                                          // A group of: '=' followed by any characters that are not >, appearing just 0 or 1 times as a whole.
+		R"(( [^>]*)?>)"                                         // A group of: ' ' followed by any characters that are not >, appearing just 0 or 1 times as a whole, and finishing with >
+		R"(|<color(=[^>]*)?>)"                                  // OR a <color> tag with an equal sign followed by anything that isn't '>'
+		R"(|</color>)", regex_icase                             // OR the closing </color> tag.
+	);
+
+	const std::regex brTag(
+		R"(<br>|<br[ ]*/?>)", regex_icase                       // match <br>, <br/> or <br />, allowing for any number of spaces between br and the /.
+	);
+}
+
+IniSongParser::IniSongParser(std::string content) : m_ss(std::move(content)) {}
+
+bool IniSongParser::getline(std::string& line) { return SongParserUtil::getLine(m_ss, line, m_linenum); }
+
+void IniSongParser::parse(Song& song) {
+	try {
+		SongParserUtil::parseSong(song,
+			[this](Song& s) { iniParseHeader(s); },
+			[](Song& s) { SongParserMidi::parseNotes(s); SongParserUtil::finalize(s, 0, 0, 0.0); });
+	}
+	catch (SongParserException&) {
+		throw;
+	}
+	catch (std::exception& e) {
+		throw SongParserException(song, fmt::format("Caught exception={}", e.what()), m_linenum, false);
+	}
+}
+
 /// 'Magick' to check if this file looks like correct format
-bool SongParser::iniCheck(std::string const& data) const {
+bool IniSongParser::check(std::string const& data) {
 	return std::regex_search(data.substr(0,1024), iniCheckHeader);
 }
 
 /// Parse header data for Songs screen
-void SongParser::iniParseHeader(Song& song) {
+void IniSongParser::iniParseHeader(Song& song) {
 	if (!song.vocalTracks.empty()) {
 		song.vocalTracks.clear();
 	}

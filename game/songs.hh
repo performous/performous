@@ -4,7 +4,6 @@
 #include "fs.hh"
 #include "screen.hh"
 #include "songorder.hh"
-#include "songparser.hh"
 #include "utils/cycle.hh"
 
 #include <atomic>
@@ -76,8 +75,6 @@ class Songs {
 	/// Change sorting mode (diff is normally -1 or 1)
 	void sortChange(Game&, SortChange diff);
 	void sortSpecificChange(unsigned short sortOrder, bool descending = false);
-	/// parses file into Song &tmp
-	void parseFile(Song& tmp);
 	std::atomic<bool> doneLoading{ false };
 	std::atomic<bool> displayedAlert{ false };
 	size_t loadedSongs() const { std::shared_lock<std::shared_mutex> l(m_mutex); return m_songs.size(); }
@@ -111,5 +108,4 @@ class Songs {
 	std::unique_ptr<std::thread> m_thread;
 	mutable std::shared_mutex m_mutex;
 	std::vector<SongOrderPtr> m_songOrders;
-	SongParser m_parser;
 };

@@ -4,7 +4,7 @@
 #include "ffmpeg.hh"
 #include "log.hh"
 #include "screen_sing.hh"
-#include "songparser.hh"
+#include "songparserfactory.hh"
 #include "songparserutil.hh"
 #include "unicode.hh"
 #include "util.hh"
@@ -18,8 +18,8 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 }
 
-Song::Song(ISongParser& parser, nlohmann::json const& song)
-: dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()), m_parser(parser) {
+Song::Song(nlohmann::json const& song)
+: dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()) {
 	path = getJsonEntry<std::string>(song, "txtFileFolder").value_or("");
 	filename = getJsonEntry<std::string>(song, "txtFile").value_or("");
 	mtime = getJsonEntry<std::int64_t>(song, "mtime").value_or(0);
@@ -96,25 +96,23 @@ Song::Song(ISongParser& parser, nlohmann::json const& song)
 	collateUpdate();
 }
 
-Song::Song(ISongParser& parser,fs::path const& path, fs::path const& filename):
-  dummyVocal(TrackName::VOCAL_LEAD), path(path), filename(filename), randomIdx(rand()), m_parser(parser)
+Song::Song(fs::path const& path, fs::path const& filename):
+  dummyVocal(TrackName::VOCAL_LEAD), path(path), filename(filename), randomIdx(rand())
 {
 	if (fs::is_regular_file(path)) {
 		mtime = static_cast<int64_t>(fs::last_write_time(path).time_since_epoch().count());  // .count() can return __int128
 	}
-	parser.parse(*this);
-
+	SongParserFactory().create(*this)->parse(*this);
 	collateUpdate();
 }
 
-Song::Song(ISongParser& parser)
-: dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()), m_parser(parser) {
+Song::Song()
+: dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()) {
 }
 
 void Song::reload(bool errorIgnore) {
 	try {
-		m_parser.parse(*this);
-
+		SongParserFactory().create(*this)->parse(*this);
 		collateUpdate();
 	} catch (...) {
 		if (!errorIgnore)
@@ -126,7 +124,7 @@ void Song::loadNotes(bool errorIgnore) {
 	if (loadStatus == LoadStatus::FULL)
 		return;
 	try {
-		m_parser.parse(*this);
+		SongParserFactory().create(*this)->parse(*this);
 	} catch (...) {
 		if (!errorIgnore) throw;
 	}

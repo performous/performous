@@ -1,9 +1,11 @@
-#include "songparser.hh"
+#include "songparser-sm.hh"
 
 #include "songparserutil.hh"
 
 #include "unicode.hh"
 #include "fs.hh"
+
+#include <fmt/format.h>
 
 #include <algorithm>
 #include <stdexcept>
@@ -14,8 +16,32 @@
 
 using namespace SongParserUtil;
 
+SmSongParser::SmSongParser(std::string content) : m_ss(std::move(content)) {}
+
+bool SmSongParser::getline(std::string& line) { return SongParserUtil::getLine(m_ss, line, m_linenum); }
+
+void SmSongParser::parse(Song& song) {
+	try {
+		SongParserUtil::parseSong(song,
+			// TODO: Songparser drops parsed notes, remove this once smParseHeader is more intelligent
+			[this](Song& s) { smParseHeader(s); s.dropNotes(); },  // Hack: drop notes here (load again when playing the song)
+			[this](Song& s) {
+				s.stops.clear();
+				s.danceTracks.clear();
+				smParseHeader(s);
+				SongParserUtil::finalize(s, m_tsPerBeat, m_tsEnd, m_gap);
+			});
+	}
+	catch (SongParserException&) {
+		throw;
+	}
+	catch (std::exception& e) {
+		throw SongParserException(song, fmt::format("Caught exception={}", e.what()), m_linenum, false);
+	}
+}
+
 /// 'Magick' to check if this file looks like correct format
-bool SongParser::smCheck(std::string const& data) const {
+bool SmSongParser::check(std::string const& data) {
 	if (data[0] != '#' || data[1] < 'A' || data[1] > 'Z') return false;
 	for (char ch: data) {
 		if (ch == '\n') return false;
@@ -24,18 +50,8 @@ bool SongParser::smCheck(std::string const& data) const {
 	return false;
 }
 
-/* Parsing the note data is separated into three different functions: smParse, smParseField and smParseNote.
-- smParse only begins a loop which continues as long as there is something to read in the file. It also checks if the needed information
-could be read.
-- smParseField reads all data beginning with '#'. That is, all but the actual notes. This function calls smParseNotes every time it
-reaches value #NOTES.
-- smParseNotes reads the notes into vector called notes which is a vector of structs (Note);
-*/
-
 /// Parse header data for Songs screen
-// TODO: This actually parses the whole thing
-// TODO: Songparser drops parsed notes, remove it when smParseHeader is more intelligent
-void SongParser::smParseHeader(Song& song) {
+void SmSongParser::smParseHeader(Song& song) {
 	std::string line;
 	if (!song.danceTracks.empty()) { song.danceTracks.clear(); }
 	// Parse the the entire file
@@ -50,14 +66,7 @@ void SongParser::smParseHeader(Song& song) {
 	m_tsPerBeat = 4;
 }
 
-/// Parse remaining stuff
-void SongParser::smParse(Song& song) {
-	song.stops.clear();
-	song.danceTracks.clear();
-	smParseHeader(song);
-}
-
-bool SongParser::smParseField(Song& song, std::string line) {
+bool SmSongParser::smParseField(Song& song, std::string line) {
 	trim(line);
 	if (line.empty()) return true;
 	if (line.substr(0, 2) == "//") return true; //jump over possible comments
@@ -72,7 +81,7 @@ bool SongParser::smParseField(Song& song, std::string line) {
 		/*All remaining data is parsed here.
 			All five lines of note metadata is read first and then smParseNotes is called to read
 			the actual note data.
-			All data is read into m_song.danceTracks map container.
+			All data is read into song.danceTracks map container.
 		*/
 
 		while (getline(line)) {
@@ -126,7 +135,7 @@ bool SongParser::smParseField(Song& song, std::string line) {
 	value = value.substr(0, value.size() - 1);	//Here the end character(';') is eliminated
 	if (value.empty()) return true;
 
-	// Parse header data that is stored in SongParser rather than in song (and thus needs to be read every time)
+	// Parse header data that is stored in the parser rather than in song (and thus needs to be read every time)
 	if (key == "OFFSET") { assign(m_gap, value); m_gap *= -1; }
 	else if (key == "BPMS"){
 			std::istringstream iss(value);
@@ -150,7 +159,7 @@ bool SongParser::smParseField(Song& song, std::string line) {
 
 	if (song.loadStatus >= Song::LoadStatus::HEADER) return true;  // Only re-parsing now, skip any other data
 
-	// Parse header data that is directly stored in m_song
+	// Parse header data that is directly stored in song
 	if (key == "TITLE") song.title = value.substr(value.find_first_not_of(" :"));
 	else if (key == "ARTIST") song.artist = value.substr(value.find_first_not_of(" "));
 	else if (key == "BANNER") song.cover = absolute(value, song.path);
@@ -176,7 +185,7 @@ bool SongParser::smParseField(Song& song, std::string line) {
 
 
 
-Notes SongParser::smParseNotes(Song& song, std::string line) {
+Notes SmSongParser::smParseNotes(Song& song, std::string line) {
 	//container for dance songs
 	typedef std::map<unsigned, Note> DanceChord;	//int indicates "arrow" position (cmp. fret in guitar)
 	typedef std::vector<DanceChord> DanceChords;
@@ -260,7 +269,7 @@ Notes SongParser::smParseNotes(Song& song, std::string line) {
 }
 
 /// Convert a stop into <time, duration> (as stored in the song)
-std::pair<double, double> SongParser::smStopConvert(Song& song, std::pair<double, double> s) {
+std::pair<double, double> SmSongParser::smStopConvert(Song& song, std::pair<double, double> s) {
 	s.first = tsTime(song, s.first, m_gap);
 	return s;
 }

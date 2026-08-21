@@ -1,7 +1,9 @@
-#include "songparser.hh"
+#include "songparser-mid.hh"
 
 #include "log.hh"
+#include "song.hh"
 #include "songparserutil.hh"
+#include "unicode.hh"
 
 #include <boost/algorithm/string.hpp>
 #include <stdexcept>
@@ -58,7 +60,7 @@ namespace {
 	}
 }
 
-void SongParser::midParseHeader(Song& song) {
+void SongParserMidi::parseHeader(Song& song) {
 	if (!song.vocalTracks.empty()) {
 		song.vocalTracks.clear();
 	}
@@ -88,12 +90,12 @@ void SongParser::midParseHeader(Song& song) {
 			}
 		}
 	}
-	addBPM(song, 0, static_cast<float>(6e7 / midi.tempochanges.front().value), m_gap);
+	addBPM(song, 0, static_cast<float>(6e7 / midi.tempochanges.front().value), 0.0);
 	SpdLogger::debug(LogSystem::SONGPARSER, "MIDI Parser --  Got a BPM: {}", 6e7 / midi.tempochanges.front().value);
 }
 
 /// Parse notes
-void SongParser::midParse(Song& song) {
+void SongParserMidi::parseNotes(Song& song) {
 	song.vocalTracks.clear();
 	song.instrumentTracks.clear();
 

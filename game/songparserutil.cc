@@ -1,5 +1,6 @@
 #include "songparserutil.hh"
 
+#include "songparser-mid.hh"
 #include "unicode.hh"
 #include "util.hh"
 
@@ -279,6 +280,33 @@ namespace SongParserUtil {
 		if (tsPerBeat) {
 			// Add song beat markers
 			for (unsigned ts = 0; ts < tsEnd; ts += tsPerBeat) { song.beats.push_back(tsTime(song, static_cast<double>(ts), gap)); }
+		}
+	}
+
+	void parseSong(Song& song, std::function<void(Song&)> const& parseHeader, std::function<void(Song&)> const& parseNotes) {
+		bool headerAlreadyParsed = song.loadStatus == Song::LoadStatus::HEADER;
+		if (!headerAlreadyParsed) parseHeader(song);
+
+		guessFiles(song);
+
+		if (headerAlreadyParsed) {
+			if (!song.m_bpms.empty()) {
+				// The initial gap is already baked into the cached BPM entry's begin time; recover it from
+				// there instead of relying on it having been re-parsed from the file on this fresh instance.
+				double gap = song.m_bpms.front().begin;
+				float bpm = static_cast<float>(15.0 / song.m_bpms.front().step);
+				song.m_bpms.clear();
+				addBPM(song, 0, bpm, gap);
+			}
+			parseNotes(song);
+			song.loadStatus = Song::LoadStatus::FULL;
+			return;
+		}
+		if (!song.midifilename.empty()) {
+			SongParserMidi::parseHeader(song);
+		}
+		if (song.loadStatus != Song::LoadStatus::PARSERERROR) {
+			song.loadStatus = Song::LoadStatus::HEADER;
 		}
 	}
 }
