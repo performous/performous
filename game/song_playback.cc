@@ -1,3 +1,5 @@
+// Split out of song.cc: these methods need ffmpeg (duration probing) and ScreenSing (playback status),
+// which would otherwise drag the audio/graphics stack into anything that links Song (see song.hh).
 #include "song.hh"
 
 #include "ffmpeg.hh"

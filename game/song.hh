@@ -35,14 +35,40 @@ namespace TrackName {
 
 class ScreenSing;
 
-/// Song object contains all information about a song (headers, notes)
+/**
+* Represents one song: its metadata (title, artist, BPM, file paths, ...) and, once loaded, its notes.
+*
+* Loading happens in two phases, tracked by loadStatus:
+*   - HEADER: metadata only. Cheap enough to do for every song in the library on startup (see Songs),
+*     which is why the constructors and reload() only ever load up to this point.
+*   - FULL: metadata + notes, loaded on demand via loadNotes() right before a song is actually sung,
+*     since notes can be large and aren't needed just to list a song in the browser.
+* PARSERERROR marks a song whose header failed some late validation (e.g. its audio file is missing)
+* but that should still show up in the browser (as broken) rather than be silently dropped.
+*
+* Song itself knows nothing about any particular file format. Parsing is delegated: SongParserFactory
+* (songparserfactory.hh) sniffs the file content and builds the matching ISongParser (isongparser.hh)
+* implementation -- TxtSongParser, IniSongParser, XmlSongParser or SmSongParser
+* (songparser-{txt,ini,xml,sm}.*). INI songs have no notes of their own; they pull them from a companion
+* MIDI file via the free functions in songparser-mid.*. Logic shared across formats (BPM/timing math, the
+* header-then-notes control flow, file auto-detection) lives as free functions under SongParserUtil
+* (songparserutil.*) rather than in a shared base class, so each format parser only carries the state it
+* actually needs.
+*
+* To add a new format: implement ISongParser in a new songparser-<format>.hh/.cc pair, then wire its
+* detection into SongParserFactory::create.
+*
+* Playback/UI-facing methods that pull in ffmpeg or ScreenSing (status(), getDurationSeconds(),
+* getPreviewStart()) live in song_playback.cc rather than here, so song.cc itself stays light enough to
+* link into the parser unit tests without dragging in the audio/graphics stack.
+**/
 class Song {
 public:
 	/// Is the song parsed from the file yet?
 	enum class LoadStatus { NONE = 0, HEADER = 1, FULL = 2, PARSERERROR = -1 } loadStatus = LoadStatus::NONE;
 	/// status of song
 	enum class Status { NORMAL, INSTRUMENTAL_BREAK, FINISHED };
-	enum class Type { NONE, TXT, XML, INI, SM } type = Type::NONE;
+	enum class Type { NONE, TXT, XML, INI, SM } type = Type::NONE;  ///< Set by SongParserFactory once the file format is known.
 	VocalTracks vocalTracks; ///< notes for the sing part
 	VocalTrack dummyVocal; ///< notes for the sing part
 	InstrumentTracks instrumentTracks; ///< guitar etc. notes for this song
@@ -79,10 +105,10 @@ public:
 	std::string collateByTitleOnly;  ///< String for sorting by title only
 	std::string collateByArtist;  ///< String for sorting by artist, title
 	std::string collateByArtistOnly;  ///< String for sorting by artist only
-	double videoGap = 0.0; ///< gap with video
+	double videoGap = 0.0; ///< gap between audio and video start
 	double start = 0.0; ///< start of song
 	double end = 0.0; ///< end of song
-	int year = 0; ///< year of the song
+	int year = 0; ///< year song was released
 	double preview_start = getNaN(); ///< starting time for the preview
 	double m_duration = 0.0;
 	using Stops = std::vector<std::pair<double,double> >;
@@ -101,11 +127,11 @@ public:
 	std::int64_t mtime = 0; ///< modification time of song file (for cache invalidation)
 
 	// Functions only below this line
-	explicit Song(nlohmann::json const& song);  ///< Load song from cache.
-	Song(fs::path const& path, fs::path const& filename);  ///< Load song from specified path and filename
-	Song();
+	explicit Song(nlohmann::json const& song);  ///< Load header fields from a cached JSON entry (fast path; loadStatus ends up at most HEADER).
+	Song(fs::path const& path, fs::path const& filename);  ///< Parse a song file's header from disk via SongParserFactory.
+	Song();  ///< Empty, unparsed song; callers populate fields directly (used by tests).
 
-	void reload(bool errorIgnore = true);  ///< Reset and reload the entire song from file
+	void reload(bool errorIgnore = true);  ///< Re-run the parser from scratch (e.g. after the file on disk has changed).
 	void loadNotes(bool errorIgnore = true);  ///< Load note data (called when entering singing screen, headers preloaded).
 	void dropNotes();  ///< Remove note data (when exiting singing screen), to conserve RAM
 	void insertVocalTrack(std::string vocalTrack, VocalTrack track);

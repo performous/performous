@@ -87,6 +87,10 @@ Song::Song(nlohmann::json const& song)
 	collateUpdate();
 }
 
+// These three call sites all follow the same pattern: build a fresh SongParserFactory, ask it for a
+// parser (it reads/sniffs song.filename and picks TxtSongParser/IniSongParser/XmlSongParser/SmSongParser),
+// then call parse() once. A new parser instance is created every time rather than kept around, so no
+// per-format state (e.g. a TXT song's GAP) can leak between calls or between unrelated songs.
 Song::Song(fs::path const& path, fs::path const& filename):
   dummyVocal(TrackName::VOCAL_LEAD), path(path), filename(filename), randomIdx(rand())
 {
@@ -111,6 +115,8 @@ void Song::reload(bool errorIgnore) {
 	}
 }
 
+// Parses the notes on top of an already-loaded header (loadStatus == HEADER); a no-op if they're
+// already loaded. Called when entering the sing screen, since notes aren't needed just to browse songs.
 void Song::loadNotes(bool errorIgnore) {
 	if (loadStatus == LoadStatus::FULL)
 		return;
