@@ -85,13 +85,13 @@ void Songs::reload_internal() {
 		m_songs.clear();
 		m_dirty = true;
 	}
-	SpdLogger::notice(LogSystem::CACHE, "Reading song cache file...");
+	SpdLogger::notice(LogSystem::SONGCACHE, "Reading song cache file...");
 	Profiler prof("songloader");
 
 	auto cache = loadCache();
 
     prof("load-cache");
-	SpdLogger::notice(LogSystem::CACHE, "Finished reading the song cache. Will now check songs on disk to update it if necessary.");
+	SpdLogger::notice(LogSystem::SONGCACHE, "Finished reading the song cache. Will now check songs on disk to update it if necessary.");
 
 	Paths systemSongs = PathCache::getPathsConfig("paths/system-songs");
 	Paths paths = PathCache::getPathsConfig("paths/songs");

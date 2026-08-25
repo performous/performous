@@ -15,7 +15,6 @@ class LogSystem {
 	enum Values : std::size_t {
 		BEGIN = 0,
 		AUDIO = BEGIN,
-		CACHE,
 		CONFIG,
 		CONTROLLERS,
 		DANCING,
@@ -32,6 +31,7 @@ class LogSystem {
 		OPENGL,
 		PROFILER,
 		SINGING,
+		SONGCACHE,
 		SONGPARSER,
 		SONGS,
 		STDERR,
@@ -90,9 +90,6 @@ class LogSystem {
 			case LogSystem::Values::AUDIO:
 				subsystem_string = "AUDIO";
 				break;
-			case LogSystem::Values::CACHE:
-				subsystem_string = "CACHE";
-				break;
 			case LogSystem::Values::CONFIG:
 				subsystem_string = "CONFIG";
 				break;
@@ -140,6 +137,9 @@ class LogSystem {
 				break;
 			case LogSystem::Values::SINGING:
 				subsystem_string = "SINGING";
+				break;
+			case LogSystem::Values::SONGCACHE:
+				subsystem_string = "SONGCACHE";
 				break;
 			case LogSystem::Values::SONGPARSER:
 				subsystem_string = "SONGPARSER";

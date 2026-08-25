@@ -5,14 +5,14 @@
 #include <cstring>
 #include <stdexcept>
 
-namespace cache {
+namespace svgCache {
 
 	/** Builds the full path and file name for the SVG cache resource **/
 	fs::path constructSVGCacheFileName(fs::path const& svgfilename, float factor);
 
 	/** Load an SVG from the cache, if loading fails invalid_cache_error is thrown **/
 	template <typename T> bool loadSVG(T& target, fs::path const& source_filename, float factor) {
-		fs::path const cache_filename = cache::constructSVGCacheFileName(source_filename, factor);
+		fs::path const cache_filename = svgCache::constructSVGCacheFileName(source_filename, factor);
 		// Verify that a cached file exists and that it is more recent than the original SVG
 		if (!fs::is_regular_file(cache_filename)) return false;
 		if (fs::last_write_time(source_filename) > fs::last_write_time(cache_filename)) return false;

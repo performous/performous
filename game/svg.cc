@@ -1,6 +1,6 @@
 ﻿#include "svg.hh"
 
-#include "cache.hh"
+#include "svg_cache.hh"
 #include "configuration.hh"
 #include "image.hh"
 #include "log.hh"
@@ -17,7 +17,7 @@
 void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	float factor = config["graphic/svg_lod"].f();
 	// Try to load a cached PNG instead
-	if (cache::loadSVG(bitmap, filename, factor)) return;
+	if (svgCache::loadSVG(bitmap, filename, factor)) return;
 	SpdLogger::debug(LogSystem::IMAGE, "Loading SVG file, path={}.", filename);
 	// Open the SVG file in librsvg
 #if !GLIB_CHECK_VERSION(2, 36, 0)   // Avoid deprecation warnings
@@ -76,7 +76,7 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	}
 	bitmap.fmt = pix::Format::CHAR_RGBA;
 	// Write to cache so that it can be loaded faster the next time
-	fs::path cache_filename = cache::constructSVGCacheFileName(filename, factor);
+	fs::path cache_filename = svgCache::constructSVGCacheFileName(filename, factor);
 	fs::create_directories(cache_filename.parent_path());
 	writePNG(cache_filename, bitmap);
 

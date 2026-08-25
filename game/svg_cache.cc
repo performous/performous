@@ -1,11 +1,11 @@
-#include "cache.hh"
+#include "svg_cache.hh"
 #include "fs.hh"
 #include "log.hh"
 #include "util.hh"
 
 #include <fmt/format.h>
 
-namespace cache {
+namespace svgCache {
 	fs::path constructSVGCacheFileName(fs::path const& svgfilename, float factor){
 		std::string const lod = fmt::format("{:.2f}", factor);
 		std::string const cache_basename = svgfilename.filename().string() + ".cache_" + lod + ".premul.png";
