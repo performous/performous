@@ -18,12 +18,6 @@
 using namespace SongParserUtil;
 
 namespace {
-#if defined(_MSC_VER)
-	const auto regex_multiline = std::regex_constants::ECMAScript; // MSVC hasn't implemented multiline.
-#else
-	const auto regex_multiline = std::regex::multiline;
-#endif
-
 	const auto regex_icase = std::regex::icase;
 
 	// There is some weird bug with std::regex and boost::locale on libc++ that makes regex fail if a global locale with a collation facet has been installed before instantiating patterns.
@@ -35,14 +29,15 @@ namespace {
 		R"(=)"                                                  // Delimiter
 		R"([^\S^\r\n]*)"                                        // Any number of white-space characters that are neither \n nor \r
 		R"(([^\n\r]*?))"                                        // Non-greedy matching any character that is neither \r nor \n, and
-		R"((?=[^\S^\r\n]*$))", regex_multiline                  // That is followed by any number of white-space characters that are neither \n nor \r, and the end of the line.
+		R"((?=[^\S^\r\n]*$))"                                   // That is followed by any number of white-space characters that are neither \n nor \r, and the end of the line.
 	);
 
 	const std::regex iniCheckHeader(
-		R"(^[^\S^\r\n]*)"                                       // Any number of white-space characters that are neither \n nor \r
+		R"((?:^|[\r\n]))"                                       // Start of the file, or right after a line break
+		R"([^\S\r\n]*)"                                         // Any number of white-space characters that are neither \n nor \r
 		R"(\[song\])"                                           // literal matching of [song]
-		R"([^\S^\r\n]*)"                                        // Any number of white-space characters that are neither \n nor \r
-		R"((?:$|[;#]))", regex_multiline | regex_icase           // Non-capturing group; match end-of-line or either ';' or '#', which denote a trailing comment.
+		R"([^\S\r\n]*)"                                         // Any number of white-space characters that are neither \n nor \r
+		R"((?:$|[\r\n;#]))", regex_icase                        // End of file, a line break, or a trailing comment
 	);
 
 	const std::regex richTags(

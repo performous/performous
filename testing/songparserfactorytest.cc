@@ -92,6 +92,19 @@ TEST(UnitTest_SongParserFactory, detects_ini) {
     EXPECT_NE(nullptr, dynamic_cast<IniSongParser*>(parser.get()));
 }
 
+// iniCheck() matches [song] against the whole multi-line file buffer, so it can't lean on regex
+// multiline mode (^/$ matching at line boundaries) to find it — MSVC's std::regex accepts the
+// multiline flag but doesn't actually implement it, so a regex relying on it would only ever find
+// [song] if it were literally the first and last thing in the file. Put [song] after a leading
+// comment line, with real content both before and after it, to pin that down on every platform.
+TEST(UnitTest_SongParserFactory, detects_ini_with_song_header_not_at_start_or_end_of_file) {
+    Song song = makeSong("song.ini", "; exported by some editor\n" + INI_CONTENT);
+    auto parser = SongParserFactory().create(song);
+
+    EXPECT_EQ(Song::Type::INI, song.type);
+    EXPECT_NE(nullptr, dynamic_cast<IniSongParser*>(parser.get()));
+}
+
 TEST(UnitTest_SongParserFactory, detects_sm) {
     Song song = makeSong("test.sm", SM_CONTENT);
     auto parser = SongParserFactory().create(song);
