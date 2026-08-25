@@ -149,7 +149,7 @@ void PathCache::pathBootstrap() {
 				break;
 			default:
 				char const* p = getenv("XDG_DATA_HOME");
-				data = (p ? p / performous : home / ".local" / SHARED_DATA_DIR);
+				data = (p ? p / performous : home / ".local" / performous);
 		}
 	}
 	// Cache
