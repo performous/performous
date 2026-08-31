@@ -1,0 +1,24 @@
+<!-- Modal on the playlist tab. This shows when the playlist is opened but a playlist had already been loaded in. -->
+<div id="playlist-preserve-modal-body" class="container-fluid">
+	<!-- Warning message -->
+	<p>a_previous_playlist_has_been_found.</p>
+	<!-- Button to remove the song from the current playlist. -->
+	<div class="form-group row col-sm-12">
+		<div class="col-sm-12">
+			<div>
+                <div class="btn btn-success btn-block btn-file">
+                    upload_playlist<span class="glyphicon glyphicon-upload pull-right"></span>
+                    <input type="file" id="modal-upload-playlist" accept="application/json">
+                </div>
+			</div>
+			<textarea id="modal-playlist-json" class="form-control form-group" rows="5"></textarea>
+            
+            <div class="form-group">
+                <label for="modal-clear-playlist-toggle" class="control-label">clear_playlist_before_loading</label>
+                <input id="modal-clear-playlist-toggle" class="form-control" type="checkbox" checked data-toggle="toggle" data-on="yes" data-off="no" data-onstyle="success" data-offstyle="danger">
+            </div>
+            
+            <button id="modal-export-playlist" class="btn btn-default btn-block" type="button">load_playlist<span class="glyphicon glyphicon-upload pull-right"></span></button>
+		</div>
+	</div>
+</div>
