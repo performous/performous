@@ -1,6 +1,8 @@
 #include "requesthandler.hh"
 #include "unicode.hh"
 #include "game.hh"
+#include "screen_sing.hh"
+#include "screen_playlist.hh"
 
 #include <cstdint>
 
@@ -106,39 +108,49 @@ void RequestHandler::Get(web::http::http_request request)
 	}
 	else if (path == "/api/getDataBase.json") { //get database
 		m_songs.setFilter("");
-		if (query == "sort=artist&order=ascending") {
-			m_songs.sortSpecificChange(2);
+		// parse query to key-value pairs
+		auto queryParams = web::uri::split_query(web::uri::decode(utility::conversions::to_string_t(query)));
+
+		// we want to fall back to the current sort number
+		unsigned short sort = m_songs.sortNum();
+		bool descending = queryParams.count(utility::conversions::to_string_t("order")) && utility::conversions::to_utf8string(queryParams.at(utility::conversions::to_string_t("order"))) == "descending";
+		size_t offset = 0;
+		size_t limit = 0;
+
+		std::map<std::string, unsigned short> sortTypes = {
+			{"", 2},
+			{"random", 0},
+			{"title", 1},
+			{"artist", 2},
+			{"edition", 3},
+			{"genre", 4},
+			{"folder", 5},
+			{"language", 6},
+			{"creator", 10}
+		};
+		if (queryParams.count(utility::conversions::to_string_t("sort")) && sortTypes.count(utility::conversions::to_utf8string(queryParams.at(utility::conversions::to_string_t("sort"))))) {
+			sort = sortTypes[utility::conversions::to_utf8string(queryParams.at(utility::conversions::to_string_t("sort")))];
 		}
-		else if (query == "sort=artist&order=descending") {
-			m_songs.sortSpecificChange(2, true);
+
+		m_songs.sortSpecificChange(sort, descending);
+
+		// make sure to apply the sorting
+		if (queryParams.count(utility::conversions::to_string_t("query"))) {
+			m_songs.setFilter(utility::conversions::to_utf8string(queryParams.at(utility::conversions::to_string_t("query"))));
 		}
-		else if (query == "sort=title&order=ascending") {
-			m_songs.sortSpecificChange(1);
+
+		// we want to fall back to the current offset and limit
+		if (queryParams.count(utility::conversions::to_string_t("offset")) && sscanf(utility::conversions::to_utf8string(queryParams.at(utility::conversions::to_string_t("offset"))).c_str(), "%zu", &offset) != 1) {
+			offset = 0;
 		}
-		else if (query == "sort=title&order=descending") {
-			m_songs.sortSpecificChange(1, true);
+
+		if (queryParams.count(utility::conversions::to_string_t("limit")) && sscanf(utility::conversions::to_utf8string(queryParams.at(utility::conversions::to_string_t("limit"))).c_str(), "%zu", &limit) != 1) {
+			limit = 0;
 		}
-		else if (query == "sort=language&order=ascending") {
-			m_songs.sortSpecificChange(6);
-		}
-		else if (query == "sort=language&order=descending") {
-			m_songs.sortSpecificChange(6, true);
-		}
-		else if (query == "sort=edition&order=ascending") {
-			m_songs.sortSpecificChange(3);
-		}
-		else if (query == "sort=edition&order=descending") {
-			m_songs.sortSpecificChange(3, true);
-		}
-		else if (query == "sort=creator&order=ascending") {
-			m_songs.sortSpecificChange(10);
-		}
-		else if (query == "sort=creator&order=descending") {
-			m_songs.sortSpecificChange(10, true);
-		}
+
 		// make sure to apply the filtering
 		m_songs.update();
-		web::json::value jsonRoot = SongsToJsonObject();
+		web::json::value jsonRoot = SongsToJsonObject(offset, limit);
 		request.reply(web::http::status_codes::OK, jsonRoot);
 		return;
 	}
@@ -162,16 +174,8 @@ void RequestHandler::Get(web::http::http_request request)
 		web::json::value jsonRoot = web::json::value::array();
 		unsigned i = 0;
 		for (auto const& song : m_game.getCurrentPlayList().getList()) {
-			web::json::value songObject = web::json::value::object();
-			songObject[utility::conversions::to_string_t("Title")] = web::json::value::string(utility::conversions::to_string_t(song->title));
-			songObject[utility::conversions::to_string_t("Artist")] = web::json::value::string(utility::conversions::to_string_t(song->artist));
-			songObject[utility::conversions::to_string_t("Edition")] = web::json::value::string(utility::conversions::to_string_t(song->edition));
-			songObject[utility::conversions::to_string_t("Language")] = web::json::value::string(utility::conversions::to_string_t(song->language));
-			songObject[utility::conversions::to_string_t("Creator")] = web::json::value::string(utility::conversions::to_string_t(song->creator));
+			web::json::value songObject = SongToJsonObject(song);
 			songObject[utility::conversions::to_string_t("Duration")] = web::json::value(song->getDurationSeconds());
-			songObject[utility::conversions::to_string_t("HasError")] = web::json::value::boolean(song->loadStatus == Song::LoadStatus::PARSERERROR);
-			songObject[utility::conversions::to_string_t("ProvidedBy")] = web::json::value(utility::conversions::to_string_t(song->providedBy));
-			songObject[utility::conversions::to_string_t("Comment")] = web::json::value(utility::conversions::to_string_t(song->comment));
 			jsonRoot[i] = songObject;
 			i++;
 		}
@@ -181,6 +185,27 @@ void RequestHandler::Get(web::http::http_request request)
 	}
 	else if (path == "/api/getplaylistTimeout") {
 		request.reply(web::http::status_codes::OK, std::to_string(config["game/playlist_screen_timeout"].ui()));
+		return;
+	}
+	else if (path == "/api/getCurrentSong") {
+		auto const& screen = m_game.getCurrentScreen();
+
+		if (!screen || (screen->getName() != "Sing" && screen->getName() != "Playlist")) {
+			request.reply(web::http::status_codes::OK, web::json::value::null());
+			return;
+		}
+		if (screen->getName() == "Playlist") {
+			ScreenPlaylist* playlistScreen = dynamic_cast<ScreenPlaylist*>(screen);
+			request.reply(web::http::status_codes::OK, web::json::value::number(playlistScreen->getTimer()));
+			return;
+		}
+
+		ScreenSing* singScreen = dynamic_cast<ScreenSing*>(screen);
+
+		web::json::value songObject = SongToJsonObject(singScreen->getSong());
+		songObject[utility::conversions::to_string_t("Position")] = web::json::value(singScreen->getSongPosition());
+
+		request.reply(web::http::status_codes::OK, songObject);
 		return;
 	}
 	else {
@@ -206,7 +231,16 @@ void RequestHandler::Post(web::http::http_request request)
 		return;
 	}
 
-	if (path == "/api/add") {
+	if (path == "/api/check") {
+		m_songs.setFilter("");
+		std::shared_ptr<Song> songPointer = GetSongFromJSON(jsonPostBody);
+		if (!songPointer || songPointer->loadStatus == Song::LoadStatus::PARSERERROR) {
+			request.reply(web::http::status_codes::NotFound, "not found");
+		}
+		request.reply(web::http::status_codes::OK, "success");
+		return;
+	}
+	else if (path == "/api/add" || path == "/api/add/priority" || path =="/api/add/play") {
 		m_songs.setFilter("");
 		std::shared_ptr<Song> songPointer = GetSongFromJSON(jsonPostBody);
 		if (!songPointer) {
@@ -224,6 +258,17 @@ void RequestHandler::Post(web::http::http_request request)
 		else {
 			SpdLogger::debug(LogSystem::WEBSERVER, "Adding {} - {} to the playlist.", songPointer->artist, songPointer->title);
 			m_game.getCurrentPlayList().addSong(songPointer);
+
+			if (path == "/api/add/priority" || path == "/api/add/play") {
+				m_game.getCurrentPlayList().move(static_cast<unsigned int>(m_game.getCurrentPlayList().getList().size()) - 1, 0);
+
+				if (path == "/api/add/play") {
+					std::shared_ptr<Song> songToPlay = m_game.getCurrentPlayList().getNext();
+					m_game.activateScreen("Sing");
+					ScreenSing& ss = dynamic_cast<ScreenSing&>(*m_game.getScreen("Sing"));
+					ss.setSong(songToPlay);
+				}
+			}
 			ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(m_game.getScreen("Playlist"));
 			m_pp->triggerSongListUpdate();
 
@@ -282,24 +327,90 @@ void RequestHandler::Post(web::http::http_request request)
 			return;
 		}
 	}
-	else if (path == "/api/search") {
-		auto query = utility::conversions::to_utf8string(jsonPostBody[utility::conversions::to_string_t("query")].as_string());
-		m_songs.setFilter(query);
-		web::json::value jsonRoot = web::json::value::array();
-		for (size_t i = 0; i < m_songs.size(); i++) {
-			web::json::value songObject = web::json::value::object();
-			songObject[utility::conversions::to_string_t("Title")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->title));
-			songObject[utility::conversions::to_string_t("Artist")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->artist));
-			songObject[utility::conversions::to_string_t("Edition")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->edition));
-			songObject[utility::conversions::to_string_t("Language")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->language));
-			songObject[utility::conversions::to_string_t("Creator")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->creator));
-			songObject[utility::conversions::to_string_t("HasError")] = web::json::value::boolean(m_songs[i]->loadStatus == Song::LoadStatus::PARSERERROR);
-			songObject[utility::conversions::to_string_t("ProvidedBy")] = web::json::value(utility::conversions::to_string_t(m_songs[i]->providedBy));
-			songObject[utility::conversions::to_string_t("Comment")] = web::json::value(utility::conversions::to_string_t(m_songs[i]->comment));
-			jsonRoot[i] = songObject;
+	else if (path == "/api/play") {
+		bool isSeeking = jsonPostBody[utility::conversions::to_string_t("seek")].is_number();
+		if (m_game.getCurrentPlayList().isEmpty() && !isSeeking) {
+			request.reply(web::http::status_codes::BadRequest, "Playlist is empty.");
+			return;
 		}
-		request.reply(web::http::status_codes::OK, jsonRoot);
-		return;
+		try {
+			if (jsonPostBody[utility::conversions::to_string_t("songId")].is_null() || !jsonPostBody[utility::conversions::to_string_t("songId")].is_number()) {
+				if (!isSeeking) {
+					request.reply(web::http::status_codes::BadRequest, "Provided song id is not a number. Please make a valid request.");
+					return;
+				}
+			}
+			else {
+				unsigned songIdToPlay = jsonPostBody[utility::conversions::to_string_t("songId")].as_number().to_uint32();
+				if (songIdToPlay > m_game.getCurrentPlayList().getList().size()) {
+					request.reply(web::http::status_codes::BadRequest, "No song at position \"" + std::to_string(songIdToPlay) + "\".");
+					return;
+				}
+				std::shared_ptr<Song> songToPlay = m_game.getCurrentPlayList().getSong(songIdToPlay);
+				ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(m_game.getScreen("Playlist"));
+				m_pp->triggerSongListUpdate();
+				m_game.activateScreen("Sing");
+				ScreenSing& ss = dynamic_cast<ScreenSing&>(*m_game.getScreen("Sing"));
+				ss.setSong(songToPlay);
+			}
+			if (isSeeking) {
+				if (!m_game.getCurrentScreen() || m_game.getCurrentScreen()->getName() != "Sing" || !dynamic_cast<ScreenSing&>(*m_game.getScreen("Sing")).getSong()) {
+					request.reply(web::http::status_codes::BadRequest, "No song is currently playing. Cannot seek.");
+					return;
+				}
+				double seekTo = jsonPostBody[utility::conversions::to_string_t("seek")].as_number().to_double();
+				ScreenSing& ss = dynamic_cast<ScreenSing&>(*m_game.getScreen("Sing"));
+				ss.seek(seekTo);
+			}
+			request.reply(web::http::status_codes::OK, "success");
+			return;
+		}
+		catch (std::exception const& e) {
+			std::string str = std::string("JSON Exception: ") + e.what();
+			request.reply(web::http::status_codes::BadRequest, str);
+			return;
+		}
+	}
+	else if (path == "/api/skip") {
+		try {
+			m_game.activateScreen("Playlist");
+
+			request.reply(web::http::status_codes::OK, "success");
+			return;
+		}
+		catch (web::json::json_exception const& e) {
+			std::string str = std::string("JSON Exception: ") + e.what();
+			request.reply(web::http::status_codes::BadRequest, str);
+			return;
+		}
+		catch (const std::exception& e) {
+			std::string str = std::string("Exception: ") + e.what();
+			request.reply(web::http::status_codes::BadRequest, str);
+			return;
+		}
+	}
+	else if (path == "/api/search") {
+		try {
+			auto searchQuery = utility::conversions::to_utf8string(jsonPostBody[utility::conversions::to_string_t("query")].as_string());
+			m_songs.setFilter(searchQuery);
+			size_t offset = 0;
+			size_t limit = 0;
+
+			if (!jsonPostBody[utility::conversions::to_string_t("offset")].is_null() && jsonPostBody[utility::conversions::to_string_t("offset")].is_number()) {
+				offset = jsonPostBody[utility::conversions::to_string_t("offset")].as_number().to_uint32();
+			}
+			if (!jsonPostBody[utility::conversions::to_string_t("limit")].is_null() && jsonPostBody[utility::conversions::to_string_t("limit")].is_number()) {
+				limit = jsonPostBody[utility::conversions::to_string_t("limit")].as_number().to_uint32();
+			}
+			web::json::value jsonRoot = SongsToJsonObject(offset, limit);
+			request.reply(web::http::status_codes::OK, jsonRoot);
+			return;
+		}
+		catch (web::json::json_exception const& e) {
+			std::string str = std::string("JSON Exception: ") + e.what();
+			request.reply(web::http::status_codes::BadRequest, str);
+			return;
+		}
 	}
 	else {
 		request.reply(web::http::status_codes::NotFound, "The path \"" + path + "\" was not found.");
@@ -334,21 +445,42 @@ web::json::value RequestHandler::ExtractJsonFromRequest(web::http::http_request 
 		return jsonBody;
 }
 
+web::json::value RequestHandler::SongToJsonObject(std::shared_ptr<Song> song) {
+	web::json::value songObject = web::json::value::object();
+	songObject[utility::conversions::to_string_t("Title")] = web::json::value::string(utility::conversions::to_string_t(song->title));
+	songObject[utility::conversions::to_string_t("Artist")] = web::json::value::string(utility::conversions::to_string_t(song->artist));
+	songObject[utility::conversions::to_string_t("Edition")] = web::json::value::string(utility::conversions::to_string_t(song->edition));
+	songObject[utility::conversions::to_string_t("Language")] = web::json::value::string(utility::conversions::to_string_t(song->language));
+	songObject[utility::conversions::to_string_t("Creator")] = web::json::value::string(utility::conversions::to_string_t(song->creator));
+	songObject[utility::conversions::to_string_t("name")] = web::json::value::string(utility::conversions::to_string_t(song->artist + " " + song->title));
+	songObject[utility::conversions::to_string_t("HasError")] = web::json::value::boolean(song->loadStatus == Song::LoadStatus::PARSERERROR);
+	songObject[utility::conversions::to_string_t("ProvidedBy")] = web::json::value(utility::conversions::to_string_t(song->providedBy));
+	songObject[utility::conversions::to_string_t("Comment")] = web::json::value(utility::conversions::to_string_t(song->comment));
+	songObject[utility::conversions::to_string_t("Tags")] = web::json::value(utility::conversions::to_string_t(song->tags));
 
-web::json::value RequestHandler::SongsToJsonObject() {
+	return songObject;
+}
+
+web::json::value RequestHandler::SongsToJsonObject(size_t start, size_t limit) {
+	size_t startIndex = start;
+	size_t endIndex;
+	size_t limitCount = limit;
+	size_t songCount = m_songs.size();
+
+	if (startIndex > songCount) {
+		startIndex = songCount;
+	}
+	if (limitCount < 1) {
+		limitCount = songCount;
+	}
+	endIndex = startIndex + limitCount;
+	if (endIndex > songCount) {
+		endIndex = songCount;
+	}
+
 	web::json::value jsonRoot = web::json::value::array();
-	for (size_t i = 0; i < m_songs.size(); i++) {
-		web::json::value songObject = web::json::value::object();
-		songObject[utility::conversions::to_string_t("Title")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->title));
-		songObject[utility::conversions::to_string_t("Artist")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->artist));
-		songObject[utility::conversions::to_string_t("Edition")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->edition));
-		songObject[utility::conversions::to_string_t("Language")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->language));
-		songObject[utility::conversions::to_string_t("Creator")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->creator));
-		songObject[utility::conversions::to_string_t("name")] = web::json::value::string(utility::conversions::to_string_t(m_songs[i]->artist + " " + m_songs[i]->title));
-		songObject[utility::conversions::to_string_t("HasError")] = web::json::value::boolean(m_songs[i]->loadStatus == Song::LoadStatus::PARSERERROR);
-		songObject[utility::conversions::to_string_t("ProvidedBy")] = web::json::value(utility::conversions::to_string_t(m_songs[i]->providedBy));
-		songObject[utility::conversions::to_string_t("Comment")] = web::json::value(utility::conversions::to_string_t(m_songs[i]->comment));
-		jsonRoot[i] = songObject;
+	for (size_t i = startIndex; i < endIndex; i++) {
+		jsonRoot[i - startIndex] = SongToJsonObject(m_songs[i]);
 	}
 
 	return jsonRoot;
@@ -364,7 +496,8 @@ std::shared_ptr<Song> RequestHandler::GetSongFromJSON(web::json::value jsonDoc) 
 			m_songs[i]->language == utility::conversions::to_utf8string(jsonDoc[utility::conversions::to_string_t("Language")].as_string()) &&
 			m_songs[i]->creator == utility::conversions::to_utf8string(jsonDoc[utility::conversions::to_string_t("Creator")].as_string()) &&
 			m_songs[i]->providedBy == utility::conversions::to_utf8string(jsonDoc[utility::conversions::to_string_t("ProvidedBy")].as_string()) &&
-			m_songs[i]->comment == utility::conversions::to_utf8string(jsonDoc[utility::conversions::to_string_t("Comment")].as_string())) {
+			m_songs[i]->comment == utility::conversions::to_utf8string(jsonDoc[utility::conversions::to_string_t("Comment")].as_string()) &&
+			m_songs[i]->tags == utility::conversions::to_utf8string(jsonDoc[utility::conversions::to_string_t("Tags")].as_string())) {
 				SpdLogger::info(LogSystem::WEBSERVER, "Found requested song, {} - {}", m_songs[i]->artist, m_songs[i]->title);
 				return m_songs[i];
 		}
@@ -394,6 +527,9 @@ std::vector<std::string> RequestHandler::GetTranslationKeys() {
 		translate_noop("Language"),
 		translate_noop("Edition"),
 		translate_noop("Creator"),
+		translate_noop("Provided by"),
+		translate_noop("Comment"),
+		translate_noop("Tags"),
 		translate_noop("Sort order"),
 		translate_noop("Normal"),
 		translate_noop("Inverted"),

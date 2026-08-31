@@ -26,7 +26,8 @@ class RequestHandler
 	web::json::value ExtractJsonFromRequest(web::http::http_request request);
 
 	void HandleFile(web::http::http_request request, std::string filePath = "");
-	web::json::value SongsToJsonObject();
+	web::json::value SongToJsonObject(std::shared_ptr<Song> song);
+	web::json::value SongsToJsonObject(size_t start = 0, size_t limit = 0);
 	std::map<std::string, std::string> GenerateLocaleDict();
 	std::vector<std::string> GetTranslationKeys();
 	std::shared_ptr<Song> GetSongFromJSON(web::json::value);
