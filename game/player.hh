@@ -44,7 +44,7 @@ struct Player {
 	/// constructor
 	Player(VocalTrack& vocal, Analyzer& analyzer, size_t frames);
 
-	std::string const& getId() const { return m_analyzer.getId(); }
+	std::string const& getId() const;
 
 	/// prepares analyzer
 	void prepare();

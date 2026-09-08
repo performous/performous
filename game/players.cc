@@ -166,12 +166,8 @@ void Players::advance(std::ptrdiff_t diff) {
 }
 
 void Players::advanceToId(PlayerId id) {
-	for (std::size_t i = 0; i < m_filtered.size(); ++i) {
-		if (m_filtered[i].id == id) {
-			math_cover.setTarget(static_cast<std::ptrdiff_t>(i), count());
-			return;
-		}
-	}
+	auto const it = std::find_if(m_filtered.begin(), m_filtered.end(), [id](PlayerItem const& p) { return p.id == id; });
+	if (it != m_filtered.end()) math_cover.setTarget(it - m_filtered.begin(), count());
 }
 
 PlayerItem Players::current() const {

@@ -81,6 +81,15 @@ void Database::addHiscore(std::shared_ptr<Song> s) {
 	SpdLogger::info(LogSystem::DATABASE, "Added new hiscore. Score={} on track={} for song id={}, on level={}", hiscore.score, hiscore.track, songid.value(), level);
 }
 
+std::optional<PlayerId> Database::rememberedPlayerForDevice(std::string const& deviceId) const {
+	if (deviceId.empty()) return std::nullopt;
+
+	auto const it = playersByDevices.find(deviceId);
+	if (it == playersByDevices.end()) return std::nullopt;
+
+	return it->second;
+}
+
 bool Database::reachedHiscore(std::shared_ptr<Song> s) const {
 	unsigned score = scores.front().score;
 	const auto track = scores.front().track;

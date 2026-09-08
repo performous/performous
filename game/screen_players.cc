@@ -109,13 +109,8 @@ void ScreenPlayers::checkoutNewScore() {
 		// frustrating for second one that he cannot enter, so better go for next one...
 
 		// Pre-select the player that was previously used with this score's source device, if known.
-		std::string const& deviceId = m_database.scores.front().player_id;
-		if (!deviceId.empty()) {
-			auto knownPlayerIt = m_database.playersByDevices.find(deviceId);
-			if (knownPlayerIt != m_database.playersByDevices.end()) {
-				m_players.advanceToId(knownPlayerIt->second);
-			}
-		}
+		auto const rememberedPlayer = m_database.rememberedPlayerForDevice(m_database.scores.front().player_id);
+		if (rememberedPlayer) m_players.advanceToId(*rememberedPlayer);
 	}
 }
 
