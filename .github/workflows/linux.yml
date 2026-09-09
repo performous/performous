@@ -88,14 +88,17 @@ jobs:
           fi
   build_packages:
     name: Build the Linux packages
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runners }}
     needs:
       - determine_docker_version
     strategy:
       matrix:
-        include:
-          - os: ubuntu
-            version: 20.04
+        # github runners
+        runners:
+          - ubuntu-24.04
+          - ubuntu-24.04-arm
+        # distros we're building for
+        distros:
           - os: ubuntu
             version: 22.04
           - os: ubuntu
@@ -119,10 +122,20 @@ jobs:
           - os: fedora
             version: 44
     steps:
+      - name: Detect runner architecture
+        run: |
+          if [[ "${{ matrix.runners }}" == *"arm"* ]]; then
+            echo "DOCKER_PLATFORM=linux/arm64" >> $GITHUB_ENV
+            echo "BUILD_ARCH=aarch64" >> $GITHUB_ENV
+          else
+            echo "DOCKER_PLATFORM=linux/amd64" >> $GITHUB_ENV
+            echo "BUILD_ARCH=x86_64" >> $GITHUB_ENV
+          fi
+
       - name: Container name
         run: |
           # Figure out the container name we'll use for the build
-          BUILD_CONTAINER=${{ env.REGISTRY }}/${{ needs.determine_docker_version.outputs.REPO_OWNER }}/deps:${{ matrix.os }}-${{ matrix.version }}
+          BUILD_CONTAINER=${{ env.REGISTRY }}/${{ needs.determine_docker_version.outputs.REPO_OWNER }}/deps:${{ matrix.distros.os }}-${{ matrix.distros.version }}
           echo "CONTAINER_NAME=${BUILD_CONTAINER}" >> $GITHUB_ENV
 
       - name: Checkout
@@ -135,41 +148,43 @@ jobs:
           username: ${{ needs.determine_docker_version.outputs.REPO_OWNER }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build ${{ matrix.os }} ${{ matrix.version }} Container
-        if: needs.determine_docker_version.outputs[format('build_{0}_containers', matrix.os)] == 'true' || needs.determine_docker_version.outputs['build_docker_containers'] == 'true'
+      - name: Build ${{ matrix.distros.os }} ${{ matrix.distros.version }} Container
+        if: needs.determine_docker_version.outputs[format('build_{0}_containers', matrix.distros.os)] == 'true' || needs.determine_docker_version.outputs['build_docker_containers'] == 'true'
         uses: docker/build-push-action@v7
         with:
           context: docker/
-          file: ./docker/Dockerfile.${{ matrix.os }}
+          file: ./docker/Dockerfile.${{ matrix.distros.os }}
           load: true
+          platforms: ${{ env.DOCKER_PLATFORM }}
           tags: ${{ env.CONTAINER_NAME }} 
-          build-args: OS_VERSION=${{ matrix.version }}
+          build-args: OS_VERSION=${{ matrix.distros.version }}
 
       - name: Build package
         run: |
           # Pull in our common build functions
           . .github/workflows/build_functions.sh
+
           # Set the correct version in cmake
           PACKAGE_VERSION=${{ inputs.package_complete_version }}
           EXTRA_CMAKE_ARGS="-DPERFORMOUS_VERSION=${PACKAGE_VERSION}"
           PERFORMOUS_RELEASE_TYPE="RelWithDebInfo"
           
           # Only pull the container if it wasn't built locally
-          if [ "${{ needs.determine_docker_version.outputs[format('build_{0}_containers', matrix.os)] }}" = "false" ] && [ '${{ needs.determine_docker_version.outputs.build_docker_containers }}' = 'false' ]; then
+          if [ "${{ needs.determine_docker_version.outputs[format('build_{0}_containers', matrix.distros.os)] }}" = "false" ] && [ '${{ needs.determine_docker_version.outputs.build_docker_containers }}' = 'false' ]; then
             docker pull ${{ env.CONTAINER_NAME }}
           fi
 
           # Run the build inside the docker containers using the
           # build script that was pulled inside during the build
-          docker run --env EXTRA_CMAKE_ARGS --rm -v $(pwd):/github_actions_build/ ${{ env.CONTAINER_NAME }} ./build_performous.sh -g -D /github_actions_build/ -E ${EXTRA_CMAKE_ARGS} -R ${PERFORMOUS_RELEASE_TYPE}
+          docker run --platform ${{ env.DOCKER_PLATFORM }} --env EXTRA_CMAKE_ARGS --rm -v $(pwd):/github_actions_build/ ${{ env.CONTAINER_NAME }} ./build_performous.sh -g -D /github_actions_build/ -E ${EXTRA_CMAKE_ARGS} -R ${PERFORMOUS_RELEASE_TYPE}
 
           # Provided by the common build functions
-          package_name "$(pwd)/build" "Performous*-Linux.*" "${PACKAGE_VERSION}" "${{ matrix.os }}" "${{ matrix.version }}"
+          package_name "$(pwd)/build" "Performous*-Linux.*" "${PACKAGE_VERSION}" "${{ matrix.distros.os }}" "${{ matrix.distros.version }}"
 
       - name: Run unit tests
         run: |
           # Run the containers with the script for each testing suite
-          docker run --rm -v $(pwd):/github_actions_build/ ${{ env.CONTAINER_NAME }} ./run_tests.sh
+          docker run --platform ${{ env.DOCKER_PLATFORM }} --rm -v $(pwd):/github_actions_build/ ${{ env.CONTAINER_NAME }} ./run_tests.sh
 
       # Upload artifacts during pull-requests
       - name: Upload artifact
@@ -205,7 +220,7 @@ jobs:
         if: ${{ needs.determine_docker_version.outputs.build_docker_containers == 'true' && github.event_name != 'pull_request' }}
         with:
           context: docker/
-          file: ./docker/Dockerfile.${{ matrix.os }}
+          file: ./docker/Dockerfile.${{ matrix.distros.os }}
           push: true
           tags: ${{ env.CONTAINER_NAME }}
-          build-args: OS_VERSION=${{ matrix.version }}
+          build-args: OS_VERSION=${{ matrix.distros.version }}

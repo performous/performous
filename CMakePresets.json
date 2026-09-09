@@ -128,6 +128,35 @@
       }
     },
     {
+      "name": "windows-arm64-debug",
+      "displayName": "Windows - ARM64 Debug",
+      "description": "Target Windows Debug (ARM64).",
+      "inherits": "windows-base",
+      "architecture": "arm64",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "windows-arm64-release",
+      "displayName": "Windows - ARM64 Release",
+      "description": "Target Windows Release (ARM64).",
+      "inherits": "windows-base",
+      "architecture": "arm64",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "windows-arm64-debinfo",
+      "displayName": "ARM64 Release with Debug info",
+      "description": "Target Windows Release with Debug info (ARM64).",
+      "inherits": "windows-arm64-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+    {
       "name": "macos-x64-debug",
       "displayName": "macOS - x64 Debug",
       "description": "Target macOS Debug (64-bit).",
@@ -191,6 +220,24 @@
       "configurePreset": "linux-x64-debinfo",
       "displayName": "Build Linux x64-debinfo.",
       "description": "Build Linux x64-debinfo."
+    },
+    {
+      "name": "windows-arm64-debug",
+      "configurePreset": "windows-arm64-debug",
+      "displayName": "Build Windows ARM64-debug.",
+      "description": "Build Windows ARM64-debug."
+    },
+    {
+      "name": "windows-arm64-release",
+      "configurePreset": "windows-arm64-release",
+      "displayName": "Build Windows ARM64-release.",
+      "description": "Build Windows ARM64-release."
+    },
+    {
+      "name": "windows-arm64-debinfo",
+      "configurePreset": "windows-arm64-debinfo",
+      "displayName": "Build Windows ARM64-debinfo.",
+      "description": "Build Windows ARM64-debinfo."
     },
     {
       "name": "macos-x64-debug",
