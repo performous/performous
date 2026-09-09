@@ -62,9 +62,16 @@ void Database::addSong(std::shared_ptr<Song> s) {
 }
 
 void Database::addHiscore(std::shared_ptr<Song> s) {
-	auto maybe_playerid = m_players.lookup(m_players.current().name);
+	std::string const& currentName = m_players.current().name;
+	if (currentName.empty()) {
+		// No player is actually selected (e.g. Start pressed before a name was typed/chosen).
+		// Players::addPlayer() refuses empty names, so discard the pending score
+		SpdLogger::error(LogSystem::DATABASE, "No player selected (empty name) -- discarding pending score, hiscore NOT written.");
+		return;
+	}
+	auto maybe_playerid = m_players.lookup(currentName);
 	if (!maybe_playerid.has_value()) {
-		SpdLogger::error(LogSystem::DATABASE, "Cannot find player id for player={}", m_players.current().name);
+		SpdLogger::error(LogSystem::DATABASE, "Cannot find player id for player={}", currentName);
 		return;
 	}
 	auto playerid = maybe_playerid.value();
