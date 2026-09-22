@@ -4,6 +4,7 @@
 #include "libxml++.hh"
 #include "fs.hh"
 #include "i18n.hh"
+#include "util.hh"
 
 #include <iostream>
 
@@ -62,7 +63,7 @@ void Database::addSong(std::shared_ptr<Song> s) {
 }
 
 void Database::addHiscore(std::shared_ptr<Song> s) {
-	std::string const& currentName = m_players.current().name;
+	std::string const currentName = trim(m_players.current().name);
 	if (currentName.empty()) {
 		// No player is actually selected (e.g. Start pressed before a name was typed/chosen).
 		// Players::addPlayer() refuses empty names, so discard the pending score

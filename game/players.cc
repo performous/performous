@@ -182,6 +182,7 @@ PlayerItem Players::operator[](ssize_t pos) const {
 	return m_filtered[static_cast<size_t>( index )];
 }
 
+/// Moves the current selection by diff steps, wrapping around the filtered list.
 void Players::advance(std::ptrdiff_t diff) {
 	const unsigned size = count();
 	if (size == 0) return; // Do nothing if no players are available
@@ -192,6 +193,7 @@ void Players::advance(std::ptrdiff_t diff) {
 	math_cover.setTarget(current, count());
 }
 
+/// Selects the player with the given id, if present in the filtered list.
 void Players::advanceToId(PlayerId id) {
 	auto const it = std::find_if(m_filtered.begin(), m_filtered.end(), [id](PlayerItem const& p) { return p.id == id; });
 	if (it != m_filtered.end()) math_cover.setTarget(it - m_filtered.begin(), count());
