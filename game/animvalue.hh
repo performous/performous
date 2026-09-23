@@ -76,7 +76,7 @@ class AnimAcceleration {
 		for (std::size_t i = 0; i < rounds; ++i) {
 			double d = remainder(m_target - m_position, num); // Distance (via shortest way)
 			// Allow it to stop nicely, without jitter
-			if (std::abs(m_velocity) < 0.1 && std::abs(d) < 0.001) {
+			if (almostEqual(m_velocity, 0.0, 0.1) && almostEqual(d, 0.0)) {
 				m_velocity = 0.0;
 				m_position = m_target;
 				break;
