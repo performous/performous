@@ -4,6 +4,7 @@
 #include "song.hh"
 #include "songparserutil.hh"
 #include "unicode.hh"
+#include "util.hh"
 
 #include <boost/algorithm/string.hpp>
 #include <stdexcept>
@@ -127,7 +128,7 @@ void SongParserMidi::parseNotes(Song& song) {
 					double end = midi.get_seconds(note.end) + song.start;
 					if (end == 0) continue; // Note with no ending
 					if (beg > end) { // Reversed note
-						if (beg - end > 0.001) { reversedNoteCount++; continue; }
+						if (!almostEqual(beg, end)) { reversedNoteCount++; continue; }
 						else end = beg; // Allow 1ms error to counter rounding etc errors
 					}
 					dur.push_back(Duration(beg, end));
@@ -210,7 +211,7 @@ void SongParserMidi::parseNotes(Song& song) {
 			for (auto const& lyric: it->lyrics) {
 				if(lyric.note == 116 || lyric.note == 103 || lyric.note == 124) {
 					for (auto& n: vocal.notes) {
-						if (n.begin == midi.get_seconds(lyric.begin) + song.start && n.type == Note::Type::NORMAL) {
+						if (almostEqual(n.begin, midi.get_seconds(lyric.begin) + song.start) && n.type == Note::Type::NORMAL) {
 							if (lyric.note == 124) {
 								n.type = Note::Type::FREESTYLE;
 							} else {

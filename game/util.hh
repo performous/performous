@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <cmath>
 #include <cstdint>
 #include <limits>
 #include <locale>
@@ -15,6 +16,11 @@ template <typename T> T sconv(std::string const& s);
 /** Limit val to range [min, max] **/
 template <typename T> constexpr T clamp(T val, T min = 0, T max = 1) {
 	return (val < min) ? min : (val > max) ? max : val;
+}
+
+/** Absolute-tolerance floating point comparison (avoids exact == on computed doubles/floats) **/
+template <typename T> constexpr bool almostEqual(T a, T b, T epsilon = static_cast<T>(0.001)) {
+	return std::abs(a - b) < epsilon;
 }
 
 template <typename Numeric> struct MinMax {
