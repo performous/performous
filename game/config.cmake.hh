@@ -24,5 +24,11 @@
 #define LIBXMLPP_VERSION_3_0 @LibXML++_VERSION_3_0@
 #define LIBXMLPP_VERSION_5_0 @LibXML++_VERSION_5_0@
 
+enum e_startup_screens {
+	SCREEN_INTRO = 0,
+	SCREEN_SONGS = 1,
+	SCREEN_SING = 2
+};
+
 #endif
 

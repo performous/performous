@@ -222,12 +222,14 @@ void RequestHandler::Post(web::http::http_request request)
 			return;
 		}
 		else {
-			SpdLogger::debug(LogSystem::WEBSERVER, "Adding {} - {} to the playlist.", songPointer->artist, songPointer->title);
-			m_game.getCurrentPlayList().addSong(songPointer);
-			ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(m_game.getScreen("Playlist"));
-			m_pp->triggerSongListUpdate();
-
-			request.reply(web::http::status_codes::OK, "success");
+			std::clog << "requesthandler/debug: Adding " << songPointer->artist << " - " << songPointer->title << " to the playlist " << std::endl;
+			if(m_game.getCurrentPlayList().addSong(songPointer)) {
+				ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(m_game.getScreen("Playlist"));
+				m_pp->triggerSongListUpdate();
+				request.reply(web::http::status_codes::OK, "success");
+			} else {
+				request.reply(web::http::status_codes::Forbidden, "Too many songs already in playlist");
+			}
 			return;
 		}
 	}
