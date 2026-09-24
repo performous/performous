@@ -42,8 +42,10 @@ void PlayList::clear() {
 }
 
 void PlayList::removeSong(unsigned index) {
-	std::lock_guard<std::mutex> l(m_mutex);
-	m_list.erase(m_list.begin() + index);
+	if(index < m_list.size()) {
+		std::lock_guard<std::mutex> l(m_mutex);
+		m_list.erase(m_list.begin() + index);
+	}
 }
 void PlayList::swap(unsigned index1, unsigned index2) {
 	std::lock_guard<std::mutex> l(m_mutex);
