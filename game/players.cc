@@ -1,9 +1,10 @@
 #include "players.hh"
-#include "unicode.hh"
 
 #include "configuration.hh"
 #include "fs.hh"
-#include "libxml++-impl.hh"
+#include "libxml++.hh"
+#include "log.hh"
+#include "unicode.hh"
 
 #include <algorithm>
 #include <unicode/stsearch.h>
@@ -74,7 +75,7 @@ void Players::addPlayer (std::string const& name, std::string const& picture, st
 			pi.path =  findFile(fs::path("pictures") / pi.picture);
 		} catch (std::runtime_error const& e)
 		{
-			std::cerr << e.what() << std::endl;
+		SpdLogger::error(LogSystem::DATABASE, "Error finding player picture for player {}, id={}, exception={}.", pi.name, pi.id, e.what());
 		}
 	}
 
@@ -137,25 +138,35 @@ void Players::filter_internal() {
 	math_cover.setTarget(pos, count());
 }
 
-PlayerItem Players::operator[](unsigned pos) const {
-    if (pos < count()) 
-        return m_filtered[pos];
-    
-    return PlayerItem();
+
+/**
+  * \details   Get the player at pos, but acting like a circular buffer,
+  *            so [-1] gives the last, and [size] gives the first, etc.
+  *
+  * \pos       The position within the m_filtered players, or not
+  * \returns   A copy of the PlayerItem
+  */
+PlayerItem Players::operator[](ssize_t pos) const {
+	if (m_filtered.empty())
+		return PlayerItem();
+	// wrap the index between 0 and count()-1 the signed types are important here
+	ssize_t size  = static_cast<ssize_t>( m_filtered.size() );
+	ssize_t index = ((pos % size) + size) % size;
+	return m_filtered[static_cast<size_t>( index )];
 }
 
 void Players::advance(std::ptrdiff_t diff) {
-    const unsigned size = count();
-    if (size == 0) return; // Do nothing if no players are available
-    std::ptrdiff_t current = 0;
-        current = (static_cast<std::ptrdiff_t>(math_cover.getTarget()) + diff) % size;
-    if (current < 0)
-        current += count();
-    math_cover.setTarget(current, count());
+	const unsigned size = count();
+	if (size == 0) return; // Do nothing if no players are available
+	std::ptrdiff_t current = 0;
+		current = (static_cast<std::ptrdiff_t>(math_cover.getTarget()) + diff) % size;
+	if (current < 0)
+		current += count();
+	math_cover.setTarget(current, count());
 }
 
 PlayerItem Players::current() const {
-    if (math_cover.getTarget() < static_cast<ptrdiff_t>(m_filtered.size())) return m_filtered[static_cast<unsigned>(math_cover.getTarget())];
-    
-    return PlayerItem();
+	if (math_cover.getTarget() < static_cast<ptrdiff_t>(m_filtered.size())) return m_filtered[static_cast<unsigned>(math_cover.getTarget())];
+	
+	return PlayerItem();
 }

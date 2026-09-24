@@ -9,7 +9,7 @@
 #include "controllers.hh"
 #include "texture.hh"
 #include "opengl_text.hh"
-#include "glutil.hh"
+#include "graphic/glutil.hh"
 #include "menu.hh"
 #include "screen.hh"
 #include "fs.hh"

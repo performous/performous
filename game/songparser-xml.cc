@@ -1,7 +1,7 @@
 #include "songparser.hh"
 
 #include "util.hh"
-#include "libxml++-impl.hh"
+#include "libxml++.hh"
 #include <boost/algorithm/string.hpp>
 #include <stdexcept>
 

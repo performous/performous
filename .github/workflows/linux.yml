@@ -15,7 +15,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  REPO_NAME: ${{ github.repository_owner }}
 
 jobs:
   # Decide if we need to build the containers on this run
@@ -27,10 +26,17 @@ jobs:
       build_debian_containers: ${{ steps.version.outputs.build_debian_containers }}
       build_ubuntu_containers: ${{ steps.version.outputs.build_ubuntu_containers }}
       build_fedora_containers: ${{ steps.version.outputs.build_fedora_containers }}
+      REPO_OWNER: ${{ steps.get_repo_username.outputs.REPO_OWNER }}
     steps:
+      - name: Get docker repo name (format to lowercase)
+        id: get_repo_username
+        run: |
+          REPO_OWNER=${{ github.repository_owner }}
+          echo "REPO_OWNER=${REPO_OWNER,,}" >> $GITHUB_OUTPUT
+
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -53,9 +59,9 @@ jobs:
             echo "build_docker_containers=false" >> $GITHUB_OUTPUT
           fi
 
-          DIFF_UBUNTU=$((git rev-parse HEAD:docker/Dockerfile.ubuntu HEAD:docker/build_performous.sh && git diff --merge-base ${base_version} --exit-code -- docker/Dockerfile.ubuntu docker/build_performous.sh) > /dev/null 2>&1 ; echo $?)
-          DIFF_DEBIAN=$((git rev-parse HEAD:docker/Dockerfile.debian HEAD:docker/build_performous.sh && git diff --merge-base ${base_version} --exit-code -- docker/Dockerfile.debian docker/build_performous.sh) > /dev/null 2>&1 ; echo $?)
-          DIFF_FEDORA=$((git rev-parse HEAD:docker/Dockerfile.fedora HEAD:docker/build_performous.sh && git diff --merge-base ${base_version} --exit-code -- docker/Dockerfile.fedora docker/build_performous.sh) > /dev/null 2>&1 ; echo $?)
+          DIFF_UBUNTU=$((git rev-parse HEAD:docker/Dockerfile.ubuntu HEAD:docker/build_performous.sh HEAD:docker/run_tests.sh && git diff --merge-base ${base_version} --exit-code -- docker/Dockerfile.ubuntu docker/build_performous.sh docker/run_tests.sh) > /dev/null 2>&1 ; echo $?)
+          DIFF_DEBIAN=$((git rev-parse HEAD:docker/Dockerfile.debian HEAD:docker/build_performous.sh HEAD:docker/run_tests.sh && git diff --merge-base ${base_version} --exit-code -- docker/Dockerfile.debian docker/build_performous.sh docker/run_tests.sh) > /dev/null 2>&1 ; echo $?)
+          DIFF_FEDORA=$((git rev-parse HEAD:docker/Dockerfile.fedora HEAD:docker/build_performous.sh HEAD:docker/run_tests.sh && git diff --merge-base ${base_version} --exit-code -- docker/Dockerfile.fedora docker/build_performous.sh docker/run_tests.sh) > /dev/null 2>&1 ; echo $?)
 
           if [[ $DIFF_UBUNTU != 0 ]]; then
             echo "Refresh Ubuntu containers: TRUE"
@@ -94,42 +100,44 @@ jobs:
             version: 22.04
           - os: ubuntu
             version: 24.04
-          - os: debian
-            version: 11
+          - os: ubuntu
+            version: 26.04
           - os: debian
             version: 12
-          - os: fedora
-            version: 35
-          - os: fedora
-            version: 36
-          - os: fedora
-            version: 37
-          - os: fedora
-            version: 38
+          - os: debian
+            version: 13
           - os: fedora
             version: 39
           - os: fedora
             version: 40
+          - os: fedora
+            version: 41
+          - os: fedora
+            version: 42
+          - os: fedora
+            version: 43
+          - os: fedora
+            version: 44
     steps:
       - name: Container name
         run: |
           # Figure out the container name we'll use for the build
-          BUILD_CONTAINER=${{ env.REGISTRY }}/${{ env.REPO_NAME }}/deps:${{ matrix.os }}-${{ matrix.version }}
+          BUILD_CONTAINER=${{ env.REGISTRY }}/${{ needs.determine_docker_version.outputs.REPO_OWNER }}/deps:${{ matrix.os }}-${{ matrix.version }}
           echo "CONTAINER_NAME=${BUILD_CONTAINER}" >> $GITHUB_ENV
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Login to the container registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ env.REPO_NAME }}
+          username: ${{ needs.determine_docker_version.outputs.REPO_OWNER }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build ${{ matrix.os }} ${{ matrix.version }} Container
         if: needs.determine_docker_version.outputs[format('build_{0}_containers', matrix.os)] == 'true' || needs.determine_docker_version.outputs['build_docker_containers'] == 'true'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: docker/
           file: ./docker/Dockerfile.${{ matrix.os }}
@@ -147,13 +155,13 @@ jobs:
           PERFORMOUS_RELEASE_TYPE="RelWithDebInfo"
           
           # Only pull the container if it wasn't built locally
-          if [ '${{ needs.determine_docker_version.outputs.build_docker_containers }}' = 'false' ]; then
+          if [ "${{ needs.determine_docker_version.outputs[format('build_{0}_containers', matrix.os)] }}" = "false" ] && [ '${{ needs.determine_docker_version.outputs.build_docker_containers }}' = 'false' ]; then
             docker pull ${{ env.CONTAINER_NAME }}
           fi
 
           # Run the build inside the docker containers using the
           # build script that was pulled inside during the build
-          docker run --env EXTRA_CMAKE_ARGS --rm -v $(pwd):/github_actions_build/ ${{ env.CONTAINER_NAME }}   ./build_performous.sh -g -D /github_actions_build/ -E ${EXTRA_CMAKE_ARGS} -R ${PERFORMOUS_RELEASE_TYPE}
+          docker run --env EXTRA_CMAKE_ARGS --rm -v $(pwd):/github_actions_build/ ${{ env.CONTAINER_NAME }} ./build_performous.sh -g -D /github_actions_build/ -E ${EXTRA_CMAKE_ARGS} -R ${PERFORMOUS_RELEASE_TYPE}
 
           # Provided by the common build functions
           package_name "$(pwd)/build" "Performous*-Linux.*" "${PACKAGE_VERSION}" "${{ matrix.os }}" "${{ matrix.version }}"
@@ -165,7 +173,7 @@ jobs:
 
       # Upload artifacts during pull-requests
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: ${{ github.event_name == 'pull_request' }}
         with:
           name: ${{ env.ARTIFACT_NAME }}
@@ -174,7 +182,7 @@ jobs:
       # Upload artifacts on master
       - name: Upload artifact with unified name
         if: ${{ github.ref == 'refs/heads/master' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.MASTER_ARTIFACT_NAME }}
           path: ${{ env.MASTER_ARTIFACT_PATH }}
@@ -191,7 +199,7 @@ jobs:
           file: ${{ env.ARTIFACT_PATH }}
 
       - name: Push container
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         # Containers can't be pushed during PRs because of the way permissions
         # are delegated to secrets.GITHUB_TOKEN
         if: ${{ needs.determine_docker_version.outputs.build_docker_containers == 'true' && github.event_name != 'pull_request' }}

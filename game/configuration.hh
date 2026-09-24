@@ -2,8 +2,6 @@
 
 #include "configitem.hh"
 
-#include "libxml++.hh"
-
 #include <cstdint>
 #include <map>
 #include <string>

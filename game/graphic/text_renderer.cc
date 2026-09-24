@@ -1,7 +1,7 @@
 #include "text_renderer.hh"
 
 #include <pango/pangocairo.h>
-
+#include <algorithm>
 #include <memory>
 
 namespace {
@@ -31,6 +31,96 @@ namespace {
 	}
 }
 
+
+/**
+  * \brief   Split the given text about the given token, populating the extents array with substring positions
+  *
+  * \returns The number of extents found
+  */
+size_t TextRenderer::tokenSplitter( const std::string &text, char token, std::array<TextExtent,MAX_COLUMNS> &extents )
+{
+    size_t extentCount = 0;
+    size_t tokenStart = 0;
+    size_t tokenEnd;
+
+    // Iterate through the text, finding tokens
+    while ((tokenEnd = text.find(token, tokenStart)) != std::string::npos) {
+        if (tokenStart != tokenEnd) {  // Avoid empty tokens
+            extents[extentCount] = { tokenStart, tokenEnd-tokenStart };
+            extentCount += 1;
+        }
+        tokenStart = tokenEnd + 1;
+        if ( extentCount == MAX_COLUMNS )
+            break;  // exhausted extents array
+    }
+    if (tokenStart < text.size() && extentCount < MAX_COLUMNS)
+    {
+        extents[extentCount] = { tokenStart, text.size()-tokenStart };
+        extentCount += 1;
+    }
+
+    return extentCount;
+}
+
+
+/**
+  * \details   Given a block of text, which possibly contains newlines, and _some_ tab-separated columns,
+  *            measure the width of each column in pixels.  Iterate over each line, determining the
+  *            width of each column, and keep track of the maximum width seen for each column.  
+  *
+  * \note      Since typically we have a mix of single items lines and multi-item lines, we only 
+  *            consider lines with tab-delimiters for measuring column widths.
+  *
+  * \param text    The text to measure
+  * \param style   The style to use for measuring
+  * \param m       The quality multiplier, typically doubles bitmap size
+  * \param columns An array, into which we pack the maximum column widths
+  *
+  * \returns   The maximum number of columns over every line
+  */
+size_t TextRenderer::measureColumns(const std::string& text, const TextStyle& style, float m, std::array<float,MAX_COLUMNS>& columnWidths)
+{
+    std::array<TextExtent,MAX_COLUMNS> lines;   // positions of substrings in text
+    std::array<TextExtent,MAX_COLUMNS> columns;
+
+    std::string line, colText;
+    line.reserve(256);   
+    colText.reserve(128);
+    std::fill(columnWidths.begin(), columnWidths.end(), 0.0f);
+
+    size_t maxCols = 0;         // maximum count of columns in any line
+
+    // Loop through the text, finding lines, and then columns in those lines.
+    size_t lineCount = tokenSplitter(text, '\n', lines);  // split text into lines
+    for (size_t i=0; i<lineCount; i++)
+    {
+        size_t lineStart = lines[i].first;
+        size_t lineLength = lines[i].second;
+        line = text.substr(lineStart, lineLength);
+
+        // We're only interested in lines with multiple columns
+        if (strchr(line.c_str(), '\t') != nullptr)
+        {
+            size_t colCount = tokenSplitter(line, '\t', columns);  // split line into column
+            for (size_t j=0; j<colCount; j++)
+            {
+                size_t colStart = columns[j].first;
+                size_t colLength = columns[j].second;
+                colText = line.substr(colStart, colLength);
+
+				// Measure this column's text width in pixels, keep the maximum width
+				auto size = measure(colText, style, m);
+                float factoredSize = m * size.getWidth(); // multiply by m, as bitmap size is m-times bigger
+                columnWidths[j] = std::max(factoredSize, columnWidths[j]);
+			}
+			maxCols = std::max(maxCols, colCount);
+        }
+    }
+
+    return maxCols;
+}
+
+
 OpenGLText TextRenderer::render(std::string const& text, TextStyle const& style, float m) {
 	alignFactor(m);
 
@@ -47,18 +137,38 @@ OpenGLText TextRenderer::render(std::string const& text, TextStyle const& style,
 	std::shared_ptr<PangoLayout> layout(pango_layout_new(ctx.get()), g_object_unref);
 	pango_layout_set_alignment(layout.get(), alignment);
 	pango_layout_set_font_description(layout.get(), desc.get());
-	pango_layout_set_text(layout.get(), text.c_str(), -1);
 
-	auto width = 0.f;
-	auto height = 0.f;
+	// IFF the text has columns (like the historical hiscores table) nicely format the columns
+	std::array<float,MAX_COLUMNS> colWidths;
+	bool hasColumns = (strchr(text.c_str(),'\t') != nullptr);
+	if (hasColumns)
+	{
+		size_t numTabs = measureColumns(text, style, m, colWidths);
+		// Pango defines tab-stops only for extra columns, so the first tab-stop is the pixel location of the second column. 
+		// There is no concept of a first-column tab-stop (or justification)
+		float position = 0.0f;
+		const float SPACER = TextRenderer().measure("WWWW", style, m).getWidth();  // Can't be a constant, needs to match font & screen DPI, etc.
+		PangoTabArray *tabArray = pango_tab_array_new(static_cast<int>(numTabs), TRUE);  // positions in pixels
+		for (size_t i=0; i<numTabs; i++) {
+			position += colWidths[i] + SPACER;
+			pango_tab_array_set_tab(tabArray, static_cast<int>(i), PANGO_TAB_LEFT, static_cast<int>(position+0.5f));
+		}
+		pango_layout_set_tabs(layout.get(), tabArray);
+		pango_tab_array_free(tabArray);
+	}
+
+	pango_layout_set_text(layout.get(), text.c_str(), -1);  // Measuring changes the layout text, set it finally
 
 	// Compute text extents
+	auto width = 0.f;
+	auto height = 0.f;
 	{
 		PangoRectangle rec;
 		pango_layout_get_pixel_extents(layout.get(), nullptr, &rec);
 		width = static_cast<float>(rec.width) + border;  // Add twice half a border for margins
 		height = static_cast<float>(rec.height) + border;
 	}
+
 	// Create Cairo surface and drawing context
 	std::shared_ptr<cairo_surface_t> surface(
 	  cairo_image_surface_create(CAIRO_FORMAT_ARGB32, static_cast<int>(width), static_cast<int>(height)),
@@ -88,7 +198,7 @@ OpenGLText TextRenderer::render(std::string const& text, TextStyle const& style,
 		cairo_set_source_rgba(dc.get(), style.stroke_col.r, style.stroke_col.g, style.stroke_col.b, style.stroke_col.a);
 		cairo_stroke(dc.get());
 	}
-	cairo_pop_group_to_source (dc.get());
+	cairo_pop_group_to_source(dc.get());
 	cairo_set_operator(dc.get(),CAIRO_OPERATOR_OVER);
 	cairo_paint (dc.get());
 	// Load into m_texture (OpenGL texture)

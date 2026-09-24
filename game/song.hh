@@ -3,6 +3,7 @@
 #include "fs.hh"
 #include "i18n.hh"
 #include "json.hh"
+#include "log.hh"
 #include "notes.hh"
 #include "util.hh"
 
@@ -15,6 +16,7 @@ class SongParser;
 
 namespace TrackName {
 	const std::string BGMUSIC = "background";
+	const std::string INSTRUMENTAL = "Instrumental";
 	const std::string PREVIEW = "Preview";
 	const std::string GUITAR = "Guitar";
 	const std::string GUITAR_COOP = "Coop guitar";
@@ -39,7 +41,7 @@ class Song {
 	friend class SongParser;
 public:
 	/// Is the song parsed from the file yet?
-	enum class LoadStatus { NONE = 0, HEADER = 1, FULL = 2, ERROR = -1 } loadStatus = LoadStatus::NONE;
+	enum class LoadStatus { NONE = 0, HEADER = 1, FULL = 2, PARSERERROR = -1 } loadStatus = LoadStatus::NONE;
 	/// status of song
 	enum class Status { NORMAL, INSTRUMENTAL_BREAK, FINISHED };
 	enum class Type { NONE, TXT, XML, INI, SM } type = Type::NONE;
@@ -60,12 +62,16 @@ public:
 	std::vector<BPM> m_bpms;
 	std::vector<std::string> category; ///< category of song
 	std::string genre; ///< genre
+	std::string tags; ///< tags
 	std::string edition; ///< license
 	std::string title; ///< songtitle
 	std::string artist; ///< artist
 	std::string text; ///< songtext
 	std::string creator; ///< creator
 	std::string language; ///< language
+	std::string providedBy; ///< source of the mapped file.
+	std::string comment; ///< comment of the mapped file.
+	std::string version; ///< version of the mapped file.
 	using MusicFiles = std::map<std::string, fs::path>;
 	MusicFiles music; ///< music files (background, guitar, rhythm/bass, drums, vocals)
 	fs::path cover; ///< cd cover
@@ -77,6 +83,8 @@ public:
 	std::string collateByArtistOnly;  ///< String for sorting by artist only
 	double videoGap = 0.0; ///< gap with video
 	double start = 0.0; ///< start of song
+	double end = 0.0; ///< end of song
+	int year = 0; ///< year of the song
 	double preview_start = getNaN(); ///< starting time for the preview
 	double m_duration = 0.0;
 	using Stops = std::vector<std::pair<double,double> >;
@@ -92,6 +100,7 @@ public:
 	};
 	std::vector<SongSection> songsections; ///< vector of song sections
 	int randomIdx = 0; ///< sorting index used for random order
+	std::int64_t mtime = 0; ///< modification time of song file (for cache invalidation)
 
 	// Functions only below this line
 	Song(nlohmann::json const& song);  ///< Load song from cache.
@@ -133,21 +142,32 @@ private:
 /// Thrown by SongParser when there is an error
 struct SongParserException: public std::runtime_error {
 	/// constructor
-	SongParserException(Song& s, std::string const& msg, unsigned int linenum, bool sil = false): runtime_error(msg), m_filename(s.filename), m_linenum(linenum), m_silent(sil) {
-		if (!sil) s.b0rked += msg + '\n';
+	SongParserException(Song& s, std::string const& msg, unsigned int linenum = 1, bool showInGUI = true): runtime_error(msg), m_filename(s.filename), m_linenum(linenum) {
+		if (showInGUI) {
+			fmt::format_to(std::back_inserter(s.b0rked), fmt::runtime("{}{}"), !s.b0rked.empty() ? "\n" : "", msg);
+		}
 	}
 	~SongParserException() noexcept = default;
 	fs::path const& file() const { return m_filename; } ///< file in which the error occured
 	unsigned int line() const { return m_linenum; } ///< line in which the error occured
-	bool silent() const { return m_silent; } ///< if the error should not be printed to user (file skipped)
 private:
 	fs::path m_filename;
 	unsigned int m_linenum;
-	bool m_silent;
 };
 
 using SongPtr = std::shared_ptr<Song>;
 using SongCollection = std::vector<SongPtr>;
 
-/// Print a SongParserException in a format suitable for the logging system.
-std::ostream& operator<<(std::ostream& os, SongParserException const& e);
+template <>
+struct fmt::formatter<SongParserException>: formatter<std::string_view> {
+	// Format function
+	template <typename FormatContext>
+	auto format(const SongParserException& e, FormatContext& ctx) const{
+		std::string ret{fmt::format("Error parsing songfile={}", e.file())};
+		if (e.line()) fmt::format_to(std::back_inserter(ret), ", line={}", e.line());
+		fmt::format_to(std::back_inserter(ret), ":\n{}{}", SpdLogger::newLineDec, e.what());
+		
+		// Write the scancode name to the output
+		return formatter<std::string_view>::format(ret, ctx);
+	}
+};

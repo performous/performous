@@ -1,0 +1,330 @@
+name: Build MacOS Packages
+
+on:
+  # Run when called from other workflows
+  workflow_call:
+    inputs:
+      package_complete_version:
+        description: 'The output of the complete_version of the "determine_version" job from the build_and_release.yml workflow'
+        required: true
+        type: string
+      release_id:
+        description: 'The output of the "create_release" job from the build_and_release.yml workflow'
+        required: true
+        type: string
+      boost_version:
+        required: false
+        type: string
+        default: "1.87"
+      intel_target:
+        description: 'Minimum supported macOS deployment target (compiled on min_runner_arm/min_runner_intel, which may be newer than this).'
+        required: false
+        type: string
+        default: "12.0"
+      min_runner_intel:
+        description: 'Oldest GitHub-hosted Intel macOS runner currently available, used for the intel_target build.'
+        required: false
+        type: string
+        default: "macos-15-intel"
+      arm_target:
+        description: 'Newest macOS deployment target to verify against (runs natively on max_runner_arm/max_runner_intel).'
+        required: false
+        type: string
+        default: "15.0"
+      max_runner_arm:
+        description: 'Newest GitHub-hosted arm64 macOS runner available.'
+        required: false
+        type: string
+        default: "macos-26"
+    secrets:
+      NGROK_SSH_TOKEN:
+        description: 'Token for SSH debug'
+        required: false
+      NGROK_SSH_PASS:
+        description: 'Pass for SSH debug'
+        required: false
+
+jobs:
+  Install_MacPorts:
+    strategy:
+      matrix:
+        include:
+          - os: '${{ inputs.min_runner_intel }}'
+            target: '${{ inputs.intel_target }}'
+            is_min: true
+          - os: '${{ inputs.max_runner_arm }}'
+            target: '${{ inputs.arm_target }}'
+            is_min: false
+    name: Install Macports
+    runs-on: '${{ matrix.os }}'
+    env:
+      MACOS_DEPS: >-
+        boost boost.version=${{ inputs.boost_version }}
+        cairo
+        cmake
+        cpprestsdk boost.version=${{ inputs.boost_version }}
+        dylibbundler
+        ffmpeg7
+        fftw-3-single
+        libfmt11
+        fontconfig
+        freetype
+        glm
+        gtest
+        help2man
+        icu
+        libepoxy
+        librsvg
+        libsdl2
+        libxmlxx5
+        nlohmann-json
+        opencv4
+        openssl
+        pango
+        portaudio
+        portmidi
+    steps:
+      - name: Checkout Git
+        id: checkout_git
+        uses: actions/checkout@v6
+        with:
+          path: performous
+
+      - name: Install Macports
+        uses: Lord-Kamina/setup-macports@main
+        with:
+          parameters: ./performous/.github/macports-settings.yml
+          enable-cache: 'false'
+
+      - name: Amend macports configuration
+        run: |
+          sudo port sync
+          echo macosx_deployment_target ${{ matrix.target }} | tee -a /opt/local/etc/macports/macports.conf
+          echo cxx_stdlib libc++ | tee -a /opt/local/etc/macports/macports.conf
+          echo buildmakejobs 0 | tee -a /opt/local/etc/macports/macports.conf
+          echo startupitem_type none | tee -a /opt/local/etc/macports/macports.conf
+          echo build_arch $(uname -m) | tee -a /opt/local/etc/macports/macports.conf
+          #if [[ "$(uname -m)" == "arm64" ]]; then
+          #  echo universal_archs arm64 x86_64 | tee -a /opt/local/etc/macports/macports.conf
+          #fi
+          echo build_arch $(uname -m) | tee -a /opt/local/etc/macports/macports.conf
+          echo boost.version ${{ inputs.boost_version }} | tee -a /opt/local/etc/macports/macports.conf
+
+          sudo mkdir -p /opt/custom_portfiles/www/
+          sudo portindex \
+          /opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/ports/
+          sudo cp -Rvf $(dirname $(port file cpprestsdk)) /opt/custom_portfiles/www/
+          sudo mkdir -p /opt/custom_portfiles/www/cpprestsdk/files
+
+          sudo cp -vf ./performous/.github/support-boost-1.87.patch /opt/custom_portfiles/www/cpprestsdk/files/
+
+          sudo mkdir -p /opt/custom_portfiles/graphics/
+          sudo cp -Rv $(dirname $(port file librsvg)) /opt/custom_portfiles/graphics/
+
+          sudo cat <<EOF | sudo tee -a /opt/custom_portfiles/graphics/librsvg/Portfile
+          configure.ldflags-append -Wl,-headerpad_max_install_names
+          EOF
+
+          #sudo cp -Rv $(dirname $(port file harfbuzz))/files /opt/custom_portfiles/graphics/harfbuzz/
+
+          sudo cat <<EOF | sudo tee -a /opt/custom_portfiles/www/cpprestsdk/Portfile
+            patchfiles-append support-boost-1.87.patch
+            configure.args-append -DCPPREST_EXCLUDE_WEBSOCKETS=ON
+            depends_build-delete port:websocketpp
+          EOF
+
+          sudo cat <<EOF | sudo tee /opt/local/etc/macports/sources.conf
+          file:///opt/custom_portfiles [nosync]
+          rsync://rsync.macports.org/macports/release/tarballs/ports.tar [default]
+          EOF
+
+          sudo portindex /opt/custom_portfiles
+
+      - name: Generate versions file for cache-key.
+        run: |
+          echo macOS $(sw_vers -productVersion | cut -f1 -d.) | tee "${{ github.workspace }}/cache-key.txt"
+          echo CPU Type: $(uname -m) | tee -a "${{ github.workspace }}/cache-key.txt"
+          echo Deployment target: ${{ matrix.target }} | tee -a "${{ github.workspace }}/cache-key.txt"
+
+          port info --fullname ${MACOS_DEPS} boost.version=${{ inputs.boost_version }} | \
+          grep -v -e'^--$' | cut -w -f2-3 | \
+          sed -E 's/@([[:digit:]]+)\.([[:digit:]]+)\.([[:digit:]]+){1}((\+|-)[a-zA-Z0-9_]+)*/@\1.\2/g' | \
+          tee -a "${{ github.workspace }}/cache-key.txt"
+
+          echo contents of cache-key-file:
+          cat "${{ github.workspace }}/cache-key.txt"
+
+      - name: Compute cache-key
+        id: cache-key
+        run: |
+          echo "computed_cache_key=macports-${{matrix.os}}-${{ hashFiles('cache-key.txt') }}" >> $GITHUB_OUTPUT
+
+      - name: Try to restore cache
+        id: restore_cache
+        uses: Lord-Kamina/always-upload-cache/restore@refresh-cache
+        with:
+          # Due to a very long-standing bug in cache, excluding only works if all specified paths have the same depth.
+          path: |
+            /opt/local/
+            /Applications/MacPorts/
+          key: '${{ steps.cache-key.outputs.computed_cache_key }}'
+
+      - name: Unlink Homebrew
+        run: |
+          brew unlink $(brew list --formula)
+          echo cmake: $(which cmake)
+
+#      - name: Start SSH session
+#        if: ${{ matrix.os == 'macos-15' && always() }}
+#        id: ssh_debug
+#        uses: Lord-Kamina/debug-via-ssh@main
+#        with:
+#          NGROK_AUTH_TOKEN: ${{ secrets.NGROK_SSH_TOKEN }}
+#          SSH_PASS: ${{ secrets.NGROK_SSH_PASS }}
+
+      - name: Install Dependencies
+        # First, we install packages that are both direct dependencies of performous, as well as of other packages that we will eventually need.
+        # The idea is to build from source everything performous actually depends on to run (so, direct and transitive RUNTIME dependencies),
+        # and to install from packaged binaries everything else we need but not at runtime (i.e. cmake and various versions of python and/or compilers)
+        run: |
+          . "${{ github.workspace}}/performous/.github/try_binary_first.sh"
+          set -x
+          if [[ "${{ steps.restore_cache.outputs.cache-hit }}" == "true" ]]; then
+            echo "Installed but inactive ports: "
+            sudo port -v installed inactive
+            sudo port activate -f installed boost.version=${{ inputs.boost_version }}
+          else
+            sudo portindex /opt/custom_portfiles
+          fi
+
+          echo buildfromsource ifneeded | tee -a /opt/local/etc/macports/macports.conf
+          echo keeplogs yes | tee -a /opt/local/etc/macports/macports.conf
+          sudo port install -s icu gettext-runtime
+
+          set +x
+          set +e
+          sudo rm -rvf /opt/local/var/macports/build
+
+
+          try_binary_first autoconf autoconf-archive automake bison cargo cctools clang-18 libgcc gcc15 gcc15-libcxx cmake docbook-xml docbook-xsl-nons flex gi-docgen git gmake gperf gtk-doc itstool meson mm-common nasm ninja p7zip perl5 pkgconfig py313-docutils py313-build py313-cython py313-installer py313-wheel python313 rust texinfo unzip vim websocketpp xmlto yasm boost.version=${{ inputs.boost_version }}
+
+          set -x
+          sudo port -s install ${MACOS_DEPS} boost.version=${{ inputs.boost_version }}
+
+          echo "Installed ports: "
+          port installed
+
+          sudo port -v uninstall gcc* clang* llvm* || true
+          sudo port clean --all installed
+
+          # Deactivate everything but zstd before caching, in order to reduce the cache size. It's easier to do it like this than actually manually excluding zstd and its dependencies.
+          sudo port -N rev-upgrade
+
+          # Try to prevent inactive depenndencies
+          sudo port -N activate active boost.version=${{ inputs.boost_version }}
+
+          sudo port -N uninstall leaves || true
+          sudo port deactivate -f installed
+          sudo port activate -f zstd boost.version=${{ inputs.boost_version }}
+          # Remove broken symlinks
+          # sudo find -L /opt/local -type d -path /opt/local/var/macports/software -prune -o -type l -exec ls -l {} \; -exec rm -fv {} \;
+          # Delete these folders, as we don't want the cache restore overwriting them.
+          # sudo rm -Rfv /opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/base*
+          # sudo rm -Rfv /opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/ports/_resources
+          # sudo rm -Rfv /opt/local/libexec/macports
+          # sudo rm -fv /opt/local/bin/port*
+
+      - name: Get logs from last job
+        if: ${{ !cancelled() }}
+        id: get-logs
+        run: |
+          cd /opt/local/var/macports
+          tar -czf ${{ github.workspace }}/MacPorts-log-${{ matrix.os }}.tar.gz ./logs ./build
+          echo "log_path=${{ github.workspace }}/MacPorts-log-${{ matrix.os }}.tar.gz" >> $GITHUB_OUTPUT
+
+      - name: Clear Extended attributes
+        run: |
+          sudo find /opt/local/var -type d -a -perm 700 -exec chmod 755 {} \;
+          sudo xattr -c -rsv /opt/local
+
+      - name: Cache dependencies
+        uses: Lord-Kamina/always-upload-cache/save@refresh-cache
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          refresh-cache: true
+          # Due to a very long-standing bug in cache, excluding only works if all specified paths have the same depth.
+          path: |
+            /opt/local/
+            /Applications/MacPorts/
+          key: '${{ steps.cache-key.outputs.computed_cache_key }}'
+
+      - name: Build package
+        id: build_package
+        run: |
+          sudo port activate -f installed boost.version=${{ inputs.boost_version }}
+          cd performous/osx-utils
+          chmod +x ./macos-bundler.py
+          python3 -m venv ./bundler-venv
+          source ./bundler-venv/bin/activate
+          pip3 install -r ./macos-bundler-requirements.txt
+          python3 ./macos-bundler.py --flat-output --verify-bundle --package-version="${{ inputs.package_complete_version }}" --target="${{ matrix.target }}" --enable-webserver=on --enable-midi=on --enable-webcam=on --build-tests=on --prefer-macports
+          PACKAGE_PATH="${{ github.workspace }}/performous/osx-utils/out/Performous-${{ inputs.package_complete_version }}-$(uname -m).dmg"
+          MASTER_PACKAGE_PATH="${{ github.workspace }}/performous/osx-utils/out/Performous-master[${{ inputs.package_complete_version }}]-$(uname -m).dmg"
+          cp -v ${PACKAGE_PATH} ${MASTER_PACKAGE_PATH}
+          echo "ARTIFACT_PATH=${PACKAGE_PATH}" >> ${GITHUB_ENV}
+          echo "MASTER_ARTIFACT_PATH=${MASTER_PACKAGE_PATH}" >> ${GITHUB_ENV}
+          # Multiple matrix entries can share the same architecture (e.g. arm64 at both intel_target and
+          # arm_target), so the upload-artifact *name* needs to stay unique across the whole workflow run
+          # even though the underlying file on disk keeps its normal name. Only tag non-min builds, so the
+          # canonical intel_target (shipped) artifact name is unchanged from before this matrix was widened.
+          if [[ "${{ matrix.is_min }}" == "true" ]]; then
+            echo "ARTIFACT_NAME=$(basename ${PACKAGE_PATH})" >> ${GITHUB_ENV}
+            echo "MASTER_ARTIFACT_NAME=$(basename ${MASTER_PACKAGE_PATH})" >> ${GITHUB_ENV}
+          else
+            echo "ARTIFACT_NAME=$(basename ${PACKAGE_PATH} .dmg)-macos${{ matrix.target }}.dmg" >> ${GITHUB_ENV}
+            echo "MASTER_ARTIFACT_NAME=$(basename ${MASTER_PACKAGE_PATH} .dmg)-macos${{ matrix.target }}.dmg" >> ${GITHUB_ENV}
+          fi
+      - name: Run unittests directly called.
+        run: |
+          cd "${{ github.workspace }}/performous/build/testing"
+          ./performous_test --gtest_filter=UnitTest*
+      - name: Run unittests by ctest.
+        run: |
+          cd "${{ github.workspace }}/performous/build"
+          make test
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.ARTIFACT_PATH }}
+
+      - name: Upload artifact with unified name
+        if: ${{ github.ref == 'refs/heads/master' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ env.MASTER_ARTIFACT_NAME }}
+          path: ${{ env.MASTER_ARTIFACT_PATH }}
+
+      - name: Upload artifacts to tagged release
+        id: upload_assets
+        # Only the intel_target builds (widest end-user compatibility) become the official release asset;
+        # the arm_target builds still run the full pipeline as a required CI gate, but their DMG is only
+        # kept as a normal workflow artifact above, to avoid shipping two competing DMGs.
+        if: ${{ github.event_name != 'pull_request' && github.ref_type == 'tag' && matrix.is_min == true }}
+        uses: xresloader/upload-to-github-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ inputs.release_id }}
+          file: ${{ env.ARTIFACT_PATH }}
+
+      - name: Upload logs
+        if: ${{ steps.get-logs.outputs.log_path != null && !cancelled() }}
+        id: upload-logs
+        uses: actions/upload-artifact@v7
+        with:
+          name: "MacPorts-log-${{ matrix.os }}.tar.gz"
+          path: "${{ steps.get-logs.outputs.log_path }}"

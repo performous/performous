@@ -1,7 +1,7 @@
 #include "songitems.hh"
 
 #include "unicode.hh"
-#include "libxml++-impl.hh"
+#include "libxml++.hh"
 
 #include <algorithm>
 #include <memory>

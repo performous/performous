@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# Usage: add this file to your project's .git/hooks directory.
+# Now, when you change some files in repository and try to commit these
+# changes, git will run this script right after merge. 
+
+base_dir="misc/git-hook"
+
+if [ ! -d "$base_dir" ]
+then
+    echo "Warning: cannot determine hooks base folder"
+    exit 0
+fi
+
+cp -rf "$base_dir/necessary/"* .git/hooks/; 
+
+for file in .git/hooks/*; do 
+    if [ -d "${file}" ]
+    then
+        for subfile in .git/hooks/"${file##*/}"/*; do 
+            if [ -e "$base_dir/optional/${file##*/}/${subfile##*/}" ]
+            then
+                cp -f "$base_dir/optional/${file##*/}/${subfile##*/}" "$subfile"; 
+            fi
+        done
+    else
+        if [ -e "$base_dir/optional/${file##*/}" ]
+        then
+            cp -f "$base_dir/optional/${file##*/}" "$file"; 
+        fi
+    fi
+done
+
+exit 0

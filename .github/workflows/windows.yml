@@ -24,7 +24,7 @@ jobs:
     steps:
       - name: Checkout Git
         id: checkout_git
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: performous
 
@@ -38,13 +38,18 @@ jobs:
       - name: Download and build our dependencies using vcpkg
         uses: Lord-Kamina/vcpkg-action@update_cache
         with:
-          pkgs: "\"aubio[core,tools]\" \"boost-algorithm[core]\" \"boost-align[core]\" \"boost-any[core]\" \"boost-array[core]\" \"boost-assert[core]\" \"boost-asio\" \"boost-atomic[core]\" \"boost-bind[core]\" \"boost-build[core]\" \"boost-chrono[core]\" \"boost-concept-check[core]\" \"boost-config[core]\" \"boost-container[core]\" \"boost-container-hash[core]\" \"boost-conversion[core]\" \"boost-core[core]\" \"boost-date-time[core]\" \"boost-detail[core]\" \"boost-dynamic-bitset[core]\" \"boost-exception[core]\" \"boost-function[core]\" \"boost-function-types[core]\" \"boost-fusion[core]\" \"boost-integer[core]\" \"boost-intrusive[core]\" \"boost-io[core]\" \"boost-iostreams[bzip2,core,lzma,zlib,zstd]\" \"boost-iterator[core]\" \"boost-lexical-cast[core]\" \"boost-locale[core]\" \"boost-move[core]\" \"boost-mp11[core]\" \"boost-mpl[core]\" \"boost-numeric-conversion[core]\" \"boost-optional[core]\" \"boost-predef[core]\" \"boost-preprocessor[core]\" \"boost-program-options[core]\" \"boost-random[core]\" \"boost-range[core]\" \"boost-ratio[core]\" \"boost-rational[core]\" \"boost-regex[core]\" \"boost-smart-ptr[core]\" \"boost-static-assert[core]\" \"boost-system[core]\" \"boost-thread[core]\" \"boost-throw-exception[core]\" \"boost-tokenizer[core]\" \"boost-tuple[core]\" \"boost-type-index[core]\" \"boost-type-traits[core]\" \"boost-typeof[core]\" \"boost-uninstall[core]\" \"boost-unordered[core]\" \"boost-utility[core]\" \"boost-variant2[core]\" \"boost-winapi[core]\" \"brotli[core]\" \"bzip2[core,tool]\" \"cairo[core,fontconfig,freetype,gobject]\" \"dirent[core]\" \"expat[core]\" \"ffmpeg[avcodec,avdevice,avfilter,avformat,core,swresample,swscale]\" \"fftw3[core]\" \"fmt[core]\" \"fontconfig[core]\" \"freetype[brotli,bzip2,core,png,zlib]\" \"fribidi[core]\" \"gdk-pixbuf[core]\" \"getopt[core]\" \"getopt-win32[core]\" \"gettext[core]\" \"glib[core]\" \"glibmm[core]\" \"glm[core]\" \"gperf[core]\" \"gtest[core]\" \"harfbuzz[core]\" \"icu[*]\" \"cpprestsdk[brotli,compression,core]\" \"libcroco[core]\" \"libepoxy[core]\" \"libffi[core]\" \"libflac[core]\" \"libiconv[core]\" \"libjpeg-turbo[core]\" \"liblzma[core]\" \"libogg[core]\" \"libpng[core]\" \"librsvg[core]\" \"libsigcpp[core]\" \"libsigcpp-3[core]\" \"libsndfile[core,external-libs,mpeg]\" \"libvorbis[core]\" \"libwebp[core,libwebpmux,nearlossless,simd,unicode]\" \"libxml2[core]\" \"libxmlpp[core]\" \"lzo[core]\" \"mp3lame[core]\" \"mpg123[core]\" \"nlohmann-json[core]\" \"openblas[core]\" \"opencv[core,default-features]\" \"opencv4[core,default-features,dnn,jpeg,png,quirc,tiff,webp]\" \"openssl[core]\" \"opus[core]\" \"pango[core]\" \"pcre[core]\" \"pcre2[core]\" \"pixman[core]\" \"pkgconf[core]\" \"portaudio[core]\" \"portmidi[core]\" \"protobuf[core]\" \"pthread[core]\" \"pthreads[core]\" \"quirc[core]\" \"sdl2[core]\" \"tiff[core,jpeg,lzma,zip]\"  \"yasm[core,tools]\" \"yasm-tool-helper[core]\" \"zlib[core]\" \"zstd[core]\""
+          pkgs: "\"aubio[core,tools]\" \"boost-algorithm[core]\" \"boost-align[core]\" \"boost-any[core]\" \"boost-array[core]\" \"boost-assert[core]\" \"boost-asio\" \"boost-atomic[core]\" \"boost-bind[core]\" \"boost-build[core]\" \"boost-chrono[core]\" \"boost-concept-check[core]\" \"boost-config[core]\" \"boost-container[core]\" \"boost-container-hash[core]\" \"boost-conversion[core]\" \"boost-core[core]\" \"boost-date-time[core]\" \"boost-detail[core]\" \"boost-dynamic-bitset[core]\" \"boost-exception[core]\" \"boost-function[core]\" \"boost-function-types[core]\" \"boost-fusion[core]\" \"boost-integer[core]\" \"boost-intrusive[core]\" \"boost-io[core]\" \"boost-iostreams[bzip2,core,lzma,zlib,zstd]\" \"boost-iterator[core]\" \"boost-lexical-cast[core]\" \"boost-locale[core]\" \"boost-move[core]\" \"boost-mp11[core]\" \"boost-mpl[core]\" \"boost-numeric-conversion[core]\" \"boost-optional[core]\" \"boost-predef[core]\" \"boost-preprocessor[core]\" \"boost-program-options[core]\" \"boost-random[core]\" \"boost-range[core]\" \"boost-ratio[core]\" \"boost-rational[core]\" \"boost-regex[core]\" \"boost-smart-ptr[core]\" \"boost-static-assert[core]\" \"boost-system[core]\" \"boost-thread[core]\" \"boost-throw-exception[core]\" \"boost-tokenizer[core]\" \"boost-tuple[core]\" \"boost-type-index[core]\" \"boost-type-traits[core]\" \"boost-typeof[core]\" \"boost-uninstall[core]\" \"boost-unordered[core]\" \"boost-utility[core]\" \"boost-variant2[core]\" \"boost-winapi[core]\" \"brotli[core]\" \"bzip2[core,tool]\" \"cairo[core,fontconfig,freetype,gobject]\" \"dirent[core]\" \"expat[core]\" \"ffmpeg[avcodec,avdevice,avfilter,avformat,core,swresample,swscale]\" \"fftw3[core]\" \"fmt[core]\" \"fontconfig[core]\" \"freetype[brotli,bzip2,core,png,zlib]\" \"fribidi[core]\" \"gdk-pixbuf[core]\" \"getopt[core]\" \"getopt-win32[core]\" \"gettext[core,tools]\" \"glib[core]\" \"glibmm[core]\" \"glm[core]\" \"gperf[core]\" \"gtest[core]\" \"harfbuzz[core]\" \"icu[*]\" \"cpprestsdk[brotli,compression,core]\" \"libcroco[core]\" \"libepoxy[core]\" \"libffi[core]\" \"libflac[core]\" \"libiconv[core]\" \"libjpeg-turbo[core]\" \"liblzma[core]\" \"libogg[core]\" \"libpng[core]\" \"librsvg[core]\" \"libsigcpp[core]\" \"libsndfile[core,external-libs,mpeg]\" \"libvorbis[core]\" \"libwebp[core,libwebpmux,nearlossless,simd,unicode]\" \"libxml2[core]\" \"libxmlpp[core]\" \"lzo[core]\" \"mp3lame[core]\" \"mpg123[core]\" \"nlohmann-json[core]\" \"openblas[core]\" \"opencv[core]\" \"opencv4[core,dnn,jpeg,png,quirc,tiff,webp]\" \"openssl[core]\" \"opus[core]\" \"pango[core]\" \"pcre[core]\" \"pcre2[core]\" \"pixman[core]\" \"pkgconf[core]\" \"portaudio[core]\" \"portmidi[core]\" \"protobuf[core]\" \"pthread[core]\" \"pthreads[core]\" \"quirc[core]\" \"sdl2[core]\" \"tiff[core,jpeg,lzma,zip]\"  \"yasm[core,tools]\" \"yasm-tool-helper[core]\" \"zlib[core]\" \"zstd[core]\" \"spdlog[core,fmt]\" \"libwebp[core]\""
           triplet: x64-windows-release
           extra-args: '--clean-after-build --overlay-triplets="${{ github.workspace }}\performous\cmake\triplets"'
           cache-key: win64-vcpkg
-          revision: 326d8b43e365352ba3ccadf388d989082fe0f2a6
-          api-token: ${{ secrets.GITHUB_TOKEN }}
-
+          debug: true
+          # Get the sha from https://github.com/microsoft/vcpkg/releases
+          revision: d015e31e90838a4c9dfa3eed45979bc70d9357fc
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install NSIS
+        uses: repolevedavaj/install-nsis@v1.2.0
+        with:
+          nsis-version: '3.11'
       - name: Run cmake to configure the project and build it
         env:
           PERFORMOUS_VERSION: ${{ inputs.package_complete_version }}
@@ -65,18 +70,20 @@ jobs:
       - name: Create Installer
         id: package_performous_x64
         run: |
-           cd performous/build/windows-x64-debinfo
-           cpack -G NSIS64 windows-x64-debinfo
-           Copy-Item $(Get-ChildItem -Filter '*win64.exe').Name "Performous-latest-msvc.exe"
-           Rename-Item $(Get-ChildItem -Filter '*win64.exe').Name -NewName "Performous-${{ inputs.package_complete_version }}-msvc.exe"
-           chcp 65001 #set code page to utf-8
-           echo ("ARTIFACT_PATH=${{ github.workspace }}/performous/build/windows-x64-debinfo/Performous-${{ inputs.package_complete_version }}-msvc.exe") >> $env:GITHUB_ENV
-           echo ("ARTIFACT_FILENAME=Performous-${{ inputs.package_complete_version }}-msvc.exe") >> $env:GITHUB_ENV
-           echo ("MASTER_ARTIFACT_PATH=${{ github.workspace }}/performous/build/windows-x64-debinfo/Performous-latest-msvc.exe") >> $env:GITHUB_ENV
-           echo ("MASTER_ARTIFACT_FILENAME=Performous-latest-msvc.exe") >> $env:GITHUB_ENV
+          cd performous/build/windows-x64-debinfo
+          cpack -G NSIS64 windows-x64-debinfo
+          $MASTER_ARTIFACT_FILENAME = "Performous-master[${{ inputs.package_complete_version }}]-msvc.exe"
+          $ARTIFACT_FILENAME = "Performous-${{ inputs.package_complete_version }}-msvc.exe"
+          Copy-Item $(Get-ChildItem -Filter '*win64.exe').Name $MASTER_ARTIFACT_FILENAME
+          Rename-Item $(Get-ChildItem -Filter '*win64.exe').Name -NewName $ARTIFACT_FILENAME
+          chcp 65001 #set code page to utf-8
+          echo ("ARTIFACT_PATH=${{ github.workspace }}/performous/build/windows-x64-debinfo/$ARTIFACT_FILENAME") >> $env:GITHUB_ENV
+          echo ("ARTIFACT_FILENAME=$ARTIFACT_FILENAME") >> $env:GITHUB_ENV
+          echo ("MASTER_ARTIFACT_PATH=${{ github.workspace }}/performous/build/windows-x64-debinfo/$MASTER_ARTIFACT_FILENAME") >> $env:GITHUB_ENV
+          echo ("MASTER_ARTIFACT_FILENAME=$MASTER_ARTIFACT_FILENAME") >> $env:GITHUB_ENV
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: ${{ github.event_name == 'pull_request' }}
         with:
           name: ${{ env.ARTIFACT_FILENAME }}
@@ -84,7 +91,7 @@ jobs:
 
       - name: Upload artifact with unified name
         if: ${{ github.ref == 'refs/heads/master' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.MASTER_ARTIFACT_FILENAME }}
           path: ${{ env.MASTER_ARTIFACT_PATH }}
@@ -108,7 +115,7 @@ jobs:
     steps:
       - name: Checkout Git
         id: checkout_git
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: performous
       - name: Setup action env and echoing
@@ -129,7 +136,6 @@ jobs:
             mingw-w64-x86_64-cairo
             mingw-w64-x86_64-cc
             mingw-w64-x86_64-cmake
-            mingw-w64-x86_64-ffmpeg
             mingw-w64-x86_64-fftw
             mingw-w64-x86_64-fmt
             mingw-w64-x86_64-fontconfig
@@ -154,7 +160,15 @@ jobs:
             mingw-w64-x86_64-portaudio
             mingw-w64-x86_64-portmidi
             mingw-w64-x86_64-SDL2
+            mingw-w64-x86_64-spdlog
             mingw-w64-x86_64-winpthreads-git
+            mingw-w64-x86_64-libwebp
+
+      - name: Install FFmpeg 7 (pinned)
+        shell: msys2 {0}
+        run: |
+          curl -LO https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-ffmpeg-7.1.1-7-any.pkg.tar.zst
+          pacman -U --noconfirm mingw-w64-x86_64-ffmpeg-7.1.1-7-any.pkg.tar.zst
 
       - name: Run cmake to configure the project and build it
         env:
@@ -183,16 +197,18 @@ jobs:
         id: package_performous_x64
         shell: msys2 {0}
         run: |
-           cd "${{ env.workpath }}/performous/build"
-           "${{ env.workpath }}/msys64/mingw64/bin/cpack.exe" -G NSIS64 -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64" -DCPACK_NSIS_EXECUTABLE="${{ env.workpath }}/msys64/mingw64/bin/makensis.exe" -DCMAKE_BUILD_TYPE="RelWithDebInfo" --verbose
-           powershell -command "Copy-Item \$(Get-ChildItem -Filter '*win64.exe').Name 'Performous-latest-mingw-w64.exe'"
-           powershell -command "Rename-Item \$(Get-ChildItem -Filter '*win64.exe').Name -NewName 'Performous-${{ inputs.package_complete_version }}-mingw-w64.exe'"
-           powershell -command "echo ('ARTIFACT_PATH=${{ env.workpath }}/performous/build/Performous-${{ inputs.package_complete_version }}-mingw-w64.exe') >> \$env:GITHUB_ENV"
-           powershell -command "echo ('ARTIFACT_FILENAME=Performous-${{ inputs.package_complete_version }}-mingw-w64.exe') >> \$env:GITHUB_ENV"
-           powershell -command "echo ('MASTER_ARTIFACT_PATH=${{ env.workpath }}/performous/build/Performous-latest-mingw-w64.exe') >> \$env:GITHUB_ENV"
-           powershell -command "echo ('MASTER_ARTIFACT_FILENAME=Performous-latest-mingw-w64.exe') >> \$env:GITHUB_ENV"
+          cd "${{ env.workpath }}/performous/build"
+          "${{ env.workpath }}/msys64/mingw64/bin/cpack.exe" -G NSIS64 -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64" -DCPACK_NSIS_EXECUTABLE="${{ env.workpath }}/msys64/mingw64/bin/makensis.exe" -DCMAKE_BUILD_TYPE="RelWithDebInfo" --verbose
+          MASTER_ARTIFACT_FILENAME="Performous-master[${{ inputs.package_complete_version }}]-mingw-w64.exe"
+          ARTIFACT_FILENAME="Performous-${{ inputs.package_complete_version }}-mingw-w64.exe"
+          powershell -command "Copy-Item \$(Get-ChildItem -Filter '*win64.exe').Name '${MASTER_ARTIFACT_FILENAME}'"
+          powershell -command "Rename-Item \$(Get-ChildItem -Filter '*win64.exe').Name -NewName '${ARTIFACT_FILENAME}'"
+          powershell -command "echo ('ARTIFACT_PATH=${{ env.workpath }}/performous/build/${ARTIFACT_FILENAME}') >> \$env:GITHUB_ENV"
+          powershell -command "echo ('ARTIFACT_FILENAME=${ARTIFACT_FILENAME}') >> \$env:GITHUB_ENV"
+          powershell -command "echo ('MASTER_ARTIFACT_PATH=${{ env.workpath }}/performous/build/${MASTER_ARTIFACT_FILENAME}') >> \$env:GITHUB_ENV"
+          powershell -command "echo ('MASTER_ARTIFACT_FILENAME=${MASTER_ARTIFACT_FILENAME}') >> \$env:GITHUB_ENV"
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: ${{ github.event_name == 'pull_request' }}
         with:
           name: ${{ env.ARTIFACT_FILENAME }}
@@ -200,7 +216,7 @@ jobs:
 
       - name: Upload artifact with unified name
         if: ${{ github.ref == 'refs/heads/master' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.MASTER_ARTIFACT_FILENAME }}
           path: ${{ env.MASTER_ARTIFACT_PATH }}

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "fs.hh"
-#include "glutil.hh"
+#include "graphic/glutil.hh"
 #include <memory>
 #include <string>
 

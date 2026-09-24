@@ -11,6 +11,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
+if(APPLE)
+	include(DarwinVersionedPortPrefixes)
+endif()
+
 if(NOT PERFORMOUS_VERSION)
     message("No project version specified. Determining latest tag..")
     include(GetGitRevisionDescription)
@@ -61,13 +65,13 @@ elseif(APPLE)
 		string(APPEND CMAKE_INSTALL_PREFIX "/")
 	set (CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE PATH "Location to put the Performous app bundle in.")
 	endif()
-	string(APPEND CMAKE_INSTALL_PREFIX "Performous.app/Contents")
+	string(APPEND CMAKE_INSTALL_PREFIX "Performous.app")
 	set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
-	set(CMAKE_INSTALL_DATAROOTDIR "Resources")
+	set(CMAKE_INSTALL_DATAROOTDIR "Contents/Resources")
 	set(CMAKE_INSTALL_DATADIR "${CMAKE_INSTALL_DATAROOTDIR}")
 	set(CMAKE_INSTALL_LOCALEDIR "${CMAKE_INSTALL_DATADIR}/Locale")
 	set(CMAKE_INSTALL_SYSCONFDIR "${CMAKE_INSTALL_DATADIR}/etc")
-	set(CMAKE_INSTALL_BINDIR "MacOS")
+	set(CMAKE_INSTALL_BINDIR "Contents/MacOS")
 	set(CMAKE_INSTALL_MANDIR "${CMAKE_INSTALL_DATADIR}/man/man6")
 endif()
 
@@ -155,7 +159,7 @@ set(CPACK_DEBIAN_PACKAGE_SECTION "Games")
 # RPM specific settings
 set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
 
-set(CPACK_RPM_PACKAGE_REQUIRES "cairo-devel, librsvg2-devel, glibmm24-devel, libxml++-devel, boost-devel, SDL2-devel, libepoxy-devel, ffmpeg-devel, portaudio-devel, opencv-devel, portmidi-devel, libjpeg-turbo-devel, pango-devel, libpng-devel, glm-devel, openblas-devel, fftw-devel, cpprest-devel")
+set(CPACK_RPM_PACKAGE_REQUIRES "cairo-devel, librsvg2-devel, glibmm24-devel, libxml++-devel, boost-devel, SDL2-devel, libepoxy-devel, ffmpeg-devel, portaudio-devel, opencv-devel, portmidi-devel, libjpeg-turbo-devel, pango-devel, libpng-devel, glm-devel, openblas-devel, fftw-devel, cpprest-devel, libwebp-devel")
 set(CPACK_RPM_PACKAGE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.md")
 
 set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "${LC_MESSAGES_DIRS}")
@@ -188,14 +192,9 @@ set(CPACK_NSIS_MUI_HEADERIMAGE "${CMAKE_CURRENT_SOURCE_DIR}/win32/nsis\\\\header
 set(CPACK_NSIS_MANIFEST_DPI_AWARE ON)
 set(CPACK_NSIS_BRANDING_TEXT "Performous installer ${PROJECT_VERSION} 2009-${YEAR}")
 
-# macOS specific settings
-set(CPACK_BUNDLE_NAME "Performous")
-set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/osx-utils/resources/Info.plist")
-set(CPACK_BUNDLE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/osx-utils/resources/Performous.icns")
-
 if (APPLE)
 	set(CPACK_SOURCE_GENERATOR "")
-	set(CPACK_GENERATOR "Bundle")
+	set(CPACK_GENERATOR "")
 	set(CMAKE_XCODE_ATTRIBUTE_MARKETING_VERSION "${PROJECT_VERSION}")
 	set(CMAKE_XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "org.performous.Performous")
 	set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")

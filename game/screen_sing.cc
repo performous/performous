@@ -5,7 +5,7 @@
 #include "database.hh"
 #include "engine.hh"
 #include "fs.hh"
-#include "glutil.hh"
+#include "graphic/glutil.hh"
 #include "guitargraph.hh"
 #include "i18n.hh"
 #include "layout_singer.hh"
@@ -23,6 +23,7 @@
 #include "graphic/video_driver.hh"
 
 #include <fmt/format.h>
+#include <algorithm>
 #include <iostream>
 #include <stdexcept>
 #include <cmath>
@@ -48,7 +49,10 @@ void ScreenSing::enter() {
 	if (config["graphic/webcam"].b() && Webcam::enabled()) {
 		try {
 			m_cam = std::make_unique<Webcam>(getGame().getWindow(), config["graphic/webcamid"].ui());
-		} catch (std::exception& e) { std::cout << e.what() << std::endl; };
+		}
+		catch (std::exception& e) {
+			SpdLogger::error(LogSystem::WEBCAM, "Exception={}", e.what());
+		};
 	}
 	// Load video
 	getGame().loading(_("Loading video..."), 0.2f);
@@ -60,7 +64,7 @@ void ScreenSing::enter() {
 	getGame().loading(_("Loading song..."), 0.4f);
 	try { m_song->loadNotes(false /* don't ignore errors */); }
 	catch (SongParserException& e) {
-		std::clog << e;
+		SpdLogger::warning(LogSystem::SINGING, "Aborting Song: {}", e.what());
 		getGame().activateScreen("Songs");
 	}
 	// Notify about broken tracks
@@ -118,12 +122,21 @@ void ScreenSing::setupVocals() {
 		Engine::VocalTrackPtrs selectedTracks;
 		auto& analyzers = m_audio.analyzers();
 		//size_t players = (analyzers.empty() ? 1 : analyzers.size());  // Always at least 1; should be number of mics
-		std::set<VocalTrack*> shownTracks;  // Tracks to be included in layout_singer (stored by name for proper sorting and merging duplicates)
+		std::vector<VocalTrack*> shownTracks;  // Tracks to be included in layout_singer (preserve player order, merge duplicates)
 		for (size_t player = 0; player < players(); ++player) {
 			VocalTrack* vocal = &m_song->getVocalTrack(m_vocalTracks[(m_duet.ui() == 0u ? player : 0u)].ui());
 			selectedTracks.push_back(vocal);
-			shownTracks.insert(vocal);
+			if (std::find(shownTracks.begin(), shownTracks.end(), vocal) == shownTracks.end()) {
+				shownTracks.push_back(vocal);
+			}
 		}
+
+		std::string shownTracksStr;
+		for (size_t i = 0; i < shownTracks.size(); ++i) {
+			if (!shownTracksStr.empty()) shownTracksStr += ", ";
+			shownTracksStr += shownTracks[i]->name;
+		}
+		SpdLogger::debug(LogSystem::SINGING, "Vocal layout order={} (top-to-bottom)", shownTracksStr);
 
 		//if (shownTracks.size() > 2) throw std::runtime_error("Too many tracks chosen. Only two vocal tracks can be used simultaneously.")
 		for (auto const& trk: shownTracks) {
@@ -154,11 +167,11 @@ void ScreenSing::createPauseMenu() {
 	if(!getGame().getCurrentPlayList().isEmpty() || config["game/autoplay"].b()){
 		m_menu.add(MenuOption(_("Skip"), _("Skip current song"))).screen("Playlist");
 	}
-	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"))).call([&game]() {
-		game.activateScreen("Songs");
-	});
 	m_menu.add(MenuOption(_("Abort"), _("Exit to song browser and mark song broken"))).call([&]() {
 		m_song->setBroken();
+		game.activateScreen("Songs");
+	});
+	m_menu.add(MenuOption(_("Quit"), _("Exit to song browser"))).call([&game]() {
 		game.activateScreen("Songs");
 	});
 	m_menu.close();
@@ -199,7 +212,14 @@ void ScreenSing::exit() {
 
 /// Manages the instrument drawing
 void ScreenSing::instrumentLayout(double time) {
-	if (!m_song->hasControllers()) return;
+	if (!m_song->hasControllers()) {
+		if (!m_song->music["Instrumental"].string().empty()) {
+			m_audio.streamFade("background", m_song->music["Vocals"].string().empty() && !config["audio/mute_vocals_track"].b() ? 1.0 : 0.0); // Background should be muted if both vocals and instrumental is set
+			m_audio.streamFade("Instrumental", m_song->music["Vocals"].string().empty() && !config["audio/mute_vocals_track"].b() ? 0.0 : 1.0);
+			m_audio.streamFade("Vocals", config["audio/mute_vocals_track"].b() ? 0.0 : 1.0);
+		}
+		return;
+	}
 	auto& window = getGame().getWindow();
 	int count_alive = 0, count_menu = 0, i = 0;
 	// Remove dead instruments and do the counting
@@ -251,6 +271,12 @@ void ScreenSing::instrumentLayout(double time) {
 		}
 		if (name == "Vocals") {
 			m_audio.streamFade(name, config["audio/mute_vocals_track"].b() ? 0.0 : 1.0);
+		}
+		else if (name == "background" && !m_song->music["Instrumental"].string().empty()) {
+			m_audio.streamFade(name, m_song->music["Vocals"].string().empty() && !config["audio/mute_vocals_track"].b() ? level : 0.0);
+		}
+		else if (name == "Instrumental") {
+			m_audio.streamFade(name, m_song->music["Vocals"].string().empty() && !config["audio/mute_vocals_track"].b() ? 0.0 : level);
 		}
 		else {
 			m_audio.streamFade(name, level);
@@ -446,7 +472,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 				if (m_song->getPrevSection(m_audio.getPosition(), section)) {
 					m_audio.seekPos(section.begin);
 					// TODO: display popup with section.name here
-					std::cout << section.name << std::endl;
+					SpdLogger::info(LogSystem::DANCING, "Section={}", section.name);
 				} else m_audio.seek(-5.0);
 				seekback = true;
 			}
@@ -456,7 +482,7 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			if (m_song->getNextSection(m_audio.getPosition(), section)) {
 				m_audio.seekPos(section.begin);
 				// TODO: display popup with section.name here
-				std::cout << section.name << std::endl;
+				SpdLogger::info(LogSystem::DANCING, "Section={}", section.name);
 			} else m_audio.seek(5.0);
 		}
 

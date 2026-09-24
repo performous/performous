@@ -1,13 +1,16 @@
 #include "fs.hh"
 #include "image.hh"
+#include "log.hh"
 
 #include <jpeglib.h>
 #include <png.h>
+#include <webp/decode.h>
 
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <cstring>
+#include <algorithm>
 
 namespace {
 	void writePngHelper(png_structp pngPtr, png_bytep data, png_size_t length) {
@@ -93,7 +96,8 @@ namespace {
 void writePNG(fs::path const& filename, Bitmap const& img, unsigned stride) {
 	auto name = filename.string();
 	// We use PNG in a non-standard way, with premultiplied alpha, signified by .premul.png extension.
-	std::clog << "image/debug: Saving PNG: " + name << std::endl;
+	SpdLogger::debug(LogSystem::IMAGE, "Saving PNG file, path={}", name);
+
 	std::vector<png_bytep> rows(img.height);
 	// Determine color type and bytes per pixel
 	unsigned char bpp;
@@ -134,7 +138,7 @@ void writePNG(fs::path const& filename, Bitmap const& img, unsigned stride) {
 }
 
 void loadPNG(Bitmap& bitmap, fs::path const& filename) {
-	std::clog << "image/debug: Loading PNG: " + filename.string() << std::endl;
+	SpdLogger::debug(LogSystem::IMAGE, "Loading PNG file, path={}", filename);
 	// A hack to assume linear premultiplied data if file extension is .premul.png (used for cached SVGs)
 	if (filename.stem().extension() == "premul") bitmap.linearPremul = true;
 	std::ifstream file(filename.string(), std::ios::binary);
@@ -154,7 +158,7 @@ void loadPNG(Bitmap& bitmap, fs::path const& filename) {
 }
 
 void loadJPEG(Bitmap& bitmap, fs::path const& filename) {
-	std::clog << "image/debug: Loading JPEG: " + filename.string() << std::endl;
+	SpdLogger::debug(LogSystem::IMAGE, "Loading JPEG file, path={}", filename);
 	bitmap.fmt = pix::Format::RGB;
 	struct my_jpeg_error_mgr jerr;
 	BinaryBuffer data = readFile(filename);
@@ -168,6 +172,9 @@ void loadJPEG(Bitmap& bitmap, fs::path const& filename) {
 	jpeg_create_decompress(&cinfo);
 	jpeg_mem_src(&cinfo, data.data(), static_cast<long unsigned>(data.size()));
 	if (jpeg_read_header(&cinfo, TRUE) != JPEG_HEADER_OK) throw std::runtime_error("Cannot read header of " + filename.string());
+	if (cinfo.num_components == 1) {
+		cinfo.out_color_space = JCS_RGB;  // Monochrome images will be promoted to RGB (wasteful, but simple)
+	}
 	jpeg_start_decompress(&cinfo);
 	bitmap.resize(cinfo.output_width, cinfo.output_height);
 	unsigned stride = (bitmap.width * 3 + 3) & ~3u;  // Number of bytes per row (word-aligned)
@@ -177,6 +184,124 @@ void loadJPEG(Bitmap& bitmap, fs::path const& filename) {
 		ptr += stride;
 	}
 	jpeg_destroy_decompress(&cinfo);
+}
+
+/**
+  * \brief    Load a WEBP image from the given filename.  Throws a std::runtime_error on any error
+  *
+  * \note     The support for WebP is compile-time optional.  If the library is found, it is 
+  *           used, otherwise this function is stubbed-out to simply raise an error.
+  *
+  * \param[out] bitmap    Target obejct for the pixel data
+  * \param[in]  filename  Path to load the image from
+  *
+  */
+void loadWEBP(Bitmap& bitmap, fs::path const& filename) {
+	SpdLogger::debug(LogSystem::IMAGE, "Loading WEBP file, path={}", filename);
+    static WebPDecoderConfig webpConfig;
+    static bool webpConfigured{false};
+
+	if (!webpConfigured)
+	{
+		// The WEBP decoder needs a pre-configuration step
+		if (!WebPInitDecoderConfig(&webpConfig))
+		{
+			throw std::runtime_error("Failed to Initialise WEBP Decoder");
+		}
+		webpConfigured = true;  // configured OK
+	}
+
+	BinaryBuffer webpData = readFile(filename);
+	int width;
+	int height;
+	if (!WebPGetInfo(webpData.data(), webpData.size(), &width, &height) || !(width > 0 && height > 0))
+	{
+		throw std::runtime_error("Failed Checking WEBP file"); // The image loader only catches std::runtime_error
+	}
+
+	std::uint8_t *rawPixelData = WebPDecodeRGBA(webpData.data(), webpData.size(), &width, &height);
+	if (rawPixelData)
+	{
+		unsigned width_u = static_cast<unsigned>(width);  // MacOS build needs unsigned
+		unsigned height_u = static_cast<unsigned>(height);
+		bitmap.resize(width_u, height_u); 
+		std::memcpy(bitmap.data(), rawPixelData, 4*width_u*height_u);
+		WebPFree(rawPixelData); 
+		return; // all ok
+	}
+	else
+	{
+		throw std::runtime_error("Failed Decoding WEBP file");
+	}
+}
+  
+/**  
+  * \brief    Given a filename, look inside the file to determine what sort of image it is
+  *
+  * \note     Magic Numbers listed in https://en.wikipedia.org/wiki/List_of_file_signatures
+  * \returns  ImageType, or ImageType::UNKNOWN
+  */
+ImageType getImageType(const std::string &filePath) 
+{
+	std::ifstream fin(filePath, std::ios::binary);
+	std::array<unsigned char, 12> buffer{};
+	
+	if (fin) {
+		// reading the first 12 bytes of the file into the buffer
+		fin.read(reinterpret_cast<char*>(buffer.data()), buffer.size());
+		if (static_cast<size_t>(fin.gcount()) < buffer.size()) {
+			return ImageType::UNKNOWN;
+		}
+	}
+
+	auto match = [](const auto& buf, const std::vector<unsigned char>& sig, size_t offset = 0) {
+		return std::equal(sig.begin(), sig.end(), buf.begin() + offset);
+	};
+
+	if (match(buffer, {0xff, 0xd8})) 
+		return ImageType::JPEG;
+
+	if (match(buffer, {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a}))
+		return ImageType::PNG;
+
+	// WebP "magic number" is split in two, but the first part "RIFF" is common for different
+	// files, so we must check both parts
+	if (match(buffer, {0x52, 0x49, 0x46, 0x46}) && match(buffer, {0x57, 0x45, 0x42, 0x50}, 8))
+		return ImageType::WEBP;
+
+	if(match(buffer, {0x47, 0x49, 0x46, 0x38, 0x37, 0x61}) || match(buffer, {0x47, 0x49, 0x46, 0x38, 0x39, 0x61}))
+		return ImageType::GIF;  // GIF87a, GIF89a
+
+	if(match(buffer, {0x00, 0x00, 0x01, 0x00}))
+		return ImageType::ICON;  // Windows icon file
+
+	if(match(buffer, {0x42, 0x4D}))
+		return ImageType::BMP;  // Windows bmp/dib file
+
+	// SVG is multiline text
+	fin.seekg(0, std::ios::beg);
+	std::string line;
+	while (std::getline(fin, line)) {
+		if (line.find("<svg") != std::string::npos) {
+			return ImageType::SVG;
+		}
+	}
+
+	// TIFF images; GIMP xcf; newer versions of JPEG; many more?
+
+	// If we reach here, the file is not recognized
+	return ImageType::UNKNOWN;
+}
+
+/**
+  * \returns The Image MIME type of the given file, or "application/octet-stream"
+  */
+const std::string &getImageMimeType(const std::string &filePath) 
+{
+	ImageType imType = getImageType(filePath);
+	if ( imType >= ImageType::BMP && imType < ImageType::_INVALID )
+		return ImageTypeMime[static_cast<size_t>(imType)];
+	return ImageTypeMime[static_cast<size_t>(ImageType::UNKNOWN)];
 }
 
 void Bitmap::crop(const unsigned width, const unsigned height, const unsigned x, const unsigned y) {

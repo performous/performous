@@ -1,8 +1,10 @@
 #include "menu.hh"
-#include "screen.hh"
-#include "texture.hh"
+
 #include "fs.hh"
 #include "game.hh"
+#include "log.hh"
+#include "screen.hh"
+#include "texture.hh"
 
 MenuOption::MenuOption(std::string const& nm, std::string const& comm, MenuImage img):
   type(), value(), newValue(), callback(), image(img), name(nm), comment(comm), namePtr(), commentPtr()
@@ -51,6 +53,7 @@ void Menu::select(unsigned sel) {
 void Menu::action(Game& game, int dir) {
 	switch (current().type) {
 		case MenuOption::Type::OPEN_SUBMENU: {
+			SpdLogger::debug(LogSystem::LOGGER, "Selected menu option={}", current().getName());
 			if (current().options.empty()) break;
 			menu_stack.push_back(&current().options);
 			selection_stack.push_back(0);
@@ -58,6 +61,7 @@ void Menu::action(Game& game, int dir) {
 		}
 		case MenuOption::Type::CHANGE_VALUE: {
 			if (current().value) {
+				SpdLogger::debug(LogSystem::LOGGER, "Trying to change value for menu option={}", current().getName());
 				if (current().value->getName() == "audio/backend") {
 					current().value->setOldValue(current().value->getValue());
 				}
@@ -72,10 +76,10 @@ void Menu::action(Game& game, int dir) {
 					TranslationEngine::setLanguage(value.getValue(), true);
 				} else if (current().value->getName() == "graphic/stereo3d") {
 					try {
-						std::clog << "video/info: Stereo 3D configuration changed, will reset shaders.\n";
+						SpdLogger::info(LogSystem::OPENGL, "Stereo 3D configuration changed, will reset shaders.");
 						game.getWindow().resetShaders();
-					} catch (const std::exception &) {
-						std::cerr << "video/info: Disable Stereo 3D because shader creation failed.\n";
+					} catch (std::exception const& e) {
+						SpdLogger::error(LogSystem::OPENGL, "Stereo 3D disabled because shader creation failed. Exception={}", e.what());
 						current().value->b() = false; // Disable 3D if shader fails
 						throw;
 					}
@@ -84,6 +88,7 @@ void Menu::action(Game& game, int dir) {
 			break;
 		}
 		case MenuOption::Type::SET_AND_CLOSE:
+			SpdLogger::debug(LogSystem::LOGGER, "Selected menu option={}", current().getName());
 			if (current().value) *(current().value) = current().newValue;
 			[[fallthrough]];  // Continuing to CLOSE_SUBMENU is intentional
 		case MenuOption::Type::CLOSE_SUBMENU: {
@@ -92,12 +97,14 @@ void Menu::action(Game& game, int dir) {
 		}
 		case MenuOption::Type::ACTIVATE_SCREEN: {
 			std::string screen = current().newValue.s();
+			SpdLogger::debug(LogSystem::LOGGER, "Entering screen={}...", screen);
 			clear();
 			if (screen.empty()) game.finished();
 			else game.activateScreen(screen);
 			break;
 		}
 		case MenuOption::Type::CALLBACK_FUNCTION: {
+			SpdLogger::debug(LogSystem::LOGGER, "Selected menu option={}", current().getName());
 			if (current().callback) current().callback();
 			break;
 		}

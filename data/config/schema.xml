@@ -62,6 +62,10 @@ to save the current settings to XML.
 		<short>Difficulty</short>
 		<long>Game difficulty.</long>
 	</entry>
+	<entry name="game/instrument_miss_penalty" type="bool" value="true">
+		<short>Instrument miss penalty</short>
+		<long>Deduct points when missing notes on instrument and dance tracks.</long>
+	</entry>
 
 	<entry name="game/Textstyle" type="uint" value="0">
 		<limits>
@@ -94,6 +98,11 @@ to save the current settings to XML.
 		<limits min="5" max="20" step="1" />
 		<short>Song results timeout</short>
 		<long>How long the scores will be displayed for after finishing a song.</long>
+	</entry>
+	<entry name="game/highscore_minimum" type="uint" value="2000">
+		<limits min="200" max="8000" step="200" />
+		<short>High-score Minimum</short>
+		<long>The minimum score that is elgible for recording.</long>
 	</entry>
 	<entry name="game/highscore_timeout" type="uint" value="5">
 		<limits min="0" max="30" step="5" />
@@ -388,6 +397,36 @@ to save the current settings to XML.
 		<short>Failure volume</short>
 		<long>The ingame fail sound volume. Values above 90 are not recommended as distortion may occur. 11 is louder than 10, but these go to 100. 89 louder!</long>
 	</entry>
+	<entry name="audio/miss_volume_kids" type="uint" value="0">
+		<ui unit=" %" />
+		<limits min="0" max="100" step="5" />
+		<short>Missed note volume (Kids)</short>
+		<long>Track volume level after missing a note on Kids difficulty for instruments.</long>
+	</entry>
+	<entry name="audio/miss_volume_easy" type="uint" value="0">
+		<ui unit=" %" />
+		<limits min="0" max="100" step="5" />
+		<short>Missed note volume (Easy)</short>
+		<long>Track volume level after missing a note on Easy difficulty for instruments.</long>
+	</entry>
+	<entry name="audio/miss_volume_medium" type="uint" value="0">
+		<ui unit=" %" />
+		<limits min="0" max="100" step="5" />
+		<short>Missed note volume (Medium)</short>
+		<long>Track volume level after missing a note on Medium difficulty for instruments.</long>
+	</entry>
+	<entry name="audio/miss_volume_hard" type="uint" value="0">
+		<ui unit=" %" />
+		<limits min="0" max="100" step="5" />
+		<short>Missed note volume (Hard)</short>
+		<long>Track volume level after missing a note on Hard difficulty for instruments.</long>
+	</entry>
+	<entry name="audio/miss_volume_expert" type="uint" value="0">
+		<ui unit=" %" />
+		<limits min="0" max="100" step="5" />
+		<short>Missed note volume (Expert)</short>
+		<long>Track volume level after missing a note on Expert difficulty for instruments.</long>
+	</entry>
 	<entry name="audio/pass-through" type="bool" value="false">
 		<short>Microphone pass-through</short>
 		<long>Send captured singing voice to speakers.</long>
@@ -405,6 +444,10 @@ to save the current settings to XML.
 	<entry name="audio/mute_vocals_track" type="bool" value="false">
 		<short>Mute the vocals track</short>
 		<long>Mute the vocals track if a vocals.ogg is found.</long>
+	</entry>
+	<entry name="audio/normalize_songs" type="bool" value="true">
+		<short>Normalize loudness of songs</short>
+		<long>Use "Replay Gain" volume information from each song file to even-out the playback volume.</long>
 	</entry>
 
 	<!-- Paths -->

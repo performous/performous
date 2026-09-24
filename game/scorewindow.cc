@@ -70,6 +70,11 @@ ScoreWindow::ScoreWindow(Game& game, Instruments& instruments, Database& databas
 	m_bg.dimensions.middle().center();
 }
 
+/**
+  * \brief   Draw the individual high scores at the end of the song.  
+  * \note    This is part of the end-of-song screen showing player hiscores.
+  *          It is _not_ the hiscore table that lists historical hiscores.
+  */
 void ScoreWindow::draw() {
 	using namespace glmath;
 	auto& window = m_game.getWindow();

@@ -1,6 +1,8 @@
 ﻿#include "songparser.hh"
-#include "unicode.hh"
+
 #include "fs.hh"
+#include "log.hh"
+#include "unicode.hh"
 #include "util.hh"
 
 #include <algorithm>
@@ -22,11 +24,11 @@ void SongParser::txtParseHeader() {
 	std::string line;
 	s.insertVocalTrack(TrackName::VOCAL_LEAD, VocalTrack(TrackName::VOCAL_LEAD)); // Dummy note to indicate there is a track
 	while (getline(line) && txtParseField(line)) {}
-	if (s.title.empty() || s.artist.empty()) throw std::runtime_error("Required header fields missing");
+	if (s.title.empty() || s.artist.empty()) throw SongParserException(s, "Required header fields missing", 0);
 	if (!fs::exists(s.music[TrackName::BGMUSIC]))
 	{
-		s.loadStatus = Song::LoadStatus::ERROR;
-		std::clog << "songparser/error: Required MP3 '" << s.music[TrackName::BGMUSIC].string() << "' file isn't available." << std::endl;
+		s.loadStatus = Song::LoadStatus::PARSERERROR;
+		SpdLogger::error(LogSystem::SONGPARSER, "TXT Parser ({}) -- Required song file is not available at path={}", m_song.filename, s.music[TrackName::BGMUSIC].string());
 	}
 	if (m_bpm != 0.0f) addBPM(0, m_bpm);
 }
@@ -70,13 +72,13 @@ void SongParser::txtParse() {
 				if (currentNote.type == Note::Type::SLEEP) {
 					auto prevToLast = ++(finalDuet.rbegin());
 					if (prevToLast->type == Note::Type::SLEEP) {
-						std::clog << "songparser/info: Phrase formed by a single syllable is most likely our fault, We'll skip the break." << std::endl;
+						SpdLogger::info(LogSystem::SONGPARSER, "TXT Parser ({}) -- Phrase formed by a single syllable is most likely our fault, We'll skip the break.", m_song.filename);
 						skip = true;
 					}
 				}
 				else {
 					if (Note::overlapping(finalDuet.back(),currentNote)) {
-						std::clog << "songparser/info: Will try to fix overlap (most likely between both singers) with a linebreak." << std::endl;
+						SpdLogger::info(LogSystem::SONGPARSER, "TXT Parser ({}) -- Will try to fix overlap (most likely between both singers) with a linebreak.", m_song.filename);
 						Note lineBreak = Note();
 						lineBreak.type = Note::Type::SLEEP;
 						double beatDur = getBPM(m_song, finalDuet.back().begin).step;
@@ -104,10 +106,12 @@ bool SongParser::txtParseField(std::string const& line) {
 	if (line.empty()) return true;
 	if (line[0] != '#') return false;
 	std::string::size_type pos = line.find(':');
-	if (pos == std::string::npos) throw std::runtime_error("Invalid txt format, should be #key:value");
+	if (pos == std::string::npos) throw SongParserException(m_song, "Invalid txt format, should be #key:value", m_linenum);
 	std::string key = UnicodeUtil::toUpper(trim(line.substr(1, pos - 1)));
 	std::string value = trim(line.substr(pos + 1));
 	if (value.empty()) return true;
+
+	if (key == "VERSION") m_song.version = value.substr(value.find_first_not_of(" "));
 
 	// Parse header data that is stored in SongParser rather than in song (and thus needs to be read every time)
 	if (key == "BPM") assign(m_bpm, value);
@@ -126,43 +130,52 @@ bool SongParser::txtParseField(std::string const& line) {
 	else if (key == "GENRE") m_song.genre = value.substr(value.find_first_not_of(" "));
 	else if (key == "CREATOR") m_song.creator = value.substr(value.find_first_not_of(" "));
 	else if (key == "COVER") m_song.cover = absolute(value, m_song.path);
-	else if (key == "MP3") m_song.music[TrackName::BGMUSIC] = absolute(value, m_song.path);
+	else if (key == "MP3" || key == "AUDIO") m_song.music[TrackName::BGMUSIC] = absolute(value, m_song.path);
+	else if (key == "INSTRUMENTAL") m_song.music[TrackName::INSTRUMENTAL] = absolute(value, m_song.path);
 	else if (key == "VOCALS") m_song.music[TrackName::VOCAL_LEAD] = absolute(value, m_song.path);
 	else if (key == "VIDEO") m_song.video = absolute(value, m_song.path);
 	else if (key == "BACKGROUND") m_song.background = absolute(value, m_song.path);
 	else if (key == "START") assign(m_song.start, value);
+	else if (key == "END") assign(m_song.end, value);
+	else if (key == "YEAR") assign(m_song.year, value);
 	else if (key == "VIDEOGAP") assign(m_song.videoGap, value);
 	else if (key == "PREVIEWSTART") assign(m_song.preview_start, value);
 	else if (key == "LANGUAGE") m_song.language = value.substr(value.find_first_not_of(" "));
+	else if (key == "PROVIDEDBY") m_song.providedBy = value.substr(value.find_first_not_of(" "));
+	else if (key == "COMMENT") m_song.comment = value.substr(value.find_first_not_of(" "));
+	else if (key == "TAGS") m_song.tags = value.substr(value.find_first_not_of(" "));
 	return true;
 }
 
 bool SongParser::txtParseNote(std::string line) {
+    const int MAX_STARTBEAT = 262144; // 2^18, about 2 hours on an average song (depends on BPM)
+    const int MAX_LENGTH = 2048; // A very long note
 	if (line.empty() || line == "\r") return true;
-	if (line[0] == '#') throw std::runtime_error("Key found in the middle of notes");
+	if (line[0] == '#') throw SongParserException(m_song, "Key found in the middle of notes", m_linenum);
 	if (line[line.size() - 1] == '\r') line.erase(line.size() - 1);
 	if (line[0] == 'E') return false;
 	std::istringstream iss(line);
 	if (line[0] == 'B') {
-		unsigned int ts;
+		int ts;
 		float bpm;
 		iss.ignore();
-		if (!(iss >> ts >> bpm)) throw std::runtime_error("Invalid BPM line format");
-		addBPM(ts, bpm);
+		if (!(iss >> ts >> bpm) || ts < 0 || ts > MAX_STARTBEAT) 
+        	throw SongParserException(m_song, "Invalid BPM line format", m_linenum);
+		addBPM(static_cast<unsigned int>(ts), bpm);
 		return true;
 	}
 	if (line[0] == 'P') {
 		if (m_relative) // FIXME?
-			throw std::runtime_error("Relative note timing not supported with multiple singers");
-		if (line.size() < 2) throw std::runtime_error("Invalid player info line [too short]: " + line);
+			throw SongParserException(m_song, "Relative note timing not supported with multiple singers", m_linenum);
+		if (line.size() < 2) throw SongParserException(m_song, fmt::format("Invalid player info line [too short]: {}", line), m_linenum);
 		else if (line[1] == '1') m_curSinger = CurrentSinger::P1;
 		else if (line[1] == '2') m_curSinger = CurrentSinger::P2;
 		else if (line[1] == '3') m_curSinger = CurrentSinger::BOTH;
-		else if (line.size() < 3) throw std::runtime_error("Invalid player info line [too short]: " + line);
+		else if (line.size() < 3) throw SongParserException(m_song, fmt::format("Invalid player info line [too short]: {}", line), m_linenum);
 		else if (line[2] == '1') m_curSinger = CurrentSinger::P1;
 		else if (line[2] == '2') m_curSinger = CurrentSinger::P2;
 		else if (line[2] == '3') m_curSinger = CurrentSinger::BOTH;
-		else throw std::runtime_error("Invalid player info line [malformed]: " + line);
+		else throw SongParserException(m_song, fmt::format("Invalid player info line [malformed]: {}", line), m_linenum);
 		txtResetState();
 		return true;
 	}
@@ -174,11 +187,19 @@ bool SongParser::txtParseNote(std::string line) {
 		case Note::Type::RAP:
 		case Note::Type::FREESTYLE:
 		case Note::Type::GOLDEN:
-		case Note::Type::GOLDEN2:
+		case Note::Type::GOLDENRAP:
 		{
+			int readTs = 0;  // read as signed int to check for negative values
+			int readLength = 0;
 			unsigned int length = 0;
-			if (!(iss >> ts >> length >> n.note)) throw std::runtime_error("Invalid note line format");
-			if (length < 1) std::clog << "songparser/info: Notes must have positive durations." << std::endl;
+			if (!(iss >> readTs >> readLength >> n.note) || readTs < 0 || readTs > MAX_STARTBEAT || readLength < 0 || readLength > MAX_LENGTH) 
+				throw SongParserException(m_song, "Invalid note line format", m_linenum);
+			ts = static_cast<unsigned int>(readTs);
+			length = static_cast<unsigned int>(readLength);
+			if (length < 1) {
+				SpdLogger::info(LogSystem::SONGPARSER, "TXT Parser ({}, line {}) -- Notes must have positive durations.", m_song.filename, m_linenum);
+				length = 1;
+			}
 			n.notePrev = n.note; // No slide notes in TXT yet.
 			if (m_relative) ts += m_txt.relativeShift;
 			if (iss.get() == ' ') std::getline(iss, n.syllable);
@@ -205,7 +226,7 @@ bool SongParser::txtParseNote(std::string line) {
 		case Note::Type::MINE:
 		case Note::Type::LIFT:
 		default:
-			throw std::runtime_error("Unknown note type");
+			throw SongParserException(m_song, "Unknown note type", m_linenum);
 	}
 	n.begin = tsTime(ts);
 	VocalTrack& vocal = m_song.getVocalTrack(
@@ -221,12 +242,12 @@ bool SongParser::txtParseNote(std::string line) {
 		if (notes.size() >= 1) {
 			Note& p = notes.back();
 			if (p.begin > n.begin) {
-				std::string msg = "Skipped overlapping notes:\n" + p.syllable + ", " + n.syllable + "\n";
-				m_song.b0rked += msg;
-				std::clog << "songparser/notice: " + m_song.filename.string() + ": " + msg << std::endl;
+				std::string msg{fmt::format("Skipped overlapping notes: {} and {}.", p.syllable, n.syllable)};
+				fmt::format_to(std::back_inserter(m_song.b0rked), fmt::runtime("{}{}"), !m_song.b0rked.empty() ? "\n" : "", msg);
+				SpdLogger::notice(LogSystem::SONGPARSER, "TXT Parser ({}) -- {}.", m_song.filename, msg);
 				return true;
 			}
-		} else throw std::runtime_error("The first note has negative timestamp");
+		} else throw SongParserException(m_song, "The first note has a negative timestamp");
 	}
 	double prevtime = m_txt.prevtime;
 	m_txt.prevtime = n.end;

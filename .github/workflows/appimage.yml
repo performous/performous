@@ -14,45 +14,62 @@ on:
         type: string
 
 jobs:
-  # Create the AppImage
   AppImage:
     name: Create the AppImage
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
+    permissions:
+      security-events: write
     steps:
       - name: Install the AppImage bundler and Performous deps
         id: fetch_deps
         run: |
-          wget -O appimage-builder-x86_64.AppImage https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.0.0-beta.1/appimage-builder-1.0.0-677acbd-x86_64.AppImage
+          wget -O appimage-builder-x86_64.AppImage.tar https://github.com/Lord-Kamina/appimage-builder/releases/download/continuous/appimage-builder_x86_64-AppImage.tar
+          tar xvf appimage-builder-x86_64.AppImage.tar --transform='s/.*\///'
+          mv appimage-builder-*-x86_64.AppImage appimage-builder-x86_64.AppImage
           chmod +x appimage-builder-x86_64.AppImage
           sudo mv appimage-builder-x86_64.AppImage /usr/local/bin/appimage-builder
           sudo apt update
-          sudo apt-get install -y --no-install-recommends git cmake build-essential gettext help2man libopenblas-dev libfftw3-dev libicu-dev libepoxy-dev libsdl2-dev libfreetype6-dev libpango1.0-dev librsvg2-dev libxml++2.6-dev libavcodec-dev libavformat-dev libswscale-dev libjpeg-dev portaudio19-dev libglm-dev libboost-filesystem-dev libboost-iostreams-dev libboost-locale-dev libboost-system-dev libboost-program-options-dev libssl-dev libcpprest-dev libgtest-dev libgmock-dev google-mock libportmidi-dev libopencv-dev libaubio-dev nlohmann-json3-dev libfmt-dev libfuse2
+          sudo apt-get install -y --no-install-recommends git cmake build-essential gettext help2man libopenblas-dev libfftw3-dev libicu-dev libepoxy-dev libsdl2-dev libfreetype6-dev libpango1.0-dev librsvg2-dev libxml++2.6-dev libavcodec-dev libavformat-dev libswscale-dev libjpeg-dev portaudio19-dev libglm-dev libboost-iostreams-dev libboost-locale-dev libboost-system-dev libboost-program-options-dev libssl-dev libcpprest-dev libgtest-dev libgmock-dev google-mock libportmidi-dev libopencv-dev libaubio-dev nlohmann-json3-dev libfmt-dev libfuse2 libspdlog-dev libwebp-dev
 
       - name: Checkout Git
         id: checkout_git
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Build the AppImage
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: c-cpp
+          build-mode: manual
+          queries: security-and-quality
+          packs: +githubsecuritylab/codeql-cpp-queries
+
+      - name: Build the Code
         id: build_appimage
+        run: |
+          export PERFORMOUS_PACKAGE_VERSION=${{ inputs.package_complete_version }}
+          mkdir build
+          cd build
+          cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo -DENABLE_WEBSERVER=ON -DENABLE_WEBCAM=ON -DSELF_BUILT_CED=ALWAYS -DPERFORMOUS_VERSION=$PERFORMOUS_PACKAGE_VERSION ..
+          make -j$(nproc) install DESTDIR=../AppDir
+          cd ..
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:c-cpp"
+
+      - name: Bundle the AppImage
         run: |
           # Pull in our common build functions
           . .github/workflows/build_functions.sh
-
-          PACKAGE_VERSION=${{ inputs.package_complete_version }}
-          sed -i s/@@VERSION@@/${PACKAGE_VERSION}/ AppImageBuilder.yml
-          mkdir build
-          cd build
-          cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo -DENABLE_WEBSERVER=ON -DENABLE_WEBCAM=ON -DSELF_BUILT_CED=ALWAYS -DPERFORMOUS_VERSION=$PACKAGE_VERSION ..
-          make -j$(nproc) install DESTDIR=../AppDir
-          cd ..
+          export PERFORMOUS_PACKAGE_VERSION=${{ inputs.package_complete_version }}
           appimage-builder --recipe AppImageBuilder.yml --skip-test
-
           # Provided by the common build functions
-          package_name "$(pwd)" "*.AppImage" "${PACKAGE_VERSION}"
+          package_name "$(pwd)" "*.AppImage" "${PERFORMOUS_PACKAGE_VERSION}"
 
       # Upload artifacts during pull-requests
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: ${{ github.event_name == 'pull_request' }}
         with:
           name: ${{ env.ARTIFACT_NAME }}
@@ -61,7 +78,7 @@ jobs:
       # Upload artifacts on master
       - name: Upload artifact with unified name
         if: ${{ github.ref == 'refs/heads/master' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.MASTER_ARTIFACT_NAME }}
           path: ${{ env.MASTER_ARTIFACT_PATH }}

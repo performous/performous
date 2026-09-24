@@ -4,7 +4,11 @@
 #include "texture.hh"
 #include "util.hh"
 #include "libda/sample.hpp"
+
 #include "aubio/aubio.h"
+
+#include <fmt/format.h>
+
 #include <atomic>
 #include <condition_variable>
 #include <cstdint>
@@ -19,9 +23,13 @@
 
 // ffmpeg forward declarations
 extern "C" {
+  #include <libavutil/avutil.h> // For AVMediaType
+
+  struct AVChannelLayout;
   struct AVCodecContext;
   struct AVFormatContext;
   struct AVFrame;
+  struct AVStream;
   void av_frame_free(AVFrame **);
   struct SwrContext;
   void swr_free(struct SwrContext **);
@@ -35,9 +43,18 @@ class FFmpeg {
   public:
 	// Exceptions thrown by class
 	class Eof: public std::exception {};
-	class Error;
+	class Error : public std::runtime_error {
+	  public:
+		Error(const FFmpeg &self, int errorValue, const char *func): std::runtime_error(msgFmt(self, errorValue, func)) {}
+		friend struct fmt::formatter<FFmpeg::Error>;
+	  private:
+		static std::string msgFmt(const FFmpeg &self, int errorValue, const char *func);
+	};
 	friend Error;
 
+	void inline check(int errorCode, const char* func = "") {
+		if (errorCode < 0) throw Error(*this, errorCode, func);
+	};
 	/// Decode file, depending on media type audio.
 	FFmpeg(fs::path const& filename, int mediaType);
 
@@ -49,10 +66,17 @@ class FFmpeg {
 	/// duration
 	double duration() const;
 
+	/// replay gain, in +/- decibels.  Can be zero, and is zero if not defined for the track
+	double getReplayGainInDecibels() const;
+	double getReplayGainVolumeFactor() const;
+	double calculateLinearGain(double gainInDB) const;
+
 	virtual ~FFmpeg() = default;
 
   protected:
 	static void frameDeleter(AVFrame *f) { if (f) av_frame_free(&f); }
+	bool readReplayGain(const AVStream *stream);
+	bool readR128Gain(const AVStream *stream);
 	using uFrame = std::unique_ptr<AVFrame, std::integral_constant<decltype(&frameDeleter), &frameDeleter>>;
 
 	virtual void processFrame(uFrame frame) = 0;
@@ -65,10 +89,24 @@ class FFmpeg {
 	fs::path m_filename;
 	double m_position = 0.0;
 	double m_duration = 0.0;
+	double m_replayGainDecibels = 0.0; ///< dB gain factor to normalise perceived loudness
+	double m_replayGainFactor = 0.0;   ///< Replay Gain converted into a volume correction
 	// libav-specific variables
 	int m_streamId = -1;
 	std::unique_ptr<AVFormatContext, decltype(&avformat_close_input)> m_formatContext{nullptr, avformat_close_input};
 	std::unique_ptr<AVCodecContext, decltype(&avcodec_free_context)> m_codecContext{nullptr, avcodec_free_context};
+};
+
+#if !defined(__PRETTY_FUNCTION__) && defined(_MSC_VER)
+#define __PRETTY_FUNCTION__ __FUNCSIG__
+#endif
+
+#define FFMPEG_CHECKED(func, args, caller) FFmpeg::check(func args, caller)
+
+class DurationFFmpeg : public FFmpeg {
+  public:public:
+	DurationFFmpeg(fs::path const& file) : FFmpeg(file, AVMEDIA_TYPE_AUDIO) {};
+	void processFrame(uFrame) override { return; };
 };
 
 class AudioFFmpeg : public FFmpeg {
@@ -95,7 +133,7 @@ class VideoFFmpeg : public FFmpeg {
 	void processFrame(uFrame frame) override;
   private:
 	std::unique_ptr<SwsContext, void(*)(SwsContext*)> m_swsContext{nullptr, sws_freeContext};
-        VideoCb handleVideoData;
+		VideoCb handleVideoData;
 
 };
 
@@ -133,9 +171,10 @@ class AudioBuffer {
 	std::int64_t m_eof_pos = -1; // -1 until we get the read end from ffmpeg
 
 	const unsigned m_sps;
-	const double m_duration{ 0 };
+	double m_duration{ 0 };
+	double m_replayGainDecibels{ 0.0 };
+	double m_replayGainFactor{ 0.0 };
 	bool m_seek_asked { false };
 	bool m_quit{ false };
 	std::future<void> reader_thread;
 };
-

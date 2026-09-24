@@ -3,6 +3,7 @@
 #include "config.hh"
 #include "configuration.hh"
 #include "fs.hh"
+#include "log.hh"
 #include "unicode.hh"
 
 #include <unicode/locid.h>
@@ -11,6 +12,7 @@ std::pair<std::string, std::string> TranslationEngine::m_currentLanguage{"en_US.
 std::string TranslationEngine::m_package = PACKAGE;
 boost::locale::generator TranslationEngine::m_gen{};
 std::map<std::string, std::string> TranslationEngine::m_languages{};
+std::unique_ptr<icu::Locale> TranslationEngine::m_icuLocale = std::make_unique<icu::Locale>(icu::Locale::getEnglish());
 
 TranslationEngine::TranslationEngine() {
 	initializeAllLanguages();
@@ -20,17 +22,15 @@ TranslationEngine::TranslationEngine() {
 	 * translations) */
 	populateLanguages(GetAllLanguages());
 
-	std::clog << "locale/debug: Checking if language is set in config." << std::endl;
-
 	auto prefValue = config["game/language"].getEnumName();
 	auto lang = getLanguageByHumanReadableName(prefValue);
-
+	SpdLogger::debug(LogSystem::I18N, "Checking if language is set in config... Language={}", lang);
 	setLanguage(lang);
 }
 
 void TranslationEngine::initializeAllLanguages() {
 	for(auto const& path : getLocalePaths()) {
-		std::cout << "add locale path: " << path << std::endl;
+		SpdLogger::debug(LogSystem::I18N, "Add locale path={}", path);
 		m_gen.add_messages_path(path);
 	}
         
@@ -44,7 +44,7 @@ void TranslationEngine::initializeAllLanguages() {
 }
 
 void TranslationEngine::setLanguage(const std::string& language, bool fromSettings) {
-	std::clog << "locale/notice: Setting language to: '" << language << "'" << std::endl;
+	SpdLogger::notice(LogSystem::I18N, "Setting language to: {}.", language);
 
 	if (fromSettings) {
 		TranslationEngine::m_currentLanguage = { getLanguageByHumanReadableName(language) , language };
@@ -72,17 +72,17 @@ void TranslationEngine::setLanguage(const std::string& language, bool fromSettin
 #endif
 		if (error.isFailure()) throw std::runtime_error("Error " + std::to_string(error.get()) + " creating search locale: " + error.errorName());
 		std::locale::global(m_gen(m_currentLanguage.first));
-		std::cout << "locale/notice: Current language is: '" << m_currentLanguage.second << "'" << std::endl;
+		SpdLogger::notice(LogSystem::I18N, "Current language: {}.", m_currentLanguage.second);
 	}
 	catch (std::runtime_error& e) {
-		std::clog << "locale/warning: Unable to detect locale, will try to fallback to en_US.UTF-8. Exception: " << e.what() << std::endl;
+		SpdLogger::warning(LogSystem::I18N, "Unable to configure locale, will try to fallback to en_US.UTF-8. Exception={}", e.what());
 		std::locale::global(m_gen("en_US.UTF-8"));
 	}
 
 	icu::RuleBasedCollator* search;
 	icu::RuleBasedCollator* sort;
 
-	error.reset();	
+	error.reset();
 	search = dynamic_cast<icu::RuleBasedCollator*>(icu::RuleBasedCollator::createInstance(searchLocale, error));
 	if (!search || error.isFailure()) throw std::runtime_error("Unable to create search collator. error: " + std::to_string(error.get()) + ": " + error.errorName());
 
@@ -95,6 +95,10 @@ std::to_string(error.get()) + ": " + error.errorName());
 	UnicodeUtil::m_sortCollator.reset(sort);
 	UnicodeUtil::m_searchCollator->setStrength(icu::Collator::PRIMARY);
 	UnicodeUtil::m_sortCollator->setStrength(icu::Collator::SECONDARY);
+
+	// We ideally want an ICU locale to feed to the case-mapping functions in UnicodeUtil.
+	auto icuLoc = icu::Locale::createCanonical(getCurrentLanguage().first.c_str());
+	TranslationEngine::m_icuLocale = std::make_unique<icu::Locale>(icuLoc);
 }
 
 std::string TranslationEngine::getLanguageByHumanReadableName(const std::string& language) {
@@ -102,7 +106,7 @@ std::string TranslationEngine::getLanguageByHumanReadableName(const std::string&
 		return boost::locale::util::get_system_locale(true);
 	}
 
-	auto allLanguages = GetAllLanguages();	
+	auto allLanguages = GetAllLanguages();
 	std::string languageKey;
 	for (auto const& lang : allLanguages) {
 		if (lang.second == language) {
@@ -176,7 +180,7 @@ std::vector<std::string> TranslationEngine::getLocalePaths() {
 		paths.emplace_back(root + std::string{"/lang"});
 	}
         
-	auto const path = getLocaleDir().string();
+	auto const path = PathCache::getLocaleDir().string();
         
 	if(!path.empty())
 		paths.emplace_back(path);

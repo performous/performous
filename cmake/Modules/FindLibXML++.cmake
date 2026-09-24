@@ -9,7 +9,6 @@ include(LibFindMacros)
 
 # Dependencies
 libfind_package(LibXML++ LibXML2)
-libfind_package(LibXML++ Glibmm)
 
 find_package(PkgConfig QUIET)
 if(PKG_CONFIG_FOUND)
@@ -22,9 +21,18 @@ if(PKG_CONFIG_FOUND)
     set(LibXML++_VERSION_5_0 "1")
     set(LibXML++_PKGCONF_INCLUDE_DIRS ${LibXML++_PKGCONF_5_0_INCLUDE_DIRS})
     set(LibXML++_PKGCONF_LIBRARY_DIRS ${LibXML++_PKGCONF_5_0_LIBRARY_DIRS})
+    if(MSVC) # vcpkg now insert vc143 in the library name
+      foreach(lib ${LibXML++_PKGCONF_5_0_LIBRARIES})
+        if("${lib}" MATCHES "^(xml\\+\\+.*)")
+          set(LibXML++_LIBRARY_NAME "${CMAKE_MATCH_1}")
+          break()
+        endif()
+      endforeach()
+    endif()
   else()
     libfind_pkg_check_modules(LibXML++_PKGCONF_3_0 libxml++-3.0)
     if(LibXML++_PKGCONF_3_0_FOUND)
+      libfind_package(LibXML++ Glibmm)
       set(LibXML++_VERSION "3.0")
       set(LibXML++_VERSION_2_6 "0")
       set(LibXML++_VERSION_3_0 "1")
@@ -34,6 +42,7 @@ if(PKG_CONFIG_FOUND)
     else()  
       libfind_pkg_check_modules(LibXML++_PKGCONF_2_6 libxml++-2.6)
       if(LibXML++_PKGCONF_2_6_FOUND)
+        libfind_package(LibXML++ Glibmm)
         set(LibXML++_VERSION "2.6")
         set(LibXML++_VERSION_2_6 "1")
         set(LibXML++_VERSION_3_0 "0")
@@ -68,7 +77,7 @@ find_path(LibXML++Config_INCLUDE_DIR
 
 # Finally the library itself
 find_library(LibXML++_LIBRARY
-  NAMES xml++-${LibXML++_VERSION}
+  NAMES xml++-${LibXML++_VERSION} ${LibXML++_LIBRARY_NAME}
   HINTS ${LibXML++_PKGCONF_LIBRARY_DIRS}
 )
 

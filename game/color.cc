@@ -1,4 +1,6 @@
 #include "color.hh"
+#include "log.hh"
+
 #include <cstdio>
 #include <iostream>
 #include <map>
@@ -51,7 +53,7 @@ Color::Color(std::string const& str) {
 	}
 	ColorNames::Map::const_iterator it = colors.m.find(str);
 	if (it != colors.m.end()) { *this = it->second; return; }
-	std::clog << "color/warning: Unknown color: " << str << " (using magenta to highlight)" << std::endl;
+	SpdLogger::warn(LogSystem::IMAGE, "Unknown color: {}; using magenta to highlight.");
 	*this = Color(1.0f, 0.0f, 1.0f, 1.0f);
 }
 

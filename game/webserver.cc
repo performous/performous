@@ -1,5 +1,7 @@
 #include "webserver.hh"
+
 #include "game.hh"
+#include "log.hh"
 #include "platform.hh"
 
 #ifdef USE_WEBSERVER
@@ -8,13 +10,13 @@
 void WebServer::StartServer(int tried, bool fallbackPortInUse) {
 	if(tried > 2) {
 		if(fallbackPortInUse == false) {
-			std::clog << "webserver/error: Couldn't start webserver tried 3 times. Trying fallback port.." << std::endl;
+			SpdLogger::error(LogSystem::WEBSERVER, "Couldn't start webserver after 3 tries. Will now try fallback port.");
+			// not changing this message for now because it's potentially translatable. 
 			m_game.notificationFromWebserver("Couldn't start webserver tried 3 times. Trying fallback port...");
 			StartServer(0, true);
 			return;
 		}
-
-		std::clog << "webserver/error: Couldn't start webserver tried 3 times using normal port and 3 times using fallback port. Stopping webserver." << std::endl;
+		SpdLogger::error(LogSystem::WEBSERVER, "Couldn't start webserver after 3 tries, using the normal and fallback ports.");
 		m_game.notificationFromWebserver("Couldn't start webserver.");
 		if(m_server) {
 			m_server->close().wait();
@@ -25,17 +27,17 @@ void WebServer::StartServer(int tried, bool fallbackPortInUse) {
 	std::string addr("");
 	if(config["game/webserver_access"].ui() == 1) {
 		addr = "http://127.0.0.1:" + portToUse;
-		std::clog << "webserver/notice: Starting local server on: " << addr <<std::endl;
+		SpdLogger::notice(LogSystem::WEBSERVER, "Starting local server on IP={}", addr);
 	} else {
 		if (Platform::currentOS() == Platform::HostOS::OS_WIN)
 		{
-			addr = "http://*:" + portToUse; // Allow Windows to accept all connections. Needs admin privileges though.
+			addr = "http://+:" + portToUse; // Allow Windows to accept all connections. Needs admin privileges though.
 		}
 		else 
 		{
 			addr = "http://0.0.0.0:" + portToUse;
 		}
-		std::clog << "webserver/notice: Starting public server on: " << addr << std::endl;
+		SpdLogger::notice(LogSystem::WEBSERVER, "Starting public server on IP={}", addr);
 	}
 
 	try {
@@ -45,9 +47,8 @@ void WebServer::StartServer(int tried, bool fallbackPortInUse) {
 		m_game.notificationFromWebserver(message);
 	} catch (std::exception& e) {
 		tried = tried + 1;
-		std::clog << "webserver/error: " << e.what() << " Trying again... (tried " << tried << " times)." << std::endl;
-		std::string message(e.what());
-		message += " Trying again... (tried " + std::to_string(tried) +" times).";
+		SpdLogger::error(LogSystem::WEBSERVER, "Exception={}. Trying again... (tried {} times).", e.what(), tried);
+		std::string message = fmt::format("{}. Trying again... (tried {} times).", e.what(), tried);
 		m_game.notificationFromWebserver(message);
 		std::this_thread::sleep_for(20s);
 		StartServer(tried, fallbackPortInUse);
@@ -58,7 +59,7 @@ WebServer::WebServer(Game &game, Songs& songs)
 : m_game(game), m_songs(songs)
 {
 	if(config["game/webserver_access"].ui() == 0) {
-		std::clog << "webserver/notice: Not starting webserver." << std::endl;
+		SpdLogger::notice(LogSystem::WEBSERVER, "Not starting webserver.");
 	} else {
 		m_serverThread = std::make_unique<std::thread>([this] { StartServer(0, false); });
 	}
@@ -70,18 +71,17 @@ WebServer::~WebServer() {
 		m_server->close().wait();
 		m_serverThread->join();
             } catch (const pplx::invalid_operation &e) {
-                std::clog << "webserver/error: stoping webserver failed: " << e.what() << std::endl;
+            	SpdLogger::error(LogSystem::WEBSERVER, "Error stopping webserver. Exception={}.", e.what());
             }
 	}
 }
 
 std::string WebServer::getIPaddr() {
 	try {
-		boost::asio::io_service netService;
+		boost::asio::io_context netService;
 		boost::asio::ip::udp::resolver resolver(netService);
-		boost::asio::ip::udp::resolver::query query(boost::asio::ip::udp::v4(), "1.1.1.1", "80");
-		boost::asio::ip::udp::resolver::iterator endpoints = resolver.resolve(query);
-		boost::asio::ip::udp::endpoint ep = *endpoints;
+		auto endpoints = resolver.resolve("1.1.1.1", "80");
+		boost::asio::ip::udp::endpoint ep = endpoints.begin()->endpoint();
 		boost::asio::ip::udp::socket socket(netService);
 		socket.connect(ep);
 		boost::asio::ip::address addr = socket.local_endpoint().address();

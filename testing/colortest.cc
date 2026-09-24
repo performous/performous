@@ -2,6 +2,8 @@
 
 #include "common.hh"
 
+#include <unordered_map>
+
 TEST(UnitTest_Color, default_ctor_white) {
     EXPECT_EQ(1.0f, Color().r);
     EXPECT_EQ(1.0f, Color().g);
@@ -31,7 +33,7 @@ TEST(UnitTest_Color, alpha_factory) {
 }
 
 TEST(UnitTest_Color, ctor_ccs_name) {
-    auto const colors = std::map<std::string, Color>{
+    auto const colors = std::unordered_map<std::string, Color>{
         {"maroon", Color("#800000FF")},
         {"red", Color("#FF0000FF")},
         {"green", Color("#008000FF")},

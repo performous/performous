@@ -2,13 +2,15 @@
 
 #include "shader_manager.hh"
 
-#include <functional>
-#include <map>
-#include <memory>
-#include <SDL_events.h>
 #include "glmath.hh"
 #include "glshader.hh"
 #include "glutil.hh"
+
+#include <SDL_events.h>
+
+#include <functional>
+#include <map>
+#include <memory>
 
 struct SDL_Surface;
 struct SDL_Window;

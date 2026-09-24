@@ -1,8 +1,9 @@
 #include "songparser.hh"
 
-#include <stdexcept>
+#include "log.hh"
 #include "midifile.hh"
 
+#include <stdexcept>
 /// @file
 /// Functions used for parsing MIDI files (FoF and other song formats)
 
@@ -62,9 +63,15 @@ void SongParser::midParseHeader() {
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
 		std::string name = it->name;
-		if (mangleTrackName(name)) ; // Beautify the track name
-		else if (midi.tracks.size() == 1) name = TrackName::GUITAR; // Original (old) FoF songs only have one track
-		else continue; // not a valid track
+		// Check for harmony tracks first (they don't have "PART " prefix)
+		if (name == "HARM1") name = HARMONIC_1;
+		else if (name == "HARM2") name = HARMONIC_2;
+		else if (name == "HARM3") name = HARMONIC_3;
+		else if (!mangleTrackName(name)) {
+			// Not a recognized track
+			if (midi.tracks.size() == 1) name = TrackName::GUITAR; // Original (old) FoF songs only have one track
+			else continue; // not a valid track
+		}
 		// Add dummy notes to tracks so that they can be seen in song browser
 		if (isVocalTrack(name)) s.insertVocalTrack(name, VocalTrack(name));
 		else {
@@ -75,12 +82,13 @@ void SongParser::midParseHeader() {
 		}
 	}
 	addBPM(0, static_cast<float>(6e7 / midi.tempochanges.front().value));
-	std::clog << "songparser-mid/debug: Got a bpm: " << (6e7 / midi.tempochanges.front().value) << std::endl;
+	SpdLogger::debug(LogSystem::SONGPARSER, "MIDI Parser --  Got a BPM: {}", 6e7 / midi.tempochanges.front().value);
 }
 
 /// Parse notes
 void SongParser::midParse() {
 	Song& s = m_song;
+	s.vocalTracks.clear();
 	s.instrumentTracks.clear();
 
 	MidiFileParser midi(s.midifilename);
@@ -89,9 +97,15 @@ void SongParser::midParse() {
 	for (MidiFileParser::Tracks::const_iterator it = midi.tracks.begin(); it != midi.tracks.end(); ++it) {
 		// Figure out the track name
 		std::string name = it->name;
-		if (mangleTrackName(name)) ; // Beautify the track name
-		else if (midi.tracks.size() == 1) name = TrackName::GUITAR; // Original (old) FoF songs only have one track
-		else continue; // not a valid track
+		// Check for harmony tracks first (they don't have "PART " prefix)
+		if (name == "HARM1") name = HARMONIC_1;
+		else if (name == "HARM2") name = HARMONIC_2;
+		else if (name == "HARM3") name = HARMONIC_3;
+		else if (!mangleTrackName(name)) {
+			// Not a recognized track
+			if (midi.tracks.size() == 1) name = TrackName::GUITAR; // Original (old) FoF songs only have one track
+			else continue; // not a valid track
+		}
 		if (!isVocalTrack(name)) {
 			// Process non-vocal tracks
 			double trackEnd = 0.0;
@@ -157,7 +171,7 @@ void SongParser::midParse() {
 					if (n.type == Note::Type::SLIDE) {
 						auto prev = vocal.notes.rbegin();
 						while (prev != vocal.notes.rend() && prev->type == Note::Type::SLEEP) ++prev;
-						if (prev == vocal.notes.rend()) throw std::runtime_error("The song begins with a slide note");
+						if (prev == vocal.notes.rend()) throw SongParserException(m_song, "The song begins with a slide note", 1);
 						eraseLast(prev->syllable); // Erase the space if there is any
 						{
 							// insert new sliding note
@@ -208,9 +222,7 @@ void SongParser::midParse() {
 	}
 	// Output some warning
 	if (reversedNoteCount > 0) {
-		std::ostringstream oss;
-		oss << "songparser/notice: Skipping " << reversedNoteCount << " reversed note(s) in " << s.midifilename.string();
-		std::clog << oss.str() << std::endl; // More likely to be atomic when written as one string
+		SpdLogger::notice(LogSystem::SONGPARSER, "MIDI Parser -- Skipping {} reversed notes in {}", reversedNoteCount, s.midifilename);
 	}
 	// copy midi sections to song section
 	// design goals: (1) keep midi parser free of dependencies on song (2) store data in song as parsers are discarded before song

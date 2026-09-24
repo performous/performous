@@ -3,6 +3,7 @@
 #include "chrono.hh"
 #include "configuration.hh"
 #include "libda/portaudio.hpp"
+#include "log.hh"
 #include "screen_songs.hh"
 #include "game.hh"
 #include "analyzer.hh"
@@ -358,7 +359,7 @@ struct Output {
 		if (!l.owns_lock()) return;  // No update now, try again later (cannot stop and wait for mutex to be released)
 		// Move from preloading to playing, if ready
 		if (preloading && preloading->prepare()) {
-			std::clog << "audio/debug: preload done -> playing " << preloading.get() << std::endl;
+			SpdLogger::debug(LogSystem::AUDIO, "preload done -> playing: {}", fmt::ptr(preloading.get()));
 			if (!playing.empty()) playing[0]->fadeRate = -preloading->fadeRate;  // Fade out the old music
 			playing.insert(playing.begin(), std::move(preloading));
 		}
@@ -465,7 +466,8 @@ int Device::operator()(float const* inbuf, float* outbuf, std::ptrdiff_t frames)
 	if (outptr) outptr->callback(outbuf, outbuf + 2 * frames, rate);
 	return paContinue;
 } catch (std::exception& e) {
-	std::cerr << "Exception in audio callback: " << e.what() << std::endl;
+
+	SpdLogger::error(LogSystem::AUDIO, "Exception={}, in audio callback.", e.what());
 	return paAbort;
 }
 
@@ -476,7 +478,7 @@ struct Audio::Impl {
 	bool playback = false;
 	std::string selectedBackend = Audio::backendConfig().getValue();
 	Impl() {
-		std::clog << portaudio::AudioBackends().dump() << std::flush; // Dump PortAudio backends and devices to log.
+		SpdLogger::info(LogSystem::AUDIO, portaudio::AudioBackends().dump()); // Dump PortAudio backends and devices to log.
 		// Parse audio devices from config
 		ConfigItem::StringList devs = config["audio/devices"].sl();
 		for (ConfigItem::StringList::const_iterator it = devs.begin(), end = devs.end(); it != end; ++it) {
@@ -512,21 +514,21 @@ struct Audio::Impl {
 				portaudio::AudioDevices ad(PaHostApiTypeId(PaHostApiNameToHostApiTypeId(selectedBackend)));
 					bool wantOutput = (params.in == 0) ? true : false;
 					int num;
-					std::string msg = "audio/info: Device string empty; will look for a device with at least ";
+					std::string msg{"Device string empty; will look for a device with at least "};
 					if (wantOutput) {
-						msg += std::to_string(params.out) + " output channels.";
+						fmt::format_to(std::back_inserter(msg), "{} output channels.", params.out);
 						num = params.out;
 					}
 					else {
-						msg += std::to_string(params.in) + " input channels.";
+						fmt::format_to(std::back_inserter(msg), "{} input channels.", params.in);
 						num = params.in;
 					}
 					if (!params.dev.empty()) {
-					std::clog << "audio/debug: Will try to find device matching dev: " << params.dev << std::endl;
+					SpdLogger::debug(LogSystem::AUDIO, "Will try to find device matching dev: {}", params.dev);
 					}
-					else { std::clog << msg << std::endl; }
+					else { SpdLogger::info(LogSystem::AUDIO, msg); }
 					portaudio::DeviceInfo const& info = ad.find(params.dev, wantOutput, num);
-					std::clog << "audio/info: Found: " << info.name << ", in: " << info.in << ", out: " << info.out << std::endl;
+					SpdLogger::info(LogSystem::AUDIO, "Found: {}, in: {}, out: {}.", info.name, info.in, info.out);
 				if (info.in < static_cast<int>(params.mics.size())) throw std::runtime_error("Device doesn't have enough input channels");
 				if (info.out < params.out) throw std::runtime_error("Device doesn't have enough output channels");
 				// Match found if we got here, construct a device
@@ -551,16 +553,22 @@ struct Audio::Impl {
 				}
 				// Assign playback output for the first available stereo output
 				if (!playback && d.out == 2) { d.outptr = &output; playback = true; }
-				std::clog << "audio/info: Using audio device: " << info.desc();
-				if (assigned_mics) std::clog << ", input channels: " << assigned_mics;
-				if (params.out) std::clog << ", output channels: " << params.out;
-				std::clog << std::endl;
+				msg = fmt::format("Using audio device: {}; channels assigned:", info.desc());
+				if (assigned_mics > 0) fmt::format_to(std::back_inserter(msg), " input={}", assigned_mics);
+				if (assigned_mics > 0 && params.out > 0) msg.append(",");
+				if (params.out > 0) fmt::format_to(std::back_inserter(msg), " output={}", params.out);
+				SpdLogger::info(LogSystem::AUDIO, msg);
+	
 				// Start capture/playback on this device (likely to throw due to audio system errors)
 				// NOTE: When it throws we want to keep the device in devices to avoid calling ~Device
 				// which often would hit the Pa_CloseStream hang bug and terminate the application.
 				d.start();
-			} catch(std::runtime_error& e) {
-				std::clog << "audio/error: Audio device '" << *it << "': " << e.what() << std::endl;
+			}
+			catch (portaudio::DeviceNotFoundError const& e) {
+				SpdLogger::warn(LogSystem::AUDIO, "Audio device={}, exception={}", *it, e.what());
+			}
+			catch(std::runtime_error const& e) {
+				SpdLogger::error(LogSystem::AUDIO, "Audio device={}, exception={}", *it, e.what());
 			}
 		}
 		// Assign mic buffers to the output for pass-through
@@ -571,7 +579,14 @@ struct Audio::Impl {
 		// stop all audio streams befor destoying the object.
 		// else portaudio will keep sending data to those destroyed
 		// objects.
-		for (auto& device: devices) try { device.stop(); } catch (const std::exception &e) { std::clog << "audio/error: " << e.what(); }
+		for (auto& device: devices) {
+			try {
+				device.stop();
+			}
+			catch (const std::exception &e) {
+				SpdLogger::error(LogSystem::AUDIO, "Error stopping audio device={}, exception={}", device.dev, e.what());
+			}
+		}
 	}
 };
 
@@ -635,13 +650,13 @@ void Audio::playMusic(Game& game, Audio::Files const& filenames, bool preview, d
 	m->seek(startPos);
 	m->fadeRate = 1.0 / getSR() / fadeTime;
 	// Format debug message
-	std::string logmsg = "audio/debug: playMusic(";
-	for (auto& kv: filenames) logmsg += kv.first + "=" + kv.second.filename().string() + ", ";
-	logmsg += ") -> ";
-	std::clog << logmsg << m.get() << std::endl;
+	std::string logmsg{"audio/debug: playMusic("};
+	for (auto& kv: filenames) fmt::format_to(std::back_inserter(logmsg), fmt::runtime("{}={}{}"), kv.first, kv.second.filename().string(), filenames.size() > 1 ? ", " : "");
+	fmt::format_to(std::back_inserter(logmsg), ") -> {}", fmt::ptr(m.get()));
+	SpdLogger::debug(LogSystem::AUDIO, logmsg);
 	// Send to audio playback thread
 	std::lock_guard<std::mutex> l(o.mutex);
-	if (o.preloading) std::clog << "audio/debug: earlier music still preloading, disposing " << o.preloading.get() << std::endl;
+	if (o.preloading) SpdLogger::debug(LogSystem::AUDIO, "earlier music still preloading, disposing {}", fmt::ptr(o.preloading.get()));
 	o.preloading = std::move(m);
 	o.disposing.clear();  // Delete disposed streams
 	o.commands.clear();  // Remove old unprocessed commands (they should not apply to the new music)

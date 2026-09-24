@@ -1,6 +1,6 @@
 #include "instrumentgraph.hh"
 #include "i18n.hh"
-#include "glutil.hh"
+#include "graphic/glutil.hh"
 #include "theme.hh"
 #include "graphic/view_trans.hh"
 

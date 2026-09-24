@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string>performous-launcher</string>
+	<string>Performous</string>
 	<key>CFBundleGetInfoString</key>
 	<string>Performous</string>
 	<key>CFBundleIconFile</key>
@@ -24,6 +24,8 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>@MACOSX_BUNDLE_BUNDLE_VERSION@</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>__PERFORMOUS_MIN_OS_VERSION__</string>
 	<key>LSUIElement</key>
 	<false/>
 	<key>NSHighResolutionCapable</key>

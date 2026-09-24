@@ -1,8 +1,9 @@
 ﻿#include "svg.hh"
 
-#include "cache.hh"
+#include "svg_cache.hh"
 #include "configuration.hh"
 #include "image.hh"
+#include "log.hh"
 
 #include <librsvg/rsvg.h>
 #include <cstdint>
@@ -16,8 +17,8 @@
 void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	float factor = config["graphic/svg_lod"].f();
 	// Try to load a cached PNG instead
-	if (cache::loadSVG(bitmap, filename, factor)) return;
-	std::clog << "image/debug: Loading SVG: " + filename.string() << std::endl;
+	if (svgCache::loadSVG(bitmap, filename, factor)) return;
+	SpdLogger::debug(LogSystem::IMAGE, "Loading SVG file, path={}.", filename);
 	// Open the SVG file in librsvg
 #if !GLIB_CHECK_VERSION(2, 36, 0)   // Avoid deprecation warnings
 	g_type_init();
@@ -30,7 +31,19 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	}
 #if LIBRSVG_MAJOR_VERSION >= 2 && LIBRSVG_MINOR_VERSION >= 52
 	gdouble svg_width = 0.0, svg_height = 0.0;
-	rsvg_handle_get_intrinsic_size_in_pixels(svgHandle.get(), &svg_width, &svg_height);
+	gboolean svg_has_viewbox = FALSE;
+	gboolean svg_has_size = rsvg_handle_get_intrinsic_size_in_pixels(svgHandle.get(), &svg_width, &svg_height);
+	if (svg_has_size == FALSE) {
+		SpdLogger::warn(LogSystem::IMAGE, "SVG file, path={} has no defined size, falling back to viewbox.", filename);
+		RsvgRectangle svg_rect;
+		rsvg_handle_get_intrinsic_dimensions(svgHandle.get(), nullptr, nullptr, nullptr, nullptr, &svg_has_viewbox, &svg_rect);
+		if (svg_has_viewbox == FALSE) {
+			SpdLogger::error(LogSystem::IMAGE, "SVG file, path={} has no defined size nor a viewbox.", filename);
+			throw std::runtime_error(fmt::format("SVG file, path={} can't be rendered.", filename));
+		}
+		svg_width = svg_rect.width;
+		svg_height = svg_rect.height;
+	}
 	bitmap.resize(static_cast<unsigned>(svg_width * factor + 0.5f), static_cast<unsigned>(svg_height * factor + 0.5f));
 #else //functions are deprecated since 2.46
 	// Get SVG dimensions
@@ -63,7 +76,7 @@ void loadSVG(Bitmap& bitmap, fs::path const& filename) {
 	}
 	bitmap.fmt = pix::Format::CHAR_RGBA;
 	// Write to cache so that it can be loaded faster the next time
-	fs::path cache_filename = cache::constructSVGCacheFileName(filename, factor);
+	fs::path cache_filename = svgCache::constructSVGCacheFileName(filename, factor);
 	fs::create_directories(cache_filename.parent_path());
 	writePNG(cache_filename, bitmap);
 

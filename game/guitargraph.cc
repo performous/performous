@@ -1,5 +1,8 @@
 #include "guitargraph.hh"
+
+#include "configuration.hh"
 #include "fs.hh"
+#include "log.hh"
 #include "song.hh"
 #include "i18n.hh"
 #include "graphic/view_trans.hh"
@@ -174,6 +177,30 @@ void GuitarGraph::setupJoinMenuDifficulty() {
 	m_selectedDifficulty.select(cur); // Set the selection to current level
 	m_menu.add(MenuOption("", _("Select difficulty"))).changer(m_selectedDifficulty); // MenuOption that cycles the options
 	m_menu.back().setDynamicName(m_difficultyOpt); // Set the title to be dynamic
+}
+
+double GuitarGraph::missVolumeTarget() const {
+	auto missVolumePercent = 0u;
+	switch (m_level) {
+		case Difficulty::KIDS:
+			missVolumePercent = config["audio/miss_volume_kids"].ui();
+			break;
+		case Difficulty::SUPAEASY:
+			missVolumePercent = config["audio/miss_volume_easy"].ui();
+			break;
+		case Difficulty::EASY:
+			missVolumePercent = config["audio/miss_volume_medium"].ui();
+			break;
+		case Difficulty::MEDIUM:
+			missVolumePercent = config["audio/miss_volume_hard"].ui();
+			break;
+		case Difficulty::AMAZING:
+			missVolumePercent = config["audio/miss_volume_expert"].ui();
+			break;
+		default:
+			break;
+	}
+	return clamp(static_cast<double>(missVolumePercent) / 100.0);
 }
 
 void GuitarGraph::setupJoinMenuDrums() {
@@ -401,7 +428,9 @@ void GuitarGraph::engine() {
 	// - Only after we are so much past them that they can no longer be played (maxTolerance)
 	// - For chords played or skipped by playing (i.e. play another chord that quickly follows), ++m_chordIt is done elsewhere
 	while (m_chordIt != m_chords.end() && m_chordIt->begin + maxTolerance < time) {
-		if (m_chordIt->status < m_chordIt->polyphony) endStreak();
+		// For guitar, status is 0/1/2 (not played/tapped/picked). For drums, status counts pads hit (0 to polyphony).
+		bool chordMissed = m_drums ? (m_chordIt->status < m_chordIt->polyphony) : (m_chordIt->status == 0);
+		if (chordMissed) endStreak();
 		// Calculate solo total score
 		if (m_solo) { m_soloScore += m_chordIt->score; m_soloTotal += static_cast<float>(m_chordIt->polyphony) * static_cast<float>(points(0));
 		// Solo just ended?
@@ -415,7 +444,9 @@ void GuitarGraph::engine() {
 		++m_chordIt;
 	}
 	// Start decreasing correctness instantly if the current note is being played late (don't wait until maxTolerance)
-	if (m_chordIt != m_chords.end() && m_chordIt->begin < time && m_chordIt->status == 0) m_correctness.setTarget(0.0);
+	if (m_chordIt != m_chords.end() && m_chordIt->begin < time && m_chordIt->status == 0) {
+		m_correctness.setTarget(missVolumeTarget());
+	}
 	// Process holds
 	if (!m_drums) {
 		// FIXME: Why do we have per-fret hold handling, why not just as a part of the current chord?
@@ -438,10 +469,8 @@ void GuitarGraph::engine() {
 			double t = last - ev.holdTime;
 			if (t < 0) continue;  // FIXME: What is this for, rewinding?
 			// Is the hold being played correctly?
-			bool early = time - ev.dur->begin < 1.5;  // At the beginning we don't require whammy
-			bool whammy = ev.whammy.get() > 0.01f;
-			bool godmode = m_starpower.get() > 0.01f;
-			if (early || whammy || godmode) ++count;
+			// Just holding the fret button sustains the note
+			++count;
 			// Score for holding
 			m_score += t * 50.0f * m_correctness.get();
 			// Whammy fills starmeter much faster
@@ -499,7 +528,7 @@ void GuitarGraph::endHold(unsigned fret, double time) {
 			if (time > chord.begin + maxTolerance && time < chord.end - maxTolerance) {
 				chord.releaseTimes[fret] = time;
 				if (time >= chord.end - maxTolerance) chord.passed = true; // Mark as past note for rewinding
-				else m_correctness.setValue(0.0f);  // Note: if still holding some frets, proper percentage will be set in hold handling
+				else m_correctness.setValue(static_cast<float>(missVolumeTarget()));  // Note: if still holding some frets, proper percentage will be set in hold handling
 				break;
 			}
 		}
@@ -520,8 +549,10 @@ void GuitarGraph::fail(double time, int fret) {
 		// remove equivalent of 1 perfect hit for every note
 		// kids tend to play a lot of extra notes just for the fun of it.
 		// need to make sure they don't end up with a score of zero
-		m_score -= (m_level == Difficulty::KIDS) ? points(0)/2.0f : points(0);
-		m_correctness.setTarget(0.0, true);  // Instantly fail correctness
+		if (config["game/instrument_miss_penalty"].b()) {
+			m_score -= (m_level == Difficulty::KIDS) ? points(0)/2.0f : points(0);
+		}
+		m_correctness.setTarget(missVolumeTarget(), true);  // Instantly fail correctness
 	}
 	endStreak();
 }
@@ -566,7 +597,7 @@ void GuitarGraph::updateDrumFill(double time) {
 
 /// Handle drum hit scoring
 void GuitarGraph::drumHit(double time, unsigned layer, unsigned fret) {
-	std::cout << "drumHit: " << time << " layer:" << layer << " fret:" << fret << std::endl;
+	SpdLogger::debug(LogSystem::INSTRUMENTS, "DrumHit={}, Layer={}, Fret={}.", time, layer, fret);
 	// Handle drum fills
 	if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin - maxTolerance
 	  && time <= m_dfIt->end + maxTolerance) {

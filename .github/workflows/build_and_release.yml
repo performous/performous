@@ -3,9 +3,9 @@ name: Build and Release Performous
 # Controls when the workflow will run
 on:
   # Run on a schedule to get weekly updates for the Linux containers
-  # and keep the cache fresh for Windows builds. Runs Sundays at midnight.
+  # and keep the cache fresh for Windows builds. Runs Mondays and Thursdays at midnight.
   schedule:
-    - cron: "0 0 * * 0"
+    - cron: "0 0 * * 1,4"
   # Triggers the workflow on merges to master, release branches,
   # all PRs, and release tags 
   push:
@@ -21,6 +21,14 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: write
+  packages: write
+  pull-requests: write
+  security-events: write
+  statuses: write
 
 # Note: entire jobs or sections can be disabled by adding
 # if: ${{ false }} to the definition column
@@ -39,7 +47,7 @@ jobs:
       complete_version: ${{ steps.versioning.outputs.complete_version }}
     steps:
       - name: Checkout Performous
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: ${{ github.workspace }}/performous
           repository: ${{ github.event.repository.full_name }}
@@ -59,7 +67,25 @@ jobs:
           echo "version_minor=$(cut -d '.' -f 2 <<< $(git describe --tags --abbrev=0 || echo 1.0.0))" >> $GITHUB_OUTPUT
           echo "version_patch=$(cut -d '.' -f 3 <<< $(git describe --tags --abbrev=0 || echo 1.0.0))" >> $GITHUB_OUTPUT
           echo "version_tweak=0" >> $GITHUB_OUTPUT
-          echo "complete_version=$(if [ $GITHUB_REF_TYPE = 'tag' ]; then echo $GITHUB_REF_NAME; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME = 'master' ]; then echo $LATEST_FULL_TAG_VERSION-beta; elif [ $GITHUB_REF_TYPE = 'branch' ] && [ $GITHUB_REF_NAME != 'master' ]; then echo $LATEST_TAG_VERSION-${{github.event.pull_request.number}}-$(git rev-parse --short=7 $(git describe))-alpha; fi)" >> $GITHUB_OUTPUT
+
+          if [[ ${{ github.event_name }} == "push" ]]; then
+            COMMIT_SHA=$(git rev-parse --short=7 ${{ github.event.after }})
+          elif [[ ${{ github.event_name }} == "pull_request" ]]; then
+            COMMIT_SHA=$(git rev-parse --short=7 ${{ github.event.pull_request.head.sha }})
+          elif [[ ${{ github.event_name }} == "schedule" || ${{ github.event_name }} == "workflow_dispatch" ]]; then
+            COMMIT_SHA=$(git rev-parse --short=7 ${{ github.sha }})
+          fi
+
+          if [[ ${{ github.ref_type }} == "tag" ]]; then
+            echo "complete_version=${{github.ref_name}}" >> $GITHUB_OUTPUT
+          elif [[ ${{ github.ref_type }} == "branch" ]]; then
+            if [[ ${{ github.ref_name}} == "master" ]]; then
+              NUMCOMMITS=$(git describe --tags | sed "s|$(git describe --tags --abbrev=0)-||" | cut -d- -f1)
+              echo "complete_version=$LATEST_TAG_VERSION+${NUMCOMMITS}-git-${COMMIT_SHA}" >> $GITHUB_OUTPUT
+            else
+              echo "complete_version=$LATEST_TAG_VERSION+git-${COMMIT_SHA}-PR${{github.event.pull_request.number}}-alpha" >> $GITHUB_OUTPUT
+            fi
+          fi
 
 
   # Set up a release that packages will be published to.
@@ -74,7 +100,7 @@ jobs:
       - name: Create the Main release
         id: create_release
         if: ${{ github.event_name != 'pull_request' && github.ref_type == 'tag' }}
-        uses: softprops/action-gh-release@v0.1.15
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.ref_name }}
           name: Performous ${{ github.ref_name }}
@@ -103,10 +129,9 @@ jobs:
       - determine_version
       - create_release
 
-  # Pull in the MacOS build workflow
-  MacOS_Package:
-    name: Build the MacOS package
-    uses: ./.github/workflows/macos.yml
+  MacPorts_Package:
+    name: Package macOS builds
+    uses: ./.github/workflows/macports.yml
     secrets: inherit
     with:
       package_complete_version: ${{ needs.determine_version.outputs.complete_version }}
@@ -114,7 +139,8 @@ jobs:
     needs:
       - determine_version
       - create_release
-  
+
+
   # Pull in the Windows build workflow
   Windows_Packages:
     name: Build the Windows packages
@@ -125,3 +151,10 @@ jobs:
     needs:
       - determine_version
       - create_release
+
+
+  CodeQL:
+    name: Static Code Analysis.
+    uses: ./.github/workflows/codeql.yml
+    needs:
+      - determine_version
