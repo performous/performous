@@ -1,10 +1,7 @@
 #include "song.hh"
 
-#include "config.hh"
-#include "ffmpeg.hh"
 #include "log.hh"
-#include "screen_sing.hh"
-#include "songparser.hh"
+#include "songparserfactory.hh"
 #include "unicode.hh"
 #include "util.hh"
 
@@ -12,12 +9,8 @@
 #include <limits>
 #include <optional>
 
-extern "C" {
-#include <libavformat/avformat.h>
-#include <libavcodec/avcodec.h>
-}
-
-Song::Song(nlohmann::json const& song) : dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()) {
+Song::Song(nlohmann::json const& song)
+: dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()) {
 	path = getJsonEntry<std::string>(song, "txtFileFolder").value_or("");
 	filename = getJsonEntry<std::string>(song, "txtFile").value_or("");
 	mtime = getJsonEntry<std::int64_t>(song, "mtime").value_or(0);
@@ -94,30 +87,44 @@ Song::Song(nlohmann::json const& song) : dummyVocal(TrackName::VOCAL_LEAD), rand
 	collateUpdate();
 }
 
-Song::Song(fs::path const& filename):
-  dummyVocal(TrackName::VOCAL_LEAD), path(filename.parent_path()), filename(filename), randomIdx(rand())
+// These three call sites all follow the same pattern: build a fresh SongParserFactory, ask it for a
+// parser (it reads/sniffs song.filename and picks TxtSongParser/IniSongParser/XmlSongParser/SmSongParser),
+// then call parse() once. A new parser instance is created every time rather than kept around, so no
+// per-format state (e.g. a TXT song's GAP) can leak between calls or between unrelated songs.
+Song::Song(fs::path const& path, fs::path const& filename):
+  dummyVocal(TrackName::VOCAL_LEAD), path(path), filename(filename), randomIdx(rand())
 {
-	if (fs::is_regular_file(filename)) {
-		mtime = static_cast<int64_t>(fs::last_write_time(filename).time_since_epoch().count());  // .count() can return __int128
+	if (fs::is_regular_file(path)) {
+		mtime = static_cast<int64_t>(fs::last_write_time(path).time_since_epoch().count());  // .count() can return __int128
 	}
-	SongParser(*this);
+	SongParserFactory().create(*this)->parse(*this);
 	collateUpdate();
+}
+
+Song::Song()
+: dummyVocal(TrackName::VOCAL_LEAD), randomIdx(rand()) {
 }
 
 void Song::reload(bool errorIgnore) {
 	try {
-		*this = Song(filename);
-	}
-	catch (...) {
+		SongParserFactory().create(*this)->parse(*this);
+		collateUpdate();
+	} catch (...) {
 		if (!errorIgnore)
 			throw;
 	}
 }
 
+// Parses the notes on top of an already-loaded header (loadStatus == HEADER); a no-op if they're
+// already loaded. Called when entering the sing screen, since notes aren't needed just to browse songs.
 void Song::loadNotes(bool errorIgnore) {
-	if (loadStatus == LoadStatus::FULL) return;
-	try { SongParser(*this); }
-	catch (SongParserException const&) { if (!errorIgnore) throw; }
+	if (loadStatus == LoadStatus::FULL)
+		return;
+	try {
+		SongParserFactory().create(*this)->parse(*this);
+	} catch (...) {
+		if (!errorIgnore) throw;
+	}
 }
 
 void Song::dropNotes() {
@@ -137,25 +144,6 @@ void Song::collateUpdate() {
 
 	collateByArtist = collateInfo["artist"] + "__" + collateInfo["title"] + "__" + filename.string();
 	collateByArtistOnly = collateInfo["artist"];
-}
-
-Song::Status Song::status(double time, ScreenSing* song) {
-	if (song->getMenu().isOpen()) return Status::NORMAL; // This should prevent querying getVocalTrack with an out-of-bounds/uninitialized index.
-	if (vocalTracks.empty()) return Status::NORMAL;	 // To avoid crash with non-vocal songs (dance, guitar) -- FIXME: what should we actually do?
-	Note target; target.end = time;
-	Notes* notes = nullptr;
-	Notes::const_iterator it;
-
-	if (song->singingDuet()) {
-		notes = &getVocalTrack(SongParserUtil::DUET_BOTH).notes;
-	}
-	else {
-		notes = &getVocalTrack(song->selectedVocalTrack()).notes;
-	}
-	it = std::lower_bound(notes->begin(), notes->end(), target, [](Note const& a, Note const& b) { return a.end < b.end; });
-	if (it == notes->end()) return Status::FINISHED;
-	if (it->begin > time + 4.0) return Status::INSTRUMENTAL_BREAK;
-	return Status::NORMAL;
 }
 
 bool Song::getNextSection(double pos, SongSection& section) {
@@ -214,36 +202,11 @@ VocalTrack& Song::getVocalTrack(std::string vocalTrack) {
 VocalTrack& Song::getVocalTrack(unsigned idx) {
 	if (idx >= static_cast<unsigned>(vocalTracks.size())) {
 		return dummyVocal;
-	}
-	else {
+	} else {
 		VocalTracks::iterator it = vocalTracks.begin();
 		std::advance(it, idx);
 		return it->second;
 	}
-}
-
-double Song::getDurationSeconds() {
-	if (m_duration == 0.0 || m_duration < 1.0) {
-		try {
-			auto ffmpeg = std::make_unique<DurationFFmpeg>(music[TrackName::BGMUSIC]);
-			m_duration = ffmpeg->duration();
-			return m_duration;
-		}
-		catch (FFmpeg::Error const& e) {
-			SpdLogger::warn(LogSystem::SONGS, "Couldn't open file for calculating duration. FFMPEG error={}", e.what());
-			return 0.0;
-		}
-	}
-	else { //duration is still in memmory that means we already loaded it
-		return m_duration;
-	}
-}
-
-double Song::getPreviewStart() {
-	if (std::isnan(preview_start)) {
-		preview_start = ((type == Type::INI || getDurationSeconds() < 50.0) ? 5.0 : 30.0);	// 5 s for band mode, 30 s for others
-	}
-	return preview_start;
 }
 
 std::string Song::str() const { return title + "  by  " + artist; }

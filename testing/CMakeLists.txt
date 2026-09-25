@@ -9,12 +9,16 @@ set(SOURCE_FILES
 	"fixednotegraphscalertest.cc"
 	"microphones_test.cc"
 	"notegraphscalerfactorytest.cc"
+	"songparserfactorytest.cc"
+	"smsongparsertest.cc"
+	"txtsongparsertest.cc"
 	"ringbuffertest.cc"
 	"utiltest.cc"
 	"imagetypetest.cc"
 
 	"main.cc"
 	"printer.cc"
+	"stubs.cc"
 )
 set(GAME_SOURCES
 	"../game/analyzer.cc"
@@ -33,6 +37,18 @@ set(GAME_SOURCES
 	"../game/platform.cc"
 	"../game/tone.cc"
 	"../game/util.cc"
+
+	"../game/i18n.cc"
+	"../game/midifile.cc"
+	"../game/song.cc"
+	"../game/songparser-ini.cc"
+	"../game/songparser-mid.cc"
+	"../game/songparser-sm.cc"
+	"../game/songparser-txt.cc"
+	"../game/songparser-xml.cc"
+	"../game/songparserfactory.cc"
+	"../game/songparserutil.cc"
+	"../game/unicode.cc"
 )
 
 set(GTEST_REQUIRED "")
@@ -64,6 +80,12 @@ if(GTest_FOUND)
 	find_package(ICU 65 REQUIRED uc data i18n io)
 	target_link_libraries(performous_test PRIVATE ICU::uc ICU::data ICU::i18n ICU::io)
 
+	find_package(LibXML++ REQUIRED)
+	target_include_directories(performous_test SYSTEM PRIVATE ${LibXML++_INCLUDE_DIRS})
+	target_link_libraries(performous_test PRIVATE ${LibXML++_LIBRARIES})
+
+	find_package(Ced REQUIRED)
+	target_link_libraries(performous_test PRIVATE ced)
 
 	find_package(Spdlog REQUIRED MODULE)
 
