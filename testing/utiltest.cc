@@ -12,12 +12,20 @@ TEST(UnitTest_Utils, almostEqual_exact) {
     EXPECT_TRUE(almostEqual(1.0, 1.0));
 }
 
-TEST(UnitTest_Utils, almostEqual_within_default_epsilon) {
-    EXPECT_TRUE(almostEqual(1.0, 1.0005));
+TEST(UnitTest_Utils, almostEqual_within_default_float_epsilon) {
+    EXPECT_TRUE(almostEqual(1.0f, 1.00000005f));
 }
 
-TEST(UnitTest_Utils, almostEqual_outside_default_epsilon) {
-    EXPECT_FALSE(almostEqual(1.0, 1.01));
+TEST(UnitTest_Utils, almostEqual_within_default_double_epsilon) {
+    EXPECT_TRUE(almostEqual(1.0, 1.00000000000000005));
+}
+
+TEST(UnitTest_Utils, almostEqual_outside_default_float_epsilon) {
+    EXPECT_FALSE(almostEqual(1.0f, 1.0000005f));
+}
+
+TEST(UnitTest_Utils, almostEqual_outside_default_double_epsilon) {
+    EXPECT_FALSE(almostEqual(1.0, 1.0000000000000005));
 }
 
 TEST(UnitTest_Utils, almostEqual_custom_epsilon) {
