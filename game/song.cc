@@ -202,7 +202,8 @@ VocalTrack& Song::getVocalTrack(std::string vocalTrack) {
 VocalTrack& Song::getVocalTrack(unsigned idx) {
 	if (idx >= static_cast<unsigned>(vocalTracks.size())) {
 		return dummyVocal;
-	} else {
+	}
+	else {
 		VocalTracks::iterator it = vocalTracks.begin();
 		std::advance(it, idx);
 		return it->second;

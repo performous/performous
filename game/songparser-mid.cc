@@ -1,16 +1,16 @@
 #include "songparser-mid.hh"
 
 #include "log.hh"
+#include "midifile.hh"
 #include "song.hh"
 #include "songparserutil.hh"
 #include "unicode.hh"
 #include "util.hh"
 
 #include <boost/algorithm/string.hpp>
-#include <stdexcept>
-#include "midifile.hh"
 
 #include <stdexcept>
+
 /// @file
 /// Functions used for parsing MIDI files (FoF and other song formats)
 

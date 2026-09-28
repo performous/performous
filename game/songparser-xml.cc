@@ -1,12 +1,13 @@
 #include "songparser-xml.hh"
 
-#include "songparserutil.hh"
-
 #include "i18n.hh"
-#include "util.hh"
 #include "libxml++.hh"
+#include "songparserutil.hh"
+#include "util.hh"
+
 #include <boost/algorithm/string.hpp>
 #include <fmt/format.h>
+
 #include <stdexcept>
 
 /// @file

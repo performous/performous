@@ -1,10 +1,9 @@
 #include "songparser-ini.hh"
 
+#include "fs.hh"
 #include "i18n.hh"
 #include "songparser-mid.hh"
 #include "songparserutil.hh"
-
-#include "fs.hh"
 #include "unicode.hh"
 #include "util.hh"
 

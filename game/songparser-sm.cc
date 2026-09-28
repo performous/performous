@@ -1,15 +1,14 @@
 #include "songparser-sm.hh"
 
-#include "songparserutil.hh"
-
-#include "unicode.hh"
 #include "fs.hh"
+#include "songparserutil.hh"
+#include "unicode.hh"
 
 #include <fmt/format.h>
 
 #include <algorithm>
-#include <stdexcept>
 #include <map>
+#include <stdexcept>
 
 /// @file
 /// Functions used for parsing the StepMania SM format

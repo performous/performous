@@ -1,9 +1,8 @@
 #include "songparser-txt.hh"
 
-#include "songparserutil.hh"
-
 #include "fs.hh"
 #include "log.hh"
+#include "songparserutil.hh"
 #include "unicode.hh"
 #include "util.hh"
 
@@ -246,7 +245,7 @@ bool TxtSongParser::txtParseNote(Song& song, std::string line) {
 		case Note::Type::MINE:
 		case Note::Type::LIFT:
 		default:
-			throw std::runtime_error("Unknown note type");
+			throw SongParserException(song, "Unknown note type", m_linenum);
 	}
 	n.begin = tsTime(song, ts, m_gap);
 	VocalTrack& vocal = song.getVocalTrack(
