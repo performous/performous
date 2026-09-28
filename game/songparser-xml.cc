@@ -91,7 +91,8 @@ namespace {
 		if (note.type == Note::Type::SLEEP) {
 			// Skip extra sleep notes
 			if (vocal.notes.empty() || vocal.notes.back().type == Note::Type::SLEEP) return;
-		} else {
+		}
+		else {
 			vocal.noteMin = std::min(vocal.noteMin, note.note);
 			vocal.noteMax = std::max(vocal.noteMax, note.note);
 		}
@@ -208,7 +209,8 @@ Note XmlSongParser::xmlParseNote(Song& song, xmlpp::Element const& noteNode, uns
 	if (lyric.size() > 0 && lyric[lyric.size() - 1] == '-') {
 		if (lyric.size() > 1 && lyric[lyric.size() - 2] == ' ') lyric.erase(lyric.size() - 2);
 		else lyric[lyric.size() - 1] = '~';
-	} else {
+	}
+	else {
 		lyric += ' ';
 	}
 	int note;

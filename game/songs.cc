@@ -321,11 +321,13 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 					auto currentMtime = fs::last_write_time(p).time_since_epoch().count();
 					if (match->second->mtime != 0 && match->second->mtime == currentMtime) {
 						song = match->second;
-					} else {
+					}
+					else {
 						SpdLogger::info(LogSystem::SONGS, "Song={} has been modified on disk, re-reading.", p);
 						song = std::make_shared<Song>(p.parent_path(), p);
 					}
-				} else {
+				}
+				else {
 					SpdLogger::info(LogSystem::SONGS, "Found song={}, which was not present in the cache.", p);
 					song = std::make_shared<Song>(p.parent_path(), p);
 				}
@@ -385,7 +387,8 @@ void Songs::filter_internal() {
 		if (m_filter == std::string() && m_type == 0) {
 			std::shared_lock<std::shared_mutex> l(m_mutex);
 			filtered = m_songs;
-		} else {
+		}
+		else {
 			auto filter = icu::UnicodeString::fromUTF8(
 				UnicodeUtil::convertToUTF8(m_filter)
 			);

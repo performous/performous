@@ -138,7 +138,8 @@ void SongParserMidi::parseNotes(Song& song) {
 			// Discard empty tracks
 			// Note: some songs have notes at the very beginning (but are otherwise empty)
 			if (trackEnd < 1.0) song.instrumentTracks.erase(name);
-		} else {
+		}
+		else {
 			// Process vocal tracks
 			VocalTrack vocal(name);
 			for (auto const& lyric: it->lyrics) {
@@ -214,7 +215,8 @@ void SongParserMidi::parseNotes(Song& song) {
 						if (almostEqual(n.begin, midi.get_seconds(lyric.begin) + song.start) && n.type == Note::Type::NORMAL) {
 							if (lyric.note == 124) {
 								n.type = Note::Type::FREESTYLE;
-							} else {
+							}
+							else {
 								n.type = Note::Type::GOLDEN;
 							}
 							break;
