@@ -1,6 +1,6 @@
+#include "midiparser.hh"
 #include "songparserutil.hh"
 
-#include "songparser-mid.hh"
 #include "unicode.hh"
 #include "util.hh"
 
@@ -303,11 +303,10 @@ namespace SongParserUtil {
 			return;
 		}
 		if (!song.midifilename.empty()) {
-			SongParserMidi::parseHeader(song);
+			MidiParser::parseHeader(song);
 		}
 		if (song.loadStatus != Song::LoadStatus::PARSERERROR) {
 			song.loadStatus = Song::LoadStatus::HEADER;
 		}
 	}
 }
-

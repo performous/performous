@@ -2,7 +2,7 @@
 
 #include "fs.hh"
 #include "i18n.hh"
-#include "songparser-mid.hh"
+#include "midiparser.hh"
 #include "songparserutil.hh"
 #include "unicode.hh"
 #include "util.hh"
@@ -61,7 +61,7 @@ void IniSongParser::parse(Song& song) {
 	try {
 		SongParserUtil::parseSong(song,
 			[this](Song& s) { iniParseHeader(s); },
-			[](Song& s) { SongParserMidi::parseNotes(s); SongParserUtil::finalize(s, 0, 0, 0.0); });
+			[](Song& s) { MidiParser::parseNotes(s); SongParserUtil::finalize(s, 0, 0, 0.0); });
 	}
 	catch (SongParserException&) {
 		throw;

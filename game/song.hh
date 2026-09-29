@@ -50,7 +50,7 @@ class ScreenSing;
 * (songparserfactory.hh) sniffs the file content and builds the matching ISongParser (isongparser.hh)
 * implementation -- TxtSongParser, IniSongParser, XmlSongParser or SmSongParser
 * (songparser-{txt,ini,xml,sm}.*). INI songs have no notes of their own; they pull them from a companion
-* MIDI file via the free functions in songparser-mid.*. Logic shared across formats (BPM/timing math, the
+* MIDI file via the free functions in midiparser.*. Logic shared across formats (BPM/timing math, the
 * header-then-notes control flow, file auto-detection) lives as free functions under SongParserUtil
 * (songparserutil.*) rather than in a shared base class, so each format parser only carries the state it
 * actually needs.

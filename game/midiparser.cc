@@ -1,7 +1,7 @@
-#include "songparser-mid.hh"
 
 #include "log.hh"
 #include "midifile.hh"
+#include "midiparser.hh"
 #include "song.hh"
 #include "songparserutil.hh"
 #include "unicode.hh"
@@ -61,7 +61,7 @@ namespace {
 	}
 }
 
-void SongParserMidi::parseHeader(Song& song) {
+void MidiParser::parseHeader(Song& song) {
 	if (!song.vocalTracks.empty()) {
 		song.vocalTracks.clear();
 	}
@@ -96,7 +96,7 @@ void SongParserMidi::parseHeader(Song& song) {
 }
 
 /// Parse notes
-void SongParserMidi::parseNotes(Song& song) {
+void MidiParser::parseNotes(Song& song) {
 	song.vocalTracks.clear();
 	song.instrumentTracks.clear();
 

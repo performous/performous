@@ -40,9 +40,9 @@ set(GAME_SOURCES
 
 	"../game/i18n.cc"
 	"../game/midifile.cc"
+	"../game/midiparser.cc"
 	"../game/song.cc"
 	"../game/songparser-ini.cc"
-	"../game/songparser-mid.cc"
 	"../game/songparser-sm.cc"
 	"../game/songparser-txt.cc"
 	"../game/songparser-xml.cc"
@@ -63,7 +63,7 @@ if(GTest_FOUND)
 	message(STATUS "Testing enabled: Building test host")
 
 	set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${GAME_SOURCES})
-	
+
 	add_executable(performous_test ${SOURCES})
 
 	find_package(Boost 1.70 CONFIG REQUIRED COMPONENTS program_options iostreams locale)
@@ -101,7 +101,7 @@ if(GTest_FOUND)
 	else()
 		target_compile_options(performous_test PUBLIC -Werror)
 	endif()
-	
+
 	find_package(SDL2 REQUIRED)
 	if (TARGET SDL2::SDL2)
 		target_link_libraries(performous_test PRIVATE SDL2::SDL2)
