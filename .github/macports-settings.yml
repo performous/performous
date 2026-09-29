@@ -11,4 +11,5 @@ variants:
     - python314
     - x11
     - universal
+    - dbus
 ports:

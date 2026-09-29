@@ -242,9 +242,11 @@ jobs:
           tar -czf ${{ github.workspace }}/MacPorts-log-${{ matrix.os }}.tar.gz ./logs ./build
           echo "log_path=${{ github.workspace }}/MacPorts-log-${{ matrix.os }}.tar.gz" >> $GITHUB_OUTPUT
 
-      - name: Clear Extended attributes
+      - name: Clear extended attributes & fix weird permissions.
         run: |
-          sudo find /opt/local/var -type d -a -perm 700 -exec chmod 755 {} \;
+          # Fix weird permissions that break caching.
+          sudo find /opt/local/var -type d -a -perm 700 -ls -exec chmod 755 {} \;
+          sudo find /opt/local \( -not -perm -400 -exec chmod -v u+r {} \; -not -perm -004 -exec chmod -v o+r {} \; \) -ls
           sudo xattr -c -rsv /opt/local
 
       - name: Cache dependencies
