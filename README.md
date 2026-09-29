@@ -13,7 +13,7 @@ Discord at https://discord.gg/NS3m3ad
 For compiling instructions visit the wiki page: https://github.com/performous/performous/wiki/Building-and-installing-from-source
 
 # Pre-compiled builds
-Performous currently builds on Windows(MSVC and MinGW-w64), macOS, and various versions of Ubuntu, Debian, Fedora, as well as an AppImage build.
+Performous currently builds on Windows(MSVC and MSYS2), macOS, and various versions of Ubuntu, Debian, Fedora, as well as an AppImage build.
 
 - Latest Performous Release: https://github.com/performous/performous/releases/latest
 - Weekly BETA builds from the `master` branch: https://nightly.link/performous/performous/workflows/build_and_release/master?preview

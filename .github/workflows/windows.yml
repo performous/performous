@@ -106,8 +106,8 @@ jobs:
           release_id: ${{ inputs.release_id }}
           file: ${{ env.ARTIFACT_PATH }}
 
-  Windows_MinGW-w64_Packages:
-    name: Create Windows installer with MinGW-w64
+  Windows_MSYS_Packages:
+    name: Create Windows installer with MSYS2
     runs-on: windows-latest
     defaults:
       run:
@@ -127,48 +127,48 @@ jobs:
       - name: Install MSYS2.
         uses: msys2/setup-msys2@v2
         with:
-          msystem: MINGW64
+          msystem: CLANG64
           update: false
           location: "${{ env.workpath }}"
           install: >-
             git
-            mingw-w64-x86_64-boost
-            mingw-w64-x86_64-cairo
-            mingw-w64-x86_64-cc
-            mingw-w64-x86_64-cmake
-            mingw-w64-x86_64-fftw
-            mingw-w64-x86_64-fmt
-            mingw-w64-x86_64-fontconfig
-            mingw-w64-x86_64-gettext
-            mingw-w64-x86_64-glm
-            mingw-w64-x86_64-gtest
-            mingw-w64-x86_64-icu
-            mingw-w64-x86_64-libepoxy
-            mingw-w64-x86_64-libjpeg-turbo
-            mingw-w64-x86_64-libpng
-            mingw-w64-x86_64-librsvg
-            mingw-w64-x86_64-libsigc++
-            mingw-w64-x86_64-libxml++
-            mingw-w64-x86_64-libxml2
-            mingw-w64-x86_64-make
-            mingw-w64-x86_64-nsis
-            mingw-w64-x86_64-nlohmann-json
-            mingw-w64-x86_64-openblas
-            mingw-w64-x86_64-opencv
-            mingw-w64-x86_64-opencv
-            mingw-w64-x86_64-pango
-            mingw-w64-x86_64-portaudio
-            mingw-w64-x86_64-portmidi
-            mingw-w64-x86_64-SDL2
-            mingw-w64-x86_64-spdlog
-            mingw-w64-x86_64-winpthreads-git
-            mingw-w64-x86_64-libwebp
+            mingw-w64-clang-x86_64-boost
+            mingw-w64-clang-x86_64-cairo
+            mingw-w64-clang-x86_64-cc
+            mingw-w64-clang-x86_64-cmake
+            mingw-w64-clang-x86_64-fftw
+            mingw-w64-clang-x86_64-fmt
+            mingw-w64-clang-x86_64-fontconfig
+            mingw-w64-clang-x86_64-gettext
+            mingw-w64-clang-x86_64-glm
+            mingw-w64-clang-x86_64-gtest
+            mingw-w64-clang-x86_64-icu
+            mingw-w64-clang-x86_64-libepoxy
+            mingw-w64-clang-x86_64-libjpeg-turbo
+            mingw-w64-clang-x86_64-libpng
+            mingw-w64-clang-x86_64-librsvg
+            mingw-w64-clang-x86_64-libsigc++
+            mingw-w64-clang-x86_64-libxml++
+            mingw-w64-clang-x86_64-libxml2
+            mingw-w64-clang-x86_64-make
+            mingw-w64-clang-x86_64-nsis
+            mingw-w64-clang-x86_64-nlohmann-json
+            mingw-w64-clang-x86_64-openblas
+            mingw-w64-clang-x86_64-opencv
+            mingw-w64-clang-x86_64-opencv
+            mingw-w64-clang-x86_64-pango
+            mingw-w64-clang-x86_64-portaudio
+            mingw-w64-clang-x86_64-portmidi
+            mingw-w64-clang-x86_64-SDL2
+            mingw-w64-clang-x86_64-spdlog
+            mingw-w64-clang-x86_64-winpthreads-git
+            mingw-w64-clang-x86_64-libwebp
 
-      - name: Install FFmpeg 7 (pinned)
+      - name: Install FFmpeg 8 (pinned)
         shell: msys2 {0}
         run: |
-          curl -LO https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-ffmpeg-7.1.1-7-any.pkg.tar.zst
-          pacman -U --noconfirm mingw-w64-x86_64-ffmpeg-7.1.1-7-any.pkg.tar.zst
+          curl -LO https://repo.msys2.org/mingw/clang64/mingw-w64-clang-x86_64-ffmpeg-8.1.2-2-any.pkg.tar.zst
+          pacman -U --noconfirm mingw-w64-clang-x86_64-ffmpeg-8.1.2-2-any.pkg.tar.zst
 
       - name: Run cmake to configure the project and build it
         env:
@@ -179,10 +179,10 @@ jobs:
           mkdir build
           for f in $(ls -Q ./lang/*.po); do mkdir -pv "./build/lang/$(basename $f | cut -d. -f1)/LC_MESSAGES";done
           cd build
-          "${{ env.workpath }}/msys64/mingw64/bin/cmake.exe" -G "MinGW Makefiles" .. -DCMAKE_BUILD_TYPE="RelWithDebInfo" -DSELF_BUILT_AUBIO=ALWAYS -DSELF_BUILT_CED=ALWAYS -DENABLE_WEBSERVER=OFF \
+          "${{ env.workpath }}/msys64/clang64/bin/cmake.exe" -G "MinGW Makefiles" .. -DCMAKE_BUILD_TYPE="RelWithDebInfo" -DSELF_BUILT_AUBIO=ALWAYS -DSELF_BUILT_CED=ALWAYS -DENABLE_WEBSERVER=OFF \
           -DPERFORMOUS_VERSION=${{ env.PERFORMOUS_VERSION }} -DBUILD_TESTS=ON \
-          -DCMAKE_VERBOSE_MAKEFILE=ON -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64"
-          "${{ env.workpath }}/msys64/mingw64/bin/cmake.exe" --build ./ --verbose --parallel 3
+          -DCMAKE_VERBOSE_MAKEFILE=ON -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/clang64"
+          "${{ env.workpath }}/msys64/clang64/bin/cmake.exe" --build ./ --verbose --parallel 3
       - name: Run unittests directly called.
         shell: msys2 {0}
         run: |
@@ -192,15 +192,15 @@ jobs:
         shell: msys2 {0}
         run: |
           cd "${{ env.workpath }}/performous/build"
-          "${{ env.workpath }}/msys64/mingw64/bin/mingw32-make.exe" test
+          "${{ env.workpath }}/msys64/clang64/bin/mingw32-make.exe" test
       - name: Create Installer
         id: package_performous_x64
         shell: msys2 {0}
         run: |
           cd "${{ env.workpath }}/performous/build"
-          "${{ env.workpath }}/msys64/mingw64/bin/cpack.exe" -G NSIS64 -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/mingw64" -DCPACK_NSIS_EXECUTABLE="${{ env.workpath }}/msys64/mingw64/bin/makensis.exe" -DCMAKE_BUILD_TYPE="RelWithDebInfo" --verbose
-          MASTER_ARTIFACT_FILENAME="Performous-master[${{ inputs.package_complete_version }}]-mingw-w64.exe"
-          ARTIFACT_FILENAME="Performous-${{ inputs.package_complete_version }}-mingw-w64.exe"
+          "${{ env.workpath }}/msys64/clang64/bin/cpack.exe" -G NSIS64 -DCPACK_MINGW_SYSTEM_PREFIX="${{ env.workpath }}/msys64/clang64" -DCPACK_NSIS_EXECUTABLE="${{ env.workpath }}/msys64/clang64/bin/makensis.exe" -DCMAKE_BUILD_TYPE="RelWithDebInfo" --verbose
+          MASTER_ARTIFACT_FILENAME="Performous-master[${{ inputs.package_complete_version }}]-msys-w64.exe"
+          ARTIFACT_FILENAME="Performous-${{ inputs.package_complete_version }}-msys-w64.exe"
           powershell -command "Copy-Item \$(Get-ChildItem -Filter '*win64.exe').Name '${MASTER_ARTIFACT_FILENAME}'"
           powershell -command "Rename-Item \$(Get-ChildItem -Filter '*win64.exe').Name -NewName '${ARTIFACT_FILENAME}'"
           powershell -command "echo ('ARTIFACT_PATH=${{ env.workpath }}/performous/build/${ARTIFACT_FILENAME}') >> \$env:GITHUB_ENV"
