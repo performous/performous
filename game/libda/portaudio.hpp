@@ -22,19 +22,20 @@
 
 #define PORTAUDIO_CHECKED(func, args) portaudio::internal::check(func args, #func)
 
+namespace portaudio {
+
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
-const PaHostApiTypeId V1337 = PaHostApiTypeId(1337);
+	inline const PaHostApiTypeId AutoBackendType = PaHostApiTypeId(1337);
 #pragma GCC diagnostic pop
 #else
 #pragma warning(push)
 #pragma warning(disable: 4244)  // C4244  "possible loss of data"
-const PaHostApiTypeId V1337 = PaHostApiTypeId(1337);
+	inline const PaHostApiTypeId AutoBackendType = PaHostApiTypeId(1337);
 #pragma warning(pop)
 #endif
 
-namespace portaudio {
 	class Error: public std::runtime_error {
 	public:
 		Error(PaError code_, char const* func_):
@@ -78,13 +79,12 @@ namespace portaudio {
 	typedef std::vector<DeviceInfo> DeviceInfos;
 	struct AudioDevices {
 		static int count() { return Pa_GetDeviceCount(); }
-		static const PaHostApiTypeId AutoBackendType {V1337};
 		static PaHostApiTypeId defaultBackEnd() {
 			return PaHostApiTypeId(Platform::defaultBackEnd());
 		}
 		/// Constructor gets the PA devices into a vector
-		AudioDevices(PaHostApiTypeId backend = AutoBackendType) {
-			PaHostApiIndex backendIndex = Pa_HostApiTypeIdToHostApiIndex((backend == AutoBackendType ? defaultBackEnd() : backend));
+		AudioDevices(PaHostApiTypeId backend = portaudio::AutoBackendType) {
+			PaHostApiIndex backendIndex = Pa_HostApiTypeIdToHostApiIndex((backend == portaudio::AutoBackendType ? defaultBackEnd() : backend));
 			if (backendIndex == paHostApiNotFound) backendIndex = Pa_HostApiTypeIdToHostApiIndex(defaultBackEnd());
 			for (int i = 0, end = Pa_GetHostApiInfo(backendIndex)->deviceCount; i != end; ++i) {
 				PaDeviceInfo const* info = Pa_GetDeviceInfo(Pa_HostApiDeviceIndexToDeviceIndex(backendIndex, i));

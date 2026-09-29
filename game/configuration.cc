@@ -183,21 +183,20 @@ namespace {
 		if (item.getName() != "audio/backend")
 			throw std::logic_error("getValue_audio_backend: item must be 'audio/backend' but is '" + item.getName() + "'");
 
-		int AutoBackendType = 1337;
 		static int val = std::get<unsigned short>(item.value());
 		if (val != std::get<unsigned short>(item.value()))
 			val = PaHostApiNameToHostApiTypeId(item.getEnumName()); // In the case of the audio backend, val is the real value while m_value is the enum case for its cosmetic name.
 		int hostApi = Pa_HostApiTypeIdToHostApiIndex(PaHostApiTypeId(val));
 		std::string bendInfo{"Trying the selected Portaudio backend..."};
-		if (val != AutoBackendType) {
+		if (val != portaudio::AutoBackendType) {
 			fmt::format_to(std::back_inserter(bendInfo), " found at index: {}", hostApi);
 		}
 		else {
 			bendInfo.append(" not found; but this is normal if 'Auto' is selected."); // Auto is not a real PaHostApiTypeId, so it will always return paHostApiNotFound
 		}
 		SpdLogger::info(LogSystem::AUDIO, bendInfo);
-		if ((hostApi != paHostApiNotFound) || (val == AutoBackendType)) {
-			std::string backendName = (val != AutoBackendType) ? Pa_GetHostApiInfo(hostApi)->name : "Auto";
+		if ((hostApi != paHostApiNotFound) || (val == portaudio::AutoBackendType)) {
+			std::string backendName = (val != portaudio::AutoBackendType) ? Pa_GetHostApiInfo(hostApi)->name : "Auto";
 			SpdLogger::info(LogSystem::AUDIO, "Currently selected audio backend is: {}", backendName);
 			return backendName;
 		}
