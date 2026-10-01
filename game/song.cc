@@ -107,6 +107,7 @@ Song::Song()
 
 void Song::reload(bool errorIgnore) {
 	try {
+		*this = Song(path, filename);
 		SongParserFactory().create(*this)->parse(*this);
 		collateUpdate();
 	} catch (...) {
