@@ -27,10 +27,10 @@ template <typename T> constexpr bool almostEqual(T lhs, T rhs) {
 	);
 	T tolerance;
 	if (sizeof(lhs) == 4) {
-		tolerance = 0.0000001f;
+		tolerance = 0.00000012f;
 	}
 	else {
-		tolerance = 0.0000000000000002;
+		tolerance = 0.00000000000000023;
 	}
 	const T largest = std::max(std::abs(lhs),std::abs(rhs));
 	return (std::abs(lhs-rhs) < tolerance * largest || tolerance > largest);
