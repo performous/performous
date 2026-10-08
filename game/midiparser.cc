@@ -128,7 +128,7 @@ void MidiParser::parseNotes(Song& song) {
 					double end = midi.get_seconds(note.end) + song.start;
 					if (end == 0) continue; // Note with no ending
 					if (beg > end) { // Reversed note
-						if (!almostEqual(beg, end)) { reversedNoteCount++; continue; }
+						if (!almostEqual(beg, end, 0.001)) { reversedNoteCount++; continue; }
 						else end = beg; // Allow 1ms error to counter rounding etc errors
 					}
 					dur.push_back(Duration(beg, end));
