@@ -27,6 +27,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <cmath>
+#include <thread>
 #include <utility>
 
 namespace {
@@ -491,9 +492,19 @@ void ScreenSing::manageEvent(SDL_Event event) {
 			for (unsigned i = 0; i < m_layout_singer.size(); ++i)
 				m_layout_singer[i]->reset();
 		// Reload current song
-		if (key == SDL_SCANCODE_R) {
-			exit(); m_song->reload(); enter();
-			m_audio.seek(time);
+		if (key == SDL_SCANCODE_R && event.key.keysym.mod & KMOD_SHIFT) {
+			exit();
+			m_song->reload();
+			enter();
+			m_audio.pause();
+			std::this_thread::sleep_for(500ms);
+			m_audio.seekPos(time);
+		}
+		// Just restart
+		else if (key == SDL_SCANCODE_R) {
+			exit();
+			m_song->reload();
+			enter();
 		}
 	}
 }
