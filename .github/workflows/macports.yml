@@ -165,8 +165,9 @@ jobs:
         with:
           # Due to a very long-standing bug in cache, excluding only works if all specified paths have the same depth.
           path: |
-            /opt/local/
+            /opt/local/*/*
             /Applications/MacPorts/
+            !/opt/local/etc/macports
           key: '${{ steps.cache-key.outputs.computed_cache_key }}'
 
       - name: Unlink Homebrew
@@ -197,8 +198,8 @@ jobs:
             sudo portindex /opt/custom_portfiles
           fi
 
-          echo buildfromsource ifneeded | tee -a /opt/local/etc/macports/macports.conf
-          echo keeplogs yes | tee -a /opt/local/etc/macports/macports.conf
+          echo buildfromsource ifneeded | sudo tee -a /opt/local/etc/macports/macports.conf
+          echo keeplogs yes | sudo tee -a /opt/local/etc/macports/macports.conf
           sudo port install -s icu gettext-runtime
 
           set +x
@@ -214,16 +215,19 @@ jobs:
             cargo \
             cctools \
             clang-18 \
+            cmake \
+            coreutils \
             libgcc \
             gcc15 \
             gcc15-libcxx \
-            cmake \
             docbook-xml \
             docbook-xsl-nons \
             flex \
             gi-docgen \
             git \
             gmake \
+            gnutar \
+            gnutls \
             gperf \
             gtk-doc \
             itstool \
@@ -275,15 +279,15 @@ jobs:
           sudo port -v uninstall gcc* clang* llvm* || true
           sudo port clean --all installed
 
-          # Deactivate everything but zstd before caching, in order to reduce the cache size. It's easier to do it like this than actually manually excluding zstd and its dependencies.
+          # Deactivate everything but gnutar and zstd before caching, in order to reduce the cache size. It's easier to do it like this than actually manually excluding zstd and its dependencies.
           sudo port -N rev-upgrade
 
-          # Try to prevent inactive depenndencies
+          # Try to prevent inactive dependencies
           sudo port -N activate active boost.version=${{ inputs.boost_version }}
-
+          sudo port setrequested gnutar
           sudo port -N uninstall leaves || true
           sudo port deactivate -f installed
-          sudo port activate -f zstd boost.version=${{ inputs.boost_version }}
+          sudo port activate -f gnutar zstd boost.version=${{ inputs.boost_version }}
           # Remove broken symlinks
           # sudo find -L /opt/local -type d -path /opt/local/var/macports/software -prune -o -type l -exec ls -l {} \; -exec rm -fv {} \;
           # Delete these folders, as we don't want the cache restore overwriting them.
@@ -314,8 +318,9 @@ jobs:
           refresh-cache: true
           # Due to a very long-standing bug in cache, excluding only works if all specified paths have the same depth.
           path: |
-            /opt/local/
+            /opt/local/*/*
             /Applications/MacPorts/
+            !/opt/local/etc/macports
           key: '${{ steps.cache-key.outputs.computed_cache_key }}'
 
       - name: Build package
