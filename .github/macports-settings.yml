@@ -5,10 +5,11 @@ variants:
     - clang18
     - gfortran
     - ffmpeg7
-    - python313
+    - python314
     - quartz
   deselect:
-    - python314
+    - python313
+    - python315
     - x11
     - universal
     - dbus

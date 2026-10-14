@@ -25,7 +25,7 @@ on:
         description: 'Oldest GitHub-hosted Intel macOS runner currently available, used for the intel_target build.'
         required: false
         type: string
-        default: "macos-15-intel"
+        default: "macos-26-intel"
       arm_target:
         description: 'Newest macOS deployment target to verify against (runs natively on max_runner_arm/max_runner_intel).'
         required: false
@@ -206,7 +206,65 @@ jobs:
           sudo rm -rvf /opt/local/var/macports/build
 
 
-          try_binary_first autoconf autoconf-archive automake bison cargo cctools clang-18 libgcc gcc15 gcc15-libcxx cmake docbook-xml docbook-xsl-nons flex gi-docgen git gmake gperf gtk-doc itstool meson mm-common nasm ninja p7zip perl5 pkgconfig py313-docutils py313-build py313-cython py313-installer py313-wheel python313 rust texinfo unzip vim websocketpp xmlto yasm boost.version=${{ inputs.boost_version }}
+          try_binary_first \
+            autoconf \
+            autoconf-archive \
+            automake \
+            bison \
+            cargo \
+            cctools \
+            clang-18 \
+            libgcc \
+            gcc15 \
+            gcc15-libcxx \
+            cmake \
+            docbook-xml \
+            docbook-xsl-nons \
+            flex \
+            gi-docgen \
+            git \
+            gmake \
+            gperf \
+            gtk-doc \
+            itstool \
+            meson \
+            mm-common \
+            nasm \
+            ninja \
+            p7zip \
+            perl5 \
+            pkgconfig \
+            python314 \
+            py314-anytree \
+            py314-build \
+            py314-cython \
+            py314-docutils \
+            py314-flit_core \
+            py314-installer \
+            py314-jinja2 \
+            py314-libxml2 \
+            py314-lxml \
+            py314-mako \
+            py314-markdown \
+            py314-markupsafe \
+            py314-meson \
+            py314-packaging \
+            py314-pygments \
+            py314-pyproject_hooks \
+            py314-roman \
+            py314-setuptools \
+            py314-smartypants \
+            py314-toml \
+            py314-typogrify \
+            py314-wheel \
+            rust \
+            texinfo \
+            unzip \
+            vim \
+            websocketpp \
+            xmlto \
+            yasm \
+            boost.version=${{ inputs.boost_version }}
 
           set -x
           sudo port -s install ${MACOS_DEPS} boost.version=${{ inputs.boost_version }}
@@ -244,7 +302,6 @@ jobs:
 
       - name: Clear extended attributes & fix weird permissions.
         run: |
-          # Fix weird permissions that break caching.
           sudo find /opt/local/var -type d -a -perm 700 -ls -exec chmod 755 {} \;
           sudo find /opt/local \( -not -perm -400 -exec chmod -v u+r {} \; -not -perm -004 -exec chmod -v o+r {} \; \) -ls
           sudo xattr -c -rsv /opt/local
