@@ -323,10 +323,14 @@ jobs:
             !/opt/local/etc/macports
           key: '${{ steps.cache-key.outputs.computed_cache_key }}'
 
+      - name: Verify installed dependencies
+        run: |
+          sudo port activate -f installed boost.version=${{ inputs.boost_version }}
+          sudo port -v contents ${MACOS_DEPS}
+
       - name: Build package
         id: build_package
         run: |
-          sudo port activate -f installed boost.version=${{ inputs.boost_version }}
           cd performous/osx-utils
           chmod +x ./macos-bundler.py
           python3 -m venv ./bundler-venv
