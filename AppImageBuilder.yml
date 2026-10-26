@@ -15,9 +15,9 @@ AppDir:
     arch: amd64
     allow_unauthenticated: true
     sources:
-      - sourceline: deb http://archive.ubuntu.com/ubuntu/ noble main restricted universe multiverse
-        key_url: 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920d1991bc93c'
-      - sourceline: deb http://archive.ubuntu.com/ubuntu/ noble-updates main restricted universe multiverse
+      - sourceline: 'deb [arch=amd64] https://archive.ubuntu.com/ubuntu/ noble main restricted universe multiverse'
+      - sourceline: 'deb [arch=amd64] https://archive.ubuntu.com/ubuntu/ noble-updates main restricted universe multiverse'
+        key_url: 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920d1991bc93c'
     include:
       ## All of these dependencies can be found by downloading the Performous
       ## package for Ubuntu 22.04 and doing a dpkg -I on it
