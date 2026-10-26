@@ -23,11 +23,11 @@ jobs:
       - name: Install the AppImage bundler and Performous deps
         id: fetch_deps
         run: |
-          wget -O appimage-builder-x86_64.AppImage.tar https://github.com/Lord-Kamina/appimage-builder/releases/download/continuous/appimage-builder_x86_64-AppImage.tar
+          wget -O appimage-builder-x86_64.AppImage.tar https://github.com/Lord-Kamina/appimage-builder/releases/download/continuous/appimage-builder_x86_64-AppImage-DEBUG.tar
           tar xvf appimage-builder-x86_64.AppImage.tar --transform='s/.*\///'
-          mv appimage-builder-*-x86_64.AppImage appimage-builder-x86_64.AppImage
-          chmod +x appimage-builder-x86_64.AppImage
-          sudo mv appimage-builder-x86_64.AppImage /usr/local/bin/appimage-builder
+          mv appimage-builder-*-x86_64*.AppImage appimage-builder
+          chmod +x appimage-builder
+          sudo mv -fv appimage-builder /usr/local/bin/
           sudo apt update
           sudo apt-get install -y --no-install-recommends git cmake build-essential gettext help2man libopenblas-dev libfftw3-dev libicu-dev libepoxy-dev libsdl2-dev libfreetype6-dev libpango1.0-dev librsvg2-dev libxml++2.6-dev libavcodec-dev libavformat-dev libswscale-dev libjpeg-dev portaudio19-dev libglm-dev libboost-iostreams-dev libboost-locale-dev libboost-system-dev libboost-program-options-dev libssl-dev libcpprest-dev libgtest-dev libgmock-dev google-mock libportmidi-dev libopencv-dev libaubio-dev nlohmann-json3-dev libfmt-dev libfuse2 libspdlog-dev libwebp-dev
 
@@ -63,7 +63,7 @@ jobs:
           # Pull in our common build functions
           . .github/workflows/build_functions.sh
           export PERFORMOUS_PACKAGE_VERSION=${{ inputs.package_complete_version }}
-          appimage-builder --recipe AppImageBuilder.yml --skip-test
+          appimage-builder --log DEBUG --recipe AppImageBuilder.yml --skip-test
           # Provided by the common build functions
           package_name "$(pwd)" "*.AppImage" "${PERFORMOUS_PACKAGE_VERSION}"
 
