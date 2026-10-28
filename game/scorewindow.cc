@@ -20,7 +20,8 @@ ScoreWindow::ScoreWindow(Game& game, Instruments& instruments, Database& databas
 	// Singers
 	m_database.cur.remove_if([](Player const& p){ return p.getScore() < 500; }); // Dead.
 	for (Player const& p: m_database.cur) {
-		m_database.scores.emplace_back(p.getScore(), input::DevType::VOCALS, "Vocals", "vocals", Color(p.m_color.r, p.m_color.g, p.m_color.b));
+		ScoreItem& item = m_database.scores.emplace_back(p.getScore(), input::DevType::VOCALS, "Vocals", "vocals", Color(p.m_color.r, p.m_color.g, p.m_color.b));
+		item.player_id = p.getId();
 	}
 
 	// Instruments
@@ -36,7 +37,8 @@ ScoreWindow::ScoreWindow(Game& game, Instruments& instruments, Database& databas
 		else if (track_simple == TrackName::BASS)
 			color = Color(0.5f, 0.3f, 0.1f);
 
-		m_database.scores.emplace_back(i->getScore(), type, track, track_simple, color);
+		ScoreItem& item = m_database.scores.emplace_back(i->getScore(), type, track, track_simple, color);
+		item.player_id = track_simple; // probably not totally unique, but at least lets us discern some players by their favorite instrument
 	}
 
 	if (m_database.scores.empty())
