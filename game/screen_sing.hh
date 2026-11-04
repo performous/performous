@@ -95,5 +95,6 @@ class ScreenSing: public Screen {
 	unsigned m_selectedVocal;
 	bool m_displayAutoPlay = false;
 	bool keyPressed = false;
+	bool m_exitFadingOut = false; ///< Music is fading out before leaving the score window
 };
 
