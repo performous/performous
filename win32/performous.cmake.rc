@@ -31,3 +31,6 @@ BEGIN
     VALUE "Translation", 0x409, 1200
   END
 END
+
+// Application manifest (UTF-8 code page). Only set for MinGW builds; MSVC merges the manifest at link time.
+@PERFORMOUS_RC_MANIFEST@
