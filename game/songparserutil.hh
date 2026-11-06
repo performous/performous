@@ -14,9 +14,9 @@ namespace SongParserUtil {
 	/// Parse an unsigned int from string and assign it to a variable
 	void assign(unsigned& var, std::string const& str);
 	/// Parse a double from string and assign it to a variable
-	void assign(double& var, std::string str);
+	void assign(double& var, std::string const& str);
 	/// Parse a float from string and assign it to a variable
-	void assign(float& var, std::string str);
+	void assign(float& var, std::string const& str);
 	/// Parse a boolean from string and assign it to a variable
 	void assign(bool& var, std::string const& str);
 	/// Erase last character if it matches
