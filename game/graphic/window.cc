@@ -261,6 +261,10 @@ void Window::createShaders() {
 	  .bindUniformBlocks();
 
 	updateColor();
+	// core.frag recolours any texel matching origFill/origStroke. Until LyricColorTrans sets real lyric
+	// colours, use a value no texel can match, so nothing is recoloured (issue #723).
+	glmath::vec4 const noRecolour(-1.0f);
+	updateLyricHighlight(noRecolour, noRecolour, noRecolour, noRecolour);
 	view(0);  // For loading screens
 }
 
@@ -278,6 +282,10 @@ void Window::initBuffers() {
 	glBindVertexArray(Window::m_vao);
 	glGenBuffers(1, &Window::m_vbo); // Create VBO.
 	glGenBuffers(1, &Window::m_ubo); // Create UBO.
+	// Allocate the UBO storage once, for all uniform blocks. Its initial contents are undefined;
+	// createShaders() writes defaults into any block that is not otherwise written before use.
+	glBindBuffer(GL_UNIFORM_BUFFER, Window::m_ubo);
+	glBufferData(GL_UNIFORM_BUFFER, glutil::danceNoteUniforms::offset() + glutil::danceNoteUniforms::size(), nullptr, GL_DYNAMIC_DRAW);
 
 	GLsizei stride = glutil::VertexArray::stride();
 	glBindBuffer(GL_ARRAY_BUFFER, Window::m_vbo);
