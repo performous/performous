@@ -307,3 +307,33 @@ TEST(UnitTest_Utils, isText_utf8_euro_border_2) {
     EXPECT_TRUE(isText("euro sign: " + euro_utf8, 13));
 }
 
+
+namespace {
+	struct CommaDecimalPoint : std::numpunct<char> {
+		char do_decimal_point() const override { return ','; }
+	};
+}
+
+TEST(UnitTest_Utils, sconv_float) {
+	EXPECT_FLOAT_EQ(0.1f, sconv<float>("0.1"));
+	EXPECT_FLOAT_EQ(1.5f, sconv<float>("1.500000"));
+	EXPECT_DOUBLE_EQ(-2.25, sconv<double>("-2.25"));
+}
+
+TEST(UnitTest_Utils, sconv_float_accepts_comma_as_decimal_separator) {
+	EXPECT_FLOAT_EQ(1.5f, sconv<float>("1,500000"));
+	EXPECT_DOUBLE_EQ(120.5, sconv<double>("120,5"));
+}
+
+TEST(UnitTest_Utils, sconv_float_invalid_throws) {
+	EXPECT_THROW(sconv<float>(""), std::invalid_argument);
+	EXPECT_THROW(sconv<float>("abc"), std::invalid_argument);
+	EXPECT_THROW(sconv<double>("nan"), std::invalid_argument);
+}
+
+TEST(UnitTest_Utils, sconv_float_ignores_global_locale) {
+	auto const previous = std::locale::global(std::locale(std::locale::classic(), new CommaDecimalPoint));
+	EXPECT_FLOAT_EQ(0.1f, sconv<float>("0.1"));
+	EXPECT_DOUBLE_EQ(1.5, sconv<double>("1.5"));
+	std::locale::global(previous);
+}
