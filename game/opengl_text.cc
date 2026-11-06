@@ -8,12 +8,14 @@
 #include "fontconfig/fontconfig.h"
 #include "libxml++.hh"
 #include "log.hh"
+#include "util.hh"
 
 #include <pango/pangocairo.h>
 
 #include <cstdint>
 #include <cmath>
 #include <iostream>
+#include <locale>
 #include <sstream>
 
 void loadFonts() {
@@ -83,12 +85,12 @@ namespace {
 		auto n = dom.get_document()->get_root_node()->find("/svg:svg/@width",nsmap);
 		if (n.empty()) throw std::runtime_error("Unable to find text theme info width in "+themeFile.string());
 		xmlpp::Attribute& width = dynamic_cast<xmlpp::Attribute&>(*n[0]);
-		_width = std::stof(width.get_value());
+		_width = sconv<float>(width.get_value());
 		// Parse height attribute
 		n = dom.get_document()->get_root_node()->find("/svg:svg/@height",nsmap);
 		if (n.empty()) throw std::runtime_error("Unable to find text theme info height in "+themeFile.string());
 		xmlpp::Attribute& height = dynamic_cast<xmlpp::Attribute&>(*n[0]);
-		_height = std::stof(height.get_value());
+		_height = sconv<float>(height.get_value());
 		// Parse text style attribute (CSS rules)
 		n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@style",nsmap);
 		if (n.empty()) throw std::runtime_error("Unable to find text theme info style in "+themeFile.string());
@@ -97,6 +99,7 @@ namespace {
 		std::string token;
 		while (std::getline(iss, token, ';')) {
 			std::istringstream iss2(token);
+			iss2.imbue(std::locale::classic());  // SVG numbers always use '.' as decimal separator
 			std::getline(iss2, token, ':');
 			if (token == "font-size") {
 				// Parse as int because https://llvm.org/bugs/show_bug.cgi?id=17782
@@ -128,11 +131,11 @@ namespace {
 		n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@x",nsmap);
 		if (n.empty()) throw std::runtime_error("Unable to find text theme info x in "+themeFile.string());
 		xmlpp::Attribute& x = dynamic_cast<xmlpp::Attribute&>(*n[0]);
-		_x = std::stof(x.get_value());
+		_x = sconv<float>(x.get_value());
 		n = dom.get_document()->get_root_node()->find("/svg:svg//svg:text/@y",nsmap);
 		if (n.empty()) throw std::runtime_error("Unable to find text theme info y in "+themeFile.string());
 		xmlpp::Attribute& y = dynamic_cast<xmlpp::Attribute&>(*n[0]);
-		_y = std::stof(y.get_value());
+		_y = sconv<float>(y.get_value());
 	}
 }
 
