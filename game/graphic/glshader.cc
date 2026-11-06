@@ -58,8 +58,8 @@ void Shader::dumpInfoLog(GLuint id) {
 void Shader::bindUniformBlocks() {
 	glUseProgram(program);
 	glBindBuffer(GL_UNIFORM_BUFFER,Window::UBO());
-	GLint64 bufferSize = glutil::danceNoteUniforms::offset() + glutil::danceNoteUniforms::size();
-	glBufferData(GL_UNIFORM_BUFFER, bufferSize, NULL, GL_DYNAMIC_DRAW);
+	// The UBO is allocated once in Window::initBuffers(). Re-allocating it here (once per shader) would
+	// discard its contents, leaving blocks such as lyricColors undefined (issue #723).
 	for (std::pair<std::string, unsigned int> const& uniformBlock: Shader::m_uniformblocks) {
 			GLuint blockIndex = glGetUniformBlockIndex(program, uniformBlock.first.c_str());
 			if (blockIndex != GL_INVALID_INDEX) {
