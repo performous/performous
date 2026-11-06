@@ -30,18 +30,16 @@ namespace SongParserUtil {
 			throw std::runtime_error ("\"" + str + "\" is not valid unsigned integer value");
 		}
 	}
-	void assign (float& var, std::string str) {
-		std::replace (str.begin(), str.end(), ',', '.');  // Fix decimal separators
+	void assign (float& var, std::string const& str) {
 		try {
-			var = std::stof (str);
+			var = sconv<float>(str);  // Locale-independent, accepts ',' as decimal separator
 		} catch (...) {
 			throw std::runtime_error ("\"" + str + "\" is not valid floating point value");
 		}
 	}
-	void assign (double& var, std::string str) {
-		std::replace (str.begin(), str.end(), ',', '.');  // Fix decimal separators
+	void assign (double& var, std::string const& str) {
 		try {
-			var = std::stod (str);
+			var = sconv<double>(str);  // Locale-independent, accepts ',' as decimal separator
 		} catch (...) {
 			throw std::runtime_error ("\"" + str + "\" is not valid floating point value");
 		}
