@@ -9,12 +9,26 @@
 #include <sstream>
 #include <stdexcept>
 
+namespace {
+	/** Locale-independent floating point parsing.
+	 *  std::stof/std::stod follow the C locale, which on e.g. a Dutch Windows uses ',' as decimal separator
+	 *  and would silently parse "0.1" as 0. A ',' in the input is accepted as decimal separator too. **/
+	template <typename T> T parseFloatingPoint(std::string s) {
+		std::replace(s.begin(), s.end(), ',', '.');
+		std::istringstream iss(s);
+		iss.imbue(std::locale::classic());
+		T value{};
+		if (!(iss >> value)) throw std::invalid_argument("Invalid floating point value '" + s + "'");
+		return value;
+	}
+}
+
 // Only conversion types used in Performous are provided
 template <> int sconv(std::string const& s) { return std::stoi(s); }
 template <> unsigned short sconv(std::string const& s) { return static_cast<unsigned short>(std::stoi(s)); }
 template <> unsigned sconv(std::string const& s) { return stou(s); }
-template <> float sconv(std::string const& s) { return std::stof(s); }
-template <> double sconv(std::string const& s) { return std::stod(s); }
+template <> float sconv(std::string const& s) { return parseFloatingPoint<float>(s); }
+template <> double sconv(std::string const& s) { return parseFloatingPoint<double>(s); }
 template <> std::string sconv(std::string const& s) { return s; }
 
 /** Converts a std::string into an unsigned int. **/
