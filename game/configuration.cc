@@ -15,6 +15,7 @@
 #include <cmath>
 #include <future>
 #include <iomanip>
+#include <limits>
 #include <map>
 #include <stdexcept>
 #include <string>
@@ -141,7 +142,20 @@ void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, unsigne
 		}
 		else if (item.getType() == "float") {
 			std::string value_string = xmlpp::getAttribute(elem, "value");
-			if (!value_string.empty()) item.setValue(std::stof(value_string));
+			if (!value_string.empty()) {
+				float value = std::numeric_limits<float>::quiet_NaN();
+				try {
+					value = sconv<float>(value_string);
+				}
+				catch (std::exception&) {
+				}
+				if (std::isfinite(value))
+					item.setValue(value);
+				else if (mode == 0)
+					throw std::runtime_error("Invalid float value '" + value_string + "'");
+				else
+					SpdLogger::warn(LogSystem::CONFIG, "Ignoring invalid value='{}' for entry={}.", value_string, xmlpp::getAttribute(elem, "name"));
+			}
 			updateNumeric<float>(item, elem, mode);
 		}
 		else if (item.getType() == "string") {
@@ -260,7 +274,7 @@ void writeConfig(Game& game, bool system) {
 		else if (type == "int") entryNode->set_attribute("value", std::to_string(item.i()));
 		else if (type == "uint") entryNode->set_attribute("value",std::to_string(item.ui()));
 		else if (type == "bool") entryNode->set_attribute("value", item.b() ? "true" : "false");
-		else if (type == "float") entryNode->set_attribute("value", std::to_string(item.f()));
+		else if (type == "float") entryNode->set_attribute("value", fmt::format("{:f}", item.f()));  // fmt is locale-independent, std::to_string is not
 		else if (type == "string") xmlpp::add_child_element(entryNode, "stringvalue")->add_child_text(item.s());
 		else if (type == "string_list") {
 			for (auto const& str : item.sl()) {
