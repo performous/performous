@@ -34,7 +34,7 @@ public:
 	/// swaps two songs
 	void swap (unsigned index1, unsigned index2);
 	/// sets limit to the max amount of songs
-	void setLimit(unsigned int limit) { m_limit = limit; };
+	void setLimit(unsigned limit);
 	/// Moves a song from an index to another index.
 	void move(unsigned fromIndex, unsigned toIndex);
 	/// gets a specific song and removes it from the queue

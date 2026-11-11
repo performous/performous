@@ -38,3 +38,5 @@ class Screen {
 	Game &m_game;
 	std::string m_name;
 };
+
+enum class StartupScreen : unsigned { SCREEN_INTRO = 0, SCREEN_SONGS = 1, SCREEN_SING = 2}; // can't use just SING due to a macro collision.

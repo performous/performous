@@ -4,7 +4,7 @@
 #include <random>
 
 bool PlayList::addSong(std::shared_ptr<Song> song) {
-	if(m_limit == 0 || m_limit >= m_list.size() + 1) {
+	if (m_limit == 0 || m_limit > m_list.size()) {
 		std::lock_guard<std::mutex> l(m_mutex);
 		m_list.push_back(song);
 		return true;
@@ -53,6 +53,11 @@ void PlayList::swap(unsigned index1, unsigned index2) {
 	m_list[index1] = m_list[index2];
 	m_list[index2] = song1;
 }
+
+void PlayList::setLimit(unsigned limit) {
+	m_limit = limit;
+}
+
 void PlayList::move(unsigned fromIndex, unsigned toIndex)
 {
 	std::lock_guard<std::mutex> l(m_mutex);
