@@ -16,11 +16,26 @@ on:
 jobs:
   # Create the Windows installer
   Windows_MSVC_Packages:
-    name: Create Windows installer with MSVC
-    runs-on: windows-latest
+    name: Create Windows installer with MSVC (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
     defaults:
       run:
         shell: powershell
+    strategy:
+      matrix:
+        include:
+          - arch: x64
+            runner: windows-latest
+            triplet: x64-windows-release
+            cache-key: win64-vcpkg
+            preset: windows-x64-debinfo
+            artifact-suffix: msvc
+          - arch: arm64
+            runner: windows-11-arm
+            triplet: arm64-windows-release
+            cache-key: win-arm64-vcpkg
+            preset: windows-arm64-debinfo
+            artifact-suffix: msvc-arm64
     steps:
       - name: Checkout Git
         id: checkout_git
@@ -39,9 +54,9 @@ jobs:
         uses: Lord-Kamina/vcpkg-action@update_cache
         with:
           pkgs: "\"aubio[core,tools]\" \"boost-algorithm[core]\" \"boost-align[core]\" \"boost-any[core]\" \"boost-array[core]\" \"boost-assert[core]\" \"boost-asio\" \"boost-atomic[core]\" \"boost-bind[core]\" \"boost-build[core]\" \"boost-chrono[core]\" \"boost-concept-check[core]\" \"boost-config[core]\" \"boost-container[core]\" \"boost-container-hash[core]\" \"boost-conversion[core]\" \"boost-core[core]\" \"boost-date-time[core]\" \"boost-detail[core]\" \"boost-dynamic-bitset[core]\" \"boost-exception[core]\" \"boost-function[core]\" \"boost-function-types[core]\" \"boost-fusion[core]\" \"boost-integer[core]\" \"boost-intrusive[core]\" \"boost-io[core]\" \"boost-iostreams[bzip2,core,lzma,zlib,zstd]\" \"boost-iterator[core]\" \"boost-lexical-cast[core]\" \"boost-locale[core]\" \"boost-move[core]\" \"boost-mp11[core]\" \"boost-mpl[core]\" \"boost-numeric-conversion[core]\" \"boost-optional[core]\" \"boost-predef[core]\" \"boost-preprocessor[core]\" \"boost-program-options[core]\" \"boost-random[core]\" \"boost-range[core]\" \"boost-ratio[core]\" \"boost-rational[core]\" \"boost-regex[core]\" \"boost-smart-ptr[core]\" \"boost-static-assert[core]\" \"boost-system[core]\" \"boost-thread[core]\" \"boost-throw-exception[core]\" \"boost-tokenizer[core]\" \"boost-tuple[core]\" \"boost-type-index[core]\" \"boost-type-traits[core]\" \"boost-typeof[core]\" \"boost-uninstall[core]\" \"boost-unordered[core]\" \"boost-utility[core]\" \"boost-variant2[core]\" \"boost-winapi[core]\" \"brotli[core]\" \"bzip2[core,tool]\" \"cairo[core,fontconfig,freetype,gobject]\" \"dirent[core]\" \"expat[core]\" \"ffmpeg[avcodec,avdevice,avfilter,avformat,core,swresample,swscale]\" \"fftw3[core]\" \"fmt[core]\" \"fontconfig[core]\" \"freetype[brotli,bzip2,core,png,zlib]\" \"fribidi[core]\" \"gdk-pixbuf[core]\" \"getopt[core]\" \"getopt-win32[core]\" \"gettext[core,tools]\" \"glib[core]\" \"glibmm[core]\" \"glm[core]\" \"gperf[core]\" \"gtest[core]\" \"harfbuzz[core]\" \"icu[*]\" \"cpprestsdk[brotli,compression,core]\" \"libcroco[core]\" \"libepoxy[core]\" \"libffi[core]\" \"libflac[core]\" \"libiconv[core]\" \"libjpeg-turbo[core]\" \"liblzma[core]\" \"libogg[core]\" \"libpng[core]\" \"librsvg[core]\" \"libsigcpp[core]\" \"libsndfile[core,external-libs,mpeg]\" \"libvorbis[core]\" \"libwebp[core,libwebpmux,nearlossless,simd,unicode]\" \"libxml2[core]\" \"libxmlpp[core]\" \"lzo[core]\" \"mp3lame[core]\" \"mpg123[core]\" \"nlohmann-json[core]\" \"openblas[core]\" \"opencv[core]\" \"opencv4[core,dnn,jpeg,png,quirc,tiff,webp]\" \"openssl[core]\" \"opus[core]\" \"pango[core]\" \"pcre[core]\" \"pcre2[core]\" \"pixman[core]\" \"pkgconf[core]\" \"portaudio[core]\" \"portmidi[core]\" \"protobuf[core]\" \"pthread[core]\" \"pthreads[core]\" \"quirc[core]\" \"sdl2[core]\" \"tiff[core,jpeg,lzma,zip]\"  \"yasm[core,tools]\" \"yasm-tool-helper[core]\" \"zlib[core]\" \"zstd[core]\" \"spdlog[core,fmt]\" \"libwebp[core]\""
-          triplet: x64-windows-release
+          triplet: ${{ matrix.triplet }}
           extra-args: '--clean-after-build --overlay-triplets="${{ github.workspace }}\performous\cmake\triplets"'
-          cache-key: win64-vcpkg
+          cache-key: ${{ matrix.cache-key }}
           debug: true
           # Get the sha from https://github.com/microsoft/vcpkg/releases
           revision: d015e31e90838a4c9dfa3eed45979bc70d9357fc
@@ -57,29 +72,29 @@ jobs:
           set VCPKG_BINARY_SOURCES="files,${{ github.workspace }}\vcpkg_cache,read"
           cd ${{ github.workspace }}/performous
           echo $PERFORMOUS_VERSION
-          cmake --preset "windows-x64-debinfo" -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-release -DVCPKG_OVERLAY_TRIPLETS="${{ github.workspace }}\performous\cmake\triplets"
-          cmake --build --preset "windows-x64-debinfo"
+          cmake --preset "${{ matrix.preset }}" -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} -DVCPKG_OVERLAY_TRIPLETS="${{ github.workspace }}\performous\cmake\triplets"
+          cmake --build --preset "${{ matrix.preset }}"
       - name: Run unittests directly called.
         run: |
-          cd "performous/build/windows-x64-debinfo/testing"
+          cd "performous/build/${{ matrix.preset }}/testing"
           ./performous_test.exe --gtest_filter=UnitTest*
       - name: Run unittests by ctest.
         run: |
-          cd "performous/build/windows-x64-debinfo"
+          cd "performous/build/${{ matrix.preset }}"
           ninja testing/test
       - name: Create Installer
         id: package_performous_x64
         run: |
-          cd performous/build/windows-x64-debinfo
-          cpack -G NSIS64 windows-x64-debinfo
-          $MASTER_ARTIFACT_FILENAME = "Performous-master[${{ inputs.package_complete_version }}]-msvc.exe"
-          $ARTIFACT_FILENAME = "Performous-${{ inputs.package_complete_version }}-msvc.exe"
+          cd performous/build/${{ matrix.preset }}
+          cpack -G NSIS64 ${{ matrix.preset }}
+          $MASTER_ARTIFACT_FILENAME = "Performous-master[${{ inputs.package_complete_version }}]-${{ matrix.artifact-suffix }}.exe"
+          $ARTIFACT_FILENAME = "Performous-${{ inputs.package_complete_version }}-${{ matrix.artifact-suffix }}.exe"
           Copy-Item $(Get-ChildItem -Filter '*win64.exe').Name $MASTER_ARTIFACT_FILENAME
           Rename-Item $(Get-ChildItem -Filter '*win64.exe').Name -NewName $ARTIFACT_FILENAME
           chcp 65001 #set code page to utf-8
-          echo ("ARTIFACT_PATH=${{ github.workspace }}/performous/build/windows-x64-debinfo/$ARTIFACT_FILENAME") >> $env:GITHUB_ENV
+          echo ("ARTIFACT_PATH=${{ github.workspace }}/performous/build/${{ matrix.preset }}/$ARTIFACT_FILENAME") >> $env:GITHUB_ENV
           echo ("ARTIFACT_FILENAME=$ARTIFACT_FILENAME") >> $env:GITHUB_ENV
-          echo ("MASTER_ARTIFACT_PATH=${{ github.workspace }}/performous/build/windows-x64-debinfo/$MASTER_ARTIFACT_FILENAME") >> $env:GITHUB_ENV
+          echo ("MASTER_ARTIFACT_PATH=${{ github.workspace }}/performous/build/${{ matrix.preset }}/$MASTER_ARTIFACT_FILENAME") >> $env:GITHUB_ENV
           echo ("MASTER_ARTIFACT_FILENAME=$MASTER_ARTIFACT_FILENAME") >> $env:GITHUB_ENV
 
       - name: Upload artifacts

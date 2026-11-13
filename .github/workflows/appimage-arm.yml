@@ -1,0 +1,86 @@
+name: Build AppImage Packages
+
+on:
+  # Run when called from other workflows
+  workflow_call:
+    inputs:
+      package_complete_version:
+        description: 'The output of the complete_version of the "determine_version" job from the build_and_release.yml workflow'
+        required: true
+        type: string
+      release_id:
+        description: 'The output of the "create_release" job from the build_and_release.yml workflow'
+        required: true
+        type: string
+
+jobs:
+  AppImage:
+    name: Create the AppImage
+    runs-on: ${{ matrix.runners }}
+    strategy:
+      matrix:
+          runners:
+            - ubuntu-22.04
+            - ubuntu-22.04-arm
+          # The Performous package version to use when building the AppImage 
+          package_os:
+            - ubuntu_22.04
+    permissions:
+      security-events: write
+    steps:
+      - name: Install the AppImage bundler
+        id: fetch_deps
+        run: |
+          sudo apt update
+          sudo apt install -y wget libfuse2
+          wget -c $(wget -q https://api.github.com/repos/AppImageCommunity/pkg2appimage/releases -O - | grep "pkg2appimage-.*-${{ contains(matrix.runners, 'arm') && 'aarch64' || 'x86_64'  }}.AppImage" | grep browser_download_url | head -n 1 | cut -d '"' -f 4)
+          chmod +x ./pkg2appimage-*.AppImage
+          sudo mv ./pkg2appimage-*.AppImage /usr/local/bin/pkg2appimage
+
+      - name: Checkout Git
+        id: checkout_git
+        uses: actions/checkout@v4
+
+      - name: Download the Ubuntu artifact
+        uses: actions/download-artifact@v5
+        with:
+          pattern: Performous-*-${{ matrix.package_os }}-${{ contains(matrix.runners, 'arm') && 'arm64' || 'amd64'  }}.deb 
+
+      - name: Bundle the AppImage
+        run: |
+          # Pull in our common build functions
+          . .github/workflows/build_functions.sh
+
+          export PERFORMOUS_PACKAGE_VERSION=${{ inputs.package_complete_version }}
+          pkg2appimage Performous_AppImage.yaml
+          mv out/*.AppImage ./Performous.AppImage
+
+          # Provided by the common build functions
+          package_name "$(pwd)" "Performous.AppImage" "${PERFORMOUS_PACKAGE_VERSION}"
+
+      # Upload artifacts during pull-requests
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.ARTIFACT_PATH }}
+
+      # Upload artifacts on master
+      - name: Upload artifact with unified name
+        if: ${{ github.ref == 'refs/heads/master' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.MASTER_ARTIFACT_NAME }}
+          path: ${{ env.MASTER_ARTIFACT_PATH }}
+
+      # Upload artifacts to releases only during Release events
+      - name: Upload artifacts to tagged release
+        id: upload_assets
+        if: ${{ github.event_name != 'pull_request' && github.ref_type == 'tag' }}
+        uses: xresloader/upload-to-github-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ inputs.release_id }}
+          file: ${{ env.ARTIFACT_PATH }}
