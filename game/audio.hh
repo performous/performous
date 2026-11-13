@@ -111,6 +111,8 @@ class Audio {
 	void stopMusic(Game&);
 	/** Fades music out **/
 	void fadeout(Game&, double time = 1.0);
+	/** Fades out the currently playing music in place, keeping its position readable until it ends **/
+	void fadeoutCurrent(double time = 1.0);
 	/** Get the length of the currently playing song, in seconds. **/
 	double getLength() const;
 	/**
