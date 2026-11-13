@@ -25,7 +25,23 @@ void Players::load(xmlpp::NodeSet const& n) {
 			auto tn = xmlpp::get_first_child_text(dynamic_cast<xmlpp::Element&>(**n2.begin()));
 			picture = tn->get_content();
 		}
-		addPlayer(a_name->get_value(), picture, id);
+
+		std::string name = a_name->get_value();
+		if (name.empty()) {
+			// assign_id_internal() used to treat a valid player id of 0 as "no players exist"
+			// (id 0 is falsy), so once a database gets its first player, every
+			// subsequently-typed name silently collided, failed to insert, and any hiscore
+			// entered right after got misattributed to a coincidentally-blank current-player
+			// selection landing on that id-0 entry instead. Existing installs may have
+			// one of these players with existing hiscores attached to it - don't drop
+			// the entry (that would orphan those scores), just give it a visible name so it's
+			// no longer a dead, unselectable, invisible list entry.
+			name = "Player " + std::to_string(id.value_or(assign_id_internal()));
+			SpdLogger::notice(LogSystem::DATABASE,
+				"Player with empty name (id={}) found while loading the database; this is a known artifact of a fixed bug. Renaming to '{}'.",
+				id.value_or(0), name);
+		}
+		addPlayer(name, picture, id);
 	}
 	filter_internal();
 }
@@ -56,13 +72,20 @@ std::optional<PlayerId> Players::lookup(std::string const& name) const {
 
 std::optional<std::string> Players::lookup(const PlayerId& id) const {
 	const auto it = m_players.find(PlayerItem(id));
-	if (it == m_players.end()) 
+	if (it == m_players.end())
 		return std::nullopt;
 
 	return it->name;
 }
 
 void Players::addPlayer (std::string const& name, std::string const& picture, std::optional<PlayerId> id) {
+	if (name.empty()) {
+		// Refuse blank names outright: a Player with an empty name is indistinguishable
+		// from "nothing selected" (see Players::current()/Database::addHiscore)
+		SpdLogger::error(LogSystem::DATABASE, "Refusing to add a player with an empty name (id={}).", id.value_or(0));
+		return;
+	}
+
 	PlayerItem pi;
 	pi.name = name;
 	pi.picture = picture;
@@ -84,7 +107,11 @@ void Players::addPlayer (std::string const& name, std::string const& picture, st
 	if (!ret.second)
 	{
 		pi.id = assign_id_internal();
-		m_players.insert(pi); // now do the insert with the fresh id
+		const auto ret2 = m_players.insert(pi); // now do the insert with the fresh id
+		if (!ret2.second) {
+			SpdLogger::error(LogSystem::DATABASE, "Player '{}' could not be added - id assignment collided twice (id={}, already owned by '{}'). "
+				"Player was not added, will not be filtered, saved, or scoreable.", pi.name, pi.id, ret2.first->name);
+		}
 	}
 }
 
@@ -96,10 +123,10 @@ void Players::setFilter(std::string const& val) {
 
 PlayerId Players::assign_id_internal() {
 	const auto it = std::max_element(m_players.begin(),m_players.end());
-	
-	if (it != m_players.end() && it->id) 
+
+	if (it != m_players.end())
 		return it->id + 1;
-	
+
 	return 0;
 }
 
@@ -155,6 +182,7 @@ PlayerItem Players::operator[](ssize_t pos) const {
 	return m_filtered[static_cast<size_t>( index )];
 }
 
+/// Moves the current selection by diff steps, wrapping around the filtered list.
 void Players::advance(std::ptrdiff_t diff) {
 	const unsigned size = count();
 	if (size == 0) return; // Do nothing if no players are available
@@ -165,8 +193,14 @@ void Players::advance(std::ptrdiff_t diff) {
 	math_cover.setTarget(current, count());
 }
 
+/// Selects the player with the given id, if present in the filtered list.
+void Players::advanceToId(PlayerId id) {
+	auto const it = std::find_if(m_filtered.begin(), m_filtered.end(), [id](PlayerItem const& p) { return p.id == id; });
+	if (it != m_filtered.end()) math_cover.setTarget(it - m_filtered.begin(), count());
+}
+
 PlayerItem Players::current() const {
 	if (math_cover.getTarget() < static_cast<ptrdiff_t>(m_filtered.size())) return m_filtered[static_cast<unsigned>(math_cover.getTarget())];
-	
+
 	return PlayerItem();
 }

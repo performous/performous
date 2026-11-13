@@ -61,11 +61,14 @@ public:
 private: // will be bypassed by above friend declaration
 	typedef std::list<Player> cur_players_t;
 	typedef std::list<ScoreItem> cur_scores_t;
+	typedef std::map <std::string, PlayerId> players_devices_t;
 
 	//This fields are misused as additional parameters
 	cur_players_t cur;
 	cur_scores_t scores;
 
+	/// Remembers which player was last selected for a given score source device, see rememberedPlayerForDevice().
+	players_devices_t playersByDevices;
 public: // methods for database management
 
 	/**A facade for Players::addPlayer.*/
@@ -77,6 +80,11 @@ public: // methods for database management
 	 The ids will be looked up first by using the songs and current players data.
 	 */
 	void addHiscore(std::shared_ptr<Song> s);
+
+	/**Looks up which player was last selected for the given score source device (e.g. a microphone id),
+	  so that a returning player can be pre-selected instead of searched for by name each time.
+	 */
+	std::optional<PlayerId> rememberedPlayerForDevice(std::string const& deviceId) const;
 
 public: // methods for database queries
 	/**A facade for Hiscore::reachedHiscore.

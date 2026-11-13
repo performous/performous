@@ -4,6 +4,7 @@
 #include "libxml++.hh"
 #include "fs.hh"
 #include "i18n.hh"
+#include "util.hh"
 
 #include <iostream>
 
@@ -62,22 +63,39 @@ void Database::addSong(std::shared_ptr<Song> s) {
 }
 
 void Database::addHiscore(std::shared_ptr<Song> s) {
-	auto maybe_playerid = m_players.lookup(m_players.current().name);
+	std::string const currentName = trim(m_players.current().name);
+	if (currentName.empty()) {
+		// No player is actually selected (e.g. Start pressed before a name was typed/chosen).
+		// Players::addPlayer() refuses empty names, so discard the pending score
+		SpdLogger::error(LogSystem::DATABASE, "No player selected (empty name) -- discarding pending score, hiscore NOT written.");
+		return;
+	}
+	auto maybe_playerid = m_players.lookup(currentName);
 	if (!maybe_playerid.has_value()) {
-		SpdLogger::error(LogSystem::DATABASE, "Cannot find player id for player={}", m_players.current().name);
+		SpdLogger::error(LogSystem::DATABASE, "Cannot find player id for player={}", currentName);
 		return;
 	}
 	auto playerid = maybe_playerid.value();
-	unsigned score = scores.front().score;
-	std::string track = scores.front().track;
+	ScoreItem const& hiscore = scores.front();
 	const auto songid = m_songs.lookup(s);
 	if(!songid.has_value()) {
 		SpdLogger::error(LogSystem::DATABASE, "Invalid song ID for song: artist={}, title={}", s->artist, s->title);
 		return;
 	}
 	unsigned short level = config["game/difficulty"].ui();
-	m_hiscores.addHiscore(score, playerid, songid.value(), level, track);
-	SpdLogger::info(LogSystem::DATABASE, "Added new hiscore. Score={} on track={} for song id={}, on level={}", score, track, songid.value(), level);
+	m_hiscores.addHiscore(hiscore.score, playerid, songid.value(), level, hiscore.track);
+	// Remember which player was selected for this score's source device, so it can be pre-selected next time.
+	if (!hiscore.player_id.empty()) playersByDevices[hiscore.player_id] = playerid;
+	SpdLogger::info(LogSystem::DATABASE, "Added new hiscore. Score={} on track={} for song id={}, on level={}", hiscore.score, hiscore.track, songid.value(), level);
+}
+
+std::optional<PlayerId> Database::rememberedPlayerForDevice(std::string const& deviceId) const {
+	if (deviceId.empty()) return std::nullopt;
+
+	auto const it = playersByDevices.find(deviceId);
+	if (it == playersByDevices.end()) return std::nullopt;
+
+	return it->second;
 }
 
 bool Database::reachedHiscore(std::shared_ptr<Song> s) const {
@@ -142,4 +160,3 @@ std::vector<HiscoreItem> Database::getHiscores(SongPtr const& s) const {
 		throw;
 	}
 }
-
