@@ -37,6 +37,10 @@ public:
 	void exit();
 	void reloadGL();
 	void triggerSongListUpdate();
+	/** Get the current timer value until the next song autoplays (in seconds). */
+	double getTimer() {
+		return m_nextTimer.get();
+	}
 private:
 	Menu overlay_menu;
 	Menu songlist_menu;
