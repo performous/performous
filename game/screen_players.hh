@@ -36,6 +36,8 @@ class ScreenPlayers : public Screen {
 
   private:
 	Texture* loadTextureFromMap(fs::path path);
+	void checkoutNewScore();
+
   	Audio& m_audio;
 	Database& m_database;
 	Players& m_players;
