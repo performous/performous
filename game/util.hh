@@ -19,30 +19,41 @@ template <typename T> constexpr T clamp(T val, T min = 0, T max = 1) {
 	return (val < min) ? min : (val > max) ? max : val;
 }
 
-/** Absolute-tolerance floating point comparison (avoids exact == on computed doubles/floats) **/
-template <typename T> constexpr bool almostEqual(T lhs, T rhs) {
-	static_assert(
-		std::is_floating_point_v<T>,
-		"Called almostEqual on a non floating-point type."
-	);
-	T tolerance;
-	if (sizeof(lhs) == 4) {
-		tolerance = 0.00000012f;
-	}
-	else {
-		tolerance = 0.00000000000000023;
-	}
-	const T largest = std::max(std::abs(lhs),std::abs(rhs));
-	return (std::abs(lhs-rhs) < tolerance * largest || tolerance > largest);
+#include <algorithm>
+#include <cfenv>
+#include <cmath>
+#include <iomanip>
+#include <limits>
+#include <sstream>
+#include <type_traits>
+
+template <typename T>
+constexpr std::remove_cv_t<T> defaultTolerance() noexcept {
+	using U = std::remove_cv_t<T>;
+	// 4 * epsilon: ~4.7683716e-7f for float, ~8.8817842e-16 for double
+	return U(4) * std::numeric_limits<U>::epsilon();
 }
 
-template <typename T> constexpr bool almostEqual(T lhs, T rhs, T epsilon) {
+template <typename T>
+constexpr bool almostEqual(T lhs, T rhs, std::remove_cv_t<T> abs_tol = defaultTolerance<T>()) {
+	using U = std::remove_cv_t<T>;
 	static_assert(
-		std::is_floating_point_v<T>,
+		std::is_floating_point_v<U>,
 		"Called almostEqual on a non floating-point type."
 	);
-	const T largest = std::max(std::abs(lhs),std::abs(rhs));
-	return (std::abs(lhs-rhs) < epsilon * largest || epsilon > largest);
+
+	if (lhs == rhs) return true;
+	if (std::isnan(lhs) || std::isnan(rhs)) return false;
+	if (!std::isfinite(lhs) || !std::isfinite(rhs) || !(abs_tol >= U(0))) return false;
+
+	constexpr U rel_tol = defaultTolerance<U>();
+	const U largest = std::max(std::abs(lhs), std::abs(rhs));
+	const U max_diff = std::max(abs_tol, rel_tol * largest);
+
+	// Guard against (lhs - rhs) overflow when operands have opposite signs
+	if ((lhs < U(0)) != (rhs < U(0)) && largest > max_diff) return false;
+
+	return std::abs(lhs - rhs) <= max_diff;
 }
 
 template <typename Numeric> struct MinMax {
