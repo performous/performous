@@ -679,7 +679,7 @@ void GuitarGraph::drumHit(double time, unsigned layer, unsigned fret) {
 			m_streak += 1;
 			if (m_streak > m_longestStreak) m_longestStreak = m_streak;
 			// Handle Big Rock Ending scoring
-			if (m_drumfillHits > 0 && *best == m_chords.back()) endBRE();
+			if (m_drumfillHits > 0 && &*best == &m_chords.back()) endBRE();  // Same chord object, not just the same frets
 			// ErrorMeter
 			errorMeter(static_cast<float>(signed_error));
 		}
@@ -773,7 +773,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 			}
 		}
 		// Handle Big Rock Ending scoring
-		if (m_drumfillHits > 0 && *best == m_chords.back()) endBRE();
+		if (m_drumfillHits > 0 && &*best == &m_chords.back()) endBRE();  // Same chord object, not just the same frets
 	}
 }
 
