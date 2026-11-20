@@ -37,12 +37,15 @@ void PlayList::clear() {
 	m_list.clear();
 }
 
-void PlayList::removeSong(unsigned index) {
+bool PlayList::removeSong(unsigned index) {
 	std::lock_guard<std::mutex> l(m_mutex);
+	if (index >= m_list.size()) return false;
 	m_list.erase(m_list.begin() + index);
+	return true;
 }
 void PlayList::swap(unsigned index1, unsigned index2) {
 	std::lock_guard<std::mutex> l(m_mutex);
+	if (index1 >= m_list.size() || index2 >= m_list.size()) return;
 	std::shared_ptr<Song> song1 = m_list[index1];
 	m_list[index1] = m_list[index2];
 	m_list[index2] = song1;
@@ -50,6 +53,7 @@ void PlayList::swap(unsigned index1, unsigned index2) {
 void PlayList::move(unsigned fromIndex, unsigned toIndex)
 {
 	std::lock_guard<std::mutex> l(m_mutex);
+	if (fromIndex >= m_list.size() || toIndex >= m_list.size()) return;
 	if (fromIndex > toIndex)
 	{
 		std::rotate(m_list.rend() - fromIndex - 1, m_list.rend() - fromIndex, m_list.rend() - toIndex);
@@ -62,7 +66,7 @@ void PlayList::move(unsigned fromIndex, unsigned toIndex)
 
 std::shared_ptr<Song> PlayList::getSong(unsigned index) {
 	std::lock_guard<std::mutex> l(m_mutex);
-	if (isEmpty()) return std::shared_ptr<Song>();
+	if (index >= m_list.size()) return std::shared_ptr<Song>();
 	std::shared_ptr<Song> nextSong;
 	nextSong = m_list[index];
 	m_list.erase(m_list.begin() + index);
