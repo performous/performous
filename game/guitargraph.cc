@@ -480,7 +480,8 @@ void GuitarGraph::engine() {
 			if (last == ev.dur->end) endHold(fret, time);
 		}
 		// Set correctness as a percentage of chord being held
-		if (holds) m_correctness.setTarget(clamp(double(count) / m_chordIt->polyphony));  // FIXME: polyphony doesn't seem to be set correctly for guitar tracks (workaround by clamping)
+		// m_chordIt is end() while the sustain of the song's last chord is still being held
+		if (holds && m_chordIt != m_chords.end()) m_correctness.setTarget(clamp(double(count) / m_chordIt->polyphony));  // FIXME: polyphony doesn't seem to be set correctly for guitar tracks (workaround by clamping)
 	}
 	// Update solo status
 	m_solo = false;
