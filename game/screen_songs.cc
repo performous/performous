@@ -101,7 +101,7 @@ void ScreenSongs::manageEvent(input::NavEvent const& event) {
 	else if (nav == input::NavButton::MOREDOWN) m_songs.advance(10);
 	else if (m_jukebox) {
 		if (nav == input::NavButton::CANCEL) m_jukebox = false;
-		else if (nav == input::NavButton::START) { addSong(); sing(); }
+		else if (nav == input::NavButton::START) { if (addSong()) sing(); }  // Like the normal path: only sing if the song was queued first
 		else if (event.menu == input::NavMenu::B_NEXT)  m_audio.seek(-5);
 		else if (event.menu == input::NavMenu::B_PREV) m_audio.seek(5);
 		else if (nav == input::NavButton::MOREUP) m_audio.seek(-30);
@@ -221,6 +221,7 @@ void ScreenSongs::update() {
 bool ScreenSongs::addSong() {
 	auto& pl = getGame().getCurrentPlayList();
 	auto song = m_songs.currentPtr();
+	if (!song) return false;
 	if (song->loadStatus != Song::LoadStatus::PARSERERROR) {
 		pl.addSong(song);
 	}
