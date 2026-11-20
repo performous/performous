@@ -91,7 +91,12 @@ MidiStream::Riff::~Riff() {
 	
 	if (has_more_data()) SpdLogger::warning(LogSystem::MIDI, "Only {} of {} bytes read of RIFF chunk {}", offset, site, name);
 #endif
-	ms.f.seekg(pos + size);
+	// Never let this throw (the stream has failbit exceptions enabled): a chunk size larger
+	// than the file would otherwise call std::terminate, possibly during stack unwinding.
+	try {
+		ms.f.clear();
+		ms.f.seekg(pos + size);
+	} catch (...) {}
 }
 
 std::uint32_t MidiStream::Riff::read_varlen() {
