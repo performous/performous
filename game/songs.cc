@@ -34,6 +34,13 @@
 #include <stdexcept>
 
 namespace {
+	/// File of a music track, or "" if the song has none. Unlike music[name], never inserts into the map:
+	/// this runs on the loader thread while the UI may be using the same Song.
+	std::string musicFile(Song const& song, std::string const& track) {
+		auto it = song.music.find(track);
+		return it == song.music.end() ? std::string() : it->second.string();
+	}
+
 	void initializeSongOrders(Songs& songs) {
 		songs.addSongOrder(std::make_shared<RandomSongOrder>());
 		songs.addSongOrder(std::make_shared<NameSongOrder>());
@@ -187,11 +194,11 @@ void Songs::CacheSonglist() {
 		if(!song->background.string().empty()) {
 			songObject["background"] = song->background.string();
 		}
-		if(!song->music[TrackName::BGMUSIC].string().empty()) {
-			songObject["songFile"] = song->music[TrackName::BGMUSIC].string();
+		if(!musicFile(*song, TrackName::BGMUSIC).empty()) {
+			songObject["songFile"] = musicFile(*song, TrackName::BGMUSIC);
 		}
-		if (!song->music[TrackName::INSTRUMENTAL].string().empty()) {
-			songObject["instrumental"] = song->music[TrackName::INSTRUMENTAL].string();
+		if (!musicFile(*song, TrackName::INSTRUMENTAL).empty()) {
+			songObject["instrumental"] = musicFile(*song, TrackName::INSTRUMENTAL);
 		}
 		if(!song->midifilename.string().empty()) {
 			songObject["midiFile"] = song->midifilename.string();
@@ -211,44 +218,44 @@ void Songs::CacheSonglist() {
 		if(!std::isnan(song->preview_start)) {
 			songObject["previewStart"] = song->preview_start;
 		}
-		if(!song->music[TrackName::INSTRUMENTAL].string().empty()) {
-			songObject["instrumental"] = song->music[TrackName::INSTRUMENTAL].string();
+		if(!musicFile(*song, TrackName::INSTRUMENTAL).empty()) {
+			songObject["instrumental"] = musicFile(*song, TrackName::INSTRUMENTAL);
 		}
-		if(!song->music[TrackName::VOCAL_LEAD].string().empty()) {
-			songObject["vocals"] = song->music[TrackName::VOCAL_LEAD].string();
+		if(!musicFile(*song, TrackName::VOCAL_LEAD).empty()) {
+			songObject["vocals"] = musicFile(*song, TrackName::VOCAL_LEAD);
 		}
-		if(!song->music[TrackName::VOCAL_BACKING].string().empty()) {
-			songObject["vocalsBacking"] = song->music[TrackName::VOCAL_BACKING].string();
+		if(!musicFile(*song, TrackName::VOCAL_BACKING).empty()) {
+			songObject["vocalsBacking"] = musicFile(*song, TrackName::VOCAL_BACKING);
 		}
-		if(!song->music[TrackName::PREVIEW].string().empty()) {
-			songObject["preview"] = song->music[TrackName::PREVIEW].string();
+		if(!musicFile(*song, TrackName::PREVIEW).empty()) {
+			songObject["preview"] = musicFile(*song, TrackName::PREVIEW);
 		}
-		if(!song->music[TrackName::GUITAR].string().empty()) {
-			songObject["guitar"] = song->music[TrackName::GUITAR].string();
+		if(!musicFile(*song, TrackName::GUITAR).empty()) {
+			songObject["guitar"] = musicFile(*song, TrackName::GUITAR);
 		}
-		if(!song->music[TrackName::BASS].string().empty()) {
-			songObject["bass"] = song->music[TrackName::BASS].string();
+		if(!musicFile(*song, TrackName::BASS).empty()) {
+			songObject["bass"] = musicFile(*song, TrackName::BASS);
 		}
-		if(!song->music[TrackName::DRUMS].string().empty()) {
-			songObject["drums"] = song->music[TrackName::DRUMS].string();
+		if(!musicFile(*song, TrackName::DRUMS).empty()) {
+			songObject["drums"] = musicFile(*song, TrackName::DRUMS);
 		}
-		if(!song->music[TrackName::DRUMS_SNARE].string().empty()) {
-			songObject["drumsSnare"] = song->music[TrackName::DRUMS_SNARE].string();
+		if(!musicFile(*song, TrackName::DRUMS_SNARE).empty()) {
+			songObject["drumsSnare"] = musicFile(*song, TrackName::DRUMS_SNARE);
 		}
-		if(!song->music[TrackName::DRUMS_CYMBALS].string().empty()) {
-			songObject["drumsCymbals"] = song->music[TrackName::DRUMS_CYMBALS].string();
+		if(!musicFile(*song, TrackName::DRUMS_CYMBALS).empty()) {
+			songObject["drumsCymbals"] = musicFile(*song, TrackName::DRUMS_CYMBALS);
 		}
-		if(!song->music[TrackName::DRUMS_TOMS].string().empty()) {
-			songObject["drumsToms"] = song->music[TrackName::DRUMS_TOMS].string();
+		if(!musicFile(*song, TrackName::DRUMS_TOMS).empty()) {
+			songObject["drumsToms"] = musicFile(*song, TrackName::DRUMS_TOMS);
 		}
-		if(!song->music[TrackName::KEYBOARD].string().empty()) {
-			songObject["keyboard"] = song->music[TrackName::KEYBOARD].string();
+		if(!musicFile(*song, TrackName::KEYBOARD).empty()) {
+			songObject["keyboard"] = musicFile(*song, TrackName::KEYBOARD);
 		}
-		if(!song->music[TrackName::GUITAR_COOP].string().empty()) {
-			songObject["guitarCoop"] = song->music[TrackName::GUITAR_COOP].string();
+		if(!musicFile(*song, TrackName::GUITAR_COOP).empty()) {
+			songObject["guitarCoop"] = musicFile(*song, TrackName::GUITAR_COOP);
 		}
-		if(!song->music[TrackName::GUITAR_RHYTHM].string().empty()) {
-			songObject["guitarRhythm"] = song->music[TrackName::GUITAR_RHYTHM].string();
+		if(!musicFile(*song, TrackName::GUITAR_RHYTHM).empty()) {
+			songObject["guitarRhythm"] = musicFile(*song, TrackName::GUITAR_RHYTHM);
 		}
 
 		if (!song->m_bpms.empty()) {
