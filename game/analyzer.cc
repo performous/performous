@@ -35,8 +35,11 @@ void Analyzer::output(float* begin, float* end, double rate) {
 	auto const out = static_cast<unsigned>((end - begin) / 2) /* stereo */;
 	if (out == 0) return;
 	const unsigned in = static_cast<unsigned>(m_resampleFactor * (m_rate / rate) * out + 2 * a) /* lanczos kernel */ + 5 /* safety margin for rounding errors */;
+	// The resampler below reads pcm[k + j] up to this index: never go past the buffer (large callbacks, e.g. JACK)
+	auto const last = static_cast<std::size_t>(m_resamplePos + m_resampleFactor * out) + 2 * a;
+	if (last >= static_cast<std::size_t>(m_passthrough.capacity)) return;
 	std::vector<float> pcm(m_passthrough.capacity);
-	m_passthrough.read(pcm.data(), pcm.data() + in + 4);
+	if (!m_passthrough.read(pcm.data(), pcm.data() + in + 4)) return;  // Not enough input yet: don't mix silence nor pop
 	for (unsigned i = 0; i < out; ++i) {
 		double s = 0.0;
 		unsigned k = static_cast<unsigned>(m_resamplePos);
