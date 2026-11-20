@@ -258,9 +258,12 @@ void GuitarGraph::updateNeck() {
 
 /// Cycle through the different tracks
 void GuitarGraph::changeTrack(int dir) {
-	if (dir >= 0) ++m_track_index; else --m_track_index;
-	if (m_track_index == m_instrumentTracks.end()) m_track_index = m_instrumentTracks.begin();
-	else if (m_track_index == (--m_instrumentTracks.end())) m_track_index = (--m_instrumentTracks.end());
+	if (dir >= 0) {
+		if (++m_track_index == m_instrumentTracks.end()) m_track_index = m_instrumentTracks.begin();
+	} else {
+		if (m_track_index == m_instrumentTracks.begin()) m_track_index = m_instrumentTracks.end();
+		--m_track_index;
+	}
 	difficultyAuto(true);
 	updateNeck();
 	setupJoinMenu();  // Reset menu as difficulties might have changed
