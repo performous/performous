@@ -149,7 +149,6 @@ class GuitarGraph: public InstrumentGraph {
 	AnimValue m_errorMeterFade;
 	AnimValue m_drumJump;
 	AnimValue m_starpower; /// how long the GodMode lasts (also used in fading the effect)
-	float m_starmeter; /// when this is high enough, GodMode becomes available
 	float m_drumfillHits; /// keeps track that enough hits are scored
 	float m_drumfillScore; /// max score for the notes under drum fill
 	float m_soloTotal; /// maximum solo score
