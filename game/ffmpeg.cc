@@ -174,7 +174,7 @@ AudioBuffer::AudioBuffer(fs::path const& file, unsigned rate, size_t size):
 				if (m_seek_asked) {
 					m_seek_asked = false;
 					m_write_pos = m_read_pos;
-					auto seek_pos = static_cast<double>(m_read_pos) / double(AV_TIME_BASE);
+					auto seek_pos = static_cast<double>(m_read_pos) / double(m_sps);  // m_read_pos counts interleaved samples
 
 					UnlockGuard<decltype(l)> unlocked(l); // release lock during seek
 					ffmpeg->seek(seek_pos);
