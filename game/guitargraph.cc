@@ -628,7 +628,7 @@ void GuitarGraph::drumHit(double time, unsigned layer, unsigned fret) {
 		if (m_level == Difficulty::KIDS) {
 			// in kiddy mode we don't care about the correct pad
 			// all that matters is that there is still a missing note in that chord
-			if (m_chordIt->status == m_chordIt->polyphony) continue;
+			if (it->status == it->polyphony) continue;
 		} else if (m_notes[it->dur[fret]]) continue;  // invalid fret/hit or already played
 
 		// Check Pro Mode stuff...
