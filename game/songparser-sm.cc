@@ -126,7 +126,7 @@ bool SmSongParser::smParseField(Song& song, std::string line) {
 	}
 	std::string value = trim(line.substr(pos + 1));
 	//In case the value continues to several lines, all text before the ending character ';' is read to single line.
-	while (value[value.size() -1] != ';') {
+	while (value.empty() || value.back() != ';') {
 		std::string str;
 		if (!getline (str)) throw std::runtime_error("Invalid format, semicolon missing after value of " + key);
 		value += trim(str);
