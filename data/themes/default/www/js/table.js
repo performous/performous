@@ -15,15 +15,15 @@ function buildTable(database) {
     var j = -1;
     for (var key = 0, size = database.length; key < size; key++) {
         r[++j] = "<tr id='database-songs-" + key +"'><td>";
-        r[++j] = database[key].Artist;
+        r[++j] = escapeHtml(database[key].Artist);
         r[++j] = "</td><td>";
-        r[++j] = database[key].Title;
+        r[++j] = escapeHtml(database[key].Title);
         r[++j] = "</td><td class='hidden-xs'>";
-        r[++j] = database[key].Language;
+        r[++j] = escapeHtml(database[key].Language);
         r[++j] = "</td><td class='hidden-xs hidden-sm'>";
-        r[++j] = database[key].Edition;
+        r[++j] = escapeHtml(database[key].Edition);
         r[++j] = "</td><td class='hidden-xs hidden-sm hidden-md'>";
-        r[++j] = database[key].Creator;
+        r[++j] = escapeHtml(database[key].Creator);
         r[++j] = "</td><td class='hidden-xs hidden-sm hidden-md'>";
         r[++j] = database[key].HasError ? "⚠️" : "";
         r[++j] = "</td><td class='text-right text-nowrap fixed-pixel-glyphicon'>";
