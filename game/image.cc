@@ -170,18 +170,23 @@ void loadJPEG(Bitmap& bitmap, fs::path const& filename) {
 		throw std::runtime_error("Error in libjpeg when decoding " + filename.string());
 	}
 	jpeg_create_decompress(&cinfo);
-	jpeg_mem_src(&cinfo, data.data(), static_cast<long unsigned>(data.size()));
-	if (jpeg_read_header(&cinfo, TRUE) != JPEG_HEADER_OK) throw std::runtime_error("Cannot read header of " + filename.string());
-	if (cinfo.num_components == 1) {
-		cinfo.out_color_space = JCS_RGB;  // Monochrome images will be promoted to RGB (wasteful, but simple)
-	}
-	jpeg_start_decompress(&cinfo);
-	bitmap.resize(cinfo.output_width, cinfo.output_height);
-	unsigned stride = (bitmap.width * 3 + 3) & ~3u;  // Number of bytes per row (word-aligned)
-	unsigned char* ptr = &bitmap.buf[0];
-	while (cinfo.output_scanline < bitmap.height) {
-		jpeg_read_scanlines(&cinfo, &ptr, 1);
-		ptr += stride;
+	try {
+		jpeg_mem_src(&cinfo, data.data(), static_cast<long unsigned>(data.size()));
+		if (jpeg_read_header(&cinfo, TRUE) != JPEG_HEADER_OK) throw std::runtime_error("Cannot read header of " + filename.string());
+		if (cinfo.num_components == 1) {
+			cinfo.out_color_space = JCS_RGB;  // Monochrome images will be promoted to RGB (wasteful, but simple)
+		}
+		jpeg_start_decompress(&cinfo);
+		bitmap.resize(cinfo.output_width, cinfo.output_height);
+		unsigned stride = (bitmap.width * 3 + 3) & ~3u;  // Number of bytes per row (word-aligned)
+		unsigned char* ptr = &bitmap.buf[0];
+		while (cinfo.output_scanline < bitmap.height) {
+			jpeg_read_scanlines(&cinfo, &ptr, 1);
+			ptr += stride;
+		}
+	} catch (...) {
+		jpeg_destroy_decompress(&cinfo);  // C++ exceptions (bad header, oversized image) bypass the setjmp handler
+		throw;
 	}
 	jpeg_destroy_decompress(&cinfo);
 }
