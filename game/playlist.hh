@@ -29,13 +29,13 @@ public:
 	void shuffle();
 	///clears list
 	void clear();
-	///removes a song
-	void removeSong(unsigned index);
-	/// swaps two songs
+	/// Removes a song; returns false (and does nothing) if the index is out of range
+	bool removeSong(unsigned index);
+	/// Swaps two songs (no-op if an index is out of range)
 	void swap (unsigned index1, unsigned index2);
-	/// Moves a song from an index to another index.
+	/// Moves a song from an index to another index (no-op if an index is out of range)
 	void move(unsigned fromIndex, unsigned toIndex);
-	/// gets a specific song and removes it from the queue
+	/// Gets a specific song and removes it from the queue (null if the index is out of range)
 	std::shared_ptr<Song> getSong(unsigned index);
 	/// this is for the webserver, to avoid crashing when adding the current playing song
 	std::shared_ptr<Song> currentlyActive;

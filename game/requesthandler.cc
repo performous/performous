@@ -238,7 +238,10 @@ void RequestHandler::Post(web::http::http_request request)
 		}
 		try {
 			unsigned songIdToDelete = jsonPostBody[utility::conversions::to_string_t("songId")].as_number().to_uint32();
-			m_game.getCurrentPlayList().removeSong(songIdToDelete);
+			if (!m_game.getCurrentPlayList().removeSong(songIdToDelete)) {
+				request.reply(web::http::status_codes::BadRequest, "Unknown song id.");
+				return;
+			}
 			ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(m_game.getScreen("Playlist"));
 			m_pp->triggerSongListUpdate();
 
