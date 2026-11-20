@@ -35,6 +35,11 @@ jobs:
       - name: Setup ninja cmake generator
         uses: abdes/gha-setup-ninja@master
 
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '4.4.5'
+
       - name: Download and build our dependencies using vcpkg
         uses: Lord-Kamina/vcpkg-action@update_cache
         with:
