@@ -152,6 +152,7 @@ std::uint16_t MidiFileParser::parse_header(MidiStream& stream) {
 	if ((format == 0 && ntracks != 1) || (format == 1 && ntracks < 2)) throw std::runtime_error("Invalid number of tracks");
 	riff.read(division);
 	if (division & 0x8000) throw std::runtime_error("SMPTE type divisions not supported");
+	if (division == 0) throw std::runtime_error("Invalid MIDI division (zero ticks per quarter note)");
 #if MIDI_DEBUG_LEVEL > 1
 	SpdLogger::debug(LogSystem::MIDI, "Division={}", division);
 #endif
