@@ -645,7 +645,6 @@ void GuitarGraph::drumHit(double time, unsigned layer, unsigned fret) {
 		}
 	}
 	if (best == m_chords.end()) fail(time, static_cast<int>(fret));  // None found
-	if (best == m_chords.end()) fail(time, static_cast<int>(fret));  // None found
 	else {
 		// Skip all chords earlier than the best fit chord
 		for (; best != m_chordIt; ++m_chordIt) {
