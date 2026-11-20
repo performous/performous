@@ -8,6 +8,7 @@ set(SOURCE_FILES
 	"cycletest.cc"
 	"fixednotegraphscalertest.cc"
 	"microphones_test.cc"
+	"midifiletest.cc"
 	"notegraphscalerfactorytest.cc"
 	"songparserfactorytest.cc"
 	"smsongparsertest.cc"

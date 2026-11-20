@@ -331,7 +331,9 @@ void MidiFileParser::process_midi_event(Track& track, std::uint8_t t, std::uint8
 		if( arg1 < 20 ) return;
 		if (t == 8 || (t == 9 && arg2 == 0)) {
 			// end of note (note off or note on with zero velocity)
-			if( !m_lyric.empty()  ) {
+			if (track.lyrics.empty()) {
+				// note end with no lyric note to close (e.g. it was already removed)
+			} else if( !m_lyric.empty()  ) {
 				// here we should update the last note lyric with the current m_lyric
 				track.lyrics.back().lyric = m_lyric;
 				// here we should update the last note end time with the miditime
