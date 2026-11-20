@@ -170,7 +170,7 @@ void MidiParser::parseNotes(Song& song) {
 						}
 						if (erase) syl.erase(syl.size() - 1);
 						// Add spaces between words, remove hyphens
-						{
+						if (!syl.empty()) {
 							char ch = *syl.rbegin();
 							if (ch == '-') syl.erase(syl.size() - 1);
 							else if (ch == '=') { *syl.rbegin() = '-'; }
