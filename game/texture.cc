@@ -74,7 +74,14 @@ class TextureLoader::Impl {
 	std::thread m_thread;
 public:
 	Impl(): m_quit(), m_thread(&Impl::run, this) {}
-	~Impl() { m_quit = true; m_condition.notify_one(); m_thread.join(); }
+	~Impl() {
+		{
+			std::lock_guard<std::mutex> l(m_mutex);  // Under the lock, so the worker can't miss the wake-up
+			m_quit = true;
+		}
+		m_condition.notify_one();
+		m_thread.join();
+	}
 	/// The loader main loop: poll for image load jobs and load into RAM
 	void run() {
 		while (!m_quit) {
@@ -91,7 +98,7 @@ public:
 				}
 				// If not found, wait for one
 				if (!target) {
-					m_condition.wait(l);
+					if (!m_quit) m_condition.wait(l);  // m_quit is re-checked under the lock to avoid a lost wake-up
 					continue;
 				}
 			}
