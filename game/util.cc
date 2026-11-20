@@ -18,7 +18,7 @@ namespace {
 		std::istringstream iss(s);
 		iss.imbue(std::locale::classic());
 		T value{};
-		if (!(iss >> value)) throw std::invalid_argument("Invalid floating point value '" + s + "'");
+		if (!(iss >> value) || std::isnan(value)) throw std::invalid_argument("Invalid floating point value '" + s + "'");
 		return value;
 	}
 }
