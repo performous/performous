@@ -61,6 +61,8 @@ void ScreenPlayers::manageEvent(input::NavEvent const& event) {
 		if (m_search.text.empty()) { getGame().activateScreen("Songs"); return; }
 		else { m_search.text.clear(); m_players.setFilter(m_search.text); }
 	} else if (nav == input::NavButton::START) {
+		// The screen may still get events in the frame after enter() redirected to Playlist (no scores)
+		if (m_database.scores.empty()) return;
 		if (m_players.isEmpty()) {
 			m_players.addPlayer(m_search.text);
 			m_players.setFilter(m_search.text);
