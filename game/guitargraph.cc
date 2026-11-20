@@ -123,7 +123,6 @@ GuitarGraph::GuitarGraph(Game &game, Audio& audio, Song const& song, input::Devi
   m_errorMeterFade(0.0, 0.333),
   m_drumJump(0.0, 12.0),
   m_starpower(0.0, 0.1),
-  m_starmeter(),
   m_drumfillHits(),
   m_drumfillScore(),
   m_soloTotal(),
