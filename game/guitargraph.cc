@@ -123,7 +123,6 @@ GuitarGraph::GuitarGraph(Game &game, Audio& audio, Song const& song, input::Devi
   m_errorMeterFade(0.0, 0.333),
   m_drumJump(0.0, 12.0),
   m_starpower(0.0, 0.1),
-  m_starmeter(),
   m_drumfillHits(),
   m_drumfillScore(),
   m_soloTotal(),
@@ -259,9 +258,12 @@ void GuitarGraph::updateNeck() {
 
 /// Cycle through the different tracks
 void GuitarGraph::changeTrack(int dir) {
-	if (dir >= 0) ++m_track_index; else --m_track_index;
-	if (m_track_index == m_instrumentTracks.end()) m_track_index = m_instrumentTracks.begin();
-	else if (m_track_index == (--m_instrumentTracks.end())) m_track_index = (--m_instrumentTracks.end());
+	if (dir >= 0) {
+		if (++m_track_index == m_instrumentTracks.end()) m_track_index = m_instrumentTracks.begin();
+	} else {
+		if (m_track_index == m_instrumentTracks.begin()) m_track_index = m_instrumentTracks.end();
+		--m_track_index;
+	}
 	difficultyAuto(true);
 	updateNeck();
 	setupJoinMenu();  // Reset menu as difficulties might have changed
@@ -480,7 +482,8 @@ void GuitarGraph::engine() {
 			if (last == ev.dur->end) endHold(fret, time);
 		}
 		// Set correctness as a percentage of chord being held
-		if (holds) m_correctness.setTarget(clamp(double(count) / m_chordIt->polyphony));  // FIXME: polyphony doesn't seem to be set correctly for guitar tracks (workaround by clamping)
+		// m_chordIt is end() while the sustain of the song's last chord is still being held
+		if (holds && m_chordIt != m_chords.end()) m_correctness.setTarget(clamp(double(count) / m_chordIt->polyphony));  // FIXME: polyphony doesn't seem to be set correctly for guitar tracks (workaround by clamping)
 	}
 	// Update solo status
 	m_solo = false;
@@ -628,7 +631,7 @@ void GuitarGraph::drumHit(double time, unsigned layer, unsigned fret) {
 		if (m_level == Difficulty::KIDS) {
 			// in kiddy mode we don't care about the correct pad
 			// all that matters is that there is still a missing note in that chord
-			if (m_chordIt->status == m_chordIt->polyphony) continue;
+			if (it->status == it->polyphony) continue;
 		} else if (m_notes[it->dur[fret]]) continue;  // invalid fret/hit or already played
 
 		// Check Pro Mode stuff...
@@ -644,7 +647,6 @@ void GuitarGraph::drumHit(double time, unsigned layer, unsigned fret) {
 			signed_error = it->begin - time;
 		}
 	}
-	if (best == m_chords.end()) fail(time, static_cast<int>(fret));  // None found
 	if (best == m_chords.end()) fail(time, static_cast<int>(fret));  // None found
 	else {
 		// Skip all chords earlier than the best fit chord
@@ -677,7 +679,7 @@ void GuitarGraph::drumHit(double time, unsigned layer, unsigned fret) {
 			m_streak += 1;
 			if (m_streak > m_longestStreak) m_longestStreak = m_streak;
 			// Handle Big Rock Ending scoring
-			if (m_drumfillHits > 0 && *best == m_chords.back()) endBRE();
+			if (m_drumfillHits > 0 && &*best == &m_chords.back()) endBRE();  // Same chord object, not just the same frets
 			// ErrorMeter
 			errorMeter(static_cast<float>(signed_error));
 		}
@@ -706,8 +708,9 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		if (buttonId >= m_pads) return;
 		if (m_correctness.get() < 0.5f && m_starpower.get() < 0.001f) return; // Hammering not possible at the moment
 		for (unsigned fret = 0; fret < m_pads; ++fret) frets[fret] = false;
+		// Note: frets[] was just cleared, held buttons are in m_pressed (fret f is m_pressed[f + 1])
 		for (unsigned fret = buttonId + 1; fret < m_pads; ++fret) {
-			if (frets[fret]) return; // Extra buttons on right side
+			if (m_pressed[fret + 1]) return; // Extra buttons on right side
 		}
 		if (ev.pressed()) {
 			// Hammer-on, the fret pressed is played
@@ -717,7 +720,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 			int fret = static_cast<int>(buttonId);
 			do {
 				if (--fret < 0) return; // No frets pressed -> not a pull off
-			} while (!frets[fret]);
+			} while (!m_pressed[fret + 1]);
 			frets[fret] = true;
 		}
 	}
@@ -770,7 +773,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 			}
 		}
 		// Handle Big Rock Ending scoring
-		if (m_drumfillHits > 0 && *best == m_chords.back()) endBRE();
+		if (m_drumfillHits > 0 && &*best == &m_chords.back()) endBRE();  // Same chord object, not just the same frets
 	}
 }
 

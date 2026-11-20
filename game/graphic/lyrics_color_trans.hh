@@ -11,6 +11,4 @@ struct LyricColorTrans {
 
   private:
 	Window& m_window;
-	glmath::vec4 oldFill;
-	glmath::vec4 oldStroke;
 };

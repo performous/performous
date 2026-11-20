@@ -131,3 +131,16 @@ TEST(ImageType, ZeroImageDetect) {
     EXPECT_TRUE(getImageType(filename) == ImageType::UNKNOWN);
 }
 
+
+TEST(Bitmap, ResizeAllocatesFourBytesPerPixel) {
+    Bitmap bitmap;
+    bitmap.resize(3, 2);
+    EXPECT_EQ(bitmap.buf.size(), 3u * 2u * 4u);
+}
+
+TEST(Bitmap, ResizeRejectsDimensionsThatWouldOverflow) {
+    // 32768 * 32769 * 4 wraps to 131072 in 32-bit arithmetic: a single row for a huge image (heap overflow).
+    Bitmap bitmap;
+    EXPECT_THROW(bitmap.resize(32768, 32769), std::runtime_error);
+    EXPECT_TRUE(bitmap.buf.empty());
+}

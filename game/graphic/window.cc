@@ -208,6 +208,7 @@ void Window::start() {
 }
 
 Window::~Window() {
+	m_fbo.reset();  // Members are destroyed after glContext is deleted (declaration order): free GL objects while it is current
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	glBindVertexArray(0);
@@ -261,10 +262,7 @@ void Window::createShaders() {
 	  .bindUniformBlocks();
 
 	updateColor();
-	// core.frag recolours any texel matching origFill/origStroke. Until LyricColorTrans sets real lyric
-	// colours, use a value no texel can match, so nothing is recoloured (issue #723).
-	glmath::vec4 const noRecolour(-1.0f);
-	updateLyricHighlight(noRecolour, noRecolour, noRecolour, noRecolour);
+	clearLyricHighlight();  // Nothing is recoloured until LyricColorTrans sets real lyric colours
 	view(0);  // For loading screens
 }
 
@@ -325,10 +323,9 @@ void Window::updateLyricHighlight(glmath::vec4 const& fill, glmath::vec4 const& 
 	glBufferSubData(GL_UNIFORM_BUFFER, m_lyricColorUniforms.offset(), m_lyricColorUniforms.size(), &m_lyricColorUniforms);
 }
 
-void Window::updateLyricHighlight(glmath::vec4 const& fill, glmath::vec4 const& stroke) {
-	m_lyricColorUniforms.newFill = fill;
-	m_lyricColorUniforms.newStroke = stroke;
-	glBufferSubData(GL_UNIFORM_BUFFER, m_lyricColorUniforms.offset(), m_lyricColorUniforms.size(), &m_lyricColorUniforms);
+void Window::clearLyricHighlight() {
+	glmath::vec4 const noRecolour(-1.0f);
+	updateLyricHighlight(noRecolour, noRecolour, noRecolour, noRecolour);
 }
 
 void Window::updateTransforms() {

@@ -1,5 +1,15 @@
 "use strict";
 
+/*
+    Escape text for insertion into HTML strings. Song metadata comes from song files,
+    which are untrusted: never concatenate it into HTML without escaping.
+*/
+function escapeHtml(text) {
+    return String(text).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c];
+    });
+}
+
 $.loadScript = function (url, callback) {
     $.ajax({
         url: url,

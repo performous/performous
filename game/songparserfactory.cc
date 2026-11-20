@@ -16,6 +16,12 @@ std::unique_ptr<ISongParser> SongParserFactory::create(Song& song) const {
 	if (!f.is_open()) {
 		throw SongParserException(song, "Could not open song file", 0);
 	}
+	// Check the size before reading: any *.txt in the song folders is tried, including huge ones
+	std::error_code ec;
+	auto const fileSize = fs::file_size(song.filename, ec);
+	if (!ec && fileSize > 100000) {
+		throw SongParserException(song, "Does not look like a song file (wrong size)");
+	}
 	std::stringstream raw;
 	raw << f.rdbuf();
 	size_t size = raw.str().length();

@@ -57,7 +57,7 @@ class DanceGraph: public InstrumentGraph {
 	// Helpers
 	float panel2x(float f) const { return getScale() * (-(static_cast<float>(m_pads) * 0.5f) + m_arrow_map[static_cast<unsigned>(f)] + 0.5f); } /// Get x for an arrow line
 	float getScale() const { return 1.0f / static_cast<float>(m_pads) * 8.0f; }
-	double getNotesBeginTime() const { return m_notes.front().note.begin; }
+	double getNotesBeginTime() const { return m_notes.empty() ? getInf() : m_notes.front().note.begin; }
 	glutil::danceNoteUniforms m_uniforms;
 
 	// Note stuff

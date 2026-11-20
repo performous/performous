@@ -42,7 +42,9 @@ MenuOption &Menu::add(MenuOption opt) {
 }
 
 void Menu::move(int dir) {
-	if (dir > 0 && selection_stack.back() < menu_stack.back()->size() - 1u) ++selection_stack.back();
+	if (menu_stack.empty()) return;
+	// "+ 1 < size" rather than "< size - 1": the latter wraps around for an empty menu
+	if (dir > 0 && selection_stack.back() + 1u < menu_stack.back()->size()) ++selection_stack.back();
 	else if (dir < 0 && selection_stack.back() > 0) --selection_stack.back();
 }
 
@@ -51,6 +53,7 @@ void Menu::select(unsigned sel) {
 }
 
 void Menu::action(Game& game, int dir) {
+	if (menu_stack.empty() || menu_stack.back()->empty()) return;  // Nothing selected (current() would throw)
 	switch (current().type) {
 		case MenuOption::Type::OPEN_SUBMENU: {
 			SpdLogger::debug(LogSystem::LOGGER, "Selected menu option={}", current().getName());

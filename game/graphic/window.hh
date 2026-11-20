@@ -64,7 +64,8 @@ class Window {
 	void resetShaders();
 	void updateColor();
 	void updateLyricHighlight(glmath::vec4 const& fill, glmath::vec4 const& stroke, glmath::vec4 const& newFill, glmath::vec4 const& newStroke);
-	void updateLyricHighlight(glmath::vec4 const& fill, glmath::vec4 const& stroke);
+	/// Disable lyric recolouring: core.frag recolours texels matching origFill/origStroke, and no texel can match a negative colour (issue #723)
+	void clearLyricHighlight();
 	void updateTransforms();
 
   private:

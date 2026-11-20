@@ -91,7 +91,12 @@ MidiStream::Riff::~Riff() {
 	
 	if (has_more_data()) SpdLogger::warning(LogSystem::MIDI, "Only {} of {} bytes read of RIFF chunk {}", offset, site, name);
 #endif
-	ms.f.seekg(pos + size);
+	// Never let this throw (the stream has failbit exceptions enabled): a chunk size larger
+	// than the file would otherwise call std::terminate, possibly during stack unwinding.
+	try {
+		ms.f.clear();
+		ms.f.seekg(pos + size);
+	} catch (...) {}
 }
 
 std::uint32_t MidiStream::Riff::read_varlen() {
@@ -137,6 +142,7 @@ MidiFileParser::MidiFileParser(fs::path const& name):
 		--ntracks;
 	}
 	for (std::streamoff i = 0; i < ntracks; ++i) tracks.push_back(read_track(stream));
+	if (tempochanges.empty()) tempochanges.emplace_back(0, defaultTempo);
 }
 
 std::uint16_t MidiFileParser::parse_header(MidiStream& stream) {
@@ -147,6 +153,7 @@ std::uint16_t MidiFileParser::parse_header(MidiStream& stream) {
 	if ((format == 0 && ntracks != 1) || (format == 1 && ntracks < 2)) throw std::runtime_error("Invalid number of tracks");
 	riff.read(division);
 	if (division & 0x8000) throw std::runtime_error("SMPTE type divisions not supported");
+	if (division == 0) throw std::runtime_error("Invalid MIDI division (zero ticks per quarter note)");
 #if MIDI_DEBUG_LEVEL > 1
 	SpdLogger::debug(LogSystem::MIDI, "Division={}", division);
 #endif
@@ -269,7 +276,8 @@ MidiFileParser::Track MidiFileParser::read_track(MidiStream& stream) {
 void MidiFileParser::add_tempo_change(std::uint32_t miditime, std::uint32_t tempo) {
 	if (tempo == 0) throw std::runtime_error("Invalid MIDI file (tempo is zero)");
 	if (tempochanges.empty()) {
-		if (miditime > 0) throw std::runtime_error("Invalid MIDI file (tempo not set at the beginning)");
+		// Until the first tempo event, the MIDI standard assumes 120 BPM
+		if (miditime > 0) tempochanges.emplace_back(0, defaultTempo);
 	} else {
 		// Ignore duplicate (identical) tempo changes.
 		if (tempochanges.back().miditime == miditime && tempochanges.back().value == tempo) return;
@@ -297,7 +305,7 @@ void MidiFileParser::cout_midi_event(std::uint8_t t, std::uint8_t arg1, std::uin
 }
 
 std::uint64_t MidiFileParser::get_us(std::uint32_t miditime) {
-	if (tempochanges.empty()) throw std::runtime_error("Unable to calculate note duration without tempo");
+	if (tempochanges.empty()) return static_cast<std::uint64_t>(defaultTempo) * miditime / division;
 	std::uint64_t time = 0;
 	auto i = tempochanges.begin();
 	// TODO: cache previous
@@ -331,7 +339,9 @@ void MidiFileParser::process_midi_event(Track& track, std::uint8_t t, std::uint8
 		if( arg1 < 20 ) return;
 		if (t == 8 || (t == 9 && arg2 == 0)) {
 			// end of note (note off or note on with zero velocity)
-			if( !m_lyric.empty()  ) {
+			if (track.lyrics.empty()) {
+				// note end with no lyric note to close (e.g. it was already removed)
+			} else if( !m_lyric.empty()  ) {
 				// here we should update the last note lyric with the current m_lyric
 				track.lyrics.back().lyric = m_lyric;
 				// here we should update the last note end time with the miditime

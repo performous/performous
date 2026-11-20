@@ -5,6 +5,7 @@
 #include "song.hh"
 #include "database.hh"
 #include "configuration.hh"
+#include "log.hh"
 #include <iostream>
 #include <list>
 
@@ -28,7 +29,7 @@ Engine::Engine(Audio& audio, VocalTrackPtrs vocals, Database& database):
 	m_thread.reset(new std::thread(std::ref(*this)));
 }
 
-void Engine::operator()() {
+void Engine::operator()() try {
 	while (!m_quit) {
 		for (Player& player: m_database.cur) player.prepare();
 		double t = m_audio.getPosition() - config["audio/round-trip"].f();
@@ -38,4 +39,7 @@ void Engine::operator()() {
 		for (Player& player: m_database.cur) player.update();
 		m_time += TIMESTEP;
 	}
+} catch (std::exception const& e) {
+	// An exception escaping a thread function calls std::terminate: stop scoring instead of killing the game
+	SpdLogger::error(LogSystem::SINGING, "Singing engine stopped, exception={}", e.what());
 }

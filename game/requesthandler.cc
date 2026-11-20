@@ -35,7 +35,7 @@ void RequestHandler::HandleFile(web::http::http_request request, std::string fil
 	try {
 		fileToSend = findFile(fileName).string();
 	}
-	catch (std::runtime_error const& e) {
+	catch (std::exception const& e) {  // findFile("") (e.g. GET /js/) throws std::logic_error
 		SpdLogger::error(LogSystem::WEBSERVER, std::string("HandleFile() File Not Found. Client {}. {}"), clientIp, e.what());
 		auto const errorMsg = std::string("INTERNAL ERROR, MISSING FILE: ") + e.what();
 		request.reply(web::http::status_codes::NotFound, utility::conversions::to_string_t(errorMsg));
@@ -238,7 +238,10 @@ void RequestHandler::Post(web::http::http_request request)
 		}
 		try {
 			unsigned songIdToDelete = jsonPostBody[utility::conversions::to_string_t("songId")].as_number().to_uint32();
-			m_game.getCurrentPlayList().removeSong(songIdToDelete);
+			if (!m_game.getCurrentPlayList().removeSong(songIdToDelete)) {
+				request.reply(web::http::status_codes::BadRequest, "Unknown song id.");
+				return;
+			}
 			ScreenPlaylist* m_pp = dynamic_cast<ScreenPlaylist*>(m_game.getScreen("Playlist"));
 			m_pp->triggerSongListUpdate();
 

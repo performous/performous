@@ -8,12 +8,15 @@ set(SOURCE_FILES
 	"cycletest.cc"
 	"fixednotegraphscalertest.cc"
 	"microphones_test.cc"
+	"midifiletest.cc"
 	"notegraphscalerfactorytest.cc"
+	"playlisttest.cc"
 	"songparserfactorytest.cc"
 	"smsongparsertest.cc"
 	"txtsongparsertest.cc"
 	"ringbuffertest.cc"
 	"utiltest.cc"
+	"xmlsongparsertest.cc"
 	"imagetypetest.cc"
 
 	"main.cc"
@@ -35,6 +38,7 @@ set(GAME_SOURCES
 	"../game/notes.cc"
 	"../game/notegraphscalerfactory.cc"
 	"../game/platform.cc"
+	"../game/playlist.cc"
 	"../game/tone.cc"
 	"../game/util.cc"
 
