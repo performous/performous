@@ -91,3 +91,13 @@ TEST(MidiFileParser, ChunkLargerThanFileThrowsInsteadOfTerminating) {
 	TmpMidi tmp(file);
 	EXPECT_ANY_THROW(MidiFileParser midi(tmp.path));
 }
+
+TEST(MidiFileParser, ZeroDivisionIsRejected) {
+	// division is used as a divisor for every timestamp (SIGFPE) and as a loop step (infinite loop)
+	Bytes file = header(0, 1, 0);
+	Bytes events = tempo120;
+	append(events, endOfTrack);
+	append(file, track(events));
+	TmpMidi tmp(file);
+	EXPECT_THROW(MidiFileParser midi(tmp.path), std::runtime_error);
+}
