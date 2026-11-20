@@ -46,7 +46,8 @@ public:
 		TempoChange(std::uint32_t miditime, std::uint32_t value): miditime(miditime), value(value) {}
 	};
 	typedef std::vector<TempoChange> TempoChanges;
-	TempoChanges tempochanges;
+	TempoChanges tempochanges;  ///< Never empty after construction
+	static constexpr std::uint32_t defaultTempo = 500000;  ///< 120 BPM, the MIDI default when no tempo event is given
 	typedef std::uint8_t Pitch;
 	struct Note {
 		std::uint32_t begin;
