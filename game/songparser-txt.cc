@@ -92,7 +92,7 @@ void TxtSongParser::txtParse(Song& song) {
 			if (!finalDuet.empty()) {
 				if (currentNote.type == Note::Type::SLEEP) {
 					auto prevToLast = ++(finalDuet.rbegin());
-					if (prevToLast->type == Note::Type::SLEEP) {
+					if (finalDuet.size() >= 2 && prevToLast->type == Note::Type::SLEEP) {
 						SpdLogger::info(LogSystem::SONGPARSER, "TXT Parser ({}) -- Phrase formed by a single syllable is most likely our fault, We'll skip the break.", song.filename);
 						skip = true;
 					}
