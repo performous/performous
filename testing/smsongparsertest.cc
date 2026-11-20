@@ -133,3 +133,15 @@ TEST(UnitTest_SmSongParser, multi_bpm_file_parses_without_error_and_orders_notes
     ASSERT_NE(notes.end(), hold);
     EXPECT_GT(hold->end, hold->begin);
 }
+
+TEST(UnitTest_SmSongParser, empty_value_continued_on_next_line) {
+    // "#TITLE:" alone on its line used to read value[value.size() - 1] of an empty string.
+    std::string content = SM_CONTENT_SINGLE_BPM;
+    auto const pos = content.find("#TITLE:");
+    ASSERT_NE(std::string::npos, pos);
+    content.insert(pos + 7, "\n");
+    Song song = makeSong();
+
+    SmSongParser(content).parse(song);
+    EXPECT_EQ("Charlie bit me - auto tuned", song.title);
+}
