@@ -193,9 +193,17 @@ AudioBuffer::AudioBuffer(fs::path const& file, unsigned rate, size_t size):
 					// was asked and return back reading frames
 					m_cond.wait(l, [this]{ return m_quit || m_seek_asked; });
 				} catch (const std::exception& e) {
-					UnlockGuard<decltype(l)> unlocked(l); // unlock while doing IOs
-					SpdLogger::error(LogSystem::FFMPEG, "Error={}.", e.what());
-					if (++errors > 2) SpdLogger::error(LogSystem::FFMPEG, "Terminating due to multiple errors.");
+					{
+						UnlockGuard<decltype(l)> unlocked(l); // unlock while doing IOs
+						SpdLogger::error(LogSystem::FFMPEG, "Error={}.", e.what());
+					}
+					if (++errors > 2) {
+						SpdLogger::error(LogSystem::FFMPEG, "Terminating due to multiple errors.");
+						// Stop decoding as if at EOF instead of retrying forever; a seek may still restart it
+						m_eof_pos = m_write_pos;
+						m_cond.wait(l, [this]{ return m_quit || m_seek_asked; });
+						errors = 0;
+					}
 				}
 			}
 		});
