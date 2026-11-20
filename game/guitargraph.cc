@@ -706,8 +706,9 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		if (buttonId >= m_pads) return;
 		if (m_correctness.get() < 0.5f && m_starpower.get() < 0.001f) return; // Hammering not possible at the moment
 		for (unsigned fret = 0; fret < m_pads; ++fret) frets[fret] = false;
+		// Note: frets[] was just cleared, held buttons are in m_pressed (fret f is m_pressed[f + 1])
 		for (unsigned fret = buttonId + 1; fret < m_pads; ++fret) {
-			if (frets[fret]) return; // Extra buttons on right side
+			if (m_pressed[fret + 1]) return; // Extra buttons on right side
 		}
 		if (ev.pressed()) {
 			// Hammer-on, the fret pressed is played
@@ -717,7 +718,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 			int fret = static_cast<int>(buttonId);
 			do {
 				if (--fret < 0) return; // No frets pressed -> not a pull off
-			} while (!frets[fret]);
+			} while (!m_pressed[fret + 1]);
 			frets[fret] = true;
 		}
 	}
