@@ -101,3 +101,29 @@ TEST(MidiFileParser, ZeroDivisionIsRejected) {
 	TmpMidi tmp(file);
 	EXPECT_THROW(MidiFileParser midi(tmp.path), std::runtime_error);
 }
+
+TEST(MidiFileParser, MissingTempoDefaultsTo120Bpm) {
+	// The MIDI standard says to assume 120 BPM until the first tempo event
+	Bytes file = header(0, 1, 480);
+	Bytes events = {0x00, 0x90, 0x3C, 0x40};    // note-on 60 at 0
+	append(events, Bytes{0x83, 0x60, 0x80, 0x3C, 0x00});  // note-off 480 ticks (one beat) later
+	append(events, endOfTrack);
+	append(file, track(events));
+	TmpMidi tmp(file);
+	MidiFileParser midi(tmp.path);
+	ASSERT_EQ(midi.tempochanges.size(), 1u);
+	EXPECT_EQ(midi.tempochanges.front().value, MidiFileParser::defaultTempo);
+	EXPECT_DOUBLE_EQ(midi.get_seconds(480), 0.5);
+}
+
+TEST(MidiFileParser, LateFirstTempoKeeps120BpmBeforeIt) {
+	Bytes file = header(0, 1, 480);
+	Bytes events = {0x83, 0x60, 0xFF, 0x51, 0x03, 0x0F, 0x42, 0x40};  // 60 BPM after one beat
+	append(events, endOfTrack);
+	append(file, track(events));
+	TmpMidi tmp(file);
+	MidiFileParser midi(tmp.path);
+	ASSERT_EQ(midi.tempochanges.size(), 2u);
+	EXPECT_DOUBLE_EQ(midi.get_seconds(480), 0.5);
+	EXPECT_DOUBLE_EQ(midi.get_seconds(960), 1.5);
+}
