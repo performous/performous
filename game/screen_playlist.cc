@@ -110,6 +110,7 @@ void ScreenPlaylist::draw() {
 		assert(ss);
 		if(getGame().getCurrentPlayList().isEmpty()) {
 			m_songs.setFilter("");
+			if (m_songs.empty()) { getGame().activateScreen("Songs"); return; }  // Nothing to pick from (e.g. type filter)
 			unsigned randomsong = static_cast<unsigned>(std::rand()) % static_cast<unsigned>(m_songs.size());
 			ss->setSong(m_songs[randomsong]);
 		} else {
@@ -185,6 +186,7 @@ void ScreenPlaylist::createEscMenu() {
 			ss->setSong(getGame().getCurrentPlayList().getNext());
 		} else {
 			m_songs.setFilter("");
+			if (m_songs.empty()) { getGame().activateScreen("Songs"); return; }  // Nothing to pick from (e.g. type filter)
 			unsigned randomsong = static_cast<unsigned>(std::rand()) % static_cast<unsigned>(m_songs.size());
 			ss->setSong(m_songs[randomsong]);
 		}
