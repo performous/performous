@@ -14,7 +14,7 @@ namespace input {
 				SpdLogger::info(LogSystem::CONTROLLERS,
 					"Joystick {} opened: {} ({} buttons, {} axes, {} hats, {} balls.)",
 					id,
-					getName(id),
+					nameOf(joy.get()),
 					SDL_JoystickNumButtons(joy.get()),
 					SDL_JoystickNumAxes(joy.get()),
 					SDL_JoystickNumHats(joy.get()),
@@ -23,8 +23,13 @@ namespace input {
 				m_joysticks.push_back(joy);
 			}
 		}
-		std::string getName(int device) const override {
-			return SDL_JoystickNameForIndex(device);
+		/// Events carry the SDL instance id (not the device index, which differs after hotplug)
+		std::string getName(int instanceId) const override {
+			return nameOf(SDL_JoystickFromInstanceID(instanceId));
+		}
+		static std::string nameOf(SDL_Joystick* joy) {
+			char const* name = joy ? SDL_JoystickName(joy) : nullptr;
+			return name ? name : "Unknown joystick";  // SDL returns NULL for unknown devices; std::string(NULL) throws
 		}
 		bool process(Event& event, SDL_Event const& sdlEv) override {
 			if (sdlEv.type == SDL_JOYBUTTONDOWN || sdlEv.type == SDL_JOYBUTTONUP) {
