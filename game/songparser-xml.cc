@@ -46,6 +46,13 @@ void disableXMLLogger() { xmlSetGenericErrorFunc(NULL, xmlLogger); }
 */
 
 namespace {
+	/// Value of a mandatory attribute; throws (instead of dereferencing null) when a song file omits it
+	std::string requiredAttribute(xmlpp::Element const& elem, char const* name) {
+		auto const* attr = elem.get_attribute(name);
+		if (!attr) throw std::runtime_error(std::string("Missing XML attribute ") + name + " in element " + std::string(elem.get_name()));
+		return attr->get_value();
+	}
+
 	struct SSDom: public xmlpp::DomParser {
 		xmlpp::Node::PrefixNsMap nsmap;
 		SSDom(std::stringstream const& _ss) {
@@ -122,8 +129,8 @@ void XmlSongParser::xmlParseHeader(Song& song) {
 		xmlpp::const_NodeSet n;
 		if (!dom.find("/ss:MELODY", n)) throw std::runtime_error("Unable to find BPM info");
 		auto const& e = dynamic_cast<xmlpp::Element const&>(*n[0]);
-		std::string res = e.get_attribute("Resolution")->get_value();
-		SongParserUtil::assign(m_bpm, e.get_attribute("Tempo")->get_value().c_str());
+		std::string res = requiredAttribute(e, "Resolution");
+		SongParserUtil::assign(m_bpm, requiredAttribute(e, "Tempo").c_str());
 		if (res == "Semiquaver") {}
 		else if (res == "Demisemiquaver") m_bpm *= 2.0f;
 		else throw std::runtime_error("Unknown tempo resolution: " + res);
@@ -137,7 +144,7 @@ void XmlSongParser::xmlParseHeader(Song& song) {
 	if (!song.vocalTracks.empty()) { song.vocalTracks.clear(); }
 	for (auto const& elem: tracks) {
 		auto const& trackNode = dynamic_cast<xmlpp::Element const&>(*elem);
-		std::string name = trackNode.get_attribute("Name")->get_value();  // "Player1" or "Player2"
+		std::string name = requiredAttribute(trackNode, "Name");  // "Player1" or "Player2"
 		auto attr = trackNode.get_attribute("Artist");
 		std::string artist = attr ? std::string(attr->get_value()) : name;  // Singer name
 		if (attr) singers += (singers.empty() ? "" : " & ") + artist;
@@ -204,7 +211,7 @@ void XmlSongParser::xmlParse(Song& song) {
 
 Note XmlSongParser::xmlParseNote(Song& song, xmlpp::Element const& noteNode, unsigned& ts) {
 	Note n;
-	std::string lyric = noteNode.get_attribute("Lyric")->get_value();
+	std::string lyric = requiredAttribute(noteNode, "Lyric");
 	// Pretty print hyphenation
 	if (lyric.size() > 0 && lyric[lyric.size() - 1] == '-') {
 		if (lyric.size() > 1 && lyric[lyric.size() - 2] == ' ') lyric.erase(lyric.size() - 2);
@@ -215,8 +222,8 @@ Note XmlSongParser::xmlParseNote(Song& song, xmlpp::Element const& noteNode, uns
 	}
 	int note;
 	double duration;
-	SongParserUtil::assign(note, noteNode.get_attribute("MidiNote")->get_value().c_str());
-	SongParserUtil::assign(duration, noteNode.get_attribute("Duration")->get_value().c_str());
+	SongParserUtil::assign(note, requiredAttribute(noteNode, "MidiNote").c_str());
+	SongParserUtil::assign(duration, requiredAttribute(noteNode, "Duration").c_str());
 	if (noteNode.get_attribute("FreeStyle")) n.type = Note::Type::FREESTYLE;
 	else if (noteNode.get_attribute("Bonus")) n.type = Note::Type::GOLDEN;
 	else n.type = Note::Type::NORMAL;
