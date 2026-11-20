@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 namespace pix { 
@@ -19,6 +20,8 @@ namespace pix {
 }
 
 struct Bitmap {
+	/// Largest accepted width or height. Keeps w * h * 4 well within 32 bits and rejects images from untrusted files that would exhaust memory.
+	static constexpr unsigned maxDimension = 16384;
 	std::vector<unsigned char> buf;  // Pixel data if owned by Bitmap
 	unsigned char* ptr;  // Pixel data if owned by someone else
 	unsigned width, height;
@@ -29,7 +32,8 @@ struct Bitmap {
 	bool bottomFirst;  // Upside-down (only used for taking screenshots)
 	Bitmap(unsigned char* ptr = nullptr): ptr(ptr), width(), height(), ar(), timestamp(), fmt(pix::Format::CHAR_RGBA), linearPremul(), bottomFirst() {}
 	void resize(unsigned w, unsigned h) {
-		if (!ptr) buf.resize(w * h * 4); else buf.clear();
+		if (w > maxDimension || h > maxDimension) throw std::runtime_error("Image too large: " + std::to_string(w) + "x" + std::to_string(h));
+		if (!ptr) buf.resize(std::size_t{w} * h * 4); else buf.clear();
 		width = w;
 		height = h;
 		ar = float(w) / float(h);
