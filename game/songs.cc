@@ -302,13 +302,15 @@ void Songs::reload_internal(fs::path const& parent, Cache cache) {
 		}
 		auto iterator = fs::recursive_directory_iterator(parent, fs::directory_options::follow_directory_symlink);
 		auto maxDepth = iterator.depth() + 10;
-		for (const auto &dir : iterator) { //loop through files
+		for (; iterator != fs::recursive_directory_iterator(); ++iterator) { //loop through files
+			auto const& dir = *iterator;
 			if (!m_loading) return; // early return in case scanning is long and user wants to exit quickly
 			if (dir.is_directory()) {
-				continue;
-			}
-			if (iterator.depth() > maxDepth) {
-				SpdLogger::info(LogSystem::SONGS, ">>> Not scanning for songs on {}, maximum depth reached (possibly due to cyclic symlinks.)", parent);
+				// Don't descend any deeper: skipping only the files would still walk cyclic symlinks forever
+				if (iterator.depth() >= maxDepth) {
+					SpdLogger::info(LogSystem::SONGS, ">>> Not scanning for songs on {}, maximum depth reached (possibly due to cyclic symlinks.)", dir.path());
+					iterator.disable_recursion_pending();
+				}
 				continue;
 			}
 			fs::path p = dir.path();
