@@ -275,6 +275,7 @@ void DanceGraph::engine() {
 			else if (m_rejoin.b()) { unjoin(); setupJoinMenu(); m_dev->pushEvent(input::Event()); /* FIXME: HACK? */ }
 			// Sync dynamic stuff
 			updateJoinMenu();
+			continue;  // Menu navigation must not also hit notes or mines
 		// Open Menu
 		} else if (!menuOpen() && ev.value != 0.0) {
 			if (ev.nav == input::NavButton::CANCEL || ev.nav == input::NavButton::START) m_menu.open();
