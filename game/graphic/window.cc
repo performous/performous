@@ -208,6 +208,7 @@ void Window::start() {
 }
 
 Window::~Window() {
+	m_fbo.reset();  // Members are destroyed after glContext is deleted (declaration order): free GL objects while it is current
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	glBindVertexArray(0);
