@@ -15,6 +15,7 @@ set(SOURCE_FILES
 	"txtsongparsertest.cc"
 	"ringbuffertest.cc"
 	"utiltest.cc"
+	"xmlsongparsertest.cc"
 	"imagetypetest.cc"
 
 	"main.cc"
