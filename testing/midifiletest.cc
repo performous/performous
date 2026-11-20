@@ -82,3 +82,12 @@ TEST(MidiFileParser, LyricAfterRemovedVocalNoteDoesNotTouchEmptyLyrics) {
 	ASSERT_EQ(midi.tracks.size(), 1u);
 	EXPECT_TRUE(midi.tracks.front().lyrics.empty());
 }
+
+TEST(MidiFileParser, ChunkLargerThanFileThrowsInsteadOfTerminating) {
+	Bytes file;
+	append(file, "MThd");
+	appendU32(file, 0xFFFFFFFF);  // chunk size far beyond the end of the file
+	append(file, Bytes{0x00, 0x01, 0x00, 0x02, 0x01, 0xE0});
+	TmpMidi tmp(file);
+	EXPECT_ANY_THROW(MidiFileParser midi(tmp.path));
+}
