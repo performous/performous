@@ -8,6 +8,8 @@ set(SOURCE_FILES
 	"cycletest.cc"
 	"fixednotegraphscalertest.cc"
 	"gamerecordertest.cc"
+	"gamereplay.cc"
+	"gamereplaytest.cc"
 	"guitarenginetest.cc"
 	"microphones_test.cc"
 	"midifiletest.cc"
@@ -73,6 +75,7 @@ if(GTest_FOUND)
 	set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${GAME_SOURCES})
 
 	add_executable(performous_test ${SOURCES})
+	target_compile_definitions(performous_test PRIVATE REPLAY_DIR="${CMAKE_CURRENT_SOURCE_DIR}/replays")
 
 	find_package(Boost 1.70 CONFIG REQUIRED COMPONENTS program_options iostreams locale)
 	target_link_libraries(performous_test PRIVATE Boost::boost Boost::iostreams Boost::program_options Boost::locale)
