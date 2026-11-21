@@ -7,11 +7,18 @@
 #include <cstdint>
 #include <stdexcept>
 
+namespace animclock {
+	inline Time realNow() { return Clock::now(); }
+	/// Time source of every AnimValue. Tests replace it to make animations (and gameplay that
+	/// depends on them, e.g. correctness or GodMode) deterministic.
+	inline Time (*now)() = &realNow;
+}
+
 /// class for simple/linear animation/transition of values
 class AnimValue {
   public:
 	/// constructor
-	AnimValue(double value = 0.0, double rate = 1.0): m_value(value), m_target(value), m_rate(rate), m_time(Clock::now()) {}
+	AnimValue(double value = 0.0, double rate = 1.0): m_value(value), m_target(value), m_rate(rate), m_time(animclock::now()) {}
 	/// move animation forward by diff
 	void move(double diff) { m_value += diff; }
 	/// gets animition target
@@ -38,7 +45,7 @@ class AnimValue {
 
   private:
 	double duration() const {
-		auto newtime = Clock::now();
+		auto newtime = animclock::now();
 		Seconds t = newtime - m_time;
 		m_time = newtime;
 		return clamp(t.count());
