@@ -1,8 +1,10 @@
 #include "guitargraph.hh"
 
+#include "config.hh"
 #include "configuration.hh"
 #include "fs.hh"
 #include "log.hh"
+#include "platform.hh"
 #include "song.hh"
 #include "i18n.hh"
 #include "graphic/view_trans.hh"
@@ -342,6 +344,7 @@ void GuitarGraph::engine() {
 	double time = m_audio.getPosition();
 	time -= config["audio/controller_delay"].f();
 	doUpdates();
+	m_recorder.frame(time);
 	if (!m_drumfills.empty()) updateDrumFill(time); // Drum Fills / BREs
 	m_whammy = 0;
 	// Countdown to start
@@ -365,7 +368,10 @@ void GuitarGraph::engine() {
 			}
 			// Update key pressed status
 			if (layer < 8 && num < max_panels) {
-				if (!m_drums && num > 0) m_pressed[num] = static_cast<bool>(ev.value); // Only guitar frets can be held
+				if (!m_drums && num > 0) { // Only guitar frets can be held
+					m_pressed[num] = static_cast<bool>(ev.value);
+					m_recorder.pressed(num, m_pressed[num]);
+				}
 				if (ev.pressed()) m_pressed_anim[num].setValue(1.0); // Hit flash
 			}
 		}
@@ -389,7 +395,7 @@ void GuitarGraph::engine() {
 			if (!m_drums && m_selectedTrack.so() != m_track_index->first) setTrack(m_selectedTrack.so());
 			else if (std::stoi(m_selectedDifficulty.so()) != to_underlying(m_level))
 				difficulty(Difficulty(std::stoi(m_selectedDifficulty.so())));
-			else if (m_rejoin.b()) { unjoin(); setupJoinMenu(); m_dev->pushEvent(input::Event()); /* FIXME: HACK! */ }
+			else if (m_rejoin.b()) { unjoin(); m_recorder.rejoin(); setupJoinMenu(); m_dev->pushEvent(input::Event()); /* FIXME: HACK! */ }
 			// Sync menu items & captions
 			updateJoinMenu();
 			break;
@@ -422,6 +428,7 @@ void GuitarGraph::engine() {
 			guitarPlay(time, ev);
 		}
 		if (m_score < 0) m_score = 0;
+		m_recorder.input(to_underlying(ev.button.id), ev.value, m_whammy);
 	}
 	// Handle fret hold markers
 	if (!m_drums) for (unsigned num = 0; num < max_panels; ++num) m_pressed_anim[num].setTarget(m_pressed[num] ? 1.0 : 0.0);
@@ -499,6 +506,65 @@ void GuitarGraph::engine() {
 	}
 	// During GodMode, correctness is full, no matter what
 	if (m_starpower.get() > 0.01) m_correctness.setTarget(1.0, true);
+	m_recorder.state(m_score, m_streak, m_longestStreak, m_starmeter);
+}
+
+void GuitarGraph::saveReport() {
+	auto deviceType = [this]() -> std::string {
+		switch (m_dev->source.type) {
+			case input::SourceType::KEYBOARD: return "keyboard";
+			case input::SourceType::JOYSTICK: return "joystick";
+			case input::SourceType::MIDI: return "midi";
+			default: return "other";
+		}
+	};
+	auto os = []() -> std::string {
+		switch (Platform::currentOS()) {
+			case Platform::HostOS::OS_WIN: return "windows";
+			case Platform::HostOS::OS_LINUX: return "linux";
+			case Platform::HostOS::OS_MAC: return "macos";
+			case Platform::HostOS::OS_BSD: return "bsd";
+			default: return "unix";
+		}
+	};
+	try {
+		nlohmann::json charts = nlohmann::json::array();
+		for (auto const& c: m_recorder.charts()) {
+			auto it = m_instrumentTracks.find(c.track);
+			if (it == m_instrumentTracks.end()) continue;
+			charts.push_back({{"track", c.track}, {"difficulty", diffv[c.level].name}, {"level", c.level}, {"notes", chartToJson(*it->second, diffv[c.level].basepitch)}});
+		}
+		fs::path const& notesFile = m_song.midifilename.empty() ? m_song.filename : m_song.midifilename;
+		nlohmann::json report = {
+			{"format", "performous-game-report"},
+			{"formatVersion", 1},
+			{"performous", VERSION},
+			{"environment", {{"os", os()}}},
+			{"song", {{"fingerprint", songFingerprint(notesFile)}, {"format", notesFile.extension().string()}, {"hasBRE", m_song.hasBRE}}},
+			{"players", {{
+				{"instrument", m_drums ? "drums" : "guitar"},
+				{"device", deviceType()},
+				{"lefty", m_leftymode.b()},
+				{"proMode", m_proMode},
+				{"settings", {
+					{"audio/controller_delay", config["audio/controller_delay"].f()},
+					{"game/instrument_miss_penalty", config["game/instrument_miss_penalty"].b()},
+					{"audio/miss_volume_kids", config["audio/miss_volume_kids"].ui()},
+					{"audio/miss_volume_easy", config["audio/miss_volume_easy"].ui()},
+					{"audio/miss_volume_medium", config["audio/miss_volume_medium"].ui()},
+					{"audio/miss_volume_hard", config["audio/miss_volume_hard"].ui()},
+					{"audio/miss_volume_expert", config["audio/miss_volume_expert"].ui()},
+				}},
+				{"charts", charts},
+				{"events", m_recorder.entries()},
+			}}},
+		};
+		fs::path file = saveGameReport(report);
+		m_game.flashMessage(_("Saved for a bug report:") + std::string("\n") + file.filename().string());
+	} catch (std::exception const& e) {
+		SpdLogger::error(LogSystem::INSTRUMENTS, "Cannot save the game report: {}", e.what());
+		m_game.flashMessage(_("Could not save the game for a bug report"));
+	}
 }
 
 /// Attempt to activate GodMode
@@ -1030,6 +1096,8 @@ void GuitarGraph::draw(double time) {
 	}
 
 	drawInfo(time); // Go draw some texts and other interface stuff
+	// Drawing changes game state (passed chords, notes under drum fills) and reads animated values
+	m_recorder.draw(time);
 }
 
 /// Draws a single note
@@ -1213,6 +1281,7 @@ bool GuitarGraph::updateTom(unsigned int tomTrack, int fretId) {
 
 /// Create the Chord structures for the current track/difficulty level
 void GuitarGraph::updateChords() {
+	m_recorder.chart(m_track_index->first, static_cast<unsigned>(to_underlying(m_level)));
 	m_chords.clear();
 	m_solos.clear();
 	m_drumfills.clear();

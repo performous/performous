@@ -2,6 +2,7 @@
 
 #include "instrumentgraph.hh"
 #include "3dobject.hh"
+#include "gamerecorder.hh"
 
 #include <cstdint>
 
@@ -59,6 +60,8 @@ class GuitarGraph: public InstrumentGraph {
 	void changeTrack(int dir = 1);
 	void changeDifficulty(int dir = 1);
 	double getWhammy() const { return m_whammy; }
+	bool canSaveReport() const { return true; }
+	void saveReport();
 
   private:
 	// refactoring methods
@@ -157,4 +160,5 @@ class GuitarGraph: public InstrumentGraph {
 	bool m_hasTomTrack; /// true if the track has at least one tom track
 	bool m_proMode; /// true if pro drums. (it would be better to split guitar/trum tracks into sep classes)
 	double m_whammy; /// whammy value for pitch shift
+	GameRecorder m_recorder; /// what happened, for bug reports
 };
