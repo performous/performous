@@ -87,6 +87,8 @@ public:
 	// General shared functions
 	bool dead() const;
 	void setupPauseMenu();
+	virtual bool canSaveReport() const { return false; } ///< Can this player's game be saved for a bug report?
+	virtual void saveReport() {}
 	void doUpdates();
 	void drawMenu();
 	void toggleMenu(int forcestate = -1); // 0 = close, 1 = open, -1 = auto/toggle

@@ -17,10 +17,10 @@
 /// - frame: start of a GuitarGraph::engine() call, with the song time it uses
 /// - pressed: a guitar fret held/released (num = fret + 1)
 /// - input: an event that reached the gameplay rules
-/// - draw: the song time of a drawNotes() call (it changes game state)
+/// - draw: the song time of a draw() call, recorded when drawing ends (drawing changes game state)
 ///
 /// Frames and draws also store the wall-clock time since the recording started: animated values
-/// (correctness, GodMode) advance with it, and they are read while drawing too.
+/// (correctness, GodMode) advance with it between reads, and drawing reads them (the screen right after).
 /// - state: score, streak and star meter at the end of a frame, when they changed
 /// - chart: the track and difficulty in use from now on
 /// - rejoin: the player rejoined (scores reset)
