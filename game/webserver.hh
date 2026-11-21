@@ -3,7 +3,12 @@
 #ifdef USE_WEBSERVER
 #include "requesthandler.hh"
 
+#include <memory>
+#include <string>
+#include <thread>
+
 class Game;
+class Songs;
 
 class WebServer
 {

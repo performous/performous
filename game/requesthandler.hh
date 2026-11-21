@@ -1,48 +1,66 @@
 #pragma once
+
+#include <string>
+
 #ifdef USE_WEBSERVER
 
-#include <cpprest/http_listener.h>
-#include <cpprest/filestream.h>
+#include <nlohmann/json.hpp>
 
-#include "screen_playlist.hh"
+#include <httplib.h>
 
-class RequestHandler
-{
-  public:
-	RequestHandler(Game &game, Songs& songs);
-	RequestHandler(Game &game, std::string url, Songs& songs);
-	virtual ~RequestHandler() = default;
+#include <memory>
+#include <string>
 
-	pplx::task<void>open() { return m_listener.open(); }
-	pplx::task<void>close() { return m_listener.close(); }
+class Game;
+class Songs;
+class Song;
+class ScreenPlaylist;
 
-  private:
-	void Get(web::http::http_request request);
-	void Put(web::http::http_request request);
-	void Post(web::http::http_request request);
-	void Delete(web::http::http_request request);
-	void Error(pplx::task<void>& t);
+class RequestHandler {
+public:
+	RequestHandler(Game& game, const std::string& host, int port, Songs& songs);
+	~RequestHandler() = default;
 
-	web::json::value ExtractJsonFromRequest(web::http::http_request request);
+	// Blocking listen; returns when the server is stopped.
+	void listen();
+	// Stop the listener (safe to call from another thread).
+	void stop();
+	// True while the listener thread is serving requests.
+	bool is_running() const;
 
-	void HandleFile(web::http::http_request request, std::string filePath = "");
-	web::json::value SongsToJsonObject();
-	std::map<std::string, std::string> GenerateLocaleDict();
-	std::vector<std::string> GetTranslationKeys();
-	std::shared_ptr<Song> GetSongFromJSON(web::json::value);
+private:
+	void setupRoutes();
 
-	web::http::experimental::listener::http_listener m_listener;
+	// API handlers, return httplib status code; body set via res.
+	void handleGetDatabase(const httplib::Request& req, httplib::Response& res);
+	void handleLanguage(const httplib::Request& req, httplib::Response& res);
+	void handleGetCurrentPlaylist(const httplib::Request& req, httplib::Response& res);
+	void handlePlaylistTimeout(const httplib::Request& req, httplib::Response& res);
 
+	void handleAdd(const httplib::Request& req, httplib::Response& res);
+	void handleRemove(const httplib::Request& req, httplib::Response& res);
+	void handleSetPosition(const httplib::Request& req, httplib::Response& res);
+	void handleSearch(const httplib::Request& req, httplib::Response& res);
+
+	static nlohmann::json extractJson(const httplib::Request& req);
+	nlohmann::json songsToJson() const;
+	std::shared_ptr<Song> getSongFromJson(const nlohmann::json& doc) const;
+	static std::map<std::string, std::string> generateLocaleDict();
+	static std::vector<std::string> getTranslationKeys();
+
+	std::unique_ptr<httplib::Server> m_server;
+	std::string m_bindHost;
+	int m_bindPort = 0;
 	Game& m_game;
 	Songs& m_songs;
 };
+
 #else
 class Songs;
 class Game;
 
-class RequestHandler
-{
-  public:
-	RequestHandler(Game&, Songs&) {}
+class RequestHandler {
+public:
+	RequestHandler(Game&, const std::string&, int, Songs&) {}
 };
 #endif

@@ -18,7 +18,7 @@ RUN <<EOR
 	dnf install -y git cmake gcc-c++ gettext cairo-devel librsvg2-devel libsigc++20-devel \
 		glibmm24-devel libxml++-devel boost-devel SDL2-devel libepoxy-devel ffmpeg-free-devel \
 		portaudio-devel help2man redhat-lsb opencv-devel portmidi-devel libjpeg-turbo-devel \
-		pango-devel glm-devel openblas-devel fftw-devel cpprest-devel \
+		pango-devel glm-devel openblas-devel fftw-devel cpp-httplib-devel \
 		aubio-devel json-devel rpm-build fmt-devel gtest-devel gmock-devel gtest spdlog-devel \
 		libwebp-devel
 	dnf clean all

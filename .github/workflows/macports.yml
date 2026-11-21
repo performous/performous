@@ -62,7 +62,7 @@ jobs:
         boost boost.version=${{ inputs.boost_version }}
         cairo
         cmake
-        cpprestsdk boost.version=${{ inputs.boost_version }}
+        cpp-httplib
         dylibbundler
         ffmpeg7
         fftw-3-single
@@ -110,14 +110,6 @@ jobs:
           echo build_arch $(uname -m) | tee -a /opt/local/etc/macports/macports.conf
           echo boost.version ${{ inputs.boost_version }} | tee -a /opt/local/etc/macports/macports.conf
 
-          sudo mkdir -p /opt/custom_portfiles/www/
-          sudo portindex \
-          /opt/local/var/macports/sources/rsync.macports.org/macports/release/tarballs/ports/
-          sudo cp -Rvf $(dirname $(port file cpprestsdk)) /opt/custom_portfiles/www/
-          sudo mkdir -p /opt/custom_portfiles/www/cpprestsdk/files
-
-          sudo cp -vf ./performous/.github/support-boost-1.87.patch /opt/custom_portfiles/www/cpprestsdk/files/
-
           sudo mkdir -p /opt/custom_portfiles/graphics/
           sudo cp -Rv $(dirname $(port file librsvg)) /opt/custom_portfiles/graphics/
 
@@ -126,12 +118,6 @@ jobs:
           EOF
 
           #sudo cp -Rv $(dirname $(port file harfbuzz))/files /opt/custom_portfiles/graphics/harfbuzz/
-
-          sudo cat <<EOF | sudo tee -a /opt/custom_portfiles/www/cpprestsdk/Portfile
-            patchfiles-append support-boost-1.87.patch
-            configure.args-append -DCPPREST_EXCLUDE_WEBSOCKETS=ON
-            depends_build-delete port:websocketpp
-          EOF
 
           sudo cat <<EOF | sudo tee /opt/local/etc/macports/sources.conf
           file:///opt/custom_portfiles [nosync]

@@ -188,46 +188,36 @@ endif()
 # Activating webserver
 set(ENABLE_WEBSERVER AUTO CACHE STRING "Use webserver")
 set_property(CACHE ENABLE_WEBSERVER PROPERTY STRINGS AUTO ON OFF)
+set(SELF_BUILT_HTTPLIB "AUTO" CACHE STRING "rule to allow self build of HttpLib (cpp-httplib) dependency [NEVER|AUTO*|ALWAYS]")
 if("AUTO" STREQUAL "${ENABLE_WEBSERVER}")
-	# webserver not requested explicitly, best effort try to find it
-	find_package(cpprestsdk QUIET)
-	if (NOT cpprestsdk_FOUND)
-		find_package(CppRest QUIET)
-	endif()
-	if(cpprestsdk_FOUND OR CppRest_FOUND)
-		message(STATUS "Webserver support: Enabled (automatically found)")
-	else()
-		message(STATUS "Webserver support: Disabled (cpprestsdk not found)")
-		SET (ENABLE_WEBSERVER OFF FORCE)
-	endif()
+        # webserver not requested explicitly, best effort try to find it
+        find_package(HttpLib QUIET)
+        if(HttpLib_FOUND)
+                message(STATUS "Webserver support: Enabled (automatically found)")
+        else()
+                message(STATUS "Webserver support: Disabled (cpp-httplib not found)")
+                SET (ENABLE_WEBSERVER OFF FORCE)
+        endif()
 elseif(ENABLE_WEBSERVER)
-	# webserver explicitly requested, make it mandatory
-	find_package(cpprestsdk)
-	if (NOT cpprestsdk_FOUND)
-		find_package(CppRest QUIET REQUIRED)
-	endif()
-	if(cpprestsdk_FOUND OR CppRest_FOUND)
-		message(STATUS "Webserver support: Enabled (explicitly enabled)")
-	else()
-	# webserver explicitly disabled
-		message(STATUS "Webserver support: Disabled (explicitly disabled)")
-	endif()
+        # webserver explicitly requested, make it mandatory
+        find_package(HttpLib REQUIRED)
+        if(HttpLib_FOUND)
+                message(STATUS "Webserver support: Enabled (explicitly enabled)")
+        else()
+        # webserver explicitly disabled
+                message(STATUS "Webserver support: Disabled (explicitly disabled)")
+        endif()
 endif()
 
-# if cpprest is found, add it to the dependencies
-if(cpprestsdk_FOUND OR CppRest_FOUND)
-	# add other required dependencies then
-	# FIXME: move this to the CppRest package includes if possible
-	find_package(Boost 1.70 CONFIG REQUIRED COMPONENTS chrono thread)
-	find_package(OpenSSL REQUIRED)
-	if(cpprestsdk_FOUND)
-		target_link_libraries(performous PRIVATE cpprestsdk::cpprest)
-	else()
-		target_include_directories(performous SYSTEM PRIVATE ${CppRest_INCLUDE_DIRS})
-		target_link_libraries(performous PRIVATE ${CppRest_LIBRARIES})
-	endif()
-	target_link_libraries(performous PRIVATE Boost::boost Boost::chrono OpenSSL::SSL OpenSSL::Crypto)
-	add_definitions("-DUSE_WEBSERVER")
+# if cpp-httplib is found, add it to the dependencies
+if(HttpLib_FOUND)
+        target_include_directories(performous SYSTEM PRIVATE ${HttpLib_INCLUDE_DIRS})
+        target_link_libraries(performous PRIVATE ${HttpLib_LIBRARIES})
+        # Distros that ship cpp-httplib precompiled (Debian/Ubuntu) bake
+        # CPPHTTPLIB_* defines into the library; the header must be compiled
+        # with the same defines or the ABI will not match.
+        target_compile_definitions(performous PRIVATE ${HttpLib_DEFINITIONS})
+        add_definitions("-DUSE_WEBSERVER")
 endif()
 
 if(WIN32)

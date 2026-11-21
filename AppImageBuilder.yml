@@ -31,7 +31,7 @@ AppDir:
       - libboost-program-options1.83.0
       - libc6
       - libcairo2
-      - libcpprest2.10
+      - libcpp-httplib0.14t64
       - libepoxy0
       - libfmt9
       - libfontconfig1

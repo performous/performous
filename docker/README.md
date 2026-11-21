@@ -7,18 +7,18 @@ These containers are built automatically during our CI/CD workflow, and are used
 ## Building containers
 The build is a pretty standard `docker build`, just make sure you explicitly call out a `Dockerfile` with `-f Dockerfile.<distro>` and supply the correct distro version as a `build-arg`:  
 ```sh
-docker build -t performous-docker-build:ubuntu20.04 -f Dockerfile.ubuntu --build-arg OS_VERSION=20.04 .
+docker build -t performous-docker-build:ubuntu22.04 -f Dockerfile.ubuntu --build-arg OS_VERSION=22.04 .
 ```
 
 Currently supported distros are:
-- Ubuntu (20.04, 22.04)
+- Ubuntu (22.04, 24.04, 26.04)
 - Fedora (34, 35, 36)
 - Debian (10, 11)
 
 ## Running the containers
 Once the `base-image` has been built, the container can be run interactively to build `Performous`:  
 ```sh
-docker run -it performous-docker-build:ubuntu20.04
+docker run -it performous-docker-build:ubuntu22.04
 ```  
 
 From there, you can [follow the build instructions](https://github.com/performous/performous/wiki/Building-and-installing-from-source#downloading-and-installing-the-sources) to build performous.  
@@ -39,10 +39,10 @@ Optional Arguments:
 
 To build a pull request using just cmake:
 ```
-docker run performous-docker-build:ubuntu20.04 ./build_performous.sh -c -p 626
+docker run performous-docker-build:ubuntu22.04 ./build_performous.sh -c -p 626
 ```
 
 One-Liner to generate packages and copy them to `/tmp` on the running system:
 ```
-mkdir /tmp/performous-packages && docker run --rm --mount type=bind,source=/tmp/performous-packages,target=/performous/packages performous-docker-build:ubuntu20.04 /bin/bash -c './build_performous.sh -c -R -g && cp performous/build/*.deb /performous/packages'
+mkdir /tmp/performous-packages && docker run --rm --mount type=bind,source=/tmp/performous-packages,target=/performous/packages performous-docker-build:ubuntu22.04 /bin/bash -c './build_performous.sh -c -R -g && cp performous/build/*.deb /performous/packages'
 ```

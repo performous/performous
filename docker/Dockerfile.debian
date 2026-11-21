@@ -31,7 +31,7 @@ RUN <<EOR
 		libavcodec-dev libavformat-dev libswscale-dev libjpeg-dev \
 		portaudio19-dev libglm-dev libboost-filesystem-dev \
 		libboost-iostreams-dev libboost-locale-dev libboost-system-dev \
-		libboost-program-options-dev libssl-dev libcpprest-dev \
+		libboost-program-options-dev libssl-dev libcpp-httplib-dev \
 		libportmidi-dev libopencv-dev libaubio-dev nlohmann-json3-dev \
 		libfmt-dev ca-certificates file libgmock-dev libgtest-dev libwebp-dev
 	apt-get -y satisfy "libfmt-dev (>= 8)" "Conflicts: libspdlog-dev (<< 1.12)"
