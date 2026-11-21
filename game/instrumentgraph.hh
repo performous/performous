@@ -6,6 +6,7 @@
 #include "audio.hh"
 #include "animvalue.hh"
 #include "notes.hh"
+#include "playevent.hh"
 #include "controllers.hh"
 #include "texture.hh"
 #include "opengl_text.hh"
@@ -59,8 +60,6 @@ class Popup {
 	SvgTxtTheme* m_infoText;  /// Font for the additional text
 };
 
-
-const unsigned max_panels = 10; // Maximum number of arrow lines / guitar frets
 
 class Audio;
 class Game;
@@ -116,16 +115,7 @@ public:
 	size_t m_stream; /// audio stream number
 	input::DevicePtr m_dev;
 	AnimValue m_cx, m_width; /// controls horizontal position and width smoothly
-	struct Event {
-		double time;
-		AnimValue glow;
-		AnimValue whammy;
-		unsigned type; // 0 = miss (pick), 1 = tap, 2 = pick
-		int fret;
-		Duration const* dur;
-		double holdTime;
-		Event(double t, unsigned ty, int f = -1, Duration const* d = nullptr): time(t), glow(0.0, 5.0), whammy(0.0, 0.5), type(ty), fret(f), dur(d), holdTime(d ? d->begin : getNaN()) { if (type > 0) glow.setValue(1.0); }
-	};
+	using Event = PlayEvent;
 	typedef std::vector<Event> Events;
 	Events m_events;
 	typedef std::vector<Popup> Popups;
