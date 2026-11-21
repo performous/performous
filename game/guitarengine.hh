@@ -6,6 +6,8 @@
 #include "playevent.hh"
 
 #include <algorithm>
+#include <cstdlib>
+#include <functional>
 #include <map>
 #include <vector>
 
@@ -103,6 +105,8 @@ class GuitarEngine {
 
 	// State
 	Settings settings;
+	/// Random part (0..1) of the whammy value, replaceable so that a recorded game can be replayed exactly
+	std::function<double()> whammyNoise = [] { return std::rand() / double(RAND_MAX); };
 	Difficulty difficulty() const { return m_level; }
 	typedef std::vector<GuitarChord> Chords;
 	Chords const& chords() const { return m_chords; }

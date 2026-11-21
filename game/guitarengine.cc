@@ -119,7 +119,7 @@ void GuitarEngine::input(double time, input::Event ev) {
 	// Guitar specific actions
 	if (!m_drums) {
 		if (ev.button == input::ButtonId::GUITAR_GODMODE && ev.pressed()) activateStarpower();
-		if (ev.button == input::ButtonId::GUITAR_WHAMMY) m_whammy = (1.0 + ev.value + 2.0*(rand()/double(RAND_MAX))) / 4.0;
+		if (ev.button == input::ButtonId::GUITAR_WHAMMY) m_whammy = (1.0 + ev.value + 2.0 * whammyNoise()) / 4.0;
 		if (buttonId <= m_pads && !ev.pressed()) endHold(buttonId, time);
 	}
 
