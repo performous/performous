@@ -20,6 +20,7 @@ Game::Game(Window& window):
 {
 	SpdLogger::notice(LogSystem::AUDIO, "Starting the audio subsystem (errors printed on console may be ignored).");
 	m_textMessage.dimensions.middle().center(-0.05f);
+	currentPlaylist.setLimit(config["kioskmode/playlist_limit"].ui());
 }
 
 void Game::activateScreen(std::string const& name) {

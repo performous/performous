@@ -3,9 +3,13 @@
 #include <algorithm>
 #include <random>
 
-void PlayList::addSong(std::shared_ptr<Song> song) {
-	std::lock_guard<std::mutex> l(m_mutex);
-	m_list.push_back(song);
+bool PlayList::addSong(std::shared_ptr<Song> song) {
+	if (m_limit == 0 || m_limit > m_list.size()) {
+		std::lock_guard<std::mutex> l(m_mutex);
+		m_list.push_back(song);
+		return true;
+	}
+	return false;
 }
 
 std::shared_ptr<Song> PlayList::getNext() {
@@ -38,8 +42,10 @@ void PlayList::clear() {
 }
 
 void PlayList::removeSong(unsigned index) {
-	std::lock_guard<std::mutex> l(m_mutex);
-	m_list.erase(m_list.begin() + index);
+	if(index < m_list.size()) {
+		std::lock_guard<std::mutex> l(m_mutex);
+		m_list.erase(m_list.begin() + index);
+	}
 }
 void PlayList::swap(unsigned index1, unsigned index2) {
 	std::lock_guard<std::mutex> l(m_mutex);
@@ -47,6 +53,11 @@ void PlayList::swap(unsigned index1, unsigned index2) {
 	m_list[index1] = m_list[index2];
 	m_list[index2] = song1;
 }
+
+void PlayList::setLimit(unsigned limit) {
+	m_limit = limit;
+}
+
 void PlayList::move(unsigned fromIndex, unsigned toIndex)
 {
 	std::lock_guard<std::mutex> l(m_mutex);
