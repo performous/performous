@@ -163,11 +163,17 @@ jobs:
         id: restore_cache
         uses: Lord-Kamina/always-upload-cache/restore@refresh-cache
         with:
-          # Due to a very long-standing bug in cache, excluding only works if all specified paths have the same depth.
+          # An exclusion only removes a path matched at the same depth, never its descendants, and a matched directory
+          # is archived whole. To leave out the ports tree (var/macports/sources), exclude var/macports and add its
+          # children back one level down. The ports tree must stay out: 'port sync' has already written it as root
+          # before the restore, so extracting it fails and the whole cache counts as missed.
           path: |
             /opt/local/*/*
             /Applications/MacPorts/
             !/opt/local/etc/macports
+            !/opt/local/var/macports
+            /opt/local/var/macports/*
+            !/opt/local/var/macports/sources
           key: '${{ steps.cache-key.outputs.computed_cache_key }}'
 
       - name: Unlink Homebrew
@@ -317,11 +323,17 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           refresh-cache: true
-          # Due to a very long-standing bug in cache, excluding only works if all specified paths have the same depth.
+          # An exclusion only removes a path matched at the same depth, never its descendants, and a matched directory
+          # is archived whole. To leave out the ports tree (var/macports/sources), exclude var/macports and add its
+          # children back one level down. The ports tree must stay out: 'port sync' has already written it as root
+          # before the restore, so extracting it fails and the whole cache counts as missed.
           path: |
             /opt/local/*/*
             /Applications/MacPorts/
             !/opt/local/etc/macports
+            !/opt/local/var/macports
+            /opt/local/var/macports/*
+            !/opt/local/var/macports/sources
           key: '${{ steps.cache-key.outputs.computed_cache_key }}'
 
       - name: Verify installed dependencies
