@@ -286,6 +286,7 @@ jobs:
           sudo port -N activate active boost.version=${{ inputs.boost_version }}
           sudo port setrequested gnutar
           sudo port -N uninstall leaves || true
+          sudo port -N uninstall inactive || true
           sudo port deactivate -f installed
           sudo port activate -f gnutar zstd boost.version=${{ inputs.boost_version }}
           # Remove broken symlinks
