@@ -166,7 +166,8 @@ jobs:
           # An exclusion only removes a path matched at the same depth, never its descendants, and a matched directory
           # is archived whole. To leave out the ports tree (var/macports/sources), exclude var/macports and add its
           # children back one level down. The ports tree must stay out: 'port sync' has already written it as root
-          # before the restore, so extracting it fails and the whole cache counts as missed.
+          # before the restore, so extracting it fails and the whole cache counts as missed. var/macports/home is the
+          # build user's home: macOS may create unreadable folders there (Keychains, ContainerManager) and break the save.
           path: |
             /opt/local/*/*
             /Applications/MacPorts/
@@ -174,6 +175,7 @@ jobs:
             !/opt/local/var/macports
             /opt/local/var/macports/*
             !/opt/local/var/macports/sources
+            !/opt/local/var/macports/home
           key: '${{ steps.cache-key.outputs.computed_cache_key }}'
 
       - name: Unlink Homebrew
@@ -326,7 +328,8 @@ jobs:
           # An exclusion only removes a path matched at the same depth, never its descendants, and a matched directory
           # is archived whole. To leave out the ports tree (var/macports/sources), exclude var/macports and add its
           # children back one level down. The ports tree must stay out: 'port sync' has already written it as root
-          # before the restore, so extracting it fails and the whole cache counts as missed.
+          # before the restore, so extracting it fails and the whole cache counts as missed. var/macports/home is the
+          # build user's home: macOS may create unreadable folders there (Keychains, ContainerManager) and break the save.
           path: |
             /opt/local/*/*
             /Applications/MacPorts/
@@ -334,6 +337,7 @@ jobs:
             !/opt/local/var/macports
             /opt/local/var/macports/*
             !/opt/local/var/macports/sources
+            !/opt/local/var/macports/home
           key: '${{ steps.cache-key.outputs.computed_cache_key }}'
 
       - name: Verify installed dependencies
