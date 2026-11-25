@@ -11,6 +11,7 @@
 #include <atomic>
 #include <cctype>
 #include <condition_variable>
+#include <cstdint>
 #include <stdexcept>
 #include <sstream>
 #include <thread>
@@ -69,8 +70,9 @@ class TextureLoader::Impl {
 	std::atomic<bool> m_quit{ false };
 	std::mutex m_mutex;
 	std::condition_variable m_condition;
-	typedef std::map<void const*, Job> Jobs;
+	using Jobs = std::map<TextureLoader::Ticket, Job>; /// Jobs keyed by ever-increasing ticket; maintains load-ordering
 	Jobs m_jobs;
+	TextureLoader::Ticket m_lastTicket{ 0 }; 
 	std::thread m_thread;
 public:
 	Impl(): m_quit(), m_thread(&Impl::run, this) {}
@@ -85,19 +87,19 @@ public:
 	/// The loader main loop: poll for image load jobs and load into RAM
 	void run() {
 		while (!m_quit) {
-			void const* target = nullptr;
+			TextureLoader::Ticket ticket = 0;
 			fs::path name;
 			{
-				// Poll for jobs to be done
+				// Take the oldest request that is still pending
 				std::unique_lock<std::mutex> l(m_mutex);
-				for (auto& job: m_jobs) {
-					if (job.second.name.empty()) continue;  // Job already done
-					name = job.second.name;
-					target = job.first;
+				for (auto const& [t, job]: m_jobs) {
+					if (job.name.empty()) continue;  // Job already done
+					ticket = t;
+					name = job.name;
 					break;
 				}
 				// If not found, wait for one
-				if (!target) {
+				if (!ticket) {
 					if (!m_quit) m_condition.wait(l);  // m_quit is re-checked under the lock to avoid a lost wake-up
 					continue;
 				}
@@ -107,22 +109,24 @@ public:
 			load(bitmap, name);
 			// Store the result
 			std::lock_guard<std::mutex> l(m_mutex);
-			auto it = m_jobs.find(target);
-			if (it == m_jobs.end()) continue;  // The job has been removed already
+			auto it = m_jobs.find(ticket);
+			if (it == m_jobs.end()) continue;  // The job was removed: its Texture was destroyed during the load
 			it->second.name.clear();  // Mark the job completed
 			it->second.bitmap.swap(bitmap);  // Store the bitmap (if we got any)
 		}
 	}
-	/// Add a new job, using calling Texture's address as unique ID.
-	void push(void const* t, Job const& job) {
+	/// Add a new job and return its ticket. A ticket is never reused, so a finished load can only reach the job it was started for.
+	TextureLoader::Ticket push(Job job) {
 		std::lock_guard<std::mutex> l(m_mutex);
-		m_jobs[t] = job;
+		TextureLoader::Ticket const ticket = ++m_lastTicket;
+		m_jobs.emplace(ticket, std::move(job));
 		m_condition.notify_one();
+		return ticket;
 	}
-	/// Cancel a job in progress (no effect if the job has already completed)
-	void remove(void const* t) {
+	/// Cancel a job (no effect if it has already been applied)
+	void remove(TextureLoader::Ticket ticket) {
 		std::lock_guard<std::mutex> l(m_mutex);
-		m_jobs.erase(t);
+		m_jobs.erase(ticket);
 	}
 	/// Upload all completed jobs to OpenGL (must be called from a valid OpenGL context)
 	void apply() {
@@ -149,18 +153,19 @@ TextureLoader::~TextureLoader() { ldr.reset(); }
 
 void updateTextures() { ldr->apply(); }
 
-template <typename T> void loader(T* target, fs::path const& name) {
+template <typename T> TextureLoader::Ticket loader(T* target, fs::path const& name) {
 	// Temporarily add 1x1 pixel black texture
 	Bitmap bitmap;
 	bitmap.fmt = pix::Format::RGB;
 	bitmap.resize(1, 1);
 	target->load(bitmap);
-	// Ask the loader to retrieve the image
-	ldr->push(target, Job(name, [target](Bitmap& bitmap){ target->load(bitmap); }));
+	// Ask the loader to retrieve the image. The callback only runs on the main thread, and ~Texture()
+	// removes the job first, so it never runs for a destroyed Texture.
+	return ldr->push(Job(name, [target](Bitmap& bitmap){ target->load(bitmap); }));
 }
 
-Texture::Texture(fs::path const& filename) { loader(this, filename); }
-Texture::~Texture() { ldr->remove(this); }
+Texture::Texture(fs::path const& filename) { m_loadTicket = loader(this, filename); }
+Texture::~Texture() { if (m_loadTicket) ldr->remove(m_loadTicket); }
 
 // Stuff for converting pix::Format into OpenGL enum values & other flags
 namespace {
