@@ -139,6 +139,8 @@ class GuitarGraph: public InstrumentGraph {
 	// Graphics functions
 	Color const colorize(Color c, double time) const;
 	void drawNeckStuff(double time);  ///< Anything in neck coordinates
+	/// Gameplay rules that run while drawing: mark chords as passed, free notes under drum fills
+	void updateLookahead(double time);
 	void drawNotes(double time);  ///< Frets etc.
 	void drawBar(double time, float h);
 	void drawNote(unsigned fret, Color, double tBeg, double tEnd, float whammy = 0.0f, bool tappable = false, bool hit = false, double hitAnim = 0.0, double releaseTime = 0.0);

@@ -890,7 +890,35 @@ namespace {
 
 }
 
+/// Rules that run while drawing the notes visible from time + past to time + future:
+/// mark chords as passed and give the notes under a drum fill / Big Rock Ending for free.
+void GuitarGraph::updateLookahead(double time) {
+	bool drumfill = m_dfIt != m_drumfills.end() && m_dfIt->begin - time <= future;
+	if (time != time) return;  // Check that time is not NaN
+	for (auto& chord: m_chords) {
+		float tBeg = static_cast<float>(chord.begin - time);
+		float tEnd = static_cast<float>(m_drums ? tBeg : chord.end - time);
+		if (tBeg > future) break;
+		if (tEnd < past) {
+			chord.passed = true; // Mark as past note for rewinding
+			continue;
+		}
+		// Don't show past chords when rewinding
+		if (chord.passed || (tBeg > maxTolerance && chord.status > 0)) continue;
+		// Handle notes during drum fills / BREs
+		if (drumfill && chord.begin >= m_dfIt->begin - maxTolerance
+		  && chord.begin <= m_dfIt->end + maxTolerance) {
+			if (chord.status == 0) {
+				chord.status = chord.polyphony; // Mark as hit so that streak doesn't reset
+				m_drumfillScore += static_cast<float>(chord.polyphony) * 50.0f; // Count points from notes under drum fill
+			}
+			continue;
+		}
+	}
+}
+
 void GuitarGraph::drawNotes(double time) {
+	updateLookahead(time);  // FIXME: gameplay rules that depend on drawing
 	glutil::UseDepthTest depthtest;
 	// Draw drum fills / Big Rock Endings
 	bool drumfill = m_dfIt != m_drumfills.end() && m_dfIt->begin - time <= future;
@@ -913,21 +941,12 @@ void GuitarGraph::drawNotes(double time) {
 		float tBeg = static_cast<float>(chord.begin - time);
 		float tEnd = static_cast<float>(m_drums ? tBeg : chord.end - time);
 		if (tBeg > future) break;
-		if (tEnd < past) {
-			chord.passed = true; // Mark as past note for rewinding
-			continue;
-		}
+		if (tEnd < past) continue;
 		// Don't show past chords when rewinding
 		if (chord.passed || (tBeg > maxTolerance && chord.status > 0)) continue;
-		// Handle notes during drum fills / BREs
+		// Skip notes during drum fills / BREs
 		if (drumfill && chord.begin >= m_dfIt->begin - maxTolerance
-		  && chord.begin <= m_dfIt->end + maxTolerance) {
-			if (chord.status == 0) {
-				chord.status = chord.polyphony; // Mark as hit so that streak doesn't reset
-				m_drumfillScore += static_cast<float>(chord.polyphony) * 50.0f; // Count points from notes under drum fill
-			}
-			continue;
-		}
+		  && chord.begin <= m_dfIt->end + maxTolerance) continue;
 		// Loop through the frets
 		for (unsigned fret = 0; fret < m_pads; ++fret) {
 			if (!chord.fret[fret] || (tBeg > maxTolerance && chord.releaseTimes[fret] > 0)) continue;
