@@ -2,6 +2,7 @@
 
 #include "graphic/glutil.hh"
 #include "image.hh"
+#include "texturejobqueue.hh"
 #include "graphic/window.hh"
 
 #include <cairo.h>
@@ -211,10 +212,9 @@ void updateTextures();
 /// A RAII wrapper for texture loading worker thread. There must be exactly one (global) instance whenever any Textures exist.
 class TextureLoader {
 public:
-	using Ticket = std::uint64_t;  ///< Identifies one load request; never reused, 0 means none
+	using Ticket = TextureJobQueue::Ticket;  ///< Identifies one load request; never reused, 0 means none
 	TextureLoader();
 	~TextureLoader();
-	class Impl;
 };
 
 /**

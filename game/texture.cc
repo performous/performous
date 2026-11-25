@@ -6,15 +6,13 @@
 #include "log.hh"
 #include "screen.hh"
 #include "svg.hh"
+#include "texturejobqueue.hh"
 #include "util.hh"
 
-#include <atomic>
 #include <cctype>
-#include <condition_variable>
 #include <cstdint>
 #include <stdexcept>
 #include <sstream>
-#include <thread>
 #include <vector>
 
 Shader& getShader(Window& window, std::string const& name) {
@@ -30,123 +28,41 @@ float Dimensions::screenY() const {
 	throw std::logic_error("Dimensions::screenY(): unknown m_screenAnchor value");
 }
 
-struct Job {
-	fs::path name;
-	typedef std::function<void (Bitmap& bitmap)> ApplyFunc;
-	ApplyFunc apply;
-	Bitmap bitmap;
-	Job() {}
-	Job(fs::path const& n, ApplyFunc const& a): name(n), apply(a) {}
-};
-
-class TextureLoader::Impl {
-	/// Load a file from disk into a buffer
-	static void load(Bitmap& bitmap, fs::path const& name) {
-		try {
-			auto const ext = toLower(name.extension().string());
-			if (!fs::is_regular_file(name))
-			{
-				throw std::runtime_error("File not found: " + name.string());
-			}
-			else
-			{
-				const ImageType image_type{getImageType(name.string())};
-				if (image_type == ImageType::SVG)
-					loadSVG(bitmap, name);
-				else if (image_type == ImageType::JPEG)
-					loadJPEG(bitmap, name);
-				else if (image_type == ImageType::PNG)
-					loadPNG(bitmap, name);
-				else if (image_type == ImageType::WEBP)
-					loadWEBP(bitmap, name);
-				else
-					throw std::runtime_error("Unknown image file format: " + name.string());
-			}
-		}
-		catch (std::exception& e) {
-			SpdLogger::error(LogSystem::IMAGE, "Error loading texture, exception={}", e.what());
-		}
-	}
-	std::atomic<bool> m_quit{ false };
-	std::mutex m_mutex;
-	std::condition_variable m_condition;
-	using Jobs = std::map<TextureLoader::Ticket, Job>; /// Jobs keyed by ever-increasing ticket; maintains load-ordering
-	Jobs m_jobs;
-	TextureLoader::Ticket m_lastTicket{ 0 };
-	std::thread m_thread;
-public:
-	Impl(): m_quit(), m_thread(&Impl::run, this) {}
-	~Impl() {
+namespace {
+/// Load a file from disk into a buffer
+void load(Bitmap& bitmap, fs::path const& name) {
+	try {
+		auto const ext = toLower(name.extension().string());
+		if (!fs::is_regular_file(name))
 		{
-			std::lock_guard<std::mutex> l(m_mutex);  // Under the lock, so the worker can't miss the wake-up
-			m_quit = true;
+			throw std::runtime_error("File not found: " + name.string());
 		}
-		m_condition.notify_one();
-		m_thread.join();
-	}
-	/// The loader main loop: poll for image load jobs and load into RAM
-	void run() {
-		while (!m_quit) {
-			TextureLoader::Ticket ticket = 0;
-			fs::path name;
-			{
-				// Take the oldest request that is still pending
-				std::unique_lock<std::mutex> l(m_mutex);
-				for (auto const& [t, job]: m_jobs) {
-					if (job.name.empty()) continue;  // Job already done
-					ticket = t;
-					name = job.name;
-					break;
-				}
-				// If not found, wait for one
-				if (!ticket) {
-					if (!m_quit) m_condition.wait(l);  // m_quit is re-checked under the lock to avoid a lost wake-up
-					continue;
-				}
-			}
-			// Load image file into buffer
-			Bitmap bitmap;
-			load(bitmap, name);
-			// Store the result
-			std::lock_guard<std::mutex> l(m_mutex);
-			auto it = m_jobs.find(ticket);
-			if (it == m_jobs.end()) continue;  // The job was removed: its Texture was destroyed during the load
-			it->second.name.clear();  // Mark the job completed
-			it->second.bitmap.swap(bitmap);  // Store the bitmap (if we got any)
+		else
+		{
+			const ImageType image_type{getImageType(name.string())};
+			if (image_type == ImageType::SVG)
+				loadSVG(bitmap, name);
+			else if (image_type == ImageType::JPEG)
+				loadJPEG(bitmap, name);
+			else if (image_type == ImageType::PNG)
+				loadPNG(bitmap, name);
+			else if (image_type == ImageType::WEBP)
+				loadWEBP(bitmap, name);
+			else
+				throw std::runtime_error("Unknown image file format: " + name.string());
 		}
 	}
-	/// Add a new job and return its ticket. A ticket is never reused, so a finished load can only reach the job it was started for.
-	TextureLoader::Ticket push(Job job) {
-		std::lock_guard<std::mutex> l(m_mutex);
-		TextureLoader::Ticket const ticket = ++m_lastTicket;
-		m_jobs.emplace(ticket, std::move(job));
-		m_condition.notify_one();
-		return ticket;
+	catch (std::exception& e) {
+		SpdLogger::error(LogSystem::IMAGE, "Error loading texture, exception={}", e.what());
 	}
-	/// Cancel a job (no effect if it has already been applied)
-	void remove(TextureLoader::Ticket ticket) {
-		std::lock_guard<std::mutex> l(m_mutex);
-		m_jobs.erase(ticket);
-	}
-	/// Upload all completed jobs to OpenGL (must be called from a valid OpenGL context)
-	void apply() {
-		std::lock_guard<std::mutex> l(m_mutex);
-		for (auto it = m_jobs.begin(); it != m_jobs.end();) {
-			{
-				Job& j = it->second;
-				if (!j.name.empty()) { ++it; continue; }  // Job incomplete, skip it
-				j.apply(j.bitmap);  // Upload to OpenGL
-			}
-			m_jobs.erase(it++);
-		}
-	}
-};
+}
+}  // namespace
 
-std::unique_ptr<TextureLoader::Impl> ldr = nullptr;
+std::unique_ptr<TextureJobQueue> ldr = nullptr;
 
 TextureLoader::TextureLoader() {
 	if (ldr) throw std::logic_error("Texture Loader initialized twice. There can be only one.");
-	ldr = std::make_unique<Impl>();
+	ldr = std::make_unique<TextureJobQueue>(load);
 }
 
 TextureLoader::~TextureLoader() { ldr.reset(); }
@@ -161,7 +77,7 @@ template <typename T> TextureLoader::Ticket loader(T* target, fs::path const& na
 	target->load(bitmap);
 	// Ask the loader to retrieve the image. The callback only runs on the main thread, and ~Texture()
 	// removes the job first, so it never runs for a destroyed Texture.
-	return ldr->push(Job(name, [target](Bitmap& bitmap){ target->load(bitmap); }));
+	return ldr->push(name, [target](Bitmap& bitmap){ target->load(bitmap); });
 }
 
 Texture::Texture(fs::path const& filename) { m_loadTicket = loader(this, filename); }
