@@ -7,6 +7,7 @@
 #include <cairo.h>
 
 #include <algorithm>
+#include <cstdint>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -228,19 +229,19 @@ public:
 	using OpenGLTexture<GL_TEXTURE_2D>::draw;
 	/// loads texture into buffer
 	void load(Bitmap const& bitmap, bool isText = false);
-	Shader& shader(Window& window) { return m_texture.shader(window); }
 	float width() const { return m_width; }
 	float height() const { return m_height; }
 private:
 	float m_width = 0.f;
 	float m_height = 0.f;
 	bool m_premultiplied = true;
-	OpenGLTexture<GL_TEXTURE_2D> m_texture;
+	std::uint64_t m_loadTicket = 0;  ///< The TextureLoader job loading this texture's file (0 if none)
 };
 
 /// A RAII wrapper for texture loading worker thread. There must be exactly one (global) instance whenever any Textures exist.
 class TextureLoader {
 public:
+	using Ticket = std::uint64_t;  ///< Identifies one load request; never reused, 0 means none
 	TextureLoader();
 	~TextureLoader();
 	class Impl;
