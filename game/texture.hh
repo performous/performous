@@ -208,6 +208,15 @@ template <GLenum Type> void OpenGLTexture<Type>::drawCropped(Window& window, Dim
 
 void updateTextures();
 
+/// A RAII wrapper for texture loading worker thread. There must be exactly one (global) instance whenever any Textures exist.
+class TextureLoader {
+public:
+	using Ticket = std::uint64_t;  ///< Identifies one load request; never reused, 0 means none
+	TextureLoader();
+	~TextureLoader();
+	class Impl;
+};
+
 /**
 * @short High level texture/image wrapper on top of OpenGLTexture
 **/
@@ -235,15 +244,6 @@ private:
 	float m_width = 0.f;
 	float m_height = 0.f;
 	bool m_premultiplied = true;
-	std::uint64_t m_loadTicket = 0;  ///< The TextureLoader job loading this texture's file (0 if none)
-};
-
-/// A RAII wrapper for texture loading worker thread. There must be exactly one (global) instance whenever any Textures exist.
-class TextureLoader {
-public:
-	using Ticket = std::uint64_t;  ///< Identifies one load request; never reused, 0 means none
-	TextureLoader();
-	~TextureLoader();
-	class Impl;
+	TextureLoader::Ticket m_loadTicket = 0;  ///< The TextureLoader job loading this texture's file (0 if none)
 };
 

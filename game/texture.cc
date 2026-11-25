@@ -72,7 +72,7 @@ class TextureLoader::Impl {
 	std::condition_variable m_condition;
 	using Jobs = std::map<TextureLoader::Ticket, Job>; /// Jobs keyed by ever-increasing ticket; maintains load-ordering
 	Jobs m_jobs;
-	TextureLoader::Ticket m_lastTicket{ 0 }; 
+	TextureLoader::Ticket m_lastTicket{ 0 };
 	std::thread m_thread;
 public:
 	Impl(): m_quit(), m_thread(&Impl::run, this) {}
