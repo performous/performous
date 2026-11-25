@@ -74,7 +74,6 @@ class GuitarGraph: public InstrumentGraph {
 	void updateNeck();
 	bool canActivateStarpower() { return (m_starmeter > 6000); }
 	void activateStarpower();
-	void errorMeter(double error);
 	double missVolumeTarget() const;
 	void fail(double time, int fret);
 	void endHold(unsigned fret, double time = 0.0);
@@ -83,6 +82,15 @@ class GuitarGraph: public InstrumentGraph {
 	void updateDrumFill(double time);
 	void drumHit(double time, unsigned layer, unsigned fret);
 	void guitarPlay(double time, input::Event const& ev);
+	// Sound and effects for what happened in the game
+	void onMiss(int fret); ///< Play a fail sample; fret < 0 means any
+	void onFlame(unsigned fret);
+	void onDrumKick();
+	void onErrorMeter(double error); ///< Signed timing error of a hit, in seconds
+	void onStarpowerActivated();
+	void onSoloEnded(unsigned percent);
+	void onBigStreak(int streak);
+	void onChordPassed(double time);
 
 	// Media
 	Texture m_tail;

@@ -440,12 +440,11 @@ void GuitarGraph::engine() {
 		if (m_solo) { m_soloScore += m_chordIt->score; m_soloTotal += static_cast<float>(m_chordIt->polyphony) * static_cast<float>(points(0));
 		// Solo just ended?
 		} else if (m_soloTotal > 0) {
-			m_popups.push_back(Popup(std::to_string(unsigned(m_soloScore / m_soloTotal * 100)) + " %",
-			  Color(0.0f, 0.8f, 0.0f), 1.0f, m_popupText.get()));
+			onSoloEnded(unsigned(m_soloScore / m_soloTotal * 100));
 			m_soloScore = 0;
 			m_soloTotal = 0;
 		}
-		if (!joining(time)) ++m_dead;  // Increment dead counter (but not while joining)
+		onChordPassed(time);
 		++m_chordIt;
 	}
 	// Start decreasing correctness instantly if the current note is being played late (don't wait until maxTolerance)
@@ -497,8 +496,7 @@ void GuitarGraph::engine() {
 	if (m_streak >= getNextBigStreak(m_bigStreak)) {
 		m_bigStreak = getNextBigStreak(m_bigStreak);
 		m_starmeter += streakStarBonus;
-		m_popups.push_back(Popup(std::to_string(unsigned(m_bigStreak)) + "\n" + _("Streak!"),
-		  Color(1.0f, 0.0f, 0.0f), 1.0f, m_popupText.get()));
+		onBigStreak(m_bigStreak);
 	}
 	// During GodMode, correctness is full, no matter what
 	if (m_starpower.get() > 0.01) m_correctness.setTarget(1.0, true);
@@ -568,17 +566,8 @@ void GuitarGraph::activateStarpower() {
 	if (canActivateStarpower()) {
 		m_starmeter = 0.0f;
 		m_starpower.setValue(1.0f);
-		m_popups.push_back(Popup(_("God Mode\nActivated!"),
-		  Color(0.3f, 0.0f, 1.0f), 0.666f, m_popupText.get(), _("Mistakes ignored!"), &m_text));
+		onStarpowerActivated();
 	}
-}
-
-/// New hit for the error indicator
-void GuitarGraph::errorMeter(double error) {
-	error /=  maxTolerance;
-	m_errorMeter.setTarget(error, true);
-	m_errorMeterFade.setValue(1.0f);
-	if (std::abs(error) < 0.10f) m_errorMeterFlash.setValue(1.0f);
 }
 
 /// Mark the holding of a note as ended
@@ -609,8 +598,7 @@ void GuitarGraph::fail(double time, int fret) {
 	if (m_starpower.get() < 0.01f) {
 		// Reduce points and play fail sample only when GodMode is deactivated
 		m_events.push_back(Event(time, 0, fret));
-		if (fret < 0) fret = static_cast<int>(std::rand());
-		m_audio.playSample(m_samples[unsigned(fret) % m_samples.size()]);
+		onMiss(fret);
 		// remove equivalent of 1 perfect hit for every note
 		// kids tend to play a lot of extra notes just for the fun of it.
 		// need to make sure they don't end up with a score of zero
@@ -678,8 +666,7 @@ void GuitarGraph::drumHit(double time, unsigned layer, unsigned fret) {
 			m_drumfillScore = 0.0f;
 			m_drumfillHits = 0.0f;
 		}
-		m_flames[fret].push_back(AnimValue(0.0, flameSpd));
-		m_flames[fret].back().setTarget(1.0);
+		onFlame(fret);
 		return;
 	}
 	// Find any suitable note within the tolerance
@@ -730,9 +717,8 @@ void GuitarGraph::drumHit(double time, unsigned layer, unsigned fret) {
 		m_score += score;
 		if (!m_drumfills.empty()) m_starmeter += static_cast<float>(score); // Only add starmeter if it's possible to activate GodMode
 		// Graphical effects
-		m_flames[fret].push_back(AnimValue(0.0, flameSpd));
-		m_flames[fret].back().setTarget(1.0);
-		if (fret == to_underlying(input::ButtonId::DRUMS_KICK)) m_drumJump.setTarget(1.0); // Do a jump for bass drum
+		onFlame(fret);
+		if (fret == to_underlying(input::ButtonId::DRUMS_KICK)) onDrumKick(); // Do a jump for bass drum
 		// All drums of the chord hit already?
 		if (m_chordIt->status == m_chordIt->polyphony) {
 			//m_score -= m_chordIt->score;
@@ -743,7 +729,7 @@ void GuitarGraph::drumHit(double time, unsigned layer, unsigned fret) {
 			// Handle Big Rock Ending scoring
 			if (m_drumfillHits > 0 && &*best == &m_chords.back()) endBRE();  // Same chord object, not just the same frets
 			// ErrorMeter
-			errorMeter(static_cast<float>(signed_error));
+			onErrorMeter(static_cast<float>(signed_error));
 		}
 	}
 }
@@ -757,8 +743,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 	  && time <= m_dfIt->end + maxTolerance) {
 		if (!ev.pressed() || buttonId >= m_pads) return;  // No processing for release events or non-fret buttons
 		m_drumfillHits += 1;
-		m_flames[buttonId].push_back(AnimValue(0.0, flameSpd));
-		m_flames[buttonId].back().setTarget(1.0);
+		onFlame(buttonId);
 		return;
 	}
 	bool frets[max_panels];  // The combination about to be played
@@ -822,7 +807,7 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 		m_score += score;
 		m_starmeter += score;
 		m_correctness.setTarget(1.0, true); // Instantly go to one
-		errorMeter(static_cast<float>(signed_error));
+		onErrorMeter(static_cast<float>(signed_error));
 		for (unsigned fret = 0; fret < m_pads; ++fret) {
 			if (!m_chordIt->fret[fret]) continue;
 			Duration const* dur = m_chordIt->dur[fret];
@@ -830,13 +815,53 @@ void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
 			m_notes[dur] = static_cast<unsigned>(m_events.size());
 			m_holds[fret] = static_cast<unsigned>(m_events.size());
 			if (first_time) {
-				m_flames[fret].push_back(AnimValue(0.0, flameSpd));
-				m_flames[fret].back().setTarget(1.0);
+				onFlame(fret);
 			}
 		}
 		// Handle Big Rock Ending scoring
 		if (m_drumfillHits > 0 && &*best == &m_chords.back()) endBRE();  // Same chord object, not just the same frets
 	}
+}
+
+void GuitarGraph::onStarpowerActivated() {
+	m_popups.push_back(Popup(_("God Mode\nActivated!"),
+	  Color(0.3f, 0.0f, 1.0f), 0.666f, m_popupText.get(), _("Mistakes ignored!"), &m_text));
+}
+
+void GuitarGraph::onSoloEnded(unsigned percent) {
+	m_popups.push_back(Popup(std::to_string(percent) + " %",
+	  Color(0.0f, 0.8f, 0.0f), 1.0f, m_popupText.get()));
+}
+
+void GuitarGraph::onBigStreak(int streak) {
+	m_popups.push_back(Popup(std::to_string(unsigned(streak)) + "\n" + _("Streak!"),
+	  Color(1.0f, 0.0f, 0.0f), 1.0f, m_popupText.get()));
+}
+
+void GuitarGraph::onChordPassed(double time) {
+	if (!joining(time)) ++m_dead;  // Increment dead counter (but not while joining)
+}
+
+void GuitarGraph::onMiss(int fret) {
+	if (fret < 0) fret = static_cast<int>(std::rand());
+	m_audio.playSample(m_samples[unsigned(fret) % m_samples.size()]);
+}
+
+void GuitarGraph::onFlame(unsigned fret) {
+	m_flames[fret].push_back(AnimValue(0.0, flameSpd));
+	m_flames[fret].back().setTarget(1.0);
+}
+
+void GuitarGraph::onDrumKick() {
+	m_drumJump.setTarget(1.0);
+}
+
+/// New hit for the error indicator
+void GuitarGraph::onErrorMeter(double error) {
+	error /=  maxTolerance;
+	m_errorMeter.setTarget(error, true);
+	m_errorMeterFade.setValue(1.0f);
+	if (std::abs(error) < 0.10f) m_errorMeterFlash.setValue(1.0f);
 }
 
 /// Modify color based on things like GodMode and solos
