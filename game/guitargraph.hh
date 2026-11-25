@@ -120,6 +120,12 @@ class GuitarGraph: public InstrumentGraph {
 		AMAZING,  // Expert
 		COUNT
 	} m_level;
+	/// Options of the gameplay rules, read from the configuration every frame
+	struct Settings {
+		bool missPenalty = false; ///< game/instrument_miss_penalty
+		unsigned missVolumePercent[static_cast<int>(Difficulty::COUNT)] = {}; ///< audio/miss_volume_*
+	} m_settings;
+	static Settings readSettings();
 	void setupJoinMenu();
 	void updateJoinMenu();
 	void nextTrack(bool fast = false);

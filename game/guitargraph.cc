@@ -182,26 +182,19 @@ void GuitarGraph::setupJoinMenuDifficulty() {
 
 double GuitarGraph::missVolumeTarget() const {
 	auto missVolumePercent = 0u;
-	switch (m_level) {
-		case Difficulty::KIDS:
-			missVolumePercent = config["audio/miss_volume_kids"].ui();
-			break;
-		case Difficulty::SUPAEASY:
-			missVolumePercent = config["audio/miss_volume_easy"].ui();
-			break;
-		case Difficulty::EASY:
-			missVolumePercent = config["audio/miss_volume_medium"].ui();
-			break;
-		case Difficulty::MEDIUM:
-			missVolumePercent = config["audio/miss_volume_hard"].ui();
-			break;
-		case Difficulty::AMAZING:
-			missVolumePercent = config["audio/miss_volume_expert"].ui();
-			break;
-		default:
-			break;
-	}
+	if (m_level >= Difficulty::KIDS && m_level < Difficulty::COUNT) missVolumePercent = m_settings.missVolumePercent[to_underlying(m_level)];
 	return clamp(static_cast<double>(missVolumePercent) / 100.0);
+}
+
+GuitarGraph::Settings GuitarGraph::readSettings() {
+	GuitarGraph::Settings settings;
+	settings.missPenalty = config["game/instrument_miss_penalty"].b();
+	settings.missVolumePercent[to_underlying(Difficulty::KIDS)] = config["audio/miss_volume_kids"].ui();
+	settings.missVolumePercent[to_underlying(Difficulty::SUPAEASY)] = config["audio/miss_volume_easy"].ui();
+	settings.missVolumePercent[to_underlying(Difficulty::EASY)] = config["audio/miss_volume_medium"].ui();
+	settings.missVolumePercent[to_underlying(Difficulty::MEDIUM)] = config["audio/miss_volume_hard"].ui();
+	settings.missVolumePercent[to_underlying(Difficulty::AMAZING)] = config["audio/miss_volume_expert"].ui();
+	return settings;
 }
 
 void GuitarGraph::setupJoinMenuDrums() {
@@ -341,6 +334,7 @@ void GuitarGraph::engine() {
 	time -= config["audio/controller_delay"].f();
 	doUpdates();
 	m_recorder.frame(time);
+	m_settings = readSettings();
 	if (!m_drumfills.empty()) updateDrumFill(time); // Drum Fills / BREs
 	m_whammy = 0;
 	// Countdown to start
@@ -602,7 +596,7 @@ void GuitarGraph::fail(double time, int fret) {
 		// remove equivalent of 1 perfect hit for every note
 		// kids tend to play a lot of extra notes just for the fun of it.
 		// need to make sure they don't end up with a score of zero
-		if (config["game/instrument_miss_penalty"].b()) {
+		if (m_settings.missPenalty) {
 			m_score -= (m_level == Difficulty::KIDS) ? points(0)/2.0f : points(0);
 		}
 		m_correctness.setTarget(missVolumeTarget(), true);  // Instantly fail correctness
