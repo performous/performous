@@ -317,10 +317,6 @@ void GuitarGraph::difficultyAuto(bool tryKeep) {
 /// Attempt to use a given difficulty level
 bool GuitarGraph::difficulty(Difficulty level, bool check_only) {
 	InstrumentTrack const& track = *m_track_index->second;
-	// Find the stream number
-	for (auto const& elem: m_song.instrumentTracks) {
-		if (&track == &elem.second) break;
-	}
 	// Check if the difficulty level is available
 	unsigned basepitch = diffv[to_underlying(level)].basepitch;
 	NoteMap const& nm = track.nm;
