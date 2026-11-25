@@ -101,8 +101,8 @@ public:
 	bool menuOpen() const { return m_menu.isOpen(); }
 	void position(float cx, float width) { m_cx.setTarget(cx); m_width.setTarget(width); }
 	size_t stream() const { return m_stream; }
-	double correctness() const { return m_correctness.get(); }
-	unsigned getScore() const { return static_cast<unsigned>(clamp(m_score * m_scoreFactor, 0.0, 10000.0)); }
+	virtual double correctness() const { return m_correctness.get(); }
+	virtual unsigned getScore() const { return static_cast<unsigned>(clamp(m_score * m_scoreFactor, 0.0, 10000.0)); }
 	input::DevType getGraphType() const { return m_dev->type; }
 	virtual double getWhammy() const { return 0; }
 	bool isKeyboard() const { return m_dev->source.isKeyboard(); }
