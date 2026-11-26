@@ -18,16 +18,9 @@ namespace {
 	#if 0 // Here is some dummy gettext calls to populate the dictionary
 	_("Kids") _("Easy") _("Medium") _("Hard") _("Expert")
 	#endif
-	struct Diff { std::string name; unsigned basepitch; } diffv[] = {
-		{ "Kids", 0x3C },
-		{ "Easy", 0x3C },
-		{ "Medium", 0x48 },
-		{ "Hard", 0x54 },
-		{ "Expert", 0x60 }
-	};
 	const float g_angle = 1.4f; // How many radians to rotate the fretboards
-	const float past = -0.2f; // Relative time from cursor that is considered past (out of screen)
-	const float future = 1.5f; // Relative time from cursor that is considered future (out of screen)
+	const float past = GuitarEngine::past;
+	const float future = GuitarEngine::future;
 	const float timescale = 25.0f; // Multiplier to get graphics units from time
 	const float texCoordStep = -0.5f; // Two beat lines per neck texture => 0.5 tex units per beat
 	const float flameSpd = 6.0f; // Multiplier for flame growth
@@ -39,25 +32,8 @@ namespace {
 	}
 	float y2a(float y) { return time2a(past - y / timescale * (future - past)); }
 	float tc(float y) { return static_cast<float>(y * 0.1); } // Get texture coordinates for animating hold notes
-	const double maxTolerance = 0.15; // Maximum error in seconds
-
-	const float drumfill_min_rate = 6.0; // The rate of hits per second required to complete a drum fill
-	double points(double error) {
-		// error    points
-		// 150ms      15
-		// 100ms      30
-		//  50ms      45
-		//  30ms      50
-		double score = 0.0;
-		if (error < maxTolerance) score += 15;
-		if (error < 0.1) score += 15;
-		if (error < 0.05) score += 15;
-		if (error < 0.03) score += 5;
-		return score;
-	}
-
-	const int streakStarBonus = 500;
-	int getNextBigStreak(int prev) { return prev + 50; }
+	const double maxTolerance = GuitarEngine::maxTolerance;
+	const float drumfill_min_rate = GuitarEngine::drumfill_min_rate;
 	inline float blend(float a, float b, float f) { return a*f + b*(1.0f-f); }
 }
 
@@ -117,22 +93,12 @@ GuitarGraph::GuitarGraph(Game &game, Audio& audio, Song const& song, input::Devi
   m_neckglow(findFile("neck_glow.svg")),
   m_neckglowColor(),
   m_drums(dev->type == input::DevType::DRUMS),
-  m_level(),
   m_track_index(m_instrumentTracks.end()),
-  m_dfIt(m_drumfills.end()),
+  m_engine(*this, m_drums, config["game/drum_promode"].b(), song.hasBRE),
   m_errorMeter(0.0, 2.0),
   m_errorMeterFlash(0.0, 4.0),
   m_errorMeterFade(0.0, 0.333),
-  m_drumJump(0.0, 12.0),
-  m_starpower(0.0, 0.1),
-  m_drumfillHits(),
-  m_drumfillScore(),
-  m_soloTotal(),
-  m_soloScore(),
-  m_solo(),
-  m_hasTomTrack(false),
-  m_proMode(config["game/drum_promode"].b()),
-  m_whammy(0)
+  m_drumJump(0.0, 12.0)
 {
 	if(m_drums) {
 		initDrums();
@@ -147,7 +113,6 @@ GuitarGraph::GuitarGraph(Game &game, Audio& audio, Song const& song, input::Devi
 	m_streakText = std::make_unique<SvgTxtThemeSimple>(findFile("sing_score_text.svg"), config["graphic/text_lod"].f());
 	for (size_t i = 0; i < max_panels; ++i) {
 		m_pressed_anim[i].setRate(5.0);
-		m_holds[i] = 0;
 	}
 	m_pads = 5;
 	m_track_index = m_instrumentTracks.begin();
@@ -171,7 +136,7 @@ void GuitarGraph::setupJoinMenuDifficulty() {
 	for (int level = 0; level < maxLevel; ++level) {
 		if (difficulty(Difficulty(level), true)) {
 			ol.push_back(std::to_string(level));
-			if (Difficulty(level) == m_level) cur = static_cast<unsigned short>(ol.size()-1u);
+			if (Difficulty(level) == this->level()) cur = static_cast<unsigned short>(ol.size()-1u);
 		}
 	}
 	m_selectedDifficulty = ConfigItem(ol); // Create a ConfigItem from the option list
@@ -180,28 +145,17 @@ void GuitarGraph::setupJoinMenuDifficulty() {
 	m_menu.back().setDynamicName(m_difficultyOpt); // Set the title to be dynamic
 }
 
-double GuitarGraph::missVolumeTarget() const {
-	auto missVolumePercent = 0u;
-	switch (m_level) {
-		case Difficulty::KIDS:
-			missVolumePercent = config["audio/miss_volume_kids"].ui();
-			break;
-		case Difficulty::SUPAEASY:
-			missVolumePercent = config["audio/miss_volume_easy"].ui();
-			break;
-		case Difficulty::EASY:
-			missVolumePercent = config["audio/miss_volume_medium"].ui();
-			break;
-		case Difficulty::MEDIUM:
-			missVolumePercent = config["audio/miss_volume_hard"].ui();
-			break;
-		case Difficulty::AMAZING:
-			missVolumePercent = config["audio/miss_volume_expert"].ui();
-			break;
-		default:
-			break;
+namespace {
+	GuitarEngine::Settings readSettings() {
+		GuitarEngine::Settings settings;
+		settings.missPenalty = config["game/instrument_miss_penalty"].b();
+		settings.missVolumePercent[to_underlying(GuitarEngine::Difficulty::KIDS)] = config["audio/miss_volume_kids"].ui();
+		settings.missVolumePercent[to_underlying(GuitarEngine::Difficulty::SUPAEASY)] = config["audio/miss_volume_easy"].ui();
+		settings.missVolumePercent[to_underlying(GuitarEngine::Difficulty::EASY)] = config["audio/miss_volume_medium"].ui();
+		settings.missVolumePercent[to_underlying(GuitarEngine::Difficulty::MEDIUM)] = config["audio/miss_volume_hard"].ui();
+		settings.missVolumePercent[to_underlying(GuitarEngine::Difficulty::AMAZING)] = config["audio/miss_volume_expert"].ui();
+		return settings;
 	}
-	return clamp(static_cast<double>(missVolumePercent) / 100.0);
 }
 
 void GuitarGraph::setupJoinMenuDrums() {
@@ -289,26 +243,26 @@ std::string GuitarGraph::getTrack() const {
 
 /// Get the difficulty as displayable string
 std::string GuitarGraph::getDifficultyString() const {
-	return _(diffv[to_underlying(m_level)].name.c_str());
+	return _(GuitarEngine::difficultyName(level()));
 }
 
 /// Get a string id for track and difficulty
 std::string GuitarGraph::getModeId() const {
-	return m_track_index->first + " - " + diffv[to_underlying(m_level)].name;
+	return m_track_index->first + " - " + GuitarEngine::difficultyName(level());
 }
 
 /// Cycle through difficulties
 void GuitarGraph::changeDifficulty(int dir) {
 	auto maxLevel = to_underlying(Difficulty::COUNT);
-	auto currentLevel = to_underlying(m_level);
-	for (int level = ((int)m_level + dir) % maxLevel; level != currentLevel;
+	auto currentLevel = to_underlying(this->level());
+	for (int level = ((int)this->level() + dir) % maxLevel; level != currentLevel;
 	  level = (level+dir) % maxLevel)
 		if (difficulty(Difficulty(level))) return;
 }
 
 /// Find an initial difficulty level to use
 void GuitarGraph::difficultyAuto(bool tryKeep) {
-	if (tryKeep && difficulty(Difficulty(m_level))) return;
+	if (tryKeep && difficulty(Difficulty(level()))) return;
 	auto maxLevel = to_underlying(Difficulty::COUNT);
 	for (int level = 0; level < maxLevel; ++level) if (difficulty(Difficulty(level))) return;
 	throw std::runtime_error("No difficulty levels found for track " + m_track_index->first);
@@ -317,25 +271,11 @@ void GuitarGraph::difficultyAuto(bool tryKeep) {
 /// Attempt to use a given difficulty level
 bool GuitarGraph::difficulty(Difficulty level, bool check_only) {
 	InstrumentTrack const& track = *m_track_index->second;
-	// Find the stream number
-	for (auto const& elem: m_song.instrumentTracks) {
-		if (&track == &elem.second) break;
-	}
 	// Check if the difficulty level is available
-	unsigned basepitch = diffv[to_underlying(level)].basepitch;
-	NoteMap const& nm = track.nm;
-	unsigned fail = 0;
-	for (unsigned fret = 0; fret < m_pads; ++fret) if (nm.find(basepitch + fret) == nm.end()) ++fail;
-	if (fail == m_pads) return false;
+	if (!GuitarEngine::hasDifficulty(track, level)) return false;
 	if (check_only) return true;
-	Difficulty prevLevel = m_level;
-	m_level = level;
-	updateChords();
-	if (m_chords.size() <= 1) { // If there is only one chord, it's probably b0rked
-		m_level = prevLevel;
-		updateChords();
-		return false;
-	}
+	if (!m_engine.setDifficulty(track, level)) return false;
+	m_recorder.chart(m_track_index->first, static_cast<unsigned>(to_underlying(level)));
 	return true;
 }
 
@@ -345,13 +285,13 @@ void GuitarGraph::engine() {
 	time -= config["audio/controller_delay"].f();
 	doUpdates();
 	m_recorder.frame(time);
-	if (!m_drumfills.empty()) updateDrumFill(time); // Drum Fills / BREs
-	m_whammy = 0;
+	m_engine.settings = readSettings();
+	m_engine.beginFrame(time);
 	// Countdown to start
-	handleCountdown(time, time < getNotesBeginTime() ? getNotesBeginTime() : m_jointime+1);
+	double const notesBegin = m_engine.getNotesBeginTime();
+	handleCountdown(time, time < notesBegin ? notesBegin : m_jointime+1);
 	// Handle all events
 	for (input::Event ev; m_dev->getEvent(ev); ) {
-		unsigned buttonId = to_underlying(ev.button.id);
 		// Lefty mode flip of buttons
 		if (m_leftymode.b() && m_drums && ev.source.type != input::SourceType::MIDI) {
 			unsigned layer = ev.button.layer(), num = ev.button.num();
@@ -369,8 +309,8 @@ void GuitarGraph::engine() {
 			// Update key pressed status
 			if (layer < 8 && num < max_panels) {
 				if (!m_drums && num > 0) { // Only guitar frets can be held
-					m_pressed[num] = static_cast<bool>(ev.value);
-					m_recorder.pressed(num, m_pressed[num]);
+					m_engine.setPressed(num, static_cast<bool>(ev.value));
+					m_recorder.pressed(num, m_engine.pressed(num));
 				}
 				if (ev.pressed()) m_pressed_anim[num].setValue(1.0); // Hit flash
 			}
@@ -393,9 +333,9 @@ void GuitarGraph::engine() {
 			}
 			// See if anything changed
 			if (!m_drums && m_selectedTrack.so() != m_track_index->first) setTrack(m_selectedTrack.so());
-			else if (std::stoi(m_selectedDifficulty.so()) != to_underlying(m_level))
+			else if (std::stoi(m_selectedDifficulty.so()) != to_underlying(level()))
 				difficulty(Difficulty(std::stoi(m_selectedDifficulty.so())));
-			else if (m_rejoin.b()) { unjoin(); m_recorder.rejoin(); setupJoinMenu(); m_dev->pushEvent(input::Event()); /* FIXME: HACK! */ }
+			else if (m_rejoin.b()) { unjoin(); m_engine.resetScore(); m_recorder.rejoin(); setupJoinMenu(); m_dev->pushEvent(input::Event()); /* FIXME: HACK! */ }
 			// Sync menu items & captions
 			updateJoinMenu();
 			break;
@@ -414,99 +354,13 @@ void GuitarGraph::engine() {
 		// Disable gameplay when game is paused
 		if (m_audio.isPaused()) continue;
 
-		// Guitar specific actions
-		if (!m_drums) {
-			if (ev.button == input::ButtonId::GUITAR_GODMODE && ev.pressed()) activateStarpower();
-			if (ev.button == input::ButtonId::GUITAR_WHAMMY) m_whammy = (1.0 + ev.value + 2.0*(rand()/double(RAND_MAX))) / 4.0;
-			if (buttonId <= m_pads && !ev.pressed()) endHold(buttonId, time);
-		}
-
-		// Playing
-		if (m_drums) {
-			if (ev.pressed() && ev.button.layer() < 8 && ev.button.num() < m_pads) drumHit(time, ev.button.layer(), ev.button.num());
-		} else {
-			guitarPlay(time, ev);
-		}
-		if (m_score < 0) m_score = 0;
-		m_recorder.input(to_underlying(ev.button.id), ev.value, m_whammy);
+		m_engine.input(time, ev);
+		m_recorder.input(to_underlying(ev.button.id), ev.value, m_engine.whammy());
 	}
 	// Handle fret hold markers
-	if (!m_drums) for (unsigned num = 0; num < max_panels; ++num) m_pressed_anim[num].setTarget(m_pressed[num] ? 1.0 : 0.0);
-
-	// Skip missed chords
-	// - Only after we are so much past them that they can no longer be played (maxTolerance)
-	// - For chords played or skipped by playing (i.e. play another chord that quickly follows), ++m_chordIt is done elsewhere
-	while (m_chordIt != m_chords.end() && m_chordIt->begin + maxTolerance < time) {
-		// For guitar, status is 0/1/2 (not played/tapped/picked). For drums, status counts pads hit (0 to polyphony).
-		bool chordMissed = m_drums ? (m_chordIt->status < m_chordIt->polyphony) : (m_chordIt->status == 0);
-		if (chordMissed) endStreak();
-		// Calculate solo total score
-		if (m_solo) { m_soloScore += m_chordIt->score; m_soloTotal += static_cast<float>(m_chordIt->polyphony) * static_cast<float>(points(0));
-		// Solo just ended?
-		} else if (m_soloTotal > 0) {
-			m_popups.push_back(Popup(std::to_string(unsigned(m_soloScore / m_soloTotal * 100)) + " %",
-			  Color(0.0f, 0.8f, 0.0f), 1.0f, m_popupText.get()));
-			m_soloScore = 0;
-			m_soloTotal = 0;
-		}
-		if (!joining(time)) ++m_dead;  // Increment dead counter (but not while joining)
-		++m_chordIt;
-	}
-	// Start decreasing correctness instantly if the current note is being played late (don't wait until maxTolerance)
-	if (m_chordIt != m_chords.end() && m_chordIt->begin < time && m_chordIt->status == 0) {
-		m_correctness.setTarget(missVolumeTarget());
-	}
-	// Process holds
-	if (!m_drums) {
-		// FIXME: Why do we have per-fret hold handling, why not just as a part of the current chord?
-		// FIXME: Use polyphony from proper chord (which isn't always m_chordIt); now it only counts frets currently held
-		unsigned count = 0;
-		bool holds = false;
-		for (unsigned fret = 0; fret < m_pads; ++fret) {
-			if (!m_holds[fret]) continue;
-			holds = true;
-			Event& ev = m_events[m_holds[fret] - 1];
-			ev.glow.setTarget(1.0, true);
-			// Whammy animvalue mangling
-			ev.whammy.setTarget(m_whammy);
-			if (m_whammy > 0.0f) {
-				ev.whammy.move(0.5f);
-				if (ev.whammy.get() > 1.0f) ev.whammy.setValue(1.0f);
-			}
-			// Calculate how long the note was held this cycle and score it
-			double last = std::min(time, ev.dur->end);
-			double t = last - ev.holdTime;
-			if (t < 0) continue;  // FIXME: What is this for, rewinding?
-			// Is the hold being played correctly?
-			// Just holding the fret button sustains the note
-			++count;
-			// Score for holding
-			m_score += t * 50.0f * m_correctness.get();
-			// Whammy fills starmeter much faster
-			m_starmeter += static_cast<float>(t * 50.0f * ( (ev.whammy.get() > 0.01f) ? 2.0f : 1.0f ));
-			ev.holdTime = time;
-			// If end reached, handle it
-			if (last == ev.dur->end) endHold(fret, time);
-		}
-		// Set correctness as a percentage of chord being held
-		// m_chordIt is end() while the sustain of the song's last chord is still being held
-		if (holds && m_chordIt != m_chords.end()) m_correctness.setTarget(clamp(double(count) / m_chordIt->polyphony));  // FIXME: polyphony doesn't seem to be set correctly for guitar tracks (workaround by clamping)
-	}
-	// Update solo status
-	m_solo = false;
-	for (Durations::const_iterator it = m_solos.begin(); it != m_solos.end(); ++it) {
-		if (time >= it->begin && time <= it->end) { m_solo = true; break; }
-	}
-	// Check if a long streak goal has been reached (display a nasty combo breaker popup)
-	if (m_streak >= getNextBigStreak(m_bigStreak)) {
-		m_bigStreak = getNextBigStreak(m_bigStreak);
-		m_starmeter += streakStarBonus;
-		m_popups.push_back(Popup(std::to_string(unsigned(m_bigStreak)) + "\n" + _("Streak!"),
-		  Color(1.0f, 0.0f, 0.0f), 1.0f, m_popupText.get()));
-	}
-	// During GodMode, correctness is full, no matter what
-	if (m_starpower.get() > 0.01) m_correctness.setTarget(1.0, true);
-	m_recorder.state(m_score, m_streak, m_longestStreak, m_starmeter);
+	if (!m_drums) for (unsigned num = 0; num < max_panels; ++num) m_pressed_anim[num].setTarget(m_engine.pressed(num) ? 1.0 : 0.0);
+	m_engine.update(time);
+	m_recorder.state(m_engine.score(), m_engine.streak(), m_engine.longestStreak(), m_engine.starmeter());
 }
 
 void GuitarGraph::saveReport() {
@@ -532,7 +386,7 @@ void GuitarGraph::saveReport() {
 		for (auto const& c: m_recorder.charts()) {
 			auto it = m_instrumentTracks.find(c.track);
 			if (it == m_instrumentTracks.end()) continue;
-			charts.push_back({{"track", c.track}, {"difficulty", diffv[c.level].name}, {"level", c.level}, {"notes", chartToJson(*it->second, diffv[c.level].basepitch)}});
+			charts.push_back({{"track", c.track}, {"difficulty", GuitarEngine::difficultyName(Difficulty(c.level))}, {"level", c.level}, {"notes", chartToJson(*it->second, GuitarEngine::basePitch(Difficulty(c.level)))}});
 		}
 		fs::path const& notesFile = m_song.midifilename.empty() ? m_song.filename : m_song.midifilename;
 		nlohmann::json report = {
@@ -545,7 +399,7 @@ void GuitarGraph::saveReport() {
 				{"instrument", m_drums ? "drums" : "guitar"},
 				{"device", deviceType()},
 				{"lefty", m_leftymode.b()},
-				{"proMode", m_proMode},
+				{"proMode", m_engine.proMode()},
 				{"settings", {
 					{"audio/controller_delay", config["audio/controller_delay"].f()},
 					{"game/instrument_miss_penalty", config["game/instrument_miss_penalty"].b()},
@@ -567,280 +421,45 @@ void GuitarGraph::saveReport() {
 	}
 }
 
-/// Attempt to activate GodMode
-void GuitarGraph::activateStarpower() {
-	if (canActivateStarpower()) {
-		m_starmeter = 0.0f;
-		m_starpower.setValue(1.0f);
-		m_popups.push_back(Popup(_("God Mode\nActivated!"),
-		  Color(0.3f, 0.0f, 1.0f), 0.666f, m_popupText.get(), _("Mistakes ignored!"), &m_text));
-	}
+void GuitarGraph::onStarpowerActivated() {
+	m_popups.push_back(Popup(_("God Mode\nActivated!"),
+	  Color(0.3f, 0.0f, 1.0f), 0.666f, m_popupText.get(), _("Mistakes ignored!"), &m_text));
+}
+
+void GuitarGraph::onSoloEnded(unsigned percent) {
+	m_popups.push_back(Popup(std::to_string(percent) + " %",
+	  Color(0.0f, 0.8f, 0.0f), 1.0f, m_popupText.get()));
+}
+
+void GuitarGraph::onBigStreak(int streak) {
+	m_popups.push_back(Popup(std::to_string(unsigned(streak)) + "\n" + _("Streak!"),
+	  Color(1.0f, 0.0f, 0.0f), 1.0f, m_popupText.get()));
+}
+
+void GuitarGraph::onChordPassed(double time) {
+	if (!joining(time)) ++m_dead;  // Increment dead counter (but not while joining)
+}
+
+void GuitarGraph::onMiss(int fret) {
+	if (fret < 0) fret = static_cast<int>(std::rand());
+	m_audio.playSample(m_samples[unsigned(fret) % m_samples.size()]);
+}
+
+void GuitarGraph::onFlame(unsigned fret) {
+	m_flames[fret].push_back(AnimValue(0.0, flameSpd));
+	m_flames[fret].back().setTarget(1.0);
+}
+
+void GuitarGraph::onDrumKick() {
+	m_drumJump.setTarget(1.0);
 }
 
 /// New hit for the error indicator
-void GuitarGraph::errorMeter(double error) {
+void GuitarGraph::onErrorMeter(double error) {
 	error /=  maxTolerance;
 	m_errorMeter.setTarget(error, true);
 	m_errorMeterFade.setValue(1.0f);
 	if (std::abs(error) < 0.10f) m_errorMeterFlash.setValue(1.0f);
-}
-
-/// Mark the holding of a note as ended
-void GuitarGraph::endHold(unsigned fret, double time) {
-	if (fret >= m_pads || !m_holds[fret]) return;
-	m_events[m_holds[fret] - 1].glow.setTarget(0.0);
-	m_events[m_holds[fret] - 1].whammy.setTarget(0.0, true);
-	m_holds[fret] = 0;
-	if (time > 0) { // Do we set the releaseTime?
-		// Search for the Chord this hold belongs to
-		for (auto& chord: m_chords) {
-			if (time > chord.begin + maxTolerance && time < chord.end - maxTolerance) {
-				chord.releaseTimes[fret] = time;
-				if (time >= chord.end - maxTolerance) chord.passed = true; // Mark as past note for rewinding
-				else m_correctness.setValue(static_cast<float>(missVolumeTarget()));  // Note: if still holding some frets, proper percentage will be set in hold handling
-				break;
-			}
-		}
-	}
-}
-
-/// Do stuff when a note is played incorrectly
-void GuitarGraph::fail(double time, int fret) {
-	if (fret == -2) return; // Tapped note
-	if (fret == -1) {
-		for (unsigned i = 0; i < m_pads; ++i) endHold(i, time);
-	}
-	if (m_starpower.get() < 0.01f) {
-		// Reduce points and play fail sample only when GodMode is deactivated
-		m_events.push_back(Event(time, 0, fret));
-		if (fret < 0) fret = static_cast<int>(std::rand());
-		m_audio.playSample(m_samples[unsigned(fret) % m_samples.size()]);
-		// remove equivalent of 1 perfect hit for every note
-		// kids tend to play a lot of extra notes just for the fun of it.
-		// need to make sure they don't end up with a score of zero
-		if (config["game/instrument_miss_penalty"].b()) {
-			m_score -= (m_level == Difficulty::KIDS) ? points(0)/2.0f : points(0);
-		}
-		m_correctness.setTarget(missVolumeTarget(), true);  // Instantly fail correctness
-	}
-	endStreak();
-}
-
-/// Ends the Big Rock Ending and gives score if appropriate
-void GuitarGraph::endBRE() {
-	float l = static_cast<float>(m_dfIt->end - m_dfIt->begin);
-	// Completion requires ~ 6 hits per second
-	if (m_drumfillHits / l >= 6.0f) {
-		m_score += m_drumfillScore; // Add score from overlapped notes if there were any
-		m_score += 50.0f * l; // Add score as if it were a single long hold
-	}
-	m_drumfillHits = 0.0f;
-	m_drumfillScore = 0.0f;
-	m_dfIt = m_drumfills.end();
-}
-
-/// Calculates the start and end times for the next/current drum fill
-/// Also activates GodMode if fill went well
-void GuitarGraph::updateDrumFill(double time) {
-	// Check if fill is over
-	if (m_dfIt != m_drumfills.end()) {
-		// Reset stuff for drum fills but not for BREs (handled elsewhere)
-		if (time > m_dfIt->end - past && (m_dfIt != (--m_drumfills.end()) || (m_drums && !m_song.hasBRE))) {
-			m_drumfillHits = 0.0f;
-			m_drumfillScore = 0.0f;
-			m_dfIt = m_drumfills.end();
-		}
-		return;
-	} else if (m_drums && canActivateStarpower()) {
-		// Search for the next drum fill
-		for (Durations::const_iterator it = m_drumfills.begin(); it != m_drumfills.end(); ++it) {
-			if (it->begin >= time + future) { m_dfIt = it; return; }
-		}
-	} else if (!m_drums && m_drumfills.back().begin >= time + future) {
-		m_dfIt = (--m_drumfills.end()); return; // Guitar Big Rock Ending
-	} else if (m_drums && m_song.hasBRE && m_drumfills.back().begin <= time + future) {
-		m_dfIt = (--m_drumfills.end()); return; // Drum Big Rock Ending
-	}
-	m_dfIt = m_drumfills.end(); // Reset iterator
-}
-
-/// Handle drum hit scoring
-void GuitarGraph::drumHit(double time, unsigned layer, unsigned fret) {
-	SpdLogger::debug(LogSystem::INSTRUMENTS, "DrumHit={}, Layer={}, Fret={}.", time, layer, fret);
-	// Handle drum fills
-	if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin - maxTolerance
-	  && time <= m_dfIt->end + maxTolerance) {
-		m_drumfillHits += 1.0f;
-		// Check if we hit the final note in drum fill to activate starpower and get the points
-		if (fret == 4 && time >= m_dfIt->end - maxTolerance
-		  && (!m_song.hasBRE || m_dfIt != (--m_drumfills.end()))) {
-			// GodMode and scores require ~ 6 hits per second
-			if (m_drumfillHits >= drumfill_min_rate * (m_dfIt->end - m_dfIt->begin)) {
-				activateStarpower();
-				m_score += m_drumfillScore;
-			}
-			m_drumfillScore = 0.0f;
-			m_drumfillHits = 0.0f;
-		}
-		m_flames[fret].push_back(AnimValue(0.0, flameSpd));
-		m_flames[fret].back().setTarget(1.0);
-		return;
-	}
-	// Find any suitable note within the tolerance
-	double tolerance = maxTolerance;
-	double signed_error = maxTolerance;
-	auto best = m_chords.end();
-	// when we get here m_chordIt points to the last best fit chord
-	for (auto it = m_chordIt; it != m_chords.end() && it->begin <= time + tolerance; ++it) {
-		// it->dur[static_cast<size_t>(fret)]          == NULL for a chord that doesn't include the fret played (pad hit)
-		// m_notes[it->dur[static_cast<size_t>(fret)]] != 0    when the fret played (pad hit) was already played
-		if (m_level == Difficulty::KIDS) {
-			// in kiddy mode we don't care about the correct pad
-			// all that matters is that there is still a missing note in that chord
-			if (it->status == it->polyphony) continue;
-		} else if (m_notes[it->dur[fret]]) continue;  // invalid fret/hit or already played
-
-		// Check Pro Mode stuff...
-		if ( m_proMode ) {
-			if ( fret > 1 && it->fret_cymbal[fret] && layer != 2 ) continue; // require cymbal if it's a cymbal.
-			if ( fret > 1 && !it->fret_cymbal[fret] && layer != 1 ) continue; // require not a cymbal if it's not a cymbal.
-		}
-
-		double error = std::abs(it->begin - time);
-		if (error < tolerance) {
-			best = it;
-			tolerance = error;
-			signed_error = it->begin - time;
-		}
-	}
-	if (best == m_chords.end()) fail(time, static_cast<int>(fret));  // None found
-	else {
-		// Skip all chords earlier than the best fit chord
-		for (; best != m_chordIt; ++m_chordIt) {
-			// End streak if skipped chords had not been played properly
-			if (m_chordIt->status < m_chordIt->polyphony) endStreak();
-		}
-		++m_chordIt->status;  // One more drum belonging to the chord hit
-		double percentage = clamp(double(m_chordIt->status) / m_chordIt->polyphony); // FIXME: clamping should not be necessary but polyphony seems incorrect
-		m_correctness.setTarget(1.0, true);  // Instantly correct
-		m_correctness.setTarget(percentage);  // ... but keep fading if chord is incomplete
-		Duration const* dur = m_chordIt->dur[fret];
-		// Record the hit event
-		m_events.push_back(Event(time, 1, static_cast<int>(fret), dur));
-		m_notes[dur] = static_cast<unsigned>(m_events.size());
-		// Scoring - be a little more generous for kids
-		double score = (m_level == Difficulty::KIDS) ? points(tolerance/2.0f) : points(tolerance);
-		m_chordIt->score += static_cast<float>(score);
-		m_score += score;
-		if (!m_drumfills.empty()) m_starmeter += static_cast<float>(score); // Only add starmeter if it's possible to activate GodMode
-		// Graphical effects
-		m_flames[fret].push_back(AnimValue(0.0, flameSpd));
-		m_flames[fret].back().setTarget(1.0);
-		if (fret == to_underlying(input::ButtonId::DRUMS_KICK)) m_drumJump.setTarget(1.0); // Do a jump for bass drum
-		// All drums of the chord hit already?
-		if (m_chordIt->status == m_chordIt->polyphony) {
-			//m_score -= m_chordIt->score;
-			//m_chordIt->score *= m_chordIt->polyphony;
-			//m_score += m_chordIt->score;
-			m_streak += 1;
-			if (m_streak > m_longestStreak) m_longestStreak = m_streak;
-			// Handle Big Rock Ending scoring
-			if (m_drumfillHits > 0 && &*best == &m_chords.back()) endBRE();  // Same chord object, not just the same frets
-			// ErrorMeter
-			errorMeter(static_cast<float>(signed_error));
-		}
-	}
-}
-
-/// Handle guitar events and scoring
-void GuitarGraph::guitarPlay(double time, input::Event const& ev) {
-	bool picked = (ev.button == input::ButtonId::GUITAR_PICK_UP || ev.button == input::ButtonId::GUITAR_PICK_DOWN) && ev.pressed();
-	unsigned buttonId = to_underlying(ev.button.id);
-	// Handle Big Rock Ending
-	if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin - maxTolerance
-	  && time <= m_dfIt->end + maxTolerance) {
-		if (!ev.pressed() || buttonId >= m_pads) return;  // No processing for release events or non-fret buttons
-		m_drumfillHits += 1;
-		m_flames[buttonId].push_back(AnimValue(0.0, flameSpd));
-		m_flames[buttonId].back().setTarget(1.0);
-		return;
-	}
-	bool frets[max_panels];  // The combination about to be played
-	if (picked) {
-		for (unsigned fret = 0; fret < m_pads; ++fret) {
-			frets[fret] = m_pressed[fret + 1u];
-		}
-	} else { // Attempt to tap
-		if (buttonId >= m_pads) return;
-		if (m_correctness.get() < 0.5f && m_starpower.get() < 0.001f) return; // Hammering not possible at the moment
-		for (unsigned fret = 0; fret < m_pads; ++fret) frets[fret] = false;
-		// Note: frets[] was just cleared, held buttons are in m_pressed (fret f is m_pressed[f + 1])
-		for (unsigned fret = buttonId + 1; fret < m_pads; ++fret) {
-			if (m_pressed[fret + 1]) return; // Extra buttons on right side
-		}
-		if (ev.pressed()) {
-			// Hammer-on, the fret pressed is played
-			frets[buttonId] = true;
-		} else {
-			// Pull off, find the note to played that way
-			int fret = static_cast<int>(buttonId);
-			do {
-				if (--fret < 0) return; // No frets pressed -> not a pull off
-			} while (!m_pressed[fret + 1]);
-			frets[fret] = true;
-		}
-	}
-	// Find any suitable note within the tolerance
-	double tolerance = maxTolerance;
-	double signed_error = maxTolerance;
-	auto best = m_chords.end();
-	for (auto it = m_chordIt; it != m_chords.end() && it->begin <= time + tolerance; ++it) {
-		if (it->status > 1) continue; // Already picked, can't play again
-		if (!picked) { // Tapping rules
-			if (it->status > 0) continue; // Already tapped, can't tap again
-			if (!it->tappable) continue; // Cannot tap
-			auto tmp = it;
-			if ( (tmp == m_chords.begin() || (--tmp)->status == 0) &&
-			  m_starpower.get() < 0.001f) continue; // The previous note not played
-		}
-		if (!it->matches(frets)) continue;
-		double error = std::abs(it->begin - time);
-		if (error < tolerance) {
-			best = it;
-			tolerance = error;
-			signed_error = it->begin - time;
-		}
-	}
-	if (best == m_chords.end()) fail(time, picked ? -1 : -2);
-	else { // Correctly hit
-		m_chordIt = best;
-		float& score = m_chordIt->score;
-		m_score -= score;
-		m_starmeter -= score;
-		bool first_time = (score == 0 ? true : false);
-		if (first_time) m_streak++;
-		if (m_streak > m_longestStreak) m_longestStreak = m_streak;
-		score = static_cast<float>(points(tolerance));
-		score *= static_cast<float>(m_chordIt->polyphony);
-		m_chordIt->status = 1 + picked;
-		m_score += score;
-		m_starmeter += score;
-		m_correctness.setTarget(1.0, true); // Instantly go to one
-		errorMeter(static_cast<float>(signed_error));
-		for (unsigned fret = 0; fret < m_pads; ++fret) {
-			if (!m_chordIt->fret[fret]) continue;
-			Duration const* dur = m_chordIt->dur[fret];
-			m_events.push_back(Event(time, 1 + picked, static_cast<int>(fret), dur));
-			m_notes[dur] = static_cast<unsigned>(m_events.size());
-			m_holds[fret] = static_cast<unsigned>(m_events.size());
-			if (first_time) {
-				m_flames[fret].push_back(AnimValue(0.0, flameSpd));
-				m_flames[fret].back().setTarget(1.0);
-			}
-		}
-		// Handle Big Rock Ending scoring
-		if (m_drumfillHits > 0 && &*best == &m_chords.back()) endBRE();  // Same chord object, not just the same frets
-	}
 }
 
 /// Modify color based on things like GodMode and solos
@@ -848,10 +467,10 @@ Color const GuitarGraph::colorize(Color c, double time) const {
 	const static Color godmodeC(0.5f, 0.5f, 1.0f); // Color for full GodMode
 	const static Color soloC(0.2f, 0.9f, 0.2f); // Color for solo notes
 	// Solo? (cannot use m_solo, as time can be in future)
-	for (auto const& solo: m_solos) {
+	for (auto const& solo: m_engine.solos()) {
 		if (time >= solo.begin && time <= solo.end) { c = soloC; break; }
 	}
-	float f = static_cast<float>(m_starpower.get());
+	float f = static_cast<float>(m_engine.starpower().get());
 	if (f < 0.001f) return c;
 	f = std::sqrt(std::sqrt(f));
 	c.r = blend(godmodeC.r, c.r, f);
@@ -876,17 +495,20 @@ namespace {
 }
 
 void GuitarGraph::drawNotes(double time) {
+	m_engine.updateLookahead(time);  // FIXME: gameplay rules that depend on drawing
 	glutil::UseDepthTest depthtest;
+	auto const& drumfills = m_engine.drumfills();
+	auto const dfIt = m_engine.drumfillIt();
 	// Draw drum fills / Big Rock Endings
-	bool drumfill = m_dfIt != m_drumfills.end() && m_dfIt->begin - time <= future;
+	bool drumfill = dfIt != drumfills.end() && dfIt->begin - time <= future;
 	if (drumfill) {
-		drawDrumfill(m_dfIt->begin - time, m_dfIt->end - time);
+		drawDrumfill(dfIt->begin - time, dfIt->end - time);
 		// If it is a drum fill (not BRE), draw the final note
-		if (m_drums && (!m_song.hasBRE || (m_dfIt != (--m_drumfills.end())))) {
+		if (m_drums && (!m_song.hasBRE || (dfIt != (--drumfills.end())))) {
 			Color c(0.7f, 0.7f, 0.7f);
-			if (m_drumfillHits >= drumfill_min_rate * (m_dfIt->end - m_dfIt->begin))
-				c = colorize(color(4), m_dfIt->end);
-			drawNote(4, c, m_dfIt->end - time, m_dfIt->end - time, 0.0f, false, false, 0.0, 0.0);
+			if (m_engine.drumfillHits() >= drumfill_min_rate * (dfIt->end - dfIt->begin))
+				c = colorize(color(4), dfIt->end);
+			drawNote(4, c, dfIt->end - time, dfIt->end - time, 0.0f, false, false, 0.0, 0.0);
 		}
 	}
 	if (time != time) return;  // Check that time is not NaN
@@ -894,35 +516,26 @@ void GuitarGraph::drawNotes(double time) {
 	glmath::vec4 neckglow{};  // Used for calculating the average neck color
 
 	// Iterate chords
-	for (auto& chord: m_chords) {
+	for (auto const& chord: m_engine.chords()) {
 		float tBeg = static_cast<float>(chord.begin - time);
 		float tEnd = static_cast<float>(m_drums ? tBeg : chord.end - time);
 		if (tBeg > future) break;
-		if (tEnd < past) {
-			chord.passed = true; // Mark as past note for rewinding
-			continue;
-		}
+		if (tEnd < past) continue;
 		// Don't show past chords when rewinding
 		if (chord.passed || (tBeg > maxTolerance && chord.status > 0)) continue;
-		// Handle notes during drum fills / BREs
-		if (drumfill && chord.begin >= m_dfIt->begin - maxTolerance
-		  && chord.begin <= m_dfIt->end + maxTolerance) {
-			if (chord.status == 0) {
-				chord.status = chord.polyphony; // Mark as hit so that streak doesn't reset
-				m_drumfillScore += static_cast<float>(chord.polyphony) * 50.0f; // Count points from notes under drum fill
-			}
-			continue;
-		}
+		// Skip notes during drum fills / BREs
+		if (drumfill && chord.begin >= dfIt->begin - maxTolerance
+		  && chord.begin <= dfIt->end + maxTolerance) continue;
 		// Loop through the frets
 		for (unsigned fret = 0; fret < m_pads; ++fret) {
 			if (!chord.fret[fret] || (tBeg > maxTolerance && chord.releaseTimes[fret] > 0)) continue;
 			if (tEnd > future) tEnd = future;
-			unsigned event = m_notes[chord.dur[fret]];
+			unsigned event = m_engine.noteEvent(chord.dur[fret]);
 			float glow = 0.0f;
 			float whammy = 0.0f;
 			if (event > 0) {
-				glow = static_cast<float>(m_events[event - 1].glow.get());
-				whammy = static_cast<float>(m_events[event - 1].whammy.get());
+				glow = static_cast<float>(m_engine.events()[event - 1].glow.get());
+				whammy = static_cast<float>(m_engine.events()[event - 1].whammy.get());
 			}
 			// Set the default color (disabled state)
 			Color c(0.5f, 0.5f, 0.5f);
@@ -1024,7 +637,7 @@ void GuitarGraph::drawNeckStuff(double time) {
 			m_flames[fret].clear(); continue;
 		}
 		Texture* ftex = &m_flame;
-		if (m_starpower.get() > 0.01f) ftex = &m_flame_godmode;
+		if (m_engine.starpower().get() > 0.01f) ftex = &m_flame_godmode;
 		float x = getFretX(fret);
 		for (auto it = m_flames[fret].begin(); it != m_flames[fret].end();) {
 			float flameAnim = static_cast<float>(it->get());
@@ -1176,7 +789,7 @@ void GuitarGraph::drawNote(unsigned fret, Color color, double tBeg, double tEnd,
 	}
 	// Hammer note caps
 	if (tappable) {
-		float l = std::max(0.3f, static_cast<float>(m_correctness.get()));
+		float l = std::max(0.3f, static_cast<float>(m_engine.correctness().get()));
 		float s = static_cast<float>(1.0f - hitAnim);
 		ColorTrans c(window, Color(l, l, l, s));
 		m_tappableObj.draw(window, x, yBeg, 0.0f, s);
@@ -1228,8 +841,8 @@ void GuitarGraph::drawInfo(double time) {
 		// Draw streak counter
 		{
 			ColorTrans c(window, Color(0.6f, 0.6f, 0.7f, 0.95f));
-			m_streakText->render(std::to_string(unsigned(m_streak)) + "/"
-			  + std::to_string(unsigned(m_longestStreak)));
+			m_streakText->render(std::to_string(unsigned(m_engine.streak())) + "/"
+			  + std::to_string(unsigned(m_engine.longestStreak())));
 			m_streakText->dimensions().middle(-xcor).fixedHeight(h*0.75f).screenBottom(-0.18f);
 			m_streakText->draw(window);
 		}
@@ -1241,9 +854,9 @@ void GuitarGraph::drawInfo(double time) {
 			m_text.dimensions.screenBottom(-0.02f).middle(-0.12f);
 			if (!m_drums)
 				m_text.draw(window, _("God Mode Ready!"));
-			else if (m_dfIt != m_drumfills.end() && time >= m_dfIt->begin && time <= m_dfIt->end)
+			else if (m_engine.drumfillIt() != m_engine.drumfills().end() && time >= m_engine.drumfillIt()->begin && time <= m_engine.drumfillIt()->end)
 				m_text.draw(window, _("Drum Fill!"));
-		} else if (m_solo) {
+		} else if (m_engine.solo()) {
 			m_text.dimensions.screenBottom(-0.02f).middle(-0.03f);
 			m_text.draw(window, _("Solo!"));
 		}
@@ -1263,110 +876,4 @@ void GuitarGraph::drawBar(double time, float h) {
 	va.normal(0.0f, 1.0f, 0.0f).texCoord(0,0).vertex(2.5f, time2y(static_cast<float>(time - h)));
 
 	va.draw();
-}
-
-bool GuitarGraph::updateTom(unsigned int tomTrack, int fretId) {
-	auto tomTrackIt = m_track_index->second->nm.find(tomTrack);
-	if (tomTrackIt == m_track_index->second->nm.end()) return false;  // Track not found
-	auto chordIt = m_chords.begin();
-	for (Duration const& tom: tomTrackIt->second) {
-		// Iterate over chords of the song
-		for (; chordIt != m_chords.end() && chordIt->begin < tom.end; ++chordIt) {
-			if (!chordIt->fret[fretId]) continue;  // Chord doesn't contain the fret we are looking for
-			chordIt->fret_cymbal[fretId] = (chordIt->begin < tom.begin);  // If not within tom, it is a cymbal
-		}
-	}
-	return true;
-}
-
-/// Create the Chord structures for the current track/difficulty level
-void GuitarGraph::updateChords() {
-	m_recorder.chart(m_track_index->first, static_cast<unsigned>(to_underlying(m_level)));
-	m_chords.clear();
-	m_solos.clear();
-	m_drumfills.clear();
-	m_scoreFactor = 0;
-	NoteMap const& nm = m_track_index->second->nm;
-
-	Durations::size_type pos[5] = {}, size[5] = {};
-	Durations const* durations[5] = {};
-	auto currentLevel = to_underlying(m_level);
-	for (unsigned fret = 0; fret < m_pads; ++fret) {
-		unsigned basepitch = diffv[currentLevel].basepitch;
-		auto it = nm.find(basepitch + fret);
-		if (it == nm.end()) continue;
-		durations[fret] = &it->second;
-		size[fret] = durations[fret]->size();
-	}
-	double lastEnd = 0.0;
-	const double tapMaxDelay = 0.15;  // Delay from the end of the previous note
-	while (true) {
-		// Find the earliest
-		double t = getInf();
-		for (unsigned fret = 0; fret < m_pads; ++fret) {
-			if (pos[fret] == size[fret]) continue;
-			Durations const& dur = *durations[fret];
-			t = std::min(t, dur[pos[fret]].begin);
-		}
-		// Quit processing if none were left
-		if (t == getInf()) break;
-		// Construct a chord
-		GuitarChord c;
-		c.begin = t;
-		unsigned tapfret = 0;
-		for (unsigned fret = 0; fret < m_pads; ++fret) {
-			if (pos[fret] == size[fret]) continue;
-			Durations const& dur = *durations[fret];
-			Duration const& d = dur[pos[fret]];
-			if (d.begin > t) continue;
-			c.end = std::max(c.end, d.end);
-			c.fret[fret] = true;
-			c.dur[fret] = &d;
-			tapfret = fret;
-			++c.polyphony;
-			++pos[fret];
-			m_scoreFactor += 50.0f;
-			if (d.end - d.begin > 0.0f) m_scoreFactor += 50.0f * (d.end - d.begin);
-		}
-		// Check if the chord is tappable
-		if (!m_drums && c.polyphony == 1) {
-			c.tappable = true;
-			if (m_chords.empty() || m_chords.back().fret[tapfret]) c.tappable = false;
-			if (lastEnd + tapMaxDelay < t) c.tappable = false;
-		}
-		lastEnd = c.end;
-		m_chords.push_back(c);
-	}
-	m_chordIt = m_chords.begin();
-
-	m_hasTomTrack = false;
-	if(m_drums) {
-		// HiHat/Rack Tom 1 detection
-		m_hasTomTrack = updateTom(110, to_underlying(input::ButtonId::DRUMS_YELLOW)) || m_hasTomTrack;
-		// Ride Cymbal/Rack Tom 2 detection
-		m_hasTomTrack = updateTom(111, to_underlying(input::ButtonId::DRUMS_BLUE)) || m_hasTomTrack;
-		// Crash Cymbal/Floor Tom detection
-		m_hasTomTrack = updateTom(112, to_underlying(input::ButtonId::DRUMS_GREEN)) || m_hasTomTrack;
-	}
-
-	// Solos
-	auto solotrack = nm.find(103); // 103 = Expert Solo - used for every difficulty
-	if (solotrack != nm.end()) {
-		for (auto const& solo: solotrack->second) {
-			// Require at least 6s length in order to avoid starpower sections
-			if (solo.end - solo.begin >= 6.0f) m_solos.push_back(solo);
-		}
-	}
-	// Drum fills
-	auto dfTrack = nm.find(124); // 124 = drum fills (actually 120-124, but one is enough)
-	if (dfTrack != nm.end()) {
-		m_drumfills = dfTrack->second;
-		// Big Rock Ending scoring (single hold note)
-		if (!m_drums || m_song.hasBRE)
-			m_scoreFactor += 50.0f * (m_drumfills.back().end - m_drumfills.back().begin);
-	}
-	m_dfIt = m_drumfills.end();
-
-	// Normalize maximum score factor
-	m_scoreFactor = 10000.0f / m_scoreFactor;
 }

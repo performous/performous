@@ -6,6 +6,7 @@
 #include "audio.hh"
 #include "animvalue.hh"
 #include "notes.hh"
+#include "playevent.hh"
 #include "controllers.hh"
 #include "texture.hh"
 #include "opengl_text.hh"
@@ -60,8 +61,6 @@ class Popup {
 };
 
 
-const unsigned max_panels = 10; // Maximum number of arrow lines / guitar frets
-
 class Audio;
 class Game;
 class Song;
@@ -102,8 +101,8 @@ public:
 	bool menuOpen() const { return m_menu.isOpen(); }
 	void position(float cx, float width) { m_cx.setTarget(cx); m_width.setTarget(width); }
 	size_t stream() const { return m_stream; }
-	double correctness() const { return m_correctness.get(); }
-	unsigned getScore() const { return static_cast<unsigned>(clamp(m_score * m_scoreFactor, 0.0, 10000.0)); }
+	virtual double correctness() const { return m_correctness.get(); }
+	virtual unsigned getScore() const { return static_cast<unsigned>(clamp(m_score * m_scoreFactor, 0.0, 10000.0)); }
 	input::DevType getGraphType() const { return m_dev->type; }
 	virtual double getWhammy() const { return 0; }
 	bool isKeyboard() const { return m_dev->source.isKeyboard(); }
@@ -116,16 +115,7 @@ public:
 	size_t m_stream; /// audio stream number
 	input::DevicePtr m_dev;
 	AnimValue m_cx, m_width; /// controls horizontal position and width smoothly
-	struct Event {
-		double time;
-		AnimValue glow;
-		AnimValue whammy;
-		unsigned type; // 0 = miss (pick), 1 = tap, 2 = pick
-		int fret;
-		Duration const* dur;
-		double holdTime;
-		Event(double t, unsigned ty, int f = -1, Duration const* d = nullptr): time(t), glow(0.0, 5.0), whammy(0.0, 0.5), type(ty), fret(f), dur(d), holdTime(d ? d->begin : getNaN()) { if (type > 0) glow.setValue(1.0); }
-	};
+	using Event = PlayEvent;
 	typedef std::vector<Event> Events;
 	Events m_events;
 	typedef std::vector<Popup> Popups;

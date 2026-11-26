@@ -1,0 +1,183 @@
+diff --git a/game/audio.cc b/game/audio.cc
+index ec5eb06c..af2bbc20 100644
+--- a/game/audio.cc
++++ b/game/audio.cc
+@@ -1,3 +1,5 @@
++#include <thread>
++#include <cstdlib>
+ #include "audio.hh"
+ 
+ #include "chrono.hh"
+@@ -464,6 +466,13 @@ int Device::operator()(float const* inbuf, float* outbuf, std::ptrdiff_t frames)
+ 		mics[i]->input(it, it + frames);
+ 	}
+ 	if (outptr) outptr->callback(outbuf, outbuf + 2 * frames, rate);
++	// AUTOPLAY: the null sound device takes samples as fast as it can, play them in real time instead
++	if (outptr && std::getenv("PERFORMOUS_AUTOPLAY")) {
++		static auto const start = std::chrono::steady_clock::now();
++		static double played = 0.0;
++		played += static_cast<double>(frames) / rate;
++		std::this_thread::sleep_until(start + std::chrono::duration_cast<std::chrono::steady_clock::duration>(std::chrono::duration<double>(played)));
++	}
+ 	return paContinue;
+ } catch (std::exception& e) {
+ 
+diff --git a/game/autoplay.hh b/game/autoplay.hh
+new file mode 100644
+index 00000000..7ee3344d
+--- /dev/null
++++ b/game/autoplay.hh
+@@ -0,0 +1,17 @@
++#pragma once
++// TEST HARNESS ONLY (never committed): plays a scripted game so that the old gameplay code produces reports.
++#include <nlohmann/json.hpp>
++#include <cstdlib>
++#include <fstream>
++#include <optional>
++
++inline nlohmann::json const* autoplaySpec() {
++	static std::optional<nlohmann::json> spec = []() -> std::optional<nlohmann::json> {
++		char const* file = std::getenv("PERFORMOUS_AUTOPLAY");
++		if (!file) return std::nullopt;
++		std::ifstream f(file);
++		return nlohmann::json::parse(f);
++	}();
++	return spec ? &*spec : nullptr;
++}
++inline int g_autoplayPending = 0;
+diff --git a/game/guitargraph.cc b/game/guitargraph.cc
+index 6deb0eb0..499e5b9a 100644
+--- a/game/guitargraph.cc
++++ b/game/guitargraph.cc
+@@ -5,6 +5,7 @@
+ #include "fs.hh"
+ #include "log.hh"
+ #include "platform.hh"
++#include "autoplay.hh"
+ #include "song.hh"
+ #include "i18n.hh"
+ #include "graphic/view_trans.hh"
+@@ -349,6 +350,17 @@ void GuitarGraph::engine() {
+ 	m_whammy = 0;
+ 	// Countdown to start
+ 	handleCountdown(time, time < getNotesBeginTime() ? getNotesBeginTime() : m_jointime+1);
++	// AUTOPLAY: feed the scripted events that are due
++	while (m_autoPos < m_autoEvents.size() && std::get<0>(m_autoEvents[m_autoPos]) <= time) {
++		input::Event ev;
++		ev.source = m_dev->source;
++		ev.devType = m_dev->type;
++		ev.button = input::ButtonId(std::get<1>(m_autoEvents[m_autoPos]));
++		ev.value = std::get<2>(m_autoEvents[m_autoPos]);
++		ev.time = Clock::now();
++		m_dev->pushEvent(ev);
++		++m_autoPos;
++	}
+ 	// Handle all events
+ 	for (input::Event ev; m_dev->getEvent(ev); ) {
+ 		unsigned buttonId = to_underlying(ev.button.id);
+@@ -507,6 +519,22 @@ void GuitarGraph::engine() {
+ 	// During GodMode, correctness is full, no matter what
+ 	if (m_starpower.get() > 0.01) m_correctness.setTarget(1.0, true);
+ 	m_recorder.state(m_score, m_streak, m_longestStreak, m_starmeter);
++	if (m_autoEnd > 0.0 && time > m_autoEnd) {
++		m_autoEnd = -1.0;
++		saveReport();
++		if (--g_autoplayPending == 0) std::_Exit(0);
++	}
++}
++
++void GuitarGraph::autoplay(nlohmann::json const& p, double end) {
++	if (!m_drums && !p["track"].get<std::string>().empty()) setTrack(p["track"].get<std::string>());
++	if (!difficulty(Difficulty(p["level"].get<int>()))) { SpdLogger::error(LogSystem::INSTRUMENTS, "AUTOPLAY: no such difficulty"); std::_Exit(4); }
++	m_leftymode.b() = p.value("lefty", false);
++	for (auto const& e: p["events"]) m_autoEvents.emplace_back(e[0].get<double>(), e[1].get<unsigned>(), e[2].get<double>());
++	m_autoEnd = end;
++	m_jointime = -1.0;  // Joined from the start (the audio position is not known yet)
++	setupJoinMenu();
++	m_menu.close();
+ }
+ 
+ void GuitarGraph::saveReport() {
+diff --git a/game/guitargraph.hh b/game/guitargraph.hh
+index 0f3d8906..233b924d 100644
+--- a/game/guitargraph.hh
++++ b/game/guitargraph.hh
+@@ -54,6 +54,7 @@ class GuitarGraph: public InstrumentGraph {
+ 	 */
+ 	void draw(double time);
+ 	void engine();
++	void autoplay(nlohmann::json const& player, double end);
+ 	std::string getTrack() const;
+ 	std::string getDifficultyString() const;
+ 	std::string getModeId() const;
+@@ -160,5 +161,8 @@ class GuitarGraph: public InstrumentGraph {
+ 	bool m_hasTomTrack; /// true if the track has at least one tom track
+ 	bool m_proMode; /// true if pro drums. (it would be better to split guitar/trum tracks into sep classes)
+ 	double m_whammy; /// whammy value for pitch shift
++	std::vector<std::tuple<double, unsigned, double>> m_autoEvents;
++	std::size_t m_autoPos = 0;
++	double m_autoEnd = -1.0;
+ 	GameRecorder m_recorder; /// what happened, for bug reports
+ };
+diff --git a/game/main.cc b/game/main.cc
+index 756c91a9..32092abb 100644
+--- a/game/main.cc
++++ b/game/main.cc
+@@ -15,6 +15,7 @@
+ #include "graphic/window.hh"
+ #include "webcam.hh"
+ #include "webserver.hh"
++#include "autoplay.hh"
+ 
+ // Screens
+ #include "screen_intro.hh"
+@@ -151,6 +152,20 @@ void mainLoop(std::string const& songlist) {
+ 	while (!gm.isFinished()) {
+ 		Profiler prof("mainloop");
+ 		bool benchmarking = config["graphic/fps"].b();
++		if (static bool autoStarted = false; !autoStarted && songs.doneLoading && autoplaySpec()) {
++			autoStarted = true;
++			songs.update();
++			bool found = false;
++			for (std::size_t i = 0; i < songs.size(); ++i) {
++				if (songs[i]->path.string().find((*autoplaySpec())["song"].get<std::string>()) == std::string::npos) continue;
++				auto& ss = dynamic_cast<ScreenSing&>(*gm.getScreen("Sing"));
++				ss.setSong(songs[i]);
++				gm.activateScreen("Sing");
++				found = true;
++				break;
++			}
++			if (!found) { SpdLogger::error(LogSystem::LOGGER, "AUTOPLAY: song not found"); std::_Exit(3); }
++		}
+ 		if (songs.doneLoading == true && songs.displayedAlert == false) {
+ 			gm.dialog(fmt::format(_("Done Loading!\n Loaded {0} songs."), songs.loadedSongs()));
+ 			songs.displayedAlert = true;
+diff --git a/game/screen_sing.cc b/game/screen_sing.cc
+index 4f27e842..50840195 100644
+--- a/game/screen_sing.cc
++++ b/game/screen_sing.cc
+@@ -1,4 +1,5 @@
+ #include "screen_sing.hh"
++#include "autoplay.hh"
+ 
+ #include "backgrounds.hh"
+ #include "dancegraph.hh"
+@@ -527,6 +528,18 @@ namespace {
+ }
+ 
+ void ScreenSing::prepare() {
++	if (static bool autoCreated = false; !autoCreated && autoplaySpec()) {
++		autoCreated = true;
++		unsigned n = 0;
++		for (auto const& p: (*autoplaySpec())["players"]) {
++			bool drums = p["drums"].get<bool>();
++			auto source = input::SourceId(p["keyboard"].get<bool>() ? input::SourceType::KEYBOARD : input::SourceType::JOYSTICK, 7, n++);
++			auto dev = std::make_shared<input::Device>(source, drums ? input::DevType::DRUMS : input::DevType::GUITAR);
++			m_instruments.push_back(std::make_unique<GuitarGraph>(getGame(), m_audio, *m_song, dev, m_instruments.size()));
++			dynamic_cast<GuitarGraph&>(*m_instruments.back()).autoplay(p, (*autoplaySpec())["end"].get<double>());
++			++g_autoplayPending;
++		}
++	}
+ 	// Enable/disable controllers as needed (mostly so that keyboard navigation will not be obstructed).
+ 	getGame().controllers.enableEvents(m_song->hasControllers() && !m_menu.isOpen() && !m_score_window.get());
+ 	double time = m_audio.getPosition();
