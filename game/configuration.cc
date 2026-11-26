@@ -12,22 +12,30 @@
 #include <fmt/format.h>
 
 #include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <future>
 #include <iomanip>
 #include <limits>
+#include <locale>
 #include <map>
+#include <sstream>
 #include <stdexcept>
 #include <string>
+#include <system_error>
 
 
 class ConfigItemXMLLoader {
 public:
 	void update(ConfigItem&, xmlpp::Element& elem, unsigned mode); ///< Load XML config file, elem = Entry, mode = 0 for schema, 1 for system config and 2 for user config
+	bool clamped() const { return m_clamped; } ///< update() clamped the value to the schema range
 
 private:
 	template <typename T> void updateNumeric(ConfigItem& item, xmlpp::Element& elem, unsigned mode); ///< Used internally for loading XML
+	template <typename T, typename V> V clampToRange(ConfigItem const& item, V value, unsigned mode); ///< Clamp a value from a config file to the schema range, if there is one
 	void verifyType(std::string const& t) const; ///< throws std::logic_error if t != type
+
+	bool m_clamped = false;
 };
 
 namespace {
@@ -53,20 +61,70 @@ namespace {
 	template <typename T> void setLimits(xmlpp::Element& e, ConfigItem& item) {
 		setLimits<T>(e, item.m_min, item.m_max, item.m_step);
 	}
+
+	/// True if only whitespace follows pos in s
+	bool onlySpaceAfter(std::string const& s, std::size_t pos) {
+		return std::all_of(s.begin() + static_cast<std::ptrdiff_t>(pos), s.end(), [](unsigned char c) { return std::isspace(c); });
+	}
+
+	/// Parse a whole string as an int: unlike std::stoi, "12abc" is an error rather than 12
+	int parseInt(std::string const& value_string) {
+		std::size_t pos = 0;
+		int value = 0;
+		try {
+			value = std::stoi(value_string, &pos);
+		}
+		catch (std::exception&) {
+			pos = 0;
+		}
+		if (pos == 0 || !onlySpaceAfter(value_string, pos))
+			throw std::runtime_error("Invalid integer value '" + value_string + "'");
+		return value;
+	}
+
+	/// Parse a whole string as a finite float, like sconv<float> (locale independent, ',' accepted as
+	/// the decimal separator), but "3xyz" is an error rather than 3
+	float parseFloat(std::string const& value_string) {
+		std::string s = value_string;
+		std::replace(s.begin(), s.end(), ',', '.');
+		std::istringstream iss(s);
+		iss.imbue(std::locale::classic());
+		float value = 0.0f;
+		if (!(iss >> value) || !std::isfinite(value) || !(iss >> std::ws).eof())
+			throw std::runtime_error("Invalid float value '" + value_string + "'");
+		return value;
+	}
+
+	/// Keep a copy of a bad config file, because the next save would overwrite it with only the good items
+	void backupBadConfig(fs::path const& file) {
+		fs::path backup = file;
+		backup += ".bad";
+		std::error_code ec;
+		fs::copy_file(file, backup, fs::copy_options::overwrite_existing, ec);
+		if (ec)
+			SpdLogger::error(LogSystem::CONFIG, "Could not save a copy of the bad configuration file as {} ({})", backup, ec.message());
+		else
+			SpdLogger::notice(LogSystem::CONFIG, "Saved a copy of the bad configuration file as {}", backup);
+	}
 }
 
 template <typename T> void ConfigItemXMLLoader::updateNumeric(ConfigItem& item, xmlpp::Element& elem, unsigned mode) {
+	// Limits and display settings come only from the schema. writeConfig() never writes them, and
+	// reading them from a config file would let it widen the range, or give a min greater than max.
+	if (mode != 0)
+		return;
 	auto ns = elem.find("limits");
-	if (!ns.empty())
-		setLimits<T>(dynamic_cast<xmlpp::Element&>(*ns[0]), item);
-	else if (mode == 0)
+	if (ns.empty())
 		throw xmlpp::XMLError(elem, "child element limits missing");
-	ns = elem.find("ui");
+	auto& limits = dynamic_cast<xmlpp::Element&>(*ns[0]);
+	setLimits<T>(limits, item);
+	item.m_hasRange = limits.get_attribute("min") && limits.get_attribute("max");
+	if (item.m_hasRange && std::get<T>(item.m_min) > std::get<T>(item.m_max))
+		throw xmlpp::XMLError(limits, "min is greater than max");
 	// Default values
-	if (mode == 0) {
-		item.m_unit = {};
-		item.m_multiplier = static_cast<T>(1);
-	}
+	item.m_unit = {};
+	item.m_multiplier = static_cast<T>(1);
+	ns = elem.find("ui");
 	if (!ns.empty()) {
 		xmlpp::Element& e = dynamic_cast<xmlpp::Element&>(*ns[0]);
 		try {
@@ -87,6 +145,19 @@ template <typename T> void ConfigItemXMLLoader::updateNumeric(ConfigItem& item, 
 	}
 }
 
+template <typename T, typename V> V ConfigItemXMLLoader::clampToRange(ConfigItem const& item, V value, unsigned mode) {
+	if (mode == 0 || !item.m_hasRange)
+		return value;
+	auto const min = static_cast<V>(std::get<T>(item.m_min));
+	auto const max = static_cast<V>(std::get<T>(item.m_max));
+	if (value >= min && value <= max)
+		return value;
+	auto const clamped = std::clamp(value, min, max);
+	m_clamped = true;
+	SpdLogger::error(LogSystem::CONFIG, "Bad configuration item for \"{}\", {} is outside the range {} to {}, using {}", item.getName(), value, min, max, clamped);
+	return clamped;
+}
+
 void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, unsigned mode) {
 	try {
 		if (mode == 0) {
@@ -99,13 +170,15 @@ void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, unsigne
 			item.setLongDescription(getText(elem, "long"));
 		}
 		else {
-			std::string type{xmlpp::getAttribute(elem, "type")};
+			// The type attribute is optional in config files: the schema gives the type
+			auto const typeAttribute = elem.get_attribute("type");
+			std::string type = typeAttribute ? std::string(typeAttribute->get_value()) : std::string();
 			if (item.getType() == "uint" && type == "int") {
 				type = "uint"; // Convert old config values.
-				SpdLogger::info(LogSystem::CONFIG, "Converting config value: {} to type uint.", xmlpp::getAttribute(elem, "name"));
+				SpdLogger::info(LogSystem::CONFIG, "Converting config value: {} to type uint.", item.getName());
 			}
 			if (!type.empty() && type != item.getType())
-				throw std::runtime_error("Entry type mismatch: " + xmlpp::getAttribute(elem, "name") + ": schema type = " + item.getType() + ", config type = " + type);
+				throw std::runtime_error("Entry type mismatch: " + item.getName() + ": schema type = " + item.getType() + ", config type = " + type);
 		}
 		if (item.getType() == "bool") {
 			const auto value_string = xmlpp::getAttribute(elem, "value");
@@ -118,13 +191,11 @@ void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, unsigne
 		}
 		else if (item.getType() == "int") {
 			const auto value_string = xmlpp::getAttribute(elem, "value");
-			if (!value_string.empty())
-				item.setValue(std::stoi(value_string));
 			updateNumeric<int>(item, elem, mode);
+			if (!value_string.empty())
+				item.setValue(clampToRange<int>(item, parseInt(value_string), mode));
 		} else if (item.getType() == "uint") {
 			std::string value_string = xmlpp::getAttribute(elem, "value");
-			if (!value_string.empty())
-				item.setValue(static_cast<unsigned short>(std::stoi(value_string)));
 			// Enum handling
 			if (mode == 0) {
 				auto n2 = elem.find("limits/enum");
@@ -139,24 +210,19 @@ void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, unsigne
 				}
 			}
 			updateNumeric<unsigned short>(item, elem, mode);
+			if (!value_string.empty()) {
+				// Clamp as int, so that a value too big for unsigned short does not wrap around first
+				const int value = clampToRange<unsigned short>(item, parseInt(value_string), mode);
+				if (value < 0 || value > std::numeric_limits<unsigned short>::max())
+					throw std::runtime_error("Invalid unsigned integer value '" + value_string + "'");
+				item.setValue(static_cast<unsigned short>(value));
+			}
 		}
 		else if (item.getType() == "float") {
 			std::string value_string = xmlpp::getAttribute(elem, "value");
-			if (!value_string.empty()) {
-				float value = std::numeric_limits<float>::quiet_NaN();
-				try {
-					value = sconv<float>(value_string);
-				}
-				catch (std::exception&) {
-				}
-				if (std::isfinite(value))
-					item.setValue(value);
-				else if (mode == 0)
-					throw std::runtime_error("Invalid float value '" + value_string + "'");
-				else
-					SpdLogger::warn(LogSystem::CONFIG, "Ignoring invalid value='{}' for entry={}.", value_string, xmlpp::getAttribute(elem, "name"));
-			}
 			updateNumeric<float>(item, elem, mode);
+			if (!value_string.empty())
+				item.setValue(clampToRange<float>(item, parseFloat(value_string), mode));
 		}
 		else if (item.getType() == "string") {
 			item.setValue(getText(elem, "stringvalue"));
@@ -335,7 +401,24 @@ void readConfigXML(fs::path const& file, unsigned mode) {
 		return;
 	}
 	SpdLogger::info(LogSystem::CONFIG, "Parsing file={}", file);
-	xmlpp::DomParser domParser(file.string());
+	xmlpp::DomParser domParser;
+	try {
+		domParser.parse_file(file.string());
+	}
+	catch (std::exception& e) {
+		if (mode == 0)
+			throw std::runtime_error(file.string() + ": " + e.what());
+		// A system or user config that is not valid XML is not fatal: every item keeps its default.
+		// The libxml++ message spans several lines; fold it onto one.
+		std::string reason = e.what();
+		std::replace(reason.begin(), reason.end(), '\n', ' ');
+		while (!reason.empty() && std::isspace(static_cast<unsigned char>(reason.back())))
+			reason.pop_back();
+		SpdLogger::error(LogSystem::CONFIG, "Bad configuration file {}, using defaults for all of its items ({})", file, reason);
+		backupBadConfig(file);
+		return;
+	}
+	bool bad = false; // A bad item was found in a system or user config
 	try {
 		auto n = domParser.get_document()->get_root_node()->find("/performous/menu/entry");
 		if (!n.empty()) {
@@ -345,8 +428,15 @@ void readConfigXML(fs::path const& file, unsigned mode) {
 		n = domParser.get_document()->get_root_node()->find("/performous/entry");
 		for (auto nodeit = n.begin(), end = n.end(); nodeit != end; ++nodeit) {
 			xmlpp::Element& elem = dynamic_cast<xmlpp::Element&>(**nodeit);
-			std::string name = xmlpp::getAttribute(elem, "name");
-			if (name.empty()) throw std::runtime_error(file.string() + " element Entry missing name attribute");
+			auto const nameAttribute = elem.get_attribute("name");
+			std::string const name = nameAttribute ? std::string(nameAttribute->get_value()) : std::string();
+			if (name.empty()) {
+				if (mode == 0)
+					throw std::runtime_error(std::to_string(elem.get_line()) + ": element entry missing name attribute");
+				SpdLogger::error(LogSystem::CONFIG, "Bad configuration item with no name, ignoring it ({}:{})", file, elem.get_line());
+				bad = true;
+				continue;
+			}
 			auto it = config.find(name);
 			if (mode == 0) { // Schema
 				if (it != config.end())
@@ -378,9 +468,30 @@ void readConfigXML(fs::path const& file, unsigned mode) {
 					SpdLogger::warn(LogSystem::CONFIG, "Ignored entry={}; does not exist in config schema.", name);
 					continue;
 				}
-				ConfigItemXMLLoader().update(it->second, elem, mode);
+				// A bad entry in the system or user config is not fatal: log it and keep the default.
+				// reset() gives the system default for the user config, and the factory default for the
+				// system config, because update() only sets the default after a value parses.
+				std::string reason;
+				ConfigItemXMLLoader loader;
+				try {
+					loader.update(it->second, elem, mode);
+				}
+				catch (xmlpp::XMLError& e) {
+					reason = fmt::format("{}:{}: {}", file, e.elem.get_line(), e.message);
+				}
+				catch (std::exception& e) {
+					reason = fmt::format("{}:{}", file, e.what());
+				}
+				if (!reason.empty()) {
+					it->second.reset();
+					SpdLogger::error(LogSystem::CONFIG, "Bad configuration item for \"{}\", using default of {} ({})", name, it->second.getValue(), reason);
+				}
+				if (!reason.empty() || loader.clamped())
+					bad = true;
 			}
 		}
+		if (bad)
+			backupBadConfig(file);
 	}
 	catch (xmlpp::XMLError& e) {
 		int line = e.elem.get_line();

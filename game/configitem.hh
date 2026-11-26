@@ -73,6 +73,7 @@ class ConfigItem {
   public:
 	NumericValue m_step{1};
 	NumericValue m_min, m_max;
+	bool m_hasRange = false; ///< The schema gives both min and max, so values from config files are clamped to them
 	NumericValue m_multiplier;
 	std::string m_unit;
 

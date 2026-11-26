@@ -338,3 +338,32 @@ TEST(UnitTest_ConfigItem, decrease) {
     EXPECT_EQ(0, item.ui());
 }
 
+
+TEST(UnitTest_ConfigItem, stepZeroDoesNotChangeValue) {
+    auto uintItem = ConfigItem(static_cast<unsigned short>(5));
+    uintItem.m_min = static_cast<unsigned short>(0);
+    uintItem.m_max = static_cast<unsigned short>(10);
+    uintItem.m_step = static_cast<unsigned short>(0);
+    ++uintItem;
+    EXPECT_EQ(5, uintItem.ui());
+    --uintItem;
+    EXPECT_EQ(5, uintItem.ui());
+
+    auto intItem = ConfigItem(5);
+    intItem.m_min = 0;
+    intItem.m_max = 10;
+    intItem.m_step = 0;
+    ++intItem;
+    EXPECT_EQ(5, intItem.i());
+    --intItem;
+    EXPECT_EQ(5, intItem.i());
+
+    auto floatItem = ConfigItem(0.5f);
+    floatItem.m_min = 0.0f;
+    floatItem.m_max = 1.0f;
+    floatItem.m_step = 0.0f;
+    ++floatItem;
+    EXPECT_FLOAT_EQ(0.5f, floatItem.f());
+    --floatItem;
+    EXPECT_FLOAT_EQ(0.5f, floatItem.f());
+}
