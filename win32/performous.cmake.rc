@@ -3,6 +3,7 @@
 LANGUAGE 9, 1
 
 1 ICON "@CMAKE_SOURCE_DIR@/win32/performous.ico"
+1 RT_MANIFEST "@CMAKE_SOURCE_DIR@/win32/performous.manifest"
 
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION @VERSION_MAJOR@, @VERSION_MINOR@, @VERSION_PATCH@, @VERSION_TWEAK@
@@ -20,7 +21,7 @@ BEGIN
       VALUE "FileDescription",  "@CMAKE_PROJECT_NAME@ Game"
       VALUE "FileVersion", "@PROJECT_VERSION@"
       VALUE "InternalName", "Performous.exe"
-      VALUE "LegalCopyright", "Copyright © 2009-@YEAR@ @CMAKE_PROJECT_NAME@ Team - GNU GPL v2 or later"
+      VALUE "LegalCopyright", "Copyright ï¿½ 2009-@YEAR@ @CMAKE_PROJECT_NAME@ Team - GNU GPL v2 or later"
       VALUE "OriginalFilename", "Performous.exe"
       VALUE "ProductName", "@CMAKE_PROJECT_NAME@"
       VALUE "ProductVersion", "@PROJECT_VERSION@"
