@@ -1,0 +1,15 @@
+app: Performous
+
+ingredients:
+  dist: jammy
+  sources: 
+    - deb http://archive.ubuntu.com/ubuntu/ jammy main universe
+  debs:
+    - ../Performous-*.deb
+
+
+script:
+  - cp usr/share/icons/hicolor/scalable/apps/performous.svg .
+#  - sed -i -e 's|^Exec=.*|Exec=harmony|g' harmony.desktop
+#  - mv opt/Harmony/* usr/bin/ ; rm -r opt/
+#  - ( cd usr/bin ; ln -s Harmony harmony )
