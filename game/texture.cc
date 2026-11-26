@@ -10,9 +10,9 @@
 #include "util.hh"
 
 #include <cctype>
-#include <cstdint>
 #include <stdexcept>
 #include <sstream>
+#include <type_traits>
 #include <vector>
 
 Shader& getShader(Window& window, std::string const& name) {
@@ -60,6 +60,8 @@ void load(Bitmap& bitmap, fs::path const& name) {
 /// The one loader, created and destroyed by TextureLoader. Only used in this file.
 std::unique_ptr<TextureJobQueue> gTextureLoader = nullptr;
 }  // namespace
+
+static_assert(std::is_same_v<TextureLoader::Ticket, TextureJobQueue::Ticket>, "texture.hh declares Ticket separately to avoid including texturejobqueue.hh");
 
 TextureLoader::TextureLoader() {
 	if (gTextureLoader) throw std::logic_error("Texture Loader initialized twice. There can be only one.");

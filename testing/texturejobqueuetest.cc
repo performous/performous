@@ -326,11 +326,11 @@ TEST_F(TextureJobQueueTest, aQueueWithPendingJobsIsDestroyedPromptlyWithoutApply
 TEST_F(TextureJobQueueTest, destructionWaitsForTheLoadInProgress) {
 	queue->push("slow.png", record("slow"));
 	ASSERT_TRUE(gate.waitForArrivals(1));
+	auto const start = std::chrono::steady_clock::now();  // Read before the opener starts, so a stall here can't shorten the measured wait
 	std::thread opener([this] {
 		std::this_thread::sleep_for(50ms);
 		gate.open();
 	});
-	auto const start = std::chrono::steady_clock::now();
 	EXPECT_TRUE(destroysInTime(std::move(queue)));
 	opener.join();
 	EXPECT_GE(std::chrono::steady_clock::now() - start, 40ms);  // It couldn't return until the gate opened

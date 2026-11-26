@@ -2,7 +2,6 @@
 
 #include "graphic/glutil.hh"
 #include "image.hh"
-#include "texturejobqueue.hh"
 #include "graphic/window.hh"
 
 #include <cairo.h>
@@ -210,9 +209,10 @@ template <GLenum Type> void OpenGLTexture<Type>::drawCropped(Window& window, Dim
 void updateTextures();
 
 /// A RAII wrapper for texture loading worker thread. There must be exactly one (global) instance whenever any Textures exist.
+/// It must outlive every Texture created from a file: a Texture destroyed after it would dereference a null loader.
 class TextureLoader {
 public:
-	using Ticket = TextureJobQueue::Ticket;  ///< Identifies one load request; never reused, 0 means none
+	using Ticket = std::uint64_t;  ///< Identifies one load request; never reused, 0 means none
 	TextureLoader();
 	~TextureLoader();
 };

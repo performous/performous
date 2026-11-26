@@ -47,7 +47,9 @@ public:
 		std::lock_guard<std::mutex> l(m_mutex);
 		m_jobs.erase(ticket);
 	}
-	/// Run the apply function of every completed job on the calling thread, then forget those jobs
+	/// Run the apply function of every completed job on the calling thread, then forget those jobs.
+	/// The callbacks run with the mutex held, so a callback must not call push() or remove()
+	/// (e.g. by creating or destroying a Texture): that would deadlock.
 	void apply() {
 		std::lock_guard<std::mutex> l(m_mutex);
 		for (auto it = m_jobs.begin(); it != m_jobs.end();) {
