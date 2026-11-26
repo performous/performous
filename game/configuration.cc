@@ -27,6 +27,7 @@ public:
 
 private:
 	template <typename T> void updateNumeric(ConfigItem& item, xmlpp::Element& elem, unsigned mode); ///< Used internally for loading XML
+	template <typename T, typename V> V clampToRange(ConfigItem const& item, V value, unsigned mode) const; ///< Clamp a value from a config file to the schema range, if there is one
 	void verifyType(std::string const& t) const; ///< throws std::logic_error if t != type
 };
 
@@ -65,17 +66,22 @@ namespace {
 }
 
 template <typename T> void ConfigItemXMLLoader::updateNumeric(ConfigItem& item, xmlpp::Element& elem, unsigned mode) {
+	// Limits and display settings come only from the schema. writeConfig() never writes them, and
+	// reading them from a config file would let it widen the range, or give a min greater than max.
+	if (mode != 0)
+		return;
 	auto ns = elem.find("limits");
-	if (!ns.empty())
-		setLimits<T>(dynamic_cast<xmlpp::Element&>(*ns[0]), item);
-	else if (mode == 0)
+	if (ns.empty())
 		throw xmlpp::XMLError(elem, "child element limits missing");
-	ns = elem.find("ui");
+	auto& limits = dynamic_cast<xmlpp::Element&>(*ns[0]);
+	setLimits<T>(limits, item);
+	item.m_hasRange = limits.get_attribute("min") && limits.get_attribute("max");
+	if (item.m_hasRange && std::get<T>(item.m_min) > std::get<T>(item.m_max))
+		throw xmlpp::XMLError(limits, "min is greater than max");
 	// Default values
-	if (mode == 0) {
-		item.m_unit = {};
-		item.m_multiplier = static_cast<T>(1);
-	}
+	item.m_unit = {};
+	item.m_multiplier = static_cast<T>(1);
+	ns = elem.find("ui");
 	if (!ns.empty()) {
 		xmlpp::Element& e = dynamic_cast<xmlpp::Element&>(*ns[0]);
 		try {
@@ -94,6 +100,18 @@ template <typename T> void ConfigItemXMLLoader::updateNumeric(ConfigItem& item, 
 			throw xmlpp::XMLError(e, "attribute multiplier='" + m + "' value invalid");
 		}
 	}
+}
+
+template <typename T, typename V> V ConfigItemXMLLoader::clampToRange(ConfigItem const& item, V value, unsigned mode) const {
+	if (mode == 0 || !item.m_hasRange)
+		return value;
+	auto const min = static_cast<V>(std::get<T>(item.m_min));
+	auto const max = static_cast<V>(std::get<T>(item.m_max));
+	if (value >= min && value <= max)
+		return value;
+	auto const clamped = std::clamp(value, min, max);
+	SpdLogger::error(LogSystem::CONFIG, "Bad configuration item for \"{}\", {} is outside the range {} to {}, using {}", item.getName(), value, min, max, clamped);
+	return clamped;
 }
 
 void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, unsigned mode) {
@@ -127,13 +145,11 @@ void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, unsigne
 		}
 		else if (item.getType() == "int") {
 			const auto value_string = xmlpp::getAttribute(elem, "value");
-			if (!value_string.empty())
-				item.setValue(parseInt(value_string));
 			updateNumeric<int>(item, elem, mode);
+			if (!value_string.empty())
+				item.setValue(clampToRange<int>(item, parseInt(value_string), mode));
 		} else if (item.getType() == "uint") {
 			std::string value_string = xmlpp::getAttribute(elem, "value");
-			if (!value_string.empty())
-				item.setValue(static_cast<unsigned short>(parseInt(value_string)));
 			// Enum handling
 			if (mode == 0) {
 				auto n2 = elem.find("limits/enum");
@@ -148,9 +164,17 @@ void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, unsigne
 				}
 			}
 			updateNumeric<unsigned short>(item, elem, mode);
+			if (!value_string.empty()) {
+				// Clamp as int, so that a value too big for unsigned short does not wrap around first
+				const int value = clampToRange<unsigned short>(item, parseInt(value_string), mode);
+				if (value < 0 || value > std::numeric_limits<unsigned short>::max())
+					throw std::runtime_error("Invalid unsigned integer value '" + value_string + "'");
+				item.setValue(static_cast<unsigned short>(value));
+			}
 		}
 		else if (item.getType() == "float") {
 			std::string value_string = xmlpp::getAttribute(elem, "value");
+			updateNumeric<float>(item, elem, mode);
 			if (!value_string.empty()) {
 				float value = std::numeric_limits<float>::quiet_NaN();
 				try {
@@ -160,9 +184,8 @@ void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, unsigne
 				}
 				if (!std::isfinite(value))
 					throw std::runtime_error("Invalid float value '" + value_string + "'");
-				item.setValue(value);
+				item.setValue(clampToRange<float>(item, value, mode));
 			}
-			updateNumeric<float>(item, elem, mode);
 		}
 		else if (item.getType() == "string") {
 			item.setValue(getText(elem, "stringvalue"));
