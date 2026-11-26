@@ -148,6 +148,8 @@ set_property(CACHE BUILD_TESTS PROPERTY STRINGS AUTO ON OFF)
 
 
 if(BUILD_TESTS STREQUAL "AUTO" OR BUILD_TESTS STREQUAL "ON")
+	# Show what a failing test printed when running the test target (ninja test), as CI does
+	set(CMAKE_CTEST_ARGUMENTS --output-on-failure)
 	enable_testing()
 	add_subdirectory(testing)
 endif()
