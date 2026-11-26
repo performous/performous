@@ -19,6 +19,7 @@ set(SOURCE_FILES
 	"utiltest.cc"
 	"xmlsongparsertest.cc"
 	"imagetypetest.cc"
+	"texturejobqueuetest.cc"
 
 	"main.cc"
 	"printer.cc"
