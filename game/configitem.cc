@@ -38,20 +38,25 @@ ConfigItem::ConfigItem(OptionList opts)
 }
 
 ConfigItem& ConfigItem::incdec(int dir) {
+	// A step of 0 (e.g. game/theme before any themes are found) means the value cannot be stepped,
+	// and must not reach the divisions below.
 	if (m_type == "int") {
 		int& val = std::get<int>(m_value);
 		int step = std::get<int>(m_step);
+		if (step == 0) return *this;
 		val = clamp(((val + dir * step)/ step) * step, std::get<int>(m_min), std::get<int>(m_max));
 	} else if (m_type == "uint") {
 		unsigned short& val = std::get<unsigned short>(m_value);
 		int value = static_cast<int>(val);
 		int step = static_cast<int>(std::get<unsigned short>(m_step));
+		if (step == 0) return *this;
 		int min = static_cast<int>(std::get<unsigned short>(m_min));
 		int max = static_cast<int>(std::get<unsigned short>(m_max));
 		val = static_cast<unsigned short>(clamp(((value + dir * step) / step) * step, min, max));
 	} else if (m_type == "float") {
 		auto& val = std::get<float>(m_value);
 		auto step = std::get<float>(m_step);
+		if (step == 0.0f) return *this;
 		val = clamp(static_cast<float>(round((val + static_cast<float>(dir) * step) / step) * step), std::get<float>(m_min), std::get<float>(m_max));
 	} else if (m_type == "bool") {
 		bool& val = std::get<bool>(m_value);
