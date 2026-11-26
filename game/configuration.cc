@@ -89,6 +89,7 @@ template <typename T> void ConfigItemXMLLoader::updateNumeric(ConfigItem& item, 
 
 void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, unsigned mode) {
 	try {
+		bool fromBool = false;  // Saved as bool by an older version, now a uint enum (false = 0, true = 1)
 		if (mode == 0) {
 			item.setName(xmlpp::getAttribute(elem, "name"));
 			item.setType(xmlpp::getAttribute(elem, "type"));
@@ -103,6 +104,11 @@ void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, unsigne
 			if (item.getType() == "uint" && type == "int") {
 				type = "uint"; // Convert old config values.
 				SpdLogger::info(LogSystem::CONFIG, "Converting config value: {} to type uint.", xmlpp::getAttribute(elem, "name"));
+			}
+			else if (item.getType() == "uint" && type == "bool") {
+				type = "uint"; // Convert old config values.
+				fromBool = true;
+				SpdLogger::info(LogSystem::CONFIG, "Converting config value: {} from type bool to type uint.", xmlpp::getAttribute(elem, "name"));
 			}
 			if (!type.empty() && type != item.getType())
 				throw std::runtime_error("Entry type mismatch: " + xmlpp::getAttribute(elem, "name") + ": schema type = " + item.getType() + ", config type = " + type);
@@ -123,6 +129,14 @@ void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, unsigne
 			updateNumeric<int>(item, elem, mode);
 		} else if (item.getType() == "uint") {
 			std::string value_string = xmlpp::getAttribute(elem, "value");
+			if (fromBool) {
+				if (value_string == "true")
+					value_string = "1";
+				else if (value_string == "false")
+					value_string = "0";
+				else
+					throw std::runtime_error("Invalid boolean value '" + value_string + "'");
+			}
 			if (!value_string.empty())
 				item.setValue(static_cast<unsigned short>(std::stoi(value_string)));
 			// Enum handling

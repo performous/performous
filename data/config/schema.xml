@@ -422,9 +422,14 @@ to save the current settings to XML.
 		<short>Missed note volume (Expert)</short>
 		<long>Track volume level after missing a note on Expert difficulty for instruments.</long>
 	</entry>
-	<entry name="audio/pass-through" type="bool" value="false">
+	<entry name="audio/pass-through" type="uint" value="0">
+		<limits>
+			<enum>Off</enum>
+			<enum>On</enum>
+			<enum>Singing Only</enum>
+		</limits>
 		<short>Microphone pass-through</short>
-		<long>Send captured singing voice to speakers.</long>
+		<long>Send captured singing voice to speakers. Singing Only: just during a song or on the practice screen, not in menus or on the score screen.</long>
 	</entry>
 	<entry name="audio/pass-through_ratio" type="float" value="2.0">
 		<ui unit=" x" />

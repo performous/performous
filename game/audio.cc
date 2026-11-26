@@ -352,6 +352,7 @@ struct Output {
 	std::unordered_map<std::string, std::unique_ptr<Sample>> samples;
 	std::vector<Command> commands;
 	std::atomic<bool> paused{ false };
+	std::atomic<bool> singing{ false };  // A song is being sung or practiced (for audio/pass-through "Singing Only")
 	Output(): paused(false) {}
 
 	void callbackUpdate() {
@@ -399,8 +400,9 @@ struct Output {
 			}
 			else { ++i; }
 		}
-		// Mix in microphones (if pass-through is enabled)
-		if (mics.size() > 0 && config["audio/pass-through"].b()) {
+		// Mix in microphones (if pass-through is on, or limited to singing and a song is being sung)
+		auto const passThrough = static_cast<PassThroughMode>(config["audio/pass-through"].ui());
+		if (mics.size() > 0 && (passThrough == PassThroughMode::On || (passThrough == PassThroughMode::SingingOnly && singing))) {
 			// Decrease music volume
 			float amp = 1.0f / config["audio/pass-through_ratio"].f();
 			if (amp != 1.0f) 
@@ -722,6 +724,7 @@ void Audio::seekPos(double pos) {
 
 void Audio::pause(bool state) { self->output.paused = state; }
 bool Audio::isPaused() const { return self->output.paused; }
+void Audio::setSinging(bool singing) { self->output.singing = singing; }
 
 void Audio::streamFade(std::string track, double fadeLevel) {
 	Output& o = self->output;

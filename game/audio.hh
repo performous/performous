@@ -73,6 +73,9 @@ struct Device {
 extern int getBackend();
 class ConfigItem;
 
+/** Values of the audio/pass-through option; must match the order of its enum in schema.xml **/
+enum class PassThroughMode : unsigned short { Off = 0, On = 1, SingingOnly = 2 };
+
 /** @short High level audio playback API **/
 class Audio {
 	friend int getBackend();
@@ -128,6 +131,8 @@ class Audio {
 	void togglePause() { pause(!isPaused()); }
 	void pause(bool state = true);
 	bool isPaused() const;
+	/** Tell whether a song is being sung or practiced, for the audio/pass-through "Singing Only" setting **/
+	void setSinging(bool singing);
 	/** Toggle synth playback **/
 	void toggleSynth(Notes const&);
 	/** Toggle center channel suppressor **/
