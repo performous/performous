@@ -432,6 +432,10 @@ to save the current settings to XML.
 		<short>Pass-through volume ratio</short>
 		<long>How much voice is amplified compared to the music.</long>
 	</entry>
+	<entry name="audio/pass-through_singing_only" type="bool" value="false">
+		<short>Pass-through only while singing</short>
+		<long>Only send captured singing voice to speakers during a song or on the practice screen, not in menus or on the score screen.</long>
+	</entry>
 	<entry name="audio/suppress_center_channel" type="bool" value="false">
 		<short>Suppress center channel</short>
 		<long>Suppress audio of center channel (e.g. vocals).</long>

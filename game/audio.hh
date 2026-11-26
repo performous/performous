@@ -128,6 +128,8 @@ class Audio {
 	void togglePause() { pause(!isPaused()); }
 	void pause(bool state = true);
 	bool isPaused() const;
+	/** Tell whether a song is being sung or practiced, for the audio/pass-through_singing_only option **/
+	void setSinging(bool singing);
 	/** Toggle synth playback **/
 	void toggleSynth(Notes const&);
 	/** Toggle center channel suppressor **/

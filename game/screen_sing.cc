@@ -156,6 +156,7 @@ void ScreenSing::setupVocals() {
 		if (vocalTrack.ui() != m_selectedVocal) { sameVoice = false; break; }
 	}
 	m_singingDuet = (m_song->hasDuet() && m_duet.ui() == 0 && players() > 1 && sameVoice != true);
+	m_audio.setSinging(true);
 	m_audio.pause(false);
 }
 
@@ -206,6 +207,7 @@ void ScreenSing::exit() {
 	m_song->dropNotes();
 	m_menuTheme.reset();
 	theme.reset();
+	m_audio.setSinging(false);
 	m_audio.fadeout(getGame(), 0);
 	if (m_audio.isPaused()) m_audio.togglePause();
 	getGame().showLogo();
@@ -396,6 +398,7 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 		// Open score dialog early
 		if (status == Song::Status::FINISHED) {
 			if (m_engine) m_engine->kill(); // Kill the engine thread
+			m_audio.setSinging(false);
 			m_score_window = std::make_unique<ScoreWindow>(getGame(), m_instruments, m_database); // Song finished, but no score window -> show it
 		}
 		// Skip instrumental breaks
@@ -673,6 +676,7 @@ void ScreenSing::draw() {
 			// Time to create the score window
 			m_quitTimer.setValue(config["game/results_timeout"].ui());
 			if (m_engine) m_engine->kill(); // kill the engine thread (to avoid consuming memory)
+			m_audio.setSinging(false);
 			m_score_window = std::make_unique<ScoreWindow>(getGame(), m_instruments, m_database);
 		}
 	}

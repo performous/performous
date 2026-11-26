@@ -28,6 +28,7 @@ void ScreenPractice::enter() {
 	//m_samples.push_back("drum tom2");
 	reloadGL();
 	getGame().controllers.enableEvents(true);
+	m_audio.setSinging(true);
 }
 
 void ScreenPractice::reloadGL() {
@@ -35,6 +36,7 @@ void ScreenPractice::reloadGL() {
 }
 
 void ScreenPractice::exit() {
+	m_audio.setSinging(false);
 	getGame().controllers.enableEvents(false);
 	m_vumeters.clear();
 	m_samples.clear();
