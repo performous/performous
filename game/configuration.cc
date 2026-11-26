@@ -53,6 +53,15 @@ namespace {
 	template <typename T> void setLimits(xmlpp::Element& e, ConfigItem& item) {
 		setLimits<T>(e, item.m_min, item.m_max, item.m_step);
 	}
+
+	int parseInt(std::string const& value_string) {
+		try {
+			return std::stoi(value_string);
+		}
+		catch (std::exception&) {
+			throw std::runtime_error("Invalid integer value '" + value_string + "'");
+		}
+	}
 }
 
 template <typename T> void ConfigItemXMLLoader::updateNumeric(ConfigItem& item, xmlpp::Element& elem, unsigned mode) {
@@ -119,12 +128,12 @@ void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, unsigne
 		else if (item.getType() == "int") {
 			const auto value_string = xmlpp::getAttribute(elem, "value");
 			if (!value_string.empty())
-				item.setValue(std::stoi(value_string));
+				item.setValue(parseInt(value_string));
 			updateNumeric<int>(item, elem, mode);
 		} else if (item.getType() == "uint") {
 			std::string value_string = xmlpp::getAttribute(elem, "value");
 			if (!value_string.empty())
-				item.setValue(static_cast<unsigned short>(std::stoi(value_string)));
+				item.setValue(static_cast<unsigned short>(parseInt(value_string)));
 			// Enum handling
 			if (mode == 0) {
 				auto n2 = elem.find("limits/enum");
@@ -149,12 +158,9 @@ void ConfigItemXMLLoader::update(ConfigItem& item, xmlpp::Element& elem, unsigne
 				}
 				catch (std::exception&) {
 				}
-				if (std::isfinite(value))
-					item.setValue(value);
-				else if (mode == 0)
+				if (!std::isfinite(value))
 					throw std::runtime_error("Invalid float value '" + value_string + "'");
-				else
-					SpdLogger::warn(LogSystem::CONFIG, "Ignoring invalid value='{}' for entry={}.", value_string, xmlpp::getAttribute(elem, "name"));
+				item.setValue(value);
 			}
 			updateNumeric<float>(item, elem, mode);
 		}
@@ -378,7 +384,23 @@ void readConfigXML(fs::path const& file, unsigned mode) {
 					SpdLogger::warn(LogSystem::CONFIG, "Ignored entry={}; does not exist in config schema.", name);
 					continue;
 				}
-				ConfigItemXMLLoader().update(it->second, elem, mode);
+				// A bad entry in the system or user config is not fatal: log it and keep the default.
+				// reset() gives the system default for the user config, and the factory default for the
+				// system config, because update() only sets the default after a value parses.
+				std::string reason;
+				try {
+					ConfigItemXMLLoader().update(it->second, elem, mode);
+				}
+				catch (xmlpp::XMLError& e) {
+					reason = fmt::format("{}:{}: {}", file, e.elem.get_line(), e.message);
+				}
+				catch (std::exception& e) {
+					reason = fmt::format("{}:{}", file, e.what());
+				}
+				if (!reason.empty()) {
+					it->second.reset();
+					SpdLogger::error(LogSystem::CONFIG, "Bad configuration item for \"{}\", using default of {} ({})", name, it->second.getValue(), reason);
+				}
 			}
 		}
 	}
