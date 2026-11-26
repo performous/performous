@@ -206,6 +206,7 @@ void ScreenSing::exit() {
 	m_song->dropNotes();
 	m_menuTheme.reset();
 	theme.reset();
+	m_exitFadingOut = false;
 	m_audio.fadeout(getGame(), 0);
 	if (m_audio.isPaused()) m_audio.togglePause();
 	getGame().showLogo();
@@ -318,7 +319,13 @@ void ScreenSing::manageEvent(input::NavEvent const& event) {
 	Song::Status status = m_song->status(time, this);
 	// When score window is displayed
 	if (m_score_window.get()) {
-		if (nav == input::NavButton::START || nav == input::NavButton::CANCEL) activateNextScreen();
+		if (nav == input::NavButton::START || nav == input::NavButton::CANCEL) {
+			// Fade the outro out before leaving; a second press during the fade leaves immediately
+			if (!m_exitFadingOut && m_audio.isPlaying() && !m_audio.isPaused()) {
+				m_audio.fadeoutCurrent();
+				m_exitFadingOut = true;
+			} else activateNextScreen();
+		}
 		return;  // The rest are only available when score window is not displayed
 	}
 	// Instant quit with CANCEL at the very beginning
@@ -661,10 +668,15 @@ void ScreenSing::draw() {
 	} else {
 		if (m_score_window.get()) {
 			// Score window has been created (we are near the end)
+			if (m_exitFadingOut && !m_audio.isPlaying()) { activateNextScreen(); return; }  // Exit fade finished
 			if (m_score_window->empty()) {  // No players to display scores for
 				if (!m_audio.isPlaying()) { activateNextScreen(); return; }
 			} else {  // Window being displayed
-				if (m_quitTimer.get() == 0.0 && !m_audio.isPaused()) { activateNextScreen(); return; }
+				if (m_quitTimer.get() == 0.0 && !m_audio.isPaused() && !m_exitFadingOut) {
+					// Results timeout: fade the outro out too, then leave once the fade finishes (handled above)
+					if (m_audio.isPlaying()) { m_audio.fadeoutCurrent(); m_exitFadingOut = true; }
+					else { activateNextScreen(); return; }
+				}
 				m_score_window->draw();
 			}
 		}

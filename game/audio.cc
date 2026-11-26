@@ -335,7 +335,7 @@ struct Synth {
 };
 
 struct Command {
-	enum class Type { TRACK_FADE, TRACK_PITCHBEND, SAMPLE_RESET } type;
+	enum class Type { TRACK_FADE, TRACK_PITCHBEND, SAMPLE_RESET, MUSIC_FADEOUT } type;
 	std::string track;
 	double factor;
 };
@@ -371,6 +371,9 @@ struct Output {
 				break;
 			case Command::Type::TRACK_PITCHBEND:
 				if (!playing.empty()) playing[0]->trackPitchBend(cmd.track, cmd.factor);
+				break;
+			case Command::Type::MUSIC_FADEOUT:
+				if (!playing.empty()) playing[0]->fadeRate = -cmd.factor;
 				break;
 			case Command::Type::SAMPLE_RESET:
 				auto it = samples.find(cmd.track);
@@ -686,6 +689,13 @@ void Audio::fadeout(Game& game, double fadeTime) {
 		std::lock_guard<std::mutex> l(o.synth_mutex);
 		o.synth.reset();
 	}
+}
+
+void Audio::fadeoutCurrent(double fadeTime) {
+	Output& o = self->output;
+	std::lock_guard<std::mutex> l(o.mutex);
+	Command cmd = { Command::Type::MUSIC_FADEOUT, "", 1.0 / getSR() / fadeTime };
+	o.commands.push_back(cmd);
 }
 
 double Audio::getPosition() const {
