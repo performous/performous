@@ -56,18 +56,19 @@ void load(Bitmap& bitmap, fs::path const& name) {
 		SpdLogger::error(LogSystem::IMAGE, "Error loading texture, exception={}", e.what());
 	}
 }
+
+/// The one loader, created and destroyed by TextureLoader. Only used in this file.
+std::unique_ptr<TextureJobQueue> gTextureLoader = nullptr;
 }  // namespace
 
-std::unique_ptr<TextureJobQueue> ldr = nullptr;
-
 TextureLoader::TextureLoader() {
-	if (ldr) throw std::logic_error("Texture Loader initialized twice. There can be only one.");
-	ldr = std::make_unique<TextureJobQueue>(load);
+	if (gTextureLoader) throw std::logic_error("Texture Loader initialized twice. There can be only one.");
+	gTextureLoader = std::make_unique<TextureJobQueue>(load);
 }
 
-TextureLoader::~TextureLoader() { ldr.reset(); }
+TextureLoader::~TextureLoader() { gTextureLoader.reset(); }
 
-void updateTextures() { ldr->apply(); }
+void updateTextures() { gTextureLoader->apply(); }
 
 template <typename T> TextureLoader::Ticket loader(T* target, fs::path const& name) {
 	// Temporarily add 1x1 pixel black texture
@@ -77,11 +78,11 @@ template <typename T> TextureLoader::Ticket loader(T* target, fs::path const& na
 	target->load(bitmap);
 	// Ask the loader to retrieve the image. The callback only runs on the main thread, and ~Texture()
 	// removes the job first, so it never runs for a destroyed Texture.
-	return ldr->push(name, [target](Bitmap& bitmap){ target->load(bitmap); });
+	return gTextureLoader->push(name, [target](Bitmap& bitmap){ target->load(bitmap); });
 }
 
 Texture::Texture(fs::path const& filename) { m_loadTicket = loader(this, filename); }
-Texture::~Texture() { if (m_loadTicket) ldr->remove(m_loadTicket); }
+Texture::~Texture() { if (m_loadTicket) gTextureLoader->remove(m_loadTicket); }
 
 // Stuff for converting pix::Format into OpenGL enum values & other flags
 namespace {
