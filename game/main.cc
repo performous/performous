@@ -30,18 +30,17 @@
 #include <fmt/format.h>
 #include <SDL_keyboard.h>
 #include <SDL_scancode.h>
+#include <spdlog/spdlog.h>
 
 #include <cstdlib>
 #include <cstdint>
 #include <csignal>
+#include <exception>
 #include <iostream>
+#include <mutex>
 #include <string>
 #include <thread>
 #include <vector>
-
-// Disable main level exception handling for debug builds (because gdb cannot properly catch throwing otherwise)
-#define RUNTIME_ERROR std::runtime_error
-#define EXCEPTION std::exception
 
 bool g_take_screenshot = false;
 
@@ -159,7 +158,7 @@ void mainLoop(std::string const& songlist) {
 			try {
 				window.screenshot();
 				gm.flashMessage(_("Screenshot taken!"));
-			} catch (EXCEPTION& e) {
+			} catch (std::exception& e) {
 				SpdLogger::error(LogSystem::IMAGE, "Screenshot failed, exception={}", e.what());
 				gm.flashMessage(_("Screenshot failed!"));
 			}
@@ -196,7 +195,7 @@ void mainLoop(std::string const& songlist) {
 			gm.controllers.process(eventTime);
 			checkEvents(gm, eventTime);
 			if (benchmarking) prof("events");
-			} catch (RUNTIME_ERROR& e) {
+			} catch (std::runtime_error& e) {
 				SpdLogger::error(LogSystem::LOGGER, "Caught error, exception={}", e.what());
 				gm.flashMessage(std::string("ERROR: ") + e.what());
 		}
@@ -246,7 +245,7 @@ void jstestLoop() {
 			window.blank(); window.swap();
 			std::this_thread::sleep_for(10ms); // Max 100 FPS
 		}
-	} catch (EXCEPTION& e) {
+	} catch (std::exception& e) {
 		SpdLogger::error(LogSystem::CONTROLLERS, "Caught error, exception={}", e.what());
 	}
 	return;
@@ -261,18 +260,84 @@ template <typename Container> void confOverride(Container const& c, std::string 
 
 void outputOptionalFeatureStatus();
 
-static void fatalError(const std::string &msg) {
+// Fatal error handling: an error popup for users AND a full stack trace for developers.
+//
+// main() deliberately has no top-level try/catch. Catching an exception in main() means the
+// stack has already been unwound by the time we get to handle it: every frame between the
+// throw and main() is destroyed, so a debugger or core dump only shows main() and the
+// original location of the error is lost; all that survives is the e.what() string.
+//
+// Instead, this function is installed with std::set_terminate(). When an exception is thrown
+// and nothing catches it, the C++ runtime calls std::terminate() *at the throw site, without
+// unwinding the stack* (exceptions are two-phase: the runtime first searches for a matching
+// catch, and only unwinds once it has found one). So while this function runs, the frames
+// of the code that threw are still on the stack, underneath this handler. That lets us:
+//   1. get the exception message via std::current_exception() and log it,
+//   2. show the user the usual "FATAL ERROR, please report this" popup, and then
+//   3. call std::abort(). That raises SIGABRT with the original stack still in place, so
+//      gdb stops right there (`bt` shows the throwing function), a core dump has the full
+//      backtrace, and on Windows the crash dump / JIT debugger sees the real crash site.
+//
+// This also covers fatal errors that a try/catch in main() never could: exceptions escaping
+// from other threads (songs loader, backgrounds, webcam, webserver...), exceptions thrown
+// through noexcept functions, and std::terminate() called directly.
+//
+// Exceptions that the game can recover from must still be caught where they happen (see the
+// per-frame catch in mainLoop()). Note that a try/catch in between, even one that rethrows
+// with `throw;`, unwinds the stack up to that point, so this only preserves the stack for
+// exceptions that nothing catches.
+[[noreturn]] static void fatalErrorHandler() {
+	// Guard against recursion (if anything below throws, std::terminate() is called again on
+	// this thread) and against several threads failing at once (the others wait here until
+	// the first one aborts the process, so only one popup is shown).
+	static std::mutex fatalErrorMutex;
+	thread_local bool insideHandler = false;
+	if (insideHandler) std::abort();
+	insideHandler = true;
+	std::lock_guard<std::mutex> lock(fatalErrorMutex);
+
+	// Rethrowing and catching here only handles a copy of the exception inside this handler.
+	// The stack frames of the original throw are left as they are.
+	std::string msg = "std::terminate() was called without an active exception.";
+	if (std::exception_ptr eptr = std::current_exception()) {
+		try {
+			std::rethrow_exception(eptr);
+		} catch (std::exception const& e) {
+			msg = e.what();
+		} catch (...) {
+			msg = "Unknown exception (not derived from std::exception).";
+		}
+	}
+
+	// Log first, and flush, before showing the popup: the popup blocks until the user closes
+	// it, and std::abort() skips destructors (including ~SpdLogger, which would normally flush
+	// the asynchronous logger), so without this the log could miss the very error it is about.
+	if (SpdLogger::initialized()) {
+		SpdLogger::error(LogSystem::LOGGER, "Fatal error, exception={}", msg);
+		SpdLogger::notice(LogSystem::LOGGER, "More details might be available in {}", PathCache::getLogFilename().u8string());
+		// The loggers are asynchronous: flush() only queues a flush request behind the pending
+		// messages, and shutdown() waits for that queue to be processed. Both are needed: the
+		// file sink is a buffered FILE*, which std::abort() will not flush for us.
+		spdlog::default_logger()->flush();
+		spdlog::shutdown();
+	} else {
+		std::cerr << "FATAL ERROR: " << msg << std::endl;
+	}
+
 	auto errorMsg = fmt::format(
 	"{}"
 	"\nIf you think this is a bug in Performous, please report it at \n"
 	"  https://github.com/performous/performous/issues"
 	, msg);
-	auto title = "FATAL ERROR";
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, errorMsg.c_str(), nullptr);
-	SpdLogger::error(LogSystem::LOGGER, msg);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "FATAL ERROR", errorMsg.c_str(), nullptr);
+
+	std::abort(); // Not exit(): abort keeps the stack intact for the debugger / core dump.
 }
 
 int main(int argc, char** argv) {
+	// Installed first so that it covers everything below. See fatalErrorHandler() for why we
+	// use this instead of wrapping main() in a try/catch.
+	std::set_terminate(fatalErrorHandler);
 	std::srand(static_cast<unsigned>(std::time(nullptr)));
 	// Parse commandline options
 	std::vector<std::string> devices;
@@ -312,7 +377,7 @@ int main(int argc, char** argv) {
 		std::cout << cmdline << "\n  Any arguments without a switch are interpreted as song folders.\n" << std::endl;
 		return EXIT_SUCCESS;
 	}
-	catch (EXCEPTION& e) {
+	catch (std::exception& e) {
 		std::cerr << "Error parsing program options. Exception=" << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
@@ -335,47 +400,42 @@ int main(int argc, char** argv) {
 	PathCache::pathBootstrap();
 	SpdLogger spdLogger(levelEnum);
 	Platform platform;
-	try {
-		outputOptionalFeatureStatus();
+	// No try/catch here on purpose: uncaught exceptions go to fatalErrorHandler().
+	outputOptionalFeatureStatus();
 
-		readConfig();
-		SpdLogger::toggleProfilerLogger();
+	readConfig();
+	SpdLogger::toggleProfilerLogger();
 
-		if (vm.count("audiohelp")) {
-			SpdLogger::notice(LogSystem::LOGGER, "Starting the audio subsystem for audiohelp (errors printed on console may be ignored).");
-			Audio audio;
-			// Print the devices
-			std::cout << portaudio::AudioBackends().dump();
-			// Some examples
-			std::cout << "Example --audio parameters" << std::endl;
-			std::cout << "  --audio \"out=2\"         # Pick first working two-channel playback device" << std::endl;
-			std::cout << "  --audio \"dev=1 out=2\"   # Pick device id 1 and assign stereo playback" << std::endl;
-			std::cout << "  --audio 'dev=\"HDA Intel\" mics=blue,red'   # HDA Intel with two mics" << std::endl;
-			std::cout << "  --audio 'dev=pulse out=2 mics=blue'       # PulseAudio with input and output" << std::endl;
-			return EXIT_SUCCESS;
-		}
-		// Override XML config for options that were specified from commandline or performous.conf
-		confOverride(songdirs, "paths/songs");
-		confOverride(devices, "audio/devices");
-		PathCache::getPaths(); // Initialize paths before other threads start
-		if (vm.count("jstest")) { // Joystick test program
-			SpdLogger::info(LogSystem::CONTROLLERS, 
-				"Starting jstest input test utility.\n"
-				"Joystick utility - Touch your joystick to see buttons here\n"
-				"Hit ESC (window focused) to quit"
-			);
-			jstestLoop();
-			SpdLogger::info(LogSystem::LOGGER, "Exiting normally.");
-			return EXIT_SUCCESS;
-		}
-		// Run the game init and main loop
-		mainLoop(songlist);
+	if (vm.count("audiohelp")) {
+		SpdLogger::notice(LogSystem::LOGGER, "Starting the audio subsystem for audiohelp (errors printed on console may be ignored).");
+		Audio audio;
+		// Print the devices
+		std::cout << portaudio::AudioBackends().dump();
+		// Some examples
+		std::cout << "Example --audio parameters" << std::endl;
+		std::cout << "  --audio \"out=2\"         # Pick first working two-channel playback device" << std::endl;
+		std::cout << "  --audio \"dev=1 out=2\"   # Pick device id 1 and assign stereo playback" << std::endl;
+		std::cout << "  --audio 'dev=\"HDA Intel\" mics=blue,red'   # HDA Intel with two mics" << std::endl;
+		std::cout << "  --audio 'dev=pulse out=2 mics=blue'       # PulseAudio with input and output" << std::endl;
+		return EXIT_SUCCESS;
+	}
+	// Override XML config for options that were specified from commandline or performous.conf
+	confOverride(songdirs, "paths/songs");
+	confOverride(devices, "audio/devices");
+	PathCache::getPaths(); // Initialize paths before other threads start
+	if (vm.count("jstest")) { // Joystick test program
+		SpdLogger::info(LogSystem::CONTROLLERS, 
+			"Starting jstest input test utility.\n"
+			"Joystick utility - Touch your joystick to see buttons here\n"
+			"Hit ESC (window focused) to quit"
+		);
+		jstestLoop();
 		SpdLogger::info(LogSystem::LOGGER, "Exiting normally.");
+		return EXIT_SUCCESS;
 	}
-	catch (EXCEPTION& e) {
-		fatalError(e.what());
-		return EXIT_FAILURE;
-	}
+	// Run the game init and main loop
+	mainLoop(songlist);
+	SpdLogger::info(LogSystem::LOGGER, "Exiting normally.");
 	return EXIT_SUCCESS; // Do not remove. SDL_Main (which this function is called on some platforms) needs return statement.
 }
 
