@@ -58,8 +58,22 @@ if(WIN32)
 	endforeach()
 	message(STATUS "Setting .exe version: ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_TWEAK}")
 
+	# Application manifest: sets the process code page to UTF-8 so narrow-string path conversions
+	# can't fail on characters outside the legacy code page (issue #1093).
+	set(PERFORMOUS_MANIFEST "${CMAKE_SOURCE_DIR}/win32/performous.manifest")
+	if(MINGW)
+		# MinGW has no manifest merging; embed it as the RT_MANIFEST (24) resource with ID 1.
+		set(PERFORMOUS_RC_MANIFEST "1 24 \"${PERFORMOUS_MANIFEST}\"")
+	else()
+		set(PERFORMOUS_RC_MANIFEST "")
+	endif()
+
 	set(RESOURCE_FILES "${CMAKE_BINARY_DIR}/performous.rc")
 	configure_file("../win32/performous.cmake.rc" "${RESOURCE_FILES}")
+	if(MSVC)
+		# MSVC merges .manifest sources into the linker-generated manifest.
+		list(APPEND RESOURCE_FILES "${PERFORMOUS_MANIFEST}")
+	endif()
 
 	if(MINGW)
 		# According to MinGW tools, we need to compile the rc file, and then link it into projects:
@@ -83,6 +97,10 @@ set(SOURCES ${SOURCE_FILES} ${HEADER_FILES} ${RESOURCE_FILES})
 
 # Build main executable
 add_executable(performous ${SUBSYSTEM_WIN32} ${SOURCES})
+if(MSVC)
+	# Our manifest already carries trustInfo; stop the linker adding a second copy.
+	target_link_options(performous PRIVATE /MANIFESTUAC:NO)
+endif()
 # Libraries
 
 find_package(Boost 1.70 CONFIG REQUIRED COMPONENTS program_options iostreams locale)
