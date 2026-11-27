@@ -21,6 +21,10 @@ void Player::prepare() {
 	m_analyzer.process();
 }
 
+std::string const& Player::getId() const {
+	return m_analyzer.getId();
+}
+
 void Player::update() {
 	if (m_pos == m_pitch.size()) return; // End of song already
 	double beginTime = Engine::TIMESTEP * static_cast<double>(m_pos);
