@@ -78,7 +78,9 @@ void PathCache::pathBootstrap() {
 			if (!share.empty()) {
 				break; // Found
 			}
-			base = base.parent_path();
+			// The parent of the root folder is the root folder itself, so stop there: an empty base
+			// makes the next iteration throw.
+			base = (base == base.parent_path()) ? fs::path() : base.parent_path();
 		} while (true);
 		// Use locale .mo files from build folder?
 		if (Platform::currentOS() == Platform::HostOS::OS_WIN) {
